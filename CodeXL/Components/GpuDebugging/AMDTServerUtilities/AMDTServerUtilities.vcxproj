@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{2B9E1447-2564-4C11-943A-FD3674C47874}</ProjectGuid>
+    <RootNamespace>AMDTServerUtilities</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)\AMDTGpuDebugging.props" />
+    <Import Project="$(AMDTCommonAMD)\APPSDK\Global-OpenCL-NoLib.props" />
+  </ImportGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>_GR_SPIES_UTILITIES_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\suAllocatedObjectsMonitor.cpp" />
+    <ClCompile Include="src\suAPICallsHandlingThread.cpp" />
+    <ClCompile Include="src\suAPIConnector.cpp" />
+    <ClCompile Include="src\suAPIFunctionsImplementations.cpp" />
+    <ClCompile Include="src\suAPIFunctionsStubs.cpp" />
+    <ClCompile Include="src\suAPIMainLoop.cpp" />
+    <ClCompile Include="src\suBreakpointsManager.cpp">
+      <Optimization Condition="'$(Configuration)'=='Release'">Disabled</Optimization>
+    </ClCompile>
+    <ClCompile Include="src\suBufferReader.cpp" />
+    <ClCompile Include="src\suCallsHistoryLogger.cpp" />
+    <ClCompile Include="src\suCallsStatisticsLogger.cpp" />
+    <ClCompile Include="src\suContextMonitor.cpp" />
+    <ClCompile Include="src\suDebugLogInitializer.cpp" />
+    <ClCompile Include="src\suGlobalVariables.cpp" />
+    <ClCompile Include="src\suIKernelDebuggingManager.cpp" />
+    <ClCompile Include="src\suInterceptionFunctions.cpp" />
+    <ClCompile Include="src\suInteroperabilityHelper.cpp" />
+    <ClCompile Include="src\suITechnologyMonitor.cpp" />
+    <ClCompile Include="src\suMacOSXInterception.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\suMemoryAllocationMonitor.cpp" />
+    <ClCompile Include="src\suNullContextCallsHistoryLogger.cpp" />
+    <ClCompile Include="src\suSingletonsDelete.cpp" />
+    <ClCompile Include="src\suSlowMotionDelay.cpp">
+      <Optimization Condition="'$(Configuration)'=='Release'">Disabled</Optimization>
+    </ClCompile>
+    <ClCompile Include="src\suSpiesUtilitiesDLLInitializationFunctions.cpp" />
+    <ClCompile Include="src\suSpiesUtilitiesDLLMainFunc.cpp" />
+    <ClCompile Include="src\suSpiesUtilitiesModuleInitializer.cpp" />
+    <ClCompile Include="src\suSpiesUtilitiesModuleTerminator.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\suSpyAPIFunctions.cpp" />
+    <ClCompile Include="src\suSpyBreakpointImplementation.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\suSpyToAPIConnector.cpp" />
+    <ClCompile Include="src\suTechnologyMonitorsManager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\suIKernelDebuggingManager.h" />
+    <ClInclude Include="Include\suInteroperabilityHelper.h" />
+    <ClInclude Include="Include\suMemoryAllocationMonitor.h" />
+    <ClInclude Include="Include\suTechnologyMonitorsManager.h" />
+    <ClInclude Include="src\suAPICallsHandlingThread.h" />
+    <ClInclude Include="src\suAPIFunctionsImplementations.h" />
+    <ClInclude Include="src\suAPIFunctionsStubs.h" />
+    <ClInclude Include="Include\suBreakpointsManager.h" />
+    <ClInclude Include="src\suDebugLogInitializer.h" />
+    <ClInclude Include="src\suSingletonsDelete.h" />
+    <ClInclude Include="src\suSpiesUtilitiesDLLInitializationFunctions.h" />
+    <ClInclude Include="src\suSpiesUtilitiesModuleInitializer.h" />
+    <ClInclude Include="src\suSpyToAPIConnector.h" />
+    <ClInclude Include="Include\suAllocatedObjectsMonitor.h" />
+    <ClInclude Include="Include\suAPIConnector.h" />
+    <ClInclude Include="Include\suAPIMainLoop.h" />
+    <ClInclude Include="Include\suBufferReader.h" />
+    <ClInclude Include="Include\suCallsHistoryLogger.h" />
+    <ClInclude Include="Include\suCallsStatisticsLogger.h" />
+    <ClInclude Include="Include\suContextMonitor.h" />
+    <ClInclude Include="Include\suGlobalVariables.h" />
+    <ClInclude Include="Include\suInterceptionFunctions.h" />
+    <ClInclude Include="Include\suInterceptionMacros.h" />
+    <ClInclude Include="Include\suITechnologyMonitor.h" />
+    <ClInclude Include="Include\suNullContextCallsHistoryLogger.h" />
+    <ClInclude Include="Include\suSlowMotionDelay.h" />
+    <ClInclude Include="Include\suSpiesUtilitiesDLLBuild.h" />
+    <ClInclude Include="Include\suSpyAPIFunctions.h" />
+    <ClInclude Include="Include\suSpyBreakpointImplementation.h" />
+    <ClInclude Include="Include\suStringConstants.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuildStep Include="Sconstruct">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </CustomBuildStep>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\..\Common\Src\VersionInfo\VersionResource.rc">
+    </ResourceCompile>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

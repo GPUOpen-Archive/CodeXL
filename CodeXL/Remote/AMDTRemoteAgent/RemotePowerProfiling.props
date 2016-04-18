@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <PowerProfilingBackendDir>$(SolutionDir)\..\Components\PowerProfiling\Backend</PowerProfilingBackendDir>
+    <CommonProjectsDir>$(SolutionDir)\..\..\Common\Src/</CommonProjectsDir>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(PowerProfilingBackendDir)\AMDTPowerProfileAPI\inc;$(CommonProjectsDir)\AMDTCommonHeaders;$(PowerProfilingBackendDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>CXLPowerProfileAPI$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="PowerProfilingBackendDir">
+      <Value>$(PowerProfilingBackendDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CommonProjectsDir">
+      <Value>$(CommonProjectsDir)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

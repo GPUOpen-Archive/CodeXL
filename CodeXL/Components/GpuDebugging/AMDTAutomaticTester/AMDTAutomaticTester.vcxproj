@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{770F5861-61F6-48DE-9BEC-2CF6733CD470}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>CodeXLGpuDebuggingTest</RootNamespace>
+    <ProjectName>CodeXLGpuDebuggingTest</ProjectName>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)\AMDTGpuDebugging.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(AMDTCommonAMD)\APPSDK\Global-OpenCL-NoLib.props" />
+    <Import Project="$(AMDTCommonEXT)\tinyxml\Global-TinyXML-2015.props" />
+  </ImportGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PreprocessorDefinitions>;_CONSOLE;_VARIADIC_MAX=10;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\inc;.;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);$(AMDTCommonExt)\GoogleTest\1-7\include\</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <AdditionalLibraryDirectories>$(AMDTCommonExt)\GoogleTest\1-7\lib\VS2015\MD\x86\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>CXLApiFunctions$(GDTProjectSuffix).lib;gtest$(GDTDebugSuffixNoDash).lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\atEventObserver.cpp" />
+    <ClCompile Include="src\atGpuDebuggingTest.cpp" />
+    <ClCompile Include="src\atInitializeInfrastructureCommand.cpp" />
+    <ClCompile Include="src\atKernelDebuggingStepTest.cpp" />
+    <ClCompile Include="src\atLoadTestsCommand.cpp" />
+    <ClCompile Include="src\atMainFunction.cpp" />
+    <ClCompile Include="src\atPrintableTestData.cpp" />
+    <ClCompile Include="src\atTestsDataVector.cpp" />
+    <ClCompile Include="src\atTestsLogCommand.cpp" />
+    <ClCompile Include="src\atUtils.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\atEventObserver.h" />
+    <ClInclude Include="inc\atGpuDebuggingTest.h" />
+    <ClInclude Include="inc\atInitializeInfrastructureCommand.h" />
+    <ClInclude Include="inc\atKernelDebuggingStepTest.h" />
+    <ClInclude Include="inc\atLoadTestsCommand.h" />
+    <ClInclude Include="inc\atPrintableTestData.h" />
+    <ClInclude Include="inc\atStringConstants.h" />
+    <ClInclude Include="inc\atTestData.h" />
+    <ClInclude Include="inc\atTestsDataVector.h" />
+    <ClInclude Include="inc\atTestsLogCommand.h" />
+    <ClInclude Include="inc\atUtils.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

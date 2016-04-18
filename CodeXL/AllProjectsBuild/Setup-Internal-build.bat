@@ -1,0 +1,2 @@
+set GDT_BUILD=GDT_INTERNAL
+set GDT_BUILD_SUFFIX=-internal

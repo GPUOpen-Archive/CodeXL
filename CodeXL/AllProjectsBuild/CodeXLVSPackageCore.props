@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="AMDTProjects">
+    <Import Project="$(SolutionDir)\CodeXLVSPackageBase.props" />
+  </ImportGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;..;$(AMDTCpuProfilingDir)AMDTCpuProfiling;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <VSCTCompile>
+      <AdditionalIncludeDirectories>.;..;$(AMDTCpuProfilingDir)AMDTCpuProfiling;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </VSCTCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>.;..;$(AMDTCpuProfilingDir)AMDTCpuProfiling;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Lib>
+      <AdditionalLibraryDirectories>$(AMDTOutputDir)\$(Configuration)\arch\;$(AMDTGpuDebuggingLibsDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+    <Link>
+      <AdditionalDependencies>CXLSharedProfiling$(GDTProjectSuffix).lib;CXLCpuProfiling$(GDTProjectSuffix).lib;CXLGpuProfiling$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+</Project>

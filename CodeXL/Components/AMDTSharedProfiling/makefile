@@ -1,0 +1,189 @@
+#MAKE FILE FOR AMDTSharedProfiling
+
+# platform specific
+PLATFORM_DIR = x86_64
+FRAMEWORK_PLATFORM_DIR=x64
+LIB_NAME = libAMDTSharedProfiling.so
+PLATFORM_CFLAG =
+PLATFORM_LINKFLAG =
+LINKFLAGS = -shared -Wl,-z,defs $(PLATFORM_LINKFLAG)
+PLATFORM =
+OBJ_DIR = OBJx64
+BUILD_DEF = -DGDT_BUILD_SUFFIX=
+QT_BUILD_DIR_PLATFORM=x86_64/release
+
+# shared
+LIB_DIR = $(OBJ_DIR)/lib
+PUBLIC_H_INSTALL_DIR = $(OBJ_DIR)/include
+TARGET = $(LIB_DIR)/$(LIB_NAME)
+CC = g++
+OPTIMIZE = -O3 -DNDEBUG
+DEFINES = -D_LINUX -DGDT_BUILD_SUFFIX="" -D__WXGTK__ -DwxUSE_GUI -D_LARGFILES -D_FILE_OFFSET_BITS=64
+SRC_DIR = ./src
+INC_DIR = ./inc
+COMMON_DIR = ../../Common
+TSINGLETON_INCLUDE_DIR=$(COMMON_DIR)/Src/TSingleton
+QT_BUILD_DIR= $(COMMON_DIR)/Lib/Ext/Qt/4.7.4/Build/CentOS6.2
+QT_BIN_DIR=$(QT_BUILD_DIR)/$(QT_BUILD_DIR_PLATFORM)/bin
+QT_INCLUDE_DIR=$(QT_BUILD_DIR)/$(QT_BUILD_DIR_PLATFORM)/include
+QT_LIB_DIR = $(QT_BUILD_DIR)/$(QT_BUILD_DIR_PLATFORM)/lib
+WX_BUILD_DIR=$(COMMON_DIR)/Lib/Ext/wxWidgets/2.9.2/Build/CentOS6.2
+WX_INCLUDE_DIR=$(WX_BUILD_DIR)/$(QT_BUILD_DIR_PLATFORM)/include/wx-2.9
+WX_LIB_DIR = $(WX_BUILD_DIR)/$(QT_BUILD_DIR_PLATFORM)/lib
+WX_GTK_INCLUDE_DIR=$(WX_LIB_DIR)/wx/include/gtk2-unicode-2.9
+AMDTBASETOOLSDIR=$(COMMON_DIR)/Lib/AMD/AMDTBaseTools/1.0
+AMDTBASETOOLS_INCLUDE_DIR=$(AMDTBASETOOLSDIR)/Include
+AMDTBASETOOLS_LIB_DIR=$(AMDTBASETOOLSDIR)/Lib/$(FRAMEWORK_PLATFORM_DIR)
+AMDTOSWRAPPERSDIR=$(COMMON_DIR)/Lib/AMD/AMDTOSWrappers/1.0
+AMDTOSWRAPPERS_INCLUDE_DIR=$(AMDTOSWRAPPERSDIR)/Include
+AMDTOSWRAPPERS_LIB_DIR=$(AMDTOSWRAPPERSDIR)/Lib/$(FRAMEWORK_PLATFORM_DIR)
+AMDTAPICLASSESDIR=$(COMMON_DIR)/Lib/AMD/AMDTAPIClasses/1.0
+AMDTAPICLASSES_INCLUDE_DIR=$(AMDTAPICLASSESDIR)/Include
+AMDTAPICLASSES_LIB_DIR=$(AMDTAPICLASSESDIR)/Lib/$(FRAMEWORK_PLATFORM_DIR)
+AMDTAPPCOMPONENTSDIR=$(COMMON_DIR)/Lib/AMD/AMDTApplicationComponents/1.0
+AMDTAPPCOMPONENTS_INCLUDE_DIR=$(AMDTAPPCOMPONENTSDIR)/Include
+AMDTAPPCOMPONENTS_LIB_DIR=$(AMDTAPPCOMPONENTSDIR)/Lib/$(FRAMEWORK_PLATFORM_DIR)
+AMDTAPPFRAMEWORKDIR=$(COMMON_DIR)/Lib/AMD/AMDTApplicationFramework/2.0
+AMDTAPPFRAMEWORK_INCLUDE_DIR=$(AMDTAPPFRAMEWORKDIR)/Include
+AMDTAPPFRAMEWORK_LIB_DIR=$(AMDTAPPFRAMEWORKDIR)/Lib/$(FRAMEWORK_PLATFORM_DIR)
+LIBS = -lrt -ldl -lpthread $(QT_LIBS) $(WX_LIBS) $(FRAMEWORK_LIBS)
+QT_LIBS = -lQtCoreAmdDt474 -lQtGuiAmdDt474
+SHARED_CFLAGS = -fPIC -Wall -Wno-unknown-pragmas $(PLATFORM_CFLAG)
+CFLAGS = $(OPTIMIZE) $(SHARED_CFLAGS) $(DEBUG_CFLAGS)
+DEBUG_CFLAGS =
+MOC = $(QT_BIN_DIR)/moc
+UIC = $(QT_BIN_DIR)/uic
+RCC = $(QT_BIN_DIR)/rcc
+MOC_OUTPUT_DIR = $(OBJ_DIR)/GeneratedFiles
+
+QT_LIBS = \
+-L$(QT_LIB_DIR) \
+-lQtCoreAmdDt474$(DEBUG_SUFFIX_NODASH) \
+-lQtGuiAmdDt474$(DEBUG_SUFFIX_NODASH)
+
+WX_LIBS = \
+-L$(WX_LIB_DIR) \
+-lwx_baseu-2.9 \
+-lwx_gtk2u_core-2.9 \
+-lwx_gtk2u_html-2.9 \
+-lwx_gtk2u_adv-2.9 \
+-lwx_gtk2u_aui-2.9 \
+-lwx_gtk2u_gl-2.9
+
+FRAMEWORK_LIBS = \
+-L$(AMDTBASETOOLS_LIB_DIR) \
+-lAMDTBaseTools$(DEBUG_SUFFIX_UNDERSCORE) \
+-L$(AMDTAPICLASSES_LIB_DIR) \
+-lAMDTAPIClasses$(DEBUG_SUFFIX_UNDERSCORE) \
+-L$(AMDTOSWRAPPERS_LIB_DIR) \
+-lAMDTOSWrappers$(DEBUG_SUFFIX_UNDERSCORE) \
+-L$(AMDTAPPCOMPONENTS_LIB_DIR) \
+-lAMDTApplicationComponents$(DEBUG_SUFFIX_UNDERSCORE) \
+-L$(AMDTAPPFRAMEWORK_LIB_DIR) \
+-lAMDTApplicationFramework$(DEBUG_SUFFIX_UNDERSCORE)
+
+INCLUDES = \
+-I. \
+-I$(INC_DIR) \
+-I$(TSINGLETON_INCLUDE_DIR) \
+-I$(QT_INCLUDE_DIR) \
+-I$(QT_INCLUDE_DIR)/QtCore \
+-I$(QT_INCLUDE_DIR)/QtGui \
+-I$(WX_INCLUDE_DIR) \
+-I$(WX_GTK_INCLUDE_DIR) \
+-I$(AMDTBASETOOLS_INCLUDE_DIR) \
+-I$(AMDTAPICLASSES_INCLUDE_DIR) \
+-I$(AMDTOSWRAPPERS_INCLUDE_DIR) \
+-I$(AMDTAPPCOMPONENTS_INCLUDE_DIR) \
+-I$(AMDTAPPFRAMEWORK_INCLUDE_DIR)
+
+MOCFILES =	\
+		./$(MOC_OUTPUT_DIR)/moc_SharedProfileManager.cpp \
+		./$(MOC_OUTPUT_DIR)/moc_SessionExplorerViewCreator.cpp \
+		./$(MOC_OUTPUT_DIR)/moc_SessionExplorerWindow.cpp \
+		./$(MOC_OUTPUT_DIR)/moc_SessionTree.cpp
+
+OBJS =	\
+	./$(OBJ_DIR)/AMDTSharedProfiling.o \
+	./$(OBJ_DIR)/GeneralTreeNode.o \
+	./$(OBJ_DIR)/SessionExplorerViewCreator.o \
+	./$(OBJ_DIR)/SessionExplorerWindow.o \
+	./$(OBJ_DIR)/SessionTree.o \
+	./$(OBJ_DIR)/SessionTreeNode.o \
+	./$(OBJ_DIR)/SharedMenuActions.o \
+	./$(OBJ_DIR)/SharedProfileManager.o \
+	./$(OBJ_DIR)/SessionNamingHelper.o \
+	./$(OBJ_DIR)/moc_SharedProfileManager.o \
+	./$(OBJ_DIR)/moc_SessionExplorerViewCreator.o \
+	./$(OBJ_DIR)/moc_SessionExplorerWindow.o \
+	./$(OBJ_DIR)/moc_SessionTree.o
+
+# Public .h files which need to be installed into the promotion tree
+PUBLIC_H = \
+	inc/GeneralTreeNode.h \
+	inc/SessionExplorerViewCreator.h \
+	inc/SessionTreeNode.h \
+	inc/LibExport.h \
+	inc/SessionExplorerWindow.h \
+	inc/SharedProfileManager.h \
+	inc/SessionExplorerDefs.h \
+	inc/SessionTree.h \
+	inc/SharedProfileViewWrapper.h \
+	inc/SessionNamingHelper.h
+
+
+$(TARGET) : $(MOCFILES) $(UIFILES) $(RCCFILES) $(OBJS) dirsetup
+	$(CC) $(LINKFLAGS) $(OBJS) $(LIBS) -o $(TARGET) $(ELF_LIB)
+
+DEBUG:
+	$(MAKE) "LIB_NAME = libAMDTSharedProfiling_d.so" "DEBUG_CFLAGS = -g -O0 -D_DEBUG -D__WXDEBUG__" "OPTIMIZE = " "RELEASE_LIBS = $(DEBUG_LIBS)" "OBJ_DIR = OBJx64DEBUG" "QT_BUILD_DIR_PLATFORM = x86_64/debug" "DEBUG_SUFFIX_NODASH = d" "DEBUG_SUFFIX_UNDERSCORE = _d"
+	cp $(PUBLIC_H) $(PUBLIC_H_INSTALL_DIR)
+
+x86DEBUG:
+	$(MAKE) "LIB_NAME = libAMDTSharedProfiling_d.so" "PLATFORM_DIR = x86" "FRAMEWORK_PLATFORM_DIR = x86" "PLATFORM_CFLAG = -m32" "DEBUG_CFLAGS = -g -O0 -D_DEBUG -D__WXDEBUG__" "PLATFORM_LINKFLAG = -m32" "PLATFORM = -DX86" "OPTIMIZE = " "RELEASE_LIBS = $(DEBUG_LIBS)" "OBJ_DIR = OBJx86DEBUG" "QT_BUILD_DIR_PLATFORM = x86/debug" "DEBUG_SUFFIX_NODASH = d" "DEBUG_SUFFIX_UNDERSCORE = _d"
+	cp $(PUBLIC_H) $(PUBLIC_H_INSTALL_DIR)
+
+x86:
+	$(MAKE) "PLATFORM_DIR = x86" "FRAMEWORK_PLATFORM_DIR = x86" "PLATFORM_CFLAG = -m32" "PLATFORM_LINKFLAG = -m32" "PLATFORM = -DX86" "OBJ_DIR = OBJx86" "QT_BUILD_DIR_PLATFORM = x86/release"
+	cp $(PUBLIC_H) $(PUBLIC_H_INSTALL_DIR)
+
+all:
+	mkdir -p $(OBJ_DIR) $(MOC_OUTPUT_DIR) $(LIB_DIR) $(PUBLIC_H_INSTALL_DIR)
+	$(MAKE)
+	cp $(PUBLIC_H) $(PUBLIC_H_INSTALL_DIR)
+	$(MAKE) x86
+	$(MAKE) DEBUG
+	$(MAKE) x86DEBUG
+
+dirsetup:
+	mkdir -p $(OBJ_DIR) $(MOC_OUTPUT_DIR) $(LIB_DIR) $(PUBLIC_H_INSTALL_DIR)
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp dirsetup
+	$(CC) $(CFLAGS) $(INCLUDES) $(DEFINES) $(BUILD_DEF) $(PLATFORM) -c $< -o $@
+
+$(OBJ_DIR)/%.o: $(MOC_OUTPUT_DIR)/%.cpp dirsetup
+	$(CC) $(CFLAGS) $(INCLUDES) $(DEFINES) $(BUILD_DEF) $(PLATFORM) -c $< -o $@
+
+./$(MOC_OUTPUT_DIR)/moc_%.cpp: $(INC_DIR)/%.h dirsetup
+	$(MOC) $(BUILD_DEF) $(DEFINES) -I. -I$(QT_INCLUDE_DIR) $< -o $@
+
+clean:
+	rm -f $(MOCFILES)
+	rm -f $(OBJS)
+
+cleandebug:
+	$(MAKE) clean "OBJ_DIR = OBJx64DEBUG"
+
+cleanx86:
+	$(MAKE) clean "OBJ_DIR = OBJx86"
+
+cleanx86debug:
+	$(MAKE) clean "OBJ_DIR = OBJx86DEBUG"
+
+cleanall:
+	$(MAKE) clean
+	$(MAKE) cleanx86
+	$(MAKE) cleandebug
+	$(MAKE) cleanx86debug
+
+# END OF MAKE FILE

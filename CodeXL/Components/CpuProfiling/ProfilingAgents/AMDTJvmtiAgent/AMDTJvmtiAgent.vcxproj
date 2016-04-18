@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{5417FBBE-B5BC-4665-B2C6-A989DD58E91E}</ProjectGuid>
+    <RootNamespace>AMDTJvmtiAgent</RootNamespace>
+    <JavaVersion>$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\SOFTWARE\JavaSoft\Java Development Kit', 'CurrentVersion', null, RegistryView.Registry64, RegistryView.Registry32))</JavaVersion>
+    <JDKRegPath>HKEY_LOCAL_MACHINE\SOFTWARE\JavaSoft\Java Development Kit\$(JavaVersion)</JDKRegPath>
+    <JDKHome>$([MSBuild]::GetRegistryValueFromView('$(JDKRegPath)', 'JavaHome', null, RegistryView.Registry64, RegistryView.Registry32))</JDKHome>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="CommonPropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(ProjectDir)\..\AMDTProfilingAgents.props" />
+    <Import Project="..\Agents-CommonProjects.props" />
+  </ImportGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>AMDT_PROFILINGAGENTSDATA_PRIVATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(JDKHome)\include;$(JDKHome)\include\win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\AMDTProfilingAgentsData\src\JclWriter.cpp" />
+    <ClCompile Include="..\AMDTProfilingAgentsData\src\Windows\PeJncWriter.cpp" />
+    <ClCompile Include="src\BytecodeToSource.cpp" />
+    <ClCompile Include="src\DllMain.cpp" />
+    <ClCompile Include="src\JvmtiProfileAgent.cpp" />
+    <ClCompile Include="src\Linux\JvmtiProfileAgent_Lin.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\Windows\JvmtiProfileAgent_Win.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="$(CommonProjectsDir)\VersionInfo\VersionResource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\BytecodeToSource.h" />
+    <ClInclude Include="inc\JvmtiProfileAgent.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

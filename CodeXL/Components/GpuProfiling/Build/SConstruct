@@ -1,0 +1,140 @@
+# 
+# CodeXL SConstruct Template
+#
+
+import os
+from CXL_init import *
+
+
+###################################################
+# Initialize CXL command line variables
+#
+# Note: DO NOT MODIFY THIS SECTION. Please see CXL_init.
+#
+CXL_vars = Variables(None)
+
+# Initial CXL_vars scons construction variables
+initCXLVars(CXL_vars)
+
+###################################################
+#
+# Additional SConstruct variables can be added here
+#
+# Note: * These variables can be configured from the commandline arguments.
+# 	* These will be included in the help "scons -h".
+# 	* Customizable
+
+# // Add more variables here
+
+###################################################
+# Initialize CXL_env 
+#
+# Note: DO NOT MODIFY THIS SECTION. Please see CXL_init.
+#
+CXL_env = Environment( 
+	variables = CXL_vars, 
+	ENV = {'PATH':os.environ['PATH']})
+
+# CXL build initialization
+initCXLBuild (CXL_env)
+
+###################################################
+# Initialize External library stuff
+# 
+# Note: * This section is customizable. 
+#
+initGtk (CXL_env)
+initTinyXml (CXL_env)
+if (CXL_env['CXL_arch'] != 'x86'):
+	initQt4 (CXL_env)
+
+
+###################################################
+# Specify Depe!h!,<Mouse>C!k!,
+#
+# Note: This section is customizable.
+#
+
+CXL_lib_common_amd_deps = (
+)
+
+initCommonLibAmd (CXL_env, CXL_lib_common_amd_deps)
+
+if (CXL_env['CXL_arch'] != 'x86'):
+	###################################################
+	# Any custom builders for this project
+	#
+	# UIC, MOC, RCC (for Qt)
+	# Custom ones are required because the default Qt ones are for Qt3, and
+	# there are no Qt4 ones which come with the scons rpm.
+	# rgorton note (7-Aug-2012):
+	# These need to be here - if they are in the CXL_init.py script, the values
+	# of SOURCES and TARGET are null, I think because we are outside of scons
+	# at that point.  Spent multiple hours puzzling over that.
+	#
+	uic_build = Builder(action = CXL_env['CXL_uic_tool'] + ' ${SOURCES[0]} -o $TARGET',
+		            prefix='ui_', suffix='.h', src_suffix='.ui')
+	CXL_env.Append(BUILDERS = {'UicBld' : uic_build})
+
+	moc_build = Builder(action = CXL_env['CXL_moc_tool'] + ' ${SOURCES[0]} -o $TARGET',
+		            prefix='moc_', suffix='.cpp', src_suffix='.h')
+	CXL_env.Append(BUILDERS = {'MocBld' : moc_build})
+
+	rcc_build = Builder(action = CXL_env['CXL_rcc_tool'] + ' ${SOURCES[0]} -o $TARGET',
+		            prefix='rcc_', suffix='.cpp', src_suffix='.qrc')
+	CXL_env.Append(BUILDERS = {'RccBld' : rcc_build})
+
+#
+# The documentation is generated from Doxygen
+# We do not have an effective way to use the Doxygen builder tool, so 
+# we will sort of spoof it, and always run it
+# doxy_build = Builder(action = CXL_env['CXL_doxy_tool'] + ' ${SOURCES[0]}')
+# CXL_env.Append(BUILDERS = {'DoxyBld' : doxy_build})
+
+##############################################################
+# Print out all environment variables of CXL_env if verbose is specified
+if CXL_env['CXL_build_verbose'] != 0 :
+	print CXL_env.Dump()
+
+
+##############################################################
+# Export the CXL_env to all SConscripts
+Export( 'CXL_env ')
+
+
+##############################################################
+# NOTE [Richard Gorton] :
+# Specifically express _dynamic_ dependencies here.  It is possible to have
+# the individual components do this, but the relevant context would need to be
+# exported globally, and then consumed.  That is, we would need to export the
+# BaseTools_Obj, via a global name, and then the downstream SCons files would
+# need to import it and write the dependency rules.
+# There is no need to write dependency rules for items which solely use the
+# promotion model.
+
+# No dynamic dependencies at all
+
+############################################
+#
+# Framework Section
+#
+FrameworkComponents = []
+
+BaseTools_Obj = SConscript('../../../../Common/Src/AMDTBaseTools/SConscript')
+FrameworkComponents += BaseTools_Obj
+if (CXL_env['CXL_arch'] != 'x86'):
+	Assertion_Obj = SConscript('../../../../Common/Src/AMDTAssertionHandlers/SConscript')
+	FrameworkComponents += Assertion_Obj
+OSWrappers_Obj = SConscript('../../../../Common/Src/AMDTOSWrappers/SConscript')
+CXL_env.Depends(OSWrappers_Obj, BaseTools_Obj)
+FrameworkComponents += OSWrappers_Obj
+ActivityLogger_Obj = SConscript('../../../../Common/Src/AMDTActivityLogger/SConscript')
+CXL_env.Depends(ActivityLogger_Obj, OSWrappers_Obj + BaseTools_Obj)
+FrameworkComponents += ActivityLogger_Obj
+
+CodeXL_Full = \
+	FrameworkComponents
+
+Default(CodeXL_Full)
+Alias( target='Framework'   , source=(FrameworkComponents))
+Alias( target='install'     , source=(CodeXL_Full))

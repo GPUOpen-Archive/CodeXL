@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{BFB56E73-D54D-4D80-9CA2-A52359AD6566}</ProjectGuid>
+    <RootNamespace>AMDTCpuProfilingTranslation</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="CommonPropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)\AMDTCpuProfiling.props" />
+  </ImportGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>AMDT_CPU_PROFILING_TRANSLATION_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(CommonProjectsDir)\AMDTCommonHeaders;$(ProjectDir);$(ProjectDir)\inc;$(ProjectDir)\..;$(ProjectDir)\..\ProfileAgents;$(ProjectDir)\..\..\ProfilingAgents;$(CommonDir)\Lib\Ext\Java\jdk1.7.0_17\include;$(CommonDir)\Lib\Ext\Java\jdk1.7.0_17\include\win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>CXLCpuProfilingRawData$(GDTProjectSuffix).lib;CXLExecutableFormat$(GDTProjectSuffix).lib;CXLCpuCallstackSampling$(GDTProjectSuffix).lib;CXLCpuPerfEventUtils$(GDTProjectSuffix).lib;CXLProfilingAgentsData$(GDTProjectSuffix).lib;CXLDisassembler$(GDTProjectSuffix).lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Cache.cpp" />
+    <ClCompile Include="src\CluInfo.cpp" />
+    <ClCompile Include="src\CpuProfileDataAccess.cpp" />
+    <ClCompile Include="src\CpuProfileDataTranslation.cpp" />
+    <ClCompile Include="src\DllMain.cpp" />
+    <ClCompile Include="src\ExecutableAnalyzer.cpp" />
+    <ClCompile Include="src\JitTaskInfo.cpp" />
+    <ClCompile Include="src\Linux\CaPerfTranslator.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\Linux\CaPerfTranslatorIbs.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\Windows\CPA_TIME.cpp" />
+    <ClCompile Include="src\Windows\MemoryMap.cpp" />
+    <ClCompile Include="src\Windows\PrdTranslator.cpp" />
+    <ClCompile Include="src\Windows\PrdUserCss.cpp" />
+    <ClCompile Include="src\Windows\RcuScheduler.cpp" />
+    <ClCompile Include="src\Windows\TaskInfoInterface.cpp" />
+    <ClCompile Include="src\Windows\ThreadPool.cpp" />
+    <ClCompile Include="src\Windows\WinTaskInfo.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\..\..\Common\Src\VersionInfo\VersionResource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\CPA_TIME.h" />
+    <ClInclude Include="inc\CpuProfileDataTranslation.h" />
+    <ClInclude Include="inc\CpuProfilingTranslationDLLBuild.h" />
+    <ClInclude Include="inc\JitTaskInfoMapper.h" />
+    <ClInclude Include="inc\Windows\TaskInfoInterface.h" />
+    <ClInclude Include="src\Cache.h" />
+    <ClInclude Include="src\CluInfo.h" />
+    <ClInclude Include="src\CpuProfileDataAccess.h" />
+    <ClInclude Include="src\ExecutableAnalyzer.h" />
+    <ClInclude Include="src\JitTaskInfo.h" />
+    <ClInclude Include="src\Linux\CaPerfTranslator.h">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="src\Linux\CaPerfTranslatorIbs.h">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="src\Windows\MemoryMap.h" />
+    <ClInclude Include="src\Windows\PrdTranslator.h" />
+    <ClInclude Include="src\Windows\PrdUserCss.h" />
+    <ClInclude Include="src\Windows\RcuHandler.h" />
+    <ClInclude Include="src\Windows\RcuScheduler.h" />
+    <ClInclude Include="src\Windows\TaskInfoMapper.h" />
+    <ClInclude Include="src\Windows\ThreadPool.h" />
+    <ClInclude Include="src\Windows\WinTaskInfo.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

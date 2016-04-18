@@ -1,0 +1,206 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\suAllocatedObjectsMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suAPICallsHandlingThread.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suAPIConnector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suAPIFunctionsImplementations.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suAPIFunctionsStubs.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suAPIMainLoop.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suBreakpointsManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suBufferReader.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suCallsHistoryLogger.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suCallsStatisticsLogger.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suContextMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suDebugLogInitializer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suGlobalVariables.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suInterceptionFunctions.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suInteroperabilityHelper.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suITechnologyMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suMacOSXInterception.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suNullContextCallsHistoryLogger.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suSingletonsDelete.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suSlowMotionDelay.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suSpiesUtilitiesDLLInitializationFunctions.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suSpiesUtilitiesDLLMainFunc.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suSpiesUtilitiesModuleInitializer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suSpiesUtilitiesModuleTerminator.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suSpyAPIFunctions.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suSpyBreakpointImplementation.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suSpyToAPIConnector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suTechnologyMonitorsManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suIKernelDebuggingManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suMemoryAllocationMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\suStringConstants.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\suSpyToAPIConnector.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\suSpyBreakpointImplementation.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\suSpyAPIFunctions.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\suSpiesUtilitiesModuleInitializer.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\suSpiesUtilitiesDLLInitializationFunctions.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\suSpiesUtilitiesDLLBuild.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\suSlowMotionDelay.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\suSingletonsDelete.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\suNullContextCallsHistoryLogger.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\suITechnologyMonitor.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\suInteroperabilityHelper.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\suInterceptionMacros.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\suInterceptionFunctions.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\suGlobalVariables.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\suDebugLogInitializer.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\suContextMonitor.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\suCallsStatisticsLogger.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\suBreakpointsManager.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\suBufferReader.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\suCallsHistoryLogger.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\suAPIMainLoop.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\suAPIFunctionsStubs.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\suAPIFunctionsImplementations.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\suAPIConnector.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\suAPICallsHandlingThread.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\suTechnologyMonitorsManager.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\suAllocatedObjectsMonitor.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\suIKernelDebuggingManager.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\suMemoryAllocationMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{ece7e85e-332a-4c2f-b8c7-ac09bd189d6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="inc">
+      <UniqueIdentifier>{468987eb-22e1-4ed9-a5f5-07029cdec81b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public inc">
+      <UniqueIdentifier>{1d45a2c6-cfd9-4be2-bd67-b7e37f7eaa34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{1a025792-f78b-4b55-ab96-fe25480ed251}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\..\CommonProjects\VersionInfo\VersionResource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

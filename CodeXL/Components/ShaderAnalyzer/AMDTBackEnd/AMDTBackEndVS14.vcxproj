@@ -1,0 +1,333 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug_Static|Win32">
+      <Configuration>Debug_Static</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug_Static|x64">
+      <Configuration>Debug_Static</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_Static|Win32">
+      <Configuration>Release_Static</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_Static|x64">
+      <Configuration>Release_Static</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>AMDTAnalysisBackend</ProjectName>
+    <ProjectGuid>{C1F67D19-DD6E-4946-B16D-F4F4D125424B}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>AMDTAnalysisBackend</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)'=='Release'" Label="Configuration">
+    <AMDTModuleType>Dynamic</AMDTModuleType>
+    <AMDTConfiguration>Release</AMDTConfiguration>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release_Static'" Label="Configuration">
+    <AMDTModuleType>Static</AMDTModuleType>
+    <AMDTConfiguration>Release</AMDTConfiguration>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'" Label="Configuration">
+    <AMDTModuleType>Dynamic</AMDTModuleType>
+    <AMDTConfiguration>Debug</AMDTConfiguration>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug_Static'" Label="Configuration">
+    <AMDTModuleType>Static</AMDTModuleType>
+    <AMDTConfiguration>Debug</AMDTConfiguration>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(AMDTModuleType)'=='Dynamic'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(AMDTModuleType)'=='Static'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)\AMDTKernelAnalyzer.props" />
+    <Import Project="$(CommonDir)\Lib\AMD\APPSDK\Global-OpenCL-NoLib.props" />
+    <Import Project="$(CommonDir)\Lib\AMD\CAL\Global-CAL-NoLib.props" />
+    <Import Project="$(CommonDir)\Lib\AMD\DX10ASM\Global-DX10ASM-VS2015.props" />
+    <Import Project="$(CommonDir)\Lib\AMD\sp3\Global-sp3-VS2015.props" />
+    <Import Project="$(CommonDir)\Lib\Ext\Boost\Global-Boost-2015.props" />
+    <Import Project="$(CommonDir)\Lib\Ext\Windows-Kits\Global-WindowsSDK.props" />
+    <Import Project="$(CommonDir)\Lib\Ext\glew\Global-GLEW.props" />
+    <Import Project="$(CommonDir)\Src\ADLUtil\Global-ADLUtil.props" />
+    <Import Project="$(CommonDir)\Src\AMDTMutex\Global-AMDTMutex.props" />
+    <Import Project="$(CommonDir)\Src\CElf\Global-CElf.props" />
+    <Import Project="$(CommonDir)\Src\DeviceInfo\Global-DeviceInfo.props" />
+    <Import Project="$(CommonDir)\Lib\AMD\ACL\Global-ACL.props" />
+    <Import Project="$(CommonDir)\Src\DynamicLibraryModule\Global-DynamicLibraryModule.props" />
+  </ImportGroup>
+  <PropertyGroup>
+    <OutDir Condition="'$(AMDTModuleType)'=='Dynamic'">$(AMDTOutputDir)$(Configuration)\bin\</OutDir>
+    <IntDir Condition="'$(AMDTModuleType)'=='Dynamic'">$(AMDTOutputDir)$(Configuration)\obj\$(ProjectName)\$(Platform)$(GDTBuildSuffix)\</IntDir>
+    <OutDir Condition="'$(AMDTModuleType)'=='Static'">$(IntDir)</OutDir>
+    <IntDir Condition="'$(AMDTModuleType)'=='Static'">$(SolutionDir)obj\$(Configuration)-$(PlatformName)$(GDTBuildSuffix)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)'=='x64'">
+    <TargetName>$(GDTProjectName)</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.;./Include/Common;$(CommonDir)\Src\ShaderUtils;$(CommonDir)\Src\ShaderUtils\DX10;$(CommonDir)\Src\ShaderUtils\DX11;$(CommonDir)\DX10ASM;$(CommonDir)\src\ACLModuleManager;..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalOptions> /MP %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(AMDTModuleType)'=='Dynamic'">
+    <ClCompile>
+      <PreprocessorDefinitions>AMDTBACKEND_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(OutDir)$(TargetName).dll</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <ImportLibrary>$(AMDTOutputDir)$(Configuration)\arch\$(TargetName).lib</ImportLibrary>
+      <TargetMachine Condition="'$(Platform)'=='x64'">MachineX64</TargetMachine>
+      <AdditionalDependencies>opengl32.lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;CXLOSAPIWrappers$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Platform)'=='Win32'">%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Platform)'=='x64'">glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)'=='Release'">%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(AMDTOutputDir)$(Configuration)\arch;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(AMDTModuleType)'=='Static'">
+    <ClCompile>
+      <PreprocessorDefinitions>AMDTANALYSISBACKEND_STATIC;AMDTOSAPIWRAPPERS_STATIC;AMDTOSWRAPPERS_STATIC;AMDTBASETOOLS_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(DX10ASMDir)\Lib\$(Platform)\$(AMDTConfiguration);$(ELFDir)\lib\$(GDTPlatform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>MSVCRTD</IgnoreSpecificDefaultLibraries>
+      <TargetMachine Condition="'$(Platform)'=='x64'">MachineX64</TargetMachine>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(AMDTConfiguration)'=='Debug'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(AMDTConfiguration)'=='Release'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug_Static'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release_Static'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="$(CommonDir)\Src\ADLUtil\ADLUtil.h" />
+    <ClInclude Include="$(CommonDir)\Src\AMDTMutex\AMDTMutex.h" />
+    <ClInclude Include="$(CommonDir)\Src\CElf\Include\CElf.h" />
+    <ClInclude Include="$(CommonDir)\Src\DeviceInfo\DeviceInfo.h" />
+    <ClInclude Include="$(CommonDir)\Src\DeviceInfo\DeviceInfoUtils.h" />
+    <ClInclude Include="$(CommonDir)\Src\DynamicLibraryModule\ACLModule.h" />
+    <ClInclude Include="$(CommonDir)\Src\DynamicLibraryModule\CALModule.h" />
+    <ClInclude Include="$(CommonDir)\Src\DynamicLibraryModule\DXXModule.h" />
+    <ClInclude Include="$(CommonDir)\Src\DynamicLibraryModule\DynamicLibraryModule.h" />
+    <ClInclude Include="$(CommonDir)\Src\DynamicLibraryModule\OpenCLModule.h" />
+    <ClInclude Include="$(CommonDir)\Src\GDT_Memory.h" />
+    <ClInclude Include="$(CommonDir)\Src\ShaderUtils\DX10\D3D10ShaderObject.h" />
+    <ClInclude Include="$(CommonDir)\Src\ShaderUtils\DX10\D3D10ShaderUtils.h" />
+    <ClInclude Include="$(CommonDir)\Src\ShaderUtils\DX10\DXBCChecksum.h" />
+    <ClInclude Include="$(CommonDir)\Src\ShaderUtils\DX10\IBlob.h" />
+    <ClInclude Include="$(CommonDir)\Src\ShaderUtils\StringUtils.h" />
+    <ClInclude Include="Emulator\Parser\DSInstruction.h" />
+    <ClInclude Include="Emulator\Parser\EXPInstruction.h" />
+    <ClInclude Include="Emulator\Parser\GenericInstructionFields1.h" />
+    <ClInclude Include="Emulator\Parser\GenericInstructionFields2.h" />
+    <ClInclude Include="Emulator\Parser\Instruction.h" />
+    <ClInclude Include="Emulator\Parser\ISAParser.h" />
+    <ClInclude Include="Emulator\Parser\ISAProgramGraph.h" />
+    <ClInclude Include="Emulator\Parser\MIMGInstruction.h" />
+    <ClInclude Include="Emulator\Parser\MTBUFInstruction.h" />
+    <ClInclude Include="Emulator\Parser\MUBUFInstruction.h" />
+    <ClInclude Include="Emulator\Parser\ParserSI.h" />
+    <ClInclude Include="Emulator\Parser\ParserSIDS.h" />
+    <ClInclude Include="Emulator\Parser\ParserSIEXP.h" />
+    <ClInclude Include="Emulator\Parser\ParserSIMIMG.h" />
+    <ClInclude Include="Emulator\Parser\ParserSIMTBUF.h" />
+    <ClInclude Include="Emulator\Parser\ParserSIMUBUF.h" />
+    <ClInclude Include="Emulator\Parser\ParserSISMRD.h" />
+    <ClInclude Include="Emulator\Parser\ParserSISOP1.h" />
+    <ClInclude Include="Emulator\Parser\ParserSISOP2.h" />
+    <ClInclude Include="Emulator\Parser\ParserSISOPC.h" />
+    <ClInclude Include="Emulator\Parser\ParserSISOPK.h" />
+    <ClInclude Include="Emulator\Parser\ParserSISOPP.h" />
+    <ClInclude Include="Emulator\Parser\ParserSIVINTRP.h" />
+    <ClInclude Include="Emulator\Parser\ParserSIVOP.h" />
+    <ClInclude Include="Emulator\Parser\ScalarInstructionFields.h" />
+    <ClInclude Include="Emulator\Parser\SMRDInstruction.h" />
+    <ClInclude Include="Emulator\Parser\SOP1Instruction.h" />
+    <ClInclude Include="Emulator\Parser\SOP2Instruction.h" />
+    <ClInclude Include="Emulator\Parser\SOPCInstruction.h" />
+    <ClInclude Include="Emulator\Parser\SOPKInstruction.h" />
+    <ClInclude Include="Emulator\Parser\SOPPInstruction.h" />
+    <ClInclude Include="Emulator\Parser\VINTRPInstruction.h" />
+    <ClInclude Include="Emulator\Parser\VOPInstruction.h" />
+    <ClInclude Include="Emulator\Scheduler\BranchUnitScheduler.h">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Emulator\Scheduler\CUScheduler.h">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Emulator\Scheduler\UTDPScheduler.h">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Emulator\Scheduler\WaveFront.h">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Emulator\Scheduler\WorkGroup.h">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Include\beAMDTBackEndDllBuild.h" />
+    <ClInclude Include="Include\beBackend.h" />
+    <ClInclude Include="Include\beD3DIncludeManager.h" />
+    <ClInclude Include="Include\beDataTypes.h" />
+    <ClInclude Include="Include\beDriverUtils.h" />
+    <ClInclude Include="Include\beInclude.h" />
+    <ClInclude Include="Include\beProgramBuilder.h" />
+    <ClInclude Include="Include\beProgramBuilderDX.h" />
+    <ClInclude Include="Include\beProgramBuilderOpenCL.h" />
+    <ClInclude Include="Include\beProgramBuilderOpenGL.h" />
+    <ClInclude Include="Include\beProgramBuilderVulkan.h" />
+    <ClInclude Include="Include\beStaticIsaAnalyzer.h" />
+    <ClInclude Include="Include\beStringConstants.h" />
+    <ClInclude Include="Include\beUtils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(CommonDir)\Src\ADLUtil\ADLUtil.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\AMDTMutex\AMDTMutex.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\CElf\Src\CElf.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\CElf\Src\CElfSection.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\CElf\Src\CElfStringTable.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\CElf\Src\CElfSymbolTable.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\DeviceInfo\DeviceInfoInternal.cpp">
+      <ExcludedFromBuild Condition="'$(GDT_BUILD)'!='GDT_INTERNAL'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(CommonDir)\Src\DeviceInfo\DeviceInfoUtils.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\DynamicLibraryModule\ACLModule.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\DynamicLibraryModule\CALModule.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\DynamicLibraryModule\DXXModule.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\DynamicLibraryModule\DynamicLibraryModule.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\DynamicLibraryModule\OpenCLModule.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\GDT_Memory.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\ShaderUtils\DX10\D3D10ShaderObject.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\ShaderUtils\DX10\D3D10ShaderUtils.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\ShaderUtils\DX10\DXBCChecksum.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\ShaderUtils\DX10\IBlob.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\ShaderUtils\StringUtils.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\ACLModuleManager\ACLModuleManager.cpp" />
+    <ClCompile Include="Emulator\Parser\Instruction.cpp">
+      <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</PreprocessToFile>
+    </ClCompile>
+    <ClCompile Include="Emulator\Parser\ISAParser.cpp" />
+    <ClCompile Include="Emulator\Parser\ISAProgramGraph.cpp" />
+    <ClCompile Include="Emulator\Parser\ParserSI.cpp" />
+    <ClCompile Include="Emulator\Parser\ParserSIDS.cpp" />
+    <ClCompile Include="Emulator\Parser\ParserSIEXP.cpp" />
+    <ClCompile Include="Emulator\Parser\ParserSIMIMG.cpp" />
+    <ClCompile Include="Emulator\Parser\ParserSIMTBUF.cpp" />
+    <ClCompile Include="Emulator\Parser\ParserSIMUBUF.cpp" />
+    <ClCompile Include="Emulator\Parser\ParserSISMRD.cpp" />
+    <ClCompile Include="Emulator\Parser\ParserSISOP1.cpp" />
+    <ClCompile Include="Emulator\Parser\ParserSISOP2.cpp" />
+    <ClCompile Include="Emulator\Parser\ParserSISOPC.cpp" />
+    <ClCompile Include="Emulator\Parser\ParserSISOPK.cpp" />
+    <ClCompile Include="Emulator\Parser\ParserSISOPP.cpp" />
+    <ClCompile Include="Emulator\Parser\ParserSIVINTRP.cpp" />
+    <ClCompile Include="Emulator\Parser\ParserSIVOP.cpp" />
+    <ClCompile Include="Emulator\Scheduler\BranchUnitScheduler.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Emulator\Scheduler\CUScheduler.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Emulator\Scheduler\UTDPScheduler.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Emulator\Scheduler\WorkGroup.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\beBackend.cpp" />
+    <ClCompile Include="src\beD3DIncludeManager.cpp" />
+    <ClCompile Include="src\beDriverUtils.cpp" />
+    <ClCompile Include="src\beProgramBuilder.cpp" />
+    <ClCompile Include="src\beProgramBuilderDX.cpp" />
+    <ClCompile Include="src\beProgramBuilderOpenCL.cpp" />
+    <ClCompile Include="src\beProgramBuilderOpenGL.cpp" />
+    <ClCompile Include="src\beProgramBuilderVulkan.cpp" />
+    <ClCompile Include="src\beStaticIsaAnalyzer.cpp" />
+    <ClCompile Include="src\beUtils.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

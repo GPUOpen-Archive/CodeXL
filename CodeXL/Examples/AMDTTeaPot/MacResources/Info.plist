@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>AMDTTeapot</string>
+	<key>CFBundleGetInfoString</key>
+	<string>AMD Teapot OpenGL Sample Application v5.8.0.11830, 14/12/2010</string>
+	<key>CFBundleIconFile</key>
+	<string>AMDTTeapot.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.AMD.AMDTTeaPot</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>AMD OpenGL Teapot</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>5.8.0</string>
+	<key>CFBundleSignature</key>
+	<string>GRTP</string>
+	<key>CFBundleVersion</key>
+	<string>5.8.0.11830</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.5.0</string>
+</dict>
+</plist>

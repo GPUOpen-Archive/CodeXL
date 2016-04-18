@@ -1,0 +1,121 @@
+#!/bin/sh
+
+# This script build all Linux projects.
+# Usage: buildAllLinuxProjects [scons arguments]
+
+export commandLineArgs=$*
+
+NUM_ERRORS=0
+
+do_buildEachTarget ()
+{
+	echo
+	echo
+	echo "-------- Building $1 -------- "
+    INVOKE="/usr/bin/time -p scons -C $1 $commandLineArgs"
+	echo "Invocation: [${INVOKE}]"
+	${INVOKE}
+	RC=$?
+	if [ ${RC} -ne 0 ]
+	then
+		echo "*** ERROR during the build of $1 ***"
+	fi
+	NUM_ERRORS=`expr ${NUM_ERRORS} + ${RC}`
+
+	# Exit on fail
+	if [ ${NUM_ERRORS} -ne 0 ]
+	then
+	    echo "*** ERROR ***"
+	    echo "*** the build failed - see the logs for details ***"
+	    exit 1
+	fi
+}
+
+#################################################################################################
+
+# Display a start message:
+echo 
+echo 
+echo "Building all Linux projects"
+echo "==========================="
+echo "Build arguments passed to scons: $commandLineArgs"
+
+# AMD_OUTPUT should be set by parent script
+if [ "x${AMD_OUTPUT}x" = "xx" ]
+then
+    # If not, it means this script was invoked by unknown means.
+    export AMD_OUTPUT=${AMD_CODEXL}/../Output
+fi
+
+
+echo
+echo
+echo "========================================== "
+echo "----------- Building Framework ----------- "
+echo "========================================== "
+
+CommonProjectsTargets="AMDTBaseTools AMDTAssertionHandlers AMDTOSWrappers AMDTAPIClasses AMDTApplicationComponents AMDTApplicationFramework AMDTApplication AMDTSharedProfiling"
+
+for target in $CommonProjectsTargets
+do
+	do_buildEachTarget $AMD_CODEXL/../CommonProjects/$target
+done
+
+
+echo
+echo
+echo "========================================== "
+echo "---------- Building GPU Debbuger --------- "
+echo "========================================== "
+
+GpuDebuggingComponents="AMDTProcessDebugger AMDTApiFunctions AMDTServerUtilities AMDTOpenCLServer AMDTOpenGLServer AMDTGpuDebuggingComponents AMDTGpuDebugging"
+
+for target in $GpuDebuggingComponents
+do
+	do_buildEachTarget $AMD_CODEXL/Components/GpuDebugging/$target
+done
+
+echo
+echo
+echo "========================================== "
+echo "---------- Building Teapot Example --------- "
+echo "========================================== "
+
+GpuDebuggingComponents="AMDTTeaPotLib AMDTTeaPot"
+
+for target in $GpuDebuggingComponents
+do
+	do_buildEachTarget $AMD_CODEXL/Examples/AMDTTeaPot/$target
+done
+
+
+echo
+echo
+echo "========================================== "
+echo "----------- Building CPU Profiling ------- "
+echo "========================================== "
+
+#eval "scons CXL_common_dir=$AMD_CODEXL/../Common CXL_commonproj_dir=${AMD_CODEXL}/../CommonProjects CXL_prefix=$AMD_OUTPUT -C $AMD_CODEXL/Components/CpuProfiling/AMDTCpuProfiling $commandLineArgs"
+#RC=$?
+#if [ ${RC} -ne 0 ]
+#then
+#    echo "*** ERROR during the build of this subcomponent ***"
+#fi
+#NUM_ERRORS=`expr ${NUM_ERRORS} + ${RC}`
+#
+#if [ ${NUM_ERRORS} -ne 0 ]
+#then
+#    echo "*** ERROR ***"
+#    echo "*** the build failed - see the logs for details ***"
+#    exit 1
+#fi
+
+echo
+echo
+echo "========================================== "
+echo "----------- Building GPU Profiling ------- "
+echo "========================================== "
+do_buildEachTarget $AMD_CODEXL/Components/GpuProfiling/AMDTGpuProfiling
+
+echo "------------------------- BUILD SUCCESS -----------------------------"
+exit 0

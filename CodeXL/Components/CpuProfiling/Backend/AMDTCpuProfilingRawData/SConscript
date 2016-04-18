@@ -1,0 +1,86 @@
+# -*- Python -*-
+
+Import('*')
+from CXL_init import *
+
+libName = "CXLCpuProfilingRawData"
+
+env = CXL_env.Clone()
+
+env_no_c11 = CXL_env.Clone()
+
+# Remove the c++ flag for the env_no_c11 library
+fullBuildFlags = env_no_c11['CPPFLAGS']
+partBuildString = fullBuildFlags.replace('-std=c++11','')
+env_no_c11.Replace( CPPFLAGS = partBuildString)
+
+env.Append( CPPPATH = [ 
+	".",
+	"inc",
+	"..",
+	"../ProfileAgents",
+	env['CXL_common_dir'] + '/../CodeXL/Components/CpuProfiling/Backend',
+	env['CXL_common_dir'] + '/../CodeXL/Components/CpuProfiling',
+	env['CXL_commonproj_dir'] + '/AMDTCommonHeaders',
+	env['CXL_commonproj_dir'],
+	env['CXL_common_dir'] + '/Lib/Ext/Java/jdk1.7.0_17/include',
+	env['CXL_common_dir'] + '/Lib/Ext/Java/jdk1.7.0_17/include/linux',
+])
+
+env_no_c11.Append( CPPPATH = [ 
+	".",
+	"inc",
+	"..",
+	env['CXL_commonproj_dir'],
+])
+
+UseQt4(env)
+
+# There are uses of %llx in some spots
+env.Append(CPPFLAGS = '-fno-strict-aliasing')
+
+env.Append (LIBS = [
+	"CXLBaseTools",
+	"CXLOSWrappers",
+])
+
+sources = \
+[
+	"src/RawData/Linux/CaPerfDataReader.cpp",
+	"src/RawData/Linux/CaPerfDataWriter.cpp",
+	"src/RawData/Linux/PerfDataReader.cpp",
+	"src/RunInfo/RunInfo.cpp",
+	"src/RunInfo/RunInfoReader.cpp",
+	"src/RunInfo/RunInfoWriter.cpp",
+	"src/Translation/CpuProfileFunction.cpp",
+	"src/Translation/CpuProfileInputStream.cpp",
+	"src/Translation/CpuProfileModule.cpp",
+	"src/Translation/CpuProfileOutputStream.cpp",
+	"src/Translation/CpuProfileProcess.cpp",
+	"src/Translation/CpuProfileReader.cpp",
+	"src/Translation/CpuProfileSample.cpp",
+	"src/Translation/CpuProfileWriter.cpp",
+	"src/Translation/ImdReader.cpp",
+	"src/Translation/ImdWriter.cpp",
+]
+
+csources = \
+[
+	"src/RawData/Linux/PerfRecName.c",
+]
+
+# Creating object files	
+objFiles = env.SharedObject(sources)
+objFilesC = env_no_c11.SharedObject(csources)
+
+# Creating shared libraries
+soFiles = env.SharedLibrary(
+	target = libName, 
+	source = objFiles + objFilesC)
+
+# Installing libraries
+libInstall = env.Install( 
+	dir = env['CXL_lib_dir'], 
+	source = (soFiles))
+
+Return('libInstall')

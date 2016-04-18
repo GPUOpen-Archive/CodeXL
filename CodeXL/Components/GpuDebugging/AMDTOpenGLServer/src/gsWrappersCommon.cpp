@@ -1,0 +1,513 @@
+//==================================================================================
+// Copyright (c) 2016 , Advanced Micro Devices, Inc.  All rights reserved.
+//
+/// \author AMD Developer Tools Team
+/// \file gsWrappersCommon.cpp
+///
+//==================================================================================
+
+//------------------------------ gsWrappersCommon.cpp ------------------------------
+
+// Infra:
+#include <AMDTBaseTools/Include/gtAssert.h>
+#include <AMDTBaseTools/Include/AMDTDefinitions.h>
+#include <AMDTOSWrappers/Include/osModule.h>
+#include <AMDTOSWrappers/Include/osBundle.h>
+#include <AMDTOSWrappers/Include/osDebugLog.h>
+#include <AMDTAPIClasses/Include/apFunctionType.h>
+#include <AMDTAPIClasses/Include/apMonitoredFunctionsManager.h>
+#include <AMDTServerUtilities/Include/suTechnologyMonitorsManager.h>
+
+// Local:
+#include <src/gsStringConstants.h>
+#include <src/gsMonitoredFunctionPointers.h>
+#include <src/gsWrappersCommon.h>
+
+// Contains true iff we should log the calls to initialization functions:
+// (See gsEnableInitializationFunctionsLogging for more details)
+static bool stat_areInitializationFunctionsLogged = true;
+
+
+// ---------------------------------------------------------------------------
+// Name:        gsGetBaseOpenGLFunctionTypes
+// Description: Returns functions types that gsOpenGLWrappers wrappes.
+//              These are generic (none extension) OGL functions and
+//              platform connection (WGL / GLX) functions.
+// Return Val:  unsigned int - A mask of apFunctionType enums.
+// Author:      Yaki Tebeka
+// Date:        21/11/2006
+// ---------------------------------------------------------------------------
+unsigned int gsGetBaseOpenGLFunctionTypes()
+{
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+    unsigned int retVal = AP_OPENGL_GENERIC_FUNC | AP_WGL_FUNC;
+#elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
+#if AMDT_LINUX_VARIANT == AMDT_GENERIC_LINUX_VARIANT
+    unsigned int retVal = AP_OPENGL_GENERIC_FUNC | AP_GLX_FUNC;
+#elif AMDT_LINUX_VARIANT == AMDT_MAC_OS_X_LINUX_VARIANT
+#ifndef _GR_IPHONE_BUILD
+    unsigned int retVal = AP_OPENGL_GENERIC_FUNC | AP_OPENGL_EXTENSION_FUNC;
+#else
+    unsigned int retVal = AP_OPENGL_ES_1_MAC_GENERIC_FUNC | AP_OPENGL_ES_2_MAC_GENERIC_FUNC | AP_OPENGL_ES_MAC_EXTENSION_FUNC;
+#endif
+#else
+#error Unknown Linux Variant!
+#endif
+#else
+#error Error: unknown platform!
+#endif
+
+    return retVal;
+}
+
+
+// ---------------------------------------------------------------------------
+// Name:        gsConnectOpenGLWrappers
+// Description: Connects the wrapper functions to the real OpenGL functions
+//              implementations.
+// Arguments:   hSystemOpenGLModule - A handle to the system's OpenGL module.
+// Return Val:  bool - Success / failure.
+// Author:      Yaki Tebeka
+// Date:        5/7/2003
+// ---------------------------------------------------------------------------
+bool gsConnectOpenGLWrappers(osModuleHandle hSystemOpenGLModule)
+{
+    bool retVal = true;
+
+    // Output debug log printout:
+    OS_OUTPUT_DEBUG_LOG(GS_STR_DebugLog_wrappingSystemOGLFunctions, OS_DEBUG_LOG_DEBUG);
+
+    // Get the "base" OGL functions types mask:
+    unsigned int baseOGLFunctionsTypes = gsGetBaseOpenGLFunctionTypes();
+
+    // Get the Monitored functions manager instance:
+    apMonitoredFunctionsManager& theMonitoredFunctionsManager = apMonitoredFunctionsManager::instance();
+
+    // For each monitored function:
+    int amountOfMonitoredFuncs = theMonitoredFunctionsManager.amountOfMonitoredFunctions();
+
+    for (int i = 0; i < amountOfMonitoredFuncs; i++)
+    {
+        // Get the function type:
+        unsigned int functionAPIType = theMonitoredFunctionsManager.monitoredFunctionAPIType((apMonitoredFunctionId)i);
+
+        // If this is a "base" OGL function:
+        if (functionAPIType & baseOGLFunctionsTypes)
+        {
+            bool functionOkay = true;
+
+            // Get a the function name:
+            gtString currFunctionName = theMonitoredFunctionsManager.monitoredFunctionName((apMonitoredFunctionId)i);
+
+            // Get a pointer to the function implementation in the system's OGL module:
+            osProcedureAddress pRealFunctionImplementation = NULL;
+            bool rc = osGetProcedureAddress(hSystemOpenGLModule, currFunctionName.asASCIICharArray(), pRealFunctionImplementation, false);
+
+            if (!rc)
+            {
+                bool shouldReportError = true;
+#if ((AMDT_BUILD_TARGET == AMDT_LINUX_OS) && (AMDT_LINUX_VARIANT == AMDT_GENERIC_LINUX_VARIANT))
+                {
+                    // On Linux, not all functions are supported by all variants, so it's alright if some
+                    // are missing.
+                }
+#elif ((AMDT_BUILD_TARGET == AMDT_LINUX_OS) && (AMDT_LINUX_VARIANT == AMDT_MAC_OS_X_LINUX_VARIANT))
+                {
+                    // On Mac, we only consider failure if a non-extension function is not found:
+#ifndef _GR_IPHONE_BUILD
+                    functionOkay = ((functionAPIType & AP_OPENGL_EXTENSION_FUNC) != 0);
+#else
+                    // The iPhone OS 3.0 OpenGLES library exports both OpenGL ES 1.1 and OpenGL ES 2.0 functions, but the older ones
+                    // only export the 1.1 ones. So, to support both cases, we do not fail here if an OpenGL ES 2.0-only function is missing.
+                    functionOkay = ((functionAPIType & (AP_OPENGL_ES_MAC_EXTENSION_FUNC | AP_OPENGL_ES_2_MAC_GENERIC_FUNC)) != 0);
+#endif
+
+                    if (functionOkay)
+                    {
+                        shouldReportError = false;
+                    }
+                }
+#else
+                {
+                    // On Windows, failure to get a function pointers is considered a failure:
+                    functionOkay = false;
+                }
+#endif
+
+                if (shouldReportError)
+                {
+                    // Output an error message:
+                    gtString errorMessage = GS_STR_DebugLog_cannotGetOGLFuncPtr;
+                    errorMessage += currFunctionName;
+                    GT_ASSERT_EX(false, errorMessage.asCharArray());
+                }
+            }
+
+            // Connects gs_stat_realFunctionPointers[i] to point the real functions implementation:
+            ((osProcedureAddress*)(&gs_stat_realFunctionPointers))[i] = pRealFunctionImplementation;
+
+            retVal = retVal && functionOkay;
+        }
+    }
+
+    // Output debug log printout:
+    OS_OUTPUT_DEBUG_LOG(GS_STR_DebugLog_wrappingSystemOGLFunctionsEnded, OS_DEBUG_LOG_DEBUG);
+
+    return retVal;
+}
+
+
+// ---------------------------------------------------------------------------
+// Name:        gsLoadSystemsOpenGLModule
+// Description: Loads the system's OpenGL module into the calling process address space.
+// Return Val:  osModuleHandle - Will get a handle to the systems OpenGL module.
+// Author:      Yaki Tebeka
+// Date:        5/7/2003
+// ---------------------------------------------------------------------------
+osModuleHandle gsLoadSystemsOpenGLModule()
+{
+    osModuleHandle retVal = OS_NO_MODULE_HANDLE;
+
+    // Will get the system's OpenGL module path:
+    gtVector<osFilePath> systemOGLModulePath;
+    osGetSystemOpenGLModulePath(systemOGLModulePath);
+    gtString moduleLoadError = L"System OpenGL module not found.";
+
+    bool rc = false;
+    int numberOfGLPaths = (int)systemOGLModulePath.size();
+    GT_ASSERT(numberOfGLPaths > 0);
+
+    for (int i = 0; (i < numberOfGLPaths) && (!rc); i++)
+    {
+        // Output debug log printout:
+        const osFilePath& currentModulePath = systemOGLModulePath[i];
+        const gtString& currentModulePathStr = currentModulePath.asString();
+        gtString dbgLogMsg = GS_STR_DebugLog_loadingSystemOGLServer;
+        dbgLogMsg.append(currentModulePathStr);
+        OS_OUTPUT_DEBUG_LOG(dbgLogMsg.asCharArray(), OS_DEBUG_LOG_DEBUG);
+
+        // Load the system OpenGL module:
+        if (currentModulePath.exists())
+        {
+            // Some of the paths may fail:
+            gtString currentModuleError;
+            rc = osLoadModule(currentModulePath, retVal, &currentModuleError, false);
+
+            if (!rc)
+            {
+                // Log the error for each attempted path:
+                moduleLoadError.append('\n').append(currentModulePathStr).append(L":\n    ").append(currentModuleError);
+            }
+            else
+            {
+                // Output debug log printout of the module that was successfully loaded:
+                dbgLogMsg = GS_STR_DebugLog_systemOGLServerLoadedOk;
+                dbgLogMsg.append(currentModulePathStr);
+                OS_OUTPUT_DEBUG_LOG(dbgLogMsg.asCharArray(), OS_DEBUG_LOG_INFO);
+            }
+        }
+    }
+
+    // If we failed to load the system OpenGL module:
+    if (!rc)
+    {
+        // Trigger an assertion failure:
+        GT_ASSERT_EX(false, GS_STR_DebugLog_systemOGLServerLoadFailed);
+        GT_ASSERT_EX(false, moduleLoadError.asCharArray());
+
+        suTechnologyMonitorsManager::reportFailedSystemModuleLoad(moduleLoadError);
+    }
+    else
+    {
+        // Log the system's OpenGL module handle:
+        gsSetSystemsOpenGLModuleHandle(retVal);
+    }
+
+    return retVal;
+}
+
+
+// ---------------------------------------------------------------------------
+// Name:        gsUnloadSystemOpenGLModule
+// Description: Unloads the loaded system's OpenGL module from this process address space.
+// Author:      Yaki Tebeka
+// Date:        5/7/2003
+// ---------------------------------------------------------------------------
+bool gsUnloadSystemOpenGLModule()
+{
+    bool retVal = false;
+
+    // Get the loaded systems OpenGL module handle:
+    osModuleHandle systemOGLModuleHandle = gsSystemsOpenGLModuleHandle();
+
+    // If the system OGL module was loaded:
+    if (systemOGLModuleHandle != NULL)
+    {
+        // Unload it:
+        bool rc1 = osReleaseModule(systemOGLModuleHandle);
+        GT_IF_WITH_ASSERT(rc1)
+        {
+            // Mark that the system's OpenGL module handle was released:
+            gsSetSystemsOpenGLModuleHandle(NULL);
+
+            retVal = true;
+        }
+    }
+
+    return retVal;
+}
+
+// Mac OSX code only:
+#if ((AMDT_BUILD_TARGET == AMDT_LINUX_OS) && (AMDT_LINUX_VARIANT == AMDT_MAC_OS_X_LINUX_VARIANT))
+
+// ---------------------------------------------------------------------------
+// Name:        gsConnectCGLWrappers
+// Description: Connects the wrapper functions to the system's CGL functions
+//              implementations.
+// Arguments:   hSystemOpenGLFramework - A handle to the system's OpenGL framework.
+// Return Val:  bool - Success / failure.
+// Author:      Yaki Tebeka
+// Date:        5/7/2003
+// ---------------------------------------------------------------------------
+bool gsConnectCGLWrappers(osModuleHandle hSystemOpenGLFramework)
+{
+    bool retVal = true;
+
+    // Output debug log printout:
+    OS_OUTPUT_DEBUG_LOG(GS_STR_DebugLog_wrappingSystemOGLFunctions, OS_DEBUG_LOG_DEBUG);
+
+    // Get the Monitored functions manager instance:
+    apMonitoredFunctionsManager& theMonitoredFunctionsManager = apMonitoredFunctionsManager::instance();
+
+    // For each monitored function:
+    int amountOfMonitoredFuncs = theMonitoredFunctionsManager.amountOfMonitoredFunctions();
+
+    for (int i = 0; i < amountOfMonitoredFuncs; i++)
+    {
+        // Get the function type:
+        unsigned int functionType = theMonitoredFunctionsManager.monitoredFunctionAPIType((apMonitoredFunctionId)i);
+
+        // If this is a CGL function:
+        if (functionType & AP_CGL_FUNC)
+        {
+            bool functionOkay = true;
+
+            // Get a the function name:
+            gtString currFunctionName = theMonitoredFunctionsManager.monitoredFunctionName((apMonitoredFunctionId)i);
+
+            // Get a pointer to the function implementation in the system's OpenGL framework:
+            osProcedureAddress pRealFunctionImplementation = NULL;
+            bool rc = osGetProcedureAddress(hSystemOpenGLFramework, currFunctionName, pRealFunctionImplementation, false);
+
+            if (!rc)
+            {
+                functionOkay = false;
+
+                // Output an error message:
+                gtString errorMessage = GS_STR_DebugLog_cannotGetOGLFuncPtr;
+                errorMessage += currFunctionName;
+                GT_ASSERT_EX(false, errorMessage.asCharArray());
+            }
+
+            // Connects gs_stat_realFunctionPointers[i] to point the real functions implementation:
+            ((osProcedureAddress*)(&gs_stat_realFunctionPointers))[i] = pRealFunctionImplementation;
+
+            retVal = retVal && functionOkay;
+        }
+    }
+
+    // Output debug log printout:
+    OS_OUTPUT_DEBUG_LOG(GS_STR_DebugLog_wrappingSystemCGLFunctionsEnded, OS_DEBUG_LOG_DEBUG);
+
+    return retVal;
+}
+
+
+#endif // Mac OSX code only
+
+
+// --------------------------------------------------------
+//             Public functions
+// --------------------------------------------------------
+
+
+// ---------------------------------------------------------------------------
+// Name:        gsInitializeWrapperFunctions
+// Description: Initialize the OpenGL Wrappers package.
+// Return Val:  bool - Success / failure.
+// Author:      Yaki Tebeka
+// Date:        5/7/2003
+// ---------------------------------------------------------------------------
+bool gsInitializeWrapperFunctions()
+{
+    static bool s_retVal = false;
+    static bool s_isFirstCall = true;
+
+    // If this is the first call to this function:
+    if (s_isFirstCall)
+    {
+        s_isFirstCall = false;
+
+        // Load the system's OpenGL module:
+        osModuleHandle hSystemOpenGLModule = gsLoadSystemsOpenGLModule();
+        GT_IF_WITH_ASSERT(hSystemOpenGLModule != NULL)
+        {
+            // Connect the OpenGL wrapper functions to the system's OpenGL functions:
+            bool rc1 = gsConnectOpenGLWrappers(hSystemOpenGLModule);
+            s_retVal = rc1;
+        }
+
+        // On Mac OS X only:
+#if ((AMDT_BUILD_TARGET == AMDT_LINUX_OS) && (AMDT_LINUX_VARIANT == AMDT_MAC_OS_X_LINUX_VARIANT))
+        {
+#ifdef _GR_IPHONE_BUILD
+            // Uri, 11/6/09: EAGL wrappers are found in the same library as the normal OpenGL ES ones.
+#else
+
+            if (s_retVal)
+            {
+                bool CGLWrappersConnected = false;
+
+                // Connect the CGL wrapper functions to the system's CGL functions:
+                bool rc2 = gsConnectCGLWrappers(hSystemOpenGLModule);
+                GT_IF_WITH_ASSERT(rc2)
+                {
+                    CGLWrappersConnected = true;
+                }
+
+                s_retVal = CGLWrappersConnected;
+            }
+
+#endif
+        }
+#endif // Mac OS X only
+    }
+
+    return s_retVal;
+}
+
+
+// ---------------------------------------------------------------------------
+// Name:        gsTerminateWrapperFunctions
+// Description: Terminate the OpenGL Wrappers package.
+// Return Val:  bool - Success / failure.
+// Author:      Yaki Tebeka
+// Date:        5/7/2003
+// ---------------------------------------------------------------------------
+bool gsTerminateWrapperFunctions()
+{
+    // Unload the system's OpenGL module:
+    bool retVal = gsUnloadSystemOpenGLModule();
+    return retVal;
+}
+
+
+// ---------------------------------------------------------------------------
+// Name:        gsGetSystemsOGLModuleProcAddress
+// Description: Returns the address of a function that reside in the systems
+//              OpenGL module.
+// Arguments: procname - The queried function name.
+// Return Val:  osProcedureAddress - The queried function address, or NULL in case of failure.
+// Author:      Yaki Tebeka
+// Date:        5/12/2006
+// ---------------------------------------------------------------------------
+osProcedureAddress gsGetSystemsOGLModuleProcAddress(const char* procname)
+{
+    osProcedureAddress retVal = NULL;
+
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+    retVal = (osProcedureAddress)(gs_stat_realFunctionPointers.wglGetProcAddress(procname));
+#elif ((AMDT_BUILD_TARGET == AMDT_LINUX_OS) && (AMDT_LINUX_VARIANT == AMDT_GENERIC_LINUX_VARIANT))
+    retVal = (osProcedureAddress)(gs_stat_realFunctionPointers.glXGetProcAddress((const GLubyte*)procname));
+#elif ((AMDT_BUILD_TARGET == AMDT_LINUX_OS) && (AMDT_LINUX_VARIANT == AMDT_MAC_OS_X_LINUX_VARIANT))
+    retVal = (osProcedureAddress)osGetOpenGLFrameworkFunctionAddress(procname);
+#else
+#error Unknown build target!
+#endif
+
+    return retVal;
+}
+
+// ---------------------------------------------------------------------------
+// Name:        gsTextureCoordinateString
+// Description: Translated GLenum that describes texture coordinates to
+//              a string.
+// Arguments:   coord - The input texture coordinate.
+// Return Val:  const char* - The output string (or "Unknown in case of error).
+// Author:      Yaki Tebeka
+// Date:        13/9/2004
+// Implementation Notes:
+//   See comments at apGLenumParameter::valueAsString() implementation notes.
+// ---------------------------------------------------------------------------
+const char* gsTextureCoordinateString(GLenum coord)
+{
+    // The strings array:
+    static const char* stat_stringsArr[5] =
+    {
+        "Unknown",
+        "GL_S",
+        "GL_T",
+        "GL_R",
+        "GL_Q"
+    };
+
+    int stringIndex = 0;
+
+    if (coord == GL_S)
+    {
+        stringIndex = 1;
+    }
+    else if (coord == GL_T)
+    {
+        stringIndex = 2;
+    }
+    else if (coord == GL_R)
+    {
+        stringIndex = 3;
+    }
+    else if (coord == GL_Q)
+    {
+        stringIndex = 4;
+    }
+
+    return stat_stringsArr[stringIndex];
+}
+
+
+// ---------------------------------------------------------------------------
+// Name:        gsEnableInitializationFunctionsLogging
+// Description:
+//  Causes the OpenGL server to log / do not log initialization function calls.
+//  For example:
+//  - Sometimes, we would like to call SwapBuffers ourselves, but since
+//    SwapBuffers calls wglSwapBuffers, we need to disable the logging of the
+//    wglSwapBuffers call.
+//  - NVIDIA functions sometimes calls wglGetProcAddress and glGetString.
+//    We would like to disable function calls logging while this happens.
+//
+// Arguments: isLoggingEnabled - true - to get into a mode where initialization functions are logged.
+//                               false - to disable initialization function's logging.
+// Author:      Yaki Tebeka
+// Date:        16/9/2009
+// ---------------------------------------------------------------------------
+void gsEnableInitializationFunctionsLogging(bool isLoggingEnabled)
+{
+    stat_areInitializationFunctionsLogged = isLoggingEnabled;
+}
+
+
+// ---------------------------------------------------------------------------
+// Name:        gsAreInitializationFunctionsLogged
+// Description:
+//  Returns true when initialization functions are logged, false otherwise
+//  (For more details, see gsEnableInitializationFunctionsLogging)
+//
+// Author:      Yaki Tebeka
+// Date:        16/9/2008
+// ---------------------------------------------------------------------------
+bool gsAreInitializationFunctionsLogged()
+{
+    return stat_areInitializationFunctionsLogged;
+}
+
+

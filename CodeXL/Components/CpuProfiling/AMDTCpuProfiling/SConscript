@@ -1,0 +1,103 @@
+# -*- Python -*-
+
+import os
+from CXL_init import *
+
+Import('*')
+
+libName = "CXLCpuProfiling"
+
+CPU_env = CXL_env.Clone()
+
+UseTinyXml(CPU_env)
+UseQt4(CPU_env)
+UseQCustomPlot(CPU_env)
+
+CXL_lib_common_amd_deps = (
+
+)
+
+initCommonLibAmd (CPU_env, CXL_lib_common_amd_deps)
+
+CPU_env.Append(LIBS = [
+	"CXLDisassembler",
+	"CXLExecutableFormat",
+	"CXLCpuPerfEventUtils",
+	"CXLCpuCallstackSampling",
+	"CXLProfilingAgentsData",
+	"CXLCpuProfilingTranslation",
+	"CXLCpuProfilingRawData",
+	"CXLCpuProfilingControl",
+	"CXLSharedProfiling",
+])
+
+###################################################
+# Initialize SconsScripts
+#
+
+# For CommonProjectHdr stuff
+CPU_env.Append( CPPPATH = [
+	CPU_env['CXL_common_dir'] + '/../CodeXL/Components/CpuProfiling/Backend',
+	CPU_env['CXL_common_dir'] + '/../CodeXL/Components/CpuProfiling',
+        CPU_env['CXL_common_dir'] + '/../CodeXL/Components/ThreadProfiling/Backend/AMDTThreadProfileAPI/inc',
+	CPU_env['CXL_common_dir'] + '/../CodeXL/Components/CpuProfiling/ProfilingAgents',
+        CPU_env['CXL_common_dir'] + '/../CodeXL/Components',
+        CPU_env['CXL_common_dir'] + '/../CodeXL/Components/AMDTSharedProfiling/inc/',
+        CPU_env['CXL_common_dir'] + '/../CodeXL',
+	CPU_env['CXL_common_dir'] + '/Src/TSingleton',
+	os.environ['JAVA_HOME'] + '/include',
+	os.environ['JAVA_HOME'] +'/include/linux',
+	CPU_env['CXL_commonproj_dir'],
+#	CPU_env['CXL_commonproj_dir'] + '/AMDTSharedProfiling/inc/',UseQCustomPlot(env)
+        CPU_env['CXL_commonproj_dir'] + '/AMDTCommonHeaders/',
+	os.getcwd(), 
+	'#obj',
+])
+
+####################################################
+# Exporting variables
+
+CPUProfiling_Lib = [];
+
+UIC_Generated = [];
+MOC_Generated = [];
+
+Export( 'CPU_env ' + 
+	'CPUProfiling_Lib ' +
+	'UIC_Generated ' +
+	'MOC_Generated ' )
+
+##############################################################
+
+# Build UIC generated files
+UIC_Generated = SConscript(
+	'#Components/CpuProfiling/AMDTCpuProfiling/ui/SConscript',
+	variant_dir='#obj/tmp/ui')
+
+# Build MOC generated files
+MOC_Generated = SConscript(
+	'#Components/CpuProfiling/AMDTCpuProfiling/inc/SConscript',
+	variant_dir='#obj/tmp/moc')
+
+CPU_env.Depends(MOC_Generated, UIC_Generated)
+
+# Build Cpu profiler code
+CPUProfiling_Lib = SConscript(
+	'#Components/CpuProfiling/AMDTCpuProfiling/src/SConscript', 
+	variant_dir='#obj/' + CPU_env['CXL_build'])
+
+CPU_env.Depends(CPUProfiling_Lib, UIC_Generated)
+
+sources = CPUProfiling_Lib + MOC_Generated
+
+# Creating shared libraries
+soFiles = CPU_env.SharedLibrary(
+	target = libName, 
+	source = sources)
+
+# Installing libraries
+libInstall = CPU_env.Install( 
+	dir = CPU_env['CXL_lib_dir'], 
+	source = (soFiles))
+
+Return('libInstall')

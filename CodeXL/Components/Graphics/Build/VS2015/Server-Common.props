@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="UserMacros">
+    <!--ConfigurationFolderName-->
+    <ConfigurationFolderName Condition="'$(Configuration)'=='Debug'">Debug</ConfigurationFolderName>
+    <ConfigurationFolderName Condition="'$(Configuration)'=='Debug_Static'">Debug</ConfigurationFolderName>
+    <ConfigurationFolderName Condition="'$(Configuration)'=='Release'">Release</ConfigurationFolderName>
+    <ConfigurationFolderName Condition="'$(Configuration)'=='Release_Static'">Release</ConfigurationFolderName>
+    <!--MyBinDir-->
+    <MyBinDir Condition="'$(SolutionName)'=='CodeXL-AllProjects'">$(SolutionDir)..\Output\$(ConfigurationFolderName)\bin\</MyBinDir>
+    <MyBinDir Condition="'$(SolutionName)'!='CodeXL-AllProjects'">$(SolutionDir)bin\$(ConfigurationFolderName)$(GDT_BUILD_SUFFIX)\</MyBinDir>
+    <!--BaseDir-->
+    <BaseDir Condition="'$(SolutionName)'=='CodeXL-AllProjects'">$(SolutionDir)..\..\</BaseDir>
+    <BaseDir Condition="'$(SolutionName)'!='CodeXL-AllProjects'">$(SolutionDir)..\..\..\</BaseDir>
+    <CommonDir>$(BaseDir)Common\</CommonDir>
+    <UtilDir>$(BaseDir)Util\</UtilDir>
+  </PropertyGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(CommonDir)\Src\Vsprops\Global-Common.props" />
+  </ImportGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(CommonDir)Src\Sushi3\Common\include;$(CommonDir)Src\ShaderUtils;$(BaseDir)ShaderDebugger\Include;$(CommonDir)Src\DDS;$(CommonDir)Src\</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>LOG_MODULE="$(ProjectName)";NOMINMAX;STRICT;SHADERDEBUGGER_DX10;_GDT_Assert=PsAssert;_GDT_Verify=PsVerify;_GDT_Break=PsBreak;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="MyBinDir">
+      <Value>$(MyBinDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="BaseDir">
+      <Value>$(BaseDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CommonDir">
+      <Value>$(CommonDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="UtilDir">
+      <Value>$(UtilDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GDTCRT">
+      <Value>$(GDTCRT)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

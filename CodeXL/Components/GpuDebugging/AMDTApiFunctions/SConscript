@@ -1,0 +1,57 @@
+# -*- Python -*-
+
+from CXL_init import *
+
+Import('*')
+
+libName = "CXLApiFunctions"
+
+env = CXL_env.Clone()
+env.Append( CPPPATH = [ 
+	".",
+	"./..",
+	env['CXL_commonproj_dir'],
+	env['CXL_commonproj_dir'] + "/AMDTOSWrappers/Include",
+])
+
+UseAPPSDK(env);
+
+sources = \
+[
+	"src/gaAPIToSpyConnector.cpp",
+	"src/gaDebuggedProcessEventsFiller.cpp",
+	"src/gaIncomingSpyEventsListenerThread.cpp",
+	"src/gaIncomingSpyEventsPipeSocketListenerThread.cpp",
+	"src/gaIncomingSpyEventsTCPIPListenerThread.cpp",
+	"src/gaPersistentDataManager.cpp",
+	"src/gaPipeSocketSpyConnectionWaiterThread.cpp",
+	"src/gaPrivateAPIFunctions.cpp",
+	"src/gaSingletonsDelete.cpp",
+	"src/gaGRApiFunctions.cpp",
+	"src/gaSpyConnectionWaiterThread.cpp",
+	"src/gaTCPIPSpyConnectionWaiterThread.cpp"
+]
+
+
+env.Append( LIBS = 
+[
+	"CXLBaseTools",
+	"CXLOSWrappers",
+	"CXLAPIClasses",
+	"CXLProcessDebugger",
+])
+	
+# Creating object files	
+objFiles = env.SharedObject(sources)
+
+# Creating shared libraries
+soFiles = env.SharedLibrary(
+	target = libName, 
+	source = objFiles)
+
+# Installing libraries
+libInstall = env.Install( 
+	dir = env['CXL_lib_dir'], 
+	source = (soFiles))
+
+Return('libInstall')

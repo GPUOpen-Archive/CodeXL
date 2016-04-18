@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{43356050-3BB7-4FE9-8E01-FA614C9B4210}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="$(SolutionDir)\AMDTGpuDebugging.props" />
+    <Import Project="..\..\..\..\Common\Lib\AMD\APPSDK\Global-OpenCL-NoLib.props" />
+  </ImportGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>AMDTAPIFUNCTIONS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>CXLProcessDebugger$(GDTProjectSuffix).lib;Pdh.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\gaAPIToSpyConnector.cpp" />
+    <ClCompile Include="src\gaDebuggedProcessEventsFiller.cpp" />
+    <ClCompile Include="src\gaGRApiFunctions.cpp" />
+    <ClCompile Include="src\gaIncomingSpyEventsListenerThread.cpp" />
+    <ClCompile Include="src\gaIncomingSpyEventsPipeSocketListenerThread.cpp" />
+    <ClCompile Include="src\gaIncomingSpyEventsTCPIPListenerThread.cpp" />
+    <ClCompile Include="src\gaPersistentDataManager.cpp" />
+    <ClCompile Include="src\gaPipeSocketSpyConnectionWaiterThread.cpp" />
+    <ClCompile Include="src\gaPrivateAPIFunctions.cpp" />
+    <ClCompile Include="src\gaSingletonsDelete.cpp" />
+    <ClCompile Include="src\gaSpyConnectionWaiterThread.cpp" />
+    <ClCompile Include="src\gaTCPIPSpyConnectionWaiterThread.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\gaAPIToSpyConnector.h" />
+    <ClInclude Include="src\gaDebuggedProcessEventsFiller.h" />
+    <ClInclude Include="src\gaIncomingSpyEventsListenerThread.h" />
+    <ClInclude Include="src\gaIncomingSpyEventsPipeSocketListenerThread.h" />
+    <ClInclude Include="src\gaIncomingSpyEventsTCPIPListenerThread.h" />
+    <ClInclude Include="src\gaPersistentDataManager.h" />
+    <ClInclude Include="src\gaPipeSocketSpyConnectionWaiterThread.h" />
+    <ClInclude Include="src\gaPrivateAPIFunctions.h" />
+    <ClInclude Include="src\gaSingletonsDelete.h" />
+    <ClInclude Include="src\gaSpyConnectionWaiterThread.h" />
+    <ClInclude Include="src\gaStringConstants.h" />
+    <ClInclude Include="src\gaTCPIPSpyConnectionWaiterThread.h" />
+    <ClInclude Include="Include\apAPIFunctionsDLLBuild.h" />
+    <ClInclude Include="Include\gaGRApiFunctions.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuildStep Include="Sconstruct">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </CustomBuildStep>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\..\Common\Src\VersionInfo\VersionResource.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

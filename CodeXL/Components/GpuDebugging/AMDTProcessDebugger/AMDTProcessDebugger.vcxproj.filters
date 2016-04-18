@@ -1,0 +1,207 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\pdDebuggedProcessWatcherThread.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdGDBCommandInfo.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdGDBDataStructs.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdGDBDriver.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdGDBListenerThread.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdGDBOutputReader.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdGDBProcessWaiterThread.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdIPhoneDeviceProcessDebugger.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdLauncherProcessWatcherThread.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdLinuxDebuggedApplicationOutputReaderThread.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdLinuxProcessDebugger.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdLoadedModule.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdLoadedModulesManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdProcessDebugger.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdProcessDebuggersManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdRegisterProcessDebuggersManagerInstance.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdRemoteProcessDebugger.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdRemoteProcessDebuggerDebuggingServerWatcherThread.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdRemoteProcessDebuggerEventsListenerThread.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdSingletonsDelete.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdWin32DebuggerThread.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdWin32LoadLibraryStub.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdWin32MemoryInjector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdWin32ProcessDebugger.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdWin32RemoteDLLLoader.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdWin32SetRemoteProcessDLLDirectory.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdWindowsLoadedModulesManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pdRemoteProcessDebuggerTCPIPConnectionWaiterThread.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\pdWindowsLoadedModulesManager.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\pdWin32SetRemoteProcessDLLDirectory.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\pdWin32RemoteDLLLoader.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pdWin32ProcessDebugger.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\pdWin32MemoryInjector.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pdWin32LoadLibraryStub.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pdWin32DebuggerThread.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pdStringConstants.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pdSingletonsDelete.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pdRemoteProcessDebuggerEventsListenerThread.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pdRemoteProcessDebuggerDebuggingServerWatcherThread.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\pdRemoteProcessDebuggerCommandId.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pdRemoteProcessDebugger.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pdRegisterProcessDebuggersManagerInstance.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\pdProcessDebuggersManager.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\pdProcessDebugger.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pdLoadedModulesManager.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pdLoadedModule.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pdLinuxProcessDebugger.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pdLinuxDebuggedApplicationOutputReaderThread.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pdLauncherProcessWatcherThread.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pdIPhoneDeviceProcessDebugger.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pdIPhoneDebuggingFunctions.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pdGDBProcessWaiterThread.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pdGDBOutputReader.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pdGDBListenerThread.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pdGDBDriver.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pdGDBDataStructs.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pdGDBCommandInfo.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pdDebuggedProcessWatcherThread.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pdDebuggedProcessThreadData.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\ProcessDebuggerDLLBuild.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pdRemoteProcessDebuggerTCPIPConnectionWaiterThread.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{28ff2f33-52a5-4d60-8169-b074a8c40cbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="inc">
+      <UniqueIdentifier>{6f6ff9ea-7c8a-4024-84e7-15366bdf64e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public inc">
+      <UniqueIdentifier>{c8e67e27-3fb3-4e2d-a0e4-5916a6dfba49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{72e9c23b-ef28-491d-99ec-8e3e515466ff}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\..\Common\Src\VersionInfo\VersionResource.rc" />
+  </ItemGroup>
+</Project>

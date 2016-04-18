@@ -1,0 +1,221 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\FlowGraph">
+      <UniqueIdentifier>{5ae0546f-1146-40a0-8e5f-96e7d460273c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\StackWalker">
+      <UniqueIdentifier>{cb265d8b-19d4-41cc-87a3-fd649154fb9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\StackWalker\x86">
+      <UniqueIdentifier>{744707f8-4776-4471-aab5-99bc0efc0569}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\StackWalker\x64">
+      <UniqueIdentifier>{81fafc67-5b29-4bfd-b91f-bf972476267f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\StackWalker\x86\Frames">
+      <UniqueIdentifier>{fa3d879c-8ae2-4457-9933-54d73f12ec71}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\CssReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CssWriter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FunctionGraph.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CallGraph.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CallStack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CallSite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CallStackBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VirtualStackWalker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DllMain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StackWalker\x86\PostfixFrameEvaluator.cpp">
+      <Filter>Source Files\StackWalker\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StackWalker\x86\StackFrameTraverser.cpp">
+      <Filter>Source Files\StackWalker\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StackWalker\x86\FpoFrameTraverser.cpp">
+      <Filter>Source Files\StackWalker\x86\Frames</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StackWalker\x86\FrameDataFrameTraverser.cpp">
+      <Filter>Source Files\StackWalker\x86\Frames</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StackWalker\x86\PrologFrameTraverser.cpp">
+      <Filter>Source Files\StackWalker\x86\Frames</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StackWalker\x86\StandardFrameTraverser.cpp">
+      <Filter>Source Files\StackWalker\x86\Frames</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StackWalker\x86\TrapFrameTraverser.cpp">
+      <Filter>Source Files\StackWalker\x86\Frames</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StackWalker\x86\TssFrameTraverser.cpp">
+      <Filter>Source Files\StackWalker\x86\Frames</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StackWalker\x86\KiUserExceptionDispatcherFrameTraverser.cpp">
+      <Filter>Source Files\StackWalker\x86\Frames</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StackWalker\x86\FrameChainWalker.cpp">
+      <Filter>Source Files\StackWalker\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StackWalker\x64\StackVirtualUnwinder.cpp">
+      <Filter>Source Files\StackWalker\x64</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StackWalker\x86\StackWalkContextX86.cpp">
+      <Filter>Source Files\StackWalker\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StackWalker\StackWalkContext.cpp">
+      <Filter>Source Files\StackWalker</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StackWalker\x86\UnknownFrameTraverser.cpp">
+      <Filter>Source Files\StackWalker\x86\Frames</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StackWalker\x64\StackWalkContextX64.cpp">
+      <Filter>Source Files\StackWalker\x64</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StackWalker\x86\DiaFrameData.cpp">
+      <Filter>Source Files\StackWalker\x86</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VirtualStack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StackWalker\x86\DisassemblerX86.cpp">
+      <Filter>Source Files\StackWalker\x86</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="$(CommonProjectsDir)\VersionInfo\VersionResource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\CpuCallstackSamplingDLLBuild.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\CssReader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\CssWriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\FunctionGraph.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\CallGraph.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\CallStack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\CssFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\CallSite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\CallStackBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\FlowGraph\FlowGraph.h">
+      <Filter>Header Files\FlowGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\FlowGraph\FlowGraphNode.h">
+      <Filter>Header Files\FlowGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\FlowGraph\FlowGraphPath.h">
+      <Filter>Header Files\FlowGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\FlowGraph\FlowGraphTraits.h">
+      <Filter>Header Files\FlowGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\VirtualStackWalker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StackWalker\x86\PostfixFrameEvaluator.h">
+      <Filter>Source Files\StackWalker\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StackWalker\x86\StackFrameTraverser.h">
+      <Filter>Source Files\StackWalker\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StackWalker\x86\FpoFrameTraverser.h">
+      <Filter>Source Files\StackWalker\x86\Frames</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StackWalker\x86\FrameDataFrameTraverser.h">
+      <Filter>Source Files\StackWalker\x86\Frames</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StackWalker\x86\PrologFrameTraverser.h">
+      <Filter>Source Files\StackWalker\x86\Frames</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StackWalker\x86\StandardFrameTraverser.h">
+      <Filter>Source Files\StackWalker\x86\Frames</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StackWalker\x86\TrapFrameTraverser.h">
+      <Filter>Source Files\StackWalker\x86\Frames</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StackWalker\x86\TssFrameTraverser.h">
+      <Filter>Source Files\StackWalker\x86\Frames</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StackWalker\x86\KiUserExceptionDispatcherFrameTraverser.h">
+      <Filter>Source Files\StackWalker\x86\Frames</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StackWalker\x86\FrameChainWalker.h">
+      <Filter>Source Files\StackWalker\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StackWalker\StackWalkContext.h">
+      <Filter>Source Files\StackWalker</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StackWalker\x64\StackVirtualUnwinder.h">
+      <Filter>Source Files\StackWalker\x64</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StackWalker\x86\StackWalkContextX86.h">
+      <Filter>Source Files\StackWalker\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StackWalker\x86\UnknownFrameTraverser.h">
+      <Filter>Source Files\StackWalker\x86\Frames</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StackWalker\x64\StackWalkContextX64.h">
+      <Filter>Source Files\StackWalker\x64</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StackWalker\StackFrameData.h">
+      <Filter>Source Files\StackWalker</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StackWalker\x86\DiaFrameData.h">
+      <Filter>Source Files\StackWalker\x86</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\VirtualStack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StackWalker\x86\DisassemblerX86.h">
+      <Filter>Source Files\StackWalker\x86</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

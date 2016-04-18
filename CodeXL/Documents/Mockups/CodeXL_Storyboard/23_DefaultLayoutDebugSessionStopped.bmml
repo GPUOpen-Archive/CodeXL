@@ -1,0 +1,256 @@
+<mockup version="1.0" skin="sketch" measuredW="915" measuredH="666" mockupW="803" mockupH="592">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::TitleWindow" x="112" y="74" w="803" h="592" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <close>true</close>
+        <maximizeRestore>true</maximizeRestore>
+        <minimize>true</minimize>
+        <text>CodeXL%20-%20ExampleCL.uni%20%28Debug%20Mode%29</text>
+      </controlProperties>
+    </control>
+    <control controlID="2" controlTypeID="com.balsamiq.mockups::Label" x="115" y="642" w="-1" h="-1" measuredW="406" measuredH="21" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Debugging%3A%20*0%3A0%3A15*%20_Break_%20at%20AMDTTeapotOCLSmokeSystem%3A%3Acompute</text>
+      </controlProperties>
+    </control>
+    <control controlID="3" controlTypeID="com.balsamiq.mockups::MenuBar" x="112" y="95" w="803" h="29" measuredW="447" measuredH="29" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <borderStyle>square</borderStyle>
+        <hrefs>32_MenuFile1%26bm%3B32_MenuFile1.bmml%26bm%3B32_MenuFile1.bmml%26bm%3B32_MenuFile1.bmml%2C34_MenuEdit%26bm%3B34_MenuEdit.bmml%26bm%3B34_MenuEdit.bmml%26bm%3B34_MenuEdit.bmml%2C35_MenuView%26bm%3B35_MenuView.bmml%26bm%3B35_MenuView.bmml%26bm%3B35_MenuView.bmml%2C51_MenuDebugInSession%26bm%3B51_MenuDebugInSession.bmml%26bm%3B51_MenuDebugInSession.bmml%26bm%3B51_MenuDebugInSession.bmml%2C40_MenuProfile%26bm%3B40_MenuProfile.bmml%26bm%3B40_MenuProfile.bmml%26bm%3B40_MenuProfile.bmml%2C38_MenuTools%26bm%3B38_MenuTools.bmml%26bm%3B38_MenuTools.bmml%26bm%3B38_MenuTools.bmml%2C59_MenuWindows%26bm%3B59_MenuWindows.bmml%26bm%3B59_MenuWindows.bmml%26bm%3B59_MenuWindows.bmml%2C60_MenuHelp%26bm%3B60_MenuHelp.bmml%26bm%3B60_MenuHelp.bmml%26bm%3B60_MenuHelp.bmml</hrefs>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%2218%2C27%2C51%2C48%22%20href%3D%2232_MenuFile1.bmml%22%20alt%3D%2232_MenuFile1%22%20id%3D%223_0%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%2260%2C27%2C96%2C48%22%20href%3D%2234_MenuEdit.bmml%22%20alt%3D%2234_MenuEdit%22%20id%3D%223_1%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22105%2C27%2C148%2C48%22%20href%3D%2235_MenuView.bmml%22%20alt%3D%2235_MenuView%22%20id%3D%223_2%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22157%2C27%2C209%2C48%22%20href%3D%2251_MenuDebugInSession.bmml%22%20alt%3D%2251_MenuDebugInSession%22%20id%3D%223_3%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22218%2C27%2C268%2C48%22%20href%3D%2240_MenuProfile.bmml%22%20alt%3D%2240_MenuProfile%22%20id%3D%223_4%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22277%2C27%2C323%2C48%22%20href%3D%2238_MenuTools.bmml%22%20alt%3D%2238_MenuTools%22%20id%3D%223_5%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22332%2C27%2C389%2C48%22%20href%3D%2259_MenuWindows.bmml%22%20alt%3D%2259_MenuWindows%22%20id%3D%223_6%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22398%2C27%2C438%2C48%22%20href%3D%2260_MenuHelp.bmml%22%20alt%3D%2260_MenuHelp%22%20id%3D%223_7%22/%3E%0A</map>
+        <selectedIndex>-1</selectedIndex>
+        <text>%26F%26ile%2C%20%26E%26dit%2C%20%26V%26iew%2C%20%26D%26ebug%2C%20%26P%26rofile%2C%20%26T%26ools%2C%20%26W%26indow%2C%20%26H%26elp</text>
+      </controlProperties>
+    </control>
+    <control controlID="13" controlTypeID="com.balsamiq.mockups::TitleWindow" x="685" y="464" w="223" h="175" measuredW="450" measuredH="400" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bottomheight>0</bottomheight>
+        <close>true</close>
+        <text>Debugged%20Process%20Events</text>
+      </controlProperties>
+    </control>
+    <control controlID="15" controlTypeID="com.balsamiq.mockups::List" x="691" y="492" w="217" h="141" measuredW="100" measuredH="126" zOrder="6" locked="false" isInGroup="-1">
+      <controlProperties>
+        <borderStyle>square</borderStyle>
+        <hasHeader>false</hasHeader>
+        <selectedIndex>-1</selectedIndex>
+        <text>Building%20OpenCL%20Program%20%20%28Context%201%29...%0ADLL%20Loaded%3A%20C%3A%5CUsers%5Cfranksw%5CAppData%5CLocal%5CTemp%5COCL13FF.tmp.dll%0ACould%20not%20build%20OpenCL%20Program%2016%20%28Context%201%29%20for%20debugging.%20Error%20code%3A%20CL_INVALID_BUILD_OPTIONS%0ABuilding%20OpenCL%20Program%20%20%28Context%201%29%20Ended%0ABreak</text>
+        <verticalScrollbar>true</verticalScrollbar>
+      </controlProperties>
+    </control>
+    <control controlID="16" controlTypeID="com.balsamiq.mockups::TitleWindow" x="112" y="145" w="249" h="320" measuredW="450" measuredH="400" zOrder="7" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bottomheight>0</bottomheight>
+        <close>true</close>
+        <text>Debug%20Explorer</text>
+        <topheight>26</topheight>
+      </controlProperties>
+    </control>
+    <control controlID="30" controlTypeID="com.balsamiq.mockups::Icon" x="118" y="173" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="8" locked="false" isInGroup="-1">
+      <controlProperties>
+        <icon>LeftArrowIcon%7Cxsmall</icon>
+      </controlProperties>
+    </control>
+    <control controlID="31" controlTypeID="com.balsamiq.mockups::Icon" x="135" y="173" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="9" locked="false" isInGroup="-1">
+      <controlProperties>
+        <icon>RightArrowIcon%7Cxsmall</icon>
+      </controlProperties>
+    </control>
+    <control controlID="32" controlTypeID="com.balsamiq.mockups::TitleWindow" x="691" y="145" w="223" h="178" measuredW="450" measuredH="400" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bottomheight>0</bottomheight>
+        <close>true</close>
+        <text>Memory</text>
+      </controlProperties>
+    </control>
+    <control controlID="33" controlTypeID="com.balsamiq.mockups::DataGrid" x="691" y="173" w="217" h="150" measuredW="227" measuredH="85" zOrder="10" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Object%20Type%2C%20Memory%20Size%2C%20Count%0A%2C%2C%0A%2C%2C</text>
+      </controlProperties>
+    </control>
+    <control controlID="34" controlTypeID="com.balsamiq.mockups::TitleWindow" x="691" y="323" w="223" h="141" measuredW="450" measuredH="400" zOrder="11" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bottomheight>0</bottomheight>
+        <close>true</close>
+        <text>Statistics</text>
+      </controlProperties>
+    </control>
+    <control controlID="45" controlTypeID="__group__" x="200" y="463" w="95" h="175" measuredW="95" measuredH="175" zOrder="13" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::TitleWindow" x="0" y="0" w="95" h="175" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="45">
+          <controlProperties>
+            <bottomheight>0</bottomheight>
+            <close>true</close>
+            <text/>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Label" x="5" y="3" w="-1" h="-1" measuredW="67" measuredH="21" zOrder="1" locked="false" isInGroup="45">
+          <controlProperties>
+            <text>Properties</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="46" controlTypeID="__group__" x="295" y="463" w="98" h="175" measuredW="98" measuredH="175" zOrder="12" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::TitleWindow" x="0" y="0" w="98" h="175" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="46">
+          <controlProperties>
+            <bottomheight>0</bottomheight>
+            <close>true</close>
+            <text/>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Label" x="5" y="3" w="-1" h="-1" measuredW="75" measuredH="21" zOrder="1" locked="false" isInGroup="46">
+          <controlProperties>
+            <text>Breakpoints</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="47" controlTypeID="__group__" x="392" y="464" w="71" h="175" measuredW="71" measuredH="175" zOrder="14" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::TitleWindow" x="0" y="0" w="71" h="175" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="47">
+          <controlProperties>
+            <bottomheight>0</bottomheight>
+            <close>true</close>
+            <text/>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Label" x="8" y="1" w="-1" h="-1" measuredW="42" measuredH="21" zOrder="1" locked="false" isInGroup="47">
+          <controlProperties>
+            <text>Locals</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="48" controlTypeID="__group__" x="463" y="463" w="66" h="175" measuredW="66" measuredH="175" zOrder="15" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::TitleWindow" x="0" y="0" w="66" h="175" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="48">
+          <controlProperties>
+            <bottomheight>0</bottomheight>
+            <close>true</close>
+            <text/>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Label" x="4" y="3" w="-1" h="-1" measuredW="44" measuredH="21" zOrder="1" locked="false" isInGroup="48">
+          <controlProperties>
+            <text>Watch</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="50" controlTypeID="__group__" x="112" y="465" w="88" h="175" measuredW="88" measuredH="175" zOrder="16" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::TitleWindow" x="0" y="0" w="88" h="175" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="50">
+          <controlProperties>
+            <bottomheight>0</bottomheight>
+            <close>true</close>
+            <text/>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Label" x="4" y="2" w="-1" h="-1" measuredW="63" measuredH="21" zOrder="1" locked="false" isInGroup="50">
+          <controlProperties>
+            <text>Call%20Stack</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="54" controlTypeID="com.balsamiq.mockups::TitleWindow" x="529" y="464" w="162" h="178" measuredW="450" measuredH="400" zOrder="17" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bottomheight>0</bottomheight>
+        <close>true</close>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="55" controlTypeID="com.balsamiq.mockups::Label" x="532" y="464" w="133" h="21" measuredW="133" measuredH="21" zOrder="18" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>OpenGL%20State%20Variabl</text>
+      </controlProperties>
+    </control>
+    <control controlID="56" controlTypeID="com.balsamiq.mockups::TabBar" x="362" y="145" w="323" h="319" measuredW="285" measuredH="100" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>0</selectedIndex>
+        <text>amdtteapotoclsmokesystem.cpp</text>
+      </controlProperties>
+    </control>
+    <control controlID="57" controlTypeID="com.balsamiq.mockups::Paragraph" x="371" y="173" w="308" h="282" measuredW="200" measuredH="140" zOrder="19" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20msg.reset%28%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20msg.printf%28%22Building%20program%20%5C%22%25S%5C%22%20...%22%2C%20kernel._sourcePath%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20_logger-%3EsetProgress%28msg._str%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20status%20%3D%20_clBuildProgram%28%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20kernel._clProgram%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%201%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%26devid%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20str%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20NULL%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20NULL%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20char*%20log%20%3D%20NULL%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20size_t%20logSize%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20if%20%28_clGetProgramBuildInfo%28%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20kernel._clProgram%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20devid%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20CL_PROGRAM_BUILD_LOG%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%200%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20NULL%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%26logSize%29%20%3D%3D%20CL_SUCCESS%29%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7B</text>
+      </controlProperties>
+    </control>
+    <control controlID="58" controlTypeID="com.balsamiq.mockups::Canvas" x="179" y="121" w="62" h="26" measuredW="100" measuredH="70" zOrder="20" locked="false" isInGroup="-1">
+      <controlProperties>
+        <value>0</value>
+        <verticalScrollbar>false</verticalScrollbar>
+      </controlProperties>
+    </control>
+    <control controlID="59" controlTypeID="com.balsamiq.mockups::Icon" x="185" y="126" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="21" locked="false" isInGroup="-1">
+      <controlProperties>
+        <color>0</color>
+        <href>22_DefaultLayoutDebugSessionStarted%26bm%3B22_DefaultLayoutDebugSessionStarted.bmml%26bm%3B22_DefaultLayoutDebugSessionStarted.bmml%26bm%3B22_DefaultLayoutDebugSessionStarted.bmml</href>
+        <icon>RightTriangleIcon%7Cxsmall</icon>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%2273%2C52%2C89%2C68%22%20href%3D%2222_DefaultLayoutDebugSessionStarted.bmml%22%20alt%3D%2222_DefaultLayoutDebugSessionStarted%22%20id%3D%2259%22/%3E</map>
+      </controlProperties>
+    </control>
+    <control controlID="60" controlTypeID="com.balsamiq.mockups::Icon" x="201" y="126" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="22" locked="false" isInGroup="-1">
+      <controlProperties>
+        <color>10066329</color>
+        <icon>PauseIcon%7Cxsmall</icon>
+      </controlProperties>
+    </control>
+    <control controlID="61" controlTypeID="com.balsamiq.mockups::Icon" x="217" y="126" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="23" locked="false" isInGroup="-1">
+      <controlProperties>
+        <borderStyle>none</borderStyle>
+        <color>10066329</color>
+        <icon>StopIcon%7Cxsmall</icon>
+      </controlProperties>
+    </control>
+    <control controlID="63" controlTypeID="com.balsamiq.mockups::Canvas" x="341" y="121" w="574" h="24" measuredW="100" measuredH="70" zOrder="24" locked="false" isInGroup="-1"/>
+    <control controlID="68" controlTypeID="com.balsamiq.mockups::Canvas" x="114" y="191" w="247" h="273" measuredW="100" measuredH="70" zOrder="25" locked="false" isInGroup="-1"/>
+    <control controlID="69" controlTypeID="__group__" x="118" y="123" w="61" h="23" measuredW="61" measuredH="23" zOrder="26" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::ComboBox" x="20" y="0" w="-1" h="-1" measuredW="41" measuredH="23" zOrder="0" locked="false" isInGroup="69">
+          <controlProperties>
+            <size>13</size>
+            <state>closed</state>
+            <text>P%0ATimer-based%0AInstruction-based%20</text>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::TextArea" x="0" y="0" w="20" h="23" measuredW="200" measuredH="140" zOrder="1" locked="false" isInGroup="69">
+          <controlProperties>
+            <text>D</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="70" controlTypeID="__group__" x="241" y="121" w="100" h="26" measuredW="100" measuredH="26" zOrder="27" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::Canvas" x="0" y="0" w="100" h="26" measuredW="100" measuredH="70" zOrder="0" locked="false" isInGroup="70"/>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Icon" x="10" y="5" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="1" locked="false" isInGroup="70">
+          <controlProperties>
+            <color>40463</color>
+            <icon>ForwardIcon%7Cxsmall</icon>
+          </controlProperties>
+        </control>
+        <control controlID="2" controlTypeID="com.balsamiq.mockups::Icon" x="34" y="5" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="2" locked="false" isInGroup="70">
+          <controlProperties>
+            <color>6989903</color>
+            <icon>ForwardIcon%7Cxsmall</icon>
+          </controlProperties>
+        </control>
+        <control controlID="3" controlTypeID="com.balsamiq.mockups::Icon" x="54" y="5" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="3" locked="false" isInGroup="70">
+          <controlProperties>
+            <color>12554240</color>
+            <icon>ForwardIcon%7Cxsmall</icon>
+          </controlProperties>
+        </control>
+        <control controlID="4" controlTypeID="com.balsamiq.mockups::Icon" x="76" y="5" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="4" locked="false" isInGroup="70">
+          <controlProperties>
+            <color>40463</color>
+            <icon>ForwardChapterIcon%7Cxsmall</icon>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+  </controls>
+</mockup>

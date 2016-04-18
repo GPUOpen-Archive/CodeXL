@@ -1,0 +1,85 @@
+# -*- Python -*-
+
+from CXL_init import *
+
+Import('*')
+
+libName = "CXLServerUtilities"
+
+env = CXL_env.Clone()
+env.Append( CPPPATH = [ 
+	".",
+	"./..",
+	"Include",
+	env['CXL_commonproj_dir'],
+	env['CXL_commonproj_dir'] + "/AMDTOSWrappers/Include",
+])
+
+UseAPPSDK(env);
+
+#special case for the slow motion file
+slowMotion_compiler_base_flags = " -Wall -g -fmessage-length=0 -Wno-unknown-pragmas -pthread"
+if (env['CXL_build'] == 'debug'):
+    slowMotion_compiler_base_flags += ' -D_DEBUG '
+else:
+    slowMotion_compiler_base_flags += ' -O0 -DNDEBUG '
+
+slowMotionDelayObj = env.SharedObject("src/suSlowMotionDelay.cpp", CCFLAGS=slowMotion_compiler_base_flags)
+
+sources = \
+[
+	"src/suAllocatedObjectsMonitor.cpp",
+	"src/suAPICallsHandlingThread.cpp",
+	"src/suAPIConnector.cpp",
+	"src/suAPIFunctionsImplementations.cpp",
+	"src/suAPIFunctionsStubs.cpp",
+	"src/suAPIMainLoop.cpp",
+	"src/suBreakpointsManager.cpp",
+	"src/suBufferReader.cpp",
+	"src/suCallsHistoryLogger.cpp",
+	"src/suCallsStatisticsLogger.cpp",
+	"src/suContextMonitor.cpp",
+	"src/suDebugLogInitializer.cpp",
+	"src/suGlobalVariables.cpp",
+	"src/suIKernelDebuggingManager.cpp",
+	"src/suInterceptionFunctions.cpp",
+	"src/suInteroperabilityHelper.cpp",
+	"src/suITechnologyMonitor.cpp",
+    "src/suMemoryAllocationMonitor.cpp",
+	"src/suNullContextCallsHistoryLogger.cpp",
+	"src/suSingletonsDelete.cpp",
+	"src/suSpiesUtilitiesDLLInitializationFunctions.cpp",
+	"src/suSpiesUtilitiesModuleTerminator.cpp",
+	"src/suSpiesUtilitiesModuleInitializer.cpp",
+	"src/suSpyAPIFunctions.cpp",
+	"src/suSpyToAPIConnector.cpp",
+	"src/suTechnologyMonitorsManager.cpp",
+	"src/suLinuxThrdsSuspender.cpp"
+]
+
+env.Append( LIBS=
+[
+	"CXLBaseTools",
+	"CXLOSWrappers",
+	"CXLAPIClasses",
+])
+	
+# Creating object files	
+objFiles = env.SharedObject(sources)
+objFiles  += \
+[
+	# Object files:
+	slowMotionDelayObj,
+]
+
+# Creating shared libraries
+soFiles = env.SharedLibrary(
+	target = libName, 
+	source = objFiles)
+
+# Installing libraries
+libInstall = env.Install( 
+	dir = env['CXL_lib_dir'], 
+	source = (soFiles))
+
+Return('libInstall')

@@ -1,0 +1,80 @@
+# -*- Python -*-
+import os
+
+Import('*')
+from CXL_init import *
+
+libName = "CXLGpuDebugging"
+
+env = CXL_env.Clone()
+
+includePath = \
+[
+	".",
+	"./../",
+	env['CXL_commonproj_dir'],
+	env['CXL_commonproj_dir'] + "/AMDTOSWrappers/Include",
+        env['CXL_commonproj_dir'] + '/../../CodeXL',
+]
+
+UseTinyXml(env)
+UseQt4(env)
+UseQScintilla(env)
+UseQCustomPlot(env)
+
+env.Append( CPPPATH = includePath)
+
+UseAPPSDK(env);
+
+moc_files = Split(
+                " Include/gwKernelWorkItemToolbar.h"
+                )
+
+sources = \
+[
+	"src/gwApplicationCommands.cpp",
+	"src/gwDebugActionsCreator.cpp",
+	"src/gwDebugViewsCreator.cpp",
+	"src/gwEventObserver.cpp", 
+	"src/gwgDEBuggerAppWrapper.cpp",
+	"src/gwImagesAndBuffersActionsCreator.cpp",
+	"src/gwImagesAndBuffersMDIViewCreator.cpp",
+	"src/gwKernelWorkItemToolbar.cpp",
+	"src/gwMenuActionsExecutor.cpp",
+	"src/gwStatisticsActionsExecutor.cpp",
+	"src/gwWXViewsActionsCreator.cpp",
+]
+
+env.Prepend( LIBS = 
+[
+	"CXLAssertionHandlers",
+	"CXLBaseTools",
+	"CXLOSWrappers",
+	"CXLAPIClasses",
+	"CXLGpuDebuggingComponents",
+	"CXLProcessDebugger",
+	"CXLApiFunctions",
+	"CXLApplicationComponents",
+	"CXLApplicationFramework",	
+	"libGL",
+])
+	
+# Building moc content
+MOC_Generated = []
+for moc_file in moc_files:
+    MOC_Generated += env.MocBld(moc_file)
+
+# Creating object files	
+objFiles = env.SharedObject(sources + MOC_Generated)
+
+# Creating shared libraries
+soFiles = env.SharedLibrary(
+	target = libName, 
+	source = objFiles)
+
+# Installing libraries
+libInstall = env.Install( 
+	dir = env['CXL_lib_dir'], 
+	source = (soFiles))
+
+Return('libInstall')

@@ -1,0 +1,330 @@
+# -*- Python -*-
+# $Id: SConscript 4614 2010-04-09 13:11:41Z rgorton $
+# SConscript for building the GpuProfiling component
+# Generates all of the moc/uic/rcc files, and compiles
+# the rest of the sources
+
+import os
+from CXL_init import *
+Import('*')
+
+TheLibraryName = 'CXLGpuProfiling'
+GPUProf_env = CXL_env.Clone()
+initBoost(GPUProf_env)
+UseBoost(GPUProf_env)
+buildDirPath = "." + '/build/' + GPUProf_env['CXL_arch']
+print buildDirPath
+GPUProf_env.VariantDir(buildDirPath, GPUProf_env['CXL_common_dir'] + '/Src')
+
+UseTinyXml(GPUProf_env)
+UseQScintilla(GPUProf_env)
+UseQt4(GPUProf_env)
+UseQCustomPlot(GPUProf_env)
+
+CXL_lib_common_amd_deps = (
+    'GPUPerfAPI',
+)
+
+initCommonLibAmd (GPUProf_env, CXL_lib_common_amd_deps) 
+
+GPUProf_env.Append( LIBS=
+[
+    "CXLRemoteClient",
+    'CXLSharedProfiling',
+    "CXLGraphicsServerInterface"
+])
+
+###################################################
+# Initialize SconsScripts
+#
+# For CommonProjectHdr stuff
+GPUProf_env.Append( CPPPATH = [
+    ".",
+    "../",
+    GPUProf_env['CXL_common_dir'] + '/../',
+    GPUProf_env['CXL_common_dir'] + '/Src/CommonProjectsHdr',
+    GPUProf_env['CXL_common_dir'] + '/Src/TSingleton',
+    GPUProf_env['CXL_common_dir'] + '/Src/ADLUtil',
+    GPUProf_env['CXL_common_dir'] + '/Src/DeviceInfo',
+    GPUProf_env['CXL_common_dir'] + '/Src/DynamicLibraryModule',
+    GPUProf_env['CXL_common_dir'] + '/Src/AMDTMutex',
+    GPUProf_env['CXL_common_dir'] + '/Lib/Ext/utf8cpp/source',
+    GPUProf_env['CXL_commonproj_dir'],
+    GPUProf_env['CXL_common_dir'] + '/../CodeXL',
+    GPUProf_env['CXL_common_dir'] + '/../CodeXL/Components',
+    GPUProf_env['CXL_common_dir'] + '/../CodeXL/Components/AMDTSharedProfiling/inc',
+    GPUProf_env['CXL_common_dir'] + '/../CodeXL/Remote',
+    GPUProf_env['CXL_common_dir'] + '/../CodeXL/Components/Graphics',
+    os.getcwd(),
+    '#obj',
+    ])
+
+GPUProf_env.Prepend(CPPDEFINES=["USE_POINTER_SINGLETON"])
+
+# the AMD_INTERNAL_BUILD is needed for HSA headers
+GPUProf_env.Prepend(CPPDEFINES=["AMD_INTERNAL_BUILD"])
+
+# GPU Profiling also uses some content which won't ever be "live"
+# ADL, CAL 8.95, APPSDK 2.8
+GPUProf_env.Append(CPPPATH = GPUProf_env['CXL_common_dir'] + '/Lib/AMD/ADL/include')
+if GPUProf_env['CXL_os'] == 'Linux':
+    GPUProf_env.Prepend(CPPDEFINES="_LINUX")
+# No libpath or libraries for ADL
+
+# NOTE: [Suravee] 
+# Comment this out for now since Chris said this is not needed for the front end.
+# Cal 8.95
+cal_dir = GPUProf_env['CXL_common_dir'] + '/Lib/AMD/CAL/8.95'
+cal_inc = cal_dir + '/include'
+#cal_libpath = cal_dir + '/lib/' + GPUProf_env['CXL_arch']
+#cal_libs = ['aticalcl', 'aticaldd', 'aticalrt']
+#
+GPUProf_env.Append(CPPPATH = [cal_inc])
+#GPUProf_env.Append(LIBPATH = [cal_libpath])
+#GPUProf_env.Append(LIBS = cal_libs)
+
+# APPSDK 3.0 - headers only.
+appsdk_dir = GPUProf_env['CXL_common_dir'] + '/Lib/AMD/APPSDK/3-0'
+appsdk_inc = appsdk_dir + '/include'
+GPUProf_env.Prepend(CPPPATH = [appsdk_inc])
+
+# HSA - headers only.
+hsa_dir = GPUProf_env['CXL_common_dir'] + '/Lib/AMD/HSA/STGFoundation/hsa'
+hsa_inc = hsa_dir + '/include'
+GPUProf_env.Prepend(CPPPATH = [hsa_inc])
+
+# required backend dirs
+backend_dir = GPUProf_env['CXL_common_dir'] + '/../CodeXL/Components/GpuProfiling/Backend'
+backend_common_dir = backend_dir + '/Common'
+backend_clcommon_dir = backend_dir + '/CLCommon'
+backend_sprofile_dir = backend_dir + '/sprofile'
+backend_sanalyze_dir = backend_dir + '/sanalyze'
+backend_cltraceagent_dir = backend_dir + '/CLTraceAgent'
+backend_hsaserver_dir = backend_dir + '/HSAFdnTrace'
+backend_hsacommon_dir = backend_dir + '/HSAFdnCommon'
+backend_dx12common_dir = backend_dir + '/DX12Trace'
+backend_vulkancommon_dir = backend_dir + '/VulkanTrace'
+
+GPUProf_env.Append(CPPPATH = [backend_common_dir, backend_clcommon_dir, backend_sprofile_dir, backend_sanalyze_dir, backend_cltraceagent_dir, backend_hsaserver_dir, backend_hsacommon_dir, backend_dx12common_dir, backend_vulkancommon_dir])
+
+# compiler flags required in order to build HSA headers
+GPUProf_env.Append(CPPFLAGS = '-fpermissive -Wno-error ')
+
+GPUProf_env.Append(CPPFLAGS = '-std=c++11 -DGDT_BUILD_SUFFIX=\'\'')
+
+# Assume that the environment does not need to be cloned, etc.
+uic_files = Split(
+        'EditNameValue.ui ' +
+        'FindToolBar.ui ' +
+        'ListViewDialog.ui ' +
+        'ProfileSetting.ui ' +
+        'SummaryViewBase.ui '
+        )
+
+moc_files = Split(
+        'gpViewsCreator.h ' +
+        'APITimelineItems.h ' +
+        'CounterSelectionSettingPage.h ' +
+        'EditNameValueDialog.h ' +
+        'GeneralSettingWindow.h ' +
+        'ListViewWindow.h ' +
+        'OpenCLTraceSettingPage.h ' +
+        'ProfileManager.h ' +
+        'ProfileSettingDialog.h ' +
+        'SummaryView.h ' +
+        'Session.h ' +
+        'TraceView.h ' +
+        'TraceTable.h ' +
+        'CodeViewerWindow.h ' +
+        'CustomDataTypes.h ' +
+        'SessionControl.h ' +
+        'SessionWindow.h ' +
+        'ProfileSessionDataItem.h ' +
+        'gpBaseSessionView.h ' +
+        'gpConnectDialog.h ' +
+        'gpCountersSelectionDialog.h ' +
+        'gpDetailedDataRibbon.h ' +
+        'gpSessionView.h ' +
+        'gpSessionUpdaterThread.h ' +
+        'gpFrameView.h ' +
+        'gpUIManager.h ' +
+        'gpTimeline.h ' +
+        'gpTraceModels.h ' +
+        'gpTraceTable.h ' + 
+        'gpTraceTree.h ' + 
+        'gpNavigationRibbon.h ' + 
+        'gpOverview.h ' +
+        'gpProjectSettingsExtension.h ' +
+        'gpTraceView.h ' +
+        'gpTraceSummaryWidget.h ' +
+        'gpTraceSummaryTable.h ' +
+        'gpPerformanceCountersDataView.h '
+        )
+
+# rcc files are a bit funny; ours references Resources/*.ico
+# When duplicated (the default) the rcc invocation is
+#   rcc obj/<dir>/foo.qrc -o obj/<dir>/foo.cpp
+# which causes rcc to blow up with complaints of not being able to find
+# the Resources files.
+# There is a -root <path> switch which looks like it should do what 
+# is expected, but said switch does not seem to work at all.
+# So the hack is to reference '#/<qrc files>' from the original directory.
+rcc_files = Split(
+        '#Components/GpuProfiling/AMDTGpuProfiling/QtClientMain.qrc '
+        )
+
+# This leaves annoying artifacts (objects) in ..../Common/Src
+# There is probably a good way to do that (TBD)
+commonsrc_files = Split(
+        buildDirPath + '/ADLUtil/ADLUtil.cpp ' +
+        buildDirPath + '/HSAUtils/HSAUtils.cpp ' +
+        buildDirPath + '/DynamicLibraryModule/HSAModule.cpp ' +
+        buildDirPath + '/DeviceInfo/DeviceInfoUtils.cpp ' +
+        buildDirPath + '/DynamicLibraryModule/DynamicLibraryModule.cpp ' +
+        buildDirPath + '/DynamicLibraryModule/OpenCLModule.cpp ' +
+        buildDirPath + '/AMDTMutex/AMDTMutex.cpp '
+        )
+
+backend_files = Split(
+        backend_clcommon_dir + '/CLFunctionDefs.cpp ' +
+        backend_clcommon_dir + '/CLInternalFunctionDefs.cpp ' +
+        backend_clcommon_dir + '/CLUtils.cpp ' +
+        backend_cltraceagent_dir + '/CLAtpFile.cpp ' +
+        backend_clcommon_dir + '/CLFunctionEnumDefs.cpp ' +
+        backend_clcommon_dir + '/CLPlatformInfo.cpp ' +
+        backend_common_dir + '/FileUtils.cpp ' +
+        backend_hsaserver_dir + '/HSAAtpFile.cpp ' +
+        backend_hsacommon_dir + '/HSAFunctionDefsUtils.cpp ' +
+        backend_common_dir + '/ATPFileUtils.cpp ' +
+        backend_common_dir + '/LocaleSetting.cpp ' +
+        backend_common_dir + '/Logger.cpp ' +
+        backend_common_dir + '/OSUtils.cpp ' +
+        backend_common_dir + '/StringUtils.cpp ' +
+        backend_common_dir + '/StackTraceAtpFile.cpp ' +
+        backend_sprofile_dir + '/AtpFile.cpp ' +
+        backend_sprofile_dir + '/PerfMarkerAtpFile.cpp ' + 
+        backend_sanalyze_dir + '/AnalyzerHTMLUtils.cpp ' + 
+        backend_dx12common_dir + '/DX12APIInfo.cpp ' + 
+        backend_dx12common_dir + '/DX12AtpFile.cpp ' + 
+        backend_dx12common_dir + '/DX12FunctionDefs.cpp ' + 
+        backend_vulkancommon_dir + '/VulkanAPIInfo.cpp ' + 
+        backend_vulkancommon_dir + '/VulkanAtpFile.cpp ' + 
+        backend_vulkancommon_dir + '/VulkanFunctionDefs.cpp '
+        )
+
+gpuprof_files = Split(
+        'AMDTGpuProfilerPlugin.cpp ' +
+        'gpViewsCreator.cpp ' +
+        'APIColorMap.cpp ' +
+        'APITimelineItems.cpp ' +
+        'AsyncRemoteGpuProfilingTask.cpp ' +
+        'CLAPIDefs.cpp ' +
+        'CLAPIFilterManager.cpp ' +
+        'CLSummarizer.cpp ' +
+        'CLTimelineItems.cpp ' +
+        'CodeViewerWindow.cpp ' +
+        'CounterGroup.cpp ' +
+        'CounterManager.cpp ' +
+        'CounterSelectionSettingPage.cpp ' +
+        'CustomDataTypes.cpp ' +
+		'DXTimelineItems.cpp ' +
+        'EditNameValueDialog.cpp ' +
+        'FindToolBarView.cpp ' +
+        'GeneralSettingWindow.cpp ' +
+        'GlobalSettings.cpp ' +
+        'GPUProjectHandler.cpp ' +
+        'GpuSessionActionsCreator.cpp ' +
+        'HSAAPIDefs.cpp ' +
+        'HSATimelineItems.cpp ' +
+        'KernelOccupancyWindow.cpp ' +
+        'ListViewWindow.cpp ' +
+        'OccupancyInfo.cpp ' +
+        'OpenCLTraceSettingPage.cpp ' +
+        'ProfileManager.cpp ' +
+        'ProfileParam.cpp ' +
+        'ProfileProcessMonitor.cpp ' +
+        'ProfileSettingData.cpp ' +
+        'ProfileSettingDialog.cpp ' +
+        'Project.cpp ' +
+        'ProjectSettings.cpp ' +
+        'SessionControl.cpp ' +
+        'Session.cpp ' +
+        'SessionManager.cpp ' +
+        'SessionWindow.cpp ' +
+        'SessionViewTabWidget.cpp ' +
+        'SummaryView.cpp ' +
+        'SymbolInfo.cpp ' +
+        'TraceTable.cpp ' +
+        'TraceView.cpp ' +
+        'Util.cpp ' + 
+        'gpBaseSessionView.cpp ' +
+        'gpConnectDialog.cpp ' +
+        'gpCountersSelectionDialog.cpp ' +
+        'gpDetailedDataRibbon.cpp ' +
+        'gpSessionView.cpp ' +
+        'gpSessionUpdaterThread.cpp ' +
+        'gpFrameView.cpp ' +
+        'gpTraceDataContainer.cpp ' +
+        'gpTimeline.cpp ' +
+        'gpTraceModels.cpp ' +
+        'gpTraceTable.cpp ' +
+        'gpTraceTree.cpp ' +
+        'gpExecutionMode.cpp ' +
+        'gpRemoteGraphicsBackendHandler.cpp ' +
+        'gpMenuActionsExecutor.cpp ' +
+        'gpNavigationRibbon.cpp ' +
+        'gpOverview.cpp ' +
+        'gpTraceDataParser.cpp ' +
+        'gpProjectSettings.cpp ' +
+        'gpProjectSettingsExtension.cpp ' +
+        'gpRibbonDataCalculator.cpp ' +
+        'gpTraceDataModel.cpp ' +
+        'gpTraceView.cpp ' +
+        'gpTraceSummaryWidget.cpp ' +
+        'gpTraceSummaryTable.cpp ' +
+        'gpPerformanceCountersDataView.cpp ' +
+        'gpTreeHandler.cpp ' +
+        'gpUIManager.cpp ' +
+        'ProfileSessionDataItem.cpp '
+        )
+
+# Generated files first.
+# Building uic files
+#   foo.ui --> ui_foo.h
+uic_gen = []
+for uic_file in uic_files:
+    uic_gen += GPUProf_env.UicBld(uic_file)
+
+UIC_Generated = uic_gen
+
+# Building moc content
+#   foo.h --> moc_foo.cpp
+moc_gen = []
+for moc_file in moc_files:
+    moc_gen += GPUProf_env.MocBld(moc_file)
+
+MOC_Generated = moc_gen
+# this dependency might not be needed here, but it is needed in other
+# cases; adding the dependency has trivial "downside"
+GPUProf_env.Depends(MOC_Generated, UIC_Generated)
+
+# Building rcc content
+#   foo.qrc --> rcc_foo.cpp
+rcc_gen = []
+for rcc_file in rcc_files:
+    rcc_gen += GPUProf_env.RccBld(rcc_file)
+RCC_Generated = rcc_gen
+
+# Now the "regular" build parts
+gpuprof_objs = GPUProf_env.SharedObject(gpuprof_files + backend_files + commonsrc_files + MOC_Generated + RCC_Generated)
+all_objs = gpuprof_objs
+
+GPUProfiling_Lib = [all_objs]
+GPUProf_env.Depends(GPUProfiling_Lib, UIC_Generated + MOC_Generated + RCC_Generated)
+soFiles = GPUProf_env.SharedLibrary(TheLibraryName, GPUProfiling_Lib)
+
+libInstall = GPUProf_env.Install(
+        dir = GPUProf_env['CXL_lib_dir'],
+        source = (soFiles))
+
+Return('libInstall')

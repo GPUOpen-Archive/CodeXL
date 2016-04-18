@@ -1,0 +1,258 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="inc">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="rc">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="CL">
+      <UniqueIdentifier>{db10de23-2927-4526-86c3-4080e6892c59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WindowsResources">
+      <UniqueIdentifier>{a94c2e8a-483d-41f8-9603-b7661257cb3b}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="public inc">
+      <UniqueIdentifier>{bbb3ca30-6661-4f03-be90-ffd517a7bfc4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\csAMDPerformanceCountersManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csAMDQueuePerformanceCountersReader.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csAPIFunctionsImplementations.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csAPIFunctionsStubs.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csBufferSerializer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csCallsHistoryLogger.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csCLKernel.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csCommandQueueMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csCommandQueuesMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csContextMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csDevicesMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csExtensionsManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csForcedModesManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csGlobalVariables.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csMacOSXInterception.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csMemoryMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csMemoryObjectReader.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csOpenCLDLLMainFunc.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csOpenCLExtensionsWrappers.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csOpenCLHandleMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csOpenCLModuleInitializer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csOpenCLMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csOpenCLQueuePerformanceCountersReader.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csOpenCLQueuesPerformanceCountersManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csOpenCLServerInitialization.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csOpenCLWrappers.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csOpenGLIntegrationWrappers.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csProgramsAndKernelsMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csSamplersMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csWrappersCommon.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csDWARFParser.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csSingletonsDelete.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csImagesAndBuffersMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csAMDKernelDebuggingManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csMonitoredFunctionPointers.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csEventsMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\csDirectXIntegrationWrappers.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\csAMDPerformanceCountersManager.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csAMDQueuePerformanceCountersReader.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csAPIFunctionsImplementations.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csAPIFunctionsStubs.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csBufferSerializer.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csCallsHistoryLogger.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csCLKernel.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csCommandQueueMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csCommandQueuesMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csContextMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csDevicesMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csExtensionsManager.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csForcedModesManager.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csGlobalVariables.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csMacOSXInterception.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csMemoryMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csMemoryObjectReader.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csMonitoredFunctionPointers.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csOpenCLHandleMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csOpenCLMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csOpenCLQueuePerformanceCountersReader.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csOpenCLQueuesPerformanceCountersManager.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csOpenCLServerInitialization.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csOpenCLWrappersAidMacros.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csProgramsAndKernelsMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csSamplersMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csStringConstants.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csWrappersCommon.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csDWARFParser.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csSingletonsDelete.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csImagesAndBuffersMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csAMDKernelDebuggingManager.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\csPublicStringConstants.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csAMDKernelDebuggingFunctionPointers.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\csEventsMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="$(CommonProjectsDir)\VersionInfo\VersionResource.rc">
+      <Filter>rc</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="WindowsResources\AMDTOpenCLServer.def">
+      <Filter>src</Filter>
+    </None>
+    <None Include="Sconstruct" />
+  </ItemGroup>
+</Project>

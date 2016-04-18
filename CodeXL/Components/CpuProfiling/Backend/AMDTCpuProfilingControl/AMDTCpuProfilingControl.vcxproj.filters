@@ -1,0 +1,119 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Windows">
+      <UniqueIdentifier>{12c5da35-8941-470f-9e1b-8922b89e422c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Linux">
+      <UniqueIdentifier>{2fe38be1-1a8f-4215-8a99-62e797a97605}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Windows">
+      <UniqueIdentifier>{f6387a28-1d36-49f5-9b74-9bd8d04cace4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Windows\CpuUtilization.cpp">
+      <Filter>Source Files\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuProfileControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Windows\CpuProfileControl_Win.cpp">
+      <Filter>Source Files\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Linux\CaPerfConfig.cpp">
+      <Filter>Source Files\Linux</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Linux\CaPerfEvent.cpp">
+      <Filter>Source Files\Linux</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Linux\CaPerfProfiler.cpp">
+      <Filter>Source Files\Linux</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Linux\CpuProfileControl_Lin.cpp">
+      <Filter>Source Files\Linux</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Linux\PerfConfig.cpp">
+      <Filter>Source Files\Linux</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Linux\PerfEvent.cpp">
+      <Filter>Source Files\Linux</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Linux\PerfEventInternal.cpp">
+      <Filter>Source Files\Linux</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Linux\PerfPmuSession.cpp">
+      <Filter>Source Files\Linux</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Linux\PerfPmuTarget.cpp">
+      <Filter>Source Files\Linux</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Linux\PerfProfiler.cpp">
+      <Filter>Source Files\Linux</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\..\..\Common\Src\VersionInfo\VersionResource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\CpuProfilingControlDLLBuild.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Windows\CpuUtilization.h">
+      <Filter>Header Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Windows\CpuUtilizationRecords.h">
+      <Filter>Header Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\CpuProfileControl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Windows\CpuProfileControl_Win.h">
+      <Filter>Source Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Linux\CaPerfConfig.h">
+      <Filter>Source Files\Linux</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Linux\CaPerfEvent.h">
+      <Filter>Source Files\Linux</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Linux\CaPerfProfiler.h">
+      <Filter>Source Files\Linux</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Linux\CpuProfileControl_Lin.h">
+      <Filter>Source Files\Linux</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Linux\PerfConfig.h">
+      <Filter>Source Files\Linux</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Linux\PerfEvent.h">
+      <Filter>Source Files\Linux</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Linux\PerfEventInternal.h">
+      <Filter>Source Files\Linux</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Linux\PerfPmuSession.h">
+      <Filter>Source Files\Linux</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Linux\PerfPmuTarget.h">
+      <Filter>Source Files\Linux</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Linux\PerfProfiler.h">
+      <Filter>Source Files\Linux</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

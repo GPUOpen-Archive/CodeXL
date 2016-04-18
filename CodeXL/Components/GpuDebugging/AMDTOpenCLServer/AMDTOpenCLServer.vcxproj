@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{8F75E800-61EA-4688-B317-85130B107FB7}</ProjectGuid>
+    <RootNamespace>AMDTOpenCLServer</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="$(SolutionDir)\AMDTGpuDebugging.props" />
+    <Import Project="$(SolutionDir)\AMDTGpuDebuggingHwDbg.props" />
+    <Import Project="$(AMDTCommonAMD)\GPUPerfAPI\Global-GPUPerfAPI.props" />
+    <Import Project="$(AMDTCommonEXT)\GRLibDWARF\GRLibDWARF-VS2015.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(AMDTCommonAMD)\APPSDK\Global-OpenCL-NoLib.props" />
+  </ImportGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir>$(OutDir)spies$(GDTPlatformSuffixNumBitsOnly)$(GDTBuildSuffix)\</OutDir>
+    <TargetName>OpenCL</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;$(AMDTCommonAMD)OpenCLDebugAPI\1.3\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_AMDT_OPENCLSERVER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>CXLServerUtilities$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(ENABLE_HSA)'=='TRUE'">AMDTHsaDebugging$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>.\WindowsResources\AMDTOpenCLServer.def</ModuleDefinitionFile>
+      <ImportLibrary>$(AMDTOutputDir)$(Configuration)\arch\spies$(GDTPlatformSuffixNumBitsOnly)$(GDTBuildSuffix)\$(TargetName).lib</ImportLibrary>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/opt:nolbr %(AdditionalOptions)</AdditionalOptions>
+      <ImageHasSafeExceptionHandlers Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ImageHasSafeExceptionHandlers>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\csAMDKernelDebuggingManager.cpp" />
+    <ClCompile Include="src\csAMDPerformanceCountersManager.cpp" />
+    <ClCompile Include="src\csAMDQueuePerformanceCountersReader.cpp" />
+    <ClCompile Include="src\csAPIFunctionsImplementations.cpp" />
+    <ClCompile Include="src\csAPIFunctionsStubs.cpp" />
+    <ClCompile Include="src\csBufferSerializer.cpp" />
+    <ClCompile Include="src\csCallsHistoryLogger.cpp" />
+    <ClCompile Include="src\csCLKernel.cpp" />
+    <ClCompile Include="src\csCommandQueueMonitor.cpp" />
+    <ClCompile Include="src\csCommandQueuesMonitor.cpp" />
+    <ClCompile Include="src\csContextMonitor.cpp" />
+    <ClCompile Include="src\csDevicesMonitor.cpp" />
+    <ClCompile Include="src\csDirectXIntegrationWrappers.cpp" />
+    <ClCompile Include="src\csDWARFParser.cpp" />
+    <ClCompile Include="src\csEventsMonitor.cpp" />
+    <ClCompile Include="src\csExtensionsManager.cpp" />
+    <ClCompile Include="src\csForcedModesManager.cpp" />
+    <ClCompile Include="src\csGlobalVariables.cpp" />
+    <ClCompile Include="src\csImagesAndBuffersMonitor.cpp" />
+    <ClCompile Include="src\csMacOSXInterception.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\csMemoryMonitor.cpp" />
+    <ClCompile Include="src\csMemoryObjectReader.cpp" />
+    <ClCompile Include="src\csMonitoredFunctionPointers.cpp" />
+    <ClCompile Include="src\csOpenCLDLLMainFunc.cpp" />
+    <ClCompile Include="src\csOpenCLExtensionsWrappers.cpp">
+      <Optimization Condition="'$(Configuration)'=='Release'">Disabled</Optimization>
+    </ClCompile>
+    <ClCompile Include="src\csOpenCLHandleMonitor.cpp" />
+    <ClCompile Include="src\csOpenCLModuleInitializer.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\csOpenCLMonitor.cpp">
+      <Optimization Condition="'$(Configuration)'=='Release'">Disabled</Optimization>
+    </ClCompile>
+    <ClCompile Include="src\csOpenCLQueuePerformanceCountersReader.cpp" />
+    <ClCompile Include="src\csOpenCLQueuesPerformanceCountersManager.cpp" />
+    <ClCompile Include="src\csOpenCLServerInitialization.cpp" />
+    <ClCompile Include="src\csOpenCLWrappers.cpp">
+      <Optimization Condition="'$(Configuration)'=='Release'">Disabled</Optimization>
+    </ClCompile>
+    <ClCompile Include="src\csOpenGLIntegrationWrappers.cpp" />
+    <ClCompile Include="src\csProgramsAndKernelsMonitor.cpp" />
+    <ClCompile Include="src\csSamplersMonitor.cpp" />
+    <ClCompile Include="src\csSingletonsDelete.cpp" />
+    <ClCompile Include="src\csWrappersCommon.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\csPublicStringConstants.h" />
+    <ClInclude Include="src\csAMDKernelDebuggingFunctionPointers.h" />
+    <ClInclude Include="src\csAMDKernelDebuggingManager.h" />
+    <ClInclude Include="src\csAMDPerformanceCountersManager.h" />
+    <ClInclude Include="src\csAMDQueuePerformanceCountersReader.h" />
+    <ClInclude Include="src\csAPIFunctionsImplementations.h" />
+    <ClInclude Include="src\csAPIFunctionsStubs.h" />
+    <ClInclude Include="src\csBufferSerializer.h" />
+    <ClInclude Include="src\csCallsHistoryLogger.h" />
+    <ClInclude Include="src\csCLKernel.h" />
+    <ClInclude Include="src\csCommandQueueMonitor.h" />
+    <ClInclude Include="src\csCommandQueuesMonitor.h" />
+    <ClInclude Include="src\csContextMonitor.h" />
+    <ClInclude Include="src\csDevicesMonitor.h" />
+    <ClInclude Include="src\csDWARFParser.h" />
+    <ClInclude Include="src\csEventsMonitor.h" />
+    <ClInclude Include="src\csExtensionsManager.h" />
+    <ClInclude Include="src\csForcedModesManager.h" />
+    <ClInclude Include="src\csGlobalVariables.h" />
+    <ClInclude Include="src\csImagesAndBuffersMonitor.h" />
+    <ClInclude Include="src\csMacOSXInterception.h" />
+    <ClInclude Include="src\csMemoryMonitor.h" />
+    <ClInclude Include="src\csMemoryObjectReader.h" />
+    <ClInclude Include="src\csMonitoredFunctionPointers.h" />
+    <ClInclude Include="src\csOpenCLHandleMonitor.h" />
+    <ClInclude Include="src\csOpenCLMonitor.h" />
+    <ClInclude Include="src\csOpenCLQueuePerformanceCountersReader.h" />
+    <ClInclude Include="src\csOpenCLQueuesPerformanceCountersManager.h" />
+    <ClInclude Include="src\csOpenCLServerInitialization.h" />
+    <ClInclude Include="src\csOpenCLWrappersAidMacros.h" />
+    <ClInclude Include="src\csProgramsAndKernelsMonitor.h" />
+    <ClInclude Include="src\csSamplersMonitor.h" />
+    <ClInclude Include="src\csSingletonsDelete.h" />
+    <ClInclude Include="src\csStringConstants.h" />
+    <ClInclude Include="src\csWrappersCommon.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="WindowsResources\AMDTOpenCLServer.def">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </None>
+    <None Include="Sconstruct">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="$(CommonProjectsDir)\VersionInfo\VersionResource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AMDTServerUtilities\AMDTServerUtilities.vcxproj">
+      <Project>{2b9e1447-2564-4c11-943a-fd3674c47874}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

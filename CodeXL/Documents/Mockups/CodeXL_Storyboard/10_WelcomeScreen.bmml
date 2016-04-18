@@ -1,0 +1,42 @@
+<mockup version="1.0" skin="sketch" measuredW="949" measuredH="469" mockupW="336" mockupH="206">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::TitleWindow" x="613" y="263" w="336" h="206" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bottomheight>0</bottomheight>
+        <dragger>false</dragger>
+        <text>Welcome%20to%20%22Unified%20Tool%22%21</text>
+      </controlProperties>
+    </control>
+    <control controlID="2" controlTypeID="com.balsamiq.mockups::FieldSet" x="621" y="295" w="320" h="136" measuredW="200" measuredH="170" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Select%20a%20Project</text>
+      </controlProperties>
+    </control>
+    <control controlID="3" controlTypeID="com.balsamiq.mockups::CheckBox" x="621" y="431" w="127" h="23" measuredW="127" measuredH="22" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Never%20show%20again</text>
+      </controlProperties>
+    </control>
+    <control controlID="7" controlTypeID="com.balsamiq.mockups::Label" x="628" y="329" w="172" h="22" measuredW="172" measuredH="21" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <href>21_DefaultLayoutDebugSession%26bm%3B21_DefaultLayoutDebugSession.bmml%26bm%3B21_DefaultLayoutDebugSession.bmml%26bm%3B21_DefaultLayoutDebugSession.bmml</href>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%2215%2C66%2C187%2C88%22%20href%3D%2221_DefaultLayoutDebugSession.bmml%22%20alt%3D%2221_DefaultLayoutDebugSession%22%20id%3D%227%22/%3E</map>
+        <text>C%3A%5Cusers%5CTest%5CExampleCl.uni</text>
+      </controlProperties>
+    </control>
+    <control controlID="9" controlTypeID="com.balsamiq.mockups::ButtonBar" x="826" y="431" w="115" h="30" measuredW="115" measuredH="29" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <hrefs>20_DefaultLayoutNoSessions%26bm%3B20_DefaultLayoutNoSessions.bmml%26bm%3B20_DefaultLayoutNoSessions.bmml%26bm%3B20_DefaultLayoutNoSessions.bmml%2C20_DefaultLayoutNoSessions%26bm%3B20_DefaultLayoutNoSessions.bmml%26bm%3B20_DefaultLayoutNoSessions.bmml%26bm%3B20_DefaultLayoutNoSessions.bmml%2C%2C%2C%2C</hrefs>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22213%2C168%2C259%2C198%22%20href%3D%2220_DefaultLayoutNoSessions.bmml%22%20alt%3D%2220_DefaultLayoutNoSessions%22%20id%3D%229_0%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22261%2C168%2C330%2C198%22%20href%3D%2220_DefaultLayoutNoSessions.bmml%22%20alt%3D%2220_DefaultLayoutNoSessions%22%20id%3D%229_1%22/%3E%0A</map>
+        <text>%26O%26k%2C%20%26C%26ancel</text>
+      </controlProperties>
+    </control>
+    <control controlID="11" controlTypeID="com.balsamiq.mockups::Label" x="628" y="311" w="139" h="22" measuredW="139" measuredH="21" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <href>17_NewProjectDialogBox%26bm%3B17_NewProjectDialogBox.bmml%26bm%3B17_NewProjectDialogBox.bmml%26bm%3B17_NewProjectDialogBox.bmml</href>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%2215%2C48%2C154%2C70%22%20href%3D%2217_NewProjectDialogBox.bmml%22%20alt%3D%2217_NewProjectDialogBox%22%20id%3D%2211%22/%3E</map>
+        <text>Create%20a%20new%20project...</text>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

@@ -1,0 +1,244 @@
+# -*- Python -*-
+
+import os
+
+Import('*')
+from CXL_init import *
+
+libName = "CXLGpuDebuggingComponents"
+
+env = CXL_env.Clone()
+env.Append( CPPPATH = [ 
+    ".",
+    "Include"
+])
+
+UseTinyXml(env)
+UseQt4(env)
+UseQCustomPlot(env)
+
+libAmdDir = env['CXL_common_dir'] + "/Lib/AMD/"
+libExtDir = env['CXL_common_dir'] + "/Lib/Ext/"
+platformPathFragment = "Build/CentOS6.2/" + env['CXL_arch'] + "/" + env['CXL_build']
+
+# Include files path common to all platforms:
+includePath = \
+[
+    ".",
+    "../",
+    env['CXL_commonproj_dir'],
+    env['CXL_commonproj_dir'] + "/AMDTOSWrappers/Include",
+    env['CXL_commonproj_dir'] + "/AMDTAPIClasses/Include",
+    env['CXL_commonproj_dir'] + '/../../CodeXL',
+]
+
+# Define the compiler environment variables:
+env.Append(CPPPATH = includePath)
+
+UseAPPSDK(env);
+
+# Set the objects directory:
+objDir = "obj/"+ env['CXL_build']
+if not os.path.exists(objDir):
+    os.makedirs(objDir)
+
+env.VariantDir(objDir, './', duplicate=0)
+
+moc_files = Split(
+                " Include/gdStatisticsPanel.h"
+                + " Include/gdAPICallsHistoryPanel.h"
+                + " Include/gdDebugApplicationTreeHandler.h"
+		        + " Include/gdDebugApplicationTreeData.h"
+                + " Include/gdProjectSettingsExtension.h"
+                + " Include/gdGlobalDebugSettingsPage.h"
+                + " Include/dialogs/gdBreakpointsDialog.h"
+                + " Include/dialogs/gdStateVariablesDialog.h"
+                + " Include/dialogs/gdSaveAllTexturesBuffersDialog.h"
+                + " Include/views/gdAllocatedObjectsCreationStackView.h"
+                + " Include/views/gdAPICallsHistoryView.h"
+                + " Include/views/gdBreakpointsView.h"
+                + " Include/views/gdCallsStackListCtrl.h"
+                + " Include/views/gdCallStackView.h"
+                + " Include/views/gdDebuggedProcessEventsView.h"
+                + " Include/views/gdImagesAndBuffersControlPanel.h"
+                + " Include/views/gdImageAndBufferView.h"
+                + " Include/views/gdImageDataView.h"
+                + " Include/views/gdLocalsView.h"
+                + " Include/views/gdMemoryAnalysisDetailsView.h"
+                + " Include/views/gdMemoryView.h"
+                + " Include/views/gdMultiWatchView.h"
+                + " Include/views/gdStateVariablesView.h"
+                + " Include/views/gdStatisticsView.h"
+                + " Include/views/gdStatisticsViewBase.h"
+                + " Include/views/gdThumbnailView.h"
+                + " Include/views/gdWatchView.h"
+                + " Include//toolbars/gdCallsHistoryToolbar.h"
+                )
+
+# Source files:
+sources = \
+[
+# src:
+    objDir + "/src/gdAidFunctions.cpp",
+    objDir + "/src/gdAPICallsHistoryPanel.cpp",
+    objDir + "/src/gdApplicationCommands.cpp",
+    objDir + "/src/gdBreakpointsItemData.cpp",
+    objDir + "/src/gdDebugApplicationTreeData.cpp",
+    objDir + "/src/gdDebugApplicationTreeHandler.cpp",
+    objDir + "/src/gdEventStringBuilder.cpp",
+    objDir + "/src/gdExecutionMode.cpp",
+    objDir + "/src/gdFrameworkConnectionManager.cpp",
+    objDir + "/src/gdGDebuggerGlobalVariablesManager.cpp",
+    objDir + "/src/gdGlobalDebugSettingsPage.cpp",
+    objDir + "/src/gdHTMLProperties.cpp",
+    objDir + "/src/gdImagesAndBuffersManager.cpp",
+#    objDir + "/src/gdOptionsFileHandler.cpp",
+    objDir + "/src/gdProjectSettingsExtension.cpp",
+    objDir + "/src/gdPropertiesEventObserver.cpp",
+    objDir + "/src/gdShaderType.cpp",
+    objDir + "/src/gdSingletonsDelete.cpp",
+    objDir + "/src/gdStatisticsPanel.cpp",
+    objDir + "/src/gdStatusBar.cpp",
+    objDir + "/src/gdThreadsEventObserver.cpp",
+    objDir + "/src/gdUpdateUIEvent.cpp",
+
+# commands:
+    objDir + "/commands/src/gdExitCommand.cpp",
+    objDir + "/commands/src/gdFlushTexturesImagesCommand.cpp",
+    objDir + "/commands/src/gdLoadProjectCommand.cpp",
+#    objDir + "/commands/src/gdSaveProfilingDataCommand.cpp",
+    objDir + "/commands/src/gdSaveStateChangeStatisticsCommand.cpp",    
+    objDir + "/commands/src/gdSaveTotalStatisticsCommand.cpp",
+    objDir + "/commands/src/gdSaveVarStateCommand.cpp",
+    objDir + "/commands/src/gdSaveProjectCommand.cpp",
+    objDir + "/commands/src/gdStartDebuggingCommand.cpp",
+    objDir + "/commands/src/gdStopDebuggingCommand.cpp",
+
+# dialogs:
+    objDir + "/dialogs/src/gdBreakpointsDialog.cpp",
+    objDir + "/dialogs/src/gdDoubleProgressBarDialog.cpp",
+    objDir + "/dialogs/src/gdSaveAllTexturesBuffersDialog.cpp",
+    objDir + "/dialogs/src/gdStateVariablesDialog.cpp",
+
+
+# toolbars:
+    objDir + "/toolbars/src/gdCallsHistoryToolbar.cpp",
+
+# views:
+    objDir + "/views/src/gdAllocatedObjectsCreationStackView.cpp",
+    objDir + "/views/src/gdAPICallsHistoryView.cpp",
+    objDir + "/views/src/gdBatchStatisticsView.cpp",
+    objDir + "/views/src/gdBreakpointsView.cpp",
+    objDir + "/views/src/gdCallsStackListCtrl.cpp",
+    objDir + "/views/src/gdCallStackView.cpp",
+    objDir + "/views/src/gdDebuggedProcessEventsView.cpp",
+    objDir + "/views/src/gdDeprecationStatisticsView.cpp",
+    objDir + "/views/src/gdFunctionCallsStatisticsView.cpp",
+    objDir + "/views/src/gdImageAndBufferView.cpp",
+    objDir + "/views/src/gdImageAndBufferViewsController.cpp",
+    objDir + "/views/src/gdImageDataView.cpp",
+    objDir + "/views/src/gdImagesAndBuffersExporter.cpp",
+    objDir + "/views/src/gdImagesAndBuffersControlPanel.cpp",
+    objDir + "/views/src/gdLocalsView.cpp",
+    objDir + "/views/src/gdMemoryAnalysisDetailsView.cpp",
+    objDir + "/views/src/gdMemoryView.cpp",
+    objDir + "/views/src/gdMemoryViewBase.cpp",
+    objDir + "/views/src/gdMultiWatchView.cpp",
+    objDir + "/views/src/gdPBufferImageProxy.cpp",
+    objDir + "/views/src/gdRenderBufferImageProxy.cpp",
+    objDir + "/views/src/gdStateChangeStatisticsView.cpp",
+    objDir + "/views/src/gdStateVariablesCompareFunctor.cpp",
+    objDir + "/views/src/gdStateVariablesView.cpp",
+    objDir + "/views/src/gdStaticBufferImageProxy.cpp",
+    objDir + "/views/src/gdStatisticsView.cpp",
+    objDir + "/views/src/gdStatisticsViewBase.cpp",
+    objDir + "/views/src/gdTextureImageProxy.cpp",
+    objDir + "/views/src/gdThumbnailView.cpp",
+    objDir + "/views/src/gdTotalStatisticsView.cpp",
+    objDir + "/views/src/gdVBOImageProxy.cpp",
+    objDir + "/views/src/gdWatchView.cpp",
+]
+
+commonLinkedLibraries = \
+[
+	"CXLBaseTools",
+	"CXLOSWrappers",
+	"CXLAPIClasses",
+	"CXLProcessDebugger",
+	"CXLApiFunctions",
+	"CXLApplicationComponents",
+]
+
+# Contains all linked libraries:
+linkedLibraries = commonLinkedLibraries
+env.Prepend (LIBS = linkedLibraries)
+
+# Set the ELF hash generation mode:
+# - When building on new systems, we would like to generate both sysv and gnu ELF hashes.
+#   This enables running the executable also on old systems, that support only the sysv ELF hash.
+# - When building on old systems, we need to set the GR_GENERATE_ONLY_DEFAULT_ELF_HASH environment
+#   variable (preferably in the .bashrc file). Otherwise the link will fail when trying to
+#   generate an ELF hash type that the old linker does not recognize.
+# [Yaki 7/7/2009]
+linkerFlags = [ ]
+shouldGenerateOnlyDefaultELFHash = os.environ.get('GR_GENERATE_ONLY_DEFAULT_ELF_HASH')
+if shouldGenerateOnlyDefaultELFHash is None:
+    linkerFlags += [ "-Wl,--hash-style=both" ]
+
+# Building moc content
+MOC_Generated = []
+for moc_file in moc_files:
+    MOC_Generated += env.MocBld(moc_file)
+
+# Creating shared libraries
+soFiles = env.SharedLibrary(
+	target = libName, 
+    source = sources + MOC_Generated,
+	LINKFLAGS = linkerFlags)
+
+# Installing libraries
+installDir = env.Install( 
+    dir = env['CXL_lib_dir'], 
+    source = (soFiles))
+
+# TODO [Suravee]: These are not just GPUD component stuff. This used by all. 
+# Moving these files to CodeXL/Images and use the main script to install this.
+#CodeXLImagesDir = env['CXL_Images_dir']
+#installDir += env.Install(CodeXLImagesDir, "Include/res/CodeXLSplashScreen.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/AMD-CodeXL-SmallLogos.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/AMD-LogoSmallWhite.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/AMD-CodeXLLogo.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/StartupPage_AMDLogo.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/StartupPage_Documentation.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/StartupPage_CodeXLLogo.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/StartupPage_Recent.png")
+#
+## Copy the Icons to the install Images directory:
+#installDir += env.Install(CodeXLImagesDir, "Include/res/icons/GRSourceCodeIcon.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/icons/InformationIcon.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/icons/InformationIconSmall.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/icons/LightBulbIconSmall.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/icons/ShadingProgramIcon.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/icons/WarningIconYellow.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/icons/WarningIconOrange.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/icons/WarningIconRed.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/icons/WarningIconYellowSmall.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/icons/WarningIconOrangeSmall.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/icons/WarningIconRedSmall.png")
+#
+## copy the file dialog images:
+#installDir += env.Install(CodeXLImagesDir, "Include/res/back.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/cancel.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/detailMode.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/file.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/folder.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/forward.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/listMode.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/newFolder.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/open.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/save.png")
+#installDir += env.Install(CodeXLImagesDir, "Include/res/toParent.png")
+
+# Copy the library to the install directories:
+#env.Alias("install", installDir)
+Return ('installDir')

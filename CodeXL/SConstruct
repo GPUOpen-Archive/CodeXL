@@ -1,0 +1,612 @@
+# 
+# CodeXL SConstruct Template
+#
+
+import os
+from CXL_init import *
+
+###################################################
+# Initialize CXL command line variables
+#
+# Note: DO NOT MODIFY THIS SECTION. Please see CXL_init.
+#
+CXL_vars = Variables(None)
+
+# Initial CXL_vars scons construction variables
+initCXLVars(CXL_vars)
+
+###################################################
+#
+# Additional SConstruct variables can be added here
+#
+# Note: * These variables can be configured from the commandline arguments.
+# 	* These will be included in the help "scons -h".
+# 	* Customizable
+
+# // Add more variables here
+
+###################################################
+# Initialize CXL_env 
+#
+# Note: DO NOT MODIFY THIS SECTION. Please see CXL_init.
+#
+CXL_env = Environment( 
+	variables = CXL_vars, 
+	ENV = {'PATH':os.environ['PATH']})
+
+# CXL build initialization
+initCXLBuild (CXL_env)
+
+###################################################
+# Initialize External library stuff
+# 
+# Note: * This section is customizable. 
+#
+initGtk (CXL_env)
+initQt4 (CXL_env)
+initTinyXml (CXL_env)
+initQScintilla (CXL_env)
+initQCustomPlot (CXL_env)
+initStdc(CXL_env)
+
+# Set the debug/release variant data
+if (CXL_env['CXL_build'] == 'debug'):
+    obj_variant_dir    = 'variant_debug'
+else:
+    obj_variant_dir    = 'variant_release'
+
+# Generate Help 
+Help(CXL_vars.GenerateHelpText(CXL_env))
+
+
+###################################################
+# Specify Depe!h!,<Mouse>C!k!,
+#
+# Note: This section is customizable.
+#
+
+CXL_lib_common_amd_deps = (
+)
+
+initCommonLibAmd (CXL_env, CXL_lib_common_amd_deps)
+
+###################################################
+# Any custom builders for this project
+#
+# UIC, MOC, RCC (for Qt)
+# Custom ones are required because the default Qt ones are for Qt3, and
+# there are no Qt4 ones which come with the scons rpm.
+# rgorton note (7-Aug-2012):
+# These need to be here - if they are in the CXL_init.py script, the values
+# of SOURCES and TARGET are null, I think because we are outside of scons
+# at that point.  Spent multiple hours puzzling over that.
+#
+uic_build = Builder(action = CXL_env['CXL_uic_tool'] + ' ${SOURCES[0]} -o $TARGET',
+                    prefix='ui_', suffix='.h', src_suffix='.ui')
+CXL_env.Append(BUILDERS = {'UicBld' : uic_build})
+
+moc_build = Builder(action = CXL_env['CXL_moc_tool'] + ' ${SOURCES[0]} -o $TARGET',
+                    prefix='moc_', suffix='.cpp', src_suffix='.h')
+CXL_env.Append(BUILDERS = {'MocBld' : moc_build})
+
+rcc_build = Builder(action = CXL_env['CXL_rcc_tool'] + ' ${SOURCES[0]} -name $TARGET.filebase -o $TARGET',
+                    prefix='rcc_', suffix='.cpp', src_suffix='.qrc')
+CXL_env.Append(BUILDERS = {'RccBld' : rcc_build})
+
+#
+# The documentation is generated from Doxygen
+# We do not have an effective way to use the Doxygen builder tool, so 
+# we will sort of spoof it, and always run it
+doxy_build = Builder(action = CXL_env['CXL_doxy_tool'] + ' ${SOURCES[0]}')
+CXL_env.Append(BUILDERS = {'DoxyBld' : doxy_build})
+
+##############################################################
+# Print out all environment variables of CXL_env if verbose is specified
+if CXL_env['CXL_build_verbose'] != 0 :
+	print CXL_env.Dump()
+
+
+##############################################################
+# Export the CXL_env to all SConscripts
+Export( 'CXL_env ')
+
+
+##############################################################
+# NOTE [Richard Gorton] :
+# Specifically express _dynamic_ dependencies here.  It is possible to have
+# the individual components do this, but the relevant context would need to be
+# exported globally, and then consumed.  That is, we would need to export the
+# BaseTools_Obj, via a global name, and then the downstream SCons files would
+# need to import it and write the dependency rules.
+# There is no need to write dependency rules for items which solely use the
+# promotion model.
+
+# No dynamic dependencies at all
+
+############################################
+#
+# Framework Section
+#
+FrameworkComponents = []
+
+BaseTools_Obj = SConscript('../Common/Src/AMDTBaseTools/SConscript', variant_dir=obj_variant_dir+'/AMDTBaseTools', duplicate=0)
+FrameworkComponents += BaseTools_Obj
+Assertion_Obj = SConscript('../Common/Src/AMDTAssertionHandlers/SConscript', variant_dir=obj_variant_dir+'/AMDTAssertionHandlers', duplicate=0)
+FrameworkComponents += Assertion_Obj
+
+OSWrappers_Obj = SConscript('../Common/Src/AMDTOSWrappers/SConscript', variant_dir=obj_variant_dir+'/AMDTOSWrappers', duplicate=0)
+CXL_env.Depends(OSWrappers_Obj, BaseTools_Obj)
+FrameworkComponents += OSWrappers_Obj
+
+OSAPIWrappers_Obj = SConscript('../Common/Src/AMDTOSAPIWrappers/SConscript', variant_dir=obj_variant_dir+'/AMDTOSAPIWrappers', duplicate=0)
+CXL_env.Depends(OSAPIWrappers_Obj, BaseTools_Obj + OSWrappers_Obj)
+FrameworkComponents += OSAPIWrappers_Obj
+
+APIClasses_Obj = SConscript('../Common/Src/AMDTAPIClasses/SConscript', variant_dir=obj_variant_dir+'/AMDTAPIClasses', duplicate=0)
+CXL_env.Depends(APIClasses_Obj, OSWrappers_Obj + OSAPIWrappers_Obj + BaseTools_Obj)
+FrameworkComponents += APIClasses_Obj
+
+AppComponents_Obj = SConscript('../Common/Src/AMDTApplicationComponents/SConscript', variant_dir=obj_variant_dir+'/AMDTApplicationComponents', duplicate=0)
+CXL_env.Depends(AppComponents_Obj, APIClasses_Obj + OSWrappers_Obj + OSAPIWrappers_Obj + BaseTools_Obj)
+FrameworkComponents += AppComponents_Obj
+
+AMDTRemoteClient_Obj = SConscript('Remote/AMDTRemoteClient/SConscript', variant_dir=obj_variant_dir+'/AMDTRemoteClient', duplicate=0)
+CXL_env.Depends(AMDTRemoteClient_Obj, OSWrappers_Obj + BaseTools_Obj) 
+FrameworkComponents += AMDTRemoteClient_Obj
+
+AppFramework_Obj = SConscript('AMDTApplicationFramework/SConscript', variant_dir=obj_variant_dir+'/AMDTApplicationFramework', duplicate=0)
+CXL_env.Depends(AppFramework_Obj, APIClasses_Obj + OSWrappers_Obj + OSAPIWrappers_Obj + BaseTools_Obj + AMDTRemoteClient_Obj)
+FrameworkComponents += AppFramework_Obj
+
+# This depends upon everything built to date
+Application_Obj = SConscript('../Common/Src/AMDTApplication/SConscript', variant_dir=obj_variant_dir+'/AMDTApplication', duplicate=0)
+CXL_env.Depends(Application_Obj, FrameworkComponents)
+FrameworkComponents += Application_Obj
+
+# This depends upon everything built to date
+Application_Obj = SConscript('App/SConscript', variant_dir=obj_variant_dir+'/AMDCodeXL', duplicate=0)
+CXL_env.Depends(Application_Obj, FrameworkComponents)
+FrameworkComponents += Application_Obj
+
+SharedProf_Obj = SConscript('Components/AMDTSharedProfiling/SConscript', variant_dir=obj_variant_dir+'/AMDTSharedProfiling', duplicate=0)
+CXL_env.Depends(SharedProf_Obj, FrameworkComponents)
+FrameworkComponents += SharedProf_Obj
+
+CXL_env.Depends(FrameworkComponents, 
+	CXL_env['CXL_Images_install'] + 
+	CXL_env['CXL_Legal_install']
+)
+
+AMDTRemoteAgent_Obj = SConscript('Remote/AMDTRemoteAgent/SConscript', variant_dir=obj_variant_dir+'/AMDTRemoteAgent', duplicate=0)
+CXL_env.Depends(AMDTRemoteAgent_Obj, OSWrappers_Obj + BaseTools_Obj) 
+CXL_env.Depends(OSWrappers_Obj, BaseTools_Obj)
+FrameworkComponents += AMDTRemoteAgent_Obj
+
+############################################
+#
+# GPUDebugging Plugin Section
+#
+GpuDebuggingPlugins = []
+GpuD_ProcessDbg_Obj = SConscript('Components/GpuDebugging/AMDTProcessDebugger/SConscript', variant_dir=obj_variant_dir+'/AMDTProcessDebugger', duplicate=1) 
+CXL_env.Depends(GpuD_ProcessDbg_Obj, APIClasses_Obj + OSWrappers_Obj + BaseTools_Obj)
+GpuDebuggingPlugins += GpuD_ProcessDbg_Obj
+
+GpuD_RmtDbgSrv_Obj = SConscript('Components/GpuDebugging/AMDTRemoteDebuggingServer/SConscript', variant_dir=obj_variant_dir+'/AMDTRemoteDebuggingServer', duplicate=1) 
+CXL_env.Depends(GpuD_RmtDbgSrv_Obj, GpuD_ProcessDbg_Obj + APIClasses_Obj + OSWrappers_Obj + BaseTools_Obj)
+GpuDebuggingPlugins += GpuD_RmtDbgSrv_Obj
+
+GpuD_ApiFunctions_Obj = SConscript('Components/GpuDebugging/AMDTApiFunctions/SConscript', variant_dir=obj_variant_dir+'/AMDTApiFunctions', duplicate=1) 
+CXL_env.Depends(GpuD_ApiFunctions_Obj, GpuD_ProcessDbg_Obj + APIClasses_Obj + OSWrappers_Obj + BaseTools_Obj)
+GpuDebuggingPlugins += GpuD_ApiFunctions_Obj
+
+GpuD_ServerUtils_Obj = SConscript('Components/GpuDebugging/AMDTServerUtilities/SConscript', variant_dir=obj_variant_dir+'/AMDTServerUtilities', duplicate=1) 
+CXL_env.Depends(GpuD_ServerUtils_Obj, APIClasses_Obj + OSWrappers_Obj + BaseTools_Obj)
+GpuDebuggingPlugins += GpuD_ServerUtils_Obj
+GDbg_Server_Core = GpuD_ServerUtils_Obj + APIClasses_Obj + OSWrappers_Obj + BaseTools_Obj
+
+GpuD_OCL_Obj = SConscript('Components/GpuDebugging/AMDTOpenCLServer/SConscript', variant_dir=obj_variant_dir+'/AMDTOpenCLServer', duplicate=1) 
+CXL_env.Depends(GpuD_OCL_Obj, GDbg_Server_Core)
+GpuDebuggingPlugins += GpuD_OCL_Obj
+
+# The original library is build as libOpenCLTemp.so. from there it is copied to libOpenCL.so.1 (which can not be created)
+# a link from libOpenCL.so to libOpenCL.so.1 is then created. 
+# Those two files are needed since some applications are linked to libOpenCL.so and some to libOpenCL.so.1
+# In Linux the real file is usually the most "detailed" file -> yyy.so.1 and not the yyy.so hence the steps
+CXL_env.AddPostAction (GpuD_OCL_Obj, "( cd " + CXL_env['CXL_spies_dir'] + " && mv libOpenCLTemp.so libOpenCL.so.1 && ln -s -f libOpenCL.so.1 libOpenCL.so )")
+
+GpuD_OpenGL_Obj = SConscript('Components/GpuDebugging/AMDTOpenGLServer/SConscript', variant_dir=obj_variant_dir+'/AMDTOpenGLServer', duplicate=1) 
+CXL_env.Depends(GpuD_OpenGL_Obj, GDbg_Server_Core)
+GpuDebuggingPlugins += GpuD_OpenGL_Obj
+
+# The original library is build as libGLTemp.so. from there it is copied to libGL.so.1 (which can not be created)
+# a link from libGL.so to libGL.so.1 is then created. Same logic applies here as in the CL spy
+CXL_env.AddPostAction (GpuD_OpenGL_Obj, "( cd " + CXL_env['CXL_spies_dir'] + " && mv libGLTemp.so libGL.so.1 && ln -s -f libGL.so.1 libGL.so )")
+
+GpuD_HSASrv_Obj = SConscript('Components/GpuDebugging/AMDTHsaServer/SConscript', variant_dir=obj_variant_dir+'/AMDTHsaServer', duplicate=1)
+CXL_env.Depends(GpuD_HSASrv_Obj, GDbg_Server_Core)
+GpuDebuggingPlugins += GpuD_HSASrv_Obj
+
+GpuD_Components_Obj = SConscript('Components/GpuDebugging/AMDTGpuDebuggingComponents/SConscript', variant_dir=obj_variant_dir+'/AMDTGpuDebuggingComponents', duplicate=1) 
+CXL_env.Depends(GpuD_Components_Obj,
+                GpuD_ApiFunctions_Obj
+                + GpuD_ProcessDbg_Obj
+                + AppComponents_Obj
+                + APIClasses_Obj
+                + OSWrappers_Obj
+                + BaseTools_Obj)
+GpuDebuggingPlugins += GpuD_Components_Obj
+
+GpuDebugging_Obj = SConscript('Components/GpuDebugging/AMDTGpuDebugging/SConscript', variant_dir=obj_variant_dir+'/AMDTGpuDebugging', duplicate=1) 
+# All framework excepting Application and SharedProfiling
+CXL_env.Depends(GpuDebugging_Obj,
+                # Gpu Debug items
+                GpuD_Components_Obj
+                + GpuD_ApiFunctions_Obj
+                + GpuD_ProcessDbg_Obj
+                # Framework items
+                + AppFramework_Obj
+                + AppComponents_Obj
+                + APIClasses_Obj
+                + Assertion_Obj
+                + OSWrappers_Obj
+                + BaseTools_Obj)
+GpuDebuggingPlugins += GpuDebugging_Obj
+
+# Make GpuDebuggingPlugins depending on Framework
+CXL_env.Depends(GpuDebuggingPlugins , FrameworkComponents) 
+
+############################################
+#
+# CPUProfiling Plugin Section
+#
+
+CpuProfilingPlugins = []
+
+libDisassembler_Obj = SConscript('../Common/Src/AMDTDisassembler/SConscript', variant_dir=obj_variant_dir+'/AMDTDisassembler', duplicate=0)
+CpuProfilingPlugins += libDisassembler_Obj
+
+libExecutableFormat_Obj = SConscript('../Common/Src/AMDTExecutableFormat/SConscript', variant_dir=obj_variant_dir+'/AMDTExecutableFormat', duplicate=0)
+CXL_env.Depends( libExecutableFormat_Obj, 
+	OSWrappers_Obj + 
+	BaseTools_Obj)
+CpuProfilingPlugins += libExecutableFormat_Obj
+
+libCpuCallstackSampling_Obj = SConscript('Components/CpuProfiling/AMDTCpuCallstackSampling/SConscript', variant_dir=obj_variant_dir+'/AMDTCpuCallstackSampling', duplicate=0)
+CXL_env.Depends( libCpuCallstackSampling_Obj, 
+	OSWrappers_Obj + 
+	BaseTools_Obj + 
+	libExecutableFormat_Obj + 
+	libDisassembler_Obj)
+CpuProfilingPlugins += libCpuCallstackSampling_Obj
+
+libCpuPerfEventUtils_Obj = SConscript('Components/CpuProfiling/AMDTCpuPerfEventUtils/SConscript', variant_dir=obj_variant_dir+'/AMDTCpuPerfEventUtils', duplicate=0)
+CXL_env.Depends( libCpuPerfEventUtils_Obj, 
+	OSWrappers_Obj + 
+	BaseTools_Obj)
+CpuProfilingPlugins += libCpuPerfEventUtils_Obj
+
+libProfilingAgentsData_Obj = SConscript('Components/CpuProfiling/ProfilingAgents/AMDTProfilingAgentsData/SConscript', variant_dir=obj_variant_dir+'/AMDTProfilingAgentsData', duplicate=1)
+CXL_env.Depends( libProfilingAgentsData_Obj, 
+	OSWrappers_Obj + 
+	BaseTools_Obj)
+CpuProfilingPlugins += libProfilingAgentsData_Obj
+
+libJvmtiProfileAgent_Obj = SConscript('Components/CpuProfiling/ProfilingAgents/AMDTJvmtiAgent/SConscript', variant_dir=obj_variant_dir+'/AMDTJvmtiAgent', duplicate=0)
+CpuProfilingPlugins += libJvmtiProfileAgent_Obj
+
+libCpuProfilingDataAccess_Obj = SConscript('Components/CpuProfiling/Backend/AMDTCpuProfilingRawData/SConscript', variant_dir=obj_variant_dir+'/AMDTCpuProfilingRawData', duplicate=1)
+CXL_env.Depends( libCpuProfilingDataAccess_Obj, 
+	OSWrappers_Obj + 
+	BaseTools_Obj)
+CpuProfilingPlugins += libCpuProfilingDataAccess_Obj
+
+libCpuProfilingTranslation_Obj = SConscript('Components/CpuProfiling/Backend/AMDTCpuProfilingTranslation/SConscript', variant_dir=obj_variant_dir+'/AMDTCpuProfilingTranslation', duplicate=1)
+CXL_env.Depends( libCpuProfilingTranslation_Obj, 
+	OSWrappers_Obj + 
+	BaseTools_Obj + 
+	libExecutableFormat_Obj + 
+	libCpuCallstackSampling_Obj + 
+	libCpuPerfEventUtils_Obj + 
+	libCpuProfilingDataAccess_Obj)
+CpuProfilingPlugins += libCpuProfilingTranslation_Obj
+
+libCpuProfilingControl_Obj = SConscript('Components/CpuProfiling/Backend/AMDTCpuProfilingControl/SConscript', variant_dir=obj_variant_dir+'/AMDTCpuProfilingControl', duplicate=1)
+CXL_env.Depends( libCpuProfilingControl_Obj, 
+	OSWrappers_Obj + 
+	BaseTools_Obj + 
+	libExecutableFormat_Obj + 
+	libCpuCallstackSampling_Obj + 
+	libCpuPerfEventUtils_Obj + 
+	libCpuProfilingDataAccess_Obj + 
+	libCpuProfilingTranslation_Obj)
+CpuProfilingPlugins += libCpuProfilingControl_Obj
+
+ThreadProfilingPlugins = []
+
+libThreadProfileAPI_Obj = SConscript('Components/ThreadProfiling/Backend/AMDTThreadProfileAPI/SConscript', variant_dir=obj_variant_dir+'/AMDTThreadProfileAPI', duplicate=1)
+CXL_env.Depends( libThreadProfileAPI_Obj,  
+	OSWrappers_Obj + 
+	BaseTools_Obj +
+	libCpuProfilingControl_Obj)
+ 
+ThreadProfilingPlugins += libThreadProfileAPI_Obj
+
+AMDTCpuProfilingCLI_Obj = SConscript('Components/CpuProfiling/Backend/AMDTCpuProfilingCLI/SConscript', variant_dir=obj_variant_dir+'/AMDTCpuProfilingCLI', duplicate=1)
+CXL_env.Depends( AMDTCpuProfilingCLI_Obj,
+	OSWrappers_Obj +
+	BaseTools_Obj +
+	libDisassembler_Obj +
+	libExecutableFormat_Obj +
+	libCpuCallstackSampling_Obj +
+	libCpuPerfEventUtils_Obj +
+	libCpuProfilingDataAccess_Obj +
+	libCpuProfilingTranslation_Obj +
+	libThreadProfileAPI_Obj)
+CpuProfilingPlugins += AMDTCpuProfilingCLI_Obj
+
+OverallCpuProf_Obj = SConscript('Components/CpuProfiling/AMDTCpuProfiling/SConscript', variant_dir=obj_variant_dir+'/AMDTCpuProfiling', duplicate=1) 
+CXL_env.Depends(OverallCpuProf_Obj,
+                CXL_env['CXL_CpuEventsData_install']
+                + libCpuCallstackSampling_Obj
+                + libCpuPerfEventUtils_Obj
+                + libCpuProfilingDataAccess_Obj
+                + libCpuProfilingTranslation_Obj
+                + libCpuProfilingControl_Obj
+                + libExecutableFormat_Obj
+                + libDisassembler_Obj
+                + AppFramework_Obj
+                + SharedProf_Obj
+                + AppComponents_Obj
+                + APIClasses_Obj
+                + OSWrappers_Obj
+                + BaseTools_Obj)
+
+CpuProfilingPlugins += OverallCpuProf_Obj
+
+# Make CpuProfilingPlugins depending on Framework
+CXL_env.Depends(CpuProfilingPlugins , FrameworkComponents) 
+
+
+#############################################
+# Profiler Common Section
+#############################################
+ProfilerCommonPlugins = []
+
+AMDTProfilerDAL_Obj = SConscript('Components/DatabaseLayer/AMDTProfilerDAL/SConscript', variant_dir=obj_variant_dir+'/AMDTProfilerDAL', duplicate=1)
+CXL_env.Depends( AMDTProfilerDAL_Obj,
+	OSWrappers_Obj +
+	BaseTools_Obj)
+
+ProfilerCommonPlugins += AMDTProfilerDAL_Obj
+
+AMDTDbAdapter_Obj = SConscript('Components/DatabaseLayer/AMDTDbAdapter/SConscript', variant_dir=obj_variant_dir+'/AMDTDbAdapter', duplicate=1)
+CXL_env.Depends( AMDTDbAdapter_Obj,
+	OSWrappers_Obj +
+	BaseTools_Obj)
+
+ProfilerCommonPlugins += AMDTDbAdapter_Obj
+
+
+#############################################
+# Power Profling Section
+#############################################
+
+PowerProfilingPlugins = []
+
+libAMDTPowerProfilingDrivers_Obj = SConscript('Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/Linux/SConscript')
+PowerProfilingPlugins += libAMDTPowerProfilingDrivers_Obj
+
+libPowerProfileAPI_Obj = SConscript('Components/PowerProfiling/Backend/AMDTPowerProfileAPI/SConscript', variant_dir=obj_variant_dir+'/AMDTPowerProfileAPI', duplicate=1)
+CXL_env.Depends( libPowerProfileAPI_Obj,  
+	OSWrappers_Obj + 
+	BaseTools_Obj)
+ 
+PowerProfilingPlugins += libPowerProfileAPI_Obj
+
+AMDTPowerProfileCLI_Obj = SConscript('Components/PowerProfiling/Backend/AMDTPowerProfileCLI/SConscript', variant_dir=obj_variant_dir+'/AMDTPowerProfileCLI', duplicate=1)
+CXL_env.Depends( AMDTPowerProfileCLI_Obj,
+	OSWrappers_Obj +
+	BaseTools_Obj +
+	libPowerProfileAPI_Obj)
+
+PowerProfilingPlugins += AMDTPowerProfileCLI_Obj
+
+AMDTPowerProfileMidTier_Obj = SConscript('Components/PowerProfiling/MiddleTier/AMDTPowerProfilingMidTier/SConscript', variant_dir=obj_variant_dir+'/AMDTPowerProfilingMidTier', duplicate=1)
+CXL_env.Depends( AMDTPowerProfileMidTier_Obj,
+	OSWrappers_Obj +
+	BaseTools_Obj +
+    AMDTProfilerDAL_Obj +
+    AMDTRemoteClient_Obj)
+
+PowerProfilingPlugins += AMDTPowerProfileMidTier_Obj
+
+AMDTPowerProfiling_Obj = SConscript('Components/PowerProfiling/AMDTPowerProfiling/SConscript', variant_dir=obj_variant_dir+'/AMDTPowerProfiling', duplicate=0)
+CXL_env.Depends(AMDTPowerProfiling_Obj,
+    OSWrappers_Obj +
+	BaseTools_Obj + 
+    AMDTPowerProfileMidTier_Obj)
+
+PowerProfilingPlugins += AMDTPowerProfiling_Obj
+
+############################################
+#
+# GPUProfiling Plugin Section
+#
+
+GpuProfilingPlugins = []
+
+GpuProfGraphics_Obj = SConscript('Components/Graphics/AMDTGraphicsServerInterface/SConscript', variant_dir=obj_variant_dir+'/AMDTGraphicsServerInterface', duplicate=1)
+CXL_env.Depends( GpuProfGraphics_Obj,
+	OSWrappers_Obj +
+	BaseTools_Obj)
+
+GpuProfilingPlugins += GpuProfGraphics_Obj
+
+GpuProf_Obj = SConscript('Components/GpuProfiling/AMDTGpuProfiling/SConscript', variant_dir=obj_variant_dir+'/AMDTGpuProfiling', duplicate=1)
+CXL_env.Depends(GpuProf_Obj, 
+                SharedProf_Obj
+                + GpuProfGraphics_Obj
+                + AppFramework_Obj
+                + AppComponents_Obj
+                + APIClasses_Obj
+                + OSWrappers_Obj
+                + BaseTools_Obj
+                )
+
+GpuProfilingPlugins += GpuProf_Obj
+
+# Make GpuProfilingPlugins depending on Framework
+CXL_env.Depends(GpuProfilingPlugins , FrameworkComponents) 
+
+############################################
+#
+# Kernel Analyzer Section
+#
+
+KernelAnalyzer = []
+KernelAnalyzerBackend_Obj = SConscript('Components/ShaderAnalyzer/AMDTBackEnd/SConscript', variant_dir=obj_variant_dir+'/AMDTBackEnd', duplicate=0)
+CXL_env.Depends(KernelAnalyzerBackend_Obj, 
+                OSWrappers_Obj
+                + BaseTools_Obj)
+KernelAnalyzer += KernelAnalyzerBackend_Obj
+
+KernelAnalyzerFrontEnd_Obj = SConscript('Components/ShaderAnalyzer/AMDTKernelAnalyzer/SConscript', variant_dir=obj_variant_dir+'/AMDTKernelAnalyzer', duplicate=1)
+CXL_env.Depends(KernelAnalyzerFrontEnd_Obj, 
+                BaseTools_Obj
+                + OSWrappers_Obj
+		+ APIClasses_Obj
+		+ AppFramework_Obj
+		+ KernelAnalyzerBackend_Obj)
+KernelAnalyzer += KernelAnalyzerFrontEnd_Obj
+
+KernelAnalyzerCLI_Obj = SConscript('Components/ShaderAnalyzer/AMDTKernelAnalyzerCLI/SConscript', variant_dir=obj_variant_dir+'/AMDTKernelAnalyzerCLI', duplicate=1)
+CXL_env.Depends(KernelAnalyzerCLI_Obj, 
+                KernelAnalyzerBackend_Obj)
+KernelAnalyzer += KernelAnalyzerCLI_Obj
+
+############################################
+#
+# AMDTTeaPot Section
+#
+AMDTTeaPot = []
+AMDTTeaPotLib_Obj = SConscript('Examples/AMDTTeaPot/AMDTTeaPotLib/SConscript', variant_dir=obj_variant_dir+'/AMDTTeaPotLib', duplicate=0) 
+AMDTTeaPot += AMDTTeaPotLib_Obj
+
+AMDTTeaPot_Obj  = SConscript('Examples/AMDTTeaPot/AMDTTeaPot/SConscript', variant_dir=obj_variant_dir+'/AMDTTeaPot', duplicate=0) 
+CXL_env.Depends(AMDTTeaPot_Obj, AMDTTeaPotLib_Obj)
+AMDTTeaPot += AMDTTeaPot_Obj 
+# copy the teapot libraries to the correct place 
+SConscript('Examples/AMDTTeaPot/AMDTTeaPot/Copy_SConscript', variant_dir=obj_variant_dir+'/AMDTTeaPot', duplicate=0)
+#CXL_env.AddPostAction (AMDTTeaPot_Obj, SConscript('Examples/AMDTTeaPot/AMDTTeaPot/Copy_SConscript') )
+
+############################################
+#
+# AMDTSystemInformationHelper Section
+#
+AMDTSystemInformationHelper = []
+AMDTSystemInformationHelper_Obj  = SConscript('Utils/AMDTSystemInformationHelper/SConscript', variant_dir=obj_variant_dir+'/AMDTSystemInformationHelper', duplicate=0) 
+
+CXL_env.Depends(AMDTSystemInformationHelper_Obj, APIClasses_Obj + OSWrappers_Obj)
+
+AMDTSystemInformationHelper += AMDTSystemInformationHelper_Obj
+
+############################################
+#
+# AMDTClassicMatMul Section
+#
+AMDTClassicMatMul = []
+
+AMDTClassicMatMul_Obj  = SConscript('Examples/AMDTClassicMatMul/SConscript', variant_dir=obj_variant_dir+'/AMDTClassicMatMul', duplicate=0) 
+AMDTClassicMatMul += AMDTClassicMatMul_Obj 
+
+############################################
+#
+# WebHelp content
+# The generation of the HTML files is performed by the WordToHelp tool in the Jenkins CodeXL-Doc job.
+# Here we only copy the quick start guide. The extraction of the HTML files from thier tar is performed 
+# in the shell script \main\CodeXL\Util\linux\JenkinsCodeXLFullBuild
+#
+
+# Copy the quick start quide
+os.system('mkdir ../Output_x86_64/release/bin/Help/')  
+os.system('cp -u ../CodeXL/Help/CodeXL_Quick_Start_Guide.pdf ../Output_x86_64/release/bin/Help/')
+ 
+
+
+############################################
+
+CodeXL_Full = \
+    ProfilerCommonPlugins + \
+    GpuDebuggingPlugins + \
+    CpuProfilingPlugins + \
+    PowerProfilingPlugins + \
+    GpuProfilingPlugins + \
+    ThreadProfilingPlugins + \
+    AMDTSystemInformationHelper + \
+    AMDTTeaPot + \
+    AMDTClassicMatMul + \
+    KernelAnalyzer
+
+Default(CodeXL_Full)
+#Feature group build
+Alias( target='Framework'   , source=(FrameworkComponents))
+Alias( target='CpuProfiling', source=(CpuProfilingPlugins))
+Alias( target='GpuProfiling', source=(GpuProfilingPlugins))
+Alias( target='GpuDebugging', source=(GpuDebuggingPlugins))
+Alias( target='KernelAnalyzer', source=(KernelAnalyzer))
+Alias( target='PowerProfiler', source=(PowerProfilingPlugins))
+Alias( target='ThreadProfiler', source=(ThreadProfilingPlugins))
+Alias( target='Teapot', source=(AMDTTeaPot))
+Alias( target='ClassicMatMul', source=(AMDTClassicMatMul))
+Alias( target='install'     , source=(CodeXL_Full))
+Alias( target='SysInfoHelper'     , source=(AMDTSystemInformationHelper))
+
+#Per project build support
+#FrameworkComponents
+Alias( target='AMDTBaseTools'   , source=(BaseTools_Obj))
+Alias( target='AMDTOSWrappers'   , source=(OSWrappers_Obj))
+Alias( target='AMDTOSAPIWrappers'   , source=(OSAPIWrappers_Obj))
+Alias( target='AMDTAPIClasses'   , source=(APIClasses_Obj))
+Alias( target='AMDTApplicationComponents'   , source=(AppComponents_Obj))
+Alias( target='AMDTRemoteClient'   , source=(AMDTRemoteClient_Obj))
+Alias( target='AMDTApplicationFramework'   , source=(AppFramework_Obj))
+Alias( target='AMDCodeXL'   , source=(Application_Obj))
+Alias( target='AMDTSharedProfiling'   , source=(SharedProf_Obj))
+Alias( target='AMDTRemoteAgent'   , source=(AMDTRemoteAgent_Obj))
+#GPUDebugging
+Alias( target='AMDTProcessDebugger'   , source=(GpuD_ProcessDbg_Obj))
+Alias( target='AMDTRemoteDebuggingServer'   , source=(GpuD_RmtDbgSrv_Obj))
+Alias( target='AMDTApiFunctions'   , source=(GpuD_ApiFunctions_Obj))
+Alias( target='AMDTServerUtilities'   , source=(GpuD_ServerUtils_Obj))
+Alias( target='AMDTOpenCLServer'   , source=(GpuD_OCL_Obj))
+Alias( target='AMDTOpenGLServer'   , source=(GpuD_OpenGL_Obj))
+Alias( target='AMDTGpuDebuggingComponents'   , source=(GpuD_Components_Obj))
+Alias( target='AMDTGpuDebugging'   , source=(GpuDebugging_Obj))
+#CPUProfiling
+Alias( target='AMDTCpuProfilingRawData'   , source=(libCpuProfilingDataAccess_Obj))
+Alias( target='AMDTCpuProfilingTranslation'   , source=(libCpuProfilingTranslation_Obj))
+Alias( target='AMDTCpuProfilingControl'   , source=(libCpuProfilingControl_Obj))
+Alias( target='AMDTThreadProfileAPI'   , source=(libThreadProfileAPI_Obj))
+Alias( target='AMDTCpuProfilingCLI'   , source=(AMDTCpuProfilingCLI_Obj))
+Alias( target='AMDTCpuProfiling'   , source=(OverallCpuProf_Obj))
+Alias( target='AMDTDisassembler'   , source=(libDisassembler_Obj))
+Alias( target='AMDTExecutableFormat'   , source=(libExecutableFormat_Obj))
+Alias( target='AMDTCpuCallstackSampling'   , source=(libCpuCallstackSampling_Obj))
+Alias( target='AMDTCpuPerfEventUtils'   , source=(libCpuPerfEventUtils_Obj))
+Alias( target='AMDTProfilingAgentsData'   , source=(libProfilingAgentsData_Obj))
+Alias( target='AMDTJvmtiAgent'   , source=(libJvmtiProfileAgent_Obj))
+#ProfilerCommon
+Alias( target='AMDTProfilerDAL'   , source=(AMDTProfilerDAL_Obj))
+#PowerProfiling
+Alias( target='AMDTPowerProfilingDrivers'   , source=(libAMDTPowerProfilingDrivers_Obj))
+Alias( target='AMDTPowerProfileAPI'   , source=(libPowerProfileAPI_Obj))
+Alias( target='AMDTPowerProfileCLI'   , source=(AMDTPowerProfileCLI_Obj))
+Alias( target='AMDTPowerProfilingMidTier'   , source=(AMDTPowerProfileMidTier_Obj))
+Alias( target='AMDTPowerProfiling'   , source=(AMDTPowerProfiling_Obj))
+#GPUProfiling
+Alias( target='AMDTGraphicsServerInterface'   , source=(GpuProfGraphics_Obj))
+Alias( target='AMDTGpuProfiling'   , source=(GpuProf_Obj))
+#KernelAnalyzer
+Alias( target='AMDTBackEnd'   , source=(KernelAnalyzerBackend_Obj))
+Alias( target='AMDTKernelAnalyzer'   , source=(KernelAnalyzerFrontEnd_Obj))
+Alias( target='AMDTKernelAnalyzerCLI'   , source=(KernelAnalyzerCLI_Obj))

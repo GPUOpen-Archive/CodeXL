@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<VersionSettings>
+  <TitleCaption>NDA</TitleCaption>
+  <GPUProfilerExe>SProfile.exe</GPUProfilerExe>
+  <GPUProfilerPerfCountersDll>GPUPerfAPICounters.dll</GPUProfilerPerfCountersDll>
+  <CheckForNewVersionURL>http://developer.amd.com/assets</CheckForNewVersionURL>
+</VersionSettings>

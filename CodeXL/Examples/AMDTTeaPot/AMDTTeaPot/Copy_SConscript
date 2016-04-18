@@ -1,0 +1,31 @@
+# -*- Python -*-
+
+from CXL_init import *
+
+Import('*')
+
+env = CXL_env.Clone()
+
+# Create and copy the information in the AMDTTeapot folder
+if not os.path.exists(env['CXL_Examples_dir'] + '/AMDTTeaPot/src'): os.makedirs(env['CXL_Examples_dir'] + '/AMDTTeaPot/src')
+if not os.path.exists(env['CXL_Examples_dir'] + '/AMDTTeaPot/inc'): os.makedirs(env['CXL_Examples_dir'] + '/AMDTTeaPot/inc')
+os.system('cp -Ru ' +  env['CXL_OriginalExamples_dir'] + '/AMDTTeaPot/src ' + env['CXL_Examples_dir'] + '/AMDTTeaPot/') 
+os.system('cp -Ru ' +  env['CXL_OriginalExamples_dir'] + '/AMDTTeaPot/inc ' + env['CXL_Examples_dir'] + '/AMDTTeaPot/') 
+os.system('cp -u ' +  env['CXL_OriginalExamples_dir'] + '/AMDTTeaPot/*.h ' + env['CXL_Examples_dir'] + '/AMDTTeaPot/') 
+os.system('cp -u ' +  env['CXL_OriginalExamples_dir'] + '/AMDTTeaPot/*.cpp ' + env['CXL_Examples_dir'] + '/AMDTTeaPot/') 
+os.system('cp -u ' +  env['CXL_OriginalExamples_dir'] + '/AMDTTeaPot/Makefile ' + env['CXL_Examples_dir'] + '/AMDTTeaPot/') 
+os.system('cp -u ' +  env['CXL_OriginalExamples_dir'] + '/AMDTTeaPot/Sconstruct ' + env['CXL_Examples_dir'] + '/AMDTTeaPot/') 
+
+# Create and copy the information in the AMDTTeaPotlLib folder
+if not os.path.exists(env['CXL_Examples_dir'] + '/AMDTTeaPotLib'): os.makedirs(env['CXL_Examples_dir'] + '/AMDTTeaPotLib')
+os.system('cp -Ru ' +  env['CXL_OriginalExamples_dir'] + '/AMDTTeaPotLib ' + env['CXL_Examples_dir']) 
+
+# Create and copy the release directory
+if not os.path.exists(env['CXL_Examples_dir'] + '/release'): os.makedirs(env['CXL_Examples_dir'] + '/release')
+os.system('cp -Ru ' +  env['CXL_OriginalExamples_dir'] + '/AMDTTeaPotLib/res ' + env['CXL_Examples_dir'] + '/release') 
+os.system('cp -Ru ' +  env['CXL_OriginalExamples_dir'] + '/AMDTTeaPotLib/src ' + env['CXL_Examples_dir'] + '/release') 
+
+# Additional information
+if not os.path.exists(env['CXL_Examples_dir'] + '/LinuxResource'): os.makedirs(env['CXL_Examples_dir'] + '/LinuxResource')
+os.system('cp -Ru ' +  env['CXL_OriginalExamples_dir'] + '/LinuxResources ' + env['CXL_Examples_dir'] + '/LinuxResource') 
+os.system('cp -u ' +  env['CXL_OriginalExamples_dir'] + '/CXLTeapotLicense.txt ' + env['CXL_Examples_dir'] ) 

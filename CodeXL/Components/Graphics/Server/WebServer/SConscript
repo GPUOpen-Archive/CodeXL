@@ -1,0 +1,52 @@
+# Copyright (c) 2014 Advanced Micro Devices, Inc. All rights reserved.
+#
+# Main scons build file for WebServer (GPUPerfStudio)
+#
+
+Import('GPS_env')
+env = GPS_env.Clone()
+env['CPPPATH'] = env['GPS_PATH']
+env.Prepend (CPPPATH = ["../Common/Linux"])
+env.Prepend (LIBPATH = env['GPS_LIBPATH'])
+env.Prepend(CCFLAGS =
+[
+    '-Wall',
+    '-Wextra',
+
+    "-D'LOG_MODULE=\"GPUPerfServer\"'"
+])
+
+# These need to be in their dependency order. Most derived first
+env['LIBS'] = \
+[
+    #internal libraries
+    "libCommon",
+    "libAMDTOSWrappers",
+    "libAMDTBaseTools",
+    #boost
+    File('../../../Common/Lib/Ext/Boost/boost_1_59_0/lib/RHEL6/' + env.extConfig + '/libboost_program_options.a'),
+    File('../../../Common/Lib/Ext/Boost/boost_1_59_0/lib/RHEL6/' + env.extConfig + '/libboost_filesystem.a'),
+    File('../../../Common/Lib/Ext/Boost/boost_1_59_0/lib/RHEL6/' + env.extConfig + '/libboost_system.a'),
+    #enternal libraries
+    "rt",
+    "pthread",
+    "dl",
+]
+
+# build the GPUPerfStudio executable
+
+sources = \
+[
+    "Commands.cpp",
+    "ClientRequestThread.cpp",
+    "Inject.cpp",
+    "OSDependent.cpp",
+    "PluginResponseThread.cpp",
+    "ProcessTracker.cpp",
+    "RenderStallThread.cpp",
+    "ShutdownThread.cpp",
+    "WebServer.cpp",
+]
+
+GPUPerfServer = env.Program('GPUPerfServer', sources)
+Return('GPUPerfServer')

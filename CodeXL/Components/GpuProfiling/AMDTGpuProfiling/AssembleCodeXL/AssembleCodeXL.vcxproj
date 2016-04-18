@@ -1,0 +1,258 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{086AFA5C-5294-46A7-AFB8-34B2B4DF025B}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>AssembleCodeXL</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)\AMDTGpuProfiling.props" />
+    <Import Project="$(COMMONDIR)\Src\Vsprops\Global-Common.props" />
+    <Import Project="$(COMMONDIR)\Src\Vsprops\Global-x86.props" />
+    <Import Project="$(COMMONDIR)\Src\Vsprops\Global-Debug.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)\AMDTGpuProfiling.props" />
+    <Import Project="$(COMMONDIR)\Src\Vsprops\Global-Common.props" />
+    <Import Project="$(COMMONDIR)\Src\Vsprops\Global-x86.props" />
+    <Import Project="$(COMMONDIR)\Src\Vsprops\Global-Release.props" />
+  </ImportGroup>
+  <ImportGroup Label="CommonPropertySheets">
+    <Import Project="$(SolutionDir)\AMDTGpuProfiling.props" />
+    <Import Project="$(COMMONDIR)\Lib\Ext\FreeImage\Global-FreeImage.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PreBuildEvent>
+      <Command>copy $(AMDTAPIClassesDir)\Lib\$(GDTPlatform)\AMDTApiClasses$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTAPIClassesDir)\Lib\$(GDTPlatform)\AMDTApiClasses$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(AMDTAPPFRAMEWORKDIR)\Lib\$(GDTPlatform)\AMDTApplicationFramework$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTAPPFRAMEWORKDIR)\Lib\$(GDTPlatform)\AMDTApplicationFramework$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(AMDTApplicationComponentsDir)\Lib\$(GDTPlatform)\AMDTApplicationComponents$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTApplicationComponentsDir)\Lib\$(GDTPlatform)\AMDTApplicationComponents$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(AMDTBaseToolsDir)\Lib\$(GDTPlatform)\AMDTBaseTools$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTBaseToolsDir)\Lib\$(GDTPlatform)\AMDTBaseTools$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(AMDTOsWrappersDir)\Lib\$(GDTPlatform)\AMDTOSWrappers$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTOsWrappersDir)\Lib\$(GDTPlatform)\AMDTOSWrappers$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(AMDTSHAREDPROFDIR)\Lib\$(GDTPlatform)\AMDTSharedProfiling$(GDTPlatformSuffix)$(GDTDebugSuffix).dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTSHAREDPROFDIR)\Lib\$(GDTPlatform)\AMDTSharedProfiling$(GDTPlatformSuffix)$(GDTDebugSuffix).pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(AMDTApplicationDir)\Lib\$(GDTPlatform)\CodeXL$(GDTDebugSuffixUnderscore).exe $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTApplicationDir)\Lib\$(GDTPlatform)\CodeXL$(GDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(FreeImageDir)\Lib\FreeImage.dll $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(QSCINTILLADIR)\Lib\$(Platform)\$(Configuration)\qscintillaAmdDt474$(GDTDebugSuffixNoDash)2.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QSCINTILLADIR)\Lib\$(Platform)\$(Configuration)\qscintillaAmdDt474$(GDTDebugSuffixNoDash)2.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(QTDIR)\Lib\$(Platform)\QtCoreAmdDt474$(GDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtCoreAmdDt474$(GDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(QTDIR)\Lib\$(Platform)\QtGuiAmdDt474$(GDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtGuiAmdDt474$(GDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(QTDIR)\Lib\$(Platform)\QtOpenGLAmdDt474$(GDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtOpenGLAmdDt474$(GDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(QTDIR)\Lib\$(Platform)\QtNetworkAmdDt474$(GDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtNetworkAmdDt474$(GDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(QTDIR)\Lib\$(Platform)\QtXmlAmdDt474$(GDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtXmlAmdDt474$(GDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(QTDIR)\Lib\$(Platform)\QtWebKitAmdDt474$(GDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtWebKitAmdDt474$(GDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxbase292u$(GDTDebugSuffixNoDash)_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxbase292u$(GDTDebugSuffixNoDash)_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_adv_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_adv_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_aui_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_aui_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_core_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_core_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_gl_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_gl_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_html_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_html_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_stc_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_stc_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+if NOT EXIST $(AMDTOutputDir)$(Configuration)\bin\x86. mkdir $(AMDTOutputDir)$(Configuration)\bin\x86
+xcopy /Y ..\..\..\..\..\APPProfiler\bin\Release-Win32\sprofile\*.* $(AMDTOutputDir)$(Configuration)\bin\x86
+
+if NOT EXIST $(AMDTOutputDir)$(Configuration)\bin\x64. mkdir $(AMDTOutputDir)$(Configuration)\bin\x64
+xcopy /Y ..\..\..\..\..\APPProfiler\bin\Release-x64\sprofile\*.* $(AMDTOutputDir)$(Configuration)\bin\x64
+
+if NOT EXIST $(AMDTOutputDir)$(Configuration)\bin\jqPlot. mkdir $(AMDTOutputDir)$(Configuration)\bin\jqPlot
+xcopy /Y ..\..\..\..\..\APPProfiler\Backend\Common\jqPlot\*.* $(AMDTOutputDir)$(Configuration)\bin\jqPlot
+
+if NOT EXIST $(SolutionDir)\..\CodeXL\Components\Output\$(Configuration)\bin\x86. mkdir $(SolutionDir)\..\CodeXL\Components\Output\$(Configuration)\bin\x86
+xcopy /Y ..\..\..\..\..\APPProfiler\bin\Release-Win32\sprofile\*.* $(SolutionDir)\..\CodeXL\Components\Output\$(Configuration)\bin\x86
+
+if NOT EXIST $(SolutionDir)\..\CodeXL\Components\Output\$(Configuration)\bin\x64. mkdir $(SolutionDir)\..\CodeXL\Components\Output\$(Configuration)\bin\x64
+xcopy /Y ..\..\..\..\..\APPProfiler\bin\Release-x64\sprofile\*.* $(SolutionDir)\..\CodeXL\Components\Output\$(Configuration)\bin\x64
+
+if NOT EXIST $(SolutionDir)\..\CodeXL\Components\Output\$(Configuration)\bin\jqPlot. mkdir $(SolutionDir)\..\CodeXL\Components\Output\$(Configuration)\bin\jqPlot
+xcopy /Y ..\..\..\..\..\APPProfiler\Backend\Common\jqPlot\*.* $(SolutionDir)\..\CodeXL\Components\Output\$(Configuration)\bin\jqPlot
+</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <PreBuildEvent>
+      <Command>copy $(AMDTAPIClassesDir)\Lib\$(GDTPlatform)\AMDTApiClasses$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTAPIClassesDir)\Lib\$(GDTPlatform)\AMDTApiClasses$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(AMDTAPPFRAMEWORKDIR)\Lib\$(GDTPlatform)\AMDTApplicationFramework$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTAPPFRAMEWORKDIR)\Lib\$(GDTPlatform)\AMDTApplicationFramework$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(AMDTApplicationComponentsDir)\Lib\$(GDTPlatform)\AMDTApplicationComponents$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTApplicationComponentsDir)\Lib\$(GDTPlatform)\AMDTApplicationComponents$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(AMDTBaseToolsDir)\Lib\$(GDTPlatform)\AMDTBaseTools$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTBaseToolsDir)\Lib\$(GDTPlatform)\AMDTBaseTools$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(AMDTOsWrappersDir)\Lib\$(GDTPlatform)\AMDTOSWrappers$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTOsWrappersDir)\Lib\$(GDTPlatform)\AMDTOSWrappers$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(AMDTSHAREDPROFDIR)\Lib\$(GDTPlatform)\AMDTSharedProfiling$(GDTPlatformSuffix)$(GDTDebugSuffix).dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTSHAREDPROFDIR)\Lib\$(GDTPlatform)\AMDTSharedProfiling$(GDTPlatformSuffix)$(GDTDebugSuffix).pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(AMDTApplicationDir)\Lib\$(GDTPlatform)\CodeXL$(GDTDebugSuffixUnderscore).exe $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTApplicationDir)\Lib\$(GDTPlatform)\CodeXL$(GDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(FreeImageDir)\Lib\FreeImage.dll $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(QSCINTILLADIR)\Lib\$(Platform)\$(Configuration)\qscintillaAmdDt474$(GDTDebugSuffixNoDash)2.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QSCINTILLADIR)\Lib\$(Platform)\$(Configuration)\qscintillaAmdDt474$(GDTDebugSuffixNoDash)2.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(QTDIR)\Lib\$(Platform)\QtCoreAmdDt474$(GDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtCoreAmdDt474$(GDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(QTDIR)\Lib\$(Platform)\QtGuiAmdDt474$(GDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtGuiAmdDt474$(GDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(QTDIR)\Lib\$(Platform)\QtOpenGLAmdDt474$(GDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtOpenGLAmdDt474$(GDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(QTDIR)\Lib\$(Platform)\QtNetworkAmdDt474$(GDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtNetworkAmdDt474$(GDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(QTDIR)\Lib\$(Platform)\QtXmlAmdDt474$(GDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtXmlAmdDt474$(GDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(QTDIR)\Lib\$(Platform)\QtWebKitAmdDt474$(GDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtWebKitAmdDt474$(GDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxbase292u$(GDTDebugSuffixNoDash)_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxbase292u$(GDTDebugSuffixNoDash)_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_adv_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_adv_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_aui_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_aui_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_core_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_core_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_gl_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_gl_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_html_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_html_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_stc_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_stc_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+
+if NOT EXIST $(AMDTOutputDir)$(Configuration)\bin\x86. mkdir $(AMDTOutputDir)$(Configuration)\bin\x86
+xcopy /Y ..\..\..\..\..\APPProfiler\bin\Release-Win32\sprofile\*.* $(AMDTOutputDir)$(Configuration)\bin\x86
+
+if NOT EXIST $(AMDTOutputDir)$(Configuration)\bin\x64. mkdir $(AMDTOutputDir)$(Configuration)\bin\x64
+xcopy /Y ..\..\..\..\..\APPProfiler\bin\Release-x64\sprofile\*.* $(AMDTOutputDir)$(Configuration)\bin\x64
+
+if NOT EXIST $(AMDTOutputDir)$(Configuration)\bin\jqPlot. mkdir $(AMDTOutputDir)$(Configuration)\bin\jqPlot
+xcopy /Y ..\..\..\..\..\APPProfiler\Backend\Common\jqPlot\*.* $(AMDTOutputDir)$(Configuration)\bin\jqPlot
+
+if NOT EXIST $(SolutionDir)\..\CodeXL\Components\Output\$(Configuration)\bin\x86. mkdir $(SolutionDir)\..\CodeXL\Components\Output\$(Configuration)\bin\x86
+xcopy /Y ..\..\..\..\..\APPProfiler\bin\Release-Win32\sprofile\*.* $(SolutionDir)\..\CodeXL\Components\Output\$(Configuration)\bin\x86
+
+if NOT EXIST $(SolutionDir)\..\CodeXL\Components\Output\$(Configuration)\bin\x64. mkdir $(SolutionDir)\..\CodeXL\Components\Output\$(Configuration)\bin\x64
+xcopy /Y ..\..\..\..\..\APPProfiler\bin\Release-x64\sprofile\*.* $(SolutionDir)\..\CodeXL\Components\Output\$(Configuration)\bin\x64
+
+if NOT EXIST $(SolutionDir)\..\CodeXL\Components\Output\$(Configuration)\bin\jqPlot. mkdir $(SolutionDir)\..\CodeXL\Components\Output\$(Configuration)\bin\jqPlot
+xcopy /Y ..\..\..\..\..\APPProfiler\Backend\Common\jqPlot\*.* $(SolutionDir)\..\CodeXL\Components\Output\$(Configuration)\bin\jqPlot
+</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

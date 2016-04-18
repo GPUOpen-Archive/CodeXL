@@ -1,0 +1,7 @@
+#ifndef POWER_PROF_DRIVER_VERSION_H
+    #define POWER_PROF_DRIVER_VERSION_H
+
+    #define PWR_PROF_VERSION_MAJOR 1
+    #define PWR_PROF_VERSION_MINOR 1
+
+#endif

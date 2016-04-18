@@ -1,0 +1,152 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{08E8DFC3-730A-4650-BFA9-18EDCA2DC3DE}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>AMDTRemoteAgent</RootNamespace>
+    <ProjectName>AMDTRemoteAgent</ProjectName>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="$(SolutionDir)\CodeXLCommonProjects.props" />
+    <Import Project="$(AMDTCommonEXT)\tinyxml\Global-TinyXML-2015.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="RemotePowerProfiling.props" />
+    <Import Project="$(AMDTCommonEXT)\Boost\Global-Boost-2015.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="RemotePowerProfiling.props" />
+    <Import Project="$(AMDTCommonEXT)\Boost\Global-Boost-2015.props" />
+  </ImportGroup>
+  <PropertyGroup>
+    <TargetName>CodeXLRemoteAgent$(GDTProjectSuffix)</TargetName>
+    <OutDir>$(AMDTOutputDir)$(Configuration)\bin\</OutDir>
+    <IntDir>$(AMDTOutputDir)$(Configuration)\obj\$(ProjectName)\$(Platform)$(GDTBuildSuffix)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(AMDTCommonExt)zlib\1.2.8;.;$(SolutionDir)\..\Remote;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_USRDLL;NOMINMAX;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalOptions> /MP %(AdditionalOptions)</AdditionalOptions>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <ImportLibrary>$(AMDTOutputDir)$(Configuration)\arch\$(TargetName).lib</ImportLibrary>
+      <AdditionalDependencies>zlibstat.lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(AMDTOutputDir)$(Configuration)\arch;$(AMDTCommonExt)zlib\1.2.8\contrib\vstudio\vc12\$(GDTPlatform)\ZlibStat$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <ImageHasSafeExceptionHandlers Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ImageHasSafeExceptionHandlers>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/NODEFAULTLIB:AMDTPowerProfileAPI$(GDTProjectSuffix).lib
+/NODEFAULTLIB:tinyxml$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixNoDash).lib
+/NODEFAULTLIB:kernel32.lib
+/NODEFAULTLIB:user32.lib
+/NODEFAULTLIB:gdi32.lib
+/NODEFAULTLIB:winspool.lib
+/NODEFAULTLIB:comdlg32.lib
+/NODEFAULTLIB:advapi32.lib
+/NODEFAULTLIB:shell32.lib
+/NODEFAULTLIB:ole32.lib
+/NODEFAULTLIB:oleaut32.lib
+/NODEFAULTLIB:uuid.lib
+/NODEFAULTLIB:odbc32.lib
+/NODEFAULTLIB:odbccp32.lib %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="AMDTRemoteAgent.licenseheader" />
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="dmnAppWatcherThread.h" />
+    <ClInclude Include="dmnConnectionWatcherThread.h" />
+    <ClInclude Include="dmnConfigManager.h" />
+    <ClInclude Include="dmnPowerBackendAdapter.h" />
+    <ClInclude Include="dmnServerThread.h" />
+    <ClInclude Include="dmnServerThreadConfig.h" />
+    <ClInclude Include="dmnSessionThread.h" />
+    <ClInclude Include="dmnThreadObserver.h" />
+    <ClInclude Include="dmnUtils.h" />
+    <ClInclude Include="IAppWatcherObserver.h" />
+    <ClInclude Include="IThreadEventObserver.h" />
+    <ClInclude Include="Public Include\dmnDefinitions.h" />
+    <ClInclude Include="Public Include\dmnStringConstants.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="resource1.h" />
+    <ClInclude Include="resource2.h" />
+    <ClInclude Include="resource3.h" />
+    <ClInclude Include="stdafx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Daemon.cpp" />
+    <ClCompile Include="dmnAppWatcherThread.cpp" />
+    <ClCompile Include="dmnConnectionWatcherThread.cpp" />
+    <ClCompile Include="dmnConfigManager.cpp" />
+    <ClCompile Include="dmnPowerBackendAdapter.cpp" />
+    <ClCompile Include="dmnServerThread.cpp" />
+    <ClCompile Include="dmnServerThreadConfig.cpp" />
+    <ClCompile Include="dmnSessionThread.cpp" />
+    <ClCompile Include="dmnThreadObserver.cpp" />
+    <ClCompile Include="dmnUtils.cpp" />
+    <ClCompile Include="IThreadEventObserver.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resource.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

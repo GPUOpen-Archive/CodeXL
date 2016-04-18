@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="AMDTBaseProjects">
+    <Import Project="$(AMDTCommonExt)\tinyxml\Global-TinyXML.props" />
+    <Import Project="$(AMDTCommonAMD)\AMDTBaseTools\Global-AMDTBaseTools.props" />
+    <Import Project="$(AMDTCommonAMD)\AMDTOSWrappers\Global-AMDTOSWrappers.props" />
+    <Import Project="$(AMDTCommonAMD)\AMDTAPIClasses\Global-AMDTAPIClasses.props" />
+  </ImportGroup>
+  <ImportGroup Label="AMDTBaseGUIProjects" Condition="'$(Platform)'=='Win32'">
+    <Import Project="$(AMDTCommonExt)\Qt\Global-QT.props" />
+    <Import Project="$(AMDTCommonExt)\QScintilla\Global-QScintilla.props" />
+    <Import Project="$(AMDTCommonAMD)\AMDTApplicationFramework\Global-AMDTApplicationFramework.props" />
+    <Import Project="$(AMDTCommonAMD)\AMDTApplicationComponents\Global-AMDTApplicationComponents.props" />
+  </ImportGroup>
+</Project>

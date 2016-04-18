@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<CodeXL>
+	<Tests>
+		<TestResultsDirectory>GoldMasters_APPSDK_3_0</TestResultsDirectory>
+		<LogFilesDirectory>TestResults\</LogFilesDirectory>
+		<Test>
+            <ExecutablePath>samples\opencl\bin\x86_64\BitonicSort.exe</ExecutablePath>
+            <WorkingDirectory>samples\opencl\bin\x86_64\</WorkingDirectory>
+            <TestName>BitonicSort_StepTest</TestName>
+            <TestType>StepTest</TestType>
+            <Kernels>
+                <Kernel>
+                    <KernelName>bitonicSort</KernelName>
+					<WorkItemId>0,0,0</WorkItemId>
+                </Kernel>
+            </Kernels>
+        </Test>
+		<Test>
+            <ExecutablePath>samples\opencl\bin\x86_64\URNG.exe</ExecutablePath>
+            <WorkingDirectory>samples\opencl\bin\x86_64\</WorkingDirectory>
+            <TestName>URNG_StepIntoTest</TestName>
+            <TestType>StepIntoTest</TestType>
+            <Kernels>
+                <Kernel>
+                    <KernelName>noise_uniform</KernelName>
+					<WorkItemId>0,0,0</WorkItemId>
+					<StepIntoLine>82</StepIntoLine>
+                </Kernel>
+            </Kernels>
+        </Test>
+
+</Tests>
+</CodeXL>       

@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{103F4A46-3651-49E3-8C8F-9054414191BB}</ProjectGuid>
+    <RootNamespace>CLTraceAgent</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>AMDTGpuProfilerCLTraceAgent</ProjectName>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\Backend-Common.props" />
+    <Import Project="..\Backend-Common-OpenCL.props" />
+    <Import Project="..\Backend-Deliverable.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>NON_BLOCKING_TIMEOUT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalOptions>/EXPORT:clAgent_OnLoad %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="CLAPIDefBase.cpp" />
+    <ClCompile Include="CLAPIDefs.cpp" />
+    <ClCompile Include="CLAPIInfo.cpp" />
+    <ClCompile Include="CLAPIInfoManager.cpp" />
+    <ClCompile Include="CLAPITraceEntry.cpp" />
+    <ClCompile Include="CLEnqueueAPIDefs.cpp" />
+    <ClCompile Include="CLEventHandler.cpp" />
+    <ClCompile Include="CLEventManager.cpp" />
+    <ClCompile Include="CLStringUtils.cpp" />
+    <ClCompile Include="CLTraceAgent.cpp" />
+    <ClCompile Include="PMCSamplerManager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="APTraceUserPMCExt.h" />
+    <ClInclude Include="CLAPIDefBase.h" />
+    <ClInclude Include="CLAPIDefs.h" />
+    <ClInclude Include="CLAPIInfo.h" />
+    <ClInclude Include="CLAPIInfoManager.h" />
+    <ClInclude Include="CLAPITraceEntry.h" />
+    <ClInclude Include="CLEnqueueAPIDefs.h" />
+    <ClInclude Include="CLEventHandler.h" />
+    <ClInclude Include="CLEventManager.h" />
+    <ClInclude Include="CLStringUtils.h" />
+    <ClInclude Include="CLTraceAgent.h" />
+    <ClInclude Include="PMCSamplerManager.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\..\..\Common\Src\VersionInfo\VersionResource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTBaseTools\AMDTBaseToolsVS14.vcxproj">
+      <Project>{11221a7f-3883-418f-b286-b0ea1e28ef10}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTOSWrappers\AMDTOSWrappersVS14.vcxproj">
+      <Project>{5d9222ac-39fb-4123-9497-78cea5be58ad}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\CLCommon\AMDTGpuProfilerCLCommon.vcxproj">
+      <Project>{dfbd3d9e-c64f-401b-8898-b5d34d580c54}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Common\AMDTGpuProfilerCommon.vcxproj">
+      <Project>{176db1a7-68a5-4c97-8606-2cc1388d7a50}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

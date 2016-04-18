@@ -1,0 +1,274 @@
+<mockup version="1.0" skin="sketch" fontFace="Balsamiq Sans" measuredW="1030" measuredH="711" mockupW="990" mockupH="671">
+  <controls>
+    <control controlID="63" controlTypeID="com.balsamiq.mockups::CheckBox" x="329" y="106" w="177" h="22" measuredW="159" measuredH="20" zOrder="6" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <state>selected</state>
+        <text>Collect%20call%20stack%20details%20of%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="66" controlTypeID="com.balsamiq.mockups::TitleWindow" x="40" y="40" w="990" h="671" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bottomheight>0</bottomheight>
+        <text>Edit%20CodeXL%20Project%20Settings</text>
+      </controlProperties>
+    </control>
+    <control controlID="67" controlTypeID="com.balsamiq.mockups::Button" x="55" y="669" w="180" h="27" measuredW="147" measuredH="27" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>Restore%20Default%20Settings</text>
+      </controlProperties>
+    </control>
+    <control controlID="84" controlTypeID="com.balsamiq.mockups::Tree" x="55" y="71" w="267" h="583" measuredW="300" measuredH="240" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>5</selectedIndex>
+        <size>11</size>
+        <text>General%0ADebug%0Av%20Profile%0A._Application%20Timeline%20Trace%0A._GPU%20Profile%3A%20Perf.%20Counters%0A.vCPU%20Profile%0A.._Custom%0Av%20Analyze%0A._Target%20Devices%20and%20Analysis%20Input%0A.vOpenCL%20Build%20Options%0A.._General%20%26%20Optimization%0A.._Other</text>
+      </controlProperties>
+    </control>
+    <control controlID="87" controlTypeID="com.balsamiq.mockups::TextArea" x="328" y="75" w="687" h="26" measuredW="200" measuredH="140" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <borderColor>15658734</borderColor>
+        <color>15658734</color>
+        <size>11</size>
+        <text>*Call%20Stack%20Collection*</text>
+      </controlProperties>
+    </control>
+    <control controlID="93" controlTypeID="com.balsamiq.mockups::Button" x="847" y="669" w="75" h="27" measuredW="38" measuredH="27" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>OK</text>
+      </controlProperties>
+    </control>
+    <control controlID="94" controlTypeID="com.balsamiq.mockups::Button" x="941" y="669" w="75" h="27" measuredW="58" measuredH="27" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>Cancel</text>
+      </controlProperties>
+    </control>
+    <control controlID="112" controlTypeID="com.balsamiq.mockups::TextArea" x="332" y="472" w="687" h="26" measuredW="200" measuredH="140" zOrder="7" locked="false" isInGroup="-1">
+      <controlProperties>
+        <borderColor>15658734</borderColor>
+        <color>15658734</color>
+        <size>11</size>
+        <text>*Profile%20Hardware%20Scope*</text>
+      </controlProperties>
+    </control>
+    <control controlID="113" controlTypeID="com.balsamiq.mockups::Label" x="341" y="632" w="120" h="-1" measuredW="92" measuredH="19" zOrder="8" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>CPU%20Affinity%20Mask</text>
+      </controlProperties>
+    </control>
+    <control controlID="114" controlTypeID="com.balsamiq.mockups::TextInput" x="471" y="629" w="137" h="-1" measuredW="40" measuredH="25" zOrder="9" locked="false" isInGroup="-1">
+      <controlProperties>
+        <align>right</align>
+        <size>11</size>
+        <text>0x3F</text>
+      </controlProperties>
+    </control>
+    <control controlID="116" controlTypeID="com.balsamiq.mockups::Label" x="341" y="202" w="155" h="-1" measuredW="123" measuredH="19" zOrder="10" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>Collect%20Call%20Stack%20every%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="117" controlTypeID="com.balsamiq.mockups::NumericStepper" x="552" y="200" w="63" h="-1" measuredW="38" measuredH="22" zOrder="11" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>1</text>
+      </controlProperties>
+    </control>
+    <control controlID="118" controlTypeID="com.balsamiq.mockups::Label" x="620" y="202" w="155" h="-1" measuredW="42" measuredH="19" zOrder="12" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>samples</text>
+      </controlProperties>
+    </control>
+    <control controlID="153" controlTypeID="__group__" x="341" y="502" w="267" h="145" measuredW="267" measuredH="145" zOrder="13" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::Tree" x="0" y="0" w="267" h="126" measuredW="300" measuredH="225" zOrder="0" locked="false" isInGroup="153">
+          <controlProperties>
+            <selectedIndex>-1</selectedIndex>
+            <size>11</size>
+            <text>v%20%0A.%20%5Bx%5D%20Core%200%0A.%20%5Bx%5D%20Core%201%0A.%20%5Bx%5D%20Core%202%0A.%20%5Bx%5D%20Core%203%0A%3E%20</text>
+            <verticalScrollbar>true</verticalScrollbar>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::CheckBoxGroup" x="38" y="102" w="70" h="43" measuredW="51" measuredH="16" zOrder="1" locked="false" isInGroup="153">
+          <controlProperties>
+            <size>11</size>
+            <text>%5B%20%5D%20CPU%201</text>
+          </controlProperties>
+        </control>
+        <control controlID="2" controlTypeID="com.balsamiq.mockups::CheckBoxGroup" x="38" y="5" w="70" h="23" measuredW="59" measuredH="17" zOrder="2" locked="false" isInGroup="153">
+          <controlProperties>
+            <text>%5Bx%5D%20CPU%200</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="154" controlTypeID="com.balsamiq.mockups::StickyNote" x="775" y="61" w="244" h="160" measuredW="109" measuredH="123" zOrder="14" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>Options%20in%20the%20drop%20list%3A%0AMinimal%20%28%3D%202%20levels%29%0ACompact%20%28%3D%2032%20levels%29%0ALow%20%28%3D%2064%20levels%29%0ADefault%20%28%3D%20128%20levels%29%0AMaximal%20%28%3D%20392%20levels%29%0AThe%20label%20below%20the%20drop%20list%20displays%20the%20numeric%20depth%20as%20in%20the%20paranthesis%20above.</text>
+      </controlProperties>
+    </control>
+    <control controlID="157" controlTypeID="com.balsamiq.mockups::Arrow" x="671" y="199" w="120" h="44" measuredW="150" measuredH="100" zOrder="15" locked="false" isInGroup="-1">
+      <controlProperties>
+        <curvature>1</curvature>
+        <direction>bottom</direction>
+        <leftArrow>true</leftArrow>
+        <rightArrow>false</rightArrow>
+      </controlProperties>
+    </control>
+    <control controlID="162" controlTypeID="com.balsamiq.mockups::TextArea" x="332" y="318" w="687" h="26" measuredW="200" measuredH="140" zOrder="16" locked="false" isInGroup="-1">
+      <controlProperties>
+        <borderColor>15658734</borderColor>
+        <color>15658734</color>
+        <size>11</size>
+        <text>*Data%20Collection%20Schedule*</text>
+      </controlProperties>
+    </control>
+    <control controlID="163" controlTypeID="com.balsamiq.mockups::Label" x="532" y="419" w="-1" h="-1" measuredW="130" measuredH="19" zOrder="17" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <state>disabled</state>
+        <text>Start%20data%20collection%20after</text>
+      </controlProperties>
+    </control>
+    <control controlID="164" controlTypeID="com.balsamiq.mockups::NumericStepper" x="701" y="417" w="60" h="-1" measuredW="40" measuredH="22" zOrder="18" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <state>disabled</state>
+        <text>0</text>
+      </controlProperties>
+    </control>
+    <control controlID="165" controlTypeID="com.balsamiq.mockups::CheckBox" x="513" y="443" w="-1" h="-1" measuredW="144" measuredH="20" zOrder="19" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <state>disabled</state>
+        <text>End%20data%20collection%20after</text>
+      </controlProperties>
+    </control>
+    <control controlID="166" controlTypeID="com.balsamiq.mockups::Label" x="765" y="419" w="-1" h="-1" measuredW="43" measuredH="19" zOrder="20" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <state>disabled</state>
+        <text>seconds</text>
+      </controlProperties>
+    </control>
+    <control controlID="167" controlTypeID="com.balsamiq.mockups::NumericStepper" x="701" y="442" w="60" h="-1" measuredW="40" measuredH="22" zOrder="21" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <state>disabled</state>
+        <text>0</text>
+      </controlProperties>
+    </control>
+    <control controlID="168" controlTypeID="com.balsamiq.mockups::Label" x="765" y="444" w="-1" h="-1" measuredW="94" measuredH="19" zOrder="22" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <state>disabled</state>
+        <text>additional%20seconds</text>
+      </controlProperties>
+    </control>
+    <control controlID="169" controlTypeID="com.balsamiq.mockups::CheckBox" x="882" y="435" w="-1" h="-1" measuredW="99" measuredH="34" zOrder="23" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <state>disabled</state>
+        <text>Then%2C%20terminate%5Cr%20the%20process</text>
+      </controlProperties>
+    </control>
+    <control controlID="170" controlTypeID="com.balsamiq.mockups::RadioButton" x="521" y="347" w="-1" h="-1" measuredW="150" measuredH="20" zOrder="24" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <state>selected</state>
+        <text>Throughout%20Entire%20Duration</text>
+      </controlProperties>
+    </control>
+    <control controlID="171" controlTypeID="com.balsamiq.mockups::RadioButton" x="521" y="371" w="-1" h="-1" measuredW="215" measuredH="20" zOrder="25" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>Start%20profile%20with%20data%20collection%20paused</text>
+      </controlProperties>
+    </control>
+    <control controlID="172" controlTypeID="com.balsamiq.mockups::RadioButton" x="521" y="395" w="-1" h="-1" measuredW="71" measuredH="20" zOrder="26" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>Scheduled%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="173" controlTypeID="com.balsamiq.mockups::Label" x="347" y="347" w="-1" h="-1" measuredW="101" measuredH="19" zOrder="27" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>Collection%20Schedule%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="174" controlTypeID="com.balsamiq.mockups::RadioButtonGroup" x="552" y="130" w="-1" h="-1" measuredW="171" measuredH="58" zOrder="28" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>%28o%29%20User%20space%0A%28%20%29%20Kernel%20space%0A%28%20%29%20User%20space%20and%20Kernel%20space</text>
+      </controlProperties>
+    </control>
+    <control controlID="175" controlTypeID="com.balsamiq.mockups::Label" x="343" y="128" w="-1" h="-1" measuredW="144" measuredH="19" zOrder="29" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>Collect%20for%20code%20executed%20in%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="179" controlTypeID="com.balsamiq.mockups::Label" x="346" y="244" w="-1" h="-1" measuredW="111" measuredH="19" zOrder="30" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>Time-Based%20Sampling</text>
+      </controlProperties>
+    </control>
+    <control controlID="180" controlTypeID="com.balsamiq.mockups::Label" x="346" y="267" w="-1" h="-1" measuredW="172" measuredH="19" zOrder="31" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>Other%20CPU%20Profiling%20session%20types</text>
+      </controlProperties>
+    </control>
+    <control controlID="183" controlTypeID="com.balsamiq.mockups::Label" x="341" y="229" w="-1" h="-1" measuredW="135" measuredH="19" zOrder="32" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>Callstack%20Collection%20Depth%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="184" controlTypeID="com.balsamiq.mockups::StickyNote" x="622" y="502" w="393" h="114" measuredW="109" measuredH="123" zOrder="33" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>Tooltip%20for%20%22Reproduce%20missing%20call%20stack...%22%3A%0A%22Perform%20additional%20analysis%20to%20overcome%20frame-pointer%20omission%20%28FPO%29%20in%2032-bit%20apps%20and%20lack%20of%20unwind%20info%20in%2064-bit%20apps.%20The%20profiler%20will%20store%20additional%20data%20during%20the%20profile%20session%20and%20require%20more%20time%20during%20post-session%20processing.%22</text>
+      </controlProperties>
+    </control>
+    <control controlID="185" controlTypeID="com.balsamiq.mockups::CheckBox" x="701" y="243" w="-1" h="-1" measuredW="189" measuredH="20" zOrder="34" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <state>selected</state>
+        <text>Reproduce%20missing%20call%20stack%20info</text>
+      </controlProperties>
+    </control>
+    <control controlID="187" controlTypeID="com.balsamiq.mockups::CheckBox" x="700" y="268" w="-1" h="-1" measuredW="189" measuredH="20" zOrder="35" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>Reproduce%20missing%20call%20stack%20info</text>
+      </controlProperties>
+    </control>
+    <control controlID="188" controlTypeID="com.balsamiq.mockups::ComboBox" x="552" y="241" w="133" h="-1" measuredW="113" measuredH="22" zOrder="36" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>High%20%28128%20levels%29</text>
+      </controlProperties>
+    </control>
+    <control controlID="189" controlTypeID="com.balsamiq.mockups::ComboBox" x="552" y="267" w="-1" h="-1" measuredW="133" measuredH="22" zOrder="37" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>Compact%20%2832%20levels%29</text>
+      </controlProperties>
+    </control>
+    <control controlID="190" controlTypeID="com.balsamiq.mockups::Arrow" x="808" y="289" w="74" h="243" measuredW="150" measuredH="100" zOrder="38" locked="false" isInGroup="-1">
+      <controlProperties>
+        <rightArrow>false</rightArrow>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

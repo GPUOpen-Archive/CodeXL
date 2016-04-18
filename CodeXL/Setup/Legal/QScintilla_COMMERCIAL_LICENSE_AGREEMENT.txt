@@ -1,0 +1,307 @@
+QScintilla COMMERCIAL LICENSE AGREEMENT
+Version 2.3
+
+IMPORTANT-READ CAREFULLY:
+
+1. This Riverbank End-User License Agreement ("Agreement") is a legal
+agreement between you (either an individual or a legal entity)
+("Licensee") and Riverbank Computing Limited ("Riverbank") for the Riverbank
+software product(s) accompanying this Agreement, which include(s) computer
+software and may include "online" or electronic documentation,
+associated media, and printed materials, including the source code,
+example programs and the documentation ("Licensed Software").
+
+2. The Licensed Software is protected by copyright laws and
+international copyright treaties, as well as other intellectual property
+laws and treaties. The Licensed Software is licensed, not sold.
+
+3. By installing, copying, or otherwise using the Licensed Software,
+Licensee agrees to be bound by the terms of this Agreement. If Licensee
+does not agree to the terms of this Agreement, do not install,
+copy, or otherwise use the Licensed Software. Licensee may, however,
+return it to Licensee's place of purchase within 14 days of purchase for
+a full refund. In addition, by installing, copying, or otherwise using
+any updates or other components of the Licensed Software that Licensee
+receives separately as part of the Licensed Software ("Updates"),
+Licensee agrees to be bound by any additional license terms that
+accompany such Updates, if any. If Licensee does not agree to the
+additional license terms that accompany such Updates, Licensee may not
+install, copy, or otherwise use such Updates.
+
+4. Upon Licensee's acceptance of the terms and conditions of this
+Agreement, Riverbank grants Licensee the right to use the Licensed
+Software in the manner provided below.
+
+5. Riverbank grants to Licensee an unlimited number of personal, nonexclusive,
+nontransferable developer licenses to make and use copies of the Licensed
+Software for the sole purposes of designing, developing, and testing
+Licensee's software product(s) ("Applications").
+
+6. Riverbank grants to Licensee a non-exclusive, non-transferable,
+perpetual license to make, use and modify copies of the Licensed
+Software for the maximum number of individuals within Licensee's
+organization ("User"(s)) specified at the time of purchase for the sole
+purposes of designing, developing, and testing Licensee's
+software product(s), which may include the Licensed Software
+("Applications"). Modified Licensed Software shall be considered as
+Licensed Software for the purposes of this Agreement.
+
+7. Licensee may install copies of the Licensed Software on an unlimited
+number of computers provided that the number of Users using the Licensed
+Software is not exceeded.
+
+8. Verification: Riverbank or a certified auditor on Riverbank's behalf,
+may, upon its reasonable request and at its expense, audit Licensee with
+respect to the use of the Licensed Software. Such audit may be conducted
+by mail, electronic means or through an in-person visit to Licensee's
+place of business. Any such in-person audit shall be conducted during
+regular business hours at Licensee's facilities and shall not
+unreasonably interfere with Licensee's business activities. Riverbank
+will not remove, copy, or redistribute any electronic material during
+the course of an audit. Licensee does not implicitly grant Riverbank any
+form of license agreement. If an audit reveals that Licensee is using
+the Licensed Software in a way that is in material violation of the
+terms of the Agreement, then Licensee shall pay Riverbank's reasonable
+costs of conducting the audit. In the case of a material violation,
+Licensee agrees to pay Riverbank any amounts owing that are attributable
+to the unauthorized use. In the alternative, Riverbank reserves the
+right, at Riverbank's sole option, to terminate the licenses for the
+Licensed Software.
+
+GENERAL TERMS THAT APPLY TO APPLICATIONS AND REDISTRIBUTABLES
+9. a) Riverbank grants Licensee a nonexclusive, perpetual, royalty-free right
+to reproduce and distribute the object code form of certain portions of the
+Licensed Software ("Redistributables"), as specified in Appendix 1,
+Section 1, for execution on any supported operating system. Copies of
+Redistributables may only be distributed with and for the sole purpose of
+executing Applications permitted under this Agreement that Licensee has
+created using the Licensed Software. Under no circumstances may any copies of
+Redistributables be distributed separately. This Agreement does not give
+Licensee any rights to distribute any of the parts of the Licensed
+Software listed in Appendix 1, Section 2, neither as a whole nor as
+parts or snippets of code.
+
+b) Licensee may not distribute, transfer, assign or otherwise dispose of
+Redistributables, solely or as part of an Application, its source code,
+in binary/compiled form, or in any other form, if such action is part of
+a joint software and hardware distribution, except as set forth below or
+provided by a separate runtime distribution license with Riverbank or
+one of its authorized distributors. A joint hardware and software
+distribution shall be defined as either: (i) distribution of a hardware
+device that includes the Licensed Software; or (ii) distribution of the
+Licensed Software onto a device designed to facilitate the installation
+of the Licensed Software onto the same device and where the core
+functionality of the device will depend on the Licensed Software.
+
+c) If the combination of the Licensed Software and hardware and/or
+software ("Product"), in the final working end-user configuration either
+(i) relies on Apple OS X (R) or Windows 98/ME/2000/2003/ XP/Vista (R)
+(however not including embedded versions of these, e.g XP Embedded) as
+an integral part of and foundation for its functionality; or (ii) is a
+workstation, server, desktop computer or notebook computer relying on a
+complete 3rd party desktop environment such as KDE or GNOME as an
+integral part of and foundation for its functionality; or (iii) requires a
+permanent mains power supply for normal operation; or (iv) does not lose
+core functionality when the Licensed Software is removed, then Licensee
+is hereby granted an exception from the requirement for a runtime
+distribution license agreement.
+
+d) In all instances not covered above, Licensee shall contact Riverbank
+or one of Riverbank's authorized distributors to obtain a distribution
+license agreement.
+
+10. The license granted in this Agreement for Licensee to create
+Applications and distribute them and the Redistributables (if any) to
+Licensee's customers is subject to all of the following conditions: (i)
+all copies of the Applications Licensee creates must bear a valid
+copyright notice, either Licensee's own or the copyright notice that
+appears on the Licensed Software; (ii) Licensee may not remove or alter
+any copyright, trademark or other proprietary rights notice contained in
+any portion of the Licensed Software; (iii) Licensee shall not make any
+warranties in respect of the Redistributables on behalf of Riverbank, any
+such warranties shall be solely made by Licensee; (iv) Licensee will
+indemnify and hold Riverbank, its related companies and its suppliers,
+harmless from and against any claims or liabilities arising out of the
+use, reproduction or distribution of Applications, except where such
+claims or liabilities arise as a result of claims that the Licensed
+Software or Redistributables, as delivered by Riverbank, infringe the
+intellectual property of a third party; (v) Applications must be
+developed using a licensed, registered copy of the Licensed Software;
+(vi) Applications must add primary and substantial functionality to the
+Licensed Software; (vii) Applications may not pass on functionality
+which in any way makes it possible for others to create software with
+the Licensed Software; (viii) Applications may not compete with the
+Licensed Software; (ix) Licensee may not use Riverbank's or any of its
+suppliers' names, logos, or trademarks to market Application(s), except
+to state that Application was developed using the Licensed Software.
+
+11. Warranty Disclaimer: The Licensed Software is licensed to Licensee
+"as is". To the maximum extent permitted by applicable law, Riverbank on
+behalf of itself and its suppliers, disclaims all warranties and
+conditions, either express or implied, including, but not limited to,
+implied warranties of merchantability, fitness for a particular purpose,
+title and non-infringement with regard to the Licensed Software.
+
+12. Limitation of Liability: If, Riverbank's warranty disclaimer
+notwithstanding, Riverbank is held liable to Licensee, whether in
+contract, tort or any other legal theory, based on the Licensed
+Software, Riverbank's entire liability to Licensee and Licensee's
+exclusive remedy shall be, at Riverbank's option, either (A) return of
+the price Licensee paid for the Licensed Software, or (B) repair or
+replacement of the Licensed Software, provided Licensee returns to
+Riverbank all copies of the Licensed Software as originally delivered to
+Licensee. Riverbank shall not under any circumstances be liable to
+Licensee based on failure of the Licensed Software if the failure
+resulted from accident, abuse or misapplication, nor shall Riverbank
+under any circumstances be liable for special damages, punitive or
+exemplary damages, damages for loss of profits or interruption of
+business or for loss or corruption of data. Any award of damages from
+Riverbank to Licensee shall not exceed the total amount Licensee has
+paid to Riverbank in connection with this Agreement.
+
+13. Support and Updates: Licensee will be eligible to receive access
+to Updates to the Licensed Software ("Updates") for a period not to
+exceed one year from the date of initial delivery ("Initial Term"), in
+accordance with Riverbank's then current policies and procedures, if any.
+Such policies and procedures may be changed from time to time. Following
+the Initial Term, Riverbank will no longer make the Licensed Software
+available to Licensee unless Licensee purchases additional Updates
+according to section 14 below; however, Licensee's license to the previous
+versions of the Licensed Software for which Licensee has paid the applicable
+fees shall continue.
+
+14. Renewal of Updates: Licensee may purchase additional Updates
+following the Initial Term at Riverbank's terms and conditions
+applicable at the time of renewal.
+
+
+GENERAL PROVISIONS
+15. Marketing: Riverbank may not include Licensee's company name and logo in
+a publicly available list of Riverbank customers unless Riverbank first
+obtains Licensee's written permission to do so.
+
+16. Assignment: Neither party may assign any of its rights or obligations
+hereunder, whether by operation of law or otherwise, without the prior
+express written consent of the other party.  Notwithstanding the foregoing,
+either party may assign this Agreement without consent of the other party in
+connection with a merger, acquisition, corporate reorganization, or sale of
+its assets.  Any attempt by a party to assign its rights or obligations
+under this Agreement in breach of this Section shall be void and of no
+effect.  Subject to the foregoing, this Agreement shall bind and inure to the
+benefit of the parties, their respective successors and permitted assigns.
+
+17. Termination: Riverbank may terminate the Agreement at any time
+immediately upon written notice by Riverbank to Licensee if Licensee
+breaches this Agreement, fails to pay the fees for the Licensed
+Software, or infringes Riverbank's intellectual property in or to the
+Licensed Software. Upon termination of the Licenses, Licensee shall
+return to Riverbank all copies of Licensed Software that were supplied
+by Riverbank. All other copies of Licensed Software in the possession or
+control of Licensee must be erased or destroyed. An officer of Licensee
+must promptly deliver to Riverbank a written confirmation that this has
+occurred.
+
+18. Clauses that survive termination: Sections 2, 6, 7, 8, 12, 19, 20
+and 22 shall survive the termination of this Agreement, however Sections
+6 and 7 shall not survive if the Agreement is terminated for cause.
+
+19. Entire Agreement: This Agreement constitutes the complete agreement
+between the parties and supersedes all prior or contemporaneous
+discussions, representations, and proposals, written or oral, with
+respect to the subject matters discussed herein. No modification of this
+Agreement will be effective unless contained in a writing executed by an
+authorized representative of each party. No term or condition contained
+in Licensee's purchase order will apply unless expressly accepted by
+Riverbank in writing. If any provision of the Agreement is found void or
+unenforceable, the remainder will remain valid and enforceable according
+to its terms. If any remedy provided is determined to have failed for
+its essential purpose, all limitations of liability and exclusions of
+damages set forth in this Agreement shall remain in effect.
+
+20. Confidentiality: Each party acknowledges that during the term of
+this Agreement it will have access to information about the other
+party's business, business methods, business plans, customers, business
+relations, technology, and other information, including the terms of
+this Agreement, that is confidential and of great value to the other
+party, and the value of which would be significantly reduced if
+disclosed to third parties (the "Confidential Information").
+Accordingly, when a party (the "Receiving Party") receives Confidential
+Information from another party (the "Disclosing Party"), the Receiving
+Party shall, and shall obligate its employees and agents to: (i)
+maintain the Confidential Information in strict confidence; (ii) not
+disclose the Confidential Information to a third party without the
+Disclosing Party's prior written approval; and (iii) not, directly or
+indirectly, use the Confidential Information for any purpose other than
+for exercising its rights and fulfilling its responsibilities pursuant
+to this Agreement. Each party shall take reasonable measures to protect
+the Confidential Information of the other party, which measures shall
+not be less than the measures taken by such party to protect its own
+confidential and proprietary information. "Confidential Information"
+shall not include information that (a) is or becomes generally known to
+the public through no act or omission of the Receiving Party; (b) was in
+the Receiving Party's lawful possession prior to the disclosure
+hereunder and was not subject to limitations on disclosure or use; (c)
+is developed by the Receiving Party or by persons who have not had
+access to the Confidential Information of the Disclosing Party; (d) is
+lawfully disclosed to the Receiving Party without restrictions, by a
+third party not under an obligation of confidentiality; or (e) the
+Receiving Party is legally compelled to disclose the information, in
+which case the Receiving Party shall assert the privileged and
+confidential nature of the information and cooperate fully with the
+Disclosing Party to protect against and prevent disclosure of any
+Confidential Information and to limit the scope of disclosure and the
+dissemination of disclosed Confidential Information by all legally
+available means. The obligations of the Receiving Party under this
+Section shall continue during the Term and for a period of twelve (12)
+months after expiration or termination thereof; provided, however, that
+with respect to trade secret information, the obligations of the
+Receiving Party under this Section shall continue as long as such
+information remains a trade secret under applicable law.
+
+21. Governing law, legal venue: This Agreement shall be construed,
+interpreted and governed by the laws of England.
+
+22. Riverbank reserves all rights not specifically granted in this
+Agreement.
+
+
+Appendix 1:
+
+1. Parts of the Licensed Software that are permitted for distribution
+("Redistributables"):
+
+- The Licensed Software's main library in object code form
+- The Licensed Software's Python extension modules in object code form
+- The Licensed Software's API description files.
+
+2. Parts of the Licensed Software that are not permitted for
+distribution include, but are not limited to:
+
+- The Licensed Software's source code and header files
+- The Licensed Software's documentation
+- The Licensed Software's SIP specification files.
+
+
+Appendix 2:
+
+1. The Licensed Software includes software ("Scintilla") that is copyright
+Neil Hodgson <neilh@scintilla.org>.  The following applies to Scintilla:
+
+"Copyright 1998-2003 by Neil Hodgson <neilh@scintilla.org>
+
+ All Rights Reserved
+
+ Permission to use, copy, modify, and distribute this software and its
+ documentation for any purpose and without fee is hereby granted,
+ provided that the above copyright notice appear in all copies and that
+ both that copyright notice and this permission notice appear in
+ supporting documentation.
+
+ NEIL HODGSON DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS
+ SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+ AND FITNESS, IN NO EVENT SHALL NEIL HODGSON BE LIABLE FOR ANY
+ SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
+ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE
+ OR PERFORMANCE OF THIS SOFTWARE."

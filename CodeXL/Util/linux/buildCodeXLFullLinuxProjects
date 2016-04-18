@@ -1,0 +1,105 @@
+#!/bin/bash
+
+# This script build all Linux projects.
+if [ "$1" = "--help" ]; then
+	echo "Usage: buildCodeXLFullLinuxProjects [scons arguments]"
+	echo "basic Scons arguments:"
+	echo "target build group (Framework,CpuProfiling,GpuProfiling,GpuDebugging,KernelAnalyzer,PowerProfiler,ThreadProfiler)"
+	echo "clean -c"
+	echo "Number of concurrent jobs -j(number of jobs)"
+	echo "Debug CXL_build=debug"
+	echo "x86 - set "x86" as the first argument"
+	exit 0
+fi 
+commandLineArgs=$*
+if [ "$1" = "x86" ]
+then
+	x86="true"
+	shift
+	commandLineArgs=$*
+fi
+
+# Usage: buildCodeXLFullLinuxProjects [scons arguments]
+
+
+if [ -z "$AMD_CODEXL" ]; then
+	# Absolute path to build script, e.g. $workspace/main/CodeXL/Util/linux/buildCodeXLFullLinuxProjects.sh
+	BUILDSCRIPT=$(readlink -f "$0")
+	# Absolute path this script directory is in, thus p4localfiles/devtools/main/CodeXL/Util/linux/
+	SCRIPTFOLDER=$(dirname "$BUILDSCRIPT")
+	# Set AMD_CODEXL folder path in current workspace
+	AMD_CODEXL=$(readlink -e "${SCRIPTFOLDER}/../../")
+fi
+echo "AMD_CODEXL dir = ${AMD_CODEXL}"
+
+NUM_ERRORS=0
+checkforerror ()
+{
+	RC=$?
+	if [ ${RC} -ne 0 ]
+	then
+		echo "*** ERROR during the build of this subcomponent ***"
+	fi
+
+	echo "========================================== "
+	echo "----------- End building ----------------- "
+	date
+	echo "========================================== "
+
+	NUM_ERRORS=`expr ${NUM_ERRORS} + ${RC}`
+	if [ ${NUM_ERRORS} -ne 0 ]
+	then
+		echo "*** ERROR ***"
+		echo "*** the build failed - see the logs for details ***"
+		exit 1
+	else
+		echo "*** SUCCESS ***" 
+	fi
+}
+
+# Display a start message:
+echo 
+echo 
+echo "Building all Linux projects"
+echo "==========================="
+echo "Build arguments passed to scons: $commandLineArgs"
+
+if [ -n "$BASH" ]; then
+    set -o pipefail
+fi
+
+# AMD_OUTPUT should be set by parent script
+if [ "x${AMD_OUTPUT}x" = "xx" ]
+then
+    # If not, it means this script was invoked by unknown means.
+    export AMD_OUTPUT=${AMD_CODEXL}/../
+fi
+if [ -z "$x86" ]; then
+echo
+echo
+echo "========================================== "
+echo "----------- Start building --------------- "
+echo "cd ${AMD_CODEXL}"
+cd ${AMD_CODEXL}
+echo "scons CXL_common_dir=${AMD_CODEXL}/../Common CXL_prefix=$AMD_OUTPUT $commandLineArgs"
+date
+echo "========================================== "
+
+eval "scons -C ${AMD_CODEXL} CXL_common_dir=${AMD_CODEXL}/../Common CXL_prefix=$AMD_OUTPUT $commandLineArgs | perl $AMD_CODEXL/Util/linux/BuildFilter.pl"
+checkforerror
+fi 
+
+if [ "$x86" = "true" ]
+then
+	echo "========================================== "
+	echo "----- building 32 bit system helper ------ "
+	echo " Set X86 to build args at any case"
+	commandLineArgs=`echo $commandLineArgs | sed 's/CXL_arch=.* //'`
+	echo "scons CXL_common_dir=${AMD_CODEXL}/../Common CXL_arch=x86 CXL_prefix=$AMD_OUTPUT $commandLineArgs"
+	date
+	echo "========================================== "
+
+	eval "scons -C ${AMD_CODEXL}/Utils/AMDTSystemInformationHelper CXL_common_dir=${AMD_CODEXL}/../Common CXL_arch=x86 CXL_build_type=static CXL_prefix=$AMD_OUTPUT $commandLineArgs | perl $AMD_CODEXL/Util/linux/BuildFilter.pl"
+	checkforerror
+fi
+exit 0

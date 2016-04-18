@@ -1,0 +1,134 @@
+# 
+# CodeXL SConstruct Template
+#
+
+import os
+import sys
+sys.path.append("../../../Common/Src/SCons")
+from CXL_init import *
+
+###################################################
+# Initialize CXL command line variables
+#
+# Note: DO NOT MODIFY THIS SECTION. Please see CXL_init.
+#
+CXL_vars = Variables(None)
+
+# Initial CXL_vars scons construction variables
+initCXLVars(CXL_vars)
+
+###################################################
+#
+# Additional SConstruct variables can be added here
+#
+# Note: * These variables can be configured from the commandline arguments.
+# 	* These will be included in the help "scons -h".
+# 	* Customizable
+
+# // Add more variables here
+
+###################################################
+# Initialize CXL_env 
+#
+# Note: DO NOT MODIFY THIS SECTION. Please see CXL_init.
+#
+CXL_env = Environment( 
+	variables = CXL_vars, 
+	ENV = {'PATH':os.environ['PATH']})
+
+# CXL build initialization
+initCXLBuild (CXL_env)
+
+###################################################
+# Initialize External library stuff
+# 
+# Note: * This section is customizable. 
+#
+initGtk (CXL_env)
+initTinyXml (CXL_env)
+initStdc(CXL_env)
+
+# Set the debug/release variant data
+if (CXL_env['CXL_build'] == 'debug'):
+    obj_variant_dir    = 'variant_debug_x86'
+else:
+    obj_variant_dir    = 'variant_release_86'
+
+###################################################
+# Specify Depe!h!,<Mouse>C!k!,
+#
+# Note: This section is customizable.
+#
+
+CXL_lib_common_amd_deps = (
+)
+
+initCommonLibAmd (CXL_env, CXL_lib_common_amd_deps)
+
+##############################################################
+# Print out all environment variables of CXL_env if verbose is specified
+if CXL_env['CXL_build_verbose'] != 0 :
+	print CXL_env.Dump()
+
+
+##############################################################
+# Export the CXL_env to all SConscripts
+Export( 'CXL_env ')
+
+
+##############################################################
+# NOTE [Richard Gorton] :
+# Specifically express _dynamic_ dependencies here.  It is possible to have
+# the individual components do this, but the relevant context would need to be
+# exported globally, and then consumed.  That is, we would need to export the
+# BaseTools_Obj, via a global name, and then the downstream SCons files would
+# need to import it and write the dependency rules.
+# There is no need to write dependency rules for items which solely use the
+# promotion model.
+
+# No dynamic dependencies at all
+
+############################################
+#
+# Framework Section
+#
+FrameworkComponents = []
+
+BaseTools_Obj = SConscript('../../../Common/Src/AMDTBaseTools/SConscript', variant_dir=obj_variant_dir+'/AMDTBaseTools', duplicate=0)
+FrameworkComponents += BaseTools_Obj
+
+OSWrappers_Obj = SConscript('../../../Common/Src/AMDTOSWrappers/SConscript', variant_dir=obj_variant_dir+'/AMDTOSWrappers', duplicate=0)
+CXL_env.Depends(OSWrappers_Obj, BaseTools_Obj)
+FrameworkComponents += OSWrappers_Obj
+
+OSAPIWrappers_Obj = SConscript('../../../Common/Src/AMDTOSAPIWrappers/SConscript', variant_dir=obj_variant_dir+'/AMDTOSAPIWrappers', duplicate=0)
+CXL_env.Depends(OSAPIWrappers_Obj, OSWrappers_Obj + BaseTools_Obj)
+FrameworkComponents += OSAPIWrappers_Obj
+
+APIClasses_Obj = SConscript('../../../Common/Src/AMDTAPIClasses/SConscript', variant_dir=obj_variant_dir+'/AMDTAPIClasses', duplicate=0)
+CXL_env.Depends(APIClasses_Obj, OSAPIWrappers_Obj + OSWrappers_Obj + BaseTools_Obj)
+FrameworkComponents += APIClasses_Obj
+
+
+############################################
+#
+# AMDTSystemInformationHelper Section
+#
+AMDTSystemInformationHelper = []
+AMDTSystemInformationHelper_Obj  = SConscript('../../Utils/AMDTSystemInformationHelper/SConscript', variant_dir=obj_variant_dir+'/AMDTSystemInformationHelper', duplicate=1) 
+
+CXL_env.Depends(AMDTSystemInformationHelper_Obj, APIClasses_Obj + OSAPIWrappers_Obj + OSWrappers_Obj)
+
+AMDTSystemInformationHelper += AMDTSystemInformationHelper_Obj
+
+
+############################################
+
+CodeXL_Full = \
+	AMDTSystemInformationHelper
+
+Default(CodeXL_Full)
+Alias( target='Framework'   , source=(FrameworkComponents))
+Alias( target='install'     , source=(CodeXL_Full))
+Alias( target='SysInfoHelper'     , source=(AMDTSystemInformationHelper))
+

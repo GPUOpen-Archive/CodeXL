@@ -1,0 +1,108 @@
+# -*- Python -*-
+
+from CXL_init import *
+
+Import('*')
+
+libName = "libGLTemp"
+
+env = CXL_env.Clone()
+env.Append( CPPPATH = [ 
+	".",
+	"..",
+	env['CXL_commonproj_dir'],
+	env['CXL_commonproj_dir'] + "/AMDTOSWrappers/Include",
+])
+
+UseAPPSDK(env);
+
+env.Append( CPPDEFINES = [
+	"_AMDT_OPENGLSERVER_EXPORTS", 
+])
+
+
+sources = \
+[
+	"src/gsActiveUniformsMonitor.cpp",
+	"src/gsAnalyzeModeExecutor.cpp",
+	"src/gsAPIFunctionsImplementations.cpp",
+	"src/gsAPIFunctionsStubs.cpp",
+	"src/gsAttribStack.cpp",
+	"src/gsAttribStackItem.cpp",
+	"src/gsBufferReader.cpp",
+	"src/gsBufferSerializer.cpp",
+	"src/gsCallsHistoryLogger.cpp",
+	"src/gsDeprecationAnalyzer.cpp",
+	"src/gsDeprecationCondition.cpp",
+	"src/gsDisplayListMonitor.cpp",
+	"src/gsExtensionsManager.cpp",
+	"src/gsFBOMonitor.cpp",
+	"src/gsForcedModesManager.cpp",
+	"src/gsGlobalVariables.cpp",
+	"src/gsGLProgram.cpp",
+	"src/gsGLTexture.cpp",
+	"src/gsImageWriter.cpp",
+	"src/gsInterSpyConnectionFunctions.cpp",
+	"src/gsLightsMonitor.cpp",
+	"src/gsMemoryMonitor.cpp",
+	"src/gsOpenGLExtensionsWrappers.cpp",
+	"src/gsOpenGLModuleInitializer.cpp",
+	"src/gsOpenGLMonitor.cpp",
+	"src/gsOpenGLSpyInitFuncs.cpp",
+	"src/gsOpenGLWrappers.cpp",
+	"src/gsPBuffer.cpp",
+	"src/gsPBuffersMonitor.cpp",
+	"src/gsPipelineMonitor.cpp",
+	"src/gsProgramsAndShadersMonitor.cpp",
+	"src/gsProgramUniformsData.cpp",
+	"src/gsRenderBuffersMonitor.cpp",
+	"src/gsRenderContextExtensionsData.cpp",
+	"src/gsRenderContextMonitor.cpp",
+	"src/gsRenderContextPerformanceCountersManager.cpp",
+	"src/gsRenderPrimitivesStatisticsLogger.cpp",
+	"src/gsSamplersMonitor.cpp",
+	"src/gsSingletonsDelete.cpp",
+	"src/gsSpyPerformanceCountersManager.cpp",
+	"src/gsStateChangeExecutor.cpp",
+	"src/gsStateVariableReader.cpp",
+	"src/gsStateVariablesSnapshot.cpp",
+	"src/gsStaticBuffersMonitor.cpp",
+	"src/gsSyncObjectsMonitor.cpp",
+	"src/gsThreadLocalData.cpp",
+	"src/gsThreadsMonitor.cpp",
+	"src/gsVBOMonitor.cpp",
+	"src/gsTextureSerializer.cpp",
+	"src/gsTexturesMonitor.cpp",
+	"src/gsTextureUnitMonitor.cpp",
+	"src/gsWrappersCommon.cpp",
+	"src/gsGLDebugOutputManager.cpp",
+	"src/gsGLXWrappers.cpp",
+]
+
+env.Prepend( LIBS =
+[
+	"CXLBaseTools",
+	"CXLOSWrappers",
+	"CXLAPIClasses",
+	"CXLServerUtilities",
+])
+
+env.Prepend( LINKFLAGS =
+[
+	"-Wl,-soname=libGL.so.1"
+])
+
+# Creating object files	
+objFiles = env.SharedObject(sources)
+
+# Creating shared libraries
+soFiles = env.SharedLibrary(
+	target = libName, 
+	source = objFiles)
+
+# Installing libraries
+libInstall = env.Install( 
+	dir = env['CXL_spies_dir'], 
+	source = (soFiles))
+
+Return('libInstall')

@@ -1,0 +1,66 @@
+<mockup version="1.0" skin="sketch" measuredW="1075" measuredH="423" mockupW="419" mockupH="355">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::TitleWindow" x="656" y="68" w="419" h="355" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bottomheight>1</bottomheight>
+        <text>gDEBugger%20-%20Software%20Update</text>
+        <topheight>27</topheight>
+      </controlProperties>
+    </control>
+    <control controlID="1" controlTypeID="com.balsamiq.mockups::CheckBox" x="683" y="375" w="-1" h="-1" measuredW="189" measuredH="22" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <href>update_InitialScreen%26bm%3Bupdate_InitialScreen.bmml%26bm%3Bupdate_InitialScreen.bmml%26bm%3Bupdate_InitialScreen.bmml</href>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%2227%2C307%2C216%2C329%22%20href%3D%22update_InitialScreen.bmml%22%20alt%3D%22update_InitialScreen%22%20id%3D%221%22/%3E</map>
+        <state>selected</state>
+        <text>Check%20for%20updates%20on%20startup</text>
+      </controlProperties>
+    </control>
+    <control controlID="3" controlTypeID="com.balsamiq.mockups::FieldSet" x="668" y="102" w="394" h="310" measuredW="200" measuredH="170" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Updater</text>
+      </controlProperties>
+    </control>
+    <control controlID="4" controlTypeID="com.balsamiq.mockups::FieldSet" x="683" y="128" w="366" h="122" measuredW="200" measuredH="170" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Frequency%20of%20update%20checks</text>
+      </controlProperties>
+    </control>
+    <control controlID="5" controlTypeID="com.balsamiq.mockups::RadioButtonGroup" x="693" y="153" w="148" h="91" measuredW="113" measuredH="84" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>%28o%29%20Every%20startup%0A%28%20%29%20Every%20day%0A%28%20%29%20Every%207%20days%0A%28%20%29%20Every%2030%20days</text>
+      </controlProperties>
+    </control>
+    <control controlID="7" controlTypeID="com.balsamiq.mockups::Label" x="683" y="250" w="-1" h="-1" measuredW="116" measuredH="21" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Last%20update%20check%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="9" controlTypeID="com.balsamiq.mockups::Label" x="683" y="271" w="-1" h="-1" measuredW="179" measuredH="21" zOrder="6" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Next%20scheduled%20update%20check%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="10" controlTypeID="com.balsamiq.mockups::Label" x="930" y="250" w="-1" h="-1" measuredW="97" measuredH="21" zOrder="7" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Tue%20Jan%202%201900</text>
+      </controlProperties>
+    </control>
+    <control controlID="11" controlTypeID="com.balsamiq.mockups::Label" x="930" y="271" w="-1" h="-1" measuredW="42" measuredH="21" zOrder="8" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Never</text>
+      </controlProperties>
+    </control>
+    <control controlID="12" controlTypeID="com.balsamiq.mockups::Button" x="683" y="307" w="-1" h="-1" measuredW="129" measuredH="27" zOrder="9" locked="false" isInGroup="-1">
+      <controlProperties>
+        <href>update_checkClicked%26bm%3Bupdate_checkClicked.bmml%26bm%3Bupdate_checkClicked.bmml%26bm%3Bupdate_checkClicked.bmml</href>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%2227%2C239%2C156%2C266%22%20href%3D%22update_checkClicked.bmml%22%20alt%3D%22update_checkClicked%22%20id%3D%2212%22/%3E</map>
+        <text>Check%20for%20updates</text>
+      </controlProperties>
+    </control>
+    <control controlID="13" controlTypeID="com.balsamiq.mockups::TextArea" x="868" y="145" w="174" h="99" measuredW="200" measuredH="140" zOrder="10" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Release%20Notes%3A</text>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

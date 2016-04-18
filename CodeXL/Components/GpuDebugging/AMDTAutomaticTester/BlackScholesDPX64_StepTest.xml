@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<CodeXL>
+    <Tests>
+        <TestResultsDirectory>C:\Users\3dargbld.AMD\Desktop\AutomaticTester\HSAGoldMasterSDK2_8</TestResultsDirectory>
+        <LogFilesDirectory>C:\Users\3dargbld.AMD\Desktop\AutomaticTester\TestResults\</LogFilesDirectory>
+        <Test>
+            <ExecutablePath>samples\opencl\bin\x86_64\BlackScholesDP.exe</ExecutablePath>
+            <WorkingDirectory>samples\opencl\bin\x86_64\</WorkingDirectory>
+            <TestName>BlackScholesDPX64_StepTest</TestName>
+            <TestType>StepTest</TestType>
+            <Kernels>
+                <Kernel>
+                    <KernelName>blackScholes</KernelName>
+                </Kernel>
+            </Kernels>
+        </Test>
+    </Tests>
+</CodeXL>       

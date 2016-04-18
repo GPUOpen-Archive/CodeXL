@@ -1,0 +1,10 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+  <file>../images/debugGoCommand.png</file>
+  <file>../images/debugFrameStepCommand.png</file>
+  <file>../images/debugDrawStepCommand.png</file>
+  <file>../images/debugStepCommand.png</file>
+  <file>../images/debugBreakCommand.png</file>
+  <file>../images/debugStopCommand.png</file>
+</qresource>
+</RCC>

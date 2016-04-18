@@ -1,0 +1,76 @@
+# -*- Python -*-
+
+Import('*')
+from CXL_init import *
+
+env = CXL_env.Clone()
+initBoost(env)
+UseBoost(env)
+name = "CXLSystemInformationHelper-x64"
+if (env['CXL_arch'] == 'x86'):
+    name = "CXLSystemInformationHelper"
+
+UseAPPSDK(env)
+
+env.Append( CPPPATH = [ 
+    ".",
+    "./src/",
+    "./inc/",
+    env['CXL_commonproj_dir'],
+    env['CXL_commonproj_dir'] + '/../../CodeXL',
+])
+
+# osMessageBox, osDesktop
+# env.Append(CPPFLAGS = '-fno-strict-aliasing')
+
+env.Append( LIBPATH = [
+    "/usr/lib",
+])
+
+sources = \
+[
+    "src/siAMDTSystemInformationHelper.cpp",
+    "src/siOpenCLInformationCollector.cpp"
+]
+    
+# Creating object files    
+objFiles = env.SharedObject(sources)
+
+env.Append (LIBS = [
+	"CXLAPIClasses",
+	"CXLOSAPIWrappers",
+	"CXLOSWrappers",
+	"CXLBaseTools",
+	"pthread",
+	"dl",
+	"rt",
+        "libboost_filesystem",
+        "libboost_wave",
+        "libboost_system",
+        "libboost_thread",
+])
+
+if (env['CXL_arch'] != 'x86'):
+	env.Append (LIBS = [
+		"libX11",
+		"libz"
+])
+
+linkerFlags = [] 
+if (env['CXL_arch'] == 'x86'):
+	linkerFlags = [
+		"-m32",
+		"-static-libstdc++"
+]
+
+exe = env.Program(
+    target = name, 
+    source = sources,
+    LINKFLAGS = linkerFlags)
+
+# Installing libraries
+libInstall = env.Install( 
+    dir = env['CXL_bin_dir'], 
+    source = (exe))
+
+Return('libInstall')

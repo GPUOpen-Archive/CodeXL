@@ -1,0 +1,144 @@
+<mockup version="1.0" skin="sketch" measuredW="776" measuredH="628" mockupW="414" mockupH="574">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::FieldSet" x="362" y="54" w="414" h="574" measuredW="200" measuredH="170" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>New%20project...</text>
+      </controlProperties>
+    </control>
+    <control controlID="8" controlTypeID="com.balsamiq.mockups::ButtonBar" x="553" y="584" w="-1" h="-1" measuredW="204" measuredH="29" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <hrefs>10_WelcomeScreen%26bm%3B10_WelcomeScreen.bmml%26bm%3B10_WelcomeScreen.bmml%26bm%3B10_WelcomeScreen.bmml%2C21_DefaultLayoutDebugSession%26bm%3B21_DefaultLayoutDebugSession.bmml%26bm%3B21_DefaultLayoutDebugSession.bmml%26bm%3B21_DefaultLayoutDebugSession.bmml%2C%2C</hrefs>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22191%2C530%2C266%2C559%22%20href%3D%2210_WelcomeScreen.bmml%22%20alt%3D%2210_WelcomeScreen%22%20id%3D%228_0%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22268%2C530%2C328%2C559%22%20href%3D%2221_DefaultLayoutDebugSession.bmml%22%20alt%3D%2221_DefaultLayoutDebugSession%22%20id%3D%228_1%22/%3E%0A</map>
+        <selectedIndex>1</selectedIndex>
+        <text>%3C%20%26B%26ack%2C%20%26Fi%26nish%2C%20%26C%26ancel</text>
+      </controlProperties>
+    </control>
+    <control controlID="25" controlTypeID="com.balsamiq.mockups::FieldSet" x="387" y="270" w="365" h="58" measuredW="200" measuredH="170" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Debug%20Type</text>
+      </controlProperties>
+    </control>
+    <control controlID="26" controlTypeID="com.balsamiq.mockups::FieldSet" x="387" y="337" w="365" h="108" measuredW="200" measuredH="170" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>OpenGL%20Render%20Frame%20Terminators</text>
+      </controlProperties>
+    </control>
+    <control controlID="27" controlTypeID="com.balsamiq.mockups::FieldSet" x="387" y="454" w="365" h="66" measuredW="200" measuredH="170" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>OpenCL%20Computation%20Frame%20Terminators</text>
+      </controlProperties>
+    </control>
+    <control controlID="28" controlTypeID="com.balsamiq.mockups::FieldSet" x="387" y="520" w="365" h="49" measuredW="200" measuredH="170" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Advanced</text>
+      </controlProperties>
+    </control>
+    <control controlID="29" controlTypeID="com.balsamiq.mockups::RadioButton" x="400" y="291" w="-1" h="-1" measuredW="70" measuredH="22" zOrder="6" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>OpenGL</text>
+      </controlProperties>
+    </control>
+    <control controlID="30" controlTypeID="com.balsamiq.mockups::CheckBoxGroup" x="400" y="356" w="-1" h="-1" measuredW="138" measuredH="84" zOrder="7" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>%5B%20%5D%20glClear%0A%5B%20%5D%20glFlush%0A%5B%20%5D%20glFinish%0A%5B%20%5D%20SwapLayerBuffers</text>
+      </controlProperties>
+    </control>
+    <control controlID="31" controlTypeID="com.balsamiq.mockups::CheckBoxGroup" x="538" y="360" w="-1" h="-1" measuredW="205" measuredH="63" zOrder="8" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>%5Bx%5D%20swapBuffers%0A%5B%20%5D%20wglMakeCurrent%0A%5B%20%5D%20glFrameTerminatorGREMEDY</text>
+      </controlProperties>
+    </control>
+    <control controlID="32" controlTypeID="com.balsamiq.mockups::CheckBoxGroup" x="400" y="466" w="-1" h="-1" measuredW="71" measuredH="42" zOrder="9" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>%5B%20%5D%20clFlush%0A%5B%20%5D%20clFinish</text>
+      </controlProperties>
+    </control>
+    <control controlID="33" controlTypeID="com.balsamiq.mockups::CheckBoxGroup" x="524" y="469" w="-1" h="-1" measuredW="220" measuredH="42" zOrder="10" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>%5Bx%5D%20cl_gremedy_computation_frame%0A%5B%20%5D%20clWaitForEvents</text>
+      </controlProperties>
+    </control>
+    <control controlID="34" controlTypeID="com.balsamiq.mockups::CheckBox" x="393" y="533" w="-1" h="-1" measuredW="233" measuredH="22" zOrder="11" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Initialize%20DirectDraw%20library%20on%20startup</text>
+      </controlProperties>
+    </control>
+    <control controlID="35" controlTypeID="com.balsamiq.mockups::RadioButton" x="486" y="291" w="-1" h="-1" measuredW="69" measuredH="22" zOrder="12" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>OpenCL</text>
+      </controlProperties>
+    </control>
+    <control controlID="36" controlTypeID="com.balsamiq.mockups::RadioButton" x="590" y="291" w="-1" h="-1" measuredW="144" measuredH="22" zOrder="13" locked="false" isInGroup="-1">
+      <controlProperties>
+        <state>selected</state>
+        <text>OpenGL%20and%20OpenCL</text>
+      </controlProperties>
+    </control>
+    <control controlID="37" controlTypeID="com.balsamiq.mockups::Label" x="387" y="86" w="76" h="23" measuredW="91" measuredH="21" zOrder="14" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Project%20Name%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="38" controlTypeID="com.balsamiq.mockups::TextInput" x="463" y="84" w="289" h="-1" measuredW="80" measuredH="27" zOrder="15" locked="false" isInGroup="-1">
+      <controlProperties>
+        <state>disabled</state>
+        <text>ExampleCL</text>
+      </controlProperties>
+    </control>
+    <control controlID="39" controlTypeID="com.balsamiq.mockups::Label" x="396" y="122" w="-1" h="-1" measuredW="120" measuredH="21" zOrder="16" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Executable%20or%20script</text>
+      </controlProperties>
+    </control>
+    <control controlID="40" controlTypeID="com.balsamiq.mockups::TextInput" x="544" y="146" w="171" h="-1" measuredW="79" measuredH="27" zOrder="17" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="41" controlTypeID="com.balsamiq.mockups::Label" x="396" y="150" w="-1" h="-1" measuredW="108" measuredH="21" zOrder="18" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Working%20Directory</text>
+      </controlProperties>
+    </control>
+    <control controlID="42" controlTypeID="com.balsamiq.mockups::Button" x="715" y="151" w="-1" h="-1" measuredW="33" measuredH="27" zOrder="19" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>...</text>
+      </controlProperties>
+    </control>
+    <control controlID="43" controlTypeID="com.balsamiq.mockups::TextInput" x="544" y="118" w="171" h="-1" measuredW="79" measuredH="27" zOrder="20" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="44" controlTypeID="com.balsamiq.mockups::Button" x="715" y="122" w="-1" h="-1" measuredW="33" measuredH="27" zOrder="21" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>...</text>
+      </controlProperties>
+    </control>
+    <control controlID="45" controlTypeID="com.balsamiq.mockups::TextInput" x="544" y="188" w="204" h="-1" measuredW="79" measuredH="27" zOrder="22" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="46" controlTypeID="com.balsamiq.mockups::Label" x="396" y="183" w="124" h="39" measuredW="177" measuredH="21" zOrder="23" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Program%20Arguments%20%28optional%29</text>
+      </controlProperties>
+    </control>
+    <control controlID="47" controlTypeID="com.balsamiq.mockups::TextInput" x="544" y="222" w="171" h="-1" measuredW="79" measuredH="27" zOrder="24" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="48" controlTypeID="com.balsamiq.mockups::Button" x="714" y="226" w="-1" h="-1" measuredW="33" measuredH="27" zOrder="25" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>...</text>
+      </controlProperties>
+    </control>
+    <control controlID="49" controlTypeID="com.balsamiq.mockups::Paragraph" x="393" y="227" w="151" h="37" measuredW="200" measuredH="140" zOrder="26" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Environmental%20Variables%0A%28optional%29</text>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

@@ -1,0 +1,168 @@
+﻿
+body, table, div, p, dl 
+{
+    font-family: Lucida Grande, Verdana, Geneva, Arial, sans-serif;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+body 
+{
+    color: black;
+    margin: 0;
+    background-color:White;
+}
+
+h1, h2, h3
+{
+    
+}
+
+/** Wrapper of all the body contents on the page. */
+div.contents
+{
+/*    box-shadow: 0px 3px 10px #777;*/
+    width: 1024px;
+    background-color: white;
+    padding: 0px 20px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.image
+{
+   text-align: left;
+}
+    
+.image2
+{
+   text-align: center;
+}
+
+div.image, div.image2
+{
+    padding: 0px 0px 0px 0px;
+    width:2px;
+    margin: 5px 0px 5px 0px;
+}
+img {
+    -webkit-box-shadow: 2px 2px 3px #7C7C7C;
+    box-shadow: 2px 2px 3px #7C7C7C;
+    }
+    
+    img.simple {
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    }
+
+
+#projectname
+{
+    color:#D31919;
+    vertical-align: middle;
+}
+
+/** Contains the logo image */
+#projectlogo
+{
+    text-align: center;
+    vertical-align: middle;
+    border-collapse: separate;
+}
+
+/** The actual logo image */
+#projectlogo img
+{
+  border: 0px none;
+  -webkit-box-shadow: 0px 0px 0px #7C7C7C;
+    box-shadow: 0px 0px 0px #7C7C7C;
+}
+
+#projectnumber
+{
+  font: 50% Tahoma, Arial,sans-serif;
+  margin: 0px;
+  padding: 0px;
+}
+
+/** The title of the current page, right below the tabs. */
+div.header
+{
+    background-image: none;
+    background-color: inherit;
+    border-bottom: 1px solid #C4CFE5;
+}
+
+/** The upper title area, with Logo, Title and Brief Description */
+#titlearea 
+{
+    padding: 10px 10px 10px 25px;
+    box-shadow: 1px 1px 1px #999;
+
+    margin-bottom: 5px;
+    border-bottom: 1px solid #C4CFE5;
+    
+    border-top: 1px solid #C4CFE5;
+    background-repeat:repeat-x;
+    background-color: #EDF0F6;
+}
+
+
+/** The actual title of the current page. See above.
+ *  CSS3 Experiments! */
+div.headertitle
+{
+    padding:          5px 0px  0px 30px;
+    text-align:       left;
+    margin-bottom:    0px;
+}
+
+h2.groupheader {
+}
+
+.header, .headertitle, .title
+{
+    color:Black;
+}
+
+.textblock
+{
+    width: 1024px;
+}
+
+#footer_text
+{
+    width:1024px;
+    font-size:smaller;
+}
+
+
+hr.footer {
+        display: none;
+}
+
+.footer {
+        background-color: #AAA;
+        text-align:center;
+}
+
+.footer_div
+{
+    background-image:none;
+    background-color: #EDF0F6;
+    margin:  0px;
+    border-bottom: 1px solid #C4CFE5;
+    Color:Gray; 
+    border-top: 1px solid Gray;
+    text-align:center;
+    font-size:small;
+}
+
+/* This class is used to format frame of text in the help file */
+dl.section dd 
+{
+       padding: 4px;
+        margin: 4px;
+    background-color: #FBFCFD;
+    border: 1px solid #C4CFE5;
+}

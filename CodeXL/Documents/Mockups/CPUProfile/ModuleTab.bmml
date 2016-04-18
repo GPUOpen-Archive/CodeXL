@@ -1,0 +1,83 @@
+<mockup version="1.0" skin="sketch" measuredW="963" measuredH="598" mockupW="797" mockupH="583">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::TabBar" x="166" y="41" w="791" h="557" measuredW="366" measuredH="100" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>2</selectedIndex>
+        <text>Overview%2C%20System%20Data%2C%20mainSpawn.exe%20%5C%5Bx%5C%5D</text>
+      </controlProperties>
+    </control>
+    <control controlID="2" controlTypeID="com.balsamiq.mockups::DataGrid" x="166" y="99" w="790" h="472" measuredW="381" measuredH="85" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>0</selectedIndex>
+        <text>Address%2C%20Symbol%20+%20Offset%2CTimer%20Samples%20%25%20%5E%2C%20Child%0A%5C%5B+%5C%5D%200x4010c0%2C%20Busywork%2C%2060.015%2C%20500%0A%5C%5B+%5C%5D%200x401988%2C%20SetupChild%2C%2039.985%2C%20275%0A%7B20L%2C%2010L%2C%2010R%2C%2010R%2C%2035R%7D</text>
+      </controlProperties>
+    </control>
+    <control controlID="7" controlTypeID="com.balsamiq.mockups::ComboBox" x="201" y="70" w="-1" h="-1" measuredW="63" measuredH="23" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>1234</text>
+      </controlProperties>
+    </control>
+    <control controlID="8" controlTypeID="com.balsamiq.mockups::Canvas" x="339" y="149" w="106" h="36" measuredW="100" measuredH="70" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <backgroundAlpha>0</backgroundAlpha>
+        <href>SourceTab%26bm%3BSourceTab.bmml%26bm%3BSourceTab.bmml%26bm%3BSourceTab.bmml</href>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22173%2C134%2C279%2C170%22%20href%3D%22SourceTab.bmml%22%20alt%3D%22SourceTab%22%20id%3D%228%22/%3E</map>
+      </controlProperties>
+    </control>
+    <control controlID="11" controlTypeID="com.balsamiq.mockups::Label" x="166" y="571" w="-1" h="-1" measuredW="630" measuredH="21" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>1%20function%2C%2010%20instructions%2C%20Total%3A%207755%20samples%2C%2060.015%25%20of%20shown%20samples%2C%2031.02%25%20of%20total%20session%20samples</text>
+      </controlProperties>
+    </control>
+    <control controlID="12" controlTypeID="com.balsamiq.mockups::Label" x="173" y="72" w="-1" h="-1" measuredW="28" measuredH="21" zOrder="6" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Pid%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="13" controlTypeID="com.balsamiq.mockups::ComboBox" x="299" y="69" w="65" h="-1" measuredW="45" measuredH="23" zOrder="7" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>All</text>
+      </controlProperties>
+    </control>
+    <control controlID="14" controlTypeID="com.balsamiq.mockups::Label" x="271" y="71" w="28" h="21" measuredW="28" measuredH="21" zOrder="8" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Tid%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="20" controlTypeID="com.balsamiq.mockups::TitleWindow" x="166" y="15" w="797" h="583" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bottomheight>0</bottomheight>
+        <close>true</close>
+        <maximizeRestore>true</maximizeRestore>
+        <minimize>true</minimize>
+        <text>Session%201</text>
+      </controlProperties>
+    </control>
+    <control controlID="30" controlTypeID="com.balsamiq.mockups::Button" x="373" y="67" w="-1" h="-1" measuredW="66" measuredH="27" zOrder="9" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Pid/Tid</text>
+      </controlProperties>
+    </control>
+    <control controlID="33" controlTypeID="com.balsamiq.mockups::Canvas" x="445" y="70" w="416" h="29" measuredW="100" measuredH="70" zOrder="10" locked="false" isInGroup="-1"/>
+    <control controlID="34" controlTypeID="com.balsamiq.mockups::ComboBox" x="449" y="73" w="-1" h="-1" measuredW="143" measuredH="23" zOrder="11" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Timer-based%20profile</text>
+      </controlProperties>
+    </control>
+    <control controlID="35" controlTypeID="com.balsamiq.mockups::Button" x="596" y="71" w="-1" h="-1" measuredW="37" measuredH="27" zOrder="12" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>%25</text>
+      </controlProperties>
+    </control>
+    <control controlID="36" controlTypeID="com.balsamiq.mockups::ComboBox" x="639" y="72" w="-1" h="-1" measuredW="119" measuredH="23" zOrder="13" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Separate%20None</text>
+      </controlProperties>
+    </control>
+    <control controlID="37" controlTypeID="com.balsamiq.mockups::Button" x="764" y="70" w="-1" h="-1" measuredW="82" measuredH="27" zOrder="14" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>CPU%20Filter</text>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

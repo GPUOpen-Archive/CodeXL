@@ -1,0 +1,121 @@
+# -*- Python -*-
+
+Import('*')
+import os
+import shutil
+from CXL_init import *
+
+libName = "CXLPowerProfileAPI"
+
+env = CXL_env.Clone()
+
+env.Append(PWRPROFDRIVERINCLUDES = [
+		env['CXL_commonproj_dir']+"/../../CodeXL/Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/inc",
+	   ]
+)
+
+env.Append(PWRPROFDRIVERLINUXINCLUDES = [
+		env['CXL_commonproj_dir']+"/../../CodeXL/Components/PowerProfiling/Backend/AMDTPowerProfilingDrivers/Linux/inc",
+	   ]
+)
+
+compiler_base_flags = env['CPPFLAGS']
+compiler_base_flags += '-pthread -D_LINUX -DLINUX'
+
+staticLibScriptInstall = env['CXL_commonproj_dir'] + \
+                        '/../../CodeXL/Components/PowerProfiling/Backend/AMDTPowerProfileAPI/createPwrProfApiStaticLib.sh' 
+
+env.Replace(CPPFLAGS = compiler_base_flags)
+
+env.Append( CPPPATH = [ 
+	".",
+	"inc",
+	"..",
+	"src",
+	env['PWRPROFDRIVERINCLUDES'],
+	env['PWRPROFDRIVERLINUXINCLUDES'],
+	env['CXL_commonproj_dir'],
+	env['CXL_commonproj_dir']+"/AMDTCommonHeaders",
+])
+
+includes = \
+[
+    "inc/AMDTPowerProfileApi.h",
+    "inc/AMDTPowerProfileDataTypes.h",
+    "src/AMDTPowerProfileApiInternal.h"
+    "src/AMDTPowerProfileControl.h"
+    "src/AMDTPowerProfileDataAccess.h"
+    "src/AMDTPowerProfileInternal.h"
+    "src/AMDTHistogram.h",
+    "src/OsFileWrapper.h"
+    "src/PowerEvents.h"
+    "src/PowerProfileDriverInterface.h"
+    "src/PowerProfileHelper.h",
+    "src/PowerProfileTranslate.h",
+    "src/RawDataReader.h"
+]
+
+sources = \
+[
+    "src/OsFileWrapper.cpp",
+    "src/RawDataReader.cpp",
+    "src/PowerProfileHelper.cpp",
+    "src/Linux/PowerProfileDriverInterface.cpp",
+    "src/AMDTPowerProfileControl.cpp",
+    "src/AMDTPowerProfileDataAccess.cpp",
+    "src/PowerProfileTranslate.cpp",
+    "src/AMDTPowerProfileApi.cpp",
+    "src/AMDTHistogram.cpp",
+]
+
+# Creating object files	
+objFiles = env.SharedObject(sources)
+
+# Creating shared libraries
+so = env.SharedLibrary(
+	target = libName, 
+	source = objFiles)
+
+# Installing libraries
+solibInstall = env.Install( 
+	dir = env['CXL_lib_dir'], 
+	source = (so))
+
+# Install Static Library only for release version
+if (env['CXL_build'] == 'release'):
+
+    # Creating static libraries. which we be merged 
+    # with OSWrapper and BaseTools  to generate 
+    # single static lib.
+    stat = env.StaticLibrary(
+	    target = libName+"_part", 
+	    source = objFiles)
+
+    #installing partialStatic Library
+    statlibInstall = env.Install( 
+    	    dir = env['CXL_lib_dir'], 
+    	    source = (stat))
+
+    # create static Library libCXLPowerProfileAPI.a
+    # This library contains libCXLBaseTools.a, libCXLOSWrappers.a and 
+    # libCXLPowerProfileAPI_part.a(temp file)
+    def createPwrProfApiStaticLib(target = None, source = None, env = None):
+	cmd = "bash %s" %staticLibScriptInstall
+	os.system(cmd)
+	shutil.copy2('./variant_release/AMDTPowerProfileAPI/libCXLPowerProfileAPI.a', env['CXL_lib_dir'])
+	# remove partial API lib.
+	os.remove( env['CXL_lib_dir']+"/libCXLPowerProfileAPI_part.a")
+
+
+    # invoke fn createPwrProfApiStaticLib once static library is installed
+    buildStatic = env.AddPostAction(statlibInstall ,  createPwrProfApiStaticLib)
+    # since having dependency on OSWrapper and BaseTools always call this function 
+    # to capture any changes made in these library.
+    env.AlwaysBuild(buildStatic)
+
+    install = solibInstall + statlibInstall
+
+else:
+    install = solibInstall
+
+Return('install')

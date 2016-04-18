@@ -1,0 +1,78 @@
+# -*- Python -*-
+
+import os
+from CXL_init import *
+
+Import('*')
+
+appName = "CXLRemoteDebuggingServer"
+
+env = CXL_env.Clone()
+initBoost(env)
+UseBoost(env)
+env.Append( CPPPATH = [ 
+    ".",
+    "..",
+    env['CXL_commonproj_dir'],
+    env['CXL_commonproj_dir'] + "/AMDTOSWrappers/Include"
+])
+
+# Source files:
+sources = \
+[
+# src:
+    "src/rdDebuggerCommandExecutor.cpp",
+    "src/rdEventHandler.cpp",
+    "src/rdEventsHandlingThread.cpp",
+    "src/rdMainFunction.cpp",
+]
+
+env.Append( LIBPATH = [
+    "/usr/lib",
+    "/usr/lib/x86_64-linux-gnu",
+    env['CXL_common_dir'] + "/Lib/Ext/zlib/1.2.8/bin/x64/ZlibStatRelease/"
+])
+
+env.Append( LIBS=
+[
+    "CXLBaseTools",
+    "CXLOSWrappers",
+    "CXLOSAPIWrappers",
+    "CXLAPIClasses",
+    "CXLRemoteClient",
+    "CXLProcessDebugger",
+	"CXLApiFunctions",
+    "libX11",
+    "libboost_regex",
+    "libboost_filesystem",
+    "libboost_wave",
+    "libboost_system",
+    "libboost_thread",
+    "libboost_date_time"
+])
+
+
+# Set the ELF hash generation mode:
+# - When building on new systems, we would like to generate both sysv and gnu ELF hashes.
+#   This enables running the executable also on old systems, that support only the sysv ELF hash.
+# - When building on old systems, we need to set the GR_GENERATE_ONLY_DEFAULT_ELF_HASH environment
+#   variable (preferably in the .bashrc file). Otherwise the link will fail when trying to
+#   generate an ELF hash type that the old linker does not recognize.
+# [Yaki 7/7/2009]
+linkerFlags = [] 
+shouldGenerateOnlyDefaultELFHash = os.environ.get('GR_GENERATE_ONLY_DEFAULT_ELF_HASH')
+if shouldGenerateOnlyDefaultELFHash is None:
+    linkerFlags += [ "-Wl,--hash-style=both" ]
+
+# Creating executable
+exe = env.Program(
+    target = appName, 
+    source = sources,
+    LINKFLAGS = linkerFlags)
+
+# Installing libraries
+libInstall = env.Install( 
+    dir = env['CXL_bin_dir'], 
+    source = (exe))
+
+Return('libInstall')

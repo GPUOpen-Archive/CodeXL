@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# PwrProf requires bash. Do not remove the above shebang line!
+
+# ----------------------------------------------------------------------------------------------------------------------------------
+# File name: AMDTPowerProfilingCli
+# This script sets the PowerProfiler's related environment variables and and driver
+#
+# (c) 2014 Advanced Micro Devices Inc. All Rights Reserved.
+# ----------------------------------------------------------------------------------------------------------------------------------
+
+
+# Get this script full path:
+
+if echo "$0" | grep '^/' ; then
+	thisScriptFullPath="$0"
+else
+	thisScriptFullPath=`pwd`/$0
+fi
+
+# Enable the use of symbolic links to the script
+if [ -h ${thisScriptFullPath} ]
+then
+    LINKTARGET=`readlink -f "$thisScriptFullPath"`
+    thisScriptFullPath=${LINKTARGET}
+fi
+
+# PwrProf's binaries directory is this scripts directory:
+PwrProfBinariesDir=`dirname "$thisScriptFullPath"`
+
+# Calculate PwrProf's binary executable path:
+PwrProfBinaryExePath="${PwrProfBinariesDir}/AMDTPowerProfileCLI-bin"
+
+# Add PwrProf's binaries directory to LD_LIBRARY_PATH:
+if [ -z "$LD_LIBRARY_PATH" ]; then
+	export LD_LIBRARY_PATH="${PwrProfBinariesDir}"
+else
+	export LD_LIBRARY_PATH="${PwrProfBinariesDir}:$LD_LIBRARY_PATH"
+fi
+
+# Run PwrProf:
+eval "$PwrProfBinaryExePath $@"

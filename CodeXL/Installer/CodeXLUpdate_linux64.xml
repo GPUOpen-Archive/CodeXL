@@ -1,0 +1,13 @@
+<Program_Info>
+    <Program_Version_Major>1</Program_Version_Major>
+    <Program_Version_Minor>5</Program_Version_Minor>
+    <Program_Version_Build>5364</Program_Version_Build>
+    <Program_Release_Year>2014</Program_Release_Year>
+    <Program_Release_Month>9</Program_Release_Month>
+    <Program_Release_Day>17</Program_Release_Day>
+    <Program_Name>AMD CodeXL</Program_Name>
+    <Program_File>http://developer.amd.com/download/AMD_CodeXL_Linux-1.5.5364-0.x86_64.rpm</Program_File>
+    <Program_File2>http://developer.amd.com/download/AMD_CodeXL_Linux_x86_64_1.5.5364.tar.gz</Program_File2>
+    <Program_File3>http://developer.amd.com/download/amdcodexl_1.5-5364_amd64.deb</Program_File3>
+    <Version_Description_URL>http://developer.amd.com/wordpress/media/2013/12/CodeXL1_5Description.htm</Version_Description_URL>
+</Program_Info>

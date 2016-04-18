@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AMDTTeaPot", "AMDTTeaPot\AMDTTeaPotVS2013.vcxproj", "{DE5F51E4-BDD8-4E63-BB8C-CC9855BD6D71}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FF25192E-59C4-42E8-9518-362239EBC3FE} = {FF25192E-59C4-42E8-9518-362239EBC3FE}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AMDTTeaPotLib", "AMDTTeaPotLib\AMDTTeaPotLibVS2013.vcxproj", "{FF25192E-59C4-42E8-9518-362239EBC3FE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DE5F51E4-BDD8-4E63-BB8C-CC9855BD6D71}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DE5F51E4-BDD8-4E63-BB8C-CC9855BD6D71}.Debug|Win32.Build.0 = Debug|Win32
+		{DE5F51E4-BDD8-4E63-BB8C-CC9855BD6D71}.Release|Win32.ActiveCfg = Release|Win32
+		{DE5F51E4-BDD8-4E63-BB8C-CC9855BD6D71}.Release|Win32.Build.0 = Release|Win32
+		{FF25192E-59C4-42E8-9518-362239EBC3FE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FF25192E-59C4-42E8-9518-362239EBC3FE}.Debug|Win32.Build.0 = Debug|Win32
+		{FF25192E-59C4-42E8-9518-362239EBC3FE}.Release|Win32.ActiveCfg = Release|Win32
+		{FF25192E-59C4-42E8-9518-362239EBC3FE}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

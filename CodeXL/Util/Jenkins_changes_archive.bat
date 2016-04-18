@@ -1,0 +1,2 @@
+wget -P \\stlvfile\public\CodeXLArchive\CodeXL-Full  http://bdclin64-gdt-jenkins:8080/view/CodeXL/job/CodeXL-Full/changes
+wget -P \\stlvfile\public\CodeXLArchive\CodeXL-Full-Linux  http://bdclin64-gdt-jenkins:8080/view/CodeXL/job/CodeXL-Full-Linux/changes

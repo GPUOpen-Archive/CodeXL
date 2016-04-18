@@ -1,0 +1,65 @@
+# -*- Python -*-
+
+Import('*')
+from CXL_init import *
+
+libName = "CXLProfilerDAL"
+
+env = CXL_env.Clone()
+
+env_no_c11 = CXL_env.Clone()
+
+# Remove the c++ flag for the env_no_c11 library
+fullBuildFlags = env_no_c11['CPPFLAGS']
+partBuildString = fullBuildFlags.replace('-std=c++11','')
+env_no_c11.Replace( CPPFLAGS = partBuildString)
+
+env.Append( CPPPATH = [ 
+	".",
+   	"../",
+	"../../", #Support relocate from CommonProjects and keep includes path formats
+	"./include",
+	"./src/",
+	env['CXL_commonproj_dir'],
+	env['CXL_commonproj_dir'] + '/AMDTCommonHeaders/',
+	env['CXL_common_dir'] + '/Src/sqlite/3.9.2/'
+])
+
+sources = \
+[
+    "src/dbTxCommitThread.cpp",
+    "src/AMDTDatabaseAccessor.cpp",
+#	buildDirPath + '/sqlite/3.9.2/sqlite3.c',
+]
+
+csources = \
+[
+	env['CXL_commonproj_dir'] + '/sqlite/3.9.2/sqlite3.c',
+]
+
+commonLinkedLibraries = \
+[
+	"CXLBaseTools",
+	"CXLOSWrappers",
+    "libpthread"
+]
+
+# Contains all linked libraries:
+linkedLibraries = commonLinkedLibraries
+env.Prepend (LIBS = linkedLibraries)
+
+# Creating object files	
+objFiles = env.SharedObject(sources)
+objFilesC = env_no_c11.SharedObject(csources)
+
+# Creating shared libraries
+soFiles = env.SharedLibrary(
+	target = libName, 
+	source = objFiles + objFilesC)
+
+# Installing libraries
+libInstall = env.Install( 
+	dir = env['CXL_lib_dir'], 
+	source = (soFiles))
+
+Return('libInstall')

@@ -1,0 +1,92 @@
+# -*- Python -*-
+
+import os
+
+from CXL_init import *
+
+Import('*')
+
+appName = "CXLTeaPot-bin"
+
+env = CXL_env.Clone()
+
+#env.Append(CXL_commonproj_dir = env['CXL_common_dir'] + "/../CommonProjects")
+compiler_base_flags = " -Wall -g -fmessage-length=0 -Wno-unknown-pragmas -pthread -D_DEBUG "
+env.Replace(CPPFLAGS = compiler_base_flags)
+UseFltk(env)
+
+env.Append( CPPPATH = [ 
+    "./",
+    "./inc",
+    "../AMDTTeaPotLib/inc",
+    "../AMDTTeaPotLib",
+    env['CXL_commonproj_dir'] + "/AMDTOSWrappers/Include",
+    env['CXL_commonproj_dir'] + "/AMDT/Include",
+    "/usr/include/FL",
+    "/usr/include/GL",
+    "/usr/include/freetype2",
+    "/usr/include/libpng12",
+    "/usr/lib/x86_64-linux-gnu/glib-2.0/include",
+    "/usr/include/freetype2",
+
+])
+
+env.Append( LIBPATH = [
+    "/usr/lib/x86_64-linux-gnu/mesa",
+    env['CXL_Examples_dir']  + "/release",
+])
+
+# Source files:
+sources = \
+[
+# src:
+    "src/Teapot.cpp",
+    "src/GLWindow.cpp",
+]
+
+commonLinkedLibraries = \
+[
+    "fltk_gl.a",
+    "fltk.a",
+    "GL",
+    "CXLTeaPot",
+    "libglib-2.0",
+    "X11",
+    "dl",
+    "pthread",
+    "Xext",
+    "Xft",
+    "fontconfig",
+    "Xcursor",
+    "Xfixes",
+    "Xinerama"
+]
+
+linkedLibraries = commonLinkedLibraries
+env.Prepend (LIBS = linkedLibraries)
+
+
+# Set the ELF hash generation mode:
+# - When building on new systems, we would like to generate both sysv and gnu ELF hashes.
+#   This enables running the executable also on old systems, that support only the sysv ELF hash.
+# - When building on old systems, we need to set the GR_GENERATE_ONLY_DEFAULT_ELF_HASH environment
+#   variable (preferably in the .bashrc file). Otherwise the link will fail when trying to
+#   generate an ELF hash type that the old linker does not recognize.
+# [Yaki 7/7/2009]
+linkerFlags = [] 
+shouldGenerateOnlyDefaultELFHash = os.environ.get('GR_GENERATE_ONLY_DEFAULT_ELF_HASH')
+if shouldGenerateOnlyDefaultELFHash is None:
+    linkerFlags += [ "-Wl,--hash-style=both,-lz,-lrt" ]
+
+# Creating executable
+exe = env.Program(
+    target = appName, 
+    source = sources,
+    LINKFLAGS = linkerFlags)
+
+# Installing libraries
+libInstall = env.Install( 
+    dir = env['CXL_Examples_dir']  + '/release', 
+    source = (exe))
+
+Return('libInstall')

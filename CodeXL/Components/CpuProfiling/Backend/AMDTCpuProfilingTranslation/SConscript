@@ -1,0 +1,60 @@
+# -*- Python -*-
+
+Import('*')
+from CXL_init import *
+
+libName = "CXLCpuProfilingTranslation"
+
+env = CXL_env.Clone()
+
+UseQt4(env)
+
+env.Append( CPPPATH = [ 
+	".",
+	"inc",
+	"..",
+	env['CXL_common_dir'] + '/../CodeXL/Components/CpuProfiling/Backend',
+	env['CXL_common_dir'] + '/../CodeXL/Components/CpuProfiling',
+	env['CXL_commonproj_dir'] + '/AMDTCommonHeaders',
+	env['CXL_commonproj_dir'],
+	env['CXL_common_dir'] + '/../CodeXL/Components/CpuProfiling/ProfilingAgents',
+])
+
+env.Append(CPPFLAGS = '-fno-strict-aliasing')
+
+initLibElf (env)
+
+env.Append (LIBS = [
+	"CXLBaseTools",
+	"CXLOSWrappers",
+	"CXLExecutableFormat",
+	"CXLCpuCallstackSampling",
+	"CXLCpuPerfEventUtils",
+	"CXLProfilingAgentsData",
+	"CXLCpuProfilingRawData",
+])
+
+sources = \
+[
+    "src/CpuProfileDataTranslation.cpp",
+    "src/CpuProfileDataAccess.cpp",
+    "src/ExecutableAnalyzer.cpp",
+    "src/JitTaskInfo.cpp",
+    "src/Linux/CaPerfTranslator.cpp",
+    "src/Linux/CaPerfTranslatorIbs.cpp",
+]
+
+# Creating object files	
+objFiles = env.SharedObject(sources)
+
+# Creating shared libraries
+soFiles = env.SharedLibrary(
+	target = libName, 
+	source = objFiles)
+
+# Installing libraries
+libInstall = env.Install( 
+	dir = env['CXL_lib_dir'], 
+	source = (soFiles))
+
+Return('libInstall')

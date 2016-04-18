@@ -1,0 +1,218 @@
+# -*- Python -*-
+
+import os
+from CXL_init import *
+
+Import('*')
+
+libName = "CXLApplicationFramework"
+
+env = CXL_env.Clone()
+
+env.Append( CPPPATH = [ 
+    "./",
+    "./..",
+    "./inc",
+    env['CXL_commonproj_dir'],
+    env['CXL_commonproj_dir'] + "/AMDTOSAPIWrappers/Include",
+    env['CXL_commonproj_dir'] + '/../../CodeXL/Remote',
+    env['CXL_commonproj_dir'] + '/../../CodeXL',
+])
+
+UseTinyXml(env)
+UseQScintilla(env)
+UseQt4(env)
+UseAPPSDK(env)
+
+moc_files = Split(
+            " src/afProcessDebuggerEventHandler.h"
+            + " src/afProcessDebuggerPendingEventEvent.h"
+            + " Include/afCreatorAction.h"
+            + " Include/afBrowseAction.h"
+            + " Include/dialogs/afEditEnvironmentVariablesDialog.h"
+            + " Include/afExecutionModeManager.h"
+            + " Include/afGlobalSettingsPage.h"
+            + " Include/afHTMLView.h"
+            + " Include/afLineEdit.h"
+            + " Include/afMainAppWindow.h"
+            + " Include/afNewProjectDialog.h"
+            + " Include/afProjectManager.h"
+            + " Include/afQMdiSubWindow.h"
+            + " Include/afStartupPage.h"
+            + " Include/afViewActionHandler.h"
+            + " Include/afViewCreatorAction.h"
+            + " Include/afProjectSettingsExtension.h"
+            + " Include/afQtCreatorsManager.h"
+            + " Include/afSoftwareUpdaterWindow.h"
+            + " Include/afUnhandledExceptionHandler.h"
+            + " Include/dialogs/afAttachToProcessDialog.h"
+            + " Include/dialogs/afHelpAboutDialog.h"
+            + " Include/dialogs/afGlobalSettingsDialog.h"
+            + " Include/dialogs/afStartupDialog.h"
+            + " Include/dialogs/afWindowsStoreAppsBrowserDialog.h"
+            + " Include/views/afSourceCodeView.h"
+            + " Include/views/afApplicationTree.h"
+            + " Include/views/afApplicationTreeItemData.h"
+            + " Include/views/afInformationView.h"
+            + " Include/dialogs/afSystemInformationDialog.h"
+            + " Include/dialogs/afEulaDialog.h"
+            + " Include/dialogs/afMultipleDirectoriesBrowseDialog.h"
+			+ " Include/views/afTreeCtrl.h"
+            )
+
+# Source files:
+sources = \
+[
+    "src/afAidFunctions.cpp",
+    "src/afActionCreatorAbstract.cpp",
+    "src/afActionExecutorAbstract.cpp",
+    "src/afApplicationCommands.cpp",
+    "src/afBrowseAction.cpp",
+    "src/afCommand.cpp",
+    "src/afCreatorAction.cpp",
+    "src/afDocUpdateManager.cpp",
+    "src/afExecutionModeManager.cpp",
+    "src/afGeneralActionsCreator.cpp",
+    "src/afGeneralViewsCreator.cpp",
+    "src/afGlobalVariablesManager.cpp",
+    "src/afGlobalVariableChangedEvent.cpp",
+    "src/afHTMLContent.cpp",
+    "src/afHTMLUtils.cpp",
+    "src/afHTMLView.cpp",	
+    "src/afLoadProjectCommand.cpp",
+    "src/afLineEdit.cpp",
+    "src/afMainAppWindow.cpp",
+    "src/afModeProxyStyle.cpp",
+    "src/afMenuActionsExecutor.cpp",
+    "src/afMessageBox.cpp",
+    "src/afNewProjectDialog.cpp",
+    "src/afPluginConnectionManager.cpp",
+    "src/afProcessDebuggerEventHandler.cpp",
+    "src/afProcessDebuggerPendingEventEvent.cpp",
+    "src/afProjectManager.cpp",
+    "src/afProjectSettingsExtension.cpp",
+    "src/afProgressBarWrapper.cpp",
+    "src/afPropertiesUrlHandler.cpp",
+    "src/afQMdiSubWindow.cpp",
+    "src/afQtCreatorsManager.cpp",
+    "src/afQtViewCreatorAbstract.cpp",
+    "src/afRecentProjectsActionsExecutor.cpp",
+    "src/afSaveProjectCommand.cpp",
+    "src/afSingletonsDelete.cpp",
+    "src/afSoftwareUpdaterWindow.cpp",
+    "src/afSourceCodeActionsCreator.cpp",
+    "src/afMDIViewsCreator.cpp",
+    "src/afSourceCodeViewsManager.cpp",
+    "src/afStartupPage.cpp",
+    "src/afUnhandledExceptionHandler.cpp",
+    "src/afViewActionHandler.cpp", 
+    "src/afViewCreatorAbstract.cpp",
+    "src/afViewCreatorAction.cpp",
+    "src/afUtils.cpp",
+    "src/afOpenCLDeviceInformationCollector.cpp",
+# Commands:
+    "commands/afSystemInformationCommand.cpp",
+    "commands/src/afInitializeApplicationCommand.cpp",
+
+# Dialogs:
+    "dialogs/afAttachToProcessDialog.cpp",
+    "dialogs/afGlobalSettingsDialog.cpp",
+    "dialogs/afGlobalSettingsPage.cpp",
+    "dialogs/afHelpAboutDialog.cpp",
+    "dialogs/afSystemInformationDialog.cpp",
+    "dialogs/afWindowsStoreAppsBrowserDialog.cpp",
+    "dialogs/afMultipleDirectoriesBrowseDialog.cpp",
+    "dialogs/src/afEulaDialog.cpp",
+    "dialogs/src/afEditEnvironmentVariablesDialog.cpp",
+    "dialogs/src/afStartupDialog.cpp",
+
+# Views:
+    "views/afApplicationTree.cpp",
+    "views/afApplicationTreeItemData.cpp",
+    "views/afBaseView.cpp",
+    "views/afInformationView.cpp",
+    "views/afSourceCodeView.cpp",
+	"views/afTreeCtrl.cpp",
+    "views/afPropertiesView.cpp",
+]
+
+commonLinkedLibraries = \
+[
+    "CXLBaseTools",
+    "CXLOSWrappers",
+    "CXLOSAPIWrappers",
+    "CXLAPIClasses",
+    "CXLApplicationComponents",
+    "CXLRemoteClient"
+]
+
+linuxVariantLinkedLibraries = \
+[
+    "libGL",
+]
+
+linkedLibraries = commonLinkedLibraries + linuxVariantLinkedLibraries
+env.Prepend (LIBS = linkedLibraries)
+
+
+# Set the ELF hash generation mode:
+# - When building on new systems, we would like to generate both sysv and gnu ELF hashes.
+#   This enables running the executable also on old systems, that support only the sysv ELF hash.
+# - When building on old systems, we need to set the GR_GENERATE_ONLY_DEFAULT_ELF_HASH environment
+#   variable (preferably in the .bashrc file). Otherwise the link will fail when trying to
+#   generate an ELF hash type that the old linker does not recognize.
+# [Yaki 7/7/2009]
+linkerFlags = [] 
+shouldGenerateOnlyDefaultELFHash = os.environ.get('GR_GENERATE_ONLY_DEFAULT_ELF_HASH')
+if shouldGenerateOnlyDefaultELFHash is None:
+    linkerFlags += [ "-Wl,--hash-style=both" ]
+
+MOC_Generated = []
+for moc_file in moc_files:
+    MOC_Generated += env.MocBld(moc_file)
+
+# Creating shared libraries
+soFiles = env.SharedLibrary(
+    target = libName, 
+    source = sources + MOC_Generated,
+    LINKFLAGS = linkerFlags)
+
+# Installing libraries
+libInstall = env.Install( 
+    dir = env['CXL_lib_dir'], 
+    source = (soFiles))
+
+CodeXLHTMLDir = env['CXL_HTML_dir']
+
+## Copy the HTML welcome page files to the HTML directory:
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/welcome.css")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/Welcome.html")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/WelcomeAnalyzeNA.html")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/welcomepage_debug.png")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/welcomepage_debug_large.png")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/welcomepage_debug_selected.png")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/welcomepage_profile.png")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/welcomepage_profile_large.png")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/welcomepage_profile_selected.png")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/welcomepage_analyze.png")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/welcomepage_analyze_large.png")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/welcomepage_analyze_selected.png")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/analyze_add.png")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/analyze_new.png")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/arrow.png")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/debug_new.png")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/empty.png")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/profile_attach.png")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/profile_new.png")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/profile_system.png")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/recent_projects.png")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/samples.png")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/StartupPage_CodeXLLogo.png")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/welcomepage_frame_analyze.png")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/welcomepage_frame_analyze_large.png")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/welcomepage_frame_analyze_selected.png")
+libInstall += env.Install(CodeXLHTMLDir, "Include/res/welcome/frame_analyze_new.png")
+
+
+
+Return('libInstall')

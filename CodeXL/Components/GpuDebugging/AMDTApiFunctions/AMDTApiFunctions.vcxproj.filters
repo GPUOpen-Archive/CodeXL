@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{15a46f66-19df-4671-9ae3-5822ff1f5842}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="inc">
+      <UniqueIdentifier>{493a2977-cacf-4eb8-adb8-97f6b8610497}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="public inc">
+      <UniqueIdentifier>{70350612-9c6b-4116-be6c-89ef9bd1f79c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{176c8cd2-29df-40c3-9395-00c22044a3c8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\gaAPIToSpyConnector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gaDebuggedProcessEventsFiller.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gaGRApiFunctions.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gaIncomingSpyEventsListenerThread.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gaIncomingSpyEventsPipeSocketListenerThread.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gaIncomingSpyEventsTCPIPListenerThread.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gaPersistentDataManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gaPipeSocketSpyConnectionWaiterThread.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gaPrivateAPIFunctions.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gaSingletonsDelete.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gaSpyConnectionWaiterThread.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gaTCPIPSpyConnectionWaiterThread.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\gaAPIToSpyConnector.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gaDebuggedProcessEventsFiller.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gaIncomingSpyEventsListenerThread.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gaIncomingSpyEventsPipeSocketListenerThread.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gaIncomingSpyEventsTCPIPListenerThread.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gaPersistentDataManager.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gaPipeSocketSpyConnectionWaiterThread.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gaPrivateAPIFunctions.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gaSingletonsDelete.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gaSpyConnectionWaiterThread.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gaStringConstants.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gaTCPIPSpyConnectionWaiterThread.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\apAPIFunctionsDLLBuild.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gaGRApiFunctions.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuildStep Include="Sconstruct" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\..\Common\Src\VersionInfo\VersionResource.rc">
+      <Filter>src</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,54 @@
+# -*- Python -*-
+
+Import('*')
+from CXL_init import *
+
+libName = "CXLRemoteClient"
+
+env = CXL_env.Clone()
+
+env.Append( CPPPATH = [ 
+    ".",
+    "../",
+    "./src/",
+    "../../CodeXL/Components/GpuDebugging/",
+    "../../CodeXL/Components/GpuProfiling/",
+    "./Include/",
+    env['CXL_commonproj_dir'],
+    env['CXL_commonproj_dir'] + '/AMDTCommonHeaders/',
+    env['CXL_commonproj_dir'] + '/../../CodeXL/Remote',
+])
+
+# osMessageBox, osDesktop
+env.Append(CPPFLAGS = '-fno-strict-aliasing')
+
+UseGtk(env)
+UseTinyXml(env)
+
+sources = \
+[
+    "src/CXLDaemonClient.cpp",
+    "src/RemoteClientUtils.cpp",
+]
+    
+# Creating object files    
+objFiles = env.SharedObject(sources)
+
+
+env.Append (LIBS = [
+    "CXLOSWrappers",
+    "CXLBaseTools",
+    "libz"
+])
+
+# Creating shared libraries
+soFiles = env.SharedLibrary(
+    target = libName, 
+    source = objFiles)
+
+# Installing libraries
+libInstall = env.Install( 
+    dir = env['CXL_lib_dir'], 
+    source = (soFiles))
+
+Return('libInstall')

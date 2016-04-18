@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="UserMacros">
+    <COMMONDIR>$(SolutionDir)..\..\..\Common</COMMONDIR>
+    <AMDTOutputDir>$(SolutionDir)..\Output\</AMDTOutputDir>
+    <AMDTCommonAMD>$(COMMONDIR)\Lib\AMD\</AMDTCommonAMD>
+    <AMDTCommonExt>$(COMMONDIR)\Lib\Ext\</AMDTCommonExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;..;$(QTDir)\include\QtGui;$(AMDTOSWRAPPERSDIR)\Include\AMDTOSWrappers\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions> /MP /wd4996</AdditionalOptions>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+      <!-- 4996 deprecated C runtime functions
+           4512 assignment operator could not be generated (reference member)
+           4100 unreferenced formal parameter
+           4127 conditional expression is constant [while(true)]
+           -->
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="COMMONDIR">
+      <Value>$(COMMONDIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="AMDTOutputDir">
+      <Value>$(AMDTOutputDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="AMDTCommonAMD">
+      <Value>$(AMDTCommonAMD)</Value>
+    </BuildMacro>
+    <BuildMacro Include="AMDTCommonExt">
+      <Value>$(AMDTCommonExt)</Value>
+    </BuildMacro>
+  </ItemGroup>
+  <ImportGroup Label="AMDTBaseProjects">
+    <Import Project="$(SolutionDir)\..\CodeXLCommonProjectIncludes.props" />
+  </ImportGroup>
+</Project>

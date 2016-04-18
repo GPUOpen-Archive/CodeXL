@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="UserMacros">
+    <COMMONDIR>$(SolutionDir)..\..\Common</COMMONDIR>
+    <CommonProjectsDir>$(SolutionDir)..\..\Common\Src</CommonProjectsDir>
+    <AMDTOutputDir>$(SolutionDir)..\Output\</AMDTOutputDir>
+    <AMDTCommonAMD>$(COMMONDIR)\Lib\AMD\</AMDTCommonAMD>
+    <AMDTCommonExt>$(COMMONDIR)\Lib\Ext\</AMDTCommonExt>
+  </PropertyGroup>
+  <ImportGroup Label="AMDTBaseProjects">
+    <Import Project="$(SolutionDir)\..\Components\CodeXLComponent.props" />
+  </ImportGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;..;$(QTDir)\include\QtGui;$(CommonProjectsDir)\AMDTOSAPIWrappers\Include;$(SolutionDir)\..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="COMMONDIR">
+      <Value>$(COMMONDIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="AMDTOutputDir">
+      <Value>$(AMDTOutputDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="AMDTCommonAMD">
+      <Value>$(AMDTCommonAMD)</Value>
+    </BuildMacro>
+    <BuildMacro Include="AMDTCommonExt">
+      <Value>$(AMDTCommonExt)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

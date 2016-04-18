@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{83C7662A-4D27-403A-8072-FDE0AFA83CFB}</ProjectGuid>
+    <RootNamespace>AMDTCpuProfilingRawData</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="CommonPropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)\AMDTCpuProfiling.props" />
+  </ImportGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(CommonProjectsDir);$(CommonProjectsDir)\AMDTCommonHeaders;$(ProjectDir);$(ProjectDir)\inc;$(ProjectDir)\..;$(ProjectDir)\..\ProfileAgents;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>AMDT_CPU_PROFILING_RAWDATA_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CXLDbAdapter$(GDTProjectSuffix).lib;CXLCpuPerfEventUtils$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Link>
+      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CXLDbAdapter$(GDTProjectSuffix).lib;CXLCpuPerfEventUtils$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\DllMain.cpp" />
+    <ClCompile Include="src\RawData\Linux\CaPerfDataReader.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\RawData\Linux\CaPerfDataWriter.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\RawData\Linux\PerfDataReader.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\RawData\Linux\PerfRecName.c">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\RawData\Windows\PrdReader.cpp" />
+    <ClCompile Include="src\RunInfo\RunInfo.cpp" />
+    <ClCompile Include="src\RunInfo\RunInfoReader.cpp" />
+    <ClCompile Include="src\RunInfo\RunInfoWriter.cpp" />
+    <ClCompile Include="src\Translation\CpuProfileFunction.cpp" />
+    <ClCompile Include="src\Translation\CpuProfileInputStream.cpp" />
+    <ClCompile Include="src\Translation\CpuProfileModule.cpp" />
+    <ClCompile Include="src\Translation\CpuProfileOutputStream.cpp" />
+    <ClCompile Include="src\Translation\CpuProfileProcess.cpp" />
+    <ClCompile Include="src\Translation\CpuProfileReader.cpp" />
+    <ClCompile Include="src\Translation\CpuProfileSample.cpp" />
+    <ClCompile Include="src\Translation\CpuProfileWriter.cpp" />
+    <ClCompile Include="src\Translation\ImdReader.cpp" />
+    <ClCompile Include="src\Translation\ImdWriter.cpp" />
+    <ClCompile Include="src\Translation\ProfilerDataDBWriter.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\..\..\Common\Src\VersionInfo\VersionResource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\AMDTCpuProfilingBackendUtils\Include\CpuProfileDefinitions.h" />
+    <ClInclude Include="..\Driver\Windows\CpuProf\inc\UserAccess\PrdRecords.h" />
+    <ClInclude Include="inc\CpuProfileDataTranslationInfo.h" />
+    <ClInclude Include="inc\CpuProfileFunction.h" />
+    <ClInclude Include="inc\CpuProfileInfo.h" />
+    <ClInclude Include="inc\CpuProfileInputStream.h" />
+    <ClInclude Include="inc\CpuProfileModule.h" />
+    <ClInclude Include="inc\CpuProfileOutputStream.h" />
+    <ClInclude Include="inc\CpuProfileProcess.h" />
+    <ClInclude Include="inc\CpuProfileReader.h" />
+    <ClInclude Include="inc\CpuProfileSample.h" />
+    <ClInclude Include="inc\CpuProfileWriter.h" />
+    <ClInclude Include="inc\CpuProfilingRawDataDLLBuild.h" />
+    <ClInclude Include="inc\InlineInstance.h" />
+    <ClInclude Include="inc\Linux\CaPerfDataReader.h">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="inc\Linux\CaPerfDataWriter.h">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="inc\Linux\CaPerfHeader.h">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="inc\Linux\PerfData.h">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="inc\Linux\PerfDataReader.h">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="inc\ProfilerDataDBWriter.h" />
+    <ClInclude Include="inc\RunInfo.h" />
+    <ClInclude Include="inc\Windows\PrdReader.h" />
+    <ClInclude Include="inc\Windows\PrdOldRecords.h" />
+    <ClInclude Include="src\RunInfo\RunInfoReader.h" />
+    <ClInclude Include="src\RunInfo\RunInfoWriter.h" />
+    <ClInclude Include="src\Translation\ImdReader.h" />
+    <ClInclude Include="src\Translation\ImdWriter.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

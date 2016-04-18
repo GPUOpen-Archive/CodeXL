@@ -1,0 +1,1286 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{6fa2df15-0dcc-4e7a-982a-637a7c0e17f0}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Commands">
+      <UniqueIdentifier>{1a2987fe-0c1d-44ae-815d-46154de62ed1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Commands\src">
+      <UniqueIdentifier>{d12ec9c2-bdfe-4cfa-820c-e0ded28b419e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Commands\public inc">
+      <UniqueIdentifier>{3046144d-36aa-4119-9f9c-6fe483149a35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Toolbars">
+      <UniqueIdentifier>{e00ae4a0-2979-47a8-a5b4-44ad90d60c4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Toolbars\src">
+      <UniqueIdentifier>{de1a08d8-e0e2-43da-8627-6be5452d200b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Toolbars\public inc">
+      <UniqueIdentifier>{136961ca-81b3-4a08-b3fd-29a2b38ffc25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Views">
+      <UniqueIdentifier>{6036d50e-73db-4632-924d-96f52f11b536}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Views\src">
+      <UniqueIdentifier>{e0ad44ec-8519-4c78-8ce0-7a23e384feff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Viewers">
+      <UniqueIdentifier>{21c507a2-3803-4112-befa-a5b6589331b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Viewers\public inc">
+      <UniqueIdentifier>{719bd1e0-3ff4-40b5-917a-b6d5c740fbae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Viewers\src">
+      <UniqueIdentifier>{fd59cfea-dbbd-469d-8bc8-2cc4530f741a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dialogs">
+      <UniqueIdentifier>{b68eaf6f-1eb3-4179-8577-2ac28b20151a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dialogs\src">
+      <UniqueIdentifier>{71dd63ee-d757-465c-9608-e6088a683d6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dialogs\public inc">
+      <UniqueIdentifier>{de583f73-3980-4a83-94e0-48ec33913e6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Generated files">
+      <UniqueIdentifier>{a44c182b-8ece-4825-b2b3-c3412b7407c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="res">
+      <UniqueIdentifier>{03973c30-bf51-4412-b7a1-adf0a4d320e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="res\icon">
+      <UniqueIdentifier>{42f3a3f5-b91c-410d-9b13-6b4414deb866}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Include">
+      <UniqueIdentifier>{01b28238-f74a-4e4c-9897-022b3e6510b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Views\Include">
+      <UniqueIdentifier>{b4be8033-273a-4ee3-85fd-a1816ce2fa4d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\gdAidFunctions.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gdGDebuggerGlobalVariablesManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gdHTMLProperties.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gdShaderType.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gdSingletonsDelete.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gdStatusBar.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="commands\src\gdExitCommand.cpp">
+      <Filter>Commands\src</Filter>
+    </ClCompile>
+    <ClCompile Include="commands\src\gdFlushTexturesImagesCommand.cpp">
+      <Filter>Commands\src</Filter>
+    </ClCompile>
+    <ClCompile Include="commands\src\gdLoadProjectCommand.cpp">
+      <Filter>Commands\src</Filter>
+    </ClCompile>
+    <ClCompile Include="commands\src\gdSaveProfilingDataCommand.cpp">
+      <Filter>Commands\src</Filter>
+    </ClCompile>
+    <ClCompile Include="commands\src\gdSaveStateChangeStatisticsCommand.cpp">
+      <Filter>Commands\src</Filter>
+    </ClCompile>
+    <ClCompile Include="commands\src\gdSaveTotalStatisticsCommand.cpp">
+      <Filter>Commands\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands\src\gdSaveVarStateCommand.cpp">
+      <Filter>Commands\src</Filter>
+    </ClCompile>
+    <ClCompile Include="commands\src\gdSaveProjectCommand.cpp">
+      <Filter>Commands\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands\src\gdStartDebuggingCommand.cpp">
+      <Filter>Commands\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands\src\gdStopDebuggingCommand.cpp">
+      <Filter>Commands\src</Filter>
+    </ClCompile>
+    <ClCompile Include="toolbars\src\gdCallsHistoryToolbar.cpp">
+      <Filter>Toolbars\src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdAllocatedObjectsCreationStackView.cpp">
+      <Filter>Views\src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdAPICallsHistoryView.cpp">
+      <Filter>Views\src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdBatchStatisticsView.cpp">
+      <Filter>Views\src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdCallsStackListCtrl.cpp">
+      <Filter>Views\src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdCallStackView.cpp">
+      <Filter>Views\src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdDebuggedProcessEventsView.cpp">
+      <Filter>Views\src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdDeprecationStatisticsView.cpp">
+      <Filter>Views\src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdFunctionCallsStatisticsView.cpp">
+      <Filter>Views\src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdMemoryAnalysisDetailsView.cpp">
+      <Filter>Views\src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdStateChangeStatisticsView.cpp">
+      <Filter>Views\src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdStateVariablesView.cpp">
+      <Filter>Views\src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdStatisticsViewBase.cpp">
+      <Filter>Views\src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdTotalStatisticsView.cpp">
+      <Filter>Views\src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdPBufferImageProxy.cpp">
+      <Filter>Viewers\src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdRenderBufferImageProxy.cpp">
+      <Filter>Viewers\src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdStateVariablesCompareFunctor.cpp">
+      <Filter>Viewers\src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdStaticBufferImageProxy.cpp">
+      <Filter>Viewers\src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdTextureImageProxy.cpp">
+      <Filter>Viewers\src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdVBOImageProxy.cpp">
+      <Filter>Viewers\src</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogs\src\gdBreakpointsDialog.cpp">
+      <Filter>Dialogs\src</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogs\src\gdDoubleProgressBarDialog.cpp">
+      <Filter>Dialogs\src</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogs\src\gdGLDebugOutputSettingsDialog.cpp">
+      <Filter>Dialogs\src</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogs\src\gdSaveAllTexturesBuffersDialog.cpp">
+      <Filter>Dialogs\src</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogs\src\gdStateVariablesDialog.cpp">
+      <Filter>Dialogs\src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdStatisticsView.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdThumbnailView.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdImageAndBufferView.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdImageAndBufferViewsController.cpp">
+      <Filter>Views\src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdImagesAndBuffersControlPanel.cpp">
+      <Filter>Views\src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdImagesAndBuffersExporter.cpp">
+      <Filter>Views\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gdUpdateUIEvent.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdMemoryViewBase.cpp">
+      <Filter>Views\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gdApplicationCommands.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gdEventStringBuilder.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdImageDataView.cpp">
+      <Filter>Views\src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdMultiWatchView.cpp">
+      <Filter>Views\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gdAPICallsHistoryPanel.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gdImagesAndBuffersManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdBreakpointsView.cpp">
+      <Filter>Views\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gdBreakpointsItemData.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdBreakpointsView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdLocalsView.cpp">
+      <Filter>Views\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdLocalsView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdGlobalDebugSettingsPage.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdWatchView.cpp">
+      <Filter>Views\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdWatchView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="views\src\gdMemoryView.cpp">
+      <Filter>Views\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gdStatisticsPanel.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdAPICallsHistoryView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdCallsHistoryToolbar.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdStatisticsViewBase.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdAllocatedObjectsCreationStackView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdCallsStackListCtrl.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdMemoryView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdCallStackView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdMemoryAnalysisDetailsView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdAPICallsHistoryPanel.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdDebuggedProcessEventsView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdStatisticsView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdStateVariablesView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdStatisticsPanel.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gdDebuggingCommands.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gdPropertiesEventObserver.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gdFrameworkConnectionManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gdExecutionMode.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdStateVariablesDialog.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gdProjectSettingsExtension.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdProjectSettingsExtension.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gdGlobalDebugSettingsPage.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdBreakpointsDialog.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdImageAndBufferView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdImageDataView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdMultiWatchView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdImagesAndBuffersControlPanel.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdThumbnailView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdGLDebugOutputSettingsDialog.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gdThreadsEventObserver.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gdDebugApplicationTreeHandler.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gdDebugApplicationTreeData.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdDebugApplicationTreeData.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdDebugApplicationTreeHandler.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdSaveAllTexturesBuffersDialog.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\commands\gdExitCommand.h">
+      <Filter>Commands\public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\commands\gdFlushTexturesImagesCommand.h">
+      <Filter>Commands\public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\commands\gdLoadProjectCommand.h">
+      <Filter>Commands\public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\commands\gdSaveProfilingDataCommand.h">
+      <Filter>Commands\public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\commands\gdSaveStateChangeStatisticsCommand.h">
+      <Filter>Commands\public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\commands\gdSaveTotalStatisticsCommand.h">
+      <Filter>Commands\public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\commands\gdSaveVarStateCommand.h">
+      <Filter>Commands\public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\commands\gdSaveProjectCommand.h">
+      <Filter>Commands\public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\commands\gdStartDebuggingCommand.h">
+      <Filter>Commands\public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\commands\gdStopDebuggingCommand.h">
+      <Filter>Commands\public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\views\gdBatchStatisticsView.h">
+      <Filter>Views\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\views\gdDeprecationStatisticsView.h">
+      <Filter>Views\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\views\gdFunctionCallsStatisticsView.h">
+      <Filter>Views\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\views\gdStateChangeStatisticsView.h">
+      <Filter>Views\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\views\gdTotalStatisticsView.h">
+      <Filter>Views\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\views\gdPBufferImageProxy.h">
+      <Filter>Viewers\public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\views\gdRenderBufferImageProxy.h">
+      <Filter>Viewers\public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\views\gdStateVariablesCompareFunctor.h">
+      <Filter>Viewers\public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\views\gdStaticBufferImageProxy.h">
+      <Filter>Viewers\public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\views\gdTextureImageProxy.h">
+      <Filter>Viewers\public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\views\gdVBOImageProxy.h">
+      <Filter>Viewers\public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\dialogs\gdDoubleProgressBarDialog.h">
+      <Filter>Dialogs\public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\views\gdImagesAndBuffersExporter.h">
+      <Filter>Views\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\views\gdImageAndBufferViewsController.h">
+      <Filter>Views\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gdUpdateUIEvent.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gdStringConstants.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gdStatusBar.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gdSingletonsDelete.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gdShaderType.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gdHTMLStringConstants.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gdHTMLProperties.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gdGDebuggerAppDLLBuild.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gdGDebuggerGlobalVariablesManager.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gdDeprecationStringConstants.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gdCommandIDs.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gdAidFunctions.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\views\gdMemoryViewBase.h">
+      <Filter>Views\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gdApplicationCommands.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gdEventStringBuilder.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gdImagesAndBuffersManager.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gdBreakpointsItemData.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gdDebuggingCommands.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gdPropertiesEventObserver.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gdExecutionMode.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gdFrameworkConnectionManager.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gdThreadsEventObserver.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="Include\views\gdBreakpointsView.h">
+      <Filter>Views\Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdLocalsView.h">
+      <Filter>Views\Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdWatchView.h">
+      <Filter>Views\Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdStateVariablesView.h">
+      <Filter>Views\Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdAPICallsHistoryView.h">
+      <Filter>Views\Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\toolbars\gdCallsHistoryToolbar.h">
+      <Filter>Toolbars\public inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdStatisticsViewBase.h">
+      <Filter>Views\Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdDebuggedProcessEventsView.h">
+      <Filter>Views\Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdMemoryView.h">
+      <Filter>Views\Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdAllocatedObjectsCreationStackView.h">
+      <Filter>Views\Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdCallsStackListCtrl.h">
+      <Filter>Views\Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdCallStackView.h">
+      <Filter>Views\Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdMemoryAnalysisDetailsView.h">
+      <Filter>Views\Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\gdStatisticsPanel.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdStatisticsView.h">
+      <Filter>Views\Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\gdAPICallsHistoryPanel.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\dialogs\gdStateVariablesDialog.h">
+      <Filter>Dialogs\public inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\gdProjectSettingsExtension.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\gdGlobalDebugSettingsPage.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdImageAndBufferView.h">
+      <Filter>Views\Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdImageDataView.h">
+      <Filter>Views\Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdMultiWatchView.h">
+      <Filter>Views\Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdImagesAndBuffersControlPanel.h">
+      <Filter>Views\Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\dialogs\gdBreakpointsDialog.h">
+      <Filter>Dialogs\public inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdThumbnailView.h">
+      <Filter>Views\Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\dialogs\gdGLDebugOutputSettingsDialog.h">
+      <Filter>Dialogs\public inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\gdDebugApplicationTreeData.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\gdDebugApplicationTreeHandler.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\dialogs\gdSaveAllTexturesBuffersDialog.h">
+      <Filter>Dialogs\public inc</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Include\res\icons\AddCounter_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\all_buffers_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\amd_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\analyze_execution_mode.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\analyze_execution_mode_inactive.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\app_root_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\ATI_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\ATI_ico_xpm32.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\back_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\back_icon_disabled.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\blue1_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\blue2_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\blue3_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\blue4_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\break_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\buildProgram_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\cglAPICall_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\cl_copy_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\cl_kernel_execution_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\cl_read_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\cl_write_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\command_queue_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\commandQueuesViewer_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\compileShader_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\compute_context_deleted_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\compute_context_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\debug_execution_mode.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\debug_execution_mode_inactive.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\DefaultFontTexture.png">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\detailed_batch_data_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\device_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\display_list_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\emptyIcon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\environment_variables_open.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_break_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_breakOnDeprecated_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_breakOnDetectedError_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_breakOnMemoryLeak_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_breakOnOpenCLError_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_breakOnOpenGLError_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_breakOnRedundant_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_breakOnSoftwareFallback_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_breakpoint_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_clProgramBuild_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_clProgramCreated_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_clProgramDeleted_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_computeContextCreated_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_computeContextDeleted_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_connectionEnded_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_connectionEstablished_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_debugOutput_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_detectedError_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_drawStep_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_exception_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_foreignBreak_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_frameStep_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_moduleLoaded_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_moduleUnloaded_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_OpenCLError_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_outputString_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_processCreated_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_processRunStarted_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_processTerminated_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_queueCreated_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_queueDeleted_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_renderContextCreated_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_renderContextDeleted_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_step_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_threadCreated_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\eventsView_threadTerminated_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\ExtensionAPICall_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\fbo_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\file_read_only.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\find_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\forward_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\forward_icon_disabled.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\FullRecorderToolbar.bmp">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\gdb16_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\glxAPICall_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\green1_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\green2_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\green3_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\green4_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\GRSourceCodeIcon.png">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\hide_controlPanel.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\information_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\InformationIcon.png">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\InformationIconSmall.png">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\iPhone_gpu_small_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\iPhone_os_small_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\iPhone_small_ico_alt_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\iPhone_small_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\LightBulbIconSmall.png">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\linux_ico.ico">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\linux_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\mac_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\memoryAnalysisViewer_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\MyComputer_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\new_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\nextDifference_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\NextFunctionCall_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\nextMarker_command_disabled_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\nextMarker_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\nullFragmentShaders_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\nullGeometryShaders_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\nullLights_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\nullOpenGLDriver_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\nullPortView_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\nullTextures_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\openBuildLogFile_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\openCallsLog_command_disabled_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\openCallsLog_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\opencl_buffer_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\OpenCL_ico_alt_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\OpenCL_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\opencl_kernel_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\opencl_program_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\opencl_sampler_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\OpenCLCall_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\OpenGL_and_OpenCL_ico_alt_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\OpenGL_and_OpenCL_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\opengl_driver_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\OpenGL_ES_ico_alt_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\OpenGL_ES_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\OpenGL_ico_alt_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\OpenGL_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\opengl_program_deleted_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\opengl_program_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\opengl_shader_deleted_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\OpenGLCall_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\pbuffer_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\previousDifference_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\previousMarker_command_disabled_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\previousMarker_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\profile_execution_mode.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\profile_execution_mode_inactive.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\raster_fill_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\raster_points_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\raster_wireframe_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\record_command_disabled_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\record_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\red1_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\red2_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\red3_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\red4_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\render_buffer_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\render_buffer_shortcut_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\render_context_deleted_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\render_context_deleted_shared_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\render_context_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\render_context_info_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\render_context_shared_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\run_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\save_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\saveDimmed_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\saveProfilingData_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\shadersSourceCodeViewer_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\ShadingProgramIcon.png">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\show_controlPanel.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\showOnlyDifferences_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\sourcecodeViewer_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\stateVariablesCompareViewer_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\static_buffer_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\static_buffer_shortcut_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\statisticsViewer_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\step_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\stepFrame_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\stepNextDraw_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\stop_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\stringMarkerFunction_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\sync_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\tex_buffer_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\tex_multisample_array_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\tex_multisample_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_icon_cl_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_shortcut_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_viewer_alpha_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_viewer_bestfit_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_viewer_blue_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_viewer_grayscale_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_viewer_green_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_viewer_invert_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_viewer_left_rotate_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_viewer_mouse_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_viewer_originalsize_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_viewer_pan_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_viewer_red_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_viewer_right_rotate_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_viewer_texture_icon_1d.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_viewer_texture_icon_1d_array.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_viewer_texture_icon_2d.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_viewer_texture_icon_2d_array.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_viewer_texture_icon_2d_cl.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_viewer_texture_icon_3d.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_viewer_texture_icon_3d_cl.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_viewer_texture_icon_cubemap.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_viewer_texture_icon_rectangle.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_viewer_texture_icon_unknown.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_viewer_zoomin_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texture_viewer_zoomout_icon.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\texturesViewer_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\validateProgram_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\vbo_icon_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\warning_icon_orange.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\warning_icon_red.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\warning_icon_yellow.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\WarningIconOrange.png">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\WarningIconOrangeSmall.png">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\WarningIconRed.png">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\WarningIconRedSmall.png">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\WarningIconYellow.png">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\WarningIconYellowSmall.png">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\Win32.ico">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\Win32APICall_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\windows_additional_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\windows_ico_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\wizard_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\wlflag.ico">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\clearStatistics_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\clearStatistics_command_disabled_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\detailed_batch_data_command_disabled_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\monitored_objects_tree_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\multiwatch_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\properties_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\breakpoints_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\locals_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="Include\res\icons\watch_command_xpm.xpm">
+      <Filter>res\icon</Filter>
+    </None>
+    <None Include="SConscript" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\..\Common\Src\VersionInfo\VersionResource.rc">
+      <Filter>src</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

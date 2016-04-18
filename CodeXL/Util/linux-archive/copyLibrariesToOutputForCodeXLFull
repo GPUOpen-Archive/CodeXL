@@ -1,0 +1,177 @@
+#!/bin/bash -f
+
+# ------------------------------------------------------------------------------------
+# This script copies all required files into the Output directory
+# (Third party libraries, etc)
+# ------------------------------------------------------------------------------------
+# For Linux, It assumes that the release builds of the 3rd party libraries are used
+
+# Make sure we use the right tools (no aliases etc')
+ECHO=`which echo`
+LS=`which ls`
+CP=`which cp`
+__CP_OPTIONS=' -f -P '
+FIND=`which find`
+GREP=`which grep`
+MKDIR=`which mkdir`
+
+NARGS=$#
+# Use a global status to return the overall success or failure of this
+# critical setup script
+GLOBAL_STATUS=0
+
+# Get the OS type:
+osType=$(uname -o 2>&1)
+
+if [ "$osType" == "darwin" ]  ; then
+	$ECHO "Mac OS X -> $osType"
+elif [ "$osType" == "GNU/Linux" ]  ; then
+	$ECHO "Generic Linux -> $osType"
+else
+	$ECHO "Unknown OS TYPE"
+	exit 1
+fi
+
+# Get the OS bit size:
+machineType=$(uname -m 2>&1)
+
+# Override host OS size with optional argument
+# it will be x86 or x86_64
+if [ $NARGS -eq 1 ]
+then
+    machineType=$1
+fi
+
+# Channel all shell commands throught this function to get some proper feedback
+function echo_system()
+{
+    CMD=$@
+    ret=$($CMD 2>&1)
+    if [ "$?" != "0" ]; then
+    $ECHO ""
+	$ECHO "---- FAILED ----"
+	$ECHO "                $CMD"
+	$ECHO "                $ret"
+    GLOBAL_STATUS=1
+    fi
+}
+
+# use this function to overcome symbolic links bugs in CP using BASH
+function copy_all_files()
+{
+    DST=$1
+    SRC=$2
+    shift
+    shift
+    GREP_EXPR=$@
+    if [ -n "$GREP_EXPR" ]; then
+	list=`$LS  $SRC | $GREP $GREP_EXPR`
+    else
+	list=`$LS  $SRC`
+    fi
+    for file in $list
+    do
+	if [ -f $SRC/$file ] || [ -h $SRC/$file ]; then
+	    echo_system $CP $__CP_OPTIONS $SRC/$file $DST
+	else
+		if [ -d $SRC/$file ]; then
+			echo_system $MKDIR -p $DST/$file
+			echo_system $CP $__CP_OPTIONS -r $SRC/$file $DST/
+		fi
+	fi
+    done
+}
+
+# Display a header message:
+$ECHO 
+$ECHO "Setup: Copying files"
+$ECHO "===================="
+
+# Create directories:
+$ECHO
+$ECHO -n "Creating directories ... "
+echo_system $MKDIR -p $AMD_OUTPUT/release/
+echo_system $MKDIR -p $AMD_OUTPUT/release/bin
+
+echo_system $MKDIR -p $AMD_OUTPUT/debug/
+echo_system $MKDIR -p $AMD_OUTPUT/debug/bin/
+
+$ECHO ""
+$ECHO "Copying 3rd party libraries:"
+$ECHO -n "    "
+$ECHO -n "wxWidgets ... "
+    # For now, this is only CentOS6.2.  Only copy libraries
+    copy_all_files $AMD_OUTPUT/debug/bin/   $AMD_EXTLIBS/wxWidgets/2.9.2/Build/CentOS6.2/${machineType}/debug/lib/  "lib*"
+    copy_all_files $AMD_OUTPUT/release/bin/ $AMD_EXTLIBS/wxWidgets/2.9.2/Build/CentOS6.2/${machineType}/release/lib/    "lib*"
+
+$ECHO -n "AMDTQTControls ... "
+if [ "$machineType" == "x86_64" ]; then
+	echo_system $CP $__CP_OPTIONS $AMD_AMDLIBS/AMDTQtControls/1.0/Lib/x86_64/libAMDTQtControls-d.so  $AMD_OUTPUT/debug/bin/
+	echo_system $CP $__CP_OPTIONS $AMD_AMDLIBS/AMDTQtControls/1.0/Lib/x86_64/libAMDTQtControls.so    $AMD_OUTPUT/release/bin/
+else
+	echo_system $CP $__CP_OPTIONS $AMD_AMDLIBS/AMDTQtControls/1.0/Lib/x86/libAMDTQtControls-d.so  $AMD_OUTPUT/debug/bin/
+	echo_system $CP $__CP_OPTIONS $AMD_AMDLIBS/AMDTQtControls/1.0/Lib/x86/libAMDTQtControls.so    $AMD_OUTPUT/release/bin/
+fi
+
+
+$ECHO -n "QT ... "
+export QT_VER=4.7.4
+export QT_LOCATION=${AMD_EXTLIBS}/Qt/${QT_VER}/Build/CentOS6.2/${machineType}
+    copy_all_files $AMD_OUTPUT/debug/bin/   ${QT_LOCATION}/debug/lib/		libQtGuiAmdDt474d.
+    copy_all_files $AMD_OUTPUT/debug/bin/   ${QT_LOCATION}/debug/lib/		libQtCoreAmdDt474d.
+    copy_all_files $AMD_OUTPUT/debug/bin/   ${QT_LOCATION}/debug/lib/		libQtOpenGLAmdDt474d.
+    copy_all_files $AMD_OUTPUT/debug/bin/   ${QT_LOCATION}/debug/lib/		libQtNetworkAmdDt474d.
+    copy_all_files $AMD_OUTPUT/debug/bin/   ${QT_LOCATION}/debug/lib/		libQtXmlAmdDt474d.
+    copy_all_files $AMD_OUTPUT/debug/bin/   ${QT_LOCATION}/debug/lib/		libQtWebKitAmdDt474d.
+
+    copy_all_files $AMD_OUTPUT/release/bin/   ${QT_LOCATION}/release/lib/	libQtGuiAmdDt474.
+    copy_all_files $AMD_OUTPUT/release/bin/   ${QT_LOCATION}/release/lib/	libQtCoreAmdDt474.
+    copy_all_files $AMD_OUTPUT/release/bin/   ${QT_LOCATION}/release/lib/	libQtOpenGLAmdDt474.
+    copy_all_files $AMD_OUTPUT/release/bin/   ${QT_LOCATION}/release/lib/	libQtNetworkAmdDt474.
+    copy_all_files $AMD_OUTPUT/release/bin/   ${QT_LOCATION}/release/lib/	libQtXmlAmdDt474.
+    copy_all_files $AMD_OUTPUT/release/bin/   ${QT_LOCATION}/release/lib/	libQtWebKitAmdDt474.
+
+$ECHO -n "QScintilla ... "
+export QSCI_LOCATION=${AMD_EXTLIBS}/QScintilla/2.5.1/Build/CentOS6.2/${machineType}
+    copy_all_files $AMD_OUTPUT/debug/bin/   ${QSCI_LOCATION}/debug/lib 	    libqscintillaAmdDt251d.
+    copy_all_files $AMD_OUTPUT/release/bin/ ${QSCI_LOCATION}/release/lib    libqscintillaAmdDt251.
+
+
+$ECHO -n "Updater ... "
+if [ "$machineType" == "x86_64" ]; then
+    echo_system $CP $__CP_OPTIONS -fv $AMD_AMDLIBS/QtAMDUpdater/Lib/$machineType/libAMDUpdater.a $AMD_OUTPUT/release/bin/
+    echo_system $CP $__CP_OPTIONS -fv $AMD_AMDLIBS/QtAMDUpdater/Lib/$machineType/libAMDUpdater-d.a $AMD_OUTPUT/debug/bin/
+else
+    echo_system $CP $__CP_OPTIONS -fv $AMD_AMDLIBS/QtAMDUpdater/Lib/$machineType/libAMDUpdater.a $AMD_OUTPUT/release/bin/
+    echo_system $CP $__CP_OPTIONS -fv $AMD_AMDLIBS/QtAMDUpdater/Lib/$machineType/libAMDUpdater-d.a $AMD_OUTPUT/debug/bin/
+fi
+
+$ECHO -n "tinyXML ... "
+    echo_system $CP $__CP_OPTIONS -fv $AMD_EXTLIBS/tinyxml/2.5.2/Build/CentOS6.2/release/${machineType}/lib/libtinyXML.a $AMD_OUTPUT/release/bin/
+    echo_system $CP $__CP_OPTIONS -fv $AMD_EXTLIBS/tinyxml/2.5.2/Build/CentOS6.2/debug/${machineType}/lib/libtinyXML_d.a $AMD_OUTPUT/debug/bin/
+
+$ECHO 
+$ECHO "Copying promoted libraries:"
+$ECHO -n "    "
+$ECHO -n "AMDOpenCLDebug ... "
+if [ "$machineType" == "x86_64" ]; then
+	echo_system $CP $__CP_OPTIONS $AMD_AMDLIBS/OpenCLDebugAPI/1.3/Lib/x64/libAMDOpenCLDebugAPI64-d.so  $AMD_OUTPUT/debug/bin/
+	echo_system $CP $__CP_OPTIONS $AMD_AMDLIBS/OpenCLDebugAPI/1.3/Lib/x64/libAMDOpenCLDebugAPI64.so  $AMD_OUTPUT/release/bin/
+else
+	echo_system $CP $__CP_OPTIONS $AMD_AMDLIBS/OpenCLDebugAPI/1.3/Lib/x86/libAMDOpenCLDebugAPI32-d.so  $AMD_OUTPUT/debug/bin/
+	echo_system $CP $__CP_OPTIONS $AMD_AMDLIBS/OpenCLDebugAPI/1.3/Lib/x86/libAMDOpenCLDebugAPI32.so   $AMD_OUTPUT/release/bin/
+fi
+
+if [ ${GLOBAL_STATUS} -eq 0 ]
+then
+    $ECHO
+    $ECHO "Setup successfully completed"
+else
+    $ECHO
+    $ECHO "Setup failed"
+fi
+$ECHO "===================="
+$ECHO
+# if we failed anywhere, return a global failure - this is a critical
+# pre-requisite step
+exit ${GLOBAL_STATUS}

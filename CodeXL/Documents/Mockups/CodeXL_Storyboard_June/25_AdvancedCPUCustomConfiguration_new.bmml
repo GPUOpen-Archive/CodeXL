@@ -1,0 +1,160 @@
+<mockup version="1.0" skin="sketch" measuredW="1031" measuredH="690" mockupW="1025" mockupH="601">
+  <controls>
+    <control controlID="38" controlTypeID="com.balsamiq.mockups::TitleWindow" x="200" y="89" w="831" h="547" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bottomheight>2</bottomheight>
+        <close>true</close>
+        <text>Advanced%20CPU%20Profiling%20Configuration%20Events%20-%20CPU%3A%20AMD%20Family%2016%20Model%206%20Stepping%202</text>
+      </controlProperties>
+    </control>
+    <control controlID="39" controlTypeID="com.balsamiq.mockups::ButtonBar" x="861" y="599" w="159" h="27" measuredW="117" measuredH="29" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <hrefs>%2C80_DefaultLayoutProfileSession%26bm%3B80_DefaultLayoutProfileSession.bmml%26bm%3B80_DefaultLayoutProfileSession.bmml%26bm%3B80_DefaultLayoutProfileSession.bmml</hrefs>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22922%2C510%2C1016%2C537%22%20href%3D%2280_DefaultLayoutProfileSession.bmml%22%20alt%3D%2280_DefaultLayoutProfileSession%22%20id%3D%2239_0%22/%3E%0A</map>
+        <selectedIndex>-1</selectedIndex>
+        <text>OK%2CCancel</text>
+      </controlProperties>
+    </control>
+    <control controlID="40" controlTypeID="com.balsamiq.mockups::Paragraph" x="227" y="517" w="244" h="98" measuredW="200" measuredH="80" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Event%20desciption%20for%20Timer%20Sample%20%28the%20selected%20item%20in%20the%20above%20list%29</text>
+      </controlProperties>
+    </control>
+    <control controlID="42" controlTypeID="com.balsamiq.mockups::Button" x="509" y="272" w="93" h="30" measuredW="68" measuredH="27" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>%26A%26dd%20%3E%3E</text>
+      </controlProperties>
+    </control>
+    <control controlID="44" controlTypeID="com.balsamiq.mockups::Button" x="509" y="309" w="93" h="30" measuredW="93" measuredH="27" zOrder="6" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>%3C%3C%20%26R%26emove</text>
+      </controlProperties>
+    </control>
+    <control controlID="45" controlTypeID="com.balsamiq.mockups::Button" x="509" y="347" w="93" h="30" measuredW="89" measuredH="27" zOrder="7" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Remove%20A%26l%26l</text>
+      </controlProperties>
+    </control>
+    <control controlID="49" controlTypeID="__group__" x="221" y="190" w="281" h="306" measuredW="281" measuredH="306" zOrder="8" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::Tree" x="0" y="0" w="280" h="306" measuredW="300" measuredH="225" zOrder="0" locked="false" isInGroup="49">
+          <controlProperties>
+            <selectedIndex>1</selectedIndex>
+            <text>%5B-%5D%20Time%20Based%20Samplig%20%28TBS%29%0A_%5BFFF%5C%5D%20Timer%20Sample%0A%5B+%5D%20Instruction%20Based%20Sampling%20%28IBS%29%0A%5B-%5D%20All%0A_%5B000%5C%5D%20Dispatched%20FPU%20ops%0A_%5B001%5C%5D%20Cycles%20in%20which%20the%20FPU%20is%20empty%0A_%5B002%5C%5D%20Dispatched%20fast%20flag%20PFU%20operations%0A_%5B003%5C%5D%20Retired%20SSE%20ops</text>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::VerticalScrollBar" x="265" y="0" w="-1" h="306" measuredW="16" measuredH="100" zOrder="1" locked="false" isInGroup="49"/>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="54" controlTypeID="__group__" x="617" y="419" w="399" h="145" measuredW="399" measuredH="145" zOrder="13" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::FieldSet" x="0" y="0" w="399" h="145" measuredW="200" measuredH="170" zOrder="0" locked="false" isInGroup="54">
+          <controlProperties>
+            <text>Event%20Settings</text>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::DataGrid" x="8" y="17" w="202" h="117" measuredW="173" measuredH="169" zOrder="1" locked="false" isInGroup="54">
+          <controlProperties>
+            <borderStyle>none</borderStyle>
+            <hasHeader>false</hasHeader>
+            <rowHeight>16</rowHeight>
+            <selectedIndex>-1</selectedIndex>
+            <text>Unit%20Mask%0A%5Bx%5D%2C%204K%20TLB%20reload%0A%5Bx%5D%2C%202M%20TLB%20reload%0A%5Bx%5D%2C%201G%20TLB%20reload%0A-%5B%20%5D-%2C%20-Reserved-%0A-%5B%20%5D-%2C%20-Reserved-%0A-%5B%20%5D-%2C%20-Reserved-%0A-%5B%20%5D-%2C%20-Reserved-%0A-%5B%20%5D-%2C%20-Reserved-</text>
+            <vLines>false</vLines>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="56" controlTypeID="com.balsamiq.mockups::Label" x="221" y="171" w="114" h="19" measuredW="102" measuredH="21" zOrder="14" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Available%20Events</text>
+      </controlProperties>
+    </control>
+    <control controlID="57" controlTypeID="com.balsamiq.mockups::Label" x="617" y="171" w="114" h="19" measuredW="106" measuredH="21" zOrder="15" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Monitored%20Events</text>
+      </controlProperties>
+    </control>
+    <control controlID="58" controlTypeID="com.balsamiq.mockups::FieldSet" x="212" y="152" w="810" h="439" measuredW="200" measuredH="170" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Profile%20Events</text>
+      </controlProperties>
+    </control>
+    <control controlID="59" controlTypeID="com.balsamiq.mockups::Label" x="212" y="124" w="-1" h="-1" measuredW="436" measuredH="21" zOrder="16" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Add%20an%20Event%20to%20the%20%27Monitored%20Events%27%20list%20to%20include%20it%20in%20the%20profile%20session</text>
+      </controlProperties>
+    </control>
+    <control controlID="61" controlTypeID="com.balsamiq.mockups::StickyNote" x="502" y="564" w="284" h="126" measuredW="109" measuredH="123" zOrder="17" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Currently%2C%20there%27s%20only%20one%20Custom%20profile.%0A%22Custom%20Profile%20name%22%20will%20be%20implemented%20in%20future%20versions</text>
+      </controlProperties>
+    </control>
+    <control controlID="62" controlTypeID="com.balsamiq.mockups::DataGrid" x="617" y="190" w="397" h="229" measuredW="479" measuredH="97" zOrder="9" locked="false" isInGroup="-1">
+      <controlProperties>
+        <rowHeight>16</rowHeight>
+        <selectedIndex>2</selectedIndex>
+        <text>Name%2C%20Interval%2C%20Unit%20Mask%2C%20Usr%2C%20Os%2C%20Edge%2C%0A%5C%5BFFF%5C%5D%20Timer%20Sample%2C%201%20ms%2C%2C%2C%2C%0A%5C%5B0C0%5C%5D%20Retired%20Instructions%2C%20250000%2C%200%2C%20%5Bx%5D%2C%20%5Bx%5D%2C%20%5B%20%5D%0A%5C%5B046%5C%5D%20L1%20DTLB%20and%20L2%20DTLB%20miss%2C%2025000%2C%200x7%2C%20%5Bx%5D%2C%20%5Bx%5D%2C%20%5B%20%5D%0A%5C%5BF100%5C%5D%20IBS%20all%20op%20samples%2C%20250000%2C%2C%2C%2C</text>
+      </controlProperties>
+    </control>
+    <control controlID="63" controlTypeID="com.balsamiq.mockups::VerticalScrollBar" x="1000" y="190" w="-1" h="229" measuredW="16" measuredH="100" zOrder="10" locked="false" isInGroup="-1"/>
+    <control controlID="64" controlTypeID="com.balsamiq.mockups::Tooltip" x="777" y="261" w="121" h="102" measuredW="131" measuredH="0" zOrder="11" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>4K%20TLB%20reload%0A2M%20TLB%20reload%0A1G%20TLB%20reload</text>
+        <tooltipDirection>NE</tooltipDirection>
+      </controlProperties>
+    </control>
+    <control controlID="65" controlTypeID="com.balsamiq.mockups::Tooltip" x="916" y="260" w="84" h="105" measuredW="85" measuredH="0" zOrder="12" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Count%20events%20in%20user%20code</text>
+      </controlProperties>
+    </control>
+    <control controlID="66" controlTypeID="com.balsamiq.mockups::VerticalScrollBar" x="1000" y="427" w="-1" h="137" measuredW="16" measuredH="100" zOrder="18" locked="false" isInGroup="-1"/>
+    <control controlID="67" controlTypeID="com.balsamiq.mockups::StickyNote" x="826" y="104" w="166" h="86" measuredW="109" measuredH="123" zOrder="19" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Checkboxes%20in%20the%20list%20control%20are%20functional</text>
+      </controlProperties>
+    </control>
+    <control controlID="68" controlTypeID="com.balsamiq.mockups::Arrow" x="942" y="171" w="32" h="60" measuredW="150" measuredH="100" zOrder="20" locked="false" isInGroup="-1">
+      <controlProperties>
+        <leftArrow>false</leftArrow>
+      </controlProperties>
+    </control>
+    <control controlID="69" controlTypeID="com.balsamiq.mockups::Tooltip" x="796" y="444" w="166" h="52" measuredW="173" measuredH="0" zOrder="21" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Tooltip%20describes%20each%20and%20every%20setting</text>
+        <tooltipDirection>SW</tooltipDirection>
+      </controlProperties>
+    </control>
+    <control controlID="70" controlTypeID="com.balsamiq.mockups::StickyNote" x="18" y="158" w="194" h="136" measuredW="109" measuredH="123" zOrder="22" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>When%20a%20parent%20tree%20node%20is%20sellected%20and%20the%20add%20button%20is%20clicked%2C%20all%20its%20child%20nodes%20are%20added%20to%20the%20monitored%20events%20list</text>
+      </controlProperties>
+    </control>
+    <control controlID="71" controlTypeID="com.balsamiq.mockups::Arrow" x="95" y="261" w="132" h="102" measuredW="150" measuredH="100" zOrder="23" locked="false" isInGroup="-1">
+      <controlProperties>
+        <curvature>-1</curvature>
+        <direction>top</direction>
+        <leftArrow>false</leftArrow>
+      </controlProperties>
+    </control>
+    <control controlID="72" controlTypeID="com.balsamiq.mockups::VerticalScrollBar" x="486" y="511" w="-1" h="72" measuredW="16" measuredH="100" zOrder="24" locked="false" isInGroup="-1"/>
+    <control controlID="73" controlTypeID="com.balsamiq.mockups::FieldSet" x="221" y="502" w="281" h="81" measuredW="200" measuredH="170" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Timer%20Sample</text>
+      </controlProperties>
+    </control>
+    <control controlID="74" controlTypeID="com.balsamiq.mockups::StickyNote" x="6" y="363" w="194" h="136" measuredW="109" measuredH="123" zOrder="25" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>When%20no%20event%20is%20selected%2C%20the%20description%20box%20will%20be%20hidden.</text>
+      </controlProperties>
+    </control>
+    <control controlID="75" controlTypeID="com.balsamiq.mockups::Arrow" x="95" y="462" w="132" h="102" measuredW="150" measuredH="100" zOrder="26" locked="false" isInGroup="-1">
+      <controlProperties>
+        <curvature>-1</curvature>
+        <direction>top</direction>
+        <leftArrow>false</leftArrow>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

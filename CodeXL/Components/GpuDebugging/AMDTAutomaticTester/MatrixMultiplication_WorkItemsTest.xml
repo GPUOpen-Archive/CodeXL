@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<CodeXL>
+    <Tests>
+	        <TestResultsDirectory>GoldMasters_APPSDK_2_9</TestResultsDirectory>
+        <LogFilesDirectory>C:\TEMP\testResults\</LogFilesDirectory>
+		<Test>
+            <ExecutablePath>samples\opencl\bin\x86\MatrixMultiplication.exe</ExecutablePath>
+            <WorkingDirectory>samples\opencl\bin\x86</WorkingDirectory>
+            <TestName>MatrixMultiplication_WorkItemsTest</TestName>
+            <TestType>WorkItemsTest</TestType>
+            <Kernels>
+                <Kernel>
+                    <KernelName>mmmKernel</KernelName>
+					<WorkItemId>0,0,0</WorkItemId>					
+					<KernelVariables>
+						<Variable name="widthA" line="43" x="0" y="0" z="0"></Variable>		
+                    </KernelVariables>
+                </Kernel>
+            </Kernels>
+        </Test>
+	</Tests>
+</CodeXL>       

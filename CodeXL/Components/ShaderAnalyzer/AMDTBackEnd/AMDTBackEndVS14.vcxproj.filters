@@ -1,0 +1,270 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="$(CommonDir)\Src\ADLUtil\ADLUtil.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\AMDTMutex\AMDTMutex.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\CElf\Src\CElf.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\CElf\Src\CElfSection.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\CElf\Src\CElfStringTable.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\CElf\Src\CElfSymbolTable.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\DeviceInfo\DeviceInfoInternal.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\DeviceInfo\DeviceInfoUtils.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\DynamicLibraryModule\ACLModule.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\DynamicLibraryModule\CALModule.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\DynamicLibraryModule\DXXModule.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\DynamicLibraryModule\DynamicLibraryModule.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\DynamicLibraryModule\OpenCLModule.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\GDT_Memory.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\ShaderUtils\DX10\D3D10ShaderObject.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\ShaderUtils\DX10\D3D10ShaderUtils.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\ShaderUtils\DX10\DXBCChecksum.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\ShaderUtils\DX10\IBlob.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\ShaderUtils\StringUtils.cpp" />
+    <ClCompile Include="src\beBackend.cpp" />
+    <ClCompile Include="src\beD3DIncludeManager.cpp" />
+    <ClCompile Include="src\beProgramBuilder.cpp" />
+    <ClCompile Include="src\beProgramBuilderDX.cpp" />
+    <ClCompile Include="src\beProgramBuilderOpenCL.cpp" />
+    <ClCompile Include="Emulator\Parser\ParserSISMRD.cpp">
+      <Filter>Emulator\Parser\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Parser\ParserSISOP1.cpp">
+      <Filter>Emulator\Parser\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Parser\ParserSISOP2.cpp">
+      <Filter>Emulator\Parser\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Parser\ParserSISOPC.cpp">
+      <Filter>Emulator\Parser\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Parser\ParserSISOPK.cpp">
+      <Filter>Emulator\Parser\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Parser\ParserSISOPP.cpp">
+      <Filter>Emulator\Parser\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Parser\ParserSIVINTRP.cpp">
+      <Filter>Emulator\Parser\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Parser\ParserSIVOP.cpp">
+      <Filter>Emulator\Parser\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Parser\ParserSI.cpp">
+      <Filter>Emulator\Parser\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Parser\ParserSIDS.cpp">
+      <Filter>Emulator\Parser\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Parser\ParserSIMTBUF.cpp">
+      <Filter>Emulator\Parser\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Parser\ParserSIMUBUF.cpp">
+      <Filter>Emulator\Parser\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Parser\ISAParser.cpp">
+      <Filter>Emulator\Parser\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Parser\ISAProgramGraph.cpp">
+      <Filter>Emulator\Parser\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Parser\ParserSIEXP.cpp">
+      <Filter>Emulator\Parser\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Parser\ParserSIMIMG.cpp">
+      <Filter>Emulator\Parser\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Scheduler\BranchUnitScheduler.cpp">
+      <Filter>Emulator\Scheduler\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Scheduler\CUScheduler.cpp">
+      <Filter>Emulator\Scheduler\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Scheduler\UTDPScheduler.cpp">
+      <Filter>Emulator\Scheduler\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Scheduler\WorkGroup.cpp">
+      <Filter>Emulator\Scheduler\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Emulator\Parser\Instruction.cpp">
+      <Filter>Emulator\Parser\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\beDriverUtils.cpp" />
+    <ClCompile Include="src\beProgramBuilderVulkan.cpp" />
+    <ClCompile Include="src\beProgramBuilderOpenGL.cpp" />
+    <ClCompile Include="src\beUtils.cpp" />
+    <ClCompile Include="src\beStaticIsaAnalyzer.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\ACLModuleManager\ACLModuleManager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(CommonDir)\Src\ADLUtil\ADLUtil.h" />
+    <ClInclude Include="$(CommonDir)\Src\AMDTMutex\AMDTMutex.h" />
+    <ClInclude Include="$(CommonDir)\Src\CElf\Include\CElf.h" />
+    <ClInclude Include="$(CommonDir)\Src\DeviceInfo\DeviceInfo.h" />
+    <ClInclude Include="$(CommonDir)\Src\DeviceInfo\DeviceInfoUtils.h" />
+    <ClInclude Include="$(CommonDir)\Src\DynamicLibraryModule\ACLModule.h" />
+    <ClInclude Include="$(CommonDir)\Src\DynamicLibraryModule\CALModule.h" />
+    <ClInclude Include="$(CommonDir)\Src\DynamicLibraryModule\DXXModule.h" />
+    <ClInclude Include="$(CommonDir)\Src\DynamicLibraryModule\DynamicLibraryModule.h" />
+    <ClInclude Include="$(CommonDir)\Src\DynamicLibraryModule\OpenCLModule.h" />
+    <ClInclude Include="$(CommonDir)\Src\GDT_Memory.h" />
+    <ClInclude Include="$(CommonDir)\Src\ShaderUtils\DX10\D3D10ShaderObject.h" />
+    <ClInclude Include="$(CommonDir)\Src\ShaderUtils\DX10\D3D10ShaderUtils.h" />
+    <ClInclude Include="$(CommonDir)\Src\ShaderUtils\DX10\DXBCChecksum.h" />
+    <ClInclude Include="$(CommonDir)\Src\ShaderUtils\DX10\IBlob.h" />
+    <ClInclude Include="$(CommonDir)\Src\ShaderUtils\StringUtils.h" />
+    <ClInclude Include="Include\beAMDTBackEndDllBuild.h" />
+    <ClInclude Include="Include\beBackend.h" />
+    <ClInclude Include="Include\beD3DIncludeManager.h" />
+    <ClInclude Include="Include\beInclude.h" />
+    <ClInclude Include="Include\beProgramBuilder.h" />
+    <ClInclude Include="Include\beProgramBuilderDX.h" />
+    <ClInclude Include="Include\beProgramBuilderOpenCL.h" />
+    <ClInclude Include="Include\beStringConstants.h" />
+    <ClInclude Include="Emulator\Parser\ParserSISMRD.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\ParserSISOP1.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\ParserSISOP2.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\ParserSISOPC.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\ParserSISOPK.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\ParserSISOPP.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\ParserSIVINTRP.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\Instruction.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\ISAParser.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\ISAProgramGraph.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\MIMGInstruction.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\MTBUFInstruction.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\MUBUFInstruction.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\ParserSI.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\ParserSIDS.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\ParserSIMIMG.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\ParserSIMTBUF.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\ParserSIMUBUF.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\DSInstruction.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\EXPInstruction.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\GenericInstructionFields1.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\GenericInstructionFields2.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\ParserSIEXP.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\ParserSIVOP.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\ScalarInstructionFields.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\SMRDInstruction.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\SOP1Instruction.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\SOP2Instruction.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\SOPCInstruction.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\SOPKInstruction.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\SOPPInstruction.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\VINTRPInstruction.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Parser\VOPInstruction.h">
+      <Filter>Emulator\Parser\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Scheduler\BranchUnitScheduler.h">
+      <Filter>Emulator\Scheduler\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Scheduler\CUScheduler.h">
+      <Filter>Emulator\Scheduler\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Scheduler\UTDPScheduler.h">
+      <Filter>Emulator\Scheduler\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Scheduler\WaveFront.h">
+      <Filter>Emulator\Scheduler\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Emulator\Scheduler\WorkGroup.h">
+      <Filter>Emulator\Scheduler\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\beDriverUtils.h" />
+    <ClInclude Include="Include\beProgramBuilderVulkan.h" />
+    <ClInclude Include="Include\beDataTypes.h" />
+    <ClInclude Include="Include\beProgramBuilderOpenGL.h" />
+    <ClInclude Include="Include\beUtils.h" />
+    <ClInclude Include="Include\beStaticIsaAnalyzer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Emulator">
+      <UniqueIdentifier>{79db8483-cac8-45cf-adec-9dc58c876f59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Emulator\Parser">
+      <UniqueIdentifier>{68aea01b-5742-44ef-84d8-bf8513f1dc3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Emulator\Parser\include">
+      <UniqueIdentifier>{912fecee-bcad-42dd-bd4b-fd284b5e7ff2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Emulator\Parser\src">
+      <UniqueIdentifier>{c0376349-24cd-482a-b609-b2a0b9f318a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Emulator\Scheduler">
+      <UniqueIdentifier>{b8e96047-4075-436b-b3fa-89df7281f47f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Emulator\Scheduler\include">
+      <UniqueIdentifier>{cde72656-5da4-45f1-abf8-68ec44c97c12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Emulator\Scheduler\src">
+      <UniqueIdentifier>{b5b7f086-f04f-4efe-88ca-2ce40b567e7c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
+  </ItemGroup>
+</Project>

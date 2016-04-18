@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<CodeXL>
+    <Tests>
+	        <TestResultsDirectory>GoldMasters_APPSDK_2_9</TestResultsDirectory>
+        <LogFilesDirectory>C:\TEMP\testResults\</LogFilesDirectory>
+		<Test>
+            <ExecutablePath>samples\opencl\bin\x86_64\DwtHaar1D.exe</ExecutablePath>
+            <WorkingDirectory>samples\opencl\bin\x86_64\</WorkingDirectory>
+            <TestName>DwtHaar1D_WorkItemsTest</TestName>
+            <TestType>WorkItemsTest</TestType>
+            <Kernels>
+                <Kernel>
+                    <KernelName>dwtHaar1D</KernelName>
+					<WorkItemId>0,0,0</WorkItemId>					
+					<KernelVariables>
+						<Variable name="rsqrt_two" line="72" x="0" y="0" z="0"></Variable>
+                    </KernelVariables>
+                </Kernel>
+            </Kernels>
+        </Test>
+	</Tests>
+</CodeXL>       

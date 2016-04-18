@@ -1,0 +1,376 @@
+﻿<html>
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0;">
+    <title>Welcome to CodeXL</title>
+    <script type="text/javascript">
+        var doc = document.getElementById('doc');
+        doc.removeAttribute('class', 'no-js');
+        doc.setAttribute('class', 'js');
+        var current_mode = 'debug';       
+        function clickButton(action) {
+            console.log(action);
+        }
+
+        function godebug() {
+            document.getElementById('main_image').src = './welcomepage_debug_large.png';
+            document.getElementById('debug_side_image').src = './arrow.png';
+            document.getElementById('profile_side_image').src = './empty.png';
+            document.getElementById('analyze_side_image').src = './empty.png';
+            document.getElementById('frame_analyze_side_image').src = './empty.png';
+            document.getElementById('analyze_image').src = './welcomepage_analyze.png';
+            document.getElementById('frame_analyze_image').src = './welcomepage_frame_analyze.png';
+            document.getElementById('profile_image').src = './welcomepage_profile.png';
+            document.getElementById('debug_image').src = './welcomepage_debug_selected.png';
+            document.getElementById('debug_div').style.visibility = 'visible';
+            document.getElementById('profile_div').style.visibility = 'hidden';
+            document.getElementById('frame_analyze_div').style.visibility = 'hidden';
+            document.getElementById('analyze_div_windows').style.visibility = 'hidden';
+            document.getElementById('analyze_div_linux').style.visibility = 'hidden';
+            document.getElementById('debug_div').style.height = 'auto';
+            document.getElementById('profile_div').style.height = '0px';
+            document.getElementById('frame_analyze_div').style.height = '0px';
+            document.getElementById('analyze_div_windows').style.height = '0px';
+            document.getElementById('analyze_div_linux').style.height = '0px';
+            document.getElementById('debug_div').style.minHeight = '300px';
+            document.getElementById('profile_div').style.minHeight = '0px';
+            document.getElementById('frame_analyze_div').style.minHeight = '0px';
+            document.getElementById('analyze_div_windows').style.minHeight = '0px';
+            document.getElementById('analyze_div_linux').style.minHeight = '0px';
+            current_mode = 'debug';
+        }
+        function goprofile() {
+            document.getElementById('main_image').src = './welcomepage_profile_large.png';
+            document.getElementById('profile_side_image').src = './arrow.png';
+            document.getElementById('debug_side_image').src = './empty.png';
+            document.getElementById('analyze_side_image').src = './empty.png';
+            document.getElementById('frame_analyze_side_image').src = './empty.png';
+            document.getElementById('frame_analyze_image').src = './welcomepage_frame_analyze.png';
+            document.getElementById('analyze_image').src = './welcomepage_analyze.png';
+            document.getElementById('debug_image').src = './welcomepage_debug.png';
+            document.getElementById('profile_image').src = './welcomepage_profile_selected.png';
+            document.getElementById('profile_div').style.visibility = 'visible';
+            document.getElementById('frame_analyze_div').style.visibility = 'hidden';
+            document.getElementById('debug_div').style.visibility = 'hidden';
+            document.getElementById('analyze_div_windows').style.visibility = 'hidden';
+            document.getElementById('analyze_div_linux').style.visibility = 'hidden';
+            document.getElementById('profile_div').style.height = 'auto';
+            document.getElementById('frame_analyze_div').style.height = '0px';
+            document.getElementById('debug_div').style.height = '0px';
+            document.getElementById('analyze_div_windows').style.height = '0px';
+            document.getElementById('analyze_div_linux').style.height = '0px';
+            document.getElementById('profile_div').style.minHeight = '300px';
+            document.getElementById('frame_analyze_div').style.minHeight = '0px';
+            document.getElementById('debug_div').style.minHeight = '0px';
+            document.getElementById('analyze_div_windows').style.minHeight = '0px';
+            document.getElementById('analyze_div_linux').style.minHeight = '0px';
+            current_mode = 'profile';
+        }
+        function goframeanalyze() {
+            window.OSName = 'Linux';
+            if (navigator.appVersion.indexOf("Win") != -1) window.OSName = 'Windows';
+            document.getElementById('main_image').src = './welcomepage_frame_analyze_large.png';
+            document.getElementById('frame_analyze_side_image').src = './arrow.png';
+            document.getElementById('analyze_side_image').src = './empty.png';
+            document.getElementById('profile_side_image').src = './empty.png';
+            document.getElementById('debug_side_image').src = './empty.png';
+            document.getElementById('frame_analyze_image').src = './welcomepage_frame_analyze_selected.png';
+            document.getElementById('analyze_image').src = './welcomepage_analyze.png';
+            document.getElementById('profile_image').src = './welcomepage_profile.png';
+            document.getElementById('debug_image').src = './welcomepage_debug.png';
+            document.getElementById('frame_analyze_div').style.visibility = 'visible';
+            document.getElementById('profile_div').style.visibility = 'hidden';
+            document.getElementById("debug_div").style.visibility = 'hidden';
+            document.getElementById("analyze_div_windows").style.visibility = 'hidden';
+            document.getElementById("analyze_div_linux").style.visibility = 'hidden';
+            document.getElementById('frame_analyze_div').style.height = 'auto';
+            document.getElementById('profile_div').style.height = '0px';
+            document.getElementById('debug_div').style.height = '0px';
+            document.getElementById('analyze_div_windows').style.height = '0px';
+            document.getElementById('analyze_div_linux').style.height = '0px';
+            document.getElementById('frame_analyze_div').style.minHeight = '300px';
+            document.getElementById('profile_div').style.minHeight = '0px';
+            document.getElementById('debug_div').style.minHeight = '0px';
+            document.getElementById('analyze_div_windows').style.minHeight = '0px';
+            document.getElementById('analyze_div_linux').style.minHeight = '0px';
+            current_mode = 'frame_analyze';
+        }
+        function goanalyze() {
+            window.OSName = 'Linux';
+            if (navigator.appVersion.indexOf("Win") != -1) window.OSName = 'Windows';
+            document.getElementById('main_image').src = './welcomepage_analyze_large.png';
+            document.getElementById('analyze_side_image').src = './arrow.png';
+            document.getElementById('profile_side_image').src = './empty.png';
+            document.getElementById('frame_analyze_side_image').src = './empty.png';
+            document.getElementById('debug_side_image').src = './empty.png';
+            document.getElementById('analyze_image').src = './welcomepage_analyze_selected.png';
+            document.getElementById('frame_analyze_image').src = './welcomepage_frame_analyze.png';
+            document.getElementById('profile_image').src = './welcomepage_profile.png';
+            document.getElementById('frame_analyze_image').src = './welcomepage_frame_analyze.png';
+            document.getElementById('debug_image').src = './welcomepage_debug.png';
+            document.getElementById('profile_div').style.visibility = 'hidden';
+            document.getElementById('frame_analyze_div').style.visibility = 'hidden';
+            document.getElementById("debug_div").style.visibility = 'hidden';
+            document.getElementById('profile_div').style.height = '0px';
+            document.getElementById('frame_analyze_div').style.height = '0px';
+            document.getElementById('debug_div').style.height = '0px';
+            document.getElementById('profile_div').style.minHeight = '0px';
+            document.getElementById('debug_div').style.minHeight = '0px';
+            document.getElementById('frame_analyze_div').style.minHeight = '0px';
+            if (window.OSName == 'Windows') goanalyze_Windows();
+            if (window.OSName != 'Windows') goanalyze_Linux();
+            current_mode = 'analyze';
+        }
+        function goanalyze_Windows() {
+            document.getElementById('analyze_div_windows').style.visibility = 'visible';
+            document.getElementById('analyze_div_windows').style.height = 'auto';
+            document.getElementById('analyze_div_windows').style.minHeight = '300px';
+        }
+        function goanalyze_Linux() {
+            document.getElementById('analyze_div_linux').style.visibility = 'visible';
+            document.getElementById('analyze_div_linux').style.height = 'auto';
+            document.getElementById('analyze_div_linux').style.minHeight = '300px';
+        }
+        function init()
+        {
+            godebug();
+            
+            window.OSName = 'Linux';
+            if (navigator.appVersion.indexOf("Win") != -1) window.OSName = 'Windows';
+            if (window.OSName == 'Linux')
+            {
+                document.getElementById('d3d12multithreading_tr').style.visibility = 'hidden';
+                document.getElementById('fa_button_tr').style.visibility = 'hidden';
+                document.getElementById('fa_button_tr').style.minHeight = '0px';
+                document.getElementById('fa_button_tr').style.height = '0px';
+                
+                document.getElementById('frame_analyze_side_image').style.height = '0px';
+                document.getElementById('frame_analyze_side_image').style.minHeight = '0px';
+                document.getElementById('frame_analyze_side_image').style.visibility = 'hidden';
+                
+                document.getElementById('frame_analyze_image').style.height = '0px';
+                document.getElementById('frame_analyze_image').style.minHeight = '0px';
+                document.getElementById('frame_analyze_image').style.visibility = 'hidden';
+                
+                document.getElementById('frame_analyze_div').style.visibility = 'hidden';
+                document.getElementById('frame_analyze_div').style.minHeight = '0px';
+                document.getElementById('frame_analyze_div').style.height = '0px';
+            }
+        }
+    </script>
+    <link rel="stylesheet" type="text/css" href="welcome.css">
+    <link rel='stylesheet' media='screen and (max-width: 1300px)' href='low_resolution.css' />
+</head>
+    <body id="page" onload="init();">
+        <div class="wrapper">
+            <div id="content">
+                <table cellpadding="0" cellspacing="0" style="width:90%; margin: 0px 0px 0px 0px;">
+                    <tr>
+                        <td></td>
+                        <td id="main_image_td" class="white_bg" class="middle_td">
+                            <img id="main_image" src=".\welcomepage_debug_large.png" />
+                        </td>
+                        <td width="100%">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-top:10px; padding-right: 20px; margin-right:0;">
+                            <table cellspacing="0" style="height:100%; border-spacing: 0px 0px;">
+                                <tr class='clickableRow' onclick="godebug()">
+                                    <td><img id="debug_side_image" src="arrow.png" /></td>
+                                    <td><img id="debug_image" src="welcomepage_debug_selected.png" onmouseover="document.getElementById('debug_image').src = './welcomepage_debug_selected.png';" onmouseout="if (current_mode != 'debug') document.getElementById('debug_image').src = './welcomepage_debug.png';" /></td>
+                                </tr>
+                                <tr class='clickableRow' onclick="goprofile()">
+                                    <td><img id="profile_side_image" src="empty.png" /></td>
+                                    <td><img id="profile_image" src="welcomepage_profile.png" onmouseover="document.getElementById('profile_image').src = './welcomepage_profile_selected.png';" onmouseout="if (current_mode != 'profile') document.getElementById('profile_image').src = './welcomepage_profile.png';" /></td>
+                                </tr>
+                                <tr id="fa_button_tr" class='clickableRow' onclick="goframeanalyze()">
+                                    <td><img id="frame_analyze_side_image" src="empty.png" /></td>
+                                    <td><img id="frame_analyze_image" src="welcomepage_frame_analyze.png" onmouseover="document.getElementById('frame_analyze_image').src = './welcomepage_frame_analyze_selected.png';" onmouseout="if (current_mode != 'frame_analyze') document.getElementById('frame_analyze_image').src = './welcomepage_frame_analyze.png';" /></td>
+                                </tr>
+                                <tr class='clickableRow' onclick="goanalyze()">
+                                    <td><img id="analyze_side_image" src="empty.png" /></td>
+                                    <td><img id="analyze_image" src="welcomepage_analyze.png" onmouseover="document.getElementById('analyze_image').src = './welcomepage_analyze_selected.png';" onmouseout="    if (current_mode != 'analyze') document.getElementById('analyze_image').src = './welcomepage_analyze.png';" /></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td id="frame_td" class="middle_td">
+                            <div id="debug_div" class="white_bg" style="height:0px">
+                                <table cellspacing="0" id="mode_table" class="white_bg">
+                                    <tr class='clickableRow' onclick='clickButton("new_project_debug")'>
+                                        <td><img src="debug_new.png" /></td>
+                                        <td style="vertical-align:top; ">
+                                            <div class="clickableRow_title">
+                                                Create a new project for debugging
+                                            </div>
+                                            <div class="clickableRow_text">
+                                                Debugging allows you to set breakpoints, watch variables, step through OpenCL kernels and much more.<br> Automatically selects Debug mode.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div id="profile_div" class="white_bg" style="visibility:hidden;height:0px">
+                                <table cellspacing="0" id="mode_table">
+                                    <tr class='clickableRow' onclick='clickButton("new_project_profile")'>
+                                        <td><img src="profile_new.png" /></td>
+                                        <td style="vertical-align:top; ">
+                                            <div class="clickableRow_title">
+                                                Create a new project for profiling
+                                            </div>
+                                            <div class="clickableRow_text">
+                                                Profile code that runs on the CPU or the GPU. Select a session type to define what data is collected.<br>Automatically selects Profile mode.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class='clickableRow' onclick='clickButton("attach_to_process")'>
+                                        <td><img src="profile_attach.png" /></td>
+                                        <td style="vertical-align:top; ">
+                                            <div class="clickableRow_title">
+                                                Attach to Process
+                                            </div>
+                                            <div class="clickableRow_text">
+                                                Select a currently running process and CodeXL will begin collecting CPU profiling data.<br>The type of data collected is defined by CodeXL's current profile session type.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class='clickableRow' onclick='clickButton("system_wide")'>
+                                        <td><img src="profile_system.png" /></td>
+                                        <td style="vertical-align:top; ">
+                                            <div class="clickableRow_title">
+                                                System-wide Profiling
+                                            </div>
+                                            <div class="clickableRow_text">CodeXL will begin collecting CPU profiling or Power profiling data from all currently running processes.<br>The type of data collected is defined by CodeXL's current profile session type.</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div id="frame_analyze_div" class="white_bg" style="height:0px">
+                                <table cellspacing="0" id="mode_table" class="white_bg">
+                                    <tr class='clickableRow' onclick='clickButton("new_project_frame_analyze")'>
+                                        <td><img src="frame_analyze_new.png" /></td>
+                                        <td style="vertical-align:top; ">
+                                            <div class="clickableRow_title">
+                                                Create a new project for DirectX 12 or Vulkan Frame Analysis
+                                            </div>
+                                            <div class="clickableRow_text">
+                                                Launch a DirectX 12 or Vulkan based game/graphics application, capture individual frames and analyze their CPU and GPU timeline data
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div id="analyze_div_windows" class="analyze_bg" style="visibility:hidden; height:0px">
+                                <table cellspacing="0" id="mode_table">
+                                    <tr class='clickableRow' onclick='clickButton("new_analyze")' id="analyze_btn1">
+                                        <td><img src="analyze_new.png" /></td>
+                                        <td style="vertical-align:top; ">
+                                            <div class="clickableRow_title">
+                                                Create a new source file
+                                            </div>
+                                            <div class="clickableRow_text">
+                                                Create a source file, and build it for multiple hardware targets, to analyze the generated ISA, IL and performance statistics.<br>The supported platforms are: OpenGL, Vulkan, DirectX and OpenCL.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class='clickableRow' onclick='clickButton("add_analyze")' id="analyze_btn2">
+                                        <td><img src="analyze_add.png" /></td>
+                                        <td style="vertical-align:top; ">
+                                            <div class="clickableRow_title">
+                                                Add an existing source file</a>
+                                            </div>
+                                            <div class="clickableRow_text">
+                                                Add an existing source file, and build it for multiple hardware targets, to analyze the generated ISA, IL and performance statistics.<br>The supported platforms are: OpenGL, Vulkan, DirectX and OpenCL.
+                                            </div>
+                                        </td>
+                                    <tr class="clickableRow" id="analyze_na" style="visibility:hidden;">
+                                        <td><img src=" analyze_new.png" /></td>
+                                        <td style="vertical-align:top; ">
+                                            <div class="clickableRow_title">
+                                                Analyze Mode is not available
+                                            </div>
+                                            <div class="clickableRow_text">
+                                                AMD Radeon Software driver is not installed. To enable analyze mode, please install AMD Radeon Software driver.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div id="analyze_div_linux" class="analyze_bg" style="visibility:hidden; height:0px">
+                                <table cellspacing="0" id="mode_table">
+                                    <tr class='clickableRow' onclick='clickButton("new_analyze")' id="analyze_btn1">
+                                        <td><img src="analyze_new.png" /></td>
+                                        <td style="vertical-align:top; ">
+                                            <div class="clickableRow_title">
+                                                Create a new source file
+                                            </div>
+                                            <div class="clickableRow_text">
+                                                Create a source file and build it for multiple hardware targets, to analyze the generated ISA, IL and performance statistics.<br>The supported platforms are: OpenGL, Vulkan, DirectX and OpenCL.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class='clickableRow' onclick='clickButton("add_analyze")' id="analyze_btn2">
+                                        <td><img src="analyze_add.png" /></td>
+                                        <td style="vertical-align:top; ">
+                                            <div class="clickableRow_title">
+                                                Add an existing source file</a>
+                                            </div>
+                                            <div class="clickableRow_text">
+                                                Add an existing source file, and build it for multiple hardware targets, to analyze the generated ISA, IL and performance statistics.<br>The supported platforms are: OpenGL, Vulkan, DirectX and OpenCL.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="clickableRow" id="analyze_na" style="visibility:hidden;">
+                                        <td><img src=" analyze_new.png" /></td>
+                                        <td style="vertical-align:top; ">
+                                            <div class="clickableRow_title">
+                                                Analyze Mode is not available
+                                            </div>
+                                            <div class="clickableRow_text">
+                                                AMD Radeon Software driver is not installed. To enable analyze mode, please install AMD Radeon Software driver.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td id="recent_td">
+                            <table id="recent_table">
+                                <thead><img src='recent_projects.png' /></thead>
+                                <tbody>
+                                    <tr><td><a onclick='clickButton("open_project_codexlteapot")'>CodeXL Teapot</a></td></tr>
+                                </tbody>
+                            </table>
+                        </td>
+                        <td class="middle_td">
+                            <table id="sample_table">
+                                <thead><img src='samples.png' /></thead>
+                                <tbody>
+                                    <tr><td><a onclick='clickButton("load_teapot")'>CodeXL Teapot</a></td></tr>
+                                    <tr><td><a onclick='clickButton("load_matmul")'>CodeXL Matrix Multiply</a></td></tr>
+                                    <tr id=d3d12multithreading_tr><td><a onclick='clickButton("load_d3d12multithreading")'>D3D12Multithreading</a></td></tr>
+                                </tbody>
+                            </table>
+                        </td>
+                        <td>&nbsp;</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="push"></div>
+        </div>
+        <div class="footer">
+            <div id="footer_in">
+                <table width=100%>
+                    <tr>
+                        <td>
+                            <ul style="white-space:nowrap">
+                                <li><a href="" onclick='clickButton("show_help")'>User Guide</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="" onclick='clickButton("show_quick_start")'>Getting Started</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="" onclick='clickButton("show_website")'>CodeXL Web Site</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="" onclick='    clickButton("show_about")'>About CodeXL</a></li>
+                            </ul>
+                        </td>
+                        <td align=right><img src="StartupPage_CodeXLLogo.png"></img></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </body>

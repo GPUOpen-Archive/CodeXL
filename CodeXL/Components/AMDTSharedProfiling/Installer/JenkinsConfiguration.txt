@@ -1,0 +1,64 @@
+// AMDTSharedProfiling
+
+// "P4ROOT" is passed in by the build script from Hudson
+
+Define "ASPPATH" "[P4ROOT]\main\CommonProjects\AMDTSharedProfiling"
+
+Always
+   Log "[P4ROOT]\AMDTSharedProfiling_Build.log"
+
+   Define "MAJOR" "1"
+   Define "MINOR" "0"
+   Define "UPDATE" "0"
+
+Version Image
+//   Version "[ASPPATH]\vs\AMDTSharedProfiling.rc" "FILEVERSION [GETMAJOR],[GETMINOR],[0-9]+,[0-9]+"
+
+   // update version number in AMDTSharedProfiling.rc
+//   Replace "[ASPPATH]\vs\AMDTSharedProfiling.rc" "(VALUE \"FileVersion\",\s\")[0-9]+\.[0-9]+\.[0-9]+" "$1[MAJOR].[MINOR].[BUILD]"
+//   Replace "[ASPPATH]\vs\AMDTSharedProfiling.rc" "(VALUE \"ProductVersion\",\s\")[0-9]+\.[0-9]+\.[0-9]+" "$1[MAJOR].[MINOR].[BUILD]"
+//   Replace "[ASPPATH]\vs\AMDTSharedProfiling.rc" "FILEVERSION [0-9]+\,[0-9]+\,[0-9]+" "FILEVERSION [MAJOR],[MINOR],[BUILD]"
+//   Replace "[ASPPATH]\vs\AMDTSharedProfiling.rc" "PRODUCTVERSION [0-9]+\,[0-9]+\,[0-9]+" "PRODUCTVERSION  [MAJOR],[MINOR],[BUILD]"
+
+
+Image
+   // need to copy the necessary files to make a zip for delivery into Common
+   Define "ZIPDIR" "[ASPPATH]\Installer\AMDTSharedProfiling-[MAJOR].[MINOR].[BUILD].[UPDATE]"
+
+   MKDIR "[ZIPDIR]"
+   MKDIR "[ZIPDIR]\Lib"
+   MKDIR "[ZIPDIR]\Lib\x86"
+   MKDIR "[ZIPDIR]\Include"
+
+Debug
+   // build the debug version
+   BuildSln "[ASPPATH]\AMDTSharedProfiling.sln" "" "Build"     "Debug|Win32"
+
+Image
+   // copy the debug build artifacts
+   Copy "[ASPPATH]\bin\Debug-Win32\AMDTSharedProfiling\AMDTSharedProfiling-d.dll" "[ZIPDIR]\Lib\x86"
+   Copy "[ASPPATH]\bin\Debug-Win32\AMDTSharedProfiling\AMDTSharedProfiling-d.lib" "[ZIPDIR]\Lib\x86"
+   Copy "[ASPPATH]\bin\Debug-Win32\AMDTSharedProfiling\AMDTSharedProfiling-d.pdb" "[ZIPDIR]\Lib\x86"
+
+Clean
+   // clean the debug version
+   BuildSln "[ASPPATH]\AMDTSharedProfiling.sln" "" "Clean"     "Debug|Win32"
+
+Release
+   // build the release version
+   BuildSln "[ASPPATH]\AMDTSharedProfiling.sln" "" "Build"   "Release|Win32"
+
+Always
+   SendBuildErrors "[EMAIL]" "AMDTSharedProfiling Build Failed"
+  
+Image
+   // copy the release build artifacts
+   Copy "[ASPPATH]\bin\Release-Win32\AMDTSharedProfiling\AMDTSharedProfiling.dll" "[ZIPDIR]\Lib\x86"
+   Copy "[ASPPATH]\bin\Release-Win32\AMDTSharedProfiling\AMDTSharedProfiling.lib" "[ZIPDIR]\Lib\x86"
+   Copy "[ASPPATH]\bin\Release-Win32\AMDTSharedProfiling\AMDTSharedProfiling.pdb" "[ZIPDIR]\Lib\x86"
+
+   // copy the header files
+   XCopy "[ASPPATH]\inc\*.h"                           "[ZIPDIR]\Include"
+
+   // generate the public zip
+   Zip "[ASPPATH]\Installer\AMDTSharedProfiling-[MAJOR].[MINOR].[BUILD].[UPDATE].zip" "[ZIPDIR]"

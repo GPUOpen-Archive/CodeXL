@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{315ff7e7-e485-4846-913c-0d5b7986c8c5}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="inc">
+      <UniqueIdentifier>{c3bc944d-8472-4f72-b633-4a28795e5bfe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Include">
+      <UniqueIdentifier>{7d69dbc7-37bb-44b5-9795-b9615fa38c37}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{4db1fe83-2e16-4ff5-99a4-bcfea9e329a8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="$(CommonProjectsDir)\VersionInfo\VersionResource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\AMDTRemoteClientBuild.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\RemoteClientUtils.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\RemoteClientDataTypes.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\CXLDaemonClient.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\CXLDaemonClient.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RemoteClientUtils.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

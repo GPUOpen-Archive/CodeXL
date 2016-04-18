@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Server\WebServer\GPUPerfServer.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="$(CommonDir)\Src\AMDTApplication\res\ApplicationIcon.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\Server\WebServer\GPUPerfServer.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Server\WebServer\Commands.cpp" />
+    <ClCompile Include="..\..\Server\WebServer\Inject.cpp" />
+    <ClCompile Include="..\..\Server\WebServer\OSDependent.cpp" />
+    <ClCompile Include="..\..\Server\WebServer\ProcessTracker.cpp" />
+    <ClCompile Include="..\..\Server\WebServer\Registry.cpp" />
+    <ClCompile Include="..\..\Server\WebServer\WebServer.cpp" />
+    <ClCompile Include="..\..\Server\WebServer\PluginResponseThread.cpp" />
+    <ClCompile Include="..\..\Server\WebServer\RenderStallThread.cpp" />
+    <ClCompile Include="..\..\Server\WebServer\ShutdownThread.cpp" />
+    <ClCompile Include="..\..\Server\WebServer\ClientRequestThread.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Server\WebServer\Commands.h" />
+    <ClInclude Include="..\..\Server\WebServer\Inject.h" />
+    <ClInclude Include="..\..\Server\WebServer\OSDependent.h" />
+    <ClInclude Include="..\..\Server\WebServer\ProcessTracker.h" />
+    <ClInclude Include="..\..\Server\WebServer\Registry.h" />
+    <ClInclude Include="..\..\Server\WebServer\resource.h" />
+    <ClInclude Include="..\..\Server\WebServer\ServerDefinitions.h" />
+    <ClInclude Include="..\..\Server\WebServer\WebServer.h" />
+    <ClInclude Include="..\..\Server\WebServer\PluginResponseThread.h" />
+    <ClInclude Include="..\..\Server\WebServer\RenderStallThread.h" />
+    <ClInclude Include="..\..\Server\WebServer\ShutdownThread.h" />
+    <ClInclude Include="..\..\Server\WebServer\RequestInFlight.h" />
+    <ClInclude Include="..\..\Server\WebServer\ClientRequestThread.h" />
+    <ClInclude Include="..\..\Server\WebServer\RequestsInFlightDatabase.h" />
+  </ItemGroup>
+</Project>

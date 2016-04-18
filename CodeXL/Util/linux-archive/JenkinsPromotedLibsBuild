@@ -1,0 +1,128 @@
+#!/bin/sh
+# Top level jenkins script to build for promoted AMDT libraries, and verify
+# that the built results have all of the expected bits.
+# Performs builds for 32 and 64 bit versions
+# An optional parameter is the build number.
+#   If no build number is passed in, do not modify the version file
+# Also generate CodeXL-Linux[x86|x86_64].xml file for the updater
+
+export AMD_PERFORCE_ROOT=$WORKSPACE
+export AMD_AMDLIBS=$AMD_PERFORCE_ROOT/main/Common/Lib/AMD
+export AMD_EXTLIBS=$AMD_PERFORCE_ROOT/main/Common/Lib/Ext
+export AMD_OUTPUT=$AMD_PERFORCE_ROOT/main/Output
+export AMD_CODEXL=$AMD_PERFORCE_ROOT/main/CodeXL
+export AMD_WS_LINUX_UTIL_DIR=$AMD_CODEXL/Util/linux
+
+export NARGS=$#
+export VERSION_MAJOR=6
+export VERSION_MINOR=3
+export VERSION_BUILD=0
+export VERSION_UPDATE=0
+export VERSIONINFO_FILE=${AMD_CODEXL}/../CommonProjects/VersionInfo/VersionInfo.h
+
+export CONFIG_FILE_BASE=CodeXL-Linux
+
+NUM_ERRORS=0
+
+if [ ${NARGS} -gt 1 ]
+then
+    echo "Usage: $0 [optional build number]"
+    exit 1
+fi
+# if a build number is passed in, set the version information.
+# the default is to leave it in the original form (meaning a local developer build)
+if [ ${NARGS} -eq 1 ]
+then
+    VERSION_BUILD=$1
+    # Edit the version file - in situ.  A different approach would be to
+    # dynamically generate said file (perhaps in the future)
+    chmod 666 ${VERSIONINFO_FILE}
+    CHM_RC=$?
+    NUM_ERRORS=`expr ${NUM_ERRORS} + ${CHM_RC}`
+    if [ ${CHM_RC} -ne 0 ]
+    then
+        echo "*** ERROR ***"
+        echo "*** Unable to modify ${VERSIONINFO_FILE} ***"
+        echo "*** The default version numbers will be used ***"
+    else
+        # The pattern to match on in the file is 6,0,0,0
+        # meaning major,minor,build,update
+        OLDPAT=6,0,0,0
+        NEWPAT=${VERSION_MAJOR},${VERSION_MINOR},${VERSION_BUILD},${VERSION_UPDATE}
+        # And mangle
+        sed -i "s/${OLDPAT}/${NEWPAT}/g" ${VERSIONINFO_FILE}
+        SED_RC=$?
+        NUM_ERRORS=`expr ${NUM_ERRORS} + ${SED_RC}`
+        if [ ${SED_RC} -ne 0 ]
+        then
+            echo "*** ERROR ***"
+            echo "*** Unable to modify fields in ${VERSIONINFO_FILE} ***"
+            echo "*** The build may fail due to compile errors ***"
+        fi
+    fi
+fi
+
+# Figure out how much parallelism we can use.  2x cores on a really fast system
+# The build system is pretty heavily used - both for tests and builds, so dial
+# this back to be just the number of cores
+NCPUS=`grep processor /proc/cpuinfo | wc | awk '{print $1}'`
+if [ $? -ne 0 ]
+then
+    echo "Warning - Unable to determine the number of CPU cores - assuming one core"
+    NCPUS=1
+fi
+# If the system is capable of more cores, re-enable this
+# NCPUS=`expr ${NCPUS} \* 2`
+echo "Building with -j ${NCPUS}"
+
+# The bulk of the work is done here
+# The only parameter is the architecture name (x86 or x86_64)
+RunTheBuild()
+{
+    ARCHTYPE=$1
+
+    cd $AMD_WS_LINUX_UTIL_DIR
+    AMD_OUTPUT=$AMD_PERFORCE_ROOT/main/Output_${ARCHTYPE}
+    mkdir -p ${AMD_OUTPUT}
+    bash ./copyLibrariesToDriveOForPromotedLibs ${ARCHTYPE}
+    SETUP_RC=$?
+    NUM_ERRORS=`expr ${NUM_ERRORS} + ${SETUP_RC}`
+    if [ ${SETUP_RC} -ne 0 ]
+    then
+        echo "*** ERROR ***"
+        echo "*** the copyLibraries step failed for the ${ARCHTYPE} part of the build ***"
+        echo "*** Skipping the build itself for ${ARCHTYPE} ***"
+        BUILD_RELEASE_RC=0
+    else
+# build both release and debug without checking which succeeded since each can have a different set of compile problems
+# build the release
+        sh $AMD_WS_LINUX_UTIL_DIR/buildPromotedLinuxProjects release=1 arch=${ARCHTYPE} -Q install -j ${NCPUS} | perl $AMD_WS_LINUX_UTIL_DIR/BuildFilter.pl > ${AMD_OUTPUT}/CodeXLLinux_output.log 2>&1
+        BUILD_RELEASE_RC=${PIPESTATUS[0]}
+# build the debug
+        sh $AMD_WS_LINUX_UTIL_DIR/buildPromotedLinuxProjects arch=${ARCHTYPE} -Q install -j ${NCPUS} | perl $AMD_WS_LINUX_UTIL_DIR/BuildFilter.pl > ${AMD_OUTPUT}/CodeXLLinux_output.log 2>&1
+        BUILD_DEBUG_RC=${PIPESTATUS[0]}
+    fi
+
+    NUM_ERRORS=`expr ${NUM_ERRORS} + ${BUILD_RELEASE_RC} + ${BUILD_DEBUG_RC}`
+    if [ ${BUILD_RELEASE_RC} -ne 0 -o ${BUILD_DEBUG_RC} -ne 0]
+    then
+        echo "*** ERROR ***"
+        echo "*** The build failed ***"
+    else
+	echo "Build succeeded"
+    fi
+
+}
+
+# Main body of doing the build
+RunTheBuild x86
+RunTheBuild x86_64
+
+if [ ${NUM_ERRORS} -ne 0 ]
+then
+    echo "*** The build failed ***"
+    exit 1
+else
+    echo "*** The build succeeded ***"
+    exit 0
+fi

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<CodeXL>
+    <Tests>
+	        <TestResultsDirectory>GoldMasters_APPSDK_2_9</TestResultsDirectory>
+        <LogFilesDirectory>C:\TEMP\testResults\</LogFilesDirectory>
+		<Test>
+            <ExecutablePath>samples\opencl\bin\x86\CplusplusWrapper.exe</ExecutablePath>
+            <WorkingDirectory>samples\opencl\bin\x86\</WorkingDirectory>
+            <TestName>CplusplusWrapper_LocalsTest</TestName>
+            <TestType>LocalsTest</TestType>
+            <Kernels>
+                <Kernel>
+                    <KernelName>vectorAdd</KernelName>
+					<WorkItemId>0,0,0</WorkItemId>
+					<KernelLocals>
+						<LocalsInLine lineNumber="21"></LocalsInLine>
+						<LocalsInLine lineNumber="23"></LocalsInLine>
+						<LocalsInLine lineNumber="25"></LocalsInLine>
+						<LocalsInLine lineNumber="27"></LocalsInLine>
+                    </KernelLocals> 
+                </Kernel>
+            </Kernels>
+        </Test>
+	</Tests>
+</CodeXL>       

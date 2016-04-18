@@ -1,0 +1,83 @@
+#
+# Main scons build file for GLServer
+#
+
+Import('GPS_env')
+env = GPS_env.Clone()
+env['CPPPATH'] = env['GPS_PATH']
+env.Prepend (CPPPATH = ["../Common/Linux"])
+env.Prepend(CCFLAGS =
+[
+    '-Wall',
+    '-Wextra',
+])
+
+# build the Common Server static library
+
+sources = \
+[
+    # Files needed for GPA
+    "../../../Common/Src/GPUPerfAPIUtils/GPUPerfAPILoader.cpp",
+    "../../../Common/Src/GPUPerfAPIUtils/GPUPerfAPIUtil.cpp",
+#    "../../../Common/Src/ADLUtil/ADLUtil.cpp",
+#    "../../../Common/Src/AMDTMutex/AMDTMutex.cpp",
+
+#    "APIWrapperLogger.cpp",
+    "BufferDelta.cpp",
+    "Capture.cpp",
+#    "Capture_D3DPerfMarkers.cpp",      Don't include - No D3D on linux
+    "CaptureLayer.cpp",
+    "CaptureStream.cpp",
+    "CommandProcessor.cpp",
+    "CommandTimingManager.cpp",
+    "CommandVisitor.cpp",
+    "Communication_Impl.cpp",
+    "Compressor.cpp",
+    "DeltaAccumulationBuffer.cpp",
+#    "DetoursHelpers.cpp",              Don't include - only used for DirectX
+    "HookTimer.cpp",
+#    "DetourVtableImmediate.cpp",       Don't include - only used for DirectX
+#    "DLLLoader.cpp",
+    "FDPipeline.cpp",
+    "FDPipelineShaderStage.cpp",
+    "FDPipelineStage.cpp",
+    "FrameDebugger.cpp",
+    "FrameProfiler.cpp",
+    "FrameStatsLogger.cpp",
+    "geometry.cpp",
+    "GraphicsServerState.cpp",
+    "HTTPRequest.cpp",
+    "HUDTextureVisualization.cpp",
+    "IMonitor.cpp",
+    "IServerPlugin_Impl.cpp",
+    "LayerManager.cpp",
+    "Logger.cpp",
+    "MemoryBuffer.cpp",
+    "misc.cpp",
+    "NamedEvent.cpp",
+    "NamedMutex.cpp",
+    "NamedSemaphore.cpp",
+    "NetSocket.cpp",
+    "Linux/OSWrappers.cpp",
+    "parser.cpp",
+    "Linux/SafeCRT.cpp",
+    "SaveImage.cpp",
+#    "ShaderDebuggerHostGPS2.cpp",
+    "SharedGlobal.cpp",
+    "SharedMemory.cpp",
+    "SharedMemoryManager.cpp",
+    "StreamLog.cpp",
+#    "ThreadTracer.cpp",
+    "TimeControlLayer.cpp",
+    "timer.cpp",
+    "TraceAnalyzer.cpp",
+#    "TraceAnalyzerOutputDebugString.cpp",
+    "xml.cpp",
+
+    "Linux/proc.cpp",
+    "Linux/Interceptor.cpp",
+    "Linux/timerLinux.cpp"
+]
+
+Common = env.StaticLibrary('Common', sources)
+Return('Common')
