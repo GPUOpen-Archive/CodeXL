@@ -7,7 +7,6 @@
   <ImportGroup Label="HwDbgProjects">
     <Import Project="$(AMDTCommonAMD)\HwDebugger\Global-HwDbgHSA.props" />
     <Import Project="$(AMDTCommonAMD)\HwDebugger\Global-HwDbgFacilities.props" />
-    <Import Project="$(CommonDir)\Lib\AMD\HSA\Global-HSAFoundation-NoLib.props" />
   </ImportGroup>
   <ItemDefinitionGroup>
     <Link>
