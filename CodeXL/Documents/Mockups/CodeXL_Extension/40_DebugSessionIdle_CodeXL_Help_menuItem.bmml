@@ -1,0 +1,224 @@
+<mockup version="1.0" skin="sketch" measuredW="1481" measuredH="758" mockupW="1152" mockupH="726">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::TitleWindow" x="329" y="32" w="1152" h="726" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>OpenCLSamplesVS10%20-%20Microsoft%20Visual%20Studio</text>
+      </controlProperties>
+    </control>
+    <control controlID="1" controlTypeID="com.balsamiq.mockups::MenuBar" x="329" y="54" w="1152" h="29" measuredW="727" measuredH="29" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <hrefs>%2C%2C%2C%2C%2C%2C30_DebugSessionIdle%26bm%3B30_DebugSessionIdle.bmml%26bm%3B30_DebugSessionIdle.bmml%26bm%3B30_DebugSessionIdle.bmml%2C%2C%2C%2C%2C%2C%2C</hrefs>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22328%2C28%2C389%2C49%22%20href%3D%2230_DebugSessionIdle.bmml%22%20alt%3D%2230_DebugSessionIdle%22%20id%3D%221_0%22/%3E%0A</map>
+        <selectedIndex>6</selectedIndex>
+        <text>File%2C%20Edit%2C%20View%2C%20Project%2C%20Build%2C%20Debug%2C%20CodeXL%2C%20Team%2C%20Data%2C%20Tools%2C%20Test%2C%20Window%2C%20Help</text>
+      </controlProperties>
+    </control>
+    <control controlID="38" controlTypeID="__group__" x="335" y="107" w="232" h="619" measuredW="232" measuredH="619" zOrder="3" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::TabBar" x="0" y="0" w="232" h="619" measuredW="243" measuredH="100" zOrder="0" locked="false" isInGroup="38">
+          <controlProperties>
+            <selectedIndex>0</selectedIndex>
+            <tabVPosition>bottom</tabVPosition>
+            <text>CodeXL%20Exp%2C%20Solution%20Exp</text>
+            <verticalScrollbar>false</verticalScrollbar>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Label" x="2" y="2" w="230" h="20" measuredW="104" measuredH="21" zOrder="1" locked="false" isInGroup="38">
+          <controlProperties>
+            <text>CodeXL%20Explorer</text>
+          </controlProperties>
+        </control>
+        <control controlID="2" controlTypeID="com.balsamiq.mockups::HRule" x="2" y="22" w="230" h="-1" measuredW="100" measuredH="5" zOrder="2" locked="false" isInGroup="38"/>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="39" controlTypeID="__group__" x="1020" y="535" w="455" h="191" measuredW="455" measuredH="191" zOrder="2" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::TabBar" x="0" y="0" w="455" h="191" measuredW="327" measuredH="100" zOrder="0" locked="false" isInGroup="39">
+          <controlProperties>
+            <borderStyle>square</borderStyle>
+            <selectedIndex>0</selectedIndex>
+            <tabVPosition>bottom</tabVPosition>
+            <text>Breakpoints%2C%20Output%2C%20CodeXL%20Properties</text>
+          </controlProperties>
+        </control>
+        <control controlID="4" controlTypeID="com.balsamiq.mockups::Label" x="0" y="0" w="89" h="21" measuredW="75" measuredH="21" zOrder="1" locked="false" isInGroup="39">
+          <controlProperties>
+            <text>Breakpoints</text>
+          </controlProperties>
+        </control>
+        <control controlID="5" controlTypeID="com.balsamiq.mockups::HRule" x="0" y="21" w="455" h="-1" measuredW="100" measuredH="5" zOrder="2" locked="false" isInGroup="39"/>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="43" controlTypeID="__group__" x="567" y="107" w="908" h="428" measuredW="908" measuredH="428" zOrder="4" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="__group__" x="0" y="0" w="908" h="428" measuredW="908" measuredH="428" zOrder="0" locked="false" isInGroup="43">
+          <groupChildrenDescriptors>
+            <control controlID="0" controlTypeID="com.balsamiq.mockups::TabBar" x="0" y="0" w="908" h="428" measuredW="246" measuredH="100" zOrder="0" locked="false" isInGroup="0">
+              <controlProperties>
+                <selectedIndex>0</selectedIndex>
+                <text>DCT.cpp%2C%20DCT_Kernels.cl</text>
+              </controlProperties>
+            </control>
+            <control controlID="1" controlTypeID="com.balsamiq.mockups::VerticalScrollBar" x="892" y="24" w="-1" h="404" measuredW="16" measuredH="100" zOrder="1" locked="false" isInGroup="0"/>
+          </groupChildrenDescriptors>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::TextArea" x="0" y="23" w="893" h="405" measuredW="200" measuredH="140" zOrder="1" locked="false" isInGroup="43">
+          <controlProperties>
+            <align>left</align>
+            <backgroundAlpha>1</backgroundAlpha>
+            <text>%20%20%20%20/**%0A%20%20%20%20%20*%20Enqueue%20a%20kernel%20run%20call.%0A%20%20%20%20%20*/%0A%20%20%20%20cl_event%20ndrEvt%3B%0A%20%20%20%20status%20%3D%20clEnqueueNDRangeKernel%28%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20commandQueue%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20kernel%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%202%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20NULL%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20globalThreads%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20localThreads%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%200%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20NULL%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%26ndrEvt%29%3B%0A%20%20%20%20CHECK_OPENCL_ERROR%28status%2C%20%22clEnqueueNDRangeKernel%20failed.%22%29%3B%0A%20%0A%20%20%20%20status%20%3D%20clFlush%28commandQueue%29%3B%0A%20%20%20%20CHECK_OPENCL_ERROR%28status%2C%20%22clFlush%20failed.%22%29%3B%0A%20%0A%20%20%20%20status%20%3D%20sampleCommon-%3EwaitForEventAndRelease%28%26ndrEvt%29%3B%0A%20%20%20%20CHECK_ERROR%28status%2C%20SDK_SUCCESS%2C%20%22WaitForEventAndRelease%28ndrEvt%29%20Failed%22%29%3B%0A%20%0A%20%20%20%20//%20Enqueue%20readBuffer</text>
+            <underline>false</underline>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="44" controlTypeID="__group__" x="567" y="535" w="453" h="191" measuredW="453" measuredH="191" zOrder="5" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::TabBar" x="0" y="0" w="453" h="191" measuredW="342" measuredH="100" zOrder="0" locked="false" isInGroup="44">
+          <controlProperties>
+            <borderStyle>square</borderStyle>
+            <selectedIndex>1</selectedIndex>
+            <tabVPosition>bottom</tabVPosition>
+            <text>CodeXL%20Function%20Ca%2CLocals%2C%20Autos%2C%20Watch1</text>
+          </controlProperties>
+        </control>
+        <control controlID="4" controlTypeID="com.balsamiq.mockups::Label" x="0" y="0" w="55" h="21" measuredW="42" measuredH="21" zOrder="1" locked="false" isInGroup="44">
+          <controlProperties>
+            <text>Locals</text>
+          </controlProperties>
+        </control>
+        <control controlID="5" controlTypeID="com.balsamiq.mockups::HRule" x="0" y="21" w="453" h="-1" measuredW="100" measuredH="5" zOrder="2" locked="false" isInGroup="44"/>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="45" controlTypeID="com.balsamiq.mockups::Tree" x="339" y="132" w="225" h="569" measuredW="300" measuredH="288" zOrder="6" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>F%20DCT%0AC%20CL%20Context%201%20%28deleted%29%0A%5B-%5D%20CL%20Context%202%0Av%20Buffers%0A..-CL%20Buffer%201%0A..-CL%20Buffer%202%0A..-CL%20Buffer%203%0Av%20Command%20Queues%0A..-Command%20Queue%201%0Av%20OpenCL%20Programs%0A%20vOpenCL%20Program%201%0A..-Kernel%201%20-%20DCT</text>
+      </controlProperties>
+    </control>
+    <control controlID="47" controlTypeID="com.balsamiq.mockups::CheckBox" x="1027" y="565" w="-1" h="-1" measuredW="174" measuredH="22" zOrder="7" locked="false" isInGroup="-1">
+      <controlProperties>
+        <state>selected</state>
+        <text>clEnqueueNDRangeKernel</text>
+      </controlProperties>
+    </control>
+    <control controlID="48" controlTypeID="com.balsamiq.mockups::HRule" x="330" y="104" w="1151" h="-1" measuredW="100" measuredH="5" zOrder="8" locked="false" isInGroup="-1"/>
+    <control controlID="50" controlTypeID="com.balsamiq.mockups::Icon" x="573" y="345" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="9" locked="false" isInGroup="-1">
+      <controlProperties>
+        <borderStyle>none</borderStyle>
+        <color>15843890</color>
+        <icon>RightArrowIcon%7Cxsmall</icon>
+      </controlProperties>
+    </control>
+    <control controlID="51" controlTypeID="__group__" x="335" y="83" w="300" h="16" measuredW="300" measuredH="16" zOrder="10" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="__group__" x="0" y="0" w="70" h="16" measuredW="70" measuredH="16" zOrder="0" locked="false" isInGroup="51">
+          <groupChildrenDescriptors>
+            <control controlID="0" controlTypeID="com.balsamiq.mockups::Icon" x="0" y="0" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="0" locked="false" isInGroup="0">
+              <controlProperties>
+                <borderStyle>none</borderStyle>
+                <color>40463</color>
+                <icon>RightTriangleIcon%7Cxsmall</icon>
+              </controlProperties>
+            </control>
+            <control controlID="1" controlTypeID="com.balsamiq.mockups::Icon" x="16" y="0" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="1" locked="false" isInGroup="0">
+              <controlProperties>
+                <icon>PauseIcon%7Cxsmall</icon>
+              </controlProperties>
+            </control>
+            <control controlID="2" controlTypeID="com.balsamiq.mockups::Icon" x="32" y="0" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="2" locked="false" isInGroup="0">
+              <controlProperties>
+                <borderStyle>none</borderStyle>
+                <color>2848996</color>
+                <href>01_StartupScreen_Debug%26bm%3B01_StartupScreen_Debug.bmml%26bm%3B01_StartupScreen_Debug.bmml%26bm%3B01_StartupScreen_Debug.bmml</href>
+                <icon>StopIcon%7Cxsmall</icon>
+                <map>%3Carea%20shape%3D%22rect%22%20coords%3D%2238%2C51%2C54%2C67%22%20href%3D%2201_StartupScreen_Debug.bmml%22%20alt%3D%2201_StartupScreen_Debug%22%20id%3D%222%22/%3E</map>
+              </controlProperties>
+            </control>
+            <control controlID="3" controlTypeID="com.balsamiq.mockups::Icon" x="54" y="0" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="3" locked="false" isInGroup="0">
+              <controlProperties>
+                <borderStyle>square</borderStyle>
+                <icon>JumpBackIcon%7Cxsmall</icon>
+              </controlProperties>
+            </control>
+          </groupChildrenDescriptors>
+        </control>
+        <control controlID="1" controlTypeID="__group__" x="92" y="0" w="84" h="16" measuredW="84" measuredH="16" zOrder="1" locked="false" isInGroup="51">
+          <groupChildrenDescriptors>
+            <control controlID="0" controlTypeID="com.balsamiq.mockups::Icon" x="0" y="0" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="0" locked="false" isInGroup="1">
+              <controlProperties>
+                <borderStyle>none</borderStyle>
+                <color>15843890</color>
+                <icon>RightArrowIcon%7Cxsmall</icon>
+              </controlProperties>
+            </control>
+            <control controlID="1" controlTypeID="com.balsamiq.mockups::Icon" x="22" y="0" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="1" locked="false" isInGroup="1">
+              <controlProperties>
+                <borderStyle>none</borderStyle>
+                <color>0</color>
+                <icon>IndentIcon%7Cxsmall</icon>
+              </controlProperties>
+            </control>
+            <control controlID="2" controlTypeID="com.balsamiq.mockups::Icon" x="68" y="0" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="2" locked="false" isInGroup="1">
+              <controlProperties>
+                <borderStyle>none</borderStyle>
+                <color>0</color>
+                <icon>OutdentIcon%7Cxsmall</icon>
+              </controlProperties>
+            </control>
+            <control controlID="3" controlTypeID="com.balsamiq.mockups::Icon" x="46" y="0" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="3" locked="false" isInGroup="1">
+              <controlProperties>
+                <borderStyle>none</borderStyle>
+                <color>0</color>
+                <icon>TextAlignRightIcon%7Cxsmall</icon>
+              </controlProperties>
+            </control>
+          </groupChildrenDescriptors>
+        </control>
+        <control controlID="2" controlTypeID="__group__" x="202" y="0" w="61" h="16" measuredW="61" measuredH="16" zOrder="2" locked="false" isInGroup="51">
+          <groupChildrenDescriptors>
+            <control controlID="0" controlTypeID="com.balsamiq.mockups::Icon" x="0" y="0" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="0" locked="false" isInGroup="2">
+              <controlProperties>
+                <icon>TableIcon%7Cxsmall</icon>
+              </controlProperties>
+            </control>
+            <control controlID="1" controlTypeID="com.balsamiq.mockups::Icon" x="23" y="0" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="1" locked="false" isInGroup="2">
+              <controlProperties>
+                <icon>TableIcon%7Cxsmall</icon>
+              </controlProperties>
+            </control>
+            <control controlID="2" controlTypeID="com.balsamiq.mockups::Icon" x="45" y="0" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="2" locked="false" isInGroup="2">
+              <controlProperties>
+                <color>10066329</color>
+                <icon>TableIcon%7Cxsmall</icon>
+              </controlProperties>
+            </control>
+          </groupChildrenDescriptors>
+        </control>
+        <control controlID="3" controlTypeID="com.balsamiq.mockups::Icon" x="284" y="0" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="3" locked="false" isInGroup="51">
+          <controlProperties>
+            <color>13576743</color>
+            <icon>RightFillTriangleIcon%7Cxsmall</icon>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="52" controlTypeID="com.balsamiq.mockups::Menu" x="648" y="82" w="290" h="-1" measuredW="150" measuredH="481" zOrder="12" locked="false" isInGroup="-1">
+      <controlProperties>
+        <hrefs>%2C%2C%2C02_StartupScreen_Profile%26bm%3B02_StartupScreen_Profile.bmml%26bm%3B02_StartupScreen_Profile.bmml%26bm%3B02_StartupScreen_Profile.bmml%2C%2C%2C%2C%2C%2C01_StartupScreen_Debug%26bm%3B01_StartupScreen_Debug.bmml%26bm%3B01_StartupScreen_Debug.bmml%26bm%3B01_StartupScreen_Debug.bmml%2C%2C%2C%2C%2C40_DebugSessionIdle_CodeXL_BPs_menuItem%26bm%3B40_DebugSessionIdle_CodeXL_BPs_menuItem.bmml%26bm%3B40_DebugSessionIdle_CodeXL_BPs_menuItem.bmml%26bm%3B40_DebugSessionIdle_CodeXL_BPs_menuItem.bmml%2C%2C%2C%2C%2C%2C%2C%2C%2C40_DebugSessionIdle_CodeXL_Views_menuItem%26bm%3B40_DebugSessionIdle_CodeXL_Views_menuItem.bmml%26bm%3B40_DebugSessionIdle_CodeXL_Views_menuItem.bmml%26bm%3B40_DebugSessionIdle_CodeXL_Views_menuItem.bmml%2C%2C%2C</hrefs>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22319%2C102%2C609%2C123%22%20href%3D%2202_StartupScreen_Profile.bmml%22%20alt%3D%2202_StartupScreen_Profile%22%20id%3D%2252_0%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22319%2C212%2C609%2C233%22%20href%3D%2201_StartupScreen_Debug.bmml%22%20alt%3D%2201_StartupScreen_Debug%22%20id%3D%2252_1%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22319%2C301%2C609%2C322%22%20href%3D%2240_DebugSessionIdle_CodeXL_BPs_menuItem.bmml%22%20alt%3D%2240_DebugSessionIdle_CodeXL_BPs_menuItem%22%20id%3D%2252_2%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22319%2C458%2C609%2C479%22%20href%3D%2240_DebugSessionIdle_CodeXL_Views_menuItem.bmml%22%20alt%3D%2240_DebugSessionIdle_CodeXL_Views_menuItem%22%20id%3D%2252_3%22/%3E%0A</map>
+        <selectedIndex>26</selectedIndex>
+        <text>-Start%20Debug-%0A---%0Ax%20Debug%20Mode%0AProfile%20Mode%0A---%0AContinue%2C%20Shift+Alt+F5%0AStep%20Into%0AStep%20Over%0A-Break%20All-%2C-Ctrl+Alt+Break-%0AStop%20Debugging%2CF6%0A-Restart-%2C-Ctrl+Shift+F5-%0AStep%20Out%2CShift+F11%0A---%0AToggle%20Breakpoints%2CF9%0ABreakpoints%20%3E%0AAdd%20/%20Remove%20Breakpoints...%2CAlt+Shift+B%0ADelete%20all%20Breakpoints%2CCtrl+Shift+F9%0ADisable%20all%20Breakpoints%0A---%0ASystem%20Information...%0ADebug%20Settings...%0ACodeXL%20Options...%0A---%0AViews%3E%0A---%0A-Open%20Teapot%20Sample%20Project-%0AHelp%3E</text>
+      </controlProperties>
+    </control>
+    <control controlID="53" controlTypeID="com.balsamiq.mockups::Menu" x="938" y="535" w="267" h="-1" measuredW="150" measuredH="167" zOrder="13" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>View%20%26H%26elp...%0AView%20%26T%26utorial...%0ACheck%20for%20%26U%26pdates...%0A---%0AAMD%20%26D%26eveloper%20Tools%20Support%20Forum%0AAMD%20Developer%20Tools%20%26K%26nowledge%20Base%0A%26O%26pen%20a%20Support%20Request%0A---%0A%26A%26bout%20CodeXL...</text>
+      </controlProperties>
+    </control>
+    <control controlID="54" controlTypeID="com.balsamiq.mockups::Image" x="643" y="83" w="414" h="22" measuredW="487" measuredH="27" zOrder="11" locked="false" isInGroup="-1">
+      <controlProperties>
+        <src>../../toolbar1.JPG</src>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

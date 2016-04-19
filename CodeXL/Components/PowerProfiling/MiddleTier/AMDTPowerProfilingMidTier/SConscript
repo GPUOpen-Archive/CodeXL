@@ -1,0 +1,79 @@
+# -*- Python -*-
+
+Import('*')
+from CXL_init import *
+
+libName = "CXLPowerProfilingMidTier"
+
+env = CXL_env.Clone()
+
+#need to overwrite compiler flags without the -Werror since some libraries are causing problems
+compiler_base_flags = " -Wall -Werror -Wextra -g -fmessage-length=0 -Wno-unknown-pragmas -pthread -std=c++11 -DGDT_BUILD_SUFFIX="
+    
+if (env['CXL_build'] == 'debug'):
+    compiler_base_flags += ' -D_DEBUG -D_LINUX -DBOOST_REGEX_NO_EXTERNAL_TEMPLATES'
+else:
+    compiler_base_flags += ' -O3 -DNDEBUG -D_LINUX -DBOOST_REGEX_NO_EXTERNAL_TEMPLATES'
+
+if (env['CXL_build_conf'] == 'PUBLIC'):
+	compiler_base_flags += ' -DGDT_PUBLIC '
+elif (env['CXL_build_conf'] == 'NDA'):
+	compiler_base_flags += ' -DGDT_NDA '
+elif (env['CXL_build_conf'] == 'INTERNAL'):
+	compiler_base_flags += ' -DGDT_INTERNAL '
+else:
+	compiler_base_flags += ' -DGDT_PUBLIC '
+
+env.Replace(CPPFLAGS = compiler_base_flags)
+
+env.Append( CPPPATH = [ 
+	".",
+   	"../",
+   	"../../",
+	"./include",
+	"./src/",
+	env['CXL_commonproj_dir'] +"/../../CodeXL/Components/PowerProfiling/Backend/AMDTPowerProfileAPI/inc/",
+	env['CXL_commonproj_dir'],
+	env['CXL_commonproj_dir'] + '/AMDTCommonHeaders/',
+        env['CXL_commonproj_dir'] + '/../../CodeXL/Remote',
+])
+
+sources = \
+[
+	"src/BackendDataConvertor.cpp",
+	"src/LocalBackendAdapter.cpp",
+	"src/RemoteBackendAdapter.cpp",
+	"src/PowerProfilerBL.cpp",
+	"src/PowerProfilerCore.cpp",
+	"src/PPPollingThread.cpp",
+	"src/PPDevice.cpp"
+]
+
+commonLinkedLibraries = \
+[
+	"CXLBaseTools",
+	"CXLOSWrappers",
+    "CXLPowerProfileAPI",
+    "CXLDbAdapter",
+    "CXLRemoteClient",
+    "libpthread"
+]
+
+# Contains all linked libraries:
+linkedLibraries = commonLinkedLibraries
+env.Prepend (LIBS = linkedLibraries)
+	
+# Creating object files	
+objFiles = env.SharedObject(sources)
+
+# Creating shared libraries
+soFiles = env.SharedLibrary(
+	target = libName, 
+	source = objFiles)
+
+# Installing libraries
+libInstall = env.Install( 
+	dir = env['CXL_lib_dir'], 
+	source = (soFiles))
+
+Return('libInstall')

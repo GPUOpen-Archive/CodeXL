@@ -1,0 +1,415 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{8bad7326-12b4-44c6-827a-b3e52cdd7c3a}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="inc">
+      <UniqueIdentifier>{edc9d059-1492-44ce-8cb6-538e129072a4}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="WindowsResources">
+      <UniqueIdentifier>{575c5d53-ff57-4e1c-b784-4542ec43bb90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public inc">
+      <UniqueIdentifier>{bc0cd896-473c-4c37-ba9e-8ecad4e8a583}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{ed879c05-b81f-47dc-a424-f76487a5aa4b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\gsActiveUniformsMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsAnalyzeModeExecutor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsAPIFunctionsImplementations.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsAPIFunctionsStubs.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsATIPerformanceCountersManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsATIRenderContextPerformanceCountersReader.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsAttribStack.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsAttribStackItem.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsBufferReader.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsBufferSerializer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsCallsHistoryLogger.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsCGLWrappers.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsDeprecationAnalyzer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsDeprecationCondition.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsDisplayListMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsExtensionsManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsFBOMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsForcedModesManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsGLDebugOutputManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsGlobalVariables.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsGLProgram.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsGLTexture.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsGLXWrappers.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsImageWriter.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsInterSpyConnectionFunctions.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsiPhoneGPUPerformanceCountersReader.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsLightsMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsMacOSXInterception.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsMemoryMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsOpenGL32DLLExports.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsOpenGLExtensionsWrappers.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsOpenGLModuleInitializer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsOpenGLMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsOpenGLSpyInitFuncs.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsOpenGLWrappers.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsOSPerformanceCountersManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsPBuffer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsPBuffersMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsProgramsAndShadersMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsProgramUniformsData.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsRenderBuffersMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsRenderContextExtensionsData.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsRenderContextMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsRenderContextPerformanceCountersManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsRenderPrimitivesStatisticsLogger.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsSingletonsDelete.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsSpyPerformanceCountersManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsStateChangeExecutor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsStateVariableReader.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsStateVariablesSnapshot.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsStaticBuffersMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsSyncObjectsMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsTextureSerializer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsTexturesMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsTextureUnitMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsThreadLocalData.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsThreadsMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsVBOMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsWGLWrappers.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsWrappersCommon.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsPipelineMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gsSamplersMonitor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\gsActiveUniformsMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsAnalyzeModeExecutor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsAPIFunctionsImplementations.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsAPIFunctionsStubs.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsArrayPointer.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsATIPerformanceCountersManager.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsATIRenderContextPerformanceCountersReader.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsAttribStack.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsAttribStackItem.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsBufferReader.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsBufferSerializer.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsCallsHistoryLogger.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsDeprecationAnalyzer.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsDeprecationCondition.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsDisplayListMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsExtensionsManager.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsFBOMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsForcedModesManager.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsGLDebugOutputManager.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsGlobalVariables.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsGLProgram.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsGLTexture.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsHeadsUpDisplayDrawer.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsImageWriter.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsiPhoneGPUPerformanceCountersReader.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsLightsMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsMacOSXInterception.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsMemoryMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsMonitoredFunctionPointers.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsOpenGLESAidFunctions.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsOpenGLMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsOpenGLSpyInitFuncs.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsOSPerformanceCountersManager.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsPBuffer.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsProgramsAndShadersMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsProgramUniformsData.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsRenderBuffersMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsRenderContextExtensionsData.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsRenderContextMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsRenderContextPerformanceCountersManager.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsRenderPrimitivesStatisticsLogger.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsRenderPrimitiveType.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsSingletonsDelete.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsSpyPerformanceCountersManager.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsStateChangeExecutor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsStateVariableReader.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsStateVariablesSnapshot.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsStaticBuffersMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsStringConstants.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsSyncObjectsMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsTextDrawer.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsTextureSerializer.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsTexturesMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsTextureUnitMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsThreadLocalData.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsThreadsMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsVBOMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsVertexArrayData.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsVertexArrayDrawer.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsWrappersCommon.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gsPublicStringConstants.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsPipelineMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsSamplersMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gsPBuffersMonitor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="WindowsResources\AMDTOpenGLServer.def">
+      <Filter>WindowsResources</Filter>
+    </None>
+    <None Include="Sconstruct" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="$(CommonProjectsDir)\VersionInfo\VersionResource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

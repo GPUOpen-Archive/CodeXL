@@ -1,0 +1,231 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{37E65EA2-F8DB-4C66-8AC5-E24380576310}</ProjectGuid>
+    <RootNamespace>AMDTOpenGLServer</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="$(SolutionDir)\AMDTGpuDebugging.props" />
+    <Import Project="$(AMDTCommonAMD)\GPUPerfAPI\Global-GPUPerfAPI.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(AMDTCommonAMD)\APPSDK\Global-OpenCL-NoLib.props" />
+  </ImportGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir>$(OutDir)spies$(GDTPlatformSuffixNumBitsOnly)$(GDTBuildSuffix)\</OutDir>
+    <TargetName>opengl32</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;$(AMDTCommonExt)MicrosoftDirectX_SDK\March2009\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_GDI32_;_AMDT_OPENGLSERVER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>ddraw.lib;CXLServerUtilities$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary>$(AMDTOutputDir)$(Configuration)\arch\spies$(GDTPlatformSuffixNumBitsOnly)$(GDTBuildSuffix)\$(TargetName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>$(AMDTCommonExt)MicrosoftDirectX_SDK\March2009\lib\$(GDTPlatform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ModuleDefinitionFile>.\WindowsResources\AMDTOpenGLServer.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\gsActiveUniformsMonitor.cpp" />
+    <ClCompile Include="src\gsAnalyzeModeExecutor.cpp" />
+    <ClCompile Include="src\gsAPIFunctionsImplementations.cpp" />
+    <ClCompile Include="src\gsAPIFunctionsStubs.cpp" />
+    <ClCompile Include="src\gsATIPerformanceCountersManager.cpp" />
+    <ClCompile Include="src\gsATIRenderContextPerformanceCountersReader.cpp" />
+    <ClCompile Include="src\gsAttribStack.cpp" />
+    <ClCompile Include="src\gsAttribStackItem.cpp" />
+    <ClCompile Include="src\gsBufferReader.cpp" />
+    <ClCompile Include="src\gsBufferSerializer.cpp" />
+    <ClCompile Include="src\gsCallsHistoryLogger.cpp" />
+    <ClCompile Include="src\gsCGLWrappers.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\gsDeprecationAnalyzer.cpp" />
+    <ClCompile Include="src\gsDeprecationCondition.cpp" />
+    <ClCompile Include="src\gsDisplayListMonitor.cpp" />
+    <ClCompile Include="src\gsExtensionsManager.cpp" />
+    <ClCompile Include="src\gsFBOMonitor.cpp" />
+    <ClCompile Include="src\gsForcedModesManager.cpp" />
+    <ClCompile Include="src\gsGLDebugOutputManager.cpp" />
+    <ClCompile Include="src\gsGlobalVariables.cpp" />
+    <ClCompile Include="src\gsGLProgram.cpp" />
+    <ClCompile Include="src\gsGLTexture.cpp" />
+    <ClCompile Include="src\gsGLXWrappers.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\gsImageWriter.cpp" />
+    <ClCompile Include="src\gsInterSpyConnectionFunctions.cpp" />
+    <ClCompile Include="src\gsiPhoneGPUPerformanceCountersReader.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\gsLightsMonitor.cpp" />
+    <ClCompile Include="src\gsMacOSXInterception.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\gsMemoryMonitor.cpp" />
+    <ClCompile Include="src\gsOpenGL32DLLExports.cpp" />
+    <ClCompile Include="src\gsOpenGLExtensionsWrappers.cpp">
+      <Optimization Condition="'$(Configuration)'=='Release'">Disabled</Optimization>
+    </ClCompile>
+    <ClCompile Include="src\gsOpenGLModuleInitializer.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\gsOpenGLMonitor.cpp">
+      <Optimization Condition="'$(Configuration)'=='Release'">Disabled</Optimization>
+    </ClCompile>
+    <ClCompile Include="src\gsOpenGLSpyInitFuncs.cpp" />
+    <ClCompile Include="src\gsOpenGLWrappers.cpp">
+      <Optimization Condition="'$(Configuration)'=='Release'">Disabled</Optimization>
+    </ClCompile>
+    <ClCompile Include="src\gsOSPerformanceCountersManager.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\gsPBuffer.cpp" />
+    <ClCompile Include="src\gsPBuffersMonitor.cpp" />
+    <ClCompile Include="src\gsPipelineMonitor.cpp" />
+    <ClCompile Include="src\gsProgramsAndShadersMonitor.cpp" />
+    <ClCompile Include="src\gsProgramUniformsData.cpp" />
+    <ClCompile Include="src\gsRenderBuffersMonitor.cpp" />
+    <ClCompile Include="src\gsRenderContextExtensionsData.cpp" />
+    <ClCompile Include="src\gsRenderContextMonitor.cpp" />
+    <ClCompile Include="src\gsRenderContextPerformanceCountersManager.cpp" />
+    <ClCompile Include="src\gsRenderPrimitivesStatisticsLogger.cpp" />
+    <ClCompile Include="src\gsSamplersMonitor.cpp" />
+    <ClCompile Include="src\gsSingletonsDelete.cpp" />
+    <ClCompile Include="src\gsSpyPerformanceCountersManager.cpp" />
+    <ClCompile Include="src\gsStateChangeExecutor.cpp" />
+    <ClCompile Include="src\gsStateVariableReader.cpp" />
+    <ClCompile Include="src\gsStateVariablesSnapshot.cpp" />
+    <ClCompile Include="src\gsStaticBuffersMonitor.cpp" />
+    <ClCompile Include="src\gsSyncObjectsMonitor.cpp" />
+    <ClCompile Include="src\gsTextureSerializer.cpp" />
+    <ClCompile Include="src\gsTexturesMonitor.cpp" />
+    <ClCompile Include="src\gsTextureUnitMonitor.cpp" />
+    <ClCompile Include="src\gsThreadLocalData.cpp" />
+    <ClCompile Include="src\gsThreadsMonitor.cpp" />
+    <ClCompile Include="src\gsVBOMonitor.cpp" />
+    <ClCompile Include="src\gsWGLWrappers.cpp">
+      <Optimization Condition="'$(Configuration)'=='Release'">Disabled</Optimization>
+    </ClCompile>
+    <ClCompile Include="src\gsWrappersCommon.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\gsActiveUniformsMonitor.h" />
+    <ClInclude Include="src\gsAnalyzeModeExecutor.h" />
+    <ClInclude Include="src\gsAPIFunctionsImplementations.h" />
+    <ClInclude Include="src\gsAPIFunctionsStubs.h" />
+    <ClInclude Include="src\gsArrayPointer.h" />
+    <ClInclude Include="src\gsATIPerformanceCountersManager.h" />
+    <ClInclude Include="src\gsATIRenderContextPerformanceCountersReader.h" />
+    <ClInclude Include="src\gsAttribStack.h" />
+    <ClInclude Include="src\gsAttribStackItem.h" />
+    <ClInclude Include="src\gsBufferReader.h" />
+    <ClInclude Include="src\gsBufferSerializer.h" />
+    <ClInclude Include="src\gsCallsHistoryLogger.h" />
+    <ClInclude Include="src\gsDeprecationAnalyzer.h" />
+    <ClInclude Include="src\gsDeprecationCondition.h" />
+    <ClInclude Include="src\gsDisplayListMonitor.h" />
+    <ClInclude Include="src\gsExtensionsManager.h" />
+    <ClInclude Include="src\gsFBOMonitor.h" />
+    <ClInclude Include="src\gsForcedModesManager.h" />
+    <ClInclude Include="src\gsGLDebugOutputManager.h" />
+    <ClInclude Include="src\gsGlobalVariables.h" />
+    <ClInclude Include="src\gsGLProgram.h" />
+    <ClInclude Include="src\gsGLTexture.h" />
+    <ClInclude Include="src\gsHeadsUpDisplayDrawer.h" />
+    <ClInclude Include="src\gsImageWriter.h" />
+    <ClInclude Include="src\gsiPhoneGPUPerformanceCountersReader.h" />
+    <ClInclude Include="src\gsLightsMonitor.h" />
+    <ClInclude Include="src\gsMacOSXInterception.h" />
+    <ClInclude Include="src\gsMemoryMonitor.h" />
+    <ClInclude Include="src\gsMonitoredFunctionPointers.h" />
+    <ClInclude Include="src\gsOpenGLESAidFunctions.h" />
+    <ClInclude Include="src\gsOpenGLMonitor.h" />
+    <ClInclude Include="src\gsOpenGLSpyInitFuncs.h" />
+    <ClInclude Include="src\gsOSPerformanceCountersManager.h" />
+    <ClInclude Include="src\gsPBuffer.h" />
+    <ClInclude Include="src\gsPBuffersMonitor.h" />
+    <ClInclude Include="src\gsPipelineMonitor.h" />
+    <ClInclude Include="src\gsProgramsAndShadersMonitor.h" />
+    <ClInclude Include="src\gsProgramUniformsData.h" />
+    <ClInclude Include="src\gsRenderBuffersMonitor.h" />
+    <ClInclude Include="src\gsRenderContextExtensionsData.h" />
+    <ClInclude Include="src\gsRenderContextMonitor.h" />
+    <ClInclude Include="src\gsRenderContextPerformanceCountersManager.h" />
+    <ClInclude Include="src\gsRenderPrimitivesStatisticsLogger.h" />
+    <ClInclude Include="src\gsRenderPrimitiveType.h" />
+    <ClInclude Include="src\gsSamplersMonitor.h" />
+    <ClInclude Include="src\gsSingletonsDelete.h" />
+    <ClInclude Include="src\gsSpyPerformanceCountersManager.h" />
+    <ClInclude Include="src\gsStateChangeExecutor.h" />
+    <ClInclude Include="src\gsStateVariableReader.h" />
+    <ClInclude Include="src\gsStateVariablesSnapshot.h" />
+    <ClInclude Include="src\gsStaticBuffersMonitor.h" />
+    <ClInclude Include="src\gsStringConstants.h" />
+    <ClInclude Include="src\gsSyncObjectsMonitor.h" />
+    <ClInclude Include="src\gsTextDrawer.h" />
+    <ClInclude Include="src\gsTextureSerializer.h" />
+    <ClInclude Include="src\gsTexturesMonitor.h" />
+    <ClInclude Include="src\gsTextureUnitMonitor.h" />
+    <ClInclude Include="src\gsThreadLocalData.h" />
+    <ClInclude Include="src\gsThreadsMonitor.h" />
+    <ClInclude Include="src\gsVBOMonitor.h" />
+    <ClInclude Include="src\gsVertexArrayData.h" />
+    <ClInclude Include="src\gsVertexArrayDrawer.h" />
+    <ClInclude Include="src\gsWrappersCommon.h" />
+    <ClInclude Include="Include\gsPublicStringConstants.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="WindowsResources\AMDTOpenGLServer.def">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </None>
+    <None Include="Sconstruct">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="$(CommonProjectsDir)\VersionInfo\VersionResource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AMDTServerUtilities\AMDTServerUtilities.vcxproj">
+      <Project>{2b9e1447-2564-4c11-943a-fd3674c47874}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\Server\DXGIServer\DllMain.cpp" />
+    <ClCompile Include="..\..\Server\DXGIServer\DXGIHookDXGIFactory.cpp" />
+    <ClCompile Include="..\..\Server\DXGIServer\DXGIHookDXGIFactory1.cpp" />
+    <ClCompile Include="..\..\Server\DXGIServer\DXGIHookDXGIFactory2.cpp" />
+    <ClCompile Include="..\..\Server\DXGIServer\DXGILayerManager.cpp" />
+    <ClCompile Include="..\..\Server\DXGIServer\DXGIHookSwapChain.cpp" />
+    <ClCompile Include="..\..\Server\DXGIServer\ALVRInterception.cpp">
+      <Filter>LiquidVR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DXCommonSource\Capture_D3DPerfMarkers.cpp">
+      <Filter>DXCommonSource</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DXCommonSource\D3DCapture.cpp">
+      <Filter>DXCommonSource</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DXCommonSource\HookHelpers.cpp">
+      <Filter>DXCommonSource</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DXCommonSource\HookVtableImmediate.cpp">
+      <Filter>DXCommonSource</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Server\DXGIServer\DllMain.h" />
+    <ClInclude Include="..\..\Server\DXGIServer\DXGIHookDXGIFactory.h" />
+    <ClInclude Include="..\..\Server\DXGIServer\DXGIHookDXGIFactory1.h" />
+    <ClInclude Include="..\..\Server\DXGIServer\DXGIHookDXGIFactory2.h" />
+    <ClInclude Include="..\..\Server\DXGIServer\DXGILayerManager.h" />
+    <ClInclude Include="..\..\Server\DXGIServer\DXGISwapChainTypes.h" />
+    <ClInclude Include="..\..\Server\DXGIServer\IDXGIFactoryWrapper.h" />
+    <ClInclude Include="..\..\Server\DXGIServer\resource.h" />
+    <ClInclude Include="..\..\Server\DXGIServer\DXGIHookSwapChain.h" />
+    <ClInclude Include="..\..\Server\DXGIServer\ALVRFactoryWrapper.h">
+      <Filter>LiquidVR</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DXGIServer\ALVRGPUAffinityWrapper.h">
+      <Filter>LiquidVR</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DXGIServer\ALVRInterception.h">
+      <Filter>LiquidVR</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DXCommonSource\Capture_D3DPerfMarkers.h">
+      <Filter>DXCommonSource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DXCommonSource\Capture_D3DPerfMarkers_Classes.h">
+      <Filter>DXCommonSource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DXCommonSource\D3DCapture.h">
+      <Filter>DXCommonSource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DXCommonSource\HookHelpers.h">
+      <Filter>DXCommonSource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DXCommonSource\HookVtableImmediate.h">
+      <Filter>DXCommonSource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DXCommonSource\IFaceData.h">
+      <Filter>DXCommonSource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DXCommonSource\VTableData.h">
+      <Filter>DXCommonSource</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{c5a52f94-9b3b-43d4-b283-27ac281e131a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LiquidVR">
+      <UniqueIdentifier>{825b174f-31e7-4543-aa07-cf0bc70178b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DXCommonSource">
+      <UniqueIdentifier>{0fddec9b-6e18-44a9-908b-9156e9fd49e3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\Server\DXGIServer\DXGIServer.rc" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# ----------------------------------------------------------------------------------------------------------------------------------
+# File name: AMDTTeapotApp
+# This script sets AMDTTeapotApp's related environment variables and 
+# executed the AMDTTeapotApp binary executable.
+#
+# 2004-2007 Graphic Remedy. All Rights Reserved.
+# ----------------------------------------------------------------------------------------------------------------------------------
+
+# Get this script full path:
+if echo "$0" | grep '^/' ; then
+	thisScriptFullPath="$0"
+else
+	thisScriptFullPath=`pwd`/$0
+fi
+
+# Get this scripts directory:
+thisScriptDir=`dirname "$thisScriptFullPath"`
+
+# Calculate AMDTTeapot's binary executable path:
+AMDTTeapotBinaryExePath="${thisScriptDir}/AMDTTeapotApp-bin"
+
+# GDebugger's binaries directory is two directories above this scripts directory:
+gDEBuggerBinariesDir="${thisScriptDir}/../.."
+
+# Add gDEBugger's binaries directory to LD_LIBRARY_PATH:
+if [ -z "$LD_LIBRARY_PATH" ]; then
+        export LD_LIBRARY_PATH="${gDEBuggerBinariesDir}"
+else
+	export LD_LIBRARY_PATH="${gDEBuggerBinariesDir}:$LD_LIBRARY_PATH"
+fi
+
+# Run AMDTTeapotApp binary executable:
+$AMDTTeapotBinaryExePath
+

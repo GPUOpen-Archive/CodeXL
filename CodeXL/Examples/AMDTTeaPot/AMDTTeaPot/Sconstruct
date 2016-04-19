@@ -1,0 +1,243 @@
+#
+#   AMDTTeapot Application build
+#
+
+# Python import modules:
+import os
+import shutil
+
+# Get outputDir + " name of outputDir + " OS system:
+systemName = os.uname()[0]
+
+archSpecified = ARGUMENTS.get('arch', 'None')
+if archSpecified == 'None':
+    archSpecified = 'x86_64'
+machineType = archSpecified
+
+# Check if we are in a release build:
+releaseBuild = int(ARGUMENTS.get('release', 0))
+
+# Output directory location
+outputDir     = "../../../../Output"       # previousely driveo
+outputDir += "_" + machineType
+workspacesDir = "../../Workspaces"
+teapotBaseDir = "../" + workspacesDir + "/AMDTTeaPot"
+
+# Intermediate objects directory (.os files):
+if releaseBuild:
+	objDir = outputDir + "/release/obj/AMDTTeaPot"
+else:
+	objDir = outputDir + "/debug/obj/AMDTTeaPot"
+
+ # Create outputDir + " intermediate objects directory:
+if not os.path.exists(objDir):
+    os.makedirs(objDir)
+
+# Generic Linux:
+if releaseBuild:
+    cppDefinitions = ["NDEBUG", "_FILE_OFFSET_BITS=64", "_LARGE_FILES"]
+else:
+    cppDefinitions = ["_DEBUG", "_FILE_OFFSET_BITS=64", "_LARGE_FILES"]
+
+# Compiler options and flags:
+# Generic Linux:
+cppCompilerFlags = \
+[
+    "-Wall", 
+    "-pthread", 
+    "-Wundef", 
+    "-fmessage-length=0", 
+    "-g"
+]
+
+if (systemName == "Linux"):
+    if (machineType == "x86"):
+        cppCompilerFlags += ["-m32"]
+    elif (machineType == "x86_64"):
+        cppCompilerFlags += ["-m64"]
+
+# Include files path common to all platforms:
+commonIncludePath = \
+[
+    "./",
+    "inc",
+    # We include outputDir + " OS Wrappers for outputDir + " OpenGL Includes (gl.h, glext.h etc)
+    workspacesDir + "/PublicIncludeFiles/AMDTOSWrappers",
+]
+
+# Include files path Linux variant:
+# Generic Linux:
+# Include files path for linux variant:
+# Add the fltk includes:
+
+# Calculate the user libraries path:
+
+userLibrariesPath = "/usr/lib"
+
+if (machineType.find("x86_64") != -1):
+
+    userLibrariesPath = "/usr/lib64"
+
+# Calculate glib 2.0 configuration files include path:
+
+glib2LibConfigInclude = userLibrariesPath;
+
+glib2LibConfigInclude += "/glib-2.0/include"
+
+linuxVariantIncludePath = \
+[
+    "/usr/include/FL",
+    "/usr/include/GL",
+    "/usr/include/glib-2.0",
+    "/usr/lib64/glib-2.0/include",
+    "/usr/include/freetype2",
+    "/usr/include/libpng12",
+    "/opt/AMDAPP/include",
+    "inc",
+    "../AMDTTeaPotLib/inc",
+    "../AMDTTeaPotLib",
+    glib2LibConfigInclude
+
+]
+
+# Include files path Linux variant & build configuration:
+# Generic Linux:
+if releaseBuild:
+    linuxVariantBuildConfigurationIncludePath = \
+    [
+    ]
+else:
+    linuxVariantBuildConfigurationIncludePath = \
+    [
+    ]
+
+# Contains all include files path:
+includePath  = linuxVariantBuildConfigurationIncludePath + commonIncludePath + linuxVariantIncludePath
+
+# Define outputDir + " compiler environment variables:
+env = Environment(CPPDEFINES = cppDefinitions, CCFLAGS = cppCompilerFlags, CPPPATH = includePath)
+
+# Set the objects directory:
+env.VariantDir(objDir, './', duplicate=0)
+
+# Source files:
+sources = \
+[
+    objDir + "/src/Teapot.cpp",
+    objDir + "/src/GLWindow.cpp",
+]
+
+# Linked libraries:
+if releaseBuild:
+    commonLinkedLibraries = \
+    [
+        "GL",
+        "fltk",
+        "fltk_gl",
+        "fltk_forms",
+        "fltk_images",
+        "AMDTTeaPot",
+        "GLEW",
+        "X11",
+        "dl"
+        
+    ]
+else:
+    commonLinkedLibraries = \
+    [
+        "GL",
+        "fltk",
+        "fltk_gl",
+        "fltk_forms",
+        "fltk_images",
+        "AMDTTeaPot",
+        "GLEW",
+        "X11",
+        "dl"
+    ]
+
+# Linked libraries Linux variant & build configuration:
+# Generic Linux:
+if releaseBuild:
+    linuxVariantLinkedLibraries = \
+    [
+        "fltk.a",
+        "fltk_gl.a"
+        "GLU",
+        "xml2"	
+    ]
+else:
+    linuxVariantLinkedLibraries = \
+    [
+        "GLU",
+        "xml2",
+        "fltk.a",
+        "fltk_gl.a"
+    ]
+
+
+# Contains all linked libraries:
+linkedLibraries = commonLinkedLibraries + linuxVariantLinkedLibraries
+
+linkedLibrariesPath = \
+[
+    "/usr/local/lib",
+]
+
+# Linked libraries search path:
+if releaseBuild:
+    linkedLibrariesPath += \
+    [
+        outputDir + "/release/bin"
+    ]
+else:
+    linkedLibrariesPath += \
+    [
+        outputDir + "/debug/bin"
+    ]
+
+if (systemName == "Darwin"):
+    linkedLibrariesPath += \
+    [ 
+        "/System/Library/Frameworks/OpenGL.framework/Libraries"
+    ]
+    
+# Linker flags:
+linkerFlags = \
+[
+]
+
+shouldGenerateOnlyDefaultELFHash = os.environ.get('GR_GENERATE_ONLY_DEFAULT_ELF_HASH')
+if shouldGenerateOnlyDefaultELFHash is None:
+    linkerFlags += [ "-Wl,--hash-style=both" ]
+
+if (systemName == "Linux"):
+    if (machineType == "x86"):
+        linkerFlags += ["-m32"]
+    elif (machineType == "x86_64"):
+        linkerFlags += ["-m64"]
+
+# Application name:
+if (systemName == "Darwin"):
+    appName = "AMDTTeapot"
+else:
+    appName = "AMDTTeaPot-bin"
+
+# Install directory:
+if releaseBuild:
+    installDir           = outputDir  + "/release/bin/"
+    sharedLibraryDir     = installDir
+else:
+    installDir           = outputDir  + "/debug/bin/"
+    sharedLibraryDir     = installDir
+
+# Create an executable:
+app = env.Program(installDir + appName, sources, LIBS=linkedLibraries, LIBPATH=linkedLibrariesPath, LINKFLAGS=linkerFlags)
+
+# Change outputDir + " linking to use relative path
+if (systemName == "Darwin"):
+    for lLib in linkedLibraries:
+        env.AddPostAction (app, "install_name_tool -change lib%s.dylib @executable_path/lib%s.dylib $TARGET"% ( lLib, lLib ))
+
+env.Alias("install", installDir)
+env.Alias("install", app)

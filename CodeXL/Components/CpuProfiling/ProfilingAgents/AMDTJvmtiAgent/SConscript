@@ -1,0 +1,47 @@
+# -*- Python -*-
+
+Import('*')
+from CXL_init import *
+
+libName = "libCXLJvmtiAgent-x64"
+
+env = CXL_env.Clone()
+
+env.VariantDir('build/AMDTProfilingAgentsData', '../AMDTProfilingAgentsData/src')
+
+env.Append( CPPPATH = [ 
+	"inc",
+	"..",
+	"../..",
+	env['CXL_commonproj_dir'],
+	os.environ['JAVA_HOME'] + '/include',
+	os.environ['JAVA_HOME'] + '/include/linux',
+	env['CXL_commonproj_dir'] + '/../../CodeXL/Components/CpuProfiling',
+])
+
+
+initLibElf (env)
+
+sources = \
+[
+	"src/JvmtiProfileAgent.cpp",
+	"src/Linux/JvmtiProfileAgent_Lin.cpp",
+	"src/BytecodeToSource.cpp",
+	"build/AMDTProfilingAgentsData/JclWriter.cpp",
+	"build/AMDTProfilingAgentsData/Linux/ElfJncWriter.cpp",
+]
+
+# Creating object files	
+objFiles = env.SharedObject(sources)
+
+# Creating shared libraries
+soFiles = env.SharedLibrary(
+	target = libName, 
+	source = objFiles)
+
+# Installing libraries
+libInstall = env.Install( 
+	dir = env['CXL_lib_dir'], 
+	source = (soFiles))
+
+Return('libInstall')

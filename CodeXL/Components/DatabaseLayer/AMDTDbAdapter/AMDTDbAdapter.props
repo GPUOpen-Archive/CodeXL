@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <CommonDir>$(SolutionDir)..\..\Common</CommonDir>
+    <CommonProjectsDir>$(SolutionDir)..\..\Common\Src</CommonProjectsDir>
+  </PropertyGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(SolutionDir)..\Components\CodeXLComponent.props" />
+  </ImportGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(CommonProjectsDir)\AMDTCommonHeaders;$(SolutionDir)..\Components\DatabaseLayer\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;CXLProfilerDAL$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="CommonDir">
+      <Value>$(CommonDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CommonProjectsDir">
+      <Value>$(CommonProjectsDir)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

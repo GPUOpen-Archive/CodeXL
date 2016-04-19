@@ -1,0 +1,95 @@
+#!/bin/sh
+
+# This script build all Linux projects.
+# Usage: buildAllLinuxProjects [scons arguments]
+
+export commandLineArgs=$*
+
+NUM_ERRORS=0
+
+# Display a start message:
+echo 
+echo 
+echo "Building all Linux projects"
+echo "==========================="
+echo "Build arguments passed to scons: $commandLineArgs"
+
+# Change my work directory to Workspaces:
+cd $AMD_CODEXL/../CommonProjects
+
+# Build all Linux projects:
+
+echo
+echo
+echo "-------- Building GRBaseTools -------- "
+cd AMDTBaseTools
+eval "scons $commandLineArgs"
+RC=$?
+NUM_ERRORS=`expr ${NUM_ERRORS} + ${RC}`
+cd ..
+
+echo
+echo
+echo "-------- Building GRAssertionHandlers -------- "
+cd AMDTAssertionHandlers
+eval "scons $commandLineArgs"
+RC=$?
+NUM_ERRORS=`expr ${NUM_ERRORS} + ${RC}`
+cd ..
+
+echo
+echo
+echo "-------- Building GROSWrappers -------- "
+cd AMDTOSWrappers 
+eval "scons $commandLineArgs"
+RC=$?
+NUM_ERRORS=`expr ${NUM_ERRORS} + ${RC}`
+cd ..
+
+echo
+echo
+echo "-------- Building GRAPIClasses -------- "
+cd AMDTAPIClasses
+eval "scons $commandLineArgs"
+RC=$?
+NUM_ERRORS=`expr ${NUM_ERRORS} + ${RC}`
+cd ..
+
+
+echo
+echo
+echo "-------- Building GRApplicationComponents -------- "
+cd AMDTApplicationComponents
+eval "scons $commandLineArgs"
+RC=$?
+NUM_ERRORS=`expr ${NUM_ERRORS} + ${RC}`
+cd ..
+
+echo
+echo
+echo "-------- Building AMDTApplicationFramework -------- "
+cd  AMDTApplicationFramework
+eval "scons $commandLineArgs"
+RC=$?
+NUM_ERRORS=`expr ${NUM_ERRORS} + ${RC}`
+cd ..
+
+echo
+echo
+echo "-------- Building AMDTApplication -------- "
+cd  AMDTApplication
+eval "scons $commandLineArgs"
+RC=$?
+NUM_ERRORS=`expr ${NUM_ERRORS} + ${RC}`
+cd ..
+
+if [ ${NUM_ERRORS} -ne 0 ]
+then
+    echo "*** ERROR ***"
+    echo "*** the build failed - see the logs for details ***"
+    exit 1
+else
+    echo
+    echo
+    exit 0
+fi

@@ -1,0 +1,314 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ResourceCompile Include="..\..\Server\DX12Server\DX12Server.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Server\DX12Server\DX12LayerManager.h" />
+    <ClInclude Include="..\..\Server\DX12Server\resource.h" />
+    <ClInclude Include="..\..\Server\DX12Server\D3D12Enumerations.h" />
+    <ClInclude Include="..\..\Server\DX12Server\Profiling\DX12CmdListProfiler.h">
+      <Filter>Profiling</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Rendering\DX12ImageRenderer.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DXCommonSource\Capture_D3DPerfMarkers.h">
+      <Filter>DXCommonSource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DXCommonSource\Capture_D3DPerfMarkers_Classes.h">
+      <Filter>DXCommonSource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Objects\DX12CreateInfoStructs.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DXCommonSource\D3DCapture.h">
+      <Filter>DXCommonSource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DXCommonSource\HookHelpers.h">
+      <Filter>DXCommonSource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DXCommonSource\HookVtableImmediate.h">
+      <Filter>DXCommonSource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DXCommonSource\VTableData.h">
+      <Filter>DXCommonSource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DXCommonSource\StringifyDxgiTypeEnums.h">
+      <Filter>DXCommonSource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DXCommonSource\StringifyDxgiFormatEnums.h">
+      <Filter>DXCommonSource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Objects\DX12WrappedObjectDatabase.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Objects\DX12ObjectDatabaseProcessor.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\SymbolSerializers\DX12Serializers.h">
+      <Filter>SymbolSerializers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Util\DX12Utilities.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Objects\IDX12InstanceBase.h">
+      <Filter>Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Interception\DX12Interceptor.h">
+      <Filter>Interception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Util\d3dx12.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\FrameDebugger\DX12FrameDebuggerLayer.h">
+      <Filter>FrameDebugger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Interception\Hook_D3D12.h">
+      <Filter>Interception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DXCommonSource\IFaceData.h">
+      <Filter>DXCommonSource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\DX12Defines.h" />
+    <ClInclude Include="..\..\Server\DX12Server\Profiling\DX12FrameProfilerLayer.h">
+      <Filter>Profiling</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Tracing\DX12APIEntry.h">
+      <Filter>Tracing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Tracing\DX12ThreadTraceData.h">
+      <Filter>Tracing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Tracing\DX12TraceAnalyzerLayer.h">
+      <Filter>Tracing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\SymbolSerializers\DX12CoreSymbolSerializers.h">
+      <Filter>SymbolSerializers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Util\DX12CoreDeepCopy.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12CommandAllocator.h">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12CommandList.h">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12CommandQueue.h">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12CommandSignature.h">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12DescriptorHeap.h">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12Device.h">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12DeviceChild.h">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12Fence.h">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12GraphicsCommandList.h">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12Heap.h">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12Object.h">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12Pageable.h">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12PipelineState.h">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12QueryHeap.h">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12Resource.h">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12RootSignature.h">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12RootSignatureDeserializer.h">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Objects\CustomWrappers\Wrapped_ID3D12CommandQueueCustom.h">
+      <Filter>Objects\CustomWrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Objects\CustomWrappers\Wrapped_ID3D12GraphicsCommandListCustom.h">
+      <Filter>Objects\CustomWrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\DX12Server\Profiling\DX12WorkerInfo.h">
+      <Filter>Profiling</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Server\DX12Server\DX12LayerManager.cpp" />
+    <ClCompile Include="..\..\Server\DX12Server\Profiling\DX12CmdListProfiler.cpp">
+      <Filter>Profiling</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Rendering\DX12ImageRenderer.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DXCommonSource\Capture_D3DPerfMarkers.cpp">
+      <Filter>DXCommonSource</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Objects\DX12CreateInfoStructs.cpp">
+      <Filter>Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DXCommonSource\D3DCapture.cpp">
+      <Filter>DXCommonSource</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DXCommonSource\HookHelpers.cpp">
+      <Filter>DXCommonSource</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DXCommonSource\HookVtableImmediate.cpp">
+      <Filter>DXCommonSource</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DXCommonSource\StringifyDxgiTypeEnums.cpp">
+      <Filter>DXCommonSource</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DXCommonSource\StringifyDxgiFormatEnums.cpp">
+      <Filter>DXCommonSource</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Objects\DX12WrappedObjectDatabase.cpp">
+      <Filter>Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Objects\DX12ObjectDatabaseProcessor.cpp">
+      <Filter>Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\SymbolSerializers\DX12Serializers.cpp">
+      <Filter>SymbolSerializers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Util\DX12Utilities.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Objects\IDX12InstanceBase.cpp">
+      <Filter>Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Interception\DX12Interceptor.cpp">
+      <Filter>Interception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\FrameDebugger\DX12FrameDebuggerLayer.cpp">
+      <Filter>FrameDebugger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Interception\Hook_D3D12.cpp">
+      <Filter>Interception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Profiling\DX12FrameProfilerLayer.cpp">
+      <Filter>Profiling</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Tracing\DX12APIEntry.cpp">
+      <Filter>Tracing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Tracing\DX12TraceAnalyzerLayer.cpp">
+      <Filter>Tracing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\SymbolSerializers\DX12CoreSymbolSerializers.cpp">
+      <Filter>SymbolSerializers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Util\DX12CoreDeepCopy.cpp">
+      <Filter>Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Objects\CustomWrappers\Wrapped_ID3D12CommandQueueCustom.cpp">
+      <Filter>Objects\CustomWrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Objects\CustomWrappers\Wrapped_ID3D12GraphicsCommandListCustom.cpp">
+      <Filter>Objects\CustomWrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12CommandAllocator.cpp">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12CommandList.cpp">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12CommandQueue.cpp">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12CommandSignature.cpp">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12DescriptorHeap.cpp">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12Device.cpp">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12DeviceChild.cpp">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12Fence.cpp">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12GraphicsCommandList.cpp">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12Heap.cpp">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12Object.cpp">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12Pageable.cpp">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12PipelineState.cpp">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12QueryHeap.cpp">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12Resource.cpp">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12RootSignature.cpp">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\DX12Server\Objects\BaseWrappers\Wrapped_ID3D12RootSignatureDeserializer.cpp">
+      <Filter>Objects\BaseWrappers</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="DXCommonSource">
+      <UniqueIdentifier>{b8a89758-cebb-499d-82d3-f9be4252d522}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Profiling">
+      <UniqueIdentifier>{d54616d8-4189-470b-b6c0-00a142665a84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering">
+      <UniqueIdentifier>{fa57fd74-6b28-4b08-8786-84a37a5c6733}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects">
+      <UniqueIdentifier>{1b1c3f77-3465-478a-ae93-5b325c006476}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interception">
+      <UniqueIdentifier>{f5abe297-cae8-4e28-9923-d558bbf982af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{f9ba6065-b9e5-4e56-8280-a2fd4b42e058}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SymbolSerializers">
+      <UniqueIdentifier>{3b48d82f-b4d1-40e3-bfec-44397e9f0af8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FrameDebugger">
+      <UniqueIdentifier>{3de08894-5e3e-4fac-9ff1-0c0f0f87aae5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tracing">
+      <UniqueIdentifier>{ed825af2-5f0f-49db-9eed-fa1debd86d05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\CustomWrappers">
+      <UniqueIdentifier>{8007147f-6662-4e24-81ea-e38f1070120f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Objects\BaseWrappers">
+      <UniqueIdentifier>{51d15f10-6bec-47fa-9f53-a5f011ee28e7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

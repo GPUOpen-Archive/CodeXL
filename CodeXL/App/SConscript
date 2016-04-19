@@ -1,0 +1,94 @@
+# -*- Python -*-
+
+import os
+from CXL_init import *
+
+Import('*')
+
+appName = "CodeXL-bin"
+
+env = CXL_env.Clone()
+
+env.Append( CPPPATH = [ 
+    "./",
+    "./inc",
+    env['CXL_commonproj_dir'],
+    env['CXL_commonproj_dir'] + "/AMDTOSWrappers/Include",
+    env['CXL_commonproj_dir'] + '/../../CodeXL',
+    "/usr/include/gdk-pixbuf-2.0/", # [Suravee] Needed for Ubuntu-11.10 
+])
+initBoost(env)
+UseBoost(env)
+UseGtk(env)
+UseTinyXml(env)
+UseQScintilla(env)
+UseQt4(env)
+UseQCustomPlot(env)
+
+env.Append(CPPFLAGS = '-fPIC')
+
+# Source files:
+sources = \
+[
+# src:
+    "src/cxlApplication.cpp"
+]
+
+commonLinkedLibraries = \
+[
+    "CXLBaseTools",
+    "CXLOSWrappers",
+    "CXLOSAPIWrappers",
+    "CXLAPIClasses",
+    "CXLApplicationComponents",
+    "CXLAssertionHandlers",
+    "CXLApplicationFramework",
+    "CXLApplication",
+    "CXLRemoteClient",
+    "libboost_filesystem",
+    "libboost_wave",
+    "libboost_system",
+    "libboost_thread",
+    "libboost_date_time"
+]
+
+otherResources = \
+[
+    "./LinuxResources/CodeXL",
+    "./LinuxResources/Readme.txt",
+    "./LinuxResources/CodeXL_Release_Notes.pdf"
+]
+
+linkedLibraries = commonLinkedLibraries
+env.Prepend (LIBS = linkedLibraries)
+
+
+# Set the ELF hash generation mode:
+# - When building on new systems, we would like to generate both sysv and gnu ELF hashes.
+#   This enables running the executable also on old systems, that support only the sysv ELF hash.
+# - When building on old systems, we need to set the GR_GENERATE_ONLY_DEFAULT_ELF_HASH environment
+#   variable (preferably in the .bashrc file). Otherwise the link will fail when trying to
+#   generate an ELF hash type that the old linker does not recognize.
+# [Yaki 7/7/2009]
+linkerFlags = [] 
+shouldGenerateOnlyDefaultELFHash = os.environ.get('GR_GENERATE_ONLY_DEFAULT_ELF_HASH')
+if shouldGenerateOnlyDefaultELFHash is None:
+    linkerFlags += [ "-Wl,--hash-style=both" ]
+
+# Creating executable
+exe = env.Program(
+    target = appName, 
+    source = sources,
+    LINKFLAGS = linkerFlags)
+
+# Installing libraries
+libInstall = env.Install( 
+    dir = env['CXL_bin_dir'], 
+    source = (exe))
+
+# Install additional items - shell script, readme, etc.
+libInstall += env.Install(
+    dir = env['CXL_bin_dir'], 
+    source = (otherResources))
+
+Return('libInstall')

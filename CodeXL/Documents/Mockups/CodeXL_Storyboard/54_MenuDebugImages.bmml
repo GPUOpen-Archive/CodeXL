@@ -1,0 +1,113 @@
+<mockup version="1.0" skin="sketch" measuredW="915" measuredH="666" mockupW="803" mockupH="592">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::TitleWindow" x="112" y="74" w="803" h="592" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <close>true</close>
+        <maximizeRestore>true</maximizeRestore>
+        <minimize>true</minimize>
+        <text>Unified%20Tool%20-%20ExampleCL.uni</text>
+      </controlProperties>
+    </control>
+    <control controlID="1" controlTypeID="com.balsamiq.mockups::Label" x="115" y="642" w="-1" h="-1" measuredW="44" measuredH="21" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Ready</text>
+      </controlProperties>
+    </control>
+    <control controlID="2" controlTypeID="com.balsamiq.mockups::MenuBar" x="112" y="95" w="803" h="29" measuredW="452" measuredH="29" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <hrefs>32_MenuFile1%26bm%3B32_MenuFile1.bmml%26bm%3B32_MenuFile1.bmml%26bm%3B32_MenuFile1.bmml%2C34_MenuEdit%26bm%3B34_MenuEdit.bmml%26bm%3B34_MenuEdit.bmml%26bm%3B34_MenuEdit.bmml%2C35_MenuView%26bm%3B35_MenuView.bmml%26bm%3B35_MenuView.bmml%26bm%3B35_MenuView.bmml%2C38_MenuTools%26bm%3B38_MenuTools.bmml%26bm%3B38_MenuTools.bmml%26bm%3B38_MenuTools.bmml%2C40_MenuProfile%26bm%3B40_MenuProfile.bmml%26bm%3B40_MenuProfile.bmml%26bm%3B40_MenuProfile.bmml%2C%2C59_MenuWindows%26bm%3B59_MenuWindows.bmml%26bm%3B59_MenuWindows.bmml%26bm%3B59_MenuWindows.bmml%2C60_MenuHelp%26bm%3B60_MenuHelp.bmml%26bm%3B60_MenuHelp.bmml%26bm%3B60_MenuHelp.bmml%2C</hrefs>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%2218%2C27%2C51%2C48%22%20href%3D%2232_MenuFile1.bmml%22%20alt%3D%2232_MenuFile1%22%20id%3D%222_0%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%2260%2C27%2C96%2C48%22%20href%3D%2234_MenuEdit.bmml%22%20alt%3D%2234_MenuEdit%22%20id%3D%222_1%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22105%2C27%2C148%2C48%22%20href%3D%2235_MenuView.bmml%22%20alt%3D%2235_MenuView%22%20id%3D%222_2%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22157%2C27%2C203%2C48%22%20href%3D%2238_MenuTools.bmml%22%20alt%3D%2238_MenuTools%22%20id%3D%222_3%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22212%2C27%2C262%2C48%22%20href%3D%2240_MenuProfile.bmml%22%20alt%3D%2240_MenuProfile%22%20id%3D%222_4%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22331%2C27%2C394%2C48%22%20href%3D%2259_MenuWindows.bmml%22%20alt%3D%2259_MenuWindows%22%20id%3D%222_5%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22403%2C27%2C443%2C48%22%20href%3D%2260_MenuHelp.bmml%22%20alt%3D%2260_MenuHelp%22%20id%3D%222_6%22/%3E%0A</map>
+        <selectedIndex>5</selectedIndex>
+        <text>%26F%26ile%2C%20%26E%26dit%2C%20%26V%26iew%2C%20%26T%26ools%2C%20%26P%26rofile%2C%20%26D%26ebug%2C%20%26W%26indows%2C%20%26H%26elp</text>
+      </controlProperties>
+    </control>
+    <control controlID="3" controlTypeID="com.balsamiq.mockups::Menu" x="376" y="120" w="-1" h="-1" measuredW="150" measuredH="125" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <hrefs>22_DefaultLayoutDebugSessionStarted%26bm%3B22_DefaultLayoutDebugSessionStarted.bmml%26bm%3B22_DefaultLayoutDebugSessionStarted.bmml%26bm%3B22_DefaultLayoutDebugSessionStarted.bmml%2C%2C55_MenuDebugStatistics%26bm%3B55_MenuDebugStatistics.bmml%26bm%3B55_MenuDebugStatistics.bmml%26bm%3B55_MenuDebugStatistics.bmml%2C52_MenuDebugBreakpoints%26bm%3B52_MenuDebugBreakpoints.bmml%26bm%3B52_MenuDebugBreakpoints.bmml%26bm%3B52_MenuDebugBreakpoints.bmml%2C%2C%2C24_NewProjectDebug%26bm%3B24_NewProjectDebug.bmml%26bm%3B24_NewProjectDebug.bmml%26bm%3B24_NewProjectDebug.bmml</hrefs>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22264%2C51%2C414%2C72%22%20href%3D%2222_DefaultLayoutDebugSessionStarted.bmml%22%20alt%3D%2222_DefaultLayoutDebugSessionStarted%22%20id%3D%223_0%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22264%2C77%2C414%2C98%22%20href%3D%2255_MenuDebugStatistics.bmml%22%20alt%3D%2255_MenuDebugStatistics%22%20id%3D%223_1%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22264%2C98%2C414%2C119%22%20href%3D%2252_MenuDebugBreakpoints.bmml%22%20alt%3D%2252_MenuDebugBreakpoints%22%20id%3D%223_2%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22264%2C145%2C414%2C166%22%20href%3D%2224_NewProjectDebug.bmml%22%20alt%3D%2224_NewProjectDebug%22%20id%3D%223_3%22/%3E%0A</map>
+        <selectedIndex>4</selectedIndex>
+        <text>%26S%26tart%20New%20Debug%0A---%0ADebugging%20%3E%0ABreakpoints%20%3E%0AImages%20%3E%0A---%0A%26D%26ebug%20Settings...</text>
+      </controlProperties>
+    </control>
+    <control controlID="4" controlTypeID="com.balsamiq.mockups::Menu" x="526" y="194" w="234" h="-1" measuredW="150" measuredH="304" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Select%20Tool%0AZoom%20In%2C+%0AZoom%20Out%2C-%0APan%20Tool%0AEnable%20the%20Red%20Channel%0AEnable%20the%20Green%20Channel%0AEnable%20the%20Blue%20Channel%0AEnable%20the%20Alpha%20Channel%0AEnable%20Grayscale%20Mode%0AEnable%20Color%20Invert%20Mode%0AOriginal%20Size%20%28100%25%29%0ABest%20Fit%0ARotate%20Left%2CCtrl+L%0ARotate%20Right%2CCtrl+R</text>
+      </controlProperties>
+    </control>
+    <control controlID="9" controlTypeID="com.balsamiq.mockups::Canvas" x="335" y="118" w="580" h="26" measuredW="100" measuredH="70" zOrder="3" locked="false" isInGroup="-1"/>
+    <control controlID="10" controlTypeID="__group__" x="173" y="118" w="62" h="26" measuredW="62" measuredH="26" zOrder="6" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::Canvas" x="0" y="0" w="62" h="26" measuredW="100" measuredH="70" zOrder="0" locked="false" isInGroup="10">
+          <controlProperties>
+            <value>0</value>
+            <verticalScrollbar>false</verticalScrollbar>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Icon" x="6" y="5" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="1" locked="false" isInGroup="10">
+          <controlProperties>
+            <href>81_DefaultLayoutProfileSessionStarted%26bm%3B81_DefaultLayoutProfileSessionStarted.bmml%26bm%3B81_DefaultLayoutProfileSessionStarted.bmml%26bm%3B81_DefaultLayoutProfileSessionStarted.bmml</href>
+            <icon>RightTriangleIcon%7Cxsmall</icon>
+            <map>%3Carea%20shape%3D%22rect%22%20coords%3D%2267%2C49%2C83%2C65%22%20href%3D%2281_DefaultLayoutProfileSessionStarted.bmml%22%20alt%3D%2281_DefaultLayoutProfileSessionStarted%22%20id%3D%221%22/%3E</map>
+          </controlProperties>
+        </control>
+        <control controlID="2" controlTypeID="com.balsamiq.mockups::Icon" x="22" y="5" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="2" locked="false" isInGroup="10">
+          <controlProperties>
+            <color>10066329</color>
+            <icon>PauseIcon%7Cxsmall</icon>
+          </controlProperties>
+        </control>
+        <control controlID="3" controlTypeID="com.balsamiq.mockups::Icon" x="38" y="5" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="3" locked="false" isInGroup="10">
+          <controlProperties>
+            <color>10066329</color>
+            <icon>StopIcon%7Cxsmall</icon>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="11" controlTypeID="__group__" x="112" y="120" w="61" h="23" measuredW="61" measuredH="23" zOrder="7" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::ComboBox" x="20" y="0" w="-1" h="-1" measuredW="41" measuredH="23" zOrder="0" locked="false" isInGroup="11">
+          <controlProperties>
+            <size>13</size>
+            <state>closed</state>
+            <text>P%0ATimer-based%0AInstruction-based%20</text>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::TextArea" x="0" y="0" w="20" h="23" measuredW="200" measuredH="140" zOrder="1" locked="false" isInGroup="11">
+          <controlProperties>
+            <text>D</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="12" controlTypeID="__group__" x="235" y="118" w="100" h="26" measuredW="100" measuredH="26" zOrder="8" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::Canvas" x="0" y="0" w="100" h="26" measuredW="100" measuredH="70" zOrder="0" locked="false" isInGroup="12"/>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Icon" x="10" y="5" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="1" locked="false" isInGroup="12">
+          <controlProperties>
+            <color>40463</color>
+            <icon>ForwardIcon%7Cxsmall</icon>
+          </controlProperties>
+        </control>
+        <control controlID="2" controlTypeID="com.balsamiq.mockups::Icon" x="34" y="5" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="2" locked="false" isInGroup="12">
+          <controlProperties>
+            <color>6989903</color>
+            <icon>ForwardIcon%7Cxsmall</icon>
+          </controlProperties>
+        </control>
+        <control controlID="3" controlTypeID="com.balsamiq.mockups::Icon" x="54" y="5" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="3" locked="false" isInGroup="12">
+          <controlProperties>
+            <color>12554240</color>
+            <icon>ForwardIcon%7Cxsmall</icon>
+          </controlProperties>
+        </control>
+        <control controlID="4" controlTypeID="com.balsamiq.mockups::Icon" x="76" y="5" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="4" locked="false" isInGroup="12">
+          <controlProperties>
+            <color>40463</color>
+            <icon>ForwardChapterIcon%7Cxsmall</icon>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+  </controls>
+</mockup>

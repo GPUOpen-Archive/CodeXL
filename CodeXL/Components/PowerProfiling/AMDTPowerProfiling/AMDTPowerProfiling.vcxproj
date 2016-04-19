@@ -1,0 +1,175 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{94C28338-2EF8-4E26-8375-A93A68FE8146}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>AMDTPowerProfiling</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)\AMDTPowerProfiling.props" />
+    <Import Project="$(AMDTCommonExt)\qcustomplot\Global-qcustomplot.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(CommonDir)\Src\TSingleton\Global-TSingleton.props" />
+  </ImportGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>AMDTPOWERPROFILING_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>CXLApplicationComponents$(GDTProjectSuffix).lib;CXLApiClasses$(GDTProjectSuffix).lib;CXLSharedProfiling$(GDTProjectSuffix).lib;CXLPowerProfilingMidTier$(GDTProjectSuffix).lib;CXLDbAdapter$(GDTProjectSuffix).lib;CXLProfilerDAL$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\..\Common\Src\qcustomplot\1.3.1\qcustomplot.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "$(COMMONDIR)\Src\qcustomplot\1.3.1\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="..\Backend\AMDTPowerProfileAPI\src\ppCountersStringConstants.h" />
+    <ClInclude Include="Include\ppAMDTPowerProfilingDLLBuild.h" />
+    <ClInclude Include="Include\ppAppWrapper.h" />
+    <ClInclude Include="Include\ppStringConstants.h" />
+    <CustomBuild Include="src\ppAppController.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="src\ppSessionView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="src\ppTimelineView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\ppWindowsManagerHelper.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">moc creation %(Filename)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">moc creation %(Filename)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="src\ppAidFunctions.h" />
+    <ClInclude Include="src\ppColoredBarGraphData.h" />
+    <ClInclude Include="src\ppColors.h" />
+    <ClInclude Include="src\ppCountersSortOrder.h" />
+    <ClInclude Include="src\ppDataUtils.h" />
+    <CustomBuild Include="src\ppCountersSelectionDialog.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="src\ppGUIDefs.h" />
+    <CustomBuild Include="src\ppSessionNavigationChart.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="src\ppMultiLinePlot.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="src\ppMenuActionsExecutor.h" />
+    <CustomBuild Include="src\ppMultiLinePowerStackedPlot.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="src\ppSessionController.h" />
+    <ClInclude Include="src\ppSingletonsDelete.h" />
+    <ClInclude Include="src\ppStackedBarGraphData.h" />
+    <CustomBuild Include="src\ppSummaryView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="src\ppTreeHandler.h" />
+    <ClInclude Include="src\ppMDIViewCreator.h" />
+    <CustomBuild Include="src\ppProjectSettingsExtension.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\ppAidFunctions.cpp" />
+    <ClCompile Include="src\ppAppController.cpp" />
+    <ClCompile Include="src\ppAppWrapper.cpp" />
+    <ClCompile Include="src\ppColors.cpp" />
+    <ClCompile Include="src\ppCountersSelectionDialog.cpp" />
+    <ClCompile Include="src\ppCountersSortOrder.cpp" />
+    <ClCompile Include="src\ppDataUtils.cpp" />
+    <ClCompile Include="src\ppMDIViewCreator.cpp" />
+    <ClCompile Include="src\ppMenuActionsExecutor.cpp" />
+    <ClCompile Include="src\ppMultiLinePlot.cpp" />
+    <CustomBuild Include="src\ppMultiLinePowerNonStackedPlot.h">
+      <FileType>CppCode</FileType>
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClCompile Include="src\ppMultiLinePowerNonStackedPlot.cpp" />
+    <ClCompile Include="src\ppMultiLinePowerStackedPlot.cpp" />
+    <ClCompile Include="src\ppProjectSettingsExtension.cpp" />
+    <ClCompile Include="src\ppSessionController.cpp" />
+    <ClCompile Include="src\ppSessionNavigationChart.cpp" />
+    <ClCompile Include="src\ppSessionView.cpp" />
+    <ClCompile Include="src\ppSingletonsDelete.cpp" />
+    <ClCompile Include="src\ppSummaryView.cpp" />
+    <ClCompile Include="src\ppTimelineView.cpp" />
+    <ClCompile Include="src\ppTreeHandler.cpp" />
+    <ClCompile Include="src\ppWindowsManagerHelper.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_ppAppController.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_ppCountersSelectionDialog.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_ppMultiLinePlot.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_ppMultiLinePowerNonStackedPlot.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_ppMultiLinePowerStackedPlot.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_ppProjectSettingsExtension.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_ppSessionNavigationChart.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_ppSessionView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_ppSummaryView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_ppTimelineView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_ppWindowsManagerHelper.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

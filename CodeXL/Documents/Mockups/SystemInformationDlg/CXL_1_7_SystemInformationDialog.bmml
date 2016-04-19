@@ -1,0 +1,71 @@
+<mockup version="1.0" skin="sketch" fontFace="Balsamiq Sans" measuredW="981" measuredH="481" mockupW="821" mockupH="465">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::TitleWindow" x="160" y="98" w="821" h="383" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bottomheight>0</bottomheight>
+        <close>true</close>
+        <text>System%20Information</text>
+      </controlProperties>
+    </control>
+    <control controlID="2" controlTypeID="com.balsamiq.mockups::TabBar" x="160" y="123" w="810" h="314" measuredW="652" measuredH="100" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>6</selectedIndex>
+        <size>11</size>
+        <text>System%2CDisplay%2C%20OpenGL%20Renderer%2C%20OpenGL%20Pixel%20Formats%2C%20OpenGL%20Extensions%2C%20OpenCL%20Platforms%2C%20OpenCL%20Devices</text>
+      </controlProperties>
+    </control>
+    <control controlID="4" controlTypeID="com.balsamiq.mockups::DataGrid" x="164" y="148" w="797" h="283" measuredW="1060" measuredH="275" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <alternateRowColor>16777215</alternateRowColor>
+        <borderStyle>none</borderStyle>
+        <hasHeader>true</hasHeader>
+        <rowHeight>16</rowHeight>
+        <size>11</size>
+        <text>Parameter%2C%20Device%201%20%2832-bit%5C%2C%20GPU%29%2C%20Device%201%20%2864-bit%5C%2C%20GPU%29%2C%20Device%202%20%2832-bit%5C%2C%20CPU%29%2C%20Device%202%20%2864-bit%5C%2C%20CPU%29%0APlatform%20ID%2C%201%2C%202%2C%201%2C%202%0AAddress-space%2C%2032-bit%2C%2064-bit%2C%2032-bit%2C%2064-bit%0ADevice%20Type%2C%20GPU%2C%20GPU%2C%20CPU%2C%20CPU%0ADevice%20Name%2C%20Devastator%2C%20Devastator%2C%20AMD%20A8-4500M%20APU%20with%20Radeon%20%28tm%29%20HD%20Graphics%2C%20AMD%20A8-4500M%20APU%20with%20Radeon%20%28tm%29%20HD%20Graphics%0AVendor%2C%20Advanced%20Micro%20Devices%5C%2C%20Inc.%2C%20Advanced%20Micro%20Devices%5C%2C%20Inc.%2C%20AuthenticAMD%2C%20AuthenticAMD%0ACommand%20Queue%20Properties%2C%20Queue%20Profiling%2C%20Queue%20Profiling%2C%20Queue%20Profiling%2C%20Queue%20Profiling%0AMax%20Global%20Variable%20Size%2C%200%20bytes%2C%200%20bytes%2C%201024MB%2C%201024MB%0AQueue%20On%20Device%20Properties%2C%20N/A%2C%20N/A%2C%20N/A%2C%20N/A%0AQueue%20On-Device%20Preferred%20Size%2C%200%20bytes%2C%200%20bytes%2C%200%20bytes%2C%200%20bytes%0AQueue%20On-Device%20Max%20Size%2C%200%20bytes%2C%200%20bytes%2C%200%20bytes%2C%200%20bytes%0AMax%20On-Device%20Queues%2C%200%2C0%2C0%2C0%0AMax%20On-Device%20Events%2C%200%2C0%2C0%2C0%0AShared%20Virtual%20Memory%20Capabilities%2C%20N/A%2C%20N/A%2C%20Coarse-grained%20buff...%2C%20Coarse-grained%20buff...%2C%20%0AMax%20Pipes%20Args%2C%200%2C%200%2C%2016%2C%2016%0APipe%20Max%20Active%20Reservations%2C%200%2C%200%2C%2016%2C%2016%0APipe%20Max%20Packet%20Size%2C%200%20bytes%2C%200%20bytes%2C%201024%20MB%2C%201024%20MB%0A%7B28%2C18%2C18%2C18%2C18%7D</text>
+        <verticalScrollbar>false</verticalScrollbar>
+        <vLines>false</vLines>
+      </controlProperties>
+    </control>
+    <control controlID="5" controlTypeID="com.balsamiq.mockups::Button" x="831" y="446" w="62" h="27" measuredW="41" measuredH="27" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>OK</text>
+      </controlProperties>
+    </control>
+    <control controlID="6" controlTypeID="com.balsamiq.mockups::Button" x="908" y="446" w="64" h="27" measuredW="52" measuredH="27" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Save</text>
+      </controlProperties>
+    </control>
+    <control controlID="7" controlTypeID="com.balsamiq.mockups::VerticalScrollBar" x="948" y="166" w="-1" h="265" measuredW="16" measuredH="100" zOrder="5" locked="false" isInGroup="-1"/>
+    <control controlID="8" controlTypeID="com.balsamiq.mockups::StickyNote" x="430" y="16" w="333" h="67" measuredW="109" measuredH="123" zOrder="6" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>Except%20for%20the%20left%20most%20column%20%22Parameter%22%2C%20the%20order%20of%20the%20rest%20of%20the%20columns%20is%20sorted%20by%20the%20column%20header</text>
+      </controlProperties>
+    </control>
+    <control controlID="9" controlTypeID="com.balsamiq.mockups::Arrow" x="747" y="74" w="120" h="77" measuredW="150" measuredH="100" zOrder="7" locked="false" isInGroup="-1">
+      <controlProperties>
+        <leftArrow>false</leftArrow>
+      </controlProperties>
+    </control>
+    <control controlID="10" controlTypeID="com.balsamiq.mockups::Arrow" x="670" y="74" w="53" h="76" measuredW="150" measuredH="100" zOrder="8" locked="false" isInGroup="-1">
+      <controlProperties>
+        <leftArrow>false</leftArrow>
+      </controlProperties>
+    </control>
+    <control controlID="11" controlTypeID="com.balsamiq.mockups::Arrow" x="567" y="74" w="58" h="77" measuredW="150" measuredH="100" zOrder="9" locked="false" isInGroup="-1">
+      <controlProperties>
+        <direction>bottom</direction>
+        <leftArrow>true</leftArrow>
+        <rightArrow>false</rightArrow>
+      </controlProperties>
+    </control>
+    <control controlID="12" controlTypeID="com.balsamiq.mockups::Arrow" x="462" y="74" w="58" h="77" measuredW="150" measuredH="100" zOrder="10" locked="false" isInGroup="-1">
+      <controlProperties>
+        <direction>bottom</direction>
+        <leftArrow>true</leftArrow>
+        <rightArrow>false</rightArrow>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

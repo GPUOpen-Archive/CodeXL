@@ -1,0 +1,291 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{D1A4A718-6E7F-4AF3-AB0C-7B387DFDA9A6}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>AMDTAnalyzer</ProjectName>
+    <RootNamespace>AMDTAnalyzer</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)\AMDTKernelAnalyzer.props" />
+    <Import Project="$(CommonDir)\Lib\Ext\Boost\Global-Boost-2015.props" />
+    <Import Project="$(CommonDir)\Src\DeviceInfo\Global-DeviceInfo.props" />
+    <Import Project="$(CommonDir)\Lib\AMD\ACL\Global-ACL.props" />
+    <Import Project="$(CommonDir)\Src\CElf\Global-CElf.props" />
+    <Import Project="$(CommonDir)\Src\DynamicLibraryModule\Global-DynamicLibraryModule.props" />
+    <Import Project="$(CommonDir)\Lib\AMD\APPSDK\Global-OpenCL-NoLib.props" />
+    <Import Project="$(CommonDir)\Lib\AMD\CAL\Global-CAL-NoLib.props" />
+    <Import Project="$(CommonDir)\Lib\Ext\Windows-Kits\Global-WindowsSDK.props" />
+    <Import Project="$(CommonDir)\Lib\Ext\QScintilla\Global-QScintilla.props" />
+    <Import Project="$(CommonDir)\Lib\Ext\Qt\Global-QT.props" />
+    <Import Project="$(CommonDir)\Lib\Ext\tinyxml\Global-TinyXML-2015.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="..\..\..\..\Common\Lib\Ext\GoogleTest\Global-GoogleTest-1.7-2015.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="..\..\..\..\Common\Lib\Ext\GoogleTest\Global-GoogleTest-1.7-2015.props" />
+  </ImportGroup>
+  <PropertyGroup>
+    <OutDir>$(AMDTOutputDir)$(Configuration)\bin\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>AMDTKERNELANALYZER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\AMDTBackend\Include\Common\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;CXLOSAPIWrappers$(GDTProjectSuffix).lib;CXLApiClasses$(GDTProjectSuffix).lib;CXLApplicationComponents$(GDTProjectSuffix).lib;CXLApplicationFramework$(GDTProjectSuffix).lib;CXLAnalysisBackend$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ResourceCompile Include="$(CommonProjectsDir)\VersionInfo\VersionResource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(CommonDir)\Src\DeviceInfo\DeviceInfoInternal.cpp">
+      <ExcludedFromBuild Condition="'$(GDT_BUILD)'!='GDT_INTERNAL'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(CommonDir)\Src\DeviceInfo\DeviceInfoUtils.cpp" />
+    <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\kaAddFileDialog.cpp" />
+    <ClCompile Include="src\kaAnalysisView.cpp" />
+    <ClCompile Include="src\kaAnalyzeSettingsPage.cpp" />
+    <ClCompile Include="src\kaApplicationCommands.cpp" />
+    <ClCompile Include="src\kaApplicationTreeHandler.cpp" />
+    <ClCompile Include="src\kaAppWrapper.cpp" />
+    <ClCompile Include="src\kaBackendManager.cpp" />
+    <ClCompile Include="src\kaBuildToolbar.cpp" />
+    <ClCompile Include="src\kaCliLauncher.cpp" />
+    <ClCompile Include="src\kaCreateProgramDialog.cpp" />
+    <ClCompile Include="src\kaDataAnalyzerFunctions.cpp" />
+    <ClCompile Include="src\kaEventObserver.cpp" />
+    <ClCompile Include="src\kaExecutionMode.cpp" />
+    <ClCompile Include="src\kaExportBinariesDialog.cpp" />
+    <ClCompile Include="src\kaFileManager.cpp" />
+    <ClCompile Include="src\kaGlobalVariableManager.cpp" />
+    <ClCompile Include="src\kaKernelView.cpp" />
+    <ClCompile Include="src\kaMDIViewCreator.cpp" />
+    <ClCompile Include="src\kaMenuActionsExecutor.cpp" />
+    <ClCompile Include="src\kaMultiSourceActionCreator.cpp" />
+    <ClCompile Include="src\kaMultiSourceView.cpp" />
+    <ClCompile Include="src\kaOverviewView.cpp" />
+    <ClCompile Include="src\kaProgram.cpp" />
+    <ClCompile Include="src\kaProjectDataManager.cpp" />
+    <ClCompile Include="src\kaProjectSettingsExtension.cpp" />
+    <ClCompile Include="src\kaProjectSettingsExtensionBase.cpp" />
+    <ClCompile Include="src\kaProjectSettingsExtensionOther.cpp" />
+    <ClCompile Include="src\kaProjectSettingsShaderExtension.cpp" />
+    <ClCompile Include="src\kaSingletonsDelete.cpp" />
+    <ClCompile Include="src\kaSourceCodeTableView.cpp" />
+    <ClCompile Include="src\kaSourceCodeView.cpp" />
+    <ClCompile Include="src\kaStatisticsView.cpp" />
+    <ClCompile Include="src\kaTableView.cpp" />
+    <ClCompile Include="src\kaTreeDataExtension.cpp" />
+    <ClCompile Include="src\kaTreeModel.cpp" />
+    <ClCompile Include="src\kaUtils.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaAnalysisView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaAnalyzeSettingsPage.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaApplicationTreeHandler.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaBackendManager.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaBuildToolbar.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaExportBinariesDialog.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaKernelView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaMultiSourceView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaOverviewView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaProjectDataManager.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaProjectSettingsExtension.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaProjectSettingsExtensionBase.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaProjectSettingsExtensionOther.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaProjectSettingsShaderExtension.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaSourceCodeView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaSourceCodeTableView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaStatisticsView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaTableView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaTreeDataExtension.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaTreeModel.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaAddFileDialog.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaCreateProgramDialog.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(CommonDir)\Src\DeviceInfo\DeviceInfo.h" />
+    <ClInclude Include="$(CommonDir)\Src\DeviceInfo\DeviceInfoUtils.h" />
+    <ClInclude Include="Include\kaAMDTKernelAnalyzerDLLBuild.h" />
+    <ClInclude Include="Include\kaAppWrapper.h" />
+    <ClInclude Include="Include\kaCommandIDs.h" />
+    <ClInclude Include="src\kaUtils.h" />
+    <CustomBuild Include="src\kaExportBinariesDialog.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="src\kaAddFileDialog.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="src\kaCliLauncher.h" />
+    <CustomBuild Include="src\kaCreateProgramDialog.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">moc creation %(Filename)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">moc creation %(Filename)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="src\kaDataTypes.h" />
+    <ClInclude Include="src\kaFileManager.h" />
+    <ClInclude Include="src\kaMultiSourceActionCreator.h" />
+    <CustomBuild Include="src\kaSourceCodeView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="src\kaSourceCodeTableView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="src\kaTableView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Include\kaExecutionMode.h" />
+    <ClInclude Include="Include\kaStringConstants.h" />
+    <CustomBuild Include="src\kaAnalysisView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="src\kaAnalyzeSettingsPage.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="src\kaApplicationCommands.h" />
+    <CustomBuild Include="src\kaStatisticsView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="src\kaKernelView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="src\kaBuildToolbar.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="src\kaMDIViewCreator.h" />
+    <CustomBuild Include="src\kaOverviewView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="src\kaMultiSourceView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="src\kaProjectDataManager.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="src\kaTreeDataExtension.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="src\kaApplicationTreeHandler.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="src\kaBackendManager.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="src\kaEventObserver.h" />
+    <ClInclude Include="src\kaGlobalVariableManager.h" />
+    <CustomBuild Include="src\kaProjectSettingsExtension.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="src\kaProjectSettingsExtensionBase.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="src\kaProjectSettingsExtensionOther.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="src\kaProjectSettingsShaderExtension.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="src\kaProgram.h" />
+    <ClInclude Include="src\kaSingletonsDelete.h" />
+    <CustomBuild Include="src\kaTreeModel.h">
+      <Message>moc creation %(Filename)</Message>
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="src\kaDataAnalyzerFunctions.h" />
+    <ClInclude Include="src\kaMenuActionsExecutor.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

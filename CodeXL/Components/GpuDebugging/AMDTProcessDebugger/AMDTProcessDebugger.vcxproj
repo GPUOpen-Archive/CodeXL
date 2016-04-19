@@ -1,0 +1,160 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{89777CBD-D9EC-4974-9ACB-5886B7D9C60E}</ProjectGuid>
+    <RootNamespace>AMDTProcessDebugger</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="$(SolutionDir)\AMDTGpuDebugging.props" />
+    <Import Project="..\..\..\..\Common\Lib\AMD\APPSDK\Global-OpenCL-NoLib.props" />
+  </ImportGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>AMDTPROCESSDEBUGGER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Platform)'=='Win32'">
+    <Link>
+      <AdditionalDependencies>CXLRemoteClient$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\pdDebuggedProcessWatcherThread.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\pdGDBCommandInfo.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\pdGDBDataStructs.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\pdGDBDriver.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\pdGDBListenerThread.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\pdGDBOutputReader.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\pdGDBProcessWaiterThread.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\pdLauncherProcessWatcherThread.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\pdLinuxDebuggedApplicationOutputReaderThread.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\pdLinuxProcessDebugger.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\pdLoadedModule.cpp" />
+    <ClCompile Include="src\pdLoadedModulesManager.cpp" />
+    <ClCompile Include="src\pdProcessDebugger.cpp" />
+    <ClCompile Include="src\pdProcessDebuggersManager.cpp" />
+    <ClCompile Include="src\pdRegisterProcessDebuggersManagerInstance.cpp" />
+    <ClCompile Include="src\pdRemoteProcessDebugger.cpp">
+      <ExcludedFromBuild Condition="'$(Platform)'=='x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\pdRemoteProcessDebuggerDebuggingServerWatcherThread.cpp">
+      <ExcludedFromBuild Condition="'$(Platform)'=='x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\pdRemoteProcessDebuggerEventsListenerThread.cpp">
+      <ExcludedFromBuild Condition="'$(Platform)'=='x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\pdRemoteProcessDebuggerTCPIPConnectionWaiterThread.cpp">
+      <ExcludedFromBuild Condition="'$(Platform)'=='x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\pdSingletonsDelete.cpp" />
+    <ClCompile Include="src\pdWin32DebuggerThread.cpp" />
+    <ClCompile Include="src\pdWin32LoadLibraryStub.cpp" />
+    <ClCompile Include="src\pdWin32MemoryInjector.cpp" />
+    <ClCompile Include="src\pdWin32ProcessDebugger.cpp" />
+    <ClCompile Include="src\pdWin32RemoteDLLLoader.cpp" />
+    <ClCompile Include="src\pdWin32SetRemoteProcessDLLDirectory.cpp" />
+    <ClCompile Include="src\pdWindowsLoadedModulesManager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuildStep Include="Sconstruct">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </CustomBuildStep>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\pdDebuggedProcessThreadData.h" />
+    <ClInclude Include="src\pdDebuggedProcessWatcherThread.h" />
+    <ClInclude Include="src\pdGDBCommandInfo.h" />
+    <ClInclude Include="src\pdGDBDataStructs.h" />
+    <ClInclude Include="src\pdGDBDriver.h" />
+    <ClInclude Include="src\pdGDBListenerThread.h" />
+    <ClInclude Include="src\pdGDBOutputReader.h" />
+    <ClInclude Include="src\pdGDBProcessWaiterThread.h" />
+    <ClInclude Include="src\pdLauncherProcessWatcherThread.h" />
+    <ClInclude Include="src\pdLinuxDebuggedApplicationOutputReaderThread.h" />
+    <ClInclude Include="src\pdLinuxProcessDebugger.h" />
+    <ClInclude Include="src\pdLoadedModule.h" />
+    <ClInclude Include="src\pdLoadedModulesManager.h" />
+    <ClInclude Include="src\pdRegisterProcessDebuggersManagerInstance.h" />
+    <ClInclude Include="src\pdRemoteProcessDebugger.h" />
+    <ClInclude Include="src\pdRemoteProcessDebuggerDebuggingServerWatcherThread.h" />
+    <ClInclude Include="src\pdRemoteProcessDebuggerEventsListenerThread.h" />
+    <ClInclude Include="src\pdRemoteProcessDebuggerTCPIPConnectionWaiterThread.h" />
+    <ClInclude Include="src\pdSingletonsDelete.h" />
+    <ClInclude Include="src\pdStringConstants.h" />
+    <ClInclude Include="src\pdWin32DebuggerThread.h" />
+    <ClInclude Include="src\pdWin32LoadLibraryStub.h" />
+    <ClInclude Include="src\pdWin32ProcessDebugger.h" />
+    <ClInclude Include="src\pdWindowsLoadedModulesManager.h" />
+    <ClInclude Include="Include\pdProcessDebugger.h" />
+    <ClInclude Include="Include\pdProcessDebuggersManager.h" />
+    <ClInclude Include="Include\pdRemoteProcessDebuggerCommandId.h" />
+    <ClInclude Include="Include\pdWin32MemoryInjector.h" />
+    <ClInclude Include="Include\pdWin32RemoteDLLLoader.h" />
+    <ClInclude Include="Include\pdWin32SetRemoteProcessDLLDirectory.h" />
+    <ClInclude Include="Include\ProcessDebuggerDLLBuild.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\..\Common\Src\VersionInfo\VersionResource.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

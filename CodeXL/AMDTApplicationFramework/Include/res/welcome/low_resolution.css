@@ -1,0 +1,133 @@
+
+/* Style definitions for small width window (600 - 1300 px) 
+Notice - the width is not for the screen resolution, but for the welcome page width
+*/ 
+@media all and (min-width: 600px) and (max-width: 800px) 
+{
+	pre { margin: 0 0 0 10% }
+		
+		
+	/* middle_td is the class for the middle area of the HTML page. The width is defined according to the screen width */
+	td.middle_td
+	{
+		max-width: 480px;
+	}
+}
+
+.wrapper {
+margin: 0 auto -120px;
+}
+
+.push
+{
+height: 10px;
+
+}
+.footer{
+height: 80px;
+}
+
+@media all and (max-height: 800px)
+{
+.wrapper {
+margin: 0 auto -6em;
+}
+}
+/* Style definitions for low width window (1300 - 1600 px) 
+Notice - the width is not for the screen resolution, but for the welcome page width
+*/ 
+#content
+{
+	/*FOR DEBUG ONLY. Comment before submit
+	background-color: MistyRose;
+	*/
+}
+
+body
+{
+    font-size: small;
+}
+
+#content
+{
+    padding-top:20px
+}
+
+#footer_in img
+{
+    width: 50%;
+    height: auto;
+}
+
+#main_container 
+{
+    margin-bottom: 30px; 
+}
+
+#footer 
+{
+    width: 80%;
+    height:30px;
+}
+
+#footer_in
+{
+    margin-top: 0px;
+    margin-left: 60px;
+}
+
+#footer li a 
+{
+    font-size: 12px;
+}
+
+#recent_table td, 
+#recent_table td a,
+#sample_table td, 
+#sample_table td a
+{
+    font-size: 12px;
+    height:16px;
+}
+
+div.clickableRow_title
+{
+    font-size:14px;
+    font-weight: bold;
+}
+
+div.clickableRow_text
+{
+    font-size:12px;
+    line-height:18px;
+    white-space:normal;
+}
+
+#main_image_td
+{
+    padding-top:10px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px; 
+}
+
+#main_image_td,
+#frame_td
+{
+    box-shadow: 1px 2px 1px #9D9FA1;
+}
+
+td.middle_td
+{
+	max-width: 480px;
+}
+
+#recent_td 
+{
+    padding-top: 20px;
+    padding-left: 20px;
+}
+
+#content
+{
+    padding-bottom:0px;
+}

@@ -1,0 +1,177 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName Condition="'$(SolutionName)'=='CodeXL-AllProjects'">CXLGraphicsServer</ProjectName>
+    <ProjectName Condition="'$(SolutionName)'!='CodeXL-AllProjects'">GPUPerfServer</ProjectName>
+    <ProjectGuid>{E275FBA1-A4DA-428D-8D08-D40E88FB05EE}</ProjectGuid>
+    <RootNamespace>WebServer</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="Server-Common.props" />
+    <Import Project="AMDTOSWrappers.props" />
+    <Import Project="$(CommonDir)\Lib\Ext\Windows-Kits\Global-WindowsSDK.props" />
+    <Import Project="$(CommonDir)\Lib\Ext\Boost\Global-Boost-2015.props" />
+    <Import Project="$(CommonDir)\Lib\AMD\GPUPerfAPI\Global-GPUPerfAPI.props" />
+    <Import Condition="'$(GDT_BUILD)'=='GDT_INTERNAL'" Project="$(CommonDir)\Lib\AMD\GPUThreadTrace\Global-GPUThreadTrace.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(SolutionName)'=='CodeXL-AllProjects'">
+    <Import Project="$(CommonDir)\Src\AMDTInterceptor\Interceptor.mhook-dllinjector-2015.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(SolutionName)'!='CodeXL-AllProjects'">
+    <Import Project="$(CommonDir)\Src\AMDTInterceptor\Global-Interceptor-2015.props" />
+  </ImportGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(MyBinDir)</OutDir>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(MyBinDir)</OutDir>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(MyBinDir)</OutDir>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(MyBinDir)</OutDir>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <CustomBuildStep />
+    <ClCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ResourceCompile>
+      <PreprocessorDefinitions>$(CustomPreProcessorDefs);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <CustomBuildStep />
+    <ClCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ResourceCompile>
+      <PreprocessorDefinitions>$(CustomPreProcessorDefs);%(PreprocessorDefinitions);</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <CustomBuildStep />
+    <ClCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ResourceCompile>
+      <PreprocessorDefinitions>$(CustomPreProcessorDefs);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <CustomBuildStep />
+    <ClCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ResourceCompile>
+      <PreprocessorDefinitions>$(CustomPreProcessorDefs);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="..\..\Server\WebServer\GPUPerfServer.ico" />
+    <None Include="$(CommonDir)\Src\AMDTApplication\res\ApplicationIcon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\Server\WebServer\GPUPerfServer.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Server\WebServer\ClientRequestThread.cpp" />
+    <ClCompile Include="..\..\Server\WebServer\Commands.cpp" />
+    <ClCompile Include="..\..\Server\WebServer\Inject.cpp" />
+    <ClCompile Include="..\..\Server\WebServer\OSDependent.cpp" />
+    <ClCompile Include="..\..\Server\WebServer\PluginResponseThread.cpp" />
+    <ClCompile Include="..\..\Server\WebServer\ProcessTracker.cpp" />
+    <ClCompile Include="..\..\Server\WebServer\Registry.cpp" />
+    <ClCompile Include="..\..\Server\WebServer\RenderStallThread.cpp" />
+    <ClCompile Include="..\..\Server\WebServer\ShutdownThread.cpp" />
+    <ClCompile Include="..\..\Server\WebServer\WebServer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Server\WebServer\ClientRequestThread.h" />
+    <ClInclude Include="..\..\Server\WebServer\Commands.h" />
+    <ClInclude Include="..\..\Server\WebServer\Inject.h" />
+    <ClInclude Include="..\..\Server\WebServer\OSDependent.h" />
+    <ClInclude Include="..\..\Server\WebServer\PluginResponseThread.h" />
+    <ClInclude Include="..\..\Server\WebServer\ProcessTracker.h" />
+    <ClInclude Include="..\..\Server\WebServer\Registry.h" />
+    <ClInclude Include="..\..\Server\WebServer\RenderStallThread.h" />
+    <ClInclude Include="..\..\Server\WebServer\RequestInFlight.h" />
+    <ClInclude Include="..\..\Server\WebServer\RequestsInFlightDatabase.h" />
+    <ClInclude Include="..\..\Server\WebServer\resource.h" />
+    <ClInclude Include="..\..\Server\WebServer\ServerDefinitions.h" />
+    <ClInclude Include="..\..\Server\WebServer\ShutdownThread.h" />
+    <ClInclude Include="..\..\Server\WebServer\WebServer.h" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(SolutionName)'!='CodeXL-AllProjects'">
+    <ProjectReference Include="$(CommonDir)\Src\AMDTInterceptor\Detours\Interceptor-2015.vcxproj">
+      <Project>{0E055CAF-C68B-42CB-A302-F775CA5A917F}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(SolutionName)'=='CodeXL-AllProjects'">
+    <ProjectReference Include="$(CommonDir)\Src\AMDTInterceptor\mhook-dllInjector\Interceptor-2015.vcxproj">
+      <Project>{0E055CAF-C68B-42CB-A302-F775CA5A917F}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(CommonDir)\Src\AMDTBaseTools\AMDTBaseToolsVS14.vcxproj">
+      <Project>{11221a7f-3883-418f-b286-b0ea1e28ef10}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(CommonDir)\Src\AMDTOSWrappers\AMDTOSWrappersVS14.vcxproj">
+      <Project>{5d9222ac-39fb-4123-9497-78cea5be58ad}</Project>
+    </ProjectReference>
+    <ProjectReference Include="Common.vcxproj">
+      <Project>{265623d5-5abf-4800-a4cc-ed4dd2dad3ae}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

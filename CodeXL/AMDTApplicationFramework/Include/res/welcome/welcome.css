@@ -1,0 +1,294 @@
+﻿/* Reset */
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+	font-family: "Helvetica Neue", clean, sans-serif;
+}
+
+article, aside, details, figcaption, figure, footer, header, hgroup, nav, section { display: block; }
+audio, canvas, video { display: inline-block; *display: inline; *zoom: 1; }
+audio:not([controls]) { display: none; }
+[hidden] { display: none; }
+html { font-size: 100%; overflow-y: scroll; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+::-moz-selection { background: rgba(255,255,255,.4); color: #000; text-shadow: none; }
+::selection { background: rgba(255,255,255,.4); color: #000; text-shadow: none; }
+a {text-decoration: none; }
+
+
+/* 
+
+The following few CSS settings are required to keep the footer fixed to the bottom of the HTML page.
+Please do not override or change these settings, it is very sensitive to other elements change 
+*/
+
+* {
+margin: 0;
+}
+html, body {
+height: 100%;
+}
+.wrapper {
+min-height: 100%;
+height: auto !important;
+height: 100%;
+margin: 0 auto -8em;
+}
+.footer, .push {
+height: 6em;
+}
+
+#footer_in{
+    margin-left: 60px;
+}
+
+/* 
+End of footer fixed properties
+*/
+
+
+#page
+{
+    background-color:#FBFBFB;
+}
+
+#content
+{
+	padding-top: 80px;
+}
+
+.footer li {
+    list-style: none;
+    margin: 0 0 0 0;
+    display: block;
+    text-align: left;
+    color: #C4C5C7;
+    overflow:hidden;
+}
+
+.footer li a 
+{
+    margin: 0 0 0 0;
+    color: #5A5B5B;
+    font-size: 13px;
+}
+
+.footer li a:hover
+{
+    text-decoration: underline;
+}
+
+
+img 
+{
+	height: auto;
+	width: auto;
+}
+div.main_container
+{
+    background-image:none;
+    background-repeat:no-repeat;
+    background-position-x:right;
+    background-position-y:bottom;
+}
+
+#main_container {
+    margin-bottom: 20px; 
+}
+
+#content
+{
+    padding-bottom:20px;
+}
+/* middle_td is the class for the middle area of the HTML page. The width is defined according to the screen width */
+
+td.middle_td
+{
+	min-width: 680px;
+}
+#debug_div, #profile_div, #analyze_div, #analyze_na, #frame_analyze_div
+{
+	min-height: 300px;
+	border-bottom-right-radius: 6px; 
+	border-bottom-left-radius: 6px;
+}
+#mode_table
+{
+    padding-left: 20px;
+    padding-right: 6px;
+}
+
+
+#main_image_td
+{
+    padding-top:10px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px; 
+}
+
+#main_image_td,
+#frame_td
+{
+    box-shadow: 1px 2px 1px #9D9FA1;
+}
+
+#frame_td
+{
+    vertical-align:top;
+    padding-top: 10px; 
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px; 
+    width:auto; 
+}
+
+table.white_bg,td.white_bg, div.white_bg, #frame_td
+{
+    background-color:white;
+}
+
+table { border-collapse: separate; }
+tr td.frame_td:first-child 
+{ 
+    border-bottom-left-radius: 6px;
+}
+
+tr td.frame_td:last-child
+{ 
+    border-bottom-right-radius: 6px; 
+    background-color:#F7F7F7;
+}
+
+tr.clickableRow td
+{
+    padding: 8px;
+    border-radius: 6px;
+}
+
+
+tr.clickableRow:hover,
+tr.clickableRow:active,
+tr.clickableRow:focus
+{
+    background: linear-gradient(#F0F0F0, #F0F0F0);
+    text-decoration: none;
+    font-weight:normal;
+    cursor: pointer;
+}
+
+#mode_table tr.clickableRow:hover,
+#mode_table tr.clickableRow:active,
+#mode_table tr.clickableRow:focus
+{
+    background: linear-gradient(#FBFBFB, #FBFBFB);
+}
+
+tr.clickableRow td:first-child
+{
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 0px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 0px;
+}
+
+tr.clickableRow td:last-child
+{
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 6px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 6px;
+}
+
+#recent_table,
+#sample_table
+{
+    margin-top: 0px;
+    overflow:scroll;
+}
+
+#recent_table td a:hover
+{
+    color:#00AAB4;
+    cursor:pointer;
+}
+#sample_table td a:hover
+{
+    color:#9D9FA1;
+    cursor:pointer;
+}
+
+
+#recent_table td, 
+#recent_table td a,
+#sample_table td, 
+#sample_table td a
+{
+    color:black;
+    font-size: 14px;
+    height:18px;
+}
+
+#recent_table td, 
+#sample_table td
+{
+    padding-left: 35px;
+}
+
+
+#recent_table,
+#recent_table td,
+#recent_table td a
+{
+    width:100%;
+}
+
+#recent_td 
+{
+    padding-top: 40px;
+    padding-left: 40px;
+}
+
+#recent_table tr.clickableRow
+{
+    padding: 0px;
+}
+
+#recent_table
+{
+    overflow-y:scroll;
+}
+div.clickableRow_title
+{
+    font-size:16px;
+    font-weight: bold;
+}
+
+div.clickableRow_text
+{
+    font-size:12px;
+    line-height:18px;
+    white-space:nowrap;
+}
+
+
+#content
+{
+	/*FOR DEBUG ONLY. Comment before submit
+	background-color: LightGoldenRodYellow ;
+	*/
+}

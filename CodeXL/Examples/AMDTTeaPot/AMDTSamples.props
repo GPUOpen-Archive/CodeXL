@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="UserMacros">
+    <AMDTOutputDir>$(SolutionDir)\$(Configuration)</AMDTOutputDir>
+    <AMDTCommonAMD>$(AMDAPPSDKROOT)</AMDTCommonAMD>
+    <AMDTTeapotOutputDir>$(SolutionDir)\$(Configuration)\</AMDTTeapotOutputDir>    
+  </PropertyGroup>
+  <ItemGroup>
+    <BuildMacro Include="AMDTOutputDir">
+      <Value>$(AMDTOutputDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="AMDTCommonAMD">
+      <Value>$(AMDTCommonAMD)</Value>
+    </BuildMacro>
+    <BuildMacro Include="AMDTTeapotOutputDir">
+      <Value>$(AMDTTeapotOutputDir)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

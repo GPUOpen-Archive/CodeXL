@@ -1,0 +1,449 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{1C20A760-CEE0-4676-9976-DD0188FFD2C8}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>AMDTApplicationFramework</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)\CodeXLCommonProjects.props" />
+    <Import Project="$(CommonProjectsDir)\VersionInfo\VersionInfo.props" />
+    <Import Project="$(AMDTCommonAMD)\APPSDK\Global-OpenCL-NoLib.props" />
+    <Import Project="$(AMDTCommonExt)\QScintilla\Global-QScintilla.props" />
+    <Import Project="$(AMDTCommonExt)\Qt\Global-QT.props" />
+    <Import Project="$(AMDTCommonEXT)\tinyxml\Global-TinyXML-2015.props" />
+  </ImportGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir>$(AMDTOutputDir)$(Configuration)\bin\</OutDir>
+    <IntDir>$(AMDTOutputDir)$(Configuration)\obj\$(ProjectName)\$(Platform)$(GDTBuildSuffix)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;$(SolutionDir)\..\Remote;..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_USRDLL;NOMINMAX;AMDTApplicationFramework_EXPORTS;QT_NO_OPENGL;QT_LARGEFILE_SUPPORT;QT_DLL;QT_GUI_LIB;QT_CORE_LIB;QT_THREAD_SUPPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalOptions> /MP %(AdditionalOptions)</AdditionalOptions>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(OutDir)$(TargetName).dll</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <ImportLibrary>$(AMDTOutputDir)$(Configuration)\arch\$(TargetName).lib</ImportLibrary>
+      <AdditionalDependencies>CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;CXLOSAPIWrappers$(GDTProjectSuffix).lib;CXLApiClasses$(GDTProjectSuffix).lib;CXLApplicationComponents$(GDTProjectSuffix).lib;CXLRemoteClient$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(AMDTOutputDir)$(Configuration)\arch;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>LIBCMT$(GDTDebugSuffixNoDash);%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <ImageHasSafeExceptionHandlers Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ImageHasSafeExceptionHandlers>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\afActionCreatorAbstract.h" />
+    <ClInclude Include="Include\afActionExecutorAbstract.h" />
+    <ClInclude Include="Include\afAidFunctions.h" />
+    <ClInclude Include="Include\afApplicationCommands.h" />
+    <ClInclude Include="Include\afApplicationFrameworkDLLBuild.h" />
+    <ClInclude Include="Include\afCSSSettings.h" />
+    <ClInclude Include="Include\afDocUpdateManager.h" />
+    <ClInclude Include="Include\afEnumerations.h" />
+    <ClInclude Include="Include\afSoftwareUpdaterWindow.h" />
+    <ClInclude Include="Include\afHTMLUtils.h" />
+    <ClInclude Include="Include\afIDocUpdateHandler.h" />
+    <CustomBuild Include="Include\afLineEdit.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Include\afMessageBox.h" />
+    <ClInclude Include="Include\afSourceCodeActionsCreator.h" />
+    <ClInclude Include="Include\afMDIViewsCreator.h" />
+    <ClInclude Include="Include\afSourceCodeViewsManager.h" />
+    <ClInclude Include="Include\afTreeItemType.h" />
+    <CustomBuild Include="Include\afUnhandledExceptionHandler.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\afApplicationTree.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\Views\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\afApplicationTreeItemData.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\Views\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\dialogs\afWindowsStoreAppsBrowserDialog.h">
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <Message>moc creation</Message>
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\dialogs\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+    </CustomBuild>
+    <CustomBuild Include="Include\dialogs\afAttachToProcessDialog.h">
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <Message>moc creation</Message>
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\dialogs\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+    </CustomBuild>
+    <CustomBuild Include="Include\dialogs\afMultipleDirectoriesBrowseDialog.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\dialogs\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\dialogs\afStartupDialog.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\dialogs\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\afInformationView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\views\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\views\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\afTreeCtrl.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\views\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\views\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="src\afModeProxyStyle.h" />
+    <ClInclude Include="src\afPredefinedLayouts.h" />
+    <ClInclude Include="src\afSingletonsDelete.h" />
+    <ClInclude Include="src\afUtils.h" />
+    <CustomBuild Include="src\afProcessDebuggerEventHandler.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="src\afProcessDebuggerPendingEventEvent.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "src\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\afExecutionModeManager.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Include\afGeneralActionsCreator.h" />
+    <ClInclude Include="Include\afGeneralViewsCreator.h" />
+    <ClInclude Include="Include\afHTMLContent.h" />
+    <ClInclude Include="Include\afIExecutionMode.h" />
+    <ClInclude Include="Include\afPropertiesUrlHandler.h" />
+    <ClInclude Include="Include\commands\afInitializeApplicationCommand.h" />
+    <ClInclude Include="Include\dialogs\afEulaDialog.h" />
+    <ClInclude Include="include\views\afpropertiesurlhandler.h" />
+    <ClInclude Include="Include\views\afPropertiesView.h" />
+    <CustomBuild Include="Include\afGlobalSettingsPage.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Include\afGlobalVariableChangedEvent.h" />
+    <CustomBuild Include="Include\dialogs\afGlobalSettingsDialog.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\dialogs\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Include\afIBreakpointManager.h" />
+    <ClInclude Include="Include\afIRunModeManager.h" />
+    <ClInclude Include="Include\afPluginConnectionManager.h" />
+    <ClInclude Include="Include\commands\afSystemInformationCommand.h">
+      <Command>$(AMDTCommonExt)QT\5.5\bin\moc.exe Include\Commands\%(Filename).h -o tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </ClInclude>
+    <CustomBuild Include="Include\dialogs\afSystemInformationDialog.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\dialogs\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Include\views\afBaseView.h" />
+    <CustomBuild Include="Include\views\afSourceCodeView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\Views\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\dialogs\afHelpAboutDialog.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\dialogs\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\afBrowseAction.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\afCreatorAction.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\afMainAppWindow.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Include\afAppStringConstants.h" />
+    <CustomBuild Include="Include\afQMdiSubWindow.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\dialogs\afEditEnvironmentVariablesDialog.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\dialogs\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Include\afCommand.h" />
+    <ClInclude Include="Include\afCommandIds.h" />
+    <ClInclude Include="Include\afGlobalVariablesManager.h" />
+    <ClInclude Include="Include\afLoadProjectCommand.h" />
+    <ClInclude Include="Include\afMenuActionsExecutor.h" />
+    <CustomBuild Include="Include\afNewProjectDialog.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\afProjectManager.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Include\afProgressBarWrapper.h" />
+    <CustomBuild Include="Include\afProjectSettingsExtension.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\afQtCreatorsManager.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\afViewActionHandler.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Include\afQtViewCreatorAbstract.h" />
+    <ClInclude Include="Include\afRecentProjectsActionsExecutor.h" />
+    <ClInclude Include="Include\afSaveProjectCommand.h" />
+    <CustomBuild Include="Include\afStartupPage.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\afHTMLView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Include\afViewCreatorAbstract.h" />
+    <CustomBuild Include="Include\afViewCreatorAction.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="commands\afSystemInformationCommand.cpp" />
+    <ClCompile Include="commands\src\afInitializeApplicationCommand.cpp" />
+    <ClCompile Include="dialogs\afAttachToProcessDialog.cpp" />
+    <ClCompile Include="dialogs\afGlobalSettingsDialog.cpp" />
+    <ClCompile Include="dialogs\afGlobalSettingsPage.cpp" />
+    <ClCompile Include="dialogs\afHelpAboutDialog.cpp" />
+    <ClCompile Include="dialogs\afMultipleDirectoriesBrowseDialog.cpp" />
+    <ClCompile Include="dialogs\afSystemInformationDialog.cpp" />
+    <ClCompile Include="dialogs\afWindowsStoreAppsBrowserDialog.cpp" />
+    <ClCompile Include="dialogs\src\afEditEnvironmentVariablesDialog.cpp" />
+    <ClCompile Include="dialogs\src\afEulaDialog.cpp" />
+    <ClCompile Include="dialogs\src\afStartupDialog.cpp" />
+    <ClCompile Include="src\afActionCreatorAbstract.cpp" />
+    <ClCompile Include="src\afActionExecutorAbstract.cpp" />
+    <ClCompile Include="src\afAidFunctions.cpp" />
+    <ClCompile Include="src\afApplicationCommands.cpp" />
+    <ClCompile Include="src\afCommand.cpp" />
+    <ClCompile Include="src\afBrowseAction.cpp" />
+    <ClCompile Include="src\afCreatorAction.cpp" />
+    <ClCompile Include="src\afDocUpdateManager.cpp" />
+    <ClCompile Include="src\afExecutionModeManager.cpp" />
+    <ClCompile Include="src\afGeneralActionsCreator.cpp" />
+    <ClCompile Include="src\afGeneralViewsCreator.cpp" />
+    <ClCompile Include="src\afGlobalVariableChangedEvent.cpp" />
+    <ClCompile Include="src\afGlobalVariablesManager.cpp" />
+    <ClCompile Include="src\afHTMLContent.cpp" />
+    <ClCompile Include="src\afHTMLUtils.cpp" />
+    <ClCompile Include="src\afLineEdit.cpp" />
+    <ClCompile Include="src\afLoadProjectCommand.cpp" />
+    <ClCompile Include="src\afMainAppWindow.cpp" />
+    <ClCompile Include="src\afMenuActionsExecutor.cpp" />
+    <ClCompile Include="src\afMessageBox.cpp" />
+    <ClCompile Include="src\afModeProxyStyle.cpp" />
+    <ClCompile Include="src\afNewProjectDialog.cpp" />
+    <ClCompile Include="src\afOpenCLDeviceInformationCollector.cpp" />
+    <ClCompile Include="src\afProjectManager.cpp" />
+    <ClCompile Include="src\afPluginConnectionManager.cpp" />
+    <ClCompile Include="src\afProcessDebuggerEventHandler.cpp" />
+    <ClCompile Include="src\afProcessDebuggerPendingEventEvent.cpp" />
+    <ClCompile Include="src\afProgressBarWrapper.cpp" />
+    <ClCompile Include="src\afProjectSettingsExtension.cpp" />
+    <ClCompile Include="src\afPropertiesUrlHandler.cpp" />
+    <ClCompile Include="src\afQMdiSubWindow.cpp" />
+    <ClCompile Include="src\afQtCreatorsManager.cpp" />
+    <ClCompile Include="src\afQtViewCreatorAbstract.cpp" />
+    <ClCompile Include="src\afRecentProjectsActionsExecutor.cpp" />
+    <ClCompile Include="src\afSaveProjectCommand.cpp" />
+    <ClCompile Include="src\afSingletonsDelete.cpp" />
+    <ClCompile Include="src\afSoftwareUpdaterWindow.cpp" />
+    <ClCompile Include="src\afSourceCodeActionsCreator.cpp" />
+    <ClCompile Include="src\afMDIViewsCreator.cpp" />
+    <ClCompile Include="src\afSourceCodeViewsManager.cpp" />
+    <ClCompile Include="src\afStartupPage.cpp" />
+    <ClCompile Include="src\afHTMLView.cpp" />
+    <ClCompile Include="src\afUnhandledExceptionHandler.cpp" />
+    <ClCompile Include="src\afUtils.cpp" />
+    <ClCompile Include="src\afViewActionHandler.cpp" />
+    <ClCompile Include="src\afViewCreatorAbstract.cpp" />
+    <ClCompile Include="src\afViewCreatorAction.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afApplicationTree.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afApplicationTreeItemData.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afAttachToProcessDialog.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afBrowseAction.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afCreatorAction.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afEditEnvironmentVariablesDialog.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afExecutionModeManager.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afGlobalSettingsDialog.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afGlobalSettingsPage.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afHelpAboutDialog.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afLineEdit.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afMainAppWindow.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afMultipleDirectoriesBrowseDialog.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afNewProjectDialog.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afProjectManager.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afProcessDebuggerEventHandler.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afProcessDebuggerPendingEventEvent.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afProjectSettingsExtension.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afQMdiSubWindow.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afQtCreatorsManager.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afSourceCodeView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afStartupDialog.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afStartupPage.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afHTMLView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afSystemInformationDialog.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afUnhandledExceptionHandler.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afViewActionHandler.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afViewCreatorAction.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afWindowsStoreAppsBrowserDialog.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afInformationView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afTreeCtrl.cpp" />
+    <ClCompile Include="views\afApplicationTree.cpp" />
+    <ClCompile Include="views\afTreeCtrl.cpp" />
+    <ClCompile Include="views\afApplicationTreeItemData.cpp" />
+    <ClCompile Include="views\afBaseView.cpp" />
+    <ClCompile Include="views\afInformationView.cpp" />
+    <ClCompile Include="views\afPropertiesView.cpp" />
+    <ClCompile Include="views\afSourceCodeView.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="$(CommonProjectsDir)\VersionInfo\VersionResource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Include\res\icons\application_explorer_command_xpm.xpm" />
+    <None Include="Include\res\icons\back_icon.xpm" />
+    <None Include="Include\res\icons\back_icon_disabled.xpm" />
+    <None Include="Include\res\icons\collapse_button.xpm" />
+    <None Include="Include\res\icons\down_button.xpm" />
+    <None Include="Include\res\icons\expand_button.xpm" />
+    <None Include="Include\res\icons\forward_icon.xpm" />
+    <None Include="Include\res\icons\forward_icon_disabled.xpm" />
+    <None Include="Include\res\icons\up_button.xpm" />
+    <None Include="Include\res\welcome\Welcome.html" />
+    <None Include="Include\res\welcome\WelcomeAnalyzeNA.html" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

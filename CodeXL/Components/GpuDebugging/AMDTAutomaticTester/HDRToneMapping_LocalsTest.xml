@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<CodeXL>
+    <Tests>
+	        <TestResultsDirectory>GoldMasters_APPSDK_2_9</TestResultsDirectory>
+        <LogFilesDirectory>C:\TEMP\testResults\</LogFilesDirectory>
+		<Test>
+            <ExecutablePath>samples\opencl\bin\x86\HDRToneMapping.exe</ExecutablePath>
+            <WorkingDirectory>samples\opencl\bin\x86</WorkingDirectory>
+            <TestName>HDRToneMapping_LocalsTest</TestName>
+            <TestType>LocalsTest</TestType>
+            <Kernels>
+                <Kernel>
+                    <KernelName>toneMappingPattanaik</KernelName>
+					<WorkItemId>0,0,0</WorkItemId>
+					<KernelLocals>
+						<LocalsInLine lineNumber="156"></LocalsInLine>
+						<LocalsInLine lineNumber="157"></LocalsInLine>
+						<LocalsInLine lineNumber="158"></LocalsInLine>
+                        <LocalsInLine lineNumber="159"></LocalsInLine>
+                        <LocalsInLine lineNumber="161"></LocalsInLine>
+                    </KernelLocals>
+                </Kernel>
+            </Kernels>
+        </Test>
+	</Tests>
+</CodeXL>       

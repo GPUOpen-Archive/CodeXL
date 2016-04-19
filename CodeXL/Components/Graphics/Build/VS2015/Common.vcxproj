@@ -1,0 +1,270 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName Condition="'$(SolutionName)'=='CodeXL-AllProjects'">CXLGraphicsServerCommon</ProjectName>
+    <ProjectName Condition="'$(SolutionName)'!='CodeXL-AllProjects'">Common</ProjectName>
+    <ProjectGuid>{265623D5-5ABF-4800-A4CC-ED4DD2DAD3AE}</ProjectGuid>
+    <RootNamespace>Common</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="Server-Common.props" />
+    <Import Project="$(CommonDir)\Lib\Ext\tinyxml\Global-TinyXML-2015.props" />
+    <Import Project="$(CommonDir)\Src\ADLUtil\Global-ADLUtil.props" />
+    <Import Project="$(CommonDir)\Src\AMDTMutex\Global-AMDTMutex.props" />
+    <Import Project="$(CommonDir)\Src\TSingleton\Global-TSingleton.props" />
+    <Import Project="$(CommonDir)\Lib\Ext\Windows-Kits\Global-WindowsSDK.props" />
+    <Import Project="$(CommonDir)\Lib\Ext\Boost\Global-Boost-2015.props" />
+    <Import Project="$(CommonDir)\Src\GPUPerfAPIUtils\Global-GPUPerfAPIUtils.props" />
+    <Import Project="$(CommonDir)\Lib\AMD\GPUPerfAPI\Global-GPUPerfAPI.props" />
+    <Import Condition="'$(SolutionName)'!='CodeXL-AllProjects'" Project="$(CommonDir)\Lib\AMD\ShaderDebugger\Global-ShaderDebugger-2015.props" />
+    <Import Project="AMDTOSWrappers.props" />
+    <Import Condition="'$(GDT_BUILD)'=='GDT_INTERNAL'" Project="$(CommonDir)\Lib\AMD\GPUThreadTrace\Global-GPUThreadTrace.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile />
+    <Lib>
+      <OutputFile>$(OutDir)$(GDTProjectName).lib</OutputFile>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Lib>
+      <OutputFile>$(OutDir)$(GDTProjectName).lib</OutputFile>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+    <ClCompile />
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Lib>
+      <OutputFile>$(OutDir)$(GDTProjectName).lib</OutputFile>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+    <ClCompile />
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Lib>
+      <OutputFile>$(OutDir)$(GDTProjectName).lib</OutputFile>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+    <ClCompile />
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="$(CommonDir)\Src\ADLUtil\ADLUtil.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\AMDTMutex\AMDTMutex.cpp" />
+    <ClCompile Include="..\..\Server\Common\CommandTimingManager.cpp" />
+    <ClCompile Include="..\..\Server\Common\Compressor.cpp" />
+    <ClCompile Include="..\..\Server\Common\CpuTimer.cpp" />
+    <ClCompile Condition="'$(SolutionName)'!='CodeXL-AllProjects'" Include="..\..\Server\Common\FDPipelineShaderStage.cpp" />
+    <ClCompile Condition="'$(SolutionName)'!='CodeXL-AllProjects'" Include="..\..\Server\Common\FDPipelineStage.cpp" />
+    <ClCompile Include="..\..\Server\Common\FrameInfo.cpp" />
+    <ClCompile Include="..\..\Server\Common\FrameProfiler.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\GPUPerfAPIUtils\GPUPerfAPILoader.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\GPUPerfAPIUtils\GPUPerfAPIUtil.cpp" />
+    <ClCompile Include="..\..\Server\Common\BufferDelta.cpp" />
+    <ClCompile Include="..\..\Server\Common\Capture.cpp" />
+    <ClCompile Include="..\..\Server\Common\CaptureLayer.cpp" />
+    <ClCompile Include="..\..\Server\Common\CaptureStream.cpp" />
+    <ClCompile Include="..\..\Server\Common\CommandProcessor.cpp" />
+    <ClCompile Include="..\..\Server\Common\CommandVisitor.cpp" />
+    <ClCompile Include="..\..\Server\Common\Communication_Impl.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\DebugHelpers\DebugHelpers.cpp" />
+    <ClCompile Include="..\..\Server\Common\DeltaAccumulationBuffer.cpp" />
+    <ClCompile Include="..\..\Server\Common\DLLLoader.cpp" />
+    <ClCompile Condition="'$(SolutionName)'!='CodeXL-AllProjects'" Include="..\..\Server\Common\FDPipeline.cpp" />
+    <ClCompile Include="..\..\Server\Common\FrameDebugger.cpp" />
+    <ClCompile Include="..\..\Server\Common\FrameStatsLogger.cpp" />
+    <ClCompile Include="..\..\Server\Common\geometry.cpp" />
+    <ClCompile Include="..\..\Server\Common\GraphicsServerState.cpp" />
+    <ClCompile Include="..\..\Server\Common\HookTimer.cpp" />
+    <ClCompile Include="..\..\Server\Common\HTTPRequest.cpp" />
+    <ClCompile Include="..\..\Server\Common\HUDTextureVisualization.cpp" />
+    <ClCompile Include="..\..\Server\Common\IMonitor.cpp" />
+    <ClCompile Include="..\..\Server\Common\IServerPlugin_Impl.cpp" />
+    <ClCompile Include="..\..\Server\Common\LayerManager.cpp" />
+    <ClCompile Include="..\..\Server\Common\Logger.cpp" />
+    <ClCompile Include="..\..\Server\Common\MapDeltaOptimization\mdoManager.cpp" />
+    <ClCompile Include="..\..\Server\Common\MapDeltaOptimization\mdoResource.cpp" />
+    <ClCompile Include="..\..\Server\Common\MapDeltaOptimization\mdoResourceCache.cpp" />
+    <ClCompile Include="..\..\Server\Common\MapDeltaOptimization\mdoStats.cpp" />
+    <ClCompile Include="..\..\Server\Common\MapDeltaOptimization\mdoUtil.cpp" />
+    <ClCompile Include="..\..\Server\Common\MemoryBuffer.cpp" />
+    <ClCompile Include="..\..\Server\Common\misc.cpp" />
+    <ClCompile Include="..\..\Server\Common\ModernAPIFrameDebuggerLayer.cpp" />
+    <ClCompile Include="..\..\Server\Common\ModernAPIFrameProfilerLayer.cpp" />
+    <ClCompile Include="..\..\Server\Common\ModernAPILayerManager.cpp" />
+    <ClCompile Include="..\..\Server\Common\NamedEvent.cpp" />
+    <ClCompile Include="..\..\Server\Common\NamedMutex.cpp" />
+    <ClCompile Include="..\..\Server\Common\NamedSemaphore.cpp" />
+    <ClCompile Include="..\..\Server\Common\NetSocket.cpp" />
+    <ClCompile Include="..\..\Server\Common\ObjectDatabaseProcessor.cpp" />
+    <ClCompile Include="..\..\Server\Common\parser.cpp" />
+    <ClCompile Include="..\..\Server\Common\SaveImage.cpp" />
+    <ClCompile Include="..\..\Server\Common\SessionManager.cpp" />
+    <ClCompile Condition="'$(SolutionName)'!='CodeXL-AllProjects'" Include="..\..\Server\Common\ShaderDebuggerHostGPS2.cpp" />
+    <ClCompile Include="..\..\Server\Common\SharedGlobal.cpp" />
+    <ClCompile Include="..\..\Server\Common\SharedMemory.cpp" />
+    <ClCompile Include="..\..\Server\Common\SharedMemoryManager.cpp" />
+    <ClCompile Include="..\..\Server\Common\StreamLog.cpp" />
+    <ClCompile Include="..\..\Server\Common\TimeControlLayer.cpp" />
+    <ClCompile Include="..\..\Server\Common\timer.cpp" />
+    <ClCompile Include="..\..\Server\Common\TraceAnalyzer.cpp" />
+    <ClCompile Include="..\..\Server\Common\TraceAnalyzerOutputDebugString.cpp" />
+    <ClCompile Include="..\..\Server\Common\TraceMetadata.cpp" />
+    <ClCompile Include="..\..\Server\Common\Tracing\APIEntry.cpp" />
+    <ClCompile Include="..\..\Server\Common\Tracing\MultithreadedTraceAnalyzerLayer.cpp" />
+    <ClCompile Include="..\..\Server\Common\Tracing\ThreadTraceData.cpp" />
+    <ClCompile Include="..\..\Server\Common\Windows\DllReplacement.cpp" />
+    <ClCompile Include="..\..\Server\Common\Windows\OSWrappers.cpp" />
+    <ClCompile Include="..\..\Server\Common\Windows\timerWin.cpp" />
+    <ClCompile Include="..\..\Server\Common\WrappedObjectDatabase.cpp" />
+    <ClCompile Include="..\..\Server\Common\xml.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(CommonDir)\Src\ADLUtil\ADLUtil.h" />
+    <ClInclude Include="$(CommonDir)\Src\AMDTMutex\AMDTMutex.h" />
+    <ClInclude Include="$(CommonDir)\Src\TSingleton\TSingleton.h" />
+    <ClInclude Include="..\..\Server\Common\CaptureClassTypes.h" />
+    <ClInclude Include="..\..\Server\Common\CommandTimingManager.h" />
+    <ClInclude Include="..\..\Server\Common\Compressor.h" />
+    <ClInclude Include="..\..\Server\Common\CpuTimer.h" />
+    <ClInclude Condition="'$(SolutionName)'!='CodeXL-AllProjects'" Include="..\..\Server\Common\FDPipelineShaderStage.h" />
+    <ClInclude Condition="'$(SolutionName)'!='CodeXL-AllProjects'" Include="..\..\Server\Common\FDPipelineStage.h" />
+    <ClInclude Include="..\..\Server\Common\FrameInfo.h" />
+    <ClInclude Include="..\..\Server\Common\FrameStatsLogger.h" />
+    <ClInclude Include="..\..\Server\Common\GraphicsServerState.h" />
+    <ClInclude Include="..\..\Server\Common\HookTimer.h" />
+    <ClInclude Include="..\..\Server\Common\IDrawCall.h" />
+    <ClInclude Include="..\..\Server\Common\IInstanceBase.h" />
+    <ClInclude Include="..\..\Server\Common\IModernAPILayer.h" />
+    <ClInclude Include="..\..\Server\Common\IUnknownWrapperGUID.h" />
+    <ClInclude Include="..\..\Server\Common\LiquidVRSupport.h" />
+    <ClInclude Include="..\..\Server\Common\MapDeltaOptimization\mdoManager.h" />
+    <ClInclude Include="..\..\Server\Common\MapDeltaOptimization\mdoResource.h" />
+    <ClInclude Include="..\..\Server\Common\MapDeltaOptimization\mdoResourceCache.h" />
+    <ClInclude Include="..\..\Server\Common\MapDeltaOptimization\mdoStats.h" />
+    <ClInclude Include="..\..\Server\Common\MapDeltaOptimization\mdoUtil.h" />
+    <ClInclude Include="..\..\Server\Common\MemoryBuffer.h" />
+    <ClInclude Include="..\..\Server\Common\ModernAPIFrameDebuggerLayer.h" />
+    <ClInclude Include="..\..\Server\Common\ModernAPIFrameProfilerLayer.h" />
+    <ClInclude Include="..\..\Server\Common\ModernAPILayerManager.h" />
+    <ClInclude Include="..\..\Server\Common\NamedEvent.h" />
+    <ClInclude Include="..\..\Server\Common\NamedMutex.h" />
+    <ClInclude Include="..\..\Server\Common\NamedSemaphore.h" />
+    <ClInclude Include="..\..\Server\Common\NetSocket.h" />
+    <ClInclude Include="..\..\Server\Common\ObjectDatabaseProcessor.h" />
+    <ClInclude Include="..\..\Server\Common\OSWrappers.h" />
+    <ClInclude Include="..\..\Server\Common\SessionManager.h" />
+    <ClInclude Include="..\..\Server\Common\SharedMemory.h" />
+    <ClInclude Include="..\..\Server\Common\SharedMemoryManager.h" />
+    <ClInclude Include="..\..\Server\Common\StreamLog.h" />
+    <ClInclude Include="..\..\Server\Common\TimeControlLayer.h" />
+    <ClInclude Include="..\..\Server\Common\FrameProfiler.h" />
+    <ClInclude Include="$(CommonDir)\Src\GPUPerfAPIUtils\GPUPerfAPILoader.h" />
+    <ClInclude Include="$(CommonDir)\Src\GPUPerfAPIUtils\GPUPerfAPIUtil.h" />
+    <ClInclude Include="..\..\Server\Common\BufferDelta.h" />
+    <ClInclude Include="..\..\Server\Common\Capture.h" />
+    <ClInclude Include="..\..\Server\Common\CaptureLayer.h" />
+    <ClInclude Include="..\..\Server\Common\CaptureStream.h" />
+    <ClInclude Include="..\..\Server\Common\CommandProcessor.h" />
+    <ClInclude Include="..\..\Server\Common\CommandStrings.h" />
+    <ClInclude Include="..\..\Server\Common\CommandVisitor.h" />
+    <ClInclude Include="..\..\Server\Common\CommonTypes.h" />
+    <ClInclude Include="..\..\Server\Common\ConnectWithDXGI.h" />
+    <ClInclude Include="$(CommonDir)\Src\DebugHelpers\DebugHelpers.h" />
+    <ClInclude Include="..\..\Server\Common\defines.h" />
+    <ClInclude Include="..\..\Server\Common\DeltaAccumulationBuffer.h" />
+    <ClInclude Include="..\..\Server\Common\Dictionary.h" />
+    <ClInclude Include="..\..\Server\Common\DLLLoader.h" />
+    <ClInclude Include="..\..\Server\Common\ErrorImage.h" />
+    <ClInclude Condition="'$(SolutionName)'!='CodeXL-AllProjects'" Include="..\..\Server\Common\FDPipeline.h" />
+    <ClInclude Include="..\..\Server\Common\FrameDebugger.h" />
+    <ClInclude Include="..\..\Server\Common\frect.h" />
+    <ClInclude Include="..\..\Server\Common\geometry.h" />
+    <ClInclude Include="..\..\Server\Common\HTTPLogger.h" />
+    <ClInclude Include="..\..\Server\Common\HTTPRequest.h" />
+    <ClInclude Include="..\..\Server\Common\HUDElement.h" />
+    <ClInclude Include="..\..\Server\Common\HUDImage.h" />
+    <ClInclude Include="..\..\Server\Common\HUDText.h" />
+    <ClInclude Include="..\..\Server\Common\HUDTextureControl.h" />
+    <ClInclude Include="..\..\Server\Common\HUDTextureVisualization.h" />
+    <ClInclude Include="..\..\Server\Common\ICommunication.h" />
+    <ClInclude Include="..\..\Server\Common\ICommunication_Impl.h" />
+    <ClInclude Include="..\..\Server\Common\ILayer.h" />
+    <ClInclude Include="..\..\Server\Common\IMonitor.h" />
+    <ClInclude Include="..\..\Server\Common\IProcessRequests.h" />
+    <ClInclude Include="..\..\Server\Common\IServerPlugin.h" />
+    <ClInclude Include="..\..\Server\Common\LayerManager.h" />
+    <ClInclude Include="..\..\Server\Common\Logger.h" />
+    <ClInclude Include="..\..\Server\Common\misc.h" />
+    <ClInclude Include="..\..\Server\Common\mymutex.h" />
+    <ClInclude Include="..\..\Server\Common\parser.h" />
+    <ClInclude Include="..\..\Server\Common\PerfStudioServer_Version.h" />
+    <ClInclude Include="..\..\Server\Common\RefWatcher.h" />
+    <ClInclude Include="..\..\Server\Common\SaveImage.h" />
+    <ClInclude Include="..\..\Server\Common\ShaderData.h" />
+    <ClInclude Condition="'$(SolutionName)'!='CodeXL-AllProjects'" Include="..\..\Server\Common\ShaderDebuggerHostGPS2.h" />
+    <ClInclude Include="..\..\Server\Common\SharedGlobal.h" />
+    <ClInclude Include="..\..\Server\Common\SurfaceSection.h" />
+    <ClInclude Include="..\..\Server\Common\timer.h" />
+    <ClInclude Include="..\..\Server\Common\TimingLog.h" />
+    <ClInclude Include="..\..\Server\Common\TraceAnalyzer.h" />
+    <ClInclude Include="..\..\Server\Common\TraceAnalyzerOutputDebugString.h" />
+    <ClInclude Include="..\..\Server\Common\TraceMetadata.h" />
+    <ClInclude Include="..\..\Server\Common\Tracing\APIEntry.h" />
+    <ClInclude Include="..\..\Server\Common\Tracing\MultithreadedTraceAnalyzerLayer.h" />
+    <ClInclude Include="..\..\Server\Common\Tracing\ThreadTraceData.h" />
+    <ClInclude Include="..\..\Server\Common\TSingleton.h" />
+    <ClInclude Include="..\..\Server\Common\TypeToString.h" />
+    <ClInclude Include="..\..\Server\Common\Windows\DllReplacement.h" />
+    <ClInclude Include="..\..\Server\Common\WrappedObjectDatabase.h" />
+    <ClInclude Include="..\..\Server\Common\xml.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

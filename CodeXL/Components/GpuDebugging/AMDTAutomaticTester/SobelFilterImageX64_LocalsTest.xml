@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<CodeXL>
+    <Tests>
+	        <TestResultsDirectory>GoldMasters_APPSDK_2_9</TestResultsDirectory>
+        <LogFilesDirectory>C:\TEMP\testResults\</LogFilesDirectory>
+		<Test>
+            <ExecutablePath>samples\opencl\bin\x86_64\SobelFilterImage.exe</ExecutablePath>
+            <WorkingDirectory>samples\opencl\bin\x86_64\</WorkingDirectory>
+            <TestName>SobelFilterImage_LocalsTest</TestName>
+            <TestType>LocalsTest</TestType>
+            <Kernels>
+                <Kernel>
+                    <KernelName>sobel_filter</KernelName>
+					<WorkItemId>0,0,0</WorkItemId>
+					<KernelLocals>
+						<LocalsInLine lineNumber="38"></LocalsInLine>
+						<LocalsInLine lineNumber="39"></LocalsInLine>
+						<LocalsInLine lineNumber="40"></LocalsInLine>
+						<LocalsInLine lineNumber="41"></LocalsInLine>
+						<LocalsInLine lineNumber="42"></LocalsInLine>
+					</KernelLocals>               
+                </Kernel>                         
+            </Kernels>
+        </Test>
+	</Tests>
+</CodeXL>       

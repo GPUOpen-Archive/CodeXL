@@ -1,0 +1,2 @@
+set GDT_BUILD=GDT_NDA
+set GDT_BUILD_SUFFIX=-nda

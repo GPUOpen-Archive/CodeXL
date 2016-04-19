@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<CodeXL>
+    <Tests>
+	        <TestResultsDirectory>C:\Users\TLVADMIN\Downloads\AutomaticTester-1.5.5718.0\AutomaticTester\GoldMasters_APPSDK_2_9</TestResultsDirectory>
+        <LogFilesDirectory>C:\TEMP\testResults\</LogFilesDirectory>
+		<Test>
+            <ExecutablePath>C:\Users\TLVADMIN\AMD APP SDK\2.9\samples\opencl\bin\x86\MemoryOptimizations.exe</ExecutablePath>
+            <WorkingDirectory>C:\Users\TLVADMIN\AMD APP SDK\2.9\samples\opencl\bin\x86</WorkingDirectory>
+            <TestName>MemoryOptimizations_StepIntoTest</TestName>
+            <TestType>StepIntoTest</TestType>
+            <Kernels>
+                <Kernel>
+                    <KernelName>copy1DCompletePath</KernelName>
+					<WorkItemId>0,0,0</WorkItemId>
+					<StepIntoLine>30</StepIntoLine>
+                </Kernel>
+            </Kernels>
+        </Test>
+	</Tests>
+</CodeXL>       

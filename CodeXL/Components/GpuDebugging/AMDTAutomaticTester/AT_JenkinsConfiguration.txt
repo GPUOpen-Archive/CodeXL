@@ -1,0 +1,22 @@
+//AutomaticTester Jenking configuration
+ 
+Define "ROOTPATH"		"[P4ROOT]\main"
+Define "CXLPATH"		"[ROOTPATH]\CodeXL"
+Define "COMPPATH"		"[CXLPATH]\Components"
+Define "CPUPATH"		"[COMPPATH]\CpuProfiling"
+Define "GPUDPATH"		"[COMPPATH]\GpuDebugging"
+Define "GPUPPATH"		"[COMPPATH]\GpuProfiling"
+
+//Define "MAJOR" "1"
+//Define "MINOR" "2"
+//Define "UPDATE" "0"
+
+Always
+    Log "[P4ROOT]\AT_CodeXL_Build.log"
+
+Image
+// Get the name of the AT's zip file from the last successful artifact
+	GetVersionFromLog "CodeXL_Build.log" "CodeXL-Full" "AutomaticTester-[DIRNAME].zip" "[COPYARTIFACT_BUILD_NUMBER_CODEXL_FULL]"
+	Unzip "[CXLPATH]\Installer\AutomaticTester-[DIRNAME].zip" "[GPUDPATH]\AMDTAutomaticTester\"
+
+//	Unzip "[CXLPATH]\AutomaticTester\AMDTAutomaticTester-1.2.3058.0.zip" "[GPUDPATH]\AMDTAutomaticTester\"

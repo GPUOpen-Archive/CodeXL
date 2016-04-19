@@ -1,0 +1,1042 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CommandsHandler.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CpuGlobalSettings.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CPUProfileDataTable.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CpuProfilingOptions.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CpuProjectHandler.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CpuProjectSettings.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CpuRetryDialog.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_DataTab.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_DirSearchDialog.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_DisplayFilterDlg.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_FunctionsDataTable.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_ModuleFilterDialog.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_ModulesDataTable.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_ProcessesDataTable.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionFunctionView.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionModulesView.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionOverviewWindow.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionSourceCodeView.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionViewCreator.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionWindow.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_tpAppController.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_tpSessionView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_tpOverview.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_tpThreadsView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_tpDisplaySettingsDialog.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_tpThreadsViewLegend.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_tpThreadsViewControlPanel.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_tpThreadsTimeline.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_tpThreadsTimelineItems.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_tpTreeHandler.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_tpProjectSettingsExtension.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StdAfx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SessionActions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SessionFunctionView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SessionModulesView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SessionOverviewWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SessionSourceCodeView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SessionViewCreator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SessionWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SourceCodeTreeModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SourceCodeViewUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SourceViewTreeItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ActionsExecutor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AmdtCpuProfiling.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Auxil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandsHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuAffinityThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuGlobalSettings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuProfileCss.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CPUProfileDataTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuProfileTreeHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuProfileUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuProfilingOptions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuProjectHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuProjectSettings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuRetryDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuTranslationMonitor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DataTab.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DirSearchDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DisplayFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DisplayFilterDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FunctionsDataTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ModuleFilterDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ModulesDataTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProcessesDataTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProcessMonitor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProfileConfigs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SessionCallGraphView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionCallGraphView.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CustomProfileProjectSettingsExtension.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CustomProfileProjectSettingsExtension.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CPUProfileDataTableItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tpAppController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tpDisplayInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tpMDIViewCreator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tpMenuActionsExecutor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tpProjectSettingsExtension.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tpSessionView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tpOverview.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tpThreadsView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tpDisplaySettingsDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tpThreadsViewLegend.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tpThreadsViewControlPanel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tpThreadsTimeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tpTreeHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tpThreadsTimelineItems.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tpSessionData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+    <None Include="ui\iDisplayFilterDlg.ui">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="src\SConscript" />
+    <None Include="inc\SConscript" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SessionViewCreator.cpp">
+      <Filter>Framework\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SessionWindow.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionWindow.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SessionActions.cpp">
+      <Filter>Framework\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StdAfx.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DataTab.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_DataTab.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuProjectHandler.cpp">
+      <Filter>Framework\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuProjectSettings.cpp">
+      <Filter>Framework\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CpuProjectSettings.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProfileConfigs.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CpuProjectHandler.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProcessMonitor.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CommandsHandler.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Auxil.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AmdtCpuProfiling.cpp">
+      <Filter>Framework\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuProfilingOptions.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuGlobalSettings.cpp">
+      <Filter>Framework\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DirSearchDialog.cpp">
+      <Filter>Framework\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_DirSearchDialog.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CpuGlobalSettings.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandsHandler.cpp">
+      <Filter>Framework\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuTranslationMonitor.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CpuProfilingOptions.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionViewCreator.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuAffinityThread.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuRetryDialog.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CpuRetryDialog.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuProfileTreeHandler.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SessionOverviewWindow.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionOverviewWindow.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CPUProfileDataTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DisplayFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SessionModulesView.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionModulesView.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DisplayFilterDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SessionFunctionView.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionFunctionView.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ModulesDataTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CPUProfileDataTable.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_DisplayFilterDlg.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_ModulesDataTable.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProcessesDataTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FunctionsDataTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_FunctionsDataTable.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_ProcessesDataTable.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ModuleFilterDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ActionsExecutor.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_ModuleFilterDialog.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SessionSourceCodeView.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionSourceCodeView.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SourceViewTreeItem.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuProfileUtils.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SourceCodeViewUtils.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+    <None Include="ui\iDisplayFilterDlg.ui">
+      <Filter>CpuProfiling\ui</Filter>
+    </None>
+    <None Include="src\SConscript">
+      <Filter>CpuProfiling\src</Filter>
+    </None>
+    <None Include="inc\SConscript">
+      <Filter>CpuProfiling\inc</Filter>
+    </None>
+    <ClInclude Include="tmp\ui\ui_iCpuGlobalSettings.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tmp\ui\ui_iDirSearch.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Auxil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\AmdtCpuProfiling.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ActionsExecutor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\CommandIds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\CpuAffinityThread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\CpuProfileCss.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\CPUProfileUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\CpuTranslationMonitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SessionViewCreator.cpp">
+      <Filter>Framework\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SessionWindow.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionWindow.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SessionActions.cpp">
+      <Filter>Framework\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StdAfx.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DataTab.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_DataTab.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuProjectHandler.cpp">
+      <Filter>Framework\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuProjectSettings.cpp">
+      <Filter>Framework\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CpuProjectSettings.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProfileConfigs.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CpuProjectHandler.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProcessMonitor.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CommandsHandler.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Auxil.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AmdtCpuProfiling.cpp">
+      <Filter>Framework\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuProfilingOptions.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuGlobalSettings.cpp">
+      <Filter>Framework\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DirSearchDialog.cpp">
+      <Filter>Framework\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_DirSearchDialog.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CpuGlobalSettings.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandsHandler.cpp">
+      <Filter>Framework\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuTranslationMonitor.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CpuProfilingOptions.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionViewCreator.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuAffinityThread.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuRetryDialog.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CpuRetryDialog.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuProfileTreeHandler.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SessionOverviewWindow.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionOverviewWindow.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CPUProfileDataTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DisplayFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SessionModulesView.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionModulesView.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DisplayFilterDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SessionFunctionView.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionFunctionView.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ModulesDataTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CPUProfileDataTable.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_DisplayFilterDlg.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_ModulesDataTable.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ProcessesDataTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FunctionsDataTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_FunctionsDataTable.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_ProcessesDataTable.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ModuleFilterDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ActionsExecutor.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_ModuleFilterDialog.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SessionSourceCodeView.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionSourceCodeView.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SourceViewTreeItem.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CpuProfileUtils.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SourceCodeViewUtils.cpp">
+      <Filter>CpuProfiling\src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\CommandIds.h">
+      <Filter>Framework\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Auxil.h">
+      <Filter>CpuProfiling\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\AmdtCpuProfiling.h">
+      <Filter>Framework\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="tmp\ui\ui_iCpuGlobalSettings.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tmp\ui\ui_iDirSearch.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\CpuTranslationMonitor.h">
+      <Filter>CpuProfiling\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\CpuAffinityThread.h">
+      <Filter>CpuProfiling\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="tmp\ui\ui_iDirSearch.h" />
+    <ClInclude Include="inc\CommandIds.h" />
+    <ClInclude Include="tmp\ui\ui_iCpuGlobalSettings.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="inc\DebugUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DisplayFilter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DllExport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ProcessMonitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ProfileConfigs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\StringConstants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\StdAfx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\SourceViewTreeItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\SourceCodeViewUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\SourceCodeTreeModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\SessionActions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ProcessMonitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ProfileConfigs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DllExport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\SessionActions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\StdAfx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\StringConstants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\StringConstants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\SessionActions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\StdAfx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ProfileConfigs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ProcessMonitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DllExport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\CpuTranslationMonitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Auxil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\AmdtCpuProfiling.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\CpuAffinityThread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\CpuProfileTreeHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\CPUProfileDataTableItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\tpDisplayInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\tpMDIViewCreator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\tpMenuActionsExecutor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\tpSessionData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="ui\iCpuGlobalSettings.ui">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ui\iCssButterfly.ui">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ui\iDirSearch.ui">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\CommandsHandler.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\CpuGlobalSettings.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\CPUProfileDataTable.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\CpuProfilingOptions.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\CpuProjectHandler.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\CpuProjectSettings.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\CpuRetryDialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\DataTab.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\DirSearchDialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\DisplayFilterDlg.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\FunctionsDataTable.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\ModuleFilterDialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\ModulesDataTable.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\ProcessesDataTable.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\SessionWindow.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\SessionViewCreator.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\SessionSourceCodeView.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\SessionOverviewWindow.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\SessionModulesView.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\SessionFunctionView.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ui\iCssButterfly.ui" />
+    <CustomBuild Include="ui\iCpuGlobalSettings.ui" />
+    <CustomBuild Include="ui\iDirSearch.ui" />
+    <CustomBuild Include="inc\CpuProjectSettings.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\CpuRetryDialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\CPUProfileDataTable.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\SessionOverviewWindow.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\ModulesDataTable.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\FunctionsDataTable.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\ProcessesDataTable.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\SessionModulesView.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\SessionFunctionView.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\SessionSourceCodeView.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\CommandsHandler.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\SessionCallGraphView.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\CPUProfileDataTable.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\ModulesDataTable.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\FunctionsDataTable.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\ProcessesDataTable.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\SessionFunctionView.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\SessionModulesView.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\SessionOverviewWindow.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\SessionViewCreator.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\SessionWindow.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\DirSearchDialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\DataTab.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\CpuRetryDialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\CpuProjectSettings.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\CommandsHandler.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\CpuProfilingOptions.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\CpuProjectHandler.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\CpuGlobalSettings.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ui\iDirSearch.ui">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ui\iCpuGlobalSettings.ui">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ui\iCssButterfly.ui">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\CpuGlobalSettings.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\CpuProfilingOptions.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\CpuProjectHandler.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\DataTab.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\DirSearchDialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\SessionViewCreator.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\SessionWindow.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\CustomProfileProjectSettingsExtension.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\tpAppController.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\tpSessionView.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\tpOverview.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\tpThreadsView.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\tpDisplaySettingsDialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\tpThreadsViewLegend.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\tpThreadsTimeline.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\tpTreeHandler.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\tpProjectSettingsExtension.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\tpThreadsViewControlPanel.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="inc\tpThreadsTimelineItems.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="inc\SConscript" />
+    <None Include="ReadMe.txt" />
+    <None Include="src\SConscript" />
+    <CustomBuild Include="inc\SessionSourceCodeView.h">
+      <Filter>CpuProfiling\inc</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Generated Files">
+      <UniqueIdentifier>{ea9f9e13-f690-442d-ac55-9365c4dd13d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{26f882e7-9c93-430d-80e6-d7bfe926f706}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{f9f26cfa-7288-4fb8-a1e5-37192ddf1991}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{7f8ab5ff-95b9-4df8-b082-a9969f368620}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\..\Common\Src\VersionInfo\VersionResource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

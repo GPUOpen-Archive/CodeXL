@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<CodeXL>
+    <Tests>
+	        <TestResultsDirectory>GoldMasters_APPSDK_2_9</TestResultsDirectory>
+        <LogFilesDirectory>C:\TEMP\testResults\</LogFilesDirectory>
+		<Test>
+            <ExecutablePath>samples\opencl\bin\x86_64\HelloWorld.exe</ExecutablePath>
+            <WorkingDirectory>samples\opencl\bin\x86_64\</WorkingDirectory>
+            <TestName>HelloWorld_LocalsTest</TestName>
+            <TestType>LocalsTest</TestType>
+            <Kernels>
+                <Kernel>
+                    <KernelName>helloworld</KernelName>
+					<WorkItemId>0,0,0</WorkItemId>
+					<KernelLocals>
+						<LocalsInLine lineNumber="17"></LocalsInLine>
+						<LocalsInLine lineNumber="18"></LocalsInLine>
+						<LocalsInLine lineNumber="19"></LocalsInLine>
+						<LocalsInLine lineNumber="20"></LocalsInLine>
+                    </KernelLocals>               
+                </Kernel>
+            </Kernels>
+        </Test>
+	</Tests>
+</CodeXL>       

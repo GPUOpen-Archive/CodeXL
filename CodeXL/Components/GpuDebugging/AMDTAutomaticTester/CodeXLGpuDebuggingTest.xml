@@ -1,0 +1,132 @@
+<!--BitonicSort - bitonicSort
+SobelFilter - sobel_filter
+BinarySearch - binarySearch
+1. BitonicSort 				done
+2. SobelFilter				done
+3. BinarySearch				done
+4. NBody					Loop
+5. URNG						done
+6. MonteCarloAsianDP 		needs a tahiti
+7. MatrixMultiplication  	Loop
+8. BlackScholes				done
+9. SimpleGL					done needs work
+10. BlackScholesDP
+11. MatrixTranspose
+12. MonteCarloAsian
+
+-->
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+This XML is a sample XML for the AMDTAutomaticTester.exe.
+An XML like this should be gives as an argument to AMDTAutomaticTester.exe, along with the following preperations:
+
+* A folder specified in TestResultsDirectory tag, containing a list of files with the names "testName.log", where test name is the name of the test, 
+   for each of the tests specified the XML
+
+The tester will run and write a file in %TEMP%\AMDAutomaticTestResultsTemp, with the current date, and a list of the tests, and the success / failure status.
+-->
+<CodeXL>
+    <Tests>
+	        <TestResultsDirectory>C:\jenkins\workspace\CodeXL-End-to-End-Test\main\CodeXL\Components\GpuDebugging\AMDTAutomaticTester\AutomaticTester\GoldMasters_APPSDK_2_8</TestResultsDirectory>
+        <LogFilesDirectory>C:\TEMP\testResults\</LogFilesDirectory>
+        <Test>
+            <!-- this tag opens and closes for a single test. A single test is a single execution of an executable -->
+            <ExecutablePath>samples\opencl\bin\x86\URNG.exe</ExecutablePath>
+            <!-- The executable path. Can be relative to the content of "AMDAPPSDKSAMPLESROOT" environment variable -->
+            <WorkingDirectory>samples\opencl\bin\x86\</WorkingDirectory>
+            <!-- The working folder for the executable. Can be relative to the content of "AMDAPPSDKSAMPLESROOT" environment variable -->
+            <TestName>URNG_LocalsTest</TestName>
+            <!-- Test name - will be used to identify the results golden master file name (TestName.log)-->
+            <TestType>LocalsTest</TestType>
+            <!-- Test Type: can be either:
+            1. StepTest - step into a kernel and simulate an F10 operation until the kernel is done. Output line numbers. Output requested variables specified in KernelVariables tag for work item 0, 0, 0
+            2. WorkItemsTest - step into a kernel and simulate an F10 operation until the kernel is done. Output line numbers. Output requested variables specified in KernelVariables tag for the requested work item 
+            3. LocalsTest - step into a kernel and simulate an F10 operation until the kernel is done. For lines specified in KernelLocals tag, output the list of locals
+            4. StepIntoLine - step into a kernel and simulate an F10 operation until the kernel is done. In line specified in StepIntoLine tag, perform a step into operation
+            5. AllValuesTest - step into a kernel and simulate an F10 operation until the kernel is done. In line specified, print all the work items values for the specified variables
+            -->
+            <Kernels>
+                <Kernel>
+                    <KernelName>noise_uniform</KernelName>
+                    <KernelLocals>
+                        <LocalsInLine lineNumber="75"></LocalsInLine>
+                        <LocalsInLine lineNumber="82"></LocalsInLine>
+                    </KernelLocals>
+                </Kernel>
+            </Kernels>
+        </Test>
+        <Test>
+            <ExecutablePath>samples\opencl\bin\x86\SobelFilter.exe</ExecutablePath>
+            <WorkingDirectory>samples\opencl\bin\x86\</WorkingDirectory>
+            <TestName>SobelFilter_StepTest</TestName>
+            <TestType>StepTest</TestType>
+            <Kernels>
+                <Kernel>
+                    <KernelName>sobel_filter</KernelName>
+                    <KernelVariables>
+						<!--i21.s0 at (0,0) should not be available in line 50 as this branch is not taken by (0,0) -->
+                        <Variable name="i21.s0" line="50" x="0" y="0" z="-1"></Variable>
+                        <Variable name="i21.s0" line="50" x="1" y="1" z="-1"></Variable>
+                    </KernelVariables>
+                </Kernel>
+            </Kernels>
+        </Test>
+        <Test>
+            <ExecutablePath>samples\opencl\bin\x86\BlackScholes.exe</ExecutablePath>
+            <WorkingDirectory>samples\opencl\bin\x86\</WorkingDirectory>
+            <TestName>BlackScholes_StepIntoTest</TestName>
+            <TestType>StepIntoTest</TestType>
+            <Kernels>
+                <Kernel>
+                    <KernelName>blackScholes</KernelName>
+                    <StepIntoLine>116</StepIntoLine>
+                </Kernel>
+            </Kernels>
+        </Test>
+        <Test>
+            <ExecutablePath>samples\opencl\bin\x86\SobelFilter.exe</ExecutablePath>
+            <WorkingDirectory>samples\opencl\bin\x86\</WorkingDirectory>
+            <TestName>SobelFilter_WorkItemsTest</TestName>
+            <TestType>WorkItemsTest</TestType>
+            <Kernels>
+                <Kernel>
+                    <KernelName>sobel_filter</KernelName>
+                    <KernelVariables>
+                        <Variable name="i21.s0" line="50" x="0" y="0" z="-1"></Variable>
+                        <Variable name="i21.s0" line="50" x="8" y="1" z="-1"></Variable>
+                        <Variable name="i21.s0" line="50" x="17" y="124" z="-1"></Variable>
+                    </KernelVariables>
+                </Kernel>
+            </Kernels>
+        </Test>
+		<Test>
+            <ExecutablePath>samples\opencl\bin\x86\BitonicSort.exe</ExecutablePath>
+            <WorkingDirectory>samples\opencl\bin\x86\</WorkingDirectory>
+            <TestName>BitonicSort_StepTest</TestName>
+            <TestType>StepTest</TestType>
+            <Kernels>
+                <Kernel>
+                    <KernelName>bitonicSort</KernelName>
+                </Kernel>
+            </Kernels>
+        </Test>
+		<Test>
+            <ExecutablePath>samples\opencl\bin\x86\BinarySearch.exe</ExecutablePath>
+            <WorkingDirectory>samples\opencl\bin\x86\</WorkingDirectory>
+            <TestName>BinarySearch_LocalsTest</TestName>
+            <TestType>LocalsTest</TestType>
+            <Kernels>
+                <Kernel>
+                    <KernelName>binarySearch</KernelName>
+                    <KernelLocals>
+						<LocalsInLine lineNumber="31"></LocalsInLine>
+						<LocalsInLine lineNumber="32"></LocalsInLine>
+						<LocalsInLine lineNumber="35"></LocalsInLine>
+                        <LocalsInLine lineNumber="38"></LocalsInLine>
+                        <LocalsInLine lineNumber="53"></LocalsInLine>
+                    </KernelLocals>
+                </Kernel>
+            </Kernels>
+        </Test>
+    </Tests>
+</CodeXL>       

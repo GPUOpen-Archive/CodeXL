@@ -1,0 +1,56 @@
+# -*- Python -*-
+
+from CXL_init import *
+
+Import('*')
+
+libName = "CXLTeaPot"
+
+env = CXL_env.Clone()
+compiler_base_flags = " -Wall -g -fmessage-length=0 -Wno-unknown-pragmas -pthread -D_DEBUG "
+env.Replace(CPPFLAGS = compiler_base_flags)
+
+env.Append( CPPPATH = [ 
+	".",
+	"./inc/",
+	"../AMDTTeaPot/inc",
+	"../AMDTTeaPot",
+	env['CXL_commonproj_dir'],
+])
+
+sources = \
+[
+	"src/AMDTFluidGrid.cpp",
+	"src/AMDTImage.cpp",
+	"src/AMDTOpenCLHelper.cpp",
+	"src/AMDTOpenGLHelper.cpp",
+	"src/AMDTOpenGLMath.cpp",
+	"src/AMDTTeapotOCLSmokeSystem.cpp",
+	"src/AMDTTeapotOGLCanvas.cpp",
+	"src/AMDTTeapotRenderState.cpp"
+]
+
+commonLinkedLibraries = \
+[
+  	"GL",
+	"X11",
+	"xml2"
+]
+
+linkedLibraries = commonLinkedLibraries
+env.Prepend (LIBS = linkedLibraries)
+
+# Creating object files	
+objFiles = env.StaticObject(sources)
+
+# Creating shared libraries
+soFiles = env.StaticLibrary(
+	target = libName, 
+	source = objFiles)
+
+# Installing libraries
+libInstall = env.Install( 
+	dir = env['CXL_Examples_dir']  + '/release', 
+	source = (soFiles))
+
+Return('libInstall')

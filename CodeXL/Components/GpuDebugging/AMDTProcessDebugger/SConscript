@@ -1,0 +1,63 @@
+# -*- Python -*-
+
+from CXL_init import *
+
+Import('*')
+
+libName = "CXLProcessDebugger"
+
+env = CXL_env.Clone()
+env.Append( CPPPATH = [ 
+	".",
+	"./..",
+	"./../../Remote",
+	env['CXL_commonproj_dir'],
+	env['CXL_commonproj_dir'] + "/AMDTOSWrappers/Include",
+])
+
+UseAPPSDK(env);
+
+sources = \
+[
+	"src/pdDebuggedProcessWatcherThread.cpp",
+	"src/pdGDBCommandInfo.cpp",
+	"src/pdGDBDataStructs.cpp",
+	"src/pdGDBDriver.cpp",
+	"src/pdGDBListenerThread.cpp",
+	"src/pdGDBOutputReader.cpp",
+	"src/pdGDBProcessWaiterThread.cpp",
+	"src/pdLauncherProcessWatcherThread.cpp",
+	"src/pdLinuxDebuggedApplicationOutputReaderThread.cpp",
+	"src/pdLinuxProcessDebugger.cpp",
+	"src/pdProcessDebugger.cpp",
+	"src/pdProcessDebuggersManager.cpp",
+	"src/pdRegisterProcessDebuggersManagerInstance.cpp",
+	"src/pdRemoteProcessDebugger.cpp",
+	"src/pdRemoteProcessDebuggerDebuggingServerWatcherThread.cpp",
+	"src/pdRemoteProcessDebuggerEventsListenerThread.cpp",
+	"src/pdRemoteProcessDebuggerTCPIPConnectionWaiterThread.cpp", 
+	"src/pdSingletonsDelete.cpp"
+]
+
+env.Append( LIBS=
+[
+	"CXLBaseTools",
+	"CXLOSWrappers",
+	"CXLAPIClasses",
+	"CXLRemoteClient",
+])
+
+# Creating object files	
+objFiles = env.SharedObject(sources)
+
+# Creating shared libraries
+soFiles = env.SharedLibrary(
+	target = libName, 
+	source = objFiles)
+
+# Installing libraries
+libInstall = env.Install( 
+	dir = env['CXL_lib_dir'], 
+	source = (soFiles))
+
+Return('libInstall')

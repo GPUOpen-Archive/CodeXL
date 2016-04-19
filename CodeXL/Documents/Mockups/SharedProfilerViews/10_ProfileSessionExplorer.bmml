@@ -1,0 +1,62 @@
+<mockup version="1.0" skin="sketch" measuredW="938" measuredH="334" mockupW="772" mockupH="269">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::TitleWindow" x="166" y="65" w="231" h="250" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bottomheight>0</bottomheight>
+        <close>true</close>
+        <text>Profile%20Session%20Explorer</text>
+      </controlProperties>
+    </control>
+    <control controlID="2" controlTypeID="com.balsamiq.mockups::Tree" x="169" y="90" w="228" h="225" measuredW="300" measuredH="225" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>4</selectedIndex>
+        <text>_%20Session%201%20-%20CPU%20Timer%0A_%20Session%202%20-%20CPU%20Timer%0A_%20Session%203%20-%20Trace%0A_%20GPU%20Scenario%201%20-%20GPU%20Counters%0A_%20GPU%20Scenario%202%20-%20GPU%20Counters</text>
+      </controlProperties>
+    </control>
+    <control controlID="3" controlTypeID="com.balsamiq.mockups::StickyNote" x="453" y="75" w="351" h="87" measuredW="109" measuredH="123" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Per%20discussion%20with%20Chris%3A%0AProbably%20don%27t%20need%20the%20project%20separation%20from%20VS%20APP</text>
+      </controlProperties>
+    </control>
+    <control controlID="4" controlTypeID="com.balsamiq.mockups::StickyNote" x="443" y="190" w="495" h="135" measuredW="109" measuredH="123" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Questions%20to%20be%20answered%3A%0A1%29%20Do%20we%20ever%20want%20to%20overlap%20profile%20%27types%27%2C%20like%20APP%20trace%20with%20CPU%20Timer%3F%0A2%29%20Do%20we%20want%20different%20icons%20for%20different%20profiles%20%27types%27%3F%0A3%29%20Do%20we%20want%20to%20append%20the%20profile%20type%20to%20the%20session%20name%2C%20like%20current%20APP%3F%0A4%29%20Most%20recent%20session%20on%20top%20or%20bottom%3F</text>
+      </controlProperties>
+    </control>
+    <control controlID="5" controlTypeID="com.balsamiq.mockups::Icon" x="177" y="145" w="-1" h="-1" measuredW="24" measuredH="24" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <icon>./assets/icon_Database.png%7Csmall</icon>
+      </controlProperties>
+    </control>
+    <control controlID="6" controlTypeID="com.balsamiq.mockups::Icon" x="177" y="166" w="-1" h="-1" measuredW="24" measuredH="24" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <icon>./assets/icon_LCD.png%7Csmall</icon>
+      </controlProperties>
+    </control>
+    <control controlID="7" controlTypeID="com.balsamiq.mockups::Icon" x="177" y="190" w="-1" h="-1" measuredW="24" measuredH="24" zOrder="6" locked="false" isInGroup="-1">
+      <controlProperties>
+        <icon>./assets/icon_LCD.png%7Csmall</icon>
+      </controlProperties>
+    </control>
+    <control controlID="8" controlTypeID="com.balsamiq.mockups::Icon" x="177" y="121" w="-1" h="-1" measuredW="24" measuredH="24" zOrder="7" locked="false" isInGroup="-1">
+      <controlProperties>
+        <icon>./assets/icon_CPU.png%7Csmall</icon>
+      </controlProperties>
+    </control>
+    <control controlID="9" controlTypeID="com.balsamiq.mockups::Icon" x="177" y="97" w="-1" h="-1" measuredW="24" measuredH="24" zOrder="8" locked="false" isInGroup="-1">
+      <controlProperties>
+        <icon>./assets/icon_CPU.png%7Csmall</icon>
+      </controlProperties>
+    </control>
+    <control controlID="10" controlTypeID="com.balsamiq.mockups::Menu" x="265" y="214" w="163" h="-1" measuredW="150" measuredH="120" zOrder="9" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Show%20%26P%26roperties%0A%26R%26ename%0A%26O%26pen%20Containing%20Folder%0A---%0A%26D%26elete%0ADelete%20%26A%26ll</text>
+      </controlProperties>
+    </control>
+    <control controlID="11" controlTypeID="com.balsamiq.mockups::Icon" x="257" y="208" w="-1" h="-1" measuredW="24" measuredH="24" zOrder="10" locked="false" isInGroup="-1">
+      <controlProperties>
+        <icon>CursorIcon%7Csmall</icon>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

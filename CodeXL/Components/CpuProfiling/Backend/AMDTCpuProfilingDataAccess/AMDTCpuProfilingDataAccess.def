@@ -1,0 +1,21 @@
+EXPORTS
+	AMDTOpenProfileData
+	AMDTCloseProfileData
+	AMDTGetProfileSessionInfo
+	AMDTGetCpuTopology
+	AMDTGetSampledCountersList
+	AMDTGetSamplingConfiguration
+	AMDTSetDebugInfoPaths
+	AMDTSetSourcePaths
+	AMDTSetReportOptions
+	AMDTSetReportOption
+	AMDTSetReportCounters
+	AMDTGetProcessInfo
+	AMDTGetModuleInfo
+	AMDTGetThreadInfo
+	AMDTGetProcessSummary
+	AMDTGetThreadSummary
+	AMDTGetModuleSummary
+	AMDTGetFunctionSummary
+	AMDTGetFunctionProfileData
+	AMDTGetFunctionDisassembly

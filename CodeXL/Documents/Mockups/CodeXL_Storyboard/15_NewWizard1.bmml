@@ -1,0 +1,42 @@
+<mockup version="1.0" skin="sketch" measuredW="735" measuredH="377" mockupW="370" mockupH="212">
+  <controls>
+    <control controlID="1" controlTypeID="com.balsamiq.mockups::TextInput" x="468" y="189" w="188" h="-1" measuredW="79" measuredH="27" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="2" controlTypeID="com.balsamiq.mockups::Label" x="373" y="194" w="86" h="21" measuredW="86" measuredH="21" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Project%20Name</text>
+      </controlProperties>
+    </control>
+    <control controlID="3" controlTypeID="com.balsamiq.mockups::TextInput" x="468" y="218" w="162" h="-1" measuredW="79" measuredH="27" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="4" controlTypeID="com.balsamiq.mockups::Label" x="373" y="221" w="53" h="21" measuredW="53" measuredH="21" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Location</text>
+      </controlProperties>
+    </control>
+    <control controlID="5" controlTypeID="com.balsamiq.mockups::Button" x="639" y="218" w="33" h="27" measuredW="33" measuredH="27" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>...</text>
+      </controlProperties>
+    </control>
+    <control controlID="8" controlTypeID="com.balsamiq.mockups::ButtonBar" x="502" y="333" w="-1" h="-1" measuredW="218" measuredH="29" zOrder="6" locked="false" isInGroup="-1">
+      <controlProperties>
+        <hrefs>%2C17_NewWizard2%26bm%3B17_NewWizard2.bmml%26bm%3B17_NewWizard2.bmml%26bm%3B17_NewWizard2.bmml%2C30_CleanWindow%26bm%3B30_CleanWindow.bmml%26bm%3B30_CleanWindow.bmml%26bm%3B30_CleanWindow.bmml</hrefs>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22214%2C168%2C288%2C197%22%20href%3D%2217_NewWizard2.bmml%22%20alt%3D%2217_NewWizard2%22%20id%3D%228_0%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22290%2C168%2C359%2C197%22%20href%3D%2230_CleanWindow.bmml%22%20alt%3D%2230_CleanWindow%22%20id%3D%228_1%22/%3E%0A</map>
+        <selectedIndex>1</selectedIndex>
+        <text>-%3C%20%26B%26ack-%2C%20%26N%26ext%20%3E%2C%20%26C%26ancel</text>
+      </controlProperties>
+    </control>
+    <control controlID="9" controlTypeID="com.balsamiq.mockups::FieldSet" x="365" y="165" w="370" h="212" measuredW="200" measuredH="170" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>New%20project%20Wizard%20%28step%201%29</text>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

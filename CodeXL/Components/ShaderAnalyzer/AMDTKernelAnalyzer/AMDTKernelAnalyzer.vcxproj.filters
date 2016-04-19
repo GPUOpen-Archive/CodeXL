@@ -1,0 +1,349 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="public inc">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="inc">
+      <UniqueIdentifier>{a457baf5-c225-46a0-af0c-79d5e359c1bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Generated files">
+      <UniqueIdentifier>{3ba55fb8-4b49-4c79-9f97-4d111c874137}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Emulator src">
+      <UniqueIdentifier>{17e1957a-c63d-41fe-abeb-a22195db9984}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Emulator inc">
+      <UniqueIdentifier>{4dda75e7-0a7b-4190-a4f7-1e04189f0546}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="$(CommonProjectsDir)\VersionInfo\VersionResource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\dllmain.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaMenuActionsExecutor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaAppWrapper.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaDataAnalyzerFunctions.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaSingletonsDelete.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaGlobalVariableManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaTreeModel.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaTreeModel.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaBackendManager.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaBackendManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaEventObserver.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaProjectSettingsExtension.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaProjectSettingsExtension.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaApplicationTreeHandler.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaApplicationTreeHandler.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaTreeDataExtension.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaProjectDataManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaApplicationCommands.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaMDIViewCreator.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaTreeDataExtension.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaOverviewView.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaOverviewView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaKernelView.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaKernelView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaAnalysisView.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaStatisticsView.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaAnalysisView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaStatisticsView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaMultiSourceView.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaMultiSourceView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaTableView.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaTableView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaBuildToolbar.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaBuildToolbar.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaExecutionMode.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaAnalyzeSettingsPage.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaAnalyzeSettingsPage.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaSourceCodeView.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaMultiSourceActionCreator.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaSourceCodeView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaProjectSettingsExtensionBase.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaProjectSettingsExtensionBase.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaProjectSettingsExtensionOther.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaProjectSettingsExtensionOther.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaProjectDataManager.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaExportBinariesDialog.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaExportBinariesDialog.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="$(CommonDir)\Src\DeviceInfo\DeviceInfoUtils.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaProjectSettingsShaderExtension.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaProjectSettingsShaderExtension.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaAddFileDialog.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaAddFileDialog.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaSourceCodeTableView.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaSourceCodeTableView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaCliLauncher.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(CommonDir)\Src\DeviceInfo\DeviceInfoInternal.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaCreateProgramDialog.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaFileManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaProgram.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_kaCreateProgramDialog.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kaUtils.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\kaAMDTKernelAnalyzerDLLBuild.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kaStringConstants.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kaMenuActionsExecutor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kaCommandIDs.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kaAppWrapper.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kaDataAnalyzerFunctions.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kaSingletonsDelete.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kaGlobalVariableManager.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kaEventObserver.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kaApplicationCommands.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kaMDIViewCreator.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\kaExecutionMode.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kaMultiSourceActionCreator.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="$(CommonDir)\Src\DeviceInfo\DeviceInfoUtils.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="$(CommonDir)\Src\DeviceInfo\DeviceInfo.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kaDataTypes.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kaCliLauncher.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kaProgram.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kaFileManager.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kaUtils.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="src\kaTreeModel.h">
+      <Filter>inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\kaProjectSettingsExtension.h">
+      <Filter>inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\kaApplicationTreeHandler.h">
+      <Filter>inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\kaBackendManager.h">
+      <Filter>inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\kaTreeDataExtension.h">
+      <Filter>inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\kaOverviewView.h">
+      <Filter>inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\kaKernelView.h">
+      <Filter>inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\kaAnalysisView.h">
+      <Filter>inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\kaStatisticsView.h">
+      <Filter>inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\kaMultiSourceView.h">
+      <Filter>inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\kaTableView.h">
+      <Filter>inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\kaBuildToolbar.h">
+      <Filter>inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\kaAnalyzeSettingsPage.h">
+      <Filter>inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\kaSourceCodeView.h">
+      <Filter>inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\kaProjectSettingsExtensionBase.h">
+      <Filter>inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\kaProjectSettingsExtensionOther.h">
+      <Filter>inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\kaProjectDataManager.h">
+      <Filter>inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\kaExportBinariesDialog.h">
+      <Filter>inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\kaProjectSettingsShaderExtension.h">
+      <Filter>inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\kaAddFileDialog.h">
+      <Filter>inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\kaSourceCodeTableView.h">
+      <Filter>inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\kaCreateProgramDialog.h">
+      <Filter>inc</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{5B9EF4DE-1D94-43FA-9B28-5452055B8749}</ProjectGuid>
+    <RootNamespace>AMDTPowerProfilingControl</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)\AMDTPowerProfiling.props" />
+  </ImportGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\AMDTPowerProfilingDrivers\Windows\inc\;..\AMDTPowerProfilingDrivers\inc\;..\inc;..\..\..\..\..\Common\Src\AMDTCommonHeaders\;.\inc;..\..\..\..\..\Common\Src\AMDTCpuPerfEventUtils\inc\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>CXLDriverControl$(GDTProjectSuffix).lib;advapi32.lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib</AdditionalDependencies>
+      <ModuleDefinitionFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AMDTPowerProfileAPI.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AMDTPowerProfileAPI.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AMDTPowerProfileAPI.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AMDTPowerProfileAPI.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ResourceCompile Include="$(CommonProjectsDir)\VersionInfo\VersionResource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\AMDTHistogram.cpp" />
+    <ClCompile Include="src\AMDTPowerProfileApi.cpp" />
+    <ClCompile Include="src\AMDTPowerProfileControl.cpp" />
+    <ClCompile Include="src\AMDTPowerProfileDataAccess.cpp" />
+    <ClCompile Include="src\DllMain.cpp" />
+    <ClCompile Include="src\OsFileWrapper.cpp" />
+    <ClCompile Include="src\PowerProfileDriverInterface_win.cpp" />
+    <ClCompile Include="src\PowerProfileHelper.cpp" />
+    <ClCompile Include="src\PowerProfileTranslate.cpp" />
+    <ClCompile Include="src\RawDataReader.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\AMDTPowerProfileApi.h" />
+    <ClInclude Include="inc\AMDTPowerProfileDataTypes.h" />
+    <ClInclude Include="src\AMDTPowerProfileApiInternal.h" />
+    <ClInclude Include="src\AMDTPowerProfileControl.h" />
+    <ClInclude Include="src\AMDTPowerProfileDataAccess.h" />
+    <ClInclude Include="src\AMDTPowerProfileInternal.h" />
+    <ClInclude Include="src\BasicCounterList.h" />
+    <ClInclude Include="src\OsFileWrapper.h" />
+    <ClInclude Include="src\PowerProfileDriverInterface.h" />
+    <ClInclude Include="src\PowerProfileHelper.h" />
+    <ClInclude Include="src\PowerProfileTranslate.h" />
+    <ClInclude Include="src\ppCountersStringConstants.h" />
+    <ClInclude Include="src\RawDataReader.h" />
+    <ClInclude Include="src\Smu75CounterList.h" />
+    <ClInclude Include="src\Smu7CounterList.h" />
+    <ClInclude Include="src\Smu7DgpuCounterList.h" />
+    <ClInclude Include="src\Smu8CounterList.h" />
+    <ClInclude Include="src\SupportedDeviceList.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AMDTPowerProfileAPI.def" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

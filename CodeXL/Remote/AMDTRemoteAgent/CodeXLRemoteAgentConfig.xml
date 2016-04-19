@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- Settings for CodeXL Daemon -->
+<Settings>
+    <!-- Valid port number -->
+    <PortNumber>27015</PortNumber>
+    
+    <!-- -1 for maximum possible timeout, or any positive integer -->
+    <ReadTimeoutMs>-1</ReadTimeoutMs>
+    <WriteTimeoutMs>-1</WriteTimeoutMs>
+   
+    <Version>public</Version>
+</Settings>

@@ -1,0 +1,66 @@
+<mockup version="1.0" skin="sketch" measuredW="981" measuredH="481" mockupW="821" mockupH="383">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::TitleWindow" x="160" y="98" w="821" h="383" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bottomheight>0</bottomheight>
+        <close>true</close>
+        <text>Options</text>
+      </controlProperties>
+    </control>
+    <control controlID="1" controlTypeID="com.balsamiq.mockups::ButtonBar" x="865" y="437" w="-1" h="-1" measuredW="105" measuredH="29" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <hrefs>20_DefaultLayoutNoSessions%26bm%3B20_DefaultLayoutNoSessions.bmml%26bm%3B20_DefaultLayoutNoSessions.bmml%26bm%3B20_DefaultLayoutNoSessions.bmml%2C%2C%2C%2C%2C</hrefs>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22705%2C339%2C751%2C368%22%20href%3D%2220_DefaultLayoutNoSessions.bmml%22%20alt%3D%2220_DefaultLayoutNoSessions%22%20id%3D%221_0%22/%3E%0A</map>
+        <text>%26O%26k%2C%20%26S%26ave</text>
+      </controlProperties>
+    </control>
+    <control controlID="2" controlTypeID="com.balsamiq.mockups::TabBar" x="160" y="123" w="810" h="314" measuredW="490" measuredH="100" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <hrefs>64_OptionsDlg%26bm%3B64_OptionsDlg.bmml%26bm%3B64_OptionsDlg.bmml%26bm%3B64_OptionsDlg.bmml%2C66_OptionsDlgSource%26bm%3B66_OptionsDlgSource.bmml%26bm%3B66_OptionsDlgSource.bmml%26bm%3B66_OptionsDlgSource.bmml%2C68_OptionsDlgLog%26bm%3B68_OptionsDlgLog.bmml%26bm%3B68_OptionsDlgLog.bmml%26bm%3B68_OptionsDlgLog.bmml%2C%2C72_OptionsDlgProfiles%26bm%3B72_OptionsDlgProfiles.bmml%26bm%3B72_OptionsDlgProfiles.bmml%26bm%3B72_OptionsDlgProfiles.bmml%2C74_OptionsDlgManage%26bm%3B74_OptionsDlgManage.bmml%26bm%3B74_OptionsDlgManage.bmml%26bm%3B74_OptionsDlgManage.bmml</hrefs>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%2220%2C25%2C78%2C50%22%20href%3D%2264_OptionsDlg.bmml%22%20alt%3D%2264_OptionsDlg%22%20id%3D%222_0%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%2278%2C25%2C131%2C50%22%20href%3D%2266_OptionsDlgSource.bmml%22%20alt%3D%2266_OptionsDlgSource%22%20id%3D%222_1%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22131%2C25%2C187%2C50%22%20href%3D%2268_OptionsDlgLog.bmml%22%20alt%3D%2268_OptionsDlgLog%22%20id%3D%222_2%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22235%2C25%2C283%2C50%22%20href%3D%2272_OptionsDlgProfiles.bmml%22%20alt%3D%2272_OptionsDlgProfiles%22%20id%3D%222_3%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22283%2C25%2C416%2C50%22%20href%3D%2274_OptionsDlgManage.bmml%22%20alt%3D%2274_OptionsDlgManage%22%20id%3D%222_4%22/%3E%0A</map>
+        <selectedIndex>3</selectedIndex>
+        <text>General%2C%20Source%2C%20Log%20File%2C%20Debug%2C%20Profile%2C%20Manage%20Components</text>
+      </controlProperties>
+    </control>
+    <control controlID="48" controlTypeID="com.balsamiq.mockups::CheckBox" x="169" y="154" w="-1" h="-1" measuredW="281" measuredH="22" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <state>selected</state>
+        <text>Collect%20allocated%20objects%27%20creation%20call%20stacks</text>
+      </controlProperties>
+    </control>
+    <control controlID="49" controlTypeID="com.balsamiq.mockups::CheckBox" x="169" y="176" w="-1" h="-1" measuredW="220" measuredH="22" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <state>up</state>
+        <text>I%20am%20using%20an%20HTTP%20proxy%20server%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="50" controlTypeID="com.balsamiq.mockups::TextInput" x="394" y="176" w="248" h="-1" measuredW="145" measuredH="27" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <state>disabled</state>
+        <text>www.myproxy.example</text>
+      </controlProperties>
+    </control>
+    <control controlID="51" controlTypeID="com.balsamiq.mockups::Label" x="649" y="178" w="-1" h="-1" measuredW="80" measuredH="21" zOrder="6" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>-Port%20number%3A-</text>
+      </controlProperties>
+    </control>
+    <control controlID="52" controlTypeID="com.balsamiq.mockups::NumericStepper" x="734" y="177" w="-1" h="-1" measuredW="49" measuredH="24" zOrder="7" locked="false" isInGroup="-1">
+      <controlProperties>
+        <state>disabled</state>
+        <text>80</text>
+      </controlProperties>
+    </control>
+    <control controlID="53" controlTypeID="com.balsamiq.mockups::Label" x="171" y="208" w="-1" h="-1" measuredW="265" measuredH="21" zOrder="8" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Performance%20Counters%20sample%20interval%20%28mS%29%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="54" controlTypeID="com.balsamiq.mockups::NumericStepper" x="436" y="206" w="-1" h="-1" measuredW="57" measuredH="24" zOrder="9" locked="false" isInGroup="-1">
+      <controlProperties>
+        <state>up</state>
+        <text>200</text>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

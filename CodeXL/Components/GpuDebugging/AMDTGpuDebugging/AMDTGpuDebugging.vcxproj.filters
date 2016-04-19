@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="inc">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Generated files">
+      <UniqueIdentifier>{03da8885-92fc-4f1b-9492-0b31de8cbd69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public inc">
+      <UniqueIdentifier>{c493892f-cb98-40ee-b9dd-6011c25b07c3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\gwgDEBuggerAppWrapper.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gwgDEBuggerAppWrapperDLLBuild.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gwApplicationCommands.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gwEventObserver.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gwImagesAndBuffersActionsCreator.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gwStringConstants.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gwImagesAndBuffersMDIViewCreator.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gwMenuActionsExecutor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gwWXViewsActionsCreator.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gwDebugViewsCreator.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gwDebugActionsCreator.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gwStatisticsActionsExecutor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gwKernelWorkItemToolbar.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\dllmain.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gwgDEBuggerAppWrapper.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gwApplicationCommands.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gwEventObserver.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gwImagesAndBuffersActionsCreator.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gwImagesAndBuffersMDIViewCreator.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gwMenuActionsExecutor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gwWXViewsActionsCreator.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gwDebugViewsCreator.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gwKernelWorkItemToolbar.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gwKernelWorkItemToolbar.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gwDebugActionsCreator.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gwStatisticsActionsExecutor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SConscript" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="Include\gwKernelWorkItemToolbar.h">
+      <Filter>public inc</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\..\Common\Src\VersionInfo\VersionResource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

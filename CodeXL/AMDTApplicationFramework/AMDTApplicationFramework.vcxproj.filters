@@ -1,0 +1,611 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Generated files">
+      <UniqueIdentifier>{7616b990-5acb-4c17-93e0-dbfc94400b01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Commands">
+      <UniqueIdentifier>{0b4daf05-67de-4394-b6d4-b38c5db1ea21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dialogs">
+      <UniqueIdentifier>{275395dc-9878-4adb-8ba3-878575756190}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Views">
+      <UniqueIdentifier>{f4c51496-add7-4787-915e-c177672fc6f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dialogs\src">
+      <UniqueIdentifier>{a10c63be-f19a-432c-ad42-20b929da5761}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Commands\public inc">
+      <UniqueIdentifier>{abf349fc-1270-430f-aab3-d5af633cd300}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Commands\src">
+      <UniqueIdentifier>{427a2ea6-2c2c-4fa8-b66d-8665941ce12e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Include">
+      <UniqueIdentifier>{52aa4915-7b15-45b3-8788-bbe04cf3e1f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dialogs\Include">
+      <UniqueIdentifier>{14738ea9-3db7-4e44-8739-7fe39acf5feb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="inc">
+      <UniqueIdentifier>{2fdae144-13f5-4d94-8d18-dc2a3a7fe50f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\afViewCreatorAbstract.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afQtCreatorsManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afActionCreatorAbstract.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afViewActionHandler.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afViewActionHandler.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afBrowseAction.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afCreatorAction.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afBrowseAction.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afCreatorAction.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afMainAppWindow.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afMainAppWindow.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afQtViewCreatorAbstract.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afQMdiSubWindow.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afQMdiSubWindow.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afProgressBarWrapper.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afActionExecutorAbstract.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afViewCreatorAction.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afViewCreatorAction.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afNewProjectDialog.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afLineEdit.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afMenuActionsExecutor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afLineEdit.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afNewProjectDialog.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afProjectManager.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afProjectManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afProjectSettingsExtension.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afApplicationCommands.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afRecentProjectsActionsExecutor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afStartupPage.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afHTMLView.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afStartupPage.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afHTMLView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afProjectSettingsExtension.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afEditEnvironmentVariablesDialog.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afCommand.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afGlobalVariablesManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\afSourceCodeView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
+    <ClCompile Include="views\afBaseView.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogs\afHelpAboutDialog.cpp">
+      <Filter>Dialogs\src</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogs\afSystemInformationDialog.cpp">
+      <Filter>Dialogs\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afSaveProjectCommand.cpp">
+      <Filter>Commands\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afLoadProjectCommand.cpp">
+      <Filter>Commands\src</Filter>
+    </ClCompile>
+    <ClCompile Include="commands\afSystemInformationCommand.cpp">
+      <Filter>Commands\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afHelpAboutDialog.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afSourceCodeView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afAidFunctions.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afGlobalVariableChangedEvent.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogs\afGlobalSettingsDialog.cpp">
+      <Filter>Dialogs\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afGlobalSettingsDialog.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afGlobalSettingsPage.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogs\afGlobalSettingsPage.cpp">
+      <Filter>Dialogs\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afPluginConnectionManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\afPropertiesView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afHTMLContent.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afGeneralViewsCreator.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afPropertiesUrlHandler.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afGeneralActionsCreator.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afExecutionModeManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afExecutionModeManager.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afSystemInformationDialog.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="commands\src\afInitializeApplicationCommand.cpp">
+      <Filter>Commands\src</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogs\src\afEulaDialog.cpp">
+      <Filter>Dialogs\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afProcessDebuggerEventHandler.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afProcessDebuggerPendingEventEvent.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogs\src\afEditEnvironmentVariablesDialog.cpp">
+      <Filter>Dialogs\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afUnhandledExceptionHandler.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afSourceCodeViewsManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afMDIViewsCreator.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afSourceCodeActionsCreator.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afProcessDebuggerEventHandler.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afProcessDebuggerPendingEventEvent.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afModeProxyStyle.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afSingletonsDelete.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\afApplicationTree.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\afApplicationTreeItemData.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afApplicationTree.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afApplicationTreeItemData.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afSoftwareUpdaterWindow.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afMessageBox.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afHTMLUtils.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogs\afWindowsStoreAppsBrowserDialog.cpp">
+      <Filter>Dialogs\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afWindowsStoreAppsBrowserDialog.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogs\afAttachToProcessDialog.cpp">
+      <Filter>Dialogs\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afAttachToProcessDialog.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afUtils.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="views\afInformationView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogs\afMultipleDirectoriesBrowseDialog.cpp">
+      <Filter>Dialogs\src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afMultipleDirectoriesBrowseDialog.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afQtCreatorsManager.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afStartupDialog.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="dialogs\src\afStartupDialog.cpp">
+      <Filter>Dialogs\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afDocUpdateManager.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afUnhandledExceptionHandler.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afInformationView.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\afOpenCLDeviceInformationCollector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_afTreeCtrl.cpp">
+      <Filter>Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="views\afTreeCtrl.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\afActionCreatorAbstract.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afViewCreatorAbstract.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afApplicationFrameworkDLLBuild.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afAppStringConstants.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afQtViewCreatorAbstract.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afProgressBarWrapper.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afActionExecutorAbstract.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afMenuActionsExecutor.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afApplicationCommands.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afRecentProjectsActionsExecutor.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afCommandIds.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afAidFunctions.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afCommand.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afGlobalVariablesManager.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afEnumerations.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\views\afBaseView.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afLoadProjectCommand.h">
+      <Filter>Commands\public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afSaveProjectCommand.h">
+      <Filter>Commands\public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afGlobalVariableChangedEvent.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afPluginConnectionManager.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afIBreakpointManager.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afIRunModeManager.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\views\afPropertiesView.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <CustomBuild Include="Include\afExecutionModeManager.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <ClInclude Include="Include\afIExecutionMode.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afHTMLContent.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\views\afpropertiesurlhandler.h">
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afPropertiesUrlHandler.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afGeneralActionsCreator.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afGeneralViewsCreator.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\commands\afInitializeApplicationCommand.h">
+      <Filter>Commands\public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afSourceCodeViewsManager.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afMDIViewsCreator.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afSourceCodeActionsCreator.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\commands\afSystemInformationCommand.h">
+      <Filter>Commands\public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\afModeProxyStyle.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\afSingletonsDelete.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\afUtils.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afTreeItemType.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\afPredefinedLayouts.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afMessageBox.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afHTMLUtils.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afCSSSettings.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afDocUpdateManager.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afIDocUpdateHandler.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\dialogs\afEulaDialog.h">
+      <Filter>Dialogs\Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\afSoftwareUpdaterWindow.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="Include\afViewActionHandler.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\afBrowseAction.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\afCreatorAction.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\afMainAppWindow.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\afQMdiSubWindow.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\afViewCreatorAction.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\afLineEdit.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\afNewProjectDialog.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\afStartupPage.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\afHTMLView.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\afProjectSettingsExtension.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\dialogs\afHelpAboutDialog.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\afSourceCodeView.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\dialogs\afEditEnvironmentVariablesDialog.h">
+      <Filter>Dialogs\Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\dialogs\afGlobalSettingsDialog.h">
+      <Filter>Dialogs\Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\afGlobalSettingsPage.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\afExecutionModeManager.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\dialogs\afSystemInformationDialog.h">
+      <Filter>Dialogs\Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\afProcessDebuggerEventHandler.h">
+      <Filter>inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="src\afProcessDebuggerPendingEventEvent.h">
+      <Filter>inc</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\afApplicationTreeItemData.h">
+      <Filter>Views</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\afApplicationTree.h">
+      <Filter>Views</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\dialogs\afWindowsStoreAppsBrowserDialog.h">
+      <Filter>Dialogs\Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\dialogs\afAttachToProcessDialog.h">
+      <Filter>Dialogs\Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\dialogs\afMultipleDirectoriesBrowseDialog.h">
+      <Filter>Dialogs\Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\afQtCreatorsManager.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\dialogs\afStartupDialog.h">
+      <Filter>Dialogs\Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\afProjectManager.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\afUnhandledExceptionHandler.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\afInformationView.h">
+      <Filter>Include</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Include\afLineEdit.h" />
+    <CustomBuild Include="Include\views\afTreeCtrl.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Include\res\icons\application_explorer_command_xpm.xpm">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Include\res\icons\back_icon.xpm">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Include\res\icons\back_icon_disabled.xpm">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Include\res\icons\forward_icon.xpm">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Include\res\icons\forward_icon_disabled.xpm">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Include\res\icons\collapse_button.xpm">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Include\res\icons\expand_button.xpm">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Include\res\icons\down_button.xpm">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Include\res\icons\up_button.xpm">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Include\res\welcome\Welcome.html">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Include\res\welcome\WelcomeAnalyzeNA.html">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="$(CommonProjectsDir)\VersionInfo\VersionResource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,74 @@
+# -*- Python -*-
+
+Import('*')
+from CXL_init import *
+
+appName = "CodeXLRemoteAgent-bin"
+
+env = CXL_env.Clone()
+initBoost(env)
+UseBoost(env)
+
+env.Append( CPPPATH = [ 
+    ".",
+    "./Public Include/",
+    "../../CodeXL/Components/PowerProfiling/Backend/",
+    env['CXL_commonproj_dir'] +"/../../CodeXL/Components/PowerProfiling/Backend/",
+    env['CXL_commonproj_dir'] +"/../../CodeXL/Components/PowerProfiling/Backend/AMDTPowerProfileAPI/inc/",
+    env['CXL_commonproj_dir'] + '/AMDTCommonHeaders/',
+    env['CXL_commonproj_dir'],
+    env['CXL_commonproj_dir'] + '/../../CodeXL/Remote',
+])
+
+# osMessageBox, osDesktop
+env.Append(CPPFLAGS = '-fno-strict-aliasing')
+
+UseGtk(env)
+UseTinyXml(env)
+
+sources = \
+[
+    "./dmnConfigManager.cpp",
+    "./Daemon.cpp",
+    "./dmnSessionThread.cpp",
+    "./dmnUtils.cpp",
+    "./dmnThreadObserver.cpp",
+    "./dmnServerThreadConfig.cpp",
+    "./dmnServerThread.cpp",
+    "./dmnConnectionWatcherThread.cpp",
+    "./IThreadEventObserver.cpp",
+    "./dmnPowerBackendAdapter.cpp",
+    "./dmnAppWatcherThread.cpp",
+]
+    
+# Creating object files    
+objFiles = env.SharedObject(sources)
+
+linkerFlags = []
+
+env.Append (LIBS = [
+    "CXLOSWrappers",
+    "CXLBaseTools",
+    "CXLPowerProfileAPI",
+    "libz",
+    "libpthread",
+    "libboost_regex",
+    "libboost_filesystem",
+    "libboost_wave",
+    "libboost_system",
+    "libboost_thread",
+    "libboost_date_time"
+])
+
+# Creating executable
+exe = env.Program(
+	target = appName, 
+    source = sources,
+	LINKFLAGS = linkerFlags)
+
+# Installing libraries
+libInstall = env.Install( 
+    dir = env['CXL_bin_dir'], 
+    source = (exe))
+
+Return('libInstall')

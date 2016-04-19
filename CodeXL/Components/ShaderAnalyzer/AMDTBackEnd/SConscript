@@ -1,0 +1,124 @@
+# -*- Python -*-
+
+Import('*')
+from CXL_init import *
+
+libName = "CXLAnalysisBackend"
+
+env = CXL_env.Clone()
+buildDirPath = "." + '/build/' + env['CXL_arch']
+print buildDirPath
+env.VariantDir(buildDirPath, env['CXL_common_dir'] + '/Src')
+
+initGLEW(env)
+UseBoost(env)
+
+#need to overwrite compiler flags without the -Werror since some libraries are causing problems
+compiler_base_flags = " -std=c++11 -Wall -Wextra -g -fmessage-length=0 -Wno-unknown-pragmas -pthread -DGDT_PUBLIC -DGDT_BUILD_SUFFIX="
+    
+if (env['CXL_build'] == 'debug'):
+    compiler_base_flags += ' -D_DEBUG -D_LINUX'
+else:
+    compiler_base_flags += ' -O3 -DNDEBUG -D_LINUX'
+
+env.Replace(CPPFLAGS = compiler_base_flags)
+
+env.Append( CPPPATH = [ 
+	".",
+	"./Include",
+	"./src",
+	"./Emulator/Parser",
+	env['CXL_commonproj_dir'],
+	env['CXL_common_dir'] + '/../CodeXL/Components/ShaderAnalyzer',
+	env['CXL_common_dir'] + '/Src/CElf/Include',
+	env['CXL_common_dir'] + '/Lib/AMD/CAL/8.95/include',
+	env['CXL_common_dir'] + '/Src/ADLUtil',
+	env['CXL_common_dir'] + '/Src/ACLModuleManager',
+	env['CXL_common_dir'] + '/Src/AMDTMutex',
+	env['CXL_common_dir'] + '/Lib/AMD/ADL/include',
+	env['CXL_common_dir'] + '/Src/TSingleton',
+	env['CXL_common_dir'] + '/Src/DeviceInfo',
+	env['CXL_common_dir'] + '/Lib/AMD/sp3/Include/Public',
+	env['CXL_common_dir'] + '/Src/DynamicLibraryModule',
+	env['CXL_common_dir'] + '/Lib/AMD/APPSDK/3-0/include',
+	env['CXL_common_dir'] + '/Lib/AMD/ACL/TOT/include',
+])
+
+# UseGtk(env)
+
+commonsrc_files = Split(
+	buildDirPath + '/DynamicLibraryModule/ACLModule.cpp ' +
+	buildDirPath + '/DynamicLibraryModule/CALModule.cpp ' +
+	buildDirPath + '/DynamicLibraryModule/DynamicLibraryModule.cpp ' +
+	buildDirPath + '/DynamicLibraryModule/OpenCLModule.cpp ' +
+	buildDirPath + '/ADLUtil/ADLUtil.cpp ' +
+	buildDirPath + '/ACLModuleManager/ACLModuleManager.cpp ' +
+	buildDirPath + '/AMDTMutex/AMDTMutex.cpp ' +
+	buildDirPath + '/CElf/Src/CElf.cpp ' +
+	buildDirPath + '/CElf/Src/CElfSection.cpp ' +
+	buildDirPath + '/CElf/Src/CElfStringTable.cpp ' +
+	buildDirPath + '/CElf/Src/CElfSymbolTable.cpp ' +
+	buildDirPath + '/DeviceInfo/DeviceInfoUtils.cpp'
+	)
+
+sources = \
+[
+	"src/beBackend.cpp",
+	"src/beProgramBuilder.cpp",
+	"src/beProgramBuilderOpenCL.cpp",
+	"src/beProgramBuilderOpenGL.cpp",
+	"src/beProgramBuilderVulkan.cpp",
+	"src/beUtils.cpp",
+	"src/beDriverUtils.cpp",
+	"src/beStaticIsaAnalyzer.cpp",
+	"Emulator/Parser/ISAParser.cpp",
+	"Emulator/Parser/ISAProgramGraph.cpp",
+	"Emulator/Parser/ParserSI.cpp",
+	"Emulator/Parser/ParserSIDS.cpp",
+	"Emulator/Parser/ParserSIEXP.cpp",
+	"Emulator/Parser/ParserSIMIMG.cpp",
+	"Emulator/Parser/ParserSIMTBUF.cpp",
+	"Emulator/Parser/ParserSIMUBUF.cpp",
+	"Emulator/Parser/ParserSISMRD.cpp",
+	"Emulator/Parser/ParserSISOP1.cpp",
+	"Emulator/Parser/ParserSISOP2.cpp",
+	"Emulator/Parser/ParserSISOPC.cpp",
+	"Emulator/Parser/ParserSISOPK.cpp",
+	"Emulator/Parser/ParserSISOPP.cpp",
+	"Emulator/Parser/ParserSIVINTRP.cpp",
+	"Emulator/Parser/ParserSIVOP.cpp",
+	"Emulator/Parser/Instruction.cpp",
+]
+
+env.Append( LIBPATH = [ 
+	env['CXL_common_dir'] + '/Lib/AMD/sp3/Lib/Linux/Public/Release/x86_64',
+])
+
+commonLinkedLibraries = \
+[
+	"CXLBaseTools",
+	"CXLOSWrappers",
+	"CXLOSAPIWrappers",
+	"libboost_system",
+	"dl",
+	"sp3",
+]
+
+# Contains all linked libraries:
+linkedLibraries = commonLinkedLibraries
+env.Prepend (LIBS = linkedLibraries)
+	
+# Creating object files	
+objFiles = env.SharedObject(sources + commonsrc_files)
+
+# Creating shared libraries
+soFiles = env.SharedLibrary(
+	target = libName, 
+	source = objFiles)
+
+# Installing libraries
+libInstall = env.Install( 
+	dir = env['CXL_lib_dir'], 
+	source = (soFiles))
+
+Return('libInstall')

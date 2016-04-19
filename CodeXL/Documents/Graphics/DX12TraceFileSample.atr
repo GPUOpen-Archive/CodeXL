@@ -1,0 +1,55 @@
+## Header (not mandatory)
+# API traced (is it possible to write like other fields??? "API=DX12")
+//API:DX12
+# Trace time (is it possible to write like other fields??? "TraceDateTime=09/09/2015 10:32:30")
+//TraceDateTime:09/09/2015 10:32:30
+# Trace file version (is it needed?)
+TraceFileVersion=1.0
+# Application full path (is passed by the client)
+Application=C:\Users\salgrana\Documents\AMD APP\samples\opencl\bin\debug\x86\BoxFilterGL.exe
+# Application command line argument path (is passed by the client)
+ApplicationArgs=
+# Working directory (is passed by the client)
+WorkingDirectory=C:/Users/salgrana/Documents/AMD APP/samples/opencl/bin/debug/x86
+# System information: do we need??? (OS/ driver version / GPUs installed) (the below section is an example of GPU profile system inforamation section)
+Device AMD FX(tm)-8150 Eight-Core Processor            Platform Vendor = Advanced Micro Devices, Inc.
+Device AMD FX(tm)-8150 Eight-Core Processor            Platform Name = AMD Accelerated Parallel Processing
+Device AMD FX(tm)-8150 Eight-Core Processor            Platform Version = OpenCL 2.0 AMD-APP (1756.4)
+Device AMD FX(tm)-8150 Eight-Core Processor            CLDriver Version = 1756.4 (sse2,avx,fma4)
+Device AMD FX(tm)-8150 Eight-Core Processor            CLRuntime Version = OpenCL 1.2 AMD-APP (1756.4)
+Device AMD FX(tm)-8150 Eight-Core Processor            NumberAppAddressBits = 32
+Device Barts Platform Vendor = Advanced Micro Devices, Inc.
+Device Barts Platform Name = AMD Accelerated Parallel Processing
+Device Barts Platform Version = OpenCL 2.0 AMD-APP (1756.4)
+Device Barts CLDriver Version = 1756.4 (VM)
+Device Barts CLRuntime Version = OpenCL 1.2 AMD-APP (1756.4)
+Device Barts NumberAppAddressBits = 32
+# Display name - is passed by the client as the atr file name
+DisplayName=Aug-18-2015_15-13-13
+# This header indicates the trace file content
+## End of header
+# Start of trace (mandatory)
+=====AMD CodeXL DX12 API Trace Output=====
+# thread ID + API count
+ThreadID=2652
+ThreadAPICount=245
+# list of 245 API calls
+# TreadID InterfacePtr InterfaceName_FunctionName(Parameters) = RetVal StartTime(double) EndTime(double) ???
+2652 0x0000002B7B12E800 ID3D12GraphicsCommandList_ResourceBarrier(1, 0x0000002B004924E8) = void 9921512.370986 10248579.079185 0
+...
+...
+
+ThreadID=3288
+ThreadAPICount=123
+# list of 123 API calls
+# TreadID InterfacePtr InterfaceName_FunctionName(Parameters) = RetVal StartTime(double) EndTime(double) ???
+3288 0x0000002B7B12E6C0 ID3D12GraphicsCommandList_Reset(+0x0000002B7B12E620, +0x0000000000000000) = S_OK 24439069.770041 24468891.996050 0
+...
+...
+
+=====AMD CodeXL DX12 GPU Trace Output=====
+# List of GPU commands
+# ??? InterfacePtr InterfaceName_FunctionName(Parameters) = RetVal StartTime(double) EndTime(double) CallIndex?
+0000002B7B12E210 0 0000002B7B12E800 ID3D12GraphicsCommandList_ClearRenderTargetView(0x0000002B7EEF0750, [ 0.000000, 0.000000, 0.000000, 1.000000 ], 0, 0x0000000000000000) = void 625456074.939343 625456074.959736 1
+0000002B7B12E210 0 0000002B7B12E9E0 ID3D12GraphicsCommandList_DrawIndexedInstanced(3, 1, 6, 0, 0) = void 625456122.031082 625456122.967793 2
+

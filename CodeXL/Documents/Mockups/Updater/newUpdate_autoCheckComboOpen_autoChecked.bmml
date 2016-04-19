@@ -1,0 +1,67 @@
+<mockup version="1.0" skin="sketch" measuredW="1290" measuredH="557" mockupW="760" mockupH="457">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::TitleWindow" x="530" y="100" w="760" h="442" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bottomheight>0</bottomheight>
+        <text>gDEBugger%20-%20Check%20for%20updates</text>
+      </controlProperties>
+    </control>
+    <control controlID="3" controlTypeID="com.balsamiq.mockups::Label" x="538" y="130" w="-1" h="-1" measuredW="167" measuredH="21" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Software%20update%20information</text>
+      </controlProperties>
+    </control>
+    <control controlID="4" controlTypeID="com.balsamiq.mockups::Label" x="538" y="151" w="203" h="20" measuredW="203" measuredH="21" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>gDEBugger%20is%20up%20to%20date%20%286.1.257%29</text>
+      </controlProperties>
+    </control>
+    <control controlID="6" controlTypeID="com.balsamiq.mockups::Canvas" x="539" y="176" w="742" h="299" measuredW="100" measuredH="70" zOrder="3" locked="false" isInGroup="-1"/>
+    <control controlID="7" controlTypeID="com.balsamiq.mockups::Label" x="556" y="193" w="-1" h="-1" measuredW="200" measuredH="26" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>18</size>
+        <text>No%20new%20version%20available</text>
+      </controlProperties>
+    </control>
+    <control controlID="8" controlTypeID="com.balsamiq.mockups::Label" x="556" y="225" w="258" h="21" measuredW="258" measuredH="21" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>You%20already%20have%20the%20latest%20version%20installed</text>
+      </controlProperties>
+    </control>
+    <control controlID="9" controlTypeID="com.balsamiq.mockups::CheckBox" x="545" y="479" w="-1" h="-1" measuredW="244" measuredH="22" zOrder="6" locked="false" isInGroup="-1">
+      <controlProperties>
+        <href>newUpdate_noUpdateAvailable%26bm%3BnewUpdate_noUpdateAvailable.bmml%26bm%3BnewUpdate_noUpdateAvailable.bmml%26bm%3BnewUpdate_noUpdateAvailable.bmml</href>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%2215%2C379%2C259%2C401%22%20href%3D%22newUpdate_noUpdateAvailable.bmml%22%20alt%3D%22newUpdate_noUpdateAvailable%22%20id%3D%229%22/%3E</map>
+        <state>selected</state>
+        <text>Automatically%20check%20for%20updates%20every</text>
+      </controlProperties>
+    </control>
+    <control controlID="10" controlTypeID="com.balsamiq.mockups::ComboBox" x="789" y="479" w="92" h="-1" measuredW="67" measuredH="78" zOrder="7" locked="false" isInGroup="-1">
+      <controlProperties>
+        <href>newUpdate_noUpdateAvailable_autoChecked%26bm%3BnewUpdate_noUpdateAvailable_autoChecked.bmml%26bm%3BnewUpdate_noUpdateAvailable_autoChecked.bmml%26bm%3BnewUpdate_noUpdateAvailable_autoChecked.bmml</href>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22259%2C379%2C351%2C457%22%20href%3D%22newUpdate_noUpdateAvailable_autoChecked.bmml%22%20alt%3D%22newUpdate_noUpdateAvailable_autoChecked%22%20id%3D%2210%22/%3E</map>
+        <state>up</state>
+        <text>Week%0ADay%0AWeek%0AMonth</text>
+      </controlProperties>
+    </control>
+    <control controlID="15" controlTypeID="com.balsamiq.mockups::Button" x="1087" y="506" w="113" h="27" measuredW="112" measuredH="27" zOrder="8" locked="false" isInGroup="-1">
+      <controlProperties>
+        <state>disabled</state>
+        <text>%26S%26kip%20this%20update</text>
+      </controlProperties>
+    </control>
+    <control controlID="16" controlTypeID="com.balsamiq.mockups::Button" x="999" y="506" w="82" h="27" measuredW="78" measuredH="27" zOrder="9" locked="false" isInGroup="-1">
+      <controlProperties>
+        <state>disabled</state>
+        <text>%26D%26ownload</text>
+      </controlProperties>
+    </control>
+    <control controlID="17" controlTypeID="com.balsamiq.mockups::Button" x="1206" y="506" w="75" h="27" measuredW="56" measuredH="27" zOrder="10" locked="false" isInGroup="-1">
+      <controlProperties>
+        <href>20_DefaultLayoutNoSessions%26bm%3B20_DefaultLayoutNoSessions.bmml%26bm%3B20_DefaultLayoutNoSessions.bmml%26bm%3B20_DefaultLayoutNoSessions.bmml</href>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22676%2C406%2C751%2C433%22%20href%3D%2220_DefaultLayoutNoSessions.bmml%22%20alt%3D%2220_DefaultLayoutNoSessions%22%20id%3D%2217%22/%3E</map>
+        <text>%26C%26lose</text>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

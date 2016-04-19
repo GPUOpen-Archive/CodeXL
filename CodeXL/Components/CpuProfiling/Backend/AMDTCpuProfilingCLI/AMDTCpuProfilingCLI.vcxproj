@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{4A2AAE7E-C4B6-4BEC-B4DA-483DCCDDACF2}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>AMDTCpuProfilingCLI</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)\AMDTCpuProfilingCLI.props" />
+  </ImportGroup>
+  <PropertyGroup>
+    <TargetName>CodeXLCpuProfiler$(GDTProjectSuffix)</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>QT_LARGEFILE_SUPPORT;QT_DLL;QT_CORE_LIB;QT_THREAD_SUPPORT;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\inc;$(ProjectDir)\..;$(ProjectDir)\..\..;$(CommonProjectsDir)\AMDTCommonHeaders\;$(ProjectDir)\..\..\..\ThreadProfiling\Backend\AMDTThreadProfileAPI\inc\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>CXLCpuProfilingControl$(GDTProjectSuffix).lib;CXLCpuProfilingTranslation$(GDTProjectSuffix).lib;CXLCpuProfilingDataAccess$(GDTProjectSuffix).lib;CXLCpuProfilingRawData$(GDTProjectSuffix).lib;CXLCpuPerfEventUtils$(GDTProjectSuffix).lib;CXLExecutableFormat$(GDTProjectSuffix).lib;CXLCpuCallstackSampling$(GDTProjectSuffix).lib;CXLProfilingAgentsData$(GDTProjectSuffix).lib;CXLThreadProfileAPI$(GDTProjectSuffix).lib;CXLDisassembler$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\AMDTCpuProfilingCLI.cpp" />
+    <ClCompile Include="src\CGCallback.cpp" />
+    <ClCompile Include="src\Collect.cpp" />
+    <ClCompile Include="src\ParseArgs.cpp" />
+    <ClCompile Include="src\Report.cpp" />
+    <ClCompile Include="src\Reporter.cpp" />
+    <ClCompile Include="src\Utils.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\AMDTCpuProfilingCLI.h" />
+    <ClInclude Include="inc\CGCallback.h" />
+    <ClInclude Include="inc\Collect.h" />
+    <ClInclude Include="inc\ParseArgs.h" />
+    <ClInclude Include="inc\Report.h" />
+    <ClInclude Include="inc\Reporter.h" />
+    <ClInclude Include="inc\Utils.h" />
+    <ClInclude Include="inc\CommonUtils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="AMDTCpuProfilingCLI.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

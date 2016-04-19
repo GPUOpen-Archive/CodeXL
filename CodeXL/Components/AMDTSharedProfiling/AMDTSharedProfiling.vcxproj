@@ -1,0 +1,185 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="UserMacros">
+    <COMMONDIR>$(SolutionDir)..\..\Common</COMMONDIR>
+    <CommonProjectsDir>$(SolutionDir)..\..\CommonProjects</CommonProjectsDir>
+    <AMDTOutputDir>$(SolutionDir)..\Output\</AMDTOutputDir>
+    <AMDTCommonAMD>$(COMMONDIR)\Lib\AMD\</AMDTCommonAMD>
+    <AMDTCommonExt>$(COMMONDIR)\Lib\Ext\</AMDTCommonExt>
+  </PropertyGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{033BB047-F8A8-4946-9FA4-0D2E25ABD473}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>AMDTSharedProfiling</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)\CodeXLCommonProjects.props" />
+    <Import Project="$(AMDTCommonExt)\Qt\Global-QT.props" />
+    <Import Project="$(CommonDir)\Src\TSingleton\Global-TSingleton.props" />
+    <Import Project="$(AMDTCommonExt)\tinyxml\Global-TinyXML-2015.props" />
+  </ImportGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir>$(AMDTOutputDir)$(Configuration)\bin\</OutDir>
+    <IntDir>$(AMDTOutputDir)$(Configuration)\obj\$(ProjectName)\$(Platform)$(GDTBuildSuffix)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(ProjectDir);.\src;$(CommonDir)\Src\Miniz\;$(CommonProjectsDir);$(CommonProjectsDir)\AMDTOSWrappers\Include;$(VSLIncludePath);$(VSClearInstallationIncludePath);$(VSIntegrationInclude);$(VSClearInstallIntegrationInclude);$(IntDir);$(SolutionDir)\..;$(SolutionDir)\..\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_USRDLL;NOMINMAX;AMDTSHAREDPROFILING_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalOptions> /MP %(AdditionalOptions)</AdditionalOptions>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <ImportLibrary>$(AMDTOutputDir)$(Configuration)\arch\$(TargetName).lib</ImportLibrary>
+      <AdditionalDependencies>CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;CXLApiClasses$(GDTProjectSuffix).lib;CXLApplicationComponents$(GDTProjectSuffix).lib;CXLApplicationFramework$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(AMDTOutputDir)$(Configuration)\arch;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>LIBCMT$(GDTDebugSuffixNoDash);%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="inc\AMDTSharedProfiling.h">
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="inc\LibExport.h" />
+    <CustomBuild Include="inc\SharedProfileManager.h">
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="inc\ProfileApplicationTreeHandler.h">
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+      <Message>moc creation for %(Filename)</Message>
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+    </CustomBuild>
+    <ClInclude Include="inc\SessionExplorerDefs.h" />
+    <CustomBuild Include="inc\SharedMenuActions.h">
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="inc\SessionTreeNodeData.h">
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <Message>moc creation for %(Filename)</Message>
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+    </CustomBuild>
+    <ClInclude Include="inc\SessionTypeTreeHandlerAbstract.h" />
+    <CustomBuild Include="inc\SharedProfileSettingPage.h">
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="inc\SharedSessionWindow.h">
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="inc\SharedProfileProcessMonitor.h" />
+    <ClInclude Include="inc\SharedProfileSingletonsDelete.h" />
+    <ClInclude Include="inc\StringConstants.h" />
+    <ClInclude Include="vs\resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\AMDTSharedProfiling.cpp" />
+    <ClCompile Include="src\ProfileApplicationTreeHandler.cpp" />
+    <ClCompile Include="src\SessionTreeNodeData.cpp" />
+    <ClCompile Include="src\SharedProfileProcessMonitor.cpp" />
+    <ClCompile Include="src\SharedProfileSettingPage.cpp" />
+    <ClCompile Include="src\SharedProfileSingletonsDelete.cpp" />
+    <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\SharedMenuActions.cpp" />
+    <ClCompile Include="src\SharedProfileManager.cpp" />
+    <ClCompile Include="src\SharedSessionWindow.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_ProfileApplicationTreeHandler.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionTreeNodeData.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SharedMenuActions.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SharedProfileManager.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SharedProfileSettingPage.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SharedSessionWindow.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="inc\Profile.xpm" />
+    <None Include="..\SConscript" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="$(CommonProjectsDir)\VersionInfo\VersionResource.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ItemGroup>
+    <BuildMacro Include="COMMONDIR">
+      <Value>$(COMMONDIR)</Value>
+    </BuildMacro>
+    <BuildMacro Include="AMDTOutputDir">
+      <Value>$(AMDTOutputDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="AMDTCommonAMD">
+      <Value>$(AMDTCommonAMD)</Value>
+    </BuildMacro>
+    <BuildMacro Include="AMDTCommonExt">
+      <Value>$(AMDTCommonExt)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

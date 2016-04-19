@@ -1,0 +1,254 @@
+#!/bin/sh
+# Top level jenkins script to build for promoted AMDT libraries, and verify
+# that the built results have all of the expected bits.
+# Also generate the CodeXL-Linux[32|64].xml file for the updater to consume
+# 
+# Usage:
+#   $0 [<version number>] [scratch]
+#   <version number>:
+#       An optional parameter is the build number.
+#       When the build number is 0 (zero) only the debug version is built
+#       If no build number is passed in, do not modify the version file
+#   scratch:
+#       An optional parameter.  When passed in, the script will run
+#       scons <stuff> -c to perform a clean prior to the normal build
+#       Thus, a scratch build
+#
+
+#
+# Assumptions:
+# - WORKSPACE environment variable to be set
+#
+
+AMD_PERFORCE_ROOT=$WORKSPACE
+AMD_BRANCH_PART=main
+AMD_BRANCH_ROOT=${AMD_PERFORCE_ROOT}/${AMD_BRANCH_PART}
+AMD_WS_LINUX_UTIL_DIR=${AMD_BRANCH_ROOT}/CodeXL/Util/linux
+CODEXL_HELP_FOLDER=${AMD_BRANCH_ROOT}/CodeXL/Help
+
+# NOTE: This is used by buildCodeXLFullLinuxProjects
+export AMD_CODEXL=$AMD_BRANCH_ROOT/CodeXL
+export AMD_OUTPUT=$AMD_BRANCH_ROOT/
+
+# Version Number stuff
+VERSION_MAJOR=1
+VERSION_MINOR=8
+VERSION_BUILD=0
+# VERSION_UPDATE=0
+VERSIONINFO_FILE=${AMD_CODEXL}/../Common/Src/VersionInfo/VersionInfo.h
+
+NUM_ERRORS=0
+BUILD_DEBUG_RC=0
+GPUP_BUILD_RC=0
+ONLY_BUILD_DEBUG=0
+IS_SCRATCH_BUILD=0
+
+export CONFIG_FILE_BASE=CodeXLUpdate_linux
+
+# A utility bit of code - simply does a scons -c over both builds
+NukeIt()
+{
+    ARCHTYPE=$1
+    BUILD_OPTS="-j ${NCPUS} CXL_build=debug CXL_arch=${ARCHTYPE} -c"
+    sh $AMD_WS_LINUX_UTIL_DIR/buildCodeXLFullLinuxProjects ${BUILD_OPTS} > ${WORKSPACE}/CodeXL-Linux_${ARCHTYPE}_debug.log 2>&1
+}
+
+# The bulk of the work is done here
+# The only parameter is the architecture name (x86 or x86_64)
+RunTheBuild()
+{
+    ARCHTYPE=$1
+
+    cd $AMD_WS_LINUX_UTIL_DIR
+
+
+    # BUILD DEBUG
+    BUILD_OPTS="-j ${NCPUS} CXL_build=debug CXL_arch=${ARCHTYPE}"
+    echo ""
+    echo "========== Timing start: `date` ============================================"
+    echo "Building: sh $AMD_WS_LINUX_UTIL_DIR/buildCodeXLFullLinuxProjects ${BUILD_OPTS}"
+    sh $AMD_WS_LINUX_UTIL_DIR/buildCodeXLFullLinuxProjects ${BUILD_OPTS} > ${WORKSPACE}/CodeXL-Linux_${ARCHTYPE}_debug.log 2>&1
+    BUILD_DEBUG_RC=$?
+    echo "========== Timing end: `date` =============================================="
+
+    GPUPROFILER_BACKEND_BUILD=${AMD_BRANCH_ROOT}/CodeXL/Components/GpuProfiling/Build
+    GPUPROFILER_BACKEND_BUILD_SCRIPT=${GPUPROFILER_BACKEND_BUILD}/backend_build.sh
+
+    GPUP_BUILD_OPTS="bldnum ${VERSION_BUILD} workspace ${AMD_PERFORCE_ROOT} build-internal release-root ${AMD_BRANCH_PART}"
+    GPUP_BUILD_INCREMENTAL=
+    if [ ${IS_SCRATCH_BUILD} -eq 0 ]
+    then
+        GPUP_BUILD_INCREMENTAL="incremental"
+    fi
+    echo ""
+    echo "========== Timing start: `date` ============================================"
+    echo "Building: sh ${GPUPROFILER_BACKEND_BUILD_SCRIPT} ${GPUP_BUILD_OPTS} ${GPUP_BUILD_INCREMENTAL}"
+    sh ${GPUPROFILER_BACKEND_BUILD_SCRIPT} ${GPUP_BUILD_OPTS} ${GPUP_BUILD_INCREMENTAL}
+    GPUP_BUILD_RC=$?
+    echo "========== Timing end: `date` =============================================="
+
+    NUM_ERRORS=`expr ${NUM_ERRORS} + ${BUILD_DEBUG_RC} + ${GPUP_BUILD_RC}`
+    if [ ${BUILD_DEBUG_RC} -ne 0 -o ${GPUP_BUILD_RC} -ne 0 ]
+    then
+        echo "*** ERROR ***"
+        echo "*** The GPU Profiler backend build had ${GPUP_BUILD_RC} errors ***"
+        if [ ${GPUP_BUILD_RC} -ne 0 ]
+        then
+            echo "***    Check ${GPUPROFILER_BACKEND_BUILD}/GpuProfilerBackend_Build.log for errors ***"
+        fi
+
+        echo "*** The debug build had ${BUILD_DEBUG_RC} errors ***"
+        
+    else
+	echo "Build succeeded"
+    fi
+
+}
+
+PackageTheBuild()
+{
+    echo "---- TIMING: Packaging start: `date`"  
+
+    cd $AMD_BRANCH_ROOT
+
+    # First: clean out object files and other build artifacts which should not go into
+    # the final tarball
+    rm -rf Output_x86_64/debug/obj
+
+    # Future enhancement:
+    # This is a good point to split in the future.  Generate the CodeXL tarball bits
+    # and do not bother with other components until some other repackaging step.
+    # This will keep the overhead and complexity lower here.
+
+
+    # Archive the debug bits as well - some developers are apparently not getting
+    # assertions while others are.
+    DBG_PKG_NAME=CodeXL-Linux-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_BUILD}-x86_64-debug
+    tar czf ${DBG_PKG_NAME}.tar.gz Output_x86_64/debug
+
+    # And finally, create the xml files for the updater to use
+    # Only a 64-bit version
+    FULL_CONFIG_FILE=${CONFIG_FILE_BASE}64.xml
+    echo "sh ${AMD_BRANCH_ROOT}/CodeXL/Installer-Linux/generateConfigXML.sh ${VERSION_MAJOR} ${VERSION_MINOR} ${VERSION_BUILD} ${ARCHTYPE} > ${AMD_OUTPUT}/${FULL_CONFIG_FILE}"
+    sh -x ${AMD_BRANCH_ROOT}/CodeXL/Installer-Linux/generateConfigXML.sh ${VERSION_MAJOR} ${VERSION_MINOR} ${VERSION_BUILD} ${ARCHTYPE} > ${AMD_OUTPUT}/${FULL_CONFIG_FILE}
+
+    echo "---- TIMING: Packaging end: `date`"  
+}
+
+UsageAndExit()
+{
+    echo "Usage: $0 [quick] [build-num BUILDNUM] [scratch] [help]"
+    echo "If quick is specified a compile-only (x86_64, debug) build is performed."
+    echo "    No packaging of the debug content is performed"
+    echo "If BUILDNUM is 0 (zero) a quick build is performed."
+    echo "If scratch is specified, the build is from scratch (not the default)"
+    echo "If help is specified, then this message is displayed"
+    exit 1
+}
+
+########################## MAIN #############################
+
+NARGS=$#
+FOUND_VERNO=0
+if [ ${NARGS} -eq 0 ]
+then
+    UsageAndExit
+fi
+
+if [ ${NARGS} -gt 7 ]
+then
+    UsageAndExit
+fi
+
+while [ "$*" != "" ]
+do
+   if [ "$1" = "scratch" ]
+   then
+      IS_SCRATCH_BUILD=1
+   elif [ "$1" = "quick" ]
+   then
+      FOUND_VERNO=1
+      VERSION_BUILD=0
+   elif [ "$1" = "build-num" ]
+   then
+      shift
+      FOUND_VERNO=1
+      VERSION_BUILD=$1
+   elif [ "$1" = "help" ]
+   then
+      UsageAndExit
+   else
+      UsageAndExit
+   fi
+   shift
+done
+
+# FOUND_VERNO and IS_SCRATCH_BUILD have the correct (boolean) values
+# at this point
+if [ ${FOUND_VERNO} -eq 1 ]
+then
+    if [ "${VERSION_BUILD}" = "0" ]
+    then
+        ONLY_BUILD_DEBUG=1
+    fi
+    # Edit the version file - in situ.  A different approach would be to
+    # dynamically generate said file (perhaps in the future)
+    chmod 666 ${VERSIONINFO_FILE}
+    CHM_RC=$?
+    NUM_ERRORS=`expr ${NUM_ERRORS} + ${CHM_RC}`
+    if [ ${CHM_RC} -ne 0 ]
+    then
+        echo "*** ERROR ***"
+        echo "*** Unable to modify ${VERSIONINFO_FILE} ***"
+        echo "*** The default version numbers will be used ***"
+    else
+        # The pattern to match on in the file is 1,0,0,0
+        # meaning major,minor,build,update
+        OLDPAT=0,0,0,0
+        NEWPAT=${VERSION_MAJOR},${VERSION_MINOR},${VERSION_BUILD},0
+        # And mangle
+        sed -i "s/${OLDPAT}/${NEWPAT}/g" ${VERSIONINFO_FILE}
+        SED_RC=$?
+        NUM_ERRORS=`expr ${NUM_ERRORS} + ${SED_RC}`
+        if [ ${SED_RC} -ne 0 ]
+        then
+            echo "*** ERROR ***"
+            echo "*** Unable to modify fields in ${VERSIONINFO_FILE} ***"
+            echo "*** The build may fail due to compile errors ***"
+        fi
+    fi
+fi
+
+# Figure out how much parallelism we can use.  2x cores on a really fast system
+# The build system is pretty heavily used - both for tests and builds, so dial
+# this back to be just the number of cores
+NCPUS=`grep processor /proc/cpuinfo | wc | awk '{print $1}'`
+if [ $? -ne 0 ]
+then
+    echo "Warning - Unable to determine the number of CPU cores - assuming one core"
+    NCPUS=1
+fi
+# If the system is capable of more cores, re-enable this
+NCPUS=`expr ${NCPUS} \* 2`
+echo "Building with -j ${NCPUS}"
+
+#
+# BUILDING 
+#
+
+# Clean up everything from past builds if this is a scratch build
+if [ ${IS_SCRATCH_BUILD} -ne 0 ]
+then
+    NukeIt x86_64
+fi
+RunTheBuild x86_64
+
+if [ ${NUM_ERRORS} -ne 0 ]
+then
+    echo "*** The build failed ***"
+    exit 1
+else
+    PackageTheBuild
+    echo "*** The build succeeded ***"
+    exit 0
+fi

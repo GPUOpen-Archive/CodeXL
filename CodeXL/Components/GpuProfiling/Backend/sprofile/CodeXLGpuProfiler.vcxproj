@@ -1,0 +1,149 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{2C1F63A3-3521-4EEF-8F54-3FDF4160F5A7}</ProjectGuid>
+    <RootNamespace>Server</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>CodeXLGpuProfiler</ProjectName>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\Backend-Common.props" />
+    <Import Project="..\Backend-Common-OpenCL.props" />
+    <Import Project="..\Backend-Deliverable.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>NON_BLOCKING_TIMEOUT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>NON_BLOCKING_TIMEOUT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>NON_BLOCKING_TIMEOUT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ClCompile>
+      <PreprocessorDefinitions>;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>NON_BLOCKING_TIMEOUT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\HSAFdnCommon\HSAFunctionDefsUtils.cpp" />
+    <ClCompile Include="..\HSAFdnTrace\HSAAtpFile.cpp" />
+    <ClCompile Include="Analyze.cpp" />
+    <ClCompile Include="..\CLTraceAgent\CLAtpFile.cpp" />
+    <ClCompile Include="..\CLOccupancyAgent\CLOccupancyFile.cpp" />
+    <ClCompile Include="AtpFile.cpp" />
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="OccupancyChart.cpp" />
+    <ClCompile Include="OccupancyUtils.cpp" />
+    <ClCompile Include="ParseCmdLine.cpp" />
+    <ClCompile Include="PerfMarkerAtpFile.cpp" />
+    <ClCompile Include="..\Common\StackTraceAtpFile.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\HSAFdnTrace\HSAAtpFile.h" />
+    <ClInclude Include="Analyze.h" />
+    <ClInclude Include="..\CLTraceAgent\CLAtpFile.h" />
+    <ClInclude Include="..\CLOccupancyAgent\CLOccupancyFile.h" />
+    <ClInclude Include="AtpFile.h" />
+    <ClInclude Include="OccupancyChart.h" />
+    <ClInclude Include="OccupancyUtils.h" />
+    <ClInclude Include="ParseCmdLine.h" />
+    <ClInclude Include="PerfMarkerAtpFile.h" />
+    <ClInclude Include="..\Common\StackTraceAtpFile.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTBaseTools\AMDTBaseToolsVS14.vcxproj">
+      <Project>{11221a7f-3883-418f-b286-b0ea1e28ef10}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTInterceptor\mhook-dllInjector\Interceptor-2015.vcxproj">
+      <Project>{0e055caf-c68b-42cb-a302-f775ca5a917f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTOSWrappers\AMDTOSWrappersVS14.vcxproj">
+      <Project>{5d9222ac-39fb-4123-9497-78cea5be58ad}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\CLCommon\AMDTGpuProfilerCLCommon.vcxproj">
+      <Project>{dfbd3d9e-c64f-401b-8898-b5d34d580c54}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Common\AMDTGpuProfilerCommon.vcxproj">
+      <Project>{176db1a7-68a5-4c97-8606-2cc1388d7a50}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\sanalyze\AMDTGpuProfilerAnalyzer.vcxproj">
+      <Project>{2062b193-8caf-4559-a709-39acb5ccc09d}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="sprofile.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

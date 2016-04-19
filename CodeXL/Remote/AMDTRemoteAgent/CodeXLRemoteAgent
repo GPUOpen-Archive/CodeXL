@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# CodeXLRemoteAgent requires bash. Do not remove the above shebang line!
+
+# ----------------------------------------------------------------------------------------------------------------------------------
+# File name: CodeXLRemoteAgent
+# This script sets CodeXLRemoteAgent's related environment variables and 
+# executed the CodeXLRemoteAgent binary executable.
+#
+# (c) 2013 Advanced Micro Devices Inc. All Rights Reserved.
+# ----------------------------------------------------------------------------------------------------------------------------------
+
+# Get this script full path:
+if echo "$0" | grep '^/' ; then
+	thisScriptFullPath="$0"
+else
+	thisScriptFullPath=`pwd`/$0
+fi
+
+# Enable the use of symbolic links to the script
+if [ -h ${thisScriptFullPath} ]
+then
+    LINKTARGET=`readlink -f "$thisScriptFullPath"`
+    thisScriptFullPath=${LINKTARGET}
+fi
+
+# CodeXLRemoteAgent's binaries directory is this scripts directory:
+CodeXLBinariesDir=`dirname "$thisScriptFullPath"`
+
+# Calculate CodeXLRemoteAgent's binary executable path:
+CodeXLRemoteAgentBinaryExePath="${CodeXLBinariesDir}/CodeXLRemoteAgent-bin"
+
+# Obtain libstdc++ needed version
+CRUNTIMEPATH=$(ldconfig -p | grep libstdc++.so.6 | grep 64)
+if [ -z "$CRUNTIMEPATH" ] ; then
+   CRUNTIMEPATH=$(/sbin/ldconfig -p | grep libstdc++.so.6 | grep 64)
+fi
+CRUNTIMEFILE=${CRUNTIMEPATH##*>}
+# Test if current system C++ runtime is older from CodeXL version needed
+CXL_CLIB=""
+NEWCRUNTIME=$(strings $CRUNTIMEFILE | grep GLIBCXX_3.4.16)
+if [ -z "$NEWCRUNTIME" ];then
+    # System C++ runtime is older from CodeXL
+    CXL_CLIB="${CodeXLBinariesDir}/RuntimeLibs"
+fi
+
+# Add CodeXLRemoteAgent's binaries directory to LD_LIBRARY_PATH:
+if [ -z "$LD_LIBRARY_PATH" ]; then
+	export LD_LIBRARY_PATH="${CodeXLBinariesDir}:${CXL_CLIB}"
+else
+	export LD_LIBRARY_PATH="${CodeXLBinariesDir}:${CXL_CLIB}:$LD_LIBRARY_PATH"
+fi
+
+# Run CodeXLRemoteAgent:
+eval "$CodeXLRemoteAgentBinaryExePath $@"
+

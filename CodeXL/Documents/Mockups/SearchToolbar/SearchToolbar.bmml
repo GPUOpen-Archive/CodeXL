@@ -1,0 +1,58 @@
+<mockup version="1.0" skin="sketch" fontFace="Balsamiq Sans" measuredW="1159" measuredH="456" mockupW="721" mockupH="415">
+  <controls>
+    <control controlID="11" controlTypeID="com.balsamiq.mockups::StickyNote" x="438" y="102" w="502" h="354" measuredW="109" measuredH="123" zOrder="7" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>%26General%26%0A*%20The%20search%20toolbar%20is%20a%20regualr%20toolbar%20that%20is%20hidden%20by%20default.%0A*%20It%20appears%20as%20a%20new%20toolbar%20line%20when%20CTRL+F%20is%20pressed%20or%20Edit%20menu%20Find%20command%20is%20selected%0A*%20If%20reached%20the%20first%20found%20instance%20then%20the%20arrow%20up%20button%20will%20be%20disabled.%0A*%20If%20reached%20the%20last%20found%20instance%20then%20the%20arrow%20down%20button%20will%20be%20disabled.%0A%20%0A%26Search%20toolbar%20should%20react%20to%20the%20following%20keyboard%20shortcuts%3A%26%0A*%20Search%20begins%20when%20user%20clicks%20ENTER.%0A*%20ENTER%20-%20when%20toolbar%20has%20focus%20should%20jump%20to%20next%20found%20instance%20and%20select%20it.%20Focus%20remains%20in%20toolbar%20edit%20box.%0A*%20F3%20-%20jump%20to%20next%20found%20instance%20and%20select%20it%2C%20regardless%20of%20focus%0A*%20SHIFT+F3-%20jump%20to%20previous%20found%20instance%20and%20select%20it%2C%20regardless%20of%20focus%0A*%20ESC%20-%20if%20the%20search%20toolbar%20has%20focus%20than%20clicking%20ESC%20causes%20it%20to%20disappear%0A*%20ALT+C%20is%20the%20accelerator%20for%20%22Match%20case%22%0A%20%0A%26When%20Search%20toolbar%20is%20hidden%26%0A*%20Clicking%20F3%20or%20SHIFT+F3%20jumps%20to%20the%20next%20instance%20of%20the%20last%20word%20that%20was%20searched%2C%20even%20if%20the%20toolbar%20is%20hidden.%0A%20%0A%26Priority%26%0A*%20Implementing%20%22X%20%20of%20Y%22%20is%20lower%20priority%0A*%20Showin%20search%20history%20in%20droplist%20is%20lower%20priority</text>
+      </controlProperties>
+    </control>
+    <control controlID="12" controlTypeID="com.balsamiq.mockups::FieldSet" x="438" y="41" w="721" h="46" measuredW="200" measuredH="170" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="13" controlTypeID="com.balsamiq.mockups::CheckBox" x="701" y="58" w="78" h="20" measuredW="78" measuredH="20" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>Match%20case</text>
+      </controlProperties>
+    </control>
+    <control controlID="14" controlTypeID="com.balsamiq.mockups::TextArea" x="446" y="56" w="204" h="22" measuredW="200" measuredH="140" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>%20%20%20%20NDRange</text>
+      </controlProperties>
+    </control>
+    <control controlID="15" controlTypeID="com.balsamiq.mockups::Button" x="648" y="56" w="24" h="22" measuredW="38" measuredH="27" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <icon>UpTriangleIcon%7Cxsmall</icon>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="16" controlTypeID="com.balsamiq.mockups::Button" x="670" y="57" w="24" h="22" measuredW="38" measuredH="27" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <icon>DownTriangleIcon%7Cxsmall</icon>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="17" controlTypeID="com.balsamiq.mockups::Icon" x="449" y="59" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <color>10066329</color>
+        <icon>SearchIcon%7Cxsmall</icon>
+      </controlProperties>
+    </control>
+    <control controlID="18" controlTypeID="com.balsamiq.mockups::Label" x="612" y="59" w="34" h="-1" measuredW="34" measuredH="19" zOrder="6" locked="false" isInGroup="-1">
+      <controlProperties>
+        <color>10066329</color>
+        <size>11</size>
+        <text>5%20of%2016</text>
+      </controlProperties>
+    </control>
+    <control controlID="19" controlTypeID="com.balsamiq.mockups::Icon" x="1135" y="60" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="8" locked="false" isInGroup="-1">
+      <controlProperties>
+        <borderStyle>square</borderStyle>
+        <icon>XIcon%7Cxsmall</icon>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

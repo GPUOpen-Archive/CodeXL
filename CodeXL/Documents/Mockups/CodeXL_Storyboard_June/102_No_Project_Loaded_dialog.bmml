@@ -1,0 +1,136 @@
+<mockup version="1.0" skin="sketch" fontFace="Balsamiq Sans" measuredW="510" measuredH="492" mockupW="450" mockupH="472">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::TitleWindow" x="60" y="20" w="450" h="472" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bottomheight>0</bottomheight>
+        <close>true</close>
+        <dragger>false</dragger>
+        <text>CodeXL%20-%20No%20project%20loaded</text>
+      </controlProperties>
+    </control>
+    <control controlID="4" controlTypeID="__group__" x="89" y="78" w="372" h="37" measuredW="372" measuredH="37" zOrder="1" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::Button" x="0" y="2" w="-1" h="-1" measuredW="54" measuredH="32" zOrder="0" locked="false" isInGroup="4">
+          <controlProperties>
+            <icon>Number1Icon%7Cmedium</icon>
+            <text/>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Label" x="62" y="0" w="310" h="-1" measuredW="146" measuredH="37" zOrder="1" locked="false" isInGroup="4">
+          <controlProperties>
+            <text>*Create%20new%20project*%5CrCreate%20new%20project%20for%20...</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="5" controlTypeID="__group__" x="89" y="153" w="372" h="37" measuredW="372" measuredH="37" zOrder="2" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::Button" x="0" y="2" w="-1" h="-1" measuredW="54" measuredH="32" zOrder="0" locked="false" isInGroup="5">
+          <controlProperties>
+            <icon>Number1Icon%7Cmedium</icon>
+            <text/>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Label" x="62" y="0" w="310" h="-1" measuredW="209" measuredH="37" zOrder="1" locked="false" isInGroup="5">
+          <controlProperties>
+            <text>*Create%20new%20project%20for%20debugging*%5CrCreate%20new%20project%20for%20...</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="6" controlTypeID="com.balsamiq.mockups::Label" x="74" y="124" w="-1" h="-1" measuredW="48" measuredH="24" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bold>true</bold>
+        <size>16</size>
+        <text>Debug</text>
+        <underline>true</underline>
+      </controlProperties>
+    </control>
+    <control controlID="7" controlTypeID="__group__" x="89" y="231" w="372" h="37" measuredW="372" measuredH="37" zOrder="4" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::Button" x="0" y="2" w="-1" h="-1" measuredW="54" measuredH="32" zOrder="0" locked="false" isInGroup="7">
+          <controlProperties>
+            <icon>Number1Icon%7Cmedium</icon>
+            <text/>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Label" x="62" y="0" w="310" h="-1" measuredW="197" measuredH="37" zOrder="1" locked="false" isInGroup="7">
+          <controlProperties>
+            <text>*Create%20new%20project%20for%20profiling*%5CrCreate%20new%20project%20for%20...</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="8" controlTypeID="com.balsamiq.mockups::Label" x="74" y="202" w="-1" h="-1" measuredW="50" measuredH="24" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bold>true</bold>
+        <size>16</size>
+        <text>Profile</text>
+        <underline>true</underline>
+      </controlProperties>
+    </control>
+    <control controlID="9" controlTypeID="__group__" x="89" y="395" w="372" h="37" measuredW="372" measuredH="37" zOrder="6" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::Button" x="0" y="2" w="-1" h="-1" measuredW="54" measuredH="32" zOrder="0" locked="false" isInGroup="9">
+          <controlProperties>
+            <icon>AddPageIcon%7Cmedium</icon>
+            <text/>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Label" x="62" y="0" w="310" h="-1" measuredW="205" measuredH="37" zOrder="1" locked="false" isInGroup="9">
+          <controlProperties>
+            <text>*Open%20an%20OpenCL%20file%20for%20analysis*%5CrCreate%20new%20project%20for%20...</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="10" controlTypeID="com.balsamiq.mockups::Label" x="74" y="366" w="-1" h="-1" measuredW="60" measuredH="24" zOrder="7" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bold>true</bold>
+        <size>16</size>
+        <text>Analyze</text>
+        <underline>true</underline>
+      </controlProperties>
+    </control>
+    <control controlID="11" controlTypeID="__group__" x="89" y="275" w="372" h="37" measuredW="372" measuredH="37" zOrder="8" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::Button" x="0" y="2" w="-1" h="-1" measuredW="54" measuredH="32" zOrder="0" locked="false" isInGroup="11">
+          <controlProperties>
+            <icon>ClockIcon%7Cmedium</icon>
+            <text/>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Label" x="62" y="0" w="310" h="-1" measuredW="218" measuredH="37" zOrder="1" locked="false" isInGroup="11">
+          <controlProperties>
+            <text>*Attach%20to%20process%20for%20CPU%20profiling*%5CrCreate%20new%20project%20for%20...</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="12" controlTypeID="__group__" x="89" y="318" w="372" h="37" measuredW="372" measuredH="37" zOrder="9" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::Button" x="0" y="2" w="-1" h="-1" measuredW="54" measuredH="32" zOrder="0" locked="false" isInGroup="12">
+          <controlProperties>
+            <icon>AlarmClockIcon%7Cmedium</icon>
+            <text/>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Label" x="62" y="0" w="310" h="-1" measuredW="166" measuredH="37" zOrder="1" locked="false" isInGroup="12">
+          <controlProperties>
+            <text>*System-wide%20CPU%20profiling*%5CrCreate%20new%20project%20for%20...</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="13" controlTypeID="com.balsamiq.mockups::Button" x="431" y="450" w="-1" h="-1" measuredW="64" measuredH="27" zOrder="10" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Cancel</text>
+      </controlProperties>
+    </control>
+    <control controlID="14" controlTypeID="com.balsamiq.mockups::Label" x="74" y="51" w="-1" h="-1" measuredW="366" measuredH="21" zOrder="11" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Alas%2C%20no%20project%20is%20currently%20loaded.%20What%20would%20you%20like%20to%20do%3F</text>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

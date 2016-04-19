@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<CodeXL>
+    <Tests>
+     <TestResultsDirectory>GoldMasters_APPSDK_2_9</TestResultsDirectory>
+     <LogFilesDirectory>C:\TEMP\testResults\</LogFilesDirectory>
+        <Test>
+            <ExecutablePath>C:\Program Files (x86)\AMD\CodeXL\Examples\Teapot\AMDTTeaPot.exe</ExecutablePath>
+            <WorkingDirectory>C:\Program Files (x86)\AMD\CodeXL\Examples\Teapot</WorkingDirectory>
+            <TestName>AMDTTeaPot_StepTest</TestName>
+            <TestType>StepTest</TestType>
+            <Kernels>
+			    <Kernel>
+                    <KernelName>applySources</KernelName>
+                    <WorkItemId>0,0,0</WorkItemId>
+                </Kernel>			
+                <Kernel>
+                    <KernelName>applyBuoyancy</KernelName>
+                    <WorkItemId>0,0,0</WorkItemId>
+                </Kernel>
+			    <Kernel>
+                    <KernelName>calculateCurlU</KernelName>
+                    <WorkItemId>0,0,0</WorkItemId>
+                </Kernel>
+				<Kernel>
+                    <KernelName>applyVorticity</KernelName>
+                    <WorkItemId>0,0,0</WorkItemId>
+                </Kernel>				
+			    <Kernel>
+                    <KernelName>advectFieldVelocity</KernelName>
+                    <WorkItemId>0,0,0</WorkItemId>
+                </Kernel>
+			    <Kernel>
+                    <KernelName>applyVelocityBoundaryCondition</KernelName>
+                    <WorkItemId>0,0,0</WorkItemId>
+                </Kernel>
+			    <Kernel>
+                    <KernelName>computeFieldPressurePrep</KernelName>
+                    <WorkItemId>0,0,0</WorkItemId>
+                </Kernel>
+                <Kernel>
+                    <KernelName>applyPressureBoundaryCondition</KernelName>
+                    <WorkItemId>0,0,0</WorkItemId>
+                </Kernel>				
+				<Kernel>
+                    <KernelName>advectFieldScalar</KernelName>
+                    <WorkItemId>0,0,0</WorkItemId>
+                </Kernel>
+				<Kernel>
+                    <KernelName>createDensityTexture</KernelName>
+                    <WorkItemId>0,0,0</WorkItemId>
+                </Kernel>			
+				<Kernel>
+                    <KernelName>dissipateDensity</KernelName>
+                    <WorkItemId>0,0,0</WorkItemId>
+                </Kernel>		
+				<Kernel>
+                    <KernelName>dissipateTemperature</KernelName>
+                    <WorkItemId>0,0,0</WorkItemId>
+                </Kernel>	
+				<Kernel>
+                    <KernelName>projectFieldVelocity</KernelName>
+                    <WorkItemId>0,0,0</WorkItemId>
+                </Kernel>	
+				<Kernel>
+                    <KernelName>computeIntersection</KernelName>
+                    <WorkItemId>0,0,0</WorkItemId>
+                </Kernel>	
+			</Kernels>
+        </Test>
+    </Tests>
+</CodeXL>       

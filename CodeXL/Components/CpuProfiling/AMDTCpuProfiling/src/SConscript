@@ -1,0 +1,67 @@
+# -*- Python -*-
+# $Id: SConscript 4614 2010-04-09 13:11:41Z rgorton $
+# SConscript for building the CpuProfiling component
+
+Import('*')
+
+# Assume that the environment does not need to be cloned, etc.
+cpu_prof_files = Split(
+        'AmdtCpuProfiling.cpp ' +
+        'ActionsExecutor.cpp ' +
+        'Auxil.cpp ' +
+        'CommandsHandler.cpp ' +
+        'CpuRetryDialog.cpp ' +
+        'CpuAffinityThread.cpp ' +
+        'CpuGlobalSettings.cpp ' +
+        'CpuProfileCss.cpp ' +
+        'CPUProfileDataTable.cpp ' +
+        'CPUProfileDataTableItem.cpp ' +
+        'CpuProfileTreeHandler.cpp ' +
+        'CpuProfileUtils.cpp ' +
+        'CpuProfilingOptions.cpp ' +
+        'CpuProjectHandler.cpp ' +
+        'CpuProjectSettings.cpp ' +
+        'CpuTranslationMonitor.cpp ' +
+        'CustomProfileProjectSettingsExtension.cpp ' +
+        'DataTab.cpp ' +
+        'DirSearchDialog.cpp ' +
+        'DisplayFilter.cpp ' +
+        'DisplayFilterDlg.cpp ' +
+        'ModuleFilterDialog.cpp ' +
+        'FunctionsDataTable.cpp ' +
+        'ModulesDataTable.cpp ' +
+        'ProcessMonitor.cpp ' +
+        'ProcessesDataTable.cpp ' +
+        'ProfileConfigs.cpp ' +
+        'SessionActions.cpp ' +
+        'SessionCallGraphView.cpp ' +
+        'SessionFunctionView.cpp ' +
+        'SessionModulesView.cpp ' +
+        'SessionOverviewWindow.cpp ' +
+        'SessionSourceCodeView.cpp ' +
+        'SessionViewCreator.cpp ' +
+        'SessionWindow.cpp ' +
+        'SourceCodeViewUtils.cpp ' +
+        'SourceCodeTreeModel.cpp ' +
+        'SourceViewTreeItem.cpp ' +
+        'StdAfx.cpp '
+        # 'tpAppController.cpp ' +
+        # 'tpDisplayInfo.cpp ' +
+        # 'tpMDIViewCreator.cpp ' +
+        # 'tpMenuActionsExecutor.cpp ' +
+        # 'tpProjectSettingsExtension.cpp ' +
+        # 'tpSessionView.cpp ' +
+        # 'tpOverview.cpp ' +
+        # 'tpSessionData.cpp ' +
+        # 'tpThreadsTimelineItems.cpp ' +
+        # 'tpThreadsView.cpp ' +
+        # 'tpDisplaySettingsDialog.cpp ' +
+        # 'tpThreadsViewLegend.cpp ' +
+        # 'tpThreadsViewControlPanel.cpp ' +
+        # 'tpThreadsTimeline.cpp ' +
+        # 'tpTreeHandler.cpp '
+        )
+
+cpu_prof_objs = CPU_env.SharedObject(cpu_prof_files)
+CPUProfiling_Lib += [cpu_prof_objs]
+Return('cpu_prof_objs')

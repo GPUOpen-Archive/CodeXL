@@ -1,0 +1,80 @@
+<mockup version="1.0" skin="sketch" measuredW="1290" measuredH="542" mockupW="760" mockupH="442">
+  <controls>
+    <control controlID="28" controlTypeID="__group__" x="530" y="100" w="760" h="442" measuredW="760" measuredH="442" zOrder="0" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::TitleWindow" x="0" y="0" w="760" h="442" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="28">
+          <controlProperties>
+            <bottomheight>0</bottomheight>
+            <text>gDEBugger%20-%20Check%20for%20updates</text>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Label" x="8" y="51" w="389" h="20" measuredW="385" measuredH="21" zOrder="1" locked="false" isInGroup="28">
+          <controlProperties>
+            <text>gDEBugger%20version%206.2.616%20is%20available%20%28Installed%20version%3A%206.1.257%29</text>
+          </controlProperties>
+        </control>
+        <control controlID="2" controlTypeID="com.balsamiq.mockups::CheckBox" x="15" y="379" w="-1" h="-1" measuredW="244" measuredH="22" zOrder="2" locked="false" isInGroup="28">
+          <controlProperties>
+            <state>up</state>
+            <text>Automatically%20check%20for%20updates%20every</text>
+          </controlProperties>
+        </control>
+        <control controlID="3" controlTypeID="com.balsamiq.mockups::ComboBox" x="259" y="379" w="92" h="-1" measuredW="67" measuredH="23" zOrder="3" locked="false" isInGroup="28">
+          <controlProperties>
+            <state>closed</state>
+            <text>Week%0ADay%0AMonth</text>
+          </controlProperties>
+        </control>
+        <control controlID="4" controlTypeID="__group__" x="8" y="71" w="743" h="301" measuredW="743" measuredH="301" zOrder="4" locked="false" isInGroup="28">
+          <groupChildrenDescriptors>
+            <control controlID="0" controlTypeID="com.balsamiq.mockups::TextArea" x="0" y="0" w="743" h="301" measuredW="200" measuredH="140" zOrder="0" locked="false" isInGroup="4">
+              <controlProperties>
+                <state>up</state>
+                <text>%20%0A%20%0A%20%0AAdded%3A%0A-%20OpenCL%201.2%20is%20now%20supported%20by%20gDEBugger%20CL.%20%0A%20%0AChanged%3A%0A-%20Improved%20the%20OpenCL%20forced%20/%20disable%20modes%0A-%20Added%20a%20cap%20to%20the%20number%20of%20debug%20and%20output%20strings%20reported%0A%20%0AFixed%20bugs%3A%0A-%20Fixed%20a%20rare%20crash%20in%20multi-threaded%20applications.%20%0A-%20In%20some%20configurations%2C%20the%20gDEBugger%20OpenGL%20and%20OpenCL%20servers%20would%20crash%20as%20the%20debugged%20application%20exited.%20%0A-%20When%20debugging%20several%20applications%20in%20one%20gDEBugger%20session%2C%20contexts%20were%20sometimes%20wrongly%20marked%20as%20deleted.%20%0A-%20Calling%20glUniform1fARB%20with%20no%20current%20context%20could%20crash%20the%20OpenGL%20server.%20%0A-%20Some%20parameters%20in%20glBlitFramebufferEXT%2C%20glBufferAddressRangeNV%20and%20clCreate%20%0A-%20functions%20were%20logged%20incorrectly.</text>
+              </controlProperties>
+            </control>
+            <control controlID="1" controlTypeID="com.balsamiq.mockups::StickyNote" x="564" y="53" w="115" h="89" measuredW="109" measuredH="123" zOrder="1" locked="false" isInGroup="4">
+              <controlProperties>
+                <text>HTML%20File%20from%20the%20web</text>
+              </controlProperties>
+            </control>
+            <control controlID="2" controlTypeID="com.balsamiq.mockups::Label" x="7" y="15" w="-1" h="-1" measuredW="133" measuredH="26" zOrder="2" locked="false" isInGroup="4">
+              <controlProperties>
+                <size>18</size>
+                <text>Version%206.2.616</text>
+              </controlProperties>
+            </control>
+          </groupChildrenDescriptors>
+        </control>
+        <control controlID="5" controlTypeID="com.balsamiq.mockups::Button" x="557" y="406" w="113" h="27" measuredW="112" measuredH="27" zOrder="5" locked="false" isInGroup="28">
+          <controlProperties>
+            <href>20_DefaultLayoutNoSessions%26bm%3B20_DefaultLayoutNoSessions.bmml%26bm%3B20_DefaultLayoutNoSessions.bmml%26bm%3B20_DefaultLayoutNoSessions.bmml</href>
+            <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22557%2C406%2C670%2C433%22%20href%3D%2220_DefaultLayoutNoSessions.bmml%22%20alt%3D%2220_DefaultLayoutNoSessions%22%20id%3D%225%22/%3E</map>
+            <state>up</state>
+            <text>%26S%26kip%20this%20update</text>
+          </controlProperties>
+        </control>
+        <control controlID="6" controlTypeID="com.balsamiq.mockups::Button" x="469" y="406" w="82" h="27" measuredW="78" measuredH="27" zOrder="6" locked="false" isInGroup="28">
+          <controlProperties>
+            <href>newUpdate_DownloadSelectFolder%26bm%3BnewUpdate_DownloadSelectFolder.bmml%26bm%3BnewUpdate_DownloadSelectFolder.bmml%26bm%3BnewUpdate_DownloadSelectFolder.bmml</href>
+            <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22469%2C406%2C551%2C433%22%20href%3D%22newUpdate_DownloadSelectFolder.bmml%22%20alt%3D%22newUpdate_DownloadSelectFolder%22%20id%3D%226%22/%3E</map>
+            <state>up</state>
+            <text>%26D%26ownload</text>
+          </controlProperties>
+        </control>
+        <control controlID="7" controlTypeID="com.balsamiq.mockups::Button" x="676" y="406" w="75" h="27" measuredW="56" measuredH="27" zOrder="7" locked="false" isInGroup="28">
+          <controlProperties>
+            <href>20_DefaultLayoutNoSessions%26bm%3B20_DefaultLayoutNoSessions.bmml%26bm%3B20_DefaultLayoutNoSessions.bmml%26bm%3B20_DefaultLayoutNoSessions.bmml</href>
+            <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22676%2C406%2C751%2C433%22%20href%3D%2220_DefaultLayoutNoSessions.bmml%22%20alt%3D%2220_DefaultLayoutNoSessions%22%20id%3D%227%22/%3E</map>
+            <text>%26C%26lose</text>
+          </controlProperties>
+        </control>
+        <control controlID="8" controlTypeID="com.balsamiq.mockups::Label" x="8" y="30" w="-1" h="-1" measuredW="167" measuredH="21" zOrder="8" locked="false" isInGroup="28">
+          <controlProperties>
+            <text>Software%20update%20information</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+  </controls>
+</mockup>

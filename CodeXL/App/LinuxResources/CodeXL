@@ -1,0 +1,70 @@
+#!/bin/bash
+
+# CodeXL requires bash. Do not remove the above shebang line!
+
+# ----------------------------------------------------------------------------------------------------------------------------------
+# File name: CodeXL
+# This script sets CodeXL's related environment variables and 
+# launches the CodeXL binary executable.
+#
+# (c) 2015 Advanced Micro Devices Inc. All Rights Reserved.
+# ----------------------------------------------------------------------------------------------------------------------------------
+
+# check if the display is valid (for putty connection with x11 forwarding
+eval "xhost" >&/dev/null
+RC=$?
+if [ ${RC} -ne 0 ]
+then
+    echo "The system display is not defined therefore CodeXL cannot run."
+    echo "This may be caused by:"
+    echo "Working with a remote connection but X11 forwarding not defined, or"
+    echo "Logging in as a user but launching CodeXL as root, or vice versa"
+    exit 1
+fi
+
+# Get this script full path:
+if echo "$0" | grep '^/' ; then
+	thisScriptFullPath="$0"
+else
+	thisScriptFullPath=`pwd`/$0
+fi
+
+# Enable the use of symbolic links to the script
+if [ -h ${thisScriptFullPath} ]
+then
+    LINKTARGET=`readlink -f "$thisScriptFullPath"`
+    thisScriptFullPath=${LINKTARGET}
+fi
+
+# CodeXL's binaries directory is this scripts directory:
+CodeXLBinariesDir=`dirname "$thisScriptFullPath"`
+CodeXLQTLibsDir="${CodeXLBinariesDir}/RuntimeLibs/QT"
+
+# Calculate CodeXL's binary executable path:
+CodeXLBinaryExePath="${CodeXLBinariesDir}/CodeXL-bin"
+
+# Obtain libstdc++ needed version
+CRUNTIMEPATH=$(ldconfig -p | grep libstdc++.so.6 | grep 64)
+if [ -z "$CRUNTIMEPATH" ] ; then
+   CRUNTIMEPATH=$(/sbin/ldconfig -p | grep libstdc++.so.6 | grep 64)
+fi
+CRUNTIMEFILE=${CRUNTIMEPATH##*>}
+# Test if current system C++ runtime is older from CodeXL version needed
+CXL_CLIB=""
+NEWCRUNTIME=$(strings $CRUNTIMEFILE | grep GLIBCXX_3.4.16)
+if [ -z "$NEWCRUNTIME" ];then
+    # System C++ runtime is older from CodeXL
+    CXL_CLIB="${CodeXLBinariesDir}/RuntimeLibs/x86_64"
+fi
+
+
+# Add CodeXL's binaries directory to LD_LIBRARY_PATH:
+if [ -z "$LD_LIBRARY_PATH" ]; then
+	export LD_LIBRARY_PATH="${CodeXLBinariesDir}:${CXL_CLIB}:${CodeXLQTLibsDir}"
+else
+	export LD_LIBRARY_PATH="${CodeXLBinariesDir}:${CXL_CLIB}:${CodeXLQTLibsDir}:$LD_LIBRARY_PATH"
+fi
+
+# Run CodeXL:
+eval "$CodeXLBinaryExePath $@"
+

@@ -1,0 +1,77 @@
+<mockup version="1.0" skin="sketch" measuredW="945" measuredH="499" mockupW="683" mockupH="400">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::TitleWindow" x="262" y="99" w="683" h="400" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bottomheight>0</bottomheight>
+        <close>true</close>
+        <dragger>true</dragger>
+        <text>OpenGL%20and%20OpenCL%20Breakpoints</text>
+      </controlProperties>
+    </control>
+    <control controlID="1" controlTypeID="com.balsamiq.mockups::ButtonBar" x="815" y="455" w="-1" h="-1" measuredW="115" measuredH="29" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <hrefs>24_DefaultLayoutDebugSessionPaused%26bm%3B24_DefaultLayoutDebugSessionPaused.bmml%26bm%3B24_DefaultLayoutDebugSessionPaused.bmml%26bm%3B24_DefaultLayoutDebugSessionPaused.bmml%2C</hrefs>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22553%2C356%2C599%2C385%22%20href%3D%2224_DefaultLayoutDebugSessionPaused.bmml%22%20alt%3D%2224_DefaultLayoutDebugSessionPaused%22%20id%3D%221_0%22/%3E%0A</map>
+        <text>%26O%26k%2C%20%26C%26ancel</text>
+      </controlProperties>
+    </control>
+    <control controlID="2" controlTypeID="com.balsamiq.mockups::Label" x="267" y="123" w="-1" h="-1" measuredW="460" measuredH="21" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Add%20a%20function%20to%20the%20%27Active%20Breakpoints%27%20list%20to%20set%20it%20as%20a%20debugging%20breakpoint</text>
+      </controlProperties>
+    </control>
+    <control controlID="3" controlTypeID="com.balsamiq.mockups::Label" x="268" y="149" w="-1" h="-1" measuredW="75" measuredH="21" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Breakpoints</text>
+      </controlProperties>
+    </control>
+    <control controlID="4" controlTypeID="com.balsamiq.mockups::Label" x="776" y="148" w="-1" h="-1" measuredW="115" measuredH="21" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Active%20Breakpoints</text>
+      </controlProperties>
+    </control>
+    <control controlID="5" controlTypeID="com.balsamiq.mockups::TabBar" x="269" y="172" w="336" h="283" measuredW="360" measuredH="100" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>0</selectedIndex>
+        <text>API%20Functions%2C%20Kernel%20Functions%2C%20Error/Warning</text>
+      </controlProperties>
+    </control>
+    <control controlID="6" controlTypeID="com.balsamiq.mockups::TextInput" x="268" y="428" w="337" h="-1" measuredW="79" measuredH="27" zOrder="6" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="7" controlTypeID="com.balsamiq.mockups::VerticalScrollBar" x="589" y="197" w="-1" h="232" measuredW="16" measuredH="100" zOrder="7" locked="false" isInGroup="-1"/>
+    <control controlID="10" controlTypeID="com.balsamiq.mockups::Paragraph" x="277" y="203" w="290" h="225" measuredW="200" measuredH="140" zOrder="8" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>clBeginComputationFrameAMD%0AclBuildProgram%0AclCompileProgram%0AclCreateBuffer%0AclCreateCommandQueue%0AclCreateContext%0AclCreateContextFromType%0AclCreateEventFromGLsyncKHR%0AclCreateFromGLBuffer%0AclCreateFromGLRenderbuffer%0AclCreateFromGLTexture2D%0AclCreateFromGLTexture3D%0AclCreateKernel%0AclCreateKernelsInProgram</text>
+      </controlProperties>
+    </control>
+    <control controlID="11" controlTypeID="com.balsamiq.mockups::DataGrid" x="733" y="170" w="207" h="258" measuredW="213" measuredH="55" zOrder="9" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Breakpoint%20Name%2CType%0A-Type%20kernel%20function%20name-</text>
+        <vLines>false</vLines>
+      </controlProperties>
+    </control>
+    <control controlID="12" controlTypeID="com.balsamiq.mockups::CheckBox" x="732" y="433" w="-1" h="-1" measuredW="153" measuredH="22" zOrder="10" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>-Enable%20all%20Breakpoints-</text>
+      </controlProperties>
+    </control>
+    <control controlID="13" controlTypeID="com.balsamiq.mockups::Button" x="632" y="241" w="-1" h="-1" measuredW="68" measuredH="27" zOrder="11" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Add%20%3E%3E</text>
+      </controlProperties>
+    </control>
+    <control controlID="14" controlTypeID="com.balsamiq.mockups::Button" x="619" y="285" w="-1" h="-1" measuredW="94" measuredH="27" zOrder="12" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>%3C%3C%20Remove</text>
+      </controlProperties>
+    </control>
+    <control controlID="15" controlTypeID="com.balsamiq.mockups::Button" x="621" y="327" w="-1" h="-1" measuredW="90" measuredH="27" zOrder="13" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Remove%20All</text>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

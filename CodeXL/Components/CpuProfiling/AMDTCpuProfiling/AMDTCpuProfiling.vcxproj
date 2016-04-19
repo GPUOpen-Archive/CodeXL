@@ -1,0 +1,394 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{94BEDC68-7B30-45A1-86F5-4D4A6714E0FD}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>AMDTCpuProfiling</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="CommonPropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)\AMDTCpuProfiling.props" />
+    <Import Project="$(COMMONDIR)\Src\TSingleton\Global-TSingleton.props" />
+  </ImportGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>QT_LARGEFILE_SUPPORT;QT_DLL;QT_GUI_LIB;QT_CORE_LIB;QT_THREAD_SUPPORT;AMDT_CPU_PROFILING_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\..\Backend;$(ProjectDir)\..\Backend\ProfileAgents;$(ProjectDir)\..\ProfilingAgents;$(CommonDir)\Lib\Ext\Java\jdk1.7.0_17\include;$(CommonDir)\Lib\Ext\Java\jdk1.7.0_17\include\win32;$(ProjectDir)\..\..\ThreadProfiling\Backend\AMDTThreadProfileAPI\inc;$(CommonProjectsDir)\AMDTCommonHeaders;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>CXLCpuProfilingControl$(GDTProjectSuffix).lib;CXLDisassembler$(GDTProjectSuffix).lib;CXLCpuProfilingTranslation$(GDTProjectSuffix).lib;CXLCpuProfilingRawData$(GDTProjectSuffix).lib;CXLCpuPerfEventUtils$(GDTProjectSuffix).lib;CXLExecutableFormat$(GDTProjectSuffix).lib;CXLCpuCallstackSampling$(GDTProjectSuffix).lib;CXLProfilingAgentsData$(GDTProjectSuffix).lib;CXLThreadProfileAPI$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="inc\SConscript" />
+    <None Include="ReadMe.txt" />
+    <CustomBuild Include="ui\iCssButterfly.ui">
+      <FileType>Document</FileType>
+      <Command>"$(QtDir)\bin\uic.exe" "ui\%(Filename).ui" -o "tmp\ui\ui_%(Filename).h"</Command>
+      <Message>UIC creation for %(Filename)</Message>
+      <Outputs>tmp\ui\ui_%(Filename).h</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\uic.exe</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="ui\iCpuGlobalSettings.ui">
+      <FileType>Document</FileType>
+      <Command>"$(QtDir)\bin\uic.exe" "ui\%(Filename).ui" -o "tmp\ui\ui_%(Filename).h"</Command>
+      <Message>UIC creation for %(Filename)</Message>
+      <Outputs>tmp\ui\ui_%(Filename).h</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\uic.exe</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="ui\iDirSearch.ui">
+      <FileType>Document</FileType>
+      <Command>"$(QtDir)\bin\uic.exe" "ui\%(Filename).ui" -o "tmp\ui\ui_%(Filename).h"</Command>
+      <Message>UIC creation for %(Filename)</Message>
+      <Outputs>tmp\ui\ui_%(Filename).h</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\uic.exe</AdditionalInputs>
+    </CustomBuild>
+    <None Include="src\SConscript" />
+    <None Include="ui\iDisplayFilterDlg.ui" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <CompileAsManaged>false</CompileAsManaged>
+    </ClCompile>
+    <CustomBuild Include="inc\CpuProjectSettings.h">
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+    </CustomBuild>
+    <ClCompile Include="src\ActionsExecutor.cpp" />
+    <ClCompile Include="src\AmdtCpuProfiling.cpp" />
+    <ClCompile Include="src\Auxil.cpp" />
+    <ClCompile Include="src\CommandsHandler.cpp" />
+    <ClCompile Include="src\CpuAffinityThread.cpp" />
+    <ClCompile Include="src\CpuGlobalSettings.cpp" />
+    <ClCompile Include="src\CpuProfileCss.cpp" />
+    <ClCompile Include="src\CPUProfileDataTable.cpp" />
+    <ClCompile Include="src\CPUProfileDataTableItem.cpp" />
+    <ClCompile Include="src\CpuProfileTreeHandler.cpp" />
+    <ClCompile Include="src\CpuProfileUtils.cpp" />
+    <ClCompile Include="src\CpuProfilingOptions.cpp" />
+    <ClCompile Include="src\CpuProjectHandler.cpp" />
+    <ClCompile Include="src\CpuProjectSettings.cpp" />
+    <ClCompile Include="src\CpuRetryDialog.cpp" />
+    <ClCompile Include="src\CpuTranslationMonitor.cpp" />
+    <ClCompile Include="src\CustomProfileProjectSettingsExtension.cpp" />
+    <ClCompile Include="src\DataTab.cpp" />
+    <ClCompile Include="src\DirSearchDialog.cpp" />
+    <ClCompile Include="src\DisplayFilter.cpp" />
+    <ClCompile Include="src\DisplayFilterDlg.cpp" />
+    <ClCompile Include="src\FunctionsDataTable.cpp" />
+    <ClCompile Include="src\ModuleFilterDialog.cpp" />
+    <ClCompile Include="src\ModulesDataTable.cpp" />
+    <ClCompile Include="src\ProcessesDataTable.cpp" />
+    <ClCompile Include="src\ProcessMonitor.cpp" />
+    <ClCompile Include="src\ProfileConfigs.cpp" />
+    <ClCompile Include="src\SessionActions.cpp" />
+    <ClCompile Include="src\SessionCallGraphView.cpp" />
+    <ClCompile Include="src\SessionFunctionView.cpp" />
+    <ClCompile Include="src\SessionModulesView.cpp" />
+    <ClCompile Include="src\SessionOverviewWindow.cpp" />
+    <ClCompile Include="src\SessionSourceCodeView.cpp" />
+    <ClCompile Include="src\SessionViewCreator.cpp" />
+    <ClCompile Include="src\SessionWindow.cpp" />
+    <ClCompile Include="src\SourceCodeTreeModel.cpp" />
+    <ClCompile Include="src\SourceCodeViewUtils.cpp" />
+    <ClCompile Include="src\SourceViewTreeItem.cpp" />
+    <ClCompile Include="src\StdAfx.cpp" />
+    <ClCompile Include="src\tpAppController.cpp" />
+    <ClCompile Include="src\tpDisplayInfo.cpp" />
+    <ClCompile Include="src\tpMDIViewCreator.cpp" />
+    <ClCompile Include="src\tpMenuActionsExecutor.cpp" />
+    <ClCompile Include="src\tpProjectSettingsExtension.cpp" />
+    <ClCompile Include="src\tpSessionData.cpp" />
+    <ClCompile Include="src\tpSessionView.cpp" />
+    <ClCompile Include="src\tpOverview.cpp" />
+    <ClCompile Include="src\tpThreadsTimelineItems.cpp" />
+    <ClCompile Include="src\tpThreadsView.cpp" />
+    <ClCompile Include="src\tpDisplaySettingsDialog.cpp" />
+    <ClCompile Include="src\tpThreadsViewLegend.cpp" />
+    <ClCompile Include="src\tpThreadsViewControlPanel.cpp" />
+    <ClCompile Include="src\tpThreadsTimeline.cpp" />
+    <ClCompile Include="src\tpTreeHandler.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CustomProfileProjectSettingsExtension.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_DisplayFilterDlg.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CommandsHandler.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CpuGlobalSettings.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CPUProfileDataTable.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CpuProfilingOptions.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CpuProjectHandler.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CpuProjectSettings.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_CpuRetryDialog.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_DataTab.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_DirSearchDialog.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_FunctionsDataTable.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_ModulesDataTable.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_ProcessesDataTable.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionCallGraphView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionModulesView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionFunctionView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionOverviewWindow.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_ModuleFilterDialog.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionSourceCodeView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionViewCreator.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_SessionWindow.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_tpAppController.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_tpSessionView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_tpOverview.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_tpThreadsView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_tpDisplaySettingsDialog.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_tpThreadsViewLegend.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_tpThreadsViewControlPanel.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_tpThreadsTimeline.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_tpThreadsTimelineItems.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_tpTreeHandler.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_tpProjectSettingsExtension.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\ActionsExecutor.h" />
+    <ClInclude Include="inc\AmdtCpuProfiling.h" />
+    <ClInclude Include="inc\Auxil.h" />
+    <ClInclude Include="inc\CpuAffinityThread.h" />
+    <CustomBuild Include="inc\CpuRetryDialog.h">
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="inc\CPUProfileDataTable.h">
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="inc\CpuProfileCss.h" />
+    <ClInclude Include="inc\CPUProfileDataTableItem.h" />
+    <ClInclude Include="inc\CpuProfileTreeHandler.h" />
+    <ClInclude Include="inc\CPUProfileUtils.h" />
+    <ClInclude Include="inc\CpuTranslationMonitor.h" />
+    <CustomBuild Include="inc\SessionOverviewWindow.h">
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="inc\CustomProfileProjectSettingsExtension.h">
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="inc\DebugUtils.h" />
+    <ClInclude Include="inc\DisplayFilter.h" />
+    <CustomBuild Include="inc\ModulesDataTable.h">
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="inc\FunctionsDataTable.h">
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="inc\ProcessesDataTable.h">
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="inc\SessionModulesView.h">
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+    </CustomBuild>
+    <CustomBuild Include="inc\SessionFunctionView.h">
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+    </CustomBuild>
+    <CustomBuild Include="inc\SessionSourceCodeView.h">
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="inc\SessionCallGraphView.h">
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="inc\SourceCodeTreeModel.h" />
+    <ClInclude Include="inc\SourceCodeViewUtils.h" />
+    <ClInclude Include="inc\SourceViewTreeItem.h" />
+    <ClInclude Include="inc\tpSessionData.h" />
+    <ClInclude Include="tmp\ui\ui_iDirSearch.h" />
+    <ClInclude Include="inc\CommandIds.h" />
+    <CustomBuild Include="inc\CommandsHandler.h">
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="inc\DisplayFilterDlg.h">
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+      <Message>moc creation for %(Filename)</Message>
+    </CustomBuild>
+    <CustomBuild Include="inc\CpuGlobalSettings.h">
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="inc\CpuProfilingOptions.h">
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="inc\DirSearchDialog.h">
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="inc\ProcessMonitor.h" />
+    <ClInclude Include="inc\ProfileConfigs.h" />
+    <ClInclude Include="tmp\ui\ui_iCpuGlobalSettings.h" />
+    <CustomBuild Include="inc\ModuleFilterDialog.h">
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="inc\CpuProjectHandler.h">
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="inc\DataTab.h">
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="inc\DllExport.h" />
+    <CustomBuild Include="inc\SessionWindow.h">
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="inc\SessionActions.h" />
+    <ClInclude Include="inc\StdAfx.h" />
+    <ClInclude Include="resource.h" />
+    <CustomBuild Include="inc\SessionViewCreator.h">
+      <Command>"$(QtDir)\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation for %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="inc\StringConstants.h" />
+    <ClInclude Include="inc\tpDisplayInfo.h" />
+    <ClInclude Include="inc\tpMDIViewCreator.h" />
+    <ClInclude Include="inc\tpMenuActionsExecutor.h" />
+    <CustomBuild Include="inc\tpAppController.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;inc\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="inc\tpSessionView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="inc\tpOverview.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="inc\tpThreadsView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="inc\tpDisplaySettingsDialog.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="inc\tpThreadsViewLegend.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="inc\tpThreadsViewControlPanel.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="inc\tpThreadsTimeline.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="inc\tpThreadsTimelineItems.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="inc\tpTreeHandler.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="inc\tpProjectSettingsExtension.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "inc\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation %(Filename)</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\..\Common\Src\VersionInfo\VersionResource.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

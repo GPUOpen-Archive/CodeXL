@@ -1,0 +1,484 @@
+<mockup version="1.0" skin="sketch" measuredW="1673" measuredH="775" mockupW="1641" mockupH="775">
+  <controls>
+    <control controlID="21" controlTypeID="__group__" x="99" y="61" w="62" h="26" measuredW="62" measuredH="26" zOrder="6" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::Canvas" x="0" y="0" w="62" h="26" measuredW="100" measuredH="70" zOrder="0" locked="false" isInGroup="21">
+          <controlProperties>
+            <value>0</value>
+            <verticalScrollbar>false</verticalScrollbar>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Icon" x="6" y="5" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="1" locked="false" isInGroup="21">
+          <controlProperties>
+            <color>40463</color>
+            <href>81_DefaultLayoutProfileSessionStarted%26bm%3B81_DefaultLayoutProfileSessionStarted.bmml%26bm%3B81_DefaultLayoutProfileSessionStarted.bmml%26bm%3B81_DefaultLayoutProfileSessionStarted.bmml</href>
+            <icon>RightTriangleIcon%7Cxsmall</icon>
+            <map>%3Carea%20shape%3D%22rect%22%20coords%3D%2273%2C66%2C89%2C82%22%20href%3D%2281_DefaultLayoutProfileSessionStarted.bmml%22%20alt%3D%2281_DefaultLayoutProfileSessionStarted%22%20id%3D%221%22/%3E</map>
+          </controlProperties>
+        </control>
+        <control controlID="2" controlTypeID="com.balsamiq.mockups::Icon" x="22" y="5" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="2" locked="false" isInGroup="21">
+          <controlProperties>
+            <color>10066329</color>
+            <icon>PauseIcon%7Cxsmall</icon>
+          </controlProperties>
+        </control>
+        <control controlID="3" controlTypeID="com.balsamiq.mockups::Icon" x="38" y="5" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="3" locked="false" isInGroup="21">
+          <controlProperties>
+            <color>10066329</color>
+            <icon>StopIcon%7Cxsmall</icon>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="22" controlTypeID="__group__" x="32" y="63" w="67" h="23" measuredW="67" measuredH="23" zOrder="7" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::ComboBox" x="20" y="0" w="-1" h="-1" measuredW="47" measuredH="23" zOrder="0" locked="false" isInGroup="22">
+          <controlProperties>
+            <size>13</size>
+            <state>closed</state>
+            <text>Pc%0ATimer-based%0AInstruction-based%20</text>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::TextArea" x="0" y="0" w="20" h="23" measuredW="200" measuredH="140" zOrder="1" locked="false" isInGroup="22">
+          <controlProperties>
+            <text>D</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="23" controlTypeID="__group__" x="163" y="61" w="100" h="26" measuredW="100" measuredH="26" zOrder="8" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::Canvas" x="0" y="0" w="100" h="26" measuredW="100" measuredH="70" zOrder="0" locked="false" isInGroup="23">
+          <controlProperties>
+            <borderStyle>square</borderStyle>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Icon" x="10" y="5" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="1" locked="false" isInGroup="23">
+          <controlProperties>
+            <color>10066329</color>
+            <icon>ForwardIcon%7Cxsmall</icon>
+          </controlProperties>
+        </control>
+        <control controlID="2" controlTypeID="com.balsamiq.mockups::Icon" x="34" y="5" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="2" locked="false" isInGroup="23">
+          <controlProperties>
+            <color>10066329</color>
+            <icon>ForwardIcon%7Cxsmall</icon>
+          </controlProperties>
+        </control>
+        <control controlID="3" controlTypeID="com.balsamiq.mockups::Icon" x="54" y="5" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="3" locked="false" isInGroup="23">
+          <controlProperties>
+            <color>10066329</color>
+            <icon>ForwardIcon%7Cxsmall</icon>
+          </controlProperties>
+        </control>
+        <control controlID="4" controlTypeID="com.balsamiq.mockups::Icon" x="76" y="5" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="4" locked="false" isInGroup="23">
+          <controlProperties>
+            <color>10066329</color>
+            <icon>ForwardChapterIcon%7Cxsmall</icon>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="24" controlTypeID="com.balsamiq.mockups::TitleWindow" x="32" y="7" w="1024" h="768" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <close>true</close>
+        <maximizeRestore>true</maximizeRestore>
+        <minimize>true</minimize>
+        <text>CodeXL%20-%20MyApp.exe%20%28Profile%20Mode%20-%20TBP%29</text>
+      </controlProperties>
+    </control>
+    <control controlID="25" controlTypeID="com.balsamiq.mockups::MenuBar" x="32" y="32" w="1024" h="29" measuredW="446" measuredH="29" zOrder="9" locked="false" isInGroup="-1">
+      <controlProperties>
+        <hrefs>32_MenuFile1%26bm%3B32_MenuFile1.bmml%26bm%3B32_MenuFile1.bmml%26bm%3B32_MenuFile1.bmml%2C34_MenuEdit%26bm%3B34_MenuEdit.bmml%26bm%3B34_MenuEdit.bmml%26bm%3B34_MenuEdit.bmml%2C35_MenuView%26bm%3B35_MenuView.bmml%26bm%3B35_MenuView.bmml%26bm%3B35_MenuView.bmml%2C50_MenuDebug%26bm%3B50_MenuDebug.bmml%26bm%3B50_MenuDebug.bmml%26bm%3B50_MenuDebug.bmml%2C%2C38_MenuTools%26bm%3B38_MenuTools.bmml%26bm%3B38_MenuTools.bmml%26bm%3B38_MenuTools.bmml%2C59_MenuWindows%26bm%3B59_MenuWindows.bmml%26bm%3B59_MenuWindows.bmml%26bm%3B59_MenuWindows.bmml%2C60_MenuHelp%26bm%3B60_MenuHelp.bmml%26bm%3B60_MenuHelp.bmml%26bm%3B60_MenuHelp.bmml</hrefs>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%2218%2C38%2C51%2C59%22%20href%3D%2232_MenuFile1.bmml%22%20alt%3D%2232_MenuFile1%22%20id%3D%2225_0%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%2260%2C38%2C96%2C59%22%20href%3D%2234_MenuEdit.bmml%22%20alt%3D%2234_MenuEdit%22%20id%3D%2225_1%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22105%2C38%2C148%2C59%22%20href%3D%2235_MenuView.bmml%22%20alt%3D%2235_MenuView%22%20id%3D%2225_2%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22157%2C38%2C208%2C59%22%20href%3D%2250_MenuDebug.bmml%22%20alt%3D%2250_MenuDebug%22%20id%3D%2225_3%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22276%2C38%2C322%2C59%22%20href%3D%2238_MenuTools.bmml%22%20alt%3D%2238_MenuTools%22%20id%3D%2225_4%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22331%2C38%2C388%2C59%22%20href%3D%2259_MenuWindows.bmml%22%20alt%3D%2259_MenuWindows%22%20id%3D%2225_5%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22397%2C38%2C437%2C59%22%20href%3D%2260_MenuHelp.bmml%22%20alt%3D%2260_MenuHelp%22%20id%3D%2225_6%22/%3E%0A</map>
+        <selectedIndex>4</selectedIndex>
+        <text>%26F%26ile%2C%20%26E%26dit%2C%20%26V%26iew%2C%20%26D%26ebug%2C%20%26P%26rofile%2C%20%26T%26ools%2C%20%26W%26indow%2C%20%26H%26elp</text>
+      </controlProperties>
+    </control>
+    <control controlID="31" controlTypeID="com.balsamiq.mockups::TitleWindow" x="251" y="458" w="804" h="243" measuredW="450" measuredH="400" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bottomheight>0</bottomheight>
+        <close>false</close>
+        <dragger>false</dragger>
+        <minimize>false</minimize>
+        <text>Paths%20Graph%3A%20CalcBig</text>
+        <topheight>26</topheight>
+        <verticalScrollbar>true</verticalScrollbar>
+      </controlProperties>
+    </control>
+    <control controlID="42" controlTypeID="com.balsamiq.mockups::TabBar" x="245" y="111" w="810" h="644" measuredW="327" measuredH="100" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>2</selectedIndex>
+        <text>Overview%2CModules%2CCall%20Graph%2CFunctions</text>
+      </controlProperties>
+    </control>
+    <control controlID="48" controlTypeID="__group__" x="248" y="156" w="808" h="176" measuredW="808" measuredH="176" zOrder="10" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::DataGrid" x="0" y="0" w="808" h="176" measuredW="600" measuredH="157" zOrder="0" locked="false" isInGroup="48">
+          <controlProperties>
+            <rowHeight>16</rowHeight>
+            <selectedIndex>6</selectedIndex>
+            <size>10</size>
+            <text>Function%2C%20%23%20of%5CrPaths%2C%20Path%5CrSamples%2C%20Avg.%20%5CrSamples%5Crper%20Path%20%20v%2CSelf%20%5CrSamples%2C%20Deep%20%5CrSamples%2C%20%25%20of%5CrDeep%5CrSamples%2C%20Source%20%5Crfile%2C%20Module%0AFunc1InLib%2C%201%2C%20205%2C%20205.0%2C%200.35%2C%200.35%2C%20%20%20%20%20%20%207%25%20%20%20%2C%20%2CMyLib.dll%0AMinorFunction%2C%201%2C%20165%2C%20165.0%2C%200.25%2C%200.50%2C%20%20%20%20%20%2010%25%20%20%20%20%2CMyUtil.cpp%20%2813%29%2C%20MyApp.exe%0AFunc2InLib%2C%201%2C%20162%2C%20162.0%2C%200.15%2C%200.15%2C%20%20%20%20%20%201%25%20%20%20%20%20%2C%20%2CMyLib.dll%0Amain%2C%205%2C467%2C93.4%2C%200.10%2C%200.467%2C%20%20%20%20%20%20%20%20%20%20%20%20%20%20%2C%20CalcBig.cpp%20%2815%29%2C%20MyApp.exe%0AInternalCalcBig%2C%203%2C267%2C89.0%2C%200.67%2C%200.17%2C%20%20%20%20%20%20%20%20%20%20%20%20%20%20%2C%20CalcBig.cpp%20%28159%29%2C%20MyApp.exe%0ASomeFunc2%2C%202%2C%20172%2C86.0%2C%200.70%2C%200.90%2C%20%20%20%20%20%20%20%20%20%20%20%20%20%20%2C%20CalcBig.cpp%20%2855%29%2C%20MyApp.exe%0ACalcBig%2C%207%2C%20292%2C41.7%2C%200.50%2C%200.21%2C%20%20%20%20%20%20%20%20%20%20%20%20%20%20%2C%20CalcBig.cpp%20%28126%29%2C%20MyApp.exe</text>
+            <verticalScrollbar>true</verticalScrollbar>
+          </controlProperties>
+        </control>
+        <control controlID="2" controlTypeID="com.balsamiq.mockups::RoundButton" x="481" y="86" w="80" h="20" measuredW="32" measuredH="32" zOrder="1" locked="false" isInGroup="48">
+          <controlProperties>
+            <color>13369344</color>
+            <shape>rectangle</shape>
+            <size>11</size>
+            <text>100%25</text>
+          </controlProperties>
+        </control>
+        <control controlID="3" controlTypeID="com.balsamiq.mockups::RoundButton" x="481" y="135" w="50" h="20" measuredW="32" measuredH="32" zOrder="2" locked="false" isInGroup="48">
+          <controlProperties>
+            <color>14706278</color>
+            <shape>rectangle</shape>
+            <size>11</size>
+            <text>46%25</text>
+          </controlProperties>
+        </control>
+        <control controlID="4" controlTypeID="com.balsamiq.mockups::RoundButton" x="481" y="104" w="39" h="15" measuredW="32" measuredH="32" zOrder="3" locked="false" isInGroup="48">
+          <controlProperties>
+            <color>15374745</color>
+            <shape>rectangle</shape>
+            <size>11</size>
+            <text>25%25</text>
+          </controlProperties>
+        </control>
+        <control controlID="5" controlTypeID="com.balsamiq.mockups::RoundButton" x="481" y="119" w="39" h="16" measuredW="32" measuredH="32" zOrder="4" locked="false" isInGroup="48">
+          <controlProperties>
+            <color>15374745</color>
+            <shape>rectangle</shape>
+            <size>11</size>
+            <text>19%25</text>
+          </controlProperties>
+        </control>
+        <control controlID="6" controlTypeID="com.balsamiq.mockups::RoundButton" x="481" y="58" w="23" h="16" measuredW="32" measuredH="32" zOrder="5" locked="false" isInGroup="48">
+          <controlProperties>
+            <color>15374745</color>
+            <shape>rectangle</shape>
+            <size>11</size>
+            <text/>
+          </controlProperties>
+        </control>
+        <control controlID="7" controlTypeID="com.balsamiq.mockups::RoundButton" x="481" y="72" w="14" h="16" measuredW="32" measuredH="32" zOrder="6" locked="false" isInGroup="48">
+          <controlProperties>
+            <color>15374745</color>
+            <shape>rectangle</shape>
+            <size>11</size>
+            <text/>
+          </controlProperties>
+        </control>
+        <control controlID="8" controlTypeID="com.balsamiq.mockups::RoundButton" x="481" y="42" w="23" h="16" measuredW="32" measuredH="32" zOrder="7" locked="false" isInGroup="48">
+          <controlProperties>
+            <color>15374745</color>
+            <shape>rectangle</shape>
+            <size>11</size>
+            <text/>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="58" controlTypeID="com.balsamiq.mockups::Tree" x="253" y="494" w="578" h="253" measuredW="300" measuredH="225" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <borderStyle>none</borderStyle>
+        <selectedIndex>2</selectedIndex>
+        <size>10</size>
+        <text>_%0A%5B-%5D%20main%0A.%5B-%5D%20CalcBig%0A..%5B-%5D%20InternalCalcBig%0A...%5B%20%5D%20Func1InLib%0A..%5B%20%5D%20MinorFunction%0A.%5B-%5D%20CalcBig%0A..%5B-%5D%20InternalCalcBig%0A...%5B%20%5D%20Func2InLib</text>
+        <value>0</value>
+        <verticalScrollbar>false</verticalScrollbar>
+      </controlProperties>
+    </control>
+    <control controlID="60" controlTypeID="com.balsamiq.mockups::DataGrid" x="831" y="483" w="208" h="218" measuredW="207" measuredH="158" zOrder="11" locked="false" isInGroup="-1">
+      <controlProperties>
+        <rowHeight>18</rowHeight>
+        <selectedIndex>1</selectedIndex>
+        <size>10</size>
+        <text>Self%5CrSamples%2C%20Downstream%20%5CrSamples%2C%20Downstream%20%5Crsamples%20%25%0A100%2C%20%2C%20%0A%2040%2C%2065%2C%20%20%20%2014%25%0A%2030%2C%20%2035%2C%20%20%20%207%25%0A%2035%2C%20%200%2C%20%20%20%200%25%0A%2025%2C%20%200%2C%20%20%20%200%25%0A%2010%2C%20%2037%2C%20%20%20%207%25%0A%2037%2C%20%200%2C%20%20%20%200%25</text>
+        <verticalScrollbar>false</verticalScrollbar>
+      </controlProperties>
+    </control>
+    <control controlID="61" controlTypeID="com.balsamiq.mockups::StickyNote" x="500" y="593" w="256" h="102" measuredW="109" measuredH="123" zOrder="12" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Paths%20graph%20is%20sorted%20according%20to%20the%20sample%20count%20of%20each%20call%20path%2C%20showing%20the%20highest%20values%20first.</text>
+      </controlProperties>
+    </control>
+    <control controlID="62" controlTypeID="com.balsamiq.mockups::Tooltip" x="992" y="607" w="139" h="102" measuredW="147" measuredH="0" zOrder="28" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Downstream%20Samples%20are%20from%20this%20point%20down%20in%20the%20path%2C%20not%20including%20func%20samples</text>
+      </controlProperties>
+    </control>
+    <control controlID="63" controlTypeID="com.balsamiq.mockups::Tooltip" x="686" y="534" w="145" h="89" measuredW="150" measuredH="0" zOrder="13" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Function%20Samples%20are%20samples%20in%20this%20function%20with%20the%20given%20ancestry</text>
+        <tooltipDirection>NE</tooltipDirection>
+      </controlProperties>
+    </control>
+    <control controlID="65" controlTypeID="com.balsamiq.mockups::Tooltip" x="303" y="483" w="213" h="41" measuredW="198" measuredH="0" zOrder="14" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>main%20also%20calls%20SomeFunc1%2C%20SomeFunc2%20%28not%20shown%29</text>
+        <tooltipDirection>SW</tooltipDirection>
+      </controlProperties>
+    </control>
+    <control controlID="68" controlTypeID="com.balsamiq.mockups::StickyNote" x="1071" y="424" w="602" h="225" measuredW="109" measuredH="123" zOrder="15" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Synchronized%20views%0ADouble-clicking%20a%20function%20in%20one%20of%20the%203%20views%20%28Table%20of%20functions%2C%20Paths%20graph%2C%20Parents/Children%29%20%20will%20cause%20the%20other%20two%20views%20to%20synchronize%20their%20content%20by%20making%20the%20chosen%20function%20the%20focus%20of%20their%20display%2C%20as%20follows%3A%0ATable%20of%20functions%3A%20the%20chosen%20function%20becomes%20the%20selected%20list%20item%20and%20the%20windows%20displays%20it%20even%20if%20it%20was%20beyond%20the%20current%20displayed%20part%20before%20the%20selection.%0ACall%20graph%3A%20displays%20all%20call%20paths%20that%20contain%20the%20chosen%20function.%20Call%20paths%20that%20do%20not%20contain%20selected%20function%20are%20not%20shown.%0AParents/Children%3A%20display%20the%20parents%20and%20children%20of%20the%20chosen%20function</text>
+      </controlProperties>
+    </control>
+    <control controlID="70" controlTypeID="com.balsamiq.mockups::DataGrid" x="245" y="355" w="399" h="100" measuredW="328" measuredH="37" zOrder="17" locked="false" isInGroup="-1">
+      <controlProperties>
+        <hLines>false</hLines>
+        <rowHeight>16</rowHeight>
+        <size>10</size>
+        <text>Parents%20%5E%2C%20Func%20Samples%2C%20Deep%20Sampels%2C%20%25%20of%20Deep%20Samples%0Amain%2C%20100%2C%20467%2C%20100%25</text>
+      </controlProperties>
+    </control>
+    <control controlID="71" controlTypeID="com.balsamiq.mockups::DataGrid" x="644" y="357" w="411" h="98" measuredW="358" measuredH="69" zOrder="18" locked="false" isInGroup="-1">
+      <controlProperties>
+        <rowHeight>16</rowHeight>
+        <size>10</size>
+        <text>Self%20+%20Children%20%5E%2C%20Func%20Samples%2C%20Deep%20Samples%2C%20%25%20of%20Deep%20Samples%0A%20%28self%29%2C%2050%2C%20%2850%20self%29%2C%20%20%20%20%20%2023%25%0A%20InternalCalcBig%2C%2067%2C%20117%2C%20%20%20%20%20%2054%25%0A%20MinorFunction%2C%2025%2C%2050%2C%20%20%20%20%20%20%2023%25</text>
+      </controlProperties>
+    </control>
+    <control controlID="72" controlTypeID="com.balsamiq.mockups::TitleWindow" x="245" y="335" w="811" h="120" measuredW="450" measuredH="400" zOrder="16" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bottomheight>0</bottomheight>
+        <close>false</close>
+        <text>Parents%20and%20Children%20of%3A%20CalcBig</text>
+        <topheight>26</topheight>
+      </controlProperties>
+    </control>
+    <control controlID="73" controlTypeID="com.balsamiq.mockups::RoundButton" x="512" y="372" w="126" h="15" measuredW="32" measuredH="32" zOrder="19" locked="false" isInGroup="-1">
+      <controlProperties>
+        <color>13369344</color>
+        <shape>rectangle</shape>
+        <size>11</size>
+        <text>100%25</text>
+      </controlProperties>
+    </control>
+    <control controlID="74" controlTypeID="com.balsamiq.mockups::RoundButton" x="933" y="375" w="20" h="15" measuredW="32" measuredH="32" zOrder="20" locked="false" isInGroup="-1">
+      <controlProperties>
+        <color>14706278</color>
+        <shape>rectangle</shape>
+        <size>11</size>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="78" controlTypeID="com.balsamiq.mockups::RoundButton" x="959" y="548" w="10" h="15" measuredW="32" measuredH="32" zOrder="21" locked="false" isInGroup="-1">
+      <controlProperties>
+        <color>14706278</color>
+        <shape>rectangle</shape>
+        <size>11</size>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="80" controlTypeID="com.balsamiq.mockups::RoundButton" x="959" y="600" w="10" h="15" measuredW="32" measuredH="32" zOrder="22" locked="false" isInGroup="-1">
+      <controlProperties>
+        <color>15374745</color>
+        <shape>rectangle</shape>
+        <size>11</size>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="82" controlTypeID="com.balsamiq.mockups::RoundButton" x="933" y="391" w="35" h="15" measuredW="32" measuredH="32" zOrder="23" locked="false" isInGroup="-1">
+      <controlProperties>
+        <color>14706278</color>
+        <shape>rectangle</shape>
+        <size>11</size>
+        <text>54%25</text>
+      </controlProperties>
+    </control>
+    <control controlID="83" controlTypeID="com.balsamiq.mockups::RoundButton" x="933" y="408" w="20" h="15" measuredW="32" measuredH="32" zOrder="24" locked="false" isInGroup="-1">
+      <controlProperties>
+        <color>14706278</color>
+        <shape>rectangle</shape>
+        <size>11</size>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="84" controlTypeID="com.balsamiq.mockups::Link" x="449" y="137" w="-1" h="-1" measuredW="167" measuredH="17" zOrder="25" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>10</size>
+        <text>2%20modules%20shown%2C%2013%20modules%20hidden</text>
+      </controlProperties>
+    </control>
+    <control controlID="85" controlTypeID="com.balsamiq.mockups::RoundButton" x="959" y="529" w="12" h="15" measuredW="32" measuredH="32" zOrder="26" locked="false" isInGroup="-1">
+      <controlProperties>
+        <color>14706278</color>
+        <shape>rectangle</shape>
+        <size>11</size>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="86" controlTypeID="com.balsamiq.mockups::TabBar" x="245" y="86" w="811" h="667" measuredW="233" measuredH="100" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>0</selectedIndex>
+        <text>EBP%20Jul-10%202012%2014%3A42</text>
+      </controlProperties>
+    </control>
+    <control controlID="87" controlTypeID="com.balsamiq.mockups::TitleWindow" x="245" y="133" w="811" h="620" measuredW="450" measuredH="400" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bottomheight>0</bottomheight>
+        <close>false</close>
+        <text/>
+        <topheight>26</topheight>
+      </controlProperties>
+    </control>
+    <control controlID="90" controlTypeID="com.balsamiq.mockups::HRule" x="244" y="331" w="812" h="-1" measuredW="100" measuredH="5" zOrder="27" locked="false" isInGroup="-1"/>
+    <control controlID="100" controlTypeID="com.balsamiq.mockups::TitleWindow" x="32" y="577" w="211" h="177" measuredW="450" measuredH="400" zOrder="29" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bottomheight>0</bottomheight>
+        <close>true</close>
+        <dragger>false</dragger>
+        <maximizeRestore>false</maximizeRestore>
+        <minimize>false</minimize>
+        <text>Properties</text>
+      </controlProperties>
+    </control>
+    <control controlID="101" controlTypeID="com.balsamiq.mockups::TextArea" x="38" y="604" w="198" h="143" measuredW="200" measuredH="140" zOrder="30" locked="false" isInGroup="-1">
+      <controlProperties>
+        <borderColor>16777215</borderColor>
+        <size>11</size>
+        <text>Function%3A%20CalcBig%0AModule%3A%20MyApp.exe%0ASource%20File%3A%20</text>
+        <underline>false</underline>
+        <verticalScrollbar>false</verticalScrollbar>
+      </controlProperties>
+    </control>
+    <control controlID="104" controlTypeID="__group__" x="32" y="87" w="211" h="490" measuredW="211" measuredH="490" zOrder="31" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::TitleWindow" x="0" y="0" w="211" h="490" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="104">
+          <controlProperties>
+            <bottomheight>0</bottomheight>
+            <close>true</close>
+            <text>CodeXL%20Explorer</text>
+            <topheight>26</topheight>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Tree" x="0" y="39" w="211" h="451" measuredW="300" measuredH="468" zOrder="1" locked="false" isInGroup="104">
+          <controlProperties>
+            <selectedIndex>8</selectedIndex>
+            <size>11</size>
+            <text>%3E%20MyApp.exe%0A.v%20Time%20Based%20Profiling%0A..%3E%20Jul-10%2C2012%2C%2010%3A40%0A..%3E%20Jul-10%2C2012%2C%2011%3A01%0A.v%20*Event%20Based%20Profiling*%0A..%3E%20*Jul-10%2C2012%2C%2014%3A42*%0A..._%20Overview%0A..._%20Modules%0A..._%20Call%20Graph%0A..._%20Functions%0A...%5B-%5D%20Source%20Code%0A.v%20Instruction%20Based%20Sampling%0A..%3E%20Jul-10%2C2012%2C%2015%3A11%0A.v%20GPU%20Application%20Trace%0A..%3E%20Jul-10%2C2012%2C%2016%3A48%0A...v%20Summary%0A....%5B%5D%20API%20Summary%0A....%5B%5D%20Context%20Summary%0A....%5B%5D%20Kernel%20API%20Summary%0A....%5B%5D%20Top%2010%20Data%20Transfer%20Summary%0A....%5B%5D%20Top%2010%20Kernel%20Summary%0A...v%20Kernels%0A....%5B%5D%20sobel_filter%0A....%5B%5D%20kernel2</text>
+            <value>0</value>
+            <verticalScrollbar>true</verticalScrollbar>
+          </controlProperties>
+        </control>
+        <control controlID="2" controlTypeID="com.balsamiq.mockups::Icon" x="4" y="24" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="2" locked="false" isInGroup="104">
+          <controlProperties>
+            <icon>LeftArrowIcon%7Cxsmall</icon>
+          </controlProperties>
+        </control>
+        <control controlID="3" controlTypeID="com.balsamiq.mockups::Icon" x="24" y="24" w="-1" h="-1" measuredW="16" measuredH="16" zOrder="3" locked="false" isInGroup="104">
+          <controlProperties>
+            <icon>RightArrowIcon%7Cxsmall</icon>
+          </controlProperties>
+        </control>
+        <control controlID="4" controlTypeID="com.balsamiq.mockups::Label" x="175" y="22" w="-1" h="-1" measuredW="34" measuredH="21" zOrder="4" locked="false" isInGroup="104">
+          <controlProperties>
+            <bold>true</bold>
+            <text>AMD</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="105" controlTypeID="com.balsamiq.mockups::HRule" x="242" y="453" w="812" h="-1" measuredW="100" measuredH="5" zOrder="32" locked="false" isInGroup="-1"/>
+    <control controlID="106" controlTypeID="com.balsamiq.mockups::Link" x="88" y="649" w="-1" h="-1" measuredW="146" measuredH="18" zOrder="33" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>C%3A%5Ctemp%5CMyApps%5CCalcBig.cpp</text>
+      </controlProperties>
+    </control>
+    <control controlID="107" controlTypeID="com.balsamiq.mockups::TextArea" x="246" y="701" w="809" h="53" measuredW="200" measuredH="140" zOrder="34" locked="false" isInGroup="-1">
+      <controlProperties>
+        <color>16776960</color>
+        <size>11</size>
+        <text>%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20Paths%20Graph%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20Shows%20the%20tree%20of%20call%20sequences%20that%20were%20sampled%20during%20the%20profile%20session.%20A%20parent%20node%20is%20a%20function%20that%20contains%20a%20call%20to%20the%20%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20function%20in%20its%20leaf%20node.</text>
+      </controlProperties>
+    </control>
+    <control controlID="108" controlTypeID="com.balsamiq.mockups::Icon" x="260" y="715" w="-1" h="-1" measuredW="24" measuredH="24" zOrder="35" locked="false" isInGroup="-1">
+      <controlProperties>
+        <icon>Info2Icon%7Csmall</icon>
+      </controlProperties>
+    </control>
+    <control controlID="109" controlTypeID="com.balsamiq.mockups::StickyNote" x="50" y="23" w="220" h="102" measuredW="109" measuredH="123" zOrder="36" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>This%20node/tab%20is%20displayed%20only%20if%20CSS%20was%20enabled%20in%20the%20profile%20session.</text>
+      </controlProperties>
+    </control>
+    <control controlID="110" controlTypeID="com.balsamiq.mockups::Arrow" x="173" y="102" w="80" h="193" measuredW="150" measuredH="100" zOrder="37" locked="false" isInGroup="-1">
+      <controlProperties>
+        <direction>bottom</direction>
+        <leftArrow>true</leftArrow>
+        <rightArrow>false</rightArrow>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="111" controlTypeID="com.balsamiq.mockups::Arrow" x="263" y="71" w="166" h="44" measuredW="150" measuredH="100" zOrder="39" locked="false" isInGroup="-1">
+      <controlProperties>
+        <direction>top</direction>
+        <leftArrow>false</leftArrow>
+        <rightArrow>true</rightArrow>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="112" controlTypeID="com.balsamiq.mockups::StickyNote" x="1071" y="0" w="333" h="203" measuredW="109" measuredH="123" zOrder="38" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>In%20EBP%20the%20drop-list%20is%20called%20monitored%20events%20and%20shows%20only%20the%20actual%20monitored%20events%2C%20not%20the%20%27views%27%20selectable%20in%20the%20filter%20dialog%20and%20available%20in%20other%20tabs%20such%20as%20functions%20and%20modules.%0A%20%0AThere%20is%20no%20call%20graph%20view%20for%20IBS.%20It%20just%20doesnt%20make%20sense.</text>
+      </controlProperties>
+    </control>
+    <control controlID="113" controlTypeID="com.balsamiq.mockups::Label" x="294" y="162" w="58" h="39" measuredW="109" measuredH="18" zOrder="40" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>%287%20shown%2C%2087%20hidden%29</text>
+      </controlProperties>
+    </control>
+    <control controlID="116" controlTypeID="com.balsamiq.mockups::ComboBox" x="903" y="136" w="146" h="-1" measuredW="129" measuredH="20" zOrder="41" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>Retired%20Instructions</text>
+      </controlProperties>
+    </control>
+    <control controlID="117" controlTypeID="com.balsamiq.mockups::TextArea" x="807" y="136" w="96" h="17" measuredW="200" measuredH="140" zOrder="42" locked="false" isInGroup="-1">
+      <controlProperties>
+        <borderColor>16777215</borderColor>
+        <size>11</size>
+        <text>Monitored%20event%3A</text>
+        <underline>false</underline>
+      </controlProperties>
+    </control>
+    <control controlID="119" controlTypeID="com.balsamiq.mockups::Link" x="320" y="136" w="-1" h="-1" measuredW="117" measuredH="18" zOrder="43" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <state>up</state>
+        <text>all%20CPUs%2C%20System%20DLLs</text>
+      </controlProperties>
+    </control>
+    <control controlID="120" controlTypeID="com.balsamiq.mockups::ComboBox" x="683" y="136" w="-1" h="-1" measuredW="113" measuredH="19" zOrder="44" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>10</size>
+        <text>MyApp.exe%2012668</text>
+      </controlProperties>
+    </control>
+    <control controlID="121" controlTypeID="com.balsamiq.mockups::Label" x="638" y="137" w="-1" h="-1" measuredW="46" measuredH="17" zOrder="45" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>10</size>
+        <text>Process%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="122" controlTypeID="com.balsamiq.mockups::Label" x="250" y="136" w="75" h="18" measuredW="71" measuredH="18" zOrder="46" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>11</size>
+        <text>Display%20Filter%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="123" controlTypeID="com.balsamiq.mockups::Label" x="433" y="137" w="15" h="18" measuredW="10" measuredH="18" zOrder="47" locked="false" isInGroup="-1">
+      <controlProperties>
+        <align>center</align>
+        <size>11</size>
+        <text>%7C</text>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

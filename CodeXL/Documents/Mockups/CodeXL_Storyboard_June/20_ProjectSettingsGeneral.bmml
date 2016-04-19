@@ -1,0 +1,238 @@
+<mockup version="1.0" skin="sketch" fontFace="Balsamiq Sans" measuredW="1030" measuredH="679" mockupW="990" mockupH="639">
+  <controls>
+    <control controlID="49" controlTypeID="com.balsamiq.mockups::TitleWindow" x="40" y="40" w="990" h="568" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bottomheight>0</bottomheight>
+        <text>Edit%20CodeXL%20Project%20Settings</text>
+      </controlProperties>
+    </control>
+    <control controlID="51" controlTypeID="com.balsamiq.mockups::Button" x="55" y="566" w="180" h="27" measuredW="170" measuredH="27" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Restore%20Default%20Settings</text>
+      </controlProperties>
+    </control>
+    <control controlID="53" controlTypeID="com.balsamiq.mockups::Label" x="343" y="303" w="112" h="-1" measuredW="109" measuredH="21" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Working%20Directory%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="54" controlTypeID="com.balsamiq.mockups::Label" x="343" y="109" w="141" h="-1" measuredW="135" measuredH="21" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>CodeXL%20Project%20Name%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="56" controlTypeID="com.balsamiq.mockups::TextInput" x="579" y="333" w="390" h="-1" measuredW="79" measuredH="26" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="57" controlTypeID="com.balsamiq.mockups::Label" x="343" y="334" w="174" h="-1" measuredW="161" measuredH="21" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Command%20Line%20Arguments%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="59" controlTypeID="com.balsamiq.mockups::TextInput" x="581" y="106" w="434" h="-1" measuredW="79" measuredH="26" zOrder="7" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="60" controlTypeID="com.balsamiq.mockups::Label" x="343" y="442" w="176" h="-1" measuredW="143" measuredH="21" zOrder="8" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Source%20Files%20Directories%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="62" controlTypeID="com.balsamiq.mockups::TextInput" x="579" y="367" w="390" h="-1" measuredW="79" measuredH="26" zOrder="9" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="63" controlTypeID="com.balsamiq.mockups::Label" x="343" y="368" w="174" h="-1" measuredW="133" measuredH="21" zOrder="10" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Environment%20Variables%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="64" controlTypeID="__group__" x="286" y="559" w="501" h="120" measuredW="501" measuredH="120" zOrder="11" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::StickyNote" x="0" y="0" w="501" h="120" measuredW="109" measuredH="123" zOrder="0" locked="false" isInGroup="64">
+          <controlProperties>
+            <text>*%20The%20%22Windows%20Store%20app%22%20radio%20button%20is%20only%20enabled%20on%20Win8%20OS%20or%20later.%20If%20the%20%22Windows%20Store%20App%22%20radio%20button%20is%20selected%20then%20the%20label%20%22Executable%20Path%3A%22%20is%20replaced%20witht%20he%20label%20%22User%20Model%20ID%3A%22%0A*%20Remote%20host%20text%20box%20is%20enabled%20only%20if%20the%20%22Remote%20host%22%20radio%20button%20is%20checked.</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="66" controlTypeID="com.balsamiq.mockups::RadioButton" x="581" y="227" w="-1" h="-1" measuredW="134" measuredH="22" zOrder="12" locked="false" isInGroup="-1">
+      <controlProperties>
+        <state>selected</state>
+        <text>Desktop%20Application</text>
+      </controlProperties>
+    </control>
+    <control controlID="67" controlTypeID="com.balsamiq.mockups::RadioButton" x="730" y="227" w="-1" h="-1" measuredW="132" measuredH="22" zOrder="13" locked="false" isInGroup="-1">
+      <controlProperties>
+        <state>disabled</state>
+        <text>Windows%20Store%20App</text>
+      </controlProperties>
+    </control>
+    <control controlID="68" controlTypeID="com.balsamiq.mockups::TextInput" x="581" y="160" w="308" h="-1" measuredW="79" measuredH="26" zOrder="14" locked="false" isInGroup="-1">
+      <controlProperties>
+        <state>disabled</state>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="72" controlTypeID="com.balsamiq.mockups::Label" x="897" y="161" w="35" h="-1" measuredW="27" measuredH="21" zOrder="15" locked="false" isInGroup="-1">
+      <controlProperties>
+        <state>disabled</state>
+        <text>Port%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="73" controlTypeID="com.balsamiq.mockups::TextInput" x="929" y="160" w="86" h="-1" measuredW="50" measuredH="27" zOrder="16" locked="false" isInGroup="-1">
+      <controlProperties>
+        <state>disabled</state>
+        <text>27015</text>
+      </controlProperties>
+    </control>
+    <control controlID="74" controlTypeID="com.balsamiq.mockups::Tree" x="55" y="71" w="267" h="480" measuredW="300" measuredH="285" zOrder="17" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>0</selectedIndex>
+        <text>General%0ADebug%0Av%20Profile%0A._General%0A._CPU%20Profile%0A._Custom%20CPU%20Profile%0A._GPU%20Profile%3A%20App.%20Trace%0A._GPU%20Profile%3A%20Perf.%20Counters%0Av%20Analyze%0A._Target%20Devices%20and%20Analysis%20Input%0A.vOpenCL%20Build%20Options%0A.._General%20%26%20Optimization%0A.._Other</text>
+      </controlProperties>
+    </control>
+    <control controlID="76" controlTypeID="com.balsamiq.mockups::RadioButton" x="669" y="136" w="-1" h="-1" measuredW="94" measuredH="22" zOrder="18" locked="false" isInGroup="-1">
+      <controlProperties>
+        <state>up</state>
+        <text>Remote%20host%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="77" controlTypeID="com.balsamiq.mockups::RadioButton" x="581" y="136" w="-1" h="-1" measuredW="77" measuredH="22" zOrder="19" locked="false" isInGroup="-1">
+      <controlProperties>
+        <state>selected</state>
+        <text>Local%20host</text>
+      </controlProperties>
+    </control>
+    <control controlID="79" controlTypeID="com.balsamiq.mockups::TextArea" x="328" y="75" w="687" h="26" measuredW="200" measuredH="140" zOrder="20" locked="false" isInGroup="-1">
+      <controlProperties>
+        <borderColor>15658734</borderColor>
+        <color>15658734</color>
+        <text>*General*</text>
+      </controlProperties>
+    </control>
+    <control controlID="80" controlTypeID="com.balsamiq.mockups::TextArea" x="328" y="192" w="687" h="26" measuredW="200" measuredH="140" zOrder="21" locked="false" isInGroup="-1">
+      <controlProperties>
+        <borderColor>15658734</borderColor>
+        <color>15658734</color>
+        <text>*Target%20Application*</text>
+      </controlProperties>
+    </control>
+    <control controlID="86" controlTypeID="__group__" x="579" y="261" w="437" h="27" measuredW="437" measuredH="27" zOrder="6" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::TextInput" x="0" y="0" w="389" h="-1" measuredW="79" measuredH="26" zOrder="0" locked="false" isInGroup="86">
+          <controlProperties>
+            <text/>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Button" x="389" y="0" w="48" h="27" measuredW="38" measuredH="27" zOrder="1" locked="false" isInGroup="86">
+          <controlProperties>
+            <icon>FolderIcon%7Cxsmall</icon>
+            <text/>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="87" controlTypeID="__group__" x="579" y="300" w="436" h="27" measuredW="436" measuredH="27" zOrder="22" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::TextInput" x="0" y="0" w="388" h="-1" measuredW="79" measuredH="26" zOrder="0" locked="false" isInGroup="87">
+          <controlProperties>
+            <text/>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Button" x="388" y="0" w="48" h="27" measuredW="38" measuredH="27" zOrder="1" locked="false" isInGroup="87">
+          <controlProperties>
+            <icon>FolderIcon%7Cxsmall</icon>
+            <text/>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="88" controlTypeID="com.balsamiq.mockups::TextArea" x="328" y="404" w="687" h="26" measuredW="200" measuredH="140" zOrder="23" locked="false" isInGroup="-1">
+      <controlProperties>
+        <borderColor>15658734</borderColor>
+        <color>15658734</color>
+        <text>*Source%20Files*</text>
+      </controlProperties>
+    </control>
+    <control controlID="89" controlTypeID="__group__" x="579" y="439" w="436" h="27" measuredW="436" measuredH="27" zOrder="24" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::TextInput" x="0" y="0" w="388" h="-1" measuredW="79" measuredH="26" zOrder="0" locked="false" isInGroup="89">
+          <controlProperties>
+            <text/>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Button" x="388" y="0" w="48" h="27" measuredW="30" measuredH="27" zOrder="1" locked="false" isInGroup="89">
+          <controlProperties>
+            <text>...</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="90" controlTypeID="com.balsamiq.mockups::Button" x="846" y="566" w="75" h="27" measuredW="41" measuredH="27" zOrder="25" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>OK</text>
+      </controlProperties>
+    </control>
+    <control controlID="91" controlTypeID="com.balsamiq.mockups::Button" x="940" y="566" w="75" h="27" measuredW="64" measuredH="27" zOrder="26" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Cancel</text>
+      </controlProperties>
+    </control>
+    <control controlID="92" controlTypeID="com.balsamiq.mockups::Label" x="343" y="473" w="176" h="-1" measuredW="138" measuredH="37" zOrder="27" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Source%20Files%20Resolution%5CrRoot%20Directory%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="93" controlTypeID="__group__" x="580" y="478" w="435" h="27" measuredW="435" measuredH="27" zOrder="28" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::TextInput" x="0" y="0" w="387" h="-1" measuredW="79" measuredH="26" zOrder="0" locked="false" isInGroup="93">
+          <controlProperties>
+            <text/>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Button" x="387" y="0" w="48" h="27" measuredW="38" measuredH="27" zOrder="1" locked="false" isInGroup="93">
+          <controlProperties>
+            <icon>FolderIcon%7Cxsmall</icon>
+            <text/>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="94" controlTypeID="com.balsamiq.mockups::CheckBox" x="343" y="516" w="-1" h="-1" measuredW="238" measuredH="38" zOrder="29" locked="false" isInGroup="-1">
+      <controlProperties>
+        <size>13</size>
+        <text>Automatically%20add%20all%20%22.cl%22%20files%20in%20the%5Crsource%20files%20directories%20to%20the%20project</text>
+      </controlProperties>
+    </control>
+    <control controlID="95" controlTypeID="com.balsamiq.mockups::Label" x="343" y="137" w="112" h="-1" measuredW="72" measuredH="21" zOrder="30" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Target%20Host%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="96" controlTypeID="com.balsamiq.mockups::Label" x="343" y="163" w="176" h="-1" measuredW="132" measuredH="21" zOrder="31" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Remote%20Host%20Address%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="97" controlTypeID="com.balsamiq.mockups::Label" x="343" y="228" w="176" h="-1" measuredW="100" measuredH="21" zOrder="32" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Application%20Type%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="98" controlTypeID="com.balsamiq.mockups::Label" x="343" y="264" w="176" h="-1" measuredW="97" measuredH="21" zOrder="33" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Executable%20Path%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="99" controlTypeID="com.balsamiq.mockups::Button" x="969" y="367" w="48" h="27" measuredW="30" measuredH="27" zOrder="34" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>...</text>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

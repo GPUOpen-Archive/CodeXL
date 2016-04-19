@@ -1,0 +1,152 @@
+#
+#   AMDTTeapot Library build
+#
+
+# Python import modules:
+import os
+import shutil
+
+# Get outputDir + " name of outputDir + " OS system:
+systemName = os.uname()[0]
+
+archSpecified = ARGUMENTS.get('arch', 'None')
+if archSpecified == 'None':
+    archSpecified = 'x86_64'
+machineType = archSpecified
+
+# Check if we are in a release build:
+releaseBuild = int(ARGUMENTS.get('release', 0))
+
+# Output directory location
+outputDir     = "../../../../Output"       # previousely driveo
+outputDir += "_" + machineType
+workspacesDir = "../../Workspaces"
+teapotBaseDir = "../" + workspacesDir + "/AMDTTeaPot"
+
+# Intermediate objects directory (.os files):
+if releaseBuild:
+	objDir = outputDir + "/release/obj/AMDTTeaPot"
+else:
+	objDir = outputDir + "/debug/obj/AMDTTeaPot"
+
+# Create outputDir + " intermediate objects directory:
+if not os.path.exists(objDir):
+	os.makedirs(objDir)
+
+# Generic Linux:
+if releaseBuild:
+	cppDefinitions = ["NDEBUG", "_FILE_OFFSET_BITS=64", "_LARGE_FILES"]
+else:
+	cppDefinitions = ["_DEBUG", "_FILE_OFFSET_BITS=64", "_LARGE_FILES"]
+
+if (systemName == "Linux"):
+    if (machineType == "x86"):
+        cppCompilerFlags = ["-m32"]
+    elif (machineType == "x86_64"):
+        cppCompilerFlags = ["-m64"]
+
+# Generic Linux:
+cppCompilerFlags += \
+[
+	"-Wall", 
+	"-pthread", 
+	"-Wundef", 
+	"-fmessage-length=0", 
+	"-g",
+]
+
+# Include files path common to all platforms:
+includePath = \
+[
+	"./",
+	# We include outputDir + " OS Wrappers for outputDir + " OpenGL Includes (gl.h, glext.h etc)
+	workspacesDir + "/PublicIncludeFiles/AMDTOSWrappers",
+	"/usr/include/GL",
+	"/usr/include/glib-2.0",
+	"/usr/lib/glib-2.0/include",
+	"/usr/include/pixman-1",
+	"/usr/include/freetype2",
+	"/opt/AMDAPP/include",
+	"inc",
+	"../AMDTTeaPot/inc",
+	"../AMDTTeaPot"
+]
+
+# Define outputDir + " compiler environment variables:
+env = Environment(CPPDEFINES = cppDefinitions, CCFLAGS = cppCompilerFlags, CPPPATH = includePath)
+
+# Set outputDir + " objects directory:
+env.VariantDir(objDir, './', duplicate=0)
+
+# Source files:
+sources = \
+[
+	objDir + "/src/AMDTFluidGrid.cpp",
+	objDir + "/src/AMDTImage.cpp",
+	objDir + "/src/AMDTOpenCLHelper.cpp",
+	objDir + "/src/AMDTOpenGLHelper.cpp",
+	objDir + "/src/AMDTOpenGLMath.cpp",
+	objDir + "/src/AMDTTeapotOCLSmokeSystem.cpp",
+	objDir + "/src/AMDTTeapotOGLCanvas.cpp",
+	objDir + "/src/AMDTTeapotRenderState.cpp"
+]
+
+# Linked libraries:
+linkedLibraries = \
+[
+	"GL",
+	"X11",	
+	"GLU",
+	"xml2",
+]
+
+linkedLibrariesPath = \
+[
+	"/usr/local/lib",
+]
+
+# Linked libraries search path:
+if releaseBuild:
+	linkedLibrariesPath += \
+	[
+		outputDir + "/release/bin"
+	]
+else:
+	linkedLibrariesPath += \
+	[
+		outputDir + "/debug/bin"
+	]
+	
+# Linker flags:
+linkerFlags = \
+[
+]
+
+if (systemName == "Linux"):
+    if (machineType == "x86"):
+        linkerFlags += ["-m32"]
+    elif (machineType == "x86_64"):
+        linkerFlags += ["-m64"]
+
+shouldGenerateOnlyDefaultELFHash = os.environ.get('GR_GENERATE_ONLY_DEFAULT_ELF_HASH')
+if shouldGenerateOnlyDefaultELFHash is None:
+	linkerFlags += [ "-Wl,--hash-style=both" ]
+
+# Library name:
+libName = "AMDTTeaPot"
+
+# Install directory:
+if releaseBuild:
+	installDir           = outputDir  + "/release/bin/"
+	sharedLibraryDir     = installDir
+else:
+	installDir           = outputDir  + "/debug/bin/"
+	sharedLibraryDir     = installDir
+
+# Create a static library:
+lib = env.StaticLibrary(installDir + "/" + libName, sources, LIBS=linkedLibraries, LIBPATH=linkedLibrariesPath, LINKFLAGS=linkerFlags)
+
+# Change outputDir + " linking to use relative path
+
+env.Alias("install", installDir)
+env.Alias("install", lib)

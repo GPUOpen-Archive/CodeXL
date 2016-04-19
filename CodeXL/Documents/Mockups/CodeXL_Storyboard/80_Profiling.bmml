@@ -1,0 +1,38 @@
+<mockup version="1.0" skin="sketch" measuredW="915" measuredH="666" mockupW="803" mockupH="592">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::TitleWindow" x="112" y="74" w="803" h="592" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <close>true</close>
+        <maximizeRestore>true</maximizeRestore>
+        <minimize>true</minimize>
+        <text>Unified%20Tool%20-%20ExampleCL.uni</text>
+      </controlProperties>
+    </control>
+    <control controlID="1" controlTypeID="com.balsamiq.mockups::MenuBar" x="112" y="95" w="803" h="29" measuredW="452" measuredH="29" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <hrefs>32_MenuFile%26bm%3B32_MenuFile.bmml%26bm%3B32_MenuFile.bmml%26bm%3B32_MenuFile.bmml%2C34_MenuEdit%26bm%3B34_MenuEdit.bmml%26bm%3B34_MenuEdit.bmml%26bm%3B34_MenuEdit.bmml%2C35_MenuView%26bm%3B35_MenuView.bmml%26bm%3B35_MenuView.bmml%26bm%3B35_MenuView.bmml%2C38_MenuTools%26bm%3B38_MenuTools.bmml%26bm%3B38_MenuTools.bmml%26bm%3B38_MenuTools.bmml%2C%2C50_MenuDebug%26bm%3B50_MenuDebug.bmml%26bm%3B50_MenuDebug.bmml%26bm%3B50_MenuDebug.bmml%2C59_MenuWindows%26bm%3B59_MenuWindows.bmml%26bm%3B59_MenuWindows.bmml%26bm%3B59_MenuWindows.bmml%2C60_MenuHelp%26bm%3B60_MenuHelp.bmml%26bm%3B60_MenuHelp.bmml%26bm%3B60_MenuHelp.bmml</hrefs>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%2218%2C27%2C51%2C48%22%20href%3D%2232_MenuFile.bmml%22%20alt%3D%2232_MenuFile%22%20id%3D%221_0%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%2260%2C27%2C96%2C48%22%20href%3D%2234_MenuEdit.bmml%22%20alt%3D%2234_MenuEdit%22%20id%3D%221_1%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22105%2C27%2C148%2C48%22%20href%3D%2235_MenuView.bmml%22%20alt%3D%2235_MenuView%22%20id%3D%221_2%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22157%2C27%2C203%2C48%22%20href%3D%2238_MenuTools.bmml%22%20alt%3D%2238_MenuTools%22%20id%3D%221_3%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22271%2C27%2C322%2C48%22%20href%3D%2250_MenuDebug.bmml%22%20alt%3D%2250_MenuDebug%22%20id%3D%221_4%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22331%2C27%2C394%2C48%22%20href%3D%2259_MenuWindows.bmml%22%20alt%3D%2259_MenuWindows%22%20id%3D%221_5%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%22403%2C27%2C443%2C48%22%20href%3D%2260_MenuHelp.bmml%22%20alt%3D%2260_MenuHelp%22%20id%3D%221_6%22/%3E%0A</map>
+        <selectedIndex>4</selectedIndex>
+        <text>%26F%26ile%2C%20%26E%26dit%2C%20%26V%26iew%2C%20%26T%26ools%2C%20%26P%26rofile%2C%20%26D%26ebug%2C%20%26W%26indows%2C%20%26H%26elp</text>
+      </controlProperties>
+    </control>
+    <control controlID="2" controlTypeID="com.balsamiq.mockups::Label" x="115" y="642" w="-1" h="-1" measuredW="303" measuredH="21" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Profiling%3A%20CPU%3A%20Timer-based%20sampling%20*0%3A0%3A13*%20_Paused_</text>
+      </controlProperties>
+    </control>
+    <control controlID="3" controlTypeID="com.balsamiq.mockups::Menu" x="316" y="119" w="-1" h="-1" measuredW="150" measuredH="120" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <selectedIndex>1</selectedIndex>
+        <text>-%26S%26tart%20New%20Profile%20%3E-%0A%26P%26rofiling%20%3E%0A-%26E%26xport%20Data...-%0A---%0A-%26I%26mport%20Profile-%0A%26A%26dvanced%20Settings...</text>
+      </controlProperties>
+    </control>
+    <control controlID="4" controlTypeID="com.balsamiq.mockups::Menu" x="466" y="146" w="86" h="-1" measuredW="150" measuredH="52" zOrder="4" locked="false" isInGroup="-1">
+      <controlProperties>
+        <hrefs>%2C82_NewProfileSession%26bm%3B82_NewProfileSession.bmml%26bm%3B82_NewProfileSession.bmml%26bm%3B82_NewProfileSession.bmml</hrefs>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22354%2C98%2C440%2C119%22%20href%3D%2282_NewProfileSession.bmml%22%20alt%3D%2282_NewProfileSession%22%20id%3D%224_0%22/%3E%0A</map>
+        <text>x%20%26P%26ause%0A%26S%26top</text>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

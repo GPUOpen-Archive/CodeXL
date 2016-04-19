@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{8341BDB2-8A70-46DC-B47C-7F51B9694B35}</ProjectGuid>
+    <RootNamespace>AMDTPowerProfilingCLI</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  <ImportGroup Label="CommonPropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)\AMDTPowerProfilingNoGUI.props" />
+  </ImportGroup>
+  <PropertyGroup>
+    <TargetName>CodeXLPowerProfiler$(GDTProjectSuffix)</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\;$(ProjectDir)..\;$(CommonDir);$(CommonProjectsDir)\AMDTCommonHeaders\;..\AMDTPowerProfileApi\Inc\;$(SolutionDir)\..\Components\DatabaseLayer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>CXLPowerProfileApi$(GDTProjectSuffix).lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;CXLDbAdapter$(GDTProjectSuffix).lib;CXLProfilerDAL$(GDTProjectSuffix).lib</AdditionalDependencies>
+      <ImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\PowerProfileCLI.cpp" />
+    <ClCompile Include="src\ppCliUtils.cpp" />
+    <ClCompile Include="src\ppCollect.cpp" />
+    <ClCompile Include="src\ppParseArgs.cpp" />
+    <ClCompile Include="src\ppReporter.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\PowerProfileCLI.h" />
+    <ClInclude Include="src\ppCliUtils.h" />
+    <ClInclude Include="src\ppCollect.h" />
+    <ClInclude Include="src\ppParseArgs.h" />
+    <ClInclude Include="src\ppReporter.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="AMDTPowerProfileCLI.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

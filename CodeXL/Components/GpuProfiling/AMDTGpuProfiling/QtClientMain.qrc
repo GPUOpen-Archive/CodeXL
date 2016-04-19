@@ -1,0 +1,13 @@
+ <!DOCTYPE RCC><RCC version="1.0">
+ <qresource>
+     <file>Resources/APITrace.ico</file>
+     <file>Resources/ArrowLeft.ico</file>
+     <file>Resources/ArrowRight.ico</file>
+     <file>Resources/Clear.ico</file>
+     <file>Resources/Configure.ico</file>
+     <file>Resources/Help.ico</file>
+     <file>Resources/Import.ico</file>
+     <file>Resources/PCounter.ico</file>
+     <file>Resources/ProjectIcon.ico</file>
+ </qresource>
+ </RCC>

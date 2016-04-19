@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<LogFormat xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+                     xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+                     xmlns="http://www.legitlog.com/LogFormatSchema.xsd" 
+                     FormatName="CodeXL Log"> 
+    <Description> 
+        Log format for CodeXL. 
+    </Description> 
+    <LogLine> 
+        <Fields> 
+             <LogFieldFormat Name="Time" FieldType="DateTime" Delimiter="&#9;#" Format="yyyy.MM.dd&#9;HH:mm:ss.fff" /> 
+             <LogFieldFormat Name="FileTime" FieldType="String" Delimiter="&#9;#" FilterColumn="false" /> 
+             <LogFieldFormat Name="Level" FieldType="String" Delimiter="&#9;#" FilterColumn="true" HighlightRows="true" /> 
+	   <LogFieldFormat Name="SessionStartTime" FieldType="String" Delimiter="&#9;#" FilterColumn="true" HighlightRows="true"/> 
+             <LogFieldFormat Name="ThreadId" FieldType="Int" Delimiter="&#9;#"  FilterColumn="true" HighlightRows="true"/> 
+             <LogFieldFormat Name="Function" FieldType="String" Delimiter="&#9;#" FilterColumn="true" HighlightRows="true" />
+             <LogFieldFormat Name="SourceFile" FieldType="String" Delimiter="&#9;#" FilterColumn="true" HighlightRows="true" /> 
+             <LogFieldFormat Name="LineNum" FieldType="Int" Delimiter="&#9;#" />
+             <LogFieldFormat Name="Message" FieldType="String" Delimiter="&#10;"/> 
+        </Fields> 
+    </LogLine> 
+</LogFormat>

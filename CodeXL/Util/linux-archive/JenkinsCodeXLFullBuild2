@@ -1,0 +1,277 @@
+#!/bin/sh
+# Top level jenkins script to build for promoted AMDT libraries, and verify
+# that the built results have all of the expected bits.
+# 
+# Usage:
+#   $0 [<version number>] [scratch]
+#   <version number>:
+#       An optional parameter is the build number.
+#       When the build number is 0 (zero) only the debug version is built
+#       If no build number is passed in, do not modify the version file
+#   scratch:
+#       An optional parameter.  When passed in, the script will run
+#       scons <stuff> -c to perform a clean prior to the normal build
+#       Thus, a scratch build
+#
+
+#
+# Assumptions:
+# - WORKSPACE environment variable to be set
+#
+
+AMD_PERFORCE_ROOT=$WORKSPACE
+AMD_WS_LINUX_UTIL_DIR=${AMD_PERFORCE_ROOT}/main/CodeXL/Util/linux
+
+# NOTE: This is used by buildCodeXLFullLinuxProjects2
+export AMD_CODEXL=$AMD_PERFORCE_ROOT/main/CodeXL
+export AMD_OUTPUT=$AMD_PERFORCE_ROOT/main/
+
+# Version Number stuff
+VERSION_MAJOR=1
+VERSION_MINOR=0
+VERSION_BUILD=0
+VERSION_UPDATE=0
+VERSIONINFO_FILE=${AMD_CODEXL}/../CommonProjects/VersionInfo/VersionInfo.h
+
+NUM_ERRORS=0
+BUILD_DEBUG_RC=0
+BUILD_RELEASE_RC=0
+ONLY_BUILD_DEBUG=0
+IS_SCRATCH_BUILD=0
+GPUP_BACKEND_BUILD_NUM=0
+
+# A utility bit of code - simply does a scons -c over both builds
+NukeIt()
+{
+    ARCHTYPE=$1
+    BUILD_OPTS="--debug=time -j ${NCPUS} CXL_build=release CXL_arch=${ARCHTYPE} -c"
+    sh $AMD_WS_LINUX_UTIL_DIR/buildCodeXLFullLinuxProjects2 ${BUILD_OPTS} > ${WORKSPACE}/CodeXL-Linux_${ARCHTYPE}_release.log 2>&1
+    BUILD_OPTS="-j ${NCPUS} CXL_build=debug CXL_arch=${ARCHTYPE} -c"
+    sh $AMD_WS_LINUX_UTIL_DIR/buildCodeXLFullLinuxProjects2 ${BUILD_OPTS} > ${WORKSPACE}/CodeXL-Linux_${ARCHTYPE}_debug.log 2>&1
+}
+
+# The bulk of the work is done here
+# The only parameter is the architecture name (x86 or x86_64)
+RunTheBuild()
+{
+    ARCHTYPE=$1
+
+    cd $AMD_WS_LINUX_UTIL_DIR
+
+    if [ ${ONLY_BUILD_DEBUG} -eq 0 ]
+    then
+        # BUILD RELEASE when the version is non-zero
+        BUILD_OPTS="--debug=time -j ${NCPUS} CXL_build=release CXL_arch=${ARCHTYPE}"
+        echo ""
+        echo "========== Timing start: `date` ============================================"
+        echo "Building: sh $AMD_WS_LINUX_UTIL_DIR/buildCodeXLFullLinuxProjects2 ${BUILD_OPTS}"
+        sh $AMD_WS_LINUX_UTIL_DIR/buildCodeXLFullLinuxProjects2 ${BUILD_OPTS} > ${WORKSPACE}/CodeXL-Linux_${ARCHTYPE}_release.log 2>&1
+        BUILD_RELEASE_RC=$?
+        echo "========== Timing end: `date` =============================================="
+    fi
+
+    # BUILD DEBUG
+    BUILD_OPTS="-j ${NCPUS} CXL_build=debug CXL_arch=${ARCHTYPE}"
+    echo ""
+    echo "========== Timing start: `date` ============================================"
+    echo "Building: sh $AMD_WS_LINUX_UTIL_DIR/buildCodeXLFullLinuxProjects2 ${BUILD_OPTS}"
+    sh $AMD_WS_LINUX_UTIL_DIR/buildCodeXLFullLinuxProjects2 ${BUILD_OPTS} > ${WORKSPACE}/CodeXL-Linux_${ARCHTYPE}_debug.log 2>&1
+    BUILD_DEBUG_RC=$?
+    echo "========== Timing end: `date` =============================================="
+
+    NUM_ERRORS=`expr ${NUM_ERRORS} + ${BUILD_RELEASE_RC} + ${BUILD_DEBUG_RC}`
+    if [ ${BUILD_RELEASE_RC} -ne 0 -o ${BUILD_DEBUG_RC} -ne 0 ]
+    then
+        echo "*** ERROR ***"
+        echo "*** The debug build had ${BUILD_DEBUG_RC} errors ***"
+        echo "*** The release build had ${BUILD_RELEASE_RC} errors ***"
+    else
+	echo "Build succeeded"
+    fi
+
+}
+
+PackageTheBuild()
+{
+    echo "---- TIMING: Packaging start: `date`"  
+
+    cd $AMD_PERFORCE_ROOT/main
+
+    # First: clean out object files and other build artifacts which should not go into
+    # the final tarball
+    rm -rf Output_x86_64/release/obj
+    rm -rf Output_x86_64/debug/obj
+
+    # Future enhancement:
+    # This is a good point to split in the future.  Generate the CodeXL tarball bits
+    # and do not bother with other components until some other repackaging step.
+    # This will keep the overhead and complexity lower here.
+
+    # un-tar the GPU Profiler backend if it exists
+    if [ ${GPUP_BACKEND_BUILD_NUM} -ne 0 ]
+    then
+        cd $AMD_PERFORCE_ROOT/main/Output_x86_64/release/bin
+        GPUP_BACKEND_TARBALL=GPUProfilingBackendCodeXL-v2.6.$GPUP_BACKEND_BUILD_NUM.tgz
+        GPUP_BACKEND_INTERNAL_TARBALL=GPUProfilingBackendCodeXLInternal-v2.6.$GPUP_BACKEND_BUILD_NUM.tgz
+        if [ -e $GPUP_BACKEND_TARBALL ]
+        then
+            tar xzf $GPUP_BACKEND_TARBALL
+            rm -f $GPUP_BACKEND_TARBALL
+        fi
+        if [ -e $GPUP_BACKEND_INTERNAL_TARBALL ]
+        then
+            # tar xzf $GPUP_BACKEND_INTERNAL_TARBALL
+            rm -f $GPUP_BACKEND_INTERNAL_TARBALL
+        fi
+        cd $AMD_PERFORCE_ROOT/main
+    fi
+
+    cd $AMD_PERFORCE_ROOT/main
+    # Autodetect any KernelAnalyzer .tgz files (which should be in $AMD_PERFORCE_ROOT/main)
+    # If found, extract into Output_x86_64 as a parallel entity to CodeXL
+    KA_PKG="${AMD_PERFORCE_ROOT}/main/AMDAPPKernelAnalyzer*.tgz"
+    if [ -s ${KA_PKG} ]
+    then
+        KA_BN=`basename ${KA_PKG}`
+        echo "Adding Kernel Analyzer: ${KA_BN} to the kit"
+        cd $AMD_PERFORCE_ROOT/main/Output_x86_64/release
+        tar xfz ${KA_PKG}
+    fi
+    cd $AMD_PERFORCE_ROOT/main
+
+    PKG_NAME=CodeXL-Linux-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_BUILD}.${VERSION_UPDATE}-x86_64-release
+    mkdir -p ${PKG_NAME}/Output_x86_64
+    cp -drf Output_x86_64/release ${PKG_NAME}/Output_x86_64
+    tar czf ${PKG_NAME}.tar.gz ${PKG_NAME}
+
+    # Archive the debug bits as well - some developers are apparently not getting
+    # assertions while others are.
+    DBG_PKG_NAME=CodeXL-Linux-${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_BUILD}.${VERSION_UPDATE}-x86_64-debug
+    tar czf ${DBG_PKG_NAME}.tar.gz Output_x86_64/debug
+
+
+    echo "---- TIMING: Packaging end: `date`"  
+}
+
+UsageAndExit()
+{
+    echo "Usage: $0 [quick] [build-num BUILDNUM] [scratch] [gpup-backend-build-num GPUPBUILDNUM] [help]"
+    echo "If quick is specified a compile-only (x86_64, debug) build is performed."
+    echo "    No packaging of the debug content is performed"
+    echo "If BUILDNUM is 0 (zero) a quick build is performed."
+    echo "If scratch is specified, the build is from scratch (not the default)"
+    echo "If gpup-backend-build-num is specified, then the packaging portion will try to un-tar the tgz file from the upstream Jenkins build with number GPUPBUILDNUM"
+    echo "If help is specified, then this message is displayed"
+    exit 1
+}
+
+########################## MAIN #############################
+
+NARGS=$#
+FOUND_VERNO=0
+if [ ${NARGS} -eq 0 ]
+then
+    UsageAndExit
+fi
+
+if [ ${NARGS} -gt 7 ]
+then
+    UsageAndExit
+fi
+
+while [ "$*" != "" ]
+do
+   if [ "$1" = "scratch" ]
+   then
+      IS_SCRATCH_BUILD=1
+   elif [ "$1" = "quick" ]
+   then
+      FOUND_VERNO=1
+      VERSION_BUILD=0
+   elif [ "$1" = "build-num" ]
+   then
+      shift
+      FOUND_VERNO=1
+      VERSION_BUILD=$1
+   elif [ "$1" = "gpup-backend-build-num" ]
+   then
+      shift
+      GPUP_BACKEND_BUILD_NUM="$1"
+   elif [ "$1" = "help" ]
+   then
+      UsageAndExit
+   else
+      UsageAndExit
+   fi
+   shift
+done
+
+# FOUND_VERNO and IS_SCRATCH_BUILD have the correct (boolean) values
+# at this point
+if [ ${FOUND_VERNO} -eq 1 ]
+then
+    if [ "${VERSION_BUILD}" = "0" ]
+    then
+        ONLY_BUILD_DEBUG=1
+    fi
+    # Edit the version file - in situ.  A different approach would be to
+    # dynamically generate said file (perhaps in the future)
+    chmod 666 ${VERSIONINFO_FILE}
+    CHM_RC=$?
+    NUM_ERRORS=`expr ${NUM_ERRORS} + ${CHM_RC}`
+    if [ ${CHM_RC} -ne 0 ]
+    then
+        echo "*** ERROR ***"
+        echo "*** Unable to modify ${VERSIONINFO_FILE} ***"
+        echo "*** The default version numbers will be used ***"
+    else
+        # The pattern to match on in the file is 1,0,0,0
+        # meaning major,minor,build,update
+        OLDPAT=0,0,0,0
+        NEWPAT=${VERSION_MAJOR},${VERSION_MINOR},${VERSION_BUILD},${VERSION_UPDATE}
+        # And mangle
+        sed -i "s/${OLDPAT}/${NEWPAT}/g" ${VERSIONINFO_FILE}
+        SED_RC=$?
+        NUM_ERRORS=`expr ${NUM_ERRORS} + ${SED_RC}`
+        if [ ${SED_RC} -ne 0 ]
+        then
+            echo "*** ERROR ***"
+            echo "*** Unable to modify fields in ${VERSIONINFO_FILE} ***"
+            echo "*** The build may fail due to compile errors ***"
+        fi
+    fi
+fi
+
+# Figure out how much parallelism we can use.  2x cores on a really fast system
+# The build system is pretty heavily used - both for tests and builds, so dial
+# this back to be just the number of cores
+NCPUS=`grep processor /proc/cpuinfo | wc | awk '{print $1}'`
+if [ $? -ne 0 ]
+then
+    echo "Warning - Unable to determine the number of CPU cores - assuming one core"
+    NCPUS=1
+fi
+# If the system is capable of more cores, re-enable this
+NCPUS=`expr ${NCPUS} \* 2`
+echo "Building with -j ${NCPUS}"
+
+#
+# BUILDING 
+#
+
+# Clean up everything from past builds if this is a scratch build
+if [ ${IS_SCRATCH_BUILD} -ne 0 ]
+then
+    NukeIt x86_64
+fi
+RunTheBuild x86_64
+
+if [ ${NUM_ERRORS} -ne 0 ]
+then
+    echo "*** The build failed ***"
+    exit 1
+else
+    PackageTheBuild
+    echo "*** The build succeeded ***"
+    exit 0
+fi

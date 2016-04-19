@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<CodeXL>
+    <Tests>
+	        <TestResultsDirectory>GoldMasters_APPSDK_2_9</TestResultsDirectory>
+        <LogFilesDirectory>C:\TEMP\testResults\</LogFilesDirectory>
+		<Test>
+            <ExecutablePath>samples\opencl\bin\x86_64\MatrixMultiplicationCPPKernel.exe</ExecutablePath>
+            <WorkingDirectory>samples\opencl\bin\x86_64\</WorkingDirectory>
+            <TestName>MatrixMultiplicationCPPKernel_LocalsTest</TestName>
+            <TestType>LocalsTest</TestType>
+            <Kernels>
+                <Kernel>
+                    <KernelName>mmmKernel_localFloat4</KernelName>
+					<WorkItemId>0,0,0</WorkItemId>
+					<KernelLocals>
+						<LocalsInLine lineNumber="106"></LocalsInLine>
+						<LocalsInLine lineNumber="109"></LocalsInLine>
+						<LocalsInLine lineNumber="112"></LocalsInLine>
+						<LocalsInLine lineNumber="113"></LocalsInLine>
+						<LocalsInLine lineNumber="114"></LocalsInLine>
+					</KernelLocals>               
+                </Kernel>                         
+            </Kernels>
+        </Test>
+	</Tests>
+</CodeXL>       

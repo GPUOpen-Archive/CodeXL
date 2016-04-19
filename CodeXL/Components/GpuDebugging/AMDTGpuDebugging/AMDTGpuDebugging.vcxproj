@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{42F50090-40D9-4A2D-A27A-5FCD7A48B6B2}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>AMDTGpuDebugging</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)\AMDTGpuDebuggingGUI.props" />
+    <Import Project="$(AMDTCommonAMD)\APPSDK\Global-OpenCL-NoLib.props" />
+    <Import Project="$(AMDTCommonExt)\QScintilla\Global-QScintilla.props" />
+    <Import Project="$(AMDTCommonExt)\qcustomplot\Global-qcustomplot.props" />
+  </ImportGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(AMDTCommonExt)tinyxml\2.6.2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>QT_NO_OPENGL;QT_LARGEFILE_SUPPORT;QT_DLL;QT_GUI_LIB;QT_CORE_LIB;QT_THREAD_SUPPORT;AMDTGPUDEBUGGING_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>CXLProcessDebugger$(GDTProjectSuffix).lib;CXLApiFunctions$(GDTProjectSuffix).lib;CXLApplicationComponents$(GDTProjectSuffix).lib;CXLApplicationFramework$(GDTProjectSuffix).lib;CXLGpuDebuggingComponents$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\gwgDEBuggerAppWrapper.h" />
+    <ClInclude Include="Include\gwgDEBuggerAppWrapperDLLBuild.h" />
+    <CustomBuild Include="Include\gwKernelWorkItemToolbar.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Include\gwStringConstants.h" />
+    <ClInclude Include="src\gwApplicationCommands.h" />
+    <ClInclude Include="src\gwDebugActionsCreator.h" />
+    <ClInclude Include="src\gwDebugViewsCreator.h" />
+    <ClInclude Include="src\gwEventObserver.h" />
+    <ClInclude Include="Include\gwKernelWorkItemToolbar.h" />
+    <ClInclude Include="src\gwImagesAndBuffersActionsCreator.h" />
+    <ClInclude Include="src\gwImagesAndBuffersMDIViewCreator.h" />
+    <ClInclude Include="src\gwMenuActionsExecutor.h" />
+    <ClInclude Include="src\gwStatisticsActionsExecutor.h" />
+    <ClInclude Include="src\gwWXViewsActionsCreator.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\gwApplicationCommands.cpp" />
+    <ClCompile Include="src\gwDebugActionsCreator.cpp" />
+    <ClCompile Include="src\gwDebugViewsCreator.cpp" />
+    <ClCompile Include="src\gwEventObserver.cpp" />
+    <ClCompile Include="src\gwgDEBuggerAppWrapper.cpp" />
+    <ClCompile Include="src\gwImagesAndBuffersActionsCreator.cpp" />
+    <ClCompile Include="src\gwImagesAndBuffersMDIViewCreator.cpp" />
+    <ClCompile Include="src\gwKernelWorkItemToolbar.cpp" />
+    <ClCompile Include="src\gwMenuActionsExecutor.cpp" />
+    <ClCompile Include="src\gwStatisticsActionsExecutor.cpp" />
+    <ClCompile Include="src\gwWXViewsActionsCreator.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gwKernelWorkItemToolbar.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SConscript">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\..\Common\Src\VersionInfo\VersionResource.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

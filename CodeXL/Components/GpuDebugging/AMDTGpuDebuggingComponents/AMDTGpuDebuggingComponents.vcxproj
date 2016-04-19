@@ -1,0 +1,611 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{84469B70-AF39-4824-9FB6-85117385F4DD}</ProjectGuid>
+    <RootNamespace>AMDTGpuDebuggingComponents</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="$(SolutionDir)\AMDTGpuDebuggingGUI.props" />
+    <Import Project="$(AMDTCommonExt)\QScintilla\Global-QScintilla.props" />
+    <Import Project="$(AMDTCommonExt)\qcustomplot\Global-qcustomplot.props" />
+    <Import Project="$(AMDTCommonEXT)\tinyxml\Global-TinyXML-2015.props" />
+    <Import Project="$(AMDTCommonAMD)\APPSDK\Global-OpenCL-NoLib.props" />
+  </ImportGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>QT_NO_OPENGL;AMDTGPUDEBUGGINGCOMPONENTS_EXPORTS;XPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>CXLApplicationComponents$(GDTProjectSuffix).lib;CXLApplicationFramework$(GDTProjectSuffix).lib;CXLProcessDebugger$(GDTProjectSuffix).lib;CXLApiFunctions$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\gdAidFunctions.cpp" />
+    <ClCompile Include="src\gdAPICallsHistoryPanel.cpp" />
+    <ClCompile Include="src\gdApplicationCommands.cpp" />
+    <ClCompile Include="src\gdBreakpointsItemData.cpp" />
+    <ClCompile Include="src\gdDebugApplicationTreeData.cpp" />
+    <ClCompile Include="src\gdDebugApplicationTreeHandler.cpp" />
+    <ClCompile Include="src\gdDebuggingCommands.cpp" />
+    <ClCompile Include="src\gdEventStringBuilder.cpp" />
+    <ClCompile Include="src\gdExecutionMode.cpp" />
+    <ClCompile Include="src\gdFrameworkConnectionManager.cpp" />
+    <ClCompile Include="src\gdGDebuggerGlobalVariablesManager.cpp" />
+    <ClCompile Include="src\gdGlobalDebugSettingsPage.cpp" />
+    <ClCompile Include="src\gdHTMLProperties.cpp" />
+    <ClCompile Include="src\gdImagesAndBuffersManager.cpp" />
+    <ClCompile Include="src\gdProjectSettingsExtension.cpp" />
+    <ClCompile Include="src\gdPropertiesEventObserver.cpp" />
+    <ClCompile Include="src\gdShaderType.cpp" />
+    <ClCompile Include="src\gdSingletonsDelete.cpp" />
+    <ClCompile Include="src\gdStatisticsPanel.cpp" />
+    <ClCompile Include="src\gdStatusBar.cpp" />
+    <ClCompile Include="commands\src\gdExitCommand.cpp" />
+    <ClCompile Include="commands\src\gdFlushTexturesImagesCommand.cpp" />
+    <ClCompile Include="commands\src\gdLoadProjectCommand.cpp" />
+    <ClCompile Include="commands\src\gdSaveProfilingDataCommand.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="commands\src\gdSaveStateChangeStatisticsCommand.cpp" />
+    <ClCompile Include="commands\src\gdSaveTotalStatisticsCommand.cpp" />
+    <ClCompile Include="Commands\src\gdSaveVarStateCommand.cpp" />
+    <ClCompile Include="commands\src\gdSaveProjectCommand.cpp" />
+    <ClCompile Include="Commands\src\gdStartDebuggingCommand.cpp" />
+    <ClCompile Include="Commands\src\gdStopDebuggingCommand.cpp" />
+    <ClCompile Include="src\gdThreadsEventObserver.cpp" />
+    <ClCompile Include="src\gdUpdateUIEvent.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdAllocatedObjectsCreationStackView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdAPICallsHistoryPanel.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdAPICallsHistoryView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdBreakpointsDialog.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdBreakpointsView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdCallsHistoryToolbar.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdCallsStackListCtrl.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdCallStackView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdDebugApplicationTreeData.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdDebugApplicationTreeHandler.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdDebuggedProcessEventsView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdGLDebugOutputSettingsDialog.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdGlobalDebugSettingsPage.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdImageAndBufferView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdImageDataView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdImagesAndBuffersControlPanel.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdLocalsView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdMemoryAnalysisDetailsView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdMemoryView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdMultiWatchView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdProjectSettingsExtension.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdSaveAllTexturesBuffersDialog.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdStateVariablesDialog.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdStatisticsPanel.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdStatisticsView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdStateVariablesView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdStatisticsViewBase.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdThumbnailView.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gdWatchView.cpp" />
+    <ClCompile Include="toolbars\src\gdCallsHistoryToolbar.cpp" />
+    <ClCompile Include="views\src\gdAllocatedObjectsCreationStackView.cpp" />
+    <ClCompile Include="views\src\gdAPICallsHistoryView.cpp" />
+    <ClCompile Include="views\src\gdBatchStatisticsView.cpp" />
+    <ClCompile Include="views\src\gdBreakpointsView.cpp" />
+    <ClCompile Include="views\src\gdCallsStackListCtrl.cpp" />
+    <ClCompile Include="views\src\gdCallStackView.cpp" />
+    <ClCompile Include="views\src\gdDebuggedProcessEventsView.cpp" />
+    <ClCompile Include="views\src\gdDeprecationStatisticsView.cpp" />
+    <ClCompile Include="views\src\gdFunctionCallsStatisticsView.cpp" />
+    <ClCompile Include="views\src\gdImageAndBufferView.cpp" />
+    <ClCompile Include="views\src\gdImageAndBufferViewsController.cpp" />
+    <ClCompile Include="views\src\gdImageDataView.cpp" />
+    <ClCompile Include="views\src\gdImagesAndBuffersControlPanel.cpp" />
+    <ClCompile Include="views\src\gdImagesAndBuffersExporter.cpp" />
+    <ClCompile Include="views\src\gdLocalsView.cpp" />
+    <ClCompile Include="views\src\gdMemoryAnalysisDetailsView.cpp" />
+    <ClCompile Include="views\src\gdMemoryView.cpp" />
+    <ClCompile Include="views\src\gdMemoryViewBase.cpp" />
+    <ClCompile Include="views\src\gdMultiWatchView.cpp" />
+    <ClCompile Include="views\src\gdStateChangeStatisticsView.cpp" />
+    <ClCompile Include="views\src\gdStateVariablesView.cpp" />
+    <ClCompile Include="views\src\gdStatisticsView.cpp" />
+    <ClCompile Include="views\src\gdStatisticsViewBase.cpp" />
+    <ClCompile Include="views\src\gdThumbnailView.cpp" />
+    <ClCompile Include="views\src\gdTotalStatisticsView.cpp" />
+    <ClCompile Include="views\src\gdPBufferImageProxy.cpp" />
+    <ClCompile Include="views\src\gdRenderBufferImageProxy.cpp" />
+    <ClCompile Include="views\src\gdStateVariablesCompareFunctor.cpp" />
+    <ClCompile Include="views\src\gdStaticBufferImageProxy.cpp" />
+    <ClCompile Include="views\src\gdTextureImageProxy.cpp" />
+    <ClCompile Include="views\src\gdVBOImageProxy.cpp" />
+    <ClCompile Include="dialogs\src\gdBreakpointsDialog.cpp" />
+    <ClCompile Include="dialogs\src\gdDoubleProgressBarDialog.cpp" />
+    <ClCompile Include="dialogs\src\gdGLDebugOutputSettingsDialog.cpp" />
+    <ClCompile Include="dialogs\src\gdSaveAllTexturesBuffersDialog.cpp" />
+    <ClCompile Include="dialogs\src\gdStateVariablesDialog.cpp" />
+    <ClCompile Include="views\src\gdWatchView.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\commands\gdExitCommand.h" />
+    <ClInclude Include="Include\commands\gdFlushTexturesImagesCommand.h" />
+    <ClInclude Include="Include\commands\gdLoadProjectCommand.h" />
+    <ClInclude Include="Include\commands\gdSaveProfilingDataCommand.h" />
+    <ClInclude Include="Include\commands\gdSaveStateChangeStatisticsCommand.h" />
+    <ClInclude Include="Include\commands\gdSaveTotalStatisticsCommand.h" />
+    <ClInclude Include="Include\commands\gdSaveVarStateCommand.h" />
+    <ClInclude Include="Include\commands\gdSaveProjectCommand.h" />
+    <ClInclude Include="Include\commands\gdStartDebuggingCommand.h" />
+    <ClInclude Include="Include\commands\gdStopDebuggingCommand.h" />
+    <CustomBuild Include="Include\gdAPICallsHistoryPanel.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Include\gdApplicationCommands.h" />
+    <ClInclude Include="Include\gdBreakpointsItemData.h" />
+    <CustomBuild Include="Include\gdDebugApplicationTreeData.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\gdDebugApplicationTreeHandler.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Include\gdDebuggingCommands.h" />
+    <ClInclude Include="Include\gdEventStringBuilder.h" />
+    <ClInclude Include="Include\gdExecutionMode.h" />
+    <ClInclude Include="Include\gdFrameworkConnectionManager.h" />
+    <CustomBuild Include="Include\gdGlobalDebugSettingsPage.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Include\gdImagesAndBuffersManager.h" />
+    <CustomBuild Include="Include\gdProjectSettingsExtension.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Include\gdPropertiesEventObserver.h" />
+    <ClInclude Include="Include\gdThreadsEventObserver.h" />
+    <ClInclude Include="Include\gdUpdateUIEvent.h" />
+    <CustomBuild Include="Include\toolbars\gdCallsHistoryToolbar.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\toolbars\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdAllocatedObjectsCreationStackView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\views\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdAPICallsHistoryView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\views\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Include\views\gdBatchStatisticsView.h" />
+    <CustomBuild Include="Include\views\gdBreakpointsView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\views\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\gdStatisticsPanel.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdCallsStackListCtrl.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\views\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdCallStackView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\views\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdDebuggedProcessEventsView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\views\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+    </CustomBuild>
+    <ClInclude Include="Include\views\gdDeprecationStatisticsView.h" />
+    <ClInclude Include="Include\views\gdFunctionCallsStatisticsView.h" />
+    <CustomBuild Include="Include\views\gdImageAndBufferView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\views\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Include\views\gdImageAndBufferViewsController.h" />
+    <CustomBuild Include="Include\views\gdImageDataView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\views\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdImagesAndBuffersControlPanel.h">
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\views\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+    </CustomBuild>
+    <ClInclude Include="Include\views\gdImagesAndBuffersExporter.h" />
+    <CustomBuild Include="Include\views\gdLocalsView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\views\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdMemoryAnalysisDetailsView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\views\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdMemoryView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\views\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Include\views\gdMemoryViewBase.h" />
+    <CustomBuild Include="Include\views\gdMultiWatchView.h">
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\views\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+    </CustomBuild>
+    <ClInclude Include="Include\views\gdStateChangeStatisticsView.h" />
+    <CustomBuild Include="Include\views\gdStateVariablesView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\views\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdStatisticsViewBase.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\views\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdStatisticsView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\views\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\views\gdThumbnailView.h">
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\views\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+    </CustomBuild>
+    <ClInclude Include="Include\views\gdTotalStatisticsView.h" />
+    <ClInclude Include="Include\views\gdPBufferImageProxy.h" />
+    <ClInclude Include="Include\views\gdRenderBufferImageProxy.h" />
+    <ClInclude Include="Include\views\gdStateVariablesCompareFunctor.h" />
+    <ClInclude Include="Include\views\gdStaticBufferImageProxy.h" />
+    <ClInclude Include="Include\views\gdTextureImageProxy.h" />
+    <ClInclude Include="Include\views\gdVBOImageProxy.h" />
+    <CustomBuild Include="Include\dialogs\gdBreakpointsDialog.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\dialogs\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Include\dialogs\gdDoubleProgressBarDialog.h" />
+    <CustomBuild Include="Include\dialogs\gdGLDebugOutputSettingsDialog.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\dialogs\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\dialogs\gdSaveAllTexturesBuffersDialog.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\dialogs\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="Include\dialogs\gdStateVariablesDialog.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\dialogs\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+    <ClInclude Include="Include\gdAidFunctions.h" />
+    <ClInclude Include="Include\gdCommandIDs.h" />
+    <ClInclude Include="Include\gdDeprecationStringConstants.h" />
+    <ClInclude Include="Include\gdGDebuggerAppDLLBuild.h" />
+    <ClInclude Include="Include\gdGDebuggerGlobalVariablesManager.h" />
+    <ClInclude Include="Include\gdHTMLProperties.h" />
+    <ClInclude Include="Include\gdHTMLStringConstants.h" />
+    <ClInclude Include="Include\gdShaderType.h" />
+    <ClInclude Include="Include\gdSingletonsDelete.h" />
+    <ClInclude Include="Include\gdStatusBar.h" />
+    <ClInclude Include="Include\gdStringConstants.h" />
+    <CustomBuild Include="Include\views\gdWatchView.h">
+      <Command>"$(AMDTCommonExt)QT\5.5\bin\moc.exe" "Include\views\%(Filename).h" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>moc creation</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
+      <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\..\Common\Src\VersionInfo\VersionResource.rc">
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Include\res\icons\AddCounter_ico_xpm.xpm" />
+    <None Include="Include\res\icons\all_buffers_icon_xpm.xpm" />
+    <None Include="Include\res\icons\amd_ico_xpm.xpm" />
+    <None Include="Include\res\icons\analyze_execution_mode.xpm" />
+    <None Include="Include\res\icons\analyze_execution_mode_inactive.xpm" />
+    <None Include="Include\res\icons\app_root_icon_xpm.xpm" />
+    <None Include="Include\res\icons\ATI_ico_xpm.xpm" />
+    <None Include="Include\res\icons\ATI_ico_xpm32.xpm" />
+    <None Include="Include\res\icons\back_icon.xpm" />
+    <None Include="Include\res\icons\back_icon_disabled.xpm" />
+    <None Include="Include\res\icons\blue1_icon.xpm" />
+    <None Include="Include\res\icons\blue2_icon.xpm" />
+    <None Include="Include\res\icons\blue3_icon.xpm" />
+    <None Include="Include\res\icons\blue4_icon.xpm" />
+    <None Include="Include\res\icons\breakpoints_command_xpm.xpm" />
+    <None Include="Include\res\icons\break_command_xpm.xpm" />
+    <None Include="Include\res\icons\buildProgram_command_xpm.xpm" />
+    <None Include="Include\res\icons\cglAPICall_ico_xpm.xpm" />
+    <None Include="Include\res\icons\clearStatistics_command_disabled_xpm.xpm" />
+    <None Include="Include\res\icons\clearStatistics_command_xpm.xpm" />
+    <None Include="Include\res\icons\cl_copy_command_xpm.xpm" />
+    <None Include="Include\res\icons\cl_kernel_execution_command_xpm.xpm" />
+    <None Include="Include\res\icons\cl_read_command_xpm.xpm" />
+    <None Include="Include\res\icons\cl_write_command_xpm.xpm" />
+    <None Include="Include\res\icons\commandQueuesViewer_command_xpm.xpm" />
+    <None Include="Include\res\icons\command_queue_icon_xpm.xpm" />
+    <None Include="Include\res\icons\compileShader_command_xpm.xpm" />
+    <None Include="Include\res\icons\compute_context_deleted_icon_xpm.xpm" />
+    <None Include="Include\res\icons\compute_context_icon_xpm.xpm" />
+    <None Include="Include\res\icons\debug_execution_mode.xpm" />
+    <None Include="Include\res\icons\debug_execution_mode_inactive.xpm" />
+    <None Include="Include\res\icons\DefaultFontTexture.png" />
+    <None Include="Include\res\icons\detailed_batch_data_command_disabled_xpm.xpm" />
+    <None Include="Include\res\icons\detailed_batch_data_command_xpm.xpm" />
+    <None Include="Include\res\icons\device_icon_xpm.xpm" />
+    <None Include="Include\res\icons\display_list_icon_xpm.xpm" />
+    <None Include="Include\res\icons\emptyIcon_xpm.xpm" />
+    <None Include="Include\res\icons\environment_variables_open.xpm" />
+    <None Include="Include\res\icons\eventsView_breakOnDeprecated_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_breakOnDetectedError_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_breakOnMemoryLeak_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_breakOnOpenCLError_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_breakOnOpenGLError_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_breakOnRedundant_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_breakOnSoftwareFallback_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_breakpoint_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_break_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_clProgramBuild_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_clProgramCreated_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_clProgramDeleted_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_computeContextCreated_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_computeContextDeleted_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_connectionEnded_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_connectionEstablished_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_debugOutput_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_detectedError_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_drawStep_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_exception_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_foreignBreak_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_frameStep_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_moduleLoaded_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_moduleUnloaded_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_OpenCLError_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_outputString_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_processCreated_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_processRunStarted_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_processTerminated_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_queueCreated_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_queueDeleted_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_renderContextCreated_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_renderContextDeleted_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_step_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_threadCreated_xpm.xpm" />
+    <None Include="Include\res\icons\eventsView_threadTerminated_xpm.xpm" />
+    <None Include="Include\res\icons\ExtensionAPICall_ico_xpm.xpm" />
+    <None Include="Include\res\icons\fbo_icon_xpm.xpm" />
+    <None Include="Include\res\icons\file_read_only.xpm" />
+    <None Include="Include\res\icons\find_command_xpm.xpm" />
+    <None Include="Include\res\icons\forward_icon.xpm" />
+    <None Include="Include\res\icons\forward_icon_disabled.xpm" />
+    <None Include="Include\res\icons\FullRecorderToolbar.bmp" />
+    <None Include="Include\res\icons\gdb16_ico_xpm.xpm" />
+    <None Include="Include\res\icons\glxAPICall_ico_xpm.xpm" />
+    <None Include="Include\res\icons\green1_icon.xpm" />
+    <None Include="Include\res\icons\green2_icon.xpm" />
+    <None Include="Include\res\icons\green3_icon.xpm" />
+    <None Include="Include\res\icons\green4_icon.xpm" />
+    <None Include="Include\res\icons\GRSourceCodeIcon.png" />
+    <None Include="Include\res\icons\hide_controlPanel.xpm" />
+    <None Include="Include\res\icons\InformationIcon.png" />
+    <None Include="Include\res\icons\InformationIconSmall.png" />
+    <None Include="Include\res\icons\information_icon.xpm" />
+    <None Include="Include\res\icons\iPhone_gpu_small_ico_xpm.xpm" />
+    <None Include="Include\res\icons\iPhone_os_small_ico_xpm.xpm" />
+    <None Include="Include\res\icons\iPhone_small_ico_alt_xpm.xpm" />
+    <None Include="Include\res\icons\iPhone_small_ico_xpm.xpm" />
+    <None Include="Include\res\icons\LightBulbIconSmall.png" />
+    <None Include="Include\res\icons\linux_ico.ico" />
+    <None Include="Include\res\icons\linux_ico_xpm.xpm" />
+    <None Include="Include\res\icons\locals_command_xpm.xpm" />
+    <None Include="Include\res\icons\mac_ico_xpm.xpm" />
+    <None Include="Include\res\icons\memoryAnalysisViewer_command_xpm.xpm" />
+    <None Include="Include\res\icons\monitored_objects_tree_command_xpm.xpm" />
+    <None Include="Include\res\icons\multiwatch_command_xpm.xpm" />
+    <None Include="Include\res\icons\MyComputer_ico_xpm.xpm" />
+    <None Include="Include\res\icons\new_ico_xpm.xpm" />
+    <None Include="Include\res\icons\nextDifference_command_xpm.xpm" />
+    <None Include="Include\res\icons\NextFunctionCall_ico_xpm.xpm" />
+    <None Include="Include\res\icons\nextMarker_command_disabled_xpm.xpm" />
+    <None Include="Include\res\icons\nextMarker_command_xpm.xpm" />
+    <None Include="Include\res\icons\nullFragmentShaders_command_xpm.xpm" />
+    <None Include="Include\res\icons\nullGeometryShaders_command_xpm.xpm" />
+    <None Include="Include\res\icons\nullLights_command_xpm.xpm" />
+    <None Include="Include\res\icons\nullOpenGLDriver_command_xpm.xpm" />
+    <None Include="Include\res\icons\nullPortView_command_xpm.xpm" />
+    <None Include="Include\res\icons\nullTextures_command_xpm.xpm" />
+    <None Include="Include\res\icons\openBuildLogFile_command_xpm.xpm" />
+    <None Include="Include\res\icons\openCallsLog_command_disabled_xpm.xpm" />
+    <None Include="Include\res\icons\openCallsLog_command_xpm.xpm" />
+    <None Include="Include\res\icons\OpenCLCall_ico_xpm.xpm" />
+    <None Include="Include\res\icons\opencl_buffer_icon_xpm.xpm" />
+    <None Include="Include\res\icons\OpenCL_ico_alt_xpm.xpm" />
+    <None Include="Include\res\icons\OpenCL_ico_xpm.xpm" />
+    <None Include="Include\res\icons\opencl_kernel_icon_xpm.xpm" />
+    <None Include="Include\res\icons\opencl_program_icon_xpm.xpm" />
+    <None Include="Include\res\icons\opencl_sampler_icon_xpm.xpm" />
+    <None Include="Include\res\icons\OpenGLCall_ico_xpm.xpm" />
+    <None Include="Include\res\icons\OpenGL_and_OpenCL_ico_alt_xpm.xpm" />
+    <None Include="Include\res\icons\OpenGL_and_OpenCL_ico_xpm.xpm" />
+    <None Include="Include\res\icons\opengl_driver_ico_xpm.xpm" />
+    <None Include="Include\res\icons\OpenGL_ES_ico_alt_xpm.xpm" />
+    <None Include="Include\res\icons\OpenGL_ES_ico_xpm.xpm" />
+    <None Include="Include\res\icons\OpenGL_ico_alt_xpm.xpm" />
+    <None Include="Include\res\icons\OpenGL_ico_xpm.xpm" />
+    <None Include="Include\res\icons\opengl_program_deleted_icon_xpm.xpm" />
+    <None Include="Include\res\icons\opengl_program_icon_xpm.xpm" />
+    <None Include="Include\res\icons\opengl_shader_deleted_icon_xpm.xpm" />
+    <None Include="Include\res\icons\pbuffer_icon_xpm.xpm" />
+    <None Include="Include\res\icons\previousDifference_command_xpm.xpm" />
+    <None Include="Include\res\icons\previousMarker_command_disabled_xpm.xpm" />
+    <None Include="Include\res\icons\previousMarker_command_xpm.xpm" />
+    <None Include="Include\res\icons\profile_execution_mode.xpm" />
+    <None Include="Include\res\icons\profile_execution_mode_inactive.xpm" />
+    <None Include="Include\res\icons\properties_command_xpm.xpm" />
+    <None Include="Include\res\icons\raster_fill_command_xpm.xpm" />
+    <None Include="Include\res\icons\raster_points_command_xpm.xpm" />
+    <None Include="Include\res\icons\raster_wireframe_command_xpm.xpm" />
+    <None Include="Include\res\icons\record_command_disabled_xpm.xpm" />
+    <None Include="Include\res\icons\record_command_xpm.xpm" />
+    <None Include="Include\res\icons\red1_icon.xpm" />
+    <None Include="Include\res\icons\red2_icon.xpm" />
+    <None Include="Include\res\icons\red3_icon.xpm" />
+    <None Include="Include\res\icons\red4_icon.xpm" />
+    <None Include="Include\res\icons\render_buffer_icon_xpm.xpm" />
+    <None Include="Include\res\icons\render_buffer_shortcut_icon_xpm.xpm" />
+    <None Include="Include\res\icons\render_context_deleted_icon_xpm.xpm" />
+    <None Include="Include\res\icons\render_context_deleted_shared_icon_xpm.xpm" />
+    <None Include="Include\res\icons\render_context_icon_xpm.xpm" />
+    <None Include="Include\res\icons\render_context_info_command_xpm.xpm" />
+    <None Include="Include\res\icons\render_context_shared_icon_xpm.xpm" />
+    <None Include="Include\res\icons\run_command_xpm.xpm" />
+    <None Include="Include\res\icons\saveDimmed_command_xpm.xpm" />
+    <None Include="Include\res\icons\saveProfilingData_command_xpm.xpm" />
+    <None Include="Include\res\icons\save_command_xpm.xpm" />
+    <None Include="Include\res\icons\shadersSourceCodeViewer_command_xpm.xpm" />
+    <None Include="Include\res\icons\ShadingProgramIcon.png" />
+    <None Include="Include\res\icons\showOnlyDifferences_command_xpm.xpm" />
+    <None Include="Include\res\icons\show_controlPanel.xpm" />
+    <None Include="Include\res\icons\sourcecodeViewer_command_xpm.xpm" />
+    <None Include="Include\res\icons\stateVariablesCompareViewer_command_xpm.xpm" />
+    <None Include="Include\res\icons\static_buffer_icon_xpm.xpm" />
+    <None Include="Include\res\icons\static_buffer_shortcut_icon_xpm.xpm" />
+    <None Include="Include\res\icons\statisticsViewer_command_xpm.xpm" />
+    <None Include="Include\res\icons\stepFrame_command_xpm.xpm" />
+    <None Include="Include\res\icons\stepNextDraw_command_xpm.xpm" />
+    <None Include="Include\res\icons\step_command_xpm.xpm" />
+    <None Include="Include\res\icons\stop_command_xpm.xpm" />
+    <None Include="Include\res\icons\stringMarkerFunction_ico_xpm.xpm" />
+    <None Include="Include\res\icons\sync_icon_xpm.xpm" />
+    <None Include="Include\res\icons\texturesViewer_command_xpm.xpm" />
+    <None Include="Include\res\icons\texture_icon_cl_xpm.xpm" />
+    <None Include="Include\res\icons\texture_icon_xpm.xpm" />
+    <None Include="Include\res\icons\texture_shortcut_icon_xpm.xpm" />
+    <None Include="Include\res\icons\texture_viewer_alpha_icon.xpm" />
+    <None Include="Include\res\icons\texture_viewer_bestfit_icon.xpm" />
+    <None Include="Include\res\icons\texture_viewer_blue_icon.xpm" />
+    <None Include="Include\res\icons\texture_viewer_grayscale_icon.xpm" />
+    <None Include="Include\res\icons\texture_viewer_green_icon.xpm" />
+    <None Include="Include\res\icons\texture_viewer_invert_icon.xpm" />
+    <None Include="Include\res\icons\texture_viewer_left_rotate_icon.xpm" />
+    <None Include="Include\res\icons\texture_viewer_mouse_icon.xpm" />
+    <None Include="Include\res\icons\texture_viewer_originalsize_icon.xpm" />
+    <None Include="Include\res\icons\texture_viewer_pan_icon.xpm" />
+    <None Include="Include\res\icons\texture_viewer_red_icon.xpm" />
+    <None Include="Include\res\icons\texture_viewer_right_rotate_icon.xpm" />
+    <None Include="Include\res\icons\texture_viewer_texture_icon_1d.xpm" />
+    <None Include="Include\res\icons\texture_viewer_texture_icon_1d_array.xpm" />
+    <None Include="Include\res\icons\texture_viewer_texture_icon_2d.xpm" />
+    <None Include="Include\res\icons\texture_viewer_texture_icon_2d_array.xpm" />
+    <None Include="Include\res\icons\texture_viewer_texture_icon_2d_cl.xpm" />
+    <None Include="Include\res\icons\texture_viewer_texture_icon_3d.xpm" />
+    <None Include="Include\res\icons\texture_viewer_texture_icon_3d_cl.xpm" />
+    <None Include="Include\res\icons\texture_viewer_texture_icon_cubemap.xpm" />
+    <None Include="Include\res\icons\texture_viewer_texture_icon_rectangle.xpm" />
+    <None Include="Include\res\icons\texture_viewer_texture_icon_unknown.xpm" />
+    <None Include="Include\res\icons\texture_viewer_zoomin_icon.xpm" />
+    <None Include="Include\res\icons\texture_viewer_zoomout_icon.xpm" />
+    <None Include="Include\res\icons\tex_buffer_icon_xpm.xpm" />
+    <None Include="Include\res\icons\tex_multisample_array_icon_xpm.xpm" />
+    <None Include="Include\res\icons\tex_multisample_icon_xpm.xpm" />
+    <None Include="Include\res\icons\validateProgram_command_xpm.xpm" />
+    <None Include="Include\res\icons\vbo_icon_xpm.xpm" />
+    <None Include="Include\res\icons\WarningIconOrange.png" />
+    <None Include="Include\res\icons\WarningIconOrangeSmall.png" />
+    <None Include="Include\res\icons\WarningIconRed.png" />
+    <None Include="Include\res\icons\WarningIconRedSmall.png" />
+    <None Include="Include\res\icons\WarningIconYellow.png" />
+    <None Include="Include\res\icons\WarningIconYellowSmall.png" />
+    <None Include="Include\res\icons\warning_icon_orange.xpm" />
+    <None Include="Include\res\icons\warning_icon_red.xpm" />
+    <None Include="Include\res\icons\warning_icon_yellow.xpm" />
+    <None Include="Include\res\icons\watch_command_xpm.xpm" />
+    <None Include="Include\res\icons\Win32.ico" />
+    <None Include="Include\res\icons\Win32APICall_ico_xpm.xpm" />
+    <None Include="Include\res\icons\windows_additional_ico_xpm.xpm" />
+    <None Include="Include\res\icons\windows_ico_xpm.xpm" />
+    <None Include="Include\res\icons\wizard_xpm.xpm" />
+    <None Include="Include\res\icons\wlflag.ico" />
+    <None Include="SConscript">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </None>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

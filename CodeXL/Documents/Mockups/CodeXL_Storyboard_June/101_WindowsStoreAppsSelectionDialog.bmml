@@ -1,0 +1,78 @@
+<mockup version="1.0" skin="sketch" measuredW="1005" measuredH="573" mockupW="761" mockupH="548">
+  <controls>
+    <control controlID="0" controlTypeID="com.balsamiq.mockups::TitleWindow" x="537" y="25" w="468" h="548" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bottomheight>0</bottomheight>
+        <text>Select%20Windows%20Store%20app</text>
+      </controlProperties>
+    </control>
+    <control controlID="13" controlTypeID="com.balsamiq.mockups::ButtonBar" x="803" y="496" w="187" h="29" measuredW="115" measuredH="29" zOrder="2" locked="false" isInGroup="-1">
+      <controlProperties>
+        <hrefs>32_MenuFile1%26bm%3B32_MenuFile1.bmml%26bm%3B32_MenuFile1.bmml%26bm%3B32_MenuFile1.bmml%2C</hrefs>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22559%2C471%2C634%2C500%22%20href%3D%2232_MenuFile1.bmml%22%20alt%3D%2232_MenuFile1%22%20id%3D%2213_0%22/%3E%0A</map>
+        <selectedIndex>0</selectedIndex>
+        <text>%26O%26k%2C%20%26C%26ancel</text>
+      </controlProperties>
+    </control>
+    <control controlID="71" controlTypeID="__group__" x="244" y="115" w="269" h="108" measuredW="269" measuredH="108" zOrder="1" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::StickyNote" x="0" y="0" w="269" h="108" measuredW="109" measuredH="123" zOrder="0" locked="false" isInGroup="71">
+          <controlProperties>
+            <text>When%20the%20user%20selects%20an%20application%2C%20the%20text%20field%20below%20changes%20to%20the%20selected%20application%20user%20model%20id</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="77" controlTypeID="com.balsamiq.mockups::FieldSet" x="552" y="64" w="390" h="238" measuredW="200" measuredH="170" zOrder="3" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text/>
+      </controlProperties>
+    </control>
+    <control controlID="82" controlTypeID="__group__" x="563" y="88" w="376" h="101" measuredW="376" measuredH="101" zOrder="4" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::IconLabel" x="4" y="12" w="319" h="-1" measuredW="84" measuredH="24" zOrder="1" locked="false" isInGroup="82">
+          <controlProperties>
+            <borderStyle>square</borderStyle>
+            <color>0</color>
+            <icon>HeartIcon%7Csmall</icon>
+            <labelPosition>right</labelPosition>
+            <state>up</state>
+            <text>Tweetro</text>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::IconLabel" x="4" y="44" w="319" h="-1" measuredW="176" measuredH="24" zOrder="2" locked="false" isInGroup="82">
+          <controlProperties>
+            <borderStyle>square</borderStyle>
+            <icon>FlickrIcon%7Csmall</icon>
+            <labelPosition>right</labelPosition>
+            <text>China%20Face%20for%20Windows8</text>
+          </controlProperties>
+        </control>
+        <control controlID="2" controlTypeID="com.balsamiq.mockups::IconLabel" x="4" y="77" w="319" h="-1" measuredW="59" measuredH="24" zOrder="3" locked="false" isInGroup="82">
+          <controlProperties>
+            <borderStyle>square</borderStyle>
+            <icon>ThumbsUpIcon%7Csmall</icon>
+            <labelPosition>right</labelPosition>
+            <text>Rowi</text>
+          </controlProperties>
+        </control>
+        <control controlID="3" controlTypeID="com.balsamiq.mockups::FieldSet" x="0" y="0" w="376" h="40" measuredW="200" measuredH="170" zOrder="0" locked="false" isInGroup="82">
+          <controlProperties>
+            <color>10470904</color>
+            <text/>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="84" controlTypeID="com.balsamiq.mockups::TextInput" x="643" y="310" w="299" h="-1" measuredW="91" measuredH="27" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Tweetro%21App</text>
+      </controlProperties>
+    </control>
+    <control controlID="85" controlTypeID="com.balsamiq.mockups::Label" x="552" y="313" w="-1" h="-1" measuredW="91" measuredH="21" zOrder="6" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>User%20Model%20ID%3A</text>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

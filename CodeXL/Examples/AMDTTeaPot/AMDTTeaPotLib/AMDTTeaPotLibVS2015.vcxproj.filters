@@ -1,0 +1,181 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="res">
+      <UniqueIdentifier>{754c1993-608e-44f8-a272-ee84bf9eb5ff}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\CL\cl_icd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\AMDTFluidGrid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\AMDTImage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\AMDTOpenCLHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\AMDTOpenGLHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\AMDTOpenGLMath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\AMDTTeapotConstants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\AMDTTeapotOCLSmokeSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\AMDTTeapotOGLCanvas.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\AMDTTeapotRenderState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\AMDTTimer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="res\AMDTTeapotSmokeSimulation.h">
+      <Filter>res</Filter>
+    </ClInclude>
+    <ClInclude Include="res\AMDTTeapotSmokeSimulationClamp.h">
+      <Filter>res</Filter>
+    </ClInclude>
+    <ClInclude Include="res\AMDTTeapotSmokeSimulationGen.h">
+      <Filter>res</Filter>
+    </ClInclude>
+    <ClInclude Include="res\AMDTTeapotSmokeSimulationIndex.h">
+      <Filter>res</Filter>
+    </ClInclude>
+    <ClInclude Include="res\AMDTTeapotSmokeSimulationScalarField.h">
+      <Filter>res</Filter>
+    </ClInclude>
+    <ClInclude Include="res\AMDTTeapotSmokeSimulationVec.h">
+      <Filter>res</Filter>
+    </ClInclude>
+    <ClInclude Include="res\AMDTTeapotSmokeSimulationVecField.h">
+      <Filter>res</Filter>
+    </ClInclude>
+    <ClInclude Include="res\AMDTTeapotSmokeSimulationVecLength.h">
+      <Filter>res</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\AMDTTeapotRenderState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AMDTFluidGrid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AMDTImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AMDTOpenCLHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AMDTOpenGLHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AMDTOpenGLMath.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AMDTTeapotOCLSmokeSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AMDTTeapotOGLCanvas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\tpAdvectFieldScalar.cl">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\tpAdvectFieldVelocity.cl">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\tpApplyBuoyancy.cl">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\tpApplyPressureBoundaryCondition.cl">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\tpApplySources.cl">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\tpApplyVelocityBoundaryCondition.cl">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\tpApplyVorticity.cl">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\tpCalculateCurlU.cl">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\tpComputeFieldPressureIter.cl">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\tpComputeFieldPressurePrep.cl">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\tpCreateDensityTexture.cl">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\tpDebugDensity.cl">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\tpDebugFieldPressure.cl">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\tpDebugTemperature.cl">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\tpDebugVelocityLength.cl">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\tpDebugVelocityVector.cl">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\tpDissipateDensity.cl">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\tpDissipateTemperature.cl">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\tpFragmentShader.catchMeIfYouCan.glsl">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\tpFragmentShader.glsl">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\tpLogo-white.bmp">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\tpProjectFieldVelocity.cl">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\tpSmokeSimulation.cl">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\tpVertexShader.glsl">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\tpVolumeSlicing.cl">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\AMDT-CodeXLLogo.png">
+      <Filter>res</Filter>
+    </None>
+  </ItemGroup>
+</Project>

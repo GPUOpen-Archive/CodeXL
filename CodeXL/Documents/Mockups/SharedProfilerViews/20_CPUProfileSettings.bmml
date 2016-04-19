@@ -1,0 +1,166 @@
+<mockup version="1.0" skin="sketch" measuredW="664" measuredH="540" mockupW="532" mockupH="508">
+  <controls>
+    <control controlID="3" controlTypeID="__group__" x="246" y="197" w="359" h="78" measuredW="359" measuredH="78" zOrder="2" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::FieldSet" x="0" y="0" w="359" h="78" measuredW="200" measuredH="170" zOrder="0" locked="false" isInGroup="3">
+          <controlProperties>
+            <text>Profile%20Start%20Options</text>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::Label" x="10" y="22" w="-1" h="-1" measuredW="60" measuredH="21" zOrder="1" locked="false" isInGroup="3">
+          <controlProperties>
+            <text>Delay%20%28S%29</text>
+          </controlProperties>
+        </control>
+        <control controlID="2" controlTypeID="com.balsamiq.mockups::TextInput" x="79" y="22" w="38" h="-1" measuredW="22" measuredH="27" zOrder="2" locked="false" isInGroup="3">
+          <controlProperties>
+            <text>0</text>
+          </controlProperties>
+        </control>
+        <control controlID="3" controlTypeID="com.balsamiq.mockups::CheckBox" x="13" y="50" w="-1" h="-1" measuredW="114" measuredH="22" zOrder="3" locked="false" isInGroup="3">
+          <controlProperties>
+            <text>Profiling%20paused</text>
+          </controlProperties>
+        </control>
+        <control controlID="4" controlTypeID="com.balsamiq.mockups::Label" x="149" y="18" w="107" h="21" measuredW="105" measuredH="21" zOrder="4" locked="false" isInGroup="3">
+          <controlProperties>
+            <text>CPU%20Affinity%20Mask</text>
+          </controlProperties>
+        </control>
+        <control controlID="5" controlTypeID="com.balsamiq.mockups::TextInput" x="256" y="18" w="46" h="-1" measuredW="43" measuredH="27" zOrder="5" locked="false" isInGroup="3">
+          <controlProperties>
+            <text>0x3F</text>
+          </controlProperties>
+        </control>
+        <control controlID="6" controlTypeID="com.balsamiq.mockups::Button" x="302" y="20" w="-1" h="-1" measuredW="33" measuredH="27" zOrder="6" locked="false" isInGroup="3">
+          <controlProperties>
+            <text>...</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="4" controlTypeID="__group__" x="246" y="275" w="359" h="71" measuredW="359" measuredH="71" zOrder="3" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::FieldSet" x="0" y="0" w="359" h="71" measuredW="200" measuredH="170" zOrder="0" locked="false" isInGroup="4">
+          <controlProperties>
+            <backgroundAlpha>1</backgroundAlpha>
+            <text>Profile%20Duration</text>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::CheckBox" x="10" y="21" w="-1" h="-1" measuredW="147" measuredH="22" zOrder="1" locked="false" isInGroup="4">
+          <controlProperties>
+            <state>selected</state>
+            <text>Profile%20entire%20duration</text>
+          </controlProperties>
+        </control>
+        <control controlID="2" controlTypeID="com.balsamiq.mockups::Label" x="231" y="18" w="77" h="21" measuredW="73" measuredH="21" zOrder="2" locked="false" isInGroup="4">
+          <controlProperties>
+            <text>-Duration%20%28S%29-</text>
+          </controlProperties>
+        </control>
+        <control controlID="3" controlTypeID="com.balsamiq.mockups::TextInput" x="304" y="18" w="40" h="-1" measuredW="22" measuredH="27" zOrder="3" locked="false" isInGroup="4">
+          <controlProperties>
+            <text>-0-</text>
+          </controlProperties>
+        </control>
+        <control controlID="4" controlTypeID="com.balsamiq.mockups::CheckBox" x="155" y="46" w="-1" h="-1" measuredW="201" measuredH="22" zOrder="4" locked="false" isInGroup="4">
+          <controlProperties>
+            <text>-Then%2C%20terminate%20the%20application-</text>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="5" controlTypeID="__group__" x="246" y="346" w="359" h="78" measuredW="359" measuredH="78" zOrder="4" locked="false" isInGroup="-1">
+      <groupChildrenDescriptors>
+        <control controlID="0" controlTypeID="com.balsamiq.mockups::FieldSet" x="0" y="0" w="359" h="78" measuredW="200" measuredH="170" zOrder="0" locked="false" isInGroup="5">
+          <controlProperties>
+            <text>Call%20Stack%20Collection%20%20%20%20</text>
+          </controlProperties>
+        </control>
+        <control controlID="1" controlTypeID="com.balsamiq.mockups::NumericStepper" x="92" y="24" w="-1" h="-1" measuredW="47" measuredH="24" zOrder="1" locked="false" isInGroup="5">
+          <controlProperties>
+            <text>10</text>
+          </controlProperties>
+        </control>
+        <control controlID="2" controlTypeID="com.balsamiq.mockups::Label" x="9" y="24" w="-1" h="-1" measuredW="83" measuredH="21" zOrder="2" locked="false" isInGroup="5">
+          <controlProperties>
+            <text>Unwind%20Depth</text>
+          </controlProperties>
+        </control>
+        <control controlID="3" controlTypeID="com.balsamiq.mockups::NumericStepper" x="191" y="48" w="-1" h="-1" measuredW="39" measuredH="24" zOrder="3" locked="false" isInGroup="5">
+          <controlProperties>
+            <text>1</text>
+          </controlProperties>
+        </control>
+        <control controlID="4" controlTypeID="com.balsamiq.mockups::Label" x="10" y="48" w="-1" h="-1" measuredW="178" measuredH="21" zOrder="4" locked="false" isInGroup="5">
+          <controlProperties>
+            <text>Call%20Stack%20collection%20frequency</text>
+          </controlProperties>
+        </control>
+        <control controlID="5" controlTypeID="com.balsamiq.mockups::CheckBox" x="135" y="0" w="26" h="21" measuredW="26" measuredH="5" zOrder="5" locked="false" isInGroup="5">
+          <controlProperties>
+            <state>selected</state>
+            <text/>
+          </controlProperties>
+        </control>
+      </groupChildrenDescriptors>
+    </control>
+    <control controlID="7" controlTypeID="com.balsamiq.mockups::Label" x="246" y="104" w="-1" h="-1" measuredW="80" measuredH="21" zOrder="5" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Profile%20Name</text>
+      </controlProperties>
+    </control>
+    <control controlID="8" controlTypeID="com.balsamiq.mockups::TextInput" x="354" y="100" w="251" h="-1" measuredW="57" measuredH="27" zOrder="6" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Session</text>
+      </controlProperties>
+    </control>
+    <control controlID="9" controlTypeID="com.balsamiq.mockups::Label" x="246" y="128" w="-1" h="-1" measuredW="76" measuredH="21" zOrder="7" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Profile%20Type</text>
+      </controlProperties>
+    </control>
+    <control controlID="10" controlTypeID="com.balsamiq.mockups::ComboBox" x="353" y="130" w="252" h="-1" measuredW="192" measuredH="23" zOrder="8" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>CPU%3A%20Timer-based%20sampling</text>
+      </controlProperties>
+    </control>
+    <control controlID="11" controlTypeID="com.balsamiq.mockups::Label" x="138" y="64" w="-1" h="-1" measuredW="91" measuredH="21" zOrder="9" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>Project%20Name%3A</text>
+      </controlProperties>
+    </control>
+    <control controlID="12" controlTypeID="com.balsamiq.mockups::TextInput" x="246" y="60" w="329" h="-1" measuredW="80" measuredH="27" zOrder="10" locked="false" isInGroup="-1">
+      <controlProperties>
+        <state>disabled</state>
+        <text>ExampleCL</text>
+      </controlProperties>
+    </control>
+    <control controlID="13" controlTypeID="com.balsamiq.mockups::TitleWindow" x="132" y="32" w="532" h="508" measuredW="450" measuredH="400" zOrder="0" locked="false" isInGroup="-1">
+      <controlProperties>
+        <bottomheight>0</bottomheight>
+        <text>Project%20Settings</text>
+      </controlProperties>
+    </control>
+    <control controlID="14" controlTypeID="com.balsamiq.mockups::VerticalTabBar" x="138" y="95" w="520" h="403" measuredW="200" measuredH="220" zOrder="1" locked="false" isInGroup="-1">
+      <controlProperties>
+        <hrefs>%2C%2C25_GPUProfileSettings%26bm%3B25_GPUProfileSettings.bmml%26bm%3B25_GPUProfileSettings.bmml%26bm%3B25_GPUProfileSettings.bmml%2C30_OpenCLTraceSettings%26bm%3B30_OpenCLTraceSettings.bmml%26bm%3B30_OpenCLTraceSettings.bmml%26bm%3B30_OpenCLTraceSettings.bmml%2C%2C</hrefs>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%226%2C141%2C108%2C170%22%20href%3D%2225_GPUProfileSettings.bmml%22%20alt%3D%2225_GPUProfileSettings%22%20id%3D%2214_0%22/%3E%0A%3Carea%20shape%3D%22rect%22%20coords%3D%226%2C170%2C108%2C199%22%20href%3D%2230_OpenCLTraceSettings.bmml%22%20alt%3D%2230_OpenCLTraceSettings%22%20id%3D%2214_1%22/%3E%0A</map>
+        <selectedIndex>1</selectedIndex>
+        <text>General%0ACPU%20Profile%20%0AGPU%20Profile%20%0AOpenCL%20Trace%20%0ADebug%0A%28Extend%29</text>
+      </controlProperties>
+    </control>
+    <control controlID="15" controlTypeID="com.balsamiq.mockups::ButtonBar" x="534" y="505" w="-1" h="-1" measuredW="115" measuredH="29" zOrder="11" locked="false" isInGroup="-1">
+      <controlProperties>
+        <hrefs>82_DefaultLayoutProfileSessionStopped%26bm%3B82_DefaultLayoutProfileSessionStopped.bmml%26bm%3B82_DefaultLayoutProfileSessionStopped.bmml%26bm%3B82_DefaultLayoutProfileSessionStopped.bmml%2C</hrefs>
+        <map>%3Carea%20shape%3D%22rect%22%20coords%3D%22402%2C473%2C448%2C502%22%20href%3D%2282_DefaultLayoutProfileSessionStopped.bmml%22%20alt%3D%2282_DefaultLayoutProfileSessionStopped%22%20id%3D%2215_0%22/%3E%0A</map>
+        <text>%26O%26k%2C%20%26C%26ancel</text>
+      </controlProperties>
+    </control>
+    <control controlID="16" controlTypeID="com.balsamiq.mockups::CheckBox" x="247" y="160" w="-1" h="-1" measuredW="140" measuredH="22" zOrder="12" locked="false" isInGroup="-1">
+      <controlProperties>
+        <text>System-wide%20profile</text>
+      </controlProperties>
+    </control>
+  </controls>
+</mockup>

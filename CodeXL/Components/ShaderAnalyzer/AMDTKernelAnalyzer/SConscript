@@ -1,0 +1,138 @@
+# -*- Python -*-
+
+Import('*')
+from CXL_init import *
+
+libName = "CXLAnalyzer"
+
+env = CXL_env.Clone()
+
+initBoost(env)
+UseBoost(env)
+UseTinyXml(env)
+UseQt4(env)
+UseQScintilla(env)
+
+env.Append( CPPPATH = [ 
+	".",
+    	"../",
+	"./Include",
+	"./src/",
+	env['CXL_commonproj_dir'],
+        env['CXL_common_dir'] + '/../CodeXL',
+	env['CXL_common_dir'] + '/../CodeXL/Components/ShaderAnalyzer',
+	env['CXL_common_dir'] + '/Src/CElf/Include',
+	env['CXL_common_dir'] + '/Lib/AMD/CAL/8.95/include',
+	env['CXL_common_dir'] + '/Lib/Ext/glew/1.9.0/include',
+	env['CXL_common_dir'] + '/Src/ADLUtil',
+	env['CXL_common_dir'] + '/Src/AMDTMutex',
+	env['CXL_common_dir'] + '/Lib/AMD/ADL/include',
+	env['CXL_common_dir'] + '/Src/TSingleton',
+	env['CXL_common_dir'] + '/Src/DeviceInfo',
+	env['CXL_common_dir'] + '/Lib/AMD/sp3/Include/Public',
+	env['CXL_common_dir'] + '/Src/DynamicLibraryModule',
+	env['CXL_common_dir'] + '/Lib/AMD/APPSDK/3-0/include',
+	env['CXL_common_dir'] + '/Lib/AMD/ACL/TOT/include',
+])
+
+moc_files = Split(
+                " src/kaAddFileDialog.h"
+                + " src/kaAnalyzeSettingsPage.h"
+                + " src/kaAnalysisView.h"
+                + " src/kaApplicationTreeHandler.h"
+                + " src/kaBackendManager.h"
+                + " src/kaBuildToolbar.h"
+                + " src/kaKernelView.h"
+                + " src/kaMultiSourceView.h"
+                + " src/kaOverviewView.h"
+                + " src/kaProjectSettingsExtension.h"
+                + " src/kaProjectDataManager.h"
+                + " src/kaProjectSettingsExtensionBase.h"
+                + " src/kaProjectSettingsExtensionOther.h"
+                + " src/kaProjectSettingsShaderExtension.h"
+                + " src/kaSourceCodeView.h"
+                + " src/kaStatisticsView.h"
+                + " src/kaTableView.h"
+                + " src/kaTreeDataExtension.h"
+                + " src/kaTreeModel.h"
+                + " src/kaExportBinariesDialog.h"
+                + " src/kaSourceCodeTableView.h"
+                + " src/kaCreateProgramDialog.h"
+                )
+
+sources = \
+[
+	"src/kaAddFileDialog.cpp",
+	"src/kaAnalyzeSettingsPage.cpp",
+	"src/kaAnalysisView.cpp",
+	"src/kaApplicationCommands.cpp",
+	"src/kaApplicationTreeHandler.cpp",
+	"src/kaAppWrapper.cpp",
+	"src/kaBackendManager.cpp",
+	"src/kaBuildToolbar.cpp",
+	"src/kaDataAnalyzerFunctions.cpp",
+	"src/kaEventObserver.cpp",
+	"src/kaExecutionMode.cpp",
+	"src/kaExportBinariesDialog.cpp",
+	"src/kaGlobalVariableManager.cpp",
+	"src/kaKernelView.cpp",
+	"src/kaMDIViewCreator.cpp",
+	"src/kaMenuActionsExecutor.cpp",
+	"src/kaMultiSourceView.cpp",
+	"src/kaMultiSourceActionCreator.cpp",
+	"src/kaOverviewView.cpp",
+	"src/kaProjectDataManager.cpp",
+	"src/kaProjectSettingsExtension.cpp",
+	"src/kaProjectSettingsExtensionBase.cpp",
+	"src/kaProjectSettingsExtensionOther.cpp",
+	"src/kaProjectSettingsShaderExtension.cpp",
+	"src/kaSingletonsDelete.cpp",
+	"src/kaSourceCodeView.cpp",
+	"src/kaStatisticsView.cpp",
+	"src/kaTableView.cpp",
+	"src/kaTreeDataExtension.cpp",
+	"src/kaTreeModel.cpp",
+	"src/kaSourceCodeTableView.cpp",
+	"src/kaCliLauncher.cpp",
+    "src/kaCreateProgramDialog.cpp",
+	"src/kaFileManager.cpp",
+	"src/kaProgram.cpp",
+	"src/kaUtils.cpp",
+]
+
+commonLinkedLibraries = \
+[
+	"CXLBaseTools",
+	"CXLOSWrappers",
+	"CXLOSAPIWrappers",
+	"CXLAPIClasses",
+	"CXLAnalysisBackend",
+	"CXLApplicationFramework",
+	"libboost_regex",
+	"libboost_filesystem",
+    "libpthread"
+]
+
+# Building moc content
+MOC_Generated = []
+for moc_file in moc_files:
+    MOC_Generated += env.MocBld(moc_file)
+
+# Contains all linked libraries:
+linkedLibraries = commonLinkedLibraries
+env.Prepend (LIBS = linkedLibraries)
+
+# Creating object files	
+objFiles = env.SharedObject(sources + MOC_Generated)
+
+# Creating shared libraries
+soFiles = env.SharedLibrary(
+	target = libName, 
+	source = objFiles)
+
+# Installing libraries
+libInstall = env.Install( 
+	dir = env['CXL_lib_dir'], 
+	source = (soFiles))
+
+Return('libInstall')

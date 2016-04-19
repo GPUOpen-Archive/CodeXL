@@ -1,0 +1,796 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="GeneratedFiles">
+      <UniqueIdentifier>{3843283a-3efb-4d43-9045-3441c54dda56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GeneratedFiles">
+      <UniqueIdentifier>{4ece5ef9-cd49-4659-8e2f-f0138f196907}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI Files">
+      <UniqueIdentifier>{f224c400-e86f-4c71-b119-bca5b73fa572}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common Source">
+      <UniqueIdentifier>{5d5eb0de-6159-455c-8b17-8f1411d64ea7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Backend Source">
+      <UniqueIdentifier>{c3e06029-e24d-413a-86a6-48b16074e41f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GeneratedFiles\moc_Win32Debug">
+      <UniqueIdentifier>{532e5c11-3580-4742-9237-f00d86899026}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GeneratedFiles\moc_Win32Release">
+      <UniqueIdentifier>{335bef39-c616-4d51-94aa-01a979a11963}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AMDTGpuProfilerPlugin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CounterGroup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CounterManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Session.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OccupancyInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpViewsCreator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeViewerWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomDataTypes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SessionControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SessionWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\rcc_QtClientMain.cpp">
+      <Filter>GeneratedFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="SessionManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CLAPIFilterManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CLSummarizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EditNameValueDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FindToolBarView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GlobalSettings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="KernelOccupancyWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProfileManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProfileParam.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProfileSettingData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SummaryView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TraceTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TraceView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Project.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ListViewWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CLAPIDefs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HSAAPIDefs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CounterSelectionSettingPage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneralSettingWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GPUProjectHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenCLTraceSettingPage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProjectSettings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CLTimelineItems.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+	<ClCompile Include="DXTimelineItems.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SymbolInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProfileProcessMonitor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="APIColorMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SessionViewTabWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\Src\ADLUtil\ADLUtil.cpp">
+      <Filter>Common Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\Src\DeviceInfo\DeviceInfoUtils.cpp">
+      <Filter>Common Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\Src\DynamicLibraryModule\OpenCLModule.cpp">
+      <Filter>Common Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\Src\DynamicLibraryModule\DynamicLibraryModule.cpp">
+      <Filter>Common Source</Filter>
+    </ClCompile>
+    <ClCompile Include="HSATimelineItems.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Backend\sprofile\AtpFile.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Backend\CLTraceAgent\CLAtpFile.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Backend\Common\FileUtils.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Backend\Common\LocaleSetting.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Backend\Common\OSUtils.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Backend\Common\StringUtils.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="APITimelineItems.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AsyncRemoteGpuProfilingTask.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GpuSessionActionsCreator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Debug\moc_gpViewsCreator.cpp">
+      <Filter>GeneratedFiles\moc_Win32Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Debug\moc_APITimelineItems.cpp">
+      <Filter>GeneratedFiles\moc_Win32Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Debug\moc_CodeViewerWindow.cpp">
+      <Filter>GeneratedFiles\moc_Win32Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Debug\moc_CounterSelectionSettingPage.cpp">
+      <Filter>GeneratedFiles\moc_Win32Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Debug\moc_CustomDataTypes.cpp">
+      <Filter>GeneratedFiles\moc_Win32Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Debug\moc_EditNameValueDialog.cpp">
+      <Filter>GeneratedFiles\moc_Win32Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Debug\moc_GeneralSettingWindow.cpp">
+      <Filter>GeneratedFiles\moc_Win32Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Debug\moc_ListViewWindow.cpp">
+      <Filter>GeneratedFiles\moc_Win32Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Debug\moc_OpenCLTraceSettingPage.cpp">
+      <Filter>GeneratedFiles\moc_Win32Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Debug\moc_ProfileManager.cpp">
+      <Filter>GeneratedFiles\moc_Win32Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Debug\moc_Session.cpp">
+      <Filter>GeneratedFiles\moc_Win32Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Debug\moc_SessionControl.cpp">
+      <Filter>GeneratedFiles\moc_Win32Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Debug\moc_SessionWindow.cpp">
+      <Filter>GeneratedFiles\moc_Win32Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Debug\moc_SummaryView.cpp">
+      <Filter>GeneratedFiles\moc_Win32Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Debug\moc_TraceTable.cpp">
+      <Filter>GeneratedFiles\moc_Win32Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Debug\moc_TraceView.cpp">
+      <Filter>GeneratedFiles\moc_Win32Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Release\moc_gpViewsCreator.cpp">
+      <Filter>GeneratedFiles\moc_Win32Release</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Release\moc_APITimelineItems.cpp">
+      <Filter>GeneratedFiles\moc_Win32Release</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Release\moc_CodeViewerWindow.cpp">
+      <Filter>GeneratedFiles\moc_Win32Release</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Release\moc_CounterSelectionSettingPage.cpp">
+      <Filter>GeneratedFiles\moc_Win32Release</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Release\moc_CustomDataTypes.cpp">
+      <Filter>GeneratedFiles\moc_Win32Release</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Release\moc_EditNameValueDialog.cpp">
+      <Filter>GeneratedFiles\moc_Win32Release</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Release\moc_GeneralSettingWindow.cpp">
+      <Filter>GeneratedFiles\moc_Win32Release</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Release\moc_ListViewWindow.cpp">
+      <Filter>GeneratedFiles\moc_Win32Release</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Release\moc_OpenCLTraceSettingPage.cpp">
+      <Filter>GeneratedFiles\moc_Win32Release</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Release\moc_ProfileManager.cpp">
+      <Filter>GeneratedFiles\moc_Win32Release</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Release\moc_Session.cpp">
+      <Filter>GeneratedFiles\moc_Win32Release</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Release\moc_SessionControl.cpp">
+      <Filter>GeneratedFiles\moc_Win32Release</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Release\moc_SessionWindow.cpp">
+      <Filter>GeneratedFiles\moc_Win32Release</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Release\moc_SummaryView.cpp">
+      <Filter>GeneratedFiles\moc_Win32Release</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Release\moc_TraceTable.cpp">
+      <Filter>GeneratedFiles\moc_Win32Release</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_Win32Release\moc_TraceView.cpp">
+      <Filter>GeneratedFiles\moc_Win32Release</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Backend\CLCommon\CLFunctionDefs.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Backend\CLCommon\CLFunctionEnumDefs.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Backend\CLCommon\CLInternalFunctionDefs.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Backend\CLCommon\CLPlatformInfo.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Backend\CLCommon\CLUtils.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\Src\AMDTMutex\AMDTMutex.cpp">
+      <Filter>Common Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Backend\HSAFdnTrace\HSAAtpFile.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Backend\DX12Trace\DX12FunctionDefs.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Backend\DX12Trace\DX12APIInfo.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Backend\DX12Trace\DX12AtpFile.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Backend\VulkanTrace\VulkanFunctionDefs.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Backend\VulkanTrace\VulkanAPIInfo.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Backend\VulkanTrace\VulkanAtpFile.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Backend\Common\StackTraceAtpFile.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Backend\sprofile\PerfMarkerAtpFile.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Backend\Common\ATPFileUtils.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="gpProjectSettingsExtension.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpMenuActionsExecutor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpBaseSessionView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpTraceView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpTraceSummaryWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpTraceSummaryTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpPerformanceCountersDataView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpSessionView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpSessionUpdaterThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpFrameView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpNavigationRibbon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpDetailedDataRibbon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpCountersSelectionDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpOverview.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpProjectSettingsExtension.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpUIManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpBaseSessionView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpTraceView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpTraceSummaryWidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpTraceSummaryTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpPerformanceCountersDataView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpTraceDataContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpTraceDataParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProfileSessionDataItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpTimeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpTraceModels.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpTraceTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpTraceTree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpTraceDataModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpTimeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpTraceModels.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpTraceTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpTraceTree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpExecutionMode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpTreeHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpFrameView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpUIManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpOverview.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpTraceModels.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Backend\Common\Logger.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Backend\sanalyze\AnalyzerHTMLUtils.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="gpCountersSelectionDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpConnectDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpConnectDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpNavigationRibbon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpProjectSettings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpSessionView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpSessionUpdaterThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpRemoteGraphicsBackendHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Common\Src\DeviceInfo\DeviceInfoInternal.cpp">
+      <Filter>Common Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Backend\HSAFdnCommon\HSAFunctionDefsUtils.cpp">
+      <Filter>Backend Source</Filter>
+    </ClCompile>
+    <ClCompile Include="gpRibbonDataCalculator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpDetailedDataRibbon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AMDTGpuProfilerPlugin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AMDTGpuProfilerDefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CounterGroup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CounterManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OccupancyInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SessionManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_EditNameValue.h">
+      <Filter>GeneratedFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_FindToolBar.h">
+      <Filter>GeneratedFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_ListViewDialog.h">
+      <Filter>GeneratedFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_ProfileSetting.h">
+      <Filter>GeneratedFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_SummaryViewBase.h">
+      <Filter>GeneratedFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="CLAPIDefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HSAAPIDefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CLAPIFilterManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CLSummarizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FindToolBarView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalSettings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KernelOccupancyWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProfileParam.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProfileSettingData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Project.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProjectSettings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CLTimelineItems.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+	<ClInclude Include="DXTimelineItems.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SymbolInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProfileProcessMonitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="APIColorMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SessionViewTabWidget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HSATimelineItems.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AsyncRemoteGpuProfilingTask.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gpStringConstants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GpuSessionActionsCreator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gpMenuActionsExecutor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gpAbstractTraceDataAccessInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gpTraceDataContainer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gpTraceDataParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProfileSessionDataItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gpTraceDataModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gpExecutionMode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gpTreeHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Backend\DX12Trace\DX12APIInfo.h">
+      <Filter>Backend Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Backend\DX12Trace\DX12AtpFile.h">
+      <Filter>Backend Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Backend\DX12Trace\DX12FunctionDefs.h">
+      <Filter>Backend Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Backend\VulkanTrace\VulkanAPIInfo.h">
+      <Filter>Backend Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Backend\VulkanTrace\VulkanAtpFile.h">
+      <Filter>Backend Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Backend\VulkanTrace\VulkanFunctionDefs.h">
+      <Filter>Backend Source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Common\Src\qcustomplot\1.3.1\qcustomplot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gpProjectSettings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gpRemoteGraphicsBackendHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gpRibbonDataCalculator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <CustomBuild Include="gpDetailedDataRibbon.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="QtClientMain.qrc">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="EditNameValue.ui">
+      <Filter>UI Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SummaryViewBase.ui">
+      <Filter>UI Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ProfileSetting.ui">
+      <Filter>UI Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ListViewDialog.ui">
+      <Filter>UI Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="FindToolBar.ui">
+      <Filter>UI Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CodeViewerWindow.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CustomDataTypes.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SessionControl.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SessionWindow.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ProfileManager.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SummaryView.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="EditNameValueDialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ListViewWindow.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="GeneralSettingWindow.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CounterSelectionSettingPage.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="OpenCLTraceSettingPage.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gpViewsCreator.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="TraceView.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="TraceView.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="TraceTable.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Session.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="APITimelineItems.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gpBaseSessionView.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gpTraceView.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gpTraceSummaryWidget.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gpTraceSummaryTable.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gpPerformanceCountersDataView.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gpProjectSettingsExtension.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gpTimeline.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gpTraceModels.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gpTraceTable.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gpTraceTree.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gpFrameView.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gpUIManager.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gpNavigationRibbon.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gpCountersSelectionDialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gpConnectDialog.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gpOverview.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gpSessionView.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gpSessionUpdaterThread.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\..\CommonProjects\VersionInfo\VersionResource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SConscript" />
+  </ItemGroup>
+</Project>

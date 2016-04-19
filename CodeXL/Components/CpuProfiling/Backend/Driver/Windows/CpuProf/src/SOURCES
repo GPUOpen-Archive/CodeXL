@@ -1,0 +1,26 @@
+TARGETNAME=CpuProf
+TARGETTYPE=DRIVER
+TARGETPATH=obj$(BUILD_ALT_DIR)
+
+C_DEFINES=
+
+!IF "$(DDKBUILDENV)" == "fre"
+MSC_OPTIMIZATION=/O2 /Ot /Oi /Oy /Ob2 /GL /GS- 
+!ELSE
+MSC_OPTIMIZATION=$(MSC_OPTIMIZATION)
+!ENDIF
+
+!IF "$(AMD64)" == "1"
+
+TARGETLIBS=$(PCORE_DIR)\amd64\pcore.lib $(SDK_LIB_PATH)\RtlVer.lib		#for 64-bit
+
+C_DEFINES= $(C_DEFINES) -D_AMD_WIN64_
+MSC_WARNING_LEVEL=-W3
+!ELSE
+LINKER_FLAGS=$(LINKER_FLAGS) /SAFESEH
+
+TARGETLIBS=$(PCORE_DIR)\i386\pcore.lib $(SDK_LIB_PATH)\RtlVer.lib		#for 32-bit
+
+!ENDIF
+
+SOURCES=CallStackSampler.cpp CpuProfClient.cpp CpuProfDeferredSampling.cpp CpuProfDevice.cpp Entry.cpp Helpers.cpp IoControl.cpp ModuleInfo.cpp NtKernelExt.c PrdFile.cpp RuntimeTaskInfo.cpp StackWalker.cpp Win7KernelExt.c Win8KernelExt.c WinBlueKernelExt.c CpuProf.rc

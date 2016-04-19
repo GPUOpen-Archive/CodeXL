@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<CodeXL>
+    <Tests>
+	        <TestResultsDirectory>GoldMasters_APPSDK_2_9</TestResultsDirectory>
+        <LogFilesDirectory>C:\TEMP\testResults\</LogFilesDirectory>
+		<Test>
+            <ExecutablePath>samples\opencl\bin\x86\MatrixTranspose.exe</ExecutablePath>
+            <WorkingDirectory>samples\opencl\bin\x86</WorkingDirectory>
+            <TestName>MatrixTranspose_StepIntoTest</TestName>
+            <TestType>StepIntoTest</TestType>
+            <Kernels>
+                <Kernel>
+                    <KernelName>matrixTranspose</KernelName>
+					<WorkItemId>0,0,0</WorkItemId>
+					<StepIntoLine>53</StepIntoLine>
+                </Kernel>
+            </Kernels>
+        </Test>
+	</Tests>
+</CodeXL>       

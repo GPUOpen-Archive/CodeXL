@@ -1,0 +1,20 @@
+# -*- Python -*-
+# $Id: SConscript 4614 2010-04-09 13:11:41Z rgorton $
+# SConscript for building the webhelp content on Linux
+# Uses doxygen
+
+import os
+from CXL_init import *
+Import('*')
+
+Help_env = CXL_env.Clone()
+
+help_files = ['HelpRelease_Linux.Doxyfile']
+
+# This is a weird builder - it builds the content into the output tree,
+# so no need to install
+Doxy_Generated = []
+for help_file in help_files:
+    Doxy_Generated += Help_env.DoxyBld(help_file)
+
+Return('Doxy_Generated')

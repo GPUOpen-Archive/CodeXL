@@ -1,0 +1,94 @@
+# -*- Python -*-
+
+from CXL_init import *
+
+Import('*')
+
+libName = "OpenCLTemp"
+
+env = CXL_env.Clone()
+
+initLibDwarf (env)
+initLibElf (env)
+initAMDOpenCL(env)
+
+env.Append( CPPPATH = [ 
+	".",
+	"..",
+	env['CXL_commonproj_dir'],
+	env['CXL_commonproj_dir'] + "/AMDTOSWrappers/Include",
+	env['CXL_common_dir'] + "/Lib/AMD/OpenCLDebugAPI/1.3/Include",
+])
+
+UseAPPSDK(env);
+
+env.Append( CPPDEFINES = [
+	"_AMDT_OPENCLSERVER_EXPORTS", 
+	"CL_USE_DEPRECATED_OPENCL_1_1_APIS", 
+	"CL_USE_DEPRECATED_OPENCL_1_0_APIS"
+])
+
+sources = \
+[
+	"src/csAMDKernelDebuggingManager.cpp",
+#	"src/csAMDPerformanceCountersManager.cpp",
+#	"src/csAMDQueuePerformanceCountersReader.cpp",
+	"src/csAPIFunctionsImplementations.cpp",
+	"src/csAPIFunctionsStubs.cpp",
+	"src/csBufferSerializer.cpp",
+	"src/csCallsHistoryLogger.cpp",
+	"src/csCLKernel.cpp",
+	"src/csCommandQueueMonitor.cpp",
+	"src/csCommandQueuesMonitor.cpp",
+	"src/csContextMonitor.cpp",
+	"src/csDevicesMonitor.cpp",
+	"src/csDWARFParser.cpp",
+	"src/csExtensionsManager.cpp",
+	"src/csEventsMonitor.cpp",
+	"src/csForcedModesManager.cpp",
+	"src/csGlobalVariables.cpp",
+	"src/csImagesAndBuffersMonitor.cpp",
+	"src/csMemoryMonitor.cpp",
+	"src/csMemoryObjectReader.cpp",
+	"src/csMonitoredFunctionPointers.cpp",
+	"src/csOpenCLExtensionsWrappers.cpp",
+	"src/csOpenCLHandleMonitor.cpp",
+	"src/csOpenCLModuleInitializer.cpp",
+	"src/csOpenCLMonitor.cpp",
+	"src/csOpenCLQueuesPerformanceCountersManager.cpp",
+	"src/csOpenCLQueuePerformanceCountersReader.cpp",
+	"src/csOpenCLServerInitialization.cpp",
+	"src/csOpenCLWrappers.cpp",
+	"src/csOpenGLIntegrationWrappers.cpp",
+	"src/csProgramsAndKernelsMonitor.cpp",
+	"src/csSamplersMonitor.cpp",
+	"src/csWrappersCommon.cpp",
+]
+
+env.Prepend( LIBS =
+[
+	"CXLBaseTools",
+	"CXLOSWrappers",
+	"CXLAPIClasses",
+	"CXLServerUtilities",
+])
+
+env.Prepend( LINKFLAGS =
+[
+	"-Wl,-soname=libOpenCL.so.1"
+])
+
+# Creating object files	
+objFiles = env.SharedObject(sources)
+
+# Creating shared libraries
+soFiles = env.SharedLibrary(
+	target = libName, 
+	source = objFiles)
+
+# Installing libraries
+libInstall = env.Install( 
+	dir = env['CXL_spies_dir'], 
+	source = (soFiles))
+
+Return('libInstall')

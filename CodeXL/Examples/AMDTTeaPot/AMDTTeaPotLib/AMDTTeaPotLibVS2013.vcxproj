@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{FF25192E-59C4-42E8-9518-362239EBC3FE}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>AMDTTeaPotLib</RootNamespace>
+    <ProjectName>AMDTTeaPotLib</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)\AMDTSamples.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LibraryPath>$(AMDAPPSDKROOT)\lib\x86\;$(LibraryPath)</LibraryPath>
+    <OutDir>$(AMDTTeapotOutputDir)Library\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LibraryPath>$(AMDAPPSDKROOT)\lib\x86\;$(LibraryPath)</LibraryPath>
+    <OutDir>$(AMDTTeapotOutputDir)Library\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_WIN32;_CRT_SECURE_NO_WARNINGS;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(AMDAPPSDKROOT)\include;..\AMDTTeaPotLib;..\AMDTTeaPotLib\inc;..\AMDTTeaPot;..\AMDTTeaPot\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <OutputFile>$(TargetPath)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>Disabled</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_WIN32;_CRT_SECURE_NO_WARNINGS;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(AMDAPPSDKROOT)\include;..\AMDTTeaPotLib;..\AMDTTeaPotLib\inc;..\AMDTTeaPot;..\AMDTTeaPot\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Lib>
+      <OutputFile>$(TargetPath)</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\AMDTFluidGrid.h" />
+    <ClInclude Include="inc\AMDTImage.h" />
+    <ClInclude Include="inc\AMDTOpenCLHelper.h" />
+    <ClInclude Include="inc\AMDTOpenGLHelper.h" />
+    <ClInclude Include="inc\AMDTOpenGLMath.h" />
+    <ClInclude Include="inc\AMDTTeapotConstants.h" />
+    <ClInclude Include="inc\AMDTTeapotOCLSmokeSystem.h" />
+    <ClInclude Include="inc\AMDTTeapotOGLCanvas.h" />
+    <ClInclude Include="inc\AMDTTeapotRenderState.h" />
+    <ClInclude Include="inc\AMDTTimer.h" />
+    <ClInclude Include="inc\CL\cl_icd.h" />
+    <ClInclude Include="res\AMDTTeapotSmokeSimulation.h" />
+    <ClInclude Include="res\AMDTTeapotSmokeSimulationClamp.h" />
+    <ClInclude Include="res\AMDTTeapotSmokeSimulationGen.h" />
+    <ClInclude Include="res\AMDTTeapotSmokeSimulationIndex.h" />
+    <ClInclude Include="res\AMDTTeapotSmokeSimulationScalarField.h" />
+    <ClInclude Include="res\AMDTTeapotSmokeSimulationVec.h" />
+    <ClInclude Include="res\AMDTTeapotSmokeSimulationVecField.h" />
+    <ClInclude Include="res\AMDTTeapotSmokeSimulationVecLength.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\AMDTFluidGrid.cpp" />
+    <ClCompile Include="src\AMDTImage.cpp" />
+    <ClCompile Include="src\AMDTOpenCLHelper.cpp" />
+    <ClCompile Include="src\AMDTOpenGLHelper.cpp" />
+    <ClCompile Include="src\AMDTOpenGLMath.cpp" />
+    <ClCompile Include="src\AMDTTeapotOCLSmokeSystem.cpp" />
+    <ClCompile Include="src\AMDTTeapotOGLCanvas.cpp" />
+    <ClCompile Include="src\AMDTTeapotRenderState.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\AMDT-CodeXLLogo.png" />
+    <None Include="res\tpAdvectFieldScalar.cl" />
+    <None Include="res\tpAdvectFieldVelocity.cl" />
+    <None Include="res\tpApplyBuoyancy.cl" />
+    <None Include="res\tpApplyPressureBoundaryCondition.cl" />
+    <None Include="res\tpApplySources.cl" />
+    <None Include="res\tpApplyVelocityBoundaryCondition.cl" />
+    <None Include="res\tpApplyVorticity.cl" />
+    <None Include="res\tpCalculateCurlU.cl" />
+    <None Include="res\tpComputeFieldPressureIter.cl" />
+    <None Include="res\tpComputeFieldPressurePrep.cl" />
+    <None Include="res\tpCreateDensityTexture.cl" />
+    <None Include="res\tpDebugDensity.cl" />
+    <None Include="res\tpDebugFieldPressure.cl" />
+    <None Include="res\tpDebugTemperature.cl" />
+    <None Include="res\tpDebugVelocityLength.cl" />
+    <None Include="res\tpDebugVelocityVector.cl" />
+    <None Include="res\tpDissipateDensity.cl" />
+    <None Include="res\tpDissipateTemperature.cl" />
+    <None Include="res\tpFragmentShader.catchMeIfYouCan.glsl" />
+    <None Include="res\tpFragmentShader.glsl" />
+    <None Include="res\tpGeometryShader.glsl" />
+    <None Include="res\tpLogo-white.bmp" />
+    <None Include="res\tpProjectFieldVelocity.cl" />
+    <None Include="res\tpSmokeSimulation.cl" />
+    <None Include="res\tpVertexShader.glsl" />
+    <None Include="res\tpVolumeSlicing.cl" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

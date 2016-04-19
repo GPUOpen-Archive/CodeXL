@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<CodeXL>
+    <Tests>
+	        <TestResultsDirectory>GoldMasters_APPSDK_2_9</TestResultsDirectory>
+        <LogFilesDirectory>C:\TEMP\testResults\</LogFilesDirectory>
+		<Test>
+            <ExecutablePath>samples\opencl\bin\x86_64\SimpleGL.exe</ExecutablePath>
+            <WorkingDirectory>samples\opencl\bin\x86_64\</WorkingDirectory>
+            <TestName>SimpleGL_LocalsTest</TestName>
+            <TestType>LocalsTest</TestType>
+            <Kernels>
+                <Kernel>
+                    <KernelName>sineWave</KernelName>
+					<WorkItemId>0,0,0</WorkItemId>
+					<KernelLocals>
+						<LocalsInLine lineNumber="33"></LocalsInLine>
+						<LocalsInLine lineNumber="34"></LocalsInLine>
+						<LocalsInLine lineNumber="35"></LocalsInLine>
+						<LocalsInLine lineNumber="36"></LocalsInLine>
+						<LocalsInLine lineNumber="39"></LocalsInLine>
+                    </KernelLocals>               
+                </Kernel>
+            </Kernels>
+        </Test>
+	</Tests>
+</CodeXL>       
