@@ -18,8 +18,6 @@
 // Local:
 #include <AMDTApplicationFramework/Include/afApplicationFrameworkDLLBuild.h>
 
-// Forward declaration:
-
 class AF_API afHTMLView : public QWebView
 {
     Q_OBJECT
@@ -29,7 +27,7 @@ public:
     virtual ~afHTMLView();
 
     /// returns the file path
-    osFilePath& FilePath() { return m_filePath; }
+    const osFilePath& FilePath() const { return m_filePath; }
 
     /// reload the view
     void ReloadView();
