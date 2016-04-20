@@ -310,7 +310,7 @@ bool gpSessionView::DisplaySession(const osFilePath& sessionFilePath, afTreeItem
                 GT_ASSERT(rc);
 
                 // Connect to the session stop signal
-                connect(gpUIManager::Instance(), SIGNAL(UpdateUI()), this, SLOT(OnUpdateUI()));
+                rc = connect(gpUIManager::Instance(), SIGNAL(UIUpdated()), this, SLOT(OnUpdateUI()));
                 GT_ASSERT(rc);
 
 
