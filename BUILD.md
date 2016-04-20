@@ -46,8 +46,8 @@ Install glibc
 * yum -y install glibc-devel.i686 glibc-devel
 
 #### Building the HSA/ROCm Profiler
-* In order to build the HSA/ROCm profiler, the ROCm packages need to be installed (so that the ROCR header files are available at build time).
-* The ROCm packages are available at https://github.com/RadeonOpenCompute/ROCm.  Please see the instructions in the [README.md](https://github.com/GPUOpen-Tools/CodeXL/releases) contained in that repository.
+* In order to build the HSA/ROCm profiler, the rocm-dev package needs to be installed (so that the ROCR header files are available at build time).
+* The ROCm packages are available at https://github.com/RadeonOpenCompute/ROCm.  Please see the instructions in the [README.md](https://github.com/GPUOpen-Tools/CodeXL/releases) contained in that repository. To build CodeXL, only the rocm-dev package is needed.  In order to run and profile HSA/ROCm applications, the rocm package is needed.
 * If the ROCR header files are not available on the build system, you can skip this part of the build.  See the Build Switches section below for information on how to do this.
 
 #### Building CodeXL
