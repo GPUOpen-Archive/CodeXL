@@ -49,7 +49,7 @@
 afNewProjectDialog* afNewProjectDialog::m_spMySingleInstance = nullptr;
 
 // Dialog size:
-#define AF_NEW_PROJECT_DIALOG_WIDTH 1000
+#define AF_NEW_PROJECT_DIALOG_WIDTH 1024
 #define AF_NEW_PROJECT_DIALOG_HEIGHT 500
 #define AF_NEW_PROJECT_SETTINGS_TREE_WIDTH 150
 #define AF_NEW_PROJECT_BUTTON_STANDARD_SIZE 21
