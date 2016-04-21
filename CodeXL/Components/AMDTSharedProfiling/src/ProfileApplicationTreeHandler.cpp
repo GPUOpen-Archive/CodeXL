@@ -452,7 +452,7 @@ void ProfileApplicationTreeHandler::OnExportSession()
                         pNodeData->m_filePath.getFileDirectory(sessionDir);
                         SessionTreeNodeData* pSessionData = qobject_cast<SessionTreeNodeData*>(pNodeData->extendedItemData());
 
-                        if (nullptr != pSessionData)
+                        if (nullptr != pSessionData && nullptr != m_pExportSessionAction)
                         {
                             QString sessionName = pSessionData->m_displayName;
 
@@ -592,7 +592,7 @@ void ProfileApplicationTreeHandler::OnMultipleSessionDelete()
 void ProfileApplicationTreeHandler::OnItemOpen()
 {
     // Get the clicked item from application tree:
-    GT_IF_WITH_ASSERT(nullptr != m_pApplicationTree && nullptr != m_pApplicationTree->treeControl)
+    GT_IF_WITH_ASSERT(nullptr != m_pApplicationTree && nullptr != m_pApplicationTree->treeControl())
     {
         QList<QTreeWidgetItem*> treeSelectedItems = m_pApplicationTree->treeControl()->selectedItems();
         QTreeWidgetItem* pContextMenuItem = treeSelectedItems.at(0);
@@ -839,13 +839,16 @@ bool ProfileApplicationTreeHandler::CheckFilterList(const QString& fileExt)
 
     if (m_profileFilterList.count() > 0 && isInProfileMode)
     {
-        foreach (FileFilter* filter, m_profileFilterList)
+        foreach (FileFilter* pFilter, m_profileFilterList)
         {
-            QFileInfo fileInfo(filter->m_strMask);
-
-            if (fileInfo.suffix() == fileExt)
+            if (nullptr != pFilter)
             {
-                return true;
+                QFileInfo fileInfo(pFilter->m_strMask);
+
+                if (fileInfo.suffix() == fileExt)
+                {
+                    return true;
+                }
             }
         }
     }
