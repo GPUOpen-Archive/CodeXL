@@ -128,9 +128,8 @@ bool gpTraceView::DisplaySession(const osFilePath& sessionFilePath, afTreeItemTy
         GT_IF_WITH_ASSERT(retVal)
         {
             // Make sure that the file exists, and contain data from server, and parse the trace file
-            // NZ retVal = PrepareTraceFile();
-
             gpExecutionMode* pModeManager = ProfileManager::Instance()->GetFrameAnalysisModeManager();
+            GT_ASSERT(pModeManager != nullptr);
             retVal = pModeManager->PrepareTraceFile(m_sessionFilePath, m_frameIndex, m_pSessionData, this);
 
 
