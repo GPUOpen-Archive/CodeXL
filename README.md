@@ -11,8 +11,9 @@ To encourage 3rd party contribution and adoption, CodeXL is no longer branded as
 
 ## Installation and Build
 
-* Windows: To install CodeXL, use the provided executable file CodeXL_*.exe
-* Linux: To install CodeXL, use the provided RPM file, Debian file, or simply extract the compressed archive onto your hard drive.
+* Windows: To install CodeXL, use the [provided](https://github.com/GPUOpen-Tools/CodeXL/releases) executable file CodeXL_*.exe
+* Linux: To install CodeXL, use the [provided](https://github.com/GPUOpen-Tools/CodeXL/releases) RPM file, Debian file, or simply extract the compressed archive onto your hard drive.
+
 
 Refer to [BUILD.md](BUILD.md) for information on building CodeXL from source.
 
