@@ -3,7 +3,7 @@
 // "P4ROOT" is passed in by the build script from Jenkins
 // "COPYARTIFACT_BUILD_NUMBER_*" variables referenced below are passed in to the build script from Jenkins
 
-Define "ROOTPATH"		"[P4ROOT]\main"
+Define "ROOTPATH"		"[P4ROOT]"
 Define "CXLPATH"		"[ROOTPATH]\CodeXL"
 Define "INSPATH"		"[ROOTPATH]\Common\DK\Installer"
 Define "LIBPATH"		"[ROOTPATH]\Common\Src"

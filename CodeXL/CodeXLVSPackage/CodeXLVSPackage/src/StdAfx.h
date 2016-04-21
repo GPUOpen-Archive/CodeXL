@@ -17,7 +17,7 @@
 //#include <AMDTBaseTools/Include/gtIgnoreCompilerWarnings.h>
 // Windows Platform headers and control defines
 #define STRICT
-#define _WIN32_WINNT 0x0500 // Visual Studio requires Windows 2000 or better
+#define _WIN32_WINNT 0x0601 // Visual Studio requires Windows 2000 or better
 
 #ifndef NOMINMAX
     #define NOMINMAX // Windows Platform min and max macros cause problems for the Standard C++ Library

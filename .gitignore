@@ -197,3 +197,23 @@ FakesAssemblies/
 # Visual Studio 6 workspace options file
 *.opt
 /.project
+*.VC.opendb
+*.VC.db
+
+# CodeXl VSPackage temp files
+CodeXL/AMDTApplicationFramework/tmp/
+CodeXL/CodeXLVSPackage/CodeXLVSPackage/CodeXLVSPackageVS14VSIX/ApplicationIcon.ico
+CodeXL/CodeXLVSPackage/CodeXLVSPackage/CodeXLVSPackageVS14VSIX/CodeXL_App_Settings.txt
+CodeXL/CodeXLVSPackage/CodeXLVSPackage/Debug-CodeXLVSPackageVS14/
+CodeXL/CodeXLVSPackage/CodeXLVSPackage/Release-CodeXLVSPackageVS14/
+CodeXL/CodeXLVSPackage/CodeXLVSPackage/tmp/
+CodeXL/CodeXLVSPackage/CodeXL_App_Settings.txt
+CodeXL/Components/AMDTSharedProfiling/tmp/
+CodeXL/Components/CpuProfiling/AMDTCpuProfiling/tmp/
+CodeXL/Components/GpuDebugging/AMDTGpuDebugging/tmp/
+CodeXL/Components/GpuDebugging/AMDTGpuDebuggingComponents/tmp/
+CodeXL/Components/GpuProfiling/AMDTGpuProfiling/GeneratedFiles/
+CodeXL/Components/GpuProfiling/AMDTGpuProfiling/tmp/
+CodeXL/Components/PowerProfiling/AMDTPowerProfiling/tmp/
+CodeXL/Components/ShaderAnalyzer/AMDTKernelAnalyzer/tmp/
+
