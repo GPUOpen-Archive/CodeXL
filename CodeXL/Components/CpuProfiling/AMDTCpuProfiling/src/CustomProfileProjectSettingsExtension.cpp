@@ -676,7 +676,7 @@ void CustomProfileProjectSettingsExtension::monitorEvent(QTreeWidgetItem* pAvail
         {
             addEvent = false;
         }
-        else if (QMessageBox::Ok != acMessageBox::instance().question(AF_STR_QuestionA, "Click Ok if you want the duplicate event. Note that you will need to change the Unit mask, Usr, or Os settings before the configuration is valid.", QMessageBox::Ok | QMessageBox::Cancel))
+        else if (QMessageBox::Ok != acMessageBox::instance().question(AF_STR_QuestionA, "Click Ok if you want the duplicate event. Note that you will need to change the Unit mask, User Mode, or Kernel Mode settings before the configuration is valid.", QMessageBox::Ok | QMessageBox::Cancel))
         {
             addEvent = false;
         }
