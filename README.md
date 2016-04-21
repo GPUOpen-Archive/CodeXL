@@ -27,7 +27,7 @@ Users are also encouraged to submit issues and feature requests via the reposito
 
 ## License
 
-CodeXL is part of the GPUOpen.com initiative. CodeXL source code and binaries are released under the following MIT license.
+CodeXL is part of the [GPUOpen.com](http://gpuopen.com/) initiative. CodeXL source code and binaries are released under the following MIT license:
 
 Copyright © 2016 Advanced Micro Devices, Inc. All rights reserved.
 
