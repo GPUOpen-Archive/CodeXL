@@ -1383,7 +1383,7 @@ void gpExecutionMode::Terminate()
 }
 
 
-bool gpExecutionMode::PrepareTraceFile(const osFilePath& sessionFilePath, int frameIndex, SessionTreeNodeData* pTreeNodeData, gpBaseSessionView* pTraceView, bool prepareTraceData)
+bool gpExecutionMode::PrepareTraceFile(const osFilePath& sessionFile, int frameIndex, SessionTreeNodeData* pTreeNodeData, gpBaseSessionView* pTraceView, bool prepareTraceData)
 {
     bool retVal = false;
     OS_DEBUG_LOG_TRACER_WITH_RETVAL(retVal);
@@ -1392,7 +1392,7 @@ bool gpExecutionMode::PrepareTraceFile(const osFilePath& sessionFilePath, int fr
     {
         // Extract the frame index from the file path
         gtString fileName;
-        sessionFilePath.getFileName(fileName);
+        sessionFile.getFileName(fileName);
         int pos = fileName.findLastOf(L"_");
 
         GT_IF_WITH_ASSERT(pos >= 0)
@@ -1424,14 +1424,14 @@ bool gpExecutionMode::PrepareTraceFile(const osFilePath& sessionFilePath, int fr
                 gpExecutionMode* pModeManager = ProfileManager::Instance()->GetFrameAnalysisModeManager();
                 GT_IF_WITH_ASSERT(pModeManager != nullptr)
                 {
-                    osFilePath traceFilePath = gpTreeHandler::Instance().GetFrameChildFilePath(sessionFilePath, frameIndex, AF_TREE_ITEM_GP_FRAME_TIMELINE);
+                    osFilePath traceFilePath = gpTreeHandler::Instance().GetFrameChildFilePath(sessionFile, frameIndex, AF_TREE_ITEM_GP_FRAME_TIMELINE);
 
                     retVal = pModeManager->GetFrameTraceFromServer(sessionFilePath, frameIndex, traceFilePath);
                     GT_IF_WITH_ASSERT(retVal)
                     {
                         if (prepareTraceData == true)
                         {
-                            gpUIManager::Instance()->PrepareTraceData(sessionFilePath, pTraceView, qobject_cast<GPUSessionTreeItemData*>(pTreeNodeData));
+                            gpUIManager::Instance()->PrepareTraceData(sessionFile, pTraceView, qobject_cast<GPUSessionTreeItemData*>(pTreeNodeData));
                         }
                     }
                 }

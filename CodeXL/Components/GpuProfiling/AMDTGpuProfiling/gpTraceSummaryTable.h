@@ -197,7 +197,7 @@ public:
     void TableItemsAsString(QStringList& membersStringsList)
     {
         // m_avgTimeMs is calculated here, after all samples were gathered
-        GT_IF_WITH_ASSERT(0 != m_numCalls)
+        if (0 != m_numCalls)
         {
             m_avgTimeMs = (float)((float)m_cumulativeTime / (float)m_numCalls);
 
