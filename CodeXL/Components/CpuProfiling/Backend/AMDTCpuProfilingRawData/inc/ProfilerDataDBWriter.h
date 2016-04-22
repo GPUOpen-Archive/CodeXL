@@ -39,8 +39,9 @@ public:
                CpuProfileInfo& profileInfo,
                gtUInt64 cpuAffinity,
                const PidProcessMap& procMap,
+               gtVector<std::tuple<gtUInt32, gtUInt32>>& processThreadList,
                const NameModuleMap& modMap,
-               const gtVector<std::tuple<gtUInt32, gtString, gtUInt64, gtUInt64>>& modInstanceInfo,
+               const gtHashMap<gtUInt32, std::tuple<gtString, gtUInt64, gtUInt64>>& modInstanceInfo,
                const CoreTopologyMap* topMap = nullptr);
 
 private:
@@ -51,8 +52,8 @@ private:
                             AMDTProfileSamplingConfigVec& samplingConfigs);
     void PackProcessInfo(const PidProcessMap& processMap, CPAProcessList& processList);
     void PackModuleInfo(const NameModuleMap& modMap, CPAModuleList& moduleList);
-    void PackModuleInstanceInfo(const NameModuleMap& modMap, const gtVector<std::tuple<gtUInt32, gtString, gtUInt64, gtUInt64>>& modInstanceInfo, CPAModuleInstanceList& moduleInstanceList);
-    void PackProcessThreadInfo(const NameModuleMap& modMap, CPAProcessThreadList& procThreadList);
+    void PackModuleInstanceInfo(const NameModuleMap& modMap, const gtHashMap<gtUInt32, std::tuple<gtString, gtUInt64, gtUInt64>>& modInstanceInfoMap, CPAModuleInstanceList& moduleInstanceList);
+    void PackProcessThreadInfo(const gtVector<std::tuple<gtUInt32, gtUInt32>>& processThreadList, CPAProcessThreadList& procThreadIdList);
     void PackCoreSamplingConfigInfo(const NameModuleMap& modMap, CPACoreSamplingConfigList& coreConfigList);
     void PackSampleInfo(const NameModuleMap& modMap, CPASampeInfoList& sampleList);
     void PackFunctionInfo(const NameModuleMap& modMap, CPAFunctionInfoList& funcInfoList);

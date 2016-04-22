@@ -16,22 +16,22 @@
 
 struct CPAdapterTopology
 {
-    gtUInt32 coreId;
-    gtUInt16 processor;
-    gtUInt16 numaNode;
+    gtUInt32 m_coreId;
+    gtUInt16 m_processor;
+    gtUInt16 m_numaNode;
 
-    CPAdapterTopology(gtUInt32 coreId, gtUInt16 proc, gtUInt16 numa) : coreId(coreId), processor(proc), numaNode(numa) {}
+    CPAdapterTopology(gtUInt32 coreId, gtUInt16 proc, gtUInt16 numa) : m_coreId(coreId), m_processor(proc), m_numaNode(numa) {}
 };
 
 using CPAdapterTopologyMap = gtVector<CPAdapterTopology>;
 
 struct CPAProcessInfo
 {
-    gtUInt32 pid;
-    gtString name;
-    bool is32Bit;
+    gtUInt32 m_pid;
+    gtString m_name;
+    bool     m_is32Bit;
 
-    CPAProcessInfo(gtUInt32 pid, gtString name, bool is32Bit) : pid(pid), name(name), is32Bit(is32Bit) {}
+    CPAProcessInfo(gtUInt32 pid, gtString name, bool is32Bit) : m_pid(pid), m_name(name), m_is32Bit(is32Bit) {}
 };
 
 using CPAProcessList = gtVector<CPAProcessInfo>;
@@ -67,43 +67,38 @@ using CPAModuleInstanceList = gtVector<CPAModuleInstanceInfo>;
 
 struct CPAProcessThreadInfo
 {
-    gtUInt64 pid;
-    gtUInt32 threadId;
+    gtUInt64 m_ptId;
+    gtUInt64 m_processId;
+    gtUInt32 m_threadId;
 
-    CPAProcessThreadInfo(gtUInt64 pid, gtUInt32 threadId) : pid(pid), threadId(threadId) {}
-
-    bool operator<(const CPAProcessThreadInfo& rhs) const { return (pid < rhs.pid) || ((pid == rhs.pid) && (threadId < rhs.threadId)); }
+    CPAProcessThreadInfo(gtUInt64 id, gtUInt64 processId, gtUInt32 threadId) : m_ptId(id), m_processId(processId), m_threadId(threadId) {}
 };
 
 using CPAProcessThreadList = gtVector<CPAProcessThreadInfo>;
 
 struct CPACoreSamplingConfigInfo
 {
-    gtUInt32 coreId;
-    gtUInt32 eventMask;
+    gtUInt64 m_id;
+    gtUInt16 m_coreId;
+    gtUInt32 m_samplingConfigId;
 
-    CPACoreSamplingConfigInfo(gtUInt32 coreId, gtUInt32 eventMask) : coreId(coreId), eventMask(eventMask) {}
-
-    // bool operator<(const CPACoreSamplingConfigInfo& rhs) const { return (coreId < rhs.coreId) || ((coreId == rhs.coreId) && (eventMask < rhs.eventMask)); }
-    bool operator<(const CPACoreSamplingConfigInfo& rhs) const { return (eventMask < rhs.eventMask) || ((eventMask == rhs.eventMask) && (coreId < rhs.coreId)); }
+    CPACoreSamplingConfigInfo(gtUInt64 id, gtUInt16 coreId, gtUInt32 samplingConfigId) : m_id(id), m_coreId(coreId), m_samplingConfigId(samplingConfigId) {}
 };
 
 using CPACoreSamplingConfigList = gtVector<CPACoreSamplingConfigInfo>;
 
 struct CPASampleInfo
 {
-    gtUInt64 m_pid = 0;
-    gtUInt32 m_threadId = 0;
+    gtUInt64 m_processThreadId = 0;
     gtUInt32 m_moduleInstanceId = 0;
-    gtUInt32 m_coreId = 0;
-    gtUInt32 m_eventMask = 0;
-    gtUInt32 m_functionid = 0;
+    gtUInt64 m_coreSamplingConfigId = 0;
+    gtUInt32 m_functionId = 0;
     // m_offset is w.r.t. module load address
     gtUInt64 m_offset = 0;
     gtUInt64 m_count = 0;
 
-    CPASampleInfo(gtUInt64 pid, gtUInt32 threadId, gtUInt32 moduleInstanceId, gtUInt32 coreId, gtUInt32 eventMask, gtUInt32 functionid, gtUInt64 offset, gtUInt64 count) :
-        m_pid(pid), m_threadId(threadId), m_moduleInstanceId(moduleInstanceId), m_coreId(coreId), m_eventMask(eventMask), m_functionid(functionid), m_offset(offset), m_count(count) {}
+    CPASampleInfo(gtUInt64 processThreadId, gtUInt32 moduleInstanceId, gtUInt64 coreSamplingConfigId, gtUInt32 functionId, gtUInt64 offset, gtUInt64 count) :
+        m_processThreadId(processThreadId), m_moduleInstanceId(moduleInstanceId), m_coreSamplingConfigId(coreSamplingConfigId), m_functionId(functionId), m_offset(offset), m_count(count) {}
 };
 
 using CPASampeInfoList = gtVector<CPASampleInfo>;

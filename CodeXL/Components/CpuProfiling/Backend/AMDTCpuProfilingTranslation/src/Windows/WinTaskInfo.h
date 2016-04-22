@@ -118,7 +118,7 @@ public:
     HRESULT GetModuleInfo(TiModuleInfo* pModInfo);
 
 #ifdef AMDT_ENABLE_CPUPROF_DB
-    HRESULT GetModuleInstanceInfoList(gtVector<std::tuple<gtUInt32, gtString, gtUInt64, gtUInt64>>& info);
+    HRESULT GetProcessThreadList(gtVector<std::tuple<gtUInt32, gtUInt32>>& info);
 #endif
 
     // Get number of kernel modules
