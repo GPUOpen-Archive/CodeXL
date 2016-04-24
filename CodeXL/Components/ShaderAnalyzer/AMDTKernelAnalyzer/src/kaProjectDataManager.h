@@ -217,6 +217,9 @@ public:
     /// Set the build options:
     void setBuildOptions(const QString& buildOptions);
 
+
+    /// Sets kernel build options to local member
+    /// \param buildOptions build options
     void SetKernelBuildOptions(const QString& buildOptions);
 
     /// Set the Shader build options:
@@ -474,7 +477,14 @@ private:
     /// build kernels list for a text file based on .cl file format
     /// \param in text file source
     /// \param in pCurrentFileData file data into which to merge
+    /// \return true if at least one kerenl found in source file
     bool buildKernelList(const QString& fileData, const osFilePath& filePath, kaSourceFile* pCurrentFileData) const;
+
+    /// Fills kernel list from given source file, i.e. we do macro expansion for given file, parse file after it, locate all kernel functions and fill those functions into output parameter
+    /// \param in fileData - given file content
+    /// \param in filePath - given file location
+    /// \param in additionalMacros during file macro preprocessing this macros list used for as reference
+    /// \param out kernelList kernel list, that was extracted from given file , after macro expansion
     static void FillKernelNamesList(const QString& fileData, const osFilePath& filePath, const std::vector<std::string>& additionalMacros, gtVector<kaProjectDataManagerAnaylzeData>& kernelList);
     static void AddMangledKernelName(std::vector<PreProcessedToken>::iterator& token, std::vector<PreProcessedToken>& tokens, gtVector<kaProjectDataManagerAnaylzeData>& kernelList);
 
