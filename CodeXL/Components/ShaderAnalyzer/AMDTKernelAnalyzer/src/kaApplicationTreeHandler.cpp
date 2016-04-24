@@ -4205,22 +4205,23 @@ void kaApplicationTreeHandler::DropOutertemsOnRelevantProgram(const QMimeData* p
                                 kaTreeDataExtension* pProgramKAItemData = qobject_cast<kaTreeDataExtension*>(pParentData->extendedItemData());
                                 // obtain kaProgram* from extended data
                                 pProgram = pProgramKAItemData->GetProgram();
+                                destinationItemType = AF_TREE_ITEM_KA_PROGRAM;
                                 break;
                             }
                         }
+                        pDropDestinationItem = pParent;
                     }
                 }
 
                 if (pProgram != nullptr)
                 {
+                    kaProgramTypes programType = pProgram->GetBuildType();
                     // Check if the destination is a program stage. If not, item type should be calculated according to the parent program
 
                     bool isProgramStage = (destinationItemType >= AF_TREE_ITEM_KA_FIRST_FILE_ITEM_TYPE) && (destinationItemType <= AF_TREE_ITEM_KA_PROGRAM_GL_VERT);
 
                     if (!isProgramStage)
                     {
-                        kaProgramTypes programType = pProgram->GetBuildType();
-
                         if (AF_TREE_ITEM_KA_PROGRAM == destinationItemType)
                         {
                             if (kaProgramTypes::kaProgramGL_Compute == programType || kaProgramVK_Compute == programType)
@@ -4235,16 +4236,18 @@ void kaApplicationTreeHandler::DropOutertemsOnRelevantProgram(const QMimeData* p
                         }
                     }
 
-                    for (const osFilePath& it : addedFilePaths)
+                    if (isProgramStage || (!isProgramStage && (kaProgramDX == programType || kaProgramCL == programType)))
                     {
-                        // Add the file node to the program branch
-                        if (!pProgram->HasFile(it, AF_TREE_ITEM_ITEM_NONE))
+                        for (const osFilePath& it : addedFilePaths)
                         {
-                            AddFileNodeToProgramBranch(it, pProgramItemData, destinationItemType);
-
-                            if (!IsAddingMultipleFilesToProgramBranchAllowed(pProgramItemData))
+                            // Add the file node to the program branch
+                            if (!pProgram->HasFile(it, AF_TREE_ITEM_ITEM_NONE))
                             {
-                                break;
+                                AddFileNodeToProgramBranch(it, pProgramItemData, destinationItemType);
+                                if (!IsAddingMultipleFilesToProgramBranchAllowed(pProgramItemData))
+                                {
+                                    break;
+                                }
                             }
                         }
                     }
