@@ -98,14 +98,17 @@ void CustomProfileProjectSettingsExtension::Initialize()
 
     pButtonsLayout->addStretch();
     m_pAddEvent = new QPushButton(AF_STR_AddButton);
+    m_pAddEvent->setToolTip(CP_STR_cpuProfileProjectSettingsAddButtonTooltip);
 
     pButtonsLayout->addWidget(m_pAddEvent);
 
     m_pRemoveEvent = new QPushButton(AF_STR_RemoveButton);
+    m_pRemoveEvent->setToolTip(CP_STR_cpuProfileProjectSettingsAddButtonTooltip);
 
     pButtonsLayout->addWidget(m_pRemoveEvent);
 
     m_pRemoveAll = new QPushButton(AF_STR_RemoveAllButton);
+    m_pRemoveAll->setToolTip(CP_STR_cpuProfileProjectSettingsRemoveAllButtonTooltip);
 
     pButtonsLayout->addWidget(m_pRemoveAll);
 

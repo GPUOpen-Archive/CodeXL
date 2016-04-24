@@ -90,7 +90,7 @@ void SharedProfileSettingPage::Initialize()
     m_pProfileTypeCombo = new QComboBox;
 
     m_pProfileTypeCombo->setMaxVisibleItems(12);
-
+    m_pProfileTypeCombo->setToolTip(PM_STR_sharedProfileSettingsProfileSessionTypeTooltip);
 
     QLabel* pLabel1 = new QLabel(PM_STR_sharedProfileSettingsProfileSessionType);
 
@@ -104,7 +104,7 @@ void SharedProfileSettingPage::Initialize()
     pMainLayout->addWidget(pSpacerLabel, currentRow, 2, 2, 1);
 
     QLabel* pLabel2 = new QLabel(PM_STR_sharedProfileSettingsProfileScope);
-
+    pLabel2->setToolTip(PM_STR_sharedProfileSettingsProfileScopeTooltip);
 
     // Create the system-wide / single application radio buttons:
     m_pSingleApplicationRadioButton = new QRadioButton(PM_STR_sharedProfileSettingsSingleApplication);

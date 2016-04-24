@@ -68,6 +68,7 @@ void gdProjectSettingsExtension::Initialize()
     // Create the OpenGL frame terminators group box:
     QLabel* pCaption1 = new QLabel(GD_STR_projectSettingsGLFrameTerminators);
     pCaption1->setStyleSheet(AF_STR_captionLabelStyleSheetMain);
+    pCaption1->setToolTip(GD_STR_projectSettingsGLFrameTerminatorsTooltip);
 
     QVBoxLayout* pGLFrameTerminatorsLayout = new QVBoxLayout;
     createGLControls(pGLFrameTerminatorsLayout);
@@ -91,6 +92,7 @@ void gdProjectSettingsExtension::Initialize()
 
     // Create the breakpoints button:
     QPushButton* pBreakpointsButton = new QPushButton(GD_STR_projectSettingsAddBreakpoints);
+    pBreakpointsButton->setToolTip(GD_STR_projectSettingsAddBreakpointsTooltip);
     bool rc = connect(pBreakpointsButton, SIGNAL(clicked()), this, SLOT(onAddRemoveBreakpoints()));
     GT_ASSERT(rc);
 
@@ -247,12 +249,19 @@ void gdProjectSettingsExtension::createGLControls(QVBoxLayout* pGLFrameTerminato
     GT_IF_WITH_ASSERT(pGLFrameTerminatorsLayout != NULL)
     {
         m_pGlClearCheckbox = new QCheckBox(GD_STR_DebugSettingsGlClear);
+        m_pGlClearCheckbox->setToolTip(GD_STR_projectSettingsGLFrameTerminatorsTooltip);
         m_pGlFlushCheckbox = new QCheckBox(GD_STR_DebugSettingsGlFlush);
+        m_pGlFlushCheckbox->setToolTip(GD_STR_projectSettingsGLFrameTerminatorsTooltip);
         m_pGlFinishCheckbox = new QCheckBox(GD_STR_DebugSettingsGlFinish);
+        m_pGlFinishCheckbox->setToolTip(GD_STR_projectSettingsGLFrameTerminatorsTooltip);
         m_pGlFrameTerminatorGREMEDYCheckbox = new QCheckBox(GD_STR_DebugSettingsGlFrameTerminatorGREMEDY);
+        m_pGlFrameTerminatorGREMEDYCheckbox->setToolTip(GD_STR_projectSettingsGLFrameTerminatorsTooltip);
         m_pMakeCurrentCheckbox = new QCheckBox(GD_STR_DebugSettingsMakeCurrent);
+        m_pMakeCurrentCheckbox->setToolTip(GD_STR_projectSettingsGLFrameTerminatorsTooltip);
         m_pSwapLayerBuffersCheckbox = new QCheckBox(GD_STR_DebugSettingsSwapLayerBuffers);
+        m_pSwapLayerBuffersCheckbox->setToolTip(GD_STR_projectSettingsGLFrameTerminatorsTooltip);
         m_pSwapBuffersCheckbox = new QCheckBox(GD_STR_DebugSettingsSwapBuffers);
+        m_pSwapBuffersCheckbox->setToolTip(GD_STR_projectSettingsGLFrameTerminatorsTooltip);
 
         // Add the check boxes to the vertical layout:
         pGLFrameTerminatorsLayout->addWidget(m_pGlClearCheckbox);
@@ -279,9 +288,13 @@ void gdProjectSettingsExtension::createCLControls(QVBoxLayout* pCLFrameTerminato
 {
     // Create the OpenCL frame terminators check boxes:
     m_pCl_gremedy_computation_frameCheckbox = new QCheckBox(GD_STR_DebugSettingsCl_gremedy_computation_frameCheckbox);
+    m_pCl_gremedy_computation_frameCheckbox->setToolTip(GD_STR_projectSettingsCLFrameTerminatorsTooltip);
     m_pClFlushCheckbox = new QCheckBox(GD_STR_DebugSettingsClFlush);
+    m_pClFlushCheckbox->setToolTip(GD_STR_projectSettingsCLFrameTerminatorsTooltip);
     m_pClFinishCheckbox = new QCheckBox(GD_STR_DebugSettingsClFinish);
+    m_pClFinishCheckbox->setToolTip(GD_STR_projectSettingsCLFrameTerminatorsTooltip);
     m_pClWaitForEventsCheckbox = new QCheckBox(GD_STR_DebugSettingsClWaitForEvents);
+    m_pClWaitForEventsCheckbox->setToolTip(GD_STR_projectSettingsCLFrameTerminatorsTooltip);
 
     // Add the check boxes to the layout:
     pCLFrameTerminatorsLayout->addWidget(m_pCl_gremedy_computation_frameCheckbox);

@@ -2743,9 +2743,12 @@
 #define GD_STR_projectSettingsExtensionNameASCII "GPUDebug"
 #define GD_STR_projectSettingsExtensionDisplayName L"Debug"
 #define GD_STR_projectSettingsGLFrameTerminators "OpenGL Frame Terminators"
+#define GD_STR_projectSettingsGLFrameTerminatorsTooltip "OpenGL Frame Terminators will be used to perform a frame step while debugging the application"
 #define GD_STR_projectSettingsCLFrameTerminators "OpenCL Frame Terminators"
+#define GD_STR_projectSettingsCLFrameTerminatorsTooltip "OpenCL Frame Terminators will be used to perform a frame step while debugging the application"
 #define GD_STR_projectSettingsHSASettings "HSA Settings"
 #define GD_STR_projectSettingsAddBreakpoints "Add / Remove Breakpoints..."
+#define GD_STR_projectSettingsAddBreakpointsTooltip "Click to select API functions, Kernel functions and Generic breakpoint for the debugged application"
 
 // Frame terminators:
 #define GD_STR_DebugSettingsGlFlush "glF&lush"

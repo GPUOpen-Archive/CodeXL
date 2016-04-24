@@ -892,8 +892,12 @@ void afNewProjectDialog::createGeneralPage()
 
 
     // Remote host:
-    m_pRemoteHostRadioButton = new QRadioButton;
-    m_pLocalHostRadioButton = new QRadioButton;
+    m_pRemoteHostRadioButton = new QRadioButton(AF_STR_newProject_remoteHost);
+    m_pLocalHostRadioButton = new QRadioButton(AF_STR_newProject_localHost);
+
+    m_pRemoteHostRadioButton->setToolTip(AF_STR_newProject_remoteHostTooltip);
+    m_pLocalHostRadioButton->setToolTip(AF_STR_newProject_localHostTooltip);
+
     m_pDummyRemoteWidgetA = new QWidget;
     m_pRemoteHostLayoutA = new QHBoxLayout;
     m_pRemoteHostLayoutB = new QHBoxLayout;
@@ -901,6 +905,7 @@ void afNewProjectDialog::createGeneralPage()
     m_pRemoteHostPortLabel = new QLabel;
     m_pRemoteHostPortLineEdit = new QLineEdit;
     m_pTestConnectionButton = new QPushButton(AF_STR_newProject_remoteHostTestConnection);
+    m_pTestConnectionButton->setToolTip(AF_STR_newProject_remoteHostTestConnectionTooltip);
 
     m_pRemoteHostLayoutB->setContentsMargins(0, 0, 0, 0);
     m_pRemoteHostLayoutB->addWidget(m_pLocalHostRadioButton, 0, Qt::AlignLeft);
@@ -925,8 +930,6 @@ void afNewProjectDialog::createGeneralPage()
     pLayout->addWidget(m_pRemoteHostAddressLabel, currentGridRow, 0);
     pLayout->addLayout(m_pRemoteHostLayoutA, currentGridRow, 1, 1, 2);
 
-    m_pRemoteHostRadioButton->setText(AF_STR_newProject_remoteHost);
-    m_pLocalHostRadioButton->setText(AF_STR_newProject_localHost);
     m_pLocalHostRadioButton->setChecked(true);
     m_pRemoteHostPortLabel->setText(AF_STR_newProject_remoteHostPort);
     m_pRemoteHostPortLineEdit->setText(AF_STR_newProject_remoteHostDefaultPort);
@@ -952,7 +955,9 @@ void afNewProjectDialog::createGeneralPage()
 
     // Exe / User ID radio:
     m_pProgramExeRadioButton = new QRadioButton(AF_STR_newProjectDesktopApplication);
+    m_pProgramExeRadioButton->setToolTip(AF_STR_newProjectDesktopApplicationTooltip);
     m_pWinStoreAppRadioButton = new QRadioButton(AF_STR_newProjectWindowsStoreApp);
+    m_pWinStoreAppRadioButton->setToolTip(AF_STR_newProjectWindowsStoreAppTooltip);
 
     QButtonGroup* pGroup = new QButtonGroup;
     pGroup->addButton(m_pProgramExeRadioButton);
@@ -966,7 +971,9 @@ void afNewProjectDialog::createGeneralPage()
     m_pBrowseForExeButton->setContentsMargins(0, 0, 0, 0);
     m_pBrowseForExeButtonAction = new afBrowseAction(AF_Str_NewProjectBrowseForEXE);
     m_pBrowseForExeButton->setDefaultAction(m_pBrowseForExeButtonAction);
+    m_pBrowseForExeButton->setToolTip(AF_STR_newProjectProjectBrowseForExePathTooltipApp);
     m_pBrowseForExeButtonAction->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
+    m_pBrowseForExeButtonAction->setToolTip(AF_STR_newProjectProjectBrowseForExePathTooltipApp);
 
     QHBoxLayout* pHLayout = new QHBoxLayout;
     pHLayout->addWidget(m_pProgramExeRadioButton, 0, Qt::AlignLeft);
@@ -1022,10 +1029,12 @@ void afNewProjectDialog::createGeneralPage()
     m_pWorkingFolderTextEdit = new QLineEdit;
     m_pWorkingFolderPathButton = new QToolButton;
     m_pWorkingFolderPathButton->setContentsMargins(0, 0, 0, 0);
+    m_pWorkingFolderPathButton->setToolTip(AF_STR_newProjectWorkingFolderTooltip);
 
     m_pBrowseForWorkingFolderAction = new afBrowseAction(AF_Str_NewProjectBrowseForWorkingFolder);
     m_pWorkingFolderPathButton->setDefaultAction(m_pBrowseForWorkingFolderAction);
     m_pBrowseForWorkingFolderAction->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
+    m_pBrowseForWorkingFolderAction->setToolTip(AF_STR_newProjectWorkingFolderTooltip);
 
     // Get the size for a button with standard icon:
     int buttonDim = (int)acScalePixelSizeToDisplayDPI(AF_NEW_PROJECT_BUTTON_STANDARD_SIZE);
@@ -1048,6 +1057,7 @@ void afNewProjectDialog::createGeneralPage()
     currentGridRow++;
     pLayout->addWidget(m_pProgramArgsTitle, currentGridRow, 0);
     pLayout->addWidget(m_pProgramArgs, currentGridRow, 1, 1, 1);
+    m_pProgramArgs->setToolTip(AF_STR_newProjectProgramArgumentsTooltip);
 
     // Environment variables:
     m_pEnvironmentVariablesTitle = new QLabel;
@@ -1060,6 +1070,7 @@ void afNewProjectDialog::createGeneralPage()
     m_pEditEnvironmentVariables->setContentsMargins(0, 0, 0, 0);
     m_pEditEnvironmentVariables->setMaximumSize(buttonSize);
     m_pEditEnvironmentVariables->setMinimumSize(buttonSize);
+    m_pEditEnvironmentVariables->setToolTip(AF_STR_newProjectEditEnvVarsTooltip);
 
     currentGridRow++;
     pLayout->addWidget(m_pEnvironmentVariablesTitle, currentGridRow, 0);
@@ -1085,6 +1096,7 @@ void afNewProjectDialog::createGeneralPage()
     m_pSourceFilesDirectoryButton->setContentsMargins(0, 0, 0, 0);
     m_pSourceFilesDirectoryButton->setMaximumSize(buttonSize);
     m_pSourceFilesDirectoryButton->setMinimumSize(buttonSize);
+    m_pSourceFilesDirectoryButton->setToolTip(AF_STR_projectSettingsSourceFilesDirectoryTooltip);
 
     // Connect the browse button to its slot:
     rc = connect(m_pSourceFilesDirectoryButton, SIGNAL(clicked()), this, SLOT(OnClickBrowseForSourceFilesDirectory()));
@@ -1689,7 +1701,8 @@ void afNewProjectDialog::OnApplicationTypeRadioButtonSelect()
 {
     // Sanity check:
     GT_IF_WITH_ASSERT((m_pWinStoreAppRadioButton != nullptr) && (m_pLocalHostRadioButton != nullptr) &&
-                      (m_pProgramExeRadioButton != nullptr) && (m_pProgramExeLabel != nullptr))
+                      (m_pProgramExeRadioButton != nullptr) && (m_pProgramExeLabel != nullptr) && 
+                      (m_pProgramExeTextEdit != nullptr) && (m_pBrowseForExeButton != nullptr))
     {
         bool isExe = m_pProgramExeRadioButton->isChecked();
 
@@ -1699,7 +1712,16 @@ void afNewProjectDialog::OnApplicationTypeRadioButtonSelect()
             m_pLocalHostRadioButton->setChecked(true);
         }
 
+        // Set the labels and tooltip of the relevant widgets for exe / windows store app selection
+        QString tooltip = isExe ? AF_STR_newProjectProjectBrowseForExePathTooltipApp : AF_STR_newProjectProjectBrowseForExePathTooltipWinStoreApp;
+        QString editBoxTooltip = isExe ? AF_STR_newProjectProjectEXEEditLineTooltipApp : AF_STR_newProjectProjectStoreAppEditLineTooltipApp;
         QString label = isExe ? AF_STR_newProjectProjectExePath : AF_STR_newProjectWindowsStoreAppUserModelID;
+
+        m_pBrowseForExeButton->setToolTip(tooltip);
+        m_pBrowseForExeButtonAction->setToolTip(tooltip);
+
+        m_pProgramExeTextEdit->setToolTip(editBoxTooltip);
+
         m_pProgramExeLabel->setText(label);
 
         adjustGuiToHostChange(false);
