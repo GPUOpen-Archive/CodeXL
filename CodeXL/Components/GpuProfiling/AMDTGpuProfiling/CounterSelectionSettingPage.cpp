@@ -1137,7 +1137,7 @@ Qt::CheckState CounterSelectionSettingWindow::GetItemCheckStateByChildrenState(Q
             // set the parent state
             const QString name = pParent->text(0);
 
-            //set checked only HSA default checkboxes
+            //set checked only HSA default check boxes
             if (m_pHSARadioButton->isChecked())
             {
                 cs = HSADefaultCheckedList.contains(name) ? Qt::Checked : Qt::Unchecked;
@@ -1145,7 +1145,16 @@ Qt::CheckState CounterSelectionSettingWindow::GetItemCheckStateByChildrenState(Q
             }
             else
             {
-                cs = Qt::Checked;
+                if (m_currentSettings.m_checkedCounterList.contains(name))
+                {
+                    cs = m_currentSettings.m_checkedCounterList[name] == true? Qt::Checked : Qt::Unchecked;
+                }
+                //by default set counter unchecked
+                else
+                {
+                    //in internal builds disable check boxes by default
+                    cs = (Util::IsInternalBuild() == true)? Qt::Unchecked : Qt::Checked;
+                }
                 pParent->setCheckState(0, cs);
             }
         }
