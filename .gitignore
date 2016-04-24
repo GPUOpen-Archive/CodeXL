@@ -261,3 +261,4 @@ CodeXL/Components/ShaderAnalyzer/AMDTKernelAnalyzer/tmp/
 # JetBrains Rider
 .idea/
 *.sln.iml
+/CodeXL/Components/GpuProfiling/Build/CodeXLGpuProfiler
