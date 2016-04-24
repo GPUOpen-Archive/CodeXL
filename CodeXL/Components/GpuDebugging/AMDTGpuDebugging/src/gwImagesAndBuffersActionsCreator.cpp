@@ -156,11 +156,13 @@ bool gwImagesAndBuffersActionsCreator::actionText(int actionIndex, gtString& cap
         case ID_IMAGES_AND_BUFFERS_VIEWER_TOOLBAR_ZOOMIN:
             caption = GD_STR_ImagesAndBuffersViewerToolbarZoomInTool;
             tooltip = GD_STR_ImagesAndBuffersViewerToolbarZoomInTool;
+            keyboardShortcut = GD_STR_keyboardShortcutZoomInString;
             break;
 
         case ID_IMAGES_AND_BUFFERS_VIEWER_TOOLBAR_ZOOMOUT:
             caption = GD_STR_ImagesAndBuffersViewerToolbarZoomOutTool;
             tooltip = GD_STR_ImagesAndBuffersViewerToolbarZoomOutTool;
+            keyboardShortcut = GD_STR_keyboardShortcutZoomOutString;
             break;
 
         case ID_IMAGES_AND_BUFFERS_VIEWER_ORIGINAL_SIZE:
@@ -176,11 +178,13 @@ bool gwImagesAndBuffersActionsCreator::actionText(int actionIndex, gtString& cap
         case ID_IMAGES_AND_BUFFERS_VIEWER_TOOLBAR_ROTATE_LEFT:
             caption = GD_STR_ImagesAndBuffersViewerToolbarRotateLeft;
             tooltip = GD_STR_ImagesAndBuffersViewerToolbarRotateLeft;
+            keyboardShortcut = GD_STR_keyboardShortcutLeftString;
             break;
 
         case ID_IMAGES_AND_BUFFERS_VIEWER_TOOLBAR_ROTATE_RIGHT:
             caption = GD_STR_ImagesAndBuffersViewerToolbarRotateRight;
             tooltip = GD_STR_ImagesAndBuffersViewerToolbarRotateRight;
+            keyboardShortcut = GD_STR_keyboardShortcutRightString;
             break;
 
         case ID_IMAGES_AND_BUFFERS_VIEWER_TOOLBAR_RED_CHANNEL:
