@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<VersionSettings>
+  <TitleCaption>Internal</TitleCaption>
+  <GPUProfilerExe>sprofile-Internal.exe</GPUProfilerExe>
+  <GPUProfilerPerfCountersDll>GPUPerfAPICounters-Internal.dll</GPUProfilerPerfCountersDll>
+  <CheckForNewVersionURL>http://developer.amd.com/assets</CheckForNewVersionURL>
+</VersionSettings>

@@ -92,12 +92,12 @@ const std::vector<std::string> SQL_CREATE_DB_STMTS_AGGREGATION =
     //TODO: For some tables, ROWID can be used as PK instead of explicit PK column. We can remove such columns.
     "CREATE TABLE Core (id INTEGER NOT NULL PRIMARY KEY, processorId INTEGER, numaNodeId INTEGER)",
     "CREATE TABLE SamplingCounter (id INTEGER NOT NULL PRIMARY KEY, name TEXT, description TEXT)",
-    "CREATE TABLE SamplingConfiguration (id INTEGER PRIMARY KEY AUTOINCREMENT, counterId INTEGER, samplingInterval INTEGER, unitMask INTEGER, isUserMode INTEGER, isOsMode INTEGER, edge INTEGER)",
-    "CREATE TABLE CoreSamplingConfiguration (id INTEGER PRIMARY KEY AUTOINCREMENT, coreId INTEGER, samplingConfigurationId INTEGER)", // FOREIGN KEY(samplingConfigurationId) REFERENCES SamplingConfiguration(id), FOREIGN KEY(coreId) REFERENCES Core(id)
+    "CREATE TABLE SamplingConfiguration (id INTEGER PRIMARY KEY, counterId INTEGER, samplingInterval INTEGER, unitMask INTEGER, isUserMode INTEGER, isOsMode INTEGER, edge INTEGER)",
+    "CREATE TABLE CoreSamplingConfiguration (id INTEGER PRIMARY KEY, coreId INTEGER, samplingConfigurationId INTEGER)", // FOREIGN KEY(samplingConfigurationId) REFERENCES SamplingConfiguration(id), FOREIGN KEY(coreId) REFERENCES Core(id)
     "CREATE TABLE Process (id INTEGER NOT NULL PRIMARY KEY, name TEXT, is32Bit INTEGER)",
     "CREATE TABLE Module (id INTEGER PRIMARY KEY, path TEXT, isSystemModule INTEGER, is32Bit INTEGER, type INTEGER, size INTEGER, foundDebugInfo INTEGER)",
     "CREATE TABLE ModuleInstance (id INTEGER PRIMARY KEY, processId INTEGER, moduleId INTEGER, loadAddress INTEGER)", // FOREIGN KEY(processId) REFERENCES Process(id), FOREIGN KEY(moduleId) REFERENCES Module(id)
-    "CREATE TABLE ProcessThread (id INTEGER PRIMARY KEY AUTOINCREMENT, processId INTEGER, threadId INTEGER)", // FOREIGN KEY(processId) REFERENCES Process(id)
+    "CREATE TABLE ProcessThread (id INTEGER PRIMARY KEY, processId INTEGER, threadId INTEGER)", // FOREIGN KEY(processId) REFERENCES Process(id)
     "CREATE TABLE Function (id INTEGER PRIMARY KEY, moduleId INTEGER, name TEXT, startOffset INTEGER, size INTEGER, sourceFileId INTEGER)", // FOREIGN KEY(moduleId) REFERENCES module(id)
     "CREATE TABLE SampleContext (id INTEGER PRIMARY KEY AUTOINCREMENT, processThreadId INTEGER, moduleInstanceId INTEGER, coreSamplingConfigurationId INTEGER, functionId INTEGER, offset INTEGER, count INTEGER, sourceLine INTEGER DEFAULT 0)", // FOREIGN KEY(processThreadId) REFERENCES ProcessThread(rowid), FOREIGN KEY(moduleInstanceId) REFERENCES ModuleInstance(id), FOREIGN KEY(coreSamplingConfigurationId) REFERENCES CoreSamplingConfiguration(id)
     "CREATE TABLE SourceFile (path TEXT)",
@@ -395,7 +395,7 @@ public:
     {
         bool ret = false;
 
-        const char* pCsSqlCmd = "INSERT INTO SamplingConfiguration(counterId, samplingInterval, unitMask, isUserMode, isOsMode, edge) VALUES(?, ?, ?, ?, ?, ?);";
+        const char* pCsSqlCmd = "INSERT INTO SamplingConfiguration(id, counterId, samplingInterval, unitMask, isUserMode, isOsMode, edge) VALUES(?, ?, ?, ?, ?, ?, ?);";
         int rc = sqlite3_prepare_v2(m_pWriteDbConn, pCsSqlCmd, -1, &m_pSamplingConfigInsertStmt, nullptr);
         ret = (rc == SQLITE_OK);
 
@@ -406,7 +406,7 @@ public:
     {
         bool ret = false;
 
-        const char* pCsSqlCmd = "INSERT INTO CoreSamplingConfiguration(coreId, samplingConfigurationId) VALUES(?, ?);";
+        const char* pCsSqlCmd = "INSERT INTO CoreSamplingConfiguration(id, coreId, samplingConfigurationId) VALUES(?, ?, ?);";
         int rc = sqlite3_prepare_v2(m_pWriteDbConn, pCsSqlCmd, -1, &m_pCoreSamplingConfigInsertStmt, nullptr);
         ret = (rc == SQLITE_OK);
 
@@ -450,7 +450,7 @@ public:
     {
         bool ret = false;
 
-        const char* pCsSqlCmd = "INSERT INTO ProcessThread(processId, threadId) VALUES(?, ?);";
+        const char* pCsSqlCmd = "INSERT INTO ProcessThread(id, processId, threadId) VALUES(?, ?, ?);";
         int rc = sqlite3_prepare_v2(m_pWriteDbConn, pCsSqlCmd, -1, &m_pProcessThreadInsertStmt, nullptr);
         ret = (rc == SQLITE_OK);
 
@@ -1322,16 +1322,17 @@ public:
         return ret;
     }
 
-    bool InsertSamplingConfig(gtUInt16 counterId, gtUInt64 samplingInterval, gtUInt16 unitMask, int isUserMode, int isOsMode, int edge)
+    bool InsertSamplingConfig(gtUInt32 id, gtUInt16 counterId, gtUInt64 samplingInterval, gtUInt16 unitMask, int isUserMode, int isOsMode, int edge)
     {
         bool ret = false;
 
-        sqlite3_bind_int(m_pSamplingConfigInsertStmt, 1, counterId);
-        sqlite3_bind_int64(m_pSamplingConfigInsertStmt, 2, samplingInterval);
-        sqlite3_bind_int(m_pSamplingConfigInsertStmt, 3, unitMask);
-        sqlite3_bind_int(m_pSamplingConfigInsertStmt, 4, isUserMode);
-        sqlite3_bind_int(m_pSamplingConfigInsertStmt, 5, isOsMode);
-        sqlite3_bind_int(m_pSamplingConfigInsertStmt, 6, edge);
+        sqlite3_bind_int(m_pSamplingConfigInsertStmt, 1, id);
+        sqlite3_bind_int(m_pSamplingConfigInsertStmt, 2, counterId);
+        sqlite3_bind_int64(m_pSamplingConfigInsertStmt, 3, samplingInterval);
+        sqlite3_bind_int(m_pSamplingConfigInsertStmt, 4, unitMask);
+        sqlite3_bind_int(m_pSamplingConfigInsertStmt, 5, isUserMode);
+        sqlite3_bind_int(m_pSamplingConfigInsertStmt, 6, isOsMode);
+        sqlite3_bind_int(m_pSamplingConfigInsertStmt, 7, edge);
 
         if (SQLITE_DONE == sqlite3_step(m_pSamplingConfigInsertStmt))
         {
@@ -1342,12 +1343,13 @@ public:
         return ret;
     }
 
-    bool InsertCoreSamplingConfig(gtUInt16 coreId, gtUInt32 samplingConfigId)
+    bool InsertCoreSamplingConfig(gtUInt64 id, gtUInt16 coreId, gtUInt32 samplingConfigId)
     {
         bool ret = false;
 
-        sqlite3_bind_int(m_pCoreSamplingConfigInsertStmt, 1, coreId);
-        sqlite3_bind_int(m_pCoreSamplingConfigInsertStmt, 2, samplingConfigId);
+        sqlite3_bind_int64(m_pCoreSamplingConfigInsertStmt, 1, id);
+        sqlite3_bind_int(m_pCoreSamplingConfigInsertStmt, 2, coreId);
+        sqlite3_bind_int(m_pCoreSamplingConfigInsertStmt, 3, samplingConfigId);
 
         if (SQLITE_DONE == sqlite3_step(m_pCoreSamplingConfigInsertStmt))
         {
@@ -1396,12 +1398,13 @@ public:
         return ret;
     }
 
-    bool InsertProcessThreadInfo(gtUInt64 pid, gtUInt64 threadId)
+    bool InsertProcessThreadInfo(gtUInt64 id, gtUInt64 pid, gtUInt64 threadId)
     {
         bool ret = false;
 
-        sqlite3_bind_int64(m_pProcessThreadInsertStmt, 1, pid);
-        sqlite3_bind_int64(m_pProcessThreadInsertStmt, 2, threadId);
+        sqlite3_bind_int64(m_pProcessThreadInsertStmt, 1, id);
+        sqlite3_bind_int64(m_pProcessThreadInsertStmt, 2, pid);
+        sqlite3_bind_int64(m_pProcessThreadInsertStmt, 3, threadId);
 
         if (SQLITE_DONE == sqlite3_step(m_pProcessThreadInsertStmt))
         {
@@ -1623,80 +1626,6 @@ public:
         }
 
         sqlite3_reset(m_pSamplingConfigIdQueryStmt);
-        return ret;
-    }
-
-    // Used while inserting samples
-    bool GetCoreSamplingConfigId(gtUInt32 coreId, gtUInt64 samplingConfigId, gtUInt64& coreSamplingConfigId)
-    {
-        bool ret = false;
-        coreSamplingConfigId = 0;
-
-        sqlite3_bind_int(m_pCoreSamplingConfigIdQueryStmt, 1, coreId);
-        sqlite3_bind_int64(m_pCoreSamplingConfigIdQueryStmt, 2, samplingConfigId);
-
-        if (SQLITE_ROW == sqlite3_step(m_pCoreSamplingConfigIdQueryStmt))
-        {
-            coreSamplingConfigId = sqlite3_column_int64(m_pCoreSamplingConfigIdQueryStmt, 0);
-            ret = true;
-        }
-
-        sqlite3_reset(m_pCoreSamplingConfigIdQueryStmt);
-        return ret;
-    }
-
-    bool GetProcessThreadId(gtUInt64 pid, gtUInt32 threadId, gtUInt64& processThreadId)
-    {
-        bool ret = false;
-        processThreadId = 0;
-
-        sqlite3_bind_int64(m_pProcessThreadIdQueryStmt, 1, pid);
-        sqlite3_bind_int(m_pProcessThreadIdQueryStmt, 2, threadId);
-
-        if (SQLITE_ROW == sqlite3_step(m_pProcessThreadIdQueryStmt))
-        {
-            processThreadId = sqlite3_column_int64(m_pProcessThreadIdQueryStmt, 0);
-            ret = true;
-        }
-
-        sqlite3_reset(m_pProcessThreadIdQueryStmt);
-        return ret;
-    }
-
-    bool GetModuleInstanceId(gtUInt64 pid, gtUInt64 moduleId, gtUInt64 loadAddr, gtUInt64& moduleInstanceId)
-    {
-        bool ret = false;
-        moduleInstanceId = 0;
-
-        sqlite3_bind_int64(m_pModuleInstanceIdQueryStmt, 1, pid);
-        sqlite3_bind_int64(m_pModuleInstanceIdQueryStmt, 2, moduleId);
-        sqlite3_bind_int64(m_pModuleInstanceIdQueryStmt, 3, loadAddr);
-
-        if (SQLITE_ROW == sqlite3_step(m_pModuleInstanceIdQueryStmt))
-        {
-            moduleInstanceId = sqlite3_column_int64(m_pModuleInstanceIdQueryStmt, 0);
-            ret = true;
-        }
-
-        sqlite3_reset(m_pModuleInstanceIdQueryStmt);
-        return ret;
-    }
-
-    bool GetFunctionId(gtUInt64 moduleId, gtUInt64 funcStartOffset, gtUInt64& functionId)
-    {
-        bool ret = false;
-        functionId = 0;
-
-        sqlite3_bind_int64(m_pFunctionIdQueryStmt, 1, moduleId);
-        sqlite3_bind_int64(m_pFunctionIdQueryStmt, 2, funcStartOffset);
-
-        if (SQLITE_ROW == sqlite3_step(m_pFunctionIdQueryStmt))
-        {
-            functionId = sqlite3_column_int64(m_pFunctionIdQueryStmt, 0);
-            ret = true;
-        }
-
-        sqlite3_reset(m_pFunctionIdQueryStmt);
         return ret;
     }
 
@@ -4614,13 +4543,14 @@ bool AmdtDatabaseAccessor::InsertSamplingCounter(gtUInt32 eventId, gtString name
     return ret;
 }
 
-bool AmdtDatabaseAccessor::InsertSamplingConfig(gtUInt16 counterId, gtUInt64 samplingInterval, gtUInt16 unitMask, bool isUserMode, bool isOsMode, bool edge)
+bool AmdtDatabaseAccessor::InsertSamplingConfig(gtUInt32 id, gtUInt16 counterId, gtUInt64 samplingInterval, gtUInt16 unitMask, bool isUserMode, bool isOsMode, bool edge)
 {
     bool ret = false;
 
     if (m_pImpl != nullptr)
     {
-        ret = m_pImpl->InsertSamplingConfig(counterId,
+        ret = m_pImpl->InsertSamplingConfig(id,
+                                            counterId,
                                             samplingInterval,
                                             unitMask,
                                             (isUserMode ? 1 : 0),
@@ -4631,18 +4561,13 @@ bool AmdtDatabaseAccessor::InsertSamplingConfig(gtUInt16 counterId, gtUInt64 sam
     return ret;
 }
 
-bool AmdtDatabaseAccessor::InsertCoreSamplingConfig(gtUInt16 coreId, gtUInt16 eventId, gtUByte unitMask, bool bitOs, bool bitUsr)
+bool AmdtDatabaseAccessor::InsertCoreSamplingConfig(gtUInt64 id, gtUInt16 coreId, gtUInt32 samplingConfigId)
 {
     bool ret = false;
 
     if (m_pImpl != nullptr)
     {
-        gtUInt64 samplingConfigId;
-
-        if (m_pImpl->GetSamplingConfigId(eventId, unitMask, bitOs, bitUsr, samplingConfigId))
-        {
-            ret = m_pImpl->InsertCoreSamplingConfig(coreId, static_cast<gtUInt32>(samplingConfigId));
-        }
+        ret = m_pImpl->InsertCoreSamplingConfig(id, coreId, samplingConfigId);
     }
 
     return ret;
@@ -4696,13 +4621,13 @@ bool AmdtDatabaseAccessor::InsertModuleInstanceInfo(gtUInt32 moduleInstanceId, g
     return ret;
 }
 
-bool AmdtDatabaseAccessor::InsertProcessThreadInfo(gtUInt64 pid, gtUInt64 threadId)
+bool AmdtDatabaseAccessor::InsertProcessThreadInfo(gtUInt64 id, gtUInt64 pid, gtUInt64 threadId)
 {
     bool ret = false;
 
     if (m_pImpl != nullptr)
     {
-        ret = m_pImpl->InsertProcessThreadInfo(pid, threadId);
+        ret = m_pImpl->InsertProcessThreadInfo(id, pid, threadId);
     }
 
     return ret;
@@ -4714,24 +4639,10 @@ bool AmdtDatabaseAccessor::InsertSamples(CPSampleData& sampleData)
 
     if (m_pImpl != nullptr)
     {
-        gtUInt64 coreSamplingConfigId = 0;
-        gtUInt64 processThreadId = 0;
-        gtUInt64 samplingConfigId = 0;
-
-        // TODO: We could use table inner join to get the coreSamplingConfigId in single query instead of two queries
-        ret = m_pImpl->GetSamplingConfigId(sampleData.m_event, sampleData.m_unitMask, sampleData.m_bitOs, sampleData.m_bitUsr, samplingConfigId);
-
-        if (ret)
-        {
-            m_pImpl->GetCoreSamplingConfigId(sampleData.m_coreId, samplingConfigId, coreSamplingConfigId);
-        }
-
-        m_pImpl->GetProcessThreadId(sampleData.m_pid, sampleData.m_threadId, processThreadId);
-
         ret = m_pImpl->InsertSamples(
-                  processThreadId,
+                  sampleData.m_processThreadId,
                   sampleData.m_moduleInstanceId,
-                  coreSamplingConfigId,
+                  sampleData.m_coreSamplingConfigId,
                   sampleData.m_functionId,
                   sampleData.m_offset,
                   sampleData.m_count);

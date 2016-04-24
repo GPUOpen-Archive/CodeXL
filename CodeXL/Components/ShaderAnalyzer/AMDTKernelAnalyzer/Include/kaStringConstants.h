@@ -188,7 +188,7 @@
 #define KA_STR_tableLoopsColumn "Loop Iterations"
 
 // analysis settings page:
-#define KA_STR_analyzeSettingsPageTitle L"Analyze"
+#define KA_STR_analyzeSettingsPageTitle L"&Analyze"
 #define KA_STR_analsisSettingGeneralInfo "Default kernel analysis work dimensions"
 #define KA_STR_analsisSettingKernelColumn "Kernel"
 #define KA_STR_analsisSettingDefaultGlobal "64"

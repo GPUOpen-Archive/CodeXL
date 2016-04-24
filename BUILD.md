@@ -28,6 +28,7 @@ CodeXL uses the SCons build system on Linux.
 * sudo apt-get install libglu1-mesa-dev mesa-common-dev libgtk2.0-dev
 * sudo apt-get install zlib1g-dev libx11-dev:i386
 * sudo apt-get install scons
+* Download and install latest JDK both for linux from : http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 
 #### Building on CENTOS 6.X
 Install compiler 4.7.2
@@ -51,6 +52,7 @@ Install glibc
 * If the ROCR header files are not available on the build system, you can skip this part of the build.  See the Build Switches section below for information on how to do this.
 
 #### Building CodeXL
+* Before build please define JAVA_HOME variable for example : export JAVA_HOME=/opt/java/jdk1.8.0_77
 * CD to local copy of /CodeXL/Components/GpuProfiling/Build
 * Run ./backend_build.sh
 * CD to local copy of /CodeXL/Util/linux/
