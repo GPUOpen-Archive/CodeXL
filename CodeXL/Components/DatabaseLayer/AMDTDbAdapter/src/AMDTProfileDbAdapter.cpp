@@ -178,7 +178,7 @@ bool amdtProfileDbAdapter::InsertTopology(const CPAdapterTopologyMap& topologyMa
 
     for (const auto& t : topologyMap)
     {
-        ret = m_pDbAccessor->InsertCoreInfo(t.coreId, static_cast<gtUInt16>(t.processor), static_cast<gtUInt16>(t.numaNode));
+        ret = m_pDbAccessor->InsertCoreInfo(t.m_coreId, t.m_processor, t.m_numaNode);
     }
 
     return ret;
@@ -191,7 +191,8 @@ bool amdtProfileDbAdapter::InsertSamplingEvents(AMDTProfileCounterDescVec& event
     for (const auto& config : configVec)
     {
         bool edge = false;
-        ret = m_pDbAccessor->InsertSamplingConfig((AMDTUInt16)config.m_hwEventId,
+        ret = m_pDbAccessor->InsertSamplingConfig(config.m_id,
+                                                  static_cast<AMDTUInt16>(config.m_hwEventId),
                                                   config.m_samplingInterval,
                                                   config.m_unitMask,
                                                   config.m_userMode,
@@ -213,7 +214,7 @@ bool amdtProfileDbAdapter::InsertProcessInfo(const CPAProcessList& procesList)
 
     for (const auto& p : procesList)
     {
-        ret = m_pDbAccessor->InsertProcessInfo(p.pid, p.name, p.is32Bit);
+        ret = m_pDbAccessor->InsertProcessInfo(p.m_pid, p.m_name, p.m_is32Bit);
     }
 
     return ret;
@@ -249,7 +250,7 @@ bool amdtProfileDbAdapter::InsertProcessThreadInfo(const CPAProcessThreadList& p
 
     for (const auto& it : procThreadList)
     {
-        ret = m_pDbAccessor->InsertProcessThreadInfo(it.pid, it.threadId);
+        ret = m_pDbAccessor->InsertProcessThreadInfo(it.m_ptId, it.m_processId, it.m_threadId);
     }
 
     return ret;
@@ -261,12 +262,7 @@ bool amdtProfileDbAdapter::InsertCoreSamplingConfigInfo(const CPACoreSamplingCon
 
     for (const auto& it : coreConfigList)
     {
-        gtUInt16 event;
-        gtUByte unitMask;
-        bool bitOs;
-        bool bitUsr;
-        DecodeEvent(it.eventMask, event, unitMask, bitOs, bitUsr);
-        ret = m_pDbAccessor->InsertCoreSamplingConfig(static_cast<gtUInt16>(it.coreId), event, unitMask, bitOs, bitUsr);
+        ret = m_pDbAccessor->InsertCoreSamplingConfig(it.m_id, it.m_coreId, it.m_samplingConfigId);
     }
 
     return ret;
@@ -291,13 +287,11 @@ bool amdtProfileDbAdapter::InsertSamples(const CPASampeInfoList& sampleList)
     for (const auto& it : sampleList)
     {
         CPSampleData sampleData;
-        DecodeEvent(it.m_eventMask, sampleData.m_event, sampleData.m_unitMask, sampleData.m_bitOs, sampleData.m_bitUsr);
 
+        sampleData.m_processThreadId = it.m_processThreadId;
         sampleData.m_moduleInstanceId = it.m_moduleInstanceId;
-        sampleData.m_pid = it.m_pid;
-        sampleData.m_coreId = it.m_coreId;
-        sampleData.m_threadId = it.m_threadId;
-        sampleData.m_functionId = it.m_functionid;
+        sampleData.m_coreSamplingConfigId = it.m_coreSamplingConfigId;
+        sampleData.m_functionId = it.m_functionId;
         sampleData.m_offset = it.m_offset;
         sampleData.m_count = it.m_count;
 
@@ -717,18 +711,6 @@ bool amdtProfileDbAdapter::GetBucketizedSamplesByCounterId(unsigned int bucketWi
 //
 //  Helper functions
 //
-
-void amdtProfileDbAdapter::DecodeEvent(gtUInt32 encoded, gtUInt16& event, gtUByte& unitMask, bool& bitOs, bool& bitUsr)
-{
-    gtUInt16 mask16 = static_cast<gtUInt16>(-1);
-    event = encoded & mask16;
-
-    gtUByte mask8 = static_cast<gtUByte>(-1);
-    unitMask = (encoded >> 16) & mask8;
-
-    bitOs = (encoded >> 25) & 1U;
-    bitUsr = (encoded >> 24) & 1U;
-}
 
 void amdtProfileDbAdapter::PrepareTimelineSamplesToInsert(AMDTProfileTimelineSample* pSample, gtVector<PPSampleData>& dbSamples)
 {

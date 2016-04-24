@@ -95,12 +95,12 @@ public:
 
     bool InsertCoreInfo(gtUInt32 coreId, gtUInt32 processorId, gtUInt32 numaNodeId);
     bool InsertSamplingCounter(gtUInt32 eventId, gtString name, gtString description);
-    bool InsertSamplingConfig(gtUInt16 counterId, gtUInt64 samplingInterval, gtUInt16 unitMask, bool isUserMode, bool isOsMode, bool edge);
-    bool InsertCoreSamplingConfig(gtUInt16 coreId, gtUInt16 eventId, gtUByte unitMask, bool bitOs, bool bitUsr);
+    bool InsertSamplingConfig(gtUInt32 id, gtUInt16 counterId, gtUInt64 samplingInterval, gtUInt16 unitMask, bool isUserMode, bool isOsMode, bool edge);
+    bool InsertCoreSamplingConfig(gtUInt64 id, gtUInt16 coreId, gtUInt32 samplingConfigId);
     bool InsertProcessInfo(gtUInt64 pid, const gtString& path, bool is32Bit);
     bool InsertModuleInfo(gtUInt32 id, const gtString& path, bool isSystemModule, bool is32Bit, gtUInt32 type, gtUInt32 size, bool foundDebugInfo);
     bool InsertModuleInstanceInfo(gtUInt32 moduleInstanceId, gtUInt32 moduleId, gtUInt64 pid, gtUInt64 loadAddr);
-    bool InsertProcessThreadInfo(gtUInt64 pid, gtUInt64 threadId);
+    bool InsertProcessThreadInfo(gtUInt64 id, gtUInt64 pid, gtUInt64 threadId);
     bool InsertSamples(CPSampleData& sampleData);
     bool InsertFunction(gtUInt32 funcId, gtUInt32 modId, const gtString& funcName, gtUInt64 offset, gtUInt64 size);
 

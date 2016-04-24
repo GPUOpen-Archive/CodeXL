@@ -1,0 +1,10 @@
+Package: codexl
+Version: 
+Architecture: amd64
+Maintainer: AMD Developer Tools <gputools.support@amd.com>
+Installed-Size: 327680
+Section: unknown
+Priority: extra
+Homepage: http://developer.amd.com/tools-and-sdks/heterogeneous-computing/codexl/
+Description: A comprehensive tool suite for performance-aware developers
+ CodeXL is a comprehensive tool suite that enables developers to harness the benefits of AMD CPUs, GPUs and APUs. It includes powerful GPU debugging, comprehensive GPU and CPU profiling, and OpenCL, DirectX and OpenGL static analysis capabilities, enhancing accessibility for software developers to enter the era of heterogeneous computing. AMD CodeXL is available both as a Visual Studio extension and a standalone user interface application for Windows and Linux.

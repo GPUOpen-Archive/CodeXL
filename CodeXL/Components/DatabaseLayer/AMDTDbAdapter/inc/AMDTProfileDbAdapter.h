@@ -130,7 +130,6 @@ public:
                                 AMDTProfileFunctionData&    functionData);
 
 private:
-    void DecodeEvent(gtUInt32 encoded, gtUInt16& event, gtUByte& unitMask, bool& bitOs, bool& bitUsr);
     void PrepareTimelineSamplesToInsert(AMDTProfileTimelineSample* pSample, gtVector<PPSampleData>& dbSamples);
 };
 

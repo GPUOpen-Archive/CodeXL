@@ -2,7 +2,7 @@
 // Copyright (c) 2015 Advanced Micro Devices, Inc. All rights reserved.
 /// \author AMD Developer Tools Team
 /// \file
-/// \brief  This class interfacts with GPA to retrieve PMC and write the output file
+/// \brief  This class interfaces with GPA to retrieve PMC and write the output file
 //==============================================================================
 
 #include <iostream>

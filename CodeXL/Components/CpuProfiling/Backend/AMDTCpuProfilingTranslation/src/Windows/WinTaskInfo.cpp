@@ -2650,20 +2650,14 @@ HRESULT WinTaskInfo::GetModuleInfo(TiModuleInfo* pModInfo)
 }
 
 #ifdef AMDT_ENABLE_CPUPROF_DB
-HRESULT WinTaskInfo::GetModuleInstanceInfoList(gtVector<std::tuple<gtUInt32, gtString, gtUInt64, gtUInt64>>& info)
+HRESULT WinTaskInfo::GetProcessThreadList(gtVector<std::tuple<gtUInt32, gtUInt32>>& info)
 {
     HRESULT hr = S_OK;
 
     // Iterate over user modules
-    for (const auto modIt : m_tiModMap)
+    for (const auto& it : m_ThreadMap)
     {
-        info.emplace_back(modIt.second.instanceId, gtString(modIt.second.moduleName), modIt.first.processId, modIt.first.moduleLoadAddr);
-    }
-
-    // Iterate over kernel modules
-    for (const auto modIt : m_tiKeModMap)
-    {
-        info.emplace_back(modIt.second.instanceId, gtString(modIt.second.keModName), 0, modIt.first.keModLoadAddr);
+        info.emplace_back(static_cast<gtUInt32>(it.first.processID), static_cast<gtUInt32>(it.first.threadID));
     }
 
     return hr;

@@ -12,7 +12,6 @@
 // Change list:    $ $
 //=====================================================================
 
-#include <AMDTBaseTools/Include/gtSet.h>
 #include <AMDTOSWrappers/Include/osFilePath.h>
 #include <AMDTOSWrappers/Include/osApplication.h>
 
@@ -58,12 +57,8 @@ void ProfilerDataDBWriter::PackCoreTopology(const CoreTopologyMap& coreTopology,
 
 void ProfilerDataDBWriter::DecodeSamplingEvent(EventMaskType encoded, gtUInt16& event, gtUByte& unitMask, bool& bitOs, bool& bitUsr)
 {
-    gtUInt16 eventMask = static_cast<gtUInt16>(-1);
-    event = encoded & eventMask;
-
-    gtUByte umask = static_cast<gtUByte>(-1);
-    unitMask = (encoded >> 16) & umask;
-
+    event = encoded & 0xFFFFU;
+    unitMask = (encoded >> 16) & 0xFFU;
     bitOs = (encoded >> 25) & 1U;
     bitUsr = (encoded >> 24) & 1U;
 }
@@ -244,7 +239,6 @@ void ProfilerDataDBWriter::PackSamplingEvents(const CpuProfileInfo& profileInfo,
                                               AMDTProfileCounterDescVec& events,
                                               AMDTProfileSamplingConfigVec& samplingConfigs)
 {
-    int idx = 0;
     EventsFile eventsFile;
     bool eventsFileAvbl = InitializeEventsXMLFile(profileInfo.m_cpuFamily, profileInfo.m_cpuModel, eventsFile);
 
@@ -262,7 +256,8 @@ void ProfilerDataDBWriter::PackSamplingEvents(const CpuProfileInfo& profileInfo,
 
         DecodeSamplingEvent(samplingEvent.eventMask, eventSel, unitMask, os, user);
 
-        samplingConfig.m_id = ++idx;
+        // Use eventMask as id, clear the unused 6 MSBs in the eventMask value
+        samplingConfig.m_id = samplingEvent.eventMask & 0x3FFFFFF;
         samplingConfig.m_hwEventId = eventSel;
         samplingConfig.m_unitMask = unitMask;
         samplingConfig.m_osMode = os;
@@ -320,49 +315,42 @@ void ProfilerDataDBWriter::PackModuleInfo(const NameModuleMap& modMap, CPAModule
     }
 }
 
-void ProfilerDataDBWriter::PackModuleInstanceInfo(const NameModuleMap& modMap, const gtVector<std::tuple<gtUInt32, gtString, gtUInt64, gtUInt64>>& modInstanceInfo, CPAModuleInstanceList& moduleInstanceList)
+void ProfilerDataDBWriter::PackModuleInstanceInfo(const NameModuleMap& modMap, const gtHashMap<gtUInt32, std::tuple<gtString, gtUInt64, gtUInt64>>& modInstanceInfoMap, CPAModuleInstanceList& moduleInstanceList)
 {
     // modInstanceInfo : vector of <instanceId, modName, pid, loadAddr>
-    for (const auto& modIt : modInstanceInfo)
+    for (const auto& modIt : modInstanceInfoMap)
     {
         gtUInt32 moduleId = 0;
-        const auto& it = modMap.find(std::get<1>(modIt));
+        const auto& it = modMap.find(std::get<0>(modIt.second));
 
         if (it != modMap.end())
         {
             // Insert into DB only if the module has samples
             moduleId = it->second.m_moduleId;
-            moduleInstanceList.emplace_back(std::get<0>(modIt), moduleId, std::get<2>(modIt), std::get<3>(modIt));
+            moduleInstanceList.emplace_back(modIt.first, moduleId, std::get<1>(modIt.second), std::get<2>(modIt.second));
         }
     }
 }
 
-void ProfilerDataDBWriter::PackProcessThreadInfo(const NameModuleMap& modMap, CPAProcessThreadList& procThreadList)
+void ProfilerDataDBWriter::PackProcessThreadInfo(const gtVector<std::tuple<gtUInt32, gtUInt32>>& processThreadList, CPAProcessThreadList& procThreadIdList)
 {
-    gtSet<CPAProcessThreadInfo> ptSet;
-
-    for (auto& it : modMap)
+    for (const auto& it : processThreadList)
     {
-        for (auto fit = it.second.getBeginFunction(); fit != it.second.getEndFunction(); ++fit)
-        {
-            auto sit = fit->second.getBeginSample();
+        gtUInt32 processId = 0;
+        gtUInt32 threadId = 0;
+        std::tie(processId, threadId) = it;
 
-            if (sit != fit->second.getEndSample())
-            {
-                ptSet.insert(CPAProcessThreadInfo{ sit->first.m_pid, sit->first.m_tid });
-            }
-        }
-    }
+        gtUInt64 ptId = processId;
+        ptId = (ptId << 32) | threadId;
 
-    for (auto& it : ptSet)
-    {
-        procThreadList.push_back(it);
+        procThreadIdList.emplace_back(ptId, static_cast<gtUInt64>(processId), threadId);
     }
 }
 
 void ProfilerDataDBWriter::PackCoreSamplingConfigInfo(const NameModuleMap& modMap, CPACoreSamplingConfigList& coreConfigList)
 {
-    gtSet<CPACoreSamplingConfigInfo> configSet;
+    gtHashMap<gtUInt64, std::pair<gtUInt16, gtUInt32>> configs;
+    gtUInt32 unusedBitsMask = 0x3FFFFFF;
 
     for (auto& m : modMap)
     {
@@ -370,19 +358,23 @@ void ProfilerDataDBWriter::PackCoreSamplingConfigInfo(const NameModuleMap& modMa
         {
             for (auto cit = sit->second.getBeginSample(); cit != sit->second.getEndSample(); ++cit)
             {
-                configSet.insert(CPACoreSamplingConfigInfo{ static_cast<gtUInt32>(cit->first.cpu), cit->first.event });
+                gtUInt64 id = cit->first.cpu;
+                id = (id << 32) | (cit->first.event & unusedBitsMask);
+                configs.emplace(id, std::make_pair(static_cast<gtUInt16>(cit->first.cpu), cit->first.event));
             }
         }
     }
 
-    for (auto& it : configSet)
+    for (auto& it : configs)
     {
-        coreConfigList.push_back(it);
+        coreConfigList.emplace_back(it.first, it.second.first, it.second.second);
     }
 }
 
 void ProfilerDataDBWriter::PackSampleInfo(const NameModuleMap& modMap, CPASampeInfoList& sampleList)
 {
+    gtUInt32 unusedBitsMask = 0x3FFFFFF;
+
     for (auto& module : modMap)
     {
         // TODO: module load address should not come from NameModuleMap as
@@ -410,13 +402,16 @@ void ProfilerDataDBWriter::PackSampleInfo(const NameModuleMap& modMap, CPASampeI
                     }
                 }
 
+                gtUInt64 processThreadId = pid;
+                processThreadId = (processThreadId << 32) | threadId;
+
                 for (auto skIt = aptIt->second.getBeginSample(); skIt != aptIt->second.getEndSample(); ++skIt)
                 {
-                    gtUInt32 coreId = skIt->first.cpu;
-                    gtUInt32 eventMask = skIt->first.event;
                     gtUInt64 sampleCount = skIt->second;
+                    gtUInt64 coreSamplingConfigId = skIt->first.cpu;
+                    coreSamplingConfigId = (coreSamplingConfigId << 32) | (skIt->first.event & unusedBitsMask);
 
-                    sampleList.emplace_back(pid, threadId, moduleInstanceid, coreId, eventMask, functionId, sampleOffset, sampleCount);
+                    sampleList.emplace_back(processThreadId, moduleInstanceid, coreSamplingConfigId, functionId, sampleOffset, sampleCount);
                 }
             }
         }
@@ -476,8 +471,9 @@ bool ProfilerDataDBWriter::Write(
     CpuProfileInfo& profileInfo,
     gtUInt64 cpuAffinity,
     const PidProcessMap& procMap,
+    gtVector<std::tuple<gtUInt32, gtUInt32>>& processThreadList,
     const NameModuleMap& modMap,
-    const gtVector<std::tuple<gtUInt32, gtString, gtUInt64, gtUInt64>>& modInstanceInfo,
+    const gtHashMap<gtUInt32, std::tuple<gtString, gtUInt64, gtUInt64>>& modInstanceInfoMap,
     const CoreTopologyMap* pTopMap)
 {
     if (m_pCpuProfDbAdapter != nullptr)
@@ -528,14 +524,14 @@ bool ProfilerDataDBWriter::Write(
         moduleList.clear();
 
         CPAModuleInstanceList modInstanceList;
-        PackModuleInstanceInfo(modMap, modInstanceInfo, modInstanceList);
+        PackModuleInstanceInfo(modMap, modInstanceInfoMap, modInstanceList);
         m_pCpuProfDbAdapter->InsertModuleInstanceInfo(modInstanceList);
         modInstanceList.clear();
 
-        CPAProcessThreadList procThreadList;
-        PackProcessThreadInfo(modMap, procThreadList);
-        m_pCpuProfDbAdapter->InsertProcessThreadInfo(procThreadList);
-        procThreadList.clear();
+        CPAProcessThreadList procThreadIdList;
+        PackProcessThreadInfo(processThreadList, procThreadIdList);
+        m_pCpuProfDbAdapter->InsertProcessThreadInfo(procThreadIdList);
+        procThreadIdList.clear();
 
         CPACoreSamplingConfigList coreConfigList;
         PackCoreSamplingConfigInfo(modMap, coreConfigList);

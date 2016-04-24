@@ -294,9 +294,9 @@ HRESULT fnGetModuleInfo(TiModuleInfo* info)
 }
 
 #ifdef AMDT_ENABLE_CPUPROF_DB
-HRESULT fnGetModuleInstanceInfoList(gtVector<std::tuple<gtUInt32, gtString, gtUInt64, gtUInt64>>& info)
+HRESULT fnGetProcessThreadList(gtVector<std::tuple<gtUInt32, gtUInt32>>& info)
 {
-    HRESULT hr = g_TaskInfo.GetModuleInstanceInfoList(info);
+    HRESULT hr = g_TaskInfo.GetProcessThreadList(info);
 
     return hr;
 }
