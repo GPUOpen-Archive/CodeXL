@@ -54,6 +54,10 @@ gpConnectDialog::gpConnectDialog(GraphicsServerCommunication* pGraphicsServerCom
 
     bool rc = connect(&m_sampleTimer, SIGNAL(timeout()), this, SLOT(onTimerTimeout()));
     GT_ASSERT(rc);
+
+    Qt::WindowFlags flags = windowFlags();
+    flags &= ~Qt::WindowContextHelpButtonHint;
+    setWindowFlags(flags);
 }
 
 gpConnectDialog::~gpConnectDialog()
