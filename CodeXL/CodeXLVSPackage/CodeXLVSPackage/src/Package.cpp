@@ -457,7 +457,6 @@ void CodeXLVSPackage::onCodeXLExplorerView(CommandHandler* pSender, DWORD flags,
     {
         int viewId = VSCORE(vsc_GetObjectNavigationTreeId());
         _pObjectsExplorerToolWindow->setMyWindowCommandID(viewId);
-        _pObjectsExplorerToolWindow->CreateAndShow();
 
         // Invoke the core logic.
         VSCORE(vsc_OnCodeExplorerView)();

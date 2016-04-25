@@ -252,9 +252,8 @@ void gpMenuActionsExecutor::handleUiUpdate(int actionIndex)
             case ID_GP_REFRESH_FROM_SERVER:
             {
                 bool isProjectLoaded = !afProjectManager::instance().currentProjectSettings().projectName().isEmpty();
-                bool isRemoteTarget = afProjectManager::instance().currentProjectSettings().isRemoteTarget();
                 isActionEnabled = (afExecutionModeManager::instance().isActiveMode(GPU_STR_executionMode));
-                isActionEnabled = isActionEnabled && isRemoteTarget && isProjectLoaded;
+                isActionEnabled = isActionEnabled && isProjectLoaded;
             }
             break;
 
