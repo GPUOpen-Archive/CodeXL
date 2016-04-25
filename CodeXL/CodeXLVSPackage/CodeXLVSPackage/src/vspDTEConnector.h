@@ -119,6 +119,10 @@ public:
     /// Issue a save all command before starting a "Start ..." in codeXL
     void SaveAllCommand();
 
+    /// Execute a command
+    /// \Param command text
+    void ExecuteCommand(wchar_t* pCommandText);
+
 protected:
 
     void registerCommandListener();
