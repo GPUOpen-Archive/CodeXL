@@ -247,15 +247,6 @@ void GetFreeVM(gtUInt64& pFreeVM)
     return;
 }
 
-#ifdef AMDT_ENABLE_CPUPROF_DB
-static gtUInt32 generateFuncId(gtUInt16 moduleId, gtUInt16 funcSeq)
-{
-    gtUInt32 funcId = moduleId;
-    funcId = (funcId << 16) | funcSeq;
-    return funcId;
-}
-#endif
-
 PrdTranslator::ProcessInfo::ProcessInfo(ProcessIdType processId) : m_processId(processId)
 {
     m_exeAnalyzers.reserve(64);
@@ -926,7 +917,7 @@ void PrdTranslator::AggregateKnownModuleSampleData(
                         }
 
 #ifdef AMDT_ENABLE_CPUPROF_DB
-                        functionId = generateFuncId(module.m_moduleId, pFuncInfo->m_funcId);
+                        functionId = pFuncInfo->m_funcId;
 #endif
                     }
                 }

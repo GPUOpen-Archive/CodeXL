@@ -2608,10 +2608,26 @@ HRESULT WinTaskInfo::GetProcessThreadList(gtVector<std::tuple<gtUInt32, gtUInt32
 {
     HRESULT hr = S_OK;
 
-    // Iterate over user modules
-    for (const auto& it : m_ThreadMap)
+    for (const auto& it : m_interestingPidMap)
     {
-        info.emplace_back(static_cast<gtUInt32>(it.first.processID), static_cast<gtUInt32>(it.first.threadID));
+        ThreadInfoKey t_threadKey(static_cast<gtUInt64>(it.first), 0xFFFFFFFF);
+        auto iter = m_ThreadMap.upper_bound(t_threadKey);
+
+        if (m_ThreadMap.end() != iter)
+        {
+            --iter;
+            while (iter->first.processID == it.first)
+            {
+                info.emplace_back(static_cast<gtUInt32>(iter->first.processID), static_cast<gtUInt32>(iter->first.threadID));
+
+                if (m_ThreadMap.begin() == iter)
+                {
+                    break;
+                }
+
+                --iter;
+            }
+        }
     }
 
     return hr;
@@ -4617,40 +4633,6 @@ gtUInt64 WinTaskInfo::GetModuleSize(const wchar_t* pModuleName) const
 
     return imageSize;
 }
-
-#if 0
-void WinTaskInfo::UpdateOclKernelJit(unsigned int pid, gtUInt64* pJitAddress, unsigned int size, const wchar_t* pJitOutputDir)
-{
-    for (unsigned int k = 0; k < size; k++)
-    {
-        // this is user space, check module map.
-        ModuleMap::iterator i = m_tiModMap.lower_bound(ModuleKey(pid, pJitAddress[k], TI_TIMETYPE_MAX));
-
-        for (; i != m_tiModMap.end(); ++i)
-        {
-            ModuleMap::value_type& item = *i;
-
-            // different process
-            if (item.first.processId != pid)
-            {
-                break;
-            }
-
-            // since the module map is sorted by the process id, module address and time.
-            // if module load address is greater than sample address, we don't need
-            // go farther.
-            if (item.first.moduleLoadAddr != pJitAddress[k])
-            {
-                break;
-            }
-
-            //wcsncpy (pathstring, modulename, OS_MAX_PATH);
-            wsprintf(item.second.moduleName, L"%s\\%I64x.ocl", pJitOutputDir, pJitAddress[k]);
-            item.second.moduleType = evOCLModule;
-        }
-    }
-}
-#endif
 
 void WinTaskInfo::AddLoadModules(gtUInt64 processId)
 {

@@ -26,6 +26,13 @@
 #ifdef AMDT_ENABLE_CPUPROF_DB
 #include <ProfilerDataDBWriter.h>
 
+static inline gtUInt32 generateFuncId(gtUInt16 moduleId, gtUInt16 funcSeq)
+{
+    gtUInt32 funcId = moduleId;
+    funcId = (funcId << 16) | funcSeq;
+    return funcId;
+}
+
 void ProfilerDataDBWriter::PackSessionInfo(const CpuProfileInfo& profileInfo, gtUInt64 cpuAffinity, AMDTProfileSessionInfo& sessionInfo)
 {
     sessionInfo.m_targetAppPath = profileInfo.m_targetPath;
@@ -435,7 +442,7 @@ void ProfilerDataDBWriter::PackFunctionInfo(const NameModuleMap& modMap, CPAFunc
             gtString funcName = fit->second.getFuncName();
             gtUInt64 startOffset = fit->second.getBaseAddr() - modLoadAddr;
             gtUInt64 size = fit->second.getSize();
-            gtUInt32 funcId = fit->second.m_functionId;
+            gtUInt32 funcId = generateFuncId(modId, fit->second.m_functionId);
 
             // If function name is empty, it will be considered as unknown-function, don't insert into DB.
             // else insert function info into DB
