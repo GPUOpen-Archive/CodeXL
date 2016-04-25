@@ -77,19 +77,19 @@ public:
 /// Enums covering the initial static menu items
 enum pmMenuItemCommands
 {
-    //Profile menu:
-    ///Display the appropriate project settings dialog tab
+    // Profile menu:
+    /// Display the appropriate project settings dialog tab
     ID_PM_PROFILE_SETTINGS_DIALOG = SHARED_PROFILING_FIRST_COMMAND_ID,
     /// Starts a new profile
     ID_PM_START_PROFILE,
+    /// Pause or resume the profile
+    ID_PM_PAUSE_PROFILE,
+    /// Stop the profile
+    ID_PM_STOP_PROFILE,
     /// Attach to process and start profile
     ID_PM_ATTACH_PROFILE,
     /// Display the currently selected profile
     ID_PM_SELECTED_PROFILE,
-    ///Pause or resume the profile
-    ID_PM_PAUSE_PROFILE,
-    ///Manually stop the profile
-    ID_PM_STOP_PROFILE,
 
     PM_LAST_COMMAND_ID = ID_PM_STOP_PROFILE
 };

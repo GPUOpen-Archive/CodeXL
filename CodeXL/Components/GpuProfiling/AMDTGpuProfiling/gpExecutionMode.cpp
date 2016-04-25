@@ -501,7 +501,7 @@ void gpExecutionMode::OnStartFrameAnalysis()
 
         if (rc)
         {
-            gpConnectDialog connectionDialog(m_pGraphicsServerCommunication);
+            gpConnectDialog connectionDialog(m_pGraphicsServerCommunication, afMainAppWindow::instance());
             bool shouldConnect = connectionDialog.Connect();
             QString processID = connectionDialog.PIDToConnectTo();
 

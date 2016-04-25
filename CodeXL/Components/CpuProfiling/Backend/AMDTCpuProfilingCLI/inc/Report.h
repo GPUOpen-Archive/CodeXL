@@ -22,7 +22,7 @@
 #include <AMDTOSWrappers/Include/osTime.h>
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    //#define AMDT_ENABLE_DB_SUPPORT  1
+    // #define AMDT_ENABLE_DB_SUPPORT  1
 #endif
 
 #ifdef AMDT_ENABLE_DB_SUPPORT
@@ -277,7 +277,7 @@ private:
     bool                   m_isReportImix = false;
 
 #ifdef AMDT_ENABLE_DB_SUPPORT
-    AMDTProfileReaderHandle m_profileDbReader;
+    AMDTProfileReaderHandle m_profileDbReader = 0;
 #endif
 
     void SetupEnvironment();

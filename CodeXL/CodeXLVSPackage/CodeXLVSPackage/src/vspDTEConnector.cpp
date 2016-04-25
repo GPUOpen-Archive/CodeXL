@@ -5233,6 +5233,22 @@ void vspDTEConnector::SaveAllCommand()
     }
 }
 
+void vspDTEConnector::ExecuteCommand(wchar_t* pCommandText)
+{
+    assert(_piDTE != nullptr);
+
+    if (_piDTE != nullptr && pCommandText != nullptr)
+    {
+        BSTR commandStr = SysAllocString(pCommandText);
+
+        if (commandStr != nullptr)
+        {
+            _piDTE->ExecuteCommand(commandStr);
+            SysFreeString(commandStr);
+        }
+    }
+}
+
 void vspDTEConnector::vspDtecBuildSaveTree(IDteTreeEventHandler* pDteTreeEventHandler)
 {
     buildSaveTree(pDteTreeEventHandler);

@@ -109,11 +109,21 @@ public:
     bool GetModuleInfo(AMDTUInt32 pid, AMDTModuleId mid, gtVector<AMDTProfileModuleInfo>& moduleInfoList);
     bool GetThreadInfo(AMDTUInt32 pid, AMDTThreadId tid, gtVector<AMDTProfileThreadInfo>& threadInfoList);
 
+    bool GetCounterTotals(AMDTProfileDataType   type,
+        AMDTProcessId         procId,
+        AMDTThreadId          threadId,
+        AMDTModuleId          moduleId,
+        AMDTFunctionId        funcId,
+        gtVector<AMDTUInt32>  counterIdsList,
+        AMDTUInt64            coreMask,
+        bool                  separateByCore,
+        AMDTSampleValueVec&   sampleValueVec);
+
     bool GetProfileData(AMDTProfileDataType type,
                         AMDTProcessId processId,   // can be AMDT_CP_ALL_PROCESSES for process summary
                         AMDTModuleId moduleId,     // can be AMDT_CP_ALL_MODULES
                         AMDTThreadId threadId,     // can be AMDT_CP_ALL_THREAD
-                        AMDTUInt32 counterId,
+                        gtVector<AMDTUInt32> counterIdList,
                         AMDTUInt64 coreMask,       // can be AMDT_CP_ALL_CORES
                         bool separateByCore,
                         bool separateByProcess,

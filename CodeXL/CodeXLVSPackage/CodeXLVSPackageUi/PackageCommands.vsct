@@ -1401,14 +1401,12 @@
 
       <Combo guid="guidCodeXLVSPackageCmdSet" id="commandIDBitnessCombo" priority="0x0102" type="DropDownCombo" defaultWidth="100" idCommandList="commandIDBitnessComboGetList">
         <Parent guid="guidCodeXLVSPackageCmdSet" id="cmdidCodeXLKAItemsTLBShaderModelGroup"/>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>CommandWellOnly</CommandFlag>
-        <CommandFlag>IconAndText</CommandFlag>
         <Strings>
-          <ButtonText> </ButtonText>
+          <ButtonText>Shader Bitness</ButtonText>
           <ToolTipText>CodeXL: Shader Bitness</ToolTipText>
-          <CommandName>Shader Bitness</CommandName>
-          <CanonicalName>Shader Bitness</CanonicalName>
-          <LocCanonicalName>Shader Bitness</LocCanonicalName>
         </Strings>
       </Combo>
 
