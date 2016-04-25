@@ -72,9 +72,9 @@ enum HardcodedEventType
     #define KERNEL_SPACE_START  0x80000000
 #endif
 
-//const QString UNKNOWN_MODULE_PID = "unknown module pid";
 const QString UNKNOWN_MODULE_STR = "Unknown Module";
 #define UNKNOWN_KERNEL_SAMPLES  L"Unknown Kernel Samples"
+#define UNKNOWN_MODULE_PID_BUF_LEN 30
 
 const QString TI_FILE_EXT = ".ti";
 const QString PRD_FILE_EXT = ".prd";
@@ -1106,7 +1106,7 @@ void PrdTranslator::AggregateUnknownModuleSampleData(
     else
     {
         // unknown user module
-        wchar_t buf[20] = {L'\0'};
+        wchar_t buf[UNKNOWN_MODULE_PID_BUF_LEN] = {L'\0'};
         swprintf(buf, sizeof(buf) - 1, L" (PID %d)", sampInfo.pid);
         tmp_modName = UNKNOWN_MODULE_STR.toStdWString().c_str();
         tmp_modName += gtString(buf);
@@ -1256,7 +1256,7 @@ void PrdTranslator::AggregatePidSampleData(
         if (S_OK != fnFindProcessName(prdRecord.m_PID, processName, OS_MAX_PATH))
         {
             gtString tmp;
-            wchar_t buf[20] = {L'\0'};
+            wchar_t buf[UNKNOWN_MODULE_PID_BUF_LEN] = {L'\0'};
             swprintf(buf, sizeof(buf) - 1, L" (PID %lld)", prdRecord.m_PID);
             tmp = UNKNOWN_MODULE_STR.toStdWString().c_str();
             tmp += gtString(buf);
