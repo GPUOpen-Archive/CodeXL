@@ -197,6 +197,27 @@ public:
     bool GetModuleInfo(AMDTUInt32 pid, AMDTModuleId mid, gtVector<AMDTProfileModuleInfo>& moduleInfoList);
     bool GetThreadInfo(AMDTUInt32 pid, gtUInt32 tid, gtVector<AMDTProfileThreadInfo>& threadInfoList);
 
+    bool GetProcessTotals(AMDTProcessId               procId,
+        gtVector<AMDTUInt32>        counterIdsList,
+        AMDTUInt64                  coreMask,
+        bool                        separateByCore,
+        AMDTSampleValueVec&         sampleValueVec);
+
+    bool GetModuleTotals(AMDTModuleId                moduleId,
+        AMDTProcessId               processId,
+        gtVector<AMDTUInt32>        counterIdsList,
+        AMDTUInt64                  coreMask,
+        bool                        separateByCore,
+        AMDTSampleValueVec&         sampleValueVec);
+
+    bool GetFunctionTotals(AMDTFunctionId         funcId,
+        AMDTProcessId          processId,
+        AMDTThreadId           threadId,
+        gtVector<AMDTUInt32>&  counterIdsList,
+        AMDTUInt64             coreMask,
+        bool                   separateByCore,
+        AMDTSampleValueVec&    sampleValueVec);
+
     bool GetProcessSummaryData(AMDTProcessId               processId,
                                gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
                                AMDTUInt64                  coreMask,
@@ -225,6 +246,7 @@ public:
 
     bool GetFunctionSummaryData(AMDTProcessId               processId,           // for a given process or for all processes
                                 AMDTThreadId                threadId,
+                                AMDTModuleId                moduleId,
                                 gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
                                 AMDTUInt64                  coreMask,
                                 bool                        separateByCore,
