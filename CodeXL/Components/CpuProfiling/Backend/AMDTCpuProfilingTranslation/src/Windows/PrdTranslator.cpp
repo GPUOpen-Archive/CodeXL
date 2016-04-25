@@ -1132,6 +1132,7 @@ void PrdTranslator::AggregateUnknownModuleSampleData(
         b_is32bit = mod.m_is32Bit;
 #ifdef AMDT_ENABLE_CPUPROF_DB
         mod.m_moduleId = AtomicAdd(m_nextModuleId, 1);
+        mod.m_moduleInstanceInfo.emplace_back(pModInfo->processID, pModInfo->ModuleStartAddr, pModInfo->instanceId);
 #endif
 
         // CLU profiles IBS Op event, record IBS sample only when profiling IBS Op
@@ -1150,6 +1151,30 @@ void PrdTranslator::AggregateUnknownModuleSampleData(
     else
     {
         b_is32bit = mit->second.m_is32Bit;
+#ifdef AMDT_ENABLE_CPUPROF_DB
+        // Module is already present in the map. Just append the new instance info.
+        gtUInt64 pid = pModInfo->processID;
+        gtUInt64 loadAddr = pModInfo->ModuleStartAddr;
+        gtUInt32 instanceId = pModInfo->instanceId;
+        bool isFound = false;
+
+        for (auto& it : mit->second.m_moduleInstanceInfo)
+        {
+            // Just check for matching PID and module load address
+            // We are assuming that only module gets loaded to loadAddr for a PID
+            if ((std::get<0>(it) == pid) && (std::get<1>(it) == loadAddr))
+            {
+                isFound = true;
+                break;
+            }
+        }
+
+        if (!isFound)
+        {
+            mit->second.m_moduleInstanceInfo.emplace_back(pid, loadAddr, instanceId);
+        }
+
+#endif
 
         // CLU profiles IBS Op event, record IBS sample only when profiling IBS Op
         if (!IsIbsOpEvent(eventType) || m_runInfo->m_isProfilingIbsOp)
@@ -1617,6 +1642,7 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
                                                   PidProcessMap& processMap,
                                                   NameModuleMap& moduleMap,
                                                   PidModaddrItrMap* pidModaddrItrMap,
+                                                  ModInstanceMap& modInstanceMap,
                                                   bool bDoCLU,
                                                   bool bLdStCollect,
                                                   UINT8 L1DcAssoc,
@@ -1851,9 +1877,16 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
                 hr = GetModuleInfoHelper((void*) &prdRecord, &modInfo, evTBPEBPRecord, proFile);
                 END_TICK_COUNT(findModuleInfo);
 
-                AggregateSampleData(prdRecord, &modInfo, &processMap, &moduleMap, pidModaddrItrMap, 1U, pStats);
+#ifdef AMDT_ENABLE_CPUPROF_DB
+                if (modInstanceMap.end() == modInstanceMap.find(modInfo.instanceId))
+                {
+                    modInstanceMap.emplace(modInfo.instanceId, std::make_tuple(gtString(modInfo.pModulename), modInfo.processID, modInfo.ModuleStartAddr));
+                }
+#else
+                GT_UNREFERENCED_PARAMETER(modInstanceMap);
+#endif
 
-                //AggregateData(prdRecord, &processMap, &moduleMap);
+                AggregateSampleData(prdRecord, &modInfo, &processMap, &moduleMap, pidModaddrItrMap, 1U, pStats);
 
                 // We only try to finalize a User call-stack if the sampled instruction is in user space.
                 if ((S_OK == hr) && !modInfo.kernel)
@@ -2160,6 +2193,7 @@ static void workerPRDReaderThread(void* pData, void* workData)
         *(pThreadData->processMap),
         *(pThreadData->moduleMap),
         pThreadData->pidModaddrItrMap,
+        *(pThreadData->modInstanceMap),
         pThreadData->bCLUtil,
         pThreadData->bLdStCollect,
         pThreadData->L1DcAssoc,
@@ -2432,10 +2466,11 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
         }
     }
 
-
     ThreadParamList plist;
     PidProcessList procList;
     NameModuleList modList;
+    ModInstanceList modInstanceList;
+
     gtUInt64 totalBytes;
     gtUInt64* bytesRead;
 
@@ -2471,25 +2506,23 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
 
         pThreadData->pCssBuffer = new gtUByte[CallStackBuilder::CalcRequiredBufferSize(MAX_CSS_VALUES)];
 
-        PrdReaderThread*    threadPRDReader    = new PrdReaderThread(tPrdReader);
-
-        PidProcessMap*       processMap        = new PidProcessMap;
-
-        NameModuleMap*       moduleMap         = new NameModuleMap;
-
-        PidModaddrItrMap*    pidModaddrItrMap  = new PidModaddrItrMap;
-
+        PrdReaderThread*  threadPRDReader  = new PrdReaderThread(tPrdReader);
+        PidProcessMap*    processMap       = new PidProcessMap;
+        NameModuleMap*    moduleMap        = new NameModuleMap;
+        PidModaddrItrMap* pidModaddrItrMap = new PidModaddrItrMap;
+        ModInstanceMap*   modInstanceMap   = new ModInstanceMap;
 
         pThreadData->threadPrdReader     = threadPRDReader;
         pThreadData->processMap          = processMap;
         pThreadData->moduleMap           = moduleMap;
         pThreadData->pidModaddrItrMap    = pidModaddrItrMap;
+        pThreadData->modInstanceMap      = modInstanceMap;
 
         // Put the processMap and moduleMap in the respective lists.
         procList.push_back(processMap);
         modList.push_back(moduleMap);
-
         plist.push_back(pThreadData);
+        modInstanceList.push_back(modInstanceMap);
 
         UpdateProgressBar(80ULL + static_cast<gtUInt64>(((i + 1) * static_cast<unsigned int>(m_progressStride)) / 128), 100ULL);
     }
@@ -2876,7 +2909,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
 
     // Aggregate all the processmaps and module maps
     startTime = GetTickCount();
-    AggregateThreadMaps(procList, modList);
+    AggregateThreadMaps(procList, modList, modInstanceList);
 
     if (m_collectStat)
     {
@@ -2889,6 +2922,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
 
     PidProcessMap*  procMap = *(PidProcessList::iterator)procList.begin();
     NameModuleMap*  modMap = *(NameModuleList::iterator)modList.begin();
+    ModInstanceMap* modInstanceMap = *(modInstanceList.begin());
 
     if (hasCluData)
     {
@@ -2908,14 +2942,15 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
                               tPrdReader,
                               pMissedInfo,
                               *procMap,
-                              *modMap);
+                              *modMap,
+                              *modInstanceMap);
 
     if (m_collectStat)
     {
         OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_DEBUG, L"Elapsed Time: Write profile files: (%d ms)", (GetTickCount() - startTime));
     }
 
-    // Stor pid filter list before closing the reader
+    // Store pid filter list before closing the reader
     m_pidFilterList = tPrdReader.GetPidFilterList();
 
     // Clean up..
@@ -3019,10 +3054,11 @@ bool PrdTranslator::IsProfilingDriver(gtVAddr va) const
 //
 // The aggregated values will be in the first list entry..
 //
-bool PrdTranslator::AggregateThreadMaps(PidProcessList& procList, NameModuleList& modList)
+bool PrdTranslator::AggregateThreadMaps(PidProcessList& procList, NameModuleList& modList, ModInstanceList& modInstanceList)
 {
     PidProcessMap*   procMap;
     NameModuleMap*   modMap;
+    ModInstanceMap*  modInstanceMap;
 
 #if ENABLE_PRD_DEBUG_OUTPUT && (AMDT_BUILD_CONFIGURATION == AMDT_DEBUG_BUILD)
     OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_EXTENSIVE, L"Thread(%d) got the work from workqueue", GetCurrentThreadId());
@@ -3145,6 +3181,26 @@ bool PrdTranslator::AggregateThreadMaps(PidProcessList& procList, NameModuleList
         delete mMap;
     }
 
+    auto miIter = modInstanceList.begin();
+    modInstanceMap = *miIter;
+    ++miIter;
+    while (miIter != modInstanceList.end())
+    {
+        ModInstanceMap* miMap = *miIter;
+
+        for (const auto& it : *miMap)
+        {
+            if (modInstanceMap->end() == modInstanceMap->find(it.first))
+            {
+                modInstanceMap->emplace(it.first, it.second);
+            }
+        }
+
+        miMap->clear();
+        delete miMap;
+        miIter = modInstanceList.erase(miIter);
+    }
+
     return true;
 }
 
@@ -3153,7 +3209,8 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
                                     PrdReader& tPrdReader,
                                     const MissedInfoType* pMissedInfo,
                                     const PidProcessMap& processMap,
-                                    NameModuleMap& moduleMap)
+                                    NameModuleMap& moduleMap,
+                                    const ModInstanceMap& modInstanceMap)
 {
     HRESULT  res = S_OK;
 
@@ -3229,6 +3286,7 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
                           &processMap,
                           &moduleMap,
                           &topMap,
+                          &modInstanceMap,
                           cpuCount,
                           pMissedInfo->missedCount,
                           cpuFamily,
@@ -3245,6 +3303,7 @@ bool PrdTranslator::WriteProfileFile(const gtString& path,
                                      const PidProcessMap* procMap,
                                      const NameModuleMap* modMap,
                                      const CoreTopologyMap* pTopMap,
+                                     const ModInstanceMap* pModInstanceMap,
                                      gtUInt32 num_cpus,
                                      gtUInt64 missedCount,
                                      int cpuFamily,
@@ -3306,18 +3365,19 @@ bool PrdTranslator::WriteProfileFile(const gtString& path,
 #ifdef AMDT_ENABLE_CPUPROF_DB
     gtUInt64 startTime = GetTickCount();
 
-    gtVector<std::tuple<gtUInt32, gtString, gtUInt64, gtUInt64>> modInstanceInfoList;
-    fnGetModuleInstanceInfoList(modInstanceInfoList);
+    gtVector<std::tuple<gtUInt32, gtUInt32>> processThreadList;
+    fnGetProcessThreadList(processThreadList);
 
     ProfilerDataDBWriter DBWriter;
     //TODO: cpu affinity should be part of CpuProfileInfo i.e. info parameter
-    DBWriter.Write(path, info, m_runInfo->m_cpuAffinity, *procMap, *modMap, modInstanceInfoList, pTopMap);
+    DBWriter.Write(path, info, m_runInfo->m_cpuAffinity, *procMap, processThreadList, *modMap, *pModInstanceMap, pTopMap);
 
     if (m_collectStat)
     {
         OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_DEBUG, L"Elapsed Time: DB Write: (%d ms)", (GetTickCount() - startTime));
     }
-
+#else
+    GT_UNREFERENCED_PARAMETER(pModInstanceMap);
 #endif
 
     if (!writer.Write(path, &info, procMap, modMap, pTopMap))

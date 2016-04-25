@@ -11,8 +11,9 @@ To encourage 3rd party contribution and adoption, CodeXL is no longer branded as
 
 ## Installation and Build
 
-* Windows: To install CodeXL, use the provided executable file CodeXL_*.exe
-* Linux: To install CodeXL, use the provided RPM file, Debian file, or simply extract the compressed archive onto your hard drive.
+* Windows: To install CodeXL, use the [provided](https://github.com/GPUOpen-Tools/CodeXL/releases) executable file CodeXL_*.exe
+* Linux: To install CodeXL, use the [provided](https://github.com/GPUOpen-Tools/CodeXL/releases) RPM file, Debian file, or simply extract the compressed archive onto your hard drive.
+
 
 Refer to [BUILD.md](BUILD.md) for information on building CodeXL from source.
 
@@ -26,7 +27,7 @@ Users are also encouraged to submit issues and feature requests via the reposito
 
 ## License
 
-CodeXL is part of the GPUOpen.com initiative. CodeXL source code and binaries are released under the following MIT license.
+CodeXL is part of the [GPUOpen.com](http://gpuopen.com/) initiative. CodeXL source code and binaries are released under the following MIT license:
 
 Copyright © 2016 Advanced Micro Devices, Inc. All rights reserved.
 

@@ -17,10 +17,13 @@
 [Rr]elease/
 !Common/Lib/**/[Rr]elease
 [Rr]eleases/
+x64/
+x86/
 bld/
 [Bb]in/
 !Common/Lib/**/[Bb]in
 [Oo]bj/
+[Ll]og/
 
 # Visual Studo 2015 cache/options directory
 .vs/
@@ -37,6 +40,10 @@ TestResult.xml
 [Dd]ebugPS/
 [Rr]eleasePS/
 dlldata.c
+
+# DNX
+project.lock.json
+artifacts/
 
 *_i.c
 *_p.c
@@ -72,14 +79,18 @@ _Chutzpah*
 ipch/
 *.aps
 *.ncb
+*.opendb
 *.opensdf
 *.sdf
 *.cachefile
+*.VC.db
+*.VC.VC.opendb
 
 # Visual Studio profiler
 *.psess
 *.vsp
 *.vspx
+*.sap
 
 # TFS 2012 Local Workspace
 $tf/
@@ -104,6 +115,7 @@ _TeamCity*
 # NCrunch
 _NCrunch_*
 .*crunch*.local.xml
+nCrunchTemp_*
 
 # MightyMoose
 *.mm.*
@@ -136,6 +148,11 @@ publish/
 *.pubxml
 *.publishproj
 
+# Microsoft Azure Web App publish settings. Comment the next line if you want to
+# checkin your Azure Web App publish settings, but sensitive information contained
+# in these scripts will be unencrypted
+PublishScripts/
+
 # NuGet Packages
 *.nupkg
 # The packages folder can be ignored because of Package Restore
@@ -144,16 +161,30 @@ publish/
 !**/packages/build/
 # Uncomment if necessary however generally it will be regenerated when needed
 #!**/packages/repositories.config
+# NuGet v3's project.json files produces more ignoreable files
+*.nuget.props
+*.nuget.targets
 
 # Windows Azure Build Output
 csx/
 *.build.csdef
 
-# Windows Store app package directory
+# Microsoft Azure Emulator
+ecf/
+rcf/
+
+# Windows Store app package directories and files
 AppPackages/
+BundleArtifacts/
+Package.StoreAssociation.xml
+_pkginfo.txt
 
 # Others
 *.[Cc]ache
+# but keep track of directories ending in .cache
+!*.[Cc]ache/
+
+# Others
 ClientBin/
 [Ss]tyle[Cc]op.*
 ~$*
@@ -188,6 +219,9 @@ UpgradeLog*.htm
 # Microsoft Fakes
 FakesAssemblies/
 
+# GhostDoc plugin setting file
+*.GhostDoc.xml
+
 # Node.js Tools for Visual Studio
 .ntvs_analysis.dat
 
@@ -199,6 +233,13 @@ FakesAssemblies/
 /.project
 *.VC.opendb
 *.VC.db
+# Visual Studio LightSwitch build output
+**/*.HTMLClient/GeneratedArtifacts
+**/*.DesktopClient/GeneratedArtifacts
+**/*.DesktopClient/ModelManifest.xml
+**/*.Server/GeneratedArtifacts
+**/*.Server/ModelManifest.xml
+_Pvt_Extensions
 
 # CodeXl VSPackage temp files
 CodeXL/AMDTApplicationFramework/tmp/
@@ -217,3 +258,7 @@ CodeXL/Components/GpuProfiling/AMDTGpuProfiling/tmp/
 CodeXL/Components/PowerProfiling/AMDTPowerProfiling/tmp/
 CodeXL/Components/ShaderAnalyzer/AMDTKernelAnalyzer/tmp/
 
+# JetBrains Rider
+.idea/
+*.sln.iml
+/CodeXL/Components/GpuProfiling/Build/CodeXLGpuProfiler

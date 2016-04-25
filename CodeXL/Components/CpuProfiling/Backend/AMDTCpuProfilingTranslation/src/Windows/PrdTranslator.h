@@ -69,6 +69,9 @@ typedef gtMap<PidModaddrKey, NameModuleMap::iterator> PidModaddrItrMap;
 typedef gtList<PidProcessMap*> PidProcessList;
 typedef gtList<NameModuleMap*> NameModuleList;
 
+using ModInstanceMap = gtHashMap<gtUInt32, std::tuple<gtString, gtUInt64, gtUInt64>>;
+using ModInstanceList = gtList<ModInstanceMap*>;
+
 struct PrdTranslationStats
 {
     struct StatValue
@@ -182,6 +185,7 @@ public:
                                        PidProcessMap& processMap,
                                        NameModuleMap& moduleMap,
                                        PidModaddrItrMap* pidModaddrItrMap,
+                                       ModInstanceMap& ModInstanceMap,
                                        bool bCLUUtil,
                                        bool bLdStCollect,
                                        UINT8 L1DcAssoc,
@@ -414,18 +418,20 @@ private:
         gtUInt32* pRecType,
         gtUInt32* pCnt);
 
-    bool AggregateThreadMaps(PidProcessList& procList, NameModuleList& modList);
+    bool AggregateThreadMaps(PidProcessList& procList, NameModuleList& modList, ModInstanceList& modInstanceList);
 
     HRESULT WriteProfile(const QString& proFile,
                          PrdReader& tPrdReader,
                          const MissedInfoType* pMissedInfo,
                          const PidProcessMap& processMap,
-                         NameModuleMap& moduleMap);
+                         NameModuleMap& moduleMap,
+                         const ModInstanceMap& modInstanceMap);
 
     bool WriteProfileFile(const gtString& path,
                           const PidProcessMap* procMap,
                           const NameModuleMap* modMap,
                           const CoreTopologyMap* pTopMap,
+                          const ModInstanceMap* pModInstanceMap,
                           gtUInt32 num_cpus,
                           gtUInt64 missedCount = 0,
                           int cpuFamily = 0, //FAMILY_UNKNOWN
@@ -530,6 +536,7 @@ struct ThreadPrdData
     PidProcessMap*      processMap;
     NameModuleMap*      moduleMap;
     PidModaddrItrMap*   pidModaddrItrMap;
+    ModInstanceMap*     modInstanceMap;
 
     gtUInt64*           pBytesRead;
     gtUInt64            totalTypes;
