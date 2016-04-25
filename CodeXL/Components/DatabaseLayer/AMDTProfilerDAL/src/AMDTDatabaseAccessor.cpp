@@ -2391,6 +2391,10 @@ public:
 
                 counterDesc.m_id = sqlite3_column_int(pQueryStmt, 0);
                 counterDesc.m_hwEventId = sqlite3_column_int(pQueryStmt, 1);
+                counterDesc.m_type = AMDT_PROFILE_COUNTER_TYPE_RAW;
+                counterDesc.m_unit = AMDT_PROFILE_COUNTER_UNIT_COUNT;
+                counterDesc.m_category = 0;
+                counterDesc.m_deviceId = 0;
 
                 if (GetCounterNameAndDescription(counterDesc.m_hwEventId, name, desc))
                 {
@@ -2442,6 +2446,7 @@ public:
                 AMDTInt32 userMode = sqlite3_column_int(pQueryStmt, 3);
                 AMDTInt32 osMode = sqlite3_column_int(pQueryStmt, 4);
 
+                samplingConfig.m_id               = samplingConfigId;
                 samplingConfig.m_hwEventId        = hwEventId;
                 samplingConfig.m_samplingInterval = samplingInterval;
                 samplingConfig.m_unitMask         = static_cast<AMDTInt8>(unitMask);
@@ -2528,14 +2533,14 @@ public:
                 GetNameFromPath(moduleInfo.m_path, moduleInfo.m_name);
 
                 // loadAddress is valid only if the PID is specified.
-                moduleInfo.m_loadAddress = (IS_PROCESS_QUERY(pid)) ? loadAddress : AMDT_PROFILE_INVALID_ADDR;
+                // FIXME.. what will be the value if the pid is -1
+                // moduleInfo.m_loadAddress = (IS_PROCESS_QUERY(pid)) ? loadAddress : AMDT_PROFILE_INVALID_ADDR;
+                moduleInfo.m_loadAddress = loadAddress;
                 moduleInfo.m_size = size;
                 moduleInfo.m_is64Bit = (is32Bit == 0) ? true : false;
                 moduleInfo.m_foundDebugInfo = (foundDebugInfo == 0) ? false : true;
                 moduleInfo.m_type = static_cast<AMDTModuleType>(type);
                 moduleInfo.m_isSystemModule = (systemModule == 0) ? false : true;
-                // FIXME: if the processname and module name is same
-                moduleInfo.m_isMainModule = false;
 
                 moduleInfoList.emplace_back(moduleInfo);
             }
@@ -3290,11 +3295,14 @@ public:
                             SELECT  ProcessThread.processId,                    \
                                     ProcessThread.threadId,                     \
                                     ModuleInstance.moduleId,                    \
+                                    Module.isSystemModule,                      \
+                                    Module.foundDebugInfo,                      \
                                     SampleContext.coreSamplingConfigurationId,  \
                                     sum(count) as sampleCount                   \
                             FROM SampleContext                                  \
                             INNER JOIN ProcessThread ON processThreadId = ProcessThread.id       \
                             INNER JOIN ModuleInstance ON moduleInstanceId = ModuleInstance.id    \
+                            INNER JOIN Module ON ModuleInstance.moduleID = Module.id             \
                             GROUP BY threadId, moduleId, SampleContext.coreSamplingConfigurationId;";
 
         int rc = sqlite3_prepare_v2(m_pReadDbConn, viewCreateQuery.str().c_str(), -1, &pViewCreateStmt, nullptr);
@@ -3315,7 +3323,9 @@ public:
             summaryViewCreate << "CREATE TEMP VIEW SampleProcessSummaryAllData AS     \
                                   SELECT SampleProcessSummaryData.processId,          \
                                          SampleProcessSummaryData.threadId,           \
-                                         SampleProcessSummaryData.moduleId, ";
+                                         SampleProcessSummaryData.moduleId,           \
+                                         SampleProcessSummaryData.isSystemModule,     \
+                                         SampleProcessSummaryData.foundDebugInfo, ";
 
             std::stringstream partialQuery;
             string fromCol("CoreSamplingConfiguration.id");
@@ -3421,7 +3431,7 @@ public:
 
             summaryViewCreate << " FROM SampleFunctionSummaryData  \
                                    INNER JOIN CoreSamplingConfiguration ON SampleFunctionSummaryData.coreSamplingConfigurationId = CoreSamplingConfiguration.id    \
-                                   group by threadId, moduleId;";
+                                   group by threadId, functionId;";
 
             //fprintf(stderr, " %s\n", summaryViewCreate.str().c_str());
 
@@ -3592,10 +3602,10 @@ public:
                     profileData.m_type = AMDT_PROFILE_DATA_PROCESS;
 
                     AMDTProcessId pid = sqlite3_column_int(pQueryStmt, 0);
-                    profileData.m_processId = pid;
+                    profileData.m_id = pid;
+                    profileData.m_moduleId = AMDT_PROFILE_ALL_MODULES;
 
-                    GetProcessName(pid, profileData.m_path);
-                    GetNameFromPath(profileData.m_path, profileData.m_name);
+                    GetProcessName(pid, profileData.m_name);
 
                     int idx = 1;
 
@@ -3662,21 +3672,20 @@ public:
         {
             gtString partQuery;
 
-            if (IS_MODULE_QUERY(processId) && IS_PROCESS_QUERY(processId))
+            if (IS_PROCESS_MODULE_QUERY(processId, moduleId))
             {
-                partQuery.appendFormattedString(L" WHERE moduleId = %d AND processId = %d ", moduleId, processId);
-            }
-            else if (IS_MODULE_QUERY(moduleId))
-            {
-                partQuery.appendFormattedString(L" WHERE moduleId = %d ", moduleId);
+                partQuery.appendFormattedString(L" WHERE processId = %d AND moduleId = %d ", processId, moduleId);
             }
             else if (IS_PROCESS_QUERY(processId))
             {
                 partQuery.appendFormattedString(L" WHERE processId = %d ", processId);
             }
+            else if (IS_MODULE_QUERY(moduleId))
+            {
+                partQuery.appendFormattedString(L" WHERE moduleId = %d ", moduleId);
+            }
 
             query << partQuery.asASCIICharArray();
-
             query << " GROUP BY moduleId ";
 
             if (doSort)
@@ -3703,10 +3712,9 @@ public:
                     profileData.m_moduleId = mid; // module ID
 
                     AMDTProcessId pid = sqlite3_column_int(pQueryStmt, 1);
-                    profileData.m_processId = pid; // process ID
+                    profileData.m_id = pid; // process ID
 
-                    GetModulePath(mid, profileData.m_path);
-                    GetNameFromPath(profileData.m_path, profileData.m_name);
+                    GetModulePath(mid, profileData.m_name);
 
                     int idx = 2;
 
@@ -3758,7 +3766,7 @@ public:
         //        from SampleProcessSummaryAllData group by threadId order by eventTotal-1 desc;
 
         std::stringstream query;
-        query << "SELECT threadId, processId, ";
+        query << "SELECT threadId, ";
 
         std::stringstream partialQuery;
         std::string firstCountColName;
@@ -3773,21 +3781,20 @@ public:
         {
             gtString partQuery;
 
-            if (IS_THREAD_QUERY(processId) && IS_PROCESS_QUERY(processId))
+            if (IS_PROCESS_THREAD_QUERY(processId, threadId))
             {
-                partQuery.appendFormattedString(L" WHERE threadId = %d AND processId = %d ", threadId, processId);
-            }
-            else if (IS_THREAD_QUERY(processId))
-            {
-                partQuery.appendFormattedString(L" WHERE threadId = %d ", threadId);
+                partQuery.appendFormattedString(L" WHERE processId = %d AND threadId = %d ", processId, threadId);
             }
             else if (IS_PROCESS_QUERY(processId))
             {
                 partQuery.appendFormattedString(L" WHERE processId = %d ", processId);
             }
+            else if (IS_THREAD_QUERY(threadId))
+            {
+                partQuery.appendFormattedString(L" WHERE threadId = %d ", threadId);
+            }
 
             query << partQuery.asASCIICharArray();
-
             query << " GROUP BY threadId ";
 
             if (doSort)
@@ -3811,15 +3818,12 @@ public:
                     profileData.m_type = AMDT_PROFILE_DATA_THREAD;
 
                     AMDTThreadId tid = sqlite3_column_int(pQueryStmt, 0);
-                    profileData.m_threadId = tid;
+                    profileData.m_id = tid;
+                    profileData.m_moduleId = AMDT_PROFILE_ALL_MODULES;
 
-                    AMDTProcessId pid = sqlite3_column_int(pQueryStmt, 1);
-                    profileData.m_processId = pid;
+                    int idx = 1;
 
-                    int idx = 2;
-
-                    // TODO: Reference
-                    for (auto sample : sampleInfoVec)
+                    for (auto& sample : sampleInfoVec)
                     {
                         sample.m_sampleCount = sqlite3_column_int(pQueryStmt, idx);
                         idx++;
@@ -3840,6 +3844,158 @@ public:
 
         return ret;
     }
+
+    // if processId == -1, entire profile run
+    // otherwise, given process
+    bool GetProcessTotals(
+        AMDTProcessId               processId,           // for a given process or for all processes
+        gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
+        AMDTUInt64                  coreMask,
+        bool                        separateByCore,
+        AMDTSampleValueVec&         sampleValueVec)
+    {
+        bool ret = false;
+
+        // select threadId, processId
+        //        (sum(ifnull(e1, 0)) + sum(ifnull(e3, 0)) + sum(ifnull(e5, 0)) + sum(ifnull(e7, 0))) as eventTotal-1,
+        //        (sum(ifnull(e2, 0)) + sum(ifnull(e4, 0)) + sum(ifnull(e6, 0)) + sum(ifnull(e8, 0))) as eventTotal-2
+        //        from SampleProcessSummaryAllData group by threadId order by eventTotal-1 desc;
+
+        std::stringstream query;
+        query << "SELECT processId, ";
+
+        std::stringstream partialQuery;
+        std::string firstCountColName;
+
+        gtVector<AMDTSampleValue> sampleInfoVec;
+
+        ret = GetEventCorePartialQuery(counterIdsList, coreMask, separateByCore, partialQuery, firstCountColName, sampleInfoVec);
+        query << partialQuery.str();
+        query << " FROM SampleProcessSummaryAllData ";
+
+        if (ret)
+        {
+            gtString partQuery;
+
+            if (IS_PROCESS_QUERY(processId))
+            {
+                partQuery.appendFormattedString(L" WHERE processId = %d ", processId);
+                query << partQuery.asASCIICharArray();
+            }
+
+            //fprintf(stderr, " %s \n", query.str().c_str());
+
+            sqlite3_stmt* pQueryStmt = nullptr;
+            int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+
+            if (rc == SQLITE_OK)
+            {
+                // Execute the query.
+                while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
+                {
+                    AMDTProcessId pid = sqlite3_column_int(pQueryStmt, 0);
+                    pid = pid; // avoid compiler warning
+
+                    int idx = 1;
+                    for (auto& sample : sampleInfoVec)
+                    {
+                        sample.m_sampleCount = sqlite3_column_int(pQueryStmt, idx);
+                        idx++;
+
+                        sampleValueVec.emplace_back(sample);
+                    }
+                }
+            }
+
+            // Finalize the statement.
+            sqlite3_finalize(pQueryStmt);
+
+            ret = (SQLITE_DONE == rc || SQLITE_ROW == rc) ? true : false;
+        }
+
+        return ret;
+    }
+
+    // moduleId cannot be AMDT_PROFILE_ALL_MODULES
+    //   for the given module among all process
+    //   for the given module within given process
+    bool GetModuleTotals(
+        AMDTModuleId                moduleId,
+        AMDTProcessId               processId,           // for a given process or for all processes
+        gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
+        AMDTUInt64                  coreMask,
+        bool                        separateByCore,
+        AMDTSampleValueVec&         sampleValueVec)
+    {
+        bool ret = IS_MODULE_QUERY(moduleId);
+
+        if (ret)
+        {
+            // select moduleId,
+            //        (sum(ifnull(e1, 0)) + sum(ifnull(e3, 0)) + sum(ifnull(e5, 0)) + sum(ifnull(e7, 0))) as eventTotal-1,
+            //        (sum(ifnull(e2, 0)) + sum(ifnull(e4, 0)) + sum(ifnull(e6, 0)) + sum(ifnull(e8, 0))) as eventTotal-2
+            //        from SampleProcessSummaryAllData
+            //       where SampleProcessSummaryAllData.moduleId = moduleId;
+
+            std::stringstream query;
+            query << "SELECT moduleId, ";
+
+            std::stringstream partialQuery;
+            std::string firstCountColName;
+
+            gtVector<AMDTSampleValue> sampleInfoVec;
+
+            ret = GetEventCorePartialQuery(counterIdsList, coreMask, separateByCore, partialQuery, firstCountColName, sampleInfoVec);
+
+            if (ret)
+            {
+                query << partialQuery.str();
+                query << " FROM SampleProcessSummaryAllData ";
+
+                gtString partQuery;
+
+                partQuery.appendFormattedString(L" WHERE moduleId = %d ", moduleId);
+
+                if (IS_PROCESS_QUERY(processId))
+                {
+                    partQuery.appendFormattedString(L" AND processId = %d ", processId);
+                }
+
+                query << partQuery.asASCIICharArray();
+
+                //fprintf(stderr, " %s \n", query.str().c_str());
+
+                sqlite3_stmt* pQueryStmt = nullptr;
+                int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+
+                if (rc == SQLITE_OK)
+                {
+                    // Execute the query.
+                    while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
+                    {
+                        AMDTModuleId mid = sqlite3_column_int(pQueryStmt, 0);
+                        mid = mid; // module ID
+
+                        int idx = 1;
+                        for (auto& sample : sampleInfoVec)
+                        {
+                            sample.m_sampleCount = sqlite3_column_int(pQueryStmt, idx);
+                            idx++;
+
+                            sampleValueVec.emplace_back(sample);
+                        }
+                    }
+                }
+
+                // Finalize the statement.
+                sqlite3_finalize(pQueryStmt);
+
+                ret = (SQLITE_DONE == rc || SQLITE_ROW == rc) ? true : false;
+            }
+        }
+
+        return ret;
+    } // GetModuleTotals
 
     bool GetProcessName(AMDTProcessId procId, gtString& procName)
     {
@@ -4032,6 +4188,7 @@ public:
     bool GetFunctionSummaryData(
         AMDTProcessId               processId,           // for a given process or for all processes
         AMDTThreadId                threadId,
+        AMDTModuleId                moduleId,
         gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
         AMDTUInt64                  coreMask,
         bool                        separateByCore,
@@ -4049,7 +4206,6 @@ public:
         //    group by functionId, processId order by eventTotal1 desc;
 
         std::stringstream query;
-        //query << "SELECT functionId, threadId, processId, ";
         query << "SELECT functionId, moduleId, ";
 
         if (separateByProcess)
@@ -4070,27 +4226,41 @@ public:
         {
             gtString partQuery;
 
-            if (IS_THREAD_QUERY(processId) && IS_PROCESS_QUERY(processId))
+            if (IS_PROCESS_THREAD_QUERY(processId, threadId) && IS_MODULE_QUERY(moduleId))
             {
-                partQuery.appendFormattedString(L" WHERE threadId = %d AND processId = %d ", threadId, processId);
+                partQuery.appendFormattedString(L" WHERE processId = %d AND threadId = %d AND moduleID = %d ", processId, threadId, moduleId);
             }
-            else if (IS_THREAD_QUERY(processId))
+            else if (IS_PROCESS_THREAD_QUERY(processId, threadId))
             {
-                partQuery.appendFormattedString(L" WHERE threadId = %d ", threadId);
+                partQuery.appendFormattedString(L" WHERE processId = %d AND threadId = %d ", processId, threadId);
+            }
+            else if (IS_PROCESS_MODULE_QUERY(processId, moduleId))
+            {
+                partQuery.appendFormattedString(L" WHERE processId = %d AND moduleId = %d ", processId, moduleId);
             }
             else if (IS_PROCESS_QUERY(processId))
             {
                 partQuery.appendFormattedString(L" WHERE processId = %d ", processId);
             }
+            else if (IS_THREAD_QUERY(threadId))
+            {
+                partQuery.appendFormattedString(L" WHERE threadId = %d ", threadId);
+            }
+            else if (IS_MODULE_QUERY(moduleId))
+            {
+                partQuery.appendFormattedString(L" WHERE moduleId = %d ", moduleId);
+            }
 
             query << partQuery.asASCIICharArray();
-
             query << " GROUP BY functionId ";
 
+            // TODO: When is this required?
             if (separateByProcess)
             {
                 query << " , processId ";
             }
+
+            query << " HAVING functionId > 0 ";  // Don't aggregate for unknown functions
 
             if (doSort)
             {
@@ -4114,23 +4284,17 @@ public:
 
                     int idx = 0;
                     AMDTFunctionId id = sqlite3_column_int(pQueryStmt, idx++);
-                    profileData.m_functionId = id;
+                    profileData.m_id = id;
 
-                    GetFunctionName(profileData.m_functionId, profileData.m_name);
+                    GetFunctionName(id, profileData.m_name);
 
                     AMDTModuleId mid = sqlite3_column_int(pQueryStmt, idx++);
                     profileData.m_moduleId = mid;
 
-                    // Get the module path
-                    GetModulePath(profileData.m_moduleId, profileData.m_path);
-
-                    profileData.m_threadId = threadId;
-                    profileData.m_processId = processId;
-
                     if (separateByProcess)
                     {
                         AMDTProcessId pid = sqlite3_column_int(pQueryStmt, idx++);
-                        profileData.m_processId = pid;
+                        pid = pid;
                     }
 
                     for (auto& sample : sampleInfoVec)
@@ -4143,6 +4307,91 @@ public:
 
                     dataList.emplace_back(profileData);
                     --tmpCount;
+                }
+            }
+
+            // Finalize the statement.
+            sqlite3_finalize(pQueryStmt);
+
+            ret = (SQLITE_DONE == rc || SQLITE_ROW == rc) ? true : false;
+        }
+
+        return ret;
+    }
+
+    // Supported
+    //      process (all processes, given process)
+    //      thread (all processes, given process)
+    bool GetFunctionTotals(
+        AMDTFunctionId              funcId,
+        AMDTProcessId               processId,
+        AMDTThreadId                threadId,
+        gtVector<AMDTUInt32>        counterIdsList,
+        AMDTUInt64                  coreMask,
+        bool                        separateByCore,
+        AMDTSampleValueVec&         sampleValueVec)
+    {
+        bool ret = false;
+
+        //select sampleFunctionSummaryAllData.functionId,
+        //    (sum(ifnull(e1, 0)) + sum(ifnull(e2, 0)) + sum(ifnull(e3, 0)) + sum(ifnull(e4, 0))) as eventTotal1,
+        //    (sum(ifnull(e5, 0)) + sum(ifnull(e6, 0)) + sum(ifnull(e7, 0)) + sum(ifnull(e8, 0))) as eventTotal2
+        //    from sampleFunctionSummaryAllData
+        //    where functionId = funcId;
+
+        std::stringstream query;
+        query << "SELECT functionId, ";
+
+        std::stringstream partialQuery;
+        std::string firstCountColName;
+        AMDTSampleValueVec sampleInfoVec;
+
+        ret = GetEventCorePartialQuery(counterIdsList, coreMask, separateByCore, partialQuery, firstCountColName, sampleInfoVec);
+
+        if (ret)
+        {
+            query << partialQuery.str();
+            query << " FROM SampleFunctionSummaryAllData ";
+
+            gtString partQuery;
+            partQuery.appendFormattedString(L" WHERE functionId = %d ", funcId);
+
+            if (IS_PROCESS_QUERY(processId))
+            {
+                partQuery.appendFormattedString(L" AND processId = %d ", processId);
+            }
+
+            if (IS_THREAD_QUERY(threadId))
+            {
+                partQuery.appendFormattedString(L" AND threadId = %d ", threadId);
+            }
+
+            query << partQuery.asASCIICharArray();
+
+            //fprintf(stderr, " %s \n", query.str().c_str());
+
+            sqlite3_stmt* pQueryStmt = nullptr;
+            int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+
+            if (rc == SQLITE_OK)
+            {
+                // Execute the query.
+                while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
+                {
+                    AMDTProfileData profileData;
+                    profileData.m_type = AMDT_PROFILE_DATA_FUNCTION;
+
+                    int idx = 0;
+                    AMDTFunctionId id = sqlite3_column_int(pQueryStmt, idx++);
+                    id = id; // avoid compiler warning
+
+                    for (auto& sample : sampleInfoVec)
+                    {
+                        sample.m_sampleCount = sqlite3_column_int(pQueryStmt, idx);
+                        idx++;
+
+                        sampleValueVec.emplace_back(sample);
+                    }
                 }
             }
 
@@ -4196,17 +4445,17 @@ public:
             {
                 gtString partQuery;
 
-                if (IS_THREAD_QUERY(processId) && IS_PROCESS_QUERY(processId))
+                if (IS_PROCESS_THREAD_QUERY(processId, threadId))
                 {
-                    partQuery.appendFormattedString(L" WHERE threadId = %d AND processId = %d ", threadId, processId);
-                }
-                else if (IS_THREAD_QUERY(processId))
-                {
-                    partQuery.appendFormattedString(L" WHERE threadId = %d ", threadId);
+                    partQuery.appendFormattedString(L" WHERE processId = %d AND threadId = %d ", processId, threadId);
                 }
                 else if (IS_PROCESS_QUERY(processId))
                 {
                     partQuery.appendFormattedString(L" WHERE processId = %d ", processId);
+                }
+                else if (IS_THREAD_QUERY(threadId))
+                {
+                    partQuery.appendFormattedString(L" WHERE threadId = %d ", threadId);
                 }
 
                 if (!partQuery.isEmpty())
@@ -4223,8 +4472,8 @@ public:
 
                 if (rc == SQLITE_OK)
                 {
-                    functionData.m_pid = processId;
-                    functionData.m_threadId = threadId;
+                    //functionData.m_pid = processId;
+                    //functionData.m_threadId = threadId;
                     functionData.m_functionInfo.m_functionId = functionId;
 
                     GetFunctionInfo(functionId, functionData.m_functionInfo);
@@ -4639,13 +4888,12 @@ bool AmdtDatabaseAccessor::InsertSamples(CPSampleData& sampleData)
 
     if (m_pImpl != nullptr)
     {
-        ret = m_pImpl->InsertSamples(
-                  sampleData.m_processThreadId,
-                  sampleData.m_moduleInstanceId,
-                  sampleData.m_coreSamplingConfigId,
-                  sampleData.m_functionId,
-                  sampleData.m_offset,
-                  sampleData.m_count);
+        ret = m_pImpl->InsertSamples(sampleData.m_processThreadId,
+                                     sampleData.m_moduleInstanceId,
+                                     sampleData.m_coreSamplingConfigId,
+                                     sampleData.m_functionId,
+                                     sampleData.m_offset,
+                                     sampleData.m_count);
     }
 
     return ret;
@@ -4959,6 +5207,57 @@ bool AmdtDatabaseAccessor::GetSamplingConfiguration(AMDTUInt32 counterId, AMDTPr
     return ret;
 }
 
+bool AmdtDatabaseAccessor::GetProcessTotals(AMDTProcessId               procId,
+    gtVector<AMDTUInt32>        counterIdsList,
+    AMDTUInt64                  coreMask,
+    bool                        separateByCore,
+    AMDTSampleValueVec&         sampleValueVec)
+{
+    bool ret = false;
+
+    if (m_pImpl != nullptr)
+    {
+        ret = m_pImpl->GetProcessTotals(procId, counterIdsList, coreMask, separateByCore, sampleValueVec);
+    }
+
+    return ret;
+}
+
+bool AmdtDatabaseAccessor::GetModuleTotals(AMDTModuleId             moduleId,
+    AMDTProcessId            processId,
+    gtVector<AMDTUInt32>     counterIdsList,
+    AMDTUInt64               coreMask,
+    bool                     separateByCore,
+    AMDTSampleValueVec&      sampleValueVec)
+{
+    bool ret = false;
+
+    if (m_pImpl != nullptr)
+    {
+        ret = m_pImpl->GetModuleTotals(moduleId, processId, counterIdsList, coreMask, separateByCore, sampleValueVec);
+    }
+
+    return ret;
+}
+
+bool AmdtDatabaseAccessor::GetFunctionTotals(AMDTFunctionId         funcId,
+    AMDTProcessId          processId,
+    AMDTThreadId           threadId,
+    gtVector<AMDTUInt32>&  counterIdsList,
+    AMDTUInt64             coreMask,
+    bool                   separateByCore,
+    AMDTSampleValueVec&    sampleValueVec)
+{
+    bool ret = false;
+
+    if (m_pImpl != nullptr)
+    {
+        ret = m_pImpl->GetFunctionTotals(funcId, processId, threadId, counterIdsList, coreMask, separateByCore, sampleValueVec);
+    }
+
+    return ret;
+}
+
 bool AmdtDatabaseAccessor::GetProcessInfo(AMDTUInt32 pid, gtVector<AMDTProfileProcessInfo>& processInfoList)
 {
     bool ret = false;
@@ -5077,6 +5376,7 @@ bool AmdtDatabaseAccessor::GetThreadSummaryData(
 bool AmdtDatabaseAccessor::GetFunctionSummaryData(
     AMDTProcessId               processId,           // for a given process or for all processes
     AMDTThreadId                threadId,
+    AMDTModuleId                moduleId,
     gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
     AMDTUInt64                  coreMask,
     bool                        separateByCore,
@@ -5091,6 +5391,7 @@ bool AmdtDatabaseAccessor::GetFunctionSummaryData(
     {
         ret = m_pImpl->GetFunctionSummaryData(processId,
                                               threadId,
+                                              moduleId,
                                               counterIdsList,
                                               coreMask,
                                               separateByCore,
