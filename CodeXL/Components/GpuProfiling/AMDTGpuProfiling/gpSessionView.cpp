@@ -812,10 +812,18 @@ void gpSessionView::FillExecutionDetails()
 
         bool rc = gpUIManager::Instance()->ReadDashboardFile(sessionData, m_sessionPath);
         GT_ASSERT(rc);
+
         htmlContent.addHTMLItem(afHTMLContent::AP_HTML_BOLD_LINE, GPU_STR_dashboard_HTMLHost, sessionData.m_hostIP);
         htmlContent.addHTMLItem(afHTMLContent::AP_HTML_BOLD_LINE, GPU_STR_dashboard_HTMLTargetPath, sessionData.m_exePath);
         htmlContent.addHTMLItem(afHTMLContent::AP_HTML_BOLD_LINE, GPU_STR_dashboard_HTMLWorkingDirectory, sessionData.m_workingFolder);
-        htmlContent.addHTMLItem(afHTMLContent::AP_HTML_BOLD_LINE, GPU_STR_dashboard_HTMLCommandLineArguments, sessionData.m_cmdArgs);
+
+        // If there are on command line arguments, add an empty string to avoid HTML empty cell
+        gtString cmdArgs = sessionData.m_cmdArgs;
+        if (cmdArgs.isEmpty())
+        {
+            cmdArgs = acQStringToGTString(AF_STR_HtmlNBSP);
+        }
+        htmlContent.addHTMLItem(afHTMLContent::AP_HTML_BOLD_LINE, GPU_STR_dashboard_HTMLCommandLineArguments, cmdArgs);
 
         htmlContent.toString(strContent);
 
