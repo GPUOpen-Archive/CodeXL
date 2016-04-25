@@ -262,7 +262,6 @@ CodeXL/Components/ShaderAnalyzer/AMDTKernelAnalyzer/tmp/
 .idea/
 *.sln.iml
 /CodeXL/Components/GpuProfiling/Build/CodeXLGpuProfiler
-/CodeXL/App/vert_patch.il
 /CodeXL/App/vert_pal.il
 /CodeXL/App/vert.spv
 /CodeXL/App/vert.il
