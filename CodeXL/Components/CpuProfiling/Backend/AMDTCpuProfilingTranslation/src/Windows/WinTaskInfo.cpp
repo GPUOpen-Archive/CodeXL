@@ -2250,7 +2250,6 @@ bool WinTaskInfo::GetUserPeModInfo(TiModuleInfo* pModInfo, TiTimeType systemTime
         {
             wcsncpy(item.second.moduleName, tStr, OS_MAX_PATH);
             item.second.bNameConverted = true;
-            //m_tiModMap[item.first] = item.second;
         }
     }
 
@@ -2333,43 +2332,7 @@ bool WinTaskInfo::GetUserPeModInfo(TiModuleInfo* pModInfo, TiTimeType systemTime
 
     return true;
 }
-#if 0
-bool WinTaskInfo::GetUserOclModInfo(TiModuleInfo* pModInfo, TiTimeType systemTimeTick, ModuleMap::value_type& item)
-{
-    GT_UNREFERENCED_PARAMETER(systemTimeTick);
 
-    pModInfo->ModuleStartAddr = item.first.moduleLoadAddr;
-    pModInfo->Modulesize = item.second.moduleSize;
-    pModInfo->FunStartAddr = item.first.moduleLoadAddr; // What is this?
-
-    // The module name is the JIT function name.
-    wcsncpy(pModInfo->pFunctionName, wcsrchr(item.second.moduleName, L'\\') + 1, pModInfo->funNameSize);
-
-    wcsncpy(pModInfo->pJncName, item.second.moduleName, pModInfo->jncNameSize);
-
-    if (!item.second.bNameConverted)
-    {
-        wchar_t tStr[OS_MAX_PATH];
-        wcsncpy(tStr, item.second.moduleName, OS_MAX_PATH);
-        ConvertName(tStr, pModInfo->processID);
-
-        osCriticalSectionLocker lock(m_TIMutexJIT);
-
-        if (!item.second.bNameConverted)
-        {
-            wcsncpy(item.second.moduleName, tStr, OS_MAX_PATH);
-            item.second.bNameConverted = true;
-            m_tiModMap[item.first] = item.second;
-        }
-    }
-
-    wcsncpy(pModInfo->pModulename, item.second.moduleName, pModInfo->namesize);
-    wcsncpy(pModInfo->pJavaSrcFileName, item.second.moduleName, pModInfo->namesize);
-    wcsncpy(&pModInfo->pJavaSrcFileName[wcslen(pModInfo->pJavaSrcFileName) - 4], L".src", 4);
-
-    return true;
-}
-#endif
 HRESULT WinTaskInfo::GetUserModInfo(TiModuleInfo* pModInfo, TiTimeType systemTimeTick)
 {
     HRESULT hr = S_FALSE;
@@ -2410,7 +2373,7 @@ HRESULT WinTaskInfo::GetUserModInfo(TiModuleInfo* pModInfo, TiTimeType systemTim
         //     Hence, for java modules avoid checking the timestamp till we figure out a better approach.
         // This has a side effect - if the same address range is used by two different compiled methods,
         // then all the samples will be attributed only to the compiled method which was loaded first.
-        // This behaviour is still OK then attributing those many samples to "unknown module"
+        // This behavior is still OK then attributing those many samples to "unknown module"
         //
         if (0 != systemTimeTick && (item.first.moduleLoadTime >= systemTimeTick || item.second.moduleUnloadTime < systemTimeTick))
         {
@@ -2443,15 +2406,6 @@ HRESULT WinTaskInfo::GetUserModInfo(TiModuleInfo* pModInfo, TiTimeType systemTim
                 break;
 
             case evOCLModule:
-#if 0
-                if (GetUserOclModInfo(pModInfo, systemTimeTick, item))
-                {
-                    hr = S_OK;
-                }
-
-                break;
-#endif
-
             case evInvalidType:
                 break;
         }
