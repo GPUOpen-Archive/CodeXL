@@ -98,14 +98,17 @@ void CustomProfileProjectSettingsExtension::Initialize()
 
     pButtonsLayout->addStretch();
     m_pAddEvent = new QPushButton(AF_STR_AddButton);
+    m_pAddEvent->setToolTip(CP_STR_cpuProfileProjectSettingsAddButtonTooltip);
 
     pButtonsLayout->addWidget(m_pAddEvent);
 
     m_pRemoveEvent = new QPushButton(AF_STR_RemoveButton);
+    m_pRemoveEvent->setToolTip(CP_STR_cpuProfileProjectSettingsAddButtonTooltip);
 
     pButtonsLayout->addWidget(m_pRemoveEvent);
 
     m_pRemoveAll = new QPushButton(AF_STR_RemoveAllButton);
+    m_pRemoveAll->setToolTip(CP_STR_cpuProfileProjectSettingsRemoveAllButtonTooltip);
 
     pButtonsLayout->addWidget(m_pRemoveAll);
 
@@ -676,7 +679,7 @@ void CustomProfileProjectSettingsExtension::monitorEvent(QTreeWidgetItem* pAvail
         {
             addEvent = false;
         }
-        else if (QMessageBox::Ok != acMessageBox::instance().question(AF_STR_QuestionA, "Click Ok if you want the duplicate event. Note that you will need to change the Unit mask, Usr, or Os settings before the configuration is valid.", QMessageBox::Ok | QMessageBox::Cancel))
+        else if (QMessageBox::Ok != acMessageBox::instance().question(AF_STR_QuestionA, "Click Ok if you want the duplicate event. Note that you will need to change the Unit mask, User Mode, or Kernel Mode settings before the configuration is valid.", QMessageBox::Ok | QMessageBox::Cancel))
         {
             addEvent = false;
         }

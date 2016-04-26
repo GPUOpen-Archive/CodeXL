@@ -62,9 +62,6 @@ private:
     gtString ConvertQtToGTString(const QString& inputStr);
     void DecodeSamplingEvent(EventMaskType encoded, gtUInt16& event, gtUByte& unitMask, bool& bitOs, bool& bitUsr);
     bool InitializeEventsXMLFile(gtUInt32 cpuFamily, gtUInt32 cpuModel, EventsFile& eventsFile);
-    bool IsWindowsSystemModuleNoExt(const gtString& absolutePath);
-    bool AuxIsLinuxSystemModule(const gtString& absolutePath);
-    bool IsSystemModule(const gtString& absolutePath);
 
     amdtProfileDbAdapter* m_pCpuProfDbAdapter = nullptr;
 };

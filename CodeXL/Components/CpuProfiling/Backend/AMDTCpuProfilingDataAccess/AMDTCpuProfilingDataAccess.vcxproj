@@ -66,6 +66,10 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="AMDTCpuProfilingDataAccess.props" />
   </ImportGroup>
+  <ImportGroup Label="CommonPropertySheets">
+    <Import Project="$(SolutionDir)\CodeXLCommonProjects.props" />
+    <Import Project="$(AMDTCommonExt)\Qt\Global-QT.props" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -90,14 +94,15 @@
       <PrecompiledHeader>
       </PrecompiledHeader>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;AMDTCPUPROFILINGDATAACCESS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)inc;$(SolutionDir)\..\Components\DatabaseLayer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;CXLPROFILEDATA_READER_EXPORTS;AMDTCPUPROFILINGDATAACCESS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..;$(ProjectDir)inc;$(SolutionDir)\..\Components\DatabaseLayer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>CXLDbAdapter$(GDTProjectSuffix).lib;CXLProfilerDAL$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>AMDTCpuProfilingDataAccess.def</ModuleDefinitionFile>
+      <AdditionalDependencies>CXLDbAdapter$(GDTProjectSuffix).lib;CXLProfilerDAL$(GDTProjectSuffix).lib;CXLCpuPerfEventUtils$(GDTProjectSuffix).lib;CXLExecutableFormat$(GDTProjectSuffix).lib;CXLDisassembler$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -121,16 +126,17 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;AMDTCPUPROFILINGDATAACCESS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)inc;$(SolutionDir)\..\Components\DatabaseLayer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;CXLPROFILEDATA_READER_EXPORTS;AMDTCPUPROFILINGDATAACCESS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..;$(ProjectDir)inc;$(SolutionDir)\..\Components\DatabaseLayer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>CXLDbAdapter$(GDTProjectSuffix).lib;CXLProfilerDAL$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>AMDTCpuProfilingDataAccess.def</ModuleDefinitionFile>
+      <AdditionalDependencies>CXLDbAdapter$(GDTProjectSuffix).lib;CXLProfilerDAL$(GDTProjectSuffix).lib;CXLCpuPerfEventUtils$(GDTProjectSuffix).lib;CXLExecutableFormat$(GDTProjectSuffix).lib;CXLDisassembler$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

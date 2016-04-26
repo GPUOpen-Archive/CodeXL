@@ -139,6 +139,7 @@ void CpuProjectSettings::Initialize()
     pMainLayout->addWidget(pCaption1, currentRow, 0, 1, 2);
 
     m_pCollectCSSCheckBox = new QCheckBox(CP_STR_cpuProfileProjectSettingsCallStackCollection);
+    m_pCollectCSSCheckBox->setToolTip(CP_STR_cpuProfileProjectSettingsCallStackCollectionTooltip);
     currentRow++;
     pMainLayout->addWidget(m_pCollectCSSCheckBox, currentRow, 0, 1, 1);
 
@@ -162,6 +163,7 @@ void CpuProjectSettings::Initialize()
     m_pCodeExecInComboBox = new QComboBox;
     m_pCodeExecInComboBox->setInsertPolicy(QComboBox::InsertAtTop);
     m_pCodeExecInComboBox->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    m_pCodeExecInComboBox->setToolTip(CP_STR_cpuProfileProjectSettingsCallStackModeTooltip);
     m_pCodeExecInComboBox->addItem(CP_STR_cpuProfileProjectSettingsCallStackUserSpace, CP_CSS_SCOPE_USER);
     m_pCodeExecInComboBox->addItem(CP_STR_cpuProfileProjectSettingsCallStackKernelSpace, CP_CSS_SCOPE_KERNEL);
     m_pCodeExecInComboBox->addItem(CP_STR_cpuProfileProjectSettingsCallStackUserKernelSpaces, CP_CSS_SCOPE_ALL);
@@ -182,6 +184,7 @@ void CpuProjectSettings::Initialize()
 
     QHBoxLayout* pCollectEveryLayout = new QHBoxLayout;
     m_pCollectionFrequencySpinBox = new QSpinBox;
+    m_pCollectionFrequencySpinBox->setToolTip(CP_STR_cpuProfileProjectSettingsCallStackCollectionEveryTooltip);
     m_pCollectionFrequencySpinBox->setRange(CP_CSS_MIN_UNWIND_INTERVAL, CP_CSS_MAX_UNWIND_INTERVAL);
     m_pCSSLabel3 = new QLabel("samples");
 
@@ -221,7 +224,7 @@ void CpuProjectSettings::Initialize()
     m_pUnwindDepthComboBox->addItem(QString(CP_STR_cpuProfileProjectSettingsDepthMaximal).arg(CP_CSS_MAX_UNWIND_DEPTH), QVariant(CP_CSS_MAX_UNWIND_DEPTH));
 
     m_pUnwindDepthComboBox->setCurrentText(QString(CP_STR_cpuProfileProjectSettingsDepthHigh).arg(CP_CSS_HIGH_UNWIND_DEPTH));
-
+    m_pUnwindDepthComboBox->setToolTip(CP_STR_cpuProfileProjectSettingsDepthTooltip);
     pLayoutTimeBased->addWidget(m_pUnwindDepthComboBox);
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
@@ -257,6 +260,7 @@ void CpuProjectSettings::Initialize()
     m_pOtherDepthComboBox->addItem(QString(CP_STR_cpuProfileProjectSettingsDepthMaximal).arg(CP_CSS_MAX_UNWIND_DEPTH), QVariant(CP_CSS_MAX_UNWIND_DEPTH));
 
     m_pOtherDepthComboBox->setCurrentText(QString(CP_STR_cpuProfileProjectSettingsDepthLow).arg(CP_CSS_LOW_UNWIND_DEPTH));
+    m_pOtherDepthComboBox->setToolTip(CP_STR_cpuProfileProjectSettingsDepthOtherTooltip);
 
     pLayoutOther->addWidget(m_pOtherDepthComboBox);
 
@@ -283,14 +287,18 @@ void CpuProjectSettings::Initialize()
 
     // ********** Collection Schedule *******
     QLabel* pCaption2 = new QLabel(PM_STR_sharedProfileSettingsDataCollectionSchedule);
+    pCaption2->setToolTip(PM_STR_sharedProfileSettingsCollectDataScheduleTooltip);
 
     currentRow++;
     pCaption2->setStyleSheet(AF_STR_captionLabelStyleSheet);
     pMainLayout->addWidget(pCaption2, currentRow, 0, 1, 4);
 
     m_pEntireDurationRadio = new QRadioButton(PM_STR_sharedProfileSettingsEntireDuration);
+    m_pEntireDurationRadio->setToolTip(PM_STR_sharedProfileSettingsEntireDurationTooltip);
     m_pProfilePausedRadio = new QRadioButton(PM_STR_sharedProfileSettingsProfilePaused);
+    m_pProfilePausedRadio->setToolTip(PM_STR_sharedProfileSettingsProfilePausedTooltip);
     m_pProfileScheduledRadio = new QRadioButton(PM_STR_sharedProfileSettingsProfileScheduled);
+    m_pProfileScheduledRadio->setToolTip(PM_STR_sharedProfileSettingsProfileScheduledTooltip);
 
     QButtonGroup* pGroup2 = new QButtonGroup;
 
@@ -316,6 +324,7 @@ void CpuProjectSettings::Initialize()
 
     m_pDurationLabel1 = new QLabel(PM_STR_sharedProfileSettingsStartAfter);
     m_pStartAfterSpinBox = new QSpinBox;
+    m_pStartAfterSpinBox->setToolTip(PM_STR_sharedProfileSettingsStartAfterTooltip);
     m_pDurationLabel2 = new QLabel(PM_STR_sharedProfileSettingsSeconds);
 
 
@@ -336,9 +345,11 @@ void CpuProjectSettings::Initialize()
     m_pEndAfterCheckbox = new QCheckBox(PM_STR_sharedProfileSettingsEndAfter);
 
     m_pProfileDurationSpinBox = new QSpinBox;
+    m_pProfileDurationSpinBox->setToolTip(PM_STR_sharedProfileSettingsEndAfterTooltip);
     m_pDurationLabel4 = new QLabel(PM_STR_sharedProfileSettingsAdditionalSeconds);
     m_pDurationLabel4->setWordWrap(true);
     m_pTerminateAfterDataCollectionCheckBox = new QCheckBox(PM_STR_sharedProfileSettingsTerminateAfter);
+    m_pTerminateAfterDataCollectionCheckBox->setToolTip(PM_STR_sharedProfileSettingsTerminateAfterTooltip);
     QHBoxLayout* pDummyLayout = new QHBoxLayout;
     pDummyLayout->setContentsMargins(20, 0, 0, 0);
     pDummyLayout->addWidget(m_pTerminateAfterDataCollectionCheckBox);
@@ -394,8 +405,9 @@ void CpuProjectSettings::Initialize()
     hardwareScopeGrid->addWidget(m_pCoresTree, 0, 0, 1, 2, Qt::AlignLeft);
 
     QHBoxLayout* pComboLayout = new QHBoxLayout;
-    //pComboLayout->addStretch(1);
-    pComboLayout->addWidget(new QLabel(CP_STR_cpuProfileProjectSettingsCPUAffinityMask), 0, Qt::AlignRight);
+    QLabel* pCPUAffinityLabel = new QLabel(CP_STR_cpuProfileProjectSettingsCPUAffinityMask);
+    pCPUAffinityLabel->setToolTip(CP_STR_cpuProfileProjectSettingsCPUAffinityMaskTooltip);
+    pComboLayout->addWidget(pCPUAffinityLabel, 0, Qt::AlignRight);
     pComboLayout->addWidget(m_pAffinityMaskText, 0, Qt::AlignRight);
     hardwareScopeGrid->addLayout(pComboLayout, 1, 0, 1, 2, Qt::AlignRight);
 

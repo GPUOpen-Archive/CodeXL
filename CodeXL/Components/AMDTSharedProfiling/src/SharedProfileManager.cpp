@@ -518,11 +518,13 @@ bool SharedProfileManager::isPausedEnabled(bool& checkable, bool& checked, bool&
 
 bool SharedProfileManager::isStopEnabled(bool& checkable, bool& checked)
 {
+    bool retVal = false;
     checkable = false;
     checked = false;
-    return ((isProfilingOkay(false))
-            && (0 != (SPM_ALLOW_STOP & m_flags[m_selectedProfile]))
-            && (m_profileIsRunning));
+
+    bool isStopEnabledForCurrentProfile = SPM_ALLOW_STOP & m_flags[m_selectedProfile];
+    retVal = isProfilingOkay(false) && isStopEnabledForCurrentProfile && m_profileIsRunning;
+    return retVal;
 }
 
 void SharedProfileManager::updateUI(afExecutionCommandId commandId, QAction* pAction)
