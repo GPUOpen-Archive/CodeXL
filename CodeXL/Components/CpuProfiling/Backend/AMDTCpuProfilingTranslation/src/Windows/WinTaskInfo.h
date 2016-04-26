@@ -117,9 +117,7 @@ public:
     // Caller allocates the space for module name.
     HRESULT GetModuleInfo(TiModuleInfo* pModInfo);
 
-#ifdef AMDT_ENABLE_CPUPROF_DB
     HRESULT GetProcessThreadList(gtVector<std::tuple<gtUInt32, gtUInt32>>& info);
-#endif
 
     // Get number of kernel modules
     HRESULT GetKernelModNum(/* [out] */ unsigned* pKeModNum);
@@ -324,9 +322,7 @@ private:
     osCriticalSection m_TIMutexKE;
     osCriticalSection m_TIMutexModule;
 
-#ifdef AMDT_ENABLE_CPUPROF_DB
     gtUInt32 m_nextModInstanceId = 1;
-#endif
 };
 
 #endif // _WINTASKINFO_H_

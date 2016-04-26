@@ -293,14 +293,12 @@ HRESULT fnGetModuleInfo(TiModuleInfo* info)
     return hr;
 }
 
-#ifdef AMDT_ENABLE_CPUPROF_DB
 HRESULT fnGetProcessThreadList(gtVector<std::tuple<gtUInt32, gtUInt32>>& info)
 {
     HRESULT hr = g_TaskInfo.GetProcessThreadList(info);
 
     return hr;
 }
-#endif
 
 ///////////////////////////////////////////////////////////////////////////
 // fnGetKernelModNum(unsigned *pKeModNum)

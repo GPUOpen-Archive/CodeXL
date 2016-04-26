@@ -490,9 +490,7 @@ bool JitTaskInfo::GetUserJitModInfo(TiModuleInfo* pModInfo, TiTimeType systemTim
     pModInfo->ModuleStartAddr = item.first.moduleLoadAddr;
     pModInfo->Modulesize = 0;
     pModInfo->FunStartAddr = item.first.moduleLoadAddr;
-#ifdef AMDT_ENABLE_CPUPROF_DB
     pModInfo->instanceId = item.second.instanceId;
-#endif
 
     // The module name is the JIT function name.
     wcsncpy(pModInfo->pFunctionName, item.second.moduleName, pModInfo->funNameSize);
