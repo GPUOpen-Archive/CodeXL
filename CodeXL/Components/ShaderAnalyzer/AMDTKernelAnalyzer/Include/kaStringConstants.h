@@ -229,7 +229,7 @@
 
 
 #define KA_STR_treeProjectFileExists "Source file already exists in the project."
-#define KA_STR_treeProgramFileExists "Source file already attached to the prorgam."
+#define KA_STR_treeProgramFileExists "Source file already attached to the program."
 #define KA_STR_kernelPrefix L"Kernel - "
 #define KA_STR_kernelPrefixASCII "Kernel - "
 #define KA_STR_ShaderPrefix L"Shader - "
