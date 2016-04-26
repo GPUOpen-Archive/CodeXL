@@ -56,11 +56,9 @@ struct TiModuleInfo
     /* [out] */ bool kernel;  //Used for thread profiling.
     /* [in] */  unsigned sesdirsize;
     /* [out] */ wchar_t* pSessionDir;
+    /* [out] */ gtUInt32 instanceId;
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     /* [out]*/  PeFile* pPeFile;
-#endif
-#ifdef AMDT_ENABLE_CPUPROF_DB
-    /* [out] */ gtUInt32 instanceId;
 #endif
 };
 
@@ -122,10 +120,8 @@ struct ModuleValue
 
     // JIT block copied to run session dir.
     ModTypeEnum moduleType;     // manage, unmanaged, java etc.
-
-#ifdef AMDT_ENABLE_CPUPROF_DB
     gtUInt32 instanceId = 0;
-#endif
+
     // default constructor
     ModuleValue() : moduleBaseAddr(0),
         moduleSize(0),

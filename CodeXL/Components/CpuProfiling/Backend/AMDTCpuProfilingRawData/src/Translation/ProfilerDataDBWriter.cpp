@@ -24,7 +24,6 @@
 #include <CpuProfileModule.h>
 #include <CpuProfileProcess.h>
 
-#ifdef AMDT_ENABLE_CPUPROF_DB
 #include <ProfilerDataDBWriter.h>
 
 static inline gtUInt32 generateFuncId(gtUInt16 moduleId, gtUInt16 funcSeq)
@@ -442,4 +441,3 @@ bool ProfilerDataDBWriter::Write(
 
     return true;
 }
-#endif // AMDT_ENABLE_CPUPROF_DB

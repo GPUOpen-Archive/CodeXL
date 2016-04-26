@@ -27,11 +27,7 @@ CpuProfileFunction::CpuProfileFunction(const gtString& name,
     m_total(0),
     m_sourceLine(lineNumber)
 {
-#ifdef AMDT_ENABLE_CPUPROF_DB
     m_functionId = functionId;
-#else
-    GT_UNREFERENCED_PARAMETER(functionId);
-#endif
 }
 
 void CpuProfileFunction::setBaseAddr(gtVAddr addr)
