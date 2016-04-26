@@ -128,12 +128,11 @@ public:
     bool m_symbolsLoaded;           // FIXME. why do we need?
     bool m_isDebugInfoAvailable;    // Whether Debug Info (PDB/Dwarf/Stab) is available during data-translation
 
-#ifdef AMDT_ENABLE_CPUPROF_DB
     // Unique module id for each module
     gtUInt32 m_moduleId = 0;
     // List of different module instances <pid,loadAddr,instanceId> for each module
     gtVector<std::tuple<gtUInt64, gtUInt64, gtUInt32>> m_moduleInstanceInfo;
-#endif
+
 private:
     int m_imdIndex;
     gtUInt64 m_total; // Updated by recordSample
