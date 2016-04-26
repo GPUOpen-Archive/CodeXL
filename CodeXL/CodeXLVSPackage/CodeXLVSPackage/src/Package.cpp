@@ -1815,6 +1815,9 @@ void CodeXLVSPackage::verifyBaseViewsCreated()
             _pPropertiesToolWindow->setMyWindowCommandID(VSCORE(vsc_GetPropertiesViewId)());
             _pPropertiesToolWindow->Create();
         }
+
+        // make sure the solution view is in the front:
+        vspDTEConnector::instance().ExecuteCommand(L"View.SolutionExplorer");
     }
 }
 
