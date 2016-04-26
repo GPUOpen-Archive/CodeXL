@@ -2250,7 +2250,6 @@ bool WinTaskInfo::GetUserPeModInfo(TiModuleInfo* pModInfo, TiTimeType systemTime
         {
             wcsncpy(item.second.moduleName, tStr, OS_MAX_PATH);
             item.second.bNameConverted = true;
-            //m_tiModMap[item.first] = item.second;
         }
     }
 
@@ -2333,43 +2332,7 @@ bool WinTaskInfo::GetUserPeModInfo(TiModuleInfo* pModInfo, TiTimeType systemTime
 
     return true;
 }
-#if 0
-bool WinTaskInfo::GetUserOclModInfo(TiModuleInfo* pModInfo, TiTimeType systemTimeTick, ModuleMap::value_type& item)
-{
-    GT_UNREFERENCED_PARAMETER(systemTimeTick);
 
-    pModInfo->ModuleStartAddr = item.first.moduleLoadAddr;
-    pModInfo->Modulesize = item.second.moduleSize;
-    pModInfo->FunStartAddr = item.first.moduleLoadAddr; // What is this?
-
-    // The module name is the JIT function name.
-    wcsncpy(pModInfo->pFunctionName, wcsrchr(item.second.moduleName, L'\\') + 1, pModInfo->funNameSize);
-
-    wcsncpy(pModInfo->pJncName, item.second.moduleName, pModInfo->jncNameSize);
-
-    if (!item.second.bNameConverted)
-    {
-        wchar_t tStr[OS_MAX_PATH];
-        wcsncpy(tStr, item.second.moduleName, OS_MAX_PATH);
-        ConvertName(tStr, pModInfo->processID);
-
-        osCriticalSectionLocker lock(m_TIMutexJIT);
-
-        if (!item.second.bNameConverted)
-        {
-            wcsncpy(item.second.moduleName, tStr, OS_MAX_PATH);
-            item.second.bNameConverted = true;
-            m_tiModMap[item.first] = item.second;
-        }
-    }
-
-    wcsncpy(pModInfo->pModulename, item.second.moduleName, pModInfo->namesize);
-    wcsncpy(pModInfo->pJavaSrcFileName, item.second.moduleName, pModInfo->namesize);
-    wcsncpy(&pModInfo->pJavaSrcFileName[wcslen(pModInfo->pJavaSrcFileName) - 4], L".src", 4);
-
-    return true;
-}
-#endif
 HRESULT WinTaskInfo::GetUserModInfo(TiModuleInfo* pModInfo, TiTimeType systemTimeTick)
 {
     HRESULT hr = S_FALSE;
@@ -2410,7 +2373,7 @@ HRESULT WinTaskInfo::GetUserModInfo(TiModuleInfo* pModInfo, TiTimeType systemTim
         //     Hence, for java modules avoid checking the timestamp till we figure out a better approach.
         // This has a side effect - if the same address range is used by two different compiled methods,
         // then all the samples will be attributed only to the compiled method which was loaded first.
-        // This behaviour is still OK then attributing those many samples to "unknown module"
+        // This behavior is still OK then attributing those many samples to "unknown module"
         //
         if (0 != systemTimeTick && (item.first.moduleLoadTime >= systemTimeTick || item.second.moduleUnloadTime < systemTimeTick))
         {
@@ -2443,15 +2406,6 @@ HRESULT WinTaskInfo::GetUserModInfo(TiModuleInfo* pModInfo, TiTimeType systemTim
                 break;
 
             case evOCLModule:
-#if 0
-                if (GetUserOclModInfo(pModInfo, systemTimeTick, item))
-                {
-                    hr = S_OK;
-                }
-
-                break;
-#endif
-
             case evInvalidType:
                 break;
         }
@@ -2654,10 +2608,26 @@ HRESULT WinTaskInfo::GetProcessThreadList(gtVector<std::tuple<gtUInt32, gtUInt32
 {
     HRESULT hr = S_OK;
 
-    // Iterate over user modules
-    for (const auto& it : m_ThreadMap)
+    for (const auto& it : m_interestingPidMap)
     {
-        info.emplace_back(static_cast<gtUInt32>(it.first.processID), static_cast<gtUInt32>(it.first.threadID));
+        ThreadInfoKey t_threadKey(static_cast<gtUInt64>(it.first), 0xFFFFFFFF);
+        auto iter = m_ThreadMap.upper_bound(t_threadKey);
+
+        if (m_ThreadMap.end() != iter)
+        {
+            --iter;
+            while (iter->first.processID == it.first)
+            {
+                info.emplace_back(static_cast<gtUInt32>(iter->first.processID), static_cast<gtUInt32>(iter->first.threadID));
+
+                if (m_ThreadMap.begin() == iter)
+                {
+                    break;
+                }
+
+                --iter;
+            }
+        }
     }
 
     return hr;
@@ -4663,40 +4633,6 @@ gtUInt64 WinTaskInfo::GetModuleSize(const wchar_t* pModuleName) const
 
     return imageSize;
 }
-
-#if 0
-void WinTaskInfo::UpdateOclKernelJit(unsigned int pid, gtUInt64* pJitAddress, unsigned int size, const wchar_t* pJitOutputDir)
-{
-    for (unsigned int k = 0; k < size; k++)
-    {
-        // this is user space, check module map.
-        ModuleMap::iterator i = m_tiModMap.lower_bound(ModuleKey(pid, pJitAddress[k], TI_TIMETYPE_MAX));
-
-        for (; i != m_tiModMap.end(); ++i)
-        {
-            ModuleMap::value_type& item = *i;
-
-            // different process
-            if (item.first.processId != pid)
-            {
-                break;
-            }
-
-            // since the module map is sorted by the process id, module address and time.
-            // if module load address is greater than sample address, we don't need
-            // go farther.
-            if (item.first.moduleLoadAddr != pJitAddress[k])
-            {
-                break;
-            }
-
-            //wcsncpy (pathstring, modulename, OS_MAX_PATH);
-            wsprintf(item.second.moduleName, L"%s\\%I64x.ocl", pJitOutputDir, pJitAddress[k]);
-            item.second.moduleType = evOCLModule;
-        }
-    }
-}
-#endif
 
 void WinTaskInfo::AddLoadModules(gtUInt64 processId)
 {

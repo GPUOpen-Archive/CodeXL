@@ -213,24 +213,489 @@ HRESULT CpuProfileReport::Report()
 } // Report
 
 #ifdef AMDT_ENABLE_DB_SUPPORT
+
+#define STR_FORMAT L"%ls"
+#define DQ_STR_FORMAT L"\"%ls\""
+
+
+static void PrintSessionInfo(osFile& reportFile, AMDTProfileSessionInfo& sessionInfo)
+{
+    gtString s;
+
+    s << L"CodeXL CPU Profiler - PROFILE SESSION INFO\n";
+    //s.appendFormattedString(L"Target Machine," STR_FORMAT L"\n", sessionInfo.m_targetMachineName.asASCIICharArray());
+    s.appendFormattedString(L"Target Application," STR_FORMAT L"\n", sessionInfo.m_targetAppPath.asCharArray());
+    s.appendFormattedString(L"System Details," STR_FORMAT L"\n", sessionInfo.m_systemDetails.asCharArray());
+
+    s << L"\n";
+    reportFile.writeString(s);
+
+    return;
+}
+
+static void PrintSampledCounters(osFile& reportFile, AMDTProfileCounterDescVec& counters, AMDTProfileSamplingConfigVec& samplingConfig)
+{
+    gtString s;
+
+    s << L"Sampled Counters\n";
+
+    s.appendFormattedString(L"Counter Name, Sampling Interval, USer, Os\n");
+
+    int idx = 0;
+    for (auto& counter : counters)
+    {
+        s.appendFormattedString(STR_FORMAT L", %lu, %d, %d\n",
+            counter.m_name.asCharArray(), samplingConfig[idx].m_samplingInterval, samplingConfig[idx].m_userMode, samplingConfig[idx].m_osMode);
+
+        idx++;
+    }
+
+    s << L"\n";
+    reportFile.writeString(s);
+
+    return;
+}
+
+static void PrintOverview(osFile& reportFile, gtString hdr, AMDTProfileCounterDesc& counterDesc, AMDTProfileDataVec& data)
+{
+    gtString s;
+
+    s << hdr;
+    s << L" OVERVIEW (Counter - ";
+    s << counterDesc.m_name;
+    s << L")\n";
+    s.appendFormattedString(L"ID, Name, SampleCount, SamplePercentage\n");
+
+    for (auto& aData : data)
+    {
+        s.appendFormattedString(L"%d, ", aData.m_id);
+        s << aData.m_name;
+
+        for (auto& aSampleValue : aData.m_sampleValue)
+        {
+            if (counterDesc.m_type == AMDT_PROFILE_COUNTER_TYPE_RAW)
+            {
+                s.appendFormattedString(L",%lu", static_cast<gtUInt64>(aSampleValue.m_sampleCount));
+                s.appendFormattedString(L",%3.02f%%", static_cast<float>(aSampleValue.m_sampleCountPercentage));
+            }
+            else if (counterDesc.m_type == AMDT_PROFILE_COUNTER_TYPE_COMPUTED)
+            {
+                s.appendFormattedString(L",%5.04f", static_cast<float>(aSampleValue.m_sampleCount));
+            }
+        }
+        s << L"\n";
+    }
+
+    s << L"\n";
+    reportFile.writeString(s);
+
+    return;
+}
+
+static void PrintAllData(osFile& reportFile, gtString hdr, AMDTProfileCounterDescVec& counterDescVec, AMDTProfileDataVec& data)
+{
+    gtString s;
+
+    s << L" All Data - ";
+    s << hdr;
+    s << L"\n";
+
+    s.appendFormattedString(L"ID, Name ");
+
+    for (auto& aCounter : counterDescVec)
+    {
+        if (aCounter.m_type == AMDT_PROFILE_COUNTER_TYPE_RAW)
+        {
+            s << L"," << aCounter.m_name;
+            //s << L"," << aCounter.m_name << L"-SampleCount";
+            //s << L"," << aCounter.m_name << L"-SamplePercentage";
+        }
+        else if (aCounter.m_type == AMDT_PROFILE_COUNTER_TYPE_COMPUTED)
+        {
+            s << L"," << aCounter.m_name;
+        }
+    }
+    s << L"\n";
+
+    for (auto& aData : data)
+    {
+        s.appendFormattedString(L"%d, ", aData.m_id);
+        s << aData.m_name;
+
+        int idx = 0;
+        for (auto& aSampleValue : aData.m_sampleValue)
+        {
+            if (counterDescVec[idx].m_type == AMDT_PROFILE_COUNTER_TYPE_RAW)
+            {
+                s.appendFormattedString(L",%lu ", static_cast<gtUInt64>(aSampleValue.m_sampleCount));
+                s.appendFormattedString(L"(%3.02f%%)", static_cast<float>(aSampleValue.m_sampleCountPercentage));
+
+                //s.appendFormattedString(L",%lu", static_cast<gtUInt64>(aSampleValue.m_sampleCount));
+                //s.appendFormattedString(L",%3.02f%%", static_cast<float>(aSampleValue.m_sampleCountPercentage));
+            }
+            else if (counterDescVec[idx].m_type == AMDT_PROFILE_COUNTER_TYPE_COMPUTED)
+            {
+                s.appendFormattedString(L",%5.04f", static_cast<float>(aSampleValue.m_sampleCount));
+            }
+
+            idx++;
+        }
+        s << L"\n";
+    }
+
+    s << L"\n";
+    reportFile.writeString(s);
+
+    return;
+}
+
+static void GetInstOffsets(gtUInt16 srcLine, AMDTSourceAndDisasmInfoVec& srcInfoVec, gtVector<gtVAddr>& instOffsetVec)
+{
+    for (auto& srcInfo : srcInfoVec)
+    {
+        if (srcInfo.m_sourceLine == srcLine)
+        {
+            instOffsetVec.push_back(srcInfo.m_offset);
+        }
+
+    }
+
+    return;
+}
+
+static void GetDisasmString(gtVAddr offset, AMDTSourceAndDisasmInfoVec& srcInfoVec, gtString& disasm, gtString& codeByte)
+{
+    auto instData = std::find_if(srcInfoVec.begin(), srcInfoVec.end(),
+        [&offset](AMDTSourceAndDisasmInfo const& srcInfo) { return srcInfo.m_offset == offset; });
+
+    if (instData != srcInfoVec.end())
+    {
+        disasm = instData->m_disasmStr;
+        codeByte = instData->m_codeByteStr;
+    }
+
+    return;
+}
+
+static void GetDisasmSampleValue(gtVAddr offset, AMDTProfileInstructionDataVec& dataVec, AMDTSampleValueVec& sampleValue)
+{
+    auto instData = std::find_if(dataVec.begin(), dataVec.end(),
+        [&offset](AMDTProfileInstructionData const& data) { return data.m_offset == offset; });
+
+    if (instData != dataVec.end())
+    {
+        sampleValue = instData->m_sampleValues;
+    }
+
+    return;
+}
+
+static bool GetSourceLines(const gtString& filePath, gtVector<gtString>& srcLines)
+{
+    unsigned int count = 0;
+    QFile file(convertToQString(filePath));
+
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        return false;
+    }
+
+    QTextStream srcStream(&file);
+    srcStream.setCodec("UTF-8");
+
+    while (!srcStream.atEnd())
+    {
+        srcLines.emplace_back(convertToGTString(srcStream.readLine()));
+        count++;
+    }
+
+    file.close();
+    return true;
+}
+
+
+static void PrintFunctionDetailData(osFile& reportFile, AMDTProfileCounterDescVec& counterDescVec,
+    AMDTProfileFunctionData& data,
+    gtString& srcFilePath,
+    AMDTSourceAndDisasmInfoVec& srcInfoVec)
+{
+    gtString s;
+
+    s << L" Function Detail Data\n";
+
+    s.appendFormattedString(L"Name,SrcLine,Offset,Disassembly,CodeByte ");
+
+    for (auto& aCounter : counterDescVec)
+    {
+        if (aCounter.m_type == AMDT_PROFILE_COUNTER_TYPE_RAW)
+        {
+            s << L"," << aCounter.m_name;
+            //s << L"," << aCounter.m_name << L"-SampleCount";
+            //s << L"," << aCounter.m_name << L"-SamplePercentage";
+        }
+        else if (aCounter.m_type == AMDT_PROFILE_COUNTER_TYPE_COMPUTED)
+        {
+            s << L"," << aCounter.m_name;
+        }
+    }
+    s << L"\n";
+
+    // s.appendFormattedString(L"%d, ", data.m_functionInfo.m_functionId);
+    s << data.m_functionInfo.m_name << "  (" << srcFilePath << ")  ";
+    s << L"\n";
+
+    gtVector<gtString> srcLines;
+
+    bool foundSrcLine = GetSourceLines(srcFilePath, srcLines);
+
+    for (auto& srcData : data.m_srcLineDataList)
+    {
+        //s.appendFormattedString(L",%d,,,", srcData.m_sourceLineNumber);
+        s.appendFormattedString(L"%d,", srcData.m_sourceLineNumber);
+
+        if (foundSrcLine)
+        {
+            s.appendFormattedString(DQ_STR_FORMAT, srcLines[srcData.m_sourceLineNumber - 1].asCharArray());
+            s.appendFormattedString(L",,,", srcData.m_sourceLineNumber);
+        }
+        else
+        {
+            s.appendFormattedString(L",,,,", srcData.m_sourceLineNumber);
+        }
+
+        int idx = 0;
+        for (auto& aSampleValue : srcData.m_sampleValues)
+        {
+            if (counterDescVec[idx].m_type == AMDT_PROFILE_COUNTER_TYPE_RAW)
+            {
+                s.appendFormattedString(L",%lu ", static_cast<gtUInt64>(aSampleValue.m_sampleCount));
+                s.appendFormattedString(L"(%3.02f%%)", static_cast<float>(aSampleValue.m_sampleCountPercentage));
+
+                //s.appendFormattedString(L",%lu", static_cast<gtUInt64>(aSampleValue.m_sampleCount));
+                //s.appendFormattedString(L",%3.02f%%", static_cast<float>(aSampleValue.m_sampleCountPercentage));
+            }
+            else if (counterDescVec[idx].m_type == AMDT_PROFILE_COUNTER_TYPE_COMPUTED)
+            {
+                s.appendFormattedString(L",%5.04f", static_cast<float>(aSampleValue.m_sampleCount));
+            }
+
+            idx++;
+        }
+        s << L"\n";
+
+        // For this srcLine get the list of inst offsets..
+        gtVector<gtVAddr> instOffsetVec;
+        GetInstOffsets(srcData.m_sourceLineNumber, srcInfoVec, instOffsetVec);
+
+        // For this offset get the disams and samples values
+        for (auto& instOffset : instOffsetVec)
+        {
+            gtString disasm;
+            gtString codeByte;
+
+            GetDisasmString(instOffset, srcInfoVec, disasm, codeByte);
+            AMDTSampleValueVec sampleValue;
+            GetDisasmSampleValue(instOffset, data.m_instDataList, sampleValue);
+
+            s.appendFormattedString(L",,0x%lx,", instOffset);
+            s.appendFormattedString(DQ_STR_FORMAT, disasm.asCharArray());
+            s.appendFormattedString(L"," DQ_STR_FORMAT, codeByte.asCharArray());
+
+            idx = 0;
+            for (auto& aSampleValue : sampleValue)
+            {
+                if (counterDescVec[idx].m_type == AMDT_PROFILE_COUNTER_TYPE_RAW)
+                {
+                    s.appendFormattedString(L",%lu ", static_cast<gtUInt64>(aSampleValue.m_sampleCount));
+                    s.appendFormattedString(L"(%3.02f%%)", static_cast<float>(aSampleValue.m_sampleCountPercentage));
+                }
+                else if (counterDescVec[idx].m_type == AMDT_PROFILE_COUNTER_TYPE_COMPUTED)
+                {
+                    s.appendFormattedString(L",%5.04f", static_cast<float>(aSampleValue.m_sampleCount));
+                }
+
+                idx++;
+            }
+            s << L"\n";
+        }
+
+        s << L"\n";
+    }
+
+    s << L"\n";
+    reportFile.writeString(s);
+
+    return;
+}
+
 HRESULT CpuProfileReport::ReportFromDb()
 {
-    HRESULT hr = S_OK;
+    bool ret = false;
+
+    cxlProfileDataReader profileDbReader;
 
     // if -i has .cxldb file
     if (m_isDbInputFile)
     {
-        hr = AMDTOpenProfileData(m_inputFilePath.asString(), m_profileDbReader);
+        osFilePath reportFilePath = GetOutputFilePath();
+        reportFilePath.setFileExtension(CPUPROFILE_CSV_REPORT_EXTENSION);
+        osFile reportFile;
 
-        if (AMDT_STATUS_OK == hr)
+        if (!reportFilePath.isEmpty())
+        {
+            ret = reportFile.open(reportFilePath, osChannel::OS_ASCII_TEXT_CHANNEL, osFile::OS_OPEN_TO_WRITE);
+        }
+
+        ret = profileDbReader.OpenProfileData(m_inputFilePath.asString());
+
+        if (ret)
         {
             AMDTProfileSessionInfo sessionInfo;
 
-            hr = AMDTGetProfileSessionInfo(m_profileDbReader, sessionInfo);
+            ret = profileDbReader.GetProfileSessionInfo(sessionInfo);
+            PrintSessionInfo(reportFile, sessionInfo);
+
+            AMDTCpuTopologyVec topologyVec;
+            ret = profileDbReader.GetCpuTopology(topologyVec);
+
+            gtVector<AMDTProfileCounterDesc> counterDesc;
+            ret = profileDbReader.GetSampledCountersList(counterDesc);
+
+            AMDTProfileSamplingConfigVec samplingConfigVec;
+            for (auto const& counter : counterDesc)
+            {
+                AMDTProfileSamplingConfig sampleConfig;
+                ret = profileDbReader.GetSamplingConfiguration(counter.m_id, sampleConfig);
+                samplingConfigVec.push_back(sampleConfig);
+            }
+            PrintSampledCounters(reportFile, counterDesc, samplingConfigVec);
+
+            gtVector<AMDTProfileReportConfig> reportConfigs;
+            ret = profileDbReader.GetReportConfigurations(reportConfigs);
+
+            AMDTProfileDataOptions options;
+            options.m_coreMask = AMDT_PROFILE_ALL_CORES;
+            options.m_doSort = true;
+            options.m_summaryCount = 5;
+            options.m_isSeperateByCore = false;
+
+            //for (auto const& counter : counterDesc)
+            for (auto const& counter : reportConfigs[2].m_counterDescs)
+            {
+                options.m_counters.push_back(counter.m_id);
+            }
+
+            ret = profileDbReader.SetReportOption(options);
+
+            gtVector<AMDTProfileProcessInfo> procInfo;
+            ret = profileDbReader.GetProcessInfo(AMDT_PROFILE_ALL_PROCESSES, procInfo);
+            for (auto const& process : procInfo)
+            {
+                fprintf(stderr, "PID : %d\n", process.m_pid);
+            }
+
+            gtVector<AMDTProfileModuleInfo> modInfo;
+            ret = profileDbReader.GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, modInfo);
+            for (auto const& module : modInfo)
+            {
+                fprintf(stderr, "Module : %d\n", module.m_moduleId);
+            }
+
+            gtVector<AMDTProfileThreadInfo> threadInfo;
+            ret = profileDbReader.GetThreadInfo(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_THREADS, threadInfo);
+            for (auto const& thread : threadInfo)
+            {
+                fprintf(stderr, "Thread : %d\n", thread.m_threadId);
+            }
+
+            AMDTProfileDataVec funcProfileData;
+            AMDTProfileDataVec processProfileData;
+            AMDTProfileDataVec moduleProfileData;
+            AMDTProfileDataVec threadProfileData;
+            for (auto& counter : counterDesc)
+            {
+                processProfileData.clear();
+                ret = profileDbReader.GetProcessSummary(counter.m_id, processProfileData);
+                PrintOverview(reportFile, L"Process", counter, processProfileData);
+
+                moduleProfileData.clear();
+                ret = profileDbReader.GetModuleSummary(counter.m_id, moduleProfileData);
+                PrintOverview(reportFile, L"Module", counter, moduleProfileData);
+
+                threadProfileData.clear();
+                ret = profileDbReader.GetThreadSummary(counter.m_id, threadProfileData);
+                PrintOverview(reportFile, L"Thread", counter, threadProfileData);
+
+                funcProfileData.clear();
+                ret = profileDbReader.GetFunctionSummary(counter.m_id, funcProfileData);
+                PrintOverview(reportFile, L"Function", counter, funcProfileData);
+            }
+
+            // Process View - "All Data" view
+            gtVector<AMDTProfileData> allProcessData;
+            ret = profileDbReader.GetProcessProfileData(AMDT_PROFILE_ALL_PROCESSES, allProcessData);
+            PrintAllData(reportFile, L"Process", reportConfigs[2].m_counterDescs, allProcessData);
+
+            // Module View - "All Data" view
+            gtVector<AMDTProfileData> allModuleData;
+            ret = profileDbReader.GetModuleProfileData(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, allModuleData);
+            PrintAllData(reportFile, L"Module", reportConfigs[2].m_counterDescs, allModuleData);
+
+            // function View - "All Data" view
+            gtVector<AMDTProfileData> allFunctionData;
+            ret = profileDbReader.GetFunctionProfileData(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, allFunctionData);
+            PrintAllData(reportFile, L"Function", reportConfigs[2].m_counterDescs, allFunctionData);
+
+            // Get detailed function profiledata
+            for (auto const& func : funcProfileData)
+            {
+                fprintf(stderr, "%s \n", func.m_name.asASCIICharArray());
+
+                AMDTProfileFunctionData  functionData;
+                ret = profileDbReader.GetFunctionDetailedProfileData(func.m_id,
+                    AMDT_PROFILE_ALL_PROCESSES,
+                    AMDT_PROFILE_ALL_THREADS,
+                    functionData);
+
+                // if function size is zero, compute the size from instruction data.. 
+                //gtUInt32 functionSize = functionData.m_functionInfo.m_size;
+                //gtUInt32 startOffset = functionData.m_functionInfo.m_startOffset;
+                //gtUInt32 nbrInsts = functionData.m_instDataList.size();
+
+                //if (functionSize == 0 && nbrInsts)
+                //{
+                //    gtUInt32 instStartOffset = functionData.m_instDataList[0].m_offset;
+
+                //    startOffset = (instStartOffset < startOffset) ? instStartOffset : startOffset;
+
+                //    functionSize = functionData.m_instDataList[nbrInsts - 1].m_offset - instStartOffset;
+                //}
+
+                gtString srcFilePath;
+                AMDTSourceAndDisasmInfoVec srcInfoVec;
+                ret = profileDbReader.GetFunctionSourceAndDisasmInfo(func.m_id, srcFilePath, srcInfoVec);
+
+                PrintFunctionDetailData(reportFile, reportConfigs[2].m_counterDescs, functionData, srcFilePath, srcInfoVec);
+
+#if 0
+                AMDTDisasmInfoVec disasmInfoVec;
+                AMDTProfileSourceLineTableVec sltTable;
+                ret = profileDbReader.GetFunctionDisassembly(func.m_moduleId,
+                    functionData.m_modBaseAddress,
+                    startOffset,
+                    functionSize,
+                    disasmInfoVec,
+                    sltTable);
+#endif
+
+            }
+
+            // close the db
+            ret = profileDbReader.CloseProfileData();
         }
     }
 
-    return hr;
+    return S_OK;
 } // ReportFromDb
 #endif
 

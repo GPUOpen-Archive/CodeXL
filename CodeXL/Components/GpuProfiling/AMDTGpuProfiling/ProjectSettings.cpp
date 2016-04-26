@@ -234,10 +234,12 @@ void CounterSettingOption::RestoreDefault(const QStringList& counterNames)
     CounterSettingOption restore;
     (*this) = restore;
 
-    // Enable all counters by default:
-    foreach (QString counter, counterNames)
+    //in internal builds disable check boxes by default
+    const static bool defaultValue = (Util::IsInternalBuild() == false);
+   
+    for (const QString& counter : counterNames)
     {
-        m_checkedCounterList[counter] = true;
+        m_checkedCounterList[counter] = defaultValue;
     }
 }
 

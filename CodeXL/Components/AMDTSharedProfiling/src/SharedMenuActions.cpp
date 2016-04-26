@@ -82,10 +82,11 @@ void SharedMenuActions::populateSupportedCommandIds()
 {
     // fill the vector of supported command ids:
     m_supportedCommandIds.push_back(ID_PM_START_PROFILE);
+    m_supportedCommandIds.push_back(ID_PM_PAUSE_PROFILE);
+    m_supportedCommandIds.push_back(ID_PM_STOP_PROFILE);
     m_supportedCommandIds.push_back(ID_PM_ATTACH_PROFILE);
     m_supportedCommandIds.push_back(ID_PM_SELECTED_PROFILE);
     m_supportedCommandIds.push_back(ID_PM_PROFILE_SETTINGS_DIALOG);
-    m_supportedCommandIds.push_back(ID_PM_PAUSE_PROFILE);
     m_supportedCommandIds.push_back(ID_PM_STOP_PROFILE);
 }
 
@@ -110,6 +111,9 @@ void SharedMenuActions::initActionIcons()
 
     // Pause command:
     initSingleActionIcon(ID_PM_PAUSE_PROFILE, AC_ICON_EXECUTION_PAUSE);
+
+    // Pause command:
+    initSingleActionIcon(ID_PM_STOP_PROFILE, AC_ICON_EXECUTION_STOP);
 
     // Stop command:
     initSingleActionIcon(ID_PM_STOP_PROFILE, AC_ICON_EXECUTION_STOP);
@@ -219,8 +223,10 @@ gtString SharedMenuActions::menuPosition(int actionIndex, afActionPositionData& 
 
         switch (commandId)
         {
-            //Profile menu
-            case ID_PM_START_PROFILE:
+            // Profile menu
+        case ID_PM_START_PROFILE:
+        case ID_PM_PAUSE_PROFILE:
+        case ID_PM_STOP_PROFILE:
                 retVal = AF_STR_ProfileMenuString;
                 positionData.m_beforeActionMenuPosition = AF_STR_ProfileMenuString;
                 positionData.m_beforeActionMenuPosition.append(PM_STR_MENU_SEPARATOR);
@@ -246,21 +252,6 @@ gtString SharedMenuActions::menuPosition(int actionIndex, afActionPositionData& 
             case ID_PM_PROFILE_SETTINGS_DIALOG:
                 positionData.m_actionSeparatorType = afActionPositionData::AF_SEPARATOR_BEFORE_COMMAND;
                 retVal = AF_STR_ProfileMenuString;
-                break;
-
-            case ID_PM_PAUSE_PROFILE:
-                positionData.m_actionSeparatorType = afActionPositionData::AF_SEPARATOR_BEFORE_COMMAND;
-                retVal = AF_STR_ProfileMenuString;
-                positionData.m_beforeActionMenuPosition = AF_STR_ProfileMenuString;
-                positionData.m_beforeActionMenuPosition.append(PM_STR_MENU_SEPARATOR);
-                positionData.m_beforeActionText = PM_STR_MENU_SETTINGS;
-                break;
-
-            case ID_PM_STOP_PROFILE:
-                retVal = AF_STR_ProfileMenuString;
-                positionData.m_beforeActionMenuPosition = AF_STR_ProfileMenuString;
-                positionData.m_beforeActionMenuPosition.append(PM_STR_MENU_SEPARATOR);
-                positionData.m_beforeActionText = PM_STR_MENU_SETTINGS;
                 break;
 
             default:

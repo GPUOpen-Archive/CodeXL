@@ -457,7 +457,6 @@ void CodeXLVSPackage::onCodeXLExplorerView(CommandHandler* pSender, DWORD flags,
     {
         int viewId = VSCORE(vsc_GetObjectNavigationTreeId());
         _pObjectsExplorerToolWindow->setMyWindowCommandID(viewId);
-        _pObjectsExplorerToolWindow->CreateAndShow();
 
         // Invoke the core logic.
         VSCORE(vsc_OnCodeExplorerView)();
@@ -1816,6 +1815,9 @@ void CodeXLVSPackage::verifyBaseViewsCreated()
             _pPropertiesToolWindow->setMyWindowCommandID(VSCORE(vsc_GetPropertiesViewId)());
             _pPropertiesToolWindow->Create();
         }
+
+        // make sure the solution view is in the front:
+        vspDTEConnector::instance().ExecuteCommand(L"View.SolutionExplorer");
     }
 }
 
