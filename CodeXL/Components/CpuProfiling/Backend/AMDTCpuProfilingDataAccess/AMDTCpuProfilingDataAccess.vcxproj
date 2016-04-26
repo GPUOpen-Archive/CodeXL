@@ -101,7 +101,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>CXLDbAdapter$(GDTProjectSuffix).lib;CXLProfilerDAL$(GDTProjectSuffix).lib;CXLCpuPerfEventUtils$(GDTProjectSuffix).lib;CXLExecutableFormat$(GDTProjectSuffix).lib;CXLDisassembler$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>AMDTCpuProfilingDataAccess.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -134,7 +135,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>CXLDbAdapter$(GDTProjectSuffix).lib;CXLProfilerDAL$(GDTProjectSuffix).lib;CXLCpuPerfEventUtils$(GDTProjectSuffix).lib;CXLExecutableFormat$(GDTProjectSuffix).lib;CXLDisassembler$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ModuleDefinitionFile>AMDTCpuProfilingDataAccess.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

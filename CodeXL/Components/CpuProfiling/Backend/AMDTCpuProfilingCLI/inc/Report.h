@@ -183,16 +183,6 @@ public:
             delete m_pCss;
             m_pCss = NULL;
         }
-
-#ifdef AMDT_ENABLE_DB_SUPPORT
-
-        if (m_profileDbReader)
-        {
-            AMDTCloseProfileData(m_profileDbReader);
-            m_profileDbReader = 0;
-        }
-
-#endif
     };
 
     HRESULT Initialize();
@@ -275,10 +265,6 @@ private:
     bool                   m_isReportAggregateByModule = false;
     bool                   m_isReportCallGraph = false;
     bool                   m_isReportImix = false;
-
-#ifdef AMDT_ENABLE_DB_SUPPORT
-    AMDTProfileReaderHandle m_profileDbReader = 0;
-#endif
 
     void SetupEnvironment();
     void ValidateOptions();
