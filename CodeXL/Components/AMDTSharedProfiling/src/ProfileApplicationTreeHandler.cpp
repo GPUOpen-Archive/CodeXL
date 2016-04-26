@@ -423,7 +423,7 @@ bool ProfileApplicationTreeHandler::ImportFile(const QString& importFilePath)
         afApplicationCommands::instance()->CreateDefaultProject(PM_STR_PROFILE_MODE);
     }
 
-    ImportStarted(); 
+    ImportStarted();
     bool success = false;
     emit FileImported(importFilePath, success);
     return success;
