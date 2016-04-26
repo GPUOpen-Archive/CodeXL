@@ -47,6 +47,7 @@ bool AmdtDatabaseAdapter::CreateDb(const gtString& dbName, AMDTProfileMode profi
         {
             // Turn on the flag so that we will know that the DB has to be closed.
             m_isDbToBeClosed = true;
+            m_profileMode = profileMode;
         }
     }
 
@@ -55,6 +56,7 @@ bool AmdtDatabaseAdapter::CreateDb(const gtString& dbName, AMDTProfileMode profi
 
 bool AmdtDatabaseAdapter::OpenDb(const gtString& dbName, AMDTProfileMode profileMode, bool isReadOnly)
 {
+    m_profileMode = profileMode;
     return m_pDbAccessor->OpenProfilingDatabase(dbName, profileMode, isReadOnly);
 }
 
@@ -306,7 +308,66 @@ bool AmdtDatabaseAdapter::GetSessionConfiguration(AMDTProfileSessionInfo& sessio
 
     if (isOk && IsAggregateMode())
     {
-        // TODO:
+        gtString valueStr;
+
+        isOk = m_pDbAccessor->GetSessionInfoValue(gtString(AMDT_SESSION_INFO_CPU_FAMILY), valueStr);
+
+        if (isOk)
+        {
+            valueStr.toUnsignedIntNumber(sessionInfo.m_cpuFamily);
+        }
+
+        valueStr.makeEmpty();
+        isOk = m_pDbAccessor->GetSessionInfoValue(gtString(AMDT_SESSION_INFO_CPU_MODEL), valueStr);
+
+        if (isOk)
+        {
+            valueStr.toUnsignedIntNumber(sessionInfo.m_cpuModel);
+        }
+
+        valueStr.makeEmpty();
+        isOk = m_pDbAccessor->GetSessionInfoValue(gtString(AMDT_SESSION_INFO_CORE_AFFNITY), valueStr);
+
+        if (isOk)
+        {
+            valueStr.toUnsignedInt64Number(sessionInfo.m_coreAffinity);
+        }
+
+        valueStr.makeEmpty();
+        isOk = m_pDbAccessor->GetSessionInfoValue(gtString(AMDT_SESSION_INFO_CSS_UNWIND_DEPTH), valueStr);
+
+        if (isOk)
+        {
+            gtUInt32 cssDepth = 0;
+            valueStr.toUnsignedIntNumber(cssDepth);
+            sessionInfo.m_unwindDepth = static_cast<gtUInt16>(cssDepth);
+        }
+
+        valueStr.makeEmpty();
+        isOk = m_pDbAccessor->GetSessionInfoValue(gtString(AMDT_SESSION_INFO_CSS_UNWIND_SCOPE), valueStr);
+
+        if (isOk)
+        {
+            gtUInt32 cssScope = 0;
+            valueStr.toUnsignedIntNumber(cssScope);
+            sessionInfo.m_unwindScope = static_cast<gtUInt16>(cssScope);
+        }
+
+        valueStr.makeEmpty();
+        isOk = m_pDbAccessor->GetSessionInfoValue(gtString(AMDT_SESSION_INFO_CSS_ENABLED), valueStr);
+
+        if (isOk)
+        {
+            sessionInfo.m_cssEnabled = (valueStr.compareNoCase(L"YES") == 0) ? true : false;
+        }
+
+        valueStr.makeEmpty();
+        isOk = m_pDbAccessor->GetSessionInfoValue(gtString(AMDT_SESSION_INFO_FPO_ENABLED), valueStr);
+
+        if (isOk)
+        {
+            sessionInfo.m_cssFPOEnabled = (valueStr.compareNoCase(L"YES") == 0) ? true : false;
+        }
     }
 
     return isOk;
