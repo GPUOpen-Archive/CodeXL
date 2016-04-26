@@ -189,7 +189,10 @@ public:
     /// Allow the mode to terminate gracefully at the end of CodeXL.
     void Terminate();
 
+    /// Prepares the trace file for the given frame.
     bool PrepareTraceFile(const osFilePath& sessionFilePath, int frameIndex, SessionTreeNodeData* pTreeNodeData, gpBaseSessionView* pTraceView, bool prepareTraceData = true);
+
+    /// Handles remote agent on execution mode change.
     void onExecutionModeChanged();
 
     /// Delete the frame analysis session on the server

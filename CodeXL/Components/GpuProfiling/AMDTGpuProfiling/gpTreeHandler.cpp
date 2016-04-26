@@ -1120,7 +1120,7 @@ bool gpTreeHandler::PrepareTraceForSessionFrames(const osDirectory& sessionDir, 
         QString overviewFilePath, thumbnailFilePath;
         FrameInfo currentFrameInfo;
         bool rc = gpUIManager::Instance()->GetPathsForFrame(sessionFilePath, frameIndex, frameDir, overviewFilePath, thumbnailFilePath);
-        GT_IF_WITH_ASSERT(rc)
+        GT_IF_WITH_ASSERT(rc && pModeManager != nullptr)
         {
             retVal &= pModeManager->PrepareTraceFile(sessionFilePath, frameIndex, pSessionData, nullptr, false);
         }

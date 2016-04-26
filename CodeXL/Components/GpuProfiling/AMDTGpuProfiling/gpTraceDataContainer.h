@@ -167,8 +167,13 @@ public:
     /// \return the items count for the requested queue
     int QueueItemsCount(const QString& queueName);
 
-    /// Return the API item in apiItemIndex for the thread in threadID
+    /// Returns the item in m_sessionQueueToGPUDataItems which has the requested queue name and given index (n'th place in the list of items with the same queue name)
+    /// \param queueName the requested queue name
+    /// \param apiItemIndex the requested index (n'th place in the list of items with the same queue name)
     ProfileSessionDataItem* QueueItem(const QString& queueName, int apiItemIndex) const;
+    /// Returns the item in m_sessionQueueToGPUDataItems which has the requested queue name and call index. This method is required when there is more than 1 queue, and the n'th place does not match the call index 
+    /// \param queueName the requested queue name
+    /// \param apiItemIndex the requested call index
     ProfileSessionDataItem* QueueItemByItemCallIndex(const QString& queueName, int apiItemIndex) const;
 
     /// Return all API items with the given sampleId

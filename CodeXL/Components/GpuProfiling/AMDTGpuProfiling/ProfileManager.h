@@ -311,9 +311,8 @@ private:
     /// Exracts data from archived frame analysis session and creates gpSessionTreeNodeData
     bool ExtractArchivedSession(const QString& strSessionFilePath, osDirectory sessionOSDir, const QString& strProjName, gtString& xmlFileNewName, gtString& strSessionDisplayName);
 
-    void ComposeImportedSessionName(gtString& archiveRootDirStr, const QString& strProjName, QString& sessionFolderName, gtString& sessionName);
-
-    bool RenameSessionFiles(const osDirectory& sessionDir, const gtString& stringToReplace, const gtString& newString);
+    /// Rename session files according to imported session naming convention
+   bool RenameSessionFiles(const osDirectory& sessionDir, const gtString& stringToReplace, const gtString& newString);
 
 
     QStringList                       m_openedProjectList;      ///< List of opened project in this Profile session
