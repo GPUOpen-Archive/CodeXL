@@ -1449,7 +1449,9 @@ bool afNewProjectDialog::AreSettingsValid(gtString& invalidMessageStr, gtString&
                 else if (!m_pProgramExeTextEdit->text().isEmpty())
                 {
                     QFile file(m_pProgramExeTextEdit->text());
-                    isAppValid = (isRemoteSession || file.exists());
+                    //if remote file don't check its validity
+                    //for local files: if windows store application just check if file exists, for regular binaries check if it's an executable
+                    isAppValid = (isRemoteSession || (m_pWinStoreAppRadioButton->isChecked()? file.exists() : QFileInfo(file).isExecutable()));
                 }
 
                 QDir dir(m_pWorkingFolderTextEdit->text());
@@ -1465,7 +1467,7 @@ bool afNewProjectDialog::AreSettingsValid(gtString& invalidMessageStr, gtString&
                     }
                     else
                     {
-                        invalidMessageStr = AF_STR_newProjectExeDoesNotExist;
+                        invalidMessageStr = AF_STR_newProjectExeDoesNotExistOrInvalid;
                     }
                 }
                 else if (!isRemoteSession && !isWorkingFolderValid)

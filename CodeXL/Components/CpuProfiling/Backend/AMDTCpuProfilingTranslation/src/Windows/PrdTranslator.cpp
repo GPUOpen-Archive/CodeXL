@@ -28,6 +28,7 @@
 #include <AMDTOSWrappers/Include/osCpuid.h>
 #include <AMDTOSWrappers/Include/osDirectory.h>
 #include <AMDTOSWrappers/Include/osFilePath.h>
+#include <AMDTOSWrappers/Include/osProcess.h>
 #include <AMDTOSWrappers/Include/osDebugLog.h>
 
 #include <AMDTCpuPerfEventUtils/inc/EventEncoding.h>
@@ -378,9 +379,7 @@ PrdTranslator::PrdTranslator(QString dataFile, bool collectStat) : m_pfnProgress
     m_pServerList = NULL;
     m_pCachePath = NULL;
 
-#ifdef AMDT_ENABLE_CPUPROF_DB
     m_nextModuleId = 1;
-#endif
 }
 
 PrdTranslator::~PrdTranslator()
@@ -794,8 +793,6 @@ void PrdTranslator::AggregateKnownModuleSampleData(
             // Find again
             mit = pMMap->find(ModName);
         }
-
-#ifdef AMDT_ENABLE_CPUPROF_DB
         else
         {
             // Module is already present in the map. Just append the new instance info.
@@ -820,8 +817,6 @@ void PrdTranslator::AggregateKnownModuleSampleData(
                 mit->second.m_moduleInstanceInfo.emplace_back(pid, loadAddr, instanceId);
             }
         }
-
-#endif
 
         if ((pModInfo->moduleType == evJavaModule || pModInfo->moduleType == evManaged || pModInfo->moduleType == evOCLModule) &&
             NULL != pModInfo->pFunctionName && L'\0' != pModInfo->pFunctionName[0])
@@ -916,9 +911,7 @@ void PrdTranslator::AggregateKnownModuleSampleData(
                             }
                         }
 
-#ifdef AMDT_ENABLE_CPUPROF_DB
                         functionId = pFuncInfo->m_funcId;
-#endif
                     }
                 }
                 else
@@ -967,7 +960,6 @@ void PrdTranslator::InitNewModule(CpuProfileModule& mod,
     {
         case evPEModule:
             mod.m_modType = CpuProfileModule::UNMANAGEDPE;
-#ifdef AMDT_ENABLE_CPUPROF_DB
 
             if (nullptr != pModInfo && nullptr != pModInfo->pPeFile)
             {
@@ -975,7 +967,6 @@ void PrdTranslator::InitNewModule(CpuProfileModule& mod,
                 mod.m_isDebugInfoAvailable = pModInfo->pPeFile->IsDebugInfoAvailable();
             }
 
-#endif // AMDT_ENABLE_CPUPROF_DB
             break;
 
         case evJavaModule:
@@ -996,10 +987,8 @@ void PrdTranslator::InitNewModule(CpuProfileModule& mod,
 
     mod.setPath(ModName);
     mod.m_base = pModInfo->ModuleStartAddr;
-#ifdef AMDT_ENABLE_CPUPROF_DB
     mod.m_moduleId = AtomicAdd(m_nextModuleId, 1);
     mod.m_moduleInstanceInfo.emplace_back(pModInfo->processID, pModInfo->ModuleStartAddr, pModInfo->instanceId);
-#endif
 
     // currently I don't use size and tsc in CA --Lei
     mod.m_size = 0;
@@ -1121,10 +1110,8 @@ void PrdTranslator::AggregateUnknownModuleSampleData(
         mod.m_size = 0;
         mod.m_is32Bit = fnIsJITProcess32Bit(pModInfo->processID);
         b_is32bit = mod.m_is32Bit;
-#ifdef AMDT_ENABLE_CPUPROF_DB
         mod.m_moduleId = AtomicAdd(m_nextModuleId, 1);
         mod.m_moduleInstanceInfo.emplace_back(pModInfo->processID, pModInfo->ModuleStartAddr, pModInfo->instanceId);
-#endif
 
         // CLU profiles IBS Op event, record IBS sample only when profiling IBS Op
         if (!IsIbsOpEvent(eventType) || m_runInfo->m_isProfilingIbsOp)
@@ -1142,7 +1129,7 @@ void PrdTranslator::AggregateUnknownModuleSampleData(
     else
     {
         b_is32bit = mit->second.m_is32Bit;
-#ifdef AMDT_ENABLE_CPUPROF_DB
+
         // Module is already present in the map. Just append the new instance info.
         gtUInt64 pid = pModInfo->processID;
         gtUInt64 loadAddr = pModInfo->ModuleStartAddr;
@@ -1164,8 +1151,6 @@ void PrdTranslator::AggregateUnknownModuleSampleData(
         {
             mit->second.m_moduleInstanceInfo.emplace_back(pid, loadAddr, instanceId);
         }
-
-#endif
 
         // CLU profiles IBS Op event, record IBS sample only when profiling IBS Op
         if (!IsIbsOpEvent(eventType) || m_runInfo->m_isProfilingIbsOp)
@@ -1868,14 +1853,10 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
                 hr = GetModuleInfoHelper((void*) &prdRecord, &modInfo, evTBPEBPRecord, proFile);
                 END_TICK_COUNT(findModuleInfo);
 
-#ifdef AMDT_ENABLE_CPUPROF_DB
                 if (modInstanceMap.end() == modInstanceMap.find(modInfo.instanceId))
                 {
                     modInstanceMap.emplace(modInfo.instanceId, std::make_tuple(gtString(modInfo.pModulename), modInfo.processID, modInfo.ModuleStartAddr));
                 }
-#else
-                GT_UNREFERENCED_PARAMETER(modInstanceMap);
-#endif
 
                 AggregateSampleData(prdRecord, &modInfo, &processMap, &moduleMap, pidModaddrItrMap, 1U, pStats);
 
@@ -3353,23 +3334,30 @@ bool PrdTranslator::WriteProfileFile(const gtString& path,
 
     UpdateProgressBar(80ULL, 100ULL);
 
-#ifdef AMDT_ENABLE_CPUPROF_DB
-    gtUInt64 startTime = GetTickCount();
+    gtString createDbEnvStr;
+    bool createDb = false;
 
-    gtVector<std::tuple<gtUInt32, gtUInt32>> processThreadList;
-    fnGetProcessThreadList(processThreadList);
-
-    ProfilerDataDBWriter DBWriter;
-    //TODO: cpu affinity should be part of CpuProfileInfo i.e. info parameter
-    DBWriter.Write(path, info, m_runInfo->m_cpuAffinity, *procMap, processThreadList, *modMap, *pModInstanceMap, pTopMap);
-
-    if (m_collectStat)
+    if (osGetCurrentProcessEnvVariableValue(L"AMDT_CPUPROFILE_CREATE_DB", createDbEnvStr))
     {
-        OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_DEBUG, L"Elapsed Time: DB Write: (%d ms)", (GetTickCount() - startTime));
+        createDb = createDbEnvStr.isEqualNoCase(L"YES");
     }
-#else
-    GT_UNREFERENCED_PARAMETER(pModInstanceMap);
-#endif
+
+    if (createDb)
+    {
+        gtUInt64 startTime = GetTickCount();
+
+        gtVector<std::tuple<gtUInt32, gtUInt32>> processThreadList;
+        fnGetProcessThreadList(processThreadList);
+
+        ProfilerDataDBWriter DBWriter;
+        //TODO: cpu affinity should be part of CpuProfileInfo i.e. info parameter
+        DBWriter.Write(path, info, m_runInfo->m_cpuAffinity, *procMap, processThreadList, *modMap, *pModInstanceMap, pTopMap);
+
+        if (m_collectStat)
+        {
+            OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_DEBUG, L"Elapsed Time: DB Write: (%d ms)", (GetTickCount() - startTime));
+        }
+    }
 
     if (!writer.Write(path, &info, procMap, modMap, pTopMap))
     {

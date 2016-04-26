@@ -1674,10 +1674,8 @@ HRESULT WinTaskInfo::StopCapture(bool bConvertFlag, const wchar_t* tempTiFileNam
         CalculateDriverSize();
     }
 
-#ifdef AMDT_ENABLE_CPUPROF_DB
     // Reset after capture and before translation of each session
     m_nextModInstanceId = 1;
-#endif
 
     return hr;
 }
@@ -2234,9 +2232,7 @@ bool WinTaskInfo::GetUserPeModInfo(TiModuleInfo* pModInfo, TiTimeType systemTime
     pModInfo->ModuleStartAddr = item.first.moduleLoadAddr;
     pModInfo->Modulesize = item.second.moduleSize;
     pModInfo->pPeFile = item.second.pPeFile;
-#ifdef AMDT_ENABLE_CPUPROF_DB
     pModInfo->instanceId = item.second.instanceId;
-#endif
 
     if (!item.second.bNameConverted)
     {
@@ -2448,9 +2444,7 @@ HRESULT WinTaskInfo::GetKernelModInfo(TiModuleInfo* pModInfo, TiTimeType systemT
             pModInfo->ModuleStartAddr = kemoditem.first.keModLoadAddr;
             pModInfo->Modulesize = kemoditem.second.keModEndAddr - kemoditem.first.keModLoadAddr;
             pModInfo->pPeFile = kemoditem.second.pPeFile;
-#ifdef AMDT_ENABLE_CPUPROF_DB
             pModInfo->instanceId = kemoditem.second.instanceId;
-#endif
 
             if (!kemoditem.second.bNameConverted)
             {
@@ -2603,7 +2597,6 @@ HRESULT WinTaskInfo::GetModuleInfo(TiModuleInfo* pModInfo)
     return hr;
 }
 
-#ifdef AMDT_ENABLE_CPUPROF_DB
 HRESULT WinTaskInfo::GetProcessThreadList(gtVector<std::tuple<gtUInt32, gtUInt32>>& info)
 {
     HRESULT hr = S_OK;
@@ -2632,7 +2625,6 @@ HRESULT WinTaskInfo::GetProcessThreadList(gtVector<std::tuple<gtUInt32, gtUInt32
 
     return hr;
 }
-#endif
 
 ///////////////////////////////////////////////////////////////////////////
 // WinTaskInfo::GetKernelModNum(unsigned *pKeModNum)
@@ -3233,9 +3225,7 @@ HRESULT WinTaskInfo::ReadModuleInfoFile(const wchar_t* filename)
             wcscpy(t_keModValue.keModName, buffer);
             t_keModValue.bNameConverted = false;
             t_keModValue.keModImageSize = 0;
-#ifdef AMDT_ENABLE_CPUPROF_DB
             t_keModValue.instanceId = m_nextModInstanceId++;
-#endif
 
             m_tiKeModMap.insert(KernelModMap::value_type(t_keModKey, t_keModValue));
         }
@@ -3780,9 +3770,7 @@ HRESULT WinTaskInfo::ReadCLRJitInformation(/* [in] */ const wchar_t* clrdirector
 
                             ModuleValue t_modValue(0, static_cast<gtUInt64>(funcRec.codeSize),
                                                    TI_TIMETYPE_MAX, tClassFunc.toStdWString().c_str(), evManaged);
-#ifdef AMDT_ENABLE_CPUPROF_DB
                             t_modValue.instanceId = m_nextModInstanceId++;
-#endif
 
                             m_tiModMap.insert(ModuleMap::value_type(t_modKey, t_modValue));
                             m_JitModCount++;
@@ -4653,14 +4641,11 @@ void WinTaskInfo::AddLoadModules(gtUInt64 processId)
                 if (modKey.processId == processId)
                 {
                     ModuleValue& modValue = modIter->second;
-#ifdef AMDT_ENABLE_CPUPROF_DB
 
                     if (0 == modValue.instanceId)
                     {
                         modValue.instanceId = m_nextModInstanceId++;
                     }
-
-#endif
 
                     m_tiModMap.insert(ModuleMap::value_type(modKey, modValue));
                 }

@@ -109,10 +109,8 @@ private:
     AptAggregatedSampleMap m_aptMap;    // [SUB] sections
     unsigned m_sourceLine;
 
-#ifdef AMDT_ENABLE_CPUPROF_DB
 public:
     gtUInt32 m_functionId = 0;
-#endif
 };
 
 /****************************************

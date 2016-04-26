@@ -511,9 +511,7 @@ private:
     KeModQueryInfo* m_pProfilingDrivers;
     unsigned m_countProfilingDrivers;
 
-#ifdef AMDT_ENABLE_CPUPROF_DB
     gtInt32 m_nextModuleId;
-#endif
 
     ProcessInfo* FindProcessInfo(ProcessIdType pid) const;
     ProcessInfo& AcquireProcessInfo(ProcessIdType pid);

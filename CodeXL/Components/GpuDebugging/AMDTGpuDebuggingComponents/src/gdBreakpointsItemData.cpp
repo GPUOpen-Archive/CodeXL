@@ -120,7 +120,7 @@ gdBreakpointsItemData::gdBreakpointsItemData(const gtAutoPtr<apBreakPoint>& aptr
         {
             // Down cast it to apKernelFunctionNameBreakpoint:
             apKernelFunctionNameBreakpoint* pFunctionNameBreakpoint = (apKernelFunctionNameBreakpoint*)(aptrBreakpoint.pointedObject());
-            GT_IF_WITH_ASSERT(pFunctionNameBreakpoint != NULL)
+            GT_IF_WITH_ASSERT(nullptr != pFunctionNameBreakpoint)
             {
                 // Get the kernel function's name:
                 _kernelFunctionName = pFunctionNameBreakpoint->kernelFunctionName();
@@ -132,7 +132,7 @@ gdBreakpointsItemData::gdBreakpointsItemData(const gtAutoPtr<apBreakPoint>& aptr
         {
             // Down cast it to apSourceCodeBreakpoint:
             apHostSourceCodeBreakpoint* pSourceCodeBreakpoint = (apHostSourceCodeBreakpoint*)(aptrBreakpoint.pointedObject());
-            GT_IF_WITH_ASSERT(pSourceCodeBreakpoint != NULL)
+            GT_IF_WITH_ASSERT(nullptr != pSourceCodeBreakpoint)
             {
                 // Set the item data file path and line number:
                 _sourceCodeFilePath = pSourceCodeBreakpoint->filePath();
@@ -253,7 +253,7 @@ bool gdBreakpointsItemData::sameAs(const gtAutoPtr<apBreakPoint>& aptrBreakpoint
             {
                 // Down cast it to apSourceCodeBreakpoint:
                 apSourceCodeBreakpoint* pSourceCodeBreakpoint = (apSourceCodeBreakpoint*)(aptrBreakpoint.pointedObject());
-                GT_IF_WITH_ASSERT(pSourceCodeBreakpoint != NULL)
+                GT_IF_WITH_ASSERT(nullptr != pSourceCodeBreakpoint)
                 {
                     // Set the item data file path and line number:
                     retVal = ((_sourceCodeFilePath == pSourceCodeBreakpoint->filePath()) && (_sourceCodeLine == pSourceCodeBreakpoint->lineNumber()));
@@ -265,7 +265,7 @@ bool gdBreakpointsItemData::sameAs(const gtAutoPtr<apBreakPoint>& aptrBreakpoint
             {
                 // Down cast it to apSourceCodeBreakpoint:
                 apHostSourceCodeBreakpoint* pSourceCodeBreakpoint = (apHostSourceCodeBreakpoint*)(aptrBreakpoint.pointedObject());
-                GT_IF_WITH_ASSERT(pSourceCodeBreakpoint != NULL)
+                GT_IF_WITH_ASSERT(nullptr != pSourceCodeBreakpoint)
                 {
                     // Set the item data file path and line number:
                     retVal = ((_sourceCodeFilePath == pSourceCodeBreakpoint->filePath()) && (_sourceCodeLine == pSourceCodeBreakpoint->lineNumber()));

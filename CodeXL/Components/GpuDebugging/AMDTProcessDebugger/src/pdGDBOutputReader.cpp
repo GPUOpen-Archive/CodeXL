@@ -3705,12 +3705,7 @@ void pdGDBOutputReader::handleSignalOutput(const gtASCIIString& gdbOutputLine, b
                 // Hangup detected on controlling terminal or death of controlling process:
                 exceptionReason = OS_SIGHUP_SIGNAL;
             }
-            else /*if (signalNameStr == sigIntGDBStr)
-            {
-                // We got an interrupt from keyboard:
-                exceptionReason = OS_SIGINT_SIGNAL;
-            }
-            else*/ if (signalNameStr == sigQuitGDBStr)
+            else if (signalNameStr == sigQuitGDBStr)
                 {
                     // Quit from keyboard:
                     exceptionReason = OS_SIGQUIT_SIGNAL;
