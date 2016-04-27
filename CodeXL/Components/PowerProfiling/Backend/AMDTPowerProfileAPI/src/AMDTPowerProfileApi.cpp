@@ -3611,11 +3611,14 @@ AMDTResult AMDTEnableProcessProfiling()
     return ret;
 }
 
-// AMDTReadProcessProfileData: This API will provide the list of
-// PIDs executed so far from the time of profile start and their
-// aggregated power indicators. This API can be called at any point
-// of time from start of the profile to the stop of the profile.
-AMDTResult AMDTReadProcessProfileData(AMDTUInt32* pPIDCount, AMDTPwrProcessInfo** ppData)
+// This API will provide the list of running PIDs so far from the time of
+// profile start or bewteen two consecutive call of this function,
+// their agreegated power indicators. This API can be called at any
+// point of time from start of the profile to the stop of the profile.
+AMDTResult AMDTGetProcessProfileData(AMDTUInt32* pPIDCount,
+                                     AMDTPwrProcessInfo** ppData,
+                                     AMDTUInt32 pidVal,
+                                     bool reset)
 {
     AMDTPwrProfileState state = AMDT_PWR_PROFILE_STATE_UNINITIALIZED;
     AMDTResult ret = AMDT_STATUS_OK;
@@ -3642,7 +3645,7 @@ AMDTResult AMDTReadProcessProfileData(AMDTUInt32* pPIDCount, AMDTPwrProcessInfo*
             || (AMDT_PWR_PROFILE_STATE_PAUSED == state))
 
         {
-            ret = AMDTGetProcessProfileData(pPIDCount, ppData);
+            ret = AMDTGetCummulativePidProfData(pPIDCount, ppData, pidVal, reset);
         }
     }
 
