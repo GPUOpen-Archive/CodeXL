@@ -89,7 +89,6 @@ const std::vector<std::string> SQL_CREATE_DB_STMTS_TIMELINE =
 
 const std::vector<std::string> SQL_CREATE_DB_STMTS_AGGREGATION =
 {
-    //TODO: For some tables, ROWID can be used as PK instead of explicit PK column. We can remove such columns.
     "CREATE TABLE Core (id INTEGER NOT NULL PRIMARY KEY, processorId INTEGER, numaNodeId INTEGER)",
     "CREATE TABLE SamplingCounter (id INTEGER NOT NULL PRIMARY KEY, name TEXT, description TEXT)",
     "CREATE TABLE SamplingConfiguration (id INTEGER PRIMARY KEY, counterId INTEGER, samplingInterval INTEGER, unitMask INTEGER, isUserMode INTEGER, isOsMode INTEGER, edge INTEGER)",
@@ -101,11 +100,9 @@ const std::vector<std::string> SQL_CREATE_DB_STMTS_AGGREGATION =
     "CREATE TABLE Function (id INTEGER PRIMARY KEY, moduleId INTEGER, name TEXT, startOffset INTEGER, size INTEGER, sourceFileId INTEGER)", // FOREIGN KEY(moduleId) REFERENCES module(id)
     "CREATE TABLE SampleContext (id INTEGER PRIMARY KEY AUTOINCREMENT, processThreadId INTEGER, moduleInstanceId INTEGER, coreSamplingConfigurationId INTEGER, functionId INTEGER, offset INTEGER, count INTEGER, sourceLine INTEGER DEFAULT 0)", // FOREIGN KEY(processThreadId) REFERENCES ProcessThread(rowid), FOREIGN KEY(moduleInstanceId) REFERENCES ModuleInstance(id), FOREIGN KEY(coreSamplingConfigurationId) REFERENCES CoreSamplingConfiguration(id)
     "CREATE TABLE SourceFile (path TEXT)",
-    //"CREATE TABLE SampleOccurrences (sampleContextId INTEGER NOT NULL, elapsedTime INTEGER, callstackId INTEGER)", // FOREIGN KEY(sampleContextId) REFERENCES SampleContext(id)
-    //"CREATE TABLE Callstack (id INTEGER NOT NULL PRIMARY KEY)",
-    //"CREATE TABLE CallstackFrame (callstackId INTEGER NOT NULL, functionId INTEGER, offset INTEGER, level INTEGER)", // FOREIGN KEY(callstackId) REFERENCES Callstack(id), FOREIGN KEY(functionId) REFERENCES Function(id)
-    //"CREATE TABLE CallstackLeaf (callstackId INTEGER NOT NULL, functionId INTEGER, offset INTEGER, totalNumberOfSamples INTEGER, sampleContextId INTEGER)", // FOREIGN KEY(callstackId) REFERENCES Callstack(id), FOREIGN KEY(functionId) REFERENCES Function(id), FOREIGN KEY(sampleContextId) REFERENCES SampleContextId(id)
-    //"CREATE TABLE Callgraph (id INTEGER NOT NULL, callerId INTEGER, calleeId INTEGER, edgeLevel INTEGER)", // FOREIGN KEY(callerId) REFERENCES Function(id), FOREIGN KEY(calleeId) REFERENCES Function(id)
+    "CREATE TABLE CallstackFrame (callstackId INTEGER NOT NULL, functionId INTEGER, offset INTEGER, depth INTEGER)", // FOREIGN KEY(functionId) REFERENCES Function(id)
+    "CREATE TABLE CallstackLeaf (callstackId INTEGER NOT NULL, functionId INTEGER, offset INTEGER, samplingConfigurationId INTEGER, selfSamples INTEGER)", // FOREIGN KEY(functionId) REFERENCES Function(id)
+    //"CREATE TABLE Callgraph (id INTEGER NOT NULL, callerId INTEGER, calleeId INTEGER, edgeLevel INTEGER)", // FOREIGN KEY(callerId) REFERENCES Function(id), FOREIGN KEY(calleeId) REFERENCES Function(id), FOREIGN KEY(samplingConfigurationId) REFERENCES SamplingConfiguration(id)
     //"CREATE TABLE CallgraphSampleAggregation (callgraphId INTEGER NOT NULL, sampleContextId INTEGER, selfSamples INTEGER, deepSamples INTEGER)", // FOREIGN KEY(callgraphId) REFERENCES Callgraph(id), FOREIGN KEY(sampleContextId) REFERENCES SampleContext(id)
 };
 
