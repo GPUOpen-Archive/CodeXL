@@ -11,9 +11,9 @@
 
 #include <string.h>
 
-#include <AMDTBasetools/Include/AMDTDefinitions.h>
-#include <AMDTBasetools/Include/gtMap.h>
-#include <AMDTBasetools/Include/gtSet.h>
+#include <AMDTBaseTools/Include/AMDTDefinitions.h>
+#include <AMDTBaseTools/Include/gtMap.h>
+#include <AMDTBaseTools/Include/gtSet.h>
 
 #include "AMDTCpuProfilingDataAccess.h"
 #include <AMDTDbAdapter/inc/AMDTProfileDbAdapter.h>
@@ -338,7 +338,7 @@ public:
         {
             for (auto& counterDesc : m_sampledCounterDescVec)
             {
-                AMDTProfileSamplingConfig sampleConfig; 
+                AMDTProfileSamplingConfig sampleConfig;
 
                 if (GetSamplingConfiguration(counterDesc.m_id, sampleConfig))
                 {
@@ -629,7 +629,7 @@ public:
             {
                 QString name;
                 viewConfigInfo.m_viewCfg.GetConfigName(name);
-                
+
                 gtString cfgName = ConvertQtToGTString(name);
 
                 if (cfgName.compareNoCase(configName) == 0)
@@ -720,7 +720,7 @@ public:
 
         // Set the default view to "All Data"
         AMDTProfileReportConfig reportConfig;
-        
+
         if (GetReportConfigurationByName(CXL_REPORT_VIEW_ALL_DATAW, reportConfig))
         {
             for (auto& counterDesc : reportConfig.m_counterDescs)
@@ -963,7 +963,7 @@ public:
             ret = AddOthersEntry(summaryDataVec, counterId);
 
             // calculate the percentage
-            ret = CalculateRawCounterPercentage(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, counterIdList, summaryDataVec);           
+            ret = CalculateRawCounterPercentage(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, counterIdList, summaryDataVec);
         }
 
         return ret;
@@ -1593,7 +1593,6 @@ public:
         bool ret = false;
         AMDTModuleId moduleId = 0;
         gtUInt32 offset = 0;
-        gtUInt32 size = 0;
 
         auto funcInfoIt = m_funcIdInfoMap.find(funcId);
 
@@ -1604,7 +1603,6 @@ public:
 
             moduleId = funcInfo.m_moduleId;
             offset = funcInfo.m_startOffset;
-            size = funcInfo.m_size;
 
             ret = true;
         }
@@ -1890,7 +1888,8 @@ public:
                     unsigned int sectionIndex = pExecutable->LookupSectionIndex(startRVAddr);
 
                     BYTE error_code;
-                    UIInstInfoType temp_struct = { 0 };
+                    UIInstInfoType temp_struct;
+                    memset(&temp_struct, 0, sizeof(temp_struct));
                     char dasmArray[256] = { 0 };
                     unsigned int strlength = 255;
 
