@@ -257,7 +257,7 @@ bool kaApplicationTreeHandler::BuildContextMenuForItems(const gtList<const afApp
         }
         else
         {
-            // Multiple item - we support only "Build" action:
+            bool isInBuild = kaBackendManager::instance().isInBuild();
             retVal = true;
             auto iter = contextMenuItemsList.begin();
             auto iterEnd = contextMenuItemsList.end();
@@ -266,8 +266,36 @@ bool kaApplicationTreeHandler::BuildContextMenuForItems(const gtList<const afApp
             const afApplicationTreeItemData* pFirstItem = *iter;
             bool isMultiFileReferencesSelection = (pFirstItem->m_itemType >= AF_TREE_ITEM_KA_FIRST_FILE_ITEM_TYPE) && (pFirstItem->m_itemType <= AF_TREE_ITEM_KA_LAST_FILE_ITEM_TYPE);
             bool isMultiFileSelection = (pFirstItem->m_itemType == AF_TREE_ITEM_KA_FILE);
+            bool isMultiProgramsSelection = true;
 
-            if (isMultiFileSelection || isMultiFileReferencesSelection)
+            for (const auto& it : contextMenuItemsList)
+            {
+                if (it->m_itemType != AF_TREE_ITEM_KA_PROGRAM)
+                {
+                    isMultiProgramsSelection = false;
+                    break;
+                }
+            }
+
+            if (isMultiProgramsSelection)
+            {
+                // Add "Build" and "Cancel Build" actions but until multi program build implementation they will be disabled
+                QString buildMenuStr = "Build";
+                m_pBuildAction->setText(buildMenuStr);
+                menu.addAction(m_pBuildAction);
+                m_pBuildAction->setEnabled(false);
+
+                QString cancelBuildMenuStr = KA_STR_CancelBuildASCII;
+                m_pCancelBuildAction->setText(cancelBuildMenuStr);
+                menu.addAction(m_pCancelBuildAction);
+                m_pCancelBuildAction->setEnabled(false);
+
+                // Add "Remove from project" action:
+                m_pRemoveAction->setText(KA_STR_removeFromProjectASCII);
+                menu.addAction(m_pRemoveAction);
+                m_pRemoveAction->setEnabled(!isInBuild);
+            }
+            else if (isMultiFileSelection || isMultiFileReferencesSelection)
             {
                 for (; iter != iterEnd; iter++)
                 {
@@ -291,8 +319,6 @@ bool kaApplicationTreeHandler::BuildContextMenuForItems(const gtList<const afApp
 
             if (isMultiFileReferencesSelection)
             {
-                bool isInBuild = kaBackendManager::instance().isInBuild();
-
                 // Add the "Build" action:
                 QString buildMenuStr = GetBuildCommandString();
                 m_pBuildAction->setText(buildMenuStr);
@@ -4205,22 +4231,23 @@ void kaApplicationTreeHandler::DropOutertemsOnRelevantProgram(const QMimeData* p
                                 kaTreeDataExtension* pProgramKAItemData = qobject_cast<kaTreeDataExtension*>(pParentData->extendedItemData());
                                 // obtain kaProgram* from extended data
                                 pProgram = pProgramKAItemData->GetProgram();
+                                destinationItemType = AF_TREE_ITEM_KA_PROGRAM;
                                 break;
                             }
                         }
+                        pDropDestinationItem = pParent;
                     }
                 }
 
                 if (pProgram != nullptr)
                 {
+                    kaProgramTypes programType = pProgram->GetBuildType();
                     // Check if the destination is a program stage. If not, item type should be calculated according to the parent program
 
                     bool isProgramStage = (destinationItemType >= AF_TREE_ITEM_KA_FIRST_FILE_ITEM_TYPE) && (destinationItemType <= AF_TREE_ITEM_KA_PROGRAM_GL_VERT);
 
                     if (!isProgramStage)
                     {
-                        kaProgramTypes programType = pProgram->GetBuildType();
-
                         if (AF_TREE_ITEM_KA_PROGRAM == destinationItemType)
                         {
                             if (kaProgramTypes::kaProgramGL_Compute == programType || kaProgramVK_Compute == programType)
@@ -4235,16 +4262,18 @@ void kaApplicationTreeHandler::DropOutertemsOnRelevantProgram(const QMimeData* p
                         }
                     }
 
-                    for (const osFilePath& it : addedFilePaths)
+                    if (isProgramStage || (!isProgramStage && (kaProgramDX == programType || kaProgramCL == programType)))
                     {
-                        // Add the file node to the program branch
-                        if (!pProgram->HasFile(it, AF_TREE_ITEM_ITEM_NONE))
+                        for (const osFilePath& it : addedFilePaths)
                         {
-                            AddFileNodeToProgramBranch(it, pProgramItemData, destinationItemType);
-
-                            if (!IsAddingMultipleFilesToProgramBranchAllowed(pProgramItemData))
+                            // Add the file node to the program branch
+                            if (!pProgram->HasFile(it, AF_TREE_ITEM_ITEM_NONE))
                             {
-                                break;
+                                AddFileNodeToProgramBranch(it, pProgramItemData, destinationItemType);
+                                if (!IsAddingMultipleFilesToProgramBranchAllowed(pProgramItemData))
+                                {
+                                    break;
+                                }
                             }
                         }
                     }

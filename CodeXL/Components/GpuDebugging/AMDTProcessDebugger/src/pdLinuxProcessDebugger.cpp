@@ -1056,7 +1056,6 @@ void pdLinuxProcessDebugger::onEventRegistration(apEvent& eve, bool& vetoEvent)
         if ((breakReason == AP_BEFORE_KERNEL_DEBUGGING_HIT) || (breakReason == AP_AFTER_KERNEL_DEBUGGING_HIT))
         {
             // Continue the debugged process:
-            //bool rc = _gdbDriver.executeGDBCommand(PD_CONTINUE_CMD, emptyCmdParam);
             bool rc = _gdbDriver.executeGDBCommand(PD_CONTINUE_CMD, " --all");
             GT_ASSERT(rc);
 
@@ -2780,6 +2779,7 @@ bool pdLinuxProcessDebugger::fillThrdsRealizeCollection()
         m_GDBIdsOfThreadsToRelease.insert(spyGDBId);
     }
 
+    /// Dont remove. Need for future using. Vadim
     /*
     if (nullptr != _pDebuggedProcessThreadsData)
     {
@@ -2929,17 +2929,6 @@ bool pdLinuxProcessDebugger::updateThreadCallStack(osThreadId threadId, pdGDBCal
     }
 
     bool bSuspend = true;
-    /*
-    int gdbThread = -1;
-
-    GT_IF_WITH_ASSERT(getThreadGDBId(threadId, gdbThread))
-    {
-        if (_gdbDriver.IsThreadRunning(gdbThread))
-        {
-            GT_ASSERT(trySuspendProcess(bSuspend, false));
-        }
-    }
-    */
 
     // Get the current thread's call stack:
     const pdGDBData* pGDBOutputData = NULL;
@@ -3846,12 +3835,7 @@ bool pdLinuxProcessDebugger::getHostVariableValue(osThreadId threadId, int callS
             int diff = realCallStack.amountOfStackFrames() - visibleCallStack.amountOfStackFrames();
 
             GT_ASSERT(diff >= 0);
-            /*
-                        if (diff > 0)
-                        {
-                            diff++;
-                        }
-                        */
+
             parametersString += std::to_string(callStackFrameIndex + diff).c_str();
 
             GT_IF_WITH_ASSERT(_gdbDriver.executeGDBCommand(PD_SET_ACTIVE_FRAME_CMD, parametersString, nullptr))
@@ -4047,13 +4031,7 @@ bool pdLinuxProcessDebugger::isAtAPIOrKernelBreakpoint(osThreadId threadId) cons
     }
     else
     {
-        //        if (OS_NO_THREAD_ID != threadId)
-        //        {
-        //            if (m_triggeringThreadId == threadId)
-        //            {
         result = true;
-        //            }
-        //        }
     }
 
     return result;
@@ -4405,17 +4383,20 @@ bool pdLinuxProcessDebugger::performHostStep(osThreadId threadId, StepType stepT
 
                 if (!returnResult)
                 {
-                    gtString _fileName;
+                    GT_IF_WITH_ASSERT(nullptr != frame)
+                    {
+                        gtString _fileName;
 
-                    frame->sourceCodeFilePath().getFileNameAndExtension(_fileName);
+                        frame->sourceCodeFilePath().getFileNameAndExtension(_fileName);
 
-                    gtASCIIString param = _fileName.asASCIICharArray();
-                    param += ":";
-                    int sourceCodeNumber = frame->sourceCodeFileLineNumber();
-                    sourceCodeNumber++;
-                    param += std::to_string(sourceCodeNumber).c_str();
+                        gtASCIIString param = _fileName.asASCIICharArray();
+                        param += ":";
+                        int sourceCodeNumber = frame->sourceCodeFileLineNumber();
+                        sourceCodeNumber++;
+                        param += std::to_string(sourceCodeNumber).c_str();
 
-                    returnResult = _gdbDriver.executeGDBCommand(PD_GDB_UNTIL_CMD, param, (const pdGDBData**)&pStepResult);
+                        returnResult = _gdbDriver.executeGDBCommand(PD_GDB_UNTIL_CMD, param, (const pdGDBData**)&pStepResult);
+                    }
                 }
 
                 /// Start running after temporary breakpoint

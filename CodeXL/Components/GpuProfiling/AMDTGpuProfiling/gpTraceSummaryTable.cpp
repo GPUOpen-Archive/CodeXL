@@ -200,6 +200,7 @@ void gpTraceSummaryTable::FillTable()
     sortByColumn(COLUMN_MAX_TIME);
     horizontalHeader()->setSortIndicator(COLUMN_MAX_TIME, Qt::DescendingOrder);
     horizontalHeader()->setSortIndicatorShown(true);
+    selectRow(0);
 }
 
 void gpTraceSummaryTable::Refresh(bool useTimelineScope, quint64 min, quint64 max)

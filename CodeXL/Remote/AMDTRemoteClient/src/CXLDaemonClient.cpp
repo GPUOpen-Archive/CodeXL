@@ -452,7 +452,6 @@ public:
         bool ret = buffer.setPath(osFilePath::OS_USER_APPLICATION_DATA);
         GT_IF_WITH_ASSERT(ret)
         {
-            buffer.appendSubDirectory(L"AMD");
             buffer.appendSubDirectory(DWM_STR_CODEXL_DIR_NAME);
         }
         return ret;

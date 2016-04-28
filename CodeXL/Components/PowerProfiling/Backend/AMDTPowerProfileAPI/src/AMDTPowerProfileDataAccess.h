@@ -86,9 +86,9 @@ AMDTResult AMDTPwrGetProfileTimeStamps(
 // AMDTGetCounterValues: Get profile time line counter values.
 AMDTResult AMDTGetCounterValues(AMDTPwrProcessedDataRecord* pData);
 
-// AMDTGetProcessProfileData: Get Process profile infornation list.
+// AMDTGetCummulativePidProfData: Get Process profile infornation list.
 // This is a list of PIDs and their corresponding power indicators
-AMDTResult AMDTGetProcessProfileData(AMDTUInt32* pPIDCount, AMDTPwrProcessInfo** ppData);
+AMDTResult AMDTGetCummulativePidProfData(AMDTUInt32* pPIDCount, AMDTPwrProcessInfo** ppData, AMDTUInt32 pidVal, bool reset);
 
 // AMDTGetInstrumentedData: Get the accumulated instrumented data
 AMDTResult AMDTGetInstrumentedData(AMDTUInt32 markerId, PwrInstrumentedPowerData** ppData);

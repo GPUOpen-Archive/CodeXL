@@ -197,15 +197,18 @@ public:
     void TableItemsAsString(QStringList& membersStringsList)
     {
         // m_avgTimeMs is calculated here, after all samples were gathered
-        m_avgTimeMs = (float)((float)m_cumulativeTime / (float)m_numCalls);
+        if (0 != m_numCalls)
+        {
+            m_avgTimeMs = (float)((float)m_cumulativeTime / (float)m_numCalls);
 
-        membersStringsList << m_call;
-        membersStringsList << QString::number(m_maxTimeMs, 'f', 6);
-        membersStringsList << QString::number(m_minTimeMs, 'f', 6);
-        membersStringsList << QString::number(m_avgTimeMs, 'f', 6);
-        membersStringsList << QString::number(m_cumulativeTime, 'f', 6);
-        membersStringsList << QString::number(m_percentageOfTotalTime, 'f', 3);
-        membersStringsList << QString::number(m_numCalls);
+            membersStringsList << m_call;
+            membersStringsList << QString::number(m_maxTimeMs, 'f', 6);
+            membersStringsList << QString::number(m_minTimeMs, 'f', 6);
+            membersStringsList << QString::number(m_avgTimeMs, 'f', 6);
+            membersStringsList << QString::number(m_cumulativeTime, 'f', 6);
+            membersStringsList << QString::number(m_percentageOfTotalTime, 'f', 3);
+            membersStringsList << QString::number(m_numCalls);
+        }
     }
 
     QString m_interface;

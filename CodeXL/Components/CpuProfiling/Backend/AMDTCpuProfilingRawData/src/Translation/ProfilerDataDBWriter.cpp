@@ -14,6 +14,7 @@
 
 #include <AMDTOSWrappers/Include/osFilePath.h>
 #include <AMDTOSWrappers/Include/osApplication.h>
+#include <AMDTOSWrappers/Include/osGeneralFunctions.h>
 
 #include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
 
@@ -23,8 +24,14 @@
 #include <CpuProfileModule.h>
 #include <CpuProfileProcess.h>
 
-#ifdef AMDT_ENABLE_CPUPROF_DB
 #include <ProfilerDataDBWriter.h>
+
+static inline gtUInt32 generateFuncId(gtUInt16 moduleId, gtUInt16 funcSeq)
+{
+    gtUInt32 funcId = moduleId;
+    funcId = (funcId << 16) | funcSeq;
+    return funcId;
+}
 
 void ProfilerDataDBWriter::PackSessionInfo(const CpuProfileInfo& profileInfo, gtUInt64 cpuAffinity, AMDTProfileSessionInfo& sessionInfo)
 {
@@ -102,125 +109,6 @@ bool ProfilerDataDBWriter::InitializeEventsXMLFile(gtUInt32 cpuFamily, gtUInt32 
 
     return rv;
 }
-
-bool ProfilerDataDBWriter::IsWindowsSystemModuleNoExt(const gtString& absolutePath)
-{
-    bool ret = false;
-
-    // 21 is the minimum of: "\\windows\\system\\*.***"
-    if (absolutePath.length() >= 21)
-    {
-        gtString lowerAbsolutePath = absolutePath;
-
-        for (int i = 0, e = lowerAbsolutePath.length(); i != e; ++i)
-        {
-            wchar_t& wc = lowerAbsolutePath[i];
-
-            if ('/' == wc)
-            {
-                wc = '\\';
-            }
-            else
-            {
-                // Paths in windows are case insensitive
-                wc = tolower(wc);
-            }
-        }
-
-        int rootPos = lowerAbsolutePath.find(L"\\windows\\");
-
-        if (-1 != rootPos)
-        {
-            // 9 is the length of "\\windows\\"
-            rootPos += 9;
-
-            if (lowerAbsolutePath.compare(rootPos, 3, L"sys") == 0)
-            {
-                rootPos += 3;
-
-                if (lowerAbsolutePath.compare(rootPos, 4, L"tem\\") == 0 || // "\\windows\\system\\"
-                    lowerAbsolutePath.compare(rootPos, 6, L"tem32\\") == 0 || // "\\windows\\system32\\"
-                    lowerAbsolutePath.compare(rootPos, 6, L"wow64\\") == 0)   // "\\windows\\syswow64\\"
-                {
-                    ret = true;
-                }
-            }
-            else
-            {
-                if (lowerAbsolutePath.compare(rootPos, 7, L"winsxs\\") == 0)
-                {
-                    ret = true;
-                }
-            }
-        }
-    }
-
-    return ret;
-}
-
-// This function tries to tell whether a given module name is a Linux system library.
-//
-// The special name "[kernel.kallsyms]" is the module name for samples within the kernel.
-// Then, if the path does not start with '/' we assume it's not a system library.
-// The name must then start with "lib" and have ".so" within it.
-// If so, we consider these files to be system libraries if they are from:
-//          /lib*
-//          /usr/lib*
-//          /usr/local/lib*
-//          /usr/share/gdb*
-//
-bool ProfilerDataDBWriter::AuxIsLinuxSystemModule(const gtString& absolutePath)
-{
-    bool ret = false;
-
-    int len = absolutePath.length();
-
-    if (len > 3 && 0 == memcmp(absolutePath.asCharArray() + len - 3, L".so", 3 * sizeof(wchar_t)))
-    {
-        // Kernel samples
-        ret = (absolutePath.find(L"[kernel.kallsyms]") != -1);
-
-        if (!ret && L'/' == absolutePath[0])
-        {
-            // is it "/lib"
-            ret = (absolutePath.compare(1, 3, L"lib") == 0);
-
-            if (!ret)
-            {
-                bool isUsrPath = (absolutePath.compare(1, 4, L"usr/") == 0);
-
-                // is it /usr/lib, /usr/local/lib, /usr/share/gdb
-                if (isUsrPath)
-                {
-                    bool isLib = (absolutePath.compare(5, 3, L"lib") == 0) || (absolutePath.compare(5, 9, L"local/lib") == 0);
-
-                    ret = isLib || (absolutePath.compare(5, 10, L"share/gdb") == 0);
-                }
-            }
-        }
-    }
-
-    return ret;
-}
-
-bool ProfilerDataDBWriter::IsSystemModule(const gtString& absolutePath)
-{
-    bool ret;
-
-    if (absolutePath.length() > 4 && (absolutePath.endsWith(L".dll") ||
-                                      absolutePath.endsWith(L".sys") ||
-                                      absolutePath.endsWith(L".exe")))
-    {
-        ret = IsWindowsSystemModuleNoExt(absolutePath);
-    }
-    else
-    {
-        ret = AuxIsLinuxSystemModule(absolutePath);
-    }
-
-    return ret;
-}
-
 
 gtString ProfilerDataDBWriter::ConvertQtToGTString(const QString& inputStr)
 {
@@ -309,7 +197,7 @@ void ProfilerDataDBWriter::PackModuleInfo(const NameModuleMap& modMap, CPAModule
                                 m.first,
                                 m.second.m_size,
                                 m.second.m_modType,
-                                IsSystemModule(m.first),
+                                osIsSystemModule(m.first),
                                 m.second.m_is32Bit,
                                 m.second.m_isDebugInfoAvailable);
     }
@@ -435,7 +323,7 @@ void ProfilerDataDBWriter::PackFunctionInfo(const NameModuleMap& modMap, CPAFunc
             gtString funcName = fit->second.getFuncName();
             gtUInt64 startOffset = fit->second.getBaseAddr() - modLoadAddr;
             gtUInt64 size = fit->second.getSize();
-            gtUInt32 funcId = fit->second.m_functionId;
+            gtUInt32 funcId = generateFuncId(modId, fit->second.m_functionId);
 
             // If function name is empty, it will be considered as unknown-function, don't insert into DB.
             // else insert function info into DB
@@ -553,4 +441,3 @@ bool ProfilerDataDBWriter::Write(
 
     return true;
 }
-#endif // AMDT_ENABLE_CPUPROF_DB

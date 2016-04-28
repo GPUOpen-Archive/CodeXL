@@ -108,10 +108,8 @@ CP_TRANS_API HRESULT fnGetModuleInfoByIndex(/* [in] */  gtUInt64 processID,
 //Caller allocates the space for module name.
 CP_TRANS_API HRESULT fnGetModuleInfo(TiModuleInfo* info);
 
-#ifdef AMDT_ENABLE_CPUPROF_DB
 // Get the module instance info as a vector of <instanceId, modName, pid, loadAddr>
 CP_TRANS_API HRESULT fnGetProcessThreadList(gtVector<std::tuple<gtUInt32, gtUInt32>>& info);
-#endif
 
 // Get number of kernel modules
 CP_TRANS_API HRESULT fnGetKernelModNum(/* [out] */ unsigned* pNumOfKeMod);

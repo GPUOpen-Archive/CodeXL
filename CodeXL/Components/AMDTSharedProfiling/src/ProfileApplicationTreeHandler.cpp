@@ -431,61 +431,63 @@ bool ProfileApplicationTreeHandler::ImportFile(const QString& importFilePath)
 
 void ProfileApplicationTreeHandler::OnExportSession()
 {
-
-    QList<QTreeWidgetItem*> treeSelectedItems = m_pApplicationTree->treeControl()->selectedItems();
-
-    if (treeSelectedItems.count() == 1)
+    GT_IF_WITH_ASSERT(nullptr != m_pApplicationTree && nullptr != m_pApplicationTree->treeControl())
     {
-        QTreeWidgetItem* pContextMenuItem = treeSelectedItems.at(0);
-        GT_IF_WITH_ASSERT(nullptr != pContextMenuItem)
+        QList<QTreeWidgetItem*> treeSelectedItems = m_pApplicationTree->treeControl()->selectedItems();
+
+        if (treeSelectedItems.count() == 1)
         {
-            afApplicationTreeItemData* pTreeItemData = m_pApplicationTree->getTreeItemData(pContextMenuItem);
-            GT_IF_WITH_ASSERT(nullptr != pTreeItemData)
+            QTreeWidgetItem* pContextMenuItem = treeSelectedItems.at(0);
+            GT_IF_WITH_ASSERT(nullptr != pContextMenuItem)
             {
-                afApplicationTreeItemData* pNodeData = FindParentSessionItemData(pTreeItemData);
-
-                GT_IF_WITH_ASSERT(nullptr != pNodeData)
+                afApplicationTreeItemData* pTreeItemData = m_pApplicationTree->getTreeItemData(pContextMenuItem);
+                GT_IF_WITH_ASSERT(nullptr != pTreeItemData)
                 {
-                    QString report;
-                    osDirectory sessionDir;
-                    pNodeData->m_filePath.getFileDirectory(sessionDir);
-                    SessionTreeNodeData* pSessionData = qobject_cast<SessionTreeNodeData*>(pNodeData->extendedItemData());
+                    afApplicationTreeItemData* pNodeData = FindParentSessionItemData(pTreeItemData);
 
-                    if (nullptr != pSessionData)
+                    GT_IF_WITH_ASSERT(nullptr != pNodeData)
                     {
-                        QString sessionName = pSessionData->m_displayName;
+                        QString report;
+                        osDirectory sessionDir;
+                        pNodeData->m_filePath.getFileDirectory(sessionDir);
+                        SessionTreeNodeData* pSessionData = qobject_cast<SessionTreeNodeData*>(pNodeData->extendedItemData());
 
-                        QString strDir;
-                        strDir = QString::fromWCharArray(afProjectManager::instance().currentProjectFilePath().fileDirectoryAsString().asCharArray());
-
-                        // Set the CodeXL projects location as default browse path for the exported file:
-                        if (m_pExportSessionAction->LastBrowsedFolder().isEmpty())
+                        if (nullptr != pSessionData && nullptr != m_pExportSessionAction)
                         {
-                            QString currentProjectPath = acGTStringToQString(afProjectManager::instance().currentProjectFilePath().fileDirectoryAsString());
-                            m_pExportSessionAction->SetLastBrowsedFolder(currentProjectPath);
-                        }
+                            QString sessionName = pSessionData->m_displayName;
 
-                        QString dialogTitle(PM_STR_ExportDialogTitle);
-                        QString defaultPath("");
-                        QString fullFileName = sessionName;
-                        fullFileName.append(AF_STR_HyphenA);
-                        fullFileName.append(afGlobalVariablesManager::ProductNameA());
-                        fullFileName.append("." + acGTStringToQString(AF_STR_frameAnalysisArchivedFileExtension));
+                            QString strDir;
+                            strDir = QString::fromWCharArray(afProjectManager::instance().currentProjectFilePath().fileDirectoryAsString().asCharArray());
 
-                        bool ret = afApplicationCommands::instance()->ShowQTSaveFileDialog(defaultPath, fullFileName, m_pExportSessionAction->LastBrowsedFolder(), m_pApplicationTree, "", dialogTitle);
-
-                        if (ret == true)
-                        {
-                            QString pathToSave = defaultPath;
-                            int lastIndex = pathToSave.lastIndexOf("/");
-                            pathToSave.chop(pathToSave.length() - lastIndex);
-                            m_pExportSessionAction->SetLastBrowsedFolder(pathToSave);
-
-                            gtList<SessionTypeTreeHandlerAbstract*>::iterator it = m_sessionTypeToTreeHandlerList.begin();
-
-                            for (; (it != m_sessionTypeToTreeHandlerList.end()); it++)
+                            // Set the CodeXL projects location as default browse path for the exported file:
+                            if (m_pExportSessionAction->LastBrowsedFolder().isEmpty())
                             {
-                                ret = (*it)->ExportFile(sessionDir, defaultPath, pSessionData);
+                                QString currentProjectPath = acGTStringToQString(afProjectManager::instance().currentProjectFilePath().fileDirectoryAsString());
+                                m_pExportSessionAction->SetLastBrowsedFolder(currentProjectPath);
+                            }
+
+                            QString dialogTitle(PM_STR_ExportDialogTitle);
+                            QString defaultPath("");
+                            QString fullFileName = sessionName;
+                            fullFileName.append(AF_STR_HyphenA);
+                            fullFileName.append(afGlobalVariablesManager::ProductNameA());
+                            fullFileName.append("." + acGTStringToQString(AF_STR_frameAnalysisArchivedFileExtension));
+
+                            bool ret = afApplicationCommands::instance()->ShowQTSaveFileDialog(defaultPath, fullFileName, m_pExportSessionAction->LastBrowsedFolder(), m_pApplicationTree, "", dialogTitle);
+
+                            if (ret == true)
+                            {
+                                QString pathToSave = defaultPath;
+                                int lastIndex = pathToSave.lastIndexOf("/");
+                                pathToSave.chop(pathToSave.length() - lastIndex);
+                                m_pExportSessionAction->SetLastBrowsedFolder(pathToSave);
+
+                                gtList<SessionTypeTreeHandlerAbstract*>::iterator it = m_sessionTypeToTreeHandlerList.begin();
+
+                                for (; (it != m_sessionTypeToTreeHandlerList.end()); it++)
+                                {
+                                    ret = (*it)->ExportFile(sessionDir, defaultPath, pSessionData);
+                                }
                             }
                         }
                     }
@@ -493,7 +495,6 @@ void ProfileApplicationTreeHandler::OnExportSession()
             }
         }
     }
-
 }
 
 void ProfileApplicationTreeHandler::OnRefreshFromServer()
@@ -516,7 +517,7 @@ void ProfileApplicationTreeHandler::OnRefreshFromServer()
 void ProfileApplicationTreeHandler::OnSessionDelete()
 {
     // Get the clicked item from application tree:
-    GT_IF_WITH_ASSERT(nullptr != m_pApplicationTree)
+    GT_IF_WITH_ASSERT(nullptr != m_pApplicationTree && nullptr != m_pApplicationTree->treeControl())
     {
         QList<QTreeWidgetItem*> treeSelectedItems = m_pApplicationTree->treeControl()->selectedItems();
 
@@ -556,7 +557,7 @@ void ProfileApplicationTreeHandler::OnSessionDelete()
 void ProfileApplicationTreeHandler::OnMultipleSessionDelete()
 {
     // Get the clicked item from application tree:
-    GT_IF_WITH_ASSERT(nullptr != m_pApplicationTree)
+    GT_IF_WITH_ASSERT(nullptr != m_pApplicationTree && nullptr != m_pApplicationTree->treeControl())
     {
         QMessageBox::StandardButton result;
         result = acMessageBox::instance().question(afGlobalVariablesManager::ProductNameA(), PS_STR_TREE_DELETE_MULTIPLE_QUESTION, QMessageBox::Yes | QMessageBox::No);
@@ -591,7 +592,7 @@ void ProfileApplicationTreeHandler::OnMultipleSessionDelete()
 void ProfileApplicationTreeHandler::OnItemOpen()
 {
     // Get the clicked item from application tree:
-    GT_IF_WITH_ASSERT(nullptr != m_pApplicationTree)
+    GT_IF_WITH_ASSERT(nullptr != m_pApplicationTree && nullptr != m_pApplicationTree->treeControl())
     {
         QList<QTreeWidgetItem*> treeSelectedItems = m_pApplicationTree->treeControl()->selectedItems();
         QTreeWidgetItem* pContextMenuItem = treeSelectedItems.at(0);
@@ -612,7 +613,7 @@ void ProfileApplicationTreeHandler::OnItemOpen()
 void ProfileApplicationTreeHandler::OnOpenContainingFolder()
 {
     // Get the clicked item from application tree:
-    GT_IF_WITH_ASSERT(nullptr != m_pApplicationTree)
+    GT_IF_WITH_ASSERT(nullptr != m_pApplicationTree && nullptr != m_pApplicationTree->treeControl())
     {
         QList<QTreeWidgetItem*> treeSelectedItems = m_pApplicationTree->treeControl()->selectedItems();
         QTreeWidgetItem* pContextMenuItem = treeSelectedItems.at(0);
@@ -636,7 +637,7 @@ void ProfileApplicationTreeHandler::OnOpenContainingFolder()
 
 void ProfileApplicationTreeHandler::CurrentTreeNodeChanged(QTreeWidgetItem* pItem)
 {
-    if (nullptr != pItem)
+    if (nullptr != pItem && nullptr != m_pApplicationTree)
     {
         afApplicationTreeItemData* pItemData = m_pApplicationTree->getTreeItemData(pItem);
 
@@ -695,7 +696,7 @@ ExplorerSessionId ProfileApplicationTreeHandler::AddSession(SessionTreeNodeData*
                 if (activateItem)
                 {
                     afApplicationTreeItemData* pSessionItemData = GetSessionNodeItemData(retVal);
-                    GT_IF_WITH_ASSERT(nullptr != pSessionItemData)
+                    GT_IF_WITH_ASSERT(nullptr != pSessionItemData && nullptr != m_pApplicationTree)
                     {
                         // Expand and activate the session item:
                         m_pApplicationTree->expandItem(pSessionItemData->m_pTreeWidgetItem);
@@ -838,13 +839,16 @@ bool ProfileApplicationTreeHandler::CheckFilterList(const QString& fileExt)
 
     if (m_profileFilterList.count() > 0 && isInProfileMode)
     {
-        foreach (FileFilter* filter, m_profileFilterList)
+        foreach (FileFilter* pFilter, m_profileFilterList)
         {
-            QFileInfo fileInfo(filter->m_strMask);
-
-            if (fileInfo.suffix() == fileExt)
+            if (nullptr != pFilter)
             {
-                return true;
+                QFileInfo fileInfo(pFilter->m_strMask);
+
+                if (fileInfo.suffix() == fileExt)
+                {
+                    return true;
+                }
             }
         }
     }
@@ -1152,7 +1156,7 @@ void ProfileApplicationTreeHandler::GlobalVariableChangedHandler(const afGlobalV
     if (variableId == afGlobalVariableChangedEvent::CURRENT_PROJECT)
     {
         // Expand the tree:
-        if (WasTreeCreated())
+        if (WasTreeCreated() && nullptr != m_pApplicationTree)
         {
             // Clear the sessions tree:
             DeleteAllSessions(nullptr, SESSION_EXPLORER_REMOVE_FROM_TREE_ONLY);
@@ -1413,7 +1417,7 @@ void ProfileApplicationTreeHandler::OnEditorClosed(const QString& newValue)
 
     if (shouldHandle)
     {
-        GT_IF_WITH_ASSERT(nullptr != m_pApplicationTree)
+        GT_IF_WITH_ASSERT(nullptr != m_pApplicationTree && nullptr != m_pApplicationTree->treeControl())
         {
             QList<QTreeWidgetItem*> treeSelectedItems = m_pApplicationTree->treeControl()->selectedItems();
             QTreeWidgetItem* pItem = nullptr;
@@ -1461,7 +1465,7 @@ void ProfileApplicationTreeHandler::OnEditorClosed(const QString& newValue)
 
 void ProfileApplicationTreeHandler::OnSessionRename()
 {
-    GT_IF_WITH_ASSERT(nullptr != m_pApplicationTree)
+    GT_IF_WITH_ASSERT(nullptr != m_pApplicationTree && nullptr != m_pApplicationTree->treeControl())
     {
         QList<QTreeWidgetItem*> treeSelectedItems = m_pApplicationTree->treeControl()->selectedItems();
 
@@ -1516,40 +1520,42 @@ bool ProfileApplicationTreeHandler::IsSessionNameValid(const QString& sessionNam
     {
         valid = true;
     }
-
-    // Search for an item with the same name:
-    QTreeWidgetItem* pRootItem = m_pApplicationTree->treeControl()->topLevelItem(0);
-
-    GT_IF_WITH_ASSERT(nullptr != pRootItem)
+    GT_IF_WITH_ASSERT(nullptr != m_pApplicationTree && nullptr != m_pApplicationTree->treeControl())
     {
-        int sessionTypesCount = pRootItem->childCount();
+        // Search for an item with the same name:
+        QTreeWidgetItem* pRootItem = m_pApplicationTree->treeControl()->topLevelItem(0);
 
-        for (int i = 0; i < sessionTypesCount; i++)
+        GT_IF_WITH_ASSERT(nullptr != pRootItem)
         {
-            QTreeWidgetItem* pSessionTypeItem = pRootItem->child(i);
+            int sessionTypesCount = pRootItem->childCount();
 
-            if (nullptr != pSessionTypeItem)
+            for (int i = 0; i < sessionTypesCount; i++)
             {
-                int sessionsCount = pSessionTypeItem->childCount();
+                QTreeWidgetItem* pSessionTypeItem = pRootItem->child(i);
 
-                for (int j = 0; j < sessionsCount; j++)
+                if (nullptr != pSessionTypeItem)
                 {
-                    QTreeWidgetItem* pSessionItem = pSessionTypeItem->child(j);
-                    afApplicationTreeItemData* pItemData = m_pApplicationTree->getTreeItemData(pSessionItem);
+                    int sessionsCount = pSessionTypeItem->childCount();
 
-                    if ((nullptr != pItemData) && (nullptr != pItemData->m_pTreeWidgetItem))
+                    for (int j = 0; j < sessionsCount; j++)
                     {
-                        // Do not compare the currently selected item, this is the renamed session:
-                        if (!pItemData->m_pTreeWidgetItem->isSelected())
-                        {
-                            SessionTreeNodeData* pSessionData = qobject_cast<SessionTreeNodeData*>(pItemData->extendedItemData());
+                        QTreeWidgetItem* pSessionItem = pSessionTypeItem->child(j);
+                        afApplicationTreeItemData* pItemData = m_pApplicationTree->getTreeItemData(pSessionItem);
 
-                            if (nullptr != pSessionData)
+                        if ((nullptr != pItemData) && (nullptr != pItemData->m_pTreeWidgetItem))
+                        {
+                            // Do not compare the currently selected item, this is the renamed session:
+                            if (!pItemData->m_pTreeWidgetItem->isSelected())
                             {
-                                if (pSessionData->m_displayName == sessionName)
+                                SessionTreeNodeData* pSessionData = qobject_cast<SessionTreeNodeData*>(pItemData->extendedItemData());
+
+                                if (nullptr != pSessionData)
                                 {
-                                    valid = false;
-                                    errMsg = QString(PM_STR_RENAME_SESSION_EXISTS).arg(sessionName);
+                                    if (pSessionData->m_displayName == sessionName)
+                                    {
+                                        valid = false;
+                                        errMsg = QString(PM_STR_RENAME_SESSION_EXISTS).arg(sessionName);
+                                    }
                                 }
                             }
                         }
@@ -1558,7 +1564,6 @@ bool ProfileApplicationTreeHandler::IsSessionNameValid(const QString& sessionNam
             }
         }
     }
-
     return valid;
 }
 
@@ -2290,7 +2295,7 @@ bool ProfileApplicationTreeHandler::ExecuteDropEvent(QDropEvent* pEvent, const Q
     osFilePath draggedSessionPath(acQStringToGTString(dragDropFile));
     afApplicationTreeItemData* pExistingItemData = FindItemByProfileFilePath(draggedSessionPath);
 
-    if (nullptr != pExistingItemData)
+    if (nullptr != pExistingItemData && nullptr != m_pApplicationTree)
     {
         acMessageBox::instance().information(AF_STR_InformationA, PM_STR_PROFILE_TREE_SESSION_EXIST);
         m_pApplicationTree->expandItem(pExistingItemData->m_pTreeWidgetItem);
@@ -2512,7 +2517,7 @@ void ProfileApplicationTreeHandler::OnApplicationTreeCreated()
 {
     m_pApplicationTree = afApplicationCommands::instance()->applicationTree();
 
-    GT_IF_WITH_ASSERT(nullptr != m_pApplicationTree)
+    GT_IF_WITH_ASSERT(nullptr != m_pApplicationTree && nullptr != m_pApplicationTree->treeControl())
     {
         bool rc = connect(m_pApplicationTree->treeControl(), SIGNAL(onItemCloseEditor(const QString&)), this, SLOT(OnEditorClosed(const QString&)));
         GT_ASSERT(rc);
@@ -2663,7 +2668,7 @@ void ProfileApplicationTreeHandler::OnCreateEmptySession()
                         pEmptySessionData->m_sessionId = ++m_sSessionCount;
 
                         // select the item and expend it only if it was created if not this will cause infinite loop and crash.
-                        GT_IF_WITH_ASSERT(DoesEmptySessionNodeExist())
+                        GT_IF_WITH_ASSERT(DoesEmptySessionNodeExist() && nullptr != m_pApplicationTree)
                         {
                             // Select the session node and expand it:
                             afApplicationCommands::instance()->applicationTree()->selectItem(m_pEmptySessionItemData, true);
@@ -2889,7 +2894,7 @@ void ProfileApplicationTreeHandler::EnableEmptySessionNode(const gtString& sessi
         // Add an empty session creation node:
         AddEmptySessionCreationNode(true);
 
-        GT_IF_WITH_ASSERT(DoesEmptySessionNodeExist())
+        GT_IF_WITH_ASSERT(DoesEmptySessionNodeExist() && nullptr != m_pApplicationTree)
         {
             m_pEmptySessionItemData->m_pTreeWidgetItem->setForeground(0, Qt::black);
             m_pApplicationTree->selectItem(m_pEmptySessionItemData, false);

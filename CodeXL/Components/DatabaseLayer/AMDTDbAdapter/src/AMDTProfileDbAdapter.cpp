@@ -590,12 +590,66 @@ bool amdtProfileDbAdapter::GetThreadInfo(AMDTUInt32 pid, AMDTThreadId tid, gtVec
     return ret;
 }
 
+bool amdtProfileDbAdapter::GetCounterTotals(AMDTProfileDataType   type,
+    AMDTProcessId         procId,
+    AMDTThreadId          threadId,
+    AMDTModuleId          moduleId,
+    AMDTFunctionId        funcId,
+    gtVector<AMDTUInt32>  counterIdsList,
+    AMDTUInt64            coreMask,
+    bool                  separateByCore,
+    AMDTSampleValueVec&   sampleValueVec)
+{
+    bool ret = false;
+
+    if (m_pDbAccessor != nullptr)
+    {
+        switch (type)
+        {
+        case AMDT_PROFILE_DATA_PROCESS:
+            ret = m_pDbAccessor->GetProcessTotals(procId,
+                                                  counterIdsList,
+                                                  coreMask,
+                                                  separateByCore,
+                                                  sampleValueVec);
+            break;
+
+        case AMDT_PROFILE_DATA_MODULE:
+            ret = m_pDbAccessor->GetModuleTotals(moduleId,
+                                                 procId,
+                                                 counterIdsList,
+                                                 coreMask,
+                                                 separateByCore,
+                                                 sampleValueVec);
+            break;
+
+        case AMDT_PROFILE_DATA_THREAD:
+            break;
+
+        case AMDT_PROFILE_DATA_FUNCTION:
+            ret = m_pDbAccessor->GetFunctionTotals(funcId,
+                                                   procId,
+                                                   threadId,
+                                                   counterIdsList,
+                                                   coreMask,
+                                                   separateByCore,
+                                                   sampleValueVec);
+            break;
+
+        default:
+            ret = false;
+        }
+    }
+
+    return ret;
+}
+
 bool amdtProfileDbAdapter::GetProfileData(
     AMDTProfileDataType         type,
     AMDTProcessId               processId,
     AMDTModuleId                moduleId,
     AMDTThreadId                threadId,
-    AMDTUInt32                  counterId,
+    gtVector<AMDTUInt32>        counterIdList,
     AMDTUInt64                  coreMask,
     bool                        separateByCore,
     bool                        separateByProcess,  // for function summary
@@ -607,9 +661,6 @@ bool amdtProfileDbAdapter::GetProfileData(
 
     if (m_pDbAccessor != nullptr)
     {
-        gtVector<AMDTUInt32> counterIdList;
-        counterIdList.push_back(counterId);
-
         switch (type)
         {
             case AMDT_PROFILE_DATA_PROCESS:
@@ -648,6 +699,7 @@ bool amdtProfileDbAdapter::GetProfileData(
             case AMDT_PROFILE_DATA_FUNCTION:
                 ret = m_pDbAccessor->GetFunctionSummaryData(processId,
                                                             threadId,
+                                                            moduleId,
                                                             counterIdList,
                                                             coreMask,
                                                             separateByCore,
@@ -655,14 +707,11 @@ bool amdtProfileDbAdapter::GetProfileData(
                                                             doSort,
                                                             count,
                                                             dataList);
-
                 break;
 
             default:
                 ret = false;
         }
-
-        // Based on Type call the appropriate interface
     }
 
     return ret;

@@ -80,9 +80,7 @@ struct KernelModValue
     bool bLoadedPeFile;
     PeFile* pPeFile;
 
-#ifdef AMDT_ENABLE_CPUPROF_DB
     gtUInt32 instanceId = 0;
-#endif
 
     // default constructor
     KernelModValue() : keModEndAddr(0),

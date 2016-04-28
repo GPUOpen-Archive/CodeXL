@@ -332,7 +332,6 @@ private:
 ///
 struct pdGDBBreakpointIndex : public pdGDBData
 {
-public:
     ///////////////////////////////////////////////
     /// \brief Standard constructor (unavailable)
     ///
@@ -356,8 +355,6 @@ public:
     virtual ~pdGDBBreakpointIndex();
 
     int  m_gdbBreakpointIndex;      ///< gdb breakpoint index
-
-private:
 };
 
 //////////////////////////////////////////////////////////////////////
