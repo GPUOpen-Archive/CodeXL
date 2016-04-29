@@ -144,7 +144,7 @@ public:
     /// \return Running threads count
     /// \author Vadim Entov
     /// \date 11/02/2016
-    int GetExistingThreadsCount() const;
+    int GetExistingThreadsCount();
 
     //////////////////////////////////////////////////////////////////////////////////////
     /// \brief Get currently host process stopped threads
