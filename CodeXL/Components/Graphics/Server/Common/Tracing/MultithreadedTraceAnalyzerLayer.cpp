@@ -813,7 +813,7 @@ bool MultithreadedTraceAnalyzerLayer::WriteTraceAndMetadataFiles(const gtASCIISt
     // If we've successfully opened the metadata file, we'll also attempt to write the trace file.
     if (bMetadataFileOpened == false)
     {
-        Log(logERROR, "Failed to open trace metadata file for writing: '%s'\n", smd.metadataFilename);
+        Log(logERROR, "Failed to open trace metadata file for writing: '%s'\n", smd.metadataFilename.asCharArray());
         return false;
     }
 
