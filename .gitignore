@@ -268,3 +268,11 @@ CodeXL/Components/ShaderAnalyzer/AMDTKernelAnalyzer/tmp/
 /CodeXL/App/vert.il
 /CodeXL/App/spvLogInfo.txt
 /CodeXL/App/Overview.cxlovr
+
+# Linux build files
+*.os
+*.pyc
+.sconsign.dblite
+/CodeXL/variant_release
+/CodeXL/Components/GpuProfiling/Backend/CodeXLGpuProfiler
+/CodeXL/Components/GpuProfiling/**/*.a
