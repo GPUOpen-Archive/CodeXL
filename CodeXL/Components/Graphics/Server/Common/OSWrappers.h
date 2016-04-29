@@ -12,6 +12,10 @@
 #include <AMDTOSWrappers/Include/osModuleArchitecture.h>
 #include <AMDTOSWrappers/Include/osThread.h>
 
+#ifdef _LINUX
+#include "Linux/WinDefs.h"
+#endif
+
 namespace OSWrappers
 {
 /// Get the executable type (whether it is 32 or 64 bit)
@@ -56,6 +60,8 @@ bool IsProcessRunning(const char* szProcessName, bool useSubString);
 
 #ifdef _LINUX
     void OutputDebugString(const char* lpOutputString);
+
+    BOOL  QueryPerformanceFrequency(LARGE_INTEGER* lpFrequency);
 #endif
 
 #endif //GPS_OSUTILS_H

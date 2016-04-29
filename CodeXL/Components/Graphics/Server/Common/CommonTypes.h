@@ -35,7 +35,7 @@
     #include <inttypes.h>
     #include <WinDefs.h>
 
-    typedef uint64_t           GPS_TIMESTAMP;
+    typedef LARGE_INTEGER      GPS_TIMESTAMP;
     typedef int8_t             INT8;
     typedef int16_t            INT16;
     typedef int32_t            INT32;
