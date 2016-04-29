@@ -411,7 +411,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
     {
         case PARAMETER_POINTER:
         {
-            void* data;
+            void* data = nullptr;
             memcpy(&data, pRawData, sizeof(void*));
             StringCbPrintf(ioParameterString, bufferLength, "0x%p", data);
             break;
@@ -419,7 +419,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
 
         case PARAMETER_POINTER_SPECIAL:
         {
-            void* data;
+            void* data = nullptr;
             memcpy(&data, pRawData, sizeof(void*));
             StringCbPrintf(ioParameterString, bufferLength, "+0x%p", data);
             break;
@@ -427,7 +427,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
 
         case PARAMETER_INT:
         {
-            int data;
+            int data = 0;
             memcpy(&data, pRawData, sizeof(int));
             StringCbPrintf(ioParameterString, bufferLength, "%d", data);
             break;
@@ -435,7 +435,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
 
         case PARAMETER_UNSIGNED_INT:
         {
-            unsigned int data;
+            unsigned int data = 0;
             memcpy(&data, pRawData, sizeof(unsigned int));
             StringCbPrintf(ioParameterString, bufferLength, "%u", data);
             break;
@@ -443,7 +443,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
 
         case PARAMETER_UNSIGNED_CHAR:
         {
-            unsigned char data;
+            unsigned char data = 0;
             memcpy(&data, pRawData, sizeof(unsigned char));
             StringCbPrintf(ioParameterString, bufferLength, "%hhu", data);
             break;
@@ -451,7 +451,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
 
         case PARAMETER_BOOL:
         {
-            BOOL data;
+            BOOL data = FALSE;
             memcpy(&data, pRawData, sizeof(BOOL));
             StringCbPrintf(ioParameterString, bufferLength, "%s", DX12Util::PrintBool(data));
             break;
@@ -459,7 +459,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
 
         case PARAMETER_FLOAT:
         {
-            float data;
+            float data = 0.0f;
             memcpy(&data, pRawData, sizeof(float));
             StringCbPrintf(ioParameterString, bufferLength, "%f", data);
             break;
@@ -467,7 +467,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
 
         case PARAMETER_UINT64:
         {
-            UINT64 data;
+            UINT64 data = 0;
             memcpy(&data, pRawData, sizeof(UINT64));
             StringCbPrintf(ioParameterString, bufferLength, "%llu", data);
             break;
@@ -475,7 +475,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
 
         case PARAMETER_GUID:
         {
-            GUID guid;
+            GUID guid = {};
             memcpy(&guid, pRawData, sizeof(GUID));
             gtASCIIString guidString;
             DX12Util::PrintREFIID(guid, guidString);
@@ -485,7 +485,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
 
         case PARAMETER_REFIID:
         {
-            IID riid;
+            IID riid = {};
             memcpy(&riid, pRawData, sizeof(IID));
             gtASCIIString refiidString;
             DX12Util::PrintREFIID(riid, refiidString);
@@ -495,7 +495,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
 
         case PARAMETER_SIZE_T:
         {
-            size_t data;
+            size_t data = 0;
             memcpy(&data, pRawData, sizeof(size_t));
             StringCbPrintf(ioParameterString, bufferLength, "%Iu", data);
             break;
@@ -503,7 +503,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
 
         case PARAMETER_DXGI_FORMAT:
         {
-            DXGI_FORMAT format;
+            DXGI_FORMAT format = {};
             memcpy(&format, pRawData, sizeof(DXGI_FORMAT));
             gtASCIIString dxgiFormat = Stringify_DXGI_FORMAT(format);
             StringCbPrintf(ioParameterString, bufferLength, "%s", dxgiFormat.asCharArray());
@@ -512,7 +512,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
 
         case PARAMETER_PRIMITIVE_TOPOLOGY:
         {
-            D3D12_PRIMITIVE_TOPOLOGY primitiveTopology;
+            D3D12_PRIMITIVE_TOPOLOGY primitiveTopology = {};
             memcpy(&primitiveTopology, pRawData, sizeof(D3D12_PRIMITIVE_TOPOLOGY));
             StringCbPrintf(ioParameterString, bufferLength, "%s", DX12CustomSerializers::WritePrimitiveTopology(primitiveTopology));
             break;
@@ -520,7 +520,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
 
         case PARAMETER_QUERY_TYPE:
         {
-            D3D12_QUERY_TYPE type;
+            D3D12_QUERY_TYPE type = {};
             memcpy(&type, pRawData, sizeof(D3D12_QUERY_TYPE));
             StringCbPrintf(ioParameterString, bufferLength, "%s", DX12CoreSerializers::WriteQueryTypeEnumAsString(type));
             break;
@@ -528,7 +528,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
 
         case PARAMETER_PREDICATION_OP:
         {
-            D3D12_PREDICATION_OP operation;
+            D3D12_PREDICATION_OP operation = {};
             memcpy(&operation, pRawData, sizeof(D3D12_PREDICATION_OP));
             StringCbPrintf(ioParameterString, bufferLength, "%s", DX12CoreSerializers::WritePredicationOpEnumAsString(operation));
             break;
@@ -536,7 +536,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
 
         case PARAMETER_COMMAND_LIST:
         {
-            D3D12_COMMAND_LIST_TYPE type;
+            D3D12_COMMAND_LIST_TYPE type = {};
             memcpy(&type, pRawData, sizeof(D3D12_COMMAND_LIST_TYPE));
             StringCbPrintf(ioParameterString, bufferLength, "%s", DX12CoreSerializers::WriteCommandListTypeEnumAsString(type));
             break;
@@ -544,7 +544,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
 
         case PARAMETER_FEATURE:
         {
-            D3D12_FEATURE feature;
+            D3D12_FEATURE feature = {};
             memcpy(&feature, pRawData, sizeof(D3D12_FEATURE));
             StringCbPrintf(ioParameterString, bufferLength, "%s", DX12CoreSerializers::WriteFeatureEnumAsString(feature));
             break;
@@ -552,7 +552,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
 
         case PARAMETER_DESCRIPTOR_HEAP:
         {
-            D3D12_DESCRIPTOR_HEAP_TYPE type;
+            D3D12_DESCRIPTOR_HEAP_TYPE type = {};
             memcpy(&type, pRawData, sizeof(D3D12_DESCRIPTOR_HEAP_TYPE));
             StringCbPrintf(ioParameterString, bufferLength, "%s", DX12CoreSerializers::WriteDescriptorHeapTypeEnumAsString(type));
             break;
@@ -560,7 +560,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
 
         case PARAMETER_HEAP_TYPE:
         {
-            D3D12_HEAP_TYPE type;
+            D3D12_HEAP_TYPE type = {};
             memcpy(&type, pRawData, sizeof(D3D12_HEAP_TYPE));
             StringCbPrintf(ioParameterString, bufferLength, "%s", DX12CoreSerializers::WriteHeapTypeEnumAsString(type));
             break;
@@ -568,7 +568,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
 
         case PARAMETER_RESOURCE_STATES:
         {
-            D3D12_RESOURCE_STATES states;
+            D3D12_RESOURCE_STATES states = {};
             memcpy(&states, pRawData, sizeof(D3D12_RESOURCE_STATES));
             StringCbPrintf(ioParameterString, bufferLength, "%s", DX12CoreSerializers::WriteResourceStatesEnumAsString(states));
             break;
