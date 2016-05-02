@@ -6,8 +6,8 @@
 //=============================================================================
 
 #include "vktAPIEntry.h"
-#include "../Tracing/VktTraceAnalyzerLayer.h"
-#include "../Profiling/VktFrameProfilerLayer.h"
+#include "../Tracing/vktTraceAnalyzerLayer.h"
+#include "../Profiling/vktFrameProfilerLayer.h"
 #include "../../../Common/TypeToString.h"
 
 //-----------------------------------------------------------------------------
