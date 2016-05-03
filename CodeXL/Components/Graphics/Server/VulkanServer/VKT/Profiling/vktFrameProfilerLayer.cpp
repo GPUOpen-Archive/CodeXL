@@ -5,10 +5,10 @@
 /// \brief  The Vulkan-specific Frame Profiler layer implementation.
 //==============================================================================
 
-#include "VktFrameProfilerLayer.h"
-#include "../VktLayerManager.h"
-#include "../Tracing/VktTraceAnalyzerLayer.h"
-#include "../Objects/VktObjectDatabaseProcessor.h"
+#include "vktFrameProfilerLayer.h"
+#include "../vktLayerManager.h"
+#include "../Tracing/vktTraceAnalyzerLayer.h"
+#include "../Objects/vktObjectDatabaseProcessor.h"
 #include "../Objects/Wrappers/vktWrappedCmdBuf.h"
 #include "../Objects/Wrappers/vktWrappedQueue.h"
 #include "../vktInterceptManager.h"

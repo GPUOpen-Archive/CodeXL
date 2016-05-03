@@ -271,7 +271,7 @@ void ProfilerDataDBWriter::PackSampleInfo(const NameModuleMap& modMap, CPASampeI
 
         for (auto fit = module.second.getBeginFunction(); fit != module.second.getEndFunction(); ++fit)
         {
-            gtUInt32 functionId = fit->second.m_functionId;
+            gtUInt32 functionId = generateFuncId(module.second.m_moduleId, fit->second.m_functionId);
 
             for (auto aptIt = fit->second.getBeginSample(); aptIt != fit->second.getEndSample(); ++aptIt)
             {

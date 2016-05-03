@@ -22,11 +22,8 @@
 #include <AMDTOSWrappers/Include/osTime.h>
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    // #define AMDT_ENABLE_DB_SUPPORT  1
-#endif
-
-#ifdef AMDT_ENABLE_DB_SUPPORT
-    #include <AMDTCpuProfilingDataAccess/inc/AMDTCpuProfilingDataAccess.h>
+    //#define AMDT_ENABLE_DB_SUPPORT  1
+#include <AMDTCpuProfilingDataAccess/inc/AMDTCpuProfilingDataAccess.h>
 #endif
 
 // Backend:
@@ -188,10 +185,7 @@ public:
     HRESULT Initialize();
     HRESULT Translate();
     HRESULT Report();
-
-#ifdef AMDT_ENABLE_DB_SUPPORT
     HRESULT ReportFromDb();
-#endif
 
     // Thread profiler
     HRESULT ReportTP();

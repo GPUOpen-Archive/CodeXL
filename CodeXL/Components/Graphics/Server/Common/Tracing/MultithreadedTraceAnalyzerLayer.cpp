@@ -12,7 +12,7 @@
 #include "../ModernAPIFrameProfilerLayer.h"
 #include "../TraceMetadata.h"
 #include "../FrameInfo.h"
-#include "../OSwrappers.h"
+#include "../OSWrappers.h"
 #include <AMDTOSWrappers/Include/osFile.h>
 #include <AMDTOSWrappers/Include/osTime.h>
 #include <AMDTOSWrappers/Include/osDirectory.h>

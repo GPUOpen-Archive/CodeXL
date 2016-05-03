@@ -5,7 +5,7 @@
 /// \brief  A wrapper for command buffers.
 //=============================================================================
 
-#include "VktWrappedCmdBuf.h"
+#include "vktWrappedCmdBuf.h"
 #include "../../vktInterceptManager.h"
 #include "../../vktDefines.h"
 #include "../../Profiling/vktCmdBufProfilerStatic.h"
