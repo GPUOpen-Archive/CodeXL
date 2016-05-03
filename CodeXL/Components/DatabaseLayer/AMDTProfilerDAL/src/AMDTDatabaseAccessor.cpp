@@ -17,6 +17,7 @@
 // Infra.
 #include <AMDTBaseTools/Include/gtAssert.h>
 #include <AMDTBaseTools/Include/gtVector.h>
+#include <AMDTBaseTools/Include/gtSet.h>
 #include <AMDTOSWrappers/Include/osDebugLog.h>
 #include <AMDTOSWrappers/Include/osTimeInterval.h>
 
@@ -37,6 +38,9 @@
 #define IS_CORE_QUERY(coreMask_)                        (coreMask_ != AMDT_PROFILE_ALL_CORES)
 #define IS_ALL_COUNTER_QUERY(counterId_)                (counterId_ == AMDT_PROFILE_ALL_COUNTERS)
 #define IS_ALL_CORE_QUERY(coreMask_)                    (coreMask_ == AMDT_PROFILE_ALL_CORES)
+
+#define IS_ALL_CALLSTACK_QUERY(cs_)                     (cs_ == AMDT_PROFILE_ALL_CALLPATHS)
+#define IS_CALLSTACK_QUERY(cs_)                         (cs_ != AMDT_PROFILE_ALL_CALLPATHS)
 
 #ifdef PP_DAL_TEST
 
@@ -4279,19 +4283,20 @@ public:
                     AMDTProfileData profileData;
                     profileData.m_type = AMDT_PROFILE_DATA_FUNCTION;
 
-                    int idx = 0;
-                    AMDTFunctionId id = sqlite3_column_int(pQueryStmt, idx++);
+                    AMDTFunctionId id = sqlite3_column_int(pQueryStmt, 0);
                     profileData.m_id = id;
 
                     GetFunctionName(id, profileData.m_name);
 
-                    AMDTModuleId mid = sqlite3_column_int(pQueryStmt, idx++);
+                    AMDTModuleId mid = sqlite3_column_int(pQueryStmt, 1);
                     profileData.m_moduleId = mid;
 
+                    int idx = 2;
                     if (separateByProcess)
                     {
-                        AMDTProcessId pid = sqlite3_column_int(pQueryStmt, idx++);
+                        AMDTProcessId pid = sqlite3_column_int(pQueryStmt, idx);
                         pid = pid;
+                        idx++;
                     }
 
                     for (auto& sample : sampleInfoVec)
@@ -4493,7 +4498,6 @@ public:
                             sampleValue.m_sampleCount = sqlite3_column_int(pQueryStmt, idx);
                             sampleValue.m_counterId = sample.m_counterId;
                             sampleValue.m_coreId = sample.m_coreId;
-                            // TODO: sampleValue.m_sampleCountPercentage
 
                             idx++;
                             instData.m_sampleValues.emplace_back(sampleValue);
@@ -4515,6 +4519,200 @@ public:
 
         return ret;
     }
+
+    // Query CallStackLeaf
+    bool GetCallstackLeafData(
+        AMDTProcessId       processId,
+        AMDTUInt32          counterId,   // TODO: Is there a need to support ALL_COUNTERS?
+        gtUInt32            callstackId, // AMDT_PROFILE_ALL_CALLPATHS
+        CallstackFrameVec&  leafs)
+    {
+        GT_UNREFERENCED_PARAMETER(processId);
+        bool ret = false;
+
+        std::stringstream query;
+        query << "SELECT callstackId, functionId, offset, selfSamples "  \
+                 "FROM  CallstackLeaf "     \
+                 "WHERE samplingConfigurationId = ? ";
+
+        if (IS_CALLSTACK_QUERY(callstackId))
+        {
+            query << "AND callstackId = ? ";
+        }
+
+        query << " ;";
+
+        sqlite3_stmt* pQueryStmt = nullptr;
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+
+        if (rc == SQLITE_OK)
+        {
+            sqlite3_bind_int(pQueryStmt, 1, counterId);
+
+            if (IS_CALLSTACK_QUERY(callstackId))
+            {
+                sqlite3_bind_int(pQueryStmt, 2, callstackId);
+            }
+
+            // Execute the query.
+            while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
+            {
+                CallstackFrame aLeaf;
+                AMDTProfileFunctionInfo functionInfo;
+
+                aLeaf.m_callstackId = sqlite3_column_int(pQueryStmt, 0);
+
+                AMDTFunctionId funcId = sqlite3_column_int(pQueryStmt, 1);
+                gtUInt32 offset = sqlite3_column_int(pQueryStmt, 2);
+                // TODO: offset is required when funcid is incomplete
+                offset = offset;
+
+                double value = sqlite3_column_double(pQueryStmt, 3);
+                aLeaf.m_selfSamples = static_cast<gtUInt32>(value);
+                aLeaf.m_counterId = counterId;
+                aLeaf.m_depth = 0;
+                aLeaf.m_isLeaf = true;
+
+                GetFunctionInfo(funcId, aLeaf.m_funcInfo);
+                GetModuleBaseAddress(funcId, processId, aLeaf.m_moduleBaseAddr);
+
+                leafs.push_back(aLeaf);
+            }
+        }
+
+        // Finalize the statement.
+        sqlite3_finalize(pQueryStmt);
+
+        ret = (SQLITE_DONE == rc) ? true : false;
+
+        return ret;
+    }
+
+    // Query CallStackFrame
+    bool GetCallstackFrameData(
+        AMDTProcessId       processId,
+        gtUInt32            callstackId,
+        CallstackFrameVec&  frames)
+    {
+        GT_UNREFERENCED_PARAMETER(processId);
+        bool ret = false;
+
+        std::stringstream query;
+        query << "SELECT callstackId, functionId, offset, depth "  \
+                 "FROM  CallstackFrame "     \
+                 "WHERE callstackId = ? "    \
+                 "ORDER BY depth DESC ;";
+
+        sqlite3_stmt* pQueryStmt = nullptr;
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+
+        if (rc == SQLITE_OK)
+        {
+            sqlite3_bind_int(pQueryStmt, 1, callstackId);
+
+            // Execute the query.
+            while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
+            {
+                CallstackFrame aLeaf;
+                AMDTProfileFunctionInfo functionInfo;
+
+                aLeaf.m_callstackId = sqlite3_column_int(pQueryStmt, 0);
+                AMDTFunctionId funcId  = sqlite3_column_int(pQueryStmt, 1);
+                gtUInt32 offset = sqlite3_column_int(pQueryStmt, 2);
+                // TODO: offset is required when funcid is incomplete
+                offset = offset;
+
+                aLeaf.m_depth = sqlite3_column_int(pQueryStmt, 3);
+
+                aLeaf.m_selfSamples = 0;
+                aLeaf.m_counterId = 0; // FIXME               
+                aLeaf.m_isLeaf = false;
+
+                GetFunctionInfo(funcId, aLeaf.m_funcInfo);
+                GetModuleBaseAddress(funcId, processId, aLeaf.m_moduleBaseAddr);
+
+                frames.push_back(aLeaf);
+            }
+        }
+
+        // Finalize the statement.
+        sqlite3_finalize(pQueryStmt);
+
+        ret = (SQLITE_DONE == rc) ? true : false;
+
+        return ret;
+    }
+
+    // Query CallStackPath
+    // FIXME: This will not work for *unknown* functions
+    // Note: Callstack and Callpath denotes the same
+    bool GetCallstackIds (
+        AMDTProcessId        processId,
+        AMDTFunctionId       funcId,
+        gtVector<gtUInt32>&  csIds)
+    {
+        GT_UNREFERENCED_PARAMETER(processId);
+        bool ret = false;
+        gtSet<gtUInt32> uniqueSet;
+        gtUInt32 csId = 0;
+
+        std::stringstream query;
+        query << "SELECT DISTINCT callstackId "        \
+                  "FROM  CallstackFrame "     \
+                  "WHERE functionId = ? ;";
+
+        sqlite3_stmt* pQueryStmt = nullptr;
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+
+        if (rc == SQLITE_OK)
+        {
+            sqlite3_bind_int(pQueryStmt, 1, funcId);
+
+            // Execute the query.
+            while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
+            {
+                csId = sqlite3_column_int(pQueryStmt, 0);
+                uniqueSet.insert(csId);
+            }
+        }
+
+        // Finalize the statement.
+        sqlite3_finalize(pQueryStmt);
+
+        // Recursive function which has selfSamples, there will be duplicate callstackIds.
+        // Hence using unique set to avoid duplicate callstackIds
+        query.str("");
+        query << "SELECT DISTINCT callstackId "        \
+                "FROM  CallstackLeaf "     \
+                "WHERE functionId = ? ;";
+
+        pQueryStmt = nullptr;
+        rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+
+        if (rc == SQLITE_OK)
+        {
+            sqlite3_bind_int(pQueryStmt, 1, funcId);
+
+            // Execute the query.
+            while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
+            {
+                csId = sqlite3_column_int(pQueryStmt, 0);
+                uniqueSet.insert(csId);
+            }
+        }
+
+        // Finalize the statement.
+        sqlite3_finalize(pQueryStmt);
+
+        for (auto& id : uniqueSet)
+        {
+            csIds.push_back(id);
+        }
+
+        ret = (SQLITE_DONE == rc) ? true : false;
+        return ret;
+    }
+
 
     //
     // Data members of impl class
@@ -5422,6 +5620,51 @@ bool AmdtDatabaseAccessor::GetFunctionProfileData(
                                               separateByCore,
                                               functionData);
 
+    }
+
+    return ret;
+}
+
+// Query CallStackLeaf
+bool AmdtDatabaseAccessor::GetCallstackLeafData(AMDTProcessId       processId,
+                                                AMDTCounterId       counterId,
+                                                gtUInt32            callStackId,
+                                                CallstackFrameVec&  leafs)
+{
+    bool ret = false;
+
+    if (m_pImpl != nullptr)
+    {
+        ret = m_pImpl->GetCallstackLeafData(processId, counterId, callStackId, leafs);
+    }
+
+    return ret;
+}
+
+// Query CallStackFrame to retrieve the callpath for the given callstackIdx
+bool AmdtDatabaseAccessor::GetCallstackFrameData(AMDTProcessId       processId,
+                                                 gtUInt32            callstackId,
+                                                 CallstackFrameVec&  frames)
+{
+    bool ret = false;
+
+    if (m_pImpl != nullptr)
+    {
+        ret = m_pImpl->GetCallstackFrameData(processId, callstackId, frames);
+    }
+
+    return ret;
+}
+
+bool AmdtDatabaseAccessor::GetCallstackIds(AMDTProcessId        processId,
+                                           AMDTFunctionId       funcId,
+                                           gtVector<gtUInt32>&  csIds)
+{
+    bool ret = false;
+
+    if (m_pImpl != nullptr)
+    {
+        ret = m_pImpl->GetCallstackIds(processId, funcId, csIds);
     }
 
     return ret;
