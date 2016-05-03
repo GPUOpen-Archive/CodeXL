@@ -239,8 +239,6 @@ VkResult VktWrappedQueue::QueueSubmit(VkQueue queue, uint32_t submitCount, const
         {
             VktWrappedCmdBuf* pWrappedCmdBuf = GetWrappedCmdBuf(currSubmit.pCommandBuffers[j]);
 
-            Log(logERROR, "Submitting CmdBuf 0x%p\n", pWrappedCmdBuf->AppHandle());
-
             if (pWrappedCmdBuf != nullptr)
             {
                 pWrappedCmdBuf->SetProfilerExecutionId(m_executionID);
