@@ -2160,7 +2160,7 @@ public:
 
     bool GetCallGraphFunctionInfo(AMDTProcessId processId, AMDTFunctionId funcId, AMDTCallGraphFunctionVec& parents, AMDTCallGraphFunctionVec& children)
     {
-        UNREFERENCED_PARAMETER(processId);
+        GT_UNREFERENCED_PARAMETER(processId);
         bool ret = false;
 
         auto cgFuncIter = m_cgFunctionMap.find(funcId);

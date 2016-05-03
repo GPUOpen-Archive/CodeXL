@@ -4527,7 +4527,7 @@ public:
         gtUInt32            callstackId, // AMDT_PROFILE_ALL_CALLPATHS
         CallstackFrameVec&  leafs)
     {
-        UNREFERENCED_PARAMETER(processId);
+        GT_UNREFERENCED_PARAMETER(processId);
         bool ret = false;
 
         std::stringstream query;
@@ -4594,7 +4594,7 @@ public:
         gtUInt32            callstackId,
         CallstackFrameVec&  frames)
     {
-        UNREFERENCED_PARAMETER(processId);
+        GT_UNREFERENCED_PARAMETER(processId);
         bool ret = false;
 
         std::stringstream query;
@@ -4651,7 +4651,7 @@ public:
         AMDTFunctionId       funcId,
         gtVector<gtUInt32>&  csIds)
     {
-        UNREFERENCED_PARAMETER(processId);
+        GT_UNREFERENCED_PARAMETER(processId);
         bool ret = false;
         gtSet<gtUInt32> uniqueSet;
         gtUInt32 csId = 0;
