@@ -1169,12 +1169,12 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateSemaphore(VkDevice d
         sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p", device, pCreateInfo, pAllocator, pSemaphore);
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
-        result = device_dispatch_table(device)->CreateSemaphoreA(device, pCreateInfo, pAllocator, pSemaphore);
+        result = device_dispatch_table(device)->CreateSemaphore(device, pCreateInfo, pAllocator, pSemaphore);
         g_pInterceptMgr->PostCall(pNewEntry, result);
     }
     else
     {
-        result = device_dispatch_table(device)->CreateSemaphoreA(device, pCreateInfo, pAllocator, pSemaphore);
+        result = device_dispatch_table(device)->CreateSemaphore(device, pCreateInfo, pAllocator, pSemaphore);
     }
 
     return result;
@@ -1211,12 +1211,12 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateEvent(VkDevice devic
         sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p", device, pCreateInfo, pAllocator, pEvent);
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
-        result = device_dispatch_table(device)->CreateEventA(device, pCreateInfo, pAllocator, pEvent);
+        result = device_dispatch_table(device)->CreateEvent(device, pCreateInfo, pAllocator, pEvent);
         g_pInterceptMgr->PostCall(pNewEntry, result);
     }
     else
     {
-        result = device_dispatch_table(device)->CreateEventA(device, pCreateInfo, pAllocator, pEvent);
+        result = device_dispatch_table(device)->CreateEvent(device, pCreateInfo, pAllocator, pEvent);
     }
 
     return result;

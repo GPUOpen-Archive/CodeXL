@@ -10,9 +10,7 @@
 #ifndef __VKT_UTIL_H__
 #define __VKT_UTIL_H__
 
-#ifdef WIN32
-#include <windows.h>
-#elif defined _LINUX
+#if defined _LINUX
 #include <signal.h>
 #endif
 
