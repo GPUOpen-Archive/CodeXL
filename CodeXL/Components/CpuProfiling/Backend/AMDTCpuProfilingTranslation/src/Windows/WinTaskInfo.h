@@ -18,6 +18,7 @@
 #pragma warning(pop)
 
 #include <AMDTBaseTools/Include/gtASCIIString.h>
+#include <AMDTBaseTools/Include/gtHashMap.h>
 #include "TaskInfoMapper.h"
 #include "JitTaskInfo.h"
 
@@ -44,6 +45,7 @@
 #define CA_TASKINFO_DRIVER_NAME "CAPROF"
 
 typedef gtMap<gtUInt64, gtUInt64> PidMap;
+typedef gtHashMap<std::wstring, gtUInt32> ModuleIdMap;
 
 struct ModNameAddrKey
 {
@@ -290,6 +292,7 @@ private:
 
     ModuleMap m_allModulesMap;
     PidMap m_interestingPidMap;
+    ModuleIdMap m_moduleIdMap;
 
     // kernel module map
     KernelModMap m_tiKeModMap;
@@ -323,6 +326,7 @@ private:
     osCriticalSection m_TIMutexModule;
 
     gtUInt32 m_nextModInstanceId = 1;
+    gtInt32 m_nextModuleId = 1;
 };
 
 #endif // _WINTASKINFO_H_

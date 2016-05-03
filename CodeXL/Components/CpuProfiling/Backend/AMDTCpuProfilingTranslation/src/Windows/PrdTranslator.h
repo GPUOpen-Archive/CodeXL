@@ -511,8 +511,6 @@ private:
     KeModQueryInfo* m_pProfilingDrivers;
     unsigned m_countProfilingDrivers;
 
-    gtInt32 m_nextModuleId;
-
     ProcessInfo* FindProcessInfo(ProcessIdType pid) const;
     ProcessInfo& AcquireProcessInfo(ProcessIdType pid);
 
