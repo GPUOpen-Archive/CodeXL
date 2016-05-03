@@ -14,7 +14,7 @@
 #include "../../../Common/Tracing/MultithreadedTraceAnalyzerLayer.h"
 #include "../../../Common/TSingleton.h"
 #include "../Util/vktUtil.h"
-#include "VktAPIEntry.h"
+#include "vktAPIEntry.h"
 
 struct ProfilerResult;
 class VktFrameProfilerLayer;

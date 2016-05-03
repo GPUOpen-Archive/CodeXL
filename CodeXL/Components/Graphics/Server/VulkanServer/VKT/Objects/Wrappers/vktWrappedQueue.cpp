@@ -5,12 +5,12 @@
 /// \brief  A wrapper for queues.
 //=============================================================================
 
-#include "VktWrappedQueue.h"
+#include "vktWrappedQueue.h"
 #include "vktWrappedCmdBuf.h"
 #include "../../vktInterceptManager.h"
 #include "../../vktLayerManager.h"
 #include "../../vktDefines.h"
-#include "../../FrameDebugger/VktFrameDebuggerLayer.h"
+#include "../../FrameDebugger/vktFrameDebuggerLayer.h"
 
 //-----------------------------------------------------------------------------
 /// Profiler results collection worker function.

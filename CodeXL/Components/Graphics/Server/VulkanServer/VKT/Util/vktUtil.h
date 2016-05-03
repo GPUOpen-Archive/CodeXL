@@ -12,6 +12,8 @@
 
 #ifdef WIN32
 #include <windows.h>
+#elif defined _LINUX
+#include <signal.h>
 #endif
 
 // Cross-platform
@@ -180,14 +182,25 @@ std::string DecomposeCommandBufferResetFlagsEnumAsString(UINT flags);
 }
 
 #ifdef _DEBUG
-    /// Break on condition
-    #define VKT_ASSERT(__expr__) if (!(__expr__)) __debugbreak();
+    #ifdef WIN32
+        /// Break on condition
+        #define VKT_ASSERT(__expr__) if (!(__expr__)) __debugbreak();
 
-    /// Always break
-    #define VKT_ASSERT_ALWAYS() __debugbreak();
+        /// Always break
+        #define VKT_ASSERT_ALWAYS() __debugbreak();
 
-    /// Break on a code path which needs implementation
-    #define VKT_ASSERT_NOT_IMPLEMENTED() __debugbreak();
+        /// Break on a code path which needs implementation
+        #define VKT_ASSERT_NOT_IMPLEMENTED() __debugbreak();
+    #else
+        /// Break on condition
+        #define VKT_ASSERT(__expr__) if (!(__expr__)) raise(SIGTRAP);
+
+        /// Always break
+        #define VKT_ASSERT_ALWAYS() raise(SIGTRAP);
+
+        /// Break on a code path which needs implementation
+        #define VKT_ASSERT_NOT_IMPLEMENTED() raise(SIGTRAP);
+    #endif // WIN32
 #else
     /// Break on condition
     #define VKT_ASSERT(__expr__)

@@ -5,8 +5,8 @@
 /// \brief  A Vulkan-specific implementation of a traced thread's data.
 //=============================================================================
 
-#include "VktThreadTraceData.h"
-#include "VktAPIEntry.h"
+#include "vktThreadTraceData.h"
+#include "vktAPIEntry.h"
 
 //-----------------------------------------------------------------------------
 /// Given a SampleId, find the callData that was logged during thread tracing.
