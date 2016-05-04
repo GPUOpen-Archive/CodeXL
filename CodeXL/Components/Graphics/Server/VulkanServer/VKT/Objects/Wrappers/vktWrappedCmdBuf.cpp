@@ -52,17 +52,19 @@ VktWrappedCmdBuf::VktWrappedCmdBuf(const WrappedCmdBufCreateInfo& createInfo) :
 //-----------------------------------------------------------------------------
 void VktWrappedCmdBuf::Free()
 {
+    DestroyProfilers();
+
+    m_alive = false;
+
 #if MEASURE_WHOLE_CMD_BUFS
+    ScopeLock lock(&m_beginEndProfilerMutex);
+
     if (m_pBeginEndProfiler != nullptr)
     {
         delete m_pBeginEndProfiler;
         m_pBeginEndProfiler = nullptr;
     }
 #endif
-
-    DestroyProfilers();
-
-    m_alive = false;
 }
 
 //-----------------------------------------------------------------------------
@@ -184,9 +186,13 @@ ProfilerResultCode VktWrappedCmdBuf::GetCmdBufResultsST(std::vector<ProfilerResu
 //-----------------------------------------------------------------------------
 ProfilerResultCode VktWrappedCmdBuf::GetCmdBufResultsMT(INT64 targetExecId, std::vector<ProfilerResult>& outResults)
 {
-    ScopeLock lock(&m_closedProfilersMutex);
-
     ProfilerResultCode result = PROFILER_SUCCESS;
+
+#if MEASURE_WHOLE_CMD_BUFS
+    result = GetBeginEndResultsMT(outResults);
+#endif
+
+    ScopeLock lock(&m_closedProfilersMutex);
 
     for (UINT i = 0; i < m_closedProfilers.size(); i++)
     {
@@ -199,6 +205,25 @@ ProfilerResultCode VktWrappedCmdBuf::GetCmdBufResultsMT(INT64 targetExecId, std:
                 result = pProfiler->GetCmdBufResults(outResults);
             }
         }
+    }
+
+    return result;
+}
+
+//-----------------------------------------------------------------------------
+/// Synchronized result fetch from our begin/end profiler.
+/// \param outResults A vector of measurement results retrieved from the profiler.
+/// \returns A ProfilerResultCode indicating the operation's success.
+//-----------------------------------------------------------------------------
+ProfilerResultCode VktWrappedCmdBuf::GetBeginEndResultsMT(std::vector<ProfilerResult>& outResults)
+{
+    ScopeLock lock(&m_beginEndProfilerMutex);
+
+    ProfilerResultCode result = PROFILER_SUCCESS;
+
+    if (m_pBeginEndProfiler != nullptr)
+    {
+        result = m_pBeginEndProfiler->GetCmdBufResults(outResults);
     }
 
     return result;

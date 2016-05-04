@@ -50,8 +50,9 @@ public:
 
     ProfilerResultCode BeginCmdMeasurement(const ProfilerMeasurementId* pIdInfo);
     ProfilerResultCode EndCmdMeasurement();
-    ProfilerResultCode GetCmdBufResultsMT(INT64 targetExecId, std::vector<ProfilerResult>& outResults);
     ProfilerResultCode GetCmdBufResultsST(std::vector<ProfilerResult>& outResults);
+    ProfilerResultCode GetCmdBufResultsMT(INT64 targetExecId, std::vector<ProfilerResult>& outResults);
+    ProfilerResultCode GetBeginEndResultsMT(std::vector<ProfilerResult>& outResults);
 
     /// Determine if this command buffer is currently being profiled
     bool IsProfilingEnabled() { return m_pProfiler != nullptr; }
@@ -132,6 +133,9 @@ private:
 
     /// A profiler dedicated to measuring the span of this entire command buffer.
     VktCmdBufProfiler* m_pBeginEndProfiler;
+
+    /// Mutex to lock the usage of profilers used to measure full command buffer duration.
+    mutex m_beginEndProfilerMutex;
 
     /// A vector of closed profiler objects for this CommandBuffer.
     std::vector<VktCmdBufProfiler*> m_closedProfilers;

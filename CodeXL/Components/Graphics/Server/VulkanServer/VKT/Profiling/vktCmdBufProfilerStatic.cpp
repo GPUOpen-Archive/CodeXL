@@ -44,8 +44,8 @@ VktCmdBufProfilerStatic::VktCmdBufProfilerStatic() :
 //-----------------------------------------------------------------------------
 VktCmdBufProfilerStatic::~VktCmdBufProfilerStatic()
 {
-    // This should only be 1-element long
-    VKT_ASSERT(m_cmdBufData.measurementGroups.size() == 1);
+    // Verify this is no greater than 1
+    VKT_ASSERT(m_cmdBufData.measurementGroups.size() <= 1);
 
     for (UINT i = 0; i < m_cmdBufData.measurementGroups.size(); i++)
     {
