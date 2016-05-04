@@ -57,8 +57,8 @@ public:
 
     double GetTimestampFrequency();
 
-    void GatherWrappedCommandBufs(UINT commandBufferCount, const VkCommandBuffer* pCommandBuffers, std::vector<VktWrappedCmdBuf*>& cmdBufsWithProfiledCalls);
-    void SpawnWorker(CalibrationTimestampPair* pTimestampPair, VktWrappedQueue* pQueue, VkFence fenceToWaitOn, bool internalFence, const std::vector<VktWrappedCmdBuf*> cmdBufsWithProfiledCalls);
+    void GatherWrappedCommandBufs(UINT commandBufferCount, const VkCommandBuffer* pCommandBuffers, std::vector<VktWrappedCmdBuf*>& wrappedCmdBufs);
+    void SpawnWorker(CalibrationTimestampPair* pTimestampPair, VktWrappedQueue* pQueue, VkFence fenceToWaitOn, bool internalFence, const std::vector<VktWrappedCmdBuf*> wrappedCmdBufs);
 
     void EndCollection();
 

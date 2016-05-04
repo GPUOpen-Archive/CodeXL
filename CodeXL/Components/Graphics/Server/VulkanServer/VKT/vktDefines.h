@@ -24,10 +24,13 @@
 /// The timeout in Milliseconds to wait on queue's profiler results.
 #define QUEUE_RESULTS_WORKER_TIMEOUT         1000
 
-/// How long to wait for a queue to be done before retrieving results, in nanoseconds
-#define FENCE_TIMEOUT_TIME                   1000000
+/// Use fences to wait on profiler results to come back. Else, wait for idle queue.
+#define GPU_FENCES_FOR_PROFILER_WAIT         1
 
-/// Inject timestamps at the very beginning and at the very end of each command buffer
+/// How long to wait for a queue to be done before retrieving results, in nanoseconds.
+#define GPU_FENCE_TIMEOUT_TIME               100000000
+
+/// Inject timestamps at the very beginning and at the very end of each command buffer.
 #define MEASURE_WHOLE_CMD_BUFS               1
 
 #endif // __VKT_DEFINES_H__

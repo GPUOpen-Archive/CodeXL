@@ -22,7 +22,7 @@ struct WorkerInputs
     VkFence                        fenceToWaitOn;                 ///< The fence we should be waiting on
     CalibrationTimestampPair       timestampPair;                 ///< A pair of timestamps used to align CPU and GPU timelines
     VktWrappedQueue*               pQueue;                        ///< The Queue used to profile calls
-    std::vector<VktWrappedCmdBuf*> commandListsWithProfiledCalls; ///< A vector of CommandBuffers with profiled calls
+    std::vector<VktWrappedCmdBuf*> cmdBufs;                       ///< A vector of known command buffers
     INT64                          executionID;                   ///< Track which ExecuteCommandBuffers() call this worker is for
 };
 
