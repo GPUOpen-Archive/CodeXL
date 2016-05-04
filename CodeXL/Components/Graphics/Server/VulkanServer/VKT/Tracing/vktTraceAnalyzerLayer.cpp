@@ -10,7 +10,7 @@
 //==============================================================================
 
 #include "vktTraceAnalyzerLayer.h"
-#include "VktThreadTraceData.h"
+#include "vktThreadTraceData.h"
 #include "../vktLayerManager.h"
 #include "../vktInterceptManager.h"
 #include "../vktDefines.h"
