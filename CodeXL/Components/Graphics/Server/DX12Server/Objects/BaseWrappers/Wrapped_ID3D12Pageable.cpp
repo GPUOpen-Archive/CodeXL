@@ -44,7 +44,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Pageable::QueryInterface(REFIID riid, vo
     {
         DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-        if (interceptor->ShouldCollectTrace())
+        if (interceptor && interceptor->ShouldCollectTrace())
         {
             ParameterEntry parameters[] =
             {
@@ -87,7 +87,7 @@ ULONG STDMETHODCALLTYPE Wrapped_ID3D12Pageable::AddRef()
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor->ShouldCollectTrace())
+    if (interceptor && interceptor->ShouldCollectTrace())
     {
         DX12APIEntry* pNewEntry = interceptor->PreCall(this, FuncId_IUnknown_AddRef, 0, nullptr);
         result = mRealPageable->AddRef();
@@ -114,7 +114,7 @@ ULONG STDMETHODCALLTYPE Wrapped_ID3D12Pageable::Release()
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor->ShouldCollectTrace())
+    if (interceptor && interceptor->ShouldCollectTrace())
     {
         DX12APIEntry* pNewEntry = interceptor->PreCall(this, FuncId_IUnknown_Release, 0, nullptr);
         result = mRealPageable->Release();
@@ -152,7 +152,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Pageable::GetPrivateData(REFGUID guid, U
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor->ShouldCollectTrace())
+    if (interceptor && interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -187,7 +187,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Pageable::SetPrivateData(REFGUID guid, U
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor->ShouldCollectTrace())
+    if (interceptor && interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -222,7 +222,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Pageable::SetPrivateDataInterface(REFGUI
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor->ShouldCollectTrace())
+    if (interceptor && interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -256,7 +256,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Pageable::SetName(LPCWSTR Name)
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor->ShouldCollectTrace())
+    if (interceptor && interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -289,7 +289,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Pageable::GetDevice(REFIID riid, void** 
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor->ShouldCollectTrace())
+    if (interceptor && interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {

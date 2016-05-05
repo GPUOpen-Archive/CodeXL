@@ -62,6 +62,7 @@ sources = \
 	"src/Translation/CpuProfileWriter.cpp",
 	"src/Translation/ImdReader.cpp",
 	"src/Translation/ImdWriter.cpp",
+	"src/Translation/ProfilerDataDBWriter.cpp",
 ]
 
 csources = \

@@ -15,6 +15,7 @@
 #include <AMDTCommonHeaders/AMDTCommonProfileDataTypes.h>
 #include <AMDTBaseTools/Include/gtString.h>
 #include <AMDTBaseTools/Include/gtVector.h>
+#include <AMDTBaseTools/Include/gtMap.h>
 
 //
 //  typedefs
@@ -29,6 +30,32 @@
 #else
 #define CXLPROFILEDATA_READER_API
 #endif
+
+struct cgEdge
+{
+    AMDTProfileFunctionInfo     m_funcInfo;
+    gtVAddr                     m_moduleBaseAddr = 0;
+
+    AMDTSampleValue             m_selfSamples;
+    AMDTSampleValue             m_deepSamples;
+};
+
+using cgEdgeVec = gtVector<cgEdge>;
+
+struct cgNode
+{
+    AMDTProfileFunctionInfo     m_funcInfo;
+    gtVAddr                     m_moduleBaseAddr = 0;
+
+    cgEdgeVec                   m_callerVec;
+    cgEdgeVec                   m_calleeVec;
+
+    AMDTSampleValue             m_totalSelfSamples;
+    AMDTSampleValue             m_totalDeepSamples;
+    gtUInt32                    m_pathCount = 0;
+};
+
+using functionIdcgNodeMap = gtMap<AMDTFunctionId, cgNode>;
 
 class CXLPROFILEDATA_READER_API cxlProfileDataReader
 {
@@ -86,6 +113,12 @@ public:
                         AMDTUInt32 offset,
                         AMDTUInt32 size,
                         AMDTSourceAndDisasmInfoVec& srcInfo);
+
+    bool GetCallGraphFunctions(AMDTProcessId pid, AMDTCounterId counterId, AMDTCallGraphFunctionVec& cgFuncsVec);
+
+    bool GetCallGraphFunctionInfo(AMDTProcessId pid, AMDTFunctionId funcId, AMDTCallGraphFunctionVec& caller, AMDTCallGraphFunctionVec& callee);
+
+    bool GetCallGraphPaths(AMDTProcessId processId, AMDTFunctionId funcId, gtVector<AMDTCallGraphPath>& paths);
 
 private:
     class Impl;

@@ -268,19 +268,11 @@ CodeXL/Components/ShaderAnalyzer/AMDTKernelAnalyzer/tmp/
 /CodeXL/App/vert.il
 /CodeXL/App/spvLogInfo.txt
 /CodeXL/App/Overview.cxlovr
-/CodeXL/App/tese_patch.il
-/CodeXL/App/tese_pal.il
-/CodeXL/App/tese.spv
-/CodeXL/App/tese.il
-/CodeXL/App/tesc_patch.il
-/CodeXL/App/tesc_pal.il
-/CodeXL/App/tesc.spv
-/CodeXL/App/tesc.il
-/CodeXL/App/geom_patch.il
-/CodeXL/App/geom_pal.il
-/CodeXL/App/geom.spv
-/CodeXL/App/geom.il
-/CodeXL/App/frag_patch.il
-/CodeXL/App/frag_pal.il
-/CodeXL/App/frag.spv
-/CodeXL/App/frag.il
+
+# Linux build files
+*.os
+*.pyc
+.sconsign.dblite
+/CodeXL/variant_release
+/CodeXL/Components/GpuProfiling/Backend/CodeXLGpuProfiler
+/CodeXL/Components/GpuProfiling/**/*.a
