@@ -293,7 +293,9 @@ VktCmdBufProfiler* VktWrappedCmdBuf::InitNewProfiler(ProfilerType profilerType)
 {
     VktCmdBufProfiler* pProfiler = nullptr;
 
-    UINT measurementsPerGroup = 16;
+    // Can currently fit up to 64 timestamps into our query buffer
+    // Three timestamps per measurement: 21*3 = 63
+    UINT measurementsPerGroup = 21;
 
 #if DYNAMIC_PROFILER_GROUP_SIZING
 
