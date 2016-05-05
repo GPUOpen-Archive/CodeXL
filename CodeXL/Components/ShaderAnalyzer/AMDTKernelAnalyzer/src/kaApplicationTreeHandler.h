@@ -137,16 +137,7 @@ public:
     /// \param clFilePath the requested file path
     void selectFileNode(const osFilePath& clFilePath);
 
-    /// Activates the child item for the requested cl file path:
-    /// \param filePath the OpenCL file path
-    /// \param treeItemType the child item type
-    /// \return true iff the cl file exists
-    bool ActivateFileChildItem(const osFilePath& filePath, afTreeItemType treeItemType);
 
-    /// Finds the item data for the node with the requested cl file
-    /// \param filePath the OpenCL file path
-    /// \return the action data attached to the node with the cl file path requested
-    afApplicationTreeItemData* FindFileItemData(const osFilePath& filePath);
 
     /// Return the currently active item data in kernel analyzer tree:
     const afApplicationTreeItemData* activeItemData() const { return m_pActiveItemData; }
@@ -155,9 +146,6 @@ public:
     /// Select an active item cl file node if nothing is select
     void SelectFirstSourceFileNode();
 
-    /// Is handling a created kernel after its creation:
-    /// \param createdCLFilePath the created kernel file path
-    void HandleCreatedKernel(const osFilePath& createdCLFilePath);
 
     /// Checks if a default kernel file should be created:
     bool ShouldCreateDefaultKernel() const { return m_shouldCreateDefaultKernel; };
@@ -333,9 +321,6 @@ private:
     ///update items program node to bold
     void UpdateItemProgramNodeToBold(QTreeWidgetItem* pCurrentItem) const;
 
-    /// makes Source Files node bold when a childe node selected
-    /// \param pCurrentItem
-    void MakeSourceFilesNodeBold(QTreeWidgetItem* pCurrentItem);
 
 public slots:
 
@@ -344,9 +329,6 @@ public slots:
 
     /// handle the build command:
     void OnBuild();
-
-    /// expanding sources node on project name change
-    void OnProjectNameChanged(QTreeWidgetItem*, int);
 
     /// Handle the new file context menu command. If programChildItemType is a rendering stage, the file should be attached to the parent rendering program
     /// \param programChildItemType the item type describing the rendering program stage, on which the file should be attached
@@ -408,6 +390,9 @@ private slots:
     /// Export selected device ISA to CSV
     void OnExportToCSVAction();
 
+    /// Handling tree elements drag move
+    void OnDragMoveEvent(QDragMoveEvent *pEvent);
+
 signals:
     /// Send a signal that a KA document selection was changed in the tree:
     void KADocumentSelectionChanged();
@@ -433,9 +418,6 @@ private:
     /// \return true iff the operation ended successfully
     bool AddProgramCreateTreeItem();
 
-    /// Add the "Source..." tree item to the tree:
-    /// \return true iff the operation ended successfully
-    bool AddSourcesTreeItem();
 
     /// Replace the path in the ka extension data of a tree node
     void SetNewFilePath(QTreeWidgetItem* treeItem, const osFilePath& filePath);
@@ -489,9 +471,6 @@ private:
     /// Build a non pipelined program tree item
     void BuildNPProgramTreeItemNode(kaNonPipelinedProgram* pNPProgram, QTreeWidgetItem* pProgramTreeNodeItem);
 
-    /// Remove utils:
-    /// Remove a file from project
-    void OnRemoveFromProject();
 
     /// Remove a shader from program
     void OnRemoveShaderFromProgram();
@@ -568,7 +547,6 @@ private:
     QTreeWidgetItem* m_pAddFileTreeItem;
     QTreeWidgetItem* m_pNewFileTreeItem;
     QTreeWidgetItem* m_pNewProgramTreeItem;
-    QTreeWidgetItem* m_pSourcesTreeItem;
     const afApplicationTreeItemData* m_pActiveItemData;
 
     /// Context menu actions:
@@ -613,6 +591,9 @@ private:
 
     /// a flag that mark if after the context menu is closed we should take the rename action
     bool m_shouldTakeRenameAction;
+
+    /// a stage shader tree item that was highlighted as a drop destination hint
+    QTreeWidgetItem* m_pLastHintItem = nullptr;
 };
 
 #endif // __KAAPPLICATIONTREEHANDLER_H
