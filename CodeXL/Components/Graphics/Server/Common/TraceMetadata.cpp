@@ -9,7 +9,7 @@
 #include "FrameInfo.h"
 #include "misc.h"
 #include "xml.h"
-#include "OSwrappers.h"
+#include "OSWrappers.h"
 #include <AMDTOSWrappers/Include/osFile.h>
 #include <AMDTOSWrappers/Include/osTime.h>
 #include <AMDTOSWrappers/Include/osDirectory.h>

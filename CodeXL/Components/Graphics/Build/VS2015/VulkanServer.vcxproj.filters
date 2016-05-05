@@ -1,0 +1,197 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\Server\VulkanServer\VKT\Objects\vktWrappedObjectDatabase.cpp">
+      <Filter>VKT\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\VulkanServer\VKT\Objects\vktObjectDatabaseProcessor.cpp">
+      <Filter>VKT\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\VulkanServer\VKT\Objects\vktInstanceBase.cpp">
+      <Filter>VKT\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\VulkanServer\OS\Windows\DllMain.cpp">
+      <Filter>OS\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\VulkanServer\VKT\Util\vktUtil.cpp">
+      <Filter>VKT\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\VulkanServer\VKT\Interception\vktIntercept.cpp">
+      <Filter>VKT\Interception</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\VulkanServer\VKT\FrameDebugger\vktFrameDebuggerLayer.cpp">
+      <Filter>VKT\FrameDebugger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\VulkanServer\VKT\Profiling\vktFrameProfilerLayer.cpp">
+      <Filter>VKT\Profiling</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\VulkanServer\VKT\Profiling\vktCmdBufProfiler.cpp">
+      <Filter>VKT\Profiling</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\VulkanServer\VKT\Rendering\vktImageRenderer.cpp">
+      <Filter>VKT\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\VulkanServer\VKT\Tracing\vktTraceAnalyzerLayer.cpp">
+      <Filter>VKT\Tracing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\VulkanServer\VKT\Objects\Wrappers\vktWrappedObject.cpp">
+      <Filter>VKT\Objects\Wrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\VulkanServer\VKT\Objects\Wrappers\vktWrappedCmdBuf.cpp">
+      <Filter>VKT\Objects\Wrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\VulkanServer\VKT\Tracing\vktAPIEntry.cpp">
+      <Filter>VKT\Tracing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\VulkanServer\VKT\Tracing\vktThreadTraceData.cpp">
+      <Filter>VKT\Tracing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\VulkanServer\VKT\Objects\Wrappers\vktWrappedQueue.cpp">
+      <Filter>VKT\Objects\Wrappers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\VulkanServer\VKT\vktInterceptManager.cpp">
+      <Filter>VKT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\VulkanServer\VKT\vktLayerManager.cpp">
+      <Filter>VKT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\VulkanServer\VKT\vktPlugin.cpp">
+      <Filter>VKT</Filter>
+    </ClCompile>
+    <ClCompile Include="$(CommonDir)\Src\Vulkan\1.0.8.0\LoaderAndValidationLayers\src\vk_layer_extension_utils.cpp">
+      <Filter>LunarG</Filter>
+    </ClCompile>
+    <ClCompile Include="$(CommonDir)\Src\Vulkan\1.0.8.0\LoaderAndValidationLayers\src\vk_layer_table.cpp">
+      <Filter>LunarG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Server\VulkanServer\VKT\Profiling\vktCmdBufProfilerStatic.cpp">
+      <Filter>VKT\Profiling</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Server\VulkanServer\VKT\Objects\vktWrappedObjectDatabase.h">
+      <Filter>VKT\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\VulkanServer\VKT\Objects\vktObjectDatabaseProcessor.h">
+      <Filter>VKT\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\VulkanServer\VKT\Objects\vktInstanceBase.h">
+      <Filter>VKT\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\VulkanServer\VKT\Util\vktUtil.h">
+      <Filter>VKT\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\VulkanServer\VKT\FrameDebugger\vktFrameDebuggerLayer.h">
+      <Filter>VKT\FrameDebugger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\VulkanServer\VKT\Profiling\vktFrameProfilerLayer.h">
+      <Filter>VKT\Profiling</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\VulkanServer\VKT\Profiling\vktCmdBufProfiler.h">
+      <Filter>VKT\Profiling</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\VulkanServer\VKT\Rendering\vktImageRenderer.h">
+      <Filter>VKT\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\VulkanServer\VKT\Tracing\vktTraceAnalyzerLayer.h">
+      <Filter>VKT\Tracing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\VulkanServer\VKT\Objects\Wrappers\vktWrappedObject.h">
+      <Filter>VKT\Objects\Wrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\VulkanServer\VKT\Interception\vktIntercept.h">
+      <Filter>VKT\Interception</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\VulkanServer\VKT\Objects\Wrappers\vktWrappedCmdBuf.h">
+      <Filter>VKT\Objects\Wrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\VulkanServer\VKT\Tracing\vktAPIEntry.h">
+      <Filter>VKT\Tracing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\VulkanServer\VKT\Tracing\vktThreadTraceData.h">
+      <Filter>VKT\Tracing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\VulkanServer\VKT\Objects\Wrappers\vktWrappedQueue.h">
+      <Filter>VKT\Objects\Wrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\VulkanServer\VKT\Profiling\vktWorkerInfo.h">
+      <Filter>VKT\Profiling</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\VulkanServer\VKT\vktDefines.h">
+      <Filter>VKT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\VulkanServer\VKT\vktEnumerations.h">
+      <Filter>VKT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\VulkanServer\VKT\vktInterceptManager.h">
+      <Filter>VKT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\VulkanServer\VKT\vktLayerManager.h">
+      <Filter>VKT</Filter>
+    </ClInclude>
+    <ClInclude Include="$(CommonDir)\Lib\Ext\Vulkan\1.0.8.0\LoaderAndValidationLayers\inc\vk_dispatch_table_helper.h">
+      <Filter>LunarG</Filter>
+    </ClInclude>
+    <ClInclude Include="$(CommonDir)\Lib\Ext\Vulkan\1.0.8.0\LoaderAndValidationLayers\inc\vk_icd.h">
+      <Filter>LunarG</Filter>
+    </ClInclude>
+    <ClInclude Include="$(CommonDir)\Lib\Ext\Vulkan\1.0.8.0\LoaderAndValidationLayers\inc\vk_layer_extension_utils.h">
+      <Filter>LunarG</Filter>
+    </ClInclude>
+    <ClInclude Include="$(CommonDir)\Lib\Ext\Vulkan\1.0.8.0\LoaderAndValidationLayers\inc\vk_layer_table.h">
+      <Filter>LunarG</Filter>
+    </ClInclude>
+    <ClInclude Include="$(CommonDir)\Lib\Ext\Vulkan\1.0.8.0\LoaderAndValidationLayers\inc\vk_loader_platform.h">
+      <Filter>LunarG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\VulkanServer\VKT\Profiling\vktCmdBufProfilerStatic.h">
+      <Filter>VKT\Profiling</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="VKT">
+      <UniqueIdentifier>{023e99ec-1659-40dd-838f-c7303ce6b2b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="VKT\Objects">
+      <UniqueIdentifier>{ac77c509-f40d-4158-a18c-874eb3c08e58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="VKT\Util">
+      <UniqueIdentifier>{268c033e-720b-4881-abc6-e860f15a025f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="VKT\Interception">
+      <UniqueIdentifier>{fb29ea25-65ea-43f5-87da-b69fa67cd35c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OS">
+      <UniqueIdentifier>{6d793ade-78e2-48b7-bbe7-959b1bd2e89a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="OS\Windows">
+      <UniqueIdentifier>{243b02db-b43d-497f-95ec-61289a2c4f14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="VKT\Profiling">
+      <UniqueIdentifier>{8ad2d5c3-ebc9-4a30-8eb8-1c04085d8058}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="VKT\FrameDebugger">
+      <UniqueIdentifier>{ac2f7074-3e23-4cd1-8d6e-ca3e39e80242}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="VKT\Rendering">
+      <UniqueIdentifier>{aba95b39-337f-49a9-9ff5-768f6c10271e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="VKT\Tracing">
+      <UniqueIdentifier>{beced3b5-7fd1-4dfa-9b8f-eca774bd42bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="VKT\Objects\Wrappers">
+      <UniqueIdentifier>{e36b13ac-4ede-4352-bfc3-b383cb580400}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LunarG">
+      <UniqueIdentifier>{9053dd1b-18a3-4486-9bd8-50bed2b3d943}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Server\VulkanServer\VKT\Rendering\FsQuadToBuffer.frag">
+      <Filter>VKT\Rendering</Filter>
+    </None>
+    <None Include="..\..\Server\VulkanServer\VKT\Rendering\FsQuadToBuffer.vert">
+      <Filter>VKT\Rendering</Filter>
+    </None>
+  </ItemGroup>
+</Project>

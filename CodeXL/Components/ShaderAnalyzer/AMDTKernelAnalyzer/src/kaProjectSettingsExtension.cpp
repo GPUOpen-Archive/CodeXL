@@ -177,7 +177,7 @@ bool kaProjectSettingsExtension::SetSettingsFromXMLString(const gtString& projec
     }
 
     QString macrosStr = KA_PROJECT_DATA_MGR_INSTANCE.KernelMacros();
-    GT_IF_WITH_ASSERT(NULL != m_pMacrosLineEdit)
+    GT_IF_WITH_ASSERT(nullptr != m_pMacrosLineEdit)
     {
         m_pMacrosLineEdit->setText(macrosStr);
     }
@@ -211,7 +211,7 @@ bool kaProjectSettingsExtension::SaveCurrentSettings()
     }
 
     // set macros to project data
-    GT_IF_WITH_ASSERT(NULL != m_pMacrosLineEdit)
+    GT_IF_WITH_ASSERT(nullptr != m_pMacrosLineEdit)
     {
         KA_PROJECT_DATA_MGR_INSTANCE.SetKernelMacros(m_pMacrosLineEdit->text());
     }
@@ -227,7 +227,7 @@ bool kaProjectSettingsExtension::SaveCurrentSettings()
 // ---------------------------------------------------------------------------
 void kaProjectSettingsExtension::RestoreDefaultProjectSettings()
 {
-    if (NULL != m_pCommandTextEdit)
+    if (nullptr != m_pCommandTextEdit)
     {
         m_pCommandTextEdit->setPlainText("");
     }

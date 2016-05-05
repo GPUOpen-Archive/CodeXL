@@ -15,11 +15,7 @@
 ThreadTraceData::ThreadTraceData()
 {
     // Initialize this to known garbage so we can check it later. It should *always* be overwritten by real data.
-#ifdef _WIN32
     m_startTime.QuadPart = s_DummyTimestampValue;
-#else
-    m_startTime = s_DummyTimestampValue;
-#endif
 
     // We should expect a lot of entries within this structure, so make it large enough up front.
     // @PERFORMANCE @TODO: Do we really need to reserve space for APIEntries?

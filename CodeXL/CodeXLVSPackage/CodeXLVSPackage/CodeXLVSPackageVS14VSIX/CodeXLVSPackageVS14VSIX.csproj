@@ -129,8 +129,12 @@
     <PreBuildEvent>cd $(ProjectDir)\..\..\
 Edit_CodeXL_App_Settings.bat  $(AMDTOutputDir)$(Configuration)\bin\ $(ProjectDir)
 </PreBuildEvent>
-    <PostBuildEvent>cd $(ProjectDir)\..\..\
-CopyReleaseVSProjectFilesByAccessType.bat VS14</PostBuildEvent>
+    <PostBuildEvent>if $(ConfigurationName) == Release (
+      cd $(ProjectDir)\..\..\
+      CopyReleaseVSProjectFilesByAccessType.bat VS14
+) ELSE (
+  echo "No post build in Debug".
+)</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
