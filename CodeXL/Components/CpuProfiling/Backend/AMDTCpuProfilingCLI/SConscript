@@ -30,7 +30,7 @@ linker_flags = " -Wl,-rpath,'$$ORIGIN' "
 env.Append(LINKFLAGS = linker_flags)
 
 # Include path
-env.Append( CPPPATH = [
+env.Append( CPPPATH = [ 
     ".",
     "./inc",
     "./src/",
@@ -67,8 +67,6 @@ env.Append(LIBS = [
     "CXLCpuProfilingTranslation",
     "CXLCpuProfilingRawData",
     "CXLCpuProfilingControl",
-    "CXLProfilerDAL",
-    "CXLDbAdapter",
     "CXLBaseTools",
     "CXLOSWrappers",
     "libpthread",
@@ -84,21 +82,21 @@ resources = \
     "LinuxResources/CodeXLCpuProfiler"
 ]
 
-# Creating object files
+# Creating object files	
 objFiles = env.SharedObject(sources)
 
 # Creating shared libraries
 exe = env.Program(
-    target = appName,
+    target = appName, 
     source = objFiles)
 
 # Installing libraries
-libInstall = env.Install(
-    dir = env['CXL_lib_dir'],
+libInstall = env.Install( 
+    dir = env['CXL_lib_dir'], 
     source = (exe))
 
-libInstall += env.Install(
-    dir = env['CXL_lib_dir'],
+libInstall += env.Install( 
+    dir = env['CXL_lib_dir'], 
     source = (resources))
 
 Return('libInstall')

@@ -1163,7 +1163,7 @@ AMDTResult ppCollect::GetProcessData(AMDTUInt32* pPIDCount, AMDTPwrProcessInfo**
         m_nbrSamples = 0;
         m_pSampleData = nullptr;
 
-        ret = AMDTGetProcessProfileData(&pidCnt, &pData, AMD_PWR_ALL_PIDS, false);
+        ret = AMDTReadProcessProfileData(&pidCnt, &pData);
 
         if ((AMDT_STATUS_OK == m_error) && (pidCnt > 0) && (nullptr != pData))
         {

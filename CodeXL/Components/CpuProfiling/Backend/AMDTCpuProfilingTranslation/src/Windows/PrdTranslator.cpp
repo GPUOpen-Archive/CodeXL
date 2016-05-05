@@ -378,6 +378,8 @@ PrdTranslator::PrdTranslator(QString dataFile, bool collectStat) : m_pfnProgress
     m_pSearchPath = NULL;
     m_pServerList = NULL;
     m_pCachePath = NULL;
+
+    m_nextModuleId = 1;
 }
 
 PrdTranslator::~PrdTranslator()
@@ -985,7 +987,7 @@ void PrdTranslator::InitNewModule(CpuProfileModule& mod,
 
     mod.setPath(ModName);
     mod.m_base = pModInfo->ModuleStartAddr;
-    mod.m_moduleId = pModInfo->moduleId;
+    mod.m_moduleId = AtomicAdd(m_nextModuleId, 1);
     mod.m_moduleInstanceInfo.emplace_back(pModInfo->processID, pModInfo->ModuleStartAddr, pModInfo->instanceId);
 
     // currently I don't use size and tsc in CA --Lei
@@ -1108,7 +1110,7 @@ void PrdTranslator::AggregateUnknownModuleSampleData(
         mod.m_size = 0;
         mod.m_is32Bit = fnIsJITProcess32Bit(pModInfo->processID);
         b_is32bit = mod.m_is32Bit;
-        mod.m_moduleId = pModInfo->moduleId;
+        mod.m_moduleId = AtomicAdd(m_nextModuleId, 1);
         mod.m_moduleInstanceInfo.emplace_back(pModInfo->processID, pModInfo->ModuleStartAddr, pModInfo->instanceId);
 
         // CLU profiles IBS Op event, record IBS sample only when profiling IBS Op
@@ -3154,7 +3156,6 @@ bool PrdTranslator::AggregateThreadMaps(PidProcessList& procList, NameModuleList
     auto miIter = modInstanceList.begin();
     modInstanceMap = *miIter;
     ++miIter;
-
     while (miIter != modInstanceList.end())
     {
         ModInstanceMap* miMap = *miIter;

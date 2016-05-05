@@ -786,16 +786,16 @@ void ObjectDatabaseProcessor::BuildObjectTreeResponse(gtASCIIString& outObjectTr
                 xmlFile.readIntoString(outObjectTreeXml);
                 xmlFile.close();
 
-                Log(logMESSAGE, "Read XML tree from '%s'.\n", fullFilepathAsGTString.asASCIICharArray());
+                Log(logMESSAGE, "Read XML tree from '%s'.\n", fullFilepathAsGTString);
             }
             else
             {
-                Log(logERROR, "Failed to open file for xml read: '%s'\n", fullFilepathAsGTString.asASCIICharArray());
+                Log(logERROR, "Failed to open file for xml read: '%s'\n", fullFilepathAsGTString);
             }
         }
         else
         {
-            Log(logERROR, "Xml read, file missing: '%s'\n", fullFilepathAsGTString.asASCIICharArray());
+            Log(logERROR, "Xml read, file missing: '%s'\n", fullFilepathAsGTString);
         }
     }
 }

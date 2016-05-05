@@ -871,7 +871,6 @@
             SV_Depth, SV_DispatchThreadID, SV_DomainLocation, SV_GroupID, SV_GroupIndex, SV_GroupThreadID, SV_GSInstanceID,\
             SV_InsideTessFactor, SV_IsFrontFace, SV_OutputControlPointID, SV_Position, SV_RenderTargetArrayIndex, SV_SampleIndex,\
 SV_Target[*], SV_TessFactor, SV_ViewportArrayIndex, SV_PrimitiveID, SV_VertexID, packoffsetregister"
-#define KA_STR_ProgrammingKeyWords "for,while,foreach,if,switch"
 
 // Enhanced ISA view.
 #define KA_STR_NA_VALUE "Varies"

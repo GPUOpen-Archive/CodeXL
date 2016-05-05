@@ -12,7 +12,7 @@
 #include "../ModernAPIFrameProfilerLayer.h"
 #include "../TraceMetadata.h"
 #include "../FrameInfo.h"
-#include "../OSWrappers.h"
+#include "../OSwrappers.h"
 #include <AMDTOSWrappers/Include/osFile.h>
 #include <AMDTOSWrappers/Include/osTime.h>
 #include <AMDTOSWrappers/Include/osDirectory.h>
@@ -752,9 +752,7 @@ void MultithreadedTraceAnalyzerLayer::Clear()
 //--------------------------------------------------------------------------
 ThreadTraceData* MultithreadedTraceAnalyzerLayer::FindOrCreateThreadData(DWORD inThreadId)
 {
-    // Need to lock here to control access into our thread trace map
-    ScopeLock mapInsertionLock(&mTraceMutex);
-
+    // We don't need to lock yet. map::find is threadsafe.
     ThreadTraceData* resultTraceData = NULL;
     ThreadIdToTraceData::iterator traceIter = mThreadTraces.find(inThreadId);
 
@@ -764,6 +762,9 @@ ThreadTraceData* MultithreadedTraceAnalyzerLayer::FindOrCreateThreadData(DWORD i
     }
     else
     {
+        // We need to lock here- we're going to insert a new instance into our thread trace map.
+        ScopeLock mapInsertionLock(&mTraceMutex);
+
         // Insert the new ThreadData struct into the map to hold them all.
         resultTraceData = CreateThreadTraceDataInstance();
         mThreadTraces[inThreadId] = resultTraceData;
@@ -812,7 +813,7 @@ bool MultithreadedTraceAnalyzerLayer::WriteTraceAndMetadataFiles(const gtASCIISt
     // If we've successfully opened the metadata file, we'll also attempt to write the trace file.
     if (bMetadataFileOpened == false)
     {
-        Log(logERROR, "Failed to open trace metadata file for writing: '%s'\n", smd.metadataFilename.asCharArray());
+        Log(logERROR, "Failed to open trace metadata file for writing: '%s'\n", smd.metadataFilename);
         return false;
     }
 

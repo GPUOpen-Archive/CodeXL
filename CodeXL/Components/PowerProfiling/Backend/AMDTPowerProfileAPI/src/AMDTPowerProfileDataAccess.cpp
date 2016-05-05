@@ -18,18 +18,15 @@
 #include <iostream>
 #include <thread>
 #include <mutex>
-#include <unordered_map>
 
 static bool g_isOnline = false;
 static PowerProfileTranslate* g_pTranslate = nullptr;
 static AMDTPwrProfileConfig g_currentCfg;
-static AMDTPwrProcessInfo g_pidInfo[MAX_PID_CNT];
 
 osCriticalSection driverCriticalSection;
 
 static AMDTPwrProcessedDataRecord* pProcData = nullptr;
 static AMDTPwrProcessedDataRecord* pprevProcData = nullptr;
-std::unordered_map<AMDTUInt32, AMDTPwrProcessInfo> g_lastAggrPidPwrMap;
 
 extern PowerData   g_aggrPidPowerList;
 
@@ -163,162 +160,21 @@ AMDTResult AMDTGetCounterValues(AMDTPwrProcessedDataRecord* pData)
     return ret;
 }
 
-// GetCummulativePidProfDataFromStart: Get power data for process
-AMDTResult GetCummulativePidProfDataFromStart(AMDTUInt32* pPIDCount,
-                                              AMDTPwrProcessInfo** ppData,
-                                              AMDTUInt32 pidVal)
+// AMDTGetProcessProfileData: Get Process profile infornation list.
+// This is a list of PIDs and their corresponding power indicators
+AMDTResult AMDTGetProcessProfileData(AMDTUInt32* pPIDCount, AMDTPwrProcessInfo** ppData)
 {
-    AMDTResult ret = AMDT_ERROR_NODATA;
+    AMDTResult ret = AMDT_STATUS_OK;
 
     if (g_aggrPidPowerList.m_numberOfPids > 0)
     {
-        if (AMD_PWR_ALL_PIDS == pidVal)
-        {
-            *pPIDCount = g_aggrPidPowerList.m_numberOfPids;
-            *ppData = &g_aggrPidPowerList.m_process[0];
-            ret = AMDT_STATUS_OK;
-        }
-        else
-        {
-            for (AMDTUInt32 idx = 0; idx < g_aggrPidPowerList.m_numberOfPids; ++idx)
-            {
-                if (pidVal == g_aggrPidPowerList.m_process[idx].m_pid)
-                {
-                    *pPIDCount = 1;
-                    *ppData = &g_aggrPidPowerList.m_process[idx];
-                    ret = AMDT_STATUS_OK;
-                    break;
-                }
-            }
-        }
-    }
-
-    return ret;
-}
-
-AMDTResult GetCummulativePidProfDataInstatant(AMDTUInt32* pPIDCount,
-                                              AMDTPwrProcessInfo** ppData,
-                                              AMDTUInt32 pidVal)
-{
-    AMDTResult ret = AMDT_STATUS_OK;
-
-    // first call to this function
-    if (g_lastAggrPidPwrMap.empty())
-    {
-        if (g_aggrPidPowerList.m_numberOfPids > 0)
-        {
-            // Copy g_aggrPidPowerData to an unordered-map for later processing
-            for (AMDTUInt32 idx = 0; idx < g_aggrPidPowerList.m_numberOfPids; ++idx)
-            {
-                g_lastAggrPidPwrMap.insert({ g_aggrPidPowerList.m_process[idx].m_pid, g_aggrPidPowerList.m_process[idx] });
-            }
-
-            if (AMD_PWR_ALL_PIDS == pidVal)
-            {
-                *pPIDCount = g_aggrPidPowerList.m_numberOfPids;
-                *ppData = &g_aggrPidPowerList.m_process[0];
-            }
-            else
-            {
-                // find pid in map
-                auto pidFindItr = g_lastAggrPidPwrMap.find(pidVal);
-
-                if (g_lastAggrPidPwrMap.end() != pidFindItr)
-                {
-                    *pPIDCount = 1;
-                    *ppData = &pidFindItr->second;
-                }
-                else
-                {
-                    // error
-                    ret = AMDT_ERROR_NODATA;
-                }
-            }
-        }
-        else
-        {
-            ret = AMDT_ERROR_NODATA;
-        }
+        *pPIDCount = g_aggrPidPowerList.m_numberOfPids;
+        *ppData = &g_aggrPidPowerList.m_process[0];
     }
     else
     {
-        AMDTUInt32 count = 0;
-        memset(g_pidInfo, 0, sizeof(AMDTUInt32) * MAX_PID_CNT);
-
-        for (AMDTUInt32 idx = 0; idx < g_aggrPidPowerList.m_numberOfPids; ++idx)
-        {
-            auto itr = g_lastAggrPidPwrMap.find(g_aggrPidPowerList.m_process[idx].m_pid);
-
-            if (g_lastAggrPidPwrMap.end() != itr)
-            {
-                // entry found
-                g_pidInfo[count].m_ipc = g_aggrPidPowerList.m_process[idx].m_ipc - itr->second.m_ipc;
-                g_pidInfo[count].m_power = g_aggrPidPowerList.m_process[idx].m_power - itr->second.m_power;
-                g_pidInfo[count].m_sampleCnt = g_aggrPidPowerList.m_process[idx].m_sampleCnt - itr->second.m_sampleCnt;
-            }
-            else
-            {
-                // entry not found
-                g_pidInfo[count].m_ipc = g_aggrPidPowerList.m_process[idx].m_ipc;
-                g_pidInfo[count].m_power = g_aggrPidPowerList.m_process[idx].m_power;
-                g_pidInfo[count].m_sampleCnt = g_aggrPidPowerList.m_process[idx].m_sampleCnt;
-            }
-
-            strcpy(g_pidInfo[count].m_name, g_aggrPidPowerList.m_process[idx].m_name);
-            strcpy(g_pidInfo[count].m_path, g_aggrPidPowerList.m_process[idx].m_path);
-            g_pidInfo[count].m_pid = g_aggrPidPowerList.m_process[idx].m_pid;
-            ++count;
-        }
-
-        if (AMD_PWR_ALL_PIDS == pidVal)
-        {
-            *pPIDCount = count;
-            *ppData = &g_pidInfo[0];
-        }
-        else
-        {
-            for (AMDTUInt32 pid = 0; pid < count; ++pid)
-            {
-                if (pidVal == g_pidInfo[pid].m_pid)
-                {
-                    *pPIDCount = 1;
-                    *ppData = &g_pidInfo[pid];
-                    break;
-                }
-            }
-        }
-
-        if (g_aggrPidPowerList.m_numberOfPids > 0)
-        {
-            g_lastAggrPidPwrMap.clear();
-
-            // Copy g_aggrPidPowerData
-            for (AMDTUInt32 idx = 0; idx < g_aggrPidPowerList.m_numberOfPids; ++idx)
-            {
-                g_lastAggrPidPwrMap.insert({ g_aggrPidPowerList.m_process[idx].m_pid, g_aggrPidPowerList.m_process[idx] });
-            }
-        }
-    }
-
-    return ret;
-}
-
-// AMDTGetCummulativePidProfData: Get Process profile infornation list.
-// This is a list of PIDs and their corresponding power indicators
-AMDTResult AMDTGetCummulativePidProfData(AMDTUInt32* pPIDCount,
-                                         AMDTPwrProcessInfo** ppData,
-                                         AMDTUInt32 pidVal,
-                                         bool reset)
-{
-    AMDTResult ret = AMDT_STATUS_OK;
-
-    if (false == reset)
-    {
-        ret = GetCummulativePidProfDataFromStart(pPIDCount, ppData, pidVal);
-    }
-    else
-    {
-        ret = GetCummulativePidProfDataInstatant(pPIDCount, ppData, pidVal);
+        ret = AMDT_ERROR_NODATA;
+        PwrTrace("data not avaiolable");
     }
 
     return ret;

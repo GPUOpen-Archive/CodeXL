@@ -255,26 +255,6 @@ GpuDebuggingPlugins += GpuDebugging_Obj
 # Make GpuDebuggingPlugins depending on Framework
 CXL_env.Depends(GpuDebuggingPlugins , FrameworkComponents) 
 
-#############################################
-# Profiler Common Section
-#############################################
-ProfilerCommonPlugins = []
-
-AMDTProfilerDAL_Obj = SConscript('Components/DatabaseLayer/AMDTProfilerDAL/SConscript', variant_dir=obj_variant_dir+'/AMDTProfilerDAL', duplicate=1)
-CXL_env.Depends( AMDTProfilerDAL_Obj,
-	OSWrappers_Obj +
-	BaseTools_Obj)
-
-ProfilerCommonPlugins += AMDTProfilerDAL_Obj
-
-AMDTDbAdapter_Obj = SConscript('Components/DatabaseLayer/AMDTDbAdapter/SConscript', variant_dir=obj_variant_dir+'/AMDTDbAdapter', duplicate=1)
-CXL_env.Depends( AMDTDbAdapter_Obj,
-	OSWrappers_Obj +
-	BaseTools_Obj +
-    AMDTProfilerDAL_Obj)
-
-ProfilerCommonPlugins += AMDTDbAdapter_Obj
-
 ############################################
 #
 # CPUProfiling Plugin Section
@@ -351,19 +331,6 @@ CXL_env.Depends( libThreadProfileAPI_Obj,
  
 ThreadProfilingPlugins += libThreadProfileAPI_Obj
 
-AMDTProfilingDataAccess_Obj = SConscript('Components/CpuProfiling/Backend/AMDTCpuProfilingDataAccess/SConscript', variant_dir=obj_variant_dir+'/AMDTCpuProfilingDataAccess', duplicate=1)
-CXL_env.Depends( AMDTProfilingDataAccess_Obj,
-	OSWrappers_Obj +
-	BaseTools_Obj +
-	libDisassembler_Obj +
-	libExecutableFormat_Obj +
-	libCpuCallstackSampling_Obj +
-	libCpuPerfEventUtils_Obj +
-	libCpuProfilingDataAccess_Obj +
-	libCpuProfilingTranslation_Obj +
-    AMDTDbAdapter_Obj)
-CpuProfilingPlugins += AMDTProfilingDataAccess_Obj
-
 AMDTCpuProfilingCLI_Obj = SConscript('Components/CpuProfiling/Backend/AMDTCpuProfilingCLI/SConscript', variant_dir=obj_variant_dir+'/AMDTCpuProfilingCLI', duplicate=1)
 CXL_env.Depends( AMDTCpuProfilingCLI_Obj,
 	OSWrappers_Obj +
@@ -374,7 +341,6 @@ CXL_env.Depends( AMDTCpuProfilingCLI_Obj,
 	libCpuPerfEventUtils_Obj +
 	libCpuProfilingDataAccess_Obj +
 	libCpuProfilingTranslation_Obj +
-	AMDTProfilingDataAccess_Obj +
 	libThreadProfileAPI_Obj)
 CpuProfilingPlugins += AMDTCpuProfilingCLI_Obj
 
@@ -399,6 +365,27 @@ CpuProfilingPlugins += OverallCpuProf_Obj
 
 # Make CpuProfilingPlugins depending on Framework
 CXL_env.Depends(CpuProfilingPlugins , FrameworkComponents) 
+
+
+#############################################
+# Profiler Common Section
+#############################################
+ProfilerCommonPlugins = []
+
+AMDTProfilerDAL_Obj = SConscript('Components/DatabaseLayer/AMDTProfilerDAL/SConscript', variant_dir=obj_variant_dir+'/AMDTProfilerDAL', duplicate=1)
+CXL_env.Depends( AMDTProfilerDAL_Obj,
+	OSWrappers_Obj +
+	BaseTools_Obj)
+
+ProfilerCommonPlugins += AMDTProfilerDAL_Obj
+
+AMDTDbAdapter_Obj = SConscript('Components/DatabaseLayer/AMDTDbAdapter/SConscript', variant_dir=obj_variant_dir+'/AMDTDbAdapter', duplicate=1)
+CXL_env.Depends( AMDTDbAdapter_Obj,
+	OSWrappers_Obj +
+	BaseTools_Obj)
+
+ProfilerCommonPlugins += AMDTDbAdapter_Obj
+
 
 #############################################
 # Power Profling Section

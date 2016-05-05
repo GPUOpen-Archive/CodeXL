@@ -99,8 +99,6 @@ kaProjectDataManager::kaProjectDataManager() : m_shaderD3dBuildOptionsMask(0),
     m_sourceFileManager.reset(new kaFileManager());
 
     QString tmpStr = KA_STR_HLSLSemanticKeyWords;
-    tmpStr += "," + QString(KA_STR_ProgrammingKeyWords);
-
     tmpStr.remove('\t');
     tmpStr.remove(' ');
     QStringList wordsList = tmpStr.split(',');

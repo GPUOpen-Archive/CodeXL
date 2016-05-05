@@ -70,7 +70,7 @@ const gtString COMPRESSED_FILE_SUFFIX = L"_zipped";
 
 // Executable names and paths:
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    #define DMN_REMOTE_DEBUGGING_SERVER_EXECUTABLE_NAME L"CXLRemoteDebuggingServer" GDT_PROJECT_SUFFIX_W
+    #define DMN_REMOTE_DEBUGGING_SERVER_EXECUTABLE_NAME L"AMDTRemoteDebuggingServer" GDT_PROJECT_SUFFIX_W
     #define DMN_REMOTE_DEBUGGING_SERVER_EXECUTABLE_EXTENSION L"exe"
     #define DMN_PROFILER_BACKEND_32_BIT_SUBFOLDER OS_STR_32BitDirectoryName
     #define DMN_PROFILER_BACKEND_64_BIT_SUBFOLDER OS_STR_64BitDirectoryName
@@ -79,7 +79,7 @@ const gtString COMPRESSED_FILE_SUFFIX = L"_zipped";
     #define DMN_PROFILER_BACKEND_EXECUTABLE_EXTENSION L"exe"
 #elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
     // Linux version has same name for both debug and release builds:
-    #define DMN_REMOTE_DEBUGGING_SERVER_EXECUTABLE_NAME L"CXLRemoteDebuggingServer"
+    #define DMN_REMOTE_DEBUGGING_SERVER_EXECUTABLE_NAME L"AMDTRemoteDebuggingServer"
     #define DMN_REMOTE_DEBUGGING_SERVER_EXECUTABLE_EXTENSION L""
     // Linux does not currently support 32-bit profiling, so we do not have an L"x86" option:
     #define DMN_PROFILER_BACKEND_32_BIT_SUBFOLDER OS_STR_64BitDirectoryName

@@ -450,8 +450,6 @@ void DX12FrameProfilerLayer::SetProfiledFuncs()
     mbProfiledFuncs[FuncId_ID3D12GraphicsCommandList_ClearDepthStencilView] = true;
     mbProfiledFuncs[FuncId_ID3D12GraphicsCommandList_ClearUnorderedAccessViewUint] = true;
     mbProfiledFuncs[FuncId_ID3D12GraphicsCommandList_ClearUnorderedAccessViewFloat] = true;
-
-    mbProfiledFuncs[FuncId_ID3D12GraphicsCommandList_ResourceBarrier] = true;
 }
 
 //-----------------------------------------------------------------------------

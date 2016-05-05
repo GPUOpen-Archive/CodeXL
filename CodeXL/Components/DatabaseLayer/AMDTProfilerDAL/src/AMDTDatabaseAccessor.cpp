@@ -17,7 +17,6 @@
 // Infra.
 #include <AMDTBaseTools/Include/gtAssert.h>
 #include <AMDTBaseTools/Include/gtVector.h>
-#include <AMDTBaseTools/Include/gtSet.h>
 #include <AMDTOSWrappers/Include/osDebugLog.h>
 #include <AMDTOSWrappers/Include/osTimeInterval.h>
 
@@ -38,9 +37,6 @@
 #define IS_CORE_QUERY(coreMask_)                        (coreMask_ != AMDT_PROFILE_ALL_CORES)
 #define IS_ALL_COUNTER_QUERY(counterId_)                (counterId_ == AMDT_PROFILE_ALL_COUNTERS)
 #define IS_ALL_CORE_QUERY(coreMask_)                    (coreMask_ == AMDT_PROFILE_ALL_CORES)
-
-#define IS_ALL_CALLSTACK_QUERY(cs_)                     (cs_ == AMDT_PROFILE_ALL_CALLPATHS)
-#define IS_CALLSTACK_QUERY(cs_)                         (cs_ != AMDT_PROFILE_ALL_CALLPATHS)
 
 #ifdef PP_DAL_TEST
 
@@ -93,6 +89,7 @@ const std::vector<std::string> SQL_CREATE_DB_STMTS_TIMELINE =
 
 const std::vector<std::string> SQL_CREATE_DB_STMTS_AGGREGATION =
 {
+    //TODO: For some tables, ROWID can be used as PK instead of explicit PK column. We can remove such columns.
     "CREATE TABLE Core (id INTEGER NOT NULL PRIMARY KEY, processorId INTEGER, numaNodeId INTEGER)",
     "CREATE TABLE SamplingCounter (id INTEGER NOT NULL PRIMARY KEY, name TEXT, description TEXT)",
     "CREATE TABLE SamplingConfiguration (id INTEGER PRIMARY KEY, counterId INTEGER, samplingInterval INTEGER, unitMask INTEGER, isUserMode INTEGER, isOsMode INTEGER, edge INTEGER)",
@@ -104,9 +101,11 @@ const std::vector<std::string> SQL_CREATE_DB_STMTS_AGGREGATION =
     "CREATE TABLE Function (id INTEGER PRIMARY KEY, moduleId INTEGER, name TEXT, startOffset INTEGER, size INTEGER, sourceFileId INTEGER)", // FOREIGN KEY(moduleId) REFERENCES module(id)
     "CREATE TABLE SampleContext (id INTEGER PRIMARY KEY AUTOINCREMENT, processThreadId INTEGER, moduleInstanceId INTEGER, coreSamplingConfigurationId INTEGER, functionId INTEGER, offset INTEGER, count INTEGER, sourceLine INTEGER DEFAULT 0)", // FOREIGN KEY(processThreadId) REFERENCES ProcessThread(rowid), FOREIGN KEY(moduleInstanceId) REFERENCES ModuleInstance(id), FOREIGN KEY(coreSamplingConfigurationId) REFERENCES CoreSamplingConfiguration(id)
     "CREATE TABLE SourceFile (path TEXT)",
-    "CREATE TABLE CallstackFrame (callstackId INTEGER NOT NULL, functionId INTEGER, offset INTEGER, depth INTEGER)", // FOREIGN KEY(functionId) REFERENCES Function(id)
-    "CREATE TABLE CallstackLeaf (callstackId INTEGER NOT NULL, functionId INTEGER, offset INTEGER, samplingConfigurationId INTEGER, selfSamples INTEGER)", // FOREIGN KEY(functionId) REFERENCES Function(id)
-    //"CREATE TABLE Callgraph (id INTEGER NOT NULL, callerId INTEGER, calleeId INTEGER, edgeLevel INTEGER)", // FOREIGN KEY(callerId) REFERENCES Function(id), FOREIGN KEY(calleeId) REFERENCES Function(id), FOREIGN KEY(samplingConfigurationId) REFERENCES SamplingConfiguration(id)
+    //"CREATE TABLE SampleOccurrences (sampleContextId INTEGER NOT NULL, elapsedTime INTEGER, callstackId INTEGER)", // FOREIGN KEY(sampleContextId) REFERENCES SampleContext(id)
+    //"CREATE TABLE Callstack (id INTEGER NOT NULL PRIMARY KEY)",
+    //"CREATE TABLE CallstackFrame (callstackId INTEGER NOT NULL, functionId INTEGER, offset INTEGER, level INTEGER)", // FOREIGN KEY(callstackId) REFERENCES Callstack(id), FOREIGN KEY(functionId) REFERENCES Function(id)
+    //"CREATE TABLE CallstackLeaf (callstackId INTEGER NOT NULL, functionId INTEGER, offset INTEGER, totalNumberOfSamples INTEGER, sampleContextId INTEGER)", // FOREIGN KEY(callstackId) REFERENCES Callstack(id), FOREIGN KEY(functionId) REFERENCES Function(id), FOREIGN KEY(sampleContextId) REFERENCES SampleContextId(id)
+    //"CREATE TABLE Callgraph (id INTEGER NOT NULL, callerId INTEGER, calleeId INTEGER, edgeLevel INTEGER)", // FOREIGN KEY(callerId) REFERENCES Function(id), FOREIGN KEY(calleeId) REFERENCES Function(id)
     //"CREATE TABLE CallgraphSampleAggregation (callgraphId INTEGER NOT NULL, sampleContextId INTEGER, selfSamples INTEGER, deepSamples INTEGER)", // FOREIGN KEY(callgraphId) REFERENCES Callgraph(id), FOREIGN KEY(sampleContextId) REFERENCES SampleContext(id)
 };
 
@@ -4283,20 +4282,19 @@ public:
                     AMDTProfileData profileData;
                     profileData.m_type = AMDT_PROFILE_DATA_FUNCTION;
 
-                    AMDTFunctionId id = sqlite3_column_int(pQueryStmt, 0);
+                    int idx = 0;
+                    AMDTFunctionId id = sqlite3_column_int(pQueryStmt, idx++);
                     profileData.m_id = id;
 
                     GetFunctionName(id, profileData.m_name);
 
-                    AMDTModuleId mid = sqlite3_column_int(pQueryStmt, 1);
+                    AMDTModuleId mid = sqlite3_column_int(pQueryStmt, idx++);
                     profileData.m_moduleId = mid;
 
-                    int idx = 2;
                     if (separateByProcess)
                     {
-                        AMDTProcessId pid = sqlite3_column_int(pQueryStmt, idx);
+                        AMDTProcessId pid = sqlite3_column_int(pQueryStmt, idx++);
                         pid = pid;
-                        idx++;
                     }
 
                     for (auto& sample : sampleInfoVec)
@@ -4498,6 +4496,7 @@ public:
                             sampleValue.m_sampleCount = sqlite3_column_int(pQueryStmt, idx);
                             sampleValue.m_counterId = sample.m_counterId;
                             sampleValue.m_coreId = sample.m_coreId;
+                            // TODO: sampleValue.m_sampleCountPercentage
 
                             idx++;
                             instData.m_sampleValues.emplace_back(sampleValue);
@@ -4519,200 +4518,6 @@ public:
 
         return ret;
     }
-
-    // Query CallStackLeaf
-    bool GetCallstackLeafData(
-        AMDTProcessId       processId,
-        AMDTUInt32          counterId,   // TODO: Is there a need to support ALL_COUNTERS?
-        gtUInt32            callstackId, // AMDT_PROFILE_ALL_CALLPATHS
-        CallstackFrameVec&  leafs)
-    {
-        GT_UNREFERENCED_PARAMETER(processId);
-        bool ret = false;
-
-        std::stringstream query;
-        query << "SELECT callstackId, functionId, offset, selfSamples "  \
-                 "FROM  CallstackLeaf "     \
-                 "WHERE samplingConfigurationId = ? ";
-
-        if (IS_CALLSTACK_QUERY(callstackId))
-        {
-            query << "AND callstackId = ? ";
-        }
-
-        query << " ;";
-
-        sqlite3_stmt* pQueryStmt = nullptr;
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
-
-        if (rc == SQLITE_OK)
-        {
-            sqlite3_bind_int(pQueryStmt, 1, counterId);
-
-            if (IS_CALLSTACK_QUERY(callstackId))
-            {
-                sqlite3_bind_int(pQueryStmt, 2, callstackId);
-            }
-
-            // Execute the query.
-            while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
-            {
-                CallstackFrame aLeaf;
-                AMDTProfileFunctionInfo functionInfo;
-
-                aLeaf.m_callstackId = sqlite3_column_int(pQueryStmt, 0);
-
-                AMDTFunctionId funcId = sqlite3_column_int(pQueryStmt, 1);
-                gtUInt32 offset = sqlite3_column_int(pQueryStmt, 2);
-                // TODO: offset is required when funcid is incomplete
-                offset = offset;
-
-                double value = sqlite3_column_double(pQueryStmt, 3);
-                aLeaf.m_selfSamples = static_cast<gtUInt32>(value);
-                aLeaf.m_counterId = counterId;
-                aLeaf.m_depth = 0;
-                aLeaf.m_isLeaf = true;
-
-                GetFunctionInfo(funcId, aLeaf.m_funcInfo);
-                GetModuleBaseAddress(funcId, processId, aLeaf.m_moduleBaseAddr);
-
-                leafs.push_back(aLeaf);
-            }
-        }
-
-        // Finalize the statement.
-        sqlite3_finalize(pQueryStmt);
-
-        ret = (SQLITE_DONE == rc) ? true : false;
-
-        return ret;
-    }
-
-    // Query CallStackFrame
-    bool GetCallstackFrameData(
-        AMDTProcessId       processId,
-        gtUInt32            callstackId,
-        CallstackFrameVec&  frames)
-    {
-        GT_UNREFERENCED_PARAMETER(processId);
-        bool ret = false;
-
-        std::stringstream query;
-        query << "SELECT callstackId, functionId, offset, depth "  \
-                 "FROM  CallstackFrame "     \
-                 "WHERE callstackId = ? "    \
-                 "ORDER BY depth DESC ;";
-
-        sqlite3_stmt* pQueryStmt = nullptr;
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
-
-        if (rc == SQLITE_OK)
-        {
-            sqlite3_bind_int(pQueryStmt, 1, callstackId);
-
-            // Execute the query.
-            while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
-            {
-                CallstackFrame aLeaf;
-                AMDTProfileFunctionInfo functionInfo;
-
-                aLeaf.m_callstackId = sqlite3_column_int(pQueryStmt, 0);
-                AMDTFunctionId funcId  = sqlite3_column_int(pQueryStmt, 1);
-                gtUInt32 offset = sqlite3_column_int(pQueryStmt, 2);
-                // TODO: offset is required when funcid is incomplete
-                offset = offset;
-
-                aLeaf.m_depth = sqlite3_column_int(pQueryStmt, 3);
-
-                aLeaf.m_selfSamples = 0;
-                aLeaf.m_counterId = 0; // FIXME               
-                aLeaf.m_isLeaf = false;
-
-                GetFunctionInfo(funcId, aLeaf.m_funcInfo);
-                GetModuleBaseAddress(funcId, processId, aLeaf.m_moduleBaseAddr);
-
-                frames.push_back(aLeaf);
-            }
-        }
-
-        // Finalize the statement.
-        sqlite3_finalize(pQueryStmt);
-
-        ret = (SQLITE_DONE == rc) ? true : false;
-
-        return ret;
-    }
-
-    // Query CallStackPath
-    // FIXME: This will not work for *unknown* functions
-    // Note: Callstack and Callpath denotes the same
-    bool GetCallstackIds (
-        AMDTProcessId        processId,
-        AMDTFunctionId       funcId,
-        gtVector<gtUInt32>&  csIds)
-    {
-        GT_UNREFERENCED_PARAMETER(processId);
-        bool ret = false;
-        gtSet<gtUInt32> uniqueSet;
-        gtUInt32 csId = 0;
-
-        std::stringstream query;
-        query << "SELECT DISTINCT callstackId "        \
-                  "FROM  CallstackFrame "     \
-                  "WHERE functionId = ? ;";
-
-        sqlite3_stmt* pQueryStmt = nullptr;
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
-
-        if (rc == SQLITE_OK)
-        {
-            sqlite3_bind_int(pQueryStmt, 1, funcId);
-
-            // Execute the query.
-            while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
-            {
-                csId = sqlite3_column_int(pQueryStmt, 0);
-                uniqueSet.insert(csId);
-            }
-        }
-
-        // Finalize the statement.
-        sqlite3_finalize(pQueryStmt);
-
-        // Recursive function which has selfSamples, there will be duplicate callstackIds.
-        // Hence using unique set to avoid duplicate callstackIds
-        query.str("");
-        query << "SELECT DISTINCT callstackId "        \
-                "FROM  CallstackLeaf "     \
-                "WHERE functionId = ? ;";
-
-        pQueryStmt = nullptr;
-        rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
-
-        if (rc == SQLITE_OK)
-        {
-            sqlite3_bind_int(pQueryStmt, 1, funcId);
-
-            // Execute the query.
-            while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
-            {
-                csId = sqlite3_column_int(pQueryStmt, 0);
-                uniqueSet.insert(csId);
-            }
-        }
-
-        // Finalize the statement.
-        sqlite3_finalize(pQueryStmt);
-
-        for (auto& id : uniqueSet)
-        {
-            csIds.push_back(id);
-        }
-
-        ret = (SQLITE_DONE == rc) ? true : false;
-        return ret;
-    }
-
 
     //
     // Data members of impl class
@@ -5620,51 +5425,6 @@ bool AmdtDatabaseAccessor::GetFunctionProfileData(
                                               separateByCore,
                                               functionData);
 
-    }
-
-    return ret;
-}
-
-// Query CallStackLeaf
-bool AmdtDatabaseAccessor::GetCallstackLeafData(AMDTProcessId       processId,
-                                                AMDTCounterId       counterId,
-                                                gtUInt32            callStackId,
-                                                CallstackFrameVec&  leafs)
-{
-    bool ret = false;
-
-    if (m_pImpl != nullptr)
-    {
-        ret = m_pImpl->GetCallstackLeafData(processId, counterId, callStackId, leafs);
-    }
-
-    return ret;
-}
-
-// Query CallStackFrame to retrieve the callpath for the given callstackIdx
-bool AmdtDatabaseAccessor::GetCallstackFrameData(AMDTProcessId       processId,
-                                                 gtUInt32            callstackId,
-                                                 CallstackFrameVec&  frames)
-{
-    bool ret = false;
-
-    if (m_pImpl != nullptr)
-    {
-        ret = m_pImpl->GetCallstackFrameData(processId, callstackId, frames);
-    }
-
-    return ret;
-}
-
-bool AmdtDatabaseAccessor::GetCallstackIds(AMDTProcessId        processId,
-                                           AMDTFunctionId       funcId,
-                                           gtVector<gtUInt32>&  csIds)
-{
-    bool ret = false;
-
-    if (m_pImpl != nullptr)
-    {
-        ret = m_pImpl->GetCallstackIds(processId, funcId, csIds);
     }
 
     return ret;

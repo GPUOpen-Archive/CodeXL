@@ -1390,7 +1390,7 @@ int pdGDBDriver::GetRunnungThreadsCount()
 /// \return Running threads count
 /// \author Vadim Entov
 /// \date 11/02/2016
-int pdGDBDriver::GetExistingThreadsCount()
+int pdGDBDriver::GetExistingThreadsCount() const
 {
     osCriticalSectionLocker lock(m_threadsInfoCS);
 

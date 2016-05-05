@@ -44,8 +44,7 @@ const static std::string s_str_threadAPICountHeaderPrefix = "//ThreadAPICount=";
 #define GP_VK_TIMESTAMP_FACTOR 100000
 
 VKAtpFilePart::VKAtpFilePart(const Config& config, bool shouldReleaseMemory) : IAtpFilePart(config, shouldReleaseMemory),
-    m_currentParsedTraceType(API), m_currentParsedThreadID(0), m_currentParsedThreadAPICount(0),
-    m_cpuStart(0), m_cpuEnd(0), m_gpuStart(0)
+    m_currentParsedTraceType(API), m_currentParsedThreadID(0), m_currentParsedThreadAPICount(0)
 {
 #define PART_NAME "vulkan"
     m_strPartName = PART_NAME;
@@ -151,20 +150,6 @@ bool VKAtpFilePart::ParseGPUAPICallString(const std::string& apiStr, VKGPUTraceI
 
         apiInfo.m_ullStart = ULONGLONG(timeStartDouble * GP_VK_TIMESTAMP_FACTOR);
         apiInfo.m_ullEnd = ULONGLONG(timeEndDouble * GP_VK_TIMESTAMP_FACTOR);
-
-        /// Store the GPU start time if it is not stored yet
-        /// GPU timestamps to fit the CPU timeline
-        if (m_gpuStart == 0)
-        {
-            m_gpuStart = apiInfo.m_ullStart;
-        }
-
-        if (m_cpuStart != 0)
-        {
-            // If the CPU start time is stored, "normalize" the GPU times according to the CPU time
-            apiInfo.m_ullStart = apiInfo.m_ullStart - m_gpuStart + m_cpuEnd - (m_cpuEnd - m_cpuStart) / 3;
-            apiInfo.m_ullEnd = apiInfo.m_ullEnd - m_gpuStart + m_cpuEnd - (m_cpuEnd - m_cpuStart) / 3;
-        }
 
         ss >> apiInfo.m_sampleId;
         CHECK_SS_ERROR(ss);
@@ -289,16 +274,6 @@ bool VKAtpFilePart::ParseCPUAPICallString(const std::string& apiStr, VKAPIInfo& 
 
         apiInfo.m_ullStart = ULONGLONG(timeStartDouble * GP_VK_TIMESTAMP_FACTOR);
         apiInfo.m_ullEnd = ULONGLONG(timeEndDouble * GP_VK_TIMESTAMP_FACTOR);
-
-        // Store the CPU start and end time (if not stored yet)
-        if (m_cpuStart == 0)
-        {
-            m_cpuStart = apiInfo.m_ullStart;
-        }
-        if (apiInfo.m_ullEnd > m_cpuEnd)
-        {
-            m_cpuEnd = apiInfo.m_ullEnd;
-        }
 
         retVal = (!ss.fail());
     }

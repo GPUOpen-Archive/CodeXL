@@ -206,11 +206,6 @@ public:
     /// \return true for success
     static bool vkAPITypeToString(vk_FUNC_TYPE apiType, std::string& strAPIName);
 
-    /// Get the function type from the function ID:
-    /// \param inAPIFuncId vulkan function id
-    /// \return the API type
-    static vkAPIType GetAPIGroupFromAPI(vk_FUNC_TYPE inAPIFuncId);
-
 private:
 
     /// Initializes the maps

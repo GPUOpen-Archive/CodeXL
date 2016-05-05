@@ -14,8 +14,6 @@
 #include <boost/algorithm/string/classification.hpp>
 #pragma warning ( pop )
 
-#include "AMDTOSWrappers/Include/osFilePath.h"
-
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -31,8 +29,8 @@
 namespace po = boost::program_options;
 using namespace std;
 
-void PrintCounters(const std::string& strOutputFile);
-void PrintCounters(CounterList& counterList, const string& strGenerationName, const std::string& outputFile);
+void PrintCounters();
+void PrintCounters(CounterList& counterList, const string& strGenerationName);
 
 pair<string, string> Parser(const string& strOptionToParse);
 
@@ -247,6 +245,12 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
         else
         {
             configOut.strAPIFilterFile.clear();
+        }
+
+        if (unicodeOptionsMap.count("list") > 0)
+        {
+            PrintCounters();
+            return false;
         }
 
         // check profile modes
@@ -666,13 +670,6 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
 
         configOut.bNoDetours = unicodeOptionsMap.count("__nodetours__") > 0;
 
-        // check for "list" last so that other params are checked first (like output file)
-        if (unicodeOptionsMap.count("list") > 0)
-        {
-            PrintCounters(configOut.strOutputFile);
-            return false;
-        }
-
         if (unicodeOptionsMap.count("help") > 0)
         {
             // when user asks for help (CodeXLGpuProfiler --help), always display the general options
@@ -920,46 +917,13 @@ bool GetGenerationName(GPA_HW_GENERATION gen, std::string& strGenerationName)
 
 }
 
-std::string GetCounterListOutputFileName(const std::string& strOutputFile, const std::string& strAPI, const std::string& strGeneration)
-{
-    std::string retVal = "";
-
-    if (!strOutputFile.empty())
-    {
-        gtString outputFileName;
-        outputFileName.fromUtf8String(strOutputFile.c_str());
-
-        osFilePath outputFile(outputFileName);
-
-        gtString baseFileName;
-        outputFile.getFileName(baseFileName);
-
-        gtString apiName;
-        apiName.fromASCIIString(strAPI.c_str());
-
-        std::string noSpaceGenName = StringUtils::Replace(strGeneration, " ", "_");
-        gtString genName;
-        genName.fromASCIIString(noSpaceGenName.c_str());
-
-        baseFileName.appendFormattedString(L"_%ls_%ls", apiName.asCharArray(), genName.asCharArray());
-
-        outputFile.setFileName(baseFileName);
-
-        retVal = std::string(outputFile.asString().asUTF8CharArray());
-    }
-
-    return retVal;
-}
-
 // print a list of public counters
-void PrintCounters(const std::string& strOutputFile)
+void PrintCounters()
 {
     gtString strDirPath = FileUtils::GetExePathAsUnicode();
     string strErrorOut;
     GPAUtils gpaUtils;
     CounterList counterList;
-
-    bool shouldWriteToFile = !strOutputFile.empty();
 
     bool gpaInit = gpaUtils.InitGPA(GPA_API_OPENCL,
                                     strDirPath,
@@ -969,10 +933,7 @@ void PrintCounters(const std::string& strOutputFile)
 
     if (gpaInit)
     {
-        if (!shouldWriteToFile)
-        {
-            cout << "OpenCL performance counters:\n";
-        }
+        cout << "OpenCL performance counters:\n";
 
         for (int gen = GPA_HW_GENERATION_SOUTHERNISLAND; gen < GPA_HW_GENERATION_LAST; gen++)
         {
@@ -984,7 +945,7 @@ void PrintCounters(const std::string& strOutputFile)
 
                 if (GetGenerationName(hwGen, strGenerationName))
                 {
-                    PrintCounters(counterList, strGenerationName, GetCounterListOutputFileName(strOutputFile, "OpenCL", strGenerationName));
+                    PrintCounters(counterList, strGenerationName);
                 }
             }
         }
@@ -1000,10 +961,7 @@ void PrintCounters(const std::string& strOutputFile)
 
     if (gpaInit)
     {
-        if (!shouldWriteToFile)
-        {
-            cout << "HSA performance counters:\n";
-        }
+        cout << "HSA performance counters:\n";
 
         for (int gen = GPA_HW_GENERATION_SEAISLAND; gen < GPA_HW_GENERATION_LAST; gen++)
         {
@@ -1015,7 +973,7 @@ void PrintCounters(const std::string& strOutputFile)
 
                 if (GetGenerationName(hwGen, strGenerationName))
                 {
-                    PrintCounters(counterList, strGenerationName, GetCounterListOutputFileName(strOutputFile, "HSA", strGenerationName));
+                    PrintCounters(counterList, strGenerationName);
                 }
             }
         }
@@ -1032,10 +990,7 @@ void PrintCounters(const std::string& strOutputFile)
 
     if (gpaInit)
     {
-        if (!shouldWriteToFile)
-        {
-            cout << "DirectCompute performance counters:\n";
-        }
+        cout << "DirectCompute performance counters:\n";
 
         for (int gen = GPA_HW_GENERATION_SOUTHERNISLAND; gen < GPA_HW_GENERATION_LAST; gen++)
         {
@@ -1048,7 +1003,7 @@ void PrintCounters(const std::string& strOutputFile)
 
                 if (GetGenerationName(hwGen, strGenerationName))
                 {
-                    PrintCounters(counterList, strGenerationName, GetCounterListOutputFileName(strOutputFile, "DirectCompute", strGenerationName));
+                    PrintCounters(counterList, strGenerationName);
                 }
             }
         }
@@ -1060,67 +1015,35 @@ void PrintCounters(const std::string& strOutputFile)
 }
 
 // helper function
-void PrintCounters(CounterList& counterList, const string& strGenerationName, const std::string& outputFile)
+void PrintCounters(CounterList& counterList, const string& strGenerationName)
 {
     const unsigned int nLineBreak = 5;
     unsigned int curItem = 0;
 
-    bool shouldWriteToFile = !outputFile.empty();
-    std::ofstream fout;
-
-    if (shouldWriteToFile)
-    {
-        fout.open(outputFile.c_str());
-
-        if (!fout.is_open())
-        {
-            cout << "Unable to open " << outputFile << std::endl;
-            return;
-        }
-    }
-    else
-    {
-        cout << "The list of valid counters for " << strGenerationName << " based graphics cards:\n";
-    }
+    cout << "The list of valid counters for " << strGenerationName << " based graphics cards:\n";
 
     for (CounterList::iterator it = counterList.begin(); it != counterList.end(); ++it)
     {
+        cout << *it;
 
-        if (shouldWriteToFile)
+        if (*it != counterList.back())
         {
-            fout << *it << std::endl;
+            cout << ", ";
+        }
+
+        // line break
+        if (curItem && (curItem + 1) % nLineBreak == 0)
+        {
+            cout << endl;
+            curItem = 0;
         }
         else
         {
-            cout << *it;
-
-            if (*it != counterList.back())
-            {
-                cout << ", ";
-            }
-
-            // line break
-            if (curItem && (curItem + 1) % nLineBreak == 0)
-            {
-                cout << endl;
-                curItem = 0;
-            }
-            else
-            {
-                curItem++;
-            }
+            curItem++;
         }
     }
 
-    if (shouldWriteToFile)
-    {
-        fout.close();
-        cout << "Counters written to " << outputFile << std::endl;
-    }
-    else
-    {
-        cout << endl << endl;
-    }
+    cout << endl << endl;
 }
 
 

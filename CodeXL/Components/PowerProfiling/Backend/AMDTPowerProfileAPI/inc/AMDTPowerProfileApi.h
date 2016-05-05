@@ -448,27 +448,23 @@ extern AMDTResult AMDTPwrGetNodeTemperature(AMDTFloat32* pNodeTemp);
 */
 AMDTResult AMDTEnableProcessProfiling(void);
 
-/** This API will provide the list of running PIDs so far from the time of profile start or bewteen two
-consecutive call of this function, their agregated power indicators.
-This API can be called at any point of time from start of the profile to the stop of the profile.
+/** This API will provide the list of running PIDs so far from the time of profile start and their agreegated power indicators.
+    This API can be called at any point of time from start of the profile to the stop of the profile.
 
-\ingroup profiling
-@param[in]  pidVal: If \ref AMD_PWR_ALL_PIDS is set will collect power for all the pids else for the given pid value.
-@param[in]  reset: If set power data is collected from the time profile start else data bewtween two consecutive call of this fn.
-@param[out] pPIDCount: Total number of PIDs running during the profile session
-@param[out] ppData: List of PIDs with their power indicators
-\return The status reading process profiling data
-\retval AMDT_STATUS_OK: On Success
-\retval AMDT_ERROR_INVALIDARG: NULL pointer was passed as pData parameters
-\retval AMDT_ERROR_DRIVER_UNINITIALIZED: \ref AMDTPwrProfileInitialize() function was neither called nor successful
-\retval AMDT_ERROR_PROFILE_NOT_STARTED: Profile is not started
-\retval AMDT_ERROR_PROFILE_DATA_NOT_AVAILABLE: Profile data is not yet available
-\retval AMDT_ERROR_OUTOFMEMORY: Memory not available
-\retval AMDT_ERROR_PROCESS_PROFILE_NOT_ENABLED: Process profiling not enabled
-\retval AMDT_ERROR_FAIL: An internal error occurred
-\retval AMDT_ERROR_PROCESS_PROFILE_NOT_SUPPORTED: Platform not supported
+    \ingroup profiling
+    @param[out] pPIDCount: Total number of PIDs running during the profile session
+    @param[out] ppData: List of PIDs with their power indicators
+    \return The status reading process profiling data
+    \retval AMDT_STATUS_OK: On Success
+    \retval AMDT_ERROR_INVALIDARG: NULL pointer was passed as pData parameters
+    \retval AMDT_ERROR_DRIVER_UNINITIALIZED: \ref AMDTPwrProfileInitialize() function was neither called nor successful
+    \retval AMDT_ERROR_PROFILE_NOT_STARTED: Profile is not started
+    \retval AMDT_ERROR_PROFILE_DATA_NOT_AVAILABLE: Profile data is not yet available
+    \retval AMDT_ERROR_OUTOFMEMORY: Memory not available
+    \retval AMDT_ERROR_PROCESS_PROFILE_NOT_ENABLED: Process profiling not enabled
+    \retval AMDT_ERROR_FAIL: An internal error occurred
+    \retval AMDT_ERROR_PROCESS_PROFILE_NOT_SUPPORTED: Platform not supported
 */
-AMDTResult AMDTGetProcessProfileData(AMDTUInt32* pPIDCount, AMDTPwrProcessInfo** ppData, AMDTUInt32 pidVal, bool reset);
-
+AMDTResult AMDTReadProcessProfileData(AMDTUInt32* pPIDCount, AMDTPwrProcessInfo** ppData);
 
 #endif //_AMDTPOWERPROFILEAPI_H_

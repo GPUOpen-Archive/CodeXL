@@ -46,7 +46,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Resource::QueryInterface(REFIID riid, vo
     {
         DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-        if (interceptor && interceptor->ShouldCollectTrace())
+        if (interceptor->ShouldCollectTrace())
         {
             ParameterEntry parameters[] =
             {
@@ -91,7 +91,7 @@ ULONG STDMETHODCALLTYPE Wrapped_ID3D12Resource::AddRef()
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         DX12APIEntry* pNewEntry = interceptor->PreCall(this, FuncId_IUnknown_AddRef, 0, nullptr);
         result = mRealResource->AddRef();
@@ -118,7 +118,7 @@ ULONG STDMETHODCALLTYPE Wrapped_ID3D12Resource::Release()
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         DX12APIEntry* pNewEntry = interceptor->PreCall(this, FuncId_IUnknown_Release, 0, nullptr);
         result = mRealResource->Release();
@@ -156,7 +156,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Resource::GetPrivateData(REFGUID guid, U
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -191,7 +191,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Resource::SetPrivateData(REFGUID guid, U
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -226,7 +226,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Resource::SetPrivateDataInterface(REFGUI
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -260,7 +260,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Resource::SetName(LPCWSTR Name)
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -293,7 +293,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Resource::GetDevice(REFIID riid, void** 
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -333,7 +333,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Resource::Map(UINT Subresource, const D3
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -366,7 +366,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12Resource::Unmap(UINT Subresource, const D3D
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -398,7 +398,7 @@ D3D12_RESOURCE_DESC STDMETHODCALLTYPE Wrapped_ID3D12Resource::GetDesc()
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         DX12APIEntry* pNewEntry = interceptor->PreCall(this, FuncId_ID3D12Resource_GetDesc, 0);
         result = mRealResource->GetDesc();
@@ -426,7 +426,7 @@ D3D12_GPU_VIRTUAL_ADDRESS STDMETHODCALLTYPE Wrapped_ID3D12Resource::GetGPUVirtua
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         DX12APIEntry* pNewEntry = interceptor->PreCall(this, FuncId_ID3D12Resource_GetGPUVirtualAddress, 0, nullptr);
         result = mRealResource->GetGPUVirtualAddress();
@@ -453,7 +453,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Resource::WriteToSubresource(UINT DstSub
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -490,7 +490,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Resource::ReadFromSubresource(void* pDst
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -527,7 +527,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Resource::GetHeapProperties(D3D12_HEAP_P
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {

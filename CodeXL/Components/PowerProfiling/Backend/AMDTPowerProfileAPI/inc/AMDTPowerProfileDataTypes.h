@@ -48,10 +48,6 @@ This macro denotes all the counters that are relevant to power profiling.
 */
 typedef AMDTUInt32 AMDTPwrDeviceId;
 
-/** All the PIDs are set
-*/
-#define AMD_PWR_ALL_PIDS 0xFFFFFFFFU
-
 /** Following power profile modes are supported.
 \ingroup profiling
 */

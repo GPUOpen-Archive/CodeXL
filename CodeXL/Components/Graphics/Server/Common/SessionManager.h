@@ -9,7 +9,7 @@
 #define GPS_SESSION_MANAGER_H
 
 #include "TSingleton.h"
-#include "../Common/OSWrappers.h"
+#include "../Common/OSwrappers.h"
 
 /// This struct is used to pass data in and out of the GetSessionManagerData() method.
 typedef struct

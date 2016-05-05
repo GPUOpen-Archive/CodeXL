@@ -669,7 +669,7 @@ if $bZip || $bZipOnly ; then
 
       # create artifact for CodeXL
       cd $BUILD_PATH/$PRODUCTNAME-$VERSION
-      tar cvzf $CODEXL_ARCHIVE bin/ jqPlot/ $ACTIVITYLOGGER/
+      tar cvzf $CODEXL_ARCHIVE bin/ jqPlot/ AMDTActivityLogger/
       chmod 755 $CODEXL_ARCHIVE
       cd $BUILD_PATH
    fi
@@ -689,7 +689,7 @@ if $bZip || $bZipOnly ; then
 
       # create artifact for CodeXL
       cd $BUILD_PATH/$PRODUCTNAME_INTERNAL-$VERSION
-      tar cvzf $CODEXL_ARCHIVE_INTERNAL bin/ jqPlot/ $ACTIVITYLOGGER/
+      tar cvzf $CODEXL_ARCHIVE_INTERNAL bin/ jqPlot/ CXLActivityLogger/
       chmod 755 $CODEXL_ARCHIVE_INTERNAL
       cd $BUILD_PATH
    fi

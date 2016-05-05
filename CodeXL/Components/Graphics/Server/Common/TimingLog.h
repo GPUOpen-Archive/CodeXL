@@ -102,8 +102,8 @@ public:
 #else
         /// Convert timings to nanoseconds. Timing functions on Linux use clock_gettime which has nanosecond precision.
         PS_UNREFERENCED_PARAMETER(inTimeFrequency);
-        outDeltaStartTime = (double)(inStart.QuadPart - inFrameStart.QuadPart);
-        outDeltaEndTime = (double)(inEnd.QuadPart - inFrameStart.QuadPart);
+        outDeltaStartTime = (double)(inStart - inFrameStart);
+        outDeltaEndTime = (double)(inEnd - inFrameStart);
 #endif // _WIN32
 
         /*
@@ -128,15 +128,14 @@ public:
     //--------------------------------------------------------------------------
     GPS_TIMESTAMP GetTimeFrequency() const
     {
-        GPS_TIMESTAMP TimeFrequency;
 #if defined (_WIN32)
+        GPS_TIMESTAMP TimeFrequency;
         QueryPerformanceFrequency(&TimeFrequency);
         return TimeFrequency;
 #elif defined (_LINUX)
         // the Linux equivalent of QueryPerformanceCounter used in PerfStudio is
         // clock_getTime(), which has a fixed frequency of 1 nanosecond
-        TimeFrequency.QuadPart = 1000000000;
-        return TimeFrequency;
+        return 1000000000;
 #else
 #error IMPLEMENT ME!
 #endif // _WIN32

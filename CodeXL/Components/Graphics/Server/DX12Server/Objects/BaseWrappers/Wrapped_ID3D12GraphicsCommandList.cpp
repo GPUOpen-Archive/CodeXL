@@ -50,7 +50,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::QueryInterface(REFI
     {
         DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-        if (interceptor && interceptor->ShouldCollectTrace())
+        if (interceptor->ShouldCollectTrace())
         {
             ParameterEntry parameters[] =
             {
@@ -95,7 +95,7 @@ ULONG STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::AddRef()
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         DX12APIEntry* pNewEntry = interceptor->PreCall(this, FuncId_IUnknown_AddRef, 0, nullptr);
         result = mRealGraphicsCommandList->AddRef();
@@ -124,7 +124,7 @@ ULONG STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::Release()
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         DX12APIEntry* pNewEntry = interceptor->PreCall(this, FuncId_IUnknown_Release, 0, nullptr);
         result = mRealGraphicsCommandList->Release();
@@ -162,7 +162,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::GetPrivateData(REFG
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -199,7 +199,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::SetPrivateData(REFG
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -236,7 +236,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::SetPrivateDataInter
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -272,7 +272,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::SetName(LPCWSTR Nam
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -307,7 +307,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::GetDevice(REFIID ri
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -349,7 +349,7 @@ D3D12_COMMAND_LIST_TYPE STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::Get
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         DX12APIEntry* pNewEntry = interceptor->PreCall(this, FuncId_ID3D12CommandList_GetType, 0, nullptr);
         result = mRealGraphicsCommandList->GetType();
@@ -378,7 +378,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::Close()
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         DX12APIEntry* pNewEntry = interceptor->PreCall(this, FuncId_ID3D12GraphicsCommandList_Close, 0, nullptr);
         result = mRealGraphicsCommandList->Close();
@@ -411,7 +411,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::Reset(ID3D12Command
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -448,7 +448,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::ClearState(ID3D12Pipel
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -479,7 +479,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::DrawInstanced(UINT Ver
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -513,7 +513,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::DrawIndexedInstanced(U
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -548,7 +548,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::Dispatch(UINT ThreadGr
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -586,7 +586,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::CopyBufferRegion(ID3D1
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -626,7 +626,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::CopyTextureRegion(cons
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -667,7 +667,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::CopyResource(ID3D12Res
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -704,7 +704,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::CopyTiles(ID3D12Resour
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -745,7 +745,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::ResolveSubresource(ID3
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -780,7 +780,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::IASetPrimitiveTopology
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -811,7 +811,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::RSSetViewports(UINT Nu
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -843,7 +843,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::RSSetScissorRects(UINT
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -875,7 +875,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::OMSetBlendFactor(const
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         static const int arraySize = 4;
         ParameterEntry parameters[] =
@@ -911,7 +911,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::OMSetStencilRef(UINT S
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -945,7 +945,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::SetPipelineState(ID3D1
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -988,7 +988,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::ResourceBarrier(UINT N
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1025,7 +1025,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::ExecuteBundle(ID3D12Gr
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1068,7 +1068,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::SetDescriptorHeaps(UIN
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         int numParameters = NumDescriptorHeaps + 1;
         ParameterEntry* parameters = new ParameterEntry[numParameters];
@@ -1110,7 +1110,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::SetComputeRootSignatur
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1144,7 +1144,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::SetGraphicsRootSignatu
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1175,7 +1175,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::SetComputeRootDescript
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1207,7 +1207,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::SetGraphicsRootDescrip
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1239,7 +1239,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::SetComputeRoot32BitCon
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1272,7 +1272,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::SetGraphicsRoot32BitCo
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1305,7 +1305,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::SetComputeRoot32BitCon
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1339,7 +1339,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::SetGraphicsRoot32BitCo
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1373,7 +1373,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::SetComputeRootConstant
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1405,7 +1405,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::SetGraphicsRootConstan
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1437,7 +1437,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::SetComputeRootShaderRe
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1469,7 +1469,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::SetGraphicsRootShaderR
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1501,7 +1501,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::SetComputeRootUnordere
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1533,7 +1533,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::SetGraphicsRootUnorder
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1565,7 +1565,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::IASetIndexBuffer(const
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1596,7 +1596,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::IASetVertexBuffers(UIN
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1629,7 +1629,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::SOSetTargets(UINT Star
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1662,7 +1662,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::OMSetRenderTargets(UIN
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1696,7 +1696,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::ClearDepthStencilView(
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1730,7 +1730,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::ClearRenderTargetView(
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         static const int arraySize = 4;
         ParameterEntry parameters[] =
@@ -1772,7 +1772,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::ClearUnorderedAccessVi
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         static const int arraySize = 4;
         ParameterEntry parameters[] =
@@ -1816,7 +1816,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::ClearUnorderedAccessVi
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         static const int arraySize = 4;
         ParameterEntry parameters[] =
@@ -1860,7 +1860,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::DiscardResource(ID3D12
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1893,7 +1893,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::BeginQuery(ID3D12Query
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1929,7 +1929,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::EndQuery(ID3D12QueryHe
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1967,7 +1967,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::ResolveQueryData(ID3D1
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -2006,7 +2006,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::SetPredication(ID3D12R
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -2039,7 +2039,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::SetMarker(UINT Metadat
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -2082,7 +2082,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::BeginEvent(UINT Metada
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -2125,7 +2125,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::EndEvent()
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         DX12APIEntry* pNewEntry = interceptor->PreCall(this, FuncId_ID3D12GraphicsCommandList_EndEvent, 0);
         mRealGraphicsCommandList->EndEvent();
@@ -2157,7 +2157,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12GraphicsCommandList::ExecuteIndirect(ID3D12
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {

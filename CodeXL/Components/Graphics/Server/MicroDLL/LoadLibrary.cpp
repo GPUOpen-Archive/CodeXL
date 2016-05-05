@@ -121,23 +121,15 @@ static void CheckWrappers()
 /// \return 0 if strings are the same, non-zero if different.
 static int my_lstrcmp(LPCSTR str1, LPCSTR str2)
 {
-    // Return -1 if either pointer is unsafe
-    int result = -1;
-
-    if ((str1 != nullptr) && (str2 != nullptr))
+    while (*str1 == *str2++)
     {
-        while (*str1 == *str2++)
+        if (*str1++ == 0)
         {
-            if (*str1++ == 0)
-            {
-                return 0;
-            }
+            return (0);
         }
-
-        result = (*(const unsigned char*)str1 - *(const unsigned char*)(str2 - 1));
     }
 
-    return result;
+    return (*(const unsigned char*)str1 - * (const unsigned char*)(str2 - 1));
 }
 
 /// Compare 2 wide character strings. Local version used here because lstrcmpW is called
@@ -149,23 +141,15 @@ static int my_lstrcmp(LPCSTR str1, LPCSTR str2)
 // \return 0 if strings are the same, non-zero if different.
 static int my_lstrcmpW(LPCWSTR str1, LPCWSTR str2)
 {
-    // Return -1 if either pointer is unsafe
-    int result = -1;
-
-    if ((str1 != nullptr) && (str2 != nullptr))
+    while (*str1 == *str2++)
     {
-        while (*str1 == *str2++)
+        if (*str1++ == 0)
         {
-            if (*str1++ == 0)
-            {
-                return 0;
-            }
+            return (0);
         }
-
-        result = (*str1 - *(str2 - 1));
     }
 
-    return result;
+    return (*str1 - * (str2 - 1));
 }
 
 /// Mine entry point for intercepted function

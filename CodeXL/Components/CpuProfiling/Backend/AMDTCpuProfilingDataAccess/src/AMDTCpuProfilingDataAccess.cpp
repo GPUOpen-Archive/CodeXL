@@ -11,9 +11,9 @@
 
 #include <string.h>
 
-#include <AMDTBaseTools/Include/AMDTDefinitions.h>
-#include <AMDTBaseTools/Include/gtMap.h>
-#include <AMDTBaseTools/Include/gtSet.h>
+#include <AMDTBasetools/Include/AMDTDefinitions.h>
+#include <AMDTBasetools/Include/gtMap.h>
+#include <AMDTBasetools/Include/gtSet.h>
 
 #include "AMDTCpuProfilingDataAccess.h"
 #include <AMDTDbAdapter/inc/AMDTProfileDbAdapter.h>
@@ -52,9 +52,6 @@ struct ViewConfigInfo
 #define IS_PROCESS_QUERY(procId_)                       (procId_ != AMDT_PROFILE_ALL_PROCESSES)
 #define IS_MODULE_QUERY(modId_)                         (modId_ != AMDT_PROFILE_ALL_MODULES)
 
-#define CXL_ROOT_FUNCTION_ID        1
-#define CXL_ROOT_FUNCTION_NAME      L"[ROOT]"
-
 // Sampling Configuration
 using AMDTCounterIdVec = gtVector<AMDTCounterId>;
 using CounterIdSampleConfigMap = gtMap<AMDTCounterId, AMDTProfileSamplingConfig>;
@@ -69,8 +66,7 @@ using ComputedCounterNameIdMap = gtMap<gtString, AMDTCounterId>;
 using ComputedCounterIdSpecMap = gtMap<AMDTCounterId, ColumnSpec>;
 
 // Module Info
-using ModuleIdInfoMap = gtMap<AMDTModuleId, AMDTProfileModuleInfo>;
-using ModuleIdExecutableMap = gtMap<AMDTModuleId, ExecutableFile*>;
+using ModuleIdInfoMap = gtMap<AMDTCounterId, AMDTProfileModuleInfo>;
 
 // Function Info
 using FuncIdSrcInfoMap = gtMap<AMDTFunctionId, AMDTSourceAndDisasmInfoVec>;
@@ -124,7 +120,6 @@ public:
     AMDTCpuTopologyVec                  m_cpuToplogyVec;
 
     ModuleIdInfoMap                     m_moduleIdInfoMap;
-    ModuleIdExecutableMap               m_moduleIdExeMap;
 
     AMDTProfileCounterDescVec           m_sampledCounterDescVec;
     CounterIdSampleConfigMap            m_sampleConfigMap;
@@ -146,11 +141,6 @@ public:
     // Totals
     ProcessSampleTotalMap               m_processSampleTotalMap;
     ModuleSampleTotalMap                m_moduleSampleTotalMap;
-
-    // CallGraph
-    cgNode              m_cgRootNode;
-    functionIdcgNodeMap m_cgFunctionMap;
-    AMDTCounterId       m_cgCounterId = 0;
 
     Impl()
     {
@@ -199,12 +189,6 @@ public:
 
         m_processSampleTotalMap.clear();
         m_moduleSampleTotalMap.clear();
-
-        for (auto pExeIter : m_moduleIdExeMap)
-        {
-            pExeIter.second->Close();
-        }
-        m_moduleIdExeMap.clear();
     };
 
     // profile file can either be raw PRD file or processed DB file
@@ -354,7 +338,7 @@ public:
         {
             for (auto& counterDesc : m_sampledCounterDescVec)
             {
-                AMDTProfileSamplingConfig sampleConfig;
+                AMDTProfileSamplingConfig sampleConfig; 
 
                 if (GetSamplingConfiguration(counterDesc.m_id, sampleConfig))
                 {
@@ -645,7 +629,7 @@ public:
             {
                 QString name;
                 viewConfigInfo.m_viewCfg.GetConfigName(name);
-
+                
                 gtString cfgName = ConvertQtToGTString(name);
 
                 if (cfgName.compareNoCase(configName) == 0)
@@ -736,7 +720,7 @@ public:
 
         // Set the default view to "All Data"
         AMDTProfileReportConfig reportConfig;
-
+        
         if (GetReportConfigurationByName(CXL_REPORT_VIEW_ALL_DATAW, reportConfig))
         {
             for (auto& counterDesc : reportConfig.m_counterDescs)
@@ -979,7 +963,7 @@ public:
             ret = AddOthersEntry(summaryDataVec, counterId);
 
             // calculate the percentage
-            ret = CalculateRawCounterPercentage(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, counterIdList, summaryDataVec);
+            ret = CalculateRawCounterPercentage(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, counterIdList, summaryDataVec);           
         }
 
         return ret;
@@ -1586,7 +1570,7 @@ public:
         return ret;
     }
 
-    bool GetSrcFilePathForVaddr(ExecutableFile& exeFile, gtVAddr rvAddr, gtString& srcFilePath, gtUInt32& srcLine)
+    bool GetSrcFilePathForVaddr(ExecutableFile& exeFile, gtVAddr rvAddr, gtString& srcFilePath)
     {
         bool ret = false;
         SymbolEngine* pSymbolEngine = exeFile.GetSymbolEngine();
@@ -1597,8 +1581,6 @@ public:
             if (pSymbolEngine->FindSourceLine(rvAddr, srcData))
             {
                 srcFilePath = srcData.m_filePath;
-                srcLine = srcData.m_line;
-
                 ret = true;
             }
         }
@@ -1606,11 +1588,12 @@ public:
         return ret;
     }
 
-    bool GetSrcFilePathForFuncId(AMDTFunctionId funcId, gtString& srcFilePath, gtUInt32& srcLine)
+    bool GetSrcFilePathForFuncId(AMDTFunctionId funcId, gtString& srcFilePath)
     {
         bool ret = false;
         AMDTModuleId moduleId = 0;
         gtUInt32 offset = 0;
+        gtUInt32 size = 0;
 
         auto funcInfoIt = m_funcIdInfoMap.find(funcId);
 
@@ -1621,6 +1604,7 @@ public:
 
             moduleId = funcInfo.m_moduleId;
             offset = funcInfo.m_startOffset;
+            size = funcInfo.m_size;
 
             ret = true;
         }
@@ -1652,8 +1636,6 @@ public:
                         if (pSymbolEngine->FindSourceLine(startRVAddr, srcData))
                         {
                             srcFilePath = srcData.m_filePath;
-                            srcLine = srcData.m_line;
-
                             ret = true;
                         }
                     }
@@ -1664,12 +1646,6 @@ public:
         }
 
         return ret;
-    }
-
-    bool GetSrcFilePathForFuncId(AMDTFunctionId funcId, gtString& srcFilePath)
-    {
-        gtUInt32 srcLine;
-        return GetSrcFilePathForFuncId(funcId, srcFilePath, srcLine);
     }
 
     // TODO: Bool return is not sufficient
@@ -1720,6 +1696,152 @@ public:
             foundSrcFilePath = GetSrcFilePathForFuncId(funcId, srcFilePath);
         }
 
+
+#if 0
+        if (ret && nullptr != m_pDbAdapter)
+        {
+            AMDTProfileModuleInfo modInfo;
+
+            ret = GetModuleInfo(moduleId, modInfo);
+
+            gtVAddr loadAddress = modInfo.m_loadAddress;
+            gtString exePath = modInfo.m_path;
+            ExecutableFile* pExecutable = ExecutableFile::Open(exePath.asCharArray(), loadAddress);
+
+            if (nullptr != pExecutable)
+            {
+                const gtUByte* pCode = nullptr;
+                gtRVAddr sectionStartRva = 0, sectionEndRva = 0;
+                unsigned int prevSectionIndex = static_cast<unsigned int>(-1);
+
+                // Setup disassembler
+                LibDisassembler dasm;
+                // if the code is 64-bits
+                bool isLongMode = pExecutable->Is64Bit();
+                dasm.SetLongMode(isLongMode);
+
+                AMDTUInt32 bytesToRead = size;
+                gtVAddr currOffset = offset;
+
+                InitializeSymbolEngine(pExecutable);
+                SymbolEngine* pSymbolEngine = pExecutable->GetSymbolEngine();
+
+                bool srcFilePathNotSet = true;
+
+                while (bytesToRead > 0)
+                {
+                    AMDTSourceAndDisasmInfo srcLineInfo;
+
+                    // FIXME - module Instance loadAddress?
+                    gtRVAddr startRVAddr = pExecutable->VaToRva(loadAddress + currOffset);
+                    unsigned int sectionIndex = pExecutable->LookupSectionIndex(startRVAddr);
+
+                    BYTE error_code;
+                    UIInstInfoType temp_struct;
+                    char dasmArray[256] = { 0 };
+                    unsigned int strlength = 255;
+
+                    gtRVAddr codeOffset = startRVAddr;
+                    const gtUByte* pCurrentCode = pCode;
+
+                    SourceLineInfo srcData;
+                    if (nullptr != pSymbolEngine)
+                    {
+                        pSymbolEngine->FindSourceLine(startRVAddr, srcData);
+
+                        if (srcFilePathNotSet)
+                        {
+                            srcFilePath = srcData.m_filePath;
+                            srcFilePathNotSet = false;
+                        }
+
+                        srcLineInfo.m_sourceLine = srcData.m_line;
+                    }
+
+                    if (pExecutable->GetSectionsCount() <= sectionIndex)
+                    {
+                        strcpy(dasmArray, "BAD DASM");
+                    }
+                    else if (sectionIndex == prevSectionIndex)
+                    {
+                        codeOffset = startRVAddr - sectionStartRva;
+                        pCurrentCode = pCode + codeOffset;
+
+                        // Get disassembly for the current pCode from the disassembler
+                        HRESULT hr = dasm.UIDisassemble((BYTE*)pCurrentCode, (unsigned int*)&strlength, (BYTE*)dasmArray, &temp_struct, &error_code);
+
+                        if (S_OK != hr)
+                        {
+                            strcpy(dasmArray, "BAD DASM");
+                        }
+
+                        currOffset += temp_struct.NumBytesUsed;
+                        bytesToRead -= temp_struct.NumBytesUsed;
+                    }
+                    else
+                    {
+                        pCode = pExecutable->GetSectionBytes(sectionIndex);
+                        pExecutable->GetSectionRvaLimits(sectionIndex, sectionStartRva, sectionEndRva);
+
+                        // GetCodeBytes return the pointer to the sectionStart
+                        // We need to add the offset to the beginning of the function
+                        codeOffset = startRVAddr - sectionStartRva;
+                        pCurrentCode = pCode + codeOffset;
+
+                        // Get disassembly for the current pCode from the disassembler
+                        HRESULT hr = dasm.UIDisassemble((BYTE*)pCurrentCode, (unsigned int*)&strlength, (BYTE*)dasmArray, &temp_struct, &error_code);
+
+                        if (S_OK != hr)
+                        {
+                            temp_struct.NumBytesUsed = 1;
+                            strcpy(dasmArray, "BAD DASM");
+                            // FIXME:
+                            break;
+                        }
+
+                        prevSectionIndex = sectionIndex;
+
+                        currOffset += temp_struct.NumBytesUsed;
+                        bytesToRead -= temp_struct.NumBytesUsed;
+                    }
+
+                    gtString& disasmStr = srcLineInfo.m_disasmStr;
+                    //srcLineInfo.m_offset = codeOffset + startRVAddr;
+                    srcLineInfo.m_offset = codeOffset + sectionStartRva;
+                    disasmStr.fromASCIIString(dasmArray);
+
+                    if (temp_struct.bIsPCRelative && temp_struct.bHasDispData)
+                    {
+                        disasmStr.appendFormattedString(L"(0x%lx)", srcLineInfo.m_offset + temp_struct.NumBytesUsed + temp_struct.DispDataValue);
+                    }
+
+                    // Get codebytes
+                    char codeBytes[16];
+                    memcpy(codeBytes, pCurrentCode, temp_struct.NumBytesUsed);
+
+                    for (int count = 0; count < temp_struct.NumBytesUsed; count++)
+                    {
+                        gtUByte byteCode = codeBytes[count];
+
+                        gtUByte btHigh = (byteCode >> 4);
+                        gtUByte btLow = (byteCode & 0xF);
+
+                        srcLineInfo.m_codeByteStr.append((btHigh <= 9) ? ('0' + btHigh) : ('A' + btHigh - 0xA));
+                        srcLineInfo.m_codeByteStr.append((btLow <= 9) ? ('0' + btLow) : ('A' + btLow - 0xA));
+
+                        srcLineInfo.m_codeByteStr << L" ";
+                    }
+
+                    srcInfoVec.push_back(srcLineInfo);
+                }
+
+                m_funcIdSrcInfoMap.insert({ funcId, srcInfoVec });
+
+                delete pExecutable;
+            }
+        }
+#endif // 0
+
         return ret;
     }
 
@@ -1768,8 +1890,7 @@ public:
                     unsigned int sectionIndex = pExecutable->LookupSectionIndex(startRVAddr);
 
                     BYTE error_code;
-                    UIInstInfoType temp_struct;
-                    memset(&temp_struct, 0, sizeof(temp_struct));
+                    UIInstInfoType temp_struct = { 0 };
                     char dasmArray[256] = { 0 };
                     unsigned int strlength = 255;
 
@@ -1855,455 +1976,6 @@ public:
                 }
 
                 delete pExecutable;
-            }
-        }
-
-        return ret;
-    }
-
-    bool GetFunctionNode(functionIdcgNodeMap& nodeMap, CallstackFrame& frame, gtUInt32 deepSamples, cgNode*& funcNode)
-    {
-        bool ret = false;
-        AMDTFunctionId funcId = frame.m_funcInfo.m_functionId;
-
-        //Lookupfunction(frame.m_funcInfo);
-
-        auto it = nodeMap.find(funcId);
-
-        if (nodeMap.end() == it)
-        {
-            cgNode node;
-            node.m_funcInfo = frame.m_funcInfo;
-
-            nodeMap.insert({ funcId, node });
-
-            it = nodeMap.find(funcId);
-        }
-
-        if (nodeMap.end() != it)
-        {
-            if (frame.m_isLeaf)
-            {
-                it->second.m_totalSelfSamples.m_sampleCount += frame.m_selfSamples;
-                it->second.m_totalDeepSamples.m_sampleCount += frame.m_selfSamples;
-            }
-            else
-            {
-                // Set the deep samples in the function node
-                it->second.m_totalDeepSamples.m_sampleCount += deepSamples;
-            }
-
-            it->second.m_pathCount++;
-            it->second.m_moduleBaseAddr = frame.m_moduleBaseAddr;
-
-            funcNode = &(it->second);
-            ret = true;
-        }
-
-        return ret;
-    }
-
-    bool AddRootNode(functionIdcgNodeMap& nodeMap, CallstackFrame& frame, cgNode*& rootNode)
-    {
-        bool ret = false;
-
-        frame.m_funcInfo.m_functionId = CXL_ROOT_FUNCTION_ID;  // "[ROOT]" node
-        frame.m_funcInfo.m_name = CXL_ROOT_FUNCTION_NAME;
-        frame.m_isLeaf = false;
-        frame.m_callstackId = 0;
-        frame.m_moduleBaseAddr = 0;
-        frame.m_depth = 0;
-        frame.m_selfSamples = 0;
-
-        ret = GetFunctionNode(nodeMap, frame, 0, rootNode);
-        rootNode->m_pathCount = 0;
-
-        return ret;
-    }
-
-    bool GetEdge(cgEdgeVec& edgeVec, AMDTProfileFunctionInfo& funcInfo, cgEdge*& pEdge)
-    {
-        bool ret = true;
-
-        AMDTFunctionId funcId = funcInfo.m_functionId;
-
-        auto itEdge = std::find_if(edgeVec.begin(), edgeVec.end(),
-            [&funcId](cgEdge const& aEdge) { return aEdge.m_funcInfo.m_functionId == funcId; });
-
-        // if edge is found
-        if (edgeVec.end() != itEdge)
-        {
-            pEdge = &(*itEdge);
-        }
-        else
-        {
-            cgEdge aEdge;
-
-            aEdge.m_funcInfo = funcInfo;
-
-            edgeVec.push_back(aEdge);
-
-            auto iterEdge = std::find_if(edgeVec.begin(), edgeVec.end(),
-                [&funcId](cgEdge const& aEdge) { return aEdge.m_funcInfo.m_functionId == funcId; });
-
-            pEdge = &(*iterEdge);
-        }
-
-        return ret;
-    }
-
-    bool AddCallerToCalleeEdge(cgNode*& caller, cgNode*& callee, double& sampleCount, bool isCalleeLeaf)
-    {
-        bool ret = false;
-
-        // a directed forward edge from caller to callee (in caller's in callee-edge vector)
-        cgEdge* pEdge = nullptr;
-        ret = GetEdge(caller->m_calleeVec, callee->m_funcInfo, pEdge);
-
-        if (ret && nullptr != pEdge)
-        {
-            pEdge->m_moduleBaseAddr = callee->m_moduleBaseAddr; // Hmm.. inefficient
-            pEdge->m_selfSamples.m_sampleCount += (isCalleeLeaf) ? sampleCount : 0;
-
-            pEdge->m_deepSamples.m_sampleCount += sampleCount;
-        }
-
-        return ret;
-    }
-
-    bool AddCalleeToCallerEdge(cgNode*& caller, cgNode*& callee, double& sampleCount)
-    {
-        bool ret = false;
-
-        //  a directed backeward edge from callee to caller (in callee's caller-edge vector)
-        cgEdge* pEdge = nullptr;
-        ret = GetEdge(callee->m_callerVec, caller->m_funcInfo, pEdge);
-
-        if (ret && nullptr != pEdge)
-        {
-            pEdge->m_moduleBaseAddr = caller->m_moduleBaseAddr; // Hmm.. inefficient
-            pEdge->m_deepSamples.m_sampleCount += sampleCount;
-        }
-
-        return ret;
-    }
-
-    // Callgraph
-    bool ConstructCallGraph(AMDTProcessId pid, AMDTCounterId counterId)
-    {
-        bool ret = false;
-
-        // Get list of Leaf nodes for the given process
-        // For each Leaf node
-        //      get the callstack frames 
-        //      construct the arc details and update node and edge details
-
-        functionIdcgNodeMap& nodeFunctionMap = m_cgFunctionMap;
-
-        // Add [ROOT] Node
-        cgNode* pRootNode = nullptr;
-        CallstackFrame dummyRootFrame;
-        ret = AddRootNode(nodeFunctionMap, dummyRootFrame, pRootNode);
-
-        CallstackFrameVec leafs;
-        ret = m_pDbAdapter->GetCallstackLeafData(pid, counterId, AMDT_PROFILE_ALL_CALLPATHS, leafs);
-
-        if (ret)
-        {
-            for (auto& leaf : leafs)
-            {
-                // Get the function Node
-                cgNode *pLeafNode = nullptr;
-
-                double sampleCount = leaf.m_selfSamples;
-                ret = GetFunctionNode(nodeFunctionMap, leaf, sampleCount, pLeafNode);
-
-                if (ret && nullptr != pLeafNode)
-                {
-                    // get the callstack frames (in reverse order - depth (n-1) to 1)
-                    CallstackFrameVec frames;
-                    ret = m_pDbAdapter->GetCallstackFrameData(pid, leaf.m_callstackId, frames);
-
-                    if (ret)
-                    {
-                        cgNode* pCallerNode = nullptr;
-                        cgNode* pCalleeNode = pLeafNode;
-                        bool isCalleeLeaf = true;
-
-                        for (auto& frame : frames)
-                        {
-                            pCallerNode = nullptr;
-                            ret = GetFunctionNode(nodeFunctionMap, frame, sampleCount, pCallerNode);
-
-                            ret = ret && AddCallerToCalleeEdge(pCallerNode, pCalleeNode, sampleCount, isCalleeLeaf);
-                            ret = ret && AddCalleeToCallerEdge(pCallerNode, pCalleeNode, sampleCount);
-
-                            pCalleeNode = pCallerNode;
-                            isCalleeLeaf = false;
-                        }
-
-                        // Connect this to [ROOT] node
-                        ret = GetFunctionNode(nodeFunctionMap, dummyRootFrame, sampleCount, pCallerNode);
-                        ret = ret && AddCallerToCalleeEdge(pCallerNode, pCalleeNode, sampleCount, false);
-                        ret = ret && AddCalleeToCallerEdge(pCallerNode, pCalleeNode, sampleCount);
-                    }
-                }
-            }
-        }
-
-        m_cgCounterId = (ret) ? counterId : 0;
-
-        return ret;
-    }
-
-    bool CopyCGNode(AMDTCallGraphFunction& cgFunc, cgNode& node, gtUInt32 totalDeepSamples)
-    {
-        cgFunc.m_functionInfo = node.m_funcInfo;
-        cgFunc.m_moduleBaseAddr = node.m_moduleBaseAddr;
-        cgFunc.m_pathCount = node.m_pathCount;
-        
-        cgFunc.m_totalDeepSamples = node.m_totalDeepSamples.m_sampleCount;
-        cgFunc.m_totalSelfSamples = node.m_totalSelfSamples.m_sampleCount;
-
-        if (cgFunc.m_totalDeepSamples > 0 && totalDeepSamples > 0)
-        {
-            cgFunc.m_deepSamplesPerc = (cgFunc.m_totalDeepSamples / (double)(totalDeepSamples)) * 100.0;
-        }
-
-        GetSrcFilePathForFuncId(node.m_funcInfo.m_functionId, cgFunc.m_srcFile, cgFunc.m_srcFileLine);
-
-        return true;
-    }
-
-    bool CopyCGEdge(AMDTCallGraphFunction& cgFunc, cgEdge& edge, gtUInt32 totalDeepSamples)
-    {
-        cgFunc.m_functionInfo = edge.m_funcInfo;
-        cgFunc.m_moduleBaseAddr = edge.m_moduleBaseAddr;
-        cgFunc.m_pathCount = 0;
-
-        cgFunc.m_totalDeepSamples = edge.m_deepSamples.m_sampleCount;
-        cgFunc.m_totalSelfSamples = edge.m_selfSamples.m_sampleCount;
-
-        if (cgFunc.m_totalDeepSamples > 0 && totalDeepSamples > 0)
-        {
-            cgFunc.m_deepSamplesPerc = (cgFunc.m_totalDeepSamples / (double)(totalDeepSamples)) * 100.0;
-        }
-
-        GetSrcFilePathForFuncId(edge.m_funcInfo.m_functionId, cgFunc.m_srcFile, cgFunc.m_srcFileLine);
-
-        return true;
-    }
-
-    bool CopyCGSelf(AMDTCallGraphFunction& cgFunc, cgNode& node, gtUInt32 totalDeepSamples)
-    {
-        cgFunc.m_functionInfo = node.m_funcInfo;
-        // override the name to [self]
-        cgFunc.m_functionInfo.m_name = L"[self]";
-        cgFunc.m_moduleBaseAddr = node.m_moduleBaseAddr;
-        cgFunc.m_pathCount = node.m_pathCount;
-
-        cgFunc.m_totalDeepSamples = node.m_totalDeepSamples.m_sampleCount;
-        cgFunc.m_totalSelfSamples = node.m_totalSelfSamples.m_sampleCount;
-
-        // !!! Note !!!
-        //  For "[self]" entry the m_deepSamplesPerc denotes the percentage of self samples w.r.t to deep sample of the function
-        if (cgFunc.m_totalSelfSamples > 0 && totalDeepSamples > 0)
-        {
-            cgFunc.m_deepSamplesPerc = (cgFunc.m_totalSelfSamples / (double)(totalDeepSamples)) * 100.0;
-        }
-
-        GetSrcFilePathForFuncId(node.m_funcInfo.m_functionId, cgFunc.m_srcFile, cgFunc.m_srcFileLine);
-
-        return true;
-    }
-
-    bool CopyCGFunction(AMDTCallGraphFunction& cgFunc, CallstackFrame& frame, gtUInt32 samples)
-    {
-        cgFunc.m_functionInfo = frame.m_funcInfo;
-        cgFunc.m_moduleBaseAddr = frame.m_moduleBaseAddr;
-        cgFunc.m_pathCount = 0;
-
-        cgFunc.m_totalDeepSamples = samples;
-        cgFunc.m_totalSelfSamples = (frame.m_isLeaf) ? samples : 0;
-
-        GetSrcFilePathForFuncId(frame.m_funcInfo.m_functionId, cgFunc.m_srcFile, cgFunc.m_srcFileLine);
-
-        return true;
-    }
-
-    bool GetCallGraphFunctions(AMDTProcessId pid, AMDTCounterId counterId, AMDTCallGraphFunctionVec& cgFuncsVec)
-    {
-        bool ret = false;
-
-        ret = ConstructCallGraph(pid, counterId);
-
-        if (ret)
-        {
-            auto rootFuncIter = m_cgFunctionMap.find(CXL_ROOT_FUNCTION_ID);
-            gtUInt32 totalDeepSamples = 0;
-
-            if (m_cgFunctionMap.end() != rootFuncIter)
-            {
-                totalDeepSamples = rootFuncIter->second.m_totalDeepSamples.m_sampleCount;
-            }
-
-            for (auto& cgFunc : m_cgFunctionMap)
-            {
-                AMDTCallGraphFunction func;
-                CopyCGNode(func, cgFunc.second, totalDeepSamples);
-                cgFuncsVec.push_back(func);
-            }
-        }
-
-        return ret;
-    }
-
-    bool GetCallGraphFunctionInfo(AMDTProcessId processId, AMDTFunctionId funcId, AMDTCallGraphFunctionVec& parents, AMDTCallGraphFunctionVec& children)
-    {
-        GT_UNREFERENCED_PARAMETER(processId);
-        bool ret = false;
-
-        auto cgFuncIter = m_cgFunctionMap.find(funcId);
-
-        if (m_cgFunctionMap.end() != cgFuncIter)
-        {
-            gtUInt32 totalDeepSamples = cgFuncIter->second.m_totalDeepSamples.m_sampleCount;
-
-            for (auto& parent : cgFuncIter->second.m_callerVec)
-            {
-                AMDTCallGraphFunction parentFunc;
-                CopyCGEdge(parentFunc, parent, totalDeepSamples);
-
-                parents.push_back(parentFunc);
-            }
-
-            for (auto& child : cgFuncIter->second.m_calleeVec)
-            {
-                AMDTCallGraphFunction childFunc;
-                CopyCGEdge(childFunc, child, totalDeepSamples);
-
-                children.push_back(childFunc);
-            }
-
-            // TBD: Should i add this [self] entry.. 
-            // Add [self] in children vector
-            AMDTCallGraphFunction self;
-            CopyCGSelf(self, cgFuncIter->second, totalDeepSamples);
-            children.push_back(self);
-
-            ret = true;
-        }
-
-        return ret;
-    }
-
-    bool GetCallGraphPaths(AMDTProcessId processId, AMDTFunctionId funcId, gtVector<AMDTCallGraphPath>& paths)
-    {
-        bool ret = false;
-        gtVector<gtUInt32>  csIds;
-
-        ret = m_pDbAdapter->GetCallstackIds(processId, funcId, csIds);
-
-        for (auto& csId : csIds)
-        {
-            // Get the leaf node
-            CallstackFrameVec leafs;    // There will only one entry
-            ret = m_pDbAdapter->GetCallstackLeafData(processId, m_cgCounterId, csId, leafs);
-            
-            if (ret && leafs.size() > 0)
-            {
-                CallstackFrame leaf = leafs[0];
-                gtUInt32 samples = leaf.m_selfSamples;
-
-                // Get the callstack/callpath for this csId
-                CallstackFrameVec frames;
-                ret = m_pDbAdapter->GetCallstackFrameData(processId, csId, frames);
-
-                // construct callpath
-                AMDTCallGraphPath aPath;
-                
-                for (auto frameIt = frames.rbegin(); frameIt != frames.rend(); ++frameIt)
-                {
-                    AMDTCallGraphFunction cgFunc;
-
-                    CopyCGFunction(cgFunc, (*frameIt), samples);
-                    aPath.push_back(cgFunc);
-                }
-
-                // add the leaf node
-                AMDTCallGraphFunction leafFunc;
-                CopyCGFunction(leafFunc, leaf, samples);
-                aPath.push_back(leafFunc);
-
-                paths.push_back(aPath);
-            }
-        }
-
-        return ret;
-    }
-
-    bool GetModuleExecutable(AMDTModuleId moduleId, ExecutableFile*& pExecutable, bool initSymbolEngine)
-    {
-        bool ret = true;
-        ExecutableFile* pExe = nullptr;
-
-        auto exeIt = m_moduleIdExeMap.find(moduleId);
-
-        if (exeIt != m_moduleIdExeMap.end())
-        {
-            pExe = exeIt->second;
-        }
-        else
-        {
-            auto it = m_moduleIdInfoMap.find(moduleId);
-
-            if (it != m_moduleIdInfoMap.end())
-            {
-                AMDTProfileModuleInfo& modInfo = it->second;
-
-                pExe = ExecutableFile::Open(modInfo.m_path.asCharArray(), modInfo.m_loadAddress);
-
-                if (nullptr != pExe)
-                {
-                    ret = (initSymbolEngine) ? InitializeSymbolEngine(pExe) : true;
-                    m_moduleIdExeMap.insert({ moduleId, pExe });
-                }
-            }
-        }
-
-        pExecutable = pExe;
-        return ret;
-    }
-
-    bool Lookupfunction(AMDTProfileFunctionInfo& funcInfo)
-    {
-        bool ret = true;
-        gtUInt32 symEngineFuncId = funcInfo.m_functionId & 0xFFFFUL;
-
-        if (0 == symEngineFuncId)
-        {
-            ExecutableFile* pExecutable = nullptr;
-
-            ret = GetModuleExecutable(funcInfo.m_moduleId, pExecutable, true);
-
-            if (ret && nullptr != pExecutable)
-            {
-                ret = false;
-                SymbolEngine* pSymbolEngine = pExecutable->GetSymbolEngine();
-
-                gtRVAddr funcRvaEnd = GT_INVALID_RVADDR;
-                const FunctionSymbolInfo* pFuncSymbol = pSymbolEngine->LookupFunction(funcInfo.m_startOffset, &funcRvaEnd);
-
-                if (NULL != pFuncSymbol)
-                {
-                    gtUInt32 funcSize = ((pFuncSymbol->m_size == 0) && (GT_INVALID_RVADDR != funcRvaEnd))
-                                            ? funcRvaEnd - pFuncSymbol->m_rva : 0;
-
-                    funcInfo.m_name = pFuncSymbol->m_pName;
-                    funcInfo.m_size = funcSize;
-
-                    ret = true;
-                }
             }
         }
 
@@ -2620,51 +2292,15 @@ bool cxlProfileDataReader::GetFunctionSourceAndDisasmInfo(AMDTFunctionId funcId,
 }
 
 bool cxlProfileDataReader::GetDisassembly(AMDTModuleId moduleId,
-                                          AMDTUInt32 offset,
-                                          AMDTUInt32 size,
-                                          AMDTSourceAndDisasmInfoVec& disasmInfoVec)
+                                            AMDTUInt32 offset,
+                                            AMDTUInt32 size,
+                                            AMDTSourceAndDisasmInfoVec& disasmInfoVec)
 {
     bool ret = false;
 
     if (nullptr != m_pImpl)
     {
         ret = m_pImpl->GetDisassembly(moduleId, offset, size, disasmInfoVec);
-    }
-
-    return ret;
-}
-
-bool cxlProfileDataReader::GetCallGraphFunctions(AMDTProcessId pid, AMDTCounterId counterId, AMDTCallGraphFunctionVec& cgFuncsVec)
-{
-    bool ret = false;
-
-    if (nullptr != m_pImpl)
-    {
-        ret = m_pImpl->GetCallGraphFunctions(pid, counterId, cgFuncsVec);
-    }
-
-    return ret;
-}
-
-bool cxlProfileDataReader::GetCallGraphFunctionInfo(AMDTProcessId processId, AMDTFunctionId funcId, AMDTCallGraphFunctionVec& caller, AMDTCallGraphFunctionVec& callee)
-{
-    bool ret = false;
-
-    if (nullptr != m_pImpl)
-    {
-        ret = m_pImpl->GetCallGraphFunctionInfo(processId, funcId, caller, callee);
-    }
-
-    return ret;
-}
-
-bool cxlProfileDataReader::GetCallGraphPaths(AMDTProcessId processId, AMDTFunctionId funcId, gtVector<AMDTCallGraphPath>& paths)
-{
-    bool ret = false;
-
-    if (nullptr != m_pImpl)
-    {
-        ret = m_pImpl->GetCallGraphPaths(processId, funcId, paths);
     }
 
     return ret;

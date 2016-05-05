@@ -25,5 +25,5 @@ EXPORTS
     AMDTPwrGetCounterHierarchy
     AMDTPwrGetNodeTemperature
     AMDTEnableProcessProfiling
-    AMDTGetProcessProfileData
-    AMDTPwrReadCumulativeCounter
+    AMDTReadProcessProfileData
+    AMDTPwrReadCumulativeCounter    

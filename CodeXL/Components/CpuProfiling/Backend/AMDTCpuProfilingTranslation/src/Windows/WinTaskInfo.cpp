@@ -16,7 +16,6 @@
 
 #include <AMDTBaseTools/Include/gtAssert.h>
 #include <AMDTOSWrappers/Include/osCriticalSectionLocker.h>
-#include <AMDTOSWrappers/Include/osAtomic.h>
 #include <AMDTOSWrappers/Include/osFilePath.h>
 #include <AMDTOSWrappers/Include/osDebugLog.h>
 
@@ -138,8 +137,6 @@ void WinTaskInfo::Cleanup()
         free(m_pCachePath);
         m_pCachePath = NULL;
     }
-
-    m_moduleIdMap.clear();
 }
 
 
@@ -1679,7 +1676,6 @@ HRESULT WinTaskInfo::StopCapture(bool bConvertFlag, const wchar_t* tempTiFileNam
 
     // Reset after capture and before translation of each session
     m_nextModInstanceId = 1;
-    m_nextModuleId = 1;
 
     return hr;
 }
@@ -2598,29 +2594,6 @@ HRESULT WinTaskInfo::GetModuleInfo(TiModuleInfo* pModInfo)
         hr = GetKernelModInfo(pModInfo, t_time);
     }
 
-    std::wstring modName;
-
-    if (pModInfo->pModulename[0] == L'\0')
-    {
-        // Module name is unknown
-        modName = to_wstring(pModInfo->processID);
-    }
-    else
-    {
-        // Module name is known
-        modName = pModInfo->pModulename;
-    }
-
-    auto iter = m_moduleIdMap.find(modName);
-
-    if (m_moduleIdMap.end() == iter)
-    {
-        auto ret = m_moduleIdMap.emplace(modName, AtomicAdd(m_nextModuleId, 1));
-        iter = ret.first;
-    }
-
-    pModInfo->moduleId = static_cast<gtUInt32>(iter->second);
-
     return hr;
 }
 
@@ -2636,7 +2609,6 @@ HRESULT WinTaskInfo::GetProcessThreadList(gtVector<std::tuple<gtUInt32, gtUInt32
         if (m_ThreadMap.end() != iter)
         {
             --iter;
-
             while (iter->first.processID == it.first)
             {
                 info.emplace_back(static_cast<gtUInt32>(iter->first.processID), static_cast<gtUInt32>(iter->first.threadID));
@@ -3256,14 +3228,6 @@ HRESULT WinTaskInfo::ReadModuleInfoFile(const wchar_t* filename)
             t_keModValue.instanceId = m_nextModInstanceId++;
 
             m_tiKeModMap.insert(KernelModMap::value_type(t_keModKey, t_keModValue));
-
-            std::wstring modName(t_keModValue.keModName);
-            auto iter = m_moduleIdMap.find(modName);
-
-            if (m_moduleIdMap.end() == iter)
-            {
-                m_moduleIdMap.emplace(modName, AtomicAdd(m_nextModuleId, 1));
-            }
         }
 
         if (TASK_INFO_FILE_VERSION_2 <= versionNumber)
@@ -3810,14 +3774,6 @@ HRESULT WinTaskInfo::ReadCLRJitInformation(/* [in] */ const wchar_t* clrdirector
 
                             m_tiModMap.insert(ModuleMap::value_type(t_modKey, t_modValue));
                             m_JitModCount++;
-
-                            std::wstring modName(t_modValue.moduleName);
-                            auto iter = m_moduleIdMap.find(modName);
-
-                            if (m_moduleIdMap.end() == iter)
-                            {
-                                m_moduleIdMap.emplace(modName, AtomicAdd(m_nextModuleId, 1));
-                            }
 
                             tModuleName.append(".jit");
                             QString repPath = QString::fromWCharArray(funcRec.jncFileName);
@@ -4692,14 +4648,6 @@ void WinTaskInfo::AddLoadModules(gtUInt64 processId)
                     }
 
                     m_tiModMap.insert(ModuleMap::value_type(modKey, modValue));
-
-                    std::wstring modName(modValue.moduleName);
-                    auto iter = m_moduleIdMap.find(modName);
-
-                    if (m_moduleIdMap.end() == iter)
-                    {
-                        m_moduleIdMap.emplace(modName, AtomicAdd(m_nextModuleId, 1));
-                    }
                 }
             }
 

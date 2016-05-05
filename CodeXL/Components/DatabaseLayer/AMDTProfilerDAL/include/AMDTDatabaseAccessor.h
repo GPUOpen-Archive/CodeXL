@@ -27,7 +27,6 @@
 #endif
 
 #define AMDT_CURRENT_PROFILE_DB_VERSION     1
-#define AMDT_PROFILE_ALL_CALLPATHS  0xFFFFFFFFUL
 
 namespace AMDTProfilerDAL
 {
@@ -263,19 +262,6 @@ public:
                                 AMDTUInt64                  coreMask,
                                 bool                        separateByCore,
                                 AMDTProfileFunctionData&    functionData);
-
-    bool GetCallstackLeafData(AMDTProcessId       processId,
-                              AMDTUInt32          counterId,
-                              gtUInt32            callStackId,
-                              CallstackFrameVec&  leafs);
-
-    bool GetCallstackFrameData(AMDTProcessId       processId,
-                               gtUInt32            callstackId,
-                               CallstackFrameVec&  frames);
-
-    bool GetCallstackIds(AMDTProcessId        processId,
-                         AMDTFunctionId       funcId,
-                         gtVector<gtUInt32>&  csIds);
 
 private:
     class Impl;

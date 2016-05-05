@@ -90,7 +90,7 @@ GPUProf_env.Prepend(CPPPATH = [appsdk_inc])
 
 # HSA - headers only.
 hsa_dir = GPUProf_env['CXL_common_dir'] + '/Lib/AMD/HSA/STGFoundation/hsa'
-hsa_inc = hsa_dir + '/include' , '/opt/rocm/hsa/include/' #added local install of public release HSA headers to allow both Public and Internal builds
+hsa_inc = hsa_dir + '/include'
 GPUProf_env.Prepend(CPPPATH = [hsa_inc])
 
 # required backend dirs

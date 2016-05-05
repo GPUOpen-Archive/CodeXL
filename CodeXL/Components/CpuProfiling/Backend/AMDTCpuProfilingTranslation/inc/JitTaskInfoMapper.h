@@ -36,30 +36,29 @@ enum ModTypeEnum
 
 struct TiModuleInfo
 {
-    /* [in]  */  gtUInt64 processID;
-    /* [in]  */  unsigned CSvalue;
-    /* [in]  */  gtUInt64 sampleAddr;
-    /* [in]  */  unsigned cpuIndex;
-    /* [in]  */  gtUInt64 deltaTick;
-    /* [out] */  gtUInt64 ModuleStartAddr;
-    /* [out] */  gtUInt64 Modulesize;
-    /* [out] */  ModTypeEnum moduleType;
-    /* [in]  */  unsigned funNameSize;
-    /* [out] */  wchar_t* pFunctionName;
-    /* [out] */  gtUInt64 FunStartAddr;
-    /* [in]  */  unsigned jncNameSize;
-    /* [out] */  wchar_t* pJncName;
-    /* [in]  */  unsigned namesize;
-    /* [out] */  wchar_t* pModulename;
-    /* [in]  */  unsigned srcfilesize;
-    /* [out] */  wchar_t* pJavaSrcFileName;  // This is for Java JITed block;
-    /* [out] */  bool kernel;                // Used for thread profiling.
-    /* [in]  */  unsigned sesdirsize;
-    /* [out] */  wchar_t* pSessionDir;
-    /* [out] */  gtUInt32 moduleId;
-    /* [out] */  gtUInt32 instanceId;
+    /* [in] */  gtUInt64 processID;
+    /* [in] */  unsigned CSvalue;
+    /* [in] */  gtUInt64 sampleAddr;
+    /* [in] */  unsigned cpuIndex;
+    /* [in] */  gtUInt64 deltaTick;
+    /* [out] */ gtUInt64 ModuleStartAddr;
+    /* [out] */ gtUInt64 Modulesize;
+    /* [out] */ ModTypeEnum moduleType;
+    /* [in] */  unsigned funNameSize;
+    /* [out] */ wchar_t* pFunctionName;
+    /* [out] */ gtUInt64 FunStartAddr;
+    /* [in] */  unsigned jncNameSize;
+    /* [out] */ wchar_t* pJncName;
+    /* [in] */  unsigned namesize;
+    /* [out] */ wchar_t* pModulename;
+    /* [in] */  unsigned srcfilesize;
+    /* [out] */ wchar_t* pJavaSrcFileName;  // this is for Java JITed block;
+    /* [out] */ bool kernel;  //Used for thread profiling.
+    /* [in] */  unsigned sesdirsize;
+    /* [out] */ wchar_t* pSessionDir;
+    /* [out] */ gtUInt32 instanceId;
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    /* [out] */  PeFile* pPeFile;
+    /* [out]*/  PeFile* pPeFile;
 #endif
 };
 

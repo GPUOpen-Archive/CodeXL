@@ -57,7 +57,7 @@ public:
 #elif defined (_LINUX)
         struct timeval tv;
         gettimeofday(&tv, NULL);
-        TimeStamp.QuadPart = (uint64)tv.tv_sec * 1000000 + (uint64)tv.tv_usec;
+        TimeStamp = (GPS_TIMESTAMP)tv.tv_sec * 1000000 + (GPS_TIMESTAMP)tv.tv_usec;
 #endif
     }
 

@@ -151,11 +151,15 @@ HRESULT CpuProfileReport::Report()
 {
     HRESULT hr = S_OK;
 
+#ifdef AMDT_ENABLE_DB_SUPPORT
+
     // If DB input file - -i has .cxldb file
     if (m_isDbInputFile)
     {
         return ReportFromDb();
     }
+
+#endif
 
     // Initialize the report file
     bool retVal = InitializeReportFile();
@@ -523,17 +527,9 @@ static void PrintFunctionDetailData(osFile& reportFile, AMDTProfileCounterDescVe
 
     return;
 }
-#endif // AMDT_ENABLE_DB_SUPPORT
 
 HRESULT CpuProfileReport::ReportFromDb()
 {
-#ifndef AMDT_ENABLE_DB_SUPPORT
-
-    fprintf(stderr, " Report from DB is not yet supported.\n");
-    return E_FAIL;
-
-#else
-
     bool ret = false;
 
     cxlProfileDataReader profileDbReader;
@@ -584,7 +580,7 @@ HRESULT CpuProfileReport::ReportFromDb()
             options.m_isSeperateByCore = false;
 
             //for (auto const& counter : counterDesc)
-            for (auto const& counter : reportConfigs[0].m_counterDescs)
+            for (auto const& counter : reportConfigs[2].m_counterDescs)
             {
                 options.m_counters.push_back(counter.m_id);
             }
@@ -638,17 +634,17 @@ HRESULT CpuProfileReport::ReportFromDb()
             // Process View - "All Data" view
             gtVector<AMDTProfileData> allProcessData;
             ret = profileDbReader.GetProcessProfileData(AMDT_PROFILE_ALL_PROCESSES, allProcessData);
-            PrintAllData(reportFile, L"Process", reportConfigs[0].m_counterDescs, allProcessData);
+            PrintAllData(reportFile, L"Process", reportConfigs[2].m_counterDescs, allProcessData);
 
             // Module View - "All Data" view
             gtVector<AMDTProfileData> allModuleData;
             ret = profileDbReader.GetModuleProfileData(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, allModuleData);
-            PrintAllData(reportFile, L"Module", reportConfigs[0].m_counterDescs, allModuleData);
+            PrintAllData(reportFile, L"Module", reportConfigs[2].m_counterDescs, allModuleData);
 
             // function View - "All Data" view
             gtVector<AMDTProfileData> allFunctionData;
             ret = profileDbReader.GetFunctionProfileData(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, allFunctionData);
-            PrintAllData(reportFile, L"Function", reportConfigs[0].m_counterDescs, allFunctionData);
+            PrintAllData(reportFile, L"Function", reportConfigs[2].m_counterDescs, allFunctionData);
 
             // Get detailed function profiledata
             for (auto const& func : funcProfileData)
@@ -679,28 +675,19 @@ HRESULT CpuProfileReport::ReportFromDb()
                 AMDTSourceAndDisasmInfoVec srcInfoVec;
                 ret = profileDbReader.GetFunctionSourceAndDisasmInfo(func.m_id, srcFilePath, srcInfoVec);
 
-                PrintFunctionDetailData(reportFile, reportConfigs[0].m_counterDescs, functionData, srcFilePath, srcInfoVec);
-            }
+                PrintFunctionDetailData(reportFile, reportConfigs[2].m_counterDescs, functionData, srcFilePath, srcInfoVec);
 
-            for (auto const& process : procInfo)
-            {
-                AMDTCounterId counterId = counterDesc[0].m_id;
-                AMDTCallGraphFunctionVec cgFuncs;
+#if 0
+                AMDTDisasmInfoVec disasmInfoVec;
+                AMDTProfileSourceLineTableVec sltTable;
+                ret = profileDbReader.GetFunctionDisassembly(func.m_moduleId,
+                    functionData.m_modBaseAddress,
+                    startOffset,
+                    functionSize,
+                    disasmInfoVec,
+                    sltTable);
+#endif
 
-                // CG Functions
-                ret = profileDbReader.GetCallGraphFunctions(process.m_pid, counterId, cgFuncs);
-
-                // CG Parents/Children
-                for (auto& cgFunc : cgFuncs)
-                {
-                    AMDTCallGraphFunctionVec parents;
-                    AMDTCallGraphFunctionVec children;
-
-                    ret = profileDbReader.GetCallGraphFunctionInfo(process.m_pid, cgFunc.m_functionInfo.m_functionId, parents, children);
-
-                    gtVector<AMDTCallGraphPath> paths;
-                    ret = profileDbReader.GetCallGraphPaths(process.m_pid, cgFunc.m_functionInfo.m_functionId, paths);
-                }
             }
 
             // close the db
@@ -709,8 +696,8 @@ HRESULT CpuProfileReport::ReportFromDb()
     }
 
     return S_OK;
-#endif // AMDT_ENABLE_DB_SUPPORT
 } // ReportFromDb
+#endif
 
 static AMDTResult printThreadSummary(AMDTThreadProfileDataHandle& tpReaderHandle, AMDTThreadId tid, osFile& reportFile, bool reportHdr);
 static AMDTResult printThreadSampleData(AMDTThreadProfileDataHandle& tpReaderHandle, AMDTThreadId tid, osFile& reportFile);

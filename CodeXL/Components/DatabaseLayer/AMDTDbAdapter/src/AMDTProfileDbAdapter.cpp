@@ -757,49 +757,6 @@ bool amdtProfileDbAdapter::GetBucketizedSamplesByCounterId(unsigned int bucketWi
     return ret;
 }
 
-bool amdtProfileDbAdapter::GetCallstackLeafData(AMDTProcessId       processId,
-                                                AMDTUInt32          counterId,
-                                                gtUInt32            callStackId,
-                                                CallstackFrameVec&  leafs)
-{
-    bool ret = false;
-
-    if (m_pDbAccessor != nullptr)
-    {
-        ret = m_pDbAccessor->GetCallstackLeafData(processId, counterId, callStackId, leafs);
-    }
-
-    return ret;
-}
-
-bool amdtProfileDbAdapter::GetCallstackFrameData(AMDTProcessId       processId,
-                                                 gtUInt32            callstackId,
-                                                 CallstackFrameVec&  frames)
-{
-    bool ret = false;
-
-    if (m_pDbAccessor != nullptr)
-    {
-        ret = m_pDbAccessor->GetCallstackFrameData(processId, callstackId, frames);
-    }
-
-    return ret;
-}
-
-bool amdtProfileDbAdapter::GetCallstackIds(AMDTProcessId        processId,
-                                           AMDTFunctionId       funcId,
-                                           gtVector<gtUInt32>&  csIds)
-{
-    bool ret = false;
-
-    if (m_pDbAccessor != nullptr)
-    {
-        ret = m_pDbAccessor->GetCallstackIds(processId, funcId, csIds);
-    }
-
-    return ret;
-}
-
 //
 //  Helper functions
 //

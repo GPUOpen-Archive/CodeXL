@@ -93,14 +93,6 @@ private:
 
     /// Currently not used (assuming that this is always "DX12")
     std::string m_apiStr;
-
-    /// Will be used to hack the different timestamps for CPU and GPU items. 
-    /// We will store the CPU start and end time, and the GPU start time, and will "normalize" the 
-    /// GPU timestamps to fit the CPU timeline
-    ULONGLONG m_cpuStart;
-    ULONGLONG m_cpuEnd;
-    ULONGLONG m_gpuStart;
-
 };
 
 
