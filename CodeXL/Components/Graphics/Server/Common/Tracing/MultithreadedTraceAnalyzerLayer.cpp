@@ -752,7 +752,9 @@ void MultithreadedTraceAnalyzerLayer::Clear()
 //--------------------------------------------------------------------------
 ThreadTraceData* MultithreadedTraceAnalyzerLayer::FindOrCreateThreadData(DWORD inThreadId)
 {
-    // We don't need to lock yet. map::find is threadsafe.
+    // Need to lock here to control access into our thread trace map
+    ScopeLock mapInsertionLock(&mTraceMutex);
+
     ThreadTraceData* resultTraceData = NULL;
     ThreadIdToTraceData::iterator traceIter = mThreadTraces.find(inThreadId);
 
@@ -762,9 +764,6 @@ ThreadTraceData* MultithreadedTraceAnalyzerLayer::FindOrCreateThreadData(DWORD i
     }
     else
     {
-        // We need to lock here- we're going to insert a new instance into our thread trace map.
-        ScopeLock mapInsertionLock(&mTraceMutex);
-
         // Insert the new ThreadData struct into the map to hold them all.
         resultTraceData = CreateThreadTraceDataInstance();
         mThreadTraces[inThreadId] = resultTraceData;

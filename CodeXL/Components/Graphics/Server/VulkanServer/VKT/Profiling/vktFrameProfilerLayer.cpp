@@ -200,6 +200,9 @@ void VktFrameProfilerLayer::SetProfilingEnabled(bool inbProfilingEnabled)
 //-----------------------------------------------------------------------------
 void VktFrameProfilerLayer::StoreProfilerResult(VktAPIEntry* pEntry)
 {
+    // Need to lock here to control access into our profiling results map
+    ScopeLock profilerResultsLock(&mProfilingResultsMutex);
+
     UINT32 threadId = osGetCurrentThreadId();
 
     if (mSampleIdToEntry.find(threadId) == mSampleIdToEntry.end())
@@ -207,9 +210,6 @@ void VktFrameProfilerLayer::StoreProfilerResult(VktAPIEntry* pEntry)
         // create a new entry
         SampleIdToAPIEntryMap newMap;
         newMap[pEntry->m_sampleId] = pEntry;
-
-        // adding a new thread to the map so need to lock
-        ScopeLock profilerResultsLock(&mProfilingResultsMutex);
 
         mSampleIdToEntry[threadId] = newMap;
     }
