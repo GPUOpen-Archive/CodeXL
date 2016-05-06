@@ -21,8 +21,10 @@
 #if defined (_WIN32)
 #pragma warning(push)
 #pragma warning(disable: 4244 4275 4800)
+#endif
 #include <QtWidgets>
 #include <QXmlDefaultHandler>
+#if defined (_WIN32)
 #pragma warning( pop )
 #endif
 
