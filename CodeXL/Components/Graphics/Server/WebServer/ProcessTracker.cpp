@@ -1109,7 +1109,7 @@ void SetupVulkanEnvVariables()
     gtASCIIString serverPath;
     GetModuleDirectory(serverPath);
 
-    // VK_LAYER_PATH equal to where our layer lives
+    // Set VK_LAYER_PATH equal to where our layer lives
     osEnvironmentVariable layerPath;
     layerPath._name = L"VK_LAYER_PATH";
     layerPath._value.fromASCIIString(serverPath.asCharArray());
