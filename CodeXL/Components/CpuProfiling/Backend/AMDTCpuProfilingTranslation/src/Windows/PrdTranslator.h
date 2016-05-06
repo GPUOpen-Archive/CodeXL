@@ -35,6 +35,7 @@
 #include <AMDTAPIClasses/Include/Events/apProfileProgressEvent.h>
 #include <AMDTExecutableFormat/inc/ProcessWorkingSet.h>
 #include <AMDTBaseTools/Include/gtFlatMap.h>
+#include <AMDTCpuProfilingRawData/inc/ProfilerDataDBWriter.h>
 
 class ExecutableAnalyzer;
 
@@ -516,6 +517,8 @@ private:
 
     friend class PrdUserCssRcuHandler;
     friend class PrdUserCssRcuHandlerPool;
+
+    ProfilerDataDBWriter* m_dbWriter = nullptr;
 };
 
 

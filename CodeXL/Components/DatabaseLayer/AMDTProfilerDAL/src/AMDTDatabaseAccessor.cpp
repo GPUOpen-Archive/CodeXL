@@ -97,15 +97,15 @@ const std::vector<std::string> SQL_CREATE_DB_STMTS_AGGREGATION =
     "CREATE TABLE SamplingCounter (id INTEGER NOT NULL PRIMARY KEY, name TEXT, description TEXT)",
     "CREATE TABLE SamplingConfiguration (id INTEGER PRIMARY KEY, counterId INTEGER, samplingInterval INTEGER, unitMask INTEGER, isUserMode INTEGER, isOsMode INTEGER, edge INTEGER)",
     "CREATE TABLE CoreSamplingConfiguration (id INTEGER PRIMARY KEY, coreId INTEGER, samplingConfigurationId INTEGER)", // FOREIGN KEY(samplingConfigurationId) REFERENCES SamplingConfiguration(id), FOREIGN KEY(coreId) REFERENCES Core(id)
-    "CREATE TABLE Process (id INTEGER NOT NULL PRIMARY KEY, name TEXT, is32Bit INTEGER)",
+    "CREATE TABLE Process (id INTEGER NOT NULL PRIMARY KEY, name TEXT, is32Bit INTEGER, hasCSS INTEGER)",
     "CREATE TABLE Module (id INTEGER PRIMARY KEY, path TEXT, isSystemModule INTEGER, is32Bit INTEGER, type INTEGER, size INTEGER, foundDebugInfo INTEGER)",
     "CREATE TABLE ModuleInstance (id INTEGER PRIMARY KEY, processId INTEGER, moduleId INTEGER, loadAddress INTEGER)", // FOREIGN KEY(processId) REFERENCES Process(id), FOREIGN KEY(moduleId) REFERENCES Module(id)
     "CREATE TABLE ProcessThread (id INTEGER PRIMARY KEY, processId INTEGER, threadId INTEGER)", // FOREIGN KEY(processId) REFERENCES Process(id)
     "CREATE TABLE Function (id INTEGER PRIMARY KEY, moduleId INTEGER, name TEXT, startOffset INTEGER, size INTEGER, sourceFileId INTEGER)", // FOREIGN KEY(moduleId) REFERENCES module(id)
-    "CREATE TABLE SampleContext (id INTEGER PRIMARY KEY AUTOINCREMENT, processThreadId INTEGER, moduleInstanceId INTEGER, coreSamplingConfigurationId INTEGER, functionId INTEGER, offset INTEGER, count INTEGER, sourceLine INTEGER DEFAULT 0)", // FOREIGN KEY(processThreadId) REFERENCES ProcessThread(rowid), FOREIGN KEY(moduleInstanceId) REFERENCES ModuleInstance(id), FOREIGN KEY(coreSamplingConfigurationId) REFERENCES CoreSamplingConfiguration(id)
+    "CREATE TABLE SampleContext (id INTEGER PRIMARY KEY AUTOINCREMENT, processThreadId INTEGER, moduleInstanceId INTEGER, coreSamplingConfigurationId INTEGER, functionId INTEGER, offset INTEGER, count INTEGER)", // FOREIGN KEY(processThreadId) REFERENCES ProcessThread(rowid), FOREIGN KEY(moduleInstanceId) REFERENCES ModuleInstance(id), FOREIGN KEY(coreSamplingConfigurationId) REFERENCES CoreSamplingConfiguration(id)
     "CREATE TABLE SourceFile (path TEXT)",
-    "CREATE TABLE CallstackFrame (callstackId INTEGER NOT NULL, functionId INTEGER, offset INTEGER, depth INTEGER)", // FOREIGN KEY(functionId) REFERENCES Function(id)
-    "CREATE TABLE CallstackLeaf (callstackId INTEGER NOT NULL, functionId INTEGER, offset INTEGER, samplingConfigurationId INTEGER, selfSamples INTEGER)", // FOREIGN KEY(functionId) REFERENCES Function(id)
+    "CREATE TABLE CallstackFrame (callstackId INTEGER, processId INTEGER, functionId INTEGER, offset INTEGER, depth INTEGER)", // FOREIGN KEY(functionId) REFERENCES Function(id)
+    "CREATE TABLE CallstackLeaf (callstackId INTEGER, processId INTEGER, functionId INTEGER, offset INTEGER, samplingConfigurationId INTEGER, selfSamples INTEGER)", // FOREIGN KEY(functionId) REFERENCES Function(id)
     //"CREATE TABLE Callgraph (id INTEGER NOT NULL, callerId INTEGER, calleeId INTEGER, edgeLevel INTEGER)", // FOREIGN KEY(callerId) REFERENCES Function(id), FOREIGN KEY(calleeId) REFERENCES Function(id), FOREIGN KEY(samplingConfigurationId) REFERENCES SamplingConfiguration(id)
     //"CREATE TABLE CallgraphSampleAggregation (callgraphId INTEGER NOT NULL, sampleContextId INTEGER, selfSamples INTEGER, deepSamples INTEGER)", // FOREIGN KEY(callgraphId) REFERENCES Callgraph(id), FOREIGN KEY(sampleContextId) REFERENCES SampleContext(id)
 };
@@ -418,7 +418,7 @@ public:
     {
         bool ret = false;
 
-        const char* pCsSqlCmd = "INSERT INTO Process(id, name, is32Bit) VALUES(?, ?, ?);";
+        const char* pCsSqlCmd = "INSERT INTO Process(id, name, is32Bit, hasCSS) VALUES(?, ?, ?, ?);";
         int rc = sqlite3_prepare_v2(m_pWriteDbConn, pCsSqlCmd, -1, &m_pProcessInfoInsertStmt, nullptr);
         ret = (rc == SQLITE_OK);
 
@@ -475,6 +475,28 @@ public:
 
         const char* pCsSqlCmd = "INSERT INTO Function(id, moduleId, name, startOffset, size) VALUES(?, ?, ?, ?, ?);";
         int rc = sqlite3_prepare_v2(m_pWriteDbConn, pCsSqlCmd, -1, &m_pFunctionInfoInsertStmt, nullptr);
+        ret = (rc == SQLITE_OK);
+
+        return ret;
+    }
+
+    bool PrepareInsertCallStackFrameStatement(void)
+    {
+        bool ret = false;
+
+        const char* pCsSqlCmd = "INSERT INTO CallstackFrame(callstackId, processId, functionId, offset, depth) VALUES(?, ?, ?, ?, ?);";
+        int rc = sqlite3_prepare_v2(m_pWriteDbConn, pCsSqlCmd, -1, &m_pCallStackFrameInsertStmt, nullptr);
+        ret = (rc == SQLITE_OK);
+
+        return ret;
+    }
+
+    bool PrepareInsertCallStackLeafStatement(void)
+    {
+        bool ret = false;
+
+        const char* pCsSqlCmd = "INSERT INTO CallstackLeaf(callstackId, processId, functionId, offset, samplingConfigurationId, selfSamples) VALUES(?, ?, ?, ?, ?, ?);";
+        int rc = sqlite3_prepare_v2(m_pWriteDbConn, pCsSqlCmd, -1, &m_pCallStackLeafInsertStmt, nullptr);
         ret = (rc == SQLITE_OK);
 
         return ret;
@@ -567,7 +589,9 @@ public:
                    PrepareGetProcessThreadIdStatement() &&
                    PrepareInsertFunctionInfoStatement() &&
                    PrepareGetFunctionIdStatement() &&
-                   PrepareInsertSampleContextStatement();
+                   PrepareInsertSampleContextStatement() &&
+                   PrepareInsertCallStackFrameStatement() &&
+                   PrepareInsertCallStackLeafStatement();
 
         return ret;
     }
@@ -1361,13 +1385,14 @@ public:
         return ret;
     }
 
-    bool InsertProcessInfo(gtUInt64 pid, const std::string& pathAsUtf8Str, int is32Bit)
+    bool InsertProcessInfo(gtUInt64 pid, const std::string& pathAsUtf8Str, int is32Bit, int hasCSS)
     {
         bool ret = false;
 
         sqlite3_bind_int64(m_pProcessInfoInsertStmt, 1, static_cast<sqlite3_int64>(pid));
         sqlite3_bind_text(m_pProcessInfoInsertStmt, 2, pathAsUtf8Str.c_str(), pathAsUtf8Str.size(), nullptr);
         sqlite3_bind_int(m_pProcessInfoInsertStmt, 3, is32Bit);
+        sqlite3_bind_int(m_pProcessInfoInsertStmt, 4, hasCSS);
 
         if (SQLITE_DONE == sqlite3_step(m_pProcessInfoInsertStmt))
         {
@@ -1483,6 +1508,45 @@ public:
         }
 
         sqlite3_reset(m_pModuleInstanceInsertStmt);
+        return ret;
+    }
+
+    bool InsertCallStackFrame(gtUInt32 callStackId, gtUInt64 processId, gtUInt64 funcId, gtUInt64 offset, gtUInt16 depth)
+    {
+        bool ret = false;
+
+        sqlite3_bind_int(m_pCallStackFrameInsertStmt, 1, callStackId);
+        sqlite3_bind_int64(m_pCallStackFrameInsertStmt, 2, processId);
+        sqlite3_bind_int64(m_pCallStackFrameInsertStmt, 3, funcId);
+        sqlite3_bind_int64(m_pCallStackFrameInsertStmt, 4, offset);
+        sqlite3_bind_int(m_pCallStackFrameInsertStmt, 5, depth);
+
+        if (SQLITE_DONE == sqlite3_step(m_pCallStackFrameInsertStmt))
+        {
+            ret = true;
+        }
+
+        sqlite3_reset(m_pCallStackFrameInsertStmt);
+        return ret;
+    }
+
+    bool InsertCallStackLeaf(gtUInt32 callStackId, gtUInt64 processId, gtUInt64 funcId, gtUInt64 offset, gtUInt32 counterId, gtUInt64 selfSamples)
+    {
+        bool ret = false;
+
+        sqlite3_bind_int(m_pCallStackLeafInsertStmt, 1, callStackId);
+        sqlite3_bind_int64(m_pCallStackLeafInsertStmt, 2, processId);
+        sqlite3_bind_int64(m_pCallStackLeafInsertStmt, 3, funcId);
+        sqlite3_bind_int64(m_pCallStackLeafInsertStmt, 4, offset);
+        sqlite3_bind_int(m_pCallStackLeafInsertStmt, 5, counterId);
+        sqlite3_bind_int64(m_pCallStackLeafInsertStmt, 6, selfSamples);
+
+        if (SQLITE_DONE == sqlite3_step(m_pCallStackLeafInsertStmt))
+        {
+            ret = true;
+        }
+
+        sqlite3_reset(m_pCallStackLeafInsertStmt);
         return ret;
     }
 
@@ -4625,7 +4689,7 @@ public:
                 aLeaf.m_depth = sqlite3_column_int(pQueryStmt, 3);
 
                 aLeaf.m_selfSamples = 0;
-                aLeaf.m_counterId = 0; // FIXME               
+                aLeaf.m_counterId = 0; // FIXME
                 aLeaf.m_isLeaf = false;
 
                 GetFunctionInfo(funcId, aLeaf.m_funcInfo);
@@ -4761,15 +4825,15 @@ public:
     sqlite3_stmt* m_pModuleInstanceInsertStmt = nullptr;
     sqlite3_stmt* m_pProcessThreadInsertStmt = nullptr;
     sqlite3_stmt* m_pSampleContextInsertStmt = nullptr;
-    //sqlite3_stmt* m_pAggregatedSamplesInsertStmt = nullptr;
     sqlite3_stmt* m_pFunctionInfoInsertStmt = nullptr;
-    //sqlite3_stmt* m_pFunctionSampleAggregationInsertStmt = nullptr;
     sqlite3_stmt* m_pModuleIdQueryStmt = nullptr;
     sqlite3_stmt* m_pSamplingConfigIdQueryStmt = nullptr;
     sqlite3_stmt* m_pCoreSamplingConfigIdQueryStmt = nullptr;
     sqlite3_stmt* m_pModuleInstanceIdQueryStmt = nullptr;
     sqlite3_stmt* m_pProcessThreadIdQueryStmt = nullptr;
     sqlite3_stmt* m_pFunctionIdQueryStmt = nullptr;
+    sqlite3_stmt* m_pCallStackFrameInsertStmt = nullptr;
+    sqlite3_stmt* m_pCallStackLeafInsertStmt = nullptr;
 
     // This thread is used to commit data to the database (which might take time).
     // As we would like to avoid stalls in the main thread.
@@ -5017,7 +5081,7 @@ bool AmdtDatabaseAccessor::InsertCoreSamplingConfig(gtUInt64 id, gtUInt16 coreId
     return ret;
 }
 
-bool AmdtDatabaseAccessor::InsertProcessInfo(gtUInt64 pid, const gtString& path, bool is32Bit)
+bool AmdtDatabaseAccessor::InsertProcessInfo(gtUInt64 pid, const gtString& path, bool is32Bit, bool hasCSS)
 {
     bool ret = false;
 
@@ -5026,7 +5090,7 @@ bool AmdtDatabaseAccessor::InsertProcessInfo(gtUInt64 pid, const gtString& path,
         std::string pathAsUtf8Str;
         path.asUtf8(pathAsUtf8Str);
 
-        ret = m_pImpl->InsertProcessInfo(pid, pathAsUtf8Str, (is32Bit ? 1 : 0));
+        ret = m_pImpl->InsertProcessInfo(pid, pathAsUtf8Str, (is32Bit ? 1 : 0), (hasCSS ? 1 : 0));
     }
 
     return ret;
@@ -5103,6 +5167,30 @@ bool AmdtDatabaseAccessor::InsertFunction(gtUInt32 functionId, gtUInt32 moduleId
         std::string funcNameAsUtf8Str;
         funcName.asUtf8(funcNameAsUtf8Str);
         ret = m_pImpl->InsertFunctionInfo(functionId, moduleId, funcNameAsUtf8Str, offset, size);
+    }
+
+    return ret;
+}
+
+bool AmdtDatabaseAccessor::InsertCallStackFrame(gtUInt32 callStackId, gtUInt64 processId, gtUInt64 funcId, gtUInt64 offset, gtUInt16 depth)
+{
+    bool ret = false;
+
+    if (m_pImpl != nullptr)
+    {
+        ret = m_pImpl->InsertCallStackFrame(callStackId, processId, funcId, offset, depth);
+    }
+
+    return ret;
+}
+
+bool AmdtDatabaseAccessor::InsertCallStackLeaf(gtUInt32 callStackId, gtUInt64 processId, gtUInt64 funcId, gtUInt64 offset, gtUInt32 counterId, gtUInt64 selfSamples)
+{
+    bool ret = false;
+
+    if (m_pImpl != nullptr)
+    {
+        ret = m_pImpl->InsertCallStackLeaf(callStackId, processId, funcId, offset, counterId, selfSamples);
     }
 
     return ret;

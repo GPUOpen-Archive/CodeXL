@@ -15,15 +15,11 @@
 #include <AMDTOSWrappers/Include/osFilePath.h>
 #include <AMDTOSWrappers/Include/osApplication.h>
 #include <AMDTOSWrappers/Include/osGeneralFunctions.h>
-
 #include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
-
 #include <AMDTCommonProfileDataTypes.h>
-
 #include <CpuProfileInfo.h>
 #include <CpuProfileModule.h>
 #include <CpuProfileProcess.h>
-
 #include <ProfilerDataDBWriter.h>
 
 static inline gtUInt32 generateFuncId(gtUInt16 moduleId, gtUInt16 funcSeq)
@@ -31,6 +27,35 @@ static inline gtUInt32 generateFuncId(gtUInt16 moduleId, gtUInt16 funcSeq)
     gtUInt32 funcId = moduleId;
     funcId = (funcId << 16) | funcSeq;
     return funcId;
+}
+
+bool ProfilerDataDBWriter::Initialize(const gtString& path)
+{
+    bool rc = false;
+
+    if (m_pCpuProfDbAdapter != nullptr)
+    {
+        // Remove trailing '.ebp' from path
+        gtString dbPath = path;
+
+        if (dbPath.endsWith(gtString(L".ebp")))
+        {
+            int pos = dbPath.reverseFind(L".");
+            dbPath.extruct(pos, dbPath.length());
+        }
+
+        gtString dbExtn;
+        m_pCpuProfDbAdapter->GetDbFileExtension(dbExtn);
+        dbPath.append(dbExtn);
+        rc = m_pCpuProfDbAdapter->CreateDb(dbPath, AMDT_PROFILE_MODE_AGGREGATION);
+    }
+
+    if (rc)
+    {
+        m_isWriterReady = true;
+    }
+
+    return rc;
 }
 
 void ProfilerDataDBWriter::PackSessionInfo(const CpuProfileInfo& profileInfo, gtUInt64 cpuAffinity, AMDTProfileSessionInfo& sessionInfo)
@@ -185,7 +210,7 @@ void ProfilerDataDBWriter::PackProcessInfo(const PidProcessMap& processMap, CPAP
 {
     for (auto& pit : processMap)
     {
-        processList.emplace_back(pit.first, pit.second.getPath(), pit.second.m_is32Bit);
+        processList.emplace_back(pit.first, pit.second.getPath(), pit.second.m_is32Bit, pit.second.m_hasCss);
     }
 }
 
@@ -355,7 +380,6 @@ void ProfilerDataDBWriter::PackFunctionInfo(const NameModuleMap& modMap, CPAFunc
 }
 
 bool ProfilerDataDBWriter::Write(
-    const gtString& path,
     CpuProfileInfo& profileInfo,
     gtUInt64 cpuAffinity,
     const PidProcessMap& procMap,
@@ -364,22 +388,8 @@ bool ProfilerDataDBWriter::Write(
     const gtHashMap<gtUInt32, std::tuple<gtString, gtUInt64, gtUInt64>>& modInstanceInfoMap,
     const CoreTopologyMap* pTopMap)
 {
-    if (m_pCpuProfDbAdapter != nullptr)
+    if (m_isWriterReady)
     {
-        // Remove trailing '.ebp' from path
-        gtString dbPath = path;
-
-        if (dbPath.endsWith(gtString(L".ebp")))
-        {
-            int pos = dbPath.reverseFind(L".");
-            dbPath.extruct(pos, dbPath.length());
-        }
-
-        gtString dbExtn;
-        m_pCpuProfDbAdapter->GetDbFileExtension(dbExtn);
-        dbPath.append(dbExtn);
-        m_pCpuProfDbAdapter->CreateDb(dbPath, AMDT_PROFILE_MODE_AGGREGATION);
-
         AMDTProfileSessionInfo sessionInfo;
         PackSessionInfo(profileInfo, cpuAffinity, sessionInfo);
         m_pCpuProfDbAdapter->InsertSessionInfo(sessionInfo);
@@ -435,8 +445,26 @@ bool ProfilerDataDBWriter::Write(
         PackSampleInfo(modMap, sampleList);
         m_pCpuProfDbAdapter->InsertSamples(sampleList);
         sampleList.clear();
+    }
 
-        m_pCpuProfDbAdapter->CloseDb();
+    return true;
+}
+
+bool ProfilerDataDBWriter::Write(const CPACallStackFrameInfoList& csFrameInfoList)
+{
+    if (m_isWriterReady)
+    {
+        m_pCpuProfDbAdapter->InsertCallStackFrames(csFrameInfoList);
+    }
+
+    return true;
+}
+
+bool ProfilerDataDBWriter::Write(const CPACallStackLeafInfoList& csLeafInfoList)
+{
+    if (m_isWriterReady)
+    {
+        return m_pCpuProfDbAdapter->InsertCallStackLeafs(csLeafInfoList);
     }
 
     return true;
