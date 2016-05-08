@@ -621,7 +621,10 @@ void gpSessionView::OnApplicationRunEnded(gpSessionTreeNodeData* pRunningSession
         m_pCurrentFrameCaptionLabel->setText(GPU_STR_dashboard_MainImageCaptionStopped);
 
         // Select the first capture frame, to make sure that the "Open Timeline" button is enabled
-        m_pSnapshotsThumbView->SetSelected(0, true);
+        if (m_pSnapshotsThumbView->ItemsCount() > 0)
+        {
+            m_pSnapshotsThumbView->SetSelected(0, true);
+        }
     }
 }
 

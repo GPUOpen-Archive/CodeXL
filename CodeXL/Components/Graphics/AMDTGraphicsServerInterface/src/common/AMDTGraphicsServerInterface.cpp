@@ -15,6 +15,10 @@
 
 #define GP_GRAPHICS_SERVER_STATE_STALLED "GRAPHICS_SERVER_STATE_STALLED"
 #define GP_GRAPHICS_SERVER_STATE_PROCESS_NOT_RUNNING "GRAPHICS_SERVER_STATE_PROCESS_NOT_RUNNING"
+
+#define GP_GRAPHICS_SERVER_DX12_API_TYPE  "DX12"
+#define GP_GRAPHICS_SERVER_VULKAN_API_TYPE  "Vulkan"
+
 // ---------------------------------------------------------------------------
 // Name:        GraphicsServerCommunication::GraphicsServerCommunication
 // Description: Constructor
@@ -88,7 +92,7 @@ bool GraphicsServerCommunication::ConnectServer(const gtASCIIString strServer)
 // Arguments:   strPid - Process ID to connect to and update current PID, (optional) can be "", function will then connect to known process
 // Return Val:  bool  - Success / failure
 // ---------------------------------------------------------------------------
-bool GraphicsServerCommunication::ConnectProcess(const gtASCIIString strPid)
+bool GraphicsServerCommunication::ConnectProcess(const gtASCIIString strPid, const gtASCIIString& apiType)
 {
     gtASCIIString strWebResponse;
 
@@ -99,24 +103,43 @@ bool GraphicsServerCommunication::ConnectProcess(const gtASCIIString strPid)
         m_strPid = strPid;
     }
 
-    if (0 < m_strPid.length())
+    if (apiType.isEmpty() == false)
+    {
+        if (apiType == GP_GRAPHICS_SERVER_DX12_API_TYPE || apiType == GP_GRAPHICS_SERVER_VULKAN_API_TYPE)
+        {
+            m_strApiHttpCommand = "/";
+            m_strApiHttpCommand.append(apiType);
+        }
+        else
+        {
+            gtString msg = L"Wrong API given : ";
+            msg.append(gtString().fromASCIIString(apiType.asCharArray()));
+            GT_ASSERT_EX(false, msg.asCharArray());
+            m_strApiHttpCommand = "";
+        }
+    }
+    if (m_strPid.isEmpty() == false && m_strApiHttpCommand.isEmpty() == false)
     {
         // Connect
-        retVal = SendCommandPid("/DX12/ShowStack", strWebResponse, "");
+        gtASCIIString showStack = m_strApiHttpCommand;
+        retVal = SendCommandPid(showStack.append("/ShowStack"), strWebResponse, "");
 
         if (retVal)
         {
-            retVal = SendCommandPid("/DX12/PushLayer=TimeControl", strWebResponse, "");
+            gtASCIIString timeControl = m_strApiHttpCommand;
+            retVal = SendCommandPid(timeControl.append("/PushLayer=TimeControl") , strWebResponse, "");
         }
 
         if (retVal)
         {
-            retVal = SendCommandPid("/DX12/TC/Settings.xml", strWebResponse, "");
+            gtASCIIString tcSettings = m_strApiHttpCommand;
+            retVal = SendCommandPid(tcSettings.append("/TC/Settings.xml"), strWebResponse, "");
         }
 
         if (retVal)
         {
-            retVal = SendCommandPid("/DX12/AutoCapture", strWebResponse, "");
+            gtASCIIString autoCapture = m_strApiHttpCommand;
+            retVal = SendCommandPid(autoCapture.append("/AutoCapture"), strWebResponse, "");
         }
     }
 

@@ -53,7 +53,7 @@ public:
 
     // connections
     bool ConnectServer(const gtASCIIString strServer);
-    bool ConnectProcess(const gtASCIIString strPid);
+    bool ConnectProcess(const gtASCIIString strPid, const gtASCIIString& apiType);
     bool Disconnect();
 
     // commands
@@ -149,6 +149,9 @@ private:
 
     // current process ID
     gtASCIIString   m_strPid;
+    
+    /// current API http command for example : /DX12 or /Vulkan
+    gtASCIIString   m_strApiHttpCommand;
 
     bool m_isStopSignaled;
 };

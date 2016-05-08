@@ -37,6 +37,7 @@ gpConnectDialog::gpConnectDialog(GraphicsServerCommunication* pGraphicsServerCom
     m_pGraphicsServerCommunication(pGraphicsServerCommunication),
     m_timePassed(0),
     m_pidToConnectTo(""),
+    m_apiToConnectTo(GPU_STR_TraceViewDX12),
     m_processName(""),
     m_processNumber("1"),
     m_validator(1, 100, this),
@@ -449,6 +450,7 @@ bool gpConnectDialog::CheckAutoConnected(QVector<gpConnectionData>& connections)
                 if (foundConnection)
                 {
                     m_pidToConnectTo = connections[nConnection].mPID;
+                    m_apiToConnectTo = connections[nConnection].mAPI;
                     retVal = true;
                     accept();
                     break;
@@ -476,6 +478,8 @@ void gpConnectDialog::OnAccept()
                 gtString itemText;
                 m_pConnectionsTable->getItemText(currentRow, eProcIDColumn, itemText);
                 m_pidToConnectTo = acGTStringToQString(itemText);
+                m_pConnectionsTable->getItemText(currentRow, eAPIColumn, itemText);
+                m_apiToConnectTo = acGTStringToQString(itemText);
             }
         }
 

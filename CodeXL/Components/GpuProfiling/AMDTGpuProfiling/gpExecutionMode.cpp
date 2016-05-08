@@ -509,7 +509,7 @@ void gpExecutionMode::OnStartFrameAnalysis()
             {
                 m_isFrameAnalysisConnecting = true;
                 // connect the process and pass the pid:
-                rc = m_pGraphicsServerCommunication->ConnectProcess(processID.toStdString().c_str());
+                rc = m_pGraphicsServerCommunication->ConnectProcess(processID.toStdString().c_str(), connectionDialog.APIToConnectTo().toStdString().c_str());
 
                 GT_IF_WITH_ASSERT(rc)
                 {
@@ -678,7 +678,7 @@ bool gpExecutionMode::GetFrameTraceFromServer(const osFilePath& sessionFilePath,
                 if (shouldConnect && !processID.isEmpty())
                 {
                     // connect the process and pass the pid:
-                    retVal = m_pGraphicsServerCommunication->ConnectProcess(processID.toStdString().c_str());
+                    retVal = m_pGraphicsServerCommunication->ConnectProcess(processID.toStdString().c_str(), connectionDialog.APIToConnectTo().toStdString().c_str());
 
                     gtASCIIString traceAsText;
 
@@ -778,7 +778,7 @@ bool gpExecutionMode::GetFrameObject(const osFilePath& sessionFilePath, int fram
                 if (shouldConnect && !processID.isEmpty())
                 {
                     // connect the process and pass the pid:
-                    retVal = m_pGraphicsServerCommunication->ConnectProcess(processID.toStdString().c_str());
+                    retVal = m_pGraphicsServerCommunication->ConnectProcess(processID.toStdString().c_str(), connectionDialog.APIToConnectTo().toStdString().c_str());
 
                     gtASCIIString objectInfoAsXML;
 

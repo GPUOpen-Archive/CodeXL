@@ -41,6 +41,7 @@ public:
     bool Connect();
 
     QString PIDToConnectTo() { return m_pidToConnectTo; }
+    QString APIToConnectTo() { return m_apiToConnectTo; }
 
 protected slots:
     void onTimerTimeout();
@@ -82,6 +83,8 @@ private:
 
     /// process to connect to
     QString m_pidToConnectTo;
+    /// api type to connect to (DX12 or Vulkan)
+    QString m_apiToConnectTo;
 
     /// strings that temporary store the data
     QString m_processName;
