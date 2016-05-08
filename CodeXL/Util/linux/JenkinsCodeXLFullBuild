@@ -154,7 +154,7 @@ PackageTheBuild()
 		################################################################################################
 		# Copy the files for the CodeXL Public version
 		################################################################################################
-		PKG_NAME=AMD_CodeXL_Linux_x86_64_${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_BUILD}
+		PKG_NAME=CodeXL_Linux_x86_64_${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_BUILD}
 		mkdir -p ${PKG_NAME}
 		cp ${AMD_CODEXL}/../CodeXL/Installer-Linux/debian/main/amdcodexlicon.desktop ${PKG_NAME}
 		cp ${AMD_CODEXL}/../CodeXL/Installer-Linux/debian/main/amdremoteagenticon.desktop ${PKG_NAME}
