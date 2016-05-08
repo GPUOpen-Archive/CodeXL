@@ -47,6 +47,9 @@ public:
     /// The command queue pointer as string
     std::string m_commandQueuePtrStr;
 
+    /// The command list pointer as string
+    std::string m_commandListPtrStr;
+
     /// The GPU command sample ID
     int m_sampleId;
 };

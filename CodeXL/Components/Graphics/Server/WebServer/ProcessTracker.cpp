@@ -1082,7 +1082,8 @@ bool ProcessTracker::PassRequestToPlugin(const char* strDestination,
 }
 
 //--------------------------------------------------------------------------
-/// Setup Vulkan-specific environment variables
+/// Setup Vulkan-specific environment variables.
+/// This code needs to be called during tool initialization.
 //--------------------------------------------------------------------------
 void SetupVulkanEnvVariables()
 {
@@ -1091,57 +1092,40 @@ void SetupVulkanEnvVariables()
     // Windows
 #ifdef _WIN32
 
-    // Internal build
-#ifdef GDT_INTERNAL
 #ifdef _DEBUG
 #ifdef X64
-    gtString layerName = L"VulkanServer-x64-d-Internal";
+    gtString layerName = L"CXLGraphicsServerVulkan-x64-d";
 #else
-    gtString layerName = L"VulkanServer-d-Internal";
+    gtString layerName = L"CXLGraphicsServerVulkan-d";
 #endif
 #else
 #ifdef X64
-    gtString layerName = L"VulkanServer-x64-Internal";
+    gtString layerName = L"CXLGraphicsServerVulkan-x64";
 #else
-    gtString layerName = L"VulkanServer-Internal";
+    gtString layerName = L"CXLGraphicsServerVulkan";
 #endif
-#endif
-
-    // Release build
-#else
-
-#ifdef _DEBUG
-#ifdef X64
-    gtString layerName = L"VulkanServer-x64-d";
-#else
-    gtString layerName = L"VulkanServer-d";
-#endif
-#else
-#ifdef X64
-    gtString layerName = L"VulkanServer-x64";
-#else
-    gtString layerName = L"VulkanServer";
-#endif
-#endif
-
 #endif
 
     gtASCIIString serverPath;
     GetModuleDirectory(serverPath);
 
+    // Set VK_LAYER_PATH equal to where our layer lives
     osEnvironmentVariable layerPath;
     layerPath._name = L"VK_LAYER_PATH";
     layerPath._value.fromASCIIString(serverPath.asCharArray());
     layerPath._value.append(L"Plugins");
 
+    // Set VK_INSTANCE_LAYERS equal to our layer above
     osEnvironmentVariable instanceLayerName;
     instanceLayerName._name =  L"VK_INSTANCE_LAYERS";
     instanceLayerName._value = layerName;
 
+    // Set VK_DEVICE_LAYERS equal to our layer above
     osEnvironmentVariable deviceLayerName;
     deviceLayerName._name = L"VK_DEVICE_LAYERS";
     deviceLayerName._value = layerName;
 
+    // Setting these environment variables should register our server as a layer
     osSetCurrentProcessEnvVariable(layerPath);
     osSetCurrentProcessEnvVariable(instanceLayerName);
     osSetCurrentProcessEnvVariable(deviceLayerName);

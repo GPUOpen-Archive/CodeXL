@@ -214,7 +214,7 @@ bool amdtProfileDbAdapter::InsertProcessInfo(const CPAProcessList& procesList)
 
     for (const auto& p : procesList)
     {
-        ret = m_pDbAccessor->InsertProcessInfo(p.m_pid, p.m_name, p.m_is32Bit);
+        ret = m_pDbAccessor->InsertProcessInfo(p.m_pid, p.m_name, p.m_is32Bit, p.m_hasCSS);
     }
 
     return ret;
@@ -813,4 +813,39 @@ void amdtProfileDbAdapter::PrepareTimelineSamplesToInsert(AMDTProfileTimelineSam
             static_cast<int>(beVal.m_counterId),
             static_cast<double>(beVal.m_counterValue));
     }
+}
+
+bool amdtProfileDbAdapter::InsertCallStackFrames(const CPACallStackFrameInfoList& csFrameInfoList)
+{
+    if (m_pDbAccessor != nullptr)
+    {
+        for (const auto& frameInfo : csFrameInfoList)
+        {
+            m_pDbAccessor->InsertCallStackFrame(
+                frameInfo.m_callStackId,
+                frameInfo.m_processId,
+                frameInfo.m_funcId,
+                frameInfo.m_offset,
+                frameInfo.m_depth);
+        }
+    }
+    return true;
+}
+
+bool amdtProfileDbAdapter::InsertCallStackLeafs(const CPACallStackLeafInfoList& csLeafInfoList)
+{
+    if (m_pDbAccessor != nullptr)
+    {
+        for (const auto& frameInfo : csLeafInfoList)
+        {
+            m_pDbAccessor->InsertCallStackLeaf(
+                frameInfo.m_callStackId,
+                frameInfo.m_processId,
+                frameInfo.m_funcId,
+                frameInfo.m_offset,
+                frameInfo.m_counterId,
+                frameInfo.m_selfSamples);
+        }
+    }
+    return true;
 }

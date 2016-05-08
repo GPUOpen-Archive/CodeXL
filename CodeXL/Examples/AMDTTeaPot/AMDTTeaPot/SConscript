@@ -13,7 +13,6 @@ env = CXL_env.Clone()
 #env.Append(CXL_commonproj_dir = env['CXL_common_dir'] + "/../CommonProjects")
 compiler_base_flags = " -Wall -g -fmessage-length=0 -Wno-unknown-pragmas -pthread -D_DEBUG "
 env.Replace(CPPFLAGS = compiler_base_flags)
-UseFltk(env)
 
 env.Append( CPPPATH = [ 
     "./",
@@ -48,8 +47,8 @@ commonLinkedLibraries = \
 [
     "fltk_gl.a",
     "fltk.a",
-    "GL",
     "CXLTeaPot",
+    "GL",
     "libglib-2.0",
     "X11",
     "dl",

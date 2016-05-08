@@ -30,8 +30,9 @@ struct CPAProcessInfo
     gtUInt32 m_pid;
     gtString m_name;
     bool     m_is32Bit;
+    bool     m_hasCSS;
 
-    CPAProcessInfo(gtUInt32 pid, gtString name, bool is32Bit) : m_pid(pid), m_name(name), m_is32Bit(is32Bit) {}
+    CPAProcessInfo(gtUInt32 pid, gtString name, bool is32Bit, bool hasCSS) : m_pid(pid), m_name(name), m_is32Bit(is32Bit), m_hasCSS(hasCSS) {}
 };
 
 using CPAProcessList = gtVector<CPAProcessInfo>;
@@ -118,5 +119,35 @@ struct CPAFunctionInfo
 };
 
 using CPAFunctionInfoList = gtVector<CPAFunctionInfo>;
+
+struct CPACallStackFrameInfo
+{
+    gtUInt32 m_callStackId = 0;
+    gtUInt64 m_processId = 0;
+    gtUInt64 m_funcId = 0;
+    gtUInt64 m_offset = 0;  // with respect to module load address
+    gtUInt16 m_depth = 0;
+
+    CPACallStackFrameInfo(gtUInt32 callStackId, gtUInt64 processId, gtUInt64 funcId, gtUInt64 offset, gtUInt16 depth) :
+        m_callStackId(callStackId), m_processId(processId), m_funcId(funcId), m_offset(offset), m_depth(depth) {}
+};
+
+using CPACallStackFrameInfoList = gtVector<CPACallStackFrameInfo>;
+
+struct CPACallStackLeafInfo
+{
+    gtUInt32 m_callStackId = 0;
+    gtUInt64 m_processId = 0;
+    gtUInt64 m_funcId = 0;
+    gtUInt64 m_offset = 0;  // with respect to module load address
+    gtUInt32 m_counterId = 0;
+    gtUInt64 m_selfSamples = 0;
+
+    CPACallStackLeafInfo(gtUInt32 callStackId, gtUInt64 processId, gtUInt64 funcId, gtUInt64 offset, gtUInt32 counterId, gtUInt64 selfSamples) :
+    m_callStackId(callStackId), m_processId(processId), m_funcId(funcId), m_offset(offset), m_counterId(counterId), m_selfSamples(selfSamples) {}
+};
+
+using CPACallStackLeafInfoList = gtVector<CPACallStackLeafInfo>;
+
 
 #endif //_CPADAPTERDATADEFS_H_

@@ -36,7 +36,6 @@
 #include <AMDTExecutableFormat/inc/PeFile.h>
 #include <AMDTCpuCallstackSampling/inc/CallStackBuilder.h>
 #include <AMDTCpuCallstackSampling/inc/CssWriter.h>
-#include <AMDTCpuProfilingRawData/inc/ProfilerDataDBWriter.h>
 
 #include <psapi.h>
 #include <sstream>
@@ -428,6 +427,11 @@ PrdTranslator::~PrdTranslator()
     }
 
     fnCleanupMaps();
+
+    if (nullptr != m_dbWriter)
+    {
+        delete m_dbWriter;
+    }
 }
 
 void PrdTranslator::InitializeProgressBar(const gtString& caption, bool incremental)
@@ -3185,6 +3189,24 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
 {
     HRESULT  res = S_OK;
 
+    gtString createDbEnvStr;
+    bool createDb = false;
+
+    if (osGetCurrentProcessEnvVariableValue(L"AMDT_CPUPROFILE_CREATE_DB", createDbEnvStr))
+    {
+        createDb = createDbEnvStr.isEqualNoCase(L"YES");
+    }
+
+    if (createDb)
+    {
+        m_dbWriter = new ProfilerDataDBWriter;
+    }
+
+    if (nullptr != m_dbWriter)
+    {
+        m_dbWriter->Initialize(proFile.toStdWString().c_str());
+    }
+
     // Write the CSS files to the same directory as the profile file
     for (gtMap<ProcessIdType, ProcessInfo*>::iterator it = m_processInfos.begin(), itEnd = m_processInfos.end(); it != itEnd; ++it)
     {
@@ -3267,6 +3289,107 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
         return res;
     }
 
+    if (nullptr != m_dbWriter)
+    {
+        // Write the callstack info to DB
+        for (auto procIter = m_processInfos.begin(), procIterEnd = m_processInfos.end(); procIter != procIterEnd; ++procIter)
+        {
+            ProcessInfo* pProcessInfo = procIter->second;
+
+            if (NULL != pProcessInfo && 0U != pProcessInfo->m_callGraph.GetOrder())
+            {
+                ProcessIdType pid = procIter->first;
+                CallGraph& callGraph = pProcessInfo->m_callGraph;
+                TiProcessWorkingSetQuery workingSet(pid);
+
+                gtUInt32 callStackId = 0;
+                CPACallStackFrameInfoList csFrameInfoList;
+                CPACallStackLeafInfoList  csLeafInfoList;
+
+                for (auto stackIt = callGraph.GetBeginCallStack(), stackItEnd = callGraph.GetEndCallStack(); stackIt != stackItEnd; ++stackIt)
+                {
+                    CallStack& callStack = **stackIt;
+                    gtUInt16 callSiteDepth = 0;
+                    ++callStackId;
+
+                    for (auto siteIt = callStack.begin(), siteItEnd = callStack.end(); siteIt != siteItEnd; ++siteIt)
+                    {
+                        CallSite& callSite = *siteIt;
+                        ++callSiteDepth;
+                        gtUInt64 funcId = 0;
+
+                        ExecutableFile* pExe = workingSet.FindModule(callSite.m_traverseAddr);
+                        gtUInt64 loadAddr = (nullptr != pExe) ? pExe->GetLoadAddress() : 0ULL;
+                        gtUInt64 offset = callSite.m_traverseAddr - loadAddr;
+
+                        if (pExe != nullptr)
+                        {
+                            gtString moduleName = pExe->GetFilePath();
+                            auto modIt = moduleMap.find(moduleName);
+
+                            if (modIt != moduleMap.end())
+                            {
+                                funcId = modIt->second.m_moduleId << 16;
+                                auto pFunc = modIt->second.findFunction(callSite.m_traverseAddr);
+
+                                if (pFunc != nullptr)
+                                {
+                                    funcId |= pFunc->m_functionId;
+                                }
+                            }
+                        }
+
+                        csFrameInfoList.emplace_back(callStackId, pid, funcId, offset, callSiteDepth);
+                    }
+
+                    const EventSampleList& samples = callStack.GetEventSampleList();
+
+                    if (!samples.IsEmpty())
+                    {
+                        auto eventIter = samples.begin();
+                        auto eventIterEnd = samples.end();
+
+                        while (++eventIter != eventIterEnd)
+                        {
+                            const EventSampleInfo& sampleInfo = *eventIter;
+                            gtUInt64 funcId = 0;
+
+                            ExecutableFile* pExe = workingSet.FindModule(sampleInfo.m_pSite->m_traverseAddr);
+                            gtUInt64 loadAddr = (nullptr != pExe) ? pExe->GetLoadAddress() : 0ULL;
+                            gtUInt64 offset = sampleInfo.m_pSite->m_traverseAddr - loadAddr;
+
+                            if (pExe != nullptr)
+                            {
+                                gtString moduleName = pExe->GetFilePath();
+                                auto modIt = moduleMap.find(moduleName);
+
+                                if (modIt != moduleMap.end())
+                                {
+                                    funcId = modIt->second.m_moduleId << 16;
+                                    auto pFunc = modIt->second.findFunction(sampleInfo.m_pSite->m_traverseAddr);
+
+                                    if (pFunc != nullptr)
+                                    {
+                                        funcId |= pFunc->m_functionId;
+                                    }
+                                }
+                            }
+
+                            csLeafInfoList.emplace_back(
+                                callStackId, pid, funcId, offset, sampleInfo.m_eventId, sampleInfo.m_count);
+                        }
+                    }
+                }
+
+                m_dbWriter->Write(csFrameInfoList);
+                csFrameInfoList.clear();
+
+                m_dbWriter->Write(csLeafInfoList);
+                csLeafInfoList.clear();
+            }
+        }
+    }
+
     return res;
 }
 
@@ -3333,24 +3456,15 @@ bool PrdTranslator::WriteProfileFile(const gtString& path,
 
     UpdateProgressBar(80ULL, 100ULL);
 
-    gtString createDbEnvStr;
-    bool createDb = false;
-
-    if (osGetCurrentProcessEnvVariableValue(L"AMDT_CPUPROFILE_CREATE_DB", createDbEnvStr))
-    {
-        createDb = createDbEnvStr.isEqualNoCase(L"YES");
-    }
-
-    if (createDb)
+    if (nullptr != m_dbWriter)
     {
         gtUInt64 startTime = GetTickCount();
 
         gtVector<std::tuple<gtUInt32, gtUInt32>> processThreadList;
         fnGetProcessThreadList(processThreadList);
 
-        ProfilerDataDBWriter DBWriter;
         //TODO: cpu affinity should be part of CpuProfileInfo i.e. info parameter
-        DBWriter.Write(path, info, m_runInfo->m_cpuAffinity, *procMap, processThreadList, *modMap, *pModInstanceMap, pTopMap);
+        m_dbWriter->Write(info, m_runInfo->m_cpuAffinity, *procMap, processThreadList, *modMap, *pModInstanceMap, pTopMap);
 
         if (m_collectStat)
         {

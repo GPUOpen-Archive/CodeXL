@@ -42,6 +42,26 @@ public:
     /// Destructor
     ~gpTraceDataContainer();
 
+    class CommandListData
+    {
+    public:
+
+        /// Constructor
+        CommandListData();
+
+        /// The queue for which the command list belongs to
+        QString m_queueName;
+
+        /// A list of API calls indices
+        QList<int> m_apiIndices;
+
+        /// The command list start time
+        quint64 m_startTime;
+
+        /// The command list end time
+        quint64 m_endTime;
+    };
+
     /// Sets the session API calls count
     virtual void SetAPINum(osThreadId threadId, unsigned int apiNum);
 
@@ -199,6 +219,9 @@ public:
     /// \return the item in which the string appears or null if the string was not found in the container
     ProfileSessionDataItem* FindNextItem(const QString& findStr, bool isCaseSensitive);
 
+    /// Get the data collected for the frame command lists
+    const QMap<QString, gpTraceDataContainer::CommandListData>& CommandListsData() const { return m_commandListData; };
+
 private:
 
     /// Map from thread id to API count
@@ -255,6 +278,12 @@ private:
     /// map of sampleId to CPU\GPU items, for fast sync
     QMap<int, ProfileSessionDataItem*> m_sampleIdToCPUItemMap;
     QMap<int, ProfileSessionDataItem*> m_sampleIdToGPUItemMap;
+
+    /// A map from command list pointer to queue pointer
+    QMap <QString, QString> m_commandListToQueueMap;
+
+    /// Map from command list pointer to command list data
+    QMap <QString, CommandListData> m_commandListData;
 };
 
 #endif // _GPTRACEDATACONTAINER_H_

@@ -16,6 +16,8 @@
 #define _PROFILEDATADBWRITER_H_
 
 #include <AMDTDbAdapter/inc/AMDTProfileDbAdapter.h>
+#include <AMDTCpuCallstackSampling/inc/CallGraph.h>
+#include <AMDTCpuPerfEventUtils/inc/EventsFile.h>
 #include "CpuProfilingRawDataDLLBuild.h"
 #include "CpuProfileInfo.h"
 #include "CpuProfileModule.h"
@@ -25,6 +27,7 @@ class CP_RAWDATA_API ProfilerDataDBWriter
 {
 public:
     ProfilerDataDBWriter() : m_pCpuProfDbAdapter(new amdtProfileDbAdapter) {};
+
     ~ProfilerDataDBWriter()
     {
         if (m_pCpuProfDbAdapter != nullptr)
@@ -35,14 +38,18 @@ public:
         }
     }
 
-    bool Write(const gtString& path,
-               CpuProfileInfo& profileInfo,
+    bool Initialize(const gtString& path);
+
+    bool Write(CpuProfileInfo& profileInfo,
                gtUInt64 cpuAffinity,
                const PidProcessMap& procMap,
                gtVector<std::tuple<gtUInt32, gtUInt32>>& processThreadList,
                const NameModuleMap& modMap,
                const gtHashMap<gtUInt32, std::tuple<gtString, gtUInt64, gtUInt64>>& modInstanceInfo,
                const CoreTopologyMap* topMap = nullptr);
+
+    bool Write(const CPACallStackFrameInfoList& csFrameInfoList);
+    bool Write(const CPACallStackLeafInfoList& csLeafInfoList);
 
 private:
     void PackSessionInfo(const CpuProfileInfo& profileInfo, gtUInt64 cpuAffinity, AMDTProfileSessionInfo& sessionInfo);
@@ -64,6 +71,7 @@ private:
     bool InitializeEventsXMLFile(gtUInt32 cpuFamily, gtUInt32 cpuModel, EventsFile& eventsFile);
 
     amdtProfileDbAdapter* m_pCpuProfDbAdapter = nullptr;
+    bool m_isWriterReady = false;
 };
 
 #endif //_CPUPROFILEDATADBWRITER_H_

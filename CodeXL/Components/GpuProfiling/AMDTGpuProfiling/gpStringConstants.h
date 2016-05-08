@@ -244,6 +244,7 @@
 #define GPU_STR_TraceViewDX12 "DX12"
 #define GPU_STR_TraceViewVulkan "Vulkan"
 #define GPU_STR_TraceViewGPU "GPU"
+#define GPU_STR_TraceViewCommandLists "Command Lists"
 #define GPU_STR_TraceViewCPU "CPU"
 #define GPU_STR_TraceViewThread "Thread"
 #define GPU_STR_TraceViewHSAPerfMarker "HSAPerfMarker"
@@ -257,6 +258,7 @@
 // Trace table captions
 #define GP_STR_TraceTableColumnIndex "Index"
 #define GP_STR_TraceTableColumnInterface "Interface"
+#define GP_STR_TraceTableColumnCommandList "Command List"
 #define GP_STR_TraceTableColumnCall "Call"
 #define GP_STR_TraceTableColumnParameters "Parameters"
 #define GP_STR_TraceTableColumnResult "Result"

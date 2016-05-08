@@ -53,12 +53,16 @@ public:
     /// \return the color for performance markers
     QColor GetPerfMarkersColor() const ;
 
+    /// Gets the color for the command list with the specified index
+    /// \return the color for the command list 
+    QColor GetCommandListColor(int index) const;
+
 private:
     /// struct used in the m_apiColorMap cache
     class APIColorInfo
     {
     public:
-        /// Intializes a new instance of the APIColorInfo struct
+        /// Initializes a new instance of the APIColorInfo struct
         /// \param color the color for the api being cached
         /// \param useDefaultColor flag indicating whether or not the api being cached uses the default color
         APIColorInfo(QColor color, bool useDefaultColor): m_color(color), m_useDefaultColor(useDefaultColor) { }
@@ -76,7 +80,10 @@ private:
         bool   m_useDefaultColor; ///< flag indicating whether or not the api being cached uses the default color
     };
 
-    /// Detroys the APIColorMap instance (frees the APIColorInfo items and clears the map)
+    /// Constructor
+    APIColorMap();
+
+    /// Destroys the APIColorMap instance (frees the APIColorInfo items and clears the map)
     virtual ~APIColorMap();
 
     typedef QMap<QString, APIColorInfo*> ColorMap;      ///< typedef for the map used in the api color cache
@@ -86,6 +93,9 @@ private:
     typedef QMap<QPair<ProfileSessionDataItem::ProfileItemType, unsigned int>, APIColorInfo*> APIToColorMap;
     ///< a map from api type + function ID to the color info for that api
     APIToColorMap m_apiTypeToColorMap;
+
+    /// A vector of colors for command lists
+    QVector<QColor> m_commandListsColors;
 };
 
 
