@@ -32,6 +32,24 @@
 ///< color used for perf marker timeline items
 static const QColor s_LIGHT_BLUE_PERF_MARKER_COLOR = QColor(173, 216, 230);
 
+
+APIColorMap::APIColorMap()
+{
+    m_commandListsColors << QColor(173, 216, 230);
+    m_commandListsColors << QColor(173, 0, 230);
+    m_commandListsColors << QColor(173, 216, 0);
+    m_commandListsColors << QColor(0, 216, 230);
+    m_commandListsColors << QColor(173, 23, 230);
+    m_commandListsColors << QColor(173, 216, 23);
+    m_commandListsColors << QColor(23, 216, 230);
+    m_commandListsColors << QColor(173, 255, 230);
+    m_commandListsColors << QColor(255, 216, 230);
+    m_commandListsColors << QColor(173, 216, 255);
+    m_commandListsColors << QColor(255, 255, 230);
+    m_commandListsColors << QColor(173, 255, 255);
+
+}
+
 APIColorMap::~APIColorMap()
 {
     for (ColorMap::iterator i = m_apiColorMap.begin(); i != m_apiColorMap.end(); ++i)
@@ -310,5 +328,16 @@ QColor APIColorMap::GetAPIColor(ProfileSessionDataItem::ProfileItemType itemType
 QColor APIColorMap::GetPerfMarkersColor() const
 {
     return s_LIGHT_BLUE_PERF_MARKER_COLOR;
+}
+
+QColor APIColorMap::GetCommandListColor(int index) const
+{
+    QColor retVal = s_LIGHT_BLUE_PERF_MARKER_COLOR;
+    int indexInVec = index % (m_commandListsColors.size() - 1);
+    GT_IF_WITH_ASSERT(indexInVec < m_commandListsColors.size() && index >= 0)
+    {
+        retVal = m_commandListsColors[indexInVec];
+    }
+    return retVal;
 }
 

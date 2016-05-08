@@ -67,3 +67,16 @@ PerfMarkerTimelineItem::PerfMarkerTimelineItem(quint64 startTime, quint64 endTim
 }
 
 
+CommandListTimelineItem::CommandListTimelineItem(quint64 startTime, quint64 endTime): acTimelineItem(startTime, endTime)
+{
+
+}
+
+void CommandListTimelineItem::tooltipItems(acTimelineItemToolTip& tooltip) const
+{
+    // Add the base class tooltip items:
+    acTimelineItem::tooltipItems(tooltip);
+
+    QString commandListName = QString("Command list %1").arg(text());
+    tooltip.add(commandListName, "");
+}

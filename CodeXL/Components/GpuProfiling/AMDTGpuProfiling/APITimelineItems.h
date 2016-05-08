@@ -123,4 +123,21 @@ private:
 };
 
 
+class CommandListTimelineItem : public acTimelineItem
+{
+    Q_OBJECT
+
+public:
+    /// Initializes a new instance of the HostAPITimelineItem class
+    /// \param startTime the start time for this timeline item.
+    /// \param endTime the end time for this timeline item.
+    CommandListTimelineItem(quint64 startTime, quint64 endTime);
+
+    /// Fill in a TimelineItemToolTip instance with a set of name/value pairs that will be displayed in the tooltip for this timeline item
+    /// \param tooltip acTimelineItemToolTip instance that should get populated with name/value pairs
+    virtual void tooltipItems(acTimelineItemToolTip& tooltip) const;
+};
+
+
+
 #endif // _API_TIMELINE_ITEMS_H_

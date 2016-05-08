@@ -191,6 +191,38 @@ ProfileSessionDataItem* gpTraceDataContainer::AddDX12GPUTraceItem(DX12GPUTraceIn
 
         // Add the item to the session items map
         m_sessionItemsSortedByStartTime.insertMulti(pRetVal->StartTime(), pRetVal);
+
+        // Add this API call to the command list data
+        QString commandListName = QString::fromStdString(pAPIInfo->m_commandListPtrStr);
+        QString queueName = QString::fromStdString(pAPIInfo->m_commandQueuePtrStr);
+        if (m_commandListToQueueMap.contains(commandListName))
+        {
+            GT_ASSERT_EX(m_commandListToQueueMap[commandListName] == queueName, L"This command list was already added with another queue name");
+        }
+        else
+        {
+            m_commandListToQueueMap.insertMulti(commandListName, queueName);
+        }
+
+        // Get or add the command list data for the current command list
+        if (!m_commandListData.contains(commandListName))
+        {
+            m_commandListData.insertMulti(commandListName, CommandListData());
+        }
+
+        // Update the existing command list data with the current API call data
+        m_commandListData[commandListName].m_queueName = queueName;
+        m_commandListData[commandListName].m_apiIndices.push_back(pAPIInfo->m_uiSeqID);
+
+        if ((m_commandListData[commandListName].m_startTime == std::numeric_limits<quint64>::max()) || (m_commandListData[commandListName].m_startTime > pAPIInfo->m_ullStart))
+        {
+            m_commandListData[commandListName].m_startTime = pAPIInfo->m_ullStart;
+        }
+
+        if ((m_commandListData[commandListName].m_endTime == std::numeric_limits<quint64>::min()) || (m_commandListData[commandListName].m_endTime < pAPIInfo->m_ullEnd))
+        {
+            m_commandListData[commandListName].m_endTime = pAPIInfo->m_ullEnd;
+        }
     }
 
     return pRetVal;
@@ -934,4 +966,12 @@ ProfileSessionDataItem* gpTraceDataContainer::FindNextItem(const QString& findSt
     }
 
     return pRetVal;
+}
+
+gpTraceDataContainer::CommandListData::CommandListData() : 
+    m_queueName(""),
+    m_startTime(std::numeric_limits<quint64>::max()),
+    m_endTime(std::numeric_limits<quint64>::min())
+{
+
 }

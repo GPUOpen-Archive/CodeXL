@@ -32,7 +32,8 @@ gpTimeline::gpTimeline(QWidget* pParent, gpTraceView* pSessionView) : acTimeline
     m_pOpenCLBranch(nullptr),
     m_pHSABranch(nullptr),
     m_pCPUTimelineBranch(nullptr),
-    m_pGPUTimelineBranch(nullptr)
+    m_pGPUTimelineBranch(nullptr),
+    m_pCommandListsBranch(nullptr)
 {
     // Since we deal with a single frame, we want the grid to draw precise time labels
     SetGridLabelsPrecision(5);
@@ -89,12 +90,15 @@ void gpTimeline::BuildTimeline(gpTraceDataContainer* pDataContainer)
             // Get the queue name
             QString queueName = m_pSessionDataContainer->QueueName(i);
 
-            // Add the API for this thread
+            // Add the API for this queue
             AddQueueGPUApis(queueName);
         }
 
         // Add the GPU items for this trace session
         AddGPUItemsToTimeline();
+
+        // Add the frame command lists to the frame timeline
+        AddCommandListsToTimeline();
 
         // Add the created branches and sub-branches. NOTICE: This can only be done at the end, since the start & end time are updated
         // from a branch to its parent
@@ -122,6 +126,20 @@ void gpTimeline::BuildTimeline(gpTraceDataContainer* pDataContainer)
             addBranch(m_pGPUTimelineBranch);
 
             m_gpuBranchesMap.clear();
+        }
+
+        // Add the created branches and sub-branches. NOTICE: This can only be done at the end, since the start & end time are updated
+        // from a branch to its parent
+        if (!m_commandListsQueuesBranchesMap.isEmpty())
+        {
+            for (auto i = m_commandListsQueuesBranchesMap.begin(); i != m_commandListsQueuesBranchesMap.end(); ++i)
+            {
+                m_pCommandListsBranch->addSubBranch(*i);
+            }
+
+            addBranch(m_pCommandListsBranch);
+
+            m_commandListsQueuesBranchesMap.clear();
         }
 
         if (!m_oclCtxMap.isEmpty())
@@ -244,6 +262,45 @@ void gpTimeline::AddQueueGPUApis(const QString& queueName)
 
         afProgressBarWrapper::instance().hideProgressBar();
 
+    }
+}
+
+
+void gpTimeline::AddCommandListsToTimeline()
+{
+    // Sanity check:
+    GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
+    {
+        // Get the command lists data from the session data container
+        const QMap<QString, gpTraceDataContainer::CommandListData>& commandListsData = m_pSessionDataContainer->CommandListsData();
+
+        int commandListIndex = 0;
+        auto iter = commandListsData.begin();
+        auto iterEnd = commandListsData.end();
+        for (; iter != iterEnd; iter++)
+        {
+            QString commandListName = iter.key();
+            gpTraceDataContainer::CommandListData commandListData = commandListsData[commandListName];
+            acTimelineBranch* pQueueBranch = GetCommandListBranch(commandListData.m_queueName);
+            GT_IF_WITH_ASSERT(pQueueBranch != nullptr)
+            {
+                // Create the command list timeline item
+                CommandListTimelineItem* pNewItem = new CommandListTimelineItem(commandListData.m_startTime, commandListData.m_endTime);
+
+                // Set the command list name as the item text
+                pNewItem->setText(commandListName);
+
+                // Get the color for this command list by its index
+                QColor commandListColor = APIColorMap::Instance()->GetCommandListColor(commandListIndex);
+                pNewItem->setBackgroundColor(commandListColor);
+
+                // Add the item to the queue branch
+                pQueueBranch->addTimelineItem(pNewItem);
+
+                // Index for coloring
+                commandListIndex++;
+            }
+        }
     }
 }
 
@@ -556,6 +613,12 @@ acTimelineBranch* gpTimeline::GetBranchForAPI(osThreadId threadId, const QString
         m_pGPUTimelineBranch->setText(tr(GPU_STR_TraceViewGPU));
     }
 
+    if (m_pCommandListsBranch == nullptr)
+    {
+        m_pCommandListsBranch = new acTimelineBranch;
+        m_pCommandListsBranch->setText(tr(GPU_STR_TraceViewCommandLists));
+    }
+
     if (itemType == ProfileSessionDataItem::DX12_GPU_PROFILE_ITEM)
     {
         QString queueTypeStr;
@@ -621,6 +684,45 @@ acTimelineBranch* gpTimeline::GetBranchForAPI(osThreadId threadId, const QString
         }
 
         pRetVal = pRootBranch;
+    }
+
+    return pRetVal;
+}
+
+
+acTimelineBranch* gpTimeline::GetCommandListBranch(const QString& queueName)
+{
+    acTimelineBranch* pRetVal = nullptr;
+
+    if (m_pCommandListsBranch == nullptr)
+    {
+        m_pCommandListsBranch = new acTimelineBranch;
+        m_pCommandListsBranch->setText(tr(GPU_STR_TraceViewCommandLists));
+    }
+    QString queueTypeStr;
+    GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
+    {
+        int queueType = m_pSessionDataContainer->QueueType(queueName);
+        queueTypeStr = gpTraceDataContainer::CommandListTypeAsString(queueType);
+    }
+
+    // Create the queue branch name
+    QString queueDisplayName = ProfileSessionDataItem::QueueDisplayName(queueName);
+    QString gpuQueueLabel = QString(GPU_STR_timeline_QueueBranchName).arg(queueTypeStr).arg(queueDisplayName);
+
+    // Add or get the queue branch to the command lists branches as well
+    if (m_commandListsQueuesBranchesMap.contains(queueName))
+    {
+        pRetVal = m_commandListsQueuesBranchesMap[queueName];
+    }
+
+    else
+    {
+        pRetVal = new acTimelineBranch;
+        pRetVal->SetBGColor(QColor::fromRgb(230, 230, 230));
+
+        pRetVal->setText(gpuQueueLabel);
+        m_commandListsQueuesBranchesMap.insert(queueName, pRetVal);
     }
 
     return pRetVal;
