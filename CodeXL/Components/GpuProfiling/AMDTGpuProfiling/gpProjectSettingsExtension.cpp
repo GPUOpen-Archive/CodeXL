@@ -305,7 +305,7 @@ void gpProjectSettingsExtension::OnTextEdited(const QString& text)
     {
         if (m_pOptionsComboBox->currentIndex() == gpProjectSettings::egpProcessConnection)
         {
-            m_processNumber = text;;
+            m_processNumber = text;
         }
         else if (m_pOptionsComboBox->currentIndex() == gpProjectSettings::egpFirstDXInProcessConnection)
         {
