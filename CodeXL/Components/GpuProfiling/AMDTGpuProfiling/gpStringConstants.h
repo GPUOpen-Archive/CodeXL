@@ -389,6 +389,7 @@
 #define GPU_STR_projectSettingsComboProcessNumberOption "Launched Process #"
 #define GPU_STR_projectSettingsComboAPIOption "First active API in process"
 #define GPU_STR_projectSettingsComboDX12Option "First active DX12"
+#define GPU_STR_projectSettingsComboVulkanOption "First active Vulkan"
 
 #define GPU_STR_PropertiesExecutionInformationSA L"To start Frame Analysis, select 'Start Frame Analysis' from the Frame Analysis menu, or click the 'Start Frame Analysis' toolbar button."
 #define GPU_STR_PropertiesExecutionInformationVS L"To start Frame Analysis, select 'Start Frame Analysis' from CodeXL menu, or click the 'Start Frame Analysis' toolbar button."
