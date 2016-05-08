@@ -126,7 +126,7 @@ bool DX12AtpFilePart::ParseGPUAPICallString(const std::string& apiStr, DX12GPUTr
 
             if (pCurrentToken != nullptr)
             {
-                apiInfo.m_interfacePtrStr = pCurrentToken;
+                apiInfo.m_commandListPtrStr = pCurrentToken;
 
                 pCurrentToken = strtok(nullptr, " ");
 

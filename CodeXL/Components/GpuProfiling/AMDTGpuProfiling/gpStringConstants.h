@@ -257,6 +257,7 @@
 // Trace table captions
 #define GP_STR_TraceTableColumnIndex "Index"
 #define GP_STR_TraceTableColumnInterface "Interface"
+#define GP_STR_TraceTableColumnCommandList "Command List"
 #define GP_STR_TraceTableColumnCall "Call"
 #define GP_STR_TraceTableColumnParameters "Parameters"
 #define GP_STR_TraceTableColumnResult "Result"

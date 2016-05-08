@@ -8,7 +8,7 @@ DX12APIInfo::DX12APIInfo() : APIInfo(), m_apiType(kAPIType_Unknown), m_apiId(Fun
 
 }
 
-DX12GPUTraceInfo::DX12GPUTraceInfo() : DX12APIInfo(), m_commandListType(0), m_commandQueuePtrStr("")
+DX12GPUTraceInfo::DX12GPUTraceInfo() : DX12APIInfo(), m_commandListType(0), m_commandQueuePtrStr(""), m_commandListPtrStr("")
 {
     m_isGPU = true;
 }

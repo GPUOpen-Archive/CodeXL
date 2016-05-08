@@ -396,6 +396,7 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
 
         m_data[ProfileSessionDataItem::SESSION_ITEM_PARAMETERS_COLUMN] = QString::fromStdString(pApiInfo->m_ArgList);
         m_data[ProfileSessionDataItem::SESSION_ITEM_RESULT_COLUMN] = QString::fromStdString(pApiInfo->m_strRet);
+        m_data[ProfileSessionDataItem::SESSION_ITEM_COMMAND_LIST_COLUMN] = QString::fromStdString(pApiInfo->m_commandListPtrStr);
 
         // Set the start and end time. DX12 timestamps are stored in Nanoseconds
         m_startTime = pApiInfo->m_ullStart;
@@ -681,6 +682,7 @@ QVariant ProfileSessionDataItem::GetColumnData(int columnIndex) const
     {
         case ProfileSessionDataItem::SESSION_ITEM_INTERFACE_COLUMN:
         case ProfileSessionDataItem::SESSION_ITEM_CALL_COLUMN:
+        case ProfileSessionDataItem::SESSION_ITEM_COMMAND_LIST_COLUMN:
         case ProfileSessionDataItem::SESSION_ITEM_PARAMETERS_COLUMN:
         case ProfileSessionDataItem::SESSION_ITEM_RESULT_COLUMN:
         case ProfileSessionDataItem::SESSION_ITEM_DEVICE_BLOCK_COLUMN:
@@ -1145,6 +1147,24 @@ QString ProfileSessionDataItem::QueueName() const
     return m_queueName;
 }
 
+QString ProfileSessionDataItem::CommandListPointer() const
+{
+    QString retVal;
+    if (m_itemType.m_itemMainType == DX12_GPU_PROFILE_ITEM)
+    {
+        if (m_pApiInfo != nullptr)
+        {
+            DX12GPUTraceInfo* pAPIInfo = (DX12GPUTraceInfo*)m_pApiInfo;
+            if (pAPIInfo != nullptr)
+            {
+                retVal.fromStdString(pAPIInfo->m_commandListPtrStr);
+            }
+        }
+    }
+
+    return retVal;
+}
+
 QString ProfileSessionDataItem::QueueDisplayName(const QString& queueName)
 {
     QString retVal = queueName;
@@ -1310,6 +1330,7 @@ void ProfileSessionDataItem::InitStaticMembers()
         m_sItemTypesColumnsMap[DX12_GPU_PROFILE_ITEM] << SESSION_ITEM_INDEX_COLUMN;
         m_sItemTypesColumnsMap[DX12_GPU_PROFILE_ITEM] << SESSION_ITEM_INTERFACE_COLUMN;
         m_sItemTypesColumnsMap[DX12_GPU_PROFILE_ITEM] << SESSION_ITEM_CALL_COLUMN;
+        m_sItemTypesColumnsMap[DX12_GPU_PROFILE_ITEM] << SESSION_ITEM_COMMAND_LIST_COLUMN;
         m_sItemTypesColumnsMap[DX12_GPU_PROFILE_ITEM] << SESSION_ITEM_PARAMETERS_COLUMN;
         m_sItemTypesColumnsMap[DX12_GPU_PROFILE_ITEM] << SESSION_ITEM_GPU_TIME_COLUMN;
         m_sItemTypesColumnsMap[DX12_GPU_PROFILE_ITEM] << SESSION_ITEM_RESULT_COLUMN;
@@ -1325,6 +1346,7 @@ void ProfileSessionDataItem::InitStaticMembers()
         // Vulkan GPU table columns
         m_sItemTypesColumnsMap[VK_GPU_PROFILE_ITEM] << SESSION_ITEM_INDEX_COLUMN;
         m_sItemTypesColumnsMap[VK_GPU_PROFILE_ITEM] << SESSION_ITEM_CALL_COLUMN;
+        m_sItemTypesColumnsMap[VK_GPU_PROFILE_ITEM] << SESSION_ITEM_COMMAND_LIST_COLUMN;
         m_sItemTypesColumnsMap[VK_GPU_PROFILE_ITEM] << SESSION_ITEM_PARAMETERS_COLUMN;
         m_sItemTypesColumnsMap[VK_GPU_PROFILE_ITEM] << SESSION_ITEM_GPU_TIME_COLUMN;
         m_sItemTypesColumnsMap[VK_GPU_PROFILE_ITEM] << SESSION_ITEM_RESULT_COLUMN;
@@ -1353,6 +1375,7 @@ void ProfileSessionDataItem::InitStaticMembers()
         // Initialize the captions map
         m_sItemTypesToTitleMap[SESSION_ITEM_INDEX_COLUMN] = GP_STR_TraceTableColumnIndex;
         m_sItemTypesToTitleMap[SESSION_ITEM_INTERFACE_COLUMN] = GP_STR_TraceTableColumnInterface;
+        m_sItemTypesToTitleMap[SESSION_ITEM_COMMAND_LIST_COLUMN] = GP_STR_TraceTableColumnCommandList;
         m_sItemTypesToTitleMap[SESSION_ITEM_CALL_COLUMN] = GP_STR_TraceTableColumnCall;
         m_sItemTypesToTitleMap[SESSION_ITEM_PARAMETERS_COLUMN] = GP_STR_TraceTableColumnParameters;
         m_sItemTypesToTitleMap[SESSION_ITEM_RESULT_COLUMN] = GP_STR_TraceTableColumnResult;

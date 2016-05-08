@@ -112,11 +112,6 @@ bool VKAtpFilePart::ParseGPUAPICallString(const std::string& apiStr, VKGPUTraceI
     CHECK_SS_ERROR(ss);
     apiInfo.m_apiType = (vkAPIType)intVal;
 
-    /*
-        ss >> intVal;
-        CHECK_SS_ERROR(ss);
-        apiInfo.m_apiId = (vk_FUNC_TYPE)intVal;*/
-
     ss >> apiInfo.m_strName;
     CHECK_SS_ERROR(ss);
 
