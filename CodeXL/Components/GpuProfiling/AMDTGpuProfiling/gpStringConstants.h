@@ -389,9 +389,8 @@
 #define GPU_STR_projectSettingsAutomaticConnect "Automatically connect to"
 #define GPU_STR_projectSettingsServerConnectionPort "Server connection port"
 #define GPU_STR_projectSettingsComboProcessNumberOption "Launched Process #"
-#define GPU_STR_projectSettingsComboAPIOption "First active API in process"
-#define GPU_STR_projectSettingsComboDX12Option "First active DX12"
-#define GPU_STR_projectSettingsComboVulkanOption "First active Vulkan"
+#define GPU_STR_projectSettingsComboAPIInProcessOption "First active API in [ProcessName]"
+#define GPU_STR_projectSettingsComboAPIOption "First active [API]"
 
 #define GPU_STR_PropertiesExecutionInformationSA L"To start Frame Analysis, select 'Start Frame Analysis' from the Frame Analysis menu, or click the 'Start Frame Analysis' toolbar button."
 #define GPU_STR_PropertiesExecutionInformationVS L"To start Frame Analysis, select 'Start Frame Analysis' from CodeXL menu, or click the 'Start Frame Analysis' toolbar button."
@@ -568,7 +567,7 @@
 #define GPU_STR_connectionDialogTableHeader "#,Process,PID,API,Status,Time loaded"
 #define GPU_STR_connectionDialogMonitoring "Monitoring..."
 #define GPU_STR_connectionDialogAutoCheckBox "Automatically connect next session to"
-#define GPU_STR_connectionDialogComboOptionsDefault "Launched Process [#],First active API in [ProcessName],First active [API]"
+#define GPU_STR_connectionDialogComboOptionsDefault  GPU_STR_projectSettingsComboProcessNumberOption "," GPU_STR_projectSettingsComboAPIInProcessOption "," GPU_STR_projectSettingsComboAPIOption
 #define GPU_STR_connectionDialogComboOptionsSelected "Process %1,First active API in %1,First active %1"
 #define GPU_STR_connectionDialogOKCaption L"Connect"
 #define GPU_STR_connectionDialogStarted "Started"

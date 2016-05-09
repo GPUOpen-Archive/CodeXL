@@ -56,8 +56,8 @@ void gpProjectSettingsExtension::Initialize()
 
     m_pOptionsComboBox = new QComboBox();
     m_pOptionsComboBox->addItem(GPU_STR_projectSettingsComboProcessNumberOption);
+    m_pOptionsComboBox->addItem(GPU_STR_projectSettingsComboAPIInProcessOption);
     m_pOptionsComboBox->addItem(GPU_STR_projectSettingsComboAPIOption);
-    m_pOptionsComboBox->addItem(GPU_STR_projectSettingsComboDX12Option);
 
     m_pOptionsEdit = new QLineEdit();
 
