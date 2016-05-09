@@ -140,11 +140,8 @@ void kaApplicationCommands::AddFileCommand(gtVector<osFilePath>& addedFilePaths)
         if (rc)
         {
             AddFilesToTree(selectedFilesVector, false);
-
-            // open the first file in the list
             if (selectedFilesVector.size() > 0)
             {
-                kaApplicationTreeHandler::instance()->ActivateFileChildItem(selectedFilesVector[0], AF_TREE_ITEM_KA_SOURCE);
                 addedFilePaths = selectedFilesVector;
             }
         }
@@ -653,72 +650,59 @@ void kaApplicationCommands::SetToolbarBuildOptions(const QString& buildOptions)
 bool kaApplicationCommands::AddSourceFile(const osFilePath& clFilePath, bool displayExistingFileErr)
 {
     bool retVal = false;
+    kaSourceFile* pCurrentFile = KA_PROJECT_DATA_MGR_INSTANCE.dataFileByPath(clFilePath);
 
-    kaApplicationTreeHandler* pTreeHandler = kaApplicationTreeHandler::instance();
-
-    // Sanity check:
-    GT_IF_WITH_ASSERT(pTreeHandler != nullptr)
+    if (pCurrentFile != nullptr)
     {
-        // Check if this file exists:
-        if (pTreeHandler->FindFileItemData(clFilePath) != nullptr)
-        {
-            if (displayExistingFileErr)
-            {
-                // Output a message to the user that the file exists:
-                acMessageBox::instance().critical(AF_STR_ErrorA, KA_STR_treeProjectFileExists);
 
-                // Select this file:
-                pTreeHandler->selectFileNode(clFilePath);
+        if (displayExistingFileErr)
+        {
+            // Output a message to the user that the file exists:
+            acMessageBox::instance().critical(AF_STR_ErrorA, KA_STR_treeProjectFileExists);
+        }
+        retVal = true;
+    }
+    else
+    {
+        // store the path for next time:
+        m_lastAddFilePath = clFilePath;
+
+        // Add the data to the project data manager, the data manager update the tree
+        KA_PROJECT_DATA_MGR_INSTANCE.AddFileOnProjectLoad(clFilePath);
+        pCurrentFile = KA_PROJECT_DATA_MGR_INSTANCE.dataFileByPath(clFilePath);
+        KA_PROJECT_DATA_MGR_INSTANCE.BuildFunctionsList(clFilePath, pCurrentFile);
+
+        GT_IF_WITH_ASSERT(nullptr != pCurrentFile)
+        {
+            QString newFilePlatform = acGTStringToQString(pCurrentFile->BuildPlatform());
+
+            if (newFilePlatform.compare(KA_STR_platformDirectX) == 0)
+            {
+                const gtVector<kaProjectDataManagerAnaylzeData>& analyzedVector = pCurrentFile->analyzeVector();
+
+                if (!analyzedVector.empty())
+                {
+                    SetNewFileProfile(clFilePath, analyzedVector[0].m_kernelName);
+                }
             }
+            else if (newFilePlatform.compare(KA_STR_platformOpenGL) == 0)
+            {
+                // GL file have a default entry point and do not have their file parsed
+                // In GL type file, the user can not change the entry point and it will remain KA_STR_buildDXEntryPoint
+                pCurrentFile->SetEntryPointFunction(acQStringToGTString(KA_STR_buildDXEntryPoint));
+            }
+
+            osFilePath overViewPath = pCurrentFile->buildDirectory().directoryPath();
+            overViewPath.setFileName(KA_STR_overviewName);
+            overViewPath.setFileExtension(KA_STR_overviewExtension);
+            osFile overViewFile;
+            overViewFile.open(overViewPath, osChannel::OS_UNICODE_TEXT_CHANNEL, osFile::OS_OPEN_TO_WRITE);
+            overViewFile.writeString(clFilePath.asString());
+            overViewFile.close();
 
             retVal = true;
         }
-        else
-        {
-            // store the path for next time:
-            m_lastAddFilePath = clFilePath;
-
-            // Add the data to the project data manager, the data manager update the tree
-            KA_PROJECT_DATA_MGR_INSTANCE.AddFileOnProjectLoad(clFilePath);
-            kaSourceFile* pCurrentFile = KA_PROJECT_DATA_MGR_INSTANCE.dataFileByPath(clFilePath);
-            KA_PROJECT_DATA_MGR_INSTANCE.BuildFunctionsList(clFilePath, pCurrentFile);
-
-            // Update the Tree:
-            kaApplicationTreeHandler::instance()->AddFile(clFilePath, true, pCurrentFile, false);
-
-            GT_IF_WITH_ASSERT(nullptr != pCurrentFile)
-            {
-                QString newFilePlatform = acGTStringToQString(pCurrentFile->BuildPlatform());
-
-                if (newFilePlatform.compare(KA_STR_platformDirectX) == 0)
-                {
-                    const gtVector<kaProjectDataManagerAnaylzeData>& analyzedVector = pCurrentFile->analyzeVector();
-
-                    if (!analyzedVector.empty())
-                    {
-                        SetNewFileProfile(clFilePath, analyzedVector[0].m_kernelName);
-                    }
-                }
-                else if (newFilePlatform.compare(KA_STR_platformOpenGL) == 0)
-                {
-                    // GL file have a default entry point and do not have their file parsed
-                    // In GL type file, the user can not change the entry point and it will remain KA_STR_buildDXEntryPoint
-                    pCurrentFile->SetEntryPointFunction(acQStringToGTString(KA_STR_buildDXEntryPoint));
-                }
-
-                osFilePath overViewPath = pCurrentFile->buildDirectory().directoryPath();
-                overViewPath.setFileName(KA_STR_overviewName);
-                overViewPath.setFileExtension(KA_STR_overviewExtension);
-                osFile overViewFile;
-                overViewFile.open(overViewPath, osChannel::OS_UNICODE_TEXT_CHANNEL, osFile::OS_OPEN_TO_WRITE);
-                overViewFile.writeString(clFilePath.asString());
-                overViewFile.close();
-
-                retVal = true;
-            }
-        }
     }
-
     return retVal;
 }
 
@@ -883,7 +867,6 @@ osFilePath kaApplicationCommands::CreateDefaultFile(QString& fileNameFromUser, Q
     afApplicationCommands::instance()->OnFileSaveProject();
 
     // Handle the new created kernel in the tree handler:
-    kaApplicationTreeHandler::instance()->HandleCreatedKernel(selectedFile);
 
     kaApplicationTreeHandler::instance()->SetShouldCreateDefaultKernel(false);
     return selectedFile;
@@ -1096,16 +1079,47 @@ void kaApplicationCommands::ActivateMDITreeItem(const osFilePath& filePath)
         {
             if (pKATreeHandler->WasTreeCreated())
             {
-                afApplicationTreeItemData* pFileItemData = pKATreeHandler->FindFileItemData(filePathToActivate);
-
-                if (nullptr != pFileItemData && pFileItemData->m_itemType != AF_TREE_ITEM_KA_ADD_FILE && pFileItemData->m_itemType != AF_TREE_ITEM_KA_NEW_FILE)
+                const gtVector<kaProgram*> projectPrograms = KA_PROJECT_DATA_MGR_INSTANCE.GetPrograms();
+                for(kaProgram* pProg: projectPrograms)
                 {
-                    afApplicationTree* pTree = afApplicationCommands::instance()->applicationTree();
-
-                    if (nullptr != pTree)
+                    if (nullptr != pProg)
                     {
-                        pTree->selectItem(pFileItemData, false);
-                        m_MDITreeItemfilePath = filePath;
+                        // check if current program contains this file
+                        if (pProg->HasFile(filePathToActivate, AF_TREE_ITEM_ITEM_NONE))
+                        {
+                            afApplicationTree* pTree = afApplicationCommands::instance()->applicationTree();
+                            if (nullptr != pTree)
+                            {
+                                QTreeWidgetItem* pProgramItem = pKATreeHandler->GetProgramTreeItem(pProg);
+                                QTreeWidgetItem* pProgramChildItem = nullptr;
+                                if (pProgramItem != nullptr)
+                                {
+                                    for (int i = 0; i < pProgramItem->childCount(); ++i)
+                                    {
+                                        pProgramChildItem = pProgramItem->child(i);
+                                        if (nullptr != pProgramChildItem)
+                                        {
+                                            afApplicationTreeItemData* pChildData = pTree->getTreeItemData(pProgramChildItem);
+
+                                            if (pChildData != nullptr)
+                                            {
+                                                kaTreeDataExtension* pKAData = qobject_cast<kaTreeDataExtension*>(pChildData->extendedItemData());
+
+                                                if (pKAData != nullptr)
+                                                {
+                                                    if (pKAData->filePath() == filePathToActivate)
+                                                    {
+                                                        pTree->selectItem(pChildData, false);
+                                                        m_MDITreeItemfilePath = filePath;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
