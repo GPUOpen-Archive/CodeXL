@@ -654,7 +654,7 @@ void kcCLICommanderCL::GetILText(const Config& config)
                     // Print the warning message.
                     std::stringstream msg;
                     msg << STR_WRN_CL_SUPPRESS_WIHTOUT_BINARY << std::endl;
-                    LogCallBack(msg.str());;
+                    LogCallBack(msg.str());
                 }
 
                 // This variable will hold the IL text.
@@ -700,7 +700,7 @@ void kcCLICommanderCL::GetISAText(const Config& config)
             // Print the warning message.
             std::stringstream msg;
             msg << STR_WRN_CL_SUPPRESS_WIHTOUT_BINARY << std::endl;
-            LogCallBack(msg.str());;
+            LogCallBack(msg.str());
         }
 
         beProgramBuilderOpenCL* pClBuilder = be->theOpenCLBuilder();
@@ -819,7 +819,7 @@ void kcCLICommanderCL::GetMetadata(const Config& config)
             // Print the warning message.
             std::stringstream msg;
             msg << STR_WRN_CL_SUPPRESS_WIHTOUT_BINARY << std::endl;
-            LogCallBack(msg.str());;
+            LogCallBack(msg.str());
         }
 
         beProgramBuilderOpenCL* pBuilder = be->theOpenCLBuilder();

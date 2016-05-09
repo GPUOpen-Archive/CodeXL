@@ -722,7 +722,7 @@ bool siOpenCLInformationCollector::CollectOpenCLSingleDeviceInformation(gtList< 
         GT_IF_WITH_ASSERT(iter != infoData.end())
         {
             gtList<gtString>& currentList = (*iter);
-            gtString availbleStr = (pDevice->isAvailable()) ? AF_STR_Yes : AF_STR_No;;
+            gtString availbleStr = (pDevice->isAvailable()) ? AF_STR_Yes : AF_STR_No;
             currentList.push_back(availbleStr);
             iter++;
         }
@@ -730,7 +730,7 @@ bool siOpenCLInformationCollector::CollectOpenCLSingleDeviceInformation(gtList< 
         GT_IF_WITH_ASSERT(iter != infoData.end())
         {
             gtList<gtString>& currentList = (*iter);
-            gtString availbleStr = (pDevice->isCompilerAvailable()) ? AF_STR_Yes : AF_STR_No;;
+            gtString availbleStr = (pDevice->isCompilerAvailable()) ? AF_STR_Yes : AF_STR_No;
             currentList.push_back(availbleStr);
             iter++;
         }
@@ -767,7 +767,7 @@ bool siOpenCLInformationCollector::CollectOpenCLSingleDeviceInformation(gtList< 
         GT_IF_WITH_ASSERT(iter != infoData.end())
         {
             gtList<gtString>& currentList = (*iter);
-            gtString propertyStr = (pDevice->isEndianLittle()) ? AF_STR_Yes : AF_STR_No;;
+            gtString propertyStr = (pDevice->isEndianLittle()) ? AF_STR_Yes : AF_STR_No;
             currentList.push_back(propertyStr);
             iter++;
         }
@@ -775,7 +775,7 @@ bool siOpenCLInformationCollector::CollectOpenCLSingleDeviceInformation(gtList< 
         GT_IF_WITH_ASSERT(iter != infoData.end())
         {
             gtList<gtString>& currentList = (*iter);
-            gtString propertyStr = (pDevice->isDeviceErrorCorrectionSupport()) ? AF_STR_Yes : AF_STR_No;;
+            gtString propertyStr = (pDevice->isDeviceErrorCorrectionSupport()) ? AF_STR_Yes : AF_STR_No;
             currentList.push_back(propertyStr);
             iter++;
         }
@@ -832,7 +832,7 @@ bool siOpenCLInformationCollector::CollectOpenCLSingleDeviceInformation(gtList< 
 
             if (pDevice->clMinorVersion() >= 1)
             {
-                propertyStr = (pDevice->isHostUnifiedMemory()) ? AF_STR_Yes : AF_STR_No;;
+                propertyStr = (pDevice->isHostUnifiedMemory()) ? AF_STR_Yes : AF_STR_No;
             }
 
             currentList.push_back(propertyStr);
@@ -842,7 +842,7 @@ bool siOpenCLInformationCollector::CollectOpenCLSingleDeviceInformation(gtList< 
         GT_IF_WITH_ASSERT(iter != infoData.end())
         {
             gtList<gtString>& currentList = (*iter);
-            gtString propertyStr = (pDevice->isImageSupport()) ? AF_STR_Yes : AF_STR_No;;
+            gtString propertyStr = (pDevice->isImageSupport()) ? AF_STR_Yes : AF_STR_No;
             currentList.push_back(propertyStr);
             iter++;
         }

@@ -199,7 +199,7 @@ bool ppCliUtils::GetAggregationString(AMDTPwrAggregation aggregationType, gtStri
 bool ppCliUtils::GetDeviceTypeString(AMDTDeviceType deviceType, gtString& deviceTypeStr)
 {
     bool ret = true;
-    const char* pStr = nullptr;;
+    const char* pStr = nullptr;
 
     switch (deviceType)
     {

@@ -128,7 +128,7 @@ public:
     /// Enable the creator to block the process of a file open.
     /// \param cannotOpenFileMessage the message displayed to the user in case that the file cannot be opened
     /// \return true iff the file can currently be opened
-    virtual bool CanFileBeOpened(const osFilePath& filePath, gtString& cannotOpenFileMessage);;
+    virtual bool CanFileBeOpened(const osFilePath& filePath, gtString& cannotOpenFileMessage);
 
     /// Try to find a window that is matching this file path:
     /// For sessions, look for the file path itself

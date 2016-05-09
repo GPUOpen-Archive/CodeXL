@@ -3131,7 +3131,7 @@ HRESULT WinTaskInfo::ReadModuleInfoFile(const wchar_t* filename)
 
 
         // read module number
-        fread(&count, sizeof(DWORD), 1, p_tifile);;
+        fread(&count, sizeof(DWORD), 1, p_tifile);
 
         for (i = 0; i < count; i++)
         {

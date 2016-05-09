@@ -85,7 +85,7 @@ vspSaveListDialog::~vspSaveListDialog()
 void vspSaveListDialog::buildLayout()
 {
     // Creating the sizers:
-    QVBoxLayout* pMainLayout = new QVBoxLayout;;
+    QVBoxLayout* pMainLayout = new QVBoxLayout;
 
 
     // Projects list to build:

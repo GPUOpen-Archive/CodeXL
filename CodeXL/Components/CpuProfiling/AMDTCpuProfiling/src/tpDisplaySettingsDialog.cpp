@@ -210,7 +210,7 @@ void tpDisplaySettingsDialog::SetProcessesTree()
         for (; it != procsAndThreadsMap.end(); it++)
         {
             // for each process - add top level item to tree
-            AMDTProcessId processId = it.key();;
+            AMDTProcessId processId = it.key();
             processItem = new QTreeWidgetItem();
             processItem->setFlags(processItem->flags() | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
             QString processName = m_pSessionData->GetProcessNameById(processId);

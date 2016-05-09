@@ -40,7 +40,7 @@ public:
     virtual ~suBufferReader();
 
     // Return a pointer to the buffer raw data:
-    gtByte* getReadBufferData() { return _pReadBufferData; };;
+    gtByte* getReadBufferData() { return _pReadBufferData; };
 
 protected:
 

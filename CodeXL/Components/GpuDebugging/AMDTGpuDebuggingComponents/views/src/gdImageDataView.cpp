@@ -1235,7 +1235,7 @@ bool gdImageDataView::exportSpyData(afApplicationTreeItemData* pItemData)
                         //bool dirtyImageExists = true;
                         bool dirtyRawDataExists = true;
 
-                        // bool rc = gaIsTextureImageDirty(pItemData->_contextId._contextId, pItemData->_textureMiplevelID, dirtyImageExists, dirtyRawDataExists);;
+                        // bool rc = gaIsTextureImageDirty(pItemData->_contextId._contextId, pItemData->_textureMiplevelID, dirtyImageExists, dirtyRawDataExists);
                         if (dirtyRawDataExists)
                         {
                             retVal = gaUpdateOpenCLImageRawData(pGDData->_contextId._contextId, texturesVector);

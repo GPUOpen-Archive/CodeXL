@@ -64,10 +64,10 @@ void gsActiveUniformsMonitor::onFirstTimeContextMadeCurrent()
     _glGetUniformivARB = (PFNGLGETUNIFORMIVARBPROC)gsGetSystemsOGLModuleProcAddress("glGetUniformivARB");
     _glGetUniformLocationARB = (PFNGLGETUNIFORMLOCATIONARBPROC)gsGetSystemsOGLModuleProcAddress("glGetUniformLocationARB");
 
-    _glUniform1ivARB = (PFNGLUNIFORM1IVARBPROC)gsGetSystemsOGLModuleProcAddress("glUniform1ivARB");;
-    _glUniform2ivARB = (PFNGLUNIFORM2IVARBPROC)gsGetSystemsOGLModuleProcAddress("glUniform2ivARB");;
-    _glUniform3ivARB = (PFNGLUNIFORM3IVARBPROC)gsGetSystemsOGLModuleProcAddress("glUniform3ivARB");;
-    _glUniform4ivARB = (PFNGLUNIFORM4IVARBPROC)gsGetSystemsOGLModuleProcAddress("glUniform4ivARB");;
+    _glUniform1ivARB = (PFNGLUNIFORM1IVARBPROC)gsGetSystemsOGLModuleProcAddress("glUniform1ivARB");
+    _glUniform2ivARB = (PFNGLUNIFORM2IVARBPROC)gsGetSystemsOGLModuleProcAddress("glUniform2ivARB");
+    _glUniform3ivARB = (PFNGLUNIFORM3IVARBPROC)gsGetSystemsOGLModuleProcAddress("glUniform3ivARB");
+    _glUniform4ivARB = (PFNGLUNIFORM4IVARBPROC)gsGetSystemsOGLModuleProcAddress("glUniform4ivARB");
 
     _glUniform1fvARB = (PFNGLUNIFORM1FVARBPROC)gsGetSystemsOGLModuleProcAddress("glUniform1fvARB");
     _glUniform2fvARB = (PFNGLUNIFORM2FVARBPROC)gsGetSystemsOGLModuleProcAddress("glUniform2fvARB");

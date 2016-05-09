@@ -70,7 +70,7 @@ public:
 
     /// This function should be called once, before the application initialization:
     /// \param productName The name of the product. For instance, for CodeXL.exe, productName will be CodeXL
-    static void SetProductName(const gtString& productName);;
+    static void SetProductName(const gtString& productName);
 
     /// Return the product name:
     static gtString ProductName() { return m_sProductName; };

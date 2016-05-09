@@ -1471,7 +1471,7 @@ cl_int CL_API_CALL
 Mine_clReleaseDeviceEXT(cl_device_id device)
 {
     SeqIDGenerator::Instance()->GenerateID();
-    return ((clReleaseDeviceEXT_fn)(g_nextDispatchTable._reservedForDeviceFissionEXT[2]))(device);;
+    return ((clReleaseDeviceEXT_fn)(g_nextDispatchTable._reservedForDeviceFissionEXT[2]))(device);
 }
 
 //******End of Sub Devices*********************//

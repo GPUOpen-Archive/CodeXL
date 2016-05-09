@@ -44,7 +44,7 @@ public:
     virtual void SetGraphInitializationData();
 
     /// Sets the plot and table visibility:
-    void SetShown(bool isShown, bool shouldUpdateVisibility);;
+    void SetShown(bool isShown, bool shouldUpdateVisibility);
 
     /// Is the plot and table visible?
     bool IsShown() const { return m_isShown; }

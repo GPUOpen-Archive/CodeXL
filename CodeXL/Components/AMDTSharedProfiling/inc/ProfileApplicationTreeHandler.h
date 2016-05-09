@@ -71,7 +71,7 @@ public:
     virtual bool BuildItemHTMLPropeties(const afApplicationTreeItemData& displayedItemId, afHTMLContent& htmlContent);
     virtual void SetItemsVisibility();
     virtual bool IsDragDropSupported(QDropEvent* event, QString& dragDropFile, bool& shouldAccpet);
-    virtual bool ExecuteDropEvent(QDropEvent* pEvent, const QString& dragDropFile);;
+    virtual bool ExecuteDropEvent(QDropEvent* pEvent, const QString& dragDropFile);
 
     /// Go over the tree and look for a profile with the requested file path:
     /// \param filePath - the profile file path

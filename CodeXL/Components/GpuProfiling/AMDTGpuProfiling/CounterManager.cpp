@@ -538,7 +538,7 @@ bool CounterManager::GetCounterDesc(HardwareFamily hardwareFamily, const QString
             strCounterDesc = strCounterDesc.replace(sentenceDelimiter, ".\n");
         }
 
-        retVal = true;;
+        retVal = true;
     }
 
     return retVal;

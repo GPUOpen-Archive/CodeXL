@@ -45,8 +45,8 @@ public:
     gtVAddr m_functionStartAddress;
 
     SourceLineKey(int lineNumber);
-    bool operator< (const SourceLineKey& other) const;;
-    bool operator==(const SourceLineKey& other) const;;
+    bool operator< (const SourceLineKey& other) const;
+    bool operator==(const SourceLineKey& other) const;
 };
 
 class SourceLineAsmInfo
@@ -57,8 +57,8 @@ public:
     int m_asmLineNumber;
     SourceLineAsmInfo();
     SourceLineAsmInfo(int lineNumber, int asmLineNumber);
-    bool operator< (const SourceLineAsmInfo& other) const;;
-    bool operator== (const SourceLineAsmInfo& other) const;;
+    bool operator< (const SourceLineAsmInfo& other) const;
+    bool operator== (const SourceLineAsmInfo& other) const;
 
 };
 class SessionSourceCodeView;

@@ -1267,7 +1267,7 @@ beKA::beStatus beProgramBuilderOpenCL::GetKernelISAText(const std::string& devic
                             // In both cases, fall back to the other name if the most-likely name fails
                             if (doesUseHsail)
                             {
-                                strKernelName = "&__OpenCL_" + kernel + "_kernel";;
+                                strKernelName = "&__OpenCL_" + kernel + "_kernel";
                                 strKernelNameAlt = kernel;
                             }
                             else

@@ -1328,7 +1328,7 @@ bool gaGRApiFunctions::gaCanGetHostVariables()
 /// \date 05/01/2015
 bool gaGRApiFunctions::gaCanGetHostDebugging()
 {
-    return pdProcessDebugger::instance().canPerformHostDebugging();;
+    return pdProcessDebugger::instance().canPerformHostDebugging();
 }
 
 //////////////////////////////////////////////////////////////////

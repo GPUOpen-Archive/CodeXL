@@ -845,7 +845,7 @@ void gdImagesAndBuffersExporter::generateCSVFileHeader(acRawFileHandler* pRawDat
         // ***********************
         fileHeader.append(GD_STR_StatisticsExportFileHeaderSeperator);
         fileHeader.append(GD_STR_RawDataExportFileHeaderTitle);
-        fileHeader.append(GD_STR_StatisticsExportFileHeaderProjectName) += projectName += L"\n//\n";;
+        fileHeader.append(GD_STR_StatisticsExportFileHeaderProjectName) += projectName += L"\n//\n";
         fileHeader.append(rawDataDimensions);
         fileHeader.append(rawDataFormat);
         fileHeader.append(rawDataType);

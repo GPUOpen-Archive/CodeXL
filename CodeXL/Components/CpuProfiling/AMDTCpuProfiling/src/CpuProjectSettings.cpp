@@ -1006,7 +1006,7 @@ void CpuProjectSettings::EnableCSSCheckBox()
     bool isExeSupportingCSS = !CPUSessionTreeItemData::ShouldDisableCSS(m_currentExePath);
 
     // Check if the current profile type supports CSS:
-    bool isProfileTypeSupportingCSS = m_currentProfileTypeStr.startsWith("CPU");;
+    bool isProfileTypeSupportingCSS = m_currentProfileTypeStr.startsWith("CPU");
 
     if (m_currentProfileTypeStr.endsWith(PM_profileTypeCLU))
     {

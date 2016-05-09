@@ -939,7 +939,7 @@ struct gsMonitoredFunctionPointers
     void (APIENTRY* glUniform2uiv)(GLint location, GLsizei size, const GLuint* value);
     void (APIENTRY* glUniform3uiv)(GLint location, GLsizei size, const GLuint* value);
     void (APIENTRY* glUniform4uiv)(GLint location, GLsizei size, const GLuint* value);
-    void (APIENTRY* glTexParameterIiv)(GLenum target, GLenum pname, const GLint* params);;
+    void (APIENTRY* glTexParameterIiv)(GLenum target, GLenum pname, const GLint* params);
     void (APIENTRY* glTexParameterIuiv)(GLenum target, GLenum pname, const GLuint* params);
     void (APIENTRY* glGetTexParameterIiv)(GLenum target, GLenum pname, GLint* params);
     void (APIENTRY* glGetTexParameterIuiv)(GLenum target, GLenum pname, GLuint* params);

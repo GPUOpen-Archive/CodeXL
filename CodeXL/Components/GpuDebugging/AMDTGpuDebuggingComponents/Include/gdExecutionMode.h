@@ -48,7 +48,7 @@ public:
     virtual bool IsStartupActionSupported(afStartupAction action) {return (action == AF_NO_PROJECT_USER_ACTION_CREATE_NEW_PROJECT_DEBUG);};
 
     /// Return true iff the execution mode supports remote host scenario for the requested session type:
-    virtual bool IsRemoteEnabledForSessionType(const gtString& sessionType);;
+    virtual bool IsRemoteEnabledForSessionType(const gtString& sessionType);
 
     /// Execute the command
     virtual void execute(afExecutionCommandId commandId);

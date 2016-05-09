@@ -213,7 +213,7 @@ bool gdSaveTotalStatisticsCommand::writeTotalStatisticsDataToFile()
         fileHeader.append(GD_STR_StatisticsExportFileHeaderTitlePrefix);
         fileHeader.append(GD_STR_saveTotalStatistics);
         fileHeader.append(GD_STR_StatisticsExportFileHeaderTitlePostfix);
-        fileHeader.append(GD_STR_StatisticsExportFileHeaderProjectName) += projectFileName += AF_STR_NewLine;;
+        fileHeader.append(GD_STR_StatisticsExportFileHeaderProjectName) += projectFileName += AF_STR_NewLine;
         fileHeader.append(GD_STR_StatisticsExportFileHeaderGenerationDate) += fileSavedDate += AF_STR_NewLine;
         fileHeader.append(GD_STR_StatisticsExportFileHeaderGenerationTime) += fileSavedTime += L"\n//\n";
         fileHeader.append(GD_STR_StatisticsExportFileHeaderGeneratedBy);

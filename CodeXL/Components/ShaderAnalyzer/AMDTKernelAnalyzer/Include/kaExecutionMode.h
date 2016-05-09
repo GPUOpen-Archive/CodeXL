@@ -38,7 +38,7 @@ public:
     virtual bool ExecuteStartupAction(afStartupAction action);
 
     /// Perform a startup action. Return true iff the mode support the requested action:
-    virtual bool IsStartupActionSupported(afStartupAction action);;
+    virtual bool IsStartupActionSupported(afStartupAction action);
 
     // Execute the command
     virtual void execute(afExecutionCommandId commandId);

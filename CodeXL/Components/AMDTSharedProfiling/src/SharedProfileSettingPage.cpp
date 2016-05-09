@@ -318,7 +318,7 @@ bool SharedProfileSettingPage::DoesProjectContainData(const gtString& projectNam
 
     gtString projectFolderString = projectFilePath.fileDirectoryAsString();
     projectFolderString.append(osFilePath::osPathSeparator);
-    QDir projectProfilesQDir(acGTStringToQString(projectFolderString));;
+    QDir projectProfilesQDir(acGTStringToQString(projectFolderString));
     QFileInfoList sessionDirs = projectProfilesQDir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Time | QDir::Reversed);
 
     // sort the directories by creation date, so the sessions appear chronologically
@@ -512,7 +512,7 @@ SharedProfileSettingPage* SharedProfileSettingPage::Instance()
 
 bool SharedProfileSettingPage::IsSystemWideRadioButtonChecked()
 {
-    bool res = false;;
+    bool res = false;
     GT_IF_WITH_ASSERT(m_pSystemWideRadioButton)
     {
         res = m_pSystemWideRadioButton->isChecked();

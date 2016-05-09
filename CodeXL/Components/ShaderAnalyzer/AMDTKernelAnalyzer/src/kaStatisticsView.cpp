@@ -677,7 +677,7 @@ void kaStatisticsView::RebuildSGPRsInformationTable(const QString& deviceDetails
     GT_IF_WITH_ASSERT(m_pSGRPsInfoTable != nullptr)
     {
         // First remove all columns.
-        int currColumnCount = m_pSGRPsInfoTable->columnCount();;
+        int currColumnCount = m_pSGRPsInfoTable->columnCount();
 
         for (int column = 0; column < currColumnCount; ++column)
         {

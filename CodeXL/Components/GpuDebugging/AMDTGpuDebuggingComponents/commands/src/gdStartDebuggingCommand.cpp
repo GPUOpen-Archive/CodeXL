@@ -151,7 +151,7 @@ bool gdStartDebuggingCommand::AreDebugSettingsValid(bool& exeFileExist, bool& wo
     unsigned short rdsPort = theGlobalVarsMgr.getRdsPort();
     unsigned short rdsEvePort = theGlobalVarsMgr.getRdsEventsPort();
     unsigned short spyPort = theGlobalVarsMgr.getSpyPort();
-    unsigned short spyEvePort = theGlobalVarsMgr.getSpyEventsPort();;
+    unsigned short spyEvePort = theGlobalVarsMgr.getSpyEventsPort();
 
     // Remote Settings:
     arePortsLegal = (0 != rdsPort) && (0 != rdsEvePort) && (0 != spyPort) && (0 != spyEvePort);

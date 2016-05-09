@@ -152,7 +152,7 @@ public slots:
     virtual void onFindClick() {};
     virtual void onFindNext() {};
     virtual void onExport() {emit exportData(m_pList);};
-    virtual void OnApplicationFocusChanged(QWidget* pOld, QWidget* pNew);;
+    virtual void OnApplicationFocusChanged(QWidget* pOld, QWidget* pNew);
 
 
 protected:

@@ -2747,7 +2747,7 @@ void SessionCallGraphView::SetViewLayout()
 
         m_pPathFuncTable = new CallGraphPathFuncList(this);
 
-        m_pPathFuncTable->setWindowTitle("Paths");;
+        m_pPathFuncTable->setWindowTitle("Paths");
         m_pPathFuncTable->initialize();
 
         rc = connect(m_pPathFuncTable, SIGNAL(functionSelected(const FunctionGraph::Node&)), SLOT(FunctionListSelectionDone(const FunctionGraph::Node&)));

@@ -303,7 +303,7 @@ bool ParseCmdLine(int argc, char* argv[], Config& config)
 #if _WIN32
             cout << ", DirectX";
 #endif
-            cout << ", OpenGL and Vulkan" << std::endl;;
+            cout << ", OpenGL and Vulkan" << std::endl;
             cout << "To view help for OpenCL: -h -s cl" << std::endl;
             cout << "To view help for OpenGL: -h -s opengl" << endl;
             cout << "To view help for Vulkan: -h -s vulkan" << endl;

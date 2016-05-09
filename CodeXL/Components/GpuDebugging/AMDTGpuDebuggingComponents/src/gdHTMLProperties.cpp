@@ -4371,7 +4371,7 @@ void gdHTMLProperties::getFunctionCallWarnings(const apContextID& contextID, int
         // For function with no information, append the standard information string;
         if (functionWarning1.isEmpty() && functionWarning2.isEmpty())
         {
-            functionWarning1.appendFormattedString(GD_STR_StatisticsViewerPropertiesGenericCallsHistory, apiSTR.asCharArray());;
+            functionWarning1.appendFormattedString(GD_STR_StatisticsViewerPropertiesGenericCallsHistory, apiSTR.asCharArray());
         }
     }
 }
@@ -11320,7 +11320,7 @@ bool gdHTMLProperties::addDevicesToHTMLContent(const apCLContext& contextInfo, a
 
             // Add the device vendor:
             const gtString& deviceVendor = deviceDetails.deviceVendor();
-            htmlContent.addHTMLItem(afHTMLContent::AP_HTML_LINE, AF_STR_ContextsInformationsDialogDeviceVendor, deviceVendor);;
+            htmlContent.addHTMLItem(afHTMLContent::AP_HTML_LINE, AF_STR_ContextsInformationsDialogDeviceVendor, deviceVendor);
 
             // TO_DO: OpenCL - Add deviceAllowedQueueProperties and many other device properties that are not currently
             // expressed in apCLDevice

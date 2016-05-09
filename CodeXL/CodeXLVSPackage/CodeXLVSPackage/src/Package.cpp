@@ -1982,9 +1982,9 @@ void CodeXLVSPackage::executeDebugSession(bool isProjectTypeValid)
                 // Extract the current settings.
                 VSCORE(vsc_GetCurrentSettings)(pExecutableFilePathBuffer, pWorkingDirectoryPath, pCommandLineArguments, pEnvironment);
                 std::wstring executableFilePath      = (pExecutableFilePathBuffer != nullptr) ? pExecutableFilePathBuffer : L"";
-                std::wstring workingDirectoryPath    = (pWorkingDirectoryPath != nullptr) ? pWorkingDirectoryPath : L"";;
-                std::wstring commandLineArguments    = (pCommandLineArguments != nullptr) ? pCommandLineArguments : L"";;
-                std::wstring environment             = (pEnvironment != nullptr) ? pEnvironment : L"";;
+                std::wstring workingDirectoryPath    = (pWorkingDirectoryPath != nullptr) ? pWorkingDirectoryPath : L"";
+                std::wstring commandLineArguments    = (pCommandLineArguments != nullptr) ? pCommandLineArguments : L"";
+                std::wstring environment             = (pEnvironment != nullptr) ? pEnvironment : L"";
 
                 bool rcDbg = validateDebugSettings(executableFilePath, workingDirectoryPath, isProjectTypeValid);
 

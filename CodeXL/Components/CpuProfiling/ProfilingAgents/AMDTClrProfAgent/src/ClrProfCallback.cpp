@@ -797,7 +797,7 @@ HRESULT ClrProfCallBack::JITCompilationFinished(FunctionID functionId, HRESULT h
         pMDImport = NULL;
     }
 
-    return E_NOTIMPL;;
+    return E_NOTIMPL;
 }
 
 HRESULT ClrProfCallBack::JITCachedFunctionSearchStarted(FunctionID functionId, BOOL* pbUseCachedFunction)

@@ -497,7 +497,7 @@ void kaApplicationCommands::onUpdateCancelBuildCommand(bool& isEnabled)
 // ---------------------------------------------------------------------------
 void kaApplicationCommands::openUpdateContainingFolder(bool& isEnabled)
 {
-    isEnabled = (afExecutionModeManager::instance().isActiveMode(KA_STR_executionMode));;
+    isEnabled = (afExecutionModeManager::instance().isActiveMode(KA_STR_executionMode));
     gtVector<osFilePath> dummFilesPath;
 
     isEnabled = isEnabled && (activeCLFiles(dummFilesPath) > 0);

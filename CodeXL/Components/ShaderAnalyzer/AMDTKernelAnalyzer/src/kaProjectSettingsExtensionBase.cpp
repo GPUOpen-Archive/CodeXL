@@ -796,7 +796,7 @@ void kaProjectSettingsExtensionBase::OnTextChange(const QString& lineText)
                 }
                 // We use the parent flag data old string from this point in order to have
                 // just one string changing:
-                kaProjectSettingFlagData* pUsedFlagData = pFlagData->m_pParentData;;
+                kaProjectSettingFlagData* pUsedFlagData = pFlagData->m_pParentData;
                 ReplaceText(pUsedFlagData, newText);
             }
         }

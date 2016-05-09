@@ -1651,7 +1651,7 @@ void pdLinuxProcessDebugger::fillCallsStackDebugInfo(osCallStack& callStack, boo
 
                 if ((0 == j) && (!isAtAPIOrKernelBreakpoint(OS_NO_THREAD_ID)))
                 {
-                    instructionPointerAddress = (osInstructionPointer)((gtUInt64)instructionPointerAddress + 1);;
+                    instructionPointerAddress = (osInstructionPointer)((gtUInt64)instructionPointerAddress + 1);
                 }
 
                 if (instructionPointerAddress != (osInstructionPointer)NULL)

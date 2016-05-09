@@ -310,7 +310,7 @@ bool KernelAssembly::GenerateKernelFilesFromACLModule(ACLModule*         pAclMod
             // In both cases, fall back to the other name if the most-likely name fails
             if (usesHSAILPath)
             {
-                strKernelName = "&__OpenCL_" + strKernelFunction + "_kernel";;
+                strKernelName = "&__OpenCL_" + strKernelFunction + "_kernel";
                 strKernelNameAlt = strKernelFunction;
             }
             else

@@ -230,7 +230,7 @@ bool CpuGlobalSettings::saveCurrentSettings()
     pOptions->symSrvList = servers.join(";");
 
     // Trim and remove leading zeros from the instruction block size text box.
-    QString disassemblyInstructionCountAsQstr = m_pDisassemblyInstructionCountLineEdit->text().trimmed().remove(QRegExp("^[0]*"));;
+    QString disassemblyInstructionCountAsQstr = m_pDisassemblyInstructionCountLineEdit->text().trimmed().remove(QRegExp("^[0]*"));
 
     // Set the adjusted string to the text box.
     m_pDisassemblyInstructionCountLineEdit->setText(disassemblyInstructionCountAsQstr);

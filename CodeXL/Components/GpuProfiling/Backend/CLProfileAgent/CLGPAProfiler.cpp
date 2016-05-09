@@ -162,7 +162,7 @@ bool CLGPAProfiler::AddKernelArgSVMPointer(const cl_kernel kernel, cl_uint argId
 
     if (CL_SUCCESS == status)
     {
-        retVal = m_contextManager.AddKernelArgSVMPointer(context, kernel, argIdx);;
+        retVal = m_contextManager.AddKernelArgSVMPointer(context, kernel, argIdx);
     }
 
     return retVal;
@@ -192,7 +192,7 @@ bool CLGPAProfiler::AddKernelArgPipe(const cl_kernel kernel, cl_uint argIdx)
 
     if (CL_SUCCESS == status)
     {
-        retVal = m_contextManager.AddKernelArgPipe(context, kernel, argIdx);;
+        retVal = m_contextManager.AddKernelArgPipe(context, kernel, argIdx);
     }
 
     return retVal;

@@ -1599,7 +1599,7 @@ HRESULT CaPerfDataWriter::writeKernelMmap(const char* symbolName, gtUInt16 sampl
         return ret;
     }
 
-    // FIXME - map;;
+    // FIXME - map;
     // map = machine->vmlinux_maps[MAP__FUNCTION];
 
     // FIXME - mmap_name
