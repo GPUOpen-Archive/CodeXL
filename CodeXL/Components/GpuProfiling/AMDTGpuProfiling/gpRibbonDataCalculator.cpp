@@ -466,6 +466,7 @@ void gpRibbonDataCalculator::GetPresentData(QVector<double>& presentData)
                     if (pCurrentItem->StartTime() - m_pTimeLine->startTime() < firstGPUTime)
                     {
                         firstGPUTime = pCurrentItem->StartTime() - m_pTimeLine->startTime();
+                        break;
                     }
                 }
             }
