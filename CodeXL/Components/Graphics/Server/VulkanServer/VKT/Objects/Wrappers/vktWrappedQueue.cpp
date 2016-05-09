@@ -91,24 +91,32 @@ VktWrappedQueue::VktWrappedQueue(const WrappedQueueCreateInfo& createInfo) :
 
 //-----------------------------------------------------------------------------
 /// Fill a vector with all wrapped command buffers.
-/// \param commandBufferCount The number of CommandBuffers to gather results for.
-/// \param pCommandBuffers The array of CommandBuffers to gather results for.
+/// \param submitCount The number of submits in this submission.
+/// \param pSubmits The array of VkSubmitInfo structures.
 /// \param cmdBufsWithProfiledCalls An array of CommandBuffers with profiled calls.
 //-----------------------------------------------------------------------------
 void VktWrappedQueue::GatherWrappedCommandBufs(
-    UINT                            commandBufferCount,
-    const VkCommandBuffer*          pCommandBuffers,
+    uint32_t                        submitCount,
+    const VkSubmitInfo*             pSubmits,
     std::vector<VktWrappedCmdBuf*>& wrappedCmdBufs)
 {
-    for (UINT i = 0; i < commandBufferCount; i++)
+    if ((submitCount > 0) && (pSubmits != nullptr))
     {
-        if (pCommandBuffers[i] != nullptr)
+        for (UINT i = 0; i < submitCount; i++)
         {
-            VktWrappedCmdBuf* pWrappedCmdBuf = GetWrappedCmdBuf(pCommandBuffers[i]);
+            const VkSubmitInfo& currSubmit = pSubmits[i];
 
-            if (pWrappedCmdBuf != nullptr)
+            for (UINT j = 0; j < currSubmit.commandBufferCount; j++)
             {
-                wrappedCmdBufs.push_back(pWrappedCmdBuf);
+                if (currSubmit.pCommandBuffers[j] != nullptr)
+                {
+                    VktWrappedCmdBuf* pWrappedCmdBuf = GetWrappedCmdBuf(currSubmit.pCommandBuffers[j]);
+
+                    if (pWrappedCmdBuf != nullptr)
+                    {
+                        wrappedCmdBufs.push_back(pWrappedCmdBuf);
+                    }
+                }
             }
         }
     }
@@ -180,7 +188,7 @@ void VktWrappedQueue::EndCollection()
 
             if (pCmdBuf != nullptr)
             {
-                pCmdBuf->DestroyProfilers();
+                pCmdBuf->DestroyDynamicProfilers();
             }
         }
 
@@ -235,23 +243,12 @@ VkResult VktWrappedQueue::QueueSubmit(VkQueue queue, uint32_t submitCount, const
     bool usingInternalFence = false;
 
     std::vector<VktWrappedCmdBuf*> wrappedCmdBufs;
+    GatherWrappedCommandBufs(submitCount, pSubmits, wrappedCmdBufs);
 
-    for (UINT i = 0; i < submitCount; i++)
+    for (UINT i = 0; i < wrappedCmdBufs.size(); i++)
     {
-        const VkSubmitInfo& currSubmit = pSubmits[i];
-
-        GatherWrappedCommandBufs(currSubmit.commandBufferCount, currSubmit.pCommandBuffers, wrappedCmdBufs);
-
-        for (UINT j = 0; j < currSubmit.commandBufferCount; j++)
-        {
-            VktWrappedCmdBuf* pWrappedCmdBuf = GetWrappedCmdBuf(currSubmit.pCommandBuffers[j]);
-
-            if (pWrappedCmdBuf != nullptr)
-            {
-                pWrappedCmdBuf->SetProfilerExecutionId(m_executionID);
-                pWrappedCmdBuf->IncrementSubmitCount();
-            }
-        }
+        wrappedCmdBufs[i]->SetProfilerExecutionId(m_executionID);
+        wrappedCmdBufs[i]->IncrementSubmitCount();
     }
 
     // Surround the execution of CommandBuffers with timestamps so we can determine when the GPU work occurred in the CPU timeline.
@@ -329,6 +326,13 @@ VkResult VktWrappedQueue::QueueSubmit(VkQueue queue, uint32_t submitCount, const
         }
 #endif
     }
+
+#if GATHER_PROFILER_RESULTS_WITH_WORKERS == 0
+    for (UINT i = 0; i < wrappedCmdBufs.size(); i++)
+    {
+        wrappedCmdBufs[i]->DestroyDynamicProfilers();
+    }
+#endif
 
     return result;
 }

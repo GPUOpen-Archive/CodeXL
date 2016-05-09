@@ -62,7 +62,7 @@ public:
     /// Return the number of profiled commands for this CmdBuf
     UINT GetProfiledCallCount() const { return m_profiledCallCount; }
 
-    void DestroyProfilers();
+    void DestroyDynamicProfilers();
     void SetProfilerExecutionId(INT64 executionId);
 
     VkResult BeginCommandBuffer(VkCommandBuffer commandBuffer, const VkCommandBufferBeginInfo* pBeginInfo);

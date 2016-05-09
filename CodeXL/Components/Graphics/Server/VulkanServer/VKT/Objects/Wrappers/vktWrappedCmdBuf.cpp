@@ -6,6 +6,7 @@
 //=============================================================================
 
 #include "vktWrappedCmdBuf.h"
+#include "../../vktLayerManager.h"
 #include "../../vktInterceptManager.h"
 #include "../../vktDefines.h"
 #include "../../Profiling/vktCmdBufProfilerStatic.h"
@@ -52,7 +53,7 @@ VktWrappedCmdBuf::VktWrappedCmdBuf(const WrappedCmdBufCreateInfo& createInfo) :
 //-----------------------------------------------------------------------------
 void VktWrappedCmdBuf::Free()
 {
-    DestroyProfilers();
+    DestroyDynamicProfilers();
 
     m_alive = false;
 
@@ -165,7 +166,7 @@ ProfilerResultCode VktWrappedCmdBuf::GetCmdBufResultsST(std::vector<ProfilerResu
 
     result = GetStaticProfilerResults(outResults);
 
-    DestroyProfilers();
+    DestroyDynamicProfilers();
 
     return result;
 }
@@ -258,7 +259,7 @@ ProfilerResultCode VktWrappedCmdBuf::GetStaticProfilerResultsMT(std::vector<Prof
 //-----------------------------------------------------------------------------
 /// Destroy all of the profiler objects used with this CommandBuffer.
 //-----------------------------------------------------------------------------
-void VktWrappedCmdBuf::DestroyProfilers()
+void VktWrappedCmdBuf::DestroyDynamicProfilers()
 {
     ScopeLock lock(&m_closedProfilersMutex);
 
@@ -376,7 +377,7 @@ VkResult VktWrappedCmdBuf::BeginCommandBuffer(VkCommandBuffer commandBuffer, con
             UINT cmdBufId = ((UINT64)m_createInfo.appCmdBuf & 0xFFFFFFFF) + m_submitNumber;
 
             ProfilerMeasurementId measurementId = {};
-            VktUtil::ConstructMeasurementInfo(FuncId_WholeCmdBuf, cmdBufId, this, 0, measurementId);
+            VktUtil::ConstructMeasurementInfo(FuncId_WholeCmdBuf, cmdBufId, this, VktLayerManager::GetLayerManager()->GetFrameCount(), measurementId);
 
             m_pStaticProfiler->BeginCmdMeasurement(&measurementId);
         }
