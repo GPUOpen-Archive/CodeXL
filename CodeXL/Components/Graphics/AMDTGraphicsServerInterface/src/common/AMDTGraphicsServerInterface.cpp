@@ -135,12 +135,6 @@ bool GraphicsServerCommunication::ConnectProcess(const gtASCIIString strPid, con
             gtASCIIString tcSettings = m_strApiHttpCommand;
             retVal = SendCommandPid(tcSettings.append("/TC/Settings.xml"), strWebResponse, "");
         }
-
-        if (retVal)
-        {
-            gtASCIIString autoCapture = m_strApiHttpCommand;
-            retVal = SendCommandPid(autoCapture.append("/AutoCapture"), strWebResponse, "");
-        }
     }
 
     return retVal;
