@@ -232,7 +232,9 @@ static void HandleServerStatusResponse(GRAPHICS_SERVER_STATE serverState, HTTPRe
 #endif
 
 /// Record the clear state of the registry
-static bool registryCleared = false;
+#ifdef _WIN32
+    static bool registryCleared = false;
+#endif
 
 bool ProcessTracker::HandleRequest(HTTPRequestHeader* pRequestHeader,
                                    CommunicationID requestID,
@@ -615,6 +617,9 @@ bool ProcessTracker::WritePluginsToSharedMemoryAndLaunchApp()
 //--------------------------------------------------------------
 PROCESS_INFORMATION ProcessTracker::LaunchAppInNewProcess(gtASCIIString strApp, gtASCIIString strDir, gtASCIIString strArgs, osModuleArchitecture binaryType)
 {
+#ifdef _LINUX
+    PS_UNREFERENCED_PARAMETER(binaryType);
+#endif
     LogConsole(logMESSAGE, "About to launch: %s\n", strApp.asCharArray());
     LogConsole(logMESSAGE, "Params: %s\n", strArgs.asCharArray());
     LogConsole(logMESSAGE, "Working Directory: %s\n", strDir.asCharArray());
@@ -1082,61 +1087,43 @@ bool ProcessTracker::PassRequestToPlugin(const char* strDestination,
 }
 
 //--------------------------------------------------------------------------
-/// Setup Vulkan-specific environment variables.
-/// This code needs to be called during tool initialization.
+/// Setup Vulkan-specific environment variables
 //--------------------------------------------------------------------------
-void SetupVulkanEnvVariables()
-{
 #if ENABLE_VULKAN
 
-    // Windows
-#ifdef _WIN32
+static void SetupVulkanEnvVariables()
+{
+#ifdef CODEXL_GRAPHICS
+    gtASCIIString layerNameA = "CXLGraphicsServerVulkan" GDT_PROJECT_SUFFIX;
+#else
+    gtASCIIString layerNameA = "VulkanServer" GDT_PROJECT_SUFFIX;
+#endif
 
-#ifdef _DEBUG
-#ifdef X64
-    gtString layerName = L"CXLGraphicsServerVulkan-x64-d";
-#else
-    gtString layerName = L"CXLGraphicsServerVulkan-d";
-#endif
-#else
-#ifdef X64
-    gtString layerName = L"CXLGraphicsServerVulkan-x64";
-#else
-    gtString layerName = L"CXLGraphicsServerVulkan";
-#endif
-#endif
+    gtString layerName;
+    layerName.fromASCIIString(layerNameA.asCharArray());
 
     gtASCIIString serverPath;
     GetModuleDirectory(serverPath);
 
-    // Set VK_LAYER_PATH equal to where our layer lives
     osEnvironmentVariable layerPath;
     layerPath._name = L"VK_LAYER_PATH";
     layerPath._value.fromASCIIString(serverPath.asCharArray());
     layerPath._value.append(L"Plugins");
 
-    // Set VK_INSTANCE_LAYERS equal to our layer above
     osEnvironmentVariable instanceLayerName;
     instanceLayerName._name =  L"VK_INSTANCE_LAYERS";
     instanceLayerName._value = layerName;
 
-    // Set VK_DEVICE_LAYERS equal to our layer above
     osEnvironmentVariable deviceLayerName;
     deviceLayerName._name = L"VK_DEVICE_LAYERS";
     deviceLayerName._value = layerName;
 
-    // Setting these environment variables should register our server as a layer
     osSetCurrentProcessEnvVariable(layerPath);
     osSetCurrentProcessEnvVariable(instanceLayerName);
     osSetCurrentProcessEnvVariable(deviceLayerName);
-
-    // Linux
-#else
-
-#endif
-
-#endif
 }
+
+#endif // ENABLE_VULKAN
 
 //--------------------------------------------------------------------------
 /// Before launching a new process, this function will initialize the environment for the
