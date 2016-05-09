@@ -3344,40 +3344,33 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
 
                     const EventSampleList& samples = callStack.GetEventSampleList();
 
-                    if (!samples.IsEmpty())
+                    for (const auto& sampleInfo : samples)
                     {
-                        auto eventIter = samples.begin();
-                        auto eventIterEnd = samples.end();
+                        gtUInt64 funcId = 0;
 
-                        while (++eventIter != eventIterEnd)
+                        ExecutableFile* pExe = workingSet.FindModule(sampleInfo.m_pSite->m_traverseAddr);
+                        gtUInt64 loadAddr = (nullptr != pExe) ? pExe->GetLoadAddress() : 0ULL;
+                        gtUInt64 offset = sampleInfo.m_pSite->m_traverseAddr - loadAddr;
+
+                        if (pExe != nullptr)
                         {
-                            const EventSampleInfo& sampleInfo = *eventIter;
-                            gtUInt64 funcId = 0;
+                            gtString moduleName = pExe->GetFilePath();
+                            auto modIt = moduleMap.find(moduleName);
 
-                            ExecutableFile* pExe = workingSet.FindModule(sampleInfo.m_pSite->m_traverseAddr);
-                            gtUInt64 loadAddr = (nullptr != pExe) ? pExe->GetLoadAddress() : 0ULL;
-                            gtUInt64 offset = sampleInfo.m_pSite->m_traverseAddr - loadAddr;
-
-                            if (pExe != nullptr)
+                            if (modIt != moduleMap.end())
                             {
-                                gtString moduleName = pExe->GetFilePath();
-                                auto modIt = moduleMap.find(moduleName);
+                                funcId = modIt->second.m_moduleId << 16;
+                                auto pFunc = modIt->second.findFunction(sampleInfo.m_pSite->m_traverseAddr);
 
-                                if (modIt != moduleMap.end())
+                                if (pFunc != nullptr)
                                 {
-                                    funcId = modIt->second.m_moduleId << 16;
-                                    auto pFunc = modIt->second.findFunction(sampleInfo.m_pSite->m_traverseAddr);
-
-                                    if (pFunc != nullptr)
-                                    {
-                                        funcId |= pFunc->m_functionId;
-                                    }
+                                    funcId |= pFunc->m_functionId;
                                 }
                             }
-
-                            csLeafInfoList.emplace_back(
-                                callStackId, pid, funcId, offset, sampleInfo.m_eventId, sampleInfo.m_count);
                         }
+
+                        csLeafInfoList.emplace_back(
+                            callStackId, pid, funcId, offset, sampleInfo.m_eventId, sampleInfo.m_count);
                     }
                 }
 
