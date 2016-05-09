@@ -521,7 +521,7 @@ void gpConnectDialog::OnTextEdited(const QString& text)
     {
         if (m_pOptionsComboBox->currentIndex() == gpProjectSettings::egpProcessConnection)
         {
-            m_processNumber = text;;
+            m_processNumber = text;
         }
         else if (m_pOptionsComboBox->currentIndex() == gpProjectSettings::egpFirstDXInProcessConnection)
         {
@@ -536,7 +536,7 @@ void gpConnectDialog::OnTableSelectionChanged()
     {
         QList<QTableWidgetItem*> selectedItems = m_pConnectionsTable->selectedItems();
         bool isSelected = (selectedItems.size() == m_pConnectionsTable->columnCount());
-        bool isDX12 = false;
+        bool isSupportedApi = false;
 
         if (isSelected && selectedItems.size() >= eAPIColumn)
         {
@@ -544,13 +544,14 @@ void gpConnectDialog::OnTableSelectionChanged()
 
             if (pAPIItem != nullptr)
             {
-                if (pAPIItem->text().compare("DX12", Qt::CaseInsensitive) == 0)
+                if (pAPIItem->text().compare(GPU_STR_TraceViewDX12, Qt::CaseInsensitive) == 0 ||
+                    pAPIItem->text().compare(GPU_STR_TraceViewVulkan, Qt::CaseInsensitive) == 0)
                 {
-                    isDX12 = true;
+                    isSupportedApi = true;
                 }
             }
         }
 
-        m_pOKButton->setEnabled(isSelected && isDX12);
+        m_pOKButton->setEnabled(isSelected && isSupportedApi);
     }
 }
