@@ -80,7 +80,6 @@ void CommandListTimelineItem::tooltipItems(acTimelineItemToolTip& tooltip) const
     tooltip.add("Command list", text());
 
     quint64 timelineStartTime = 0;
-
     if (m_pParentBranch != NULL)
     {
         acTimeline* timeline = m_pParentBranch->parentTimeline();
