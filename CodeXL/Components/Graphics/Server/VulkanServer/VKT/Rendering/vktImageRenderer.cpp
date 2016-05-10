@@ -488,13 +488,6 @@ VkResult VktImageRenderer::CaptureImage(
 
     if ((srcImage != VK_NULL_HANDLE) && (pImgOut != nullptr) && (srcWidth > 0) && (srcHeight > 0))
     {
-        // Only shrink or retain size
-        if ((dstWidth > srcWidth) || (dstHeight > srcHeight))
-        {
-            dstWidth = srcWidth;
-            dstHeight = srcHeight;
-        }
-
         // Create temp assets used in this capture
         CaptureAssets assets = {};
         result = CreateCaptureAssets(srcImage, dstWidth, dstHeight, flipX, flipY, assets);
