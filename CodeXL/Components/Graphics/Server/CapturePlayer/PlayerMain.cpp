@@ -1,128 +1,129 @@
 //==============================================================================
 /// Copyright (c) 2015 Advanced Micro Devices, Inc. All rights reserved.
 /// \author AMD Developer Tools Team
-/// \file Main.cpp
+/// \file PLayerMain.cpp
 /// \brief The main entrypoint for the CapturePlayer application. This small
 /// application is responsible for loading a Capture file, and executing
 /// playback of all captured calls. The player is able to respond to commands
 /// issued by HTTP requests.
 ///
-/// @TODO: THERE SHOULD NOT BE ANY API-SPECIFIC CODE WITHIN THE PLAYER'S MAIN.
+/// THERE SHOULD NOT BE ANY API-SPECIFIC CODE WITHIN THE PLAYER'S MAIN.
 /// Instead, load a Capture file from disk, and execute it. Doing so will load
 /// our Server plugins, which we can use to communicate with the player process.
 ///
-/// @TODO: Must update the CapturePlayer project file to remove unwanted .props.
-///
 //==============================================================================
 
-#include <d3d12.h>
-#include <dxgi1_4.h>
 #include <stdio.h>
-#include "ReplayWindow.h"
 
-inline void ThrowIfFailed(HRESULT hr)
+#include "DX12Player.h"
+#include "VulkanPlayer.h"
+#include <tinyxml.h>
+#include "..\Common\StreamLog.h"
+#include "..\Common\TraceMetadata.h"
+#include "..\Common\FrameInfo.h"
+#include "..\Common\Logger.h"
+
+#include <AMDTOSWrappers/Include/osFile.h>
+#include <AMDTOSWrappers/Include/osTime.h>
+#include <AMDTOSWrappers/Include/osDirectory.h>
+#include <AMDTOSWrappers/Include/osModuleArchitecture.h>
+#include <AMDTOSWrappers/Include/osProcess.h>
+
+const UINT windowWidth = 800; ///< Render window width
+const UINT windowHeight = 600; ///< Render window height
+
+#ifdef _DEBUG
+#define CP_ASSERT(s) if (s == false) { __debugbreak(); }
+#else
+#define CP_ASSERT(s)
+#endif
+
+/// Main entry point
+/// \param hInstance A handle to the current instance of the application.
+/// \param hPrevInstance A handle to the previous instance of the application.This parameter is always NULL.
+/// \param lpCmdLine The command line for the application, excluding the program name.
+/// \param nCmdShow Controls how the window is to be shown.
+/// \return Returns the exit value contained in message's wParam parameter or 0.
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-    if (FAILED(hr))
+    UNREFERENCED_PARAMETER(hPrevInstance);
+    UNREFERENCED_PARAMETER(lpCmdLine);
+    UNREFERENCED_PARAMETER(nCmdShow);
+
+    osModuleArchitecture moduleArchitecture;
+    osRuntimePlatform currentPlatform;
+    gtString executablePathString;
+    gtString commandLine;
+    gtString workingDirectory;
+
+    // Get the process information
+    bool bRes = osGetProcessLaunchInfo(osGetCurrentProcessId(), moduleArchitecture, currentPlatform, executablePathString, commandLine, workingDirectory);
+    CP_ASSERT(bRes == true);
+    if (bRes != true)
     {
-        throw;
+        Log(logERROR, "Could not get the process information from: osGetProcessLaunchInfo\n");
+        exit(EXIT_FAILURE);
     }
-}
 
-// Main message handler for the sample.
-LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    // Handle destroy/shutdown messages.
-    switch (message)
+    // Create a meta data object to read the XML into
+    TraceMetadata mtf;
+    FrameInfo frameInfo;
+    mtf.mFrameInfo = &frameInfo;
+
+    // Read the XML data
+    bRes = ReadMetadataFile(commandLine.asASCIICharArray(), &mtf);
+    CP_ASSERT(bRes == true);
+    if (bRes != true)
     {
-        case WM_DESTROY:
-            PostQuitMessage(0);
-            return 0;
+        Log(logERROR, "ReadMetadataFile: FAILED reading %s\n", commandLine.asASCIICharArray());
+        exit(EXIT_FAILURE);
     }
 
-    // Handle any messages the switch statement didn't.
-    return DefWindowProc(hWnd, message, wParam, lParam);
-}
+    // Declare a player pointer
+    WindowsPlayer* pPlayer = NULL;
 
-ReplayWindow* replayWindow = NULL;
-const UINT windowWidth = 800;
-const UINT windowHeight = 600;
-
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
-{
-    replayWindow = new ReplayWindow(windowWidth, windowHeight);
-
-    // Start the ecapture player minimized. We will need to revert this when we are playing back a frame capture as in this case we will want to see the window.
-    bool bWindowInitialied = replayWindow->Initialize(hInstance, nCmdShow, WindowProc);
-
-    if (bWindowInitialied)
+    size_t found = mtf.mAPIString.find("Vulkan");
+    if (found != std::string::npos)
     {
-        // Open the window in the system's UI after creating it.
-        bool bWindowReady = replayWindow->OpenAndUpdate(SW_MINIMIZE);
-
-        if (bWindowReady)
+        pPlayer = new VulkanPlayer();
+    }
+    else
+    {
+        found = mtf.mAPIString.find("DX12");
+        if (found != std::string::npos)
         {
-            //////////////////////////////////////////////////////////////////////////
-            // @TODO: THIS CODE WAS STOLEN FROM THE "D3D12MULTITHREADING" SDK SAMPLE!
-            //////////////////////////////////////////////////////////////////////////
-            ID3D12Device* graphicsDevice = NULL;
-
-            UINT frameCount = 2;
-
-            // Initialize all pipeline components necessary to render a frame.
-            /// Invoking these calls will allow the DXGI/DX12Server plugins to be injected into our player application.
-
-            // @TODO: In the future, the following commands will invoked by loaded a capture file,
-            // initializing, and executing all captured calls. Spinning on the target frame will beat
-            // the DX12Server's message loop, allowing communicate with GPUPerfServer.
-            IDXGIFactory4* factory = NULL;
-            ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&factory)));
-
-            ThrowIfFailed(D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&graphicsDevice)));
-
-            // Describe and create the command queue.
-            D3D12_COMMAND_QUEUE_DESC queueDesc = {};
-            queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-            queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-
-            ID3D12CommandQueue* commandQueue = NULL;
-            ThrowIfFailed(graphicsDevice->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&commandQueue)));
-
-            // Describe and create the swap chain.
-            DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
-            swapChainDesc.BufferCount = frameCount;
-            swapChainDesc.BufferDesc.Width = windowWidth;
-            swapChainDesc.BufferDesc.Height = windowHeight;
-            swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-            swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-            swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-            swapChainDesc.OutputWindow = replayWindow->GetWindowHandle();
-            swapChainDesc.SampleDesc.Count = 1;
-            swapChainDesc.Windowed = TRUE;
-
-            IDXGISwapChain3* swapchain = NULL;
-            ThrowIfFailed(factory->CreateSwapChain(commandQueue, &swapChainDesc, (IDXGISwapChain**)&swapchain));
-
-            // Main sample loop.
-            MSG msg = { 0 };
-
-            for (;;)
-            {
-                // Process any messages in the queue.
-                if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-                {
-                    TranslateMessage(&msg);
-                    DispatchMessage(&msg);
-
-                    if (msg.message == WM_QUIT)
-                    {
-                        break;
-                    }
-                }
-
-                ThrowIfFailed(swapchain->Present(0, 0));
-            }
+            pPlayer = new DX12Player();
+        }
+        else
+        {
+            // Default to using DX12 to support older traces that were prior to Vulkan support in GPS/CodeXL 
+            pPlayer = new DX12Player();
         }
     }
+
+    // Initialize the render window 
+    bRes = pPlayer->InitializeWindow(hInstance, windowWidth, windowHeight);
+    CP_ASSERT(bRes == true);
+    if (bRes != true)
+    {
+        Log(logERROR, "InitializeWindow FAILED.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Initialize render loop graphics
+    bRes = pPlayer->InitializeGraphics();
+    CP_ASSERT(bRes == true);
+    if (bRes != true)
+    {
+        Log(logERROR, "InitializeGraphics FAILED.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // Spin on the render loop to process commands
+    pPlayer->RenderLoop();
+
+    // Cleanup
+    pPlayer->Destroy();
 
     return 0;
 }

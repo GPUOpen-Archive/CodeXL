@@ -44,7 +44,11 @@ public:
         // Step through each element, looking for specific names. Extract what we need to fill out our structure.
         if (elementName != NULL && elementText != NULL)
         {
-            if (strcmp(elementName, "Location") == 0)
+            if (strcmp(elementName, "API") == 0)
+            {
+                mMetadataInstance->mAPIString.assign(elementText);
+            }
+            else if (strcmp(elementName, "Location") == 0)
             {
                 mMetadataInstance->mMetadataFilepath.assign(elementText);
             }
@@ -149,6 +153,7 @@ void TraceMetadata::WriteToXML(gtASCIIString& outMetadataXML)
 {
     gtASCIIString metadataXML;
 
+    metadataXML += XML("API", FormatText("%s", mAPIString.c_str()).asCharArray());
     metadataXML += XML("Location", FormatText("%s", mMetadataFilepath.c_str()).asCharArray());
     metadataXML += XML("Architecture", FormatText("%u", mArchitecture).asCharArray());
     metadataXML += XML("APICallCount", FormatText("%u", mAPICallCount).asCharArray());

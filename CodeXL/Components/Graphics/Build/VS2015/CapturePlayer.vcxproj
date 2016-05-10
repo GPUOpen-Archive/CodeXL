@@ -19,11 +19,29 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Server\CapturePlayer\DX12Player.cpp" />
     <ClCompile Include="..\..\Server\CapturePlayer\PlayerMain.cpp" />
-    <ClCompile Include="..\..\Server\CapturePlayer\ReplayWindow.cpp" />
+    <ClCompile Include="..\..\Server\CapturePlayer\VulkanPlayer.cpp" />
+    <ClCompile Include="..\..\Server\CapturePlayer\WindowsPlayer.cpp" />
+    <ClCompile Include="..\..\Server\CapturePlayer\WindowsWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Server\CapturePlayer\ReplayWindow.h" />
+    <ClInclude Include="..\..\Server\CapturePlayer\BasePlayer.h" />
+    <ClInclude Include="..\..\Server\CapturePlayer\DX12Player.h" />
+    <ClInclude Include="..\..\Server\CapturePlayer\VulkanPlayer.h" />
+    <ClInclude Include="..\..\Server\CapturePlayer\WindowsPlayer.h" />
+    <ClInclude Include="..\..\Server\CapturePlayer\WindowsWindow.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(CommonDir)\Src\AMDTBaseTools\AMDTBaseToolsVS14.vcxproj">
+      <Project>{11221a7f-3883-418f-b286-b0ea1e28ef10}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(CommonDir)\Src\AMDTOSWrappers\AMDTOSWrappersVS14.vcxproj">
+      <Project>{5d9222ac-39fb-4123-9497-78cea5be58ad}</Project>
+    </ProjectReference>
+    <ProjectReference Include="Common.vcxproj">
+      <Project>{265623d5-5abf-4800-a4cc-ed4dd2dad3ae}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A659A6A5-A116-43BF-B3CF-4ADD48E40055}</ProjectGuid>
@@ -63,9 +81,26 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="Server-Common.props" />
-    <Import Project="$(CommonDir)\Lib\Ext\Windows-Kits\Global-WindowsSDK.props" />
     <Import Project="AMDTOSWrappers.props" />
+    <Import Project="$(CommonDir)\Lib\Ext\Windows-Kits\Global-WindowsSDK.props" />
+    <Import Project="$(CommonDir)\Lib\Ext\Boost\Global-Boost-2015.props" />
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(CommonDir)\Lib\Ext\Vulkan\Global-Vulkan.props" />
+    <Import Project="$(CommonDir)\Lib\Ext\tinyxml\Global-TinyXML-2015.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(CommonDir)\Lib\Ext\Vulkan\Global-Vulkan.props" />
+    <Import Project="$(CommonDir)\Lib\Ext\tinyxml\Global-TinyXML-2015.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(CommonDir)\Lib\Ext\Vulkan\Global-Vulkan.props" />
+    <Import Project="$(CommonDir)\Lib\Ext\tinyxml\Global-TinyXML-2015.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(CommonDir)\Lib\Ext\Vulkan\Global-Vulkan.props" />
+    <Import Project="$(CommonDir)\Lib\Ext\tinyxml\Global-TinyXML-2015.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -85,7 +120,49 @@
       <SubSystem>
       </SubSystem>
       <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DelayLoadDLLs>vulkan-1.dll</DelayLoadDLLs>
+      <AdditionalLibraryDirectories>$(VulkanReqsDir)SDK\win\Bin32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
+      <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DelayLoadDLLs>vulkan-1.dll</DelayLoadDLLs>
+      <AdditionalLibraryDirectories>$(VulkanReqsDir)SDK\win\Bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
+      <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DelayLoadDLLs>vulkan-1.dll</DelayLoadDLLs>
+      <AdditionalLibraryDirectories>$(VulkanReqsDir)SDK\win\Bin32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
+      <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <DelayLoadDLLs>vulkan-1.dll</DelayLoadDLLs>
+      <AdditionalLibraryDirectories>$(VulkanReqsDir)SDK\win\Bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>D3D12.DLL</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
@@ -94,7 +171,7 @@
       <SubSystem>
       </SubSystem>
       <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>D3D12.DLL</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
@@ -104,7 +181,7 @@
       </SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>D3D12.DLL</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
@@ -114,7 +191,7 @@
       </SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>D3D12.DLL</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>

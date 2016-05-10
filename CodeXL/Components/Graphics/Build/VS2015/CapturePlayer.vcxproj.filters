@@ -1,10 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="..\..\Server\CapturePlayer\ReplayWindow.cpp" />
     <ClCompile Include="..\..\Server\CapturePlayer\PlayerMain.cpp" />
+    <ClCompile Include="..\..\Server\CapturePlayer\DX12Player.cpp" />
+    <ClCompile Include="..\..\Server\CapturePlayer\VulkanPlayer.cpp" />
+    <ClCompile Include="..\..\Server\CapturePlayer\WindowsPlayer.cpp" />
+    <ClCompile Include="..\..\Server\CapturePlayer\WindowsWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Server\CapturePlayer\ReplayWindow.h" />
+    <ClInclude Include="..\..\Server\CapturePlayer\BasePlayer.h" />
+    <ClInclude Include="..\..\Server\CapturePlayer\DX12Player.h" />
+    <ClInclude Include="..\..\Server\CapturePlayer\VulkanPlayer.h" />
+    <ClInclude Include="..\..\Server\CapturePlayer\WindowsPlayer.h" />
+    <ClInclude Include="..\..\Server\CapturePlayer\WindowsWindow.h" />
   </ItemGroup>
 </Project>

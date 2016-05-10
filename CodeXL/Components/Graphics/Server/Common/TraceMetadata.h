@@ -8,7 +8,7 @@
 #ifndef TRACEMETADATA_H
 #define TRACEMETADATA_H
 
-#include "OSwrappers.h"
+#include "OSWrappers.h"
 #include <AMDTOSWrappers/Include/osProcess.h>
 
 class FrameInfo;
@@ -47,6 +47,11 @@ public:
     /// and draw call counts.
     //--------------------------------------------------------------------------
     FrameInfo* mFrameInfo;
+
+    //-----------------------------------------------------------------------------
+    /// A string containing the API used when the trace was collected.
+    //-----------------------------------------------------------------------------
+    std::string mAPIString;
 
     //--------------------------------------------------------------------------
     /// The path to the cached trace file on disk.
