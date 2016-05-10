@@ -14,7 +14,7 @@ fullBuildFlags = env_no_c11['CPPFLAGS']
 partBuildString = fullBuildFlags.replace('-std=c++11','')
 env_no_c11.Replace( CPPFLAGS = partBuildString)
 
-env.Append( CPPPATH = [ 
+env.Append( CPPPATH = [
 	".",
 	"inc",
 	"..",
@@ -27,7 +27,7 @@ env.Append( CPPPATH = [
 	env['CXL_common_dir'] + '/Lib/Ext/Java/jdk1.7.0_17/include/linux',
 ])
 
-env_no_c11.Append( CPPPATH = [ 
+env_no_c11.Append( CPPPATH = [
 	".",
 	"inc",
 	"..",
@@ -42,6 +42,8 @@ env.Append(CPPFLAGS = '-fno-strict-aliasing')
 env.Append (LIBS = [
 	"CXLBaseTools",
 	"CXLOSWrappers",
+	"CXLCpuPerfEventUtils",
+	"CXLDbAdapter",
 ])
 
 sources = \
@@ -70,18 +72,18 @@ csources = \
 	"src/RawData/Linux/PerfRecName.c",
 ]
 
-# Creating object files	
+# Creating object files
 objFiles = env.SharedObject(sources)
 objFilesC = env_no_c11.SharedObject(csources)
 
 # Creating shared libraries
 soFiles = env.SharedLibrary(
-	target = libName, 
+	target = libName,
 	source = objFiles + objFilesC)
 
 # Installing libraries
-libInstall = env.Install( 
-	dir = env['CXL_lib_dir'], 
+libInstall = env.Install(
+	dir = env['CXL_lib_dir'],
 	source = (soFiles))
 
 Return('libInstall')
