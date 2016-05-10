@@ -256,11 +256,11 @@ bool gpProjectSettingsExtension::RestoreCurrentSettings()
                     m_pOptionsEdit->setText(settings.m_processNumber);
                     break;
 
-                case gpProjectSettings::egpFirstDXInProcessConnection:
+                case gpProjectSettings::egpFirstApiInProcessConnection:
                     m_pOptionsEdit->setText(settings.m_processName);
                     break;
 
-                case gpProjectSettings::egpFirstDX12Connection:
+                case gpProjectSettings::egpFirstApiConnection:
                     m_pOptionsEdit->setVisible(false);
                     m_pOptionsEdit->setText("");
                     break;
@@ -284,14 +284,14 @@ void gpProjectSettingsExtension::OnAutomaticClicked(bool)
 void gpProjectSettingsExtension::OnConnectionSelected(int index)
 {
     m_bUpdateSettings = true;
-    m_pOptionsEdit->setHidden((gpProjectSettings::eConnectionType)index == gpProjectSettings::egpFirstDX12Connection);
+    m_pOptionsEdit->setHidden((gpProjectSettings::eConnectionType)index == gpProjectSettings::egpFirstApiConnection);
 
     if ((gpProjectSettings::eConnectionType)index == gpProjectSettings::egpProcessConnection)
     {
         m_pOptionsEdit->setValidator(&m_validator);
         m_pOptionsEdit->setText(m_processNumber);
     }
-    else if ((gpProjectSettings::eConnectionType)index == gpProjectSettings::egpFirstDXInProcessConnection)
+    else if ((gpProjectSettings::eConnectionType)index == gpProjectSettings::egpFirstApiInProcessConnection)
     {
         m_pOptionsEdit->setValidator(nullptr);
         m_pOptionsEdit->setText(m_processName);
@@ -307,7 +307,7 @@ void gpProjectSettingsExtension::OnTextEdited(const QString& text)
         {
             m_processNumber = text;
         }
-        else if (m_pOptionsComboBox->currentIndex() == gpProjectSettings::egpFirstDXInProcessConnection)
+        else if (m_pOptionsComboBox->currentIndex() == gpProjectSettings::egpFirstApiInProcessConnection)
         {
             m_processName = text;
         }

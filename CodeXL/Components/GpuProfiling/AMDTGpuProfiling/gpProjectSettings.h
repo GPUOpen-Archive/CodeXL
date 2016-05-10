@@ -39,11 +39,8 @@ public:
     enum eConnectionType
     {
         egpProcessConnection = 0,
-        egpFirstDXInProcessConnection,
-        egpFirstDX12Connection,
-
-        egpFirstVulkanInProcessConnection,
-        egpFirstVulkanConnection
+        egpFirstApiInProcessConnection,
+        egpFirstApiConnection
     };
 
     /// should the connection be automatic (-1 marks that is should be marked as should but should not since this is the first time it is connected)
