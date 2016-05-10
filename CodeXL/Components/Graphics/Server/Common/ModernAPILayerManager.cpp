@@ -33,11 +33,12 @@ static const UINT kPrintScreenVirtualKeyCode = 0x2C;
 //--------------------------------------------------------------------------
 ModernAPILayerManager::ModernAPILayerManager() :
     mbInCapturePlayer(false),
-    mbTraceTriggeredFromKeypress(false)
+    mbTraceTriggeredFromKeypress(false),
+    m_captureType(3),
+    m_captureCount(1)
 {
     // Command that collects a CPU and GPU trace from the same frame.
-    AddCommand(CONTENT_TEXT, "FrameCaptureWithSave", "FrameCaptureWithSave", "FrameCaptureWithSave.txt", DISPLAY, INCLUDE, mCmdFrameCaptureWithSave);
-    mCmdFrameCaptureWithSave.SetEditableContentAutoReply(false);
+    AddCommand(CONTENT_TEXT, "FrameCaptureWithSave", "FrameCaptureWithSave", "FrameCaptureWithSave", NO_DISPLAY, NO_INCLUDE, mCmdFrameCaptureWithSave);
 
     // Command to set the session name
     AddCommand(CONTENT_TEXT, "SetSessionName", "SetSessionName", "SetSessionName.txt", DISPLAY, INCLUDE, mCmdSetSessionName);
@@ -235,12 +236,17 @@ void ModernAPILayerManager::BeginFrame()
 
     if (mCmdFrameCaptureWithSave.IsActive())
     {
-        const char* captureModeString = mCmdFrameCaptureWithSave.GetValue();
+        // Extract the capture mode argument from the capture mode string
+        m_captureType = mCmdFrameCaptureWithSave.GetCaptureType();
+        m_captureCount = mCmdFrameCaptureWithSave.GetCaptureCount();
 
-        // Extract the capture mode argument from the
-        int captureMode = atoi(captureModeString);
+        if (m_captureCount == 0)
+        {
+            Log(logERROR, "ModernAPILayerManager::BeginFrame - m_captureCount is 0, forcing it to 1.\n");
+            m_captureCount = 1;
+        }
 
-        if (captureMode == 3)
+        if (m_captureType == 3)
         {
             // Now I need to make sure that the MultithreadedTraceAnalyzerLayer is on the stack.
             MultithreadedTraceAnalyzerLayer* traceAnalyzer = GetTraceAnalyzerLayer();
@@ -256,6 +262,8 @@ void ModernAPILayerManager::BeginFrame()
     LayerManager::BeginFrame();
 }
 
+#include "../Common/StreamLog.h"
+
 //--------------------------------------------------------------------------
 /// End the frame.
 //--------------------------------------------------------------------------
@@ -268,12 +276,11 @@ void ModernAPILayerManager::EndFrame()
 
     if (mCmdFrameCaptureWithSave.IsActive())
     {
-        const char* captureModeString = mCmdFrameCaptureWithSave.GetValue();
-
         // Extract the capture mode argument from the
-        int captureMode = atoi(captureModeString);
+        m_captureType = mCmdFrameCaptureWithSave.GetCaptureType();
+        m_captureCount = mCmdFrameCaptureWithSave.GetCaptureCount();
 
-        if (captureMode == 3)
+        if (m_captureType == 3)
         {
             // Now need to make sure that the MultithreadedTraceAnalyzerLayer is on the stack.
             if (pTraceAnalyzer != nullptr)

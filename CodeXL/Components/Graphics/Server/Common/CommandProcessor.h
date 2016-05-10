@@ -1650,4 +1650,50 @@ private:
     bool m_flattenCommandLists;     ///< Client Flatten CommandLists setting
 };
 
+/// Helper CommandResponse for handling captures with modern APIs
+class ModernCaptureCommandResponse : public CommandResponse
+{
+
+public:
+
+    /// Default constructor
+    ModernCaptureCommandResponse()
+        : m_captureType(3) // Default to linked trace
+        , m_captureCount(1) // default to one frame to capture
+    {
+    }
+
+    /// Default Destructor
+    virtual ~ModernCaptureCommandResponse()
+    {
+    }
+
+    /// get the setup parameters needed for frame capture
+    bool GetParams(CommandObject& rCommObj)
+    {
+        GetParam(rCommObj, "CaptureCount", m_captureCount);
+        GetParam(rCommObj, "CaptureType", m_captureType);
+        return true;
+    }
+
+    /// Get method for the number frames to capture
+    /// \return The number of frames to capture
+    int GetCaptureCount()
+    {
+        return m_captureCount;
+    }
+
+    /// Get method for the capture type
+    /// \return The capture type
+    int GetCaptureType()
+    {
+        return m_captureType;
+    }
+ 
+private:
+
+    int m_captureType;  ///< Capture type
+    int m_captureCount; ///< The number of frames to capture
+};
+
 #endif //_COMMAND_PROCESSOR_H_

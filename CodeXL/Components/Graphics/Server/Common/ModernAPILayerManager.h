@@ -114,7 +114,7 @@ public:
     /// A CommandResponse that can collect a frame capture or trace, and will save
     /// the response to disk. Metadata XML describing the operation is returned.
     //--------------------------------------------------------------------------
-    TextCommandResponse mCmdFrameCaptureWithSave;
+    ModernCaptureCommandResponse mCmdFrameCaptureWithSave;
 
     //--------------------------------------------------------------------------
     /// A CommandResponse that sets the session name to be used when capturing
@@ -130,6 +130,20 @@ public:
     /// Retrieve the path to the metadata file, if one has been provided.
     //--------------------------------------------------------------------------
     const std::string& GetPathToTargetMetadataFile() const { return mPathToTargetMetadataFile; }
+
+    /// Get method for the number frames to capture
+    /// \return The number of frames to capture
+    int GetCaptureCount()
+    {
+        return m_captureCount;
+    }
+
+    /// Get method for the capture type
+    /// \return The capture type
+    int GetCaptureType()
+    {
+        return m_captureType;
+    }
 
 private:
     //--------------------------------------------------------------------------
@@ -153,6 +167,11 @@ private:
     /// A flag that indicates that the server should collect a frame triggered by a keypress.
     //--------------------------------------------------------------------------
     bool mbTraceTriggeredFromKeypress;
+
+private:
+
+    int m_captureType;  ///< Capture type
+    int m_captureCount; ///< The number of frames to capture
 };
 
 #endif // MODERNAPILAYERMANAGER_H
