@@ -357,7 +357,8 @@ bool GraphicsServerCommunication::GetProcesses(gtASCIIString& strWebResponse)
 bool GraphicsServerCommunication::PushLogger(gtASCIIString& strWebResponse)
 {
     bool retVal = false;
-    retVal = SendCommandPid("/DX12/PushLayer=Logger", strWebResponse, "");
+    gtASCIIString command = m_strApiHttpCommand;
+    retVal = SendCommandPid(command.append("/PushLayer=Logger"), strWebResponse, "");
 
     return retVal;
 }
@@ -371,8 +372,8 @@ bool GraphicsServerCommunication::PushLogger(gtASCIIString& strWebResponse)
 bool GraphicsServerCommunication::PushObjectProcessor(gtASCIIString& strWebResponse)
 {
     bool retVal = false;
-
-    retVal = SendCommandPid("/DX12/PushLayer=ObjectDatabase", strWebResponse, "");
+    gtASCIIString command = m_strApiHttpCommand;
+    retVal = SendCommandPid(command.append("/PushLayer=ObjectDatabase"), strWebResponse, "");
 
     return retVal;
 }
