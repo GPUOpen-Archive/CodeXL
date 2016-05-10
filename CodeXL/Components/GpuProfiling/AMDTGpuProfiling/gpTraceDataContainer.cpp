@@ -1,6 +1,8 @@
 //------------------------------ gpTraceDataContainer.cpp ------------------------------
 
 #include <qtIgnoreCompilerWarnings.h>
+// boost
+#include <boost/icl/split_interval_map.hpp>
 
 // Infra:
 #include <AMDTBaseTools/Include/gtAssert.h>
@@ -17,6 +19,8 @@
 #include <AMDTGpuProfiling/ProjectSettings.h>
 #include <AMDTGpuProfiling/SymbolInfo.h>
 #include <AMDTGpuProfiling/Util.h>
+
+namespace boosticl = boost::icl;
 
 #if (AMDT_BUILD_TARGET == AMDT_WINDOWS_OS)
     #include <d3d12.h>
@@ -647,6 +651,7 @@ void gpTraceDataContainer::FinalizeDataCollection()
             MergePerformanceCountersForThread(tid);
         }
     }
+    UpdateUiRowLocations();
 }
 
 void gpTraceDataContainer::MergePerformanceCountersForThread(osThreadId tid)
@@ -967,11 +972,48 @@ ProfileSessionDataItem* gpTraceDataContainer::FindNextItem(const QString& findSt
 
     return pRetVal;
 }
+/// Here below algorithm, that  calculates UI row location for all command lists
+/// Algorithm:
+/// Step 1 copy all command list data to temporary map
+/// Step 2 Till temporary map not empty do :
+/// Step 2.1. scan temporary map and try to insert each item into interval map container :
+ ///          if no time overlapping - mark row number for item, insert item into interval map and remove it from temporary map, otherwise skip the item - we'll try to mark it with next row later
+/// Step 2.2 increment row count and continue to Step 2
+void gpTraceDataContainer::UpdateUiRowLocations()
+{
+    using CommandListIntervalMap = boosticl::split_interval_map<quint64, QString, boost::icl::partial_absorber, std::less, boost::icl::inplace_max>;
+    auto commandListData = m_commandListData;
+    size_t rowIx = 0;
+    while (commandListData.empty() == false)
+    {
+            CommandListIntervalMap commandListIntervals;
+            auto currItr = commandListData.begin();
+            while  (currItr != commandListData.end())
+            {
+                auto currentInterval = boosticl::interval<quint64>::closed(currItr->m_startTime, currItr->m_endTime);
+                //no overlapping, can mark row number and add into interval map
+                if (commandListIntervals.find(currentInterval) == commandListIntervals.end())
+                {
+                    //update row location
+                    m_commandListData[currItr.key()].m_uiRowLocation = rowIx;
+                    commandListIntervals += make_pair(boosticl::interval<quint64>::closed(currItr->m_startTime, currItr->m_endTime), currItr->m_queueName);
+                    currItr = commandListData.erase(currItr);
+                }
+                //overlapping skip for now
+                else
+                {
+                    ++currItr;
+                }
+            }
+            ++rowIx;
+    }
+}
 
-gpTraceDataContainer::CommandListData::CommandListData() : 
+gpTraceDataContainer::CommandListData::CommandListData() :
     m_queueName(""),
     m_startTime(std::numeric_limits<quint64>::max()),
-    m_endTime(std::numeric_limits<quint64>::min())
+    m_endTime(std::numeric_limits<quint64>::min()),
+    m_uiRowLocation(0)
 {
 
 }

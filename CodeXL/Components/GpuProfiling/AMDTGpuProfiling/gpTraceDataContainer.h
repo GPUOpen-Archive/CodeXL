@@ -60,6 +60,9 @@ public:
 
         /// The command list end time
         quint64 m_endTime;
+
+        /// Indicates from UI prespective on what row it shall belong
+        size_t m_uiRowLocation;
     };
 
     /// Sets the session API calls count
@@ -221,6 +224,8 @@ public:
 
     /// Get the data collected for the frame command lists
     const QMap<QString, gpTraceDataContainer::CommandListData>& CommandListsData() const { return m_commandListData; };
+private:
+    void UpdateUiRowLocations();
 
 private:
 
