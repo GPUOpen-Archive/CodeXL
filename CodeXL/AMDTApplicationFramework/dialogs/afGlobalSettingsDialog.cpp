@@ -624,19 +624,20 @@ void afGlobalSettingsDialog::setActivePage(const gtString& extensionName)
     {
         // Set the general page as active by default:
         m_pMainTabWidget->setCurrentIndex(0);
-
+        QString currentTabText;
+        QString extensionText = acGTStringToQString(extensionName);
+        // Remove accelerator from extension name - fixing CODEXL-3040
+        extensionText.remove("&");
         // Get the amount of pages:
         int amountOfPages = m_pMainTabWidget->count();
-
+       
         // Iterate the pages and look for the relevant page:
-        for (int i = 0 ; i < amountOfPages; i++)
+        for (int i = 0; i < amountOfPages; i++)
         {
-            QString currentTabText = m_pMainTabWidget->tabText(i);
-
+            currentTabText = m_pMainTabWidget->tabText(i);
             // Remove accelerator from tab name:
             currentTabText.remove("&");
-
-            if (currentTabText == acGTStringToQString(extensionName))
+            if (currentTabText == extensionText)
             {
                 m_pMainTabWidget->setCurrentIndex(i);
                 m_pMainTabWidget->currentWidget()->setFocus();
