@@ -264,7 +264,7 @@ void gpConnectDialog::onTimerTimeout()
                         connectDataVector.push_back(newConnection);
                     }
 
-                    apiElement = currentProcess.nextSiblingElement(GPU_STR_connectionDialogAPINode);
+                    apiElement = apiElement.nextSiblingElement(GPU_STR_connectionDialogAPINode);
                 }
             }
 
