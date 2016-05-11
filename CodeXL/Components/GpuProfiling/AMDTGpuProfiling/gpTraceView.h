@@ -232,8 +232,10 @@ protected:
 
     /// True if the user selected an item in the CPU table
     bool m_isCpuAPISelectionChangeInProgress;
+
     /// True if the user selected an item in the GPU table
     bool m_isGpuAPISelectionChangeInProgress;
+
 };
 
 

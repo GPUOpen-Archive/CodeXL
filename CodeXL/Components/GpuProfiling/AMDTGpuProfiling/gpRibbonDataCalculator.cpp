@@ -120,16 +120,16 @@ void gpRibbonDataCalculator::GetGPUOps(QVector<gpRibbonCallsData>& dataVector)
 {
     GT_IF_WITH_ASSERT(m_pData != nullptr && m_pTimeLineGrid != nullptr && m_pTimeLine != nullptr)
     {
-        int numQueues = m_pData->DX12QueuesCount();
+        int numQueues = m_pData->GPUCallsContainersCount();
 
         for (int nQueue = 0; nQueue < numQueues; nQueue++)
         {
-            QString queueName = m_pData->QueueName(nQueue);
-            int numGPUOps = m_pData->QueueItemsCount(queueName);
+            QString queueName = m_pData->GPUObjectName(nQueue);
+            int numGPUOps = m_pData->GPUItemsCount(queueName);
 
             for (int nGPUOp = 0; nGPUOp < numGPUOps; nGPUOp++)
             {
-                ProfileSessionDataItem* pCurrentItem = m_pData->QueueItem(queueName, nGPUOp);
+                ProfileSessionDataItem* pCurrentItem = m_pData->GPUItem(queueName, nGPUOp);
                 GT_IF_WITH_ASSERT(pCurrentItem != nullptr)
                 {
                     if (pCurrentItem->ItemType().m_itemMainType == ProfileSessionDataItem::DX12_GPU_PROFILE_ITEM)
@@ -451,16 +451,16 @@ void gpRibbonDataCalculator::GetPresentData(QVector<double>& presentData)
     double firstGPUTime = DBL_MAX;
     GT_IF_WITH_ASSERT(m_pData != nullptr && m_pTimeLine != nullptr)
     {
-        int numQueues = m_pData->DX12QueuesCount();
+        int numQueues = m_pData->GPUCallsContainersCount();
 
         for (int nQueue = 0; nQueue < numQueues; nQueue++)
         {
-            QString queueName = m_pData->QueueName(nQueue);
-            int numGPUOps = m_pData->QueueItemsCount(queueName);
+            QString queueName = m_pData->GPUObjectName(nQueue);
+            int numGPUOps = m_pData->GPUItemsCount(queueName);
 
             for (int nGPUOp = 0; nGPUOp < numGPUOps; nGPUOp++)
             {
-                ProfileSessionDataItem* pCurrentItem = m_pData->QueueItem(queueName, nGPUOp);
+                ProfileSessionDataItem* pCurrentItem = m_pData->GPUItem(queueName, nGPUOp);
                 GT_IF_WITH_ASSERT(pCurrentItem != nullptr)
                 {
                     if (pCurrentItem->StartTime() - m_pTimeLine->startTime() < firstGPUTime)
@@ -508,12 +508,12 @@ int gpRibbonDataCalculator::GetTotalApiCalls()
     GT_IF_WITH_ASSERT(m_pData != nullptr)
     {
         // add the GPU API counts in the GPU queues
-        int numQueues = m_pData->DX12QueuesCount();
+        int numQueues = m_pData->GPUCallsContainersCount();
 
         for (int nQueue = 0; nQueue < numQueues; nQueue++)
         {
-            QString queueName = m_pData->QueueName(nQueue);
-            int numGPUOps = m_pData->QueueItemsCount(queueName);
+            QString queueName = m_pData->GPUObjectName(nQueue);
+            int numGPUOps = m_pData->GPUItemsCount(queueName);
 
             retVal += numGPUOps;
         }

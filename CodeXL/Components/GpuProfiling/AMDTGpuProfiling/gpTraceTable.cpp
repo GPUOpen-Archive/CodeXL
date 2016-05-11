@@ -69,34 +69,37 @@ gpTraceTable::gpTraceTable(const QString& queueName, gpTraceDataContainer* pData
     m_pExportToCSVAction(nullptr),
     m_pCahcedSymbolInfo(nullptr)
 {
-    // Create the model for this table
-    m_pDataModel = new DXAPIGPUTableModel(queueName, pDataContainer);
-    setModel(m_pDataModel);
-
-    // Set the link color
-    m_pDataModel->SetVisualProperties(palette().color(QPalette::Text), palette().color(QPalette::Link), font());
-
-    // Set the graphic attributes
-    setSortingEnabled(false);
-    setAlternatingRowColors(false);
-    setSelectionBehavior(QAbstractItemView::SelectRows);
-    setSelectionMode(QAbstractItemView::ExtendedSelection);
-    setMouseTracking(true);
-    verticalHeader()->setDefaultSectionSize(acScaleSignedPixelSizeToDisplayDPI(GP_DEFAULT_ROW_HEIGHT));
-
-    // Set the horizontal header properties
-    QHeaderView* pHorizHeader = horizontalHeader();
-
-    // Sanity check
-    GT_IF_WITH_ASSERT(pHorizHeader != nullptr)
+    GT_IF_WITH_ASSERT(pDataContainer != nullptr)
     {
-        pHorizHeader->setSectionResizeMode(QHeaderView::Interactive);
-        pHorizHeader->setHighlightSections(false);
-        pHorizHeader->setDefaultAlignment(Qt::AlignLeft);
-    }
+        // Create a GPU table model
+        m_pDataModel = new GPUTableModel(queueName, pDataContainer);
+        setModel(m_pDataModel);
 
-    // Prepare the context menu
-    BuildContextMenu();
+        // Set the link color
+        m_pDataModel->SetVisualProperties(palette().color(QPalette::Text), palette().color(QPalette::Link), font());
+
+        // Set the graphic attributes
+        setSortingEnabled(false);
+        setAlternatingRowColors(false);
+        setSelectionBehavior(QAbstractItemView::SelectRows);
+        setSelectionMode(QAbstractItemView::ExtendedSelection);
+        setMouseTracking(true);
+        verticalHeader()->setDefaultSectionSize(acScaleSignedPixelSizeToDisplayDPI(GP_DEFAULT_ROW_HEIGHT));
+
+        // Set the horizontal header properties
+        QHeaderView* pHorizHeader = horizontalHeader();
+
+        // Sanity check
+        GT_IF_WITH_ASSERT(pHorizHeader != nullptr)
+        {
+            pHorizHeader->setSectionResizeMode(QHeaderView::Interactive);
+            pHorizHeader->setHighlightSections(false);
+            pHorizHeader->setDefaultAlignment(Qt::AlignLeft);
+        }
+
+        // Prepare the context menu
+        BuildContextMenu();
+    }
 }
 
 
@@ -163,12 +166,15 @@ float gpTraceTable::GetSectionFillWeight(int sectionIndex)
     static float s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_COLUMN_COUNT];
     s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_INDEX_COLUMN] = 5;
     s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_INTERFACE_COLUMN] = 14;
+    s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_COMMAND_LIST_COLUMN] = 14;
+    s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_COMMAND_BUFFER_COLUMN] = 14;
     s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_CALL_COLUMN] = 14;
     s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_PARAMETERS_COLUMN] = 35;
     s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_RESULT_COLUMN] = 9;
     s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_DEVICE_BLOCK_COLUMN] = 9;
     s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_OCCUPANCY_COLUMN] = 9;
     s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_CPU_TIME_COLUMN] = 5;
+    s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_GPU_TIME_COLUMN] = 5;
 
     GT_IF_WITH_ASSERT((sectionIndex < ProfileSessionDataItem::SESSION_ITEM_COLUMN_COUNT) && (sectionIndex >= 0))
     {

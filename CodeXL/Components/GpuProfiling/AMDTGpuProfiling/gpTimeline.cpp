@@ -83,12 +83,12 @@ void gpTimeline::BuildTimeline(gpTraceDataContainer* pDataContainer)
             AddPerformanceMarkersToTimeline(threadId);
         }
 
-        int queuesCount = m_pSessionDataContainer->DX12QueuesCount();
+        int queuesCount = m_pSessionDataContainer->GPUCallsContainersCount();
 
         for (int i = 0; i < queuesCount; i++)
         {
             // Get the queue name
-            QString queueName = m_pSessionDataContainer->QueueName(i);
+            QString queueName = m_pSessionDataContainer->GPUObjectName(i);
 
             // Add the API for this queue
             AddQueueGPUApis(queueName);
@@ -225,13 +225,13 @@ void gpTimeline::AddQueueGPUApis(const QString& queueName)
     // Sanity check:
     GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
     {
-        int apiCount = m_pSessionDataContainer->QueueItemsCount(queueName);
+        int apiCount = m_pSessionDataContainer->GPUItemsCount(queueName);
         afProgressBarWrapper::instance().ShowProgressDialog(GPU_STR_TraceViewLoadingAPITimelineItems, apiCount);
 
         for (int i = 0; i < apiCount; i++)
         {
             // Get the current API item
-            ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItem(queueName, i);
+            ProfileSessionDataItem* pItem = m_pSessionDataContainer->GPUItem(queueName, i);
 
             // Sanity check:
             GT_IF_WITH_ASSERT(pItem != nullptr)
@@ -624,7 +624,7 @@ acTimelineBranch* gpTimeline::GetBranchForAPI(osThreadId threadId, const QString
         QString queueTypeStr;
         GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
         {
-            int queueType = m_pSessionDataContainer->QueueType(queueName);
+            int queueType = m_pSessionDataContainer->GPUObjectType(queueName);
             queueTypeStr = gpTraceDataContainer::CommandListTypeAsString(queueType);
         }
 
@@ -702,7 +702,7 @@ acTimelineBranch* gpTimeline::GetCommandListBranch(const QString& queueName)
     QString queueTypeStr;
     GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
     {
-        int queueType = m_pSessionDataContainer->QueueType(queueName);
+        int queueType = m_pSessionDataContainer->GPUObjectType(queueName);
         queueTypeStr = gpTraceDataContainer::CommandListTypeAsString(queueType);
     }
 

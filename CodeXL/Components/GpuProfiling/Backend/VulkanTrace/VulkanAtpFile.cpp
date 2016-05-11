@@ -107,10 +107,17 @@ bool VKAtpFilePart::ParseGPUAPICallString(const std::string& apiStr, VKGPUTraceI
     ss >> apiInfo.m_commandListType;
     CHECK_SS_ERROR(ss);
 
+    ss >> apiInfo.m_commandBufferPtrStr;
+    CHECK_SS_ERROR(ss);
+
     int intVal = 0;
     ss >> intVal;
     CHECK_SS_ERROR(ss);
     apiInfo.m_apiType = (vkAPIType)intVal;
+
+    ss >> intVal;
+    CHECK_SS_ERROR(ss);
+    apiInfo.m_apiId = (vk_FUNC_TYPE)intVal;
 
     ss >> apiInfo.m_strName;
     CHECK_SS_ERROR(ss);

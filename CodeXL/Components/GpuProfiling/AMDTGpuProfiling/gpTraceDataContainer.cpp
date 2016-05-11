@@ -27,7 +27,8 @@ namespace boosticl = boost::icl;
 #endif
 
 gpTraceDataContainer::gpTraceDataContainer() :
-    m_apiCount(0)
+    m_apiCount(0),
+    m_sessionAPIType(ProfileSessionDataItem::DX12_API_PROFILE_ITEM)
 {
     m_sessionTimeRange.first = std::numeric_limits<quint64>::max();
     m_sessionTimeRange.second = std::numeric_limits<quint64>::min();
@@ -45,9 +46,9 @@ gpTraceDataContainer::~gpTraceDataContainer()
         delete(*cpuIter);
     }
 
-    auto gpuIter = m_sessionQueueToGPUDataItems.begin();
+    auto gpuIter = m_sessionGPUCallsMap.begin();
 
-    for (; gpuIter != m_sessionQueueToGPUDataItems.end(); gpuIter++)
+    for (; gpuIter != m_sessionGPUCallsMap.end(); gpuIter++)
     {
         const QList<ProfileSessionDataItem*>& list = (*gpuIter);
 
@@ -64,7 +65,7 @@ gpTraceDataContainer::~gpTraceDataContainer()
 
     m_sessionCPUDataItems.clear();
     m_sessionGPUDataItems.clear();
-    m_sessionQueueToGPUDataItems.clear();
+    m_sessionGPUCallsMap.clear();
     m_threadToRootItemMap.clear();
 }
 
@@ -98,6 +99,9 @@ ProfileSessionDataItem* gpTraceDataContainer::AddCLItem(CLAPIInfo* pAPIInfo)
         // Add the item to the session items map
         m_sessionItemsSortedByStartTime.insertMulti(pRetVal->StartTime(), pRetVal);
 
+        // Initialize the container API type
+        m_sessionAPIType = ProfileSessionDataItem::CL_API_PROFILE_ITEM;
+
     }
 
     return pRetVal;
@@ -126,6 +130,9 @@ ProfileSessionDataItem* gpTraceDataContainer::AddHSAItem(HSAAPIInfo* pAPIInfo)
 
         // Add the item to the thread's root
         AddItemToThread(pRetVal);
+
+        // Initialize the container API type
+        m_sessionAPIType = ProfileSessionDataItem::HSA_API_PROFILE_ITEM;
     }
 
     return pRetVal;
@@ -160,6 +167,9 @@ ProfileSessionDataItem* gpTraceDataContainer::AddDX12APIItem(DX12APIInfo* pAPIIn
 
         // Add the item to the session items map
         m_sessionItemsSortedByStartTime.insertMulti(pRetVal->StartTime(), pRetVal);
+
+        // Initialize the container API type
+        m_sessionAPIType = ProfileSessionDataItem::DX12_API_PROFILE_ITEM;
     }
 
     return pRetVal;
@@ -176,7 +186,7 @@ ProfileSessionDataItem* gpTraceDataContainer::AddDX12GPUTraceItem(DX12GPUTraceIn
         pRetVal = new ProfileSessionDataItem(this, pAPIInfo);
 
         // Add the item to the queues map
-        m_sessionQueueToGPUDataItems[pAPIInfo->m_commandQueuePtrStr] << pRetVal;
+        m_sessionGPUCallsMap[pAPIInfo->m_commandQueuePtrStr] << pRetVal;
 
         // Add a map from the queue name to the queue type
         if (m_sessionQueueNameToCommandListType.contains(pAPIInfo->m_commandQueuePtrStr))
@@ -244,7 +254,7 @@ ProfileSessionDataItem* gpTraceDataContainer::AddVKAPIItem(VKAPIInfo* pAPIInfo)
         // Set this thread API type
         if (!m_threadAPIType.contains(tid))
         {
-            m_threadAPIType[tid] = ProfileSessionDataItem::DX12_API_PROFILE_ITEM;
+            m_threadAPIType[tid] = ProfileSessionDataItem::VK_API_PROFILE_ITEM;
         }
 
         // Create an HSA profile item
@@ -255,6 +265,9 @@ ProfileSessionDataItem* gpTraceDataContainer::AddVKAPIItem(VKAPIInfo* pAPIInfo)
 
         // Add the item to the session items map
         m_sessionItemsSortedByStartTime.insertMulti(pRetVal->StartTime(), pRetVal);
+
+        // Initialize the container API type
+        m_sessionAPIType = ProfileSessionDataItem::VK_API_PROFILE_ITEM;
     }
 
     return pRetVal;
@@ -274,7 +287,7 @@ ProfileSessionDataItem* gpTraceDataContainer::AddVKGPUTraceItem(VKGPUTraceInfo* 
         m_sessionItemsSortedByStartTime.insertMulti(pRetVal->StartTime(), pRetVal);
 
         // Add the item to the queues map
-        m_sessionQueueToGPUDataItems[pAPIInfo->m_commandQueuePtrStr] << pRetVal;
+        m_sessionGPUCallsMap[pAPIInfo->m_commandBufferPtrStr] << pRetVal;
 
         // Add a map from the queue name to the queue type
         if (m_sessionQueueNameToCommandListType.contains(pAPIInfo->m_commandQueuePtrStr))
@@ -475,9 +488,9 @@ int gpTraceDataContainer::ThreadsCount() const
     return retVal;
 }
 
-int gpTraceDataContainer::DX12QueuesCount() const
+int gpTraceDataContainer::GPUCallsContainersCount() const
 {
-    return m_sessionQueueToGPUDataItems.size();
+    return m_sessionGPUCallsMap.size();
 }
 
 osThreadId gpTraceDataContainer::ThreadID(int threadIndex) const
@@ -788,16 +801,16 @@ void gpTraceDataContainer::MergePerformanceCountersForThread(osThreadId tid)
     }
 }
 
-QString gpTraceDataContainer::QueueName(int queueIndex)
+QString gpTraceDataContainer::GPUObjectName(int gpuObjectIndex)
 {
     QString retVal;
 
     // Iterate the map and find the queue with the requested index
-    auto iter = m_sessionQueueToGPUDataItems.begin();
+    auto iter = m_sessionGPUCallsMap.begin();
 
-    for (int index = 0; iter != m_sessionQueueToGPUDataItems.end(); iter++, index++)
+    for (int index = 0; iter != m_sessionGPUCallsMap.end(); iter++, index++)
     {
-        if (index == queueIndex)
+        if (index == gpuObjectIndex)
         {
             std::string queue = iter.key();
             retVal = QString::fromStdString(queue);
@@ -809,7 +822,7 @@ QString gpTraceDataContainer::QueueName(int queueIndex)
 }
 
 
-int gpTraceDataContainer::QueueType(const QString& queueName)
+int gpTraceDataContainer::GPUObjectType(const QString& queueName)
 {
     int retVal = -1;
 
@@ -821,28 +834,28 @@ int gpTraceDataContainer::QueueType(const QString& queueName)
     return retVal;
 }
 
-int gpTraceDataContainer::QueueItemsCount(const QString& queueName)
+int gpTraceDataContainer::GPUItemsCount(const QString& gpuItemName)
 {
     int retVal = 0;
-    std::string queueNameStr = queueName.toUtf8().constData();
+    std::string queueNameStr = gpuItemName.toUtf8().constData();
 
-    if (m_sessionQueueToGPUDataItems.contains(queueNameStr))
+    if (m_sessionGPUCallsMap.contains(queueNameStr))
     {
-        retVal = m_sessionQueueToGPUDataItems[queueNameStr].size();
+        retVal = m_sessionGPUCallsMap[queueNameStr].size();
     }
 
     return retVal;
 }
 
-ProfileSessionDataItem* gpTraceDataContainer::QueueItem(const QString& queueName, int apiItemIndex) const
+ProfileSessionDataItem* gpTraceDataContainer::GPUItem(const QString& gpuObjectName, int apiItemIndex) const
 {
     ProfileSessionDataItem* pRetVal = nullptr;
-    std::string queueNameStr = queueName.toUtf8().constData();
+    std::string gpuObjectNameStr = gpuObjectName.toUtf8().constData();
 
     // Sanity check:
-    GT_IF_WITH_ASSERT(m_sessionQueueToGPUDataItems.contains(queueNameStr))
+    GT_IF_WITH_ASSERT(m_sessionGPUCallsMap.contains(gpuObjectNameStr))
     {
-        const QList<ProfileSessionDataItem*>& apisList = m_sessionQueueToGPUDataItems[queueNameStr];
+        const QList<ProfileSessionDataItem*>& apisList = m_sessionGPUCallsMap[gpuObjectNameStr];
         GT_IF_WITH_ASSERT((apiItemIndex >= 0) && (apiItemIndex < (int)apisList.size()))
         {
             pRetVal = apisList[apiItemIndex];
@@ -853,15 +866,15 @@ ProfileSessionDataItem* gpTraceDataContainer::QueueItem(const QString& queueName
 
 }
 
-ProfileSessionDataItem* gpTraceDataContainer::QueueItemByItemCallIndex(const QString& queueName, int apiItemIndex) const
+ProfileSessionDataItem* gpTraceDataContainer::GPUItemByItemCallIndex(const QString& queueName, int apiItemIndex) const
 {
     ProfileSessionDataItem* pRetVal = nullptr;
     std::string queueNameStr = queueName.toUtf8().constData();
 
     // Sanity check:
-    GT_IF_WITH_ASSERT(m_sessionQueueToGPUDataItems.contains(queueNameStr))
+    GT_IF_WITH_ASSERT(m_sessionGPUCallsMap.contains(queueNameStr))
     {
-        const QList<ProfileSessionDataItem*>& apisList = m_sessionQueueToGPUDataItems[queueNameStr];
+        const QList<ProfileSessionDataItem*>& apisList = m_sessionGPUCallsMap[queueNameStr];
         GT_IF_WITH_ASSERT(apiItemIndex >= 0)
         {
             for (auto pItem : apisList)

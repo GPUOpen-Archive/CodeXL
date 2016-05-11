@@ -404,20 +404,20 @@ void gpSummaryLogic::InitGPUItems(gpTraceDataContainer* pSessionDataContainer)
         m_allCallItemsMultiMap.clear();
         m_totalTimeMs = 0;
         m_numTotalCalls = 0;
-        int queuesCount = pSessionDataContainer->DX12QueuesCount();
+        int queuesCount = pSessionDataContainer->GPUCallsContainersCount();
         // fill local array of SummaryInfo items
         APISummaryInfo infoArray[SUMMARY_INFO_ARRAY_SIZE] = {};
 
         for (int i = 0; i < queuesCount; i++)
         {
             afProgressBarWrapper::instance().incrementProgressBar();
-            QString queueName = pSessionDataContainer->QueueName(i);
-            int apiCount = pSessionDataContainer->QueueItemsCount(queueName);
+            QString queueName = pSessionDataContainer->GPUObjectName(i);
+            int apiCount = pSessionDataContainer->GPUItemsCount(queueName);
 
             for (int i = 0; i < apiCount; i++)
             {
                 // Get the current API item
-                ProfileSessionDataItem* pItem = pSessionDataContainer->QueueItem(queueName, i);
+                ProfileSessionDataItem* pItem = pSessionDataContainer->GPUItem(queueName, i);
                 GT_IF_WITH_ASSERT(pItem != nullptr)
                 {
                     unsigned int apiId;

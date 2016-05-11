@@ -184,8 +184,9 @@ bool gpTraceView::DisplaySession(const osFilePath& sessionFilePath, afTreeItemTy
                 afApplicationCommands::instance()->EndPerformancePrintout("Adding CPU items");
 
                 afApplicationCommands::instance()->StartPerformancePrintout("Adding GPU items");
+
                 // Add the GPU items
-                int queuesCount = m_pSessionDataContainer->DX12QueuesCount();
+                int queuesCount = m_pSessionDataContainer->GPUCallsContainersCount();
 
                 if (queuesCount > 0)
                 {
@@ -193,7 +194,9 @@ bool gpTraceView::DisplaySession(const osFilePath& sessionFilePath, afTreeItemTy
                     {
                         for (int i = 0; i < queuesCount; i++)
                         {
-                            QString queueName = m_pSessionDataContainer->QueueName(i);
+                            QString queueName = m_pSessionDataContainer->GPUObjectName(i);
+
+                            // Find the GPU item type according to the container API type
                             gpTraceTable* pTable = new gpTraceTable(queueName, m_pSessionDataContainer, this);
                             pTable->SetSelectionBackgroundColor(acQAMD_CYAN_SELECTION_BKG_COLOUR);
 
@@ -215,12 +218,17 @@ bool gpTraceView::DisplaySession(const osFilePath& sessionFilePath, afTreeItemTy
 
                             // Get the queue name from the queue name and type
                             QString queueTypeStr;
-                            int queueType = m_pSessionDataContainer->QueueType(queueName);
+                            int queueType = m_pSessionDataContainer->GPUObjectType(queueName);
                             queueTypeStr = gpTraceDataContainer::CommandListTypeAsString(queueType);
 
                             // Create the queue table name
                             QString queueDisplayName = ProfileSessionDataItem::QueueDisplayName(queueName);
-                            QString tableCaption = QString(GPU_STR_timeline_QueueBranchName).arg(queueTypeStr).arg(queueDisplayName);
+                            QString gpuObjectString = GPU_STR_timeline_QueueBranchName;
+                            if (m_pSessionDataContainer->SessionAPIType() == ProfileSessionDataItem::VK_API_PROFILE_ITEM)
+                            {
+                                gpuObjectString = GPU_STR_timeline_CommandBufferBranchName;
+                            }
+                            QString tableCaption = QString(gpuObjectString).arg(queueTypeStr).arg(queueDisplayName);
                             m_pGPUTraceTablesTabWidget->addTab(pTable, QIcon(), tableCaption);
                         }
                     }
@@ -522,7 +530,7 @@ void gpTraceView::SetProfileDataModel(gpTraceDataModel* pDataModel)
         // Sanity check:
         GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
         {
-            isGPUTrace = m_pSessionDataContainer->DX12QueuesCount() > 0;
+            isGPUTrace = m_pSessionDataContainer->GPUCallsContainersCount() > 0;
         }
 
         // If there is a GPU trace, add an horizontal splitter with the GPU trace table.
@@ -601,7 +609,7 @@ void gpTraceView::OnTimelineItemActivated(acTimelineItem* pTimelineItem)
                 if (!callId.m_queueName.isEmpty())
                 {
                     // This is a GPU item, get it from the data container
-                    pMatchingItem = m_pSessionDataContainer->QueueItemByItemCallIndex(callId.m_queueName, callId.m_callIndex);
+                    pMatchingItem = m_pSessionDataContainer->GPUItemByItemCallIndex(callId.m_queueName, callId.m_callIndex);
                 }
                 else
                 {

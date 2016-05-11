@@ -136,8 +136,8 @@ public:
     /// Return the threads count for the session
     int ThreadsCount() const;
 
-    /// Return the DX12 queues count for the session
-    int DX12QueuesCount() const;
+    /// Return the DX12 queues or Vulkan command buffers count for this session
+    int GPUCallsContainersCount() const;
 
     /// Return the thread ID for the thread in index threadIndex
     osThreadId ThreadID(int threadIndex) const;
@@ -179,25 +179,26 @@ public:
     /// Returns the session start and end time
     TimeRange SessionTimeRange() const { return m_sessionTimeRange; }
 
-    /// Return the name of the queue in the queueIndex place in the map
-    QString QueueName(int queueIndex);
+    /// Return the name of the queue / command buffer in the index place in the map
+    QString GPUObjectName(int index);
 
-    /// Return an integer number of describing the queue type
-    int QueueType(const QString& queueName);
+    /// Return an integer number of describing the queue / command buffer type
+    int GPUObjectType(const QString& queueName);
 
-    /// Return the items count for the requested queue
-    /// \param queueName the queue name
+    /// Return the items count for the requested queue / command buffer
+    /// \param gpuItemName the queue / command buffer name
     /// \return the items count for the requested queue
-    int QueueItemsCount(const QString& queueName);
+    int GPUItemsCount(const QString& gpuItemName);
 
     /// Returns the item in m_sessionQueueToGPUDataItems which has the requested queue name and given index (n'th place in the list of items with the same queue name)
-    /// \param queueName the requested queue name
+    /// \param gpuObjectName the requested queue / command buffer name
     /// \param apiItemIndex the requested index (n'th place in the list of items with the same queue name)
-    ProfileSessionDataItem* QueueItem(const QString& queueName, int apiItemIndex) const;
+    ProfileSessionDataItem* GPUItem(const QString& gpuObjectName, int apiItemIndex) const;
+
     /// Returns the item in m_sessionQueueToGPUDataItems which has the requested queue name and call index. This method is required when there is more than 1 queue, and the n'th place does not match the call index 
     /// \param queueName the requested queue name
     /// \param apiItemIndex the requested call index
-    ProfileSessionDataItem* QueueItemByItemCallIndex(const QString& queueName, int apiItemIndex) const;
+    ProfileSessionDataItem* GPUItemByItemCallIndex(const QString& queueName, int apiItemIndex) const;
 
     /// Return all API items with the given sampleId
     /// \param sampleId the requested sampleId
@@ -224,8 +225,13 @@ public:
 
     /// Get the data collected for the frame command lists
     const QMap<QString, gpTraceDataContainer::CommandListData>& CommandListsData() const { return m_commandListData; };
+
+    /// Contain the api type for this session
+    ProfileSessionDataItem::ProfileItemAPIType SessionAPIType() const { return m_sessionAPIType; };
+
 private:
     void UpdateUiRowLocations();
+
 
 private:
 
@@ -235,8 +241,8 @@ private:
     /// List of the CPU profile session data items
     QMap<osThreadId, QList<ProfileSessionDataItem*>> m_sessionCPUDataItems;
 
-    /// List of the GPU profile session data items
-    QMap<std::string, QList<ProfileSessionDataItem*>> m_sessionQueueToGPUDataItems;
+    /// Map from DX12 Queue / Vulkan command buffer to the GPU profile session data items
+    QMap<std::string, QList<ProfileSessionDataItem*>> m_sessionGPUCallsMap;
 
     /// Map queue name to command list type
     QMap<std::string, int> m_sessionQueueNameToCommandListType;
@@ -289,6 +295,9 @@ private:
 
     /// Map from command list pointer to command list data
     QMap <QString, CommandListData> m_commandListData;
+
+    /// Contain the api type for this session
+    ProfileSessionDataItem::ProfileItemAPIType m_sessionAPIType;
 };
 
 #endif // _GPTRACEDATACONTAINER_H_

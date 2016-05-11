@@ -37,6 +37,11 @@ public:
     /// \param pDataContainer the session data container
     gpTableModelBase(osThreadId threadID, gpTraceDataContainer* pDataContainer);
 
+    /// Constructor
+    /// \param pDataContainer the session data container
+    /// \param apiType the API type for the trace
+    gpTableModelBase(gpTraceDataContainer* pDataContainer, ProfileSessionDataItem::ProfileItemAPIType apiType);
+
     /// Destructor
     virtual ~gpTableModelBase();
 
@@ -135,7 +140,7 @@ protected:
     osThreadId m_threadID;
 
 };
-class DXAPIGPUTableModel : public gpTableModelBase
+class GPUTableModel : public gpTableModelBase
 {
     Q_OBJECT
 
@@ -143,10 +148,10 @@ public:
 
     /// \param the queue name (for GPU trace)
     /// \param pDataContainer the session data container
-    DXAPIGPUTableModel(const QString& queueName, gpTraceDataContainer* pDataContainer);
+    GPUTableModel(const QString& queueName, gpTraceDataContainer* pDataContainer);
 
     /// Destructor
-    virtual ~DXAPIGPUTableModel();
+    virtual ~GPUTableModel();
 
     /// Override ancestor method. Gets the number of rows in the table
     /// \param parent the parent index
