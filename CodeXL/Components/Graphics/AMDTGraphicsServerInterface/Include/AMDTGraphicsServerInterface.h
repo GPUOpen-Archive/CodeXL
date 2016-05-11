@@ -84,9 +84,10 @@ public:
     bool GetCurrentFrameInfo(gtASCIIString& frameInfoAsXML, unsigned char*& pImageBuffer, unsigned long& imageSize);
 
     /// Send a capture request to the server, and get the current frame info and thumbnail
+    /// \param numberFramesToCapture number of frames to capture
     /// \param frameInfoXML[out] the captured frame info as XML
     /// \return true for success
-    bool CaptureFrame(gtASCIIString& frameInfoAsXML);
+    bool CaptureFrame(int numberFramesToCapture, gtASCIIString& frameInfoAsXML);
 
     /// Stub function until the get captured frame functionality is resolved
     bool CaptureFrameStub(gtASCIIString& frameInfoAsXML, unsigned char*& pImageBuffer, unsigned long& imageSize);

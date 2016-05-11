@@ -107,7 +107,14 @@ bool gpSessionUpdaterThread::CaptureFrame()
     GT_IF_WITH_ASSERT(m_pServerComm != nullptr)
     {
         gtASCIIString frameAsXML;
-        retVal = m_pServerComm->CaptureFrame(frameAsXML);
+        // get the number of frames
+        int numberFrames = 1;
+        GT_IF_WITH_ASSERT(ProfileManager::Instance()->GetFrameAnalysisModeManager() != nullptr)
+        {
+            numberFrames = ProfileManager::Instance()->GetFrameAnalysisModeManager()->ProjectSettings().m_numFramesToCapture.toInt();
+        }
+
+        retVal = m_pServerComm->CaptureFrame(numberFrames, frameAsXML);
 
         if (frameAsXML.find(GP_GRAPHICS_SERVER_STATE_STALLED) >= 0)
         {

@@ -681,10 +681,11 @@ bool GraphicsServerCommunication::GetCurrentFrameInfo(gtASCIIString& frameInfoAs
 // ---------------------------------------------------------------------------
 // Name:        GraphicsServerCommunication::CaptureFrame
 // Description: Capture all available frame information to disk, trace and objects
-// Arguments:   frameInfoAsXML(return) - path that contains captured metadata file
+// Arguments:   numberFramesToCapture number of frames to capture
+//              frameInfoAsXML(return) - path that contains captured metadata file
 // Return Val:  bool  - Success / failure
 // ---------------------------------------------------------------------------
-bool GraphicsServerCommunication::CaptureFrame(gtASCIIString& frameInfoAsXML)
+bool GraphicsServerCommunication::CaptureFrame(int numberFramesToCapture, gtASCIIString& frameInfoAsXML)
 {
     bool retVal = false;
     OS_DEBUG_LOG_TRACER_WITH_RETVAL(retVal);
@@ -695,14 +696,13 @@ bool GraphicsServerCommunication::CaptureFrame(gtASCIIString& frameInfoAsXML)
     if (retVal == true)
     {
         // Capture the frame, =3 is includes the save XML frame data, need object database active to include the object database.
-        gtASCIIString commandPrefix = m_strApiHttpCommand;
-        retVal = SendCommandPid(commandPrefix.append("/FrameCaptureWithSave.txt=3"), frameInfoAsXML, "");
+        gtASCIIString commandToSend = m_strApiHttpCommand;
+        commandToSend.append("/FrameCaptureWithSave?CaptureType=3");
+        commandToSend.appendFormattedString("&CaptureCount=%d", numberFramesToCapture);
+        retVal = SendCommandPid(commandToSend, frameInfoAsXML, "");
 
-        if (retVal)
-        {
-            // Pop the logger layer
-            PopLayer();
-        }
+        // Pop the logger layer
+        PopLayer();
     }
 
     return retVal;

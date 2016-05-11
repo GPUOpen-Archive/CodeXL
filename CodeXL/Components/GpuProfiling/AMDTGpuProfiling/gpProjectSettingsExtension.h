@@ -51,6 +51,7 @@ protected slots:
     void OnAutomaticClicked(bool);
     void OnConnectionSelected(int);
     void OnTextEdited(const QString&);
+    void OnNumFramesEdited(const QString& text);
 
 private:
 
@@ -68,6 +69,10 @@ private:
 
     QIntValidator m_validator;
 
+    /// number of frames to capture in each capture action
+    QLineEdit* m_pNumberFramesEdit;
+
+    QString m_numFramesToCapture;
 };
 
 #endif //__GPPROJECTSETTINGSEXTENSION_H

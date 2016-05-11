@@ -25,7 +25,7 @@
 
 
 gpProjectSettings::gpProjectSettings() : m_shouldConnectAutomatically(1), m_connection(egpFirstApiConnection), m_serverConnectionPort(GP_DEFAULT_PORT),
-    m_processNumber("1"), m_processName("")
+    m_processNumber("1"), m_processName(""), m_numFramesToCapture("1")
 {
 
 }

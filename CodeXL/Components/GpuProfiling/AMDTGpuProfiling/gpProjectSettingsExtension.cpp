@@ -23,6 +23,7 @@
 #include <AMDTGpuProfiling/gpExecutionMode.h>
 
 #define GP_LINE_EDIT_MARGIN 15
+#define GP_MAX_FRAME_CAPTURE 100
 
 gpProjectSettingsExtension::gpProjectSettingsExtension() :
     m_pAutomaticCheckBox(nullptr),
@@ -32,7 +33,9 @@ gpProjectSettingsExtension::gpProjectSettingsExtension() :
     m_bUpdateSettings(false),
     m_processName(""),
     m_processNumber("1"),
-    m_validator(1, 100, this)
+    m_validator(1, 100, this),
+    m_pNumberFramesEdit(nullptr),
+    m_numFramesToCapture("1")
 {
 }
 
@@ -51,6 +54,7 @@ void gpProjectSettingsExtension::Initialize()
     // Add H layout for the sampling interval widgets:
     QHBoxLayout* pHLayout1 = new QHBoxLayout;
     QHBoxLayout* pHLayout2 = new QHBoxLayout;
+    QHBoxLayout* pHLayout3 = new QHBoxLayout;
 
     m_pAutomaticCheckBox = new QCheckBox(GPU_STR_projectSettingsAutomaticConnect);
 
@@ -77,9 +81,19 @@ void gpProjectSettingsExtension::Initialize()
     pHLayout2->addWidget(m_pPortLineEdit, 0);
     pHLayout2->addStretch();
 
+    // Add the number of frames to capture options
+    m_pNumberFramesEdit = new QLineEdit();
+    m_pNumberFramesEdit->setValidator(&m_validator);
+    maxWidth = QFontMetrics(m_pPortLineEdit->font()).boundingRect(QString::number(GP_MAX_FRAME_CAPTURE)).width() + GP_LINE_EDIT_MARGIN;
+    m_pNumberFramesEdit->setMaximumWidth(maxWidth);
+    pHLayout3->addWidget(new QLabel(GPU_STR_projectSettingNumberOfFramesToCapture), 0);
+    pHLayout3->addWidget(m_pNumberFramesEdit, 0);
+    pHLayout3->addStretch();
+
     pMainLayout->addWidget(pCaptionAPI);
     pMainLayout->addLayout(pHLayout1);
     pMainLayout->addLayout(pHLayout2);
+    pMainLayout->addLayout(pHLayout3);
 
     pMainLayout->addStretch();
 
@@ -93,6 +107,9 @@ void gpProjectSettingsExtension::Initialize()
     GT_ASSERT(rc);
 
     rc = connect(m_pOptionsEdit, SIGNAL(textEdited(const QString&)), this, SLOT(OnTextEdited(const QString&)));
+    GT_ASSERT(rc);
+
+    rc = connect(m_pNumberFramesEdit, SIGNAL(textEdited(const QString&)), this, SLOT(OnNumFramesEdited(const QString&)));
     GT_ASSERT(rc);
 }
 
@@ -124,6 +141,7 @@ bool gpProjectSettingsExtension::GetXMLSettingsString(gtString& projectAsXMLStri
         afUtils::addFieldToXML(projectAsXMLString, GPU_STR_projectSettingsPortNumberXMLField, settings.m_serverConnectionPort);
         afUtils::addFieldToXML(projectAsXMLString, GPU_STR_projectSettingsProcessNumberXMLField, acQStringToGTString(settings.m_processNumber));
         afUtils::addFieldToXML(projectAsXMLString, GPU_STR_projectSettingsProcessNameXMLField, acQStringToGTString(settings.m_processName));
+        afUtils::addFieldToXML(projectAsXMLString, GPU_STR_projectSettingsNumberFramesToCaptureXMLField, acQStringToGTString(settings.m_numFramesToCapture));
     }
     projectAsXMLString.appendFormattedString(L"</%ls>", ExtensionXMLString().asCharArray());
 
@@ -155,6 +173,7 @@ bool gpProjectSettingsExtension::SetSettingsFromXMLString(const gtString& projec
             int connectionType = 0, portNumber = GP_DEFAULT_PORT;
             gtString connectionNumber;
             gtString connectionName;
+            gtString numFramesToCapture;
 
             afUtils::getFieldFromXML(*pTPNode, GPU_STR_projectSettingsAutomaticXMLField, settings.m_shouldConnectAutomatically);
             afUtils::getFieldFromXML(*pTPNode, GPU_STR_projectSettingsConnectionXMLField, connectionType);
@@ -162,11 +181,14 @@ bool gpProjectSettingsExtension::SetSettingsFromXMLString(const gtString& projec
             settings.m_connection = (gpProjectSettings::eConnectionType)connectionType;
             afUtils::getFieldFromXML(*pTPNode, GPU_STR_projectSettingsProcessNumberXMLField, connectionNumber);
             afUtils::getFieldFromXML(*pTPNode, GPU_STR_projectSettingsProcessNameXMLField, connectionName);
+            afUtils::getFieldFromXML(*pTPNode, GPU_STR_projectSettingsNumberFramesToCaptureXMLField, numFramesToCapture);
 
             settings.m_processNumber = acGTStringToQString(connectionNumber);
             settings.m_processName = acGTStringToQString(connectionName);
 
             settings.m_serverConnectionPort = portNumber;
+
+            settings.m_numFramesToCapture = acGTStringToQString(numFramesToCapture);
 
             retVal = true;
         }
@@ -199,6 +221,8 @@ bool gpProjectSettingsExtension::SaveCurrentSettings()
                 settings.m_processName = m_processName;
                 settings.m_processNumber = m_processNumber;
 
+                settings.m_numFramesToCapture = m_numFramesToCapture;
+
                 m_bUpdateSettings = false;
             }
 
@@ -211,7 +235,7 @@ bool gpProjectSettingsExtension::SaveCurrentSettings()
 
 void gpProjectSettingsExtension::RestoreDefaultProjectSettings()
 {
-    GT_IF_WITH_ASSERT(m_pAutomaticCheckBox != nullptr && m_pOptionsComboBox != nullptr && m_pOptionsEdit != nullptr)
+    GT_IF_WITH_ASSERT(m_pAutomaticCheckBox != nullptr && m_pOptionsComboBox != nullptr && m_pOptionsEdit != nullptr && m_pNumberFramesEdit != nullptr)
     {
         m_pAutomaticCheckBox->setChecked(true);
         m_pOptionsComboBox->setCurrentIndex(2);
@@ -219,6 +243,8 @@ void gpProjectSettingsExtension::RestoreDefaultProjectSettings()
         m_pPortLineEdit->setText(QString::number(GP_DEFAULT_PORT));
         m_processName = "";
         m_processNumber = "1";
+        m_numFramesToCapture = "1";
+        m_pNumberFramesEdit->setText(QString::number(1));
         // Set the value in the line edit:
         m_bUpdateSettings = true;
     }
@@ -271,6 +297,9 @@ bool gpProjectSettingsExtension::RestoreCurrentSettings()
             }
 
             m_pPortLineEdit->setText(QString::number(settings.m_serverConnectionPort));
+
+            m_numFramesToCapture = settings.m_numFramesToCapture;
+            m_pNumberFramesEdit->setText(m_numFramesToCapture);
         }
     }
     return retVal;
@@ -311,5 +340,14 @@ void gpProjectSettingsExtension::OnTextEdited(const QString& text)
         {
             m_processName = text;
         }
+    }
+}
+
+void gpProjectSettingsExtension::OnNumFramesEdited(const QString& text)
+{
+    m_bUpdateSettings = true;
+    GT_IF_WITH_ASSERT(m_pNumberFramesEdit != nullptr)
+    {
+        m_numFramesToCapture = text;
     }
 }

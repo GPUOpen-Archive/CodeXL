@@ -58,6 +58,9 @@ public:
     /// First DX12 in this process
     QString m_processName;
 
+    /// number of frames to capture
+    QString m_numFramesToCapture;
+
     /// lists of preset counters
     std::map<QString, QStringList>& PresetCountersLists() { return m_presetCountersLists; };
 
