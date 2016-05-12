@@ -320,9 +320,7 @@ VktCmdBufProfiler* VktWrappedCmdBuf::InitNewProfiler(ProfilerType profilerType)
 {
     VktCmdBufProfiler* pProfiler = nullptr;
 
-    // Can currently fit up to 64 timestamps into our query buffer
-    // Three timestamps per measurement: 21*3 = 63
-    UINT measurementsPerGroup = 21;
+    UINT measurementsPerGroup = 256;
 
 #if DYNAMIC_PROFILER_GROUP_SIZING
 
@@ -340,7 +338,7 @@ VktCmdBufProfiler* VktWrappedCmdBuf::InitNewProfiler(ProfilerType profilerType)
     config.physicalDevice         = m_createInfo.physicalDevice;
     config.device                 = m_createInfo.device;
     config.cmdBuf                 = m_createInfo.appCmdBuf;
-    config.mapTimestampMem        = true;
+    config.mapTimestampMem        = false;
     config.newMemClear            = true;
     config.newMemClearValue       = 0;
 

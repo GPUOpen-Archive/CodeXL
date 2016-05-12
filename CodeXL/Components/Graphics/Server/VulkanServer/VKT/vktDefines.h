@@ -19,7 +19,7 @@
 #define TRACK_CMD_BUF_COMMANDS               0
 
 /// Enable dynamically resizing the buffer used to store profiler results.
-#define DYNAMIC_PROFILER_GROUP_SIZING        0
+#define DYNAMIC_PROFILER_GROUP_SIZING        1
 
 /// The timeout in Milliseconds to wait on queue's profiler results.
 #define QUEUE_RESULTS_WORKER_TIMEOUT         1000
