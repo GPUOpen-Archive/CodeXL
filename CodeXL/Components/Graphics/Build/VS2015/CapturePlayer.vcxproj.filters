@@ -4,7 +4,6 @@
     <ClCompile Include="..\..\Server\CapturePlayer\PlayerMain.cpp" />
     <ClCompile Include="..\..\Server\CapturePlayer\DX12Player.cpp" />
     <ClCompile Include="..\..\Server\CapturePlayer\VulkanPlayer.cpp" />
-    <ClCompile Include="..\..\Server\CapturePlayer\WindowsPlayer.cpp" />
     <ClCompile Include="..\..\Server\CapturePlayer\WindowsWindow.cpp" />
   </ItemGroup>
   <ItemGroup>

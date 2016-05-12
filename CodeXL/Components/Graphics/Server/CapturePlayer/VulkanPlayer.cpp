@@ -145,6 +145,11 @@ bool VulkanPlayer::InitializeWindow(HINSTANCE hInstance, UINT windowWidth, UINT 
 /// \return True if success, false if failure
 bool VulkanPlayer::InitializeGraphics()
 {
+    s_vkState.width = m_windowWidth;
+    s_vkState.height = m_windowHeight;
+    s_vkState.hInstance = m_pPlayerWindow->GetHINSTANCE();
+    s_vkState.hWnd = m_pPlayerWindow->GetWindowHandle();
+
     m_lastErrorResult = VK_INCOMPLETE;
     UINT instExtCount = 0;
     s_vkState.extCount = 0;
