@@ -181,28 +181,6 @@ bool VktLayerManager::ProcessRequestFromCommId(CommunicationID inRequestId)
 }
 
 //--------------------------------------------------------------------------
-/// The layer must create its resources here, it may hook some functions if really needed.
-/// \param type The creation type.
-/// \param pPtr Output pointer.
-/// \return True if successful.
-//--------------------------------------------------------------------------
-bool VktLayerManager::OnCreate(CREATION_TYPE type, void* pPtr)
-{
-    bool success = true;
-
-    for (uint32 i = 0; i < m_AvailableLayers.size(); i++)
-    {
-        if (m_AvailableLayers[i]->OnCreate(type, pPtr) == false)
-        {
-            Log(logERROR, "Layer with index '%u' failed in OnCreate call.\n", i);
-            success = false;
-        }
-    }
-
-    return success;
-}
-
-//--------------------------------------------------------------------------
 /// Destroy all layers tracked by this LayerManager.
 /// \param type The creation type.
 /// \param pPtr Output pointer.

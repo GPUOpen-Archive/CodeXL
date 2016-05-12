@@ -35,7 +35,6 @@ public:
     /// Nothing special to destroy here
     virtual ~VktLayerManager() {}
 
-    virtual bool OnCreate(CREATION_TYPE type, void* pPtr);
     virtual bool OnDestroy(CREATION_TYPE type, void* pPtr);
     virtual void BeginFrame();
     virtual void AutocaptureTriggered();
