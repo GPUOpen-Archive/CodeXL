@@ -116,11 +116,6 @@ bool VulkanPlayer::InitializeWindow(HINSTANCE hInstance, UINT windowWidth, UINT 
     m_windowWidth = windowWidth;
     m_windowHeight = windowHeight;
 
-    s_vkState.width = m_windowWidth;
-    s_vkState.height = m_windowHeight;
-    s_vkState.hInstance = hInstance;
-    s_vkState.hWnd = m_pPlayerWindow->GetWindowHandle();
-
     m_pPlayerWindow = new WindowsWindow(windowWidth, windowHeight, VulkanWindowProc);
 
     if (m_pPlayerWindow == NULL)
