@@ -483,7 +483,9 @@ void VulkanPlayer::RenderLoop()
 
     while (m_pPlayerWindow->Update())
     {
+#ifdef WIN32
         RedrawWindow(s_vkState.hWnd, nullptr, nullptr, RDW_INTERNALPAINT);
+#endif
     }
 }
 
