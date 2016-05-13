@@ -807,6 +807,20 @@ void GraphicsServerCommunication::CheckServerStatus(unsigned char* pBuffer, unsi
     }
 }
 
+/// Replace any special HTTP characters
+/// \param ioCommandText the command string to modify. This string is fixed up in place.
+void GraphicsServerCommunication::ReplaceSpecialHTTPCharacters(gtASCIIString& ioCommandText)
+{
+    ioCommandText.replace(" ", "%20");
+    ioCommandText.replace("\"", "%22");
+    ioCommandText.replace("\\", "%5C");
+    ioCommandText.replace("-", "%E2%80%93");
+    ioCommandText.replace("&", "%26");
+    ioCommandText.replace("'", "%27");
+    ioCommandText.replace("`", "%60");
+    ioCommandText.replace("`", "%E2%80%98");
+}
+
 bool GraphicsServerCommunication::SetSessionName(const gtASCIIString& sessionName)
 {
     bool retVal = false;
@@ -814,15 +828,7 @@ bool GraphicsServerCommunication::SetSessionName(const gtASCIIString& sessionNam
     gtASCIIString commandText = m_strApiHttpCommand;
     gtASCIIString strWebResponse;
     commandText.appendFormattedString("/SetSessionName.txt=%s", sessionName.asCharArray());
-    // Replace any special HTTP characters
-    commandText.replace(" ", "%20");
-    commandText.replace("\"", "%22");
-    commandText.replace("\\", "%5C");
-    commandText.replace("-", "%E2%80%93");
-    commandText.replace("&", "%26");
-    commandText.replace("'", "%27");
-    commandText.replace("`", "%60");
-    commandText.replace("`", "%E2%80%98");
+    ReplaceSpecialHTTPCharacters(commandText);
     retVal = SendCommandPid(commandText, strWebResponse, "");
     return retVal;
 }
@@ -835,16 +841,7 @@ bool GraphicsServerCommunication::SetProjectName(const gtASCIIString& projectNam
     gtASCIIString commandText = m_strApiHttpCommand;
     gtASCIIString strWebResponse;
     commandText.appendFormattedString("/SetProjectName.txt=%s", projectName.asCharArray());
-    // Replace any special HTTP characters
-    commandText.replace(" ", "%20");
-    commandText.replace("\"", "%22");
-    commandText.replace("\\", "%5C");
-    commandText.replace("-", "%E2%80%93");
-    commandText.replace("&", "%26");
-    commandText.replace("'", "%27");
-    commandText.replace("`", "%60");
-    commandText.replace("`", "%E2%80%98");
-
+    ReplaceSpecialHTTPCharacters(commandText);
     retVal = SendCommandPid(commandText, strWebResponse, "");
     return retVal;
 }

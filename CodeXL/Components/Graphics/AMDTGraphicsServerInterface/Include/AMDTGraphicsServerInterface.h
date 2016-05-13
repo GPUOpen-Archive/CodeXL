@@ -137,6 +137,10 @@ private:
     void CheckServerStatus(const gtASCIIString& httpRequestResult, TargetAppState& appState);
     void CheckServerStatus(unsigned char* pBuffer, unsigned long bufferSize, TargetAppState& appState);
 
+    /// Replace any special HTTP characters
+    /// \param ioCommandText the command string to modify. This string is fixed up in place.
+    void ReplaceSpecialHTTPCharacters(gtASCIIString& ioCommandText);
+
 private:
     enum { SLEEP_INTERVAL_BETWEEN_CONSECUTIVE_RESEND_ATTEMPTS_IN_MILLISECS = 500};
     osPortAddress   m_GPSServer;
