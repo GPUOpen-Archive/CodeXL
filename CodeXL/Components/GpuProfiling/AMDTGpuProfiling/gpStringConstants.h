@@ -436,7 +436,7 @@
 #define GPU_STR_dashboard_DrawCalls "Draw Calls: %1"
 #define GPU_STR_dashboard_RunTimeDoubleClickMessage "Frame trace can be opened only after the session stops.\nDo you want to stop the session and open the timeline?"
 #define GPU_STR_dashboard_ItemTooltip "Double click to review frame data"
-#define GPU_STR_dashboard_serverdisconnectedError "The session stopped due to one of the following reasons:\n- The profiled application stopped running.\n- The profiled application needs to be brought back to focus."
+#define GPU_STR_dashboard_serverdisconnectedError "The session was stopped because:\n- The application being analyzed was closed.\n- The analyzed application needs to be raised into focus."
 #define GPU_STR_dashboard_failedToLaunchError "Application failed to launch:\n- Please validate application exists at specified location\n- Please validate application can be launched."
 #define GPU_STR_dashboard_failedToConnectError "Application failed to launch:\nServer failed to connect to application, no DX12 component or profiled application need to be raised into focus."
 #define GPU_STR_dashboard_CapturedFramesCaptionNumFrames " (%1 Frames)"
