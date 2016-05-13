@@ -178,52 +178,54 @@ const char* DX12APIEntry::GetParameterString() const
         // get the API function parameters from the raw memory buffer
         int arrayCount = 0;
         char* buffer = mParameterBuffer;
-
-        for (UINT32 loop = 0; loop < mNumParameters; loop++)
+        if (buffer != nullptr)
         {
-            char* ptr = buffer;
-            PARAMETER_TYPE paramType;
-            memcpy(&paramType, ptr, sizeof(PARAMETER_TYPE));
-            ptr += sizeof(PARAMETER_TYPE);
-            unsigned char length = *ptr++;
-
-            if (length < BYTES_PER_PARAMETER)
+            for (UINT32 loop = 0; loop < mNumParameters; loop++)
             {
-                // if an array token is found, add an opening brace and start the array elements countdown
-                if (paramType == PARAMETER_ARRAY)
-                {
-                    memcpy(&arrayCount, ptr, sizeof(unsigned int));
-                    parameterString += "[ ";
-                }
-                else
-                {
-                    char parameter[BYTES_PER_PARAMETER];
+                char* ptr = buffer;
+                PARAMETER_TYPE paramType;
+                memcpy(&paramType, ptr, sizeof(PARAMETER_TYPE));
+                ptr += sizeof(PARAMETER_TYPE);
+                unsigned char length = *ptr++;
 
-                    GetParameterAsString(paramType, length, ptr, parameter);
-                    parameterString += parameter;
-
-                    // check to see if this is the last array element. If so, output a closing brace
-                    // before the comma separator (if needed)
-                    if (arrayCount > 0)
+                if (length < BYTES_PER_PARAMETER)
+                {
+                    // if an array token is found, add an opening brace and start the array elements countdown
+                    if (paramType == PARAMETER_ARRAY)
                     {
-                        arrayCount--;
+                        memcpy(&arrayCount, ptr, sizeof(unsigned int));
+                        parameterString += "[ ";
+                    }
+                    else
+                    {
+                        char parameter[BYTES_PER_PARAMETER] = {};
 
-                        if (arrayCount == 0)
+                        GetParameterAsString(paramType, length, ptr, parameter);
+                        parameterString += parameter;
+
+                        // check to see if this is the last array element. If so, output a closing brace
+                        // before the comma separator (if needed)
+                        if (arrayCount > 0)
                         {
-                            parameterString += " ]";
+                            arrayCount--;
+
+                            if (arrayCount == 0)
+                            {
+                                parameterString += " ]";
+                            }
+                        }
+
+                        // if there are more parameters to come, insert a comma delimiter
+                        if ((loop + 1) < mNumParameters)
+                        {
+                            parameterString += ", ";
                         }
                     }
-
-                    // if there are more parameters to come, insert a comma delimiter
-                    if ((loop + 1) < mNumParameters)
-                    {
-                        parameterString += ", ";
-                    }
                 }
-            }
 
-            // point to next parameter in the buffer
-            buffer += BYTES_PER_PARAMETER;
+                // point to next parameter in the buffer
+                buffer += BYTES_PER_PARAMETER;
+            }
         }
 
         return parameterString.asCharArray();
