@@ -114,10 +114,7 @@ void VulkanPlayer::Present()
 /// \return True if success, false if failure
 bool VulkanPlayer::InitializeWindow(HINSTANCE hInstance, UINT windowWidth, UINT windowHeight)
 {
-    m_windowWidth = windowWidth;
-    m_windowHeight = windowHeight;
-
-    m_pPlayerWindow = new WindowsWindow(hInstance, VulkanWindowProc);
+    m_pPlayerWindow = new WindowsWindow(windowWidth, windowHeight, hInstance, VulkanWindowProc);
 
     if (m_pPlayerWindow == NULL)
     {
@@ -133,7 +130,6 @@ bool VulkanPlayer::InitializeWindow(HINSTANCE hInstance, UINT windowWidth, UINT 
 
     bool bOpenAndUpdated = m_pPlayerWindow->OpenAndUpdate(SW_MINIMIZE);
 
-
     return bOpenAndUpdated;
 }
 
@@ -141,8 +137,8 @@ bool VulkanPlayer::InitializeWindow(HINSTANCE hInstance, UINT windowWidth, UINT 
 /// \return True if success, false if failure
 bool VulkanPlayer::InitializeGraphics()
 {
-    s_vkState.width = m_windowWidth;
-    s_vkState.height = m_windowHeight;
+    s_vkState.width = m_pPlayerWindow->GetWindowWidth();
+    s_vkState.height = m_pPlayerWindow->GetWindowHeight();
     s_vkState.hInstance = m_pPlayerWindow->GetInstance();
     s_vkState.hWnd = m_pPlayerWindow->GetWindowHandle();
 
@@ -444,8 +440,8 @@ bool VulkanPlayer::InitializeGraphics()
 /// Implement the render loop.
 void VulkanPlayer::RenderLoop()
 {
-    s_vkState.width = m_windowWidth;
-    s_vkState.height = m_windowHeight;
+    s_vkState.width = m_pPlayerWindow->GetWindowWidth();
+    s_vkState.height = m_pPlayerWindow->GetWindowHeight();
     s_vkState.hInstance = m_pPlayerWindow->GetInstance();
     s_vkState.hWnd = m_pPlayerWindow->GetWindowHandle();
 
@@ -453,22 +449,8 @@ void VulkanPlayer::RenderLoop()
     //result = VulkanInit();
     //CP_ASSERT(result == VK_SUCCESS);
 
-    MSG msg = {};
-
-    for (;;)
+    while (m_pPlayerWindow->Update())
     {
-        // Process any messages in the queue.
-        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-        {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-
-            if (msg.message == WM_QUIT)
-            {
-                break;
-            }
-        }
-
         RedrawWindow(s_vkState.hWnd, nullptr, nullptr, RDW_INTERNALPAINT);
     }
 }

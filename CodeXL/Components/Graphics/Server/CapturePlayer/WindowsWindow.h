@@ -16,12 +16,18 @@ class WindowsWindow : public WindowBase
 public:
 
     /// Constructor
-    WindowsWindow(HINSTANCE hInstance, WNDPROC inWndProc);
+    WindowsWindow(UINT windowWidth, UINT windowHeight, HINSTANCE hInstance, WNDPROC inWndProc);
 
+    /// Destructor
     virtual ~WindowsWindow();
 
+    /// Create a new window and prepare it for use.
+    /// \param inHinstance The HINSTANCE for the running application.
+    /// \returns True if initialization is successful.
     bool Initialize();
 
+    /// Shut down and clean up resources associated with a ReplayWindow instance.
+    /// \returns True if cleanup and shutdown was successful.
     bool Shutdown();
 
     /// Retrieve the OS window handle for the ReplayWindow.
@@ -38,8 +44,16 @@ public:
         return mhInstance;
     }
 
-
+    /// Open an initialized window in the system UI.
+    /// \param inNCmdShow Controls how the window is to be shown.
+    /// \return True if success, false if fail.
     bool OpenAndUpdate(int inNCmdShow);
+
+    /// Update the window. This is the OS-dependent message loop
+    /// implementation so should be called periodically.
+    /// \return false if the message loop is to be terminated, true
+    /// otherwise.
+    bool Update();
 
 private:
 

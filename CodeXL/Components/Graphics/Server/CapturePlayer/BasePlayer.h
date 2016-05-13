@@ -23,7 +23,7 @@ class BasePlayer
 public:
 
     /// Constructor
-    BasePlayer() : m_windowWidth(0), m_windowHeight(0), m_pPlayerWindow(NULL)
+    BasePlayer() : m_pPlayerWindow(NULL)
     {
     }
 
@@ -48,12 +48,6 @@ public:
     virtual void Destroy() = 0;
 
 protected:
-
-    /// Width of the player window
-    UINT m_windowWidth;
-
-    /// Height of the player window
-    UINT m_windowHeight;
 
     /// Stores the instance of the player window
     WindowBase* m_pPlayerWindow;

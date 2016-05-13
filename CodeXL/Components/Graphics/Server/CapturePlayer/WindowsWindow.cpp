@@ -14,8 +14,9 @@ const wchar_t* kWindowTitle = L"Capture Player - [PLACEHOLDER].ACR"; ///< Window
 /// \param inWidth The width of the player window
 /// \param inHeight The height of the player window
 /// \param inWndProc The application - defined function that processes messages sent to a window.Main message handler
-WindowsWindow::WindowsWindow(HINSTANCE hInstance, WNDPROC inWndProc)
-    : mWindowHandle(NULL)
+WindowsWindow::WindowsWindow(UINT windowWidth, UINT windowHeight, HINSTANCE hInstance, WNDPROC inWndProc)
+    : WindowBase(windowWidth, windowHeight)
+    , mWindowHandle(NULL)
     , mhInstance(hInstance)
     , mWndProc(inWndProc)
 {
@@ -70,7 +71,6 @@ bool WindowsWindow::Initialize()
     return bInitializedSuccessfully;
 }
 
-
 /// Shut down and clean up resources associated with a ReplayWindow instance.
 /// \returns True if cleanup and shutdown was successful.
 bool WindowsWindow::Shutdown()
@@ -113,4 +113,26 @@ bool WindowsWindow::OpenAndUpdate(int inNCmdShow)
     }
 
     return bSuccessful;
+}
+
+/// Update the window. This is the OS-dependent message loop
+/// implementation so should be called periodically.
+/// \return false if the message loop is to be terminated, true
+/// otherwise.
+bool WindowsWindow::Update()
+{
+    MSG msg = {};
+
+    // Process any messages in the queue.
+    if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+
+        if (msg.message == WM_QUIT)
+        {
+            return false;
+        }
+    }
+    return true;
 }

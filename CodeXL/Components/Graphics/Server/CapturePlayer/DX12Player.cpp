@@ -40,10 +40,7 @@ LRESULT CALLBACK DX12WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 /// \return True if success, false if failure
 bool DX12Player::InitializeWindow(HINSTANCE hInstance, UINT windowWidth, UINT windowHeight)
 {
-    m_windowWidth = windowWidth;
-    m_windowHeight = windowHeight;
-
-    m_pPlayerWindow = new WindowsWindow(hInstance, DX12WindowProc);
+    m_pPlayerWindow = new WindowsWindow(windowWidth, windowHeight, hInstance, DX12WindowProc);
 
     if (m_pPlayerWindow == NULL)
     {
@@ -99,8 +96,8 @@ bool DX12Player::InitializeGraphics()
     // Describe and create the swap chain.
     DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
     swapChainDesc.BufferCount = frameCount;
-    swapChainDesc.BufferDesc.Width = m_windowWidth;
-    swapChainDesc.BufferDesc.Height = m_windowHeight;
+    swapChainDesc.BufferDesc.Width = m_pPlayerWindow->GetWindowWidth();
+    swapChainDesc.BufferDesc.Height = m_pPlayerWindow->GetWindowHeight();
     swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
