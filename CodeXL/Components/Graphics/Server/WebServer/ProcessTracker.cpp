@@ -278,7 +278,6 @@ bool ProcessTracker::HandleRequest(HTTPRequestHeader* pRequestHeader,
 #ifdef _WIN32
 
     // if using AppInit_Dll, clear the registry as soon as a process.xml request is sent.
-    // TODO: move this to where a connection has definately been made
     if (SG_GET_BOOL(OptionAppInitDll) == true)
     {
         if (registryCleared == false)
