@@ -8,7 +8,13 @@
 #ifndef BASE_PLAYER_H
 #define BASE_PLAYER_H
 
+#ifdef WIN32
 #include <Windows.h>
+#else
+#include <WinDefs.h>
+typedef void* HINSTANCE;
+#endif
+#include "WindowBase.h"
 
 /// This class specifies the functionality required by all derived players
 class BasePlayer
@@ -17,7 +23,7 @@ class BasePlayer
 public:
 
     /// Constructor
-    BasePlayer()
+    BasePlayer() : m_windowWidth(0), m_windowHeight(0), m_pPlayerWindow(NULL)
     {
     }
 
@@ -42,6 +48,15 @@ public:
     virtual void Destroy() = 0;
 
 protected:
+
+    /// Width of the player window
+    UINT m_windowWidth;
+
+    /// Height of the player window
+    UINT m_windowHeight;
+
+    /// Stores the instance of the player window
+    WindowBase* m_pPlayerWindow;
 
     /// Static function to be called from the OS mechanism for triggering a rendering.
     static void Present();

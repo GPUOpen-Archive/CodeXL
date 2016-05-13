@@ -9,10 +9,11 @@
 #define DX12_PLAYER_H
 
 #include <dxgi1_4.h>
-#include "WindowsPlayer.h"
+#include "WindowsWindow.h"
+#include "BasePlayer.h"
 
 /// This class implements the features required for a DX12 capture player
-class DX12Player: public WindowsPlayer
+class DX12Player: public BasePlayer
 {
     /// Stores the current swapchain pointer
     IDXGISwapChain3* m_swapchain;

@@ -1,5 +1,5 @@
 #define VK_USE_PLATFORM_WIN32_KHR
-#include <vulkan.h>
+#include <vulkan/vulkan.h>
 
 #include <malloc.h>
 
@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 
+#include "WindowsWindow.h"
 #include "VulkanPlayer.h"
 
 /// Define some Vulkan state.
@@ -116,14 +117,14 @@ bool VulkanPlayer::InitializeWindow(HINSTANCE hInstance, UINT windowWidth, UINT 
     m_windowWidth = windowWidth;
     m_windowHeight = windowHeight;
 
-    m_pPlayerWindow = new WindowsWindow(windowWidth, windowHeight, VulkanWindowProc);
+    m_pPlayerWindow = new WindowsWindow(hInstance, VulkanWindowProc);
 
     if (m_pPlayerWindow == NULL)
     {
         return false;
     }
 
-    bool bWindowInitialied = m_pPlayerWindow->Initialize(hInstance);
+    bool bWindowInitialied = m_pPlayerWindow->Initialize();
 
     if (bWindowInitialied == false)
     {
@@ -142,7 +143,7 @@ bool VulkanPlayer::InitializeGraphics()
 {
     s_vkState.width = m_windowWidth;
     s_vkState.height = m_windowHeight;
-    s_vkState.hInstance = m_pPlayerWindow->GetHINSTANCE();
+    s_vkState.hInstance = m_pPlayerWindow->GetInstance();
     s_vkState.hWnd = m_pPlayerWindow->GetWindowHandle();
 
     m_lastErrorResult = VK_INCOMPLETE;
@@ -445,7 +446,7 @@ void VulkanPlayer::RenderLoop()
 {
     s_vkState.width = m_windowWidth;
     s_vkState.height = m_windowHeight;
-    s_vkState.hInstance = m_pPlayerWindow->GetHINSTANCE();
+    s_vkState.hInstance = m_pPlayerWindow->GetInstance();
     s_vkState.hWnd = m_pPlayerWindow->GetWindowHandle();
 
     //VkResult result = VK_INCOMPLETE;

@@ -8,33 +8,32 @@
 #ifndef WINDOWS_WINDOW_H
 #define WINDOWS_WINDOW_H
 
-#include "../Common/misc.h"
+#include "WindowBase.h"
 
 /// An empty window used for replaying API Frame Capture files.
-class WindowsWindow
+class WindowsWindow : public WindowBase
 {
-
 public:
 
     /// Constructor
-    WindowsWindow(UINT32 inWidth, UINT32 inHeight, WNDPROC inWndProc);
+    WindowsWindow(HINSTANCE hInstance, WNDPROC inWndProc);
 
     virtual ~WindowsWindow();
 
-    bool Initialize(HINSTANCE inHinstance);
+    bool Initialize();
 
     bool Shutdown();
 
     /// Retrieve the OS window handle for the ReplayWindow.
     /// \return The OS window handle for the ReplayWindow.
-    const HWND GetWindowHandle() const
+    const NativeWindowType GetWindowHandle() const
     {
         return mWindowHandle;
     }
 
     /// Retrieve the application instance.
     /// \returns The OS application instance.
-    const HINSTANCE GetHINSTANCE() const
+    const NativeInstanceType GetInstance() const
     {
         return mhInstance;
     }
@@ -44,20 +43,14 @@ public:
 
 private:
 
-    /// The width of the window that was opened for replay.
-    UINT32 mWidth;
-
-    /// The height of the window that was opened for replay.
-    UINT32 mHeight;
-
     /// A handle to the window that was opened to replay a capture.
-    HWND mWindowHandle;
+    NativeWindowType mWindowHandle;
 
     /// The window class that must be registered in order to open a replay window.
     WNDCLASSEX mWindowClass;
 
     /// The HINSTANCE of the player application.
-    HINSTANCE mhInstance;
+    NativeInstanceType mhInstance;
 
     /// The callback
     WNDPROC mWndProc;

@@ -80,7 +80,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     }
 
     // Declare a player pointer
-    WindowsPlayer* pPlayer = NULL;
+    BasePlayer* pPlayer = NULL;
 
     size_t found = mtf.mAPIString.find("Vulkan");
     if (found != std::string::npos)

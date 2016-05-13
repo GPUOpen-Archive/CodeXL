@@ -43,14 +43,14 @@ bool DX12Player::InitializeWindow(HINSTANCE hInstance, UINT windowWidth, UINT wi
     m_windowWidth = windowWidth;
     m_windowHeight = windowHeight;
 
-    m_pPlayerWindow = new WindowsWindow(windowWidth, windowHeight, DX12WindowProc);
+    m_pPlayerWindow = new WindowsWindow(hInstance, DX12WindowProc);
 
     if (m_pPlayerWindow == NULL)
     {
         return false;
     }
 
-    bool bWindowInitialied = m_pPlayerWindow->Initialize(hInstance);
+    bool bWindowInitialied = m_pPlayerWindow->Initialize();
 
     if (bWindowInitialied == false)
     {

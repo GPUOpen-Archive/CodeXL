@@ -8,13 +8,18 @@
 #ifndef VULKAN_PLAYER_H
 #define VULKAN_PLAYER_H
 
-#include "WindowsPlayer.h"
-
+#include "BasePlayer.h"
+#ifdef WIN32
 #define VK_USE_PLATFORM_WIN32_KHR
-#include <vulkan.h>
+#else
+typedef void* HINSTANCE;
+#define VK_USE_PLATFORM_XLIB_KHR
+#endif
+
+#include <vulkan/vulkan.h>
 
 /// This class implements the features required for a Vulkan capture player
-class VulkanPlayer: public WindowsPlayer
+class VulkanPlayer: public BasePlayer
 {
     /// Record the last error
     VkResult m_lastErrorResult;

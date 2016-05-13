@@ -14,11 +14,9 @@ const wchar_t* kWindowTitle = L"Capture Player - [PLACEHOLDER].ACR"; ///< Window
 /// \param inWidth The width of the player window
 /// \param inHeight The height of the player window
 /// \param inWndProc The application - defined function that processes messages sent to a window.Main message handler
-WindowsWindow::WindowsWindow(UINT32 inWidth, UINT32 inHeight, WNDPROC inWndProc)
-    : mWidth(inWidth)
-    , mHeight(inHeight)
-    , mWindowHandle(NULL)
-    , mhInstance(NULL)
+WindowsWindow::WindowsWindow(HINSTANCE hInstance, WNDPROC inWndProc)
+    : mWindowHandle(NULL)
+    , mhInstance(hInstance)
     , mWndProc(inWndProc)
 {
     mWindowClass = {};
@@ -32,11 +30,9 @@ WindowsWindow::~WindowsWindow()
 /// Create a new window and prepare it for use.
 /// \param inHinstance The HINSTANCE for the running application.
 /// \returns True if initialization is successful.
-bool WindowsWindow::Initialize(HINSTANCE inHinstance)
+bool WindowsWindow::Initialize()
 {
     bool bInitializedSuccessfully = false;
-
-    mhInstance = inHinstance;
 
     mWindowClass = {};
     mWindowClass.cbSize = sizeof(WNDCLASSEX);
@@ -45,14 +41,14 @@ bool WindowsWindow::Initialize(HINSTANCE inHinstance)
     mWindowClass.lpfnWndProc = mWndProc;
     mWindowClass.cbClsExtra = 0;
     mWindowClass.cbWndExtra = 0;
-    mWindowClass.hInstance = inHinstance;
+    mWindowClass.hInstance = mhInstance;
     mWindowClass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     mWindowClass.lpszClassName = kWindowClassName;
 
     if (RegisterClassEx(&mWindowClass) != 0)
     {
         mWindowHandle = CreateWindow(kWindowClassName, kWindowTitle, WS_OVERLAPPEDWINDOW,
-                                     CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, inHinstance, NULL);
+                                     CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, mhInstance, NULL);
 
         if (mWindowHandle != NULL)
         {
