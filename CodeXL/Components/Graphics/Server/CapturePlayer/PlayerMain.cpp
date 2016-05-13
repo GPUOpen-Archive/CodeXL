@@ -15,13 +15,19 @@
 
 #include <stdio.h>
 
+#ifdef WIN32
 #include "DX12Player.h"
+#else
+#include <signal.h>
+#include "WinDefs.h"
+#endif
+
 #include "VulkanPlayer.h"
 #include <tinyxml.h>
-#include "..\Common\StreamLog.h"
-#include "..\Common\TraceMetadata.h"
-#include "..\Common\FrameInfo.h"
-#include "..\Common\Logger.h"
+#include "../Common/StreamLog.h"
+#include "../Common/TraceMetadata.h"
+#include "../Common/FrameInfo.h"
+#include "../Common/Logger.h"
 
 #include <AMDTOSWrappers/Include/osFile.h>
 #include <AMDTOSWrappers/Include/osTime.h>
@@ -33,9 +39,13 @@ const UINT windowWidth = 800; ///< Render window width
 const UINT windowHeight = 600; ///< Render window height
 
 #ifdef _DEBUG
-#define CP_ASSERT(s) if (s == false) { __debugbreak(); }
+    #ifdef WIN32
+        #define CP_ASSERT(s) if (s == false) { __debugbreak(); }
+    #else
+        #define CP_ASSERT(s) if (!(s)) { raise(SIGTRAP); }
+    #endif
 #else
-#define CP_ASSERT(s)
+    #define CP_ASSERT(s)
 #endif
 
 /// Main entry point
@@ -44,11 +54,17 @@ const UINT windowHeight = 600; ///< Render window height
 /// \param lpCmdLine The command line for the application, excluding the program name.
 /// \param nCmdShow Controls how the window is to be shown.
 /// \return Returns the exit value contained in message's wParam parameter or 0.
+#ifdef WIN32
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
     UNREFERENCED_PARAMETER(nCmdShow);
+
+#else
+int main()
+{
+#endif
 
     osModuleArchitecture moduleArchitecture;
     osRuntimePlatform currentPlatform;
@@ -82,6 +98,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     // Declare a player pointer
     BasePlayer* pPlayer = NULL;
 
+#ifdef WIN32
     size_t found = mtf.mAPIString.find("Vulkan");
     if (found != std::string::npos)
     {
@@ -103,6 +120,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     // Initialize the render window 
     bRes = pPlayer->InitializeWindow(hInstance, windowWidth, windowHeight);
+#else
+    // Linux only has vulkan (for now)
+    pPlayer = new VulkanPlayer();
+
+    // Initialize the render window 
+    bRes = pPlayer->InitializeWindow(nullptr, windowWidth, windowHeight);
+#endif
+
     CP_ASSERT(bRes == true);
     if (bRes != true)
     {

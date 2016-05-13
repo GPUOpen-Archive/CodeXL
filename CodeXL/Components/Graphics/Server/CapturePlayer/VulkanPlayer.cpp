@@ -1,25 +1,33 @@
-#define VK_USE_PLATFORM_WIN32_KHR
-#include <vulkan/vulkan.h>
-
 #include <malloc.h>
-
-#ifdef _DEBUG
-#define CP_ASSERT(s) if (s == false) { __debugbreak(); }
-#else
-#define CP_ASSERT(s)
-#endif
-
 #include <stdio.h>
 
-#include "WindowsWindow.h"
 #include "VulkanPlayer.h"
+
+#ifdef WIN32
+#include "WindowsWindow.h"
+#else
+#include "X11Window.h"
+#include <signal.h>
+#include "WinDefs.h"
+#define SW_MINIMIZE 1
+#endif
+
+#ifdef _DEBUG
+    #ifdef WIN32
+        #define CP_ASSERT(s) if (s == false) { __debugbreak(); }
+    #else
+        #define CP_ASSERT(s) if (!(s)) { raise(SIGTRAP); }
+    #endif
+#else
+    #define CP_ASSERT(s)
+#endif
 
 /// Define some Vulkan state.
 struct VulkanState
 {
-    HINSTANCE    hInstance; ///< Application instance.
-    HWND         hWnd; ///< Window Handle.
-    bool         initComplete; ///< Record if initialization has been done.
+    NativeInstanceType       hInstance; ///< Application instance.
+    NativeWindowType         hWnd; ///< Window Handle.
+    bool                     initComplete; ///< Record if initialization has been done.
 
     VkSurfaceKHR             surface; ///< Render surface.
     VkInstance               inst; ///< Vulkan instance.
@@ -50,6 +58,7 @@ static VulkanState s_vkState = {};
 /// \param wParam Additional message information. The contents of this parameter depend on the value of the uMsg parameter.
 /// \param lParam Additional message information. The contents of this parameter depend on the value of the uMsg parameter.
 /// \return The return value is the result of the message processing and depends on the message sent.
+#ifdef WIN32
 LRESULT CALLBACK VulkanWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     // Handle destroy/shutdown messages
@@ -69,6 +78,7 @@ LRESULT CALLBACK VulkanWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
     // Handle any messages the switch statement didn't
     return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
+#endif
 
 /// Vulkan presentation code.
 void VulkanPlayer::Present()
@@ -114,7 +124,11 @@ void VulkanPlayer::Present()
 /// \return True if success, false if failure
 bool VulkanPlayer::InitializeWindow(HINSTANCE hInstance, UINT windowWidth, UINT windowHeight)
 {
+#ifdef WIN32
     m_pPlayerWindow = new WindowsWindow(windowWidth, windowHeight, hInstance, VulkanWindowProc);
+#else
+    m_pPlayerWindow = new X11Window(windowWidth, windowHeight);
+#endif
 
     if (m_pPlayerWindow == NULL)
     {
@@ -166,14 +180,21 @@ bool VulkanPlayer::InitializeGraphics()
             if (!strcmp(VK_KHR_SURFACE_EXTENSION_NAME, pInstExts[i].extensionName))
             {
                 surfaceExtFound = 1;
-                s_vkState.pExtNames[s_vkState.extCount++] = VK_KHR_SURFACE_EXTENSION_NAME;
+                s_vkState.pExtNames[s_vkState.extCount++] = (char*)VK_KHR_SURFACE_EXTENSION_NAME;
             }
-
+#ifdef WIN32
             if (!strcmp(VK_KHR_WIN32_SURFACE_EXTENSION_NAME, pInstExts[i].extensionName))
             {
                 platformSurfaceExtFound = 1;
-                s_vkState.pExtNames[s_vkState.extCount++] = VK_KHR_WIN32_SURFACE_EXTENSION_NAME;
+                s_vkState.pExtNames[s_vkState.extCount++] = (char*)VK_KHR_WIN32_SURFACE_EXTENSION_NAME;
             }
+#else
+            if (!strcmp(VK_KHR_XLIB_SURFACE_EXTENSION_NAME, pInstExts[i].extensionName))
+            {
+                platformSurfaceExtFound = 1;
+                s_vkState.pExtNames[s_vkState.extCount++] = (char*)VK_KHR_XLIB_SURFACE_EXTENSION_NAME;
+            }
+#endif
         }
 
         free(pInstExts);
@@ -238,7 +259,7 @@ bool VulkanPlayer::InitializeGraphics()
             if (!strcmp(VK_KHR_SWAPCHAIN_EXTENSION_NAME, pDeviceExts[i].extensionName))
             {
                 swapchainExtFound = 1;
-                s_vkState.pExtNames[s_vkState.extCount++] = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
+                s_vkState.pExtNames[s_vkState.extCount++] = (char*)VK_KHR_SWAPCHAIN_EXTENSION_NAME;
             }
         }
 
@@ -253,6 +274,7 @@ bool VulkanPlayer::InitializeGraphics()
     vkGetPhysicalDeviceQueueFamilyProperties(s_vkState.gpu, &s_vkState.queueCount, s_vkState.pQueueProps);
     CP_ASSERT((s_vkState.queueCount >= 1) == true);
 
+#ifdef WIN32
     VkWin32SurfaceCreateInfoKHR createInfo;
     createInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
     createInfo.pNext = nullptr;
@@ -261,6 +283,16 @@ bool VulkanPlayer::InitializeGraphics()
     createInfo.hwnd = s_vkState.hWnd;
 
     m_lastErrorResult = vkCreateWin32SurfaceKHR(s_vkState.inst, &createInfo, nullptr, &s_vkState.surface);
+#else
+    VkXlibSurfaceCreateInfoKHR createInfo;
+    createInfo.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
+    createInfo.pNext = nullptr;
+    createInfo.flags = 0;
+    createInfo.dpy = s_vkState.hInstance;
+    createInfo.window = s_vkState.hWnd;
+
+    m_lastErrorResult = vkCreateXlibSurfaceKHR(s_vkState.inst, &createInfo, nullptr, &s_vkState.surface);
+#endif
 
     VkBool32* pSupportsPresent = (VkBool32 *)malloc(s_vkState.queueCount * sizeof(VkBool32));
     CP_ASSERT(pSupportsPresent != nullptr);
