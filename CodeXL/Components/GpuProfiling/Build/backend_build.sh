@@ -238,11 +238,12 @@ if !($bZipOnly) ; then
    #-----------------------------------------
    # Update Version.h to include build number
    #-----------------------------------------
+   CURRENT_VERSION_H_FILE_PERMISSIONS=$(stat --format %a $VERSION_FILE)
    chmod 777 $VERSION_FILE
    old=$(grep -E "#define GPUPROFILER_BACKEND_BUILD_NUMBER [0-9]+" $VERSION_FILE)
    new="#define GPUPROFILER_BACKEND_BUILD_NUMBER $BUILD"
    sed -i "s/$old/$new/g" $VERSION_FILE
-   chmod 444 $VERSION_FILE
+   chmod $CURRENT_VERSION_H_FILE_PERMISSIONS $VERSION_FILE
 
    # delete log file
    if !($bAppendToLog) ; then
