@@ -421,9 +421,6 @@ acAPITimelineItem* gpTimeline::CreateTimelineItem(ProfileSessionDataItem* pItem)
         {
             if (functionId == CL_FUNC_TYPE_clGetEventInfo)
             {
-#pragma message ("TODO: FA: check what is the use of m_uiDisplaySeqID. Is it needed with the new design?")
-                // pRetVal = new CLGetEventInfoTimelineItem(pItem->StartTime(), pItem->EndTime(), pApiInfo->m_uiDisplaySeqID); //TODO verify that the tooltip show the index as "after index XXX" correctly
-                // don't assign an apiIndex to clGetEventInfo
                 pRetVal = new CLGetEventInfoTimelineItem(startTime, endTime, pItem->APICallIndex());
             }
             else
@@ -460,6 +457,8 @@ acAPITimelineItem* gpTimeline::CreateTimelineItem(ProfileSessionDataItem* pItem)
             pRetVal->setForegroundColor(Qt::white);
             pRetVal->setText(apiName);
 
+            QString gpuObjectName = pItem->QueueName();
+
             // Create an HSA / OpenCL branch for the API function
             QString branchText = GPU_STR_TraceViewOpenCL;
 
@@ -482,9 +481,10 @@ acAPITimelineItem* gpTimeline::CreateTimelineItem(ProfileSessionDataItem* pItem)
             else if (pItem->ItemType().m_itemMainType == ProfileSessionDataItem::VK_GPU_PROFILE_ITEM)
             {
                 branchText = GPU_STR_TraceViewGPU;
+                gpuObjectName = pItem->CommandListPointer();
             }
 
-            acTimelineBranch* pHostBranch = GetBranchForAPI(pItem->ThreadID(), pItem->QueueName(), branchText, pItem->ItemType().m_itemMainType);
+            acTimelineBranch* pHostBranch = GetBranchForAPI(pItem->ThreadID(), gpuObjectName, branchText, pItem->ItemType().m_itemMainType);
             GT_IF_WITH_ASSERT(pHostBranch != nullptr)
             {
                 pHostBranch->addTimelineItem(pRetVal);
@@ -621,7 +621,7 @@ acTimelineBranch* gpTimeline::GetBranchForAPI(osThreadId threadId, const QString
         m_pCommandListsBranch->setText(tr(GPU_STR_TraceViewCommandLists));
     }
 
-    if (itemType == ProfileSessionDataItem::DX12_GPU_PROFILE_ITEM)
+    if ((itemType == ProfileSessionDataItem::DX12_GPU_PROFILE_ITEM) || (itemType == ProfileSessionDataItem::VK_GPU_PROFILE_ITEM))
     {
         QString queueTypeStr;
         GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)

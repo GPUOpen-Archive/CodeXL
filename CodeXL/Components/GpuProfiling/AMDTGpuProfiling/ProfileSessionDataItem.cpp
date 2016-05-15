@@ -1159,7 +1159,19 @@ QString ProfileSessionDataItem::CommandListPointer() const
             DX12GPUTraceInfo* pAPIInfo = (DX12GPUTraceInfo*)m_pApiInfo;
             if (pAPIInfo != nullptr)
             {
-                retVal.fromStdString(pAPIInfo->m_commandListPtrStr);
+                retVal = QString::fromStdString(pAPIInfo->m_commandListPtrStr);
+            }
+        }
+    }
+
+    else if (m_itemType.m_itemMainType == VK_GPU_PROFILE_ITEM)
+    {
+        if (m_pApiInfo != nullptr)
+        {
+            VKGPUTraceInfo* pAPIInfo = (VKGPUTraceInfo*)m_pApiInfo;
+            if (pAPIInfo != nullptr)
+            {
+                retVal = QString::fromStdString(pAPIInfo->m_commandBufferPtrStr);
             }
         }
     }

@@ -156,7 +156,7 @@ bool VKAtpFilePart::ParseGPUAPICallString(const std::string& apiStr, VKGPUTraceI
 
         /// Store the GPU start time if it is not stored yet
         /// GPU timestamps to fit the CPU timeline
-        if (m_gpuStart == 0)
+        if ((m_gpuStart == 0) || (m_gpuStart > apiInfo.m_ullStart))
         {
             m_gpuStart = apiInfo.m_ullStart;
         }
