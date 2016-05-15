@@ -175,6 +175,8 @@ void gpTimeline::BuildTimeline(gpTraceDataContainer* pDataContainer)
         }
     }
     UpdateCPUCaption();
+
+    ShouldScrollToEnd(true);
 }
 
 void gpTimeline::AddThreadAPIFunctions(osThreadId threadId)
