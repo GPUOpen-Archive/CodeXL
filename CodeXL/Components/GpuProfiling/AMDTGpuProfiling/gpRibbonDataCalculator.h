@@ -57,9 +57,7 @@ public:
 
     enum ePresentData
     {
-        ePresentCPU = 0,
-        ePresentGPU,
-        eNumPresent
+        ePresentGPU = 0,
     };
 
     gpRibbonDataCalculator(gpTraceDataContainer* pSessionData, acTimeline* pTimeLine);
