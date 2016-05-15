@@ -951,7 +951,7 @@ ProfileSessionDataItem* gpTraceDataContainer::FindItem(const QString& findStr, b
     // Find the first item to start with
     auto iter = m_sessionItemsSortedByStartTime.begin();
     auto iterEnd = m_sessionItemsSortedByStartTime.end();
-
+    m_lastFindResultStartTime = 0;
     for (; iter != iterEnd; iter++)
     {
         if (iter.value()->DoesStringMatch(findStr, isCaseSensitive))
@@ -968,7 +968,11 @@ ProfileSessionDataItem* gpTraceDataContainer::FindItem(const QString& findStr, b
 ProfileSessionDataItem* gpTraceDataContainer::FindNextItem(const QString& findStr, bool isCaseSensitive)
 {
     ProfileSessionDataItem* pRetVal = nullptr;
-
+    if (m_lastStringSearched != findStr)
+    {
+        m_lastStringSearched = findStr;
+        m_lastFindResultStartTime = 0;
+    }
     // Find the first item to start with
     auto iter = m_sessionItemsSortedByStartTime.upperBound(m_lastFindResultStartTime);
     auto iterEnd = m_sessionItemsSortedByStartTime.end();

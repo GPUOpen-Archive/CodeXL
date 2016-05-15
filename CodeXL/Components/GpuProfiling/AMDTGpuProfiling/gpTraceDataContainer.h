@@ -279,6 +279,7 @@ private:
 
     /// Contain the last find result start time
     quint64 m_lastFindResultStartTime;
+    QString m_lastStringSearched;
 
     /// Counts the API function calls
     int m_apiCount;
