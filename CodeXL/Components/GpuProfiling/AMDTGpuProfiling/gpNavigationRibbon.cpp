@@ -596,16 +596,20 @@ void gpNavigationRibbon::OnLayerVisibilityChanged(int visibleGroup, int visibleL
             m_pNavigationChart->removePlottable(m_pPresentBars);
         }
 
-        if ((m_presentData.size() > 0) && (m_presentData[gpRibbonDataCalculator::ePresentCPU] >= 0))
+        // Add only the CPU present if there are any
+        int presentSize = m_presentData.size();
+        if (presentSize > 1)
         {
-            // Add only the CPU present
             QVector<double> xData;
             QVector<double> yData;
-            xData.resize(1);
-            yData.resize(1);
-            double upperRange = m_pNavigationChart->yAxis->range().upper;
-            yData[0] = upperRange;
-            xData[0] = m_presentData[gpRibbonDataCalculator::ePresentCPU];
+            xData.resize(presentSize - 1);
+            yData.resize(presentSize - 1);
+            for (int nPresent = 1; nPresent < presentSize; nPresent++)
+            {
+                double upperRange = m_pNavigationChart->yAxis->range().upper;
+                yData[nPresent - 1] = upperRange;
+                xData[nPresent - 1] = m_presentData[nPresent];
+            }
             m_pPresentBars = new QCPBars(m_pNavigationChart->xAxis, m_pNavigationChart->yAxis);
             m_pPresentBars->setData(xData, yData);
 

@@ -440,11 +440,11 @@ void gpRibbonDataCalculator::ConcurrencyToBuckets(QVector<gpRibbonCallsData>& da
     }
 }
 
+
 void gpRibbonDataCalculator::GetPresentData(QVector<double>& presentData)
 {
     presentData.clear();
-    presentData.resize(eNumPresent);
-    presentData[ePresentCPU] = -1;
+    presentData.resize(1);
     presentData[ePresentGPU] = DBL_MAX;
 
     // find the first GPU op
@@ -466,7 +466,6 @@ void gpRibbonDataCalculator::GetPresentData(QVector<double>& presentData)
                     if (pCurrentItem->StartTime() - m_pTimeLine->startTime() < firstGPUTime)
                     {
                         firstGPUTime = pCurrentItem->StartTime() - m_pTimeLine->startTime();
-                        break;
                     }
                 }
             }
@@ -474,7 +473,7 @@ void gpRibbonDataCalculator::GetPresentData(QVector<double>& presentData)
     }
     presentData[ePresentGPU] = firstGPUTime;
 
-    // first CPU present item
+    // There can be multiple CPU present so they will be pushed
     int numThreads = m_pData->ThreadsCount();
 
     for (int nThread = 0; nThread < numThreads; nThread++)
@@ -493,8 +492,7 @@ void gpRibbonDataCalculator::GetPresentData(QVector<double>& presentData)
 
                 if (rc && pCurrentItem->ItemType().m_itemSubType == FuncId_IDXGISwapChain_Present)
                 {
-                    presentData[ePresentCPU] = pCurrentItem->EndTime() - m_pTimeLine->startTime();
-                    break;
+                    presentData.push_back((pCurrentItem->EndTime() - m_pTimeLine->startTime()));
                 }
             }
         }

@@ -1057,11 +1057,21 @@ void gpTimeline::paintEvent(QPaintEvent* event)
     int presetGPUPixel = TimeToPixel(m_presentData[gpRibbonDataCalculator::ePresentGPU]);
     int endPixel = TimeToPixel(grid()->fullRange());
 
+    int numPresents = m_presentData.size();
     // If we have a present call time
-    if (m_presentData[gpRibbonDataCalculator::ePresentCPU] >= 0)
+    if (numPresents > 1)
     {
+        // find the latest CPU present
+        double latestCPUPreset = 0;
+        for (int nPresent = 1; nPresent < numPresents; nPresent++)
+        {
+            if (m_presentData[nPresent] > latestCPUPreset)
+            {
+                latestCPUPreset = m_presentData[nPresent];
+            }
+        }
         // Get the present call time as pixel
-        int presetCPUPixel = TimeToPixel(m_presentData[gpRibbonDataCalculator::ePresentCPU]);
+        int presetCPUPixel = TimeToPixel(latestCPUPreset);
 
         if (presetCPUPixel >= 0)
         {

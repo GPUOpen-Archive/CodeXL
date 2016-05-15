@@ -580,6 +580,11 @@ static std::string GenerateDXBuilderOptions(const std::string& buildOptions, con
         }
     }
 
+    if (additionalBuildOptions.m_buildOptionsMask != 0)
+    {
+        outputStream << "--DXFlags " << additionalBuildOptions.m_buildOptionsMask << " ";
+    }
+
     return outputStream.str();
 }
 
@@ -675,6 +680,7 @@ bool LaunchDXSessionForDevice(AnalyzerBuildArchitecture& bitness,
         // Build the command string for FXC invocation.
         dxOptionsOutputStream << " --FXC \"\\";
         dxOptionsOutputStream << "\"" << additionalBuildOptions.m_builderPath.toStdString().c_str() << "\\\" ";
+        dxOptionsOutputStream << additionalBuildOptions.m_buildOptions.toStdString().c_str() << " ";
 
         // Handle custom include paths.
         std::vector<std::string> includePaths;
