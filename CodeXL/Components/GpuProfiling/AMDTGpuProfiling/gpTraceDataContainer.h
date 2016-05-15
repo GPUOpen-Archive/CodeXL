@@ -61,7 +61,7 @@ public:
         /// The command list end time
         quint64 m_endTime;
 
-        /// Indicates from UI prespective on what row it shall belong
+        /// Indicates from UI perspective , what row it shall belong to
         size_t m_uiRowLocation;
     };
 
