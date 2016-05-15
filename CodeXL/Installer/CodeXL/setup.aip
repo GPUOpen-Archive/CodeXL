@@ -2707,6 +2707,7 @@
     <ROW Action="AI_RemoveAllTempFiles" Type="1281" Source="tempFiles.dll" Target="RemoveAllTempFiles" AdditionalSeq="AI_DATA_SETTER_9"/>
     <ROW Action="AI_RemoveTempFiles" Type="1" Source="tempFiles.dll" Target="RemoveTempFiles" WithoutSeq="true"/>
     <ROW Action="AI_ResolveKnownFolders" Type="1" Source="aicustact.dll" Target="AI_ResolveKnownFolders"/>
+    <ROW Action="AI_ResolveLocalizedCredentials" Type="1" Source="aicustact.dll" Target="GetLocalizedCredentials"/>
     <ROW Action="AI_SETPROGRAMFILES" Type="51" Source="AI_ProgramFiles" Target="[ProgramFilesFolder]"/>
     <ROW Action="AI_SETPROGRAMFILES64" Type="51" Source="AI_ProgramFiles" Target="[ProgramFiles64Folder]"/>
     <ROW Action="AI_SHOW_LOG" Type="65" Source="aicustact.dll" Target="LaunchLogFile" WithoutSeq="true"/>
@@ -2780,7 +2781,7 @@
     <ROW Action="AI_DOWNGRADE" Condition="AI_NEWERPRODUCTFOUND AND (UILevel &lt;&gt; 5)" Sequence="205"/>
     <ROW Action="AI_STORE_LOCATION" Condition="(Not Installed) OR REINSTALL" Sequence="1503"/>
     <ROW Action="AI_PREPARE_UPGRADE" Condition="AI_UPGRADE=&quot;No&quot; AND (Not Installed)" Sequence="1399"/>
-    <ROW Action="AI_ResolveKnownFolders" Sequence="51"/>
+    <ROW Action="AI_ResolveKnownFolders" Sequence="52"/>
     <ROW Action="AI_SETPROGRAMFILES64" Condition="VersionNT64" Sequence="747"/>
     <ROW Action="AI_SETPROGRAMFILES" Condition="NOT VersionNT64" Sequence="748"/>
     <ROW Action="AI_ExtractFiles" Sequence="3998" Builds="DefaultBuild;NDABuild;InternalBuild"/>
@@ -2841,9 +2842,10 @@
     <ROW Action="AI_DATA_SETTER_15" Sequence="222"/>
     <ROW Action="AI_ConfigPermissions" Condition="REMOVE &lt;&gt; &quot;ALL&quot;" Sequence="5851"/>
     <ROW Action="AI_AiRemoveFilesImmediate" Sequence="3499"/>
+    <ROW Action="AI_ResolveLocalizedCredentials" Sequence="51"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiInstallUISequenceComponent">
-    <ROW Action="AI_ResolveKnownFolders" Sequence="56"/>
+    <ROW Action="AI_ResolveKnownFolders" Sequence="57"/>
     <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Sequence="99"/>
     <ROW Action="AI_RESTORE_AI_SETUPEXEPATH" Condition="AI_SETUPEXEPATH_ORIGINAL" Sequence="102"/>
     <ROW Action="AI_SETPROGRAMFILES64" Condition="VersionNT64" Sequence="747"/>
@@ -2853,16 +2855,16 @@
     <ROW Action="Set_VS11_Folder_Maintenance" Condition="( Installed AND REMOVE &lt;&gt; &quot;ALL&quot; AND AI_INSTALL_MODE &lt;&gt; &quot;Remove&quot; ) AND ( VISUAL_STUDIO_11 )" Sequence="210"/>
     <ROW Action="Set_VS11_Folder_uninstall" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) ) AND ( VISUAL_STUDIO_11 )" Sequence="204"/>
     <ROW Action="Set_VS_Folder_Maintenance" Condition="( Installed AND REMOVE &lt;&gt; &quot;ALL&quot; AND AI_INSTALL_MODE &lt;&gt; &quot;Remove&quot; ) AND ( VISUAL_STUDIO )" Sequence="209"/>
-    <ROW Action="DetectProcess_VS_RUN_Install" Condition="( ( NOT Installed ) OR ( Installed AND REMOVE &lt;&gt; &quot;ALL&quot; AND AI_INSTALL_MODE &lt;&gt; &quot;Remove&quot; ) )" Sequence="53"/>
-    <ROW Action="AI_DATA_SETTER_3" Condition="( ( NOT Installed ) OR ( Installed AND REMOVE &lt;&gt; &quot;ALL&quot; AND AI_INSTALL_MODE &lt;&gt; &quot;Remove&quot; ) )" Sequence="52"/>
-    <ROW Action="DetectProcess_VS_RUN_Uninstall" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) )" Sequence="55"/>
-    <ROW Action="AI_DATA_SETTER_6" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) )" Sequence="54"/>
+    <ROW Action="DetectProcess_VS_RUN_Install" Condition="( ( NOT Installed ) OR ( Installed AND REMOVE &lt;&gt; &quot;ALL&quot; AND AI_INSTALL_MODE &lt;&gt; &quot;Remove&quot; ) )" Sequence="54"/>
+    <ROW Action="AI_DATA_SETTER_3" Condition="( ( NOT Installed ) OR ( Installed AND REMOVE &lt;&gt; &quot;ALL&quot; AND AI_INSTALL_MODE &lt;&gt; &quot;Remove&quot; ) )" Sequence="53"/>
+    <ROW Action="DetectProcess_VS_RUN_Uninstall" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) )" Sequence="56"/>
+    <ROW Action="AI_DATA_SETTER_6" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) )" Sequence="55"/>
     <ROW Action="SetProperty" Sequence="76"/>
     <ROW Action="Set_VS12_Folder" Condition="( NOT Installed ) AND ( VISUAL_STUDIO_12 )" Sequence="205"/>
     <ROW Action="Set_VS11_Folder" Condition="( NOT Installed ) AND ( VISUAL_STUDIO_11 )" Sequence="203"/>
     <ROW Action="Set_VS12_Folder_uninstall" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) ) AND ( VISUAL_STUDIO_12 )" Sequence="207"/>
     <ROW Action="Set_VS12_Folder_Maintenance" Condition="( Installed AND REMOVE &lt;&gt; &quot;ALL&quot; AND AI_INSTALL_MODE &lt;&gt; &quot;Remove&quot; ) AND ( VISUAL_STUDIO_12 )" Sequence="211"/>
-    <ROW Action="AI_DpiContentScale" Sequence="51"/>
+    <ROW Action="AI_DpiContentScale" Sequence="52"/>
     <ROW Action="ExecuteAction" Sequence="1277" SeqType="0" MsiKey="ExecuteAction"/>
     <ROW Action="SetProperty_Launch_VS_2012" Condition="( NOT Installed ) AND ( (&amp;VS11_Feature = 3) AND NOT (!VS11_Feature = 3) )" Sequence="1280"/>
     <ROW Action="SetProperty_Launch_SA_Pub" Condition="( NOT Installed ) AND ( (&amp;SA_Public_files = 3) AND NOT (!SA_Public_files = 3) )" Sequence="1283"/>
@@ -2880,6 +2882,7 @@
     <ROW Action="Set_VS2015_Folder" Condition="( NOT Installed ) AND ( VISUAL_STUDIO_2015 )" Sequence="206"/>
     <ROW Action="Set_VS2015_Folder_uninstall" Condition="( ( Installed AND REMOVE &lt;&gt; &quot;ALL&quot; AND AI_INSTALL_MODE &lt;&gt; &quot;Remove&quot; ) OR ( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) ) ) AND ( VISUAL_STUDIO_2015 )" Sequence="208"/>
     <ROW Action="SetProperty_Launch_VS_2015" Condition="( NOT Installed ) AND ( (&amp;VS2015_Feature = 3) AND NOT (!VS2015_Feature = 3) )" Sequence="1282"/>
+    <ROW Action="AI_ResolveLocalizedCredentials" Sequence="51"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiLaunchConditionsComponent">
     <ROW Condition="( Version9X OR ( NOT VersionNT64 ) OR ( VersionNT64 AND ((VersionNT64 &lt;&gt; 502) OR (((VersionNT64 = 502) AND (ServicePackLevel &gt;= 1)) OR (MsiNTProductType &lt;&gt; 1))) AND ((VersionNT64 &lt;&gt; 502) OR (((VersionNT64 = 502) AND (ServicePackLevel &lt;&gt; 1)) OR (MsiNTProductType &lt;&gt; 1))) AND ((VersionNT64 &lt;&gt; 502) OR (((VersionNT64 = 502) AND (ServicePackLevel &lt;&gt; 2)) OR (MsiNTProductType &lt;&gt; 1))) AND ((VersionNT64 &lt;&gt; 502) OR ((VersionNT64 = 502) AND ((MsiNTProductType = 1) OR (ServicePackLevel &gt;= 1)))) AND ((VersionNT64 &lt;&gt; 502) OR ((VersionNT64 = 502) AND ((MsiNTProductType = 1) OR (ServicePackLevel &lt;&gt; 1)))) AND ((VersionNT64 &lt;&gt; 502) OR ((VersionNT64 = 502) AND ((MsiNTProductType = 1) OR (ServicePackLevel &lt;&gt; 2)))) ) )" Description="[ProductName] cannot be installed on the following Windows versions: [WindowsTypeNT64Display]" DescriptionLocId="AI.LaunchCondition.NoSpecificNT64" IsPredefined="true" Builds="NDABuild;InternalBuild"/>
@@ -2892,37 +2895,37 @@
     <ROW Condition="VersionNT" Description="[ProductName] cannot be installed on [WindowsType9XDisplay]" DescriptionLocId="AI.LaunchCondition.No9X" IsPredefined="true" Builds="DefaultBuild;NDABuild;InternalBuild"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiLockPermComponent">
-    <ROW LockObject="CodeXL_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="SA_Examples_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="ClassicMatMul_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="Release_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="SA_Examples_Teapot_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="VS10_Examples_Teapot_Release_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="VS10_Examples_Teapot_Release_bin_res_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="VS10_Examples_Teapot_Debug_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="VS10_Examples_Teapot_Debug_bin_res_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="SA_Examples_Teapot_res_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="SA_Examples_Teapot_AMDTTeapot_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="SA_Examples_Teapot_AMDTTeapot_src_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="SA_Examples_Teapot_AMDTTeapot_res_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="SA_Examples_Teapot_AMDTTeapot_inc_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="SA_Examples_Teapot_AMDTTeapotLib_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="SA_Examples_Teapot_AMDTTeapotLib_src_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="SA_Examples_Teapot_AMDTTeapotLib_inc_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="SA_Examples_Teapot_AMDTTeapotLib_inc_GL_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="SA_Examples_Teapot_AMDTTeapotLib_inc_CL_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="SA_Examples_Teapot_AMDTTeapotLib_res_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="vs_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="AMDTClassicMatMulVS2015_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="v14_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="D3D12Multithreading_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="vs_1_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="D3D12MultithreadingVS2015_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="v14_1_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="Release_1_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="vs_2_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="AMDTTeaPotVS2015_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
-    <ROW LockObject="v14_2_Dir" Table="CreateFolder" User="Users" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="CodeXL_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="D3D12Multithreading_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="SA_Examples_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="Release_1_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="vs_1_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="D3D12MultithreadingVS2015_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="v14_1_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="ClassicMatMul_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="Release_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="vs_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="AMDTClassicMatMulVS2015_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="v14_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="SA_Examples_Teapot_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="VS10_Examples_Teapot_Debug_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="VS10_Examples_Teapot_Debug_bin_res_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="SA_Examples_Teapot_res_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="SA_Examples_Teapot_AMDTTeapot_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="SA_Examples_Teapot_AMDTTeapot_src_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="SA_Examples_Teapot_AMDTTeapot_res_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="SA_Examples_Teapot_AMDTTeapot_inc_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="SA_Examples_Teapot_AMDTTeapotLib_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="SA_Examples_Teapot_AMDTTeapotLib_src_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="SA_Examples_Teapot_AMDTTeapotLib_res_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="SA_Examples_Teapot_AMDTTeapotLib_inc_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="SA_Examples_Teapot_AMDTTeapotLib_inc_GL_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="SA_Examples_Teapot_AMDTTeapotLib_inc_CL_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="vs_2_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="AMDTTeaPotVS2015_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="v14_2_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="VS10_Examples_Teapot_Release_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
+    <ROW LockObject="VS10_Examples_Teapot_Release_bin_res_Dir" Table="CreateFolder" User="[GRP_USERS]" Permission="1880096767" Flags="2"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiMergeModsComponent">
     <ROW Module="Microsoft_VC120_CRT_x64.msm" Path="C:\Program Files (x86)\Common Files\Merge modules\Microsoft_VC120_CRT_x64.msm" Feature="VisualC12.0CRTx64" Directory="APPDIR"/>
