@@ -986,6 +986,11 @@ ProfileSessionDataItem* gpTraceDataContainer::FindNextItem(const QString& findSt
             break;
         }
     }
+    //failed to find, try from beginning next time
+    if (pRetVal == nullptr)
+    {
+        m_lastFindResultStartTime = 0;
+    }
 
     return pRetVal;
 }
