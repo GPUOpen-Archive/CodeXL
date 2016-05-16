@@ -168,7 +168,7 @@ VkResult VktTimestampedCmdBuf::Init(const TimestampedCmdBufConfig& config)   ///
 
                             if (result == VK_SUCCESS)
                             {
-                                memset(pMappedMem, 0, memReqs.size);
+                                memset(pMappedMem, 0, (size_t)memReqs.size);
                                 m_pDeviceDT->UnmapMemory(m_config.device, m_gpuRes.timestampMem);
                             }
                         }
