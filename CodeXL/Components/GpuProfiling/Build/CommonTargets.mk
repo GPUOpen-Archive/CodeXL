@@ -124,4 +124,5 @@ cleanDbgInternalx86:
 	$(MAKE) -f $(MAKEFILENAME) clean $(BUILD_DEBUG_INTERNAL_X86_OVERRIDES)
 
 spotless: clean cleanx86 cleanInternal cleanInternalx86 cleanDbg cleanDbgx86 cleanDbgInternal cleanDbgInternalx86
+	rm -rf $(BASE_OBJDIR)
 

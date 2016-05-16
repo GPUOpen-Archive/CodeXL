@@ -20,6 +20,9 @@ bZip=false
 # Only generate zip file
 bZipOnly=false
 
+# Only execute clean target (mutually exclusive with incremental build)
+bCleanOnly=false
+
 # Build number
 BUILD=0
 
@@ -62,8 +65,13 @@ do
       b32bitbuild=false
    elif [ "$1" = "incremental" ]; then
       bIncrementalBuild=true
+      bCleanOnly=false
    elif [ "$1" = "quick" ]; then
       bIncrementalBuild=true
+      bCleanOnly=false
+   elif [ "$1" = "clean" ]; then
+      bCleanOnly=true
+      bIncrementalBuild=false
    elif [ "$1" = "bldnum" ]; then
       shift
       BUILD="$1"
@@ -194,6 +202,10 @@ if !($bZipOnly) ; then
       #-----------------------------------------
       commandLineArgs=$*
 
+      if ($bCleanOnly); then
+         commandLineArgs="$commandLineArgs -c"
+      fi
+
       NUM_ERRORS=0
 
       # Display a start message:
@@ -259,6 +271,11 @@ if !($bZipOnly) ; then
       else
          echo "*** SUCCESS ***"
       fi
+
+      if ($bCleanOnly); then
+         rm -rf $SPROOT/Output_x86_64/
+         rm -rf $SPROOT/Output_x86/
+      fi
    fi
 
    cd $SPROFILE
@@ -296,43 +313,49 @@ if !($bZipOnly) ; then
          make -C $SUBDIR spotless >> $LOGFILE 2>&1
       fi
 
-      #make 64 bit
-      echo "Build ${BASENAME}, 64-bit..." | tee -a $LOGFILE
+      if !($bCleanOnly); then
+         #make 64 bit
+         echo "Build ${BASENAME}, 64-bit..." | tee -a $LOGFILE
 
-      if ! make -C $SUBDIR -j$CPU_COUNT $HSA_DIR_OVERRIDE $MAKE_TARGET >> $LOGFILE 2>&1; then
-         echo "Failed to build ${BASENAME}, 64 bit"
-         exit 1
-      fi
-
-      if $b32bitbuild; then
-         if [ "$SUBDIR" = "$HSAFDNTRACE" ]; then
-            continue;
-         fi
-
-         if [ "$SUBDIR" = "$HSAFDNPMC" ]; then
-            continue;
-         fi
-
-         #make 32 bit
-         echo "Build ${BASENAME}, 32-bit..." | tee -a $LOGFILE
-
-         if ! make -C $SUBDIR -j$CPU_COUNT $HSA_DIR_OVERRIDE $MAKE_TARGET$MAKE_TARGET_SUFFIX_X86 >> $LOGFILE 2>&1; then
-            echo "Failed to build ${BASENAME}, 32 bit"
+         if ! make -C $SUBDIR -j$CPU_COUNT $HSA_DIR_OVERRIDE $MAKE_TARGET >> $LOGFILE 2>&1; then
+            echo "Failed to build ${BASENAME}, 64 bit"
             exit 1
+         fi
+
+         if $b32bitbuild; then
+            if [ "$SUBDIR" = "$HSAFDNTRACE" ]; then
+               continue;
+            fi
+
+            if [ "$SUBDIR" = "$HSAFDNPMC" ]; then
+               continue;
+            fi
+
+            #make 32 bit
+            echo "Build ${BASENAME}, 32-bit..." | tee -a $LOGFILE
+
+            if ! make -C $SUBDIR -j$CPU_COUNT $HSA_DIR_OVERRIDE $MAKE_TARGET$MAKE_TARGET_SUFFIX_X86 >> $LOGFILE 2>&1; then
+               echo "Failed to build ${BASENAME}, 32 bit"
+               exit 1
+            fi
          fi
       fi
    done
 
-   cp -f $GPA/Bin/Linx64/$GPACOUNTER $PROFILER_OUTPUT
-   cp -f $GPA/Bin/Linx86/$GPACOUNTER32 $PROFILER_OUTPUT
+   if !($bCleanOnly); then
+      cp -f $GPA/Bin/Linx64/$GPACOUNTER $PROFILER_OUTPUT
+      cp -f $GPA/Bin/Linx86/$GPACOUNTER32 $PROFILER_OUTPUT
 
-   if $bBuildOCLProfiler ; then
-      cp -f $GPA/Bin/Linx64/$GPACL $PROFILER_OUTPUT
-      cp -f $GPA/Bin/Linx86/$GPACL32 $PROFILER_OUTPUT
-   fi
+      if $bBuildOCLProfiler ; then
+         cp -f $GPA/Bin/Linx64/$GPACL $PROFILER_OUTPUT
+         cp -f $GPA/Bin/Linx86/$GPACL32 $PROFILER_OUTPUT
+      fi
 
-   if $bBuildHSAProfiler ; then
-      cp -f $GPA/Bin/Linx64/$GPAHSA $PROFILER_OUTPUT
+      if $bBuildHSAProfiler ; then
+         cp -f $GPA/Bin/Linx64/$GPAHSA $PROFILER_OUTPUT
+      fi
+   else
+      rm -rf $PROFILER_OUTPUT
    fi
 
    #-----------------------------------------
@@ -340,83 +363,84 @@ if !($bZipOnly) ; then
    #-----------------------------------------
    rm -rf $BIN
 
-   #-----------------------------------------
-   #check if bin folder exist
-   #-----------------------------------------
-   if [ ! -e $BIN ]; then
-      mkdir $BIN
-   fi
-
-   if [ ! -e $BIN/$ACTIVITYLOGGER ]; then
-      mkdir $BIN/$ACTIVITYLOGGER
-   fi
-
-   if [ ! -e $BIN/$ACTIVITYLOGGER/bin ]; then
-      mkdir $BIN/$ACTIVITYLOGGER/bin
-   fi
-
-   if [ ! -e $BIN/$ACTIVITYLOGGER/doc ]; then
-      mkdir $BIN/$ACTIVITYLOGGER/doc
-   fi
-
-   if [ ! -e $BIN/$ACTIVITYLOGGER/bin/x86 ]; then
-      mkdir $BIN/$ACTIVITYLOGGER/bin/x86
-   fi
-
-   if [ ! -e $BIN/$ACTIVITYLOGGER/bin/x86_64 ]; then
-      mkdir $BIN/$ACTIVITYLOGGER/bin/x86_64
-   fi
-
-   if [ ! -e $BIN/$ACTIVITYLOGGER/include ]; then
-      mkdir $BIN/$ACTIVITYLOGGER/include
-   fi
-
-   if [ ! -e $BIN/jqPlot ]; then
-      mkdir $BIN/jqPlot
-   fi
-
-   #-----------------------------------------
-   #copy to bin folder
-   #-----------------------------------------
-   # x64
-   cp $PROFILER_OUTPUT/$SPROFILEBIN $BIN/$SPROFILEBIN
-   cp $PROFILER_OUTPUT/$PRELOADXINITTHREADSBIN $BIN/$PRELOADXINITTHREADSBIN
-   if $bBuildOCLProfiler ; then
-      cp $PROFILER_OUTPUT/$PROFILEBIN $BIN/$PROFILEBIN
-      cp $PROFILER_OUTPUT/$TRACEBIN $BIN/$TRACEBIN
-      cp $PROFILER_OUTPUT/$OCCUPANCYBIN $BIN/$OCCUPANCYBIN
-      cp $GPA/Bin/Linx64/$GPACL $BIN/$GPACL
-   fi
-   if $bBuildHSAProfiler ; then
-      cp $PROFILER_OUTPUT/$HSATRACEAGENTBIN $BIN/$HSATRACEAGENTBIN
-      cp $PROFILER_OUTPUT/$HSAPROFILEAGENTBIN $BIN/$HSAPROFILEAGENTBIN
-      cp $GPA/Bin/Linx64/$GPAHSA $BIN/$GPAHSA
-   fi
-   cp $GPA/Bin/Linx64/$GPACOUNTER $BIN/$GPACOUNTER
-   cp $LINUXRESOURCES/CodeXLGpuProfilerRun $BIN
-
-   #x86
-   if $b32bitbuild; then
-      if $bBuildOCLProfiler ; then
-         cp $PROFILER_OUTPUT/$SPROFILEBIN32 $BIN/$SPROFILEBIN32
-         cp $PROFILER_OUTPUT/$PRELOADXINITTHREADSBIN32 $BIN/$PRELOADXINITTHREADSBIN32
-         cp $PROFILER_OUTPUT/$PROFILEBIN32 $BIN/$PROFILEBIN32
-         cp $PROFILER_OUTPUT/$TRACEBIN32 $BIN/$TRACEBIN32
-         cp $PROFILER_OUTPUT/$OCCUPANCYBIN32 $BIN/$OCCUPANCYBIN32
-         cp $GPA/Bin/Linx86/$GPACL32 $BIN/$GPACL32
-         cp $GPA/Bin/Linx86/$GPACOUNTER32 $BIN/$GPACOUNTER32
-         cp $LINUXRESOURCES/CodeXLGpuProfilerRun32 $BIN
+   if !($bCleanOnly); then
+      #-----------------------------------------
+      #check if bin folder exist
+      #-----------------------------------------
+      if [ ! -e $BIN ]; then
+         mkdir $BIN
       fi
+
+      if [ ! -e $BIN/$ACTIVITYLOGGER ]; then
+         mkdir $BIN/$ACTIVITYLOGGER
+      fi
+
+      if [ ! -e $BIN/$ACTIVITYLOGGER/bin ]; then
+         mkdir $BIN/$ACTIVITYLOGGER/bin
+      fi
+
+      if [ ! -e $BIN/$ACTIVITYLOGGER/doc ]; then
+         mkdir $BIN/$ACTIVITYLOGGER/doc
+      fi
+
+      if [ ! -e $BIN/$ACTIVITYLOGGER/bin/x86 ]; then
+         mkdir $BIN/$ACTIVITYLOGGER/bin/x86
+      fi
+
+      if [ ! -e $BIN/$ACTIVITYLOGGER/bin/x86_64 ]; then
+         mkdir $BIN/$ACTIVITYLOGGER/bin/x86_64
+      fi
+
+      if [ ! -e $BIN/$ACTIVITYLOGGER/include ]; then
+         mkdir $BIN/$ACTIVITYLOGGER/include
+      fi
+
+      if [ ! -e $BIN/jqPlot ]; then
+         mkdir $BIN/jqPlot
+      fi
+
+      #-----------------------------------------
+      #copy to bin folder
+      #-----------------------------------------
+      # x64
+      cp $PROFILER_OUTPUT/$SPROFILEBIN $BIN/$SPROFILEBIN
+      cp $PROFILER_OUTPUT/$PRELOADXINITTHREADSBIN $BIN/$PRELOADXINITTHREADSBIN
+      if $bBuildOCLProfiler ; then
+         cp $PROFILER_OUTPUT/$PROFILEBIN $BIN/$PROFILEBIN
+         cp $PROFILER_OUTPUT/$TRACEBIN $BIN/$TRACEBIN
+         cp $PROFILER_OUTPUT/$OCCUPANCYBIN $BIN/$OCCUPANCYBIN
+         cp $GPA/Bin/Linx64/$GPACL $BIN/$GPACL
+      fi
+      if $bBuildHSAProfiler ; then
+         cp $PROFILER_OUTPUT/$HSATRACEAGENTBIN $BIN/$HSATRACEAGENTBIN
+         cp $PROFILER_OUTPUT/$HSAPROFILEAGENTBIN $BIN/$HSAPROFILEAGENTBIN
+         cp $GPA/Bin/Linx64/$GPAHSA $BIN/$GPAHSA
+      fi
+      cp $GPA/Bin/Linx64/$GPACOUNTER $BIN/$GPACOUNTER
+      cp $LINUXRESOURCES/CodeXLGpuProfilerRun $BIN
+
+      #x86
+      if $b32bitbuild; then
+         if $bBuildOCLProfiler ; then
+            cp $PROFILER_OUTPUT/$SPROFILEBIN32 $BIN/$SPROFILEBIN32
+            cp $PROFILER_OUTPUT/$PRELOADXINITTHREADSBIN32 $BIN/$PRELOADXINITTHREADSBIN32
+            cp $PROFILER_OUTPUT/$PROFILEBIN32 $BIN/$PROFILEBIN32
+            cp $PROFILER_OUTPUT/$TRACEBIN32 $BIN/$TRACEBIN32
+            cp $PROFILER_OUTPUT/$OCCUPANCYBIN32 $BIN/$OCCUPANCYBIN32
+            cp $GPA/Bin/Linx86/$GPACL32 $BIN/$GPACL32
+            cp $GPA/Bin/Linx86/$GPACOUNTER32 $BIN/$GPACOUNTER32
+            cp $LINUXRESOURCES/CodeXLGpuProfilerRun32 $BIN
+         fi
+      fi
+
+      #AMDTActivityLogger files
+      cp $SPROOT/Output_x86_64/$CODEXL_FRAMEWORK_BUILD_CONFIG_DIR/bin/$ACTIVITYLOGGERBIN $BIN/$ACTIVITYLOGGER/bin/x86_64/$ACTIVITYLOGGERBIN
+      cp $SPROOT/Output_x86/$CODEXL_FRAMEWORK_BUILD_CONFIG_DIR/bin/$ACTIVITYLOGGERBIN32 $BIN/$ACTIVITYLOGGER/bin/x86/$ACTIVITYLOGGERBIN32
+      cp $ACTIVITYLOGGERDIR/AMDTActivityLogger.h $BIN/$ACTIVITYLOGGER/include/$ACTIVITYLOGGER.h
+      cp $ACTIVITYLOGGERDIR/Doc/AMDTActivityLogger.pdf $BIN/$ACTIVITYLOGGER/doc/AMDTActivityLogger.pdf
+      #jqPlot files
+      cp $JQPLOT_PATH/* $BIN/jqPlot
    fi
-
-   #AMDTActivityLogger files
-   cp $SPROOT/Output_x86_64/$CODEXL_FRAMEWORK_BUILD_CONFIG_DIR/bin/$ACTIVITYLOGGERBIN $BIN/$ACTIVITYLOGGER/bin/x86_64/$ACTIVITYLOGGERBIN
-   cp $SPROOT/Output_x86/$CODEXL_FRAMEWORK_BUILD_CONFIG_DIR/bin/$ACTIVITYLOGGERBIN32 $BIN/$ACTIVITYLOGGER/bin/x86/$ACTIVITYLOGGERBIN32
-   cp $ACTIVITYLOGGERDIR/AMDTActivityLogger.h $BIN/$ACTIVITYLOGGER/include/$ACTIVITYLOGGER.h
-   cp $ACTIVITYLOGGERDIR/Doc/AMDTActivityLogger.pdf $BIN/$ACTIVITYLOGGER/doc/AMDTActivityLogger.pdf
-   #jqPlot files
-   cp $JQPLOT_PATH/* $BIN/jqPlot
-
 fi
 
 #-----------------------------------------
@@ -427,27 +451,29 @@ CODEXLOUTPUTREL=$CODEXLOUTPUT/release
 CODEXLOUTPUTDBG=$CODEXLOUTPUT/debug
 
 if [ -d $CODEXLOUTPUTREL ]; then
-   echo "Copying GPU Profiler backend files to CodeXL Output release directory" | tee -a $LOGFILE
-
    rm -rf $CODEXLOUTPUTREL/bin/$ACTIVITYLOGGER
    rm -rf $CODEXLOUTPUTREL/bin/jqPlot
 
-   cp -R $BIN/$ACTIVITYLOGGER $CODEXLOUTPUTREL/bin
-   cp -R $BIN/jqPlot $CODEXLOUTPUTREL/bin
+   if !($bCleanOnly); then
+      echo "Copying GPU Profiler backend files to CodeXL Output release directory" | tee -a $LOGFILE
+      cp -R $BIN/$ACTIVITYLOGGER $CODEXLOUTPUTREL/bin
+      cp -R $BIN/jqPlot $CODEXLOUTPUTREL/bin
 
-   cp -f $BIN/* $CODEXLOUTPUTREL/bin
+      cp -f $BIN/* $CODEXLOUTPUTREL/bin
+   fi
 fi
 
 if [ -d $CODEXLOUTPUTDBG ]; then
-   echo "Copying GPU Profiler backend files to CodeXL Output debug directory" | tee -a $LOGFILE
-
    rm -rf $CODEXLOUTPUTDBG/bin/$ACTIVITYLOGGER
    rm -rf $CODEXLOUTPUTDBG/bin/jqPlot
 
-   cp -R $BIN/$ACTIVITYLOGGER $CODEXLOUTPUTDBG/bin
-   cp -R $BIN/jqPlot $CODEXLOUTPUTDBG/bin
+   if !($bCleanOnly); then
+      echo "Copying GPU Profiler backend files to CodeXL Output debug directory" | tee -a $LOGFILE
+      cp -R $BIN/$ACTIVITYLOGGER $CODEXLOUTPUTDBG/bin
+      cp -R $BIN/jqPlot $CODEXLOUTPUTDBG/bin
 
-   cp -f $BIN/* $CODEXLOUTPUTDBG/bin
+      cp -f $BIN/* $CODEXLOUTPUTDBG/bin
+   fi
 fi
 
 #-----------------------------------------
