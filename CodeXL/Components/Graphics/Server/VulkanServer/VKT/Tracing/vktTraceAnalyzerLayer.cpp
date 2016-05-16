@@ -348,9 +348,12 @@ std::string VktTraceAnalyzerLayer::GetGPUTraceTXT()
                     // Convert timestamps to milliseconds by using the clock frequency.
 #ifndef CODEXL_GRAPHICS
                     double preStartTimestamp = (pResult->timestampResult.rawClocks.preStart / timestampFrequency) * 1000.0;
-#endif
                     double startTimestamp = (pResult->timestampResult.rawClocks.start / timestampFrequency) * 1000.0;
                     double endTimestamp = (pResult->timestampResult.rawClocks.end / timestampFrequency) * 1000.0;
+#else
+                    double startTimestamp = pResult->timestampResult.alignedMillisecondTimestamps.start;
+                    double endTimestamp = pResult->timestampResult.alignedMillisecondTimestamps.end;
+#endif
 
                     FuncId funcId = (FuncId)pResult->measurementInfo.idInfo.funcId;
 
