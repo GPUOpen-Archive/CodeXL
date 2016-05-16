@@ -142,6 +142,7 @@
     <ClInclude Include="..\..\Server\VulkanServer\VKT\Profiling\vktCmdBufProfiler.h" />
     <ClInclude Include="..\..\Server\VulkanServer\VKT\Profiling\vktCmdBufProfilerStatic.h" />
     <ClInclude Include="..\..\Server\VulkanServer\VKT\Profiling\vktFrameProfilerLayer.h" />
+    <ClInclude Include="..\..\Server\VulkanServer\VKT\Profiling\vktTimestampedCmdBuf.h" />
     <ClInclude Include="..\..\Server\VulkanServer\VKT\Profiling\vktWorkerInfo.h" />
     <ClInclude Include="..\..\Server\VulkanServer\VKT\Rendering\vktImageRenderer.h" />
     <ClInclude Include="..\..\Server\VulkanServer\VKT\Tracing\vktAPIEntry.h" />
@@ -168,6 +169,7 @@
     <ClCompile Include="..\..\Server\VulkanServer\VKT\Profiling\vktCmdBufProfiler.cpp" />
     <ClCompile Include="..\..\Server\VulkanServer\VKT\Profiling\vktCmdBufProfilerStatic.cpp" />
     <ClCompile Include="..\..\Server\VulkanServer\VKT\Profiling\vktFrameProfilerLayer.cpp" />
+    <ClCompile Include="..\..\Server\VulkanServer\VKT\Profiling\vktTimestampedCmdBuf.cpp" />
     <ClCompile Include="..\..\Server\VulkanServer\VKT\Rendering\vktImageRenderer.cpp" />
     <ClCompile Include="..\..\Server\VulkanServer\VKT\Tracing\vktAPIEntry.cpp" />
     <ClCompile Include="..\..\Server\VulkanServer\VKT\Tracing\vktThreadTraceData.cpp" />

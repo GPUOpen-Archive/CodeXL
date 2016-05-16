@@ -15,7 +15,7 @@
 /// A flag used to enable threaded worker profiler collection.
 #define GATHER_PROFILER_RESULTS_WITH_WORKERS 0
 
-/// Enable tracking of each command inserted into Command Buffers.
+/// Enable tracking of each command inserted into command buffers.
 #define TRACK_CMD_BUF_COMMANDS               0
 
 /// Enable dynamically resizing the buffer used to store profiler results.
@@ -32,5 +32,8 @@
 
 /// Inject timestamps at the very beginning and at the very end of each command buffer.
 #define MEASURE_WHOLE_CMD_BUFS               1
+
+/// Since Vulkan does not provide function to calibrate CPU/GPU timestamp, do it ourselves manually.
+#define MANUAL_TIMESTAMP_CALIBRATION         1
 
 #endif // __VKT_DEFINES_H__

@@ -49,8 +49,14 @@ public:
     /// Return the parent device for this queue
     VkDevice ParentDevice() { return m_createInfo.device; }
 
+    /// Return the physical device for this queue
+    VkPhysicalDevice PhysicalDevice() { return m_createInfo.physicalDevice; }
+
     /// Return the queue's index
     UINT GetQueueIndex() { return m_createInfo.queueIndex; }
+
+    /// Return the queue's family index
+    UINT GetQueueFamilyIndex() { return m_createInfo.queueFamilyIndex; }
 
     /// Return the queue's creation flags
     UINT GetQueueFlags() { return m_createInfo.queueFlags; }

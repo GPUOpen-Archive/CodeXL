@@ -480,7 +480,7 @@ VkResult VktCmdBufProfiler::CreateQueryBuffer(
 
                         if (result == VK_SUCCESS)
                         {
-                            const ProfilerInterval storeVal = { m_config.newMemClearValue, m_config.newMemClearValue };
+                            const ProfilerInterval storeVal = { m_config.newMemClearValue, m_config.newMemClearValue, m_config.newMemClearValue };
                             const UINT numSets = size / sizeof(storeVal);
 
                             for (UINT i = 0; i < numSets; i++)

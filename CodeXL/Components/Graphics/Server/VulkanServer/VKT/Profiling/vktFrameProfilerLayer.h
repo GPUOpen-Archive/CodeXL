@@ -77,7 +77,7 @@ public:
     void CopyProfilerResult(ProfilerResult* pDst, const ProfilerResult* pSrc);
     void VerifyAlignAndStoreResults(VktWrappedQueue* pQueue, std::vector<ProfilerResult>& results, CalibrationTimestampPair* pTimestampPair, UINT32 threadID, GPS_TIMESTAMP frameStartTime);
     bool AlignProfilerResultWithCPUTimeline(ProfilerResult& ioResult, const CalibrationTimestampPair* pTimestamps, GPS_TIMESTAMP inFrameStartTime);
-    void CollectCalibrationTimestamps(VktWrappedQueue* inSubmissionQueue, CalibrationTimestampPair* ioTimestamps);
+    VkResult CollectCalibrationTimestamps(VktWrappedQueue* pWrappedQueue, CalibrationTimestampPair* pTimestamps);
     virtual void ClearProfilingResults();
 
     void PreCall(FuncId funcId, VktWrappedCmdBuf* pWrappedCmdBuf);

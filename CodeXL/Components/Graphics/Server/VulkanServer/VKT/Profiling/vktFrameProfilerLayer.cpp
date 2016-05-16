@@ -12,6 +12,8 @@
 #include "../Objects/Wrappers/vktWrappedCmdBuf.h"
 #include "../Objects/Wrappers/vktWrappedQueue.h"
 #include "../vktInterceptManager.h"
+#include "../Profiling/vktTimestampedCmdBuf.h"
+#include "../vktDefines.h"
 
 //-----------------------------------------------------------------------------
 /// Default constructor for VktFrameProfilerLayer.
@@ -156,11 +158,12 @@ void VktFrameProfilerLayer::VerifyAlignAndStoreResults(
             // Verify that the timestamps retrieved from the profiler appear to be valid.
             if (ValidateProfilerResult(currentResult) == true)
             {
+#if MANUAL_TIMESTAMP_CALIBRATION
                 // Now attempt to align the profiled GPU timestamps with the traced API calls on the CPU.
                 bool bAlignedSuccessfully = AlignProfilerResultWithCPUTimeline(currentResult, pTimestampPair, frameStartTime);
-
-                // @TODO - remove
-                bAlignedSuccessfully = true;
+#else
+                bool bAlignedSuccessfully = true;
+#endif
 
                 // @TODO - determine if this is what we want to do
                 // Make zero-duration case equal to 1 clock cycle
@@ -437,40 +440,82 @@ bool VktFrameProfilerLayer::AlignProfilerResultWithCPUTimeline(ProfilerResult& i
 
 //-----------------------------------------------------------------------------
 /// Collect and store calibration timestamps from the CPU and GPU to align execution results in a single timeline.
-/// \param inSubmissionQueue The Queue responsible for work submission.
-/// \param ioTimestamps The timestamps structure used to hold timestamps occurring before and after workload execution.
+/// \param pWrappedQueue The Queue responsible for work submission.
+/// \param pTimestamps The timestamps structure used to hold timestamps occurring before and after workload execution.
 //-----------------------------------------------------------------------------
-void VktFrameProfilerLayer::CollectCalibrationTimestamps(VktWrappedQueue* inSubmissionQueue, CalibrationTimestampPair* ioTimestamps)
+VkResult VktFrameProfilerLayer::CollectCalibrationTimestamps(VktWrappedQueue* pWrappedQueue, CalibrationTimestampPair* pTimestamps)
 {
-    UNREFERENCED_PARAMETER(inSubmissionQueue);
-    UNREFERENCED_PARAMETER(ioTimestamps);
+    VkResult result = VK_INCOMPLETE;
 
-    // @TODO - implement
-    //// Collect the GPU clock calibration timestamps.
-    //UINT64 gpuTime;
-    //UINT64 cpuTime;
+#if MANUAL_TIMESTAMP_CALIBRATION
+    if ((pWrappedQueue != nullptr) && (pTimestamps != nullptr))
+    {
+        VkQueue queue = pWrappedQueue->AppHandle();
+        VkDevice device = pWrappedQueue->ParentDevice();
 
-    //HRESULT gotClockCalibration = inSubmissionQueue->mRealCommandQueue->GetClockCalibration(&gpuTime, &cpuTime);
+        TimestampedCmdBufConfig config = {};
+        config.device           = device;
+        config.physicalDevice   = pWrappedQueue->PhysicalDevice();
+        config.mapTimestampMem  = false;
+        config.pipelineLoc      = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+        config.queueFamilyIndex = pWrappedQueue->GetQueueFamilyIndex();
 
-    //if (gotClockCalibration != S_OK)
-    //{
-    //    Log(logWARNING, "Call to ID3D12CommandQueue->GetClockCalibration failed when attempting to collect device calibration timestamps.\n");
-    //}
+        VktTimestampedCmdBuf* pTimestampedCmdBuf = VktTimestampedCmdBuf::Create(config);
 
-    //// Collect the clock frequency for this GPU queue.
-    //UINT64 queueFrequency;
-    //HRESULT gotDeviceFrequency = inSubmissionQueue->mRealCommandQueue->GetTimestampFrequency(&queueFrequency);
+        if (pTimestampedCmdBuf != nullptr)
+        {
+            const VkCommandBuffer cmdBufs[] = { pTimestampedCmdBuf->CmdBufHandle() };
 
-    //if (gotDeviceFrequency != S_OK)
-    //{
-    //    Log(logERROR, "Failed to query GPU frequency. CPU and GPU timestamps may be misaligned as a side-effect.\n");
-    //}
+            VkSubmitInfo submitInfo = {};
+            submitInfo.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+            submitInfo.pNext                = nullptr;
+            submitInfo.waitSemaphoreCount   = 0;
+            submitInfo.pWaitSemaphores      = nullptr;
+            submitInfo.pWaitDstStageMask    = nullptr;
+            submitInfo.commandBufferCount   = 1;
+            submitInfo.pCommandBuffers      = cmdBufs;
+            submitInfo.signalSemaphoreCount = 0;
+            submitInfo.pSignalSemaphores    = nullptr;
 
-    //// Dump the results into the output structure
-    //ioTimestamps->mBeforeExecutionGPUTimestamp = gpuTime;
-    //ioTimestamps->mBeforeExecutionCPUTimestamp = cpuTime;
+            VkFence fence = VK_NULL_HANDLE;
+            VkFenceCreateInfo fenceCreateInfo = {};
+            result = device_dispatch_table(queue)->CreateFence(device, &fenceCreateInfo, nullptr, &fence);
 
-    //ioTimestamps->mQueueFrequency = queueFrequency;
+            if (result == VK_SUCCESS)
+            {
+                LARGE_INTEGER largeInt = {};
+
+                result = pWrappedQueue->QueueSubmit_ICD(queue, 1, &submitInfo, fence);
+                VKT_ASSERT(result == VK_SUCCESS);
+
+                VkResult waitResult = VK_TIMEOUT;
+                do
+                {
+                    waitResult = device_dispatch_table(device)->WaitForFences(device, 1, &fence, VK_TRUE, GPU_FENCE_TIMEOUT_TIME);
+                } while (waitResult == VK_TIMEOUT);
+
+                // Fetch the GPU counter
+                pTimestampedCmdBuf->GetTimestampResult(&pTimestamps->mBeforeExecutionGPUTimestamp);
+
+#ifdef WIN32
+                // Immediately after, fetch the CPU counter
+                QueryPerformanceCounter(&largeInt);
+
+                pTimestamps->mBeforeExecutionCPUTimestamp = largeInt.QuadPart;
+#endif
+
+                pTimestamps->mQueueFrequency = (UINT64)pWrappedQueue->GetTimestampFrequency();
+
+                device_dispatch_table(device)->DestroyFence(device, fence, nullptr);
+            }
+
+            delete pTimestampedCmdBuf;
+            pTimestampedCmdBuf = nullptr;
+        }
+    }
+#endif
+
+    return result;
 }
 
 //-----------------------------------------------------------------------------

@@ -67,6 +67,9 @@
     <ClCompile Include="..\..\Server\VulkanServer\VKT\Profiling\vktCmdBufProfilerStatic.cpp">
       <Filter>VKT\Profiling</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Server\VulkanServer\VKT\Profiling\vktTimestampedCmdBuf.cpp">
+      <Filter>VKT\Profiling</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Server\VulkanServer\VKT\Objects\vktWrappedObjectDatabase.h">
@@ -145,6 +148,9 @@
       <Filter>LunarG</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Server\VulkanServer\VKT\Profiling\vktCmdBufProfilerStatic.h">
+      <Filter>VKT\Profiling</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Server\VulkanServer\VKT\Profiling\vktTimestampedCmdBuf.h">
       <Filter>VKT\Profiling</Filter>
     </ClInclude>
   </ItemGroup>
