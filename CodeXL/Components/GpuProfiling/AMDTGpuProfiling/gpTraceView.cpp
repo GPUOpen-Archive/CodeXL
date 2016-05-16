@@ -581,7 +581,10 @@ void gpTraceView::SetProfileDataModel(gpTraceDataModel* pDataModel)
         GT_ASSERT(rc);
         rc = connect(m_pTimeline, SIGNAL(itemDoubleClicked(acTimelineItem*)), this, SLOT(OnTimelineItemActivated(acTimelineItem*)));
         GT_ASSERT(rc);
-
+        rc = connect(m_pRibbonManager, SIGNAL(ShowTimeLine(bool, double)), m_pNavigationRibbon->NavigationChart(), SLOT(OnShowTimeLine(bool, double)));
+        GT_ASSERT(rc);
+        rc = connect(m_pNavigationRibbon->NavigationChart(), SIGNAL(ShowTimeLine(bool, double)), m_pRibbonManager, SLOT(OnShowTimeLine(bool, double)));
+        GT_ASSERT(rc);
     }
 }
 void gpTraceView::OnTimelineRangeChanged()

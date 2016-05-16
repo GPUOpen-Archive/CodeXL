@@ -140,6 +140,7 @@ void gpNavigationRibbon::InitLayout()
     m_pNavigationChart->SetMinimumRange(-0.01);
     m_pNavigationChart->SetNavigationUnitsX(acNavigationChart::eNavigationNanoseconds);
     m_pNavigationChart->SetUnitsDisplayType(acNavigationChart::eNavigationDisplayMilliOnly);
+    m_pNavigationChart->UseTimelineSync();
 
     pMainLayout->addWidget(m_pNavigationChart);
     pMainLayout->addStretch(1);
