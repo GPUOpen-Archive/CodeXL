@@ -162,7 +162,7 @@
       </SubSystem>
       <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
       <AdditionalDependencies>d3d12.lib;dxgi.lib;wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <DelayLoadDLLs>D3D12.DLL</DelayLoadDLLs>
+      <DelayLoadDLLs>D3D12.DLL;%(DelayLoadDLLs)</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -171,7 +171,7 @@
       </SubSystem>
       <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
       <AdditionalDependencies>d3d12.lib;dxgi.lib;wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <DelayLoadDLLs>D3D12.DLL</DelayLoadDLLs>
+      <DelayLoadDLLs>D3D12.DLL;%(DelayLoadDLLs)</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -181,7 +181,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
       <AdditionalDependencies>d3d12.lib;dxgi.lib;wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <DelayLoadDLLs>D3D12.DLL</DelayLoadDLLs>
+      <DelayLoadDLLs>D3D12.DLL;%(DelayLoadDLLs)</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -191,7 +191,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
       <AdditionalDependencies>d3d12.lib;dxgi.lib;wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <DelayLoadDLLs>D3D12.DLL</DelayLoadDLLs>
+      <DelayLoadDLLs>D3D12.DLL;%(DelayLoadDLLs)</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
