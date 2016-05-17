@@ -476,14 +476,13 @@ if [ -d $CODEXLOUTPUTDBG ]; then
    fi
 fi
 
+cd $BUILD_PATH
+rm -f ./*.tgz
+
 #-----------------------------------------
 # zip
 #-----------------------------------------
 if $bZip || $bZipOnly ; then
-   if [ ! -e $BUILD_PATH ]; then
-      mkdir $BUILD_PATH
-   fi
-
    cd $BUILD_PATH
    rm -f ./*.tgz
 
