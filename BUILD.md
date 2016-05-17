@@ -70,3 +70,4 @@ Install glibc
   * __skip-hsaprofiler__: skips building the HSA profiler binaries. If building on a system where you don't have HSA/ROCR header files, use this switch to avoid errors due to missing header files
   * __hsadir <dir>__: by default, when building the HSA Profiler binaries, the build scripts will look for the HSA/ROCR headers under /opt/rocm/hsa.  You can override this location using the "hsadir" switch.
   * __quick__ or __incremental__: performs an incremental build (as opposed to a from-scratch build)
+  * __clean__: performs a "clean" of all build targets, removing all intermediate and final output files 
