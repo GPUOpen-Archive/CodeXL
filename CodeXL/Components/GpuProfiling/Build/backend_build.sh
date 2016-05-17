@@ -4,6 +4,7 @@
 SPROOT=`dirname $(readlink -f "$0")`/..
 
 # Command line args
+echo "Command line arguments passed to backend_build.sh: $@"
 
 # Build Framework (BaseTools/OSWrappers) -- only makes sense to skip if doing an incremental build
 bBuildFramework=true
