@@ -3732,20 +3732,18 @@ void kaApplicationTreeHandler::BuildMenuForProgramItem(const afApplicationTreeIt
             QString removeProgramMenuStr = QString(KA_STR_removeProgramFromProjectASCII).arg(acGTStringToQString(pKAData->GetProgram()->GetProgramName()));
             m_pRemoveAction->setText(removeProgramMenuStr);
 
-            if (pProgram != nullptr && pProgram->HasFile())
+            GT_IF_WITH_ASSERT(pProgram != nullptr)
             {
-                QString buildMenuStr = GetBuildCommandString(pKAData, pItemData->m_itemType);
-                m_pBuildAction->setText(buildMenuStr);
-                menu.addAction(m_pBuildAction);
-                menu.addSeparator();
-            }
+                if (pProgram->HasFile())
+                {
+                    QString buildMenuStr = GetBuildCommandString(pKAData, pItemData->m_itemType);
+                    m_pBuildAction->setText(buildMenuStr);
+                    menu.addAction(m_pBuildAction);
+                    menu.addSeparator();
+                }
 
-
-            menu.addAction(m_pRenameFileAction);
-            menu.addAction(m_pRemoveAction);
-
-            if (pProgram != nullptr)
-            {
+                menu.addAction(m_pRenameFileAction);
+                menu.addAction(m_pRemoveAction);
                 kaProgramTypes programType = pProgram->GetBuildType();
 
                 if (programType == kaProgramCL || programType == kaProgramDX)
@@ -3754,19 +3752,23 @@ void kaApplicationTreeHandler::BuildMenuForProgramItem(const afApplicationTreeIt
                     menu.addAction(m_pNewAction);
                     menu.addAction(m_pAddAction);
                 }
-            }
-
-            GT_IF_WITH_ASSERT(pProgram != nullptr)
-            {
+              
                 if (
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
                     KA_PROJECT_DATA_MGR_INSTANCE.IsBuilt(pProgram, kaBuildArch32_bit) ||
 #endif
                     KA_PROJECT_DATA_MGR_INSTANCE.IsBuilt(pProgram, kaBuildArch64_bit))
                 {
-                    m_pExportAction->setEnabled(true);
-                    menu.addSeparator();
-                    menu.addAction(m_pExportAction);
+
+
+                    bool isExportAvailable = ((programType != kaProgramVK_Compute) && (programType != kaProgramVK_Rendering));
+                    // Currently exporting for Vulkan is not supported
+                    if (isExportAvailable)
+                    {
+                        m_pExportAction->setEnabled(isExportAvailable);
+                        menu.addSeparator();
+                        menu.addAction(m_pExportAction);
+                    }
                 }
             }
         }
