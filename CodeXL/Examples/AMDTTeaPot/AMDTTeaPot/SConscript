@@ -21,7 +21,6 @@ env.Append( CPPPATH = [
     "../AMDTTeaPotLib",
     env['CXL_commonproj_dir'] + "/AMDTOSWrappers/Include",
     env['CXL_commonproj_dir'] + "/AMDT/Include",
-    "/usr/include/FL",
     "/usr/include/GL",
     "/usr/include/freetype2",
     "/usr/include/libpng12",
