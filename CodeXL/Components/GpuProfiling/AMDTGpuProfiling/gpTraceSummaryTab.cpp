@@ -656,7 +656,7 @@ void gpCommandListSummaryTab::FillTop20List(CallIndexId apiCall, const QString& 
 
         for (auto apiIndex : currCommandList.m_apiIndices)
         {
-            ProfileSessionDataItem* pItem = m_pSessionDataContainer->GPUItemByItemCallIndex(currCommandList.m_queueName, apiIndex+1);// NZ???
+            ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItemByItemCallIndex(currCommandList.m_queueName, apiIndex+1);// NZ???
             GT_IF_WITH_ASSERT(pItem != nullptr)
             {
                 m_top20ItemList.push_back(pItem);
