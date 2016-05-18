@@ -303,6 +303,11 @@ public:
     /// \return true for success (false if this is not a DX12 item)
     bool GetDX12APIType(eAPIType& apiType);
 
+    /// Return the Vulkan api type
+    /// \param apiType[out] the api type
+    /// \return true for success (false if this is not a DX12 item)
+    bool GetVKAPIType(vkAPIType& apiType);
+
     /// Get the item sample id
     int GetSampleId()const { return m_sampleId; }
 

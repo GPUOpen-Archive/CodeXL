@@ -614,6 +614,28 @@ bool ProfileSessionDataItem::GetDX12APIType(eAPIType& apiType)
     return retVal;
 }
 
+bool ProfileSessionDataItem::GetVKAPIType(vkAPIType& apiType)
+{
+    bool retVal = false;
+
+    if ((m_itemType.m_itemMainType == DX12_API_PROFILE_ITEM) || (m_itemType.m_itemMainType == DX12_GPU_PROFILE_ITEM))
+    {
+        GT_IF_WITH_ASSERT(m_pApiInfo != nullptr)
+        {
+            // Downcast the API info class
+            VKAPIInfo* pVKAPIInfo = dynamic_cast<VKAPIInfo*>(m_pApiInfo);
+            GT_IF_WITH_ASSERT(pVKAPIInfo)
+            {
+                // Get the API type from the VKAPIInfo
+                apiType = pVKAPIInfo->m_apiType;
+                retVal = true;
+            }
+        }
+    }
+
+    return retVal;
+}
+
 ProfileSessionDataItem::~ProfileSessionDataItem()
 {
     qDeleteAll(m_children);
