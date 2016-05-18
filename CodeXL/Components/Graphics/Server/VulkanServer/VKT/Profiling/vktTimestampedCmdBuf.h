@@ -35,6 +35,7 @@ public:
 
     VkResult GetTimestampResult(UINT64* pOutClock);
 
+    /// Fetch the a handle to the backing command buffer
     VkCommandBuffer CmdBufHandle() { return m_cmdBuf; }
 
 private:
@@ -49,10 +50,16 @@ private:
     /// Device dispatch table
     VkLayerDispatchTable* m_pDeviceDT;
 
+    /// Configuration for this command buffer wrapper
     TimestampedCmdBufConfig m_config;
 
+    /// Internal command pool
     VkCommandPool        m_cmdPool;
+
+    /// Internal command buffer which will fetch a timestamp
     VkCommandBuffer      m_cmdBuf;
+
+    /// Collection of GPU resources used to get a timestamp
     ProfilerGpuResources m_gpuRes;
 
     /// GPU memory heap properties

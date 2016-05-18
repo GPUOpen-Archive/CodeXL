@@ -93,7 +93,7 @@ VktWrappedQueue::VktWrappedQueue(const WrappedQueueCreateInfo& createInfo) :
 /// Fill a vector with all wrapped command buffers.
 /// \param submitCount The number of submits in this submission.
 /// \param pSubmits The array of VkSubmitInfo structures.
-/// \param cmdBufsWithProfiledCalls An array of CommandBuffers with profiled calls.
+/// \param wrappedCmdBufs A vector of command buffers being executed.
 //-----------------------------------------------------------------------------
 void VktWrappedQueue::GatherWrappedCommandBufs(
     uint32_t                        submitCount,
@@ -126,9 +126,9 @@ void VktWrappedQueue::GatherWrappedCommandBufs(
 /// Spawn a worker thread to gather GPU profiler results.
 /// \param pTimestampPair A pair of calibration timestamps used to align CPU and GPU timelines.
 /// \param pQueue The Queue responsible for executed the profiled workload.
-/// \param fenceToWaitOn The fence we want to wait on
-/// \param internalFence True if the fence we're waiting on was created by VulkanServer
-/// \param cmdBufsWithProfiledCalls The array of CommandBuffers being executed.
+/// \param fenceToWaitOn The fence we want to wait on.
+/// \param internalFence True if the fence we're waiting on was created by VulkanServer.
+/// \param cmdBufs A vector of command buffers being executed.
 //-----------------------------------------------------------------------------
 void VktWrappedQueue::SpawnWorker(
     CalibrationTimestampPair*            pTimestampPair,

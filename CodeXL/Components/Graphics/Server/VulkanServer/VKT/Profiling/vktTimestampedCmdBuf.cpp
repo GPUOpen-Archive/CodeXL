@@ -27,6 +27,7 @@ VktTimestampedCmdBuf* VktTimestampedCmdBuf::Create(const TimestampedCmdBufConfig
 
     return pOut;
 }
+
 //-----------------------------------------------------------------------------
 /// Constructor.
 //-----------------------------------------------------------------------------
@@ -227,7 +228,6 @@ VkResult VktTimestampedCmdBuf::Init(const TimestampedCmdBufConfig& config)   ///
 
     return result;
 }
-
 
 //-----------------------------------------------------------------------------
 /// Find a memory type from available heaps.

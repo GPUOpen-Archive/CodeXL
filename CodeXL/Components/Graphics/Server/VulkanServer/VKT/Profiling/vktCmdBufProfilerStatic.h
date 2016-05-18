@@ -29,6 +29,7 @@ public:
 private:
     virtual VkResult ResetProfilerState() { return VK_SUCCESS; }
 
+    /// Track whether ths profiler created its GPU resources
     bool m_createdAssets;
 
 };

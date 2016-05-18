@@ -313,7 +313,7 @@ void VktWrappedCmdBuf::PrintCommands()
 
 //-----------------------------------------------------------------------------
 /// Initialize a profiler per-command buffer.
-/// \param queuedRelease Use a queue to release resources.
+/// \param profilerType Either a static or dynamic profiler.
 /// \returns A new profiler instance to be used for this command buffer.
 //-----------------------------------------------------------------------------
 VktCmdBufProfiler* VktWrappedCmdBuf::InitNewProfiler(ProfilerType profilerType)

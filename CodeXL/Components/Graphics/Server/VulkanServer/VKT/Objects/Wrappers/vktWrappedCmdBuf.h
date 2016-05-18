@@ -69,6 +69,7 @@ public:
     VkResult EndCommandBuffer(VkCommandBuffer commandBuffer);
     VkResult ResetCommandBuffer(VkCommandBuffer commandBuffer, VkCommandBufferResetFlags flags);
 
+    /// Keep track of how many times this command buffer was submitted
     void IncrementSubmitCount() { m_submitNumber++; }
 
 #if TRACK_CMD_LIST_COMMANDS
