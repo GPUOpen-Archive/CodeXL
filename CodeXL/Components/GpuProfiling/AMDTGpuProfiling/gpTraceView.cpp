@@ -222,9 +222,15 @@ bool gpTraceView::DisplaySession(const osFilePath& sessionFilePath, afTreeItemTy
                             queueTypeStr = gpTraceDataContainer::CommandListTypeAsString(queueType);
 
                             // Create the queue table name
-                            QString queueDisplayName = ProfileSessionDataItem::QueueDisplayName(queueName);
-                            QString gpuObjectString = GPU_STR_timeline_QueueBranchName;
-                            QString tableCaption = QString(gpuObjectString).arg(queueTypeStr).arg(queueDisplayName);
+                            QString queueDisplayName = m_pSessionDataContainer->QueueNameFromPointer(queueName);
+
+                            QString tableCaption = queueDisplayName;
+                            if (queueTypeStr.isEmpty())
+                            {
+                                tableCaption.prepend(AF_STR_SpaceA);
+                                tableCaption.prepend(queueTypeStr);
+                            }
+                            
                             m_pGPUTraceTablesTabWidget->addTab(pTable, QIcon(), tableCaption);
                         }
                     }

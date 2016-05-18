@@ -32,8 +32,7 @@ gpTimeline::gpTimeline(QWidget* pParent, gpTraceView* pSessionView) : acTimeline
     m_pOpenCLBranch(nullptr),
     m_pHSABranch(nullptr),
     m_pCPUTimelineBranch(nullptr),
-    m_pGPUTimelineBranch(nullptr),
-    m_pCommandListsBranch(nullptr)
+    m_pGPUTimelineBranch(nullptr)
 {
     // Since we deal with a single frame, we want the grid to draw precise time labels
     SetGridLabelsPrecision(5);
@@ -120,26 +119,36 @@ void gpTimeline::BuildTimeline(gpTraceDataContainer* pDataContainer)
         {
             for (auto i = m_gpuBranchesMap.begin(); i != m_gpuBranchesMap.end(); ++i)
             {
-                m_pGPUTimelineBranch->addSubBranch(*i);
+                QueueBranches queueBranches = i.value();
+
+                if (queueBranches.m_pQueueRootBranch == nullptr)
+                {
+                    // Create the queue branch name
+                    QString queueDisplayName = m_pSessionDataContainer->QueueNameFromPointer(i.key());
+
+                    // Append the queue type to the queue name in DX12 (irrelevant in Vulkan)
+                    if (m_pSessionDataContainer->SessionAPIType() == ProfileSessionDataItem::DX12_API_PROFILE_ITEM)
+                    {
+                        int queueType = m_pSessionDataContainer->QueueType(i.key());
+                        QString queueTypeStr = gpTraceDataContainer::CommandListTypeAsString(queueType);
+                        queueDisplayName.prepend(AF_STR_SpaceA);
+                        queueDisplayName.prepend(queueTypeStr);
+                    }
+
+                    // Create the queue root branch and add the API and command lists / buffers branches
+                    queueBranches.m_pQueueRootBranch = new acTimelineBranch();
+                    queueBranches.m_pQueueRootBranch->setText(queueDisplayName);
+
+                    queueBranches.m_pQueueRootBranch->addSubBranch(queueBranches.m_pQueueAPIBranch);
+                    queueBranches.m_pQueueRootBranch->addSubBranch(queueBranches.m_pQueueCommandListsBranch);
+
+                    m_pGPUTimelineBranch->addSubBranch(queueBranches.m_pQueueRootBranch);
+                }
             }
 
             addBranch(m_pGPUTimelineBranch);
 
             m_gpuBranchesMap.clear();
-        }
-
-        // Add the created branches and sub-branches. NOTICE: This can only be done at the end, since the start & end time are updated
-        // from a branch to its parent
-        if (!m_commandListsQueuesBranchesMap.isEmpty())
-        {
-            for (auto i = m_commandListsQueuesBranchesMap.begin(); i != m_commandListsQueuesBranchesMap.end(); ++i)
-            {
-                m_pCommandListsBranch->addSubBranch(*i);
-            }
-
-            addBranch(m_pCommandListsBranch);
-
-            m_commandListsQueuesBranchesMap.clear();
         }
 
         if (!m_oclCtxMap.isEmpty())
@@ -290,7 +299,8 @@ void gpTimeline::AddCommandListsToTimeline()
                 CommandListTimelineItem* pNewItem = new CommandListTimelineItem(commandListData.m_startTime, commandListData.m_endTime);
 
                 // Set the command list name as the item text
-                pNewItem->setText(commandListName);
+                QString commandListDisplayName = m_pSessionDataContainer->CommandListNameFromPointer(commandListName);
+                pNewItem->setText(commandListDisplayName);
 
                 // Get the color for this command list by its index
                 QColor commandListColor = APIColorMap::Instance()->GetCommandListColor(commandListIndex);
@@ -481,7 +491,6 @@ acAPITimelineItem* gpTimeline::CreateTimelineItem(ProfileSessionDataItem* pItem)
             else if (pItem->ItemType().m_itemMainType == ProfileSessionDataItem::VK_GPU_PROFILE_ITEM)
             {
                 branchText = GPU_STR_TraceViewGPU;
-                gpuObjectName = pItem->CommandListPointer();
             }
 
             acTimelineBranch* pHostBranch = GetBranchForAPI(pItem->ThreadID(), gpuObjectName, branchText, pItem->ItemType().m_itemMainType);
@@ -615,40 +624,39 @@ acTimelineBranch* gpTimeline::GetBranchForAPI(osThreadId threadId, const QString
         m_pGPUTimelineBranch->setText(tr(GPU_STR_TraceViewGPU));
     }
 
-    if (m_pCommandListsBranch == nullptr)
-    {
-        m_pCommandListsBranch = new acTimelineBranch;
-        m_pCommandListsBranch->setText(tr(GPU_STR_TraceViewCommandLists));
-    }
-
     if ((itemType == ProfileSessionDataItem::DX12_GPU_PROFILE_ITEM) || (itemType == ProfileSessionDataItem::VK_GPU_PROFILE_ITEM))
     {
         QString queueTypeStr;
+
+        // Create the queue table name
+        QString queueDisplayName = m_pSessionDataContainer->QueueNameFromPointer(queueName);
+
         GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
         {
-            int queueType = m_pSessionDataContainer->QueueType(queueName);
-            queueTypeStr = gpTraceDataContainer::CommandListTypeAsString(queueType);
+            if (itemType == ProfileSessionDataItem::DX12_GPU_PROFILE_ITEM)
+            {
+                int queueType = m_pSessionDataContainer->QueueType(queueName);
+                queueTypeStr = gpTraceDataContainer::CommandListTypeAsString(queueType);
+                queueDisplayName.prepend(AF_STR_SpaceA);
+                queueDisplayName.prepend(queueTypeStr);
+            }
         }
-
-        // Create the queue branch name
-        QString queueDisplayName = ProfileSessionDataItem::QueueDisplayName(queueName);
-        QString gpuQueueLabel = QString(GPU_STR_timeline_QueueBranchName).arg(queueTypeStr).arg(queueDisplayName);
 
         // Get or create the queue root branch
         acTimelineBranch* pRootBranch = nullptr;
 
         if (m_gpuBranchesMap.contains(queueName))
         {
-            pRootBranch = m_gpuBranchesMap[queueName];
+            pRootBranch = m_gpuBranchesMap[queueName].m_pQueueAPIBranch;
         }
 
         if (pRootBranch == nullptr)
         {
             pRootBranch = new acTimelineBranch;
             pRootBranch->SetBGColor(QColor::fromRgb(230, 230, 230));
+            m_gpuBranchesMap[queueName].m_pQueueAPIBranch = pRootBranch;
 
-            pRootBranch->setText(gpuQueueLabel);
-            m_gpuBranchesMap.insert(queueName, pRootBranch);
+            pRootBranch->setText(GPU_STR_timeline_QueueAPICallsBranchName);
         }
 
         pRetVal = pRootBranch;
@@ -696,35 +704,20 @@ acTimelineBranch* gpTimeline::GetCommandListBranch(const QString& queueName)
 {
     acTimelineBranch* pRetVal = nullptr;
 
-    if (m_pCommandListsBranch == nullptr)
-    {
-        m_pCommandListsBranch = new acTimelineBranch;
-        m_pCommandListsBranch->setText(tr(GPU_STR_TraceViewCommandLists));
-    }
-    QString queueTypeStr;
-    GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
-    {
-        int queueType = m_pSessionDataContainer->QueueType(queueName);
-        queueTypeStr = gpTraceDataContainer::CommandListTypeAsString(queueType);
-    }
-
-    // Create the queue branch name
-    QString queueDisplayName = ProfileSessionDataItem::QueueDisplayName(queueName);
-    QString gpuQueueLabel = QString(GPU_STR_timeline_QueueBranchName).arg(queueTypeStr).arg(queueDisplayName);
-
     // Add or get the queue branch to the command lists branches as well
-    if (m_commandListsQueuesBranchesMap.contains(queueName))
+    if (m_gpuBranchesMap.contains(queueName))
     {
-        pRetVal = m_commandListsQueuesBranchesMap[queueName];
+        pRetVal = m_gpuBranchesMap[queueName].m_pQueueCommandListsBranch;
     }
 
-    else
+    if (pRetVal == nullptr)
     {
-        pRetVal = new acTimelineBranch;
+        m_gpuBranchesMap[queueName].m_pQueueCommandListsBranch = new acTimelineBranch;
+        pRetVal = m_gpuBranchesMap[queueName].m_pQueueCommandListsBranch;
         pRetVal->SetBGColor(QColor::fromRgb(230, 230, 230));
 
-        pRetVal->setText(gpuQueueLabel);
-        m_commandListsQueuesBranchesMap.insert(queueName, pRetVal);
+        QString branchName = (m_pSessionDataContainer->SessionAPIType() == ProfileSessionDataItem::DX12_API_PROFILE_ITEM) ? GPU_STR_timeline_CmdListsBranchName : GPU_STR_timeline_CmdBuffersBranchName;
+        pRetVal->setText(branchName);
     }
 
     return pRetVal;

@@ -396,7 +396,8 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
 
         m_data[ProfileSessionDataItem::SESSION_ITEM_PARAMETERS_COLUMN] = QString::fromStdString(pApiInfo->m_ArgList);
         m_data[ProfileSessionDataItem::SESSION_ITEM_RESULT_COLUMN] = QString::fromStdString(pApiInfo->m_strRet);
-        m_data[ProfileSessionDataItem::SESSION_ITEM_COMMAND_LIST_COLUMN] = QString::fromStdString(pApiInfo->m_commandListPtrStr);
+        m_data[ProfileSessionDataItem::SESSION_ITEM_COMMAND_LIST_COLUMN] = m_pSessionDataContainer->CommandListNameFromPointer(QString::fromStdString(pApiInfo->m_commandListPtrStr));
+
 
         // Set the start and end time. DX12 timestamps are stored in Nanoseconds
         m_startTime = pApiInfo->m_ullStart;
@@ -481,7 +482,7 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
     }
 
     // Sanity check:
-    GT_IF_WITH_ASSERT(m_pApiInfo != nullptr)
+    GT_IF_WITH_ASSERT((m_pApiInfo != nullptr) && (m_pSessionDataContainer != nullptr))
     {
         if (pApiInfo->m_bHasDisplayableSeqId)
         {
@@ -504,7 +505,7 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
 
         m_data[ProfileSessionDataItem::SESSION_ITEM_PARAMETERS_COLUMN] = QString::fromStdString(pApiInfo->m_ArgList);
         m_data[ProfileSessionDataItem::SESSION_ITEM_RESULT_COLUMN] = QString::fromStdString(pApiInfo->m_strRet);
-        m_data[ProfileSessionDataItem::SESSION_ITEM_COMMAND_BUFFER_COLUMN] = QString::fromStdString(pApiInfo->m_commandBufferPtrStr);
+        m_data[ProfileSessionDataItem::SESSION_ITEM_COMMAND_BUFFER_COLUMN] = m_pSessionDataContainer->CommandListNameFromPointer(QString::fromStdString(pApiInfo->m_commandBufferPtrStr));
 
         // Set the start and end time. DX12 timestamps are stored in Nanoseconds
         m_startTime = pApiInfo->m_ullStart;
@@ -605,6 +606,28 @@ bool ProfileSessionDataItem::GetDX12APIType(eAPIType& apiType)
             {
                 // Get the API type from the DX12APIInfo
                 apiType = pDX12ApiInfo->m_apiType;
+                retVal = true;
+            }
+        }
+    }
+
+    return retVal;
+}
+
+bool ProfileSessionDataItem::GetVKAPIType(vkAPIType& apiType)
+{
+    bool retVal = false;
+
+    if ((m_itemType.m_itemMainType == DX12_API_PROFILE_ITEM) || (m_itemType.m_itemMainType == DX12_GPU_PROFILE_ITEM))
+    {
+        GT_IF_WITH_ASSERT(m_pApiInfo != nullptr)
+        {
+            // Downcast the API info class
+            VKAPIInfo* pVKAPIInfo = dynamic_cast<VKAPIInfo*>(m_pApiInfo);
+            GT_IF_WITH_ASSERT(pVKAPIInfo)
+            {
+                // Get the API type from the VKAPIInfo
+                apiType = pVKAPIInfo->m_apiType;
                 retVal = true;
             }
         }
