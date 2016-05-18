@@ -487,6 +487,8 @@
 #define AF_STR_FindNext L"Find &Next\t" AF_STR_keyboardShortcutFindNextMenu
 #define AF_STR_FindPrev L"Find Pre&vious\t" AF_STR_keyboardShortcutFindPrevMenu
 #define AF_STR_FindNextA "Find &Next\t" AF_STR_keyboardShortcutFindNextMenuA
+#define AF_STR_GoTo L"&Go to...\t" AF_STR_keyboardShortcutGoToMenu
+#define AF_STR_GoToA "&Go to...\t" AF_STR_keyboardShortcutGoToMenuA
 #define AF_STR_MarkerNext L"Go to Next Marker\t" AF_STR_keyboardShortcutNextMarkerMenu
 #define AF_STR_MarkerPrevious L"Go to Previous Marker\t" AF_STR_keyboardShortcutPrevMarkerMenu
 #define AF_STR_CopyStatusbarString L"Copies the selection to the Clipboard"
@@ -499,6 +501,7 @@
 #define AF_STR_MarkerPreviousStatusbarString L"Previous: Scroll the Calls History View to the previous string marker function call"
 #define AF_STR_SelectAllStatusbarString L"Select all items in the view"
 #define AF_STR_ShowLineNumbersStatusbarString L"Show line numbers in source code view"
+#define AF_STR_GoToStatusbarString L"Go to line"
 
 // Main menu:
 #define AF_STR_ProfileMenuString L"&Profile"
@@ -579,6 +582,9 @@
 #define AF_STR_keyboardShortcutDeleteMenuA "Del"
 #define AF_STR_keyboardShortcutDeleteMenu L"Del"
 #define AF_STR_keyboardShortcutDeleteString L"Del"
+#define AF_STR_keyboardShortcutGoToMenu L"Ctrl+G"
+#define AF_STR_keyboardShortcutGoToMenuA "Ctrl+G"
+#define AF_STR_keyboardShortcutGoToString L"Ctrl + G"
 
 // Edit environment variables:
 #define AF_STR_EditVariablesDialogTitle "Edit Environment Variables"

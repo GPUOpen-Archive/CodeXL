@@ -30,6 +30,7 @@
 #include <AMDTAPIClasses/Include/Events/apBreakpointsUpdatedEvent.h>
 #include <AMDTApplicationComponents/Include/acFindWidget.h>
 #include <AMDTApplicationComponents/Include/acFunctions.h>
+#include <AMDTApplicationComponents/Include/acGoToLineDialog.h>
 
 // AMDTApplicationFramework:
 #include <AMDTApplicationFramework/Include/afApplicationCommands.h>
@@ -1048,4 +1049,37 @@ void afSourceCodeView::GetSelectedText(gtString& selectedText)
     selectedText = acQStringToGTString(text);
 }
 
+void afSourceCodeView::OnGoToLine()
+{
+    unsigned int lineCount = lines();
+    int currentLine = 0;
+    int currentLineIndex = 0;
+    getCursorPosition(&currentLine, &currentLineIndex);
+
+    acGoToLineDialog dlg(nullptr, lineCount);
+
+    int rc = afApplicationCommands::instance()->showModal(&dlg);
+
+    if (QDialog::Accepted == rc)
+    {
+        unsigned int selectedLine = dlg.GetLineNumber();
+        setCursorPosition(selectedLine, 0);
+
+        // set selected line in the middle of the page if possible
+        if (selectedLine > (unsigned int)currentLine)
+        {
+            // moving up
+            int firstLine = firstVisibleLine();
+            int lineToSelect = firstLine + (selectedLine - firstLine) / 2 - 1;
+            setFirstVisibleLine(lineToSelect);
+        }
+        else
+        {
+            // moving down : need to fix 
+            setFirstVisibleLine(selectedLine-20);
+            ensureLineVisible(selectedLine);
+        }
+    }
+
+}
 // ---------------------------------------------------------------------------

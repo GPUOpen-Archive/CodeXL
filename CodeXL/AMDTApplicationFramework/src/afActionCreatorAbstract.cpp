@@ -359,6 +359,12 @@ bool afActionCreatorAbstract::actionText(int actionIndex, gtString& caption, gtS
             tooltip = AF_STR_saveFileAsStatusbarString;
             break;
 
+            case ID_GO_TO:
+            caption = AF_STR_GoTo;
+            tooltip = AF_STR_GoToStatusbarString;
+            keyboardShortcut = AF_STR_keyboardShortcutGoToMenu;
+            break;
+
         default:
             GT_ASSERT(false);
             retVal = false;

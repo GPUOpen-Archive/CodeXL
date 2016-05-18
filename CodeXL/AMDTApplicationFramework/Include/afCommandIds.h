@@ -24,6 +24,7 @@ enum afGeneralCommmands
     ID_SHOW_LINE_NUMBERS,
     AF_ID_SAVE_FILE,
     AF_ID_SAVE_FILE_AS,
+    ID_GO_TO,
 
     AF_ID_NEW_PROJECT,
     AF_ID_OPEN_STARTUP_PAGE,

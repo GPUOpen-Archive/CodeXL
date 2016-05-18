@@ -56,6 +56,7 @@ void afGeneralActionsCreator::populateSupportedCommandIds()
     m_supportedCommandIds.push_back(ID_SELECT_ALL);
     m_supportedCommandIds.push_back(AF_ID_SAVE_FILE);
     m_supportedCommandIds.push_back(AF_ID_SAVE_FILE_AS);
+    m_supportedCommandIds.push_back(ID_GO_TO);
 }
 
 // ---------------------------------------------------------------------------
@@ -93,6 +94,7 @@ gtString afGeneralActionsCreator::menuPosition(int actionIndex, afActionPosition
 
         case ID_FIND:
         case ID_SELECT_ALL:
+        case ID_GO_TO:
         {
             positionData.m_actionSeparatorType = afActionPositionData::AF_SEPARATOR_BEFORE_COMMAND;
             retVal = AF_STR_EditMenuString;

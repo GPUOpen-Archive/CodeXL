@@ -80,6 +80,8 @@ public slots:
     /// Is called when the main window find previous is clicked:
     virtual void onFindPrev();
 
+    void OnGoToLine();
+
 protected slots:
 
     void marginClicked(int margin, int line, Qt::KeyboardModifiers state);

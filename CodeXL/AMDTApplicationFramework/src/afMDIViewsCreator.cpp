@@ -615,6 +615,12 @@ void afMDIViewsCreator::handleTrigger(int viewIndex, int actionIndex)
                     m_pApplicationCommands->onFileSaveFileAs();
                     break;
 
+                case ID_GO_TO:
+                {
+                    pSourceCodeView->OnGoToLine();
+                }
+                break;
+
                 default:
                 {
                     GT_ASSERT_EX(false, L"Unsupported application command");
@@ -666,6 +672,7 @@ void afMDIViewsCreator::handleUiUpdate(int viewIndex, int actionIndex)
                 case ID_FIND_PREV:
                 case ID_FIND:
                 case ID_SELECT_ALL:
+                case ID_GO_TO:
                     isActionEnabled = true;
                     break;
 
