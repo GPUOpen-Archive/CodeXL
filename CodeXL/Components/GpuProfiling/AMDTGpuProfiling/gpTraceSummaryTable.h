@@ -111,9 +111,9 @@ public:
         if (0 != m_numCalls)
         {
             membersStringsList << m_address;
+            membersStringsList << QString::number(m_executionTimeMS, 'f', 6);
             membersStringsList << QString::number(m_minTimeMs, 'f', 6);
             membersStringsList << QString::number(m_maxTimeMs, 'f', 6);
-            membersStringsList << QString::number(m_executionTimeMS, 'f', 6);
             membersStringsList << QString::number(m_numCalls);
             membersStringsList << m_gpuQueue;
         }
@@ -289,9 +289,9 @@ public:
     enum CommandListSummaryColumnIndex
     {
         COLUMN_ADDRESS,
+        COLUMN_EXECUTION_TIME,
         COLUMN_START_TIME,
         COLUMN_END_TIME,
-        COLUMN_EXECUTION_TIME,
         COLUMN_NUM_OF_COMMANDS,
         COLUMN_GPU_QUEUE,
         COLUMN_COUNT

@@ -591,9 +591,9 @@ gpCommandListSummaryTable::gpCommandListSummaryTable(gpTraceDataContainer* pData
 {
     QStringList columnCaptions;
     columnCaptions << GP_STR_SummaryTableCommandListAddress;
+    columnCaptions << GP_STR_SummaryTableCommandListExecutionTime;
     columnCaptions << GP_STR_SummaryTableCommandListStartTime;
     columnCaptions << GP_STR_SummaryTableCommandListEndTime;
-    columnCaptions << GP_STR_SummaryTableCommandListExecutionTime;
     columnCaptions << GP_STR_SummaryTableCommandListNumCommands;
     columnCaptions << GP_STR_SummaryTableCommandListGPUQueue;
     initHeaders(columnCaptions, false);
@@ -792,9 +792,9 @@ bool gpCommandListSummaryTable::GetItemCommandList(int row, QString& callName)co
         callName = pItemInterface->text();
         return true;
     }
-
     return false;
 }
+
 bool gpCommandListSummaryTable::GetItemQueueName(int row, QString& queueName)const
 {
     // Get the table widget item:

@@ -129,13 +129,15 @@ class gpTraceSummaryTab : public gpSummaryTab
 public:
     gpTraceSummaryTab(eCallType callType) :gpSummaryTab(callType) {}
     virtual void RefreshAndMaintainSelection(bool check);
-    public slots :
+
+public slots :
     /// Handles selection change in summary table: updates top20 table accordingly
     virtual void OnSummaryTableSelectionChanged();
     virtual void OnTop20TableCellDoubleClicked(int row, int col);
+    virtual void OnSummaryTableCellClicked(int row, int col);
+    virtual void OnSummaryTableCellDoubleClicked(int, int) {}
 
 protected:
-    virtual void OnSummaryTableCellClicked(int row, int col);
     virtual void FillTop20List(CallIndexId callIndex, const QString& callName);
     virtual void SetTop20TableCaption(const QString& callName);
 
@@ -147,10 +149,11 @@ class gpCommandListSummaryTab : public gpSummaryTab
 public:
     gpCommandListSummaryTab(eCallType callType) :gpSummaryTab(callType) {}
     virtual void RefreshAndMaintainSelection(bool check);
-    public slots :
+public slots :
     /// Handles selection change in summary table: updates top20 table accordingly
     virtual void OnSummaryTableSelectionChanged();
     virtual void OnSummaryTableCellClicked(int row, int col);
+    virtual void OnSummaryTableCellDoubleClicked(int row, int col);
     virtual void OnTop20TableCellDoubleClicked(int row, int col);
     void SelectCommandList(const QString& commandListName);
 

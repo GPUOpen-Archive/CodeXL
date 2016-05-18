@@ -62,6 +62,8 @@ bool gpSummaryTab::Init(gpTraceDataContainer* pDataContainer, gpTraceView* pSess
     GT_ASSERT(rc);
     rc = connect(m_pSummaryTable, SIGNAL(cellClicked(int, int)), this, SLOT(OnSummaryTableCellClicked(int, int)));
     GT_ASSERT(rc);
+    rc = connect(m_pSummaryTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(OnSummaryTableCellDoubleClicked(int, int)));
+    GT_ASSERT(rc);
     rc = connect(m_pTop20Table, SIGNAL(cellClicked(int, int)), this, SLOT(OnTop20TableCellClicked(int, int)));
     GT_ASSERT(rc);
     rc = connect(m_pTop20Table, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(OnTop20TableCellDoubleClicked(int, int)));
@@ -258,9 +260,7 @@ void gpTraceSummaryTab::OnSummaryTableCellClicked(int row, int col)
     GT_UNREFERENCED_PARAMETER(col);
     GT_IF_WITH_ASSERT(m_pTraceView != nullptr && m_pSummaryTable != nullptr)
     {
-        gpTraceSummaryTable* pSummaryTable = dynamic_cast<gpTraceSummaryTable*>(m_pSummaryTable);
-        GT_ASSERT(pSummaryTable != nullptr);
-        ProfileSessionDataItem* pItem = pSummaryTable->GetRelatedItem(row, col);
+        ProfileSessionDataItem* pItem = m_pSummaryTable->GetRelatedItem(row, col);
         SyncSelectionInOtherControls(pItem);
     }
 }
@@ -510,31 +510,34 @@ void gpTraceSummaryTab::FillTop20List(CallIndexId apiCall, const QString& callNa
 
 void gpTraceSummaryTab::SetTop20TableCaption(const QString& callName)
 {
-    int numItems = m_top20ItemList.count();
-    if (numItems < MAX_ITEMS_IN_TABLE)
+    GT_IF_WITH_ASSERT(m_pTop20Caption != nullptr)
     {
-        if (m_callType == API_CALL)
+        int numItems = m_top20ItemList.count();
+        if (numItems < MAX_ITEMS_IN_TABLE)
         {
-            m_pTop20Caption->setText(QString(GPU_STR_Top_Cpu_Calls_Summary).arg(callName));
+            if (m_callType == API_CALL)
+            {
+                m_pTop20Caption->setText(QString(GPU_STR_Top_Cpu_Calls_Summary).arg(callName));
+            }
+            else
+            {
+                m_pTop20Caption->setText(QString(GPU_STR_Top_Gpu_Calls_Summary).arg(callName));
+            }
         }
         else
         {
-            m_pTop20Caption->setText(QString(GPU_STR_Top_Gpu_Calls_Summary).arg(callName));
+            if (m_callType == API_CALL)
+            {
+                m_pTop20Caption->setText(QString(GPU_STR_Top_20_Cpu_Calls_Summary).arg(MAX_ITEMS_IN_TABLE).arg(callName));
+            }
+            else
+            {
+                m_pTop20Caption->setText(QString(GPU_STR_Top_20_Gpu_Calls_Summary).arg(MAX_ITEMS_IN_TABLE).arg(callName));
+            }
         }
     }
-    else
-    {
-        if (m_callType == API_CALL)
-        {
-            m_pTop20Caption->setText(QString(GPU_STR_Top_20_Cpu_Calls_Summary).arg(MAX_ITEMS_IN_TABLE).arg(callName));
-        }
-        else
-        {
-            m_pTop20Caption->setText(QString(GPU_STR_Top_20_Gpu_Calls_Summary).arg(MAX_ITEMS_IN_TABLE).arg(callName));
-        }
-    }
-
 }
+
 /////////////////////////////////////////////////////////////////////////////////////
 void gpCommandListSummaryTab::OnSummaryTableSelectionChanged()
 {
@@ -677,13 +680,33 @@ void gpCommandListSummaryTab::SelectCommandList(const QString& commandListName)
 
 void gpCommandListSummaryTab::SetTop20TableCaption(const QString& callName)
 {
-    int numItems = m_top20ItemList.count();
-    if (numItems < MAX_ITEMS_IN_TABLE)
+    GT_IF_WITH_ASSERT(m_pTop20Caption != nullptr)
     {
-        m_pTop20Caption->setText(QString(GPU_STR_Top_20_CommandLists_Summary).arg(callName));
-    }
-    else
-    {
-        m_pTop20Caption->setText(QString(GPU_STR_Top_CommandLists_Summary).arg(MAX_ITEMS_IN_TABLE).arg(callName));
+        int numItems = m_top20ItemList.count();
+        if (numItems < MAX_ITEMS_IN_TABLE)
+        {
+            m_pTop20Caption->setText(QString(GPU_STR_Top_CommandLists_Summary).arg(callName));
+        }
+        else
+        {
+            m_pTop20Caption->setText(QString(GPU_STR_Top_20_CommandLists_Summary).arg(MAX_ITEMS_IN_TABLE).arg(callName));
+        }
     }
 }
+
+void gpCommandListSummaryTab::OnSummaryTableCellDoubleClicked(int row, int col) 
+{
+    GT_UNREFERENCED_PARAMETER(col);
+    GT_IF_WITH_ASSERT(m_pTraceView != nullptr && m_pSummaryTable != nullptr)
+    {
+        gpCommandListSummaryTable* pSummaryTable = dynamic_cast<gpCommandListSummaryTable*>(m_pSummaryTable);
+        GT_ASSERT(pSummaryTable != nullptr);
+
+        QString commandListName;
+        if (pSummaryTable->GetItemCommandList(row, commandListName))
+        {
+            // TODO
+        }
+    }
+}
+

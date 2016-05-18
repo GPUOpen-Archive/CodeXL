@@ -619,7 +619,6 @@
 #define GPU_STR_Top_Cpu_Calls_Summary "Top %1 calls (CPU)"
 #define GPU_STR_Top_20_Gpu_Calls_Summary "Top %1 %2 calls (GPU)"
 #define GPU_STR_Top_Gpu_Calls_Summary "Top %1 calls (GPU)"
-
 #define GPU_STR_Top_20_CommandLists_Summary "Top %1 %2 command lists"
 #define GPU_STR_Top_CommandLists_Summary "Top %1 command lists"
 
