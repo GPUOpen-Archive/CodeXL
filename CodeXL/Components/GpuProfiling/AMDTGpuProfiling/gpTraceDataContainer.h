@@ -149,7 +149,7 @@ public:
     int ThreadPerfMarkersCount(osThreadId threadID) const;
 
     /// Return the GPU items count
-    int GPUItemsCount() const;
+    int QueueItemsCount() const;
 
     /// Return the API item in apiItemIndex for the thread in threadID
     ProfileSessionDataItem* APIItem(osThreadId threadID, int apiItemIndex) const;
@@ -183,22 +183,22 @@ public:
     QString GPUObjectName(int index);
 
     /// Return an integer number of describing the queue / command buffer type
-    int GPUObjectType(const QString& queueName);
+    int QueueType(const QString& queueName);
 
     /// Return the items count for the requested queue / command buffer
     /// \param gpuItemName the queue / command buffer name
     /// \return the items count for the requested queue
-    int GPUItemsCount(const QString& gpuItemName);
+    int QueueItemsCount(const QString& gpuItemName);
 
     /// Returns the item in m_sessionQueueToGPUDataItems which has the requested queue name and given index (n'th place in the list of items with the same queue name)
     /// \param gpuObjectName the requested queue / command buffer name
     /// \param apiItemIndex the requested index (n'th place in the list of items with the same queue name)
-    ProfileSessionDataItem* GPUItem(const QString& gpuObjectName, int apiItemIndex) const;
+    ProfileSessionDataItem* QueueItem(const QString& gpuObjectName, int apiItemIndex) const;
 
     /// Returns the item in m_sessionQueueToGPUDataItems which has the requested queue name and call index. This method is required when there is more than 1 queue, and the n'th place does not match the call index 
     /// \param queueName the requested queue name
     /// \param apiItemIndex the requested call index
-    ProfileSessionDataItem* GPUItemByItemCallIndex(const QString& queueName, int apiItemIndex) const;
+    ProfileSessionDataItem* QueueItemByItemCallIndex(const QString& queueName, int apiItemIndex) const;
 
     /// Return all API items with the given sampleId
     /// \param sampleId the requested sampleId
@@ -241,8 +241,8 @@ private:
     /// List of the CPU profile session data items
     QMap<osThreadId, QList<ProfileSessionDataItem*>> m_sessionCPUDataItems;
 
-    /// Map from DX12 Queue / Vulkan command buffer to the GPU profile session data items
-    QMap<std::string, QList<ProfileSessionDataItem*>> m_sessionGPUCallsMap;
+    /// Map from DX12 / Vulkan Queue to the GPU profile session data items
+    QMap<std::string, QList<ProfileSessionDataItem*>> m_sessionQueuesToCallsMap;
 
     /// Map queue name to command list type
     QMap<std::string, int> m_sessionQueueNameToCommandListType;

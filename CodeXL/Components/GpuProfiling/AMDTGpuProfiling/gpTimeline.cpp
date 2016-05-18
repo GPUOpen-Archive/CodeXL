@@ -227,13 +227,13 @@ void gpTimeline::AddQueueGPUApis(const QString& queueName)
     // Sanity check:
     GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
     {
-        int apiCount = m_pSessionDataContainer->GPUItemsCount(queueName);
+        int apiCount = m_pSessionDataContainer->QueueItemsCount(queueName);
         afProgressBarWrapper::instance().ShowProgressDialog(GPU_STR_TraceViewLoadingAPITimelineItems, apiCount);
 
         for (int i = 0; i < apiCount; i++)
         {
             // Get the current API item
-            ProfileSessionDataItem* pItem = m_pSessionDataContainer->GPUItem(queueName, i);
+            ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItem(queueName, i);
 
             // Sanity check:
             GT_IF_WITH_ASSERT(pItem != nullptr)
@@ -311,7 +311,7 @@ void gpTimeline::AddGPUItemsToTimeline()
     // Sanity check:
     GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
     {
-        int gpuItemsCount = m_pSessionDataContainer->GPUItemsCount();
+        int gpuItemsCount = m_pSessionDataContainer->QueueItemsCount();
         afProgressBarWrapper::instance().ShowProgressDialog(GPU_STR_TraceViewLoadingGPUTimelineItems, gpuItemsCount);
 
         for (int i = 0; i < gpuItemsCount; i++)
@@ -626,7 +626,7 @@ acTimelineBranch* gpTimeline::GetBranchForAPI(osThreadId threadId, const QString
         QString queueTypeStr;
         GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
         {
-            int queueType = m_pSessionDataContainer->GPUObjectType(queueName);
+            int queueType = m_pSessionDataContainer->QueueType(queueName);
             queueTypeStr = gpTraceDataContainer::CommandListTypeAsString(queueType);
         }
 
@@ -704,7 +704,7 @@ acTimelineBranch* gpTimeline::GetCommandListBranch(const QString& queueName)
     QString queueTypeStr;
     GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
     {
-        int queueType = m_pSessionDataContainer->GPUObjectType(queueName);
+        int queueType = m_pSessionDataContainer->QueueType(queueName);
         queueTypeStr = gpTraceDataContainer::CommandListTypeAsString(queueType);
     }
 

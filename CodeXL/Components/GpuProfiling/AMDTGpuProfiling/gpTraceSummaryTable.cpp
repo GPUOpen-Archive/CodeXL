@@ -412,12 +412,12 @@ void gpSummaryLogic::InitGPUItems(gpTraceDataContainer* pSessionDataContainer)
         {
             afProgressBarWrapper::instance().incrementProgressBar();
             QString queueName = pSessionDataContainer->GPUObjectName(i);
-            int apiCount = pSessionDataContainer->GPUItemsCount(queueName);
+            int apiCount = pSessionDataContainer->QueueItemsCount(queueName);
 
             for (int i = 0; i < apiCount; i++)
             {
                 // Get the current API item
-                ProfileSessionDataItem* pItem = pSessionDataContainer->GPUItem(queueName, i);
+                ProfileSessionDataItem* pItem = pSessionDataContainer->QueueItem(queueName, i);
                 GT_IF_WITH_ASSERT(pItem != nullptr)
                 {
                     unsigned int apiId;

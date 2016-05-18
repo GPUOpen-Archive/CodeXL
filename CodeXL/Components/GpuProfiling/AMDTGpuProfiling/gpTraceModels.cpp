@@ -409,7 +409,7 @@ int GPUTableModel::rowCount(const QModelIndex& parent) const
     {
         if (parent.column() <= 0)
         {
-            retVal = m_pSessionDataContainer->GPUItemsCount(m_queueName);
+            retVal = m_pSessionDataContainer->QueueItemsCount(m_queueName);
         }
 
     }
@@ -425,7 +425,7 @@ QModelIndex GPUTableModel::index(int row, int column, const QModelIndex& parent)
         // Sanity check:
         GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
         {
-            ProfileSessionDataItem* pItem = m_pSessionDataContainer->GPUItem(m_queueName, row);
+            ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItem(m_queueName, row);
 
             if (pItem != nullptr)
             {
@@ -444,7 +444,7 @@ ProfileSessionDataItem* GPUTableModel::GetItem(const QModelIndex& item) const
     // Sanity check:
     GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
     {
-        pRetVal = m_pSessionDataContainer->GPUItem(m_queueName, item.row());
+        pRetVal = m_pSessionDataContainer->QueueItem(m_queueName, item.row());
     }
 
     return pRetVal;
@@ -466,7 +466,7 @@ bool GPUTableModel::ExportToCSV(const QString& outputFilePath)
             QString queueFile = outputFilePath;
 
             QString queueTypeStr;
-            int queueType = m_pSessionDataContainer->GPUObjectType(queueName);
+            int queueType = m_pSessionDataContainer->QueueType(queueName);
             queueTypeStr = gpTraceDataContainer::CommandListTypeAsString(queueType);
 
             // Create the queue table name
@@ -489,7 +489,7 @@ bool GPUTableModel::ExportToCSV(const QString& outputFilePath)
 
 
                 // Get the row count:
-                int rowCount = m_pSessionDataContainer->GPUItemsCount(queueName);
+                int rowCount = m_pSessionDataContainer->QueueItemsCount(queueName);
                 int colCount = m_columnIndicesVec.count();
 
                 // Write the headers:
@@ -507,7 +507,7 @@ bool GPUTableModel::ExportToCSV(const QString& outputFilePath)
                 for (int row = 0; row < rowCount; ++row)
                 {
                     QString rowStr;
-                    ProfileSessionDataItem* pRowItem = m_pSessionDataContainer->GPUItem(queueName, row);
+                    ProfileSessionDataItem* pRowItem = m_pSessionDataContainer->QueueItem(queueName, row);
 
                     // Sanity check:
                     GT_IF_WITH_ASSERT(pRowItem != nullptr)

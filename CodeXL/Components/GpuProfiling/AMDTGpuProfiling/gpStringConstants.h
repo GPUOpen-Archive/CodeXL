@@ -486,7 +486,6 @@
 #define GPU_STR_timeline_QueueBranchNameWithParam "Queue (%1) - %2"
 #define GPU_STR_timeline_ContextBranchName "Context %1 (%2)"
 #define GPU_STR_timeline_QueueBranchName "%1 Queue %2"
-#define GPU_STR_timeline_CommandBufferBranchName "%1 Command Buffer %2"
 #define GPU_STR_timeline_ContextBranchNameWithParam "Queue %1 - %2 (%3)"
 #define GPU_STR_DXAPITimeline_tooltipLine1 "Call #%1<br>%2"
 #define GPU_STR_DXAPITimeline_tooltipLine2 "Time: %3 - %4 (%5ms)"

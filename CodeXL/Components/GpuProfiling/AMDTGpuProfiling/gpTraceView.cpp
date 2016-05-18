@@ -218,16 +218,12 @@ bool gpTraceView::DisplaySession(const osFilePath& sessionFilePath, afTreeItemTy
 
                             // Get the queue name from the queue name and type
                             QString queueTypeStr;
-                            int queueType = m_pSessionDataContainer->GPUObjectType(queueName);
+                            int queueType = m_pSessionDataContainer->QueueType(queueName);
                             queueTypeStr = gpTraceDataContainer::CommandListTypeAsString(queueType);
 
                             // Create the queue table name
                             QString queueDisplayName = ProfileSessionDataItem::QueueDisplayName(queueName);
                             QString gpuObjectString = GPU_STR_timeline_QueueBranchName;
-                            if (m_pSessionDataContainer->SessionAPIType() == ProfileSessionDataItem::VK_API_PROFILE_ITEM)
-                            {
-                                gpuObjectString = GPU_STR_timeline_CommandBufferBranchName;
-                            }
                             QString tableCaption = QString(gpuObjectString).arg(queueTypeStr).arg(queueDisplayName);
                             m_pGPUTraceTablesTabWidget->addTab(pTable, QIcon(), tableCaption);
                         }
@@ -612,7 +608,7 @@ void gpTraceView::OnTimelineItemActivated(acTimelineItem* pTimelineItem)
                 if (!callId.m_queueName.isEmpty())
                 {
                     // This is a GPU item, get it from the data container
-                    pMatchingItem = m_pSessionDataContainer->GPUItemByItemCallIndex(callId.m_queueName, callId.m_callIndex);
+                    pMatchingItem = m_pSessionDataContainer->QueueItemByItemCallIndex(callId.m_queueName, callId.m_callIndex);
                 }
                 else
                 {

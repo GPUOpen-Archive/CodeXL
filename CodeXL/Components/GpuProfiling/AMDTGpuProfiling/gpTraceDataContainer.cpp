@@ -46,9 +46,9 @@ gpTraceDataContainer::~gpTraceDataContainer()
         delete(*cpuIter);
     }
 
-    auto gpuIter = m_sessionGPUCallsMap.begin();
+    auto gpuIter = m_sessionQueuesToCallsMap.begin();
 
-    for (; gpuIter != m_sessionGPUCallsMap.end(); gpuIter++)
+    for (; gpuIter != m_sessionQueuesToCallsMap.end(); gpuIter++)
     {
         const QList<ProfileSessionDataItem*>& list = (*gpuIter);
 
@@ -65,7 +65,7 @@ gpTraceDataContainer::~gpTraceDataContainer()
 
     m_sessionCPUDataItems.clear();
     m_sessionGPUDataItems.clear();
-    m_sessionGPUCallsMap.clear();
+    m_sessionQueuesToCallsMap.clear();
     m_threadToRootItemMap.clear();
 }
 
@@ -186,7 +186,7 @@ ProfileSessionDataItem* gpTraceDataContainer::AddDX12GPUTraceItem(DX12GPUTraceIn
         pRetVal = new ProfileSessionDataItem(this, pAPIInfo);
 
         // Add the item to the queues map
-        m_sessionGPUCallsMap[pAPIInfo->m_commandQueuePtrStr] << pRetVal;
+        m_sessionQueuesToCallsMap[pAPIInfo->m_commandQueuePtrStr] << pRetVal;
 
         // Add a map from the queue name to the queue type
         if (m_sessionQueueNameToCommandListType.contains(pAPIInfo->m_commandQueuePtrStr))
@@ -287,7 +287,7 @@ ProfileSessionDataItem* gpTraceDataContainer::AddVKGPUTraceItem(VKGPUTraceInfo* 
         m_sessionItemsSortedByStartTime.insertMulti(pRetVal->StartTime(), pRetVal);
 
         // Add the item to the queues map
-        m_sessionGPUCallsMap[pAPIInfo->m_commandBufferPtrStr] << pRetVal;
+        m_sessionQueuesToCallsMap[pAPIInfo->m_commandQueuePtrStr] << pRetVal;
 
         // Add a map from the queue name to the queue type
         if (m_sessionQueueNameToCommandListType.contains(pAPIInfo->m_commandQueuePtrStr))
@@ -297,6 +297,38 @@ ProfileSessionDataItem* gpTraceDataContainer::AddVKGPUTraceItem(VKGPUTraceInfo* 
         else
         {
             m_sessionQueueNameToCommandListType[pAPIInfo->m_commandQueuePtrStr] = pAPIInfo->m_commandListType;
+        }
+
+        // Add this API call to the command list data
+        QString commandBufferName = QString::fromStdString(pAPIInfo->m_commandBufferPtrStr);
+        QString queueName = QString::fromStdString(pAPIInfo->m_commandQueuePtrStr);
+        if (m_commandListToQueueMap.contains(commandBufferName))
+        {
+            GT_ASSERT_EX(m_commandListToQueueMap[commandBufferName] == queueName, L"This command buffer was already added with another queue name");
+        }
+        else
+        {
+            m_commandListToQueueMap.insertMulti(commandBufferName, queueName);
+        }
+
+        // Get or add the command list data for the current command list
+        if (!m_commandListData.contains(commandBufferName))
+        {
+            m_commandListData.insertMulti(commandBufferName, CommandListData());
+        }
+
+        // Update the existing command list data with the current API call data
+        m_commandListData[commandBufferName].m_queueName = queueName;
+        m_commandListData[commandBufferName].m_apiIndices.push_back(pAPIInfo->m_uiSeqID);
+
+        if ((m_commandListData[commandBufferName].m_startTime == std::numeric_limits<quint64>::max()) || (m_commandListData[commandBufferName].m_startTime > pAPIInfo->m_ullStart))
+        {
+            m_commandListData[commandBufferName].m_startTime = pAPIInfo->m_ullStart;
+        }
+
+        if ((m_commandListData[commandBufferName].m_endTime == std::numeric_limits<quint64>::min()) || (m_commandListData[commandBufferName].m_endTime < pAPIInfo->m_ullEnd))
+        {
+            m_commandListData[commandBufferName].m_endTime = pAPIInfo->m_ullEnd;
         }
     }
 
@@ -490,7 +522,7 @@ int gpTraceDataContainer::ThreadsCount() const
 
 int gpTraceDataContainer::GPUCallsContainersCount() const
 {
-    return m_sessionGPUCallsMap.size();
+    return m_sessionQueuesToCallsMap.size();
 }
 
 osThreadId gpTraceDataContainer::ThreadID(int threadIndex) const
@@ -537,7 +569,7 @@ int gpTraceDataContainer::ThreadPerfMarkersCount(osThreadId threadID) const
 }
 
 
-int gpTraceDataContainer::GPUItemsCount() const
+int gpTraceDataContainer::QueueItemsCount() const
 {
     int retVal = 0;
 
@@ -806,9 +838,9 @@ QString gpTraceDataContainer::GPUObjectName(int gpuObjectIndex)
     QString retVal;
 
     // Iterate the map and find the queue with the requested index
-    auto iter = m_sessionGPUCallsMap.begin();
+    auto iter = m_sessionQueuesToCallsMap.begin();
 
-    for (int index = 0; iter != m_sessionGPUCallsMap.end(); iter++, index++)
+    for (int index = 0; iter != m_sessionQueuesToCallsMap.end(); iter++, index++)
     {
         if (index == gpuObjectIndex)
         {
@@ -822,7 +854,7 @@ QString gpTraceDataContainer::GPUObjectName(int gpuObjectIndex)
 }
 
 
-int gpTraceDataContainer::GPUObjectType(const QString& queueName)
+int gpTraceDataContainer::QueueType(const QString& queueName)
 {
     int retVal = -1;
 
@@ -834,28 +866,28 @@ int gpTraceDataContainer::GPUObjectType(const QString& queueName)
     return retVal;
 }
 
-int gpTraceDataContainer::GPUItemsCount(const QString& gpuItemName)
+int gpTraceDataContainer::QueueItemsCount(const QString& queueName)
 {
     int retVal = 0;
-    std::string queueNameStr = gpuItemName.toUtf8().constData();
+    std::string queueNameStr = queueName.toUtf8().constData();
 
-    if (m_sessionGPUCallsMap.contains(queueNameStr))
+    if (m_sessionQueuesToCallsMap.contains(queueNameStr))
     {
-        retVal = m_sessionGPUCallsMap[queueNameStr].size();
+        retVal = m_sessionQueuesToCallsMap[queueNameStr].size();
     }
 
     return retVal;
 }
 
-ProfileSessionDataItem* gpTraceDataContainer::GPUItem(const QString& gpuObjectName, int apiItemIndex) const
+ProfileSessionDataItem* gpTraceDataContainer::QueueItem(const QString& queueName, int apiItemIndex) const
 {
     ProfileSessionDataItem* pRetVal = nullptr;
-    std::string gpuObjectNameStr = gpuObjectName.toUtf8().constData();
+    std::string gpuObjectNameStr = queueName.toUtf8().constData();
 
     // Sanity check:
-    GT_IF_WITH_ASSERT(m_sessionGPUCallsMap.contains(gpuObjectNameStr))
+    GT_IF_WITH_ASSERT(m_sessionQueuesToCallsMap.contains(gpuObjectNameStr))
     {
-        const QList<ProfileSessionDataItem*>& apisList = m_sessionGPUCallsMap[gpuObjectNameStr];
+        const QList<ProfileSessionDataItem*>& apisList = m_sessionQueuesToCallsMap[gpuObjectNameStr];
         GT_IF_WITH_ASSERT((apiItemIndex >= 0) && (apiItemIndex < (int)apisList.size()))
         {
             pRetVal = apisList[apiItemIndex];
@@ -866,15 +898,15 @@ ProfileSessionDataItem* gpTraceDataContainer::GPUItem(const QString& gpuObjectNa
 
 }
 
-ProfileSessionDataItem* gpTraceDataContainer::GPUItemByItemCallIndex(const QString& queueName, int apiItemIndex) const
+ProfileSessionDataItem* gpTraceDataContainer::QueueItemByItemCallIndex(const QString& queueName, int apiItemIndex) const
 {
     ProfileSessionDataItem* pRetVal = nullptr;
     std::string queueNameStr = queueName.toUtf8().constData();
 
     // Sanity check:
-    GT_IF_WITH_ASSERT(m_sessionGPUCallsMap.contains(queueNameStr))
+    GT_IF_WITH_ASSERT(m_sessionQueuesToCallsMap.contains(queueNameStr))
     {
-        const QList<ProfileSessionDataItem*>& apisList = m_sessionGPUCallsMap[queueNameStr];
+        const QList<ProfileSessionDataItem*>& apisList = m_sessionQueuesToCallsMap[queueNameStr];
         GT_IF_WITH_ASSERT(apiItemIndex >= 0)
         {
             for (auto pItem : apisList)

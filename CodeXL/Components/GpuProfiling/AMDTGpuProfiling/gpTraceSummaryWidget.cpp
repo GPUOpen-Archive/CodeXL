@@ -525,7 +525,7 @@ void gpTraceSummaryWidget::Init(gpTraceDataContainer* pDataContainer, gpTraceVie
 {
     m_pTraceView = pSessionView;
 
-    int numItems = pDataContainer->GPUItemsCount() + pDataContainer->ThreadsCount();
+    int numItems = pDataContainer->QueueItemsCount() + pDataContainer->ThreadsCount();
 
     afProgressBarWrapper::instance().ShowProgressDialog(L"Loading Summary", numItems * DEFAULT_PROGRESS_FACTOR);
     afProgressBarWrapper::instance().incrementProgressBar();
