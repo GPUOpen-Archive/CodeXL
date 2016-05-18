@@ -8,6 +8,7 @@ echo "Command line arguments passed to backend_build.sh: $@"
 
 # Build Framework (BaseTools/OSWrappers) -- only makes sense to skip if doing an incremental build
 bBuildFramework=true
+bBuildFrameworkOnly=false
 
 # Build HSA Profiler
 bBuildHSAProfiler=true
@@ -64,6 +65,8 @@ do
       bIncrementalBuild=true
    elif [ "$1" = "skip-32bitbuild" ]; then
       b32bitbuild=false
+   elif [ "$1" = "framework-only" ]; then
+      bFrameworkOnly=true
    elif [ "$1" = "incremental" ]; then
       bIncrementalBuild=true
       bCleanOnly=false
@@ -179,17 +182,6 @@ CODEXL_ARCHIVE_BASE=GPUProfilingBackendCodeXL-v$VERSION.$BUILD.tgz
 CODEXL_ARCHIVE=$BUILD_PATH/$CODEXL_ARCHIVE_BASE
 
 if !($bZipOnly) ; then
-
-   #-----------------------------------------
-   # Update Version.h to include build number
-   #-----------------------------------------
-   CURRENT_VERSION_H_FILE_PERMISSIONS=$(stat --format %a $VERSION_FILE)
-   chmod 777 $VERSION_FILE
-   old=$(grep -E "#define GPUPROFILER_BACKEND_BUILD_NUMBER [0-9]+" $VERSION_FILE)
-   new="#define GPUPROFILER_BACKEND_BUILD_NUMBER $BUILD"
-   sed -i "s/$old/$new/g" $VERSION_FILE
-   chmod $CURRENT_VERSION_H_FILE_PERMISSIONS $VERSION_FILE
-
    # delete log file
    if !($bAppendToLog) ; then
       rm -f $LOGFILE
@@ -271,6 +263,9 @@ if !($bZipOnly) ; then
          exit 1
       else
          echo "*** SUCCESS ***"
+         if ($bFrameworkOnly) ; then
+            exit 0
+         fi
       fi
 
       if ($bCleanOnly); then
@@ -278,6 +273,16 @@ if !($bZipOnly) ; then
          rm -rf $SPROOT/Output_x86/
       fi
    fi
+
+   #-----------------------------------------
+   # Update Version.h to include build number
+   #-----------------------------------------
+   CURRENT_VERSION_H_FILE_PERMISSIONS=$(stat --format %a $VERSION_FILE)
+   chmod 777 $VERSION_FILE
+   old=$(grep -E "#define GPUPROFILER_BACKEND_BUILD_NUMBER [0-9]+" $VERSION_FILE)
+   new="#define GPUPROFILER_BACKEND_BUILD_NUMBER $BUILD"
+   sed -i "s/$old/$new/g" $VERSION_FILE
+   chmod $CURRENT_VERSION_H_FILE_PERMISSIONS $VERSION_FILE
 
    cd $SPROFILE
 
