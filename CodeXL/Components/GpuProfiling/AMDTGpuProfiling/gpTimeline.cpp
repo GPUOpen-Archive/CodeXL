@@ -123,7 +123,6 @@ void gpTimeline::BuildTimeline(gpTraceDataContainer* pDataContainer)
 
                 if (queueBranches.m_pQueueRootBranch == nullptr)
                 {
-
                     // Create the queue branch name
                     QString queueDisplayName = m_pSessionDataContainer->QueueNameFromPointer(i.key());
 
@@ -136,12 +135,15 @@ void gpTimeline::BuildTimeline(gpTraceDataContainer* pDataContainer)
                         queueDisplayName.prepend(queueTypeStr);
                     }
 
+                    // Create the queue root branch and add the API and command lists / buffers branches
                     queueBranches.m_pQueueRootBranch = new acTimelineBranch();
                     queueBranches.m_pQueueRootBranch->setText(queueDisplayName);
+
+                    queueBranches.m_pQueueRootBranch->addSubBranch(queueBranches.m_pQueueAPIBranch);
+                    queueBranches.m_pQueueRootBranch->addSubBranch(queueBranches.m_pQueueCommandListsBranch);
+
+                    m_pGPUTimelineBranch->addSubBranch(queueBranches.m_pQueueRootBranch);
                 }
-                m_pGPUTimelineBranch->addSubBranch(queueBranches.m_pQueueRootBranch);
-                queueBranches.m_pQueueRootBranch->addSubBranch(queueBranches.m_pQueueAPIBranch);
-                queueBranches.m_pQueueRootBranch->addSubBranch(queueBranches.m_pQueueCommandListsBranch);
             }
 
             addBranch(m_pGPUTimelineBranch);
@@ -489,7 +491,6 @@ acAPITimelineItem* gpTimeline::CreateTimelineItem(ProfileSessionDataItem* pItem)
             else if (pItem->ItemType().m_itemMainType == ProfileSessionDataItem::VK_GPU_PROFILE_ITEM)
             {
                 branchText = GPU_STR_TraceViewGPU;
-                gpuObjectName = pItem->CommandListPointer();
             }
 
             acTimelineBranch* pHostBranch = GetBranchForAPI(pItem->ThreadID(), gpuObjectName, branchText, pItem->ItemType().m_itemMainType);
@@ -715,7 +716,7 @@ acTimelineBranch* gpTimeline::GetCommandListBranch(const QString& queueName)
         pRetVal = m_gpuBranchesMap[queueName].m_pQueueCommandListsBranch;
         pRetVal->SetBGColor(QColor::fromRgb(230, 230, 230));
 
-        QString branchName = (m_pSessionDataContainer->SessionAPIType() == ProfileSessionDataItem::DX12_API_PROFILE_ITEM) ? GPU_STR_timeline_CmdBuffersBranchName : GPU_STR_timeline_CmdListsBranchName;
+        QString branchName = (m_pSessionDataContainer->SessionAPIType() == ProfileSessionDataItem::DX12_API_PROFILE_ITEM) ? GPU_STR_timeline_CmdListsBranchName : GPU_STR_timeline_CmdBuffersBranchName;
         pRetVal->setText(branchName);
     }
 
