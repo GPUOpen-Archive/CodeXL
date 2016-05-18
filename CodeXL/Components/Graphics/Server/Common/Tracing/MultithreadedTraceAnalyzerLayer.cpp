@@ -22,7 +22,6 @@
 #include "APIEntry.h"
 #include "ThreadTraceData.h"
 
-#if ENABLE_MULTI_FRAME_TRACE
 //-----------------------------------------------------------------------------
 /// A flag used to indicate that multiple sequential frames are being traced.
 //-----------------------------------------------------------------------------
@@ -32,7 +31,6 @@ static bool sbTracingMultipleFrames = false;
 /// The number of frames that have been traced thus far in multi-frame trace mode.
 //-----------------------------------------------------------------------------
 static int sTracedFramesCount = 0;
-#endif // ENABLE_MULTI_FRAME_TRACE
 
 //--------------------------------------------------------------------------
 /// MultithreadedTraceAnalyzerLayer's default constructor, which initializes CommandResponses.
@@ -58,14 +56,6 @@ MultithreadedTraceAnalyzerLayer::MultithreadedTraceAnalyzerLayer()
 
     // Command used to automatically trace a target frame in an instrumented application.
     AddCommand(CONTENT_TEXT, "AutoTrace", "AutoTrace", "AutoTrace.txt", DISPLAY, INCLUDE, mCmdAutoCaptureCachedTrace);
-
-#if ENABLE_MULTI_FRAME_TRACE
-    // Command used to specify how many sequential frames should be traced when collecting any kind of trace.
-    AddCommand(CONTENT_TEXT, "NumSequentialPresents", "NumSequentialPresents", "NumSequentialPresents.txt", DISPLAY, INCLUDE, mNumSequentialPresents);
-
-    // Trace only a single frame by default.
-    mNumSequentialPresents = 1;
-#endif // ENABLE_MULTI_FRAME_TRACE
 }
 
 //--------------------------------------------------------------------------
@@ -99,13 +89,11 @@ void MultithreadedTraceAnalyzerLayer::AfterAPITrace()
 //--------------------------------------------------------------------------
 void MultithreadedTraceAnalyzerLayer::BeginFrame()
 {
-#if ENABLE_MULTI_FRAME_TRACE
     if (sbTracingMultipleFrames == true)
     {
         // If we're tracing multiple frames in a row, skip BeginFrame and pretend we're collecting data for a single huge frame.
         return;
     }
-#endif // ENABLE_MULTI_FRAME_TRACE
 
     bool bFrameCaptureWithSaveActive = GetParentLayerManager()->mCmdFrameCaptureWithSave.IsActive();
 
@@ -123,13 +111,11 @@ void MultithreadedTraceAnalyzerLayer::BeginFrame()
 
     if (bAPITraceNeeded || bGPUTraceNeeded)
     {
-#if ENABLE_MULTI_FRAME_TRACE
-        int numFramesToTrace = mNumSequentialPresents.GetValue();
+        int numFramesToTrace = GetParentLayerManager()->GetCaptureCount();
         if (numFramesToTrace > 1)
         {
             sbTracingMultipleFrames = true;
         }
-#endif // ENABLE_MULTI_FRAME_TRACE
 
         // Set the flag indicating that the frame is being traced. We'll be rendering the next frame when this flag is checked.
         mLastTracedFrameIndex = GetParentLayerManager()->GetFrameCount();
@@ -166,10 +152,9 @@ void MultithreadedTraceAnalyzerLayer::BeginFrame()
 //--------------------------------------------------------------------------
 void MultithreadedTraceAnalyzerLayer::EndFrame()
 {
-#if ENABLE_MULTI_FRAME_TRACE
     if (sbTracingMultipleFrames == true)
     {
-        int numPresentsToWaitOn = mNumSequentialPresents.GetValue() - 1;
+        int numPresentsToWaitOn = GetParentLayerManager()->GetCaptureCount() - 1; // NOTE: subtraction of one
         if (sTracedFramesCount < numPresentsToWaitOn)
         {
             sTracedFramesCount++;
@@ -182,7 +167,6 @@ void MultithreadedTraceAnalyzerLayer::EndFrame()
             sbTracingMultipleFrames = false;
         }
     }
-#endif // ENABLE_MULTI_FRAME_TRACE
 
     // Check again which trace type is active at the end of the frame. Need to match how it was started.
     int autotraceFlags = GetTraceTypeFlags();
