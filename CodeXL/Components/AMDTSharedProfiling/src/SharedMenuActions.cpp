@@ -87,7 +87,6 @@ void SharedMenuActions::populateSupportedCommandIds()
     m_supportedCommandIds.push_back(ID_PM_ATTACH_PROFILE);
     m_supportedCommandIds.push_back(ID_PM_SELECTED_PROFILE);
     m_supportedCommandIds.push_back(ID_PM_PROFILE_SETTINGS_DIALOG);
-    m_supportedCommandIds.push_back(ID_PM_STOP_PROFILE);
 }
 
 SharedMenuActions& SharedMenuActions::instance()
@@ -133,7 +132,7 @@ bool SharedMenuActions::actionText(int actionIndex, gtString& caption, gtString&
     // COUNT_OF_STATIC_PM_MENUS + # of mru profiles <= actionIndex
     int maxRange = m_pProfiles->profiles().size() + MAX_MRU_PROFILES + COUNT_OF_STATIC_PM_MENUS;
 
-    if (actionIndex < COUNT_OF_STATIC_PM_MENUS)
+    if (actionIndex <= COUNT_OF_STATIC_PM_MENUS)
     {
         // Get the command id:
         int commandId = actionIndexToCommandId(actionIndex);
@@ -216,7 +215,7 @@ gtString SharedMenuActions::menuPosition(int actionIndex, afActionPositionData& 
     int maxRange = m_pProfiles->profiles().size() + MAX_MRU_PROFILES + COUNT_OF_STATIC_PM_MENUS;
 
 
-    if (actionIndex < COUNT_OF_STATIC_PM_MENUS)
+    if (actionIndex <= COUNT_OF_STATIC_PM_MENUS)
     {
         // Get the command id:
         int commandId = actionIndexToCommandId(actionIndex);
@@ -329,7 +328,7 @@ void SharedMenuActions::handleTrigger(int actionIndex)
     // COUNT_OF_STATIC_PM_MENUS + # of mru profiles <= actionIndex
     int maxRange = m_pProfiles->profiles().size() + MAX_MRU_PROFILES + COUNT_OF_STATIC_PM_MENUS;
 
-    if (actionIndex < COUNT_OF_STATIC_PM_MENUS)
+    if (actionIndex <= COUNT_OF_STATIC_PM_MENUS)
     {
         // Get the command id:
         int commandId = actionIndexToCommandId(actionIndex);
@@ -411,7 +410,7 @@ void SharedMenuActions::handleUiUpdate(int actionIndex)
     // COUNT_OF_STATIC_PM_MENUS + # of mru profiles <= actionIndex
     int maxRange = m_pProfiles->profiles().size() + MAX_MRU_PROFILES + COUNT_OF_STATIC_PM_MENUS;
 
-    if (actionIndex < COUNT_OF_STATIC_PM_MENUS)
+    if (actionIndex <= COUNT_OF_STATIC_PM_MENUS)
     {
         // Get the command id:
         int commandId = actionIndexToCommandId(actionIndex);
