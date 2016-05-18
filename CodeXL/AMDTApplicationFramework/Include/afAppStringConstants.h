@@ -328,7 +328,7 @@
 #define AF_STR_FrameAnalysisPerfCountersFileExtension L"cxlfc"
 #define AF_STR_D3D12MultithreadingSampleProjectName L"D3D12Multithreading"
 #define AF_STR_TeapotSampleProjectName L"CodeXL Teapot"
-#define AF_STR_TeapotSampleVSProjectName L"AMDTTeaPot"
+#define AF_STR_TeapotSampleVSProjectName L"CXLTeaPot"
 #define AF_STR_MatMulSampleProjectName L"CodeXL Matrix Multiply"
 #define AF_STR_D3D12MultithreadingSampleProjectName L"D3D12Multithreading"
 #define AF_STR_ProfileDirExtension L"_ProfilerOutput"
