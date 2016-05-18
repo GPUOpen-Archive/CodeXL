@@ -18,6 +18,9 @@
 #include <AMDTGpuProfiling/gpRibbonDataCalculator.h>
 #include <AMDTGpuProfiling/gpTraceDataContainer.h>
 
+#define CODEXL_INCLUDE
+#include <AMDTGpuProfiling/../Graphics/Server/VulkanServer/VKT/vktEnumerations.h>
+#undef CODEXL_INCLUDE
 
 #define GP_DEFAULT_BUCKET_NUMBER 2000
 
@@ -487,12 +490,25 @@ void gpRibbonDataCalculator::GetPresentData(QVector<double>& presentData)
 
             GT_IF_WITH_ASSERT(pCurrentItem != nullptr)
             {
-                eAPIType apiType;
-                bool rc = pCurrentItem->GetDX12APIType(apiType);
-
-                if (rc && pCurrentItem->ItemType().m_itemSubType == FuncId_IDXGISwapChain_Present)
+                if (m_pData->SessionAPIType() == ProfileSessionDataItem::DX12_API_PROFILE_ITEM)
                 {
-                    presentData.push_back((pCurrentItem->EndTime() - m_pTimeLine->startTime()));
+                    eAPIType apiType;
+                    bool rc = pCurrentItem->GetDX12APIType(apiType);
+
+                    if (rc && pCurrentItem->ItemType().m_itemSubType == FuncId_IDXGISwapChain_Present)
+                    {
+                        presentData.push_back((pCurrentItem->EndTime() - m_pTimeLine->startTime()));
+                    }
+                }
+                else
+                {
+                    vkAPIType apiType;
+                    bool rc = pCurrentItem->GetVKAPIType(apiType);
+
+                    if (rc && pCurrentItem->ItemType().m_itemSubType == FuncId_vkQueuePresentKHR)
+                    {
+                        presentData.push_back((pCurrentItem->EndTime() - m_pTimeLine->startTime()));
+                    }
                 }
             }
         }

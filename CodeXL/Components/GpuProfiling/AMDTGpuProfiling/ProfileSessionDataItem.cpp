@@ -618,7 +618,7 @@ bool ProfileSessionDataItem::GetVKAPIType(vkAPIType& apiType)
 {
     bool retVal = false;
 
-    if ((m_itemType.m_itemMainType == DX12_API_PROFILE_ITEM) || (m_itemType.m_itemMainType == DX12_GPU_PROFILE_ITEM))
+    if ((m_itemType.m_itemMainType == VK_API_PROFILE_ITEM) || (m_itemType.m_itemMainType == VK_GPU_PROFILE_ITEM))
     {
         GT_IF_WITH_ASSERT(m_pApiInfo != nullptr)
         {

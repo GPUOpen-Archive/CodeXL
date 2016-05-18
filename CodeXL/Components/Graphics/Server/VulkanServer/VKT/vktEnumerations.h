@@ -12,6 +12,7 @@
 //-----------------------------------------------------------------------------
 /// An API Type enumeration that defines the group that the API call is classified into.
 //-----------------------------------------------------------------------------
+#ifndef CODEXL_INCLUDE
 enum eAPIType
 {
     kAPIType_Unknown           = 0,
@@ -26,13 +27,22 @@ enum eAPIType
     kAPIType_Sync              = 0x100,
     kAPIType_KHR               = 0x200,
 };
+#endif
 
 //-----------------------------------------------------------------------------
 /// A FuncId enumeration that defines all Vulkan API calls that can possibly be traced.
 //-----------------------------------------------------------------------------
+#ifdef CODEXL_INCLUDE
+enum VkFuncId : int
+#else
 enum FuncId : int
+#endif
 {
+#ifdef CODEXL_INCLUDE
+    FuncId_vkUNDEFINED = 0,
+#else
     FuncId_UNDEFINED = 0,
+#endif
 
     FuncId_vkCreateInstance,
     FuncId_vkDestroyInstance,
@@ -183,12 +193,17 @@ enum FuncId : int
 
     FuncId_WholeCmdBuf,
 
-    FuncId_MAX,
+#ifdef CODEXL_INCLUDE
+        FuncId_vkMAX,
+#else
+        FuncId_MAX,
+#endif
 };
 
 //-----------------------------------------------------------------------------
 /// An object type enumeration that defines the types of Vulkan objects that GPS can wrap.
 //-----------------------------------------------------------------------------
+#ifndef CODEXL_INCLUDE
 enum eObjectType : int
 {
     kObjectType_Undefined = -1,
@@ -220,5 +235,6 @@ enum eObjectType : int
     kObjectType_End_Range = kObjectType_SwapChainKHR,
     kObjectType_Count = (kObjectType_End_Range - kObjectType_Begin_Range + 1)
 };
+#endif
 
 #endif // __VKT_ENUMERATIONS_H__
