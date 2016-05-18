@@ -1342,9 +1342,8 @@ void ProfileSessionDataItem::InitStaticMembers()
 
         // DX12 GPU table columns
         m_sItemTypesColumnsMap[DX12_GPU_PROFILE_ITEM] << SESSION_ITEM_INDEX_COLUMN;
-        m_sItemTypesColumnsMap[DX12_GPU_PROFILE_ITEM] << SESSION_ITEM_INTERFACE_COLUMN;
-        m_sItemTypesColumnsMap[DX12_GPU_PROFILE_ITEM] << SESSION_ITEM_CALL_COLUMN;
         m_sItemTypesColumnsMap[DX12_GPU_PROFILE_ITEM] << SESSION_ITEM_COMMAND_LIST_COLUMN;
+        m_sItemTypesColumnsMap[DX12_GPU_PROFILE_ITEM] << SESSION_ITEM_CALL_COLUMN;
         m_sItemTypesColumnsMap[DX12_GPU_PROFILE_ITEM] << SESSION_ITEM_PARAMETERS_COLUMN;
         m_sItemTypesColumnsMap[DX12_GPU_PROFILE_ITEM] << SESSION_ITEM_GPU_TIME_COLUMN;
         m_sItemTypesColumnsMap[DX12_GPU_PROFILE_ITEM] << SESSION_ITEM_RESULT_COLUMN;
@@ -1358,8 +1357,8 @@ void ProfileSessionDataItem::InitStaticMembers()
 
         // Vulkan GPU table columns
         m_sItemTypesColumnsMap[VK_GPU_PROFILE_ITEM] << SESSION_ITEM_INDEX_COLUMN;
-        m_sItemTypesColumnsMap[VK_GPU_PROFILE_ITEM] << SESSION_ITEM_CALL_COLUMN;
         m_sItemTypesColumnsMap[VK_GPU_PROFILE_ITEM] << SESSION_ITEM_COMMAND_BUFFER_COLUMN;
+        m_sItemTypesColumnsMap[VK_GPU_PROFILE_ITEM] << SESSION_ITEM_CALL_COLUMN;
         m_sItemTypesColumnsMap[VK_GPU_PROFILE_ITEM] << SESSION_ITEM_PARAMETERS_COLUMN;
         m_sItemTypesColumnsMap[VK_GPU_PROFILE_ITEM] << SESSION_ITEM_GPU_TIME_COLUMN;
         m_sItemTypesColumnsMap[VK_GPU_PROFILE_ITEM] << SESSION_ITEM_RESULT_COLUMN;
