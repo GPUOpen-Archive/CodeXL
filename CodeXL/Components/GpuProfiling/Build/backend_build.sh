@@ -66,7 +66,7 @@ do
    elif [ "$1" = "skip-32bitbuild" ]; then
       b32bitbuild=false
    elif [ "$1" = "framework-only" ]; then
-      bFrameworkOnly=true
+      bBuildFrameworkOnly=true
    elif [ "$1" = "incremental" ]; then
       bIncrementalBuild=true
       bCleanOnly=false
@@ -263,7 +263,7 @@ if !($bZipOnly) ; then
          exit 1
       else
          echo "*** SUCCESS ***"
-         if ($bFrameworkOnly) ; then
+         if ($bBuildFrameworkOnly) ; then
             exit 0
          fi
       fi
