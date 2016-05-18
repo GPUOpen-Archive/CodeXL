@@ -91,7 +91,7 @@ enum pmMenuItemCommands
     /// Display the currently selected profile
     ID_PM_SELECTED_PROFILE,
 
-    PM_LAST_COMMAND_ID = ID_PM_STOP_PROFILE
+    PM_LAST_COMMAND_ID = ID_PM_SELECTED_PROFILE
 };
 
 enum pmNumericConstants
