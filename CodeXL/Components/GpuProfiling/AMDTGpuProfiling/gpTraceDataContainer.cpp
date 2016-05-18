@@ -1063,6 +1063,59 @@ void gpTraceDataContainer::UpdateUiRowLocations()
     }
 }
 
+QString gpTraceDataContainer::CommandListNameFromPointer(const QString& commandBufferPtrStr)
+{
+    int commandListIndex = 1;
+    QString retVal;
+
+    // If the command buffer / list is not mapped to an index yet, allocate an index for the current command list
+    if (!m_commandListPointerToIndexMap.contains(commandBufferPtrStr))
+    {
+        int index = m_commandListPointerToIndexMap.size() + 1;
+        m_commandListPointerToIndexMap.insertMulti(commandBufferPtrStr, index);
+    }
+
+    // Get the index for this command list / buffer
+    GT_IF_WITH_ASSERT(m_commandListPointerToIndexMap.contains(commandBufferPtrStr))
+    {
+        commandListIndex = m_commandListPointerToIndexMap[commandBufferPtrStr];
+    }
+
+    if (m_sessionAPIType == ProfileSessionDataItem::DX12_API_PROFILE_ITEM)
+    {
+        retVal = QString(GPU_STR_timeline_CmdListBranchName).arg(commandListIndex);
+    }
+    else
+    {
+        retVal = QString(GPU_STR_timeline_CmdBufferBranchName).arg(commandListIndex);
+    }
+
+    return retVal;
+}
+
+QString gpTraceDataContainer::QueueNameFromPointer(const QString& queuePtrStr)
+{
+    int queueIndex = 1;
+    QString retVal;
+
+    // If the command buffer / list is not mapped to an index yet, allocate an index for the current command list
+    if (!m_commandQueuePointerToIndexMap.contains(queuePtrStr))
+    {
+        int index = m_commandQueuePointerToIndexMap.size() + 1;
+        m_commandQueuePointerToIndexMap.insertMulti(queuePtrStr, index);
+    }
+
+    // Get the index for this command list / buffer
+    GT_IF_WITH_ASSERT(m_commandQueuePointerToIndexMap.contains(queuePtrStr))
+    {
+        queueIndex = m_commandQueuePointerToIndexMap[queuePtrStr];
+    }
+
+    retVal = QString(GPU_STR_timeline_QueueBranchName).arg(queueIndex);
+
+    return retVal;
+}
+
 gpTraceDataContainer::CommandListData::CommandListData() :
     m_queueName(""),
     m_startTime(std::numeric_limits<quint64>::max()),

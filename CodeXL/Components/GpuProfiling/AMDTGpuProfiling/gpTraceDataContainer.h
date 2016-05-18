@@ -229,9 +229,19 @@ public:
     /// Contain the api type for this session
     ProfileSessionDataItem::ProfileItemAPIType SessionAPIType() const { return m_sessionAPIType; };
 
+    /// Return an indexed name for the command buffer / list from  it's pointer
+    /// \param commandBufferPtrStr the command buffer / list pointer
+    /// \return a formatted name with the command buffer / list index
+    QString CommandListNameFromPointer(const QString& commandBufferPtrStr);
+
+    /// Return an indexed name for the queue from  it's pointer
+    /// \param queuePtrStr the queue list pointer
+    /// \return a formatted name with the queue index
+    QString QueueNameFromPointer(const QString& queuePtrStr);
+
+
 private:
     void UpdateUiRowLocations();
-
 
 private:
 
@@ -291,8 +301,14 @@ private:
     QMap<int, ProfileSessionDataItem*> m_sampleIdToCPUItemMap;
     QMap<int, ProfileSessionDataItem*> m_sampleIdToGPUItemMap;
 
-    /// A map from command list pointer to queue pointer
+    /// A map from command queue pointer to an index
+    QMap <QString, int> m_commandQueuePointerToIndexMap;
+
+    /// A map from command list / buffer pointer to queue pointer
     QMap <QString, QString> m_commandListToQueueMap;
+
+    /// A map from command list / buffer pointer to an index
+    QMap <QString, int> m_commandListPointerToIndexMap;
 
     /// Map from command list pointer to command list data
     QMap <QString, CommandListData> m_commandListData;
