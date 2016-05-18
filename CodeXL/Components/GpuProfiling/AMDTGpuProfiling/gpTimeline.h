@@ -169,19 +169,19 @@ private:
     QMap<osThreadId, acTimelineBranch*> m_cpuBranchesMap;
 
     /// Map from queue name to the timeline branch for that queue
-    QMap<QString, acTimelineBranch*> m_gpuBranchesMap;
-
-    /// Map from command list name to the timeline branch for that queue
-    QMap<QString, acTimelineBranch*> m_commandListsQueuesBranchesMap;
+    struct QueueBranches
+    {
+        acTimelineBranch* m_pQueueRootBranch;
+        acTimelineBranch* m_pQueueAPIBranch;
+        acTimelineBranch* m_pQueueCommandListsBranch;
+    };
+    QMap<QString, QueueBranches> m_gpuBranchesMap;
 
     /// CPU timeline branch
     acTimelineBranch* m_pCPUTimelineBranch;
 
     /// GPU timeline branch
     acTimelineBranch* m_pGPUTimelineBranch;
-
-    /// Command lists timeline branch
-    acTimelineBranch* m_pCommandListsBranch;
 
     /// the present data
     QVector<double> m_presentData;
