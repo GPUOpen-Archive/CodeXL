@@ -357,7 +357,10 @@
     <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpTraceSummaryWidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpTraceSummaryTable.cpp">
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpTraceSummaryTab.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile> 
+	<ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpTraceSummaryTable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpPerformanceCountersDataView.cpp">
@@ -399,7 +402,10 @@
     <ClCompile Include="gpTraceSummaryWidget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="gpTraceSummaryTable.cpp">
+    <ClCompile Include="gpTraceSummaryTab.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile> 
+	<ClCompile Include="gpTraceSummaryTable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="gpPerformanceCountersDataView.cpp">
@@ -737,6 +743,9 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="gpTraceSummaryWidget.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gpTraceSummaryTab.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="gpTraceSummaryTable.h">

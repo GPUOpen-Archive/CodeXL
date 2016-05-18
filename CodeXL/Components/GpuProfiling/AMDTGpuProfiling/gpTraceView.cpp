@@ -620,10 +620,14 @@ void gpTraceView::OnTimelineItemActivated(acTimelineItem* pTimelineItem)
             }
         }
 
-        GT_IF_WITH_ASSERT(pMatchingItem != nullptr)
+        if (pMatchingItem != nullptr)
         {
             // Select the item in the tables
             SelectItemInTraceTables(pMatchingItem, true);
+        }
+        else // command list
+        {
+            m_pSummaryTableTabWidget->SelectCommandList(pTimelineItem->text());
         }
     }
 }
