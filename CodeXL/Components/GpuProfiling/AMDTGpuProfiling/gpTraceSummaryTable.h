@@ -46,13 +46,13 @@ public:
     {
 
         m_maxTimeMs = 0;
-        m_minTimeMs = INT_MIN;
+        m_minTimeMs = std::numeric_limits<quint64>::max();
         m_numCalls = 0;
     }
 
     virtual void TableItemsAsString(QStringList& membersStringsList) = 0;
-    float m_maxTimeMs;
-    float m_minTimeMs;
+    quint64 m_maxTimeMs;
+    quint64 m_minTimeMs;
     QColor m_typeColor;
     ProfileSessionDataItem* m_pMinTimeItem;
     ProfileSessionDataItem* m_pMaxTimeItem;
@@ -121,6 +121,7 @@ public:
 
     QString m_address;
     QString m_gpuQueue;
+    QString m_gpuQueueAddress;
     quint64 m_executionTimeMS;
 
 };

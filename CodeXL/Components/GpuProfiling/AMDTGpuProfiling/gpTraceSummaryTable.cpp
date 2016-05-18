@@ -401,16 +401,14 @@ void gpTraceSummaryTable::AddSessionItemToSummaryInfo(APISummaryTraceInfo& info,
                 info.m_pMaxTimeItem = pItem;
             }
 
-            if (duration < info.m_minTimeMs || info.m_minTimeMs == INT_MIN)
+            if (duration < info.m_minTimeMs || info.m_minTimeMs == std::numeric_limits<quint64>::max())
             {
                 info.m_minTimeMs = duration;
                 info.m_pMinTimeItem = pItem;
             }
-
         }
     }
 }
-
 
 void gpTraceSummaryTable::InitGPUItems(gpTraceDataContainer* pSessionDataContainer)
 {
@@ -654,8 +652,10 @@ void gpCommandListSummaryTable::InitCommandListSummaryMap()
             gpTraceDataContainer::CommandListData commandListData = commandListsData[commandListName];
 
             APISummaryCommandListInfo& info = infoArray[commandListIndex];
-            QString displayName = ProfileSessionDataItem::QueueDisplayName(commandListData.m_queueName);
-            info.m_gpuQueue = displayName;
+
+            int queueType = m_pSessionDataContainer->QueueType(commandListData.m_queueName);
+            info.m_gpuQueue = gpTraceDataContainer::CommandListTypeAsString(queueType);
+            info.m_gpuQueueAddress = commandListData.m_queueName;
 
             info.m_address = commandListName;
             info.m_minTimeMs = commandListData.m_startTime;
@@ -670,11 +670,11 @@ void gpCommandListSummaryTable::InitCommandListSummaryMap()
                 ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItemByItemCallIndex(commandListData.m_queueName, apiIndex+1); // NZ ???
                 GT_IF_WITH_ASSERT(pItem != nullptr)
                 {
-                    if (pItem->StartTimeMilliseconds() == info.m_minTimeMs)
+                    if (pItem->StartTime() == info.m_minTimeMs)
                     {
                         info.m_pMinTimeItem = pItem;
                     }
-                    if (pItem->EndTimeMilliseconds() == info.m_maxTimeMs)
+                    if (pItem->EndTime() == info.m_maxTimeMs)
                     {
                         info.m_pMaxTimeItem = pItem;
                     }
@@ -738,12 +738,19 @@ void gpCommandListSummaryTable::AddSummaryRow(int rowIndex, APISummaryInfo* pInf
             switch (i)
             {
             case COLUMN_ADDRESS:
-            case COLUMN_GPU_QUEUE:
             {
                 pItem = allocateNewWidgetItem(rowStrings[i]);
                 setItem(rowIndex, i, pItem);
                 initItem(*pItem, rowStrings[i], nullptr, false, Qt::Unchecked, nullptr);
                 setItemTextColor(rowIndex, i, pInfo->m_typeColor);
+                shouldSetValue = false;
+            }
+            break;
+            case COLUMN_GPU_QUEUE:
+            {
+                pItem = allocateNewWidgetItem(rowStrings[i]);
+                setItem(rowIndex, i, pItem);
+                initItem(*pItem, rowStrings[i], nullptr, false, Qt::Unchecked, nullptr);
                 shouldSetValue = false;
             }
             break;
