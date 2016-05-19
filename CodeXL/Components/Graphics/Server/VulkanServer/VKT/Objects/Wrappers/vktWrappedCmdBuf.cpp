@@ -39,12 +39,12 @@ VktWrappedCmdBuf::VktWrappedCmdBuf(const WrappedCmdBufCreateInfo& createInfo) :
     m_potentialProfiledCallCount(0),
     m_potentialProfiledCallCountHighest(0),
     m_pStaticProfiler(nullptr),
-    m_submitNumber(0)
+    m_fillId(0)
 {
     memcpy(&m_createInfo, &createInfo, sizeof(m_createInfo));
 
 #if MEASURE_WHOLE_CMD_BUFS
-    m_pStaticProfiler = InitNewProfiler(PROFILER_TYPE_STATIC);
+    m_pStaticProfiler = static_cast<VktCmdBufProfilerStatic*>(InitNewProfiler(PROFILER_TYPE_STATIC));
 #endif
 }
 
@@ -53,18 +53,10 @@ VktWrappedCmdBuf::VktWrappedCmdBuf(const WrappedCmdBufCreateInfo& createInfo) :
 //-----------------------------------------------------------------------------
 void VktWrappedCmdBuf::Free()
 {
-    DestroyDynamicProfilers();
-
-    m_alive = false;
-
-#if MEASURE_WHOLE_CMD_BUFS
-    ScopeLock lock(&m_staticProfilerMutex);
-
-    if (m_pStaticProfiler != nullptr)
-    {
-        delete m_pStaticProfiler;
-        m_pStaticProfiler = nullptr;
-    }
+#if GATHER_PROFILER_RESULTS_WITH_WORKERS
+    FreeMT();
+#else
+    FreeST();
 #endif
 }
 
@@ -154,17 +146,9 @@ ProfilerResultCode VktWrappedCmdBuf::GetCmdBufResultsST(std::vector<ProfilerResu
 {
     ProfilerResultCode result = PROFILER_SUCCESS;
 
-    for (UINT i = 0; i < m_closedProfilers.size(); i++)
-    {
-        VktCmdBufProfiler* pProfiler = m_closedProfilers[i];
+    result = GetDynamicProfilerResults(m_fillId, outResults);
 
-        if (pProfiler != nullptr)
-        {
-            result = pProfiler->GetCmdBufResults(outResults);
-        }
-    }
-
-    result = GetStaticProfilerResults(outResults);
+    result = GetStaticProfilerResults(m_fillId, m_profiledCallCount, outResults);
 
     DestroyDynamicProfilers();
 
@@ -177,13 +161,13 @@ ProfilerResultCode VktWrappedCmdBuf::GetCmdBufResultsST(std::vector<ProfilerResu
 /// \param outResults A vector of measurement results retrieved from the profiler.
 /// \returns A ProfilerResultCode indicating the operation's success.
 //-----------------------------------------------------------------------------
-ProfilerResultCode VktWrappedCmdBuf::GetCmdBufResultsMT(INT64 targetExecId, std::vector<ProfilerResult>& outResults)
+ProfilerResultCode VktWrappedCmdBuf::GetCmdBufResultsMT(UINT64 targetFillId, UINT profiledCallCount, std::vector<ProfilerResult>& outResults)
 {
     ProfilerResultCode result = PROFILER_SUCCESS;
 
-    result = GetDynamicProfilerResultsMT(targetExecId, outResults);
+    result = GetDynamicProfilerResultsMT(targetFillId, outResults);
 
-    result = GetStaticProfilerResultsMT(outResults);
+    result = GetStaticProfilerResultsMT(targetFillId, profiledCallCount, outResults);
 
     return result;
 }
@@ -194,10 +178,8 @@ ProfilerResultCode VktWrappedCmdBuf::GetCmdBufResultsMT(INT64 targetExecId, std:
 /// \param outResults A vector of measurement results retrieved from the profiler.
 /// \returns A ProfilerResultCode indicating the operation's success.
 //-----------------------------------------------------------------------------
-ProfilerResultCode VktWrappedCmdBuf::GetDynamicProfilerResultsMT(INT64 targetExecId, std::vector<ProfilerResult>& outResults)
+ProfilerResultCode VktWrappedCmdBuf::GetDynamicProfilerResults(UINT64 targetFillId, std::vector<ProfilerResult>& outResults)
 {
-    ScopeLock lock(&m_closedProfilersMutex);
-
     ProfilerResultCode result = PROFILER_SUCCESS;
 
     for (UINT i = 0; i < m_closedProfilers.size(); i++)
@@ -206,7 +188,7 @@ ProfilerResultCode VktWrappedCmdBuf::GetDynamicProfilerResultsMT(INT64 targetExe
 
         if (pProfiler != nullptr)
         {
-            if (targetExecId == pProfiler->GetExecutionId())
+            if (targetFillId == pProfiler->GetFillId())
             {
                 result = pProfiler->GetCmdBufResults(outResults);
             }
@@ -221,7 +203,7 @@ ProfilerResultCode VktWrappedCmdBuf::GetDynamicProfilerResultsMT(INT64 targetExe
 /// \param outResults A vector of measurement results retrieved from the profiler.
 /// \returns A ProfilerResultCode indicating the operation's success.
 //-----------------------------------------------------------------------------
-ProfilerResultCode VktWrappedCmdBuf::GetStaticProfilerResults(std::vector<ProfilerResult>& outResults)
+ProfilerResultCode VktWrappedCmdBuf::GetStaticProfilerResults(UINT64 fillId, UINT profiledCallCount, std::vector<ProfilerResult>& outResults)
 {
     ProfilerResultCode result = PROFILER_SUCCESS;
 
@@ -229,15 +211,35 @@ ProfilerResultCode VktWrappedCmdBuf::GetStaticProfilerResults(std::vector<Profil
     if (m_pStaticProfiler != nullptr)
     {
 #ifdef CODEXL_GRAPHICS
-        if (m_profiledCallCount == 0)
+        if (profiledCallCount == 0)
         {
-            m_pStaticProfiler->GetCmdBufResults(outResults);
+            m_pStaticProfiler->GetCmdBufResults(fillId, outResults);
         }
 #else
-        m_pStaticProfiler->GetCmdBufResults(outResults);
+        UNREFERENCED_PARAMETER(profiledCallCount);
+
+        m_pStaticProfiler->GetCmdBufResults(fillId, outResults);
 #endif
     }
+#else
+    UNREFERENCED_PARAMETER(fillId);
+    UNREFERENCED_PARAMETER(outResults);
 #endif
+
+    return result;
+}
+
+//-----------------------------------------------------------------------------
+/// Synchronized result fetch from our closed profilers.
+/// \param targetFillId The Id of the ExecuteCommandBuffers to retrieve profiling results for.
+/// \param outResults A vector of measurement results retrieved from the profiler.
+/// \returns A ProfilerResultCode indicating the operation's success.
+//-----------------------------------------------------------------------------
+ProfilerResultCode VktWrappedCmdBuf::GetDynamicProfilerResultsMT(UINT64 targetFillId, std::vector<ProfilerResult>& outResults)
+{
+    ScopeLock lock(&m_closedProfilersMutex);
+
+    ProfilerResultCode result = GetDynamicProfilerResults(targetFillId, outResults);
 
     return result;
 }
@@ -247,13 +249,94 @@ ProfilerResultCode VktWrappedCmdBuf::GetStaticProfilerResults(std::vector<Profil
 /// \param outResults A vector of measurement results retrieved from the profiler.
 /// \returns A ProfilerResultCode indicating the operation's success.
 //-----------------------------------------------------------------------------
-ProfilerResultCode VktWrappedCmdBuf::GetStaticProfilerResultsMT(std::vector<ProfilerResult>& outResults)
+ProfilerResultCode VktWrappedCmdBuf::GetStaticProfilerResultsMT(UINT64 targetFillId, UINT profiledCallCount, std::vector<ProfilerResult>& outResults)
 {
     ScopeLock lock(&m_staticProfilerMutex);
 
-    ProfilerResultCode result = GetStaticProfilerResults(outResults);
+    ProfilerResultCode result = GetStaticProfilerResults(targetFillId, profiledCallCount, outResults);
 
     return result;
+}
+
+//-----------------------------------------------------------------------------
+/// Single-threaded free ops.
+//-----------------------------------------------------------------------------
+void VktWrappedCmdBuf::FreeST()
+{
+    m_alive = false;
+
+    DestroyDynamicProfilers();
+
+#if MEASURE_WHOLE_CMD_BUFS
+    ScopeLock lock(&m_staticProfilerMutex);
+
+    if (m_pStaticProfiler != nullptr)
+    {
+        delete m_pStaticProfiler;
+        m_pStaticProfiler = nullptr;
+    }
+#endif
+}
+
+//-----------------------------------------------------------------------------
+/// Multi-threaded free ops.
+//-----------------------------------------------------------------------------
+void VktWrappedCmdBuf::FreeMT()
+{
+    ScopeLock lock(&m_deletionQueueMutex);
+
+    m_alive = false;
+
+    for (UINT i = 0; i < m_closedProfilers.size(); i++)
+    {
+        m_deletionQueue.push(m_closedProfilers[i]);
+    }
+
+    m_deletionQueue.push(m_pDynamicProfiler);
+
+#if MEASURE_WHOLE_CMD_BUFS
+    m_deletionQueue.push(m_pStaticProfiler);
+#endif
+}
+
+//-----------------------------------------------------------------------------
+/// Release resources when using thread workers
+//-----------------------------------------------------------------------------
+void VktWrappedCmdBuf::ReleaseProfilersMT()
+{
+    if (m_alive == false)
+    {
+        ScopeLock lock(&m_deletionQueueMutex);
+
+        while (m_deletionQueue.empty() == false)
+        {
+            VktCmdBufProfiler* pProfiler = m_deletionQueue.front();
+
+            if (pProfiler != nullptr)
+            {
+                delete pProfiler;
+                pProfiler = nullptr;
+            }
+
+            m_deletionQueue.pop();
+        }
+    }
+    else
+    {
+        DestroyDynamicProfilers();
+    }
+}
+
+//-----------------------------------------------------------------------------
+/// Safely clear closed profilers, only to be called after wiping queue.
+//-----------------------------------------------------------------------------
+void VktWrappedCmdBuf::ClearProfilersMT()
+{
+    ScopeLock lock(&m_closedProfilersMutex);
+
+    m_closedProfilers.clear();
+    m_pDynamicProfiler = nullptr;
+    m_pStaticProfiler = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -272,26 +355,12 @@ void VktWrappedCmdBuf::DestroyDynamicProfilers()
         }
     }
 
+    m_closedProfilers.clear();
+
     if (m_pDynamicProfiler != nullptr)
     {
         delete m_pDynamicProfiler;
         m_pDynamicProfiler = nullptr;
-    }
-
-    m_closedProfilers.clear();
-}
-
-//-----------------------------------------------------------------------------
-/// Let the profiler know which group of command buffers this profiler belongs to.
-/// \param executionId The unique Id for the ExecuteCommandBuffers call executing profiler commands.
-//-----------------------------------------------------------------------------
-void VktWrappedCmdBuf::SetProfilerExecutionId(INT64 executionId)
-{
-    ScopeLock lock(&m_closedProfilersMutex);
-
-    if (m_closedProfilers.size() > 0)
-    {
-        m_closedProfilers.back()->SetExecutionId(executionId);
     }
 }
 
@@ -341,6 +410,7 @@ VktCmdBufProfiler* VktWrappedCmdBuf::InitNewProfiler(ProfilerType profilerType)
     config.mapTimestampMem        = false;
     config.newMemClear            = true;
     config.newMemClearValue       = 0;
+    config.cmdBufFillId           = m_fillId;
 
     if (profilerType == PROFILER_TYPE_DYNAMIC)
     {
@@ -348,6 +418,7 @@ VktCmdBufProfiler* VktWrappedCmdBuf::InitNewProfiler(ProfilerType profilerType)
     }
     else if (profilerType == PROFILER_TYPE_STATIC)
     {
+        config.measurementsPerGroup = 1;
         pProfiler = VktCmdBufProfilerStatic::Create(config);
     }
 
@@ -364,6 +435,8 @@ VkResult VktWrappedCmdBuf::BeginCommandBuffer(VkCommandBuffer commandBuffer, con
 {
     VkResult result = BeginCommandBuffer_ICD(commandBuffer, pBeginInfo);
 
+    m_fillId++;
+
     m_profiledCallCount = 0;
 
 #if MEASURE_WHOLE_CMD_BUFS
@@ -372,10 +445,10 @@ VkResult VktWrappedCmdBuf::BeginCommandBuffer(VkCommandBuffer commandBuffer, con
         if (m_pStaticProfiler != nullptr)
         {
             // SampleID is just an identifier, so we could use the command buffer handle plus the current submit number
-            UINT cmdBufId = ((UINT64)m_createInfo.appCmdBuf & 0xFFFFFFFF) + m_submitNumber;
+            UINT cmdBufId = ((UINT64)m_createInfo.appCmdBuf & 0xFFFFFFFF) + (UINT)m_fillId;
 
             ProfilerMeasurementId measurementId = {};
-            VktUtil::ConstructMeasurementInfo(FuncId_WholeCmdBuf, cmdBufId, this, VktLayerManager::GetLayerManager()->GetFrameCount(), measurementId);
+            VktUtil::ConstructMeasurementInfo(FuncId_WholeCmdBuf, cmdBufId, this, VktLayerManager::GetLayerManager()->GetFrameCount(), m_fillId, measurementId);
 
             m_pStaticProfiler->BeginCmdMeasurement(&measurementId);
         }

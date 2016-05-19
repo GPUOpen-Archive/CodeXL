@@ -4,7 +4,7 @@
 /// \file   vktCmdBufProfilerStatic.cpp
 /// \brief  Vulkan command buffer profiler.
 ///         Special version of the default profiler. This one is limited to
-///         a single measurement, whereas the other grows dynamically.
+///         a fixed number of measurements, whereas the other grows dynamically.
 //==============================================================================
 
 #include "vktCmdBufProfilerStatic.h"
@@ -20,7 +20,7 @@ VktCmdBufProfilerStatic* VktCmdBufProfilerStatic::Create(const VktCmdBufProfiler
 
     if (pOut != nullptr)
     {
-        if (pOut->Init(config) != VK_SUCCESS)
+        if ((pOut->Init(config) != VK_SUCCESS) || (pOut->InternalInit() != VK_SUCCESS))
         {
             delete pOut;
             pOut = nullptr;
@@ -34,9 +34,24 @@ VktCmdBufProfilerStatic* VktCmdBufProfilerStatic::Create(const VktCmdBufProfiler
 /// Constructor.
 //-----------------------------------------------------------------------------
 VktCmdBufProfilerStatic::VktCmdBufProfilerStatic() :
-    VktCmdBufProfiler(),
-    m_createdAssets(false)
+    VktCmdBufProfiler(), m_activeSlot(0)
 {
+    memset(&m_slots, 0, sizeof(m_slots));
+}
+
+//-----------------------------------------------------------------------------
+/// InternalInit
+//-----------------------------------------------------------------------------
+VkResult VktCmdBufProfilerStatic::InternalInit()
+{
+    VkResult result = VK_INCOMPLETE;
+
+    for (UINT i = 0; i < StaticMeasurementCount; i++)
+    {
+        result = CreateGpuResourceGroup(m_slots[i].gpuRes);
+    }
+
+    return result;
 }
 
 //-----------------------------------------------------------------------------
@@ -44,12 +59,9 @@ VktCmdBufProfilerStatic::VktCmdBufProfilerStatic() :
 //-----------------------------------------------------------------------------
 VktCmdBufProfilerStatic::~VktCmdBufProfilerStatic()
 {
-    // Verify this is no greater than 1
-    VKT_ASSERT(m_cmdBufData.measurementGroups.size() <= 1);
-
-    for (UINT i = 0; i < m_cmdBufData.measurementGroups.size(); i++)
+    for (UINT i = 0; i < StaticMeasurementCount; i++)
     {
-        ReleaseStaleResourceGroup(m_cmdBufData.measurementGroups[i].gpuRes);
+        ReleaseGpuResourceGroup(m_slots[i].gpuRes);
     }
 }
 
@@ -62,22 +74,23 @@ ProfilerResultCode VktCmdBufProfilerStatic::BeginCmdMeasurement(const ProfilerMe
 {
     ProfilerResultCode profilerResultCode = PROFILER_FAIL;
 
-    // This profiler only supports 1 measurement.
-    m_config.measurementsPerGroup = 1;
-    m_cmdBufData.cmdBufMeasurementCount = 1;
-
-    if (m_cmdBufData.state != PROFILER_STATE_MEASUREMENT_BEGAN)
+    if (m_activeSlot == StaticMeasurementCount)
     {
-        if (m_createdAssets == false)
+        m_activeSlot = 0;
+    }
+
+    MeasurementSlot& currSlot = m_slots[m_activeSlot];
+
+    if (currSlot.state != PROFILER_STATE_MEASUREMENT_BEGAN)
+    {
+        if (m_activeSlot == 0)
         {
-            VkResult result = VK_INCOMPLETE;
-            result = SetupNewMeasurementGroup();
-            VKT_ASSERT(result == VK_SUCCESS);
-
-            m_createdAssets = true;
+            m_pDeviceDT->CmdResetQueryPool(
+                m_config.cmdBuf,
+                currSlot.gpuRes.timestampQueryPool,
+                0,
+                m_maxQueriesPerGroup);
         }
-
-        m_pDeviceDT->CmdResetQueryPool(m_config.cmdBuf, m_cmdBufData.pActiveMeasurementGroup->gpuRes.timestampQueryPool, 0, 3);
 
         if (m_config.measurementTypeFlags & PROFILER_MEASUREMENT_TYPE_TIMESTAMPS)
         {
@@ -85,39 +98,29 @@ ProfilerResultCode VktCmdBufProfilerStatic::BeginCmdMeasurement(const ProfilerMe
             m_pDeviceDT->CmdWriteTimestamp(
                 m_config.cmdBuf,
                 VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-                m_cmdBufData.pActiveMeasurementGroup->gpuRes.timestampQueryPool,
+                currSlot.gpuRes.timestampQueryPool,
                 0);
 
             // Inject timestamp
             m_pDeviceDT->CmdWriteTimestamp(
                 m_config.cmdBuf,
                 VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
-                m_cmdBufData.pActiveMeasurementGroup->gpuRes.timestampQueryPool,
+                currSlot.gpuRes.timestampQueryPool,
                 1);
         }
 
+        m_activeSlot++;
+
         // Add a new measurement
         ProfilerMeasurementInfo clientData = {};
-        clientData.measurementNum = m_cmdBufData.cmdBufMeasurementCount;
+        clientData.measurementNum = m_activeSlot;
 
         if (pIdInfo != nullptr)
         {
-            memcpy(&clientData.idInfo, pIdInfo, sizeof(ProfilerMeasurementId));
+            memcpy(&currSlot.measurementInfo.idInfo, pIdInfo, sizeof(ProfilerMeasurementId));
         }
 
-        // Only fill in the first slot since we'll only ever have 1 measurement with this profiler
-        if (m_cmdBufData.pActiveMeasurementGroup->measurementInfos.size() == 1)
-        {
-            m_cmdBufData.pActiveMeasurementGroup->measurementInfos[0] = clientData;
-        }
-        else
-        {
-            m_cmdBufData.pActiveMeasurementGroup->measurementInfos.push_back(clientData);
-        }
-
-        m_cmdBufData.pActiveMeasurementGroup->groupMeasurementCount = 1;
-
-        m_cmdBufData.state = PROFILER_STATE_MEASUREMENT_BEGAN;
+        currSlot.state = PROFILER_STATE_MEASUREMENT_BEGAN;
 
         profilerResultCode = PROFILER_SUCCESS;
     }
@@ -126,6 +129,195 @@ ProfilerResultCode VktCmdBufProfilerStatic::BeginCmdMeasurement(const ProfilerMe
         profilerResultCode = PROFILER_ERROR_MEASUREMENT_ALREADY_BEGAN;
 
         VKT_ASSERT_ALWAYS();
+    }
+
+    return profilerResultCode;
+}
+
+//-----------------------------------------------------------------------------
+/// End profiling a GPU command.
+/// \returns A profiler result code indicating measurement success.
+//-----------------------------------------------------------------------------
+ProfilerResultCode VktCmdBufProfilerStatic::EndCmdMeasurement()
+{
+    ProfilerResultCode profilerResultCode = PROFILER_FAIL;
+
+    MeasurementSlot& currSlot = m_slots[m_activeSlot - 1];
+
+    if (currSlot.state == PROFILER_STATE_MEASUREMENT_BEGAN)
+    {
+        // Inject timestamp
+        if (m_config.measurementTypeFlags & PROFILER_MEASUREMENT_TYPE_TIMESTAMPS)
+        {
+            m_pDeviceDT->CmdWriteTimestamp(
+                m_config.cmdBuf,
+                VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+                currSlot.gpuRes.timestampQueryPool,
+                2);
+        }
+
+        currSlot.state = PROFILER_STATE_MEASUREMENT_ENDED;
+
+        profilerResultCode = PROFILER_SUCCESS;
+    }
+    else
+    {
+        profilerResultCode = PROFILER_MEASUREMENT_NOT_STARTED;
+
+        VKT_ASSERT_ALWAYS();
+    }
+
+    return profilerResultCode;
+}
+
+//-----------------------------------------------------------------------------
+/// Notify the profiler that this command buffer was closed.
+//-----------------------------------------------------------------------------
+void VktCmdBufProfilerStatic::NotifyCmdBufClosure()
+{
+    ProfilerResultCode result = PROFILER_FAIL;
+
+    MeasurementSlot& currSlot = m_slots[m_activeSlot - 1];
+
+    if (m_config.mapTimestampMem == true)
+    {
+        if (m_config.measurementTypeFlags & PROFILER_MEASUREMENT_TYPE_TIMESTAMPS)
+        {
+            if (currSlot.state == PROFILER_STATE_MEASUREMENT_ENDED)
+            {
+                m_pDeviceDT->CmdCopyQueryPoolResults(
+                    m_config.cmdBuf,
+                    currSlot.gpuRes.timestampQueryPool,
+                    0,
+                    ProfilerTimestampsPerMeasurement,
+                    currSlot.gpuRes.timestampBuffer,
+                    0,
+                    sizeof(UINT64),
+                    VK_QUERY_RESULT_WAIT_BIT | VK_QUERY_RESULT_64_BIT);
+
+                result = PROFILER_SUCCESS;
+            }
+        }
+    }
+
+    currSlot.state = PROFILER_STATE_CMD_BUF_CLOSED;
+}
+
+//-----------------------------------------------------------------------------
+/// We assume this will be called immediately after a command buffer has been submitted.
+/// \param fillId An identifier for how many times a command buffer was filled in.
+/// \param results A vector containing performance information for a given function.
+/// \returns A code with the result of collecting profiler results for the CommandBuffer.
+//-----------------------------------------------------------------------------
+ProfilerResultCode VktCmdBufProfilerStatic::GetCmdBufResults(UINT64 fillId, std::vector<ProfilerResult>& results)
+{
+    ProfilerResultCode profilerResultCode = PROFILER_THIS_CMD_BUF_WAS_NOT_CLOSED;
+
+    INT slot = -1;
+    for (UINT i = 0; i < StaticMeasurementCount; i++)
+    {
+        if (m_slots[i].measurementInfo.idInfo.fillId == fillId)
+        {
+            slot = i;
+            break;
+        }
+    }
+
+    if (slot != -1)
+    {
+        MeasurementSlot& currSlot = m_slots[slot];
+
+        if (currSlot.state == PROFILER_STATE_CMD_BUF_CLOSED)
+        {
+            VkResult result = VK_INCOMPLETE;
+
+            ProfilerInterval* pTimestampData = nullptr;
+
+            ProfilerInterval interval = {};
+
+            if (m_config.measurementTypeFlags & PROFILER_MEASUREMENT_TYPE_TIMESTAMPS)
+            {
+                // We use vkCmdCopyQueryPoolResults
+                if (m_config.mapTimestampMem == true)
+                {
+                    result = m_pDeviceDT->MapMemory(
+                        m_config.device,
+                        currSlot.gpuRes.timestampMem,
+                        0,
+                        VK_WHOLE_SIZE,
+                        0,
+                        (void**)&pTimestampData);
+                }
+
+                // We use vkGetQueryPoolResults
+                else
+                {
+                    result = m_pDeviceDT->GetQueryPoolResults(
+                        m_config.device,
+                        currSlot.gpuRes.timestampQueryPool,
+                        0,
+                        3,
+                        sizeof(ProfilerInterval),
+                        &interval,
+                        sizeof(UINT64),
+                        VK_QUERY_RESULT_WAIT_BIT | VK_QUERY_RESULT_64_BIT);
+
+                    pTimestampData = &interval;
+                }
+            }
+
+            // Report no results
+            if (m_config.measurementTypeFlags == PROFILER_MEASUREMENT_TYPE_NONE)
+            {
+                ProfilerResult profilerResult = {};
+                results.push_back(profilerResult);
+            }
+
+            // Fetch our results
+            else
+            {
+                profilerResultCode = PROFILER_SUCCESS;
+
+                ProfilerResult profilerResult = {};
+
+                memcpy(&profilerResult.measurementInfo, &currSlot.measurementInfo, sizeof(ProfilerMeasurementInfo));
+
+                if (m_config.measurementTypeFlags & PROFILER_MEASUREMENT_TYPE_TIMESTAMPS)
+                {
+                    UINT64* pTimerPreBegin = &pTimestampData->preStart;
+                    UINT64* pTimerBegin = &pTimestampData->start;
+                    UINT64* pTimerEnd = &pTimestampData->end;
+                    UINT64 baseClock = pTimestampData->start;
+
+                    // Store raw clocks
+                    profilerResult.timestampResult.rawClocks.preStart = *pTimerPreBegin;
+                    profilerResult.timestampResult.rawClocks.start = *pTimerBegin;
+                    profilerResult.timestampResult.rawClocks.end = *pTimerEnd;
+
+                    // Calculate adjusted clocks
+                    profilerResult.timestampResult.adjustedClocks.preStart = 0;
+                    profilerResult.timestampResult.adjustedClocks.start = *pTimerBegin - baseClock;
+                    profilerResult.timestampResult.adjustedClocks.end = *pTimerEnd - baseClock;
+
+                    // Calculate exec time
+                    profilerResult.timestampResult.execMicroSecs = static_cast<double>(*pTimerEnd - *pTimerBegin) / m_gpuTimestampFreq;
+                    profilerResult.timestampResult.execMicroSecs *= 1000000;
+
+                    // Detected a zero timestamp. Allow this and continue, but some results are invalid.
+                    VKT_ASSERT((*pTimerPreBegin != 0ULL) && (*pTimerBegin != 0ULL) && (*pTimerEnd != 0ULL));
+                }
+
+                results.push_back(profilerResult);
+            }
+
+            if (pTimestampData != nullptr)
+            {
+                if (m_config.mapTimestampMem == true)
+                {
+                    m_pDeviceDT->UnmapMemory(m_config.device, currSlot.gpuRes.timestampMem);
+                }
+            }
+        }
     }
 
     return profilerResultCode;

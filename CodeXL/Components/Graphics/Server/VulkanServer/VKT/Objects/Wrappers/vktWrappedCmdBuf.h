@@ -11,6 +11,7 @@
 #include "vktWrappedObject.h"
 #include "../../Util/vktUtil.h"
 #include "../../Profiling/vktCmdBufProfiler.h"
+#include "../../Profiling/vktCmdBufProfilerStatic.h"
 
 class VktInterceptManager;
 
@@ -51,10 +52,16 @@ public:
     ProfilerResultCode BeginCmdMeasurement(const ProfilerMeasurementId* pIdInfo);
     ProfilerResultCode EndCmdMeasurement();
     ProfilerResultCode GetCmdBufResultsST(std::vector<ProfilerResult>& outResults);
-    ProfilerResultCode GetCmdBufResultsMT(INT64 targetExecId, std::vector<ProfilerResult>& outResults);
-    ProfilerResultCode GetDynamicProfilerResultsMT(INT64 targetExecId, std::vector<ProfilerResult>& outResults);
-    ProfilerResultCode GetStaticProfilerResults(std::vector<ProfilerResult>& outResults);
-    ProfilerResultCode GetStaticProfilerResultsMT(std::vector<ProfilerResult>& outResults);
+    ProfilerResultCode GetCmdBufResultsMT(UINT64 targetFillId, UINT profiledCallCount, std::vector<ProfilerResult>& outResults);
+    ProfilerResultCode GetDynamicProfilerResults(UINT64 targetFillId, std::vector<ProfilerResult>& outResults);
+    ProfilerResultCode GetStaticProfilerResults(UINT64 fillId, UINT profiledCallCount, std::vector<ProfilerResult>& outResults);
+    ProfilerResultCode GetDynamicProfilerResultsMT(UINT64 targetFillId, std::vector<ProfilerResult>& outResults);
+    ProfilerResultCode GetStaticProfilerResultsMT(UINT64 targetFillId, UINT profiledCallCount, std::vector<ProfilerResult>& outResults);
+
+    void FreeST();
+    void FreeMT();
+    void ReleaseProfilersMT();
+    void ClearProfilersMT();
 
     /// Determine if this command buffer is currently being profiled
     bool IsProfilingEnabled() { return m_pDynamicProfiler != nullptr; }
@@ -63,14 +70,12 @@ public:
     UINT GetProfiledCallCount() const { return m_profiledCallCount; }
 
     void DestroyDynamicProfilers();
-    void SetProfilerExecutionId(INT64 executionId);
 
     VkResult BeginCommandBuffer(VkCommandBuffer commandBuffer, const VkCommandBufferBeginInfo* pBeginInfo);
     VkResult EndCommandBuffer(VkCommandBuffer commandBuffer);
     VkResult ResetCommandBuffer(VkCommandBuffer commandBuffer, VkCommandBufferResetFlags flags);
 
-    /// Keep track of how many times this command buffer was submitted
-    void IncrementSubmitCount() { m_submitNumber++; }
+    UINT64 FillCount() { return m_fillId; }
 
 #if TRACK_CMD_LIST_COMMANDS
     void PrintCommands();
@@ -141,7 +146,13 @@ private:
     mutex m_closedProfilersMutex;
 
     /// A profiler dedicated to measuring the span of this entire command buffer.
-    VktCmdBufProfiler* m_pStaticProfiler;
+    VktCmdBufProfilerStatic* m_pStaticProfiler;
+
+    /// Track stale profilers
+    std::queue<VktCmdBufProfiler*> m_deletionQueue;
+
+    /// Mutex to lock the usage of profiler instances
+    mutex m_deletionQueueMutex;
 
     /// Mutex to lock the usage of profilers used to measure full command buffer duration.
     mutex m_staticProfilerMutex;
@@ -158,8 +169,8 @@ private:
     /// CmdBuf create info
     WrappedCmdBufCreateInfo m_createInfo;
 
-    /// Track number of submits
-    UINT m_submitNumber;
+    /// Track the number of times this cmdBuf was filled in
+    UINT64 m_fillId;
 
     /// Track aliveness
     bool m_alive;

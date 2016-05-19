@@ -14,16 +14,26 @@
 class VktWrappedQueue;
 
 //-----------------------------------------------------------------------------
+/// Holds information about a command buffer and its desired fill ID
+//-----------------------------------------------------------------------------
+struct WrappedCmdBufData
+{
+    VktWrappedCmdBuf* pCmdBuf;           ///< The profiled command buffer
+    UINT64            targetFillID;      ///< An ID specifying how many times this command buffer was filled
+    UINT              profiledCallCount; ///< The last-known number of times this cmdBuf was profiled
+};
+
+//-----------------------------------------------------------------------------
 /// Holds information passed to a worker thread.
 //-----------------------------------------------------------------------------
 struct WorkerInputs
 {
-    bool                           internalFence;                 ///< The fence passed here is internal to VulkanServer
-    VkFence                        fenceToWaitOn;                 ///< The fence we should be waiting on
-    CalibrationTimestampPair       timestampPair;                 ///< A pair of timestamps used to align CPU and GPU timelines
-    VktWrappedQueue*               pQueue;                        ///< The Queue used to profile calls
-    std::vector<VktWrappedCmdBuf*> cmdBufs;                       ///< A vector of known command buffers
-    INT64                          executionID;                   ///< Track which ExecuteCommandBuffers() call this worker is for
+    bool                           internalFence;     ///< The fence passed here is internal to VulkanServer
+    VkFence                        fenceToWaitOn;     ///< The fence we should be waiting on
+    CalibrationTimestampPair       timestampPair;     ///< A pair of timestamps used to align CPU and GPU timelines
+    VktWrappedQueue*               pQueue;            ///< The Queue used to profile calls
+    std::vector<WrappedCmdBufData> cmdBufData;        ///< A vector of WrappedCmdBufData structs
+    GPS_TIMESTAMP                  frameStartTime;    ///< Cache frame start time before launching threads
 };
 
 //-----------------------------------------------------------------------------
@@ -31,8 +41,7 @@ struct WorkerInputs
 //-----------------------------------------------------------------------------
 struct WorkerOutputs
 {
-    bool                        bResultsGathered; ///< A flag used to indicate if the results were gathered correctly
-    std::vector<ProfilerResult> results;          ///< A vector containing all collected profiler results
+    std::vector<ProfilerResult> results;      ///< A vector containing all collected profiler results
 };
 
 //-----------------------------------------------------------------------------
@@ -61,9 +70,8 @@ public:
         m_inputs.internalFence = false;
         m_inputs.fenceToWaitOn = VK_NULL_HANDLE;
         m_inputs.pQueue        = nullptr;
-        m_inputs.executionID = -1;
 
-        m_outputs.bResultsGathered = false;
+        memset(&m_inputs.frameStartTime, 0, sizeof(m_inputs.frameStartTime));
 
         memset(&m_threadInfo, 0, sizeof(m_threadInfo));
     }

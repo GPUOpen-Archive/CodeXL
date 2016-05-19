@@ -61,7 +61,6 @@ enum ProfilerResultCode
     PROFILER_THIS_CMD_BUF_WAS_NOT_CLOSED,
     PROFILER_MEASUREMENT_NOT_STARTED,
     PROFILER_ERROR_MEASUREMENT_ALREADY_BEGAN,
-    PROFILER_ERROR_MEASUREMENT_CONTAINED_ZEROES,
 };
 
 //-----------------------------------------------------------------------------
@@ -78,6 +77,7 @@ struct VktCmdBufProfilerConfig
     bool             mapTimestampMem;        ///< Use vkCmdCopyQueryPoolResults or vkGetQueryPoolResults
     bool             newMemClear;            ///< A flag used to indicate if we should clear the profiler's timestamp memory before profiling
     UINT64           newMemClearValue;       ///< The value to clear the profiler memory to
+    UINT64           cmdBufFillId;           ///< The command buffer's fill ID
 };
 
 //-----------------------------------------------------------------------------
@@ -170,7 +170,7 @@ public:
 
     virtual ~VktCmdBufProfiler();
 
-    virtual ProfilerResultCode BeginCmdMeasurement(const ProfilerMeasurementId* pIdInfo);
+    ProfilerResultCode BeginCmdMeasurement(const ProfilerMeasurementId* pIdInfo);
     ProfilerResultCode EndCmdMeasurement();
     ProfilerResultCode GetCmdBufResults(std::vector<ProfilerResult>& results);
 
@@ -179,13 +179,10 @@ public:
 
     static const char* PrintProfilerResult(ProfilerResultCode resultCode);
 
-    /// Set execution ID
-    void SetExecutionId(INT64 executionId) { m_executionId = executionId; }
+    /// Return the command buffer's fill ID
+    UINT64 GetFillId() { return m_config.cmdBufFillId; }
 
-    /// Return the execution ID
-    INT64 GetExecutionId() { return m_executionId; }
-
-    virtual VkResult ResetProfilerState();
+    VkResult ResetProfilerState();
 
 protected:
     VktCmdBufProfiler();
@@ -194,7 +191,8 @@ protected:
 
     VkResult SetupNewMeasurementGroup();
     VkResult CreateQueryBuffer(VkBuffer* pBuffer, VkDeviceMemory* pMemory, UINT size);
-    VkResult ReleaseStaleResourceGroup(ProfilerGpuResources& gpuRes);
+    VkResult CreateGpuResourceGroup(ProfilerGpuResources& gpuRes);
+    VkResult ReleaseGpuResourceGroup(ProfilerGpuResources& gpuRes);
     void ClearCmdBufData();
     VkResult MemTypeFromProps(UINT typeBits, VkFlags reqsMask, UINT* pTypeIdx);
 
@@ -210,9 +208,6 @@ protected:
     /// Critical section object
     mutex m_mutex;
 
-    /// Track which ExecuteCommandBuffers() group this profiler belongs to.
-    INT64 m_executionId;
-
     /// GPU properties
     VkPhysicalDeviceProperties m_physicalDeviceProps;
 
@@ -227,5 +222,8 @@ protected:
 
     /// Device dispatch table
     VkLayerDispatchTable* m_pDeviceDT;
+
+    /// Track how many queries we will create per group
+    UINT m_maxQueriesPerGroup;
 };
 #endif // __VKT_CMD_BUF_PROFILER_H__

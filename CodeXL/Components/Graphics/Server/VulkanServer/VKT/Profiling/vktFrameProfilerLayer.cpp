@@ -144,6 +144,11 @@ void VktFrameProfilerLayer::VerifyAlignAndStoreResults(
     UINT32                       threadID,
     GPS_TIMESTAMP                frameStartTime)
 {
+#if MANUAL_TIMESTAMP_CALIBRATION == 0
+    UNREFERENCED_PARAMETER(pTimestampPair);
+    UNREFERENCED_PARAMETER(frameStartTime);
+#endif
+
     SampleIdToProfilerResultMap* pResultMap = FindOrCreateProfilerResultsMap(pQueue, threadID);
     PsAssert(pResultMap != nullptr);
 
@@ -267,7 +272,7 @@ void VktFrameProfilerLayer::PreCall(FuncId funcId, VktWrappedCmdBuf* pWrappedCmd
             UINT64 nextSampleId = SetNextSampleId(pSampleInfo);
 
             ProfilerMeasurementId measurementId = {};
-            VktUtil::ConstructMeasurementInfo(funcId, nextSampleId, pWrappedCmdBuf, GetParentLayerManager()->GetFrameCount(), measurementId);
+            VktUtil::ConstructMeasurementInfo(funcId, nextSampleId, pWrappedCmdBuf, GetParentLayerManager()->GetFrameCount(), pWrappedCmdBuf->FillCount(), measurementId);
 
             ProfilerResultCode beginResult = pWrappedCmdBuf->BeginCmdMeasurement(&measurementId);
 
@@ -513,6 +518,9 @@ VkResult VktFrameProfilerLayer::CollectCalibrationTimestamps(VktWrappedQueue* pW
             pTimestampedCmdBuf = nullptr;
         }
     }
+#else
+    UNREFERENCED_PARAMETER(pWrappedQueue);
+    UNREFERENCED_PARAMETER(pTimestamps);
 #endif
 
     return result;

@@ -71,7 +71,6 @@ struct CalibrationTimestampPair
     UINT64        mBeforeExecutionGPUTimestamp; ///< A GPU timestamp
     GPS_TIMESTAMP cpuFrequency;                 ///< The clock frequency for the CPU that executed API calls
     UINT64        mQueueFrequency;              ///< The clock frequency for the Queue that work was submitted through
-    bool          mQueueCanBeTimestamped;       ///< A flag used to determine if the Queue can be timestamped
 };
 
 //-----------------------------------------------------------------------------
@@ -83,6 +82,7 @@ struct ProfilerMeasurementId
     UINT              funcId;          ///< The function currently being profiled
     UINT              frame;           ///< The frame being profiled
     VktWrappedCmdBuf* pWrappedCmdBuf;  ///< Pointers to parent command buffer
+    UINT64            fillId;          ///< An ID used to track how many times a cmdBuf was filled in
 };
 
 /// The maximum size allowed for string-ified entry point arguments
@@ -108,7 +108,7 @@ typedef const char* (WriteEnum_Hook)(UINT flags);
 //-----------------------------------------------------------------------------
 namespace VktUtil
 {
-void ConstructMeasurementInfo(FuncId inFuncId, UINT64 sampleId, VktWrappedCmdBuf* pWrappedCmdBuf, UINT frameNum, ProfilerMeasurementId& measurementId);
+void ConstructMeasurementInfo(FuncId inFuncId, UINT64 sampleId, VktWrappedCmdBuf* pWrappedCmdBuf, UINT frameNum, UINT64 fillId, ProfilerMeasurementId& measurementId);
 void DecomposeFlags(UINT flags, gtASCIIString& ioFlagsString, WriteEnum_Hook inWriteHook, UINT inMinFlag, UINT inMaxFlag);
 
 const char* WritePipelineCacheHeaderVersionEnumAsString(int enumVal);

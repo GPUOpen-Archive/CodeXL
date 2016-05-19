@@ -36,27 +36,23 @@ DWORD WINAPI ThreadFunc(LPVOID lpParam)
     waitResult = device_dispatch_table(queue)->QueueWaitIdle(queue);
 #endif
 
-    if (pWorkerInfo->m_inputs.timestampPair.mQueueCanBeTimestamped)
+    for (UINT i = 0; i < pWorkerInfo->m_inputs.cmdBufData.size(); i++)
     {
-        for (UINT i = 0; i < pWorkerInfo->m_inputs.cmdBufs.size(); i++)
+        VktWrappedCmdBuf* pWrappedCmdBuf = pWorkerInfo->m_inputs.cmdBufData[i].pCmdBuf;
+        UINT64 targetFillId = pWorkerInfo->m_inputs.cmdBufData[i].targetFillID;
+        UINT profiledCallCount = pWorkerInfo->m_inputs.cmdBufData[i].profiledCallCount;
+
+        ProfilerResultCode profResult = pWrappedCmdBuf->GetCmdBufResultsMT(targetFillId, profiledCallCount, pWorkerInfo->m_outputs.results);
+
+        if (profResult != PROFILER_SUCCESS)
         {
-            VktWrappedCmdBuf* pWrappedCmdBuf = pWorkerInfo->m_inputs.cmdBufs[i];
+            const char* profilerErrorCode = VktCmdBufProfiler::PrintProfilerResult(profResult);
 
-            ProfilerResultCode profResult = pWrappedCmdBuf->GetCmdBufResultsMT(pWorkerInfo->m_inputs.executionID, pWorkerInfo->m_outputs.results);
-
-            if (profResult != PROFILER_SUCCESS)
-            {
-                const char* profilerErrorCode = VktCmdBufProfiler::PrintProfilerResult(profResult);
-
-                // Report that a problem occurred in retrieving full profiler results.
-                Log(logERROR, "Failed to retrieve full profiler results: CmdBuf 0x%p, Queue 0x%p, ErrorCode %s\n",
-                    pWorkerInfo->m_inputs.cmdBufs[i], pWorkerInfo->m_inputs.pQueue, profilerErrorCode);
-            }
+            // Report that a problem occurred in retrieving full profiler results.
+            Log(logERROR, "Failed to retrieve full profiler results: CmdBuf 0x%p, Queue 0x%p, ErrorCode %s\n",
+                pWorkerInfo->m_inputs.cmdBufData[i].pCmdBuf, pWorkerInfo->m_inputs.pQueue, profilerErrorCode);
         }
     }
-
-    // This will only be set to true if the GPU results have come back in time.
-    pWorkerInfo->m_outputs.bResultsGathered = true;
 
     return 0;
 }
@@ -83,10 +79,15 @@ VktWrappedQueue* VktWrappedQueue::Create(const WrappedQueueCreateInfo& createInf
 /// Constructor
 /// \param createInfo Creation struct used to construct this wrapper.
 //-----------------------------------------------------------------------------
-VktWrappedQueue::VktWrappedQueue(const WrappedQueueCreateInfo& createInfo) :
-    m_executionID(-1)
+VktWrappedQueue::VktWrappedQueue(const WrappedQueueCreateInfo& createInfo)
 {
     memcpy(&m_createInfo, &createInfo, sizeof(m_createInfo));
+
+    UINT queueCount = 1;
+    VkQueueFamilyProperties queueProps = {};
+    instance_dispatch_table(m_createInfo.physicalDevice)->GetPhysicalDeviceQueueFamilyProperties(m_createInfo.physicalDevice, &queueCount, &queueProps);
+
+    m_timestampsSupported = (queueProps.timestampValidBits != 0) ? true : false;
 }
 
 //-----------------------------------------------------------------------------
@@ -145,17 +146,22 @@ void VktWrappedQueue::SpawnWorker(
 
         VktWorkerInfo* pWorkerInfo = new VktWorkerInfo();
 
-        pWorkerInfo->m_inputs.internalFence = internalFence;
-        pWorkerInfo->m_inputs.fenceToWaitOn = fenceToWaitOn;
-        pWorkerInfo->m_inputs.pQueue        = pQueue;
-        pWorkerInfo->m_inputs.executionID   = m_executionID;
+        pWorkerInfo->m_inputs.internalFence  = internalFence;
+        pWorkerInfo->m_inputs.fenceToWaitOn  = fenceToWaitOn;
+        pWorkerInfo->m_inputs.pQueue         = pQueue;
+        pWorkerInfo->m_inputs.frameStartTime = VktTraceAnalyzerLayer::Instance()->GetFrameStartTime();
 
         pWorkerInfo->m_threadInfo.workerThreadCountID = s_threadID++;
         pWorkerInfo->m_threadInfo.parentThreadID = osGetCurrentThreadId();
 
-        for (size_t index = 0; index < cmdBufCount; index++)
+        for (size_t i = 0; i < cmdBufCount; i++)
         {
-            pWorkerInfo->m_inputs.cmdBufs.push_back(cmdBufs[index]);
+            WrappedCmdBufData cmdBufData = {};
+            cmdBufData.pCmdBuf           = cmdBufs[i];
+            cmdBufData.targetFillID      = cmdBufs[i]->FillCount();
+            cmdBufData.profiledCallCount = cmdBufs[i]->GetProfiledCallCount();
+
+            pWorkerInfo->m_inputs.cmdBufData.push_back(cmdBufData);
         }
 
         memcpy(&pWorkerInfo->m_inputs.timestampPair, pTimestampPair, sizeof(pWorkerInfo->m_inputs.timestampPair));
@@ -182,13 +188,13 @@ void VktWrappedQueue::EndCollection()
     for (UINT i = 0; i < m_workerThreadInfo.size(); i++)
     {
         // Delete profiler memory
-        for (UINT j = 0; j < m_workerThreadInfo[i]->m_inputs.cmdBufs.size(); j++)
+        for (UINT j = 0; j < m_workerThreadInfo[i]->m_inputs.cmdBufData.size(); j++)
         {
-            VktWrappedCmdBuf* pCmdBuf = m_workerThreadInfo[i]->m_inputs.cmdBufs[j];
+            VktWrappedCmdBuf* pCmdBuf = m_workerThreadInfo[i]->m_inputs.cmdBufData[j].pCmdBuf;
 
             if (pCmdBuf != nullptr)
             {
-                pCmdBuf->DestroyDynamicProfilers();
+                pCmdBuf->ReleaseProfilersMT();
             }
         }
 
@@ -228,79 +234,63 @@ double VktWrappedQueue::GetTimestampFrequency()
 //-----------------------------------------------------------------------------
 VkResult VktWrappedQueue::QueueSubmit(VkQueue queue, uint32_t submitCount, const VkSubmitInfo* pSubmits, VkFence fence)
 {
-    m_executionID++;
-
     VkResult result = VK_INCOMPLETE;
 
-    VktTraceAnalyzerLayer* pTraceAnalyzer = VktTraceAnalyzerLayer::Instance();
-    VktFrameProfilerLayer* pFrameProfiler = VktFrameProfilerLayer::Instance();
-
-    // Use this calibration timestamp structure to convert GPU events to the CPU timeline.
-    CalibrationTimestampPair calibrationTimestamps = {};
-    calibrationTimestamps.mQueueCanBeTimestamped = true;
-
-    VkFence fenceToWaitOn = fence;
-    bool usingInternalFence = false;
-
-    std::vector<VktWrappedCmdBuf*> wrappedCmdBufs;
-    GatherWrappedCommandBufs(submitCount, pSubmits, wrappedCmdBufs);
-
-    for (UINT i = 0; i < wrappedCmdBufs.size(); i++)
+    if (m_timestampsSupported == true)
     {
-        wrappedCmdBufs[i]->SetProfilerExecutionId(m_executionID);
-        wrappedCmdBufs[i]->IncrementSubmitCount();
-    }
+        VktTraceAnalyzerLayer* pTraceAnalyzer = VktTraceAnalyzerLayer::Instance();
+        VktFrameProfilerLayer* pFrameProfiler = VktFrameProfilerLayer::Instance();
 
-    // Surround the execution of CommandBuffers with timestamps so we can determine when the GPU work occurred in the CPU timeline.
-    if (pTraceAnalyzer->ShouldCollectTrace() && pFrameProfiler->ShouldCollectGPUTime())
-    {
-        // Collect calibration timestamps in case we need to align GPU events against the CPU timeline.
-        if (calibrationTimestamps.mQueueCanBeTimestamped)
+        // Use this calibration timestamp structure to convert GPU events to the CPU timeline.
+        CalibrationTimestampPair calibrationTimestamps = {};
+
+        VkFence fenceToWaitOn = fence;
+        bool usingInternalFence = false;
+
+        std::vector<VktWrappedCmdBuf*> wrappedCmdBufs;
+        GatherWrappedCommandBufs(submitCount, pSubmits, wrappedCmdBufs);
+
+        // Surround the execution of CommandBuffers with timestamps so we can determine when the GPU work occurred in the CPU timeline.
+        if (pTraceAnalyzer->ShouldCollectTrace() && pFrameProfiler->ShouldCollectGPUTime())
         {
+            // Collect calibration timestamps in case we need to align GPU events against the CPU timeline.
             pFrameProfiler->CollectCalibrationTimestamps(this, &calibrationTimestamps);
+
+            // Inject our own fence if the app did not supply one
+            if (fenceToWaitOn == VK_NULL_HANDLE)
+            {
+                // Create internal fence
+                VkFenceCreateInfo fenceCreateInfo = {};
+                VkResult fenceResult = VK_INCOMPLETE;
+                fenceResult = device_dispatch_table(queue)->CreateFence(m_createInfo.device, &fenceCreateInfo, nullptr, &fenceToWaitOn);
+                VKT_ASSERT(fenceResult == VK_SUCCESS);
+
+                usingInternalFence = true;
+            }
         }
-        else
+
+        // Invoke the real call to execute on the GPU
+        result = QueueSubmit_ICD(queue, submitCount, pSubmits, fenceToWaitOn);
+
+        if (pTraceAnalyzer->ShouldCollectTrace() && pFrameProfiler->ShouldCollectGPUTime())
         {
-            Log(logTRACE, "Did not collect calibration timestamps for Queue '0x%p'\n", this);
-        }
-
-        // Inject our own fence if the app did not supply one
-        if (fenceToWaitOn == VK_NULL_HANDLE)
-        {
-            // Create internal fence
-            VkFenceCreateInfo fenceCreateInfo = {};
-            VkResult fenceResult = VK_INCOMPLETE;
-            fenceResult = device_dispatch_table(queue)->CreateFence(m_createInfo.device, &fenceCreateInfo, nullptr, &fenceToWaitOn);
-            VKT_ASSERT(fenceResult == VK_SUCCESS);
-
-            usingInternalFence = true;
-        }
-    }
-
-    // Invoke the real call to execute on the GPU
-    result = QueueSubmit_ICD(queue, submitCount, pSubmits, fenceToWaitOn);
-
-    if (pTraceAnalyzer->ShouldCollectTrace() && pFrameProfiler->ShouldCollectGPUTime())
-    {
-        // Collect the CPU and GPU frequency to convert timestamps.
-        QueryPerformanceFrequency(&calibrationTimestamps.cpuFrequency);
+            // Collect the CPU and GPU frequency to convert timestamps.
+            QueryPerformanceFrequency(&calibrationTimestamps.cpuFrequency);
 
 #if GATHER_PROFILER_RESULTS_WITH_WORKERS
-        SpawnWorker(&calibrationTimestamps, this, fenceToWaitOn, usingInternalFence, wrappedCmdBufs);
+            SpawnWorker(&calibrationTimestamps, this, fenceToWaitOn, usingInternalFence, wrappedCmdBufs);
 #else
-        VkResult waitResult = VK_TIMEOUT;
+            VkResult waitResult = VK_TIMEOUT;
 
 #if GPU_FENCES_FOR_PROFILER_WAIT
-        do
-        {
-            waitResult = device_dispatch_table(m_createInfo.device)->WaitForFences(m_createInfo.device, 1, &fenceToWaitOn, VK_TRUE, GPU_FENCE_TIMEOUT_TIME);
-        } while (waitResult == VK_TIMEOUT);
+            do
+            {
+                waitResult = device_dispatch_table(m_createInfo.device)->WaitForFences(m_createInfo.device, 1, &fenceToWaitOn, VK_TRUE, GPU_FENCE_TIMEOUT_TIME);
+            } while (waitResult == VK_TIMEOUT);
 #else
-        waitResult = device_dispatch_table(queue)->QueueWaitIdle(queue);
+            waitResult = device_dispatch_table(queue)->QueueWaitIdle(queue);
 #endif
 
-        if (calibrationTimestamps.mQueueCanBeTimestamped)
-        {
             // Put all results into thread ID 0 bucket
             const UINT32 threadID = 0;
             std::vector<ProfilerResult> results;
@@ -319,20 +309,21 @@ VkResult VktWrappedQueue::QueueSubmit(VkQueue queue, uint32_t submitCount, const
             {
                 device_dispatch_table(m_createInfo.device)->DestroyFence(m_createInfo.device, fenceToWaitOn, nullptr);
             }
-        }
-        else
-        {
-            Log(logTRACE, "Didn't collect calibration timestamps for Queue '0x%p'.\n", this);
-        }
 #endif
-    }
+        }
 
 #if GATHER_PROFILER_RESULTS_WITH_WORKERS == 0
-    for (UINT i = 0; i < wrappedCmdBufs.size(); i++)
-    {
-        wrappedCmdBufs[i]->DestroyDynamicProfilers();
-    }
+        for (UINT i = 0; i < wrappedCmdBufs.size(); i++)
+        {
+            wrappedCmdBufs[i]->DestroyDynamicProfilers();
+        }
 #endif
+
+    }
+    else
+    {
+        result = QueueSubmit_ICD(queue, submitCount, pSubmits, fence);
+    }
 
     return result;
 }

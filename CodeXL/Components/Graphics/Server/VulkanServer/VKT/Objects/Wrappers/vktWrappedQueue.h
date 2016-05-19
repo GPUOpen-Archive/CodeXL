@@ -98,8 +98,8 @@ private:
     /// A mutex used to serialize access to the worker thread info storage.
     mutex m_workerThreadInfoMutex;
 
-    /// Track an ExecuteCommandBuffers ID.
-    INT64 m_executionID;
+    /// Track whether this queue supports timestamps.
+    bool m_timestampsSupported;
 };
 
 #endif // __VKT_WRAPPED_QUEUE_H__

@@ -281,7 +281,7 @@ void VktTraceAnalyzerLayer::WaitAndFetchResults(VktFrameProfilerLayer* pFramePro
                         pWorkerInfo->m_outputs.results,
                         &pWorkerInfo->m_inputs.timestampPair,
                         pWorkerInfo->m_threadInfo.workerThreadCountID,
-                        mFramestartTime);
+                        pWorkerInfo->m_inputs.frameStartTime);
                 }
             }
 

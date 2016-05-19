@@ -4,13 +4,26 @@
 /// \file   vktCmdBufProfilerStatic.h
 /// \brief  Vulkan command buffer profiler.
 ///         Special version of the default profiler. This one is limited to
-///         a single measurement, whereas the other grows dynamically.
+///         a fixed number of measurements, whereas the other grows dynamically.
 //==============================================================================
 
 #ifndef __VKT_CMD_BUF_PROFILER_STATIC_H__
 #define __VKT_CMD_BUF_PROFILER_STATIC_H__
 
 #include "vktCmdBufProfiler.h"
+
+/// Only permit a pool of size 2
+static const UINT StaticMeasurementCount = 2;
+
+//-----------------------------------------------------------------------------
+/// Holds information for one of the StaticMeasurementCount slots.
+//-----------------------------------------------------------------------------
+struct MeasurementSlot
+{
+    ProfilerState           state;            ///< Profiler state for this slot
+    ProfilerGpuResources    gpuRes;           ///< The GPU resources used by this slot
+    ProfilerMeasurementInfo measurementInfo;  ///< Measurement info for this slot
+};
 
 //-----------------------------------------------------------------------------
 /// The Vulkan command buffer profiler.
@@ -24,13 +37,19 @@ public:
 
     virtual ~VktCmdBufProfilerStatic();
 
-    virtual ProfilerResultCode BeginCmdMeasurement(const ProfilerMeasurementId* pIdInfo);
+    ProfilerResultCode BeginCmdMeasurement(const ProfilerMeasurementId* pIdInfo);
+    ProfilerResultCode EndCmdMeasurement();
+    void NotifyCmdBufClosure();
+    ProfilerResultCode GetCmdBufResults(UINT64 fillId, std::vector<ProfilerResult>& results);
 
 private:
-    virtual VkResult ResetProfilerState() { return VK_SUCCESS; }
+    VkResult InternalInit();
 
-    /// Track whether ths profiler created its GPU resources
-    bool m_createdAssets;
+    /// A reusable pool of measurements
+    MeasurementSlot m_slots[StaticMeasurementCount];
+
+    /// The currently active slot
+    UINT m_activeSlot;
 
 };
 #endif // __VKT_CMD_BUF_PROFILER_STATIC_H__

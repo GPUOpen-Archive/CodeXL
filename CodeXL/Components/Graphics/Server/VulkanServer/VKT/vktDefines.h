@@ -13,9 +13,9 @@
 //-----------------------------------------------------------------------------
 
 /// A flag used to enable threaded worker profiler collection.
-#define GATHER_PROFILER_RESULTS_WITH_WORKERS 0
+#define GATHER_PROFILER_RESULTS_WITH_WORKERS 1
 
-/// Enable tracking of each command inserted into command buffers.
+/// Enable tracking of each command inserted into command buffers. For debugging only.
 #define TRACK_CMD_BUF_COMMANDS               0
 
 /// Enable dynamically resizing the buffer used to store profiler results.

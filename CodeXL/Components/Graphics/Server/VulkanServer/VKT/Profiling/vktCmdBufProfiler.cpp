@@ -34,8 +34,7 @@ VktCmdBufProfiler* VktCmdBufProfiler::Create(const VktCmdBufProfilerConfig& conf
 /// Constructor.
 //-----------------------------------------------------------------------------
 VktCmdBufProfiler::VktCmdBufProfiler() :
-    m_gpuTimestampFreq(0),
-    m_executionId(-1)
+    m_gpuTimestampFreq(0)
 {
 }
 
@@ -62,6 +61,8 @@ VkResult VktCmdBufProfiler::Init(const VktCmdBufProfilerConfig& config)   ///< [
 
         m_gpuTimestampFreq = 1000000000.0f / m_physicalDeviceProps.limits.timestampPeriod;
 
+        m_maxQueriesPerGroup = m_config.measurementsPerGroup * ProfilerTimestampsPerMeasurement;
+
         ClearCmdBufData();
 
         result = VK_SUCCESS;
@@ -77,7 +78,7 @@ VktCmdBufProfiler::~VktCmdBufProfiler()
 {
     while (m_deletionQueue.empty() == false)
     {
-        ReleaseStaleResourceGroup(m_deletionQueue.front());
+        ReleaseGpuResourceGroup(m_deletionQueue.front());
 
         m_deletionQueue.pop();
     }
@@ -102,6 +103,8 @@ ProfilerResultCode VktCmdBufProfiler::BeginCmdMeasurement(const ProfilerMeasurem
             VkResult result = VK_INCOMPLETE;
             result = SetupNewMeasurementGroup();
             VKT_ASSERT(result == VK_SUCCESS);
+
+            m_pDeviceDT->CmdResetQueryPool(m_config.cmdBuf, m_cmdBufData.pActiveMeasurementGroup->gpuRes.timestampQueryPool, 0, m_maxQueriesPerGroup);
         }
 
         if (m_config.measurementTypeFlags & PROFILER_MEASUREMENT_TYPE_TIMESTAMPS)
@@ -243,8 +246,6 @@ ProfilerResultCode VktCmdBufProfiler::GetCmdBufResults(std::vector<ProfilerResul
     {
         profilerResultCode = PROFILER_THIS_CMD_BUF_WAS_NOT_MEASURED;
 
-        bool containsZeroTimestamp = false;
-
         // Loop through all measurements for this command buffer
         for (UINT i = 0; i < m_cmdBufData.measurementGroups.size(); i++)
         {
@@ -326,10 +327,7 @@ ProfilerResultCode VktCmdBufProfiler::GetCmdBufResults(std::vector<ProfilerResul
                         profilerResult.timestampResult.execMicroSecs *= 1000000;
 
                         // Detected a zero timestamp. Allow this and continue, but some results are invalid.
-                        if ((*pTimerPreBegin == 0ULL) || (*pTimerBegin == 0ULL) || (*pTimerEnd == 0ULL))
-                        {
-                            containsZeroTimestamp = true;
-                        }
+                        VKT_ASSERT((*pTimerPreBegin != 0ULL) && (*pTimerBegin != 0ULL) && (*pTimerEnd != 0ULL));
                     }
 
                     results.push_back(profilerResult);
@@ -347,11 +345,6 @@ ProfilerResultCode VktCmdBufProfiler::GetCmdBufResults(std::vector<ProfilerResul
                     delete [] pTimestampData;
                     pTimestampData = nullptr;
                 }
-            }
-
-            if (containsZeroTimestamp == true)
-            {
-                profilerResultCode = PROFILER_ERROR_MEASUREMENT_CONTAINED_ZEROES;
             }
         }
     }
@@ -404,10 +397,6 @@ const char* VktCmdBufProfiler::PrintProfilerResult(ProfilerResultCode resultCode
 
     case PROFILER_THIS_CMD_BUF_WAS_NOT_CLOSED:
         pResult = "PROFILER_THIS_CMD_BUF_WAS_NOT_CLOSED";
-        break;
-
-    case PROFILER_ERROR_MEASUREMENT_CONTAINED_ZEROES:
-        pResult = "PROFILER_ERROR_MEASUREMENT_CONTAINED_ZEROES";
         break;
     }
 
@@ -511,24 +500,7 @@ VkResult VktCmdBufProfiler::SetupNewMeasurementGroup()
 
     if (m_config.measurementTypeFlags & PROFILER_MEASUREMENT_TYPE_TIMESTAMPS)
     {
-        const UINT queryCount = m_config.measurementsPerGroup * ProfilerTimestampsPerMeasurement;
-
-        VkQueryPoolCreateInfo queryPoolCreateInfo = {};
-        queryPoolCreateInfo.sType      = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO;
-        queryPoolCreateInfo.pNext      = nullptr;
-        queryPoolCreateInfo.queryType  = VK_QUERY_TYPE_TIMESTAMP;
-        queryPoolCreateInfo.queryCount = queryCount;
-        result = m_pDeviceDT->CreateQueryPool(m_config.device, &queryPoolCreateInfo, nullptr, &measurementGroup.gpuRes.timestampQueryPool);
-
-        m_pDeviceDT->CmdResetQueryPool(m_config.cmdBuf, measurementGroup.gpuRes.timestampQueryPool, 0, queryCount);
-
-        if (result == VK_SUCCESS)
-        {
-            result = CreateQueryBuffer(
-                         &measurementGroup.gpuRes.timestampBuffer,
-                         &measurementGroup.gpuRes.timestampMem,
-                         m_config.measurementsPerGroup * sizeof(ProfilerInterval));
-        }
+        result = CreateGpuResourceGroup(measurementGroup.gpuRes);
     }
 
     if (result == VK_SUCCESS)
@@ -541,28 +513,55 @@ VkResult VktCmdBufProfiler::SetupNewMeasurementGroup()
 }
 
 //-----------------------------------------------------------------------------
-/// Release collection of stale GPU resources.
+/// Release collection of GPU resources.
 /// \param gpuRes The set of GPU resources to release.
 /// \returns The result code after attempting to release the incoming resources.
 //-----------------------------------------------------------------------------
-VkResult VktCmdBufProfiler::ReleaseStaleResourceGroup(ProfilerGpuResources& gpuRes)
+VkResult VktCmdBufProfiler::CreateGpuResourceGroup(ProfilerGpuResources& gpuRes)
 {
-    if (gpuRes.timestampQueryPool != NULL)
+    VkResult result = VK_INCOMPLETE;
+
+    VkQueryPoolCreateInfo queryPoolCreateInfo = {};
+    queryPoolCreateInfo.sType      = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO;
+    queryPoolCreateInfo.pNext      = nullptr;
+    queryPoolCreateInfo.queryType  = VK_QUERY_TYPE_TIMESTAMP;
+    queryPoolCreateInfo.queryCount = m_maxQueriesPerGroup;
+    result = m_pDeviceDT->CreateQueryPool(m_config.device, &queryPoolCreateInfo, nullptr, &gpuRes.timestampQueryPool);
+
+    if (result == VK_SUCCESS)
+    {
+        result = CreateQueryBuffer(
+            &gpuRes.timestampBuffer,
+            &gpuRes.timestampMem,
+            m_config.measurementsPerGroup * sizeof(ProfilerInterval));
+    }
+
+    return result;
+}
+
+//-----------------------------------------------------------------------------
+/// Release collection of GPU resources.
+/// \param gpuRes The set of GPU resources to release.
+/// \returns The result code after attempting to release the incoming resources.
+//-----------------------------------------------------------------------------
+VkResult VktCmdBufProfiler::ReleaseGpuResourceGroup(ProfilerGpuResources& gpuRes)
+{
+    if (gpuRes.timestampQueryPool != VK_NULL_HANDLE)
     {
         m_pDeviceDT->DestroyQueryPool(m_config.device, gpuRes.timestampQueryPool, nullptr);
-        gpuRes.timestampQueryPool = NULL;
+        gpuRes.timestampQueryPool = VK_NULL_HANDLE;
     }
 
-    if (gpuRes.timestampBuffer != NULL)
+    if (gpuRes.timestampBuffer != VK_NULL_HANDLE)
     {
         m_pDeviceDT->DestroyBuffer(m_config.device, gpuRes.timestampBuffer, nullptr);
-        gpuRes.timestampBuffer = NULL;
+        gpuRes.timestampBuffer = VK_NULL_HANDLE;
     }
 
-    if (gpuRes.timestampMem != NULL)
+    if (gpuRes.timestampMem != VK_NULL_HANDLE)
     {
         m_pDeviceDT->FreeMemory(m_config.device, gpuRes.timestampMem, nullptr);
-        gpuRes.timestampMem = NULL;
+        gpuRes.timestampMem = VK_NULL_HANDLE;
     }
 
     return VK_SUCCESS;
@@ -598,7 +597,7 @@ VkResult VktCmdBufProfiler::ResetProfilerState()
     // Release GPU objects at the end of deletion queue
     if (m_deletionQueue.size() > m_config.maxStaleResourceGroups)
     {
-        result = ReleaseStaleResourceGroup(m_deletionQueue.front());
+        result = ReleaseGpuResourceGroup(m_deletionQueue.front());
     }
 
     return result;

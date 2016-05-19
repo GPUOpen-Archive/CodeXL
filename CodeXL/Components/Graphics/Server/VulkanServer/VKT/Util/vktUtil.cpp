@@ -15,14 +15,16 @@
 /// \param sampleId The SampleID associated with the profiled command.
 /// \param pWrappedCmdBuf The command buffer that executed the profiled command.
 /// \param frameNum The frame number.
+/// \param fillId An ID used to track how many times a cmdBuf was filled in.
 /// \param measurementId A ProfilerMeasurementId containing metadata for the new measurement.
 //-----------------------------------------------------------------------------
-void VktUtil::ConstructMeasurementInfo(FuncId inFuncId, UINT64 sampleId, VktWrappedCmdBuf* pWrappedCmdBuf, UINT frameNum, ProfilerMeasurementId& measurementId)
+void VktUtil::ConstructMeasurementInfo(FuncId inFuncId, UINT64 sampleId, VktWrappedCmdBuf* pWrappedCmdBuf, UINT frameNum, UINT64 fillId, ProfilerMeasurementId& measurementId)
 {
     measurementId.pWrappedCmdBuf = pWrappedCmdBuf;
     measurementId.sampleId       = sampleId;
     measurementId.frame          = frameNum;
     measurementId.funcId         = inFuncId;
+    measurementId.fillId         = fillId;
 }
 
 //-----------------------------------------------------------------------------
