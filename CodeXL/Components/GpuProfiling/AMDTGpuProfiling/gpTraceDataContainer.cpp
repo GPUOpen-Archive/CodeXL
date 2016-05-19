@@ -1066,13 +1066,13 @@ void gpTraceDataContainer::UpdateUiRowLocations()
 
 QString gpTraceDataContainer::CommandListNameFromPointer(const QString& commandBufferPtrStr)
 {
-    int commandListIndex = 1;
+    int commandListIndex = 0;
     QString retVal;
 
     // If the command buffer / list is not mapped to an index yet, allocate an index for the current command list
     if (!m_commandListPointerToIndexMap.contains(commandBufferPtrStr))
     {
-        int index = m_commandListPointerToIndexMap.size() + 1;
+        int index = m_commandListPointerToIndexMap.size();
         m_commandListPointerToIndexMap.insertMulti(commandBufferPtrStr, index);
     }
 
