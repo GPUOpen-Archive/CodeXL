@@ -70,7 +70,7 @@ private:
     QIntValidator m_validator;
 
     /// number of frames to capture in each capture action
-    QLineEdit* m_pNumberFramesEdit;
+    QComboBox* m_pNumberFramesCombo;
 
     QString m_numFramesToCapture;
 };

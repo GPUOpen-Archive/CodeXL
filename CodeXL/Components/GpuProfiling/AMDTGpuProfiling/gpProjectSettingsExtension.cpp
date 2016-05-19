@@ -23,7 +23,7 @@
 #include <AMDTGpuProfiling/gpExecutionMode.h>
 
 #define GP_LINE_EDIT_MARGIN 15
-#define GP_MAX_FRAME_CAPTURE 100
+#define GP_MAX_FRAME_CAPTURE_WIDTH 30
 
 gpProjectSettingsExtension::gpProjectSettingsExtension() :
     m_pAutomaticCheckBox(nullptr),
@@ -34,7 +34,7 @@ gpProjectSettingsExtension::gpProjectSettingsExtension() :
     m_processName(""),
     m_processNumber("1"),
     m_validator(1, 100, this),
-    m_pNumberFramesEdit(nullptr),
+    m_pNumberFramesCombo(nullptr),
     m_numFramesToCapture("1")
 {
 }
@@ -82,12 +82,11 @@ void gpProjectSettingsExtension::Initialize()
     pHLayout2->addStretch();
 
     // Add the number of frames to capture options
-    m_pNumberFramesEdit = new QLineEdit();
-    m_pNumberFramesEdit->setValidator(&m_validator);
-    maxWidth = QFontMetrics(m_pPortLineEdit->font()).boundingRect(QString::number(GP_MAX_FRAME_CAPTURE)).width() + GP_LINE_EDIT_MARGIN;
-    m_pNumberFramesEdit->setMaximumWidth(maxWidth);
+    m_pNumberFramesCombo = new QComboBox();
+    m_pNumberFramesCombo->addItems(QString("1,2,3").split(","));
+    m_pNumberFramesCombo->setMaximumWidth(GP_MAX_FRAME_CAPTURE_WIDTH);
     pHLayout3->addWidget(new QLabel(GPU_STR_projectSettingNumberOfFramesToCapture), 0);
-    pHLayout3->addWidget(m_pNumberFramesEdit, 0);
+    pHLayout3->addWidget(m_pNumberFramesCombo, 0);
     pHLayout3->addStretch();
 
     pMainLayout->addWidget(pCaptionAPI);
@@ -109,7 +108,7 @@ void gpProjectSettingsExtension::Initialize()
     rc = connect(m_pOptionsEdit, SIGNAL(textEdited(const QString&)), this, SLOT(OnTextEdited(const QString&)));
     GT_ASSERT(rc);
 
-    rc = connect(m_pNumberFramesEdit, SIGNAL(textEdited(const QString&)), this, SLOT(OnNumFramesEdited(const QString&)));
+    rc = connect(m_pNumberFramesCombo, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(OnNumFramesEdited(const QString&)));
     GT_ASSERT(rc);
 }
 
@@ -235,7 +234,7 @@ bool gpProjectSettingsExtension::SaveCurrentSettings()
 
 void gpProjectSettingsExtension::RestoreDefaultProjectSettings()
 {
-    GT_IF_WITH_ASSERT(m_pAutomaticCheckBox != nullptr && m_pOptionsComboBox != nullptr && m_pOptionsEdit != nullptr && m_pNumberFramesEdit != nullptr)
+    GT_IF_WITH_ASSERT(m_pAutomaticCheckBox != nullptr && m_pOptionsComboBox != nullptr && m_pOptionsEdit != nullptr && m_pNumberFramesCombo != nullptr)
     {
         m_pAutomaticCheckBox->setChecked(true);
         m_pOptionsComboBox->setCurrentIndex(2);
@@ -244,7 +243,7 @@ void gpProjectSettingsExtension::RestoreDefaultProjectSettings()
         m_processName = "";
         m_processNumber = "1";
         m_numFramesToCapture = "1";
-        m_pNumberFramesEdit->setText(QString::number(1));
+        m_pNumberFramesCombo->setCurrentText("1");
         // Set the value in the line edit:
         m_bUpdateSettings = true;
     }
@@ -299,7 +298,7 @@ bool gpProjectSettingsExtension::RestoreCurrentSettings()
             m_pPortLineEdit->setText(QString::number(settings.m_serverConnectionPort));
 
             m_numFramesToCapture = settings.m_numFramesToCapture;
-            m_pNumberFramesEdit->setText(m_numFramesToCapture);
+            m_pNumberFramesCombo->setCurrentText(m_numFramesToCapture);
         }
     }
     return retVal;
@@ -346,7 +345,7 @@ void gpProjectSettingsExtension::OnTextEdited(const QString& text)
 void gpProjectSettingsExtension::OnNumFramesEdited(const QString& text)
 {
     m_bUpdateSettings = true;
-    GT_IF_WITH_ASSERT(m_pNumberFramesEdit != nullptr)
+    GT_IF_WITH_ASSERT(m_pNumberFramesCombo != nullptr)
     {
         m_numFramesToCapture = text;
     }
