@@ -1922,57 +1922,60 @@ bool csProgramsAndKernelsMonitor::updateKernelArgsInfo(csCLKernel* pKernel)
                 cl_int rcNum = cs_stat_realFunctionPointers.clGetKernelInfo(kernelInternalHandle, CL_KERNEL_NUM_ARGS, sizeof(cl_uint), &kernelArgNum, NULL);
                 SU_AFTER_EXECUTING_REAL_FUNCTION(ap_clGetKernelInfo);
 
-                SU_BEFORE_EXECUTING_REAL_FUNCTION(ap_clGetKernelArgInfo);
-
-                for (int i = 0; i < (int)kernelArgNum; i++)
+                if ((CL_SUCCESS == rcNum) && (0 < kernelArgNum))
                 {
-                    cl_kernel_arg_address_qualifier addressQualifier;
-                    cl_uint cRetVal = cs_stat_realFunctionPointers.clGetKernelArgInfo(kernelInternalHandle, i, CL_KERNEL_ARG_ADDRESS_QUALIFIER, sizeof(cl_kernel_arg_address_qualifier), &addressQualifier, NULL);
-                    GT_ASSERT(cRetVal == CL_SUCCESS);
+                    SU_BEFORE_EXECUTING_REAL_FUNCTION(ap_clGetKernelArgInfo);
 
-                    cl_kernel_arg_access_qualifier accessQualifier;
-                    cRetVal = cs_stat_realFunctionPointers.clGetKernelArgInfo(kernelInternalHandle, i, CL_KERNEL_ARG_ACCESS_QUALIFIER, sizeof(cl_kernel_arg_access_qualifier), &accessQualifier, NULL);
-                    GT_ASSERT(cRetVal == CL_SUCCESS);
-
-                    size_t argTypeNameLength = 0;
-                    cRetVal = cs_stat_realFunctionPointers.clGetKernelArgInfo(kernelInternalHandle, i, CL_KERNEL_ARG_TYPE_NAME, 0, NULL, &argTypeNameLength);
-                    GT_IF_WITH_ASSERT((cRetVal == CL_SUCCESS) && (argTypeNameLength > 0))
+                    for (int i = 0; i < (int)kernelArgNum; i++)
                     {
-                        // Get the arg type name:
-                        outputStringBuf.resize(argTypeNameLength + 2);
-                        cRetVal = cs_stat_realFunctionPointers.clGetKernelArgInfo(kernelInternalHandle, i, CL_KERNEL_ARG_TYPE_NAME, argTypeNameLength + 1, &(outputStringBuf[0]), NULL);
-                        outputStringBuf[argTypeNameLength + 1] = '\0';
+                        cl_kernel_arg_address_qualifier addressQualifier;
+                        cl_uint cRetVal = cs_stat_realFunctionPointers.clGetKernelArgInfo(kernelInternalHandle, i, CL_KERNEL_ARG_ADDRESS_QUALIFIER, sizeof(cl_kernel_arg_address_qualifier), &addressQualifier, NULL);
+                        GT_ASSERT(cRetVal == CL_SUCCESS);
 
-                        if (cRetVal == CL_SUCCESS)
+                        cl_kernel_arg_access_qualifier accessQualifier;
+                        cRetVal = cs_stat_realFunctionPointers.clGetKernelArgInfo(kernelInternalHandle, i, CL_KERNEL_ARG_ACCESS_QUALIFIER, sizeof(cl_kernel_arg_access_qualifier), &accessQualifier, NULL);
+                        GT_ASSERT(cRetVal == CL_SUCCESS);
+
+                        size_t argTypeNameLength = 0;
+                        cRetVal = cs_stat_realFunctionPointers.clGetKernelArgInfo(kernelInternalHandle, i, CL_KERNEL_ARG_TYPE_NAME, 0, NULL, &argTypeNameLength);
+                        GT_IF_WITH_ASSERT((cRetVal == CL_SUCCESS) && (argTypeNameLength > 0))
                         {
-                            argTypeName = &(outputStringBuf[0]);
+                            // Get the arg type name:
+                            outputStringBuf.resize(argTypeNameLength + 2);
+                            cRetVal = cs_stat_realFunctionPointers.clGetKernelArgInfo(kernelInternalHandle, i, CL_KERNEL_ARG_TYPE_NAME, argTypeNameLength + 1, &(outputStringBuf[0]), NULL);
+                            outputStringBuf[argTypeNameLength + 1] = '\0';
+
+                            if (cRetVal == CL_SUCCESS)
+                            {
+                                argTypeName = &(outputStringBuf[0]);
+                            }
                         }
+
+                        cl_kernel_arg_type_qualifier argTypeQualifier;
+                        cRetVal = cs_stat_realFunctionPointers.clGetKernelArgInfo(kernelInternalHandle, i, CL_KERNEL_ARG_TYPE_QUALIFIER, sizeof(cl_kernel_arg_type_qualifier), &argTypeQualifier, NULL);
+                        GT_ASSERT(cRetVal == CL_SUCCESS);
+
+                        size_t argNameLength = 0;
+                        cRetVal = cs_stat_realFunctionPointers.clGetKernelArgInfo(kernelInternalHandle, i, CL_KERNEL_ARG_NAME, 0, NULL, &argNameLength);
+                        GT_IF_WITH_ASSERT((cRetVal == CL_SUCCESS) && (argNameLength > 0))
+                        {
+                            // Get the arg name:
+                            outputStringBuf.resize(argNameLength + 2);
+                            cRetVal = cs_stat_realFunctionPointers.clGetKernelArgInfo(kernelInternalHandle, i, CL_KERNEL_ARG_NAME, argNameLength + 1, &(outputStringBuf[0]), NULL);
+                            outputStringBuf[argNameLength + 1] = '\0';
+
+                            if (cRetVal == CL_SUCCESS)
+                            {
+                                argName = &(outputStringBuf[0]);
+                            }
+                        }
+
+                        // Add a kernel argument info:
+                        pKernel->addKernelArgumentInfo(addressQualifier, accessQualifier, argTypeQualifier, argTypeName, argName);
                     }
 
-                    cl_kernel_arg_type_qualifier argTypeQualifier;
-                    cRetVal = cs_stat_realFunctionPointers.clGetKernelArgInfo(kernelInternalHandle, i, CL_KERNEL_ARG_TYPE_QUALIFIER, sizeof(cl_kernel_arg_type_qualifier), &argTypeQualifier, NULL);
-                    GT_ASSERT(cRetVal == CL_SUCCESS);
-
-                    size_t argNameLength = 0;
-                    cRetVal = cs_stat_realFunctionPointers.clGetKernelArgInfo(kernelInternalHandle, i, CL_KERNEL_ARG_NAME, 0, NULL, &argNameLength);
-                    GT_IF_WITH_ASSERT((cRetVal == CL_SUCCESS) && (argNameLength > 0))
-                    {
-                        // Get the arg name:
-                        outputStringBuf.resize(argNameLength + 2);
-                        cRetVal = cs_stat_realFunctionPointers.clGetKernelArgInfo(kernelInternalHandle, i, CL_KERNEL_ARG_NAME, argNameLength + 1, &(outputStringBuf[0]), NULL);
-                        outputStringBuf[argNameLength + 1] = '\0';
-
-                        if (cRetVal == CL_SUCCESS)
-                        {
-                            argName = &(outputStringBuf[0]);
-                        }
-                    }
-
-                    // Add a kernel argument info:
-                    pKernel->addKernelArgumentInfo(addressQualifier, accessQualifier, argTypeQualifier, argTypeName, argName);
+                    SU_AFTER_EXECUTING_REAL_FUNCTION(ap_clGetKernelArgInfo);
                 }
-
-                SU_AFTER_EXECUTING_REAL_FUNCTION(ap_clGetKernelArgInfo);
             }
         }
     }
