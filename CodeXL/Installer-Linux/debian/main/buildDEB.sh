@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION_VER=$(find . -name 'AMD_CodeXL*.tar.gz' | awk -F"." '{ print $4}') 
+VERSION_VER=$(find . -name 'CodeXL*.tar.gz' | awk -F"." '{ print $4}') 
 BASE_VERSION=2.1
 BASE_REVISION=$VERSION_VER
 INTERNAL_VERSION=${BASE_VERSION}.$VERSION_VER
@@ -8,8 +8,8 @@ VERSION=${BASE_VERSION}-$VERSION_VER
 PACAKGENAME="codexl"
 echo $VERSION
 # Change Package name if NDA or INTERNAL version
-NDASET=$(find . -name 'AMD_CodeXL*.tar.gz' | grep -q "NDA"; [ $? -eq 0 ] && echo "nda")
-INTERNALSET=$(find . -name 'AMD_CodeXL*.tar.gz' | grep -q "Internal"; [ $? -eq 0 ] && echo "internal")
+NDASET=$(find . -name 'CodeXL*.tar.gz' | grep -q "NDA"; [ $? -eq 0 ] && echo "nda")
+INTERNALSET=$(find . -name 'CodeXL*.tar.gz' | grep -q "Internal"; [ $? -eq 0 ] && echo "internal")
 if ! [ -z "$NDASET" ];then
 	PACAKGENAME="${PACAKGENAME}-${NDASET}"
 elif ! [ -z "$INTERNALSET" ];then
@@ -19,7 +19,7 @@ fi
 #Un-tar source files
 echo "Unpack files" 
 mkdir AMDExtractFolder
-tar xf AMD_CodeXL*.tar.gz --strip 1 -C AMDExtractFolder
+tar xf CodeXL*.tar.gz --strip 1 -C AMDExtractFolder
 
 echo "Setting files and folder"
 # Set Executables Icons
@@ -68,5 +68,5 @@ mv codexl*.deb ../../../../
 rm -rf AMDExtractFolder
 rm -rf opt
 rm -rf usr
-rm -rf AMD_CodeXL*.tar.gz
+rm -rf CodeXL*.tar.gz
 
