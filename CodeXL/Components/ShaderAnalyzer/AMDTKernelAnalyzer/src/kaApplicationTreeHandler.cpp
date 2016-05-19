@@ -128,7 +128,7 @@ kaApplicationTreeHandler::kaApplicationTreeHandler() : afApplicationTreeHandler(
     acSetIconInPixmap(m_pIconsArray[KA_PIXMAP_FOLDER],          AC_ICON_ANALYZE_APPTREE_FOLDER);
 
     // Register as an events observer
-    apEventsHandler::instance().registerEventsObserver(*this, AP_PROCESS_DEBUGGER_EVENTS_HANDLING_PRIORITY);
+    apEventsHandler::instance().registerEventsObserver(*this, AP_APPLICATION_COMPONENTS_MANAGERS_EVENTS_HANDLING_PRIORITY);
 
     // Connect the backend build complete signal to a slot:
     bool rc = connect(&kaBackendManager::instance(), SIGNAL(buildComplete(const gtString&)), this, SLOT(OnBuildComplete(const gtString&)));
