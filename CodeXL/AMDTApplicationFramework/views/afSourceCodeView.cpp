@@ -1062,23 +1062,20 @@ void afSourceCodeView::OnGoToLine()
 
     if (QDialog::Accepted == rc)
     {
-        unsigned int selectedLine = dlg.GetLineNumber();
+        unsigned int selectedLine = dlg.GetLineNumber()-1;
         setCursorPosition(selectedLine, 0);
 
-        // set selected line in the middle of the page if possible
-        if (selectedLine > (unsigned int)currentLine)
+        int h = height();
+        int th = textHeight(selectedLine);
+        int visibleRowsCount = h / th;
+
+        int ensureVisibleRow = selectedLine - visibleRowsCount / 2;
+        if (ensureVisibleRow < 0)
         {
-            // moving up
-            int firstLine = firstVisibleLine();
-            int lineToSelect = firstLine + (selectedLine - firstLine) / 2 - 1;
-            setFirstVisibleLine(lineToSelect);
+            ensureVisibleRow = 0;
         }
-        else
-        {
-            // moving down : need to fix 
-            setFirstVisibleLine(selectedLine-20);
-            ensureLineVisible(selectedLine);
-        }
+        setFirstVisibleLine(ensureVisibleRow);
+        ensureLineVisible(selectedLine);
     }
 
 }
