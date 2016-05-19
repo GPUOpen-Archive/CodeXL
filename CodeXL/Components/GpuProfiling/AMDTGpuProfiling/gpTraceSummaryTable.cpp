@@ -14,6 +14,7 @@
 #include <AMDTApplicationFramework/Include/afProgressBarWrapper.h>
 #include <AMDTApplicationComponents/Include/Timeline/acTimelineItem.h>
 #include <AMDTApplicationComponents/Include/Timeline/acTimelineBranch.h>
+#include <AMDTApplicationFramework/Include/afAppStringConstants.h>
 
 const int SUMMARY_INFO_ARRAY_SIZE = 500; // 130 DX12 call types, X Vulcan call types...
 
@@ -588,16 +589,17 @@ gpCommandListSummaryTable::gpCommandListSummaryTable(gpTraceDataContainer* pData
     : gpSummaryTable(pDataContainer, pSessionView, (eCallType)3), m_pSessionDataContainer(pDataContainer), m_pTraceView(pSessionView), m_lastSelectedRowIndex(-1)
 {
     QStringList columnCaptions;
-    columnCaptions << GP_STR_SummaryTableCommandListAddress;
+    columnCaptions << GP_STR_SummaryTableCommandListType;
     columnCaptions << GP_STR_SummaryTableCommandListExecutionTime;
     columnCaptions << GP_STR_SummaryTableCommandListStartTime;
     columnCaptions << GP_STR_SummaryTableCommandListEndTime;
     columnCaptions << GP_STR_SummaryTableCommandListNumCommands;
     columnCaptions << GP_STR_SummaryTableCommandListGPUQueue;
+    columnCaptions << GP_STR_SummaryTableCommandListAddress;
     initHeaders(columnCaptions, false);
     setShowGrid(true);
     m_pSessionDataContainer = pDataContainer;
-    InitCommandListSummaryMap();
+    InitCommandListItems();
     // fill Table widget
     FillTable();
     setSortingEnabled(true);
@@ -635,7 +637,7 @@ void gpCommandListSummaryTable::CollateAllItemsIntoSummaryMap()
         }
     }
 }
-void gpCommandListSummaryTable::InitCommandListSummaryMap()
+void gpCommandListSummaryTable::InitCommandListItems()
 {
     GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
     {
@@ -653,8 +655,9 @@ void gpCommandListSummaryTable::InitCommandListSummaryMap()
 
             APISummaryCommandListInfo& info = infoArray[commandListIndex];
 
-            int queueType = m_pSessionDataContainer->QueueType(commandListData.m_queueName);
-            info.m_gpuQueue = gpTraceDataContainer::CommandListTypeAsString(queueType);
+            info.m_index = m_pSessionDataContainer->CommandListNameFromPointer(commandListName);
+
+            info.m_gpuQueue = m_pSessionDataContainer->QueueDisplayName(commandListData.m_queueName);
             info.m_gpuQueueAddress = commandListData.m_queueName;
 
             info.m_address = commandListName;
@@ -738,6 +741,7 @@ void gpCommandListSummaryTable::AddSummaryRow(int rowIndex, APISummaryInfo* pInf
             switch (i)
             {
             case COLUMN_ADDRESS:
+            case COLUMN_COMMAND_INDEX:
             {
                 pItem = allocateNewWidgetItem(rowStrings[i]);
                 setItem(rowIndex, i, pItem);

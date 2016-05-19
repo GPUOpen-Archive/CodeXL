@@ -66,7 +66,7 @@ void gpTraceSummaryWidget::Init(gpTraceDataContainer* pDataContainer, gpTraceVie
 
     afProgressBarWrapper::instance().hideProgressBar();
 
-    setCurrentIndex(GPU_CALL);
+    setCurrentIndex(COMMAND_LIST);
 }
 
 void gpTraceSummaryWidget::SelectAPIRowByCallName(const QString& callName)

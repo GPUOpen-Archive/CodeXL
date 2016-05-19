@@ -638,12 +638,13 @@
 #define GP_STR_SummaryTableColumnMaxTime "Max Time"
 #define GP_STR_SummaryTableColumnMinTime "Min Time"
 
-#define GP_STR_SummaryTableCommandListAddress "Address"
+#define GP_STR_SummaryTableCommandListType "Command Buffer"
 #define GP_STR_SummaryTableCommandListStartTime "Start time"
 #define GP_STR_SummaryTableCommandListEndTime "End time"
 #define GP_STR_SummaryTableCommandListExecutionTime "Execution time"
 #define GP_STR_SummaryTableCommandListNumCommands "# of commands"
 #define GP_STR_SummaryTableCommandListGPUQueue "GPU queue"
+#define GP_STR_SummaryTableCommandListAddress "Address"
 
 #define GP_STR_SummaryTop20TableColumnCallIndex "index"
 #define GP_STR_SummaryTop20TableColumnThreadId "Thread Id"

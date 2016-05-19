@@ -110,15 +110,17 @@ public:
     {
         if (0 != m_numCalls)
         {
-            membersStringsList << m_address;
+            membersStringsList << m_index;
             membersStringsList << QString::number(m_executionTimeMS, 'f', 6);
             membersStringsList << QString::number(m_minTimeMs, 'f', 6);
             membersStringsList << QString::number(m_maxTimeMs, 'f', 6);
             membersStringsList << QString::number(m_numCalls);
             membersStringsList << m_gpuQueue;
+            membersStringsList << m_address;
         }
     }
 
+    QString m_index;
     QString m_address;
     QString m_gpuQueue;
     QString m_gpuQueueAddress;
@@ -289,12 +291,13 @@ class gpCommandListSummaryTable : public gpSummaryTable
 public:
     enum CommandListSummaryColumnIndex
     {
-        COLUMN_ADDRESS,
+        COLUMN_COMMAND_INDEX,
         COLUMN_EXECUTION_TIME,
         COLUMN_START_TIME,
         COLUMN_END_TIME,
         COLUMN_NUM_OF_COMMANDS,
         COLUMN_GPU_QUEUE,
+        COLUMN_ADDRESS,
         COLUMN_COUNT
     };
     gpCommandListSummaryTable(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView);
@@ -326,7 +329,7 @@ protected:
 private:
     /// Fills table only with calls within the timeline start and end
     void BuildSummaryMapInTimelineScope(quint64 min, quint64 max);
-    void InitCommandListSummaryMap();
+    void InitCommandListItems();
 
     /// Collects calls into given map
     void CollateAllItemsIntoSummaryMap();

@@ -224,7 +224,7 @@ public:
     ProfileSessionDataItem* FindNextItem(const QString& findStr, bool isCaseSensitive);
 
     /// Get the data collected for the frame command lists
-    const QMap<QString, gpTraceDataContainer::CommandListData>& CommandListsData() const { return m_commandListData; };
+    const QMap<QString, gpTraceDataContainer::CommandListData>& CommandListsData() const { return m_commandListData; }
 
     /// Contain the api type for this session
     ProfileSessionDataItem::ProfileItemAPIType SessionAPIType() const { return m_sessionAPIType; };
