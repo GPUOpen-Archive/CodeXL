@@ -550,7 +550,7 @@ void SharedMenuActions::updateMru(const gtString& newMru)
 
     for (i = 0; i < m_mruProfiles.size(); i++)
     {
-        QAction* pUpdate = action(i + COUNT_OF_STATIC_PM_MENUS);
+        QAction* pUpdate = action(i + COUNT_OF_STATIC_PM_MENUS + 1);
 
         if (NULL == pUpdate)
         {
