@@ -256,8 +256,6 @@ void gpTraceSummaryTab::OnSummaryTableSelectionChanged()
 // If the min \ max coloumn is selected -> zoom to item in timeline
 void gpTraceSummaryTab::OnSummaryTableCellClicked(int row, int col)
 {
-    GT_UNREFERENCED_PARAMETER(row);
-    GT_UNREFERENCED_PARAMETER(col);
     GT_IF_WITH_ASSERT(m_pTraceView != nullptr && m_pSummaryTable != nullptr)
     {
         ProfileSessionDataItem* pItem = m_pSummaryTable->GetRelatedItem(row, col);
