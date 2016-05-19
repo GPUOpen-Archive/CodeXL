@@ -23,7 +23,7 @@
 #include <AMDTGpuProfiling/gpExecutionMode.h>
 
 #define GP_LINE_EDIT_MARGIN 15
-#define GP_MAX_FRAME_CAPTURE_WIDTH 30
+#define GP_MAX_FRAME_CAPTURE_WIDTH 60
 
 gpProjectSettingsExtension::gpProjectSettingsExtension() :
     m_pAutomaticCheckBox(nullptr),
