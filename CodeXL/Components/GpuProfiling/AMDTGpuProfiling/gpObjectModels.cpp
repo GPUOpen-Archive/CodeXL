@@ -106,9 +106,6 @@ void ObjTreeModel::refreshTree()
 QVariant ObjTreeModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     GT_UNREFERENCED_PARAMETER(section);
-    GT_UNREFERENCED_PARAMETER(orientation);
-    GT_UNREFERENCED_PARAMETER(role);
-
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
     {
         return tr("AMD Graphics");
