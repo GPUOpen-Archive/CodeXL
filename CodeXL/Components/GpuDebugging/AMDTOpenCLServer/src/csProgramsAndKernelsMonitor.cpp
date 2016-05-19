@@ -1552,6 +1552,8 @@ bool csProgramsAndKernelsMonitor::updateProgramInfoWithInternalHandle(apCLProgra
     int numberOfDevices = (int)programDevices.size();
     SU_BEFORE_EXECUTING_REAL_FUNCTION(ap_clGetProgramBuildInfo);
 
+    gtVector<char> optionsStringBuf;
+
     for (int i = 0; i < numberOfDevices; i++)
     {
         // Get the build log:
@@ -1584,12 +1586,12 @@ bool csProgramsAndKernelsMonitor::updateProgramInfoWithInternalHandle(apCLProgra
 
         if ((cRetVal4 == CL_SUCCESS) && (buildOptionsLength > 0))
         {
-            char* pBuildOptions = new char[buildOptionsLength + 1];
-            cRetVal4 = cs_stat_realFunctionPointers.clGetProgramBuildInfo(programInternalHandleAsCLProgram, curDeviceHandle, CL_PROGRAM_BUILD_OPTIONS, buildOptionsLength + 1, pBuildOptions, NULL);
-            pBuildOptions[buildOptionsLength] = '\0';
+            optionsStringBuf.resize(buildOptionsLength + 2);
+            cRetVal4 = cs_stat_realFunctionPointers.clGetProgramBuildInfo(programInternalHandleAsCLProgram, curDeviceHandle, CL_PROGRAM_BUILD_OPTIONS, buildOptionsLength + 1, &(optionsStringBuf[0]), NULL);
+            optionsStringBuf[buildOptionsLength + 1] = '\0';
             GT_IF_WITH_ASSERT(cRetVal4 == CL_SUCCESS)
             {
-                currentBuildData._buildOptions.fromASCIIString(pBuildOptions);
+                currentBuildData._buildOptions.fromASCIIString(&(optionsStringBuf[0]));
 
                 // If we are using the AMD kernel debugging API, we are appending " -g -cl-opt-disable" to the end:
                 if (cs_stat_pIKernelDebuggingManager->isAMDKernelDebuggingEnabled() && (suIKernelDebuggingManager::CS_OPENCL_SOFTWARE_KERNEL_DEBUGGER == cs_stat_pIKernelDebuggingManager->kernelDebuggerType()))
@@ -1628,7 +1630,6 @@ bool csProgramsAndKernelsMonitor::updateProgramInfoWithInternalHandle(apCLProgra
                     }
                 }
             }
-            delete[] pBuildOptions;
         }
     }
 
@@ -1900,7 +1901,10 @@ bool csProgramsAndKernelsMonitor::updateKernelArgsInfo(csCLKernel* pKernel)
         {
             // Clear the kernel arguments info:
             pKernel->clearArgumentsInfo();
-            gtMap<oaCLHandle, oaCLHandle>::const_iterator findIter = _programAndKernelExternalToInternalHandle.find(pKernel->kernelHandle());
+
+            // Get the internal handle:
+            oaCLKernelHandle hKernel = pKernel->kernelHandle();
+            gtMap<oaCLHandle, oaCLHandle>::const_iterator findIter = _programAndKernelExternalToInternalHandle.find(hKernel);
             gtMap<oaCLHandle, oaCLHandle>::const_iterator endIter = _programAndKernelExternalToInternalHandle.end();
             GT_IF_WITH_ASSERT(findIter != endIter)
             {
@@ -1910,11 +1914,12 @@ bool csProgramsAndKernelsMonitor::updateKernelArgsInfo(csCLKernel* pKernel)
                 // Get the kernel arguments number:
                 gtASCIIString argTypeName;
                 gtASCIIString argName;
+                gtVector<char> outputStringBuf;
 
                 // Get the kernel arguments amount:
                 SU_BEFORE_EXECUTING_REAL_FUNCTION(ap_clGetKernelInfo);
-                cl_uint kernelArgNum;
-                (void) cs_stat_realFunctionPointers.clGetKernelInfo(kernelInternalHandle, CL_KERNEL_NUM_ARGS, sizeof(cl_uint), &kernelArgNum, NULL);
+                cl_uint kernelArgNum = 0;
+                cl_int rcNum = cs_stat_realFunctionPointers.clGetKernelInfo(kernelInternalHandle, CL_KERNEL_NUM_ARGS, sizeof(cl_uint), &kernelArgNum, NULL);
                 SU_AFTER_EXECUTING_REAL_FUNCTION(ap_clGetKernelInfo);
 
                 SU_BEFORE_EXECUTING_REAL_FUNCTION(ap_clGetKernelArgInfo);
@@ -1934,16 +1939,14 @@ bool csProgramsAndKernelsMonitor::updateKernelArgsInfo(csCLKernel* pKernel)
                     GT_IF_WITH_ASSERT((cRetVal == CL_SUCCESS) && (argTypeNameLength > 0))
                     {
                         // Get the arg type name:
-                        char* pArgTypeName = new char[argTypeNameLength + 2];
-                        cRetVal = cs_stat_realFunctionPointers.clGetKernelArgInfo(kernelInternalHandle, i, CL_KERNEL_ARG_TYPE_NAME, argTypeNameLength + 1, pArgTypeName, NULL);
-                        pArgTypeName[argTypeNameLength + 1] = '\0';
+                        outputStringBuf.resize(argTypeNameLength + 2);
+                        cRetVal = cs_stat_realFunctionPointers.clGetKernelArgInfo(kernelInternalHandle, i, CL_KERNEL_ARG_TYPE_NAME, argTypeNameLength + 1, &(outputStringBuf[0]), NULL);
+                        outputStringBuf[argTypeNameLength + 1] = '\0';
 
                         if (cRetVal == CL_SUCCESS)
                         {
-                            argTypeName = pArgTypeName;
+                            argTypeName = &(outputStringBuf[0]);
                         }
-
-                        delete[] pArgTypeName;
                     }
 
                     cl_kernel_arg_type_qualifier argTypeQualifier;
@@ -1955,16 +1958,14 @@ bool csProgramsAndKernelsMonitor::updateKernelArgsInfo(csCLKernel* pKernel)
                     GT_IF_WITH_ASSERT((cRetVal == CL_SUCCESS) && (argNameLength > 0))
                     {
                         // Get the arg name:
-                        char* pArgName = new char[argNameLength + 2];
-                        cRetVal = cs_stat_realFunctionPointers.clGetKernelArgInfo(kernelInternalHandle, i, CL_KERNEL_ARG_NAME, argNameLength + 1, pArgName, NULL);
-                        pArgName[argNameLength + 1] = '\0';
+                        outputStringBuf.resize(argNameLength + 2);
+                        cRetVal = cs_stat_realFunctionPointers.clGetKernelArgInfo(kernelInternalHandle, i, CL_KERNEL_ARG_NAME, argNameLength + 1, &(outputStringBuf[0]), NULL);
+                        outputStringBuf[argNameLength + 1] = '\0';
 
                         if (cRetVal == CL_SUCCESS)
                         {
-                            argName = pArgName;
+                            argName = &(outputStringBuf[0]);
                         }
-
-                        delete[] pArgName;
                     }
 
                     // Add a kernel argument info:
