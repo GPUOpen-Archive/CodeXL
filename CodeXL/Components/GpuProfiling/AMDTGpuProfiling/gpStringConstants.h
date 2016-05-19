@@ -243,7 +243,7 @@
 #define GPU_STR_TraceViewHSA "HSA"
 #define GPU_STR_DX12Api "DX12"
 #define GPU_STR_VulkanApi "Vulkan"
-#define GPU_STR_TraceViewGPU "GPU"
+#define GPU_STR_TraceViewGPU "GPU Queues"
 #define GPU_STR_TraceViewCPU "CPU"
 #define GPU_STR_TraceViewThread "Thread"
 #define GPU_STR_TraceViewHSAPerfMarker "HSAPerfMarker"
