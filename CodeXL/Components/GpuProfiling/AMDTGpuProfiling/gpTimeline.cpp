@@ -288,7 +288,7 @@ void gpTimeline::AddCommandListsToTimeline()
             GT_IF_WITH_ASSERT(pQueueBranch != nullptr)
             {
                 // Create the command list timeline item
-                CommandListTimelineItem* pNewItem = new CommandListTimelineItem(commandListData.m_startTime, commandListData.m_endTime);
+                CommandListTimelineItem* pNewItem = new CommandListTimelineItem(commandListData.m_startTime, commandListData.m_endTime, iter.key());
 
                 // Set the command list name as the item text
                 QString commandListDisplayName = m_pSessionDataContainer->CommandListNameFromPointer(commandListName);
@@ -437,11 +437,12 @@ acAPITimelineItem* gpTimeline::CreateTimelineItem(ProfileSessionDataItem* pItem)
                 else
                 {
                     bool isDX = (pItem->ItemType().m_itemMainType == ProfileSessionDataItem::DX12_API_PROFILE_ITEM) || (pItem->ItemType().m_itemMainType == ProfileSessionDataItem::DX12_GPU_PROFILE_ITEM);
+                    bool isVK = (pItem->ItemType().m_itemMainType == ProfileSessionDataItem::VK_API_PROFILE_ITEM) || (pItem->ItemType().m_itemMainType == ProfileSessionDataItem::VK_GPU_PROFILE_ITEM);
 
-                    if (isDX)
+                    if (isDX || isVK)
                     {
                         // Create a new DX API item and set the interface name
-                        DXAPITimelineItem* pNewDXItem = new DXAPITimelineItem(startTime, endTime, pItem->APICallIndex());
+                        gpAPITimelineItem* pNewDXItem = new gpAPITimelineItem(startTime, endTime, pItem->APICallIndex());
                         pNewDXItem->SetInterfaceName(pItem->GetColumnData(ProfileSessionDataItem::SESSION_ITEM_INTERFACE_COLUMN).toString());
                         pRetVal = pNewDXItem;
                     }

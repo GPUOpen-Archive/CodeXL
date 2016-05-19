@@ -162,24 +162,30 @@ float gpTraceTable::GetSectionFillWeight(int sectionIndex)
 {
     float retVal = .05f;
 
-    // column widths as a percent of the total width (these values look best)
+    // Get the enumeration for this physical section index
+    ProfileSessionDataItem::ProfileSessionDataColumnIndex columnIndex = m_pDataModel->TableIndexToColumnIndex(sectionIndex);
+
+    // Column widths as a percent of the total width (these values look best)
     static float s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_COLUMN_COUNT];
     s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_INDEX_COLUMN] = 5;
-    s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_INTERFACE_COLUMN] = 14;
-    s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_COMMAND_LIST_COLUMN] = 14;
-    s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_COMMAND_BUFFER_COLUMN] = 14;
-    s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_CALL_COLUMN] = 14;
+    s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_INTERFACE_COLUMN] = 9;
+    s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_COMMAND_LIST_COLUMN] = 9;
+    s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_COMMAND_BUFFER_COLUMN] = 9;
+    s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_CALL_COLUMN] = 18;
     s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_PARAMETERS_COLUMN] = 35;
-    s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_RESULT_COLUMN] = 9;
+    s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_RESULT_COLUMN] = 5;
     s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_DEVICE_BLOCK_COLUMN] = 9;
     s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_OCCUPANCY_COLUMN] = 9;
-    s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_CPU_TIME_COLUMN] = 5;
-    s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_GPU_TIME_COLUMN] = 5;
+    s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_CPU_TIME_COLUMN] = 9;
+    s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_GPU_TIME_COLUMN] = 9;
+    s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_START_TIME_COLUMN] = 9;
+    s_columnWeightsPercentage[ProfileSessionDataItem::SESSION_ITEM_END_TIME_COLUMN] = 9;
 
-    GT_IF_WITH_ASSERT((sectionIndex < ProfileSessionDataItem::SESSION_ITEM_COLUMN_COUNT) && (sectionIndex >= 0))
+    GT_IF_WITH_ASSERT((columnIndex < ProfileSessionDataItem::SESSION_ITEM_COLUMN_COUNT) && (columnIndex >= 0))
     {
-        retVal = s_columnWeightsPercentage[sectionIndex] / 100.0;
+        retVal = s_columnWeightsPercentage[columnIndex] / 100.0;
     }
+
     return retVal;
 }
 

@@ -9,12 +9,12 @@
 
 
 
-DXAPITimelineItem::DXAPITimelineItem(quint64 startTime, quint64 endTime, int apiIndex)
+gpAPITimelineItem::gpAPITimelineItem(quint64 startTime, quint64 endTime, int apiIndex)
     : APITimelineItem(startTime, endTime, apiIndex)
 {
 }
 
-void DXAPITimelineItem::tooltipItems(acTimelineItemToolTip& tooltip) const
+void gpAPITimelineItem::tooltipItems(acTimelineItemToolTip& tooltip) const
 {
     QString functionName;
 
@@ -46,7 +46,7 @@ void DXAPITimelineItem::tooltipItems(acTimelineItemToolTip& tooltip) const
     QString durationStr = NanosecToTimeString(duration, true, false);
 
     QString tooltipLine1 = QString(GPU_STR_DXAPITimeline_tooltipLine1).arg(m_nApiIndex).arg(functionName);
-    QString tooltipLine2 = QString(GPU_STR_DXAPITimeline_tooltipLine2).arg(fnumStart, 0, 'f', 3).arg(fnumEnd, 0, 'f', 3).arg(durationStr);
+    QString tooltipLine2 = QString(GPU_STR_APITimeline_TimeTooltipLine).arg(fnumStart, 0, 'f', 3).arg(fnumEnd, 0, 'f', 3).arg(durationStr);
     tooltip.add("", tooltipLine1);
     tooltip.add("", tooltipLine2);
 }

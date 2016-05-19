@@ -257,8 +257,8 @@
 // Trace table captions
 #define GP_STR_TraceTableColumnIndex "Index"
 #define GP_STR_TraceTableColumnInterface "Interface"
-#define GP_STR_TraceTableColumnCommandList "Command List"
-#define GP_STR_TraceTableColumnCommandBuffer "Command Buffer"
+#define GP_STR_TraceTableColumnCommandList "CmdList #"
+#define GP_STR_TraceTableColumnCommandBuffer "CmdBuffer #"
 #define GP_STR_TraceTableColumnCall "Call"
 #define GP_STR_TraceTableColumnParameters "Parameters"
 #define GP_STR_TraceTableColumnResult "Result"
@@ -493,7 +493,7 @@
 #define GPU_STR_timeline_ContextBranchNameWithParam "Queue %1 - %2 (%3)"
 
 #define GPU_STR_DXAPITimeline_tooltipLine1 "Call #%1<br>%2"
-#define GPU_STR_DXAPITimeline_tooltipLine2 "Time: %3 - %4 (%5ms)"
+#define GPU_STR_APITimeline_TimeTooltipLine "Time: %3 - %4 (%5ms)"
 
 // Frame info xml
 #define GPU_STR_frameInfoXMLLocation "Location"

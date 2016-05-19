@@ -5,14 +5,14 @@
 #include <AMDTGpuProfiling/APITimelineItems.h>
 
 /// holds the information for DX timeline item
-class DXAPITimelineItem : public APITimelineItem
+class gpAPITimelineItem : public APITimelineItem
 {
 public:
-    /// Initializes a new instance of the CLAPITimelineItem class
+    /// Initializes a new instance of the an API item for the frame analysis sessions
     /// \param startTime the start time for this timeline item.
     /// \param endTime the end time for this timeline item.
     /// \param apiIndex the index of this api in the application's call sequence
-    DXAPITimelineItem(quint64 startTime, quint64 endTime, int apiIndex);
+    gpAPITimelineItem(quint64 startTime, quint64 endTime, int apiIndex);
 
     /// Fill in a TimelineItemToolTip instance with a set of name/value pairs that will be displayed in the tooltip for this timeline item
     /// \param tooltip acTimelineItemToolTip instance that should get populated with name/value pairs

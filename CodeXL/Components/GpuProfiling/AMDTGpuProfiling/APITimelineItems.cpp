@@ -20,6 +20,7 @@
 // Local:
 #include <AMDTGpuProfiling/APITimelineItems.h>
 #include <AMDTGpuProfiling/TraceTable.h>
+#include <AMDTGpuProfiling/gpStringConstants.h>
 
 
 APITimelineItem::APITimelineItem() : acAPITimelineItem(std::numeric_limits<quint64>::max(), std::numeric_limits<quint64>::min(), -1), m_pTraceTableItem(NULL)
@@ -70,14 +71,15 @@ PerfMarkerTimelineItem::PerfMarkerTimelineItem(quint64 startTime, quint64 endTim
 }
 
 
-CommandListTimelineItem::CommandListTimelineItem(quint64 startTime, quint64 endTime): acTimelineItem(startTime, endTime)
+CommandListTimelineItem::CommandListTimelineItem(quint64 startTime, quint64 endTime, const QString& commandListPtr): 
+    acTimelineItem(startTime, endTime), m_commandListPtr(commandListPtr)
 {
 
 }
 
 void CommandListTimelineItem::tooltipItems(acTimelineItemToolTip& tooltip) const
 {
-    tooltip.add("Command list", text());
+    tooltip.add(text(), m_commandListPtr);
 
     quint64 timelineStartTime = 0;
     if (m_pParentBranch != NULL)
@@ -89,15 +91,14 @@ void CommandListTimelineItem::tooltipItems(acTimelineItemToolTip& tooltip) const
             timelineStartTime = timeline->startTime();
         }
     }
-    double fnum = (m_nStartTime - timelineStartTime) / 1e6; // convert to milliseconds
-    QString strNum = QString(tr("%1 millisecond")).arg(fnum, 0, 'f', 3);
-    tooltip.add(tr("Start Time"), strNum);
 
-    fnum = (m_nEndTime - timelineStartTime) / 1e6; // convert to milliseconds
-    strNum = QString(tr("%1 millisecond")).arg(fnum, 0, 'f', 3);
-    tooltip.add(tr("End Time"), strNum);
+    // Convert the start and end times to milliseconds
+    double fnumStart = (m_nStartTime - timelineStartTime) / 1e6; 
+    double fnumEnd = (m_nEndTime - timelineStartTime) / 1e6; // convert to milliseconds
 
     quint64 duration = m_nEndTime - m_nStartTime;
-    QString strDuration = QString(tr("%1 millisecond")).arg(NanosecToTimeString(duration, true, false));
-    tooltip.add(tr("Duration"), strDuration);
+    QString durationStr = NanosecToTimeString(duration, true, false);
+
+    QString tooltipLine = QString(GPU_STR_APITimeline_TimeTooltipLine).arg(fnumStart, 0, 'f', 3).arg(fnumEnd, 0, 'f', 3).arg(durationStr);
+    tooltip.add("", tooltipLine);
 }
