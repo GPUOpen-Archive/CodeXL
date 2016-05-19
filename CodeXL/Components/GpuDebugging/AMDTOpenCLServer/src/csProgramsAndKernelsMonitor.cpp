@@ -1602,7 +1602,13 @@ bool csProgramsAndKernelsMonitor::updateProgramInfoWithInternalHandle(apCLProgra
                     int foundPosition = currentBuildData._buildOptions.reverseFind(forcedBuildOptions);
 
                     // We allow for the flags not to be present if the program was not yet built:
-                    GT_ASSERT((foundPosition > -1) || (CL_BUILD_NONE == currentBuildData._buildStatus));
+                    if (!((foundPosition > -1) || (CL_BUILD_NONE == currentBuildData._buildStatus)))
+                    {
+                        // Output a log message if the flags were not found:
+                        gtString logMsg = currentBuildData._buildOptions;
+                        logMsg.prepend(L"Program under OpenCL kernel debugger did not have the debugging flags added. Program build flags: ");
+                        OS_OUTPUT_DEBUG_LOG(logMsg.asCharArray(), OS_DEBUG_LOG_DEBUG);
+                    }
 
                     if (foundPosition > -1)
                     {
