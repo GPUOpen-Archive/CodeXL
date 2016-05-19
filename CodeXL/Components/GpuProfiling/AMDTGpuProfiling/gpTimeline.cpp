@@ -123,17 +123,9 @@ void gpTimeline::BuildTimeline(gpTraceDataContainer* pDataContainer)
 
                 if (queueBranches.m_pQueueRootBranch == nullptr)
                 {
-                    // Create the queue branch name
-                    QString queueDisplayName = m_pSessionDataContainer->QueueNameFromPointer(i.key());
 
-                    // Append the queue type to the queue name in DX12 (irrelevant in Vulkan)
-                    if (m_pSessionDataContainer->SessionAPIType() == ProfileSessionDataItem::DX12_API_PROFILE_ITEM)
-                    {
-                        int queueType = m_pSessionDataContainer->QueueType(i.key());
-                        QString queueTypeStr = gpTraceDataContainer::CommandListTypeAsString(queueType);
-                        queueDisplayName.prepend(AF_STR_SpaceA);
-                        queueDisplayName.prepend(queueTypeStr);
-                    }
+                    // Get the queue branch name
+                    QString queueDisplayName = m_pSessionDataContainer->QueueDisplayName(i.key());
 
                     // Create the queue root branch and add the API and command lists / buffers branches
                     queueBranches.m_pQueueRootBranch = new acTimelineBranch();

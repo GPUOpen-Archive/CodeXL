@@ -216,22 +216,9 @@ bool gpTraceView::DisplaySession(const osFilePath& sessionFilePath, afTreeItemTy
                             GT_ASSERT(rc);
 
 
-                            // Get the queue name from the queue name and type
-                            QString queueTypeStr;
-                            int queueType = m_pSessionDataContainer->QueueType(queueName);
-                            queueTypeStr = gpTraceDataContainer::CommandListTypeAsString(queueType);
-
-                            // Create the queue table name
-                            QString queueDisplayName = m_pSessionDataContainer->QueueNameFromPointer(queueName);
-
-                            QString tableCaption = queueDisplayName;
-                            if (queueTypeStr.isEmpty())
-                            {
-                                tableCaption.prepend(AF_STR_SpaceA);
-                                tableCaption.prepend(queueTypeStr);
-                            }
-                            
-                            m_pGPUTraceTablesTabWidget->addTab(pTable, QIcon(), tableCaption);
+                            // Get the queue display name for the table caption, and add the tab
+                            QString queueDisplayName = m_pSessionDataContainer->QueueDisplayName(queueName);
+                            m_pGPUTraceTablesTabWidget->addTab(pTable, QIcon(), queueDisplayName);
                         }
                     }
                 }

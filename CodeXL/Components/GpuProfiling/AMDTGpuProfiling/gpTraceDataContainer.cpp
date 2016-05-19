@@ -11,6 +11,7 @@
 
 // afProgressBarWrapper:
 #include <AMDTApplicationFramework/Include/afProgressBarWrapper.h>
+#include <AMDTApplicationFramework/Include/afAppStringConstants.h>
 
 // Local:
 #include <AMDTGpuProfiling/CLAPIDefs.h>
@@ -1113,6 +1114,22 @@ QString gpTraceDataContainer::QueueNameFromPointer(const QString& queuePtrStr)
 
     retVal = QString(GPU_STR_timeline_QueueBranchName).arg(queueIndex);
 
+    return retVal;
+}
+
+QString gpTraceDataContainer::QueueDisplayName(const QString& queuePtrStr)
+{
+    // Get the name with the index
+    QString retVal = QueueNameFromPointer(queuePtrStr);
+
+    // Append the queue type to the queue name in DX12 (irrelevant in Vulkan)
+    if (SessionAPIType() == ProfileSessionDataItem::DX12_API_PROFILE_ITEM)
+    {
+        int queueType = QueueType(queuePtrStr);
+        QString queueTypeStr = CommandListTypeAsString(queueType);
+        retVal.append(AF_STR_SpaceA);
+        retVal.append(queueTypeStr);
+    }
     return retVal;
 }
 

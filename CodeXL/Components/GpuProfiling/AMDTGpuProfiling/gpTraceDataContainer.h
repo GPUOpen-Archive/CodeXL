@@ -234,10 +234,15 @@ public:
     /// \return a formatted name with the command buffer / list index
     QString CommandListNameFromPointer(const QString& commandBufferPtrStr);
 
-    /// Return an indexed name for the queue from  it's pointer
+    /// Return an indexed name for the queue from it's pointer
     /// \param queuePtrStr the queue list pointer
     /// \return a formatted name with the queue index
     QString QueueNameFromPointer(const QString& queuePtrStr);
+
+    /// Return a display name for the queue from it's pointer
+    /// \param queuePtrStr the queue list pointer
+    /// \return a formatted name with the queue index and type
+    QString QueueDisplayName(const QString& queuePtrStr);
 
 
 private:
