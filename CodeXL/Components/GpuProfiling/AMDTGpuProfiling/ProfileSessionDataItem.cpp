@@ -822,6 +822,8 @@ QString ProfileSessionDataItem::GetColumnTooltip(int columnIndex) const
         case ProfileSessionDataItem::SESSION_ITEM_DEVICE_TIME_COLUMN:
         case ProfileSessionDataItem::SESSION_ITEM_START_TIME_COLUMN:
         case ProfileSessionDataItem::SESSION_ITEM_END_TIME_COLUMN:
+        case ProfileSessionDataItem::SESSION_ITEM_COMMAND_LIST_COLUMN:
+        case ProfileSessionDataItem::SESSION_ITEM_COMMAND_BUFFER_COLUMN:
         {
             retVal = GetColumnData(columnIndex).toString();
             break;
