@@ -614,18 +614,20 @@
 // Dashboard Summary
 #define GPU_STR_API_Summary "CPU API Summary"
 #define GPU_STR_GPU_Summary "GPU Commands Summary"
-#define GPU_STR_Command_List_Summary "Command List Summary"
+#define GPU_STR_Command_Lists_Summary "Command Lists Summary"
+#define GPU_STR_Command_Buffers_Summary "Command Buffers Summary"
 #define GPU_STR_API_Call_Summary "Call History Aggregated Data"
 #define GPU_STR_GPU_Call_Summary "GPU Cmds Aggregated Data"
-#define GPU_STR_Command_List_Call_Summary "Command List Aggregated Data"
+#define GPU_STR_Command_List_Call_Summary "%1 Command Lists"
+#define GPU_STR_Command_Buffers_Call_Summary "%1 Command Buffers"
 #define GPU_STR_Use_Scope_Summary "Use timeline selection scope"
 #define GPU_STR_Top_20_Cpu_Calls_Summary "Top %1 %2 calls (CPU)"
 #define GPU_STR_Top_Cpu_Calls_Summary "Top %1 calls (CPU)"
 #define GPU_STR_Top_20_Gpu_Calls_Summary "Top %1 %2 calls (GPU)"
 #define GPU_STR_Top_Gpu_Calls_Summary "Top %1 calls (GPU)"
 
-#define GPU_STR_Top_20_CommandLists_Summary "Top %1 %2 command lists"
-#define GPU_STR_Top_CommandLists_Summary "Top %1 command lists"
+#define GPU_STR_Top_20_CommandLists_Summary "Top %1 %2 commands"
+#define GPU_STR_Top_CommandLists_Summary "Top %1 commands"
 
 
 // Summary table captions
@@ -645,6 +647,7 @@
 #define GP_STR_SummaryTableCommandListNumCommands "# of commands"
 #define GP_STR_SummaryTableCommandListGPUQueue "GPU queue"
 #define GP_STR_SummaryTableCommandListAddress "Address"
+#define GP_STR_SummaryTableCommandListHandle "Handle"
 
 #define GP_STR_SummaryTop20TableColumnCallIndex "index"
 #define GP_STR_SummaryTop20TableColumnThreadId "Thread Id"

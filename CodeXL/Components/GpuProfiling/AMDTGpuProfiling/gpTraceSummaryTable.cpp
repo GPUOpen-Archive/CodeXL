@@ -588,6 +588,8 @@ void gpTraceSummaryTable::Cleanup()
 gpCommandListSummaryTable::gpCommandListSummaryTable(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView)
     : gpSummaryTable(pDataContainer, pSessionView, (eCallType)3), m_pSessionDataContainer(pDataContainer), m_pTraceView(pSessionView), m_lastSelectedRowIndex(-1)
 {
+    m_pSessionDataContainer = pDataContainer;
+
     QStringList columnCaptions;
     columnCaptions << GP_STR_SummaryTableCommandListType;
     columnCaptions << GP_STR_SummaryTableCommandListExecutionTime;
@@ -595,10 +597,18 @@ gpCommandListSummaryTable::gpCommandListSummaryTable(gpTraceDataContainer* pData
     columnCaptions << GP_STR_SummaryTableCommandListEndTime;
     columnCaptions << GP_STR_SummaryTableCommandListNumCommands;
     columnCaptions << GP_STR_SummaryTableCommandListGPUQueue;
-    columnCaptions << GP_STR_SummaryTableCommandListAddress;
+
+    if (pDataContainer != nullptr && pDataContainer->SessionAPIType() == ProfileSessionDataItem::ProfileItemAPIType::VK_API_PROFILE_ITEM)
+    {
+        columnCaptions << GP_STR_SummaryTableCommandListHandle;
+    }
+    else
+    {
+        columnCaptions << GP_STR_SummaryTableCommandListAddress;
+    }
+
     initHeaders(columnCaptions, false);
     setShowGrid(true);
-    m_pSessionDataContainer = pDataContainer;
     InitCommandListItems();
     // fill Table widget
     FillTable();

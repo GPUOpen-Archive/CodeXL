@@ -8,7 +8,7 @@
 
 #include <AMDTApplicationComponents/Include/acColours.h>
 
-static const char* table_captions[] = { GPU_STR_API_Call_Summary, GPU_STR_GPU_Call_Summary, GPU_STR_Command_List_Call_Summary };
+static const char* table_captions[] = { GPU_STR_API_Call_Summary, GPU_STR_GPU_Call_Summary, GPU_STR_Command_List_Call_Summary , GPU_STR_Command_Buffers_Call_Summary };
 
 const int MAX_ITEMS_IN_TABLE = 20;
 
@@ -51,23 +51,29 @@ bool gpSummaryTab::Init(gpTraceDataContainer* pDataContainer, gpTraceView* pSess
     QWidget* pWidgetLeft = new QWidget;
     QWidget* pWidgetRight = new QWidget;
 
-    QLabel* pLblCaption = new QLabel(QString(table_captions[m_callType]));
+    QString caption;
+    if (m_callType == eCallType::API_CALL || m_callType == eCallType::GPU_CALL)
+    {
+        caption = table_captions[m_callType];
+    }
+    else
+    { 
+        int commandCount = m_pSessionDataContainer->CommandListsData().size();
+        if (pDataContainer->SessionAPIType() == ProfileSessionDataItem::ProfileItemAPIType::DX12_API_PROFILE_ITEM)
+        {
+            caption = QString(table_captions[m_callType]).arg(commandCount);
+        }
+        else
+        {
+            caption = QString(table_captions[m_callType + 1]).arg(commandCount);
+        }
+    }
+    
+    QLabel* pLblCaption = new QLabel(caption);
     m_pChkboxUseScope = new QCheckBox(GPU_STR_Use_Scope_Summary);
 
     pLeftHLayout->addWidget(pLblCaption, 0, Qt::AlignTop);
 
-    bool rc = connect(m_pChkboxUseScope, SIGNAL(toggled(bool)), this, SLOT(OnUseTimelineSelectionScopeChanged(bool)));
-    GT_ASSERT(rc);
-    rc = connect(m_pSummaryTable, SIGNAL(itemSelectionChanged()), this, SLOT(OnSummaryTableSelectionChanged()));
-    GT_ASSERT(rc);
-    rc = connect(m_pSummaryTable, SIGNAL(cellClicked(int, int)), this, SLOT(OnSummaryTableCellClicked(int, int)));
-    GT_ASSERT(rc);
-    rc = connect(m_pSummaryTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(OnSummaryTableCellDoubleClicked(int, int)));
-    GT_ASSERT(rc);
-    rc = connect(m_pTop20Table, SIGNAL(cellClicked(int, int)), this, SLOT(OnTop20TableCellClicked(int, int)));
-    GT_ASSERT(rc);
-    rc = connect(m_pTop20Table, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(OnTop20TableCellDoubleClicked(int, int)));
-    GT_ASSERT(rc);
 
     QString styleSheetStr = QString("QDialog{border:1px solid gray;}");
     pLeftHLayout->addWidget(m_pChkboxUseScope, 0, Qt::AlignHCenter);
@@ -123,7 +129,22 @@ bool gpSummaryTab::Init(gpTraceDataContainer* pDataContainer, gpTraceView* pSess
 
     SetTimelineScope(false, timelineStart, timelineEnd);
 
+    bool rc = connect(m_pChkboxUseScope, SIGNAL(toggled(bool)), this, SLOT(OnUseTimelineSelectionScopeChanged(bool)));
+    GT_ASSERT(rc);
+    rc = connect(m_pSummaryTable, SIGNAL(itemSelectionChanged()), this, SLOT(OnSummaryTableSelectionChanged()));
+    GT_ASSERT(rc);
+    rc = connect(m_pSummaryTable, SIGNAL(cellClicked(int, int)), this, SLOT(OnSummaryTableCellClicked(int, int)));
+    GT_ASSERT(rc);
+    rc = connect(m_pSummaryTable, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(OnSummaryTableCellDoubleClicked(int, int)));
+    GT_ASSERT(rc);
+    rc = connect(m_pTop20Table, SIGNAL(cellClicked(int, int)), this, SLOT(OnTop20TableCellClicked(int, int)));
+    GT_ASSERT(rc);
+    rc = connect(m_pTop20Table, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(OnTop20TableCellDoubleClicked(int, int)));
+    GT_ASSERT(rc);
+
     m_pSummaryTable->selectRow(0);
+
+
 
     return true;
 }
@@ -678,14 +699,16 @@ void gpCommandListSummaryTab::SetTop20TableCaption(const QString& callName)
 {
     GT_IF_WITH_ASSERT(m_pTop20Caption != nullptr)
     {
+        QString commandListIndex = m_pSessionDataContainer->CommandListNameFromPointer(callName);
+
         int numItems = m_top20ItemList.count();
         if (numItems < MAX_ITEMS_IN_TABLE)
         {
-            m_pTop20Caption->setText(QString(GPU_STR_Top_CommandLists_Summary).arg(callName));
+            m_pTop20Caption->setText(QString(GPU_STR_Top_CommandLists_Summary).arg(commandListIndex));
         }
         else
         {
-            m_pTop20Caption->setText(QString(GPU_STR_Top_20_CommandLists_Summary).arg(MAX_ITEMS_IN_TABLE).arg(callName));
+            m_pTop20Caption->setText(QString(GPU_STR_Top_20_CommandLists_Summary).arg(MAX_ITEMS_IN_TABLE).arg(commandListIndex));
         }
     }
 }

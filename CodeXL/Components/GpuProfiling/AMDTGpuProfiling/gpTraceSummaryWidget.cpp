@@ -7,7 +7,7 @@
 #include <AMDTApplicationFramework/Include/afProgressBarWrapper.h>
 
 const int DEFAULT_PROGRESS_FACTOR = 10000;
-static const char* tab_captions[] = { GPU_STR_API_Summary, GPU_STR_GPU_Summary, GPU_STR_Command_List_Summary };
+static const char* tab_captions[] = { GPU_STR_API_Summary, GPU_STR_GPU_Summary, GPU_STR_Command_Lists_Summary, GPU_STR_Command_Buffers_Summary };
 
 /////////////////////////////////////////////////////////////////////////////////////
 // gpTraceSummaryWidget
@@ -51,7 +51,15 @@ void gpTraceSummaryWidget::Init(gpTraceDataContainer* pDataContainer, gpTraceVie
 
         bool rc = m_tabs[i]->Init(pDataContainer, pSessionView, timelineStartTime, timelineRange);
         GT_ASSERT(rc);
-        addTab(m_tabs[i], QIcon(), tab_captions[i]);
+        if (i == eCallType::API_CALL || i == eCallType::GPU_CALL || 
+            i == eCallType::COMMAND_LIST && pDataContainer->SessionAPIType() == ProfileSessionDataItem::ProfileItemAPIType::DX12_API_PROFILE_ITEM)
+        {
+            addTab(m_tabs[i], QIcon(), tab_captions[i]);
+        }
+        else
+        {
+            addTab(m_tabs[i], QIcon(), tab_captions[i+1]);
+        }
 
         rc = connect(this, SIGNAL(currentChanged(int)), this, SLOT(OnCurrentChanged(int)));
         GT_ASSERT(rc);
