@@ -75,9 +75,11 @@ public slots:
     void OnEditCopy();
 
     void OnTabSummaryItemClicked(ProfileSessionDataItem* pItem);
+    void OnTabSummaryCmdListClicked(const QString& cmdList);
 
 signals:
     void SummaryItemClicked(ProfileSessionDataItem* pItem);
+    void SummaryCmdListClicked(const QString& cmdList);
 
 private:
 

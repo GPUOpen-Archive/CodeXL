@@ -303,6 +303,8 @@ void gpTimeline::AddCommandListsToTimeline()
 
                 // Index for coloring
                 commandListIndex++;
+
+                m_cmdListTimelineItemMap.insert(commandListName, pNewItem);
             }
         }
     }
@@ -1125,4 +1127,19 @@ void gpTimeline::DrawTextInRect(QPainter& painter, const QRect& stringRect, cons
     }
 
     painter.setPen(currentPen);
+}
+
+void gpTimeline::OnSummaryCmdListClicked(const QString& cmdList)
+{
+
+    QMap<QString, CommandListTimelineItem*>::iterator item = m_cmdListTimelineItemMap.find(cmdList);
+
+    if (item != m_cmdListTimelineItemMap.end())
+    {
+        CommandListTimelineItem* pItem = item.value();
+        if (pItem != nullptr)
+        {
+            ZoomToItem(pItem, true);
+        }
+    }
 }

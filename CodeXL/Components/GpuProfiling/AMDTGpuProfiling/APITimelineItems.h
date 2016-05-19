@@ -138,6 +138,8 @@ public:
     /// \param tooltip acTimelineItemToolTip instance that should get populated with name/value pairs
     virtual void tooltipItems(acTimelineItemToolTip& tooltip) const;
 
+    const QString& CpommandListPtr()const { return m_commandListPtr; }
+
 protected:
 
     /// The command list pointer

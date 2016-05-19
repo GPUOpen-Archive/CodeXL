@@ -724,7 +724,7 @@ void gpCommandListSummaryTab::OnSummaryTableCellDoubleClicked(int row, int col)
         QString commandListName;
         if (pSummaryTable->GetItemCommandList(row, commandListName))
         {
-            // TODO
+            emit TabSummaryCmdListClicked(commandListName);
         }
     }
 }

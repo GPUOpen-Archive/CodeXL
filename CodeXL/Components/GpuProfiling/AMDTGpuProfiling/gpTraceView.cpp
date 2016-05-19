@@ -46,6 +46,7 @@
 #include <AMDTGpuProfiling/gpTraceSummaryWidget.h>
 #include <AMDTGpuProfiling/gpDetailedDataRibbon.h>
 #include <AMDTGpuProfiling/gpRibbonDataCalculator.h>
+#include <AMDTGpuProfiling/APITimelineItems.h>
 
 
 static const unsigned int s_UI_REFRESH_RATE = 1000;
@@ -266,6 +267,8 @@ bool gpTraceView::DisplaySession(const osFilePath& sessionFilePath, afTreeItemTy
 
                 m_pSummaryTableTabWidget->Init(m_pSessionDataContainer, this, m_pTimeline->visibleStartTime(), m_pTimeline->visibleRange());
                 bool rc = connect(m_pSummaryTableTabWidget, SIGNAL(SummaryItemClicked(ProfileSessionDataItem*)), this, SLOT(OnSummaryItemClicked(ProfileSessionDataItem*)));
+                GT_ASSERT(rc);
+                rc = connect(m_pSummaryTableTabWidget, SIGNAL(SummaryCmdListClicked(const QString& )), m_pTimeline, SLOT(OnSummaryCmdListClicked(const QString&)));
                 GT_ASSERT(rc);
 
                 afApplicationCommands::instance()->EndPerformancePrintout("Summary");
@@ -620,7 +623,11 @@ void gpTraceView::OnTimelineItemActivated(acTimelineItem* pTimelineItem)
         }
         else // command list
         {
-            m_pSummaryTableTabWidget->SelectCommandList(pTimelineItem->text());
+            CommandListTimelineItem* pCmdListItem = dynamic_cast<CommandListTimelineItem*>(pTimelineItem);
+            if (pCmdListItem != nullptr)
+            {
+                m_pSummaryTableTabWidget->SelectCommandList(pCmdListItem->CpommandListPtr());
+            }
         }
     }
 }

@@ -16,6 +16,8 @@
 
 class gpTraceDataContainer;
 class gpTraceView;
+class CommandListTimelineItem;
+
 // ----------------------------------------------------------------------------------
 // Class Name:          gpTimeline
 // General Description: An object handling the fill and draw of a timeline table for
@@ -69,6 +71,7 @@ protected slots:
     void OnSetElementsNewWidth(int legendWidth, int timelineWidth);
 
     void OnVisibilityFilterChanged(QMap<QString, bool>& threadNameVisibilityMap);
+    void OnSummaryCmdListClicked(const QString& cmdList);
 
 private:
 
@@ -185,6 +188,9 @@ private:
 
     /// the present data
     QVector<double> m_presentData;
+
+    /// map 
+    QMap<QString, CommandListTimelineItem*> m_cmdListTimelineItemMap;
 };
 
 

@@ -67,7 +67,13 @@ void gpTraceSummaryWidget::Init(gpTraceDataContainer* pDataContainer, gpTraceVie
         GT_ASSERT(rc);
         rc = connect(m_tabs[i], SIGNAL(TabSummaryItemClicked(ProfileSessionDataItem*)), this, SLOT(OnTabSummaryItemClicked(ProfileSessionDataItem*)));
         GT_ASSERT(rc);
-
+        if (i == eCallType::COMMAND_LIST)
+        {
+            gpCommandListSummaryTab* pCmdListTab = dynamic_cast<gpCommandListSummaryTab*>(m_tabs[i]);
+            GT_ASSERT(pCmdListTab != nullptr);
+            rc = connect(pCmdListTab, SIGNAL(TabSummaryCmdListClicked(const QString&)), this, SLOT(OnTabSummaryCmdListClicked(const QString&)));
+            GT_ASSERT(rc);
+        }
 
         afProgressBarWrapper::instance().incrementProgressBar();
     }
@@ -204,6 +210,7 @@ void gpTraceSummaryWidget::OnTabSummaryItemClicked(ProfileSessionDataItem* pItem
 {
     emit SummaryItemClicked(pItem);
 }
+
 void gpTraceSummaryWidget::SelectCommandList(const QString& commandListName)
 {
     gpCommandListSummaryTab* pCurrentTab = qobject_cast<gpCommandListSummaryTab*>(currentWidget());
@@ -211,4 +218,9 @@ void gpTraceSummaryWidget::SelectCommandList(const QString& commandListName)
     {
         pCurrentTab->SelectCommandList(commandListName);
     }
+}
+
+void gpTraceSummaryWidget::OnTabSummaryCmdListClicked(const QString& cmdList)
+{
+    emit SummaryCmdListClicked(cmdList);
 }
