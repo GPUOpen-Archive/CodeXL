@@ -44,11 +44,11 @@ CodeXLQTLibsDir="${CodeXLBinariesDir}/RuntimeLibs/QT"
 CodeXLBinaryExePath="${CodeXLBinariesDir}/CodeXL-bin"
 
 # Obtain libstdc++ needed version
-CRUNTIMEPATH=$(ldconfig -p | grep libstdc++.so.6 | grep 64)
-if [ -z "$CRUNTIMEPATH" ] ; then
-   CRUNTIMEPATH=$(/sbin/ldconfig -p | grep libstdc++.so.6 | grep 64)
-fi
+LDCONFIG="ldconfig"
+command -v "$LDCONFIG" &> /dev/null || LDCONFIG="/sbin/ldconfig"
+CRUNTIMEPATH=$(${LDCONFIG} -p | grep libstdc++.so.6 | grep 64)
 CRUNTIMEFILE=${CRUNTIMEPATH##*>}
+
 # Test if current system C++ runtime is older from CodeXL version needed
 CXL_CLIB=""
 NEWCRUNTIME=$(strings $CRUNTIMEFILE | grep GLIBCXX_3.4.16)
