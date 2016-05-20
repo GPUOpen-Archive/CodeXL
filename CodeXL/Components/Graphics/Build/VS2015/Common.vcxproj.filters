@@ -34,6 +34,7 @@
     <ClCompile Include="..\..\Server\Common\Communication_Impl.cpp" />
     <ClCompile Include="..\..\Server\Common\DeltaAccumulationBuffer.cpp" />
     <ClCompile Include="..\..\Server\Common\DLLLoader.cpp" />
+    <ClCompile Include="..\..\Server\Common\ErrorImage.cpp" />
     <ClCompile Include="..\..\Server\Common\FDPipeline.cpp" />
     <ClCompile Include="..\..\Server\Common\FrameDebugger.cpp" />
     <ClCompile Include="..\..\Server\Common\FrameStatsLogger.cpp" />

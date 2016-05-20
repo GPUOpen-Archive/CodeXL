@@ -94,6 +94,7 @@
     <ClCompile Include="..\..\Server\Common\CommandTimingManager.cpp" />
     <ClCompile Include="..\..\Server\Common\Compressor.cpp" />
     <ClCompile Include="..\..\Server\Common\CpuTimer.cpp" />
+    <ClCompile Include="..\..\Server\Common\ErrorImage.cpp" />
     <ClCompile Condition="'$(SolutionName)'!='CodeXL-AllProjects'" Include="..\..\Server\Common\FDPipelineShaderStage.cpp" />
     <ClCompile Condition="'$(SolutionName)'!='CodeXL-AllProjects'" Include="..\..\Server\Common\FDPipelineStage.cpp" />
     <ClCompile Include="..\..\Server\Common\FrameInfo.cpp" />

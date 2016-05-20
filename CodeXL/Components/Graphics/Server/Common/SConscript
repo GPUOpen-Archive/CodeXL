@@ -5,7 +5,12 @@
 Import('GPS_env')
 env = GPS_env.Clone()
 env['CPPPATH'] = env['GPS_PATH']
-env.Prepend (CPPPATH = ["../Common/Linux"])
+env.Prepend (CPPPATH =
+[
+    '../Common/Linux',
+    '../../../Common/Lib/Ext/tinyxml/2.6.2',
+])
+
 env.Prepend(CCFLAGS =
 [
     '-Wall',
@@ -16,16 +21,20 @@ env.Prepend(CCFLAGS =
 
 sources = \
 [
+    # TinyXML
+    "../../../Common/Lib/Ext/tinyxml/2.6.2/tinystr.cpp",
+    "../../../Common/Lib/Ext/tinyxml/2.6.2/tinyxmlparser.cpp",
+    "../../../Common/Lib/Ext/tinyxml/2.6.2/tinyxml.cpp",
+    "../../../Common/Lib/Ext/tinyxml/2.6.2/tinyxmlerror.cpp",
+
     # Files needed for GPA
     "../../../Common/Src/GPUPerfAPIUtils/GPUPerfAPILoader.cpp",
     "../../../Common/Src/GPUPerfAPIUtils/GPUPerfAPIUtil.cpp",
 #    "../../../Common/Src/ADLUtil/ADLUtil.cpp",
 #    "../../../Common/Src/AMDTMutex/AMDTMutex.cpp",
 
-#    "APIWrapperLogger.cpp",
     "BufferDelta.cpp",
     "Capture.cpp",
-#    "Capture_D3DPerfMarkers.cpp",      Don't include - No D3D on linux
     "CaptureLayer.cpp",
     "CaptureStream.cpp",
     "CommandProcessor.cpp",
@@ -34,14 +43,13 @@ sources = \
     "Communication_Impl.cpp",
     "Compressor.cpp",
     "DeltaAccumulationBuffer.cpp",
-#    "DetoursHelpers.cpp",              Don't include - only used for DirectX
+    "ErrorImage.cpp",
     "HookTimer.cpp",
-#    "DetourVtableImmediate.cpp",       Don't include - only used for DirectX
-#    "DLLLoader.cpp",
     "FDPipeline.cpp",
     "FDPipelineShaderStage.cpp",
     "FDPipelineStage.cpp",
     "FrameDebugger.cpp",
+    "FrameInfo.cpp",
     "FrameProfiler.cpp",
     "FrameStatsLogger.cpp",
     "geometry.cpp",
@@ -54,28 +62,36 @@ sources = \
     "Logger.cpp",
     "MemoryBuffer.cpp",
     "misc.cpp",
+    "ModernAPIFrameDebuggerLayer.cpp",
+    "ModernAPIFrameProfilerLayer.cpp",
+    "ModernAPILayerManager.cpp",
     "NamedEvent.cpp",
     "NamedMutex.cpp",
     "NamedSemaphore.cpp",
     "NetSocket.cpp",
-    "Linux/OSWrappers.cpp",
+    "ObjectDatabaseProcessor.cpp",
     "parser.cpp",
-    "Linux/SafeCRT.cpp",
     "SaveImage.cpp",
-#    "ShaderDebuggerHostGPS2.cpp",
+    "SessionManager.cpp",
     "SharedGlobal.cpp",
     "SharedMemory.cpp",
     "SharedMemoryManager.cpp",
     "StreamLog.cpp",
-#    "ThreadTracer.cpp",
     "TimeControlLayer.cpp",
     "timer.cpp",
     "TraceAnalyzer.cpp",
-#    "TraceAnalyzerOutputDebugString.cpp",
+    "TraceMetadata.cpp",
+    "Tracing/APIEntry.cpp",
+    "Tracing/MultithreadedTraceAnalyzerLayer.cpp",
+    "Tracing/ThreadTraceData.cpp",
+    "WrappedObjectDatabase.cpp",
     "xml.cpp",
 
+    # Linux files
     "Linux/proc.cpp",
     "Linux/Interceptor.cpp",
+    "Linux/OSWrappers.cpp",
+    "Linux/SafeCRT.cpp",
     "Linux/timerLinux.cpp"
 ]
 
