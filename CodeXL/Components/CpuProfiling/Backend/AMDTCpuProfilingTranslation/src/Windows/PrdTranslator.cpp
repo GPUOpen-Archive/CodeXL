@@ -427,11 +427,6 @@ PrdTranslator::~PrdTranslator()
     }
 
     fnCleanupMaps();
-
-    if (nullptr != m_dbWriter)
-    {
-        delete m_dbWriter;
-    }
 }
 
 void PrdTranslator::InitializeProgressBar(const gtString& caption, bool incremental)
@@ -3199,10 +3194,10 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
 
     if (createDb)
     {
-        m_dbWriter = new ProfilerDataDBWriter;
+        m_dbWriter.reset(new ProfilerDataDBWriter);
     }
 
-    if (nullptr != m_dbWriter)
+    if (m_dbWriter)
     {
         m_dbWriter->Initialize(proFile.toStdWString().c_str());
     }
@@ -3289,7 +3284,7 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
         return res;
     }
 
-    if (nullptr != m_dbWriter)
+    if (m_dbWriter)
     {
         // Write the callstack info to DB
         for (auto procIter = m_processInfos.begin(), procIterEnd = m_processInfos.end(); procIter != procIterEnd; ++procIter)
@@ -3449,7 +3444,7 @@ bool PrdTranslator::WriteProfileFile(const gtString& path,
 
     UpdateProgressBar(80ULL, 100ULL);
 
-    if (nullptr != m_dbWriter)
+    if (m_dbWriter)
     {
         gtUInt64 startTime = GetTickCount();
 

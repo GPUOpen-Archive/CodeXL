@@ -63,7 +63,7 @@ gtSet<FunctionSymbolInfo>::const_iterator ExecutableAnalyzer::AnalyzeCodeRva(gtR
     FunctionSymbolInfo func;
     func.m_rva = rva;
     func.m_size = 0;
-    func.m_pName = NULL;
+    func.m_pName = nullptr;
 
     m_mapLock.lockRead();
     itContainingFunc = m_functions.end();
@@ -145,21 +145,21 @@ bool ExecutableAnalyzer::IsSystemCall(gtRVAddr rva) const
 
 const FunctionSymbolInfo* ExecutableAnalyzer::FindAnalyzedFunction(gtVAddr va, bool handleInline)
 {
-    const FunctionSymbolInfo* pFunc = NULL;
+    const FunctionSymbolInfo* pFunc = nullptr;
+    gtRVAddr rva = m_exe.VaToRva(va);
 
     if (handleInline)
     {
         SymbolEngine* pSymbolEngine = m_exe.GetSymbolEngine();
 
-        if (NULL != pSymbolEngine)
+        if (nullptr != pSymbolEngine)
         {
-            pFunc = pSymbolEngine->LookupInlinedFunction(m_exe.VaToRva(va));
+            pFunc = pSymbolEngine->LookupFunction(rva, nullptr, handleInline);
         }
     }
 
-    if (NULL == pFunc)
+    if (nullptr == pFunc)
     {
-        gtRVAddr rva = m_exe.VaToRva(va);
         gtSet<FunctionSymbolInfo>::const_iterator itFunc = AnalyzeCodeRva(rva);
 
         m_mapLock.lockRead();
@@ -189,7 +189,7 @@ const FunctionSymbolInfo* ExecutableAnalyzer::FindAnalyzedFunction(gtVAddr va, b
                     // Though, we should never reach this point!
                     if (parentFunc.m_rva > rva)
                     {
-                        pFunc = NULL;
+                        pFunc = nullptr;
                         break;
                     }
 
@@ -214,7 +214,7 @@ bool ExecutableAnalyzer::AddFunctionEntry(gtRVAddr rva)
     FunctionSymbolInfo func;
     func.m_rva = rva;
     func.m_size = 0;
-    func.m_pName = NULL;
+    func.m_pName = nullptr;
 
     m_mapLock.lockWrite();
     ret = m_functions.insert(func).second;
@@ -239,7 +239,7 @@ bool ExecutableAnalyzer::AddFunction(FunctionSymbolInfo& func, gtSet<FunctionSym
             funcSet.m_size  = func.m_size;
 
             // This prevents us from overriding preallocated names.
-            if (NULL != func.m_pName)
+            if (nullptr != func.m_pName)
             {
                 funcSet.m_pName = func.m_pName;
             }
@@ -291,7 +291,7 @@ void ExecutableAnalyzer::DisassembleContainingFunction(gtRVAddr rva, FunctionSym
     {
         const gtUByte* pCode = GetCodeBytes(sectionIndex, func.m_rva);
 
-        if (NULL != pCode)
+        if (nullptr != pCode)
         {
             gtVector<int> workingVec;
             workingVec.reserve(32);
@@ -363,7 +363,7 @@ void ExecutableAnalyzer::DisassembleContainingFunction(gtRVAddr rva, FunctionSym
                     pCode += func.m_size;
                     func.m_rva += func.m_size;
                     func.m_size = sizeLeft - func.m_size;
-                    func.m_pName = NULL;
+                    func.m_pName = nullptr;
                     codeSymType = CODE_SYM_NONE;
                 }
             }
@@ -435,7 +435,7 @@ bool ExecutableAnalyzer::DisassembleBasicBlock(const gtUByte* pCode, const gtUBy
             continue;
         }
 
-        if (NULL != pInst)
+        if (nullptr != pInst)
         {
             if (IsFunctionExitPoint(*pInst))
             {
@@ -563,7 +563,7 @@ bool ExecutableAnalyzer::DisassembleBasicBlock(const gtUByte* pCode, const gtUBy
 int ExecutableAnalyzer::Decode(const gtUByte* pCode, const CInstr_Table*& pInst)
 {
     int length = -1;
-    pInst = NULL;
+    pInst = nullptr;
 
     m_dasmLock.enter();
 
@@ -575,7 +575,7 @@ int ExecutableAnalyzer::Decode(const gtUByte* pCode, const CInstr_Table*& pInst)
         {
             const CInstr_ExtraCodes* pExtraInfo = static_cast<CInstr_ExtraCodes*>(m_pDasm->GetExtraInfoPtr());
 
-            if (NULL != pExtraInfo)
+            if (nullptr != pExtraInfo)
             {
                 pInst = &pExtraInfo->instr_table;
             }
@@ -593,7 +593,7 @@ const gtUByte* ExecutableAnalyzer::GetCodeBytes(unsigned sectionIndex, gtRVAddr 
 
     gtRVAddr startRva, endRva;
 
-    if (NULL != pBytes && m_exe.GetSectionRvaLimits(sectionIndex, startRva, endRva))
+    if (nullptr != pBytes && m_exe.GetSectionRvaLimits(sectionIndex, startRva, endRva))
     {
         pBytes += rva - startRva;
     }
@@ -611,17 +611,17 @@ unsigned ExecutableAnalyzer::FindBoundingKnownCode(gtRVAddr rva, FunctionSymbolI
     if (m_exe.GetSectionRvaLimits(sectionIndex, startRva, endRva))
     {
         gtUInt32 size = endRva - startRva;
-        wchar_t* pName = NULL;
+        wchar_t* pName = nullptr;
 
 
         SymbolEngine* pSymbolEngine = m_exe.GetSymbolEngine();
 
-        if (NULL != pSymbolEngine)
+        if (nullptr != pSymbolEngine)
         {
             gtRVAddr nextRva = GT_INVALID_RVADDR;
             const FunctionSymbolInfo* pFuncInfo = pSymbolEngine->LookupBoundingFunction(rva, &nextRva);
 
-            if (NULL != pFuncInfo)
+            if (nullptr != pFuncInfo)
             {
                 if (startRva <= pFuncInfo->m_rva)
                 {
@@ -661,7 +661,7 @@ unsigned ExecutableAnalyzer::FindBoundingKnownCode(gtRVAddr rva, FunctionSymbolI
                         }
 
                         size = endRva - startRva;
-                        pName = NULL;
+                        pName = nullptr;
                     }
                 }
                 else

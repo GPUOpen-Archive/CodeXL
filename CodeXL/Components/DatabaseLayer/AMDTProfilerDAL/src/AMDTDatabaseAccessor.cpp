@@ -101,9 +101,8 @@ const std::vector<std::string> SQL_CREATE_DB_STMTS_AGGREGATION =
     "CREATE TABLE Module (id INTEGER PRIMARY KEY, path TEXT, isSystemModule INTEGER, is32Bit INTEGER, type INTEGER, size INTEGER, foundDebugInfo INTEGER)",
     "CREATE TABLE ModuleInstance (id INTEGER PRIMARY KEY, processId INTEGER, moduleId INTEGER, loadAddress INTEGER)", // FOREIGN KEY(processId) REFERENCES Process(id), FOREIGN KEY(moduleId) REFERENCES Module(id)
     "CREATE TABLE ProcessThread (id INTEGER PRIMARY KEY, processId INTEGER, threadId INTEGER)", // FOREIGN KEY(processId) REFERENCES Process(id)
-    "CREATE TABLE Function (id INTEGER PRIMARY KEY, moduleId INTEGER, name TEXT, startOffset INTEGER, size INTEGER, sourceFileId INTEGER)", // FOREIGN KEY(moduleId) REFERENCES module(id)
+    "CREATE TABLE Function (id INTEGER PRIMARY KEY, moduleId INTEGER, name TEXT, startOffset INTEGER, size INTEGER)", // FOREIGN KEY(moduleId) REFERENCES module(id)
     "CREATE TABLE SampleContext (id INTEGER PRIMARY KEY AUTOINCREMENT, processThreadId INTEGER, moduleInstanceId INTEGER, coreSamplingConfigurationId INTEGER, functionId INTEGER, offset INTEGER, count INTEGER)", // FOREIGN KEY(processThreadId) REFERENCES ProcessThread(rowid), FOREIGN KEY(moduleInstanceId) REFERENCES ModuleInstance(id), FOREIGN KEY(coreSamplingConfigurationId) REFERENCES CoreSamplingConfiguration(id)
-    "CREATE TABLE SourceFile (path TEXT)",
     "CREATE TABLE CallstackFrame (callstackId INTEGER, processId INTEGER, functionId INTEGER, offset INTEGER, depth INTEGER)", // FOREIGN KEY(functionId) REFERENCES Function(id)
     "CREATE TABLE CallstackLeaf (callstackId INTEGER, processId INTEGER, functionId INTEGER, offset INTEGER, samplingConfigurationId INTEGER, selfSamples INTEGER)", // FOREIGN KEY(functionId) REFERENCES Function(id)
     //"CREATE TABLE Callgraph (id INTEGER NOT NULL, callerId INTEGER, calleeId INTEGER, edgeLevel INTEGER)", // FOREIGN KEY(callerId) REFERENCES Function(id), FOREIGN KEY(calleeId) REFERENCES Function(id), FOREIGN KEY(samplingConfigurationId) REFERENCES SamplingConfiguration(id)
