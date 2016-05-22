@@ -34,7 +34,7 @@ RPMBUILD=${WORKSPACE}/rpmbuild
 RPM_SOURCES=${RPMBUILD}/SOURCES
 RPM_SPECS=${RPMBUILD}/SPECS
 RPMRC_FILE=${RPMBUILD}/rpmrc
-RPM_BRANCH=${WORKSPACE}/main
+RPM_BRANCH=${WORKSPACE}
 
 rm -rf ${RPMBUILD}
 
@@ -59,17 +59,17 @@ echo "%_topdir %(echo ${RPMBUILD})" > ${HOME}/.rpmmacros
 # And the spec file will set the __find_requires macro to that script
 
 # At present, we get one single tarball containing CodeXL content
-cp ${RPM_BRANCH}/AMD\_CodeXL\_*.tar.gz ${RPM_SOURCES}
+cp ${RPM_BRANCH}/CodeXL\_*.tar.gz ${RPM_SOURCES}
 cp $RPM_BRANCH/CodeXL/Installer-Linux/rpm/CodeXL.spec ${RPM_SPECS}
 cp $RPM_BRANCH/CodeXL/Installer-Linux/lcl-find-requires ${RPM_SPECS}
 
 # Before we run the build, we do need to know the name of the tarball up to the .tar.gz
 # The rpm spec file will utilize this
-CXL_CONTENT=`basename ${RPM_BRANCH}/AMD_CodeXL_Linux*.tar.gz .tar.gz`
+CXL_CONTENT=`basename ${RPM_BRANCH}/CodeXL_Linux*.tar.gz .tar.gz`
 CXL_NAME=CodeXL_Linux
-CXL_CONTENT_NDA=`basename ${RPM_BRANCH}/AMD_CodeXL_AMD_NDA_Only_Linux*.tar.gz .tar.gz`
+CXL_CONTENT_NDA=`basename ${RPM_BRANCH}/CodeXL_NDA_Only_Linux*.tar.gz .tar.gz`
 CXL_NAME_NDA=CodeXL_NDA_Only_Linux
-CXL_CONTENT_INTERNAL=`basename ${RPM_BRANCH}/AMD_CodeXL_AMD_Internal_Only_Linux*.tar.gz .tar.gz`
+CXL_CONTENT_INTERNAL=`basename ${RPM_BRANCH}/CodeXL_Internal_Only_Linux*.tar.gz .tar.gz`
 CXL_NAME_INTERNAL=CodeXL_Internal_Only_Linux
 CXL_PKG_VERSION=`echo ${CXL_CONTENT} | awk -F_ '{print $6}'`
 
