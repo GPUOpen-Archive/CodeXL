@@ -75,6 +75,8 @@ public:
     /// \return true on success, else false.
     virtual bool RestoreCurrentSettings();
 
+    bool IsHSAInstalled() const;
+
     /// Are current settings set in the widget valid?
     /// \param invalidMessageStr invalid string
     /// \return true on success, else false.

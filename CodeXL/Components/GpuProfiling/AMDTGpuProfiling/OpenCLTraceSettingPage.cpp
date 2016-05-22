@@ -25,6 +25,7 @@
 // AMDTApplicationFramework:
 #include <AMDTApplicationFramework/Include/afCSSSettings.h>
 #include <AMDTApplicationFramework/Include/afGlobalVariablesManager.h>
+#include <AMDTApplicationFramework/Include/afProjectManager.h>
 
 // Local:
 #include <AMDTGpuProfiling/gpStringConstants.h>
@@ -45,6 +46,7 @@
     #define NEED_TO_POP_SIGNALS_MACRO
 #endif
 #include "../HSAFdnCommon/HSAFunctionDefs.h"
+
 #if defined (NEED_TO_POP_SIGNALS_MACRO)
     #pragma pop_macro("signals")
 #endif
@@ -455,9 +457,8 @@ bool OpenCLTraceOptions::RestoreCurrentSettings()
 
     // Check if the catalyst and HSA are installed, and enable / check the OpenCL / HSA button accordingly:
     bool isCatalystInstalled = (afGlobalVariablesManager::instance().InstalledAMDComponentsBitmask() & AF_AMD_CATALYST_COMPONENT);
-    bool isHSAInstalled = (afGlobalVariablesManager::instance().InstalledAMDComponentsBitmask() & AF_AMD_HSA_COMPONENT);
 
-    m_pHSARadioButton->setEnabled(isHSAInstalled);
+    m_pHSARadioButton->setEnabled(IsHSAInstalled());
     m_pOpenCLRadioButton->setEnabled(isCatalystInstalled);
 
     if (!isCatalystInstalled)
@@ -484,6 +485,46 @@ bool OpenCLTraceOptions::RestoreCurrentSettings()
     RestoreTreesDataFromSettings();
 
     return true;
+}
+
+bool OpenCLTraceOptions::IsHSAInstalled() const
+{
+    bool isHSAInstalled = false;  
+    
+    const auto& projectSettings = afProjectManager::instance().currentProjectSettings();
+    if (projectSettings.isRemoteTarget())
+    {
+        // Retrieve the daemon's address.
+        const auto dmnPort = projectSettings.remoteTargetDaemonConnectionPort();
+        const auto dmnIp = projectSettings.remoteTargetName();
+
+        osPortAddress daemonAddr(dmnIp, dmnPort);
+
+        // Initialize the daemon if required.
+        static const unsigned CONNECTION_VALIDATION_TIMEOUT_MS = 1500;
+        bool retVal = CXLDaemonClient::IsInitialized(daemonAddr) || CXLDaemonClient::Init(daemonAddr, CONNECTION_VALIDATION_TIMEOUT_MS);
+        GT_ASSERT_EX(retVal, GPU_STR_REMOTE_AGENT_INIT_FAILURE_WITH_CTX);
+
+        CXLDaemonClient* pDmnClient = CXLDaemonClient::GetInstance();
+        GT_IF_WITH_ASSERT(pDmnClient != NULL)
+        {
+            if (retVal)
+            {
+                // Connect to the daemon.
+                osPortAddress addrBuffer;
+                retVal = pDmnClient->ConnectToDaemon(addrBuffer);
+                GT_IF_WITH_ASSERT(retVal)
+                {
+                    isHSAInstalled = pDmnClient->IsHSAEnabled();
+                }
+            }
+        }
+    }
+    else
+    {
+        isHSAInstalled = (afGlobalVariablesManager::instance().InstalledAMDComponentsBitmask() & AF_AMD_HSA_COMPONENT);
+    }
+    return isHSAInstalled;
 }
 
 bool OpenCLTraceOptions::AreSettingsValid(gtString& invalidMessageStr)
@@ -516,6 +557,10 @@ bool OpenCLTraceOptions::SetTraceOptions(APITraceOptions& apiTraceOptions)
 
 bool OpenCLTraceOptions::SaveCurrentSettings()
 {
+#if (AMDT_BUILD_TARGET == AMDT_LINUX_OS)
+    m_pHSARadioButton->setEnabled(IsHSAInstalled());
+#endif
+
     m_currentSettings.m_apiToTrace = m_pOpenCLRadioButton->isChecked() ? APIToTrace_OPENCL : APIToTrace_HSA;
     m_currentSettings.m_alwaysShowAPIErrorCode = m_pShowAPIErrorCodeCB->isChecked();
     m_currentSettings.m_collapseClGetEventInfo = m_pCollapseCallsCB->isChecked();

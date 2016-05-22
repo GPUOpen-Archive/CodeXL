@@ -252,6 +252,9 @@ public:
 
     bool GetDaemonAddress(osPortAddress&);
 
+    // retruns true if HSA enabled on remote machine
+    bool IsHSAEnabled();
+
 private:
 
     // This will have to be a global singleton, to allow for cross system
