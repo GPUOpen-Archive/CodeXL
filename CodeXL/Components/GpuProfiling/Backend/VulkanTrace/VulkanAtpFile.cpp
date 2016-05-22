@@ -102,12 +102,12 @@ bool VKAtpFilePart::ParseGPUAPICallString(const std::string& apiStr, VKGPUTraceI
     string temp;
     istringstream ss(apiStr);
 
-    ss >> apiInfo.m_commandQueuePtrStr;
+    ss >> apiInfo.m_queueIndexStr;
     CHECK_SS_ERROR(ss);
     ss >> apiInfo.m_commandListType;
     CHECK_SS_ERROR(ss);
 
-    ss >> apiInfo.m_commandBufferPtrStr;
+    ss >> apiInfo.m_commandBufferHandleStr;
     CHECK_SS_ERROR(ss);
 
     int intVal = 0;

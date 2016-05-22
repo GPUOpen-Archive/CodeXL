@@ -489,7 +489,7 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
             m_itemIndex = (int)pApiInfo->m_uiDisplaySeqID;
         }
 
-        m_queueName = QString::fromStdString(pApiInfo->m_commandQueuePtrStr);
+        m_queueName = QString::fromStdString(pApiInfo->m_queueIndexStr);
 
         std::string interfaceName = pApiInfo->m_strName;
         m_itemType.m_itemSubType = pApiInfo->m_apiId;
@@ -505,7 +505,7 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
 
         m_data[ProfileSessionDataItem::SESSION_ITEM_PARAMETERS_COLUMN] = QString::fromStdString(pApiInfo->m_ArgList);
         m_data[ProfileSessionDataItem::SESSION_ITEM_RESULT_COLUMN] = QString::fromStdString(pApiInfo->m_strRet);
-        m_data[ProfileSessionDataItem::SESSION_ITEM_COMMAND_BUFFER_COLUMN] = m_pSessionDataContainer->CommandListNameFromPointer(QString::fromStdString(pApiInfo->m_commandBufferPtrStr));
+        m_data[ProfileSessionDataItem::SESSION_ITEM_COMMAND_BUFFER_COLUMN] = m_pSessionDataContainer->CommandListNameFromPointer(pApiInfo);
 
         // Set the start and end time. DX12 timestamps are stored in Nanoseconds
         m_startTime = pApiInfo->m_ullStart;
@@ -1196,7 +1196,7 @@ QString ProfileSessionDataItem::CommandListPointer() const
             VKGPUTraceInfo* pAPIInfo = (VKGPUTraceInfo*)m_pApiInfo;
             if (pAPIInfo != nullptr)
             {
-                retVal = QString::fromStdString(pAPIInfo->m_commandBufferPtrStr);
+                retVal = QString::fromStdString(pAPIInfo->m_commandBufferHandleStr);
             }
         }
     }

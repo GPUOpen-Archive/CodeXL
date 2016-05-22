@@ -44,11 +44,11 @@ public:
     /// Command list type (D3D12_COMMAND_LIST_TYPE)
     int m_commandListType;
 
-    /// The command queue pointer as string
-    std::string m_commandQueuePtrStr;
+    /// The command queue index as string
+    std::string m_queueIndexStr;
 
-    /// The command buffer pointer as string
-    std::string m_commandBufferPtrStr;
+    /// The command buffer handle as string
+    std::string m_commandBufferHandleStr;
 
     /// The GPU command sample ID
     int m_sampleId;

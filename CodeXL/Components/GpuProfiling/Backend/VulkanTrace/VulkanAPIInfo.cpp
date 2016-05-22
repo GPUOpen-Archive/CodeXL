@@ -8,7 +8,7 @@ VKAPIInfo::VKAPIInfo() : APIInfo(), m_apiType(vkAPIType_Unknown), m_apiId(vk_FUN
 
 }
 
-VKGPUTraceInfo::VKGPUTraceInfo() : VKAPIInfo(), m_commandListType(0), m_commandQueuePtrStr(""), m_commandBufferPtrStr(""), m_sampleId(0)
+VKGPUTraceInfo::VKGPUTraceInfo() : VKAPIInfo(), m_commandListType(0), m_sampleId(0)
 {
     m_isGPU = true;
 }

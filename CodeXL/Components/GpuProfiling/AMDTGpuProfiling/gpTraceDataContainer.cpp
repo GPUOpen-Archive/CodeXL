@@ -288,21 +288,21 @@ ProfileSessionDataItem* gpTraceDataContainer::AddVKGPUTraceItem(VKGPUTraceInfo* 
         m_sessionItemsSortedByStartTime.insertMulti(pRetVal->StartTime(), pRetVal);
 
         // Add the item to the queues map
-        m_sessionQueuesToCallsMap[pAPIInfo->m_commandQueuePtrStr] << pRetVal;
+        m_sessionQueuesToCallsMap[pAPIInfo->m_queueIndexStr] << pRetVal;
 
         // Add a map from the queue name to the queue type
-        if (m_sessionQueueNameToCommandListType.contains(pAPIInfo->m_commandQueuePtrStr))
+        if (m_sessionQueueNameToCommandListType.contains(pAPIInfo->m_queueIndexStr))
         {
-            GT_ASSERT(m_sessionQueueNameToCommandListType[pAPIInfo->m_commandQueuePtrStr] == pAPIInfo->m_commandListType);
+            GT_ASSERT(m_sessionQueueNameToCommandListType[pAPIInfo->m_queueIndexStr] == pAPIInfo->m_commandListType);
         }
         else
         {
-            m_sessionQueueNameToCommandListType[pAPIInfo->m_commandQueuePtrStr] = pAPIInfo->m_commandListType;
+            m_sessionQueueNameToCommandListType[pAPIInfo->m_queueIndexStr] = pAPIInfo->m_commandListType;
         }
 
         // Add this API call to the command list data
-        QString commandBufferName = QString::fromStdString(pAPIInfo->m_commandBufferPtrStr);
-        QString queueName = QString::fromStdString(pAPIInfo->m_commandQueuePtrStr);
+        QString commandBufferName = QString::fromStdString(pAPIInfo->m_commandBufferHandleStr);
+        QString queueName = QString::fromStdString(pAPIInfo->m_queueIndexStr);
         if (m_commandListToQueueMap.contains(commandBufferName))
         {
             GT_ASSERT_EX(m_commandListToQueueMap[commandBufferName] == queueName, L"This command buffer was already added with another queue name");
@@ -1091,6 +1091,24 @@ QString gpTraceDataContainer::CommandListNameFromPointer(const QString& commandB
         retVal = QString(GPU_STR_timeline_CmdBufferBranchName).arg(commandListIndex);
     }
 
+    return retVal;
+}
+
+QString gpTraceDataContainer::CommandListNameFromPointer(VKGPUTraceInfo* pCommandBufferInfo)
+{
+    QString retVal;
+    GT_IF_WITH_ASSERT(pCommandBufferInfo != nullptr)
+    {
+        QString queueIndexStr = QString::fromStdString(pCommandBufferInfo->m_queueIndexStr);
+        bool ok;
+        int num = queueIndexStr.toUInt(&ok, 16);
+        QString commandBufferHandleStr = QString::fromStdString(pCommandBufferInfo->m_commandBufferHandleStr);
+        if (!m_commandListPointerToIndexMap.contains(commandBufferHandleStr) && ok==true)
+        {
+            m_commandListPointerToIndexMap.insertMulti(commandBufferHandleStr, num);
+        }
+        retVal = QString(GPU_STR_timeline_CmdBufferBranchName).arg(num);
+   }
     return retVal;
 }
 
