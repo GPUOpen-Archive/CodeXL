@@ -234,11 +234,6 @@ public:
     /// \return a formatted name with the command buffer / list index
     QString CommandListNameFromPointer(const QString& commandBufferPtrStr);
 
-    /// Return an indexed name for the command buffer / list from  it's pointer
-    /// \param pApiInfo the vulkan trace info, containing the index which was set in the ltr file
-    /// \return a formatted name with the command buffer / list index
-    QString CommandListNameFromPointer(VKGPUTraceInfo* pApiInfo);
-
     /// Return an indexed name for the queue from it's pointer
     /// \param queuePtrStr the queue list pointer
     /// \return a formatted name with the queue index

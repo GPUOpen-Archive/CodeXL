@@ -1094,40 +1094,29 @@ QString gpTraceDataContainer::CommandListNameFromPointer(const QString& commandB
     return retVal;
 }
 
-QString gpTraceDataContainer::CommandListNameFromPointer(VKGPUTraceInfo* pCommandBufferInfo)
-{
-    QString retVal;
-    GT_IF_WITH_ASSERT(pCommandBufferInfo != nullptr)
-    {
-        QString queueIndexStr = QString::fromStdString(pCommandBufferInfo->m_queueIndexStr);
-        bool ok;
-        int num = queueIndexStr.toUInt(&ok, 16);
-        QString commandBufferHandleStr = QString::fromStdString(pCommandBufferInfo->m_commandBufferHandleStr);
-        if (!m_commandListPointerToIndexMap.contains(commandBufferHandleStr) && ok==true)
-        {
-            m_commandListPointerToIndexMap.insertMulti(commandBufferHandleStr, num);
-        }
-        retVal = QString(GPU_STR_timeline_CmdBufferBranchName).arg(num);
-   }
-    return retVal;
-}
-
 QString gpTraceDataContainer::QueueNameFromPointer(const QString& queuePtrStr)
 {
     int queueIndex = 1;
     QString retVal;
 
-    // If the command buffer / list is not mapped to an index yet, allocate an index for the current command list
-    if (!m_commandQueuePointerToIndexMap.contains(queuePtrStr))
+    if (SessionAPIType() == ProfileSessionDataItem::DX12_API_PROFILE_ITEM)
     {
-        int index = m_commandQueuePointerToIndexMap.size() + 1;
-        m_commandQueuePointerToIndexMap.insertMulti(queuePtrStr, index);
-    }
+        // If the command buffer / list is not mapped to an index yet, allocate an index for the current command list
+        if (!m_commandQueuePointerToIndexMap.contains(queuePtrStr))
+        {
+            int index = m_commandQueuePointerToIndexMap.size() + 1;
+            m_commandQueuePointerToIndexMap.insertMulti(queuePtrStr, index);
+        }
 
-    // Get the index for this command list / buffer
-    GT_IF_WITH_ASSERT(m_commandQueuePointerToIndexMap.contains(queuePtrStr))
+        // Get the index for this command list / buffer
+        GT_IF_WITH_ASSERT(m_commandQueuePointerToIndexMap.contains(queuePtrStr))
+        {
+            queueIndex = m_commandQueuePointerToIndexMap[queuePtrStr];
+        }
+    }
+    else
     {
-        queueIndex = m_commandQueuePointerToIndexMap[queuePtrStr];
+        queueIndex = queuePtrStr.toInt();
     }
 
     retVal = QString(GPU_STR_timeline_QueueBranchName).arg(queueIndex);
