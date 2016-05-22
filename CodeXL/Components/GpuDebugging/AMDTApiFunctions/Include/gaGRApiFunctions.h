@@ -165,6 +165,8 @@ public:
     virtual bool gaTerminateDebuggedProcess();
     virtual bool gaSuspendDebuggedProcess();
     virtual bool gaResumeDebuggedProcess();
+    virtual bool gaLockDriverThreads();
+    virtual bool gaUnLockDriverThreads();
     virtual bool gaSuspendThreads(const std::vector<osThreadId>& thrds);
     virtual bool gaResumeThreads();
     virtual bool gaIsDebuggedProcessSuspended();
@@ -592,6 +594,8 @@ GA_API bool gaDebuggedProcessExists();
 GA_API bool gaTerminateDebuggedProcess();
 GA_API bool gaSuspendDebuggedProcess();
 GA_API bool gaResumeDebuggedProcess();
+GA_API bool gaLockDriverThreads();
+GA_API bool gaUnLockDriverThreads();
 GA_API bool gaSuspendThreads(const std::vector<osThreadId>& thrds);
 GA_API bool gaResumeThreads();
 GA_API bool gaIsDebuggedProcessSuspended();

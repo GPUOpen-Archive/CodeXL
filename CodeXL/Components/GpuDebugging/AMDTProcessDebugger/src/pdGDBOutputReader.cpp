@@ -40,6 +40,7 @@
 #include <AMDTAPIClasses/Include/Events/apOutputDebugStringEvent.h>
 #include <AMDTAPIClasses/Include/Events/apDebuggedProcessTerminatedEvent.h>
 #include <AMDTAPIClasses/Include/Events/apThreadCreatedEvent.h>
+#include <AMDTApiFunctions/Include/gaGRApiFunctions.h>
 
 
 // Local:
@@ -3590,6 +3591,8 @@ void pdGDBOutputReader::handleSignalOutput(const gtASCIIString& gdbOutputLine, b
 
     if (nullptr != _pGDBCommunicationPipe && nullptr != _pGDBDriver)
     {
+        gaLockDriverThreads();
+        
         std::string cmd = "-exec-interrupt --all\n";
         _wasGDBPrompt = false;
         _pGDBCommunicationPipe->write(cmd.c_str(), cmd.length());

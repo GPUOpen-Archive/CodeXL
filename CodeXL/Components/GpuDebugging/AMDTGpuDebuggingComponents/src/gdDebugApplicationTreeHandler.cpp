@@ -5313,10 +5313,7 @@ void gdDebugApplicationTreeHandler::onEvent(const apEvent& eve, bool& vetoEvent)
 
                 bool rcUpdate = true;
 
-                if (AP_BREAK_COMMAND_HIT != breakpointEvent.breakReason())
-                {
-                    rcUpdate = updateMonitoredObjectsTree();
-                }
+                rcUpdate = updateMonitoredObjectsTree();
 
                 GT_IF_WITH_ASSERT(rcUpdate)
                 {

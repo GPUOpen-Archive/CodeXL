@@ -3592,6 +3592,8 @@ bool pdLinuxProcessDebugger::trySuspendProcess(bool& suspendedBefore, bool bRele
     if (!_gdbDriver.IsAllThreadsStopped(bRelevantThrds ? &m_GDBIdsOfThreadsToRelease : nullptr))
         //if (!isDebuggedProcssSuspended())
     {
+        gaLockDriverThreads();
+
         suspendedBefore = false;
 
         if (!_gdbDriver.executeGDBCommand(PD_GDB_SUSPEND_DEBUGGED_PROCESS_CMD, "--all"))
