@@ -29,12 +29,17 @@ then
     exit 1
 fi
 
+if [ "$1" = "all_variants" ]
+then
+  all_variants="true"
+fi
+
 # Always wipe out the old rpmrc file and create a new one from scratch
 RPMBUILD=${WORKSPACE}/rpmbuild
 RPM_SOURCES=${RPMBUILD}/SOURCES
 RPM_SPECS=${RPMBUILD}/SPECS
 RPMRC_FILE=${RPMBUILD}/rpmrc
-RPM_BRANCH=${WORKSPACE}/main
+RPM_BRANCH=${WORKSPACE}
 
 rm -rf ${RPMBUILD}
 
@@ -59,19 +64,19 @@ echo "%_topdir %(echo ${RPMBUILD})" > ${HOME}/.rpmmacros
 # And the spec file will set the __find_requires macro to that script
 
 # At present, we get one single tarball containing CodeXL content
-cp ${RPM_BRANCH}/AMD\_CodeXL\_*.tar.gz ${RPM_SOURCES}
+cp ${RPM_BRANCH}/CodeXL\_*.tar.gz ${RPM_SOURCES}
 cp $RPM_BRANCH/CodeXL/Installer-Linux/rpm/CodeXL.spec ${RPM_SPECS}
 cp $RPM_BRANCH/CodeXL/Installer-Linux/lcl-find-requires ${RPM_SPECS}
 
 # Before we run the build, we do need to know the name of the tarball up to the .tar.gz
 # The rpm spec file will utilize this
-CXL_CONTENT=`basename ${RPM_BRANCH}/AMD_CodeXL_Linux*.tar.gz .tar.gz`
+CXL_CONTENT=`basename ${RPM_BRANCH}/CodeXL_Linux*.tar.gz .tar.gz`
 CXL_NAME=CodeXL_Linux
-CXL_CONTENT_NDA=`basename ${RPM_BRANCH}/AMD_CodeXL_AMD_NDA_Only_Linux*.tar.gz .tar.gz`
+CXL_CONTENT_NDA=`basename ${RPM_BRANCH}/CodeXL_NDA_Only_Linux*.tar.gz .tar.gz`
 CXL_NAME_NDA=CodeXL_NDA_Only_Linux
-CXL_CONTENT_INTERNAL=`basename ${RPM_BRANCH}/AMD_CodeXL_AMD_Internal_Only_Linux*.tar.gz .tar.gz`
+CXL_CONTENT_INTERNAL=`basename ${RPM_BRANCH}/CodeXL_Internal_Only_Linux*.tar.gz .tar.gz`
 CXL_NAME_INTERNAL=CodeXL_Internal_Only_Linux
-CXL_PKG_VERSION=`echo ${CXL_CONTENT} | awk -F_ '{print $6}'`
+CXL_PKG_VERSION=`echo ${CXL_CONTENT} | awk -F_ '{print $5}'`
 
 
 # And run the build
@@ -81,22 +86,23 @@ rpmbuild \
     --define "CXL_name ${CXL_NAME}" \
     --ba ${RPM_SPECS}/CodeXL.spec
 
-CXL_PKG_VERSION=`echo ${CXL_CONTENT_NDA} | awk -F_ '{print $9}'`
+if [ "$all_variants" = "true" ]; then
+  CXL_PKG_VERSION=`echo ${CXL_CONTENT_NDA} | awk -F_ '{print $7}'`
 
-rpmbuild \
-    --define "CXL_ver ${CXL_PKG_VERSION}" \
-    --define "CXL_name ${CXL_NAME_NDA}" \
-    --define "CXL_Content ${CXL_CONTENT_NDA}" \
-    --ba ${RPM_SPECS}/CodeXL.spec
+  rpmbuild \
+      --define "CXL_ver ${CXL_PKG_VERSION}" \
+      --define "CXL_name ${CXL_NAME_NDA}" \
+      --define "CXL_Content ${CXL_CONTENT_NDA}" \
+      --ba ${RPM_SPECS}/CodeXL.spec
 
-CXL_PKG_VERSION=`echo ${CXL_CONTENT_INTERNAL} | awk -F_ '{print $9}'`
+  CXL_PKG_VERSION=`echo ${CXL_CONTENT_INTERNAL} | awk -F_ '{print $7}'`
 
-rpmbuild \
-    --define "CXL_ver ${CXL_PKG_VERSION}" \
-    --define "CXL_Content ${CXL_CONTENT_INTERNAL}" \
-    --define "CXL_name ${CXL_NAME_INTERNAL}" \
-    --ba ${RPM_SPECS}/CodeXL.spec
-
+  rpmbuild \
+      --define "CXL_ver ${CXL_PKG_VERSION}" \
+      --define "CXL_Content ${CXL_CONTENT_INTERNAL}" \
+      --define "CXL_name ${CXL_NAME_INTERNAL}" \
+      --ba ${RPM_SPECS}/CodeXL.spec
+fi
 #changing the name of the rpm-removing the "release" from the file name
 
 #(ls -l ${RPMBUILD}/RPMS/x86_64/*release*.rpm | awk -F\  '{print $10}' && ls -l ${RPMBUILD}/RPMS/x86_64/*release*.rpm | awk -F\  '{print $10}' | sed '{s/release\.//}') | sort | xargs -l2 mv

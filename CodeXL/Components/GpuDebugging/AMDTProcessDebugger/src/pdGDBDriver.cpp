@@ -61,6 +61,7 @@
 #include <AMDTAPIClasses/Include/Events/apExceptionEvent.h>
 #include <AMDTAPIClasses/Include/Events/apInfrastructureFailureEvent.h>
 #include <AMDTAPIClasses/Include/Events/apEventsHandler.h>
+#include <AMDTApiFunctions/Include/gaGRApiFunctions.h>
 
 // Local:
 #include <src/pdStringConstants.h>
@@ -521,6 +522,8 @@ bool pdGDBDriver::executeGDBCommand(pdGDBCommandId gdbCommandId,
 
                             if (PD_CONTINUE_CMD == gdbCommandId)
                             {
+                                gaUnLockDriverThreads();
+                                
                                 while (!IsAllThreadsRunning())
                                 {
                                     _gdbOutputReader.readGDBOutput(*_pGDBCommunicationPipe, *this, gdbCommandId, ignoredS, ignoredT, ppGDBOutputData);

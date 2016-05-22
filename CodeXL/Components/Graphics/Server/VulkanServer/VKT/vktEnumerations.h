@@ -30,6 +30,27 @@ enum eAPIType
 #endif
 
 //-----------------------------------------------------------------------------
+/// An API Type enumeration that defines the group that the API call is classified into.
+//-----------------------------------------------------------------------------
+#ifdef CODEXL_INCLUDE
+enum vkAPIType
+{
+    vkAPIType_Unknown = 0,
+    vkAPIType_CmdBufNonProfiled = 0x1,
+    vkAPIType_CmdBufProfiled = 0x2,
+    vkAPIType_DescriptorSet = 0x4,
+    vkAPIType_Create = 0x8,
+    vkAPIType_Destroy = 0x10,
+    vkAPIType_Get = 0x20,
+    vkAPIType_Memory = 0x40,
+    vkAPIType_QueueSubmission = 0x80,
+    vkAPIType_Sync = 0x100,
+    vkAPIType_KHR = 0x200,
+};
+#endif
+
+
+//-----------------------------------------------------------------------------
 /// A FuncId enumeration that defines all Vulkan API calls that can possibly be traced.
 //-----------------------------------------------------------------------------
 #ifdef CODEXL_INCLUDE

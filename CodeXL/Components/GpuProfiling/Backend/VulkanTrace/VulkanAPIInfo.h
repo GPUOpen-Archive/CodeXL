@@ -6,6 +6,7 @@
 // Local:
 #include "../VulkanTrace/VulkanFunctionDefs.h"
 
+
 //------------------------------------------------------------------------------------
 /// DX12 API Base class
 //------------------------------------------------------------------------------------
@@ -23,7 +24,7 @@ public:
     vkAPIType m_apiType;
 
     /// Vulkan API ID, defined in VulkanFunctionDefs.h
-    vk_FUNC_TYPE m_apiId;
+    VkFuncId m_apiId;
 
     // The interface pointer as string
     std::string m_interfacePtrStr;

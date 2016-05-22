@@ -262,22 +262,18 @@ QColor APIColorMap::GetAPIColor(ProfileSessionDataItem::ProfileItemType itemType
             || (itemType.m_itemMainType == ProfileSessionDataItem::VK_GPU_PROFILE_ITEM))
         {
             // Get the Vulkan API type
-            vkAPIType apiType = vulkanFunctionDefs::GetAPIGroupFromAPI((vk_FUNC_TYPE)itemType.m_itemSubType);
+            vkAPIType apiType = vulkanFunctionDefs::GetAPIGroupFromAPI((VkFuncId)itemType.m_itemSubType);
 
             switch (apiType)
             {
-            case vkAPIType_Command:
-            {
-                retVal = QColor::fromRgb(255, 128, 0);
-                break;
-            }
 
-            case vkAPIType_CommandDraw:
+            case vkAPIType_CmdBufProfiled:
+            case vkAPIType_CmdBufNonProfiled:
             {
                 retVal = QColor::fromRgb(60, 24, 216);
                 break;
             }
-            case vkAPIType_General:
+            case vkAPIType_DescriptorSet:
             {
                 retVal = QColor::fromRgb(57, 151, 17);
                 break;
@@ -298,7 +294,7 @@ QColor APIColorMap::GetAPIColor(ProfileSessionDataItem::ProfileItemType itemType
                 retVal = QColor::fromRgb(230, 138, 0);
                 break;
             }
-            case vkAPIType_Queue:
+            case vkAPIType_QueueSubmission:
             {
                 retVal = QColor::fromRgb(14, 130, 94);
                 break;

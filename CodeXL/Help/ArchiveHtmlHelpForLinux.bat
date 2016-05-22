@@ -8,12 +8,12 @@ REM Argument1 = Perforce Workspace root path. Usualy this is D:\jenkins\workspac
 @echo on
 REM Remove any old archive
 cd %1%
-del /f /q ".\main\CodeXL\Help\CodeXL User Guide\CodeXL_User_Guide_HTML.tar.gz"
+del /f /q ".\CodeXL\Help\CodeXL User Guide\CodeXL_User_Guide_HTML.tar.gz"
 
 REM Add the location of the tar utility to the path so we can use it
-set PATH=%PATH%;%1%\main\Common\DK\Gnu\cw1.3.12\bin
+set PATH=%PATH%;%1%\Common\DK\Gnu\cw1.3.12\bin
 
-cd ".\main\CodeXL\Help\CodeXL User Guide\webhelp"
+cd ".\CodeXL\Help\CodeXL User Guide\webhelp"
 
 REM Archive all the files in the current directory
 tar.exe cvf ..\CodeXL_User_Guide_HTML.tar.gz *

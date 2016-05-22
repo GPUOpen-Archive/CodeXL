@@ -32,7 +32,7 @@ struct CPAProcessInfo
     bool     m_is32Bit;
     bool     m_hasCSS;
 
-    CPAProcessInfo(gtUInt32 pid, gtString name, bool is32Bit, bool hasCSS) : m_pid(pid), m_name(name), m_is32Bit(is32Bit), m_hasCSS(hasCSS) {}
+    CPAProcessInfo(gtUInt32 pid, const gtString& name, bool is32Bit, bool hasCSS) : m_pid(pid), m_name(name), m_is32Bit(is32Bit), m_hasCSS(hasCSS) {}
 };
 
 using CPAProcessList = gtVector<CPAProcessInfo>;
@@ -47,7 +47,7 @@ struct CPAModuleInfo
     bool     m_is32Bit;
     bool     m_foundDebugInfo;
 
-    CPAModuleInfo(gtUInt32 id, gtString name, gtUInt32 size, gtUInt32 type, bool isSysModule, bool is32Bit, bool foundDebugInfo) :
+    CPAModuleInfo(gtUInt32 id, const gtString& name, gtUInt32 size, gtUInt32 type, bool isSysModule, bool is32Bit, bool foundDebugInfo) :
         m_id(id), m_name(name), m_size(size), m_type(type), m_isSysModule(isSysModule), m_is32Bit(is32Bit), m_foundDebugInfo(foundDebugInfo) {}
 };
 
@@ -114,7 +114,7 @@ struct CPAFunctionInfo
     gtUInt64 m_funcStartOffset = 0;
     gtUInt64 m_funcSize = 0;
 
-    CPAFunctionInfo(gtUInt32 funcId, gtUInt32 modId, gtString& funcName, gtUInt64 funcStartOffset, gtUInt64 funcSize) :
+    CPAFunctionInfo(gtUInt32 funcId, gtUInt32 modId, const gtString& funcName, gtUInt64 funcStartOffset, gtUInt64 funcSize) :
         m_funcId(funcId), m_modId(modId), m_funcName(funcName), m_funcStartOffset(funcStartOffset), m_funcSize(funcSize) {}
 };
 

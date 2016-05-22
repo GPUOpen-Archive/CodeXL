@@ -31,12 +31,11 @@
 #include <sys/time.h>
 #include <fcntl.h>
 #include <wchar.h>
-
-
 #include <sstream>
 #include <iostream>
 #include <iomanip>
 #include <string>
+#include <memory>
 
 #ifdef HAVE_LIBELF_GELF_H
     #include <libelf/gelf.h>
@@ -58,8 +57,10 @@
 #include <AMDTOSWrappers/Include/osCpuid.h>
 #include <AMDTOSWrappers/Include/osFilePath.h>
 #include <AMDTOSWrappers/Include/osProcess.h>
+#include <AMDTOSWrappers/Include/osAtomic.h>
 #include <AMDTOSWrappers/Include/osDebugLog.h>
 #include <AMDTCpuProfilingRawData/inc/RunInfo.h>
+#include <AMDTCpuProfilingRawData/inc/ProfilerDataDBWriter.h>
 
 #include "CaPerfTranslator.h"
 
@@ -133,7 +134,7 @@ CaPerfTranslator::ProcessInfo::~ProcessInfo()
     {
         ExecutableAnalyzer* pExeAnalyzer = it->second;
 
-        if (NULL != pExeAnalyzer)
+        if (nullptr != pExeAnalyzer)
         {
             delete pExeAnalyzer;
         }
@@ -142,7 +143,7 @@ CaPerfTranslator::ProcessInfo::~ProcessInfo()
 
 ExecutableAnalyzer* CaPerfTranslator::ProcessInfo::AcquireExecutableAnalyzer(gtVAddr va)
 {
-    ExecutableAnalyzer* pExeAnalyzer = NULL;
+    ExecutableAnalyzer* pExeAnalyzer = nullptr;
     VAddrRange range = {va, va};
 
     ExecutableAnalyzersMap::iterator it = m_exeAnalyzers.find(range);
@@ -155,14 +156,14 @@ ExecutableAnalyzer* CaPerfTranslator::ProcessInfo::AcquireExecutableAnalyzer(gtV
     {
         ExecutableFile* pExe = m_workingSet.FindModule(va);
 
-        if (NULL != pExe)
+        if (nullptr != pExe)
         {
             range.m_min = pExe->GetLoadAddress();
             range.m_max = range.m_min + static_cast<gtVAddr>(pExe->GetImageSize() - 1);
 
             ExecutableAnalyzer*& pMapExeAnalyzer = m_exeAnalyzers[range];
 
-            if (NULL == pMapExeAnalyzer)
+            if (nullptr == pMapExeAnalyzer)
             {
                 pMapExeAnalyzer = new ExecutableAnalyzer(*pExe);
             }
@@ -177,14 +178,14 @@ ExecutableAnalyzer* CaPerfTranslator::ProcessInfo::AcquireExecutableAnalyzer(gtV
 CaPerfTranslator::ProcessInfo* CaPerfTranslator::FindProcessInfo(ProcessIdType pid) const
 {
     gtMap<ProcessIdType, ProcessInfo*>::const_iterator it = m_processInfos.find(pid);
-    return (m_processInfos.end() != it) ? it->second : NULL;
+    return (m_processInfos.end() != it) ? it->second : nullptr;
 }
 
 CaPerfTranslator::ProcessInfo& CaPerfTranslator::AcquireProcessInfo(ProcessIdType pid)
 {
     ProcessInfo* pProcessInfo = FindProcessInfo(pid);
 
-    if (NULL == pProcessInfo)
+    if (nullptr == pProcessInfo)
     {
         pProcessInfo = new ProcessInfo(m_pSearchPath, m_pServerList, m_pCachePath);
         m_processInfos.insert(std::pair<ProcessIdType, ProcessInfo*>(pid, pProcessInfo));
@@ -208,17 +209,16 @@ CaPerfTranslator::CaPerfTranslator(const string& perfDataPath)
 void CaPerfTranslator::_init()
 {
     m_curProcTs = 0;
-    m_pCurProc = NULL;
-    m_pPerfDataRdr = NULL;
+    m_pCurProc = nullptr;
+    m_pPerfDataRdr = nullptr;
     m_cachedMod = m_modLoadInfoMap.rend();
     m_cachedPid = 0;
     m_bVerb = false;
 
     _clearAllHandlers();
 
-    m_pLogFile = NULL;
-
-    m_pCalogCss = NULL;
+    m_pLogFile = nullptr;
+    m_pCalogCss = nullptr;
 
     m_numFork = 0;
     m_numComm = 0;
@@ -251,14 +251,14 @@ void CaPerfTranslator::_init()
 
 #ifdef ENABLE_FAKETIMER
     //Initialize the arrays to NULL
-    m_aFakeFlags = NULL;
-    m_fakeInfo.timerFds = NULL;
-    m_fakeInfo.fakeTimerFds = NULL;
+    m_aFakeFlags = nullptr;
+    m_fakeInfo.timerFds = nullptr;
+    m_fakeInfo.fakeTimerFds = nullptr;
 #endif
 
-    m_pSearchPath = NULL;
-    m_pServerList = NULL;
-    m_pCachePath = NULL;
+    m_pSearchPath = nullptr;
+    m_pServerList = nullptr;
+    m_pCachePath = nullptr;
 }
 
 // This function adds an individual IBS event identifier to
@@ -392,15 +392,15 @@ bool CaPerfTranslator::_getInlinedFuncInfoListByVa(const ProcessIdType pid, gtVA
     bool result = false;
     ProcessInfo* pProcessInfo = FindProcessInfo(pid);
 
-    if (NULL != pProcessInfo)
+    if (nullptr != pProcessInfo)
     {
         ExecutableFile* pExecutable = pProcessInfo->m_workingSet.FindModule(ip);
 
-        if (NULL != pExecutable)
+        if (nullptr != pExecutable)
         {
             SymbolEngine* pSymbolEngine = pExecutable->GetSymbolEngine();
 
-            if (NULL != pSymbolEngine)
+            if (nullptr != pSymbolEngine)
             {
                 gtRVAddr rva = pExecutable->VaToRva(ip);
                 gtVector<gtRVAddr> funcRvaList = pSymbolEngine->FindNestedInlineFunctions(rva);
@@ -422,24 +422,24 @@ void CaPerfTranslator::SetDebugSymbolsSearchPath(const wchar_t* pSearchPath, con
 {
     // We use 'free' instead of 'delete' because these strings were created by 'wcsdup'
     //
-    if (NULL != m_pSearchPath)
+    if (nullptr != m_pSearchPath)
     {
         free(m_pSearchPath);
     }
 
-    if (NULL != m_pServerList)
+    if (nullptr != m_pServerList)
     {
         free(m_pServerList);
     }
 
-    if (NULL != m_pCachePath)
+    if (nullptr != m_pCachePath)
     {
         free(m_pCachePath);
     }
 
-    m_pSearchPath = (NULL != pSearchPath) ? wcsdup(pSearchPath) : NULL;
-    m_pServerList = (NULL != pServerList) ? wcsdup(pServerList) : NULL;
-    m_pCachePath  = (NULL != pCachePath)  ? wcsdup(pCachePath)  : NULL;
+    m_pSearchPath = (nullptr != pSearchPath) ? wcsdup(pSearchPath) : nullptr;
+    m_pServerList = (nullptr != pServerList) ? wcsdup(pServerList) : nullptr;
+    m_pCachePath  = (nullptr != pCachePath)  ? wcsdup(pCachePath)  : nullptr;
 
     // Update the working sets, if there are any.
     for (gtMap<ProcessIdType, ProcessInfo*>::iterator it = m_processInfos.begin(), itEnd = m_processInfos.end(); it != itEnd; ++it)
@@ -461,13 +461,13 @@ CaPerfTranslator::~CaPerfTranslator()
     {
         m_pPerfDataRdr->deinit();
         delete m_pPerfDataRdr;
-        m_pPerfDataRdr = NULL;
+        m_pPerfDataRdr = nullptr;
     }
 
     if (m_pLogFile)
     {
         fclose(m_pLogFile);
-        m_pLogFile = NULL;
+        m_pLogFile = nullptr;
     }
 
 #ifdef HAVE_CALOG
@@ -475,7 +475,7 @@ CaPerfTranslator::~CaPerfTranslator()
     if (m_pCalogCss)
     {
         calog_close(&m_pCalogCss);
-        m_pCalogCss = NULL;
+        m_pCalogCss = nullptr;
     }
 
 #endif
@@ -485,7 +485,7 @@ CaPerfTranslator::~CaPerfTranslator()
     if (m_aFakeFlags)
     {
         delete [] m_aFakeFlags;
-        m_aFakeFlags = NULL;
+        m_aFakeFlags = nullptr;
     }
 
 #endif
@@ -494,7 +494,7 @@ CaPerfTranslator::~CaPerfTranslator()
     {
         ProcessInfo* pProcessInfo = it->second;
 
-        if (NULL != pProcessInfo)
+        if (nullptr != pProcessInfo)
         {
             delete pProcessInfo;
         }
@@ -502,17 +502,17 @@ CaPerfTranslator::~CaPerfTranslator()
 
     // We use 'free' instead of 'delete' because these strings were created by 'wcsdup'
     //
-    if (NULL != m_pSearchPath)
+    if (nullptr != m_pSearchPath)
     {
         free(m_pSearchPath);
     }
 
-    if (NULL != m_pServerList)
+    if (nullptr != m_pServerList)
     {
         free(m_pServerList);
     }
 
-    if (NULL != m_pCachePath)
+    if (nullptr != m_pCachePath)
     {
         free(m_pCachePath);
     }
@@ -800,7 +800,7 @@ HRESULT CaPerfTranslator::_translate_pass1()
 {
     HRESULT retVal = S_OK;
     struct perf_event_header hdr;
-    const void* pBuf = NULL;
+    const void* pBuf = nullptr;
 
     if (m_bVerb)
     {
@@ -822,7 +822,7 @@ HRESULT CaPerfTranslator::_translate_pass1()
     m_handlers[PERF_RECORD_SAMPLE] =
         (PerfRecordHandler_t) &CaPerfTranslator::preprocess_PERF_RECORD_SAMPLE_into_block;
 
-    gettimeofday(&m_pass1Start, NULL);
+    gettimeofday(&m_pass1Start, nullptr);
 
     //-------------------------------------------------------------------------
 
@@ -854,7 +854,7 @@ HRESULT CaPerfTranslator::_translate_pass1()
             continue;
         }
 
-        if (m_handlers[hdr.type] != NULL)
+        if (m_handlers[hdr.type] != nullptr)
         {
             (this->*(m_handlers[hdr.type]))(&hdr, pBuf, offset, recIndx);
         }
@@ -882,7 +882,7 @@ HRESULT CaPerfTranslator::_translate_pass1()
 
     //-------------------------------------------------------
     // Stop PASS1 timer and log timing in logfile
-    gettimeofday(&m_pass1Stop, NULL);
+    gettimeofday(&m_pass1Stop, nullptr);
 
     if (m_pLogFile)
     {
@@ -902,7 +902,7 @@ HRESULT CaPerfTranslator::_translate_pass2_serialize()
 {
     HRESULT retVal = S_OK;
     struct perf_event_header hdr;
-    const void* pBuf = NULL;
+    const void* pBuf = nullptr;
     gtUInt32 offset = 0;
     gtUInt32 recIndx = 0;
 
@@ -923,7 +923,7 @@ HRESULT CaPerfTranslator::_translate_pass2_serialize()
         OS_OUTPUT_DEBUG_LOG(L"============== PASS2 SERIALIZE ==============", OS_DEBUG_LOG_INFO);
     }
 
-    gettimeofday(&m_pass2Start, NULL);
+    gettimeofday(&m_pass2Start, nullptr);
 
     m_handlers[PERF_RECORD_SAMPLE] =
         (PerfRecordHandler_t) &CaPerfTranslator::process_PERF_RECORD_SAMPLE;
@@ -952,7 +952,7 @@ HRESULT CaPerfTranslator::_translate_pass2_serialize()
             continue;
         }
 
-        if (m_handlers[hdr.type] != NULL)
+        if (m_handlers[hdr.type] != nullptr)
         {
             (this->*(m_handlers[hdr.type]))(&hdr, pBuf, offset, recIndx);
         }
@@ -1000,7 +1000,7 @@ HRESULT CaPerfTranslator::_translate_pass2_serialize()
     }
 
     //-------------------------------------------------------
-    gettimeofday(&m_pass2Stop, NULL);
+    gettimeofday(&m_pass2Stop, nullptr);
 
     _printPass2Log();
 
@@ -1049,7 +1049,7 @@ HRESULT CaPerfTranslator::_translate_pass2_sort()
         OS_OUTPUT_DEBUG_LOG(L"============== PASS2 SORT ==============", OS_DEBUG_LOG_INFO);
     }
 
-    gettimeofday(&m_pass2Start, NULL);
+    gettimeofday(&m_pass2Start, nullptr);
     //-------------------------------------------------------
     // Initializing
     EvBlkIdMap::iterator eit  = m_evBlkIdMap.begin();
@@ -1189,7 +1189,7 @@ HRESULT CaPerfTranslator::_translate_pass2_sort()
     } // while
 
     //-------------------------------------------------------
-    gettimeofday(&m_pass2Stop, NULL);
+    gettimeofday(&m_pass2Stop, nullptr);
 
 
     //-------------------------------------------------------
@@ -1260,8 +1260,8 @@ HRESULT CaPerfTranslator::_getSampleBlockFromOffset(
     (void)(evId); // unused
     int retVal = S_OK;
     struct perf_event_header hdr;
-    const void* pBuf = NULL;
-    char* pTmp = NULL;
+    const void* pBuf = nullptr;
+    char* pTmp = nullptr;
     gtUInt32 totSize = 0;
 
 #if 0
@@ -1419,7 +1419,7 @@ ModLoadInfoMap::reverse_iterator CaPerfTranslator::_getModuleForSample(gtUInt32 
 
     CpuProfileModule* pMod = rit->second.pMod;
 
-    if (NULL != pMod && 0 == pMod->m_base)
+    if (nullptr != pMod && 0 == pMod->m_base)
     {
         pMod->m_base = rit->first.addr;
 
@@ -1436,16 +1436,16 @@ ModLoadInfoMap::reverse_iterator CaPerfTranslator::_getModuleForSample(gtUInt32 
 
 const FunctionSymbolInfo* CaPerfTranslator::getFunctionSymbol(ProcessIdType pid, gtVAddr ip, CpuProfileModule* pMod)
 {
-    const FunctionSymbolInfo* pFuncInfo = NULL;
+    const FunctionSymbolInfo* pFuncInfo = nullptr;
     bool handleInline = true;
 
     ProcessInfo* pProcessInfo = FindProcessInfo(pid);
 
-    if (NULL != pProcessInfo)
+    if (nullptr != pProcessInfo)
     {
         ExecutableAnalyzer* pExeAnalyzer = pProcessInfo->AcquireExecutableAnalyzer(ip);
 
-        if (NULL != pExeAnalyzer)
+        if (nullptr != pExeAnalyzer)
         {
             pFuncInfo = pExeAnalyzer->FindAnalyzedFunction(ip, handleInline);
         }
@@ -1453,18 +1453,18 @@ const FunctionSymbolInfo* CaPerfTranslator::getFunctionSymbol(ProcessIdType pid,
         {
             ExecutableFile* pExecutable = pProcessInfo->m_workingSet.FindModule(ip);
 
-            if (NULL != pExecutable)
+            if (nullptr != pExecutable)
             {
-                if (NULL != pMod)
+                if (nullptr != pMod)
                 {
                     pMod->m_size = pExecutable->GetImageSize();
                 }
 
                 SymbolEngine* pSymbolEngine = pExecutable->GetSymbolEngine();
 
-                if (NULL != pSymbolEngine)
+                if (nullptr != pSymbolEngine)
                 {
-                    pFuncInfo = pSymbolEngine->LookupFunction(pExecutable->VaToRva(ip), NULL, handleInline);
+                    pFuncInfo = pSymbolEngine->LookupFunction(pExecutable->VaToRva(ip), nullptr, handleInline);
                 }
             }
         }
@@ -1476,7 +1476,7 @@ const FunctionSymbolInfo* CaPerfTranslator::getFunctionSymbol(ProcessIdType pid,
 
 CpuProfileModule* CaPerfTranslator::getModule(const string& modName)
 {
-    CpuProfileModule* pRet = NULL;
+    CpuProfileModule* pRet = nullptr;
     gtString wModName;
     wModName.fromUtf8String(modName);
 
@@ -1495,6 +1495,7 @@ CpuProfileModule* CaPerfTranslator::getModule(const string& modName)
         bool is32Bit = false;
         _getModuleBitness(modName, &is32Bit);
         mod.m_is32Bit = is32Bit;
+        mod.m_moduleId = AtomicAdd(m_nextModuleId, 1);
 
         m_modMap.insert(NameModuleMap::value_type(wModName, mod));
 
@@ -1513,7 +1514,7 @@ CpuProfileModule* CaPerfTranslator::getModule(const string& modName)
 
 CpuProfileProcess* CaPerfTranslator::getProcess(ProcessIdType pid)
 {
-    CpuProfileProcess* pRet = NULL;
+    CpuProfileProcess* pRet = nullptr;
 
     PidProcessMap::iterator it = m_procMap.find(pid);
 
@@ -1543,7 +1544,7 @@ int CaPerfTranslator::process_PERF_RECORD_MMAP(struct perf_event_header* pHdr, v
 {
     (void)(offset); // unused
 
-    if (NULL == pHdr || NULL == ptr)
+    if (nullptr == pHdr || nullptr == ptr)
     {
         return E_INVALIDARG;
     }
@@ -1605,6 +1606,7 @@ int CaPerfTranslator::process_PERF_RECORD_MMAP(struct perf_event_header* pHdr, v
     }
 
     info.pMod->m_modType = CpuProfileModule::UNMANAGEDPE;
+    info.instanceId = AtomicAdd(m_nextModInstanceId, 1);
 
     m_modLoadInfoMap.insert(ModLoadInfoMap::value_type(key, info));
 
@@ -1618,7 +1620,7 @@ int CaPerfTranslator::process_PERF_RECORD_COMM(struct perf_event_header* pHdr, v
 {
     (void)(offset); // unused
 
-    if (NULL == pHdr || NULL == ptr)
+    if (nullptr == pHdr || nullptr == ptr)
     {
         return E_INVALIDARG;
     }
@@ -1633,7 +1635,7 @@ int CaPerfTranslator::process_PERF_RECORD_COMM(struct perf_event_header* pHdr, v
 
     CpuProfileProcess* pProc = getProcess(pRec->pid);
 
-    if (NULL == pProc)
+    if (nullptr == pProc)
     {
         return E_FAIL;
     }
@@ -1721,7 +1723,7 @@ void CaPerfTranslator::_addSampleToProcessAndModule(CpuProfileProcess* pProc,
 {
     EventMaskType evMask = _getEvmask(event, umask, os, usr);
 
-    if ((NULL == pProc) || (NULL == pMod))
+    if ((nullptr == pProc) || (nullptr == pMod))
     {
         return;
     }
@@ -1750,29 +1752,33 @@ void CaPerfTranslator::_addSampleToProcessAndModule(CpuProfileProcess* pProc,
         gtString srcFileName;
         unsigned srcLineNum = 0U;
         bool handleInline = true;
+        gtUInt32 functionId = UNKNOWN_FUNCTION_ID;
 
-        if (NULL != pFuncInfo)
+        if (nullptr != pFuncInfo)
         {
+
             ProcessInfo* pProcessInfo = FindProcessInfo(pid);
 
-            if (NULL != pProcessInfo)
+            if (nullptr != pProcessInfo)
             {
                 ExecutableFile* pExecutable = pProcessInfo->m_workingSet.FindModule(ip);
 
-                if (NULL != pExecutable)
+                if (nullptr != pExecutable)
                 {
+                    pMod->m_isDebugInfoAvailable = pExecutable->IsDebugInfoAvailable();
+
                     gtRVAddr rva = pExecutable->VaToRva(sampInfo.address);
                     SymbolEngine* pSymbolEngine = pExecutable->GetSymbolEngine();
 
-                    if (NULL != pSymbolEngine)
+                    if (nullptr != pSymbolEngine)
                     {
                         gtRVAddr inlineRva = pSymbolEngine->TranslateToInlineeRVA(rva);
                         gtVAddr addr = sampInfo.address - rva + inlineRva;
                         CpuProfileFunction* pFunc = pMod->findFunction(addr);
 
-                        if (NULL == pFunc || pMod->isUnchartedFunction(*pFunc))
+                        if (nullptr == pFunc || pMod->isUnchartedFunction(*pFunc))
                         {
-                            if (NULL != pFuncInfo->m_pName)
+                            if (nullptr != pFuncInfo->m_pName)
                             {
                                 funcName = pFuncInfo->m_pName;
                             }
@@ -1785,10 +1791,12 @@ void CaPerfTranslator::_addSampleToProcessAndModule(CpuProfileProcess* pProc,
                                 srcLineNum = sourceLine.m_line;
                                 sampInfo.address = pExecutable->RvaToVa(sourceLine.m_rva);
                             }
+
+                            functionId = pFuncInfo->m_funcId;
                         }
                         else
                         {
-                            if (NULL != pFuncInfo->m_pName)
+                            if (nullptr != pFuncInfo->m_pName)
                             {
                                 funcName = pFuncInfo->m_pName;
                             }
@@ -1800,7 +1808,7 @@ void CaPerfTranslator::_addSampleToProcessAndModule(CpuProfileProcess* pProc,
             }
         }
 
-        pMod->recordSample(sampInfo, count, ldAddr, funcSize, funcName, gtString(), srcFileName, srcLineNum);
+        pMod->recordSample(sampInfo, count, ldAddr, funcSize, funcName, gtString(), srcFileName, srcLineNum, functionId);
     }
     else if (pMod->m_modType == CpuProfileModule::JAVAMODULE)
     {
@@ -1900,7 +1908,7 @@ int CaPerfTranslator::preprocess_PERF_RECORD_SAMPLE_into_block(struct perf_event
 
     memset(&rec, 0, sizeof(struct CA_PERF_RECORD_SAMPLE));
 
-    if (NULL == ptr)
+    if (nullptr == ptr)
     {
         return E_INVALIDARG;
     }
@@ -2012,8 +2020,8 @@ HRESULT CaPerfTranslator::_prepareBlkForSorting(gtUInt32 blkSize, void* pBlk, gt
 {
     HRESULT retVal = S_OK;
     struct CA_PERF_RECORD_SAMPLE rec;
-    struct perf_event_header* pRec = NULL;
-    char* pCur = NULL;
+    struct perf_event_header* pRec = nullptr;
+    char* pCur = nullptr;
     gtUInt32 totSize = 0;
 
     numEntries = 0;
@@ -2086,7 +2094,7 @@ HRESULT CaPerfTranslator::_prepareBlkForSorting(gtUInt32 blkSize, void* pBlk, gt
 
 HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* pHdr, void* ptr, gtUInt32 offset, gtUInt32 index)
 {
-    if (NULL == ptr)
+    if (nullptr == ptr)
     {
         return E_INVALIDARG;
     }
@@ -2396,7 +2404,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
     }
     else
     {
-        rec.callchain = NULL;
+        rec.callchain = nullptr;
     }
 
     if (m_sampleType & PERF_SAMPLE_RAW)
@@ -2432,12 +2440,12 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
     bool bIsUser = ((pHdr->misc & PERF_RECORD_MISC_USER) != 0);
 
     bool isJavaProcess = false;
-    CpuProfileProcess* pJavaProc = NULL;
-    CpuProfileModule* pJavaMod = NULL;
+    CpuProfileProcess* pJavaProc = nullptr;
+    CpuProfileModule* pJavaMod = nullptr;
 
     gtVAddr funcBaseAddr = 0;
     gtUInt32 funcSize = 0;
-    const FunctionSymbolInfo* pFuncInfo = NULL;
+    const FunctionSymbolInfo* pFuncInfo = nullptr;
 
 #if _ENABLE_MOD_AGG_CACHED_
     /* MODULE AGGREGATION CACHING:
@@ -2455,7 +2463,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
 
         pFuncInfo = getFunctionSymbol(rec.pid, rec.ip, modRit->second.pMod);
 
-        if (NULL != pFuncInfo)
+        if (nullptr != pFuncInfo)
         {
             funcBaseAddr += pFuncInfo->m_rva;
             funcSize = pFuncInfo->m_size;
@@ -2472,7 +2480,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
             // Check for java module,
             pJavaMod = getJavaModuleforSample(&gJavaJclModInfo, rec.pid, rec.time, rec.ip);
 
-            if (NULL != pJavaMod)
+            if (nullptr != pJavaMod)
             {
                 OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_ERROR, L"Found Java Module pid(%d), ip(0x%lx)", rec.pid, rec.ip);
 
@@ -2508,7 +2516,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
 
             pFuncInfo = getFunctionSymbol(rec.pid, rec.ip, modRit->second.pMod);
 
-            if (NULL != pFuncInfo)
+            if (nullptr != pFuncInfo)
             {
                 funcBaseAddr += pFuncInfo->m_rva;
                 funcSize = pFuncInfo->m_size;
@@ -2620,7 +2628,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
     gtUInt32 f_usr;
 
     //If there is a fake timer that should generate real css data for the software timer
-    if ((NULL != m_fakeInfo.timerFds) && (m_fakeInfo.timerFds[cpu] == rec.id))
+    if ((nullptr != m_fakeInfo.timerFds) && (m_fakeInfo.timerFds[cpu] == rec.id))
     {
         //Set the flag so the next sample will also be saved as software timer data
         m_aFakeFlags[cpu] = true;
@@ -2684,7 +2692,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
                 ibsOffset,
                 rec.pid, rec.tid, cpu,
                 os, usr, weight,
-                NULL);
+                nullptr);
         }
         else
         {
@@ -2802,7 +2810,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
                     pJavaMod,
                     ibsOffset, rec.pid, rec.tid, cpu,
                     os, usr, weight,
-                    NULL);
+                    nullptr);
 
                 trans_ibs_op_ls(
                     &trans_op, ibs_op_ls_selected_flag,
@@ -2812,7 +2820,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
                     pJavaMod,
                     ibsOffset, rec.pid, rec.tid, cpu,
                     os, usr, weight,
-                    NULL);
+                    nullptr);
 
                 trans_ibs_op_nb(
                     &trans_op, ibs_op_nb_selected_flag,
@@ -2822,7 +2830,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
                     pJavaMod,
                     ibsOffset, rec.pid, rec.tid, cpu,
                     os, usr, weight,
-                    NULL);
+                    nullptr);
 
             }
             else
@@ -2874,7 +2882,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
         //    this sample away.
 
         //If there is a fake timer in this profile
-        if ((NULL != m_aFakeFlags))
+        if ((nullptr != m_aFakeFlags))
         {
             // If the flag wasn't set, just ignore any fake timer samples
             if ((m_fakeInfo.fakeTimerFds[cpu] == rec.id) && (!m_aFakeFlags[cpu]))
@@ -2921,7 +2929,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
                         rec.ip, rec.pid, rec.tid, cpu,
                         f_event, f_umask, f_os, f_usr,
                         weight,
-                        NULL);
+                        nullptr);
 
                 }
 
@@ -2948,7 +2956,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
                 rec.ip, rec.pid, rec.tid, cpu,
                 event, umask, os, usr,
                 weight,
-                NULL);
+                nullptr);
         }
         else
         {
@@ -2981,7 +2989,7 @@ int CaPerfTranslator::process_PERF_RECORD_FORK(struct perf_event_header* pHdr, v
     (void)(offset); // unused
     struct CA_PERF_RECORD_FORK_EXIT rec;
 
-    if (NULL == ptr)
+    if (nullptr == ptr)
     {
         return E_INVALIDARG;
     }
@@ -3070,7 +3078,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_EXIT(struct perf_event_header* pHd
     (void)(offset); // unused
     struct CA_PERF_RECORD_FORK_EXIT rec;
 
-    if (NULL == ptr)
+    if (nullptr == ptr)
     {
         return E_INVALIDARG;
     }
@@ -3091,9 +3099,10 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_EXIT(struct perf_event_header* pHd
 
 int CaPerfTranslator::writeEbpOutput(const string& outputFile)
 {
-    bool bRet;
-    CpuProfileWriter    profWriter;
-    CpuProfileInfo profInfo;
+    bool bRet = false;
+    CpuProfileWriter      profWriter;
+    CpuProfileInfo        profInfo;
+    std::unique_ptr<ProfilerDataDBWriter> profDBWriter;
     int numMod = 0;
     const PerfEventAttrVec* pAttrVec;
     struct timeval ebp_timerStart;
@@ -3101,9 +3110,9 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
     struct timeval css_timerStart;
     struct timeval css_timerStop;
 
-    gettimeofday(&ebp_timerStart, NULL);
+    gettimeofday(&ebp_timerStart, nullptr);
 
-    if (!m_pPerfDataRdr || (pAttrVec = m_pPerfDataRdr->getPerfEventAttrVec()) == NULL)
+    if (!m_pPerfDataRdr || (pAttrVec = m_pPerfDataRdr->getPerfEventAttrVec()) == nullptr)
     {
         return E_FAIL;
     }
@@ -3154,7 +3163,7 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
 
     ////////////////////////////////
     // Get time.
-    time_t wrTime = time(NULL);
+    time_t wrTime = time(nullptr);
     string str(ctime(&wrTime));
     profInfo.m_timeStamp.fromUtf8String(str);
 
@@ -3333,8 +3342,86 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
 
     bRet = profWriter.Write(woutputFile, &profInfo, &m_procMap, &m_modMap, &topMap);
 
-    gettimeofday(&ebp_timerStop, NULL);
+    gettimeofday(&ebp_timerStop, nullptr);
     memcpy(&css_timerStart, &ebp_timerStop, sizeof(struct timeval));
+
+    gtString createDbEnvStr;
+    bool createDb = false;
+
+    if (osGetCurrentProcessEnvVariableValue(L"AMDT_CPUPROFILE_CREATE_DB", createDbEnvStr))
+    {
+        createDb = createDbEnvStr.isEqualNoCase(L"YES");
+    }
+
+    if (createDb)
+    {
+        profDBWriter.reset(new ProfilerDataDBWriter);
+    }
+
+    if (profDBWriter)
+    {
+        if (!profDBWriter->Initialize(woutputFile))
+        {
+            profDBWriter.reset(nullptr);
+        }
+    }
+
+    if (profDBWriter)
+    {
+        gtHashMap<gtUInt32, gtVector<gtUInt32>> processThreadMap;
+        for (const auto& module : m_modMap)
+        {
+            if (module.second.getTotal())
+            {
+                for (auto fit = module.second.getBeginFunction(); fit != module.second.getEndFunction(); ++fit)
+                {
+                    for (auto aptIt = fit->second.getBeginSample(); aptIt != fit->second.getEndSample(); ++aptIt)
+                    {
+                        gtUInt32 pid = aptIt->first.m_pid;
+                        gtUInt32 threadId = aptIt->first.m_tid;
+                        processThreadMap[pid].push_back(threadId);
+                    }
+                }
+            }
+        }
+
+        gtVector<std::tuple<gtUInt32, gtUInt32>> processThreadList;
+        for (auto& pidIt : processThreadMap)
+        {
+            for (auto threadId : pidIt.second)
+            {
+                processThreadList.emplace_back(pidIt.first, threadId);
+            }
+
+            pidIt.second.clear();
+        }
+        processThreadMap.clear();
+
+        gtHashMap<gtUInt32, std::tuple<gtString, gtUInt64, gtUInt64>> modInstanceMap;
+        for (const auto& modIns : m_modLoadInfoMap)
+        {
+                // This can be optimized further. Instead of passing module name, we can pass moduleId.
+                gtString modName;
+                modName.fromUtf8String(modIns.second.name);
+                modInstanceMap.emplace(
+                    modIns.second.instanceId,
+                    std::make_tuple(modName, static_cast<gtUInt64>(modIns.first.pid), modIns.first.addr));
+                // Update module, so that it can be used while inserting samples
+                modIns.second.pMod->m_moduleInstanceInfo.emplace_back(modIns.first.pid, modIns.first.addr, modIns.second.instanceId);
+        }
+
+        profDBWriter->Write(
+                profInfo,
+                runInfo.m_cpuAffinity,
+                m_procMap,
+                processThreadList,
+                m_modMap,
+                modInstanceMap,
+                &topMap);
+
+        processThreadList.clear();
+        modInstanceMap.clear();
+    }
 
     // Write CSS too
     if (!m_cssFileDir.empty())
@@ -3343,7 +3430,7 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
         {
             ProcessInfo* pProcessInfo = it->second;
 
-            if (NULL != pProcessInfo && 0U != pProcessInfo->m_callGraph.GetOrder())
+            if (nullptr != pProcessInfo && 0U != pProcessInfo->m_callGraph.GetOrder())
             {
                 ProcessIdType pid = it->first;
 
@@ -3360,7 +3447,101 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
         }
     }
 
-    gettimeofday(&css_timerStop, NULL);
+    if (profDBWriter)
+    {
+        // Write the callstack info to DB
+        for (const auto& procIter : m_processInfos)
+        {
+            ProcessInfo* pProcessInfo = procIter.second;
+
+            if (nullptr != pProcessInfo && 0U != pProcessInfo->m_callGraph.GetOrder())
+            {
+                ProcessIdType pid = procIter.first;
+                CallGraph& callGraph = pProcessInfo->m_callGraph;
+                SimpleProcessWorkingSetQuery workingSet(pProcessInfo->m_workingSet);
+
+                gtUInt32 callStackId = 0;
+                CPACallStackFrameInfoList csFrameInfoList;
+                CPACallStackLeafInfoList  csLeafInfoList;
+
+                for (auto stackIt = callGraph.GetBeginCallStack(), stackItEnd = callGraph.GetEndCallStack(); stackIt != stackItEnd; ++stackIt)
+                {
+                    CallStack& callStack = **stackIt;
+                    gtUInt16 callSiteDepth = 0;
+                    ++callStackId;
+
+                    for (auto siteIt = callStack.begin(), siteItEnd = callStack.end(); siteIt != siteItEnd; ++siteIt)
+                    {
+                        CallSite& callSite = *siteIt;
+                        ++callSiteDepth;
+                        gtUInt64 funcId = 0;
+
+                        ExecutableFile* pExe = workingSet.FindModule(callSite.m_traverseAddr);
+                        gtUInt64 loadAddr = (nullptr != pExe) ? pExe->GetLoadAddress() : 0ULL;
+                        gtUInt64 offset = callSite.m_traverseAddr - loadAddr;
+
+                        if (pExe != nullptr)
+                        {
+                            gtString moduleName = pExe->GetFilePath();
+                            auto modIt = m_modMap.find(moduleName);
+
+                            if (modIt != m_modMap.end())
+                            {
+                                funcId = modIt->second.m_moduleId << 16;
+                                auto pFunc = modIt->second.findFunction(callSite.m_traverseAddr);
+
+                                if (pFunc != nullptr)
+                                {
+                                    funcId |= pFunc->m_functionId;
+                                }
+                            }
+                        }
+
+                        csFrameInfoList.emplace_back(callStackId, pid, funcId, offset, callSiteDepth);
+                    }
+
+                    const EventSampleList& samples = callStack.GetEventSampleList();
+
+                    for (const auto& sampleInfo : samples)
+                    {
+                        gtUInt64 funcId = 0;
+
+                        ExecutableFile* pExe = workingSet.FindModule(sampleInfo.m_pSite->m_traverseAddr);
+                        gtUInt64 loadAddr = (nullptr != pExe) ? pExe->GetLoadAddress() : 0ULL;
+                        gtUInt64 offset = sampleInfo.m_pSite->m_traverseAddr - loadAddr;
+
+                        if (pExe != nullptr)
+                        {
+                            gtString moduleName = pExe->GetFilePath();
+                            auto modIt = m_modMap.find(moduleName);
+
+                            if (modIt != m_modMap.end())
+                            {
+                                funcId = modIt->second.m_moduleId << 16;
+                                auto pFunc = modIt->second.findFunction(sampleInfo.m_pSite->m_traverseAddr);
+
+                                if (pFunc != nullptr)
+                                {
+                                    funcId |= pFunc->m_functionId;
+                                }
+                            }
+                        }
+
+                        csLeafInfoList.emplace_back(
+                            callStackId, pid, funcId, offset, sampleInfo.m_eventId, sampleInfo.m_count);
+                    }
+                }
+
+                profDBWriter->Write(csFrameInfoList);
+                csFrameInfoList.clear();
+
+                profDBWriter->Write(csLeafInfoList);
+                csLeafInfoList.clear();
+            }
+        }
+    }
+
+    gettimeofday(&css_timerStop, nullptr);
 
     if (m_pLogFile)
     {
@@ -3371,14 +3552,7 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
         fprintf(m_pLogFile, "Write CSS time             : %lu sec, %lu usec\n", diff.tv_sec, diff.tv_usec);
     }
 
-    if (bRet)
-    {
-        return 0;
-    }
-    else
-    {
-        return 1;
-    }
+    return bRet ? 0 : 1;
 }
 
 
@@ -3418,7 +3592,7 @@ HRESULT CaPerfTranslator::_setupReader(const string& perfDataPath)
     }
 
     delete m_pPerfDataRdr;
-    m_pPerfDataRdr = NULL;
+    m_pPerfDataRdr = nullptr;
 
     return E_FAIL;
 }
@@ -3429,7 +3603,7 @@ HRESULT CaPerfTranslator::setupLogFile(const string& logFile)
     if (m_pLogFile)
     {
         fclose(m_pLogFile);
-        m_pLogFile = NULL;
+        m_pLogFile = nullptr;
     }
 
     m_pLogFile = fopen(logFile.c_str(), "w");
@@ -3453,7 +3627,7 @@ HRESULT CaPerfTranslator::setupCalogCssFile(const string& file)
     if (m_pCalogCss)
     {
         calog_close(&m_pCalogCss);
-        m_pCalogCss = NULL;
+        m_pCalogCss = nullptr;
     }
 
     m_pCalogCss = calog_init(file.c_str(), CALOG_CACSS);
@@ -3486,17 +3660,17 @@ HRESULT CaPerfTranslator::_getModuleBitness(const string& modName, bool* pIs32Bi
 {
     int fd;
     int elfClass;
-    Elf* e = NULL;
+    Elf* e = nullptr;
     HRESULT ret = E_FAIL;
 
-    if (NULL == pIs32Bit)
+    if (nullptr == pIs32Bit)
     {
         return E_INVALIDARG;
     }
 
     if (elf_version(EV_CURRENT) != EV_NONE && 0 <= (fd = open(modName.c_str(), O_RDONLY, 0)))
     {
-        if ((e = elf_begin(fd, ELF_C_READ, NULL)) != NULL)
+        if ((e = elf_begin(fd, ELF_C_READ, nullptr)) != nullptr)
         {
             elfClass = gelf_getclass(e);
             *pIs32Bit = (ELFCLASS32 == elfClass);
@@ -3544,7 +3718,7 @@ HRESULT CaPerfTranslator::_getElfFileType(const string& modName, gtUInt32* pElfT
 {
     HRESULT ret = E_FAIL;
 
-    if (NULL == pElfType)
+    if (nullptr == pElfType)
     {
         return E_INVALIDARG;
     }
@@ -3566,9 +3740,9 @@ HRESULT CaPerfTranslator::_getElfFileType(const string& modName, gtUInt32* pElfT
         return E_FAIL;
     }
 
-    Elf* e = elf_begin(fd, ELF_C_READ, NULL);
+    Elf* e = elf_begin(fd, ELF_C_READ, nullptr);
 
-    if (e != NULL)
+    if (e != nullptr)
     {
 
         int elfClass = gelf_getclass(e);
@@ -3576,7 +3750,7 @@ HRESULT CaPerfTranslator::_getElfFileType(const string& modName, gtUInt32* pElfT
 
         GElf_Ehdr elfHdr;
 
-        if (NULL != gelf_getehdr(e, &elfHdr))
+        if (nullptr != gelf_getehdr(e, &elfHdr))
         {
             if (bIs32Bit)
             {
@@ -3658,7 +3832,7 @@ HRESULT CaPerfTranslator::_getFakeTimerInfo()
 
         m_aFakeFlags = new bool[m_fakeInfo.numCpu];
 
-        if (NULL == m_aFakeFlags)
+        if (nullptr == m_aFakeFlags)
         {
             return E_OUTOFMEMORY;
         }
@@ -3823,7 +3997,7 @@ int CaPerfTranslator::process_PERF_RECORD_READ(
     (void)(offset); // unused
     (void)(index); // unused
 
-    if (NULL == ptr)
+    if (nullptr == ptr)
     {
         return E_INVALIDARG;
     }
@@ -3852,7 +4026,7 @@ HRESULT CaPerfTranslator::_processCSS(struct perf_event_header* pHdr,
 {
     HRESULT ret = S_OK;
 
-    bool bIsCssOk = (rec.callchain != NULL);
+    bool bIsCssOk = (rec.callchain != nullptr);
 
     // NOTE [Suravee]:
     // We DO NOT handle the call stack for kernel samples.
@@ -3962,7 +4136,7 @@ HRESULT CaPerfTranslator::_processCSS(struct perf_event_header* pHdr,
                                     &data,
                                     sizeof(cacss_data),
                                     rit->second.name.c_str(),
-                                    NULL))
+                                    nullptr))
             {
                 break;
             }
@@ -3982,7 +4156,7 @@ HRESULT CaPerfTranslator::_processCSS(struct perf_event_header* pHdr,
 
             struct timeval css_timerStart;
             struct timeval css_timerStop;
-            gettimeofday(&css_timerStart, NULL);
+            gettimeofday(&css_timerStart, nullptr);
 
             // Also specify that this process has CSS information
             if (modRit->second.pProc)
@@ -4128,7 +4302,7 @@ HRESULT CaPerfTranslator::_processCSS(struct perf_event_header* pHdr,
                 callStackBuilder.Finalize(eventSample);
             }
 
-            gettimeofday(&css_timerStop, NULL);
+            gettimeofday(&css_timerStop, nullptr);
 
             struct timeval diff;
             timersub(&css_timerStop, &css_timerStart, &diff);
@@ -4150,7 +4324,7 @@ CpuProfileModule* CaPerfTranslator::getJavaModuleforSample(TiModuleInfo* pModInf
     if (S_OK != hr)
     {
         // fprintf(stderr, "getJavaModuleforSample failed \n");
-        return NULL;
+        return nullptr;
     }
 
     if (m_pLogFile)
@@ -4165,7 +4339,7 @@ CpuProfileModule* CaPerfTranslator::getJavaModuleforSample(TiModuleInfo* pModInf
     //  - create CpuProfileModule object
     gtString javaModName(pModInfo->pModulename);
     CpuProfileModule javaMod;
-    CpuProfileModule* pJavaMod = NULL;
+    CpuProfileModule* pJavaMod = nullptr;
 
     // Check whether this java module is available already
     NameModuleMap::iterator it = m_modMap.find(javaModName);
@@ -4178,6 +4352,7 @@ CpuProfileModule* CaPerfTranslator::getJavaModuleforSample(TiModuleInfo* pModInf
         javaMod.m_is32Bit = false;
         javaMod.m_base = pModInfo->ModuleStartAddr;
         javaMod.m_size = 0;
+        javaMod.m_moduleId = AtomicAdd(m_nextModuleId, 1);
 
         m_modMap.insert(NameModuleMap::value_type(javaModName, javaMod));
 
@@ -4188,7 +4363,7 @@ CpuProfileModule* CaPerfTranslator::getJavaModuleforSample(TiModuleInfo* pModInf
         {
             // wprintf(L"Error while adding java module %S\n",
             //      javaModName.c_str());
-            return NULL;
+            return nullptr;
         }
 
         pJavaMod = &(it->second);
@@ -4198,7 +4373,7 @@ CpuProfileModule* CaPerfTranslator::getJavaModuleforSample(TiModuleInfo* pModInf
         if (!pProc)
         {
             // wprintf(L"failed to get CA_process for Pid %d\n", pid);
-            return NULL;
+            return nullptr;
         }
 
         ModKey key(0, pModInfo->ModuleStartAddr, pid);
@@ -4219,6 +4394,7 @@ CpuProfileModule* CaPerfTranslator::getJavaModuleforSample(TiModuleInfo* pModInf
 
         // set the module type
         pJavaMod->m_modType = CpuProfileModule::JAVAMODULE;
+        info.instanceId = AtomicAdd(m_nextModInstanceId, 1);
 
         m_modLoadInfoMap.insert(ModLoadInfoMap::value_type(key, info));
     }
@@ -4227,10 +4403,10 @@ CpuProfileModule* CaPerfTranslator::getJavaModuleforSample(TiModuleInfo* pModInf
         pJavaMod = &(it->second);
     }
 
-    if (NULL == pJavaMod)
+    if (nullptr == pJavaMod)
     {
         // wprintf(L"failed to get Java Module for %S\n", javaModName.c_str());
-        return NULL;
+        return nullptr;
     }
 
     return pJavaMod;
@@ -4241,7 +4417,7 @@ CpuProfileModule* CaPerfTranslator::getJavaModuleforSample(TiModuleInfo* pModInf
 // and get module information via task info interface
 HRESULT CaPerfTranslator::_getJavaModuleforSample(TiModuleInfo* pModInfo, gtUInt32 pid, gtUInt64 time, gtUInt64 ip)
 {
-    if (NULL == pModInfo)
+    if (nullptr == pModInfo)
     {
         return E_FAIL;
     }

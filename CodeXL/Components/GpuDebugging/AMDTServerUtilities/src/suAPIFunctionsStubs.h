@@ -26,6 +26,8 @@ void gaGetAPIThreadIdStub(osSocket& apiSocket);
 void gaTerminateDebuggedProcessStub(osSocket& apiSocket);
 void gaSuspendDebuggedProcessStub(osSocket& apiSocket);
 void gaResumeDebuggedProcessStub(osSocket& apiSocket);
+void gaLockDriverThreadsStub(osSocket& apiSocket);
+void gaUnLockDriverThreadsStub(osSocket& apiSocket);
 
 // Debugged process threads:
 void gaMakeThreadGetCallStackStub(osSocket& apiSocket);
