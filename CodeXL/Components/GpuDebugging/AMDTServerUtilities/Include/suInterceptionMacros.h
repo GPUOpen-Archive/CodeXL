@@ -15,9 +15,8 @@
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
 #include <AMDTOSAPIWrappers/Include/oaOpenGLIncludes.h>
 
-#if (AMDT_BUILD_TARGET == AMDT_LINUX_OS)
-#include "suSWMRInstance.h"
-#endif
+// Local:
+#include <AMDTServerUtilities/Include/suSWMRInstance.h>
 
 // Mac OSX interception utilities:
 #if ((AMDT_BUILD_TARGET == AMDT_LINUX_OS) && (AMDT_LINUX_VARIANT == AMDT_MAC_OS_X_LINUX_VARIANT))
@@ -95,9 +94,14 @@
 // Author:      Uri Shomroni
 // Date:        14/10/2009
 // ---------------------------------------------------------------------------
+#ifdef SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC
 #define SU_START_FUNCTION_WRAPPER(funcId) \
-    su_stat_functionInterceptionInfo[funcId]._isCurrentlyInsideWrapper = true; \
-    suSWMRInstance::GetInstance().SharedLock();
+    suSWMRInstance::GetInstance().SharedLock(); \
+    su_stat_functionInterceptionInfo[funcId]._isCurrentlyInsideWrapper = true;
+#else // !defined(SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC)
+#define SU_START_FUNCTION_WRAPPER(funcId) \
+    su_stat_functionInterceptionInfo[funcId]._isCurrentlyInsideWrapper = true;
+#endif
 
 // ---------------------------------------------------------------------------
 // Name:        SU_START_DRAW_FUNCTION_WRAPPER
@@ -363,10 +367,10 @@
 // Author:      Yaki Tebeka
 // Date:        30/11/2006
 // ---------------------------------------------------------------------------
-#if (AMDT_BUILD_TARGET == AMDT_LINUX_OS)
+#ifdef SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC
 #define SU_START_FUNCTION_WRAPPER(funcId) \
     suSWMRInstance::GetInstance().SharedLock();
-#else
+#else // !defined(SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC)
 #define SU_START_FUNCTION_WRAPPER(funcId) 
 #endif
 

@@ -874,9 +874,11 @@ void gaFlushLogFileAfterEachFunctionCallStub(osSocket& apiSocket)
 // \date        11/05/2016
 void gaLockDriverThreadsStub(osSocket& apiSocket)
 {
-    (void)apiSocket;
+    GT_UNREFERENCED_PARAMETER(apiSocket);
 
+#ifdef SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC
     suSWMRInstance::GetInstance().UniqueLock();
+#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -886,9 +888,11 @@ void gaLockDriverThreadsStub(osSocket& apiSocket)
 // \date        11/05/2016
 void gaUnLockDriverThreadsStub(osSocket& apiSocket)
 {
-    (void)apiSocket;
+    GT_UNREFERENCED_PARAMETER(apiSocket);
 
+#ifdef SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC
     suSWMRInstance::GetInstance().UniqueUnLock();
+#endif
 }
 
 

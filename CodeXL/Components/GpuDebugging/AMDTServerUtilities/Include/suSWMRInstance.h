@@ -11,6 +11,14 @@
 #ifndef __SUSWMRINSTANCE_H
 #define __SUSWMRINSTANCE_H
 
+// Infra:
+#include <AMDTBaseTools/Include/AMDTDefinitions.h>
+
+// This function has about a 5% impact on OpenGL application performance, so we
+// dont use it on Windows:
+#if (AMDT_BUILD_TARGET == AMDT_LINUX_OS)
+#define SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC 1
+
 #include <mutex>
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -78,6 +86,8 @@ private:
     bool         bUniqLocked;
     std::mutex   mtxUniqLockedVariable;
 };
+
+#endif // AMDT_BUILD_TARGET == AMDT_LINUX_OS
 
 #endif // __SUSWMRINSTANCE_H
 
