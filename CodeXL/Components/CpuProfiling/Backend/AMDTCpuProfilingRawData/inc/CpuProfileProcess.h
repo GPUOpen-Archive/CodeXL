@@ -32,8 +32,8 @@ public:
     void setPath(const gtString& path) { m_fullPath = path; }
 
 public:
-    bool m_is32Bit;
-    bool m_hasCss;
+    bool m_is32Bit = false;
+    bool m_hasCss = false;
 
 private:
     gtString m_fullPath;

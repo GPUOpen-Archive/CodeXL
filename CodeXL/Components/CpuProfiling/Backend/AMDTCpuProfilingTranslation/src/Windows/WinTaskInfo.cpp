@@ -2611,6 +2611,8 @@ HRESULT WinTaskInfo::GetModuleInfo(TiModuleInfo* pModInfo)
         modName = pModInfo->pModulename;
     }
 
+    osCriticalSectionLocker lock(m_TIMutexModule);
+
     auto iter = m_moduleIdMap.find(modName);
 
     if (m_moduleIdMap.end() == iter)

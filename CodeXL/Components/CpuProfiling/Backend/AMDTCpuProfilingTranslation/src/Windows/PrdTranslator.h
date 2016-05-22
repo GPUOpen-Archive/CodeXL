@@ -18,6 +18,7 @@
 #include <QMap>
 #pragma warning(pop)
 
+#include <memory>
 #include "MemoryMap.h"
 #include "CluInfo.h"
 #include <AMDTCpuPerfEventUtils/inc/EventEncoding.h>
@@ -518,7 +519,7 @@ private:
     friend class PrdUserCssRcuHandler;
     friend class PrdUserCssRcuHandlerPool;
 
-    ProfilerDataDBWriter* m_dbWriter = nullptr;
+    std::unique_ptr<ProfilerDataDBWriter> m_dbWriter;
 };
 
 

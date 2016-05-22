@@ -46,8 +46,6 @@ struct PROCMODAddress;
 class PerfDataReader;
 class ExecutableAnalyzer;
 
-#include <qstring.h>
-
 class EvBlkKey
 {
 public:
@@ -76,7 +74,7 @@ public:
               gtUInt32 vnum = 0,
               gtUInt64 vstartTs = 0,
               gtUInt64 vperiod = 0,
-              void* pVData = NULL) : index(vindex),
+              void* pVData = nullptr) : index(vindex),
         evId(vevId),
         offset(voffset),
         bytes(vbytes),
@@ -89,7 +87,7 @@ public:
 
     virtual ~EvBlkInfo()
     {
-        if (NULL != pData)
+        if (nullptr != pData)
         {
             free(pData);
         }
@@ -145,17 +143,16 @@ public:
 class ModInfo
 {
 public:
-    ModInfo() : len(0), pgoff(0), pProc(NULL), pMod(NULL) {}
-
-    ModInfo(gtUInt64 vlen, gtUInt64 vpgoff, char filename[]) : len(vlen), pgoff(vpgoff), name(filename), pProc(NULL), pMod(NULL) {}
+    ModInfo(gtUInt64 vlen, gtUInt64 vpgoff, char filename[]) : len(vlen), pgoff(vpgoff), name(filename) {}
 
     virtual ~ModInfo() {}
 
-    gtUInt64 len;
-    gtUInt64 pgoff;
+    gtUInt64 len = 0;
+    gtUInt64 pgoff = 0;
     string name;
-    CpuProfileProcess* pProc;
-    CpuProfileModule* pMod;
+    CpuProfileProcess* pProc = nullptr;
+    CpuProfileModule* pMod = nullptr;
+    gtInt32  instanceId = 0;
 };
 
 
@@ -317,7 +314,7 @@ private:
 
     ModLoadInfoMap::reverse_iterator _getModuleForSample(gtUInt32 pid, gtUInt64 time, gtUInt64 ip, bool bIsUser);
 
-    const FunctionSymbolInfo* getFunctionSymbol(ProcessIdType pid, gtVAddr ip, CpuProfileModule* pMod = NULL);
+    const FunctionSymbolInfo* getFunctionSymbol(ProcessIdType pid, gtVAddr ip, CpuProfileModule* pMod = nullptr);
 
     void _addSampleToProcessAndModule(CpuProfileProcess* pProc,
                                       gtUInt64 ldAddr, gtUInt32 funcSize, CpuProfileModule* pMod,
@@ -458,7 +455,7 @@ private:
         ExecutableAnalyzersMap m_exeAnalyzers;
         CallGraph m_callGraph;
 
-        ProcessInfo(const wchar_t* pSearchPath = NULL, const wchar_t* pServerList = NULL, const wchar_t* pCachePath = NULL);
+        ProcessInfo(const wchar_t* pSearchPath = nullptr, const wchar_t* pServerList = nullptr, const wchar_t* pCachePath = nullptr);
         ~ProcessInfo();
 
         ExecutableAnalyzer* AcquireExecutableAnalyzer(gtVAddr va);
@@ -472,6 +469,9 @@ private:
 
     ProcessInfo* FindProcessInfo(ProcessIdType pid) const;
     ProcessInfo& AcquireProcessInfo(ProcessIdType pid);
+
+    gtInt32 m_nextModInstanceId = 1;
+    gtInt32 m_nextModuleId = 1;
 };
 
 #endif //_CAPERFTRANSLATOR_H_

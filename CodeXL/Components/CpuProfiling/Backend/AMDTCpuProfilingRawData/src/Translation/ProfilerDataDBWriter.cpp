@@ -208,35 +208,44 @@ void ProfilerDataDBWriter::PackSamplingEvents(const CpuProfileInfo& profileInfo,
 
 void ProfilerDataDBWriter::PackProcessInfo(const PidProcessMap& processMap, CPAProcessList& processList)
 {
-    for (auto& pit : processMap)
+    for (const auto& pit : processMap)
     {
-        processList.emplace_back(pit.first, pit.second.getPath(), pit.second.m_is32Bit, pit.second.m_hasCss);
+        if (pit.second.getTotal())
+        {
+            processList.emplace_back(pit.first, pit.second.getPath(), pit.second.m_is32Bit, pit.second.m_hasCss);
+        }
     }
 }
 
 void ProfilerDataDBWriter::PackModuleInfo(const NameModuleMap& modMap, CPAModuleList& moduleList)
 {
-    for (auto& m : modMap)
+    for (const auto& m : modMap)
     {
-        moduleList.emplace_back(m.second.m_moduleId,
-                                m.first,
-                                m.second.m_size,
-                                m.second.m_modType,
-                                osIsSystemModule(m.first),
-                                m.second.m_is32Bit,
-                                m.second.m_isDebugInfoAvailable);
+        if (m.second.getTotal())
+        {
+            moduleList.emplace_back(m.second.m_moduleId,
+                                    m.first,
+                                    m.second.m_size,
+                                    m.second.m_modType,
+                                    osIsSystemModule(m.first),
+                                    m.second.m_is32Bit,
+                                    m.second.m_isDebugInfoAvailable);
+        }
     }
 }
 
-void ProfilerDataDBWriter::PackModuleInstanceInfo(const NameModuleMap& modMap, const gtHashMap<gtUInt32, std::tuple<gtString, gtUInt64, gtUInt64>>& modInstanceInfoMap, CPAModuleInstanceList& moduleInstanceList)
+void ProfilerDataDBWriter::PackModuleInstanceInfo(
+    const NameModuleMap& modMap,
+    const gtHashMap<gtUInt32, std::tuple<gtString, gtUInt64, gtUInt64>>& modInstanceInfoMap,
+    CPAModuleInstanceList& moduleInstanceList)
 {
-    // modInstanceInfo : vector of <instanceId, modName, pid, loadAddr>
+    // modInstanceInfoMap : Map of < instanceId, tuple of <modName, pid, loadAddr> >
     for (const auto& modIt : modInstanceInfoMap)
     {
         gtUInt32 moduleId = 0;
         const auto& it = modMap.find(std::get<0>(modIt.second));
 
-        if (it != modMap.end())
+        if (it != modMap.end() && it->second.getTotal())
         {
             // Insert into DB only if the module has samples
             moduleId = it->second.m_moduleId;
@@ -290,9 +299,7 @@ void ProfilerDataDBWriter::PackSampleInfo(const NameModuleMap& modMap, CPASampeI
 
     for (auto& module : modMap)
     {
-        // TODO: module load address should not come from NameModuleMap as
-        // this map keeps only one loadAddress for each unique module
-        gtVAddr modLoadAddr = module.second.getBaseAddr();
+        gtUInt32 modSize = module.second.m_size;
 
         for (auto fit = module.second.getBeginFunction(); fit != module.second.getEndFunction(); ++fit)
         {
@@ -300,21 +307,27 @@ void ProfilerDataDBWriter::PackSampleInfo(const NameModuleMap& modMap, CPASampeI
 
             for (auto aptIt = fit->second.getBeginSample(); aptIt != fit->second.getEndSample(); ++aptIt)
             {
-                // sample address offset is w.r.t. module load address
-                gtUInt64 sampleOffset = aptIt->first.m_addr - modLoadAddr;
                 gtUInt64 pid = aptIt->first.m_pid;
                 gtUInt32 threadId = aptIt->first.m_tid;
+                gtVAddr  sampleAddr = aptIt->first.m_addr;
                 gtUInt32 moduleInstanceid = 0ULL;
+                gtVAddr  modLoadAddr = 0ULL;
 
                 for (const auto& it : module.second.m_moduleInstanceInfo)
                 {
-                    if (std::get<0>(it) == pid && std::get<1>(it) == modLoadAddr)
+                    modLoadAddr = std::get<1>(it);
+                    gtVAddr modEndAddr = modLoadAddr + modSize;
+
+
+                    if (std::get<0>(it) == pid && modLoadAddr <= sampleAddr && sampleAddr < modEndAddr)
                     {
                         moduleInstanceid = std::get<2>(it);
                         break;
                     }
                 }
 
+                // sample address offset is w.r.t. module load address
+                gtUInt64 sampleOffset = sampleAddr - modLoadAddr;
                 gtUInt64 processThreadId = pid;
                 processThreadId = (processThreadId << 32) | threadId;
 
