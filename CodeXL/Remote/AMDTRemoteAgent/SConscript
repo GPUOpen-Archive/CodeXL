@@ -8,6 +8,7 @@ appName = "CodeXLRemoteAgent-bin"
 env = CXL_env.Clone()
 initBoost(env)
 UseBoost(env)
+UseAPPSDK(env)
 
 env.Append( CPPPATH = [ 
     ".",
@@ -18,6 +19,7 @@ env.Append( CPPPATH = [
     env['CXL_commonproj_dir'] + '/AMDTCommonHeaders/',
     env['CXL_commonproj_dir'],
     env['CXL_commonproj_dir'] + '/../../CodeXL/Remote',
+    env['CXL_commonproj_dir'] + "/AMDTOSAPIWrappers/Include",
 ])
 
 # osMessageBox, osDesktop
@@ -49,6 +51,7 @@ linkerFlags = []
 env.Append (LIBS = [
     "CXLOSWrappers",
     "CXLBaseTools",
+    "CXLOSAPIWrappers",
     "CXLPowerProfileAPI",
     "libz",
     "libpthread",
