@@ -3,7 +3,7 @@
 using namespace GPULogger;
 
 
-VKAPIInfo::VKAPIInfo() : APIInfo(), m_apiType(vkAPIType_Unknown), m_apiId(vk_FUNC_TYPE_Unknown), m_isGPU(false)
+VKAPIInfo::VKAPIInfo() : APIInfo(), m_apiType(vkAPIType_Unknown), m_apiId(FuncId_vkUNDEFINED), m_isGPU(false)
 {
 
 }

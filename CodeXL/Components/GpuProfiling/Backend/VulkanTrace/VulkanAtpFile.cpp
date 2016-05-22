@@ -117,7 +117,7 @@ bool VKAtpFilePart::ParseGPUAPICallString(const std::string& apiStr, VKGPUTraceI
 
     ss >> intVal;
     CHECK_SS_ERROR(ss);
-    apiInfo.m_apiId = (vk_FUNC_TYPE)intVal;
+    apiInfo.m_apiId = (VkFuncId)intVal;
 
     ss >> apiInfo.m_strName;
     CHECK_SS_ERROR(ss);
@@ -230,7 +230,7 @@ bool VKAtpFilePart::ParseSectionHeaderLine(const string& line)
 
 /// Expecting the following API call format:
 /// Type
-/// vkAPIType   vk_FUNC_TYPE    InterfacePtr       Interface_Call                       Args                                     = Result     StartTime       EndTime        GPUCallIndex
+/// vkAPIType   VkFuncId    InterfacePtr       Interface_Call                       Args                                     = Result     StartTime       EndTime        GPUCallIndex
 /// 128         90              0x0000000000000000 NonTrackedObject_vkBeginCommandBuffer(0x00000001362066F0, 0x000000009F7DE710) = VK_SUCCESS 89349181.540584 89365867.767216 0
 bool VKAtpFilePart::ParseCPUAPICallString(const std::string& apiStr, VKAPIInfo& apiInfo)
 {
@@ -250,7 +250,7 @@ bool VKAtpFilePart::ParseCPUAPICallString(const std::string& apiStr, VKAPIInfo& 
     // Get the API ID
     ss >> intVal;
     CHECK_SS_ERROR(ss);
-    apiInfo.m_apiId = (vk_FUNC_TYPE)intVal;
+    apiInfo.m_apiId = (VkFuncId)intVal;
 
     // Get the interface name
     ss >> apiInfo.m_interfacePtrStr;

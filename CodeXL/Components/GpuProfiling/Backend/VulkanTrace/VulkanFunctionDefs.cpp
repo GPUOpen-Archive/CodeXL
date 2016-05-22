@@ -5,8 +5,8 @@ using namespace std;
 using namespace GPULogger;
 
 bool vulkanFunctionDefs::m_sIsInitialized = false;
-map<string, vk_FUNC_TYPE> vulkanFunctionDefs::m_sVKAPIMap;
-map<vk_FUNC_TYPE, string> vulkanFunctionDefs::m_sVKAPIStringsMap;
+map<string, VkFuncId> vulkanFunctionDefs::m_sVKAPIMap;
+map<VkFuncId, string> vulkanFunctionDefs::m_sVKAPIStringsMap;
 map<string, vkAPIType> vulkanFunctionDefs::m_sVKAPITypeMap;
 string vulkanFunctionDefs::m_sMissingInterfaces;
 
@@ -20,24 +20,24 @@ void vulkanFunctionDefs::Initialize()
         InitDestroyAPI();
         InitGetAPI();
         InitMemAPI();
-        InitGeneralAPI();
-        InitQueueAPI();
-        InitCmdDrawcallAPI();
-        InitCmdGeneralAPI();
+        InitDescriptorAPI();
+        InitQueueSubmissionAPI();
+        InitCmdBufProfiledAPI();
+        InitCmdBufNonProfiledAPI();
         InitSyncAPI();
         InitKHRAPI();
     }
 }
 
-vk_FUNC_TYPE vulkanFunctionDefs::ToVKFuncType(const std::string& strName)
+VkFuncId vulkanFunctionDefs::ToVKFuncType(const std::string& strName)
 {
-    vk_FUNC_TYPE retVal = vk_FUNC_TYPE_Unknown;
+    VkFuncId retVal = FuncId_vkUNDEFINED;
 
     // Make sure mappings are initialized
     Initialize();
 
     // Find the API in the map
-    map<string, vk_FUNC_TYPE>::iterator it = m_sVKAPIMap.find(strName);
+    map<string, VkFuncId>::iterator it = m_sVKAPIMap.find(strName);
 
     if (it != m_sVKAPIMap.end())
     {
@@ -71,7 +71,7 @@ vkAPIType vulkanFunctionDefs::TovkAPIType(const std::string& strAPIName)
     return retVal;
 }
 
-bool vulkanFunctionDefs::vkAPITypeToString(vk_FUNC_TYPE apiType, std::string& strAPIName)
+bool vulkanFunctionDefs::vkAPITypeToString(VkFuncId apiType, std::string& strAPIName)
 {
     bool retVal = false;
 
@@ -79,7 +79,7 @@ bool vulkanFunctionDefs::vkAPITypeToString(vk_FUNC_TYPE apiType, std::string& st
     Initialize();
 
     // Find the API in the map
-    map<vk_FUNC_TYPE, string>::iterator it = m_sVKAPIStringsMap.find(apiType);
+    map<VkFuncId, string>::iterator it = m_sVKAPIStringsMap.find(apiType);
 
     if (it != m_sVKAPIStringsMap.end())
     {
@@ -91,413 +91,386 @@ bool vulkanFunctionDefs::vkAPITypeToString(vk_FUNC_TYPE apiType, std::string& st
 }
 
 
-vkAPIType vulkanFunctionDefs::GetAPIGroupFromAPI(vk_FUNC_TYPE inAPIFuncId)
+vkAPIType vulkanFunctionDefs::GetAPIGroupFromAPI(VkFuncId inAPIFuncId)
 {
     vkAPIType apiType = vkAPIType_Unknown;
 
     switch (inAPIFuncId)
     {
-    case vk_FUNC_TYPE_vkCreateInstance:
-    case vk_FUNC_TYPE_vkCreateDevice:
-    case vk_FUNC_TYPE_vkCreateFence:
-    case vk_FUNC_TYPE_vkCreateEvent:
-    case vk_FUNC_TYPE_vkCreateQueryPool:
-    case vk_FUNC_TYPE_vkCreateBuffer:
-    case vk_FUNC_TYPE_vkCreateBufferView:
-    case vk_FUNC_TYPE_vkCreateSemaphore:
-    case vk_FUNC_TYPE_vkCreateImage:
-    case vk_FUNC_TYPE_vkCreatePipelineLayout:
-    case vk_FUNC_TYPE_vkCreateShaderModule:
-    case vk_FUNC_TYPE_vkCreateSampler:
-    case vk_FUNC_TYPE_vkCreatePipelineCache:
-    case vk_FUNC_TYPE_vkCreateGraphicsPipelines:
-    case vk_FUNC_TYPE_vkCreateComputePipelines:
-    case vk_FUNC_TYPE_vkCreateShader:
-    case vk_FUNC_TYPE_vkCreateDescriptorSetLayout:
-    case vk_FUNC_TYPE_vkCreateCommandPool:
-    case vk_FUNC_TYPE_vkCreateCommandBuffer:
-    case vk_FUNC_TYPE_vkCreateFramebuffer:
-    case vk_FUNC_TYPE_vkCreateRenderPass:
-    case vk_FUNC_TYPE_vkCreateDescriptorPool:
-    case vk_FUNC_TYPE_vkCreateImageView:
-    {
+    case FuncId_vkCreateInstance:
+    case FuncId_vkCreateDevice:
+    case FuncId_vkCreateFence:
+    case FuncId_vkCreateEvent:
+    case FuncId_vkCreateBufferView:
+    case FuncId_vkCreateQueryPool:
+    case FuncId_vkCreateImage:
+    case FuncId_vkCreateGraphicsPipelines:
+    case FuncId_vkCreateComputePipelines:
+    case FuncId_vkCreateBuffer:
+    case FuncId_vkCreateImageView:
+    case FuncId_vkCreateShaderModule:
+    case FuncId_vkCreateSemaphore:
+    case FuncId_vkCreatePipelineCache:
+    case FuncId_vkCreateSampler:
+    case FuncId_vkCreateDescriptorSetLayout:
+    case FuncId_vkCreatePipelineLayout:
+    case FuncId_vkCreateFramebuffer:
+    case FuncId_vkCreateRenderPass:
+    case FuncId_vkCreateCommandPool:
+    case FuncId_vkCreateDescriptorPool:
         apiType = vkAPIType_Create;
         break;
-    }
 
-    case vk_FUNC_TYPE_vkDestroyInstance:
-    case vk_FUNC_TYPE_vkDestroyDevice:
-    case vk_FUNC_TYPE_vkDestroyEvent:
-    case vk_FUNC_TYPE_vkDestroySemaphore:
-    case vk_FUNC_TYPE_vkDestroyBuffer:
-    case vk_FUNC_TYPE_vkDestroyBufferView:
-    case vk_FUNC_TYPE_vkDestroyImage:
-    case vk_FUNC_TYPE_vkDestroyPipeline:
-    case vk_FUNC_TYPE_vkDestroyPipelineLayout:
-    case vk_FUNC_TYPE_vkDestroySampler:
-    case vk_FUNC_TYPE_vkDestroyFence:
-    case vk_FUNC_TYPE_vkDestroyCommandPool:
-    case vk_FUNC_TYPE_vkDestroyImageView:
-    case vk_FUNC_TYPE_vkDestroyShaderModule:
-    case vk_FUNC_TYPE_vkDestroyShader:
-    case vk_FUNC_TYPE_vkDestroyPipelineCache:
-    case vk_FUNC_TYPE_vkDestroyDescriptorSetLayout:
-    case vk_FUNC_TYPE_vkDestroyQueryPool:
-    case vk_FUNC_TYPE_vkDestroyCommandBuffer:
-    case vk_FUNC_TYPE_vkDestroyFramebuffer:
-    case vk_FUNC_TYPE_vkDestroyRenderPass:
-    case vk_FUNC_TYPE_vkDestroyDescriptorPool:
-    {
+    case FuncId_vkDestroyInstance:
+    case FuncId_vkDestroyDevice:
+    case FuncId_vkDestroySemaphore:
+    case FuncId_vkDestroyEvent:
+    case FuncId_vkDestroyBuffer:
+    case FuncId_vkDestroyBufferView:
+    case FuncId_vkDestroyPipeline:
+    case FuncId_vkDestroyPipelineLayout:
+    case FuncId_vkDestroySampler:
+    case FuncId_vkDestroyDescriptorSetLayout:
+    case FuncId_vkDestroyDescriptorPool:
+    case FuncId_vkDestroyImageView:
+    case FuncId_vkDestroyShaderModule:
+    case FuncId_vkDestroyPipelineCache:
+    case FuncId_vkDestroyFramebuffer:
+    case FuncId_vkDestroyRenderPass:
+    case FuncId_vkDestroyQueryPool:
+    case FuncId_vkDestroyCommandPool:
+    case FuncId_vkDestroyFence:
+    case FuncId_vkDestroyImage:
         apiType = vkAPIType_Destroy;
         break;
-    }
 
-
-    case vk_FUNC_TYPE_vkEnumeratePhysicalDevices:
-    case vk_FUNC_TYPE_vkEnumerateInstanceExtensionProperties:
-    case vk_FUNC_TYPE_vkEnumerateInstanceLayerProperties:
-    case vk_FUNC_TYPE_vkEnumerateDeviceLayerProperties:
-    case vk_FUNC_TYPE_vkGetPhysicalDeviceFeatures:
-    case vk_FUNC_TYPE_vkGetPhysicalDeviceFormatProperties:
-    case vk_FUNC_TYPE_vkGetPhysicalDeviceImageFormatProperties:
-    case vk_FUNC_TYPE_vkGetPhysicalDeviceProperties:
-    case vk_FUNC_TYPE_vkGetPhysicalDeviceQueueFamilyProperties:
-    case vk_FUNC_TYPE_vkGetPhysicalDeviceMemoryProperties:
-    case vk_FUNC_TYPE_vkGetDeviceQueue:
-    case vk_FUNC_TYPE_vkGetDeviceMemoryCommitment:
-    case vk_FUNC_TYPE_vkGetPhysicalDeviceSparseImageFormatProperties:
-    case vk_FUNC_TYPE_vkGetBufferMemoryRequirements:
-    case vk_FUNC_TYPE_vkGetImageMemoryRequirements:
-    case vk_FUNC_TYPE_vkGetImageSparseMemoryRequirements:
-    case vk_FUNC_TYPE_vkGetRenderAreaGranularity:
-    case vk_FUNC_TYPE_vkGetPipelineCacheSize:
-    case vk_FUNC_TYPE_vkGetPipelineCacheData:
-    case vk_FUNC_TYPE_vkGetQueryPoolResults:
-    case vk_FUNC_TYPE_vkGetImageSubresourceLayout:
-    {
+    case FuncId_vkEnumeratePhysicalDevices:
+    case FuncId_vkEnumerateInstanceExtensionProperties:
+    case FuncId_vkEnumerateInstanceLayerProperties:
+    case FuncId_vkEnumerateDeviceLayerProperties:
+    case FuncId_vkGetPhysicalDeviceFeatures:
+    case FuncId_vkGetPhysicalDeviceFormatProperties:
+    case FuncId_vkGetPhysicalDeviceImageFormatProperties:
+    case FuncId_vkGetPhysicalDeviceProperties:
+    case FuncId_vkGetPhysicalDeviceQueueFamilyProperties:
+    case FuncId_vkGetPhysicalDeviceMemoryProperties:
+    case FuncId_vkGetDeviceQueue:
+    case FuncId_vkGetBufferMemoryRequirements:
+    case FuncId_vkGetImageMemoryRequirements:
+    case FuncId_vkGetImageSparseMemoryRequirements:
+    case FuncId_vkGetPhysicalDeviceSparseImageFormatProperties:
+    case FuncId_vkGetQueryPoolResults:
+    case FuncId_vkGetImageSubresourceLayout:
+    case FuncId_vkGetPipelineCacheData:
+    case FuncId_vkGetRenderAreaGranularity:
+    case FuncId_vkGetDeviceMemoryCommitment:
         apiType = vkAPIType_Get;
         break;
-    }
 
-    case vk_FUNC_TYPE_vkAllocMemory:
-    case vk_FUNC_TYPE_vkFreeMemory:
-    case vk_FUNC_TYPE_vkMapMemory:
-    case vk_FUNC_TYPE_vkUnmapMemory:
-    case vk_FUNC_TYPE_vkFlushMappedMemoryRanges:
-    case vk_FUNC_TYPE_vkInvalidateMappedMemoryRanges:
-    case vk_FUNC_TYPE_vkBindBufferMemory:
-    case vk_FUNC_TYPE_vkBindImageMemory:
-    case vk_FUNC_TYPE_vkQueueBindSparseBufferMemory:
-    case vk_FUNC_TYPE_vkQueueBindSparseImageOpaqueMemory:
-    case vk_FUNC_TYPE_vkQueueBindSparseImageMemory:
-    {
+    case FuncId_vkAllocateMemory:
+    case FuncId_vkFreeMemory:
+    case FuncId_vkMapMemory:
+    case FuncId_vkUnmapMemory:
+    case FuncId_vkBindBufferMemory:
+    case FuncId_vkBindImageMemory:
+    case FuncId_vkFlushMappedMemoryRanges:
+    case FuncId_vkInvalidateMappedMemoryRanges:
+    case FuncId_vkMergePipelineCaches:
         apiType = vkAPIType_Memory;
         break;
-    }
 
-    case vk_FUNC_TYPE_vkMergePipelineCaches:
-    case vk_FUNC_TYPE_vkResetDescriptorPool:
-    case vk_FUNC_TYPE_vkAllocDescriptorSets:
-    case vk_FUNC_TYPE_vkFreeDescriptorSets:
-    case vk_FUNC_TYPE_vkUpdateDescriptorSets:
-    {
-        apiType = vkAPIType_General;
+    case FuncId_vkResetDescriptorPool:
+    case FuncId_vkAllocateDescriptorSets:
+    case FuncId_vkFreeDescriptorSets:
+    case FuncId_vkUpdateDescriptorSets:
+        apiType = vkAPIType_DescriptorSet;
         break;
-    }
 
-    case vk_FUNC_TYPE_vkQueueSubmit:
-    case vk_FUNC_TYPE_vkResetCommandPool:
-    case vk_FUNC_TYPE_vkBeginCommandBuffer:
-    case vk_FUNC_TYPE_vkEndCommandBuffer:
-    case vk_FUNC_TYPE_vkResetCommandBuffer:
-    {
-        apiType = vkAPIType_Queue;
+    case FuncId_vkQueueSubmit:
+    case FuncId_vkQueueBindSparse:
+    case FuncId_vkResetCommandPool:
+    case FuncId_vkAllocateCommandBuffers:
+    case FuncId_vkFreeCommandBuffers:
+    case FuncId_vkBeginCommandBuffer:
+    case FuncId_vkEndCommandBuffer:
+    case FuncId_vkResetCommandBuffer:
+        apiType = vkAPIType_QueueSubmission;
         break;
-    }
-    case vk_FUNC_TYPE_vkCmdDraw:
-    case vk_FUNC_TYPE_vkCmdDrawIndexed:
-    case vk_FUNC_TYPE_vkCmdDrawIndirect:
-    case vk_FUNC_TYPE_vkCmdDrawIndexedIndirect:
-    case vk_FUNC_TYPE_vkCmdDispatch:
-    case vk_FUNC_TYPE_vkCmdDispatchIndirect:
-    {
-        apiType = vkAPIType_CommandDraw;
-        break;
-    }
 
-    case vk_FUNC_TYPE_vkCmdBindPipeline:
-    case vk_FUNC_TYPE_vkCmdBindDescriptorSets:
-    case vk_FUNC_TYPE_vkCmdBindIndexBuffer:
-    case vk_FUNC_TYPE_vkCmdBindVertexBuffers:
-    case vk_FUNC_TYPE_vkCmdCopyBuffer:
-    case vk_FUNC_TYPE_vkCmdCopyImage:
-    case vk_FUNC_TYPE_vkCmdBlitImage:
-    case vk_FUNC_TYPE_vkCmdCopyBufferToImage:
-    case vk_FUNC_TYPE_vkCmdCopyImageToBuffer:
-    case vk_FUNC_TYPE_vkCmdUpdateBuffer:
-    case vk_FUNC_TYPE_vkCmdFillBuffer:
-    case vk_FUNC_TYPE_vkCmdClearColorImage:
-    case vk_FUNC_TYPE_vkCmdClearDepthStencilImage:
-    case vk_FUNC_TYPE_vkCmdClearColorAttachment:
-    case vk_FUNC_TYPE_vkCmdClearDepthStencilAttachment:
-    case vk_FUNC_TYPE_vkCmdResolveImage:
-    case vk_FUNC_TYPE_vkCmdSetEvent:
-    case vk_FUNC_TYPE_vkCmdResetEvent:
-    case vk_FUNC_TYPE_vkCmdWaitEvents:
-    case vk_FUNC_TYPE_vkCmdPipelineBarrier:
-    case vk_FUNC_TYPE_vkCmdBeginQuery:
-    case vk_FUNC_TYPE_vkCmdEndQuery:
-    case vk_FUNC_TYPE_vkCmdResetQueryPool:
-    case vk_FUNC_TYPE_vkCmdWriteTimestamp:
-    case vk_FUNC_TYPE_vkCmdCopyQueryPoolResults:
-    case vk_FUNC_TYPE_vkCmdBeginRenderPass:
-    case vk_FUNC_TYPE_vkCmdNextSubpass:
-    case vk_FUNC_TYPE_vkCmdPushConstants:
-    case vk_FUNC_TYPE_vkCmdEndRenderPass:
-    case vk_FUNC_TYPE_vkCmdExecuteCommands:
-    case vk_FUNC_TYPE_vkCmdSetViewport:
-    case vk_FUNC_TYPE_vkCmdSetScissor:
-    case vk_FUNC_TYPE_vkCmdSetLineWidth:
-    case vk_FUNC_TYPE_vkCmdSetDepthBias:
-    case vk_FUNC_TYPE_vkCmdSetBlendConstants:
-    case vk_FUNC_TYPE_vkCmdSetDepthBounds:
-    case vk_FUNC_TYPE_vkCmdSetStencilCompareMask:
-    case vk_FUNC_TYPE_vkCmdSetStencilWriteMask:
-    case vk_FUNC_TYPE_vkCmdSetStencilReference:
-    {
-        apiType = vkAPIType_Command;
+    case FuncId_vkCmdDraw:
+    case FuncId_vkCmdDrawIndexed:
+    case FuncId_vkCmdDrawIndirect:
+    case FuncId_vkCmdDrawIndexedIndirect:
+    case FuncId_vkCmdDispatch:
+    case FuncId_vkCmdDispatchIndirect:
+    case FuncId_vkCmdCopyBuffer:
+    case FuncId_vkCmdCopyImage:
+    case FuncId_vkCmdBlitImage:
+    case FuncId_vkCmdCopyBufferToImage:
+    case FuncId_vkCmdCopyImageToBuffer:
+    case FuncId_vkCmdUpdateBuffer:
+    case FuncId_vkCmdFillBuffer:
+    case FuncId_vkCmdClearColorImage:
+    case FuncId_vkCmdClearDepthStencilImage:
+    case FuncId_vkCmdClearAttachments:
+    case FuncId_vkCmdResolveImage:
+    case FuncId_vkCmdResetQueryPool:
+    case FuncId_vkCmdCopyQueryPoolResults:
+    case FuncId_vkCmdExecuteCommands:
+    case FuncId_vkCmdPipelineBarrier:
+    case FuncId_vkCmdPushConstants:
+    case FuncId_vkCmdBeginRenderPass:
+    case FuncId_vkCmdNextSubpass:
+    case FuncId_vkCmdEndRenderPass:
+    case FuncId_vkCmdWaitEvents:
+        apiType = vkAPIType_CmdBufProfiled;
         break;
-    }
-    case vk_FUNC_TYPE_vkQueueWaitIdle:
-    case vk_FUNC_TYPE_vkQueueSignalSemaphore:
-    case vk_FUNC_TYPE_vkQueueWaitSemaphore:
-    case vk_FUNC_TYPE_vkResetFences:
-    case vk_FUNC_TYPE_vkGetFenceStatus:
-    case vk_FUNC_TYPE_vkWaitForFences:
-    case vk_FUNC_TYPE_vkGetEventStatus:
-    case vk_FUNC_TYPE_vkSetEvent:
-    case vk_FUNC_TYPE_vkResetEvent:
-    case vk_FUNC_TYPE_vkDeviceWaitIdle:
-    {
+
+    case FuncId_vkCmdBindPipeline:
+    case FuncId_vkCmdSetViewport:
+    case FuncId_vkCmdSetScissor:
+    case FuncId_vkCmdSetLineWidth:
+    case FuncId_vkCmdSetDepthBias:
+    case FuncId_vkCmdSetBlendConstants:
+    case FuncId_vkCmdSetDepthBounds:
+    case FuncId_vkCmdSetStencilCompareMask:
+    case FuncId_vkCmdSetStencilWriteMask:
+    case FuncId_vkCmdSetStencilReference:
+    case FuncId_vkCmdBindDescriptorSets:
+    case FuncId_vkCmdBindIndexBuffer:
+    case FuncId_vkCmdBindVertexBuffers:
+    case FuncId_vkCmdSetEvent:
+    case FuncId_vkCmdResetEvent:
+    case FuncId_vkCmdBeginQuery:
+    case FuncId_vkCmdEndQuery:
+    case FuncId_vkCmdWriteTimestamp:
+        apiType = vkAPIType_CmdBufNonProfiled;
+        break;
+
+    case FuncId_vkQueueWaitIdle:
+    case FuncId_vkDeviceWaitIdle:
+    case FuncId_vkResetFences:
+    case FuncId_vkGetFenceStatus:
+    case FuncId_vkWaitForFences:
+    case FuncId_vkGetEventStatus:
+    case FuncId_vkSetEvent:
+    case FuncId_vkResetEvent:
         apiType = vkAPIType_Sync;
         break;
-    }
-    case vk_FUNC_TYPE_vkGetPhysicalDeviceSurfaceSupportKHR:
-    case vk_FUNC_TYPE_vkGetSurfacePropertiesKHR:
-    case vk_FUNC_TYPE_vkGetSurfaceFormatsKHR:
-    case vk_FUNC_TYPE_vkGetSurfacePresentModesKHR:
-    case vk_FUNC_TYPE_vkCreateSwapchainKHR:
-    case vk_FUNC_TYPE_vkDestroySwapchainKHR:
-    case vk_FUNC_TYPE_vkGetSwapchainImagesKHR:
-    case vk_FUNC_TYPE_vkAcquireNextImageKHR:
-    case vk_FUNC_TYPE_vkQueuePresentKHR:
-    {
+
+    case FuncId_vkDestroySurfaceKHR:
+    case FuncId_vkCreateSwapchainKHR:
+    case FuncId_vkDestroySwapchainKHR:
+    case FuncId_vkGetSwapchainImagesKHR:
+    case FuncId_vkAcquireNextImageKHR:
+    case FuncId_vkQueuePresentKHR:
+    case FuncId_vkGetPhysicalDeviceSurfaceSupportKHR:
+    case FuncId_vkGetPhysicalDeviceSurfaceCapabilitiesKHR:
+    case FuncId_vkGetPhysicalDeviceSurfaceFormatsKHR:
+    case FuncId_vkGetPhysicalDeviceSurfacePresentModesKHR:
+    case FuncId_vkCreateWin32SurfaceKHR:
+    case FuncId_vkGetPhysicalDeviceWin32PresentationSupportKHR:
         apiType = vkAPIType_KHR;
         break;
-    }
+
     default:
-    {
-        break;
-    }
+        apiType = vkAPIType_Unknown;
     }
     return apiType;
 
 }
 
-void vulkanFunctionDefs::AddInterfaceFunction(const std::string& apiStr, vk_FUNC_TYPE functionType, vkAPIType apiType)
+void vulkanFunctionDefs::AddInterfaceFunction(const std::string& apiStr, VkFuncId functionType, vkAPIType apiType)
 {
     // Make sure that the string and type were not added yet (avoid copy paste mistakes)
     SpAssert(m_sVKAPIMap.find(apiStr) == m_sVKAPIMap.end());
     SpAssert(m_sVKAPIStringsMap.find(functionType) == m_sVKAPIStringsMap.end());
     SpAssert(m_sVKAPITypeMap.find(apiStr) == m_sVKAPITypeMap.end());
 
-    m_sVKAPIMap.insert(pair<string, vk_FUNC_TYPE>(apiStr, functionType));
-    m_sVKAPIStringsMap.insert(pair<vk_FUNC_TYPE, string>(functionType, apiStr));
+    m_sVKAPIMap.insert(pair<string, VkFuncId>(apiStr, functionType));
+    m_sVKAPIStringsMap.insert(pair<VkFuncId, string>(functionType, apiStr));
     m_sVKAPITypeMap.insert(pair<string, vkAPIType>(apiStr, apiType));
 }
 
 
 void vulkanFunctionDefs::InitCreateAPI()
 {
-    // create API functions
-    AddInterfaceFunction(string("vkCreateInstance"), vk_FUNC_TYPE_vkCreateInstance, vkAPIType_Create);
-    AddInterfaceFunction(string("vkCreateDevice"), vk_FUNC_TYPE_vkCreateDevice, vkAPIType_Create);
-    AddInterfaceFunction(string("vkCreateFence"), vk_FUNC_TYPE_vkCreateFence, vkAPIType_Create);
-    AddInterfaceFunction(string("vkCreateEvent"), vk_FUNC_TYPE_vkCreateEvent, vkAPIType_Create);
-    AddInterfaceFunction(string("vkCreateQueryPool"), vk_FUNC_TYPE_vkCreateQueryPool, vkAPIType_Create);
-    AddInterfaceFunction(string("vkCreateBuffer"), vk_FUNC_TYPE_vkCreateBuffer, vkAPIType_Create);
-    AddInterfaceFunction(string("vkCreateBufferView"), vk_FUNC_TYPE_vkCreateBufferView, vkAPIType_Create);
-    AddInterfaceFunction(string("vkCreateSemaphore"), vk_FUNC_TYPE_vkCreateSemaphore, vkAPIType_Create);
-    AddInterfaceFunction(string("vkCreateImage"), vk_FUNC_TYPE_vkCreateImage, vkAPIType_Create);
-    AddInterfaceFunction(string("vkCreatePipelineLayout"), vk_FUNC_TYPE_vkCreatePipelineLayout, vkAPIType_Create);
-    AddInterfaceFunction(string("vkCreateShaderModule"), vk_FUNC_TYPE_vkCreateShaderModule, vkAPIType_Create);
-    AddInterfaceFunction(string("vkCreateSampler"), vk_FUNC_TYPE_vkCreateSampler, vkAPIType_Create);
-    AddInterfaceFunction(string("vkCreatePipelineCache"), vk_FUNC_TYPE_vkCreatePipelineCache, vkAPIType_Create);
-    AddInterfaceFunction(string("vkCreateGraphicsPipelines"), vk_FUNC_TYPE_vkCreateGraphicsPipelines, vkAPIType_Create);
-    AddInterfaceFunction(string("vkCreateComputePipelines"), vk_FUNC_TYPE_vkCreateComputePipelines, vkAPIType_Create);
-    AddInterfaceFunction(string("vkCreateShader"), vk_FUNC_TYPE_vkCreateShader, vkAPIType_Create);
-    AddInterfaceFunction(string("vkCreateDescriptorSetLayout"), vk_FUNC_TYPE_vkCreateDescriptorSetLayout, vkAPIType_Create);
-    AddInterfaceFunction(string("vkCreateCommandPool"), vk_FUNC_TYPE_vkCreateCommandPool, vkAPIType_Create);
-    AddInterfaceFunction(string("vkCreateCommandBuffer"), vk_FUNC_TYPE_vkCreateCommandBuffer, vkAPIType_Create);
-    AddInterfaceFunction(string("vkCreateFramebuffer"), vk_FUNC_TYPE_vkCreateFramebuffer, vkAPIType_Create);
-    AddInterfaceFunction(string("vkCreateRenderPass"), vk_FUNC_TYPE_vkCreateRenderPass, vkAPIType_Create);
-    AddInterfaceFunction(string("vkCreateDescriptorPool"), vk_FUNC_TYPE_vkCreateDescriptorPool, vkAPIType_Create);
-    AddInterfaceFunction(string("vkCreateImageView"), vk_FUNC_TYPE_vkCreateImageView, vkAPIType_Create);
+    // Create API functions
+    AddInterfaceFunction(string("vkCreateInstance"), FuncId_vkCreateInstance, vkAPIType_Create);
+    AddInterfaceFunction(string("vkCreateDevice"), FuncId_vkCreateDevice, vkAPIType_Create);
+    AddInterfaceFunction(string("vkCreateFence"), FuncId_vkCreateFence, vkAPIType_Create);
+    AddInterfaceFunction(string("vkCreateEvent"), FuncId_vkCreateEvent, vkAPIType_Create);
+    AddInterfaceFunction(string("vkCreateBufferView"), FuncId_vkCreateBufferView, vkAPIType_Create);
+    AddInterfaceFunction(string("vkCreateQueryPool"), FuncId_vkCreateQueryPool, vkAPIType_Create);
+    AddInterfaceFunction(string("vkCreateImage"), FuncId_vkCreateImage, vkAPIType_Create);
+    AddInterfaceFunction(string("vkCreateGraphicsPipelines"), FuncId_vkCreateGraphicsPipelines, vkAPIType_Create);
+    AddInterfaceFunction(string("vkCreateComputePipelines"), FuncId_vkCreateComputePipelines, vkAPIType_Create);
+    AddInterfaceFunction(string("vkCreateBuffer"), FuncId_vkCreateInstance, vkAPIType_Create);
+    AddInterfaceFunction(string("vkCreateImageView"), FuncId_vkCreateImageView, vkAPIType_Create);
+    AddInterfaceFunction(string("vkCreateShaderModule"), FuncId_vkCreateShaderModule, vkAPIType_Create);
+    AddInterfaceFunction(string("vkCreateSemaphore"), FuncId_vkCreateSemaphore, vkAPIType_Create);
+    AddInterfaceFunction(string("vkCreatePipelineCache"), FuncId_vkCreatePipelineCache, vkAPIType_Create);
+    AddInterfaceFunction(string("vkCreateSampler"), FuncId_vkCreateSampler, vkAPIType_Create);
+    AddInterfaceFunction(string("vkCreateDescriptorSetLayout"), FuncId_vkCreateDescriptorSetLayout, vkAPIType_Create);
+    AddInterfaceFunction(string("vkCreatePipelineLayout"), FuncId_vkCreateInstance, vkAPIType_Create);
+    AddInterfaceFunction(string("vkCreateFramebuffer"), FuncId_vkCreateFramebuffer, vkAPIType_Create);
+    AddInterfaceFunction(string("vkCreateRenderPass"), FuncId_vkCreateInstance, vkAPIType_Create);
+    AddInterfaceFunction(string("vkCreateCommandPool"), FuncId_vkCreateCommandPool, vkAPIType_Create);
+    AddInterfaceFunction(string("vkCreateDescriptorPool"), FuncId_vkCreateDescriptorPool, vkAPIType_Create);
 }
 void vulkanFunctionDefs::InitDestroyAPI()
 {
-    AddInterfaceFunction(string("vkDestroyInstance"), vk_FUNC_TYPE_vkDestroyInstance, vkAPIType_Destroy);
-    AddInterfaceFunction(string("vkDestroyDevice"), vk_FUNC_TYPE_vkDestroyDevice, vkAPIType_Destroy);
-    AddInterfaceFunction(string("vkDestroyEvent"), vk_FUNC_TYPE_vkDestroyEvent, vkAPIType_Destroy);
-    AddInterfaceFunction(string("vkDestroySemaphore"), vk_FUNC_TYPE_vkDestroySemaphore, vkAPIType_Destroy);
-    AddInterfaceFunction(string("vkDestroyBuffer"), vk_FUNC_TYPE_vkDestroyBuffer, vkAPIType_Destroy);
-    AddInterfaceFunction(string("vkDestroyBufferView"), vk_FUNC_TYPE_vkDestroyBufferView, vkAPIType_Destroy);
-    AddInterfaceFunction(string("vkDestroyImage"), vk_FUNC_TYPE_vkDestroyImage, vkAPIType_Destroy);
-    AddInterfaceFunction(string("vkDestroyPipeline"), vk_FUNC_TYPE_vkDestroyPipeline, vkAPIType_Destroy);
-    AddInterfaceFunction(string("vkDestroyPipelineLayout"), vk_FUNC_TYPE_vkDestroyPipelineLayout, vkAPIType_Destroy);
-    AddInterfaceFunction(string("vkDestroySampler"), vk_FUNC_TYPE_vkDestroySampler, vkAPIType_Destroy);
-    AddInterfaceFunction(string("vkDestroyFence"), vk_FUNC_TYPE_vkDestroyFence, vkAPIType_Destroy);
-    AddInterfaceFunction(string("vkDestroyCommandPool"), vk_FUNC_TYPE_vkDestroyCommandPool, vkAPIType_Destroy);
-    AddInterfaceFunction(string("vkDestroyImageView"), vk_FUNC_TYPE_vkDestroyImageView, vkAPIType_Destroy);
-    AddInterfaceFunction(string("vkDestroyShaderModule"), vk_FUNC_TYPE_vkDestroyShaderModule, vkAPIType_Destroy);
-    AddInterfaceFunction(string("vkDestroyShader"), vk_FUNC_TYPE_vkDestroyShader, vkAPIType_Destroy);
-    AddInterfaceFunction(string("vkDestroyPipelineCache"), vk_FUNC_TYPE_vkDestroyPipelineCache, vkAPIType_Destroy);
-    AddInterfaceFunction(string("vkDestroyDescriptorSetLayout"), vk_FUNC_TYPE_vkDestroyDescriptorSetLayout, vkAPIType_Destroy);
-    AddInterfaceFunction(string("vkDestroyQueryPool"), vk_FUNC_TYPE_vkDestroyQueryPool, vkAPIType_Destroy);
-    AddInterfaceFunction(string("vkDestroyCommandBuffer"), vk_FUNC_TYPE_vkDestroyCommandBuffer, vkAPIType_Destroy);
-    AddInterfaceFunction(string("vkDestroyFramebuffer"), vk_FUNC_TYPE_vkDestroyFramebuffer, vkAPIType_Destroy);
-    AddInterfaceFunction(string("vkDestroyRenderPass"), vk_FUNC_TYPE_vkDestroyRenderPass, vkAPIType_Destroy);
-    AddInterfaceFunction(string("vkDestroyDescriptorPool"), vk_FUNC_TYPE_vkDestroyDescriptorPool, vkAPIType_Destroy);
+    AddInterfaceFunction(string("vkDestroyInstance"), FuncId_vkDestroyInstance, vkAPIType_Destroy);
+    AddInterfaceFunction(string("vkDestroyDevice"), FuncId_vkDestroyDevice, vkAPIType_Destroy);
+    AddInterfaceFunction(string("vkDestroySemaphore"), FuncId_vkDestroySemaphore, vkAPIType_Destroy);
+    AddInterfaceFunction(string("vkDestroyEvent"), FuncId_vkDestroyEvent, vkAPIType_Destroy);
+    AddInterfaceFunction(string("vkDestroyBuffer"), FuncId_vkDestroyBuffer, vkAPIType_Destroy);
+    AddInterfaceFunction(string("vkDestroyBufferView"), FuncId_vkDestroyBufferView, vkAPIType_Destroy);
+    AddInterfaceFunction(string("vkDestroyPipeline"), FuncId_vkDestroyPipeline, vkAPIType_Destroy);
+    AddInterfaceFunction(string("vkDestroyPipelineLayout"), FuncId_vkDestroyPipelineLayout, vkAPIType_Destroy);
+    AddInterfaceFunction(string("vkDestroySampler"), FuncId_vkDestroySampler, vkAPIType_Destroy);
+    AddInterfaceFunction(string("vkDestroyDescriptorSetLayout"), FuncId_vkDestroyDescriptorSetLayout, vkAPIType_Destroy);
+    AddInterfaceFunction(string("vkDestroyDescriptorPool"), FuncId_vkDestroyDescriptorPool, vkAPIType_Destroy);
+    AddInterfaceFunction(string("vkDestroyImageView"), FuncId_vkDestroyImageView, vkAPIType_Destroy);
+    AddInterfaceFunction(string("vkDestroyShaderModule"), FuncId_vkDestroyShaderModule, vkAPIType_Destroy);
+    AddInterfaceFunction(string("vkDestroyPipelineCache"), FuncId_vkDestroyPipelineCache, vkAPIType_Destroy);
+    AddInterfaceFunction(string("vkDestroyFramebuffer"), FuncId_vkDestroyFramebuffer, vkAPIType_Destroy);
+    AddInterfaceFunction(string("vkDestroyRenderPass"), FuncId_vkDestroyRenderPass, vkAPIType_Destroy);
+    AddInterfaceFunction(string("vkDestroyQueryPool"), FuncId_vkDestroyQueryPool, vkAPIType_Destroy);
+    AddInterfaceFunction(string("vkDestroyCommandPool"), FuncId_vkDestroyCommandPool, vkAPIType_Destroy);
+    AddInterfaceFunction(string("vkDestroyFence"), FuncId_vkDestroyFence, vkAPIType_Destroy);
+    AddInterfaceFunction(string("vkDestroyImage"), FuncId_vkDestroyImage, vkAPIType_Destroy);
 }
 void vulkanFunctionDefs::InitGetAPI()
 {
-    AddInterfaceFunction(string("vkEnumeratePhysicalDevices"), vk_FUNC_TYPE_vkEnumeratePhysicalDevices, vkAPIType_Get);
-    AddInterfaceFunction(string("vkEnumerateInstanceExtensionProperties"), vk_FUNC_TYPE_vkEnumerateInstanceExtensionProperties, vkAPIType_Get);
-    AddInterfaceFunction(string("vkEnumerateInstanceLayerProperties"), vk_FUNC_TYPE_vkEnumerateInstanceLayerProperties, vkAPIType_Get);
-    AddInterfaceFunction(string("vkEnumerateDeviceLayerProperties"), vk_FUNC_TYPE_vkEnumerateDeviceLayerProperties, vkAPIType_Get);
-    AddInterfaceFunction(string("vkGetPhysicalDeviceFeatures"), vk_FUNC_TYPE_vkGetPhysicalDeviceFeatures, vkAPIType_Get);
-    AddInterfaceFunction(string("vkGetPhysicalDeviceFormatProperties"), vk_FUNC_TYPE_vkGetPhysicalDeviceFormatProperties, vkAPIType_Get);
-    AddInterfaceFunction(string("vkGetPhysicalDeviceImageFormatProperties"), vk_FUNC_TYPE_vkGetPhysicalDeviceImageFormatProperties, vkAPIType_Get);
-    AddInterfaceFunction(string("vkGetPhysicalDeviceProperties"), vk_FUNC_TYPE_vkGetPhysicalDeviceProperties, vkAPIType_Get);
-    AddInterfaceFunction(string("vkGetPhysicalDeviceQueueFamilyProperties"), vk_FUNC_TYPE_vkGetPhysicalDeviceQueueFamilyProperties, vkAPIType_Get);
-    AddInterfaceFunction(string("vkGetPhysicalDeviceMemoryProperties"), vk_FUNC_TYPE_vkGetPhysicalDeviceMemoryProperties, vkAPIType_Get);
-    AddInterfaceFunction(string("vkGetDeviceQueue"), vk_FUNC_TYPE_vkGetDeviceQueue, vkAPIType_Get);
-    AddInterfaceFunction(string("vkGetDeviceMemoryCommitment"), vk_FUNC_TYPE_vkGetDeviceMemoryCommitment, vkAPIType_Get);
-    AddInterfaceFunction(string("vkGetPhysicalDeviceSparseImageFormatProperties"), vk_FUNC_TYPE_vkGetPhysicalDeviceSparseImageFormatProperties, vkAPIType_Get);
-    AddInterfaceFunction(string("vkGetBufferMemoryRequirements"), vk_FUNC_TYPE_vkGetBufferMemoryRequirements, vkAPIType_Get);
-    AddInterfaceFunction(string("vkGetImageMemoryRequirements"), vk_FUNC_TYPE_vkGetImageMemoryRequirements, vkAPIType_Get);
-    AddInterfaceFunction(string("vkGetImageSparseMemoryRequirements"), vk_FUNC_TYPE_vkGetImageSparseMemoryRequirements, vkAPIType_Get);
-    AddInterfaceFunction(string("vkGetRenderAreaGranularity"), vk_FUNC_TYPE_vkGetRenderAreaGranularity, vkAPIType_Get);
-    AddInterfaceFunction(string("vkGetPipelineCacheSize"), vk_FUNC_TYPE_vkGetPipelineCacheSize, vkAPIType_Get);
-    AddInterfaceFunction(string("vkGetPipelineCacheData"), vk_FUNC_TYPE_vkGetPipelineCacheData, vkAPIType_Get);
-    AddInterfaceFunction(string("vkGetQueryPoolResults"), vk_FUNC_TYPE_vkGetQueryPoolResults, vkAPIType_Get);
-    AddInterfaceFunction(string("vkGetImageSubresourceLayout"), vk_FUNC_TYPE_vkGetImageSubresourceLayout, vkAPIType_Get);
+    AddInterfaceFunction(string("vkEnumeratePhysicalDevices"), FuncId_vkEnumeratePhysicalDevices, vkAPIType_Get);
+    AddInterfaceFunction(string("vkEnumerateInstanceExtensionProperties"), FuncId_vkEnumerateInstanceExtensionProperties, vkAPIType_Get);
+    AddInterfaceFunction(string("vkEnumerateInstanceLayerProperties"), FuncId_vkEnumerateInstanceLayerProperties, vkAPIType_Get);
+    AddInterfaceFunction(string("vkEnumerateDeviceLayerProperties"), FuncId_vkEnumerateDeviceLayerProperties, vkAPIType_Get);
+    AddInterfaceFunction(string("vkGetPhysicalDeviceFeatures"), FuncId_vkGetPhysicalDeviceFeatures, vkAPIType_Get);
+    AddInterfaceFunction(string("vkGetPhysicalDeviceFormatProperties"), FuncId_vkGetPhysicalDeviceFormatProperties, vkAPIType_Get);
+    AddInterfaceFunction(string("vkGetPhysicalDeviceImageFormatProperties"), FuncId_vkGetPhysicalDeviceImageFormatProperties, vkAPIType_Get);
+    AddInterfaceFunction(string("vkGetPhysicalDeviceProperties"), FuncId_vkGetPhysicalDeviceProperties, vkAPIType_Get);
+    AddInterfaceFunction(string("vkGetPhysicalDeviceQueueFamilyProperties"), FuncId_vkGetPhysicalDeviceQueueFamilyProperties, vkAPIType_Get);
+    AddInterfaceFunction(string("vkGetPhysicalDeviceMemoryProperties"), FuncId_vkGetPhysicalDeviceMemoryProperties, vkAPIType_Get);
+    AddInterfaceFunction(string("vkGetDeviceQueue"), FuncId_vkGetDeviceQueue, vkAPIType_Get);
+    AddInterfaceFunction(string("vkGetBufferMemoryRequirements"), FuncId_vkGetBufferMemoryRequirements, vkAPIType_Get);
+    AddInterfaceFunction(string("vkGetImageMemoryRequirements"), FuncId_vkGetImageMemoryRequirements, vkAPIType_Get);
+    AddInterfaceFunction(string("vkGetImageSparseMemoryRequirements"), FuncId_vkGetImageSparseMemoryRequirements, vkAPIType_Get);
+    AddInterfaceFunction(string("vkGetPhysicalDeviceSparseImageFormatProperties"), FuncId_vkGetPhysicalDeviceSparseImageFormatProperties, vkAPIType_Get);
+    AddInterfaceFunction(string("vkGetQueryPoolResults"), FuncId_vkGetQueryPoolResults, vkAPIType_Get);
+    AddInterfaceFunction(string("vkGetImageSubresourceLayout"), FuncId_vkGetImageSubresourceLayout, vkAPIType_Get);
+    AddInterfaceFunction(string("vkGetPipelineCacheData"), FuncId_vkGetPipelineCacheData, vkAPIType_Get);
+    AddInterfaceFunction(string("vkGetRenderAreaGranularity"), FuncId_vkGetRenderAreaGranularity, vkAPIType_Get);
+    AddInterfaceFunction(string("vkGetDeviceMemoryCommitment"), FuncId_vkGetDeviceMemoryCommitment, vkAPIType_Get);
 }
 void vulkanFunctionDefs::InitMemAPI()
 {
-    AddInterfaceFunction(string("vkAllocMemory"), vk_FUNC_TYPE_vkAllocMemory, vkAPIType_Memory);
-    AddInterfaceFunction(string("vkFreeMemory"), vk_FUNC_TYPE_vkFreeMemory, vkAPIType_Memory);
-    AddInterfaceFunction(string("vkMapMemory"), vk_FUNC_TYPE_vkMapMemory, vkAPIType_Memory);
-    AddInterfaceFunction(string("vkUnmapMemory"), vk_FUNC_TYPE_vkUnmapMemory, vkAPIType_Memory);
-    AddInterfaceFunction(string("vkFlushMappedMemoryRanges"), vk_FUNC_TYPE_vkFlushMappedMemoryRanges, vkAPIType_Memory);
-    AddInterfaceFunction(string("vkInvalidateMappedMemoryRanges"), vk_FUNC_TYPE_vkInvalidateMappedMemoryRanges, vkAPIType_Memory);
-    AddInterfaceFunction(string("vkBindBufferMemory"), vk_FUNC_TYPE_vkBindBufferMemory, vkAPIType_Memory);
-    AddInterfaceFunction(string("vkBindImageMemory"), vk_FUNC_TYPE_vkBindImageMemory, vkAPIType_Memory);
-    AddInterfaceFunction(string("vkQueueBindSparseBufferMemory"), vk_FUNC_TYPE_vkQueueBindSparseBufferMemory, vkAPIType_Memory);
-    AddInterfaceFunction(string("vkQueueBindSparseImageOpaqueMemory"), vk_FUNC_TYPE_vkQueueBindSparseImageOpaqueMemory, vkAPIType_Memory);
-    AddInterfaceFunction(string("vkQueueBindSparseImageMemory"), vk_FUNC_TYPE_vkQueueBindSparseImageMemory, vkAPIType_Memory);
+    AddInterfaceFunction(string("vkAllocateMemory"), FuncId_vkAllocateMemory, vkAPIType_Memory);
+    AddInterfaceFunction(string("vkFreeMemory"), FuncId_vkFreeMemory, vkAPIType_Memory);
+    AddInterfaceFunction(string("vkMapMemory"), FuncId_vkMapMemory, vkAPIType_Memory);
+    AddInterfaceFunction(string("vkUnmapMemory"), FuncId_vkUnmapMemory, vkAPIType_Memory);
+    AddInterfaceFunction(string("vkBindBufferMemory"), FuncId_vkBindBufferMemory, vkAPIType_Memory);
+    AddInterfaceFunction(string("vkBindImageMemory"), FuncId_vkBindImageMemory, vkAPIType_Memory);
+    AddInterfaceFunction(string("vkFlushMappedMemoryRanges"), FuncId_vkFlushMappedMemoryRanges, vkAPIType_Memory);
+    AddInterfaceFunction(string("vkInvalidateMappedMemoryRanges"), FuncId_vkInvalidateMappedMemoryRanges, vkAPIType_Memory);
+    AddInterfaceFunction(string("vkMergePipelineCaches"), FuncId_vkMergePipelineCaches, vkAPIType_Memory);
 }
-void vulkanFunctionDefs::InitGeneralAPI()
+void vulkanFunctionDefs::InitDescriptorAPI()
 {
-    AddInterfaceFunction(string("vkMergePipelineCaches"), vk_FUNC_TYPE_vkMergePipelineCaches, vkAPIType_General);
-    AddInterfaceFunction(string("vkResetDescriptorPool"), vk_FUNC_TYPE_vkResetDescriptorPool, vkAPIType_General);
-    AddInterfaceFunction(string("vkAllocDescriptorSets"), vk_FUNC_TYPE_vkAllocDescriptorSets, vkAPIType_General);
-    AddInterfaceFunction(string("vkFreeDescriptorSets"), vk_FUNC_TYPE_vkFreeDescriptorSets, vkAPIType_General);
-    AddInterfaceFunction(string("vkUpdateDescriptorSets"), vk_FUNC_TYPE_vkUpdateDescriptorSets, vkAPIType_General);
-}
-void vulkanFunctionDefs::InitQueueAPI()
-{
-    AddInterfaceFunction(string("vkQueueSubmit"), vk_FUNC_TYPE_vkQueueSubmit, vkAPIType_Queue);
-    AddInterfaceFunction(string("vkResetCommandPool"), vk_FUNC_TYPE_vkResetCommandPool, vkAPIType_Queue);
-    AddInterfaceFunction(string("vkBeginCommandBuffer"), vk_FUNC_TYPE_vkBeginCommandBuffer, vkAPIType_Queue);
-    AddInterfaceFunction(string("vkEndCommandBuffer"), vk_FUNC_TYPE_vkEndCommandBuffer, vkAPIType_Queue);
-    AddInterfaceFunction(string("vkResetCommandBuffer"), vk_FUNC_TYPE_vkResetCommandBuffer, vkAPIType_Queue);
-}
-void vulkanFunctionDefs::InitCmdDrawcallAPI()
-{
-    AddInterfaceFunction(string("vkCmdDraw"), vk_FUNC_TYPE_vkCmdDraw, vkAPIType_CommandDraw);
-    AddInterfaceFunction(string("vkCmdDrawIndexed"), vk_FUNC_TYPE_vkCmdDrawIndexed, vkAPIType_CommandDraw);
-    AddInterfaceFunction(string("vkCmdDrawIndirect"), vk_FUNC_TYPE_vkCmdDrawIndirect, vkAPIType_CommandDraw);
-    AddInterfaceFunction(string("vkCmdDrawIndexedIndirect"), vk_FUNC_TYPE_vkCmdDrawIndexedIndirect, vkAPIType_CommandDraw);
-    AddInterfaceFunction(string("vkCmdDispatch"), vk_FUNC_TYPE_vkCmdDispatch, vkAPIType_CommandDraw);
-    AddInterfaceFunction(string("vkCmdDispatchIndirect"), vk_FUNC_TYPE_vkCmdDispatchIndirect, vkAPIType_CommandDraw);
+    AddInterfaceFunction(string("vkResetDescriptorPool"), FuncId_vkResetDescriptorPool, vkAPIType_DescriptorSet);
+    AddInterfaceFunction(string("vkAllocateDescriptorSets"), FuncId_vkAllocateDescriptorSets, vkAPIType_DescriptorSet);
+    AddInterfaceFunction(string("vkFreeDescriptorSets"), FuncId_vkFreeDescriptorSets, vkAPIType_DescriptorSet);
+    AddInterfaceFunction(string("vkUpdateDescriptorSets"), FuncId_vkUpdateDescriptorSets, vkAPIType_DescriptorSet);
 }
 
-void vulkanFunctionDefs::InitCmdGeneralAPI()
+void vulkanFunctionDefs::InitQueueSubmissionAPI()
 {
-    AddInterfaceFunction(string("vkCmdBindPipeline"), vk_FUNC_TYPE_vkCmdBindPipeline, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdBindDescriptorSets"), vk_FUNC_TYPE_vkCmdBindDescriptorSets, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdBindIndexBuffer"), vk_FUNC_TYPE_vkCmdBindIndexBuffer, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdBindVertexBuffers"), vk_FUNC_TYPE_vkCmdBindVertexBuffers, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdCopyBuffer"), vk_FUNC_TYPE_vkCmdCopyBuffer, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdCopyImage"), vk_FUNC_TYPE_vkCmdCopyImage, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdBlitImage"), vk_FUNC_TYPE_vkCmdBlitImage, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdCopyBufferToImage"), vk_FUNC_TYPE_vkCmdCopyBufferToImage, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdCopyImageToBuffer"), vk_FUNC_TYPE_vkCmdCopyImageToBuffer, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdUpdateBuffer"), vk_FUNC_TYPE_vkCmdUpdateBuffer, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdFillBuffer"), vk_FUNC_TYPE_vkCmdFillBuffer, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdClearColorImage"), vk_FUNC_TYPE_vkCmdClearColorImage, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdClearDepthStencilImage"), vk_FUNC_TYPE_vkCmdClearDepthStencilImage, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdClearColorAttachment"), vk_FUNC_TYPE_vkCmdClearColorAttachment, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdClearDepthStencilAttachment"), vk_FUNC_TYPE_vkCmdClearDepthStencilAttachment, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdResolveImage"), vk_FUNC_TYPE_vkCmdResolveImage, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdSetEvent"), vk_FUNC_TYPE_vkCmdSetEvent, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdResetEvent"), vk_FUNC_TYPE_vkCmdResetEvent, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdWaitEvents"), vk_FUNC_TYPE_vkCmdWaitEvents, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdPipelineBarrier"), vk_FUNC_TYPE_vkCmdPipelineBarrier, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdBeginQuery"), vk_FUNC_TYPE_vkCmdBeginQuery, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdEndQuery"), vk_FUNC_TYPE_vkCmdEndQuery, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdResetQueryPool"), vk_FUNC_TYPE_vkCmdResetQueryPool, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdWriteTimestamp"), vk_FUNC_TYPE_vkCmdWriteTimestamp, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdCopyQueryPoolResults"), vk_FUNC_TYPE_vkCmdCopyQueryPoolResults, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdBeginRenderPass"), vk_FUNC_TYPE_vkCmdBeginRenderPass, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdNextSubpass"), vk_FUNC_TYPE_vkCmdNextSubpass, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdPushConstants"), vk_FUNC_TYPE_vkCmdPushConstants, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdEndRenderPass"), vk_FUNC_TYPE_vkCmdEndRenderPass, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdExecuteCommands"), vk_FUNC_TYPE_vkCmdExecuteCommands, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdSetViewport"), vk_FUNC_TYPE_vkCmdSetViewport, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdSetScissor"), vk_FUNC_TYPE_vkCmdSetScissor, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdSetLineWidth"), vk_FUNC_TYPE_vkCmdSetLineWidth, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdSetDepthBias"), vk_FUNC_TYPE_vkCmdSetDepthBias, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdSetBlendConstants"), vk_FUNC_TYPE_vkCmdSetBlendConstants, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdSetDepthBounds"), vk_FUNC_TYPE_vkCmdSetDepthBounds, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdSetStencilCompareMask"), vk_FUNC_TYPE_vkCmdSetStencilCompareMask, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdSetStencilWriteMask"), vk_FUNC_TYPE_vkCmdSetStencilWriteMask, vkAPIType_Command);
-    AddInterfaceFunction(string("vkCmdSetStencilReference"), vk_FUNC_TYPE_vkCmdSetStencilReference, vkAPIType_Command);
+    AddInterfaceFunction(string("vkQueueSubmit"), FuncId_vkQueueSubmit, vkAPIType_QueueSubmission);
+    AddInterfaceFunction(string("vkQueueBindSparse"), FuncId_vkQueueBindSparse, vkAPIType_QueueSubmission);
+    AddInterfaceFunction(string("vkResetCommandPool"), FuncId_vkResetCommandPool, vkAPIType_QueueSubmission);
+    AddInterfaceFunction(string("vkAllocateCommandBuffers"), FuncId_vkAllocateCommandBuffers, vkAPIType_QueueSubmission);
+    AddInterfaceFunction(string("vkFreeCommandBuffers"), FuncId_vkFreeCommandBuffers, vkAPIType_QueueSubmission);
+    AddInterfaceFunction(string("vkBeginCommandBuffer"), FuncId_vkBeginCommandBuffer, vkAPIType_QueueSubmission);
+    AddInterfaceFunction(string("vkEndCommandBuffer"), FuncId_vkEndCommandBuffer, vkAPIType_QueueSubmission);
+    AddInterfaceFunction(string("vkResetCommandBuffer"), FuncId_vkResetCommandBuffer, vkAPIType_QueueSubmission);
 }
+
+void vulkanFunctionDefs::InitCmdBufProfiledAPI()
+{
+    AddInterfaceFunction(string("vkCmdDraw"), FuncId_vkCmdDraw, vkAPIType_CmdBufProfiled);
+    AddInterfaceFunction(string("vkCmdDrawIndexed"), FuncId_vkCmdDrawIndexed, vkAPIType_CmdBufProfiled);
+    AddInterfaceFunction(string("vkCmdDrawIndirect"), FuncId_vkCmdDrawIndirect, vkAPIType_CmdBufProfiled);
+    AddInterfaceFunction(string("vkCmdDrawIndexedIndirect"), FuncId_vkCmdDrawIndexedIndirect, vkAPIType_CmdBufProfiled);
+    AddInterfaceFunction(string("vkCmdDispatch"), FuncId_vkCmdDispatch, vkAPIType_CmdBufProfiled);
+    AddInterfaceFunction(string("vkCmdDispatchIndirect"), FuncId_vkCmdDispatchIndirect, vkAPIType_CmdBufProfiled);
+    AddInterfaceFunction(string("vkCmdCopyBuffer"), FuncId_vkCmdCopyBuffer, vkAPIType_CmdBufProfiled);
+    AddInterfaceFunction(string("vkCmdCopyImage"), FuncId_vkCmdCopyImage, vkAPIType_CmdBufProfiled);
+    AddInterfaceFunction(string("vkCmdBlitImage"), FuncId_vkCmdBlitImage, vkAPIType_CmdBufProfiled);
+    AddInterfaceFunction(string("vkCmdCopyBufferToImage"), FuncId_vkCmdCopyBufferToImage, vkAPIType_CmdBufProfiled);
+    AddInterfaceFunction(string("vkCmdCopyImageToBuffer"), FuncId_vkCmdCopyImageToBuffer, vkAPIType_CmdBufProfiled);
+    AddInterfaceFunction(string("vkCmdUpdateBuffer"), FuncId_vkCmdUpdateBuffer, vkAPIType_CmdBufProfiled);
+    AddInterfaceFunction(string("vkCmdFillBuffer"), FuncId_vkCmdFillBuffer, vkAPIType_CmdBufProfiled);
+    AddInterfaceFunction(string("vkCmdClearColorImage"), FuncId_vkCmdClearColorImage, vkAPIType_CmdBufProfiled);
+    AddInterfaceFunction(string("vkCmdClearDepthStencilImage"), FuncId_vkCmdClearDepthStencilImage, vkAPIType_CmdBufProfiled);
+    AddInterfaceFunction(string("vkCmdClearAttachments"), FuncId_vkCmdClearAttachments, vkAPIType_CmdBufProfiled);
+    AddInterfaceFunction(string("vkCmdResolveImage"), FuncId_vkCmdResolveImage, vkAPIType_CmdBufProfiled);
+    AddInterfaceFunction(string("vkCmdResetQueryPool"), FuncId_vkCmdResetQueryPool, vkAPIType_CmdBufProfiled);
+    AddInterfaceFunction(string("vkCmdCopyQueryPoolResults"), FuncId_vkCmdCopyQueryPoolResults, vkAPIType_CmdBufProfiled);
+    AddInterfaceFunction(string("vkCmdExecuteCommands"), FuncId_vkCmdExecuteCommands, vkAPIType_CmdBufProfiled);
+    AddInterfaceFunction(string("vkCmdPipelineBarrier"), FuncId_vkCmdPipelineBarrier, vkAPIType_CmdBufProfiled);
+    AddInterfaceFunction(string("vkCmdPushConstants"), FuncId_vkCmdPushConstants, vkAPIType_CmdBufProfiled);
+    AddInterfaceFunction(string("vkCmdBeginRenderPass"), FuncId_vkCmdBeginRenderPass, vkAPIType_CmdBufProfiled);
+    AddInterfaceFunction(string("vkCmdNextSubpass"), FuncId_vkCmdNextSubpass, vkAPIType_CmdBufProfiled);
+    AddInterfaceFunction(string("vkCmdEndRenderPass"), FuncId_vkCmdEndRenderPass, vkAPIType_CmdBufProfiled);
+    AddInterfaceFunction(string("vkCmdWaitEvents"), FuncId_vkCmdWaitEvents, vkAPIType_CmdBufProfiled);
+}
+
+void vulkanFunctionDefs::InitCmdBufNonProfiledAPI()
+{
+    AddInterfaceFunction(string("vkCmdBindPipeline"), FuncId_vkCmdBindPipeline, vkAPIType_CmdBufNonProfiled);
+    AddInterfaceFunction(string("vkCmdSetViewport"), FuncId_vkCmdSetViewport, vkAPIType_CmdBufNonProfiled);
+    AddInterfaceFunction(string("vkCmdSetScissor"), FuncId_vkCmdSetScissor, vkAPIType_CmdBufNonProfiled);
+    AddInterfaceFunction(string("vkCmdSetLineWidth"), FuncId_vkCmdSetLineWidth, vkAPIType_CmdBufNonProfiled);
+    AddInterfaceFunction(string("vkCmdSetDepthBias"), FuncId_vkCmdSetDepthBias, vkAPIType_CmdBufNonProfiled);
+    AddInterfaceFunction(string("vkCmdSetBlendConstants"), FuncId_vkCmdSetBlendConstants, vkAPIType_CmdBufNonProfiled);
+    AddInterfaceFunction(string("vkCmdSetDepthBounds"), FuncId_vkCmdSetDepthBounds, vkAPIType_CmdBufNonProfiled);
+    AddInterfaceFunction(string("vkCmdSetStencilCompareMask"), FuncId_vkCmdSetStencilCompareMask, vkAPIType_CmdBufNonProfiled);
+    AddInterfaceFunction(string("vkCmdSetStencilWriteMask"), FuncId_vkCmdSetStencilWriteMask, vkAPIType_CmdBufNonProfiled);
+    AddInterfaceFunction(string("vkCmdSetStencilReference"), FuncId_vkCmdSetStencilReference, vkAPIType_CmdBufNonProfiled);
+    AddInterfaceFunction(string("vkCmdBindDescriptorSets"), FuncId_vkCmdBindDescriptorSets, vkAPIType_CmdBufNonProfiled);
+    AddInterfaceFunction(string("vkCmdBindIndexBuffer"), FuncId_vkCmdBindIndexBuffer, vkAPIType_CmdBufNonProfiled);
+    AddInterfaceFunction(string("vkCmdBindVertexBuffers"), FuncId_vkCmdBindVertexBuffers, vkAPIType_CmdBufNonProfiled);
+    AddInterfaceFunction(string("vkCmdSetEvent"), FuncId_vkCmdSetEvent, vkAPIType_CmdBufNonProfiled);
+    AddInterfaceFunction(string("vkCmdResetEvent"), FuncId_vkCmdResetEvent, vkAPIType_CmdBufNonProfiled);
+    AddInterfaceFunction(string("vkCmdBeginQuery"), FuncId_vkCmdBeginQuery, vkAPIType_CmdBufNonProfiled);
+    AddInterfaceFunction(string("vkCmdEndQuery"), FuncId_vkCmdEndQuery, vkAPIType_CmdBufNonProfiled);
+    AddInterfaceFunction(string("vkCmdWriteTimestamp"), FuncId_vkCmdWriteTimestamp, vkAPIType_CmdBufNonProfiled);
+}
+
 void vulkanFunctionDefs::InitSyncAPI()
 {
-    AddInterfaceFunction(string("vkQueueWaitIdle"), vk_FUNC_TYPE_vkQueueWaitIdle, vkAPIType_Sync);
-    AddInterfaceFunction(string("vkQueueSignalSemaphore"), vk_FUNC_TYPE_vkQueueSignalSemaphore, vkAPIType_Sync);
-    AddInterfaceFunction(string("vkQueueWaitSemaphore"), vk_FUNC_TYPE_vkQueueWaitSemaphore, vkAPIType_Sync);
-    AddInterfaceFunction(string("vkResetFences"), vk_FUNC_TYPE_vkResetFences, vkAPIType_Sync);
-    AddInterfaceFunction(string("vkGetFenceStatus"), vk_FUNC_TYPE_vkGetFenceStatus, vkAPIType_Sync);
-    AddInterfaceFunction(string("vkWaitForFences"), vk_FUNC_TYPE_vkWaitForFences, vkAPIType_Sync);
-    AddInterfaceFunction(string("vkGetEventStatus"), vk_FUNC_TYPE_vkGetEventStatus, vkAPIType_Sync);
-    AddInterfaceFunction(string("vkSetEvent"), vk_FUNC_TYPE_vkSetEvent, vkAPIType_Sync);
-    AddInterfaceFunction(string("vkResetEvent"), vk_FUNC_TYPE_vkResetEvent, vkAPIType_Sync);
-    AddInterfaceFunction(string("vkDeviceWaitIdle"), vk_FUNC_TYPE_vkDeviceWaitIdle, vkAPIType_Sync);
+    AddInterfaceFunction(string("vkQueueWaitIdle"), FuncId_vkQueueWaitIdle, vkAPIType_Sync);
+    AddInterfaceFunction(string("vkDeviceWaitIdle"), FuncId_vkDeviceWaitIdle, vkAPIType_Sync);
+    AddInterfaceFunction(string("vkResetFences"), FuncId_vkResetFences, vkAPIType_Sync);
+    AddInterfaceFunction(string("vkGetFenceStatus"), FuncId_vkGetFenceStatus, vkAPIType_Sync);
+    AddInterfaceFunction(string("vkWaitForFences"), FuncId_vkWaitForFences, vkAPIType_Sync);
+    AddInterfaceFunction(string("vkGetEventStatus"), FuncId_vkGetEventStatus, vkAPIType_Sync);
+    AddInterfaceFunction(string("vkSetEvent"), FuncId_vkSetEvent, vkAPIType_Sync);
+    AddInterfaceFunction(string("vkResetEvent"), FuncId_vkResetEvent, vkAPIType_Sync);
 }
 void vulkanFunctionDefs::InitKHRAPI()
 {
-    AddInterfaceFunction(string("vkGetPhysicalDeviceSurfaceSupportKHR"), vk_FUNC_TYPE_vkGetPhysicalDeviceSurfaceSupportKHR, vkAPIType_KHR);
-    AddInterfaceFunction(string("vkGetSurfacePropertiesKHR"), vk_FUNC_TYPE_vkGetSurfacePropertiesKHR, vkAPIType_KHR);
-    AddInterfaceFunction(string("vkGetSurfaceFormatsKHR"), vk_FUNC_TYPE_vkGetSurfaceFormatsKHR, vkAPIType_KHR);
-    AddInterfaceFunction(string("vkGetSurfacePresentModesKHR"), vk_FUNC_TYPE_vkGetSurfacePresentModesKHR, vkAPIType_KHR);
-    AddInterfaceFunction(string("vkCreateSwapchainKHR"), vk_FUNC_TYPE_vkCreateSwapchainKHR, vkAPIType_KHR);
-    AddInterfaceFunction(string("vkDestroySwapchainKHR"), vk_FUNC_TYPE_vkDestroySwapchainKHR, vkAPIType_KHR);
-    AddInterfaceFunction(string("vkGetSwapchainImagesKHR"), vk_FUNC_TYPE_vkGetSwapchainImagesKHR, vkAPIType_KHR);
-    AddInterfaceFunction(string("vkAcquireNextImageKHR"), vk_FUNC_TYPE_vkAcquireNextImageKHR, vkAPIType_KHR);
-    AddInterfaceFunction(string("vkQueuePresentKHR"), vk_FUNC_TYPE_vkQueuePresentKHR, vkAPIType_KHR);
+    AddInterfaceFunction(string("vkCreateSwapchainKHR"), FuncId_vkCreateSwapchainKHR, vkAPIType_KHR);
+    AddInterfaceFunction(string("vkDestroySwapchainKHR"), FuncId_vkDestroySwapchainKHR, vkAPIType_KHR);
+    AddInterfaceFunction(string("vkGetSwapchainImagesKHR"), FuncId_vkGetSwapchainImagesKHR, vkAPIType_KHR);
+    AddInterfaceFunction(string("vkAcquireNextImageKHR"), FuncId_vkAcquireNextImageKHR, vkAPIType_KHR);
+    AddInterfaceFunction(string("vkQueuePresentKHR"), FuncId_vkQueuePresentKHR, vkAPIType_KHR);
+    AddInterfaceFunction(string("vkGetPhysicalDeviceSurfaceSupportKHR"), FuncId_vkGetPhysicalDeviceSurfaceSupportKHR, vkAPIType_KHR);
+    AddInterfaceFunction(string("vkGetPhysicalDeviceSurfaceCapabilitiesKHR"), FuncId_vkGetPhysicalDeviceSurfaceCapabilitiesKHR, vkAPIType_KHR);
+    AddInterfaceFunction(string("vkGetPhysicalDeviceSurfaceFormatsKHR"), FuncId_vkGetPhysicalDeviceSurfaceFormatsKHR, vkAPIType_KHR);
+    AddInterfaceFunction(string("vkGetPhysicalDeviceSurfacePresentModesKHR"), FuncId_vkGetPhysicalDeviceSurfacePresentModesKHR, vkAPIType_KHR);
+    AddInterfaceFunction(string("vkCreateWin32SurfaceKHR"), FuncId_vkCreateWin32SurfaceKHR, vkAPIType_KHR);
+    AddInterfaceFunction(string("vkGetPhysicalDeviceWin32PresentationSupportKHR"), FuncId_vkGetPhysicalDeviceWin32PresentationSupportKHR, vkAPIType_KHR);
 
 }
