@@ -589,16 +589,25 @@ gpCommandListSummaryTable::gpCommandListSummaryTable(gpTraceDataContainer* pData
     : gpSummaryTable(pDataContainer, pSessionView, (eCallType)3), m_pSessionDataContainer(pDataContainer), m_pTraceView(pSessionView), m_lastSelectedRowIndex(-1)
 {
     m_pSessionDataContainer = pDataContainer;
+    bool isDx12 = (pDataContainer != nullptr && pDataContainer->SessionAPIType() == ProfileSessionDataItem::ProfileItemAPIType::DX12_API_PROFILE_ITEM);
 
     QStringList columnCaptions;
-    columnCaptions << GP_STR_SummaryTableCommandListType;
+    if (isDx12)
+    {
+        columnCaptions << GP_STR_SummaryTableCommandListType;
+    }
+    else
+    { 
+        columnCaptions << GP_STR_SummaryTableCommandBufferType;
+    }
+
     columnCaptions << GP_STR_SummaryTableCommandListExecutionTime;
     columnCaptions << GP_STR_SummaryTableCommandListStartTime;
     columnCaptions << GP_STR_SummaryTableCommandListEndTime;
     columnCaptions << GP_STR_SummaryTableCommandListNumCommands;
     columnCaptions << GP_STR_SummaryTableCommandListGPUQueue;
 
-    if (pDataContainer != nullptr && pDataContainer->SessionAPIType() == ProfileSessionDataItem::ProfileItemAPIType::VK_API_PROFILE_ITEM)
+    if (isDx12)
     {
         columnCaptions << GP_STR_SummaryTableCommandListHandle;
     }

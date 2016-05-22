@@ -640,7 +640,8 @@
 #define GP_STR_SummaryTableColumnMaxTime "Max Time"
 #define GP_STR_SummaryTableColumnMinTime "Min Time"
 
-#define GP_STR_SummaryTableCommandListType "Command Buffer"
+#define GP_STR_SummaryTableCommandBufferType "Command Buffer"
+#define GP_STR_SummaryTableCommandListType "Command List"
 #define GP_STR_SummaryTableCommandListStartTime "Start time"
 #define GP_STR_SummaryTableCommandListEndTime "End time"
 #define GP_STR_SummaryTableCommandListExecutionTime "Execution time"
