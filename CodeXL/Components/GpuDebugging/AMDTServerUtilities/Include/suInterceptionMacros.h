@@ -15,7 +15,7 @@
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
 #include <AMDTOSAPIWrappers/Include/oaOpenGLIncludes.h>
 
-#if ((AMDT_BUILD_TARGET == AMDT_LINUX_OS)
+#if (AMDT_BUILD_TARGET == AMDT_LINUX_OS)
 #include "suSWMRInstance.h"
 #endif
 
@@ -363,7 +363,7 @@
 // Author:      Yaki Tebeka
 // Date:        30/11/2006
 // ---------------------------------------------------------------------------
-#if ((AMDT_BUILD_TARGET == AMDT_LINUX_OS)
+#if (AMDT_BUILD_TARGET == AMDT_LINUX_OS)
 #define SU_START_FUNCTION_WRAPPER(funcId) \
     suSWMRInstance::GetInstance().SharedLock();
 #else
