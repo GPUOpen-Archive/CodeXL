@@ -19,7 +19,7 @@
 #include <AMDTGpuProfiling/gpTraceDataContainer.h>
 
 #define CODEXL_INCLUDE
-#include <AMDTGpuProfiling/../Graphics/Server/VulkanServer/VKT/vktEnumerations.h>
+#include <Server/VulkanServer/VKT/vktEnumerations.h>
 #undef CODEXL_INCLUDE
 
 #define GP_DEFAULT_BUCKET_NUMBER 2000
