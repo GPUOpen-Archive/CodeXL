@@ -671,16 +671,16 @@ void gpCommandListSummaryTable::InitCommandListItems()
             if (!(*iter).m_commandListQueueName.isEmpty())
             {
                 afProgressBarWrapper::instance().incrementProgressBar();
-                QString commandListName = (*iter).m_commandListPtr;
+                QString commandListName = m_pSessionDataContainer->CommandListNameFromPointer((*iter).m_commandListPtr, (*iter).m_instanceIndex);
 
                 APISummaryCommandListInfo& info = infoArray[commandListIndex];
 
-                info.m_index = (*iter).m_instanceIndex;
+                info.m_index = commandListName;
 
                 info.m_gpuQueue = m_pSessionDataContainer->QueueDisplayName((*iter).m_commandListQueueName);
                 info.m_gpuQueueAddress = (*iter).m_commandListQueueName;
 
-                info.m_address = commandListName;
+                info.m_address = (*iter).m_commandListPtr;
                 info.m_minTimeMs = (*iter).m_startTime;
                 info.m_maxTimeMs = (*iter).m_endTime;
                 info.m_numCalls = (*iter).m_apiIndices.size();
@@ -822,7 +822,7 @@ void gpCommandListSummaryTable::AddSummaryRow(int rowIndex, APISummaryInfo* pInf
 bool gpCommandListSummaryTable::GetItemCommandList(int row, QString& callName)const
 {
     // Get the table widget item:
-    QTableWidgetItem* pItemInterface = item(row, COLUMN_ADDRESS);
+    QTableWidgetItem* pItemInterface = item(row, COLUMN_COMMAND_INDEX);
 
     if (pItemInterface != nullptr)
     {

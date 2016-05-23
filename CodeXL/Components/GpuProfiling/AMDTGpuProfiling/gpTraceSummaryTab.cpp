@@ -709,17 +709,14 @@ void gpCommandListSummaryTab::SetTop20TableCaption(const QString& callName)
 {
     GT_IF_WITH_ASSERT(m_pTop20Caption != nullptr)
     {
-        GT_ASSERT_EX(false, L"Should implement");
-        QString commandListIndex = m_pSessionDataContainer->CommandListNameFromPointer(callName, 0);
-
         int numItems = m_top20ItemList.count();
         if (numItems < MAX_ITEMS_IN_TABLE)
         {
-            m_pTop20Caption->setText(QString(GPU_STR_Top_CommandLists_Summary).arg(commandListIndex));
+            m_pTop20Caption->setText(QString(GPU_STR_Top_CommandLists_Summary).arg(callName));
         }
         else
         {
-            m_pTop20Caption->setText(QString(GPU_STR_Top_20_CommandLists_Summary).arg(MAX_ITEMS_IN_TABLE).arg(commandListIndex));
+            m_pTop20Caption->setText(QString(GPU_STR_Top_20_CommandLists_Summary).arg(MAX_ITEMS_IN_TABLE).arg(callName));
         }
     }
 }
