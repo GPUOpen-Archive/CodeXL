@@ -749,7 +749,7 @@ void gpTraceView::SelectItemInTraceTables(ProfileSessionDataItem* pItem, bool se
                 for (int i = 0; i < m_pGPUTraceTablesTabWidget->count(); i++)
                 {
                     QString tabText = m_pGPUTraceTablesTabWidget->tabText(i);
-                    QString queueDisplayName = ProfileSessionDataItem::QueueDisplayName(pItem->QueueName());
+                    QString queueDisplayName = m_pSessionDataContainer->QueueNameFromPointer(pItem->QueueName());
 
                     if (tabText.contains(queueDisplayName))
                     {
