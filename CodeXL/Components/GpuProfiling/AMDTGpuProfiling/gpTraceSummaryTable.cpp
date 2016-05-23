@@ -668,49 +668,52 @@ void gpCommandListSummaryTable::InitCommandListItems()
         auto iterEnd = commandListsData.end();
         for (; iter != iterEnd; iter++)
         {
-            afProgressBarWrapper::instance().incrementProgressBar();
-            QString commandListName = (*iter).m_commandListPtr;
-
-            APISummaryCommandListInfo& info = infoArray[commandListIndex];
-
-            info.m_index = (*iter).m_instanceIndex;
-
-            info.m_gpuQueue = m_pSessionDataContainer->QueueDisplayName((*iter).m_queueName);
-            info.m_gpuQueueAddress = (*iter).m_queueName;
-
-            info.m_address = commandListName;
-            info.m_minTimeMs = (*iter).m_startTime;
-            info.m_maxTimeMs = (*iter).m_endTime;
-            info.m_numCalls = (*iter).m_apiIndices.size();
-            info.m_executionTimeMS = ((*iter).m_endTime - (*iter).m_startTime);
-            info.m_typeColor = APIColorMap::Instance()->GetCommandListColor(commandListIndex);
-
-
-            for (auto apiIndex : (*iter).m_apiIndices)
+            if (!(*iter).m_commandListQueueName.isEmpty())
             {
-                ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItemByItemCallIndex((*iter).m_queueName, apiIndex+1);
-                GT_IF_WITH_ASSERT(pItem != nullptr)
-                {
-                    if (pItem->StartTime() == info.m_minTimeMs)
-                    {
-                        info.m_pMinTimeItem = pItem;
-                    }
-                    if (pItem->EndTime() == info.m_maxTimeMs)
-                    {
-                        info.m_pMaxTimeItem = pItem;
-                    }
+                afProgressBarWrapper::instance().incrementProgressBar();
+                QString commandListName = (*iter).m_commandListPtr;
 
-                    if (info.m_pMinTimeItem != nullptr && info.m_pMaxTimeItem != nullptr)
+                APISummaryCommandListInfo& info = infoArray[commandListIndex];
+
+                info.m_index = (*iter).m_instanceIndex;
+
+                info.m_gpuQueue = m_pSessionDataContainer->QueueDisplayName((*iter).m_commandListQueueName);
+                info.m_gpuQueueAddress = (*iter).m_commandListQueueName;
+
+                info.m_address = commandListName;
+                info.m_minTimeMs = (*iter).m_startTime;
+                info.m_maxTimeMs = (*iter).m_endTime;
+                info.m_numCalls = (*iter).m_apiIndices.size();
+                info.m_executionTimeMS = ((*iter).m_endTime - (*iter).m_startTime);
+                info.m_typeColor = APIColorMap::Instance()->GetCommandListColor(commandListIndex);
+
+
+                for (auto apiIndex : (*iter).m_apiIndices)
+                {
+                    ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItemByItemCallIndex((*iter).m_commandListQueueName, apiIndex + 1);
+                    GT_IF_WITH_ASSERT(pItem != nullptr)
                     {
-                        break;
+                        if (pItem->StartTime() == info.m_minTimeMs)
+                        {
+                            info.m_pMinTimeItem = pItem;
+                        }
+                        if (pItem->EndTime() == info.m_maxTimeMs)
+                        {
+                            info.m_pMaxTimeItem = pItem;
+                        }
+
+                        if (info.m_pMinTimeItem != nullptr && info.m_pMaxTimeItem != nullptr)
+                        {
+                            break;
+                        }
                     }
                 }
+
+                commandListIndex++;
+
+                m_allInfoSummaryMap.insert(commandListName, info);
+                m_apiCallInfoSummaryMap.insert(commandListName, info);
             }
-
-            commandListIndex++;
-
-            m_allInfoSummaryMap.insert(commandListName, info);
-            m_apiCallInfoSummaryMap.insert(commandListName, info);
         }
     }
 }

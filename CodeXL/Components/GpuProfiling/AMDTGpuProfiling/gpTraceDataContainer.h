@@ -50,7 +50,7 @@ public:
         CommandListInstanceData();
 
         /// The queue for which the command list belongs to
-        QString m_queueName;
+        QString m_commandListQueueName;
 
         /// A list of API calls indices
         QList<int> m_apiIndices;

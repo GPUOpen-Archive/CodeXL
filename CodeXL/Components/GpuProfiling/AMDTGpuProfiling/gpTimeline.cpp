@@ -285,27 +285,32 @@ void gpTimeline::AddCommandListsToTimeline()
             QString commandListName = (*iter).m_commandListPtr;
             int instnaceIndex = (*iter).m_instanceIndex;
 
-            acTimelineBranch* pQueueBranch = GetCommandListBranch((*iter).m_queueName);
-            GT_IF_WITH_ASSERT(pQueueBranch != nullptr)
+            // Make sure that the queue name is not empty
+            QString queueName = (*iter).m_commandListQueueName;
+            if (!queueName.isEmpty())
             {
-                // Create the command list timeline item
-                CommandListTimelineItem* pNewItem = new CommandListTimelineItem((*iter).m_startTime, (*iter).m_endTime, commandListName);
+                acTimelineBranch* pQueueBranch = GetCommandListBranch(queueName);
+                GT_IF_WITH_ASSERT(pQueueBranch != nullptr)
+                {
+                    // Create the command list timeline item
+                    CommandListTimelineItem* pNewItem = new CommandListTimelineItem((*iter).m_startTime, (*iter).m_endTime, commandListName);
 
-                // Set the command list name as the item text
-                QString commandListDisplayName = m_pSessionDataContainer->CommandListNameFromPointer(commandListName, instnaceIndex);
-                pNewItem->setText(commandListDisplayName);
+                    // Set the command list name as the item text
+                    QString commandListDisplayName = m_pSessionDataContainer->CommandListNameFromPointer(commandListName, instnaceIndex);
+                    pNewItem->setText(commandListDisplayName);
 
-                // Get the color for this command list by its index
-                QColor commandListColor = APIColorMap::Instance()->GetCommandListColor(commandListIndex);
-                pNewItem->setBackgroundColor(commandListColor);
+                    // Get the color for this command list by its index
+                    QColor commandListColor = APIColorMap::Instance()->GetCommandListColor(commandListIndex);
+                    pNewItem->setBackgroundColor(commandListColor);
 
-                // Add the item to the queue branch
-                pQueueBranch->addTimelineItem(pNewItem);
+                    // Add the item to the queue branch
+                    pQueueBranch->addTimelineItem(pNewItem);
 
-                // Index for coloring
-                commandListIndex++;
+                    // Index for coloring
+                    commandListIndex++;
 
-                m_cmdListTimelineItemMap.insert(commandListName, pNewItem);
+                    m_cmdListTimelineItemMap.insert(commandListName, pNewItem);
+                }
             }
         }
     }

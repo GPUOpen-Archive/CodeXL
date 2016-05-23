@@ -992,10 +992,27 @@ void gpTraceDataContainer::CloseCommandList(DX12APIInfo* pAPIInfo)
         // Get the command list pointer
         QString commandListPtr = QString::fromStdString(pAPIInfo->m_interfacePtrStr);
 
+        // Count other command list instance with the same command list pointer
+        int newCommandListIndex = -1;
+        for (int i = 0; i < m_commandListInstancesVector.size(); i++)
+        {
+            if (m_commandListInstancesVector[i].m_commandListPtr == commandListPtr)
+            {
+                // If there only was one instance so far, make sure that the already existing commnad list is indexed
+                if (m_commandListInstancesVector[i].m_instanceIndex < 0)
+                {
+                    m_commandListInstancesVector[i].m_instanceIndex = 1;
+                }
+
+                // Find the next available index for the new instance
+                newCommandListIndex = qMax(newCommandListIndex, m_commandListInstancesVector[i].m_instanceIndex + 1);
+            }
+        }
+
         // Add new command list instance to the vector
         CommandListInstanceData currentInstanceData;
+        currentInstanceData.m_instanceIndex = newCommandListIndex;
         currentInstanceData.m_commandListPtr = QString::fromStdString(pAPIInfo->m_interfacePtrStr);
-        currentInstanceData.m_queueName = m_commandListToQueueMap[currentInstanceData.m_commandListPtr];
 
         // Go through all the calls, and check if the command list pointer is in it's parameter's list
         for (auto iter = m_commandListUnAttachedCalls.begin(); iter != m_commandListUnAttachedCalls.end(); iter++)
@@ -1010,6 +1027,7 @@ void gpTraceDataContainer::CloseCommandList(DX12APIInfo* pAPIInfo)
                     // Add this sample id to the list of samples for this instance, and remove the item from the unattached list
                     currentInstanceData.m_sampleIds << pCurrentItem->SampleId();
                     m_commandListUnAttachedCalls.removeOne(pCurrentItem);
+                    currentInstanceData.m_commandListQueueName = m_commandListToQueueMap[commandListPtr];
                 }
             }
         }
@@ -1049,8 +1067,8 @@ QString gpTraceDataContainer::AddGPUCallToCommandList(APIInfo* pAPIInfo)
             }
 
 
-            // Get this sample id
-            if (m_commandListToQueueMap.contains(commandListName))
+            // Add this command list to the queue names map. Make sure that the command list was not added with a different name before
+            if (m_commandListToQueueMap.contains(commandListName) && !m_commandListToQueueMap[commandListName].isEmpty())
             {
                 GT_ASSERT_EX(m_commandListToQueueMap[commandListName] == queueName, L"This command list was already added with another queue name");
             }
@@ -1075,7 +1093,7 @@ QString gpTraceDataContainer::AddGPUCallToCommandList(APIInfo* pAPIInfo)
             GT_IF_WITH_ASSERT((commandListInstnaceIndex >= 0) && (commandListInstnaceIndex < m_commandListInstancesVector.size()))
             {
                 // Update the existing command list data with the current API call data
-                m_commandListInstancesVector[commandListInstnaceIndex].m_queueName = queueName;
+                m_commandListInstancesVector[commandListInstnaceIndex].m_commandListQueueName = queueName;
                 m_commandListInstancesVector[commandListInstnaceIndex].m_apiIndices.push_back(pAPIInfo->m_uiSeqID);
 
                 if ((m_commandListInstancesVector[commandListInstnaceIndex].m_startTime == std::numeric_limits<quint64>::max()) || (m_commandListInstancesVector[commandListInstnaceIndex].m_startTime > pAPIInfo->m_ullStart))
@@ -1232,7 +1250,7 @@ QString gpTraceDataContainer::QueueDisplayName(const QString& queuePtrStr)
 }
 
 gpTraceDataContainer::CommandListInstanceData::CommandListInstanceData() :
-    m_queueName(""),
+    m_commandListQueueName(""),
     m_startTime(std::numeric_limits<quint64>::max()),
     m_endTime(std::numeric_limits<quint64>::min()),
     m_instanceIndex(-1),
