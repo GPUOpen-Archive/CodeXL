@@ -372,15 +372,10 @@
 // Author:      Yaki Tebeka
 // Date:        30/11/2006
 // ---------------------------------------------------------------------------
-#ifdef SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC
+#if (AMDT_BUILD_TARGET == AMDT_LINUX_OS)
 #define SU_START_FUNCTION_WRAPPER(funcId) \
-<<<<<<< HEAD
     suSWMRInstance::SharedLock();
 #else
-=======
-    suSWMRInstance::GetInstance().SharedLock();
-#else // !defined(SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC)
->>>>>>> 16b25ed61bf5dc405ed9ae2453c93d07d1ca8598
 #define SU_START_FUNCTION_WRAPPER(funcId) 
 #endif
 
