@@ -64,8 +64,8 @@
       <AdditionalLibraryDirectories>$(AMDTTeapotOutputDir)Library;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /F /Y /I ..\AMDTTeaPot\res "$(AMDTTeapotOutputDir)\res"
-xcopy /F /Y ..\AMDTTeapotLicense.txt "$(AMDTTeapotOutputDir)"
+      <Command>rem xcopy /F /Y /I ..\AMDTTeaPot\res "$(AMDTTeapotOutputDir)\res"
+rem xcopy /F /Y ..\AMDTTeapotLicense.txt "$(AMDTTeapotOutputDir)"
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -92,8 +92,8 @@ xcopy /F /Y ..\AMDTTeapotLicense.txt "$(AMDTTeapotOutputDir)"
       <AdditionalLibraryDirectories>$(AMDTTeapotOutputDir)Library;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /F /Y /I ..\AMDTTeaPot\res "$(AMDTTeapotOutputDir)\res"
-xcopy /F /Y ..\AMDTTeapotLicense.txt "$(AMDTTeapotOutputDir)"
+      <Command>rem xcopy /F /Y /I ..\AMDTTeaPot\res "$(AMDTTeapotOutputDir)\res"
+rem xcopy /F /Y ..\AMDTTeapotLicense.txt "$(AMDTTeapotOutputDir)"
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
