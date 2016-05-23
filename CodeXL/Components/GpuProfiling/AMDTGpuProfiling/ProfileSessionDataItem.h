@@ -293,7 +293,7 @@ public:
 
     /// Gets the item end index
     /// \return the item end index
-    int GetEndIndex() const { return m_endIndex; }
+    int EndIndex() const { return m_endIndex; }
 
     /// Remove all the children of this item
     void RemoveAllChildren();
@@ -309,7 +309,11 @@ public:
     bool GetVKAPIType(vkAPIType& apiType);
 
     /// Get the item sample id
-    int GetSampleId()const { return m_sampleId; }
+    int SampleId()const { return m_sampleId; }
+
+    /// Return the session item interface pointer. Only relevant for DX12
+    /// \return string with the interface pointer for DX12 function, or an empty string for other APIs
+    QString InterfacePtr()const;
 
 private:
 

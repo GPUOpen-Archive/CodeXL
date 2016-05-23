@@ -557,7 +557,7 @@ VkResult VktWrappedCmdBuf::EndCommandBuffer_ICD(VkCommandBuffer commandBuffer)
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p", this);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p", commandBuffer);
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         result = device_dispatch_table(commandBuffer)->EndCommandBuffer(commandBuffer);

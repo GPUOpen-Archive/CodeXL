@@ -21,8 +21,10 @@
     #pragma warning ( pop )
 #endif
 
+// Infra
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
 #include <AMDTOSWrappers/Include/osStringConstants.h>
+#include <AMDTOSAPIWrappers/Include/oaDriver.h>
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     #define ZLIB_WINAPI
@@ -1055,6 +1057,12 @@ int dmnSessionThread::entryPoint()
                         GT_ASSERT(isOk);
                         break;
                     }
+                    case docIsHSAEnabled:
+                    {
+                        isOk = IsHSAEnabled();
+                        GT_ASSERT(isOk);
+                        break;
+                    }
 
                     default:
                     {
@@ -1177,6 +1185,26 @@ bool dmnSessionThread::KillRunningProcess()
         processNames.push_back(processName);
         osTerminateProcessesByName(processNames);
 
+        retVal = true;
+
+        // Send a success status to CodeXL client after getting the command arguments
+        ReportSuccess(m_pConnHandler);
+    }
+
+    return retVal;
+}
+
+bool dmnSessionThread::IsHSAEnabled()
+{
+    bool retVal = false;
+    GT_IF_WITH_ASSERT(m_pConnHandler != nullptr)
+    {
+#if (AMDT_BUILD_TARGET == AMDT_WINDOWS_OS)
+        bool isHSAInstalled = false;
+#elif (AMDT_BUILD_TARGET == AMDT_LINUX_OS)
+        bool isHSAInstalled = oaIsHSADriver();
+#endif
+        (*m_pConnHandler) << isHSAInstalled;
         retVal = true;
 
         // Send a success status to CodeXL client after getting the command arguments

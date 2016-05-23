@@ -67,7 +67,7 @@
     </Link>
     <PostBuildEvent>
       <Command>xcopy /F /Y /I ..\AMDTTeaPot\res "$(AMDTTeapotOutputDir)\res"
-xcopy /F /Y ..\AMDTTeapotLicense.txt "$(AMDTTeapotOutputDir)"
+ xcopy /F /Y ..\CXLTeapotLicense.txt "$(AMDTTeapotOutputDir)"
 </Command>
     </PostBuildEvent>
     <ResourceCompile>
@@ -95,7 +95,7 @@ xcopy /F /Y ..\AMDTTeapotLicense.txt "$(AMDTTeapotOutputDir)"
     </Link>
     <PostBuildEvent>
       <Command>xcopy /F /Y /I ..\AMDTTeaPot\res "$(AMDTTeapotOutputDir)\res"
-xcopy /F /Y ..\AMDTTeapotLicense.txt "$(AMDTTeapotOutputDir)"
+xcopy /F /Y ..\CXLTeapotLicense.txt "$(AMDTTeapotOutputDir)"
 </Command>
     </PostBuildEvent>
     <ResourceCompile>

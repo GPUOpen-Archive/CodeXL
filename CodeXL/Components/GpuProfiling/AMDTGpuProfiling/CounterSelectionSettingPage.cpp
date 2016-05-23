@@ -396,19 +396,17 @@ bool CounterSelectionSettingWindow::RestoreCurrentSettings()
     m_pGenerateOccupancyCB->setChecked(m_currentSettings.m_generateKernelOccupancy);
     m_pGpuTimeCollectCB->setChecked(m_currentSettings.m_measureKernelExecutionTime);
     m_pSpecificKernelsEdit->setText(acGTStringToQString(m_currentSettings.m_specificKernels));
+    const bool isHsaEnabled = Util::IsHSAEnabled();
+    m_pHSARadioButton->setEnabled(isHsaEnabled);
 
 #if (AMDT_BUILD_TARGET == AMDT_WINDOWS_OS)
     m_pHSARadioButton->setChecked(false);
-    m_pHSARadioButton->setEnabled(false);
 #endif
 
 #if (AMDT_BUILD_TARGET == AMDT_LINUX_OS)
 
     // Check if the catalyst and HSA are installed, and enable / check the OpenCL / HSA button accordingly:
     bool isCatalystInstalled = (afGlobalVariablesManager::instance().InstalledAMDComponentsBitmask() & AF_AMD_CATALYST_COMPONENT);
-    bool isHSAInstalled = (afGlobalVariablesManager::instance().InstalledAMDComponentsBitmask() & AF_AMD_HSA_COMPONENT);
-
-    m_pHSARadioButton->setEnabled(isHSAInstalled);
     m_pOpenCLRadioButton->setEnabled(isCatalystInstalled);
 
     if (!isCatalystInstalled)
@@ -549,6 +547,9 @@ bool CounterSelectionSettingWindow::AreSettingsValid(gtString& invalidMessageStr
 
 bool CounterSelectionSettingWindow::SaveCurrentSettings()
 {
+    const bool isHsaEnabled = Util::IsHSAEnabled();
+    m_pHSARadioButton->setEnabled(isHsaEnabled);
+
     m_currentSettings.m_api = m_pOpenCLRadioButton->isChecked() ? APIToTrace_OPENCL : APIToTrace_HSA;
     m_currentSettings.m_generateKernelOccupancy = m_pGenerateOccupancyCB->isChecked();
     m_currentSettings.m_measureKernelExecutionTime = m_pGpuTimeCollectCB->isChecked();

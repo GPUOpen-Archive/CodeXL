@@ -7,7 +7,7 @@
 using namespace std;
 
 #define CODEXL_INCLUDE
-#include <AMDTGpuProfiling/../Graphics/Server/VulkanServer/VKT/vktEnumerations.h>
+#include <Server/VulkanServer/VKT/vktEnumerations.h>
 #undef CODEXL_INCLUDE
 
 // ----------------------------------------------------------------------------------

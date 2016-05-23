@@ -275,36 +275,42 @@ void gpTimeline::AddCommandListsToTimeline()
     GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
     {
         // Get the command lists data from the session data container
-        const QMap<QString, gpTraceDataContainer::CommandListData>& commandListsData = m_pSessionDataContainer->CommandListsData();
+        const QVector<gpTraceDataContainer::CommandListInstanceData>& commandListsData = m_pSessionDataContainer->CommandListsData();
 
         int commandListIndex = 0;
         auto iter = commandListsData.begin();
         auto iterEnd = commandListsData.end();
         for (; iter != iterEnd; iter++)
         {
-            QString commandListName = iter.key();
-            gpTraceDataContainer::CommandListData commandListData = commandListsData[commandListName];
-            acTimelineBranch* pQueueBranch = GetCommandListBranch(commandListData.m_queueName);
-            GT_IF_WITH_ASSERT(pQueueBranch != nullptr)
+            QString commandListName = (*iter).m_commandListPtr;
+            int instnaceIndex = (*iter).m_instanceIndex;
+
+            // Make sure that the queue name is not empty
+            QString queueName = (*iter).m_commandListQueueName;
+            if (!queueName.isEmpty())
             {
-                // Create the command list timeline item
-                CommandListTimelineItem* pNewItem = new CommandListTimelineItem(commandListData.m_startTime, commandListData.m_endTime, iter.key());
+                acTimelineBranch* pQueueBranch = GetCommandListBranch(queueName);
+                GT_IF_WITH_ASSERT(pQueueBranch != nullptr)
+                {
+                    // Create the command list timeline item
+                    CommandListTimelineItem* pNewItem = new CommandListTimelineItem((*iter).m_startTime, (*iter).m_endTime, commandListName);
 
-                // Set the command list name as the item text
-                QString commandListDisplayName = m_pSessionDataContainer->CommandListNameFromPointer(commandListName);
-                pNewItem->setText(commandListDisplayName);
+                    // Set the command list name as the item text
+                    QString commandListDisplayName = m_pSessionDataContainer->CommandListNameFromPointer(commandListName, instnaceIndex);
+                    pNewItem->setText(commandListDisplayName);
 
-                // Get the color for this command list by its index
-                QColor commandListColor = APIColorMap::Instance()->GetCommandListColor(commandListIndex);
-                pNewItem->setBackgroundColor(commandListColor);
+                    // Get the color for this command list by its index
+                    QColor commandListColor = APIColorMap::Instance()->GetCommandListColor(commandListIndex);
+                    pNewItem->setBackgroundColor(commandListColor);
 
-                // Add the item to the queue branch
-                pQueueBranch->addTimelineItem(pNewItem);
+                    // Add the item to the queue branch
+                    pQueueBranch->addTimelineItem(pNewItem);
 
-                // Index for coloring
-                commandListIndex++;
+                    // Index for coloring
+                    commandListIndex++;
 
-                m_cmdListTimelineItemMap.insert(commandListName, pNewItem);
+                    m_cmdListTimelineItemMap.insert(commandListName, pNewItem);
+                }
             }
         }
     }

@@ -11,6 +11,18 @@
 #ifndef __SUSWMRINSTANCE_H
 #define __SUSWMRINSTANCE_H
 
+<<<<<<< HEAD
+=======
+// Infra:
+#include <AMDTBaseTools/Include/AMDTDefinitions.h>
+
+// This function has about a 5% impact on OpenGL application performance, so we
+// dont use it on Windows:
+#if (AMDT_BUILD_TARGET == AMDT_LINUX_OS)
+#define SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC 1
+
+#include <mutex>
+>>>>>>> 16b25ed61bf5dc405ed9ae2453c93d07d1ca8598
 
 ////////////////////////////////////////////////////////////////////////////////////
 /// \class suSWMRInstance
@@ -52,6 +64,8 @@ public:
 
 private:
 };
+
+#endif // AMDT_BUILD_TARGET == AMDT_LINUX_OS
 
 #endif // __SUSWMRINSTANCE_H
 

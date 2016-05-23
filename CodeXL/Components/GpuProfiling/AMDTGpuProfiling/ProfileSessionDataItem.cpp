@@ -303,17 +303,17 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
     m_pParent(nullptr),
     m_itemType(DX12_API_PROFILE_ITEM, 0),
     m_pOwnerCPUAPIItem(nullptr),
-    m_itemIndex(-1),
-    m_endIndex(-1),
-    m_api(APIToTrace_Unknown),
-    m_pOccupancyInfo(nullptr),
-    m_startTime(0),
-    m_endTime(0),
-    m_tid(0),
-    m_queueName(""),
-    m_pApiInfo(pApiInfo),
-    m_sampleId(0),
-    m_pSessionDataContainer(pSessionDataContainer)
+m_itemIndex(-1),
+m_endIndex(-1),
+m_api(APIToTrace_Unknown),
+m_pOccupancyInfo(nullptr),
+m_startTime(0),
+m_endTime(0),
+m_tid(0),
+m_queueName(""),
+m_pApiInfo(pApiInfo),
+m_sampleId(0),
+m_pSessionDataContainer(pSessionDataContainer)
 {
     for (int i = 0; i < ProfileSessionDataItem::SESSION_ITEM_COLUMN_COUNT; i++)
     {
@@ -396,7 +396,6 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
 
         m_data[ProfileSessionDataItem::SESSION_ITEM_PARAMETERS_COLUMN] = QString::fromStdString(pApiInfo->m_ArgList);
         m_data[ProfileSessionDataItem::SESSION_ITEM_RESULT_COLUMN] = QString::fromStdString(pApiInfo->m_strRet);
-        m_data[ProfileSessionDataItem::SESSION_ITEM_COMMAND_LIST_COLUMN] = m_pSessionDataContainer->CommandListNameFromPointer(QString::fromStdString(pApiInfo->m_commandListPtrStr));
 
 
         // Set the start and end time. DX12 timestamps are stored in Nanoseconds
@@ -455,9 +454,8 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
         m_startTime = pApiInfo->m_ullStart;
         m_endTime = pApiInfo->m_ullEnd;
 
-        // removed calc of m_data[ProfileSessionDataItem::SESSION_ITEM_CPU_TIME_COLUMN] because it will be calulated on GetColumnData()
-
         m_tid = pApiInfo->m_tid;
+        m_sampleId = pApiInfo->m_sampleId;
     }
 }
 
@@ -505,13 +503,14 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
 
         m_data[ProfileSessionDataItem::SESSION_ITEM_PARAMETERS_COLUMN] = QString::fromStdString(pApiInfo->m_ArgList);
         m_data[ProfileSessionDataItem::SESSION_ITEM_RESULT_COLUMN] = QString::fromStdString(pApiInfo->m_strRet);
-        m_data[ProfileSessionDataItem::SESSION_ITEM_COMMAND_BUFFER_COLUMN] = m_pSessionDataContainer->CommandListNameFromPointer( QString::fromStdString(pApiInfo->m_commandBufferHandleStr));
+        m_data[ProfileSessionDataItem::SESSION_ITEM_COMMAND_BUFFER_COLUMN] = m_pSessionDataContainer->GetContainingCommandList(pApiInfo);
 
         // Set the start and end time. DX12 timestamps are stored in Nanoseconds
         m_startTime = pApiInfo->m_ullStart;
         m_endTime = pApiInfo->m_ullEnd;
 
         m_tid = pApiInfo->m_tid;
+        m_sampleId = pApiInfo->m_sampleId;
     }
 }
 
@@ -633,6 +632,21 @@ bool ProfileSessionDataItem::GetVKAPIType(vkAPIType& apiType)
         }
     }
 
+    return retVal;
+}
+
+QString ProfileSessionDataItem::InterfacePtr() const
+{
+    QString retVal;
+
+    if ((m_itemType.m_itemMainType == DX12_API_PROFILE_ITEM) || (m_itemType.m_itemMainType == DX12_GPU_PROFILE_ITEM))
+    {
+        DX12APIInfo* pDXInfo = (DX12APIInfo*)m_pApiInfo;
+        if (pDXInfo != nullptr)
+        {
+            retVal = QString::fromStdString(pDXInfo->m_interfacePtrStr);
+        }
+    }
     return retVal;
 }
 
@@ -847,6 +861,8 @@ void ProfileSessionDataItem::SetColumnData(int columnIndex, QVariant data)
     {
         case ProfileSessionDataItem::SESSION_ITEM_INDEX_COLUMN:
         case ProfileSessionDataItem::SESSION_ITEM_INTERFACE_COLUMN:
+        case ProfileSessionDataItem::SESSION_ITEM_COMMAND_LIST_COLUMN:
+        case ProfileSessionDataItem::SESSION_ITEM_COMMAND_BUFFER_COLUMN:
         case ProfileSessionDataItem::SESSION_ITEM_PARAMETERS_COLUMN:
         case ProfileSessionDataItem::SESSION_ITEM_RESULT_COLUMN:
         case ProfileSessionDataItem::SESSION_ITEM_CPU_TIME_COLUMN:

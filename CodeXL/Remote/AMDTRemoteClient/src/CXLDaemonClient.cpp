@@ -2122,8 +2122,30 @@ public:
         return retVal;
     }
 
+    bool IsHSAEnabled()
+    {
+        bool retVal = false;
+        bool isHSAEnabled = false;
+        m_tcpClient << docIsHSAEnabled;
+        // Verify.
+        gtInt32 opStatus = dosFailure;
+        m_tcpClient >> opStatus;
+        retVal = (opStatus == dosSuccess);
+        GT_ASSERT_EX(retVal, L"OpCode receive ack.");
 
-    // Power Profiling - End.
+
+        if (retVal)
+        {
+            m_tcpClient >> isHSAEnabled;
+            // Verify that data was received by the remote agent
+            opStatus = dosFailure;
+            m_tcpClient >> opStatus;
+            retVal = (opStatus == dosSuccess);
+            GT_ASSERT_EX(retVal, L"OpCode receive ack.");
+        }
+        return isHSAEnabled;
+    }
+
 private:
     long m_readTimeout;
     bool m_isConnected;
@@ -2717,4 +2739,15 @@ bool CXLDaemonClient::GetDaemonAddress(osPortAddress& address)
     }
 
     return false;
+}
+
+bool CXLDaemonClient::IsHSAEnabled()
+{
+    bool result = false;
+    if (m_pImpl != nullptr)
+    {
+        result = m_pImpl->IsHSAEnabled();
+    }
+
+    return result;
 }

@@ -33,10 +33,12 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="RemotePowerProfiling.props" />
     <Import Project="$(AMDTCommonEXT)\Boost\Global-Boost-2015.props" />
+    <Import Project="..\..\..\Common\Lib\AMD\APPSDK\Global-OpenCL-NoLib.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="RemotePowerProfiling.props" />
     <Import Project="$(AMDTCommonEXT)\Boost\Global-Boost-2015.props" />
+    <Import Project="..\..\..\Common\Lib\AMD\APPSDK\Global-OpenCL-NoLib.props" />
   </ImportGroup>
   <PropertyGroup>
     <TargetName>CodeXLRemoteAgent$(GDTProjectSuffix)</TargetName>
@@ -57,7 +59,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
       <ImportLibrary>$(AMDTOutputDir)$(Configuration)\arch\$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>zlibstat.lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>zlibstat.lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;CXLOSAPIWrappers$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(AMDTOutputDir)$(Configuration)\arch;$(AMDTCommonExt)zlib\1.2.8\contrib\vstudio\vc12\$(GDTPlatform)\ZlibStat$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>

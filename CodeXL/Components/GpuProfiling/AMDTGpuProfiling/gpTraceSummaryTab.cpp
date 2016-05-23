@@ -263,6 +263,7 @@ void gpTraceSummaryTab::OnSummaryTableSelectionChanged()
             GT_ASSERT(pSummaryTable != nullptr);
             if (pSummaryTable->GetItemCallIndex(rowIndex, apiCall, callName))
             {
+                m_currentCallIndex = apiCall;
                 FillTop20Table(apiCall, callName);
                 pItem = pSummaryTable->GetRelatedItem(rowIndex, index.column());
                 SyncSelectionInOtherControls(pItem);
@@ -670,18 +671,28 @@ void gpCommandListSummaryTab::FillTop20List(CallIndexId apiCall, const QString& 
         gpCommandListSummaryTable* pSummaryTable = dynamic_cast<gpCommandListSummaryTable*>(m_pSummaryTable);
         GT_ASSERT(pSummaryTable != nullptr);
 
-        const QMap<QString, gpTraceDataContainer::CommandListData>& commandListsData = m_pSessionDataContainer->CommandListsData();
-
-        gpTraceDataContainer::CommandListData currCommandList = commandListsData.value(callName);
-
-        for (auto apiIndex : currCommandList.m_apiIndices)
+        const QVector<gpTraceDataContainer::CommandListInstanceData>& commandListsData = m_pSessionDataContainer->CommandListsData();
+        for (int i = 0; i < commandListsData.size(); i++)
         {
-            ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItemByItemCallIndex(currCommandList.m_queueName, apiIndex+1);// NZ???
-            GT_IF_WITH_ASSERT(pItem != nullptr)
+            QString cmdListPtr = commandListsData[i].m_commandListPtr;
+            int instanceIndex = commandListsData[i].m_instanceIndex;
+            QString currentCmdListName = m_pSessionDataContainer->CommandListNameFromPointer(cmdListPtr, instanceIndex);
+            if (callName == currentCmdListName)
             {
-                m_top20ItemList.push_back(pItem);
+                // Add all the API indices for this command list instance
+                for (auto apiIndex : commandListsData[i].m_apiIndices)
+                {
+                    ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItemByItemCallIndex(commandListsData[i].m_commandListQueueName, apiIndex + 1);
+                    GT_IF_WITH_ASSERT(pItem != nullptr)
+                    {
+                        m_top20ItemList.push_back(pItem);
+                    }
+                }
+                break;
             }
         }
+
+        
     }
 }
 
@@ -699,16 +710,14 @@ void gpCommandListSummaryTab::SetTop20TableCaption(const QString& callName)
 {
     GT_IF_WITH_ASSERT(m_pTop20Caption != nullptr)
     {
-        QString commandListIndex = m_pSessionDataContainer->CommandListNameFromPointer(callName);
-
         int numItems = m_top20ItemList.count();
         if (numItems < MAX_ITEMS_IN_TABLE)
         {
-            m_pTop20Caption->setText(QString(GPU_STR_Top_CommandLists_Summary).arg(commandListIndex));
+            m_pTop20Caption->setText(QString(GPU_STR_Top_CommandLists_Summary).arg(callName));
         }
         else
         {
-            m_pTop20Caption->setText(QString(GPU_STR_Top_20_CommandLists_Summary).arg(MAX_ITEMS_IN_TABLE).arg(commandListIndex));
+            m_pTop20Caption->setText(QString(GPU_STR_Top_20_CommandLists_Summary).arg(MAX_ITEMS_IN_TABLE).arg(callName));
         }
     }
 }

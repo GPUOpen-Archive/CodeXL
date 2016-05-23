@@ -874,11 +874,19 @@ void gaFlushLogFileAfterEachFunctionCallStub(osSocket& apiSocket)
 // \date        11/05/2016
 void gaLockDriverThreadsStub(osSocket& apiSocket)
 {
+<<<<<<< HEAD
     bool retVal = true;
 
     suSWMRInstance::UniqueLock();
 
     apiSocket << retVal;
+=======
+    GT_UNREFERENCED_PARAMETER(apiSocket);
+
+#ifdef SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC
+    suSWMRInstance::GetInstance().UniqueLock();
+#endif
+>>>>>>> 16b25ed61bf5dc405ed9ae2453c93d07d1ca8598
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -888,11 +896,19 @@ void gaLockDriverThreadsStub(osSocket& apiSocket)
 // \date        11/05/2016
 void gaUnLockDriverThreadsStub(osSocket& apiSocket)
 {
+<<<<<<< HEAD
     bool retVal = true;
 
     suSWMRInstance::UniqueUnLock();
 
     apiSocket << retVal;
+=======
+    GT_UNREFERENCED_PARAMETER(apiSocket);
+
+#ifdef SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC
+    suSWMRInstance::GetInstance().UniqueUnLock();
+#endif
+>>>>>>> 16b25ed61bf5dc405ed9ae2453c93d07d1ca8598
 }
 
 
