@@ -91,6 +91,12 @@
     <ClCompile Include="src\suMemoryAllocationMonitor.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\suSWMRImpl.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\suSWMRInstance.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\suStringConstants.h">
@@ -183,6 +189,12 @@
     <ClInclude Include="Include\suMemoryAllocationMonitor.h">
       <Filter>inc</Filter>
     </ClInclude>
+    <ClInclude Include="Include\suSWMRInstance.h">
+      <Filter>public inc</Filter>
+    </ClInclude>
+    <ClInclude Include="src\suSWMRImpl.h">
+      <Filter>inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -199,8 +211,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\..\..\..\CommonProjects\VersionInfo\VersionResource.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
+    <ResourceCompile Include="..\..\..\..\Common\Src\VersionInfo\VersionResource.rc" />
   </ItemGroup>
 </Project>

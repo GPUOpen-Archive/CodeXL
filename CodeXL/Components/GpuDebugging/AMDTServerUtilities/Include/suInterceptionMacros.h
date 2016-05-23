@@ -96,17 +96,12 @@
 // ---------------------------------------------------------------------------
 #ifdef SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC
 #define SU_START_FUNCTION_WRAPPER(funcId) \
-<<<<<<< HEAD
-    su_stat_functionInterceptionInfo[funcId]._isCurrentlyInsideWrapper = true; \
-    suSWMRInstance::SharedLock();
-=======
-    suSWMRInstance::GetInstance().SharedLock(); \
+        suSWMRInstance::SharedLock();
     su_stat_functionInterceptionInfo[funcId]._isCurrentlyInsideWrapper = true;
 #else // !defined(SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC)
 #define SU_START_FUNCTION_WRAPPER(funcId) \
     su_stat_functionInterceptionInfo[funcId]._isCurrentlyInsideWrapper = true;
 #endif
->>>>>>> 16b25ed61bf5dc405ed9ae2453c93d07d1ca8598
 
 // ---------------------------------------------------------------------------
 // Name:        SU_START_DRAW_FUNCTION_WRAPPER
@@ -372,10 +367,10 @@
 // Author:      Yaki Tebeka
 // Date:        30/11/2006
 // ---------------------------------------------------------------------------
-#if (AMDT_BUILD_TARGET == AMDT_LINUX_OS)
+#ifdef SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC
 #define SU_START_FUNCTION_WRAPPER(funcId) \
     suSWMRInstance::SharedLock();
-#else
+#else // !defined(SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC)
 #define SU_START_FUNCTION_WRAPPER(funcId) 
 #endif
 
@@ -397,10 +392,10 @@
 // Author:      Yaki Tebeka
 // Date:        30/11/2006
 // ---------------------------------------------------------------------------
-#if (AMDT_BUILD_TARGET == AMDT_LINUX_OS)
+#ifdef SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC
 #define SU_START_DRAW_FUNCTION_WRAPPER(funcId) if (gs_stat_isInNullOpenGLImplementationMode) { return; }; \
     suSWMRInstance::SharedLock();
-#else
+#else // !defined(SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC)
 #define SU_START_DRAW_FUNCTION_WRAPPER(funcId) if (gs_stat_isInNullOpenGLImplementationMode) { return; };
 #endif
 
@@ -421,10 +416,10 @@
 // Author:      Yaki Tebeka
 // Date:        30/11/2006
 // ---------------------------------------------------------------------------
-#if (AMDT_BUILD_TARGET == AMDT_LINUX_OS)
+#ifdef SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC
 #define SU_END_FUNCTION_WRAPPER(funcId) if (!su_stat_interoperabilityHelper.isInNestedFunction()) {SU_TECHNOLOGY_MONITOR.afterMonitoredFunctionExecutionActions(funcId);}; \
     suSWMRInstance::SharedUnLock();
-#else
+#else // !defined(SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC)
 #define SU_END_FUNCTION_WRAPPER(funcId) if (!su_stat_interoperabilityHelper.isInNestedFunction()) {SU_TECHNOLOGY_MONITOR.afterMonitoredFunctionExecutionActions(funcId);};
 #endif
 	

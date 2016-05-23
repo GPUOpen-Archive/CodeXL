@@ -1,4 +1,8 @@
-#include "suSWMRImpl.h"
+
+// Local:
+#include <src/suSWMRImpl.h>
+
+// STL:
 #include <iostream>
 
 

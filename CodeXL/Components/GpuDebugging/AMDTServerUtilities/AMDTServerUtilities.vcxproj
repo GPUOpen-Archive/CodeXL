@@ -86,12 +86,19 @@
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\suSpyToAPIConnector.cpp" />
+    <ClCompile Include="src\suSWMRImpl.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\suSWMRInstance.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="src\suTechnologyMonitorsManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\suIKernelDebuggingManager.h" />
     <ClInclude Include="Include\suInteroperabilityHelper.h" />
     <ClInclude Include="Include\suMemoryAllocationMonitor.h" />
+    <ClInclude Include="Include\suSWMRInstance.h" />
     <ClInclude Include="Include\suTechnologyMonitorsManager.h" />
     <ClInclude Include="src\suAPICallsHandlingThread.h" />
     <ClInclude Include="src\suAPIFunctionsImplementations.h" />
@@ -119,6 +126,7 @@
     <ClInclude Include="Include\suSpyAPIFunctions.h" />
     <ClInclude Include="Include\suSpyBreakpointImplementation.h" />
     <ClInclude Include="Include\suStringConstants.h" />
+    <ClInclude Include="src\suSWMRImpl.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuildStep Include="Sconstruct">
