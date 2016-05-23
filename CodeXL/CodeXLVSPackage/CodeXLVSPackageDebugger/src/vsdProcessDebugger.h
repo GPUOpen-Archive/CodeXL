@@ -292,6 +292,8 @@ private:
     // Instances of process information wrappers:
     osCriticalSection m_threadDataCS;
     gtPtrVector<vsdCDebugThread*> m_debuggedProcessThreads;
+    vsdCDebugThread* m_debuggedProcessSuspensionThread1;
+    vsdCDebugThread* m_debuggedProcessSuspensionThread2;
     gtPtrVector<vsdHostBreakpoint*> m_hostBreakpoints;
 
     // Interface implementations:
