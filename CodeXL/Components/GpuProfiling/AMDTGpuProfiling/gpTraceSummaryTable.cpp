@@ -661,7 +661,7 @@ void gpCommandListSummaryTable::InitCommandListItems()
     GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
     {
         APISummaryCommandListInfo infoArray[SUMMARY_INFO_ARRAY_SIZE] = {};
-        const QMap<QString, gpTraceDataContainer::CommandListData>& commandListsData = m_pSessionDataContainer->CommandListsData();
+        const QVector<gpTraceDataContainer::CommandListInstanceData>& commandListsData = m_pSessionDataContainer->CommandListsData();
 
         int commandListIndex = 0;
         auto iter = commandListsData.begin();
@@ -669,27 +669,26 @@ void gpCommandListSummaryTable::InitCommandListItems()
         for (; iter != iterEnd; iter++)
         {
             afProgressBarWrapper::instance().incrementProgressBar();
-            QString commandListName = iter.key();
-            gpTraceDataContainer::CommandListData commandListData = commandListsData[commandListName];
+            QString commandListName = (*iter).m_commandListPtr;
 
             APISummaryCommandListInfo& info = infoArray[commandListIndex];
 
-            info.m_index = m_pSessionDataContainer->CommandListNameFromPointer(commandListName);
+            info.m_index = (*iter).m_instanceIndex;
 
-            info.m_gpuQueue = m_pSessionDataContainer->QueueDisplayName(commandListData.m_queueName);
-            info.m_gpuQueueAddress = commandListData.m_queueName;
+            info.m_gpuQueue = m_pSessionDataContainer->QueueDisplayName((*iter).m_queueName);
+            info.m_gpuQueueAddress = (*iter).m_queueName;
 
             info.m_address = commandListName;
-            info.m_minTimeMs = commandListData.m_startTime;
-            info.m_maxTimeMs = commandListData.m_endTime;
-            info.m_numCalls = commandListData.m_apiIndices.size();
-            info.m_executionTimeMS = (commandListData.m_endTime - commandListData.m_startTime);
+            info.m_minTimeMs = (*iter).m_startTime;
+            info.m_maxTimeMs = (*iter).m_endTime;
+            info.m_numCalls = (*iter).m_apiIndices.size();
+            info.m_executionTimeMS = ((*iter).m_endTime - (*iter).m_startTime);
             info.m_typeColor = APIColorMap::Instance()->GetCommandListColor(commandListIndex);
 
 
-            for (auto apiIndex : commandListData.m_apiIndices)
+            for (auto apiIndex : (*iter).m_apiIndices)
             {
-                ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItemByItemCallIndex(commandListData.m_queueName, apiIndex+1); // NZ ???
+                ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItemByItemCallIndex((*iter).m_queueName, apiIndex+1);
                 GT_IF_WITH_ASSERT(pItem != nullptr)
                 {
                     if (pItem->StartTime() == info.m_minTimeMs)
@@ -751,63 +750,68 @@ void gpCommandListSummaryTable::AddSummaryRow(int rowIndex, APISummaryInfo* pInf
 
         insertRow(rowIndex);
 
-        for (int i = 0; i < CommandListSummaryColumnIndex::COLUMN_COUNT; i++)
+
+        // Sanity check: make sure that the string are fully built
+        GT_IF_WITH_ASSERT(rowStrings.size() >= CommandListSummaryColumnIndex::COLUMN_COUNT - 1)
         {
-            QTableWidgetItem* pItem = nullptr;
+            for (int i = 0; i < CommandListSummaryColumnIndex::COLUMN_COUNT; i++)
+            {
+                QTableWidgetItem* pItem = nullptr;
 
-            bool shouldSetValue = true;
+                bool shouldSetValue = true;
 
-            switch (i)
-            {
-            case COLUMN_ADDRESS:
-            case COLUMN_COMMAND_INDEX:
-            {
-                pItem = allocateNewWidgetItem(rowStrings[i]);
-                setItem(rowIndex, i, pItem);
-                initItem(*pItem, rowStrings[i], nullptr, false, Qt::Unchecked, nullptr);
-                setItemTextColor(rowIndex, i, pInfo->m_typeColor);
-                shouldSetValue = false;
-            }
-            break;
-            case COLUMN_GPU_QUEUE:
-            {
-                pItem = allocateNewWidgetItem(rowStrings[i]);
-                setItem(rowIndex, i, pItem);
-                initItem(*pItem, rowStrings[i], nullptr, false, Qt::Unchecked, nullptr);
-                shouldSetValue = false;
-            }
-            break;
+                switch (i)
+                {
+                case COLUMN_ADDRESS:
+                case COLUMN_COMMAND_INDEX:
+                {
+                    pItem = allocateNewWidgetItem(rowStrings[i]);
+                    setItem(rowIndex, i, pItem);
+                    initItem(*pItem, rowStrings[i], nullptr, false, Qt::Unchecked, nullptr);
+                    setItemTextColor(rowIndex, i, pInfo->m_typeColor);
+                    shouldSetValue = false;
+                }
+                break;
+                case COLUMN_GPU_QUEUE:
+                {
+                    pItem = allocateNewWidgetItem(rowStrings[i]);
+                    setItem(rowIndex, i, pItem);
+                    initItem(*pItem, rowStrings[i], nullptr, false, Qt::Unchecked, nullptr);
+                    shouldSetValue = false;
+                }
+                break;
 
-            case COLUMN_START_TIME:
-            case COLUMN_END_TIME:
-            {
-                pItem = new FormattedTimeItem();
-                ((FormattedTimeItem*)pItem)->SetAsLink(true);
+                case COLUMN_START_TIME:
+                case COLUMN_END_TIME:
+                {
+                    pItem = new FormattedTimeItem();
+                    ((FormattedTimeItem*)pItem)->SetAsLink(true);
 
-            }
-            break;
-            case COLUMN_EXECUTION_TIME:
-            {
-                pItem = new FormattedTimeItem();
-            }
-            break;
-            case COLUMN_NUM_OF_COMMANDS:
-            {
-                pItem = new QTableWidgetItem();
-            }
-            break;
-            }
+                }
+                break;
+                case COLUMN_EXECUTION_TIME:
+                {
+                    pItem = new FormattedTimeItem();
+                }
+                break;
+                case COLUMN_NUM_OF_COMMANDS:
+                {
+                    pItem = new QTableWidgetItem();
+                }
+                break;
+                }
 
-            if (shouldSetValue)
-            {
-                setItem(rowIndex, i, pItem);
-                QVariant dataVariant;
-                dataVariant.setValue(rowStrings[i].toDouble());
-                pItem->setData(Qt::DisplayRole, dataVariant);
-                pItem->setToolTip(pItem->text());
-            }
+                if (shouldSetValue)
+                {
+                    setItem(rowIndex, i, pItem);
+                    QVariant dataVariant;
+                    dataVariant.setValue(rowStrings[i].toDouble());
+                    pItem->setData(Qt::DisplayRole, dataVariant);
+                    pItem->setToolTip(pItem->text());
+                }
 
-            pItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+                pItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+            }
         }
     }
 }

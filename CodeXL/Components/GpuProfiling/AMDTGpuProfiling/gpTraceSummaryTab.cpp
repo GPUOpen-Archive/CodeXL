@@ -670,18 +670,28 @@ void gpCommandListSummaryTab::FillTop20List(CallIndexId apiCall, const QString& 
         gpCommandListSummaryTable* pSummaryTable = dynamic_cast<gpCommandListSummaryTable*>(m_pSummaryTable);
         GT_ASSERT(pSummaryTable != nullptr);
 
-        const QMap<QString, gpTraceDataContainer::CommandListData>& commandListsData = m_pSessionDataContainer->CommandListsData();
-
-        gpTraceDataContainer::CommandListData currCommandList = commandListsData.value(callName);
-
-        for (auto apiIndex : currCommandList.m_apiIndices)
+        const QVector<gpTraceDataContainer::CommandListInstanceData>& commandListsData = m_pSessionDataContainer->CommandListsData();
+        for (int i = 0; i < commandListsData.size(); i++)
         {
-            ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItemByItemCallIndex(currCommandList.m_queueName, apiIndex+1);// NZ???
-            GT_IF_WITH_ASSERT(pItem != nullptr)
+            QString cmdListPtr = commandListsData[i].m_commandListPtr;
+            int instanceIndex = commandListsData[i].m_instanceIndex;
+            QString currentCmdListName = m_pSessionDataContainer->CommandListNameFromPointer(cmdListPtr, instanceIndex);
+            if (callName == currentCmdListName)
             {
-                m_top20ItemList.push_back(pItem);
+                // Add all the API indices for this command list instance
+                for (auto apiIndex : commandListsData[i].m_apiIndices)
+                {
+                    ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItemByItemCallIndex(commandListsData[i].m_queueName, apiIndex + 1);
+                    GT_IF_WITH_ASSERT(pItem != nullptr)
+                    {
+                        m_top20ItemList.push_back(pItem);
+                    }
+                }
+                break;
             }
         }
+
+        
     }
 }
 
@@ -699,7 +709,8 @@ void gpCommandListSummaryTab::SetTop20TableCaption(const QString& callName)
 {
     GT_IF_WITH_ASSERT(m_pTop20Caption != nullptr)
     {
-        QString commandListIndex = m_pSessionDataContainer->CommandListNameFromPointer(callName);
+        GT_ASSERT_EX(false, L"Should implement");
+        QString commandListIndex = m_pSessionDataContainer->CommandListNameFromPointer(callName, 0);
 
         int numItems = m_top20ItemList.count();
         if (numItems < MAX_ITEMS_IN_TABLE)

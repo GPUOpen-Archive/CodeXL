@@ -979,7 +979,7 @@ void gpTraceView::SyncSelectionInAllTables(ProfileSessionDataItem* pDataItem)
     {
         QList<ProfileSessionDataItem*> items;
         // sync selection trace tables
-        int itemSampleId = pDataItem->GetSampleId();
+        int itemSampleId = pDataItem->SampleId();
         ClearSelectionInTraceTables(pDataItem->IsCPUItem());
 
         if (itemSampleId != 0)

@@ -171,6 +171,19 @@ ProfileSessionDataItem* gpTraceDataContainer::AddDX12APIItem(DX12APIInfo* pAPIIn
 
         // Initialize the container API type
         m_sessionAPIType = ProfileSessionDataItem::DX12_API_PROFILE_ITEM;
+
+        // If this call has a sample id, add it to the list of calls
+        if (pAPIInfo->m_sampleId > 0)
+        {
+            m_commandListUnAttachedCalls << pRetVal;
+        }
+
+        // Analyze the command list close API call
+        if (pAPIInfo->m_apiId == FuncId_ID3D12GraphicsCommandList_Close)
+        {
+            // Close the command list
+            CloseCommandList(pAPIInfo);
+        }
     }
 
     return pRetVal;
@@ -207,37 +220,10 @@ ProfileSessionDataItem* gpTraceDataContainer::AddDX12GPUTraceItem(DX12GPUTraceIn
         // Add the item to the session items map
         m_sessionItemsSortedByStartTime.insertMulti(pRetVal->StartTime(), pRetVal);
 
-        // Add this API call to the command list data
-        QString commandListName = QString::fromStdString(pAPIInfo->m_commandListPtrStr);
-        QString queueName = QString::fromStdString(pAPIInfo->m_commandQueuePtrStr);
-        if (m_commandListToQueueMap.contains(commandListName))
-        {
-            GT_ASSERT_EX(m_commandListToQueueMap[commandListName] == queueName, L"This command list was already added with another queue name");
-        }
-        else
-        {
-            m_commandListToQueueMap.insertMulti(commandListName, queueName);
-        }
+        // Add this GPU call to the relevant command list instance (according to it's sample id)
+        QString commandListInstanceName = AddGPUCallToCommandList(pAPIInfo);
+        pRetVal->SetColumnData(ProfileSessionDataItem::SESSION_ITEM_COMMAND_LIST_COLUMN, commandListInstanceName);
 
-        // Get or add the command list data for the current command list
-        if (!m_commandListData.contains(commandListName))
-        {
-            m_commandListData.insertMulti(commandListName, CommandListData());
-        }
-
-        // Update the existing command list data with the current API call data
-        m_commandListData[commandListName].m_queueName = queueName;
-        m_commandListData[commandListName].m_apiIndices.push_back(pAPIInfo->m_uiSeqID);
-
-        if ((m_commandListData[commandListName].m_startTime == std::numeric_limits<quint64>::max()) || (m_commandListData[commandListName].m_startTime > pAPIInfo->m_ullStart))
-        {
-            m_commandListData[commandListName].m_startTime = pAPIInfo->m_ullStart;
-        }
-
-        if ((m_commandListData[commandListName].m_endTime == std::numeric_limits<quint64>::min()) || (m_commandListData[commandListName].m_endTime < pAPIInfo->m_ullEnd))
-        {
-            m_commandListData[commandListName].m_endTime = pAPIInfo->m_ullEnd;
-        }
     }
 
     return pRetVal;
@@ -300,37 +286,9 @@ ProfileSessionDataItem* gpTraceDataContainer::AddVKGPUTraceItem(VKGPUTraceInfo* 
             m_sessionQueueNameToCommandListType[pAPIInfo->m_queueIndexStr] = pAPIInfo->m_commandListType;
         }
 
-        // Add this API call to the command list data
-        QString commandBufferName = QString::fromStdString(pAPIInfo->m_commandBufferHandleStr);
-        QString queueName = QString::fromStdString(pAPIInfo->m_queueIndexStr);
-        if (m_commandListToQueueMap.contains(commandBufferName))
-        {
-            GT_ASSERT_EX(m_commandListToQueueMap[commandBufferName] == queueName, L"This command buffer was already added with another queue name");
-        }
-        else
-        {
-            m_commandListToQueueMap.insertMulti(commandBufferName, queueName);
-        }
-
-        // Get or add the command list data for the current command list
-        if (!m_commandListData.contains(commandBufferName))
-        {
-            m_commandListData.insertMulti(commandBufferName, CommandListData());
-        }
-
-        // Update the existing command list data with the current API call data
-        m_commandListData[commandBufferName].m_queueName = queueName;
-        m_commandListData[commandBufferName].m_apiIndices.push_back(pAPIInfo->m_uiSeqID);
-
-        if ((m_commandListData[commandBufferName].m_startTime == std::numeric_limits<quint64>::max()) || (m_commandListData[commandBufferName].m_startTime > pAPIInfo->m_ullStart))
-        {
-            m_commandListData[commandBufferName].m_startTime = pAPIInfo->m_ullStart;
-        }
-
-        if ((m_commandListData[commandBufferName].m_endTime == std::numeric_limits<quint64>::min()) || (m_commandListData[commandBufferName].m_endTime < pAPIInfo->m_ullEnd))
-        {
-            m_commandListData[commandBufferName].m_endTime = pAPIInfo->m_ullEnd;
-        }
+        // Add this GPU call to the relevant command list instance (according to it's sample id)
+        QString commandListInstanceName = AddGPUCallToCommandList(pAPIInfo);
+        pRetVal->SetColumnData(ProfileSessionDataItem::SESSION_ITEM_COMMAND_LIST_COLUMN, commandListInstanceName);
     }
 
     return pRetVal;
@@ -697,7 +655,6 @@ void gpTraceDataContainer::FinalizeDataCollection()
             MergePerformanceCountersForThread(tid);
         }
     }
-    UpdateUiRowLocations();
 }
 
 void gpTraceDataContainer::MergePerformanceCountersForThread(osThreadId tid)
@@ -825,7 +782,7 @@ void gpTraceDataContainer::MergePerformanceCountersForThread(osThreadId tid)
 
                 if (pParent != pRootItem)
                 {
-                    pParent->UpdateIndices(pNextItemToAdd->APICallIndex(), pNextItemToAdd->GetEndIndex());
+                    pParent->UpdateIndices(pNextItemToAdd->APICallIndex(), pNextItemToAdd->EndIndex());
                 }
 
                 afProgressBarWrapper::instance().incrementProgressBar();
@@ -1027,48 +984,124 @@ ProfileSessionDataItem* gpTraceDataContainer::FindNextItem(const QString& findSt
 
     return pRetVal;
 }
-/// Here below algorithm, that  calculates UI row location for all command lists
-/// Algorithm:
-/// Step 1 copy all command list data to temporary map
-/// Step 2 Till temporary map not empty do :
-/// Step 2.1. scan temporary map and try to insert each item into interval map container :
- ///          if no time overlapping - mark row number for item, insert item into interval map and remove it from temporary map, otherwise skip the item - we'll try to mark it with next row later
-/// Step 2.2 increment row count and continue to Step 2
-void gpTraceDataContainer::UpdateUiRowLocations()
+
+void gpTraceDataContainer::CloseCommandList(DX12APIInfo* pAPIInfo)
 {
-    using CommandListIntervalMap = boosticl::split_interval_map<quint64, QString, boost::icl::partial_absorber, std::less, boost::icl::inplace_max>;
-    auto commandListData = m_commandListData;
-    size_t rowIx = 0;
-    while (commandListData.empty() == false)
+    GT_IF_WITH_ASSERT(pAPIInfo != nullptr)
     {
-            CommandListIntervalMap commandListIntervals;
-            auto currItr = commandListData.begin();
-            while  (currItr != commandListData.end())
+        // Get the command list pointer
+        QString commandListPtr = QString::fromStdString(pAPIInfo->m_interfacePtrStr);
+
+        // Add new command list instance to the vector
+        CommandListInstanceData currentInstanceData;
+        currentInstanceData.m_commandListPtr = QString::fromStdString(pAPIInfo->m_interfacePtrStr);
+        currentInstanceData.m_queueName = m_commandListToQueueMap[currentInstanceData.m_commandListPtr];
+
+        // Go through all the calls, and check if the command list pointer is in it's parameter's list
+        for (auto iter = m_commandListUnAttachedCalls.begin(); iter != m_commandListUnAttachedCalls.end(); iter++)
+        {
+            ProfileSessionDataItem* pCurrentItem = *iter;
+            if (pCurrentItem != nullptr)
             {
-                auto currentInterval = boosticl::interval<quint64>::closed(currItr->m_startTime, currItr->m_endTime);
-                //no overlapping, can mark row number and add into interval map
-                if (commandListIntervals.find(currentInterval) == commandListIntervals.end())
+                QString params = pCurrentItem->GetColumnData(ProfileSessionDataItem::SESSION_ITEM_PARAMETERS_COLUMN).toString();
+                QString interfacePtr = pCurrentItem->InterfacePtr();
+                if ((interfacePtr == commandListPtr) || params.contains(commandListPtr))
                 {
-                    //update row location
-                    m_commandListData[currItr.key()].m_uiRowLocation = rowIx;
-                    commandListIntervals += make_pair(boosticl::interval<quint64>::closed(currItr->m_startTime, currItr->m_endTime), currItr->m_queueName);
-                    currItr = commandListData.erase(currItr);
-                }
-                //overlapping skip for now
-                else
-                {
-                    ++currItr;
+                    // Add this sample id to the list of samples for this instance, and remove the item from the unattached list
+                    currentInstanceData.m_sampleIds << pCurrentItem->SampleId();
+                    m_commandListUnAttachedCalls.removeOne(pCurrentItem);
                 }
             }
-            ++rowIx;
+        }
+
+        m_commandListInstancesVector << currentInstanceData;
     }
 }
 
-QString gpTraceDataContainer::CommandListNameFromPointer(const QString& commandBufferPtrStr)
+QString gpTraceDataContainer::AddGPUCallToCommandList(APIInfo* pAPIInfo)
 {
-    int commandListIndex = 1;
     QString retVal;
 
+    // Sanity check:
+    GT_IF_WITH_ASSERT(pAPIInfo != nullptr)
+    {
+        // Find the relevant information for this call
+        int sampleID = -1;
+        QString commandListName, queueName;
+
+        bool isVK = (m_sessionAPIType == ProfileSessionDataItem::VK_API_PROFILE_ITEM);
+        bool isDX = (m_sessionAPIType == ProfileSessionDataItem::DX12_API_PROFILE_ITEM);
+        if (isVK || isDX)
+        {
+            if (isVK)
+            {
+                VKGPUTraceInfo* pVKAPIInfo = (VKGPUTraceInfo*)pAPIInfo;
+                sampleID = pVKAPIInfo->m_sampleId;
+                commandListName = QString::fromStdString(pVKAPIInfo->m_commandBufferHandleStr);
+                queueName = QString::fromStdString(pVKAPIInfo->m_queueIndexStr);
+            }
+            else if (isDX)
+            {
+                DX12GPUTraceInfo* pDXAPIInfo = (DX12GPUTraceInfo*)pAPIInfo;
+                sampleID = pDXAPIInfo->m_sampleId;
+                commandListName = QString::fromStdString(pDXAPIInfo->m_commandListPtrStr);
+                queueName = QString::fromStdString(pDXAPIInfo->m_commandQueuePtrStr);
+            }
+
+
+            // Get this sample id
+            if (m_commandListToQueueMap.contains(commandListName))
+            {
+                GT_ASSERT_EX(m_commandListToQueueMap[commandListName] == queueName, L"This command list was already added with another queue name");
+            }
+            else
+            {
+                m_commandListToQueueMap.insertMulti(commandListName, queueName);
+            }
+
+            // Find the command list data for which this GPU call should be added
+            // The right command list instance is the one containing this sample id
+            int commandListInstnaceIndex = -1;
+            for (int i = 0; i < (int)m_commandListInstancesVector.size(); i++)
+            {
+                if (m_commandListInstancesVector[i].m_sampleIds.contains(sampleID))
+                {
+                    commandListInstnaceIndex = i;
+                    break;
+                }
+            }
+
+            // The sample id should be contained in one of the lists
+            GT_IF_WITH_ASSERT((commandListInstnaceIndex >= 0) && (commandListInstnaceIndex < m_commandListInstancesVector.size()))
+            {
+                // Update the existing command list data with the current API call data
+                m_commandListInstancesVector[commandListInstnaceIndex].m_queueName = queueName;
+                m_commandListInstancesVector[commandListInstnaceIndex].m_apiIndices.push_back(pAPIInfo->m_uiSeqID);
+
+                if ((m_commandListInstancesVector[commandListInstnaceIndex].m_startTime == std::numeric_limits<quint64>::max()) || (m_commandListInstancesVector[commandListInstnaceIndex].m_startTime > pAPIInfo->m_ullStart))
+                {
+                    m_commandListInstancesVector[commandListInstnaceIndex].m_startTime = pAPIInfo->m_ullStart;
+                }
+
+                if ((m_commandListInstancesVector[commandListInstnaceIndex].m_endTime == std::numeric_limits<quint64>::min()) || (m_commandListInstancesVector[commandListInstnaceIndex].m_endTime < pAPIInfo->m_ullEnd))
+                {
+                    m_commandListInstancesVector[commandListInstnaceIndex].m_endTime = pAPIInfo->m_ullEnd;
+                }
+
+                // Build containing command list instance name
+                retVal = CommandListNameFromPointer(m_commandListInstancesVector[commandListInstnaceIndex].m_commandListPtr, m_commandListInstancesVector[commandListInstnaceIndex].m_instanceIndex);
+            }
+        }
+    }
+
+    return retVal;
+}
+
+QString gpTraceDataContainer::CommandListNameFromPointer(const QString& commandBufferPtrStr, int instanceIndex)
+{
+    QString retVal;
+
+    int commandListIndex = 1;
     // If the command buffer / list is not mapped to an index yet, allocate an index for the current command list
     if (!m_commandListPointerToIndexMap.contains(commandBufferPtrStr))
     {
@@ -1084,11 +1117,69 @@ QString gpTraceDataContainer::CommandListNameFromPointer(const QString& commandB
 
     if (m_sessionAPIType == ProfileSessionDataItem::DX12_API_PROFILE_ITEM)
     {
-        retVal = QString(GPU_STR_timeline_CmdListBranchName).arg(commandListIndex);
+        if (instanceIndex > 0)
+        {
+            retVal = QString(GPU_STR_timeline_CmdListIsntanceBranchName).arg(commandListIndex).arg(instanceIndex);
+        }
+        else
+        {
+            retVal = QString(GPU_STR_timeline_CmdListBranchName).arg(commandListIndex);
+        }
     }
     else
     {
-        retVal = QString(GPU_STR_timeline_CmdBufferBranchName).arg(commandListIndex);
+        if (instanceIndex > 0)
+        {
+            retVal = QString(GPU_STR_timeline_CmdBufferInstanceBranchName).arg(commandListIndex).arg(instanceIndex);
+        }
+        else
+        {
+            retVal = QString(GPU_STR_timeline_CmdBufferBranchName).arg(commandListIndex);
+        }
+    }
+
+    return retVal;
+}
+
+QString gpTraceDataContainer::GetContainingCommandList(APIInfo* pApiInfo)
+{
+    QString retVal;
+    // Sanity check:
+    GT_IF_WITH_ASSERT(pApiInfo != nullptr)
+    {
+        QString commandListPtr;
+        int commandListIndex = -1;
+        int apiIndex = pApiInfo->m_uiSeqID;
+
+        bool isVK = (m_sessionAPIType == ProfileSessionDataItem::VK_API_PROFILE_ITEM);
+        bool isDX = (m_sessionAPIType == ProfileSessionDataItem::DX12_API_PROFILE_ITEM);
+        if (isVK || isDX)
+        {
+            if (isVK)
+            {
+                VKGPUTraceInfo* pVKAPIInfo = (VKGPUTraceInfo*)pApiInfo;
+                commandListPtr = QString::fromStdString(pVKAPIInfo->m_commandBufferHandleStr);
+            }
+            else if (isDX)
+            {
+                DX12GPUTraceInfo* pDXAPIInfo = (DX12GPUTraceInfo*)pApiInfo;
+                commandListPtr = QString::fromStdString(pDXAPIInfo->m_commandListPtrStr);
+            }
+
+            int cmdListInstanceIndex = 0;
+            for (int i = 0; i < m_commandListInstancesVector.size(); i++)
+            {
+                if (m_commandListInstancesVector[i].m_commandListPtr == commandListPtr)
+                {
+                    if (m_commandListInstancesVector[i].m_apiIndices.contains(apiIndex))
+                    {
+                        cmdListInstanceIndex = m_commandListInstancesVector[i].m_instanceIndex;
+                    }
+                }
+            }
+        }
+
+        retVal = CommandListNameFromPointer(commandListPtr, commandListIndex);
     }
 
     return retVal;
@@ -1140,11 +1231,12 @@ QString gpTraceDataContainer::QueueDisplayName(const QString& queuePtrStr)
     return retVal;
 }
 
-gpTraceDataContainer::CommandListData::CommandListData() :
+gpTraceDataContainer::CommandListInstanceData::CommandListInstanceData() :
     m_queueName(""),
     m_startTime(std::numeric_limits<quint64>::max()),
     m_endTime(std::numeric_limits<quint64>::min()),
-    m_uiRowLocation(0)
+    m_instanceIndex(-1),
+    m_commandListPtr("")
 {
 
 }
