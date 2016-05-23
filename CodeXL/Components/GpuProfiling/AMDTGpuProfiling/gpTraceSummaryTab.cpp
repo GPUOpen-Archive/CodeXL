@@ -263,6 +263,7 @@ void gpTraceSummaryTab::OnSummaryTableSelectionChanged()
             GT_ASSERT(pSummaryTable != nullptr);
             if (pSummaryTable->GetItemCallIndex(rowIndex, apiCall, callName))
             {
+                m_currentCallIndex = apiCall;
                 FillTop20Table(apiCall, callName);
                 pItem = pSummaryTable->GetRelatedItem(rowIndex, index.column());
                 SyncSelectionInOtherControls(pItem);

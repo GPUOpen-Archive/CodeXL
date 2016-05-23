@@ -114,6 +114,7 @@ protected:
     quint64 m_timelineStart;
     quint64 m_timelineEnd;
     QLabel* m_pTop20Caption;
+    CallIndexId m_currentCallIndex;
 
 private:
 
@@ -121,7 +122,6 @@ private:
 
     bool m_useTimelineSelectionScope;
     QString m_currentCallName;
-    CallIndexId m_currentCallIndex;
 
 };
 
