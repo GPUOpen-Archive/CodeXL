@@ -255,6 +255,13 @@ ProfileSessionDataItem* gpTraceDataContainer::AddVKAPIItem(VKAPIInfo* pAPIInfo)
 
         // Initialize the container API type
         m_sessionAPIType = ProfileSessionDataItem::VK_API_PROFILE_ITEM;
+
+        // Analyze the command list close API call
+        if (pAPIInfo->m_apiId == FuncId_vkEndCommandBuffer)
+        {
+            // Close the command list
+            CloseCommandList(pAPIInfo);
+        }
     }
 
     return pRetVal;
@@ -985,54 +992,73 @@ ProfileSessionDataItem* gpTraceDataContainer::FindNextItem(const QString& findSt
     return pRetVal;
 }
 
-void gpTraceDataContainer::CloseCommandList(DX12APIInfo* pAPIInfo)
+void gpTraceDataContainer::CloseCommandList(APIInfo* pAPIInfo)
 {
     GT_IF_WITH_ASSERT(pAPIInfo != nullptr)
     {
-        // Get the command list pointer
-        QString commandListPtr = QString::fromStdString(pAPIInfo->m_interfacePtrStr);
-
-        // Count other command list instance with the same command list pointer
-        int newCommandListIndex = -1;
-        for (int i = 0; i < m_commandListInstancesVector.size(); i++)
+        bool isVK = (m_sessionAPIType == ProfileSessionDataItem::VK_API_PROFILE_ITEM);
+        bool isDX = (m_sessionAPIType == ProfileSessionDataItem::DX12_API_PROFILE_ITEM);
+        if (isVK || isDX)
         {
-            if (m_commandListInstancesVector[i].m_commandListPtr == commandListPtr)
+            // Get the command list pointer
+            QString commandListPtr;
+            if (isVK)
             {
-                // If there only was one instance so far, make sure that the already existing commnad list is indexed
-                if (m_commandListInstancesVector[i].m_instanceIndex < 0)
-                {
-                    m_commandListInstancesVector[i].m_instanceIndex = 1;
-                }
+                VKGPUTraceInfo* pVKAPIInfo = (VKGPUTraceInfo*)pAPIInfo;
 
-                // Find the next available index for the new instance
-                newCommandListIndex = qMax(newCommandListIndex, m_commandListInstancesVector[i].m_instanceIndex + 1);
+                // In Vulkan, we expect the command buffer pointer to be the end command list function argument
+                commandListPtr = QString::fromStdString(pVKAPIInfo->m_ArgList);
             }
-        }
-
-        // Add new command list instance to the vector
-        CommandListInstanceData currentInstanceData;
-        currentInstanceData.m_instanceIndex = newCommandListIndex;
-        currentInstanceData.m_commandListPtr = QString::fromStdString(pAPIInfo->m_interfacePtrStr);
-
-        // Go through all the calls, and check if the command list pointer is in it's parameter's list
-        for (auto iter = m_commandListUnAttachedCalls.begin(); iter != m_commandListUnAttachedCalls.end(); iter++)
-        {
-            ProfileSessionDataItem* pCurrentItem = *iter;
-            if (pCurrentItem != nullptr)
+            else if (isDX)
             {
-                QString params = pCurrentItem->GetColumnData(ProfileSessionDataItem::SESSION_ITEM_PARAMETERS_COLUMN).toString();
-                QString interfacePtr = pCurrentItem->InterfacePtr();
-                if ((interfacePtr == commandListPtr) || params.contains(commandListPtr))
+                DX12GPUTraceInfo* pDXAPIInfo = (DX12GPUTraceInfo*)pAPIInfo;
+
+                // In DX12 the command list pointer is the function interface pointer
+                commandListPtr = QString::fromStdString(pDXAPIInfo->m_interfacePtrStr);
+            }
+
+            // Count other command list instance with the same command list pointer
+            int newCommandListIndex = -1;
+            for (int i = 0; i < m_commandListInstancesVector.size(); i++)
+            {
+                if (m_commandListInstancesVector[i].m_commandListPtr == commandListPtr)
                 {
-                    // Add this sample id to the list of samples for this instance, and remove the item from the unattached list
-                    currentInstanceData.m_sampleIds << pCurrentItem->SampleId();
-                    m_commandListUnAttachedCalls.removeOne(pCurrentItem);
-                    currentInstanceData.m_commandListQueueName = m_commandListToQueueMap[commandListPtr];
+                    // If there only was one instance so far, make sure that the already existing command list is indexed
+                    if (m_commandListInstancesVector[i].m_instanceIndex < 0)
+                    {
+                        m_commandListInstancesVector[i].m_instanceIndex = 1;
+                    }
+
+                    // Find the next available index for the new instance
+                    newCommandListIndex = qMax(newCommandListIndex, m_commandListInstancesVector[i].m_instanceIndex + 1);
                 }
             }
-        }
 
-        m_commandListInstancesVector << currentInstanceData;
+            // Add new command list instance to the vector
+            CommandListInstanceData currentInstanceData;
+            currentInstanceData.m_instanceIndex = newCommandListIndex;
+            currentInstanceData.m_commandListPtr = commandListPtr;
+
+            // Go through all the calls, and check if the command list pointer is in it's parameter's list
+            for (auto iter = m_commandListUnAttachedCalls.begin(); iter != m_commandListUnAttachedCalls.end(); iter++)
+            {
+                ProfileSessionDataItem* pCurrentItem = *iter;
+                if (pCurrentItem != nullptr)
+                {
+                    QString params = pCurrentItem->GetColumnData(ProfileSessionDataItem::SESSION_ITEM_PARAMETERS_COLUMN).toString();
+                    QString interfacePtr = pCurrentItem->InterfacePtr();
+                    if ((interfacePtr == commandListPtr) || params.contains(commandListPtr))
+                    {
+                        // Add this sample id to the list of samples for this instance, and remove the item from the unattached list
+                        currentInstanceData.m_sampleIds << pCurrentItem->SampleId();
+                        m_commandListUnAttachedCalls.removeOne(pCurrentItem);
+                        currentInstanceData.m_commandListQueueName = m_commandListToQueueMap[commandListPtr];
+                    }
+                }
+            }
+
+            m_commandListInstancesVector << currentInstanceData;
+        }
     }
 }
 

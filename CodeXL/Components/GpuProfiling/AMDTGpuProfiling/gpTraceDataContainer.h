@@ -232,9 +232,10 @@ public:
     /// Get the data collected for the frame command lists
     const QVector<CommandListInstanceData>& CommandListsData() const { return m_commandListInstancesVector; }
 
-    /// Is called when a command list close function is added. 
-    /// The function will analyze the command list API execution
-    void CloseCommandList(DX12APIInfo* pAPIInfo);
+    /// Is called when a command list / buffer close / end function is added. 
+    /// The function will analyze the command list API execution 
+    /// \param pAPIInfo the api info is expected to be of type DX12APIInfo or VKAPIInfo
+    void CloseCommandList(APIInfo* pAPIInfo);
 
     /// Is called when a GPU call is added. The function is adding the GPU call to the matching command list
     /// \param pApiInfo the structure describing the API info of the GPU call
