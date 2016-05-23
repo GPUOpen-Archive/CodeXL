@@ -79,8 +79,8 @@ void suRegisterAPIStubFunctions()
     suRegisterAPIFunctionStub(GA_FID_gaEnableImagesDataLogging, &gaEnableImagesDataLoggingStub);
     suRegisterAPIFunctionStub(GA_FID_gaSetFloatParametersDisplayPrecision, &gaSetFloatParametersDisplayPrecisionStub);
     suRegisterAPIFunctionStub(GA_FID_gaFlushAfterEachMonitoredFunctionCall, &gaFlushLogFileAfterEachFunctionCallStub);
-    suRegisterAPIFunctionStub(GA_FID_gaLockDriverThreads, gaLockDriverThreadsStub);
-    suRegisterAPIFunctionStub(GA_FID_gaUnlockDriverThreads, gaUnLockDriverThreadsStub);
+    suRegisterAPIFunctionStub(GA_FID_gaLockDriverThreads, &gaLockDriverThreadsStub);
+    suRegisterAPIFunctionStub(GA_FID_gaUnlockDriverThreads, &gaUnLockDriverThreadsStub);
 }
 
 
@@ -874,9 +874,11 @@ void gaFlushLogFileAfterEachFunctionCallStub(osSocket& apiSocket)
 // \date        11/05/2016
 void gaLockDriverThreadsStub(osSocket& apiSocket)
 {
-    (void)apiSocket;
+    bool retVal = true;
 
-    suSWMRInstance::GetInstance().UniqueLock();
+    suSWMRInstance::UniqueLock();
+
+    apiSocket << retVal;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -886,9 +888,11 @@ void gaLockDriverThreadsStub(osSocket& apiSocket)
 // \date        11/05/2016
 void gaUnLockDriverThreadsStub(osSocket& apiSocket)
 {
-    (void)apiSocket;
+    bool retVal = true;
 
-    suSWMRInstance::GetInstance().UniqueUnLock();
+    suSWMRInstance::UniqueUnLock();
+
+    apiSocket << retVal;
 }
 
 

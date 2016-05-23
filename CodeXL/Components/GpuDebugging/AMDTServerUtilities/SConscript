@@ -59,7 +59,8 @@ sources = \
 	"src/suSpyToAPIConnector.cpp",
 	"src/suTechnologyMonitorsManager.cpp",
 	"src/suLinuxThrdsSuspender.cpp",
-	"src/suSWMRInstance.cpp"
+	"src/suSWMRInstance.cpp",
+        "src/suSWMRImpl.cpp"
 ]
 
 env.Append( LIBS=

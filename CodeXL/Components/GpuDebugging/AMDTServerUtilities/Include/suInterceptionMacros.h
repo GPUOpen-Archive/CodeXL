@@ -97,7 +97,7 @@
 // ---------------------------------------------------------------------------
 #define SU_START_FUNCTION_WRAPPER(funcId) \
     su_stat_functionInterceptionInfo[funcId]._isCurrentlyInsideWrapper = true; \
-    suSWMRInstance::GetInstance().SharedLock();
+    suSWMRInstance::SharedLock();
 
 // ---------------------------------------------------------------------------
 // Name:        SU_START_DRAW_FUNCTION_WRAPPER
@@ -365,7 +365,7 @@
 // ---------------------------------------------------------------------------
 #if (AMDT_BUILD_TARGET == AMDT_LINUX_OS)
 #define SU_START_FUNCTION_WRAPPER(funcId) \
-    suSWMRInstance::GetInstance().SharedLock();
+    suSWMRInstance::SharedLock();
 #else
 #define SU_START_FUNCTION_WRAPPER(funcId) 
 #endif
@@ -388,7 +388,12 @@
 // Author:      Yaki Tebeka
 // Date:        30/11/2006
 // ---------------------------------------------------------------------------
+#if (AMDT_BUILD_TARGET == AMDT_LINUX_OS)
+#define SU_START_DRAW_FUNCTION_WRAPPER(funcId) if (gs_stat_isInNullOpenGLImplementationMode) { return; }; \
+    suSWMRInstance::SharedLock();
+#else
 #define SU_START_DRAW_FUNCTION_WRAPPER(funcId) if (gs_stat_isInNullOpenGLImplementationMode) { return; };
+#endif
 
 
 // ---------------------------------------------------------------------------
@@ -407,7 +412,13 @@
 // Author:      Yaki Tebeka
 // Date:        30/11/2006
 // ---------------------------------------------------------------------------
+#if (AMDT_BUILD_TARGET == AMDT_LINUX_OS)
+#define SU_END_FUNCTION_WRAPPER(funcId) if (!su_stat_interoperabilityHelper.isInNestedFunction()) {SU_TECHNOLOGY_MONITOR.afterMonitoredFunctionExecutionActions(funcId);}; \
+    suSWMRInstance::SharedUnLock();
+#else
 #define SU_END_FUNCTION_WRAPPER(funcId) if (!su_stat_interoperabilityHelper.isInNestedFunction()) {SU_TECHNOLOGY_MONITOR.afterMonitoredFunctionExecutionActions(funcId);};
+#endif
+	
 
 // ---------------------------------------------------------------------------
 // Name:        SU_BEFORE_EXECUTING_REAL_FUNCTION

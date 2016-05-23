@@ -487,6 +487,7 @@ bool pdGDBDriver::executeGDBCommand(pdGDBCommandId gdbCommandId,
         {
             // Send the command string to gdb:
             _gdbOutputReader.resetGDBPrompt();
+
             bool rc2 = writeToGDBInput(commandString);
             GT_IF_WITH_ASSERT(rc2)
             {
@@ -522,8 +523,6 @@ bool pdGDBDriver::executeGDBCommand(pdGDBCommandId gdbCommandId,
 
                             if (PD_CONTINUE_CMD == gdbCommandId)
                             {
-                                gaUnLockDriverThreads();
-                                
                                 while (!IsAllThreadsRunning())
                                 {
                                     _gdbOutputReader.readGDBOutput(*_pGDBCommunicationPipe, *this, gdbCommandId, ignoredS, ignoredT, ppGDBOutputData);

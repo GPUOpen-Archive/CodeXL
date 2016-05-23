@@ -812,10 +812,16 @@ bool gaGRApiFunctions::gaResumeDebuggedProcess()
 /// \date 15/05/2016
 bool gaGRApiFunctions::gaLockDriverThreads()
 {
+    OS_OUTPUT_DEBUG_LOG(L"Try lock threads", OS_DEBUG_LOG_DEBUG);
+
     if (gaIsAPIConnectionActive(AP_SPIES_UTILITIES_API_CONNECTION))
     {
         osSocket& spyConnectionSocket = gaSpiesAPISocket();
         spyConnectionSocket << (gtInt32)GA_FID_gaLockDriverThreads;
+
+        bool retVal;
+
+        spyConnectionSocket >> retVal;
     }
 
     return true;
@@ -829,10 +835,16 @@ bool gaGRApiFunctions::gaLockDriverThreads()
 /// \date 15/05/2016
 bool gaGRApiFunctions::gaUnLockDriverThreads()
 {
+    OS_OUTPUT_DEBUG_LOG(L"Try unlock threads", OS_DEBUG_LOG_DEBUG);
+
     if (gaIsAPIConnectionActive(AP_SPIES_UTILITIES_API_CONNECTION))
     {
         osSocket& spyConnectionSocket = gaSpiesAPISocket();
         spyConnectionSocket << (gtInt32)GA_FID_gaUnlockDriverThreads;
+
+        bool retVal;
+
+        spyConnectionSocket >> retVal;
     }
 
     return true;

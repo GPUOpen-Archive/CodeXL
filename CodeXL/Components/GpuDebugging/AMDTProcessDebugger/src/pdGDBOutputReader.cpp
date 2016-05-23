@@ -3591,8 +3591,6 @@ void pdGDBOutputReader::handleSignalOutput(const gtASCIIString& gdbOutputLine, b
 
     if (nullptr != _pGDBCommunicationPipe && nullptr != _pGDBDriver)
     {
-        gaLockDriverThreads();
-        
         std::string cmd = "-exec-interrupt --all\n";
         _wasGDBPrompt = false;
         _pGDBCommunicationPipe->write(cmd.c_str(), cmd.length());

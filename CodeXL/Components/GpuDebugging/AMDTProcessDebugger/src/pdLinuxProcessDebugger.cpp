@@ -890,6 +890,8 @@ bool pdLinuxProcessDebugger::resumeDebuggedProcess()
     {
         if (_isUnderHostBreakpoint)
         {
+            gaUnLockDriverThreads();
+
             retVal = tryResumeProcess();
         }
 
@@ -3592,8 +3594,6 @@ bool pdLinuxProcessDebugger::trySuspendProcess(bool& suspendedBefore, bool bRele
     if (!_gdbDriver.IsAllThreadsStopped(bRelevantThrds ? &m_GDBIdsOfThreadsToRelease : nullptr))
         //if (!isDebuggedProcssSuspended())
     {
-        gaLockDriverThreads();
-
         suspendedBefore = false;
 
         if (!_gdbDriver.executeGDBCommand(PD_GDB_SUSPEND_DEBUGGED_PROCESS_CMD, "--all"))
@@ -4243,6 +4243,8 @@ bool pdLinuxProcessDebugger::performHostStep(osThreadId threadId, StepType stepT
 
     bool before = false;
 
+    gaUnLockDriverThreads();
+
     if (_isDuringInternalContinue)
     {
         trySuspendProcess(before);
@@ -4659,6 +4661,7 @@ bool pdLinuxProcessDebugger::suspendHostDebuggedProcess()
     bool result = false;
     bool bSuspendedBefore = false;
 
+    gaLockDriverThreads();
     result = trySuspendProcess(bSuspendedBefore);
 
     GT_IF_WITH_ASSERT(result)
