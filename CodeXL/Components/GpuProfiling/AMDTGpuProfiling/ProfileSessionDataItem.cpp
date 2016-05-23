@@ -454,9 +454,8 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
         m_startTime = pApiInfo->m_ullStart;
         m_endTime = pApiInfo->m_ullEnd;
 
-        // removed calc of m_data[ProfileSessionDataItem::SESSION_ITEM_CPU_TIME_COLUMN] because it will be calulated on GetColumnData()
-
         m_tid = pApiInfo->m_tid;
+        m_sampleId = pApiInfo->m_sampleId;
     }
 }
 
@@ -511,6 +510,7 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
         m_endTime = pApiInfo->m_ullEnd;
 
         m_tid = pApiInfo->m_tid;
+        m_sampleId = pApiInfo->m_sampleId;
     }
 }
 

@@ -302,6 +302,9 @@ bool VKAtpFilePart::ParseCPUAPICallString(const std::string& apiStr, VKAPIInfo& 
             m_cpuEnd = apiInfo.m_ullEnd;
         }
 
+        ss >> apiInfo.m_sampleId;
+        CHECK_SS_ERROR(ss);
+
         retVal = (!ss.fail());
     }
 

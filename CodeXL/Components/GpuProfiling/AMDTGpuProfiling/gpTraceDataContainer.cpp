@@ -256,6 +256,12 @@ ProfileSessionDataItem* gpTraceDataContainer::AddVKAPIItem(VKAPIInfo* pAPIInfo)
         // Initialize the container API type
         m_sessionAPIType = ProfileSessionDataItem::VK_API_PROFILE_ITEM;
 
+        // If this call has a sample id, add it to the list of calls
+        if (pAPIInfo->m_sampleId > 0)
+        {
+            m_commandListUnAttachedCalls << pRetVal;
+        }
+
         // Analyze the command list close API call
         if (pAPIInfo->m_apiId == FuncId_vkEndCommandBuffer)
         {
@@ -1115,8 +1121,11 @@ QString gpTraceDataContainer::AddGPUCallToCommandList(APIInfo* pAPIInfo)
                 }
             }
 
+            int commandListIndex = -1;
+            QString commandListPtr = commandListName;
+
             // The sample id should be contained in one of the lists
-            GT_IF_WITH_ASSERT((commandListInstnaceIndex >= 0) && (commandListInstnaceIndex < m_commandListInstancesVector.size()))
+            if ((commandListInstnaceIndex >= 0) && (commandListInstnaceIndex < m_commandListInstancesVector.size()))
             {
                 // Update the existing command list data with the current API call data
                 m_commandListInstancesVector[commandListInstnaceIndex].m_commandListQueueName = queueName;
@@ -1132,9 +1141,12 @@ QString gpTraceDataContainer::AddGPUCallToCommandList(APIInfo* pAPIInfo)
                     m_commandListInstancesVector[commandListInstnaceIndex].m_endTime = pAPIInfo->m_ullEnd;
                 }
 
-                // Build containing command list instance name
-                retVal = CommandListNameFromPointer(m_commandListInstancesVector[commandListInstnaceIndex].m_commandListPtr, m_commandListInstancesVector[commandListInstnaceIndex].m_instanceIndex);
+                commandListIndex = m_commandListInstancesVector[commandListInstnaceIndex].m_instanceIndex;
+                commandListPtr = m_commandListInstancesVector[commandListInstnaceIndex].m_commandListPtr;
             }
+
+            // Build containing command list instance name
+            retVal = CommandListNameFromPointer(commandListPtr, commandListIndex);
         }
     }
 

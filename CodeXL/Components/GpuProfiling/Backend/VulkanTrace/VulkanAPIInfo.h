@@ -32,6 +32,9 @@ public:
     /// True for GPU items
     bool m_isGPU;
 
+    /// The GPU command sample ID
+    int m_sampleId;
+
 };
 
 
