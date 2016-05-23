@@ -30,9 +30,9 @@
     <ROW Property="ProductCode" Value="1033:{3BE8B138-E31B-4FA7-9C8F-9FA002EEACD2} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="CodeXL"/>
-    <ROW Property="ProductVersion" Value="2.1.19" Type="32"/>
+    <ROW Property="ProductVersion" Value="2.2.19" Type="32"/>
     <ROW Property="RUNAPPLICATION" Value="1" Type="4"/>
-    <ROW Property="SETUP_FILE_NAME" Value="CodeXL_Win_2.1.19"/>
+    <ROW Property="SETUP_FILE_NAME" Value="CodeXL_Win_2.2.19"/>
     <ROW Property="SYSTEM" Value="[|SYSTEM]" Options="1"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="UpgradeCode" Value="{07CC0C5E-4F70-4624-A24C-CED574D51C4C}"/>
