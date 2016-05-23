@@ -19,6 +19,7 @@
 #include <QtCore>
 #include <QtWidgets>
 
+// Infra
 #include <AMDTBaseTools/Include/gtAssert.h>
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
 #include <AMDTOSWrappers/Include/osFilePath.h>
@@ -38,6 +39,9 @@
 
 // AMDTSharedProfiling:
 #include <AMDTSharedProfiling/inc/StringConstants.h>
+
+// Remote
+#include <AMDTRemoteClient/Include/CXLDaemonClient.h>
 
 // Backend header files
 #include "Defs.h"
@@ -1172,4 +1176,48 @@ bool Util::CheckOccupancyDeviceName(const QString& strDeviceName1, const QString
     }
 
     return retVal;
+}
+
+bool Util::IsHSAEnabled()
+{
+    //on windows by default it's false
+    bool isHSAInstalled = false;
+
+    const auto& projectSettings = afProjectManager::instance().currentProjectSettings();
+    if (projectSettings.isRemoteTarget())
+    {
+        // Retrieve the daemon's address.
+        const auto dmnPort = projectSettings.remoteTargetDaemonConnectionPort();
+        const auto dmnIp = projectSettings.remoteTargetName();
+
+        osPortAddress daemonAddr(dmnIp, dmnPort);
+
+        // Initialize the daemon if required.
+        static const unsigned CONNECTION_VALIDATION_TIMEOUT_MS = 1500;
+        bool retVal = CXLDaemonClient::IsInitialized(daemonAddr) || CXLDaemonClient::Init(daemonAddr, CONNECTION_VALIDATION_TIMEOUT_MS);
+        GT_ASSERT_EX(retVal, GPU_STR_REMOTE_AGENT_INIT_FAILURE_WITH_CTX);
+
+        CXLDaemonClient* pDmnClient = CXLDaemonClient::GetInstance();
+        GT_IF_WITH_ASSERT(pDmnClient != NULL)
+        {
+            if (retVal)
+            {
+                // Connect to the daemon.
+                osPortAddress addrBuffer;
+                retVal = pDmnClient->ConnectToDaemon(addrBuffer);
+                GT_IF_WITH_ASSERT(retVal)
+                {
+                    isHSAInstalled = pDmnClient->IsHSAEnabled();
+                }
+            }
+        }
+    }
+//on Linux we do real check if machine supports HSA
+#if (AMDT_BUILD_TARGET == AMDT_LINUX_OS)
+    else
+    {
+        isHSAInstalled = (afGlobalVariablesManager::instance().InstalledAMDComponentsBitmask() & AF_AMD_HSA_COMPONENT);
+    }
+#endif
+    return isHSAInstalled;
 }

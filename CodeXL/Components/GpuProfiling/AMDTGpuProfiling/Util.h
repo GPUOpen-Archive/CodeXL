@@ -324,6 +324,10 @@ public:
     /// \param strDeviceName2 the second device name
     /// \return true if the two devices names are identical or if they differ only in cases where spaces have been replaced by underscores, false otherwise
     static bool CheckOccupancyDeviceName(const QString& strDeviceName1, const QString& strDeviceName2);
+    
+    /// Verifies if profiled machine has HSA support  both remote and local dependant on projects type(remote or local)
+    /// \return true if profiled machine supports HSA
+    static bool IsHSAEnabled();
 
 private:
     /// prevent creation of an instance of this static class
