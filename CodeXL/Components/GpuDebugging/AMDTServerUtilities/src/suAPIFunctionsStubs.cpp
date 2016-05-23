@@ -876,7 +876,9 @@ void gaLockDriverThreadsStub(osSocket& apiSocket)
 {
     bool retVal = true;
 
+#if (AMDT_BUILD_TARGET == AMDT_LINUX_OS)
     suSWMRInstance::UniqueLock();
+#endif
 
     apiSocket << retVal;
 }
@@ -890,7 +892,9 @@ void gaUnLockDriverThreadsStub(osSocket& apiSocket)
 {
     bool retVal = true;
 
+#if (AMDT_BUILD_TARGET == AMDT_LINUX_OS)
     suSWMRInstance::UniqueUnLock();
+#endif
 
     apiSocket << retVal;
 }
