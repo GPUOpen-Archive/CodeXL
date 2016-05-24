@@ -19,7 +19,7 @@ Define "DEBUGDIR"		"[COMPPATH]\Output\Debug"
 Define "ALLPROJECTS"	"[CXLPATH]\AllProjectsBuild"
 
 Define "MAJOR" "2"
-Define "MINOR" "1"
+Define "MINOR" "2"
 Define "UPDATE" "0"
 
 Always

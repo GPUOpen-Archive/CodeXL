@@ -876,7 +876,9 @@ void gaLockDriverThreadsStub(osSocket& apiSocket)
 {
     bool retVal = true;
 
+#ifdef SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC
     suSWMRInstance::UniqueLock();
+#endif
 
     apiSocket << retVal;
 }
@@ -890,7 +892,9 @@ void gaUnLockDriverThreadsStub(osSocket& apiSocket)
 {
     bool retVal = true;
 
+#ifdef SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC
     suSWMRInstance::UniqueUnLock();
+#endif
 
     apiSocket << retVal;
 }

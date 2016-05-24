@@ -54,7 +54,7 @@ vsdProcessDebugger::vsdProcessDebugger(IDebugEngine2& riNativeDebugEngine, IDebu
       m_piNativeDebugEngine(&riNativeDebugEngine), m_piNativeDebugEngineLaunch(NULL),
       m_piNativeProgramProvider(&riNativeProgramProvider),
       m_piDebugPort(NULL), m_piDebugDefaultPort(NULL),
-      m_piProcess(NULL), m_piAttachedProgram(nullptr), m_piProgram(NULL),
+      m_piProcess(NULL), m_piAttachedProgram(nullptr), m_piProgram(NULL), m_debuggedProcessSuspensionThread1(nullptr), m_debuggedProcessSuspensionThread2(nullptr),
       m_pDebugEventCallback(NULL)
 {
     // Retain the debug interfaces:
@@ -199,6 +199,17 @@ void vsdProcessDebugger::initialize()
 
     m_debuggedProcessThreads.deleteElementsAndClear();
 
+    if (nullptr != m_debuggedProcessSuspensionThread1)
+    {
+        delete m_debuggedProcessSuspensionThread1;
+        m_debuggedProcessSuspensionThread1 = nullptr;
+    }
+    if (nullptr != m_debuggedProcessSuspensionThread2)
+    {
+        delete m_debuggedProcessSuspensionThread2;
+        m_debuggedProcessSuspensionThread2 = nullptr;
+    }
+
     // The process termination event often comes before the deletion of breakpoints by th VS SDM.
     // As such, we will not clear the breakpoints here, but rather when initializing for the next run.
     // m_hostBreakpoints.deleteElementsAndClear();
@@ -266,25 +277,43 @@ void vsdProcessDebugger::addDebugThread(IDebugThread2* piDebugThread)
 
         if (getThreadFromId(newThreadId) == NULL)
         {
-            osCriticalSectionLocker threadDataCSLocker(m_threadDataCS);
-            m_debuggedProcessThreads.push_back(pNewThread);
-
-            // If a new thread was encountered while we are "suspended", suspend it as well:
-            if (m_isDebuggedProcessSuspended)
+            // If we are waiting for suspension, this is almost surely the thread created by ::DebugBreakProcess
+            if (m_isWaitingForProcessSuspension)
             {
-                // If we are waiting for suspension, this is almost surely the thread created by ::DebugBreakProcess
-                if (m_isWaitingForProcessSuspension)
+                // Internal suspension should only happen during external suspension:
+                GT_IF_WITH_ASSERT(m_isDebuggedProcessSuspended)
+                {
+                    // We should not see two threads in this case:
+                    GT_IF_WITH_ASSERT((nullptr == m_debuggedProcessSuspensionThread1) || (nullptr == m_debuggedProcessSuspensionThread2))
+                    {
+                        vsdCDebugThread*& pFirstAvailableSlot = (nullptr == m_debuggedProcessSuspensionThread1) ? m_debuggedProcessSuspensionThread1 : m_debuggedProcessSuspensionThread2;
+
+                        // Save the thread separately:
+                        pNewThread->setCanSuspendThread(false);
+                        pFirstAvailableSlot = pNewThread;
+
+                        // Mark that we have handled the thread:
+                        pNewThread = nullptr;
+                    }
+                }
+            }
+
+            if (nullptr != pNewThread)
+            {
+                osCriticalSectionLocker threadDataCSLocker(m_threadDataCS);
+                m_debuggedProcessThreads.push_back(pNewThread);
+
+                // If a new thread was encountered while we are "suspended", suspend it as well:
+                if (m_isDebuggedProcessSuspended)
+                {
+                    pNewThread->suspendThread();
+                }
+
+                // Disallow the spies thread from being suspended:
+                if (m_spiesAPIThreadId == newThreadId)
                 {
                     pNewThread->setCanSuspendThread(false);
                 }
-
-                pNewThread->suspendThread();
-            }
-
-            // Disallow the spies thread from being suspended:
-            if (m_spiesAPIThreadId == newThreadId)
-            {
-                pNewThread->setCanSuspendThread(false);
             }
         }
         else // getThreadFromId(newThreadId) != NULL
@@ -333,52 +362,74 @@ void vsdProcessDebugger::removeDebugThread(IDebugThread2* piDebugThread)
         GT_IF_WITH_ASSERT(SUCCEEDED(hr) && (0 != dwTID))
         {
             osThreadId threadId = (osThreadId)dwTID;
-
-            // Iterate the threads vector:
-            osCriticalSectionLocker threadDataCSLocker((osCriticalSection&)m_threadDataCS);
-            int numberOfThreads = (int)m_debuggedProcessThreads.size();
-
             bool found = false;
 
-            for (int i = 0; i < numberOfThreads; i++)
+            // Check if this is the suspension thread:
+            if (nullptr != m_debuggedProcessSuspensionThread1)
             {
-                if (!found)
+                if (m_debuggedProcessSuspensionThread1->threadId() == threadId)
                 {
-                    vsdCDebugThread* pCurrentThread = (vsdCDebugThread*)m_debuggedProcessThreads[i];
-                    GT_IF_WITH_ASSERT(pCurrentThread != NULL)
+                    delete m_debuggedProcessSuspensionThread1;
+                    m_debuggedProcessSuspensionThread1 = nullptr;
+                    found = true;
+                }
+            }
+            if (nullptr != m_debuggedProcessSuspensionThread2)
+            {
+                if (m_debuggedProcessSuspensionThread2->threadId() == threadId)
+                {
+                    delete m_debuggedProcessSuspensionThread2;
+                    m_debuggedProcessSuspensionThread2 = nullptr;
+                    found = true;
+                }
+            }
+
+            if (!found)
+            {
+                // Iterate the threads vector:
+                osCriticalSectionLocker threadDataCSLocker((osCriticalSection&)m_threadDataCS);
+                int numberOfThreads = (int)m_debuggedProcessThreads.size();
+
+                for (int i = 0; i < numberOfThreads; i++)
+                {
+                    if (!found)
                     {
-                        if (pCurrentThread->threadId() == threadId)
+                        vsdCDebugThread* pCurrentThread = (vsdCDebugThread*)m_debuggedProcessThreads[i];
+                        GT_IF_WITH_ASSERT(pCurrentThread != NULL)
                         {
-                            // Delete the thread object:
-                            delete pCurrentThread;
-                            m_debuggedProcessThreads[i] = nullptr;
-                            found = true;
+                            if (pCurrentThread->threadId() == threadId)
+                            {
+                                // Delete the thread object:
+                                delete pCurrentThread;
+                                m_debuggedProcessThreads[i] = nullptr;
+                                found = true;
+                            }
                         }
                     }
-                }
-                else
-                {
-                    // This cannot happen on the first iteration:
-                    m_debuggedProcessThreads[i - 1] = m_debuggedProcessThreads[i];
-                }
-            }
-
-            GT_IF_WITH_ASSERT(found)
-            {
-                // Remove the last vector item, which is either nullptr or a duplicate pointer:
-                m_debuggedProcessThreads.pop_back();
-            }
-
-            if (threadId == m_mainThreadId)
-            {
-                m_mainThreadId = OS_NO_THREAD_ID;
-
-                if (0 < m_debuggedProcessThreads.size())
-                {
-                    vsdCDebugThread* pFirstRemainingThread = m_debuggedProcessThreads[0];
-                    GT_IF_WITH_ASSERT(nullptr != pFirstRemainingThread)
+                    else
                     {
-                        m_mainThreadId = pFirstRemainingThread->threadId();
+                        // This cannot happen on the first iteration:
+                        m_debuggedProcessThreads[i - 1] = m_debuggedProcessThreads[i];
+                    }
+                }
+
+                GT_IF_WITH_ASSERT(found)
+                {
+                    // Remove the last vector item, which is either nullptr or a duplicate pointer:
+                    m_debuggedProcessThreads.pop_back();
+                }
+
+                if (threadId == m_mainThreadId)
+                {
+                    m_mainThreadId = OS_NO_THREAD_ID;
+
+                    if (0 < m_debuggedProcessThreads.size())
+                    {
+                        vsdCDebugThread* pFirstRemainingThread = m_debuggedProcessThreads[0];
+                        GT_IF_WITH_ASSERT(nullptr != pFirstRemainingThread)
+                        {
+                            m_mainThreadId = pFirstRemainingThread->threadId();
+                        }
                     }
                 }
             }
@@ -1880,6 +1931,7 @@ bool vsdProcessDebugger::getThreadId(int threadIndex, osThreadId& threadId) cons
     // Sanity check:
     GT_IF_WITH_ASSERT((0 <= threadIndex) && (amountOfDebuggedProcessThreads() > threadIndex))
     {
+        // Note that m_debuggedProcessSuspensionThread is not reported externally, so it should not appear here:
         osCriticalSectionLocker threadDataCSLocker((osCriticalSection&)m_threadDataCS);
         vsdCDebugThread* pThread = m_debuggedProcessThreads[threadIndex];
         threadDataCSLocker.leaveCriticalSection();
@@ -2436,20 +2488,40 @@ vsdProcessDebugger::vsdCDebugThread* vsdProcessDebugger::getThreadFromId(osThrea
 
     if (threadId != OS_NO_THREAD_ID)
     {
-        // Iterate the threads vector:
-        osCriticalSectionLocker threadDataCSLocker((osCriticalSection&)m_threadDataCS);
-        int numberOfThreads = (int)m_debuggedProcessThreads.size();
-
-        for (int i = 0; i < numberOfThreads; i++)
+        // Check if this is the suspension thread:
+        if (nullptr != m_debuggedProcessSuspensionThread1)
         {
-            vsdCDebugThread* pCurrentThread = (vsdCDebugThread*)m_debuggedProcessThreads[i];
-            GT_IF_WITH_ASSERT(pCurrentThread != NULL)
+            if (m_debuggedProcessSuspensionThread1->threadId() == threadId)
             {
-                if (pCurrentThread->threadId() == threadId)
-                {
-                    retVal = pCurrentThread;
+                retVal = m_debuggedProcessSuspensionThread1;
+            }
+        }
 
-                    break;
+        if ((nullptr == retVal) && (nullptr != m_debuggedProcessSuspensionThread2))
+        {
+            if (m_debuggedProcessSuspensionThread2->threadId() == threadId)
+            {
+                retVal = m_debuggedProcessSuspensionThread2;
+            }
+        }
+
+        if (nullptr == retVal)
+        {
+            // Iterate the threads vector:
+            osCriticalSectionLocker threadDataCSLocker((osCriticalSection&)m_threadDataCS);
+            int numberOfThreads = (int)m_debuggedProcessThreads.size();
+
+            for (int i = 0; i < numberOfThreads; i++)
+            {
+                vsdCDebugThread* pCurrentThread = (vsdCDebugThread*)m_debuggedProcessThreads[i];
+                GT_IF_WITH_ASSERT(pCurrentThread != NULL)
+                {
+                    if (pCurrentThread->threadId() == threadId)
+                    {
+                        retVal = pCurrentThread;
+
+                        break;
+                    }
                 }
             }
         }
@@ -2470,7 +2542,7 @@ int vsdProcessDebugger::getThreadIndexFromId(osThreadId threadId) const
 
     if (threadId != OS_NO_THREAD_ID)
     {
-        // Iterate the threads vector:
+        // Iterate the threads vector. Note that m_debuggedProcessSuspensionThread is not reported and therefore not indexed:
         osCriticalSectionLocker threadDataCSLocker((osCriticalSection&)m_threadDataCS);
         int numberOfThreads = (int)m_debuggedProcessThreads.size();
 

@@ -168,10 +168,12 @@ bool VKAtpFilePart::ParseGPUAPICallString(const std::string& apiStr, VKGPUTraceI
             apiInfo.m_ullEnd = apiInfo.m_ullEnd - m_gpuStart + m_cpuEnd - (m_cpuEnd - m_cpuStart) / 3;
         }
 
-        ss >> apiInfo.m_sampleId;
-        CHECK_SS_ERROR(ss);
-
+        // Checking the status is done before attempting to read 'sample id' because 
+        // the reading of 'sample id' is not critical and can fail without affecting the rest of the parsing.
         retVal = (!ss.fail());
+
+        apiInfo.m_sampleId = 0;
+        ss >> apiInfo.m_sampleId;
     }
 
     return retVal;
