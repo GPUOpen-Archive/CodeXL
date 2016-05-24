@@ -53,9 +53,6 @@ public:
 
     /// The command buffer handle as string
     std::string m_commandBufferHandleStr;
-
-    /// The GPU command sample ID
-    int m_sampleId;
 };
 
 
