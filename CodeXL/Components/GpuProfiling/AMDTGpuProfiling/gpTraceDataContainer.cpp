@@ -280,28 +280,36 @@ ProfileSessionDataItem* gpTraceDataContainer::AddVKGPUTraceItem(VKGPUTraceInfo* 
     // Sanity check:
     GT_IF_WITH_ASSERT(pAPIInfo != nullptr)
     {
-        // Create an HSA profile item
-        pRetVal = new ProfileSessionDataItem(this, pAPIInfo);
-
-        // Add the item to the session items map
-        m_sessionItemsSortedByStartTime.insertMulti(pRetVal->StartTime(), pRetVal);
-
-        // Add the item to the queues map
-        m_sessionQueuesToCallsMap[pAPIInfo->m_queueIndexStr] << pRetVal;
-
-        // Add a map from the queue name to the queue type
-        if (m_sessionQueueNameToCommandListType.contains(pAPIInfo->m_queueIndexStr))
+        if (pAPIInfo->m_strName == GPU_STR_TraceViewWholeBufferTraceStr)
         {
-            GT_ASSERT(m_sessionQueueNameToCommandListType[pAPIInfo->m_queueIndexStr] == pAPIInfo->m_commandListType);
+            // Do not add WholeBuffer commands as GPU api calls
         }
         else
         {
-            m_sessionQueueNameToCommandListType[pAPIInfo->m_queueIndexStr] = pAPIInfo->m_commandListType;
-        }
+            // Create a Vulkan profile item
+            pRetVal = new ProfileSessionDataItem(this, pAPIInfo);
 
-        // Add this GPU call to the relevant command list instance (according to it's sample id)
-        QString commandListInstanceName = AddGPUCallToCommandList(pAPIInfo);
-        pRetVal->SetColumnData(ProfileSessionDataItem::SESSION_ITEM_COMMAND_LIST_COLUMN, commandListInstanceName);
+            // Add the item to the session items map
+            m_sessionItemsSortedByStartTime.insertMulti(pRetVal->StartTime(), pRetVal);
+
+            // Add the item to the queues map
+            m_sessionQueuesToCallsMap[pAPIInfo->m_queueIndexStr] << pRetVal;
+
+            // Add a map from the queue name to the queue type
+            if (m_sessionQueueNameToCommandListType.contains(pAPIInfo->m_queueIndexStr))
+            {
+                GT_ASSERT(m_sessionQueueNameToCommandListType[pAPIInfo->m_queueIndexStr] == pAPIInfo->m_commandListType);
+            }
+            else
+            {
+                m_sessionQueueNameToCommandListType[pAPIInfo->m_queueIndexStr] = pAPIInfo->m_commandListType;
+            }
+
+            // Add this GPU call to the relevant command list instance (according to it's sample id)
+            QString commandListInstanceName = AddGPUCallToCommandList(pAPIInfo);
+            pRetVal->SetColumnData(ProfileSessionDataItem::SESSION_ITEM_COMMAND_LIST_COLUMN, commandListInstanceName);
+
+        }
     }
 
     return pRetVal;
@@ -1045,6 +1053,9 @@ void gpTraceDataContainer::CloseCommandList(APIInfo* pAPIInfo)
             currentInstanceData.m_instanceIndex = newCommandListIndex;
             currentInstanceData.m_commandListPtr = commandListPtr;
 
+            // This list accumulates all items that should be removed from m_commandListUnAttachedCalls after the iteration
+            QList<ProfileSessionDataItem*> itemsToRemove;
+
             // Go through all the calls, and check if the command list pointer is in it's parameter's list
             for (auto iter = m_commandListUnAttachedCalls.begin(); iter != m_commandListUnAttachedCalls.end(); iter++)
             {
@@ -1057,10 +1068,15 @@ void gpTraceDataContainer::CloseCommandList(APIInfo* pAPIInfo)
                     {
                         // Add this sample id to the list of samples for this instance, and remove the item from the unattached list
                         currentInstanceData.m_sampleIds << pCurrentItem->SampleId();
-                        m_commandListUnAttachedCalls.removeOne(pCurrentItem);
+                        itemsToRemove << pCurrentItem;
                         currentInstanceData.m_commandListQueueName = m_commandListToQueueMap[commandListPtr];
                     }
                 }
+            }
+
+            foreach(ProfileSessionDataItem* pItem, itemsToRemove)
+            {
+                m_commandListUnAttachedCalls.removeOne(pItem);
             }
 
             m_commandListInstancesVector << currentInstanceData;
