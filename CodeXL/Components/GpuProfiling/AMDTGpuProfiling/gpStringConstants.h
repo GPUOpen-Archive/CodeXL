@@ -254,6 +254,9 @@
 #define GPU_STR_TraceViewGPUEarlierFull "GPU PROCESSING EARLIER FRAME/S"
 #define GPU_STR_TraceViewGPUEarlierShort "EARLIER FRAME/S"
 
+// WholeCmdBuf
+#define GPU_STR_TraceViewWholeBufferTraceStr "Vulkan_WholeCmdBuf"
+
 // Trace table captions
 #define GP_STR_TraceTableColumnIndex "Index"
 #define GP_STR_TraceTableColumnInterface "Interface"
