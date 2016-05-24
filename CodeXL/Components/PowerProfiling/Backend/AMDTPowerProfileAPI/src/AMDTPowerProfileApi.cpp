@@ -2140,7 +2140,7 @@ AMDTResult AMDTPwrDisableCounter(AMDTUInt32 counterID)
 
         if (last != std::find(first, last, counterID))
         {
-            g_activeCounters.erase(remove(first, last, counterID), first);
+            g_activeCounters.erase(remove(first, last, counterID));
             foundCounter = true;
         }
 
