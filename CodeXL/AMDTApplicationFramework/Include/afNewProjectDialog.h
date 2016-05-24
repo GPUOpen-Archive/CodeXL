@@ -126,7 +126,7 @@ protected:
     void createGeneralPage();
     void fillGeneralPageData();
     void initDialogCurrentProjectSettings();
-    bool isValidRemoteSettings(gtString& invalidMessageStr);
+    bool isValidRemoteSettings(gtString& invalidMessageStr) const;
     void adjustGuiToHostChange(bool isRemote);
 
     void SelectTreeItemByTreePath(const QString& selectedTreeFilePath);
@@ -138,8 +138,20 @@ protected:
     /// Check if the current settings are valid:
     /// \param invalidMessageStr the message describing the invalidity
     /// \param invalidExtensionTreePath the tree path of the extension with the problem
-    /// \return true iff the settings are valid
-    bool AreSettingsValid(gtString& invalidMessageStr, gtString& invalidExtensionTreePath);
+    /// \return true if the settings are valid
+    bool AreSettingsValid(gtString& invalidMessageStr, gtString& invalidExtensionTreePath) const;
+
+    /// Checks if project application paths(both remote and local) are valid, both executable path and working directory path
+    /// \param isAppValid output parameter, true if application has valid path and application is an executable
+    /// \param isWorkingFolderValid output parameter, true if working directory path exists
+    /// \return None
+    void IsApplicationPathsValid(bool& isAppValid, bool& isWorkingFolderValid) const;
+
+
+    /// extracts port and host address from project settings
+    /// \param dmnAddress output parameter, holds project port and host address
+    /// \return true if extracted port address ok
+    bool  GetRemotePortAddress(osPortAddress& dmnAddress) const;
 
     /// Fit the GUI controls for VS extension:
     void FitToVisualStudio();

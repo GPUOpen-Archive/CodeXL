@@ -104,6 +104,11 @@ public:
     // daemonAddress - the agent's address.
     static bool ValidateConnectivity(const osPortAddress& daemonAddress, bool& isConnectivityValid);
 
+    // Checks if remote application path and working directory are valid
+    // Return true if remote query executed successfully
+    // daemonAddress - the agent's address
+    static bool ValidateAppPaths(const osPortAddress& daemonAddress, const gtString& appFilePath, const gtString& workingFolderPath, bool& isAppValid, bool& isWorkingFolderValid);
+
     // Connects to CodeXL Daemon.
     // Return value is true iff the connection was established successfully.
     // Upon success, connectionPortBuffer is filled with the ip and port address
@@ -254,6 +259,8 @@ public:
 
     // retruns true if HSA enabled on remote machine
     bool IsHSAEnabled();
+
+    bool ValidateAppPaths(const gtString& appFilePath, const gtString& workingFolderPath, bool& isAppValid, bool& isWorkingFolderValid);
 
 private:
 

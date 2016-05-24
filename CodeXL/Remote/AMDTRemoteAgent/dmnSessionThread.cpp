@@ -1063,6 +1063,12 @@ int dmnSessionThread::entryPoint()
                         GT_ASSERT(isOk);
                         break;
                     }
+                    case docValidateAppPaths:
+                    {
+                        isOk = ValidateAppPaths();
+                        GT_ASSERT(isOk);
+                        break;
+                    }
 
                     default:
                     {
@@ -1210,6 +1216,36 @@ bool dmnSessionThread::IsHSAEnabled()
         // Send a success status to CodeXL client after getting the command arguments
         ReportSuccess(m_pConnHandler);
     }
+
+    return retVal;
+}
+
+bool dmnSessionThread::ValidateAppPaths()
+{
+    GT_ASSERT(m_pConnHandler != nullptr);
+
+    bool retVal = true;
+
+    gtString appPath;
+    bool appPathValid = false;
+
+    retVal &= m_pConnHandler->readString(appPath);
+    osFilePath appFilePath(appPath);
+    osFile appFile(appFilePath);
+    appPathValid = appFile.IsExecutable();
+    (*m_pConnHandler) << appPathValid;
+
+    gtString workingDir;
+    bool workDirValid = false;
+
+    retVal &= m_pConnHandler->readString(workingDir);
+    osFilePath workingDirFilePath(workingDir);
+    osDirectory workingDirectory(workingDirFilePath);
+    workDirValid = workingDirectory.exists();
+    (*m_pConnHandler) << workDirValid;
+
+    // Send a success status to CodeXL client after getting the command arguments
+    ReportSuccess(m_pConnHandler);
 
     return retVal;
 }

@@ -99,6 +99,8 @@ private:
     /// Returns true if HSA enabled 
     bool IsHSAEnabled();
 
+    bool ValidateAppPaths();
+
 private:
     osTCPSocketServerConnectionHandler* m_pConnHandler;
     osProcessId m_rdsProcId;

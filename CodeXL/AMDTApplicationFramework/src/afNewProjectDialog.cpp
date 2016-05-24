@@ -1378,7 +1378,7 @@ void afNewProjectDialog::OnRestoreDefaultSettings(bool keepProjectUnchanged)
 // Author:      Amit Ben-Moshe
 // Date:        26/08/2013
 // ---------------------------------------------------------------------------
-bool afNewProjectDialog::isValidRemoteSettings(gtString& invalidMessageStr)
+bool afNewProjectDialog::isValidRemoteSettings(gtString& invalidMessageStr) const
 {
     bool ret = false;
 
@@ -1420,7 +1420,7 @@ bool afNewProjectDialog::isValidRemoteSettings(gtString& invalidMessageStr)
     return ret;
 }
 
-bool afNewProjectDialog::AreSettingsValid(gtString& invalidMessageStr, gtString& invalidExtensionTreePath)
+bool afNewProjectDialog::AreSettingsValid(gtString& invalidMessageStr, gtString& invalidExtensionTreePath) const
 {
     bool retVal = true;
 
@@ -1436,26 +1436,14 @@ bool afNewProjectDialog::AreSettingsValid(gtString& invalidMessageStr, gtString&
                           (m_pLocalHostRadioButton != nullptr))
         {
             // Verify remote configurations (if relevant).
-            bool isRemoteSession = m_pRemoteHostRadioButton->isChecked();
+            const bool isRemoteSession = m_pRemoteHostRadioButton->isChecked();
             retVal = (!isRemoteSession || isValidRemoteSettings(invalidMessageStr));
             GT_IF_WITH_ASSERT(retVal)
             {
                 bool isAppValid = true;
+                bool isWorkingFolderValid = true;
+                IsApplicationPathsValid(isAppValid, isWorkingFolderValid);
 
-                if (m_pWinStoreAppRadioButton->isChecked())
-                {
-                    isAppValid = !m_pProgramExeTextEdit->text().isEmpty();
-                }
-                else if (!m_pProgramExeTextEdit->text().isEmpty())
-                {
-                    QFile file(m_pProgramExeTextEdit->text());
-                    //if remote file don't check its validity
-                    //for local files: if windows store application just check if file exists, for regular binaries check if it's an executable
-                    isAppValid = (isRemoteSession || (m_pWinStoreAppRadioButton->isChecked()? file.exists() : QFileInfo(file).isExecutable()));
-                }
-
-                QDir dir(m_pWorkingFolderTextEdit->text());
-                bool isWorkingFolderValid = dir.exists() || m_pWorkingFolderTextEdit->text().isEmpty();
 
                 if (!isAppValid)
                 {
@@ -1470,7 +1458,7 @@ bool afNewProjectDialog::AreSettingsValid(gtString& invalidMessageStr, gtString&
                         invalidMessageStr = AF_STR_newProjectExeDoesNotExistOrInvalid;
                     }
                 }
-                else if (!isRemoteSession && !isWorkingFolderValid)
+                else if (!isWorkingFolderValid)
                 {
                     retVal = false;
                     invalidMessageStr = AF_STR_newProjectWorkingFolderDoesNotExist;
@@ -1531,6 +1519,64 @@ bool afNewProjectDialog::AreSettingsValid(gtString& invalidMessageStr, gtString&
     return retVal;
 }
 
+
+void afNewProjectDialog::IsApplicationPathsValid(bool& isAppValid, bool& isWorkingFolderValid) const
+{
+    isAppValid = true;
+    const bool isWInStoreAppRadioButtonChecked = m_pWinStoreAppRadioButton->isChecked();
+    const QString workingFolderPath = m_pWorkingFolderTextEdit->text();
+    const QString appFilePath = m_pProgramExeTextEdit->text();
+    const bool isRemoteSession = m_pRemoteHostRadioButton->isChecked();
+    if (isRemoteSession)
+    {
+        osPortAddress dmnAddress;
+        GT_IF_WITH_ASSERT(GetRemotePortAddress(dmnAddress))
+        {
+            bool isExecutionSuccessfull = CXLDaemonClient::ValidateAppPaths(dmnAddress, acQStringToGTString(appFilePath), acQStringToGTString(workingFolderPath), isAppValid, isWorkingFolderValid);
+            GT_ASSERT_EX(isExecutionSuccessfull, L"Failed to check application path for validity");
+        }
+    }
+    else
+    {
+        if (isWInStoreAppRadioButtonChecked)
+        {
+            isAppValid = !appFilePath.isEmpty();
+        }
+        else if (!appFilePath.isEmpty())
+        {
+            QFile file(appFilePath);
+            //for local files: if windows store application just check if file exists, for regular binaries check if it's an executable
+            isAppValid = isWInStoreAppRadioButtonChecked? file.exists() : QFileInfo(file).isExecutable();
+        }
+
+        QDir dir(workingFolderPath);
+        isWorkingFolderValid = dir.exists() || workingFolderPath.isEmpty();
+    }
+    
+}
+
+
+bool afNewProjectDialog::GetRemotePortAddress(osPortAddress& dmnAddress) const
+{
+    bool result = false;
+    // Sanity check:
+    GT_IF_WITH_ASSERT((m_pRemoteHostIpLineEdit != nullptr) && (m_pRemoteHostPortLineEdit != nullptr))
+    {
+        // Get the host name and port number from widgets:
+        QString qstrHostIp = m_pRemoteHostIpLineEdit->text().trimmed();
+        QString qstrHostPort = m_pRemoteHostPortLineEdit->text().trimmed();
+        gtString hostIp = acQStringToGTString(qstrHostIp);
+        gtString hostPort = acQStringToGTString(qstrHostPort);
+
+        // Convert the port to a number:
+        unsigned int hostPortNumber = 0;
+        hostPort.toUnsignedIntNumber(hostPortNumber);
+        dmnAddress.setAsRemotePortAddress(hostIp, hostPortNumber);
+        result = true;
+    }
+    
+    return result;
+}
 
 // ---------------------------------------------------------------------------
 // Name:        afNewProjectDialog::OnProjectNameEdit
@@ -1904,23 +1950,13 @@ void afNewProjectDialog::FitToVisualStudio()
 
 void afNewProjectDialog::OnTestConnection()
 {
-    // Sanity check:
-    GT_IF_WITH_ASSERT((m_pRemoteHostIpLineEdit != nullptr) && (m_pRemoteHostPortLineEdit != nullptr))
+
+    osPortAddress dmnAddress;
+    GT_IF_WITH_ASSERT(GetRemotePortAddress(dmnAddress))
     {
-        // Get the host name and port number from widgets:
-        QString qstrHostIp = m_pRemoteHostIpLineEdit->text().trimmed();
-        QString qstrHostPort = m_pRemoteHostPortLineEdit->text().trimmed();
-        gtString hostIp = acQStringToGTString(qstrHostIp);
-        gtString hostPort = acQStringToGTString(qstrHostPort);
-
-        // Convert the port to a number:
-        unsigned int hostPortNumber = 0;
-        hostPort.toUnsignedIntNumber(hostPortNumber);
-
         // Perform the connection test:
         bool isExecutionSuccessfull = false;
         bool isConnectivityValid = false;
-        const osPortAddress dmnAddress(hostIp.asCharArray(), hostPortNumber);
         isExecutionSuccessfull = CXLDaemonClient::ValidateConnectivity(dmnAddress, isConnectivityValid);
 
 
@@ -1929,7 +1965,7 @@ void afNewProjectDialog::OnTestConnection()
 
         if (!isExecutionSuccessfull || !isConnectivityValid)
         {
-            connectionTestResults = QString(AF_STR_newProject_remoteHostTestConnectionFailedMessage).arg(qstrHostIp).arg(qstrHostPort);
+            connectionTestResults = QString(AF_STR_newProject_remoteHostTestConnectionFailedMessage).arg(dmnAddress.hostName().asASCIICharArray()).arg(dmnAddress.portNumber());
         }
 
         // Popup a message box with the connection test results:
