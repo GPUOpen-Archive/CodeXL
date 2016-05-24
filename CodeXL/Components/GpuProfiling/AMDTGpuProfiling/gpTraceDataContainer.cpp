@@ -1289,17 +1289,24 @@ QString gpTraceDataContainer::QueueNameFromPointer(const QString& queuePtrStr)
 
 QString gpTraceDataContainer::QueueDisplayName(const QString& queuePtrStr)
 {
-    // Get the name with the index
-    QString retVal = QueueNameFromPointer(queuePtrStr);
+    
+    QString retVal;
 
     // Append the queue type to the queue name in DX12 (irrelevant in Vulkan)
     if (SessionAPIType() == ProfileSessionDataItem::DX12_API_PROFILE_ITEM)
     {
         int queueType = QueueType(queuePtrStr);
         QString queueTypeStr = CommandListTypeAsString(queueType);
-        retVal.append(AF_STR_SpaceA);
         retVal.append(queueTypeStr);
+        retVal.append(AF_STR_SpaceA);
+        retVal.append(QString(GPU_STR_timeline_QueueBranchName).arg(ProfileSessionDataItem::QueueDisplayName(queuePtrStr)));
     }
+    else
+    {
+        // for vulkan: Get the name with the index
+        retVal = QueueNameFromPointer(queuePtrStr);
+    }
+
     return retVal;
 }
 
