@@ -584,7 +584,7 @@ AMDTResult PowerProfileTranslate::ProcessSample(ContextData* pCtx, AMDTFloat32 i
 
     if (S_OK != fnGetModuleInstanceId(pCtx->m_processId, pCtx->m_ip, deltaTick, instanceId))
     {
-        PwrTrace("fnGetModuleInstanceId faild for PID %d", pCtx->m_processId);
+        PwrTrace("fnGetModuleInstanceId failed for PID %d", pCtx->m_processId);
     }
 
 #ifdef MEMORY_TIME_TRACE
@@ -1997,7 +1997,7 @@ AMDTResult PowerProfileTranslate::PwrGetProfileData(CXLContextProfileType type, 
 
         *pPower = totalPower;
         *pData = &m_processList[0];
-        *pCnt = m_processList.size();
+        *pCnt = static_cast<AMDTUInt32>(m_processList.size());
     }
 
 
@@ -2046,7 +2046,7 @@ AMDTResult PowerProfileTranslate::PwrGetProfileData(CXLContextProfileType type, 
 
         *pPower = totalPower;
         *pData = &m_moduleList[0];
-        *pCnt = m_moduleList.size();
+        *pCnt = static_cast<AMDTUInt32>(m_moduleList.size());
     }
 
     if (*pCnt == 0)
