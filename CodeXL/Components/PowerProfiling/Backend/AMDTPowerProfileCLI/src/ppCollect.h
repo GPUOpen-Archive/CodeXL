@@ -59,6 +59,7 @@ public:
     AMDTResult Initialize();
     AMDTResult Configure();
     AMDTResult GetProcessData(AMDTUInt32* pPIDCount, AMDTPwrProcessInfo** ppData);
+    AMDTResult GetModuleData(AMDTPwrModuleData** ppData, AMDTUInt32* pModuleCnt, AMDTFloat32* pPower);
 
     AMDTResult EnableProcessProfiling();
 

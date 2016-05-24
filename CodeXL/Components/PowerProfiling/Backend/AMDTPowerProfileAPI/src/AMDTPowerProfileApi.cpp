@@ -2680,11 +2680,6 @@ AMDTResult AMDTPwrStopProfiling()
         ret = PwrStopProfiling();
     }
 
-    if (AMDT_STATUS_OK == ret)
-    {
-        ret = AMDTPwrCloseDataAccess();
-    }
-
     return ret;
 }
 
@@ -2835,6 +2830,7 @@ AMDTResult AMDTPwrProfileClose()
 
     if (AMDT_STATUS_OK == ret)
     {
+        AMDTPwrCloseDataAccess();
         // release the memory pool created
         ret = ReleaseMemoryPool(&g_apiMemoryPool);
 
@@ -3651,5 +3647,48 @@ AMDTResult AMDTGetProcessProfileData(AMDTUInt32* pPIDCount,
 
     return ret;
 }
+
+// This API will provide the list of running processes/Modules/ip samples collected by the profiler
+// so far from the time of profile start or bewteen two consecutive call of this function,
+// their agreegated power indicators. This API can be called at any
+// point of time from start of the profile to the stop of the profile.
+AMDTResult AMDTPwrGetModuleProfileData(AMDTPwrModuleData** ppData, AMDTUInt32* pModuleCount, AMDTFloat32* pPower)
+{
+    AMDTPwrProfileState state = AMDT_PWR_PROFILE_STATE_UNINITIALIZED;
+    AMDTResult ret = AMDT_STATUS_OK;
+#ifdef LINUX
+    return AMDT_ERROR_NOTSUPPORTED;
+#else
+
+    // Check for valid arguments
+    if ((nullptr == pModuleCount) || (nullptr == ppData))
+    {
+        ret = AMDT_ERROR_INVALIDARG;
+    }
+
+    if (AMDT_STATUS_OK == ret)
+    {
+        *pModuleCount = 0;
+        *ppData = nullptr;
+
+        // Check for valid profile state
+        ret = AMDTPwrGetProfilingState(&state);
+    }
+
+    if (ret == AMDT_STATUS_OK)
+    {
+        if ((AMDT_PWR_PROFILE_STATE_STOPPED == state)
+            || (AMDT_PWR_PROFILE_STATE_RUNNING == state)
+            || (AMDT_PWR_PROFILE_STATE_PAUSED == state))
+
+        {
+            ret = PwrGetModuleProfileData(ppData, pModuleCount, pPower);
+        }
+    }
+
+    return ret;
+#endif
+}
+
 #endif
 

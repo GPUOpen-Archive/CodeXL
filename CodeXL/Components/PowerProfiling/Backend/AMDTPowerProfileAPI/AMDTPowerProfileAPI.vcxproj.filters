@@ -114,6 +114,5 @@
     <None Include="AMDTPowerProfileAPI.def">
       <Filter>Source Files</Filter>
     </None>
-    <None Include="AMDTPowerProfileAPI.licenseheader" />
   </ItemGroup>
 </Project>

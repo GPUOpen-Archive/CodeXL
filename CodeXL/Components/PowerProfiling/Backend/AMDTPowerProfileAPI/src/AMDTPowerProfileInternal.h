@@ -27,6 +27,14 @@
 #define AMD_VENDOR_ID           0x1002
 #define AMD_VENDOR_ID1          0x1022
 
+typedef enum CXLContextProfileType
+{
+    PROCESS_PROFILE,
+    MODULE_PROFILE,
+    IPSAMPLE_PROFILE,
+    MAX_PROFILE
+} CXLContextProfileType;
+
 //AMDTPwrProcessedDataType: Processed data type
 enum AMDTPwrProcessedDataType
 {

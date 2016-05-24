@@ -293,6 +293,30 @@ HRESULT fnGetModuleInfo(TiModuleInfo* info)
     return hr;
 }
 
+HRESULT fnGetModuleInstanceId(gtUInt32 processId, gtUInt64 sampleAddr, gtUInt64 deltaTick, gtUInt32& modInstId)
+{
+    HRESULT hr = S_OK;
+
+    hr = g_TaskInfo.GetModuleInstanceId(processId, sampleAddr, deltaTick, modInstId);
+
+    return hr;
+}
+
+HRESULT fnGetModuleInfoByInstanceId(gtUInt32 instanceId, LoadModuleInfo* pModInfo)
+{
+    HRESULT hr = S_OK;
+
+    if (NULL == pModInfo)
+    {
+        return S_FALSE;
+    }
+
+    hr = g_TaskInfo.GetLoadModuleInfoByInstanceId(instanceId, pModInfo);
+
+    return hr;
+}
+
+
 HRESULT fnGetProcessThreadList(gtVector<std::tuple<gtUInt32, gtUInt32>>& info)
 {
     HRESULT hr = g_TaskInfo.GetProcessThreadList(info);

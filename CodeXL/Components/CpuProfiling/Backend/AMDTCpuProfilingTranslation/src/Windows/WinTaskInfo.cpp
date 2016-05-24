@@ -2546,6 +2546,252 @@ HRESULT WinTaskInfo::GetKernelModInfo(TiModuleInfo* pModInfo, TiTimeType systemT
     return hr;
 }
 
+HRESULT WinTaskInfo::FindModuleId(const wchar_t* pModuleName, gtInt32& moduleId)
+{
+    HRESULT hr = S_OK;
+
+    auto iter = m_moduleIdMap.find(pModuleName);
+
+    if (m_moduleIdMap.end() == iter)
+    {
+        auto ret = m_moduleIdMap.emplace(pModuleName, AtomicAdd(m_nextModuleId, 1));
+        moduleId = ret.second;
+        //hr = S_OK;
+    }
+
+    return hr;
+}
+
+HRESULT ConstructModuleName(ModuleValue& modValue, gtUInt64 pid, std::wstring& modName)
+{
+    if (modValue.moduleName[0] == L'\0')
+    {
+        // Module name is unknown
+        modName = to_wstring(pid);
+    }
+    else
+    {
+        // Module name is known
+        modName = modValue.moduleName;
+    }
+
+    return S_OK;
+}
+
+// GetModuleInstanceId
+// Get module instance id for a given sample record .
+HRESULT WinTaskInfo::GetModuleInstanceId(gtUInt32 processId, gtUInt64 sampleAddr, gtUInt64 deltaTick, gtUInt32& modInstId)
+{
+    HRESULT hr = S_FALSE;
+    bool moduleFound = false;
+
+    AddLoadModules(processId);
+
+    // this is user space, check module map.
+    ModuleMap::iterator i = m_tiModMap.lower_bound(ModuleKey(processId, sampleAddr, TI_TIMETYPE_MAX));
+
+    for (ModuleMap::iterator iEnd = m_tiModMap.end(); i != iEnd; ++i)
+    {
+        ModuleMap::value_type& item = *i;
+
+        // different process
+        if (item.first.processId != processId)
+        {
+            break;
+        }
+
+        // since the module map is sorted by the process id, module address and time.
+        // if module load address is greater than sample address, we don't need
+        // go farther.
+        if ((item.first.moduleLoadAddr + item.second.moduleSize) < sampleAddr)
+        {
+            break;
+        }
+
+        if (0 != deltaTick && (item.first.moduleLoadTime >= deltaTick || item.second.moduleUnloadTime < deltaTick))
+        {
+            if (evJavaModule != item.second.moduleType)
+            {
+                //OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_DEBUG, L"Unknown Module : systemTimeTick(%d) IP(0x%lx)", systemTimeTick, pModInfo->sampleAddr);
+                continue;
+            }
+        }
+
+        modInstId = item.second.instanceId;
+        hr = S_OK;
+        std::wstring modName;
+        ConstructModuleName(item.second, item.first.processId, modName);
+
+        FindModuleId(modName.c_str(), item.second.moduleId);
+        moduleFound = true;
+        break;
+    }
+
+    if (false == moduleFound)
+    {
+        KernelModMap::iterator iter;
+
+        KernelModKey t_value(sampleAddr, TI_TIMETYPE_MAX);
+
+        for (iter = m_tiKeModMap.lower_bound(t_value); iter != m_tiKeModMap.end(); ++iter)
+        {
+            KernelModMap::value_type& kemoditem = *iter;
+
+            // Since the module with greater start address will stay on the bottom of map.
+            // if module end address is less than sample address, we don't need to go farther
+            //
+            if (kemoditem.second.keModEndAddr < sampleAddr)
+            {
+                break;
+            }
+
+            if (deltaTick && kemoditem.first.keModLoadTime > deltaTick)
+            {
+                continue;
+            }
+
+            if (kemoditem.first.keModLoadAddr <= sampleAddr && kemoditem.second.keModEndAddr > sampleAddr)
+            {
+                modInstId = kemoditem.second.instanceId;
+                hr = S_OK;
+
+                if (!kemoditem.second.bNameConverted)
+                {
+                    wchar_t tStr[OS_MAX_PATH + 1];
+                    wcsncpy(tStr, kemoditem.second.keModName, OS_MAX_PATH + 1);
+                    ConvertName(tStr, 0);
+
+                    osCriticalSectionLocker lock(m_TIMutexKE);
+
+                    if (!kemoditem.second.bNameConverted)
+                    {
+                        wcsncpy(kemoditem.second.keModName, tStr, OS_MAX_PATH + 1);
+                        kemoditem.second.bNameConverted = true;
+                    }
+                }
+
+                if (!kemoditem.second.bLoadedPeFile)
+                {
+                    osCriticalSectionLocker lock(m_TIMutexKE);
+
+                    if (!kemoditem.second.bLoadedPeFile)
+                    {
+                        if (NULL != kemoditem.second.pPeFile)
+                        {
+                            delete kemoditem.second.pPeFile;
+                        }
+
+                        PeFile* pPeFile = new PeFile(kemoditem.second.keModName);
+
+                        if (NULL != pPeFile)
+                        {
+                            if (pPeFile->Open(kemoditem.first.keModLoadAddr))
+                            {
+                                pPeFile->InitializeSymbolEngine(m_pSearchPath, m_pServerList, m_pCachePath);
+                            }
+                            else
+                            {
+                                delete pPeFile;
+                                pPeFile = NULL;
+                            }
+                        }
+
+                        kemoditem.second.pPeFile = pPeFile;
+                        kemoditem.second.bLoadedPeFile = true;
+                        m_bLoadKernelPeFiles = true;
+                    }
+                }
+
+                // if the module image size is not available, then update the module image size;
+                if (0ULL == kemoditem.second.keModImageSize)
+                {
+                    gtUInt64 modImageSize = 0;
+
+                    if (NULL != kemoditem.second.pPeFile)
+                    {
+                        modImageSize = kemoditem.second.pPeFile->GetImageSize();
+                    }
+
+                    osCriticalSectionLocker lock(m_TIMutexKE);
+
+                    if (0ULL == kemoditem.second.keModImageSize)
+                    {
+                        kemoditem.second.keModImageSize = modImageSize;
+                    }
+                }
+
+                if (kemoditem.second.keModImageSize != 0)
+                {
+                    if (sampleAddr > kemoditem.first.keModLoadAddr + kemoditem.second.keModImageSize)
+                    {
+                        //TODO: hr = S_FALSE;
+                        modInstId = 0xFF000000 + processId;
+                    }
+                }
+
+                break;
+            }
+        }
+    }
+
+    return hr;
+}
+
+// GetModuleInfoFromInstanceId: Get module information for a give instance id
+HRESULT WinTaskInfo::GetLoadModuleInfoByInstanceId(gtUInt32 instanceId, LoadModuleInfo* pModInfo)
+{
+    HRESULT hr = S_FALSE;
+    bool found = false;
+
+    if (NULL == pModInfo)
+    {
+        return hr;
+    }
+
+    // check map status
+    if (! m_bMapBuilt)
+    {
+        m_ErrorMsg = "Maps are not built up yet.";
+        return S_FALSE;
+    }
+
+    for (auto moditer : m_tiModMap)
+    {
+        if (instanceId == moditer.second.instanceId)
+        {
+            pModInfo->m_pid = (gtUInt32)moditer.first.processId;
+            pModInfo->m_instanceId = instanceId;
+            pModInfo->m_moduleStartAddr = moditer.first.moduleLoadAddr;
+            pModInfo->m_modulesize = (gtUInt32)moditer.second.moduleSize;
+            pModInfo->m_moduleType = moditer.second.moduleType;
+            wcstombs(pModInfo->m_pModulename, moditer.second.moduleName, OS_MAX_PATH);
+            pModInfo->m_moduleId = moditer.second.moduleId;
+            pModInfo->m_isKernel = false;
+            found = true;
+            break;
+        }
+    }
+
+    if (false == found)
+    {
+        for (auto moditer : m_tiKeModMap)
+        {
+            if (instanceId == moditer.second.instanceId)
+            {
+                pModInfo->m_instanceId = instanceId;
+                pModInfo->m_moduleStartAddr = moditer.first.keModLoadAddr;
+                pModInfo->m_modulesize = (gtUInt32)(moditer.second.keModEndAddr - moditer.first.keModLoadAddr);
+                pModInfo->m_isKernel = true;
+                wcstombs(pModInfo->m_pModulename, moditer.second.keModName, OS_MAX_PATH);
+                //pModInfo->m_moduleId = moditer.second.;
+                found = true;
+                break;
+            }
+        }
+    }
+
+    return (true == found) ? S_OK : E_FAIL;
+}
 //////////////////////////////////////////////////////////////////////////////////////
 // WinTaskInfo::GetModuleInfo( )
 //  Get module info for a given sample record.

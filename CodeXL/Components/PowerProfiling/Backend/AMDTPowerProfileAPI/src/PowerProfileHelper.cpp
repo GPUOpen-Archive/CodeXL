@@ -316,7 +316,14 @@ uint32 GetActiveCoreCount()
 
 #ifdef _PWR_BACKEND_TRACE_
 FILE* pFile = nullptr;
-
+// PowerTraceFlush: Dump trace buffer to the file
+void PowerTraceFlush()
+{
+    if (nullptr != pFile)
+    {
+        fflush(pFile);
+    }
+}
 // PowerTrace: This function will write the formated text to the trace file
 void PowerTrace(const char* func, AMDTUInt32 line, const char* format, ...)
 {
@@ -354,7 +361,6 @@ void PowerTrace(const char* func, AMDTUInt32 line, const char* format, ...)
         // If file is created write the trace message
         fwrite(preText, strlen(preText), sizeof(uint8), pFile);
         fwrite(lineBuffer, strlen(lineBuffer), sizeof(uint8), pFile);
-        fwrite("\n", 1, sizeof(uint8), pFile);
         fflush(pFile);
     }
 

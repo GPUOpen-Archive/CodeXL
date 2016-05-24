@@ -294,6 +294,33 @@ typedef struct AMDTPwrProcessInfo
     char        m_path[AMDT_PWR_EXE_PATH_LENGTH];       /**< Path */
 } AMDTPwrProcessInfo;
 
+// ContextPowerData: Power with context information
+typedef struct  ContextPowerData
+{
+    AMDTUInt64    m_ip;             /**< Sample address */
+    AMDTUInt32    m_processId;      /**< Process id */
+    AMDTUInt32    m_threadId;       /**< Thread id */
+    AMDTUInt64    m_timeStamp;      /**< Sample time stamp */
+    AMDTUInt32    m_coreId;         /**< Cpu core id */
+    AMDTFloat32   m_ipcLoad;        /**< Agreegated IPC value */
+    AMDTFloat32   m_power;          /**< Power consumed */
+    AMDTUInt32    m_sampleCnt;      /**< Number of samples */
+} ContextPowerData;
+
+// AMDTPwrModuleData: Power with module information
+typedef struct AMDTPwrModuleData
+{
+    AMDTUInt32    m_processId;                        /**< Process id */
+    AMDTFloat32   m_power;                            /**< Power consumed */
+    AMDTFloat32   m_ipcLoad;                          /**< Agreegated IPC value */
+    AMDTUInt32    m_sampleCnt;                        /**< Number of PID samples */
+    bool          m_isKernel;                         /**< Kernel/User module */
+    char          m_name[AMDT_PWR_EXE_NAME_LENGTH];   /**< Executable name */
+    char          m_path[AMDT_PWR_EXE_PATH_LENGTH];   /**< Path */
+    AMDTUInt64    m_loadAddr;                         /**< Module load address */
+    AMDTUInt64    m_size;                             /**< Module size */
+} AMDTPwrModuleData;
+
 /** Represents the instrumented power data.
 \ingroup profiling
 */

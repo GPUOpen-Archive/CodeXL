@@ -27,3 +27,4 @@ EXPORTS
     AMDTEnableProcessProfiling
     AMDTGetProcessProfileData
     AMDTPwrReadCumulativeCounter
+    AMDTPwrGetModuleProfileData

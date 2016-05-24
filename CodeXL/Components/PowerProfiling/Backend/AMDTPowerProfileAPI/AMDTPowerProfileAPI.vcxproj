@@ -38,12 +38,12 @@
   </ImportGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>..\AMDTPowerProfilingDrivers\Windows\inc\;..\AMDTPowerProfilingDrivers\inc\;..\inc;..\..\..\..\..\Common\Src\AMDTCommonHeaders\;.\inc;..\..\..\..\..\Common\Src\AMDTCpuPerfEventUtils\inc\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\AMDTPowerProfilingDrivers\Windows\inc\;..\AMDTPowerProfilingDrivers\inc\;..\inc;..\..\..\..\..\Common\Src\AMDTCommonHeaders\;.\inc;..\..\..\CpuProfiling\Backend\AMDTCpuProfilingTranslation\inc;..\..\..\CpuProfiling\Backend\AMDTCpuProfilingTranslation\inc\Windows;..\..\..\CpuProfiling\Backend;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>CXLDriverControl$(GDTProjectSuffix).lib;advapi32.lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib</AdditionalDependencies>
+      <AdditionalDependencies>CXLDriverControl$(GDTProjectSuffix).lib;advapi32.lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;CXLCpuProfilingTranslation$(GDTProjectSuffix).lib</AdditionalDependencies>
       <ModuleDefinitionFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AMDTPowerProfileAPI.def</ModuleDefinitionFile>
       <ModuleDefinitionFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AMDTPowerProfileAPI.def</ModuleDefinitionFile>
       <ModuleDefinitionFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AMDTPowerProfileAPI.def</ModuleDefinitionFile>

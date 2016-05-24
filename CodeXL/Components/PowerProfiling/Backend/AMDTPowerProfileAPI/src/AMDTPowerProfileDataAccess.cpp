@@ -169,23 +169,39 @@ AMDTResult GetCummulativePidProfDataFromStart(AMDTUInt32* pPIDCount,
                                               AMDTUInt32 pidVal)
 {
     AMDTResult ret = AMDT_ERROR_NODATA;
+    AMDTPwrProcessInfo* pInfo = nullptr;
+    AMDTUInt32 entries = 0;
+    AMDTFloat32 power = 0;
+#ifndef LINUX
 
-    if (g_aggrPidPowerList.m_numberOfPids > 0)
+    if (nullptr != g_pTranslate)
+    {
+        g_pTranslate->PwrGetProfileData(PROCESS_PROFILE, (void**)&pInfo, &entries, &power);
+        (void)power;
+    }
+
+#else
+    entries = g_aggrPidPowerList.m_numberOfPids;
+    pInfo = &g_aggrPidPowerList.m_process[0]
+
+#endif
+
+    if (entries > 0)
     {
         if (AMD_PWR_ALL_PIDS == pidVal)
         {
-            *pPIDCount = g_aggrPidPowerList.m_numberOfPids;
-            *ppData = &g_aggrPidPowerList.m_process[0];
+            *pPIDCount = entries;
+            *ppData = pInfo;
             ret = AMDT_STATUS_OK;
         }
         else
         {
-            for (AMDTUInt32 idx = 0; idx < g_aggrPidPowerList.m_numberOfPids; ++idx)
+            for (AMDTUInt32 idx = 0; idx < entries; ++idx)
             {
-                if (pidVal == g_aggrPidPowerList.m_process[idx].m_pid)
+                if (pidVal == pInfo[idx].m_pid)
                 {
                     *pPIDCount = 1;
-                    *ppData = &g_aggrPidPowerList.m_process[idx];
+                    *ppData = &pInfo[idx];
                     ret = AMDT_STATUS_OK;
                     break;
                 }
@@ -201,22 +217,38 @@ AMDTResult GetCummulativePidProfDataInstatant(AMDTUInt32* pPIDCount,
                                               AMDTUInt32 pidVal)
 {
     AMDTResult ret = AMDT_STATUS_OK;
+    AMDTPwrProcessInfo* pInfo = nullptr;
+    AMDTUInt32 entries = 0;
+    AMDTFloat32 power = 0;
+#ifndef LINUX
+
+    if (nullptr != g_pTranslate)
+    {
+        g_pTranslate->PwrGetProfileData(PROCESS_PROFILE, (void**)&pInfo, &entries, &power);
+        (void)power;
+    }
+
+#else
+    entries = g_aggrPidPowerList.m_numberOfPids;
+    pInfo = &g_aggrPidPowerList.m_process[0]
+
+#endif
 
     // first call to this function
     if (g_lastAggrPidPwrMap.empty())
     {
-        if (g_aggrPidPowerList.m_numberOfPids > 0)
+        if (entries > 0)
         {
             // Copy g_aggrPidPowerData to an unordered-map for later processing
-            for (AMDTUInt32 idx = 0; idx < g_aggrPidPowerList.m_numberOfPids; ++idx)
+            for (AMDTUInt32 idx = 0; idx < entries; ++idx)
             {
-                g_lastAggrPidPwrMap.insert({ g_aggrPidPowerList.m_process[idx].m_pid, g_aggrPidPowerList.m_process[idx] });
+                g_lastAggrPidPwrMap.insert({ pInfo[idx].m_pid, pInfo[idx] });
             }
 
             if (AMD_PWR_ALL_PIDS == pidVal)
             {
-                *pPIDCount = g_aggrPidPowerList.m_numberOfPids;
-                *ppData = &g_aggrPidPowerList.m_process[0];
+                *pPIDCount = entries;
+                *ppData = &pInfo[0];
             }
             else
             {
@@ -245,28 +277,28 @@ AMDTResult GetCummulativePidProfDataInstatant(AMDTUInt32* pPIDCount,
         AMDTUInt32 count = 0;
         memset(g_pidInfo, 0, sizeof(AMDTUInt32) * MAX_PID_CNT);
 
-        for (AMDTUInt32 idx = 0; idx < g_aggrPidPowerList.m_numberOfPids; ++idx)
+        for (AMDTUInt32 idx = 0; idx < entries; ++idx)
         {
-            auto itr = g_lastAggrPidPwrMap.find(g_aggrPidPowerList.m_process[idx].m_pid);
+            auto itr = g_lastAggrPidPwrMap.find(pInfo[idx].m_pid);
 
             if (g_lastAggrPidPwrMap.end() != itr)
             {
                 // entry found
-                g_pidInfo[count].m_ipc = g_aggrPidPowerList.m_process[idx].m_ipc - itr->second.m_ipc;
-                g_pidInfo[count].m_power = g_aggrPidPowerList.m_process[idx].m_power - itr->second.m_power;
-                g_pidInfo[count].m_sampleCnt = g_aggrPidPowerList.m_process[idx].m_sampleCnt - itr->second.m_sampleCnt;
+                g_pidInfo[count].m_ipc = pInfo[idx].m_ipc - itr->second.m_ipc;
+                g_pidInfo[count].m_power = pInfo[idx].m_power - itr->second.m_power;
+                g_pidInfo[count].m_sampleCnt = pInfo[idx].m_sampleCnt - itr->second.m_sampleCnt;
             }
             else
             {
                 // entry not found
-                g_pidInfo[count].m_ipc = g_aggrPidPowerList.m_process[idx].m_ipc;
-                g_pidInfo[count].m_power = g_aggrPidPowerList.m_process[idx].m_power;
-                g_pidInfo[count].m_sampleCnt = g_aggrPidPowerList.m_process[idx].m_sampleCnt;
+                g_pidInfo[count].m_ipc = pInfo[idx].m_ipc;
+                g_pidInfo[count].m_power = pInfo[idx].m_power;
+                g_pidInfo[count].m_sampleCnt = pInfo[idx].m_sampleCnt;
             }
 
-            strcpy(g_pidInfo[count].m_name, g_aggrPidPowerList.m_process[idx].m_name);
-            strcpy(g_pidInfo[count].m_path, g_aggrPidPowerList.m_process[idx].m_path);
-            g_pidInfo[count].m_pid = g_aggrPidPowerList.m_process[idx].m_pid;
+            strcpy(g_pidInfo[count].m_name, pInfo[idx].m_name);
+            strcpy(g_pidInfo[count].m_path, pInfo[idx].m_path);
+            g_pidInfo[count].m_pid = pInfo[idx].m_pid;
             ++count;
         }
 
@@ -288,12 +320,12 @@ AMDTResult GetCummulativePidProfDataInstatant(AMDTUInt32* pPIDCount,
             }
         }
 
-        if (g_aggrPidPowerList.m_numberOfPids > 0)
+        if (entries > 0)
         {
             g_lastAggrPidPwrMap.clear();
 
             // Copy g_aggrPidPowerData
-            for (AMDTUInt32 idx = 0; idx < g_aggrPidPowerList.m_numberOfPids; ++idx)
+            for (AMDTUInt32 idx = 0; idx < entries; ++idx)
             {
                 g_lastAggrPidPwrMap.insert({ g_aggrPidPowerList.m_process[idx].m_pid, g_aggrPidPowerList.m_process[idx] });
             }
@@ -334,6 +366,27 @@ AMDTResult AMDTGetInstrumentedData(AMDTUInt32 markerId, PwrInstrumentedPowerData
         && (0 != markerId))
     {
         ret = g_pTranslate->GetInstrumentedData(markerId, ppData);
+    }
+    else
+    {
+        ret = AMDT_ERROR_INTERNAL;
+        PwrTrace("Invalid pointer g_translation or pInfo");
+    }
+
+    return ret;
+}
+
+// PwrGetModuleProfileData: module level profiling data.
+// this api can be called at any point of profile state from start to end of the session
+AMDTResult PwrGetModuleProfileData(AMDTPwrModuleData** ppData, AMDTUInt32* pModuleCount, AMDTFloat32* pPower)
+{
+    AMDTResult ret = AMDT_STATUS_OK;
+
+    if ((nullptr != g_pTranslate)
+        && (nullptr != ppData)
+        && (nullptr != pModuleCount))
+    {
+        ret = g_pTranslate->PwrGetProfileData(MODULE_PROFILE, (void**)ppData, pModuleCount, pPower);
     }
     else
     {

@@ -19,6 +19,7 @@
 #include <math.h>
 #include <stdarg.h>
 #include <list>
+#include <TaskInfoInterface.h>
 struct ContextData;
 
 AMDTUInt32 g_tracePids = 0;
@@ -46,6 +47,7 @@ static AMDTFloat32 g_totalApuPower = 0;
     const AMDTFloat32 g_countPerSeconds = static_cast<AMDTFloat32>(MILLISEC_PER_SEC);
 #endif
 
+#define WCHAR_PATH_LEN 2 * OS_MAX_PATH
 extern AMDTUInt8* g_pSharedBuffer;
 PowerProfileTranslate::PowerProfileTranslate()
 {
@@ -62,14 +64,55 @@ PowerProfileTranslate::~PowerProfileTranslate()
     //TODO: need to check  m_rawFileHld->Close();
 }
 
+#ifdef MEMORY_TIME_TRACE
+AMDTUInt64 processContext = 0;
+AMDTUInt64 calculatePower = 0;
+AMDTUInt64 modInfoTs = 0;
+AMDTUInt64 modtab = 0;
+AMDTUInt64 outDataTs = 0;
+
+#include <psapi.h>
+
+void PrintMemoryUsage(const char* header)
+{
+    DWORD                   procId = GetCurrentProcessId();
+    HANDLE                  hProc;
+    PROCESS_MEMORY_COUNTERS pmc;
+
+    hProc = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
+                        FALSE, procId);
+
+    if (NULL == hProc)
+    {
+        return;
+    }
+
+    // Print the header, if provided by the caller...
+    if (NULL != header)
+    {
+        PwrTrace("%s", header);
+    }
+
+    if (GetProcessMemoryInfo(hProc, &pmc, sizeof(pmc)))
+    {
+        PwrTrace("\tPeakWorkingSetSize: %d bytes", pmc.PeakWorkingSetSize);
+        PwrTrace("\tWorkingSetSize: %d bytes", pmc.WorkingSetSize);
+    }
+
+    CloseHandle(hProc);
+
+    return;
+}
+#endif
 void PowerProfileTranslate::ClosePowerProfileTranslate()
 {
     m_isRunning =  false;
+    AMDTUInt32 cnt = 0;
 
     PwrTrace("PID Collected %d", g_tracePids);
     //TRACE//
     {
-        AMDTUInt32 cnt = 0;
+
 
         for (cnt = 0; cnt < g_markerCnt; cnt++)
         {
@@ -100,6 +143,7 @@ void PowerProfileTranslate::ClosePowerProfileTranslate()
         delete m_rawFileHld; // Destructor calls close
     }
 
+    fnCleanupMaps();
     m_rawFileHld = NULL;
 }
 
@@ -170,8 +214,9 @@ AMDTResult PowerProfileTranslate::InitPowerTranslate(const wchar_t* pFileName, A
         InitializeHistogram();
 
         // Initialize TS parameters
-        m_prevTs = 0.0;
-        m_currentTs = 0.0;
+        m_prevTs = 0;
+        m_currentTs = 0;
+        m_prevTs1 = 0;
 
         // Instrumented power data
         g_pInstrumentedPowerData = (PwrInstrumentedPowerData*)GetMemoryPoolBuffer(&g_transPool, PWR_MAX_MARKER_CNT * sizeof(PwrInstrumentedPowerData));
@@ -185,6 +230,11 @@ AMDTResult PowerProfileTranslate::InitPowerTranslate(const wchar_t* pFileName, A
     memset(m_prevSmuSampleData, 0, MAX_PREV_COUNTERS * sizeof(AMDTPwrAttributeInfo));
     //allocate the buffer list again
     m_rawFileHld->PrepareRawBufferList((AMDTUInt16)m_targetCoreCnt);
+
+    memset(m_sampleIpcLoad, 0, sizeof(AMDTFloat32) * MAX_CORE_CNT);
+
+    m_perfCounter = m_rawFileHld->GetSessionProfileStartPerfCounter();
+    m_perfFreq = m_rawFileHld->GetSessionPerfFreq();
     return ret;
 }
 
@@ -323,6 +373,9 @@ AMDTResult PowerProfileTranslate::PrepareAttrList()
         PrepareInitialProcessList(g_processNames);
     }
 
+#ifdef MEMORY_TIME_TRACE
+    PrintMemoryUsage("Profile beginging...");
+#endif
     return ret;
 }
 
@@ -457,7 +510,7 @@ void PowerProfileTranslate::ProcessMarkerRecords(AMDTUInt8* pRaw, AMDTUInt32 buf
     AMDTUInt32 markerLen = PWR_MARKER_BUFFER_SIZE + sizeof(RawRecordHdr);
     RawRecordHdr hdr;
     MarkerTag marker;
-    AMDTFloat32 ts = 0;
+    AMDTUInt64 ts = 0;
 
     memset(&hdr, 0, sizeof(RawRecordHdr));
 
@@ -484,7 +537,7 @@ void PowerProfileTranslate::ProcessMarkerRecords(AMDTUInt8* pRaw, AMDTUInt32 buf
                     g_pInstrumentedPowerData[g_markerCnt].m_markerId = marker.m_markerId;
                     g_pInstrumentedPowerData[g_markerCnt].m_data.m_pidInfo.m_pid = marker.m_pid;
                     SetElapsedTime(marker.m_ts, &ts);
-                    g_pInstrumentedPowerData[g_markerCnt].m_data.m_startTs = (AMDTUInt64)ts;
+                    g_pInstrumentedPowerData[g_markerCnt].m_data.m_startTs = ts;
                     memcpy(g_pInstrumentedPowerData[g_markerCnt].m_data.m_name, marker.m_name, PWR_MARKER_BUFFER_SIZE);
                     memcpy(g_pInstrumentedPowerData[g_markerCnt].m_data.m_userBuffer, marker.m_userBuffer, PWR_MARKER_BUFFER_SIZE);
                     g_markerCnt++;
@@ -499,7 +552,7 @@ void PowerProfileTranslate::ProcessMarkerRecords(AMDTUInt8* pRaw, AMDTUInt32 buf
                         {
                             g_pInstrumentedPowerData[loop].m_state = PWR_MARKER_DISABLE;
                             SetElapsedTime(marker.m_ts, &ts);
-                            g_pInstrumentedPowerData[g_markerCnt].m_data.m_startTs = (AMDTUInt64)ts;
+                            g_pInstrumentedPowerData[g_markerCnt].m_data.m_startTs = ts;
                         }
                     }
                 }
@@ -510,6 +563,187 @@ void PowerProfileTranslate::ProcessMarkerRecords(AMDTUInt8* pRaw, AMDTUInt32 buf
             break;
         }
     }
+}
+
+// ProcessSample: Process each data sample for process/module/ip profiling
+AMDTResult PowerProfileTranslate::ProcessSample(ContextData* pCtx, AMDTFloat32 ipc, AMDTUInt32 coreId)
+{
+    AMDTUInt64 key = 0;
+    bool newModule = false;
+    AMDTUInt64 deltaTick = 0;
+    SetElapsedTime(pCtx->m_timeStamp, (AMDTUInt64*)&deltaTick);
+
+    AMDTUInt32 instanceId = 0;
+#ifdef MEMORY_TIME_TRACE
+    AMDTUInt64 ts1 = 0;
+#endif
+    pCtx->m_ip = pCtx->m_ip & 0x0000FFFFFFFFFFFF;
+#ifdef MEMORY_TIME_TRACE
+    ts1 = GetOsTimeStamp();
+#endif
+
+    if (S_OK != fnGetModuleInstanceId(pCtx->m_processId, pCtx->m_ip, deltaTick, instanceId))
+    {
+        PwrTrace("fnGetModuleInstanceId faild for PID %d", pCtx->m_processId);
+    }
+
+#ifdef MEMORY_TIME_TRACE
+    ts1 = GetOsTimeStamp() - ts1;
+    modInfoTs += ts1;
+#endif
+    key = (pCtx->m_ip & 0x0000FFFFFFFFFFFFULL) | ((AMDTUInt64)instanceId << 48);
+    SampleMap:: iterator sampleIter = m_sampleMap[coreId].find(key);
+
+    if (sampleIter == m_sampleMap[coreId].end())
+    {
+        SampleData sample;
+        sample.m_ip = pCtx->m_ip;
+        sample.m_processId = pCtx->m_processId;
+        sample.m_threadId = pCtx->m_threadId;
+        sample.m_modInstance = instanceId;
+        sample.m_timeStamp = deltaTick;
+        sample.m_ipc = ipc;
+        sample.m_sampleCnt = 1;
+        m_sampleMap[coreId].insert(SampleMap::value_type(key, sample));
+        newModule = true;
+    }
+    else
+    {
+        sampleIter->second.m_ipc += ipc;
+        sampleIter->second.m_sampleCnt++;
+    }
+
+    m_sampleIpcLoad[coreId] += ipc;
+#ifdef MEMORY_TIME_TRACE
+    AMDTUInt64 ts = GetOsTimeStamp();
+#endif
+
+    if (newModule)
+    {
+        ModuleInfoMap::iterator tabIter = m_moduleTable.find(instanceId);
+
+        if (tabIter == m_moduleTable.end())
+        {
+            LoadModuleInfo mod;
+            memset(&mod, 0, sizeof(LoadModuleInfo));
+            fnGetModuleInfoByInstanceId(instanceId, &mod);
+            m_moduleTable.insert(ModuleInfoMap::value_type(instanceId, mod));
+        }
+    }
+
+#ifdef MEMORY_TIME_TRACE
+    ts = GetOsTimeStamp() - ts;
+    modtab += ts;
+#endif
+    return AMDT_STATUS_OK;
+}
+
+// InsertSampleToSystemTree: Insert each sample to system tree with corresponding power
+AMDTResult PowerProfileTranslate::InsertSampleToSystemTree(SampleData* pCtx, AMDTFloat32 power, AMDTUInt32 sampleCnt)
+{
+    AMDTResult ret = AMDT_STATUS_OK;
+    IpAddressInfo ipSample;
+    bool moduleInstFound = false;
+
+    ProcessTreeMap::iterator processIter = m_systemTreeMap.find(pCtx->m_processId);
+
+    if (processIter == m_systemTreeMap.end())
+    {
+        ipSample.m_sampleCnt = sampleCnt;
+        ipSample.m_power = power;
+
+        //Create ip address map
+        ModuleIntanceInfo modInfo;
+
+        modInfo.m_ipMap.insert(IpAddressMap::value_type(pCtx->m_ip, ipSample));
+        modInfo.m_power = power;
+        modInfo.m_sampleCnt = sampleCnt;
+        //Create ModuleInstanceMap
+        ProcessInfo processInfo;
+        processInfo.m_power = power;
+        processInfo.m_sampleCnt = sampleCnt;
+        processInfo.m_modInstMap.insert(ModuleInstanceMap::value_type(pCtx->m_modInstance, modInfo));
+        //Create m_systemTreeMap
+        m_systemTreeMap.insert(ProcessTreeMap::value_type(pCtx->m_processId, processInfo));
+    }
+    else
+    {
+        ModuleInstanceMap:: iterator moduleIter = processIter->second.m_modInstMap.find(pCtx->m_modInstance);
+
+        if (moduleIter == processIter->second.m_modInstMap.end())
+        {
+            ModuleIntanceInfo instInfo;
+            ipSample.m_sampleCnt = sampleCnt;
+            ipSample.m_power = power;
+            instInfo.m_power = power;
+            instInfo.m_sampleCnt = sampleCnt;
+            instInfo.m_ipMap.insert(IpAddressMap::value_type(pCtx->m_modInstance, ipSample));
+            //Create
+            processIter->second.m_modInstMap.insert(ModuleInstanceMap::value_type(pCtx->m_modInstance, instInfo));
+            processIter->second.m_power += power;
+            moduleInstFound = true;
+        }
+        else
+        {
+            IpAddressMap::iterator ipIter = moduleIter->second.m_ipMap.find(pCtx->m_ip);
+
+            if (ipIter == moduleIter->second.m_ipMap.end())
+            {
+                ipSample.m_sampleCnt = sampleCnt;
+                ipSample.m_power = power;
+                moduleIter->second.m_ipMap.insert(IpAddressMap::value_type(pCtx->m_ip, ipSample));
+                moduleIter->second.m_power += power;
+                moduleIter->second.m_sampleCnt += sampleCnt;
+                processIter->second.m_power += power;
+                processIter->second.m_sampleCnt += sampleCnt;
+            }
+            else
+            {
+                ipIter->second.m_power += power;
+                ipIter->second.m_sampleCnt += sampleCnt;
+                moduleIter->second.m_power += power;
+                moduleIter->second.m_sampleCnt += sampleCnt;
+                processIter->second.m_power += power;
+                ipIter->second.m_sampleCnt += sampleCnt;
+                processIter->second.m_sampleCnt++;
+            }
+        }
+    }
+
+    return ret;
+}
+
+//AttributePowerToSample: Calculate the power for each sample and insert in the system tree
+AMDTResult PowerProfileTranslate::AttributePowerToSample(AMDTFloat32* cuPower)
+{
+    AMDTUInt32 coreIdx = 0;
+    AMDTFloat32 timeDiv = 0;
+    AMDTFloat32 totalCuLoad[MAX_CU_CNT] = {0, 0};
+    AMDTFloat32 power = 0;
+    timeDiv = (m_currentTs > m_prevTs1) ? ((m_currentTs - m_prevTs1) / g_countPerSeconds) : m_samplingPeriod;
+
+    m_prevTs1 = m_currentTs;
+
+    for (coreIdx = 0; coreIdx < m_targetCoreCnt; coreIdx++)
+    {
+        totalCuLoad[coreIdx / m_coresPerCu] += m_sampleIpcLoad[coreIdx];
+    }
+
+    for (coreIdx = 0; coreIdx < m_targetCoreCnt; coreIdx++)
+    {
+        AMDTUInt32 cu = coreIdx / m_coresPerCu;
+
+        for (auto sampleIter : m_sampleMap[coreIdx])
+        {
+            power = (sampleIter.second.m_ipc / totalCuLoad[cu]) * (cuPower[cu] * timeDiv);
+            InsertSampleToSystemTree(&sampleIter.second, power, sampleIter.second.m_sampleCnt);
+        }
+
+        m_sampleMap[coreIdx].clear();
+        m_sampleIpcLoad[coreIdx] = 0;
+    }
+
+    return AMDT_STATUS_OK;
 }
 
 // TranslateRawData: Read the shared buffer and decode the raw data
@@ -540,7 +774,6 @@ AMDTResult PowerProfileTranslate::TranslateRawData()
             ret = AMDT_ERROR_FAIL;
         }
     }
-
 
     if (AMDT_STATUS_OK == ret)
     {
@@ -608,8 +841,9 @@ AMDTResult PowerProfileTranslate::TranslateRawData()
                     {
                         m_data.m_recId = recId / m_recIdFactor;
                         m_data.m_recordType = (AMDTPwrProcessedDataType)hdr.m_recordType;
+                        m_prevTs = m_currentTs;
                         SetElapsedTime(tsRaw, &m_currentTs);
-                        m_data.m_ts = (AMDTUInt64)m_currentTs;
+                        m_data.m_ts = m_currentTs;
                     }
 
                     attrCnt = m_configList.m_pCfg[sampleId].m_attrCnt;
@@ -642,7 +876,6 @@ AMDTResult PowerProfileTranslate::TranslateRawData()
                     if (cnt == (coreCnt - 1))
                     {
                         std::lock_guard<std::mutex> lock(m_lock);
-                        m_prevTs = m_currentTs;
                         m_processedData.push(m_data);
                         m_condition.notify_one();
                         memset(&m_data, 0, sizeof(AMDTPwrProcessedDataRecord));
@@ -652,9 +885,7 @@ AMDTResult PowerProfileTranslate::TranslateRawData()
                 {
                     AMDTFloat32 ipc = 0;
                     ContextData contextData;
-                    AMDTUInt32 pidCnt = 0;
                     AMDTUInt32 markerIdx = 0;
-                    bool found = false;
                     AMDTUInt32 cuId = coreId / 2;
                     memcpy(&recId, (AMDTUInt64*)&pRaw[offset], sizeof(AMDTUInt64));
                     offset += sizeof(AMDTUInt64);
@@ -668,15 +899,24 @@ AMDTResult PowerProfileTranslate::TranslateRawData()
                         PwrTrace("MAX_PID_CNT reached");
                     }
 
-#ifdef LINUX
-                    // TODO: PMC support for LINUX is pending
-                    contextData.m_pmcData[PMC_EVENT_RETIRED_MICRO_OPS] = 1;
-                    contextData.m_pmcData[PMC_EVENT_CPU_CYCLE_NOT_HALTED] = 1;
-
-#endif
+#ifndef LINUX
                     // ipc = retired micro ops/ cpu cycle not halted
                     ipc = (AMDTFloat32) contextData.m_pmcData[PMC_EVENT_RETIRED_MICRO_OPS]
                           / (AMDTFloat32) contextData.m_pmcData[PMC_EVENT_CPU_CYCLE_NOT_HALTED];
+#ifdef MEMORY_TIME_TRACE
+                    AMDTUInt64 ts = GetOsTimeStamp();
+#endif
+                    ProcessSample(&contextData, ipc, coreId);
+#ifdef MEMORY_TIME_TRACE
+
+                    ts = GetOsTimeStamp() - ts;
+                    processContext += ts;
+#endif
+#else
+                    AMDTUInt32 pidCnt = 0;
+                    bool found = false;
+                    //TODO: for Linux we are not using PMC as of now
+                    ipc = 1;
 
                     for (pidCnt = 0; pidCnt < m_samplePower[cuId].m_numberOfPids; pidCnt++)
                     {
@@ -701,6 +941,8 @@ AMDTResult PowerProfileTranslate::TranslateRawData()
                         m_samplePower[cuId].m_sampleCnt++;
                     }
 
+#endif
+
                     for (markerIdx = 0; markerIdx < g_markerCnt; markerIdx++)
                     {
                         if ((g_pInstrumentedPowerData[markerIdx].m_data.m_pidInfo.m_pid == contextData.m_processId)
@@ -711,9 +953,19 @@ AMDTResult PowerProfileTranslate::TranslateRawData()
                             //PwrTrace("inst %d",g_pInstrumentedPowerData[markerIdx].m_cuPidInst[cuId]);
                         }
                     }
+
+
+                }
+                else
+                {
+                    PwrTrace("Why here");
+                    offset = offset - sizeof(RawRecordHdr);
                 }
 
-                ProcessMarkerRecords(pRaw, pCoreBuffer->m_size, &offset);
+                if ((g_markerCnt > 0) && (nullptr != pRaw) && (nullptr != pCoreBuffer))
+                {
+                    ProcessMarkerRecords(pRaw, pCoreBuffer->m_size, &offset);
+                }
 
                 // Update the process buffer offset
                 pCoreBuffer->m_processedOffset = offset;
@@ -744,15 +996,13 @@ AMDTFloat32 GetVDDAPower()
 }
 
 // SetElapsedTime: Elapse time from the time when first record was collected
-void PowerProfileTranslate::SetElapsedTime(AMDTUInt64 raw, AMDTFloat32* pResult)
+void PowerProfileTranslate::SetElapsedTime(AMDTUInt64 raw, AMDTUInt64* pResult)
 {
-    AMDTUInt64 perfCounter = m_rawFileHld->GetSessionProfileStartPerfCounter();
 #ifdef LINUX
     const unsigned int nsec_to_microSec = 1000;
-    *pResult = static_cast<AMDTUInt64>(raw - perfCounter) / nsec_to_microSec;
+    *pResult = static_cast<AMDTUInt64>(raw - m_perfCounter) / nsec_to_microSec;
 #else
-    AMDTUInt64 perfFreq = m_rawFileHld->GetSessionPerfFreq();
-    *pResult = static_cast<AMDTFloat32>((AMDTFloat32)((raw - perfCounter) * 1000) / (AMDTFloat32)perfFreq);
+    *pResult = static_cast<AMDTUInt64>((AMDTUInt64)((raw - m_perfCounter) * 1000) / (AMDTUInt64)m_perfFreq);
 #endif
 }
 
@@ -827,7 +1077,6 @@ AMDTResult PowerProfileTranslate::DecodeDgpuData(AMDTUInt8* pData,
 // GetProcessName: Get process name
 void PowerProfileTranslate:: GetProcessName(AMDTPwrProcessInfo* pInfo)
 {
-    std::list<ProcessName>::iterator itr;
     bool found = false;
     bool refreshed = false;
 
@@ -840,12 +1089,12 @@ void PowerProfileTranslate:: GetProcessName(AMDTPwrProcessInfo* pInfo)
         {
             if (g_processNames.size() > 0)
             {
-                for (itr = g_processNames.begin(); itr != g_processNames.end(); ++itr)
+                for (auto itr : g_processNames)
                 {
-                    if (itr->m_pid == pInfo->m_pid)
+                    if (itr.m_pid == pInfo->m_pid)
                     {
-                        memcpy(pInfo->m_name, itr->m_name, strlen(itr->m_name));
-                        memcpy(pInfo->m_path, itr->m_path, strlen(itr->m_path));
+                        memcpy(pInfo->m_name, itr.m_name, strlen(itr.m_name));
+                        memcpy(pInfo->m_path, itr.m_path, strlen(itr.m_path));
                         found = true;
                         break;
                     }
@@ -887,7 +1136,7 @@ void PowerProfileTranslate::CalculatePidPower(AMDTFloat32* cuPower, AMDTUInt32 c
     PowerData* pSrc = nullptr;
     AMDTFloat32 energyPerCuSample = 0.0;
     AMDTUInt32 markerIdx = 0;
-    AMDTFloat32 timeSpan = 0;
+    AMDTUInt64 timeSpan = 0;
     AMDTFloat32 load = 0;
 
     for (cuIdx = 0; cuIdx < cuCnt; cuIdx++)
@@ -1070,6 +1319,7 @@ AMDTResult PowerProfileTranslate::DecodeData(AMDTUInt32 coreId,
 
                     if (res > MAX_TEMPERATURE)
                     {
+                        PwrTrace("Invalid war data %f", res);
                         res = GetPrevSampleData(counterId, cuId);
                     }
 
@@ -1167,7 +1417,19 @@ AMDTResult PowerProfileTranslate::DecodeData(AMDTUInt32 coreId,
 
                 if (PROFILE_TYPE_PROCESS_PROFILING == m_profileType)
                 {
+
+#ifndef LINUX
+#ifdef MEMORY_TIME_TRACE
+                    AMDTUInt64 ts = GetOsTimeStamp();
+#endif
+                    AttributePowerToSample(cuPower);
+#ifdef MEMORY_TIME_TRACE
+                    ts = GetOsTimeStamp() - ts;
+                    calculatePower += ts;
+#endif
+#else
                     CalculatePidPower(cuPower, cuId);
+#endif
                 }
 
                 break;
@@ -1509,7 +1771,6 @@ AMDTResult PowerProfileTranslate::DecodeData(AMDTUInt32 coreId,
     return ret;
 }
 
-
 // ReadSharedBuffer: Read shared buffer between driver and backend
 // and populate per core buffers for processing.
 AMDTResult PowerProfileTranslate::ReadSharedBuffer(SharedBuffer* pBuffer, AMDTUInt64 coreMask)
@@ -1659,4 +1920,144 @@ AMDTResult PowerProfileTranslate::GetInstrumentedData(AMDTUInt32 markerId, PwrIn
 
     return ret;
 }
+
+// ExtractNameAndPath: Extract file name and path from the full wchar_t path
+void PowerProfileTranslate::ExtractNameAndPath(char* pFullPath, char* pName, char* pPath)
+{
+    AMDTUInt32 cnt = 0;
+    AMDTUInt32 begin = 0;
+    char* path = pFullPath;
+    bool prefix = false;
+
+    while (path[cnt] != '\0')
+    {
+        if ('\\' == path[cnt])
+        {
+            begin = cnt;
+            prefix = true;
+        }
+
+        cnt++;
+    }
+
+    if (prefix)
+    {
+        begin += 1;
+    }
+
+    memset(pName, 0, AMDT_PWR_EXE_NAME_LENGTH);
+    memset(pPath, 0, AMDT_PWR_EXE_PATH_LENGTH);
+    memcpy(pName, &path[begin], strlen(&path[begin]) + 1);
+    memcpy(pPath, &path[0], begin);
+}
+
+// PwrGetProfileData: Provide process data based on process/module/ip profile type
+AMDTResult PowerProfileTranslate::PwrGetProfileData(CXLContextProfileType type, void** pData, AMDTUInt32* pCnt, AMDTFloat32* pPower)
+{
+    AMDTResult ret = AMDT_STATUS_OK;
+    AMDTFloat32 totalPower = 0;
+#ifdef MEMORY_TIME_TRACE
+    PrintMemoryUsage("before aggregation ...");
+#endif
+
+    if (PROCESS_PROFILE == type)
+    {
+        AMDTPwrProcessInfo process;
+        memset(&process, 0, sizeof(AMDTPwrProcessInfo));
+        m_processList.clear();
+
+        for (auto processIter : m_systemTreeMap)
+        {
+            wchar_t str[OS_MAX_PATH];
+            memset(&process, 0, sizeof(AMDTPwrProcessInfo));
+            process.m_pid = processIter.first;
+
+            if (S_OK == fnFindProcessName(process.m_pid, str, AMDT_PWR_EXE_PATH_LENGTH))
+            {
+                char path[OS_MAX_PATH];
+                wcstombs(path, str, OS_MAX_PATH);
+                ExtractNameAndPath(path, process.m_name, process.m_path);
+            }
+
+            if (strlen(process.m_name) == 0)
+            {
+                memcpy(process.m_name, "unknown name", AMDT_PWR_EXE_NAME_LENGTH);
+            }
+
+            if (strlen(process.m_path) == 0)
+            {
+                memcpy(process.m_path, "unknown path", AMDT_PWR_EXE_PATH_LENGTH);
+            }
+
+            process.m_sampleCnt = processIter.second.m_sampleCnt;
+            process.m_power = processIter.second.m_power;
+            totalPower += process.m_power;
+            m_processList.push_back(process);
+        }
+
+        *pPower = totalPower;
+        *pData = &m_processList[0];
+        *pCnt = m_processList.size();
+    }
+
+
+    if (MODULE_PROFILE == type)
+    {
+        AMDTPwrModuleData module;
+        m_moduleList.clear();
+        memset(&module, 0, sizeof(AMDTPwrModuleData));
+
+        for (auto processIter : m_systemTreeMap)
+        {
+            for (auto moduleIter : processIter.second.m_modInstMap)
+            {
+                module.m_power = moduleIter.second.m_power;
+                totalPower += module.m_power;
+
+                ModuleInfoMap::iterator tabIter = m_moduleTable.find(moduleIter.first);
+
+                if (tabIter != m_moduleTable.end())
+                {
+                    module.m_isKernel = tabIter->second.m_isKernel;
+                    module.m_loadAddr = tabIter->second.m_moduleStartAddr;
+                    module.m_size = tabIter->second.m_modulesize;
+                    module.m_processId = (AMDTUInt32)processIter.first;
+                    ExtractNameAndPath(tabIter->second.m_pModulename, module.m_name, module.m_path);
+                }
+                else
+                {
+                    //PwrTrace("Error finding module pid %d module inst %d", (AMDTUInt32)processIter.first, moduleIter.first);
+                }
+
+                if (strlen(module.m_name) == 0)
+                {
+                    memcpy(module.m_name, "unknown name", AMDT_PWR_EXE_NAME_LENGTH);
+                }
+
+                if (strlen(module.m_path) == 0)
+                {
+                    memcpy(module.m_path, "unknown path", AMDT_PWR_EXE_PATH_LENGTH);
+                }
+
+                module.m_sampleCnt = moduleIter.second.m_sampleCnt;
+                m_moduleList.push_back(module);
+            }
+        }
+
+        *pPower = totalPower;
+        *pData = &m_moduleList[0];
+        *pCnt = m_moduleList.size();
+    }
+
+    if (*pCnt == 0)
+    {
+        ret = AMDT_ERROR_NODATA;
+    }
+
+#ifdef MEMORY_TIME_TRACE
+    PrintMemoryUsage("end of ...");
+#endif
+    return ret;
+}
+
 

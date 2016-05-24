@@ -14,6 +14,9 @@
 #include <AMDTRawDataFileHeader.h>
 #include <AMDTPwrProfDriver.h>
 #include <list>
+#include <TaskInfoInterface.h>
+#include <CpuProfilingTranslationDLLBuild.h>
+#include <AMDTOSWrappers/Include/osApplication.h>
 
 #define AMDT_PWR_STR_SYSTEM_IDLE "System Idle Process"
 #define AMDT_PWR_STR_SYSTEM "System"

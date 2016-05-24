@@ -470,5 +470,25 @@ This API can be called at any point of time from start of the profile to the sto
 */
 AMDTResult AMDTGetProcessProfileData(AMDTUInt32* pPIDCount, AMDTPwrProcessInfo** ppData, AMDTUInt32 pidVal, bool reset);
 
+/** This API will provide the list of running modules so far from the time of profile start
+of the profile and provides their agregated power indicators.
+This API can be called at any point of time from start of the profile to the stop of the profile.
+
+\ingroup profiling
+@param[out] pModuleCount: Total number of modules running during the profile session
+@param[out] ppData: List of modules with their power indicators
+@param[out] pPower: Total power consumed by the profile session
+\return The status reading process profiling data
+\retval AMDT_STATUS_OK: On Success
+\retval AMDT_ERROR_INVALIDARG: NULL pointer was passed as pData parameters
+\retval AMDT_ERROR_DRIVER_UNINITIALIZED: \ref AMDTPwrProfileInitialize() function was neither called nor successful
+\retval AMDT_ERROR_PROFILE_NOT_STARTED: Profile is not started
+\retval AMDT_ERROR_PROFILE_DATA_NOT_AVAILABLE: Profile data is not yet available
+\retval AMDT_ERROR_OUTOFMEMORY: Memory not available
+\retval AMDT_ERROR_PROCESS_PROFILE_NOT_ENABLED: Process profiling not enabled
+\retval AMDT_ERROR_FAIL: An internal error occurred
+\retval AMDT_ERROR_PROCESS_PROFILE_NOT_SUPPORTED: Platform not supported
+*/
+AMDTResult AMDTPwrGetModuleProfileData(AMDTPwrModuleData** ppData, AMDTUInt32* pModuleCount, AMDTFloat32* pPower);
 
 #endif //_AMDTPOWERPROFILEAPI_H_

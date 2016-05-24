@@ -92,6 +92,9 @@ AMDTResult AMDTGetCummulativePidProfData(AMDTUInt32* pPIDCount, AMDTPwrProcessIn
 
 // AMDTGetInstrumentedData: Get the accumulated instrumented data
 AMDTResult AMDTGetInstrumentedData(AMDTUInt32 markerId, PwrInstrumentedPowerData** ppData);
+// PwrGetModuleProfileData: module level profiling data.
+// this api can be called at any point of profile state from start to end of the session
+AMDTResult PwrGetModuleProfileData(AMDTPwrModuleData** ppData, AMDTUInt32* pModuleCount, AMDTFloat32* pPower);
 
 
 #endif //_AMDTPOWERPROFILEDATAACCESS_H_

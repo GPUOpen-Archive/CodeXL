@@ -126,6 +126,7 @@ public:
     virtual void ReportHistogramCounters(AMDTUInt32 num, AMDTPwrHistogram* pHist) = 0;
     virtual void ReportCumulativeCounters(AMDTUInt32 num, AMDTFloat32* pHist, AMDTUInt32* pCounterId) = 0;
     virtual void WriteProcessData(AMDTUInt32 recCnt, AMDTPwrProcessInfo*& pInfo) = 0;
+    virtual void WriteModuleData(AMDTUInt32 recCnt, AMDTPwrModuleData*& pInfo, AMDTFloat32 totalPower) = 0;
 
 
 protected:
@@ -169,6 +170,7 @@ public:
     void ReportHistogramCounters(AMDTUInt32 num, AMDTPwrHistogram* pHist);
     void ReportCumulativeCounters(AMDTUInt32 num, AMDTFloat32* pHist, AMDTUInt32* pCounterId);
     void WriteProcessData(AMDTUInt32 recCnt, AMDTPwrProcessInfo*& pInfo);
+    void WriteModuleData(AMDTUInt32 recCnt, AMDTPwrModuleData*& pInfo, AMDTFloat32 totalPower);
 };
 
 class ppReporterCsv : public ppReporter
@@ -191,6 +193,7 @@ public:
     void ReportHistogramCounters(AMDTUInt32 num, AMDTPwrHistogram* pHist);
     void ReportCumulativeCounters(AMDTUInt32 num, AMDTFloat32* pHist, AMDTUInt32* pCounterId);
     void WriteProcessData(AMDTUInt32 recCnt, AMDTPwrProcessInfo*& pInfo);
+    void WriteModuleData(AMDTUInt32 recCnt, AMDTPwrModuleData*& pInfo, AMDTFloat32 totalPower);
 };
 
 #endif // #ifndef _PP_REPORTER_H_

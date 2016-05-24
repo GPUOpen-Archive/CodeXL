@@ -40,6 +40,19 @@ struct TI_THREAD_INFO
     DWORD threadDeletionTime;
 };
 
+// ModuleInfo: This structure is use for power profiler
+typedef struct LoadModuleInfo
+{
+	gtUInt32	m_pid;
+	gtUInt64	m_moduleStartAddr;
+	gtUInt32	m_modulesize;
+	ModTypeEnum m_moduleType;
+	char		m_pModulename[OS_MAX_PATH];
+	bool		m_isKernel;
+	gtUInt32	m_moduleId;
+	gtUInt32	m_instanceId;
+} LoadModuleInfo;
+
 // start task info capturing, with optional directory for driver
 CP_TRANS_API HRESULT fnStartCapture(gtUInt64 startCount, const wchar_t* binDirectory = NULL);
 
@@ -107,6 +120,13 @@ CP_TRANS_API HRESULT fnGetModuleInfoByIndex(/* [in] */  gtUInt64 processID,
 // for a given sample record, identify which module the sample is in.
 //Caller allocates the space for module name.
 CP_TRANS_API HRESULT fnGetModuleInfo(TiModuleInfo* info);
+
+// Get module instance id for a given samples process id, time offset and ip address
+CP_TRANS_API HRESULT fnGetModuleInstanceId(gtUInt32 processId, gtUInt64 sampleAddr, gtUInt64 deltaTick, gtUInt32& modInstId);
+
+// Get module information for a give module instance id
+CP_TRANS_API HRESULT fnGetModuleInfoByInstanceId(gtUInt32 instanceId, LoadModuleInfo* pModInfo);
+
 
 // Get the module instance info as a vector of <instanceId, modName, pid, loadAddr>
 CP_TRANS_API HRESULT fnGetProcessThreadList(gtVector<std::tuple<gtUInt32, gtUInt32>>& info);

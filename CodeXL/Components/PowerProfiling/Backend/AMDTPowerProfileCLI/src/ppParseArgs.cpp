@@ -494,6 +494,16 @@ bool ppParseArgs::InitializeArgs(int nbrArgs, char* args[])
                     m_profileType = 1;
                     m_hasProfileCounters = true;
                 }
+
+#ifndef LINUX
+                else if ((tmp.isAlnum(L"- _")) && tmp.isEqual("module"))
+                {
+                    // Process profile types
+                    m_profileType = 2;
+                    m_hasProfileCounters = true;
+                }
+
+#endif
                 else
                 {
                     fprintf(stderr, "Invalid argument(%s) is passed with option(-M).\n",

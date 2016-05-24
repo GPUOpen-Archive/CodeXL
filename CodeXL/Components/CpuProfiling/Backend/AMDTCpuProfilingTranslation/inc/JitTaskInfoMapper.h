@@ -122,6 +122,7 @@ struct ModuleValue
     // JIT block copied to run session dir.
     ModTypeEnum moduleType;     // manage, unmanaged, java etc.
     gtUInt32 instanceId = 0;
+    gtInt32 moduleId = 0;
 
     // default constructor
     ModuleValue() : moduleBaseAddr(0),

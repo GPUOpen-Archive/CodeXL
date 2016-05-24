@@ -12,7 +12,6 @@
 
 #include <iostream>
 #include <algorithm>
-
 // TODO: this not required only linux pcore stuff is moved to API layer
 #if AMDT_BUILD_TARGET == AMDT_LINUX_OS
     #include <sstream>
@@ -1173,6 +1172,36 @@ AMDTResult ppCollect::GetProcessData(AMDTUInt32* pPIDCount, AMDTPwrProcessInfo**
         else
         {
             ReportError(true, "Reading process data failed with error code(0x%lx)", ret);
+        }
+
+    }
+
+    return ret;
+}
+
+AMDTResult ppCollect::GetModuleData(AMDTPwrModuleData** ppData, AMDTUInt32* pModuleCnt, AMDTFloat32* pPower)
+{
+    AMDTResult ret = AMDT_ERROR_FAIL;
+    AMDTUInt32 moduleCnt = 0;
+    AMDTPwrModuleData* pData = nullptr;
+    AMDTFloat32 power = 0;
+
+    if (isOK())
+    {
+        m_nbrSamples = 0;
+        m_pSampleData = nullptr;
+
+        ret = AMDTPwrGetModuleProfileData(&pData, &moduleCnt, &power);
+
+        if ((AMDT_STATUS_OK == m_error) && (moduleCnt > 0) && (nullptr != pData))
+        {
+            *pPower = power;
+            *ppData = pData;
+            *pModuleCnt = moduleCnt;
+        }
+        else
+        {
+            ReportError(true, "Reading module data failed with error code(0x%lx)", ret);
         }
 
     }

@@ -110,6 +110,8 @@ AMDTResult GetCpuFamilyDetails(AMDTUInt32* pFamily, AMDTUInt32* pModel, bool* pI
     #else
         #define PwrTrace(fmt, ...)    PowerTrace(__FUNCTION__, __LINE__, fmt "\n", __VA_ARGS__)
     #endif
+    void PowerTraceFlush(void);
+    #define PwrTraceFlush() PowerTraceFlush()
 #else
     #define PwrTrace(fmt, ...)
 #endif

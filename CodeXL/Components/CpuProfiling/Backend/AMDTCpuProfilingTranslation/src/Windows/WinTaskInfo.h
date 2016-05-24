@@ -119,6 +119,12 @@ public:
     // Caller allocates the space for module name.
     HRESULT GetModuleInfo(TiModuleInfo* pModInfo);
 
+    // Get intance id of a module from ip address, pid and time stamp
+    HRESULT GetModuleInstanceId(gtUInt32 processId, gtUInt64 sampleAddr, gtUInt64 deltaTick, gtUInt32& modInstId);
+
+    // GetModuleInfoFromInstanceId: Get module information for a give instance id
+    HRESULT GetLoadModuleInfoByInstanceId(gtUInt32 instanceId, LoadModuleInfo* pModInfo);
+
     HRESULT GetProcessThreadList(gtVector<std::tuple<gtUInt32, gtUInt32>>& info);
 
     // Get number of kernel modules
@@ -235,6 +241,9 @@ private:
 
     // launch 32-bit or 64-bit process to enumerate process and module info
     HRESULT LaunchModuleEnumerator(bool b32bit = true, const wchar_t* binDirectory = NULL);
+
+    // Find the module id for the given module name
+    HRESULT FindModuleId(const wchar_t* pModuleName, gtInt32& moduleId);
 
     // the snapshot file name for 32-bit process
     wchar_t m_tiSnapshotFileName[OS_MAX_PATH + 1];

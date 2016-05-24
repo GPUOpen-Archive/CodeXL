@@ -143,7 +143,9 @@ static int PrintHelp()
     fprintf(stderr, "                                   all - collect all the supported counters\n");
     fprintf(stderr, "\n    -M  <profile mode>         Specify profile mode. Following profile modes are supported.\n");
     fprintf(stderr, "                                   process - process profiling\n");
-
+#ifndef LINUX
+    fprintf(stderr, "                                   module - process profiling\n");
+#endif
     fprintf(stderr, "\n    -l                         List all the supported counters.\n");
 
     fprintf(stderr, "\n    -e <counter,...>           Specify the comma separated list of counter names to be collected.\n");
@@ -472,13 +474,13 @@ int main(int argc, char* argv[])
                 ErrorExit("Failed to configure the power profile run.", -1);
             }
 
-            if (1 == args.GetProfileType())
+            if ((1 == args.GetProfileType()) || (2 == args.GetProfileType()))
             {
                 hResult = collect.EnableProcessProfiling();
 
                 if (AMDT_STATUS_OK != hResult)
                 {
-                    ErrorExit("Failed to configure the process profiling run.", -1);
+                    ErrorExit("Failed to configure the process/module profiling run.", -1);
                 }
             }
 
@@ -671,7 +673,10 @@ int main(int argc, char* argv[])
                             (expectedSamples - collect.GetTotalNumberOfSamples()));
                 }
             }
-            else if (collect.IsProfilingCumulativeCounters() || collect.IsProfilingHistogramCounters() || (1 == args.GetProfileType()))
+            else if (collect.IsProfilingCumulativeCounters()
+                     || collect.IsProfilingHistogramCounters()
+                     || (1 == args.GetProfileType())
+                     || (2 == args.GetProfileType()))
             {
                 AMDTUInt64 startTs = GetTickCount();
 
@@ -753,6 +758,16 @@ int main(int argc, char* argv[])
                 //Get the aggregated process data
                 hResult = collect.GetProcessData(&pidCnt, &pProcessData);
                 pReporter->WriteProcessData(pidCnt, pProcessData);
+            }
+            else if (2 ==  args.GetProfileType() && (nullptr != pReporter))
+            {
+                AMDTUInt32 moduleCnt = 0;
+                AMDTFloat32 power = 0;
+                AMDTPwrModuleData* pModuleData = nullptr;
+
+                //Get the aggregated process data
+                hResult = collect.GetModuleData(&pModuleData, &moduleCnt, &power);
+                pReporter->WriteModuleData(moduleCnt, pModuleData, power);
             }
 
             if (AMDT_STATUS_OK == hResult)

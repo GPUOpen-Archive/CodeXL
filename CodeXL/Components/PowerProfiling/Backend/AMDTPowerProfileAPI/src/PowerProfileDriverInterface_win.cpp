@@ -134,8 +134,11 @@ AMDTResult GetPowerDriverClientId(AMDTUInt32* pClientId)
     *pClientId = g_clientIdx;
     return (g_clientIdx <= MAX_CLIENT_COUNT) ? AMDT_STATUS_OK : S_FALSE;
 }
+bool InitializeTaskInfo();
+
 bool IsPowerDriverOpened(void)
 {
+    InitializeTaskInfo();
 
     if (INVALID_HANDLE_VALUE == g_powerDrvHld)
     {
@@ -423,125 +426,68 @@ bool GetProcessNameFromPid(AMDTPwrProcessInfo* pInfo)
     return found;
 }
 
-void GetProcessSnapShot(list<ProcessName>& list)
+// GetApplicationPath: Retrive the application path
+bool GetApplicationPath(wchar_t* appPath)
+{
+    // Assumption: processEnum[32|64].exe will reside in the dir in which codexl.exe resides;
+    osFilePath filePath;
+    bool retVal = false;
+
+    // First, see if the dll path is set (like VS)
+    retVal = osGetCurrentApplicationDllsPath(filePath);
+
+    if (!retVal)
+    {
+        //Since the dll path is not set, assume the dlls are in the
+        // same path as the exe.
+        // Get the absolute path for the application - codexl.exe
+        retVal = osGetCurrentApplicationPath(filePath);
+    }
+
+    if (false == retVal)
+    {
+        return retVal;
+    }
+
+    memcpy(appPath, filePath.fileDirectoryAsString().asCharArray(), OS_MAX_PATH);
+    return retVal;
+}
+
+// InitializeTaskInfo: take a snapshot of all running PIDs, modules before we start the profile
+bool InitializeTaskInfo()
 {
     HRESULT hr = S_OK;
-    ProcessName process;
+    wchar_t dirPath[OS_MAX_PATH] = { L'\0' };
+    LARGE_INTEGER startCount;
+    QueryPerformanceCounter(&startCount);
 
-    // Take a snapshot of all processes in the system.
-    HANDLE hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    GetApplicationPath(dirPath);
 
-    if (hProcessSnap == INVALID_HANDLE_VALUE)
-    {
-        hr = E_FAIL;
-    }
-
-    PROCESSENTRY32W pe32 = { 0 };
-    pe32.dwSize = sizeof(PROCESSENTRY32W);
-
-    // Retrieve information about the first process
-    if (S_OK == hr && !Process32FirstW(hProcessSnap, &pe32))
-    {
-        hr = E_FAIL;
-    }
-
+    hr = fnStartCapture(startCount.QuadPart, dirPath);
 
     if (S_OK == hr)
     {
-        do
+        wchar_t tiDynamicFile[OS_MAX_PATH + 1];
+        wchar_t tempPath [OS_MAX_PATH + 1];
+        GetTempPathW(OS_MAX_PATH + 1, tempPath);
+        // define the temp file name for driver with prefix "tiD".
+        GetTempFileNameW(tempPath, L"tiD", 0, tiDynamicFile);
+        hr = fnStopCapture(true, tiDynamicFile);
+
+        if (S_OK == hr)
         {
+            const size_t cSize = OS_MAX_PATH;
+            wcscat(tempPath, L"PwrTiFile.ti");
+            hr = fnWriteModuleInfoFile(tempPath);
 
-            memset(&process, 0, sizeof(process));
-            process.m_pid = pe32.th32ProcessID;
-
-            HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pe32.th32ProcessID);
-
-            if (nullptr != hProcess)
+            if (S_OK == hr)
             {
-
-                LPSTR path = new CHAR[MAX_PATH];
-                DWORD len = MAX_PATH;
-                BOOL res = QueryFullProcessImageName(hProcess, 0, path, &len);
-
-                if (0 == res)
-                {
-                    memcpy(process.m_name, ERROR_READING_PROCESS_NAME, strlen(ERROR_READING_PROCESS_NAME) + 1);
-                    memcpy(process.m_name, ERROR_READING_PROCESS_PATH, strlen(ERROR_READING_PROCESS_PATH) + 1);
-                }
-                else
-                {
-                    AMDTUInt32 cnt = 0;
-                    AMDTUInt32 begin = 0;
-
-                    while (path[cnt] != '\0')
-                    {
-                        if ('\\' == path[cnt])
-                        {
-                            begin = cnt;
-                        }
-
-                        cnt++;
-                    }
-
-                    memcpy(process.m_name, &path[begin + 1], strlen(&path[begin + 1]) + 1);
-                    memcpy(process.m_path, &path[0], begin);
-                }
-            }
-            else
-            {
-                wcstombs(process.m_name, pe32.szExeFile, AMDT_PWR_EXE_NAME_LENGTH);
-                memcpy(process.m_path, ERROR_READING_PROCESS_PATH, strlen(ERROR_READING_PROCESS_PATH) + 1);
-            }
-
-            list.push_back(process);
-            CloseHandle(hProcess);
-        }
-        while (Process32NextW(hProcessSnap, &pe32));
-    }
-}
-
-void SetPreviledge(bool enable)
-{
-    HANDLE              hToken;
-    LUID                SeDebugNameValue;
-    TOKEN_PRIVILEGES    TokenPrivileges;
-
-    if (OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken))
-    {
-        if (LookupPrivilegeValue(NULL, SE_DEBUG_NAME, &SeDebugNameValue))
-        {
-            TokenPrivileges.PrivilegeCount = 1;
-            TokenPrivileges.Privileges[0].Luid = SeDebugNameValue;
-
-            if (true == enable)
-            {
-                TokenPrivileges.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-            }
-            else
-            {
-                TokenPrivileges.Privileges[0].Attributes = 0;
-            }
-
-            if (AdjustTokenPrivileges(hToken, FALSE, &TokenPrivileges, sizeof(TOKEN_PRIVILEGES), NULL, NULL))
-            {
-                CloseHandle(hToken);
-            }
-            else
-            {
-                CloseHandle(hToken);
-                throw std::exception("Couldn't adjust token privileges!");
+                hr = fnReadModuleInfoFile(tempPath);
             }
         }
-        else
-        {
-            CloseHandle(hToken);
-            throw std::exception("Couldn't look up privilege value!");
-        }
     }
-    else
-    {
-        throw std::exception("Couldn't open process token!");
-    }
+
+    return (S_OK == hr) ? true : false;
 }
 
 // PrepareInitialProcessList: Prepare the initial process list before the
@@ -552,10 +498,7 @@ AMDTResult PrepareInitialProcessList(list<ProcessName>& list)
 
     list.clear();
 
-    SetPreviledge(true);
-    GetProcessSnapShot(list);
-    SetPreviledge(false);
-
+    //    ret = (true == InitializeTaskInfo()) ? AMDT_STATUS_OK : AMDT_ERROR_FAIL;
     return ret;
 }
 
