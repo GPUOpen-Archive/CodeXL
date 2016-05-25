@@ -58,7 +58,7 @@ bool gpSummaryTab::Init(gpTraceDataContainer* pDataContainer, gpTraceView* pSess
     }
     else
     { 
-        int commandCount = m_pSessionDataContainer->CommandListsData().size();
+        int commandCount = m_pSessionDataContainer->CommandListCount();
         if (pDataContainer->SessionAPIType() == ProfileSessionDataItem::ProfileItemAPIType::DX12_API_PROFILE_ITEM)
         {
             caption = QString(table_captions[m_callType]).arg(commandCount);

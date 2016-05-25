@@ -271,6 +271,10 @@ public:
     /// \param queuePtrStr the queue list pointer
     /// \return a formatted name with the queue index and type
     QString QueueDisplayName(const QString& queuePtrStr);
+
+    /// Returns the number of command lists \ buffers
+    int CommandListCount()const;
+
 private:
 
     /// Map from thread id to API count

@@ -1311,6 +1311,11 @@ QString gpTraceDataContainer::QueueDisplayName(const QString& queuePtrStr)
     return retVal;
 }
 
+int gpTraceDataContainer::CommandListCount()const
+{
+    return m_commandListPointerToIndexMap.size();
+}
+
 void gpTraceDataContainer::AddBakedCommandBuffer(VKGPUTraceInfo* pAPIInfo)
 {
     // Sanity check:
