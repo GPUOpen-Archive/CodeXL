@@ -172,8 +172,7 @@ AMDTResult GetCummulativePidProfDataFromStart(AMDTUInt32* pPIDCount,
     AMDTPwrProcessInfo* pInfo = nullptr;
     AMDTUInt32 entries = 0;
     AMDTFloat32 power = 0;
-#ifndef LINUX
-
+#ifdef _WIN32
     if (nullptr != g_pTranslate)
     {
         g_pTranslate->PwrGetProfileData(PROCESS_PROFILE, (void**)&pInfo, &entries, &power);
@@ -220,7 +219,7 @@ AMDTResult GetCummulativePidProfDataInstatant(AMDTUInt32* pPIDCount,
     AMDTPwrProcessInfo* pInfo = nullptr;
     AMDTUInt32 entries = 0;
     AMDTFloat32 power = 0;
-#ifndef LINUX
+#ifdef _WIN32
 
     if (nullptr != g_pTranslate)
     {

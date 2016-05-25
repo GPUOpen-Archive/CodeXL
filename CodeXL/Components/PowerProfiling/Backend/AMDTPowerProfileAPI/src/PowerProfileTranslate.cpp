@@ -142,8 +142,9 @@ void PowerProfileTranslate::ClosePowerProfileTranslate()
         m_rawFileHld->ReleaseBufferList();
         delete m_rawFileHld; // Destructor calls close
     }
-
+#if !(defined(_WIN64) || defined(LINUX))
     fnCleanupMaps();
+#endif
     m_rawFileHld = NULL;
 }
 
@@ -568,6 +569,13 @@ void PowerProfileTranslate::ProcessMarkerRecords(AMDTUInt8* pRaw, AMDTUInt32 buf
 // ProcessSample: Process each data sample for process/module/ip profiling
 AMDTResult PowerProfileTranslate::ProcessSample(ContextData* pCtx, AMDTFloat32 ipc, AMDTUInt32 coreId)
 {
+
+#if (defined(_WIN64) || defined(LINUX))
+(void)pCtx;
+(void)ipc;
+(void)coreId;
+#else
+
     AMDTUInt64 key = 0;
     bool newModule = false;
     AMDTUInt64 deltaTick = 0;
@@ -634,6 +642,8 @@ AMDTResult PowerProfileTranslate::ProcessSample(ContextData* pCtx, AMDTFloat32 i
 #ifdef MEMORY_TIME_TRACE
     ts = GetOsTimeStamp() - ts;
     modtab += ts;
+#endif
+
 #endif
     return AMDT_STATUS_OK;
 }
@@ -899,7 +909,7 @@ AMDTResult PowerProfileTranslate::TranslateRawData()
                         PwrTrace("MAX_PID_CNT reached");
                     }
 
-#ifndef LINUX
+#if !(defined(_WIN64) || defined(LINUX))
                     // ipc = retired micro ops/ cpu cycle not halted
                     ipc = (AMDTFloat32) contextData.m_pmcData[PMC_EVENT_RETIRED_MICRO_OPS]
                           / (AMDTFloat32) contextData.m_pmcData[PMC_EVENT_CPU_CYCLE_NOT_HALTED];
@@ -1417,8 +1427,7 @@ AMDTResult PowerProfileTranslate::DecodeData(AMDTUInt32 coreId,
 
                 if (PROFILE_TYPE_PROCESS_PROFILING == m_profileType)
                 {
-
-#ifndef LINUX
+#if !(defined(_WIN64) || defined(LINUX))
 #ifdef MEMORY_TIME_TRACE
                     AMDTUInt64 ts = GetOsTimeStamp();
 #endif
@@ -1954,6 +1963,16 @@ void PowerProfileTranslate::ExtractNameAndPath(char* pFullPath, char* pName, cha
 // PwrGetProfileData: Provide process data based on process/module/ip profile type
 AMDTResult PowerProfileTranslate::PwrGetProfileData(CXLContextProfileType type, void** pData, AMDTUInt32* pCnt, AMDTFloat32* pPower)
 {
+
+#if (defined(_WIN64) || defined(LINUX))
+(void)type;
+(void)pData;
+(void)pCnt;
+(void)pPower;
+return AMDT_STATUS_OK;
+
+#else
+
     AMDTResult ret = AMDT_STATUS_OK;
     AMDTFloat32 totalPower = 0;
 #ifdef MEMORY_TIME_TRACE
@@ -2058,6 +2077,7 @@ AMDTResult PowerProfileTranslate::PwrGetProfileData(CXLContextProfileType type, 
     PrintMemoryUsage("end of ...");
 #endif
     return ret;
+#endif
 }
 
 

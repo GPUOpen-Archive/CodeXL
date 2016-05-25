@@ -3654,11 +3654,15 @@ AMDTResult AMDTGetProcessProfileData(AMDTUInt32* pPIDCount,
 // point of time from start of the profile to the stop of the profile.
 AMDTResult AMDTPwrGetModuleProfileData(AMDTPwrModuleData** ppData, AMDTUInt32* pModuleCount, AMDTFloat32* pPower)
 {
-    AMDTPwrProfileState state = AMDT_PWR_PROFILE_STATE_UNINITIALIZED;
-    AMDTResult ret = AMDT_STATUS_OK;
-#ifdef LINUX
+
+#if (defined(_WIN64) || defined(LINUX))
+    (void)ppData;
+    (void)pModuleCount;
+    (void)pPower;
     return AMDT_ERROR_NOTSUPPORTED;
 #else
+    AMDTPwrProfileState state = AMDT_PWR_PROFILE_STATE_UNINITIALIZED;
+    AMDTResult ret = AMDT_STATUS_OK;
 
     // Check for valid arguments
     if ((nullptr == pModuleCount) || (nullptr == ppData))
@@ -3687,6 +3691,7 @@ AMDTResult AMDTPwrGetModuleProfileData(AMDTPwrModuleData** ppData, AMDTUInt32* p
     }
 
     return ret;
+
 #endif
 }
 

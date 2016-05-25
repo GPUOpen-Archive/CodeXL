@@ -456,6 +456,10 @@ bool GetApplicationPath(wchar_t* appPath)
 // InitializeTaskInfo: take a snapshot of all running PIDs, modules before we start the profile
 bool InitializeTaskInfo()
 {
+
+#if (defined(_WIN64) || defined(LINUX))
+return true;
+#else
     HRESULT hr = S_OK;
     wchar_t dirPath[OS_MAX_PATH] = { L'\0' };
     LARGE_INTEGER startCount;
@@ -488,6 +492,7 @@ bool InitializeTaskInfo()
     }
 
     return (S_OK == hr) ? true : false;
+#endif
 }
 
 // PrepareInitialProcessList: Prepare the initial process list before the
