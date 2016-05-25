@@ -532,7 +532,14 @@ void gpExecutionMode::OnStartFrameAnalysis()
                 }
                 else
                 {
-                    acMessageBox::instance().information(AF_STR_InformationA, GPU_STR_dashboard_failedToConnectError);
+                    // Build a message according to the API type
+                    QString apiStr = connectionDialog.APIToConnectTo();
+                    if (apiStr.isEmpty())
+                    {
+                        apiStr = QString("%1 or %2").arg(GPU_STR_DX12Api).arg(GPU_STR_VulkanApi);
+                    }
+                    QString userMessage = QString(GPU_STR_dashboard_failedToConnectError).arg(apiStr);
+                    acMessageBox::instance().information(AF_STR_InformationA, userMessage);
                 }
 
                 m_isFrameAnalysisConnecting = false;
