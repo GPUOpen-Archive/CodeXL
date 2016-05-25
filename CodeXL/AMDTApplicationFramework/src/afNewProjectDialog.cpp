@@ -1523,6 +1523,7 @@ bool afNewProjectDialog::AreSettingsValid(gtString& invalidMessageStr, gtString&
 void afNewProjectDialog::IsApplicationPathsValid(bool& isAppValid, bool& isWorkingFolderValid) const
 {
     isAppValid = true;
+    GT_ASSERT(m_pWinStoreAppRadioButton != nullptr && m_pWorkingFolderTextEdit!=nullptr && m_pRemoteHostRadioButton!=nullptr)
     const bool isWInStoreAppRadioButtonChecked = m_pWinStoreAppRadioButton->isChecked();
     const QString workingFolderPath = m_pWorkingFolderTextEdit->text();
     const QString appFilePath = m_pProgramExeTextEdit->text();

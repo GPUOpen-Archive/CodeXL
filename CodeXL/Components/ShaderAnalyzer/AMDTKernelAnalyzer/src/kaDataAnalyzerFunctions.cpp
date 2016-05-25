@@ -14,18 +14,7 @@
     #pragma GCC diagnostic ignored "-Wformat"
 #endif
 
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    //boost warnings disable
-    #pragma warning(disable : 4100)
-    #pragma warning(disable : 4458)
-    #pragma warning(disable : 4459)
-    #pragma warning(disable : 4245)
-    #pragma warning(disable : 4706)
-    #pragma warning(disable : 4503)
-    #pragma warning(disable : 4477)
-    #pragma warning(disable : 4702)
-#endif
-
+#include <AMDTBaseTools/Include/gtIgnoreBoostCompilerWarnings.h>
 //std
 #include <iostream>
 
