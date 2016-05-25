@@ -659,6 +659,7 @@
 #define GP_STR_SummaryTop20TableColumnThreadId "Thread Id"
 #define GP_STR_SummaryTop20TableColumnTime "Time"
 #define GP_STR_SummaryTop20TableShowAll "Show all..."
+#define GP_STR_SummaryCmdBufferToolTip "Command buffer was constructed in a previous frame."
 
 // draw calls ribbon
 #define GP_STR_DrawCallToolTip "%1: %2"
