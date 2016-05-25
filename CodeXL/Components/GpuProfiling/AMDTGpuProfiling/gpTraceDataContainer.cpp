@@ -283,6 +283,7 @@ ProfileSessionDataItem* gpTraceDataContainer::AddVKGPUTraceItem(VKGPUTraceInfo* 
         if (pAPIInfo->m_strName == GPU_STR_TraceViewWholeBufferTraceStr)
         {
             // Do not add WholeBuffer commands as GPU api calls
+            AddBakedCommandBuffer(pAPIInfo);
         }
         else
         {
@@ -1303,11 +1304,24 @@ QString gpTraceDataContainer::QueueDisplayName(const QString& queuePtrStr)
     }
     else
     {
-        // for vulkan: Get the name with the index
+        // for Vulkan: Get the name with the index
         retVal = QueueNameFromPointer(queuePtrStr);
     }
 
     return retVal;
+}
+
+void gpTraceDataContainer::AddBakedCommandBuffer(VKGPUTraceInfo* pAPIInfo)
+{
+    // Sanity check:
+    GT_IF_WITH_ASSERT(pAPIInfo != nullptr)
+    {
+        CommandListInstanceData bakedCommandBuffer;
+        bakedCommandBuffer.m_startTime = pAPIInfo->m_ullStart;
+        bakedCommandBuffer.m_endTime = pAPIInfo->m_ullEnd;
+        bakedCommandBuffer.m_commandListQueueName = QString::fromStdString(pAPIInfo->m_queueIndexStr);
+        m_commandListInstancesVector << bakedCommandBuffer;
+    }
 }
 
 gpTraceDataContainer::CommandListInstanceData::CommandListInstanceData() :

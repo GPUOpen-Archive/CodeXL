@@ -242,7 +242,12 @@ public:
     /// \return the string describing the command list instance that executes this call
     QString AddGPUCallToCommandList(APIInfo* pAPIInfo);
 
-    /// Contain the api type for this session
+    /// This function is used for command buffers that are created and built in previous frames, and are executed in this frame
+    /// These command buffers has no API calls attached
+    /// \param pAPIInfo the struct describing the command buffer execution
+    void AddBakedCommandBuffer(VKGPUTraceInfo* pAPIInfo);
+
+    /// Contain the API type for this session
     ProfileSessionDataItem::ProfileItemAPIType SessionAPIType() const { return m_sessionAPIType; };
 
     /// Return an indexed name for the command buffer / list from  it's pointer
@@ -266,7 +271,6 @@ public:
     /// \param queuePtrStr the queue list pointer
     /// \return a formatted name with the queue index and type
     QString QueueDisplayName(const QString& queuePtrStr);
-
 private:
 
     /// Map from thread id to API count
