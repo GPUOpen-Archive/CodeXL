@@ -108,16 +108,13 @@ public:
 
     void TableItemsAsString(QStringList& membersStringsList)
     {
-        if (0 != m_numCalls)
-        {
-            membersStringsList << m_index;
-            membersStringsList << QString::number(m_executionTimeMS, 'f', 6);
-            membersStringsList << QString::number(m_minTimeMs, 'f', 6);
-            membersStringsList << QString::number(m_maxTimeMs, 'f', 6);
-            membersStringsList << QString::number(m_numCalls);
-            membersStringsList << m_gpuQueue;
-            membersStringsList << m_address;
-        }
+        membersStringsList << m_index;
+        membersStringsList << QString::number(m_executionTimeMS, 'f', 6);
+        membersStringsList << QString::number(m_minTimeMs, 'f', 6);
+        membersStringsList << QString::number(m_maxTimeMs, 'f', 6);
+        membersStringsList << QString::number(m_numCalls);
+        membersStringsList << m_gpuQueue;
+        membersStringsList << m_address;
     }
 
     QString m_index;

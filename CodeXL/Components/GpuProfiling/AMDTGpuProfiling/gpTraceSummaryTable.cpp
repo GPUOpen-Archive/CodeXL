@@ -480,11 +480,8 @@ void gpTraceSummaryTable::CollateAllItemsIntoSummaryMap()
             }
         }
 
-        if (info.m_numCalls > 0)
-        {
-            m_apiCallInfoSummaryMap.insert(info.m_callIndex, info);
-        }
-
+        m_apiCallInfoSummaryMap.insert(info.m_callIndex, info);
+        
         InsertSummaryInfoToMap(info);
     }
 }
@@ -762,6 +759,7 @@ void gpCommandListSummaryTable::AddSummaryRow(int rowIndex, APISummaryInfo* pInf
                 QTableWidgetItem* pItem = nullptr;
 
                 bool shouldSetValue = true;
+                bool shouldSetCmdBufferTooltip = false;
 
                 switch (i)
                 {
@@ -800,6 +798,10 @@ void gpCommandListSummaryTable::AddSummaryRow(int rowIndex, APISummaryInfo* pInf
                 case COLUMN_NUM_OF_COMMANDS:
                 {
                     pItem = new QTableWidgetItem();
+                    if (pInfo->m_numCalls == 0)
+                    {
+                        shouldSetCmdBufferTooltip = true;
+                    }
                 }
                 break;
                 }
@@ -810,9 +812,15 @@ void gpCommandListSummaryTable::AddSummaryRow(int rowIndex, APISummaryInfo* pInf
                     QVariant dataVariant;
                     dataVariant.setValue(rowStrings[i].toDouble());
                     pItem->setData(Qt::DisplayRole, dataVariant);
+                }
+                if (shouldSetCmdBufferTooltip)
+                {
+                    pItem->setToolTip(GP_STR_SummaryCmdBufferToolTip);
+                }
+                else
+                {
                     pItem->setToolTip(pItem->text());
                 }
-
                 pItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
             }
         }
