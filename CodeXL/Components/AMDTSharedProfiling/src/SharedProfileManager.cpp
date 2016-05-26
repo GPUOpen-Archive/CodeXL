@@ -56,7 +56,7 @@ SharedProfileManager* SharedProfileManager::m_pMySingleInstance = NULL;
 
 SharedProfileManager::SharedProfileManager() : QObject(), afIExecutionMode(), afIRunModeManager(),
     m_selectedProfile(PM_STR_SELECT_EMPTY),
-    m_menuCmdCount(COUNT_OF_STATIC_PM_MENUS + MAX_MRU_PROFILES), m_profileIsRunning(false), m_profileSessionProcessCompleted(true), m_paused(false),
+    m_menuCmdCount(COUNT_OF_STATIC_PM_MENUS), m_profileIsRunning(false), m_profileSessionProcessCompleted(true), m_paused(false),
     m_importIsRunning(false), m_exportIsRunning(false)
 {
     m_profileLookup.insert(ProfileMap::value_type(SPM_VS_CPU_ASSESS_PERF, acQStringToGTString(PM_profileTypeAssesPerformancePrefix)));
