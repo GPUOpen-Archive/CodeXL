@@ -367,7 +367,6 @@ public:
         {
             QString valStr = QString::number(value.toDouble());
             valStr.append(PERCENTAGE_SYMBOL);
-            m_text = valStr;
             QTableWidgetItem::setData(role, valStr);
         }
         else
