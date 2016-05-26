@@ -98,12 +98,7 @@ enum pmNumericConstants
 {
 
     /// Used to keep track of the static menu item count
-    COUNT_OF_STATIC_PM_MENUS = PM_LAST_COMMAND_ID - SHARED_PROFILING_FIRST_COMMAND_ID,
-
-    /// The maximum number of mru profiles to keep at the top of the list
-    MAX_MRU_PROFILES = 3,
-    /// The minimum number of profiles needed to show the mru list
-    MIN_PROFILE_SHOW_MRU = 5,
+    COUNT_OF_STATIC_PM_MENUS = PM_LAST_COMMAND_ID - SHARED_PROFILING_FIRST_COMMAND_ID + 1,
 
     /// The profile can only be started
     SPM_ONLY_START = 0,
