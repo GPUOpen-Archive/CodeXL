@@ -375,13 +375,9 @@ public:
             QTableWidgetItem::setData(role, value);
         }
     }
-    QString text()const
-    {
-        return m_text;
-    }
+
 private:
     const char PERCENTAGE_SYMBOL[2] = "%";
-    QString m_text;
 };
 
 class FormattedTimeItem : public QTableWidgetItem
