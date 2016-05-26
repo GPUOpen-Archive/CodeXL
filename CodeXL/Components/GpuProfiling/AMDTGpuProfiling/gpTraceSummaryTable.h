@@ -363,12 +363,25 @@ public:
     }
     virtual void setData(int role, const QVariant& value)
     {
-        QString valStr = QString::number(value.toDouble());
-        valStr.append(PERCENTAGE_SYMBOL);
-        QTableWidgetItem::setData(role, valStr);
+        if (role == Qt::DisplayRole)
+        {
+            QString valStr = QString::number(value.toDouble());
+            valStr.append(PERCENTAGE_SYMBOL);
+            m_text = valStr;
+            QTableWidgetItem::setData(role, valStr);
+        }
+        else
+        {
+            QTableWidgetItem::setData(role, value);
+        }
+    }
+    QString text()const
+    {
+        return m_text;
     }
 private:
     const char PERCENTAGE_SYMBOL[2] = "%";
+    QString m_text;
 };
 
 class FormattedTimeItem : public QTableWidgetItem
