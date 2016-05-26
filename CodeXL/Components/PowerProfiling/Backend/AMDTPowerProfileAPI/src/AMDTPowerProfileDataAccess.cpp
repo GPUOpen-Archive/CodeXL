@@ -101,12 +101,10 @@ AMDTResult AMDTPwrCloseDataAccess()
 
     FlushDriverSignal();
 
-    g_pTranslate->ClosePowerProfileTranslate();
-
     //Release all allocated memory
-
     if (g_pTranslate)
     {
+        g_pTranslate->ClosePowerProfileTranslate();
         delete g_pTranslate;
         g_pTranslate = nullptr;
     }
@@ -173,6 +171,7 @@ AMDTResult GetCummulativePidProfDataFromStart(AMDTUInt32* pPIDCount,
     AMDTUInt32 entries = 0;
     AMDTFloat32 power = 0;
 #ifdef _WIN32
+
     if (nullptr != g_pTranslate)
     {
         g_pTranslate->PwrGetProfileData(PROCESS_PROFILE, (void**)&pInfo, &entries, &power);
