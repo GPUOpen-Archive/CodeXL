@@ -8,21 +8,25 @@
 
 #ifndef _POWER_PROFILE_TRANSLATE_H_
 #define _POWER_PROFILE_TRANSLATE_H_
+
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+
 #include <AMDTDefinitions.h>
 #include <OsFileWrapper.h>
+#include <AMDTOSWrappers/Include/osApplication.h>
+#include <AMDTBaseTools/Include/gtMap.h>
+
 #include <AMDTRawDataFileHeader.h>
 #include <RawDataReader.h>
 #include <AMDTPowerProfileInternal.h>
 #include <PowerProfileDriverInterface.h>
-#include <queue>
-#include <mutex>
-#include <condition_variable>
-#include <TaskInfoInterface.h>
-#include <CpuProfilingTranslationDLLBuild.h>
-#include <AMDTOSWrappers/Include/osApplication.h>
 
-using namespace std;
-#define MAX_CORE_CNT 32
+#ifndef _LINUX
+    #include <TaskInfoInterface.h>
+    #include <CpuProfilingTranslationDLLBuild.h>
+#endif
 
 #define TRANSLATION_POOL_SIZE 2*1048576 // 2MB
 // Maximum value to check the validity
@@ -131,8 +135,10 @@ using namespace std;
     // process map: (process id, process info)
     typedef gtMap<AMDTUInt32, ProcessInfo> ProcessTreeMap;
 
+#ifndef LINUX
     // Interesting module instance list(instance id, module info)
     typedef gtMap<AMDTUInt32, LoadModuleInfo> ModuleInfoMap;
+#endif
 
     // sample key(ip+instance, sample info)
     typedef gtMap<AMDTUInt64, SampleData> SampleMap;
@@ -291,7 +297,9 @@ using namespace std;
         vector <AMDTPwrModuleData> m_moduleList;
 
         AMDTFloat32 m_sampleIpcLoad[MAX_CORE_CNT];
+#ifndef LINUX
         ModuleInfoMap m_moduleTable;
+#endif
         SampleMap m_sampleMap[MAX_CORE_CNT];
         ProcessTreeMap m_systemTreeMap;
         AMDTUInt64 m_prevTs1;
@@ -300,4 +308,3 @@ using namespace std;
     };
 
 #endif //_POWER_PROFILE_TRANSLATE_H_
-

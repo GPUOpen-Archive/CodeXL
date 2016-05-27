@@ -33,15 +33,19 @@
     #define PROCESS_INFO_TXT_HDR_FORMAT    "\nSNo\tPID\tSamples\tPower(Joules)\tPower(%)\tName\t\t\t\t\t\tPath\n\n"
     #define PROCESS_INFO_CSV_FORMAT        "%d,%d,%d,%3.2f,%3.2f,%s,%s\n"
     #define PROCESS_INFO_CSV_HDR_FORMAT    "\nSNo,PID,Samples,Power(Joules),Power(%),Name,Path\n\n"
+    #define MODULE_INFO_TXT_FORMAT         "%d\t%d\t%d\t%d\t%3.2f\t\t%3.2f\t\t0x%-8.8lx\t\t%-1.8ld\t\t%-45.45s\t%s\n"
+    #define MODULE_INFO_TXT_HDR_FORMAT     "\nSNo\tPID\tSamples\tKernel\tPower(Joules)\tPower(%)\tLoad Addr\t\tsize\t\t\tName\t\t\t\t\t\tPath\n\n"
+    #define MODULE_INFO_CSV_FORMAT         "%d,%d,%d,%d,%3.2f,%3.2f,0x%lx,%ld,%s,%s\n"
+    #define MODULE_INFO_CSV_HDR_FORMAT     "\nSNo,PID,Samples,Kernel,Power(Joules),Power(%),Load Addr,size,Name,Path\n\n"
 #else // Windows
     #define PROCESS_INFO_TXT_FORMAT        "%d\t%d\t%d\t%3.2f\t%3.2f\t\t%3.2f\t\t%-45.45s\t%s\n"
     #define PROCESS_INFO_TXT_HDR_FORMAT    "\nSNo\tPID\tSamples\tIPC\tPower(Joules)\tPower(%)\tName\t\t\t\t\t\tPath\n\n"
     #define PROCESS_INFO_CSV_FORMAT        "%d,%d,%d,%3.2f,%3.2f,%3.2f,%s,%s\n"
     #define PROCESS_INFO_CSV_HDR_FORMAT    "\nSNo,PID,Samples,IPC,Power(Joules),Power(%),Name,Path\n\n"
-    #define MODULE_INFO_TXT_FORMAT        "%d\t%d\t%d\t%d\t%3.2f\t\t%3.2f\t\t0x%-8.8llx\t\t%-1.8lld\t\t%-45.45s\t%s\n"
-    #define MODULE_INFO_TXT_HDR_FORMAT    "\nSNo\tPID\tSamples\tKernel\tPower(Joules)\tPower(%)\tLoad Addr\t\tsize\t\t\tName\t\t\t\t\t\tPath\n\n"
-    #define MODULE_INFO_CSV_FORMAT        "%d,%d,%d,%d,%3.2f,%3.2f,0x%llx,%lld,%s,%s\n"
-    #define MODULE_INFO_CSV_HDR_FORMAT    "\nSNo,PID,Samples,Kernel,Power(Joules),Power(%),Load Addr,size,Name,Path\n\n"
+    #define MODULE_INFO_TXT_FORMAT         "%d\t%d\t%d\t%d\t%3.2f\t\t%3.2f\t\t0x%-8.8llx\t\t%-1.8lld\t\t%-45.45s\t%s\n"
+    #define MODULE_INFO_TXT_HDR_FORMAT     "\nSNo\tPID\tSamples\tKernel\tPower(Joules)\tPower(%)\tLoad Addr\t\tsize\t\t\tName\t\t\t\t\t\tPath\n\n"
+    #define MODULE_INFO_CSV_FORMAT         "%d,%d,%d,%d,%3.2f,%3.2f,0x%llx,%lld,%s,%s\n"
+    #define MODULE_INFO_CSV_HDR_FORMAT     "\nSNo,PID,Samples,Kernel,Power(Joules),Power(%),Load Addr,size,Name,Path\n\n"
 #endif
 
 void ppReporter::ReportHeader()
@@ -878,4 +882,3 @@ void ppReporterCsv::WriteModuleData(AMDTUInt32 recCnt, AMDTPwrModuleData*& pInfo
     m_dataStr.append("\n");
     m_reportFile.write(m_dataStr.c_str(), m_dataStr.length());
 }
-

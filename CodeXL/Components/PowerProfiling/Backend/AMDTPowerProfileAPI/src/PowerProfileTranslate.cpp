@@ -6,20 +6,19 @@
 ///
 //==================================================================================
 
-#include "PowerProfileTranslate.h"
-#include <RawDataReader.h>
+#include <cstring>
+#include <cmath>
+#include <cstdarg>
+#include <list>
+
 #include <PowerProfileHelper.h>
 #include <AMDTPowerProfileControl.h>
-#include <AMDTPowerProfileInternal.h>
 #include <AMDTPwrProfAttributes.h>
 #include <AMDTSharedBufferConfig.h>
 #include <AMDTHistogram.h>
-#include <cstring>
 #include <AMDTDriverTypedefs.h>
-#include <math.h>
-#include <stdarg.h>
-#include <list>
-#include <TaskInfoInterface.h>
+#include "PowerProfileTranslate.h"
+
 struct ContextData;
 
 AMDTUInt32 g_tracePids = 0;
@@ -653,7 +652,7 @@ AMDTResult PowerProfileTranslate::InsertSampleToSystemTree(SampleData* pCtx, AMD
 {
     AMDTResult ret = AMDT_STATUS_OK;
     IpAddressInfo ipSample;
-    bool moduleInstFound = false;
+    //bool moduleInstFound = false;
 
     ProcessTreeMap::iterator processIter = m_systemTreeMap.find(pCtx->m_processId);
 
@@ -691,7 +690,7 @@ AMDTResult PowerProfileTranslate::InsertSampleToSystemTree(SampleData* pCtx, AMD
             //Create
             processIter->second.m_modInstMap.insert(ModuleInstanceMap::value_type(pCtx->m_modInstance, instInfo));
             processIter->second.m_power += power;
-            moduleInstFound = true;
+            //moduleInstFound = true;
         }
         else
         {
@@ -1963,18 +1962,19 @@ void PowerProfileTranslate::ExtractNameAndPath(char* pFullPath, char* pName, cha
 // PwrGetProfileData: Provide process data based on process/module/ip profile type
 AMDTResult PowerProfileTranslate::PwrGetProfileData(CXLContextProfileType type, void** pData, AMDTUInt32* pCnt, AMDTFloat32* pPower)
 {
+    AMDTResult ret = AMDT_STATUS_OK;
 
 #if (defined(_WIN64) || defined(LINUX))
-(void)type;
-(void)pData;
-(void)pCnt;
-(void)pPower;
-return AMDT_STATUS_OK;
+
+    (void)type;
+    (void)pData;
+    (void)pCnt;
+    (void)pPower;
 
 #else
 
-    AMDTResult ret = AMDT_STATUS_OK;
     AMDTFloat32 totalPower = 0;
+
 #ifdef MEMORY_TIME_TRACE
     PrintMemoryUsage("before aggregation ...");
 #endif
@@ -2076,8 +2076,7 @@ return AMDT_STATUS_OK;
 #ifdef MEMORY_TIME_TRACE
     PrintMemoryUsage("end of ...");
 #endif
-    return ret;
 #endif
+
+    return ret;
 }
-
-

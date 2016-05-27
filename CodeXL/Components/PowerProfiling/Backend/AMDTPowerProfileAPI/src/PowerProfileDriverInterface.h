@@ -14,8 +14,6 @@
 #include <AMDTRawDataFileHeader.h>
 #include <AMDTPwrProfDriver.h>
 #include <list>
-#include <TaskInfoInterface.h>
-#include <CpuProfilingTranslationDLLBuild.h>
 #include <AMDTOSWrappers/Include/osApplication.h>
 
 #define AMDT_PWR_STR_SYSTEM_IDLE "System Idle Process"
@@ -24,10 +22,10 @@
 #define ERROR_READING_PROCESS_PATH "Unable to read path"
 
 #ifndef _LINUX
+    #include <TaskInfoInterface.h>
+    #include <CpuProfilingTranslationDLLBuild.h>
     #include <AMDTDriverControl/inc/DriverControl.h>
 #endif
-
-using namespace std;
 
 enum DriverCommandType
 {
@@ -109,4 +107,3 @@ bool GetProcessNameFromPid(AMDTPwrProcessInfo* pInfo);
 
 
 #endif //_POWERPROFILEDRIVERINTERFACE_H_
-

@@ -6,6 +6,12 @@
 ///
 //==================================================================================
 
+#include <cstring>
+#include <iostream>
+#include <thread>
+#include <mutex>
+#include <unordered_map>
+
 #include <AMDTOSWrappers/Include/osCriticalSection.h>
 #include <AMDTOSWrappers/Include/osCriticalSectionLocker.h>
 
@@ -14,11 +20,6 @@
 #include <AMDTPowerProfileDataAccess.h>
 #include <PowerProfileHelper.h>
 #include <PowerProfileDriverInterface.h>
-#include <cstring>
-#include <iostream>
-#include <thread>
-#include <mutex>
-#include <unordered_map>
 
 static bool g_isOnline = false;
 static PowerProfileTranslate* g_pTranslate = nullptr;
@@ -169,18 +170,20 @@ AMDTResult GetCummulativePidProfDataFromStart(AMDTUInt32* pPIDCount,
     AMDTResult ret = AMDT_ERROR_NODATA;
     AMDTPwrProcessInfo* pInfo = nullptr;
     AMDTUInt32 entries = 0;
-    AMDTFloat32 power = 0;
+
 #ifdef _WIN32
 
     if (nullptr != g_pTranslate)
     {
+        AMDTFloat32 power = 0;
         g_pTranslate->PwrGetProfileData(PROCESS_PROFILE, (void**)&pInfo, &entries, &power);
         (void)power;
     }
 
 #else
+
     entries = g_aggrPidPowerList.m_numberOfPids;
-    pInfo = &g_aggrPidPowerList.m_process[0]
+    pInfo = &g_aggrPidPowerList.m_process[0];
 
 #endif
 
@@ -217,18 +220,20 @@ AMDTResult GetCummulativePidProfDataInstatant(AMDTUInt32* pPIDCount,
     AMDTResult ret = AMDT_STATUS_OK;
     AMDTPwrProcessInfo* pInfo = nullptr;
     AMDTUInt32 entries = 0;
-    AMDTFloat32 power = 0;
+
 #ifdef _WIN32
 
     if (nullptr != g_pTranslate)
     {
+        AMDTFloat32 power = 0;
         g_pTranslate->PwrGetProfileData(PROCESS_PROFILE, (void**)&pInfo, &entries, &power);
         (void)power;
     }
 
 #else
+
     entries = g_aggrPidPowerList.m_numberOfPids;
-    pInfo = &g_aggrPidPowerList.m_process[0]
+    pInfo = &g_aggrPidPowerList.m_process[0];
 
 #endif
 
