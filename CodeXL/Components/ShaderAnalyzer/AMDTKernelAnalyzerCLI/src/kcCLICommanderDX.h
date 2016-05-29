@@ -27,6 +27,7 @@ private: //functions
                                 const std::string& sAnalysisFile, std::stringstream& log);
     void ExtractISA(const std::string& deviceName, const Config& config, size_t& isaSizeInBytes, std::string isaBuffer,
                     bool& isIsaSizeDetected, bool& shouldDetectIsaSize, const bool bRegisterLiveness, const bool bControlFlow);
+    void ExtractIL(const std::string& deviceName, const Config& config);
     bool ExtractStats(const  std::string& deviceName, const Config& config, bool shouldDetectIsaSize, std::string isaBuffer,
                       bool isIsaSizeDetected, size_t isaSizeInBytes, vector<AnalysisData>& AnalysisDataVec, vector<string>& DeviceAnalysisDataVec);
     void ExtractBinary(const std::string& deviceName, const Config& config);

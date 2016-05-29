@@ -243,6 +243,37 @@ void kcCLICommanderDX::ExtractISA(const string& deviceName, const Config& config
 
 }
 
+void kcCLICommanderDX::ExtractIL(const std::string& deviceName, const Config& config)
+{
+    beProgramBuilderDX* pProgramBuilderDX = m_pBackEndHandler != nullptr ? m_pBackEndHandler->theOpenDXBuilder() : nullptr;
+    beStatus backendRet = beStatus_Invalid;
+    GT_IF_WITH_ASSERT(pProgramBuilderDX != nullptr)
+    {
+        std::string ilBuffer;
+        backendRet = pProgramBuilderDX->GetDxShaderIL(deviceName, config.m_Function, config.m_Profile, ilBuffer);
+
+        if (backendRet == beStatus_SUCCESS)
+        {
+            gtString ilOutputFileName;
+            kcUtils::ConstructOutputFileName(config.m_ILFile, KC_STR_DEFAULT_AMD_IL_SUFFIX,
+                config.m_Function, deviceName, ilOutputFileName);
+            KAUtils::WriteTextFile(ilOutputFileName.asASCIICharArray(), ilBuffer, m_LogCallback);
+        }
+
+        if (backendRet == beStatus_SUCCESS)
+        {
+            std::stringstream s_Log;
+            s_Log << KA_CLI_STR_EXTRACTING_AMDIL << deviceName << KA_CLI_STR_STATUS_SUCCESS << std::endl;
+            LogCallBack(s_Log.str());
+        }
+        else
+        {
+            std::stringstream s_Log;
+            s_Log << KA_CLI_STR_EXTRACTING_AMDIL << deviceName << KA_CLI_STR_STATUS_FAILURE << std::endl;
+            LogCallBack(s_Log.str());
+        }
+    }
+}
 
 bool kcCLICommanderDX::ExtractStats(const string& deviceName, const Config& config, bool shouldDetectIsaSize, string isaBuffer, bool isIsaSizeDetected,
                                     size_t isaSizeInBytes, vector<AnalysisData>& AnalysisDataVec, vector<string>& DeviceAnalysisDataVec)
@@ -336,14 +367,8 @@ void kcCLICommanderDX::RunCompileCommands(const Config& config, LoggingCallBackF
 
     if (isInitSuccessful)
     {
-        bool bIL = (config.m_ILFile.length() > 0);
-
-        if (bIL)
-        {
-            callback("Warning: IL code generation for DX is currently not supported. --il command line switch will be ignored.\n");
-        }
-
         const bool bISA = config.m_ISAFile.length() > 0;
+        const bool bIL = config.m_ILFile.length() > 0;
         const bool bStatistics = config.m_AnalysisFile.length() > 0;
         const bool bRegisterLiveness = config.m_LiveRegisterAnalysisFile.length() > 0;
         const bool bControlFlow = config.m_ControlFlowGraphFile.length() > 0;
@@ -446,7 +471,10 @@ void kcCLICommanderDX::RunCompileCommands(const Config& config, LoggingCallBackF
                 {
                     ExtractISA(deviceName, config, isaSizeInBytes, isaBuffer, isIsaSizeDetected, shouldDetectIsaSize, bRegisterLiveness, bControlFlow);
                 }
-
+                if (bIL)
+                {
+                    ExtractIL(deviceName, config);
+                }
                 if (bStatistics)
                 {
                     isIsaSizeDetected = ExtractStats(deviceName, config, shouldDetectIsaSize, isaBuffer, isIsaSizeDetected, isaSizeInBytes, AnalysisDataVec, DeviceAnalysisDataVec);

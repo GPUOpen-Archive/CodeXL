@@ -1044,6 +1044,23 @@ const CElfSection* beProgramBuilderDX::GetISATextSection(const string& deviceNam
 
     return result;
 }
+
+const CElfSection* beProgramBuilderDX::GetILSection(const std::string& deviceName) const
+{
+    // Get the relevant ELF section for the required device.
+    const CElfSection* result = nullptr;
+    CElf* pElf = GetDeviceElf(deviceName);
+
+    if (pElf != nullptr)
+    {
+        // There is no symbol table.  We just need the .text section.
+        const string IL_SECTION_NAME(".amdil");
+        result = pElf->GetSection(IL_SECTION_NAME);
+    }
+
+    return result;
+}
+
 beKA::beStatus beProgramBuilderDX::GetDxShaderISAText(const string& deviceName, const string& shader, const string& target, string& isaBuffer)
 {
     beKA::beStatus ret = beStatus_Invalid;
@@ -1124,6 +1141,71 @@ beKA::beStatus beProgramBuilderDX::GetDxShaderISAText(const string& deviceName, 
         // Release the memory.
         sp3_close(pDisasmState);
         UsePlatformNativeLineEndings(isaBuffer);
+        sp3_free(pDisassembledShader);
+        sp3_vm_free(pVm);
+    }
+
+    else
+    {
+        ret = beStatus_NO_ISA_FOR_DEVICE;
+    }
+
+    return ret;
+}
+
+beKA::beStatus beProgramBuilderDX::GetDxShaderIL(const std::string& device, const std::string& shader,
+    const std::string& target, std::string& ilBuffer)
+{
+    beKA::beStatus ret = beStatus_Invalid;
+
+    // Get the relevant ELF section for the required device.
+    const CElfSection* pAmdilSection = GetILSection(device);
+
+    if (pAmdilSection != nullptr)
+    {
+        // This is the binary image.
+        const vector<char>& sectionData = pAmdilSection->GetData();
+
+        // Use the sp3 library to do the disassembly.
+        // This only works with SI & CI for now.
+        // See on that matter: sc/Src/R1000/R1000Disassembler.cpp.
+        struct sp3_context* pDisasmState = sp3_new();
+        char* pDisassembledShader = nullptr;
+        sp3_vma* pVm = nullptr;
+
+        // Prepare the tokens.
+        unsigned* pIlBytes = (unsigned*)&sectionData[0];
+
+        if (pIlBytes != nullptr)
+        {
+            size_t ilBytesLen = sectionData.size() / 4;
+            pVm = sp3_vm_new_ptr(0, ilBytesLen, pIlBytes);
+
+            // Prepare the flags.
+            unsigned disasmFlags = 0;
+            disasmFlags |= SP3DIS_FORCEVALID;
+
+            // Get the shader type.
+            const int shaderType = GetShaderType(target);
+
+            // Disassemble the code.
+            pDisassembledShader = sp3_disasm(pDisasmState, pVm, 0, shader.c_str(),
+                shaderType, NULL, (unsigned)ilBytesLen, disasmFlags);
+
+            if (pDisassembledShader != nullptr)
+            {
+
+                // Fill the buffer.
+                ilBuffer = string(pDisassembledShader);
+
+                // We are done.
+                ret = beKA::beStatus_SUCCESS;
+            }
+        }
+
+        // Release the memory.
+        sp3_close(pDisasmState);
+        UsePlatformNativeLineEndings(ilBuffer);
         sp3_free(pDisassembledShader);
         sp3_vm_free(pVm);
     }
