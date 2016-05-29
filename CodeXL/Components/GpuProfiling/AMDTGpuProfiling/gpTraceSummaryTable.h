@@ -109,13 +109,14 @@ public:
     void TableItemsAsString(QStringList& membersStringsList)
     {
         membersStringsList << m_index;
-        membersStringsList << QString::number(m_executionTimeMS, 'f', 6);
-        membersStringsList << QString::number(m_minTimeMs, 'f', 6);
-        membersStringsList << QString::number(m_maxTimeMs, 'f', 6);
+        membersStringsList << QString::number(m_executionTimeMS, 'f', 3);
+        membersStringsList << QString::number(m_minTimeMs, 'f', 3);
+        membersStringsList << QString::number(m_maxTimeMs, 'f', 3);
         membersStringsList << QString::number(m_numCalls);
         membersStringsList << m_gpuQueue;
         membersStringsList << m_address;
     }
+
 
     QString m_index;
     QString m_address;
@@ -132,7 +133,7 @@ class gpSummaryTable : public acListCtrl
 
     Q_OBJECT
 public :
-    gpSummaryTable(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView, eCallType callType);
+    gpSummaryTable(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView, eCallType callType, quint64 timelineAbsoluteStart);
     virtual ~gpSummaryTable();
     // Save selection in summary table to be restored on tab switch
     // Restores selection
@@ -165,6 +166,7 @@ protected:
     gpTraceView* m_pTraceView;
 
     int m_lastSelectedRowIndex;
+    quint64 m_timelineAbsoluteStart;
 
 private:
     /// Fills table only with calls within the timeline start and end
@@ -196,7 +198,7 @@ public :
         COLUMN_NUM_OF_CALLS,
         COLUMN_COUNT
     };
-    gpTraceSummaryTable(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView, eCallType callType);
+    gpTraceSummaryTable(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView, eCallType callType, quint64 timelineAbsoluteStart);
 
     /// class destructor.
     virtual ~gpTraceSummaryTable();
@@ -297,7 +299,7 @@ public:
         COLUMN_ADDRESS,
         COLUMN_COUNT
     };
-    gpCommandListSummaryTable(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView);
+    gpCommandListSummaryTable(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView, quint64 timelineAbsoluteStart);
 
     /// class destructor.
     virtual ~gpCommandListSummaryTable();

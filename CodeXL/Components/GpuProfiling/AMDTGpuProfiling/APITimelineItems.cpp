@@ -93,12 +93,14 @@ void CommandListTimelineItem::tooltipItems(acTimelineItemToolTip& tooltip) const
     }
 
     // Convert the start and end times to milliseconds
-    double fnumStart = (m_nStartTime - timelineStartTime) / 1e6; 
-    double fnumEnd = (m_nEndTime - timelineStartTime) / 1e6; // convert to milliseconds
+    double fnumStart = (m_nStartTime - timelineStartTime); 
+    double fnumEnd = (m_nEndTime - timelineStartTime); 
 
     quint64 duration = m_nEndTime - m_nStartTime;
-    QString durationStr = NanosecToTimeString(duration, true, false);
+    QString durationStr = NanosecToTimeStringFormatted(duration, true);
+    QString fnumStartStr = NanosecToTimeStringFormatted(fnumStart, true);
+    QString fnumEndStr = NanosecToTimeStringFormatted(fnumEnd, true);
 
-    QString tooltipLine = QString(GPU_STR_APITimeline_TimeTooltipLine).arg(fnumStart, 0, 'f', 3).arg(fnumEnd, 0, 'f', 3).arg(durationStr);
+    QString tooltipLine = QString(GPU_STR_APITimeline_TimeTooltipLine).arg(fnumStartStr).arg(fnumEndStr).arg(durationStr);
     tooltip.add("", tooltipLine);
 }

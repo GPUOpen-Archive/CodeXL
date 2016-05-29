@@ -13,8 +13,8 @@ static const char* table_captions[] = { GPU_STR_API_Call_Summary, GPU_STR_GPU_Ca
 const int MAX_ITEMS_IN_TABLE = 20;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-gpSummaryTab::gpSummaryTab(eCallType callType)
-    : m_callType(callType), m_pTraceView(nullptr), m_pSummaryTable(nullptr), m_pTop20Table(nullptr), m_pTop20Caption(nullptr), m_pChkboxUseScope(nullptr), m_useTimelineSelectionScope(false), m_timelineStart(0), m_timelineEnd(0), m_currentCallIndex(0)
+gpSummaryTab::gpSummaryTab(eCallType callType, quint64 timelineAbsoluteStart)
+    : m_callType(callType), m_pTraceView(nullptr), m_pSummaryTable(nullptr), m_pTop20Table(nullptr), m_pTop20Caption(nullptr), m_pChkboxUseScope(nullptr), m_useTimelineSelectionScope(false), m_timelineStart(0), m_timelineEnd(0), m_currentCallIndex(0), m_timelineAbsoluteStart(timelineAbsoluteStart)
 {
 }
 
@@ -25,11 +25,11 @@ bool gpSummaryTab::Init(gpTraceDataContainer* pDataContainer, gpTraceView* pSess
     m_pSessionDataContainer = pDataContainer;
     if (m_callType == API_CALL || m_callType == GPU_CALL)
     {
-        m_pSummaryTable = new gpTraceSummaryTable(pDataContainer, pSessionView, m_callType);
+        m_pSummaryTable = new gpTraceSummaryTable(pDataContainer, pSessionView, m_callType, m_timelineAbsoluteStart);
     }
     else
     {
-        m_pSummaryTable = new gpCommandListSummaryTable(pDataContainer, pSessionView);
+        m_pSummaryTable = new gpCommandListSummaryTable(pDataContainer, pSessionView, m_timelineAbsoluteStart);
     }
 
     m_pTop20Table = new acListCtrl(this);

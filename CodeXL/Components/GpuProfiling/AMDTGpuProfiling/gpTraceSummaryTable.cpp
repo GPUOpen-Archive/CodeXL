@@ -25,8 +25,8 @@ void gpSummaryTable::Refresh(bool useTimelineScope, quint64 min, quint64 max)
     FillTable();
 }
 
-gpTraceSummaryTable::gpTraceSummaryTable(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView, eCallType callType)
-    : gpSummaryTable(pDataContainer, pSessionView, callType), m_callType(callType)
+gpTraceSummaryTable::gpTraceSummaryTable(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView, eCallType callType, quint64 timelineAbsoluteStart)
+    : gpSummaryTable(pDataContainer, pSessionView, callType, timelineAbsoluteStart), m_callType(callType)
 {
     m_pSessionDataContainer = pDataContainer;
 
@@ -257,8 +257,8 @@ void gpTraceSummaryTable::OnCellEntered(int row, int column)
     }
 }
 
-gpSummaryTable::gpSummaryTable(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView, eCallType callType)
-    :acListCtrl(nullptr), m_pSessionDataContainer(pDataContainer), m_pTraceView(pSessionView), m_lastSelectedRowIndex(-1)
+gpSummaryTable::gpSummaryTable(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView, eCallType callType, quint64 timelineAbsoluteStart)
+    :acListCtrl(nullptr), m_pSessionDataContainer(pDataContainer), m_pTraceView(pSessionView), m_lastSelectedRowIndex(-1), m_timelineAbsoluteStart(timelineAbsoluteStart)
 {
     GT_UNREFERENCED_PARAMETER(callType);
 }
@@ -582,8 +582,8 @@ void gpTraceSummaryTable::Cleanup()
 }
 
 /////////////////////////////////////////////////////////////////////////////////
-gpCommandListSummaryTable::gpCommandListSummaryTable(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView)
-    : gpSummaryTable(pDataContainer, pSessionView, (eCallType)3), m_pSessionDataContainer(pDataContainer), m_pTraceView(pSessionView), m_lastSelectedRowIndex(-1)
+gpCommandListSummaryTable::gpCommandListSummaryTable(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView, quint64 timelineAbsoluteStart)
+    : gpSummaryTable(pDataContainer, pSessionView, (eCallType)3, timelineAbsoluteStart), m_pSessionDataContainer(pDataContainer), m_pTraceView(pSessionView), m_lastSelectedRowIndex(-1)
 {
     m_pSessionDataContainer = pDataContainer;
     bool isDx12 = (pDataContainer != nullptr && pDataContainer->SessionAPIType() == ProfileSessionDataItem::ProfileItemAPIType::DX12_API_PROFILE_ITEM);
@@ -680,6 +680,7 @@ void gpCommandListSummaryTable::InitCommandListItems()
                 info.m_address = (*iter).m_commandListPtr;
                 info.m_minTimeMs = (*iter).m_startTime;
                 info.m_maxTimeMs = (*iter).m_endTime;
+
                 info.m_numCalls = (*iter).m_apiIndices.size();
                 info.m_executionTimeMS = ((*iter).m_endTime - (*iter).m_startTime);
                 info.m_typeColor = APIColorMap::Instance()->GetCommandListColor(commandListIndex);
@@ -705,6 +706,9 @@ void gpCommandListSummaryTable::InitCommandListItems()
                         }
                     }
                 }
+                // normalize to timeline start
+                info.m_minTimeMs = (info.m_minTimeMs - m_timelineAbsoluteStart);
+                info.m_maxTimeMs = (info.m_maxTimeMs - m_timelineAbsoluteStart);
 
                 commandListIndex++;
 
