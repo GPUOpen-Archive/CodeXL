@@ -436,8 +436,11 @@ void OpenCLTraceOptions::RestoreDefaultProjectSettings()
 
 bool OpenCLTraceOptions::RestoreCurrentSettings()
 {
-    m_pOpenCLRadioButton->setChecked(m_currentSettings.m_apiToTrace == APIToTrace_OPENCL);
-    m_pHSARadioButton->setChecked(m_currentSettings.m_apiToTrace == APIToTrace_HSA);
+    const bool isHsaEnabled = Util::IsHSAEnabled();
+    const bool isRemote = afProjectManager::instance().currentProjectSettings().isRemoteTarget();
+    const bool openCLChecked = m_currentSettings.m_apiToTrace == APIToTrace_OPENCL || (isRemote && isHsaEnabled == false);
+    m_pOpenCLRadioButton->setChecked(openCLChecked);
+    m_pHSARadioButton->setChecked(m_currentSettings.m_apiToTrace == APIToTrace_HSA || (isRemote && isHsaEnabled));
     m_pShowAPIErrorCodeCB->setChecked(m_currentSettings.m_alwaysShowAPIErrorCode);
     m_pCollapseCallsCB->setChecked(m_currentSettings.m_collapseClGetEventInfo);
     m_pEnableNavigationCB->setChecked(m_currentSettings.m_generateSymInfo);
@@ -447,7 +450,6 @@ bool OpenCLTraceOptions::RestoreCurrentSettings()
     m_pMaxNumberOfAPIsSB->setValue(m_currentSettings.m_maxAPICalls);
 
     m_pTimeOutIntervalSB->setValue(m_currentSettings.m_timeoutInterval);
-    const bool isHsaEnabled = Util::IsHSAEnabled();
     m_pHSARadioButton->setEnabled(isHsaEnabled);
 
 #if (AMDT_BUILD_TARGET == AMDT_WINDOWS_OS)
@@ -460,7 +462,7 @@ bool OpenCLTraceOptions::RestoreCurrentSettings()
     bool isCatalystInstalled = (afGlobalVariablesManager::instance().InstalledAMDComponentsBitmask() & AF_AMD_CATALYST_COMPONENT);
     m_pOpenCLRadioButton->setEnabled(isCatalystInstalled);
 
-    if (!isCatalystInstalled)
+    if (!isCatalystInstalled && isRemote == false)
     {
         m_pHSARadioButton->setChecked(true);
     }

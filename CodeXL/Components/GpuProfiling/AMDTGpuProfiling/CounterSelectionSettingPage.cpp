@@ -391,12 +391,14 @@ void CounterSelectionSettingWindow::RestoreDefaultProjectSettings()
 bool CounterSelectionSettingWindow::RestoreCurrentSettings()
 {
     m_pCounterListTW->blockSignals(true);
-    m_pOpenCLRadioButton->setChecked(m_currentSettings.m_api == APIToTrace_OPENCL);
-    m_pHSARadioButton->setChecked(m_currentSettings.m_api == APIToTrace_HSA);
+    const bool isHsaEnabled = Util::IsHSAEnabled();
+    const bool isRemote = afProjectManager::instance().currentProjectSettings().isRemoteTarget();
+    const bool openCLChecked = m_currentSettings.m_api == APIToTrace_OPENCL || (isRemote && isHsaEnabled == false);
+    m_pOpenCLRadioButton->setChecked(openCLChecked);
+    m_pHSARadioButton->setChecked(m_currentSettings.m_api == APIToTrace_HSA ||  (isRemote && isHsaEnabled));
     m_pGenerateOccupancyCB->setChecked(m_currentSettings.m_generateKernelOccupancy);
     m_pGpuTimeCollectCB->setChecked(m_currentSettings.m_measureKernelExecutionTime);
     m_pSpecificKernelsEdit->setText(acGTStringToQString(m_currentSettings.m_specificKernels));
-    const bool isHsaEnabled = Util::IsHSAEnabled();
     m_pHSARadioButton->setEnabled(isHsaEnabled);
 
 #if (AMDT_BUILD_TARGET == AMDT_WINDOWS_OS)
@@ -408,8 +410,9 @@ bool CounterSelectionSettingWindow::RestoreCurrentSettings()
     // Check if the catalyst and HSA are installed, and enable / check the OpenCL / HSA button accordingly:
     bool isCatalystInstalled = (afGlobalVariablesManager::instance().InstalledAMDComponentsBitmask() & AF_AMD_CATALYST_COMPONENT);
     m_pOpenCLRadioButton->setEnabled(isCatalystInstalled);
-
-    if (!isCatalystInstalled)
+    
+    
+    if (!isCatalystInstalled && isRemote == false)
     {
         m_pHSARadioButton->setChecked(true);
     }
