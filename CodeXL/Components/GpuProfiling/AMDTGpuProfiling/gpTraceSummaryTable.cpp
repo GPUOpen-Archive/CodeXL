@@ -606,11 +606,11 @@ gpCommandListSummaryTable::gpCommandListSummaryTable(gpTraceDataContainer* pData
 
     if (isDx12)
     {
-        columnCaptions << GP_STR_SummaryTableCommandListHandle;
+        columnCaptions << GP_STR_SummaryTableCommandListAddress;
     }
     else
     {
-        columnCaptions << GP_STR_SummaryTableCommandListAddress;
+        columnCaptions << GP_STR_SummaryTableCommandListHandle;
     }
 
     initHeaders(columnCaptions, false);
