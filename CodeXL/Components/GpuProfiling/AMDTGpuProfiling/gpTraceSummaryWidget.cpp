@@ -42,11 +42,11 @@ void gpTraceSummaryWidget::Init(gpTraceDataContainer* pDataContainer, gpTraceVie
     {
         if (i == eCallType::API_CALL || i == eCallType::GPU_CALL)
         {
-            m_tabs[i] = new gpTraceSummaryTab((eCallType)i);
+            m_tabs[i] = new gpTraceSummaryTab((eCallType)i, m_timelineAbsoluteStart);
         }
         else
         {
-            m_tabs[i] = new gpCommandListSummaryTab((eCallType)i);
+            m_tabs[i] = new gpCommandListSummaryTab((eCallType)i, m_timelineAbsoluteStart);
         }
 
         bool rc = m_tabs[i]->Init(pDataContainer, pSessionView, timelineStartTime, timelineRange);

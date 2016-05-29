@@ -498,7 +498,7 @@
 #define GPU_STR_timeline_ContextBranchNameWithParam "Queue %1 - %2 (%3)"
 
 #define GPU_STR_DXAPITimeline_tooltipLine1 "Call #%1<br>%2"
-#define GPU_STR_APITimeline_TimeTooltipLine "Time: %3 - %4 (%5ms)"
+#define GPU_STR_APITimeline_TimeTooltipLine "Time: %3 - %4 (%5)"
 
 // Frame info xml
 #define GPU_STR_frameInfoXMLLocation "Location"
