@@ -41,7 +41,7 @@ const static std::string s_str_threadAPICountHeaderPrefix = "//ThreadAPICount=";
 
 // The Vulkan timestamps are double number. The data structures expect long long numbers, so we multiply the double timestamp by a GP_VK_TIMESTAMP_FACTOR
 // to make sure that we get integer value. In the front-end, we will perform the opposite operation
-#define GP_VK_TIMESTAMP_FACTOR 100000
+#define GP_VK_TIMESTAMP_MILLISECONDS_TO_NANOSECONDS_FACTOR 1000000
 
 VKAtpFilePart::VKAtpFilePart(const Config& config, bool shouldReleaseMemory) : IAtpFilePart(config, shouldReleaseMemory),
     m_currentParsedTraceType(API), m_currentParsedThreadID(0), m_currentParsedThreadAPICount(0),
@@ -151,8 +151,8 @@ bool VKAtpFilePart::ParseGPUAPICallString(const std::string& apiStr, VKGPUTraceI
         ss >> timeEndDouble;
         CHECK_SS_ERROR(ss);
 
-        apiInfo.m_ullStart = ULONGLONG(timeStartDouble * GP_VK_TIMESTAMP_FACTOR);
-        apiInfo.m_ullEnd = ULONGLONG(timeEndDouble * GP_VK_TIMESTAMP_FACTOR);
+        apiInfo.m_ullStart = ULONGLONG(timeStartDouble * GP_VK_TIMESTAMP_MILLISECONDS_TO_NANOSECONDS_FACTOR);
+        apiInfo.m_ullEnd = ULONGLONG(timeEndDouble * GP_VK_TIMESTAMP_MILLISECONDS_TO_NANOSECONDS_FACTOR);
 
         /// Store the GPU start time if it is not stored yet
         /// GPU timestamps to fit the CPU timeline
@@ -291,8 +291,8 @@ bool VKAtpFilePart::ParseCPUAPICallString(const std::string& apiStr, VKAPIInfo& 
         ss >> timeEndDouble;
         CHECK_SS_ERROR(ss);
 
-        apiInfo.m_ullStart = ULONGLONG(timeStartDouble * GP_VK_TIMESTAMP_FACTOR);
-        apiInfo.m_ullEnd = ULONGLONG(timeEndDouble * GP_VK_TIMESTAMP_FACTOR);
+        apiInfo.m_ullStart = ULONGLONG(timeStartDouble * GP_VK_TIMESTAMP_MILLISECONDS_TO_NANOSECONDS_FACTOR);
+        apiInfo.m_ullEnd = ULONGLONG(timeEndDouble * GP_VK_TIMESTAMP_MILLISECONDS_TO_NANOSECONDS_FACTOR);
 
         // Store the CPU start and end time (if not stored yet)
         if (m_cpuStart == 0)

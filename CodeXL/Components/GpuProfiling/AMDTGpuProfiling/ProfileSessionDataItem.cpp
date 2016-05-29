@@ -912,7 +912,8 @@ quint64 ProfileSessionDataItem::TimeMilliseconds(quint64 time) const
 {
     quint64 retVal = time;
 
-    if (m_itemType.m_itemMainType == DX12_API_PROFILE_ITEM || m_itemType.m_itemMainType == DX12_GPU_PROFILE_ITEM)
+    if ((m_itemType.m_itemMainType == DX12_API_PROFILE_ITEM || m_itemType.m_itemMainType == DX12_GPU_PROFILE_ITEM) ||
+        (m_itemType.m_itemMainType == VK_API_PROFILE_ITEM || m_itemType.m_itemMainType == VK_GPU_PROFILE_ITEM))
     {
         retVal = time / GP_NANOSECONDS_TO_MILLISECOND;
     }

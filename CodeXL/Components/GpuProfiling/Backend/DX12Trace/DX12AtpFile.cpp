@@ -41,9 +41,9 @@ const static std::string s_str_apiTypeHeaderPrefix = "//API=";
 const static std::string s_str_threadIDHeaderPrefix = "//ThreadID=";
 const static std::string s_str_threadAPICountHeaderPrefix = "//ThreadAPICount=";
 
-// The DX12 timestamps are double number. The data structures expect long long numbers, so we multiply the double timestamp by a GP_DX_TIMESTAMP_FACTOR
+// The DX12 timestamps are double number. The data structures expect long long numbers, so we multiply the double timestamp by a GP_DX_TIMESTAMP_MILLISECONDS_TO_NANOSECONDS_FACTOR
 // to make sure that we get integer value. In the front-end, we will perform the opposite operation
-#define GP_DX_TIMESTAMP_FACTOR 1000000
+#define GP_DX_TIMESTAMP_MILLISECONDS_TO_NANOSECONDS_FACTOR 1000000
 
 #define KILO_BYTE 1024
 #define MEGA_BYTE (KILO_BYTE * 1024)
@@ -201,8 +201,8 @@ bool DX12AtpFilePart::ParseGPUAPICallString(const std::string& apiStr, DX12GPUTr
 
                                 // The timestamps are stored in a double number, in milliseconds units.
                                 // We multiply it by 1000000, to keep the accuracy, and we will refer to it as nanoseconds
-                                apiInfo.m_ullStart = ULONGLONG(timeStartDouble * GP_DX_TIMESTAMP_FACTOR);
-                                apiInfo.m_ullEnd = ULONGLONG(timeEndDouble * GP_DX_TIMESTAMP_FACTOR);
+                                apiInfo.m_ullStart = ULONGLONG(timeStartDouble * GP_DX_TIMESTAMP_MILLISECONDS_TO_NANOSECONDS_FACTOR);
+                                apiInfo.m_ullEnd = ULONGLONG(timeEndDouble * GP_DX_TIMESTAMP_MILLISECONDS_TO_NANOSECONDS_FACTOR);
 
                                 pCurrentToken = strtok(nullptr, " ");
 
@@ -385,8 +385,8 @@ bool DX12AtpFilePart::ParseCPUAPICallString(const std::string& apiStr, DX12APIIn
 
                 // The timestamps are stored in a double number, in milliseconds units.
                 // We multiply it by 1000000, to keep the accuracy, and we will refer to it as nanoseconds
-                apiInfo.m_ullStart = ULONGLONG(timeStartDouble * GP_DX_TIMESTAMP_FACTOR);
-                apiInfo.m_ullEnd = ULONGLONG(timeEndDouble * GP_DX_TIMESTAMP_FACTOR);
+                apiInfo.m_ullStart = ULONGLONG(timeStartDouble * GP_DX_TIMESTAMP_MILLISECONDS_TO_NANOSECONDS_FACTOR);
+                apiInfo.m_ullEnd = ULONGLONG(timeEndDouble * GP_DX_TIMESTAMP_MILLISECONDS_TO_NANOSECONDS_FACTOR);
 
                 pCurrentToken = strtok(nullptr, " ");
 
