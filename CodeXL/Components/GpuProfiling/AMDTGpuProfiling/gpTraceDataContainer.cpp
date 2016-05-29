@@ -161,21 +161,18 @@ ProfileSessionDataItem* gpTraceDataContainer::AddDX12APIItem(DX12APIInfo* pAPIIn
         // Add the item to the thread's root
         AddItemToThread(pRetVal);
 
-        if (pAPIInfo->m_sampleId > 0)
-        {
-            m_sampleIdToCPUItemMap.insertMulti(pAPIInfo->m_sampleId, pRetVal);
-        }
-
         // Add the item to the session items map
         m_sessionItemsSortedByStartTime.insertMulti(pRetVal->StartTime(), pRetVal);
 
         // Initialize the container API type
         m_sessionAPIType = ProfileSessionDataItem::DX12_API_PROFILE_ITEM;
 
-        // If this call has a sample id, add it to the list of calls
+        // If this call has a sample id, add it to the list of calls and to the map of CPU - GPU ids
         if (pAPIInfo->m_sampleId > 0)
         {
             m_commandListUnAttachedCalls << pRetVal;
+            m_sampleIdToCPUItemMap.insertMulti(pAPIInfo->m_sampleId, pRetVal);
+
         }
 
         // Analyze the command list close API call
@@ -260,6 +257,7 @@ ProfileSessionDataItem* gpTraceDataContainer::AddVKAPIItem(VKAPIInfo* pAPIInfo)
         if (pAPIInfo->m_sampleId > 0)
         {
             m_commandListUnAttachedCalls << pRetVal;
+            m_sampleIdToCPUItemMap.insertMulti(pAPIInfo->m_sampleId, pRetVal);
         }
 
         // Analyze the command list close API call
@@ -310,6 +308,10 @@ ProfileSessionDataItem* gpTraceDataContainer::AddVKGPUTraceItem(VKGPUTraceInfo* 
             QString commandListInstanceName = AddGPUCallToCommandList(pAPIInfo);
             pRetVal->SetColumnData(ProfileSessionDataItem::SESSION_ITEM_COMMAND_LIST_COLUMN, commandListInstanceName);
 
+            if (pAPIInfo->m_sampleId > 0)
+            {
+                m_sampleIdToGPUItemMap.insertMulti(pAPIInfo->m_sampleId, pRetVal);
+            }
         }
     }
 
