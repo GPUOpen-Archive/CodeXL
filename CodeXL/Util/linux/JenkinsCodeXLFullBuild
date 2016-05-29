@@ -72,6 +72,7 @@ RunTheBuild()
     sh $AMD_WS_LINUX_UTIL_DIR/buildCodeXLFullLinuxProjects ${BUILD_OPTS} > ${WORKSPACE}/CodeXL-Linux_${ARCHTYPE}_release.log 2>&1
     BUILD_RELEASE_RC=$?
     echo "========== Timing end: `date` =============================================="
+    checkforerror
 
     # BUILD RELEASE x86 when the version is non-zero
     BUILD_OPTS="x86 --debug=time -j ${NCPUS} CXL_build=release CXL_arch=${ARCHTYPE} CXL_build_conf=${BUILDTYPE}"
@@ -81,6 +82,7 @@ RunTheBuild()
     sh $AMD_WS_LINUX_UTIL_DIR/buildCodeXLFullLinuxProjects ${BUILD_OPTS} > ${WORKSPACE}/CodeXL-Linux_x86_release.log 2>&1
     BUILD_RELEASE_RC=$?
     echo "========== Timing end: `date` =============================================="
+    checkforerror
 
     GPUPROFILER_BACKEND_BUILD=${AMD_BRANCH_ROOT}/CodeXL/Components/GpuProfiling/Build
     GPUPROFILER_BACKEND_BUILD_SCRIPT=${GPUPROFILER_BACKEND_BUILD}/backend_build.sh
@@ -119,6 +121,19 @@ RunTheBuild()
 	echo "Build succeeded"
     fi
 
+}
+
+checkforerror()
+{
+  NUM_ERRORS=`expr ${NUM_ERRORS} + ${BUILD_RELEASE_RC}`
+  if [ ${BUILD_RELEASE_RC} -ne 0 ]
+  then
+    echo "*** ERROR ***"
+    echo "*** the build failed - see the ${WORKSPACE}/CodeXL-Linux_${ARCHTYPE}_release.log for details ***"
+    exit 1
+  else
+   echo "*** SUCCESS ***" 
+  fi
 }
 
 PackageTheBuild()
