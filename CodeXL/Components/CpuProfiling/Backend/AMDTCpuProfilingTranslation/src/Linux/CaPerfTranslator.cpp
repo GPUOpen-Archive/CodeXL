@@ -3403,11 +3403,16 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
                 // This can be optimized further. Instead of passing module name, we can pass moduleId.
                 gtString modName;
                 modName.fromUtf8String(modIns.second.name);
+
                 modInstanceMap.emplace(
                     modIns.second.instanceId,
                     std::make_tuple(modName, static_cast<gtUInt64>(modIns.first.pid), modIns.first.addr));
+
                 // Update module, so that it can be used while inserting samples
-                modIns.second.pMod->m_moduleInstanceInfo.emplace_back(modIns.first.pid, modIns.first.addr, modIns.second.instanceId);
+                if (nullptr != modIns.second.pMod)
+                {
+                    modIns.second.pMod->m_moduleInstanceInfo.emplace_back(modIns.first.pid, modIns.first.addr, modIns.second.instanceId);
+                }
         }
 
         profDBWriter->Write(
