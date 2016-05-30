@@ -652,7 +652,6 @@ AMDTResult PowerProfileTranslate::InsertSampleToSystemTree(SampleData* pCtx, AMD
 {
     AMDTResult ret = AMDT_STATUS_OK;
     IpAddressInfo ipSample;
-    //bool moduleInstFound = false;
 
     ProcessTreeMap::iterator processIter = m_systemTreeMap.find(pCtx->m_processId);
 
@@ -690,7 +689,6 @@ AMDTResult PowerProfileTranslate::InsertSampleToSystemTree(SampleData* pCtx, AMD
             //Create
             processIter->second.m_modInstMap.insert(ModuleInstanceMap::value_type(pCtx->m_modInstance, instInfo));
             processIter->second.m_power += power;
-            //moduleInstFound = true;
         }
         else
         {
