@@ -176,7 +176,7 @@ gtASCIIString ProcessTracker::GetProcessesXML()
 /// \param pRequestHeader The request header.
 /// \param client_socket The socket used for the request
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
-static void HandleServerStatusResponse(GRAPHICS_SERVER_STATE serverState, HTTPRequestHeader* pRequestHeader, NetSocket* client_socket)
+void ProcessTracker::HandleServerStatusResponse(GRAPHICS_SERVER_STATE serverState, HTTPRequestHeader* pRequestHeader, NetSocket* client_socket)
 {
     char* strResquest = pRequestHeader->GetUrl();
 
@@ -1045,12 +1045,16 @@ bool ProcessTracker::PassRequestToPlugin(const char* strDestination,
             pRequestHeader->SetPostDataSize(0);
         }
 
+#ifdef CODEXL_GRAPHICS
+#ifdef USE_GRAPHICS_SERVER_STATUS_RETURN_CODES
         // Create a new record of this request
         // We will check to see when it comes back from the server.
-        //RequestInFlight* pNewRequest = new RequestInFlight(pRequestHeader, pClientSocket);
+        RequestInFlight* pNewRequest = new RequestInFlight(pRequestHeader, pClientSocket, pid);
 
         // Add the new record to the DB.
-        //RequestsInFlightDatabase::Instance()->Add(pClientSocket, pNewRequest);
+        RequestsInFlightDatabase::Instance()->Add(pClientSocket, pNewRequest);
+#endif
+#endif
 
         bResult = smPut(strDestination, pRequestHeader->GetHeaderData(), sizeof(HTTPHeaderData));
 

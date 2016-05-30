@@ -549,7 +549,7 @@ bool HTTPRequestHeader::CheckProcessStillRunning()
 {
     char* ptr = this->GetUrl();
     char* sCmd = &ptr[1];
-    bool isAlive = false;
+    bool isAlive = true;
 
     gtASCIIString str(sCmd);
 
@@ -561,8 +561,13 @@ bool HTTPRequestHeader::CheckProcessStillRunning()
         str.truncate(0, end - 1);
         processID = atoi(str.asCharArray());
 
+        Log(logMESSAGE, "HTTPRequestHeader::CheckProcessStillRunning: processID = %d\n", processID);
+
+        if (processID > 0)
+        {
         // check to see if process is still running
         osIsProcessAlive((DWORD)processID, isAlive);
+    }
     }
 
     return isAlive;

@@ -9,6 +9,7 @@
 #include "RenderStallThread.h"
 #include "../Common/GraphicsServerState.h"
 #include "../Common/SharedGlobal.h"
+#include "RequestsInFlightDatabase.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// Checks to see if the app has stopped rendering (or ever rendered at all).
@@ -17,12 +18,11 @@
 void RenderStallThread::CheckForRenderStall()
 {
     static double lastPresentTime = 0.0f;
+    int delay = 0;
+    int outerDelay = 0;
 
     for (;;)    // loop forever
     {
-        //int stallCount = 0;
-        int delay = 0;
-
         if (GetServerShutdownState() == true)
         {
             return;
@@ -59,14 +59,34 @@ void RenderStallThread::CheckForRenderStall()
                 if (delay > GRAPHICS_SERVER_STATUS_STALL_THRESHOLD_TIME)
                 {
                     SetServerStalledState(true);
+
+#ifdef CODEXL_GRAPHICS
+#ifdef USE_GRAPHICS_SERVER_STATUS_RETURN_CODES
+                    int inFlight = RequestsInFlightDatabase::Instance()->InFlightCount();
+
+                    Log(logMESSAGE, "RenderStallThread::CheckForRenderStall(): App has not rendered for %ld (ms), inFlightCount = %d\n", outerDelay, inFlight);
+
+                    if (inFlight > 0)
+                    {
+                        // Send process not running status back to the messages in flight
+                        Log(logMESSAGE, "RenderStallThread::CheckForRenderStall(): Check messages in flight to see if process is still running\n");
+                        RequestsInFlightDatabase::Instance()->CheckProcessesAreRunning();
+                    }
+#endif
+#endif
+
+                    delay = 0;
                 }
 
                 delay += GRAPHICS_SERVER_STATUS_STALL_LOOP_SLEEP_TIME;
+
+                outerDelay += GRAPHICS_SERVER_STATUS_STALL_LOOP_SLEEP_TIME;
             }
             else
             {
                 SetServerStalledState(false);
                 delay = 0;
+                outerDelay = 0;
             }
         }
 
