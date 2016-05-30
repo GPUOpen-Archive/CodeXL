@@ -72,9 +72,12 @@ void PluginResponseThread::WaitForPluginResponses(void* pData)
                     NetSocket* client_socket = ProcessTracker::Instance()->GetSocketFromHandle(requestID);
                     ProcessTracker::Instance()->RemoveSocketFromMap(requestID);
 
+#ifdef CODEXL_GRAPHICS
+#ifdef USE_GRAPHICS_SERVER_STATUS_RETURN_CODES
                     // We can remove this message from the DB as we no longer need to monitor it anymore
-                    //RequestsInFlightDatabase::Instance()->Remove(client_socket);
-
+                    RequestsInFlightDatabase::Instance()->Remove(client_socket);
+#endif
+#endif
                     // now try to get the mime type
                     if (smGet("PLUGINS_TO_GPS", &pcMimeType, PS_MAX_PATH) > 0)
                     {

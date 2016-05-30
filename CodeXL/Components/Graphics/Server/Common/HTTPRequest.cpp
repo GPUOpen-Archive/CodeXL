@@ -213,7 +213,7 @@ HTTP_REQUEST_RESULT HTTPRequestHeader::ReadWebRequest(string& strError, NetSocke
     // Check for error
     if (nRead == (gtSize_t) - 1)
     {
-        strError = "HTTPRequestHeader: SocketReadHeader read -01 bytes.";
+        strError = "HTTPRequestHeader: SocketReadHeader read -1 bytes.";
         return HTTP_SOCKET_ERROR;
     }
 
@@ -549,7 +549,7 @@ bool HTTPRequestHeader::CheckProcessStillRunning()
 {
     char* ptr = this->GetUrl();
     char* sCmd = &ptr[1];
-    bool isAlive = false;
+    bool isAlive = true;
 
     gtASCIIString str(sCmd);
 
@@ -561,8 +561,13 @@ bool HTTPRequestHeader::CheckProcessStillRunning()
         str.truncate(0, end - 1);
         processID = atoi(str.asCharArray());
 
-        // check to see if process is still running
-        osIsProcessAlive((DWORD)processID, isAlive);
+        Log(logMESSAGE, "HTTPRequestHeader::CheckProcessStillRunning: processID = %d\n", processID);
+
+        if (processID > 0)
+        {
+            // check to see if process is still running
+            osIsProcessAlive((DWORD)processID, isAlive);
+        }
     }
 
     return isAlive;

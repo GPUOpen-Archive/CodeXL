@@ -19,17 +19,20 @@ public:
     /// Constructor
     /// \param pRequestHeader Input request
     /// \param pClientSocket Client socket
-    RequestInFlight(HTTPRequestHeader* pRequestHeader, NetSocket* pClientSocket)
+    /// \param processID The process ID
+    RequestInFlight(HTTPRequestHeader* pRequestHeader, NetSocket* pClientSocket, unsigned long processID)
     {
         m_pRequestHeader = pRequestHeader;
         m_pClientSocket = pClientSocket;
+        m_processID = processID;
     }
 
-private:
 
-    HTTPRequestHeader* m_pRequestHeader; ///< Stores the request in flight
+    HTTPRequestHeader* m_pRequestHeader; ///< Stores the request header
 
-    NetSocket* m_pClientSocket; ///< STores teh client socket
+    NetSocket* m_pClientSocket; ///< Stores the client socket
+
+    unsigned long m_processID; ///< Record the process ID 
 
 };
 

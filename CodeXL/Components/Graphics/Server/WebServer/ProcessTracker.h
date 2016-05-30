@@ -144,6 +144,12 @@ public:
     /// \return socket corresponding to the handle
     NetSocket* GetSocketFromHandle(CommunicationID handle);
 
+    /// Used to send a server status message back to the requesting command.
+    /// \param serverState The server state type to return
+    /// \param pRequestHeader The requesting HTTP command
+    /// \param client_socket The socket to communicate over
+    void HandleServerStatusResponse(GRAPHICS_SERVER_STATE serverState, HTTPRequestHeader* pRequestHeader, NetSocket* client_socket);
+
 protected:
 
     /// Prevents default instances of the ProcessTracker class.
