@@ -1737,30 +1737,6 @@
 #define GD_STR_PropertiesView L"Properties View"
 #define GD_STR_PropertiesViewLinkAvailableOnProcessSuspensionMessage "Object links are available only when debugged process is suspended"
 
-// Images and buffers load status messages:
-#define GD_STR_ImagesAndBuffersViewLoadFailure L"Object is currently unavailable"
-#define GD_STR_ImagesAndBuffersViewImagesBuffersProcessIsRunning L"Textures, Buffers and Images information are only displayed when the debugged process has been suspended"
-#define GD_STR_ImagesAndBuffersViewImagesBuffersProcessIsRunningTitle L"Process is running"
-#define GD_STR_ImagesAndBuffersViewImagesBuffersProcessIsNotRunningTitle L"Process is not running"
-#define GD_STR_ImagesAndBuffersViewVariablesProcessIsRunning L"Kernel variables information is only displayed when the debugged process has been suspended"
-
-#define GD_STR_ImagesAndBuffersViewKernelIsNotDebuggedTitle L"Process is not in kernel debugging"
-#define GD_STR_ImagesAndBuffersViewKernelInteroperabilityTitle L"CL-GL interoperability object"
-#define GD_STR_ImagesAndBuffersViewKernelIsNotDebugged L"Kernel variables are displayed only when a kernel is being debugged"
-#define GD_STR_ImagesAndBuffersViewKernelDebugged L"Images and buffers are not available when a kernel is being debugged"
-#define GD_STR_ImagesAndBuffersViewObjectNotAvailable L"%ls is currently unavailable"
-#define GD_STR_ImagesAndBuffersViewObjectsNotAvailable L"%ls are not currently available"
-#define GD_STR_ImagesAndBuffersViewImageTypeUnknown L"Image type is unknown"
-#define GD_STR_ImagesAndBuffersViewTextureTypeUnknown L"Texture type is unknown"
-#define GD_STR_ImagesAndBuffersViewGLCLInterop L"CL-GL interoperability objects are currently not supported"
-#define GD_STR_ImagesAndBuffersViewGLBeginEndMessage L"Images and buffers are unavailable while the process is in glBegin-glEnd block"
-#define GD_STR_ImagesAndBuffersViewGLBeginEndTitle L"Process is in glBegin-glEnd block"
-#define GD_STR_ImagesAndBuffersViewObjectUnavailableMessageHeader L"%ls is unavailable"
-#define GD_STR_ImagesAndBuffersViewObjectUnavailableMessageTitle L"Item is unavailable"
-#define GD_STR_ImagesAndBuffersViewVariableDoNotExistMessageTitle L"The variable doesn't exist in this context"
-#define GD_STR_ImagesAndBuffersViewBoundToFBO L"Object is unavailble when an FBO is bound"
-#define GD_STR_ImagesAndBuffersViewerNoObjectsAvailableMessage L"%ls Are Unavailable"
-
 // Multi watch load status messages:
 #define GD_STR_MultiWatchViewVariableNameTitle L"Kernel multi-watch view"
 #define GD_STR_MultiWatchViewVariableNameMessage L"Please select or type the variable name"
