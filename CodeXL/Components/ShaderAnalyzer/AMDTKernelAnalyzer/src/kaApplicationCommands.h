@@ -79,6 +79,8 @@ public:
 
     void buildCommand(const gtVector<osFilePath>& filePathsVector);
 
+    void BuildSingleProgram(kaProgram* pProgram, const gtVector<osFilePath>& filePathsVector);
+
     void buildProgramCommand(kaProgram* pProgram);
 
     /// Cancels the current build.

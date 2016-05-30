@@ -21,6 +21,7 @@
 #include <vector>
 #include <map>
 #include <queue>
+#include <thread>
 
 using std::multimap;
 
@@ -38,6 +39,8 @@ using std::multimap;
 #include <AMDTBaseTools/Include/gtString.h>
 #include <AMDTBaseTools/Include/gtMap.h>
 #include <AMDTOSWrappers/Include/osDirectory.h>
+#include <AMDTOSWrappers/Include/osSynchronizedQueue.h>
+
 
 // Local:
 #include <AMDTKernelAnalyzer/Include/kaAMDTKernelAnalyzerDLLBuild.h>
@@ -161,6 +164,8 @@ public:
     //-----------------------------------------------------------------------------
     void PrepareProgramBuildInner(kaProgram* pProgram, const BuildType buildType);
 
+    void ExecuteBuildThread(const BuildType buildType, kaProgram* pProgram);
+
     // DX is only supported on Windows.
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
 
@@ -283,6 +288,7 @@ public:
     /// \retval bool true if succeeded
     bool IsBuildSucceded() const;
     gtVector<int> GetLastBuildProgramFileIds() const;
+    gtString GetLastBuildProgramName() const;
 
     /// Prints the build prologue.
     void PrintBuildPrologue(gtString& programName, size_t numOfDevicesToBuild, bool shouldPrependCR);
@@ -532,6 +538,10 @@ private:
     /// set to true if initialization of the backend manager completed successfully
     bool m_isInitialized;
 
+    osSynchronizedQueue<std::pair<kaProgram* , const BuildType >> m_executionWaitingList;
+    bool m_buildCompleted = true;
+    unique_ptr<std::thread> m_executionThread = nullptr;
+    bool m_stopExecutionThread = false;
     //-----------------------------------------------------------------------------
     /// General setup for a build
     /// \param[in] sourceCode   A source code for a build

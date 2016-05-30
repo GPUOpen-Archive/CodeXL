@@ -5,6 +5,8 @@
 
 /// C++
 #include <memory>
+#include <unordered_map>
+
 
 /// Qt
 #include <qtIgnoreCompilerWarnings.h>
@@ -388,13 +390,16 @@ public:
     /// Returns active program
     kaProgram* GetActiveProgram();
 
+    /// Returns active programms
+    void GetActiveProgramms(std::vector<kaProgram*>& programms);
+
     /// Sets last build program
     /// \param [in] pProgram
-    void SetLastBuildProgram(kaProgram* pProgram) { m_pLastBuildProgram = pProgram; }
+    void SetLastBuildProgram(kaProgram* pProgram);
 
     /// Gets last build program
     /// \return m_pLastBuildProgram
-    kaProgram* GetLastBuildProgram()const { return m_pLastBuildProgram; }
+    std::unordered_map<wstring, kaProgram*>& GetLastBuildProgram() { return m_pLastBuildProgram; }
 
     bool IsRender(const kaProgram* pProgram) const;
     bool IsActiveProgramRender() const;
@@ -585,8 +590,8 @@ private:
     /// vector of last build files
     gtVector<osFilePath> m_lastBuildFiles;
 
-    /// last build program
-    kaProgram* m_pLastBuildProgram;
+    /// maps last built program name to last built program
+    std::unordered_map<std::wstring, kaProgram*> m_pLastBuildProgram;
 };
 #endif //__KAPROJECTDATAMANAGER_h
 

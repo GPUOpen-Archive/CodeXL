@@ -197,13 +197,17 @@ void kaProgram::AddUniqueFileId(const int fileId)
 
 void kaProgram::GetProgramFiles(gtVector<osFilePath>& filesPath)const
 {
-    osFilePath filePath;
+   
     const gtVector<int>& idVector = GetFileIDsVector();
 
     for (int it : idVector)
     {
+        osFilePath filePath;
         KA_PROJECT_DATA_MGR_INSTANCE.GetFilePathByID(it, filePath);
-        filesPath.push_back(filePath);
+        if (filePath.isEmpty() == false)
+        {
+            filesPath.push_back(filePath);
+        }
     }
 }
 

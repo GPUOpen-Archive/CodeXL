@@ -3,6 +3,9 @@
 #ifndef __KAAPPLICATIONTREEHANDLER_H
 #define __KAAPPLICATIONTREEHANDLER_H
 
+// std
+#include <set>
+
 #include <QtWidgets>
 #include <QMouseEvent>
 
@@ -104,6 +107,10 @@ public:
 
     kaProgram* GetActiveProgram() const;
     const afApplicationTreeItemData*  GetActiveProgramApplicaionTreeData() const;
+
+    void  GetActiveProgramms(std::vector<kaProgram*>& activeProgramms) const;
+    void  GetActiveProgramApplicaionTreeData(std::set<const  afApplicationTreeItemData*>& activeProgrammItemDatas) const;
+
     /// Add program to the tree
     /// \param focusNode should the node be focused after it is added
     /// \param pProgram pointer to the created kaProgram object
@@ -131,6 +138,8 @@ public:
     /// \param filePath - output - the active cl file path
     /// \return number of active cl files
     unsigned int activeBuildFiles(gtVector<osFilePath>& filesPath);
+
+    unsigned int AddActiveBuildFiles(const afApplicationTreeItemData* pItemData, gtVector<osFilePath> &filePaths);
 
     /// Checks if the specified file path already exist in the tree:
     /// \param clFilePath the requested file path
@@ -179,6 +188,9 @@ public:
 
     /// Returns currently selected tree node data
     afApplicationTreeItemData* GetSelectedItemData();
+
+    /// Returns currently selected tree node datas
+    void GetSelectedItemDatas(std::vector<afApplicationTreeItemData*>& result) const;
 
     /// Adds or set an existing or new file node under program
     /// \param addedFilePath

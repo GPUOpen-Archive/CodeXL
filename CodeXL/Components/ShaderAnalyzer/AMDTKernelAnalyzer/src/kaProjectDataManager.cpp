@@ -123,7 +123,6 @@ kaProjectDataManager::kaProjectDataManager() : m_shaderD3dBuildOptionsMask(0),
 
     m_glShaderExtensions = QString(KA_STR_OpenGLShaderExtensions).split(AF_STR_CommaA);
     m_dxShaderExtensions = QString(KA_STR_DirectXShaderExtensions).split(AF_STR_CommaA);
-    m_pLastBuildProgram = nullptr;
 }
 
 // ---------------------------------------------------------------------------
@@ -2440,6 +2439,22 @@ kaProgram* kaProjectDataManager::GetActiveProgram()
 
     return pRetVal;
 
+}
+
+void kaProjectDataManager::GetActiveProgramms(std::vector<kaProgram*>& programms)
+{
+    if (kaApplicationTreeHandler::instance() != nullptr)
+    {
+        kaApplicationTreeHandler::instance()->GetActiveProgramms(programms);
+    }
+}
+
+void kaProjectDataManager::SetLastBuildProgram(kaProgram* pProgram)
+{
+    if (pProgram)
+    {
+         m_pLastBuildProgram[pProgram->GetProgramName().asCharArray()]= pProgram;
+    }
 }
 
 const gtVector<osFilePath>& kaProjectDataManager::GetLastBuildFiles()const

@@ -225,36 +225,43 @@ void kaApplicationCommands::buildCommand(const gtVector<osFilePath>& filePathsVe
     GT_IF_WITH_ASSERT(filePathsVector.size() > 0)
     {
         kaProjectDataManager::instance().SetLastBuildFiles(filePathsVector);
-        bool rc = true;
-        kaProgram* pProgram = KA_PROJECT_DATA_MGR_INSTANCE.GetActiveProgram();
-
-        GT_IF_WITH_ASSERT(pProgram != nullptr)
+        vector<kaProgram*> programms;
+        KA_PROJECT_DATA_MGR_INSTANCE.GetActiveProgramms(programms);
+        for (auto pProgram : programms)
         {
-            KA_PROJECT_DATA_MGR_INSTANCE.SetLastBuildProgram(pProgram);
+            BuildSingleProgram(pProgram, filePathsVector);
+        }
+    }
+}
 
-            kaProgramTypes programType = pProgram->GetBuildType();
+void kaApplicationCommands::BuildSingleProgram(kaProgram* pProgram, const gtVector<osFilePath>& filePathsVector)
+{
+    GT_IF_WITH_ASSERT(pProgram != nullptr)
+    {
+        KA_PROJECT_DATA_MGR_INSTANCE.SetLastBuildProgram(pProgram);
 
-            if (programType == kaProgramGL_Compute ||
-                programType == kaProgramGL_Rendering ||
-                programType == kaProgramVK_Compute ||
-                programType == kaProgramVK_Rendering)
-            {
-                // marking to  erase all output dir. this can't be done in the CL/DX buildProgramCommand since it is used to build the wrapper
-                // program of specific cl files which create a dummy program for the same path and if we do it there it will erase the entire directory.
-                UpdateProgramInputAndOutputFiles(filePathsVector, pProgram, true);
+        kaProgramTypes programType = pProgram->GetBuildType();
+        bool rc = true;
+        if (programType == kaProgramGL_Compute ||
+            programType == kaProgramGL_Rendering ||
+            programType == kaProgramVK_Compute ||
+            programType == kaProgramVK_Rendering)
+        {
+            // marking to  erase all output dir. this can't be done in the CL/DX buildProgramCommand since it is used to build the wrapper
+            // program of specific cl files which create a dummy program for the same path and if we do it there it will erase the entire directory.
+            UpdateProgramInputAndOutputFiles(filePathsVector, pProgram, true);
 
-                //F7 or Build button/menu item is used on GL/VK program
-                buildProgramCommand(pProgram);
-                rc = false;
-            }
+            //F7 or Build button/menu item is used on GL/VK program
+            buildProgramCommand(pProgram);
+            rc = false;
+        }
 
-            if (rc)
-            {
-                buildNonRendering(filePathsVector, pProgram);
-
-            }
+        if (rc)
+        {
+            buildNonRendering(filePathsVector, pProgram);
 
         }
+
     }
 }
 
