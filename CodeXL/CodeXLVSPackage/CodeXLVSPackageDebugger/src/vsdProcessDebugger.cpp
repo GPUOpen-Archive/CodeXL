@@ -522,6 +522,8 @@ bool vsdProcessDebugger::internalHaltProcess()
 {
     bool retVal = false;
 
+    OS_OUTPUT_DEBUG_LOG(L"Internally halting debugged process", OS_DEBUG_LOG_DEBUG);
+
     // If the Spies API thread does not yet exist, there is no need to use the internal resume mechanism:
     if (OS_NO_THREAD_ID == m_spiesAPIThreadId)
     {
@@ -559,6 +561,8 @@ bool vsdProcessDebugger::internalHaltProcess()
         }
     }
 
+    OS_OUTPUT_DEBUG_LOG(retVal ? L"Internally halting debugged process succeeded" : L"Internally halting debugged process failed", OS_DEBUG_LOG_DEBUG);
+
     return retVal;
 }
 
@@ -572,6 +576,8 @@ bool vsdProcessDebugger::internalHaltProcess()
 bool vsdProcessDebugger::internalResumeProcess()
 {
     bool retVal = false;
+
+    OS_OUTPUT_DEBUG_LOG(L"Internally resuming debugged process", OS_DEBUG_LOG_DEBUG);
 
     // We come here in two situations:
     // 1. API thread exists, and internalHaltProcess was called just before to match.
@@ -589,6 +595,8 @@ bool vsdProcessDebugger::internalResumeProcess()
 
         retVal = true;
     }
+
+    OS_OUTPUT_DEBUG_LOG(retVal ? L"Internally resuming debugged process succeeded" : L"Internally resuming debugged process failed", OS_DEBUG_LOG_DEBUG);
 
     return retVal;
 }
