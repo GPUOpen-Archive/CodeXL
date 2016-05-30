@@ -1,20 +1,23 @@
 
-//=====================================================================
+#include <qtIgnoreCompilerWarnings.h>
 
-//=====================================================================
+// Infra:
+#include <AMDTApplicationComponents/Include/acColours.h>
+#include <AMDTApplicationComponents/Include/acFunctions.h>
+#include <AMDTApplicationComponents/Include/Timeline/acTimelineItem.h>
+#include <AMDTApplicationComponents/Include/Timeline/acTimelineBranch.h>
 
+// AMDTApplicationFramework:
+#include <AMDTApplicationFramework/Include/afAppStringConstants.h>
+#include <AMDTApplicationFramework/Include/afProgressBarWrapper.h>
+
+// Local:
 #include <AMDTGpuProfiling/gpTraceSummaryTable.h>
 #include <AMDTGpuProfiling/gpTraceSummaryWidget.h>
 #include <AMDTGpuProfiling/gpTraceDataContainer.h>
 #include <AMDTGpuProfiling/APIColorMap.h>
 #include <AMDTGpuProfiling/gpTraceView.h>
 
-#include <AMDTApplicationComponents/Include/acColours.h>
-#include <AMDTApplicationComponents/Include/acFunctions.h>
-#include <AMDTApplicationFramework/Include/afProgressBarWrapper.h>
-#include <AMDTApplicationComponents/Include/Timeline/acTimelineItem.h>
-#include <AMDTApplicationComponents/Include/Timeline/acTimelineBranch.h>
-#include <AMDTApplicationFramework/Include/afAppStringConstants.h>
 
 const int SUMMARY_INFO_ARRAY_SIZE = 500; // 130 DX12 call types, X Vulcan call types...
 
@@ -802,10 +805,20 @@ void gpCommandListSummaryTable::AddSummaryRow(int rowIndex, APISummaryInfo* pInf
                 case COLUMN_NUM_OF_COMMANDS:
                 {
                     pItem = new QTableWidgetItem();
+
+                    // For number of commands, set both text and value, to make sure that the column is sortable, and enable
+                    // display of N/A string for 0 calls 
+                    setItem(rowIndex, i, pItem);
+
                     if (pInfo->m_numCalls == 0)
                     {
                         shouldSetCmdBufferTooltip = true;
                     }
+                    QVariant dataVariant;
+                    dataVariant.setValue(rowStrings[i].toDouble());
+                    pItem->setData(Qt::EditRole, dataVariant);
+                    pItem->setData(Qt::DisplayRole, rowStrings[i]);
+                    shouldSetValue = false;
                 }
                 break;
                 }

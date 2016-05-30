@@ -4,11 +4,17 @@
 #ifndef _GPTRACESUMMARYTABLE_H_
 #define _GPTRACESUMMARYTABLE_H_
 
+// Infra:
 #include <AMDTApplicationComponents/Include/acFunctions.h>
 #include <AMDTApplicationComponents/Include/acListCtrl.h>
 #include <AMDTApplicationComponents/inc/acStringConstants.h>
-#include <AMDTGpuProfiling/AMDTGpuProfilerDefs.h>
 #include <AMDTOSWrappers/Include/osOSDefinitions.h>
+
+// AMDTApplicationFramework:
+#include <AMDTApplicationFramework/Include/afAppStringConstants.h>
+
+// Local:
+#include <AMDTGpuProfiling/AMDTGpuProfilerDefs.h>
 #include <AMDTGpuProfiling/gpTraceDataContainer.h>
 
 class gpTraceDataContainer;
@@ -108,11 +114,12 @@ public:
 
     void TableItemsAsString(QStringList& membersStringsList)
     {
+        QString numCallsStr = (m_numCalls > 0) ? QString::number(m_numCalls) : AF_STR_NotAvailableA;
         membersStringsList << m_index;
         membersStringsList << QString::number(m_executionTimeMS, 'f', 3);
         membersStringsList << QString::number(m_minTimeMs, 'f', 3);
         membersStringsList << QString::number(m_maxTimeMs, 'f', 3);
-        membersStringsList << QString::number(m_numCalls);
+        membersStringsList << numCallsStr;
         membersStringsList << m_gpuQueue;
         membersStringsList << m_address;
     }
