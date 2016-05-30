@@ -38,10 +38,10 @@
     #define MODULE_INFO_CSV_FORMAT         "%d,%d,%d,%d,%3.2f,%3.2f,0x%lx,%ld,%s,%s\n"
     #define MODULE_INFO_CSV_HDR_FORMAT     "\nSNo,PID,Samples,Kernel,Power(Joules),Power(%),Load Addr,size,Name,Path\n\n"
 #else // Windows
-    #define PROCESS_INFO_TXT_FORMAT        "%d\t%d\t%d\t%3.2f\t%3.2f\t\t%3.2f\t\t%-45.45s\t%s\n"
-    #define PROCESS_INFO_TXT_HDR_FORMAT    "\nSNo\tPID\tSamples\tIPC\tPower(Joules)\tPower(%)\tName\t\t\t\t\t\tPath\n\n"
-    #define PROCESS_INFO_CSV_FORMAT        "%d,%d,%d,%3.2f,%3.2f,%3.2f,%s,%s\n"
-    #define PROCESS_INFO_CSV_HDR_FORMAT    "\nSNo,PID,Samples,IPC,Power(Joules),Power(%),Name,Path\n\n"
+    #define PROCESS_INFO_TXT_FORMAT        "%d\t%d\t%d\t%3.2f\t\t%3.2f\t\t%-45.45s\t%s\n"
+    #define PROCESS_INFO_TXT_HDR_FORMAT    "\nSNo\tPID\tSamples\tPower(Joules)\tPower(%)\tName\t\t\t\t\t\tPath\n\n"
+    #define PROCESS_INFO_CSV_FORMAT        "%d,%d,%d,%3.2f,%3.2f,%s,%s\n"
+    #define PROCESS_INFO_CSV_HDR_FORMAT    "\nSNo,PID,Samples,Power(Joules),Power(%),Name,Path\n\n"
     #define MODULE_INFO_TXT_FORMAT         "%d\t%d\t%d\t%d\t%3.2f\t\t%3.2f\t\t0x%-8.8llx\t\t%-1.8lld\t\t%-45.45s\t%s\n"
     #define MODULE_INFO_TXT_HDR_FORMAT     "\nSNo\tPID\tSamples\tKernel\tPower(Joules)\tPower(%)\tLoad Addr\t\tsize\t\t\tName\t\t\t\t\t\tPath\n\n"
     #define MODULE_INFO_CSV_FORMAT         "%d,%d,%d,%d,%3.2f,%3.2f,0x%llx,%lld,%s,%s\n"
@@ -473,9 +473,6 @@ void ppReporterText::WriteProcessData(AMDTUInt32 recCnt, AMDTPwrProcessInfo*& pI
                     cnt,
                     recInfo->m_pid,
                     recInfo->m_sampleCnt,
-#if AMDT_BUILD_TARGET != AMDT_LINUX_OS // Windows
-                    recInfo->m_ipc,
-#endif
                     recInfo->m_power,
                     (recInfo->m_power * 100) / totalPower,
                     recInfo->m_name,
@@ -813,9 +810,6 @@ void ppReporterCsv::WriteProcessData(AMDTUInt32 recCnt, AMDTPwrProcessInfo*& pIn
                     cnt,
                     recInfo->m_pid,
                     recInfo->m_sampleCnt,
-#if AMDT_BUILD_TARGET != AMDT_LINUX_OS // Windows
-                    recInfo->m_ipc,
-#endif
                     recInfo->m_power,
                     (recInfo->m_power * 100) / totalPower,
                     recInfo->m_name,
