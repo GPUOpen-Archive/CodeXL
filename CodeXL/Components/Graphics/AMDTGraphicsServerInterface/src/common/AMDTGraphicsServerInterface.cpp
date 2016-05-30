@@ -803,7 +803,8 @@ void GraphicsServerCommunication::CheckServerStatus(unsigned char* pBuffer, unsi
 
     if (1 == bufferSize && pBuffer != nullptr)
     {
-        appState = static_cast<TargetAppState>(*pBuffer);
+        int numericValue = pBuffer[0];
+        appState = static_cast<TargetAppState>(numericValue);
     }
 }
 
