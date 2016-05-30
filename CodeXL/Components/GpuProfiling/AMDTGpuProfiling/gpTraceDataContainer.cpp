@@ -1082,7 +1082,10 @@ void gpTraceDataContainer::CloseCommandList(APIInfo* pAPIInfo)
                 m_commandListUnAttachedCalls.removeOne(pItem);
             }
 
-            m_commandListInstancesVector << currentInstanceData;
+            if (!currentInstanceData.m_sampleIds.isEmpty())
+            {
+                m_commandListInstancesVector << currentInstanceData;
+            }
         }
     }
 }
@@ -1315,7 +1318,15 @@ QString gpTraceDataContainer::QueueDisplayName(const QString& queuePtrStr)
 
 int gpTraceDataContainer::CommandListCount()const
 {
-    return m_commandListPointerToIndexMap.size();
+    int retVal = 0;
+    for (auto iter = m_commandListInstancesVector.begin(); iter!= m_commandListInstancesVector.end(); iter++)
+    {
+        if (!(*iter).m_apiIndices.isEmpty())
+        {
+            retVal++;
+        }
+    }
+    return retVal;
 }
 
 void gpTraceDataContainer::AddBakedCommandBuffer(VKGPUTraceInfo* pAPIInfo)
