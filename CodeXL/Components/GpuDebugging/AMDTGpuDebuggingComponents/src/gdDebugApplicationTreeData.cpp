@@ -35,7 +35,8 @@ gdDebugApplicationTreeData::gdDebugApplicationTreeData():
     _internalFormat(0), _isMemorySizeEstimated(false), _dataFormat(OA_TEXEL_FORMAT_UNKNOWN), _dataType(OA_UNKNOWN_DATA_TYPE),
     _minLevel(0), _maxLevel(0), _textureLayer(0), _isDataCached(false), _bufferType(AP_DISPLAY_BUFFER_UNKNOWN), _bufferAttachmentTarget(0), _bufferAttachmentPoint(0),
     _fboAttachmentFBOName(0), _shaderType(GD_UNKNOWN_SHADER), _clProgramHandle(OA_CL_NULL_HANDLE), _clKernelHandle(OA_CL_NULL_HANDLE), _syncIndex(-1), _syncHandle(OA_GL_NULL_HANDLE), _syncCondition(GL_NONE),
-    _addressingMode(0), _filterMode(0), _referenceCount(0), _amountOfEvents(0), m_queueOutOfOrderExecutionMode(false), m_queueProfilingMode(false), m_queueOnDevice(false), m_queueOnDeviceDefault(false), _memoryFlags(0), m_packetSize(0), m_maxPackets(0)
+    _addressingMode(0), _filterMode(0), _referenceCount(0), _amountOfEvents(0), m_queueOutOfOrderExecutionMode(false), m_queueProfilingMode(false), m_queueOnDevice(false), m_queueOnDeviceDefault(false), 
+    _memoryFlags(0), m_packetSize(0), m_maxPackets(0), m_isAcquired(false)
 
 {
     _textureMiplevelID._textureMipLevel = 0;
@@ -79,6 +80,7 @@ void gdDebugApplicationTreeData::copyID(gdDebugApplicationTreeData& other) const
     other._textureMiplevelID._textureMipLevel = _textureMiplevelID._textureMipLevel;
     other._textureMiplevelID._textureName = _textureMiplevelID._textureName;
     other._multiVariableName = _multiVariableName;
+    other.m_isAcquired = other.m_isAcquired;
 }
 
 /// -----------------------------------------------------------------------------------------------
@@ -92,7 +94,6 @@ void gdDebugApplicationTreeData::copyID(afTreeDataExtension*& pOther) const
     if (pOther == NULL)
     {
         pOther = new gdDebugApplicationTreeData;
-
     }
 
     GT_IF_WITH_ASSERT(pOther != NULL)

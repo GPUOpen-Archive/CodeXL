@@ -640,7 +640,7 @@ bool gdImageAndBufferView::loadCLBuffer()
             // NOTICE: This feature is not supported until the driver is fixed to support the retrieve of shared objects content:
             isInteropObject = (pGDData->_objectOpenGLName > 0);
 
-            if (isInteropObject)
+            if (isInteropObject && (!pGDData->m_isAcquired))
             {
                 // Do not display CL shared items:
                 _pDisplayedItemTreeData->setItemLoadStatus(AF_ITEM_NOT_LOADED, AF_ITEM_LOAD_CL_GL_INTEROP);
@@ -818,7 +818,7 @@ bool gdImageAndBufferView::LoadTexture(int newMipLevel)
             isInteropObject = (_pDisplayedItemTreeData->m_itemType == AF_TREE_ITEM_CL_IMAGE) && (pGDData->_objectOpenGLName > 0);
             isInteropObject = ((_pDisplayedItemTreeData->m_itemType == AF_TREE_ITEM_GL_TEXTURE) && (pGDData->_objectOpenCLName > 0)) || isInteropObject;
 
-            if (isInteropObject)
+            if (isInteropObject && (!pGDData->m_isAcquired))
             {
                 // Do not display CL shared items:
                 _pDisplayedItemTreeData->setItemLoadStatus(AF_ITEM_NOT_LOADED, AF_ITEM_LOAD_CL_GL_INTEROP);
@@ -868,12 +868,11 @@ bool gdImageAndBufferView::LoadTexture(int newMipLevel)
 
                 // If the texture / image is shared with CL/GL do not display it:
                 // NOTICE: This feature is not supported until the driver is fixed to support the retrieve of shared objects content:
-                if (isInteropObject)
+                if (isInteropObject && (!pGDData->m_isAcquired))
                 {
                     // Do not display CL shared items:
                     _pDisplayedItemTreeData->setItemLoadStatus(AF_ITEM_NOT_LOADED, AF_ITEM_LOAD_CL_GL_INTEROP);
                 }
-
                 else
                 {
                     // Adjust the image manager layout:
@@ -1281,7 +1280,7 @@ bool gdImageAndBufferView::loadRenderBuffer()
             // NOTICE: This feature is not supported until the driver is fixed to support the retrieve of shared objects content:
             isInteropObject = (pGDData->_objectOpenCLName > 0);
 
-            if (isInteropObject)
+            if (isInteropObject && (!pGDData->m_isAcquired))
             {
                 // Do not display CL shared items:
                 _pDisplayedItemTreeData->setItemLoadStatus(AF_ITEM_NOT_LOADED, AF_ITEM_LOAD_CL_GL_INTEROP);
@@ -1392,7 +1391,7 @@ bool gdImageAndBufferView::loadVBO()
             // NOTICE: This feature is not supported until the driver is fixed to support the retrieve of shared objects content:
             isInteropObject = (pGDData->_objectOpenCLName > 0);
 
-            if (isInteropObject)
+            if (isInteropObject && (!pGDData->m_isAcquired))
             {
                 // Do not display CL shared items:
                 _pDisplayedItemTreeData->setItemLoadStatus(AF_ITEM_NOT_LOADED, AF_ITEM_LOAD_CL_GL_INTEROP);

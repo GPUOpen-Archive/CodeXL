@@ -146,6 +146,9 @@ public:
     gtUInt32 m_packetSize;
     gtUInt32 m_maxPackets;
 
+    // CL-GL Interop:
+    bool m_isAcquired;
+
     // Multi variables:
     gtString _multiVariableName;
 };
