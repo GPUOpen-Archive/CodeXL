@@ -54,7 +54,7 @@
 
 bool  gInlineMode = true;
 bool  gNestedJavaInline = true;
-FILE*  pPRDDebugFP = NULL;
+FILE*  pPRDDebugFP = nullptr;
 
 static void PrintMemoryUsage(const wchar_t* header);
 
@@ -152,8 +152,8 @@ __declspec(thread) static gtUInt64 threadBytesReadSoFar = 0;
 __declspec(thread) static wchar_t system32Dir[OS_MAX_PATH + 1];
 __declspec(thread) static bool bGetSystemDir = true;
 
-#define BEGIN_TICK_COUNT()      if (NULL != pStats) startTime = GetTickCount()
-#define END_TICK_COUNT(field)   if (NULL != pStats) pStats->m_values[PrdTranslationStats::field].Add(GetTickCount() - startTime)
+#define BEGIN_TICK_COUNT()      if (nullptr != pStats) startTime = GetTickCount()
+#define END_TICK_COUNT(field)   if (nullptr != pStats) pStats->m_values[PrdTranslationStats::field].Add(GetTickCount() - startTime)
 
 unsigned int PrdTranslator::GetKernelCallStackAdditionalRecordsCount(unsigned int callersCount, bool is64Bit)
 {
@@ -259,7 +259,7 @@ PrdTranslator::ProcessInfo::~ProcessInfo()
     {
         PeriodicUserCallStackMap* pPeriodicCallStackMap = it->second;
 
-        if (NULL != pPeriodicCallStackMap)
+        if (nullptr != pPeriodicCallStackMap)
         {
             delete pPeriodicCallStackMap;
         }
@@ -269,7 +269,7 @@ PrdTranslator::ProcessInfo::~ProcessInfo()
     {
         ExecutableAnalyzer* pExeAnalyzer = it->second;
 
-        if (NULL != pExeAnalyzer)
+        if (nullptr != pExeAnalyzer)
         {
             delete pExeAnalyzer;
         }
@@ -278,7 +278,7 @@ PrdTranslator::ProcessInfo::~ProcessInfo()
 
 ExecutableAnalyzer* PrdTranslator::ProcessInfo::AcquireExecutableAnalyzer(gtVAddr va)
 {
-    ExecutableAnalyzer* pExeAnalyzer = NULL;
+    ExecutableAnalyzer* pExeAnalyzer = nullptr;
     VAddrRange range = { va, va };
 
     m_lockAnalyzers.lockRead();
@@ -294,7 +294,7 @@ ExecutableAnalyzer* PrdTranslator::ProcessInfo::AcquireExecutableAnalyzer(gtVAdd
         m_lockAnalyzers.unlockRead();
         ExecutableFile* pExe = fnFindExecutableFile(m_processId, va);
 
-        if (NULL != pExe)
+        if (nullptr != pExe)
         {
             range.m_min = pExe->GetLoadAddress();
             range.m_max = range.m_min + static_cast<gtVAddr>(pExe->GetImageSize() - 1);
@@ -302,7 +302,7 @@ ExecutableAnalyzer* PrdTranslator::ProcessInfo::AcquireExecutableAnalyzer(gtVAdd
             m_lockAnalyzers.lockWrite();
             ExecutableAnalyzer*& pMapExeAnalyzer = m_exeAnalyzers[range];
 
-            if (NULL == pMapExeAnalyzer)
+            if (nullptr == pMapExeAnalyzer)
             {
                 pMapExeAnalyzer = new ExecutableAnalyzer(*pExe);
             }
@@ -321,7 +321,7 @@ PrdTranslator::ProcessInfo* PrdTranslator::FindProcessInfo(ProcessIdType pid) co
 
     m_processInfosLock.lockRead();
     gtMap<ProcessIdType, ProcessInfo*>::const_iterator it = m_processInfos.find(pid);
-    pProcessInfo = (m_processInfos.end() != it) ? it->second : NULL;
+    pProcessInfo = (m_processInfos.end() != it) ? it->second : nullptr;
     m_processInfosLock.unlockRead();
 
     return pProcessInfo;
@@ -331,12 +331,12 @@ PrdTranslator::ProcessInfo& PrdTranslator::AcquireProcessInfo(ProcessIdType pid)
 {
     ProcessInfo* pProcessInfo = FindProcessInfo(pid);
 
-    if (NULL == pProcessInfo)
+    if (nullptr == pProcessInfo)
     {
         m_processInfosLock.lockWrite();
         ProcessInfo*& pMapProcessInfo = m_processInfos[pid];
 
-        if (NULL == pMapProcessInfo)
+        if (nullptr == pMapProcessInfo)
         {
             pMapProcessInfo = new ProcessInfo(pid);
         }
@@ -350,9 +350,9 @@ PrdTranslator::ProcessInfo& PrdTranslator::AcquireProcessInfo(ProcessIdType pid)
 }
 
 //Uses taskinfo dataFile(.prd->.ti),
-PrdTranslator::PrdTranslator(QString dataFile, bool collectStat) : m_pfnProgressBarCallback(NULL),
+PrdTranslator::PrdTranslator(QString dataFile, bool collectStat) : m_pfnProgressBarCallback(nullptr),
     m_progressEvent(L"CpuProfile", L"Preparing raw data translation...", 0),
-    m_pProfilingDrivers(NULL),
+    m_pProfilingDrivers(nullptr),
     m_countProfilingDrivers(0U)
 {
     m_dataFile = dataFile;
@@ -361,8 +361,8 @@ PrdTranslator::PrdTranslator(QString dataFile, bool collectStat) : m_pfnProgress
     m_ibsFetchCount = 0;
     m_ibsOpCount = 0;
     m_collectStat = collectStat;
-    m_pCluInfo = NULL;
-    m_runInfo = NULL;
+    m_pCluInfo = nullptr;
+    m_runInfo = nullptr;
     m_hrFreq = 0;
     m_numWorkerThreads = 0;
 
@@ -374,9 +374,9 @@ PrdTranslator::PrdTranslator(QString dataFile, bool collectStat) : m_pfnProgress
     m_progressAsync = 0;
     m_useProgressSyncObject = false;
 
-    m_pSearchPath = NULL;
-    m_pServerList = NULL;
-    m_pCachePath = NULL;
+    m_pSearchPath = nullptr;
+    m_pServerList = nullptr;
+    m_pCachePath = nullptr;
 }
 
 PrdTranslator::~PrdTranslator()
@@ -384,12 +384,12 @@ PrdTranslator::~PrdTranslator()
     CssMapCleanup();
     m_eventMap.clear();
 
-    if (NULL != m_pCluInfo)
+    if (nullptr != m_pCluInfo)
     {
         delete m_pCluInfo;
     }
 
-    if (NULL != m_runInfo)
+    if (nullptr != m_runInfo)
     {
         delete m_runInfo;
     }
@@ -398,7 +398,7 @@ PrdTranslator::~PrdTranslator()
     {
         ProcessInfo* pProcessInfo = it->second;
 
-        if (NULL != pProcessInfo)
+        if (nullptr != pProcessInfo)
         {
             delete pProcessInfo;
         }
@@ -406,22 +406,22 @@ PrdTranslator::~PrdTranslator()
 
     // We use 'free' instead of 'delete' because these strings were created by 'wcsdup'
     //
-    if (NULL != m_pSearchPath)
+    if (nullptr != m_pSearchPath)
     {
         free(m_pSearchPath);
     }
 
-    if (NULL != m_pServerList)
+    if (nullptr != m_pServerList)
     {
         free(m_pServerList);
     }
 
-    if (NULL != m_pCachePath)
+    if (nullptr != m_pCachePath)
     {
         free(m_pCachePath);
     }
 
-    if (NULL != m_pProfilingDrivers)
+    if (nullptr != m_pProfilingDrivers)
     {
         delete [] m_pProfilingDrivers;
     }
@@ -448,7 +448,7 @@ void PrdTranslator::IncrementProgressBar(int value)
 
 void PrdTranslator::UpdateProgressBar()
 {
-    if (NULL != m_pfnProgressBarCallback)
+    if (nullptr != m_pfnProgressBarCallback)
     {
         m_pfnProgressBarCallback(m_progressEvent);
     }
@@ -493,24 +493,24 @@ void PrdTranslator::SetDebugSymbolsSearchPath(const wchar_t* pSearchPath, const 
 {
     // We use 'free' instead of 'delete' because these strings were created by 'wcsdup'
     //
-    if (NULL != m_pSearchPath)
+    if (nullptr != m_pSearchPath)
     {
         free(m_pSearchPath);
     }
 
-    if (NULL != m_pServerList)
+    if (nullptr != m_pServerList)
     {
         free(m_pServerList);
     }
 
-    if (NULL != m_pCachePath)
+    if (nullptr != m_pCachePath)
     {
         free(m_pCachePath);
     }
 
-    m_pSearchPath = (NULL != pSearchPath) ? wcsdup(pSearchPath) : NULL;
-    m_pServerList = (NULL != pServerList) ? wcsdup(pServerList) : NULL;
-    m_pCachePath  = (NULL != pCachePath)  ? wcsdup(pCachePath)  : NULL;
+    m_pSearchPath = (nullptr != pSearchPath) ? wcsdup(pSearchPath) : nullptr;
+    m_pServerList = (nullptr != pServerList) ? wcsdup(pServerList) : nullptr;
+    m_pCachePath  = (nullptr != pCachePath)  ? wcsdup(pCachePath)  : nullptr;
 }
 
 
@@ -543,12 +543,12 @@ bool PrdTranslator::GetProfileEvents(DcEventConfig* pEventConfig, unsigned int n
 {
     bool bRet = false;
 
-    if (NULL == pEventConfig)
+    if (nullptr == pEventConfig)
     {
         return false;
     }
 
-    if (NULL != pNorms)
+    if (nullptr != pNorms)
     {
         pNorms->clear();
     }
@@ -570,7 +570,7 @@ bool PrdTranslator::GetProfileEvents(DcEventConfig* pEventConfig, unsigned int n
     {
         EventCfgInfo* pEvtCfg = new EventCfgInfo[cfgCnt];
 
-        if (NULL != pEvtCfg)
+        if (nullptr != pEvtCfg)
         {
             HRESULT hr = prdReader.GetEventInfo(pEvtCfg, cfgCnt);
 
@@ -583,7 +583,7 @@ bool PrdTranslator::GetProfileEvents(DcEventConfig* pEventConfig, unsigned int n
                     pE[i].pmc.perf_ctl = pEvtCfg[i].ctl.perf_ctl;
                     pE[i].eventCount = pEvtCfg[i].ctr;
 
-                    if (NULL != pNorms)
+                    if (nullptr != pNorms)
                     {
                         EventMaskType encodedEvent = EncodeEvent(pEvtCfg[i].ctl);
                         (*pNorms) [encodedEvent] = pEvtCfg[i].ctr * groupNum / pEvtCfg[i].numApperance;
@@ -594,7 +594,7 @@ bool PrdTranslator::GetProfileEvents(DcEventConfig* pEventConfig, unsigned int n
             }
 
             delete [] pEvtCfg;
-            pEvtCfg = NULL;
+            pEvtCfg = nullptr;
         }
     }
 
@@ -607,7 +607,7 @@ bool PrdTranslator::InitPrdReader(PrdReader* pReader, const wchar_t* pFileName, 
 {
     bool bRet = true;
 
-    if ((NULL == pReader) || (NULL == pFileName))
+    if ((nullptr == pReader) || (nullptr == pFileName))
     {
         return false;
     }
@@ -630,7 +630,7 @@ bool PrdTranslator::InitPrdReader(PrdReader* pReader, const wchar_t* pFileName, 
         QString msg = "Can't open raw data file. ("
                       + QString::fromWCharArray(pFileName) + ")\nMaybe no samples were taken.";
 
-        if (NULL != pParent)
+        if (nullptr != pParent)
         {
             QMessageBox::information(pParent, "Notification", msg,
                                      QMessageBox::Ok);
@@ -647,10 +647,10 @@ bool PrdTranslator::InitPrdReader(PrdReader* pReader, const wchar_t* pFileName, 
     osFilePath riFilePath(pFileName);
     riFilePath.setFileExtension(L"ri");
 
-    if (NULL != m_runInfo)
+    if (nullptr != m_runInfo)
     {
         delete m_runInfo;
-        m_runInfo = NULL;
+        m_runInfo = nullptr;
     }
 
     m_runInfo = new RunInfo();
@@ -662,10 +662,10 @@ bool PrdTranslator::InitPrdReader(PrdReader* pReader, const wchar_t* pFileName, 
     {
         if (m_runInfo->m_isProfilingClu)
         {
-            if (NULL != m_pCluInfo)
+            if (nullptr != m_pCluInfo)
             {
                 delete m_pCluInfo;
-                m_pCluInfo = NULL;
+                m_pCluInfo = nullptr;
             }
 
             m_pCluInfo = new CluInfo(pReader->GetL1DcAssoc(),
@@ -673,7 +673,7 @@ bool PrdTranslator::InitPrdReader(PrdReader* pReader, const wchar_t* pFileName, 
                                      pReader->GetL1DcLinesPerTag(),
                                      pReader->GetL1DcSize());
 
-            if (NULL == m_pCluInfo)
+            if (nullptr == m_pCluInfo)
             {
                 bRet = false;
             }
@@ -702,7 +702,7 @@ bool PrdTranslator::InitPrdReader(PrdReader* pReader, const wchar_t* pFileName, 
         cfgCnt = pReader->GetEventCount();
         EventCfgInfo* pEvtCfg = new EventCfgInfo[cfgCnt];
 
-        if (NULL == pEvtCfg)
+        if (nullptr == pEvtCfg)
         {
             bRet = false;
             OS_OUTPUT_DEBUG_LOG(L"Unable to allocate memory for the events", OS_DEBUG_LOG_ERROR);
@@ -723,7 +723,7 @@ bool PrdTranslator::InitPrdReader(PrdReader* pReader, const wchar_t* pFileName, 
             m_eventMap.insert(EventMap::value_type(encodedEvent, (gtUInt32) m_norms[encodedEvent]));
         }
 
-        if (NULL != pEvtCfg)
+        if (nullptr != pEvtCfg)
         {
             delete [] pEvtCfg;
         }
@@ -816,7 +816,7 @@ void PrdTranslator::AggregateKnownModuleSampleData(
         }
 
         if ((pModInfo->moduleType == evJavaModule || pModInfo->moduleType == evManaged || pModInfo->moduleType == evOCLModule) &&
-            NULL != pModInfo->pFunctionName && L'\0' != pModInfo->pFunctionName[0])
+            nullptr != pModInfo->pFunctionName && L'\0' != pModInfo->pFunctionName[0])
         {
             funcName = pModInfo->pFunctionName;
             wostringstream ss;
@@ -855,11 +855,11 @@ void PrdTranslator::AggregateKnownModuleSampleData(
 
         END_TICK_COUNT(querySymbolEngine);
 
-        if (NULL != pExecutable)
+        if (nullptr != pExecutable)
         {
             SymbolEngine* pSymbolEngine = pExecutable->GetSymbolEngine();
 
-            if (NULL != pSymbolEngine)
+            if (nullptr != pSymbolEngine)
             {
                 gtRVAddr rva = pExecutable->VaToRva(sampInfo.address);
                 gtRVAddr inlineRva = pSymbolEngine->TranslateToInlineeRVA(rva);
@@ -867,21 +867,21 @@ void PrdTranslator::AggregateKnownModuleSampleData(
 
                 const CpuProfileFunction* pFunc = module.findFunction(addr);
 
-                if (NULL == pFunc || module.isUnchartedFunction(*pFunc))
+                if (nullptr == pFunc || module.isUnchartedFunction(*pFunc))
                 {
                     const FunctionSymbolInfo* pFuncInfo;
 
                     // LookupFunction will discover both the inlined and non-inlined functions
-                    pFuncInfo = pSymbolEngine->LookupFunction(pExecutable->VaToRva(sampInfo.address), NULL, true);
+                    pFuncInfo = pSymbolEngine->LookupFunction(pExecutable->VaToRva(sampInfo.address), nullptr, true);
 
-                    if (NULL != pFuncInfo)
+                    if (nullptr != pFuncInfo)
                     {
                         module.m_base = startAddress;
                         module.m_size = pExecutable->GetImageSize();
 
                         sampInfo.address = addr;
 
-                        if (NULL != pFuncInfo->m_pName && L'!' != pFuncInfo->m_pName[0])
+                        if (nullptr != pFuncInfo->m_pName && L'!' != pFuncInfo->m_pName[0])
                         {
                             funcName = pFuncInfo->m_pName;
                         }
@@ -891,7 +891,7 @@ void PrdTranslator::AggregateKnownModuleSampleData(
 
                         pFunc = module.findFunction(startAddress);
 
-                        if (NULL == pFunc || module.isUnchartedFunction(*pFunc))
+                        if (nullptr == pFunc || module.isUnchartedFunction(*pFunc))
                         {
                             SourceLineInfo sourceLine;
 
@@ -924,7 +924,7 @@ void PrdTranslator::AggregateKnownModuleSampleData(
     }
 
     gtUInt16 eventType;
-    DecodeEvent(sampInfo.event, &eventType, NULL, NULL, NULL);
+    DecodeEvent(sampInfo.event, &eventType, nullptr, nullptr, nullptr);
 
     // CLU profiles IBS Op event, record IBS sample only when profiling IBS Op
     if (!IsIbsOpEvent(eventType) || m_runInfo->m_isProfilingIbsOp)
@@ -1094,7 +1094,7 @@ void PrdTranslator::AggregateUnknownModuleSampleData(
     NameModuleMap::iterator mit = pMMap->find(ModName);
 
     gtUInt16 eventType;
-    DecodeEvent(sampInfo.event, &eventType, NULL, NULL, NULL);
+    DecodeEvent(sampInfo.event, &eventType, nullptr, nullptr, nullptr);
 
     if (pMMap->end() == mit)
     {
@@ -1191,7 +1191,7 @@ bool PrdTranslator::AggregateSampleData(RecordDataStruct prdRecord,
                                     (prdRecord.m_eventBitMask & 2),
                                     (prdRecord.m_eventBitMask & 1)));
 
-    if ((NULL != pModInfo->pModulename) && (wcslen(pModInfo->pModulename)))
+    if ((nullptr != pModInfo->pModulename) && (wcslen(pModInfo->pModulename)))
     {
         AggregateKnownModuleSampleData(sampInfo, pModInfo,
                                        pMMap, *pidModaddrItrMap, b_is32bit, samplesCount, pStats);
@@ -1266,11 +1266,11 @@ void PrdTranslator::AggregatePidSampleData(
 
                 ExecutableFile* pExecutable = ExecutableFile::Open(processName);
 
-                if (NULL != pExecutable)
+                if (nullptr != pExecutable)
                 {
                     temp_process.m_is32Bit = !pExecutable->Is64Bit();
                     delete pExecutable;
-                    pExecutable = NULL;
+                    pExecutable = nullptr;
                 }
                 else
                 {
@@ -1469,7 +1469,7 @@ HRESULT PrdTranslator::TranslateData(QString proFile,
 {
     GT_UNREFERENCED_PARAMETER(bLdStCollect);
 
-    if (NULL == pMissedInfo)
+    if (nullptr == pMissedInfo)
     {
         return E_INVALIDARG;
     }
@@ -1502,9 +1502,9 @@ HRESULT PrdTranslator::TranslateData(QString proFile,
     if (S_OK == hr)
     {
         //Fix for BUG314524 - the idea is not to show progress bar in command line tools.
-        QProgressDialog* pProgDlg = NULL;
+        QProgressDialog* pProgDlg = nullptr;
 
-        if (NULL != pApp)
+        if (nullptr != pApp)
         {
             pProgDlg = new QProgressDialog(
                 "",
@@ -1521,7 +1521,7 @@ HRESULT PrdTranslator::TranslateData(QString proFile,
             pProgDlg->show();
         }
 
-        if (NULL != pProgDlg)
+        if (nullptr != pProgDlg)
         {
             delete pProgDlg;
         }
@@ -1546,7 +1546,7 @@ HRESULT PrdTranslator::TranslateData(QString proFile,
 
 #if SUPPORT_CLU
 
-    if ((NULL != m_pCLU) && bCLUtil && (S_OK == hr))
+    if ((nullptr != m_pCLU) && bCLUtil && (S_OK == hr))
     {
         startTime = GetTickCount();
         m_pCLU->CacheLineCleanup();
@@ -1571,7 +1571,7 @@ HRESULT PrdTranslator::TranslateData(QString proFile,
     if (bCLUtil)
     {
         delete m_pCLU;
-        m_pCLU = NULL;
+        m_pCLU = nullptr;
     }
 
 #endif
@@ -1646,7 +1646,7 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
 
     if (!m_collectStat)
     {
-        pStats = NULL;
+        pStats = nullptr;
     }
 
     pMissedInfo->missedCount = 0;
@@ -1704,7 +1704,7 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
 
     unsigned int cpuCount = tPrdReader.GetCoreCount();
 
-    ProcessInfo* pProcessInfo = NULL;
+    ProcessInfo* pProcessInfo = nullptr;
     ProcessIdType processInfoId = 0;
 
     gtUInt64 iterBytes;
@@ -2286,7 +2286,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
 
     pMissedInfo->missedCount = 0;
     //if (INVALID_HANDLE_VALUE == m_ThreadCompleteEvent) {
-    //  m_ThreadCompleteEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+    //  m_ThreadCompleteEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
     //  if (INVALID_HANDLE_VALUE == m_ThreadCompleteEvent)
     //      return E_ABORT;
     //}
@@ -2422,13 +2422,13 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
     }
 
 
-    ThreadPool* workerTP = NULL;
+    ThreadPool* workerTP = nullptr;
 
     if (!oneChunk)
     {
         workerTP = new ThreadPool(nbrThreads);
 
-        if (NULL == workerTP)
+        if (nullptr == workerTP)
         {
             oneChunk = true;
             nbrThreads = 1;
@@ -2497,9 +2497,9 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
     }
 
     totalBytes = fileStat.st_size - tPrdReader.GetFirstWeightRecOffset();
-    QProgressDialog* pProgDlg = NULL;
+    QProgressDialog* pProgDlg = nullptr;
 
-    if (NULL != pApp)
+    if (nullptr != pApp)
     {
         // Show the PRD processing bar
         pProgDlg = new QProgressDialog("Processing Raw sample Data...", QString::null,
@@ -2509,10 +2509,10 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
         pProgDlg->show();
     }
 
-    if (NULL != m_pProfilingDrivers)
+    if (nullptr != m_pProfilingDrivers)
     {
         delete [] m_pProfilingDrivers;
-        m_pProfilingDrivers = NULL;
+        m_pProfilingDrivers = nullptr;
     }
 
     m_countProfilingDrivers = 0U;
@@ -2537,7 +2537,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
         m_progressThreshold = m_progressStride;
         InitializeProgressBar(CPU_PROFILING_STR_TranslatingRawCSSData, true);
 
-        PrdTranslationStats* pStats = (m_collectStat) ? &globalStats : NULL;
+        PrdTranslationStats* pStats = (m_collectStat) ? &globalStats : nullptr;
 
         BEGIN_TICK_COUNT();
         PrdUserCssRcuHandlerPool* pUserCssHandlerPool = new PrdUserCssRcuHandlerPool(*this,
@@ -2548,7 +2548,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
         RcuScheduler userCssScheduler(*pUserCssHandlerPool, USER_CSS_RCU_DATA_SIZE);
         userCssScheduler.Start(false);
 
-        if (NULL != m_pfnProgressBarCallback)
+        if (nullptr != m_pfnProgressBarCallback)
         {
             unsigned int waitMilliseconds = 0U;
             m_progressEvent.setValue(0);
@@ -2755,7 +2755,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
                     baseAddress = (LPVOID)((gtUInt64)baseAddress + bufSize);
                 }
 
-                if (NULL != m_pfnProgressBarCallback)
+                if (nullptr != m_pfnProgressBarCallback)
                 {
                     gtInt32 progress = AtomicSwap(m_progressAsync, 0);
 
@@ -2790,7 +2790,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
                 //Update 4 times a second
                 waitHr = workerTP->WaitForWorkCompletion(250);
 
-                if (NULL != m_pfnProgressBarCallback)
+                if (nullptr != m_pfnProgressBarCallback)
                 {
                     gtInt32 progress = AtomicSwap(m_progressAsync, 0);
 
@@ -2811,7 +2811,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
     {
         bool bComplete = true;
 
-        if (NULL != workerTP)
+        if (nullptr != workerTP)
         {
             //Update 4 times a second
             HRESULT status = workerTP->DestroyThreadPool(250);
@@ -2835,7 +2835,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
                     break;
             }
 
-            if (NULL != m_pfnProgressBarCallback)
+            if (nullptr != m_pfnProgressBarCallback)
             {
                 gtInt32 progress = AtomicSwap(m_progressAsync, 0);
 
@@ -2857,7 +2857,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
     mapAddress.UnMap();
 
     // make sure the progress bar is complete
-    if (NULL != pApp)
+    if (nullptr != pApp)
     {
         pProgDlg->setValue(totalBytes);
     }
@@ -2872,7 +2872,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
         PrintMemoryUsage(L"Memory Usage: After processing PRD records.");
     }
 
-    bool hasCluData = (m_runInfo->m_isProfilingClu && (NULL != m_pCluInfo));
+    bool hasCluData = (m_runInfo->m_isProfilingClu && (nullptr != m_pCluInfo));
 
     InitializeProgressBar(L"Writing translated profile data...", false);
 
@@ -2898,7 +2898,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
         m_pCluInfo->CacheLineCleanup();
 
         // Aggregate and populate the CLU data
-        AggregateCluData(procMap, modMap, proFile, (m_collectStat ? &globalStats : NULL));
+        AggregateCluData(procMap, modMap, proFile, (m_collectStat ? &globalStats : nullptr));
 
         UpdateProgressBar(30ULL, 100ULL);
     }
@@ -2926,7 +2926,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
     tPrdReader.Close();
 
     // Delete the workers thread pool
-    if (NULL != workerTP)
+    if (nullptr != workerTP)
     {
         delete workerTP;
     }
@@ -2986,15 +2986,15 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
         PrintMemoryUsage(L"Memory Usage: After destroying CpuProfileProcess and CpuProfileModule objects.");
     }
 
-    if (NULL != pProgDlg)
+    if (nullptr != pProgDlg)
     {
         delete pProgDlg;
     }
 
-    if (NULL != m_pProfilingDrivers)
+    if (nullptr != m_pProfilingDrivers)
     {
         delete [] m_pProfilingDrivers;
-        m_pProfilingDrivers = NULL;
+        m_pProfilingDrivers = nullptr;
         m_countProfilingDrivers = 0U;
     }
 
@@ -3207,7 +3207,7 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
     {
         ProcessInfo* pProcessInfo = it->second;
 
-        if (NULL != pProcessInfo && 0U != pProcessInfo->m_callGraph.GetOrder())
+        if (nullptr != pProcessInfo && 0U != pProcessInfo->m_callGraph.GetOrder())
         {
             ProcessIdType pid = it->first;
 
@@ -3291,7 +3291,7 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
         {
             ProcessInfo* pProcessInfo = procIter->second;
 
-            if (NULL != pProcessInfo && 0U != pProcessInfo->m_callGraph.GetOrder())
+            if (nullptr != pProcessInfo && 0U != pProcessInfo->m_callGraph.GetOrder())
             {
                 ProcessIdType pid = procIter->first;
                 CallGraph& callGraph = pProcessInfo->m_callGraph;
@@ -3303,6 +3303,7 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
 
                 for (auto stackIt = callGraph.GetBeginCallStack(), stackItEnd = callGraph.GetEndCallStack(); stackIt != stackItEnd; ++stackIt)
                 {
+                    // **stackIt is a reference in callGraph, hence null check not required.
                     CallStack& callStack = **stackIt;
                     gtUInt16 callSiteDepth = 0;
                     ++callStackId;
@@ -3419,7 +3420,7 @@ bool PrdTranslator::WriteProfileFile(const gtString& path,
         info.m_numSamples += pit->second.getTotal();
     }
 
-    if (NULL != m_runInfo)
+    if (nullptr != m_runInfo)
     {
         // We have the RI data, set current TBP version
         info.m_tbpVersion = TBPVER_DEFAULT;
@@ -3483,7 +3484,7 @@ unsigned int PrdTranslator::GetCpuCount() const
 
 bool PrdTranslator::GetProfileEventCount(int* pEventCount)
 {
-    if (NULL == pEventCount)
+    if (nullptr == pEventCount)
     {
         return false;
     }
@@ -3520,11 +3521,11 @@ void PrdTranslator::FinalizeUserCallStack(ProcessInfo& processInfo,
 
     // if fn is inlined, instruction ptr needs to be manipulated
     // to store VA of stanby inlined fn
-    if (NULL != pExecutable)
+    if (nullptr != pExecutable)
     {
         SymbolEngine* pSymbolEngine = pExecutable->GetSymbolEngine();
 
-        if (NULL != pSymbolEngine)
+        if (nullptr != pSymbolEngine)
         {
             gtRVAddr rva = pExecutable->VaToRva(instructionPtr);
             rva = pSymbolEngine->TranslateToInlineeRVA(rva);
@@ -3584,7 +3585,7 @@ void PrdTranslator::FinalizePartialUserCallStack(ProcessInfo& processInfo,
 
     PeriodicUserCallStackMap*& pPeriodicCallStackMap = processInfo.m_userCallStacks[static_cast<ThreadIdType>(threadID)];
 
-    if (NULL == pPeriodicCallStackMap)
+    if (nullptr == pPeriodicCallStackMap)
     {
         pPeriodicCallStackMap = new PeriodicUserCallStackMap();
     }
@@ -3631,7 +3632,7 @@ void PrdTranslator::FinalizeKernelCallStack(ProcessInfo& processInfo,
                 BEGIN_TICK_COUNT();
                 ExecutableAnalyzer* pExeAnalyzer = processInfo.AcquireExecutableAnalyzer(userCallStack.m_pSampleSite->m_traverseAddr);
 
-                if (NULL != pExeAnalyzer && pExeAnalyzer->AnalyzeIsSystemCall(userCallStack.m_pSampleSite->m_traverseAddr - 1))
+                if (nullptr != pExeAnalyzer && pExeAnalyzer->AnalyzeIsSystemCall(userCallStack.m_pSampleSite->m_traverseAddr - 1))
                 {
                     userCallStack.m_kernelTransaction = UserCallStack::KERNEL_TRANSACTION_TRUE;
                 }
@@ -3710,7 +3711,7 @@ HRESULT PrdTranslator::TranslateKernelCallStack(PRD_KERNEL_CSS_DATA_RECORD& kern
 
         if (is64Bit)
         {
-            pKernelCssValues32 = NULL;
+            pKernelCssValues32 = nullptr;
 
             for (unsigned int i = 0U; i < depth; ++i)
             {
@@ -3723,7 +3724,7 @@ HRESULT PrdTranslator::TranslateKernelCallStack(PRD_KERNEL_CSS_DATA_RECORD& kern
         }
         else
         {
-            pKernelCssValues64 = NULL;
+            pKernelCssValues64 = nullptr;
 
             for (unsigned int i = 0U; i < depth; ++i)
             {
@@ -3792,7 +3793,7 @@ bool PrdTranslator::BuildCallStack(ProcessInfo& processInfo,
 {
     bool ret = false;
 
-    if (0U != depth && (NULL != pValues32 || NULL != pValues64))
+    if (0U != depth && (nullptr != pValues32 || nullptr != pValues64))
     {
         DWORD startTime = 0L;
 
@@ -3817,7 +3818,7 @@ bool PrdTranslator::BuildCallStack(ProcessInfo& processInfo,
         modInfo.srcfilesize      = OS_MAX_PATH;
         modInfo.ModuleStartAddr  = 0;
 
-        if (NULL != pValues32)
+        if (nullptr != pValues32)
         {
             modInfo.sampleAddr = pValues32[0];
         }
@@ -3844,7 +3845,7 @@ bool PrdTranslator::BuildCallStack(ProcessInfo& processInfo,
                 modInfo.srcfilesize      = OS_MAX_PATH;
                 modInfo.ModuleStartAddr  = 0;
 
-                if (NULL != pValues32)
+                if (nullptr != pValues32)
                 {
                     modInfo.sampleAddr = pValues32[1];
                 }
@@ -3862,7 +3863,7 @@ bool PrdTranslator::BuildCallStack(ProcessInfo& processInfo,
                     osCriticalSectionLocker lock(processInfo.m_criticalSection);
                     callStackBuilder.Initialize(modInfo.sampleAddr, 0ULL, 0ULL);
 
-                    if (NULL != pValues32)
+                    if (nullptr != pValues32)
                     {
                         for (unsigned int i = 2U; i < depth; ++i)
                         {
@@ -3890,7 +3891,7 @@ bool PrdTranslator::BuildCallStack(ProcessInfo& processInfo,
                             BEGIN_TICK_COUNT();
                             callStackBuilder.Push(modInfo.sampleAddr);
 
-                            if (NULL != pStats) { pStats->m_values[PrdTranslationStats::buildCss].value += GetTickCount() - startTime; }
+                            if (nullptr != pStats) { pStats->m_values[PrdTranslationStats::buildCss].value += GetTickCount() - startTime; }
                         }
                     }
                     else
@@ -3921,13 +3922,13 @@ bool PrdTranslator::BuildCallStack(ProcessInfo& processInfo,
                             BEGIN_TICK_COUNT();
                             callStackBuilder.Push(modInfo.sampleAddr);
 
-                            if (NULL != pStats) { pStats->m_values[PrdTranslationStats::buildCss].value += GetTickCount() - startTime; }
+                            if (nullptr != pStats) { pStats->m_values[PrdTranslationStats::buildCss].value += GetTickCount() - startTime; }
                         }
                     }
                 }
             }
 
-            if (NULL != pStats) { pStats->m_values[PrdTranslationStats::buildCss].count++; }
+            if (nullptr != pStats) { pStats->m_values[PrdTranslationStats::buildCss].count++; }
         }
     }
 
@@ -4151,10 +4152,10 @@ void PrdTranslator::AggregateCluData(PidProcessMap* pPMap, NameModuleMap* pMMap,
         AGG_CLU_EVENT_COUNT(DE_IBS_CLU_BYTE_COUNT, data.tot_rw);
     }
 
-    if (pidModaddrItrMap != NULL)
+    if (pidModaddrItrMap != nullptr)
     {
         delete pidModaddrItrMap;
-        pidModaddrItrMap = NULL;
+        pidModaddrItrMap = nullptr;
     }
 }
 
@@ -4631,7 +4632,7 @@ bool PrdTranslator::ProcessIbsOpRecord(const IBSOpRecordData& ibsOpRec,
 
     if (m_runInfo->m_isProfilingClu)
     {
-        if (NULL != m_pCluInfo)
+        if (nullptr != m_pCluInfo)
         {
             m_pCluInfo->RecordCacheLdSt((IBSOpRecordData*)&ibsOpRec, pModInfo, pMMap, ibsOpRec.m_IbsLdOp);
         }
@@ -4653,7 +4654,7 @@ bool PrdTranslator::ProcessIbsOpRecord(const IBSOpRecordData& ibsOpRec,
 #if 0
 bool PrdTranslator::GetIbsConfig(IbsConfig* pConfig)
 {
-    if (NULL == pConfig) { return false; }
+    if (nullptr == pConfig) { return false; }
 
     PrdReader prdReader;
 
@@ -4675,7 +4676,7 @@ bool PrdTranslator::GetIbsConfig(IbsConfig* pConfig)
 
 bool PrdTranslator::GetTimerInterval(gtUInt64* resolution)
 {
-    if (NULL == resolution) { return false; }
+    if (nullptr == resolution) { return false; }
 
     PrdReader prdReader;
 
@@ -4767,7 +4768,7 @@ PrdTranslator::CheckForJavaInlinedFunction(CpuProfileFunction&   func,
                                            JavaInlineMap*        pJilMap,
                                            AddrFunctionMultMap&  inlinedFuncMap)
 {
-    if (NULL == pJilMap)
+    if (nullptr == pJilMap)
     {
         return false;
     }
@@ -4788,7 +4789,7 @@ PrdTranslator::CheckForJavaInlinedFunction(CpuProfileFunction&   func,
         JavaInlineMap::iterator mitEnd = pJilMap->end();
 
         // DEBUG:
-        //if (NULL == pPRDDebugFP) {
+        //if (nullptr == pPRDDebugFP) {
         //    pPRDDebugFP = fopen("C:\\Temp\\Java-Translation.txt", "a+");
         //}
         //fprintf(pPRDDebugFP, "==========================================\n", ip);
@@ -4921,7 +4922,7 @@ PrdTranslator::CheckForNestedJavaInlinedFunction(
     AddrFunctionMultMap&  inlinedFuncMap
 )
 {
-    if (NULL == pJilMap)
+    if (nullptr == pJilMap)
     {
         return false;
     }
@@ -4942,7 +4943,7 @@ PrdTranslator::CheckForNestedJavaInlinedFunction(
         JavaInlineMap::iterator mitEnd = pJilMap->end();
 
         // DEBUG:
-        // if (NULL == pPRDDebugFP) {
+        // if (nullptr == pPRDDebugFP) {
         //     pPRDDebugFP = fopen("C:\\Temp\\Java-Translation.txt", "a+");
         // }
         // fprintf(pPRDDebugFP, "==========================================\n", ip);
@@ -5065,13 +5066,13 @@ void PrintMemoryUsage(const wchar_t* header)
     hProc = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
                         FALSE, procId);
 
-    if (NULL == hProc)
+    if (nullptr == hProc)
     {
         return;
     }
 
     // Print the header, if provided by the caller...
-    if (NULL != header)
+    if (nullptr != header)
     {
         OS_OUTPUT_DEBUG_LOG(header, OS_DEBUG_LOG_DEBUG);
     }

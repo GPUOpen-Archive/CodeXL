@@ -369,7 +369,7 @@ public:
         return ret;
     }
 
-    bool PrepareInsertCoreInfoStatement(void)
+    bool PrepareInsertCoreInfoStatement()
     {
         bool ret = false;
 
@@ -380,7 +380,7 @@ public:
         return ret;
     }
 
-    bool PrepareInsertSamplingCounterStatement(void)
+    bool PrepareInsertSamplingCounterStatement()
     {
         bool ret = false;
 
@@ -391,7 +391,7 @@ public:
         return ret;
     }
 
-    bool PrepareInsertSamplingConfigStatement(void)
+    bool PrepareInsertSamplingConfigStatement()
     {
         bool ret = false;
 
@@ -402,7 +402,7 @@ public:
         return ret;
     }
 
-    bool PrepareInsertCoreSamplingConfigStatement(void)
+    bool PrepareInsertCoreSamplingConfigStatement()
     {
         bool ret = false;
 
@@ -413,7 +413,7 @@ public:
         return ret;
     }
 
-    bool PrepareInsertProcessInfoStatement(void)
+    bool PrepareInsertProcessInfoStatement()
     {
         bool ret = false;
 
@@ -424,7 +424,7 @@ public:
         return ret;
     }
 
-    bool PrepareInsertModuleInfoStatement(void)
+    bool PrepareInsertModuleInfoStatement()
     {
         bool ret = false;
 
@@ -435,7 +435,7 @@ public:
         return ret;
     }
 
-    bool PrepareInsertModuleInstanceStatement(void)
+    bool PrepareInsertModuleInstanceStatement()
     {
         bool ret = false;
 
@@ -446,7 +446,7 @@ public:
         return ret;
     }
 
-    bool PrepareInsertProcessThreadStatement(void)
+    bool PrepareInsertProcessThreadStatement()
     {
         bool ret = false;
 
@@ -457,7 +457,7 @@ public:
         return ret;
     }
 
-    bool PrepareInsertSampleContextStatement(void)
+    bool PrepareInsertSampleContextStatement()
     {
         bool ret = false;
 
@@ -468,7 +468,7 @@ public:
         return ret;
     }
 
-    bool PrepareInsertFunctionInfoStatement(void)
+    bool PrepareInsertFunctionInfoStatement()
     {
         bool ret = false;
 
@@ -479,7 +479,7 @@ public:
         return ret;
     }
 
-    bool PrepareInsertCallStackFrameStatement(void)
+    bool PrepareInsertCallStackFrameStatement()
     {
         bool ret = false;
 
@@ -490,7 +490,7 @@ public:
         return ret;
     }
 
-    bool PrepareInsertCallStackLeafStatement(void)
+    bool PrepareInsertCallStackLeafStatement()
     {
         bool ret = false;
 
@@ -512,7 +512,7 @@ public:
         return ret;
     }
 
-    bool PrepareGetModuleInstanceIdStatement(void)
+    bool PrepareGetModuleInstanceIdStatement()
     {
         bool ret = false;
 
@@ -1804,7 +1804,7 @@ public:
         return true;
     }
 
-    void FlushData(void)
+    void FlushData()
     {
         if (m_pWriteDbConn != nullptr)
         {
@@ -4910,7 +4910,7 @@ bool AmdtDatabaseAccessor::GetDbVersion(int& version)
     return ret;
 }
 
-bool AmdtDatabaseAccessor::FlushData(void)
+bool AmdtDatabaseAccessor::FlushData()
 {
     bool ret = false;
 
@@ -4923,7 +4923,7 @@ bool AmdtDatabaseAccessor::FlushData(void)
     return ret;
 }
 
-bool AmdtDatabaseAccessor::FlushDataAsync(void)
+bool AmdtDatabaseAccessor::FlushDataAsync()
 {
     bool ret = false;
 
@@ -4935,7 +4935,7 @@ bool AmdtDatabaseAccessor::FlushDataAsync(void)
     return ret;
 }
 
-bool AmdtDatabaseAccessor::CloseAllConnections(void)
+bool AmdtDatabaseAccessor::CloseAllConnections()
 {
     delete m_pImpl;
     m_pImpl = new Impl(this);
