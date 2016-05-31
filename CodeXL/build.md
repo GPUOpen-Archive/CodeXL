@@ -60,6 +60,7 @@ Install glibc
 * –j specify the number of concurrent jobs (-j6).
 * CXL_build=[debug/release] - build type
 * CXL_build_verbose=1 - verbose output
+* CXL_hsa=true build hsa support. without supplying this parameter hsa support is not built.
 * When executing the backend_build.sh script, the following switches are supported:
   * __debug__: performs a debug build
   * __skip-32bitbuild__: skips building the 32-bit binaries

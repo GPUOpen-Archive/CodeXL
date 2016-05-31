@@ -65,7 +65,7 @@ RunTheBuild()
     cd $AMD_WS_LINUX_UTIL_DIR
 
     # BUILD RELEASE when the version is non-zero
-    BUILD_OPTS="--debug=time -j ${NCPUS} CXL_build=release CXL_arch=${ARCHTYPE} CXL_build_conf=${BUILDTYPE}"
+    BUILD_OPTS="--debug=time -j ${NCPUS} CXL_build=release CXL_arch=${ARCHTYPE} CXL_build_conf=${BUILDTYPE} CXL_hsa=true"
     echo ""
     echo "========== Timing start: `date` ============================================"
     echo "Building: sh $AMD_WS_LINUX_UTIL_DIR/buildCodeXLFullLinuxProjects ${BUILD_OPTS}"
