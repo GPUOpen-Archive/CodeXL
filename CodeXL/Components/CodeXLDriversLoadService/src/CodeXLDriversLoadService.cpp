@@ -75,7 +75,7 @@ bool InitializeProfAPISharedObj()
     if (!gCAProfAPISharedMapFile)
     {
         SECURITY_ATTRIBUTES secAttr;
-        char secDesc[ SECURITY_DESCRIPTOR_MIN_LENGTH ];
+        char secDesc[ SECURITY_DESCRIPTOR_MIN_LENGTH ] = "";
         secAttr.nLength = sizeof(secAttr);
         secAttr.bInheritHandle = FALSE;
         secAttr.lpSecurityDescriptor = &secDesc;

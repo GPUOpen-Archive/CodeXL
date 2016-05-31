@@ -97,7 +97,7 @@ private:
     // Apply model transformation to the canonical cube.
     void updateVertices()
     {
-        for (int i = 8; i >= 0; --i)
+        for (int i = 7; i >= 0; --i)
         {
             _tVertices[i] = _transf.TransformVec(_vertices[i]);
         }

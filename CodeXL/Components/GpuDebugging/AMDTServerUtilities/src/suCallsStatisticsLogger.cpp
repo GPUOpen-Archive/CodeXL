@@ -784,7 +784,7 @@ void suCallsStatisticsLogger::fillFunctionEnumeratorsStatistics(apFunctionCallSt
             const apEnumeratorUsageStatistics& enumTotalStatisticsHolder = enumsTotalStatisticsVec[i];
 
             // If the enumerator was used in the previous frame:
-            if (0 < enumTotalStatisticsHolder._amountOfTimesUsed || enumTotalStatisticsHolder._amountOfTimesUsed > 0)
+            if (0 < enumTotalStatisticsHolder._amountOfTimesUsed)
             {
                 // Add it to the output function statistics:
                 funcStatisticsHolder._usedEnumerators.push_back(enumTotalStatisticsHolder);

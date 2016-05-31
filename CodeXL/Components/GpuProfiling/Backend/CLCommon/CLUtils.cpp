@@ -287,7 +287,7 @@ cl_platform_id CLUtils::GetDefaultPlatform()
                 {
                     for (unsigned i = 0; i < numPlatforms; ++i)
                     {
-                        char pbuf[100];
+                        char pbuf[100] = "";
                         status = g_realDispatchTable.GetPlatformInfo(pPlatforms[i],
                                                                      CL_PLATFORM_VENDOR,
                                                                      sizeof(pbuf),

@@ -134,6 +134,7 @@ int HeaderBinFile::ReadHeader(const gtString& strFileName)
 
 void HeaderBinFile::GetFileTypeInt()
 {
+    //TODO refactor :  below condition is always true!!!!, see https://msdn.microsoft.com/en-us/library/70wx36ch.aspx
     if ((iFileType != FileUtils::FTYPE_NOT_WIN_BINARY) || (iFileType != FileUtils::FTYPE_UNKNOWN))
     {
         if ((hdrBinFile.FileHeader.Characteristics & IMAGE_FILE_DLL) != 0)

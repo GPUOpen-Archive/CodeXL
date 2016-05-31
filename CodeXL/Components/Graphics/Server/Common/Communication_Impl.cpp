@@ -309,8 +309,8 @@ static bool OutputHTTPError(NetSocket* socket, int nErrorCode)
 bool SendServerStatusMessageAsXML(GRAPHICS_SERVER_STATE eServerState, NetSocket* pClientSocket, gtASCIIString requestString)
 {
     /// generate the error code html
-    static char headerBuffer[COMM_BUFFER_SIZE];
-    static char xmlBuffer[COMM_BUFFER_SIZE];
+    static char headerBuffer[COMM_BUFFER_SIZE] = "";
+    static char xmlBuffer[COMM_BUFFER_SIZE] = "";
 
     gtASCIIString xmlSrc("<XML>");
 
@@ -420,8 +420,8 @@ bool SendServerStatusMessageAsTEXT(GRAPHICS_SERVER_STATE eServerState, NetSocket
 bool SendServerStatusMessageAsIMG(GRAPHICS_SERVER_STATE eServerState, NetSocket* pClientSocket)
 {
     /// generate the error code html
-    static char headerBuffer[COMM_BUFFER_SIZE];
-    static char imgBuffer[COMM_BUFFER_SIZE];
+    static char headerBuffer[COMM_BUFFER_SIZE] = "";
+    static char imgBuffer[COMM_BUFFER_SIZE] = "";
 
     if (eServerState == GRAPHICS_SERVER_STATE_PROCESS_NOT_RUNNING)
     {
