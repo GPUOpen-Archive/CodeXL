@@ -40,6 +40,7 @@ public:
     virtual ~pdWindowsLoadedModulesManager();
 
     void setDebuggedProcessHandle(HANDLE hDebuggedProcess) { _hDebuggedProcess = hDebuggedProcess; };
+    bool wasInitialized() const { return m_wasInitialized; };
 
     // Overrides pdLoadedModulesManager:
     virtual void onDebuggedProcessCreation(const apDebuggedProcessCreatedEvent& event);
@@ -58,6 +59,9 @@ protected:
     virtual void onNewLoadedModule(const pdLoadedModule& loadedModuleStruct);
 
 private:
+    // Was this class initialized?
+    bool m_wasInitialized;
+
     // The debugged process handle:
     HANDLE _hDebuggedProcess;
 

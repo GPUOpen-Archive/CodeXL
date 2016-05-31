@@ -26,6 +26,7 @@
 // Date:        30/6/2010
 // ---------------------------------------------------------------------------
 pdWindowsLoadedModulesManager::pdWindowsLoadedModulesManager()
+    : _hDebuggedProcess(nullptr), m_wasInitialized(false)
 {
 }
 
@@ -53,8 +54,8 @@ void pdWindowsLoadedModulesManager::onDebuggedProcessCreation(const apDebuggedPr
     GT_UNREFERENCED_PARAMETER(&event);
 
     // Initialize the debugged process symbols server:
-    bool rcInitSymSrv = _debugSymbolsManager.initializeProcessSymbolsServer(_hDebuggedProcess);
-    GT_ASSERT(rcInitSymSrv);
+    m_wasInitialized = _debugSymbolsManager.initializeProcessSymbolsServer(_hDebuggedProcess);
+    GT_ASSERT(m_wasInitialized);
 
     // Yaki 29/9/2005:
     // We cannot load the debugged process .exe module debug information here.
@@ -113,6 +114,7 @@ void pdWindowsLoadedModulesManager::onDebuggedProcessTermination()
 
     // Clear the debugged process handle:
     _hDebuggedProcess = NULL;
+    m_wasInitialized = false;
 
     // Perform base class actions:
     pdLoadedModulesManager::onDebuggedProcessTermination();

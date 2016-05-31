@@ -2359,7 +2359,7 @@ void pdWin32ProcessDebugger::outputHandlingThreadCreationDebugLogMessage(osInstr
     // If debug log severity is DEBUG:
     osDebugLogSeverity debugLogSeverity = osDebugLog::instance().loggedSeverity();
 
-    if (OS_DEBUG_LOG_DEBUG <= debugLogSeverity)
+    if ((OS_DEBUG_LOG_DEBUG <= debugLogSeverity) && (_loadedModulesManager.wasInitialized()))
     {
         // When the main thread is created we cannot load modules debug symbols:
         if (!isMainThread)
