@@ -178,13 +178,18 @@ rcc_files = Split(
 # There is probably a good way to do that (TBD)
 commonsrc_files = Split(
         buildDirPath + '/ADLUtil/ADLUtil.cpp ' +
-        buildDirPath + '/HSAUtils/HSAUtils.cpp ' +
-        buildDirPath + '/DynamicLibraryModule/HSAModule.cpp ' +
         buildDirPath + '/DeviceInfo/DeviceInfoUtils.cpp ' +
         buildDirPath + '/DynamicLibraryModule/DynamicLibraryModule.cpp ' +
         buildDirPath + '/DynamicLibraryModule/OpenCLModule.cpp ' +
         buildDirPath + '/AMDTMutex/AMDTMutex.cpp '
         )
+
+if (GPUProf_env['CXL_hsa'] == 'true'):
+    commonsrc_files += \
+    [
+        buildDirPath + "/Src/HSAUtils/HSAUtils.cpp",
+        buildDirPath + '/DynamicLibraryModule/HSAModule.cpp '
+    ]
 
 backend_files = Split(
         backend_clcommon_dir + '/CLFunctionDefs.cpp ' +
