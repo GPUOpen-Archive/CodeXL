@@ -1941,8 +1941,6 @@ void kaBackendManager::BuildThread::run()
     m_shouldBeCanceled = false;
     // reset build succeded flag
     m_buildSucceded = false;
-    // Get the target directory.
-    kaBackendManager& theBackendManager = kaBackendManager::instance();
 
     // Get the full path where to write the output results.
     GT_ASSERT(m_pCurrentProgram != nullptr);
@@ -1967,98 +1965,6 @@ void kaBackendManager::BuildThread::run()
     }
 
 #endif
-    else
-    {
-        osFilePath sourceFile;
-        sourceFile.setFullPathFromString(theBackendManager.m_sourceCodeFullPathName);
-        kaSourceFile* pCurrentFile = KA_PROJECT_DATA_MGR_INSTANCE.dataFileByPath(sourceFile);
-        osDirectory targetDirectoryForOutput;
-        GT_IF_WITH_ASSERT(pCurrentFile != nullptr)
-        {
-            // Clear the build files list.
-            pCurrentFile->buildFiles().clear();
-
-            // Get the target directory.
-            targetDirectoryForOutput = pCurrentFile->buildDirectory();
-
-            // Create the output directory if it does not exist.
-            bool isOutputDirCreate = targetDirectoryForOutput.create();
-            GT_ASSERT(isOutputDirCreate);
-
-            // The output directory.
-            gtString buildOutputDir;
-
-            if (m_buildType != CL_BUILD)
-            {
-                // Create output directory for this kernel's build.
-                gtString kernelNameAsGtStr;
-                kernelNameAsGtStr << m_kernelName.c_str();
-                osFilePath kernelOutputPath = targetDirectoryForOutput.directoryPath();
-                kernelOutputPath.appendSubDirectory(kernelNameAsGtStr);
-
-                if (!kernelOutputPath.exists())
-                {
-                    osDirectory kernelOutputDir;
-                    kernelOutputDir.setDirectoryPath(kernelOutputPath);
-                    bool isOutputDirCreate1 = kernelOutputDir.create();
-                    GT_ASSERT(isOutputDirCreate1);
-                }
-
-                // Get the string representation of the build output directory.
-                buildOutputDir = kernelOutputPath.asString(true);
-            }
-            else
-            {
-                buildOutputDir = targetDirectoryForOutput.directoryPath().asString(true);
-            }
-
-            // Prepare the source code file's full path.
-            std::string sourceCodeFullPathName;
-            theBackendManager.m_sourceCodeFullPathName.asUtf8(sourceCodeFullPathName);
-
-            // Reset the status to non-successful.
-            m_compileStatus = beStatus_Invalid;
-
-            // Counter for the number of successful builds overall.
-            // Will be used to summarize the build results for the user.
-            int numOfSuccessfulBuilds = 0;
-            int numOfBuildsOverall = 0;
-
-            // Let reading timer pick up the new content before quiting.
-            // Note:  this thread is connected to a timer for controlling the
-            // timer's start and stop slots.
-            msleep(POLLING_TIME + 5);
-
-            // Notify the user that the build process is done.
-            if (m_shouldBeCanceled)
-            {
-                std::stringstream buildCanceledMsg;
-                int numOfSkippedDevices = numOfBuildsOverall - numOfSuccessfulBuilds;
-
-                if (numOfSkippedDevices > 0)
-                {
-                    buildCanceledMsg << KA_STR_BUILD_CANCELLED_BY_USER_PREFIX <<
-                                     (numOfBuildsOverall - numOfSuccessfulBuilds) << KA_STR_BUILD_CANCELLED_BY_USER_SUFFIX;
-                }
-                else
-                {
-                    buildCanceledMsg << KA_STR_BUILD_CANCELLED_BY_USER_NO_SKIPPED;
-                }
-
-                backendMessageCallback(buildCanceledMsg.str());
-                m_owner.readLog();
-            }
-            else
-            {
-                gtASCIIString message;
-                message.appendFormattedString(KA_STR_BUILD_COMPLETED_PREFIX, numOfBuildsOverall);
-                message.appendFormattedString("%d succeeded, %d failed", numOfSuccessfulBuilds, (numOfBuildsOverall - numOfSuccessfulBuilds));
-                message.appendFormattedString("%s", KA_STR_BUILD_COMPLETED_SUFFIX);
-                backendMessageCallback(message.asCharArray());
-                m_owner.readLog();
-            }
-        }
-    }
 }
 
 
@@ -2066,7 +1972,6 @@ void kaBackendManager::BuildThread::run()
 bool kaBackendManager::BuildThread::LaunchDxBuild(const gtString& buildOutputDir)
 {
     bool result = true;
-    const gtString isaFileName;
     int  numOfSuccessfulBuilds(0);
     const auto& ids = m_pCurrentProgram->GetFileIDsVector();
     gtList<kaSourceFile*>  sourceFiles = KA_PROJECT_DATA_MGR_INSTANCE.GetSourceFilesByIds(ids);
@@ -2263,13 +2168,10 @@ void kaBackendManager::PrepareProgramBuildInner(kaProgram* pProgram, const Build
                     delete programBuildType.first;
                 }
             }
-            
         }
         ));
     }//if m_executionThread == nullptr
 }
-
-
 
 void kaBackendManager::ExecuteBuildThread(const BuildType buildType, kaProgram* pProgram)
 {

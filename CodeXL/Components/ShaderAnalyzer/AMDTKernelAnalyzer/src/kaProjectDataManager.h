@@ -205,7 +205,7 @@ public:
     kaSourceFile* dataFileByPath(const osFilePath& iFilePath);
 
     kaSourceFile* AddFileOnProjectLoad(const osFilePath& iFilePath);
-    bool removeFile(osFilePath& iFilePath);
+    bool removeFile(const osFilePath& iFilePath);
 
     /// Rename the file path from oldFilePath to newFilePath:
     /// \param oldFilePath the old file path

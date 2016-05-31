@@ -56,7 +56,8 @@ QString kaUtils::GetKernelNameFromPath(const osFilePath& identifyFilePath)
                 {
                     currentFilePath.clear();
                     KA_PROJECT_DATA_MGR_INSTANCE.GetFilePathByID(fileRefsVec[nRef], currentFilePath);
-                    gtString fileName;
+                    //clear variable
+                    fileName.makeEmpty();
                     currentFilePath.getFileName(fileName);
                     int fileNamePos = kernelName.reverseFind(fileName);
 

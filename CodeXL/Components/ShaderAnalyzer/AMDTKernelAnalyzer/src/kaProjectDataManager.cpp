@@ -489,10 +489,9 @@ kaSourceFile* kaProjectDataManager::AddFileOnProjectLoad(const osFilePath& iFile
 // Author:      Gilad Yarnitzky
 // Date:        22/8/2013
 // ---------------------------------------------------------------------------
-bool kaProjectDataManager::removeFile(osFilePath& iFilePath)
+bool kaProjectDataManager::removeFile(const osFilePath& iFilePath)
 {
     bool retVal = false;
-
 
     size_t  id = m_sourceFileManager->GetFileId(iFilePath);
     retVal = m_sourceFileManager->Remove(id);
