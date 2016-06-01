@@ -187,7 +187,7 @@ commonsrc_files = Split(
 if (GPUProf_env['CXL_hsa'] == 'true'):
     commonsrc_files += \
     [
-        buildDirPath + "/Src/HSAUtils/HSAUtils.cpp",
+        buildDirPath + '/HSAUtils/HSAUtils.cpp',
         buildDirPath + '/DynamicLibraryModule/HSAModule.cpp'
     ]
 
