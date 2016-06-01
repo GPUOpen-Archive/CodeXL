@@ -37,6 +37,13 @@ AMDTUInt8* g_pSharedBuffer = nullptr;
 #define POWER_DRIVER_IN InvokeIn
 #define POWER_DRIVER_OUT InvokeOut
 #define POWER_DRIVER_IN_OUT InvokeInOut
+
+#if defined(WIN64)
+    #define CODEXL_PPLIB_NAME  L"CXLPowerProfileAPI-x64"        GDT_DEBUG_SUFFIX_W  GDT_BUILD_SUFFIX_W
+#else
+    #define CODEXL_PPLIB_NAME  L"CXLPowerProfileAPI"    GDT_DEBUG_SUFFIX_W  GDT_BUILD_SUFFIX_W
+#endif
+
 static HANDLE g_powerDrvHld = INVALID_HANDLE_VALUE;
 
 static wchar_t g_drvPath[OS_MAX_PATH + 1];
@@ -505,5 +512,29 @@ AMDTResult PrepareInitialProcessList(list<ProcessName>& list)
 
     //    ret = (true == InitializeTaskInfo()) ? AMDT_STATUS_OK : AMDT_ERROR_FAIL;
     return ret;
+}
+
+// EnableSmu: Enable Smu features
+bool EnableSmu(bool activate)
+{
+    bool retVal = false;
+    typedef bool (* fpSmuActivate)(bool);
+    fpSmuActivate fnSmuActivate;
+    gtString ppLibName(CODEXL_PPLIB_NAME);
+
+    fnSmuActivate = (fpSmuActivate) GetProcAddress(GetModuleHandle(TEXT(ppLibName.asASCIICharArray())), "AMDTPwrActivateSmu");
+
+    if (nullptr != fnSmuActivate)
+    {
+        retVal = fnSmuActivate(activate);
+    }
+
+    return retVal;
+}
+
+// PwrApiCleanUp: Cleaning up Apis in case of unexpected abort
+bool PwrApiCleanUp(void)
+{
+    return EnableSmu(false);
 }
 

@@ -25,6 +25,7 @@
     #include <TaskInfoInterface.h>
     #include <CpuProfilingTranslationDLLBuild.h>
     #include <AMDTDriverControl/inc/DriverControl.h>
+    typedef bool (*fpSmuActivate)(bool);
 #endif
 
 enum DriverCommandType
@@ -104,6 +105,10 @@ AMDTResult PrepareInitialProcessList(list<ProcessName>& list);
 
 // GetProcessNameFromPid: Get process name from a given PID
 bool GetProcessNameFromPid(AMDTPwrProcessInfo* pInfo);
+// EnableSmu: Activate Smu feature
+bool EnableSmu(bool activate);
 
+// PwrApiCleanUp: Cleaning up Apis in case of unexpected abort
+bool PwrApiCleanUp(void);
 
 #endif //_POWERPROFILEDRIVERINTERFACE_H_

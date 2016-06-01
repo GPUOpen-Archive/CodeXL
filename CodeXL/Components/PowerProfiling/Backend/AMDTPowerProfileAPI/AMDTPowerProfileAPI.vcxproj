@@ -38,7 +38,7 @@
   </ImportGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>..\AMDTPowerProfilingDrivers\Windows\inc\;..\AMDTPowerProfilingDrivers\inc\;..\inc;..\..\..\..\..\Common\Src\AMDTCommonHeaders\;.\inc;..\..\..\CpuProfiling\Backend\AMDTCpuProfilingTranslation\inc;..\..\..\CpuProfiling\Backend\AMDTCpuProfilingTranslation\inc\Windows;..\..\..\CpuProfiling\Backend;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\AMDTPowerProfilingDrivers\Windows\inc\;..\AMDTPowerProfilingDrivers\inc\;..\inc;..\..\..\..\..\Common\Src\AMDTCommonHeaders\;.\inc;..\..\..\CpuProfiling\Backend\AMDTCpuProfilingTranslation\inc;..\..\..\CpuProfiling\Backend\AMDTCpuProfilingTranslation\inc\Windows;..\..\..\CpuProfiling\Backend;.\Non-OpenSource;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -57,6 +57,8 @@
     <ResourceCompile Include="$(CommonProjectsDir)\VersionInfo\VersionResource.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Condition="'$(GDT_BUILD)'=='GDT_INTERNAL'" Include="Non-OpenSource\AMDTPowerProfileApi-Internal.cpp" />
+    <ClCompile Condition="'$(GDT_BUILD)'=='GDT_NDA'" Include="Non-OpenSource\AMDTPowerProfileApi-Internal.cpp" />
     <ClCompile Include="src\AMDTHistogram.cpp" />
     <ClCompile Include="src\AMDTPowerProfileApi.cpp" />
     <ClCompile Include="src\AMDTPowerProfileControl.cpp" />

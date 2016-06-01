@@ -52,6 +52,7 @@ PciPortAddress  g_activePciPortList[PLATFORM_SMU_CNT + 2 ];
 
 static AMDTPwrApuPstateList g_pStateInfo;
 
+static bool g_smuRestore = false;
 bool GetAvailableSmuList(SmuList* pList);
 
 // Basic Counters- Sample id, record-id, timestamp
@@ -816,6 +817,11 @@ AMDTResult PwrStopProfiling()
         ret = GetPowerDriverClientId(&clientId);
     }
 
+    if (g_smuRestore)
+    {
+        EnableSmu(false);
+        g_smuRestore = false;
+    }
 
     if (AMDT_STATUS_OK == ret)
     {
@@ -1592,6 +1598,17 @@ bool GetAvailableSmuList(SmuList* pList)
                                             || (GDT_SPECTRE_LITE == pDevInfo->m_hardwareType))
                                         {
                                             apuSmuFeature = IsSMUFeatureEnabled();
+
+                                            if (false == apuSmuFeature)
+                                            {
+                                                apuSmuFeature = EnableSmu(true);
+                                                PwrTrace("Trying to actiavte SMU status:%s", apuSmuFeature ? "Success" : "Fail");
+
+                                                if (apuSmuFeature)
+                                                {
+                                                    g_smuRestore = true;
+                                                }
+                                            }
                                         }
                                     }
 

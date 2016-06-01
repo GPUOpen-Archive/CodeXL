@@ -2012,9 +2012,12 @@ AMDTResult PowerProfileTranslate::PwrGetProfileData(CXLContextProfileType type, 
             m_processList.push_back(process);
         }
 
-        *pPower = totalPower;
-        *pData = &m_processList[0];
-        *pCnt = static_cast<AMDTUInt32>(m_processList.size());
+        if (m_processList.size() > 0)
+        {
+            *pPower = totalPower;
+            *pData = &m_processList[0];
+            *pCnt = static_cast<AMDTUInt32>(m_processList.size());
+        }
     }
 
 
@@ -2061,9 +2064,12 @@ AMDTResult PowerProfileTranslate::PwrGetProfileData(CXLContextProfileType type, 
             }
         }
 
-        *pPower = totalPower;
-        *pData = &m_moduleList[0];
-        *pCnt = static_cast<AMDTUInt32>(m_moduleList.size());
+        if (m_moduleList.size() > 0)
+        {
+            *pPower = totalPower;
+            *pData = &m_moduleList[0];
+            *pCnt = static_cast<AMDTUInt32>(m_moduleList.size());
+        }
     }
 
     if (*pCnt == 0)
