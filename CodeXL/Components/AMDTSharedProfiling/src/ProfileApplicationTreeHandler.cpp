@@ -2057,7 +2057,7 @@ afApplicationTreeItemData* ProfileApplicationTreeHandler::FindSessionChildItemDa
                     {
                         afApplicationTreeItemData* pGrandChildData = m_pApplicationTree->getTreeItemData(pChildData->m_pTreeWidgetItem->child(j));
 
-                        if (nullptr != pChildData)
+                        if (nullptr != pGrandChildData)
                         {
                             if (pGrandChildData->m_itemType == childItemType)
                             {

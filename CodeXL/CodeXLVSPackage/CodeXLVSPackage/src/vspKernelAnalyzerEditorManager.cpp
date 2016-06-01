@@ -234,7 +234,7 @@ bool vspKernelAnalyzerEditorManager::activateItemInVS(QTreeWidgetItem* pItemToAc
                 basePath = pActivatedItemData->m_filePath;
                 retVal = true;
             }
-
+            break;
             case AF_TREE_ITEM_KA_OVERVIEW:
             case AF_TREE_ITEM_KA_STATISTICS:
             case AF_TREE_ITEM_KA_ANALYSIS:

@@ -168,6 +168,7 @@ struct ThreadInfoKey
     {
         this->processID = other.processID;
         this->threadID = other.threadID;
+		return *this;
     }
 };
 

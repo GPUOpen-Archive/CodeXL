@@ -88,7 +88,7 @@ wstring StringUtils::ToLowerW(const wstring& str)
 string StringUtils::FormatString(const char* pFmt, ...)
 {
     static const unsigned int MAX_FORMAT_STRING_LEN = 32768;
-    char str[MAX_FORMAT_STRING_LEN];
+    char str[MAX_FORMAT_STRING_LEN] = "";
     va_list arg_ptr;
 
     va_start(arg_ptr, pFmt);

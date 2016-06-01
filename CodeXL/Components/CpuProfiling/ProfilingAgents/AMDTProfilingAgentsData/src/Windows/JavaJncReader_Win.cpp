@@ -1165,7 +1165,10 @@ JavaJncReader::GetOffsetLines(wstring funcName)
         {
             if (m_jncMethodMap[it->second->methods[i]].name.empty())
             {
-                fprintf(debugFP, "Empty methods name..\n");
+                if (debugFP != nullptr)
+                {
+                    fprintf(debugFP, "Empty methods name..\n");
+                }
                 continue;
             }
 

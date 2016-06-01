@@ -17,7 +17,7 @@ void DeepCopyBuffer(void** dst, const void* src, size_t size)
         }
         else
         {
-            (*dst) = new(std::nothrow) char[size];
+            (*dst) = new(std::nothrow) char[size]();
             memcpy(*dst, src, size);
         }
     }

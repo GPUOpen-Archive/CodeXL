@@ -125,7 +125,7 @@ bool KernelAssembly::GetProgramBinary(cl_program     program,
             else
             {
                 ppBinaries[i] = new(std::nothrow) char[pBinarySizes[i]];
-                SpAssertRet(ppBinaries != NULL) false;
+                SpAssertRet(ppBinaries[i] != NULL) false;
             }
         }
         else

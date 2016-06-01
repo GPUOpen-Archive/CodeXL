@@ -308,7 +308,7 @@ bool gdThumbnailView::addPBufferContentToThumbnailView(const afApplicationTreeIt
                         if (pViewerItem->m_itemType == AF_TREE_ITEM_GL_PBUFFER_STATIC_BUFFER)
                         {
                             gdDebugApplicationTreeData* pGDViewerItem = qobject_cast<gdDebugApplicationTreeData*>(pViewerItem->extendedItemData());
-                            GT_IF_WITH_ASSERT(pGDData != NULL)
+                            GT_IF_WITH_ASSERT(pGDViewerItem != NULL)
                             {
                                 // Does item belong to our PBuffer?
                                 if (pGDViewerItem->_objectOpenGLName == (unsigned int)pbufferID)

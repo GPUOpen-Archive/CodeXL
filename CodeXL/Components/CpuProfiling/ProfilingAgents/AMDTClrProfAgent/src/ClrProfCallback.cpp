@@ -1637,8 +1637,8 @@ bool ClrProfCallBack::GetClassNameFromClassId(ClassID classId, LPWSTR wszClass, 
 
 bool ClrProfCallBack::GetInititializationParameters()
 {
-    wchar_t szProfilerOptions[256];
-    wchar_t tempDirName[FILENAME_MAX];
+    wchar_t szProfilerOptions[256] = L"";
+    wchar_t tempDirName[FILENAME_MAX] = L"";
     HKEY temp_key;
     HRESULT hr;
 

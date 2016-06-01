@@ -348,8 +348,8 @@ bool SendServerStatusMessageAsXML(GRAPHICS_SERVER_STATE eServerState, NetSocket*
 bool SendServerStatusMessageAsHTML(GRAPHICS_SERVER_STATE eServerState, NetSocket* pClientSocket)
 {
     /// generate the error code html
-    static char headerBuffer[COMM_BUFFER_SIZE];
-    static char htmlBuffer[COMM_BUFFER_SIZE];
+    static char headerBuffer[COMM_BUFFER_SIZE] = "";
+    static char htmlBuffer[COMM_BUFFER_SIZE] = "";
 
     if (eServerState == GRAPHICS_SERVER_STATE_PROCESS_NOT_RUNNING)
     {

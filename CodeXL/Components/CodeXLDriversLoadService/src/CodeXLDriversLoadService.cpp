@@ -155,7 +155,7 @@ bool InitializePwrProfSharedObj()
     if (!gPwrProfSharedMapFile)
     {
         SECURITY_ATTRIBUTES secAttr;
-        char secDesc[ SECURITY_DESCRIPTOR_MIN_LENGTH ];
+        char secDesc[ SECURITY_DESCRIPTOR_MIN_LENGTH ] = "";
         secAttr.nLength = sizeof(secAttr);
         secAttr.bInheritHandle = FALSE;
         secAttr.lpSecurityDescriptor = &secDesc;
@@ -267,7 +267,7 @@ void WriteErrorLog(wchar_t* pMsg)
 #ifdef _DEBUG
     long nError = GetLastError();
     wchar_t pTemp[121];
-    swprintf(pTemp, 120, L"%s, error code = %d", pMsg, nError);
+    swprintf(pTemp, 120, L"%s, error code = %ld", pMsg, nError);
     WriteLog(pTemp);
 #else
     (void)(pMsg);

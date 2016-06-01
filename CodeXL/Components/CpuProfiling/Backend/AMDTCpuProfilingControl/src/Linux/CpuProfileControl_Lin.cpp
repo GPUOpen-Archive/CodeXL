@@ -1836,7 +1836,7 @@ HRESULT CpuPerfGetCountingEventCount(
     (void)(core); // unused
     gtUInt32 clientId = helpGetClientId();
     *pCount = 0;
-
+    //TODO refactor below always evaluates to true!
     if ((g_profileType[clientId] != PROFILE_TYPE_EVENT_COUNTING)
         || (g_profileType[clientId] != PROFILE_TYPE_PERF_EVENT_COUNTING))
     {

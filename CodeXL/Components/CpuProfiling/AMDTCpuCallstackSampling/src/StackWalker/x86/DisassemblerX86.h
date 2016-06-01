@@ -144,8 +144,8 @@ protected:
 
     unsigned m_dw0;
     unsigned m_dw1;
-    bool m_hasOperands; // b8 | dw2
-    unsigned m_opcode; // dw3
+    bool m_hasOperands = 0; // b8 | dw2
+    unsigned m_opcode = 0; // dw3
     gtUInt32 m_value; // dw4
     gtUInt32 m_register; // dw5
 

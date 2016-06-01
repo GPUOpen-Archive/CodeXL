@@ -107,26 +107,28 @@ void MdoUtil::DumpFileToDiskArray(
     const std::string& ext,
     UINT32             bytesPerRow)
 {
-    FILE* pFile = NULL;
+    FILE* pFile = nullptr;
     UINT32 bufSize = 0;
-    char* pBuffer = NULL;
+    char* pBuffer = nullptr;
 
     std::string fileName = path + name + "." + ext;
 
     fopen_s(&pFile, fileName.c_str(), "rb");
 
-    fseek(pFile, 0, SEEK_END);
-    bufSize = ftell(pFile);
-    rewind(pFile);
-
-    pBuffer = new char[bufSize];
-
-    fread(pBuffer, 1, bufSize, pFile);
-
-    DumpMemBufferToDiskArray(name.c_str(), path.c_str(), bytesPerRow, static_cast<char*>(pBuffer), bufSize);
-
-    fclose(pFile);
-
-    delete[] pBuffer;
-    pBuffer = NULL;
+    if (pFile != nullptr)
+    {
+        fseek(pFile, 0, SEEK_END);
+        bufSize = ftell(pFile);
+        rewind(pFile);
+    
+        pBuffer = new char[bufSize];
+    
+        fread(pBuffer, 1, bufSize, pFile);
+    
+        DumpMemBufferToDiskArray(name.c_str(), path.c_str(), bytesPerRow, static_cast<char*>(pBuffer), bufSize);
+    
+        fclose(pFile);
+        delete[] pBuffer;
+        pBuffer = nullptr;
+    }
 };

@@ -283,7 +283,7 @@ void CpuUtilization::InitUtilHeader()
 
     // get memory info
     MEMORYSTATUS ms;
-    memset(&ms, sizeof(MEMORYSTATUS), 0);
+    memset(&ms, 0, sizeof(MEMORYSTATUS));
     ms.dwLength = sizeof(MEMORYSTATUS);
     ::GlobalMemoryStatus(&ms);
     m_hdr.phy_memory = ms.dwTotalPhys;

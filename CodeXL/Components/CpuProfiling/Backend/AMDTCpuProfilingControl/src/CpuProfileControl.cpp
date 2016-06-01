@@ -642,7 +642,7 @@ HRESULT fnSetCountingEvent(
     if (core >= g_maxCore)
     {
         wchar_t buffer[65];
-        swprintf(buffer, 65, L"The core (%d) was not valid, the max is %d",
+        swprintf(buffer, 65, L"The core (%u) was not valid, the max is %u",
                  core, g_maxCore - 1);
         g_errorString[clientId] = buffer;
         return E_INVALIDARG;
@@ -682,7 +682,7 @@ HRESULT fnGetEventCount(
     if (core >= g_maxCore)
     {
         wchar_t buffer[65];
-        swprintf(buffer, 65, L"The core (%d) was not valid, the max is %d",
+        swprintf(buffer, 65, L"The core (%u) was not valid, the max is %u",
                  core, g_maxCore - 1);
         g_errorString[clientId] = buffer;
         return E_INVALIDARG;
@@ -731,7 +731,7 @@ HRESULT fnSetCountingConfiguration(
     if (g_maxEventConfigs < count)
     {
         wchar_t buffer[75];
-        swprintf(buffer, 75, L"The maximum number of EventConfigurations is %d",
+        swprintf(buffer, 75, L"The maximum number of EventConfigurations is %u",
                  g_maxEventConfigs);
         g_errorString[clientId] = buffer;
     }
@@ -803,7 +803,7 @@ HRESULT fnSetCountingConfiguration(
     if (g_maxEventConfigs < count)
     {
         wchar_t buffer[75];
-        swprintf(buffer, 75, L"The maximum number of EventConfigurations is %d",
+        swprintf(buffer, 75, L"The maximum number of EventConfigurations is %u",
                  g_maxEventConfigs);
         g_errorString[clientId] = buffer;
     }

@@ -587,7 +587,7 @@ HRESULT BasicHelper::GetFunctionProperties(ICorProfilerInfo* pPrfInfo,
                                                   NULL,
                                                   &classToken);
 
-                    if SUCCEEDED(hr)
+                    if (SUCCEEDED(hr))
                     {
                         if (classToken != mdTypeDefNil)
                         {

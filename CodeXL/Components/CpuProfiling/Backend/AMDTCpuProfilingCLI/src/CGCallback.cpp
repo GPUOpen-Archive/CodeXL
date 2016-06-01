@@ -49,7 +49,7 @@ bool SyncWithSymbolEngine(CpuProfileReader& profileReader, CpuProfileModule& mod
 {
     (void) profileReader; // unused
     bool retVal = true;
-    ExecutableFile* pEexecutable = NULL;
+    ExecutableFile* pEexecutable = nullptr;
 
     // TODO.. how to get the module path - use module path as exepath
     // we need to use the path provided by the user
@@ -57,7 +57,7 @@ bool SyncWithSymbolEngine(CpuProfileReader& profileReader, CpuProfileModule& mod
 
     pEexecutable = ExecutableFile::Open(exePath.asCharArray(), module.getBaseAddr());
 
-    if (NULL != *ppEexecutable)
+    if (ppEexecutable != nullptr && nullptr != *ppEexecutable)
     {
         // Initialize executable symbol engine:
         // TODO - how to fill these stuff from args
@@ -68,12 +68,12 @@ bool SyncWithSymbolEngine(CpuProfileReader& profileReader, CpuProfileModule& mod
         if (InitializeSymbolEngine(pEexecutable, searchPath, serverList, cachePath))
         {
             delete pEexecutable;
-            pEexecutable = NULL;
+            pEexecutable = nullptr;
         }
 
     }
 
-    if (NULL != pEexecutable)
+    if (nullptr != pEexecutable)
     {
         *ppEexecutable = pEexecutable;
         retVal = true;
