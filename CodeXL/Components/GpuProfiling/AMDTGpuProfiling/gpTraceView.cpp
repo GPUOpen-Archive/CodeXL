@@ -268,7 +268,7 @@ bool gpTraceView::DisplaySession(const osFilePath& sessionFilePath, afTreeItemTy
                 m_pSummaryTableTabWidget->Init(m_pSessionDataContainer, this, m_pTimeline->visibleStartTime(), m_pTimeline->visibleRange());
                 bool rc = connect(m_pSummaryTableTabWidget, SIGNAL(SummaryItemClicked(ProfileSessionDataItem*)), this, SLOT(OnSummaryItemClicked(ProfileSessionDataItem*)));
                 GT_ASSERT(rc);
-                rc = connect(m_pSummaryTableTabWidget, SIGNAL(SummaryCmdListClicked(const QString& )), m_pTimeline, SLOT(OnSummaryCmdListClicked(const QString&)));
+                rc = connect(m_pSummaryTableTabWidget, SIGNAL(SummaryCmdListDoubleClicked(const QString& )), m_pTimeline, SLOT(OnSummaryCmdListDoubleClicked(const QString&)));
                 GT_ASSERT(rc);
 
                 afApplicationCommands::instance()->EndPerformancePrintout("Summary");

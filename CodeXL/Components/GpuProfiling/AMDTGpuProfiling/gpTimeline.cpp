@@ -1135,7 +1135,7 @@ void gpTimeline::DrawTextInRect(QPainter& painter, const QRect& stringRect, cons
     painter.setPen(currentPen);
 }
 
-void gpTimeline::OnSummaryCmdListClicked(const QString& cmdList)
+void gpTimeline::OnSummaryCmdListDoubleClicked(const QString& cmdList)
 {
 
     QMap<QString, CommandListTimelineItem*>::iterator item = m_cmdListTimelineItemMap.find(cmdList);

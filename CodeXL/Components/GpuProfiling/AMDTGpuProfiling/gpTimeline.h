@@ -71,7 +71,7 @@ protected slots:
     void OnSetElementsNewWidth(int legendWidth, int timelineWidth);
 
     void OnVisibilityFilterChanged(QMap<QString, bool>& threadNameVisibilityMap);
-    void OnSummaryCmdListClicked(const QString& cmdList);
+    void OnSummaryCmdListDoubleClicked(const QString& cmdList);
 
 private:
 

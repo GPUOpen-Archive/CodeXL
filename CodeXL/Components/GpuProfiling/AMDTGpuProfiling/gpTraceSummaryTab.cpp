@@ -731,9 +731,9 @@ void gpCommandListSummaryTab::OnSummaryTableCellDoubleClicked(int row, int col)
         GT_ASSERT(pSummaryTable != nullptr);
 
         QString commandListName;
-        if (pSummaryTable->GetItemCommandList(row, commandListName))
+        if (pSummaryTable->GetItemCommandListAddress(row, commandListName))
         {
-            emit TabSummaryCmdListClicked(commandListName);
+            emit TabSummaryCmdListDoubleClicked(commandListName);
         }
     }
 }

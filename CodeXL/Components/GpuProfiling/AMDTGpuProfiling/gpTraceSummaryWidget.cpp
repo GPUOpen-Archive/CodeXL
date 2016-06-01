@@ -71,7 +71,7 @@ void gpTraceSummaryWidget::Init(gpTraceDataContainer* pDataContainer, gpTraceVie
         {
             gpCommandListSummaryTab* pCmdListTab = dynamic_cast<gpCommandListSummaryTab*>(m_tabs[i]);
             GT_ASSERT(pCmdListTab != nullptr);
-            rc = connect(pCmdListTab, SIGNAL(TabSummaryCmdListClicked(const QString&)), this, SLOT(OnTabSummaryCmdListClicked(const QString&)));
+            rc = connect(pCmdListTab, SIGNAL(TabSummaryCmdListDoubleClicked(const QString&)), this, SLOT(OnTabSummaryCmdListDoubleClicked(const QString&)));
             GT_ASSERT(rc);
         }
 
@@ -220,7 +220,7 @@ void gpTraceSummaryWidget::SelectCommandList(const QString& commandListName)
     }
 }
 
-void gpTraceSummaryWidget::OnTabSummaryCmdListClicked(const QString& cmdList)
+void gpTraceSummaryWidget::OnTabSummaryCmdListDoubleClicked(const QString& cmdList)
 {
-    emit SummaryCmdListClicked(cmdList);
+    emit SummaryCmdListDoubleClicked(cmdList);
 }

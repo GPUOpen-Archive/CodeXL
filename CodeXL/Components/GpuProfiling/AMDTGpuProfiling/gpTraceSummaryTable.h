@@ -310,6 +310,7 @@ public:
 
     /// Returns an item by table row index
     bool GetItemCommandList(int row, QString& callName)const;
+    bool GetItemCommandListAddress(int row, QString& callName)const;
     bool GetItemQueueName(int row, QString& queueName)const;
     void SelectCommandList(const QString& commandListName);
 

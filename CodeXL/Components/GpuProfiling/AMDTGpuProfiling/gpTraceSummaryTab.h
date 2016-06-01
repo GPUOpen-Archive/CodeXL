@@ -87,7 +87,7 @@ signals:
 
     void TabSummaryItemClicked(ProfileSessionDataItem* pItem);
 
-    void TabSummaryCmdListClicked(const QString& commandList);
+    void TabSummaryCmdListDoubleClicked(const QString& commandList);
 
 protected:
     /// Handles item selection in timeline and trace tables.

@@ -844,6 +844,19 @@ bool gpCommandListSummaryTable::GetItemCommandList(int row, QString& callName)co
     return false;
 }
 
+bool gpCommandListSummaryTable::GetItemCommandListAddress(int row, QString& address)const
+{
+    // Get the table widget item:
+    QTableWidgetItem* pItemInterface = item(row, COLUMN_ADDRESS);
+
+    if (pItemInterface != nullptr)
+    {
+        address = pItemInterface->text();
+        return true;
+    }
+    return false;
+}
+
 bool gpCommandListSummaryTable::GetItemQueueName(int row, QString& queueName)const
 {
     // Get the table widget item:
@@ -857,6 +870,7 @@ bool gpCommandListSummaryTable::GetItemQueueName(int row, QString& queueName)con
 
     return false;
 }
+
 void gpCommandListSummaryTable::OnCellEntered(int row, int column)
 {
     GT_UNREFERENCED_PARAMETER(row);
