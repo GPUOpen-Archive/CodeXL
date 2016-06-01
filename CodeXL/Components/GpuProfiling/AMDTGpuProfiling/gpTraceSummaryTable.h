@@ -249,12 +249,6 @@ private:
     /// Determines whether the table handles API or GPU items
     eCallType m_callType;
 
-    /// The session data container
-    gpTraceDataContainer* m_pSessionDataContainer;
-
-    /// A pointer to the parent session view
-    gpTraceView* m_pTraceView;
-
     /// Map containing UI information for each of the API calls. Each key may have multiple items
     QMap<CallIndexId, ProfileSessionDataItem*> m_allCallItemsMultiMap;
 
@@ -338,13 +332,6 @@ private:
 
     APISummaryCommandListInfo GetSummaryInfo(const QString& callName);
 
-    /// The session data container
-    gpTraceDataContainer* m_pSessionDataContainer;
-
-    /// A pointer to the parent session view
-    gpTraceView* m_pTraceView;
-
-    int m_lastSelectedRowIndex;
     QMap<QString, APISummaryCommandListInfo> m_allInfoSummaryMap;
     QMap<QString, APISummaryCommandListInfo> m_apiCallInfoSummaryMap;
 

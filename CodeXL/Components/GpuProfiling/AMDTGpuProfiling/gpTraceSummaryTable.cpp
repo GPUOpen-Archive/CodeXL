@@ -583,7 +583,7 @@ void gpTraceSummaryTable::Cleanup()
 
 /////////////////////////////////////////////////////////////////////////////////
 gpCommandListSummaryTable::gpCommandListSummaryTable(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView, quint64 timelineAbsoluteStart)
-    : gpSummaryTable(pDataContainer, pSessionView, (eCallType)3, timelineAbsoluteStart), m_pSessionDataContainer(pDataContainer), m_pTraceView(pSessionView), m_lastSelectedRowIndex(-1)
+    : gpSummaryTable(pDataContainer, pSessionView, (eCallType)3, timelineAbsoluteStart)
 {
     m_pSessionDataContainer = pDataContainer;
     bool isDx12 = (pDataContainer != nullptr && pDataContainer->SessionAPIType() == ProfileSessionDataItem::ProfileItemAPIType::DX12_API_PROFILE_ITEM);
