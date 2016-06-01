@@ -85,7 +85,7 @@ ParserSIMIMG::GetOpSIMIMG(Instruction::instruction64bit hexInstruction, Instruct
         instKind = Instruction::Atomics;
     }
 
-    if ((op > SIMIMGInstruction::IMAGE_LOAD_MIP_PCK_SGN && op < SIMIMGInstruction::IMAGE_STORE)
+    if ((op > SIMIMGInstruction::IMAGE_LOAD_MIP_PCK_SGN && op < SIMIMGInstruction::IMAGE_STORE) //TODO refactor this is always false!!!
         || (op > SIMIMGInstruction::IMAGE_STORE_MIP_PCK && op < SIMIMGInstruction::IMAGE_GET_RESINFO)
         || (op > SIMIMGInstruction::IMAGE_GATHER4_C_CL && op < SIMIMGInstruction::IMAGE_GATHER4_C_L)
         || (op > SIMIMGInstruction::IMAGE_GATHER4_CL_O && op < SIMIMGInstruction::IMAGE_GATHER4_L_O)

@@ -70,11 +70,7 @@ private:
     }
 
     /// assignment operator made private; Prevent making copies of this object
-    NamedSemaphore& operator= (const NamedSemaphore& rhs)
-    {
-        PS_UNREFERENCED_PARAMETER(rhs);
-        return *this;
-    }
+    NamedSemaphore& operator= (const NamedSemaphore& rhs) = delete;
 
     /// pointer to implementation. Dependent on platform
     NamedSemaphoreImpl*   m_pImpl;

@@ -521,10 +521,9 @@ bool GetRequiredBufferLength(CoreData* pCfg, uint32* pLength)
                 }
             }
         }
-    }
-
-    *pLength = bufferLen;
-
+   
+        *pLength = bufferLen;
+	}
     return true;
 }
 

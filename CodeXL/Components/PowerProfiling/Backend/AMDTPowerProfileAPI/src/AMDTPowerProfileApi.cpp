@@ -548,7 +548,7 @@ AMDTPwrDevice* AllocateDevice(AMDTUInt32* usedCnt)
 
     dev->m_isAccessible = false;
 
-    return (nullptr != dev) ? dev : nullptr;
+    return  dev;
 }
 #define DGPU_AGGREGATED_COUNTER_OFFSET 7
 // FillCounterDetails: Populate the counter details
@@ -2312,8 +2312,8 @@ AMDTResult AMDTPwrSetTimerSamplingPeriod(AMDTUInt32 interval)
 AMDTResult AMDTPwrSetProfileDataFile(const char* pFilePath, AMDTUInt32 len)
 {
     AMDTResult ret = AMDT_STATUS_OK;
-    pFilePath = pFilePath;
-    (void)len;
+    GT_UNREFERENCED_PARAMETER(pFilePath);
+    GT_UNREFERENCED_PARAMETER(len);
     return ret;
 }
 

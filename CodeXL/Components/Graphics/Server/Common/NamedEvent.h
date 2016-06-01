@@ -86,17 +86,10 @@ public:
 
 private:
     /// copy constructor made private; Prevent making copies of this object
-    NamedEvent(const NamedEvent& rhs)
-    {
-        PS_UNREFERENCED_PARAMETER(rhs);
-    }
+    NamedEvent(const NamedEvent& rhs) = delete;
 
     /// assignment operator made private; Prevent making copies of this object
-    NamedEvent& operator= (const NamedEvent& rhs)
-    {
-        PS_UNREFERENCED_PARAMETER(rhs);
-        return *this;
-    }
+    NamedEvent& operator= (const NamedEvent& rhs) = delete;
 
     /// pointer to implementation. Dependent on platform
     NamedEventImpl*   m_pImpl;

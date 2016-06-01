@@ -83,16 +83,15 @@ AMDTResult RawDataReader::ReleaseBufferList()
         for (cnt = 0; cnt < m_bufferCnt; cnt++)
         {
             RawBufferInfo* list = m_pBufferList + cnt;
-            list->ulvalidLength = 0;
-
-            if (NULL != list)
+			if (nullptr != list)
             {
+                list->ulvalidLength = 0;
                 AMDTUInt8* pMem = (AMDTUInt8*)(list->uliBuffer.QuadPart);
 
-                if (NULL != pMem)
+                if (nullptr != pMem)
                 {
                     free(pMem);
-                    pMem = NULL;
+                    pMem = nullptr;
                 }
             }
         }

@@ -2148,7 +2148,7 @@ void kaApplicationTreeHandler::OnRename()
             kaTreeDataExtension* pKAData = qobject_cast<kaTreeDataExtension*>(pSelectedItemData->extendedItemData());
             QTreeWidgetItem* pSelectedItem = pSelectedItemData->m_pTreeWidgetItem;
 
-            if ((pSelectedItemData != nullptr) && (pKAData != nullptr) && (pSelectedItem != nullptr))
+            if (pKAData != nullptr && pSelectedItem != nullptr)
             {
                 // This slot can be accessed using the F2 shortcut key. We should not allow renaming of objects that cannot be renamed.
                 // We only allow rename of file items, and file references.

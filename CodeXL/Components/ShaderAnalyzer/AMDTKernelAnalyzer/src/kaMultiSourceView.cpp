@@ -1103,7 +1103,7 @@ void kaMultiSourceView::TabCloseRequestedHandler(int index)
             {
                 kaMultiSourceTabData* pTabData = (*tabDataIterator).second;
 
-                if (pTabData->m_pILSourceView == m_pFindSourceCodeView /*|| pTabData->m_ISASourceView == m_pFindSourceCodeView*/)
+                if (nullptr != pTabData && pTabData->m_pILSourceView == m_pFindSourceCodeView /*|| pTabData->m_ISASourceView == m_pFindSourceCodeView*/)
                 {
                     m_pFindSourceCodeView = nullptr;
                 }

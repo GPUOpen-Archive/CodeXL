@@ -295,7 +295,7 @@ bool HookVtableImmediate::TrueRemoveAndDetach(IUnknown* pObject, char* strLayer)
 #ifdef USE_STREAMLOG
     StreamLog::Ref() << "RemoveAndDetach: For Object:" << pObject << "\n";
 #endif
-
+//TODO refactor this :  if can't be true since see above line : VTABLE vtable = *(VTABLE*) pObject;
     if (pObject == nullptr)
     {
         Log(logERROR, "HookVtableImmediate::RemoveAndDetach pObj is 0x%p\n", pObject);
@@ -382,7 +382,7 @@ ULONG HookVtableImmediate::ObjectRealRelease(IUnknown* pObject)
 #ifdef USE_STREAMLOG
     StreamLog::Ref() << "RemoveAndDetach: For Object:" << pObject << "\n";
 #endif
-
+//TODO refactor this :  if can't be true since see above line : VTABLE vtable = *(VTABLE*) pObject;
     if (pObject == nullptr)
     {
         Log(logERROR, "HookVtableImmediate::RemoveAndDetach pObj is 0x%p\n", pObject);
@@ -465,7 +465,7 @@ ULONG HookVtableImmediate::RemoveAndDetach(IUnknown* pObject, char* strLayer)
 #ifdef USE_STREAMLOG
     StreamLog::Ref() << "RemoveAndDetach: For Object:" << pObject << "\n";
 #endif
-
+//TODO refactor this :  if can't be true since see above line : VTABLE vtable = *(VTABLE*) pObject;
     if (pObject == nullptr)
     {
         Log(logERROR, "HookVtableImmediate::RemoveAndDetach pObj is 0x%p\n", pObject);

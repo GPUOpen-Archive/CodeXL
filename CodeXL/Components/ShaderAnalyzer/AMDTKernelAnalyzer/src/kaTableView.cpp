@@ -354,7 +354,8 @@ QColor kaTableView::findColorForCell(int row, int column)
 
             if (m_amountOfColsPerDevice > 1)
             {
-                if ((deviceId / m_amountOfColsPerDevice % 2 == 0) || (deviceId / m_amountOfColsPerDevice % 2 == 2))
+                //TODO refactor : deviceId / m_amountOfColsPerDevice % 2 == 2 always false!!!! 
+				if ((deviceId / m_amountOfColsPerDevice % 2 == 0) || (deviceId / m_amountOfColsPerDevice % 2 == 2))
                 {
                     retVal = evenFamily ? m_a1Color : m_b2Color;
                 }

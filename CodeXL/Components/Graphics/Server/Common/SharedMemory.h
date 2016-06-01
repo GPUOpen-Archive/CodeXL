@@ -82,11 +82,7 @@ private:
     }
 
     /// assignment operator made private; Prevent making copies of this object
-    SharedMemory& operator= (const SharedMemory& rhs)
-    {
-        PS_UNREFERENCED_PARAMETER(rhs);
-        return *this;
-    }
+    SharedMemory& operator= (const SharedMemory& rhs) = delete;
 
     /// pointer to implementation. Dependent on platform
     SharedMemoryImpl*   m_pImpl;

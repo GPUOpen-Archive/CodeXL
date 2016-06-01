@@ -370,11 +370,9 @@ AMDTResult CommandPowerDriver(DriverCommandType cmdType,
 {
     AMDTInt32 ret = AMDT_STATUS_OK;
 
-    // To avoid compiler warning
-    // using un-used variable
-    cmdType = cmdType;
+    GT_UNREFERENCED_PARAMETER(cmdType);
     inLen++;
-    pOutData = pOutData;
+    GT_UNREFERENCED_PARAMETER(pOutData);
     outlen++;
     pResult = pResult;
 

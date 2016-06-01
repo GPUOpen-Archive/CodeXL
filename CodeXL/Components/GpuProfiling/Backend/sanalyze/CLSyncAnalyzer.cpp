@@ -225,12 +225,9 @@ void CLSyncAnalyzer::FlattenedAPIAnalyze(APIInfo* pAPIInfo)
 
                             // A sync may be required between CPU read and GPU command,
                             // else, add dependency to previous node in the command queue
-                            if (pPreNode != NULL)
-                            {
-                                CLDependencyEdge* pImplicitEdge = new(nothrow)CLDependencyEdge(pPreNode->m_pObj, ET_Implicit);
-                                CHECK_NULL_RET(pImplicitEdge)
-                                pNewNode->m_dependencyList.push_back(pImplicitEdge);
-                            }
+                            CLDependencyEdge* pImplicitEdge = new(nothrow)CLDependencyEdge(pPreNode->m_pObj, ET_Implicit);
+                            CHECK_NULL_RET(pImplicitEdge)
+                            pNewNode->m_dependencyList.push_back(pImplicitEdge);
                         }
                     }
 

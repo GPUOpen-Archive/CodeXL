@@ -74,11 +74,7 @@ private:
     }
 
     /// assignment operator made private; Prevent making copies of this object
-    NamedMutex& operator= (const NamedMutex& rhs)
-    {
-        PS_UNREFERENCED_PARAMETER(rhs);
-        return *this;
-    }
+    NamedMutex& operator= (const NamedMutex& rhs) = delete;
 
     /// pointer to implementation. Dependent on platform
     NamedMutexImpl*   m_pImpl;

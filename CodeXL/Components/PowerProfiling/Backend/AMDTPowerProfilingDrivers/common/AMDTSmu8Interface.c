@@ -104,25 +104,21 @@ bool ConfigureCounterTable(Smu8Interface* pSmu)
     uint32 version = 0;
 
     listCnt = sizeof(CounterTableOffsetList) / sizeof(CounterTableInfo);
-
-    //Set the default table;
-    pSmu->m_tableBase = (uint64)&CounterTableOffsetList[0].m_table;
-
     if (NULL != pSmu)
     {
-        version = pSmu->m_tableVersion;
-    }
-
-    for (cnt = 0; cnt < listCnt; cnt++)
-    {
-        if (version == CounterTableOffsetList[cnt].m_versionId)
-        {
-            pSmu->m_tableBase = (uint64)&CounterTableOffsetList[cnt].m_table;
-            result = true;
-            break;
-        }
-    }
-
+       //Set the default table;
+       pSmu->m_tableBase = (uint64)&CounterTableOffsetList[0].m_table;
+       version = pSmu->m_tableVersion;
+       for (cnt = 0; cnt < listCnt; cnt++)
+       {
+           if (version == CounterTableOffsetList[cnt].m_versionId)
+           {
+               pSmu->m_tableBase = (uint64)&CounterTableOffsetList[cnt].m_table;
+               result = true;
+               break;
+           }
+       }
+	}
     return result;
 }
 

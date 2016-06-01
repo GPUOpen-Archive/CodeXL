@@ -450,7 +450,7 @@ long GetConstantsFromCode(gtASCIIString code, gtASCIIString cKey, std::list<unsi
         // comment
         gtASCIIString sToken = (nNextToken == std::string::npos) ? code.substr(nStartOfToken) : code.substr(nStartOfToken, nNextToken - nStartOfToken);
 
-        if (sToken.length() > 1 && sToken.substr(0, 1) != "//")      // Skip comments and empty strings
+        if (sToken.length() > 1 && sToken.substr(0, 2) != "//")      // Skip comments and empty strings
         {
             unsigned int nStartOfInstruction = (unsigned int)sToken.find_first_not_of(" \n", 0);      // comment
             unsigned int nEndOfInstruction = (unsigned int)sToken.find(' ', nStartOfInstruction);

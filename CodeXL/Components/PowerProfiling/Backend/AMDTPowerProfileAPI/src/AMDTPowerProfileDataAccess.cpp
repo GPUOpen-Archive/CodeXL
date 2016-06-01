@@ -49,7 +49,7 @@ void DriverDataMonitor(DriverSignalInfo* pInfo)
 //AMDTPwrOpenOnlineDataAccess:
 AMDTResult AMDTPwrOpenOnlineDataAccess(void* pParam)
 {
-    pParam = pParam;
+    GT_UNREFERENCED_PARAMETER(pParam);
 
     AMDTUInt32 ret = AMDT_STATUS_OK;
     AMDTUInt64 flag = 0x01; //To indicate online
@@ -87,7 +87,7 @@ AMDTResult AMDTPwrOpenOnlineDataAccess(void* pParam)
 AMDTResult AMDTPwrOpenOfflineDataAccess(
     /*in*/ const wchar_t* pFileName)
 {
-    pFileName = pFileName;
+    GT_UNREFERENCED_PARAMETER(pFileName);
 
     int ret = AMDT_STATUS_OK;
 

@@ -608,7 +608,7 @@ NTSTATUS IoctlStartProfilerHandler(IN PPWRPROF_DEV_EXTENSION pDevExt,
         //intialize profile values
         pClient->m_profileState |= STATE_PROFILING;
     }
-
+//TODO remove this dead code!!!
     if (STATUS_SUCCESS == ret)
     {
         if (STATUS_SUCCESS != ret)
