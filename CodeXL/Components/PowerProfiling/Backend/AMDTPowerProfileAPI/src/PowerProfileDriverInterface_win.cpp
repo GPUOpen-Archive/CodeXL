@@ -518,7 +518,6 @@ AMDTResult PrepareInitialProcessList(list<ProcessName>& list)
 bool EnableSmu(bool activate)
 {
     bool retVal = false;
-    typedef bool (* fpSmuActivate)(bool);
     fpSmuActivate fnSmuActivate;
     gtString ppLibName(CODEXL_PPLIB_NAME);
 

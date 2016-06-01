@@ -526,6 +526,6 @@ bool EnableSmu(bool activate)
 // PwrApiCleanUp: Cleaning up Apis in case of unexpected abort
 bool PwrApiCleanUp(void)
 {
-    return EnableSmu(false)
+    return EnableSmu(false);
 }
 

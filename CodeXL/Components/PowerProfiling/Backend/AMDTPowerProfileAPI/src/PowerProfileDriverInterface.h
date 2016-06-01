@@ -20,12 +20,12 @@
 #define AMDT_PWR_STR_SYSTEM "System"
 #define ERROR_READING_PROCESS_NAME "Unknown process"
 #define ERROR_READING_PROCESS_PATH "Unable to read path"
+typedef bool (* fpSmuActivate)(bool);
 
 #ifndef _LINUX
     #include <TaskInfoInterface.h>
     #include <CpuProfilingTranslationDLLBuild.h>
     #include <AMDTDriverControl/inc/DriverControl.h>
-    typedef bool (*fpSmuActivate)(bool);
 #endif
 
 enum DriverCommandType
