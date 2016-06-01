@@ -36,4 +36,7 @@
 /// Since Vulkan does not provide function to calibrate CPU/GPU timestamp, do it ourselves manually.
 #define MANUAL_TIMESTAMP_CALIBRATION         1
 
+/// Specify how old static profiler memory may get before our worker code releases it.
+#define DEFERRED_RELEASE_FRAME_COUNT         8
+
 #endif // __VKT_DEFINES_H__

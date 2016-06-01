@@ -43,6 +43,8 @@ VktWrappedCmdBuf::VktWrappedCmdBuf(const WrappedCmdBufCreateInfo& createInfo) :
 {
     memcpy(&m_createInfo, &createInfo, sizeof(m_createInfo));
 
+    m_originFrame = VktLayerManager::GetLayerManager()->GetFrameCount();
+
 #if MEASURE_WHOLE_CMD_BUFS
     m_pStaticProfiler = static_cast<VktCmdBufProfilerStatic*>(InitNewProfiler(PROFILER_TYPE_STATIC));
 #endif
@@ -223,6 +225,7 @@ ProfilerResultCode VktWrappedCmdBuf::GetStaticProfilerResults(UINT64 fillId, UIN
     }
 #else
     UNREFERENCED_PARAMETER(fillId);
+    UNREFERENCED_PARAMETER(profiledCallCount);
     UNREFERENCED_PARAMETER(outResults);
 #endif
 
@@ -279,6 +282,18 @@ void VktWrappedCmdBuf::FreeST()
 }
 
 //-----------------------------------------------------------------------------
+/// Add a profiler to our deletion queue for deferred deletion
+/// \param pProfiler The profiler to push for latter deletion.
+//-----------------------------------------------------------------------------
+void VktWrappedCmdBuf::QueueProfilerForDeletion(VktCmdBufProfiler* pProfiler)
+{
+    if (pProfiler != nullptr)
+    {
+        m_deletionQueue.push(pProfiler);
+    }
+}
+
+//-----------------------------------------------------------------------------
 /// Multi-threaded free ops.
 //-----------------------------------------------------------------------------
 void VktWrappedCmdBuf::FreeMT()
@@ -289,13 +304,13 @@ void VktWrappedCmdBuf::FreeMT()
 
     for (UINT i = 0; i < m_closedProfilers.size(); i++)
     {
-        m_deletionQueue.push(m_closedProfilers[i]);
+        QueueProfilerForDeletion(m_closedProfilers[i]);
     }
 
-    m_deletionQueue.push(m_pDynamicProfiler);
+    QueueProfilerForDeletion(m_pDynamicProfiler);
 
 #if MEASURE_WHOLE_CMD_BUFS
-    m_deletionQueue.push(m_pStaticProfiler);
+    QueueProfilerForDeletion(m_pStaticProfiler);
 #endif
 }
 

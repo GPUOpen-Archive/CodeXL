@@ -272,7 +272,7 @@ void VktFrameProfilerLayer::PreCall(FuncId funcId, VktWrappedCmdBuf* pWrappedCmd
             UINT64 nextSampleId = SetNextSampleId(pSampleInfo);
 
             ProfilerMeasurementId measurementId = {};
-            VktUtil::ConstructMeasurementInfo(funcId, nextSampleId, pWrappedCmdBuf, GetParentLayerManager()->GetFrameCount(), pWrappedCmdBuf->FillCount(), measurementId);
+            VktUtil::ConstructMeasurementInfo(funcId, nextSampleId, pWrappedCmdBuf, VktLayerManager::GetLayerManager()->GetFrameCount(), pWrappedCmdBuf->FillCount(), measurementId);
 
             ProfilerResultCode beginResult = pWrappedCmdBuf->BeginCmdMeasurement(&measurementId);
 
