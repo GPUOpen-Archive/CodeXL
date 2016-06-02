@@ -188,7 +188,7 @@ bool VKAtpFilePart::ParseSectionHeaderLine(const string& line)
     {
         retVal = true;
 
-        if (line == "//==GPU Trace==")
+        if (line.find("//==GPU Trace==") == 0)
         {
             // Switch to GPU trace
             m_currentParsedTraceType = GPU;
@@ -393,7 +393,6 @@ bool VKAtpFilePart::Parse(std::istream& in, std::string& outErrorMsg)
                     else
                     {
                         delete pAPIInfo;
-                        SpBreak("Failed parsing");
                     }
 
                     // Update the progress bar

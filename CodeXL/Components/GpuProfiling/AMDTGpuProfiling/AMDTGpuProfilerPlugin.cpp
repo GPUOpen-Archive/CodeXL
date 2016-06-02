@@ -116,7 +116,6 @@ void GpuProfilerPlugin::Initialize()
 
     afProjectManager::instance().registerProjectSettingsExtension(CounterSelectionSettingWindow::Instance());
 
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS    // Register the objects for the DX profile, if it is enabled
     // Create and register the project settings object:
     gpProjectSettingsExtension* pProjectSettingsExtension = new gpProjectSettingsExtension;
 
@@ -128,7 +127,6 @@ void GpuProfilerPlugin::Initialize()
 
     // Register the actions creator:
     afQtCreatorsManager::instance().registerActionExecutor(pActionsCreator);
-#endif
 }
 
 GpuProfilerSingletonsDelete::~GpuProfilerSingletonsDelete()

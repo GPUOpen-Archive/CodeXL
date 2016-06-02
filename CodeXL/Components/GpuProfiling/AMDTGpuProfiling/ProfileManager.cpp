@@ -208,10 +208,9 @@ void ProfileManager::SetupGPUProfiling()
     ProfileApplicationTreeHandler::instance()->registerSessionTypeTreeHandler(PM_profileTypeApplicationTrace, &gpTreeHandler::Instance());
     ProfileApplicationTreeHandler::instance()->registerSessionTypeTreeHandler(PM_profileTypePerformanceCounters, &gpTreeHandler::Instance());
 
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     afExecutionModeManager::instance().registerExecutionMode(m_pFrameAnalysisMode);
     afPluginConnectionManager::instance().registerRunModeManager(m_pFrameAnalysisMode);
-#endif
+
     // Add here the tree handler for the Frame Analysis registration.
     ProfileApplicationTreeHandler::instance()->registerSessionTypeTreeHandler(PM_profileTypeFrameAnalysis, &gpTreeHandler::Instance());
 
