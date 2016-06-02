@@ -115,6 +115,7 @@ private:
     bool resetDllDirectory();
     bool setDllDirectory(const osFilePath& dllDirectory, gtString* o_pOriginalValue = NULL);
     bool updateThreadsData();
+    bool getDebuggedThreadTopStackFrame(osThreadId threadId, osCallStack& callStack);
     bool makeThreadExecuteFunctionDirectly(const osThreadId& threadId, osProcedureAddress64 funcAddress);
     bool makeThreadExecuteFunctionInBreak(const osThreadId& threadId, osProcedureAddress64 funcAddress);
     bool waitForThreadFunctionExecution();

@@ -889,7 +889,7 @@ bool pdWin32ProcessDebugger::canMakeThreadExecuteFunction(const osThreadId& thre
     // (since we cannot make the wait end - we would need the wait handle for UnregisterWait(), and we would need
     // to restore the wait afterwards).
     osCallStack threadCallsStack;
-    bool rcStack = getDebuggedThreadCallStack(threadId, threadCallsStack, false);
+    bool rcStack = getDebuggedThreadTopStackFrame(threadId, threadCallsStack);
     GT_IF_WITH_ASSERT(rcStack && (threadCallsStack.amountOfStackFrames() > 0))
     {
         const osCallStackFrame* pThreadCallsStackTopFrame = threadCallsStack.stackFrame(0);
@@ -1367,6 +1367,46 @@ bool pdWin32ProcessDebugger::setDllDirectory(const osFilePath& dllDirectory, gtS
     return retVal;
 }
 
+// ---------------------------------------------------------------------------
+// Name:        pdWin32ProcessDebugger::getDebuggedThreadTopStackFrame
+// Description: Gets a call stack, of depth 1, of the requested thread
+// Return Val:  bool - Success / failure.
+// Author:      Uri Shomroni
+// Date:        1/6/2016
+// ---------------------------------------------------------------------------
+bool pdWin32ProcessDebugger::getDebuggedThreadTopStackFrame(osThreadId threadId, osCallStack& callStack)
+{
+    bool retVal = false;
+
+    // We operate only when the debugged process is suspended:
+    if (isDebuggedProcssSuspended())
+    {
+        // Load debug info for loaded modules (if required):
+        _loadedModulesManager.loadLoadedModulesDebugSymbols();
+
+        // Verify that we are not during a function execution:
+        osSynchronizationObjectLocker syncObjLocker(_executedFuncSyncObj);
+
+        // Get the thread handle:
+        HANDLE hThread = threadIdToThreadHandle(threadId);
+
+        if (hThread != NULL)
+        {
+            // Read the thread call stack:
+            osWin32CallStackReader callStackReader(_pProcessInfo->hProcess, hThread, callStack);
+            callStackReader.setMaxFrameCount(1);
+            retVal = callStackReader.execute(false);
+        }
+
+        // Release the function execution synchronization object:
+        syncObjLocker.unlockSyncObj();
+
+        retVal = true;
+    }
+
+    GT_ASSERT(retVal);
+    return retVal;
+}
 
 // ---------------------------------------------------------------------------
 // Name:        pdWin32ProcessDebugger::updateThreadsData
