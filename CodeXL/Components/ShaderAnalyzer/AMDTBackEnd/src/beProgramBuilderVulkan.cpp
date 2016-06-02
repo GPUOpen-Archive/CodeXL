@@ -17,10 +17,10 @@ static bool GetAmdspvPath(std::string& amdspvPath)
 {
 #ifdef __linux
     amdspvPath = "./amdspv";
+#elif _WIN64
+    amdspvPath = "x64\\amdspv.exe";
 #elif _WIN32
     amdspvPath = "x86\\amdspv.exe";
-#else
-    amdspvPath = "x64\\amdspv.exe";
 #endif
     return true;
 }
@@ -528,7 +528,7 @@ beKA::beStatus beProgramBuilderVulkan::Compile(const VulkanOptions& vulkanOption
             const gtString AMPSPV_TMP_OUTPUT_FILE = L"amdspvTempFile.txt";
             osFilePath tmpFilePath(osFilePath::OS_TEMP_DIRECTORY);
             tmpFilePath.setFileName(AMPSPV_TMP_OUTPUT_FILE);
-            cmd << "out.GLSLLog=\"" << tmpFilePath.asString().asASCIICharArray() << "\" ";
+            cmd << "out.glslLog=\"" << tmpFilePath.asString().asASCIICharArray() << "\" ";
 
             // Launch amdspv.
             gtString amdspvOutput;
