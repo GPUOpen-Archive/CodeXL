@@ -97,6 +97,11 @@ public:
     /// The total number of draw calls that occurred within the traced frame.
     //--------------------------------------------------------------------------
     unsigned int mDrawCallCount;
+
+    //--------------------------------------------------------------------------
+    /// The total number of frames traced within the file
+    //--------------------------------------------------------------------------
+    unsigned int mTracedFramesCount;
 };
 
 //--------------------------------------------------------------------------

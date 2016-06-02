@@ -69,6 +69,10 @@ public:
             {
                 mMetadataInstance->mDrawCallCount = static_cast<unsigned int>(atoi(elementText));
             }
+            else if (strcmp(elementName, "TracedFramesCount") == 0)
+            {
+                mMetadataInstance->mTracedFramesCount = static_cast<unsigned int>(atoi(elementText));
+            }
             else if (strcmp(elementName, "LinkedTrace") == 0)
             {
                 mMetadataInstance->mPathToTraceFile.assign(elementText);
@@ -114,6 +118,7 @@ TraceMetadata::TraceMetadata()
     , mFrameInfo(NULL)
     , mAPICallCount(0)
     , mDrawCallCount(0)
+    , mTracedFramesCount(0)
 {
     mPathToTraceFile.clear();
     mPathToFrameBufferImage.clear();
@@ -158,6 +163,7 @@ void TraceMetadata::WriteToXML(gtASCIIString& outMetadataXML)
     metadataXML += XML("Architecture", FormatText("%u", mArchitecture).asCharArray());
     metadataXML += XML("APICallCount", FormatText("%u", mAPICallCount).asCharArray());
     metadataXML += XML("DrawCallCount", FormatText("%u", mDrawCallCount).asCharArray());
+    metadataXML += XML("TracedFramesCount", FormatText("%u", mTracedFramesCount).asCharArray());
 
     gtASCIIString contentsXML;
 

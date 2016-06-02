@@ -906,6 +906,9 @@ bool MultithreadedTraceAnalyzerLayer::WriteTraceAndMetadataFiles(const gtASCIISt
     metadataToWrite.mPathToObjectDatabaseFile = smd.pathToDataDirectory.asCharArray();
     metadataToWrite.mPathToObjectDatabaseFile.append("FullObjectDatabase.xml");
 
+    // Add the number of frames captured in the trace
+    metadataToWrite.mTracedFramesCount = GetParentLayerManager()->GetCaptureCount();
+
     ModernAPIFrameDebuggerLayer* frameDebugger = GetParentLayerManager()->GetFrameDebuggerLayer();
 
     unsigned char* pngData = NULL;
