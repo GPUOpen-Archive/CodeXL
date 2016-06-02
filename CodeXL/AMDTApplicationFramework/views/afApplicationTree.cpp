@@ -1422,7 +1422,7 @@ void afApplicationTree::addSelectedItem(afApplicationTreeItemData* pViewerItem, 
         else
         {
             // If it is the same object, and it was selected, and now it is activated, activate it:
-            if ((!pCurrentlySelectionItem->_wasItemActivated) && wasItemActivated)
+            if (pCurrentlySelectionItem && (!pCurrentlySelectionItem->_wasItemActivated) && wasItemActivated)
             {
                 pCurrentlySelectionItem->_wasItemActivated = true;
             }

@@ -530,7 +530,6 @@ bool afSourceCodeView::displayFile(const osFilePath& fileName, int lineNumber, i
     // Set the cursor in the opened file:
     setCursorPosition(sourceCodeLine, 0);
 
-    retVal = retVal;
     return retVal;
 }
 

@@ -91,7 +91,7 @@ AMDTOpenCLHelper::AMDTOpenCLHelper() :
 
         if (_hOpenCLLibrary == NULL)
         {
-            libName = "/System/Library/Frameworks/OpenCL.framework/Libraries/libCL.dylib");
+            libName = "/System/Library/Frameworks/OpenCL.framework/Libraries/libCL.dylib";
             _hOpenCLLibrary = (void*)dlopen(libName, RTLD_LAZY | RTLD_LOCAL);
         }
 
