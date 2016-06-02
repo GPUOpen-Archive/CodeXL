@@ -59,6 +59,7 @@ public:
     ProfilerResultCode GetStaticProfilerResultsMT(UINT64 targetFillId, UINT profiledCallCount, std::vector<ProfilerResult>& outResults);
 
     void FreeST();
+    void QueueProfilerForDeletion(VktCmdBufProfiler* pProfiler);
     void FreeMT();
     void ReleaseProfilersMT();
     void ClearProfilersMT();
@@ -68,6 +69,9 @@ public:
 
     /// Return the number of profiled commands for this CmdBuf
     UINT GetProfiledCallCount() const { return m_profiledCallCount; }
+
+    /// Return the frame we were on when this cmdBuf was created
+    UINT GetOriginFrame() const { return m_originFrame; }
 
     void DestroyDynamicProfilers();
 
@@ -171,6 +175,9 @@ private:
 
     /// Track the number of times this cmdBuf was filled in
     UINT64 m_fillId;
+
+    /// Track on which frame this cmdBuf was created
+    UINT m_originFrame;
 
     /// Track aliveness
     bool m_alive;
