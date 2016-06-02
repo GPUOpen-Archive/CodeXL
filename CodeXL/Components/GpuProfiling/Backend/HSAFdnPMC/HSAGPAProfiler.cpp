@@ -483,6 +483,8 @@ bool HSAGPAProfiler::Begin(const hsa_agent_t             device,
             return false;
         }
 
+        ++m_uiCurKernelCount;
+
         // make sure any previous sessions are completed before starting a new one.
         WaitForCompletedSession(pQueue->id);
 
