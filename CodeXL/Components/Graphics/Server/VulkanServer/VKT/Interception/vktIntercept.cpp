@@ -7,6 +7,7 @@
 
 #include "vktIntercept.h"
 
+#include "../vktDefines.h"
 #include "../vktLayerManager.h"
 #include "../vktInterceptManager.h"
 #include "../FrameDebugger/vktFrameDebuggerLayer.h"
@@ -92,6 +93,56 @@ static WrappedQueueMap s_queueWrappers;
 
 /// Container of all queue wrappers mutex
 static mutex s_queueWrappersMutex;
+
+/// Container of all command buffers that have been freed
+static std::deque<VktWrappedCmdBuf*> s_cmdBufFreeList;
+
+/// Container of all command buffers that have been freed mutex
+static mutex s_cmdBufFreeListMutex;
+
+//-----------------------------------------------------------------------------
+/// Release old profiler memory and add given command buffer to delete queue.
+/// \param pWrappedCmdBuf The command buffer wrapper being deleted.
+//-----------------------------------------------------------------------------
+void ProcessCmdBufFreeList(VktWrappedCmdBuf* pWrappedCmdBuf)
+{
+#if GATHER_PROFILER_RESULTS_WITH_WORKERS
+    if (pWrappedCmdBuf != nullptr)
+    {
+        ScopeLock lock(&s_cmdBufFreeListMutex);
+
+        for (std::deque<VktWrappedCmdBuf*>::iterator it = s_cmdBufFreeList.begin(); it != s_cmdBufFreeList.end(); )
+        {
+            VktWrappedCmdBuf* pCurrCmdBuf = *it;
+
+            bool advanceIter = true;
+
+            if (pCurrCmdBuf != nullptr)
+            {
+                const UINT originFrame = pCurrCmdBuf->GetOriginFrame();
+                const UINT currFrame = VktLayerManager::GetLayerManager()->GetFrameCount();
+                const UINT frameDifference = currFrame - originFrame;
+
+                if (frameDifference > DEFERRED_RELEASE_FRAME_COUNT)
+                {
+                    pCurrCmdBuf->ReleaseProfilersMT();
+                    it = s_cmdBufFreeList.erase(it);
+                    advanceIter = false;
+                }
+            }
+
+            if (advanceIter)
+            {
+                ++it;
+            }
+        }
+
+        s_cmdBufFreeList.push_back(pWrappedCmdBuf);
+    }
+#else
+    UNREFERENCED_PARAMETER(pWrappedCmdBuf);
+#endif
+}
 
 //-----------------------------------------------------------------------------
 /// Given an app's command buffer, obtain its wrapper.
@@ -2280,6 +2331,8 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkFreeCommandBuffers(VkDevice de
             if (pWrappedCmdBuf != nullptr)
             {
                 pWrappedCmdBuf->Free();
+
+                ProcessCmdBufFreeList(pWrappedCmdBuf);
             }
         }
     }
