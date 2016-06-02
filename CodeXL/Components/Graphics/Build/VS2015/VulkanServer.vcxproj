@@ -72,7 +72,7 @@
       <ModuleDefinitionFile>VulkanServer.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(ProjectDir)..\..\Server\VulkanServer\JSON\$(ProjectName)$(GDTProjectSuffix).json $(MyBinDir)Plugins\</Command>
+      <Command>copy $(ProjectDir)..\..\Server\VulkanServer\JSON\$(ProjectName)$(GDTPlatformSuffix).json $(MyBinDir)Plugins\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -89,7 +89,7 @@
       <ModuleDefinitionFile>VulkanServer.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(ProjectDir)..\..\Server\VulkanServer\JSON\$(ProjectName)$(GDTProjectSuffix).json $(MyBinDir)Plugins\</Command>
+      <Command>copy $(ProjectDir)..\..\Server\VulkanServer\JSON\$(ProjectName)$(GDTPlatformSuffix).json $(MyBinDir)Plugins\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -103,7 +103,7 @@
       <ModuleDefinitionFile>VulkanServer.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(ProjectDir)..\..\Server\VulkanServer\JSON\$(ProjectName)$(GDTProjectSuffix).json $(MyBinDir)Plugins\</Command>
+      <Command>copy $(ProjectDir)..\..\Server\VulkanServer\JSON\$(ProjectName)$(GDTPlatformSuffix).json $(MyBinDir)Plugins\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -122,7 +122,7 @@
       <ModuleDefinitionFile>VulkanServer.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(ProjectDir)..\..\Server\VulkanServer\JSON\$(ProjectName)$(GDTProjectSuffix).json $(MyBinDir)Plugins\</Command>
+      <Command>copy $(ProjectDir)..\..\Server\VulkanServer\JSON\$(ProjectName)$(GDTPlatformSuffix).json $(MyBinDir)Plugins\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
