@@ -19,7 +19,9 @@ enum HSA_API_Type
     HSA_RUNTIME_API_TABLE
     HSA_EXT_FINALIZE_API_TABLE
     HSA_EXT_IMAGE_API_TABLE
-    //HSA_EXT_AMD_API_TABLE // pending discussion with RT team whether these should be added to interception table
+#ifdef INCLUDE_AMD_EXT_TABLE
+    HSA_EXT_AMD_API_TABLE
+#endif
 #undef X
 
     // HSA tools library entrypoints
