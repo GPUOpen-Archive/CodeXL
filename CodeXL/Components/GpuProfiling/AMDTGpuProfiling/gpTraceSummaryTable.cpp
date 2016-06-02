@@ -802,10 +802,20 @@ void gpCommandListSummaryTable::AddSummaryRow(int rowIndex, APISummaryInfo* pInf
                 case COLUMN_NUM_OF_COMMANDS:
                 {
                     pItem = new QTableWidgetItem();
+
+                    // For number of commands, set both text and value, to make sure that the column is sortable, and enable
+                    // display of N/A string for 0 calls 
+                    setItem(rowIndex, i, pItem);
+
                     if (pInfo->m_numCalls == 0)
                     {
                         shouldSetCmdBufferTooltip = true;
                     }
+                    QVariant dataVariant;
+                    dataVariant.setValue(rowStrings[i].toDouble());
+                    pItem->setData(Qt::EditRole, dataVariant);
+                    pItem->setData(Qt::DisplayRole, rowStrings[i]);
+                    shouldSetValue = false;
                 }
                 break;
                 }
