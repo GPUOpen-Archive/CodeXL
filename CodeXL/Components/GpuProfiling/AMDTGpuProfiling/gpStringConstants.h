@@ -420,7 +420,7 @@
 // Dashboard
 #define GPU_STR_dashboard_FrameAnalysisCaption "Frame Analysis"
 #define GPU_STR_dashboard_CapturedFramesCaption "Captured Frames"
-#define GPU_STR_dashboard_CaptureTooltip "Click to capture and analyze a frame"
+#define GPU_STR_dashboard_CaptureTooltip "Capture %1 frames for analysis"
 #define GPU_STR_dashboard_StopTooltip "Stop the analyzed application and review any captured frames"
 #define GPU_STR_dashboard_OpenTimelineTooltip "Open the selected captured frame timeline for review"
 #define GPU_STR_dashboard_MainImageCaptionRunning "Running Frame"

@@ -32,6 +32,7 @@
 #define VSP_STR_ModuleLoadedDebugMessage L"Loaded \'"
 #define VSP_STR_ModuleUnloadedDebugMessage L"Unloaded \'"
 #define VSP_STR_BuildPrefix L"Build "
+#define VSP_STR_CaptureFrame L"Capture %ls frames for analysis"
 
 #define VSP_STR_VisualStudioRegistryRootPathPrefix L"Software\\Microsoft\\VisualStudio\\"
 #ifdef VSP_VS11BUILD

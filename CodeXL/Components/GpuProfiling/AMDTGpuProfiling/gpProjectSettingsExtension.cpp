@@ -187,7 +187,10 @@ bool gpProjectSettingsExtension::SetSettingsFromXMLString(const gtString& projec
 
             settings.m_serverConnectionPort = portNumber;
 
-            settings.m_numFramesToCapture = acGTStringToQString(numFramesToCapture);
+            if (!numFramesToCapture.isEmpty())
+            {
+                settings.m_numFramesToCapture = acGTStringToQString(numFramesToCapture);
+            }
 
             retVal = true;
         }

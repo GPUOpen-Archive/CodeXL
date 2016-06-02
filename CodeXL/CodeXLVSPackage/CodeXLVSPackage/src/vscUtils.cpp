@@ -39,7 +39,9 @@
 
 // FrameAnlysis
 #include <AMDTGpuProfiling/gpStringConstants.h>
-
+#include <AMDTGpuProfiling/gpExecutionMode.h>
+#include <AMDTGpuProfiling/ProfileManager.h>
+#include <AMDTGpuProfiling/gpProjectSettings.h>
 
 class vscUtils
 {
@@ -260,7 +262,17 @@ bool vscGetExecutionCommandName(DWORD commandId, wchar_t*& commandNameBuffer)
 
         retVal = true;
     }
+    if (commandId == cmdidCaptureFrame)
+    {
+        gpExecutionMode* pFrameAnalysisManager = ProfileManager::Instance()->GetFrameAnalysisModeManager();
+        gpProjectSettings& settings = pFrameAnalysisManager->ProjectSettings();
 
+        gtString buttonText;
+        buttonText.appendFormattedString(VSP_STR_CaptureFrame, acQStringToGTString(settings.m_numFramesToCapture).asCharArray());
+        commandName = buttonText;
+        retVal = true;
+
+    }
     // Allocate the output string.
     commandNameBuffer = vscAllocateAndCopy(commandName);
 

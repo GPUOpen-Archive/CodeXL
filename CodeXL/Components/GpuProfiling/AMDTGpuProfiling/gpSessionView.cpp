@@ -78,6 +78,9 @@ gpSessionView::~gpSessionView()
 
 void gpSessionView::InitLayout()
 {
+    gpExecutionMode* pFrameAnalysisManager = ProfileManager::Instance()->GetFrameAnalysisModeManager();
+    gpProjectSettings& settings = pFrameAnalysisManager->ProjectSettings();
+
     // layout to hold the two main vboxlayouts;
     QHBoxLayout* pMainLayout = new QHBoxLayout;
 
@@ -147,7 +150,9 @@ void gpSessionView::InitLayout()
     m_pCaptureButton = new QToolButton;
     m_pCaptureButton->setText(GPU_STR_dashboard_CaptureButton);
     m_pCaptureButton->setStyleSheet(GP_SessionViewButtonStyle);
-    m_pCaptureButton->setToolTip(GPU_STR_dashboard_CaptureTooltip);
+
+    QString tooltipStr = QString(GPU_STR_dashboard_CaptureTooltip).arg(settings.m_numFramesToCapture);
+    m_pCaptureButton->setToolTip(tooltipStr);
 
     m_pStopButton = new QToolButton;
     m_pStopButton->setStyleSheet(GP_SessionViewButtonStyle);
