@@ -374,22 +374,13 @@ std::string VktTraceAnalyzerLayer::GetGPUTraceTXT()
                         }
                     }
 
-                    UINT queueIndex = pWrappedQueue->GetQueueIndex();
-
-#ifndef CODEXL_GRAPHICS
-                    std::string queueInfo = "";
-#else
-                    std::string queueInfo = "0";
-#endif
-
                     // Vulkan Response line format:
-                    // CommandQueuePtr CommandBufferType CommandBufferPtr APIType FuncId Vulkan_FuncName(Args) = ReturnValue StartTime EndTime SampleId
+                    // QueueFamilyIndex QueueIndex CommandBuffer APIType FuncId Vulkan_FuncName(Args) = ReturnValue PreStartTime StartTime EndTime SampleId
 
-                    profiledCommandsLinesStr += "0x";
-                    profiledCommandsLinesStr += IntToString(queueIndex);
+                    profiledCommandsLinesStr += IntToString(pWrappedQueue->GetQueueFamilyIndex());
                     profiledCommandsLinesStr += " ";
 
-                    profiledCommandsLinesStr += queueInfo.c_str();
+                    profiledCommandsLinesStr += IntToString(pWrappedQueue->GetQueueIndex());
                     profiledCommandsLinesStr += " ";
 
                     profiledCommandsLinesStr += "0x";
