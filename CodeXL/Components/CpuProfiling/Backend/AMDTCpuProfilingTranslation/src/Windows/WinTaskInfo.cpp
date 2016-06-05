@@ -1902,32 +1902,31 @@ void WinTaskInfo::GetDrivePartitionInfo()
         buffer[0] = L'\0';
         GetLogicalDriveStrings(checkSize, buffer);
     }
-
-    wchar_t* temp = buffer;
-
-    //for each null-terminated drive string in the list
-    while (temp[0] != 0)
-    {
-        //we strip off the trailing backslash for the QueryDosDevice call
-        int curDriveSize = wcslen(temp);
-
-        if ((temp[curDriveSize - 1] == L'/') ||
-            (temp[curDriveSize - 1] == L'\\'))
-        {
-            temp[curDriveSize - 1] = L'\0';
-        }
-
-        if (QueryDosDevice(temp, deviceName, OS_MAX_PATH))
-        {
-            // add it into drive map.
-            m_tiDriveMap.insert(DriveMap::value_type(deviceName, temp));
-        }
-
-        temp += curDriveSize + 1;
-    }
-
     if (buffer)
     {
+        wchar_t* temp = buffer;
+        
+        //for each null-terminated drive string in the list
+        while (temp[0] != 0)
+        {
+            //we strip off the trailing backslash for the QueryDosDevice call
+            int curDriveSize = wcslen(temp);
+        
+            if ((temp[curDriveSize - 1] == L'/') ||
+                (temp[curDriveSize - 1] == L'\\'))
+            {
+                temp[curDriveSize - 1] = L'\0';
+            }
+        
+            if (QueryDosDevice(temp, deviceName, OS_MAX_PATH))
+            {
+                // add it into drive map.
+                m_tiDriveMap.insert(DriveMap::value_type(deviceName, temp));
+            }
+        
+            temp += curDriveSize + 1;
+        }
+        
         delete [] buffer;
     }
 

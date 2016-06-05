@@ -374,7 +374,7 @@ public:
     ULONG CallRealRelease(IUnknown* pObj);
 
 public:
-    int m_InstanceCount;      ///< number of instance managed
+    int m_InstanceCount = 0;      ///< number of instance managed
 
 private:
     /// Disable assignement operator

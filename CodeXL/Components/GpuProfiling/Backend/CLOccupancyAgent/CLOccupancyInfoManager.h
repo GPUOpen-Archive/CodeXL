@@ -42,7 +42,6 @@ public:
     size_t m_nGlobalItemCountMax;    ///< maximum global work size
     size_t m_nNumberOfComputeUnits;  ///< number of compute units
     CLCUInfoBase* m_pCLCUInfo;       ///< CLCU info object
-    osThreadId m_tid;                ///< Thread ID
     static char m_cListSeparator;    ///< List separator
 };
 

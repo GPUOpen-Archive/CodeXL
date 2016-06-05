@@ -436,6 +436,10 @@ CaPerfEvent::CaPerfEvent(const CaPerfEvent& evt) : PerfEventInternal(evt), m_pro
 
 CaPerfEvent& CaPerfEvent::operator=(const CaPerfEvent& evt)
 {
+	if (&evt == this)
+	{
+		return *this;
+	}
     CaPerfEvent::operator=(evt);
 
     m_profConfig = evt.m_profConfig;

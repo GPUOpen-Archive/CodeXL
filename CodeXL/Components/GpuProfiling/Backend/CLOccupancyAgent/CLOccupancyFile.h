@@ -14,8 +14,8 @@
 
 struct CLOccupancyHdr
 {
-    int m_iVersionMajor;
-    int m_iVersionMinor;
+    int m_iVersionMajor = 0;
+    int m_iVersionMinor = 0;
     gtString m_strAppName;
     gtString m_strAppArgs;
     char m_listSeparator;
