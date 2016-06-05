@@ -1545,9 +1545,10 @@ void afNewProjectDialog::IsApplicationPathsValid(bool& isAppValid, bool& isWorki
         }
         else if (!appFilePath.isEmpty())
         {
-            QFile file(appFilePath);
+            const osFilePath filePath(acQStringToGTString(appFilePath));
+            osFile file(filePath);
             //for local files: if windows store application just check if file exists, for regular binaries check if it's an executable
-            isAppValid = isWInStoreAppRadioButtonChecked? file.exists() : QFileInfo(file).isExecutable();
+            isAppValid = isWInStoreAppRadioButtonChecked? file.exists() : file.IsExecutable();
         }
 
         QDir dir(workingFolderPath);
