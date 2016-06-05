@@ -258,6 +258,10 @@ CodeXL/Components/GpuProfiling/AMDTGpuProfiling/tmp/
 CodeXL/Components/PowerProfiling/AMDTPowerProfiling/tmp/
 CodeXL/Components/ShaderAnalyzer/AMDTKernelAnalyzer/tmp/
 
+# User Guide output files
+CodeXL/Help/CodeXL User Guide/HTML help/
+CodeXL/Help/CodeXL User Guide/webhelp/
+ 
 # JetBrains Rider
 .idea/
 *.sln.iml
