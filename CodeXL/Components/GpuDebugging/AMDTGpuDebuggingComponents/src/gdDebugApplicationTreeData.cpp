@@ -36,7 +36,7 @@ gdDebugApplicationTreeData::gdDebugApplicationTreeData():
     _minLevel(0), _maxLevel(0), _textureLayer(0), _isDataCached(false), _bufferType(AP_DISPLAY_BUFFER_UNKNOWN), _bufferAttachmentTarget(0), _bufferAttachmentPoint(0),
     _fboAttachmentFBOName(0), _shaderType(GD_UNKNOWN_SHADER), _clProgramHandle(OA_CL_NULL_HANDLE), _clKernelHandle(OA_CL_NULL_HANDLE), _syncIndex(-1), _syncHandle(OA_GL_NULL_HANDLE), _syncCondition(GL_NONE),
     _addressingMode(0), _filterMode(0), _referenceCount(0), _amountOfEvents(0), m_queueOutOfOrderExecutionMode(false), m_queueProfilingMode(false), m_queueOnDevice(false), m_queueOnDeviceDefault(false), 
-    _memoryFlags(0), m_packetSize(0), m_maxPackets(0), m_isAcquired(false)
+    _memoryFlags(0), m_packetSize(0), m_maxPackets(0), m_isAcquired(true)
 
 {
     _textureMiplevelID._textureMipLevel = 0;
