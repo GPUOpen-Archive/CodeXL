@@ -906,7 +906,12 @@ void gpUIManager::WriteDashboardFile()
 bool gpUIManager::ReadDashboardFile(gpFASessionData& sessionData, const osFilePath& dashBoardFilePath)
 {
     bool rc = false;
-    memset(&sessionData, 0, sizeof(sessionData));
+    sessionData.m_workingFolder = L"";
+    sessionData.m_exePath = L"";
+    sessionData.m_cmdArgs = L"";
+    sessionData.m_envVars = L"";
+    sessionData.m_isRemoteHost = false;
+    sessionData.m_hostIP = L"";
     rc = sessionData.Read(dashBoardFilePath);
     return rc;
 }
@@ -962,25 +967,35 @@ bool gpFASessionData::Write(const osFilePath& dashboardFilePath)
 
 bool gpFASessionData::Read(const osFilePath& dashboardFilePath)
 {
-    QFile dashBoardFile(acGTStringToQString(dashboardFilePath.asString()));
-    bool rc = dashBoardFile.open(QIODevice::ReadOnly | QIODevice::Text);
-    GT_IF_WITH_ASSERT(rc)
-    {
-        QTextStream in(&dashBoardFile);
-        m_workingFolder = acQStringToGTString(in.readLine());
-        m_exePath = acQStringToGTString(in.readLine());
-        m_cmdArgs = acQStringToGTString(in.readLine());
-        m_envVars = acQStringToGTString(in.readLine());
-        m_hostIP = acQStringToGTString(in.readLine());
+	bool rc = false;
 
-        dashBoardFile.close();
+	if (dashboardFilePath.exists())
+	{
+		QFile dashBoardFile(acGTStringToQString(dashboardFilePath.asString()));
+		rc = dashBoardFile.open(QIODevice::ReadOnly | QIODevice::Text);
+		GT_IF_WITH_ASSERT(rc)
+		{
+			QTextStream in(&dashBoardFile);
+            QString workingFolder = in.readLine();
+ 			m_workingFolder = acQStringToGTString(workingFolder);
+            QString exePath = in.readLine();
+			m_exePath = acQStringToGTString(exePath);
+            QString cmdArgs = in.readLine();
+			m_cmdArgs = acQStringToGTString(cmdArgs);
+            QString envVars = in.readLine();
+			m_envVars = acQStringToGTString(envVars);
+            QString hostIP = in.readLine();
+			m_hostIP = acQStringToGTString(hostIP);
 
-        if (IsRemoteHost() == false)
-        {
-            m_hostIP = GPU_STR_dashboard_HTMLHostLocal;
-        }
+			dashBoardFile.close();
 
-    }
+			if (IsRemoteHost() == false)
+			{
+				m_hostIP = GPU_STR_dashboard_HTMLHostLocal;
+			}
+
+		}
+	}
     return rc;
 }
 
