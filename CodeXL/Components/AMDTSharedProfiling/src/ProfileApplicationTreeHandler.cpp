@@ -2194,7 +2194,7 @@ bool ProfileApplicationTreeHandler::GetNextSessionNameAndDir(const gtString& str
         // Build the session name from the time stamp:
         osTime timing;
         timing.setFromCurrentTime();
-        timing.dateAsString(strSessionDisplayName, osTime::NAME_SCHEME_FILE, osTime::LOCAL);
+        timing.dateAsString(strSessionDisplayName, osTime::NAME_SCHEME_SHORT_FILE, osTime::LOCAL);
 
         // If this is a remote session, append the "@<ip>" suffix, where <ip>
         // is the remote host's ip address.
