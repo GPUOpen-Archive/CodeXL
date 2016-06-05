@@ -391,6 +391,13 @@ bool gpUIManager::FrameInfoFromXML(const gtASCIIString& frameInfoXML, FrameInfo&
         frameInfo.m_drawCalls = elementsList.at(0).toElement().text().toInt(&rc);
     }
 
+    elementsList = frameInfoDoc.elementsByTagName(GPU_STR_frameInfoXMLFrameTracedFramesCount);
+
+    if (elementsList.size() == 1)
+    {
+        frameInfo.m_frameCount = elementsList.at(0).toElement().text().toInt(&rc);
+    }
+
     retVal = retVal && rc;
 
     elementsList = frameInfoDoc.elementsByTagName(GPU_STR_frameInfoXMLFrameCPUFrameDuration);
@@ -437,7 +444,8 @@ void gpUIManager::FrameInfoToXML(const FrameInfo& frameInfo, QString& xmlString)
                 .arg(frameInfo.m_fps)
                 .arg(frameInfo.m_frameDuration)
                 .arg(frameInfo.m_apiCalls)
-                .arg(frameInfo.m_drawCalls);
+                .arg(frameInfo.m_drawCalls)
+                .arg(frameInfo.m_frameCount);
 }
 
 bool gpUIManager::GetFrameInfo(const osFilePath& sessionFilePath, FrameInfo& frameInfo)

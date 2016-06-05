@@ -36,6 +36,7 @@ struct FrameInfo
     double         m_frameDuration = 0.0;
     unsigned int   m_apiCalls = 0;
     unsigned int   m_drawCalls = 0;
+    unsigned int   m_frameCount = 1;
 
     unsigned char* m_pImageBuffer = nullptr;
     unsigned long  m_imageSize = 0;

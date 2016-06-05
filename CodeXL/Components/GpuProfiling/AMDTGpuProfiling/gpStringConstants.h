@@ -512,6 +512,7 @@
 #define GPU_STR_frameInfoXMLFrameCPUFrameDuration "CPUFrameDuration"
 #define GPU_STR_frameInfoXMLFrameAPICallCount "APICallCount"
 #define GPU_STR_frameInfoXMLFrameDrawCallCount "DrawCallCount"
+#define GPU_STR_frameInfoXMLFrameTracedFramesCount "TracedFramesCount"
 #define GPU_STR_frameInfoXMLObjectTree "ObjectTree"
 #define GPU_STR_frameInfoXMLObjectDBase "ObjectDBase"
 
@@ -532,6 +533,7 @@
     "<CPUFrameDuration>%7</CPUFrameDuration>\n"\
     "<APICallCount>%8</APICallCount>\n"\
     "<DrawCallCount>%9</DrawCallCount>\n"\
+    "<TracedFramesCount>%10</TracedFramesCount>\n"\
     "</Contents></Root>"
 
 // Perf Studio xml file
