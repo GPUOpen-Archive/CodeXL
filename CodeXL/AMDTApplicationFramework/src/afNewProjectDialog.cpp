@@ -1523,40 +1523,24 @@ bool afNewProjectDialog::AreSettingsValid(gtString& invalidMessageStr, gtString&
 void afNewProjectDialog::IsApplicationPathsValid(bool& isAppValid, bool& isWorkingFolderValid) const
 {
     isAppValid = true;
-    GT_ASSERT(m_pWinStoreAppRadioButton != nullptr && m_pWorkingFolderTextEdit!=nullptr && m_pRemoteHostRadioButton!=nullptr)
-    const bool isWInStoreAppRadioButtonChecked = m_pWinStoreAppRadioButton->isChecked();
-    const QString workingFolderPath = m_pWorkingFolderTextEdit->text();
-    const QString appFilePath = m_pProgramExeTextEdit->text();
-    const bool isRemoteSession = m_pRemoteHostRadioButton->isChecked();
-    if (isRemoteSession)
-    {
-        osPortAddress dmnAddress;
-        GT_IF_WITH_ASSERT(GetRemotePortAddress(dmnAddress))
-        {
-            bool isExecutionSuccessfull = CXLDaemonClient::ValidateAppPaths(dmnAddress, acQStringToGTString(appFilePath), acQStringToGTString(workingFolderPath), isAppValid, isWorkingFolderValid);
-            GT_ASSERT_EX(isExecutionSuccessfull, L"Failed to check application path for validity");
-        }
-    }
-    else
-    {
-        if (isWInStoreAppRadioButtonChecked)
-        {
-            isAppValid = !appFilePath.isEmpty();
-        }
-        else if (!appFilePath.isEmpty())
-        {
-            const osFilePath filePath(acQStringToGTString(appFilePath));
-            osFile file(filePath);
-            //for local files: if windows store application just check if file exists, for regular binaries check if it's an executable
-            isAppValid = isWInStoreAppRadioButtonChecked? file.exists() : file.IsExecutable();
-        }
+    GT_ASSERT(m_pWinStoreAppRadioButton != nullptr && m_pWorkingFolderTextEdit != nullptr && m_pRemoteHostRadioButton != nullptr)
+    afIsValidApplicationInfo isValidApplicationInfo;
+    isValidApplicationInfo.isWInStoreAppRadioButtonChecked = m_pWinStoreAppRadioButton->isChecked();
+    isValidApplicationInfo.workingFolderPath = acQStringToGTString(m_pWorkingFolderTextEdit->text());
+    isValidApplicationInfo.appFilePath = acQStringToGTString(m_pProgramExeTextEdit->text());
+    isValidApplicationInfo.isRemoteSession = m_pRemoteHostRadioButton->isChecked();
+    osPortAddress portAddress;
 
-        QDir dir(workingFolderPath);
-        isWorkingFolderValid = dir.exists() || workingFolderPath.isEmpty();
+    if (isValidApplicationInfo.isRemoteSession)
+    {
+        GT_IF_WITH_ASSERT(GetRemotePortAddress(portAddress))
+        {
+            isValidApplicationInfo.portAddress = &portAddress;
+        }
+        
     }
-    
+    ::IsApplicationPathsValid(isValidApplicationInfo, isAppValid, isWorkingFolderValid);
 }
-
 
 bool afNewProjectDialog::GetRemotePortAddress(osPortAddress& dmnAddress) const
 {

@@ -30,6 +30,9 @@
 #include <AMDTApplicationComponents/Include/acFunctions.h>
 #include <AMDTApplicationComponents/Include/acIcons.h>
 
+// For remote sessions.
+#include <AMDTRemoteClient/Include/CXLDaemonClient.h>
+
 // Local:
 #include <AMDTApplicationFramework/Include/afAidFunctions.h>
 #include <AMDTApplicationFramework/Include/afAppStringConstants.h>
@@ -424,3 +427,29 @@ void afGetUserDataFolderPath(osFilePath& userDataPath)
     userDataPath.appendSubDirectory(afGlobalVariablesManager::ProductName());
 }
 
+
+void IsApplicationPathsValid(const afIsValidApplicationInfo& isValidApplicationInfo, bool &isAppValid, bool &isWorkingFolderValid) 
+{
+    if (isValidApplicationInfo.isRemoteSession && isValidApplicationInfo.portAddress)
+    {
+        bool isExecutionSuccessfull = CXLDaemonClient::ValidateAppPaths(*isValidApplicationInfo.portAddress, isValidApplicationInfo.appFilePath, 
+                                                                        isValidApplicationInfo.workingFolderPath, isAppValid, isWorkingFolderValid);
+        GT_ASSERT_EX(isExecutionSuccessfull, L"Failed to check application path for validity");
+    }
+    else
+    {
+        if (isValidApplicationInfo.isWInStoreAppRadioButtonChecked)
+        {
+            isAppValid = !isValidApplicationInfo.appFilePath.isEmpty();
+        }
+        else if (!isValidApplicationInfo.appFilePath.isEmpty())
+        {
+            const osFile file(isValidApplicationInfo.appFilePath);
+            //for local files: if windows store application just check if file exists, for regular binaries check if it's an executable
+            isAppValid = isValidApplicationInfo.isWInStoreAppRadioButtonChecked ? file.exists() : file.IsExecutable();
+        }
+
+        const osFile  dir(isValidApplicationInfo.workingFolderPath);
+        isWorkingFolderValid = dir.exists() || isValidApplicationInfo.workingFolderPath.isEmpty();
+    }
+}

@@ -37,6 +37,17 @@ AF_API bool afCanAllowDifferentSystemPath();
 AF_API bool afDefaultProjectFilePath(const osFilePath& executableFilePath, osFilePath& projectFilePath);
 AF_API void afGetVisualStudioProjectFilePath(const osFilePath& executablePath, const gtString& projectName, osFilePath& vsProjectFilePath);
 
+class osPortAddress;
+struct AF_API afIsValidApplicationInfo
+{
+    bool isRemoteSession = false;
+    osPortAddress* portAddress = nullptr;
+    gtString appFilePath;
+    gtString workingFolderPath;
+    bool isWInStoreAppRadioButtonChecked = false;
+};
+AF_API void IsApplicationPathsValid(const afIsValidApplicationInfo& isValidApplicationInfo, bool &isAppValid, bool &isWorkingFolderValid);
+
 // Get version info:
 AF_API bool afGetVersionDetails(int& buildVersion, int& majorVersion, int& minorVersion, int& year, int& month, int& day);
 
