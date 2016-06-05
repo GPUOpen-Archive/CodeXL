@@ -190,6 +190,7 @@
 #define PP_STR_SmuDisabledMsg "SMU is Disabled. Some of the counters will be disabled."
 #define PP_STR_iGPUDisabledMsg "iGPU is Disabled. Some of the counters will be disabled."
 #define PP_STR_dbMigrateFailureMsg "Unable to migrate the older version of CodeXL profile database."
+#define PP_STR_ProjectSettingsPathsInvalid AF_STR_newProjectExeDoesNotExistOrInvalid
 
 // Strings for metrics calculations:
 #define PP_STR_LongestCounterName PP_STR_Counter_AvgFreq_Core0

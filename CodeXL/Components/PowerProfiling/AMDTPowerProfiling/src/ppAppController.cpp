@@ -403,6 +403,10 @@ void ppAppController::ShowFailedErrorDialog(bool useInitError, PPResult errorToU
     {
         errorMsg << PP_STR_dbMigrateFailureMsg;
     }
+    else if (PPR_WRONG_PROJECT_SETTINGS == usedError)
+    {
+        errorMsg << PP_STR_ProjectSettingsPathsInvalid;
+    }
     else
     {
         systemPath.setPath(osFilePath::OS_SYSTEM_DIRECTORY);
@@ -753,100 +757,122 @@ ppSessionTreeNodeData* ppAppController::CreateSession(const gtString& profileTyp
     // Create the session data:
     const apProjectSettings& projectSettings = afProjectManager::instance().currentProjectSettings();
 
-    gtString projectName = projectSettings.projectName();
-    gtString projectDir = afProjectManager::instance().currentProjectFilePath().fileDirectoryAsString();
-
-    gtString strSessionDisplayName;
-    osDirectory sessionOsDir;
-    osFilePath projectDirPath(projectDir);
-
-    // Only create new session if there is no empty one:
-    wasSessionCreated = !ProfileApplicationTreeHandler::instance()->DoesEmptySessionExist();
-
-    // get the next session name and dir from the session naming helper (and clean the dir if there is any old cruft)
-    ProfileApplicationTreeHandler::instance()->GetNextSessionNameAndDir(projectName, projectDirPath, strSessionDisplayName, sessionOsDir, wasSessionCreated);
-
-    // Try to use the empty session item data:
-    afApplicationTreeItemData* pEmptySession = ProfileApplicationTreeHandler::instance()->RenameEmptySession(acGTStringToQString(strSessionDisplayName));
-
-    if (pEmptySession == nullptr)
+    afIsValidApplicationInfo isValidApplicationInfo;
+    bool isAppValid = false;
+    bool isWorkingFolderValid = false;
+    isValidApplicationInfo.isWInStoreAppRadioButtonChecked = projectSettings.windowsStoreAppUserModelID().isEmpty() == false;
+    isValidApplicationInfo.workingFolderPath = projectSettings.workDirectory().asString();
+    isValidApplicationInfo.appFilePath = projectSettings.executablePath().asString();
+    isValidApplicationInfo.isRemoteSession = projectSettings.isRemoteTarget();
+    osPortAddress portAddress;
+    if (isValidApplicationInfo.isRemoteSession)
     {
-        pRetVal = new ppSessionTreeNodeData;
-        pRetVal->m_pParentData = new afApplicationTreeItemData;
+      portAddress.setAsRemotePortAddress(projectSettings.remoteTargetName(), projectSettings.remoteTargetDaemonConnectionPort());
+      isValidApplicationInfo.portAddress = &portAddress;
+
     }
+    ::IsApplicationPathsValid(isValidApplicationInfo, isAppValid, isWorkingFolderValid);
+
+
+    GT_IF_WITH_ASSERT(isAppValid && isWorkingFolderValid)
+    {
+        gtString projectName = projectSettings.projectName();
+        gtString projectDir = afProjectManager::instance().currentProjectFilePath().fileDirectoryAsString();
+    
+        gtString strSessionDisplayName;
+        osDirectory sessionOsDir;
+        osFilePath projectDirPath(projectDir);
+    
+        // Only create new session if there is no empty one:
+        wasSessionCreated = !ProfileApplicationTreeHandler::instance()->DoesEmptySessionExist();
+    
+        // get the next session name and dir from the session naming helper (and clean the dir if there is any old cruft)
+        ProfileApplicationTreeHandler::instance()->GetNextSessionNameAndDir(projectName, projectDirPath, strSessionDisplayName, sessionOsDir, wasSessionCreated);
+    
+        // Try to use the empty session item data:
+        afApplicationTreeItemData* pEmptySession = ProfileApplicationTreeHandler::instance()->RenameEmptySession(acGTStringToQString(strSessionDisplayName));
+    
+        if (pEmptySession == nullptr)
+        {
+            pRetVal = new ppSessionTreeNodeData;
+            pRetVal->m_pParentData = new afApplicationTreeItemData;
+        }
+        else
+        {
+            pRetVal = qobject_cast<ppSessionTreeNodeData*>(pEmptySession->extendedItemData());
+    
+            // In case of rename empty data, remove the old session file:
+            osFilePath newSessionDBFile;
+            newSessionDBFile.setFileDirectory(pRetVal->SessionDir());
+            newSessionDBFile.setFileName(PM_STR_NewSessionName);
+            newSessionDBFile.setFileExtension(PP_STR_dbFileExt);
+    
+            if (newSessionDBFile.exists())
+            {
+                osFile fileToDelete(newSessionDBFile);
+                bool rc = fileToDelete.deleteFile();
+                GT_ASSERT(rc);
+            }
+        }
+    
+        GT_IF_WITH_ASSERT((pRetVal != nullptr) && (pRetVal->m_pParentData != nullptr))
+        {
+            pRetVal->m_name = acGTStringToQString(strSessionDisplayName);
+            pRetVal->m_displayName = pRetVal->m_name;
+            pRetVal->m_profileTypeStr = acGTStringToQString(profileTypeStr);
+    
+            // get the last dir path this is our session name:
+            m_executedSessionName = GetProjectNameFromSessionDir(sessionOsDir);
+    
+            osFilePath outputFilePath(sessionOsDir.directoryPath());
+            outputFilePath.setFileName(strSessionDisplayName);
+            outputFilePath.setFileExtension(PP_STR_dbFileExt);
+            pRetVal->m_pParentData->m_filePath = outputFilePath;
+    
+            pRetVal->m_isImported = false;
+            pRetVal->m_projectName = acGTStringToQString(projectName);
+    
+            pRetVal->m_commandArguments.clear();
+              
+            pRetVal->m_workingDirectory = acGTStringToQString(isValidApplicationInfo.workingFolderPath);
+            gtString exeName;
+            projectSettings.executablePath().getFileNameAndExtension(exeName);
+            pRetVal->m_exeName = acGTStringToQString(exeName);
+            pRetVal->m_exeFullPath = acGTStringToQString(isValidApplicationInfo.appFilePath);
+    
+            if (pRetVal->m_exeFullPath.isEmpty())
+            {
+                pRetVal->m_exeFullPath = acGTStringToQString(projectSettings.windowsStoreAppUserModelID());
+            }
+    
+            pRetVal->m_profileScope = SharedProfileSettingPage::Instance()->CurrentSharedProfileSettings().m_profileScope;
+    
+            if (pRetVal->m_profileScope == PM_PROFILE_SCOPE_SINGLE_EXE)
+            {
+                // Single exe scope is not supported for this profile type:
+                pRetVal->m_profileScope = PM_PROFILE_SCOPE_SYS_WIDE;
+                SharedProfileSettingPage::Instance()->CurrentSharedProfileSettings().m_profileScope = PM_PROFILE_SCOPE_SYS_WIDE;
+    
+            }
+    
+            pRetVal->m_shouldProfileEntireDuration = true;
+    
+            if (wasSessionCreated)
+            {
+                // Add the created session to the tree:
+                ProfileApplicationTreeHandler::instance()->AddSession(pRetVal, true);
+            }
+    
+            GT_IF_WITH_ASSERT(pRetVal->m_pParentData != nullptr)
+            {
+                pRetVal->m_pParentData->m_filePath = outputFilePath;
+                pRetVal->m_pParentData->m_filePathLineNumber = ppSessionController::PP_SESSION_STATE_RUNNING;
+            }
+        }
+    } 
     else
     {
-        pRetVal = qobject_cast<ppSessionTreeNodeData*>(pEmptySession->extendedItemData());
-
-        // In case of rename empty data, remove the old session file:
-        osFilePath newSessionDBFile;
-        newSessionDBFile.setFileDirectory(pRetVal->SessionDir());
-        newSessionDBFile.setFileName(PM_STR_NewSessionName);
-        newSessionDBFile.setFileExtension(PP_STR_dbFileExt);
-
-        if (newSessionDBFile.exists())
-        {
-            osFile fileToDelete(newSessionDBFile);
-            bool rc = fileToDelete.deleteFile();
-            GT_ASSERT(rc);
-        }
-    }
-
-    GT_IF_WITH_ASSERT((pRetVal != nullptr) && (pRetVal->m_pParentData != nullptr))
-    {
-        pRetVal->m_name = acGTStringToQString(strSessionDisplayName);
-        pRetVal->m_displayName = pRetVal->m_name;
-        pRetVal->m_profileTypeStr = acGTStringToQString(profileTypeStr);
-
-        // get the last dir path this is our session name:
-        m_executedSessionName = GetProjectNameFromSessionDir(sessionOsDir);
-
-        osFilePath outputFilePath(sessionOsDir.directoryPath());
-        outputFilePath.setFileName(strSessionDisplayName);
-        outputFilePath.setFileExtension(PP_STR_dbFileExt);
-        pRetVal->m_pParentData->m_filePath = outputFilePath;
-
-        pRetVal->m_isImported = false;
-        pRetVal->m_projectName = acGTStringToQString(projectName);
-
-        pRetVal->m_commandArguments.clear();
-
-        gtString workDirAsStr = projectSettings.workDirectory().asString();
-        pRetVal->m_workingDirectory = acGTStringToQString(workDirAsStr);
-        gtString exeName;
-        projectSettings.executablePath().getFileNameAndExtension(exeName);
-        pRetVal->m_exeName = acGTStringToQString(exeName);
-        gtString executablePathAsStr = projectSettings.executablePath().asString();
-        pRetVal->m_exeFullPath = acGTStringToQString(executablePathAsStr);
-
-        if (pRetVal->m_exeFullPath.isEmpty())
-        {
-            pRetVal->m_exeFullPath = acGTStringToQString(projectSettings.windowsStoreAppUserModelID());
-        }
-
-        pRetVal->m_profileScope = SharedProfileSettingPage::Instance()->CurrentSharedProfileSettings().m_profileScope;
-
-        if (pRetVal->m_profileScope == PM_PROFILE_SCOPE_SINGLE_EXE)
-        {
-            // Single exe scope is not supported for this profile type:
-            pRetVal->m_profileScope = PM_PROFILE_SCOPE_SYS_WIDE;
-            SharedProfileSettingPage::Instance()->CurrentSharedProfileSettings().m_profileScope = PM_PROFILE_SCOPE_SYS_WIDE;
-
-        }
-
-        pRetVal->m_shouldProfileEntireDuration = true;
-
-        if (wasSessionCreated)
-        {
-            // Add the created session to the tree:
-            ProfileApplicationTreeHandler::instance()->AddSession(pRetVal, true);
-        }
-
-        GT_IF_WITH_ASSERT(pRetVal->m_pParentData != nullptr)
-        {
-            pRetVal->m_pParentData->m_filePath = outputFilePath;
-            pRetVal->m_pParentData->m_filePathLineNumber = ppSessionController::PP_SESSION_STATE_RUNNING;
-        }
+        m_midTierLastInitError = PPR_WRONG_PROJECT_SETTINGS;
     }
 
     return pRetVal;
