@@ -2216,7 +2216,6 @@ bool ProfileApplicationTreeHandler::GetNextSessionNameAndDir(const gtString& str
     // Set the folder name to be the session display name:
     strSessionFolderName = strSessionDisplayName;
 
-
     // Find the parent directory for the profile session path:
     // the directory is the "PROJECTPATH/ProjectName_ProfilerOutput"
     bool doesProjectSessionsDirExist = false;
@@ -2269,6 +2268,12 @@ bool ProfileApplicationTreeHandler::GetNextSessionNameAndDir(const gtString& str
                     if (!outputDir.getFileDirectory(sessionDir))
                     {
                         continue;
+                    }
+
+                    if (!sessionDir.exists())
+                    {
+                        strSessionFolderName = strBaseTemp;
+                        strSessionDisplayName = strBaseTemp;
                     }
                 }
                 while (sessionDir.exists());
