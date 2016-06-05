@@ -956,6 +956,11 @@ bool MultithreadedTraceAnalyzerLayer::WriteTraceAndMetadataFiles(const gtASCIISt
     FrameInfo frameInfo;
     frameDebugger->GetFrameInfo(&frameInfo);
 
+    // Subtract the captured frames count from the current frame index.
+    // We need to do this even when the captured count is 1 as we actually captured the previous frame and are now at n+1.
+    // In cases where the user has captured more than 1 frames we want the frame index to be where the capture started.
+    frameInfo.mFrameNumber -= GetParentLayerManager()->GetCaptureCount();
+
     // Populate the metadata structure with the values stored in the LayerManager.
     metadataToWrite.mFrameInfo = &frameInfo;
     metadataToWrite.mArchitecture = smd.moduleArchitecture;
