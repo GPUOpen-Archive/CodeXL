@@ -83,7 +83,7 @@ void gpProjectSettingsExtension::Initialize()
 
     // Add the number of frames to capture options
     m_pNumberFramesCombo = new QComboBox();
-    m_pNumberFramesCombo->addItems(QString("1,2,3").split(","));
+    m_pNumberFramesCombo->addItems(QString("1,2,3,4").split(","));
     m_pNumberFramesCombo->setMaximumWidth(GP_MAX_FRAME_CAPTURE_WIDTH);
     pHLayout3->addWidget(new QLabel(GPU_STR_projectSettingNumberOfFramesToCapture), 0);
     pHLayout3->addWidget(m_pNumberFramesCombo, 0);
