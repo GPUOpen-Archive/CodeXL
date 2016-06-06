@@ -118,7 +118,7 @@ void MultithreadedTraceAnalyzerLayer::BeginFrame()
         }
 
         // Set the flag indicating that the frame is being traced. We'll be rendering the next frame when this flag is checked.
-        mLastTracedFrameIndex = GetParentLayerManager()->GetFrameCount();
+        mLastTracedFrameIndex = GetParentLayerManager()->GetCurrentFrameIndex();
 
         // Clear out the previous trace data before tracing the new frame.
         Clear();
@@ -503,7 +503,7 @@ void MultithreadedTraceAnalyzerLayer::HandleLinkedTraceResponse(gtASCIIString& i
                 }
                 else
                 {
-                    Log(logMESSAGE, "Successfully traced frame %d.\n", parentLayerManager->GetFrameCount());
+                    Log(logMESSAGE, "Successfully traced frame %d.\n", parentLayerManager->GetCurrentFrameIndex());
                 }
             }
             else
@@ -831,7 +831,7 @@ bool MultithreadedTraceAnalyzerLayer::WriteTraceAndMetadataFiles(const gtASCIISt
     // Use this object to pass data into and out of the GetSessionManagaerData() method.
     SessionManagerData smd;
 
-    smd.frameIndex = GetParentLayerManager()->GetFrameCount();
+    smd.frameIndex = GetParentLayerManager()->GetCapturedFrameStartIndex();
 
     bool result = SessionManager::Instance()->GetSessionManagerData(smd);
 
@@ -959,7 +959,7 @@ bool MultithreadedTraceAnalyzerLayer::WriteTraceAndMetadataFiles(const gtASCIISt
     // Subtract the captured frames count from the current frame index.
     // We need to do this even when the captured count is 1 as we actually captured the previous frame and are now at n+1.
     // In cases where the user has captured more than 1 frames we want the frame index to be where the capture started.
-    frameInfo.mFrameNumber -= GetParentLayerManager()->GetCaptureCount();
+    frameInfo.mFrameNumber = GetParentLayerManager()->GetCapturedFrameStartIndex();
 
     // Populate the metadata structure with the values stored in the LayerManager.
     metadataToWrite.mFrameInfo = &frameInfo;

@@ -299,7 +299,7 @@ void ModernAPILayerManager::EndFrame()
     if (pTraceAnalyzer != nullptr)
     {
         // Check if the previous frame had been traced. If so, we'll need to clean up the TraceAnalyzer from the stack.
-        bool bTracedLastFrame = (pTraceAnalyzer->GetLastTracedFrameIndex() == static_cast<int>(GetFrameCount()));
+        bool bTracedLastFrame = (pTraceAnalyzer->GetLastTracedFrameIndex() == static_cast<int>(GetCurrentFrameIndex()));
 
         if (bTracedLastFrame && mbTraceTriggeredFromKeypress)
         {
