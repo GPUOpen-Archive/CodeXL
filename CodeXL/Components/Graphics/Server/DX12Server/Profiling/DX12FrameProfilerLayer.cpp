@@ -131,7 +131,7 @@ void DX12FrameProfilerLayer::ConstructMeasurementInfo(FuncId inFuncId, UINT64 in
     out.pWrappedCmdList = pCmdListWrapped;
     out.mCmdListType    = pCmdListWrapped->GetCmdListType();
     out.mSampleId       = inSampleId;
-    out.mFrameIndex     = GetParentLayerManager()->GetFrameCount();
+    out.mFrameIndex     = GetParentLayerManager()->GetCurrentFrameIndex();
     out.mFunctionId     = inFuncId;
 }
 
@@ -451,6 +451,7 @@ void DX12FrameProfilerLayer::SetProfiledFuncs()
     mbProfiledFuncs[FuncId_ID3D12GraphicsCommandList_ClearUnorderedAccessViewUint] = true;
     mbProfiledFuncs[FuncId_ID3D12GraphicsCommandList_ClearUnorderedAccessViewFloat] = true;
 
+    // Barrier
     mbProfiledFuncs[FuncId_ID3D12GraphicsCommandList_ResourceBarrier] = true;
 }
 

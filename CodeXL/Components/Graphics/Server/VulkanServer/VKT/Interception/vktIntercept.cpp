@@ -120,7 +120,7 @@ void ProcessCmdBufFreeList(VktWrappedCmdBuf* pWrappedCmdBuf)
             if (pCurrCmdBuf != nullptr)
             {
                 const UINT originFrame = pCurrCmdBuf->GetOriginFrame();
-                const UINT currFrame = VktLayerManager::GetLayerManager()->GetFrameCount();
+                const UINT currFrame = VktLayerManager::GetLayerManager()->GetCurrentFrameIndex();
                 const UINT frameDifference = currFrame - originFrame;
 
                 if (frameDifference > DEFERRED_RELEASE_FRAME_COUNT)

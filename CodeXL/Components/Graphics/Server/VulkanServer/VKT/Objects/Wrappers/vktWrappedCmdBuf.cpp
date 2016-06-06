@@ -43,7 +43,7 @@ VktWrappedCmdBuf::VktWrappedCmdBuf(const WrappedCmdBufCreateInfo& createInfo) :
 {
     memcpy(&m_createInfo, &createInfo, sizeof(m_createInfo));
 
-    m_originFrame = VktLayerManager::GetLayerManager()->GetFrameCount();
+    m_originFrame = VktLayerManager::GetLayerManager()->GetCurrentFrameIndex();
 
 #if MEASURE_WHOLE_CMD_BUFS
     m_pStaticProfiler = static_cast<VktCmdBufProfilerStatic*>(InitNewProfiler(PROFILER_TYPE_STATIC));
@@ -463,7 +463,7 @@ VkResult VktWrappedCmdBuf::BeginCommandBuffer(VkCommandBuffer commandBuffer, con
             UINT cmdBufId = ((UINT64)m_createInfo.appCmdBuf & 0xFFFFFFFF) + (UINT)m_fillId;
 
             ProfilerMeasurementId measurementId = {};
-            VktUtil::ConstructMeasurementInfo(FuncId_WholeCmdBuf, cmdBufId, this, VktLayerManager::GetLayerManager()->GetFrameCount(), m_fillId, measurementId);
+            VktUtil::ConstructMeasurementInfo(FuncId_WholeCmdBuf, cmdBufId, this, VktLayerManager::GetLayerManager()->GetCurrentFrameIndex(), m_fillId, measurementId);
 
             m_pStaticProfiler->BeginCmdMeasurement(&measurementId);
         }

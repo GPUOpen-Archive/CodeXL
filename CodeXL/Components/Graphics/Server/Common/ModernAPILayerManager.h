@@ -145,6 +145,21 @@ public:
         return m_captureType;
     }
 
+    /// Gets the index of the frame where the capture started
+    /// \return Captured frame start index as an integer
+    unsigned int GetCapturedFrameStartIndex()
+    {
+        int index = GetCurrentFrameIndex() - GetCaptureCount();
+
+        if (index < 0)
+        {
+            Log(logERROR, "GetCapturedFrameStartIndex: is %d, Current Frame Index: %d, Capture Count: %d\n", index, GetCurrentFrameIndex(), GetCaptureCount());
+            return 0;
+        }
+
+        return  (unsigned int)index;
+    }
+
 private:
     //--------------------------------------------------------------------------
     /// Parse the commandline arguments string passed to the target application.
