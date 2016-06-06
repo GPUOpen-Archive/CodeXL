@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE dc_configuration SYSTEM "dcconfig.dtd">
+
+<!--     
+         Basic time-based profiling (TBP) data collection configuration
+         Date:    25 May 2006
+         Version: 1.1
+         Copyright (c) 2006 Advanced Micro Devices, Inc. All rights reserved.
+ -->
+
+<dc_configuration>
+
+  <tbp name="Time-based Sampling" interval="1.0">
+
+    <tool_tip>
+      Find program hot-spots
+    </tool_tip>
+
+    <description>
+      Use this configuration to identify where programs are spending time.
+    </description>
+
+  </tbp>
+
+</dc_configuration>

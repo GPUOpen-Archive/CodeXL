@@ -1,0 +1,35 @@
+# -*- Python -*-
+
+Import('*')
+from CXL_init import *
+
+libName = "CXLDisassembler"
+
+env = CXL_env.Clone()
+
+env.Append( CPPPATH = [ 
+	"inc",
+])
+
+sources = \
+[
+	"src/AttDisassembler.cpp",
+	"src/Disassembler.cpp",
+	"src/Disasmwrapper.cpp",
+	"src/LibDisassembler.cpp",
+]
+
+# Creating object files	
+objFiles = env.SharedObject(sources)
+
+# Creating shared libraries
+soFiles = env.SharedLibrary(
+	target = libName, 
+	source = objFiles)
+
+# Installing libraries
+libInstall = env.Install( 
+	dir = env['CXL_lib_dir'], 
+	source = (soFiles))
+
+Return('libInstall')

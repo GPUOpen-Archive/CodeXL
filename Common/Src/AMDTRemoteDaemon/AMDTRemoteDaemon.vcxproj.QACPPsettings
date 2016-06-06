@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <appSettings>
+    <!--   User application and configured property settings go here.-->
+    <!--   Example: <add key="settingName" value="settingValue"/> -->
+    <add key="TBCompiler.Text" value="C:\PRQA\QACPP-3.0.1-R\personalities\VC++2010.p_c" />
+    <add key="TBMessage.Text" value="C:\Users\abenmos\Documents\PRQA\Visual Studio 2010 Integration\QACPP\qavs.p_s" />
+    <add key="CBHdrWarning.Checked" value="False" />
+    <add key="CBDiagMode.Checked" value="False" />
+    <add key="CBCMA.Checked" value="False" />
+    <add key="CBInclHst.Checked" value="False" />
+    <add key="HMWarnings.Checked" value="False" />
+    <add key="RBMsgVS.Checked" value="True" />
+    <add key="RBMsgBrw.Checked" value="False" />
+    <add key="RBHtml.Checked" value="False" />
+    <add key="CBAnalyseHdr.Checked" value="False" />
+    <add key="CBAnalyseAll.Checked" value="True" />
+    <add key="TBSrcExt.Text" value=".cpp;.cxx;.cc" />
+    <add key="TBHdrExt.Text" value=".h;.hpp;.hh;.hxx" />
+    <add key="TBAdditionalVia.Text" value="" />
+    <add key="defaultCppCompPers" value="VC++2010.p_c" />
+    <add key="TBOutputPath.Text" value="C:\Users\abenmos\Documents\PRQA\Visual Studio 2010 Integration\Temp\QACPP-3.1-R\" />
+    <add key="CBAddOpt.Checked" value="False" />
+    <add key="CBRepOutput.Checked" value="False" />
+    <add key="CBCompile.Checked" value="False" />
+    <add key="CBBuildProject.Checked" value="False" />
+    <add key="ConfigurationQA.Text" value="QA C++ Visual Studio 2010 Configuration: AMDTRemoteDaemon" />
+    <add key="set" value="set" />
+  </appSettings>
+</configuration>

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE dc_configuration SYSTEM "dcconfig.dtd">
+
+<!--     
+         Analyze branch/near return prediction using event-based profiling
+         Date:    15 August 2006
+         Version: 1.1b
+         Copyright (c) 2006 Advanced Micro Devices, Inc. All rights reserved.
+ -->
+
+<dc_configuration>
+
+  <ebp name="Investigate Branching" mux_period="1">
+
+      <event select="C2" mask="00" os="T" user="T" count="25000"></event>
+      <event select="C3" mask="00" os="T" user="T" count="25000"></event>
+      <event select="C4" mask="00" os="T" user="T" count="25000"></event>
+      <event select="C0" mask="00" os="T" user="T" count="250000"></event>
+      <event select="C8" mask="00" os="T" user="T" count="25000"></event>
+      <event select="C9" mask="00" os="T" user="T" count="25000"></event>
+      <event select="CA" mask="00" os="T" user="T" count="25000"></event>
+
+    <tool_tip>
+      Find mispredicted branches/near returns
+    </tool_tip>
+
+    <description>
+      Use this configuration to find poorly predicted branches and
+      near returns.
+    </description>
+
+  </ebp>
+
+</dc_configuration>

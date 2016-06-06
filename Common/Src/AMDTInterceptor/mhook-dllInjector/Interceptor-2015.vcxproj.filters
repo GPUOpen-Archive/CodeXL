@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Interceptor.cpp" />
+    <ClCompile Include="dllInjector.cpp" />
+    <ClCompile Include="..\..\..\Lib\Ext\mhook\mhook-lib\mhook.cpp">
+      <Filter>mhook\mhook-lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lib\Ext\mhook\disasm-lib\cpu.c">
+      <Filter>mhook\disasm-lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lib\Ext\mhook\disasm-lib\disasm.c">
+      <Filter>mhook\disasm-lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lib\Ext\mhook\disasm-lib\disasm_x86.c">
+      <Filter>mhook\disasm-lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Lib\Ext\mhook\disasm-lib\misc.c">
+      <Filter>mhook\disasm-lib</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Lib\Ext\mhook\mhook-lib\mhook.h">
+      <Filter>mhook\mhook-lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lib\Ext\mhook\disasm-lib\cpu.h">
+      <Filter>mhook\disasm-lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lib\Ext\mhook\disasm-lib\disasm.h">
+      <Filter>mhook\disasm-lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lib\Ext\mhook\disasm-lib\disasm_x86.h">
+      <Filter>mhook\disasm-lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lib\Ext\mhook\disasm-lib\disasm_x86_tables.h">
+      <Filter>mhook\disasm-lib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Lib\Ext\mhook\disasm-lib\misc.h">
+      <Filter>mhook\disasm-lib</Filter>
+    </ClInclude>
+    <ClInclude Include="dllInjector.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="mhook">
+      <UniqueIdentifier>{c5b7e844-beaa-412b-b728-9838f98f0e9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mhook\disasm-lib">
+      <UniqueIdentifier>{a9a814c2-6fd5-4a1c-b115-e8158dd8f772}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mhook\mhook-lib">
+      <UniqueIdentifier>{bcbe8428-c429-437c-a1a6-3371dbe1fd2e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

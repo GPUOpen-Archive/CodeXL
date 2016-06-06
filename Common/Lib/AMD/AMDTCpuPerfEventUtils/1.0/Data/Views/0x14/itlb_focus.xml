@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!DOCTYPE view_configuration SYSTEM "..\viewconfig.dtd">
+
+<!--
+        Show instruction TLB (ITLB) measurements
+        View configuration
+        Date:      4 May 2010
+        Version:   1.3
+        Processor: AMD family 14h
+        Copyright (c) 2006-2010 Advanced Micro Devices, Inc.
+                      All rights reserved.
+
+        The itlb_focus view should be available when instruction cache fetch
+        ITLB miss, and retired instruction events are available.
+
+        Related data collection configurations: inst_access.xml
+ -->
+
+<view_configuration>
+
+  <view name="ITLB report"
+        separate_cpus="F"
+        separate_processes="F"
+        separate_threads="F"
+        >
+
+    <data>
+      <event id="Ret_instructions" select="c0" mask="00" />
+      <event id="IC_fetches"       select="80" mask="00" />
+      <event id="ITLB_miss"        select="85" mask="03" />
+    </data>
+
+    <output>
+      <column title="Ret inst" sort="descending">
+        <value id="Ret_instructions" />
+      </column>
+      <column title="ITLB requests" sort="none">
+        <value id="IC_fetches" />
+      </column>
+      <column title="ITLB Miss" sort="none">
+        <value id="ITLB_miss" />
+      </column>
+      <column title="ITLB request rate" sort="none">
+        <ratio left="IC_fetches" right="Ret_instructions" />
+      </column>
+      <column title="ITLB miss rate" sort="none">
+        <ratio left="ITLB_miss" right="Ret_instructions" />
+      </column>
+    </output>
+
+    <tool_tip>
+      Show detailed ITLB measurements
+    </tool_tip>
+
+    <description>
+      Use this view to analyze the instruction translation
+      lookaside buffer (ITLB) miss rate.
+    </description>
+
+  </view>
+
+</view_configuration>

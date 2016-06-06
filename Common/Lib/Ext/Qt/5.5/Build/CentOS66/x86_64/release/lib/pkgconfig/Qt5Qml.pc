@@ -1,0 +1,14 @@
+prefix=/home/3dargbld/Qt-5.5.1
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 Qml
+Description: Qt Qml module
+Version: 5.5.1
+Libs: -L${libdir} -lQt5Qml 
+Libs.private: -L/home/3dargbld/Desktop/icu54/lib -L/home/3dargbld/Qt-5.5.1/lib -lQt5Network -lQt5Core -lpthread -lrt  
+Cflags: -I${includedir}/QtQml -I${includedir}
+Requires: Qt5Core Qt5Network
+

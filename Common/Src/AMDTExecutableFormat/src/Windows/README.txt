@@ -1,0 +1,2 @@
+The original source of SymbolManglingIA.cpp is from LLVM project https://llvm.org/svn/llvm-project/libcxxabi/trunk/src/cxa_demangle.cpp
+The License for this project is available at https://llvm.org/svn/llvm-project/libcxxabi/trunk/LICENSE.TXT and a copy of license file is being kept in the same folder.

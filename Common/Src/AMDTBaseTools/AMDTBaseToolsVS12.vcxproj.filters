@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{c79692d4-6e81-4433-bff1-77d4352890a4}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Include">
+      <UniqueIdentifier>{95ed0323-f04d-46f1-9d67-f84249ca94b8}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{389bf930-f1c3-4ff0-81fd-3539eb62e85c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\gtAssert.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gtIAllocationFailureObserver.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gtIAssertionFailureHandler.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gtList.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gtMap.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gtRedBlackTree.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gtSingeltonsDelete.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gtString.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gtStringTokenizer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gtVector.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gtASCIIString.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gtASCIIStringTokenizer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gtErrorString.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\gtAlgorithms.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtAssert.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtAutoPtr.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\AMDTDefinitions.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtGRBaseToolsDLLBuild.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtIAllocationFailureObserver.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtIAssertionFailureHandler.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtIgnoreCompilerWarnings.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtList.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtMap.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtPtrVector.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtQueue.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtRedBlackTree.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtString.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtStringTokenizer.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtVector.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtASCIIString.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtASCIIStringTokenizer.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtStringConstants.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\gtSingeltonsDelete.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtSet.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtFragmentedVector.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtSmallSList.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtHashSet.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtHashMap.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtDenseIndexSet.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtStack.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtFlatMap.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtFlatSet.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\gtFlatTree.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\VersionInfo\VersionResource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

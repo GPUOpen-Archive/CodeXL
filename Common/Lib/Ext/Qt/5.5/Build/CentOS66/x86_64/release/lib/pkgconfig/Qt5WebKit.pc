@@ -1,0 +1,14 @@
+prefix=/home/3dargbld/Qt-5.5.1
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 WebKit
+Description: Qt WebKit module
+Version: 5.5.1
+Libs: -L${libdir} -lQt5WebKit 
+Libs.private: -L/home/3dargbld/Qt-5.5.1/lib -lQt5Gui -L/home/3dargbld/Desktop/icu54/lib -L/home/3dargbld/Qt-5.5.1/lib -lQt5Core -lpthread -lQt5Network -L/home/3dargbld/Desktop/icu54/lib -L/home/3dargbld/Qt-5.5.1/lib -lQt5Core -lpthread -lQt5Core -L/home/3dargbld/Desktop/icu54/lib -lpthread -lpthread -L/home/3dargbld/Desktop/icu54/lib -Wl,-whole-archive -lWebKit1 -Wl,-no-whole-archive -L/home/3dargbld/Downloads/qtbuild-xcb/qtwebkit/Source/WebKit/ -Wl,-whole-archive -lWebKit2 -Wl,-no-whole-archive -L/home/3dargbld/Downloads/qtbuild-xcb/qtwebkit/Source/WebKit2/ -lrt -Wl,-whole-archive -lWebCore -Wl,-no-whole-archive -L/home/3dargbld/Downloads/qtbuild-xcb/qtwebkit/Source/WebCore/ -lz -lXrender -lXcomposite -lXrender -lpng -Wl,-whole-archive -lANGLE -Wl,-no-whole-archive -L/home/3dargbld/Downloads/qtbuild-xcb/qtwebkit/Source/ThirdParty/ANGLE/ -Wl,-whole-archive -lleveldb -Wl,-no-whole-archive -L/home/3dargbld/Downloads/qtbuild-xcb/qtwebkit/Source/ThirdParty/leveldb/ -Wl,-whole-archive -lJavaScriptCore -Wl,-no-whole-archive -L/home/3dargbld/Downloads/qtbuild-xcb/qtwebkit/Source/JavaScriptCore/ -Wl,-whole-archive -lWTF -Wl,-no-whole-archive -L/home/3dargbld/Downloads/qtbuild-xcb/qtwebkit/Source/WTF/ -licui18n -licuuc -licudata -lXext -lX11 -lm -lX11 -lxslt -lz -lm -lxml2 -lxml2 -lsqlite3 -L/home/3dargbld/Qt-5.5.1/lib -lQt5Sensors -L/home/3dargbld/Desktop/icu54/lib -L/home/3dargbld/Qt-5.5.1/lib -lQt5Core -lpthread -L/home/3dargbld/Qt-5.5.1/lib -lQt5Positioning -L/home/3dargbld/Desktop/icu54/lib -L/home/3dargbld/Qt-5.5.1/lib -lQt5Core -lpthread -L/home/3dargbld/Qt-5.5.1/lib -lQt5Quick -L/home/3dargbld/Desktop/icu54/lib -L/home/3dargbld/Qt-5.5.1/lib -lQt5Gui -L/home/3dargbld/Qt-5.5.1/lib -lQt5Qml -lQt5Network -lQt5Core -lpthread -lQt5Qml -L/home/3dargbld/Desktop/icu54/lib -L/home/3dargbld/Qt-5.5.1/lib -lQt5Network -lQt5Core -lpthread -L/home/3dargbld/Qt-5.5.1/lib -lQt5Multimedia -L/home/3dargbld/Desktop/icu54/lib -L/home/3dargbld/Qt-5.5.1/lib -lQt5Network -lQt5Gui -lQt5Core -lpthread -lQt5Network -L/home/3dargbld/Desktop/icu54/lib -L/home/3dargbld/Qt-5.5.1/lib -lQt5Core -lpthread -lQt5Gui -L/home/3dargbld/Desktop/icu54/lib -L/home/3dargbld/Qt-5.5.1/lib -lQt5Core -lpthread -L/home/3dargbld/Qt-5.5.1/lib -lQt5WebChannel -L/home/3dargbld/Desktop/icu54/lib -L/home/3dargbld/Qt-5.5.1/lib -lQt5Qml -L/home/3dargbld/Qt-5.5.1/lib -lQt5Network -lQt5Core -lpthread -lQt5Sql -L/home/3dargbld/Desktop/icu54/lib -L/home/3dargbld/Qt-5.5.1/lib -lQt5Core -lpthread -lQt5Core -L/home/3dargbld/Desktop/icu54/lib -lpthread -lGL  
+Cflags: -I${includedir}/QtWebKit -I${includedir}
+Requires: Qt5Core Qt5Gui Qt5Network
+

@@ -1,0 +1,117 @@
+<cpu_events>
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Data Cache Unit = 3
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+<source unit="DC">
+
+<event name="Data cache accesses"  abbreviation="DC accesses" value="40"  />
+
+<event name="Data cache misses" abbreviation="DC misses" value="41"  />
+
+<event name="Data cache refills from L2"
+       abbreviation="DC refills L2" value="42" >
+	<mask name="Invalid" value="0" />
+	<mask name="Shared" value="1" />
+	<mask name="Exclusive" value="2" />
+	<mask name="Owned" value="3" />
+	<mask name="Modified" value="4" />
+</event>
+
+<event name="Data cache refills from system" 
+       abbreviation="DC refills sys" value="43" >
+	<mask name="Invalid" value="0" />
+	<mask name="Shared" value="1" />
+	<mask name="Exclusive" value="2" />
+	<mask name="Owned" value="3" />
+	<mask name="Modified" value="4" />
+</event>
+
+<event name="Evicted lines"  abbreviation="Evicted lines"  value="44" >
+	<mask name="Invalid" value="0" />
+	<mask name="Shared" value="1" />
+	<mask name="Exclusive" value="2" />
+	<mask name="Owned" value="3" />
+	<mask name="Modified" value="4" />
+</event>
+
+<event name="L1 DTLB miss and L2 DTLB hit"
+       abbreviation="DTLB L1M L2H" value="45"  />
+
+<event name="L1 and L2 DTLB miss"  
+       abbreviation="DTLB L1M L2M" value="46"  />
+
+<event name="Misaligned data reference"  
+       abbreviation="Misalign data ref" value="47"  />
+
+</source>
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Branch Unit = 3
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+<source unit="BU">
+
+<event name="Unhalted CPU clock cycles"
+       abbreviation="CPU cycles" value="76" />
+
+</source>
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; IC source unit
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+<source unit="IC">
+
+<event name="ICache fetch" abbreviation="IC fetch" value="80" />
+<event name="ICache miss" abbreviation="IC miss" value="81" />
+
+<event name="L1 ITLB miss and L2 ITLB hit"
+       abbreviation="ITLB L1M L2H"  value="84" />
+<event name="L1 ITLB miss and L2 ITBL miss"
+       abbreviation="ITLB L1M L2M" value="85" />
+
+</source>
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; FR source unit
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+<source unit="FR">
+
+<event name="Retired x86 instructions"
+       abbreviation="Ret inst"  value="C0" />
+
+<event name="Retired micro-ops" 
+       abbreviation="Ret uops"  value="C1" />
+<event name="Retired branches including exceptions and interrupts"
+       abbreviation="Ret branch"  value="C2" />
+
+<event name="Retired branches mispredicted" 
+       abbreviation="Ret misp branch"  value="C3" />
+
+<event name="Retired taken branches" 
+       abbreviation="Ret taken branch"  value="C4" />
+
+<event name="Retired taken branches mispredicted"
+       abbreviation="Ret taken branch misp"  value="C5" />
+
+<event name="Retired far control transfers" 
+       abbreviation="Ret far control xfers"  value="C6" />
+
+<event name="Retired resyncs" 
+       abbreviation="Ret resyncs"  value="C7" />
+
+<event name="Interrupts masked cycles (IF=0)" 
+       abbreviation="Int-masked cycles"  value="CD" />
+
+<event name="Interrupts masked while pending cycles (INTR while IF=0)"
+       abbreviation="Int-masked pending"  value="CE" />
+
+<event name="Taken hardware interrupts" 
+       abbreviation="Taken HW int"  value="CF" />
+	
+</source>
+
+</cpu_events>

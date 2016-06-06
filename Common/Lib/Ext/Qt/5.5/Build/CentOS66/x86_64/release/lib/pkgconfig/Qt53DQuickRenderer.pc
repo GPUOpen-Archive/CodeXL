@@ -1,0 +1,14 @@
+prefix=/home/3dargbld/Qt-5.5.1
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 3DQuickRenderer
+Description: Qt 3DQuickRenderer module
+Version: 5.5.1
+Libs: -L${libdir} -lQt53DQuickRenderer 
+Libs.private: -L/home/3dargbld/Desktop/icu54/lib -L/home/3dargbld/Qt-5.5.1/lib -lQt53DRenderer -L/home/3dargbld/Qt-5.5.1/lib -lQt53DQuick -L/home/3dargbld/Qt-5.5.1/lib -lQt53DCore -lQt5OpenGLExtensions -lGL -lQt5Gui -lQt5Qml -lQt5Network -lQt5Concurrent -lQt5Core -lpthread -lGL  
+Cflags: -I${includedir}/Qt3DQuickRenderer -I${includedir}
+Requires: Qt5Core Qt5Gui Qt5Qml Qt53DCore Qt53DRenderer Qt53DQuick
+

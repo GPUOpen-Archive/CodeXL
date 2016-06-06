@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!DOCTYPE view_configuration SYSTEM "..\viewconfig.dtd">
+
+<!--
+        IBS Northbridge local/remote access
+        View configuration
+        Date:    4 September 2014
+        Version: 1.06
+		Processor: AMD family 15h Models 60h - 6Fh
+        Copyright (c) 2014 Advanced Micro Devices, Inc. All rights reserved.
+
+        Related data collection configurations: ibs.xml
+ -->
+
+<view_configuration>
+
+  <view name="IBS NB local/remote access"
+        separate_cpus="F"
+        separate_processes="F"
+        separate_threads="F"
+        >
+
+    <data>
+      <event id="OpLoad"       select="F201" mask="00" />
+      <event id="NbLocal"      select="F240" mask="00" />
+      <event id="NbRemote"     select="F241" mask="00" />
+      <event id="NbLocalLat"   select="F24B" mask="00" />
+      <event id="NbRemoteLat"  select="F24C" mask="00" />
+    </data>
+
+    <output>
+      <column title="IBS load" sort="descending">
+        <value id="OpLoad" />
+      </column>
+      <column title="IBS NB local" sort="none">
+        <value id="NbLocal" />
+      </column>
+      <column title="IBS NB local lat" sort="none">
+        <value id="NbLocalLat" />
+      </column>
+      <column title="Ave local lat" sort="none">
+        <ratio left="NbLocalLat" right="NbLocal" />
+      </column>
+      <column title="IBS NB remote" sort="none">
+        <value id="NbRemote" />
+      </column>
+      <column title="IBS NB remote lat" sort="none">
+        <value id="NbRemoteLat" />
+      </column>
+      <column title="Ave remote lat" sort="none">
+        <ratio left="NbRemoteLat" right="NbRemote" />
+      </column>
+    </output>
+
+    <tool_tip>
+      Show IBS Northbridge local/remote access
+    </tool_tip>
+
+    <description>
+      Use this view to show the number and latency of local and remote accesses
+      through the Northbridge.
+    </description>
+
+  </view>
+
+</view_configuration>

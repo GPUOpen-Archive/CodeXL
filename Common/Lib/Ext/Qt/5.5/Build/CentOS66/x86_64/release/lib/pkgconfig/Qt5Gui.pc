@@ -1,0 +1,14 @@
+prefix=/home/3dargbld/Qt-5.5.1
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 Gui
+Description: Qt Gui module
+Version: 5.5.1
+Libs: -L${libdir} -lQt5Gui 
+Libs.private: -L/home/3dargbld/Desktop/icu54/lib -L/home/3dargbld/Qt-5.5.1/lib -lQt5Core -lpthread -lpng -lqtharfbuzzng -L/home/3dargbld/Desktop/icu54/lib -lGL  
+Cflags: -I${includedir}/QtGui -I${includedir}
+Requires: Qt5Core
+

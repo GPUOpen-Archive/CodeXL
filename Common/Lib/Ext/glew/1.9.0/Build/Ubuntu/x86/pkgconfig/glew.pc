@@ -1,0 +1,10 @@
+prefix=/home/rouellet/glewtmp
+exec_prefix=/home/rouellet/glewtmp/bin
+libdir=/home/rouellet/glewtmp/lib
+includedir=/home/rouellet/glewtmp/include/GL
+
+Name: glew
+Description: The OpenGL Extension Wrangler library
+Version: 1.9.0
+Cflags: -I${includedir} 
+Libs: -L${libdir} -lGLEW

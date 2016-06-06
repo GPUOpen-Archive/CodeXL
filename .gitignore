@@ -257,6 +257,8 @@ CodeXL/Components/GpuProfiling/AMDTGpuProfiling/GeneratedFiles/
 CodeXL/Components/GpuProfiling/AMDTGpuProfiling/tmp/
 CodeXL/Components/PowerProfiling/AMDTPowerProfiling/tmp/
 CodeXL/Components/ShaderAnalyzer/AMDTKernelAnalyzer/tmp/
+Common/Src/AMDTApplication/tmp/
+Common/Src/AMDTApplicationComponents/tmp/
 
 # User Guide output files
 CodeXL/Help/CodeXL User Guide/HTML help/
@@ -280,3 +282,6 @@ CodeXL/Help/CodeXL User Guide/webhelp/
 /CodeXL/variant_release
 /CodeXL/Components/GpuProfiling/Backend/CodeXLGpuProfiler
 /CodeXL/Components/GpuProfiling/**/*.a
+/Common/Src/**/*.so
+/Common/Src/**/*.a
+

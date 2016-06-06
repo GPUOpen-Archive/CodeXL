@@ -1,0 +1,71 @@
+# -*- Python -*-
+# $Id: SConscript 4614 2010-04-09 13:11:41Z rgorton $
+# SConscript for building the relevant/requisite parts of OpenCLDebugAPI
+# within the ShaderDebugger tree
+
+# rgorton - 23-Aug-2011 - not all of these files need all of the includes
+# This could be improved upon in the future by further splitting
+# content into additional subsidiary SConscripts
+
+Import('*')
+import os.path
+
+sd_env = env.Clone()
+
+sd_env.Append(CCFLAGS=" -I" + sd_dir + '/Src')
+sd_env.Append(CCFLAGS=" -I" + sd_dir + '/Include')
+sd_env.Append(CCFLAGS=" -I" + sd_dir + '/Src/Utils')
+sd_env.Append(CCFLAGS=" -I" + commondir + '/Src/ShaderUtils')
+sd_env.Append(CCFLAGS=" -I" + commondir + '/Src/ShaderUtils/IL')
+sd_env.Append(CCFLAGS=" -I" + commondir + '/Src/CElf/Include')
+sd_env.Append(CCFLAGS=" -I" + commondir + '/Lib/AMD/CAL/8.95/include')
+sd_env.Append(CCFLAGS=" -I" + commondir + '/Lib/AMD/ACL/TOT/include')
+sd_env.Append(CCFLAGS=" -I" + sd_dir + '/Src/ShaderDebuggerIL/sc' +
+                      " -I" + sd_dir + '/Src/ShaderDebuggerIL/sc/IL/inc' +
+                      " -I" + sd_dir + '/Src/ShaderDebuggerIL/sc/Src' +
+                      " -I" + sd_dir + '/Src/ShaderDebuggerIL/sc/Interface' +
+                      " -I" + sd_dir + '/Src/ShaderDebuggerIL/sc/IL/ILTextTranslator ')
+
+if (os_major_type == 'Linux'):
+    sd_env.Append(CCFLAGS=" -Wno-missing-braces -Wno-parentheses")
+
+# for a couple of these files, relax the Wall behavior on Linux
+relaxed_sd_env = sd_env.Clone()
+if (os_major_type == 'Linux'):
+    relaxed_sd_env.Append(CCFLAGS=" -Wno-strict-aliasing")
+    if (uses_gcc412 == '1'):
+        relaxed_sd_env.Append(CCFLAGS=" -Wno-non-virtual-dtor")
+
+elf_files =  Split('CElf/Src/CElf.cpp ' +
+                 'CElf/Src/CElfSection.cpp ' +
+                 'CElf/Src/CElfStringTable.cpp ' +
+                 'CElf/Src/CElfSymbolTable.cpp '
+                 )
+
+dynlib_files = Split('DynamicLibraryModule/DynamicLibraryModule.cpp ' +
+                     'DynamicLibraryModule/CALModule.cpp ' +
+                     'DynamicLibraryModule/OpenCLModule.cpp ' +
+                     'DynamicLibraryModule/ACLModule.cpp '
+                    )
+
+common_files = Split('ShaderUtils/StringUtils.cpp ' +
+                     'ShaderUtils/SUBuffer.cpp ' +
+                     'ShaderUtils/SUCommon.cpp ' +
+                     'GDT_Memory.cpp '
+                    )
+
+relaxed_files = Split('ShaderUtils/IL/ILShaderUtils.cpp ')
+
+# platform specific files (if any)
+# if (os_major_type == 'Windows'):
+#     # platform_files = 
+# if (os_major_type == 'Linux'):
+#     # platform_files = 
+
+common_objs = sd_env.SharedObject(common_files + elf_files + dynlib_files)
+relaxed_objs = relaxed_sd_env.SharedObject(relaxed_files)
+all_objs = common_objs + relaxed_objs
+
+OCLDA_Lib += [all_objs]
+
+Return('all_objs')

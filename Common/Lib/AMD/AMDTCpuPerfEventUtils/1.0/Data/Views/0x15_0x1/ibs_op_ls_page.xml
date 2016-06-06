@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!DOCTYPE view_configuration SYSTEM "..\viewconfig.dtd">
+
+<!--
+        IBS load/store DTLB address translations by page size
+        View configuration
+        Date:    8 July 2008
+        Version: 1.1
+        Copyright (c) 2008 Advanced Micro Devices, Inc. All rights reserved.
+
+        Related data collection configurations: ibs.xml
+ -->
+
+<view_configuration>
+
+  <view name="IBS MEM translations by page size"
+        separate_cpus="F"
+        separate_processes="F"
+        separate_threads="F"
+        >
+
+    <data>
+      <event id="OpLoadStore"  select="F200" mask="00" />
+      <event id="OpL1page4K"   select="F211" mask="00" />
+      <event id="OpL1page2M"   select="F212" mask="00" />
+      <event id="OpL1page1G"   select="F213" mask="00" />
+      <event id="OpL2page4K"   select="F215" mask="00" />
+      <event id="OpL2page2M"   select="F216" mask="00" />
+      <event id="OpL2page1G"   select="F217" mask="00" />
+    </data>
+
+    <output>
+      <column title="IBS load/store" sort="descending">
+        <value id="OpLoadStore" />
+      </column>
+      <column title="IBS L1 DTLB 4K" sort="none">
+        <value id="OpL1page4K" />
+      </column>
+      <column title="IBS L1 DTLB 2M" sort="none">
+        <value id="OpL1page2M" />
+      </column>
+      <column title="IBS L1 DTLB 1G" sort="none">
+        <value id="OpL1page1G" />
+      </column>
+      <column title="IBS L2 DTLB 4K" sort="none">
+        <value id="OpL2page4K" />
+      </column>
+      <column title="IBS L2 DTLB 2M" sort="none">
+        <value id="OpL2page2M" />
+      </column>
+      <column title="IBS L2 DTLB 1G" sort="none">
+        <value id="OpL2page1G" />
+      </column>
+    </output>
+
+    <tool_tip>
+      Show DTLB translations by page size
+    </tool_tip>
+
+    <description>
+      Use this view to show a summary of DTLB address translations
+      broken out by page size.
+    </description>
+
+  </view>
+
+</view_configuration>

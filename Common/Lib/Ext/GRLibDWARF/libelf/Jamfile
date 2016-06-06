@@ -1,0 +1,13 @@
+##
+## Copyright (c) 2008 Advanced Micro Devices, Inc. All rights reserved.
+##
+
+lib elf.lib
+    : [ glob *.c ]
+    : <toolset>gcc:<cflags>"-fPIC -fno-strict-aliasing"
+      <target-os>windows:<include>../common/win32
+      <variant>release:<define>NDEBUG <variant>debug:<define>_DEBUG
+      <include>. <include>../common <link>static :
+    : <include>. <target-os>windows:<include>../common/win32
+    ;
+

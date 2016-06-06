@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<!DOCTYPE view_configuration SYSTEM "..\viewconfig.dtd">
+
+<!--
+        IBS return op
+        View configuration
+        Date:    7 May 2007
+        Version: 0.2
+        Copyright (c) 2007 Advanced Micro Devices, Inc. All rights reserved.
+
+        Related data collection configurations: ibs.xml
+ -->
+
+<view_configuration>
+
+  <view name="IBS BR return"
+        separate_cpus="F"
+        separate_processes="F"
+        separate_threads="F"
+        >
+
+    <data>
+      <event id="OpAll"        select="F100" mask="00" />
+      <event id="OpBr"         select="F103" mask="00" />
+      <event id="OpRet"        select="F107" mask="00" />
+      <event id="OpMispRet"    select="F108" mask="00" />
+      <event id="OpTagToRet"   select="F101" mask="00" />
+      <event id="OpCompToRet"  select="F102" mask="00" />
+    </data>
+
+    <output>
+      <column title="IBS RET" sort="descending">
+        <value id="OpRet" />
+      </column>
+      <column title="IBS all ops" sort="none" visible="F">
+        <value id="OpAll" />
+      </column>
+      <column title="IBS BR" sort="none">
+        <value id="OpBr" />
+      </column>
+      <column title="IBS misp RET" sort="none">
+        <value id="OpMispRet" />
+      </column>
+      <column title="Mispredict ratio" sort="none">
+        <ratio left="OpMispRet" right="OpRet" />
+      </column>
+      <column title="IBS tag-to-ret" sort="none" visible="F">
+        <value id="OpTagToRet" />
+      </column>
+      <column title="IBS comp-to-ret" sort="none" visible="F">
+        <value id="OpCompToRet" />
+      </column>
+      <column title="Ave tag-to-ret" sort="none">
+        <ratio left="OpTagToRet" right="OpAll" />
+      </column>
+      <column title="Ave comp-to-ret" sort="none">
+        <ratio left="OpCompToRet" right="OpAll" />
+      </column>
+    </output>
+
+    <tool_tip>
+      Show IBS return op data
+    </tool_tip>
+
+    <description>
+      Use this view to show IBS return op measurements including
+      the return misprediction ratio.
+    </description>
+
+  </view>
+
+</view_configuration>

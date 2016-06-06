@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!DOCTYPE dc_configuration SYSTEM "dcconfig.dtd">
+
+<!--     
+         Basic assessment of performance using event-based profiling
+         Date:    29 April 2010
+         Version: 1.3
+         Processor: AMD family 12h
+         Copyright (c) 2008-2010 Advanced Micro Devices, Inc. 
+                       All rights reserved.
+ -->
+
+<dc_configuration>
+
+  <ebp name="Assess Performance" mux_period="1">
+
+      <event select="C0" mask="00" os="T" user="T" count="250000"></event>
+      <event select="76" mask="00" os="T" user="T" count="250000"></event>
+      <event select="C2" mask="00" os="T" user="T" count="25000"></event>
+      <event select="C3" mask="00" os="T" user="T" count="25000"></event>
+      <event select="40" mask="00" os="T" user="T" count="250000"></event>
+      <event select="41" mask="00" os="T" user="T" count="25000"></event>
+      <event select="46" mask="07" os="T" user="T" count="25000"></event>
+      <event select="47" mask="00" os="T" user="T" count="25000"></event>
+
+    <tool_tip>
+      Get an overall assessment of performance
+    </tool_tip>
+
+    <description>
+      Use this configuration to get an overall assessment of performance and
+      to find potential issues for investigation.
+    </description>
+
+  </ebp>
+
+</dc_configuration>

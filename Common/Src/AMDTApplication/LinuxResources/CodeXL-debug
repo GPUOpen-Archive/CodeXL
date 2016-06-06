@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# ----------------------------------------------------------------------------------------------------------------------------------
+# File name: CodeXL
+# This script sets CodeXL's related environment variables and 
+# executed the CodeXL binary executable.
+#
+# (c) 2012 Advanced Micro Devices Inc.
+# ----------------------------------------------------------------------------------------------------------------------------------
+
+# Get this script full path:
+if echo "$0" | grep '^/' ; then
+	thisScriptFullPath="$0"
+else
+	thisScriptFullPath=`pwd`/$0
+fi
+
+# CodeXL's binaries directory is this scripts directory:
+CodeXLBinariesDir=`dirname "$thisScriptFullPath"`
+
+# Calculate CodeXL's binary executable path:
+CodeXLBinaryExePath="${CodeXLBinariesDir}/CodeXL-bin"
+
+# Add CodeXL's binaries directory to LD_LIBRARY_PATH:
+if [ -z "$LD_LIBRARY_PATH" ]; then
+	export LD_LIBRARY_PATH="${CodeXLBinariesDir}"
+else
+	export LD_LIBRARY_PATH="${CodeXLBinariesDir}:$LD_LIBRARY_PATH"
+fi
+
+# Run CodeXL:
+kdbg $CodeXLBinaryExePath
+

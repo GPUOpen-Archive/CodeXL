@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!DOCTYPE view_configuration SYSTEM "..\viewconfig.dtd">
+
+<!--
+        Show instruction TLB (ITLB) measurements
+        View configuration
+        Date:    20 February 2008
+        Version: 1.2
+        Processor: AMD family 11h
+        Copyright (c) 2008 Advanced Micro Devices, Inc. All rights reserved.
+
+        The itlb_focus view should be available when instruction cache fetches,
+        ITLB_L1M_L2H, ITLB_L1M_L2M, and retired instructions are available.
+
+        Related data collection configurations: inst_access.xml
+ -->
+
+<view_configuration>
+
+  <view name="ITLB report"
+        separate_cpus="F"
+        separate_processes="F"
+        separate_threads="F"
+        >
+
+    <data>
+      <event id="Ret_instructions" select="c0" mask="00" />
+      <event id="IC_fetches"       select="80" mask="00" />
+      <event id="ITLB_L1M_L2H"     select="84" mask="00" />
+      <event id="ITLB_L1M_L2M"     select="85" mask="00" />
+    </data>
+
+    <output>
+      <column title="Ret inst" sort="descending">
+        <value id="Ret_instructions" />
+      </column>
+      <column title="ITLB requests" sort="none">
+        <value id="IC_fetches" />
+      </column>
+      <column title="ITLB L1M L2H" sort="none">
+        <value id="ITLB_L1M_L2H" />
+      </column>
+      <column title="ITLB L1M L2M" sort="none">
+        <value id="ITLB_L1M_L2M" />
+      </column>
+      <column title="ITLB request rate" sort="none">
+        <ratio left="IC_fetches" right="Ret_instructions" />
+      </column>
+      <column title="ITLB L1M L2H rate" sort="none">
+        <ratio left="ITLB_L1M_L2H" right="Ret_instructions" />
+      </column>
+      <column title="ITLB L1M L2M rate" sort="none">
+        <ratio left="ITLB_L1M_L2M" right="Ret_instructions" />
+      </column>
+    </output>
+
+    <tool_tip>
+      Show detailed ITLB measurements
+    </tool_tip>
+
+    <description>
+      Use this view to analyze and break out instruction translation
+      lookaside buffer (ITLB) miss rates by level (L1 and L2.)
+    </description>
+
+  </view>
+
+</view_configuration>

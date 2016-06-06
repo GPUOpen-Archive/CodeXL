@@ -1,0 +1,14 @@
+prefix=/home/3dargbld/Qt-5.5.1
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 OpenGL
+Description: Qt OpenGL module
+Version: 5.5.1
+Libs: -L${libdir} -lQt5OpenGL 
+Libs.private: -L/home/3dargbld/Desktop/icu54/lib -L/home/3dargbld/Qt-5.5.1/lib -lQt5Widgets -lQt5Gui -lQt5Core -lpthread -lGL  
+Cflags: -I${includedir}/QtOpenGL -I${includedir}
+Requires: Qt5Core Qt5Gui Qt5Widgets
+

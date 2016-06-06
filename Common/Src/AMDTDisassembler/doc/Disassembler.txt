@@ -1,0 +1,132 @@
+The Disassembler class provides a generic x86 disassembler.  It currently
+supports 3dnow, MMX, SSE, SSE2, REX, SEM, PNI, and FMAC instruction extensions. 
+It provides mechanisms for overriding its behavior and for extending the 
+information it can provide.
+
+Disassembly involves telling the disassembler the dbit setting, the long 
+mode setting (64-bit), and the instruction bytes.  The dbit and long mode 
+settings are modal and are not typically changed on every instruction.  
+After setting up those modes, the disassembler is called with a pointer to 
+the instruction bytes.  The instruction bytes can be either decoded, or 
+decoded and disassembled.  Decoding involves breaking the instruction bytes 
+into their constituent parts (prefix bytes, opcode bytes, operand bytes, ...), 
+disassembly involves decode as well as mnemonic generation.  Either way 
+(decode or disassemble), you can query the disassembler afterwards for data
+about the instruction bytes (if decode or disassembly succeeded).
+
+The disassembler was designed to facilitate derivation.  This was done to 
+provide maximum flexibility: allowing the disassembler to meet the needs of 
+a variety of applications.  The base disassembler provides an efficient 
+decoding system that will break up opcode bytes into instruction fields.  
+Furthermore, it provides a formal mnemonic generation system that is driven 
+by the instruction bytes directly so that there is a one to one correlation 
+between instruction bytes and the mnemonic generated: you can determine exactly 
+which instruction was specified from the mnemonic alone.
+
+The disassembler allows derived classes to change almost every aspect of the
+disassembler.  This includes changing the instruction mnemonic, the way the
+instruction operands are printed, whether or not prefix bytes are printed,
+how numbers are printed, ....  Because the disassembler was implemented as 
+simple as possible while providing maximum control to derived classes, the 
+disassembler can be used in an unlimited number of ways.
+
+The disassembler is table driven with the tables being organized in a formal 
+way to match the instruction bytes.  This was done to remove any arbitrary 
+organization that would make understanding the organization more difficult.  
+The tables are organized in a hierarchical fashion.  At the highest level, the 
+tables are organized by either one byte or two byte instruction opcodes.  For 
+instruction which require further qualification, e.g. instructions which use 
+the modrm byte as an opcode qualifier, the one or two byte table entry for those 
+instructions point to another (nested) table organized by the additional 
+qualification.
+
+For example, the opcode byte 0x83 corresponds to several instructions that use
+the modrm byte to qualify the instruction and to specify the operand.  Therefore, 
+the one byte opcode table at index 0x83 contains a ptr to an additional table 
+organized by the valid modrm field values used to qualify the instruction.
+
+The need to understand the organization of the disassembler tables arises during 
+some levels of derivation.  The base disassembler provides a ptr entry in the 
+tables for every instruction for use in classes derived from the disassembler.  
+Derived classes can provide additional information (specific to their needs) about 
+an instruction by placing ptrs to their data in the base class's tables.  These 
+ptrs would point to data provided by the derived class.  After an instruction is 
+decoded, the base disassembler can provide the derived class with the ptr to the 
+derived class's data pertinent to that instruction.
+
+For example, if the additional data needed about an instruction is the instruction 
+type (BASE, FPU, MMX, SSE, ...), a derived class could initialize the ptr field in 
+the base class's tables with a ptr to the instruction type for each instruction.  
+The derived class would need to have some way to categorize instructions by type, 
+and to iterate through the base class's tables to initialize the ptr field. After 
+an instruction is decoded, the derived class can request their ptr for that 
+instruction from the base class and then look at it to determine the type of the 
+instruction.
+
+The organization of the tables is straightforward, and every effort will be made 
+to keep the tables backward compatible with prior releases of the disassembler.  
+By doing this, newer releases of the disassembler that incorporate additional 
+instructions will not break derived classes based on earlier releases of the 
+disassembler.  When this is not possible, every effort will be made to communicate 
+this to aid in converting derived classes to work with newer releases of the 
+disassembler.  This will always reflect additional complexity imposed by the 
+additional instructions rather than any desire to reorganize the tables for a 
+reason specific to the disassembler.
+
+For an example of when this was not possible, some instructions were at one time 
+fully qualified at the two byte opcode level.  To reflect that, the two byte opcode 
+table in the base disassembler at the indices for those instructions provided all of 
+the information about those instructions.  Then SSE came along and those opcode bytes 
+were changed to allow the specification of an SSE instruction by prefixing the 
+instruction with an SSE prefix.  To reflect that change, the base disassembler's two 
+byte opcode table entries at those indices were changed to point to other (nested) 
+tables organized by prefix bytes.  This straightforward change was met by little 
+resistance from users of the disassembler at that time because it reflected a change 
+in the processor, not some arbitrary change in the base disassembler.  Furthermore, 
+the need to incorporate additional information about the new instructions was required 
+by their application as well, so the organizational need was a requirement in their 
+application too.
+
+Since changes in the base disassembler may require changes in derived classes, a valid 
+concern is that this makes the disassembler more difficult to use.  Although this is 
+true in some instances, it is important to understand the tradeoffs.  The base 
+disassembler could be implemented using the "does it all ways" approach.  However, to 
+accomplish that, additional code would need to be added to the base disassembler to 
+support all the different ways to do it and to determine which way to do it. These 
+additional conditional checks to determine which way to do it slow down the operation 
+of the disassembler (i.e. they bloat the disassembler).  The conditional checks can be 
+avoided by using table driven approaches, but the more natural (and transparent) way to 
+implement table driven approaches in C++ is via inheritance and virtual tables.
+
+Furthermore, users of a "does it all ways" disassembler are restricted to taking it 
+one of the ways the disassembler does it (i.e. "does it all ways" is really "does it some 
+ways").  By using the derivation approach, there is no limit to the way the disassembler 
+can be used: through derivation the disassembler can support unforeseen ways "to do it".  
+Additionally, users of a bloated disassembler are burdened with additional code that 
+their application would never use.  Keeping the code for the application specific behavior 
+closer to the application eliminates bloat as well as reducing turn around time for 
+application specific modifications to the disassembler's behavior.
+
+As an additional point, understanding the organization of the disassembler tables is 
+only required if users of the base class need additional information about each 
+instruction.  If their desire is only to change something about all instructions, e.g. 
+whether to print in hexadecimal or decimal, they do not need to hook to the instruction 
+tables and consequently do not need to understand their organization nor be affected by 
+changes to that organization with new releases of the disasembler.
+
+The current approach provides performance and flexibility at the expense of complexity.  
+However, this complexity is only imposed on users of the disassembler that require that it 
+work in some way specific to their needs.  Every effort has been made to organize the 
+disassembler tables to reflect the task at hand (decoding) rather than some arbitrary 
+organization specific to the disassembler: making it easier to use the disassembler 
+to accomplish application specific tasks.  The disassembler's tables as well as the 
+routines used to determine the index into nested tables are provided with distributions 
+of the disassembler to facilitate understanding of the table organization.
+
+A few examples of disassembler derived classes are provided with the disassembler 
+distribution to help developers deriving from the disassembler determine the steps 
+needed to accomplish their goals.  Both derivations that hook the base disassembler's 
+opcode tables and derivations that do not are included.
+
+Look at the Disassembler header file, disassembler.h, for more information about using 
+the class: the feature set is large.
