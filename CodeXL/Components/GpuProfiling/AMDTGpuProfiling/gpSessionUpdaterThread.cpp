@@ -119,7 +119,7 @@ bool gpSessionUpdaterThread::CaptureFrame()
         if (frameAsXML.find(GP_GRAPHICS_SERVER_STATE_STALLED) >= 0)
         {
             // Send a signal indicating that the profiled application is not currently rendering
-            emit CapturedFrameUpdateReady(INVALID_FRAME_INDEX_INDICATING_NO_RENDER);
+            emit CapturedFrameUpdateReady(INVALID_FRAME_INDEX_INDICATING_NO_RENDER, INVALID_FRAME_INDEX_INDICATING_NO_RENDER);
         }
 
         if (retVal)
@@ -129,7 +129,7 @@ bool gpSessionUpdaterThread::CaptureFrame()
             retVal = gpUIManager::Instance()->FrameInfoFromXML(frameAsXML, frameInfo);
             GT_IF_WITH_ASSERT(retVal)
             {
-                emit CapturedFrameUpdateReady(frameInfo.m_frameIndex);
+                emit CapturedFrameUpdateReady(frameInfo.m_frameIndex, frameInfo.m_frameIndex + frameInfo.m_framesCount - 1);
 
             }
         }

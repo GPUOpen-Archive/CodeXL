@@ -15,13 +15,19 @@
 
 // Session and other file name
 #define GP_Str_SessionFileNameFormat "Profile %1:%2:%3"
-#define GPU_STR_FrameTraceFileNameFormat "%1_Frame_%2"
-#define GPU_STR_FrameTraceFileNameFormatW L"%ls_Frame_%d"
+#define GPU_STR_FrameTraceFileNameFormatSingle "%1_Frame_%2"
+#define GPU_STR_FrameTraceFileNameFormatMulti "%1_Frame_%2-%3"
+#define GPU_STR_FrameTraceFileNameFormatSingleW L"%ls_Frame_%d"
+#define GPU_STR_FrameTraceFileNameFormatMultiW L"%ls_Frame_%d-%d"
 #define GPU_STR_FrameFileNameFormat "%1_Frame_%2.%3"
-#define GPU_STR_FrameFileNameFormat "%1_Frame_%2.%3"
-#define GPU_STR_FramePerfCountersFileNameFormat "%1_Frame_%2_Profile_%3_%4_%5"
-#define GPU_STR_FrameSubFolderNameFormat L"Frame%d"
-#define GPU_STR_FrameSubFolderNameFormatA "Frame%1"
+#define GPU_STR_FrameMultipleFileNameFormat "%1_Frame_%2-%3.%4"
+#define GPU_STR_FramePerfCountersFileNameSingleFormat "%1_Frame_%2_Profile_%3_%4_%5"
+#define GPU_STR_FramePerfCountersFileNameMultiFormat "%1_Frame_%2-%3_Profile_%4_%5_%6"
+#define GPU_STR_FrameSubFolderNameSingleFormat L"Frame%d"
+#define GPU_STR_FrameSubFolderNameSingleFormatA "Frame%1"
+#define GPU_STR_FrameSubFolderNameMultipleFormat L"Frame%d-%d"
+#define GPU_STR_FrameSubFolderNameMultipleFormatA "Frame%1-%2"
+
 #define GPU_STR_FrameSubFolderNamePrefix "Frame"
 #define GPU_STR_FullObjectDatabase L"\\FullObjectDatabase.xml"
 
@@ -372,7 +378,8 @@
 #define GPU_STR_TreeNodeDashboard L"Dashboard"
 #define GPU_STR_TreeNodeTimeline L"Timeline"
 #define GPU_STR_TreeNodeOverview L"Overview"
-#define GPU_STR_TreeNodeFrame "Frame # %1"
+#define GPU_STR_TreeNodeFrameSingle "Frame # %1"
+#define GPU_STR_TreeNodeFrameMultiple "Frame # %1-%2"
 #define GPU_STR_TreeNodePerformanceProfile L"Performance Profile"
 #define GPU_STR_TreeNodeImage L"Image"
 #define GPU_STR_TreeNodeObjectInspector L"Object Inspector"
@@ -670,7 +677,8 @@
 // Export frame analysis
 #define GP_STR_FrameAnalysisExportProgressHeader L"Exporting Frame Analysis Session"
 #define GP_STR_FrameAnalysisExportProgressMsg L"Capturing frames..."
-#define GP_STR_FrameAnalysisExportCapturingFrameMsg L"Capturing frame %d"
+#define GP_STR_FrameAnalysisExportCapturingFrameSingleMsg L"Capturing frame %d"
+#define GP_STR_FrameAnalysisExportCapturingFrameMultiMsg L"Capturing frames %d-%d"
 
 #endif //__GPSTRINGCONSTANTS_H
 

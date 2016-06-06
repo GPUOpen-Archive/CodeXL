@@ -386,7 +386,8 @@ bool gpViewsCreator::displayExistingView(const apMDIViewCreateEvent& mdiViewEven
                     gpSessionTreeNodeData* pFrameData = qobject_cast<gpSessionTreeNodeData*>(pSessionData);
                     GT_IF_WITH_ASSERT(pFrameData != nullptr)
                     {
-                        m_lastSessionFileOpened.appendFormattedString(L" - Frame %d", pFrameData->m_frameIndex);
+                        QString frameIndexStr = FrameIndexToString(pFrameData->m_frameIndex);
+                        m_lastSessionFileOpened.appendFormattedString(L" - Frame %ls", acQStringToGTString(frameIndexStr).asCharArray());
                     }
                 }
             }

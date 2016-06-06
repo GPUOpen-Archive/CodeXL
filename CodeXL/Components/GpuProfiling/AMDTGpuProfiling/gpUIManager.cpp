@@ -41,10 +41,45 @@ static bool CompareFrameDirOnDate(QFileInfo dir1, QFileInfo dir2)
     return dir1.created() < dir2.created();
 }
 
+FrameIndex FrameIndexFromString(const QString& frameIndexStr)
+{
+    FrameIndex retVal(-1, -1);
+    int separatorPos = frameIndexStr.indexOf('-');
+    bool rc = false;
+    if (separatorPos > 0)
+    {
+        retVal.first = frameIndexStr.mid(0, separatorPos).toInt(&rc);
+        GT_IF_WITH_ASSERT(rc)
+        {
+            retVal.second = frameIndexStr.mid(separatorPos + 1, frameIndexStr.size() - 1).toInt(&rc);
+        }
+    }
+    else
+    {
+        retVal.first = frameIndexStr.toInt(&rc);
+        retVal.second = retVal.first;
+    }
+    return retVal;
+}
+
+QString FrameIndexToString(FrameIndex frameIndex)
+{
+    QString retVal;
+    if (frameIndex.first == frameIndex.second)
+    {
+        retVal = QString("%1").arg(frameIndex.first);
+    }
+    else
+    {
+        retVal = QString("%1-%2").arg(frameIndex.first).arg(frameIndex.second);
+    }
+    return retVal;
+}
+
 
 gpUIManager::gpUIManager() : m_pCurrentlyRunningSessionData(nullptr), m_updaterThread(this)
 {
-    bool rc = connect(&m_updaterThread, SIGNAL(CapturedFrameUpdateReady(int)), this, SLOT(OnFrameCapture(int)), Qt::DirectConnection);
+    bool rc = connect(&m_updaterThread, SIGNAL(CapturedFrameUpdateReady(int, int)), this, SLOT(OnFrameCapture(int, int)), Qt::DirectConnection);
     GT_ASSERT(rc);
 
     // Set the dashed line pen properties
@@ -92,7 +127,8 @@ bool gpUIManager::SaveCurrentSessionFrameDataOnDisk(const FrameInfo& frameInfo)
         osFilePath sessionFilePath = m_pCurrentlyRunningSessionData->m_pParentData->m_filePath;
         QDir frameDir;
         QString overviewFilePath, thumbnailFilePath;
-        retVal = gpUIManager::GetPathsForFrame(sessionFilePath, frameInfo.m_frameIndex, frameDir, overviewFilePath, thumbnailFilePath);
+        FrameIndex frameIndex(frameInfo.m_frameIndex, frameInfo.m_frameIndex + frameInfo.m_framesCount - 1);
+        retVal = gpUIManager::GetPathsForFrame(sessionFilePath, frameIndex, frameDir, overviewFilePath, thumbnailFilePath);
         GT_IF_WITH_ASSERT(retVal)
         {
             // Write the XML string to the disk for offline session load
@@ -221,7 +257,7 @@ void gpUIManager::PrepareObjectData(const osFilePath& objectFilePath, gpBaseSess
 }
 #endif
 
-void gpUIManager::GetListOfFrameFolders(const osFilePath& sessionFilePath, QList<int>& frameIndicesList)
+void gpUIManager::GetListOfFrameFolders(const osFilePath& sessionFilePath, QList<FrameIndex>& frameIndicesList)
 {
     gtString sessiongtDir = sessionFilePath.fileDirectoryAsString();
     sessiongtDir.append(osFilePath::osPathSeparator);
@@ -242,10 +278,10 @@ void gpUIManager::GetListOfFrameFolders(const osFilePath& sessionFilePath, QList
             // Extract the frame index from the frame folder name
             QString folderName = currentFrameDir.baseName();
             folderName.remove(GPU_STR_FrameSubFolderNamePrefix);
-            bool rc = false;
-            int frameIndex = folderName.toInt(&rc);
 
-            if (rc)
+            FrameIndex frameIndex = FrameIndexFromString(folderName);
+
+            if (frameIndex.first >= 0)
             {
                 frameIndicesList << frameIndex;
             }
@@ -284,15 +320,16 @@ void gpUIManager::OnWindowClose(SharedSessionWindow* pClosedSessionWindow)
     }
 }
 
-void gpUIManager::OnFrameCapture(int frameIndex)
+void gpUIManager::OnFrameCapture(int firstFrameIndex, int lastFrameIndex)
 {
     // Sanity check:
     GT_IF_WITH_ASSERT(m_pCurrentlyRunningSessionData != nullptr)
     {
+        FrameIndex frameIndex(firstFrameIndex, lastFrameIndex);
         // Add the currently captured frame index to the vector of captured frames
         m_pCurrentlyRunningSessionData->m_capturedFramesIndices << frameIndex;
 
-        emit CapturedFrameUpdateReady(frameIndex);
+        emit CapturedFrameUpdateReady(firstFrameIndex, lastFrameIndex);
     }
 }
 
@@ -302,7 +339,7 @@ void gpUIManager::OnApplicationEnded()
     gpSessionTreeNodeData* pRunningSessionData = CurrentlyRunningSessionData();
     GT_IF_WITH_ASSERT(pRunningSessionData != nullptr)
     {
-        foreach (int frameIndex, pRunningSessionData->m_capturedFramesIndices)
+        foreach (FrameIndex frameIndex, pRunningSessionData->m_capturedFramesIndices)
         {
             // Add the captured frames to the tree and expand only the last one
             bool shouldExpand = (frameIndex == pRunningSessionData->m_capturedFramesIndices.last());
@@ -395,7 +432,7 @@ bool gpUIManager::FrameInfoFromXML(const gtASCIIString& frameInfoXML, FrameInfo&
 
     if (elementsList.size() == 1)
     {
-        frameInfo.m_frameCount = elementsList.at(0).toElement().text().toInt(&rc);
+        frameInfo.m_framesCount = elementsList.at(0).toElement().text().toInt(&rc);
     }
 
     retVal = retVal && rc;
@@ -445,7 +482,7 @@ void gpUIManager::FrameInfoToXML(const FrameInfo& frameInfo, QString& xmlString)
                 .arg(frameInfo.m_frameDuration)
                 .arg(frameInfo.m_apiCalls)
                 .arg(frameInfo.m_drawCalls)
-                .arg(frameInfo.m_frameCount);
+                .arg(frameInfo.m_framesCount);
 }
 
 bool gpUIManager::GetFrameInfo(const osFilePath& sessionFilePath, FrameInfo& frameInfo)
@@ -455,7 +492,8 @@ bool gpUIManager::GetFrameInfo(const osFilePath& sessionFilePath, FrameInfo& fra
     QDir frameDir;
     QString overviewFilePath, thumbnailFilePath;
     gtASCIIString infoXML;
-    retVal = GetPathsForFrame(sessionFilePath, frameInfo.m_frameIndex, frameDir, overviewFilePath, thumbnailFilePath);
+    FrameIndex frameIndex(frameInfo.m_frameIndex, frameInfo.m_frameIndex + frameInfo.m_framesCount - 1);
+    retVal = GetPathsForFrame(sessionFilePath, frameIndex, frameDir, overviewFilePath, thumbnailFilePath);
     GT_IF_WITH_ASSERT(retVal)
     {
         QFile fileHandle(overviewFilePath);
@@ -511,7 +549,7 @@ bool gpUIManager::GetFrameInfo(const osFilePath& sessionFilePath, FrameInfo& fra
     return retVal;
 }
 
-bool gpUIManager::GetPathsForFrame(const osFilePath& sessionFilePath, int frameIndex, QDir& frameDir, QString& overviewFilePath, QString& thumbFilePath, bool shouldCreateFrameDir)
+bool gpUIManager::GetPathsForFrame(const osFilePath& sessionFilePath, FrameIndex frameIndex, QDir& frameDir, QString& overviewFilePath, QString& thumbFilePath, bool shouldCreateFrameDir)
 {
     bool retVal = false;
 
@@ -523,17 +561,32 @@ bool gpUIManager::GetPathsForFrame(const osFilePath& sessionFilePath, int frameI
         osFilePath frameDirPath = frameOSDir.directoryPath();
         gtString frameDirStr, fileName;
         sessionFilePath.getFileName(fileName);
-        frameDirStr.appendFormattedString(GPU_STR_FrameSubFolderNameFormat, frameIndex);
+
+        QString sessionDisplayName = acGTStringToQString(fileName);
+        QString overviewFileName, thumbnailFileName;
+        if (frameIndex.first == frameIndex.second)
+        {
+            // Single frame file
+            frameDirStr.appendFormattedString(GPU_STR_FrameSubFolderNameSingleFormat, frameIndex.first);
+
+            // Build the overview & thumbnail file names
+            overviewFileName = QString(GPU_STR_FrameFileNameFormat).arg(sessionDisplayName).arg(frameIndex.first).arg(GP_Overview_FileExtension);
+            thumbnailFileName = QString(GPU_STR_FrameFileNameFormat).arg(sessionDisplayName).arg(frameIndex.first).arg(GP_ThumbnailFileExtension);
+        }
+        else
+        {
+            // Multiple frames file
+            frameDirStr.appendFormattedString(GPU_STR_FrameSubFolderNameMultipleFormat, frameIndex.first, frameIndex.second);
+
+            // Build the overview & thumbnail file names
+            overviewFileName = QString(GPU_STR_FrameMultipleFileNameFormat).arg(sessionDisplayName).arg(frameIndex.first).arg(frameIndex.second).arg(GP_Overview_FileExtension);
+            thumbnailFileName = QString(GPU_STR_FrameMultipleFileNameFormat).arg(sessionDisplayName).arg(frameIndex.first).arg(frameIndex.second).arg(GP_ThumbnailFileExtension);
+        }
         frameDirPath.appendSubDirectory(frameDirStr);
         frameDirStr = frameDirPath.fileDirectoryAsString();
         frameDirStr.append(osFilePath::osPathSeparator);
         QString frameDirQStr = acGTStringToQString(frameDirStr);
         frameDir = frameDirQStr;
-
-        // Get the overview & thumbnail file names
-        QString sessionDisplayName = acGTStringToQString(fileName);
-        QString overviewFileName = QString(GPU_STR_FrameFileNameFormat).arg(sessionDisplayName).arg(frameIndex).arg(GP_Overview_FileExtension);
-        QString thumbnailFileName = QString(GPU_STR_FrameFileNameFormat).arg(sessionDisplayName).arg(frameIndex).arg(GP_ThumbnailFileExtension);
 
         QFileInfo overviewPath(frameDir, overviewFileName);
         QFileInfo thumbPath(frameDir, thumbnailFileName);
@@ -606,7 +659,7 @@ bool gpUIManager::CacheProjectSessionsList(const gtString& capturedFramesAsXML)
 {
     bool retVal = false;
 
-    gtMap<gtString, gtVector<int>> sessionFramesMap;
+    gtMap<gtString, gtVector<FrameIndex>> sessionFramesMap;
     retVal = ProjectSessionsMapFromXML(capturedFramesAsXML, sessionFramesMap);
     GT_IF_WITH_ASSERT(retVal)
     {
@@ -630,7 +683,7 @@ bool gpUIManager::CacheProjectSessionsList(const gtString& capturedFramesAsXML)
             gtString sessionName = (*iter).first;
 
             // Get the list of frames for this session
-            const gtVector<int>& framesList = (*iter).second;
+            const gtVector<FrameIndex>& framesList = (*iter).second;
 
             if (!framesList.empty())
             {
@@ -665,7 +718,7 @@ bool gpUIManager::CacheProjectSessionsList(const gtString& capturedFramesAsXML)
 
                 for (int i = 0; i < (int)framesList.size(); i++)
                 {
-                    int currentFrameIndex = framesList[i];
+                    FrameIndex currentFrameIndex = framesList[i];
                     QDir frameDir;
                     QString ovrFilePath, thumbFilePath;
                     bool rc = GetPathsForFrame(sessionFilePath, currentFrameIndex, frameDir, ovrFilePath, thumbFilePath);
@@ -682,7 +735,8 @@ bool gpUIManager::CacheProjectSessionsList(const gtString& capturedFramesAsXML)
                                 // Go get the XML description from the server
                                 gtString frameAsXML;
                                 FrameInfo frameInfo;
-                                frameInfo.m_frameIndex = currentFrameIndex;
+                                frameInfo.m_frameIndex = currentFrameIndex.first;
+                                frameInfo.m_framesCount = currentFrameIndex.second - currentFrameIndex.first + 1;
                                 bool rc = ProfileManager::Instance()->GetFrameAnalysisModeManager()->GetCapturedFrameData(projectName, sessionName, frameInfo);
                                 GT_IF_WITH_ASSERT(rc)
                                 {
@@ -742,7 +796,7 @@ bool gpUIManager::CacheProjectSessionsList(const gtString& capturedFramesAsXML)
     return retVal;
 }
 
-bool gpUIManager::ProjectSessionsMapFromXML(const gtString& capturedFramesAsXML, gtMap<gtString, gtVector<int>>& sessionFramesMap)
+bool gpUIManager::ProjectSessionsMapFromXML(const gtString& capturedFramesAsXML, gtMap<gtString, gtVector<FrameIndex>>& sessionFramesMap)
 {
     bool retVal = false;
 
@@ -763,20 +817,20 @@ bool gpUIManager::ProjectSessionsMapFromXML(const gtString& capturedFramesAsXML,
             QDomElement sessionElem = sessionsList.at(sIndex).toElement();
             QString sessionName = sessionElem.attribute("name");
             gtString gtSessionName = acQStringToGTString(sessionName);
-            gtVector<int> framesList;
+            gtVector<FrameIndex> framesList;
             QDomNodeList sessionFramesList = sessionElem.elementsByTagName(GPU_STR_sessionInfoXMLFrame);
             int framesCount = (int)sessionFramesList.size();
 
             for (int fIndex = 0; fIndex < (int)framesCount; fIndex++)
             {
                 QDomElement frameElem = sessionFramesList.at(fIndex).toElement();
-                bool rc = false;
-                int frameIndex = frameElem.attribute(GPU_STR_sessionInfoXMLIndex).toInt(&rc);
-
-                GT_IF_WITH_ASSERT(rc && (frameIndex > 0))
+                QString frameStr = QString::fromStdString(frameElem.attribute(GPU_STR_sessionInfoXMLIndex).toStdString());
+                FrameIndex frameIndex = FrameIndexFromString(frameStr);
+                
+                GT_IF_WITH_ASSERT(frameIndex.first > 0)
                 {
                     framesList.push_back(frameIndex);
-                    retVal = retVal && rc;
+                    retVal = retVal;
                 }
             }
 
@@ -789,23 +843,24 @@ bool gpUIManager::ProjectSessionsMapFromXML(const gtString& capturedFramesAsXML,
 
 void gpUIManager::AddCapturedFramesFromServer(const gtString& capturedFramesAsXML)
 {
-    gtMap<gtString, gtVector<int>> sessionFramesMap;
+    gtMap<gtString, gtVector<FrameIndex>> sessionFramesMap;
 
     bool rc = ProjectSessionsMapFromXML(capturedFramesAsXML, sessionFramesMap);
     GT_IF_WITH_ASSERT(rc && m_pCurrentlyRunningSessionData != nullptr)
     {
         gtString sessionName = acQStringToGTString(m_pCurrentlyRunningSessionData->m_displayName);
-        const gtVector<int>& frames = sessionFramesMap[sessionName];
+        const gtVector<FrameIndex>& frames = sessionFramesMap[sessionName];
 
-        for (int i = 0; i < (int)frames.size(); i++)
+        for (auto iter = frames.begin(); iter != frames.end(); iter++)
         {
-            if (!m_pCurrentlyRunningSessionData->m_capturedFramesIndices.contains(frames[i]))
+            if (!m_pCurrentlyRunningSessionData->m_capturedFramesIndices.contains(*iter))
             {
                 // Add this captured frame to the list of frames
-                OnFrameCapture(frames[i]);
+                FrameIndex index = *iter;
+                OnFrameCapture(index.first, index.second);
 
                 // Notify users that a frame update is ready
-                emit CapturedFrameUpdateReady(frames[i]);
+                emit CapturedFrameUpdateReady(index.first, index.second);
             }
         }
     }
@@ -865,10 +920,10 @@ void gpUIManager::CloseAllSessionWindows(GPUSessionTreeItemData* pSession)
         if (pGPData != nullptr)
         {
             // Get all frame indices for this session
-            QList<int> frameIndices;
+            QList<FrameIndex> frameIndices;
             GetListOfFrameFolders(pSession->m_pParentData->m_filePath, frameIndices);
 
-            foreach (int frameIndex, frameIndices)
+            foreach (FrameIndex frameIndex, frameIndices)
             {
                 // Get the frame file path for this frame
                 QDir frameDir;

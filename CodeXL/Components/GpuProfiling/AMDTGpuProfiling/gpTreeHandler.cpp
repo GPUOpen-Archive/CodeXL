@@ -456,10 +456,10 @@ void gpTreeHandler::BuildFrameAnalysisSessionTree(QTreeWidgetItem* pTreeItem, gp
         GT_IF_WITH_ASSERT(pItemData != nullptr)
         {
             // Find all the frames captured for this session
-            QList<int> framesIndices;
+            QList<FrameIndex> framesIndices;
             gpUIManager::Instance()->GetListOfFrameFolders(pItemData->m_filePath, framesIndices);
 
-            foreach (int frameIndex, framesIndices)
+            foreach (FrameIndex frameIndex, framesIndices)
             {
                 // Build the frame index tree item
                 GetFrameTreeItem(pSessionData, frameIndex);
@@ -469,7 +469,7 @@ void gpTreeHandler::BuildFrameAnalysisSessionTree(QTreeWidgetItem* pTreeItem, gp
 }
 
 
-QTreeWidgetItem* gpTreeHandler::GetFrameTreeItem(gpSessionTreeNodeData* pSessionData, int frameIndex)
+QTreeWidgetItem* gpTreeHandler::GetFrameTreeItem(gpSessionTreeNodeData* pSessionData, FrameIndex frameIndex)
 {
     QTreeWidgetItem* pRetVal = nullptr;
 
@@ -479,8 +479,17 @@ QTreeWidgetItem* gpTreeHandler::GetFrameTreeItem(gpSessionTreeNodeData* pSession
     {
         // Build the frame node string
         QLocale locale(QLocale::English);
-        QString frameIndexStr = locale.toString((qlonglong)frameIndex);
-        QString frameNodeName = QString(GPU_STR_TreeNodeFrame).arg(frameIndexStr);
+        QString firstFrameIndexStr = locale.toString((qlonglong)frameIndex.first);
+        QString frameNodeName;
+        if (frameIndex.first == frameIndex.second)
+        {
+            frameNodeName = QString(GPU_STR_TreeNodeFrameSingle).arg(firstFrameIndexStr);
+        }
+        else
+        {
+            QString lastFrameIndexStr = locale.toString((qlonglong)frameIndex.second);
+            frameNodeName = QString(GPU_STR_TreeNodeFrameMultiple).arg(firstFrameIndexStr).arg(lastFrameIndexStr);
+        }
 
         // Get the current frame node
         afApplicationTreeItemData* pItemData = pSessionData->m_pParentData;
@@ -553,7 +562,7 @@ QTreeWidgetItem* gpTreeHandler::GetFrameTreeItem(gpSessionTreeNodeData* pSession
     return pRetVal;
 }
 
-bool gpTreeHandler::UpdateFrameFilePath(gpSessionTreeNodeData* pSessionData, int frameIndex, const osFilePath& ltrFilePath)
+bool gpTreeHandler::UpdateFrameFilePath(gpSessionTreeNodeData* pSessionData, FrameIndex frameIndex, const osFilePath& ltrFilePath)
 {
     bool retVal = false;
 
@@ -615,7 +624,7 @@ bool gpTreeHandler::UpdateFrameFilePath(gpSessionTreeNodeData* pSessionData, int
 }
 
 QTreeWidgetItem* gpTreeHandler::AddTreeItem(gpSessionTreeNodeData* pSessionData, QTreeWidgetItem* pParent,
-                                            const gtString& nodeName, afTreeItemType itemType, int frameIndex, bool shouldCreateFile)
+                                            const gtString& nodeName, afTreeItemType itemType, FrameIndex frameIndex, bool shouldCreateFile)
 {
     QTreeWidgetItem* pRetVal = nullptr;
 
@@ -683,7 +692,7 @@ QTreeWidgetItem* gpTreeHandler::AddTreeItem(gpSessionTreeNodeData* pSessionData,
     return pRetVal;
 }
 
-osFilePath gpTreeHandler::BuildFrameChildFilePath(gpSessionTreeNodeData* pSessionData, afTreeItemType childType, int frameIndex)
+osFilePath gpTreeHandler::BuildFrameChildFilePath(gpSessionTreeNodeData* pSessionData, afTreeItemType childType, FrameIndex frameIndex)
 {
     osFilePath retVal;
 
@@ -696,12 +705,31 @@ osFilePath gpTreeHandler::BuildFrameChildFilePath(gpSessionTreeNodeData* pSessio
         // If the pSessionData is in session level, the frame folder should be added
         if (pSessionData->m_pParentData->m_itemType == AF_TREE_ITEM_PROFILE_SESSION)
         {
-            sessionDir.append(acQStringToGTString(QString(GPU_STR_FrameSubFolderNameFormatA).arg(frameIndex)));
+           gtString frameFolderName;
+            if (frameIndex.first == frameIndex.second)
+            {
+                frameFolderName.appendFormattedString(GPU_STR_FrameSubFolderNameSingleFormat, frameIndex.first);
+            }
+            else
+            {
+                frameFolderName.appendFormattedString(GPU_STR_FrameSubFolderNameMultipleFormat, frameIndex.first, frameIndex.second);
+            }
+
+            sessionDir.append(frameFolderName);
             sessionDir.append(osFilePath::osPathSeparator);
+
         }
 
         retVal.setFileDirectory(sessionDir);
-        gtString fileName = acQStringToGTString(QString(GPU_STR_FrameTraceFileNameFormat).arg(pSessionData->m_displayName).arg(frameIndex));
+        gtString fileName;
+        if (frameIndex.first == frameIndex.second)
+        {
+            fileName = acQStringToGTString(QString(GPU_STR_FrameTraceFileNameFormatSingle).arg(pSessionData->m_displayName).arg(frameIndex.first));
+        }
+        else
+        {
+            fileName = acQStringToGTString(QString(GPU_STR_FrameTraceFileNameFormatMulti).arg(pSessionData->m_displayName).arg(frameIndex.first).arg(frameIndex.second));
+        }
         retVal.setFileName(fileName);
 
         switch (childType)
@@ -749,7 +777,7 @@ osFilePath gpTreeHandler::BuildFrameChildFilePath(gpSessionTreeNodeData* pSessio
 }
 
 
-osFilePath gpTreeHandler::GetFrameChildFilePath(const osFilePath& sessionFilePath, int frameIndex, afTreeItemType childType)
+osFilePath gpTreeHandler::GetFrameChildFilePath(const osFilePath& sessionFilePath, FrameIndex frameIndex, afTreeItemType childType)
 {
     osFilePath retVal;
 
@@ -826,7 +854,7 @@ bool gpTreeHandler::GetOwningFrameFilePath(const osFilePath& frameChildFilePath,
     return retVal;
 }
 
-void gpTreeHandler::AddExistingFileToPerformanceCountersNode(gpSessionTreeNodeData* pSessionData, QTreeWidgetItem* pFrameTreeItem, int frameIndex)
+void gpTreeHandler::AddExistingFileToPerformanceCountersNode(gpSessionTreeNodeData* pSessionData, QTreeWidgetItem* pFrameTreeItem, FrameIndex frameIndex)
 {
     // Sanity check:
     GT_IF_WITH_ASSERT((pSessionData != nullptr) && (pFrameTreeItem != nullptr))
@@ -839,9 +867,16 @@ void gpTreeHandler::AddExistingFileToPerformanceCountersNode(gpSessionTreeNodeDa
         {
             // Find the frame sub directory
             osFilePath frameDir = pSessionData->SessionDir().directoryPath();
-            gtString frameSubFolder;
-            frameSubFolder.appendFormattedString(GPU_STR_FrameSubFolderNameFormat, frameIndex);
-            frameDir.appendSubDirectory(frameSubFolder);
+            gtString frameFolderName;
+            if (frameIndex.first == frameIndex.second)
+            {
+                frameFolderName.appendFormattedString(GPU_STR_FrameSubFolderNameSingleFormat, frameIndex.first);
+            }
+            else
+            {
+                frameFolderName.appendFormattedString(GPU_STR_FrameSubFolderNameMultipleFormat, frameIndex.first, frameIndex.second);
+            }
+            frameDir.appendSubDirectory(frameFolderName);
 
             QString sessionDirStr = acGTStringToQString(frameDir.asString());
             QDir sessionFrameDir(acGTStringToQString(frameDir.asString()));
@@ -864,7 +899,7 @@ void gpTreeHandler::AddExistingFileToPerformanceCountersNode(gpSessionTreeNodeDa
     }
 }
 
-void gpTreeHandler::AddPerformanceCountersFileToTree(gpSessionTreeNodeData* pSessionData, const QFileInfo& performanceFilePath, QTreeWidgetItem* pPerformanceCountersItem, int frameIndex)
+void gpTreeHandler::AddPerformanceCountersFileToTree(gpSessionTreeNodeData* pSessionData, const QFileInfo& performanceFilePath, QTreeWidgetItem* pPerformanceCountersItem, FrameIndex frameIndex)
 {
     afApplicationTree* pTree = afApplicationCommands::instance()->applicationTree();
 
@@ -924,7 +959,7 @@ afApplicationTreeItemData* gpTreeHandler::GetFrameChildItemData(QTreeWidgetItem*
     return pRetVal;
 }
 
-void gpTreeHandler::AddTimelineToSession(const osFilePath& apiTraceFilePath, int frameIndex, bool shouldActivate)
+void gpTreeHandler::AddTimelineToSession(const osFilePath& apiTraceFilePath, FrameIndex frameIndex, bool shouldActivate)
 {
     // Sanity check:
     afApplicationTree* pTree = afApplicationCommands::instance()->applicationTree();
@@ -969,7 +1004,7 @@ void gpTreeHandler::AddTimelineToSession(const osFilePath& apiTraceFilePath, int
     }
 }
 
-void gpTreeHandler::AddCapturedFrameToTree(int frameIndex, bool shouldExpand)
+void gpTreeHandler::AddCapturedFrameToTree(FrameIndex frameIndex, bool shouldExpand)
 {
     // Sanity check:
     afApplicationTree* pTree = afApplicationCommands::instance()->applicationTree();
@@ -983,9 +1018,16 @@ void gpTreeHandler::AddCapturedFrameToTree(int frameIndex, bool shouldExpand)
         {
             // Create the folder to the frame if it doesn't exist
             osFilePath frameDir = pCurrentlyRunningSessionData->SessionDir().directoryPath();
-            gtString frameSubFolder;
-            frameSubFolder.appendFormattedString(GPU_STR_FrameSubFolderNameFormat, frameIndex);
-            frameDir.appendSubDirectory(frameSubFolder);
+            gtString frameFolderName;
+            if (frameIndex.first == frameIndex.second)
+            {
+                frameFolderName.appendFormattedString(GPU_STR_FrameSubFolderNameSingleFormat, frameIndex.first);
+            }
+            else
+            {
+                frameFolderName.appendFormattedString(GPU_STR_FrameSubFolderNameMultipleFormat, frameIndex.first, frameIndex.second);
+            }
+            frameDir.appendSubDirectory(frameFolderName);
             osDirectory dir;
             frameDir.getFileDirectory(dir);
 
@@ -1009,7 +1051,7 @@ void gpTreeHandler::AddCapturedFrameToTree(int frameIndex, bool shouldExpand)
     }
 }
 
-void gpTreeHandler::AddCountersDataFileToSession(const osFilePath& countersFilePath, int frameIndex, bool shouldActivate)
+void gpTreeHandler::AddCountersDataFileToSession(const osFilePath& countersFilePath, FrameIndex frameIndex, bool shouldActivate)
 {
     // Sanity check:
     afApplicationTree* pTree = afApplicationCommands::instance()->applicationTree();
@@ -1088,7 +1130,7 @@ bool gpTreeHandler::PrepareTraceForSessionFrames(const osDirectory& sessionDir, 
     sessionFilePath.setFileDirectory(sessionDir);
 
     // Get the list of frame thumbnails for the current session
-    QList<int> frameIndicesList;
+    QList<FrameIndex> frameIndicesList;
     gpUIManager::Instance()->GetListOfFrameFolders(sessionFilePath, frameIndicesList);
     gpExecutionMode* pModeManager = ProfileManager::Instance()->GetFrameAnalysisModeManager();
 
@@ -1105,12 +1147,19 @@ bool gpTreeHandler::PrepareTraceForSessionFrames(const osDirectory& sessionDir, 
         afProgressBarWrapper::instance().SetProgressDialogCaption(GP_STR_FrameAnalysisExportProgressHeader);
     }
 
-    foreach (int frameIndex, frameIndicesList)
+    foreach (FrameIndex frameIndex, frameIndicesList)
     {
         if (isFrameAnalysisExport)
         {
             gtString msg;
-            msg.appendFormattedString(GP_STR_FrameAnalysisExportCapturingFrameMsg, frameIndex);
+            if (frameIndex.first == frameIndex.second)
+            {
+                msg.appendFormattedString(GP_STR_FrameAnalysisExportCapturingFrameSingleMsg, frameIndex.first);
+            }
+            else
+            {
+                msg.appendFormattedString(GP_STR_FrameAnalysisExportCapturingFrameMultiMsg, frameIndex.first, frameIndex.second);
+            }
             afProgressBarWrapper::instance().setProgressText(msg);
             afProgressBarWrapper::instance().incrementProgressBar(GP_PROGRESS_COEF / 2);
         }

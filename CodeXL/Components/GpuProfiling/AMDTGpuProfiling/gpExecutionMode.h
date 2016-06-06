@@ -115,10 +115,10 @@ public:
     /// The function checks if the trace file is already cached on the local disk, and if not, it run the server
     /// and get the trace from the server replay
     /// \param sessionFilePath the session file path
-    /// \param frameIndex the frame index
+    /// \param frameIndex the first and last frame indices (equal for single frame trace)
     /// \param traceFilePath[out] local path for the trace file
     /// \return true for success
-    bool GetFrameTraceFromServer(const osFilePath& sessionFilePath, int frameIndex, osFilePath& traceFilePath);
+    bool GetFrameTraceFromServer(const osFilePath& sessionFilePath, FrameIndex frameIndex, osFilePath& traceFilePath);
 
     /// Get the frame objects for a specific frame in a session
     /// The function checks if the object database file is already cached on the local disk, and if not, it run the server
@@ -140,7 +140,7 @@ public:
     /// \param frameIndex the index of the frame that should be captured
     /// \param shouldOpenFile should the performance counters file be opened?
     /// \return true for success
-    bool CapturePerformanceCounters(int frameIndex, bool shouldOpenFile);
+    bool CapturePerformanceCounters(FrameIndex frameIndex, bool shouldOpenFile);
 
     // Get the server communication connection
     GraphicsServerCommunication* GetGraphicsServerComminucation() { return m_pGraphicsServerCommunication; }
@@ -189,8 +189,12 @@ public:
     /// Allow the mode to terminate gracefully at the end of CodeXL.
     void Terminate();
 
-    /// Prepares the trace file for the given frame.
-    bool PrepareTraceFile(const osFilePath& sessionFilePath, int frameIndex, SessionTreeNodeData* pTreeNodeData, gpBaseSessionView* pTraceView, bool prepareTraceData = true);
+    /// Prepares the trace file for the given frame
+    /// \param sessionFilePath the session file path (cxlfovr)
+    /// \param frameIndex the first and last frame indices (equal for single frame trace)
+    /// \param pTreeNodeData the frame tree node data
+    /// \param pTraceView the session view
+    bool PrepareTraceFile(const osFilePath& sessionFilePath, FrameIndex frameIndex, SessionTreeNodeData* pTreeNodeData, gpBaseSessionView* pTraceView, bool prepareTraceData = true);
 
     /// Handles remote agent on execution mode change.
     void onExecutionModeChanged();

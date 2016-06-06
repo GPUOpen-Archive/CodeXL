@@ -31,6 +31,7 @@
 
 // Local:
 #include <AMDTGpuProfiling/gpBaseSessionView.h>
+#include <AMDTGpuProfiling/gpUIManager.h>
 
 // forward declaration
 class gpTimeline;
@@ -225,7 +226,7 @@ protected:
     QVector<QPair<QString, QAbstractItemView*>> m_visibilityFiltersMap;
 
     /// Contain the displayed frame index
-    int m_frameIndex;
+    FrameIndex m_frameIndex;
 
     /// True if the session was already loaded
     bool m_isSessionLoaded;

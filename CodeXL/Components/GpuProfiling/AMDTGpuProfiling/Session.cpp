@@ -848,7 +848,8 @@ gpSessionTreeNodeData::gpSessionTreeNodeData(const QString& strName,
                              FRAME_ANALYSIS,
                              isImported)
 {
-    m_frameIndex = -1;
+    m_frameIndex.first = -1;
+    m_frameIndex.second = -1;
     m_strSessionFilePath = strSessionFilePath;
 
     allocCounter++;

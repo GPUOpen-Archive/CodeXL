@@ -247,12 +247,12 @@ void gpSessionView::FillOfflineSessionThumbnails()
 {
     OS_DEBUG_LOG_TRACER;
     // Get the list of frame thumbnails for the current session
-    QList<int> frameIndicesList;
+    QList<FrameIndex> frameIndicesList;
     gpUIManager::Instance()->GetListOfFrameFolders(m_sessionFilePath, frameIndicesList);
 
     afProgressBarWrapper::instance().ShowProgressDialog(GPU_STR_TraceViewLoadingFASession, frameIndicesList.size());
 
-    foreach (int frameIndex, frameIndicesList)
+    foreach (FrameIndex frameIndex, frameIndicesList)
     {
         // Get the directory, overview and thumbnail paths for this frame
         QDir frameDir;
@@ -329,13 +329,13 @@ bool gpSessionView::DisplaySession(const osFilePath& sessionFilePath, afTreeItem
                 // Make sure that the slots are not disconnected
                 // Connect to the thread's image update signal
                 disconnect(&gpUIManager::Instance()->UIUpdaterThread(), SIGNAL(CurrentFrameUpdateReady(QPixmap*, const FrameInfo&)), this, SLOT(OnCurrentFrameUpdate(QPixmap*, const FrameInfo&)));
-                disconnect(gpUIManager::Instance(), SIGNAL(CapturedFrameUpdateReady(int)), this, SLOT(OnCaptureFrameData(int)));
+                disconnect(gpUIManager::Instance(), SIGNAL(CapturedFrameUpdateReady(int, int)), this, SLOT(OnCaptureFrameData(int, int)));
 
                 // Connect to the thread's image update signal
                 rc = connect(&gpUIManager::Instance()->UIUpdaterThread(), SIGNAL(CurrentFrameUpdateReady(QPixmap*, const FrameInfo&)), this, SLOT(OnCurrentFrameUpdate(QPixmap*, const FrameInfo&)), Qt::DirectConnection);
                 GT_ASSERT(rc);
 
-                rc = connect(gpUIManager::Instance(), SIGNAL(CapturedFrameUpdateReady(int)), this, SLOT(OnCaptureFrameData(int)));
+                rc = connect(gpUIManager::Instance(), SIGNAL(CapturedFrameUpdateReady(int, int)), this, SLOT(OnCaptureFrameData(int, int)));
                 GT_ASSERT(rc);
 
                 // connect to the session termination signal
@@ -497,7 +497,8 @@ void gpSessionView::OnOpenTimelineButtonClick()
         GT_IF_WITH_ASSERT(isItemSelected)
         {
             // Get the requested frame index
-            int captureFrameIndex = selectedItem.toInt();
+            QString capturedFrameIndexStr = selectedItem.toString();
+            FrameIndex captureFrameIndex = FrameIndexFromString(capturedFrameIndexStr);
 
             // Build the trace file path for this frame
             osFilePath traceFilePath = gpTreeHandler::BuildFrameChildFilePath(m_pSessionData, AF_TREE_ITEM_GP_FRAME_TIMELINE, captureFrameIndex);
@@ -514,10 +515,11 @@ void gpSessionView::AddCapturedFrame(const FrameInfo& frameInfo)
     {
         // Add the frame thumbnail to the thumbnail view
         QStringList textLines;
+        FrameIndex frameIndex(frameInfo.m_frameIndex, frameInfo.m_frameIndex + frameInfo.m_framesCount - 1);
         QString elapsedTimeString = MsecToTimeString(frameInfo.m_elapsedTimeMS, true, false);
         QString durationTimeString = MsecToTimeString(frameInfo.m_frameDuration, true, false);
         QLocale locale(QLocale::English);
-        QString frameIndexStr = locale.toString((qlonglong)frameInfo.m_frameIndex);
+        QString frameIndexStr = FrameIndexToString(frameIndex);
         QString apiCallsStr = locale.toString((qlonglong)frameInfo.m_apiCalls);
         QString drawCallsStr = locale.toString((qlonglong)frameInfo.m_drawCalls);
 
@@ -527,7 +529,8 @@ void gpSessionView::AddCapturedFrame(const FrameInfo& frameInfo)
         textLines << QString(GPU_STR_dashboard_FPS).arg(frameInfo.m_fps);
         textLines << QString(GPU_STR_dashboard_APICalls).arg(apiCallsStr);
         textLines << QString(GPU_STR_dashboard_DrawCalls).arg(drawCallsStr);
-        m_pSnapshotsThumbView->AddThumbnail(frameInfo.m_pImageBuffer, frameInfo.m_imageSize, textLines, QVariant(frameInfo.m_frameIndex));
+
+        m_pSnapshotsThumbView->AddThumbnail(frameInfo.m_pImageBuffer, frameInfo.m_imageSize, textLines, QVariant(frameIndexStr));
 
         // Set the last captured frame index
         m_lastCapturedFrameIndex = frameInfo.m_frameIndex;
@@ -538,14 +541,14 @@ void gpSessionView::AddCapturedFrame(const FrameInfo& frameInfo)
 }
 
 
-void gpSessionView::OnCaptureFrameData(int frameIndex)
+void gpSessionView::OnCaptureFrameData(int firstFrameIndex, int lastFrameIndex)
 {
     OS_DEBUG_LOG_TRACER;
     // Sanity check
     gpExecutionMode* pExecutionMode = ProfileManager::Instance()->GetFrameAnalysisModeManager();
     GT_IF_WITH_ASSERT((m_pSessionData != nullptr) && (m_pSnapshotsThumbView != nullptr) && (pExecutionMode != nullptr))
     {
-        if (frameIndex == gpSessionUpdaterThread::INVALID_FRAME_INDEX_INDICATING_NO_RENDER)
+        if (firstFrameIndex == gpSessionUpdaterThread::INVALID_FRAME_INDEX_INDICATING_NO_RENDER)
         {
             // Anything to do in this case?
         }
@@ -554,12 +557,14 @@ void gpSessionView::OnCaptureFrameData(int frameIndex)
             // Get the directory, overview and thumbnail paths for this frame
             QDir frameDir;
             QString overviewFilePath, thumbnailFilePath;
+            FrameIndex frameIndex(firstFrameIndex, lastFrameIndex);
             bool rc = gpUIManager::Instance()->GetPathsForFrame(m_sessionFilePath, frameIndex, frameDir, overviewFilePath, thumbnailFilePath);
             GT_IF_WITH_ASSERT(rc)
             {
                 // Get the current frame data from the remote agent
                 FrameInfo capturedFrameInfo;
-                capturedFrameInfo.m_frameIndex = frameIndex;
+                capturedFrameInfo.m_frameIndex = frameIndex.first;
+                capturedFrameInfo.m_framesCount = frameIndex.second - frameIndex.first + 1;
                 bool rc = pExecutionMode->GetCapturedFrameData(capturedFrameInfo);
                 GT_IF_WITH_ASSERT(rc && capturedFrameInfo.m_pImageBuffer != nullptr)
                 {
@@ -610,7 +615,7 @@ void gpSessionView::OnApplicationRunEnded(gpSessionTreeNodeData* pRunningSession
     disconnect(&gpUIManager::Instance()->UIUpdaterThread(), SIGNAL(CurrentFrameUpdateReady(QPixmap*, const FrameInfo&)), this, SLOT(OnCurrentFrameUpdate(QPixmap*, const FrameInfo&)));
 
     // Disconnect from the capture frame ready signal
-    disconnect(gpUIManager::Instance(), SIGNAL(CapturedFrameUpdateReady(int)), this, SLOT(OnCaptureFrameData(int)));
+    disconnect(gpUIManager::Instance(), SIGNAL(CapturedFrameUpdateReady(int, int)), this, SLOT(OnCaptureFrameData(int, int)));
 
     // Sanity check:
     GT_IF_WITH_ASSERT((m_pStopButton != nullptr) && (m_pCurrentFrameCaptionLabel != nullptr) && (m_pOpenTimelineButton != nullptr) && (m_pSnapshotsThumbView != nullptr))
@@ -718,7 +723,8 @@ void gpSessionView::OnItemDoubleClicked(const QVariant& capturedFrameId)
     if (shouldOpen)
     {
         // Get the requested frame index
-        int captureFrameIndex = capturedFrameId.toInt();
+        QString capturedFrameIndexStr = capturedFrameId.toString();
+        FrameIndex captureFrameIndex = FrameIndexFromString(capturedFrameIndexStr);
 
         // Build the overview file path for this frame
 #ifdef INCLUDE_FRAME_ANALYSIS_PERFORMANCE_COUNTERS
@@ -737,12 +743,13 @@ void gpSessionView::OnItemPressed(const QVariant& capturedFrameId)
     if (!m_isSessionRunning)
     {
         // For offline sessions, display the selected frame in the main image area
-        bool rc = false;
-        int frameIndex = capturedFrameId.toInt(&rc);
-        GT_IF_WITH_ASSERT(rc)
+        QString capturedFrameIndexStr = capturedFrameId.toString();
+        FrameIndex captureFrameIndex = FrameIndexFromString(capturedFrameIndexStr);
+
+        GT_IF_WITH_ASSERT(captureFrameIndex.first >= 0)
         {
             // Set the current frame image
-            DisplayCurrentFrame(frameIndex);
+            DisplayCurrentFrame(captureFrameIndex);
 
             // Sanity check:
             GT_IF_WITH_ASSERT(m_pOpenTimelineButton != nullptr)
@@ -754,7 +761,7 @@ void gpSessionView::OnItemPressed(const QVariant& capturedFrameId)
     }
 }
 
-void gpSessionView::DisplayCurrentFrame(int frameIndex)
+void gpSessionView::DisplayCurrentFrame(FrameIndex frameIndex)
 {
     OS_DEBUG_LOG_TRACER;
     // Sanity check:
@@ -762,7 +769,8 @@ void gpSessionView::DisplayCurrentFrame(int frameIndex)
     {
         bool rc = false;
         FrameInfo frameInfo;
-        frameInfo.m_frameIndex = frameIndex;
+        frameInfo.m_frameIndex = frameIndex.first;
+        frameInfo.m_framesCount = frameIndex.second - frameIndex.first + 1;
         gtASCIIString infoXML;
 
         // Get the frame info from the files saved on disk
