@@ -35,6 +35,18 @@ class gpObjectDataModel;
 class SharedSessionWindow;
 class gpBaseSessionView;
 
+typedef QPair<int, int> FrameIndex;
+
+
+/// Get a frame index (pair of integers) from a string
+/// \param frameIndexStr the string in format "1" or "1-2" 
+/// \return the frame index extracted from the string
+FrameIndex FrameIndexFromString(const QString& frameIndexStr);
+
+/// Build a string for a frame index (pair of integers) 
+/// \param frameIndex the frame index
+/// \return  the string in format "1" or "1-2" 
+QString FrameIndexToString(FrameIndex frameIndex);
 
 /// Holds the meta data for a frame analysis session.
 /// This struct will be stored and loaded in the cxldsh file, and will be displayed in the session dashboard view
@@ -96,8 +108,8 @@ public:
 
     /// Get the list of frames thumbnails for the requested session
     /// \param sessionFilePath the session file path
-    /// \param frameFoldersList the list of frame captured on the file system
-    void GetListOfFrameFolders(const osFilePath& sessionFilePath, QList<int>& frameIndicesList);
+    /// \param frameFoldersList the list of frame captured on the file system. The list contain session index (range of frames)
+    void GetListOfFrameFolders(const osFilePath& sessionFilePath, QList<FrameIndex>& frameIndicesList);
 
     /// Get the number frames thumbnails for the requested session
     /// \param sessionFilePath the session file path
@@ -138,14 +150,14 @@ public:
 
     /// Returns the paths for a frame
     /// \param sessionFilePath the session file path
-    /// \param frameIndex the frame index
+    /// \frameIndex the first and last frame indices (equal for single frame trace)
     /// \param frameDir[out] the frame directory
     /// \param overviewFilePath[out] the overview full file path as string
     /// \param thumbFilePath[out] the thumbnail full file path as string
     /// \param shouldCreateFrameDir (true by default) should the frame folder be created if it doesn't exist. This flag should be turned off when the function
     ///                             is used only for paths calculations
     /// \return true for success
-    bool GetPathsForFrame(const osFilePath& sessionFilePath, int frameIndex, QDir& frameDir, QString& overviewFilePath, QString& thumbFilePath, bool shouldCreateFrameDir = true);
+    bool GetPathsForFrame(const osFilePath& sessionFilePath, FrameIndex frameIndex, QDir& frameDir, QString& overviewFilePath, QString& thumbFilePath, bool shouldCreateFrameDir = true);
 
     /// Extracts the frame info from an overview file
     /// \param overviewFilePath the overview file path
@@ -157,7 +169,7 @@ public:
     /// \return true for success
     bool CacheProjectSessionsList(const gtString& capturedFramesAsXML);
 
-    bool ProjectSessionsMapFromXML(const gtString& capturedFramesAsXML, gtMap<gtString, gtVector<int>>& sessionFramesMap);
+    bool ProjectSessionsMapFromXML(const gtString& capturedFramesAsXML, gtMap<gtString, gtVector<FrameIndex>>& sessionFramesMap);
 
     /// Does session has captured frames?
     bool DoesSessionHasFrames(const QDir& sessionDir);
@@ -196,7 +208,7 @@ public:
 protected slots:
     /// Emits a signal that a frame was captured
     /// \param frameInfo the captured frame info
-    void OnFrameCapture(int frameIndex);
+    void OnFrameCapture(int firstFrameIndex, int lastFrameIndex);
 
     /// Is called when the current running session window is about to be closed:
     /// \param subwindowFilePath the file path of the sub window which is about to be closed
@@ -209,7 +221,7 @@ signals:
     void ApplicationRunEnded(gpSessionTreeNodeData* pRunningSessionData);
 
     /// Notify that a new captured frame is ready
-    void CapturedFrameUpdateReady(int);
+    void CapturedFrameUpdateReady(int, int);
 
     /// Notify the views that the UI should be updated
     void UIUpdated();

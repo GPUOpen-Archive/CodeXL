@@ -92,7 +92,7 @@ gpTraceView::gpTraceView(QWidget* parent) : gpBaseSessionView(parent),
     m_pGPUTraceTablesTabWidget(nullptr),
     m_pSummaryTableTabWidget(nullptr),
     m_pSessionDataContainer(nullptr),
-    m_frameIndex(-1),
+    m_frameIndex(-1, -1),
     m_isSessionLoaded(false),
     m_isCpuAPISelectionChangeInProgress(false),
     m_isGpuAPISelectionChangeInProgress(false)

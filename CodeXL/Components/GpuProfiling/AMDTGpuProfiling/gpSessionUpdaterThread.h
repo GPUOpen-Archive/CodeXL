@@ -9,6 +9,7 @@
 // Infra:
 #include <AMDTRemoteClient/Include/RemoteClientDataTypes.h>
 
+
 class GraphicsServerCommunication;
 
 class gpSessionUpdaterThread : public QThread
@@ -39,7 +40,7 @@ signals:
     void CurrentFrameUpdateReady(QPixmap* pCurrentFramePixmap, const FrameInfo& frameInfo);
 
     /// Signals an update for the current captured frame
-    void CapturedFrameUpdateReady(int frameIndex);
+    void CapturedFrameUpdateReady(int,int);
 protected:
 
     /// Overriding QThread

@@ -66,7 +66,7 @@ private slots:
     void OnItemPressed(const QVariant& capturedFrameId);
 
     /// Is handling the FrameCaptured signal
-    void OnCaptureFrameData(int frameIndex);
+    void OnCaptureFrameData(int firstFrameIndex, int lastFrameIndex);
 
     /// \param pRunningSessionData the item data describing the session
     void OnApplicationRunEnded(gpSessionTreeNodeData* pRunningSessionData);
@@ -94,7 +94,7 @@ private:
 
     /// Set the main image frame
     /// \param frameIndex the current frame index (by default -1 for the current frame)
-    void DisplayCurrentFrame(int frameIndex = -1);
+    void DisplayCurrentFrame(FrameIndex frameIndex);
 
     /// Fill the execution HTML description
     void FillExecutionDetails();

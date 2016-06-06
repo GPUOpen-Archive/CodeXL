@@ -24,7 +24,7 @@
 #include <AMDTGpuProfiling/ProfileManager.h>
 
 gpFrameView::gpFrameView(QWidget* pParent) : gpBaseSessionView(pParent),
-    m_pTabWidget(nullptr), m_pOverview(nullptr), m_pTraceView(nullptr), m_pTraceModel(nullptr), m_frameIndex(-1)
+    m_pTabWidget(nullptr), m_pOverview(nullptr), m_pTraceView(nullptr), m_pTraceModel(nullptr), m_frameIndex(-1, -1)
 {
     m_pTabWidget = new QTabWidget;
     QVBoxLayout* pMainLayout = new QVBoxLayout;
@@ -290,7 +290,7 @@ void gpFrameView::DisplayProfile(const osFilePath& profileFilePath)
 
 void gpFrameView::ExtractFrameIndex()
 {
-    if (m_frameIndex < 0)
+    if (m_frameIndex.first < 0)
     {
         // Extract the frame index from the file path
         gtString fileName;
@@ -301,8 +301,9 @@ void gpFrameView::ExtractFrameIndex()
         {
             gtString frameIndexStr;
             fileName.getSubString(pos + 1, fileName.length(), frameIndexStr);
-            bool rc = frameIndexStr.toIntNumber(m_frameIndex);
-            GT_ASSERT(rc);
+            m_frameIndex = FrameIndexFromString(acGTStringToQString(frameIndexStr));
+
+            GT_ASSERT(m_frameIndex.first >= 0);
         }
     }
 }

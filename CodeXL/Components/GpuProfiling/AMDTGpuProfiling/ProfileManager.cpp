@@ -490,7 +490,7 @@ void ProfileManager::OnBeforeSessionRename(SessionTreeNodeData* pAboutToRenameSe
 
         if (pGPSessionData != nullptr)
         {
-            QList<int> framesIndices;
+            QList<FrameIndex> framesIndices;
             gpUIManager::Instance()->GetListOfFrameFolders(pAboutToRenameSessionData->m_pParentData->m_filePath, framesIndices);
 
             for (int i = 0; i < framesIndices.size(); i++)
@@ -634,10 +634,10 @@ void ProfileManager::HandleFASessionRename(SessionTreeNodeData* pRenamedSessionD
         GT_IF_WITH_ASSERT(pRenamedSessionData->m_pParentData != nullptr)
         {
             // Find the frame folders for the renamed session
-            QList<int> framesForSession;
+            QList<FrameIndex> framesForSession;
             gpUIManager::Instance()->GetListOfFrameFolders(pRenamedSessionData->m_pParentData->m_filePath, framesForSession);
 
-            for (int frameIndex : framesForSession)
+            for (FrameIndex frameIndex : framesForSession)
             {
                 // Calculate the frame paths for the frames (do not create the frame folder!)
                 QDir frameDir;
@@ -652,7 +652,14 @@ void ProfileManager::HandleFASessionRename(SessionTreeNodeData* pRenamedSessionD
                     oldltrFilePath.setFileExtension(GP_LTR_FileExtensionW);
 
                     gtString frameFolderName;
-                    frameFolderName.appendFormattedString(GPU_STR_FrameSubFolderNameFormat, frameIndex);
+                    if (frameIndex.first == frameIndex.second)
+                    {
+                        frameFolderName.appendFormattedString(GPU_STR_FrameSubFolderNameSingleFormat, frameIndex.first);
+                    }
+                    else
+                    {
+                        frameFolderName.appendFormattedString(GPU_STR_FrameSubFolderNameMultipleFormat, frameIndex.first, frameIndex.second);
+                    }
 
                     // The files to rename should be in the already renamed folder
                     oldOverviewFilePath.setFileDirectory(pRenamedSessionData->SessionDir());
@@ -668,7 +675,16 @@ void ProfileManager::HandleFASessionRename(SessionTreeNodeData* pRenamedSessionD
                     osFilePath newltrFilePath = oldltrFilePath;
 
                     gtString newFileName;
-                    newFileName.appendFormattedString(GPU_STR_FrameTraceFileNameFormatW, acQStringToGTString(pRenamedSessionData->m_displayName).asCharArray(), frameIndex);
+
+                    if (frameIndex.first == frameIndex.second)
+                    {
+                        newFileName = acQStringToGTString(QString(GPU_STR_FrameTraceFileNameFormatSingle).arg(pRenamedSessionData->m_displayName).arg(frameIndex.first));
+                    }
+                    else
+                    {
+                        newFileName = acQStringToGTString(QString(GPU_STR_FrameTraceFileNameFormatMulti).arg(pRenamedSessionData->m_displayName).arg(frameIndex.first).arg(frameIndex.second));
+                    }
+
                     newOverviewFilePath.setFileName(newFileName);
                     newThumbFilePath.setFileName(newFileName);
                     newltrFilePath.setFileName(newFileName);

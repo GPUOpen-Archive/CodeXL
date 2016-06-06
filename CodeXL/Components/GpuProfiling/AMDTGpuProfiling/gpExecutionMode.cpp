@@ -646,7 +646,7 @@ void gpExecutionMode::OnFrameAnalysisCapture()
     }
 }
 
-bool gpExecutionMode::GetFrameTraceFromServer(const osFilePath& sessionFilePath, int frameIndex, osFilePath& traceFilePath)
+bool gpExecutionMode::GetFrameTraceFromServer(const osFilePath& sessionFilePath, FrameIndex frameIndex, osFilePath& traceFilePath)
 {
     bool retVal = false;
     OS_DEBUG_LOG_TRACER_WITH_RETVAL(retVal);
@@ -674,7 +674,8 @@ bool gpExecutionMode::GetFrameTraceFromServer(const osFilePath& sessionFilePath,
     {
         // Launch the server with CapturePlayer
         FrameInfo frameInfo;
-        frameInfo.m_frameIndex = frameIndex;
+        frameInfo.m_frameIndex = frameIndex.first;
+        frameInfo.m_framesCount = frameIndex.second - frameIndex.first + 1;
         retVal = gpUIManager::Instance()->GetFrameInfo(sessionFilePath, frameInfo);
         GT_IF_WITH_ASSERT(retVal)
         {
@@ -902,7 +903,7 @@ bool gpExecutionMode::CaptureFrame()
     return true;
 }
 
-bool gpExecutionMode::CapturePerformanceCounters(int frameIndex, bool shouldOpenFile)
+bool gpExecutionMode::CapturePerformanceCounters(FrameIndex frameIndex, bool shouldOpenFile)
 {
     bool retVal = false;
     OS_DEBUG_LOG_TRACER_WITH_RETVAL(retVal);
@@ -931,12 +932,27 @@ bool gpExecutionMode::CapturePerformanceCounters(int frameIndex, bool shouldOpen
                 int currentHour = qrand() % 24;
                 int currentMinute = qrand() % 60;
                 int currentSec = qrand() % 60;
-                QString fileNameStr = QString(GPU_STR_FramePerfCountersFileNameFormat).arg(gpUIManager::Instance()->CurrentlyRunningSessionData()->m_displayName).arg(frameIndex).arg(currentHour).arg(currentMinute).arg(currentSec);
+                QString fileNameStr;
+                if (frameIndex.first == frameIndex.second)
+                {
+                    fileNameStr = QString(GPU_STR_FramePerfCountersFileNameSingleFormat).arg(gpUIManager::Instance()->CurrentlyRunningSessionData()->m_displayName).arg(frameIndex.first).arg(currentHour).arg(currentMinute).arg(currentSec);
+                }
+                else
+                {
+                    fileNameStr = QString(GPU_STR_FramePerfCountersFileNameMultiFormat).arg(gpUIManager::Instance()->CurrentlyRunningSessionData()->m_displayName).arg(frameIndex.first).arg(frameIndex.second).arg(currentHour).arg(currentMinute).arg(currentSec);
+                }
                 gtString fileName = acQStringToGTString(fileNameStr);
                 countersFilePath.setFileName(fileName);
-                gtString frameSubFolder;
-                frameSubFolder.appendFormattedString(GPU_STR_FrameSubFolderNameFormat, frameIndex);
-                countersFilePath.appendSubDirectory(frameSubFolder);
+                gtString frameFolderName;
+                if (frameIndex.first == frameIndex.second)
+                {
+                    frameFolderName.appendFormattedString(GPU_STR_FrameSubFolderNameSingleFormat, frameIndex.first);
+                }
+                else
+                {
+                    frameFolderName.appendFormattedString(GPU_STR_FrameSubFolderNameMultipleFormat, frameIndex.first, frameIndex.second);
+                }
+                countersFilePath.appendSubDirectory(frameFolderName);
                 countersFilePath.setFileExtension(AF_STR_profileFileExtension9);
                 osFile countersFile;
                 osDirectory frameDir;
@@ -1395,12 +1411,12 @@ void gpExecutionMode::Terminate()
 }
 
 
-bool gpExecutionMode::PrepareTraceFile(const osFilePath& sessionFile, int frameIndex, SessionTreeNodeData* pTreeNodeData, gpBaseSessionView* pTraceView, bool prepareTraceData)
+bool gpExecutionMode::PrepareTraceFile(const osFilePath& sessionFile, FrameIndex frameIndex, SessionTreeNodeData* pTreeNodeData, gpBaseSessionView* pTraceView, bool prepareTraceData)
 {
     bool retVal = false;
     OS_DEBUG_LOG_TRACER_WITH_RETVAL(retVal);
 
-    if (frameIndex < 0)
+    if (frameIndex.first < 0)
     {
         // Extract the frame index from the file path
         gtString fileName;
@@ -1409,15 +1425,31 @@ bool gpExecutionMode::PrepareTraceFile(const osFilePath& sessionFile, int frameI
 
         GT_IF_WITH_ASSERT(pos >= 0)
         {
+            // Get the frame/s string
             gtString frameIndexStr;
             fileName.getSubString(pos + 1, fileName.length(), frameIndexStr);
-            retVal = frameIndexStr.toIntNumber(frameIndex);
+
+            // Check if this is a single / multi frame file
+            int separatorPos = frameIndexStr.findFirstOf(L"-");
+            if (separatorPos < 0)
+            {
+                retVal = frameIndexStr.toIntNumber(frameIndex.first);
+                frameIndex.second = frameIndex.first;
+            }
+            else
+            {
+                gtString frameIndexStr1, frameIndexStr2;
+                frameIndexStr.getSubString(0, separatorPos - 1, frameIndexStr1);
+                frameIndexStr.getSubString(separatorPos+1, frameIndexStr.length() - 1, frameIndexStr2);
+                retVal = frameIndexStr1.toIntNumber(frameIndex.first);
+                retVal = retVal && frameIndexStr2.toIntNumber(frameIndex.second);
+            }
             GT_ASSERT(retVal);
         }
     }
 
 
-    GT_IF_WITH_ASSERT(frameIndex > 0)
+    GT_IF_WITH_ASSERT(frameIndex.first > 0)
     {
         // Make sure that the frame trace is written to the trace file
         gpExecutionMode* pModeManager = ProfileManager::Instance()->GetFrameAnalysisModeManager();

@@ -29,6 +29,7 @@
 #include <AMDTGpuProfiling/OccupancyInfo.h>
 #include <AMDTGpuProfiling/ProjectSettings.h>
 #include <AMDTGpuProfiling/Util.h>
+#include <AMDTGpuProfiling/gpUIManager.h>
 
 
 /// Store each session settings
@@ -340,13 +341,13 @@ public:
     virtual bool DeleteSessionFilesFromDisk(QString& report);
 
     /// Contain a vector of captured frame indices
-    QVector<int> m_capturedFramesIndices;
+    QVector<FrameIndex> m_capturedFramesIndices;
 
     /// Contain the specific tree item file path (timeline / profile / etc')
     osFilePath m_frameFilePath;
 
     /// Frame index
-    int m_frameIndex;
+    FrameIndex m_frameIndex;
 
     QString m_strSessionFilePath;
 };

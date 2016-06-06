@@ -18,6 +18,7 @@
 // Local:
 #include <AMDTGpuProfiling/AMDTGpuProfilerDefs.h>
 #include <AMDTGpuProfiling/gpBaseSessionView.h>
+#include <AMDTGpuProfiling/gpUIManager.h>
 
 class gpTraceDataModel;
 class gpOverview;
@@ -97,10 +98,8 @@ private:
     gpObjectDataModel* m_pObjectModel;
 #endif // GP_OBJECT_VIEW_ENABLE
 
-#pragma message ("TODO: FA: document")
-
     /// The frame index
-    int m_frameIndex;
+    FrameIndex m_frameIndex;
 
 };
 #endif // __GPFRAMEVIEW_H
