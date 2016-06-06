@@ -47,7 +47,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(AMDTOutputDir)$(Configuration)\bin\</OutDir>
     <IntDir>$(AMDTOutputDir)$(Configuration)\obj\$(ProjectName)\$(Platform)$(GDTBuildSuffix)\</IntDir>
-    <TargetName>CXLSystemInformationHelper$(GDTProjectSuffix)</TargetName>
+    <TargetName>CXLSystemInformationHelper$(GDTPlatformSuffix)$(GDTDebugSuffix)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
