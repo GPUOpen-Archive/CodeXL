@@ -1,0 +1,772 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug_Static|Win32">
+      <Configuration>Debug_Static</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug_Static|x64">
+      <Configuration>Debug_Static</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_Static|Win32">
+      <Configuration>Release_Static</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_Static|x64">
+      <Configuration>Release_Static</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{3CEBA84A-C787-491A-996D-A61090288875}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)'=='Release'" Label="Configuration">
+    <AMDTModuleType>Dynamic</AMDTModuleType>
+    <AMDTConfiguration>Release</AMDTConfiguration>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release_Static'" Label="Configuration">
+    <AMDTModuleType>Static</AMDTModuleType>
+    <AMDTConfiguration>Release</AMDTConfiguration>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'" Label="Configuration">
+    <AMDTModuleType>Dynamic</AMDTModuleType>
+    <AMDTConfiguration>Debug</AMDTConfiguration>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Debug_Static'" Label="Configuration">
+    <AMDTModuleType>Static</AMDTModuleType>
+    <AMDTConfiguration>Debug</AMDTConfiguration>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(AMDTModuleType)'=='Dynamic'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(AMDTModuleType)'=='Static'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\Local-CommonProjects.props" />
+    <Import Project="$(AMDTCommonAMD)\GPUPerfAPI\Global-GPUPerfAPI.props" />
+    <Import Project="$(AMDTCommonEXT)\Windows-Kits\Global-WindowsSDK.props" />
+    <Import Project="$(AMDTCommonAMD)\APPSDK\Global-OpenCL-NoLib.props" />
+    <Import Project="..\..\Common\Lib\Ext\zlib\Global-Zlib.props" />
+  </ImportGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(AMDTModuleType)'=='Dynamic'">$(AMDTOutputDir)$(Configuration)\bin\</OutDir>
+    <IntDir Condition="'$(AMDTModuleType)'=='Dynamic'">$(AMDTOutputDir)$(Configuration)\obj\$(ProjectName)\$(Platform)$(GDTBuildSuffix)\</IntDir>
+    <OutDir Condition="'$(AMDTModuleType)'=='Static'">$(SolutionDir)bin\$(Configuration)-$(PlatformName)$(GDTBuildSuffix)\$(ProjectName)\</OutDir>
+    <IntDir Condition="'$(AMDTModuleType)'=='Static'">$(SolutionDir)obj\$(Configuration)-$(PlatformName)$(GDTBuildSuffix)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(AMDTCommonExt)tinyxml\2.5.2;$(AMDTCommonExt)MicrosoftPlatformSDK\march2009;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DBGHELP_TRANSLATE_TCHAR;WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalOptions> /MP %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(AMDTModuleType)'=='Dynamic'">
+    <ClCompile>
+      <PreprocessorDefinitions>_USRDLL;AMDTOSWRAPPERS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(OutDir)$(TargetName).dll</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <ImportLibrary>$(AMDTOutputDir)$(Configuration)\arch\$(TargetName).lib</ImportLibrary>
+      <AdditionalDependencies>ws2_32.lib;Version.lib;tinyxml$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixNoDash).lib;AMDTBaseTools$(GDTProjectSuffix).lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(AMDTCommonExt)\tinyxml\2.5.2\$(Platform)\$(Configuration);$(AMDTOutputDir)$(Configuration)\arch;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>LIBCMT$(GDTDebugSuffixNoDash);%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(AMDTModuleType)'=='Static'">
+    <ClCompile>
+      <PreprocessorDefinitions>AMDTBASETOOLS_STATIC;AMDTOSWRAPPERS_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(AMDTConfiguration)'=='Debug'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(AMDTConfiguration)'=='Release'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug_Static'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release_Static'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Platform)'=='Win32'">
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Platform)'=='x64'">
+    <Link>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+    <Lib>
+      <AdditionalOptions>/MACHINE:X64 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\common\osApplication.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osASCIIInputFileImpl.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osBugReporter.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osCallStack.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osCallStackFrame.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osCGIInputDataReader.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osChannel.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osChannelOperators.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osCpuid.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osCriticalSection.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osCriticalSectionLocker.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osDebuggingFunctions.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osDebugLog.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osDirectory.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osDNSQueryThread.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osEmailClient.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osExceptionReason.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osFile.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osFileImpl.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osFileLauncher.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osFileLauncherThread.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osFilePath.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osFilePathByLastAccessDateCompareFunctor.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osGeneralFunctions.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osHTTPClient.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osInputFileImpl.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osModule.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osMutex.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osMutexLocker.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osNetworkAdapter.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osNULLSocket.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osOSWrappersDLLBuild.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osOutOfMemoryHandling.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osOutputFileImpl.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osPortAddress.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osRawMemoryBuffer.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osRawMemoryStream.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osSettingsFileHandler.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osSingeltonsDelete.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osSocket.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osStream.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osSynchronizationObject.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osSynchronizationObjectLocker.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osTCPSocketServer.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osTCPSocketServerConnectionHandler.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osTime.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osTimeInterval.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osTransferableObject.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osTransferableObjectCreatorsBase.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osTransferableObjectCreatorsManager.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osTransferableObjectType.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\common\osWrappersInitFunc.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osConsole.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osInputFileImpl.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osProcessSharedFile.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osReadWriteLock.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\osProductVersion.cpp">
+      <ObjectFileName>$(IntDir)%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osApplication.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osCallsStackReader.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+      <AdditionalOptions Condition="'$(AMDTConfiguration)'=='Release'">/Oy- %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <ClCompile Include="src\win32\osConsole.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osCriticalSectionImpl.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osDaemon.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osDebuggingFunctions.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+    </ClCompile>
+    <ClCompile Include="src\win32\osDesktop.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osDirectory.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osFile.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osFileLauncher.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osFilePath.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osFilePermissions.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osGeneralFunctions.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osInputFileImpl.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osMachine.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osModule.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osMutexImpl.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osNetworkAdapter.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osPipeSocket.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osPipeSocketClient.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osPipeSocketServer.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osPortAddress.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osProcess.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osProcessSharedFile.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osReadWriteLock.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osSingleApplicationInstance.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osStopWatch.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osSynchronizationObjectImpl.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osSystemError.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osTCPSocket.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osTCPSocketClient.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osTCPSocketServer.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osThread.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osThreadLocalData.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osTimer.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osToAndFromString.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osUnhandledExceptionHandler.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osUser.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osWin32CallStackReader.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osWin32DebugInfoReader.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osWin32DebugSymbolsManager.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\win32\osWin32Functions.cpp">
+      <ObjectFileName>$(IntDir)win32\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osApplication.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osCallsStackReader.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osCondition.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osCriticalSectionImpl.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osDaemon.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osDebuggingFunctions.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osDesktop.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osDirectory.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osFile.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osFileLauncher.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osFilePath.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osGeneralFunctions.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osLinuxProcFileSystemReader.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osMachine.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osModule.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osMutexImpl.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osNetworkAdapter.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osPipeExecutor.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osPipeSocket.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osPipeSocketClient.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osPipeSocketServer.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osPortAddress.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osProcess.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osSingleApplicationInstance.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osSocket.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osStopWatch.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osSystemError.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osTCPSocket.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osTCPSocketClient.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osTCPSocketServer.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osThread.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osThreadLocalData.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osTimer.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osToAndFromString.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\linux\osUser.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)linux\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\mac\osApplication.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)mac\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\mac\osBundle.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)mac\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\mac\osDebuggingFunctions.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)mac\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\mac\osFile.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)mac\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\mac\osFilePath.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)mac\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\mac\osGeneralFunctions.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)mac\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\mac\osMachine.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)mac\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\mac\osMacSystemResourcesSampler.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)mac\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\mac\osModule.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)mac\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="src\mac\osProcess.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ObjectFileName>$(IntDir)mac\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuildStep Include="src\iphone\osApplication.mm">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </CustomBuildStep>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\osAtomic.h" />
+    <ClInclude Include="Include\osConsole.h" />
+    <ClInclude Include="Include\osCpuid.h" />
+    <ClInclude Include="Include\osEnvironmentVariable.h" />
+    <ClInclude Include="Include\osOutOfMemoryHandling.h" />
+    <ClInclude Include="Include\osProcessSharedFile.h" />
+    <ClInclude Include="Include\osProductVersion.h" />
+    <ClInclude Include="Include\osApplication.h" />
+    <ClInclude Include="Include\osBugReporter.h" />
+    <ClInclude Include="Include\osBundle.h" />
+    <ClInclude Include="Include\osCallsStackReader.h" />
+    <ClInclude Include="Include\osCallStack.h" />
+    <ClInclude Include="Include\osCallStackFrame.h" />
+    <ClInclude Include="Include\osCGIInputDataReader.h" />
+    <ClInclude Include="Include\osChannel.h" />
+    <ClInclude Include="Include\osChannelOperators.h" />
+    <ClInclude Include="Include\osCondition.h" />
+    <ClInclude Include="Include\osCPUSampledData.h" />
+    <ClInclude Include="Include\osCriticalSection.h" />
+    <ClInclude Include="Include\osCriticalSectionLocker.h" />
+    <ClInclude Include="Include\osDaemon.h" />
+    <ClInclude Include="Include\osDebuggingFunctions.h" />
+    <ClInclude Include="Include\osDebugLog.h" />
+    <ClInclude Include="Include\osDebugLogParser.h" />
+    <ClInclude Include="Include\osDesktop.h" />
+    <ClInclude Include="Include\osDirectory.h" />
+    <ClInclude Include="Include\osDNSQueryThread.h" />
+    <ClInclude Include="Include\osEmailClient.h" />
+    <ClInclude Include="Include\osExceptionReason.h" />
+    <ClInclude Include="Include\osFile.h" />
+    <ClInclude Include="Include\osFileLauncher.h" />
+    <ClInclude Include="Include\osFilePath.h" />
+    <ClInclude Include="Include\osFilePathByLastAccessDateCompareFunctor.h" />
+    <ClInclude Include="Include\osFilePermissions.h" />
+    <ClInclude Include="Include\osGeneralFunctions.h" />
+    <ClInclude Include="Include\osHTTPClient.h" />
+    <ClInclude Include="Include\osLinuxProcFileSystemReader.h" />
+    <ClInclude Include="Include\osMachine.h" />
+    <ClInclude Include="Include\osMacSystemResourcesSampler.h" />
+    <ClInclude Include="Include\osMessageBox.h" />
+    <ClInclude Include="Include\osModule.h" />
+    <ClInclude Include="Include\osModuleArchitecture.h" />
+    <ClInclude Include="Include\osMutex.h" />
+    <ClInclude Include="Include\osMutexLocker.h" />
+    <ClInclude Include="Include\osNetworkAdapter.h" />
+    <ClInclude Include="Include\osNULLSocket.h" />
+    <ClInclude Include="Include\osOSDefinitions.h" />
+    <ClInclude Include="Include\osOSWrappersDLLBuild.h" />
+    <ClInclude Include="Include\osPhysicalMemorySampledData.h" />
+    <ClInclude Include="Include\osPipeExecutor.h" />
+    <ClInclude Include="Include\osPipeSocket.h" />
+    <ClInclude Include="Include\osPipeSocketClient.h" />
+    <ClInclude Include="Include\osPipeSocketServer.h" />
+    <ClInclude Include="Include\osPortAddress.h" />
+    <ClInclude Include="Include\osProcess.h" />
+    <ClInclude Include="Include\osRawMemoryBuffer.h" />
+    <ClInclude Include="Include\osRawMemoryStream.h" />
+    <ClInclude Include="Include\osReadWriteLock.h" />
+    <ClInclude Include="Include\osSettingsFileHandler.h" />
+    <ClInclude Include="Include\osSingleApplicationInstance.h" />
+    <ClInclude Include="Include\osSocket.h" />
+    <ClInclude Include="Include\osStdLibIncludes.h" />
+    <ClInclude Include="Include\osStopWatch.h" />
+    <ClInclude Include="Include\osStringConstants.h" />
+    <ClInclude Include="Include\osStream.h" />
+    <ClInclude Include="Include\osSynchronizationObject.h" />
+    <ClInclude Include="Include\osSynchronizationObjectLocker.h" />
+    <ClInclude Include="Include\osSynchronizedQueue.h" />
+    <ClInclude Include="Include\osSystemError.h" />
+    <ClInclude Include="Include\osSystemResourcesDataSampler.h" />
+    <ClInclude Include="Include\osTCPSocket.h" />
+    <ClInclude Include="Include\osTCPSocketClient.h" />
+    <ClInclude Include="Include\osTCPSocketServer.h" />
+    <ClInclude Include="Include\osTCPSocketServerConnectionHandler.h" />
+    <ClInclude Include="Include\osThread.h" />
+    <ClInclude Include="Include\osThreadLocalData.h" />
+    <ClInclude Include="Include\osTime.h" />
+    <ClInclude Include="Include\osTimeInterval.h" />
+    <ClInclude Include="Include\osTimer.h" />
+    <ClInclude Include="Include\osToAndFromString.h" />
+    <ClInclude Include="Include\osTransferableObject.h" />
+    <ClInclude Include="Include\osTransferableObjectCreator.h" />
+    <ClInclude Include="Include\osTransferableObjectCreatorsBase.h" />
+    <ClInclude Include="Include\osTransferableObjectCreatorsManager.h" />
+    <ClInclude Include="Include\osTransferableObjectType.h" />
+    <ClInclude Include="Include\osUnhandledExceptionHandler.h" />
+    <ClInclude Include="Include\osUser.h" />
+    <ClInclude Include="Include\osWin32CallStackReader.h" />
+    <ClInclude Include="Include\osWin32DebugInfoReader.h" />
+    <ClInclude Include="Include\osWin32DebugSymbolsManager.h" />
+    <ClInclude Include="Include\osWin32Functions.h" />
+    <ClInclude Include="Include\osWrappersInitFunc.h" />
+    <ClInclude Include="src\common\osASCIIInputFileImpl.h" />
+    <ClInclude Include="src\common\osFileImpl.h" />
+    <ClInclude Include="src\common\osFileLauncherThread.h" />
+    <ClInclude Include="src\common\osInputFileImpl.h" />
+    <ClInclude Include="src\common\osOutputFileImpl.h" />
+    <ClInclude Include="src\common\osSingeltonsDelete.h" />
+    <ClInclude Include="src\linux\osAtomicImpl.h" />
+    <ClInclude Include="src\win32\osAtomicImpl.h" />
+    <ClInclude Include="src\win32\osCriticalSectionImpl.h" />
+    <ClInclude Include="src\win32\osMutexImpl.h" />
+    <ClInclude Include="src\win32\osPrivateData.h" />
+    <ClInclude Include="src\win32\osSynchronizationObjectImpl.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\VersionInfo\VersionResource.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

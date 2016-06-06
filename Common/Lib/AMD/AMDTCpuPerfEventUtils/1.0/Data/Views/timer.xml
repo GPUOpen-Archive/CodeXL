@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!DOCTYPE view_configuration SYSTEM "viewconfig.dtd">
+
+<!--
+        Show time-based profiling (TBP) data
+        View configuration
+        Date:    13 September 2006
+        Version: 1.3
+        Copyright (c) 2006 Advanced Micro Devices, Inc. All rights reserved.
+
+        The timer view should always be available when TBP data are available.
+
+        Related DC configuration: tbp.xml
+ -->
+
+<view_configuration>
+
+  <view name="timer-based profile"
+        separate_cpus="F"
+        separate_processes="F"
+        separate_threads="F"
+        default_view="T"
+        show_percentage="T"
+        >
+
+    <data>
+      <event id="tbp_data" select="E100" mask="00" />
+    </data>
+
+    <output>
+      <column title="Timer samples" sort="descending">
+        <value id="tbp_data" />
+      </column>
+    </output>
+
+    <tool_tip>
+      Show profile of execution time
+    </tool_tip>
+
+    <description>
+      Use this view to find hot-spots where the program is spending most
+      of its time.
+    </description>
+
+  </view>
+
+</view_configuration>

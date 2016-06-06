@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!DOCTYPE view_configuration SYSTEM "..\viewconfig.dtd">
+
+<!--
+        IBS fetch page translation measurements
+        View configuration
+        Date:    14 January 2016
+        Version: 1.05
+		    Processor: AMD family 15h Models 70h - 7Fh
+        Copyright (c) 2016 Advanced Micro Devices, Inc. All rights reserved.
+
+        Related data collection configurations: ibs.xml
+ -->
+
+<view_configuration>
+
+  <view name="IBS fetch page translations"
+        separate_cpus="F"
+        separate_processes="F"
+        separate_threads="F"
+        >
+
+    <data>
+      <event id="FetchAttempt" select="F002" mask="00" />
+      <event id="FetchComp"    select="F003" mask="00" />
+      <event id="Fetch4KPage"  select="F00A" mask="00" />
+      <event id="Fetch2MPage"  select="F00B" mask="00" />
+    </data>
+
+    <output>
+      <column title="IBS fetch attempt" sort="none">
+        <value id="FetchAttempt" />
+      </column>
+      <column title="IBS fetch comp" sort="none">
+        <value id="FetchComp" />
+      </column>
+      <column title="IBS 4K page" sort="none">
+        <value id="Fetch4KPage" />
+      </column>
+      <column title="IBS 2M page" sort="none">
+        <value id="Fetch2MPage" />
+      </column>
+    </output>
+
+    <tool_tip>
+      Show summary of IBS L1 ITLB page translations
+    </tool_tip>
+
+    <description>
+      Use this view to show a summary of the IBS L1 ITLB page
+      translations for attempted fetches.
+    </description>
+
+  </view>
+
+</view_configuration>

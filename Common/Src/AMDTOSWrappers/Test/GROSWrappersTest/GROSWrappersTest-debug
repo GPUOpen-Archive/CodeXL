@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# ----------------------------------------------------------------------------------------------------------------------------------
+# File name: GROSWrappersTest-debug
+# This script sets GROSWrappersTest related environment variables and
+# launches it in a debugger.
+#
+# 2004-2007 Graphic Remedy. All Rights Reserved.
+# ----------------------------------------------------------------------------------------------------------------------------------
+
+# Get this script full path:
+if echo "$0" | grep '^/' ; then
+        thisScriptFullPath="$0"
+else
+        thisScriptFullPath=`pwd`/$0
+fi
+
+# CodeXL's binaries directory is this scripts directory:
+CodeXLBinariesDir=`dirname "$thisScriptFullPath"`
+
+# Add CodeXL's binaries directory to LD_LIBRARY_PATH:
+if [ -z "$LD_LIBRARY_PATH" ]; then
+        export LD_LIBRARY_PATH="${CodeXLBinariesDir}"
+else
+        export LD_LIBRARY_PATH="${CodeXLBinariesDir}:$LD_LIBRARY_PATH"
+fi
+
+# Run GROSWrappersTest:
+kdbg ./GROSWrappersTest_d

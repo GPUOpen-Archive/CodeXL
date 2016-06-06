@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="UserMacros">
+    <CustomPreProcessorDefs Condition="'$(SolutionName)'=='CodeXL-AllProjects'">CODEXL_GRAPHICS</CustomPreProcessorDefs>
+    <AMDTCommonExt>$(CommonDir)\Lib\Ext\</AMDTCommonExt>
+    <AMDTOutputDir>$(SolutionDir)..\Output\</AMDTOutputDir>
+    <AMDTCommonAMD>$(CommonDir)\Lib\AMD\</AMDTCommonAMD>
+    <CommonProjectsDir>$(CommonDir)\Src\</CommonProjectsDir>
+  </PropertyGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(CommonDir)\Src\Vsprops\Global-Common.props" />
+  </ImportGroup>
+  <ItemDefinitionGroup>
+    <Midl>
+      <AdditionalIncludeDirectories>$(VSIntegrationInclude);$(VSClearInstallIntegrationInclude);$(VSIntegrationIdl);$(VSClearInstallIntegrationIdl);$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>.\src;$(CommonProjectsDir);$(CommonProjectsDir)\AMDTOSWrappers\Include;$(VSLIncludePath);$(VSClearInstallationIncludePath);$(VSIntegrationInclude);$(VSClearInstallIntegrationInclude);$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>$(CustomPreProcessorDefs);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+    <ClCompile />
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <TreatSpecificWarningsAsErrors>4100;4101;4018;4062;4189;4700;%(TreatSpecificWarningsAsErrors)</TreatSpecificWarningsAsErrors>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(VSIntegrationInclude);$(IntDir);$(OutDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalLibraryDirectories>$(VSIntegrationLibraries);$(VSClearInstallIntegrationLibraries);$(IntDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="Office10Include">
+      <Value>$(Office10Include)</Value>
+    </BuildMacro>
+    <BuildMacro Include="RegitPath">
+      <Value>$(RegitPath)</Value>
+    </BuildMacro>
+    <BuildMacro Include="VsctPath">
+      <Value>$(VsctPath)</Value>
+    </BuildMacro>
+    <BuildMacro Include="VSIntegrationRoot">
+      <Value>$(VSIntegrationRoot)</Value>
+    </BuildMacro>
+    <BuildMacro Include="VSIntegrationCommon">
+      <Value>$(VSIntegrationCommon)</Value>
+    </BuildMacro>
+    <BuildMacro Include="VSIntegrationIdl">
+      <Value>$(VSIntegrationIdl)</Value>
+    </BuildMacro>
+    <BuildMacro Include="VSIntegrationInclude">
+      <Value>$(VSIntegrationInclude)</Value>
+    </BuildMacro>
+    <BuildMacro Include="VSIntegrationLibraries">
+      <Value>$(VSIntegrationLibraries)</Value>
+    </BuildMacro>
+    <BuildMacro Include="VSIntegrationTools">
+      <Value>$(VSIntegrationTools)</Value>
+    </BuildMacro>
+    <BuildMacro Include="VSLIncludePath">
+      <Value>$(VSLIncludePath)</Value>
+    </BuildMacro>
+    <BuildMacro Include="VSClearInstallIntegrationRoot">
+      <Value>$(VSClearInstallIntegrationRoot)</Value>
+    </BuildMacro>
+    <BuildMacro Include="VSClearInstallIntegrationCommon">
+      <Value>$(VSClearInstallIntegrationCommon)</Value>
+    </BuildMacro>
+    <BuildMacro Include="VSClearInstallIntegrationIdl">
+      <Value>$(VSClearInstallIntegrationIdl)</Value>
+    </BuildMacro>
+    <BuildMacro Include="VSClearInstallIntegrationInclude">
+      <Value>$(VSClearInstallIntegrationInclude)</Value>
+    </BuildMacro>
+    <BuildMacro Include="VSClearInstallIntegrationLibraries">
+      <Value>$(VSClearInstallIntegrationLibraries)</Value>
+    </BuildMacro>
+    <BuildMacro Include="VSCleanInstallIntegrationTools">
+      <Value>$(VSCleanInstallIntegrationTools)</Value>
+    </BuildMacro>
+    <BuildMacro Include="VSClearInstallationIncludePath">
+      <Value>$(VSClearInstallationIncludePath)</Value>
+    </BuildMacro>
+    <BuildMacro Include="AMDTCommonExt">
+      <Value>$(AMDTCommonExt)</Value>
+    </BuildMacro>
+    <BuildMacro Include="AMDTOutputDir">
+      <Value>$(AMDTOutputDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="AMDTCommonAMD">
+      <Value>$(AMDTCommonAMD)</Value>
+    </BuildMacro>
+    <BuildMacro Include="AMDTControls">
+      <Value>$(AMDTControls)</Value>
+    </BuildMacro>
+    <BuildMacro Include="CommonProjectsDir">
+      <Value>$(CommonProjectsDir)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

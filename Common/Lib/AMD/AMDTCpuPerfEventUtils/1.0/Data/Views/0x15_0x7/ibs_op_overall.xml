@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!DOCTYPE view_configuration SYSTEM "..\viewconfig.dtd">
+
+<!--
+        IBS op overall summary
+        View configuration
+        Date:    14 January 2016
+        Version: 1.05
+        Processor: AMD family 15h Models 70h - 7Fh
+        Copyright (c) 2016 Advanced Micro Devices, Inc. All rights reserved.
+
+        Related data collection configurations: ibs.xml
+ -->
+
+<view_configuration>
+
+  <view name="IBS All ops"
+        separate_cpus="F"
+        separate_processes="F"
+        separate_threads="F"
+        >
+
+    <data>
+      <event id="OpAll"        select="F100" mask="00" />
+      <event id="OpTagToRet"   select="F101" mask="00" />
+      <event id="OpCompToRet"  select="F102" mask="00" />
+      <event id="OpBranch"     select="F103" mask="00" />
+      <event id="OpLoadStore"  select="F200" mask="00" />
+    </data>
+
+    <output>
+      <column title="IBS all ops" sort="descending">
+        <value id="OpAll" />
+      </column>
+      <column title="IBS IBS BR" sort="none">
+        <value id="OpBranch" />
+      </column>
+      <column title="IBS load/store" sort="none">
+        <value id="OpLoadStore" />
+      </column>
+      <column title="IBS tag-to-ret" sort="none">
+        <value id="OpTagToRet" />
+      </column>
+      <column title="IBS comp-to-ret" sort="none">
+        <value id="OpCompToRet" />
+      </column>
+      <column title="Ave tag-to-ret" sort="none">
+        <ratio left="OpTagToRet" right="OpAll" />
+      </column>
+      <column title="Ave comp-to-ret" sort="none">
+        <ratio left="OpCompToRet" right="OpAll" />
+      </column>
+    </output>
+
+    <tool_tip>
+      Show summary of IBS op samples
+    </tool_tip>
+
+    <description>
+      Use this view to show a summary of all IBS op samples.
+    </description>
+
+  </view>
+
+</view_configuration>

@@ -1,0 +1,52 @@
+# -*- Python -*-
+
+Import('*')
+from CXL_init import *
+
+libName = "CXLExecutableFormat"
+
+env = CXL_env.Clone()
+
+env.Append( CPPPATH = [ 
+	".",
+	"inc",
+	"..",
+	env['CXL_commonproj_dir'],
+])
+
+# NOTE: Do not change the order of the two lines here
+initLibDwarf (env)
+initLibElf (env)
+
+env.Append (LIBS = [
+	"CXLBaseTools",
+	"CXLOSWrappers",
+])
+
+sources = \
+[
+	"src/ElfFile.cpp",
+	"src/ExecutableFile.cpp",
+	"src/ProcessWorkingSet.cpp",
+	"src/SymbolEngine.cpp",
+	"src/Linux/SymbolManglingIA.cpp",
+	"src/SymbolEngines/Formats/DwarfSymbolEngine.cpp",
+	"src/SymbolEngines/Formats/ElfSymbolEngine.cpp",
+	"src/SymbolEngines/Formats/StabsSymbolEngine.cpp",
+	"src/SymbolEngines/Generics/ModularSymbolEngine.cpp",
+]
+
+# Creating object files	
+objFiles = env.SharedObject(sources)
+
+# Creating shared libraries
+soFiles = env.SharedLibrary(
+	target = libName, 
+	source = objFiles)
+
+# Installing libraries
+libInstall = env.Install( 
+	dir = env['CXL_lib_dir'], 
+	source = (soFiles))
+
+Return('libInstall')

@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<!DOCTYPE view_configuration SYSTEM "..\viewconfig.dtd">
+
+<!--
+        IBS load/store data cache (DC) summary
+        View configuration
+        Date:    14 January 2016
+        Version: 1.05
+        Processor: AMD family 15h Models 70h - 7Fh
+        Copyright (c) 2016 Advanced Micro Devices, Inc. All rights reserved.
+
+        Related data collection configurations: ibs.xml
+ -->
+
+<view_configuration>
+
+  <view name="IBS MEM data cache"
+        separate_cpus="F"
+        separate_processes="F"
+        separate_threads="F"
+        >
+
+    <data>
+      <event id="OpAll"        select="F100" mask="00" />
+      <event id="OpLoadStore"  select="F200" mask="00" />
+      <event id="OpLoad"       select="F201" mask="00" />
+      <event id="OpStore"      select="F202" mask="00" />
+      <event id="OpDcMiss"     select="F206" mask="00" />
+      <event id="OpLoadLat"    select="F219" mask="00" />
+      <event id="OpLdResync"   select="F21C" mask="00" />
+    </data>
+
+    <output>
+      <column title="IBS load/store" sort="descending">
+        <value id="OpLoadStore" />
+      </column>
+      <column title="IBS all ops" sort="none" visible="F">
+        <value id="OpAll" />
+      </column>
+      <column title="IBS load" sort="none">
+        <value id="OpLoad" />
+      </column>
+      <column title="IBS store" sort="none">
+        <value id="OpStore" />
+      </column>
+      <column title="IBS DC miss" sort="none">
+        <value id="OpDcMiss" />
+      </column>
+      <column title="DC miss rate" sort="none">
+        <ratio left="OpDcMiss" right="OpAll" />
+      </column>
+      <column title="DC miss ratio" sort="none">
+        <ratio left="OpDcMiss" right="OpLoadStore" />
+      </column>
+      <column title="IBS DC miss lat" sort="none">
+        <value id="OpLoadLat" />
+      </column>
+      <column title="Ave DC miss lat" sort="none">
+        <ratio left="OpLoadLat" right="OpDcMiss" />
+      </column>
+      <column title="Load Resync" sort="none">
+        <value id="OpLdResync" />
+      </column>
+    </output>
+
+    <tool_tip>
+      Show summary of IBS load/store DC summary
+    </tool_tip>
+
+    <description>
+      Use this view to show a summary of data cache (DC) behavior
+      derived from IBS load/store op samples.
+    </description>
+
+  </view>
+
+</view_configuration>

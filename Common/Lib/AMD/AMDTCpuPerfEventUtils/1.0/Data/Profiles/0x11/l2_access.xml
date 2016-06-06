@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE dc_configuration SYSTEM "dcconfig.dtd">
+
+<!--     
+        Analyze L2 cache access using event-based profiling
+        Date:    3 May 2010
+        Version: 1.2
+        Copyright (c) 2006-2010 Advanced Micro Devices, Inc. 
+                      All rights reserved.
+ -->
+
+<dc_configuration>
+
+  <ebp name="Investigate L2 Cache Access" mux_period="0">
+
+      <event select="C0" mask="00" os="T" user="T" count="250000"></event>
+      <event select="7D" mask="07" os="T" user="T" count="25000"></event>
+      <event select="7E" mask="07" os="T" user="T" count="25000"></event>
+      <event select="7F" mask="03" os="T" user="T" count="25000"></event>
+
+    <tool_tip>
+      Analyze L2 cache behavior
+    </tool_tip>
+
+    <description>
+      Use this configuration to find memory access operations with poor
+      L2 cache locality.
+    </description>
+
+  </ebp>
+
+</dc_configuration>

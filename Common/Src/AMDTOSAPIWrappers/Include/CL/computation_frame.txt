@@ -1,0 +1,157 @@
+XXX - Not complete yet!!!
+
+Name Strings
+
+    cl_gremedy_computation_frame
+
+Contributors
+
+    Sigal Algranaty, Graphic Remedy
+    Avi Shapira, Graphic Remedy
+    Uri Shomroni, Graphic Remedy
+    Yaki Tebeka, Graphic Remedy
+
+Contact
+
+    Uri Shomroni (uri 'at' gremedy.com)
+
+IP Status
+
+    None
+
+Version
+
+    Version 1, February 17, 2010
+
+Number
+
+    TBD
+
+Status
+
+    XXX - Incomplete
+    Implemented by CodeXL CL (Version X.X or later)
+
+Extension Type
+
+    OpenCL platform extension
+
+Dependencies
+
+    OpenCL 1.0 is required. This extension is written against the OpenCL
+    1.0 specification.
+
+Overview
+
+    This extension defines a mechanism that enables marking the
+    beginning and end of "computation frames". A computation frame is a
+    set of OpenCL API calls, typically the largest set of calls an
+    OpenCL compute context performs which can be considered a single
+    logical operation.
+
+    A computation frame is comparable to a render frame in a graphics
+    engine. It is recommended for applications rendering graphics to
+    define the computation frame as the set of commands used to
+    calculate the data for a single render frame.
+
+    Having a notion and boundary of what comprises a frame allows for
+    measurements such as frame times and frame rates as well as API call
+    statistics, which are useful in debugging and profiling.
+
+    Seeing that the native OpenCL "frame terminators" (clFlush /
+    clFinish / clEnqueueBarrier ...) all affect the timing and flow of
+    commands in the OpenCL pipeline, it would be useful to have a way to
+    notify debuggers and profilers of these computation frames with the
+    minimal possible impact on actual computation performance.
+
+    This extension is expected to be only supported by tools such as 
+    debuggers and profilers. Run-time environments are not expected to
+    support this extension. This enables using an executable that
+    defines computation frames only when run in a debugger / profiler.
+    Recompilation or changes to source code are not required thanks to
+    the use of OpenCL's extension mechanism.
+
+Header File
+
+    XXX
+
+New Procedures and Functions
+
+    cl_int clBeginComputationFrameGREMEDY(cl_context context);
+
+    cl_int clEndComputationFrameGREMEDY(cl_context context);
+
+New Tokens
+
+    None
+
+Additions to Chapter NNN of the OpenCL 1.0 Specification
+
+    Add new section NNN.XX:
+
+   "NNN.XX Computation frames
+
+    The functions
+
+        cl_int clBeginComputationFrameGREMEDY(cl_context context);
+
+        cl_int clEndComputationFrameGREMEDY(cl_context context);
+
+    can be used to define the boundaries of computation frames.
+
+    <context> is an OpenCL compute context for which a computation frame
+    is defined.
+
+    clBeginComputationFrameGREMEDY opens a computation frame
+    in <context>. clEndComputationFrameGREMEDY marks the end of a
+    computation frame in <context> and closes it. All functions called
+    related to <context> or its subordinate objects between the two
+    calls comprise the computation frame.
+
+    clBeginComputationFrameGREMEDY returns CL_SUCCESS if <context> is
+    valid and no frame is open in <context>.
+    clEndComputationFrameGREMEDY returns CL_SUCCESS if <context> is
+    valid and a computation frame is currently open in <context>.
+    Otherwise they may return
+
+      * CL_INVALID_CONTEXT if <context> is not a valid OpenCL context.
+
+      * CL_INVALID_OPERATION if clBeginComputationFrameGREMEDY is called
+        when a computation frame is open in <context> or
+        clEndComputationFrameGREMEDY is called  while no computation
+        frame is open for <context>.
+
+    A computation frame is a set of OpenCL API calls, typically the
+    largest set of calls an OpenCL compute context performs which can be
+    considered a single logical operation.
+
+    A computation frame is comparable to a render frame in a graphics
+    engine. It is recommended for applications rendering graphics to
+    define the computation frame as the set of commands used to
+    calculate the data for a single render frame.
+
+    Computation frames should be used by debugging / profiling tools for
+    measurements of frame times or frame rates, for marking and clearing
+    stream loggers logs, for sampling performance metrics, and so forth.
+    The command has no effect on the OpenCL state or compute pipeline."
+
+Interactions with other extensions
+
+    None
+
+Issues
+
+    None
+
+Sample Code
+
+    None
+
+Conformance Tests
+
+    None
+
+Revision History
+
+    Version 1, February 16, 2010 (Uri Shomroni) - initial extension
+    specification

@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE dc_configuration SYSTEM "dcconfig.dtd">
+
+<!--     
+         Analyze L1 data cache line utilization using instruction-based sampling
+         Date: 5 September 2013
+         Version: 1.0
+         Processor: AMD family 10h
+         Copyright (c) 2007 Advanced Micro Devices, Inc. All rights reserved.
+ -->
+
+<dc_configuration>
+
+  <clu name="Cache Line Utilization"
+       clu_sampling="T"
+       clu_max_count="250000"
+       clu_cycle_count="F">
+
+    <tool_tip> 
+      Get a measure of cache line utilization of L1 data cache
+    </tool_tip>
+
+    <description>
+      Use this configuration to collect data about cache line utilization and
+      to find potential issues related to data locality and data access pattern
+      in the application. 
+    </description>
+
+  </clu>
+
+</dc_configuration>

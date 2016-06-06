@@ -1,0 +1,14 @@
+prefix=/home/3dargbld/Qt-5.5.1
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+
+Name: Qt5 Nfc
+Description: Qt Nfc module
+Version: 5.5.1
+Libs: -L${libdir} -lQt5Nfc 
+Libs.private: -L/home/3dargbld/Desktop/icu54/lib -L/home/3dargbld/Qt-5.5.1/lib -lQt5DBus -lQt5Core -lpthread   
+Cflags: -I${includedir}/QtNfc -I${includedir}
+Requires: Qt5Core
+

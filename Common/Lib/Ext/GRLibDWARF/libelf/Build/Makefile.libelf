@@ -1,0 +1,37 @@
+include $(OPENCL_DEPTH)/localdefs
+
+#
+## Targets
+#
+
+LIB_TARGET = libelf
+
+#
+## C files
+#
+
+vpath %.c $(COMPONENT_DEPTH)
+
+CFILES   = $(notdir $(wildcard $(COMPONENT_DEPTH)/*.c))
+
+#
+## C include paths
+#
+LCINCS += $(INCSWITCH)"$(COMPONENT_DEPTH)"
+LCINCS += $(INCSWITCH)"$(COMPONENT_DEPTH)/../common"
+
+ifdef ATI_OS_WINDOWS
+    LCINCS += $(INCSWITCH) "$(OPENCL_DEPTH)/loader/utils/common/win32"
+    #LCINCS += $(INCSWITCH) "$(OPENCL_DEPTH)/compiler/llvm/win32/include"
+endif
+
+LCDEFS += $(DEFSWITCH) BSD_LIBELF
+
+LCXXINCS = $(LCINCS)
+LCXXDEFS = $(LCDEFS)
+
+ifdef ATI_OS_LINUX
+    LCOPTS += -fPIC -fno-strict-aliasing
+endif
+
+include $(OPENCL_DEPTH)/localrules

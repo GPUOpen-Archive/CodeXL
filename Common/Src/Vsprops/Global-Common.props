@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="ConfigurationMacros">
+    <!--IsDebug: search for 'Debug' in Configuration-->
+    <IsDebug>$([System.Convert]::ToString( $([System.Text.RegularExpressions.Regex]::IsMatch($(Configuration), '[Dd]ebug'))))</IsDebug>
+    <!--IsRelease: search for 'Release' in Configuration-->
+    <IsRelease>$([System.Convert]::ToString( $([System.Text.RegularExpressions.Regex]::IsMatch($(Configuration), '[Rr]elease'))))</IsRelease>
+  </PropertyGroup>
+  <ImportGroup Label="PropertySheets" Condition="$([System.Convert]::ToBoolean($(IsDebug)))">
+    <Import Project="Global-Debug.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="$([System.Convert]::ToBoolean($(IsRelease)))">
+    <Import Project="Global-Release.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Platform)'=='Win32'">
+    <Import Project="Global-x86.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Platform)'=='x64'">
+    <Import Project="Global-x64.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros">
+    <ProjectHaveAMDPrefix>$(ProjectName.StartsWith('AMDT'))</ProjectHaveAMDPrefix>
+    <AdjustedProjectName Condition="$(ProjectHaveAMDPrefix)">CXL$(ProjectName.Remove(0,4))</AdjustedProjectName>
+    <AdjustedProjectName Condition="'$(ProjectHaveAMDPrefix)' == 'False'">$(ProjectName)</AdjustedProjectName>
+    <GDTObjDir>$(SolutionDir)obj\</GDTObjDir>
+    <GDTOutDir>$(SolutionDir)bin\</GDTOutDir>
+    <GDTBuildSuffix>$(GDT_BUILD_SUFFIX)</GDTBuildSuffix>
+    <GDTProjectSuffix>$(GDTPlatformSuffix)$(GDTDebugSuffix)$(GDTBuildSuffix)</GDTProjectSuffix>
+    <GDTProjectName>$(AdjustedProjectName)$(GDTProjectSuffix)</GDTProjectName>
+    <GDTCRT>MD</GDTCRT>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(GDT_BUILD)'==''">
+    <GDT_BUILD>GDT_PUBLIC</GDT_BUILD>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir>$(GDTOutDir)$(Configuration)-$(PlatformName)$(GDTBuildSuffix)\$(ProjectName)\</OutDir>
+    <IntDir>$(GDTObjDir)$(Configuration)-$(PlatformName)$(GDTBuildSuffix)\$(ProjectName)\</IntDir>
+    <GenerateManifest>false</GenerateManifest>
+    <TargetName>$(GDTProjectName)</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>$(GDT_BUILD);GDT_PLATFORM_SUFFIX="$(GDTPlatformSuffix)";GDT_PLATFORM_SUFFIX_W=L"$(GDTPlatformSuffix)";GDT_DEBUG_SUFFIX="$(GDTDebugSuffix)";GDT_DEBUG_SUFFIX_W=L"$(GDTDebugSuffix)";GDT_BUILD_SUFFIX="$(GDT_BUILD_SUFFIX)";GDT_BUILD_SUFFIX_W=L"$(GDT_BUILD_SUFFIX)";GDT_PROJECT_SUFFIX="$(GDTProjectSuffix)";GDT_PROJECT_SUFFIX_W=L"$(GDTProjectSuffix)";_WINDOWS;WIN32;WIN32_LEAN_AND_MEAN;SU_USE_NATIVE_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WarningLevel>Level4</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Link>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+    </Lib>
+    <ResourceCompile>
+      <PreprocessorDefinitions>GDT_PROJECT_SUFFIX="$(GDTProjectSuffix)";GDT_PROJECT_SUFFIX_W=L"$(GDTProjectSuffix)";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="GDTObjDir">
+      <Value>$(GDTObjDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GDTOutDir">
+      <Value>$(GDTOutDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GDTBuildSuffix">
+      <Value>$(GDTBuildSuffix)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GDTProjectSuffix">
+      <Value>$(GDTProjectSuffix)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GDTProjectName">
+      <Value>$(GDTProjectName)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GDTCRT">
+      <Value>$(GDTCRT)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

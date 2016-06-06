@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="UserMacros">
+    <GDTPlatform>x64</GDTPlatform>
+    <GDTPlatformExt>x86_64</GDTPlatformExt>
+    <GDTPlatformSuffix>-x64</GDTPlatformSuffix>
+    <GDTPlatformSuffixNumBitsOnly>64</GDTPlatformSuffixNumBitsOnly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>X64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="GDTPlatform">
+      <Value>$(GDTPlatform)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GDTPlatformExt">
+      <Value>$(GDTPlatformExt)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GDTPlatformSuffix">
+      <Value>$(GDTPlatformSuffix)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GDTPlatformSuffixNumBitsOnly">
+      <Value>$(GDTPlatformSuffixNumBitsOnly)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

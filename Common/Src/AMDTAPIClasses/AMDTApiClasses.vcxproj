@@ -1,0 +1,478 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{F62443FC-1D1F-43D1-BF19-A208C38FC0C1}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="..\Local-CommonProjects.props" />
+    <Import Project="$(AMDTCommonAMD)\APPSDK\Global-OpenCL-NoLib.props" />
+  </ImportGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir>$(AMDTOutputDir)$(Configuration)\bin\</OutDir>
+    <IntDir>$(AMDTOutputDir)$(Configuration)\obj\$(ProjectName)\$(Platform)$(GDTBuildSuffix)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_USRDLL;NOMINMAX;AMDTAPICLASSES_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalOptions> /MP %(AdditionalOptions)</AdditionalOptions>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(OutDir)$(TargetName).dll</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <ImportLibrary>$(AMDTOutputDir)$(Configuration)\arch\$(TargetName).lib</ImportLibrary>
+      <AdditionalDependencies>odbc32.lib;odbccp32.lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;CXLOSAPIWrappers$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(AMDTOutputDir)$(Configuration)\arch;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>LIBCMT$(GDTDebugSuffixNoDash);%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Platform)'=='Win32'">
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Platform)'=='x64'">
+    <Link>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Events\src\apAddWatchEvent.cpp" />
+    <ClCompile Include="Events\src\apAfterKernelDebuggingEvent.cpp" />
+    <ClCompile Include="Events\src\apBeforeKernelDebuggingEvent.cpp" />
+    <ClCompile Include="Events\src\apBreakpointsUpdatedEvent.cpp" />
+    <ClCompile Include="Events\src\apCallStackFrameSelectedEvent.cpp" />
+    <ClCompile Include="Events\src\apDebuggedProcessCreatedEvent.cpp" />
+    <ClCompile Include="Events\src\apDebuggedProcessCreationFailureEvent.cpp" />
+    <ClCompile Include="Events\src\apDebuggedProcessTerminatedEvent.cpp" />
+    <ClCompile Include="Events\src\apDeferredCommandEvent.cpp" />
+    <ClCompile Include="Events\src\apExecutionModeChangedEvent.cpp" />
+    <ClCompile Include="Events\src\apFlushTextureImageEvent.cpp" />
+    <ClCompile Include="Events\src\apHexChangedEvent.cpp" />
+    <ClCompile Include="Events\src\apKernelDebuggingFailedEvent.cpp" />
+    <ClCompile Include="Events\src\apKernelDebuggingInterruptedEvent.cpp" />
+    <ClCompile Include="Events\src\apKernelSourceBreakpointsUpdatedEvent.cpp" />
+    <ClCompile Include="Events\src\apKernelWorkItemChangedEvent.cpp" />
+    <ClCompile Include="Events\src\apMDIViewActivatedEvent.cpp" />
+    <ClCompile Include="Events\src\apMDIViewCreateEvent.cpp" />
+    <ClCompile Include="Events\src\apMemoryAllocationFailureEvent.cpp" />
+    <ClCompile Include="Events\src\apMonitoredObjectsTreeEvent.cpp" />
+    <ClCompile Include="Events\src\apOpenCLProgramBuildEvent.cpp" />
+    <ClCompile Include="Events\src\apOpenCLProgramBuildFailedWithDebugFlagsEvent.cpp" />
+    <ClCompile Include="Events\src\apOpenCLProgramCreatedEvent.cpp" />
+    <ClCompile Include="Events\src\apOpenCLProgramDeletedEvent.cpp" />
+    <ClCompile Include="Events\src\apProfileProcessTerminatedEvent.cpp" />
+    <ClCompile Include="Events\src\apProfileProgressEvent.cpp" />
+    <ClCompile Include="Events\src\apTechnologyMonitorFailureEvent.cpp" />
+    <ClCompile Include="Events\src\apUserWarningEvent.cpp" />
+    <ClCompile Include="src\ap2DPoint.cpp" />
+    <ClCompile Include="src\ap2DRectangle.cpp" />
+    <ClCompile Include="src\apAIDFunctions.cpp" />
+    <ClCompile Include="src\apAllocatedObject.cpp" />
+    <ClCompile Include="src\apAPIFunctionId.cpp" />
+    <ClCompile Include="src\apApiFunctionsInitializationData.cpp" />
+    <ClCompile Include="src\apAPIVersion.cpp" />
+    <ClCompile Include="src\apApplicationModesEventsType.cpp" />
+    <ClCompile Include="src\apBasicParameters.cpp" />
+    <ClCompile Include="src\apBreakPoint.cpp" />
+    <ClCompile Include="src\apCGLParameters.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\apCLBuffer.cpp" />
+    <ClCompile Include="src\apCLCommandQueue.cpp" />
+    <ClCompile Include="src\apCLContext.cpp" />
+    <ClCompile Include="src\apCLContextProperties.cpp" />
+    <ClCompile Include="src\apCLDevice.cpp" />
+    <ClCompile Include="src\apCLEnqueuedCommands.cpp" />
+    <ClCompile Include="src\apCLEvent.cpp" />
+    <ClCompile Include="src\apCLImage.cpp" />
+    <ClCompile Include="src\apCLKernel.cpp" />
+    <ClCompile Include="src\apCLMemObject.cpp" />
+    <ClCompile Include="src\apCLObjectID.cpp" />
+    <ClCompile Include="src\apCLPipe.cpp" />
+    <ClCompile Include="src\apCLProgram.cpp" />
+    <ClCompile Include="src\apCLSampler.cpp" />
+    <ClCompile Include="src\apCLSubBuffer.cpp" />
+    <ClCompile Include="Events\src\apContextDataSnapshotWasUpdatedEvent.cpp" />
+    <ClCompile Include="src\apContextID.cpp" />
+    <ClCompile Include="src\apCounterID.cpp" />
+    <ClCompile Include="src\apCounterInfo.cpp" />
+    <ClCompile Include="src\apCounterScope.cpp" />
+    <ClCompile Include="Events\src\apDebuggedProcessIsDuringTerminationEvent.cpp" />
+    <ClCompile Include="Events\src\apDebuggedProcessOutputStringEvent.cpp" />
+    <ClCompile Include="src\apDebugProjectSettings.cpp" />
+    <ClCompile Include="src\apDefaultTextureNames.cpp" />
+    <ClCompile Include="src\apDetectedErrorParameters.cpp" />
+    <ClCompile Include="src\apDisplayBuffer.cpp" />
+    <ClCompile Include="src\apEnumeratorUsageStatistics.cpp" />
+    <ClCompile Include="src\apErrorCode.cpp" />
+    <ClCompile Include="src\apFileType.cpp" />
+    <ClCompile Include="src\apFunctionCall.cpp" />
+    <ClCompile Include="src\apFunctionCallStatistics.cpp" />
+    <ClCompile Include="src\apFunctionDeprecation.cpp" />
+    <ClCompile Include="src\apGenericBreakpoint.cpp" />
+    <ClCompile Include="src\apGLComputeShader.cpp" />
+    <ClCompile Include="src\apGLDebugOutput.cpp" />
+    <ClCompile Include="src\apGLDisplayList.cpp" />
+    <ClCompile Include="src\apGLenumParameter.cpp" />
+    <ClCompile Include="src\apGLFBO.cpp" />
+    <ClCompile Include="src\apGLFixedWrapper.cpp" />
+    <ClCompile Include="src\apGLFragmentShader.cpp" />
+    <ClCompile Include="src\apGLGeometryShader.cpp" />
+    <ClCompile Include="src\apGLItemsCollection.cpp" />
+    <ClCompile Include="src\apGLPipeline.cpp" />
+    <ClCompile Include="src\apGLPixelInternalFormatParameter.cpp" />
+    <ClCompile Include="src\apGLProgram.cpp" />
+    <ClCompile Include="src\apGLRenderBuffer.cpp" />
+    <ClCompile Include="src\apGLRenderContextGraphicsInfo.cpp" />
+    <ClCompile Include="src\apGLRenderContextInfo.cpp" />
+    <ClCompile Include="src\apGLSampler.cpp" />
+    <ClCompile Include="src\apGLShaderObject.cpp" />
+    <ClCompile Include="src\apGLSync.cpp" />
+    <ClCompile Include="src\apGLTessellationControlShader.cpp" />
+    <ClCompile Include="src\apGLTessellationEvaluationShader.cpp" />
+    <ClCompile Include="src\apGLTexture.cpp" />
+    <ClCompile Include="src\apGLTextureMipLevel.cpp" />
+    <ClCompile Include="src\apGLTextureMiplevelData.cpp" />
+    <ClCompile Include="src\apGLTextureParameter.cpp" />
+    <ClCompile Include="src\apGLTextureParams.cpp" />
+    <ClCompile Include="src\apGLTransformFeedbackObject.cpp" />
+    <ClCompile Include="src\apGLUnsupportedShader.cpp" />
+    <ClCompile Include="src\apGLVBO.cpp" />
+    <ClCompile Include="src\apGLVertexShader.cpp" />
+    <ClCompile Include="src\apGLXParameters.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\apGPUInfo.cpp" />
+    <ClCompile Include="src\apHostSourceBreakPoint.cpp" />
+    <ClCompile Include="src\apiClassesInitFunc.cpp" />
+    <ClCompile Include="src\apInternalFormat.cpp" />
+    <ClCompile Include="src\apKernelFunctionNameBreakpoint.cpp" />
+    <ClCompile Include="src\apKernelSourceCodeBreakpoint.cpp" />
+    <ClCompile Include="src\apLoadedModule.cpp" />
+    <ClCompile Include="src\apMonitoredFunctionBreakPoint.cpp" />
+    <ClCompile Include="src\apMonitoredFunctionsManager.cpp" />
+    <ClCompile Include="src\apOpenCLErrorParameters.cpp" />
+    <ClCompile Include="src\apOpenCLParameters.cpp" />
+    <ClCompile Include="src\apOpenCLQueueCommandsCategories.cpp" />
+    <ClCompile Include="src\apOpenGLBuiltInUniformManager.cpp" />
+    <ClCompile Include="src\apOpenGLESExtensionId.cpp" />
+    <ClCompile Include="src\apOpenGLExtensionsId.cpp" />
+    <ClCompile Include="src\apOpenGLParameters.cpp" />
+    <ClCompile Include="src\apOpenGLStateVariablesManager.cpp" />
+    <ClCompile Include="src\apOSRelatedParameters.cpp" />
+    <ClCompile Include="src\apParameters.cpp" />
+    <ClCompile Include="src\apPBuffer.cpp" />
+    <ClCompile Include="src\apPointerParameterCreator.cpp" />
+    <ClCompile Include="src\apProjectSettings.cpp" />
+    <ClCompile Include="src\apRasterMode.cpp" />
+    <ClCompile Include="src\apRenderPrimitivesStatistics.cpp" />
+    <ClCompile Include="Events\src\apSearchingForMemoryLeaksEvent.cpp" />
+    <ClCompile Include="src\apSingeltonsDelete.cpp" />
+    <ClCompile Include="src\apSourceCodeBreakpoint.cpp" />
+    <ClCompile Include="src\apStateVariablesSnapShot.cpp" />
+    <ClCompile Include="src\apStateVariableValue.cpp" />
+    <ClCompile Include="src\apStaticBuffer.cpp" />
+    <ClCompile Include="src\apStatistics.cpp" />
+    <ClCompile Include="src\apTextureType.cpp" />
+    <ClCompile Include="Events\src\apApiConnectionEndedEvent.cpp" />
+    <ClCompile Include="Events\src\apApiConnectionEstablishedEvent.cpp" />
+    <ClCompile Include="src\apAPIConnectionType.cpp" />
+    <ClCompile Include="Events\src\apBeforeDebuggedProcessRunResumedEvent.cpp" />
+    <ClCompile Include="Events\src\apBreakpointHitEvent.cpp" />
+    <ClCompile Include="Events\src\apComputeContextCreatedEvent.cpp" />
+    <ClCompile Include="Events\src\apComputeContextDeletedEvent.cpp" />
+    <ClCompile Include="Events\src\apDebuggedProcessDetectedErrorEvent.cpp" />
+    <ClCompile Include="Events\src\apDebuggedProcessRunResumedEvent.cpp" />
+    <ClCompile Include="Events\src\apDebuggedProcessRunStartedEvent.cpp" />
+    <ClCompile Include="Events\src\apDebuggedProcessRunStartedExternallyEvent.cpp" />
+    <ClCompile Include="Events\src\apDebuggedProcessRunSuspendedEvent.cpp" />
+    <ClCompile Include="Events\src\apEvent.cpp" />
+    <ClCompile Include="Events\src\apEventsHandler.cpp" />
+    <ClCompile Include="Events\src\apExceptionEvent.cpp" />
+    <ClCompile Include="Events\src\apGDBErrorEvent.cpp" />
+    <ClCompile Include="Events\src\apGDBListenerThreadWasSuspendedEvent.cpp" />
+    <ClCompile Include="Events\src\apGDBOutputStringEvent.cpp" />
+    <ClCompile Include="Events\src\apGLDebugOutputMessageEvent.cpp" />
+    <ClCompile Include="Events\src\apIEventsFiller.cpp" />
+    <ClCompile Include="Events\src\apIEventsObserver.cpp" />
+    <ClCompile Include="Events\src\apInfrastructureEndsBeingBusyEvent.cpp" />
+    <ClCompile Include="Events\src\apInfrastructureFailureEvent.cpp" />
+    <ClCompile Include="Events\src\apInfrastructureStartsBeingBusyEvent.cpp" />
+    <ClCompile Include="Events\src\apMemoryLeakEvent.cpp" />
+    <ClCompile Include="Events\src\apModuleLoadedEvent.cpp" />
+    <ClCompile Include="Events\src\apModuleUnloadedEvent.cpp" />
+    <ClCompile Include="Events\src\apOpenCLErrorEvent.cpp" />
+    <ClCompile Include="Events\src\apOpenCLQueueCreatedEvent.cpp" />
+    <ClCompile Include="Events\src\apOpenCLQueueDeletedEvent.cpp" />
+    <ClCompile Include="Events\src\apOutputDebugStringEvent.cpp" />
+    <ClCompile Include="Events\src\apRenderContextCreatedEvent.cpp" />
+    <ClCompile Include="Events\src\apRenderContextDeletedEvent.cpp" />
+    <ClCompile Include="Events\src\apSpyProgressEvent.cpp" />
+    <ClCompile Include="Events\src\apThreadCreatedEvent.cpp" />
+    <ClCompile Include="Events\src\apThreadTerminatedEvent.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\apAPIVersion.h" />
+    <ClInclude Include="Include\apCLImage.h" />
+    <ClInclude Include="Include\apCLPipe.h" />
+    <ClInclude Include="Include\apCLSubBuffer.h" />
+    <ClInclude Include="Include\apDebugProjectSettings.h" />
+    <ClInclude Include="Include\apGenericBreakpoint.h" />
+    <ClInclude Include="Include\apGLComputeShader.h" />
+    <ClInclude Include="Include\apGLPipeline.h" />
+    <ClInclude Include="Include\apGLSampler.h" />
+    <ClInclude Include="Include\apGLTessellationControlShader.h" />
+    <ClInclude Include="Include\apGLTessellationEvaluationShader.h" />
+    <ClInclude Include="Include\apGLTransformFeedbackObject.h" />
+    <ClInclude Include="Include\apGLUnsupportedShader.h" />
+    <ClInclude Include="Include\apHostSourceBreakPoint.h" />
+    <ClInclude Include="Include\apKernelDebuggingCommand.h" />
+    <ClInclude Include="Include\apKernelFunctionNameBreakpoint.h" />
+    <ClInclude Include="Include\apKernelSourceCodeBreakpoint.h" />
+    <ClInclude Include="Include\apProjectSettings.h" />
+    <ClInclude Include="Include\apSourceCodeBreakpoint.h" />
+    <ClInclude Include="Include\Events\apAddWatchEvent.h" />
+    <ClInclude Include="Include\Events\apAfterKernelDebuggingEvent.h" />
+    <ClInclude Include="Include\Events\apBeforeKernelDebuggingEvent.h" />
+    <ClInclude Include="Include\Events\apBreakpointsUpdatedEvent.h" />
+    <ClInclude Include="Include\Events\apCallStackFrameSelectedEvent.h" />
+    <ClInclude Include="Include\Events\apDebuggedProcessCreatedEvent.h" />
+    <ClInclude Include="Include\Events\apDebuggedProcessCreationFailureEvent.h" />
+    <ClInclude Include="Include\Events\apDebuggedProcessTerminatedEvent.h" />
+    <ClInclude Include="Include\Events\apDeferredCommandEvent.h" />
+    <ClInclude Include="Include\Events\apExecutionModeChangedEvent.h" />
+    <ClInclude Include="Include\Events\apFlushTextureImageEvent.h" />
+    <ClInclude Include="Include\Events\apHexChangedEvent.h" />
+    <ClInclude Include="Include\Events\apKernelDebuggingFailedEvent.h" />
+    <ClInclude Include="Include\Events\apKernelDebuggingInterruptedEvent.h" />
+    <ClInclude Include="Include\Events\apKernelSourceBreakpointsUpdatedEvent.h" />
+    <ClInclude Include="Include\Events\apKernelWorkItemChangedEvent.h" />
+    <ClInclude Include="Include\Events\apMDIViewActivatedEvent.h" />
+    <ClInclude Include="Include\Events\apMDIViewCreateEvent.h" />
+    <ClInclude Include="Include\Events\apMemoryAllocationFailureEvent.h" />
+    <ClInclude Include="Include\events\apMonitoredObjectsTreeEvent.h" />
+    <ClInclude Include="Include\Events\apOpenCLProgramBuildEvent.h" />
+    <ClInclude Include="Include\Events\apOpenCLProgramBuildFailedWithDebugFlagsEvent.h" />
+    <ClInclude Include="Include\Events\apOpenCLProgramCreatedEvent.h" />
+    <ClInclude Include="Include\Events\apOpenCLProgramDeletedEvent.h" />
+    <ClInclude Include="Include\Events\apProfileProcessTerminatedEvent.h" />
+    <ClInclude Include="Include\Events\apProfileProgressEvent.h" />
+    <ClInclude Include="Include\Events\apTechnologyMonitorFailureEvent.h" />
+    <ClInclude Include="Include\Events\apUserWarningEvent.h" />
+    <ClInclude Include="inc\apSingeltonsDelete.h" />
+    <ClInclude Include="Include\ap2DPoint.h" />
+    <ClInclude Include="Include\ap2DRectangle.h" />
+    <ClInclude Include="Include\apAIDFunctions.h" />
+    <ClInclude Include="Include\apAllocatedObject.h" />
+    <ClInclude Include="Include\apAPIClassesDLLBuild.h" />
+    <ClInclude Include="Include\apAPIConnectionType.h" />
+    <ClInclude Include="Include\apAPIFunctionId.h" />
+    <ClInclude Include="Include\apApiFunctionsInitializationData.h" />
+    <ClInclude Include="Include\apApplicationModesEventsType.h" />
+    <ClInclude Include="Include\apBasicParameters.h" />
+    <ClInclude Include="Include\apBreakPoint.h" />
+    <ClInclude Include="Include\apBreakReason.h" />
+    <ClInclude Include="Include\apCGLParameters.h" />
+    <ClInclude Include="Include\apCLBuffer.h" />
+    <ClInclude Include="Include\apCLCommandQueue.h" />
+    <ClInclude Include="Include\apCLContext.h" />
+    <ClInclude Include="Include\apCLContextProperties.h" />
+    <ClInclude Include="Include\apCLDevice.h" />
+    <ClInclude Include="Include\apCLEnqueuedCommands.h" />
+    <ClInclude Include="Include\apCLEvent.h" />
+    <ClInclude Include="Include\apCLKernel.h" />
+    <ClInclude Include="Include\apCLMemObject.h" />
+    <ClInclude Include="Include\apCLObjectID.h" />
+    <ClInclude Include="Include\apCLProgram.h" />
+    <ClInclude Include="Include\apCLSampler.h" />
+    <ClInclude Include="Include\Events\apContextDataSnapshotWasUpdatedEvent.h" />
+    <ClInclude Include="Include\apContextID.h" />
+    <ClInclude Include="Include\apCounterID.h" />
+    <ClInclude Include="Include\apCounterInfo.h" />
+    <ClInclude Include="Include\apCounterNames.h" />
+    <ClInclude Include="Include\apCounterScope.h" />
+    <ClInclude Include="Include\apCounterType.h" />
+    <ClInclude Include="Include\Events\apDebuggedProcessIsDuringTerminationEvent.h" />
+    <ClInclude Include="Include\apDefaultTextureNames.h" />
+    <ClInclude Include="Include\apDefinitions.h" />
+    <ClInclude Include="Include\apDetectedErrorParameters.h" />
+    <ClInclude Include="Include\apDisplayBuffer.h" />
+    <ClInclude Include="Include\apEnumeratorUsageStatistics.h" />
+    <ClInclude Include="Include\apErrorCode.h" />
+    <ClInclude Include="Include\apExecutionMode.h" />
+    <ClInclude Include="Include\apFileType.h" />
+    <ClInclude Include="Include\apFrameTerminators.h" />
+    <ClInclude Include="Include\apFunctionCall.h" />
+    <ClInclude Include="Include\apFunctionCallStatistics.h" />
+    <ClInclude Include="Include\apFunctionDeprecation.h" />
+    <ClInclude Include="Include\apFunctionType.h" />
+    <ClInclude Include="Include\apGLDebugOutput.h" />
+    <ClInclude Include="Include\Events\apGLDebugOutputMessageEvent.h" />
+    <ClInclude Include="Include\apGLDisplayList.h" />
+    <ClInclude Include="Include\apGLenumParameter.h" />
+    <ClInclude Include="Include\apGLFBO.h" />
+    <ClInclude Include="Include\apGLFixedWrapper.h" />
+    <ClInclude Include="Include\apGLFragmentShader.h" />
+    <ClInclude Include="Include\apGLGeometryShader.h" />
+    <ClInclude Include="Include\apGLItemsCollection.h" />
+    <ClInclude Include="Include\apGLPixelInternalFormatParameter.h" />
+    <ClInclude Include="Include\apGLProgram.h" />
+    <ClInclude Include="Include\apGLRenderBuffer.h" />
+    <ClInclude Include="Include\apGLRenderContextGraphicsInfo.h" />
+    <ClInclude Include="Include\apGLRenderContextInfo.h" />
+    <ClInclude Include="Include\apGLShaderObject.h" />
+    <ClInclude Include="Include\apGLShadingObjectType.h" />
+    <ClInclude Include="Include\apGLSync.h" />
+    <ClInclude Include="Include\apGLTexture.h" />
+    <ClInclude Include="Include\apGLTextureMipLevel.h" />
+    <ClInclude Include="Include\apGLTextureMiplevelData.h" />
+    <ClInclude Include="Include\apGLTextureParameter.h" />
+    <ClInclude Include="Include\apGLTextureParams.h" />
+    <ClInclude Include="Include\apGLVBO.h" />
+    <ClInclude Include="Include\apGLVertexShader.h" />
+    <ClInclude Include="Include\apGLXParameters.h" />
+    <ClInclude Include="Include\apGPUInfo.h" />
+    <ClInclude Include="Include\apiClassesInitFunc.h" />
+    <ClInclude Include="Include\apInterceptionMethod.h" />
+    <ClInclude Include="Include\apInternalFormat.h" />
+    <ClInclude Include="Include\apLoadedModule.h" />
+    <ClInclude Include="Include\apMonitoredFunctionBreakPoint.h" />
+    <ClInclude Include="Include\apMonitoredFunctionId.h" />
+    <ClInclude Include="Include\apMonitoredFunctionsManager.h" />
+    <ClInclude Include="Include\apOpenCLErrorParameters.h" />
+    <ClInclude Include="Include\apOpenCLParameters.h" />
+    <ClInclude Include="Include\apOpenCLQueueCommandsCategories.h" />
+    <ClInclude Include="Include\apOpenCLQueuePerformanceCounters.h" />
+    <ClInclude Include="Include\apOpenGLAPIType.h" />
+    <ClInclude Include="Include\apOpenGLBuiltInUniformManager.h" />
+    <ClInclude Include="Include\apOpenGLESExtensionId.h" />
+    <ClInclude Include="Include\apOpenGLExtensionsId.h" />
+    <ClInclude Include="Include\apOpenGLParameters.h" />
+    <ClInclude Include="Include\apOpenGLStateVariableId.h" />
+    <ClInclude Include="Include\apOpenGLStateVariablesManager.h" />
+    <ClInclude Include="Include\apOSRelatedParameters.h" />
+    <ClInclude Include="Include\apParameters.h" />
+    <ClInclude Include="Include\apPBuffer.h" />
+    <ClInclude Include="Include\apPointerParameterCreator.h" />
+    <ClInclude Include="Include\apRasterMode.h" />
+    <ClInclude Include="Include\apRenderPrimitivesStatistics.h" />
+    <ClInclude Include="Include\apSearchDirection.h" />
+    <ClInclude Include="Include\Events\apSearchingForMemoryLeaksEvent.h" />
+    <ClInclude Include="Include\apStateVariablesSnapShot.h" />
+    <ClInclude Include="Include\apStateVariableValue.h" />
+    <ClInclude Include="Include\apStaticBuffer.h" />
+    <ClInclude Include="Include\apStatistics.h" />
+    <ClInclude Include="Include\apStringConstants.h" />
+    <ClInclude Include="Include\apTextureType.h" />
+    <ClInclude Include="Include\Events\apApiConnectionEndedEvent.h" />
+    <ClInclude Include="Include\Events\apApiConnectionEstablishedEvent.h" />
+    <ClInclude Include="Include\Events\apBeforeDebuggedProcessRunResumedEvent.h" />
+    <ClInclude Include="Include\Events\apBreakpointHitEvent.h" />
+    <ClInclude Include="Include\Events\apComputeContextCreatedEvent.h" />
+    <ClInclude Include="Include\Events\apComputeContextDeletedEvent.h" />
+    <ClInclude Include="Include\Events\apDebuggedProcessDetectedErrorEvent.h" />
+    <ClInclude Include="Include\Events\apDebuggedProcessOutputStringEvent.h" />
+    <ClInclude Include="Include\Events\apDebuggedProcessRunResumedEvent.h" />
+    <ClInclude Include="Include\Events\apDebuggedProcessRunStartedEvent.h" />
+    <ClInclude Include="Include\Events\apDebuggedProcessRunStartedExternallyEvent.h" />
+    <ClInclude Include="Include\Events\apDebuggedProcessRunSuspendedEvent.h" />
+    <ClInclude Include="Include\Events\apEvent.h" />
+    <ClInclude Include="Include\Events\apEventsHandler.h" />
+    <ClInclude Include="Include\Events\apExceptionEvent.h" />
+    <ClInclude Include="Include\Events\apGDBErrorEvent.h" />
+    <ClInclude Include="Include\Events\apGDBListenerThreadWasSuspendedEvent.h" />
+    <ClInclude Include="Include\Events\apGDBOutputStringEvent.h" />
+    <ClInclude Include="Include\Events\apIEventsFiller.h" />
+    <ClInclude Include="Include\Events\apIEventsObserver.h" />
+    <ClInclude Include="Include\Events\apInfrastructureEndsBeingBusyEvent.h" />
+    <ClInclude Include="Include\Events\apInfrastructureFailureEvent.h" />
+    <ClInclude Include="Include\Events\apInfrastructureStartsBeingBusyEvent.h" />
+    <ClInclude Include="Include\Events\apMemoryLeakEvent.h" />
+    <ClInclude Include="Include\Events\apModuleLoadedEvent.h" />
+    <ClInclude Include="Include\Events\apModuleUnloadedEvent.h" />
+    <ClInclude Include="Include\Events\apOpenCLErrorEvent.h" />
+    <ClInclude Include="Include\Events\apOpenCLQueueCreatedEvent.h" />
+    <ClInclude Include="Include\Events\apOutputDebugStringEvent.h" />
+    <ClInclude Include="Include\Events\apRenderContextCreatedEvent.h" />
+    <ClInclude Include="Include\Events\apRenderContextDeletedEvent.h" />
+    <ClInclude Include="Include\Events\apSpyProgressEvent.h" />
+    <ClInclude Include="Include\Events\apThreadCreatedEvent.h" />
+    <ClInclude Include="Include\Events\apThreadTerminatedEvent.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuildStep Include="SConscript">
+      <FileType>Document</FileType>
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </CustomBuildStep>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\VersionInfo\VersionResource.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

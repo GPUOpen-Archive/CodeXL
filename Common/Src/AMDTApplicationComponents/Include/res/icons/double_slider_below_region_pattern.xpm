@@ -1,0 +1,10 @@
+/* XPM */
+static const char* double_slider_below_region_pattern[] = {
+"1 3 3 1",
+"  c #FF435F",
+"! c #F4364C",
+"# c #B72839",
+" ",
+"!",
+"#"};
+

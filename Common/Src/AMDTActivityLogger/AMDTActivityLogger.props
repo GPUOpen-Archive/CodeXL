@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(CommonDir)\Src\AMDTMutex\Global-AMDTMutex.props" />
+    <Import Project="$(CommonDir)\Src\TSingleton\Global-TSingleton.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros">
+    <AMDTActivityLoggerOutputDir>$(AMDTOutputDir)\$(Configuration)\bin\AMDTActivityLogger\</AMDTActivityLoggerOutputDir>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OutDir>$(AMDTOutputDir)$(Configuration)\bin\$(ProjectName)\bin\$(GDTPlatform)</OutDir>
+    <IntDir>$(AMDTOutputDir)$(Configuration)\obj\$(ProjectName)\$(Platform)$(GDTBuildSuffix)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\..\CodeXL\Components\GpuProfiling\Backend\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <ModuleDefinitionFile>AMDTActivityLogger.def</ModuleDefinitionFile>
+      <ImportLibrary>$(AMDTOutputDir)$(Configuration)\bin\$(ProjectName)\lib\$(GDTPlatform)\$(TargetName).lib</ImportLibrary>
+      <AdditionalDependencies>CXLOSWrappers$(GDTProjectSuffix).lib;CXLBaseTools$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(AMDTOutputDir)$(Configuration)\arch;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /r /d /y "$(ProjectDir)AMDTActivityLogger.h" "$(AMDTActivityLoggerOutputDir)\include\"
+xcopy /r /d /y "$(ProjectDir).\Doc\AMDTActivityLogger.pdf" "$(AMDTActivityLoggerOutputDir)\doc\"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+</Project>

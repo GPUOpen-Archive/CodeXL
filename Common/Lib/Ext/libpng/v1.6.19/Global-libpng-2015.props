@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="UserMacros">
+    <libpngDir>$(CommonDir)\Lib\Ext\libpng\v1.6.19</libpngDir>
+    <!--ConfigurationFolderName-->
+    <ConfigurationFolderName Condition="'$(Configuration)'=='Debug'">Debug</ConfigurationFolderName>
+    <ConfigurationFolderName Condition="'$(Configuration)'=='Debug_Static'">Debug</ConfigurationFolderName>
+    <ConfigurationFolderName Condition="'$(Configuration)'=='Release'">Release</ConfigurationFolderName>
+    <ConfigurationFolderName Condition="'$(Configuration)'=='Release_Static'">Release</ConfigurationFolderName>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(libpngDir)\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(libpngDir)\bin\VS2015\$(GDTCRT)\$(GDTPlatform)\$(ConfigurationFolderName)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libpng16.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="libpngDir">
+      <Value>$(libpngDir)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

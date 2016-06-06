@@ -1,0 +1,180 @@
+#
+#	GRLibELF library build
+#
+
+# Python import modules:
+import os
+import SCons.Util
+
+# Check if we are in a release build:
+releaseBuild = int(ARGUMENTS.get('release', 0))
+
+# Get the name of the OS system:
+systemName = os.uname()[0]
+
+archSpecified = ARGUMENTS.get('arch', 'None')
+if archSpecified == 'None':
+    archSpecified = 'x86_64'
+machineType = archSpecified
+
+buildRoot = ARGUMENTS.get('buildroot', 'None')
+if buildRoot == 'None':
+    buildRoot = 'CentOS6.2'
+
+is64BitBuild = int(machineType.find("x86_64") != -1)
+
+# Intermediate objects directory (.os files):
+if releaseBuild:
+	if is64BitBuild:
+		objDir = "obj/x64/release"
+	else:
+		objDir = "obj/x86/release"
+else:
+	if is64BitBuild:
+		objDir = "obj/x64/debug"
+	else:
+		objDir = "obj/x86/debug"
+
+# Create the intermediate objects directory:
+if not os.path.exists(objDir):
+	os.makedirs(objDir)
+
+# Preprocessor definitions:
+if releaseBuild:
+	cppDefinitions = ["NDEBUG", "_FILE_OFFSET_BITS=64", "_LARGE_FILES"]
+else:
+	cppDefinitions = ["_DEBUG", "_FILE_OFFSET_BITS=64", "_LARGE_FILES"]
+
+# Compiler options and flags:
+# With PIC enabled, the ELF APIs get added to PLT/GOT, which leads to dyanmic linking
+# to some different libelf.[a|so] loaded during startup. Set visibility to hidden to prohibit
+# ELF APIs entry in PLT/GOT, which will make sure right ELF APIs called. Refer - BUG460036.
+cppCompilerFlags = ["-Wall", "-pthread", "-Wundef", "-Wno-unused-variable", "-fno-strict-aliasing", "-fPIC", "-fvisibility=hidden"]
+
+if releaseBuild:
+	cppCompilerFlags += ["-O3"]
+else:
+	cppCompilerFlags += ["-g"]
+
+if (systemName == "Linux"):
+    if (machineType == "x86"):
+        cppCompilerFlags += ["-m32"]
+    elif (machineType == "x86_64"):
+        cppCompilerFlags += ["-m64"]
+
+# Include path:
+includePath = \
+[
+	".",
+	"../common/"
+]
+
+m4flags = ["-E", "-DSRCDIR=."]
+
+# Define the compiler environment variables:
+env = Environment(CPPDEFINES = cppDefinitions, CCFLAGS = cppCompilerFlags, CPPPATH = includePath, M4FLAGS = m4flags)
+
+# Set the objects directory:
+env.BuildDir(objDir, './', duplicate=0)
+
+# Source files:
+sources = \
+[
+	objDir + "/elf.c",
+	objDir + "/elf_begin.c",
+	objDir + "/elf_cntl.c",
+	objDir + "/elf_data.c",
+	objDir + "/elf_end.c",
+	objDir + "/elf_errmsg.c",
+	objDir + "/elf_errno.c",
+	objDir + "/elf_fill.c",
+	objDir + "/elf_flag.c",
+	objDir + "/elf_getarhdr.c",
+	objDir + "/elf_getarsym.c",
+	objDir + "/elf_getbase.c",
+	objDir + "/elf_getident.c",
+	objDir + "/elf_hash.c",
+	objDir + "/elf_kind.c",
+	objDir + "/elf_memory.c",
+	objDir + "/elf_next.c",
+	objDir + "/elf_open.c",
+	objDir + "/elf_phnum.c",
+	objDir + "/elf_rand.c",
+	objDir + "/elf_rawfile.c",
+	objDir + "/elf_scn.c",
+	objDir + "/elf_shnum.c",
+	objDir + "/elf_shstrndx.c",
+	objDir + "/elf_strptr.c",
+	objDir + "/elf_update.c",
+	objDir + "/elf_version.c",
+	objDir + "/gelf_cap.c",
+	objDir + "/gelf_checksum.c",
+	objDir + "/gelf_dyn.c",
+	objDir + "/gelf_ehdr.c",
+	objDir + "/gelf_fsize.c",
+	objDir + "/gelf_getclass.c",
+	objDir + "/gelf_move.c",
+	objDir + "/gelf_phdr.c",
+	objDir + "/gelf_rel.c",
+	objDir + "/gelf_rela.c",
+	objDir + "/gelf_shdr.c",
+	objDir + "/gelf_sym.c",
+	objDir + "/gelf_syminfo.c",
+	objDir + "/gelf_symshndx.c",
+	objDir + "/gelf_xlate.c",
+	objDir + "/libelf_align.c",
+	objDir + "/libelf_allocate.c",
+	objDir + "/libelf_ar.c",
+	objDir + "/libelf_ar_util.c",
+	objDir + "/libelf_checksum.c",
+	objDir + "/libelf_data.c",
+	objDir + "/libelf_ehdr.c",
+	objDir + "/libelf_extended.c",
+	objDir + "/libelf_memory.c",
+	objDir + "/libelf_open.c",
+	objDir + "/libelf_phdr.c",
+	objDir + "/libelf_shdr.c",
+	objDir + "/libelf_xlate.c"
+]
+
+# There are some .m4 files involved; we need to generate .c files from these
+m4_gen = []
+m4_gen += env.M4(target = 'libelf_convert.c', source = 'libelf_convert.m4')
+m4_gen += env.M4(target = 'libelf_fsize.c', source = 'libelf_fsize.m4')
+m4_gen += env.M4(target = 'libelf_msize.c', source = 'libelf_msize.m4')
+
+# Linker flags:
+if releaseBuild:
+	linkerFlags = \
+	[
+		"-s"
+	]
+else:
+	linkerFlags = \
+	[
+	]
+
+if (systemName == "Linux"):
+    if (machineType == "x86"):
+        linkerFlags += ["-m32"]
+    elif (machineType == "x86_64"):
+        linkerFlags += ["-m64"]
+
+# Library name:
+libName = "elf"
+
+# Install directory:
+# Model after other Common projects:
+# #   Build/<os>/<machinetype>/[debug|release]/lib
+installDir="Build/" + buildRoot + "/" + machineType
+if releaseBuild:
+    installDir += "/release"
+else:
+    installDir += "/debug"
+
+installDir += "/lib"
+
+# Create a static library:
+lib = env.StaticLibrary(installDir + "/" + libName, sources + m4_gen, LINKFLAGS=linkerFlags)
+
+env.Alias("install", installDir)
