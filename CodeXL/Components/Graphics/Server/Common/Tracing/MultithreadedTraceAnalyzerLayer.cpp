@@ -152,9 +152,6 @@ void MultithreadedTraceAnalyzerLayer::BeginFrame()
 
     if (bAPITraceNeeded || bGPUTraceNeeded)
     {
-        Log(logERROR, "bAPITraceNeeded %d\n", bAPITraceNeeded);
-        Log(logERROR, "bGPUTraceNeeded %d\n", bGPUTraceNeeded);
-
         int numFramesToTrace = GetParentLayerManager()->GetCaptureCount();
         if (numFramesToTrace > 1)
         {
@@ -175,7 +172,6 @@ void MultithreadedTraceAnalyzerLayer::BeginFrame()
             // Enable global trace collection so API and GPU trace can happen.
             BeforeAPITrace();
             mbCollectingApiTrace = true;
-            Log(logERROR, "mbCollectingApiTrace %d\n", mbCollectingApiTrace);
         }
 
         if (bGPUTraceNeeded)
@@ -186,7 +182,6 @@ void MultithreadedTraceAnalyzerLayer::BeginFrame()
             ModernAPIFrameProfilerLayer* frameProfiler = GetParentLayerManager()->GetFrameProfilerLayer();
             frameProfiler->SetProfilingEnabled(true);
             mbCollectingGPUTrace = true;
-            Log(logERROR, "bGPUTraceNeeded %d\n", bGPUTraceNeeded);
         }
     }
 }
@@ -232,9 +227,6 @@ void MultithreadedTraceAnalyzerLayer::EndFrame()
     {
         FilterTraceTypes(GetParentLayerManager()->GetCaptureType(), bAPITraceResponseNeeded, bGPUTraceResponseNeeded);
     }
-
-    Log(logERROR, "bGPUTraceResponseNeeded %d\n", bGPUTraceResponseNeeded);
-    Log(logERROR, "bAPITraceResponseNeeded %d\n", bAPITraceResponseNeeded);
 
     if (bAPITraceResponseNeeded || bGPUTraceResponseNeeded)
     {
