@@ -31,6 +31,9 @@ BUILD=0
 # Incremental build
 bIncrementalBuild=false
 
+# Estimate the number of processors we have. This will only work under Linux unfortunately.
+CPU_COUNT=${CPU_COUNT:-$(grep -c ^processor /proc/cpuinfo)}
+
 # Append to existing log file
 bAppendToLog=false
 
