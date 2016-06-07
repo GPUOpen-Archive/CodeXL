@@ -361,6 +361,70 @@ bool afApplicationTreeItemData::isItemImage(afTreeItemType itemType)
     return retVal;
 }
 
+// ---------------------------------------------------------------------------
+// Name:        afApplicationTreeItemData::isItemOpenCL
+// Description: Return true iff the item type is an OpenCL object
+// Arguments:   afTreeItemType itemType
+// Author:      Uri Shomroni
+// Date:        7/6/2016
+// ---------------------------------------------------------------------------
+bool afApplicationTreeItemData::isItemOpenCL(afTreeItemType itemType)
+{
+    bool retVal = false;
+
+    // Check if the item is an OpenCL object
+    retVal = ((itemType == AF_TREE_ITEM_CL_CONTEXT)         ||
+              (itemType == AF_TREE_ITEM_CL_IMAGE)           ||
+              (itemType == AF_TREE_ITEM_CL_BUFFER)          ||
+              (itemType == AF_TREE_ITEM_CL_SUB_BUFFER)      ||
+              (itemType == AF_TREE_ITEM_CL_PIPE)            ||
+              (itemType == AF_TREE_ITEM_CL_SAMPLER)         ||
+              (itemType == AF_TREE_ITEM_CL_EVENT)           ||
+              (itemType == AF_TREE_ITEM_CL_COMMAND_QUEUE)   ||
+              (itemType == AF_TREE_ITEM_CL_DEVICE)          ||
+              (itemType == AF_TREE_ITEM_CL_PLATFORM)        ||
+              (itemType == AF_TREE_ITEM_CL_PROGRAM)         ||
+              (itemType == AF_TREE_ITEM_CL_KERNEL));
+
+    return retVal;
+}
+
+// ---------------------------------------------------------------------------
+// Name:        afApplicationTreeItemData::isItemOpenGL
+// Description: Return true iff the item type is an OpenGL object
+// Arguments:   afTreeItemType itemType
+// Author:      Uri Shomroni
+// Date:        7/6/2016
+// ---------------------------------------------------------------------------
+bool afApplicationTreeItemData::isItemOpenGL(afTreeItemType itemType)
+{
+    bool retVal = false;
+
+    // Check if the item is an OpenCL object
+    retVal = ((itemType == AF_TREE_ITEM_GL_RENDER_CONTEXT)                  ||
+              (itemType == AF_TREE_ITEM_GL_TEXTURE)                         ||
+              (itemType == AF_TREE_ITEM_GL_RENDER_BUFFER)                   ||
+              (itemType == AF_TREE_ITEM_GL_PROGRAM_PIPELINE)                ||
+              (itemType == AF_TREE_ITEM_GL_SAMPLER)                         ||
+              (itemType == AF_TREE_ITEM_GL_STATIC_BUFFER)                   ||
+              (itemType == AF_TREE_ITEM_GL_PBUFFER_NODE)                    ||
+              (itemType == AF_TREE_ITEM_GL_PBUFFER_STATIC_BUFFER)           ||
+              (itemType == AF_TREE_ITEM_GL_SYNC_OBJECT)                     ||
+              (itemType == AF_TREE_ITEM_GL_VBO)                             ||
+              (itemType == AF_TREE_ITEM_GL_PROGRAM)                         ||
+              (itemType == AF_TREE_ITEM_GL_VERTEX_SHADER)                   ||
+              (itemType == AF_TREE_ITEM_GL_TESSELLATION_CONTROL_SHADER)     ||
+              (itemType == AF_TREE_ITEM_GL_TESSELLATION_EVALUATION_SHADER)  ||
+              (itemType == AF_TREE_ITEM_GL_GEOMETRY_SHADER)                 ||
+              (itemType == AF_TREE_ITEM_GL_FRAGMENT_SHADER)                 ||
+              (itemType == AF_TREE_ITEM_GL_COMPUTE_SHADER)                  ||
+              (itemType == AF_TREE_ITEM_GL_UNSUPPORTED_SHADER)              ||
+              (itemType == AF_TREE_ITEM_GL_DISPLAY_LIST)                    ||
+              (itemType == AF_TREE_ITEM_GL_FBO)                             ||
+              (itemType == AF_TREE_ITEM_GL_FBO_ATTACHMENT));
+
+    return retVal;
+}
 
 // ---------------------------------------------------------------------------
 // Name:        afApplicationTreeItemData::isItemBuffer
