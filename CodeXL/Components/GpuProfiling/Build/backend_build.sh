@@ -207,7 +207,7 @@ if !($bZipOnly) ; then
       echo "===========================" | tee -a "$LOGFILE"
       echo "Build arguments passed to scons: $commandLineArgs" | tee -a "$LOGFILE"
 
-      if [ "x${AMD_OUTPUT}x" = "xx" ]
+      if [ -z ${AMD_OUTPUT+x} ]
       then
          # If not, it means this script was invoked by unknown means.
          export AMD_OUTPUT_PROFILING="${SPROOT}/../"
