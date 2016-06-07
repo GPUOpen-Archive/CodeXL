@@ -225,12 +225,12 @@ if !($bZipOnly) ; then
 
       if ($bDebugBuild) ; then
          echo "----------- Building debug version --------------- " | tee -a "$LOGFILE"
-         echo "scons -C ${SPROOT}/Build CXL_prefix=${SPROOT} CXL_build=debug CXL_build_type=static $commandLineArgs" | tee -a "$LOGFILE"
-         eval "scons -C \"${SPROOT}/Build\" CXL_prefix=\"${SPROOT}\" CXL_build=debug CXL_build_type=static $commandLineArgs >> \"$LOGFILE\" 2>&1"
+         echo "scons -C "${SPROOT}/Build" CXL_prefix="${SPROOT}" CXL_build=debug CXL_build_type=static $commandLineArgs" | tee -a "$LOGFILE"
+         (scons -C "${SPROOT}/Build" CXL_prefix="${SPROOT}" CXL_build=debug CXL_build_type=static $commandLineArgs) >> "$LOGFILE" 2>&1
       else
          echo "========================================== " | tee -a $LOGFILE
-         echo "scons -C ${SPROOT}/Build CXL_prefix=${SPROOT} CXL_build_type=static $commandLineArgs" | tee -a "$LOGFILE"
-         eval "scons -C \"${SPROOT}/Build\" CXL_prefix=\"${SPROOT}\" CXL_build_type=static $commandLineArgs >> \"$LOGFILE\" 2>&1"
+         echo "scons -C "${SPROOT}/Build" CXL_prefix="${SPROOT}" CXL_build_type=static $commandLineArgs" | tee -a "$LOGFILE"
+         (scons -C "${SPROOT}/Build" CXL_prefix="${SPROOT}" CXL_build_type=static $commandLineArgs) >> "$LOGFILE" 2>&1
       fi
       RC1=$?
       if [ ${RC1} -ne 0 ]
@@ -243,11 +243,11 @@ if !($bZipOnly) ; then
          if ($bDebugBuild) ; then
             echo "----------- Building debug 32-bit version --------------- " | tee -a "$LOGFILE"
             echo "scons -C ${SPROOT}/Build CXL_prefix=${SPROOT} CXL_arch=x86 CXL_build=debug CXL_build_type=static $commandLineArgs" | tee -a "$LOGFILE"
-            eval "scons -C \"${SPROOT}/Build\" CXL_prefix=\"${SPROOT}\" CXL_arch=x86 CXL_build=debug CXL_build_type=static $commandLineArgs >> \"$LOGFILE\" 2>&1"
+            (scons -C "${SPROOT}/Build" CXL_prefix="${SPROOT}" CXL_arch=x86 CXL_build=debug CXL_build_type=static $commandLineArgs) >> "$LOGFILE" 2>&1
          else
             echo "========================================== " | tee -a $LOGFILE
-            echo "scons -C ${SPROOT}/Build CXL_prefix=${SPROOT} CXL_arch=x86 CXL_build_type=static $commandLineArgs" | tee -a "$LOGFILE"
-            eval "scons -C \"${SPROOT}/Build\" CXL_prefix=\"${SPROOT}\" CXL_arch=x86 CXL_build_type=static $commandLineArgs >> \"$LOGFILE\" 2>&1"
+            echo "(scons -C "${SPROOT}/Build" CXL_prefix="${SPROOT}" CXL_arch=x86 CXL_build_type=static $commandLineArgs)" | tee -a "$LOGFILE"
+            (scons -C "${SPROOT}/Build" CXL_prefix="${SPROOT}" CXL_arch=x86 CXL_build_type=static $commandLineArgs) >> "$LOGFILE" 2>&1
          fi
          RC2=$?
          if [ ${RC2} -ne 0 ]
