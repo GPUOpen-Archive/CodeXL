@@ -379,37 +379,14 @@ if !($bZipOnly) ; then
       #-----------------------------------------
       #check if bin folder exist
       #-----------------------------------------
-      if [ ! -e "$BIN" ]; then
-         mkdir "$BIN"
-      fi
-
-      if [ ! -e "$BIN/$ACTIVITYLOGGER" ]; then
-         mkdir "$BIN/$ACTIVITYLOGGER"
-      fi
-
-      if [ ! -e "$BIN/$ACTIVITYLOGGER/bin" ]; then
-         mkdir "$BIN/$ACTIVITYLOGGER/bin"
-      fi
-
-      if [ ! -e $BIN/$ACTIVITYLOGGER/doc ]; then
-         mkdir "$BIN/$ACTIVITYLOGGER/doc"
-      fi
-
-      if [ ! -e "$BIN/$ACTIVITYLOGGER/bin/x86" ]; then
-         mkdir "$BIN/$ACTIVITYLOGGER/bin/x86"
-      fi
-
-      if [ ! -e "$BIN/$ACTIVITYLOGGER/bin/x86_64" ]; then
-         mkdir "$BIN/$ACTIVITYLOGGER/bin/x86_64"
-      fi
-
-      if [ ! -e "$BIN/$ACTIVITYLOGGER/include" ]; then
-         mkdir "$BIN/$ACTIVITYLOGGER/include"
-      fi
-
-      if [ ! -e "$BIN/jqPlot" ]; then
-         mkdir "$BIN/jqPlot"
-      fi
+      mkdir -p "$BIN"
+      mkdir -p "$BIN/$ACTIVITYLOGGER"
+      mkdir -p "$BIN/$ACTIVITYLOGGER/bin"
+      mkdir -p "$BIN/$ACTIVITYLOGGER/doc"
+      mkdir -p "$BIN/$ACTIVITYLOGGER/bin/x86"
+      mkdir -p "$BIN/$ACTIVITYLOGGER/bin/x86_64"
+      mkdir -p "$BIN/$ACTIVITYLOGGER/include"
+      mkdir -p "$BIN/jqPlot"
 
       #-----------------------------------------
       #copy to bin folder
@@ -501,10 +478,7 @@ if $bZip || $bZipOnly ; then
 
    # pack x64 version
    echo "Creating public build tarball..." | tee -a "$LOGFILE"
-   if [ ! -e "$BUILD_PATH/$PRODUCTNAME-$VERSION" ]; then
-      mkdir "$BUILD_PATH/$PRODUCTNAME-$VERSION"
-      mkdir "$BUILD_PATH/$PRODUCTNAME-$VERSION/bin"
-   fi
+   mkdir -p "$BUILD_PATH/$PRODUCTNAME-$VERSION/bin"
 
    cp "$BIN/"* "$BUILD_PATH/$PRODUCTNAME-$VERSION/bin"
    cp -R "$BIN/$ACTIVITYLOGGER" "$BUILD_PATH/$PRODUCTNAME-$VERSION"
