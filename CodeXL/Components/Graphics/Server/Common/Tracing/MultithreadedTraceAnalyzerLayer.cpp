@@ -82,7 +82,7 @@ void MultithreadedTraceAnalyzerLayer::AfterAPITrace()
 }
 
 
-void FilterTraceTypes(CaptureType captureType, bool &APITraceFlag, bool &GPUTraceFlag )
+void MultithreadedTraceAnalyzerLayer::FilterTraceTypes(CaptureType captureType, bool &APITraceFlag, bool &GPUTraceFlag )
 {
     switch (captureType)
     {
