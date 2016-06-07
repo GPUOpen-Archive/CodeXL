@@ -1992,7 +1992,7 @@ bool pdLinuxProcessDebugger::setDebuggedProcessEnvVariables()
     gtList<osEnvironmentVariable>::const_iterator iter = envVariablesList.begin();
     gtList<osEnvironmentVariable>::const_iterator endIter = envVariablesList.end();
 
-    while (iter != endIter)
+    for (; iter != endIter; ++iter)
     {
         // Get the current environment variable name:
         const gtString& envVariableName = (*iter)._name;
@@ -2017,9 +2017,36 @@ bool pdLinuxProcessDebugger::setDebuggedProcessEnvVariables()
         GT_ASSERT(rc2);
 
         retVal = retVal && rc1 && rc2;
-
-        iter++;
     }
+
+    // We need to note the path to libGL.so.1 before we obscure the library
+    // search behaviour through LD_LIRBRARY_PATH or LD_PRELOAD.
+    //
+    // It is not possible to _reliably_ emulate the library lookup behaviour
+    // of ld.so short of actually loading the library, so we load the library
+    // then query its path.
+    //
+    // Make sure that errors here don't stop the loading process; MacOS
+    // currently lacks an implementation of osGetLoadedModulePath, and it's
+    // likely the child will run correctly on many systems anyway.
+    do {
+        gtString errorMessage;
+        GT_ASSERT(errorMessage.isEmpty());
+        OsModule glModule (osFilePath(L"libGL.so.1"), &errorMessage, false);
+
+        if (!errorMessage.isEmpty ())
+            break;
+
+        osFilePath path;
+        if (!osGetLoadedModulePath (glModule.Get(), path))
+            break;
+
+        gtString envPair (L"SU_SYSTEM_OPENGL_MODULE_PATH=");
+        envPair.append (path.asString());
+
+        if (!_gdbDriver.executeGDBCommand(PD_SET_ENV_VARIABLE_CMD, envPair.asASCIICharArray ()))
+            break;
+    } while (0);
 
     // If the user didn't set the [DY]LD_LIBRARY_PATH variable, we still need to:
     if (!ldLibraryPathSet)
