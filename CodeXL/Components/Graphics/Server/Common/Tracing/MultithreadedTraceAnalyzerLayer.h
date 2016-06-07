@@ -289,6 +289,13 @@ protected:
     //--------------------------------------------------------------------------
     bool LoadTraceFile(const std::string& inTraceFilepath, gtASCIIString& outTraceFileContents);
 
+    /// This function alters the two input bools based on the inpout capture type. It is used to switch the
+    //  two capture types on or off based on the capture type.
+    /// \param captureType Input capture type.
+    /// \param APITraceFlag
+    /// \param GPUTraceFlag
+    void FilterTraceTypes(CaptureType captureType, bool &APITraceFlag, bool &GPUTraceFlag);
+
     //--------------------------------------------------------------------------
     /// The LinkedTrace CommandResponse can do two things:
     /// 1. Used to retrieve a linked trace where API/GPU traces are combined.

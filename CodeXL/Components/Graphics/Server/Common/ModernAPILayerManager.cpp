@@ -246,7 +246,7 @@ void ModernAPILayerManager::BeginFrame()
             m_captureCount = 1;
         }
 
-        // Exclude Frame Capture 
+        // Exclude Frame Capture
         if (m_captureType > 0 && m_captureType < 4)
         {
             // Now I need to make sure that the MultithreadedTraceAnalyzerLayer is on the stack.
@@ -281,7 +281,7 @@ void ModernAPILayerManager::EndFrame()
         m_captureType = (CaptureType)mCmdFrameCaptureWithSave.GetCaptureType();
         m_captureCount = mCmdFrameCaptureWithSave.GetCaptureCount();
 
-        // Exclude Frame Capture 
+        // Exclude Frame Capture
         if (m_captureType > 0 && m_captureType < 4)
         {
             // Now need to make sure that the MultithreadedTraceAnalyzerLayer is on the stack.
