@@ -67,7 +67,7 @@ CodeXL uses the SCons build system on Linux.
 
 #### Build Switches
 * all SCons general switches, like -c for clean , more info at http://scons.org/doc/HTML/scons-man.html
-* –j specify the number of concurrent jobs (-j6).
+* -j specify the number of concurrent jobs (-j6).
 * CXL_build=[debug/release] - build type
 * CXL_build_verbose=1 - verbose output
 * When executing the backend_build.sh script, the following switches are supported:
