@@ -1,7 +1,8 @@
 CodeXL build instructions
 ===========================
+
 ## Windows
--------
+
 #### Installations
 * Latest AMD Radeon Software from http://support.amd.com/en-us/download
 * Microsoft Visual Studio 2015 Community Edition or higher + Update 1
@@ -20,31 +21,37 @@ CodeXL build instructions
 * In order to alter windows SDK installation directory use "Global-WindowsSDK" property sheet and change user macro "WindowsSDKDir"
 
 ## Linux
--------
+
 CodeXL uses the SCons build system on Linux.
+
 #### One time setup:
-* sudo apt-get install gcc-multilib g++-multilib
-* sudo apt-get install gcc-4.9-multilib g++-4.9-multilib (added for Ubuntu 15.10 or above)
-* sudo apt-get install libglu1-mesa-dev mesa-common-dev libgtk2.0-dev
-* sudo apt-get install zlib1g-dev libx11-dev:i386
-* sudo apt-get install scons
+* `sudo apt-get install gcc-multilib g++-multilib`
+* `sudo apt-get install gcc-4.9-multilib g++-4.9-multilib # added for Ubuntu 15.10 or above`
+* `sudo apt-get install libglu1-mesa-dev mesa-common-dev libgtk2.0-dev`
+* `sudo apt-get install zlib1g-dev libx11-dev:i386`
+* `sudo apt-get install scons`
 * Download and install latest JDK both for linux from : http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 
 #### Building on CENTOS 6.X
-Install compiler 4.7.2
-* sudo wget http://people.centos.org/tru/devtools-1.1/devtools-1.1.repo -P /etc/yum.repos.d
-* sudo sh -c 'echo "enabled=1" >> /etc/yum.repos.d/devtools-1.1.repo'
-* sudo yum install devtoolset-1.1
-* wget http://people.centos.org/tru/devtools-1.1/6/i386/RPMS/devtoolset-1.1-libstdc++-devel-4.7.2-5.el6.i686.rpm
-* sudo yum install devtoolset-1.1-libstdc++-devel-4.7.2-5.el6.i686.rpm
-* sudo ln -s /opt/centos/devtoolset-1.1/root/usr/bin/* /usr/local/bin/
-* hash -r
-* gcc --version (verify that version 4.7.2 is displayed)
-Install zlib
-* yum install zlib-devel
 
-Install glibc
-* yum -y install glibc-devel.i686 glibc-devel
+##### Install compiler 4.7.2
+
+* `sudo wget http://people.centos.org/tru/devtools-1.1/devtools-1.1.repo -P /etc/yum.repos.d`
+* `sudo sh -c 'echo "enabled=1" >> /etc/yum.repos.d/devtools-1.1.repo'`
+* `sudo yum install devtoolset-1.1`
+* `wget http://people.centos.org/tru/devtools-1.1/6/i386/RPMS/devtoolset-1.1-libstdc++-devel-4.7.2-5.el6.i686.rpm`
+* `sudo yum install devtoolset-1.1-libstdc++-devel-4.7.2-5.el6.i686.rpm`
+* `sudo ln -s /opt/centos/devtoolset-1.1/root/usr/bin/* /usr/local/bin/`
+* `hash -r`
+* `gcc --version # verify that version 4.7.2 is displayed`
+
+##### Install zlib
+
+* `yum install zlib-devel`
+
+##### Install glibc
+
+* `yum -y install glibc-devel.i686 glibc-devel`
 
 #### Building the HSA/ROCm Profiler
 * In order to build the HSA/ROCm profiler, the rocm-dev package needs to be installed (so that the ROCR header files are available at build time).
@@ -52,11 +59,11 @@ Install glibc
 * If the ROCR header files are not available on the build system, you can skip this part of the build.  See the Build Switches section below for information on how to do this.
 
 #### Building CodeXL
-* Before build please define JAVA_HOME variable for example : export JAVA_HOME=/opt/java/jdk1.8.0_77
+* Before build please define JAVA\_HOME variable for example : export JAVA\_HOME=/opt/java/jdk1.8.0\_77
 * CD to local copy of /CodeXL/Components/GpuProfiling/Build
-* Run ./backend_build.sh
+* Run `./backend_build.sh`
 * CD to local copy of /CodeXL/Util/linux/
-* Run ./buildCodeXLFullLinuxProjects
+* Run `./buildCodeXLFullLinuxProjects`
 
 #### Build Switches
 * all SCons general switches, like -c for clean , more info at http://scons.org/doc/HTML/scons-man.html
