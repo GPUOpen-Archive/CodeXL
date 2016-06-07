@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -u
+
 #define path
 SPROOT=`dirname $(readlink -f "$0")`/..
 
