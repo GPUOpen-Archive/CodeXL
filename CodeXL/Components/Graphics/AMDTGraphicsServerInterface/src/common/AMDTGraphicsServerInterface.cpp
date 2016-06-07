@@ -7,6 +7,7 @@
 
 // Local:
 #include <AMDTGraphicsServerInterface/Include/AMDTGraphicsServerInterface.h>
+#include "../Server/Common/Tracing/CaptureTypes.h"
 
 // CodeXL uses INFINITE timeout when waiting for graphics server replies because the web server responsiveness
 // may be delayed when games go through their heavy load initialization period.
@@ -19,6 +20,26 @@
 #define GP_GRAPHICS_SERVER_DX12_API_TYPE  "DX12"
 #define GP_GRAPHICS_SERVER_VULKAN_API_TYPE  "Vulkan"
 
+
+/// Convert a CaptureType value to a string
+/// \param eType The input type to convert
+/// \return A string version of the capture type's value.
+gtASCIIString CaptureTypeString(CaptureType eType)
+{
+    switch (eType)
+    {
+    case CaptureType_APITrace:
+        return gtASCIIString("1");
+    case CaptureType_GPUTrace:
+        return gtASCIIString("2");
+    case CaptureType_LinkedTrace:
+        return gtASCIIString("3");
+    case CaptureType_FullFrameCapture:
+        return gtASCIIString("4");
+    default:
+        return gtASCIIString("3");
+    }
+}
 // ---------------------------------------------------------------------------
 // Name:        GraphicsServerCommunication::GraphicsServerCommunication
 // Description: Constructor
@@ -697,7 +718,14 @@ bool GraphicsServerCommunication::CaptureFrame(int numberFramesToCapture, gtASCI
     {
         // Capture the frame, =3 is includes the save XML frame data, need object database active to include the object database.
         gtASCIIString commandToSend = m_strApiHttpCommand;
-        commandToSend.append("/FrameCaptureWithSave?CaptureType=3");
+        commandToSend.append("/FrameCaptureWithSave?CaptureType=");
+
+        // Use CaptureType to define what type of capture to do
+        //commandToSend.append(CaptureTypeString(CaptureType_APITrace));
+        //commandToSend.append(CaptureTypeString(CaptureType_GPUTrace));
+        commandToSend.append(CaptureTypeString(CaptureType_LinkedTrace));
+
+        // Add the number of frames to capture
         commandToSend.appendFormattedString("&CaptureCount=%d", numberFramesToCapture);
         retVal = SendCommandPid(commandToSend, frameInfoAsXML, "");
 
