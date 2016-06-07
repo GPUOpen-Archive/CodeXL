@@ -23,6 +23,10 @@
     #include <AMDTOSWrappers/Include/osBundle.h>
 #endif
 
+#if AMDT_BUILD_TARGET == AMDT_LINUX_OS
+    #include <cstdlib>
+#endif
+
 
 // ---------------------------------------------------------------------------
 // Name:        osIs64BitModule
@@ -145,7 +149,25 @@ void osGetSystemOpenGLModulePath(gtVector<osFilePath>& systemOGLModulePaths)
     }
 #else // ! AMDT_LINUX_VARIANT == AMDT_MAC_OS_X_LINUX_VARIANT
     {
-        // First, look for an environment variable that contains the OpenGL driver path:
+        // If we are being debugged and our parent specified a known system
+        // library path then prefer their path over using the system lookup
+        // rules.
+        //
+        // They may have purtubed our environment in the process of
+        // implementing library interposition. This lets them pass us the real
+        // path without us needing to (poorly) implement the system's library
+        // resolution rules.
+        //
+        // Specifically, this won't break Linux systems which use /etc/ld.so.conf
+        // to prioritise library paths outside of the typical system
+        // directories.
+        if (auto c_path = ::getenv ("SU_SYSTEM_OPENGL_MODULE_PATH")) {
+            gtString w_path;
+            w_path.fromASCIIString (c_path);
+            systemOGLModulePaths.push_back(osFilePath(w_path));
+        }
+
+        // Next, look for an environment variable that contains the OpenGL driver path:
         const gtString AmdGpuDriverPathEnvVariable(L"AMDGPU_LIBGL_PATH");
         const gtString GLDriverPathEnvVariable(L"LIBGL_DRIVERS_PATH");
         gtVector<gtString> amdGpuDriverPaths;
