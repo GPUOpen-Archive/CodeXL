@@ -17,9 +17,14 @@
 #include <AMDTBaseTools/Include/gtAssert.h>
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
 
+#if AMDT_BUILD_TARGET != AMDT_LINUX_OS
+#error "Attempting to build Linux specific code for non-Linux target"
+#endif
+
 // Linux-only headers:
-#if (AMDT_BUILD_TARGET == AMDT_LINUX_OS) && (AMDT_LINUX_VARIANT == AMDT_GENERIC_LINUX_VARIANT)
+#if AMDT_LINUX_VARIANT == AMDT_GENERIC_LINUX_VARIANT
     #include <elf.h>
+    #include <link.h>
 #endif
 
 // Local:
@@ -138,10 +143,31 @@ bool osGetLoadedModuleHandle(const osFilePath& modulePath, osModuleHandle& modul
 // ---------------------------------------------------------------------------
 bool osGetLoadedModulePath(const osModuleHandle& moduleHandle, osFilePath& modulePath)
 {
-    (void)(moduleHandle); // unused
-    (void)(modulePath); // unused
-    // TO_DO: not implemented
+#if AMDT_LINUX_VARIANT == AMDT_GENERIC_LINUX_VARIANT
+    struct link_map *lmap;
+
+    // Prefer to query the linkmap over RTLD_DI_ORIGIN so we don't have to
+    // worry about memory allocations or potentially work around PATHMAX.
+    if (dlinfo (moduleHandle, RTLD_DI_LINKMAP, &lmap)) {
+        gtString message;
+        message.fromASCIIString(dlerror ());
+
+        OS_OUTPUT_DEBUG_LOG(message.asCharArray (), OS_DEBUG_LOG_ERROR);
+        return false;
+    }
+
+    gtString widePath;
+    widePath.fromASCIIString (lmap->l_name);
+    modulePath = std::move (widePath);
+    return true;
+#else
+    (void)moduleHandle;
+    (void)modulePath;
+
+    // TO_DO: not implemented for MacOS due to lack of RTLD_DI_LINKMAP.
+    // Support should be fairly straightforward to add though.
     return false;
+#endif
 }
 
 
