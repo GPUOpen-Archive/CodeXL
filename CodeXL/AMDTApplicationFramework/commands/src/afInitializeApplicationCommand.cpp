@@ -98,12 +98,7 @@ bool afInitializeApplicationCommand::executeSpecificCommand()
 
 
     // Initialize the debug log file:
-    bool rc1 = initializeDebugLogFile();
-
-    if (!rc1)
-    {
-        assert(rc1);
-    }
+    initializeDebugLogFile();
 
     // Output an "Application init begin" log printout:
     OS_OUTPUT_DEBUG_LOG(AF_STR_LogMsg_AppInitBegin, OS_DEBUG_LOG_INFO);
