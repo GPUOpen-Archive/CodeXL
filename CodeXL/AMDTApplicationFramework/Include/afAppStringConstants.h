@@ -537,7 +537,7 @@
 #define AF_STR_LoadD3D12MTSampleStatusbarString L"Load the D3D12Multithreading sample"
 #define AF_STR_HelpAboutStatusbarString L"Display the program information and copyright"
 #define AF_STR_HelpDevToolsSupportForumURL L"https://github.com/GPUOpen-Tools/CodeXL/issues"
-#define AF_STR_HelpCodeXLWebPage L"http://developer.amd.com/tools-and-sdks/opencl-zone/codexl/"
+#define AF_STR_HelpCodeXLWebPage L"http://gpuopen.com/compute-product/codexl/"
 #define AF_STR_HelpShortcut L"F1"
 
 

@@ -23,8 +23,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\Server\Common\CommandTimingManager.cpp" />
     <ClCompile Include="..\..\Server\Common\Compressor.cpp" />
-    <ClCompile Include="..\..\Server\Common\FDPipelineShaderStage.cpp" />
-    <ClCompile Include="..\..\Server\Common\FDPipelineStage.cpp" />
     <ClCompile Include="..\..\Server\Common\BufferDelta.cpp" />
     <ClCompile Include="..\..\Server\Common\Capture.cpp" />
     <ClCompile Include="..\..\Server\Common\CaptureLayer.cpp" />
@@ -35,7 +33,6 @@
     <ClCompile Include="..\..\Server\Common\DeltaAccumulationBuffer.cpp" />
     <ClCompile Include="..\..\Server\Common\DLLLoader.cpp" />
     <ClCompile Include="..\..\Server\Common\ErrorImage.cpp" />
-    <ClCompile Include="..\..\Server\Common\FDPipeline.cpp" />
     <ClCompile Include="..\..\Server\Common\FrameDebugger.cpp" />
     <ClCompile Include="..\..\Server\Common\FrameStatsLogger.cpp" />
     <ClCompile Include="..\..\Server\Common\geometry.cpp" />
@@ -54,7 +51,6 @@
     <ClCompile Include="..\..\Server\Common\ObjectDatabaseProcessor.cpp" />
     <ClCompile Include="..\..\Server\Common\parser.cpp" />
     <ClCompile Include="..\..\Server\Common\SaveImage.cpp" />
-    <ClCompile Include="..\..\Server\Common\ShaderDebuggerHostGPS2.cpp" />
     <ClCompile Include="..\..\Server\Common\SharedGlobal.cpp" />
     <ClCompile Include="..\..\Server\Common\SharedMemory.cpp" />
     <ClCompile Include="..\..\Server\Common\SharedMemoryManager.cpp" />
@@ -120,8 +116,6 @@
     <ClInclude Include="..\..\Server\Common\CaptureClassTypes.h" />
     <ClInclude Include="..\..\Server\Common\CommandTimingManager.h" />
     <ClInclude Include="..\..\Server\Common\Compressor.h" />
-    <ClInclude Include="..\..\Server\Common\FDPipelineShaderStage.h" />
-    <ClInclude Include="..\..\Server\Common\FDPipelineStage.h" />
     <ClInclude Include="..\..\Server\Common\FrameStatsLogger.h" />
     <ClInclude Include="..\..\Server\Common\IDrawCall.h" />
     <ClInclude Include="..\..\Server\Common\IInstanceBase.h" />
@@ -150,7 +144,6 @@
     <ClInclude Include="..\..\Server\Common\Dictionary.h" />
     <ClInclude Include="..\..\Server\Common\DLLLoader.h" />
     <ClInclude Include="..\..\Server\Common\ErrorImage.h" />
-    <ClInclude Include="..\..\Server\Common\FDPipeline.h" />
     <ClInclude Include="..\..\Server\Common\FrameDebugger.h" />
     <ClInclude Include="..\..\Server\Common\frect.h" />
     <ClInclude Include="..\..\Server\Common\geometry.h" />
@@ -176,7 +169,6 @@
     <ClInclude Include="..\..\Server\Common\RefWatcher.h" />
     <ClInclude Include="..\..\Server\Common\SaveImage.h" />
     <ClInclude Include="..\..\Server\Common\ShaderData.h" />
-    <ClInclude Include="..\..\Server\Common\ShaderDebuggerHostGPS2.h" />
     <ClInclude Include="..\..\Server\Common\SharedGlobal.h" />
     <ClInclude Include="..\..\Server\Common\SurfaceSection.h" />
     <ClInclude Include="..\..\Server\Common\timer.h" />
@@ -237,5 +229,8 @@
     <ClInclude Include="$(CommonDir)\Src\GPUPerfAPIUtils\GPUPerfAPILoader.h" />
     <ClInclude Include="$(CommonDir)\Src\GPUPerfAPIUtils\GPUPerfAPIUtil.h" />
     <ClInclude Include="$(CommonDir)\Src\DebugHelpers\DebugHelpers.h" />
+    <ClInclude Include="..\..\Server\Common\Tracing\CaptureTypes.h">
+      <Filter>Tracing</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

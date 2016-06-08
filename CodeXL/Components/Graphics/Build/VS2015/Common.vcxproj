@@ -252,6 +252,7 @@
     <ClInclude Include="..\..\Server\Common\TraceAnalyzerOutputDebugString.h" />
     <ClInclude Include="..\..\Server\Common\TraceMetadata.h" />
     <ClInclude Include="..\..\Server\Common\Tracing\APIEntry.h" />
+    <ClInclude Include="..\..\Server\Common\Tracing\CaptureTypes.h" />
     <ClInclude Include="..\..\Server\Common\Tracing\MultithreadedTraceAnalyzerLayer.h" />
     <ClInclude Include="..\..\Server\Common\Tracing\ThreadTraceData.h" />
     <ClInclude Include="..\..\Server\Common\TSingleton.h" />
