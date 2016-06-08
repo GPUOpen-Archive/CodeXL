@@ -163,20 +163,18 @@ void VktFrameProfilerLayer::VerifyAlignAndStoreResults(
             // Verify that the timestamps retrieved from the profiler appear to be valid.
             if (ValidateProfilerResult(currentResult) == true)
             {
+                // Assign single clock duration, for equal bottom-bottom clock case
+                if (currentResult.timestampResult.rawClocks.start == currentResult.timestampResult.rawClocks.end)
+                {
+                    currentResult.timestampResult.rawClocks.end++;
+                }
+
 #if MANUAL_TIMESTAMP_CALIBRATION
                 // Now attempt to align the profiled GPU timestamps with the traced API calls on the CPU.
                 bool bAlignedSuccessfully = AlignProfilerResultWithCPUTimeline(currentResult, pTimestampPair, frameStartTime);
 #else
                 bool bAlignedSuccessfully = true;
 #endif
-
-                // @TODO - determine if this is what we want to do
-                // Make zero-duration case equal to 1 clock cycle
-                if (currentResult.timestampResult.rawClocks.start == currentResult.timestampResult.rawClocks.end)
-                {
-                    currentResult.timestampResult.rawClocks.end++;
-                }
-
                 if (bAlignedSuccessfully)
                 {
                     // Store the final adjusted profiler results if they're valid.
