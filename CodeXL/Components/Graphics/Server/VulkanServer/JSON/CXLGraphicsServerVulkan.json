@@ -4,7 +4,7 @@
         "name": "CXLGraphicsServerVulkan",
         "type": "GLOBAL",
         "library_path": ".\\CXLGraphicsServerVulkan.dll",
-        "api_version": "1.0.8",
+        "api_version": "1.0.13",
         "implementation_version": "1",
         "description": "AMD Vulkan interception layer"
     }

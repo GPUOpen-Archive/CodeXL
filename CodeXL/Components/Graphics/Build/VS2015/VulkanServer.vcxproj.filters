@@ -58,17 +58,17 @@
     <ClCompile Include="..\..\Server\VulkanServer\VKT\vktPlugin.cpp">
       <Filter>VKT</Filter>
     </ClCompile>
-    <ClCompile Include="$(CommonDir)\Src\Vulkan\1.0.8.0\LoaderAndValidationLayers\src\vk_layer_extension_utils.cpp">
-      <Filter>LunarG</Filter>
-    </ClCompile>
-    <ClCompile Include="$(CommonDir)\Src\Vulkan\1.0.8.0\LoaderAndValidationLayers\src\vk_layer_table.cpp">
-      <Filter>LunarG</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Server\VulkanServer\VKT\Profiling\vktCmdBufProfilerStatic.cpp">
       <Filter>VKT\Profiling</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Server\VulkanServer\VKT\Profiling\vktTimestampedCmdBuf.cpp">
       <Filter>VKT\Profiling</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Common\Src\Vulkan\1.0.13.0\SDK\Source\layers\vk_layer_extension_utils.cpp">
+      <Filter>LunarG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\Common\Src\Vulkan\1.0.13.0\SDK\Source\layers\vk_layer_table.cpp">
+      <Filter>LunarG</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -131,21 +131,6 @@
     </ClInclude>
     <ClInclude Include="..\..\Server\VulkanServer\VKT\vktLayerManager.h">
       <Filter>VKT</Filter>
-    </ClInclude>
-    <ClInclude Include="$(CommonDir)\Lib\Ext\Vulkan\1.0.8.0\LoaderAndValidationLayers\inc\vk_dispatch_table_helper.h">
-      <Filter>LunarG</Filter>
-    </ClInclude>
-    <ClInclude Include="$(CommonDir)\Lib\Ext\Vulkan\1.0.8.0\LoaderAndValidationLayers\inc\vk_icd.h">
-      <Filter>LunarG</Filter>
-    </ClInclude>
-    <ClInclude Include="$(CommonDir)\Lib\Ext\Vulkan\1.0.8.0\LoaderAndValidationLayers\inc\vk_layer_extension_utils.h">
-      <Filter>LunarG</Filter>
-    </ClInclude>
-    <ClInclude Include="$(CommonDir)\Lib\Ext\Vulkan\1.0.8.0\LoaderAndValidationLayers\inc\vk_layer_table.h">
-      <Filter>LunarG</Filter>
-    </ClInclude>
-    <ClInclude Include="$(CommonDir)\Lib\Ext\Vulkan\1.0.8.0\LoaderAndValidationLayers\inc\vk_loader_platform.h">
-      <Filter>LunarG</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Server\VulkanServer\VKT\Profiling\vktCmdBufProfilerStatic.h">
       <Filter>VKT\Profiling</Filter>

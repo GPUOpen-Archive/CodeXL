@@ -146,6 +146,8 @@ const char* WritePipelineBindPointEnumAsString(int inEnumVal);
 const char* WriteCmdBufferLevelEnumAsString(int inEnumVal);
 const char* WriteIndexTypeEnumAsString(int inEnumVal);
 const char* WriteSubpassContentsEnumAsString(int inEnumVal);
+const char* WriteColorSpaceKHREnumAsString(int enumVal);
+const char* WritePresentModeKHREnumAsString(int enumVal);
 
 std::string DecomposeFormatFeatureFlagsEnumAsString(UINT flags);
 std::string DecomposeImageUsageFlagsEnumAsString(UINT flags);
@@ -177,6 +179,8 @@ std::string DecomposeCmdBufferUsageFlagsEnumAsString(UINT flags);
 std::string DecomposeStencilFaceFlagsEnumAsString(UINT flags);
 std::string DecomposeQueryControlFlagsEnumAsString(UINT flags);
 std::string DecomposeCommandBufferResetFlagsEnumAsString(UINT flags);
+std::string DecomposeSurfaceTransformFlagBitsKHRFlagsEnumAsString(uint32 flags);
+std::string DecomposeCompositeAlphaFlagsEnumAsString(uint32 flags);
 }
 
 #ifdef _DEBUG
