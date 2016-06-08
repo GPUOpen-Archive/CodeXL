@@ -2434,12 +2434,6 @@ kaProgram* kaProjectDataManager::GetActiveProgram()
     if (kaApplicationTreeHandler::instance() != nullptr)
     {
         pRetVal = kaApplicationTreeHandler::instance()->GetActiveProgram();
-        if (pRetVal && std::find(m_programsList.begin(), m_programsList.end(), pRetVal) == m_programsList.end())
-        {
-            //something wrong the apptree has pointer to already deleted program
-            GT_ASSERT(false);
-            pRetVal = nullptr;
-        }
     }
 
     return pRetVal;

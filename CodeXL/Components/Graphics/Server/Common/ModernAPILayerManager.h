@@ -10,7 +10,6 @@
 
 #include "LayerManager.h"
 #include "CommonTypes.h"
-#include "Tracing/CaptureTypes.h"
 
 class MultithreadedTraceAnalyzerLayer;
 class ModernAPIFrameDebuggerLayer;
@@ -141,24 +140,9 @@ public:
 
     /// Get method for the capture type
     /// \return The capture type
-    CaptureType GetCaptureType()
+    int GetCaptureType()
     {
         return m_captureType;
-    }
-
-    /// Gets the index of the frame where the capture started
-    /// \return Captured frame start index as an integer
-    unsigned int GetCapturedFrameStartIndex()
-    {
-        int index = GetCurrentFrameIndex() - GetCaptureCount();
-
-        if (index < 0)
-        {
-            Log(logERROR, "GetCapturedFrameStartIndex: is %d, Current Frame Index: %d, Capture Count: %d\n", index, GetCurrentFrameIndex(), GetCaptureCount());
-            return 0;
-        }
-
-        return  (unsigned int)index;
     }
 
 private:
@@ -186,7 +170,7 @@ private:
 
 private:
 
-    CaptureType m_captureType;  ///< Capture type
+    int m_captureType;  ///< Capture type
     int m_captureCount; ///< The number of frames to capture
 };
 

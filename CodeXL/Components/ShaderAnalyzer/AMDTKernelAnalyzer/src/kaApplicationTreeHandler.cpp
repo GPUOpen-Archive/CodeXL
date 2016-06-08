@@ -1597,7 +1597,7 @@ void kaApplicationTreeHandler::AddFileNodeToProgramBranch(const osFilePath& adde
                         }
                     }
                 }
-                else
+                if (!programHasFile)
                 {
                     // Connect the program to this file id in the data manager
                     KA_PROJECT_DATA_MGR_INSTANCE.Connect(pFile->id(), pProgram);

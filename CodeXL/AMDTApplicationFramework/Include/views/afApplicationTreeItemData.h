@@ -64,8 +64,6 @@ public:
     static bool isItemTypeRoot(afTreeItemType itemType) ;
     static bool isItemImageOrBuffer(afTreeItemType itemType);
     static bool isItemImage(afTreeItemType itemType);
-    static bool isItemOpenCL(afTreeItemType itemType);
-    static bool isItemOpenGL(afTreeItemType itemType);
     static bool isItemSource(afTreeItemType itemType);
     static bool isItemThumbnail(afTreeItemType itemType);
     static bool isItemBuffer(afTreeItemType itemType);

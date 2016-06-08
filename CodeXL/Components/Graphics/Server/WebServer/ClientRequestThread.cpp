@@ -200,7 +200,7 @@ void ClientRequestThread::HandleHTTPRequest(NetSocket* client_socket, SockAddrIn
     // Check for socket error
     if (result == HTTP_SOCKET_ERROR)
     {
-        string strFullError("Error SocketReadHeader.\n");
+        string strFullError("Error SocketReadHeader.");
 
         strFullError  += strError;
         OutputScreenError(strFullError.c_str());

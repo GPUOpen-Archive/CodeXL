@@ -211,16 +211,6 @@ enum FuncId : int
     FuncId_vkGetPhysicalDeviceSurfacePresentModesKHR,
     FuncId_vkCreateWin32SurfaceKHR,
     FuncId_vkGetPhysicalDeviceWin32PresentationSupportKHR,
-    FuncId_vkGetPhysicalDeviceDisplayPropertiesKHR,
-    FuncId_vkGetPhysicalDeviceDisplayPlanePropertiesKHR,
-    FuncId_vkGetDisplayPlaneSupportedDisplaysKHR,
-    FuncId_vkGetDisplayModePropertiesKHR,
-    FuncId_vkCreateDisplayModeKHR,
-    FuncId_vkGetDisplayPlaneCapabilitiesKHR,
-    FuncId_vkCreateDisplayPlaneSurfaceKHR,
-    FuncId_vkCreateDebugReportCallbackEXT,
-    FuncId_vkDestroyDebugReportCallbackEXT,
-    FuncId_vkDebugReportMessageEXT,
 
     FuncId_WholeCmdBuf,
 

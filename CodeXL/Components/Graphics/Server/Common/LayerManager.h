@@ -133,7 +133,7 @@ public:
 
     /// Accessor for frame count
     /// \return Frame count as an integer
-    unsigned int GetCurrentFrameIndex()
+    unsigned int GetFrameCount()
     {
         return m_frameCount;
     }
