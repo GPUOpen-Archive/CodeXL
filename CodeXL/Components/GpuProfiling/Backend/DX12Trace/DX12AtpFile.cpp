@@ -271,7 +271,10 @@ bool DX12AtpFilePart::ParseSectionHeaderLine(const string& line)
 
         }
     }
-
+    else if ((line[0] == '0') && (line[1] == 'x'))
+    {
+        m_currentParsedTraceType = GPU;
+    }
     return retVal;
 }
 

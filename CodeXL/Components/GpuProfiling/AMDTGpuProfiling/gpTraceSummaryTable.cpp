@@ -26,9 +26,8 @@ void gpSummaryTable::Refresh(bool useTimelineScope, quint64 min, quint64 max)
 }
 
 gpTraceSummaryTable::gpTraceSummaryTable(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView, eCallType callType, quint64 timelineAbsoluteStart)
-    : gpSummaryTable(pDataContainer, pSessionView, callType, timelineAbsoluteStart), m_callType(callType)
+    : gpSummaryTable(pDataContainer, pSessionView, callType, timelineAbsoluteStart)
 {
-    m_pSessionDataContainer = pDataContainer;
 
     QStringList columnCaptions;
     columnCaptions << GP_STR_SummaryTableColumnCall;
@@ -41,18 +40,6 @@ gpTraceSummaryTable::gpTraceSummaryTable(gpTraceDataContainer* pDataContainer, g
     initHeaders(columnCaptions, false);
     setShowGrid(true);
 
-    Init(m_callType, m_pSessionDataContainer, pSessionView);
-
-    // fill Table widget
-    FillTable();
-    setSortingEnabled(true);
-    setSelectionMode(QAbstractItemView::SingleSelection);
-    setContextMenuPolicy(Qt::NoContextMenu);
-
-    // Connect to the cell entered signal
-    setMouseTracking(true);
-    bool rc = connect(this, SIGNAL(cellEntered(int, int)), this, SLOT(OnCellEntered(int, int)));
-    GT_ASSERT(rc);
 }
 
 gpTraceSummaryTable::~gpTraceSummaryTable()
@@ -258,9 +245,8 @@ void gpTraceSummaryTable::OnCellEntered(int row, int column)
 }
 
 gpSummaryTable::gpSummaryTable(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView, eCallType callType, quint64 timelineAbsoluteStart)
-    :acListCtrl(nullptr), m_pSessionDataContainer(pDataContainer), m_pTraceView(pSessionView), m_lastSelectedRowIndex(-1), m_timelineAbsoluteStart(timelineAbsoluteStart)
+    :acListCtrl(nullptr), m_pSessionDataContainer(pDataContainer), m_pTraceView(pSessionView), m_lastSelectedRowIndex(-1), m_timelineAbsoluteStart(timelineAbsoluteStart), m_callType(callType)
 {
-    GT_UNREFERENCED_PARAMETER(callType);
 }
 
 gpSummaryTable::~gpSummaryTable()
@@ -288,34 +274,50 @@ void gpSummaryTable::ClearSelection()
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// gpSummaryTable
-void gpTraceSummaryTable::Init(eCallType callType, gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView)
-{
-    m_callType = callType;
-    m_pTraceView = pSessionView;
+// gpTraceSummaryTable
 
-    switch (callType)
+
+bool gpTraceSummaryTable::Init()
+{
+    bool rc = false;
+    switch (m_callType)
     {
     case API_CALL:
-        InitAPIItems(pDataContainer);
+        rc = InitAPIItems();
         break;
     case GPU_CALL:
-        InitGPUItems(pDataContainer);
+        rc = InitGPUItems();
         break;
     default:
         GT_ASSERT(0);
     }
+
+    if (rc == true)
+    {
+        // fill Table widget
+        FillTable();
+        setSortingEnabled(true);
+        setSelectionMode(QAbstractItemView::SingleSelection);
+        setContextMenuPolicy(Qt::NoContextMenu);
+
+        // Connect to the cell entered signal
+        setMouseTracking(true);
+        rc = connect(this, SIGNAL(cellEntered(int, int)), this, SLOT(OnCellEntered(int, int)));
+        GT_ASSERT(rc);
+    }
+
+    return rc;
 }
 
-void gpTraceSummaryTable::InitAPIItems(gpTraceDataContainer* pSessionDataContainer)
+bool gpTraceSummaryTable::InitAPIItems()
 {
-    GT_IF_WITH_ASSERT(pSessionDataContainer != nullptr)
+    bool rc = false;
+    GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
     {
-        m_pSessionDataContainer = pSessionDataContainer;
         m_allCallItemsMultiMap.clear();
         m_totalTimeMs = 0;
         m_numTotalCalls = 0;
-        int threadCount = pSessionDataContainer->ThreadsCount();
+        int threadCount = m_pSessionDataContainer->ThreadsCount();
 
         // fill local array of SummaryInfo items
         APISummaryTraceInfo infoArray[SUMMARY_INFO_ARRAY_SIZE] = {};
@@ -323,14 +325,14 @@ void gpTraceSummaryTable::InitAPIItems(gpTraceDataContainer* pSessionDataContain
         for (int i = 0; i < threadCount; i++)
         {
             afProgressBarWrapper::instance().incrementProgressBar();
-            osThreadId threadID = pSessionDataContainer->ThreadID(i);
+            osThreadId threadID = m_pSessionDataContainer->ThreadID(i);
 
-            int apiCount = pSessionDataContainer->ThreadAPICount(threadID);
+            int apiCount = m_pSessionDataContainer->ThreadAPICount(threadID);
 
             for (int i = 0; i < apiCount; i++)
             {
                 // Get the current API item
-                ProfileSessionDataItem* pItem = pSessionDataContainer->APIItem(threadID, i);
+                ProfileSessionDataItem* pItem = m_pSessionDataContainer->APIItem(threadID, i);
                 GT_IF_WITH_ASSERT(pItem != nullptr)
                 {
                     unsigned int apiId;
@@ -345,13 +347,17 @@ void gpTraceSummaryTable::InitAPIItems(gpTraceDataContainer* pSessionDataContain
                 }
             }
         }
-
-        // insert array items to summary map
-        for (auto info : infoArray)
+        if (threadCount > 0)
         {
-            InsertSummaryInfoToMap(info);
+            rc = true;
+            // insert array items to summary map
+            for (auto info : infoArray)
+            {
+                InsertSummaryInfoToMap(info);
+            }
         }
     }
+    return rc;
 }
 
 void gpTraceSummaryTable::AddSessionItemToSummaryInfo(APISummaryTraceInfo& info, ProfileSessionDataItem* pItem, unsigned int apiId)
@@ -411,29 +417,28 @@ void gpTraceSummaryTable::AddSessionItemToSummaryInfo(APISummaryTraceInfo& info,
     }
 }
 
-void gpTraceSummaryTable::InitGPUItems(gpTraceDataContainer* pSessionDataContainer)
+bool gpTraceSummaryTable::InitGPUItems()
 {
-    GT_IF_WITH_ASSERT(pSessionDataContainer != nullptr)
+    bool rc = false;
+    GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
     {
-        m_pSessionDataContainer = pSessionDataContainer;
-
         m_allCallItemsMultiMap.clear();
         m_totalTimeMs = 0;
         m_numTotalCalls = 0;
-        int queuesCount = pSessionDataContainer->GPUCallsContainersCount();
+        int queuesCount = m_pSessionDataContainer->GPUCallsContainersCount();
         // fill local array of SummaryInfo items
         APISummaryTraceInfo infoArray[SUMMARY_INFO_ARRAY_SIZE] = {};
 
         for (int i = 0; i < queuesCount; i++)
         {
             afProgressBarWrapper::instance().incrementProgressBar();
-            QString queueName = pSessionDataContainer->GPUObjectName(i);
-            int apiCount = pSessionDataContainer->QueueItemsCount(queueName);
+            QString queueName = m_pSessionDataContainer->GPUObjectName(i);
+            int apiCount = m_pSessionDataContainer->QueueItemsCount(queueName);
 
             for (int i = 0; i < apiCount; i++)
             {
                 // Get the current API item
-                ProfileSessionDataItem* pItem = pSessionDataContainer->QueueItem(queueName, i);
+                ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItem(queueName, i);
                 GT_IF_WITH_ASSERT(pItem != nullptr)
                 {
                     unsigned int apiId;
@@ -448,13 +453,17 @@ void gpTraceSummaryTable::InitGPUItems(gpTraceDataContainer* pSessionDataContain
                 }
             }
         }
-
         // insert array items to summary map
-        for (auto info : infoArray)
+        if (queuesCount > 0)
         {
-            InsertSummaryInfoToMap(info);
+            rc = true;
+            for (auto info : infoArray)
+            {
+                InsertSummaryInfoToMap(info);
+            }
         }
     }
+    return rc;
 }
 
 
@@ -615,23 +624,32 @@ gpCommandListSummaryTable::gpCommandListSummaryTable(gpTraceDataContainer* pData
 
     initHeaders(columnCaptions, false);
     setShowGrid(true);
-    InitCommandListItems();
-    // fill Table widget
-    FillTable();
-    setSortingEnabled(true);
-    setSelectionMode(QAbstractItemView::SingleSelection);
-    setContextMenuPolicy(Qt::NoContextMenu);
-
-    // Connect to the cell entered signal
-    setMouseTracking(true);
-    bool rc = connect(this, SIGNAL(cellEntered(int, int)), this, SLOT(OnCellEntered(int, int)));
-    GT_ASSERT(rc);
 }
 
 gpCommandListSummaryTable::~gpCommandListSummaryTable()
 {
 
 }
+
+bool gpCommandListSummaryTable::Init()
+{
+    bool rc = InitCommandListItems();
+    if (rc == true)
+    {
+        // fill Table widget
+        FillTable();
+        setSortingEnabled(true);
+        setSelectionMode(QAbstractItemView::SingleSelection);
+        setContextMenuPolicy(Qt::NoContextMenu);
+
+        // Connect to the cell entered signal
+        setMouseTracking(true);
+        rc = connect(this, SIGNAL(cellEntered(int, int)), this, SLOT(OnCellEntered(int, int)));
+        GT_ASSERT(rc);
+    }
+    return rc;
+}
+
 void gpCommandListSummaryTable::CollateAllItemsIntoSummaryMap()
 {
     GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
@@ -653,8 +671,9 @@ void gpCommandListSummaryTable::CollateAllItemsIntoSummaryMap()
         }
     }
 }
-void gpCommandListSummaryTable::InitCommandListItems()
+bool gpCommandListSummaryTable::InitCommandListItems()
 {
+    bool rc = false;
     GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
     {
         APISummaryCommandListInfo infoArray[SUMMARY_INFO_ARRAY_SIZE] = {};
@@ -716,7 +735,9 @@ void gpCommandListSummaryTable::InitCommandListItems()
                 m_apiCallInfoSummaryMap.insert(commandListName, info);
             }
         }
+        rc = (commandListIndex > 0);
     }
+    return rc;
 }
 
 void gpCommandListSummaryTable::FillTable()

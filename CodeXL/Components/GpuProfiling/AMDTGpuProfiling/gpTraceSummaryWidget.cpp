@@ -50,29 +50,31 @@ void gpTraceSummaryWidget::Init(gpTraceDataContainer* pDataContainer, gpTraceVie
         }
 
         bool rc = m_tabs[i]->Init(pDataContainer, pSessionView, timelineStartTime, timelineRange);
-        GT_ASSERT(rc);
-        if (i == eCallType::API_CALL || i == eCallType::GPU_CALL || 
-            i == eCallType::COMMAND_LIST && pDataContainer->SessionAPIType() == ProfileSessionDataItem::ProfileItemAPIType::DX12_API_PROFILE_ITEM)
+        if (rc)
         {
-            addTab(m_tabs[i], QIcon(), tab_captions[i]);
-        }
-        else
-        {
-            addTab(m_tabs[i], QIcon(), tab_captions[i+1]);
-        }
+            if (i == eCallType::API_CALL || i == eCallType::GPU_CALL ||
+                i == eCallType::COMMAND_LIST && pDataContainer->SessionAPIType() == ProfileSessionDataItem::ProfileItemAPIType::DX12_API_PROFILE_ITEM)
+            {
+                addTab(m_tabs[i], QIcon(), tab_captions[i]);
+            }
+            else
+            {
+                addTab(m_tabs[i], QIcon(), tab_captions[i + 1]);
+            }
 
-        rc = connect(this, SIGNAL(currentChanged(int)), this, SLOT(OnCurrentChanged(int)));
-        GT_ASSERT(rc);
-        rc = connect(m_tabs[i], SIGNAL(TabUseTimelineSelectionScopeChanged(bool)), this, SLOT(OnUseTimelineSelectionScopeChanged(bool)));
-        GT_ASSERT(rc);
-        rc = connect(m_tabs[i], SIGNAL(TabSummaryItemClicked(ProfileSessionDataItem*)), this, SLOT(OnTabSummaryItemClicked(ProfileSessionDataItem*)));
-        GT_ASSERT(rc);
-        if (i == eCallType::COMMAND_LIST)
-        {
-            gpCommandListSummaryTab* pCmdListTab = dynamic_cast<gpCommandListSummaryTab*>(m_tabs[i]);
-            GT_ASSERT(pCmdListTab != nullptr);
-            rc = connect(pCmdListTab, SIGNAL(TabSummaryCmdListDoubleClicked(const QString&)), this, SLOT(OnTabSummaryCmdListDoubleClicked(const QString&)));
+            rc = connect(this, SIGNAL(currentChanged(int)), this, SLOT(OnCurrentChanged(int)));
             GT_ASSERT(rc);
+            rc = connect(m_tabs[i], SIGNAL(TabUseTimelineSelectionScopeChanged(bool)), this, SLOT(OnUseTimelineSelectionScopeChanged(bool)));
+            GT_ASSERT(rc);
+            rc = connect(m_tabs[i], SIGNAL(TabSummaryItemClicked(ProfileSessionDataItem*)), this, SLOT(OnTabSummaryItemClicked(ProfileSessionDataItem*)));
+            GT_ASSERT(rc);
+            if (i == eCallType::COMMAND_LIST)
+            {
+                gpCommandListSummaryTab* pCmdListTab = dynamic_cast<gpCommandListSummaryTab*>(m_tabs[i]);
+                GT_ASSERT(pCmdListTab != nullptr);
+                rc = connect(pCmdListTab, SIGNAL(TabSummaryCmdListDoubleClicked(const QString&)), this, SLOT(OnTabSummaryCmdListDoubleClicked(const QString&)));
+                GT_ASSERT(rc);
+            }
         }
 
         afProgressBarWrapper::instance().incrementProgressBar();
