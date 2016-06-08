@@ -197,6 +197,10 @@ const char* VktUtil::WriteStructureTypeEnumAsString(int enumVal)
         PRINTENUMCASE(VK_STRUCTURE_TYPE_ANDROID_SURFACE_CREATE_INFO_KHR, pResultString);
         PRINTENUMCASE(VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR, pResultString);
         PRINTENUMCASE(VK_STRUCTURE_TYPE_DEBUG_REPORT_CALLBACK_CREATE_INFO_EXT, pResultString);
+        PRINTENUMCASE(VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_RASTERIZATION_ORDER_AMD, pResultString);
+        PRINTENUMCASE(VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_NAME_INFO_EXT, pResultString);
+        PRINTENUMCASE(VK_STRUCTURE_TYPE_DEBUG_MARKER_OBJECT_TAG_INFO_EXT, pResultString);
+        PRINTENUMCASE(VK_STRUCTURE_TYPE_DEBUG_MARKER_MARKER_INFO_EXT, pResultString);
         // *INDENT-ON*
     }
 
@@ -971,6 +975,37 @@ const char* VktUtil::WriteSubpassContentsEnumAsString(int enumVal)
     return pResultString;
 }
 
+const char* VktUtil::WriteColorSpaceKHREnumAsString(int enumVal)
+{
+    const char* pResultString = nullptr;
+
+    switch (enumVal)
+    {
+        // *INDENT-OFF*  to prevent astyle from wrongly indenting this next section
+        PRINTENUMCASE(VK_COLOR_SPACE_SRGB_NONLINEAR_KHR, pResultString);
+        // *INDENT-ON*
+    }
+
+    return pResultString;
+}
+
+const char* VktUtil::WritePresentModeKHREnumAsString(int enumVal)
+{
+    const char* pResultString = nullptr;
+
+    switch (enumVal)
+    {
+        // *INDENT-OFF*  to prevent astyle from wrongly indenting this next section
+        PRINTENUMCASE(VK_PRESENT_MODE_IMMEDIATE_KHR, pResultString);
+        PRINTENUMCASE(VK_PRESENT_MODE_MAILBOX_KHR, pResultString);
+        PRINTENUMCASE(VK_PRESENT_MODE_FIFO_KHR, pResultString);
+        PRINTENUMCASE(VK_PRESENT_MODE_FIFO_RELAXED_KHR, pResultString);
+        // *INDENT-ON*
+    }
+
+    return pResultString;
+}
+
 const char* WriteFormatFeatureFlagsEnumAsString(uint32 flags)
 {
     const char* pResultString = nullptr;
@@ -1715,5 +1750,58 @@ std::string VktUtil::DecomposeStencilFaceFlagsEnumAsString(uint32 flags)
 {
     gtASCIIString flagsString;
     VktUtil::DecomposeFlags(flags, flagsString, WriteStencilFaceFlagsEnumAsString, VK_STENCIL_FACE_FRONT_BIT, VK_STENCIL_FACE_BACK_BIT);
+    return flagsString.asCharArray();
+}
+
+const char* WriteSurfaceTransformFlagBitsKHRFlagsEnumAsString(uint32 flags)
+{
+    const char* pResultString = nullptr;
+
+    switch (flags)
+    {
+        // *INDENT-OFF*  to prevent astyle from wrongly indenting this next section
+        PRINTENUMCASE(VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR, pResultString);
+        PRINTENUMCASE(VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR, pResultString);
+        PRINTENUMCASE(VK_SURFACE_TRANSFORM_ROTATE_180_BIT_KHR, pResultString);
+        PRINTENUMCASE(VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR, pResultString);
+        PRINTENUMCASE(VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_BIT_KHR, pResultString);
+        PRINTENUMCASE(VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_ROTATE_90_BIT_KHR, pResultString);
+        PRINTENUMCASE(VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_ROTATE_180_BIT_KHR, pResultString);
+        PRINTENUMCASE(VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_ROTATE_270_BIT_KHR, pResultString);
+        PRINTENUMCASE(VK_SURFACE_TRANSFORM_INHERIT_BIT_KHR, pResultString);
+        // *INDENT-ON*
+    }
+
+    return pResultString;
+}
+
+std::string VktUtil::DecomposeSurfaceTransformFlagBitsKHRFlagsEnumAsString(uint32 flags)
+{
+    gtASCIIString flagsString;
+    VktUtil::DecomposeFlags(flags, flagsString, WriteSurfaceTransformFlagBitsKHRFlagsEnumAsString, VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR, VK_SURFACE_TRANSFORM_INHERIT_BIT_KHR);
+    return flagsString.asCharArray();
+}
+
+const char* WriteCompositeAlphaFlagsEnumAsString(uint32 flags)
+{
+    const char* pResultString = nullptr;
+
+    switch (flags)
+    {
+        // *INDENT-OFF*  to prevent astyle from wrongly indenting this next section
+        PRINTENUMCASE(VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR, pResultString);
+        PRINTENUMCASE(VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR, pResultString);
+        PRINTENUMCASE(VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR, pResultString);
+        PRINTENUMCASE(VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR, pResultString);
+        // *INDENT-ON*
+    }
+
+    return pResultString;
+}
+
+std::string VktUtil::DecomposeCompositeAlphaFlagsEnumAsString(uint32 flags)
+{
+    gtASCIIString flagsString;
+    VktUtil::DecomposeFlags(flags, flagsString, WriteCompositeAlphaFlagsEnumAsString, VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR, VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR);
     return flagsString.asCharArray();
 }

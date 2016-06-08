@@ -126,11 +126,6 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="$(CommonDir)\Lib\Ext\Vulkan\1.0.8.0\LoaderAndValidationLayers\inc\vk_dispatch_table_helper.h" />
-    <ClInclude Include="$(CommonDir)\Lib\Ext\Vulkan\1.0.8.0\LoaderAndValidationLayers\inc\vk_icd.h" />
-    <ClInclude Include="$(CommonDir)\Lib\Ext\Vulkan\1.0.8.0\LoaderAndValidationLayers\inc\vk_layer_extension_utils.h" />
-    <ClInclude Include="$(CommonDir)\Lib\Ext\Vulkan\1.0.8.0\LoaderAndValidationLayers\inc\vk_layer_table.h" />
-    <ClInclude Include="$(CommonDir)\Lib\Ext\Vulkan\1.0.8.0\LoaderAndValidationLayers\inc\vk_loader_platform.h" />
     <ClInclude Include="..\..\Server\VulkanServer\VKT\FrameDebugger\vktFrameDebuggerLayer.h" />
     <ClInclude Include="..\..\Server\VulkanServer\VKT\Interception\vktIntercept.h" />
     <ClInclude Include="..\..\Server\VulkanServer\VKT\Objects\vktInstanceBase.h" />
@@ -155,8 +150,8 @@
     <ClInclude Include="..\..\Server\VulkanServer\VKT\vktLayerManager.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(CommonDir)\Src\Vulkan\1.0.8.0\LoaderAndValidationLayers\src\vk_layer_extension_utils.cpp" />
-    <ClCompile Include="$(CommonDir)\Src\Vulkan\1.0.8.0\LoaderAndValidationLayers\src\vk_layer_table.cpp" />
+    <ClCompile Include="..\..\..\..\..\Common\Src\Vulkan\1.0.13.0\SDK\Source\layers\vk_layer_extension_utils.cpp" />
+    <ClCompile Include="..\..\..\..\..\Common\Src\Vulkan\1.0.13.0\SDK\Source\layers\vk_layer_table.cpp" />
     <ClCompile Include="..\..\Server\VulkanServer\OS\Windows\DllMain.cpp" />
     <ClCompile Include="..\..\Server\VulkanServer\VKT\FrameDebugger\vktFrameDebuggerLayer.cpp" />
     <ClCompile Include="..\..\Server\VulkanServer\VKT\Interception\vktIntercept.cpp" />

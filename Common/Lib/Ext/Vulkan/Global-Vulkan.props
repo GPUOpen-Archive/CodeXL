@@ -2,15 +2,15 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-    <VulkanReqsDir>$(CommonDir)Lib\Ext\Vulkan\1.0.8.0\</VulkanReqsDir>
+    <VulkanReqsDir>$(CommonDir)Lib\Ext\Vulkan\1.0.13.0\</VulkanReqsDir>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(VulkanReqsDir)LoaderAndValidationLayers\inc\;$(VulkanReqsDir)SDK\win\Include\;$(VulkanReqsDir)SDK\win\Include\vulkan\;$(VulkanReqsDir)SDK\win\glslang\SPIRV\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VulkanReqsDir)SDK\Include\;$(VulkanReqsDir)SDK\Source\layers\;$(VulkanReqsDir)SDK\Source\loader\;$(VulkanReqsDir)SDK\Include\vulkan\;$(VulkanReqsDir)SDK\glslang\SPIRV\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(VulkanReqsDir)LoaderAndValidationLayers\lib\win\VS2015\$(GDTCRT)\$(GDTPlatform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glslang.lib;OGLCompiler.lib;OSDependent.lib;SPIRV.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glslang.lib;OGLCompiler.lib;OSDependent.lib;SPIRV.lib;HLSL.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
