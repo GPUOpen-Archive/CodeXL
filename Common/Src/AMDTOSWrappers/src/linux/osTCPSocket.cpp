@@ -297,7 +297,7 @@ bool osTCPSocket::close()
     bool retVal = false;
 
     // Sanity check:
-    GT_IF_WITH_ASSERT(_socketDescriptor != NO_OS_SOCKET_DESCRIPTOR)
+    if (_socketDescriptor != NO_OS_SOCKET_DESCRIPTOR)
     {
         // Close the OS socket:
         int rc1 = ::close(_socketDescriptor);
@@ -307,6 +307,10 @@ bool osTCPSocket::close()
             _socketDescriptor = NO_OS_SOCKET_DESCRIPTOR;
             retVal = true;
         }
+    }
+    else
+    {
+        OS_OUTPUT_DEBUG_LOG(L"Warning: close() called on an uninitialized socket descriptor" , OS_DEBUG_LOG_DEBUG);
     }
 
     return retVal;

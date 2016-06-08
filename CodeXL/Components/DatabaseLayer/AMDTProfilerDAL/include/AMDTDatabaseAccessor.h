@@ -199,27 +199,29 @@ public:
     bool GetProcessInfo(AMDTUInt32 pid, gtVector<AMDTProfileProcessInfo>& processInfoList);
     bool GetModuleInfo(AMDTUInt32 pid, AMDTModuleId mid, gtVector<AMDTProfileModuleInfo>& moduleInfoList);
     bool GetThreadInfo(AMDTUInt32 pid, gtUInt32 tid, gtVector<AMDTProfileThreadInfo>& threadInfoList);
+    
+    bool GetProcessesWithCallstackSamples(gtVector<AMDTProcessId>& cssProcessVec);
 
     bool GetProcessTotals(AMDTProcessId               procId,
-        gtVector<AMDTUInt32>        counterIdsList,
-        AMDTUInt64                  coreMask,
-        bool                        separateByCore,
-        AMDTSampleValueVec&         sampleValueVec);
+                          gtVector<AMDTUInt32>        counterIdsList,
+                          AMDTUInt64                  coreMask,
+                          bool                        separateByCore,
+                          AMDTSampleValueVec&         sampleValueVec);
 
     bool GetModuleTotals(AMDTModuleId                moduleId,
-        AMDTProcessId               processId,
-        gtVector<AMDTUInt32>        counterIdsList,
-        AMDTUInt64                  coreMask,
-        bool                        separateByCore,
-        AMDTSampleValueVec&         sampleValueVec);
+                         AMDTProcessId               processId,
+                         gtVector<AMDTUInt32>        counterIdsList,
+                         AMDTUInt64                  coreMask,
+                         bool                        separateByCore,
+                         AMDTSampleValueVec&         sampleValueVec);
 
     bool GetFunctionTotals(AMDTFunctionId         funcId,
-        AMDTProcessId          processId,
-        AMDTThreadId           threadId,
-        gtVector<AMDTUInt32>&  counterIdsList,
-        AMDTUInt64             coreMask,
-        bool                   separateByCore,
-        AMDTSampleValueVec&    sampleValueVec);
+                           AMDTProcessId          processId,
+                           AMDTThreadId           threadId,
+                           gtVector<AMDTUInt32>&  counterIdsList,
+                           AMDTUInt64             coreMask,
+                           bool                   separateByCore,
+                           AMDTSampleValueVec&    sampleValueVec);
 
     bool GetProcessSummaryData(AMDTProcessId               processId,
                                gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
@@ -266,8 +268,11 @@ public:
                                 bool                        separateByCore,
                                 AMDTProfileFunctionData&    functionData);
 
+    bool GetUnknownCallstackLeafsByProcessId(AMDTProcessId       processId,
+                                             CallstackFrameVec&  leafs);
+
     bool GetCallstackLeafData(AMDTProcessId       processId,
-                              AMDTUInt32          counterId,
+                              AMDTCounterId       counterId,
                               gtUInt32            callStackId,
                               CallstackFrameVec&  leafs);
 
@@ -278,6 +283,12 @@ public:
     bool GetCallstackIds(AMDTProcessId        processId,
                          AMDTFunctionId       funcId,
                          gtVector<gtUInt32>&  csIds);
+
+    bool GetMaxFunctionId(AMDTModuleId moduleId, gtUInt32& maxFuncId);
+
+    bool UpdateCallstackLeaf(const AMDTProfileFunctionInfo& funcInfo);
+    bool UpdateCallstackFrame(const AMDTProfileFunctionInfo& funcInfo);
+    bool InsertFunctionInfo(const AMDTProfileFunctionInfo& funcInfo);
 
 private:
     class Impl;

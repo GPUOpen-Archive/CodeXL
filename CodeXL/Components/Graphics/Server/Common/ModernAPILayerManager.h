@@ -10,6 +10,7 @@
 
 #include "LayerManager.h"
 #include "CommonTypes.h"
+#include "Tracing/CaptureTypes.h"
 
 class MultithreadedTraceAnalyzerLayer;
 class ModernAPIFrameDebuggerLayer;
@@ -140,7 +141,7 @@ public:
 
     /// Get method for the capture type
     /// \return The capture type
-    int GetCaptureType()
+    CaptureType GetCaptureType()
     {
         return m_captureType;
     }
@@ -185,7 +186,7 @@ private:
 
 private:
 
-    int m_captureType;  ///< Capture type
+    CaptureType m_captureType;  ///< Capture type
     int m_captureCount; ///< The number of frames to capture
 };
 

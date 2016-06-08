@@ -173,6 +173,16 @@ VktTraceAnalyzerLayer::VktTraceAnalyzerLayer()
     mFunctionIndexToNameString[FuncId_vkGetPhysicalDeviceSurfacePresentModesKHR] = "vkGetPhysicalDeviceSurfacePresentModesKHR";
     mFunctionIndexToNameString[FuncId_vkCreateWin32SurfaceKHR] = "vkCreateWin32SurfaceKHR";
     mFunctionIndexToNameString[FuncId_vkGetPhysicalDeviceWin32PresentationSupportKHR] = "vkGetPhysicalDeviceWin32PresentationSupportKHR";
+    mFunctionIndexToNameString[FuncId_vkGetPhysicalDeviceDisplayPropertiesKHR] = "vkGetPhysicalDeviceDisplayPropertiesKHR";
+    mFunctionIndexToNameString[FuncId_vkGetPhysicalDeviceDisplayPlanePropertiesKHR] = "vkGetPhysicalDeviceDisplayPlanePropertiesKHR";
+    mFunctionIndexToNameString[FuncId_vkGetDisplayPlaneSupportedDisplaysKHR] = "vkGetDisplayPlaneSupportedDisplaysKHR";
+    mFunctionIndexToNameString[FuncId_vkGetDisplayModePropertiesKHR] = "vkGetDisplayModePropertiesKHR";
+    mFunctionIndexToNameString[FuncId_vkCreateDisplayModeKHR] = "vkCreateDisplayModeKHR";
+    mFunctionIndexToNameString[FuncId_vkGetDisplayPlaneCapabilitiesKHR] = "vkGetDisplayPlaneCapabilitiesKHR";
+    mFunctionIndexToNameString[FuncId_vkCreateDisplayPlaneSurfaceKHR] = "vkCreateDisplayPlaneSurfaceKHR";
+    mFunctionIndexToNameString[FuncId_vkCreateDebugReportCallbackEXT] = "vkCreateDebugReportCallbackEXT";
+    mFunctionIndexToNameString[FuncId_vkDestroyDebugReportCallbackEXT] = "vkDestroyDebugReportCallbackEXT";
+    mFunctionIndexToNameString[FuncId_vkDebugReportMessageEXT] = "vkDebugReportMessageEXT";
     mFunctionIndexToNameString[FuncId_WholeCmdBuf] = "WholeCmdBuf";
 }
 
@@ -226,7 +236,11 @@ void VktTraceAnalyzerLayer::GetAvailableQueues(std::vector<VktWrappedQueue*>& wr
 bool VktTraceAnalyzerLayer::WaitSucceeded(DWORD waitRetVal, UINT numThreads)
 {
     // @TODO - pull it up
+#ifdef WIN32
     return (waitRetVal >= WAIT_OBJECT_0) && (waitRetVal <= (WAIT_OBJECT_0 + numThreads - 1));
+#else
+    return true;
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -241,7 +255,11 @@ void VktTraceAnalyzerLayer::WaitAndFetchResults(VktFrameProfilerLayer* pFramePro
 
     if (queues.size() > 0)
     {
+#ifdef WIN32
         std::vector<HANDLE> queueThreads;
+#else
+        std::vector<std::thread*> queueThreads;
+#endif
 
         for (UINT i = 0; i < queues.size(); i++)
         {
@@ -262,7 +280,15 @@ void VktTraceAnalyzerLayer::WaitAndFetchResults(VktFrameProfilerLayer* pFramePro
         if (queueWorkerCount > 0)
         {
             // Wait for other workers
+#ifdef WIN32
             DWORD retVal = WaitForMultipleObjects(queueWorkerCount, &queueThreads[0], TRUE, QUEUE_RESULTS_WORKER_TIMEOUT);
+#else
+            for(size_t it = 0; it < queueWorkerCount; it++)
+            {
+                queueThreads[it]->join();
+            }
+            DWORD retVal = 0;
+#endif
 
             if (WaitSucceeded(retVal, queueWorkerCount) == false)
             {
@@ -465,11 +491,7 @@ void VktTraceAnalyzerLayer::LogAPICall(VktAPIEntry* pApiEntry)
 
     ThreadTraceData* pCurrentThreadData = FindOrCreateThreadData(pApiEntry->mThreadId);
 
-#ifdef _WIN32
     UINT64 startTime = pCurrentThreadData->m_startTime.QuadPart;
-#else
-    UINT64 startTime = pCurrentThreadData->m_startTime;
-#endif
 
     if (startTime == s_DummyTimestampValue)
     {
@@ -698,6 +720,16 @@ eAPIType VktTraceAnalyzerLayer::GetAPIGroupFromAPI(FuncId inAPIFuncId)
         case FuncId_vkGetPhysicalDeviceSurfacePresentModesKHR:
         case FuncId_vkCreateWin32SurfaceKHR:
         case FuncId_vkGetPhysicalDeviceWin32PresentationSupportKHR:
+        case FuncId_vkGetPhysicalDeviceDisplayPropertiesKHR:
+        case FuncId_vkGetPhysicalDeviceDisplayPlanePropertiesKHR:
+        case FuncId_vkGetDisplayPlaneSupportedDisplaysKHR:
+        case FuncId_vkGetDisplayModePropertiesKHR:
+        case FuncId_vkCreateDisplayModeKHR:
+        case FuncId_vkGetDisplayPlaneCapabilitiesKHR:
+        case FuncId_vkCreateDisplayPlaneSurfaceKHR:
+        case FuncId_vkCreateDebugReportCallbackEXT:
+        case FuncId_vkDestroyDebugReportCallbackEXT:
+        case FuncId_vkDebugReportMessageEXT:
             apiType = kAPIType_KHR;
             break;
 
