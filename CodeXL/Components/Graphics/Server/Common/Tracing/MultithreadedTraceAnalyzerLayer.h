@@ -244,6 +244,28 @@ protected:
     void HandleLinkedTraceResponse(gtASCIIString& inFullResponseString, bool inbSaveResponseToFile);
 
     //--------------------------------------------------------------------------
+    /// Handle what happens when a API Trace is requested. We can either:
+    /// 1. Return the cached trace file
+    /// 2. Send live generated data back to the client
+    /// \param inFullResponseString Data to send to command response
+    //--------------------------------------------------------------------------
+    void HandleAPITraceResponse(std::string& inFullResponseString);
+
+    //--------------------------------------------------------------------------
+    /// Handle what happens when a GPU Trace is requested. We can either:
+    /// 1. Return the cached trace file
+    /// 2. Send live generated data back to the client
+    /// \param inFullResponseString Data to send to command response
+    //--------------------------------------------------------------------------
+    void HandleGPUTraceResponse(std::string& inFullResponseString);
+
+    //--------------------------------------------------------------------------
+    /// Send a cached trace file to a specific command response
+    /// \param m_cmdResponse Command Response to send the cached trace data to
+    //--------------------------------------------------------------------------
+    void SendTraceFile(CommandResponse& m_cmdGPUTrace);
+
+    //--------------------------------------------------------------------------
     /// Find thread-private trace data to dump logged calls into.
     /// \param inThreadId A ThreadId used to lookup or create a corresponding ThreadTraceData instance.
     /// \returns A new or existing ThreadTraceData instance for use with a specific thread.
@@ -266,6 +288,13 @@ protected:
     /// \returns True if the trace file was loaded correctly.
     //--------------------------------------------------------------------------
     bool LoadTraceFile(const std::string& inTraceFilepath, gtASCIIString& outTraceFileContents);
+
+    /// This function alters the two input bools based on the inpout capture type. It is used to switch the
+    //  two capture types on or off based on the capture type.
+    /// \param captureType Input capture type.
+    /// \param APITraceFlag
+    /// \param GPUTraceFlag
+    void FilterTraceTypes(CaptureType captureType, bool &APITraceFlag, bool &GPUTraceFlag);
 
     //--------------------------------------------------------------------------
     /// The LinkedTrace CommandResponse can do two things:

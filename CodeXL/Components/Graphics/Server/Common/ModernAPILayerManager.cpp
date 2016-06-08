@@ -34,7 +34,7 @@ static const UINT kPrintScreenVirtualKeyCode = 0x2C;
 ModernAPILayerManager::ModernAPILayerManager() :
     mbInCapturePlayer(false),
     mbTraceTriggeredFromKeypress(false),
-    m_captureType(3),
+    m_captureType(CaptureType_LinkedTrace),
     m_captureCount(1)
 {
     // Command that collects a CPU and GPU trace from the same frame.
@@ -237,7 +237,7 @@ void ModernAPILayerManager::BeginFrame()
     if (mCmdFrameCaptureWithSave.IsActive())
     {
         // Extract the capture mode argument from the capture mode string
-        m_captureType = mCmdFrameCaptureWithSave.GetCaptureType();
+        m_captureType = (CaptureType)mCmdFrameCaptureWithSave.GetCaptureType();
         m_captureCount = mCmdFrameCaptureWithSave.GetCaptureCount();
 
         if (m_captureCount == 0)
@@ -246,7 +246,8 @@ void ModernAPILayerManager::BeginFrame()
             m_captureCount = 1;
         }
 
-        if (m_captureType == 3)
+        // Exclude Frame Capture
+        if (m_captureType > 0 && m_captureType < 4)
         {
             // Now I need to make sure that the MultithreadedTraceAnalyzerLayer is on the stack.
             MultithreadedTraceAnalyzerLayer* traceAnalyzer = GetTraceAnalyzerLayer();
@@ -277,10 +278,11 @@ void ModernAPILayerManager::EndFrame()
     if (mCmdFrameCaptureWithSave.IsActive())
     {
         // Extract the capture mode argument from the
-        m_captureType = mCmdFrameCaptureWithSave.GetCaptureType();
+        m_captureType = (CaptureType)mCmdFrameCaptureWithSave.GetCaptureType();
         m_captureCount = mCmdFrameCaptureWithSave.GetCaptureCount();
 
-        if (m_captureType == 3)
+        // Exclude Frame Capture
+        if (m_captureType > 0 && m_captureType < 4)
         {
             // Now need to make sure that the MultithreadedTraceAnalyzerLayer is on the stack.
             if (pTraceAnalyzer != nullptr)
@@ -299,7 +301,7 @@ void ModernAPILayerManager::EndFrame()
     if (pTraceAnalyzer != nullptr)
     {
         // Check if the previous frame had been traced. If so, we'll need to clean up the TraceAnalyzer from the stack.
-        bool bTracedLastFrame = (pTraceAnalyzer->GetLastTracedFrameIndex() == static_cast<int>(GetFrameCount()));
+        bool bTracedLastFrame = (pTraceAnalyzer->GetLastTracedFrameIndex() == static_cast<int>(GetCurrentFrameIndex()));
 
         if (bTracedLastFrame && mbTraceTriggeredFromKeypress)
         {
