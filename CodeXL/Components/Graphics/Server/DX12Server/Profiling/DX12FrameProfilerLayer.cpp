@@ -188,6 +188,12 @@ void DX12FrameProfilerLayer::VerifyAlignAndStoreResults(
             // Verify that the timestamps retrieved from the profiler appear to be valid.
             if (ValidateProfilerResult(currentResult) == true)
             {
+                // Assign single clock duration, for equal bottom-bottom clock case
+                if (currentResult.timestampResult.rawClocks.start == currentResult.timestampResult.rawClocks.end)
+                {
+                    currentResult.timestampResult.rawClocks.end++;
+                }
+
                 // Now attempt to align the profiled GPU timestamps with the traced API calls on the CPU.
                 bool bAlignedSuccessfully = AlignProfilerResultWithCPUTimeline(currentResult, pTimestampPair, frameStartTime);
 
