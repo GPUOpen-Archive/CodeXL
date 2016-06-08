@@ -112,6 +112,8 @@ public:
     bool GetModuleInfo(AMDTUInt32 pid, AMDTModuleId mid, gtVector<AMDTProfileModuleInfo>& moduleInfoList);
     bool GetThreadInfo(AMDTUInt32 pid, AMDTThreadId tid, gtVector<AMDTProfileThreadInfo>& threadInfoList);
 
+    bool GetProcessesWithCallstackSamples(gtVector<AMDTProcessId>& cssProcessVec);
+
     bool GetCounterTotals(AMDTProfileDataType   type,
         AMDTProcessId         procId,
         AMDTThreadId          threadId,
@@ -142,6 +144,8 @@ public:
                                 bool                        separateByCore,
                                 AMDTProfileFunctionData&    functionData);
 
+    bool GetUnknownCallstackLeafsByProcessId(AMDTProcessId processId, CallstackFrameVec& leafs);
+
     bool GetCallstackLeafData(AMDTProcessId       processId,
                               AMDTUInt32          counterId,
                               gtUInt32            callStackId,
@@ -154,6 +158,12 @@ public:
     bool GetCallstackIds(AMDTProcessId        processId,
                          AMDTFunctionId       funcId,
                          gtVector<gtUInt32>&  csIds);
+
+    bool GetMaxFunctionId(AMDTModuleId moduleId, gtUInt32& maxFuncId);
+
+    bool UpdateCallstackLeaf(const AMDTProfileFunctionInfo& funcInfo);
+    bool UpdateCallstackFrame(const AMDTProfileFunctionInfo& funcInfo);
+    bool InsertFunctionInfo(const AMDTProfileFunctionInfo& funcInfo);
 
 private:
     void PrepareTimelineSamplesToInsert(AMDTProfileTimelineSample* pSample, gtVector<PPSampleData>& dbSamples);

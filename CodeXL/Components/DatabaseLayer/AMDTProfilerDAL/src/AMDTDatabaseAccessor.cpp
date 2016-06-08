@@ -42,6 +42,13 @@
 #define IS_ALL_CALLSTACK_QUERY(cs_)                     (cs_ == AMDT_PROFILE_ALL_CALLPATHS)
 #define IS_CALLSTACK_QUERY(cs_)                         (cs_ != AMDT_PROFILE_ALL_CALLPATHS)
 
+#if AMDT_BUILD_TARGET == AMDT_LINUX_OS
+#define LONG_FORMAT     L"%ld"
+#else
+#define LONG_FORMAT     L"%lld"
+#endif
+
+
 #ifdef PP_DAL_TEST
 
     // Test.
@@ -920,10 +927,11 @@ public:
 
     bool OpenProfilingDatabase(const char* dbNameAsUtf8, gtUInt64 profileType, bool isReadOnly)
     {
-        (void)isReadOnly;
         bool ret = false;
+        int flags = (isReadOnly) ? SQLITE_OPEN_READONLY : SQLITE_OPEN_READWRITE;
+        m_canUpdateDB = !isReadOnly;
 
-        if (sqlite3_open_v2(dbNameAsUtf8, &m_pReadDbConn, SQLITE_OPEN_READONLY, nullptr) == SQLITE_OK)
+        if (sqlite3_open_v2(dbNameAsUtf8, &m_pReadDbConn, flags, nullptr) == SQLITE_OK)
         {
             m_profileType = static_cast<AMDTProfileMode>(profileType);
 
@@ -1492,6 +1500,44 @@ public:
         return ret;
     }
 
+    // This routine is called while report case
+    //  - if the user has specified the debug file path while reporting
+    //  - while processing css leaf/frame entires
+    bool InsertFunctionInfo(const AMDTProfileFunctionInfo& funcInfo)
+    {
+        bool ret = false;
+
+        if (m_canUpdateDB)
+        {
+            // Begin a transaction.
+            sqlite3_exec(m_pReadDbConn, SQL_CMD_TX_BEGIN, nullptr, nullptr, nullptr);
+
+            sqlite3_stmt* pStmt = nullptr;
+            const char* pCsSqlCmd = "INSERT INTO Function(id, moduleId, name, startOffset, size) VALUES(?, ?, ?, ?, ?);";
+            int rc = sqlite3_prepare_v2(m_pReadDbConn, pCsSqlCmd, -1, &pStmt, nullptr);
+
+            sqlite3_bind_int(pStmt, 1, funcInfo.m_functionId);
+            sqlite3_bind_int(pStmt, 2, funcInfo.m_moduleId);
+
+            std::string funcNameAsUtf8Str;
+            funcInfo.m_name.asUtf8(funcNameAsUtf8Str);
+
+            sqlite3_bind_text(pStmt, 3, funcNameAsUtf8Str.c_str(), funcNameAsUtf8Str.size(), nullptr);
+            sqlite3_bind_int64(pStmt, 4, funcInfo.m_startOffset);
+            sqlite3_bind_int64(pStmt, 5, funcInfo.m_size);
+
+            rc = sqlite3_step(pStmt);
+            ret = (SQLITE_DONE == rc) ? true : false;
+
+            sqlite3_reset(pStmt);
+
+            // Commit the transaction.
+            sqlite3_exec(m_pReadDbConn, SQL_CMD_TX_COMMIT, nullptr, nullptr, nullptr);
+        }
+
+        return ret;
+    }
+
     bool InsertModuleInstanceInfo(gtUInt32 modInstanceId, gtUInt32 moduleId, gtUInt64 pid, gtUInt64 loadAddr)
     {
         bool ret = false;
@@ -1585,6 +1631,76 @@ public:
         if (nullptr != pStmt)
         {
             sqlite3_finalize(pStmt);
+        }
+
+        return ret;
+    }
+
+    bool UpdateCallstackLeaf(const AMDTProfileFunctionInfo& funcInfo)
+    {
+        bool ret = false;
+
+        if (m_canUpdateDB)
+        {
+            sqlite3_stmt* pStmt = nullptr;
+            const char* pUpdateStmt = "UPDATE CallstackLeaf set functionId = ? where functionId = ? AND offset >= ? AND offset < ? ;";
+
+            int rc = sqlite3_prepare_v2(m_pReadDbConn, pUpdateStmt, -1, &pStmt, nullptr);
+            ret = (SQLITE_OK == rc) ? true : false;
+
+            if (ret)
+            {
+                // Begin a transaction.
+                sqlite3_exec(m_pReadDbConn, SQL_CMD_TX_BEGIN, nullptr, nullptr, nullptr);
+
+                sqlite3_bind_int(pStmt, 1, funcInfo.m_functionId);
+                sqlite3_bind_int(pStmt, 2, funcInfo.m_functionId & 0xFFFF0000UL);
+                sqlite3_bind_int64(pStmt, 3, funcInfo.m_startOffset);
+                sqlite3_bind_int64(pStmt, 4, funcInfo.m_startOffset + funcInfo.m_size);
+
+                rc = sqlite3_step(pStmt);
+                ret = (SQLITE_DONE == rc) ? true : false;
+
+                sqlite3_finalize(pStmt);
+
+                // Commit the transaction.
+                sqlite3_exec(m_pReadDbConn, SQL_CMD_TX_COMMIT, nullptr, nullptr, nullptr);
+            }
+        }
+
+        return ret;
+    }
+
+    bool UpdateCallstackFrame(const AMDTProfileFunctionInfo& funcInfo)
+    {
+        bool ret = false;
+
+        if (m_canUpdateDB)
+        {
+            sqlite3_stmt* pStmt = nullptr;
+            const char* pUpdateStmt = "UPDATE CallstackFrame set functionId = ? where functionId = ? AND offset >= ? AND offset < ? ;";
+
+            int rc = sqlite3_prepare_v2(m_pReadDbConn, pUpdateStmt, -1, &pStmt, nullptr);
+            ret = (SQLITE_OK == rc) ? true : false;
+
+            if (ret)
+            {
+                // Begin a transaction.
+                sqlite3_exec(m_pReadDbConn, SQL_CMD_TX_BEGIN, nullptr, nullptr, nullptr);
+
+                sqlite3_bind_int(pStmt, 1, funcInfo.m_functionId);
+                sqlite3_bind_int(pStmt, 2, funcInfo.m_functionId & 0xFFFF0000UL);
+                sqlite3_bind_int64(pStmt, 3, funcInfo.m_startOffset);
+                sqlite3_bind_int64(pStmt, 4, funcInfo.m_startOffset + funcInfo.m_size);
+
+                rc = sqlite3_step(pStmt);
+                ret = (SQLITE_DONE == rc) ? true : false;
+
+                sqlite3_finalize(pStmt);
+
+                // Commit the transaction.
+                sqlite3_exec(m_pReadDbConn, SQL_CMD_TX_COMMIT, nullptr, nullptr, nullptr);
+            }
         }
 
         return ret;
@@ -2813,6 +2929,35 @@ public:
         return ret;
     }
 
+    // return the list of process-ids that has call-stack data
+    bool GetProcessesWithCallstackSamples(gtVector<AMDTProcessId>& cssProcessVec)
+    {
+        bool ret = false;
+
+        sqlite3_stmt* pQueryStmt = nullptr;
+        std::stringstream query;
+
+        query << "SELECT id FROM Process WHERE hasCSS = 1;";
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+
+        if (SQLITE_OK == rc)
+        {
+            // Execute the query.
+            while (sqlite3_step(pQueryStmt) == SQLITE_ROW)
+            {
+                AMDTUInt32 processId = sqlite3_column_int(pQueryStmt, 0);
+
+                cssProcessVec.emplace_back(processId);
+            }
+
+            // Finalize the statement.
+            sqlite3_finalize(pQueryStmt);
+            ret = true;
+        }
+
+        return ret;
+    }
+
     bool GetModuleInstanceIds(AMDTProcessId pid, AMDTModuleId mid, gtVector<AMDTUInt32>& moduleInstanceIds)
     {
         bool ret = false;
@@ -2870,7 +3015,7 @@ public:
         return ret;
     }
 
-    bool GetCoreSamplingConfigIds(AMDTUInt32 counterId, AMDTUInt64 coreMask, gtVector<AMDTUInt32>& coreSamplingConfigIds)
+    bool GetCoreSamplingConfigIds(AMDTUInt32 counterId, AMDTUInt64 coreMask, gtVector<AMDTUInt64>& coreSamplingConfigIds)
     {
         bool ret = false;
         sqlite3_stmt* pQueryStmt = nullptr;
@@ -2895,7 +3040,7 @@ public:
 
         std::stringstream partialQuery;
 
-        partialQuery << "SELECT SampledCounterCoreConfig.id \
+        partialQuery << "SELECT SampledCounterCoreConfig.id     \
                          FROM SampledCounterCoreConfig";
 
         if (IS_COUNTER_CORE_QUERY(counterId, coreMask))
@@ -2917,7 +3062,7 @@ public:
         }
         else if (IS_COUNTER_QUERY(counterId))
         {
-            partialQuery << " WHERE samplingConfigurationId = ?";
+            partialQuery << " WHERE samplingConfigurationId = ? ";
         }
         else if (IS_CORE_QUERY(coreMask))
         {
@@ -2951,8 +3096,8 @@ public:
             // Execute the query.
             while (sqlite3_step(pQueryStmt) == SQLITE_ROW)
             {
-                AMDTUInt32 id = sqlite3_column_int(pQueryStmt, 0);
-                coreSamplingConfigIds.emplace_back(static_cast<AMDTUInt32>(id));
+                AMDTUInt64 id = sqlite3_column_int64(pQueryStmt, 0);
+                coreSamplingConfigIds.emplace_back(id);
             }
 
             // Finalize the statement.
@@ -3115,7 +3260,7 @@ public:
     // This is used while creating VIEWs
     bool GetAllEventCorePartialQuery(std::stringstream& partialQuery, std::string& fromCol, std::string& toCol)
     {
-        gtVector<AMDTUInt32> coreSamplingConfigIds;
+        gtVector<AMDTUInt64> coreSamplingConfigIds;
 
         GetCoreSamplingConfigIds(AMDT_PROFILE_ALL_COUNTERS, AMDT_PROFILE_ALL_CORES, coreSamplingConfigIds);
         bool addComma = false;
@@ -3128,7 +3273,7 @@ public:
             }
 
             gtString query;
-            query.appendFormattedString(L" MAX(CASE WHEN %S = %d THEN %S END) AS event%d", fromCol.c_str() , eventId, toCol.c_str(), eventId);
+            query.appendFormattedString(L" MAX(CASE WHEN %S = " LONG_FORMAT L" THEN %S END) AS event" LONG_FORMAT, fromCol.c_str() , eventId, toCol.c_str(), eventId);
 
             partialQuery << query.asASCIICharArray();
             addComma = true;
@@ -3141,7 +3286,7 @@ public:
     // This is seperate By Core
     bool GetEventSeparateByCorePartialQuery(AMDTUInt32 counterId, AMDTUInt64 coreMask, std::stringstream& partialQuery, std::string& firstCountColName)
     {
-        gtVector<AMDTUInt32> coreSamplingConfigIds;
+        gtVector<AMDTUInt64> coreSamplingConfigIds;
 
         GetCoreSamplingConfigIds(counterId, coreMask, coreSamplingConfigIds);
 
@@ -3156,10 +3301,10 @@ public:
                 query << comma.c_str();
             }
 
-            query.appendFormattedString(L"SUM(IFNULL(event%d, 0)) AS ", id);
+            query.appendFormattedString(L"SUM(IFNULL(event" LONG_FORMAT L", 0)) AS ", id);
 
             gtString countColName;
-            countColName.appendFormattedString(L"eventTotal%d ", id);
+            countColName.appendFormattedString(L"eventTotal" LONG_FORMAT L" ", id);
 
             if (firstCountColName.empty())
             {
@@ -3185,7 +3330,7 @@ public:
                                      std::string& firstCountColName,
                                      AMDTSampleValue& sampleInfo)
     {
-        gtVector<AMDTUInt32> coreSamplingConfigIds;
+        gtVector<AMDTUInt64> coreSamplingConfigIds;
         gtString query;
 
         GetCoreSamplingConfigIds(counterId, coreMask, coreSamplingConfigIds);
@@ -3202,7 +3347,7 @@ public:
                 query << addString.c_str();
             }
 
-            query.appendFormattedString(L"SUM(IFNULL(event%d, 0)) ", id);
+            query.appendFormattedString(L"SUM(IFNULL(event" LONG_FORMAT L", 0)) ", id);
 
             addAddStr = true;
         }
@@ -3295,7 +3440,7 @@ public:
         std::stringstream viewCreateQuery;
 
         viewCreateQuery << "CREATE TEMP VIEW IF NOT EXISTS SampledCounterCoreConfig AS                                 \
-                            SELECT CoreSamplingConfiguration.id,                                    \
+                            SELECT CoreSamplingConfiguration.id AS id,                                    \
                                    CoreSamplingConfiguration.samplingConfigurationId,               \
                                    CoreSamplingConfiguration.coreId,                                \
                                    SamplingConfiguration.counterId,                                 \
@@ -4141,6 +4286,34 @@ public:
     }
 #endif //0
 
+    bool GetModuleBaseAddressByModuleId(AMDTModuleId modId, AMDTProcessId procId, AMDTUInt64& baseAddr)
+    {
+        bool ret = false;
+
+        std::stringstream query;
+        query << "SELECT loadAddress        \
+                  FROM ModuleInstance       \
+                  WHERE                     \
+                  processId = ? AND moduleID = ? ;";
+
+        sqlite3_stmt* pQueryStmt = nullptr;
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+
+        if (rc == SQLITE_OK)
+        {
+            sqlite3_bind_int(pQueryStmt, 1, procId);
+            sqlite3_bind_int(pQueryStmt, 2, modId);
+
+            if ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
+            {
+                baseAddr = sqlite3_column_int64(pQueryStmt, 0);
+            }
+        }
+
+        ret = (SQLITE_DONE == rc) ? true : false;
+        return ret;
+    }
+
     bool GetModuleBaseAddress(AMDTFunctionId funcId, AMDTProcessId procId, AMDTUInt64& baseAddr)
     {
         bool ret = false;
@@ -4156,7 +4329,7 @@ public:
             query << " processId = ? AND ";
         }
 
-        query << " moduleID = (SELECT moduleId from Function WHERE id = ?) LIMIT 1;";
+        query << " moduleID = (SELECT moduleId from Function WHERE id = ? LIMIT 1);";
 
         sqlite3_stmt* pQueryStmt = nullptr;
         int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
@@ -4211,14 +4384,16 @@ public:
 
     bool GetFunctionInfo(AMDTFunctionId funcId, AMDTProfileFunctionInfo& funcInfo)
     {
-        bool ret = false;
-
+        bool ret = false;      
         std::stringstream query;
-        // TODO: Add source info
         query << "SELECT name, moduleId, startOffset, size from Function where id = ? ;";
 
         sqlite3_stmt* pQueryStmt = nullptr;
         int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+
+        gtUInt64 startOffset = 0;
+        gtUInt32 size = 0;
+        AMDTModuleId moduleId = (funcId & 0xFFFF0000UL) >> 16;
 
         if (rc == SQLITE_OK)
         {
@@ -4226,18 +4401,21 @@ public:
 
             if ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
             {
-                funcInfo.m_functionId = funcId;
-
                 const unsigned char* path = sqlite3_column_text(pQueryStmt, 0);
                 funcInfo.m_name.fromUtf8String(reinterpret_cast<const char*>(path));
 
-                funcInfo.m_moduleId = sqlite3_column_int(pQueryStmt, 1);
-                GetModulePath(funcInfo.m_moduleId, funcInfo.m_modulePath);
-
-                funcInfo.m_startOffset = sqlite3_column_int(pQueryStmt, 2);
-                funcInfo.m_size = sqlite3_column_int(pQueryStmt, 3);
+                moduleId = sqlite3_column_int(pQueryStmt, 1);
+                startOffset = sqlite3_column_int(pQueryStmt, 2);
+                size = sqlite3_column_int(pQueryStmt, 3);
             }
+
+            GetModulePath(funcInfo.m_moduleId, funcInfo.m_modulePath);
         }
+
+        funcInfo.m_functionId = funcId;
+        funcInfo.m_moduleId = moduleId;
+        funcInfo.m_startOffset = startOffset;
+        funcInfo.m_size = size;
 
         ret = (SQLITE_DONE == rc) ? true : false;
         return ret;
@@ -4261,6 +4439,37 @@ public:
         size_t                      count,
         gtVector<AMDTProfileData>&  dataList)
     {
+        bool ret = false;
+
+        ret = GetFunctionSummaryData__(processId,
+                                       threadId,
+                                       moduleId,
+                                       counterIdsList,
+                                       coreMask,
+                                       separateByCore,
+                                       separateByProcess,
+                                       doSort,
+                                       count,
+                                       dataList,
+                                       false);
+
+        return ret;
+    }
+
+    bool GetFunctionSummaryData__(
+        AMDTProcessId               processId,           // for a given process or for all processes
+        AMDTThreadId                threadId,
+        AMDTModuleId                moduleId,
+        gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
+        AMDTUInt64                  coreMask,
+        bool                        separateByCore,
+        bool                        separateByProcess,
+        bool                        doSort,
+        size_t                      count,
+        gtVector<AMDTProfileData>&  dataList,
+        bool                        queryUnknownFuncs)
+    {
+        GT_UNREFERENCED_PARAMETER(queryUnknownFuncs);
         bool ret = false;
 
         //select sampleFunctionSummaryAllData.functionId, sampleFunctionSummaryAllData.threadId, sampleFunctionSummaryAllData.processId,
@@ -4324,6 +4533,7 @@ public:
                 query << " , processId ";
             }
 
+            // FIXME: Now the function id for unknown modules has <module-id> part
             query << " HAVING functionId > 0 ";  // Don't aggregate for unknown functions
 
             if (doSort)
@@ -4583,52 +4793,129 @@ public:
         return ret;
     }
 
-    // Query CallStackLeaf
-    bool GetCallstackLeafData(
+    // Query CallStackLeaf to get the unknown functions
+    bool GetUnknownCallstackLeafsByProcessId(
         AMDTProcessId       processId,
-        AMDTUInt32          counterId,   // TODO: Is there a need to support ALL_COUNTERS?
-        gtUInt32            callstackId, // AMDT_PROFILE_ALL_CALLPATHS
         CallstackFrameVec&  leafs)
     {
-        GT_UNREFERENCED_PARAMETER(processId);
         bool ret = false;
 
         std::stringstream query;
-        query << "SELECT callstackId, functionId, offset, selfSamples "  \
+        query << "SELECT callstackId, functionId, offset, samplingConfigurationId, selfSamples "  \
                  "FROM  CallstackLeaf "     \
-                 "WHERE samplingConfigurationId = ? ";
-
-        if (IS_CALLSTACK_QUERY(callstackId))
-        {
-            query << "AND callstackId = ? ";
-        }
-
-        query << " ;";
+                 "WHERE processId = ? AND functionId & 0x0000ffff = 0 ;";
 
         sqlite3_stmt* pQueryStmt = nullptr;
         int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
 
         if (rc == SQLITE_OK)
         {
-            sqlite3_bind_int(pQueryStmt, 1, counterId);
+            sqlite3_bind_int(pQueryStmt, 1, processId);
+
+            // Execute the query.
+            while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
+            {
+                CallstackFrame aLeaf;
+
+                aLeaf.m_callstackId = sqlite3_column_int(pQueryStmt, 0);
+                AMDTFunctionId funcId = sqlite3_column_int(pQueryStmt, 1);
+                gtUInt32 offset = sqlite3_column_int(pQueryStmt, 2);
+                aLeaf.m_counterId = sqlite3_column_int(pQueryStmt, 3);
+                aLeaf.m_selfSamples = sqlite3_column_int(pQueryStmt, 4);
+                aLeaf.m_depth = 0;
+                aLeaf.m_isLeaf = true;
+
+                GetFunctionInfo(funcId, aLeaf.m_funcInfo);
+                aLeaf.m_funcInfo.m_startOffset = offset;
+
+                GetModuleBaseAddressByModuleId(aLeaf.m_funcInfo.m_moduleId, processId, aLeaf.m_moduleBaseAddr);
+
+                leafs.push_back(aLeaf);
+            }
+        }
+
+        // Finalize the statement.
+        sqlite3_finalize(pQueryStmt);
+
+        ret = (SQLITE_DONE == rc) ? true : false;
+
+        return ret;
+    }
+
+    bool GetCallstackLeafData(
+        AMDTProcessId       processId,
+        AMDTUInt32          counterId,   // TODO: Is there a need to support ALL_COUNTERS?
+        gtUInt32            callstackId, // AMDT_PROFILE_ALL_CALLPATHS
+        CallstackFrameVec&  leafs)
+    {
+        bool ret = false;
+        
+        ret = GetCallstackLeafData__(processId,
+                                     counterId,
+                                     callstackId,
+                                     leafs,
+                                     false);
+    
+        //ret = GetCallstackLeafData__(processId,
+        //                             counterId,
+        //                             callstackId,
+        //                             leafs,
+        //                             true);
+
+        return ret;
+    }
+
+    // Query CallStackLeaf
+    bool GetCallstackLeafData__(
+        AMDTProcessId       processId,
+        AMDTUInt32          counterId,   // TODO: Is there a need to support ALL_COUNTERS?
+        gtUInt32            callstackId, // AMDT_PROFILE_ALL_CALLPATHS
+        CallstackFrameVec&  leafs,
+        bool                queryUnknownFuncs)
+    {
+        bool ret = false;
+
+        std::stringstream query;
+        query << "SELECT callstackId, functionId, offset, SUM(selfSamples) "  \
+                 "FROM  CallstackLeaf "     \
+                 "WHERE processId = ? AND samplingConfigurationId = ? ";
+
+        if (IS_CALLSTACK_QUERY(callstackId))
+        {
+            query << "AND callstackId = ? ";
+        }
+
+        if (!queryUnknownFuncs)
+        {
+            query << "GROUP BY callstackId, functionId HAVING functionId & 0x0000ffff > 0 ;";
+        }
+        else
+        {
+            query << "group by callstackId, offset HAVING functionId & 0x0000ffff = 0 ;";
+        }
+
+        sqlite3_stmt* pQueryStmt = nullptr;
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+
+        if (rc == SQLITE_OK)
+        {
+            sqlite3_bind_int(pQueryStmt, 1, processId);
+            sqlite3_bind_int(pQueryStmt, 2, counterId);
 
             if (IS_CALLSTACK_QUERY(callstackId))
             {
-                sqlite3_bind_int(pQueryStmt, 2, callstackId);
+                sqlite3_bind_int(pQueryStmt, 3, callstackId);
             }
 
             // Execute the query.
             while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
             {
                 CallstackFrame aLeaf;
-                AMDTProfileFunctionInfo functionInfo;
 
                 aLeaf.m_callstackId = sqlite3_column_int(pQueryStmt, 0);
 
                 AMDTFunctionId funcId = sqlite3_column_int(pQueryStmt, 1);
                 gtUInt32 offset = sqlite3_column_int(pQueryStmt, 2);
-                // TODO: offset is required when funcid is incomplete
-                offset = offset;
 
                 double value = sqlite3_column_double(pQueryStmt, 3);
                 aLeaf.m_selfSamples = static_cast<gtUInt32>(value);
@@ -4637,6 +4924,8 @@ public:
                 aLeaf.m_isLeaf = true;
 
                 GetFunctionInfo(funcId, aLeaf.m_funcInfo);
+                aLeaf.m_funcInfo.m_startOffset = offset;
+
                 GetModuleBaseAddress(funcId, processId, aLeaf.m_moduleBaseAddr);
 
                 leafs.push_back(aLeaf);
@@ -4664,7 +4953,7 @@ public:
         query << "SELECT callstackId, functionId, offset, depth "  \
                  "FROM  CallstackFrame "     \
                  "WHERE callstackId = ? "    \
-                 "ORDER BY depth DESC ;";
+                 "ORDER BY depth ASC ;";
 
         sqlite3_stmt* pQueryStmt = nullptr;
         int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
@@ -4677,21 +4966,19 @@ public:
             while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
             {
                 CallstackFrame aLeaf;
-                AMDTProfileFunctionInfo functionInfo;
 
                 aLeaf.m_callstackId = sqlite3_column_int(pQueryStmt, 0);
                 AMDTFunctionId funcId  = sqlite3_column_int(pQueryStmt, 1);
                 gtUInt32 offset = sqlite3_column_int(pQueryStmt, 2);
-                // TODO: offset is required when funcid is incomplete
-                offset = offset;
 
                 aLeaf.m_depth = sqlite3_column_int(pQueryStmt, 3);
-
                 aLeaf.m_selfSamples = 0;
                 aLeaf.m_counterId = 0; // FIXME
                 aLeaf.m_isLeaf = false;
 
                 GetFunctionInfo(funcId, aLeaf.m_funcInfo);
+                aLeaf.m_funcInfo.m_startOffset = offset;
+
                 GetModuleBaseAddress(funcId, processId, aLeaf.m_moduleBaseAddr);
 
                 frames.push_back(aLeaf);
@@ -4776,6 +5063,36 @@ public:
         return ret;
     }
 
+    // Helpers
+    bool GetMaxFunctionId(AMDTModuleId moduleId, gtUInt32& maxFuncId)
+    {
+        bool ret = false;
+
+        std::stringstream query;
+        query << "SELECT MAX(id) "        \
+            "FROM  Function "     \
+            "WHERE moduleId = ? ;";
+
+        sqlite3_stmt* pQueryStmt = nullptr;
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+
+        if (rc == SQLITE_OK)
+        {
+            sqlite3_bind_int(pQueryStmt, 1, moduleId);
+
+            // Execute the query.
+            while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
+            {
+                maxFuncId = sqlite3_column_int(pQueryStmt, 0);
+            }
+        }
+
+        // Finalize the statement.
+        sqlite3_finalize(pQueryStmt);
+
+        ret = (SQLITE_DONE == rc) ? true : false;
+        return ret;
+    }
 
     //
     // Data members of impl class
@@ -4785,6 +5102,7 @@ public:
     AmdtDatabaseAccessor* m_pParent = nullptr;
     // Profiler Type
     AMDTProfileMode m_profileType = AMDT_PROFILE_MODE_NONE;
+    bool m_canUpdateDB = false;
 
     // These objects will be split into two different classes: reader and writer.
     sqlite3*      m_pWriteDbConn = nullptr;
@@ -5489,6 +5807,18 @@ bool AmdtDatabaseAccessor::GetSamplingConfiguration(AMDTUInt32 counterId, AMDTPr
     return ret;
 }
 
+bool AmdtDatabaseAccessor::GetProcessesWithCallstackSamples(gtVector<AMDTProcessId>& cssProcessVec)
+{
+    bool ret = false;
+
+    if (m_pImpl != nullptr)
+    {
+        ret = m_pImpl->GetProcessesWithCallstackSamples(cssProcessVec);
+    }
+
+    return ret;
+}
+
 bool AmdtDatabaseAccessor::GetProcessTotals(AMDTProcessId               procId,
     gtVector<AMDTUInt32>        counterIdsList,
     AMDTUInt64                  coreMask,
@@ -5706,7 +6036,19 @@ bool AmdtDatabaseAccessor::GetFunctionProfileData(
                                               coreMask,
                                               separateByCore,
                                               functionData);
+    }
 
+    return ret;
+}
+
+bool AmdtDatabaseAccessor::GetUnknownCallstackLeafsByProcessId(AMDTProcessId       processId,
+                                                               CallstackFrameVec&  leafs)
+{
+    bool ret = false;
+
+    if (m_pImpl != nullptr)
+    {
+        ret = m_pImpl->GetUnknownCallstackLeafsByProcessId(processId, leafs);
     }
 
     return ret;
@@ -5752,6 +6094,54 @@ bool AmdtDatabaseAccessor::GetCallstackIds(AMDTProcessId        processId,
     if (m_pImpl != nullptr)
     {
         ret = m_pImpl->GetCallstackIds(processId, funcId, csIds);
+    }
+
+    return ret;
+}
+
+bool AmdtDatabaseAccessor::UpdateCallstackLeaf(const AMDTProfileFunctionInfo& funcInfo)
+{
+    bool ret = false;
+
+    if (m_pImpl != nullptr)
+    {
+        ret = m_pImpl->UpdateCallstackLeaf(funcInfo);
+    }
+
+    return ret;
+}
+
+bool AmdtDatabaseAccessor::UpdateCallstackFrame(const AMDTProfileFunctionInfo& funcInfo)
+{
+    bool ret = false;
+
+    if (m_pImpl != nullptr)
+    {
+        ret = m_pImpl->UpdateCallstackFrame(funcInfo);
+    }
+
+    return ret;
+}
+
+bool AmdtDatabaseAccessor::InsertFunctionInfo(const AMDTProfileFunctionInfo& funcInfo)
+{
+    bool ret = false;
+
+    if (m_pImpl != nullptr)
+    {
+        ret = m_pImpl->InsertFunctionInfo(funcInfo);
+    }
+
+    return ret;
+}
+
+bool AmdtDatabaseAccessor::GetMaxFunctionId(AMDTModuleId moduleId, gtUInt32& maxFuncId)
+{
+    bool ret = false;
+
+    if (m_pImpl != nullptr)
+    {
+        ret = m_pImpl->GetMaxFunctionId(moduleId, maxFuncId);
     }
 
     return ret;

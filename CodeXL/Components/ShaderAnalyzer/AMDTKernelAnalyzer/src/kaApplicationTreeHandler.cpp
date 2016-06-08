@@ -1596,8 +1596,13 @@ void kaApplicationTreeHandler::AddFileNodeToProgramBranch(const osFilePath& adde
                             }
                         }
                     }
+
+                    GT_IF_WITH_ASSERT(pFileItemData != nullptr)
+                    {
+                        pFileTreeNode = pFileItemData->m_pTreeWidgetItem;
+                    }
                 }
-                if (!programHasFile)
+                else
                 {
                     // Connect the program to this file id in the data manager
                     KA_PROJECT_DATA_MGR_INSTANCE.Connect(pFile->id(), pProgram);
@@ -1653,13 +1658,7 @@ void kaApplicationTreeHandler::AddFileNodeToProgramBranch(const osFilePath& adde
                         pFileTreeNode->setIcon(0, m_pIconsArray[KA_PIXMAP_SOURCE]);
                     }
                 }
-                else
-                {
-                    GT_IF_WITH_ASSERT(pFileItemData != nullptr)
-                    {
-                        pFileTreeNode = pFileItemData->m_pTreeWidgetItem;
-                    }
-                }
+
 
                 GT_IF_WITH_ASSERT(pFileTreeNode != nullptr)
                 {

@@ -114,6 +114,9 @@ public:
                         AMDTUInt32 size,
                         AMDTSourceAndDisasmInfoVec& srcInfo);
 
+    bool GetCallGraphProcesses(gtVector<AMDTProcessId>& cssProcesses);
+    bool IsProcessHasCssSamples(AMDTProcessId pid);
+
     bool GetCallGraphFunctions(AMDTProcessId pid, AMDTCounterId counterId, AMDTCallGraphFunctionVec& cgFuncsVec);
 
     bool GetCallGraphFunctionInfo(AMDTProcessId pid, AMDTFunctionId funcId, AMDTCallGraphFunctionVec& caller, AMDTCallGraphFunctionVec& callee);

@@ -55,6 +55,8 @@ struct ViewConfigInfo
 #define CXL_ROOT_FUNCTION_ID        1
 #define CXL_ROOT_FUNCTION_NAME      L"[ROOT]"
 
+#define GET_PID_COUNTER_ID(id_, pid_, cid_)      id_ = pid_; id_ = id_ << 32 | cid_;
+
 // Sampling Configuration
 using AMDTCounterIdVec = gtVector<AMDTCounterId>;
 using CounterIdSampleConfigMap = gtMap<AMDTCounterId, AMDTProfileSamplingConfig>;
@@ -125,6 +127,7 @@ public:
 
     ModuleIdInfoMap                     m_moduleIdInfoMap;
     ModuleIdExecutableMap               m_moduleIdExeMap;
+    gtMap<AMDTModuleId, gtUInt32>       m_moduleIdMaxFuncIdMap; // Kludge
 
     AMDTProfileCounterDescVec           m_sampledCounterDescVec;
     CounterIdSampleConfigMap            m_sampleConfigMap;
@@ -148,9 +151,11 @@ public:
     ModuleSampleTotalMap                m_moduleSampleTotalMap;
 
     // CallGraph
-    cgNode              m_cgRootNode;
-    functionIdcgNodeMap m_cgFunctionMap;
-    AMDTCounterId       m_cgCounterId = 0;
+    bool                                  m_foundCssProcesses = false;
+    gtVector<AMDTProcessId>               m_cssProcesses;
+    gtMap<gtUInt64, functionIdcgNodeMap*> m_pidCgFunctionMap;
+    AMDTCounterId                         m_cgCounterId = 0;
+    gtMap<AMDTProcessId, AMDTProcessId>   m_handleUnknownLeafs;
 
     Impl()
     {
@@ -205,6 +210,19 @@ public:
             pExeIter.second->Close();
         }
         m_moduleIdExeMap.clear();
+
+        m_moduleIdMaxFuncIdMap.clear();
+
+        m_cssProcesses.clear();
+        m_handleUnknownLeafs.clear();
+
+        for (auto pCgFuncMap : m_pidCgFunctionMap)
+        {
+            pCgFuncMap.second->clear();
+            delete pCgFuncMap.second;
+        }
+
+        m_pidCgFunctionMap.clear();
     };
 
     // profile file can either be raw PRD file or processed DB file
@@ -220,7 +238,7 @@ public:
 
             if (nullptr != m_pDbAdapter)
             {
-                ret = m_pDbAdapter->OpenDb(profileFilePath, AMDT_PROFILE_MODE_AGGREGATION);
+                ret = m_pDbAdapter->OpenDb(profileFilePath, AMDT_PROFILE_MODE_AGGREGATION, false);
 
                 ret = ret && GetProfileSessionInfo(m_sessionInfo);
 
@@ -870,7 +888,8 @@ public:
 
             ret = m_pDbAdapter->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, moduleId, modInfoVec);
 
-            if (ret)
+            // FIXME: moduleId cannot be zero.. somehow we insert moduleId 0??
+            if (ret && modInfoVec.size() > 0)
             {
                 modInfo = modInfoVec[0];
                 m_moduleIdInfoMap.insert({ moduleId, modInfo });
@@ -1861,12 +1880,70 @@ public:
         return ret;
     }
 
-    bool GetFunctionNode(functionIdcgNodeMap& nodeMap, CallstackFrame& frame, gtUInt32 deepSamples, cgNode*& funcNode)
+    bool GetCallGraphProcesses(gtVector<AMDTProcessId>& cssProcesses)
+    {
+        bool ret = true;
+
+        if (!m_foundCssProcesses)
+        {
+            ret = m_pDbAdapter->GetProcessesWithCallstackSamples(m_cssProcesses);
+            m_foundCssProcesses = true;
+        }
+
+        if (ret)
+        {
+            cssProcesses = m_cssProcesses;
+        }
+
+        return ret;
+    }
+
+    bool IsProcessHasCssSamples(AMDTProcessId pid)
+    {
+        gtVector<AMDTProcessId> cssProcesses;
+        bool ret = GetCallGraphProcesses(cssProcesses);
+
+        // Check whether this PID has callstack samples
+        auto cssPid = std::find_if(cssProcesses.begin(), cssProcesses.end(),
+            [&pid](AMDTProcessId const& aData) { return aData == pid; });
+
+        ret = (cssPid != m_cssProcesses.end()) ? true : false;
+
+        return ret;
+    }
+
+    bool GetMaxFunctionIdByModuleId(AMDTModuleId moduleId, gtUInt32& maxFuncId)
+    {
+        bool ret = false;
+        gtUInt32 funcId = 0;
+
+        auto it = m_moduleIdMaxFuncIdMap.find(moduleId);
+
+        if (it == m_moduleIdMaxFuncIdMap.end())
+        {
+            ret = m_pDbAdapter->GetMaxFunctionId(moduleId, funcId);
+
+            if (ret)
+            {
+                m_moduleIdMaxFuncIdMap.insert({ moduleId, funcId });
+            }
+        }
+        else
+        {
+            funcId = it->second;
+            ret = true;
+        }
+
+        maxFuncId = funcId;
+        return ret;
+    }
+
+    bool GetFunctionNode(functionIdcgNodeMap& nodeMap, CallstackFrame& frame, gtUInt32 deepSamples, gtUInt32 pathCount, cgNode*& funcNode)
     {
         bool ret = false;
         AMDTFunctionId funcId = frame.m_funcInfo.m_functionId;
 
-        //Lookupfunction(frame.m_funcInfo);
+        Lookupfunction(frame.m_funcInfo);
 
         auto it = nodeMap.find(funcId);
 
@@ -1893,7 +1970,7 @@ public:
                 it->second.m_totalDeepSamples.m_sampleCount += deepSamples;
             }
 
-            it->second.m_pathCount++;
+            it->second.m_pathCount += pathCount;
             it->second.m_moduleBaseAddr = frame.m_moduleBaseAddr;
 
             funcNode = &(it->second);
@@ -1915,7 +1992,7 @@ public:
         frame.m_depth = 0;
         frame.m_selfSamples = 0;
 
-        ret = GetFunctionNode(nodeMap, frame, 0, rootNode);
+        ret = GetFunctionNode(nodeMap, frame, 0, 0, rootNode);
         rootNode->m_pathCount = 0;
 
         return ret;
@@ -1988,70 +2065,146 @@ public:
         return ret;
     }
 
+    // Returns true if callgraph is constructed
+    bool GetNodeFunctionMap(AMDTProcessId pid, AMDTCounterId cid, functionIdcgNodeMap*& pFuncNodeMap)
+    {
+        bool ret = false;
+        functionIdcgNodeMap *pNodeMap = nullptr;
+
+        gtUInt64 pidCounterId;
+        GET_PID_COUNTER_ID(pidCounterId, pid, cid);
+
+        auto funcMap = m_pidCgFunctionMap.find(pidCounterId);
+
+        if (funcMap != m_pidCgFunctionMap.end())
+        {
+            pNodeMap = funcMap->second;
+            ret = true;
+        }
+        else
+        {
+            pNodeMap = new functionIdcgNodeMap;
+            m_pidCgFunctionMap.insert({ pidCounterId, pNodeMap });
+        }
+
+        pFuncNodeMap = pNodeMap;
+        return ret;
+    }
+
+    // Initially the CallstackLeaf table may contain unknown functions
+    // Fix them, if possible
+    bool UpdateUnknownCallstackLeafs(AMDTProcessId pid)
+    {
+        bool ret = false;
+
+        auto handleUnknownLeaf = m_handleUnknownLeafs.find(pid);
+
+        if (handleUnknownLeaf == m_handleUnknownLeafs.end())
+        {
+            CallstackFrameVec leafs;
+            ret = m_pDbAdapter->GetUnknownCallstackLeafsByProcessId(pid, leafs);
+
+            if (ret)
+            {
+                for (auto& leaf : leafs)
+                {
+                    // Find the function info from debug info (if available) and update the tables
+                    ret = Lookupfunction(leaf.m_funcInfo);
+                }
+
+                m_handleUnknownLeafs.insert({ pid, pid });
+            }
+        }
+
+        return ret;
+    }
+
     // Callgraph
     bool ConstructCallGraph(AMDTProcessId pid, AMDTCounterId counterId)
     {
         bool ret = false;
 
-        // Get list of Leaf nodes for the given process
-        // For each Leaf node
-        //      get the callstack frames 
-        //      construct the arc details and update node and edge details
-
-        functionIdcgNodeMap& nodeFunctionMap = m_cgFunctionMap;
-
-        // Add [ROOT] Node
-        cgNode* pRootNode = nullptr;
-        CallstackFrame dummyRootFrame;
-        ret = AddRootNode(nodeFunctionMap, dummyRootFrame, pRootNode);
-
-        CallstackFrameVec leafs;
-        ret = m_pDbAdapter->GetCallstackLeafData(pid, counterId, AMDT_PROFILE_ALL_CALLPATHS, leafs);
-
-        if (ret)
+        if (IsProcessHasCssSamples(pid))
         {
-            for (auto& leaf : leafs)
+            functionIdcgNodeMap* pCgFunctionMap = nullptr;
+
+            ret = GetNodeFunctionMap(pid, counterId, pCgFunctionMap);
+
+            // Callgraph is not yet constructed
+            if (!ret && (nullptr != pCgFunctionMap))
             {
-                // Get the function Node
-                cgNode *pLeafNode = nullptr;
+                // Get list of Leaf nodes for the given process
+                // For each Leaf node
+                //      get the callstack frames 
+                //      construct the arc details and update node and edge details
 
-                double sampleCount = leaf.m_selfSamples;
-                ret = GetFunctionNode(nodeFunctionMap, leaf, sampleCount, pLeafNode);
+                UpdateUnknownCallstackLeafs(pid);
 
-                if (ret && nullptr != pLeafNode)
+                // Add [ROOT] Node
+                cgNode* pRootNode = nullptr;
+                CallstackFrame dummyRootFrame;
+                ret = AddRootNode(*pCgFunctionMap, dummyRootFrame, pRootNode);
+
+                CallstackFrameVec leafs;
+                ret = m_pDbAdapter->GetCallstackLeafData(pid, counterId, AMDT_PROFILE_ALL_CALLPATHS, leafs);
+
+                if (ret)
                 {
-                    // get the callstack frames (in reverse order - depth (n-1) to 1)
-                    CallstackFrameVec frames;
-                    ret = m_pDbAdapter->GetCallstackFrameData(pid, leaf.m_callstackId, frames);
+                    AMDTFunctionId prevFunctionId = 0;
+                    gtUInt32 prevCallstackId = 0;
 
-                    if (ret)
+                    for (auto& leaf : leafs)
                     {
-                        cgNode* pCallerNode = nullptr;
-                        cgNode* pCalleeNode = pLeafNode;
-                        bool isCalleeLeaf = true;
+                        // Get the function Node
+                        cgNode *pLeafNode = nullptr;
+                        double sampleCount = leaf.m_selfSamples;
+                        gtUInt32 pathCount = ((prevFunctionId == leaf.m_funcInfo.m_functionId) && (prevCallstackId == leaf.m_callstackId)) ? 0 : 1;
 
-                        for (auto& frame : frames)
+                        ret = GetFunctionNode(*pCgFunctionMap, leaf, sampleCount, pathCount, pLeafNode);
+
+                        if (ret && nullptr != pLeafNode)
                         {
-                            pCallerNode = nullptr;
-                            ret = GetFunctionNode(nodeFunctionMap, frame, sampleCount, pCallerNode);
+                            // get the callstack frames (in reverse order - depth (n-1) to 1)
+                            CallstackFrameVec frames;
+                            ret = m_pDbAdapter->GetCallstackFrameData(pid, leaf.m_callstackId, frames);
 
-                            ret = ret && AddCallerToCalleeEdge(pCallerNode, pCalleeNode, sampleCount, isCalleeLeaf);
-                            ret = ret && AddCalleeToCallerEdge(pCallerNode, pCalleeNode, sampleCount);
+                            if (ret)
+                            {
+                                cgNode* pCallerNode = nullptr;
+                                cgNode* pCalleeNode = pLeafNode;
+                                bool isCalleeLeaf = true;
 
-                            pCalleeNode = pCallerNode;
-                            isCalleeLeaf = false;
+                                for (auto& frame : frames)
+                                {
+                                    // Handle recursion.
+                                    if (frame.m_funcInfo.m_functionId != pCalleeNode->m_funcInfo.m_functionId)
+                                    {
+                                        pCallerNode = nullptr;
+                                        ret = GetFunctionNode(*pCgFunctionMap, frame, sampleCount, pathCount, pCallerNode);
+
+                                        ret = ret && AddCallerToCalleeEdge(pCallerNode, pCalleeNode, sampleCount, isCalleeLeaf);
+                                        ret = ret && AddCalleeToCallerEdge(pCallerNode, pCalleeNode, sampleCount);
+
+                                        pCalleeNode = pCallerNode;
+                                        isCalleeLeaf = false;
+                                    }
+                                }
+
+                                // Connect this to [ROOT] node
+                                ret = GetFunctionNode(*pCgFunctionMap, dummyRootFrame, sampleCount, pathCount, pCallerNode);
+                                ret = ret && AddCallerToCalleeEdge(pCallerNode, pCalleeNode, sampleCount, false);
+                                ret = ret && AddCalleeToCallerEdge(pCallerNode, pCalleeNode, sampleCount);
+                            }
+
+                            prevFunctionId = leaf.m_funcInfo.m_functionId;
+                            prevCallstackId = leaf.m_callstackId;
                         }
-
-                        // Connect this to [ROOT] node
-                        ret = GetFunctionNode(nodeFunctionMap, dummyRootFrame, sampleCount, pCallerNode);
-                        ret = ret && AddCallerToCalleeEdge(pCallerNode, pCalleeNode, sampleCount, false);
-                        ret = ret && AddCalleeToCallerEdge(pCallerNode, pCalleeNode, sampleCount);
                     }
                 }
             }
-        }
 
-        m_cgCounterId = (ret) ? counterId : 0;
+            m_cgCounterId = (ret) ? counterId : 0;
+        }
 
         return ret;
     }
@@ -2139,19 +2292,26 @@ public:
 
         if (ret)
         {
-            auto rootFuncIter = m_cgFunctionMap.find(CXL_ROOT_FUNCTION_ID);
-            gtUInt32 totalDeepSamples = 0;
+            functionIdcgNodeMap* pCgFunctionMap = nullptr;
 
-            if (m_cgFunctionMap.end() != rootFuncIter)
-            {
-                totalDeepSamples = rootFuncIter->second.m_totalDeepSamples.m_sampleCount;
-            }
+            ret = GetNodeFunctionMap(pid, counterId, pCgFunctionMap);
 
-            for (auto& cgFunc : m_cgFunctionMap)
+            if (ret && (nullptr != pCgFunctionMap))
             {
-                AMDTCallGraphFunction func;
-                CopyCGNode(func, cgFunc.second, totalDeepSamples);
-                cgFuncsVec.push_back(func);
+                auto rootFuncIter = pCgFunctionMap->find(CXL_ROOT_FUNCTION_ID);
+                gtUInt32 totalDeepSamples = 0;
+
+                if (pCgFunctionMap->end() != rootFuncIter)
+                {
+                    totalDeepSamples = rootFuncIter->second.m_totalDeepSamples.m_sampleCount;
+                }
+
+                for (auto& cgFunc : *pCgFunctionMap)
+                {
+                    AMDTCallGraphFunction func;
+                    CopyCGNode(func, cgFunc.second, totalDeepSamples);
+                    cgFuncsVec.push_back(func);
+                }
             }
         }
 
@@ -2163,35 +2323,43 @@ public:
         GT_UNREFERENCED_PARAMETER(processId);
         bool ret = false;
 
-        auto cgFuncIter = m_cgFunctionMap.find(funcId);
+        functionIdcgNodeMap* pCgFunctionMap = nullptr;
 
-        if (m_cgFunctionMap.end() != cgFuncIter)
+
+        ret = GetNodeFunctionMap(processId, m_cgCounterId, pCgFunctionMap);
+
+        if (ret && (nullptr != pCgFunctionMap))
         {
-            gtUInt32 totalDeepSamples = cgFuncIter->second.m_totalDeepSamples.m_sampleCount;
+            auto cgFuncIter = pCgFunctionMap->find(funcId);
 
-            for (auto& parent : cgFuncIter->second.m_callerVec)
+            if (pCgFunctionMap->end() != cgFuncIter)
             {
-                AMDTCallGraphFunction parentFunc;
-                CopyCGEdge(parentFunc, parent, totalDeepSamples);
+                gtUInt32 totalDeepSamples = cgFuncIter->second.m_totalDeepSamples.m_sampleCount;
 
-                parents.push_back(parentFunc);
+                for (auto& parent : cgFuncIter->second.m_callerVec)
+                {
+                    AMDTCallGraphFunction parentFunc;
+                    CopyCGEdge(parentFunc, parent, totalDeepSamples);
+
+                    parents.push_back(parentFunc);
+                }
+
+                for (auto& child : cgFuncIter->second.m_calleeVec)
+                {
+                    AMDTCallGraphFunction childFunc;
+                    CopyCGEdge(childFunc, child, totalDeepSamples);
+
+                    children.push_back(childFunc);
+                }
+
+                // TBD: Should this [self] entry be added?
+                // Add [self] in children vector
+                AMDTCallGraphFunction self;
+                CopyCGSelf(self, cgFuncIter->second, totalDeepSamples);
+                children.push_back(self);
+
+                ret = true;
             }
-
-            for (auto& child : cgFuncIter->second.m_calleeVec)
-            {
-                AMDTCallGraphFunction childFunc;
-                CopyCGEdge(childFunc, child, totalDeepSamples);
-
-                children.push_back(childFunc);
-            }
-
-            // TBD: Should i add this [self] entry.. 
-            // Add [self] in children vector
-            AMDTCallGraphFunction self;
-            CopyCGSelf(self, cgFuncIter->second, totalDeepSamples);
-            children.push_back(self);
-
-            ret = true;
         }
 
         return ret;
@@ -2255,12 +2423,11 @@ public:
         }
         else
         {
-            auto it = m_moduleIdInfoMap.find(moduleId);
+            AMDTProfileModuleInfo modInfo;
+            ret = GetModuleInfo(moduleId, modInfo);
 
-            if (it != m_moduleIdInfoMap.end())
+            if (ret)
             {
-                AMDTProfileModuleInfo& modInfo = it->second;
-
                 pExe = ExecutableFile::Open(modInfo.m_path.asCharArray(), modInfo.m_loadAddress);
 
                 if (nullptr != pExe)
@@ -2296,11 +2463,24 @@ public:
 
                 if (NULL != pFuncSymbol)
                 {
-                    gtUInt32 funcSize = ((pFuncSymbol->m_size == 0) && (GT_INVALID_RVADDR != funcRvaEnd))
-                                            ? funcRvaEnd - pFuncSymbol->m_rva : 0;
+                    gtUInt32 funcSize = pFuncSymbol->m_size;
+
+                    // TODO: if funcSize == 0 ?
+                    funcSize = ((funcSize == 0) && (GT_INVALID_RVADDR != funcRvaEnd))
+                                             ? funcRvaEnd - pFuncSymbol->m_rva : funcSize;
 
                     funcInfo.m_name = pFuncSymbol->m_pName;
+                    funcInfo.m_startOffset = pFuncSymbol->m_rva;
                     funcInfo.m_size = funcSize;
+                    gtUInt32 maxFuncId = 0;
+
+                    GetMaxFunctionIdByModuleId(funcInfo.m_moduleId, maxFuncId);
+                    funcInfo.m_functionId = pFuncSymbol->m_funcId + maxFuncId;
+
+                    // TODO: Update CallstackFrame table and insert into Function table
+                    m_pDbAdapter->InsertFunctionInfo(funcInfo);
+                    m_pDbAdapter->UpdateCallstackLeaf(funcInfo);
+                    m_pDbAdapter->UpdateCallstackFrame(funcInfo);
 
                     ret = true;
                 }
@@ -2601,7 +2781,10 @@ bool cxlProfileDataReader::GetFunctionDetailedProfileData(AMDTFunctionId        
 
     if (nullptr != m_pImpl)
     {
-        ret = m_pImpl->GetFunctionDetailedProfileData(funcId, processId, threadId, functionData);
+        if (funcId != 0xFFFFFFFFUL)
+        {
+            ret = m_pImpl->GetFunctionDetailedProfileData(funcId, processId, threadId, functionData);
+        }
     }
 
     return ret;
@@ -2629,6 +2812,30 @@ bool cxlProfileDataReader::GetDisassembly(AMDTModuleId moduleId,
     if (nullptr != m_pImpl)
     {
         ret = m_pImpl->GetDisassembly(moduleId, offset, size, disasmInfoVec);
+    }
+
+    return ret;
+}
+
+bool cxlProfileDataReader::GetCallGraphProcesses(gtVector<AMDTProcessId>& cssProcesses)
+{
+    bool ret = false;
+
+    if (nullptr != m_pImpl)
+    {
+        ret = m_pImpl->GetCallGraphProcesses(cssProcesses);
+    }
+
+    return ret;
+}
+
+bool cxlProfileDataReader::IsProcessHasCssSamples(AMDTProcessId pid)
+{
+    bool ret = false;
+
+    if (nullptr != m_pImpl)
+    {
+        ret = m_pImpl->IsProcessHasCssSamples(pid);
     }
 
     return ret;
