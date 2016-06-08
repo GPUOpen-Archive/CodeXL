@@ -28,6 +28,7 @@
     <ClInclude Include="..\..\Server\CapturePlayer\BasePlayer.h" />
     <ClInclude Include="..\..\Server\CapturePlayer\DX12Player.h" />
     <ClInclude Include="..\..\Server\CapturePlayer\VulkanPlayer.h" />
+    <ClInclude Include="..\..\Server\CapturePlayer\WindowsPlayer.h" />
     <ClInclude Include="..\..\Server\CapturePlayer\WindowsWindow.h" />
   </ItemGroup>
   <ItemGroup>

@@ -499,7 +499,7 @@
 #define GPU_STR_timeline_CmdBufferBranchName "CmdBuffer%1"
 #define GPU_STR_timeline_CmdListIsntanceBranchName "CmdList%1_%2"
 #define GPU_STR_timeline_CmdBufferInstanceBranchName "CmdBuffer%1_%2"
-#define GPU_STR_timeline_QueueGPUCommandsBranchName "GPU Commands"
+#define GPU_STR_timeline_QueueAPICallsBranchName "API Calls"
 #define GPU_STR_timeline_CmdListsBranchName "Command Lists"
 #define GPU_STR_timeline_CmdBuffersBranchName "Command Buffers"
 #define GPU_STR_timeline_ContextBranchNameWithParam "Queue %1 - %2 (%3)"

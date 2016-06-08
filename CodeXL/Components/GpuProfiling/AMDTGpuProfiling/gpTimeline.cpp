@@ -130,17 +130,15 @@ void gpTimeline::BuildTimeline(gpTraceDataContainer* pDataContainer)
                     // Create the queue root branch and add the API and command lists / buffers branches
                     queueBranches.m_pQueueRootBranch = new acTimelineBranch();
                     queueBranches.m_pQueueRootBranch->setText(queueDisplayName);
-                    queueBranches.m_pQueueRootBranch->SetDrawChildren(true);
 
-                    queueBranches.m_pQueueRootBranch->addSubBranch(queueBranches.m_pQueueCommandListsBranch);
                     queueBranches.m_pQueueRootBranch->addSubBranch(queueBranches.m_pQueueAPIBranch);
+                    queueBranches.m_pQueueRootBranch->addSubBranch(queueBranches.m_pQueueCommandListsBranch);
 
                     m_pGPUTimelineBranch->addSubBranch(queueBranches.m_pQueueRootBranch);
                 }
             }
 
             addBranch(m_pGPUTimelineBranch);
-            m_pGPUTimelineBranch->SetDrawChildren(false);
 
             m_gpuBranchesMap.clear();
         }
@@ -659,7 +657,7 @@ acTimelineBranch* gpTimeline::GetBranchForAPI(osThreadId threadId, const QString
             pRootBranch->SetBGColor(QColor::fromRgb(230, 230, 230));
             m_gpuBranchesMap[queueName].m_pQueueAPIBranch = pRootBranch;
 
-            pRootBranch->setText(GPU_STR_timeline_QueueGPUCommandsBranchName);
+            pRootBranch->setText(GPU_STR_timeline_QueueAPICallsBranchName);
         }
 
         pRetVal = pRootBranch;

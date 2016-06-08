@@ -436,7 +436,7 @@ bool ObjectDatabaseProcessor::GetFrameStorageFullPath(gtString& FrameStorageFold
 
     ModernAPILayerManager* parentLayerManager = GetParentLayerManager();
 
-    smd.frameIndex = parentLayerManager->GetCapturedFrameStartIndex();
+    smd.frameIndex = parentLayerManager->GetFrameCount();
 
     bool bFolderRetrieved = SessionManager::Instance()->GetSessionManagerData(smd);
 
