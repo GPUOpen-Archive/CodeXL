@@ -52,6 +52,8 @@ env.Append (LIBS = [
     "libboost_wave",
     "libboost_system",
     "libboost_thread",
+    "libboost_date_time",
+    "libboost_chrono"
 ])
 
 sources = \

@@ -424,8 +424,10 @@ from distutils.version import StrictVersion
 
 def initStdc(env):
     stdclib_dir = env['CXL_common_dir'] + '/Lib/Ext/libstdc/6.0.16/CentOS64/' 
-    if StrictVersion(env['CXXVERSION']) > StrictVersion('4.7.2'):
+    if StrictVersion(env['CXXVERSION']) > StrictVersion('4.8.2'):
         stdclib_dir = env['CXL_common_dir'] + '/Lib/Ext/libstdc/6.0.20/CentOS64/'
+    elif StrictVersion(env['CXXVERSION']) > StrictVersion('4.7.2'):
+        stdclib_dir = env['CXL_common_dir'] + '/Lib/Ext/libstdc/6.0.19/CentOS64/'
     stdclib_lib = stdclib_dir + env['CXL_arch']
     for file in os.listdir(stdclib_lib):
         copySharedLibrary(env, file, stdclib_lib, env['CXL_lib_dir']) 
