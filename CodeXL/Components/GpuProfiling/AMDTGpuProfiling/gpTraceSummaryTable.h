@@ -140,8 +140,11 @@ class gpSummaryTable : public acListCtrl
 
     Q_OBJECT
 public :
-    gpSummaryTable(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView, eCallType callType, quint64 timelineAbsoluteStart);
+    gpSummaryTable(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView, eCallType callType, quint64 timelineAbsoluteStart); 
     virtual ~gpSummaryTable();
+    
+    virtual bool Init() = 0;
+
     // Save selection in summary table to be restored on tab switch
     // Restores selection
     void RestoreSelection();
@@ -174,6 +177,9 @@ protected:
 
     int m_lastSelectedRowIndex;
     quint64 m_timelineAbsoluteStart;
+
+    /// Determines whether the table handles API or GPU items
+    eCallType m_callType;
 
 private:
     /// Fills table only with calls within the timeline start and end
@@ -210,6 +216,7 @@ public :
     /// class destructor.
     virtual ~gpTraceSummaryTable();
 
+    virtual bool Init();
 
     /// Returns a ProfileSessionDataItem* which belong to the specified call
     ProfileSessionDataItem* GetRelatedItem(int rowIndex, int colIndex);
@@ -220,9 +227,6 @@ public :
 
     /// Returns an item by table row index
     bool GetItemCallIndex(int row, CallIndexId& callIndex, QString& callName)const;
-
-    void Init(eCallType callType, gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView);
-
 
     /// Returns a summary info item by call name
     APISummaryTraceInfo GetSummaryInfo(int apiCall);
@@ -242,19 +246,17 @@ private:
     void CollateAllItemsIntoSummaryMap();
 
     /// Fill map with API calls data
-    void InitAPIItems(gpTraceDataContainer* pDataContainer);
+    bool InitAPIItems();
 
     /// Fill APISummaryInfo with relevant data fromProfileSessionDataItem
     void AddSessionItemToSummaryInfo(APISummaryTraceInfo& info, ProfileSessionDataItem* pItem, unsigned int apiId);
 
     /// Fill map with GPU calls data
-    void InitGPUItems(gpTraceDataContainer* pDataContainer);
+    bool InitGPUItems();
 
     /// free data containers
     void Cleanup();
 
-    /// Determines whether the table handles API or GPU items
-    eCallType m_callType;
 
     /// Map containing UI information for each of the API calls. Each key may have multiple items
     QMap<CallIndexId, ProfileSessionDataItem*> m_allCallItemsMultiMap;
@@ -304,6 +306,8 @@ public:
 
     /// class destructor.
     virtual ~gpCommandListSummaryTable();
+    
+    virtual bool Init();
 
     /// Returns a ProfileSessionDataItem* which belong to the specified call
     ProfileSessionDataItem* GetRelatedItem(int rowIndex, int colIndex);
@@ -330,12 +334,11 @@ protected:
 private:
     /// Fills table only with calls within the timeline start and end
     void BuildSummaryMapInTimelineScope(quint64 min, quint64 max);
-    void InitCommandListItems();
 
     /// Collects calls into given map
     void CollateAllItemsIntoSummaryMap();
 
-    void InitCommandListItems(gpTraceDataContainer* pSessionDataContainer);
+    bool InitCommandListItems();
 
     APISummaryCommandListInfo GetSummaryInfo(const QString& callName);
 
