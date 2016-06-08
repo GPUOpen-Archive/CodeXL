@@ -590,6 +590,18 @@ bool amdtProfileDbAdapter::GetThreadInfo(AMDTUInt32 pid, AMDTThreadId tid, gtVec
     return ret;
 }
 
+bool amdtProfileDbAdapter::GetProcessesWithCallstackSamples(gtVector<AMDTProcessId>& cssProcessVec)
+{
+    bool ret = false;
+
+    if (m_pDbAccessor != nullptr)
+    {
+        ret = m_pDbAccessor->GetProcessesWithCallstackSamples(cssProcessVec);
+    }
+
+    return ret;
+}
+
 bool amdtProfileDbAdapter::GetCounterTotals(AMDTProfileDataType   type,
     AMDTProcessId         procId,
     AMDTThreadId          threadId,
@@ -757,6 +769,18 @@ bool amdtProfileDbAdapter::GetBucketizedSamplesByCounterId(unsigned int bucketWi
     return ret;
 }
 
+bool amdtProfileDbAdapter::GetUnknownCallstackLeafsByProcessId(AMDTProcessId processId, CallstackFrameVec& leafs)
+{
+    bool ret = false;
+
+    if (m_pDbAccessor != nullptr)
+    {
+        ret = m_pDbAccessor->GetUnknownCallstackLeafsByProcessId(processId, leafs);
+    }
+
+    return ret;
+}
+
 bool amdtProfileDbAdapter::GetCallstackLeafData(AMDTProcessId       processId,
                                                 AMDTUInt32          counterId,
                                                 gtUInt32            callStackId,
@@ -795,6 +819,54 @@ bool amdtProfileDbAdapter::GetCallstackIds(AMDTProcessId        processId,
     if (m_pDbAccessor != nullptr)
     {
         ret = m_pDbAccessor->GetCallstackIds(processId, funcId, csIds);
+    }
+
+    return ret;
+}
+
+bool amdtProfileDbAdapter::UpdateCallstackLeaf(const AMDTProfileFunctionInfo& funcInfo)
+{
+    bool ret = false;
+
+    if (m_pDbAccessor != nullptr)
+    {
+        ret = m_pDbAccessor->UpdateCallstackLeaf(funcInfo);
+    }
+
+    return ret;
+}
+
+bool amdtProfileDbAdapter::UpdateCallstackFrame(const AMDTProfileFunctionInfo& funcInfo)
+{
+    bool ret = false;
+
+    if (m_pDbAccessor != nullptr)
+    {
+        ret = m_pDbAccessor->UpdateCallstackFrame(funcInfo);
+    }
+
+    return ret;
+}
+
+bool amdtProfileDbAdapter::InsertFunctionInfo(const AMDTProfileFunctionInfo& funcInfo)
+{
+    bool ret = false;
+
+    if (m_pDbAccessor != nullptr)
+    {
+        ret = m_pDbAccessor->InsertFunctionInfo(funcInfo);
+    }
+
+    return ret;
+}
+
+bool amdtProfileDbAdapter::GetMaxFunctionId(AMDTModuleId moduleId, gtUInt32& maxFuncId)
+{
+    bool ret = false;
+
+    if (m_pDbAccessor != nullptr)
+    {
+        ret = m_pDbAccessor->GetMaxFunctionId(moduleId, maxFuncId);
     }
 
     return ret;

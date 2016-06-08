@@ -850,7 +850,8 @@ void PrdTranslator::AggregateKnownModuleSampleData(
 
         if (nullptr == pExecutable)
         {
-            pExecutable = fnFindExecutableFile(sampInfo.pid, sampInfo.address);
+            pModInfo->pPeFile = fnFindExecutableFile(sampInfo.pid, sampInfo.address);
+            pExecutable = pModInfo->pPeFile;
         }
 
         END_TICK_COUNT(querySymbolEngine);
@@ -872,7 +873,8 @@ void PrdTranslator::AggregateKnownModuleSampleData(
                     const FunctionSymbolInfo* pFuncInfo;
 
                     // LookupFunction will discover both the inlined and non-inlined functions
-                    pFuncInfo = pSymbolEngine->LookupFunction(pExecutable->VaToRva(sampInfo.address), nullptr, true);
+                    gtRVAddr funcRvaEnd;
+                    pFuncInfo = pSymbolEngine->LookupFunction(pExecutable->VaToRva(sampInfo.address), &funcRvaEnd, true);
 
                     if (nullptr != pFuncInfo)
                     {
@@ -888,6 +890,10 @@ void PrdTranslator::AggregateKnownModuleSampleData(
 
                         startAddress += pFuncInfo->m_rva;
                         funcSize = pFuncInfo->m_size;
+
+                        // TODO: Baskar: This requires revisit
+                        funcSize = ((funcSize == 0) && (GT_INVALID_RVADDR != funcRvaEnd)) 
+                                        ? funcRvaEnd - pFuncInfo->m_rva : funcSize;
 
                         pFunc = module.findFunction(startAddress);
 
