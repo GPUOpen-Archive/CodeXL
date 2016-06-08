@@ -120,7 +120,7 @@
       <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
       <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>vulkan-1.dll</DelayLoadDLLs>
-      <AdditionalLibraryDirectories>$(VulkanReqsDir)SDK\win\Bin32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(VulkanReqsDir)SDK\Bin32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -130,7 +130,7 @@
       <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
       <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>vulkan-1.dll</DelayLoadDLLs>
-      <AdditionalLibraryDirectories>$(VulkanReqsDir)SDK\win\Bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(VulkanReqsDir)SDK\Bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -141,7 +141,7 @@
       <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
       <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>vulkan-1.dll</DelayLoadDLLs>
-      <AdditionalLibraryDirectories>$(VulkanReqsDir)SDK\win\Bin32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(VulkanReqsDir)SDK\Bin32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -152,7 +152,7 @@
       <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
       <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>vulkan-1.dll</DelayLoadDLLs>
-      <AdditionalLibraryDirectories>$(VulkanReqsDir)SDK\win\Bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(VulkanReqsDir)SDK\Bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
