@@ -21,6 +21,7 @@
 #include "../TypeToString.h"
 #include "APIEntry.h"
 #include "ThreadTraceData.h"
+#include "CaptureTypes.h"
 
 //-----------------------------------------------------------------------------
 /// A flag used to indicate that multiple sequential frames are being traced.
@@ -81,6 +82,36 @@ void MultithreadedTraceAnalyzerLayer::AfterAPITrace()
 }
 
 
+void MultithreadedTraceAnalyzerLayer::FilterTraceTypes(CaptureType captureType, bool &APITraceFlag, bool &GPUTraceFlag )
+{
+    switch (captureType)
+    {
+    case CaptureType_APITrace:
+        APITraceFlag = true;
+        GPUTraceFlag = false;
+        break;
+
+    case CaptureType_GPUTrace:
+        APITraceFlag = false;
+        GPUTraceFlag = true;
+        break;
+
+    case CaptureType_LinkedTrace:
+        APITraceFlag = true;
+        GPUTraceFlag = true;
+        break;
+
+    case CaptureType_FullFrameCapture:
+        APITraceFlag = false;
+        GPUTraceFlag = false;
+        Log(logERROR, "MultithreadedTraceAnalyzerLayer::BeginFrame - Unsupported: Full Frame Capture %d\n", captureType);
+        return;
+
+    default:
+        Log(logERROR, "MultithreadedTraceAnalyzerLayer::BeginFrame - Unknown capture type %d\n", captureType);
+        return;
+    }
+}
 
 //--------------------------------------------------------------------------
 /// BeginFrame is called when a new frame is started, and should setup the
@@ -103,9 +134,19 @@ void MultithreadedTraceAnalyzerLayer::BeginFrame()
     // Pick up new requests that are active and flip the switch to begin tracing calls.
     bool bLinkedTraceRequested = (mCmdLinkedTrace.IsActive() || bFrameCaptureWithSaveActive) || (autotraceFlags == kTraceType_Linked) || mbLinkedTraceForCapture;
 
+    // Set the two sub flags to be the state of the linkedTrace
+    bool linkedTraceIncludeAPITrace = bLinkedTraceRequested;
+    bool linkedTraceIncludeGPUTrace = bLinkedTraceRequested;
+
+    // If the linked trace has been requested
+    if (bLinkedTraceRequested)
+    {
+        FilterTraceTypes(GetParentLayerManager()->GetCaptureType(), linkedTraceIncludeAPITrace, linkedTraceIncludeGPUTrace);
+    }
+
     // If a linked trace is required, turn on both trace switches.
-    bool bAPITraceNeeded = OnlyAPITraceRequested() || bLinkedTraceRequested || (autotraceFlags & kTraceType_API);
-    bool bGPUTraceNeeded = OnlyGPUTraceRequested() || bLinkedTraceRequested || (autotraceFlags & kTraceType_GPU);
+    bool bAPITraceNeeded = OnlyAPITraceRequested() || linkedTraceIncludeAPITrace || (autotraceFlags & kTraceType_API);
+    bool bGPUTraceNeeded = OnlyGPUTraceRequested() || linkedTraceIncludeGPUTrace || (autotraceFlags & kTraceType_GPU);
 
     mFramestartTime = mFramestartTimer.GetRaw();
 
@@ -118,7 +159,7 @@ void MultithreadedTraceAnalyzerLayer::BeginFrame()
         }
 
         // Set the flag indicating that the frame is being traced. We'll be rendering the next frame when this flag is checked.
-        mLastTracedFrameIndex = GetParentLayerManager()->GetFrameCount();
+        mLastTracedFrameIndex = GetParentLayerManager()->GetCurrentFrameIndex();
 
         // Clear out the previous trace data before tracing the new frame.
         Clear();
@@ -180,6 +221,12 @@ void MultithreadedTraceAnalyzerLayer::EndFrame()
     // If we want a linked trace, we'll need responses from all trace types.
     bool bAPITraceResponseNeeded = OnlyAPITraceRequested() || bLinkedTraceRequested || (autotraceFlags & kTraceType_API);
     bool bGPUTraceResponseNeeded = OnlyGPUTraceRequested() || bLinkedTraceRequested || (autotraceFlags & kTraceType_GPU);
+
+    // If the linked trace has been requested
+    if (bLinkedTraceRequested)
+    {
+        FilterTraceTypes(GetParentLayerManager()->GetCaptureType(), bAPITraceResponseNeeded, bGPUTraceResponseNeeded);
+    }
 
     if (bAPITraceResponseNeeded || bGPUTraceResponseNeeded)
     {
@@ -248,15 +295,14 @@ void MultithreadedTraceAnalyzerLayer::EndFrame()
             {
                 if (bAPITraceResponseNeeded)
                 {
-                    m_apiTraceTXT.Send(apiTraceResponseString.c_str());
+                    HandleAPITraceResponse(apiTraceResponseString);
                 }
                 else if (bGPUTraceResponseNeeded)
                 {
-                    m_cmdGPUTrace.Send(gpuTraceResponseString.c_str());
+                    HandleGPUTraceResponse(gpuTraceResponseString);
                 }
             }
         }
-
     }
 
     // When AutoCapture is enabled, we need to delay rendering so the user has time to retrieve the cached response.
@@ -422,43 +468,7 @@ void MultithreadedTraceAnalyzerLayer::HandleLinkedTraceResponse(gtASCIIString& i
 
     if (parentLayerManager->InCapturePlayer())
     {
-        const std::string& metadataFile = parentLayerManager->GetPathToTargetMetadataFile();
-
-        if (metadataFile.length() > 0)
-        {
-            // Read the metadata file and store the contents in a structure.
-            TraceMetadata traceMetadata;
-            traceMetadata.mFrameInfo = new FrameInfo;
-
-            bool bReadMetadataFileSuccessfully = ReadMetadataFile(metadataFile, &traceMetadata);
-
-            if (bReadMetadataFileSuccessfully)
-            {
-                gtASCIIString traceContents;
-                bool bReadTraceSuccessfully = LoadTraceFile(traceMetadata.mPathToTraceFile, traceContents);
-
-                if (bReadTraceSuccessfully)
-                {
-                    // At this point the full trace response text should be loaded into our string and ready to be sent back to the client.
-                    mCmdLinkedTrace.Send(traceContents.asCharArray());
-                }
-                else
-                {
-                    Log(logERROR, "Failed to read trace file at '%s'.", traceMetadata.mPathToTraceFile.c_str());
-                }
-            }
-            else
-            {
-                Log(logERROR, "Failed to read metadata file at '%s'.", metadataFile.c_str());
-            }
-
-            // Destroy the FrameInfo instance that was created above.
-            SAFE_DELETE(traceMetadata.mFrameInfo);
-        }
-        else
-        {
-            Log(logERROR, "Failed to locate valid path to trace metadata file.");
-        }
+        SendTraceFile(mCmdLinkedTrace);
     }
     else
     {
@@ -503,7 +513,7 @@ void MultithreadedTraceAnalyzerLayer::HandleLinkedTraceResponse(gtASCIIString& i
                 }
                 else
                 {
-                    Log(logMESSAGE, "Successfully traced frame %d.\n", parentLayerManager->GetFrameCount());
+                    Log(logMESSAGE, "Successfully traced frame %d.\n", parentLayerManager->GetCurrentFrameIndex());
                 }
             }
             else
@@ -519,6 +529,95 @@ void MultithreadedTraceAnalyzerLayer::HandleLinkedTraceResponse(gtASCIIString& i
         }
     }
 }
+
+//--------------------------------------------------------------------------
+/// Handle what happens when a API Trace is requested. We can either:
+/// 1. Return the cached trace file
+/// 2. Send live generated data back to the client
+/// \param inFullResponseString Data to send to command response
+//--------------------------------------------------------------------------
+void MultithreadedTraceAnalyzerLayer::HandleAPITraceResponse(std::string& inFullResponseString)
+{
+    ModernAPILayerManager* parentLayerManager = GetParentLayerManager();
+
+    if (parentLayerManager->InCapturePlayer())
+    {
+        SendTraceFile(m_apiTraceTXT);
+    }
+    else
+    {
+        m_apiTraceTXT.Send(inFullResponseString.c_str());
+    }
+}
+
+//--------------------------------------------------------------------------
+/// Send a cached trace file to a specific command response
+/// \param m_cmdResponse Command Response to send the cached trace data to
+//--------------------------------------------------------------------------
+void MultithreadedTraceAnalyzerLayer::SendTraceFile(CommandResponse& m_cmdResponse)
+{
+    ModernAPILayerManager* parentLayerManager = GetParentLayerManager();
+
+    const std::string& metadataFile = parentLayerManager->GetPathToTargetMetadataFile();
+
+    if (metadataFile.length() > 0)
+    {
+        // Read the metadata file and store the contents in a structure.
+        TraceMetadata traceMetadata;
+        traceMetadata.mFrameInfo = new FrameInfo;
+
+        bool bReadMetadataFileSuccessfully = ReadMetadataFile(metadataFile, &traceMetadata);
+
+        if (bReadMetadataFileSuccessfully)
+        {
+            gtASCIIString traceContents;
+            bool bReadTraceSuccessfully = LoadTraceFile(traceMetadata.mPathToTraceFile, traceContents);
+
+            if (bReadTraceSuccessfully)
+            {
+                // At this point the full trace response text should be loaded into our string and ready to be sent back to the client.
+                m_cmdResponse.Send(traceContents.asCharArray());
+            }
+            else
+            {
+                Log(logERROR, "Failed to read trace file at '%s'.", traceMetadata.mPathToTraceFile.c_str());
+            }
+        }
+        else
+        {
+            Log(logERROR, "Failed to read metadata file at '%s'.", metadataFile.c_str());
+        }
+
+        // Destroy the FrameInfo instance that was created above.
+        SAFE_DELETE(traceMetadata.mFrameInfo);
+    }
+    else
+    {
+        Log(logERROR, "Failed to locate valid path to trace metadata file.");
+    }
+
+}
+
+//--------------------------------------------------------------------------
+/// Handle what happens when a GPU Trace is requested. We can either:
+/// 1. Return the cached trace file
+/// 2. Send live generated data back to the client
+/// \param inFullResponseString Data to send to command response
+//--------------------------------------------------------------------------
+void MultithreadedTraceAnalyzerLayer::HandleGPUTraceResponse(std::string& inFullResponseString)
+{
+    ModernAPILayerManager* parentLayerManager = GetParentLayerManager();
+
+    if (parentLayerManager->InCapturePlayer())
+    {
+        SendTraceFile(m_cmdGPUTrace);
+    }
+    else
+    {
+        m_cmdGPUTrace.Send(inFullResponseString.c_str());
+    }
+}
+
 
 //--------------------------------------------------------------------------
 /// Return a string with all of the logged API call data in line-delimited
@@ -831,7 +930,7 @@ bool MultithreadedTraceAnalyzerLayer::WriteTraceAndMetadataFiles(const gtASCIISt
     // Use this object to pass data into and out of the GetSessionManagaerData() method.
     SessionManagerData smd;
 
-    smd.frameIndex = GetParentLayerManager()->GetFrameCount();
+    smd.frameIndex = GetParentLayerManager()->GetCapturedFrameStartIndex();
 
     bool result = SessionManager::Instance()->GetSessionManagerData(smd);
 
@@ -959,7 +1058,7 @@ bool MultithreadedTraceAnalyzerLayer::WriteTraceAndMetadataFiles(const gtASCIISt
     // Subtract the captured frames count from the current frame index.
     // We need to do this even when the captured count is 1 as we actually captured the previous frame and are now at n+1.
     // In cases where the user has captured more than 1 frames we want the frame index to be where the capture started.
-    frameInfo.mFrameNumber -= GetParentLayerManager()->GetCaptureCount();
+    frameInfo.mFrameNumber = GetParentLayerManager()->GetCapturedFrameStartIndex();
 
     // Populate the metadata structure with the values stored in the LayerManager.
     metadataToWrite.mFrameInfo = &frameInfo;
