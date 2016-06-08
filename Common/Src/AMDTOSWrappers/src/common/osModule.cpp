@@ -351,6 +351,7 @@ bool osGetSystemOpenCLModulePath(gtVector<osFilePath>& systemOCLModulePaths)
             systemOCLModulePaths.push_back(systemOCLModulePathStr);
             systemOCLModulePathStr = L"/usr/lib/fglrx/" OS_OPENCL_ICD_MODULE_NAME;
             systemOCLModulePaths.push_back(systemOCLModulePathStr);
+
             systemOCLModulePathStr = L"/usr/lib/x86_64-linux-gnu/amdgpu-pro/" OS_OPENCL_ICD_MODULE_NAME;
             systemOCLModulePaths.push_back(systemOCLModulePathStr);
         }
