@@ -66,7 +66,6 @@ public:
 
     // GL ID:
     GLuint _objectOpenGLName;
-
     int _objectOwnerName;
 
     // CL ID:
@@ -148,6 +147,7 @@ public:
 
     // CL-GL Interop:
     bool m_isAcquired;
+    afTreeItemType m_clObjectCreatedFromGLType;
 
     // Multi variables:
     gtString _multiVariableName;
