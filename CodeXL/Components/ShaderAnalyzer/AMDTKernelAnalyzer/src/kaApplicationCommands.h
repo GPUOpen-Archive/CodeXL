@@ -111,9 +111,6 @@ public:
 
     void SetToolbarBuildOptions(const QString& buildOptions);
 
-    /// Get the output directory based on the filePath
-    osFilePath OutputFilePathForCurrentProject();
-
     /// Create the specific file subdir path based on a supplied filePath
     /// \param in fileNamePath file name path with the file name to base the new output dir on
     /// \param in\output the generated path do add the file name to
@@ -168,8 +165,19 @@ public:
     /// \return pointer to created program
     kaProgram* CreateDefaultProgram(kaProgramTypes programType);
 
+    /// Creates new program name, program itself  and its containing folder
+    /// returns new created program 
+    /// \param programType based on programType  we create corresponding program name
+    kaProgram* CreateProgram(const kaProgramTypes programType) const;
+
+    /// Get the output directory based on the filePath
+    osFilePath OutputFilePathForCurrentProject() const;
 
 private:
+    /// returns chosen program type followed by serial number
+    /// \param currentName program name
+    QString FindDefaultProgramName(const QString& currentName) const;
+
     ///saves given program source files to disk and erases this program previous output files
     void UpdateProgramInputAndOutputFiles(const gtVector<osFilePath>& filePathsVector, kaProgram* pProgram, const bool eraseAll = false);
     /// build non rendering programs
@@ -184,11 +192,6 @@ private:
     /// set the target for the new file by its extension. set the data manager for the current file
     /// \param filePath is the new file path
     void SetNewFileProfile(const osFilePath& filePath, const QString& entryPoint = "");
-
-
-    /// returns chosen program type followed by serial number
-    /// \param currentName program name
-    QString FindDefaultProgramName(const QString& currentName);
 
     /// Erase program related output files. if a file path is supplied then only files related to that file path will be erase
     /// if not all output dir will be erased. Bitness of the program will be used to select right output dir to erase

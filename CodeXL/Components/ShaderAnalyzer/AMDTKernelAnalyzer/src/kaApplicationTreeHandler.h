@@ -114,7 +114,8 @@ public:
     /// Add program to the tree
     /// \param focusNode should the node be focused after it is added
     /// \param pProgram pointer to the created kaProgram object
-    void AddProgram(bool focusNode, kaProgram* pProgram);
+    /// returns new created item data of the new program
+    afApplicationTreeItemData* AddProgram(bool focusNode, kaProgram* pProgram);
 
     /// update the tree based on the data from the project manager:
     void fillTreeFromProjectManager();
@@ -328,6 +329,14 @@ private:
     bool AddFileToProgram(kaProgram* pProgram, afTreeItemType programChildItemType, const int fileID, kaSourceFile* pFile) const;
     ///update items program node to bold
     void UpdateItemProgramNodeToBold(QTreeWidgetItem* pCurrentItem) const;
+    /// Adds files in given vector to program element in the tree
+    /// \param program pointer to the owning program
+    /// \param addedFilePaths collection of file paths to be added
+    /// \param pProgramItemData program item data
+    /// \param destinationItemType item type of destination element in the tree
+    /// \return the filename of the devices file without ext
+    void AddFilesToProgram(const kaProgram* pProgram, const gtVector<osFilePath>& addedFilePaths, 
+                           const afApplicationTreeItemData* pProgramItemData, afTreeItemType destinationItemType);
 
 
 public slots:

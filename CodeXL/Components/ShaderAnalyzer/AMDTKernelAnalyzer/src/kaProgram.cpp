@@ -2,6 +2,9 @@
 // TinyXml:
 #include <tinyxml.h>
 
+//boost
+#include <boost/algorithm/string.hpp>
+
 // Infra:
 #include <AMDTBaseTools/Include/gtAlgorithms.h>
 #include <AMDTApplicationComponents/Include/acFunctions.h>
@@ -586,6 +589,55 @@ gtString kaProgram::GetProgramTypeAsString(kaProgramTypes programType)
     }
 
     return typeText;
+}
+
+bool kaProgram::GetProgramTypeFromFileExtention(const osFilePath& filePath, kaProgramTypes& programType)
+{
+    struct CIComparator
+    {
+        bool operator()(const wstring& rhs, const wstring& lhs) const
+        {
+            return boost::iequals(rhs, lhs);
+        }
+    };
+
+    static  const unordered_map<wstring, kaProgramTypes, hash<wstring>, CIComparator> knownExtentionsMap({
+        { KA_STR_kernelFileExtension, kaProgramTypes::kaProgramCL },
+
+        { KA_WSTR_CommonDXShaderExtension, kaProgramTypes::kaProgramDX },
+        { KA_STR_toolbarDXShaderTypesVS, kaProgramTypes::kaProgramDX },
+        { KA_STR_toolbarDXShaderTypesHS, kaProgramTypes::kaProgramDX },
+        { KA_STR_toolbarDXShaderTypesDS, kaProgramTypes::kaProgramDX },
+        { KA_STR_toolbarDXShaderTypesGS, kaProgramTypes::kaProgramDX },
+        { KA_STR_toolbarDXShaderTypesPS, kaProgramTypes::kaProgramDX },
+        { KA_STR_toolbarDXShaderTypesCS, kaProgramTypes::kaProgramDX },
+    });
+
+    gtString fileExt;
+    filePath.getFileExtension(fileExt);
+    auto itr = knownExtentionsMap.find(fileExt.asCharArray());
+    programType = itr != knownExtentionsMap.end() ? itr->second : kaProgramTypes::kaProgramUnknown;
+
+    return programType != kaProgramTypes::kaProgramUnknown;
+}
+
+bool kaProgram::GetProgramTypeFromFileExtention(const gtVector<osFilePath>& filePaths, kaProgramTypes& programType)
+{
+    programType = kaProgramTypes::kaProgramUnknown;
+    if (filePaths.size() > 0 && kaProgram::GetProgramTypeFromFileExtention(*filePaths.begin(), programType) && filePaths.size() > 1)
+    {
+        //keep checking rest of files and verify that they have same program types
+        for (auto itr = std::next(filePaths.begin()); itr != filePaths.end(); ++itr)
+        {
+            kaProgramTypes programTempType = kaProgramTypes::kaProgramUnknown;
+            if (kaProgram::GetProgramTypeFromFileExtention(*itr, programTempType) == false || programTempType != programType)
+            {
+                programType = kaProgramTypes::kaProgramUnknown;
+                break;
+            }
+        }
+    }
+    return  programType != kaProgramTypes::kaProgramUnknown;
 }
 
 bool kaProgram::GetProgramTypeFromString(const gtString& programTypeAsString, kaProgramTypes& programType)

@@ -3947,50 +3947,78 @@ void kaApplicationTreeHandler::DropOutertemsOnRelevantProgram(const QMimeData* p
                         pDropDestinationItem = pParent;
                     }
                 }
-
-                if (pProgram != nullptr)
+                else if (destinationItemType == AF_TREE_ITEM_KA_NEW_PROGRAM)
                 {
-                    kaProgramTypes programType = pProgram->GetBuildType();
-                    // Check if the destination is a program stage. If not, item type should be calculated according to the parent program
-
-                    bool isProgramStage = (destinationItemType >= AF_TREE_ITEM_KA_FIRST_FILE_ITEM_TYPE) && (destinationItemType <= AF_TREE_ITEM_KA_PROGRAM_GL_VERT);
-
-                    if (!isProgramStage)
+                    kaProgramTypes programType = kaProgramTypes::kaProgramUnknown;
+                    if (kaProgram::GetProgramTypeFromFileExtention(addedFilePaths, programType))
                     {
-                        if (AF_TREE_ITEM_KA_PROGRAM == destinationItemType)
-                        {
-                            if (kaProgramTypes::kaProgramGL_Compute == programType || kaProgramVK_Compute == programType)
-                            {
-                                destinationItemType = AF_TREE_ITEM_KA_PROGRAM_GL_COMP;
-                            }
-                            else if (kaProgramDX == programType || kaProgramCL == programType)
-                            {
-                                destinationItemType = AF_TREE_ITEM_KA_PROGRAM_SHADER;
+                        pProgram = kaApplicationCommands::instance().CreateProgram(programType);
 
-                            }
+                        GT_IF_WITH_ASSERT(pProgram != nullptr)
+                        {
+                            pProgramItemData = AddProgram(true, pProgram);
+                            destinationItemType = AF_TREE_ITEM_KA_ADD_FILE;
+                            KA_PROJECT_DATA_MGR_INSTANCE.AddProgram(pProgram);
                         }
                     }
-
-                    if (isProgramStage || (!isProgramStage && (kaProgramDX == programType || kaProgramCL == programType)))
+                    else
                     {
-                        for (const osFilePath& it : addedFilePaths)
-                        {
-                            // Add the file node to the program branch
-                            if (!pProgram->HasFile(it, AF_TREE_ITEM_ITEM_NONE))
-                            {
-                                AddFileNodeToProgramBranch(it, pProgramItemData, destinationItemType);
-                                if (!IsAddingMultipleFilesToProgramBranchAllowed(pProgramItemData))
-                                {
-                                    break;
-                                }
-                            }
-                        }
+                        OnNewProgram();
+                    }
+                }
+
+                AddFilesToProgram(pProgram, addedFilePaths, pProgramItemData, destinationItemType);
+            }
+        }
+    }
+}
+
+void kaApplicationTreeHandler::AddFilesToProgram(const kaProgram* pProgram, const gtVector<osFilePath>& addedFilePaths,
+                                                 const afApplicationTreeItemData* pProgramItemData,
+                                                 afTreeItemType destinationItemType)
+{
+
+    if (pProgram != nullptr)
+    {
+        kaProgramTypes programType = pProgram->GetBuildType();
+        // Check if the destination is a program stage. If not, item type should be calculated according to the parent program
+
+        bool isProgramStage = (destinationItemType >= AF_TREE_ITEM_KA_FIRST_FILE_ITEM_TYPE) && (destinationItemType <= AF_TREE_ITEM_KA_PROGRAM_GL_VERT);
+
+        if (!isProgramStage)
+        {
+            if (AF_TREE_ITEM_KA_PROGRAM == destinationItemType)
+            {
+                if (kaProgramTypes::kaProgramGL_Compute == programType || kaProgramVK_Compute == programType)
+                {
+                    destinationItemType = AF_TREE_ITEM_KA_PROGRAM_GL_COMP;
+                }
+                else if (kaProgramDX == programType || kaProgramCL == programType)
+                {
+                    destinationItemType = AF_TREE_ITEM_KA_PROGRAM_SHADER;
+
+                }
+            }
+        }
+
+        if (isProgramStage || (!isProgramStage && (kaProgramDX == programType || kaProgramCL == programType)))
+        {
+            for (const osFilePath& it : addedFilePaths)
+            {
+                // Add the file node to the program branch
+                if (!pProgram->HasFile(it, AF_TREE_ITEM_ITEM_NONE))
+                {
+                    AddFileNodeToProgramBranch(it, pProgramItemData, destinationItemType);
+                    if (!IsAddingMultipleFilesToProgramBranchAllowed(pProgramItemData))
+                    {
+                        break;
                     }
                 }
             }
         }
     }
 }
+
 
 void kaApplicationTreeHandler::ExecuteDropForDraggedTreeItem(const QMimeData* pMimeData, QDropEvent* pEvent)
 {
@@ -5882,8 +5910,9 @@ void kaApplicationTreeHandler::OnNewProgram()
     }
 }
 
-void kaApplicationTreeHandler::AddProgram(bool focusNode, kaProgram* pProgram)
+afApplicationTreeItemData* kaApplicationTreeHandler::AddProgram(bool focusNode, kaProgram* pProgram)
 {
+    afApplicationTreeItemData* pItemData = nullptr;
     // Sanity check:
     GT_IF_WITH_ASSERT(m_pApplicationTree != nullptr)
     {
@@ -5892,7 +5921,7 @@ void kaApplicationTreeHandler::AddProgram(bool focusNode, kaProgram* pProgram)
             m_pApplicationTree->blockSignals(true);
 
             // Add the item to the tree:
-            afApplicationTreeItemData* pItemData = new afApplicationTreeItemData;
+            pItemData = new afApplicationTreeItemData;
             pItemData->m_itemType = AF_TREE_ITEM_KA_PROGRAM;
             pItemData->m_isItemRemovable = false;
             // extension data is needed even empty so the search will work correctly:
@@ -5968,6 +5997,7 @@ void kaApplicationTreeHandler::AddProgram(bool focusNode, kaProgram* pProgram)
             m_pApplicationTree->blockSignals(false);
         }
     }
+    return pItemData;
 }
 
 bool kaApplicationTreeHandler::IsItemDroppable(QTreeWidgetItem* pDestinationItem)
