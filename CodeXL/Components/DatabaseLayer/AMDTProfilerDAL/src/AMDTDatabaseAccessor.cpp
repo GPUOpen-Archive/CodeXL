@@ -101,7 +101,7 @@ const std::vector<std::string> SQL_CREATE_DB_STMTS_TIMELINE =
 const std::vector<std::string> SQL_CREATE_DB_STMTS_AGGREGATION =
 {
     "CREATE TABLE Core (id INTEGER NOT NULL PRIMARY KEY, processorId INTEGER, numaNodeId INTEGER)",
-    "CREATE TABLE SamplingCounter (id INTEGER NOT NULL PRIMARY KEY, name TEXT, description TEXT)",
+    "CREATE TABLE SamplingCounter (id INTEGER NOT NULL PRIMARY KEY, name TEXT, abbrev TEXT, description TEXT)",
     "CREATE TABLE SamplingConfiguration (id INTEGER PRIMARY KEY, counterId INTEGER, samplingInterval INTEGER, unitMask INTEGER, isUserMode INTEGER, isOsMode INTEGER, edge INTEGER)",
     "CREATE TABLE CoreSamplingConfiguration (id INTEGER PRIMARY KEY, coreId INTEGER, samplingConfigurationId INTEGER)", // FOREIGN KEY(samplingConfigurationId) REFERENCES SamplingConfiguration(id), FOREIGN KEY(coreId) REFERENCES Core(id)
     "CREATE TABLE Process (id INTEGER NOT NULL PRIMARY KEY, name TEXT, is32Bit INTEGER, hasCSS INTEGER)",
@@ -391,7 +391,7 @@ public:
     {
         bool ret = false;
 
-        const char* pCsSqlCmd = "INSERT INTO SamplingCounter(id, name, description) VALUES(?, ?, ?);";
+        const char* pCsSqlCmd = "INSERT INTO SamplingCounter(id, name, abbrev, description) VALUES(?, ?, ?, ?);";
         int rc = sqlite3_prepare_v2(m_pWriteDbConn, pCsSqlCmd, -1, &m_pSamplingCounterInsertStmt, nullptr);
         ret = (rc == SQLITE_OK);
 
@@ -1337,13 +1337,17 @@ public:
         return ret;
     }
 
-    bool InsertSamplingCounter(gtUInt32 eventId, const std::string& nameAsUtf8Str, const std::string& descriptionAsUtf8Str)
+    bool InsertSamplingCounter(gtUInt32 eventId,
+                               const std::string& nameAsUtf8Str,
+                               const std::string& abbrevAsUtf8Str,
+                               const std::string& descriptionAsUtf8Str)
     {
         bool ret = false;
 
         sqlite3_bind_int(m_pSamplingCounterInsertStmt, 1, eventId);
         sqlite3_bind_text(m_pSamplingCounterInsertStmt, 2, nameAsUtf8Str.c_str(), nameAsUtf8Str.size(), nullptr);
-        sqlite3_bind_text(m_pSamplingCounterInsertStmt, 3, descriptionAsUtf8Str.c_str(), descriptionAsUtf8Str.size(), nullptr);
+        sqlite3_bind_text(m_pSamplingCounterInsertStmt, 3, abbrevAsUtf8Str.c_str(), abbrevAsUtf8Str.size(), nullptr);
+        sqlite3_bind_text(m_pSamplingCounterInsertStmt, 4, descriptionAsUtf8Str.c_str(), descriptionAsUtf8Str.size(), nullptr);
 
         if (SQLITE_DONE == sqlite3_step(m_pSamplingCounterInsertStmt))
         {
@@ -2504,16 +2508,12 @@ public:
 
     // TODO: Use a single API for both PP and CP for counter table
     // Note: This is the actual PMC eventId
-    bool GetCounterNameAndDescription(AMDTUInt32 counterId, string& nameStr, string& descStr)
+    bool GetCounterNameAndDescription(AMDTUInt32 counterId, string& nameStr, string& abbrevStr, string& descStr)
     {
-        //SELECT name, description
-        //    FROM SamplingCounter
-        //    WHERE id = ?
-
         bool ret = false;
         sqlite3_stmt* pQueryStmt = nullptr;
 
-        const char* rawQuery = "SELECT name, description    \
+        const char* rawQuery = "SELECT name, abbrev, description    \
                                 FROM SamplingCounter        \
                                 WHERE id = ?;";
 
@@ -2524,15 +2524,18 @@ public:
             sqlite3_bind_int(pQueryStmt, 1, counterId);
 
             const unsigned char* name = nullptr;
+            const unsigned char* abbrev = nullptr;
             const unsigned char* desc = nullptr;
 
             // Execute the query.
             while (sqlite3_step(pQueryStmt) == SQLITE_ROW)
             {
                 name = sqlite3_column_text(pQueryStmt, 0);
-                desc = sqlite3_column_text(pQueryStmt, 1);
+                abbrev = sqlite3_column_text(pQueryStmt, 1);
+                desc = sqlite3_column_text(pQueryStmt, 2);
 
                 nameStr.assign(reinterpret_cast<const char*>(name));
+                abbrevStr.assign(reinterpret_cast<const char*>(abbrev));
                 descStr.assign(reinterpret_cast<const char*>(desc));
             }
 
@@ -2567,6 +2570,7 @@ public:
             {
                 AMDTProfileCounterDesc counterDesc;
                 string name;
+                string abbrev;
                 string desc;
 
                 counterDesc.m_id = sqlite3_column_int(pQueryStmt, 0);
@@ -2576,9 +2580,10 @@ public:
                 counterDesc.m_category = 0;
                 counterDesc.m_deviceId = 0;
 
-                if (GetCounterNameAndDescription(counterDesc.m_hwEventId, name, desc))
+                if (GetCounterNameAndDescription(counterDesc.m_hwEventId, name, abbrev, desc))
                 {
                     counterDesc.m_name.fromUtf8String(name.c_str());
+                    counterDesc.m_abbrev.fromUtf8String(abbrev.c_str());
                     counterDesc.m_description.fromUtf8String(desc.c_str());
                 }
 
@@ -5350,7 +5355,7 @@ bool AmdtDatabaseAccessor::InsertCoreInfo(gtUInt32 coreId, gtUInt32 processor, g
     return ret;
 }
 
-bool AmdtDatabaseAccessor::InsertSamplingCounter(gtUInt32 eventId, gtString name, gtString description)
+bool AmdtDatabaseAccessor::InsertSamplingCounter(gtUInt32 eventId, gtString name, gtString abbrev, gtString description)
 {
     bool ret = false;
 
@@ -5359,10 +5364,13 @@ bool AmdtDatabaseAccessor::InsertSamplingCounter(gtUInt32 eventId, gtString name
         std::string nameAsUtf8Str;
         name.asUtf8(nameAsUtf8Str);
 
+        std::string abbrevAsUtf8Str;
+        abbrev.asUtf8(abbrevAsUtf8Str);
+
         std::string descriptionAsUtf8Str;
         description.asUtf8(descriptionAsUtf8Str);
 
-        ret = m_pImpl->InsertSamplingCounter(eventId, nameAsUtf8Str, descriptionAsUtf8Str);
+        ret = m_pImpl->InsertSamplingCounter(eventId, nameAsUtf8Str, abbrevAsUtf8Str, descriptionAsUtf8Str);
     }
 
     return ret;

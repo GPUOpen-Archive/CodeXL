@@ -184,16 +184,19 @@ void ProfilerDataDBWriter::PackSamplingEvents(const CpuProfileInfo& profileInfo,
         if (IsTimerEvent(eventSel))
         {
             counterDesc.m_name = L"Timer";
+            counterDesc.m_abbrev = L"Timer";
             counterDesc.m_description = L"Timer";
         }
         else if (eventsFileAvbl && eventsFile.FindEventByValue(eventSel, &pCpuEvent))
         {
             counterDesc.m_name = ConvertQtToGTString(pCpuEvent->name);
+            counterDesc.m_abbrev = ConvertQtToGTString(pCpuEvent->abbrev);
             counterDesc.m_description = ConvertQtToGTString(pCpuEvent->description);
         }
         else
         {
             counterDesc.m_name = L"Unknown";
+            counterDesc.m_abbrev = L"Unknown";
             counterDesc.m_description = L"Unknown";
         }
 

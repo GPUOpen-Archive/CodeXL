@@ -95,7 +95,7 @@ public:
     bool InsertSamplingInterval(unsigned samplingIntervalMs, unsigned quantizedTime);
 
     bool InsertCoreInfo(gtUInt32 coreId, gtUInt32 processorId, gtUInt32 numaNodeId);
-    bool InsertSamplingCounter(gtUInt32 eventId, gtString name, gtString description);
+    bool InsertSamplingCounter(gtUInt32 eventId, gtString name, gtString abbrev, gtString description);
     bool InsertSamplingConfig(gtUInt32 id, gtUInt16 counterId, gtUInt64 samplingInterval, gtUInt16 unitMask, bool isUserMode, bool isOsMode, bool edge);
     bool InsertCoreSamplingConfig(gtUInt64 id, gtUInt16 coreId, gtUInt32 samplingConfigId);
     bool InsertProcessInfo(gtUInt64 pid, const gtString& path, bool is32Bit, bool hasCSS);

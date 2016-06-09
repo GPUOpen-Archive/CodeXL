@@ -202,7 +202,7 @@ bool amdtProfileDbAdapter::InsertSamplingEvents(AMDTProfileCounterDescVec& event
 
     for (const auto& event : events)
     {
-        ret = m_pDbAccessor->InsertSamplingCounter(event.m_hwEventId, event.m_name, event.m_description);
+        ret = m_pDbAccessor->InsertSamplingCounter(event.m_hwEventId, event.m_name, event.m_abbrev, event.m_description);
     }
 
     return ret;
