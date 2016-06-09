@@ -201,6 +201,29 @@ void gdDebugApplicationTreeHandler::getTreeItemDatas(QTreeWidgetItem* pTreeItem,
     }
 }
 
+/// -----------------------------------------------------------------------------------------------
+/// \brief Name:        getTreeItemDatas
+/// \brief Description: Finds the matching tree item and get its GD data:
+/// \return void
+/// -----------------------------------------------------------------------------------------------
+gdDebugApplicationTreeData* gdDebugApplicationTreeHandler::FindMatchingTreeItemGDData(const afApplicationTreeItemData& displayedItemId)
+{
+    gdDebugApplicationTreeData* retVal = nullptr;
+
+    afApplicationTreeItemData* pAFItemData = FindMatchingTreeItem(displayedItemId);
+    if (nullptr != pAFItemData)
+    {
+        afTreeDataExtension* pExtData = pAFItemData->extendedItemData();
+        if (nullptr != pExtData)
+        {
+            retVal = qobject_cast<gdDebugApplicationTreeData*>(pExtData);
+            GT_ASSERT(nullptr != retVal);
+        }
+    }
+
+    return retVal;
+}
+
 // ---------------------------------------------------------------------------
 // Name:        gdDebugApplicationTreeHandler::ItemHasChildren
 // Description:
@@ -954,7 +977,7 @@ bool gdDebugApplicationTreeHandler::updateApplicationOpenCLContexts(unsigned int
             gdGetContextNameString(contextId, currentContextName);
 
             apCLContext contextDetails;
-            gaGetOpenCLContextDetails(i,  contextDetails);
+            gaGetOpenCLContextDetails(i, contextDetails);
 
             if (contextDetails.openGLSpyID() > 0)
             {
@@ -981,6 +1004,7 @@ bool gdDebugApplicationTreeHandler::updateApplicationOpenCLContexts(unsigned int
 
             pContextItemData->_contextId = contextId;
             pContextItemData->_isMarkedForDeletion = wasContextDeleted;
+            pContextItemData->_objectOpenGLName = contextDetails.openGLSpyID();
             pContextItemData->_objectOpenCLNameStr = contextDetails.contextName();
             pContextItemData->_referenceCount = contextDetails.referenceCount();
 
@@ -4499,7 +4523,10 @@ bool gdDebugApplicationTreeHandler::buildCLImageObjectData(apContextID contextID
     GLuint renderBufferName = textureDetails.openGLRenderBufferName();
 
     // Set the OpenGL interop name:
-    pTextureItemData->_objectOpenGLName = (textureName > 0) ? textureName : renderBufferName;
+    bool isCreatedFromTexture = (0 < textureName);
+    bool isCreatedFromRenderBuffer = (0 < renderBufferName);
+    pTextureItemData->m_clObjectCreatedFromGLType = (isCreatedFromTexture ? AF_TREE_ITEM_GL_TEXTURE : (isCreatedFromRenderBuffer ? AF_TREE_ITEM_GL_RENDER_BUFFER : AF_TREE_ITEM_ITEM_NONE));
+    pTextureItemData->_objectOpenGLName =           (isCreatedFromTexture ? textureName             : (isCreatedFromRenderBuffer ? renderBufferName              : 0                     ));
 
     // Get the texture data format as oaTexelDataFormat:
     oaTexelDataFormat dataFormat = OA_TEXEL_FORMAT_UNKNOWN;
@@ -4778,7 +4805,10 @@ bool gdDebugApplicationTreeHandler::buildCLBufferObjectData(apContextID contextI
     pBufferItemData->_memoryFlags = bufferDetails.memoryFlags();
 
     // Set the buffer GL details:
-    pBufferItemData->_objectOpenGLName = bufferDetails.openGLBufferName();
+    GLuint vboName = bufferDetails.openGLBufferName();
+    bool isCreatedFromGLBuffer = (0 < vboName);
+    pBufferItemData->m_clObjectCreatedFromGLType = isCreatedFromGLBuffer ? AF_TREE_ITEM_GL_VBO : AF_TREE_ITEM_ITEM_NONE;
+    pBufferItemData->_objectOpenGLName =           isCreatedFromGLBuffer ? vboName             : 0                     ;
 
     imageIndex = m_clBufferIconIndex;
 
@@ -5419,11 +5449,73 @@ bool gdDebugApplicationTreeHandler::activateItem(QTreeWidgetItem* pItemToActivat
             }
             break;
 
-            case AF_TREE_ITEM_GL_TEXTURE:
-            case AF_TREE_ITEM_GL_VBO:
             case AF_TREE_ITEM_CL_IMAGE:
             case AF_TREE_ITEM_CL_BUFFER:
             case AF_TREE_ITEM_CL_SUB_BUFFER:
+            {
+                if (nullptr == m_pActivatedItemData->m_pOriginalItemTreeItem)
+                {
+                    gdDebugApplicationTreeData* pActivatedGDData = qobject_cast<gdDebugApplicationTreeData*>(m_pActivatedItemData->extendedItemData());
+                    GT_IF_WITH_ASSERT(pActivatedGDData != NULL)
+                    {
+                        // If this is an interop object:
+                        if (0 != pActivatedGDData->_objectOpenGLName)
+                        {
+                            // Get the tree item for the appropriate object. First, get the OpenGL context Id:
+                            afApplicationTreeItemData clContextItemId;
+                            gdDebugApplicationTreeData clContextItemGDId;
+                            clContextItemId.m_itemType = AF_TREE_ITEM_CL_CONTEXT;
+                            clContextItemId.setExtendedData(&clContextItemGDId);
+                            clContextItemGDId._contextId = pActivatedGDData->_contextId;
+                            gdDebugApplicationTreeData* pCLContextData = FindMatchingTreeItemGDData(clContextItemId);
+                            GT_IF_WITH_ASSERT(nullptr != pCLContextData)
+                            {
+                                // Now get the referenced object:
+                                afApplicationTreeItemData glObjectItemId;
+                                gdDebugApplicationTreeData glObjectItemGDId;
+                                glObjectItemId.m_itemType = pActivatedGDData->m_clObjectCreatedFromGLType;
+                                glObjectItemId.setExtendedData(&glObjectItemGDId);
+                                glObjectItemGDId._contextId._contextType = AP_OPENGL_CONTEXT;
+                                glObjectItemGDId._contextId._contextId = pCLContextData->_objectOpenGLName;
+                                glObjectItemGDId._objectOpenGLName = pActivatedGDData->_objectOpenGLName;
+
+                                afApplicationTreeItemData* pGLObjectData = FindMatchingTreeItem(glObjectItemId);
+                                GT_IF_WITH_ASSERT(nullptr != pGLObjectData)
+                                {
+                                    // Save its tree item ID:
+                                    m_pActivatedItemData->m_pOriginalItemTreeItem = pGLObjectData->m_pTreeWidgetItem;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // Just denote this is not an interop object by looping it back to itself:
+                            m_pActivatedItemData->m_pOriginalItemTreeItem = pItemToActivate;
+                        }
+                    }
+                }
+
+                // If we are trying to open an OpenCL-OpenGL object from the OpenCL API (which is not supported),
+                // we should instead look for the OpenGL counterpart:
+                if ((nullptr != m_pActivatedItemData->m_pOriginalItemTreeItem) && (pItemToActivate != m_pActivatedItemData->m_pOriginalItemTreeItem))
+                {
+                    // Get that item's data:
+                    afApplicationTreeItemData* pOriginalItemData = getTreeItemData(m_pActivatedItemData->m_pOriginalItemTreeItem);
+                    GT_IF_WITH_ASSERT(nullptr != pOriginalItemData)
+                    {
+                        // If this succeeds, don't open the activated item:
+                        bool rcOpenOrigianlObject = openImageBufferObject(pOriginalItemData);
+                        GT_IF_WITH_ASSERT(rcOpenOrigianlObject)
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                // Not an OpenGL item, fall through to the next case:
+            }
+            case AF_TREE_ITEM_GL_TEXTURE:
+            case AF_TREE_ITEM_GL_VBO:
             case AF_TREE_ITEM_GL_STATIC_BUFFER:
             case AF_TREE_ITEM_GL_RENDER_BUFFER:
             case AF_TREE_ITEM_GL_TEXTURES_NODE:

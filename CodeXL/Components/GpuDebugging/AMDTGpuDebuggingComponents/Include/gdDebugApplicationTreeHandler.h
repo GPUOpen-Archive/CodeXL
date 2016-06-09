@@ -94,6 +94,7 @@ public:
     // Tree functionality:
     afApplicationTreeItemData* getTreeItemData(QTreeWidgetItem* pTreeItem) const;
     void getTreeItemDatas(QTreeWidgetItem* pTreeItem, afApplicationTreeItemData*& pItemData, gdDebugApplicationTreeData*& pGDItemData) const;
+    gdDebugApplicationTreeData* FindMatchingTreeItemGDData(const afApplicationTreeItemData& displayedItemId);
     QString GetTreeItemText(const QTreeWidgetItem* pItem) const;
     bool treeItemHasChildren(QTreeWidgetItem* pTreeItem) const;
     int getTreeChildrenCount(QTreeWidgetItem* pTreeItem, bool recursively) const;
