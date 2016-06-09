@@ -280,6 +280,7 @@ CodeXL/Help/CodeXL User Guide/webhelp/
 *.pyc
 .sconsign.dblite
 /CodeXL/variant_release
+/CodeXL/variant_debug
 /CodeXL/Components/GpuProfiling/Backend/CodeXLGpuProfiler
 /CodeXL/Components/GpuProfiling/**/*.a
 /Common/Src/**/*.so
