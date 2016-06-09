@@ -224,6 +224,7 @@ public:
                            AMDTSampleValueVec&    sampleValueVec);
 
     bool GetProcessSummaryData(AMDTProcessId               processId,
+                               AMDTModuleId                moduleId,
                                gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
                                AMDTUInt64                  coreMask,
                                bool                        separateByCore,

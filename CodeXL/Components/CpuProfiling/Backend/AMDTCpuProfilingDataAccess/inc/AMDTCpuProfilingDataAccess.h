@@ -96,7 +96,7 @@ public:
     bool GetFunctionSummary(AMDTUInt32 counterId, AMDTProfileDataVec& funcSummaryData);
 
     // Process/Module/Funtion View APIs
-    bool GetProcessProfileData(AMDTProcessId procId, AMDTProfileDataVec& processProfileData);
+    bool GetProcessProfileData(AMDTProcessId procId, AMDTModuleId modId, AMDTProfileDataVec& processProfileData);
     bool GetModuleProfileData(AMDTProcessId procId, AMDTModuleId modId, AMDTProfileDataVec& moduleProfileData);
     bool GetFunctionProfileData(AMDTProcessId procId, AMDTModuleId modId, AMDTProfileDataVec& funcProfileData);
 

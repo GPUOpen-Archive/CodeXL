@@ -1492,9 +1492,9 @@ public:
         return ret;
     }
 
-    bool GetProcessProfileData(AMDTProcessId procId, AMDTProfileDataVec& processProfileData)
+    bool GetProcessProfileData(AMDTProcessId procId, AMDTModuleId modId, AMDTProfileDataVec& processProfileData)
     {
-        return GetSummaryData(AMDT_PROFILE_DATA_PROCESS, procId, AMDT_PROFILE_ALL_MODULES, processProfileData);
+        return GetSummaryData(AMDT_PROFILE_DATA_PROCESS, procId, modId, processProfileData);
     }
 
     bool GetModuleProfileData(AMDTProcessId procId, AMDTModuleId modId, AMDTProfileDataVec& moduleProfileData)
@@ -2737,13 +2737,13 @@ bool cxlProfileDataReader::GetFunctionSummary(AMDTUInt32 counterId, AMDTProfileD
 }
 
 // Process/Module/Funtion View APIs
-bool cxlProfileDataReader::GetProcessProfileData(AMDTProcessId procId, AMDTProfileDataVec& processProfileData)
+bool cxlProfileDataReader::GetProcessProfileData(AMDTProcessId procId, AMDTModuleId modId, AMDTProfileDataVec& processProfileData)
 {
     bool ret = false;
 
     if (nullptr != m_pImpl)
     {
-        ret = m_pImpl->GetProcessProfileData(procId, processProfileData);
+        ret = m_pImpl->GetProcessProfileData(procId, modId, processProfileData);
     }
 
     return ret;
