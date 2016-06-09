@@ -3824,38 +3824,6 @@ bool kaApplicationTreeHandler::ExecuteDropEvent(QDropEvent* pEvent, const QStrin
         {
             if (pMimeData->hasUrls())
             {
-                // Dropped element is a file item dragged from the outside of the application.
-                // Add the file to the tree
-                QList<QUrl> urlList = pMimeData->urls();
-
-                if (urlList.size() >= 1)
-                {
-                    retVal = true;
-
-                    for (int i = 0; i < urlList.size() && i < 32; ++i)
-                    {
-                        QString currentFile = urlList.at(i).toLocalFile();
-                        osFilePath clFilePath(acQStringToGTString(currentFile));
-
-                        // Add the file to the tree:
-                        kaSourceFile* pCurrentFile = KA_PROJECT_DATA_MGR_INSTANCE.dataFileByPath(clFilePath);
-
-                        if (pCurrentFile == nullptr)
-                        {
-                            kaApplicationCommands::instance().AddSourceFile(clFilePath);
-                        }
-
-                    }
-                }
-
-                // Save the project (so that the file is saved in this project):
-                afApplicationCommands::instance()->OnFileSaveProject();
-
-                if (!isProjectLoaded)
-                {
-                    afApplicationCommands::instance()->OnFileOpenProject(afProjectManager::instance().currentProjectFilePath().asString());
-                }
-
                 DropOutertemsOnRelevantProgram(pMimeData, pEvent);
             }
             else if (pMimeData->hasFormat("text/plain"))
@@ -4008,13 +3976,23 @@ void kaApplicationTreeHandler::AddFilesToProgram(const kaProgram* pProgram, cons
                 // Add the file node to the program branch
                 if (!pProgram->HasFile(it, AF_TREE_ITEM_ITEM_NONE))
                 {
+
+                    kaSourceFile* pCurrentFile = KA_PROJECT_DATA_MGR_INSTANCE.dataFileByPath(it);
+                    if (pCurrentFile == nullptr)
+                    {
+                        kaApplicationCommands::instance().AddSourceFile(it);
+                    }
+
                     AddFileNodeToProgramBranch(it, pProgramItemData, destinationItemType);
                     if (!IsAddingMultipleFilesToProgramBranchAllowed(pProgramItemData))
                     {
                         break;
                     }
                 }
-            }
+            }//for
+
+             // Save the project (so that the file is saved in this project):
+            afApplicationCommands::instance()->OnFileSaveProject();
         }
     }
 }
