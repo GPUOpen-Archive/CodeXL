@@ -423,8 +423,10 @@ def UseGtk(env):
 from distutils.version import StrictVersion
 
 def initStdc(env):
-    stdclib_dir = env['CXL_common_dir'] + '/Lib/Ext/libstdc/6.0.16/CentOS64/' 
-    if StrictVersion(env['CXXVERSION']) > StrictVersion('4.8.2'):
+    stdclib_dir = env['CXL_common_dir'] + '/Lib/Ext/libstdc/6.0.16/CentOS64/'
+    if StrictVersion(env['CXXVERSION']) > StrictVersion('5.0.0'):
+        stdclib_dir = env['CXL_common_dir'] + '/Lib/Ext/libstdc/6.0.21/CentOS64/'
+    elif StrictVersion(env['CXXVERSION']) > StrictVersion('4.8.2'):
         stdclib_dir = env['CXL_common_dir'] + '/Lib/Ext/libstdc/6.0.20/CentOS64/'
     elif StrictVersion(env['CXXVERSION']) > StrictVersion('4.7.2'):
         stdclib_dir = env['CXL_common_dir'] + '/Lib/Ext/libstdc/6.0.19/CentOS64/'
@@ -580,6 +582,10 @@ def UseBoost (env):
         amdboost_dir = amdboost_dir + 'lib/RHEL6/x86_64/'
     else:
         amdboost_dir = amdboost_dir + 'lib/RHEL6/x86/'
+
+    compiler_base_flags = ' -Wno-deprecated-declarations '
+
+    env.Append(CPPFLAGS = compiler_base_flags)
 
     env.Append(LIBPATH = [amdboost_dir])
     
