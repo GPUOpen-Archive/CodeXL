@@ -677,6 +677,7 @@ bool amdtProfileDbAdapter::GetProfileData(
         {
             case AMDT_PROFILE_DATA_PROCESS:
                 ret = m_pDbAccessor->GetProcessSummaryData(processId,
+                                                           moduleId,
                                                            counterIdList,
                                                            coreMask,
                                                            separateByCore,

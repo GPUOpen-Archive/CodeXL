@@ -3756,6 +3756,7 @@ public:
     //
     bool GetProcessSummaryData(
         AMDTProcessId               processId,
+        AMDTModuleId                moduleId,
         gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
         AMDTUInt64                  coreMask,
         bool                        separateByCore,
@@ -3786,13 +3787,20 @@ public:
         {
             gtString partQuery;
 
-            if (IS_PROCESS_QUERY(processId))
+            if (IS_PROCESS_MODULE_QUERY(processId, moduleId))
+            {
+                partQuery.appendFormattedString(L" WHERE processId = %d AND moduleId = %d ", processId, moduleId);
+            }
+            else if (IS_PROCESS_QUERY(processId))
             {
                 partQuery.appendFormattedString(L" WHERE processId = %d ", processId);
             }
+            else if (IS_MODULE_QUERY(moduleId))
+            {
+                partQuery.appendFormattedString(L" WHERE moduleId = %d ", moduleId);
+            }
 
             query << partQuery.asASCIICharArray();
-
             query << " GROUP BY processID ";
 
             if (doSort)
@@ -5916,6 +5924,7 @@ bool AmdtDatabaseAccessor::GetThreadInfo(AMDTUInt32 pid, gtUInt32 tid, gtVector<
 
 bool AmdtDatabaseAccessor::GetProcessSummaryData(
     AMDTProcessId               processId,
+    AMDTModuleId                moduleId,
     gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
     AMDTUInt64                  coreMask,
     bool                        separateByCore,
@@ -5928,6 +5937,7 @@ bool AmdtDatabaseAccessor::GetProcessSummaryData(
     if (m_pImpl != nullptr)
     {
         ret = m_pImpl->GetProcessSummaryData(processId,
+                                             moduleId,
                                              counterIdsList,
                                              coreMask,
                                              separateByCore,
