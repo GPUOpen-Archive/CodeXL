@@ -143,6 +143,7 @@ struct AMDTProfileCounterDesc
     AMDTUInt32              m_deviceId;
 
     gtString                m_name;
+    gtString                m_abbrev;
     gtString                m_description;
     AMDTUInt32              m_type;         // AMDTProfileCounterType
     AMDTUInt32              m_category;     // UNUSED for CPU Profiler. For Power profiler it is Power/Frequency/Temperature

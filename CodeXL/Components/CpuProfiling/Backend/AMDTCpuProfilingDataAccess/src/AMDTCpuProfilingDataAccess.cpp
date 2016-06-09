@@ -495,6 +495,7 @@ public:
                     counterDesc.m_unit = AMDT_PROFILE_COUNTER_UNIT_PERCENT;
 
                     counterDesc.m_name = ConvertQtToGTString(columnArray[i].title);
+                    counterDesc.m_abbrev = ConvertQtToGTString(columnArray[i].title);
                     counterDesc.m_description = counterDesc.m_name; // FIXME
 
                     m_computedCounterDescVec.push_back(counterDesc);
