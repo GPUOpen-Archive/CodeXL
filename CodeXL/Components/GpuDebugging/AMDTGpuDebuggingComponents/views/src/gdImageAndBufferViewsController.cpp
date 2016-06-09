@@ -1204,7 +1204,7 @@ void gdImageAndBufferViewsController::onSaveImageAs(afApplicationTreeItemData* p
             gtVector<apFileType> fileTypesVector;
 
             // Check if this is a texture:
-            bool isTexture = ((pViewerItem->m_itemType == AF_TREE_ITEM_GL_TEXTURE) || (pViewerItem->m_itemType == AF_TREE_ITEM_CL_IMAGE));
+            bool isTexture = afApplicationTreeItemData::isItemImage(pViewerItem->m_itemType);
 
             bool isTiffImageTextureType = ((pGDViewerItem->_textureType == AP_3D_TEXTURE) || (pGDViewerItem->_textureType == AP_1D_ARRAY_TEXTURE) || (pGDViewerItem->_textureType == AP_2D_ARRAY_TEXTURE));
             // If item is a 3D texture, we only allow TIFF file saving as it's the only format that have multi-layers
