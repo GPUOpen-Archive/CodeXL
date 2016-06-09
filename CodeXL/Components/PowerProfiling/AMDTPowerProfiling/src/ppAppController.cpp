@@ -764,6 +764,9 @@ ppSessionTreeNodeData* ppAppController::CreateSession(const gtString& profileTyp
     isValidApplicationInfo.workingFolderPath = projectSettings.workDirectory().asString();
     isValidApplicationInfo.appFilePath = projectSettings.executablePath().asString();
     isValidApplicationInfo.isRemoteSession = projectSettings.isRemoteTarget();
+
+    ProfileSessionScope profileScope = SharedProfileSettingPage::Instance()->CurrentSharedProfileSettings().m_profileScope;
+
     osPortAddress portAddress;
     if (isValidApplicationInfo.isRemoteSession)
     {
@@ -771,10 +774,13 @@ ppSessionTreeNodeData* ppAppController::CreateSession(const gtString& profileTyp
       isValidApplicationInfo.portAddress = &portAddress;
 
     }
-    ::IsApplicationPathsValid(isValidApplicationInfo, isAppValid, isWorkingFolderValid);
+    if (profileScope != PM_PROFILE_SCOPE_SYS_WIDE)
+    {
+        ::IsApplicationPathsValid(isValidApplicationInfo, isAppValid, isWorkingFolderValid);
+    }
 
 
-    GT_IF_WITH_ASSERT(isAppValid && isWorkingFolderValid)
+    GT_IF_WITH_ASSERT((profileScope == PM_PROFILE_SCOPE_SYS_WIDE) || (isAppValid && isWorkingFolderValid))
     {
         gtString projectName = projectSettings.projectName();
         gtString projectDir = afProjectManager::instance().currentProjectFilePath().fileDirectoryAsString();
@@ -845,13 +851,13 @@ ppSessionTreeNodeData* ppAppController::CreateSession(const gtString& profileTyp
                 pRetVal->m_exeFullPath = acGTStringToQString(projectSettings.windowsStoreAppUserModelID());
             }
     
-            pRetVal->m_profileScope = SharedProfileSettingPage::Instance()->CurrentSharedProfileSettings().m_profileScope;
+            pRetVal->m_profileScope = profileScope;
     
             if (pRetVal->m_profileScope == PM_PROFILE_SCOPE_SINGLE_EXE)
             {
                 // Single exe scope is not supported for this profile type:
-                pRetVal->m_profileScope = PM_PROFILE_SCOPE_SYS_WIDE;
-                SharedProfileSettingPage::Instance()->CurrentSharedProfileSettings().m_profileScope = PM_PROFILE_SCOPE_SYS_WIDE;
+                pRetVal->m_profileScope = PM_PROFILE_SCOPE_SYS_WIDE_FOCUS_ON_EXE;
+                SharedProfileSettingPage::Instance()->CurrentSharedProfileSettings().m_profileScope = PM_PROFILE_SCOPE_SYS_WIDE_FOCUS_ON_EXE;
     
             }
     
