@@ -590,12 +590,10 @@ bool HSAGPAProfiler::WriteSessionResult(const SessionInfo& sessionInfo)
 
     for (gpa_uint32 sample = 0; sample < sampleCount; sample++)
     {
-        // TODO: add call to write kernel stats here
-
         gpa_uint32 nEnabledCounters = 0;
         m_gpaUtils.GetGPALoader().GPA_GetEnabledCount(&nEnabledCounters);
 
-        for (gpa_uint32 counter = 0 ; counter < nEnabledCounters ; counter++)
+        for (gpa_uint32 counter = 0; counter < nEnabledCounters; counter++)
         {
             gpa_uint32 enabledCounterIndex;
 
