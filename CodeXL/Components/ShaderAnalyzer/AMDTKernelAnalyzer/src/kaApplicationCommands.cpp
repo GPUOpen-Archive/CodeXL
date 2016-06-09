@@ -422,7 +422,7 @@ bool kaApplicationCommands::isOpenCL2Build() const
 }
 
 // ---------------------------------------------------------------------------
-osFilePath kaApplicationCommands::OutputFilePathForCurrentProject()
+osFilePath kaApplicationCommands::OutputFilePathForCurrentProject() const
 {
     // create the directory that will contain the output files and update the project manager data:
     const afProjectManager& projectManager = afProjectManager::instance();
@@ -886,22 +886,7 @@ kaProgram* kaApplicationCommands::CreateDefaultProgram(kaProgramTypes programTyp
 
     if (programType != -1)
     {
-        // Get the current file path:
-        osFilePath programPath = OutputFilePathForCurrentProject();
-        // Look for the next free name
-        QString programTypesTitles = acGTStringToQString(KA_STR_programTypesTitles);
-        QStringList typesTitlesList = programTypesTitles.split(",");
-        gtString programName = acQStringToGTString(FindDefaultProgramName(typesTitlesList[programType]));
-        programPath.appendSubDirectory(programName);
-        osDirectory programDir(programPath);
-
-        // if directory not exists - create it
-        if (!programDir.exists())
-        {
-            programDir.create();
-        }
-
-        pProgram = kaProgramFactory::Create(programType, programName);
+        pProgram = CreateProgram(programType);
 
         GT_IF_WITH_ASSERT(pProgram != nullptr)
         {
@@ -917,7 +902,26 @@ kaProgram* kaApplicationCommands::CreateDefaultProgram(kaProgramTypes programTyp
     return pProgram;
 }
 
+kaProgram* kaApplicationCommands::CreateProgram(const kaProgramTypes programType) const
+{
+    // Get the current file path:
+    osFilePath programPath = OutputFilePathForCurrentProject();
+    // Look for the next free name
+    QString programTypesTitles = acGTStringToQString(KA_STR_programTypesTitles);
+    QStringList typesTitlesList = programTypesTitles.split(",");
+    gtString programName = acQStringToGTString(FindDefaultProgramName(typesTitlesList[programType]));
+    programPath.appendSubDirectory(programName);
+    osDirectory programDir(programPath);
 
+    // if directory not exists - create it
+    if (!programDir.exists())
+    {
+        programDir.create();
+    }
+    kaProgram* pProgram = kaProgramFactory::Create(programType, programName);
+
+    return pProgram;
+}
 // ---------------------------------------------------------------------------
 void kaApplicationCommands::CreateDefaultKernelFile(const osFilePath& selectedNewFile, QString& fileExt, QString filePlatform)
 {
@@ -1506,7 +1510,7 @@ void kaApplicationCommands::SetNewFileProfile(const osFilePath& filePath, const 
     }
 }
 
-QString kaApplicationCommands::FindDefaultProgramName(const QString& currentName)
+QString kaApplicationCommands::FindDefaultProgramName(const QString& currentName) const
 {
     osFilePath programPath = OutputFilePathForCurrentProject();
     QString tmpName = currentName + "%1";

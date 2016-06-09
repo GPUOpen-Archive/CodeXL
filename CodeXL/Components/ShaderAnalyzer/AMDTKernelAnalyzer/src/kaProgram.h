@@ -92,6 +92,19 @@ public:
     /// \return true for success
     static bool GetProgramTypeFromString(const gtString& programTypeAsString, kaProgramTypes& programType);
 
+    /// Get the enumeration for the program type from the file path extensions
+    /// \param the file path
+    /// \param the program type as kaProgramTypes
+    /// \return true for success
+    static bool GetProgramTypeFromFileExtention(const osFilePath& filePath, kaProgramTypes& programType);
+
+    /// Get the enumeration for the program type from the file paths extensions, 
+    /// if files have  different program types result would be program type unknown
+    /// \param the file paths
+    /// \param the program type as kaProgramTypes
+    /// \return true for if all files have same program type extensions
+    static bool GetProgramTypeFromFileExtention(const gtVector<osFilePath>& filePaths, kaProgramTypes& programType);
+
     /// Get the files vector
     const gtVector<int>& GetFileIDsVector() const { return m_fileIDsVector; };
 
