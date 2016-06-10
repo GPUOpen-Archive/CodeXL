@@ -663,6 +663,7 @@ bool amdtProfileDbAdapter::GetProfileData(
     AMDTThreadId                threadId,
     gtVector<AMDTUInt32>        counterIdList,
     AMDTUInt64                  coreMask,
+    bool                        ignoreSystemModules,
     bool                        separateByCore,
     bool                        separateByProcess,  // for function summary
     bool                        doSort,
@@ -692,6 +693,7 @@ bool amdtProfileDbAdapter::GetProfileData(
                                                           moduleId,
                                                           counterIdList,
                                                           coreMask,
+                                                          ignoreSystemModules,
                                                           separateByCore,
                                                           doSort,
                                                           count,
@@ -715,6 +717,7 @@ bool amdtProfileDbAdapter::GetProfileData(
                                                             moduleId,
                                                             counterIdList,
                                                             coreMask,
+                                                            ignoreSystemModules,
                                                             separateByCore,
                                                             separateByProcess,
                                                             doSort,

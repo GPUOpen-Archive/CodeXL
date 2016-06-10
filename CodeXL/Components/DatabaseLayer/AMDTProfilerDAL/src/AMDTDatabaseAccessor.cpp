@@ -3516,7 +3516,7 @@ public:
                             FROM SampleContext                                  \
                             INNER JOIN ProcessThread ON processThreadId = ProcessThread.id       \
                             INNER JOIN ModuleInstance ON moduleInstanceId = ModuleInstance.id    \
-                            INNER JOIN Module ON ModuleInstance.moduleID = Module.id             \
+                            INNER JOIN Module ON ModuleInstance.moduleId = Module.id             \
                             GROUP BY threadId, moduleId, SampleContext.coreSamplingConfigurationId;";
 
         int rc = sqlite3_prepare_v2(m_pReadDbConn, viewCreateQuery.str().c_str(), -1, &pViewCreateStmt, nullptr);
@@ -3607,12 +3607,14 @@ public:
                             SELECT  ProcessThread.processId,                    \
                                     ProcessThread.threadId,                     \
                                     ModuleInstance.moduleId,                    \
+                                    Module.isSystemModule,                      \
                                     SampleContext.functionId,                   \
                                     SampleContext.coreSamplingConfigurationId,  \
                                     sum(count) as sampleCount                   \
                             FROM SampleContext                                  \
                             INNER JOIN ProcessThread ON processThreadId = ProcessThread.id       \
                             INNER JOIN ModuleInstance ON moduleInstanceId = ModuleInstance.id    \
+                            INNER JOIN Module ON ModuleInstance.moduleId = Module.id             \
                             GROUP BY threadId, functionId, SampleContext.coreSamplingConfigurationId;";
 
         int rc = sqlite3_prepare_v2(m_pReadDbConn, viewCreateQuery.str().c_str(), -1, &pViewCreateStmt, nullptr);
@@ -3634,6 +3636,7 @@ public:
                                   SELECT SampleFunctionSummaryData.processId,       \
                                          SampleFunctionSummaryData.threadId,        \
                                          SampleFunctionSummaryData.moduleId,        \
+                                         SampleFunctionSummaryData.isSystemModule,  \
                                          SampleFunctionSummaryData.functionId,";
 
             std::stringstream partialQuery;
@@ -3866,6 +3869,7 @@ public:
         AMDTProcessId               processId,           // for a given process or for all processes
         gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
         AMDTUInt64                  coreMask,
+        bool                        ignoreSystemModules,
         bool                        separateByCore,
         bool                        doSort,
         size_t                      count,
@@ -3893,18 +3897,27 @@ public:
         if (ret)
         {
             gtString partQuery;
+            bool hasWhereClause = false;
 
             if (IS_PROCESS_MODULE_QUERY(processId, moduleId))
             {
                 partQuery.appendFormattedString(L" WHERE processId = %d AND moduleId = %d ", processId, moduleId);
+                hasWhereClause = true;
             }
             else if (IS_PROCESS_QUERY(processId))
             {
                 partQuery.appendFormattedString(L" WHERE processId = %d ", processId);
+                hasWhereClause = true;
             }
             else if (IS_MODULE_QUERY(moduleId))
             {
                 partQuery.appendFormattedString(L" WHERE moduleId = %d ", moduleId);
+                hasWhereClause = true;
+            }
+
+            if (ignoreSystemModules)
+            {
+                partQuery.append(hasWhereClause ? L" AND isSystemModule = 0 " : L" WHERE isSystemModule = 0 ");
             }
 
             query << partQuery.asASCIICharArray();
@@ -4446,6 +4459,7 @@ public:
         AMDTModuleId                moduleId,
         gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
         AMDTUInt64                  coreMask,
+        bool                        ignoreSystemModules,
         bool                        separateByCore,
         bool                        separateByProcess,
         bool                        doSort,
@@ -4459,6 +4473,7 @@ public:
                                        moduleId,
                                        counterIdsList,
                                        coreMask,
+                                       ignoreSystemModules,
                                        separateByCore,
                                        separateByProcess,
                                        doSort,
@@ -4475,6 +4490,7 @@ public:
         AMDTModuleId                moduleId,
         gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
         AMDTUInt64                  coreMask,
+        bool                        ignoreSystemModules,
         bool                        separateByCore,
         bool                        separateByProcess,
         bool                        doSort,
@@ -4511,30 +4527,42 @@ public:
         if (ret)
         {
             gtString partQuery;
+            bool hasWhereClause = false;
 
             if (IS_PROCESS_THREAD_QUERY(processId, threadId) && IS_MODULE_QUERY(moduleId))
             {
                 partQuery.appendFormattedString(L" WHERE processId = %d AND threadId = %d AND moduleID = %d ", processId, threadId, moduleId);
+                hasWhereClause = true;
             }
             else if (IS_PROCESS_THREAD_QUERY(processId, threadId))
             {
                 partQuery.appendFormattedString(L" WHERE processId = %d AND threadId = %d ", processId, threadId);
+                hasWhereClause = true;
             }
             else if (IS_PROCESS_MODULE_QUERY(processId, moduleId))
             {
                 partQuery.appendFormattedString(L" WHERE processId = %d AND moduleId = %d ", processId, moduleId);
+                hasWhereClause = true;
             }
             else if (IS_PROCESS_QUERY(processId))
             {
                 partQuery.appendFormattedString(L" WHERE processId = %d ", processId);
+                hasWhereClause = true;
             }
             else if (IS_THREAD_QUERY(threadId))
             {
                 partQuery.appendFormattedString(L" WHERE threadId = %d ", threadId);
+                hasWhereClause = true;
             }
             else if (IS_MODULE_QUERY(moduleId))
             {
                 partQuery.appendFormattedString(L" WHERE moduleId = %d ", moduleId);
+                hasWhereClause = true;
+            }
+
+            if (ignoreSystemModules)
+            {
+                partQuery.append(hasWhereClause ? L" AND isSystemModule = 0 " : L" WHERE isSystemModule = 0 ");
             }
 
             query << partQuery.asASCIICharArray();
@@ -5954,6 +5982,7 @@ bool AmdtDatabaseAccessor::GetModuleSummaryData(
     AMDTModuleId                moduleId,
     gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
     AMDTUInt64                  coreMask,
+    bool                        ignoreSystemModules,
     bool                        separateByCore,
     bool                        doSort,
     size_t                      count,
@@ -5967,6 +5996,7 @@ bool AmdtDatabaseAccessor::GetModuleSummaryData(
                                             processId,
                                             counterIdsList,
                                             coreMask,
+                                            ignoreSystemModules,
                                             separateByCore,
                                             doSort,
                                             count,
@@ -6009,6 +6039,7 @@ bool AmdtDatabaseAccessor::GetFunctionSummaryData(
     AMDTModuleId                moduleId,
     gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
     AMDTUInt64                  coreMask,
+    bool                        ignoreSystemModules,
     bool                        separateByCore,
     bool                        separateByProcess,
     bool                        doSort,
@@ -6024,6 +6055,7 @@ bool AmdtDatabaseAccessor::GetFunctionSummaryData(
                                               moduleId,
                                               counterIdsList,
                                               coreMask,
+                                              ignoreSystemModules,
                                               separateByCore,
                                               separateByProcess,
                                               doSort,
