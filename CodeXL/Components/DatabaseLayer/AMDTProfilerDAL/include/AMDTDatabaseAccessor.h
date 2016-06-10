@@ -236,6 +236,7 @@ public:
                               AMDTModuleId                moduleId,
                               gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
                               AMDTUInt64                  coreMask,
+                              bool                        ignoreSystemModules,
                               bool                        separateByCore,
                               bool                        doSort,
                               size_t                      count,
@@ -255,6 +256,7 @@ public:
                                 AMDTModuleId                moduleId,
                                 gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
                                 AMDTUInt64                  coreMask,
+                                bool                        ignoreSystemModules,
                                 bool                        separateByCore,
                                 bool                        separateByProcess,
                                 bool                        doSort,

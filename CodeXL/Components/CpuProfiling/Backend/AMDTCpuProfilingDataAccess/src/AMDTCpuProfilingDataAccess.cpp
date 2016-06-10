@@ -990,6 +990,7 @@ public:
                                                AMDT_PROFILE_ALL_THREADS,
                                                counterIdList,
                                                m_options.m_coreMask,
+                                               m_options.m_ignoreSystemModules,
                                                m_options.m_isSeperateByCore,
                                                false,  // separateByProcess
                                                m_options.m_doSort,
@@ -1476,6 +1477,7 @@ public:
                                                       AMDT_PROFILE_ALL_THREADS,
                                                       countersList,
                                                       m_options.m_coreMask,
+                                                      m_options.m_ignoreSystemModules,
                                                       m_options.m_isSeperateByCore,
                                                       false,  // separateByProcess
                                                       m_options.m_doSort,
@@ -1908,7 +1910,7 @@ public:
         auto cssPid = std::find_if(cssProcesses.begin(), cssProcesses.end(),
             [&pid](AMDTProcessId const& aData) { return aData == pid; });
 
-        ret = (cssPid != m_cssProcesses.end()) ? true : false;
+        ret = (cssPid != cssProcesses.end()) ? true : false;
 
         return ret;
     }
