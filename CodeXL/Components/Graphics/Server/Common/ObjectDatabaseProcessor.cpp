@@ -106,6 +106,12 @@ void ObjectDatabaseProcessor::EndFrame()
 {
     ModernAPILayerManager* parentLayerManager = GetParentLayerManager();
 
+    if (parentLayerManager == nullptr)
+    {
+        Log(logERROR, "ObjectDatabaseProcessor::EndFrame - parentLayerManager is NULL\n");
+        return;
+    }
+
     // The frame is over. Don't track any new object instance creation again until we've started a new frame.
     WrappedObjectDatabase* objectDatabase = GetObjectDatabase();
     objectDatabase->TrackObjectLifetime(false);
@@ -305,6 +311,12 @@ void ObjectDatabaseProcessor::EndFrame()
 void ObjectDatabaseProcessor::HandleObjInfoResponse()
 {
     ModernAPILayerManager* parentLayerManager = GetParentLayerManager();
+
+    if (parentLayerManager == nullptr)
+    {
+        Log(logERROR, "ObjectDatabaseProcessor::HandleObjInfoResponse - parentLayerManager is NULL\n");
+        return;
+    }
 
     if (parentLayerManager->InCapturePlayer())
     {
@@ -568,6 +580,12 @@ void ObjectDatabaseProcessor::UpdateSelectedObject()
         vector<void*> applicationHandles;
         ModernAPILayerManager* parentLayerManager = GetParentLayerManager();
 
+        if (parentLayerManager == nullptr)
+        {
+            Log(logERROR, "ObjectDatabaseProcessor::UpdateSelectedObject - parentLayerManager is NULL\n");
+            return;
+        }
+
         if (!appHandleASCIIString.startsWith("NULL") && ParseAddressesString(appHandleASCIIString, applicationHandles))
         {
             if (!parentLayerManager->InCapturePlayer())
@@ -671,6 +689,12 @@ void ObjectDatabaseProcessor::UpdateSelectedObject()
 void ObjectDatabaseProcessor::BuildObjectTreeResponse(gtASCIIString& outObjectTreeXml)
 {
     ModernAPILayerManager* parentLayerManager = GetParentLayerManager();
+
+    if (parentLayerManager == nullptr)
+    {
+        Log(logERROR, "ObjectDatabaseProcessor::BuildObjectTreeResponse - parentLayerManager is NULL\n");
+        return;
+    }
 
     if (!parentLayerManager->InCapturePlayer())
     {
@@ -808,6 +832,12 @@ bool ObjectDatabaseProcessor::LoadObjectDatabase()
 {
     bool bRtn = false;
     ModernAPILayerManager* parentLayerManager = GetParentLayerManager();
+
+    if (parentLayerManager == nullptr)
+    {
+        Log(logERROR, "ObjectDatabaseProcessor::LoadObjectDatabase - parentLayerManager is NULL\n");
+        return bRtn;
+    }
 
     if (mXmlDomObjectDatabase.NoChildren() || parentLayerManager->InCapturePlayer())
     {

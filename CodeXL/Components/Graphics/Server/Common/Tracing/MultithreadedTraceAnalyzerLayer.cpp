@@ -466,6 +466,12 @@ void MultithreadedTraceAnalyzerLayer::HandleLinkedTraceResponse(gtASCIIString& i
 {
     ModernAPILayerManager* parentLayerManager = GetParentLayerManager();
 
+    if (parentLayerManager == nullptr)
+    {
+        Log(logERROR, "MultithreadedTraceAnalyzerLayer::HandleLinkedTraceResponse - parentLayerManager is NULL\n");
+        return;
+    }
+
     if (parentLayerManager->InCapturePlayer())
     {
         SendTraceFile(mCmdLinkedTrace);
@@ -540,6 +546,12 @@ void MultithreadedTraceAnalyzerLayer::HandleAPITraceResponse(std::string& inFull
 {
     ModernAPILayerManager* parentLayerManager = GetParentLayerManager();
 
+    if (parentLayerManager == nullptr)
+    {
+        Log(logERROR, "MultithreadedTraceAnalyzerLayer::HandleAPITraceResponse - parentLayerManager is NULL\n");
+        return;
+    }
+
     if (parentLayerManager->InCapturePlayer())
     {
         SendTraceFile(m_apiTraceTXT);
@@ -607,6 +619,12 @@ void MultithreadedTraceAnalyzerLayer::SendTraceFile(CommandResponse& m_cmdRespon
 void MultithreadedTraceAnalyzerLayer::HandleGPUTraceResponse(std::string& inFullResponseString)
 {
     ModernAPILayerManager* parentLayerManager = GetParentLayerManager();
+
+    if (parentLayerManager == nullptr)
+    {
+        Log(logERROR, "MultithreadedTraceAnalyzerLayer::HandleGPUTraceResponse - parentLayerManager is NULL\n");
+        return;
+    }
 
     if (parentLayerManager->InCapturePlayer())
     {
