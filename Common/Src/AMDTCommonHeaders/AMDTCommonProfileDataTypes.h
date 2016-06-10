@@ -26,6 +26,7 @@
 #define AMDT_PROFILE_ALL_MODULES            AMDT_PROFILE_MAX_VALUE
 #define AMDT_PROFILE_ALL_THREADS            AMDT_PROFILE_MAX_VALUE
 #define AMDT_PROFILE_ALL_COUNTERS           AMDT_PROFILE_MAX_VALUE
+#define AMDT_PROFILE_ALL_FUNCTIONS          AMDT_PROFILE_MAX_VALUE
 #define AMDT_PROFILE_ALL_CORES              AMDT_PROFILE_MAX_VALUE
 #define AMDT_PROFILE_MAX_COUNT              AMDT_PROFILE_MAX_VALUE
 
@@ -294,9 +295,9 @@ struct AMDTProfileFunctionData
 {
     AMDTProfileFunctionInfo         m_functionInfo;
 
-    // TODO: We need to provide the pids and threads list for which this function has samples
-    // AMDTProcessId                   m_pid;
-    // AMDTThreadId                    m_threadId;
+    // This is required for GUI
+    gtVector<AMDTProcessId>         m_pidsList;
+    gtVector<AMDTThreadId>          m_threadsList;
 
     gtUInt64                        m_modBaseAddress;  // TBD: Not Reqduired?
 
@@ -305,6 +306,8 @@ struct AMDTProfileFunctionData
 
     ~AMDTProfileFunctionData()
     {
+        m_pidsList.clear();
+        m_threadsList.clear();
         m_srcLineDataList.clear();
         m_instDataList.clear();
     }

@@ -29,9 +29,11 @@
 #define IS_PROCESS_QUERY(procId_)                       (procId_ != AMDT_PROFILE_ALL_PROCESSES)
 #define IS_MODULE_QUERY(modId_)                         (modId_ != AMDT_PROFILE_ALL_MODULES)
 #define IS_THREAD_QUERY(threadId_)                      (threadId_ != AMDT_PROFILE_ALL_THREADS)
+#define IS_FUNCTION_QUERY(funcId_)                      (funcId_ != AMDT_PROFILE_ALL_FUNCTIONS)
 #define IS_ALL_PROCESS_QUERY(procId_)                   (procId_ == AMDT_PROFILE_ALL_PROCESSES)
 #define IS_ALL_MODULE_QUERY(modId_)                     (modId_ == AMDT_PROFILE_ALL_MODULES)
 #define IS_ALL_THREAD_QUERY(threadId_)                  (threadId_ == AMDT_PROFILE_ALL_THREADS)
+#define IS_ALL_FUNCTION_QUERY(funcId_)                  (funcId_ == AMDT_PROFILE_ALL_FUNCTIONS)
 
 #define IS_COUNTER_CORE_QUERY(counterId_, coreMask_)    (counterId_ != AMDT_PROFILE_ALL_COUNTERS && coreMask_ != AMDT_PROFILE_ALL_CORES)
 #define IS_COUNTER_QUERY(counterId_)                    (counterId_ != AMDT_PROFILE_ALL_COUNTERS)
@@ -4635,6 +4637,64 @@ public:
         return ret;
     }
 
+    // Retrives the list of processes and threads for which the given function-id has samples
+    bool GetProcessAndThreadListForFunction(
+        AMDTFunctionId              funcId,
+        gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
+        AMDTUInt64                  coreMask,
+        gtVector<AMDTProcessId>&    processList,
+        gtVector<AMDTThreadId>&     threadList)
+    {
+        GT_UNREFERENCED_PARAMETER(coreMask);
+        GT_UNREFERENCED_PARAMETER(counterIdsList);
+        bool ret = false;
+
+        if (IS_FUNCTION_QUERY(funcId))
+        {
+            std::stringstream query;
+            sqlite3_stmt* pQueryStmt = nullptr;
+
+            // TODO: Need to use the counterIdsList and coreMask
+            query << "SELECT DISTINCT processId, threadId FROM SampleFunctionSummaryAllData WHERE functionId = ? ;";
+            int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+
+            if (rc == SQLITE_OK)
+            {
+                gtSet<AMDTProcessId> pidUniqueSet;
+                gtSet<AMDTThreadId> tidUniqueSet;
+
+                sqlite3_bind_int(pQueryStmt, 1, funcId);
+
+                // Execute the query.
+                while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
+                {
+                    pidUniqueSet.insert(sqlite3_column_int(pQueryStmt, 0));
+                    tidUniqueSet.insert(sqlite3_column_int(pQueryStmt, 1));
+                }
+
+                for (auto& pid : pidUniqueSet)
+                {
+                    processList.push_back(pid);
+                }
+
+                for (auto& tid : tidUniqueSet)
+                {
+                    threadList.push_back(tid);
+                }
+
+                pidUniqueSet.clear();
+                tidUniqueSet.clear();
+            }
+
+            // Finalize the statement.
+            sqlite3_finalize(pQueryStmt);
+
+            ret = (SQLITE_DONE == rc || SQLITE_ROW == rc) ? true : false;
+        }
+
+        return ret;
+    }
+
     // Supported
     //      process (all processes, given process)
     //      thread (all processes, given process)
@@ -4830,6 +4890,13 @@ public:
             // Drop the view
             ret = DropFunctionDetailedDataView();
         }
+
+        // Get the list of processes and threads for which this function has samples
+        ret = ret && GetProcessAndThreadListForFunction(functionId,
+                                                        counterIdsList,
+                                                        coreMask,
+                                                        functionData.m_pidsList,
+                                                        functionData.m_threadsList);
 
         return ret;
     }
