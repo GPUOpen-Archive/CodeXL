@@ -241,7 +241,7 @@ protected:
     /// \param inFullResponseString The response string built by tracing the application.
     /// \param inbSaveResponseToFile A switch used to determine which response method to use.
     //--------------------------------------------------------------------------
-    void HandleLinkedTraceResponse(gtASCIIString& inFullResponseString, bool inbSaveResponseToFile);
+    void HandleLinkedTraceResponse(const gtASCIIString& inFullResponseString, bool inbSaveResponseToFile);
 
     //--------------------------------------------------------------------------
     /// Handle what happens when a API Trace is requested. We can either:
@@ -249,7 +249,7 @@ protected:
     /// 2. Send live generated data back to the client
     /// \param inFullResponseString Data to send to command response
     //--------------------------------------------------------------------------
-    void HandleAPITraceResponse(std::string& inFullResponseString);
+    void HandleAPITraceResponse(const std::string& inFullResponseString);
 
     //--------------------------------------------------------------------------
     /// Handle what happens when a GPU Trace is requested. We can either:
@@ -257,13 +257,13 @@ protected:
     /// 2. Send live generated data back to the client
     /// \param inFullResponseString Data to send to command response
     //--------------------------------------------------------------------------
-    void HandleGPUTraceResponse(std::string& inFullResponseString);
+    void HandleGPUTraceResponse(const std::string& inFullResponseString);
 
     //--------------------------------------------------------------------------
     /// Send a cached trace file to a specific command response
     /// \param m_cmdResponse Command Response to send the cached trace data to
     //--------------------------------------------------------------------------
-    void SendTraceFile(CommandResponse& m_cmdGPUTrace);
+    void SendTraceFile(CommandResponse& cmdGPUTrace);
 
     //--------------------------------------------------------------------------
     /// Find thread-private trace data to dump logged calls into.
