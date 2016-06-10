@@ -462,7 +462,7 @@ bool MultithreadedTraceAnalyzerLayer::GenerateLinkedTraceHeader(gtASCIIString& o
 /// \param inFullResponseString The response string built by tracing the application.
 /// \param inbSaveResponseToFile A switch used to determine which response method to use.
 //--------------------------------------------------------------------------
-void MultithreadedTraceAnalyzerLayer::HandleLinkedTraceResponse(gtASCIIString& inFullResponseString, bool inbSaveResponseToFile)
+void MultithreadedTraceAnalyzerLayer::HandleLinkedTraceResponse(const gtASCIIString& inFullResponseString, bool inbSaveResponseToFile)
 {
     ModernAPILayerManager* parentLayerManager = GetParentLayerManager();
 
@@ -542,7 +542,7 @@ void MultithreadedTraceAnalyzerLayer::HandleLinkedTraceResponse(gtASCIIString& i
 /// 2. Send live generated data back to the client
 /// \param inFullResponseString Data to send to command response
 //--------------------------------------------------------------------------
-void MultithreadedTraceAnalyzerLayer::HandleAPITraceResponse(std::string& inFullResponseString)
+void MultithreadedTraceAnalyzerLayer::HandleAPITraceResponse(const std::string& inFullResponseString)
 {
     ModernAPILayerManager* parentLayerManager = GetParentLayerManager();
 
@@ -566,7 +566,7 @@ void MultithreadedTraceAnalyzerLayer::HandleAPITraceResponse(std::string& inFull
 /// Send a cached trace file to a specific command response
 /// \param m_cmdResponse Command Response to send the cached trace data to
 //--------------------------------------------------------------------------
-void MultithreadedTraceAnalyzerLayer::SendTraceFile(CommandResponse& m_cmdResponse)
+void MultithreadedTraceAnalyzerLayer::SendTraceFile(CommandResponse& cmdResponse)
 {
     ModernAPILayerManager* parentLayerManager = GetParentLayerManager();
 
@@ -576,7 +576,7 @@ void MultithreadedTraceAnalyzerLayer::SendTraceFile(CommandResponse& m_cmdRespon
     {
         // Read the metadata file and store the contents in a structure.
         TraceMetadata traceMetadata;
-        traceMetadata.mFrameInfo = new FrameInfo;
+        traceMetadata.mFrameInfo = new FrameInfo();
 
         bool bReadMetadataFileSuccessfully = ReadMetadataFile(metadataFile, &traceMetadata);
 
@@ -588,7 +588,7 @@ void MultithreadedTraceAnalyzerLayer::SendTraceFile(CommandResponse& m_cmdRespon
             if (bReadTraceSuccessfully)
             {
                 // At this point the full trace response text should be loaded into our string and ready to be sent back to the client.
-                m_cmdResponse.Send(traceContents.asCharArray());
+                cmdResponse.Send(traceContents.asCharArray());
             }
             else
             {
@@ -607,7 +607,6 @@ void MultithreadedTraceAnalyzerLayer::SendTraceFile(CommandResponse& m_cmdRespon
     {
         Log(logERROR, "Failed to locate valid path to trace metadata file.");
     }
-
 }
 
 //--------------------------------------------------------------------------
@@ -616,7 +615,7 @@ void MultithreadedTraceAnalyzerLayer::SendTraceFile(CommandResponse& m_cmdRespon
 /// 2. Send live generated data back to the client
 /// \param inFullResponseString Data to send to command response
 //--------------------------------------------------------------------------
-void MultithreadedTraceAnalyzerLayer::HandleGPUTraceResponse(std::string& inFullResponseString)
+void MultithreadedTraceAnalyzerLayer::HandleGPUTraceResponse(const std::string& inFullResponseString)
 {
     ModernAPILayerManager* parentLayerManager = GetParentLayerManager();
 
