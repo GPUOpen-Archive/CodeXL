@@ -243,17 +243,16 @@ bool osHTTPClient::requestPage(const gtASCIIString& pageRelativeURL, gtASCIIStri
         }
 
         header1.append("\r\n");
-        gtASCIIString header2 = "User-Agent: amdAgent\r\n";
+        gtASCIIString header2 = "User-Agent: amdAgent\r\n\r\n";
+
+
+        requestString.append(header1);
+        requestString.append(header2);
 
         int stringLength = requestString.length();
         bool rc10 = _tcpClient.write((gtByte*)requestString.asCharArray(), stringLength);
-        stringLength = header1.length();
-        bool rc11 = _tcpClient.write((gtByte*)header1.asCharArray(), stringLength);
-        stringLength = header2.length();
-        bool rc12 = _tcpClient.write((gtByte*)header2.asCharArray(), stringLength);
-        bool rc13 = _tcpClient.write((gtByte*)"\r\n", 2);
 
-        if (rc10 && rc11 && rc12 && rc13)
+        if (rc10)
         {
             if (!isGraphicsServer)
             {
