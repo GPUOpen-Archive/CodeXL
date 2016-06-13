@@ -536,6 +536,9 @@
     <ClCompile Include="src\apHostSourceBreakPoint.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\apExpression.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\apSingeltonsDelete.h">
@@ -1094,6 +1097,9 @@
       <Filter>Events\public inc</Filter>
     </ClInclude>
     <ClInclude Include="Include\apHostSourceBreakPoint.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\apExpression.h">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>

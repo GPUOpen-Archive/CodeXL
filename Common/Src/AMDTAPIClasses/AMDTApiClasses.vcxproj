@@ -169,6 +169,7 @@
     <ClCompile Include="src\apDisplayBuffer.cpp" />
     <ClCompile Include="src\apEnumeratorUsageStatistics.cpp" />
     <ClCompile Include="src\apErrorCode.cpp" />
+    <ClCompile Include="src\apExpression.cpp" />
     <ClCompile Include="src\apFileType.cpp" />
     <ClCompile Include="src\apFunctionCall.cpp" />
     <ClCompile Include="src\apFunctionCallStatistics.cpp" />
@@ -281,6 +282,7 @@
     <ClInclude Include="Include\apCLPipe.h" />
     <ClInclude Include="Include\apCLSubBuffer.h" />
     <ClInclude Include="Include\apDebugProjectSettings.h" />
+    <ClInclude Include="Include\apExpression.h" />
     <ClInclude Include="Include\apGenericBreakpoint.h" />
     <ClInclude Include="Include\apGLComputeShader.h" />
     <ClInclude Include="Include\apGLPipeline.h" />
