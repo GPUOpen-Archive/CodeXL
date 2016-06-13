@@ -198,13 +198,6 @@ void afProgressBarWrapper::hideProgressBar()
 {
     if (IsDlgShown() == true && false == m_isShuttingDown)
     {
-        setProgressText(AF_STR_Ready);
-
-        if (m_pProgressBar != nullptr)
-        {
-            m_pProgressBar->hide();
-        }
-
         if (m_pProgressDlg != nullptr)
         {
             m_dlgLastPos = m_pProgressDlg->geometry();
@@ -235,6 +228,13 @@ void afProgressBarWrapper::hideProgressBar()
             afMainAppWindow::instance()->raise();
         }
     }
+
+    if (m_pProgressBar != nullptr)
+    {
+        m_pProgressBar->hide();
+    }
+
+    setProgressText(AF_STR_Ready);
 }
 
 // ---------------------------------------------------------------------------
