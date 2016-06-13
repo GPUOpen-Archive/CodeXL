@@ -380,7 +380,6 @@ std::string VktTraceAnalyzerLayer::GetGPUTraceTXT()
                     double startTimestamp = pResult->timestampResult.alignedMillisecondTimestamps.start;
                     double endTimestamp = pResult->timestampResult.alignedMillisecondTimestamps.end;
 #endif
-
                     FuncId funcId = (FuncId)pResult->measurementInfo.idInfo.funcId;
 
                     gtASCIIString funcName = GetFunctionNameFromId(funcId);
@@ -452,6 +451,10 @@ std::string VktTraceAnalyzerLayer::GetGPUTraceTXT()
 
         // We'll need to insert the GPU Trace section header before the response data, even if there aren't any results.
         appendString += "//==GPU Trace==";
+        appendString += "\n";
+
+        appendString += "//API=";
+        appendString += GetAPIString();
         appendString += "\n";
 
         appendString += "//CommandBufEventCount=";

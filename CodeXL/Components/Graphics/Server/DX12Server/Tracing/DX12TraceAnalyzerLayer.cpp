@@ -465,6 +465,10 @@ std::string DX12TraceAnalyzerLayer::GetGPUTraceTXT()
         appendString += "//==GPU Trace==";
         appendString += "\n";
 
+        appendString += "//API=";
+        appendString += GetAPIString();
+        appendString += "\n";
+
         appendString += "//CommandListEventCount=";
         appendString += DWORDToString(numResponseLines);
         appendString += "\n";

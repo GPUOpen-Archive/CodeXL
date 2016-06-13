@@ -169,7 +169,7 @@ bool VktFrameDebuggerLayer::HandleFrameBufferRequest(PictureCommandResponse& inI
         const std::string& metadataFilepath = layerManager->GetPathToTargetMetadataFile();
 
         TraceMetadata traceMetadata = {};
-        traceMetadata.mFrameInfo = new FrameInfo;
+        traceMetadata.mFrameInfo = new FrameInfo();
         ReadMetadataFile(metadataFilepath, &traceMetadata);
 
         const std::string& frameBufferImagePath = traceMetadata.mPathToFrameBufferImage;
