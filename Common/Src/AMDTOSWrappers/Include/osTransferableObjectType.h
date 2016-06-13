@@ -236,6 +236,7 @@ enum osTransferableObjectType
     OS_TOBJ_ID_2D_POINT,                        // ap2DPoint.
     OS_TOBJ_ID_2D_RECTANGLE,                    // ap2DRectangle.
     OS_TOBJ_ID_FPS_DISPLAY_ITEM,                // apFPSDisplayItem.
+    OS_TOBJ_ID_EXPRESSION,                      // apExpression
     OS_TOBJ_ID_GL_TEXTURE,                      // apGLTexture.
     OS_TOBJ_ID_GL_TEXTURE_THUMBNAIL_DATA,       // apGLTextureThumbnailData.
     OS_TOBJ_ID_GL_TEXTURE_DATA,                 // apGLTextureData.

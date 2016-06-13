@@ -87,6 +87,7 @@
 #include <AMDTAPIClasses/Include/apApiFunctionsInitializationData.h>
 #include <AMDTAPIClasses/Include/apCounterInfo.h>
 #include <AMDTAPIClasses/Include/apDetectedErrorParameters.h>
+#include <AMDTAPIClasses/Include/apExpression.h>
 #include <AMDTAPIClasses/Include/apFunctionCall.h>
 #include <AMDTAPIClasses/Include/apGLComputeShader.h>
 #include <AMDTAPIClasses/Include/apGLFBO.h>
@@ -617,6 +618,9 @@ bool apiClassesInitFunc()
 
         osTransferableObjectCreator<ap2DRectangle> ap2DRectangleCreator;
         theTransfetableObsCreatorsManager.registerCreator(ap2DRectangleCreator);
+
+        osTransferableObjectCreator<apExpression> apExpressionCreator;
+        theTransfetableObsCreatorsManager.registerCreator(apExpressionCreator);
 
         osTransferableObjectCreator<apGLComputeShader> apGLComputeShaderCreator;
         theTransfetableObsCreatorsManager.registerCreator(apGLComputeShaderCreator);
