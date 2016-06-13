@@ -259,19 +259,7 @@ QString acTimelineItem::getDurationString(quint64 duration)
 
 void acTimelineItem::tooltipItems(acTimelineItemToolTip& tooltip) const
 {
-    int pos = m_strText.indexOf('_');
-
-    if (pos > 0)
-    {
-        // Assuming this is an interface + call
-        QString interfaceStr = m_strText.mid(0, pos);
-        QString callStr = m_strText.mid(pos + 1, m_strText.length() - pos + 1);
-        tooltip.add(QString("%1.%2").arg(interfaceStr).arg(callStr), "");
-    }
-    else
-    {
-        tooltip.add(tr("Name"), m_strText);
-    }
+    tooltip.add(tr("Name"), m_strText);
 
     quint64 timelineStartTime = 0;
 
