@@ -284,6 +284,7 @@ div.clickableRow_text
     line-height:18px;
     white-space:nowrap;
 }
+a {white-space:pre}
 
 
 #content
