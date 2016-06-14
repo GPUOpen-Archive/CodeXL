@@ -2118,11 +2118,16 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
 
     for (gtMap<ProcessIdType, ProcessInfo*>::const_iterator it = m_processInfos.begin(), itEnd = m_processInfos.end(); it != itEnd; ++it)
     {
-        PidProcessMap::iterator p_it = processMap.find(it->first);
+        ProcessInfo* pProcInfo = it->second;
 
-        if (processMap.end() != p_it)
+        if (nullptr != pProcInfo && 0U != pProcInfo->m_callGraph.GetOrder())
         {
-            p_it->second.m_hasCss = true;
+            PidProcessMap::iterator p_it = processMap.find(it->first);
+
+            if (processMap.end() != p_it)
+            {
+                p_it->second.m_hasCss = true;
+            }
         }
     }
 
