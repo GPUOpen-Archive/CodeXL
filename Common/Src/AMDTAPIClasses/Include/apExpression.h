@@ -6,6 +6,11 @@
 ///
 //==================================================================================
 
+//------------------------------ apExpression.h ------------------------------
+
+#ifndef __APEXPRESSION_H
+#define __APEXPRESSION_H
+
 // Forward declarations:
 class osRawMemoryStream;
 
@@ -14,9 +19,10 @@ class osRawMemoryStream;
 #include <AMDTBaseTools/Include/gtPtrVector.h>
 #include <AMDTOSWrappers/Include/osTransferableObject.h>
 
+// Local:
+#include <AMDTAPIClasses/Include/apAPIClassesDLLBuild.h>
 
-//------------------------------ apExpression.h ------------------------------
-struct apExpression : public osTransferableObject
+struct AP_API apExpression : public osTransferableObject
 {
 public:
     apExpression();
@@ -48,5 +54,5 @@ private:
     gtPtrVector<apExpression*> m_children;
 };
 
-
+#endif //__APEXPRESSION_H
 
