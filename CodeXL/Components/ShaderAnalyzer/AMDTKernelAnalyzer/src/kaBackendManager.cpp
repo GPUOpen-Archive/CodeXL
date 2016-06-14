@@ -2142,6 +2142,11 @@ void kaBackendManager::PrepareProgramBuild(kaProgram* pProgram,
 //-------------------------------------------------------------------------------------------------------------
 void kaBackendManager::PrepareProgramBuildInner(kaProgram* pProgram, const BuildType buildType)
 {
+    // Print build prologue.
+    const size_t numOfDevicesToBuild = m_selectedDeviceNamesForPendingBuild.size();
+    const gtString programDisplayName = pProgram->GetProgramDisplayName();
+    PrintBuildPrologue(programDisplayName, numOfDevicesToBuild, false);
+
     // for multiple programs build we add programs into synchronized queue and execute them sequentially in parallel thread
     m_executionWaitingList.push(make_pair(pProgram->Clone(), buildType));
     if (m_executionThread == nullptr)
@@ -2177,14 +2182,9 @@ void kaBackendManager::ExecuteBuildThread(const BuildType buildType, kaProgram* 
 {
     m_pBoost->m_pBuildThread->m_buildType = buildType;
     m_pBoost->m_pBuildThread->m_bitness = m_buildArchitecture;
-    m_pBoost->m_pBuildThread->m_deviceNames = m_selectedDeviceNamesForPendingBuild;
-    size_t numOfDevicesToBuild = m_selectedDeviceNamesForPendingBuild.size();
+    m_pBoost->m_pBuildThread->m_deviceNames = m_selectedDeviceNamesForPendingBuild;   
     m_pBoost->m_pBuildThread->m_shadersPaths.Clear();
     m_isInBuild = true;
-
-    // Print build prologue.
-    gtString programDisplayName = pProgram->GetProgramDisplayName();
-    PrintBuildPrologue(programDisplayName, numOfDevicesToBuild, false);
 
     if (false == m_pBoost->m_pBuildThread->isRunning())
     {
@@ -2309,7 +2309,7 @@ bool  kaBackendManager::PreparedDxAdditionOptions(DXAdditionalBuildOptions& addi
 }
 #endif //AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
 
-void kaBackendManager::PrintBuildPrologue(gtString& programName, size_t numOfDevicesToBuild, bool shouldPrependCR)
+void kaBackendManager::PrintBuildPrologue(const gtString& programName, size_t numOfDevicesToBuild, bool shouldPrependCR)
 {
     gtASCIIString message;
     message.appendFormattedString(KA_STR_BUILD_STARTED, programName.asASCIICharArray(), numOfDevicesToBuild);
