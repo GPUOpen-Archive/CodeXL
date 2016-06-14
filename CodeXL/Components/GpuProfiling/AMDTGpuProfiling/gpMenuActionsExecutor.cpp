@@ -50,7 +50,11 @@ void gpMenuActionsExecutor::populateSupportedCommandIds()
 
 void gpMenuActionsExecutor::initActionIcons()
 {
-
+    // Initialize commands icons
+    initSingleActionIcon(ID_GP_START, AC_ICON_EXECUTION_PLAY);
+    initSingleActionIcon(ID_GP_CAPTURE, AC_ICON_EXECUTION_CAPTURE);
+    initSingleActionIcon(ID_GP_STOP, AC_ICON_EXECUTION_STOP);
+}
 }
 
 bool gpMenuActionsExecutor::actionText(int actionIndex, gtString& caption, gtString& tooltip, gtString& keyboardShortcut)
