@@ -82,6 +82,11 @@ gdGLDebugOutputSettingsDialog::gdGLDebugOutputSettingsDialog(QWidget* pParent)
 
     setWindowTitle(GD_STR_GLDebugOutputTitle);
 
+    Qt::WindowFlags flags = windowFlags();
+    flags &= ~Qt::WindowContextHelpButtonHint;
+    setWindowFlags(flags);
+
+
     // Initial the dialog
     setFrameLayout();
 
