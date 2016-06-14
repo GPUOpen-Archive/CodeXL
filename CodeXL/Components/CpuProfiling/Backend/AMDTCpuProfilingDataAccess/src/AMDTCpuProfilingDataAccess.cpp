@@ -56,6 +56,7 @@ struct ViewConfigInfo
 #define CXL_ROOT_FUNCTION_NAME      L"[ROOT]"
 
 #define GET_PID_COUNTER_ID(id_, pid_, cid_)      id_ = pid_; id_ = id_ << 32 | cid_;
+#define CXL_COMPUTE_PERCENTAGE(val1_, val2_)     (((val1_) > 0.0) && ((val2_) > 0.0)) ? (((val1_) / (val2_)) * 100.0) : 0.0
 
 // Sampling Configuration
 using AMDTCounterIdVec = gtVector<AMDTCounterId>;
@@ -1140,7 +1141,7 @@ public:
                 for (gtUInt32 idx = 0; idx < aSummaryData.m_sampleValue.size(); idx++)
                 {
                     aSummaryData.m_sampleValue[idx].m_sampleCountPercentage =
-                        (aSummaryData.m_sampleValue[idx].m_sampleCount / totalValueVec[idx].m_sampleCount) * 100.0;
+                        CXL_COMPUTE_PERCENTAGE(aSummaryData.m_sampleValue[idx].m_sampleCount, totalValueVec[idx].m_sampleCount);
                 }
             }
         }
@@ -1173,8 +1174,8 @@ public:
             {
                 for (gtUInt32 idx = 0; idx < srcLineData.m_sampleValues.size(); idx++)
                 {
-                    srcLineData.m_sampleValues[idx].m_sampleCountPercentage =
-                        (srcLineData.m_sampleValues[idx].m_sampleCount / totalValueVec[idx].m_sampleCount) * 100.0;
+                    srcLineData.m_sampleValues[idx].m_sampleCountPercentage = 
+                        CXL_COMPUTE_PERCENTAGE(srcLineData.m_sampleValues[idx].m_sampleCount, totalValueVec[idx].m_sampleCount);
                 }
             }
 
@@ -1183,7 +1184,7 @@ public:
                 for (gtUInt32 idx = 0; idx < instLineData.m_sampleValues.size(); idx++)
                 {
                     instLineData.m_sampleValues[idx].m_sampleCountPercentage =
-                        (instLineData.m_sampleValues[idx].m_sampleCount / totalValueVec[idx].m_sampleCount) * 100.0;
+                        CXL_COMPUTE_PERCENTAGE(instLineData.m_sampleValues[idx].m_sampleCount, totalValueVec[idx].m_sampleCount);
                 }
             }
         }
@@ -2223,7 +2224,7 @@ public:
 
         if (cgFunc.m_totalDeepSamples > 0 && totalDeepSamples > 0)
         {
-            cgFunc.m_deepSamplesPerc = (cgFunc.m_totalDeepSamples / (double)(totalDeepSamples)) * 100.0;
+            cgFunc.m_deepSamplesPerc = CXL_COMPUTE_PERCENTAGE(cgFunc.m_totalDeepSamples, (double)(totalDeepSamples));
         }
 
         GetSrcFilePathForFuncId(node.m_funcInfo.m_functionId, cgFunc.m_srcFile, cgFunc.m_srcFileLine);
@@ -2242,7 +2243,7 @@ public:
 
         if (cgFunc.m_totalDeepSamples > 0 && totalDeepSamples > 0)
         {
-            cgFunc.m_deepSamplesPerc = (cgFunc.m_totalDeepSamples / (double)(totalDeepSamples)) * 100.0;
+            cgFunc.m_deepSamplesPerc = CXL_COMPUTE_PERCENTAGE(cgFunc.m_totalDeepSamples, (double)(totalDeepSamples));
         }
 
         GetSrcFilePathForFuncId(edge.m_funcInfo.m_functionId, cgFunc.m_srcFile, cgFunc.m_srcFileLine);
@@ -2265,7 +2266,7 @@ public:
         //  For "[self]" entry the m_deepSamplesPerc denotes the percentage of self samples w.r.t to deep sample of the function
         if (cgFunc.m_totalSelfSamples > 0 && totalDeepSamples > 0)
         {
-            cgFunc.m_deepSamplesPerc = (cgFunc.m_totalSelfSamples / (double)(totalDeepSamples)) * 100.0;
+            cgFunc.m_deepSamplesPerc = CXL_COMPUTE_PERCENTAGE(cgFunc.m_totalSelfSamples, (double)(totalDeepSamples));
         }
 
         GetSrcFilePathForFuncId(node.m_funcInfo.m_functionId, cgFunc.m_srcFile, cgFunc.m_srcFileLine);

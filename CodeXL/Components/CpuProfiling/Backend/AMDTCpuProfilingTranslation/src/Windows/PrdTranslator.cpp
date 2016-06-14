@@ -1953,6 +1953,13 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
                     hr = GetModuleInfoHelper((void*)&ibsFetch, &modInfo, evIBSFetchRecord, proFile);
                     END_TICK_COUNT(findModuleInfo);
 
+                    if (modInstanceMap.end() == modInstanceMap.find(modInfo.instanceId))
+                    {
+                        modInstanceMap.emplace(modInfo.instanceId,
+                                               std::make_tuple(gtString(modInfo.pModulename),
+                                               modInfo.processID, modInfo.ModuleStartAddr));
+                    }
+
                     ProcessIbsFetchRecord(ibsFetch, &modInfo, &processMap, &moduleMap, pidModaddrItrMap, pStats);
 
                     // We only try to finalize a User call-stack if the sampled instruction is in user space.
@@ -2046,6 +2053,16 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
                     BEGIN_TICK_COUNT();
                     hr = GetModuleInfoHelper((void*)&ibsOp, &modInfo, evIBSOpRecord, proFile);
                     END_TICK_COUNT(findModuleInfo);
+
+                    // Baskar: FIXME: This way of constructing modInstanceMap seems ineffective.
+                    // The modInstanceMap can be constructed in AddLoadModules() in wintaskinfo.cpp
+                    // Thus avoid accessing this map for every samples.  
+                    if (modInstanceMap.end() == modInstanceMap.find(modInfo.instanceId))
+                    {
+                        modInstanceMap.emplace(modInfo.instanceId,
+                                               std::make_tuple(gtString(modInfo.pModulename),
+                                               modInfo.processID, modInfo.ModuleStartAddr));
+                    }
 
                     ProcessIbsOpRecord(ibsOp, &modInfo, &processMap,
                                        &moduleMap, pidModaddrItrMap,
