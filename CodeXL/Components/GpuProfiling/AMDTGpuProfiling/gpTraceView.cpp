@@ -643,7 +643,6 @@ void gpTraceView::OnNavigationLayerVisibilityChanged()
 
         if (visibleGroup == 2)
         {
-            afProgressBarWrapper::instance().ShowProgressDialog(GPU_STR_TraceViewLoadingThreadsConcurrency, 3);
             m_pNavigationRibbon->CalculateConcurrency();
         }
 
@@ -652,11 +651,6 @@ void gpTraceView::OnNavigationLayerVisibilityChanged()
         m_pNavigationRibbon->GetCurrentVisibility(visibleGroup, visibleLayersByFlag);
 
         m_pNavigationRibbon->OnLayerVisibilityChanged(visibleGroup, visibleLayersByFlag);
-
-        if (visibleGroup == 2)
-        {
-            afProgressBarWrapper::instance().incrementProgressBar();
-        }
 
         m_pDetailedDataRibbon->OnLayerVisibilityChanged(visibleGroup, visibleLayersByFlag);
 

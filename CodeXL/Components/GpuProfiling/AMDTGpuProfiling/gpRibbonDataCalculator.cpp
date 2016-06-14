@@ -153,6 +153,8 @@ void gpRibbonDataCalculator::CalculateCPUConcurrency()
 {
     if (!m_wasConcurrencyCalculated)
     {
+        afProgressBarWrapper::instance().ShowProgressDialog(GPU_STR_TraceViewLoadingThreadsConcurrency, GP_DEFAULT_BUCKET_NUMBER);
+
         if (m_cpuMaxThreadConcurrency.isEmpty() && m_cpuAverageThreadConcurrency.isEmpty() && m_cpuTotalThreadConcurrency.isEmpty())
         {
             // Each bucket has a vector of thread segment data
@@ -299,9 +301,13 @@ void gpRibbonDataCalculator::CalculateCPUConcurrency()
                     m_cpuMaxThreadConcurrency[nBucket] = maxThreadUsed;
                     m_cpuAverageThreadConcurrency[nBucket] = averageThreads;
                     m_cpuTotalThreadConcurrency[nBucket] = threadsUsed.size();
+
+                    afProgressBarWrapper::instance().incrementProgressBar();
                 }
             }
         }
+
+        afProgressBarWrapper::instance().hideProgressBar();
 
         m_wasConcurrencyCalculated = true;
     }
