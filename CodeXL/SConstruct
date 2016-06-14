@@ -48,6 +48,7 @@ initTinyXml (CXL_env)
 initQScintilla (CXL_env)
 initQCustomPlot (CXL_env)
 initStdc(CXL_env)
+initJava(CXL_env)
 
 # Set the debug/release variant data
 if (CXL_env['CXL_build'] == 'debug'):
@@ -313,8 +314,9 @@ CXL_env.Depends( libProfilingAgentsData_Obj,
 	BaseTools_Obj)
 CpuProfilingPlugins += libProfilingAgentsData_Obj
 
-libJvmtiProfileAgent_Obj = SConscript('Components/CpuProfiling/ProfilingAgents/AMDTJvmtiAgent/SConscript', variant_dir=obj_variant_dir+'/AMDTJvmtiAgent', duplicate=0)
-CpuProfilingPlugins += libJvmtiProfileAgent_Obj
+if (CXL_env['CXL_use_java'] != ''):
+    libJvmtiProfileAgent_Obj = SConscript('Components/CpuProfiling/ProfilingAgents/AMDTJvmtiAgent/SConscript', variant_dir=obj_variant_dir+'/AMDTJvmtiAgent', duplicate=0)
+    CpuProfilingPlugins += libJvmtiProfileAgent_Obj
 
 libCpuProfilingDataAccess_Obj = SConscript('Components/CpuProfiling/Backend/AMDTCpuProfilingRawData/SConscript', variant_dir=obj_variant_dir+'/AMDTCpuProfilingRawData', duplicate=1)
 CXL_env.Depends( libCpuProfilingDataAccess_Obj, 
@@ -380,24 +382,25 @@ CXL_env.Depends( AMDTCpuProfilingCLI_Obj,
 	libThreadProfileAPI_Obj)
 CpuProfilingPlugins += AMDTCpuProfilingCLI_Obj
 
-OverallCpuProf_Obj = SConscript('Components/CpuProfiling/AMDTCpuProfiling/SConscript', variant_dir=obj_variant_dir+'/AMDTCpuProfiling', duplicate=1) 
-CXL_env.Depends(OverallCpuProf_Obj,
-                CXL_env['CXL_CpuEventsData_install']
-                + libCpuCallstackSampling_Obj
-                + libCpuPerfEventUtils_Obj
-                + libCpuProfilingDataAccess_Obj
-                + libCpuProfilingTranslation_Obj
-                + libCpuProfilingControl_Obj
-                + libExecutableFormat_Obj
-                + libDisassembler_Obj
-                + AppFramework_Obj
-                + SharedProf_Obj
-                + AppComponents_Obj
-                + APIClasses_Obj
-                + OSWrappers_Obj
-                + BaseTools_Obj)
+if (CXL_env['CXL_use_java'] != ''):
+    OverallCpuProf_Obj = SConscript('Components/CpuProfiling/AMDTCpuProfiling/SConscript', variant_dir=obj_variant_dir+'/AMDTCpuProfiling', duplicate=1) 
+    CXL_env.Depends(OverallCpuProf_Obj,
+                    CXL_env['CXL_CpuEventsData_install']
+                    + libCpuCallstackSampling_Obj
+                    + libCpuPerfEventUtils_Obj
+                    + libCpuProfilingDataAccess_Obj
+                    + libCpuProfilingTranslation_Obj
+                    + libCpuProfilingControl_Obj
+                    + libExecutableFormat_Obj
+                    + libDisassembler_Obj
+                    + AppFramework_Obj
+                    + SharedProf_Obj
+                    + AppComponents_Obj
+                    + APIClasses_Obj
+                    + OSWrappers_Obj
+                    + BaseTools_Obj)
 
-CpuProfilingPlugins += OverallCpuProf_Obj
+    CpuProfilingPlugins += OverallCpuProf_Obj
 
 # Make CpuProfilingPlugins depending on Framework
 CXL_env.Depends(CpuProfilingPlugins , FrameworkComponents) 
@@ -603,13 +606,14 @@ Alias( target='AMDTCpuProfilingTranslation'   , source=(libCpuProfilingTranslati
 Alias( target='AMDTCpuProfilingControl'   , source=(libCpuProfilingControl_Obj))
 Alias( target='AMDTThreadProfileAPI'   , source=(libThreadProfileAPI_Obj))
 Alias( target='AMDTCpuProfilingCLI'   , source=(AMDTCpuProfilingCLI_Obj))
-Alias( target='AMDTCpuProfiling'   , source=(OverallCpuProf_Obj))
+if (CXL_env['CXL_use_java'] != ''):
+    Alias( target='AMDTCpuProfiling'   , source=(OverallCpuProf_Obj))
+    Alias( target='AMDTJvmtiAgent'   , source=(libJvmtiProfileAgent_Obj))
 Alias( target='AMDTDisassembler'   , source=(libDisassembler_Obj))
 Alias( target='AMDTExecutableFormat'   , source=(libExecutableFormat_Obj))
 Alias( target='AMDTCpuCallstackSampling'   , source=(libCpuCallstackSampling_Obj))
 Alias( target='AMDTCpuPerfEventUtils'   , source=(libCpuPerfEventUtils_Obj))
 Alias( target='AMDTProfilingAgentsData'   , source=(libProfilingAgentsData_Obj))
-Alias( target='AMDTJvmtiAgent'   , source=(libJvmtiProfileAgent_Obj))
 #ProfilerCommon
 Alias( target='AMDTProfilerDAL'   , source=(AMDTProfilerDAL_Obj))
 #PowerProfiling

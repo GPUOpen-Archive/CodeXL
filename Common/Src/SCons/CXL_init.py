@@ -76,6 +76,12 @@ def initCXLVars (CXL_vars) :
         default = '',
         allowed_values = ('true', ''))
 
+def initJava (env) :
+    useJava = os.getenv('JAVA_HOME', '')
+    if (useJava != ''):
+        env.Append (CXL_use_java = useJava)
+    else:
+        env.Append (CXL_use_java = '')
 
 def initArch (env) :
     arch = env['CXL_arch']
