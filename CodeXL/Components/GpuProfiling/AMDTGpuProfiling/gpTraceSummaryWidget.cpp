@@ -37,6 +37,7 @@ void gpTraceSummaryWidget::Init(gpTraceDataContainer* pDataContainer, gpTraceVie
     m_timelineAbsoluteStart = timelineStartTime;
     m_timelineStart = timelineStartTime;
     m_timelineEnd = m_timelineStart + timelineRange;
+    int lastTabIndex = 0;
 
     for (int i = 0; i < eCallType::MAX_TYPE; i++)
     {
@@ -75,6 +76,12 @@ void gpTraceSummaryWidget::Init(gpTraceDataContainer* pDataContainer, gpTraceVie
                 rc = connect(pCmdListTab, SIGNAL(TabSummaryCmdListDoubleClicked(const QString&)), this, SLOT(OnTabSummaryCmdListDoubleClicked(const QString&)));
                 GT_ASSERT(rc);
             }
+            lastTabIndex = i;
+        }
+        else
+        {
+            delete m_tabs[i];
+            m_tabs[i] = nullptr;
         }
 
         afProgressBarWrapper::instance().incrementProgressBar();
@@ -82,12 +89,12 @@ void gpTraceSummaryWidget::Init(gpTraceDataContainer* pDataContainer, gpTraceVie
 
     afProgressBarWrapper::instance().hideProgressBar();
 
-    setCurrentIndex(COMMAND_LIST);
+    setCurrentIndex(lastTabIndex);
 }
 
 void gpTraceSummaryWidget::SelectAPIRowByCallName(const QString& callName)
 {
-    GT_IF_WITH_ASSERT(m_tabs[API_CALL] != nullptr)
+    if (m_tabs[API_CALL] != nullptr)
     {
         gpTraceSummaryTable* pSummaryTable = dynamic_cast<gpTraceSummaryTable*>(m_tabs[API_CALL]->m_pSummaryTable);
         GT_ASSERT(pSummaryTable != nullptr);
@@ -97,7 +104,7 @@ void gpTraceSummaryWidget::SelectAPIRowByCallName(const QString& callName)
 
 void gpTraceSummaryWidget::SelectGPURowByCallName(const QString& callName)
 {
-    GT_IF_WITH_ASSERT(m_tabs[GPU_CALL] != nullptr)
+    if (m_tabs[GPU_CALL] != nullptr)
     {
         gpTraceSummaryTable* pSummaryTable = dynamic_cast<gpTraceSummaryTable*>(m_tabs[GPU_CALL]->m_pSummaryTable);
         GT_ASSERT(pSummaryTable != nullptr);
@@ -107,7 +114,7 @@ void gpTraceSummaryWidget::SelectGPURowByCallName(const QString& callName)
 
 void gpTraceSummaryWidget::ClearAPISelection()
 {
-    GT_IF_WITH_ASSERT(m_tabs[API_CALL] != nullptr)
+    if (m_tabs[API_CALL] != nullptr)
     {
         m_tabs[API_CALL]->m_pSummaryTable->clearSelection();
     }
@@ -115,7 +122,7 @@ void gpTraceSummaryWidget::ClearAPISelection()
 
 void gpTraceSummaryWidget::ClearGPUSelection()
 {
-    GT_IF_WITH_ASSERT(m_tabs[GPU_CALL] != nullptr)
+    if (m_tabs[GPU_CALL] != nullptr)
     {
         m_tabs[GPU_CALL]->m_pSummaryTable->clearSelection();
     }
@@ -146,7 +153,7 @@ void gpTraceSummaryWidget::OnTimelineChanged(const QPointF& rangePoint, bool isR
 
     if (m_useTimelineSelectionScope == true)
     {
-        GT_IF_WITH_ASSERT(m_tabs[activeTabIndex] != nullptr && m_tabs[activeTabIndex])
+        if (m_tabs[activeTabIndex] != nullptr && m_tabs[activeTabIndex])
         {
             m_tabs[activeTabIndex]->RefreshAndMaintainSelection(true);
         }
@@ -156,7 +163,7 @@ void gpTraceSummaryWidget::OnTimelineFilterChanged(QMap<QString, bool>& threadNa
 {
     GT_UNREFERENCED_PARAMETER(threadNameVisibilityMap);
     int activeTabIndex = currentIndex();
-    GT_IF_WITH_ASSERT(m_tabs[activeTabIndex] != nullptr && m_tabs[activeTabIndex])
+    if (m_tabs[activeTabIndex] != nullptr && m_tabs[activeTabIndex])
     {
         m_tabs[activeTabIndex]->OnTimelineFilterChanged();
     }
@@ -201,7 +208,7 @@ void gpTraceSummaryWidget::OnEditCopy()
 
 void gpTraceSummaryWidget::OnCurrentChanged(int activeTabIndex)
 {
-    GT_IF_WITH_ASSERT(m_tabs[activeTabIndex] != nullptr && m_tabs[activeTabIndex])
+    if (m_tabs[activeTabIndex] != nullptr && m_tabs[activeTabIndex])
     {
         m_tabs[activeTabIndex]->SetTimelineScope(m_useTimelineSelectionScope, m_timelineStart, m_timelineEnd);
         m_tabs[activeTabIndex]->RefreshAndMaintainSelection(m_useTimelineSelectionScope);

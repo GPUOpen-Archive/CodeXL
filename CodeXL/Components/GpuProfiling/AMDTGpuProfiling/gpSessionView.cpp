@@ -44,7 +44,7 @@
 // Date:        18/8/2013
 // ---------------------------------------------------------------------------
 gpSessionView::gpSessionView(QWidget* pParent, const osFilePath& sessionPath) : gpBaseSessionView(pParent),
-    m_pSessionData(nullptr), m_pImageLabel(nullptr), m_pSimulateUserCaptureButton(nullptr) , m_pCaptureButton(nullptr),
+    m_pSessionData(nullptr), m_pImageLabel(nullptr), m_pSimulateUserCaptureButton(nullptr) , m_pCaptureButton(nullptr), m_pCaptureButtonCPU(nullptr), m_pCaptureButtonGPU(nullptr),
     m_pStopButton(nullptr), m_pOpenTimelineButton(nullptr), m_pCurrentFrameDetailsLabel(nullptr), m_pCurrentFrameCaptionLabel(nullptr),
     m_pPropsHTMLLabel(nullptr), m_pSnapshotsThumbView(nullptr),
     m_isSessionRunning(false), m_isDisplayingCurrentFrame(false), m_lastCapturedFrameIndex(-1), m_sessionPath(sessionPath)
@@ -70,7 +70,7 @@ gpSessionView::~gpSessionView()
     // Remove me from the list of session windows in the session view creator:
     gpViewsCreator::Instance()->OnWindowClose(this);
 
-    m_pSimulateUserCaptureButton = m_pCaptureButton = m_pStopButton = m_pOpenTimelineButton = nullptr;
+    m_pSimulateUserCaptureButton = m_pCaptureButton = m_pCaptureButtonCPU = m_pCaptureButtonGPU = m_pStopButton = m_pOpenTimelineButton = nullptr;
     m_pImageLabel = m_pCurrentFrameDetailsLabel = m_pCurrentFrameCaptionLabel = m_pPropsHTMLLabel = m_pCapturedFramesCaptionLabel = nullptr;
     m_pSnapshotsThumbView = nullptr;
 
@@ -153,6 +153,21 @@ void gpSessionView::InitLayout()
 
     QString tooltipStr = QString(GPU_STR_dashboard_CaptureTooltip).arg(settings.m_numFramesToCapture);
     m_pCaptureButton->setToolTip(tooltipStr);
+/////////////////// capture buttons
+    m_pCaptureButtonCPU = new QToolButton;
+    m_pCaptureButtonCPU->setText(GPU_STR_dashboard_CaptureButton);
+    m_pCaptureButtonCPU->setStyleSheet(GP_SessionViewButtonStyle);
+
+    QString tooltipStrCPU = QString(GPU_STR_dashboard_CaptureTooltip).arg(settings.m_numFramesToCapture);
+    m_pCaptureButtonCPU->setToolTip(tooltipStrCPU);
+
+    m_pCaptureButtonGPU = new QToolButton;
+    m_pCaptureButtonGPU->setText(GPU_STR_dashboard_CaptureButton);
+    m_pCaptureButtonGPU->setStyleSheet(GP_SessionViewButtonStyle);
+
+    QString tooltipStrGPU = QString(GPU_STR_dashboard_CaptureTooltip).arg(settings.m_numFramesToCapture);
+    m_pCaptureButtonGPU->setToolTip(tooltipStrGPU);
+///////////////////
 
     m_pStopButton = new QToolButton;
     m_pStopButton->setStyleSheet(GP_SessionViewButtonStyle);
@@ -165,6 +180,10 @@ void gpSessionView::InitLayout()
     m_pOpenTimelineButton->setToolTip(GPU_STR_dashboard_OpenTimelineTooltip);
 
     bool rc = connect(m_pCaptureButton, SIGNAL(clicked()), this, SLOT(OnCaptureButtonClick()));
+    GT_ASSERT(rc);
+    rc = connect(m_pCaptureButtonCPU, SIGNAL(clicked()), this, SLOT(OnCaptureCPUButtonClick()));
+    GT_ASSERT(rc);
+    rc = connect(m_pCaptureButtonGPU, SIGNAL(clicked()), this, SLOT(OnCaptureGPUButtonClick()));
     GT_ASSERT(rc);
 
     rc = connect(m_pStopButton, SIGNAL(clicked()), this, SLOT(OnStopButtonClick()));
@@ -182,6 +201,14 @@ void gpSessionView::InitLayout()
     m_pCaptureButton->setIconSize(iconSize);
     m_pCaptureButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     m_pCaptureButton->setFixedWidth(acScalePixelSizeToDisplayDPI(GP_SESSION_VIEW_BUTTON_SIZE));
+    m_pCaptureButtonCPU->setIcon(captureButtonIcon);
+    m_pCaptureButtonCPU->setIconSize(iconSize);
+    m_pCaptureButtonCPU->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_pCaptureButtonCPU->setFixedWidth(acScalePixelSizeToDisplayDPI(GP_SESSION_VIEW_BUTTON_SIZE));
+    m_pCaptureButtonGPU->setIcon(captureButtonIcon);
+    m_pCaptureButtonGPU->setIconSize(iconSize);
+    m_pCaptureButtonGPU->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    m_pCaptureButtonGPU->setFixedWidth(acScalePixelSizeToDisplayDPI(GP_SESSION_VIEW_BUTTON_SIZE));
 
     QPixmap stopButtonIcon;
     acSetIconInPixmap(stopButtonIcon, AC_ICON_EXECUTION_STOP, largerButtonIcon);
@@ -212,6 +239,8 @@ void gpSessionView::InitLayout()
 #endif
 
     pButtonsLayout->addWidget(m_pCaptureButton);
+    pButtonsLayout->addWidget(m_pCaptureButtonCPU);
+    pButtonsLayout->addWidget(m_pCaptureButtonGPU);
     pButtonsLayout->addWidget(m_pStopButton);
     pButtonsLayout->addWidget(m_pOpenTimelineButton);
     pButtonsLayout->addStretch();
@@ -300,7 +329,7 @@ bool gpSessionView::DisplaySession(const osFilePath& sessionFilePath, afTreeItem
     SessionTreeNodeData* pSessionData = ProfileApplicationTreeHandler::instance()->FindSessionDataByProfileFilePath(m_sessionFilePath);
     gpExecutionMode* pModeManager = ProfileManager::Instance()->GetFrameAnalysisModeManager();
     GT_IF_WITH_ASSERT((pModeManager != nullptr) && (pSessionData != nullptr) && (m_pStopButton != nullptr)
-                      && (m_pCurrentFrameCaptionLabel != nullptr) && (m_pCaptureButton != nullptr))
+                      && (m_pCurrentFrameCaptionLabel != nullptr) && (m_pCaptureButton != nullptr)&& (m_pCaptureButtonCPU != nullptr)&& (m_pCaptureButtonGPU != nullptr))
     {
         m_pSessionData = qobject_cast<gpSessionTreeNodeData*>(pSessionData);
         GT_IF_WITH_ASSERT(m_pSessionData != nullptr)
@@ -346,6 +375,8 @@ bool gpSessionView::DisplaySession(const osFilePath& sessionFilePath, afTreeItem
             // Show / hide the stop and capture buttons
             m_pStopButton->setVisible(m_isSessionRunning);
             m_pCaptureButton->setVisible(m_isSessionRunning);
+            m_pCaptureButtonCPU->setVisible(m_isSessionRunning);
+            m_pCaptureButtonGPU->setVisible(m_isSessionRunning);
 
             // If the session is not running, thumbnails should be uploaded from the file system
             if (!m_isSessionRunning)
@@ -369,17 +400,52 @@ void gpSessionView::OnCaptureButtonClick()
     OS_DEBUG_LOG_TRACER;
     afApplicationCommands::instance()->StartPerformancePrintout("Capture");
     // Sanity check
-    GT_IF_WITH_ASSERT(ProfileManager::Instance()->GetFrameAnalysisModeManager() != nullptr)
+    GT_IF_WITH_ASSERT(ProfileManager::Instance()->GetFrameAnalysisModeManager() != nullptr && m_pCaptureButton != nullptr&& m_pCaptureButtonCPU != nullptr&& m_pCaptureButtonGPU != nullptr)
     {
         // Add the captured frame to the tree
-        bool rc = ProfileManager::Instance()->GetFrameAnalysisModeManager()->CaptureFrame();
+        bool rc = ProfileManager::Instance()->GetFrameAnalysisModeManager()->CaptureFrame(gpExecutionMode::FrameAnalysisCaptureType_LinkedTrace);
         GT_ASSERT(rc);
 
         // Disable the capture button until the captured frame is received
         m_pCaptureButton->setEnabled(false);
+        m_pCaptureButtonCPU->setEnabled(false);
+        m_pCaptureButtonGPU->setEnabled(false);
     }
 }
+void gpSessionView::OnCaptureCPUButtonClick()
+{
+    OS_DEBUG_LOG_TRACER;
+    afApplicationCommands::instance()->StartPerformancePrintout("CaptureCPU");
+    // Sanity check
+    GT_IF_WITH_ASSERT(ProfileManager::Instance()->GetFrameAnalysisModeManager() != nullptr && m_pCaptureButton != nullptr&& m_pCaptureButtonCPU != nullptr&& m_pCaptureButtonGPU != nullptr)
+    {
+        // Add the captured frame to the tree
+        bool rc = ProfileManager::Instance()->GetFrameAnalysisModeManager()->CaptureFrame(gpExecutionMode::FrameAnalysisCaptureType_APITrace);
+        GT_ASSERT(rc);
 
+        // Disable the capture button until the captured frame is received
+        m_pCaptureButton->setEnabled(false);
+        m_pCaptureButtonCPU->setEnabled(false);
+        m_pCaptureButtonGPU->setEnabled(false);
+    }
+}
+void gpSessionView::OnCaptureGPUButtonClick()
+{
+    OS_DEBUG_LOG_TRACER;
+    afApplicationCommands::instance()->StartPerformancePrintout("CaptureGPU");
+    // Sanity check
+    GT_IF_WITH_ASSERT(ProfileManager::Instance()->GetFrameAnalysisModeManager() != nullptr && m_pCaptureButton != nullptr&& m_pCaptureButtonCPU != nullptr&& m_pCaptureButtonGPU != nullptr)
+    {
+        // Add the captured frame to the tree
+        bool rc = ProfileManager::Instance()->GetFrameAnalysisModeManager()->CaptureFrame(gpExecutionMode::FrameAnalysisCaptureType_GPUTrace);
+        GT_ASSERT(rc);
+
+        // Disable the capture button until the captured frame is received
+        m_pCaptureButton->setEnabled(false);
+        m_pCaptureButtonCPU->setEnabled(false);
+        m_pCaptureButtonGPU->setEnabled(false);
+    }
+}
 void gpSessionView::OnSimulateCaptureButtonClick()
 {
     OS_DEBUG_LOG_TRACER;
@@ -582,6 +648,8 @@ void gpSessionView::OnCaptureFrameData(int firstFrameIndex, int lastFrameIndex)
         }
 
         m_pCaptureButton->setEnabled(true);
+        m_pCaptureButtonCPU->setEnabled(true);
+        m_pCaptureButtonGPU->setEnabled(true);
 
         // Notify the UI that the capture process had ended
         pExecutionMode->SetIsCapturing(false);
@@ -626,6 +694,8 @@ void gpSessionView::OnApplicationRunEnded(gpSessionTreeNodeData* pRunningSession
         int itemsCount = m_pSnapshotsThumbView->ItemsCount();
         m_pStopButton->setVisible(m_isSessionRunning);
         m_pCaptureButton->setVisible(m_isSessionRunning);
+        m_pCaptureButtonCPU->setVisible(m_isSessionRunning);
+        m_pCaptureButtonGPU->setVisible(m_isSessionRunning);
         m_pOpenTimelineButton->setVisible(!m_isSessionRunning && (itemsCount > 0));
         m_pOpenTimelineButton->setEnabled(isItemSelected && (itemsCount > 0));
         m_pCurrentFrameCaptionLabel->setText(GPU_STR_dashboard_MainImageCaptionStopped);
@@ -646,9 +716,11 @@ void gpSessionView::OnUpdateUI()
     {
         // Sanity check:
         gpExecutionMode* pModeManager = ProfileManager::Instance()->GetFrameAnalysisModeManager();
-        GT_IF_WITH_ASSERT(m_pStopButton != nullptr && m_pCaptureButton != nullptr && pModeManager != nullptr)
+        GT_IF_WITH_ASSERT(m_pStopButton != nullptr && m_pCaptureButton != nullptr && m_pCaptureButtonCPU != nullptr && m_pCaptureButtonGPU != nullptr && pModeManager != nullptr)
         {
             m_pCaptureButton->setEnabled(pModeManager->IsCaptureEnabled());
+            m_pCaptureButtonCPU->setEnabled(pModeManager->IsCaptureEnabled());
+            m_pCaptureButtonGPU->setEnabled(pModeManager->IsCaptureEnabled());
             m_pStopButton->setEnabled(pModeManager->IsStopEnabled());
         }
     }

@@ -7,7 +7,10 @@
 
 // Local:
 #include <AMDTGraphicsServerInterface/Include/AMDTGraphicsServerInterface.h>
+<<<<<<< c380a1742d0b0b4df6a10c73dbe9028771ba731f
 #include <Server/Common/Tracing/CaptureTypes.h>
+=======
+>>>>>>> Cpu\Gpu only without UI
 
 // CodeXL uses INFINITE timeout when waiting for graphics server replies because the web server responsiveness
 // may be delayed when games go through their heavy load initialization period.
@@ -706,7 +709,7 @@ bool GraphicsServerCommunication::GetCurrentFrameInfo(gtASCIIString& frameInfoAs
 //              frameInfoAsXML(return) - path that contains captured metadata file
 // Return Val:  bool  - Success / failure
 // ---------------------------------------------------------------------------
-bool GraphicsServerCommunication::CaptureFrame(int numberFramesToCapture, gtASCIIString& frameInfoAsXML)
+bool GraphicsServerCommunication::CaptureFrame(int numberFramesToCapture, gtASCIIString& frameInfoAsXML, CaptureType captuteTypeVal)
 {
     bool retVal = false;
     OS_DEBUG_LOG_TRACER_WITH_RETVAL(retVal);
@@ -723,7 +726,8 @@ bool GraphicsServerCommunication::CaptureFrame(int numberFramesToCapture, gtASCI
         // Use CaptureType to define what type of capture to do
         //commandToSend.append(CaptureTypeString(CaptureType_APITrace));
         //commandToSend.append(CaptureTypeString(CaptureType_GPUTrace));
-        commandToSend.append(CaptureTypeString(CaptureType_LinkedTrace));
+        //commandToSend.append(CaptureTypeString(CaptureType_LinkedTrace));
+        commandToSend.append(CaptureTypeString(captuteTypeVal));
 
         // Add the number of frames to capture
         commandToSend.appendFormattedString("&CaptureCount=%d", numberFramesToCapture);

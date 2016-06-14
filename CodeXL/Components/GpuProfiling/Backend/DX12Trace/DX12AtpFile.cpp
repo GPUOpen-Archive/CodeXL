@@ -57,6 +57,7 @@ DX12AtpFilePart::DX12AtpFilePart(const Config& config, bool shouldReleaseMemory)
     m_sections.push_back("//CodeXL Frame Trace");
     m_sections.push_back("API=DX12");
     m_sections.push_back("GPU Trace");
+    m_sections.push_back("CommandListEventCount");
 #undef PART_NAME
 }
 

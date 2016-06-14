@@ -132,9 +132,17 @@ public:
     /// Shuts down the graphics server, and close the communication object
     void ShutServerDown();
 
+    /// Capture type enumeration, consisted with CaptureType in Graphics\Server\Common\Tracing\CaptureTypes.h
+    enum FrameAnalysisCaptureType
+    {
+        FrameAnalysisCaptureType_APITrace = 1,
+        FrameAnalysisCaptureType_GPUTrace = 2,
+        FrameAnalysisCaptureType_LinkedTrace = 3,
+        FrameAnalysisCaptureType_FullFrameCapture = 4
+    };
     /// Captures the current frame, and add the relevant tree nodes and files
     /// \return true for success
-    bool CaptureFrame();
+    bool CaptureFrame(FrameAnalysisCaptureType captureType);
 
     /// Captures the performance counters data for the current frame, writes the trace file and opens it
     /// \param frameIndex the index of the frame that should be captured
@@ -148,11 +156,12 @@ public:
     /// Get access to the settings
     gpProjectSettings& ProjectSettings() { return m_settings; }
 
+
     /// Start frame analysis
     void OnStartFrameAnalysis();
 
     /// Capture frame analysis and show the user the dashboard of the current image
-    void OnFrameAnalysisCapture();
+    void OnFrameAnalysisCapture(gpExecutionMode::FrameAnalysisCaptureType captureType);
 
     /// Is start enabled?
     bool IsStartEnabled(gtString& startActionText);
@@ -284,6 +293,8 @@ private:
 
     /// Is frame analysis running:
     bool m_isFrameAnalysisConnecting;
+
+    FrameAnalysisCaptureType m_captureType;
 };
 #endif //__GPEXECUTIONMODE_H
 

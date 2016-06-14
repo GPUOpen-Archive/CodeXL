@@ -24,13 +24,17 @@ public:
     /// Destructor
     virtual ~gpSessionUpdaterThread();
 
-    void SendCaptureFrameRequest() { m_shouldCaptureFrame = true; }
+    void SendCaptureFrameRequest(int captureType) { // NZ
+        m_shouldCaptureFrame = true;
+        m_captureType = captureType;
+    }
     void SetCaptureIsComplete() { m_isCaptureInProgress = false; }
 
     bool EndedWithError() { return m_endedWithError;  }
 
     gtASCIIString m_sessionName;
     gtASCIIString m_projectName;
+    int m_captureType;
 
 signals:
 

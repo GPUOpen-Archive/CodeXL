@@ -418,7 +418,7 @@ void vsc_OnCapture()
 
     if (pFrameAnalysisManager != nullptr)
     {
-        pFrameAnalysisManager->OnFrameAnalysisCapture();
+        pFrameAnalysisManager->OnFrameAnalysisCapture(gpExecutionMode::FrameAnalysisCaptureType_LinkedTrace); // NZ
     }
 }
 void vsc_OnUpdateOpenCLBuild_IsActionEnabled(bool& isActionEnabled)

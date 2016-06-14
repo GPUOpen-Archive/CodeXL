@@ -91,6 +91,8 @@ void kaExecutionMode::execute(afExecutionCommandId commandId)
         case AF_EXECUTION_ID_STEP_OVER:
         case AF_EXECUTION_ID_STEP_OUT:
         case AF_EXECUTION_ID_CAPTURE:
+        case AF_EXECUTION_ID_CAPTURE_CPU:
+        case AF_EXECUTION_ID_CAPTURE_GPU:
         {
             break;
         }
@@ -137,6 +139,8 @@ void kaExecutionMode::updateUI(afExecutionCommandId commandId, QAction* pAction)
             case AF_EXECUTION_ID_STEP_OVER:
             case AF_EXECUTION_ID_STEP_OUT:
             case AF_EXECUTION_ID_CAPTURE:
+            case AF_EXECUTION_ID_CAPTURE_CPU:
+            case AF_EXECUTION_ID_CAPTURE_GPU:
             {
                 isActionVisible = false;
                 isActionEnabled = false;

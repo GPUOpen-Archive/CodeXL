@@ -156,6 +156,8 @@ private:
     /// 2. It should be possible to show and hide this widget (start action is not relevant in KA mode)
     /// It is impossible to show and hide QWidget on a toolbar, so I decided to use acWidgetAction (which inherits QWidgetAction.)
     acWidgetAction* m_pStartAction;
+    acWidgetAction* m_pStartActionCpu;
+    acWidgetAction* m_pStartActionGpu;
     acWidgetAction* m_pAPILevelStepAction;
 };
 #endif //__AFEXECUTIONMODEMANAGER_H

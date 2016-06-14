@@ -173,16 +173,15 @@ bool AtpFileParser::ParseSectionName(const std::string& input, std::string& sect
     }
     else if (m_atpFileVersion == 1)
     {
-        if (input.find("API") != -1)
-        {
-            // ATP Version 1: Section name is formated like: "//API=API_NAME"
-            // remove leading //
-            sectionName = input.substr(2);
-        }
-        else
+        sectionName = input.substr(2);
+        if (input.find("Command") != -1)
         {
             // ATP Version 1: Section name is formated like: "//==GPU Trace==" make it "GPU Trace"
-            sectionName = "GPU Trace";
+            int pos = sectionName.find("=");
+            if (pos != -1)
+            {
+                sectionName.erase(pos);
+            }
         }
     }
     else

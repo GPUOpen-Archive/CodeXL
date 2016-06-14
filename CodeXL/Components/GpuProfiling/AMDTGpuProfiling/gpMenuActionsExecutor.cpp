@@ -171,10 +171,19 @@ void gpMenuActionsExecutor::handleTrigger(int actionIndex)
 
             case ID_GP_CAPTURE:
             {
-                m_pModeManager->CaptureFrame();
+                m_pModeManager->CaptureFrame(gpExecutionMode::FrameAnalysisCaptureType_LinkedTrace);
             }
             break;
-
+            case ID_GP_CAPTURE_CPU:
+            {
+                m_pModeManager->CaptureFrame(gpExecutionMode::FrameAnalysisCaptureType_APITrace);
+            }
+            break;
+            case ID_GP_CAPTURE_GPU:
+            {
+                m_pModeManager->CaptureFrame(gpExecutionMode::FrameAnalysisCaptureType_GPUTrace);
+            }
+            break;
             case ID_GP_STOP:
             {
                 m_pModeManager->stopCurrentRun();

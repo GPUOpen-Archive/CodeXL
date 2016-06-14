@@ -12,6 +12,8 @@ enum gpMainMenuItemCommands
 {
     ID_GP_START = 0,
     ID_GP_CAPTURE,
+    ID_GP_CAPTURE_CPU,
+    ID_GP_CAPTURE_GPU,
     ID_GP_STOP,
     ID_GP_REFRESH_FROM_SERVER,
     ID_GP_MODE,

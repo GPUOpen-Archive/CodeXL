@@ -1075,7 +1075,7 @@ void gpTimeline::paintEvent(QPaintEvent* event)
         {
             // find the branch of CPU
             acTimelineBranch* pCPUBranch = getBranchFromText("CPU", true);
-            GT_IF_WITH_ASSERT(pCPUBranch != nullptr)
+            if (pCPUBranch != nullptr)
             {
                 int cpuHeight = pCPUBranch->cumulativeHeight();
                 QRect cpuRect(presetCPUPixel, pCPUBranch->top(), endPixel - presetCPUPixel, cpuHeight);
@@ -1095,7 +1095,7 @@ void gpTimeline::paintEvent(QPaintEvent* event)
     }
 
     acTimelineBranch* pGPUBranch = getBranchFromText("GPU", true);
-    GT_IF_WITH_ASSERT(pGPUBranch != nullptr)
+    if (pGPUBranch != nullptr)
     {
         int gpuHeight = pGPUBranch->cumulativeHeight();
         QRect gpuRect(startPixel, pGPUBranch->top(), presetGPUPixel - startPixel, gpuHeight);
