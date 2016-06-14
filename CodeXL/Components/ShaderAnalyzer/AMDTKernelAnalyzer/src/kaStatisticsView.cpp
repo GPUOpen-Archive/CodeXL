@@ -90,8 +90,8 @@ const int KA_MAX_LDS_V7 = 16384;
 kaStatisticsView::kaStatisticsView(QWidget* pParent, const osFilePath& kernelFilePath, const osFilePath& detailedFilePath, kaPlatform platform, const gtString& buildProfile) : kaTableView(pParent, detailedFilePath, 2),
     m_pKernelInfo(nullptr), m_pInfoGroupBoxTab1(nullptr), m_pSCSourceShaderTab2(nullptr), m_pCSDataTab3(nullptr), m_pInfoTabWidget(nullptr),
     m_pSGRPsInfoTableLabels(nullptr), m_pSGRPsInfoTable(nullptr), m_pVGRPsInfoTableLabels(nullptr), m_pVGRPsInfoTable(nullptr), m_pLDSInfoTableLabels(nullptr),
-    m_pLDSInfoTable(nullptr), m_pLDSInfoLine(nullptr), m_pMaxWavesTable(nullptr), m_pAdviceBox(nullptr), m_pRecommendLabel(nullptr), m_pDynamicLDS(nullptr),
-    m_LDSUsed(0), m_pScrollArea(nullptr), m_pScrollAreaWidget(nullptr), m_tablesResized(false), m_wasDynamicChangedByUser(false),
+    m_pLDSInfoTable(nullptr), m_pLDSInfoLine(nullptr), m_pMaxWavesTable(nullptr), m_pAdviceBox(nullptr), m_pRecommendLabel(nullptr), m_pDynamicLDS(nullptr), 
+    m_lastDynamicLDS(INVALID_LDS_SIZE), m_LDSUsed(0), m_pScrollArea(nullptr), m_pScrollAreaWidget(nullptr), m_tablesResized(false), m_wasDynamicChangedByUser(false),
     m_kernelFilePath(kernelFilePath), m_platform(platform), m_buildProfile(buildProfile), m_shouldCheckWorkGroupValues(true)
 {
     GetKernelDataInfo(pParent);
@@ -1762,9 +1762,12 @@ void kaStatisticsView::OnWorkGroupEdit()
                 }
             }
 
-            for (int nWorkitem = 0; nWorkitem < 3; nWorkitem++)
+            if (isValid)
             {
-                m_pKernelInfo->m_localWorkSize[nWorkitem] = workGroup[nWorkitem];
+                for (int nWorkitem = 0; nWorkitem < 3; nWorkitem++)
+                {
+                    m_pKernelInfo->m_localWorkSize[nWorkitem] = workGroup[nWorkitem];
+                }
             }
 
             if (isValid)
@@ -1775,6 +1778,13 @@ void kaStatisticsView::OnWorkGroupEdit()
             }
             else
             {
+                QString workItemText;
+                const int defaultWorkgroupDimensionSize = 4;
+                workItemText.setNum(defaultWorkgroupDimensionSize);
+                for (int nWorkitem = 0; nWorkitem < 3; nWorkitem++)
+                {
+                    m_pWorkgroup[nWorkitem]->setText(workItemText);
+                }
                 // notify the use it is not a valid workgroup info
                 acMessageBox::instance().warning(AF_STR_WarningA, KA_STR_analsisSettingInvalidDataMsg);
             }
@@ -1789,17 +1799,21 @@ void kaStatisticsView::OnDynamicLDSEdit()
     int newValue = m_pDynamicLDS->text().toInt();
 
     // check if the value is new. if not - there is no need to update again
-    if (m_lastDynamicLDS != newValue)
+    if (INVALID_LDS_SIZE == m_lastDynamicLDS || m_lastDynamicLDS != newValue)
     {
-        m_lastDynamicLDS = newValue;
-
         if (newValue >= 0)
         {
+            m_lastDynamicLDS = newValue;
             UpdateWorkgroupBasedInfo();
         }
         else
         {
             // the LDS value is negative
+            m_lastDynamicLDS = 0;
+            QString LDStext;
+            LDStext.setNum(m_lastDynamicLDS);
+            m_pDynamicLDS->setText(LDStext);
+            // Issue the message only after setting the text value
             acMessageBox::instance().warning(AF_STR_WarningA, KA_STR_analsisSettingInvalidLdsDataMsg);
         }
 

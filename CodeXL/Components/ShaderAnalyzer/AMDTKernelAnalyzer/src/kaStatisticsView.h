@@ -50,6 +50,9 @@ protected slots:
     void OnDynamicLDSEdit();
 
 private:
+
+    enum {INVALID_LDS_SIZE = 0x7FFFFFFF};
+
     /// Get the kernel info
     void GetKernelDataInfo(QWidget* pParent);
 
