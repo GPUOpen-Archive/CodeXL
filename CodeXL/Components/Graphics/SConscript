@@ -1,0 +1,282 @@
+# 
+# Common file script
+#
+
+Import('GPS_env')
+env = GPS_env.Clone()
+env.Prepend (CPPPATH = env['BASE_PATH'])
+env.Prepend (CPPPATH = ["../Common/Src"])
+
+base_env = Environment()
+base_env['CPPPATH'] = \
+[
+    "Server/Common/Linux/jpglib",
+    "Server/Common/Linux/libpng",
+]
+
+base_env['CCFLAGS'] = env['CCFLAGS']
+base_env.Prepend (CPPPATH = env['BASE_PATH'])
+
+#
+# build zlib
+#
+
+sources = \
+[
+    "adler32.c",
+    "compress.c",
+    "crc32.c",
+    "deflate.c",
+    "gzclose.c",
+    "gzlib.c",
+    "gzread.c",
+    "gzwrite.c",
+    "infback.c",
+    "inffast.c",
+    "inflate.c",
+    "inftrees.c",
+    "trees.c",
+    "uncompr.c",
+    "zutil.c",
+]
+
+# build the file list with the correct path prepended
+src = [];
+for file in sources:
+    src.append("../Common/Lib/Ext/zlib/1.2.8/" + file)
+
+zlib_Obj = base_env.StaticLibrary('Zlib', src)
+
+#
+# build the png library
+#
+sources = \
+[
+    "png.cpp",
+    "pngerror.cpp",
+    "pngget.cpp",
+    "pngmem.cpp",
+    "pngpread.cpp",
+    "pngread.cpp",
+    "pngrio.cpp",
+    "pngrtran.cpp",
+    "pngrutil.cpp",
+    "pngset.cpp",
+    "pngtrans.cpp",
+    "pngwio.cpp",
+    "pngwrite.cpp",
+    "pngwtran.cpp",
+    "pngwutil.cpp",
+]
+
+# build the file list with the correct path prepended
+src = [];
+for file in sources:
+    src.append("Server/Common/Linux/libpng/" + file)
+
+libPng_Obj = base_env.StaticLibrary('libPng', src)
+
+#
+# Build the JPEG library
+#
+sources = \
+[
+# library files
+    "jaricom.cpp",
+    "jcapimin.cpp",
+    "jcapistd.cpp",
+    "jcarith.cpp",
+    "jccoefct.cpp",
+    "jccolor.cpp",
+    "jcdctmgr.cpp",
+    "jchuff.cpp",
+    "jcinit.cpp",
+    "jcmainct.cpp",
+    "jcmarker.cpp",
+    "jcmaster.cpp",
+    "jcomapi.cpp",
+    "jcparam.cpp",
+    "jcprepct.cpp",
+    "jcsample.cpp",
+    "jctrans.cpp",
+    "jdapimin.cpp",
+    "jdapistd.cpp",
+    "jdarith.cpp",
+    "jdatadst.cpp",
+    "jdatasrc.cpp",
+    "jdcoefct.cpp",
+    "jdcolor.cpp",
+    "jddctmgr.cpp",
+    "jdhuff.cpp",
+    "jdinput.cpp",
+    "jdmainct.cpp",
+    "jdmarker.cpp",
+    "jdmaster.cpp",
+    "jdmerge.cpp",
+    "jdpostct.cpp",
+    "jdsample.cpp",
+    "jdtrans.cpp",
+    "jerror.cpp",
+    "jfdctflt.cpp",
+    "jfdctfst.cpp",
+    "jfdctint.cpp",
+    "jidctflt.cpp",
+    "jidctfst.cpp",
+    "jidctint.cpp",
+    "jquant1.cpp",
+    "jquant2.cpp",
+    "jutils.cpp",
+    "jmemmgr.cpp",
+    "jmemnobs.cpp",
+
+# compression
+#    "cjpeg.c",
+#    "rdppm.c",
+#    "rdgif.c",
+#    "rdtarga.c",
+#    "rdrle.c",
+#    "rdbmp.c",
+#    "rdswitch.c",
+
+# decompression
+#    "djpeg.c",
+#    "wrppm.c",
+#    "wrgif.c",
+#    "wrtarga.c",
+#    "wrrle.c",
+#    "wrbmp.c",
+#    "rdcolmap.c",
+
+#    "cdjpeg.c"
+]
+
+# build the file list with the correct path prepended
+src = [];
+for file in sources:
+    src.append("Server/Common/Linux/jpglib/" + file)
+
+jpgLib_Obj = base_env.StaticLibrary('libJpg', src)
+
+libs = \
+[
+    "dl",
+    "rt",
+    "pthread",
+]
+
+#
+# Build the DDS library
+#
+sources = \
+[
+    "../Common/Src/DDS/AMDT-DDS.cpp"
+]
+
+DDS_Obj = env.StaticLibrary('DDS', sources, LIBS=libs)
+
+#
+# Build the AMDTBaseTools library
+#
+sources = \
+[
+    "src/gtIAllocationFailureObserver.cpp",
+    "src/gtASCIIString.cpp",
+    "src/gtASCIIStringTokenizer.cpp",
+    "src/gtAssert.cpp",
+    "src/gtIAssertionFailureHandler.cpp",
+    "src/gtList.cpp",
+    "src/gtMap.cpp",
+    "src/gtSingeltonsDelete.cpp",
+    "src/gtString.cpp",
+    "src/gtStringTokenizer.cpp",
+    "src/gtVector.cpp"
+]
+
+# build the file list with the correct path prepended
+src = [];
+for file in sources:
+    src.append("../Common/Src/AMDTBaseTools/" + file)
+
+BaseTools_Obj = env.StaticLibrary('AMDTBaseTools', src, LIBS=libs)
+
+#
+# Build the AMDTOSWrappers library
+#
+sources = \
+[
+    "src/osProductVersion.cpp",
+    "src/common/osASCIIInputFileImpl.cpp",
+    "src/common/osApplication.cpp",
+    "src/common/osChannelOperators.cpp",
+    "src/common/osChannel.cpp",
+    "src/common/osCriticalSectionLocker.cpp",
+    "src/common/osCriticalSection.cpp",
+    "src/common/osCommunicationDebugManager.cpp",
+    "src/common/osCommunicationDebugThread.cpp",
+    "src/common/osDebugLog.cpp",
+    "src/common/osDirectory.cpp",
+    "src/common/osDNSQueryThread.cpp",
+    "src/common/osFileImpl.cpp",
+    "src/common/osFileLauncher.cpp",
+    "src/common/osFileLauncherThread.cpp",
+    "src/common/osFilePath.cpp",
+    "src/common/osFilePathByLastAccessDateCompareFunctor.cpp",
+    "src/common/osFile.cpp",
+    "src/common/osGeneralFunctions.cpp",
+    "src/common/osInputFileImpl.cpp",
+    "src/common/osModule.cpp",
+    "src/common/osMutex.cpp",
+    "src/common/osOutputFileImpl.cpp",
+    "src/common/osRawMemoryBuffer.cpp",
+    "src/common/osRawMemoryStream.cpp",
+    "src/common/osSettingsFileHandler.cpp",
+    "src/common/osSocket.cpp",
+    "src/common/osStream.cpp",
+    "src/common/osTime.cpp",
+    "src/common/osTimeInterval.cpp",
+    "src/common/osTransferableObjectCreatorsBase.cpp",
+    "src/common/osTransferableObjectCreatorsManager.cpp",
+    "src/common/osTransferableObjectType.cpp",
+    "src/common/osTransferableObject.cpp",
+    "src/common/osWrappersInitFunc.cpp",
+# linuxSources
+    "src/linux/osCondition.cpp",
+    "src/linux/osCriticalSectionImpl.cpp",
+    "src/linux/osDirectory.cpp",
+    "src/linux/osFile.cpp",
+    "src/linux/osFileLauncher.cpp",
+    "src/linux/osLinuxProcFileSystemReader.cpp",
+    "src/linux/osModule.cpp",
+    "src/linux/osMutexImpl.cpp",
+    "src/linux/osPortAddress.cpp",
+    "src/linux/osProcess.cpp",
+    "src/linux/osProcessSharedFile.cpp",
+    "src/linux/osStopWatch.cpp",
+    "src/linux/osSystemError.cpp",
+    "src/linux/osTCPSocket.cpp",
+    "src/linux/osTCPSocketClient.cpp",
+    "src/linux/osThread.cpp",
+    "src/linux/osTime.cpp", 
+    "src/linux/osInputFileImpl.cpp",
+    "src/linux/osUser.cpp",
+# Generic Linux 
+    "src/linux/osApplication.cpp",
+    "src/linux/osDebuggingFunctions.cpp",
+    "src/linux/osFilePath.cpp",
+    "src/linux/osGeneralFunctions.cpp",
+    "src/linux/osMachine.cpp",
+]
+
+# build the file list with the correct path prepended
+src = [];
+for file in sources:
+    src.append("../Common/Src/AMDTOSWrappers/" + file)
+
+# add the base tools to the start of the list
+libs.insert(0, env.configPath + "/libAMDTBaseTools")
+
+OSWrappers_Obj = env.StaticLibrary('AMDTOSWrappers', src, LIBS=libs)
+Depends(OSWrappers_Obj, BaseTools_Obj + DDS_Obj + zlib_Obj + jpgLib_Obj + libPng_Obj )
+
+Return('OSWrappers_Obj')
+
