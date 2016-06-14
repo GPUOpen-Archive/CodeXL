@@ -291,7 +291,7 @@ public:
     gtString GetLastBuildProgramName() const;
 
     /// Prints the build prologue.
-    void PrintBuildPrologue(gtString& programName, size_t numOfDevicesToBuild, bool shouldPrependCR);
+    void PrintBuildPrologue(const gtString& programName, size_t numOfDevicesToBuild, bool shouldPrependCR);
 
 private:
 
