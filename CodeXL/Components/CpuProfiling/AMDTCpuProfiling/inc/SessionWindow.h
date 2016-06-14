@@ -68,7 +68,7 @@ public:
     /// \param sessionFilePath the file path for the requested session
     /// \param sessionInnerPage the item type describing the inner view to open, or AF_TREE_ITEM_ITEM_NONE when the root is supposed to open
     /// \param [out] errorMessage when the display fails, errorMessage should contain a message for the user
-    virtual bool DisplaySession(const osFilePath& sessionFilePath, afTreeItemType sessionInnerPage, QString& errorMessage);
+    virtual bool DisplaySession(const osFilePath& sessionFilePath, const osFilePath& moduleFilePath,afTreeItemType sessionInnerPage, QString& errorMessage);
 
     SessionModulesView* sessionModulesView() const {return m_pSessionModulesView;};
     SessionFunctionView* sessionFunctionsView() const {return m_pSessionFunctionView;};
@@ -83,7 +83,7 @@ public:
     /// Expose information:
     CpuProfileReader& profileReader() { return m_profileReader; }
 
-    bool displaySessionSource();
+    bool displaySessionSource(const osFilePath& moduleFilePath);
     SessionDisplaySettings* sessionDisplaySettings() {return &m_sessionDisplayFilter;};
 
     /// Show / Hide information panel:

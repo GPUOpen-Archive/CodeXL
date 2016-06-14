@@ -234,7 +234,7 @@ bool SessionViewCreator::createViewContent(int viewIndex, QWidget*& pContentQWid
                         GT_IF_WITH_ASSERT(pCpuProfileEvent != nullptr)
                         {
                             QString errorMessage;
-                            bool rc = pSessionWindow->DisplaySession(pCpuProfileEvent->filePath2(), (afTreeItemType)pCpuProfileEvent->lineNumber(), errorMessage);
+                            bool rc = pSessionWindow->DisplaySession(pCpuProfileEvent->filePath(), pCpuProfileEvent->filePath2(), (afTreeItemType)pCpuProfileEvent->lineNumber(), errorMessage);
                             GT_ASSERT(rc);
 
                             // If the window failed to open, let the user know what was the problem
@@ -383,7 +383,7 @@ bool SessionViewCreator::displayExistingView(const apMDIViewCreateEvent& mdiView
     if (pSessionWindow != nullptr)
     {
         QString errorMessage;
-        retVal = pSessionWindow->DisplaySession(cpuProfileViewEvent.filePath2(), (afTreeItemType)cpuProfileViewEvent.lineNumber(), errorMessage);
+        retVal = pSessionWindow->DisplaySession(cpuProfileViewEvent.filePath(), cpuProfileViewEvent.filePath2(), (afTreeItemType)cpuProfileViewEvent.lineNumber(), errorMessage);
 
         // If the window failed to open, let the user know what was the problem
         if (!errorMessage.isEmpty() && !retVal)
@@ -633,7 +633,7 @@ QWidget* SessionViewCreator::openMdiWidget(QWidget* pQParent, const gtString& se
                     (AF_TREE_ITEM_PROFILE_SESSION == pCpuProfileEvent->lineNumber()))
                 {
                     QString errorMessage;
-                    bool retVal = pSessionWindow->DisplaySession(pCpuProfileEvent->filePath2(), (afTreeItemType)pCpuProfileEvent->lineNumber(), errorMessage);
+                    bool retVal = pSessionWindow->DisplaySession(pCpuProfileEvent->filePath(), pCpuProfileEvent->filePath2(), (afTreeItemType)pCpuProfileEvent->lineNumber(), errorMessage);
 
                     // If the window failed to open, let the user know what was the problem
                     if (!errorMessage.isEmpty() && !retVal)
@@ -749,7 +749,7 @@ bool SessionViewCreator::displayOpenSession(const osFilePath& filePath, int line
     if (pSessionWindow != nullptr)
     {
         QString errorMessage;
-        retVal = pSessionWindow->DisplaySession(filePath, (afTreeItemType)lineNumber, errorMessage);
+        retVal = pSessionWindow->DisplaySession(filePath, osFilePath(), (afTreeItemType)lineNumber, errorMessage);
 
         // If the window failed to open, let the user know what was the problem
         if (!errorMessage.isEmpty() && !retVal)

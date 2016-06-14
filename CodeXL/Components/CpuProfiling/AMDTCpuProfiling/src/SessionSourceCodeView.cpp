@@ -1911,7 +1911,7 @@ void SessionSourceCodeView::AddSourceCodeItemToExplorer()
                     {
                         // The file path for the source code node should be the session file. We want it to open first before opening the
                         // source code view
-                        pSourceCodeCreatedData->m_filePath = m_pDisplayedSessionItemData->m_filePath;
+                        // pSourceCodeCreatedData->m_filePath = m_pDisplayedSessionItemData->m_filePath;
                         pSourceCodeCreatedData->m_filePathLineNumber = AF_TREE_ITEM_PROFILE_CPU_SOURCE_CODE;
 
                         // Select the new source code item in the tree and activate it

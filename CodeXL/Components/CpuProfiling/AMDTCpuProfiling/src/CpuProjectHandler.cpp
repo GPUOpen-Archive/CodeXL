@@ -1090,16 +1090,23 @@ void CpuProjectHandler::onTreeActivationEvent(const apMonitoredObjectsTreeActiva
 
     if (pItemData != nullptr)
     {
-        if (pItemData->m_itemType == AF_TREE_ITEM_PROFILE_CPU_SOURCE_CODES)
+        if (pItemData->m_itemType == AF_TREE_ITEM_PROFILE_CPU_SOURCE_CODE)
         {
             // See if the item type if of GPU session:
             CPUSessionTreeItemData* pCPUSessionData = qobject_cast<CPUSessionTreeItemData*>(pItemData->extendedItemData());
 
             // Sanity check:
-            GT_IF_WITH_ASSERT(pCPUSessionData != nullptr)
+            GT_IF_WITH_ASSERT((pCPUSessionData != nullptr) && (m_pProfileTreeHandler != nullptr))
             {
-                gtString moduleFilePath = acQStringToGTString(pCPUSessionData->m_exeFullPath);
-                AmdtCpuProfiling::instance().sessionViewCreator()->openSession(moduleFilePath, moduleFilePath, pItemData->m_itemType);
+                // Find the related session file path
+                afApplicationTreeItemData* pSessionItemData = m_pProfileTreeHandler->FindParentSessionItemData(pCPUSessionData->m_pParentData);
+                // Sanity check:
+                GT_IF_WITH_ASSERT(pSessionItemData != nullptr)
+                {
+                    gtString sessionFilePath = pSessionItemData->m_filePath.asString();
+                    gtString moduleFilePath = acQStringToGTString(pCPUSessionData->m_exeFullPath);
+                    AmdtCpuProfiling::instance().sessionViewCreator()->openSession(sessionFilePath, moduleFilePath, pItemData->m_itemType);
+                }
             }
         }
     }
