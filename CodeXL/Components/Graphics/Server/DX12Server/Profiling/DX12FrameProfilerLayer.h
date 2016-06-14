@@ -39,7 +39,7 @@ typedef std::set<Wrapped_ID3D12GraphicsCommandList*> WrappedCommandListSet;
 typedef std::unordered_map <Wrapped_ID3D12CommandQueue*, WrappedCommandListSet>  CommandQueueToCommandListMap;
 
 /// Used to associate a SampleId with a ProfilerResult for a GPU-profiled function call.
-typedef std::unordered_map<UINT64, ProfilerResult*> SampleIdToProfilerResultMap;
+typedef std::map<UINT64, ProfilerResult*> SampleIdToProfilerResultMap;
 
 /// Associate a Queue type with all of the profiled calls that were submitted with the queue.
 typedef std::unordered_map<Wrapped_ID3D12CommandQueue*, SampleIdToProfilerResultMap*> QueueWrapperToProfilingResultsMap;
