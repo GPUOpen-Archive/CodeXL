@@ -195,7 +195,7 @@
 #define KA_STR_analsisSettingDefaultLocal "4"
 #define KA_STR_analsisSettingDefaultLoop "100"
 #define KA_STR_analsisSettingInvalidDataMsg "Invalid Analyze data:\n1: Global work items must be multiplication of local work items.\n2: Not all Global or local work item can be zero.\n3: Local work size X * Y * Z must be <= 256.\n4: Global work size X * Y * Z must be <= 16777216"
-#define KA_STR_analsisSettingInvalidLdsDataMsg "Invalid Analyze data:\n: Dynamic LDS usage must be a positive number of bytes."
+#define KA_STR_analsisSettingInvalidLdsDataMsg "Invalid data: Dynamic LDS usage size must be a positive number of bytes."
 #define KA_STR_targetDeviceSettingsPageGeneralInfo "Select devices to include them as build targets<br> The displayed devices are devices supported by the installed driver"
 #define KA_STR_driverOutOfData "Note: For CodeXL to be able to target the most recent hardware, please make sure that the latest driver is installed."
 #define KA_STR_applyUpdateLoops "Apply changes to all kernels in project"
