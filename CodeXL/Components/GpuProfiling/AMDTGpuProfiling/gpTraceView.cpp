@@ -134,7 +134,7 @@ bool gpTraceView::DisplaySession(const osFilePath& sessionFilePath, afTreeItemTy
             retVal = pModeManager->PrepareTraceFile(m_sessionFilePath, m_frameIndex, m_pSessionData, this);
 
 
-            GT_IF_WITH_ASSERT(retVal && (m_pSessionDataContainer != nullptr) && (m_pCPUTraceTablesTabWidget != nullptr) && (m_pTimeline != nullptr))
+            if (retVal && (m_pSessionDataContainer != nullptr) && (m_pTimeline != nullptr))
             {
                 afApplicationCommands::instance()->EndPerformancePrintout("Parsing Trace File");
 
@@ -515,21 +515,22 @@ void gpTraceView::SetProfileDataModel(gpTraceDataModel* pDataModel)
         m_pRibbonManager->AddRibbon(m_pDetailedDataRibbon, GPU_STR_ribbonNameDrawCalls, acScalePixelSizeToDisplayDPI(NAV_HEIGHT) * 0.5, false, true, false);
         m_pRibbonManager->AddRibbon(m_pTimeline, GPU_STR_ribbonNameTimeLine, 0);
         m_pRibbonManager->SetBoundFrameControlRibbons(m_pNavigationRibbon->NavigationChart(), m_pNavigationRibbon, m_pTimeline);
-        m_pCPUTraceTablesTabWidget = new acTabWidget(nullptr);
 
-        bool isGPUTrace = false;
+        bool isGPUTrace = false, isCPUTrace = false;
 
         // Sanity check:
         GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
         {
             isGPUTrace = m_pSessionDataContainer->GPUCallsContainersCount() > 0;
+            isCPUTrace = m_pSessionDataContainer->ThreadsCount() > 0;
         }
 
         // If there is a GPU trace, add an horizontal splitter with the GPU trace table.
-        // if there isn't add only the CPU trace tab to the main vertical splitter
-        if (isGPUTrace)
+        // if there isn't add only the CPU \ GPU trace tab to the main vertical splitter
+        if (isGPUTrace && isCPUTrace)
         {
             m_pGPUTraceTablesTabWidget = new acTabWidget(nullptr);
+            m_pCPUTraceTablesTabWidget = new acTabWidget(nullptr);
 
             QSplitter* pHSplitter = new QSplitter(Qt::Horizontal);
             QList<int> sizes;
@@ -540,9 +541,15 @@ void gpTraceView::SetProfileDataModel(gpTraceDataModel* pDataModel)
             pHSplitter->setSizes(sizes);
             m_pRibbonManager->AddRibbon(pHSplitter, GPU_STR_ribbonNameAPICalls, TABLE_HEIGHT);
         }
+        else if(isCPUTrace)
+        {
+            m_pCPUTraceTablesTabWidget = new acTabWidget(nullptr);
+            m_pRibbonManager->AddRibbon(m_pCPUTraceTablesTabWidget, GPU_STR_ribbonNameAPICalls, TABLE_HEIGHT);
+        }
         else
         {
-            m_pRibbonManager->AddRibbon(m_pCPUTraceTablesTabWidget, GPU_STR_ribbonNameAPICalls, TABLE_HEIGHT);
+            m_pGPUTraceTablesTabWidget = new acTabWidget(nullptr);
+            m_pRibbonManager->AddRibbon(m_pGPUTraceTablesTabWidget, GPU_STR_ribbonNameAPICalls, TABLE_HEIGHT);
         }
 
         // API / GPU Summary
@@ -671,7 +678,7 @@ void gpTraceView::OnSummaryItemClicked(ProfileSessionDataItem* pItem)
 
 void gpTraceView::OnTimelineFilterChanged(QMap<QString, bool>& threadNameVisibilityMap)
 {
-    GT_IF_WITH_ASSERT(m_pCPUTraceTablesTabWidget != nullptr)
+    if (m_pCPUTraceTablesTabWidget != nullptr)
     {
         int numTabs = m_pCPUTraceTablesTabWidget->count();
 
@@ -898,7 +905,7 @@ void gpTraceView::OnCPUTableRowChanged(const QModelIndex& current, const QModelI
 
     // Selection in the API table causes selection of the matching item in the GPU table, therefore this method is be called in both cases.
     // if the section "started" in the GPU table, we don't to select the matching item in the timeline, because it will cause flickering
-    if (!m_isGpuAPISelectionChangeInProgress)
+    if (!m_isGpuAPISelectionChangeInProgress && m_pCPUTraceTablesTabWidget)
     {
         m_isCpuAPISelectionChangeInProgress = true;
         int selectedTabIndex = m_pCPUTraceTablesTabWidget->currentIndex();

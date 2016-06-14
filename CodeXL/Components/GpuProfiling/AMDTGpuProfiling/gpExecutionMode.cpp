@@ -134,10 +134,19 @@ void gpExecutionMode::execute(afExecutionCommandId commandId)
 
         case AF_EXECUTION_ID_CAPTURE:
         {
-            OnFrameAnalysisCapture();
+            OnFrameAnalysisCapture(gpExecutionMode::FrameAnalysisCaptureType_LinkedTrace);
         }
         break;
-
+        case AF_EXECUTION_ID_CAPTURE_CPU:
+        {
+            OnFrameAnalysisCapture(gpExecutionMode::FrameAnalysisCaptureType_APITrace);
+        }
+        break;
+        case AF_EXECUTION_ID_CAPTURE_GPU:
+        {
+            OnFrameAnalysisCapture(gpExecutionMode::FrameAnalysisCaptureType_GPUTrace);
+        }
+        break;
         case AF_EXECUTION_ID_STOP:
         {
             stopCurrentRun();
@@ -181,6 +190,8 @@ void gpExecutionMode::updateUI(afExecutionCommandId commandId, QAction* pAction)
             break;
 
             case AF_EXECUTION_ID_CAPTURE:
+            case AF_EXECUTION_ID_CAPTURE_CPU:
+            case AF_EXECUTION_ID_CAPTURE_GPU:
             {
                 isActionEnabled = IsCaptureEnabled();
                 gpExecutionMode* pFrameAnalysisManager = ProfileManager::Instance()->GetFrameAnalysisModeManager();
@@ -630,7 +641,7 @@ bool gpExecutionMode::CheckProjectSettings()
     return retVal;
 }
 
-void gpExecutionMode::OnFrameAnalysisCapture()
+void gpExecutionMode::OnFrameAnalysisCapture(gpExecutionMode::FrameAnalysisCaptureType captureType)
 {
 
     OS_DEBUG_LOG_TRACER;
@@ -642,7 +653,7 @@ void gpExecutionMode::OnFrameAnalysisCapture()
         // If the session is not opened, open it
         afApplicationCommands::instance()->OpenFileAtLine(gpUIManager::Instance()->CurrentlyRunningSessionData()->m_pParentData->m_filePath, 0);
 
-        CaptureFrame();
+        CaptureFrame(captureType);
     }
 }
 
@@ -892,10 +903,10 @@ void gpExecutionMode::ShutServerDown()
     m_remoteGraphicsBackendServerLauncher.TerminateRemoteGraphicsBeckendServer();
 }
 
-bool gpExecutionMode::CaptureFrame()
+bool gpExecutionMode::CaptureFrame(FrameAnalysisCaptureType captureType)
 {
     OS_DEBUG_LOG_TRACER;
-    gpUIManager::Instance()->UIUpdaterThread().SendCaptureFrameRequest();
+    gpUIManager::Instance()->UIUpdaterThread().SendCaptureFrameRequest(captureType);
     m_isCapturing = true;
 
     // Notify the current opened view that a frame capture is processing

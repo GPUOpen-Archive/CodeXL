@@ -26,6 +26,8 @@ class osPortAddress;
 // Local:
 #include <AMDTGraphicsServerInterface/Include/GraphicsServerInterfaceDLLBuild.h>
 
+#include "../../Server/Common/Tracing/CaptureTypes.h"
+
 
 // ----------------------------------------------------------------------------------
 // Class Name:           GraphicsServerCommunication
@@ -87,7 +89,7 @@ public:
     /// \param numberFramesToCapture number of frames to capture
     /// \param frameInfoXML[out] the captured frame info as XML
     /// \return true for success
-    bool CaptureFrame(int numberFramesToCapture, gtASCIIString& frameInfoAsXML);
+    bool CaptureFrame(int numberFramesToCapture, gtASCIIString& frameInfoAsXML, CaptureType captuteTypeVal);
 
     /// Stub function until the get captured frame functionality is resolved
     bool CaptureFrameStub(gtASCIIString& frameInfoAsXML, unsigned char*& pImageBuffer, unsigned long& imageSize);

@@ -573,6 +573,8 @@ void SharedProfileManager::updateUI(afExecutionCommandId commandId, QAction* pAc
             case AF_EXECUTION_ID_CANCEL_BUILD:
             case AF_EXECUTION_ID_BUILD:
             case AF_EXECUTION_ID_CAPTURE:
+            case AF_EXECUTION_ID_CAPTURE_CPU:
+            case AF_EXECUTION_ID_CAPTURE_GPU:
             {
                 isActionVisible = false;
                 isActionEnabled = false;

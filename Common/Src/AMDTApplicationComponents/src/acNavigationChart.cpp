@@ -993,7 +993,7 @@ void acNavigationChart::DrawRangeControl(QPainter& painter)
         bool isValid = (geom.contains(leftHandlePos) && geom.contains(leftRangePos) && geom.contains(rectLeftStretch) && geom.contains(rangeCenterPos)
                         && geom.contains(rectRightStretch) && geom.contains(rightRangePos) && geom.contains(rightHandlePos));
 
-        GT_IF_WITH_ASSERT(isValid)
+        if (isValid) // NZ ask Gilad
         {
             painter.drawPixmap(leftHandlePos, *m_pCurrentLeftRangeHandlePixmap);
             painter.drawPixmap(leftRangePos, *m_pCurrentRangeLeftPixmap);

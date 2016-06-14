@@ -9,9 +9,10 @@
 #include <AMDTGraphicsServerInterface/Include/AMDTGraphicsServerInterface.h>
 
 // Local:
-#include <AMDTGpuProfiling/gpExecutionMode.h>
+
 #include <AMDTGpuProfiling/gpSessionUpdaterThread.h>
 #include <AMDTGpuProfiling/ProfileManager.h>
+#include <AMDTGpuProfiling/gpExecutionMode.h>
 
 #define GP_FRAME_UPDATE_INTERVAL_IN_SECONDS 1.0
 #define GP_FRAME_CAPTURE_TIMEOUT_IN_SECONDS 25.0
@@ -114,7 +115,9 @@ bool gpSessionUpdaterThread::CaptureFrame()
             numberFrames = ProfileManager::Instance()->GetFrameAnalysisModeManager()->ProjectSettings().m_numFramesToCapture.toInt();
         }
 
-        retVal = m_pServerComm->CaptureFrame(numberFrames, frameAsXML);
+
+
+        retVal = m_pServerComm->CaptureFrame(numberFrames, frameAsXML, (CaptureType)m_captureType);
 
         if (frameAsXML.find(GP_GRAPHICS_SERVER_STATE_STALLED) >= 0)
         {
@@ -133,6 +136,7 @@ bool gpSessionUpdaterThread::CaptureFrame()
 
             }
         }
+        
     }
 
     return retVal;

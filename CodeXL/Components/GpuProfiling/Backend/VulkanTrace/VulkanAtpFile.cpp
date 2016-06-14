@@ -51,6 +51,7 @@ VKAtpFilePart::VKAtpFilePart(const Config& config, bool shouldReleaseMemory) : I
     m_strPartName = PART_NAME;
     m_sections.push_back("API=Vulkan");
     m_sections.push_back("GPU Trace");
+    m_sections.push_back("CommandBufEventCount");
 #undef PART_NAME
 }
 
@@ -226,7 +227,7 @@ bool VKAtpFilePart::ParseSectionHeaderLine(const string& line)
 
         }
     }
-    else if ((line[0] == '0') && (line[1] == 'x'))
+    else if ((line[0] == '0') && (line[1] == ' '))
     {
         m_currentParsedTraceType = GPU;
     }

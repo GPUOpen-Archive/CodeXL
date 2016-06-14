@@ -55,6 +55,10 @@ private slots:
 
     /// Handles the "Capture" button
     void OnCaptureButtonClick();
+    /// Handles the "Capture" button
+    void OnCaptureCPUButtonClick();
+    /// Handles the "Capture" button
+    void OnCaptureGPUButtonClick();
 
     /// Handles the "Stop" button
     void OnStopButtonClick();
@@ -114,6 +118,8 @@ private:
 
     /// Capture button
     QToolButton* m_pCaptureButton;
+    QToolButton* m_pCaptureButtonCPU;
+    QToolButton* m_pCaptureButtonGPU;
 
     /// Stop button
     QToolButton* m_pStopButton;

@@ -326,6 +326,8 @@ void afExecutionModeManager::createActionsToolbar(afMainAppWindow* pParentWindow
                 case AF_EXECUTION_ID_CANCEL_BUILD:      acSetIconInPixmap(actionPixmap, AC_ICON_EXECUTION_CANCEL_BUILD);        break;
 
                 case AF_EXECUTION_ID_CAPTURE:           acSetIconInPixmap(actionPixmap, AC_ICON_EXECUTION_CAPTURE);             break;
+                case AF_EXECUTION_ID_CAPTURE_CPU:       acSetIconInPixmap(actionPixmap, AC_ICON_EXECUTION_CAPTURE);             break;
+                case AF_EXECUTION_ID_CAPTURE_GPU:       acSetIconInPixmap(actionPixmap, AC_ICON_EXECUTION_CAPTURE);             break;
 
                 default: break;
             }
@@ -368,6 +370,8 @@ void afExecutionModeManager::createActionsToolbar(afMainAppWindow* pParentWindow
                 case AF_EXECUTION_ID_CANCEL_BUILD:          pButtonAction->setText(AF_STR_CancelBuild);         break;
 
                 case AF_EXECUTION_ID_CAPTURE:               pButtonAction->setText(AF_STR_CaptureFrame);         break;
+                case AF_EXECUTION_ID_CAPTURE_CPU:           pButtonAction->setText(AF_STR_CaptureFrame);         break;
+                case AF_EXECUTION_ID_CAPTURE_GPU:           pButtonAction->setText(AF_STR_CaptureFrame);         break;
 
                 default: break;
             }

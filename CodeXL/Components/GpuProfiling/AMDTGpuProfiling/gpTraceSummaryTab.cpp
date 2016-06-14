@@ -145,6 +145,7 @@ bool gpSummaryTab::Init(gpTraceDataContainer* pDataContainer, gpTraceView* pSess
         GT_ASSERT(rc);
 
         m_pSummaryTable->selectRow(0);
+        OnSummaryTableSelectionChanged(); // NZ for some reason the signal isn't enough
     }
 
 
@@ -500,7 +501,7 @@ void gpSummaryTab::SyncSelectionInOtherControls(ProfileSessionDataItem* pItem)
 
 void gpSummaryTab::SetTimelineScope(bool useTimelineSelectionScope, quint64 timelineStart, quint64 timelineRange)
 {
-    GT_IF_WITH_ASSERT(m_pChkboxUseScope != nullptr)
+    if (m_pChkboxUseScope != nullptr)
     {
         m_timelineStart = timelineStart;
         m_timelineEnd = timelineStart + timelineRange;
