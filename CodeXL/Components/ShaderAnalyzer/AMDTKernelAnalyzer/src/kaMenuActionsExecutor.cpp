@@ -72,7 +72,9 @@ void kaMenuActionsExecutor::populateSupportedCommandIds()
 // ---------------------------------------------------------------------------
 void kaMenuActionsExecutor::initActionIcons()
 {
-
+    // Initialize commands icons
+    initSingleActionIcon(ID_KA_OPENCL_BUILD, AC_ICON_EXECUTION_BUILD);
+    initSingleActionIcon(ID_KA_CANCEL_BUILD, AC_ICON_EXECUTION_CANCEL_BUILD);
 }
 
 
