@@ -7,10 +7,13 @@
 
 TEST(agsLib, GetVersion)
 {
-    AGSContext* context = nullptr;
+    AGSContext* agsContext = nullptr;
     
     AGSGPUInfo gpuInfo;
-    AGSReturnCode rc = agsInit(&context, nullptr, &gpuInfo);
+    AGSReturnCode rc = agsInit(&agsContext, nullptr, &gpuInfo);
+    EXPECT_EQ(rc, AGS_SUCCESS);
+    rc = agsDeInit(agsContext);
+    agsContext = nullptr;
     EXPECT_EQ(rc, AGS_SUCCESS);
 
 }
