@@ -1429,12 +1429,12 @@ void acNavigationChart::UpdateYAxisRange()
         // find the nearest number one log10 smaller
         int base10 = (int)floor(log10(m_maxYSoFar));
 
-        if (base10 > 0)
+        if (base10 > 1)
         {
             double roundVal = pow(10, base10);
             newHighest = floor(newHighest / roundVal) * roundVal + roundVal;
         }
-        else
+        else if (base10 < 0)
         {
             // currently we don't handle ranges 0 or smaller
             if (m_maxYSoFar > 0)
