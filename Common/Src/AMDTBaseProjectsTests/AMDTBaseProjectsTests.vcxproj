@@ -62,6 +62,7 @@
     <Import Project="$(CommonDir)\Lib\Ext\Windows-Kits\Global-WindowsSDK.props" />
     <Import Project="$(CommonDir)\Lib\Ext\tinyxml\Global-TinyXML-2015.props" />
     <Import Project="$(CommonDir)\Lib\Ext\Boost\Global-Boost-2015.props" />
+    <Import Project="$(CommonDir)\Lib\Ext\ags\Global-ags-2015.props" />
     <Import Project="$(CommonDir)\Lib\Ext\GoogleTest\Global-GoogleTest-1.7-2015.props" />
     <Import Project="$(CommonDir)\Lib\Ext\Qt\Global-QT.props" />
     <Import Project="$(CommonDir)\Lib\Ext\QScintilla\Global-QScintilla.props" />
@@ -165,6 +166,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\AGSLib_test.cpp" />
     <ClCompile Include="src\AMDTOSWrappersTests\os.MachineTests.cpp" />
     <ClCompile Include="src\AMDTOSWrappersTests\osApplicationWinTests.cpp" />
     <ClCompile Include="src\AMDTOSWrappersTests\osFileTests.cpp" />
