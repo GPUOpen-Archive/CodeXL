@@ -24,14 +24,17 @@ def VulkanCleanup(target, source, env):
 
 Import('GPS_env')
 env = GPS_env.Clone()
+env.VulkanAPIVersion = "1.0.13.0"
 env['CPPPATH'] = env['GPS_PATH']
 env.Prepend (CPPPATH =
 [
     '../Common/Linux',
     '../../../Common/Lib/Ext/tinyxml/2.6.2',
-    '../../../Common/Lib/Ext/VulkanSDK/1.0.8.0/Include',
-    '../../../Common/Lib/Ext/VulkanSDK/1.0.8.0/Include/vulkan',
-    '../../../Common/Lib/Ext/VulkanSDK/1.0.8.0/glslang/SPIRV'
+    '../../../Common/Lib/Ext/Vulkan/' + env.VulkanAPIVersion + '/SDK/Include',
+    '../../../Common/Lib/Ext/Vulkan/' + env.VulkanAPIVersion + '/SDK/Include/vulkan',
+    '../../../Common/Lib/Ext/Vulkan/' + env.VulkanAPIVersion + '/SDK/Source/layers',
+    '../../../Common/Lib/Ext/Vulkan/' + env.VulkanAPIVersion + '/SDK/Source/loader',
+    '../../../Common/Lib/Ext/Vulkan/' + env.VulkanAPIVersion + '/SDK/glslang/SPIRV',
 ])
 env.Prepend (LIBPATH = env['GPS_LIBPATH'])
 env.Prepend(CCFLAGS =
@@ -54,7 +57,7 @@ env['LIBS'] = \
     "libPng",
     "libZlib",               #used by PNG
     #boost
-    File('../../../Common/Lib/Ext/Boost/boost_1_55_0/lib/RHEL6/' + env.extConfig + '/libboost_system.a'),
+    File('../../../Common/Lib/Ext/Boost/boost_' + env.BoostVersion + '/lib/RHEL6/' + env.extConfig + '/libboost_system.a'),
     #external libraries
     "dl",
     "rt",
@@ -75,35 +78,86 @@ commonSources = \
 # Vulkan specific source files
 sources = \
 [
-# common sources
-#    "../Common/MultithreadedTraceAnalyzerLayer.cpp",
-#    "../Common/WrappedObjectDatabase.cpp",
-#    "../Common/ObjectDatabaseProcessor.cpp",
+# glslang
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/glslang_tab.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/Constant.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/InfoSink.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/Initialize.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/IntermTraverse.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/Intermediate.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/ParseHelper.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/PoolAlloc.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/RemoveTree.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/Scan.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/ShaderLang.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/SymbolTable.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/Versions.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/intermOut.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/limits.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/linkValidate.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/parseConst.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/reflection.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/preprocessor/Pp.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/preprocessor/PpAtom.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/preprocessor/PpContext.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/preprocessor/PpMemory.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/preprocessor/PpScanner.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/preprocessor/PpSymbols.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/preprocessor/PpTokens.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/propagateNoContraction.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/GenericCodeGen/CodeGen.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/GenericCodeGen/Link.cpp",
 
-# LunarG sources
-    "LunarG/vk_layer_extension_utils.cpp",
-    "LunarG/vk_layer_table.cpp",
+# OSDependent
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/OSDependent/Unix/ossource.cpp",
+
+# OGLCompilersDLL
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/OGLCompilersDLL/InitializeDll.cpp",
+
+# HLSL
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/hlsl/hlslParseHelper.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/hlsl/hlslScanContext.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/hlsl/hlslOpMap.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/hlsl/hlslTokenStream.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/hlsl/hlslGrammar.cpp",
+
+# SPIRV
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/SPIRV/GlslangToSpv.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/SPIRV/InReadableOrder.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/SPIRV/Logger.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/SPIRV/SpvBuilder.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/SPIRV/SPVRemapper.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/SPIRV/doc.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/SPIRV/disassemble.cpp",
+
+# common sources
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/layers/vk_layer_extension_utils.cpp",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/layers/vk_layer_table.cpp",
 
 # VKT sources
+    "OS/Linux/VulkanServer.cpp",
+
     "VKT/FrameDebugger/vktFrameDebuggerLayer.cpp",
 
     "VKT/Interception/vktIntercept.cpp",
 
-    "VTK/Objects/Wrappers/vktWrappedCmdBuf.cpp",
-    "VTK/Objects/Wrappers/vktWrappedObject.cpp",
-    "VTK/Objects/Wrappers/vktWrappedQueue.cpp",
+    "VKT/Objects/Wrappers/vktWrappedCmdBuf.cpp",
+    "VKT/Objects/Wrappers/vktWrappedObject.cpp",
+    "VKT/Objects/Wrappers/vktWrappedQueue.cpp",
     "VKT/Objects/vktInstanceBase.cpp",
     "VKT/Objects/vktWrappedObjectDatabase.cpp",
     "VKT/Objects/vktObjectDatabaseProcessor.cpp",
 
     "VKT/Profiling/vktCmdBufProfiler.cpp",
+    "VKT/Profiling/vktCmdBufProfilerStatic.cpp",
     "VKT/Profiling/vktFrameProfilerLayer.cpp",
+    "VKT/Profiling/vktTimestampedCmdBuf.cpp",
 
     "VKT/Rendering/vktImageRenderer.cpp",
 
     "VKT/Tracing/vktAPIEntry.cpp",
     "VKT/Tracing/vktThreadTraceData.cpp",
-    "VKT/Tracing/TraceAnalyzerLayer.cpp",
+    "VKT/Tracing/vktTraceAnalyzerLayer.cpp",
 
     "VKT/Util/vktUtil.cpp",
 
