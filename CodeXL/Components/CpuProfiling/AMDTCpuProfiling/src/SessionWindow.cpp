@@ -661,7 +661,7 @@ void CpuSessionWindow::onFindNext()
     }
 }
 
-bool CpuSessionWindow::DisplaySession(const osFilePath& filePath, afTreeItemType itemType, QString& errorMessage)
+bool CpuSessionWindow::DisplaySession(const osFilePath& filePath, const osFilePath& moduleFilePath, afTreeItemType itemType, QString& errorMessage)
 {
     GT_UNREFERENCED_PARAMETER(filePath);
     GT_UNREFERENCED_PARAMETER(errorMessage);
@@ -711,7 +711,14 @@ bool CpuSessionWindow::DisplaySession(const osFilePath& filePath, afTreeItemType
 
         case AF_TREE_ITEM_PROFILE_CPU_SOURCE_CODE:
         {
-            retVal = displaySessionSource();
+            if (!moduleFilePath.isEmpty())
+            {
+                retVal = displaySessionSource(moduleFilePath);
+            }
+            else
+            {
+                retVal = true;
+            }
             break;
         }
 
@@ -960,7 +967,7 @@ void CpuSessionWindow::UpdateDisplaySettings(bool isActive, unsigned int changeT
     }
 }
 
-bool CpuSessionWindow::displaySessionSource()
+bool CpuSessionWindow::displaySessionSource(const osFilePath& moduleFilePath)
 {
     bool retVal = false;
     // Overview window should be already opened:
@@ -970,18 +977,12 @@ bool CpuSessionWindow::displaySessionSource()
         // For example, to contain also the system modules:
         m_pOverviewWindow->UpdateTableDisplaySettings();
 
-        const CPUSessionTreeItemData* pItemData = displayedCPUSessionItemData();
-        GT_IF_WITH_ASSERT(pItemData != nullptr)
+        // Get the module hander for this file path:
+        const CpuProfileModule* pModule = m_pOverviewWindow->findModuleHandler(moduleFilePath);
+        GT_IF_WITH_ASSERT(pModule != nullptr)
         {
-            osFilePath moduleFilePath = acQStringToGTString(pItemData->m_exeFullPath);
-
-            // Get the module hander for this file path:
-            const CpuProfileModule* pModule = m_pOverviewWindow->findModuleHandler(moduleFilePath);
-            GT_IF_WITH_ASSERT(pModule != nullptr)
-            {
-                onViewSourceView(0, 0, 0, pModule);
-                retVal = true;
-            }
+            onViewSourceView(0, 0, 0, pModule);
+            retVal = true;
         }
     }
 

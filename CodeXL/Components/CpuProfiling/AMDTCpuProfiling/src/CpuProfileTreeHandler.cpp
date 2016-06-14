@@ -523,9 +523,9 @@ afApplicationTreeItemData* CpuProfileTreeHandler::AddSourceCodeToSessionNode(Ses
                     // Source code item doesn't exist:
                     pRetVal = new afApplicationTreeItemData;
 
-
                     pRetVal->m_itemType = AF_TREE_ITEM_PROFILE_CPU_SOURCE_CODE;
                     pRetVal->setExtendedData(pSourceCodeItemSessionData);
+                    pSourceCodeItemSessionData->m_pParentData = pRetVal;
 
                     QPixmap* pPixmap = ProfileApplicationTreeHandler::instance()->TreeItemTypeToPixmap(AF_TREE_ITEM_PROFILE_CPU_SOURCE_CODE);
                     QFileInfo filePath(pSourceCodeItemSessionData->m_exeFullPath);
@@ -556,7 +556,6 @@ afApplicationTreeItemData* CpuProfileTreeHandler::createSourceCodeNodeForSession
         GT_IF_WITH_ASSERT(m_pApplicationTree != nullptr)
         {
             pRetVal = new afApplicationTreeItemData;
-
 
             pRetVal->m_itemType = AF_TREE_ITEM_PROFILE_CPU_SOURCE_CODES;
             pRetVal->setExtendedData(pSessionItemData->extendedItemData());
