@@ -68,6 +68,9 @@ sources = \
     "src/AMDTHistogram.cpp",
 ]
 
+if (env['CXL_build_conf'] == 'INTERNAL'):
+    sources += ["Non-OpenSource/AMDTPowerProfileApi-Internal.cpp",]
+
 # Creating object files	
 objFiles = env.SharedObject(sources)
 
