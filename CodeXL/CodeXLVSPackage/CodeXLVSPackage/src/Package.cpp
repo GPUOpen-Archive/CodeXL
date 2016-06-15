@@ -445,6 +445,11 @@ void CodeXLVSPackage::onCallsHistoryView(CommandHandler* pSender, DWORD flags, V
 // ---------------------------------------------------------------------------
 void CodeXLVSPackage::onCodeXLExplorerView(CommandHandler* pSender, DWORD flags, VARIANT* pIn, VARIANT* pOut)
 {
+    // This flag is supposed to prevent the explorer from being displayed by default.
+    // The function is first called when the tool window is created. In this case we don't want to show it.
+    // In all other calls, we will call it.
+    static bool sFirstCall = true;
+
     GT_UNREFERENCED_PARAMETER(pSender);
     GT_UNREFERENCED_PARAMETER(flags);
     GT_UNREFERENCED_PARAMETER(pIn);
@@ -457,6 +462,13 @@ void CodeXLVSPackage::onCodeXLExplorerView(CommandHandler* pSender, DWORD flags,
     {
         int viewId = VSCORE(vsc_GetObjectNavigationTreeId());
         _pObjectsExplorerToolWindow->setMyWindowCommandID(viewId);
+
+        if (!sFirstCall)
+        {
+            _pObjectsExplorerToolWindow->CreateAndShow();
+        }
+
+        sFirstCall = false;
 
         // Invoke the core logic.
         VSCORE(vsc_OnCodeExplorerView)();
