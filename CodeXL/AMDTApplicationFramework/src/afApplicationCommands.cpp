@@ -824,7 +824,7 @@ bool afApplicationCommands::ShowQTSaveFileDialog(QString& selectedFilePath, cons
         QFileDialog::Options options;
 
 #if AMDT_BUILD_TARGET == AMDT_LINUX_OS
-        QFileDialog dialog(pDialogParent, dialogCaption, defaultPath, extension);
+        QFileDialog dialog(pDialogParent, dialogCaption, acGTStringToQString(csvFileDefaultPath.asString()), extension);
         dialog.setAcceptMode(QFileDialog::AcceptSave);
 
         options = QFileDialog::DontUseNativeDialog;

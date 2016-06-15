@@ -83,7 +83,7 @@ bool osDirectorySerializer::AddDirToZip(const osDirectory& sessionDir, const gtS
         {
             osDirectory osDir(*iter);
             gtString dirName = osDir.directoryPath().fileDirectoryAsString();
-            int startPos = dirName.findLastOf(L"\\") + 1;
+            int startPos = dirName.findLastOf(osFilePath::osPathSeparator) + 1;
             dirName.getSubString(startPos, (dirName.length() - startPos), dirName);
             gtString relPathAddition = relativePath;
             relPathAddition.append(dirName);
@@ -113,7 +113,7 @@ bool osDirectorySerializer::AddFilesToZip(const osDirectory& sessionDir, const g
 
 
             gtString fullName = ((*iter).fileDirectoryAsString());
-            fullName.append(L"\\");
+            fullName.append(osFilePath::osPathSeparator);
             fullName.append(displayName);
 
             if (relativePath.isEmpty() == false)
