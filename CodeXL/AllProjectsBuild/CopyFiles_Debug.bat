@@ -58,3 +58,6 @@ XCopy /r /d /y "..\..\Common\Lib\Ext\Qt\5.5\plugins\platforms\qwindows%D_SUFFIX%
 rem copy other files qcustomplot
 XCopy /r /d /y "..\..\Common\Lib\Ext\qcustomplot\1.3.1\lib\Win32\%CONFIG_NAME%\qcustomplot%D_SUFFIX%.dll" "..\Output\%CONFIG_NAME%\bin\"
 XCopy /r /d /y "..\..\Common\Lib\Ext\qcustomplot\1.3.1\lib\Win32\%CONFIG_NAME%\qcustomplot%D_SUFFIX%.pdb" "..\Output\%CONFIG_NAME%\bin\"
+
+rem copy AGS file
+XCopy /r /d /y "..\..\Common\Lib\AMD\ags\ags_lib_v4.0.0\lib\amd_ags_x86.dll" "..\Output\%CONFIG_NAME%\bin\"
