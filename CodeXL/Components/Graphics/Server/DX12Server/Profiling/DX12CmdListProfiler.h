@@ -107,6 +107,7 @@ struct ProfilerMeasurementId
     UINT                       mFrameIndex;     ///< The index of the frame that the profiled call occurred in.
     ID3D12GraphicsCommandList* pWrappedCmdList; ///< The CommandList wrapper that was used to submit the GPU command.
     D3D12_COMMAND_LIST_TYPE    mCmdListType;    ///< The type of CommandList being measured.
+    ID3D12CommandQueue*        pCmdQueue;       ///< The command queue we got a result from.
 };
 
 //-----------------------------------------------------------------------------
