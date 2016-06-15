@@ -23,7 +23,7 @@ class BasePlayer
 public:
 
     /// Constructor
-    BasePlayer() : m_pPlayerWindow(NULL)
+    BasePlayer() : m_pPlayerWindow(nullptr)
     {
     }
 

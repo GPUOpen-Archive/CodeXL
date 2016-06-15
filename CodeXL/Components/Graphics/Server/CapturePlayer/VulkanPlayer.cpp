@@ -130,7 +130,7 @@ bool VulkanPlayer::InitializeWindow(HINSTANCE hInstance, UINT windowWidth, UINT 
     m_pPlayerWindow = new X11Window(windowWidth, windowHeight);
 #endif
 
-    if (m_pPlayerWindow == NULL)
+    if (m_pPlayerWindow == nullptr)
     {
         return false;
     }

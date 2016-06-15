@@ -1,0 +1,66 @@
+# Copyright (c) 2016 Advanced Micro Devices, Inc. All rights reserved.
+#
+# Main scons build file for Capture Player
+#
+
+Import('GPS_env')
+env = GPS_env.Clone()
+env.VulkanAPIVersion = "1.0.13.0"
+env['CPPPATH'] = env['GPS_PATH']
+env.Prepend (CPPPATH =
+[
+    '../Common/Linux',
+    '../../../Common/Lib/Ext/tinyxml/2.6.2',
+    '../../../Common/Lib/Ext/Vulkan/' + env.VulkanAPIVersion + '/SDK/Include',
+    '../../../Common/Lib/Ext/Vulkan/' + env.VulkanAPIVersion + '/SDK/Include/vulkan',
+    '../../../Common/Lib/Ext/Vulkan/' + env.VulkanAPIVersion + '/SDK/Source/loader',
+])
+env.Prepend (LIBPATH = env['GPS_LIBPATH'])
+env.Prepend(CCFLAGS =
+[
+    "-D'DATADIR=\"share\"'",
+    "-D'SYSCONFDIR=\"etc\"'",
+    "-DVK_USE_PLATFORM_XCB_KHR",
+    "-DVK_USE_PLATFORM_XLIB_KHR",
+    "-Dvulkan_EXPORTS",
+    "-std=c99",
+    "-Wall",
+    "-Wextra",
+])
+
+# These need to be in their dependency order. Most derived first
+env['LIBS'] = \
+[
+    #internal libraries
+    "libCommon",
+    "libAMDTOSWrappers",
+    "libAMDTBaseTools",
+    #enternal libraries
+    "rt",
+    "pthread",
+    "dl",
+    "X11",
+]
+
+# build the Capture Player executable
+
+sources = \
+[
+# loader
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/loader.c",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/trampoline.c",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/wsi.c",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/debug_report.c",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/cJSON.c",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/murmurhash.c",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/dev_ext_trampoline.c",
+
+# capture player
+    "PlayerMain.cpp",
+    "X11Window.cpp",
+    "VulkanPlayer.cpp",
+]
+
+CapturePlayer = env.Program('CapturePlayer', sources)
+
+Return('CapturePlayer')

@@ -16,7 +16,7 @@ const wchar_t* kWindowTitle = L"Capture Player - [PLACEHOLDER].ACR"; ///< Window
 /// \param inWndProc The application - defined function that processes messages sent to a window.Main message handler
 WindowsWindow::WindowsWindow(UINT windowWidth, UINT windowHeight, HINSTANCE hInstance, WNDPROC inWndProc)
     : WindowBase(windowWidth, windowHeight)
-    , mWindowHandle(NULL)
+    , mWindowHandle(nullptr)
     , mhInstance(hInstance)
     , mWndProc(inWndProc)
 {
@@ -49,9 +49,9 @@ bool WindowsWindow::Initialize()
     if (RegisterClassEx(&mWindowClass) != 0)
     {
         mWindowHandle = CreateWindow(kWindowClassName, kWindowTitle, WS_OVERLAPPEDWINDOW,
-                                     CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, mhInstance, NULL);
+                                     CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, mhInstance, nullptr);
 
-        if (mWindowHandle != NULL)
+        if (mWindowHandle != nullptr)
         {
             bInitializedSuccessfully = true;
         }
@@ -99,7 +99,7 @@ bool WindowsWindow::OpenAndUpdate(int inNCmdShow)
 {
     bool bSuccessful = false;
 
-    if (mWindowHandle != NULL)
+    if (mWindowHandle != nullptr)
     {
         // The window was created successfully. open
         ShowWindow(mWindowHandle, inNCmdShow);
