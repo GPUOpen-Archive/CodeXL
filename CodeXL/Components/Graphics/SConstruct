@@ -39,6 +39,8 @@ GPS_env.projectSuffix = ""
 GPS_env.projectName = "GPUPerfServer"
 GPS_env.capturePlayerName = "CapturePlayer"
 GPS_env.vulkanPluginName = "VulkanServer"
+GPS_env.jpglib = "jpeg-9"
+GPS_env.libpng = "v1.6.19/src"
 
 buildTests = False
 buildInternal = False
@@ -104,8 +106,6 @@ GPS_env['GPS_PATH'] = \
 [
     '../../Server/Common',
     '../../Server/Common/Linux',
-    '../../Server/Common/Linux/libpng',
-    '../../Server/Common/Linux/jpglib',
     '../../../Common/Src',
     '../../../Common/Src/ADLUtil',
     '../../../Common/Src/AMDLoggingRegistration',
@@ -117,6 +117,8 @@ GPS_env['GPS_PATH'] = \
     '../../../Common/Lib/AMD/GPUPerfAPI/' + GPS_env.PerfAPIVersion + '/Include',
     '../../../Common/Lib/AMD/GPUThreadTrace/1_0/Include',
     '../../../Common/Lib/Ext/Boost/boost_' + GPS_env.BoostVersion,
+    '../../../Common/Lib/Ext/libpng/' + GPS_env.libpng,
+    '../../../Common/Lib/Ext/jpglib/' + GPS_env.jpglib,
     '../../../Common/Src/ShaderUtils',
     '../../../Common/Src',
     '../../../Common/Src/AMDTOSWrappers/Include',

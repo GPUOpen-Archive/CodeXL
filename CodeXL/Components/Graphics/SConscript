@@ -10,8 +10,8 @@ env.Prepend (CPPPATH = ["../Common/Src"])
 base_env = Environment()
 base_env['CPPPATH'] = \
 [
-    "Server/Common/Linux/jpglib",
-    "Server/Common/Linux/libpng",
+    "../Common/Lib/Ext/libpng/" + env.libpng,
+    "../Common/Lib/Ext/jpglib/" + env.jpglib,
 ]
 
 base_env['CCFLAGS'] = env['CCFLAGS']
@@ -52,27 +52,27 @@ zlib_Obj = base_env.StaticLibrary('Zlib', src)
 #
 sources = \
 [
-    "png.cpp",
-    "pngerror.cpp",
-    "pngget.cpp",
-    "pngmem.cpp",
-    "pngpread.cpp",
-    "pngread.cpp",
-    "pngrio.cpp",
-    "pngrtran.cpp",
-    "pngrutil.cpp",
-    "pngset.cpp",
-    "pngtrans.cpp",
-    "pngwio.cpp",
-    "pngwrite.cpp",
-    "pngwtran.cpp",
-    "pngwutil.cpp",
+    "png.c",
+    "pngerror.c",
+    "pngget.c",
+    "pngmem.c",
+    "pngpread.c",
+    "pngread.c",
+    "pngrio.c",
+    "pngrtran.c",
+    "pngrutil.c",
+    "pngset.c",
+    "pngtrans.c",
+    "pngwio.c",
+    "pngwrite.c",
+    "pngwtran.c",
+    "pngwutil.c",
 ]
 
 # build the file list with the correct path prepended
 src = [];
 for file in sources:
-    src.append("Server/Common/Linux/libpng/" + file)
+    src.append("../Common/Lib/Ext/libpng/" + env.libpng + "/" + file)
 
 libPng_Obj = base_env.StaticLibrary('libPng', src)
 
@@ -82,52 +82,52 @@ libPng_Obj = base_env.StaticLibrary('libPng', src)
 sources = \
 [
 # library files
-    "jaricom.cpp",
-    "jcapimin.cpp",
-    "jcapistd.cpp",
-    "jcarith.cpp",
-    "jccoefct.cpp",
-    "jccolor.cpp",
-    "jcdctmgr.cpp",
-    "jchuff.cpp",
-    "jcinit.cpp",
-    "jcmainct.cpp",
-    "jcmarker.cpp",
-    "jcmaster.cpp",
-    "jcomapi.cpp",
-    "jcparam.cpp",
-    "jcprepct.cpp",
-    "jcsample.cpp",
-    "jctrans.cpp",
-    "jdapimin.cpp",
-    "jdapistd.cpp",
-    "jdarith.cpp",
-    "jdatadst.cpp",
-    "jdatasrc.cpp",
-    "jdcoefct.cpp",
-    "jdcolor.cpp",
-    "jddctmgr.cpp",
-    "jdhuff.cpp",
-    "jdinput.cpp",
-    "jdmainct.cpp",
-    "jdmarker.cpp",
-    "jdmaster.cpp",
-    "jdmerge.cpp",
-    "jdpostct.cpp",
-    "jdsample.cpp",
-    "jdtrans.cpp",
-    "jerror.cpp",
-    "jfdctflt.cpp",
-    "jfdctfst.cpp",
-    "jfdctint.cpp",
-    "jidctflt.cpp",
-    "jidctfst.cpp",
-    "jidctint.cpp",
-    "jquant1.cpp",
-    "jquant2.cpp",
-    "jutils.cpp",
-    "jmemmgr.cpp",
-    "jmemnobs.cpp",
+    "jaricom.c",
+    "jcapimin.c",
+    "jcapistd.c",
+    "jcarith.c",
+    "jccoefct.c",
+    "jccolor.c",
+    "jcdctmgr.c",
+    "jchuff.c",
+    "jcinit.c",
+    "jcmainct.c",
+    "jcmarker.c",
+    "jcmaster.c",
+    "jcomapi.c",
+    "jcparam.c",
+    "jcprepct.c",
+    "jcsample.c",
+    "jctrans.c",
+    "jdapimin.c",
+    "jdapistd.c",
+    "jdarith.c",
+    "jdatadst.c",
+    "jdatasrc.c",
+    "jdcoefct.c",
+    "jdcolor.c",
+    "jddctmgr.c",
+    "jdhuff.c",
+    "jdinput.c",
+    "jdmainct.c",
+    "jdmarker.c",
+    "jdmaster.c",
+    "jdmerge.c",
+    "jdpostct.c",
+    "jdsample.c",
+    "jdtrans.c",
+    "jerror.c",
+    "jfdctflt.c",
+    "jfdctfst.c",
+    "jfdctint.c",
+    "jidctflt.c",
+    "jidctfst.c",
+    "jidctint.c",
+    "jquant1.c",
+    "jquant2.c",
+    "jutils.c",
+    "jmemmgr.c",
+    "jmemnobs.c",
 
 # compression
 #    "cjpeg.c",
@@ -153,7 +153,7 @@ sources = \
 # build the file list with the correct path prepended
 src = [];
 for file in sources:
-    src.append("Server/Common/Linux/jpglib/" + file)
+    src.append("../Common/Lib/Ext/jpglib/" + env.jpglib + "/" + file)
 
 jpgLib_Obj = base_env.StaticLibrary('libJpg', src)
 
