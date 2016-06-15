@@ -444,8 +444,11 @@ bool DX12AtpFilePart::Parse(std::istream& in, std::string& outErrorMsg)
                     gtUInt64 availVirtualSizet = 0;
 
                     bool res = osGetLocalMachineMemoryInformation(totalRamSizet, availRamSizet, totalPageSizet, availPageSizet, totalVirtualSizet, availVirtualSizet);
-
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
                     if (res && availVirtualSizet < s_min_vm_size_for_api_parse)
+#elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
+                    if (res && availPageSizet < s_min_vm_size_for_api_parse)
+#endif
                     {
                         m_shouldStopParsing = true;
                         m_bWarning = false;
