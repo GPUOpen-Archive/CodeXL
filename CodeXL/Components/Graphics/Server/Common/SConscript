@@ -7,7 +7,6 @@ env = GPS_env.Clone()
 env['CPPPATH'] = env['GPS_PATH']
 env.Prepend (CPPPATH =
 [
-    '../Common/Linux',
     '../../../Common/Lib/Ext/tinyxml/2.6.2',
 ])
 
@@ -92,6 +91,7 @@ sources = \
     "Linux/Interceptor.cpp",
     "Linux/OSWrappers.cpp",
     "Linux/SafeCRT.cpp",
+    "Linux/ServerUtils.cpp",
     "Linux/timerLinux.cpp"
 ]
 
