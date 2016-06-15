@@ -2045,6 +2045,905 @@ PackageTheBuild()
 		cp -f ${AMD_CODEXL}/Components/PowerProfiling/Help/AMDTPowerProfileAPI.pdf        ${PKG_NAME}/SDK/CXLPowerProfile/doc
 
 		tar czf ${PKG_NAME}.tar.gz ${PKG_NAME}
+
+	elif [ ${BUILDTYPE} = "NDA" ]
+
+	then
+
+		################################################################################################
+		# Copy the files for the CodeXL NDA version
+		################################################################################################
+		PKG_NAME=CodeXL_NDA_Only_Linux_x86_64_${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_BUILD}
+		mkdir -p ${PKG_NAME}
+		cp ${AMD_CODEXL}/../CodeXL/Installer-Linux/debian/main/amdcodexlicon.desktop ${PKG_NAME}
+		cp ${AMD_CODEXL}/../CodeXL/Installer-Linux/debian/main/amdremoteagenticon.desktop ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/CodeXL_Release_Notes.pdf                ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/CXLRemoteDebuggingServer                ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/CodeXL                                  ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/CodeXLAnalyzer                          ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/CodeXLAnalyzer-bin                      ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/CodeXL-bin                              ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/CodeXLCpuProfiler                       ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/CodeXLCpuProfiler-bin                   ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/CodeXLRemoteAgent-bin                   ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/CodeXLPowerProfiler                     ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/CodeXLPowerProfiler-bin                 ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/CXLSystemInformationHelper-x64          ${PKG_NAME}
+		cp -f Output_x86/release/bin/CXLSystemInformationHelper                 ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/CodeXLPwrProfDriver.sh                  ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/CodeXLPwrProfDriverSource.tar.gz        ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/CodeXLPwrProfVersion                    ${PKG_NAME}
+		cp ${AMD_CODEXL}/Remote/AMDTRemoteAgent/CodeXLRemoteAgentConfig.xml     ${PKG_NAME}
+		cp ${AMD_CODEXL}/Remote/AMDTRemoteAgent/CodeXLRemoteAgent               ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libAMDOpenCLDebugAPI64.so              ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLAnalysisBackend.so               ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLAnalyzer.so                      ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLDbAdapter.so                     ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLProfilerDAL.so                   ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLPowerProfilingMidTier.so         ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLPowerProfiling.so                ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLAPIClasses.so                    ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLApiFunctions.so                  ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLApplicationComponents.so         ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLApplicationFramework.so          ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLApplication.so                   ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLAssertionHandlers.so             ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLBaseTools.so                     ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLCpuCallstackSampling.so          ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLCpuPerfEventUtils.so             ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLCpuProfilingControl.so           ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLCpuProfilingRawData.so           ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLCpuProfiling.so                  ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLCpuProfilingTranslation.so       ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLDisassembler.so                  ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLExecutableFormat.so              ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLGpuDebuggingComponents.so        ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLGpuDebugging.so                  ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLGpuProfiling.so                  ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLGraphicsServerInterface.so       ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLHsaServer.so                     ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLJvmtiAgent-x64.so                ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLOSWrappers.so                    ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLOSAPIWrappers.so                 ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLProcessDebugger.so               ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLProfilingAgentsData.so           ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLRemoteClient.so                  ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLServerUtilities.so               ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLSharedProfiling.so               ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLThreadProfileAPI.so              ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLPowerProfileAPI.so               ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libboost_filesystem.so.1.59.0          ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libboost_program_options.so.1.59.0     ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libboost_regex.so.1.59.0               ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libboost_system.so.1.59.0              ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libboost_chrono.so.1.59.0              ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libboost_date_time.so.1.59.0           ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libboost_thread.so.1.59.0              ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libboost_wave.so.1.59.0                ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libGLEW.so                             ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libGLEW.so.1.9                         ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libGLEW.so.1.9.0                       ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libqcustomplot.so                      ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libqscintilla.so                       ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libqscintilla.so.11                    ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libqscintilla.so.11.0                  ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libqscintilla.so.11.0.0                ${PKG_NAME}
+		cp  -f ${AMD_CODEXL}/../CodeXL/Setup/Legal/Readme.txt                   ${PKG_NAME}
+
+		mkdir -p ${PKG_NAME}/RuntimeLibs
+		mkdir -p ${PKG_NAME}/RuntimeLibs/x86
+		mkdir -p ${PKG_NAME}/RuntimeLibs/x86_64
+		cp -df Output_x86_64/release/bin/libstdc++.so*                          ${PKG_NAME}/RuntimeLibs/x86_64
+#		cp -df Output_x86_64/release/bin/libstdc++.so.6                         ${PKG_NAME}/RuntimeLibs/x86_64
+#		cp -df Output_x86_64/release/bin/libstdc++.so.6.0.16                    ${PKG_NAME}/RuntimeLibs/x86_64
+		cp -df Output_x86/release/bin/libstdc++.so*                             ${PKG_NAME}/RuntimeLibs/x86
+#		cp -df Output_x86/release/bin/libstdc++.so.6                            ${PKG_NAME}/RuntimeLibs/x86
+#		cp -df Output_x86/release/bin/libstdc++.so.6.0.16                       ${PKG_NAME}/RuntimeLibs/x86
+
+		mkdir -p ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libicudata.so                          ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libicudata.so.54                       ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libicudata.so.54.1                     ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libicui18n.so                          ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libicui18n.so.54                       ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libicui18n.so.54.1                     ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libicuio.so                            ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libicuio.so.54                         ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libicuio.so.54.1                       ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libicuuc.so                            ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libicuuc.so.54                         ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libicuuc.so.54.1                       ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Core.so                          ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Core.so.5                        ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Core.so.5.5                      ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Core.so.5.5.1                    ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5DBus.so                          ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5DBus.so.5                        ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5DBus.so.5.5                      ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5DBus.so.5.5.1                    ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Gui.so                           ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Gui.so.5                         ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Gui.so.5.5                       ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Gui.so.5.5.1                     ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Multimedia.so                    ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Multimedia.so.5                  ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Multimedia.so.5.5                ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Multimedia.so.5.5.1              ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5MultimediaWidgets.so             ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5MultimediaWidgets.so.5           ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5MultimediaWidgets.so.5.5         ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5MultimediaWidgets.so.5.5.1       ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Network.so                       ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Network.so.5                     ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Network.so.5.5                   ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Network.so.5.5.1                 ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5OpenGL.so                        ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5OpenGL.so.5                      ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5OpenGL.so.5.5                    ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5OpenGL.so.5.5.1                  ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Positioning.so                   ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Positioning.so.5                 ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Positioning.so.5.5               ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Positioning.so.5.5.1             ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5PrintSupport.so                  ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5PrintSupport.so.5                ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5PrintSupport.so.5.5              ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5PrintSupport.so.5.5.1            ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Qml.so                           ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Qml.so.5                         ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Qml.so.5.5                       ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Qml.so.5.5.1                     ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Quick.so                         ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Quick.so.5                       ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Quick.so.5.5                     ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Quick.so.5.5.1                   ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Sensors.so                       ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Sensors.so.5                     ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Sensors.so.5.5                   ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Sensors.so.5.5.1                 ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Sql.so                           ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Sql.so.5                         ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Sql.so.5.5                       ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Sql.so.5.5.1                     ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5WebChannel.so                    ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5WebChannel.so.5                  ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5WebChannel.so.5.5                ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5WebChannel.so.5.5.1              ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5WebKit.so                        ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5WebKit.so.5                      ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5WebKit.so.5.5                    ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5WebKit.so.5.5.1                  ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5WebKitWidgets.so                 ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5WebKitWidgets.so.5               ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5WebKitWidgets.so.5.5             ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5WebKitWidgets.so.5.5.1           ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Widgets.so                       ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Widgets.so.5                     ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Widgets.so.5.5                   ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Widgets.so.5.5.1                 ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5XcbQpa.so                        ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5XcbQpa.so.5                      ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5XcbQpa.so.5.5                    ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5XcbQpa.so.5.5.1                  ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Xml.so                           ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Xml.so.5                         ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Xml.so.5.5                       ${PKG_NAME}/RuntimeLibs/QT
+		cp -df Output_x86_64/release/bin/libQt5Xml.so.5.5.1                     ${PKG_NAME}/RuntimeLibs/QT
+
+		mkdir -p ${PKG_NAME}/platforms
+		cp -f Output_x86_64/release/bin/platforms/libqxcb.so                    ${PKG_NAME}/platforms
+
+		mkdir -p ${PKG_NAME}/SDK/CXLActivityLogger/bin/x86
+		cp -f Output_x86_64/release/bin/CXLActivityLogger/bin/x86/libCXLActivityLogger.so    ${PKG_NAME}/SDK/CXLActivityLogger/bin/x86/
+		mkdir -p ${PKG_NAME}/SDK/CXLActivityLogger/bin/x86_64
+		cp -f Output_x86_64/release/bin/CXLActivityLogger/bin/x86_64/libCXLActivityLogger.so ${PKG_NAME}/SDK/CXLActivityLogger/bin/x86_64/
+		mkdir -p ${PKG_NAME}/SDK/CXLActivityLogger/doc
+		cp -f Output_x86_64/release/bin//CXLActivityLogger/doc/AMDTActivityLogger.pdf        ${PKG_NAME}/SDK/CXLActivityLogger/doc/
+		mkdir -p ${PKG_NAME}/SDK/CXLActivityLogger/include
+		cp -f Output_x86_64/release/bin/CXLActivityLogger/include/CXLActivityLogger.h        ${PKG_NAME}/SDK/CXLActivityLogger/include/
+		mkdir -p ${PKG_NAME}/Data
+		cp ${AMD_CODEXL}/../CodeXL/Data/NDA/VersionSettings.xml ${PKG_NAME}/Data
+		mkdir -p ${PKG_NAME}/Data/Events
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/NDA/0x10.xml	 ${PKG_NAME}/Data/Events/
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/NDA/0x11.xml     ${PKG_NAME}/Data/Events/
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/NDA/0x12.xml     ${PKG_NAME}/Data/Events/
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/NDA/0x14.xml     ${PKG_NAME}/Data/Events/
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/NDA/0x15_0x0.xml ${PKG_NAME}/Data/Events/
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/NDA/0x15_0x1.xml ${PKG_NAME}/Data/Events/
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/NDA/0x15_0x3.xml ${PKG_NAME}/Data/Events/
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/NDA/0x15_0x6.xml ${PKG_NAME}/Data/Events/
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/NDA/0x16_0x0.xml ${PKG_NAME}/Data/Events/
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/NDA/0x16_0x3.xml      ${PKG_NAME}/Data/Events/
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/NDA/0xf.xml      ${PKG_NAME}/Data/Events/
+
+		mkdir -p ${PKG_NAME}/Data/Profiles
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/dcconfig.dtd 		${PKG_NAME}/Data/Profiles
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/tbp.xml 			${PKG_NAME}/Data/Profiles
+
+		mkdir -p ${PKG_NAME}/Data/Profiles/0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x6/assess.xml 			${PKG_NAME}/Data/Profiles/0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x6/branch.xml 			${PKG_NAME}/Data/Profiles/0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x6/data_access.xml 	${PKG_NAME}/Data/Profiles/0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x6/inst_access.xml 	${PKG_NAME}/Data/Profiles/0x6
+		mkdir -p ${PKG_NAME}/Data/Profiles/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x10/assess.xml			${PKG_NAME}/Data/Profiles/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x10/branch.xml			${PKG_NAME}/Data/Profiles/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x10/clu.xml 			${PKG_NAME}/Data/Profiles/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x10/data_access.xml 	${PKG_NAME}/Data/Profiles/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x10/ibs.xml			${PKG_NAME}/Data/Profiles/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x10/inst_access.xml	${PKG_NAME}/Data/Profiles/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x10/l2_access.xml 		${PKG_NAME}/Data/Profiles/0x10
+		mkdir -p ${PKG_NAME}/Data/Profiles/0x11
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x11/assess.xml			${PKG_NAME}/Data/Profiles/0x11
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x11/branch.xml			${PKG_NAME}/Data/Profiles/0x11
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x11/data_access.xml 	${PKG_NAME}/Data/Profiles/0x11
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x11/inst_access.xml	${PKG_NAME}/Data/Profiles/0x11
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x11/l2_access.xml 		${PKG_NAME}/Data/Profiles/0x11
+		mkdir -p ${PKG_NAME}/Data/Profiles/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x12/assess.xml			${PKG_NAME}/Data/Profiles/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x12/branch.xml			${PKG_NAME}/Data/Profiles/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x12/clu.xml 			${PKG_NAME}/Data/Profiles/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x12/data_access.xml 	${PKG_NAME}/Data/Profiles/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x12/ibs.xml			${PKG_NAME}/Data/Profiles/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x12/inst_access.xml	${PKG_NAME}/Data/Profiles/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x12/l2_access.xml 		${PKG_NAME}/Data/Profiles/0x12
+		mkdir -p ${PKG_NAME}/Data/Profiles/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x14/assess.xml			${PKG_NAME}/Data/Profiles/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x14/branch.xml			${PKG_NAME}/Data/Profiles/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x14/clu.xml 			${PKG_NAME}/Data/Profiles/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x14/data_access.xml 	${PKG_NAME}/Data/Profiles/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x14/ibs.xml			${PKG_NAME}/Data/Profiles/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x14/inst_access.xml	${PKG_NAME}/Data/Profiles/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x14/l2_access.xml 		${PKG_NAME}/Data/Profiles/0x14
+		mkdir -p ${PKG_NAME}/Data/Profiles/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x0/assess.xml			${PKG_NAME}/Data/Profiles/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x0/branch.xml			${PKG_NAME}/Data/Profiles/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x0/clu.xml 			${PKG_NAME}/Data/Profiles/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x0/data_access.xml 	${PKG_NAME}/Data/Profiles/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x0/ibs.xml			${PKG_NAME}/Data/Profiles/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x0/inst_access.xml	${PKG_NAME}/Data/Profiles/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x0/l2_access.xml 		${PKG_NAME}/Data/Profiles/0x15_0x0
+		mkdir -p ${PKG_NAME}/Data/Profiles/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x1/assess.xml			${PKG_NAME}/Data/Profiles/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x1/branch.xml			${PKG_NAME}/Data/Profiles/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x1/clu.xml 			${PKG_NAME}/Data/Profiles/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x1/data_access.xml 	${PKG_NAME}/Data/Profiles/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x1/ibs.xml			${PKG_NAME}/Data/Profiles/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x1/inst_access.xml	${PKG_NAME}/Data/Profiles/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x1/l2_access.xml 		${PKG_NAME}/Data/Profiles/0x15_0x1
+		mkdir -p ${PKG_NAME}/Data/Profiles/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x3/assess.xml			${PKG_NAME}/Data/Profiles/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x3/branch.xml			${PKG_NAME}/Data/Profiles/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x3/clu.xml 			${PKG_NAME}/Data/Profiles/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x3/data_access.xml 	${PKG_NAME}/Data/Profiles/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x3/ibs.xml			${PKG_NAME}/Data/Profiles/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x3/inst_access.xml	${PKG_NAME}/Data/Profiles/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x3/l2_access.xml 		${PKG_NAME}/Data/Profiles/0x15_0x3
+		mkdir -p ${PKG_NAME}/Data/Profiles/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x6/assess.xml       ${PKG_NAME}/Data/Profiles/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x6/branch.xml       ${PKG_NAME}/Data/Profiles/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x6/clu.xml          ${PKG_NAME}/Data/Profiles/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x6/data_access.xml  ${PKG_NAME}/Data/Profiles/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x6/ibs.xml          ${PKG_NAME}/Data/Profiles/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x6/inst_access.xml  ${PKG_NAME}/Data/Profiles/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x6/l2_access.xml    ${PKG_NAME}/Data/Profiles/0x15_0x6
+		mkdir -p ${PKG_NAME}/Data/Profiles/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x16_0x0/assess.xml			${PKG_NAME}/Data/Profiles/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x16_0x0/branch.xml			${PKG_NAME}/Data/Profiles/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x16_0x0/clu.xml 			${PKG_NAME}/Data/Profiles/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x16_0x0/data_access.xml 	${PKG_NAME}/Data/Profiles/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x16_0x0/ibs.xml			${PKG_NAME}/Data/Profiles/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x16_0x0/inst_access.xml	${PKG_NAME}/Data/Profiles/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x16_0x0/l2_access.xml 		${PKG_NAME}/Data/Profiles/0x16_0x0
+		mkdir -p ${PKG_NAME}/Data/Profiles/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x16_0x3/assess.xml			${PKG_NAME}/Data/Profiles/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x16_0x3/branch.xml			${PKG_NAME}/Data/Profiles/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x16_0x3/clu.xml 			${PKG_NAME}/Data/Profiles/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x16_0x3/data_access.xml 	${PKG_NAME}/Data/Profiles/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x16_0x3/ibs.xml			${PKG_NAME}/Data/Profiles/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x16_0x3/inst_access.xml	${PKG_NAME}/Data/Profiles/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x16_0x3/l2_access.xml 		${PKG_NAME}/Data/Profiles/0x16_0x3
+		mkdir -p ${PKG_NAME}/Data/Profiles/0xf
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0xf/assess.xml			${PKG_NAME}/Data/Profiles/0xf
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0xf/branch.xml			${PKG_NAME}/Data/Profiles/0xf
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0xf/data_access.xml 	${PKG_NAME}/Data/Profiles/0xf
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0xf/inst_access.xml		${PKG_NAME}/Data/Profiles/0xf
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0xf/l2_access.xml 		${PKG_NAME}/Data/Profiles/0xf
+
+		mkdir -p ${PKG_NAME}/Data/Views/
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/README_viewconfig.txt		${PKG_NAME}/Data/Views
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/timer.xml					${PKG_NAME}/Data/Views
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/viewconfig.dtd				${PKG_NAME}/Data/Views
+
+		mkdir -p ${PKG_NAME}/Data/Views/0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x6/br_assess.xml				${PKG_NAME}/Data/Views/0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x6/dc_assess.xml				${PKG_NAME}/Data/Views/0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x6/dc_focus.xml				${PKG_NAME}/Data/Views/0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x6/dtlb_assess.xml			${PKG_NAME}/Data/Views/0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x6/dtlb_focus.xml				${PKG_NAME}/Data/Views/0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x6/ic_focus.xml				${PKG_NAME}/Data/Views/0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x6/ipc_assess.xml				${PKG_NAME}/Data/Views/0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x6/itlb_focus.xml				${PKG_NAME}/Data/Views/0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x6/misalign_assess.xml		${PKG_NAME}/Data/Views/0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x6/taken_focus.xml			${PKG_NAME}/Data/Views/0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x6/triage_assess.xml			${PKG_NAME}/Data/Views/0x6
+		mkdir -p ${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/br_assess.xml				${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/dc_assess.xml				${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/dc_focus.xml				${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/dtlb_assess.xml			${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/dtlb_focus.xml			${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/ibs_fetch_ic.xml			${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/ibs_fetch_itlb.xml		${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/ibs_fetch_overall.xml		${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/ibs_fetch_page.xml		${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/ibs_op_branch.xml			${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/ibs_op_ls_dc.xml			${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/ibs_op_ls_dtlb.xml		${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/ibs_op_ls_expert.xml		${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/ibs_op_ls_memacc.xml		${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/ibs_op_ls_page.xml		${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/ibs_op_ls.xml				${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/ibs_op_nb_access.xml		${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/ibs_op_nb_cache.xml		${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/ibs_op_nb_service.xml		${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/ibs_op_overall.xml		${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/ibs_op_return.xml			${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/ic_focus.xml				${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/ipc_assess.xml			${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/itlb_focus.xml			${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/l2_focus.xml				${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/misalign_assess.xml		${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/return_focus.xml			${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/taken_focus.xml			${PKG_NAME}/Data/Views/0x10
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x10/triage_assess.xml			${PKG_NAME}/Data/Views/0x10
+		mkdir -p ${PKG_NAME}/Data/Views/0x11
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x11/br_assess.xml				${PKG_NAME}/Data/Views/0x11
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x11/dc_assess.xml				${PKG_NAME}/Data/Views/0x11
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x11/dc_focus.xml				${PKG_NAME}/Data/Views/0x11
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x11/dtlb_assess.xml			${PKG_NAME}/Data/Views/0x11
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x11/dtlb_focus.xml			${PKG_NAME}/Data/Views/0x11
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x11/ic_focus.xml				${PKG_NAME}/Data/Views/0x11
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x11/ipc_assess.xml			${PKG_NAME}/Data/Views/0x11
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x11/itlb_focus.xml			${PKG_NAME}/Data/Views/0x11
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x11/l2_focus.xml				${PKG_NAME}/Data/Views/0x11
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x11/misalign_assess.xml		${PKG_NAME}/Data/Views/0x11
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x11/return_focus.xml			${PKG_NAME}/Data/Views/0x11
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x11/taken_focus.xml			${PKG_NAME}/Data/Views/0x11
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x11/triage_assess.xml			${PKG_NAME}/Data/Views/0x11
+		mkdir -p ${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/br_assess.xml				${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/dc_assess.xml				${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/dc_focus.xml				${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/dtlb_assess.xml			${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/dtlb_focus.xml			${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/ibs_fetch_ic.xml			${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/ibs_fetch_itlb.xml		${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/ibs_fetch_overall.xml		${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/ibs_fetch_page.xml		${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/ibs_op_branch.xml			${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/ibs_op_ls_dc.xml			${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/ibs_op_ls_dtlb.xml		${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/ibs_op_ls_expert.xml		${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/ibs_op_ls_memacc.xml		${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/ibs_op_ls_page.xml		${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/ibs_op_ls.xml				${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/ibs_op_nb_access.xml		${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/ibs_op_nb_cache.xml		${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/ibs_op_nb_service.xml		${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/ibs_op_overall.xml		${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/ibs_op_return.xml			${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/ic_focus.xml				${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/ipc_assess.xml			${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/itlb_focus.xml			${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/l2_focus.xml				${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/misalign_assess.xml		${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/return_focus.xml			${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/taken_focus.xml			${PKG_NAME}/Data/Views/0x12
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x12/triage_assess.xml			${PKG_NAME}/Data/Views/0x12
+		mkdir -p ${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/br_assess.xml				${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/dc_assess.xml				${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/dc_focus.xml				${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/dtlb_assess.xml			${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/dtlb_focus.xml			${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/ibs_fetch_ic.xml			${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/ibs_fetch_itlb.xml		${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/ibs_fetch_overall.xml		${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/ibs_fetch_page.xml		${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/ibs_op_branch.xml			${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/ibs_op_ls_dc.xml			${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/ibs_op_ls_dtlb.xml		${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/ibs_op_ls_expert.xml		${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/ibs_op_ls_memacc.xml		${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/ibs_op_ls_page.xml		${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/ibs_op_ls.xml				${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/ibs_op_nb_access.xml		${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/ibs_op_nb_cache.xml		${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/ibs_op_nb_service.xml		${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/ibs_op_overall.xml		${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/ibs_op_return.xml			${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/ic_focus.xml				${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/ipc_assess.xml			${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/itlb_focus.xml			${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/l2_focus.xml				${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/misalign_assess.xml		${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/return_focus.xml			${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/taken_focus.xml			${PKG_NAME}/Data/Views/0x14
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x14/triage_assess.xml			${PKG_NAME}/Data/Views/0x14
+		mkdir -p ${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/br_assess.xml				${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/dc_assess.xml				${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/dc_focus.xml				${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/dtlb_assess.xml			${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/dtlb_focus.xml			${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/ibs_fetch_ic.xml			${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/ibs_fetch_itlb.xml		${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/ibs_fetch_overall.xml		${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/ibs_fetch_page.xml		${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/ibs_op_branch.xml			${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/ibs_op_ls_dc.xml			${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/ibs_op_ls_dtlb.xml		${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/ibs_op_ls_expert.xml		${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/ibs_op_ls_memacc.xml		${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/ibs_op_ls_page.xml		${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/ibs_op_ls.xml				${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/ibs_op_nb_access.xml		${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/ibs_op_nb_cache.xml		${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/ibs_op_nb_service.xml		${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/ibs_op_overall.xml		${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/ibs_op_return.xml			${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/ic_focus.xml				${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/ipc_assess.xml			${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/itlb_focus.xml			${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/l2_focus.xml				${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/misalign_assess.xml		${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/return_focus.xml			${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/taken_focus.xml			${PKG_NAME}/Data/Views/0x15_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x0/triage_assess.xml			${PKG_NAME}/Data/Views/0x15_0x0
+		mkdir -p ${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/br_assess.xml				${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/dc_assess.xml				${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/dc_focus.xml				${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/dtlb_assess.xml			${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/dtlb_focus.xml			${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/ibs_fetch_ic.xml			${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/ibs_fetch_itlb.xml		${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/ibs_fetch_overall.xml		${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/ibs_fetch_page.xml		${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/ibs_op_branch.xml			${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/ibs_op_ls_dc.xml			${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/ibs_op_ls_dtlb.xml		${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/ibs_op_ls_expert.xml		${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/ibs_op_ls_memacc.xml		${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/ibs_op_ls_page.xml		${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/ibs_op_ls.xml				${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/ibs_op_nb_access.xml		${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/ibs_op_nb_cache.xml		${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/ibs_op_nb_service.xml		${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/ibs_op_overall.xml		${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/ibs_op_return.xml			${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/ic_focus.xml				${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/ipc_assess.xml			${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/itlb_focus.xml			${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/l2_focus.xml				${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/misalign_assess.xml		${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/return_focus.xml			${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/taken_focus.xml			${PKG_NAME}/Data/Views/0x15_0x1
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x1/triage_assess.xml			${PKG_NAME}/Data/Views/0x15_0x1
+		mkdir -p ${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/br_assess.xml				${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/dc_assess.xml				${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/dc_focus.xml				${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/dtlb_assess.xml			${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/dtlb_focus.xml			${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/ibs_fetch_ic.xml			${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/ibs_fetch_itlb.xml		${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/ibs_fetch_overall.xml		${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/ibs_fetch_page.xml		${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/ibs_op_branch.xml			${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/ibs_op_ls_dc.xml			${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/ibs_op_ls_dtlb.xml		${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/ibs_op_ls_expert.xml		${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/ibs_op_ls_memacc.xml		${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/ibs_op_ls_page.xml		${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/ibs_op_ls.xml				${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/ibs_op_nb_access.xml		${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/ibs_op_nb_cache.xml		${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/ibs_op_nb_service.xml		${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/ibs_op_overall.xml		${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/ibs_op_return.xml			${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/ic_focus.xml				${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/ipc_assess.xml			${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/itlb_focus.xml			${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/l2_focus.xml				${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/misalign_assess.xml		${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/return_focus.xml			${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/taken_focus.xml			${PKG_NAME}/Data/Views/0x15_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x3/triage_assess.xml			${PKG_NAME}/Data/Views/0x15_0x3
+		mkdir -p ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/br_assess.xml               ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/dc_assess.xml               ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/dc_focus.xml                ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/dtlb_assess.xml             ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/dtlb_focus.xml              ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/ibs_fetch_ic.xml            ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/ibs_fetch_itlb.xml          ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/ibs_fetch_overall.xml       ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/ibs_fetch_page.xml          ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/ibs_op_branch.xml           ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/ibs_op_ls_dc.xml            ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/ibs_op_ls_dtlb.xml          ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/ibs_op_ls_expert.xml        ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/ibs_op_ls_memacc.xml        ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/ibs_op_ls_page.xml          ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/ibs_op_ls.xml               ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/ibs_op_nb_access.xml        ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/ibs_op_nb_cache.xml         ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/ibs_op_nb_service.xml       ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/ibs_op_overall.xml          ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/ibs_op_return.xml           ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/ic_focus.xml                ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/ipc_assess.xml              ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/itlb_focus.xml              ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/l2_focus.xml                ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/misalign_assess.xml         ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/return_focus.xml            ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/taken_focus.xml             ${PKG_NAME}/Data/Views/0x15_0x6
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/triage_assess.xml           ${PKG_NAME}/Data/Views/0x15_0x6
+		mkdir -p ${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/br_assess.xml				${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/dc_assess.xml				${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/dc_focus.xml				${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/dtlb_assess.xml			${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/dtlb_focus.xml			${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/ibs_fetch_ic.xml			${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/ibs_fetch_itlb.xml		${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/ibs_fetch_overall.xml		${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/ibs_fetch_page.xml		${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/ibs_op_branch.xml			${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/ibs_op_ls_dc.xml			${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/ibs_op_ls_dtlb.xml		${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/ibs_op_ls_expert.xml		${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/ibs_op_ls_memacc.xml		${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/ibs_op_ls_page.xml		${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/ibs_op_ls.xml				${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/ibs_op_nb_access.xml		${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/ibs_op_nb_cache.xml		${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/ibs_op_nb_service.xml		${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/ibs_op_overall.xml		${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/ibs_op_return.xml			${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/ic_focus.xml				${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/ipc_assess.xml			${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/itlb_focus.xml			${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/l2_focus.xml				${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/misalign_assess.xml		${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/return_focus.xml			${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/taken_focus.xml			${PKG_NAME}/Data/Views/0x16_0x0
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/triage_assess.xml			${PKG_NAME}/Data/Views/0x16_0x0
+		mkdir -p ${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/br_assess.xml				${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/dc_assess.xml				${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/dc_focus.xml				${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/dtlb_assess.xml			${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/dtlb_focus.xml			${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/ibs_fetch_ic.xml			${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/ibs_fetch_itlb.xml		${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/ibs_fetch_overall.xml		${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/ibs_fetch_page.xml		${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/ibs_op_branch.xml			${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/ibs_op_ls_dc.xml			${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/ibs_op_ls_dtlb.xml		${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/ibs_op_ls_expert.xml		${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/ibs_op_ls_memacc.xml		${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/ibs_op_ls_page.xml		${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/ibs_op_ls.xml				${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/ibs_op_nb_access.xml		${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/ibs_op_nb_cache.xml		${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/ibs_op_nb_service.xml		${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/ibs_op_overall.xml		${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/ibs_op_return.xml			${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/ic_focus.xml				${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/ipc_assess.xml			${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/itlb_focus.xml			${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/l2_focus.xml				${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/misalign_assess.xml		${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/return_focus.xml			${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/taken_focus.xml			${PKG_NAME}/Data/Views/0x16_0x3
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x3/triage_assess.xml			${PKG_NAME}/Data/Views/0x16_0x3
+		mkdir -p ${PKG_NAME}/Data/Views/0xf
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0xf/br_assess.xml			${PKG_NAME}/Data/Views/0xf
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0xf/dc_assess.xml			${PKG_NAME}/Data/Views/0xf
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0xf/dc_focus.xml				${PKG_NAME}/Data/Views/0xf
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0xf/dtlb_assess.xml			${PKG_NAME}/Data/Views/0xf
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0xf/dtlb_focus.xml			${PKG_NAME}/Data/Views/0xf
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0xf/ic_focus.xml				${PKG_NAME}/Data/Views/0xf
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0xf/ipc_assess.xml			${PKG_NAME}/Data/Views/0xf
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0xf/itlb_focus.xml			${PKG_NAME}/Data/Views/0xf
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0xf/l2_focus.xml				${PKG_NAME}/Data/Views/0xf
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0xf/misalign_assess.xml		${PKG_NAME}/Data/Views/0xf
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0xf/return_focus.xml			${PKG_NAME}/Data/Views/0xf
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0xf/taken_focus.xml			${PKG_NAME}/Data/Views/0xf
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0xf/triage_assess.xml		${PKG_NAME}/Data/Views/0xf
+
+		mkdir -p ${PKG_NAME}/examples/Teapot
+		cp -f Output_x86_64/release/bin/examples/Teapot/CXLTeapotLicense.txt 									${PKG_NAME}/examples/Teapot
+		mkdir -p ${PKG_NAME}/examples/Teapot/AMDTTeaPot/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPot/AMDTTeaPot.cpp 											${PKG_NAME}/examples/Teapot/AMDTTeaPot/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPot/AMDTTeaPot.h 											${PKG_NAME}/examples/Teapot/AMDTTeaPot/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPot/Makefile 												${PKG_NAME}/examples/Teapot/AMDTTeaPot/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPot/resource.h 												${PKG_NAME}/examples/Teapot/AMDTTeaPot/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPot/Sconstruct 												${PKG_NAME}/examples/Teapot/AMDTTeaPot/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPot/targetver.h 												${PKG_NAME}/examples/Teapot/AMDTTeaPot/
+		mkdir -p ${PKG_NAME}/examples/Teapot/AMDTTeaPot/inc
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPot/inc/AMDTDebug.h	 						${PKG_NAME}/examples/Teapot/AMDTTeaPot/inc
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPot/inc/AMDTMainWin.h						${PKG_NAME}/examples/Teapot/AMDTTeaPot/inc
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPot/inc/AMDTMisc.h							${PKG_NAME}/examples/Teapot/AMDTTeaPot/inc
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPot/inc/GLWindow.h							${PKG_NAME}/examples/Teapot/AMDTTeaPot/inc
+		mkdir -p ${PKG_NAME}/examples/Teapot/AMDTTeaPot/src
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPot/src/AMDTMainWin.cpp									${PKG_NAME}/examples/Teapot/AMDTTeaPot/src
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPot/src/GLWindow.cpp										${PKG_NAME}/examples/Teapot/AMDTTeaPot/src
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPot/src/Teapot.cpp										${PKG_NAME}/examples/Teapot/AMDTTeaPot/src
+
+		mkdir -p ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/Makefile                                   ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/SConscript                                 ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/Sconstruct						      	 ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/
+
+		mkdir -p ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/inc/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/inc/AMDTFluidGrid.h				       ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/inc
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/inc/AMDTImage.h                          ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/inc
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/inc/AMDTOpenCLHelper.h                   ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/inc
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/inc/AMDTOpenGLHelper.h                   ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/inc
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/inc/AMDTOpenGLMath.h                     ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/inc
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/inc/AMDTTeapotConstants.h                ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/inc
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/inc/AMDTTeapotOCLSmokeSystem.h           ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/inc
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/inc/AMDTTeapotOGLCanvas.h                ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/inc
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/inc/AMDTTeapotOGLCanvasStressTest.h      ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/inc
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/inc/AMDTTeapotRenderState.h              ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/inc
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/inc/AMDTTimer.h                          ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/inc
+
+		mkdir -p ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/inc/CL
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/inc/CL/cl_ext.h                 ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/inc/CL
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/inc/CL/cl_gl_ext.h              ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/inc/CL
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/inc/CL/cl_gl.h                  ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/inc/CL
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/inc/CL/cl.h                     ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/inc/CL
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/inc/CL/cl_icd.h                 ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/inc/CL
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/inc/CL/cl_platform.h            ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/inc/CL
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/inc/CL/GRemedyCLExtensions.h    ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/inc/CL
+
+		mkdir -p ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/inc/GL
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/inc/GL/glext.h  				  ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/inc/GL
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/inc/GL/GRemedyGLExtensions.h	  ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/inc/GL
+
+		mkdir -p ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/AMDTTeapot.icns						 	${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/AMDTTeapotSmokeSimulationClamp.h     	 	${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/AMDTTeapotSmokeSimulationGen.h       	 	${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/AMDTTeapotSmokeSimulation.h               ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/AMDTTeapotSmokeSimulationIndex.h          ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/AMDTTeapotSmokeSimulationScalarField.h    ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/AMDTTeapotSmokeSimulationVecField.h       ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/AMDTTeapotSmokeSimulationVec.h            ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/AMDTTeapotSmokeSimulationVecLength.h      ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/tpAdvectFieldScalar.cl                    ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/tpAdvectFieldVelocity.cl                  ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/tpApplyBuoyancy.cl                        ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/tpApplyPressureBoundaryCondition.cl       ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/tpApplySources.cl                         ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/tpApplyVelocityBoundaryCondition.cl       ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/tpApplyVorticity.cl                       ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/tpCalculateCurlU.cl                       ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/tpComputeFieldPressureIter.cl             ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/tpComputeFieldPressurePrep.cl             ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/tpCreateDensityTexture.cl                 ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/tpDebugDensity.cl                         ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/tpDebugFieldPressure.cl                   ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/tpDebugTemperature.cl                     ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/tpDebugVelocityLength.cl                  ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/tpDebugVelocityVector.cl                  ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/tpDissipateDensity.cl                     ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/tpDissipateTemperature.cl                 ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/tpFragmentShader.catchMeIfYouCan.glsl     ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/tpFragmentShader.glsl                     ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/tpLogo-white.bmp                          ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/tpProjectFieldVelocity.cl                 ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/tpSmokeSimulation.cl                      ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/tpVertexShader.glsl                       ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/res/tpVolumeSlicing.cl                        ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/res/
+
+		mkdir -p ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/src
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/src/AMDTFluidGrid.cpp						    ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/src/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/src/AMDTImage.cpp	                            ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/src/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/src/AMDTOpenCLHelper.cpp	                    ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/src/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/src/AMDTOpenGLHelper.cpp	                    ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/src/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/src/AMDTOpenGLMath.cpp	                    ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/src/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/src/AMDTTeapotData.dat	                    ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/src/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/src/AMDTTeapotOCLSmokeSystem.cpp	            ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/src/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/src/AMDTTeapotOGLCanvas.cpp	                ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/src/
+		cp -f Output_x86_64/release/bin/examples/Teapot/AMDTTeaPotLib/src/AMDTTeapotRenderState.cpp	                ${PKG_NAME}/examples/Teapot/AMDTTeaPotLib/src/
+		mkdir -p ${PKG_NAME}/examples/Teapot/LinuxResource/LinuxResources
+		cp -f Output_x86_64/release/bin/examples/Teapot/LinuxResource/LinuxResources/AMDTTeapotApp					${PKG_NAME}/examples/Teapot/LinuxResource/LinuxResources/
+		mkdir -p ${PKG_NAME}/examples/Teapot/release/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/CXLTeaPot-bin							${PKG_NAME}/examples/Teapot/release
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/libCXLTeaPot.a							${PKG_NAME}/examples/Teapot/release
+		mkdir -p ${PKG_NAME}/examples/Teapot/release/res
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/AMDTTeapot.icns							${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/AMDTTeapotSmokeSimulationClamp.h         ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/AMDTTeapotSmokeSimulationGen.h           ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/AMDTTeapotSmokeSimulation.h              ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/AMDTTeapotSmokeSimulationIndex.h         ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/AMDTTeapotSmokeSimulationScalarField.h   ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/AMDTTeapotSmokeSimulationVecField.h      ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/AMDTTeapotSmokeSimulationVec.h           ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/AMDTTeapotSmokeSimulationVecLength.h     ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/tpAdvectFieldScalar.cl                   ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/tpAdvectFieldVelocity.cl                 ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/tpApplyBuoyancy.cl                       ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/tpApplyPressureBoundaryCondition.cl      ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/tpApplySources.cl                        ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/tpApplyVelocityBoundaryCondition.cl      ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/tpApplyVorticity.cl                      ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/tpCalculateCurlU.cl                      ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/tpComputeFieldPressureIter.cl            ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/tpComputeFieldPressurePrep.cl            ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/tpCreateDensityTexture.cl                ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/tpDebugDensity.cl                        ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/tpDebugFieldPressure.cl                  ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/tpDebugTemperature.cl                    ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/tpDebugVelocityLength.cl                 ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/tpDebugVelocityVector.cl                 ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/tpDissipateDensity.cl                    ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/tpDissipateTemperature.cl                ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/tpFragmentShader.catchMeIfYouCan.glsl    ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/tpFragmentShader.glsl                    ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/tpLogo-white.bmp                         ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/tpProjectFieldVelocity.cl                ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/tpSmokeSimulation.cl                     ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/tpVertexShader.glsl                      ${PKG_NAME}/examples/Teapot/release/res/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/res/tpVolumeSlicing.cl                       ${PKG_NAME}/examples/Teapot/release/res/
+		mkdir -p ${PKG_NAME}/examples/Teapot/release/src
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/src/AMDTFluidGrid.cpp                        ${PKG_NAME}/examples/Teapot/release/src/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/src/AMDTImage.cpp                            ${PKG_NAME}/examples/Teapot/release/src/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/src/AMDTOpenCLHelper.cpp                     ${PKG_NAME}/examples/Teapot/release/src/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/src/AMDTOpenGLHelper.cpp                     ${PKG_NAME}/examples/Teapot/release/src/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/src/AMDTOpenGLMath.cpp                       ${PKG_NAME}/examples/Teapot/release/src/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/src/AMDTTeapotData.dat                       ${PKG_NAME}/examples/Teapot/release/src/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/src/AMDTTeapotOCLSmokeSystem.cpp             ${PKG_NAME}/examples/Teapot/release/src/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/src/AMDTTeapotOGLCanvas.cpp                  ${PKG_NAME}/examples/Teapot/release/src/
+		cp -f Output_x86_64/release/bin/examples/Teapot/release/src/AMDTTeapotRenderState.cpp                ${PKG_NAME}/examples/Teapot/release/src/
+
+		mkdir -p ${PKG_NAME}/examples/ClassicMatMul/
+		mkdir -p ${PKG_NAME}/examples/ClassicMatMul/release
+		cp -f Output_x86_64/release/bin/CXLClassicMatMul-bin						   ${PKG_NAME}/examples/ClassicMatMul/release/
+		mkdir -p ${PKG_NAME}/examples/ClassicMatMul/src
+		cp -f ${AMD_CODEXL}/Examples/AMDTClassicMatMul/AMDTClassicMatMul.cpp           ${PKG_NAME}/examples/ClassicMatMul/src
+		cp -f ${AMD_CODEXL}/Examples/AMDTClassicMatMul/Makefile				           ${PKG_NAME}/examples/ClassicMatMul/src
+
+		mkdir -p ${PKG_NAME}/Help
+		cp -f Output_x86_64/release/bin/Help/CodeXL_Quick_Start_Guide.pdf									   ${PKG_NAME}/Help/
+		mkdir -p ${PKG_NAME}/HTML
+		cp -f Output_x86_64/release/bin/HTML/welcome.css                                                    ${PKG_NAME}/HTML/
+		cp -f Output_x86_64/release/bin/HTML/Welcome.html                                                   ${PKG_NAME}/HTML/
+        	cp -f Output_x86_64/release/bin/HTML/WelcomeAnalyzeNA.html                                          ${PKG_NAME}/HTML/
+		cp -f Output_x86_64/release/bin/HTML/welcomepage_debug.png                                          ${PKG_NAME}/HTML/
+		cp -f Output_x86_64/release/bin/HTML/welcomepage_debug_large.png                                    ${PKG_NAME}/HTML/
+		cp -f Output_x86_64/release/bin/HTML/welcomepage_debug_selected.png                                 ${PKG_NAME}/HTML/
+		cp -f Output_x86_64/release/bin/HTML/welcomepage_profile.png                                        ${PKG_NAME}/HTML/
+		cp -f Output_x86_64/release/bin/HTML/welcomepage_profile_large.png                                  ${PKG_NAME}/HTML/
+		cp -f Output_x86_64/release/bin/HTML/welcomepage_profile_selected.png                               ${PKG_NAME}/HTML/
+		cp -f Output_x86_64/release/bin/HTML/welcomepage_analyze.png                                        ${PKG_NAME}/HTML/
+		cp -f Output_x86_64/release/bin/HTML/welcomepage_analyze_large.png                                  ${PKG_NAME}/HTML/
+		cp -f Output_x86_64/release/bin/HTML/welcomepage_analyze_selected.png                               ${PKG_NAME}/HTML/
+		cp -f Output_x86_64/release/bin/HTML/analyze_add.png                                                ${PKG_NAME}/HTML/
+		cp -f Output_x86_64/release/bin/HTML/analyze_new.png                                                ${PKG_NAME}/HTML/
+		cp -f Output_x86_64/release/bin/HTML/arrow.png                                                      ${PKG_NAME}/HTML/
+		cp -f Output_x86_64/release/bin/HTML/debug_new.png                                                  ${PKG_NAME}/HTML/
+		cp -f Output_x86_64/release/bin/HTML/empty.png                                                      ${PKG_NAME}/HTML/
+		cp -f Output_x86_64/release/bin/HTML/profile_attach.png                                             ${PKG_NAME}/HTML/
+		cp -f Output_x86_64/release/bin/HTML/profile_new.png                                                ${PKG_NAME}/HTML/
+		cp -f Output_x86_64/release/bin/HTML/profile_system.png                                             ${PKG_NAME}/HTML/
+		cp -f Output_x86_64/release/bin/HTML/recent_projects.png                                            ${PKG_NAME}/HTML/
+		cp -f Output_x86_64/release/bin/HTML/samples.png                                                    ${PKG_NAME}/HTML/
+		cp -f Output_x86_64/release/bin/HTML/StartupPage_CodeXLLogo.png                                     ${PKG_NAME}/HTML/
+		cp -f Output_x86_64/release/bin/HTML/welcomepage_frame_analyze.png                                  ${PKG_NAME}/HTML/
+		cp -f Output_x86_64/release/bin/HTML/welcomepage_frame_analyze_large.png                            ${PKG_NAME}/HTML/
+		cp -f Output_x86_64/release/bin/HTML/welcomepage_frame_analyze_selected.png                         ${PKG_NAME}/HTML/
+		cp -f Output_x86_64/release/bin/HTML/frame_analyze_new.png                                     	    ${PKG_NAME}/HTML/
+		mkdir -p ${PKG_NAME}/Images
+		cp -f Output_x86_64/release/bin/Images/CodeXLAboutLogo.png                  ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/CodeXLDialogSmallLogo.png            ${PKG_NAME}/Images/
+		cp ${AMD_CODEXL}/AMDTApplicationFramework/Include/res/icons/ApplicationIcon_64.ico ${PKG_NAME}/Images
+		cp -f Output_x86_64/release/bin/Images/back.png                             ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/cancel.png                           ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/CheckForUpdates.png                  ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/CodeXLSplashScreen.png               ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/DefaultFontTexture.png               ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/detailMode.png                       ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/file.png                             ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/folder.png                           ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/forward.png                          ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/GRSourceCodeIcon.png                 ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/InformationIcon.png                  ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/InformationIconSmall.png             ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/LightBulbIconSmall.png               ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/listMode.png                         ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/newFolder.png                        ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/open.png                             ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/save.png                             ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/ShadingProgramIcon.png               ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/StartupPage_CodeXLLogo.png           ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/StartupPage_Documentation.png        ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/StartupPage_Recent.png               ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/toParent.png                         ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/WarningIconOrange.png                ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/WarningIconOrangeSmall.png           ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/WarningIconRed.png                   ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/WarningIconRedSmall.png              ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/WarningIconYellow.png                ${PKG_NAME}/Images/
+		cp -f Output_x86_64/release/bin/Images/WarningIconYellowSmall.png           ${PKG_NAME}/Images/
+		mkdir -p ${PKG_NAME}/jqPlot
+		cp -f Output_x86_64/release/bin/jqPlot/excanvas.min.js						  ${PKG_NAME}/jqPlot/
+		cp -f Output_x86_64/release/bin/jqPlot/jqplot.canvasAxisLabelRenderer.min.js    ${PKG_NAME}/jqPlot/
+		cp -f Output_x86_64/release/bin/jqPlot/jqplot.canvasTextRenderer.min.js         ${PKG_NAME}/jqPlot/
+		cp -f Output_x86_64/release/bin/jqPlot/jqplot.highlighter.min.js                ${PKG_NAME}/jqPlot/
+		cp -f Output_x86_64/release/bin/jqPlot/jquery.jqplot.min.css                    ${PKG_NAME}/jqPlot/
+		cp -f Output_x86_64/release/bin/jqPlot/jquery.jqplot.min.js                     ${PKG_NAME}/jqPlot/
+		cp -f Output_x86_64/release/bin/jqPlot/jquery.min.js                            ${PKG_NAME}/jqPlot/
+		mkdir -p ${PKG_NAME}/Legal
+		cp -f Output_x86_64/release/bin/Legal/Boost_Software_License.txt                       ${PKG_NAME}/Legal/
+		cp -f Output_x86_64/release/bin/Legal/NDA/CodeXLEndUserLicenseAgreement-Linux.htm 	 ${PKG_NAME}/Legal
+		cp -f Output_x86_64/release/bin/Legal/GNU_LESSER_GENERAL_PUBLIC_LICENSE2_1.pdf         ${PKG_NAME}/Legal/
+		cp -f Output_x86_64/release/bin/Legal/jqPlot.txt                                       ${PKG_NAME}/Legal/
+		cp -f Output_x86_64/release/bin/Legal/LibDwarf.txt                                     ${PKG_NAME}/Legal/
+		cp -f Output_x86_64/release/bin/Legal/QScintilla_COMMERCIAL_LICENSE_AGREEMENT.txt      ${PKG_NAME}/Legal/
+		cp -f Output_x86_64/release/bin/Legal/Readme.txt                                       ${PKG_NAME}/Legal/
+		cp -f Output_x86_64/release/bin/Legal/zlibdoc.txt										 ${PKG_NAME}/Legal/
+		mkdir -p ${PKG_NAME}/spies
+		cp -df Output_x86_64/release/bin/spies/libGL.so		${PKG_NAME}/spies
+		cp -df Output_x86_64/release/bin/spies/libGL.so.1      ${PKG_NAME}/spies
+		cp -df Output_x86_64/release/bin/spies/libOpenCL.so    ${PKG_NAME}/spies
+		cp -df Output_x86_64/release/bin/spies/libOpenCL.so.1	${PKG_NAME}/spies
+		mkdir -p ${PKG_NAME}/webhelp
+		cp -drf Output_x86_64/release/bin/webhelp/*	${PKG_NAME}/webhelp
+
+		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLOccupancyAgent32.so         ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLProfileAgent32.so           ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLTraceAgent32.so             ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libGPUPerfAPICL32.so                            ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libGPUPerfAPICounters32.so                      ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libCXLGpuProfilerPreloadXInitThreads32.so      ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/CodeXLGpuProfiler32                             ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/CodeXLGpuProfilerRun32                          ${PKG_NAME}
+
+		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLOccupancyAgent.so        ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLProfileAgent.so          ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLTraceAgent.so            ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libCXLGpuProfilerHSAProfileAgent.so         ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libCXLGpuProfilerHSATraceAgent.so           ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libGPUPerfAPICL.so                           ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libGPUPerfAPICounters.so                     ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libGPUPerfAPIHSA.so                          ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libCXLGpuProfilerPreloadXInitThreads.so     ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/CodeXLGpuProfiler                            ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/CodeXLGpuProfilerRun                         ${PKG_NAME}
+		
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/Vulkan/rev_1_0_0/Release/lnx64/amdspv               ${PKG_NAME}
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/Vulkan/rev_1_0_0/Release/lnx64/spvgen.so            ${PKG_NAME}
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/OpenGL/VirtualContext/Release/lnx64/VirtualContext  ${PKG_NAME}
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/ShaderAnalysis/Linux/x64/shae                       ${PKG_NAME}
+
+		mkdir -p ${PKG_NAME}/SDK/CXLPowerProfile/inc
+		cp -f ${AMD_CODEXL}/../Common/Src/AMDTCommonHeaders/AMDTDefinitions.h									${PKG_NAME}/SDK/CXLPowerProfile/inc
+		cp -f ${AMD_CODEXL}/Components/PowerProfiling/Backend/AMDTPowerProfileAPI/inc/AMDTPowerProfileApi.h			${PKG_NAME}/SDK/CXLPowerProfile/inc
+		cp -f ${AMD_CODEXL}/Components/PowerProfiling/Backend/AMDTPowerProfileAPI/inc/AMDTPowerProfileDataTypes.h	${PKG_NAME}/SDK/CXLPowerProfile/inc
+		mkdir -p ${PKG_NAME}/SDK/CXLPowerProfile/bin/x86_64
+		cp -f Output_x86_64/release/bin/libCXLPowerProfileAPI.so           ${PKG_NAME}/SDK/CXLPowerProfile/bin/x86_64
+		mkdir -p ${PKG_NAME}/SDK/CXLPowerProfile/doc
+		cp -f ${AMD_CODEXL}/Components/PowerProfiling/Help/AMDTPowerProfileAPI.pdf        ${PKG_NAME}/SDK/CXLPowerProfile/doc
+
+		tar czf ${PKG_NAME}.tar.gz ${PKG_NAME}
+
 	fi
 
     set +e
