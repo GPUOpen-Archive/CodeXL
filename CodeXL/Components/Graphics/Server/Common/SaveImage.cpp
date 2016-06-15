@@ -20,8 +20,6 @@
     #include "WinDefs.h"
     #include "png.h"
 
-    using namespace GPS;
-
     #define XMD_H       // INT32 etc already defined
     //extern "C"
     //{
@@ -477,12 +475,13 @@ static  bool    _RGBtoJpeg(unsigned char* pImageData, int width, int height, UIN
     cinfo.input_components = 3;
     cinfo.in_color_space = JCS_RGB;
     jpeg_set_defaults(&cinfo);
-    jpeg_modify_defaults(&cinfo, IMAGE_QUALITY);
+    jpeg_quality_scaling(IMAGE_QUALITY);
+    jpeg_set_quality(&cinfo, IMAGE_QUALITY, FALSE);
     cinfo.dct_method = JDCT_FLOAT;
 
     jpeg_mem_dest(&cinfo, &writeBuffer, (unsigned long*)outSize);
 
-    jpeg_compress_start(&cinfo);
+    jpeg_start_compress(&cinfo, TRUE);
 
     // use a larger buffer size for small images
     int row_stride = minWidth * 3;
@@ -534,7 +533,7 @@ static  bool    _RGBtoJpeg(unsigned char* pImageData, int width, int height, UIN
 static   bool    _RGBAtoPNG(unsigned char* pImageData, int width, int height, UINT32* outSize, unsigned char** outBuffer)
 {
     static State state;
-    GPS::png_structp png_ptr;
+    png_structp png_ptr;
     png_infop info_ptr;
     static const int bytes_per_pixel = 4;
 
@@ -600,7 +599,7 @@ static   bool    _RGBAtoPNG(unsigned char* pImageData, int width, int height, UI
 
     png_bytepp row_pointers = new png_bytep[height];
 
-    int maxHeight = PNG_UINT_32_MAX / png_sizeof(png_bytep);
+    int maxHeight = PNG_UINT_32_MAX / sizeof(png_bytep);
 
     if (height > maxHeight)
     {
