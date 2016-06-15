@@ -12,6 +12,12 @@
 // The following defines are experimental switches to tweak server behavior.
 //-----------------------------------------------------------------------------
 
+#ifdef WIN32
+#define POINTER_SUFFIX "0x"
+#else
+#define POINTER_SUFFIX ""
+#endif
+
 /// A flag used to enable threaded worker profiler collection.
 #define GATHER_PROFILER_RESULTS_WITH_WORKERS 1
 

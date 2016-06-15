@@ -86,8 +86,8 @@ def CopyGPA(env, fileName, platformTarget):
 # are modified to work with the Linux server. Uses the 'sed' utility to search and replace
 # strings
 def CopyJSON(env, pluginsTarget):
-    source = "Server/VulkanServer/JSON/VulkanServer" + env.archWin + env.debugSuffix + env.buildSuffix + ".json"
-    dest = pluginsTarget + "/VulkanServer" + env.archLinux + env.debugSuffix + env.buildSuffix + ".json"
+    source = "Server/VulkanServer/JSON/" + env.vulkanPluginName + env.archWin + env.debugSuffix + env.buildSuffix + ".json"
+    dest = pluginsTarget + "/" + env.vulkanPluginName + env.archLinux + env.debugSuffix + env.buildSuffix + ".json"
 
     command = "cp " + source + " " + dest
     os.system(command)
