@@ -34,7 +34,7 @@ public:
 //-----------------------------------------------------------------------------
 struct IcdApiObject
 {
-    _VK_LOADER_DATA   loaderData;      ///< Should hold magic value
+    VK_LOADER_DATA   loaderData;      ///< Should hold magic value
     VktWrappedObject* pWrappedObject;  ///< Pointer to wrapper
 };
 
