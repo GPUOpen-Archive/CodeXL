@@ -21,6 +21,7 @@
 #define ERROR_READING_PROCESS_NAME "Unknown process"
 #define ERROR_READING_PROCESS_PATH "Unable to read path"
 typedef bool (* fpSmuActivate)(bool);
+typedef bool (* fpEnableInternalCounters)(bool);
 
 #ifndef _LINUX
     #include <TaskInfoInterface.h>
@@ -106,9 +107,13 @@ AMDTResult PrepareInitialProcessList(list<ProcessName>& list);
 // GetProcessNameFromPid: Get process name from a given PID
 bool GetProcessNameFromPid(AMDTPwrProcessInfo* pInfo);
 // EnableSmu: Activate Smu feature
-bool EnableSmu(bool activate);
+bool PwrEnableSmu(bool activate);
 
 // PwrApiCleanUp: Cleaning up Apis in case of unexpected abort
 bool PwrApiCleanUp(void);
+
+// PwrEnableInternalCounters: Enable internal counters
+bool PwrEnableInternalCounters(bool activate);
+
 
 #endif //_POWERPROFILEDRIVERINTERFACE_H_

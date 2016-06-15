@@ -37,7 +37,6 @@ extern AMDTUInt8* g_pSharedBuffer;
 extern bool g_internalCounters;
 extern bool g_isSVI2Supported;
 
-PwrInternalAddr g_internalCounterAddr;
 // Create control layer pool.
 static MemoryPool g_controlMemoryPool;
 wchar_t g_rawFileName[MAX_PATH_LEN];
@@ -468,44 +467,6 @@ bool PwrIsSVISupported(const AMDTPwrTargetSystemInfo& sysInfo)
     return ret;
 }
 
-// PwrIsInternalCounterAvailable: Check if internal counters are available
-bool PwrIsInternalCounterAvailable()
-{
-    bool ret = false;
-    FILE* pFile = nullptr;
-
-    memset(&g_internalCounterAddr, 0 , sizeof(PwrInternalAddr));
-    // For writing the file
-    //ret = PwrOpenFile(&pFile, "AMDTPwrInternalCounter.bin", "wb");
-    //ret = PwrWriteFile(pFile, (AMDTUInt8*)&g_internalCounterAddr, sizeof(PwrInternalAddr));
-
-    // Read internal counter address file
-    ret = PwrOpenFile(&pFile, "Data\\AMDTPwrInternalCounter.bin", "r");
-
-    // If internal file is available update the address from internal file
-    // else reset all address to 0
-    if (ret)
-    {
-        // Read the file into the buffer:
-        ret = PwrReadFile(pFile, (AMDTUInt8*)&g_internalCounterAddr, sizeof(PwrInternalAddr));
-    }
-    else
-    {
-        PwrTrace("Internal Counters are not available");
-    }
-
-    return ret;
-}
-
-// PwrWriteInternalCounterAddres: Write internal counter information to shared buffer
-void PwrWriteInternalCounterAddres()
-{
-    if (nullptr != g_pSharedBuffer)
-    {
-        memcpy((PwrInternalAddr*)&g_pSharedBuffer[PWR_INTERNAL_COUNTER_BASE], &g_internalCounterAddr, sizeof(PwrInternalAddr));
-    }
-}
-
 // IsSMUFeatureEnabled:  Check if BAPM/ PKG power limiting etc are enabled
 bool IsSMUFeatureEnabled()
 {
@@ -649,9 +610,6 @@ AMDTResult PwrSetProfilingConfiguration(
 
         cfgList.ulClientId = pConfig->m_clientId;
 
-        // Check if internal counter file is present
-        PwrWriteInternalCounterAddres();
-
         //Instruct driver for the configuration.
         ret = CommandPowerDriver(DRV_CMD_TYPE_IN_OUT,
                                  IOCTL_ADD_PROF_CONFIGS,
@@ -673,41 +631,6 @@ AMDTResult PwrSetProfilingConfiguration(
     }
 
     return ret;
-}
-
-// EnableSVI2Telemetry: SVI2 telemetry voltage and current is supported
-// only for internal version of Kavery & Mullins platform
-bool EnableSVI2Telemetry(bool isEnable)
-{
-    AMDTResult ret = false;
-    // Wait for the VOFT complete indication from the voltage regulator
-    // before macking additional voltage change request
-    ACCESS_PCI pci;
-    pci.address = g_internalCounterAddr.m_timingControl4;
-    pci.isReadAccess = false;
-    pci.data = (1 << 30);
-    ret = AccessPciAddress(&pci);
-
-    if (AMDT_STATUS_OK == ret)
-    {
-        // Enable SVI2 now. Telemetry enable in Voltage & Current mode
-        memset(&pci, 0, sizeof(ACCESS_PCI));
-        pci.address = g_internalCounterAddr.m_timingControl6;
-        pci.isReadAccess = false;
-
-        if (true == isEnable)
-        {
-            pci.data = 0x01;
-        }
-        else
-        {
-            pci.data = 0x00;
-        }
-
-        ret = AccessPciAddress(&pci);
-    }
-
-    return (AMDT_STATUS_OK == ret) ? true : false;
 }
 
 //AMDTPwrStartProfiling- If the profiler is not running, this will start the profiler, and cause the
@@ -753,23 +676,6 @@ AMDTResult PwrStartProfiling()
 
     if (AMDT_STATUS_OK == ret)
     {
-
-        if (true == g_isSvi2Selected)
-        {
-            // Enable SVI2
-            // SVI2 is supported only on internal & CodeXL build and
-            // for Kaveri & Mullins platforms
-            if (g_internalCounters
-                && g_isSVI2Supported)
-            {
-                EnableSVI2Telemetry(true);
-            }
-            else
-            {
-                g_isSvi2Selected = false;
-            }
-        }
-
         memset(&param, 0, sizeof(PROFILER_PROPERTIES));
         //IOCTL command to set the output file
         param.ulClientId = clientId;
@@ -819,7 +725,7 @@ AMDTResult PwrStopProfiling()
 
     if (g_smuRestore)
     {
-        EnableSmu(false);
+        PwrEnableSmu(false);
         g_smuRestore = false;
     }
 
@@ -841,7 +747,7 @@ AMDTResult PwrStopProfiling()
         if (true == g_isSvi2Selected)
         {
             // SVI2 votlage and current is enables. So need to disable now
-            EnableSVI2Telemetry(false);
+            PwrEnableInternalCounters(false);
         }
 
         g_powerProfileState = PowerProfilingStopped;
@@ -1601,7 +1507,7 @@ bool GetAvailableSmuList(SmuList* pList)
 
                                             if (false == apuSmuFeature)
                                             {
-                                                apuSmuFeature = EnableSmu(true);
+                                                apuSmuFeature = PwrEnableSmu(true);
                                                 PwrTrace("Trying to actiavte SMU status:%s", apuSmuFeature ? "Success" : "Fail");
 
                                                 if (apuSmuFeature)

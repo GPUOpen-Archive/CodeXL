@@ -514,14 +514,14 @@ AMDTResult PrepareInitialProcessList(list<ProcessName>& list)
     return ret;
 }
 
-// EnableSmu: Enable Smu features
-bool EnableSmu(bool activate)
+// PwrEnableSmu: Enable Smu features
+bool PwrEnableSmu(bool activate)
 {
     bool retVal = false;
     fpSmuActivate fnSmuActivate;
     gtString ppLibName(CODEXL_PPLIB_NAME);
 
-    fnSmuActivate = (fpSmuActivate) GetProcAddress(GetModuleHandle(TEXT(ppLibName.asASCIICharArray())), "AMDTPwrActivateSmu");
+    fnSmuActivate = (fpSmuActivate) GetProcAddress(GetModuleHandle(TEXT(ppLibName.asASCIICharArray())), "PwrActivateSmu");
 
     if (nullptr != fnSmuActivate)
     {
@@ -531,9 +531,26 @@ bool EnableSmu(bool activate)
     return retVal;
 }
 
+// PwrEnableInternalCounters: Enable internal counters
+bool PwrEnableInternalCounters(bool activate)
+{
+    bool retVal = false;
+    fpEnableInternalCounters fnEnableInternalCounters;
+    gtString ppLibName(CODEXL_PPLIB_NAME);
+
+    fnEnableInternalCounters = (fpEnableInternalCounters) GetProcAddress(GetModuleHandle(TEXT(ppLibName.asASCIICharArray())), "PwrEnableInternalCounters");
+
+    if (nullptr != fnEnableInternalCounters)
+    {
+        retVal = fnEnableInternalCounters(activate);
+    }
+
+    return retVal;
+
+}
 // PwrApiCleanUp: Cleaning up Apis in case of unexpected abort
 bool PwrApiCleanUp(void)
 {
-    return EnableSmu(false);
+    return PwrEnableSmu(false);
 }
 

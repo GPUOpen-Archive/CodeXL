@@ -16,6 +16,7 @@
 #include <AMDTPowerProfileApiInternal.h>
 #include <AMDTHistogram.h>
 #include <PowerProfileHelper.h>
+#include <PowerProfileDriverInterface.h>
 
 #include <algorithm>
 #include <atomic>
@@ -1672,7 +1673,8 @@ AMDTResult AMDTPwrProfileInitialize(AMDTPwrProfileMode profileMode)
         // Get the system info
         ret = AMDTPwrGetTargetSystemInfo(&sysInfo);
         PwrTrace("AMDTPwrGetTargetSystemInfo res 0x%x", ret);
-        g_internalCounters = PwrIsInternalCounterAvailable();
+
+        g_internalCounters = PwrEnableInternalCounters(true);
         g_isSVI2Supported = PwrIsSVISupported(sysInfo);
     }
 
