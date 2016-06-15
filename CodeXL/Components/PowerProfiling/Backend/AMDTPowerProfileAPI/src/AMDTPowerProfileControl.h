@@ -284,9 +284,6 @@ AMDTPwrApuPstateList* GetApuPStateInfo();
 // check MMIO access bit is set
 bool IsDgpuMMIOAccessible(AMDTUInt32 bus, AMDTUInt32 dev, AMDTUInt32 func);
 
-// PwrIsInternalCounterAvailable: Check if internal counters are available
-bool PwrIsInternalCounterAvailable();
-
 // PwrIsSVISupported: Check if SVI2 is supported
 bool PwrIsSVISupported(const AMDTPwrTargetSystemInfo& sysInfo);
 

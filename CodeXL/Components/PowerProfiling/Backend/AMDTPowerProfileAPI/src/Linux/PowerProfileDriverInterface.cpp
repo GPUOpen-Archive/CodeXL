@@ -58,6 +58,8 @@ AMDTUInt8* g_pSharedBuffer          = nullptr;
 
 //Function pointers for internal API
 fpSmuActivate g_fnSmuActivate = nullptr;
+fpEnableInternalCounters g_fnEnableInternalCounters = nullptr;
+
 
 namespace PwrProfDrvInterface
 {
@@ -508,8 +510,8 @@ AMDTResult PrepareInitialProcessList(list<ProcessName>& list)
     return ret;
 }
 
-// EnableSmu: enable Smu features
-bool EnableSmu(bool activate)
+// PwrEnableSmu: enable Smu features
+bool PwrEnableSmu(bool activate)
 {
     bool retVal = false;
 
@@ -521,9 +523,22 @@ bool EnableSmu(bool activate)
     return retVal;
 }
 
+bool PwrEnableInternalCounters(bool activate)
+{
+    bool retVal = false;
+
+    if (nullptr != g_fnEnableInternalCounters)
+    {
+        retVal = g_fnEnableInternalCounters(activate);
+    }
+
+    return retVal;
+
+}
+
 // PwrApiCleanUp: Cleaning up Apis in case of unexpected abort
 bool PwrApiCleanUp(void)
 {
-    return EnableSmu(false);
+    return PwrEnableSmu(false);
 }
 

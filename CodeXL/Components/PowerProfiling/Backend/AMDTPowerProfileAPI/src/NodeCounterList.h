@@ -31,6 +31,7 @@
     /*category*/(PwrCategory)CATEGORY_FREQUENCY,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_PER_CORE,
 },
+#ifdef FAMILY15H16H_INTERNAL_COUNTERS
 {
     /*attr_id*/COUNTERID_CSTATE_RES,
     /*len*/8,
@@ -40,6 +41,7 @@
     /*category*/(PwrCategory)CATEGORY_DVFS,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_PER_CORE,
 },
+#endif
 {
     /*attr_id*/COUNTERID_PSTATE,
     /*len*/8,
@@ -49,6 +51,7 @@
     /*category*/(PwrCategory)CATEGORY_DVFS,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_PER_CORE,
 },
+#ifdef FAMILY15H16H_INTERNAL_COUNTERS
 // Removing node temperature (attr_id: COUNTERID_NODE_TCTL_TEPERATURE).
 // Reading MSR gives wrong temperature value. SMU provided temperature
 // counters are supported for CU's.
@@ -70,4 +73,4 @@
     /*category*/(PwrCategory)CATEGORY_VOLTAGE,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_NONCORE_MULTIVALUE,
 },
-
+#endif
