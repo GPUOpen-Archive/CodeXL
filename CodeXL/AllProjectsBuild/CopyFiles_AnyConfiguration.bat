@@ -570,3 +570,6 @@ XCopy /r /d /y  "..\Components\Graphics\Server\media\EmptyImage.png" ..\Output\%
 rem copy frame analysis config files
 XCopy /r /d /y  "..\Data\CodeXLFrameAnalysisServer.cfg" "..\Output\%CONFIG_NAME%\bin"
 XCopy /r /d /y  "..\Data\Public\FrameAnalysisDefaultCounterSets.cfg" "..\Output\%CONFIG_NAME%\bin\Data"
+
+rem copy AGS file
+XCopy /r /d /y "..\..\Common\Lib\AMD\ags\ags_lib_v4.0.0\lib\amd_ags_x86.dll" "..\Output\%CONFIG_NAME%\bin\"
