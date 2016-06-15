@@ -130,26 +130,26 @@ gtASCIIString ProcessTracker::GetProcessesXML()
                 // CodeXL does support connecting to the DXGI API and it appears in Vulkan/OpenGL apps which confuses the users.
                 if (wrapperIter->first != "DXGI")
                 {
-                    if (SG_GET_BOOL(OptionDllReplacement) == false)
+                if (SG_GET_BOOL(OptionDllReplacement) == false)
+                {
+                    strPluginName += pluginExtensions[loop];
+                }
+
+                if (IsLibraryLoadedInProcess(pid, strPluginName.asCharArray(), NULL))
+                {
+                    bool attached = false;
+
+                    if (g_activeWrappersMap.find(FormatText("%lu/%s", pid, wrapperIter->first.c_str()).asCharArray()) != g_activeWrappersMap.end())
                     {
-                        strPluginName += pluginExtensions[loop];
+                        // the pid/plugin string was listed in the active wrappers map, so the plugin must be active.
+                        attached = true;
                     }
 
-                    if (IsLibraryLoadedInProcess(pid, strPluginName.asCharArray(), NULL))
-                    {
-                        bool attached = false;
-
-                        if (g_activeWrappersMap.find(FormatText("%lu/%s", pid, wrapperIter->first.c_str()).asCharArray()) != g_activeWrappersMap.end())
-                        {
-                            // the pid/plugin string was listed in the active wrappers map, so the plugin must be active.
-                            attached = true;
-                        }
-
-                        procXMLMap[pid] += XMLAttrib("API", FormatText("attached='%s'", attached ? "TRUE" : "FALSE").asCharArray(), wrapperIter->second.strPluginShortDesc.asCharArray());
-                    }
+                    procXMLMap[pid] += XMLAttrib("API", FormatText("attached='%s'", attached ? "TRUE" : "FALSE").asCharArray(), wrapperIter->second.strPluginShortDesc.asCharArray());
                 }
             }
         }
+    }
     }
 
     // concatenate the process XML and additional info
@@ -407,6 +407,7 @@ void ProcessTracker::UpdateListOfInjectedProcesses()
 #else
     get_process_list("GLServer" GDT_PROJECT_SUFFIX ".so", localProcessInfoArray);
     get_process_list("GLESServer" GDT_PROJECT_SUFFIX ".so", localProcessInfoArray);
+    get_process_list("VulkanServer" GDT_PROJECT_SUFFIX ".so", localProcessInfoArray);
 #endif
 
     for (ProcessInfoList::const_iterator iter = localProcessInfoArray.begin();
@@ -1152,7 +1153,7 @@ bool ProcessTracker::PrelaunchEnvironmentInitialization()
     sprintf_s(ext, PS_MAX_PATH, "%s.so", GDT_PROJECT_SUFFIX);
     char strLdPreload[PS_MAX_PATH];
     sprintf_s(strLdPreload, PS_MAX_PATH, "%sPlugins/%sServer%s", strServerPath, m_injectedAppPluginName.c_str(), ext);
-    //   LogConsole(logMESSAGE, "LD_PRELOAD is >>>%s<<<\n", strLdPreload);
+    // LogConsole(logMESSAGE, "LD_PRELOAD is >>>%s<<<\n", strLdPreload);
 
     // Set the LD_PRELOAD environment variable
     setenv("LD_PRELOAD", strLdPreload, 1);

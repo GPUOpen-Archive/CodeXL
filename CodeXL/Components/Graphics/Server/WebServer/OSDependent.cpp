@@ -1080,6 +1080,7 @@ static int ParseCommandLine(int argc, TARGV* argv[], int* optionPort, bool* remo
         ("script,S", po::value<string>(), "Run the application as specified by the shell script file, located in the target directory. This allows applications with complex arguments to be executed.")
         ("remote,R", "Allow remote launching of applications. Start the GPU PerfServer first, then launch the app.")
         ("es,E", "LD_PRELOAD the GLES plugin. By default, the GL plugin gets preloaded.")
+        ("vk,V", "LD_PRELOAD the Vulkan plugin.")
 #endif
         ("version,v", "Print the GPU PerfServer version number.")
         ("appargs", po::value< vector<string> >(), "Specified once for application path, and again for each of the application's custom arguments.")
@@ -1110,7 +1111,9 @@ static int ParseCommandLine(int argc, TARGV* argv[], int* optionPort, bool* remo
         ("capture-frame,C", po::value<int>(), "Specify which frame to capture (1-based).\nWhen a non-negative value is specified, the application is executed until the required number of frames have been rendered and a frame capture will be performed automatically without the client being connected. ( default = " PS_DEFAULT_CAPTUREFRAME " (no autocapture) )")
         ("wireframe-color,W", po::value<int>(), "Specify color to use for wireframe display ( default = " PS_DEFAULT_WIREFRAMECOLOR " ).")
         ("wireframe-overlay", "Enable/disable wireframe overlay.")
+#ifdef _WIN32
         ("liquidvr,V", "Enable support for LiquidVR applications. When enabled, PerfStudio will delay interception of the DX Device until after LiquidVR has wrapped it.")
+#endif
         ;
 
         // Hidden options, will be allowed both on command line and
@@ -1217,6 +1220,16 @@ static int ParseCommandLine(int argc, TARGV* argv[], int* optionPort, bool* remo
         {
             ProcessTracker::Instance()->SetInjectedAppPluginName("GLES");
         }
+
+        if (vm.count("vk"))
+        {
+            ProcessTracker::Instance()->SetInjectedAppPluginName("Vulkan");
+        }
+
+#ifdef CODEXL_GRAPHICS
+        // CodeXL will default to Vulkan on Linux
+        ProcessTracker::Instance()->SetInjectedAppPluginName("Vulkan");
+#endif // CODEXL_GRAPHICS
 
 #endif // def _WIN32
 

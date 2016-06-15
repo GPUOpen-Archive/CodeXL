@@ -13,7 +13,7 @@ env.Prepend(CCFLAGS =
     '-Wall',
     '-Wextra',
 
-    "-D'LOG_MODULE=\"GPUPerfServer\"'"
+    "-D'LOG_MODULE=\"" + env.projectName + "\"'"
 ])
 
 # These need to be in their dependency order. Most derived first
@@ -24,9 +24,9 @@ env['LIBS'] = \
     "libAMDTOSWrappers",
     "libAMDTBaseTools",
     #boost
-    File('../../../Common/Lib/Ext/Boost/boost_1_59_0/lib/RHEL6/' + env.extConfig + '/libboost_program_options.a'),
-    File('../../../Common/Lib/Ext/Boost/boost_1_59_0/lib/RHEL6/' + env.extConfig + '/libboost_filesystem.a'),
-    File('../../../Common/Lib/Ext/Boost/boost_1_59_0/lib/RHEL6/' + env.extConfig + '/libboost_system.a'),
+    File('../../../Common/Lib/Ext/Boost/boost_' + env.BoostVersion + '/lib/RHEL6/' + env.extConfig + '/libboost_program_options.a'),
+    File('../../../Common/Lib/Ext/Boost/boost_' + env.BoostVersion + '/lib/RHEL6/' + env.extConfig + '/libboost_filesystem.a'),
+    File('../../../Common/Lib/Ext/Boost/boost_' + env.BoostVersion + '/lib/RHEL6/' + env.extConfig + '/libboost_system.a'),
     #enternal libraries
     "rt",
     "pthread",
@@ -49,4 +49,5 @@ sources = \
 ]
 
 GPUPerfServer = env.Program('GPUPerfServer', sources)
+
 Return('GPUPerfServer')
