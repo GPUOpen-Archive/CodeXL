@@ -20,6 +20,14 @@
 #include "../Objects/CustomWrappers/Wrapped_ID3D12CommandQueueCustom.h"
 
 //-----------------------------------------------------------------------------
+/// SortByStartTime
+//-----------------------------------------------------------------------------
+bool SortByStartTime(ProfilerResult* &lhs, ProfilerResult* &rhs)
+{
+    return lhs->timestampResult.rawClocks.start <= rhs->timestampResult.rawClocks.start;
+}
+
+//-----------------------------------------------------------------------------
 /// Protected constructor, because this is a singleton.
 //-----------------------------------------------------------------------------
 DX12TraceAnalyzerLayer::DX12TraceAnalyzerLayer()
@@ -326,6 +334,64 @@ void DX12TraceAnalyzerLayer::WaitAndFetchResults(DX12FrameProfilerLayer* pFrameP
 }
 
 //-----------------------------------------------------------------------------
+/// Convert profiler result data to string form.
+/// \param pResult The profilerResult to convert.
+/// \param profiledCommandsLinesStr The output string.
+//-----------------------------------------------------------------------------
+void DX12TraceAnalyzerLayer::ProfilerResultToStr(
+    ProfilerResult* pResult,
+    gtASCIIString&  profiledCommandsLinesStr)
+{
+    DX12APIEntry* pResultEntry = DX12FrameProfilerLayer::Instance()->FindInvocationBySampleId(pResult->measurementInfo.idInfo.mSampleId);
+
+    gtASCIIString returnValueString;
+    pResultEntry->PrintReturnValue(pResultEntry->mReturnValue, pResultEntry->mReturnValueFlags, returnValueString);
+
+    double startMillisecond = pResult->timestampResult.alignedMillisecondTimestamps.start;
+    double endMillisecond = pResult->timestampResult.alignedMillisecondTimestamps.end;
+
+    // DX12 Response line format:
+    // CommandQueuePtr CommandListType CommandListPtr APIType FuncId ID3D12InterfaceName_FuncName(Args) = ReturnValue StartTime EndTime SampleId
+
+    profiledCommandsLinesStr += "0x";
+    profiledCommandsLinesStr += UINT64ToHexString((UINT64)pResult->measurementInfo.idInfo.pCmdQueue);
+    profiledCommandsLinesStr += " ";
+
+    profiledCommandsLinesStr += IntToString(pResult->measurementInfo.idInfo.mCmdListType);
+    profiledCommandsLinesStr += " ";
+
+    profiledCommandsLinesStr += "0x";
+    profiledCommandsLinesStr += UINT64ToHexString((UINT64)pResultEntry->mWrapperInterface);
+    profiledCommandsLinesStr += " ";
+
+    profiledCommandsLinesStr += IntToString(DX12TraceAnalyzerLayer::Instance()->GetAPIGroupFromAPI(pResultEntry->mFunctionId));
+    profiledCommandsLinesStr += " ";
+
+    profiledCommandsLinesStr += IntToString(pResultEntry->mFunctionId);
+    profiledCommandsLinesStr += " ";
+
+    profiledCommandsLinesStr += "ID3D12GraphicsCommandList_";
+    profiledCommandsLinesStr += GetFunctionNameFromId(pResultEntry->mFunctionId);
+
+    profiledCommandsLinesStr += "(";
+    profiledCommandsLinesStr += pResultEntry->GetParameterString();
+    profiledCommandsLinesStr += ") = ";
+
+    profiledCommandsLinesStr += returnValueString.asCharArray();
+
+    profiledCommandsLinesStr += " ";
+    profiledCommandsLinesStr += DoubleToString(startMillisecond);
+
+    profiledCommandsLinesStr += " ";
+    profiledCommandsLinesStr += DoubleToString(endMillisecond);
+
+    profiledCommandsLinesStr += " ";
+    profiledCommandsLinesStr += UINT64ToString(pResultEntry->mSampleId);
+
+    profiledCommandsLinesStr += "\n";
+}
+
+//-----------------------------------------------------------------------------
 /// Return GPU-time in text format, to be parsed by the Client and displayed as its own timeline.
 /// \return A line-delimited, ASCII-encoded, version of the GPU Trace data.
 //-----------------------------------------------------------------------------
@@ -333,133 +399,41 @@ std::string DX12TraceAnalyzerLayer::GetGPUTraceTXT()
 {
     gtASCIIString appendString = "";
 
-    DX12FrameProfilerLayer* frameProfiler = DX12FrameProfilerLayer::Instance();
+    DX12FrameProfilerLayer* pFrameProfiler = DX12FrameProfilerLayer::Instance();
 
-    WaitAndFetchResults(frameProfiler);
-
-    // Query the CPU clock frequency so we can accurately convert to wall clock time.
-    GPS_TIMESTAMP cpuClockFrequency;
-    QueryPerformanceFrequency(&cpuClockFrequency);
+    WaitAndFetchResults(pFrameProfiler);
 
     // During QueueSubmit we stored ProfilerResults in mEntriesWithProfilingResults. Form a response using it here.
-    ProfilerResultsMap& profiledCmdListResultsMap = frameProfiler->GetCmdListProfilerResultsMap();
+    ProfilerResultsMap& profiledCmdListResultsMap = pFrameProfiler->GetCmdListProfilerResultsMap();
 
+    // Gather all profiler results
     if (!profiledCmdListResultsMap.empty())
     {
-        size_t numSamples = 0;
+        std::vector<ProfilerResult*> flatResults;
 
-        ProfilerResultsMap::iterator profIt;
-
-        for (profIt = profiledCmdListResultsMap.begin(); profIt != profiledCmdListResultsMap.end(); ++profIt)
+        for (ProfilerResultsMap::iterator profIt = profiledCmdListResultsMap.begin(); profIt != profiledCmdListResultsMap.end(); ++profIt)
         {
             QueueWrapperToProfilingResultsMap& resultsPerThread = profIt->second;
 
-            // Compute how many results we should expect to write.
-            QueueWrapperToProfilingResultsMap::iterator queueResultsIter;
-
-            for (queueResultsIter = resultsPerThread.begin(); queueResultsIter != resultsPerThread.end(); ++queueResultsIter)
+            for (QueueWrapperToProfilingResultsMap::iterator queuesIt = resultsPerThread.begin();
+                 queuesIt != resultsPerThread.end();
+                 ++queuesIt)
             {
-                SampleIdToProfilerResultMap* resultsMap = queueResultsIter->second;
-                numSamples += resultsMap->size();
-            }
-        }
-    }
+                const SampleIdToProfilerResultMap* pResults = queuesIt->second;
 
-    // During QueueSubmit we stored ProfilerResults in mEntriesWithProfilingResults. Form a response using it here.
-    if (!profiledCmdListResultsMap.empty())
-    {
-        // Keep a count of the number of lines that we'll write in the response string.
-        UINT numResponseLines = 0;
-
-        gtASCIIString profiledCommandsLinesStr;
-
-        ProfilerResultsMap::iterator profIt;
-
-        for (profIt = profiledCmdListResultsMap.begin(); profIt != profiledCmdListResultsMap.end(); ++profIt)
-        {
-            QueueWrapperToProfilingResultsMap::iterator queuesWithProfilingResults;
-
-            QueueWrapperToProfilingResultsMap& resultsPerThread = profIt->second;
-
-            for (queuesWithProfilingResults = resultsPerThread.begin(); queuesWithProfilingResults != resultsPerThread.end(); ++queuesWithProfilingResults)
-            {
-                Wrapped_ID3D12CommandQueue* pWrappedQueue = queuesWithProfilingResults->first;
-
-                UINT64 timestampFrequency = 0;
-                pWrappedQueue->mRealCommandQueue->GetTimestampFrequency(&timestampFrequency);
-
-                // This structure holds all of the profiler results that were collected at QueueSubmit. The form is LinkId->ProfilerResult.
-                const SampleIdToProfilerResultMap* pQueueResults = queuesWithProfilingResults->second;
-
-                SampleIdToProfilerResultMap::const_iterator queueResultsIterInner;
-
-                for (queueResultsIterInner = pQueueResults->begin(); queueResultsIterInner != pQueueResults->end(); ++queueResultsIterInner)
+                for (SampleIdToProfilerResultMap::const_iterator sampleIdIt = pResults->begin();
+                     sampleIdIt != pResults->end();
+                     ++sampleIdIt)
                 {
-                    UINT64 sampleId = queueResultsIterInner->first;
-                    const ProfilerResult* pResult = queueResultsIterInner->second;
+                    ProfilerResult* pResult = sampleIdIt->second;
+                    pResult->measurementInfo.idInfo.pCmdQueue = queuesIt->first;
 
-                    DX12APIEntry* pResultEntry = DX12FrameProfilerLayer::Instance()->FindInvocationBySampleId(sampleId);
-
-                    // Convert the functionID and return values from integers into full strings that we can use in the response.
-                    const char* pFunctionName = GetFunctionNameFromId(pResultEntry->mFunctionId);
-                    const char* pParameters = pResultEntry->GetParameterString();
-
-                    gtASCIIString returnValueString;
-                    pResultEntry->PrintReturnValue(pResultEntry->mReturnValue, pResultEntry->mReturnValueFlags, returnValueString);
-
-                    double startMillisecond = pResult->timestampResult.alignedMillisecondTimestamps.start;
-                    double endMillisecond = pResult->timestampResult.alignedMillisecondTimestamps.end;
-
-                    D3D12_COMMAND_LIST_TYPE commandListType = frameProfiler->GetCommandListTypeFromCommandQueue(pWrappedQueue);
-
-                    // The only thing that can be profiled is an Wrapped_ID3D12GraphicsCommandList.
-                    Wrapped_ID3D12GraphicsCommandList* commandList = reinterpret_cast<Wrapped_ID3D12GraphicsCommandList*>(pResultEntry->mWrapperInterface);
-
-                    // DX12 Response line format:
-                    // CommandQueuePtr CommandListType CommandListPtr APIType FuncId ID3D12InterfaceName_FuncName(Args) = ReturnValue StartTime EndTime SampleId
-
-                    profiledCommandsLinesStr += "0x";
-                    profiledCommandsLinesStr += UINT64ToHexString((UINT64)pWrappedQueue);
-                    profiledCommandsLinesStr += " ";
-
-                    profiledCommandsLinesStr += IntToString(commandListType);
-                    profiledCommandsLinesStr += " ";
-
-                    profiledCommandsLinesStr += "0x";
-                    profiledCommandsLinesStr += UINT64ToHexString((UINT64)commandList);
-                    profiledCommandsLinesStr += " ";
-
-                    profiledCommandsLinesStr += IntToString(DX12TraceAnalyzerLayer::Instance()->GetAPIGroupFromAPI(pResultEntry->mFunctionId));
-                    profiledCommandsLinesStr += " ";
-
-                    profiledCommandsLinesStr += IntToString(pResultEntry->mFunctionId);
-                    profiledCommandsLinesStr += " ";
-
-                    profiledCommandsLinesStr += "ID3D12GraphicsCommandList_";
-                    profiledCommandsLinesStr += pFunctionName;
-
-                    profiledCommandsLinesStr += "(";
-                    profiledCommandsLinesStr += pParameters;
-                    profiledCommandsLinesStr += ") = ";
-
-                    profiledCommandsLinesStr += returnValueString.asCharArray();
-
-                    profiledCommandsLinesStr += " ";
-                    profiledCommandsLinesStr += DoubleToString(startMillisecond);
-
-                    profiledCommandsLinesStr += " ";
-                    profiledCommandsLinesStr += DoubleToString(endMillisecond);
-
-                    profiledCommandsLinesStr += " ";
-                    profiledCommandsLinesStr += UINT64ToString(pResultEntry->mSampleId);
-
-                    profiledCommandsLinesStr += "\n";
-
-                    // We just added another line to our response buffer. Increment the count that the client will read.
-                    numResponseLines++;
+                    flatResults.push_back(pResult);
                 }
             }
         }
+
+        sort(flatResults.begin(), flatResults.end(), SortByStartTime);
 
         // We'll need to insert the GPU Trace section header before the response data, even if there aren't any results.
         appendString += "//==GPU Trace==";
@@ -470,13 +444,12 @@ std::string DX12TraceAnalyzerLayer::GetGPUTraceTXT()
         appendString += "\n";
 
         appendString += "//CommandListEventCount=";
-        appendString += DWORDToString(numResponseLines);
+        appendString += IntToString((INT)flatResults.size());
         appendString += "\n";
 
-        // Include the response lines after the section header.
-        if (numResponseLines > 0)
+        for (UINT i = 0; i < flatResults.size(); i++)
         {
-            appendString += profiledCommandsLinesStr;
+            ProfilerResultToStr(flatResults[i], appendString);
         }
     }
     else

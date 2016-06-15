@@ -22,6 +22,14 @@
 #include "../Objects/Wrappers/vktWrappedQueue.h"
 
 //-----------------------------------------------------------------------------
+/// SortByStartTime
+//-----------------------------------------------------------------------------
+bool SortByStartTime(ProfilerResult* &lhs, ProfilerResult* &rhs)
+{
+    return lhs->timestampResult.rawClocks.start < rhs->timestampResult.rawClocks.start;
+}
+
+//-----------------------------------------------------------------------------
 /// Constructor.
 //-----------------------------------------------------------------------------
 VktTraceAnalyzerLayer::VktTraceAnalyzerLayer()
@@ -321,6 +329,90 @@ void VktTraceAnalyzerLayer::WaitAndFetchResults(VktFrameProfilerLayer* pFramePro
 }
 
 //-----------------------------------------------------------------------------
+/// Convert profiler result data to string form.
+/// \param pResult The profilerResult to convert.
+/// \param profiledCommandsLinesStr The output string.
+//-----------------------------------------------------------------------------
+void VktTraceAnalyzerLayer::ProfilerResultToStr(
+    ProfilerResult* pResult,
+    gtASCIIString&  profiledCommandsLinesStr)
+{
+    // Convert timestamps to milliseconds by using the clock frequency.
+#ifndef CODEXL_GRAPHICS
+    const double timestampFrequency = pResult->measurementInfo.idInfo.pWrappedQueue->GetTimestampFrequency();
+
+    double preStartTimestamp = (pResult->timestampResult.rawClocks.preStart / timestampFrequency) * 1000.0;
+    double startTimestamp = (pResult->timestampResult.rawClocks.start / timestampFrequency) * 1000.0;
+    double endTimestamp = (pResult->timestampResult.rawClocks.end / timestampFrequency) * 1000.0;
+#else
+    double startTimestamp = pResult->timestampResult.alignedMillisecondTimestamps.start;
+    double endTimestamp = pResult->timestampResult.alignedMillisecondTimestamps.end;
+#endif
+    FuncId funcId = (FuncId)pResult->measurementInfo.idInfo.funcId;
+
+    gtASCIIString funcName = GetFunctionNameFromId(funcId);
+    gtASCIIString retVal = "void";
+    gtASCIIString params = "";
+
+    if (pResult->measurementInfo.idInfo.funcId != FuncId_WholeCmdBuf)
+    {
+        VktAPIEntry* pResultEntry = VktFrameProfilerLayer::Instance()->FindInvocationBySampleId(pResult->measurementInfo.idInfo.sampleId);
+
+        if (pResultEntry != nullptr)
+        {
+            // Convert the functionID and return values from integers into full strings that we can use in the response.
+            funcName = GetFunctionNameFromId(pResultEntry->mFunctionId);
+            retVal = (pResultEntry->m_returnValue != -1) ? VktUtil::WriteResultCodeEnumAsString(pResultEntry->m_returnValue) : "void";
+            params = pResultEntry->mParameters.asCharArray();
+        }
+    }
+
+    // Vulkan Response line format:
+    // QueueFamilyIndex QueueIndex CommandBuffer APIType FuncId Vulkan_FuncName(Args) = ReturnValue PreStartTime StartTime EndTime SampleId
+
+    profiledCommandsLinesStr += IntToString(pResult->measurementInfo.idInfo.pWrappedQueue->GetQueueFamilyIndex());
+    profiledCommandsLinesStr += " ";
+
+    profiledCommandsLinesStr += IntToString(pResult->measurementInfo.idInfo.pWrappedQueue->GetQueueIndex());
+    profiledCommandsLinesStr += " ";
+
+    profiledCommandsLinesStr += "0x";
+    profiledCommandsLinesStr += UINT64ToHexString((UINT64)pResult->measurementInfo.idInfo.pWrappedCmdBuf->AppHandle());
+    profiledCommandsLinesStr += " ";
+
+    profiledCommandsLinesStr += IntToString(VktTraceAnalyzerLayer::Instance()->GetAPIGroupFromAPI(funcId));
+    profiledCommandsLinesStr += " ";
+
+    profiledCommandsLinesStr += IntToString(funcId);
+    profiledCommandsLinesStr += " ";
+
+    profiledCommandsLinesStr += "Vulkan_";
+    profiledCommandsLinesStr += funcName;
+
+    profiledCommandsLinesStr += "(";
+    profiledCommandsLinesStr += params;
+    profiledCommandsLinesStr += ") = ";
+
+    profiledCommandsLinesStr += retVal;
+
+#ifndef CODEXL_GRAPHICS
+    profiledCommandsLinesStr += " ";
+    profiledCommandsLinesStr += DoubleToString(preStartTimestamp);
+#endif
+
+    profiledCommandsLinesStr += " ";
+    profiledCommandsLinesStr += DoubleToString(startTimestamp);
+
+    profiledCommandsLinesStr += " ";
+    profiledCommandsLinesStr += DoubleToString(endTimestamp);
+
+    profiledCommandsLinesStr += " ";
+    profiledCommandsLinesStr += UINT64ToString(pResult->measurementInfo.idInfo.sampleId);
+
+    profiledCommandsLinesStr += "\n";
+}
+
+//-----------------------------------------------------------------------------
 /// Return GPU-time in text format, to be parsed by the Client and displayed as its own timeline.
 /// \return A line-delimited, ASCII-encoded, version of the GPU Trace data.
 //-----------------------------------------------------------------------------
@@ -332,122 +424,38 @@ std::string VktTraceAnalyzerLayer::GetGPUTraceTXT()
 
     WaitAndFetchResults(pProfilerLayer);
 
-    // Query the CPU clock frequency so we can accurately convert to wall clock time.
-    GPS_TIMESTAMP cpuClockFrequency;
-    QueryPerformanceFrequency(&cpuClockFrequency);
-
     // During QueueSubmit we stored ProfilerResults in mEntriesWithProfilingResults. Form a response using it here.
     ProfilerResultsMap& profiledCmdBufResultsMap = pProfilerLayer->GetCmdBufProfilerResultsMap();
 
-    // During QueueSubmit we stored ProfilerResults in mEntriesWithProfilingResults. Form a response using it here.
+    // Gather all profiler results
     if (!profiledCmdBufResultsMap.empty())
     {
-        // Keep a count of the number of lines that we'll write in the response string.
-        UINT numResponseLines = 0;
+        std::vector<ProfilerResult*> flatResults;
 
-        gtASCIIString profiledCommandsLinesStr;
-
-        ProfilerResultsMap::iterator profIt;
-
-        for (profIt = profiledCmdBufResultsMap.begin(); profIt != profiledCmdBufResultsMap.end(); ++profIt)
+        for (ProfilerResultsMap::iterator profIt = profiledCmdBufResultsMap.begin(); profIt != profiledCmdBufResultsMap.end(); ++profIt)
         {
-            QueueWrapperToProfilingResultsMap::iterator queuesWithProfilingResults;
-
             QueueWrapperToProfilingResultsMap& resultsPerThread = profIt->second;
 
-            for (queuesWithProfilingResults = resultsPerThread.begin(); queuesWithProfilingResults != resultsPerThread.end(); ++queuesWithProfilingResults)
+            for (QueueWrapperToProfilingResultsMap::iterator queuesIt = resultsPerThread.begin();
+                 queuesIt != resultsPerThread.end();
+                 ++queuesIt)
             {
-                VktWrappedQueue* pWrappedQueue = queuesWithProfilingResults->first;
-
-                const double timestampFrequency = pWrappedQueue->GetTimestampFrequency();
-
                 // This structure holds all of the profiler results that were collected at QueueSubmit. The form is LinkId->ProfilerResult.
-                const SampleIdToProfilerResultMap* pQueueResults = queuesWithProfilingResults->second;
+                const SampleIdToProfilerResultMap* pResults = queuesIt->second;
 
-                SampleIdToProfilerResultMap::const_iterator queueResultsIterInner;
-
-                for (queueResultsIterInner = pQueueResults->begin(); queueResultsIterInner != pQueueResults->end(); ++queueResultsIterInner)
+                for (SampleIdToProfilerResultMap::const_iterator sampleIdIt = pResults->begin();
+                     sampleIdIt != pResults->end();
+                     ++sampleIdIt)
                 {
-                    UINT64 sampleId = queueResultsIterInner->first;
-                    const ProfilerResult* pResult = queueResultsIterInner->second;
+                    ProfilerResult* pResult = sampleIdIt->second;
+                    pResult->measurementInfo.idInfo.pWrappedQueue = queuesIt->first;
 
-                    // Convert timestamps to milliseconds by using the clock frequency.
-#ifndef CODEXL_GRAPHICS
-                    double preStartTimestamp = (pResult->timestampResult.rawClocks.preStart / timestampFrequency) * 1000.0;
-                    double startTimestamp = (pResult->timestampResult.rawClocks.start / timestampFrequency) * 1000.0;
-                    double endTimestamp = (pResult->timestampResult.rawClocks.end / timestampFrequency) * 1000.0;
-#else
-                    double startTimestamp = pResult->timestampResult.alignedMillisecondTimestamps.start;
-                    double endTimestamp = pResult->timestampResult.alignedMillisecondTimestamps.end;
-#endif
-                    FuncId funcId = (FuncId)pResult->measurementInfo.idInfo.funcId;
-
-                    gtASCIIString funcName = GetFunctionNameFromId(funcId);
-                    gtASCIIString retVal = "void";
-                    gtASCIIString params = "";
-
-                    if (pResult->measurementInfo.idInfo.funcId != FuncId_WholeCmdBuf)
-                    {
-                        VktAPIEntry* pResultEntry = pProfilerLayer->FindInvocationBySampleId(sampleId);
-
-                        if (pResultEntry != nullptr)
-                        {
-                            // Convert the functionID and return values from integers into full strings that we can use in the response.
-                            funcName = GetFunctionNameFromId(pResultEntry->mFunctionId);
-                            retVal = (pResultEntry->m_returnValue != -1) ? VktUtil::WriteResultCodeEnumAsString(pResultEntry->m_returnValue) : "void";
-                            params = pResultEntry->mParameters.asCharArray();
-                        }
-                    }
-
-                    // Vulkan Response line format:
-                    // QueueFamilyIndex QueueIndex CommandBuffer APIType FuncId Vulkan_FuncName(Args) = ReturnValue PreStartTime StartTime EndTime SampleId
-
-                    profiledCommandsLinesStr += IntToString(pWrappedQueue->GetQueueFamilyIndex());
-                    profiledCommandsLinesStr += " ";
-
-                    profiledCommandsLinesStr += IntToString(pWrappedQueue->GetQueueIndex());
-                    profiledCommandsLinesStr += " ";
-
-                    profiledCommandsLinesStr += "0x";
-                    profiledCommandsLinesStr += UINT64ToHexString((UINT64)pResult->measurementInfo.idInfo.pWrappedCmdBuf->AppHandle());
-                    profiledCommandsLinesStr += " ";
-
-                    profiledCommandsLinesStr += IntToString(VktTraceAnalyzerLayer::Instance()->GetAPIGroupFromAPI(funcId));
-                    profiledCommandsLinesStr += " ";
-
-                    profiledCommandsLinesStr += IntToString(funcId);
-                    profiledCommandsLinesStr += " ";
-
-                    profiledCommandsLinesStr += "Vulkan_";
-                    profiledCommandsLinesStr += funcName;
-
-                    profiledCommandsLinesStr += "(";
-                    profiledCommandsLinesStr += params;
-                    profiledCommandsLinesStr += ") = ";
-
-                    profiledCommandsLinesStr += retVal;
-
-#ifndef CODEXL_GRAPHICS
-                    profiledCommandsLinesStr += " ";
-                    profiledCommandsLinesStr += DoubleToString(preStartTimestamp);
-#endif
-
-                    profiledCommandsLinesStr += " ";
-                    profiledCommandsLinesStr += DoubleToString(startTimestamp);
-
-                    profiledCommandsLinesStr += " ";
-                    profiledCommandsLinesStr += DoubleToString(endTimestamp);
-
-                    profiledCommandsLinesStr += " ";
-                    profiledCommandsLinesStr += UINT64ToString(pResult->measurementInfo.idInfo.sampleId);
-
-                    profiledCommandsLinesStr += "\n";
-
-                    // We just added another line to our response buffer. Increment the count that the client will read.
-                    numResponseLines++;
+                    flatResults.push_back(pResult);
                 }
             }
         }
+
+        sort(flatResults.begin(), flatResults.end(), SortByStartTime);
 
         // We'll need to insert the GPU Trace section header before the response data, even if there aren't any results.
         appendString += "//==GPU Trace==";
@@ -458,13 +466,12 @@ std::string VktTraceAnalyzerLayer::GetGPUTraceTXT()
         appendString += "\n";
 
         appendString += "//CommandBufEventCount=";
-        appendString += DWORDToString(numResponseLines);
+        appendString += IntToString((INT)flatResults.size());
         appendString += "\n";
 
-        // Include the response lines after the section header.
-        if (numResponseLines > 0)
+        for (UINT i = 0; i < flatResults.size(); i++)
         {
-            appendString += profiledCommandsLinesStr;
+            ProfilerResultToStr(flatResults[i], appendString);
         }
     }
     else

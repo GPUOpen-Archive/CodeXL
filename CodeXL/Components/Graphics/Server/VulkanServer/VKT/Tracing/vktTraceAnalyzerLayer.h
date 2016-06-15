@@ -45,8 +45,8 @@ public:
 
     eAPIType GetAPIGroupFromAPI(FuncId inAPIFuncId);
 
-    bool WaitSucceeded(DWORD waitRetVal, UINT numThreads);
     void WaitAndFetchResults(VktFrameProfilerLayer* pFrameProfiler);
+    void ProfilerResultToStr(ProfilerResult* pResult, gtASCIIString& profiledCommandsLinesStr);
     void GetAvailableQueues(std::vector<VktWrappedQueue*>& wrappedQueues);
 
 protected:
@@ -54,6 +54,9 @@ protected:
 
     virtual void BeforeGPUTrace();
     virtual void AfterGPUTrace();
+
+private:
+    bool WaitSucceeded(DWORD waitRetVal, UINT numThreads);
 };
 
 #endif // __VKT_TRACE_ANALYZER_LAYER_H__

@@ -42,6 +42,7 @@
 #include "../vktEnumerations.h"
 
 class VktWrappedCmdBuf;
+class VktWrappedQueue;
 
 //-----------------------------------------------------------------------------
 /// Basic device information
@@ -83,6 +84,7 @@ struct ProfilerMeasurementId
     UINT              frame;           ///< The frame being profiled
     VktWrappedCmdBuf* pWrappedCmdBuf;  ///< Pointers to parent command buffer
     UINT64            fillId;          ///< An ID used to track how many times a cmdBuf was filled in
+    VktWrappedQueue*  pWrappedQueue;   ///< The queue we gathered results from
 };
 
 /// The maximum size allowed for string-ified entry point arguments

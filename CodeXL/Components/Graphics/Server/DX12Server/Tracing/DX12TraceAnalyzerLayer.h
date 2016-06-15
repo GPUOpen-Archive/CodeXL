@@ -69,6 +69,11 @@ public:
     void WaitAndFetchResults(DX12FrameProfilerLayer* pFrameProfiler);
 
     //-----------------------------------------------------------------------------
+    /// Convert profiler result data to string form.
+    //-----------------------------------------------------------------------------
+    void ProfilerResultToStr(ProfilerResult* pResult, gtASCIIString& profiledCommandsLinesStr);
+
+    //-----------------------------------------------------------------------------
     /// Return GPU-time in text format, to be parsed by the Client and displayed as its own timeline.
     /// \return A line-delimited, ASCII-encoded, version of the GPU Trace data.
     //-----------------------------------------------------------------------------
