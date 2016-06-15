@@ -50,7 +50,7 @@ const UINT windowHeight = 600; ///< Render window height
 
 /// Main entry point
 /// \param hInstance A handle to the current instance of the application.
-/// \param hPrevInstance A handle to the previous instance of the application.This parameter is always NULL.
+/// \param hPrevInstance A handle to the previous instance of the application.This parameter is always nullptr.
 /// \param lpCmdLine The command line for the application, excluding the program name.
 /// \param nCmdShow Controls how the window is to be shown.
 /// \return Returns the exit value contained in message's wParam parameter or 0.
@@ -96,7 +96,7 @@ int main()
     }
 
     // Declare a player pointer
-    BasePlayer* pPlayer = NULL;
+    BasePlayer* pPlayer = nullptr;
 
 #ifdef WIN32
     size_t found = mtf.mAPIString.find("Vulkan");

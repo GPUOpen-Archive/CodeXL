@@ -42,7 +42,7 @@ bool DX12Player::InitializeWindow(HINSTANCE hInstance, UINT windowWidth, UINT wi
 {
     m_pPlayerWindow = new WindowsWindow(windowWidth, windowHeight, hInstance, DX12WindowProc);
 
-    if (m_pPlayerWindow == NULL)
+    if (m_pPlayerWindow == nullptr)
     {
         return false;
     }
@@ -67,10 +67,7 @@ bool DX12Player::InitializeWindow(HINSTANCE hInstance, UINT windowWidth, UINT wi
 /// \return True if success, false if failure
 bool DX12Player::InitializeGraphics()
 {
-    //////////////////////////////////////////////////////////////////////////
-    // @TODO: THIS CODE WAS COPIED FROM THE "D3D12MULTITHREADING" SDK SAMPLE!
-    //////////////////////////////////////////////////////////////////////////
-    ID3D12Device* graphicsDevice = NULL;
+    ID3D12Device* graphicsDevice = nullptr;
 
     UINT frameCount = 2;
 
@@ -80,7 +77,7 @@ bool DX12Player::InitializeGraphics()
     // @TODO: In the future, the following commands will invoked by loaded a capture file,
     // initializing, and executing all captured calls. Spinning on the target frame will beat
     // the DX12Server's message loop, allowing communicate with GPUPerfServer.
-    IDXGIFactory4* factory = NULL;
+    IDXGIFactory4* factory = nullptr;
     ThrowIfFailed(CreateDXGIFactory1(IID_PPV_ARGS(&factory)));
 
     ThrowIfFailed(D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&graphicsDevice)));
@@ -90,7 +87,7 @@ bool DX12Player::InitializeGraphics()
     queueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
     queueDesc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
 
-    ID3D12CommandQueue* commandQueue = NULL;
+    ID3D12CommandQueue* commandQueue = nullptr;
     ThrowIfFailed(graphicsDevice->CreateCommandQueue(&queueDesc, IID_PPV_ARGS(&commandQueue)));
 
     // Describe and create the swap chain.
@@ -126,10 +123,10 @@ bool DX12Player::InitializeGraphics()
 void DX12Player::Destroy()
 {
     // Cleanup here
-    if (m_pPlayerWindow != NULL)
+    if (m_pPlayerWindow != nullptr)
     {
         delete m_pPlayerWindow;
-        m_pPlayerWindow = NULL;
+        m_pPlayerWindow = nullptr;
     }
 }
 
@@ -142,7 +139,7 @@ void DX12Player::RenderLoop()
     for (;;)
     {
         // Process any messages in the queue.
-        if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
