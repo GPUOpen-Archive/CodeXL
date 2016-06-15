@@ -1805,3 +1805,52 @@ std::string VktUtil::DecomposeCompositeAlphaFlagsEnumAsString(uint32 flags)
     VktUtil::DecomposeFlags(flags, flagsString, WriteCompositeAlphaFlagsEnumAsString, VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR, VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR);
     return flagsString.asCharArray();
 }
+
+//-----------------------------------------------------------------------------
+/// Write a pointer value as a string. Used to display pointer values in the
+/// form 0x... , and implementation is dependent on platform/compiler (gcc
+/// prefix 0x to pointer values; visual studio does not.
+/// \param ptr the pointer to be displayed
+/// \return string containing the pointer
+//-----------------------------------------------------------------------------
+const char* VktUtil::WritePointerAsString(const void* ptr)
+{
+    static char string[32];
+
+#ifdef WIN32
+    sprintf_s(string, 32, "0x%p", ptr);
+#else
+    sprintf_s(string, 32, "%p", ptr);
+#endif
+    return string;
+}
+
+#pragma warning (push)
+#pragma warning (disable : 4477)
+
+// This prevents VS2015 from complaining about imperfect "%" formatting when printing Vulkan objects.
+// This only applies to the 32-bit version of VulkanServer.
+#ifndef X64
+#pragma warning (disable : 4313)
+#endif
+
+//-----------------------------------------------------------------------------
+/// Write a 64-bit unsigned int value as a string.
+/// For now, these are displayed as pointer values, since that's how these were
+/// displayed before.
+/// \param value the pointer to be displayed
+/// \return string containing the pointer
+//-----------------------------------------------------------------------------
+const char* VktUtil::WriteUint64AsString(uint64_t value)
+{
+    static char string[32];
+
+#ifdef WIN32
+    sprintf_s(string, 32, "0x%p", value);
+#else
+    sprintf_s(string, 32, "%p", value);
+#endif
+    return string;
+}
+
+#pragma warning (pop)
