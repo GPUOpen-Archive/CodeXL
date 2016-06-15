@@ -22,6 +22,9 @@ typedef unsigned int (CL_API_CALL* CALGETVERSION_PROC)(unsigned int* major, unsi
 #include <xlocbuf>
 #include <codecvt>
 
+//External
+#include <inc/amd_ags.h>
+
 // Infra.
 #include <AMDTBaseTools/Include/gtAssert.h>
 #include <AMDTOSWrappers/Include/osDebugLog.h>
@@ -202,8 +205,33 @@ static bool oaGetDriverVersionInfoViaRegistry(gtString& driverVersionWide)
     return isKeyReadSuccess;
 }
 
-
+//// ---------------------------------------------------------------------------
+// Name:        oaGetRadeonSoftwareVersion
+// Description: Dynamically load ags dll , retrieves radeon software version and unloads the ags dll
+// Return Val:  gtString - on success returns radeon software version, or empty string
+// Author:      Roman Bober
+// Date:        14/6/2016
 // ---------------------------------------------------------------------------
+gtString oaGetRadeonSoftwareVersion()
+{
+    // we use static result, since we'd like to load AGS lib once and query the radeon software version only once
+    // we assume that radeon software version wouldn't change during process run
+    static gtString result;
+    if (result.isEmpty())
+    {
+        AGSContext* agsContext = nullptr;
+        AGSGPUInfo gpuInfo;
+        AGSReturnCode rc = agsInit(&agsContext, nullptr, &gpuInfo);
+        GT_IF_WITH_ASSERT(rc == AGS_SUCCESS)
+        {
+            result.fromASCIIString(gpuInfo.radeonSoftwareVersion);
+            GT_ASSERT(AGS_SUCCESS == agsDeInit(agsContext));
+        }
+    }
+    return result;
+}
+
+//// ---------------------------------------------------------------------------
 // Name:        oaGetDriverVersion
 // Description: Dynamically load atiadlxx.dll module and using ADL_Graphics_Versions_Get
 //              get the catalyst version
@@ -214,54 +242,62 @@ static bool oaGetDriverVersionInfoViaRegistry(gtString& driverVersionWide)
 OA_API gtString oaGetDriverVersion(int& driverError)
 {
     driverError = OA_DRIVER_UNKNOWN;
-    gtString driverVersion;
+    gtString driverVersion = oaGetRadeonSoftwareVersion();
 
-    // Get the cal dll module:
-    osFilePath driverModulePath(osFilePath::OS_SYSTEM_DIRECTORY, OS_ATI_CALXY_DRIVER_DLL_NAME, OS_MODULE_EXTENSION);
-    osModuleHandle driverModuleHandle = nullptr;
-
-    bool rcLoadedModule = false;
-
-    // If this is a win64, cal xy driver file should exists, otherwise, look for cal xx driver file:
-    if (driverModulePath.exists())
+    if (driverVersion.isEmpty() == false)
     {
-        // Load the module:
-        rcLoadedModule = osLoadModule(driverModulePath, driverModuleHandle);
+        driverError = OA_DRIVER_OK;
     }
     else
     {
-        // Try to get the ATI cal XX driver dll file:
-        driverModulePath.setFileName(OS_ATI_CALXX_DRIVER_DLL_NAME);
+        // Get the cal dll module:
+        osFilePath driverModulePath(osFilePath::OS_SYSTEM_DIRECTORY, OS_ATI_CALXY_DRIVER_DLL_NAME, OS_MODULE_EXTENSION);
+        osModuleHandle driverModuleHandle = nullptr;
 
+        bool rcLoadedModule = false;
+
+        // If this is a win64, cal xy driver file should exists, otherwise, look for cal xx driver file:
         if (driverModulePath.exists())
         {
             // Load the module:
             rcLoadedModule = osLoadModule(driverModulePath, driverModuleHandle);
         }
-    }
-
-    GT_IF_WITH_ASSERT(rcLoadedModule && (driverModuleHandle != nullptr))
-    {
-        driverError = oaGetDriverVersionfromADLModule(driverModuleHandle, driverVersion);
-
-        osReleaseModule(driverModuleHandle);
-    }
-    else
-    {
-        driverError = OA_DRIVER_NOT_FOUND;
-    }
-
-    // Fallback: try to extract the version via the registry.
-    if (driverError != OA_DRIVER_OK)
-    {
-        driverVersion.makeEmpty();
-        bool isExtractedFromReg = oaGetDriverVersionInfoViaRegistry(driverVersion);
-
-        if (isExtractedFromReg && !driverVersion.isEmpty())
+        else
         {
-            driverError = OA_DRIVER_OK;
+            // Try to get the ATI cal XX driver dll file:
+            driverModulePath.setFileName(OS_ATI_CALXX_DRIVER_DLL_NAME);
+
+            if (driverModulePath.exists())
+            {
+                // Load the module:
+                rcLoadedModule = osLoadModule(driverModulePath, driverModuleHandle);
+            }
+        }
+
+        GT_IF_WITH_ASSERT(rcLoadedModule && (driverModuleHandle != nullptr))
+        {
+            driverError = oaGetDriverVersionfromADLModule(driverModuleHandle, driverVersion);
+
+            osReleaseModule(driverModuleHandle);
+        }
+        else
+        {
+            driverError = OA_DRIVER_NOT_FOUND;
+        }
+
+        // Fallback: try to extract the version via the registry.
+        if (driverError != OA_DRIVER_OK)
+        {
+            driverVersion.makeEmpty();
+            bool isExtractedFromReg = oaGetDriverVersionInfoViaRegistry(driverVersion);
+
+            if (isExtractedFromReg && !driverVersion.isEmpty())
+            {
+                driverError = OA_DRIVER_OK;
+            }
         }
     }
+    
 
     return driverVersion;
 }

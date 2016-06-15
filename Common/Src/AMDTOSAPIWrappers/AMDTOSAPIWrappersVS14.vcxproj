@@ -78,6 +78,7 @@
     <Import Project="$(CommonDir)\Src\ADLUtil\Global-ADLUtil.props" />
     <Import Project="$(CommonDir)\Src\AMDTMutex\Global-AMDTMutex.props" />
     <Import Project="$(CommonDir)\Src\TSingleton\Global-TSingleton.props" />
+    <Import Project="$(CommonDir)\Lib\AMD\ags\Global-ags-2015.props" />
   </ImportGroup>
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
@@ -105,7 +106,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
       <ImportLibrary>$(AMDTOutputDir)$(Configuration)\arch\$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>ws2_32.lib;Version.lib;zlibstat.lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;Dbghelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;Version.lib;zlibstat.lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;Dbghelp.lib;User32.lib;Advapi32.lib;Gdi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(AMDTOutputDir)$(Configuration)\arch;$(AMDTCommonExt)zlib\1.2.8\contrib\vstudio\vc12\$(GDTPlatform)\ZlibStat$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT$(GDTDebugSuffixNoDash);%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
