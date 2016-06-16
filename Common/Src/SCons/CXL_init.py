@@ -574,19 +574,19 @@ def initBoost (env) :
   
       if (env['CXL_arch'] == 'x86_64'):
         boost_dir = amdboost_dir + '/x86_64/'
-        shutil.copy2(amdboost_dir + "libboost_system.so.1.59.0", env['CXL_lib_dir'] + "/libboost_system.so.1.59.0")
-        shutil.copy2(amdboost_dir + "libboost_filesystem.so.1.59.0", env['CXL_lib_dir'] + "/libboost_filesystem.so.1.59.0")
-        shutil.copy2(amdboost_dir + "libboost_regex.so.1.59.0", env['CXL_lib_dir'] + "/libboost_regex.so.1.59.0")
-        shutil.copy2(amdboost_dir + "libboost_program_options.so.1.59.0", env['CXL_lib_dir'] + "/libboost_program_options.so.1.59.0")
-        shutil.copy2(amdboost_dir + "libboost_wave.so.1.59.0", env['CXL_lib_dir'] + "/libboost_wave.so.1.59.0")
-        shutil.copy2(amdboost_dir + "libboost_thread.so.1.59.0", env['CXL_lib_dir'] + "/libboost_thread.so.1.59.0")
-        shutil.copy2(amdboost_dir + "libboost_chrono.so.1.59.0", env['CXL_lib_dir'] + "/libboost_chrono.so.1.59.0")
-        shutil.copy2(amdboost_dir + "libboost_date_time.so.1.59.0", env['CXL_lib_dir'] + "/libboost_date_time.so.1.59.0")
+        shutil.copy2(boost_dir + "libboost_system.so.1.59.0", env['CXL_lib_dir'] + "/libboost_system.so.1.59.0")
+        shutil.copy2(boost_dir + "libboost_filesystem.so.1.59.0", env['CXL_lib_dir'] + "/libboost_filesystem.so.1.59.0")
+        shutil.copy2(boost_dir + "libboost_regex.so.1.59.0", env['CXL_lib_dir'] + "/libboost_regex.so.1.59.0")
+        shutil.copy2(boost_dir + "libboost_program_options.so.1.59.0", env['CXL_lib_dir'] + "/libboost_program_options.so.1.59.0")
+        shutil.copy2(boost_dir + "libboost_wave.so.1.59.0", env['CXL_lib_dir'] + "/libboost_wave.so.1.59.0")
+        shutil.copy2(boost_dir + "libboost_thread.so.1.59.0", env['CXL_lib_dir'] + "/libboost_thread.so.1.59.0")
+        shutil.copy2(boost_dir + "libboost_chrono.so.1.59.0", env['CXL_lib_dir'] + "/libboost_chrono.so.1.59.0")
+        shutil.copy2(boost_dir + "libboost_date_time.so.1.59.0", env['CXL_lib_dir'] + "/libboost_date_time.so.1.59.0")
       else:
         boost_dir = amdboost_dir + '/x86/'
     else:
-      boostdir=env['CXL_boost_dir']
-    env.Append(BoostDir= [boostdir])
+      boost_dir=env['CXL_boost_dir']
+    env.Append(BoostDir= [boost_dir])
     env.Append(LIBPATH = [env['BoostDir']])
 
 def UseBoost (env):
