@@ -16,11 +16,9 @@
 #include <AMDTOSWrappers/Include/osDebugLog.h>
 #include <AMDTOSWrappers/Include/osModule.h>
 #include <AMDTOSWrappers/Include/osOSDefinitions.h>
-#include <AMDTOSWrappers/Include/osRawMemoryStream.h>
 #include <AMDTOSWrappers/Include/osStringConstants.h>
 #include <AMDTOSWrappers/Include/osTime.h>
 #include <AMDTAPIClasses/Include/apDebugProjectSettings.h>
-#include <AMDTAPIClasses/Include/apExpression.h>
 #include <AMDTAPIClasses/Include/Events/apDebuggedProcessCreationFailureEvent.h>
 #include <AMDTAPIClasses/Include/Events/apEventsHandler.h>
 #include <AMDTAPIClasses/Include/Events/apThreadCreatedEvent.h>
@@ -437,16 +435,12 @@ bool rdDebuggerCommandExecutor::handleDebuggingCommand(pdRemoteProcessDebuggerCo
             {
                 gtUInt64 threadId = (gtUInt64)OS_NO_THREAD_ID;
                 gtInt32 callStackFrameIndex = -1;
-                gtInt32 evaluationDepth = 0;
-                bool onlyNames = false;
-                gtVector<apExpression> locals;
+                gtVector<gtString> locals;
 
                 _processDebuggerConnectionChannel >> threadId;
                 _processDebuggerConnectionChannel >> callStackFrameIndex;
-                _processDebuggerConnectionChannel >> evaluationDepth;
-                _processDebuggerConnectionChannel >> onlyNames;
 
-                bool retVal = _theProcessDebugger.getHostLocals((osThreadId)threadId, (int)callStackFrameIndex, (int)evaluationDepth, onlyNames, locals);
+                bool retVal = _theProcessDebugger.getHostLocals((osThreadId)threadId, (int)callStackFrameIndex, locals);
 
                 _processDebuggerConnectionChannel << retVal;
 
@@ -455,42 +449,36 @@ bool rdDebuggerCommandExecutor::handleDebuggingCommand(pdRemoteProcessDebuggerCo
                     gtInt32 numLocals = (gtInt32)locals.size();
                     _processDebuggerConnectionChannel << numLocals;
 
-                    // Write the locals to a memory stream before writing them to the channel, to lower
-                    // the number of channel transactions:
-                    osRawMemoryStream memoryStream;
-
                     for (gtInt32 i = 0; i < numLocals; i++)
                     {
-                        bool rcVar = locals[i].writeSelfIntoRawMemoryStream(memoryStream);
-                        GT_ASSERT(rcVar);
+                        _processDebuggerConnectionChannel << locals[i];
                     }
-
-                    _processDebuggerConnectionChannel << memoryStream;
                 }
             }
             break;
 
-            case PD_REMOTE_GET_HOST_EXPRESSION_VALUE_CMD:
+            case PD_REMOTE_GET_HOST_VARIABLE_VALUE_CMD:
             {
                 gtUInt64 threadId = (gtUInt64)OS_NO_THREAD_ID;
                 gtInt32 callStackFrameIndex = -1;
-                gtString expressionText;
-                gtInt32 evaluationDepth = 0;
-                apExpression o_exp;
+                gtString variableName;
+                gtString o_varValue;
+                gtString o_varValueHex;
+                gtString o_varType;
 
                 _processDebuggerConnectionChannel >> threadId;
                 _processDebuggerConnectionChannel >> callStackFrameIndex;
-                _processDebuggerConnectionChannel >> expressionText;
-                _processDebuggerConnectionChannel >> evaluationDepth;
+                _processDebuggerConnectionChannel >> variableName;
 
-                bool retVal = _theProcessDebugger.getHostExpressionValue((osThreadId)threadId, (int)callStackFrameIndex, expressionText, (int)evaluationDepth, o_exp);
+                bool retVal = _theProcessDebugger.getHostVariableValue((osThreadId)threadId, (gtInt32)callStackFrameIndex, variableName, o_varValue, o_varValueHex, o_varType);
 
                 _processDebuggerConnectionChannel << retVal;
 
                 if (retVal)
                 {
-                    bool rcExp = o_exp.writeSelfIntoChannel(_processDebuggerConnectionChannel);
-                    GT_ASSERT(rcExp)
+                    _processDebuggerConnectionChannel << o_varValue;
+                    _processDebuggerConnectionChannel << o_varValueHex;
+                    _processDebuggerConnectionChannel << o_varType;
                 }
             }
             break;

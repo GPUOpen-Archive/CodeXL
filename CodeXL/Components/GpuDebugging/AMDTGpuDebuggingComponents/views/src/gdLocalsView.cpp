@@ -213,10 +213,9 @@ void gdLocalsView::populateLocalsList()
 
     if (gaIsInKernelDebugging() && theGlobalVarsManager.isKernelDebuggingThreadChosen())
     {
-        // TO_DO: we can get the values directly - this should provide a performance improvement
         // Get the variable names:
-        gtVector<apExpression> variableNames;
-        bool rcNm = gaGetKernelDebuggingAvailableVariables(0, variableNames, false, m_stackDepth, true);
+        gtVector<gtString> variableNames;
+        bool rcNm = gaGetKernelDebuggingAvailableVariables(variableNames, false, m_stackDepth);
         GT_IF_WITH_ASSERT(rcNm)
         {
             // Get the current work item index:
@@ -231,18 +230,20 @@ void gdLocalsView::populateLocalsList()
                 for (int i = 0 ; i < numberOfLocals; i++)
                 {
                     // Get the variable value:
-                    const gtString& currentVariableName = variableNames[i].m_name;
-                    apExpression variableValue;
-                    bool rcVal = gaGetKernelDebuggingExpressionValue(currentVariableName, currentWorkItemCoord, 2, variableValue);
+                    const gtString& currentVariableName = variableNames[i];
+                    gtString variableValue;
+                    gtString variableValueHex;
+                    gtString variableType;
+                    bool rcVal = gaGetKernelDebuggingVariableValueString(currentVariableName, currentWorkItemCoord, variableValue, variableValueHex, variableType);
                     GT_IF_WITH_ASSERT(rcVal)
                     {
                         QStringList newRowStringList;
-                        newRowStringList << acGTStringToQString(variableValue.m_name);
-                        newRowStringList << acGTStringToQString(variableValue.m_value);
-                        newRowStringList << acGTStringToQString(variableValue.m_type);
+                        newRowStringList << acGTStringToQString(currentVariableName);
+                        newRowStringList << acGTStringToQString(variableValue);
+                        newRowStringList << acGTStringToQString(variableType);
                         QTreeWidgetItem* pItem = addItem(newRowStringList, NULL);
 
-                        recursivelyAddLocalItemChildren(pItem, variableValue, variableValue.m_name);
+                        recursivelyAddLocalItemChildren(pItem, currentVariableName, currentWorkItemCoord);
                     }
                 }
             }
@@ -250,28 +251,30 @@ void gdLocalsView::populateLocalsList()
     }
     else if (gaIsInHSAKernelBreakpoint())
     {
-        // TO_DO: we should get the values directly here, to improve performance:
-        gtVector<apExpression> variableNames;
-        bool rcVars = gaHSAListVariables(0, variableNames);
+        gtVector<gtString> variableNames;
+        bool rcVars = gaHSAListVariables(variableNames);
         size_t varCount = variableNames.size();
 
         if (rcVars && (0 < varCount))
         {
-            apExpression variableValue;
+            gtString variableValue;
+            gtString variableValueHex;
+            gtString variableType;
 
-            for (const apExpression& variableName : variableNames)
+            for (const gtString& variableName : variableNames)
             {
-                bool rcVar = gaHSAGetExpressionValue(variableName.m_name, 0, variableValue);
+                variableValue.makeEmpty();
+                bool rcVar = gaHSAGetVariableValue(variableName, variableValue, variableValueHex, variableType);
 
                 if (rcVar)
                 {
                     // Show HSAIL registers as hex values:
-                    bool isReg = ((0 < variableName.m_name.length()) && ('$' == variableName.m_name[0]));
+                    bool isReg = ((0 < variableName.length()) && ('$' == variableName[0]));
 
                     QStringList newRowStringList;
-                    newRowStringList << acGTStringToQString(variableValue.m_name);
-                    newRowStringList << acGTStringToQString(isReg ? variableValue.m_valueHex : variableValue.m_value);
-                    newRowStringList << acGTStringToQString(variableValue.m_type);
+                    newRowStringList << acGTStringToQString(variableName);
+                    newRowStringList << acGTStringToQString(isReg ? variableValueHex : variableValue);
+                    newRowStringList << acGTStringToQString(variableType);
                     addItem(newRowStringList, NULL);
                 }
             }
@@ -279,14 +282,13 @@ void gdLocalsView::populateLocalsList()
     }
     else if (gaCanGetHostVariables())
     {
-        // TO_DO: we should get the values directly here, to improve performance:
         int threadIdx = theGlobalVarsManager.chosenThread();
         osThreadId threadId = OS_NO_THREAD_ID;
         bool rcThd = gaGetThreadId(threadIdx, threadId);
         GT_IF_WITH_ASSERT(rcThd && (OS_NO_THREAD_ID != threadId))
         {
-            gtVector<apExpression> variableNames;
-            bool rcLoc = gaGetThreadLocals(threadId, m_stackDepth, 0, variableNames, true);
+            gtVector<gtString> variableNames;
+            bool rcLoc = gaGetThreadLocals(threadId, m_stackDepth, variableNames);
             GT_IF_WITH_ASSERT(rcLoc)
             {
                 // Iterate the variables:
@@ -295,19 +297,22 @@ void gdLocalsView::populateLocalsList()
                 for (int i = 0; i < numberOfLocals; i++)
                 {
                     // Get the variable value:
-                    const gtString& currentVariableName = variableNames[i].m_name;
-                    apExpression variableValue;
-                    bool rcVal = gaGetThreadExpressionValue(threadId, m_stackDepth, currentVariableName, 3, variableValue);
+                    const gtString& currentVariableName = variableNames[i];
+                    gtString variableValue;
+                    gtString variableValueHex;
+                    gtString variableType;
+                    bool rcVal = gaGetThreadVariableValue(threadId, m_stackDepth, currentVariableName, variableValue, variableValueHex, variableType);
                     GT_IF_WITH_ASSERT(rcVal)
                     {
                         QStringList newRowStringList;
-                        newRowStringList << acGTStringToQString(variableValue.m_name);
-                        newRowStringList << acGTStringToQString(variableValue.m_value);
-                        newRowStringList << acGTStringToQString(variableValue.m_type);
+                        newRowStringList << acGTStringToQString(currentVariableName);
+                        newRowStringList << acGTStringToQString(variableValue);
+                        newRowStringList << acGTStringToQString(variableType);
                         QTreeWidgetItem* pItem = addItem(newRowStringList, NULL);
 
-                        // Add the expression's children:
-                        recursivelyAddLocalItemChildren(pItem, variableValue, variableValue.m_name);
+                        // TO_DO: support structs?
+                        (void)pItem;
+                        // recursivelyAddLocalItemChildren(pItem, currentVariableName, currentWorkItemCoord);
                     }
                 }
             }
@@ -396,25 +401,33 @@ void gdLocalsView::extendContextMenu()
 // Author:      Uri Shomroni
 // Date:        19/2/2012
 // ---------------------------------------------------------------------------
-void gdLocalsView::recursivelyAddLocalItemChildren(QTreeWidgetItem* pItem, const apExpression& currentVariable, const gtString& currentVariableQualifiedName)
+void gdLocalsView::recursivelyAddLocalItemChildren(QTreeWidgetItem* pItem, const gtString& currentVariableName, const int currentWorkItemCoord[3])
 {
-    const gtVector<apExpression*>& variableChildren = currentVariable.children();
-
-    for (const apExpression* pCurrentChild : variableChildren)
+    gtVector<gtString> variableChildren;
+    bool rcVars = gaGetKernelDebuggingVariableMembers(currentVariableName, variableChildren);
+    GT_IF_WITH_ASSERT(rcVars)
     {
-        GT_IF_WITH_ASSERT(nullptr != pCurrentChild)
+        int numberOfChildren = (int)variableChildren.size();
+
+        for (int i = 0; i < numberOfChildren; i++)
         {
-            gtString currentMemberFullName = currentVariableQualifiedName;
-            const gtString& currentMemberName = pCurrentChild->m_name;
+            gtString currentMemberFullName = currentVariableName;
+            const gtString& currentMemberName = variableChildren[i];
             currentMemberFullName.append('.').append(currentMemberName);
+            gtString variableValue;
+            gtString variableValueHex;
+            gtString variableType;
+            bool rcVal = gaGetKernelDebuggingVariableValueString(currentMemberFullName, currentWorkItemCoord, variableValue, variableValueHex, variableType);
+            GT_IF_WITH_ASSERT(rcVal)
+            {
+                QStringList newRowStringList;
+                newRowStringList << acGTStringToQString(currentMemberName);
+                newRowStringList << acGTStringToQString(variableValue);
+                newRowStringList << acGTStringToQString(variableType);
+                QTreeWidgetItem* pMemberItem = addItem(newRowStringList, NULL, pItem);
 
-            QStringList newRowStringList;
-            newRowStringList << acGTStringToQString(currentMemberName);
-            newRowStringList << acGTStringToQString(pCurrentChild->m_value);
-            newRowStringList << acGTStringToQString(pCurrentChild->m_type);
-            QTreeWidgetItem* pMemberItem = addItem(newRowStringList, nullptr, pItem);
-
-            recursivelyAddLocalItemChildren(pMemberItem, *pCurrentChild, currentMemberFullName);
+                recursivelyAddLocalItemChildren(pMemberItem, currentMemberFullName, currentWorkItemCoord);
+            }
         }
     }
 }

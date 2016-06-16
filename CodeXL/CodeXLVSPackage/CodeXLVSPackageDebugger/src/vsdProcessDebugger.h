@@ -13,7 +13,6 @@
 
 // Forward declarations:
 class vsdCDebugEventCallback;
-struct apExpression;
 
 // Visual Studio:
 #include <msdbg.h>
@@ -115,18 +114,18 @@ public:
     virtual FunctionExecutionMode functionExecutionMode() const;
     virtual void afterAPICallIssued();
 
-    virtual bool canGetHostVariables() const override;
-    virtual bool getHostLocals(osThreadId threadId, int callStackFrameIndex, int evaluationDepth, bool onlyNames, gtVector<apExpression>& o_locals) override;
-    virtual bool getHostExpressionValue(osThreadId threadId, int callStackFrameIndex, const gtString& expressionText, int evaluationDepth, apExpression& o_exp) override;
-    virtual bool canPerformHostDebugging() const override;
-    virtual bool isAtAPIOrKernelBreakpoint(osThreadId threadId) const override;
-    virtual apBreakReason hostBreakReason() const override;
-    virtual bool getHostBreakpointLocation(osFilePath& bpFile, int& bpLine) const override;
-    virtual bool setHostSourceBreakpoint(const osFilePath& fileName, int lineNumber) override;
-    virtual bool deleteHostSourceBreakpoint(const osFilePath& fileName, int lineNumber) override;
-    virtual bool setHostFunctionBreakpoint(const gtString& funcName) override;
-    virtual bool performHostStep(osThreadId threadId, StepType stepType) override;
-    virtual bool suspendHostDebuggedProcess() override;
+    virtual bool canGetHostVariables() const;
+    virtual bool getHostLocals(osThreadId threadId, int callStackFrameIndex, gtVector<gtString>& o_variables);
+    virtual bool getHostVariableValue(osThreadId threadId, int callStackFrameIndex, const gtString& variableName, gtString& o_varValue, gtString& o_varValueHex, gtString& o_varType);
+    virtual bool canPerformHostDebugging() const;
+    virtual bool isAtAPIOrKernelBreakpoint(osThreadId threadId) const;
+    virtual apBreakReason hostBreakReason() const;
+    virtual bool getHostBreakpointLocation(osFilePath& bpFile, int& bpLine) const;
+    virtual bool setHostSourceBreakpoint(const osFilePath& fileName, int lineNumber);
+    virtual bool deleteHostSourceBreakpoint(const osFilePath& fileName, int lineNumber);
+    virtual bool setHostFunctionBreakpoint(const gtString& funcName);
+    virtual bool performHostStep(osThreadId threadId, StepType stepType);
+    virtual bool suspendHostDebuggedProcess();
 
 private:
     // Disallow use of my default constructor:
@@ -156,8 +155,8 @@ private:
         osInstructionPointer threadStartAddress() const { return m_threadStartAddress; };
         bool getCallStack(osCallStack& callStack, bool hideSpyDLLsFunctions);
         int skippedFrameCount(bool hideSpyDLLsFunctions);
-        bool listLocalsForStackFrame(int callStackFrameIndex, int evaluationDepth, bool onlyNames, gtVector<apExpression>& o_locals);
-        bool evaluateVariableInStackFrame(int callStackFrameIndex, const gtString& expressionText, int evaluationDepth, apExpression& o_exp, bool evalHex);
+        bool listLocalsForStackFrame(int callStackFrameIndex, gtVector<gtString>& o_variables);
+        bool evaluateVariableInStackFrame(int callStackFrameIndex, const gtString& variableName, gtString& o_varValue, gtString& o_varValueHex, gtString& o_varType, bool evalHex);
         bool performStep(IDebugProcess3& riProcess3, IDebugProgram2& riProgram, StepType stepType);
         bool executeFunction(osProcedureAddress64 funcAddress, bool& waitingForExecutedFunctionFlag);
         bool markThreadAsSuspendedProcessEntryPoint();

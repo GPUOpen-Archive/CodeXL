@@ -69,40 +69,27 @@ bool gaHSASetBreakpointImpl(const gtString& kernelName, gtUInt64 line)
     return retVal;
 }
 
-bool gaHSAListVariablesImpl(int evalDepth, gtVector<apExpression>& variables)
+bool gaHSAListVariablesImpl(gtVector<gtString>& variables)
 {
     bool retVal = false;
 
     const hsDebugInfo* pDebugInfo = hsDebuggingManager::instance().GetCurrentDebugInfo();
     GT_IF_WITH_ASSERT(nullptr != pDebugInfo)
     {
-        gtVector<gtString> variableNames;
-        retVal = pDebugInfo->ListVariables(variableNames);
-
-        variables.reserve(variableNames.size());
-        for (const gtString& varNm : variableNames)
-        {
-            // TO_DO: currently, onlyNames = false is assumed. This should instead be a parameter.
-            apExpression expr;
-            bool rcVar = gaHSAGetExpressionValueImpl(varNm, evalDepth, expr);
-            GT_ASSERT(rcVar);
-            variables.push_back(expr);
-        }
+        retVal = pDebugInfo->ListVariables(variables);
     }
 
     return retVal;
 }
 
-bool gaHSAGetExpressionValueImpl(const gtString& varName, int evalDepth, apExpression& varValue)
+bool gaHSAGetVariableValueImpl(const gtString& varName, gtString& varValue, gtString& varValueHex, gtString& varType)
 {
     bool retVal = false;
 
     const hsDebugInfo* pDebugInfo = hsDebuggingManager::instance().GetCurrentDebugInfo();
     GT_IF_WITH_ASSERT(nullptr != pDebugInfo)
     {
-        // TO_DO: handle members and evalDepth:
-        GT_UNREFERENCED_PARAMETER(evalDepth);
-        retVal = pDebugInfo->EvaluateVariable(varName, varValue.m_value, &varValue.m_valueHex, &varValue.m_type);
+        retVal = pDebugInfo->EvaluateVariable(varName, varValue, &varValueHex, &varType);
     }
 
     return retVal;
