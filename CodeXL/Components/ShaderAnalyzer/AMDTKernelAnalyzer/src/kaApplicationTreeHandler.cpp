@@ -2479,8 +2479,9 @@ bool kaApplicationTreeHandler::getOverviewHtmlInfo(const osFilePath& filePath, a
 // ---------------------------------------------------------------------------
 void kaApplicationTreeHandler::SetItemsVisibility()
 {
-    // Check if the kernel analyzer mode is currently active, and show / hide all the KA items in tree:
-    const bool isProjectOpened = afProjectManager::instance().currentProjectSettings().projectName().isEmpty() == false;
+    // Check if the kernel analyzer mode is currently active, and show / hide all the KA items in tree, in Stand alone mode we show KA tree even if project isn't loaded
+    const bool isProjectOpened = afGlobalVariablesManager::instance().isRunningInsideVisualStudio()? afProjectManager::instance().currentProjectSettings().projectName().isEmpty() == false :
+                                                                                                      true;
     const bool shouldShow = isProjectOpened && afExecutionModeManager::instance().isActiveMode(KA_STR_executionMode);
 
     GT_IF_WITH_ASSERT(m_pApplicationTree != nullptr)
