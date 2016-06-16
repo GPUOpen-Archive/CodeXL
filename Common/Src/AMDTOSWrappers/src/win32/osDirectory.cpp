@@ -352,18 +352,22 @@ bool osDirectory::getSubDirectoriesPaths(SortMethod sortMethod,
 //   fileNameSearchString - A search string for the file name.
 //                          The search string can contain wildcard characters (* and ?).
 //                          Example: "*.txt".
-//   files - The output file paths list.
+//   filePaths - The output file paths list.
+//   clearOutVal - true if we clear filePaths before filling it up
 // Return Val:  bool - Success / failure.
 // Author:      AMD Developer Tools Team
 // Date:        15/5/2004
 // ---------------------------------------------------------------------------
 bool osDirectory::getContainedFilePaths(const gtString& fileNameSearchString,
-                                        gtList<osFilePath>& filePaths) const
+                                        gtList<osFilePath>& filePaths, bool clearOutVal/* = true*/) const
 {
     bool retVal = false;
 
     // Make the output list empty:
-    filePaths.clear();
+    if (clearOutVal)
+    {
+        filePaths.clear();
+    }
 
     // Build the search string:
     gtString searchString = _directoryPath.asString();

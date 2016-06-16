@@ -77,7 +77,7 @@ public:
     bool deleteRecursively();
     bool isWriteAccessible();
     bool getContainedFilePaths(const gtString& fileNameSearchString, SortMethod sortMethod,
-                               gtList<osFilePath>& filePaths) const;
+                               gtList<osFilePath>& filePaths, bool clearOutVal = true) const;
     bool getSubDirectoriesPaths(SortMethod sortMethod, gtList<osFilePath>& subDirectoriesPaths) const;
     osDirectory& upOneLevel();
     osDirectory getParentDirectory() const;
@@ -96,7 +96,7 @@ public:
     virtual bool readSelfFromChannel(osChannel& channel);
 
 private:
-    bool getContainedFilePaths(const gtString& fileNameSearchString, gtList<osFilePath>& filePaths) const;
+    bool getContainedFilePaths(const gtString& fileNameSearchString, gtList<osFilePath>& filePaths, bool clearOutVal = true) const;
     static bool sortFilePathsListFromAscendingNameOrder(gtList<osFilePath>& filePaths, SortMethod sortMethod);
 
     // Do not allow the use of this function, since the automatic conversion from gtString to

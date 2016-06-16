@@ -95,17 +95,18 @@ osDirectory& osDirectory::operator=(osDirectory&& other)
 //                          The search string can contain wildcard characters (* and ?).
 //                          Example: "*.txt".
 //   sortMethod - The order in which the output file paths will be sorted.
-//   files - The output file paths list.
+//   filePaths - The output file paths list.
+//   clearOutVal - true if we clear filePaths before filling it up
 // Return Val:  bool - Success / failure.
 // Author:      AMD Developer Tools Team
 // Date:        15/5/2004
 // ---------------------------------------------------------------------------
 bool osDirectory::getContainedFilePaths(const gtString& fileNameSearchString,
                                         SortMethod sortMethod,
-                                        gtList<osFilePath>& filePaths) const
+                                        gtList<osFilePath>& filePaths, bool clearOutVal/* = true*/) const
 {
     // First - get the file names (in alphabetic order):
-    bool retVal = getContainedFilePaths(fileNameSearchString, filePaths);
+    bool retVal = getContainedFilePaths(fileNameSearchString, filePaths, clearOutVal);
 
     sortFilePathsListFromAscendingNameOrder(filePaths, sortMethod);
 
