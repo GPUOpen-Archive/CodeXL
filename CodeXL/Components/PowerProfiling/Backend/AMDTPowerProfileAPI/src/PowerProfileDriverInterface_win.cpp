@@ -538,7 +538,7 @@ bool PwrEnableInternalCounters(bool activate)
     fpEnableInternalCounters fnEnableInternalCounters;
     gtString ppLibName(CODEXL_PPLIB_NAME);
 
-    fnEnableInternalCounters = (fpEnableInternalCounters) GetProcAddress(GetModuleHandle(TEXT(ppLibName.asASCIICharArray())), "PwrEnableInternalCounters");
+    fnEnableInternalCounters = (fpEnableInternalCounters) GetProcAddress(GetModuleHandle(TEXT(ppLibName.asASCIICharArray())), "PwrEnableInternalCountersInternal");
 
     if (nullptr != fnEnableInternalCounters)
     {
