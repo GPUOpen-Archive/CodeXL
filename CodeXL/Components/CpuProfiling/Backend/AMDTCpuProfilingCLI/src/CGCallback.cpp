@@ -9,7 +9,7 @@
 // Qt:
 //#include <QtGui>
 
-#include <AMDTOSWrappers/include/osFilePath.h>
+#include <AMDTOSWrappers/Include/osFilePath.h>
 // Backend:
 #include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
 
