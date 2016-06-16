@@ -8,7 +8,7 @@
 //==================================================================================
 
 // Qt
-#include <QtGui>
+//#include <QtGui>
 
 // Backend:
 #include <AMDTCpuPerfEventUtils/inc/ViewConfig.h>

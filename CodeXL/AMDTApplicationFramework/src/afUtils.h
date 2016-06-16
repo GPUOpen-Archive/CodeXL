@@ -14,8 +14,6 @@
 
 // Infra:
 #include <AMDTBaseTools/Include/gtString.h>
-#include <AMDTBaseTools/Include/gtAssert.h>
-#include <AMDTBaseTools/Include/gtASCIIString.h>
 
 // Local:
 #include <AMDTApplicationFramework/Include/afApplicationFrameworkDLLBuild.h>
@@ -43,8 +41,6 @@ public:
     void static getFieldFromXML(TiXmlNode& debugNode, const gtString& fieldName, int& fieldValue);
     void static getFieldFromXML(TiXmlNode& debugNode, const gtString& fieldName, bool& fieldValue);
 
-    static bool ConvertCygwinPath(const wchar_t* pPath, int len, gtString& convertedPath);
-    static bool ConvertCygwinPath(const gtString& path, gtString& convertedPath);
 };
 
-#endif  // __GDPROCESSDEBUGGEREVENTHANDLER
+#endif  // __AFUTILS

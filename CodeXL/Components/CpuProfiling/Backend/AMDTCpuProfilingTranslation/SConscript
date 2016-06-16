@@ -7,7 +7,7 @@ libName = "CXLCpuProfilingTranslation"
 
 env = CXL_env.Clone()
 
-UseQt4(env)
+UseQtNoGraphics(env)
 
 env.Append( CPPPATH = [ 
 	".",

@@ -7,8 +7,9 @@
 //==================================================================================
 
 // Qt:
-#include <QtGui>
+//#include <QtGui>
 
+#include <AMDTOSWrappers/include/osFilePath.h>
 // Backend:
 #include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
 
@@ -23,8 +24,6 @@ bool InitializeSymbolEngine(ExecutableFile* pExecutable,
 bool SyncWithSymbolEngine(CpuProfileReader& profileReader, CpuProfileModule& module, ExecutableFile** ppEexecutable);
 CpuProfileModule* getModuleDetail2(CpuProfileReader& profileReader, const gtString& modulePath, ExecutableFile** ppExe);
 bool GetParentFunctionName(const CpuProfileModule* pModule, const CpuProfileFunction* pFunction, gtVAddr va, gtString& funcName);
-
-bool ConvertCygwinPath(const wchar_t* pPath, int len, gtString& convertedPath);
 
 bool InitializeSymbolEngine(ExecutableFile* pExecutable,
                             gtString& searchPath,
@@ -189,50 +188,6 @@ bool GetParentFunctionName(const CpuProfileModule* pModule, const CpuProfileFunc
 
     return ret;
 }
-
-
-bool ConvertCygwinPath(const wchar_t* pPath, int len, gtString& convertedPath)
-{
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-
-    bool ret = (10 < len && 0 == memcmp(pPath, L"/cygdrive/", 10 * sizeof(wchar_t)));
-
-    if (ret)
-    {
-        pPath += 10;
-        len -= 9;
-        convertedPath.resize(static_cast<size_t>(len));
-
-        int i = 0;
-
-        while (L'/' != *pPath)
-        {
-            convertedPath[i++] = *pPath++;
-        }
-
-        convertedPath[i++] = L':';
-        convertedPath[i++] = L'\\';
-
-        ++pPath;
-
-        for (; i < len; ++i, ++pPath)
-        {
-            convertedPath[i] = (L'/' == *pPath) ? L'\\' : *pPath;
-        }
-    }
-
-    return ret;
-
-#else
-
-    (void)pPath;         // Unused
-    (void)len;           // Unused
-    (void)convertedPath; // Unused
-    return false;
-
-#endif
-}
-
 
 
 CGCallback::CGCallback(CpuProfileReader* pProfileReader)
@@ -491,7 +446,7 @@ bool CGCallback::AddFunction(gtVAddr va, gtVAddr& startVa, gtVAddr& endVa)
                             int srcFileNameLen = static_cast<int>(wcslen(sourceLine.m_filePath));
 
                             // FIXME
-                            if (!ConvertCygwinPath(sourceLine.m_filePath, srcFileNameLen, srcFileName))
+                            if (!osFilePath::ConvertCygwinPath(sourceLine.m_filePath, srcFileNameLen, srcFileName))
                             {
                                 srcFileName.assign(sourceLine.m_filePath, srcFileNameLen);
                             }

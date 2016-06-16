@@ -164,6 +164,10 @@ public:
     bool IsMatchingExtension(const gtString& extensionsString) const;
 
     bool Rename(const gtString& newNameFullPath);
+
+    static bool ConvertCygwinPath(const wchar_t* pPath, int len, gtString& convertedPath);
+    static bool ConvertCygwinPath(const gtString& path, gtString& convertedPath);
+
 private:
     osFilePath& adjustToCurrentOS();
 

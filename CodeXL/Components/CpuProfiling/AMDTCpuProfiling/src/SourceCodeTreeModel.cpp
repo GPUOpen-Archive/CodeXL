@@ -1779,7 +1779,7 @@ bool SourceCodeTreeModel::SetupSourceInfoForUnManaged()
                     int filePathLen = static_cast<int>(wcslen(srcData.m_filePath));
                     gtString convertedPath;
 
-                    if (afUtils::ConvertCygwinPath(srcData.m_filePath, filePathLen, convertedPath))
+                    if (osFilePath::ConvertCygwinPath(srcData.m_filePath, filePathLen, convertedPath))
                     {
                         m_srcFile = acGTStringToQString(convertedPath);
                     }

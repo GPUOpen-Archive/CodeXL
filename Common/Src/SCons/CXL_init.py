@@ -381,6 +381,12 @@ def initQt4 (env) :
     qt_extra_libs = ('icui18n','icuuc','icudata')
     qt_libs.append(qt_extra_libs)
 
+    # Create a seperate collection of Qt modules that non-graphics apps such as the command line tools can safely link to.
+    qt_libs_no_graphics =[]
+    qt_libs_no_graphics.append('Qt5Core' + dbgSuffix)
+    qt_libs_no_graphics.append('Qt5Xml' + dbgSuffix)
+    env.Append(CXL_qt_libs_no_graphics = qt_libs_no_graphics)
+
     # 13-Aug-2012 - update to match "classic" build
     qt_define_list = [
         'QT_DLL', 'QT_GUI_LIB', 'QT_CORE_LIB','QT_THREAD_SUPPORT',
@@ -411,6 +417,12 @@ def UseQt4(env):
     env.Append( CPPDEFINES = env['CXL_Qt4_define_list'] )
     env.Append( CPPPATH = env['CXL_Qt4_inc_path'] )
     env.Append( LIBS = env['CXL_Qt4_libs'] )
+    env.Append( LIBPATH = [env['CXL_Qt4_libdir']] )
+
+def UseQtNoGraphics(env):
+    env.Append( CPPDEFINES = env['CXL_Qt4_define_list'] )
+    env.Append( CPPPATH = env['CXL_Qt4_inc_path'] )
+    env.Append( LIBS = env['CXL_qt_libs_no_graphics'] )
     env.Append( LIBPATH = [env['CXL_Qt4_libdir']] )
 
 

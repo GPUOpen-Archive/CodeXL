@@ -10,7 +10,7 @@
 #ifndef _EVENTENGINE_H_
 #define _EVENTENGINE_H_
 
-#include <QtWidgets>
+#include <QDir>
 
 #include "EventsFile.h"
 #include "IbsEvents.h"

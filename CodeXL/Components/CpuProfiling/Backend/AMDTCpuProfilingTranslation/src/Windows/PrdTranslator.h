@@ -13,9 +13,8 @@
 // Suppress Qt header warnings
 #pragma warning(push)
 #pragma warning(disable : 4127 4718)
+#include <qtIgnoreCompilerWarnings.h>
 #include <QString>
-#include <QProgressDialog>
-#include <QMap>
 #pragma warning(pop)
 
 #include <memory>
@@ -167,7 +166,7 @@ public:
                           MissedInfoType* pMissedInfo,
                           QStringList processFilters,
                           QStringList targetPidList,
-                          QWidget* pApp = NULL,
+                          QString& errorString,
                           bool bThread = false,
                           bool bCLUtil = false,
                           bool bLdStCollect = false,
@@ -280,7 +279,7 @@ private:
     void AddBytesToProgressBar(gtUInt64 bytes);
     void AsyncAddBytesToProgressBar(gtUInt64 bytes);
 
-    bool InitPrdReader(PrdReader* pReader, const wchar_t* pFileName, gtUInt64* pLastUserCssRecordOffset, QWidget* pParent);
+    bool InitPrdReader(PrdReader* pReader, const wchar_t* pFileName, gtUInt64* pLastUserCssRecordOffset, QString& errorString);
 
     unsigned int GetCpuCount() const;
 
@@ -340,7 +339,7 @@ private:
     void CssMapCleanup();
 
     HRESULT TranslateDataPrdFile(QString proFile, MissedInfoType* pMissedInfo,
-                                 QStringList processFilters, QWidget* pApp = NULL, bool bThread = false,
+                                 QStringList processFilters, QString& errorString, bool bThread = false,
                                  bool bCLUtil = false, bool bLdStCollect = false);
 
     bool AggregateSampleData(

@@ -1218,7 +1218,7 @@ bool CpuSessionWindow::syncWithSymbolEngine(CpuProfileModule& module, const QStr
                     {
                         int srcFileNameLen = static_cast<int>(wcslen(sourceLine.m_filePath));
 
-                        if (!afUtils::ConvertCygwinPath(sourceLine.m_filePath, srcFileNameLen, srcFileName))
+                        if (!osFilePath::ConvertCygwinPath(sourceLine.m_filePath, srcFileNameLen, srcFileName))
                         {
                             srcFileName.assign(sourceLine.m_filePath, srcFileNameLen);
                         }
