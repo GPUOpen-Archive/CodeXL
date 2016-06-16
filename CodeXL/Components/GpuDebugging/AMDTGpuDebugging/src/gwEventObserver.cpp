@@ -597,7 +597,8 @@ QString gwEventObserver::Tooltip(QString& highlightedString)
     QString retVal;
 
     // Will get the new values:
-    apExpression variableValue;
+    gtString variableValue;
+    gtString variableType;
 
     // Get the current work item index:
     int currentWorkItemCoord[3] = { -1, -1, -1 };
@@ -611,11 +612,12 @@ QString gwEventObserver::Tooltip(QString& highlightedString)
             {
                 gtString currentVariableName;
                 currentVariableName.fromASCIIString(highlightedString.toLatin1());
-                bool rcVal = gaGetKernelDebuggingExpressionValue(currentVariableName, currentWorkItemCoord, 0, variableValue);
+                gtString variableValueHex;
+                bool rcVal = gaGetKernelDebuggingVariableValueString(currentVariableName, currentWorkItemCoord, variableValue, variableValueHex, variableType);
 
                 if (rcVal)
                 {
-                    retVal = acGTStringToQString(variableValue.m_type) + " " + highlightedString + " = " + acGTStringToQString(variableValue.m_value);
+                    retVal = acGTStringToQString(variableType) + " " + highlightedString + " = " + acGTStringToQString(variableValue);
                 }
             }
         }

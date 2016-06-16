@@ -30,7 +30,6 @@
 #include <AMDTAPIClasses/Include/apCLProgram.h>
 #include <AMDTAPIClasses/Include/apCLSampler.h>
 #include <AMDTAPIClasses/Include/apCLImage.h>
-#include <AMDTAPIClasses/Include/apExpression.h>
 #include <AMDTAPIClasses/Include/apKernelDebuggingCommand.h>
 #include <AMDTAPIClasses/Include/apKernelSourceCodeBreakpoint.h>
 #include <AMDTServerUtilities/Include/suAPIMainLoop.h>
@@ -75,7 +74,8 @@ void csRegisterAPIStubFunctions()
     suRegisterAPIFunctionStub(GA_FID_gaIsWorkItemValid, &gaIsWorkItemValidStub);
     suRegisterAPIFunctionStub(GA_FID_gaGetFirstValidWorkItem, &gaGetFirstValidWorkItemStub);
     suRegisterAPIFunctionStub(GA_FID_gaCanGetKernelVariableValue, &gaCanGetKernelVariableValueStub);
-    suRegisterAPIFunctionStub(GA_FID_gaGetKernelDebuggingExpressionValue, &gaGetKernelDebuggingExpressionValueStub);
+    suRegisterAPIFunctionStub(GA_FID_gaGetKernelDebuggingVariableValueString, &gaGetKernelDebuggingVariableValueStringStub);
+    suRegisterAPIFunctionStub(GA_FID_gaGetKernelDebuggingVariableMembers, &gaGetKernelDebuggingVariableMembersStub);
     suRegisterAPIFunctionStub(GA_FID_gaGetKernelDebuggingAvailableVariables, &gaGetKernelDebuggingAvailableVariablesStub);
     suRegisterAPIFunctionStub(GA_FID_gaGetKernelDebuggingAmountOfActiveWavefronts, &gaGetKernelDebuggingAmountOfActiveWavefrontsStub);
     suRegisterAPIFunctionStub(GA_FID_gaGetKernelDebuggingActiveWavefrontID, &gaGetKernelDebuggingActiveWavefrontIDStub);
@@ -764,12 +764,12 @@ void gaCanGetKernelVariableValueStub(osSocket& apiSocket)
 }
 
 // ---------------------------------------------------------------------------
-// Name:        gaGetKernelDebuggingExpressionValueStub
-// Description: Stub function for gaGetKernelDebuggingExpressionValue
+// Name:        gaGetKernelDebuggingVariableValueStringStub
+// Description: Stub function for gaGetKernelDebuggingVariableValueString
 // Author:      Uri Shomroni
 // Date:        23/1/2011
 // ---------------------------------------------------------------------------
-void gaGetKernelDebuggingExpressionValueStub(osSocket& apiSocket)
+void gaGetKernelDebuggingVariableValueStringStub(osSocket& apiSocket)
 {
     // Get the parameters:
     gtString variableName;
@@ -783,13 +783,11 @@ void gaGetKernelDebuggingExpressionValueStub(osSocket& apiSocket)
     apiSocket >> workItemZAsInt32;
     int workItemCoordinates[3] = {(int)workItemXAsInt32, (int)workItemYAsInt32, (int)workItemZAsInt32};
 
-    // Get the evaluation depth:
-    gtInt32 evalDepth = 0;
-    apiSocket >> evalDepth;
-
     // Call the function implementation:
-    apExpression variableValue;
-    bool retVal = gaGetKernelDebuggingExpressionValueImpl(variableName, workItemCoordinates, (int)evalDepth, variableValue);
+    gtString variableValue;
+    gtString variableValueHex;
+    gtString variableType;
+    bool retVal = gaGetKernelDebuggingVariableValueStringImpl(variableName, workItemCoordinates, variableValue, variableValueHex, variableType);
 
     // Return the return value:
     apiSocket << retVal;
@@ -797,8 +795,49 @@ void gaGetKernelDebuggingExpressionValueStub(osSocket& apiSocket)
     // Return the variable Value:
     if (retVal)
     {
-        retVal = variableValue.writeSelfIntoChannel(apiSocket);
-        GT_ASSERT(retVal);
+        apiSocket << variableValue;
+        apiSocket << variableValueHex;
+        apiSocket << variableType;
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Name:        gaGetKernelDebuggingVariableMembersStub
+// Description: Stub function for gaGetKernelDebuggingVariableMembers
+// Author:      Uri Shomroni
+// Date:        23/5/2011
+// ---------------------------------------------------------------------------
+void gaGetKernelDebuggingVariableMembersStub(osSocket& apiSocket)
+{
+    // Get the parameters:
+    gtString variableName;
+    apiSocket >> variableName;
+    gtInt32 coordinateXAsInt32 = 0;
+    apiSocket >> coordinateXAsInt32;
+    gtInt32 coordinateYAsInt32 = 0;
+    apiSocket >> coordinateYAsInt32;
+    gtInt32 coordinateZAsInt32 = 0;
+    apiSocket >> coordinateZAsInt32;
+
+    int coordinate[3] = {(int)coordinateXAsInt32, (int)coordinateYAsInt32, (int)coordinateZAsInt32};
+
+    // Call the function implementation:
+    gtVector<gtString> memberNames;
+    bool retVal = gaGetKernelDebuggingVariableMembersImpl(variableName, coordinate, memberNames);
+
+    // Return the return value:
+    apiSocket << retVal;
+
+    // Return the variable Value:
+    if (retVal)
+    {
+        gtInt32 numberOfMemebers = (gtInt32)memberNames.size();
+        apiSocket << numberOfMemebers;
+
+        for (gtInt32 i = 0; i < numberOfMemebers; i++)
+        {
+            apiSocket << memberNames[i];
+        }
     }
 }
 
@@ -817,20 +856,16 @@ void gaGetKernelDebuggingAvailableVariablesStub(osSocket& apiSocket)
     apiSocket >> coordinateYAsInt32;
     gtInt32 coordinateZAsInt32 = 0;
     apiSocket >> coordinateZAsInt32;
-    gtInt32 evalDepthAsInt32 = 0;
-    apiSocket >> evalDepthAsInt32;
     bool getLeaves = false;
     apiSocket >> getLeaves;
     gtInt32 stackFrameDepthAsInt32 = -1;
     apiSocket >> stackFrameDepthAsInt32;
-    bool onlyNames = false;
-    apiSocket >> onlyNames;
 
     int coordinate[3] = {(int)coordinateXAsInt32, (int)coordinateYAsInt32, (int)coordinateZAsInt32};
 
     // Call the function implementation:
-    gtVector<apExpression> variables;
-    bool retVal = gaGetKernelDebuggingAvailableVariablesImpl(coordinate, variables, (int)evalDepthAsInt32, getLeaves, (int)stackFrameDepthAsInt32, onlyNames);
+    gtVector<gtString> variableNames;
+    bool retVal = gaGetKernelDebuggingAvailableVariablesImpl(coordinate, variableNames, getLeaves, (int)stackFrameDepthAsInt32);
 
     // Return the return value:
     apiSocket << retVal;
@@ -838,14 +873,13 @@ void gaGetKernelDebuggingAvailableVariablesStub(osSocket& apiSocket)
     if (retVal)
     {
         // Write the amount of variables:
-        gtUInt32 amountOfVariables = (gtUInt32)variables.size();
+        gtUInt32 amountOfVariables = (gtUInt32)variableNames.size();
         apiSocket << amountOfVariables;
 
         // Write the variable names:
         for (gtUInt32 i = 0; i < amountOfVariables; i++)
         {
-            bool rcVar = variables[i].writeSelfIntoChannel(apiSocket);
-            GT_ASSERT(rcVar);
+            apiSocket << variableNames[i];
         }
     }
 }

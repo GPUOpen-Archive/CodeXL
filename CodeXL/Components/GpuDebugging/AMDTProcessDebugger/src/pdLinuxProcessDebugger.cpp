@@ -41,7 +41,6 @@
 #include <AMDTAPIClasses/Include/Events/apDebuggedProcessCreationFailureEvent.h>
 #include <AMDTAPIClasses/Include/Events/apDebuggedProcessTerminatedEvent.h>
 #include <AMDTAPIClasses/Include/Events/apThreadCreatedEvent.h>
-#include <AMDTAPIClasses/Include/apExpression.h>
 #include <AMDTServerUtilities/Include/suStringConstants.h>
 #include <AMDTApiFunctions/Include/gaGRApiFunctions.h>
 
@@ -3772,7 +3771,7 @@ bool pdLinuxProcessDebugger::getThreadIndexFromId(osThreadId threadId, int& thre
 ///
 /// \author Vadim Entov
 /// \date  07/09/2015
-bool pdLinuxProcessDebugger::getHostLocals(osThreadId threadId, int callStackFrameIndex, int evaluationDepth, bool onlyNames, gtVector<apExpression>& o_locals)
+bool pdLinuxProcessDebugger::getHostLocals(osThreadId threadId, int callStackFrameIndex, gtVector<gtString>& o_variables)
 {
     gtASCIIString parametersString = "";
     bool suspendBefore = true;
@@ -3818,16 +3817,7 @@ bool pdLinuxProcessDebugger::getHostLocals(osThreadId threadId, int callStackFra
                     {
                         for (auto& it : localsData->_localsVariables)
                         {
-                            apExpression newVar;
-                            newVar.m_name = it.first;
-                            o_locals.push_back(it.first);
-
-                            if (!onlyNames)
-                            {
-                                // TO_DO: get variable values and types, here
-                                // TO_DO: also get children up to evaluationDepth levels down.
-                                GT_UNREFERENCED_PARAMETER(evaluationDepth);
-                            }
+                            o_variables.push_back(it.first);
                         }
 
                         returnResult = true;
@@ -3846,10 +3836,12 @@ bool pdLinuxProcessDebugger::getHostLocals(osThreadId threadId, int callStackFra
     return returnResult;
 }
 
-bool pdLinuxProcessDebugger::getHostExpressionValue(osThreadId threadId, int callStackFrameIndex, const gtString& expressionText, int evaluationDepth, apExpression& o_exp)
+bool pdLinuxProcessDebugger::getHostVariableValue(osThreadId threadId, int callStackFrameIndex, const gtString& variableName, gtString& o_varValue, gtString& o_varValueHex, gtString& o_varType)
 {
     GT_UNREFERENCED_PARAMETER(threadId);
     GT_UNREFERENCED_PARAMETER(callStackFrameIndex);
+    GT_UNREFERENCED_PARAMETER(o_varValueHex);
+    GT_UNREFERENCED_PARAMETER(o_varType);
 
     gtASCIIString parametersString = "";
     bool returnResult = false;
@@ -3878,29 +3870,24 @@ bool pdLinuxProcessDebugger::getHostExpressionValue(osThreadId threadId, int cal
             GT_IF_WITH_ASSERT(_gdbDriver.executeGDBCommand(PD_SET_ACTIVE_FRAME_CMD, parametersString, nullptr))
             {
                 pdGDBFrameLocalVariableValue* localsData = nullptr;
-                parametersString = expressionText.asASCIICharArray();
+                parametersString = variableName.asASCIICharArray();
                 GT_IF_WITH_ASSERT(_gdbDriver.executeGDBCommand(PD_GET_LOCAL_VARIABLE_CMD, parametersString, (const pdGDBData**)(&localsData)))
                 {
                     if (nullptr != localsData)
                     {
-                        o_exp.m_name = expressionText;
-                        o_exp.m_value = localsData->_variableValue;
+                        o_varValue = localsData->_variableValue;
 
-                        // TO_DO: handle hexadecimal display:
-                        o_exp.m_valueHex = o_exp.m_value;
+                        parametersString = variableName.asASCIICharArray();
 
                         pdGDBFVariableType* typeData = nullptr;
                         GT_IF_WITH_ASSERT(_gdbDriver.executeGDBCommand(PD_GET_VARIABLE_TYPE_CMD, parametersString, (const pdGDBData**)(&typeData)))
                         {
                             if (nullptr != typeData)
                             {
-                                o_exp.m_type = typeData->_variableType;
+                                o_varType = typeData->_variableType;
                                 returnResult = true;
                             }
                         }
-
-                        // TO_DO: Get children information down to evaluationDepth levels
-                        GT_UNREFERENCED_PARAMETER(evaluationDepth);
                     }
                 }
             }

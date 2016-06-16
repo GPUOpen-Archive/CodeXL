@@ -108,7 +108,7 @@ public:
     ///
     /// \author Vadim Entov
     /// \date   07/09/2015
-    virtual bool getHostLocals(osThreadId threadId, int callStackFrameIndex, int evaluationDepth, bool onlyNames, gtVector<apExpression>& o_locals) override;
+    virtual bool getHostLocals(osThreadId threadId, int callStackFrameIndex, gtVector<gtString>& o_variables) override;
 
     ///////////////////////////////////////////////////////////////////////////////////
     /// \brief Get local variable value
@@ -123,7 +123,7 @@ public:
     ///
     /// \author Vadim Entov
     /// \date   07/09/2015
-    virtual bool bool getHostExpressionValue(osThreadId threadId, int callStackFrameIndex, const gtString& expressionText, int evaluationDepth, apExpression& o_exp) override;
+    virtual bool getHostVariableValue(osThreadId threadId, int callStackFrameIndex, const gtString& variableName, gtString& o_varValue, gtString& o_varValueHex, gtString& o_varType) override;
 
     ///////////////////////////////////////////////////////////////////////////////////
     /// \brief Check if host debugging feature available

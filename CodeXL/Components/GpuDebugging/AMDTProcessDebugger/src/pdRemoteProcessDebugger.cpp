@@ -20,7 +20,6 @@
 #include <AMDTOSWrappers/Include/osTCPSocketClient.h>
 #include <AMDTOSWrappers/Include/osTCPSocketServer.h>
 #include <AMDTAPIClasses/Include/apDebugProjectSettings.h>
-#include <AMDTAPIClasses/Include/apExpression.h>
 #include <AMDTAPIClasses/Include/Events/apThreadCreatedEvent.h>
 #include <AMDTAPIClasses/Include/Events/apDebuggedProcessCreationFailureEvent.h>
 #include <AMDTAPIClasses/Include/Events/apEventsHandler.h>
@@ -1830,9 +1829,9 @@ bool pdRemoteProcessDebugger::canGetHostVariables() const
     return retVal;
 }
 
-bool pdRemoteProcessDebugger::getHostLocals(osThreadId threadId, int callStackFrameIndex, int evaluationDepth, bool onlyNames, gtVector<apExpression>& o_locals)
+bool pdRemoteProcessDebugger::getHostLocals(osThreadId threadId, int callStackFrameIndex, gtVector<gtString>& o_variables)
 {
-    OS_OUTPUT_DEBUG_LOG(L"pdRemoteProcessDebugger get host locals function", OS_DEBUG_LOG_EXTENSIVE);
+    OS_OUTPUT_DEBUG_LOG(L"pdRemoteProcessDebugger can get host locals function", OS_DEBUG_LOG_EXTENSIVE);
     bool retVal = false;
 
     GT_IF_WITH_ASSERT(_pRemoteDebuggingServerAPIChannel != nullptr)
@@ -1840,8 +1839,6 @@ bool pdRemoteProcessDebugger::getHostLocals(osThreadId threadId, int callStackFr
         *_pRemoteDebuggingServerAPIChannel << (gtInt32)PD_REMOTE_GET_HOST_LOCALS_CMD;
         *_pRemoteDebuggingServerAPIChannel << (gtUInt64)threadId;
         *_pRemoteDebuggingServerAPIChannel << (gtInt32)callStackFrameIndex;
-        *_pRemoteDebuggingServerAPIChannel << (gtInt32)evaluationDepth;
-        *_pRemoteDebuggingServerAPIChannel << onlyNames;
 
         *_pRemoteDebuggingServerAPIChannel >> retVal;
 
@@ -1850,44 +1847,43 @@ bool pdRemoteProcessDebugger::getHostLocals(osThreadId threadId, int callStackFr
             gtInt32 outputVectorSize = 0;
             *_pRemoteDebuggingServerAPIChannel >> outputVectorSize;
 
-            o_locals.resize(outputVectorSize);
-
             for (gtInt32 i = 0; i < outputVectorSize; i++)
             {
-                bool rcVar = o_locals[i].readSelfFromChannel(*_pRemoteDebuggingServerAPIChannel);
-                GT_ASSERT(rcVar);
-                retVal = retVal && rcVar;
+                gtString variableName;
+                *_pRemoteDebuggingServerAPIChannel >> variableName;
+                o_variables.push_back(variableName);
             }
         }
     }
 
-    OS_OUTPUT_DEBUG_LOG(L"pdRemoteProcessDebugger get host locals function exit", OS_DEBUG_LOG_EXTENSIVE);
+    OS_OUTPUT_DEBUG_LOG(L"pdRemoteProcessDebugger can get host locals function exit", OS_DEBUG_LOG_EXTENSIVE);
 
     return retVal;
 }
 
-bool pdRemoteProcessDebugger::getHostExpressionValue(osThreadId threadId, int callStackFrameIndex, const gtString& expressionText, int evaluationDepth, apExpression& o_exp)
+bool pdRemoteProcessDebugger::getHostVariableValue(osThreadId threadId, int callStackFrameIndex, const gtString& variableName, gtString& o_varValue, gtString& o_varValueHex, gtString& o_varType)
 {
-    OS_OUTPUT_DEBUG_LOG(L"pdRemoteProcessDebugger get host expression value function", OS_DEBUG_LOG_EXTENSIVE);
+    OS_OUTPUT_DEBUG_LOG(L"pdRemoteProcessDebugger can get host variable value function", OS_DEBUG_LOG_EXTENSIVE);
     bool retVal = false;
 
     GT_IF_WITH_ASSERT(_pRemoteDebuggingServerAPIChannel != nullptr)
     {
-        *_pRemoteDebuggingServerAPIChannel << (gtInt32)PD_REMOTE_GET_HOST_EXPRESSION_VALUE_CMD;
+        *_pRemoteDebuggingServerAPIChannel << (gtInt32)PD_REMOTE_GET_HOST_VARIABLE_VALUE_CMD;
         *_pRemoteDebuggingServerAPIChannel << (gtUInt64)threadId;
         *_pRemoteDebuggingServerAPIChannel << (gtInt32)callStackFrameIndex;
-        *_pRemoteDebuggingServerAPIChannel << expressionText;
-        *_pRemoteDebuggingServerAPIChannel << (gtInt32)evaluationDepth;
+        *_pRemoteDebuggingServerAPIChannel << variableName;
 
         *_pRemoteDebuggingServerAPIChannel >> retVal;
 
         if (retVal)
         {
-            retVal = o_exp.readSelfFromChannel(*_pRemoteDebuggingServerAPIChannel);
+            *_pRemoteDebuggingServerAPIChannel >> o_varValue;
+            *_pRemoteDebuggingServerAPIChannel >> o_varValueHex;
+            *_pRemoteDebuggingServerAPIChannel >> o_varType;
         }
     }
 
-    OS_OUTPUT_DEBUG_LOG(L"pdRemoteProcessDebugger get host expression value exit", OS_DEBUG_LOG_EXTENSIVE);
+    OS_OUTPUT_DEBUG_LOG(L"pdRemoteProcessDebugger can get host variable value exit", OS_DEBUG_LOG_EXTENSIVE);
 
     return retVal;
 }

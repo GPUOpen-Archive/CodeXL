@@ -35,7 +35,7 @@ void hsRegisterAPIStubFunctions()
     suRegisterAPIFunctionStub(GA_FID_gaHSASetNextDebuggingCommand, &gaHSASetNextDebuggingCommandStub);
     suRegisterAPIFunctionStub(GA_FID_gaHSASetBreakpoint, &gaHSASetBreakpointStub);
     suRegisterAPIFunctionStub(GA_FID_gaHSAListVariables, &gaHSAListVariablesStub);
-    suRegisterAPIFunctionStub(GA_FID_gaHSAGetExpressionValue, &gaHSAGetExpressionValueStub);
+    suRegisterAPIFunctionStub(GA_FID_gaHSAGetVariableValue, &gaHSAGetVariableValueStub);
     suRegisterAPIFunctionStub(GA_FID_gaHSAListWorkItems, &gaHSAListWorkItemsStub);
     suRegisterAPIFunctionStub(GA_FID_gaHSASetActiveWorkItemIndex, &gaHSASetActiveWorkItemIndexStub);
     suRegisterAPIFunctionStub(GA_FID_gaHSAGetWorkDims, &gaHSAGetWorkDimsStub);
@@ -104,11 +104,8 @@ void gaHSASetBreakpointStub(osSocket& apiSocket)
 
 void gaHSAListVariablesStub(osSocket& apiSocket)
 {
-    gtInt32 evalDepthAsInt32 = 0;
-    apiSocket >> evalDepthAsInt32;
-
-    gtVector<apExpression> variables;
-    bool retVal = gaHSAListVariablesImpl((int)evalDepthAsInt32, variables);
+    gtVector<gtString> variables;
+    bool retVal = gaHSAListVariablesImpl(variables);
 
     apiSocket << retVal;
 
@@ -119,28 +116,28 @@ void gaHSAListVariablesStub(osSocket& apiSocket)
 
         for (gtUInt32 i = 0; varCount > i; ++i)
         {
-            bool rcVar = variables[i].writeSelfIntoChannel(apiSocket);
-            GT_ASSERT(rcVar);
+            apiSocket << variables[i];
         }
     }
 }
 
-void gaHSAGetExpressionValueStub(osSocket& apiSocket)
+void gaHSAGetVariableValueStub(osSocket& apiSocket)
 {
     gtString varName;
     apiSocket >> varName;
 
-    gtInt32 evalDepthAsInt32 = 0;
-    apiSocket >> evalDepthAsInt32;
-
-    apExpression expr;
-    bool retVal = gaHSAGetExpressionValueImpl(varName, (int)evalDepthAsInt32, expr);
+    gtString varValue;
+    gtString varValueHex;
+    gtString varType;
+    bool retVal = gaHSAGetVariableValueImpl(varName, varValue, varValueHex, varType);
 
     apiSocket << retVal;
 
     if (retVal)
     {
-        bool rcVar = 
+        apiSocket << varValue;
+        apiSocket << varValueHex;
+        apiSocket << varType;
     }
 }
 

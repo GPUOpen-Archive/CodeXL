@@ -1499,14 +1499,14 @@ void gdImagesAndBuffersControlPanel::updateMultiVariablesControlsDisplay(const g
 
             // Set the multi watch variable type text:
             int workItem[3] = {0, 0, 0};
-            apExpression variableValue;
-            bool rc = gaGetKernelDebuggingExpressionValue(variableName, workItem, 0, variableValue);
+            gtString variableValue, variableValueHex, variableType;
+            bool rc = gaGetKernelDebuggingVariableValueString(variableName, workItem, variableValue, variableValueHex, variableType);
 
             if (rc)
             {
                 // Set the variable type text:
                 QString text;
-                QString varTypeQt = acGTStringToQString(variableValue.m_type);
+                QString varTypeQt = acGTStringToQString(variableType);
                 text.sprintf(GD_STR_textBlue, varTypeQt.toLatin1().data());
                 m_pMultiWatchVariableTypeText->setText(text);
                 //disable HexCheckbox on Data View in case of non-integer variable type ( BUG452383 fix)
@@ -1515,7 +1515,7 @@ void gdImagesAndBuffersControlPanel::updateMultiVariablesControlsDisplay(const g
                     acDataView* pDataView = m_pImageDataView->dataView();
                     GT_IF_WITH_ASSERT(pDataView != nullptr)
                     {
-                        bool enableHexCheckBox = (0 != variableValue.m_type.compareNoCase(GD_STR_variableTypeFloat)) && (0 != variableValue.m_type.compareNoCase(GD_STR_variableTypeDouble));
+                        bool enableHexCheckBox = (0 != variableType.compareNoCase(GD_STR_variableTypeFloat)) && (0 != variableType.compareNoCase(GD_STR_variableTypeDouble));
                         pDataView->enableHexCheckbox(enableHexCheckBox);
                     }
                 }
@@ -3008,15 +3008,15 @@ void gdImagesAndBuffersControlPanel::initializeVariableNamesCombo(bool isInKerne
             m_pMultiWatchVariableNameCombo->setEnabled(true);
 
             // Get all the current variable names:
-            gtVector<apExpression> multiWatchVariableNamesVector;
-            bool rcGetNames = gaGetKernelDebuggingAvailableVariables(0, multiWatchVariableNamesVector, true, -1, true);
+            gtVector<gtString> multiWatchVariableNamesVector;
+            bool rcGetNames = gaGetKernelDebuggingAvailableVariables(multiWatchVariableNamesVector, true, -1);
             GT_ASSERT(rcGetNames);
 
             // Add the available kernel names:
             for (int i = 0 ; i < (int)multiWatchVariableNamesVector.size(); i++)
             {
                 // Currently, filter out derefernced values, since the multiwatch view only supports direct values:
-                QString currentVarName = acGTStringToQString(multiWatchVariableNamesVector[i].m_name);
+                QString currentVarName = acGTStringToQString(multiWatchVariableNamesVector[i]);
 
                 if ((currentVarName.indexOf('*') < 0) && (currentVarName.indexOf('[') < 0) && (currentVarName.indexOf(']') < 0))
                 {
