@@ -49,6 +49,7 @@ initQScintilla (CXL_env)
 initQCustomPlot (CXL_env)
 initStdc(CXL_env)
 initJava(CXL_env)
+initBoost(CXL_env)
 
 # Set the debug/release variant data
 if (CXL_env['CXL_build'] == 'debug'):

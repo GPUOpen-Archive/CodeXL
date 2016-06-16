@@ -17,7 +17,6 @@ env.Append( CPPPATH = [
     env['CXL_commonproj_dir'] + '/../../CodeXL',
     "/usr/include/gdk-pixbuf-2.0/", # [Suravee] Needed for Ubuntu-11.10 
 ])
-initBoost(env)
 UseBoost(env)
 UseGtk(env)
 UseTinyXml(env)

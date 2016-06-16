@@ -6,7 +6,6 @@ from CXL_init import *
 appName = "CodeXLRemoteAgent-bin"
 
 env = CXL_env.Clone()
-initBoost(env)
 UseBoost(env)
 UseAPPSDK(env)
 

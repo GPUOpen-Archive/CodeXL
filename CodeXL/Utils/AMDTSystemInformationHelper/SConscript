@@ -4,7 +4,6 @@ Import('*')
 from CXL_init import *
 
 env = CXL_env.Clone()
-initBoost(env)
 UseBoost(env)
 name = "CXLSystemInformationHelper-x64"
 if (env['CXL_arch'] == 'x86'):

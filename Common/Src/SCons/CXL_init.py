@@ -76,6 +76,12 @@ def initCXLVars (CXL_vars) :
         default = '',
         allowed_values = ('true', ''))
 
+    # CxL support for system_boost
+    CXL_vars.Add(
+        key = 'CXL_boost_dir',
+        help = 'Specify Boost directory to use',
+        default = '',)
+
 def initJava (env) :
     useJava = os.getenv('JAVA_HOME', '')
     if (useJava != ''):
@@ -563,10 +569,11 @@ def initGLEW (env) :
     copySharedLibrary(env, "libGLEW.so", amdglew_dir, env['CXL_lib_dir']) 
 
 def initBoost (env) :
-    amdboost_dir =  env['CXL_common_dir'] + '/Lib/Ext/Boost/boost_1_59_0/lib/RHEL6'
-
-    if (env['CXL_arch'] == 'x86_64'):
-        amdboost_dir = amdboost_dir + '/x86_64/'
+    if (env['CXL_boost_dir'] == ''):
+      amdboost_dir =  env['CXL_common_dir'] + '/Lib/Ext/Boost/boost_1_59_0/lib/RHEL6'
+  
+      if (env['CXL_arch'] == 'x86_64'):
+        boost_dir = amdboost_dir + '/x86_64/'
         shutil.copy2(amdboost_dir + "libboost_system.so.1.59.0", env['CXL_lib_dir'] + "/libboost_system.so.1.59.0")
         shutil.copy2(amdboost_dir + "libboost_filesystem.so.1.59.0", env['CXL_lib_dir'] + "/libboost_filesystem.so.1.59.0")
         shutil.copy2(amdboost_dir + "libboost_regex.so.1.59.0", env['CXL_lib_dir'] + "/libboost_regex.so.1.59.0")
@@ -575,26 +582,18 @@ def initBoost (env) :
         shutil.copy2(amdboost_dir + "libboost_thread.so.1.59.0", env['CXL_lib_dir'] + "/libboost_thread.so.1.59.0")
         shutil.copy2(amdboost_dir + "libboost_chrono.so.1.59.0", env['CXL_lib_dir'] + "/libboost_chrono.so.1.59.0")
         shutil.copy2(amdboost_dir + "libboost_date_time.so.1.59.0", env['CXL_lib_dir'] + "/libboost_date_time.so.1.59.0")
+      else:
+        boost_dir = amdboost_dir + '/x86/'
     else:
-        amdboost_dir = amdboost_dir + '/x86/'
-
-    env.Append(LIBPATH = [amdboost_dir])
+      boostdir=env['CXL_boost_dir']
+    env.Append(BoostDir= [boostdir])
+    env.Append(LIBPATH = [env['BoostDir']])
 
 def UseBoost (env):
-    amdboost_dir =  env['CXL_common_dir'] + '/Lib/Ext/Boost/boost_1_59_0/'
-    env.Append(CPPPATH = [amdboost_dir])
-
-    if (env['CXL_arch'] == 'x86_64'):
-        amdboost_dir = amdboost_dir + 'lib/RHEL6/x86_64/'
-    else:
-        amdboost_dir = amdboost_dir + 'lib/RHEL6/x86/'
-
     compiler_base_flags = ' -Wno-deprecated-declarations '
-
     env.Append(CPPFLAGS = compiler_base_flags)
+    env.Append(CPPPATH = [env['BoostDir']])
 
-    env.Append(LIBPATH = [amdboost_dir])
-    
 def UseFltk (env):
     amdfltk_dir =  env['CXL_common_dir'] + '/Lib/Ext/fltk/1.1.0/'
     amdfltk_dir_libs = amdfltk_dir + '/lib/x86_64/'

@@ -6,7 +6,6 @@ from CXL_init import *
 libName = "CodeXLAnalyzer-bin"
 
 env = CXL_env.Clone()
-initBoost(env)
 UseBoost(env)
 #need to overwrite compiler flags without the -Werror since some libraries are causing problems
 compiler_base_flags = " -std=c++11 -Wall -Wextra -g -fmessage-length=0 -Wno-unknown-pragmas -pthread -DGDT_BUILD_SUFFIX="
