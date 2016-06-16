@@ -12,10 +12,11 @@
 #define __PDPROCESSDEBUGGER
 
 // Forward declarations:
-class apDebugProjectSettings;
 class osCallStack;
 class osFilePath;
 class osPortAddress;
+class apDebugProjectSettings;
+struct apExpression;
 class apIEventsObserver;
 class apThreadCreatedEvent;
 
@@ -128,8 +129,8 @@ public:
 
     // Host debugging:
     virtual bool canGetHostVariables() const;
-    virtual bool getHostLocals(osThreadId threadId, int callStackFrameIndex, gtVector<gtString>& o_variables);
-    virtual bool getHostVariableValue(osThreadId threadId, int callStackFrameIndex, const gtString& variableName, gtString& o_varValue, gtString& o_varValueHex, gtString& o_varType);
+    virtual bool getHostLocals(osThreadId threadId, int callStackFrameIndex, int evaluationDepth, bool onlyNames, gtVector<apExpression>& o_locals);
+    virtual bool getHostExpressionValue(osThreadId threadId, int callStackFrameIndex, const gtString& expressionText, int evaluationDepth, apExpression& o_exp);
     virtual bool canPerformHostDebugging() const;
     virtual bool isAtAPIOrKernelBreakpoint(osThreadId threadId) const;
     virtual apBreakReason hostBreakReason() const;

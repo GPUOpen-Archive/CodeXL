@@ -108,6 +108,7 @@ struct apCounterActivationInfo;
 #include <AMDTAPIClasses/Include/apAPIFunctionId.h>
 #include <AMDTAPIClasses/Include/apDisplayBuffer.h>
 #include <AMDTAPIClasses/Include/apExecutionMode.h>
+#include <AMDTAPIClasses/Include/apExpression.h>
 #include <AMDTAPIClasses/Include/apGenericBreakpoint.h>
 #include <AMDTAPIClasses/Include/apRasterMode.h>
 
@@ -187,8 +188,8 @@ public:
     virtual bool gaHostDebuggerStepIn(osThreadId threadId);
     virtual bool gaHostDebuggerStepOut(osThreadId threadId);
     virtual bool gaHostDebuggerStepOver(osThreadId threadId);
-    virtual bool gaGetThreadLocals(const osThreadId& threadId, int frameIndex, gtVector<gtString>& o_locals);
-    virtual bool gaGetThreadVariableValue(const osThreadId& threadId, int frameIndex, const gtString& variableName, gtString& o_variableValue, gtString& o_variableValueHex, gtString& o_varType);
+    virtual bool gaGetThreadLocals(const osThreadId& threadId, int frameIndex, int evalDepth, gtVector<apExpression>& o_locals, bool onlyNames);
+    virtual bool gaGetThreadExpressionValue(const osThreadId& threadId, int frameIndex, const gtString& expressionText, int evalDepth, apExpression& o_exp);
     virtual bool gaIsHostBreakPoint();
     virtual bool gaSetHostBreakpoint(const osFilePath& filePath, int lineNumber);
     virtual bool gaGetHostBreakpointLocation(osFilePath& bpFile, int& bpLine);
@@ -367,9 +368,8 @@ public:
     virtual bool gaIsWorkItemValid(const int coordinate[3]);
     virtual bool gaGetFirstValidWorkItem(int wavefrontIndex, int coordinate[3]);
     virtual bool gaCanGetKernelVariableValue(const gtString& variableName);
-    virtual bool gaGetKernelDebuggingVariableValueString(const gtString& variableName, const int workItem[3], gtString& variableValue, gtString& variableValueHex, gtString& variableType);
-    virtual bool gaGetKernelDebuggingVariableMembers(const gtString& variableName, gtVector<gtString>& memberNames);
-    virtual bool gaGetKernelDebuggingAvailableVariables(gtVector<gtString>& variableNames, bool getLeaves, int stackFrameDepth);
+    virtual bool gaGetKernelDebuggingExpressionValue(const gtString& expressionString, const int workItem[3], int evalDepth, apExpression& o_exp);
+    virtual bool gaGetKernelDebuggingAvailableVariables(int evalDepth, gtVector<apExpression>& o_locals, bool onlyLeaves, int stackFrameDepth, bool onlyNames);
     virtual bool gaGetKernelDebuggingAmountOfActiveWavefronts(int& amountOfWavefronts);
     virtual bool gaGetKernelDebuggingActiveWavefrontID(int wavefrontIndex, int& wavefrontId);
     virtual bool gaGetKernelDebuggingWavefrontIndex(const int coordinate[3], int& wavefrontIndex);
@@ -555,8 +555,8 @@ public:
     virtual bool gaHSAGetCallStack(osCallStack& stack);
     virtual bool gaHSASetNextDebuggingCommand(apKernelDebuggingCommand cmd);
     virtual bool gaHSASetBreakpoint(const gtString& kernelName, const gtUInt64& line);
-    virtual bool gaHSAListVariables(gtVector<gtString>& variables);
-    virtual bool gaHSAGetVariableValue(const gtString& varName, gtString& varValue, gtString& varValueHex, gtString& varType);
+    virtual bool gaHSAListVariables(int evalDepth, gtVector<apExpression>& o_locals);
+    virtual bool gaHSAGetExpressionValue(const gtString& expStr, int evalDepth, apExpression& o_exp);
     virtual bool gaHSAListWorkItems(gtVector<gtUInt32>& o_gidLidWgid);
     virtual bool gaHSASetActiveWorkItemIndex(gtUInt32 wiIndex);
     virtual bool gaHSAGetWorkDims(gtUByte& dims);
@@ -616,8 +616,8 @@ GA_API bool gaCanGetHostDebugging();
 GA_API bool gaHostDebuggerStepIn(osThreadId threadId);
 GA_API bool gaHostDebuggerStepOut(osThreadId threadId);
 GA_API bool gaHostDebuggerStepOver(osThreadId threadId);
-GA_API bool gaGetThreadLocals(const osThreadId& threadId, int frameIndex, gtVector<gtString>& o_locals);
-GA_API bool gaGetThreadVariableValue(const osThreadId& threadId, int frameIndex, const gtString& variableName, gtString& o_variableValue, gtString& o_variableValueHex, gtString& o_varType);
+GA_API bool gaGetThreadLocals(const osThreadId& threadId, int frameIndex, int evalDepth, gtVector<apExpression>& o_locals, bool onlyNames = false);
+GA_API bool gaGetThreadExpressionValue(const osThreadId& threadId, int frameIndex, const gtString& expressionText, int evalDepth, apExpression& o_exp);
 GA_API bool gaIsHostBreakPoint();
 GA_API bool gaSetHostBreakpoint(const osFilePath& filePath, int lineNumber);
 GA_API bool gaGetHostBreakpointLocation(osFilePath& bpFile, int& bpLine);
@@ -797,9 +797,8 @@ GA_API bool gaUpdateKernelSteppingWorkItemToCurrentCoordinate();
 GA_API bool gaIsWorkItemValid(const int coordinate[3]);
 GA_API bool gaGetFirstValidWorkItem(int wavefrontIndex, int coordinate[3]);
 GA_API bool gaCanGetKernelVariableValue(const gtString& variableName);
-GA_API bool gaGetKernelDebuggingVariableValueString(const gtString& variableName, const int workItem[3], gtString& variableValue, gtString& variableValueHex, gtString& variableType);
-GA_API bool gaGetKernelDebuggingVariableMembers(const gtString& variableName, gtVector<gtString>& memberNames);
-GA_API bool gaGetKernelDebuggingAvailableVariables(gtVector<gtString>& variableNames, bool getLeaves, int stackFrameDepth);
+GA_API bool gaGetKernelDebuggingExpressionValue(const gtString& expressionString, const int workItem[3], int evalDepth, apExpression& o_exp);
+GA_API bool gaGetKernelDebuggingAvailableVariables(int evalDepth, gtVector<apExpression>& o_locals, bool getLeaves = false, int stackFrameDepth = -1, bool onlyNames = false);
 GA_API bool gaGetKernelDebuggingAmountOfActiveWavefronts(int& amountOfWavefronts);
 GA_API bool gaGetKernelDebuggingActiveWavefrontID(int wavefrontIndex, int& wavefrontId);
 GA_API bool gaGetKernelDebuggingWavefrontIndex(const int coordinate[3], int& wavefrontIndex);
@@ -984,8 +983,8 @@ GA_API bool gaHSAGetSourceFilePath(osFilePath& srcPath, gtString& kernelName);
 GA_API bool gaHSAGetCallStack(osCallStack& stack);
 GA_API bool gaHSASetNextDebuggingCommand(apKernelDebuggingCommand cmd);
 GA_API bool gaHSASetBreakpoint(const gtString& kernelName, const gtUInt64& line);
-GA_API bool gaHSAListVariables(gtVector<gtString>& variables);
-GA_API bool gaHSAGetVariableValue(const gtString& varName, gtString& varValue, gtString& varValueHex, gtString& varType);
+GA_API bool gaHSAListVariables(int evalDepth, gtVector<apExpression>& o_locals);
+GA_API bool gaHSAGetExpressionValue(const gtString& expStr, int evalDepth, apExpression& o_exp);
 GA_API bool gaHSAListWorkItems(gtVector<gtUInt32>& o_gidLidWgid);
 GA_API bool gaHSASetActiveWorkItemIndex(gtUInt32 wiIndex);
 GA_API bool gaHSAGetWorkDims(gtUByte& dims);

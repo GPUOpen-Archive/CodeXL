@@ -230,11 +230,13 @@ bool pdProcessDebugger::canGetHostVariables() const
 // Author:      Uri Shomroni
 // Date:        31/8/2015
 // ---------------------------------------------------------------------------
-bool pdProcessDebugger::getHostLocals(osThreadId threadId, int callStackFrameIndex, gtVector<gtString>& o_variables)
+bool pdProcessDebugger::getHostLocals(osThreadId threadId, int callStackFrameIndex, int evaluationDepth, bool onlyNames, gtVector<apExpression>& o_locals)
 {
     GT_UNREFERENCED_PARAMETER(threadId);
     GT_UNREFERENCED_PARAMETER(callStackFrameIndex);
-    GT_UNREFERENCED_PARAMETER(o_variables);
+    GT_UNREFERENCED_PARAMETER(evaluationDepth);
+    GT_UNREFERENCED_PARAMETER(onlyNames);
+    GT_UNREFERENCED_PARAMETER(o_locals);
 
     // This implementation should never be called. Each implementer where
     // canGetHostVariables() == true should also override this function.
@@ -242,17 +244,8 @@ bool pdProcessDebugger::getHostLocals(osThreadId threadId, int callStackFrameInd
     return false;
 }
 
-
-bool pdProcessDebugger::deleteHostSourceBreakpoint(const osFilePath& fileName, int lineNumber)
-{
-    GT_UNREFERENCED_PARAMETER(fileName);
-    GT_UNREFERENCED_PARAMETER(lineNumber);
-
-    return false;
-}
-
 // ---------------------------------------------------------------------------
-// Name:        pdProcessDebugger::getHostVariableValue
+// Name:        pdProcessDebugger::getHostExpressionValue
 // Description: Get the value for the specific variable.
 //              If the expression cannot be parsed or is not accessible,
 //              the output variables should be set to error values.
@@ -260,14 +253,13 @@ bool pdProcessDebugger::deleteHostSourceBreakpoint(const osFilePath& fileName, i
 // Author:      Uri Shomroni
 // Date:        31/8/2015
 // ---------------------------------------------------------------------------
-bool pdProcessDebugger::getHostVariableValue(osThreadId threadId, int callStackFrameIndex, const gtString& variableName, gtString& o_varValue, gtString& o_varValueHex, gtString& o_varType)
+bool pdProcessDebugger::getHostExpressionValue(osThreadId threadId, int callStackFrameIndex, const gtString& expressionText, int evaluationDepth, apExpression& o_exp)
 {
     GT_UNREFERENCED_PARAMETER(threadId);
     GT_UNREFERENCED_PARAMETER(callStackFrameIndex);
-    GT_UNREFERENCED_PARAMETER(variableName);
-    GT_UNREFERENCED_PARAMETER(o_varValue);
-    GT_UNREFERENCED_PARAMETER(o_varValueHex);
-    GT_UNREFERENCED_PARAMETER(o_varType);
+    GT_UNREFERENCED_PARAMETER(expressionText);
+    GT_UNREFERENCED_PARAMETER(evaluationDepth);
+    GT_UNREFERENCED_PARAMETER(o_exp);
 
     // This implementation should never be called. Each implementer where
     // canGetHostVariables() == true should also override this function.
@@ -350,6 +342,15 @@ bool pdProcessDebugger::setHostSourceBreakpoint(const osFilePath& fileName, int 
     // This implementation should never be called. Each implementer where
     // canPerformHostDebugging() == true should also override this function.
     GT_ASSERT(false);
+    return false;
+}
+
+
+bool pdProcessDebugger::deleteHostSourceBreakpoint(const osFilePath& fileName, int lineNumber)
+{
+    GT_UNREFERENCED_PARAMETER(fileName);
+    GT_UNREFERENCED_PARAMETER(lineNumber);
+
     return false;
 }
 

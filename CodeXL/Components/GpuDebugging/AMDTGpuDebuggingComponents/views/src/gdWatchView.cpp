@@ -329,9 +329,9 @@ void gdWatchView::updateWatchLineValue(int lineNum)
     delete pPreviousType;
 
     // Will get the new values:
-    gtString variableValue;
-    gtString variableType;
+    apExpression variableValue;
     bool gotValue = false;
+    bool useHex = false;
 
     bool openCLDebugging = gaIsInKernelDebugging();
     bool hsaDebugging = gaIsInHSAKernelBreakpoint();
@@ -365,8 +365,7 @@ void gdWatchView::updateWatchLineValue(int lineNum)
 
                 GT_IF_WITH_ASSERT(rcCo)
                 {
-                    gtString variableValueHex;
-                    bool rcVal = gaGetKernelDebuggingVariableValueString(currentVariableName, currentWorkItemCoord, variableValue, variableValueHex, variableType);
+                    bool rcVal = gaGetKernelDebuggingExpressionValue(currentVariableName, currentWorkItemCoord, 0, variableValue);
 
                     if (rcVal)
                     {
@@ -376,8 +375,7 @@ void gdWatchView::updateWatchLineValue(int lineNum)
             }
             else if (hsaDebugging)
             {
-                gtString variableValueHex;
-                bool rcVal = gaHSAGetVariableValue(currentVariableName, variableValue, variableValueHex, variableType);
+                bool rcVal = gaHSAGetExpressionValue(currentVariableName, 0, variableValue);
 
                 if (rcVal)
                 {
@@ -386,20 +384,19 @@ void gdWatchView::updateWatchLineValue(int lineNum)
                     // Show HSAIL registers as hex values:
                     if ((0 < currentVariableName.length()) && ('$' == currentVariableName[0]))
                     {
-                        variableValue = variableValueHex;
+                        useHex = true;
                     }
                 }
             }
             else if (hostDebugging)
             {
-                gtString variableValueHex;
                 int chosenThreadIndex = gdGDebuggerGlobalVariablesManager::instance().chosenThread();
                 osThreadId threadId = OS_NO_THREAD_ID;
                 bool rc = gaGetThreadId(chosenThreadIndex, threadId);
 
                 if (rc)
                 {
-                    bool rcVal = gaGetThreadVariableValue(threadId, m_stackDepth, currentVariableName, variableValue, variableValueHex, variableType);
+                    bool rcVal = gaGetThreadExpressionValue(threadId, m_stackDepth, currentVariableName, 0, variableValue);
 
                     if (rcVal)
                     {
@@ -412,23 +409,24 @@ void gdWatchView::updateWatchLineValue(int lineNum)
 
     if (!gotValue)
     {
-        if (openCLDebugging || hsaDebugging)
+        if (openCLDebugging || hsaDebugging || hostDebugging)
         {
-            variableValue = GD_STR_watchViewCannotEvaluateExpression;
+            variableValue.m_value = GD_STR_watchViewCannotEvaluateExpression;
         }
     }
 
     // Update the list item:
-    if (!variableValue.isEmpty())
+    const gtString& usedValue = useHex ? variableValue.m_value : variableValue.m_valueHex;
+    if (!usedValue.isEmpty())
     {
-        QTableWidgetItem* pValueItem = new QTableWidgetItem(acGTStringToQString(variableValue));
+        QTableWidgetItem* pValueItem = new QTableWidgetItem(acGTStringToQString(usedValue));
         setItem(lineNum, 1, pValueItem);
         pValueItem->setFlags(pValueItem->flags() & (~Qt::ItemIsEditable));
     }
 
-    if (!variableType.isEmpty())
+    if (!variableValue.m_type.isEmpty())
     {
-        QTableWidgetItem* pTypeItem = new QTableWidgetItem(acGTStringToQString(variableType));
+        QTableWidgetItem* pTypeItem = new QTableWidgetItem(acGTStringToQString(variableValue.m_type));
         pTypeItem->setFlags(pTypeItem->flags() & (~Qt::ItemIsEditable));
         setItem(lineNum, 2, pTypeItem);
     }
@@ -545,12 +543,13 @@ bool gdWatchView::addWatch(const gtString& variableName)
         int lineNumber = rowCount() - 1;
 
         // Will get the new values:
-        gtString variableValue;
-        gtString variableType;
+        apExpression variableValue;
         bool rcVal = false;
+        bool useHex = false;
 
         bool openclDebugging = gaIsInKernelDebugging();
         bool hsaDebugging = gaIsInHSAKernelBreakpoint();
+        bool hostDebugging = gaCanGetHostVariables();
 
         if (openclDebugging)
         {
@@ -561,27 +560,36 @@ bool gdWatchView::addWatch(const gtString& variableName)
             GT_IF_WITH_ASSERT(rcCo)
             {
                 // Get the values and type:
-                gtString variableValueHex;
-                rcVal = gaGetKernelDebuggingVariableValueString(variableName, currentWorkItemCoord, variableValue, variableValueHex, variableType);
+                rcVal = gaGetKernelDebuggingExpressionValue(variableName, currentWorkItemCoord, 0, variableValue);
             }
         }
         else if (hsaDebugging)
         {
-            gtString variableValueHex;
-            rcVal = gaHSAGetVariableValue(variableName, variableValue, variableValueHex, variableType);
+            rcVal = gaHSAGetExpressionValue(variableName, 0, variableValue);
 
             // Show HSAIL registers as hex values:
             if (rcVal && (0 < variableName.length()) && ('$' == variableName[0]))
             {
-                variableValue = variableValueHex;
+                useHex = true;
+            }
+        }
+        else if (hostDebugging)
+        {
+            int chosenThreadIndex = gdGDebuggerGlobalVariablesManager::instance().chosenThread();
+            osThreadId threadId = OS_NO_THREAD_ID;
+            bool rc = gaGetThreadId(chosenThreadIndex, threadId);
+
+            if (rc)
+            {
+                rcVal = gaGetThreadExpressionValue(threadId, m_stackDepth, variableName, 0, variableValue);
             }
         }
 
         if (!rcVal)
         {
-            if (openclDebugging || hsaDebugging)
+            if (openclDebugging || hsaDebugging || hostDebugging)
             {
-                variableValue = GD_STR_watchViewCannotEvaluateExpression;
+                variableValue.m_value = GD_STR_watchViewCannotEvaluateExpression;
             }
         }
 
@@ -591,9 +599,10 @@ bool gdWatchView::addWatch(const gtString& variableName)
         pNameItem->setFlags(pNameItem->flags() | Qt::ItemIsEditable);
         pNameItem->setSelected(true);
 
-        if (!variableValue.isEmpty())
+        const gtString& usedValue = useHex ? variableValue.m_value : variableValue.m_valueHex;
+        if (!usedValue.isEmpty())
         {
-            QTableWidgetItem* pValueItem = new QTableWidgetItem(acGTStringToQString(variableValue));
+            QTableWidgetItem* pValueItem = new QTableWidgetItem(acGTStringToQString(usedValue));
             setItem(lineNumber, 1, pValueItem);
             pValueItem->setFlags(pValueItem->flags() & (~Qt::ItemIsEditable));
 
@@ -601,9 +610,9 @@ bool gdWatchView::addWatch(const gtString& variableName)
             pValueItem->setSelected(true);
         }
 
-        if (!variableType.isEmpty())
+        if (!variableValue.m_type.isEmpty())
         {
-            QTableWidgetItem* pTypeItem = new QTableWidgetItem(acGTStringToQString(variableType));
+            QTableWidgetItem* pTypeItem = new QTableWidgetItem(acGTStringToQString(variableValue.m_type));
             pTypeItem->setFlags(pTypeItem->flags() & (~Qt::ItemIsEditable));
             setItem(lineNumber, 2, pTypeItem);
 

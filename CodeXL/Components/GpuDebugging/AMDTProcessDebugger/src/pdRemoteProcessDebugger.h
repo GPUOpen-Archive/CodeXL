@@ -90,18 +90,18 @@ public:
     bool isRemoteDebuggingServerAlive(bool checkLocal, bool checkRemote);
 
     // Host debugging
-    virtual bool canGetHostVariables() const;
-    virtual bool getHostLocals(osThreadId threadId, int callStackFrameIndex, gtVector<gtString>& o_variables);
-    virtual bool getHostVariableValue(osThreadId threadId, int callStackFrameIndex, const gtString& variableName, gtString& o_varValue, gtString& o_varValueHex, gtString& o_varType);
-    virtual bool canPerformHostDebugging() const;
-    virtual bool isAtAPIOrKernelBreakpoint(osThreadId threadId) const;
-    virtual apBreakReason hostBreakReason() const;
-    virtual bool getHostBreakpointLocation(osFilePath& bpFile, int& bpLine) const;
-    virtual bool setHostSourceBreakpoint(const osFilePath& fileName, int lineNumber);
-    virtual bool deleteHostSourceBreakpoint(const osFilePath& fileName, int lineNumber);
-    virtual bool setHostFunctionBreakpoint(const gtString& funcName);
-    virtual bool performHostStep(osThreadId threadId, StepType stepType);
-    virtual bool suspendHostDebuggedProcess();
+    virtual bool canGetHostVariables() const override;
+    virtual bool getHostLocals(osThreadId threadId, int callStackFrameIndex, int evaluationDepth, bool onlyNames, gtVector<apExpression>& o_locals) override;
+    virtual bool getHostExpressionValue(osThreadId threadId, int callStackFrameIndex, const gtString& expressionText, int evaluationDepth, apExpression& o_exp) override;
+    virtual bool canPerformHostDebugging() const override;
+    virtual bool isAtAPIOrKernelBreakpoint(osThreadId threadId) const override;
+    virtual apBreakReason hostBreakReason() const override;
+    virtual bool getHostBreakpointLocation(osFilePath& bpFile, int& bpLine) const override;
+    virtual bool setHostSourceBreakpoint(const osFilePath& fileName, int lineNumber) override;
+    virtual bool deleteHostSourceBreakpoint(const osFilePath& fileName, int lineNumber) override;
+    virtual bool setHostFunctionBreakpoint(const gtString& funcName) override;
+    virtual bool performHostStep(osThreadId threadId, StepType stepType) override;
+    virtual bool suspendHostDebuggedProcess() override;
 
 private:
     enum remoteDebuggingServerConnectionMethod
