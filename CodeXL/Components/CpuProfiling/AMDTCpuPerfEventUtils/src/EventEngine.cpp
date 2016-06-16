@@ -13,7 +13,7 @@
 //=====================================================================
 
 #include <QtCore>
-#include <QtWidgets>
+//#include <QtWidgets>
 
 #include <EventEngine.h>
 #include <AMDTOSWrappers/Include/osCpuid.h>

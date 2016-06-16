@@ -12,10 +12,8 @@
 // Change list:    $Change: 569611 $
 //=====================================================================
 
-#include <QApplication>
 #include <QDateTime>
 #include <QDir>
-#include <QMessageBox>
 
 #include "ThreadPool.h"
 #include "PrdTranslator.h"
@@ -23,7 +21,6 @@
 #include <AMDTBaseTools/Include/gtString.h>
 #include <AMDTBaseTools/Include/gtList.h>
 #include <AMDTBaseTools/Include/gtAssert.h>
-#include <AMDTApplicationFramework/src/afUtils.h>
 #include <AMDTOSWrappers/Include/osAtomic.h>
 #include <AMDTOSWrappers/Include/osCpuid.h>
 #include <AMDTOSWrappers/Include/osDirectory.h>
@@ -603,9 +600,11 @@ bool PrdTranslator::GetProfileEvents(DcEventConfig* pEventConfig, unsigned int n
 #endif
 
 
-bool PrdTranslator::InitPrdReader(PrdReader* pReader, const wchar_t* pFileName, gtUInt64* pLastUserCssRecordOffset, QWidget* pParent)
+bool PrdTranslator::InitPrdReader(PrdReader* pReader, const wchar_t* pFileName, gtUInt64* pLastUserCssRecordOffset, QString& errorString)
 {
     bool bRet = true;
+    // avoid unreferenced formal parameter warning because th eonly reference is inside an if block
+    (void) errorString;
 
     if ((nullptr == pReader) || (nullptr == pFileName))
     {
@@ -627,18 +626,10 @@ bool PrdTranslator::InitPrdReader(PrdReader* pReader, const wchar_t* pFileName, 
 
     if (S_OK != hr)
     {
-        QString msg = "Can't open raw data file. ("
-                      + QString::fromWCharArray(pFileName) + ")\nMaybe no samples were taken.";
-
-        if (nullptr != pParent)
-        {
-            QMessageBox::information(pParent, "Notification", msg,
-                                     QMessageBox::Ok);
-        }
-        else
-        {
-            OS_OUTPUT_DEBUG_LOG(msg.toStdWString().c_str(), OS_DEBUG_LOG_ERROR);
-        }
+        gtString msg; 
+        msg.appendFormattedString(L"Can't open raw data file. (%ls)\nMaybe no samples were taken.", pFileName);
+        OS_OUTPUT_DEBUG_LOG(msg.asCharArray(), OS_DEBUG_LOG_ERROR);
+        errorString.fromWCharArray(msg.asCharArray());
 
         return false;
     }
@@ -905,7 +896,7 @@ void PrdTranslator::AggregateKnownModuleSampleData(
                             {
                                 int srcFileNameLen = static_cast<int>(wcslen(sourceLine.m_filePath));
 
-                                if (!afUtils::ConvertCygwinPath(sourceLine.m_filePath, srcFileNameLen, srcFileName))
+                                if (!osFilePath::ConvertCygwinPath(sourceLine.m_filePath, srcFileNameLen, srcFileName))
                                 {
                                     srcFileName.assign(sourceLine.m_filePath, srcFileNameLen);
                                 }
@@ -1467,7 +1458,7 @@ HRESULT PrdTranslator::TranslateData(QString proFile,
                                      MissedInfoType* pMissedInfo,
                                      QStringList processFilters,
                                      QStringList targetPidList,
-                                     QWidget* pApp,
+                                     QString& errorString,
                                      bool bThread,
                                      bool bCLUtil,
                                      bool bLdStCollect,
@@ -1505,43 +1496,13 @@ HRESULT PrdTranslator::TranslateData(QString proFile,
     m_pfnProgressBarCallback = pfnProgressBarCallback;
     UpdateProgressBar(10ULL, 100ULL);
 
-    if (S_OK == hr)
-    {
-        //Fix for BUG314524 - the idea is not to show progress bar in command line tools.
-        QProgressDialog* pProgDlg = nullptr;
-
-        if (nullptr != pApp)
-        {
-            pProgDlg = new QProgressDialog(
-                "",
-                QString::null,
-                0, 0, pApp,
-                Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
-
-            if (!pProgDlg)
-            {
-                return -1;
-            }
-
-            pProgDlg->setWindowModality(Qt::WindowModal);
-            pProgDlg->show();
-        }
-
-        if (nullptr != pProgDlg)
-        {
-            delete pProgDlg;
-        }
-    }
-
-    UpdateProgressBar(20ULL, 100ULL);
-
     if (m_dataFile.toLower().endsWith(".prd"))
     {
         startTime = GetTickCount();
 
         if (S_OK == hr)
         {
-            hr = TranslateDataPrdFile(proFile, pMissedInfo, processFilters, pApp, bThread, bCLUtil, false);
+            hr = TranslateDataPrdFile(proFile, pMissedInfo, processFilters, errorString, bThread, bCLUtil, false);
         }
 
         if (m_collectStat)
@@ -2301,7 +2262,7 @@ HRESULT PrdTranslator::GetBufferRecordCount(PrdReader& tPrdReader, LPVOID baseAd
 HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
                                             MissedInfoType* pMissedInfo,
                                             QStringList processFilters,
-                                            QWidget* pApp,
+                                            QString& errorString,
                                             bool bThread,
                                             bool bCLUtil,
                                             bool bLdStCollect)
@@ -2355,7 +2316,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
     MemoryMap mapAddress;
     gtUInt64 lastUserCssRecordOffset = 0ULL;
 
-    if (!InitPrdReader(&tPrdReader, m_dataFile.toStdWString().c_str(), &lastUserCssRecordOffset, pApp))
+    if (!InitPrdReader(&tPrdReader, m_dataFile.toStdWString().c_str(), &lastUserCssRecordOffset, errorString))
     {
         return E_ACCESSDENIED;
     }
@@ -2525,17 +2486,6 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
     }
 
     totalBytes = fileStat.st_size - tPrdReader.GetFirstWeightRecOffset();
-    QProgressDialog* pProgDlg = nullptr;
-
-    if (nullptr != pApp)
-    {
-        // Show the PRD processing bar
-        pProgDlg = new QProgressDialog("Processing Raw sample Data...", QString::null,
-                                       0, (totalBytes), pApp, Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
-
-        pProgDlg->setModal(true);
-        pProgDlg->show();
-    }
 
     if (nullptr != m_pProfilingDrivers)
     {
@@ -2884,15 +2834,8 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
 
     mapAddress.UnMap();
 
-    // make sure the progress bar is complete
-    if (nullptr != pApp)
-    {
-        pProgDlg->setValue(totalBytes);
-    }
-    else
-    {
-        printf("\rProfile analysis complete.\n");
-    }
+    // Report analysis is complete wen running in console mode
+    printf("\rProfile analysis complete.\n");
 
     if (m_collectStat)
     {
@@ -3012,11 +2955,6 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
     if (m_collectStat)
     {
         PrintMemoryUsage(L"Memory Usage: After destroying CpuProfileProcess and CpuProfileModule objects.");
-    }
-
-    if (nullptr != pProgDlg)
-    {
-        delete pProgDlg;
     }
 
     if (nullptr != m_pProfilingDrivers)

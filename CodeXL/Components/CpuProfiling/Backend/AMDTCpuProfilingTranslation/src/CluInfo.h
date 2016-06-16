@@ -14,7 +14,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <windows.h>
-#include <qdir.h>
+#include <QDir>
 #include <map>
 #include <list>
 

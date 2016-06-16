@@ -24,18 +24,17 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="CommonPropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(SolutionDir)\AMDTCpuProfiling.props" />
+	<Import Project="$(SolutionDir)\CodeXLCommonProjects.props" />
+	<Import Project="$(SolutionDir)\..\Components\CodeXLComponent.props" />
+	<Import Project="$(AMDTCommonExt)\Qt\Global-QT-nographics.props" />	
   </ImportGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(CommonProjectsDir);$(CommonProjectsDir)\AMDTCommonHeaders;$(ProjectDir);$(ProjectDir)\inc;$(ProjectDir)\..;$(ProjectDir)\..\ProfileAgents;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(CommonProjectsDir);$(CommonProjectsDir)\AMDTCommonHeaders;$(ProjectDir);$(ProjectDir)\inc;$(ProjectDir)\..;$(SolutionDir)\..\Components\CpuProfiling;$(SolutionDir)\..\Components\DatabaseLayer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>AMDT_CPU_PROFILING_RAWDATA_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CXLDbAdapter$(GDTProjectSuffix).lib;CXLCpuPerfEventUtils$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-    <Link>
-      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CXLDbAdapter$(GDTProjectSuffix).lib;CXLCpuPerfEventUtils$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;CXLDbAdapter$(GDTProjectSuffix).lib;CXLCpuPerfEventUtils$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -989,3 +989,67 @@ bool osFilePath::IsMatchingExtension(const gtString& extensionsString) const
 
     return retVal;
 }
+
+// ---------------------------------------------------------------------------
+// Name:        ConvertCygwinPath
+// Description: Convert a CygWin drive Linux-style path to Windows style path
+//              NOTE: This is a static function
+// Return Val:  bool - Success / failure.
+// Author:      AMD Developer Tools Team
+// Date:        
+// ---------------------------------------------------------------------------
+bool osFilePath::ConvertCygwinPath(const wchar_t* pPath, int len, gtString& convertedPath)
+{
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+
+    bool ret = (10 < len && 0 == memcmp(pPath, L"/cygdrive/", 10 * sizeof(wchar_t)));
+
+    if (ret)
+    {
+        pPath += 10;
+        len -= 9;
+        convertedPath.resize(static_cast<size_t>(len));
+
+        int i = 0;
+
+        while (L'/' != *pPath)
+        {
+            convertedPath[i++] = *pPath++;
+        }
+
+        convertedPath[i++] = L':';
+        convertedPath[i++] = L'\\';
+
+        ++pPath;
+
+        for (; i < len; ++i, ++pPath)
+        {
+            convertedPath[i] = (L'/' == *pPath) ? L'\\' : *pPath;
+        }
+    }
+
+    return ret;
+
+#else
+
+    GT_UNREFERENCED_PARAMETER(pPath);
+    GT_UNREFERENCED_PARAMETER(len);
+    GT_UNREFERENCED_PARAMETER(convertedPath);
+
+    return false;
+
+#endif
+}
+
+// ---------------------------------------------------------------------------
+// Name:        ConvertCygwinPath
+// Description: Convert a CygWin drive Linux-style path to Windows style path
+//              NOTE: This is a static function
+// Return Val:  bool - Success / failure.
+// Author:      AMD Developer Tools Team
+// Date:        
+// ---------------------------------------------------------------------------
+bool osFilePath::ConvertCygwinPath(const gtString& path, gtString& convertedPath)
+{
+    return ConvertCygwinPath(path.asCharArray(), path.length(), convertedPath);
+}

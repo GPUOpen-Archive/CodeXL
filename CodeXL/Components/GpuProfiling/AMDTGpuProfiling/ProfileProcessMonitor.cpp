@@ -22,19 +22,19 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <AMDTBaseTools/Include/gtAssert.h>
 #include <AMDTOSWrappers/Include/osProcess.h>
 #include <AMDTAPIClasses/Include/Events/apEventsHandler.h>
 #include <AMDTAPIClasses/Include/Events/apProfileProcessTerminatedEvent.h>
 #include <AMDTAPIClasses/Include/Events/apProfileProgressEvent.h>
 #include <AMDTApplicationFramework/Include/afProgressBarWrapper.h>
 #include <AMDTApplicationFramework/src/afUtils.h>
-#ifdef _WIN32
-    #pragma warning(pop)
-#endif
 
 #include <AMDTGpuProfiling/AMDTGpuProfilerDefs.h>
 #include "ProfileProcessMonitor.h"
-
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
 
 // Sigal 5/30/2013:
 // Currently the duration displayed in GPU profile is not accurate, since it also displays the time

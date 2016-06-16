@@ -7,7 +7,7 @@
 //==================================================================================
 
 // Qt:
-#include <QtGui>
+//#include <QtGui>
 
 // Backend
 #include <AMDTCpuPerfEventUtils/inc/EventEngine.h>

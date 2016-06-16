@@ -17,7 +17,6 @@
     #pragma warning(push)
     #pragma warning(disable : 4127 4718)
 #endif
-#include <QtWidgets>
 #include <QDir>
 #include <QMutexLocker>
 #include <QDateTime>

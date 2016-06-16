@@ -26,15 +26,17 @@
   </ImportGroup>
   <ImportGroup Label="CommonPropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(SolutionDir)\AMDTCpuProfiling.props" />
+	<Import Project="$(SolutionDir)\CodeXLCommonProjects.props" />
+	<Import Project="$(SolutionDir)\..\Components\CodeXLComponent.props" />
+	<Import Project="$(AMDTCommonExt)\Qt\Global-QT-nographics.props" />	
   </ImportGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <PreprocessorDefinitions>AMDT_CPU_PROFILING_TRANSLATION_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(CommonProjectsDir)\AMDTCommonHeaders;$(ProjectDir);$(ProjectDir)\inc;$(ProjectDir)\..;$(ProjectDir)\..\ProfileAgents;$(ProjectDir)\..\..\ProfilingAgents;$(CommonDir)\Lib\Ext\Java\jdk1.7.0_17\include;$(CommonDir)\Lib\Ext\Java\jdk1.7.0_17\include\win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(CommonProjectsDir)\AMDTCommonHeaders;$(ProjectDir);$(ProjectDir)\inc;$(ProjectDir)\..;$(ProjectDir)\..\ProfileAgents;$(ProjectDir)\..\..\ProfilingAgents;$(SolutionDir)\..\Components\CpuProfiling;$(SolutionDir)\..\Components\DatabaseLayer;$(CommonDir)\Lib\Ext\Java\jdk1.7.0_17\include;$(CommonDir)\Lib\Ext\Java\jdk1.7.0_17\include\win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>CXLCpuProfilingRawData$(GDTProjectSuffix).lib;CXLExecutableFormat$(GDTProjectSuffix).lib;CXLCpuCallstackSampling$(GDTProjectSuffix).lib;CXLCpuPerfEventUtils$(GDTProjectSuffix).lib;CXLProfilingAgentsData$(GDTProjectSuffix).lib;CXLDisassembler$(GDTProjectSuffix).lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;CXLApiClasses$(GDTProjectSuffix).lib;CXLCpuProfilingRawData$(GDTProjectSuffix).lib;CXLExecutableFormat$(GDTProjectSuffix).lib;CXLCpuCallstackSampling$(GDTProjectSuffix).lib;CXLCpuPerfEventUtils$(GDTProjectSuffix).lib;CXLProfilingAgentsData$(GDTProjectSuffix).lib;CXLDisassembler$(GDTProjectSuffix).lib;psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

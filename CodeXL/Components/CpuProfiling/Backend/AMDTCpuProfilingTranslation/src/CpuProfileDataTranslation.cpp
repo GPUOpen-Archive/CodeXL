@@ -13,7 +13,6 @@
 //=====================================================================
 
 #include <QtCore>
-#include <QtWidgets>
 #include <QDir>
 #include <QFileInfo>
 
@@ -648,12 +647,13 @@ HRESULT fnWriteSetToFile(
         }
 
         MissedInfoType missedInfo;
+        QString errorString;
         hr = pDataTranslator->TranslateData(
                  outPath ,
                  &missedInfo, //MissedInfoType *pMissedInfo
                  QStringList(), //QStringList processFilters
                  QStringList(), //QStringList targetPidList
-                 NULL, //QWidget *pApp = NULL
+                 errorString, //QWidget *pApp = NULL
                  false, //bool bThread = false
                  false, //bool bCLUtil = false
                  false,
