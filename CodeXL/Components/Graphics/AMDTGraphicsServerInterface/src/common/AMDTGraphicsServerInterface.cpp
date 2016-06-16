@@ -7,7 +7,6 @@
 
 // Local:
 #include <AMDTGraphicsServerInterface/Include/AMDTGraphicsServerInterface.h>
-#include <Server/Common/Tracing/CaptureTypes.h>
 
 
 // CodeXL uses INFINITE timeout when waiting for graphics server replies because the web server responsiveness
