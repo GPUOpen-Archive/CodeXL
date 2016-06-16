@@ -174,11 +174,11 @@ bool AtpFileParser::ParseSectionName(const std::string& input, std::string& sect
     else if (m_atpFileVersion == 1)
     {
         sectionName = input.substr(2);
-        if (input.find("Command") != -1)
+        if (input.find("Command") != string::npos)
         {
             // ATP Version 1: Section name is formated like: "//==GPU Trace==" make it "GPU Trace"
             size_t pos = sectionName.find("=");
-            if (pos != -1)
+            if (pos != string::npos)
             {
                 sectionName.erase(pos);
             }
