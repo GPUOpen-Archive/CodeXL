@@ -570,29 +570,33 @@ def initGLEW (env) :
 
 def initBoost (env) :
     if (env['CXL_boost_dir'] == ''):
-      amdboost_dir =  env['CXL_common_dir'] + '/Lib/Ext/Boost/boost_1_59_0/lib/RHEL6'
+      boost_lib_dir =  env['CXL_common_dir'] + '/Lib/Ext/Boost/boost_1_59_0/lib/RHEL6'
   
       if (env['CXL_arch'] == 'x86_64'):
-        boost_dir = amdboost_dir + '/x86_64/'
-        shutil.copy2(boost_dir + "libboost_system.so.1.59.0", env['CXL_lib_dir'] + "/libboost_system.so.1.59.0")
-        shutil.copy2(boost_dir + "libboost_filesystem.so.1.59.0", env['CXL_lib_dir'] + "/libboost_filesystem.so.1.59.0")
-        shutil.copy2(boost_dir + "libboost_regex.so.1.59.0", env['CXL_lib_dir'] + "/libboost_regex.so.1.59.0")
-        shutil.copy2(boost_dir + "libboost_program_options.so.1.59.0", env['CXL_lib_dir'] + "/libboost_program_options.so.1.59.0")
-        shutil.copy2(boost_dir + "libboost_wave.so.1.59.0", env['CXL_lib_dir'] + "/libboost_wave.so.1.59.0")
-        shutil.copy2(boost_dir + "libboost_thread.so.1.59.0", env['CXL_lib_dir'] + "/libboost_thread.so.1.59.0")
-        shutil.copy2(boost_dir + "libboost_chrono.so.1.59.0", env['CXL_lib_dir'] + "/libboost_chrono.so.1.59.0")
-        shutil.copy2(boost_dir + "libboost_date_time.so.1.59.0", env['CXL_lib_dir'] + "/libboost_date_time.so.1.59.0")
+        boost_lib_dir = boost_lib_dir + '/x86_64/'
+        shutil.copy2(boost_lib_dir + "libboost_system.so.1.59.0", env['CXL_lib_dir'] + "/libboost_system.so.1.59.0")
+        shutil.copy2(boost_lib_dir + "libboost_filesystem.so.1.59.0", env['CXL_lib_dir'] + "/libboost_filesystem.so.1.59.0")
+        shutil.copy2(boost_lib_dir + "libboost_regex.so.1.59.0", env['CXL_lib_dir'] + "/libboost_regex.so.1.59.0")
+        shutil.copy2(boost_lib_dir + "libboost_program_options.so.1.59.0", env['CXL_lib_dir'] + "/libboost_program_options.so.1.59.0")
+        shutil.copy2(boost_lib_dir + "libboost_wave.so.1.59.0", env['CXL_lib_dir'] + "/libboost_wave.so.1.59.0")
+        shutil.copy2(boost_lib_dir + "libboost_thread.so.1.59.0", env['CXL_lib_dir'] + "/libboost_thread.so.1.59.0")
+        shutil.copy2(boost_lib_dir + "libboost_chrono.so.1.59.0", env['CXL_lib_dir'] + "/libboost_chrono.so.1.59.0")
+        shutil.copy2(boost_lib_dir + "libboost_date_time.so.1.59.0", env['CXL_lib_dir'] + "/libboost_date_time.so.1.59.0")
       else:
-        boost_dir = amdboost_dir + '/x86/'
+        boost_lib_dir = boost_lib_dir + '/x86/'
     else:
-      boost_dir=env['CXL_boost_dir']
-    env.Append(BoostDir= [boost_dir])
-    env.Append(LIBPATH = [env['BoostDir']])
+      boost_lib_dir=env['CXL_boost_dir']
+
+    env.Append(LIBPATH = [boost_lib_dir])
 
 def UseBoost (env):
     compiler_base_flags = ' -Wno-deprecated-declarations '
     env.Append(CPPFLAGS = compiler_base_flags)
-    env.Append(CPPPATH = [env['BoostDir']])
+    if (env['CXL_boost_dir'] == ''):
+      boost_include_dir =  env['CXL_common_dir'] + '/Lib/Ext/Boost/boost_1_59_0'
+      env.Append(CPPPATH = [boost_include_dir])
+    else:  
+      env.Append(CPPPATH = [env['CXL_boost_dir']])
 
 def UseFltk (env):
     amdfltk_dir =  env['CXL_common_dir'] + '/Lib/Ext/fltk/1.1.0/'
