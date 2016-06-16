@@ -55,6 +55,7 @@
 #include <AMDTAPIClasses/Include/apDebugProjectSettings.h>
 #include <AMDTAPIClasses/Include/apDisplayBuffer.h>
 #include <AMDTAPIClasses/Include/apExecutionMode.h>
+#include <AMDTAPIClasses/Include/apExpression.h>
 #include <AMDTAPIClasses/Include/apFunctionCall.h>
 #include <AMDTAPIClasses/Include/apGLDebugOutput.h>
 #include <AMDTAPIClasses/Include/apGLDisplayList.h>
@@ -1445,13 +1446,13 @@ bool gaGRApiFunctions::gaHostDebuggerStepOver(osThreadId threadId)
 // Author:      Uri Shomroni
 // Date:        10/9/2015
 // ---------------------------------------------------------------------------
-bool gaGRApiFunctions::gaGetThreadLocals(const osThreadId& threadId, int frameIndex, gtVector<gtString>& o_locals)
+bool gaGRApiFunctions::gaGetThreadLocals(const osThreadId& threadId, int frameIndex, int evalDepth, gtVector<apExpression>& o_locals, bool onlyNames)
 {
     bool retVal = gaCanGetHostVariables();
 
     GT_IF_WITH_ASSERT(retVal)
     {
-        retVal = pdProcessDebugger::instance().getHostLocals(threadId, frameIndex, o_locals);
+        retVal = pdProcessDebugger::instance().getHostLocals(threadId, frameIndex, evalDepth, onlyNames, o_locals);
     }
 
     return retVal;
@@ -1464,13 +1465,13 @@ bool gaGRApiFunctions::gaGetThreadLocals(const osThreadId& threadId, int frameIn
 // Author:      Uri Shomroni
 // Date:        10/9/2015
 // ---------------------------------------------------------------------------
-bool gaGRApiFunctions::gaGetThreadVariableValue(const osThreadId& threadId, int frameIndex, const gtString& variableName, gtString& o_variableValue, gtString& o_variableValueHex, gtString& o_variableType)
+bool gaGRApiFunctions::gaGetThreadExpressionValue(const osThreadId& threadId, int frameIndex, const gtString& expressionText, int evalDepth, apExpression& o_exp)
 {
     bool retVal = gaCanGetHostVariables();
 
     GT_IF_WITH_ASSERT(retVal)
     {
-        retVal = pdProcessDebugger::instance().getHostVariableValue(threadId, frameIndex, variableName, o_variableValue, o_variableValueHex, o_variableType);
+        retVal = pdProcessDebugger::instance().getHostExpressionValue(threadId, frameIndex, expressionText, evalDepth, o_exp);
     }
 
     return retVal;
@@ -8073,7 +8074,7 @@ bool gaGRApiFunctions::gaCanGetKernelVariableValue(const gtString& variableName)
 // Author:      Uri Shomroni
 // Date:        23/1/2011
 // ---------------------------------------------------------------------------
-bool gaGRApiFunctions::gaGetKernelDebuggingVariableValueString(const gtString& variableName, const int workItem[3], gtString& variableValue, gtString& variableValueHex, gtString& variableType)
+bool gaGRApiFunctions::gaGetKernelDebuggingExpressionValue(const gtString& expressionString, const int workItem[3], int evalDepth, apExpression& o_exp)
 {
     bool retVal = false;
 
@@ -8084,15 +8085,18 @@ bool gaGRApiFunctions::gaGetKernelDebuggingVariableValueString(const gtString& v
         osSocket& openCLSpyAPISocket = gaSpiesAPISocket();
 
         // Send the function Id:
-        openCLSpyAPISocket << (gtInt32)GA_FID_gaGetKernelDebuggingVariableValueString;
+        openCLSpyAPISocket << (gtInt32)GA_FID_gaGetKernelDebuggingExpressionValue;
 
         // Send the variable name:
-        openCLSpyAPISocket << variableName;
+        openCLSpyAPISocket << expressionString;
 
         // Send the work item coordinates:
         openCLSpyAPISocket << (gtInt32)workItem[0];
         openCLSpyAPISocket << (gtInt32)workItem[1];
         openCLSpyAPISocket << (gtInt32)workItem[2];
+
+        // Send the evaluation depth:
+        openCLSpyAPISocket << (gtInt32)evalDepth;
 
         // Perform after API call actions:
         pdProcessDebugger::instance().afterAPICallIssued();
@@ -8103,65 +8107,7 @@ bool gaGRApiFunctions::gaGetKernelDebuggingVariableValueString(const gtString& v
         // Read the values string:
         if (retVal)
         {
-            openCLSpyAPISocket >> variableValue;
-            openCLSpyAPISocket >> variableValueHex;
-            openCLSpyAPISocket >> variableType;
-        }
-    }
-
-    return retVal;
-}
-
-// ---------------------------------------------------------------------------
-// Name:        gaGRApiFunctions::gaGetKernelDebuggingVariableMembers
-// Description: Gets the list of immediate children for the variable - its memebers
-// Return Val:  bool - Success / failure.
-// Author:      Uri Shomroni
-// Date:        23/5/2011
-// ---------------------------------------------------------------------------
-bool gaGRApiFunctions::gaGetKernelDebuggingVariableMembers(const gtString& variableName, gtVector<gtString>& memberNames)
-{
-    bool retVal = false;
-    memberNames.clear();
-
-    // Verify that the OpenCL API is active:
-    if (gaIsAPIConnectionActive(AP_OPENCL_API_CONNECTION))
-    {
-        // Get the OpenCL Spy connecting socket:
-        osSocket& openCLSpyAPISocket = gaSpiesAPISocket();
-
-        // Send the function Id:
-        openCLSpyAPISocket << (gtInt32)GA_FID_gaGetKernelDebuggingVariableMembers;
-
-        // Send the variable name:
-        openCLSpyAPISocket << variableName;
-
-        // Send the current work item coordinate:
-        gaPersistentDataManager& thePersistentDataManager = gaPersistentDataManager::instance();
-        openCLSpyAPISocket << (gtInt32)thePersistentDataManager.kernelDebuggingCurrentWorkItemCoordinate(0);
-        openCLSpyAPISocket << (gtInt32)thePersistentDataManager.kernelDebuggingCurrentWorkItemCoordinate(1);
-        openCLSpyAPISocket << (gtInt32)thePersistentDataManager.kernelDebuggingCurrentWorkItemCoordinate(2);
-
-        // Perform after API call actions:
-        pdProcessDebugger::instance().afterAPICallIssued();
-
-        // Read the return value:
-        openCLSpyAPISocket >> retVal;
-
-        // Read the member names:
-        if (retVal)
-        {
-            // Get the vector size:
-            gtInt32 numberOfMembers = -1;
-            openCLSpyAPISocket >> numberOfMembers;
-            gtString currentMember;
-
-            for (gtInt32 i = 0; i < numberOfMembers; i++)
-            {
-                // Get the values:
-                openCLSpyAPISocket >> currentMember;
-                memberNames.push_back(currentMember);
-            }
+            retVal = o_exp.readSelfFromChannel(openCLSpyAPISocket);
         }
     }
 
@@ -8181,11 +8127,11 @@ bool gaGRApiFunctions::gaGetKernelDebuggingVariableMembers(const gtString& varia
 // Author:      Uri Shomroni
 // Date:        21/2/2011
 // ---------------------------------------------------------------------------
-bool gaGRApiFunctions::gaGetKernelDebuggingAvailableVariables(gtVector<gtString>& variableNames, bool getLeaves, int stackFrameDepth)
+bool gaGRApiFunctions::gaGetKernelDebuggingAvailableVariables(int evalDepth, gtVector<apExpression>& o_locals, bool getLeaves, int stackFrameDepth, bool onlyNames)
 {
     bool retVal = false;
 
-    variableNames.clear();
+    o_locals.clear();
 
     // Verify that the OpenCL API is active:
     if (gaIsAPIConnectionActive(AP_OPENCL_API_CONNECTION))
@@ -8201,8 +8147,10 @@ bool gaGRApiFunctions::gaGetKernelDebuggingAvailableVariables(gtVector<gtString>
         openCLSpyAPISocket << (gtInt32)thePersistentDataManager.kernelDebuggingCurrentWorkItemCoordinate(0);
         openCLSpyAPISocket << (gtInt32)thePersistentDataManager.kernelDebuggingCurrentWorkItemCoordinate(1);
         openCLSpyAPISocket << (gtInt32)thePersistentDataManager.kernelDebuggingCurrentWorkItemCoordinate(2);
+        openCLSpyAPISocket << (gtInt32)evalDepth;
         openCLSpyAPISocket << getLeaves;
         openCLSpyAPISocket << (gtInt32)stackFrameDepth;
+        openCLSpyAPISocket << onlyNames;
 
         // Perform after API call actions:
         pdProcessDebugger::instance().afterAPICallIssued();
@@ -8216,15 +8164,14 @@ bool gaGRApiFunctions::gaGetKernelDebuggingAvailableVariables(gtVector<gtString>
             gtUInt32 amountOfVariables = 0;
             openCLSpyAPISocket >> amountOfVariables;
 
-            gtString currentVarName;
+            o_locals.resize(amountOfVariables);
 
             for (gtUInt32 i = 0; i < amountOfVariables; i++)
             {
                 // Read the current name:
-                openCLSpyAPISocket >> currentVarName;
-
-                // Add it to the vector:
-                variableNames.push_back(currentVarName);
+                bool rcVar = o_locals[i].readSelfFromChannel(openCLSpyAPISocket);
+                GT_ASSERT(rcVar);
+                retVal = retVal && rcVar;
             }
         }
     }
@@ -11763,9 +11710,11 @@ bool gaGRApiFunctions::gaHSASetBreakpoint(const gtString& kernelName, const gtUI
     return retVal;
 }
 
-bool gaGRApiFunctions::gaHSAListVariables(gtVector<gtString>& variables)
+bool gaGRApiFunctions::gaHSAListVariables(int evalDepth, gtVector<apExpression>& o_locals)
 {
     bool retVal = false;
+
+    o_locals.clear();
 
     // Verify that the API is active:
     if (gaIsAPIConnectionActiveAndDebuggedProcessSuspended(AP_HSA_API_CONNECTION))
@@ -11776,6 +11725,9 @@ bool gaGRApiFunctions::gaHSAListVariables(gtVector<gtString>& variables)
         // Send the function Id:
         spyConnectionSocket << (gtInt32)GA_FID_gaHSAListVariables;
 
+        // Send the parameter:
+        spyConnectionSocket << (gtInt32)evalDepth;
+
         // Receive success value:
         spyConnectionSocket >> retVal;
 
@@ -11785,11 +11737,13 @@ bool gaGRApiFunctions::gaHSAListVariables(gtVector<gtString>& variables)
             gtUInt32 varCount = 0;
             spyConnectionSocket >> varCount;
 
+            o_locals.resize(varCount);
+
             for (gtUInt32 i = 0; varCount > i; ++i)
             {
-                gtString currVar;
-                spyConnectionSocket >> currVar;
-                variables.push_back(currVar);
+                bool rcVar = o_locals[i].readSelfFromChannel(spyConnectionSocket);
+                GT_ASSERT(rcVar);
+                retVal = retVal && rcVar;
             }
         }
     }
@@ -11797,7 +11751,7 @@ bool gaGRApiFunctions::gaHSAListVariables(gtVector<gtString>& variables)
     return retVal;
 }
 
-bool gaGRApiFunctions::gaHSAGetVariableValue(const gtString& varName, gtString& varValue, gtString& varValueHex, gtString& varType)
+bool gaGRApiFunctions::gaHSAGetExpressionValue(const gtString& expStr, int evalDepth, apExpression& o_exp)
 {
     bool retVal = false;
 
@@ -11808,10 +11762,13 @@ bool gaGRApiFunctions::gaHSAGetVariableValue(const gtString& varName, gtString& 
         osSocket& spyConnectionSocket = gaSpiesAPISocket();
 
         // Send the function Id:
-        spyConnectionSocket << (gtInt32)GA_FID_gaHSAGetVariableValue;
+        spyConnectionSocket << (gtInt32)GA_FID_gaHSAGetExpressionValue;
 
         // Send the variable name:
-        spyConnectionSocket << varName;
+        spyConnectionSocket << expStr;
+
+        // Send the evaluation depth:
+        spyConnectionSocket << (gtInt32)evalDepth;
 
         // Receive success value:
         spyConnectionSocket >> retVal;
@@ -11819,9 +11776,7 @@ bool gaGRApiFunctions::gaHSAGetVariableValue(const gtString& varName, gtString& 
         if (retVal)
         {
             // Receive output values:
-            spyConnectionSocket >> varValue;
-            spyConnectionSocket >> varValueHex;
-            spyConnectionSocket >> varType;
+            retVal = o_exp.readSelfFromChannel(spyConnectionSocket);
         }
     }
 
@@ -12252,8 +12207,8 @@ GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaCanGetHostDebugging, bool, (
 GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaHostDebuggerStepIn, bool, (osThreadId threadId), (threadId));
 GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaHostDebuggerStepOut, bool, (osThreadId threadId), (threadId));
 GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaHostDebuggerStepOver, bool, (osThreadId threadId), (threadId));
-GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaGetThreadLocals, bool, (const osThreadId& threadId, int frameIndex, gtVector<gtString>& o_locals), (threadId, frameIndex, o_locals));
-GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaGetThreadVariableValue, bool, (const osThreadId& threadId, int frameIndex, const gtString& variableName, gtString& o_variableValue, gtString& o_variableValueHex, gtString& o_varType), (threadId, frameIndex, variableName, o_variableValue, o_variableValueHex, o_varType));
+GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaGetThreadLocals, bool, (const osThreadId& threadId, int frameIndex, int evalDepth, gtVector<apExpression>& o_locals, bool onlyNames), (threadId, frameIndex, evalDepth, o_locals, onlyNames));
+GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaGetThreadExpressionValue, bool, (const osThreadId& threadId, int frameIndex, const gtString& expressionText, int evalDepth, apExpression& o_exp), (threadId, frameIndex, expressionText, evalDepth, o_exp));
 GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaIsHostBreakPoint, bool, (), ());
 GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaSetHostBreakpoint, bool, (const osFilePath& filePath, int lineNumber), (filePath, lineNumber));
 GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaGetHostBreakpointLocation, bool, (osFilePath& bpFile, int& bpLine), (bpFile, bpLine));
@@ -12432,9 +12387,8 @@ GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaUpdateKernelSteppingWorkItem
 GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaIsWorkItemValid, bool, (const int coordinate[3]), (coordinate));
 GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaGetFirstValidWorkItem, bool, (int wavefrontIndex, int coordinate[3]), (wavefrontIndex, coordinate));
 GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaCanGetKernelVariableValue, bool, (const gtString& variableName), (variableName));
-GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaGetKernelDebuggingVariableValueString, bool, (const gtString& variableName, const int workItem[3], gtString& variableValue, gtString& variableValueHex, gtString& variableType), (variableName, workItem, variableValue, variableValueHex, variableType));
-GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaGetKernelDebuggingVariableMembers, bool, (const gtString& variableName, gtVector<gtString>& memberNames), (variableName, memberNames));
-GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaGetKernelDebuggingAvailableVariables, bool, (gtVector<gtString>& variableNames, bool getLeaves, int stackFrameDepth), (variableNames, getLeaves, stackFrameDepth));
+GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaGetKernelDebuggingExpressionValue, bool, (const gtString& expressionString, const int workItem[3], int evalDepth, apExpression& o_exp), (expressionString, workItem, evalDepth, o_exp));
+GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaGetKernelDebuggingAvailableVariables, bool, (int evalDepth, gtVector<apExpression>& o_locals, bool onlyLeaves, int stackFrameDepth, bool onlyNames), (evalDepth, o_locals, onlyLeaves, stackFrameDepth, onlyNames));
 GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaGetKernelDebuggingAmountOfActiveWavefronts, bool, (int& amountOfWavefronts), (amountOfWavefronts));
 GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaGetKernelDebuggingActiveWavefrontID, bool, (int wavefrontIndex, int& wavefrontId), (wavefrontIndex, wavefrontId));
 GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaGetKernelDebuggingWavefrontIndex, bool, (const int coordinate[3], int& wavefrontIndex), (coordinate, wavefrontIndex));
@@ -12616,8 +12570,8 @@ GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaHSAGetSourceFilePath, bool, 
 GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaHSAGetCallStack, bool, (osCallStack& stack), (stack));
 GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaHSASetNextDebuggingCommand, bool, (apKernelDebuggingCommand cmd), (cmd));
 GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaHSASetBreakpoint, bool, (const gtString& kernelName, const gtUInt64& line), (kernelName, line));
-GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaHSAListVariables, bool, (gtVector<gtString>& variables), (variables));
-GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaHSAGetVariableValue, bool, (const gtString& varName, gtString& varValue, gtString& varValueHex, gtString& varType), (varName, varValue, varValueHex, varType));
+GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaHSAListVariables, bool, (int evalDepth, gtVector<apExpression>& o_locals), (evalDepth, o_locals));
+GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaHSAGetExpressionValue, bool, (const gtString& expStr, int evalDepth, apExpression& o_exp), (expStr, evalDepth, o_exp));
 GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaHSAListWorkItems, bool, (gtVector<gtUInt32>& o_gidLidWgid), (o_gidLidWgid));
 GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaHSASetActiveWorkItemIndex, bool, (gtUInt32 wiIndex), (wiIndex));
 GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaHSAGetWorkDims, bool, (gtUByte& dims), (dims));
