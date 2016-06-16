@@ -6,8 +6,6 @@ from CXL_init import *
 libName = "CXLAnalyzer"
 
 env = CXL_env.Clone()
-
-initBoost(env)
 UseBoost(env)
 UseTinyXml(env)
 UseQt4(env)

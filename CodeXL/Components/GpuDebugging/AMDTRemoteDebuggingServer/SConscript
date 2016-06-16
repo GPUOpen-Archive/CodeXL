@@ -8,7 +8,6 @@ Import('*')
 appName = "CXLRemoteDebuggingServer"
 
 env = CXL_env.Clone()
-initBoost(env)
 UseBoost(env)
 env.Append( CPPPATH = [ 
     ".",

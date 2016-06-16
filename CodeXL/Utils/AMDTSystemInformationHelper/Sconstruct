@@ -47,6 +47,7 @@ initCXLBuild (CXL_env)
 initGtk (CXL_env)
 initTinyXml (CXL_env)
 initStdc(CXL_env)
+initBoost(CXL_env)
 
 # Set the debug/release variant data
 if (CXL_env['CXL_build'] == 'debug'):

@@ -10,7 +10,6 @@ Import('*')
 
 TheLibraryName = 'CXLGpuProfiling'
 GPUProf_env = CXL_env.Clone()
-initBoost(GPUProf_env)
 UseBoost(GPUProf_env)
 buildDirPath = "." + '/build/' + GPUProf_env['CXL_arch']
 print buildDirPath
