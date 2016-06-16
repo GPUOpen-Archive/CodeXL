@@ -26,7 +26,7 @@ class osPortAddress;
 // Local:
 #include <AMDTGraphicsServerInterface/Include/GraphicsServerInterfaceDLLBuild.h>
 
-#include "../../Server/Common/Tracing/CaptureTypes.h"
+#include <Server/Common/Tracing/CaptureTypes.h>
 
 
 // ----------------------------------------------------------------------------------
