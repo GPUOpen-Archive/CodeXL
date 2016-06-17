@@ -826,40 +826,60 @@ static void MergeTraceFile(int sig)
         std::string pid = StringUtils::ToString(processId);
         AtpFileWriter writer(config, pid);
 
-        // Note: these local vars need to be declared at this scope (i.e. the
-        // same scope where SaveToAtpFile is called) regardless of whether or
-        // not the parts are being added via AddAtpFilePart. Otherwise, the
-        // locals go out of scope before the code in SaveToAtpFile actually
-        // uses them.
-        CLAtpFilePart oclTrace(config);
-        StackTraceAtpFilePart clStackTrace(string("ocl"), config);
-        StackTraceAtpFilePart hsaStackTrace(string("hsa"), config);
-        HSAAtpFilePart hsaTrace(config);
-        PerfMarkerAtpFilePart perfMarker(config);
+        CLAtpFilePart* pOclTrace = nullptr;
+        StackTraceAtpFilePart* pClStackTrace = nullptr;
+        StackTraceAtpFilePart* pHsaStackTrace = nullptr;
+        HSAAtpFilePart* pHsaTrace = nullptr;
 
         if (config.bTrace)
         {
-            writer.AddAtpFilePart(&oclTrace);
+            pOclTrace = new(std::nothrow) CLAtpFilePart(config);
+
+            if (nullptr != pOclTrace)
+            {
+                writer.AddAtpFilePart(pOclTrace);
+            }
 
             if (config.bSym)
             {
-                writer.AddAtpFilePart(&clStackTrace);
+                pClStackTrace = new(std::nothrow) StackTraceAtpFilePart(string("ocl"), config);
+
+                if (nullptr != pClStackTrace)
+                {
+                    writer.AddAtpFilePart(pClStackTrace);
+                }
             }
         }
 
         if (config.bHSATrace)
         {
-            writer.AddAtpFilePart(&hsaTrace);
+            pHsaTrace = new(std::nothrow) HSAAtpFilePart(config);
+
+            if (nullptr != pHsaTrace)
+            {
+                writer.AddAtpFilePart(pHsaTrace);
+            }
 
             if (config.bSym)
             {
-                writer.AddAtpFilePart(&hsaStackTrace);
+                pHsaStackTrace = new(std::nothrow) StackTraceAtpFilePart(string("hsa"), config);
+
+                if (nullptr != pHsaStackTrace)
+                {
+                    writer.AddAtpFilePart(pHsaStackTrace);
+                }
             }
         }
 
+        PerfMarkerAtpFilePart perfMarker(config);
         writer.AddAtpFilePart(&perfMarker);
 
         writer.SaveToAtpFile();
+
+        SAFE_DELETE(pOclTrace);
+        SAFE_DELETE(pClStackTrace);
+        SAFE_DELETE(pHsaStackTrace);
+        SAFE_DELETE(pHsaTrace);
     }
 }
 
