@@ -15,6 +15,7 @@
 #include <AMDTOSWrappers/Include/osFilePath.h>
 #include <AMDTOSWrappers/Include/osApplication.h>
 #include <AMDTOSWrappers/Include/osGeneralFunctions.h>
+#include <AMDTOSWrappers/Include/osDebugLog.h>
 #include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
 #include <AMDTCommonProfileDataTypes.h>
 #include <CpuProfileInfo.h>
@@ -27,6 +28,127 @@ static inline gtUInt32 generateFuncId(gtUInt16 moduleId, gtUInt16 funcSeq)
     gtUInt32 funcId = moduleId;
     funcId = (funcId << 16) | funcSeq;
     return funcId;
+}
+
+int ProfilerDataWriterThread::entryPoint()
+{
+    const unsigned WRITER_WAIT_MS = 50;
+
+    while (true)
+    {
+        while (m_Writer.isEmpty())
+        {
+            osSleep(WRITER_WAIT_MS);
+        }
+
+        TranslatedDataContainer dc = m_Writer.Pop();
+
+        if (exitRequested || TRANSLATED_DATA_TYPE_UNKNOWN_INFO == dc.m_type)
+        {
+            break;
+        }
+
+        m_Writer.Write(dc.m_type, dc.m_data);
+    }
+
+    return 0;
+}
+
+void ProfilerDataDBWriter::ClearWriterQueue()
+{
+    while (!m_translatedDataQueue.isEmpty())
+    {
+        TranslatedDataContainer dc = m_translatedDataQueue.pop();
+        TranslatedDataType type = dc.m_type;
+        void *data = dc.m_data;
+
+        if (nullptr != data)
+        {
+            switch (type)
+            {
+            case TRANSLATED_DATA_TYPE_SESSION_INFO:
+            {
+                AMDTProfileSessionInfo *sessionInfo = reinterpret_cast<AMDTProfileSessionInfo*>(data);
+                delete sessionInfo;
+                break;
+            }
+            case TRANSLATED_DATA_TYPE_TOPOLOGY_INFO:
+            {
+                CPAdapterTopologyMap *topologyInfo = reinterpret_cast<CPAdapterTopologyMap*>(data);
+                delete topologyInfo;
+                break;
+            }
+            case TRANSLATED_DATA_TYPE_EVENT_INFO:
+            {
+                gtVector<EventMaskType> *eventVec = reinterpret_cast<gtVector<EventMaskType>*>(data);
+                delete eventVec;
+                break;
+            }
+            case TRANSLATED_DATA_TYPE_SAMPLINGCONFIG_INFO:
+            {
+                gtVector<std::pair<EventMaskType, gtUInt32>> *samplingVec = reinterpret_cast<gtVector<std::pair<EventMaskType, gtUInt32>>*>(data);
+                delete samplingVec;
+                break;
+            }
+            case TRANSLATED_DATA_TYPE_CORECONFIG_INFO:
+            {
+                CPACoreSamplingConfigList *coreConfigList = reinterpret_cast<CPACoreSamplingConfigList*>(data);
+                delete coreConfigList;
+                break;
+            }
+            case TRANSLATED_DATA_TYPE_MODULE_INFO:
+            {
+                CPAModuleList *moduleList = reinterpret_cast<CPAModuleList*>(data);
+                delete moduleList;
+                break;
+            }
+            case TRANSLATED_DATA_TYPE_PROCESS_INFO:
+            {
+                CPAProcessList *processList = reinterpret_cast<CPAProcessList*>(data);
+                delete processList;
+                break;
+            }
+            case TRANSLATED_DATA_TYPE_THREAD_INFO:
+            {
+                CPAProcessThreadList *procThreadIdList = reinterpret_cast<CPAProcessThreadList*>(data);
+                delete procThreadIdList;
+                break;
+            }
+            case TRANSLATED_DATA_TYPE_MODINSTANCE_INFO:
+            {
+                CPAModuleInstanceList *modInstanceList = reinterpret_cast<CPAModuleInstanceList*>(data);
+                delete modInstanceList;
+                break;
+            }
+            case TRANSLATED_DATA_TYPE_FUNCTION_INFO:
+            {
+                CPAFunctionInfoList *funcList = reinterpret_cast<CPAFunctionInfoList*>(data);
+                delete funcList;
+                break;
+            }
+            case TRANSLATED_DATA_TYPE_SAMPLE_INFO:
+            {
+                CPASampeInfoList *sampleList = reinterpret_cast<CPASampeInfoList*>(data);
+                delete sampleList;
+                break;
+            }
+            case TRANSLATED_DATA_TYPE_CSS_FRAME_INFO:
+            {
+                CPACallStackFrameInfoList *csFrameInfoList = reinterpret_cast<CPACallStackFrameInfoList*>(data);
+                delete csFrameInfoList;
+                break;
+            }
+            case TRANSLATED_DATA_TYPE_CSS_LEAF_INFO:
+            {
+                CPACallStackLeafInfoList  *csLeafInfoList = reinterpret_cast<CPACallStackLeafInfoList*>(data);
+                delete csLeafInfoList;
+                break;
+            }
+            default:
+                break;
+            }
+        }
+    }
 }
 
 bool ProfilerDataDBWriter::Initialize(const gtString& path)
@@ -52,39 +174,13 @@ bool ProfilerDataDBWriter::Initialize(const gtString& path)
 
     if (rc)
     {
-        m_isWriterReady = true;
+        if (nullptr != m_pWriterThread && !m_pWriterThread->execute())
+        {
+            OS_OUTPUT_DEBUG_LOG(L"Could not dispatch DB Writer Thread", OS_DEBUG_LOG_ERROR);
+        }
     }
 
     return rc;
-}
-
-void ProfilerDataDBWriter::PackSessionInfo(const CpuProfileInfo& profileInfo, gtUInt64 cpuAffinity, AMDTProfileSessionInfo& sessionInfo)
-{
-    sessionInfo.m_targetAppPath = profileInfo.m_targetPath;
-    sessionInfo.m_targetAppWorkingDir = profileInfo.m_wrkDirectory;
-    sessionInfo.m_targetAppCmdLineArgs = profileInfo.m_cmdArguments;
-    sessionInfo.m_targetAppEnvVars = profileInfo.m_envVariables;
-    sessionInfo.m_systemDetails = profileInfo.m_osName;
-    sessionInfo.m_sessionScope = profileInfo.m_profScope;
-    sessionInfo.m_sessionType = profileInfo.m_profType;
-    sessionInfo.m_sessionDir = profileInfo.m_profDirectory;
-    sessionInfo.m_sessionStartTime = profileInfo.m_profStartTime;
-    sessionInfo.m_sessionEndTime = profileInfo.m_profEndTime;
-    sessionInfo.m_cssEnabled = profileInfo.m_isCSSEnabled;
-    sessionInfo.m_unwindDepth = static_cast<gtUInt16>(profileInfo.m_cssUnwindDepth);
-    sessionInfo.m_unwindScope = static_cast<gtUInt16>(profileInfo.m_cssScope);
-    sessionInfo.m_cssFPOEnabled = profileInfo.m_isCssSupportFpo;
-    sessionInfo.m_cpuFamily = profileInfo.m_cpuFamily;
-    sessionInfo.m_cpuModel = profileInfo.m_cpuModel;
-    sessionInfo.m_coreAffinity = cpuAffinity;
-}
-
-void ProfilerDataDBWriter::PackCoreTopology(const CoreTopologyMap& coreTopology, CPAdapterTopologyMap& cpaTopology)
-{
-    for (const auto& t : coreTopology)
-    {
-        cpaTopology.emplace_back(static_cast<gtUInt32>(t.first), t.second.processor, t.second.numaNode);
-    }
 }
 
 void ProfilerDataDBWriter::DecodeSamplingEvent(EventMaskType encoded, gtUInt16& event, gtUByte& unitMask, bool& bitOs, bool& bitUsr)
@@ -93,6 +189,33 @@ void ProfilerDataDBWriter::DecodeSamplingEvent(EventMaskType encoded, gtUInt16& 
     unitMask = (encoded >> 16) & 0xFFU;
     bitOs = (encoded >> 25) & 1U;
     bitUsr = (encoded >> 24) & 1U;
+}
+
+void ProfilerDataDBWriter::PackSamplingConfigInfo(gtVector<std::pair<EventMaskType, gtUInt32>>& events,
+    AMDTProfileSamplingConfigVec& samplingConfigs)
+{
+    samplingConfigs.reserve(events.size());
+
+    for (const auto& event : events)
+    {
+        AMDTProfileSamplingConfig samplingConfig;
+        gtUInt16 eventSel;
+        gtUByte unitMask;
+        bool user;
+        bool os;
+
+        DecodeSamplingEvent(event.first, eventSel, unitMask, os, user);
+
+        // Use eventMask as id, clear the unused 6 MSBs in the eventMask value
+        samplingConfig.m_id = event.first & 0x3FFFFFF;
+        samplingConfig.m_hwEventId = eventSel;
+        samplingConfig.m_unitMask = unitMask;
+        samplingConfig.m_osMode = os;
+        samplingConfig.m_userMode = user;
+        samplingConfig.m_samplingInterval = event.second;
+
+        samplingConfigs.emplace_back(samplingConfig);
+    }
 }
 
 bool ProfilerDataDBWriter::InitializeEventsXMLFile(gtUInt32 cpuFamily, gtUInt32 cpuModel, EventsFile& eventsFile)
@@ -148,6 +271,214 @@ gtString ProfilerDataDBWriter::ConvertQtToGTString(const QString& inputStr)
     return str;
 }
 
+void ProfilerDataDBWriter::PackCounterInfo(gtVector<EventMaskType>& events, AMDTProfileCounterDescVec& counterInfo)
+{
+    EventsFile eventsFile;
+    bool eventsFileAvbl = InitializeEventsXMLFile(m_cpuFamily, m_cpuModel, eventsFile);
+    counterInfo.reserve(events.size());
+
+    for (auto samplingEvent : events)
+    {
+        gtUInt16 eventSel;
+        gtUByte unitMask;
+        bool user, os;
+
+        DecodeSamplingEvent(samplingEvent, eventSel, unitMask, os, user);
+
+        AMDTProfileCounterDesc counterDesc;
+        counterDesc.m_hwEventId = eventSel;
+        CpuEvent* pCpuEvent;
+
+        if (IsTimerEvent(eventSel))
+        {
+            counterDesc.m_name = L"Timer";
+            counterDesc.m_abbrev = L"Timer";
+            counterDesc.m_description = L"Timer";
+        }
+        else if (eventsFileAvbl && eventsFile.FindEventByValue(eventSel, &pCpuEvent))
+        {
+            counterDesc.m_name = ConvertQtToGTString(pCpuEvent->name);
+            counterDesc.m_abbrev = ConvertQtToGTString(pCpuEvent->abbrev);
+            counterDesc.m_description = ConvertQtToGTString(pCpuEvent->description);
+        }
+        else
+        {
+            counterDesc.m_name = L"Unknown";
+            counterDesc.m_abbrev = L"Unknown";
+            counterDesc.m_description = L"Unknown";
+        }
+
+        // This can have duplicate events? But will be handled while inserting into db
+        counterInfo.emplace_back(counterDesc);
+    }
+
+    eventsFile.Close();
+}
+
+void ProfilerDataDBWriter::Write(TranslatedDataType type, void* data)
+{
+    if (nullptr != data)
+    {
+        switch (type)
+        {
+        case TRANSLATED_DATA_TYPE_SESSION_INFO:
+        {
+            AMDTProfileSessionInfo *sessionInfo = reinterpret_cast<AMDTProfileSessionInfo*>(data);
+            m_cpuModel = sessionInfo->m_cpuModel;
+            m_cpuFamily = sessionInfo->m_cpuFamily;
+            m_pCpuProfDbAdapter->InsertSessionInfo(*sessionInfo);
+            delete sessionInfo;
+            break;
+        }
+        case TRANSLATED_DATA_TYPE_TOPOLOGY_INFO:
+        {
+            CPAdapterTopologyMap *topologyInfo = reinterpret_cast<CPAdapterTopologyMap*>(data);
+            m_pCpuProfDbAdapter->InsertTopology(*topologyInfo);
+            delete topologyInfo;
+            break;
+        }
+        case TRANSLATED_DATA_TYPE_EVENT_INFO:
+        {
+            gtVector<EventMaskType> *eventVec = reinterpret_cast<gtVector<EventMaskType>*>(data);
+            AMDTProfileCounterDescVec counterInfo;
+            PackCounterInfo(*eventVec, counterInfo);
+            m_pCpuProfDbAdapter->InsertCounterInfo(counterInfo);
+            delete eventVec;
+            break;
+        }
+        case TRANSLATED_DATA_TYPE_SAMPLINGCONFIG_INFO:
+        {
+            gtVector<std::pair<EventMaskType, gtUInt32>> *samplingVec = reinterpret_cast<gtVector<std::pair<EventMaskType, gtUInt32>>*>(data);
+            AMDTProfileSamplingConfigVec samplingInfo;
+            PackSamplingConfigInfo(*samplingVec, samplingInfo);
+            m_pCpuProfDbAdapter->InsertSamplingConfigInfo(samplingInfo);
+            delete samplingVec;
+            break;
+        }
+        case TRANSLATED_DATA_TYPE_MODULE_INFO:
+        {
+            CPAModuleList *moduleList = reinterpret_cast<CPAModuleList*>(data);
+            if (moduleList->size() > 0)
+            {
+                m_pCpuProfDbAdapter->InsertModuleInfo(*moduleList);
+            }
+            delete moduleList;
+            break;
+        }
+        case TRANSLATED_DATA_TYPE_PROCESS_INFO:
+        {
+            CPAProcessList *processList = reinterpret_cast<CPAProcessList*>(data);
+            if (processList->size() > 0)
+            {
+                m_pCpuProfDbAdapter->InsertProcessInfo(*processList);
+            }
+            delete processList;
+            break;
+        }
+        case TRANSLATED_DATA_TYPE_THREAD_INFO:
+        {
+            CPAProcessThreadList *procThreadIdList = reinterpret_cast<CPAProcessThreadList*>(data);
+            if (procThreadIdList->size() > 0)
+            {
+                m_pCpuProfDbAdapter->InsertProcessThreadInfo(*procThreadIdList);
+            }
+            delete procThreadIdList;
+            break;
+        }
+        case TRANSLATED_DATA_TYPE_MODINSTANCE_INFO:
+        {
+            CPAModuleInstanceList *modInstanceList = reinterpret_cast<CPAModuleInstanceList*>(data);
+            if (modInstanceList->size() > 0)
+            {
+                m_pCpuProfDbAdapter->InsertModuleInstanceInfo(*modInstanceList);
+            }
+            modInstanceList->clear();
+            break;
+        }
+        case TRANSLATED_DATA_TYPE_CORECONFIG_INFO:
+        {
+            CPACoreSamplingConfigList *coreConfigList =  reinterpret_cast<CPACoreSamplingConfigList*>(data);
+            m_pCpuProfDbAdapter->InsertCoreSamplingConfigInfo(*coreConfigList);
+            delete coreConfigList;
+            break;
+        }
+        case TRANSLATED_DATA_TYPE_FUNCTION_INFO:
+        {
+            CPAFunctionInfoList *funcList = reinterpret_cast<CPAFunctionInfoList*>(data);
+            if (funcList->size() > 0)
+            {
+                m_pCpuProfDbAdapter->InsertFunctionInfo(*funcList);
+            }
+            delete funcList;
+            break;
+        }
+        case TRANSLATED_DATA_TYPE_SAMPLE_INFO:
+        {
+            CPASampeInfoList *sampleList = reinterpret_cast<CPASampeInfoList*>(data);
+            if (sampleList->size() > 0)
+            {
+                m_pCpuProfDbAdapter->InsertSamples(*sampleList);
+            }
+            delete sampleList;
+            break;
+        }
+        case TRANSLATED_DATA_TYPE_CSS_FRAME_INFO:
+        {
+            CPACallStackFrameInfoList *csFrameInfoList = reinterpret_cast<CPACallStackFrameInfoList*>(data);
+            if (csFrameInfoList->size() > 0)
+            {
+                m_pCpuProfDbAdapter->InsertCallStackFrames(*csFrameInfoList);
+            }
+            delete csFrameInfoList;
+            break;
+        }
+        case TRANSLATED_DATA_TYPE_CSS_LEAF_INFO:
+        {
+            CPACallStackLeafInfoList  *csLeafInfoList = reinterpret_cast<CPACallStackLeafInfoList*>(data);
+            if (csLeafInfoList->size() > 0)
+            {
+                m_pCpuProfDbAdapter->InsertCallStackLeafs(*csLeafInfoList);
+            }
+            delete csLeafInfoList;
+            break;
+        }
+        default:
+        {
+            break;
+        }
+        }
+    }
+}
+#if 0
+void ProfilerDataDBWriter::PackSessionInfo(const CpuProfileInfo& profileInfo, gtUInt64 cpuAffinity, AMDTProfileSessionInfo& sessionInfo)
+{
+    sessionInfo.m_targetAppPath = profileInfo.m_targetPath;
+    sessionInfo.m_targetAppWorkingDir = profileInfo.m_wrkDirectory;
+    sessionInfo.m_targetAppCmdLineArgs = profileInfo.m_cmdArguments;
+    sessionInfo.m_targetAppEnvVars = profileInfo.m_envVariables;
+    sessionInfo.m_systemDetails = profileInfo.m_osName;
+    sessionInfo.m_sessionScope = profileInfo.m_profScope;
+    sessionInfo.m_sessionType = profileInfo.m_profType;
+    sessionInfo.m_sessionDir = profileInfo.m_profDirectory;
+    sessionInfo.m_sessionStartTime = profileInfo.m_profStartTime;
+    sessionInfo.m_sessionEndTime = profileInfo.m_profEndTime;
+    sessionInfo.m_cssEnabled = profileInfo.m_isCSSEnabled;
+    sessionInfo.m_unwindDepth = static_cast<gtUInt16>(profileInfo.m_cssUnwindDepth);
+    sessionInfo.m_unwindScope = static_cast<gtUInt16>(profileInfo.m_cssScope);
+    sessionInfo.m_cssFPOEnabled = profileInfo.m_isCssSupportFpo;
+    sessionInfo.m_cpuFamily = profileInfo.m_cpuFamily;
+    sessionInfo.m_cpuModel = profileInfo.m_cpuModel;
+    sessionInfo.m_coreAffinity = cpuAffinity;
+}
+
+void ProfilerDataDBWriter::PackCoreTopology(const CoreTopologyMap& coreTopology, CPAdapterTopologyMap& cpaTopology)
+{
+    for (const auto& t : coreTopology)
+    {
+        cpaTopology.emplace_back(static_cast<gtUInt32>(t.first), t.second.processor, t.second.numaNode);
+    }
+}
+
 void ProfilerDataDBWriter::PackSamplingEvents(const CpuProfileInfo& profileInfo,
                                               AMDTProfileCounterDescVec& events,
                                               AMDTProfileSamplingConfigVec& samplingConfigs)
@@ -159,13 +490,11 @@ void ProfilerDataDBWriter::PackSamplingEvents(const CpuProfileInfo& profileInfo,
 
     for (const auto& samplingEvent : profileEvents)
     {
+        AMDTProfileSamplingConfig samplingConfig;
         gtUInt16 eventSel;
         gtUByte unitMask;
         bool user;
         bool os;
-
-        AMDTProfileCounterDesc counterDesc;
-        AMDTProfileSamplingConfig samplingConfig;
 
         DecodeSamplingEvent(samplingEvent.eventMask, eventSel, unitMask, os, user);
 
@@ -177,6 +506,9 @@ void ProfilerDataDBWriter::PackSamplingEvents(const CpuProfileInfo& profileInfo,
         samplingConfig.m_userMode = user;
         samplingConfig.m_samplingInterval = samplingEvent.eventCount;
 
+        samplingConfigs.emplace_back(samplingConfig);
+
+        AMDTProfileCounterDesc counterDesc;
         counterDesc.m_hwEventId = eventSel;
         CpuEvent* pCpuEvent;
         gtString eventName;
@@ -199,8 +531,6 @@ void ProfilerDataDBWriter::PackSamplingEvents(const CpuProfileInfo& profileInfo,
             counterDesc.m_abbrev = L"Unknown";
             counterDesc.m_description = L"Unknown";
         }
-
-        samplingConfigs.emplace_back(samplingConfig);
 
         // This can have duplicate events? But will be handled while inserting into db
         events.emplace_back(counterDesc);
@@ -485,3 +815,4 @@ bool ProfilerDataDBWriter::Write(const CPACallStackLeafInfoList& csLeafInfoList)
 
     return true;
 }
+#endif

@@ -116,6 +116,7 @@ const std::vector<std::string> SQL_CREATE_DB_STMTS_AGGREGATION =
     "CREATE TABLE CallstackLeaf (callstackId INTEGER, processId INTEGER, functionId INTEGER, offset INTEGER, samplingConfigurationId INTEGER, selfSamples INTEGER)", // FOREIGN KEY(functionId) REFERENCES Function(id)
     //"CREATE TABLE Callgraph (id INTEGER NOT NULL, callerId INTEGER, calleeId INTEGER, edgeLevel INTEGER)", // FOREIGN KEY(callerId) REFERENCES Function(id), FOREIGN KEY(calleeId) REFERENCES Function(id), FOREIGN KEY(samplingConfigurationId) REFERENCES SamplingConfiguration(id)
     //"CREATE TABLE CallgraphSampleAggregation (callgraphId INTEGER NOT NULL, sampleContextId INTEGER, selfSamples INTEGER, deepSamples INTEGER)", // FOREIGN KEY(callgraphId) REFERENCES Callgraph(id), FOREIGN KEY(sampleContextId) REFERENCES SampleContext(id)
+    //"CREATE UNIQUE INDEX 'unique_samples' ON SampleContext (processThreadId, moduleInstanceId, coreSamplingConfigurationId, functionId, offset)",
 };
 
 // Migrate table for version 1 - add new columns in tables "devices" and "counters"
@@ -215,6 +216,7 @@ public:
             sqlite3_finalize(m_pModuleInstanceInsertStmt);
             sqlite3_finalize(m_pProcessThreadInsertStmt);
             sqlite3_finalize(m_pSampleContextInsertStmt);
+            sqlite3_finalize(m_pSampleContextUpdateStmt);
             sqlite3_finalize(m_pFunctionInfoInsertStmt);
             sqlite3_finalize(m_pModuleIdQueryStmt);
             sqlite3_finalize(m_pSamplingConfigIdQueryStmt);
@@ -222,6 +224,8 @@ public:
             sqlite3_finalize(m_pModuleInstanceIdQueryStmt);
             sqlite3_finalize(m_pProcessThreadIdQueryStmt);
             sqlite3_finalize(m_pFunctionIdQueryStmt);
+            sqlite3_finalize(m_pCallStackFrameInsertStmt);
+            sqlite3_finalize(m_pCallStackLeafInsertStmt);
         }
 
         if (m_isCurrentDbOpenForRead)
@@ -477,6 +481,17 @@ public:
         return ret;
     }
 
+    bool PrepareUpdateSampleContextStatement()
+    {
+        bool ret = false;
+
+        const char* pCsSqlCmd = "UPDATE OR IGNORE SampleContext SET count=count+? WHERE processThreadId=? AND moduleInstanceId=? AND coreSamplingConfigurationId=? AND functionId=? AND offset=?;";
+        int rc = sqlite3_prepare_v2(m_pWriteDbConn, pCsSqlCmd, -1, &m_pSampleContextUpdateStmt, nullptr);
+        ret = (rc == SQLITE_OK);
+
+        return ret;
+    }
+
     bool PrepareInsertFunctionInfoStatement()
     {
         bool ret = false;
@@ -598,6 +613,7 @@ public:
                    PrepareInsertFunctionInfoStatement() &&
                    PrepareGetFunctionIdStatement() &&
                    PrepareInsertSampleContextStatement() &&
+                   PrepareUpdateSampleContextStatement() &&
                    PrepareInsertCallStackFrameStatement() &&
                    PrepareInsertCallStackLeafStatement();
 
@@ -1469,19 +1485,42 @@ public:
                 m_isFirstInsert = false;
             }
 
-            sqlite3_bind_int64(m_pSampleContextInsertStmt, 1, ptId);
-            sqlite3_bind_int(m_pSampleContextInsertStmt, 2, moduleInstanceId);
-            sqlite3_bind_int64(m_pSampleContextInsertStmt, 3, coreSamplingConfigId);
-            sqlite3_bind_int(m_pSampleContextInsertStmt, 4, functionId);
-            sqlite3_bind_int64(m_pSampleContextInsertStmt, 5, offset);
-            sqlite3_bind_int64(m_pSampleContextInsertStmt, 6, count);
+            // Try to update the row assuming it is already inserted.
+            sqlite3_bind_int64(m_pSampleContextUpdateStmt, 1, count);
+            sqlite3_bind_int64(m_pSampleContextUpdateStmt, 2, ptId);
+            sqlite3_bind_int(m_pSampleContextUpdateStmt, 3, moduleInstanceId);
+            sqlite3_bind_int64(m_pSampleContextUpdateStmt, 4, coreSamplingConfigId);
+            sqlite3_bind_int(m_pSampleContextUpdateStmt, 5, functionId);
+            sqlite3_bind_int64(m_pSampleContextUpdateStmt, 6, offset);
 
-            if (SQLITE_DONE == sqlite3_step(m_pSampleContextInsertStmt))
+            if (SQLITE_DONE == sqlite3_step(m_pSampleContextUpdateStmt))
             {
-                ret = true;
+                int changes = sqlite3_changes(m_pWriteDbConn);
+
+                // Row update attempt failed, insert a new row.
+                if (0 == changes)
+                {
+                    sqlite3_bind_int64(m_pSampleContextInsertStmt, 1, ptId);
+                    sqlite3_bind_int(m_pSampleContextInsertStmt, 2, moduleInstanceId);
+                    sqlite3_bind_int64(m_pSampleContextInsertStmt, 3, coreSamplingConfigId);
+                    sqlite3_bind_int(m_pSampleContextInsertStmt, 4, functionId);
+                    sqlite3_bind_int64(m_pSampleContextInsertStmt, 5, offset);
+                    sqlite3_bind_int64(m_pSampleContextInsertStmt, 6, count);
+
+                    if (SQLITE_DONE == sqlite3_step(m_pSampleContextInsertStmt))
+                    {
+                        ret = true;
+                    }
+
+                    sqlite3_reset(m_pSampleContextInsertStmt);
+                }
+                else // Row update was successful.
+                {
+                    ret = true;
+                }
             }
 
-            sqlite3_reset(m_pSampleContextInsertStmt);
+            sqlite3_reset(m_pSampleContextUpdateStmt);
         }
 
         return ret;
@@ -4412,7 +4451,7 @@ public:
 
     bool GetFunctionInfo(AMDTFunctionId funcId, AMDTProfileFunctionInfo& funcInfo)
     {
-        bool ret = false;      
+        bool ret = false;
         std::stringstream query;
         query << "SELECT name, moduleId, startOffset, size from Function where id = ? ;";
 
@@ -4957,13 +4996,13 @@ public:
         CallstackFrameVec&  leafs)
     {
         bool ret = false;
-        
+
         ret = GetCallstackLeafData__(processId,
                                      counterId,
                                      callstackId,
                                      leafs,
                                      false);
-    
+
         //ret = GetCallstackLeafData__(processId,
         //                             counterId,
         //                             callstackId,
@@ -5250,6 +5289,7 @@ public:
     sqlite3_stmt* m_pModuleInstanceInsertStmt = nullptr;
     sqlite3_stmt* m_pProcessThreadInsertStmt = nullptr;
     sqlite3_stmt* m_pSampleContextInsertStmt = nullptr;
+    sqlite3_stmt* m_pSampleContextUpdateStmt = nullptr;
     sqlite3_stmt* m_pFunctionInfoInsertStmt = nullptr;
     sqlite3_stmt* m_pModuleIdQueryStmt = nullptr;
     sqlite3_stmt* m_pSamplingConfigIdQueryStmt = nullptr;
