@@ -425,14 +425,12 @@ private:
                          PrdReader& tPrdReader,
                          const MissedInfoType* pMissedInfo,
                          const PidProcessMap& processMap,
-                         NameModuleMap& moduleMap,
-                         const ModInstanceMap& modInstanceMap);
+                         NameModuleMap& moduleMap);
 
     bool WriteProfileFile(const gtString& path,
                           const PidProcessMap* procMap,
                           const NameModuleMap* modMap,
                           const CoreTopologyMap* pTopMap,
-                          const ModInstanceMap* pModInstanceMap,
                           gtUInt32 num_cpus,
                           gtUInt64 missedCount = 0,
                           int cpuFamily = 0, //FAMILY_UNKNOWN

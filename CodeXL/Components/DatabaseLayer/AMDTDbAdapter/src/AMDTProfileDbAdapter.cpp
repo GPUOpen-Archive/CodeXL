@@ -184,6 +184,37 @@ bool amdtProfileDbAdapter::InsertTopology(const CPAdapterTopologyMap& topologyMa
     return ret;
 }
 
+bool amdtProfileDbAdapter::InsertSamplingConfigInfo(const AMDTProfileSamplingConfigVec& configVec)
+{
+    bool ret = false;
+
+    for (const auto& config : configVec)
+    {
+        bool edge = false;
+        ret = m_pDbAccessor->InsertSamplingConfig(config.m_id,
+            static_cast<AMDTUInt16>(config.m_hwEventId),
+            config.m_samplingInterval,
+            config.m_unitMask,
+            config.m_userMode,
+            config.m_osMode,
+            edge);
+    }
+
+    return ret;
+}
+
+bool amdtProfileDbAdapter::InsertCounterInfo(AMDTProfileCounterDescVec& events)
+{
+    bool ret = false;
+
+    for (const auto& event : events)
+    {
+        ret = m_pDbAccessor->InsertSamplingCounter(event.m_hwEventId, event.m_name, event.m_abbrev, event.m_description);
+    }
+
+    return ret;
+}
+
 bool amdtProfileDbAdapter::InsertSamplingEvents(AMDTProfileCounterDescVec& events, const AMDTProfileSamplingConfigVec& configVec)
 {
     bool ret = false;

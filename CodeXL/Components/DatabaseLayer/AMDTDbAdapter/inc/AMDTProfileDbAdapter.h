@@ -41,6 +41,8 @@ public:
     bool InsertCounterEnabled(int counterId, int quantizedTime);
     bool InsertCounterDisabled(int counterId, int quantizedTime);
 
+    bool InsertCounterInfo(AMDTProfileCounterDescVec& events);
+    bool InsertSamplingConfigInfo(const AMDTProfileSamplingConfigVec& configVec);
     bool InsertSamplingEvents(AMDTProfileCounterDescVec& events, const AMDTProfileSamplingConfigVec& configVec);
 
     bool InsertCoreSamplingConfigInfo(const CPACoreSamplingConfigList& coreConfigList);
