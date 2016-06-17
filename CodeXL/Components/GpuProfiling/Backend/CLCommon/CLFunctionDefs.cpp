@@ -40,14 +40,15 @@ void InitNextCLFunctions(cl_icd_dispatch_table& table)
     #endif
 #endif
 
-/// static instance used to get entry points from amdocl lib
-static OpenCLModule g_OpenCLModule(AMDOCL_MODULE_NAME);
-
-/// static flag indicating if we've initialized the g_realDispatchTable with the amd ocl entry points
-static bool g_OpenCLModuleInit = false;
 
 void InitRealCLFunctions()
 {
+    /// static flag indicating if we've initialized the g_realDispatchTable with the amd ocl entry points
+    static bool g_OpenCLModuleInit = false;
+
+    /// static instance used to get entry points from amdocl lib
+    static OpenCLModule g_OpenCLModule(AMDOCL_MODULE_NAME);
+
     if (!g_OpenCLModuleInit)
     {
         if (g_OpenCLModule.OpenCLLoaded() == OpenCLModule::OpenCL_None)
