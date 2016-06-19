@@ -226,6 +226,8 @@ bool gpProjectSettingsExtension::SaveCurrentSettings()
                 settings.m_numFramesToCapture = m_numFramesToCapture;
 
                 m_bUpdateSettings = false;
+                gpUIManager::Instance()->UpdateUI();
+
             }
 
             retVal = true;

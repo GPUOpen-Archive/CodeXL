@@ -722,6 +722,14 @@ void gpSessionView::OnUpdateUI()
             m_pCaptureButtonCPU->setEnabled(pModeManager->IsCaptureEnabled());
             m_pCaptureButtonGPU->setEnabled(pModeManager->IsCaptureEnabled());
             m_pStopButton->setEnabled(pModeManager->IsStopEnabled());
+
+            gpExecutionMode* pFrameAnalysisManager = ProfileManager::Instance()->GetFrameAnalysisModeManager();
+            gpProjectSettings& settings = pFrameAnalysisManager->ProjectSettings();
+            QString tooltipStr = QString(GPU_STR_dashboard_CaptureTooltip).arg(settings.m_numFramesToCapture);
+            m_pCaptureButton->setToolTip(tooltipStr);
+            m_pCaptureButtonCPU->setToolTip(tooltipStr);
+            m_pCaptureButtonGPU->setToolTip(tooltipStr);
+
         }
     }
 }
