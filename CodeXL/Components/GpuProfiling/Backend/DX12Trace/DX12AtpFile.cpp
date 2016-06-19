@@ -234,7 +234,7 @@ bool DX12AtpFilePart::ParseSectionHeaderLine(const string& line)
     {
         retVal = true;
 
-        if (line.find("//==GPU Trace==") == 0)
+        if (line.find("//==GPU Trace==") == 0 || (line.find("//Command") == 0))
         {
             // Switch to GPU trace
             m_currentParsedTraceType = GPU;
@@ -272,10 +272,7 @@ bool DX12AtpFilePart::ParseSectionHeaderLine(const string& line)
 
         }
     }
-    else if ((line[0] == '0') && (line[1] == 'x'))
-    {
-        m_currentParsedTraceType = GPU;
-    }
+
     return retVal;
 }
 
