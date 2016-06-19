@@ -29,7 +29,7 @@
 static const int RANGE_BOUNDING_LINE_WIDTH = 2;
 
 #define RIBBON_WIDTH 2
-#define CLOSED_HEIGHT 16 // height of the image 16 pixels
+#define CLOSED_HEIGHT acScalePixelSizeToDisplayDPI(16)
 #define BANNER_SPACING 6
 #define MINIMUM_BANNER_OPEN 16
 
@@ -44,6 +44,7 @@ static const int RANGE_BOUNDING_LINE_WIDTH = 2;
 static const QString& AC_RIBBON_TOOLTIP_BORDER_COLOR = "rgb(185, 185, 185)";
 static const QString& AC_RIBBON_TOOLTIP_LINE_COLOR = "rgba(185, 185, 185, 255)";
 static const QString& AC_RIBBON_TOOLTIP_BG_COLOR = "rgba(231, 232, 236, 220)";
+
 
 // global service function for the filters
 acRibbonManager* GetManager(QObject* pObject)
@@ -434,12 +435,13 @@ void acRibbonManager::AddRibbon(QWidget* pRibbon, QString ribbonName, int initia
             QHBoxLayout* pHBox = new QHBoxLayout;
             QPixmap buttonIcon;
             bool rc = acSetIconInPixmap(buttonIcon, isOpen ? AC_ICON_RIBBON_CLOSE : AC_ICON_RIBBON_OPEN, AC_16x16_ICON);
+            int closeHeight = CLOSED_HEIGHT;
+            QPixmap scaledIcon = buttonIcon.scaled(closeHeight, closeHeight);
             GT_ASSERT(rc);
             pButton = new acRibbonManagerButton(pRibbon);
-            pButton->setPixmap(buttonIcon);
+            pButton->setPixmap(scaledIcon);
             pButton->setContentsMargins(0, 0, 0, 0);
             pButton->setEnabled(true);
-            int closeHeight = acScalePixelSizeToDisplayDPI(CLOSED_HEIGHT);
             pButton->setMaximumSize(closeHeight, closeHeight);
             pButton->setMinimumHeight(closeHeight);
             rc = connect(pButton, SIGNAL(ButtonPressed(QWidget*)), this, SLOT(OnButtonPressed(QWidget*)));
@@ -760,7 +762,9 @@ void acRibbonManager::ToggleRibbonState(int index)
         QPixmap actionIcon;
         bool rc = acSetIconInPixmap(actionIcon, m_ribbonDataVector[index].m_isVisible ? AC_ICON_RIBBON_CLOSE : AC_ICON_RIBBON_OPEN, AC_16x16_ICON);
         GT_ASSERT(rc);
-        m_ribbonDataVector[index].m_pButton->setPixmap(actionIcon);
+        int closeHeight = CLOSED_HEIGHT;
+        QPixmap scaledIcon = actionIcon.scaled(closeHeight, closeHeight);
+        m_ribbonDataVector[index].m_pButton->setPixmap(scaledIcon);
 
         // Set the splitter handle state
         if (index < numRibbons - 1)
@@ -1539,7 +1543,9 @@ void acRibbonManager::LastRibbonCheck(bool openAction)
         GT_ASSERT(rc);
         GT_IF_WITH_ASSERT(m_ribbonDataVector[openRibbonIndex].m_pButton)
         {
-            m_ribbonDataVector[openRibbonIndex].m_pButton->setPixmap(actionIcon);
+            int closeHeight = CLOSED_HEIGHT;
+            QPixmap scaledIcon = actionIcon.scaled(closeHeight, closeHeight);
+            m_ribbonDataVector[openRibbonIndex].m_pButton->setPixmap(scaledIcon);
             m_ribbonDataVector[openRibbonIndex].m_isEnabled = openAction;
         }
     }
