@@ -51,6 +51,7 @@ gpTraceTable::gpTraceTable(osThreadId threadID, gpTraceDataContainer* pDataConta
     setSelectionMode(QAbstractItemView::ExtendedSelection);
     setMouseTracking(true);
     verticalHeader()->setDefaultSectionSize(acScaleSignedPixelSizeToDisplayDPI(GP_DEFAULT_ROW_HEIGHT));
+    verticalHeader()->setVisible(false);
     QHeaderView* horzHeader = horizontalHeader();
     horzHeader->setSectionResizeMode(QHeaderView::Interactive);
     horzHeader->setHighlightSections(false);
@@ -85,6 +86,7 @@ gpTraceTable::gpTraceTable(const QString& queueName, gpTraceDataContainer* pData
         setSelectionMode(QAbstractItemView::ExtendedSelection);
         setMouseTracking(true);
         verticalHeader()->setDefaultSectionSize(acScaleSignedPixelSizeToDisplayDPI(GP_DEFAULT_ROW_HEIGHT));
+        verticalHeader()->setVisible(false);
 
         // Set the horizontal header properties
         QHeaderView* pHorizHeader = horizontalHeader();
