@@ -133,9 +133,9 @@ void CpuGlobalSettings::updateGui(bool bReset)
     else if (pOptions != nullptr)
     {
         m_pAddDebugDirs->setChecked(pOptions->addDebug);
-        m_pDebugDirText->setText(pOptions->debugSearchPaths);
+        m_pDebugDirText->setText(pOptions->debugSearchPaths.trimmed());
         m_pUseSymbolServer->setChecked(pOptions->enableSymServer);
-        m_pSymbolDirText->setText(pOptions->symbolDownloadDir);
+        m_pSymbolDirText->setText(pOptions->symbolDownloadDir.trimmed());
 
         // Just for extra safety.
         if (pOptions->disassemblyInstrcutionsChunkSize < MIN_DISASSEMBLY_INSTRUCTIONS_BLOCK_SIZE ||
