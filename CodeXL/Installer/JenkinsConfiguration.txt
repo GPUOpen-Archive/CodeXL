@@ -283,18 +283,50 @@ Version Install
     MakeWriteable "[CXLPATH]\Installer\CodeXL\setup.aip"
 
 
+Image Release
+    Define "ATZIPDIR" "[CXLPATH]\CAIT"
+    MKDIR "[ATZIPDIR]"
+    Define "ATx86DIR" "[ATZIPDIR]\x86"
+    Define "ATx64DIR" "[ATZIPDIR]\x86_64"
+    
+    // SET x86 files
+    XCopy "[GPUDPATH]\AMDTAutomaticTester\x86\*.*" "[ATZIPDIR]\x86\"
+    XCopy "[ROOTPATH]\Common\Lib\AMD\OpenCLDebugAPI\1.3\lib\x86\AMDOpenCLDebug.dll" "[ATx86DIR]\"
+    XCopy "[CXLPATH]\Output\Release\bin\CXLApiClasses.dll" "[ATx86DIR]\"
+    XCopy "[CXLPATH]\Output\Release\bin\CXLApiFunctions.dll" "[ATx86DIR]\"
+    XCopy "[CXLPATH]\Output\Release\bin\CXLBaseTools.dll" "[ATx86DIR]\"
+    XCopy "[CXLPATH]\Output\Release\bin\CXLOSWrappers.dll" "[ATx86DIR]\"
+    XCopy "[CXLPATH]\Output\Release\bin\CXLOSAPIWrappers.dll" "[ATx86DIR]\"
+    XCopy "[CXLPATH]\Output\Release\bin\CXLProcessDebugger.dll" "[ATx86DIR]\"
+    XCopy "[CXLPATH]\Output\Release\bin\CXLRemoteClient.dll" "[ATx86DIR]\"	
+    XCopy "[CXLPATH]\Output\Release\bin\CXLServerUtilities.dll" "[ATx86DIR]\"
+    XCopy "[CXLPATH]\Output\Release\bin\CodeXLGpuDebuggingTest.exe" "[ATx86DIR]\"
+    XCopy "C:\Program Files (x86)\Windows Kits\10\Debuggers\x86\dbghelp.dll" "[ATx86DIR]\"
+    XCopy "[CXLPATH]\Output\Release\bin\spies\*.*" "[ATx86DIR]\spies\"
+    XCopy "[GPUDPATH]\AMDTAutomaticTester\GoldMasters_APPSDK_3_0\BitonicSort_StepTest.log" "[ATx86DIR]\GoldMasters_APPSDK_3_0\"
+    XCopy "[GPUDPATH]\AMDTAutomaticTester\GoldMasters_APPSDK_3_0\MatrixMulDouble_StepTest.log" "[ATx86DIR]\GoldMasters_APPSDK_3_0\"
+    XCopy "[GPUDPATH]\AMDTAutomaticTester\GoldMasters_APPSDK_3_0\SobelFilter_StepTest.log" "[ATx86DIR]\GoldMasters_APPSDK_3_0\"
+    XCopy "[GPUDPATH]\AMDTAutomaticTester\GoldMasters_APPSDK_3_0\URNG_StepIntoTest.log" "[ATx86DIR]\GoldMasters_APPSDK_3_0\"
 
+    // Set x64 files
+    XCopy "[GPUDPATH]\AMDTAutomaticTester\x86_64\*.*" "[ATZIPDIR]\x86_64\"
+    XCopy "[ROOTPATH]\Common\Lib\AMD\OpenCLDebugAPI\1.3\lib\x64\AMDOpenCLDebug*.dll" "[ATx64DIR]\"
+    XCopy "[CXLPATH]\Output\Release\bin\CXLApiClasses*.dll" "[ATx64DIR]\"
+    XCopy "[CXLPATH]\Output\Release\bin\CXLApiFunctions*.dll" "[ATx64DIR]\"
+    XCopy "[CXLPATH]\Output\Release\bin\CXLBaseTools*.dll" "[ATx64DIR]\"
+    XCopy "[CXLPATH]\Output\Release\bin\CXLOSWrappers*.dll" "[ATx64DIR]\"
+    XCopy "[CXLPATH]\Output\Release\bin\CXLOSAPIWrappers*.dll" "[ATx64DIR]\"
+    XCopy "[CXLPATH]\Output\Release\bin\CXLProcessDebugger*.dll" "[ATx64DIR]\"
+    XCopy "[CXLPATH]\Output\Release\bin\CXLRemoteClient*.dll" "[ATx64DIR]\"	
+    XCopy "[CXLPATH]\Output\Release\bin\CXLRemoteDebuggingServer*.exe" "[ATx64DIR]\"  
+    XCopy "[CXLPATH]\Output\Release\bin\CXLServerUtilities*.dll" "[ATx64DIR]\"
+    XCopy "[CXLPATH]\Output\Release\bin\CodeXLGpuDebuggingTest*.exe" "[ATx64DIR]\"
+    XCopy "[CXLPATH]\Output\Release\bin\spies64\*.*" "[ATx64DIR]\spies64\"
+    XCopy "[GPUDPATH]\AMDTAutomaticTester\GoldMasters_APPSDK_3_0\BitonicSort_StepTest.log" "[ATx64DIR]\GoldMasters_APPSDK_3_0\"
+    XCopy "[GPUDPATH]\AMDTAutomaticTester\GoldMasters_APPSDK_3_0\MatrixMulDouble_StepTest.log" "[ATx64DIR]\GoldMasters_APPSDK_3_0\"
+    XCopy "[GPUDPATH]\AMDTAutomaticTester\GoldMasters_APPSDK_3_0\SobelFilter_StepTest.log" "[ATx64DIR]\GoldMasters_APPSDK_3_0\"
+    XCopy "[GPUDPATH]\AMDTAutomaticTester\GoldMasters_APPSDK_3_0\URNG_StepIntoTest.log" "[ATx64DIR]\GoldMasters_APPSDK_3_0\"
 
+XCopy "[GPUDPATH]\AMDTAutomaticTester\ReadMe.*" "[ATZIPDIR]"
 
-
-
-
-
-
-
-
-
-
-
-
-
+Zip "[CXLPATH]\Installer\CAIT-[MAJOR].[MINOR].[BUILD].zip" "[ATZIPDIR]"
