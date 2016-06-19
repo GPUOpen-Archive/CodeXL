@@ -44,6 +44,7 @@
 #define PP_STR_UnitsPostfixVolt "[V]"
 #define PP_STR_UnitsPostfixWatt "[W]"
 #define PP_STR_UnitsPostfixMHz "[MHz]"
+#define PP_STR_UnitsPostfixPercentage "%"
 #define PP_STR_UnitsPostfixCelsius "[C]"
 #define PP_STR_UnitsPostfixmA "[mA]"
 

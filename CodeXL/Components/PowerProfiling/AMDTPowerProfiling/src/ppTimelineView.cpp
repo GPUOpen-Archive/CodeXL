@@ -1483,7 +1483,7 @@ void ppTimeLineView::InitGraphByCategory(ppDataUtils::GraphViewCategoryType grap
         {
             category = AMDT_PWR_CATEGORY_DVFS;
             graphName = PP_StrTimelineCStateGraphName;
-            unitsStr = AF_STR_EmptyA;
+            unitsStr = PP_STR_UnitsPostfixPercentage;
             break;
         }
 
