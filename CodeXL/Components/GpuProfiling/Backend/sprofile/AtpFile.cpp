@@ -173,16 +173,9 @@ bool AtpFileParser::ParseSectionName(const std::string& input, std::string& sect
     }
     else if (m_atpFileVersion == 1)
     {
+        // ATP Version 1: Section name is formated like: "//API=API_NAME"
+        // remove leading //
         sectionName = input.substr(2);
-        if (input.find("Command") != string::npos)
-        {
-            // ATP Version 1: Section name is formated like: "//==GPU Trace==" make it "GPU Trace"
-            size_t pos = sectionName.find("=");
-            if (pos != string::npos)
-            {
-                sectionName.erase(pos);
-            }
-        }
     }
     else
     {
@@ -277,7 +270,7 @@ bool AtpFileParser::ParseFileSectionsLine(const std::string& sectionLine)
         //ThreadAPICount=156327
         if (sectionLine.length() > 6)
         {
-            isStartingSection = (strncmp(sectionLine.c_str(), "//API=", 6) == 0) || (strncmp(sectionLine.c_str(), "//Command", 9) == 0);
+            isStartingSection = (strncmp(sectionLine.c_str(), "//API=", 6) == 0);
         }
     }
 
