@@ -45,14 +45,18 @@ bool CPUProfileDataTable::m_sIconsInitialized = false;
 bool CPUProfileDataTable::m_CLUNoteShown = true;
 
 
-CPUProfileDataTable::CPUProfileDataTable(QWidget* pParent, const gtVector<CPUProfileDataTable::TableContextMenuActionType>& additionalContextMenuActions, SessionTreeNodeData* pSessionData)
-    : acListCtrl(pParent, CP_CPU_TABLE_ROW_HEIGHT), m_pTableDisplaySettings(nullptr), m_pSessionDisplaySettings(nullptr),
-      m_pProfileReader(nullptr), m_pDisplaySessionData(pSessionData), m_pCLUDelegate(nullptr), m_pEmptyRowTableItem(nullptr),
-      m_pOtherSamplesRowItem(nullptr)
+CPUProfileDataTable::CPUProfileDataTable(QWidget* pParent,
+                                         const gtVector<CPUProfileDataTable::TableContextMenuActionType>& additionalContextMenuActions,
+                                         SessionTreeNodeData* pSessionData)
+    : acListCtrl(pParent, CP_CPU_TABLE_ROW_HEIGHT),
+      m_pDisplaySessionData(pSessionData)
 {
     setSortingEnabled(true);
     setEnablePaste(false);
+
+#if 0
     m_totalSampleCount = 0;
+#endif
 
     // Copy cell items with captions:
     m_shouldCopyColumnHeaders = true;
@@ -61,15 +65,23 @@ CPUProfileDataTable::CPUProfileDataTable(QWidget* pParent, const gtVector<CPUPro
     extendContextMenu(additionalContextMenuActions);
 
     // Connect the sort click slot:
-    bool rc = connect(horizontalHeader(), SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)), this, SLOT(sortIndicatorChanged(int, Qt::SortOrder)));
+    bool rc = connect(horizontalHeader(),
+                      SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)),
+                      this,
+                      SLOT(sortIndicatorChanged(int, Qt::SortOrder)));
+
 
     m_tableRowHasIcon = false;
+
+#if 0
 
     for (int i = 0; i < CPU_TABLE_MAX_VALUES; i++)
     {
         m_elapsedTime[i] = 0;
         m_startTime[i] = 0;
     }
+
+#endif
 
     GT_ASSERT(rc);
 }
@@ -81,6 +93,7 @@ CPUProfileDataTable::~CPUProfileDataTable()
 
 bool CPUProfileDataTable::fillListData()
 {
+#if 0
     // Get the item for the empty table message:
     int newRowIndex = rowCount();
 
@@ -143,9 +156,70 @@ bool CPUProfileDataTable::fillListData()
         // save item
         setRowHidden(newRowIndex, true);
     }
+#endif
+    return true;
+}
+
+bool CPUProfileDataTable::displayTableSummaryData(shared_ptr<cxlProfileDataReader> pProfDataRdr, 
+	shared_ptr<DisplayFilter> pDisplayFilter,
+	int counterIdx)
+{
+    bool retVal = false;
+
+    if (nullptr != pProfDataRdr)
+    {
+        m_pProfDataRdr = pProfDataRdr;
+
+        // Clear table items:
+        clear();
+        clearContents();
+        setColumnCount(0);
+        setRowCount(0);
+
+        if (horizontalHeader()->count() == 0)
+        {
+			//initializeTableHeaders(pDisplayFilter);
+            initializeListHeaders();
+        }
+
+        fillSummaryTables(counterIdx);
+
+        retVal = true;
+
+    }
 
     return true;
 }
+
+#if 0
+bool CPUProfileDataTable::displayTableData(shared_ptr<cxlProfileDataReader> pProfDataRdr,
+                                           shared_ptr<DisplayFilter> diplayFilter)
+{
+    bool retVal = false;
+    GT_IF_WITH_ASSERT(nullptr != pProfDataRdr)
+    {
+        m_pProfDataRdr = pProfDataRdr;
+        m_pDisplayFilter = diplayFilter;
+
+        clear();
+        clearContents();
+        setColumnCount(0);
+        setRowCount(0);
+
+        if (horizontalHeader()->count() == 0)
+        {
+            bool rcHeaders = initializeTableHeaders(diplayFilter);
+            GT_ASSERT(rcHeaders);
+        }
+
+        fillTableData();
+        retVal = true;
+    }
+
+    return retVal;
+}
+
+#endif
 
 bool CPUProfileDataTable::displayProfileData(CpuProfileReader* pProfileReader)
 {
@@ -1154,7 +1228,8 @@ void CPUProfileDataTable::onContextMenuAction()
 
 bool CPUProfileDataTable::HandleHotSpotIndicatorSet()
 {
-    return displayProfileData(m_pProfileReader);
+    //return displayProfileData(m_pProfileReader);
+    return displayTableData(m_pProfDataRdr, m_pDisplayFilter, AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES);
 }
 
 bool CPUProfileDataTable::buildHotSpotIndicatorMap()
@@ -1727,6 +1802,133 @@ int CPUProfileDataTable::GetOtherSamplesItemRowNum() const
     GT_IF_WITH_ASSERT(m_pEmptyRowTableItem != nullptr)
     {
         retVal = m_pOtherSamplesRowItem->row();
+    }
+    return retVal;
+}
+
+bool CPUProfileDataTable::delegateSamplePercent(int colNum)
+{
+    bool retVal = false;
+
+    GT_IF_WITH_ASSERT((m_pProfDataRdr != nullptr) &&
+                      (m_pTableDisplaySettings != nullptr))
+    {
+        acTablePercentItemDelegate* pDelegate = new acTablePercentItemDelegate();
+
+        pDelegate->SetOwnerTable(this);
+        setItemDelegateForColumn(colNum, pDelegate);
+
+        retVal = true;
+    }
+
+    return retVal;
+}
+
+bool CPUProfileDataTable::
+displayTableData(shared_ptr<cxlProfileDataReader> pProfDataRdr,
+                 shared_ptr<DisplayFilter> diplayFilter,
+                 AMDTProcessId procId,
+                 AMDTModuleId modId,
+                 std::vector<AMDTUInt64> moduleIdVec)
+{
+    bool retVal = false;
+
+    GT_IF_WITH_ASSERT(pProfDataRdr != nullptr)
+    {
+        // Set the profile reader:
+        m_pProfDataRdr = pProfDataRdr;
+        m_pDisplayFilter = diplayFilter;
+
+        // Clear table items:
+        clear();
+        clearContents();
+        setColumnCount(0);
+        setRowCount(0);
+        m_totalSampleCount = 0;
+        m_hotSpotCellsMap.clear();
+
+        // Set the headers:
+        bool rcHeaders = true;
+
+        if (horizontalHeader()->count() == 0)
+        {
+            rcHeaders = initializeTableHeaders(diplayFilter);
+            GT_ASSERT(rcHeaders);
+        }
+
+        // Fill the list data:
+        bool rcData = fillTableData(procId, modId, moduleIdVec);
+        GT_ASSERT(rcData);
+
+        retVal = true;
+    }
+#if 0
+    horizontalHeader()->setSortIndicatorShown(false);
+
+    // Perform post process operations on the table:
+    bool rcPost = setHotSpotIndicatorValues();
+    GT_ASSERT(rcPost);
+
+    // Hide the filtered columns specified in display filter:
+    hideFilteredColumns();
+
+    // Perform post process operations on the table:
+    bool rcPercent = true;
+    rcPercent = setPercentValues();
+    GT_ASSERT(rcPercent);
+
+    // Sort the table:
+    sortTable();
+
+    // Make sure that the CLU percent values are displayed as percent:
+    setCLUPercentValues();
+
+    retVal = rcHeaders && rcData && rcPost && rcPercent;
+#endif
+
+    END_TICK_COUNT(DisplayProfileData);
+
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+    OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_DEBUG, L"Elapsed Time: displayProfileData (%u ms)", m_elapsedTime[DisplayProfileData]);
+#endif
+
+    return retVal;
+}
+
+bool CPUProfileDataTable::initializeTableHeaders(shared_ptr<DisplayFilter> diplayFilter)
+{
+    bool retVal = true;
+
+    GT_IF_WITH_ASSERT((diplayFilter != nullptr) && (m_pTableDisplaySettings != nullptr))
+    {
+        // Vector that contain the columns strings according to the current displayed columns:
+        QStringList columnsStringByObjectType;
+        QStringList columnTooltipsByObjectType;
+
+        int tableDispSettingsColsNum = (int)m_pTableDisplaySettings->m_displayedColumns.size();
+
+        for (int i = 0; i < tableDispSettingsColsNum; ++i)
+        {
+            QString colStr, colTooltip;
+
+            bool rc = m_pTableDisplaySettings->colTypeAsString(m_pTableDisplaySettings->m_displayedColumns[i],
+                                                               colStr, colTooltip);
+            GT_ASSERT(rc);
+
+            columnsStringByObjectType << colStr;
+            columnTooltipsByObjectType << colTooltip;
+        }
+
+        std::vector<gtString> selectedCounterList;
+
+        diplayFilter->GetSelectedCounterList(selectedCounterList);
+
+        for (const auto& counter : selectedCounterList)
+        {
+            columnsStringByObjectType << counter.asASCIICharArray();
+        }
+
+        initHeaders(columnsStringByObjectType, false);
     }
     return retVal;
 }

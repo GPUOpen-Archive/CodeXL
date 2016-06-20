@@ -21,6 +21,9 @@
 #include <QWidget>
 #include <QFileInfo>
 
+// cpp includes
+#include <memory>
+
 // Infra:
 #include <AMDTOSWrappers/Include/osFilePath.h>
 #include <AMDTExecutableFormat/inc/ExecutableFile.h>
@@ -47,6 +50,7 @@ class SessionFunctionView;
 class SessionTreeNodeData;
 class CPUSessionTreeItemData;
 class SessionCallGraphView;
+class cxlProfileDataReader;
 
 class CpuSessionWindow : public SharedSessionWindow
 {
@@ -68,7 +72,7 @@ public:
     /// \param sessionFilePath the file path for the requested session
     /// \param sessionInnerPage the item type describing the inner view to open, or AF_TREE_ITEM_ITEM_NONE when the root is supposed to open
     /// \param [out] errorMessage when the display fails, errorMessage should contain a message for the user
-    virtual bool DisplaySession(const osFilePath& sessionFilePath, const osFilePath& moduleFilePath,afTreeItemType sessionInnerPage, QString& errorMessage);
+    virtual bool DisplaySession(const osFilePath& sessionFilePath, afTreeItemType sessionInnerPage, QString& errorMessage);
 
     SessionModulesView* sessionModulesView() const {return m_pSessionModulesView;};
     SessionFunctionView* sessionFunctionsView() const {return m_pSessionFunctionView;};
@@ -83,7 +87,7 @@ public:
     /// Expose information:
     CpuProfileReader& profileReader() { return m_profileReader; }
 
-    bool displaySessionSource(const osFilePath& moduleFilePath);
+    bool displaySessionSource();
     SessionDisplaySettings* sessionDisplaySettings() {return &m_sessionDisplayFilter;};
 
     /// Show / Hide information panel:
@@ -95,6 +99,9 @@ public:
     void UpdateDisplaySettings(bool isActive, unsigned int changeType);
 
     CpuProfileModule* getModuleDetail(const QString& modulePath, QWidget* pParent = nullptr, ExecutableFile** ppExe = nullptr);
+
+	shared_ptr<cxlProfileDataReader> profDbReader() { return m_pProfDataRd; }
+	shared_ptr<DisplayFilter> GetDisplayFilter() { return m_pDisplayFilter; }
 
 public slots:
 
@@ -148,6 +155,9 @@ protected:
 
 private:
 
+	//TODO: Hack to get database file needs to be taken care of
+	bool OpenDataReader();
+
     /// Session tree item data:
     const afApplicationTreeItemData* m_pSessionTreeItemData;
 
@@ -159,10 +169,14 @@ private:
     SessionDisplaySettings m_sessionDisplayFilter;
 
     /// Data tabs
-    SessionOverviewWindow*  m_pOverviewWindow;
-    SessionModulesView*     m_pSessionModulesView;
-    SessionFunctionView*    m_pSessionFunctionView;
-    SessionCallGraphView*           m_pCallGraphTab;
+    SessionOverviewWindow*			m_pOverviewWindow		= nullptr;
+	SessionModulesView*				m_pSessionModulesView	= nullptr;
+    SessionFunctionView*			m_pSessionFunctionView	= nullptr;
+    SessionCallGraphView*           m_pCallGraphTab			= nullptr; 
+
+	// database reader
+	shared_ptr<cxlProfileDataReader>    m_pProfDataRd	= nullptr;
+	shared_ptr<DisplayFilter>			m_pDisplayFilter = nullptr;
 
     /// Session window widgets
     QTabWidget*         m_pTabWidget;   // The widget that holds all the tabs

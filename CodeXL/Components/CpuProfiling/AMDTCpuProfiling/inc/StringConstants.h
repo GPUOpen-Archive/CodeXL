@@ -232,6 +232,10 @@ const QString DATA_EXT_STR = ".ebp";
 #define CP_colCaptionCodeBytesTooltip "Bytes representation of the actual machine instructions"
 #define CP_colCaptionSourceFile "Source file"
 #define CP_colCaptionSourceFileTooltip "Source file full path"
+#define CP_colCaptionModuleId "Module Id"
+#define CP_colCaptionModuleIdTooltip "Module Id Hidden"
+#define CP_colCaptionFuncId "Function Id"
+#define CP_colCaptionFuncIdTooltip "Function Id Hidden"
 
 #define CP_emptyTableMessage "No samples to display. Consider changing the display settings or selecting a different hotspot indicator."
 #define CP_emptyCallGraphTableMessage "No callstack data was collected. Callstack collection settings are: %1. See the CPU Profiler node in the CodeXL Project Settings"

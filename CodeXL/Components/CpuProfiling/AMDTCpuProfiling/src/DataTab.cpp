@@ -63,8 +63,19 @@ DataTab::DataTab(QWidget* pParent, CpuSessionWindow* pParentSessionWindow, const
 {
     GT_IF_WITH_ASSERT(pParentSessionWindow != nullptr)
     {
+        m_pProfDataRdr = pParentSessionWindow->profDbReader();
         m_pProfileReader = &pParentSessionWindow->profileReader();
         m_pProfileInfo = m_pProfileReader->getProfileInfo();
+        m_pDisplayFilter = pParentSessionWindow->GetDisplayFilter();
+
+        AMDTProfileCounterDescVec counterDesc;
+        m_pProfDataRdr->GetSampledCountersList(counterDesc);
+        int idx = 0;
+
+        for (const auto& counter : counterDesc)
+        {
+            m_CounterIdxMap.emplace(counter.m_name, idx++);
+        }
     }
 
     IntializeCLUNoteString();
@@ -474,6 +485,13 @@ void DataTab::OnDisplaySettingsClicked()
 
     if (QDialog::Accepted == DisplayFilterDlg::instance().displayDialog(profileString, m_enableOnlySystemDllInDisplaySettings))
     {
+        // Update the display and the views' filters:
+        ProtectedUpdateTableDisplay(UPDATE_TABLE_COLUMNS_DATA);
+
+        // Update the displayed string:
+        updateDisplaySettingsString();
+
+#if 0
         // Get the edited settings and the current session settings:
         const SessionDisplaySettings& changedSettings = DisplayFilterDlg::instance().SessionSettings();
         SessionDisplaySettings* pSessionSettings = m_pParentSessionWindow->sessionDisplaySettings();
@@ -533,6 +551,8 @@ void DataTab::OnDisplaySettingsClicked()
                 m_pParentSessionWindow->UpdateDisplaySettings(true, settingsChangeType);
             }
         }
+
+#endif
     }
 }
 
@@ -572,6 +592,8 @@ void DataTab::openCallGraphView()
         }
     }
 }
+
+
 void DataTab::openCallGraphViewForFunction(const QString& funcName, ProcessIdType pid)
 {
     // Make sure that the function view is opened for this session:

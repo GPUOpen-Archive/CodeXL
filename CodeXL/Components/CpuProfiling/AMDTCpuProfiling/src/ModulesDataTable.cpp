@@ -331,6 +331,8 @@ bool ModulesDataTable::shouldModuleBeDisplayed(const CpuProfileModule* pModule)
 
 void ModulesDataTable::onAboutToShowContextMenu()
 {
+	//TODO: Is required ??
+#if 0
     // Call the base class implementation:
     CPUProfileDataTable::onAboutToShowContextMenu();
 
@@ -404,6 +406,7 @@ void ModulesDataTable::onAboutToShowContextMenu()
             }
         }
     }
+#endif
 }
 
 bool ModulesDataTable::AreModuleSymbolsLoaded(int moduleRowIndex)
@@ -459,4 +462,148 @@ bool ModulesDataTable::AreModuleSymbolsLoaded(int moduleRowIndex)
 CPUProfileDataTable::TableType ModulesDataTable::GetTableType() const
 {
     return CPUProfileDataTable::PROCESSES_DATA_TABLE;
+}
+
+bool ModulesDataTable::fillSummaryTables(int counterIdx)
+{
+    bool retVal = false;
+
+    GT_IF_WITH_ASSERT((m_pProfDataRdr != nullptr) &&
+                      (m_pTableDisplaySettings != nullptr))
+    {
+        AMDTProfileCounterDescVec counterDesc;
+        bool rc = m_pProfDataRdr->GetSampledCountersList(counterDesc);
+        GT_ASSERT(rc);
+
+        AMDTProfileDataVec moduleProfileData;
+        rc = m_pProfDataRdr->GetModuleSummary(counterDesc.at(counterIdx).m_id,
+                                              moduleProfileData);
+        GT_ASSERT(rc);
+
+        setSortingEnabled(false);
+
+        for (auto moduleData : moduleProfileData)
+        {
+            // create QstringList to hold the values
+            QStringList list;
+
+            // TODO: to get Function name instead of complete path.
+            osFilePath modulePath(moduleData.m_name);
+            gtString filename;
+            gtString extName;
+            gtString seperator(L".");
+
+            modulePath.getFileName(filename);
+            modulePath.getFileExtension(extName);
+
+            filename += seperator;
+            filename += extName;
+
+            list << filename.asASCIICharArray();
+#if 0
+			QString modulefullPath(moduleData.m_name.asASCIICharArray());
+			int row = rowCount(); 
+			int col = 0;
+
+			QTableWidgetItem* pModuleNameItem = item(row, col);
+			if (pModuleNameItem != nullptr)
+			{
+				pModuleNameItem->setToolTip(modulefullPath);
+			}
+#endif
+            QVariant sampleCount(moduleData.m_sampleValue.at(0).m_sampleCount);
+            list << sampleCount.toString();
+
+            QVariant sampleCountPercent(moduleData.m_sampleValue.at(0).m_sampleCountPercentage);
+            list << QString::number(moduleData.m_sampleValue.at(0).m_sampleCountPercentage, 'f', 2);
+
+            addRow(list, nullptr);
+
+			QString modulefullPath(moduleData.m_name.asASCIICharArray());
+			int row = rowCount() -1 ;
+			int col = 0;
+
+			QTableWidgetItem* pModuleNameItem = item(row, col);
+			if (pModuleNameItem != nullptr)
+			{
+				pModuleNameItem->setToolTip(modulefullPath);
+			}
+
+            rc = delegateSamplePercent(2);
+        }
+
+        setSortingEnabled(true);
+
+        retVal = true;
+    }
+
+    return retVal;
+}
+
+bool ModulesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> modIdVec)
+{
+    bool retVal = false;
+
+    GT_IF_WITH_ASSERT((m_pProfDataRdr.get() != nullptr) &&
+                      (m_pSessionDisplaySettings != nullptr) &&
+                      (m_pTableDisplaySettings != nullptr))
+    {
+        // get samples for Data cache access events
+        AMDTProfileSessionInfo sessionInfo;
+
+        bool rc = m_pProfDataRdr->GetProfileSessionInfo(sessionInfo);
+        GT_ASSERT(rc);
+
+        gtVector<AMDTProfileData> allProcessData;
+        rc = m_pProfDataRdr->GetModuleProfileData(procId, modId, allProcessData);
+        GT_ASSERT(rc);
+
+         setSortingEnabled(false);
+
+        for (auto profData : allProcessData)
+        {
+            QStringList list;
+
+            std::vector<gtString> selectedCounterList;
+
+            // insert module id
+            QVariant mId(profData.m_moduleId);
+            list << mId.toString();
+
+			AMDTProfileModuleInfoVec procInfo;
+			m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, profData.m_moduleId, procInfo);
+            list << acGTStringToQString(procInfo.at(0).m_name);
+
+            // TODO : need to discuss
+			gtString symbols = procInfo.at(0).m_loadAddress ? L"Loaded" : L"Not Loaded";
+			list << acGTStringToQString(symbols);
+
+            m_pDisplayFilter->GetSelectedCounterList(selectedCounterList);
+            int i = 0;
+
+            for (auto counter : selectedCounterList)
+            {
+                QVariant sampleCount(profData.m_sampleValue.at(i++).m_sampleCount);
+                list << sampleCount.toString();
+            }
+
+            addRow(list, nullptr);
+
+        }
+
+		hideColumn(0);
+
+		retVal = true;
+    }
+
+    return retVal;
+}
+
+bool ModulesDataTable::findModueId(int rowIndex, AMDTModuleId& modId)
+{
+	QTableWidgetItem* pidWidget = item(rowIndex, 0);
+	int moduleId = pidWidget->text().toInt();
+	modId = moduleId;
+
+	return true;
 }

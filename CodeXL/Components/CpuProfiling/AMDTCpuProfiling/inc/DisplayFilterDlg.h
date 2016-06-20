@@ -19,9 +19,12 @@
 // AMDTApplicationFramework:
 #include <AMDTApplicationFramework/Include/afMainAppWindow.h>
 #include <AMDTApplicationFramework/Include/views/afApplicationTreeItemData.h>
+#include <inc/SessionWindow.h>
 
+#include <memory>
 // Local:
 #include <inc/DisplayFilter.h>
+#include <AMDTCpuProfilingDataAccess/inc/AMDTCpuProfilingDataAccess.h>
 
 class CpuSessionWindow;
 class CpuProfileInfo;
@@ -29,105 +32,97 @@ class CpuProfileReader;
 
 class DisplayFilterDlg : public QDialog
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
 
-    /// Returns my single instance:
-    static DisplayFilterDlg& instance();
+	/// Returns my single instance:
+	static DisplayFilterDlg& instance();
 
-    /// Display the dialog for the requested session path:
-    QDialog::DialogCode displayDialog(const QString& sessionPath, bool enableOnlySystemDll);
+	/// Display the dialog for the requested session path:
+	QDialog::DialogCode displayDialog(const QString& sessionPath, bool enableOnlySystemDll);
 
-    /// Return the edited session settings:
-    const SessionDisplaySettings& SessionSettings() const {return m_displaySettings;}
+	bool DisplaySystemDlls() const { return m_displaySystemDLLs; }
+	bool ShowPercentage() const { return m_displayPercentageInColumn; }
 
-    bool DisplaySystemDlls() const {return m_displaySystemDLLs;}
-    bool ShowPercentage() const {return m_displayPercentageInColumn;}
-
-    virtual ~DisplayFilterDlg();
+	virtual ~DisplayFilterDlg();
 
 private:
 
-    DisplayFilterDlg(QWidget* pParent);
+	DisplayFilterDlg(QWidget* pParent);
 
-    bool initializeConfiguration();
-    bool populateCoreList(int noOfCores);
-    bool populateColumnList();
-    bool initializeLayout();
-    void disableAllControlsExceptSystemDll(bool disable);
-    void addFinalLayout();
-    void updateHiddenColumnList();
+	bool initializeConfiguration();
+	bool populateCoreList(int noOfCores);
+	bool populateColumnList();
+	bool initializeLayout();
+	void disableAllControlsExceptSystemDll(bool disable);
+	void addFinalLayout();
+	void updateHiddenColumnList();
+	bool createConfigCounterMap();
 
-private slots:
-    void onClickAllCoreItem(int state);
-    void onClickCoreItem(int state);
-    void onChangeView(const QString& newlySelectedView);
-    void onClickOk();
-    void onClickCancel();
-    void onClickCheckBoxSeparateColumnsBy(int state);
+	private slots:
+	void onClickAllCoreItem(int state);
+	void onClickCoreItem(int state);
+	void onChangeView(const QString& newlySelectedView);
+	void onClickOk();
+	void onClickCancel();
+	void onClickCheckBoxSeparateColumnsBy(int state);
 
 private:
 
-    static DisplayFilterDlg* m_psMySingleInstance;
+	static DisplayFilterDlg* m_psMySingleInstance;
+	osFilePath          m_sessionFile;
 
-    /// The edited settings:
-    SessionDisplaySettings m_displaySettings;
-    bool m_displaySystemDLLs;
-    bool m_displayPercentageInColumn;
+	bool m_displaySystemDLLs = false;
+	bool m_displayPercentageInColumn = false;
+	afApplicationTreeItemData* m_pSessionTreeItemData = nullptr;
+	CpuSessionWindow* m_pCurrentSessionWindow = nullptr;
+	QCheckBox* m_pCheckBoxCore = nullptr;
+	QCheckBox* m_pCheckBoxAllCore = nullptr;
+	QGridLayout*  m_pLayoutForCoreList = nullptr;
+	QWidget* m_pWidgetCoreList = nullptr;
+	int m_noOfCores = 0;
+	int m_noOfColumn = 0;
+	QWidget* m_pWidgetColumnList = nullptr;
+	QVBoxLayout* m_pVBLayoutForColumn = nullptr;
+	QCheckBox* m_pCheckBoxColumns = nullptr;
+	QLabel* m_plabelColumns = nullptr;
+	QLabel* m_plabelGeneral = nullptr;
+	QLabel* m_plabelCPUCores = nullptr;
+	QComboBox* m_pComboBoxViewes = nullptr;
+	QCheckBox* m_pCheckBoxDisplaySystemDLLs = nullptr;
+	QCheckBox* m_pCheckBoxShowPercentageBars = nullptr;
+	QCheckBox* m_pCheckBoxSeparateColumnsBy = nullptr;
+	QRadioButton* m_pRadioButtonSeparateByCore = nullptr;
+	QRadioButton* m_pRadioButtonSeparateByNUMA = nullptr;
+	QPushButton* m_pPushButtonOK = nullptr;
+	QPushButton* m_pPushButtonCancel = nullptr;
+	QScrollArea* m_pScrollAreaColumns = nullptr;
+	QScrollArea* m_pScrollAreaCPUCore = nullptr;
+	QVBoxLayout* m_pMainLayout = nullptr;
+	QHBoxLayout* m_pComboBoxViewesLayout = nullptr;
+	QHBoxLayout* m_pScrollAreaColumnsLayout = nullptr;
+	QHBoxLayout* m_pCheckBoxDisplaySystemDLLsLayout = nullptr;
+	QHBoxLayout* m_pCheckBoxShowPercentageBarsLayout = nullptr;
+	QHBoxLayout* m_pScrollAreaCPUCoreLayout = nullptr;
+	QFrame* m_pLine = nullptr;
+	QHBoxLayout* m_pCheckBoxSeparateColumnsByLayout = nullptr;
+	QHBoxLayout* m_pCoreLayout = nullptr;
+	QHBoxLayout* m_pNUMALayout = nullptr;
+	QHBoxLayout* m_pButtonBox = nullptr;
+	bool m_enableOnlySystemDll = false;
+	shared_ptr<DisplayFilter> m_displayFilter = nullptr;
 
-    afApplicationTreeItemData* m_pSessionTreeItemData;
-    CpuSessionWindow*   m_pCurrentSessionWindow;
-    CpuProfileReader*    m_pProfileReader;
-    CpuProfileInfo*      m_pProfileInfo;
+	std::shared_ptr<cxlProfileDataReader>   m_pProfDataReader;
+	shared_ptr<cofigNameCounterMap>         m_CongigrationMap;
+	QString                                 m_cofigName;
+	gtVector<AMDTUInt32>                    m_selectedCounters;
+	std::map<int, int>                      m_colIdxCounterIdMap;
+	std::vector<gtString>					m_notChecked;
 
-    // Cores:
-    QCheckBox* m_pCheckBoxCore;
-    QCheckBox* m_pCheckBoxAllCore;
-    QGridLayout*  m_pLayoutForCoreList;
-    QWidget* m_pWidgetCoreList;
-    int m_noOfCores;
-    int m_noOfColumn;
-
-    QWidget* m_pWidgetColumnList;
-    QVBoxLayout* m_pVBLayoutForColumn;
-    QCheckBox* m_pCheckBoxColumns;//
-
-
-    osFilePath          m_sessionFile;
-
-    QLabel* m_plabelColumns;
-    QLabel* m_plabelGeneral;
-    QLabel* m_plabelCPUCores;
-
-    QComboBox* m_pComboBoxViewes;
-
-    QCheckBox* m_pCheckBoxDisplaySystemDLLs;
-    QCheckBox* m_pCheckBoxShowPercentageBars;
-    QCheckBox* m_pCheckBoxSeparateColumnsBy;
-
-    QRadioButton* m_pRadioButtonSeparateByCore;
-    QRadioButton* m_pRadioButtonSeparateByNUMA;
-
-    QPushButton* m_pPushButtonOK;
-    QPushButton* m_pPushButtonCancel;
-
-    QScrollArea* m_pScrollAreaColumns;
-    QScrollArea* m_pScrollAreaCPUCore;
-    QVBoxLayout* m_pMainLayout;
-
-    QHBoxLayout* m_pComboBoxViewesLayout;
-    QHBoxLayout* m_pScrollAreaColumnsLayout;
-    QHBoxLayout* m_pCheckBoxDisplaySystemDLLsLayout;
-    QHBoxLayout* m_pCheckBoxShowPercentageBarsLayout;
-    QHBoxLayout* m_pScrollAreaCPUCoreLayout;
-    QFrame* m_pLine;
-    QHBoxLayout* m_pCheckBoxSeparateColumnsByLayout;
-    QHBoxLayout* m_pCoreLayout;
-    QHBoxLayout* m_pNUMALayout;
-    QHBoxLayout* m_pButtonBox;
-    bool m_enableOnlySystemDll;
 
 };
+
+
 #endif//__DISPLAYFILTERDLG_H
 
 

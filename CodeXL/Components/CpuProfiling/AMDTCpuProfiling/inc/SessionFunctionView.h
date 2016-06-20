@@ -42,6 +42,8 @@ public:
     /// \param - functionName the function name
     /// \param - pid the process ID
     void selectFunction(const QString& functionName, ProcessIdType pid);
+	void selectFunction(const QString& funcId);
+
 
     /// Display the functions for the requested module
     /// \param - moduleFullPath the module full path
@@ -120,10 +122,13 @@ private:
     acWidgetAction* m_pLabelModuleSelectedAction;
     acWidgetAction* m_pPIDComboBoxAction;
 
-    void addModulesForPID(uint pid);
+    //void addModulesForPID(uint pid);
     void updateDataFromPidComboBox();
     ProcessIdType getCurrentPid();
     bool m_updateData;
+
+	std::map<gtString, AMDTUInt64> m_moduleNameIdMap;
+
 };
 
 #endif //__SESSIONFUNCTIONVIEW_H
