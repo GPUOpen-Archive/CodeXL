@@ -199,7 +199,7 @@ bool AtpFileParser::ParseSuspectedHeaderLine(const string& headerLine)
     // For file version 0, Header is done when: the line that start with '====='
     if (m_atpFileVersion == 0)
     {
-        // ATR: first line of format //==API Trace== of //==GPU Trace==
+        // ATR: first line of format //==API Trace== or //==GPU Trace==
         retVal = (headerLine[0] == '=');
     }
     else if (m_atpFileVersion == 1)
@@ -269,7 +269,7 @@ bool AtpFileParser::ParseFileSectionsLine(const std::string& sectionLine)
     else if (m_atpFileVersion == 1)
     {
         // When getting a version 1 atp file, we expect a section with the following format:
-        //==API Trace==
+        //==API Trace== or //==GPU Trace==
         //API=DX12
         //ThreadID=7532
         //ThreadAPICount=156327
