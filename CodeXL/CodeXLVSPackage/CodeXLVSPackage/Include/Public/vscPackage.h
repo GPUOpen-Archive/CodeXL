@@ -190,6 +190,5 @@ void vsc_OnConfigureRemoteHost();
 void vsc_OnStartButton();
 
 void vsc_OnUpdateConfigureRemoteHost(bool& isActionEnabled);
-void vsc_OnUpdateStartButtonGetText(int maxBufSize, wchar_t*& pCmdNameBuffer, int& cmdNameStrLength);
 
 #endif // vscPackage_h__

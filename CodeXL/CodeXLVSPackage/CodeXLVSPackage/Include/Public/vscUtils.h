@@ -16,7 +16,7 @@
 // Do not confuse with vscCoreUtils which is an actual utility class to be used by both core and VS code.
 // Do not confuse with vscCoreInternalUtils which is an actual utility class to be used by the core code only.
 // ***********************************************************************************************************
-void vscUtilsGetStartActionCommandName(wchar_t*& verbNameBuffer, wchar_t*& actionCommandStrBuffer, bool addKeyboardShortcut = false);
+void vscUtilsGetStartActionCommandName(wchar_t*& verbNameBuffer, wchar_t*& actionCommandStrBuffer, bool addKeyboardShortcut = false, bool fullString = true);
 
 void vscUtilsUpdateProjectSettingsFromStartupProject(const wchar_t* execPath, const wchar_t* workDir, const wchar_t* cmdArgs, const wchar_t* execEnv, bool isProjectOpened, bool isProjectTypeSupported, bool isNonNativeProject);
 

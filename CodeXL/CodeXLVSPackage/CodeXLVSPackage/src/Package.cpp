@@ -1154,7 +1154,7 @@ void CodeXLVSPackage::onUpdateLaunchOpenCLDebugging(CommandHandler& handler, OLE
     {
         std::wstring commandName;
         std::wstring verbName;
-        vspGetStartActionCommandName(verbName, commandName, true);
+        vspGetStartActionCommandName(verbName, commandName, true, true);
 
         // Truncate the string to the buffer's size:
         int bufferSize = static_cast<int>(pOleText->cwBuf);
@@ -2511,19 +2511,21 @@ void CodeXLVSPackage::OnUpdateStartButton(CommandHandler& handler, OLECMD* pOleC
         pOleCmd->cmdf = commandFlags;
     }
 
-    int bufferSize = (int)pOleText->cwBuf;
-    int commandStrLength = 0;
-    wchar_t* pCmdNameBuf = nullptr;
-    VSCORE(vsc_OnUpdateStartButtonGetText)(bufferSize, pCmdNameBuf, commandStrLength);
-    VSP_ASSERT(pCmdNameBuf != nullptr);
+    std::wstring commandName;
+    std::wstring verbName;
+    vspGetStartActionCommandName(verbName, commandName, true, false);
 
-    if (pCmdNameBuf != nullptr)
+    // Truncate the string to the buffer's size:
+    int bufferSize = static_cast<int>(pOleText->cwBuf);
+
+    if (static_cast<unsigned int>(bufferSize) < commandName.length())
     {
-        // Copy the characters to the buffer:
-        lstrcpy(pOleText->rgwz, pCmdNameBuf);
-        pOleText->cwActual = (ULONG)(commandStrLength + 1);
-        VSCORE(vscDeleteWcharString)(pCmdNameBuf);
+        commandName = commandName.substr(0, bufferSize);
     }
+
+    // Copy the characters to the buffer:
+    lstrcpy(pOleText->rgwz, commandName.c_str());
+    pOleText->cwActual = (ULONG)(commandName.length() + 1);
 
     if (pOleCmd != nullptr)
     {

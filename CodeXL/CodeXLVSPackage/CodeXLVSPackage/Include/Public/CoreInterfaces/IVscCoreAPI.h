@@ -202,7 +202,6 @@ struct IVscCoreAPI
     void (*vsc_OnConfigureRemoteHost)();
     void (*vsc_OnStartButton)();
     void (*vsc_OnUpdateConfigureRemoteHost)(bool& isActionEnabled);
-    void (*vsc_OnUpdateStartButtonGetText)(int maxBufSize, wchar_t*& pCmdNameBuffer, int& cmdNameStrLength);
 
     // vscPackageCommandHandler
     void (*vsc_FreeStrMemory)(wchar_t*& pStr);
@@ -294,7 +293,7 @@ struct IVscCoreAPI
     void (*vscToolWindow_SetToolShowFunction)(void* pToolWindow, void* pVspToolWindow, void* pShowFunction);
 
     // vscUtils
-    void (*vscUtilsGetStartActionCommandName)(wchar_t*& verbNameBuffer, wchar_t*& actionCommandStrBuffer, bool addKeyboardShortcut /* = false */);
+    void (*vscUtilsGetStartActionCommandName)(wchar_t*& verbNameBuffer, wchar_t*& actionCommandStrBuffer, bool addKeyboardShortcut /* = false */, bool fullString /* = true */);
     void (*vscUtilsUpdateProjectSettingsFromStartupProject)(const wchar_t* execPath, const wchar_t* workDir, const wchar_t* cmdArgs, const wchar_t* execEnv, bool isProjectOpened, bool isProjectTypeSupported, bool isNonNativeProject);
     bool (*vscGetExecutionCommandName)(DWORD commandId, wchar_t*& commandNameBuffer);
 

@@ -12,7 +12,7 @@
 #define __VSPUTILS_H
 
 // Get current debugging command string name:
-void vspGetStartActionCommandName(std::wstring& verbName, std::wstring& actionCommandStr, bool addKeyboardShortcut = false);
+void vspGetStartActionCommandName(std::wstring& verbName, std::wstring& actionCommandStr, bool addKeyboardShortcut = false, bool fullString = true);
 
 // Update settings from Visual Studio project:
 void vspUpdateProjectSettingsFromStartupProject();

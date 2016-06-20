@@ -1705,39 +1705,3 @@ void vsc_OnUpdateStartButtonIsEnabled(bool& isActionEnabled)
     GT_UNREFERENCED_PARAMETER(isActionEnabled);
 }
 
-void vsc_OnUpdateStartButtonGetText(int maxBufSize, wchar_t*& pCmdNameBuffer, int& cmdNameStrLength)
-{
-    // By default the text is "Local":
-    pCmdNameBuffer = nullptr;
-    cmdNameStrLength = 0;
-    gtString commandName = acQStringToGTString(AF_STR_modeToolbarHostLocal);
-
-    // If the remote host functionality is enabled currently, get the current IP:
-    bool isRemoteEnabled;
-    vsc_OnUpdateConfigureRemoteHost(isRemoteEnabled);
-
-    if (isRemoteEnabled)
-    {
-        bool isRemoteHost = !afProjectManager::instance().currentProjectSettings().remoteTargetName().isEmpty();
-
-        if (isRemoteHost)
-        {
-            commandName = afProjectManager::instance().currentProjectSettings().remoteTargetName();
-        }
-    }
-
-    // Remove accelerator from string:
-    commandName.removeChar('&');
-
-    // Truncate the string to the buffer's size:
-    int bufferSize = maxBufSize;
-
-    if (bufferSize < commandName.length())
-    {
-        commandName.truncate(0, bufferSize - 1);
-    }
-
-    // Allocate output strings.
-    pCmdNameBuffer = vscAllocateAndCopy(commandName);
-    cmdNameStrLength = commandName.length();
-}

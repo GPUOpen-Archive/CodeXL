@@ -12,6 +12,7 @@
 #include <Include/vspStringConstants.h>
 #include <Include/vscCoreInternalUtils.h>
 #include <Include/../CodeXLVSPackageUi/CommandIds.h>
+#include <Include/Public/vscPackage.h>
 
 // Infra:
 #include <AMDTAPIClasses/Include/Events/apEventsHandler.h>
@@ -30,6 +31,7 @@
 
 // AMDTGpuDebuggingComponents:
 #include <AMDTGpuDebuggingComponents/Include/gdGDebuggerGlobalVariablesManager.h>
+#include <AMDTGpuDebuggingComponents/Include/gdStringConstants.h>
 
 // AMDTSharedProfiling:
 #include <SharedProfileManager.h>
@@ -50,7 +52,7 @@ public:
     ~vscUtils() {}
 };
 
-void vscUtilsGetStartActionCommandName(wchar_t*& verbNameBuffer, wchar_t*& actionCommandStrBuffer, bool addKeyboardShortcut /*= false*/)
+void vscUtilsGetStartActionCommandName(wchar_t*& verbNameBuffer, wchar_t*& actionCommandStrBuffer, bool addKeyboardShortcut /*= false*/, bool fullString /* = true */)
 {
     actionCommandStrBuffer = NULL;
     verbNameBuffer         = NULL;
@@ -64,6 +66,9 @@ void vscUtilsGetStartActionCommandName(wchar_t*& verbNameBuffer, wchar_t*& actio
 
     // Check if we're in profile mode:
     bool isProfiling = afExecutionModeManager::instance().isActiveMode(PM_STR_PROFILE_MODE);
+    bool isDebugging = afExecutionModeManager::instance().isActiveMode(GD_STR_executionMode);
+    bool isFrameAnalysis = afExecutionModeManager::instance().isActiveMode(PM_STR_FrameAnalysisMode);
+
     bool isSystemWide = (SharedProfileSettingPage::Instance()->CurrentSharedProfileSettings().m_profileScope == PM_PROFILE_SCOPE_SYS_WIDE);
     bool isExeSet = !exeFileName.isEmpty();
 
@@ -84,26 +89,79 @@ void vscUtilsGetStartActionCommandName(wchar_t*& verbNameBuffer, wchar_t*& actio
     else // !processExists
     {
         actionCommandStr = VSP_STR_StartGeneric;
+
         GT_IF_WITH_ASSERT(NULL != pExecMode)
         {
-            actionCommandStr = pExecMode->modeActionString();
-            actionCommandStr.prepend(VSP_STR_StartPrefix);
+            // based on the execution mode set the prefix of the string:
+            if (isDebugging)
+            {
+                actionCommandStr = VSP_STR_DebugMode;
+            }
+            else if (isProfiling)
+            {
+                actionCommandStr = VSP_STR_ProfileMode;
+                if (pExecMode != nullptr)
+                {
+                    gtString currentType = pExecMode->sessionTypeName(afExecutionModeManager::instance().activeSessionType());
+                    if (currentType.startsWith(L"CPU"))
+                    {
+                        actionCommandStr = VSP_STR_ProfileCPUMode;
+                    }
+                    else if (currentType.startsWith(L"GPU"))
+                    {
+                        actionCommandStr = VSP_STR_ProfileGPUMode;
+                    }
+                    else
+                    {
+                        actionCommandStr = VSP_STR_ProfilePowerMode;
+                    }
+                }
+            }
+            else if (isFrameAnalysis)
+            {
+                actionCommandStr = VSP_STR_FrameAnalysisMode;
+            }
+            else
+            {
+                actionCommandStr = VSP_STR_StaticAnalysisMode;
+            }
 
-            if (isProfiling && isSystemWide)
+            // Add the "Start Code if is in the menu area and not tool bar
+            if (fullString)
+            {
+                actionCommandStr.prepend(VSP_STR_StartPrefix);
+            }
+
+            // add the (..) section if in profile and full info is needed
+            if (isProfiling && isSystemWide && fullString)
             {
                 if (isExeSet)
                 {
-                    actionCommandStr.appendFormattedString(L" (%ls + System-wide)", exeFileName.asCharArray());
+                    actionCommandStr.appendFormattedString(VSP_STR_ExeAndSystemWide, exeFileName.asCharArray());
                 }
                 else
                 {
-                    actionCommandStr.append(L" (System-wide)");
+                    actionCommandStr.append(VSP_STR_SystemWide);
                 }
             }
-            else if (isExeSet)
+            else if (isExeSet && fullString)
             {
-                actionCommandStr.appendFormattedString(L" (%ls)", exeFileName.asCharArray());
+                actionCommandStr.appendFormattedString(VSP_STR_ExeNameOnly, exeFileName.asCharArray());
             }
+        }
+    }
+
+    // Add the remote location
+    bool isRemoteEnabled;
+    vsc_OnUpdateConfigureRemoteHost(isRemoteEnabled);
+
+    if (isRemoteEnabled)
+    {
+        bool isRemoteHost = !afProjectManager::instance().currentProjectSettings().remoteTargetName().isEmpty();
+
+        if (isRemoteHost)
+        {
+            actionCommandStr.appendFormattedString(L" @%ls",afProjectManager::instance().currentProjectSettings().remoteTargetName().asCharArray());
         }
     }
 
