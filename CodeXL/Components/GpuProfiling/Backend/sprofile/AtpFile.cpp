@@ -36,6 +36,11 @@ void IAtpFilePartParser::ReportProgress(const std::string& strProgressMessage, u
     }
 }
 
+void IAtpFilePartParser::SetCurrentSection(const std::string& strSectionName)
+{
+    m_strCurrentSectionName = strSectionName;
+}
+
 std::string IAtpFilePart::GetSectionHeader(const std::string& strSectionName)
 {
     stringstream ss;
@@ -264,7 +269,7 @@ bool AtpFileParser::ParseFileSectionsLine(const std::string& sectionLine)
     else if (m_atpFileVersion == 1)
     {
         // When getting a version 1 atp file, we expect a section with the following format:
-        //==API Trace== or //==GPU Trace==
+        //==API Trace==
         //API=DX12
         //ThreadID=7532
         //ThreadAPICount=156327
@@ -301,6 +306,7 @@ bool AtpFileParser::ParseFileSectionsLine(const std::string& sectionLine)
                         {
                             // Pass section content parsing to IAtpFilePartParser
                             // IAtpFilePartParser sets stream pointer to the beginning of the next section or eof
+                            pParser->SetCurrentSection(strSecName);
                             retVal = pParser->Parse(fin, m_strWarningMsg);
 
                             if (!retVal)

@@ -66,9 +66,14 @@ public:
     /// \return true if the parsing process should be stopped
     bool ShouldStopParsing() const {return m_shouldStopParsing;}
 
+    /// Sets the current section name
+    /// \param strSectionName the naem of the current section
+    void SetCurrentSection(const std::string& strSectionName);
+
 protected:
     std::vector<IParserProgressMonitor*> m_progressMonitorList; ///< Parser progress list
     bool m_shouldStopParsing;                                   ///< A flag indicating whether the user had chosen to stop the parsing
+    std::string m_strCurrentSectionName;                        ///< The current Section Name
 };
 
 //------------------------------------------------------------------------------------

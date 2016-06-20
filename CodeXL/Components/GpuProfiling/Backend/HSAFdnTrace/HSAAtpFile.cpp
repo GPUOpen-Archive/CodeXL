@@ -20,15 +20,20 @@
 using namespace std;
 using namespace GPULogger;
 
+#define HSA_PART_NAME "hsa"
+static const std::string s_PART_NAME = HSA_PART_NAME;
+static const std::string s_HSA_TRACE_OUTPUT = "CodeXL " HSA_PART_NAME " API Trace Output";
+static const std::string s_HSA_TIMESTAMP_OUTPUT = "CodeXL " HSA_PART_NAME " Timestamp Output";
+static const std::string s_HSA_KERNEL_TIMESTAMP_OUTPUT = "CodeXL " HSA_PART_NAME " Kernel Timestamp Output";
+#undef HSA_PART_NAME
+
 HSAAtpFilePart::HSAAtpFilePart(const Config& config, bool shouldReleaseMemory)
     : IAtpFilePart(config, shouldReleaseMemory), m_dispatchIndex(0)
 {
-#define PART_NAME "hsa"
-    m_strPartName = PART_NAME;
-    m_sections.push_back("CodeXL " PART_NAME " API Trace Output");
-    m_sections.push_back("CodeXL " PART_NAME " Timestamp Output");
-    m_sections.push_back("CodeXL " PART_NAME " Kernel Timestamp Output");
-#undef PART_NAME
+    m_strPartName = s_PART_NAME;
+    m_sections.push_back(s_HSA_TRACE_OUTPUT);
+    m_sections.push_back(s_HSA_TIMESTAMP_OUTPUT);
+    m_sections.push_back(s_HSA_KERNEL_TIMESTAMP_OUTPUT);
 }
 
 
@@ -260,12 +265,19 @@ bool HSAAtpFilePart::ParseDeviceTimestamp(const char* buf, HSADispatchInfo* pDis
 
 bool HSAAtpFilePart::Parse(std::istream& in, std::string& outErrorMsg)
 {
-    // Assumption: HSA API trace section first then HSA timestamp
+    // Assumption: 1) HSA API trace section first then HSA timestamp + HSA kernel timestamp OR 2) just HSA kernel timestamp
     bool bError = false;
     bool bTSStart = false;
     bool bKTSStart = false;
     std::string strProgressMessage = "Parsing Trace Data...";
     ErrorMessageUpdater errorMessageUpdater(outErrorMsg, this);
+
+    if (s_HSA_KERNEL_TIMESTAMP_OUTPUT == m_strCurrentSectionName)
+    {
+        // if the .atp file has only the kernel timestamp section, then we will start on the s_HSA_KERNEL_TIMESTAMP_OUTPUT section
+        bTSStart = true;
+        bKTSStart = true;
+    }
 
     do
     {
