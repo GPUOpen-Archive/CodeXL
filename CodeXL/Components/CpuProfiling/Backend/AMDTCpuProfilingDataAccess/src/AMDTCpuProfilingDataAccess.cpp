@@ -58,6 +58,25 @@ struct ViewConfigInfo
 #define GET_PID_COUNTER_ID(id_, pid_, cid_)      id_ = pid_; id_ = id_ << 32 | cid_;
 #define CXL_COMPUTE_PERCENTAGE(val1_, val2_)     (((val1_) > 0.0) && ((val2_) > 0.0)) ? (((val1_) / (val2_)) * 100.0) : 0.0
 
+// CLU specific events
+#define CXL_CLU_EVENT_CLU_PERCENTAGE              0xFF00UL
+#define CXL_CLU_EVENT_LINE_BOUNDARY_CROSSINGS     0xFF01UL
+#define CXL_CLU_EVENT_BYTES_PER_L1_EVICTION       0xFF02UL
+#define CXL_CLU_EVENT_ACCESSES_PER_L1_EVICTION    0xFF03UL
+#define CXL_CLU_EVENT_L1_EVICTIONS                0xFF04UL
+#define CXL_CLU_EVENT_ACCESSES                    0xFF05UL
+#define CXL_CLU_EVENT_BYTES_ACCESSED              0xFF06UL
+
+#define CXL_CLU_EVENT_CLU_PERCENTAGE_NAME_WSTR              L"Cache Line Utilization"
+#define CXL_CLU_EVENT_CLU_PERCENTAGE_NAME_STR               "Cache Line Utilization"
+#define CXL_CLU_EVENT_BYTES_PER_L1_EVICTION_NAME_STR        "Bytes/L1 Eviction"
+#define CXL_CLU_EVENT_ACCESSES_PER_L1_EVICTION_NAME_STR     "Accesses/L1 Eviction"
+
+#define CXL_PROFILE_TYPE_CLU_NAME_STR                       L"Cache Line Utilization"
+#define IS_PROFILE_TYPE(type_)  ((0 == m_sessionInfo.m_sessionType.compareNoCase(type_)) ? true : false)
+
+#define CXL_COMPUTED_COUNTER_START_ID       0x100
+
 // Sampling Configuration
 using AMDTCounterIdVec = gtVector<AMDTCounterId>;
 using CounterIdSampleConfigMap = gtMap<AMDTCounterId, AMDTProfileSamplingConfig>;
@@ -136,7 +155,7 @@ public:
 
     ComputedCounterNameIdMap            m_computedCounterNameIdMap;
     ComputedCounterIdSpecMap            m_computedCounterIdSpecMap;
-    AMDTCounterId                       m_computedCounterStartId = 0x100;
+    AMDTCounterId                       m_computedCounterStartId = CXL_COMPUTED_COUNTER_START_ID;
     AMDTProfileCounterDescVec           m_computedCounterDescVec;
 
     ViewConfigInfoVec                   m_viewConfigInfoVec;
@@ -279,6 +298,11 @@ public:
         return ret;
     }
 
+    bool isSessionTypeCLU()
+    {
+        return IS_PROFILE_TYPE(CXL_PROFILE_TYPE_CLU_NAME_STR);
+    }
+
     bool GetSampledCountersList()
     {
         bool ret = (nullptr != m_pDbAdapter) ? true : false;
@@ -365,6 +389,45 @@ public:
         return ret;
     }
 
+    void ConstructEncodedEvent(AMDTProfileSamplingConfig& sampleConfig, EventMaskType& encodedEvent)
+    {
+        gtUInt16 eventSel = static_cast<gtUInt16>(sampleConfig.m_hwEventId);
+
+        encodedEvent = EncodeEvent(eventSel,
+                                   sampleConfig.m_unitMask,
+                                   sampleConfig.m_osMode,
+                                   sampleConfig.m_userMode);
+    }
+
+    void ConstructEventConfig(AMDTProfileSamplingConfig& sampleConfig, EventConfig& eventConfig)
+    {
+        eventConfig.eventSelect = static_cast<gtUInt16>(sampleConfig.m_hwEventId);
+        eventConfig.eventUnitMask = sampleConfig.m_unitMask;
+        eventConfig.bitOs = sampleConfig.m_osMode;
+        eventConfig.bitUsr = sampleConfig.m_userMode;
+    }
+
+    bool GetEventConfigByEventId(AMDTUInt32 eventId, EventConfig& eventConfig)
+    {
+        bool ret = false;
+        auto eventDesc = std::find_if(m_sampledCounterDescVec.begin(), m_sampledCounterDescVec.end(),
+            [&eventId](AMDTProfileCounterDesc const& aEventDesc) { return aEventDesc.m_hwEventId == eventId; });
+
+        if (eventDesc != m_sampledCounterDescVec.end())
+        {
+            AMDTProfileSamplingConfig sampleConfig;
+
+            ret = GetSamplingConfiguration(eventDesc->m_id, sampleConfig);
+
+            if (ret)
+            {
+                ConstructEventConfig(sampleConfig, eventConfig);
+            }
+        }
+
+        return ret;
+    }
+
     bool InitializeCounterData()
     {
         bool ret = GetSampledCountersList();
@@ -377,12 +440,8 @@ public:
 
                 if (GetSamplingConfiguration(counterDesc.m_id, sampleConfig))
                 {
-                    gtUInt16 eventSel = static_cast<gtUInt16>(sampleConfig.m_hwEventId);
-                    EventMaskType encodedEvent = EncodeEvent(eventSel,
-                        sampleConfig.m_unitMask,
-                        sampleConfig.m_osMode,
-                        sampleConfig.m_userMode);
-
+                    EventMaskType encodedEvent;
+                    ConstructEncodedEvent(sampleConfig, encodedEvent);
                     m_eventToIdMap.insert({ encodedEvent, counterDesc.m_id });
                 }
             }
@@ -392,6 +451,23 @@ public:
     }
 
     bool PrepareReportAllDataView()
+    {
+        bool ret = false;
+
+        if (!isSessionTypeCLU())
+        {
+            ret = PrepareReportAllDataView__();
+        }
+        else
+        {
+            ret = PrepareCLUDataView();
+            ret = ret && UpdateSampledCountersForCLU();
+        }
+
+        return ret;
+    }
+
+    bool PrepareReportAllDataView__()
     {
         bool ret = GetSampledCountersList();
 
@@ -493,7 +569,9 @@ public:
                     counterDesc.m_hwEventId = AMDT_PROFILE_ALL_COUNTERS;
                     counterDesc.m_deviceId = 0;
                     counterDesc.m_category = 0;
-                    counterDesc.m_unit = AMDT_PROFILE_COUNTER_UNIT_PERCENT;
+
+                    counterDesc.m_unit = (columnArray[i].type = ColumnRatio)
+                                            ? AMDT_PROFILE_COUNTER_UNIT_RATIO : AMDT_PROFILE_COUNTER_UNIT_PERCENT;
 
                     counterDesc.m_name = ConvertQtToGTString(columnArray[i].title);
                     counterDesc.m_abbrev = ConvertQtToGTString(columnArray[i].title);
@@ -577,6 +655,18 @@ public:
         return ret;
     }
 
+    bool AddViewConfig(ViewConfigInfo& viewCfgInfo)
+    {
+        bool ret = false;
+
+        if ((ret = IsSamplingEventsAvailable(viewCfgInfo.m_viewCfg, viewCfgInfo.m_counterIdVec)))
+        {
+            m_viewConfigInfoVec.push_back(viewCfgInfo);
+        }
+
+        return ret;
+    }
+
     bool PrepareReportDataView(gtString viewConfigPath)
     {
         bool ret = GetSampledCountersList();
@@ -587,11 +677,7 @@ public:
             ViewConfig& viewCfg = viewCfgInfo.m_viewCfg;
 
             viewCfg.ReadConfigFile(ConvertToQString(viewConfigPath));
-
-            if (IsSamplingEventsAvailable(viewCfg, viewCfgInfo.m_counterIdVec))
-            {
-                m_viewConfigInfoVec.push_back(viewCfgInfo);
-            }
+            AddViewConfig(viewCfgInfo);
         }
 
         return ret;
@@ -652,6 +738,153 @@ public:
         }
 
         return true;
+    }
+
+    bool PrepareComputedCounterForCLU(AMDTUInt16 eventId, ColumnSpec& columnSpec)
+    {
+        bool ret = false;
+
+        columnSpec.type = ColumnRatio;
+        columnSpec.sorting = NoSort;
+        columnSpec.visible = true;
+
+        if (CXL_CLU_EVENT_CLU_PERCENTAGE == eventId)
+        {
+            GetEventConfigByEventId(CXL_CLU_EVENT_CLU_PERCENTAGE, columnSpec.dataSelectLeft);
+            GetEventConfigByEventId(CXL_CLU_EVENT_L1_EVICTIONS, columnSpec.dataSelectRight);
+            columnSpec.title = QString(CXL_CLU_EVENT_CLU_PERCENTAGE_NAME_STR);
+            columnSpec.type = ColumnPercentage;
+            ret = true;
+        }
+        else if (CXL_CLU_EVENT_BYTES_PER_L1_EVICTION == eventId)
+        {
+            GetEventConfigByEventId(CXL_CLU_EVENT_BYTES_ACCESSED, columnSpec.dataSelectLeft);
+            GetEventConfigByEventId(CXL_CLU_EVENT_L1_EVICTIONS, columnSpec.dataSelectRight);
+            columnSpec.title = QString(CXL_CLU_EVENT_BYTES_PER_L1_EVICTION_NAME_STR);
+            ret = true;
+        }
+        else if (CXL_CLU_EVENT_ACCESSES_PER_L1_EVICTION == eventId)
+        {
+            GetEventConfigByEventId(CXL_CLU_EVENT_ACCESSES, columnSpec.dataSelectLeft);
+            GetEventConfigByEventId(CXL_CLU_EVENT_L1_EVICTIONS, columnSpec.dataSelectRight);
+            columnSpec.title = QString(CXL_CLU_EVENT_ACCESSES_PER_L1_EVICTION_NAME_STR);
+            ret = true;
+        }
+
+        return ret;
+    }
+
+    bool PrepareCLUDataView()
+    {
+        bool ret = GetSampledCountersList();
+
+        if (ret)
+        {
+            ViewConfigInfo viewCfgInfo;
+            viewCfgInfo.m_viewCfg.SetConfigName(QString(CXL_REPORT_VIEW_ALL_DATA));
+
+            gtUInt32 nbrEvents = m_sampledCounterDescVec.size();
+
+            // We will adding 2 computed counters for CLU
+            nbrEvents += 2;
+            ColumnSpec* pColumnSpec = new ColumnSpec[nbrEvents + 2];
+
+            if (nullptr != pColumnSpec)
+            {
+                int i = 0;
+
+                for (auto& event : m_sampledCounterDescVec)
+                {
+                    if (CXL_CLU_EVENT_CLU_PERCENTAGE != event.m_id)
+                    {
+                        AMDTProfileSamplingConfig sampleConfig;
+                        ret = GetSamplingConfiguration(event.m_id, sampleConfig);
+
+                        if (ret)
+                        {
+                            pColumnSpec[i].type = ColumnValue;
+                            pColumnSpec[i].sorting = NoSort;
+                            pColumnSpec[i].visible = true;
+                            pColumnSpec[i].dataSelectRight.eventSelect = 0;
+                            pColumnSpec[i].dataSelectRight.eventUnitMask = 0;
+                            pColumnSpec[i].dataSelectRight.bitOs = 0;
+                            pColumnSpec[i].dataSelectRight.bitUsr = 0;
+
+                            ConstructEventConfig(sampleConfig, pColumnSpec[i].dataSelectLeft);
+                            pColumnSpec[i].title = QString(event.m_name.asASCIICharArray());
+
+                            i++;
+                        }
+                    }
+                }
+
+                if (ret)
+                {
+                    // Add derived counters
+                    PrepareComputedCounterForCLU(CXL_CLU_EVENT_CLU_PERCENTAGE, pColumnSpec[i]);
+                    PrepareComputedCounterForCLU(CXL_CLU_EVENT_BYTES_PER_L1_EVICTION, pColumnSpec[++i]);
+                    PrepareComputedCounterForCLU(CXL_CLU_EVENT_ACCESSES_PER_L1_EVICTION, pColumnSpec[++i]);
+
+                    viewCfgInfo.m_viewCfg.SetColumnSpecs(pColumnSpec, nbrEvents, false);
+                    viewCfgInfo.m_viewCfg.SetDescription("This special view has all of the data from the profile available.");
+
+                    AddViewConfig(viewCfgInfo);
+                }
+
+                delete[] pColumnSpec;
+            }
+        }
+
+        return ret;
+    }
+
+    bool UpdateSampledCountersForCLU()
+    {
+        // Treat CXL_CLU_EVENT_CLU_PERCENTAGE as computed counter as this involves 
+        // computing the percenatge based on evictions
+        for (auto& eventDesc : m_sampledCounterDescVec)
+        {
+            if (eventDesc.m_id == CXL_CLU_EVENT_CLU_PERCENTAGE)
+            {
+                AMDTProfileCounterDesc cluCounterDesc;
+
+                if (GetComputedCounterByName(CXL_CLU_EVENT_CLU_PERCENTAGE_NAME_WSTR, cluCounterDesc))
+                {
+                    eventDesc.m_id = cluCounterDesc.m_id;
+                    eventDesc.m_type = cluCounterDesc.m_type;
+                    eventDesc.m_unit = cluCounterDesc.m_unit;
+                    break;
+                }
+            }
+        }
+
+        // For CLU add the computed counters to sampled counters.. ugly kludge
+        for (auto& counterDesc : m_computedCounterDescVec)
+        {
+            if (counterDesc.m_name.compareNoCase(CXL_CLU_EVENT_CLU_PERCENTAGE_NAME_WSTR) != 0)
+            {
+                m_sampledCounterDescVec.push_back(counterDesc);
+            }
+        }
+
+        return true;
+    }
+
+    bool GetComputedCounterByName(gtString counterName, AMDTProfileCounterDesc& desc)
+    {
+        bool ret = false;
+
+        auto counterDesc = std::find_if(m_computedCounterDescVec.begin(), m_computedCounterDescVec.end(),
+            [&counterName](AMDTProfileCounterDesc const& aEventDesc)
+            { return 0 == aEventDesc.m_name.compareNoCase(CXL_CLU_EVENT_CLU_PERCENTAGE_NAME_WSTR); });
+
+        if (counterDesc != m_computedCounterDescVec.end())
+        {
+            desc = *counterDesc;
+            ret = true;
+        }
+
+        return ret;
     }
 
     bool GetReportConfigurationByName(gtString configName, AMDTProfileReportConfig& reportConfig)
@@ -749,7 +982,7 @@ public:
         m_options.m_coreMask = AMDT_PROFILE_ALL_CORES;
         m_options.m_isSeperateByCore = false;
         m_options.m_isSeperateByNuma = false;
-        m_options.m_ignoreSystemModules = false; // FIXME
+        m_options.m_ignoreSystemModules = false;
         m_options.m_doSort = true;
         m_options.m_othersEntryInSummary = true;
         m_options.m_summaryCount = 5;
@@ -1192,9 +1425,56 @@ public:
         return ret;
     }
 
+    bool RemoveUnnecessaryCounters(AMDTUInt32 counterId, AMDTProfileDataVec& profileData)
+    {
+        bool ret = false;
+
+        for (auto& aData : profileData)
+        {
+            AMDTSampleValueVec newSampleValueVec;
+
+            auto counterValue = std::find_if(aData.m_sampleValue.begin(), aData.m_sampleValue.end(),
+                [&counterId](AMDTSampleValue const& aSample) { return aSample.m_counterId == counterId; });
+
+            if (counterValue != aData.m_sampleValue.end())
+            {
+                newSampleValueVec.push_back(*counterValue);
+                ret = true;
+            }
+
+            aData.m_sampleValue.clear();
+            aData.m_sampleValue = newSampleValueVec;
+        }
+
+        return ret;
+    }
+
     bool GetProcessSummary(AMDTUInt32 counterId, AMDTProfileDataVec& processSummaryData)
     {
-        return GetSummaryData(AMDT_PROFILE_DATA_PROCESS, counterId, processSummaryData);
+        bool ret = false;
+        AMDTProfileCounterDesc desc;
+
+        if ((ret = GetCounterDescById(counterId, desc)))
+        {
+            if (AMDT_PROFILE_COUNTER_TYPE_RAW == desc.m_type)
+            {
+                ret = GetSummaryData(AMDT_PROFILE_DATA_PROCESS, counterId, processSummaryData);
+            }
+            else if (AMDT_PROFILE_COUNTER_TYPE_COMPUTED == desc.m_type)
+            {
+                ret = GetProcessProfileData(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, processSummaryData);
+
+                ret = ret && RemoveUnnecessaryCounters(counterId, processSummaryData);
+
+                // TODO: Return only the top five entriess
+                if (processSummaryData.size() > 5)
+                {
+                    processSummaryData.erase(processSummaryData.begin() + 5, processSummaryData.end());
+                }
+            }
+        }
+
+        return ret;
     }
 
     bool GetThreadSummary(AMDTUInt32 counterId, AMDTProfileDataVec& threadSummaryData)
@@ -1204,12 +1484,59 @@ public:
 
     bool GetModuleSummary(AMDTUInt32 counterId, AMDTProfileDataVec& moduleSummaryData)
     {
-        return GetSummaryData(AMDT_PROFILE_DATA_MODULE, counterId, moduleSummaryData);
+        bool ret = false;
+        AMDTProfileCounterDesc desc;
+
+        if ((ret = GetCounterDescById(counterId, desc)))
+        {
+            if (AMDT_PROFILE_COUNTER_TYPE_RAW == desc.m_type)
+            {
+                ret = GetSummaryData(AMDT_PROFILE_DATA_MODULE, counterId, moduleSummaryData);
+
+            }
+            else if (AMDT_PROFILE_COUNTER_TYPE_COMPUTED == desc.m_type)
+            {
+                ret = GetModuleProfileData(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, moduleSummaryData);
+                ret = ret && RemoveUnnecessaryCounters(counterId, moduleSummaryData);
+
+                // TODO: Return only the top five entriess
+                if (moduleSummaryData.size() > 5)
+                {
+                    moduleSummaryData.erase(moduleSummaryData.begin() + 5, moduleSummaryData.end());
+                }
+
+            }
+        }
+
+        return ret;
     }
 
     bool GetFunctionSummary(AMDTUInt32 counterId, AMDTProfileDataVec& funcSummaryData)
     {
-        return GetSummaryData(AMDT_PROFILE_DATA_FUNCTION, counterId, funcSummaryData);
+        bool ret = false;
+        AMDTProfileCounterDesc desc;
+
+        if ((ret = GetCounterDescById(counterId, desc)))
+        {
+            if (AMDT_PROFILE_COUNTER_TYPE_RAW == desc.m_type)
+            {
+                ret = GetSummaryData(AMDT_PROFILE_DATA_FUNCTION, counterId, funcSummaryData);
+            }
+            else if (AMDT_PROFILE_COUNTER_TYPE_COMPUTED == desc.m_type)
+            {
+                ret = GetFunctionProfileData(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, funcSummaryData);
+                ret = ret && RemoveUnnecessaryCounters(counterId, funcSummaryData);
+
+                // TODO: Return only the top five entriess
+                if (funcSummaryData.size() > 5)
+                {
+                    funcSummaryData.erase(funcSummaryData.begin() + 5, funcSummaryData.end());
+                }
+
+            }
+        }
+
+        return ret;
     }
 
     // based on m_options.counters..
@@ -1357,7 +1684,7 @@ public:
                 //  Note: !!! Used  Only For CLU !!!
                 if (lhsCount > 0.0 && rhsCount > 0.0)
                 {
-                    computedCounterValue = (lhsCount / 64.0) / (rhsCount * 100.0);
+                    computedCounterValue = (lhsCount / (static_cast<float>(64.0) * rhsCount)) * static_cast<float>(100.0);
                 }
                 break;
 
