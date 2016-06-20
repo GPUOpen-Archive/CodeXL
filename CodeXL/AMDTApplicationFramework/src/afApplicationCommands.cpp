@@ -48,6 +48,9 @@
 #include <AMDTApplicationFramework/Include/dialogs/afHelpAboutDialog.h>
 #include <AMDTApplicationFramework/Include/views/afInformationView.h>
 
+static QStringList s_sampleSourceNamesListTeapot;
+static QStringList s_sampleSourceNamesListD3DMT;
+static QStringList s_sampleSourceNamesListMatMul;
 
 // These should match the value of AP_DEFAULT_INTERCEPTION_METHOD:
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
@@ -150,6 +153,51 @@ afApplicationCommands::afApplicationCommands()
     {
         m_shouldPrintPerformanceTimestamps = (envValue == AF_CODEXL_PRINT_TIMESTAMPS_ENV_VALUE);
     }
+
+
+    // Initialize the list of sample source names
+    s_sampleSourceNamesListMatMul << AF_STR_MatMulSrc1;
+    s_sampleSourceNamesListD3DMT << AF_STR_D3DMTSrc1;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc1;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc2;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc3;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc4;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc5;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc6;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc7;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc8;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc9;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc10;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc11;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc12;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc13;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc14;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc15;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc16;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc17;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc18;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc19;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc20;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc21;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc22;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc23;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc24;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc25;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc26;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc27;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc28;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc29;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc30;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc31;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc32;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc33;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc34;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc35;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc36;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc37;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc38;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc39;
+    s_sampleSourceNamesListTeapot << AF_STR_TeapotSrc40;
 }
 
 
@@ -215,6 +263,55 @@ void afApplicationCommands::cleanupInstance()
         delete m_spMySingleInstance;
         m_spMySingleInstance = nullptr;
     }
+}
+
+bool afApplicationCommands::ConvertSamplesFilePath(const osFilePath& srcFilePath, osFilePath& localSrcFilePath)
+{
+    bool retVal = false;
+
+    // By default set the file path to the input source file path
+    localSrcFilePath = srcFilePath;
+
+    // If the file exists, we do not touch it
+    if (!srcFilePath.exists())
+    {
+        // Get the source file name
+        gtString fileNameAndExtension;
+        srcFilePath.getFileNameAndExtension(fileNameAndExtension);
+        QString fileNameQt = acGTStringToQString(fileNameAndExtension);
+
+        osFilePath::osApplicationSpecialDirectories folderEnum = osFilePath::OS_CODEXL_EXAMPLES_PATH;
+        if (s_sampleSourceNamesListTeapot.contains(fileNameQt.toLower()))
+        {
+            retVal = true;
+            folderEnum = osFilePath::OS_CODEXL_TEAPOT_SAMPLE_PATH;
+        }
+
+        else if (s_sampleSourceNamesListMatMul.contains(fileNameQt.toLower()))
+        {
+            retVal = true;
+            folderEnum = osFilePath::OS_CODEXL_MAT_MUL_SAMPLE_PATH;
+        }
+
+        if (s_sampleSourceNamesListD3DMT.contains(fileNameQt.toLower()))
+        {
+            retVal = true;
+            folderEnum = osFilePath::OS_CODEXL_D3D_MT_SAMPLE_PATH;
+        }
+
+        if (retVal)
+        {
+            // Convert the file name to local examples path
+            localSrcFilePath = osFilePath(folderEnum);
+
+            gtString fileName, extension;
+            srcFilePath.getFileName(fileName);
+            srcFilePath.getFileExtension(extension);
+            localSrcFilePath.setFileName(fileName);
+            localSrcFilePath.setFileExtension(extension);
+        }
+    }
+    return retVal;
 }
 
 /// -----------------------------------------------------------------------------------------------

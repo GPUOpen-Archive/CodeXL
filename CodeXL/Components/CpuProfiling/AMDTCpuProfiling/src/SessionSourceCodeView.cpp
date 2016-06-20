@@ -1249,6 +1249,16 @@ void SessionSourceCodeView::UpdateWithNewSymbol()
         fileLocationStr = m_pTreeViewModel->m_srcFile;
     }
 
+    // If this is a CodeXL sample source code, we should convert it to the samples location folder
+    // (The samples are built on our machines, and once CodeXL is published, the pdb contain a file path to our machines. We should
+    // convert it to the user's examples sources)
+    osFilePath localSrcFilePath, srcFilePath(acQStringToGTString(fileLocationStr));
+    bool isSampleCode = afApplicationCommands::instance()->ConvertSamplesFilePath(srcFilePath, localSrcFilePath);
+    if (isSampleCode)
+    {
+        fileLocationStr = acGTStringToQString(localSrcFilePath.asString());
+    }
+
     m_pModuleLocationInfoLabel->setText(fileLocationStr);
 }
 
