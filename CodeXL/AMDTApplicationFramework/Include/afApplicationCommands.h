@@ -237,6 +237,14 @@ public:
     /// \return the folder path or an empty string if the user clicked cancel
     virtual QString ShowFolderSelectionDialog(const QString& dialogCaption, QString& defaultFolder, afBrowseAction* pBrowseAction = nullptr);
 
+    /// The function identifies CodeXL samples source files. If the source file path cannot be found on the local machine, 
+    /// we assume that this is an installed binary pdb, with our machines paths. 
+    /// In this case we convert it to the samples location folder
+    /// \param srcFilePath the source file path
+    /// \param localSrcFilePath[out] the same source file path on the local machine
+    /// \return true iff this is a sample file path
+    bool ConvertSamplesFilePath(const osFilePath& srcFilePath, osFilePath& localSrcFilePath);
+
     // Enable / disable commands:
     virtual void enableWhenNoProcess(bool& isEnabled) const;
 
@@ -367,7 +375,6 @@ protected:
 public:
     // This should only be used at module destruction parallel to where the instance was created:
     static void cleanupInstance();
-
 protected:
     /// My single instance:
     static afApplicationCommands* m_spMySingleInstance;
