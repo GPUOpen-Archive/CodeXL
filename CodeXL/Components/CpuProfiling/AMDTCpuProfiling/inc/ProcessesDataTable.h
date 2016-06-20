@@ -40,6 +40,8 @@ protected:
 
     /// Fill the list data according to the requested item:
     bool fillListData();
+	virtual bool fillSummaryTables(int counterIdx);
+	virtual bool fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> modIdVec = {});
 
     /// Add a module item to the table:
     /// \param process - the process to add

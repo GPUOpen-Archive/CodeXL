@@ -57,9 +57,7 @@
 #endif
 
 SessionOverviewWindow::SessionOverviewWindow(QWidget* pParent, CpuSessionWindow* pSessionWindow)
-    : DataTab(pParent, pSessionWindow),
-      m_pProcessesTable(nullptr), m_pModulesTable(nullptr), m_pFunctionsTable(nullptr), m_pSplitterCentralWidget(nullptr),
-      m_pPropertiewView(nullptr), m_pHotSpotIndicatorComboBoxAction(nullptr)
+    : DataTab(pParent, pSessionWindow)
 {
     m_pList = nullptr;
     setMouseTracking(true);
@@ -182,7 +180,10 @@ void SessionOverviewWindow::setSessionWindowLayout()
     rc = connect(m_pModulesTable, SIGNAL(itemActivated(QTableWidgetItem*)), this, SLOT(onTableItemActivated(QTableWidgetItem*)));
     GT_ASSERT(rc);
 
-    rc = connect(m_pModulesTable, SIGNAL(contextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType, QTableWidgetItem*)), this, SLOT(onTableContextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType, QTableWidgetItem*)));
+    rc = connect(m_pModulesTable, SIGNAL(contextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType, QTableWidgetItem*)),
+                 this,
+                 SLOT(onTableContextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType,
+                                                        QTableWidgetItem*)));
     GT_ASSERT(rc);
 
     actions.clear();
@@ -204,7 +205,10 @@ void SessionOverviewWindow::setSessionWindowLayout()
     rc = connect(m_pFunctionsTable, SIGNAL(itemActivated(QTableWidgetItem*)), this, SLOT(onTableItemActivated(QTableWidgetItem*)));
     GT_ASSERT(rc);
 
-    rc = connect(m_pFunctionsTable, SIGNAL(contextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType, QTableWidgetItem*)), this, SLOT(onTableContextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType, QTableWidgetItem*)));
+    rc = connect(m_pFunctionsTable, SIGNAL(contextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType, QTableWidgetItem*)),
+                 this,
+                 SLOT(onTableContextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType,
+                                                        QTableWidgetItem*)));
     GT_ASSERT(rc);
 
     m_pPropertiewView = new acQHTMLWindow(nullptr);
@@ -232,8 +236,8 @@ void SessionOverviewWindow::setSessionWindowLayout()
     pModulesHeader->setFont(boldFont);
 
     // Connect the hot spot combo to it's slot:
-    rc = connect(this, SIGNAL(hotspotIndicatorChanged(const QString&)), this, SLOT(onAfterHotSpotComboChanged(const QString&)));
-    GT_ASSERT(rc);
+    //rc = connect(this, SIGNAL(hotspotIndicatorChanged(const QString&)), this, SLOT(onAfterHotSpotComboChanged(const QString&)));
+    //GT_ASSERT(rc);
 
     int colSpan = m_isMultiProcesses ? 2 : 4;
     int modulesCol = m_isMultiProcesses ? 2 : 0;
@@ -307,7 +311,6 @@ void SessionOverviewWindow::setSessionWindowLayout()
 
     QVBoxLayout* pBottomLayout = new QVBoxLayout;
 
-
     pBottomLayout->addWidget(m_pPropertiewView);
     pBottomLayout->addWidget(pFrame);
     pBottomWidget->setLayout(pBottomLayout);
@@ -347,7 +350,10 @@ bool SessionOverviewWindow::displaySessionProperties()
     GT_IF_WITH_ASSERT((m_pDisplayedSessionItemData != nullptr) && (m_pFunctionsTable != nullptr))
     {
         CPUSessionTreeItemData* pSessionData = qobject_cast<CPUSessionTreeItemData*>(m_pDisplayedSessionItemData->extendedItemData());
-        GT_IF_WITH_ASSERT((pSessionData != nullptr) && (m_pPropertiewView != nullptr) && (m_pProfileReader != nullptr) && (m_pProfileInfo != nullptr))
+        GT_IF_WITH_ASSERT((pSessionData != nullptr) &&
+                          (m_pPropertiewView != nullptr) &&
+                          (m_pProfileReader != nullptr) &&
+                          (m_pProfileInfo != nullptr))
         {
             // Get the profile info:
             CpuProfileInfo* pProfileInfo = m_pProfileReader->getProfileInfo();
@@ -357,28 +363,34 @@ bool SessionOverviewWindow::displaySessionProperties()
             content.addHTMLItem(afHTMLContent::AP_HTML_TITLE, CP_overviewPageExecutionHeader);
 
             gtString firstColStr, secondColStr;
-            firstColStr.appendFormattedString(L"<b>%ls:</b> %ls", CP_overviewPageTargetPath, acQStringToGTString(pSessionData->m_exeFullPath).asCharArray());
+            firstColStr.appendFormattedString(L"<b>%ls:</b> %ls", CP_overviewPageTargetPath,
+                                              acQStringToGTString(pSessionData->m_exeFullPath).asCharArray());
             content.addHTMLItem(afHTMLContent::AP_HTML_LINE, firstColStr);
 
             firstColStr.makeEmpty();
-            firstColStr.appendFormattedString(L"<b>%ls:</b> %ls", CP_overviewPageWorkingDirectory, acQStringToGTString(pSessionData->m_workingDirectory).asCharArray());
+            firstColStr.appendFormattedString(L"<b>%ls:</b> %ls", CP_overviewPageWorkingDirectory,
+                                              acQStringToGTString(pSessionData->m_workingDirectory).asCharArray());
             content.addHTMLItem(afHTMLContent::AP_HTML_LINE, firstColStr);
 
             firstColStr.makeEmpty();
-            firstColStr.appendFormattedString(L"<b>%ls:</b> %ls", CP_overviewPageDataFolder, pSessionData->SessionDir().directoryPath().asString().asCharArray());
+            firstColStr.appendFormattedString(L"<b>%ls:</b> %ls", CP_overviewPageDataFolder,
+                                              pSessionData->SessionDir().directoryPath().asString().asCharArray());
             content.addHTMLItem(afHTMLContent::AP_HTML_LINE, firstColStr);
 
             firstColStr.makeEmpty();
-            firstColStr.appendFormattedString(L"<b>%ls:</b> %ls", CP_overviewPageCommandLineArgs, acQStringToGTString(pSessionData->m_commandArguments).asCharArray());
+            firstColStr.appendFormattedString(L"<b>%ls:</b> %ls", CP_overviewPageCommandLineArgs,
+                                              acQStringToGTString(pSessionData->m_commandArguments).asCharArray());
             content.addHTMLItem(afHTMLContent::AP_HTML_LINE, firstColStr);
 
             firstColStr.makeEmpty();
-            firstColStr.appendFormattedString(L"<b>%ls:</b> %ls", CP_overviewPageEnvVars, pSessionData->m_envVariables.asCharArray());
+            firstColStr.appendFormattedString(L"<b>%ls:</b> %ls", CP_overviewPageEnvVars,
+                                              pSessionData->m_envVariables.asCharArray());
             content.addHTMLItem(afHTMLContent::AP_HTML_LINE, firstColStr);
 
             secondColStr.makeEmpty();
             firstColStr.makeEmpty();
-            firstColStr.appendFormattedString(L"<b>%ls:</b> 0x%llx", CP_overviewPageProfileCPUAffinity, pSessionData->m_startAffinity);
+            firstColStr.appendFormattedString(L"<b>%ls:</b> 0x%llx", CP_overviewPageProfileCPUAffinity,
+                                              pSessionData->m_startAffinity);
             gtString scopeStr = PM_STR_ProfileScopeSingleApplication;
 
             if (pSessionData->m_profileScope == PM_PROFILE_SCOPE_SYS_WIDE)
@@ -452,7 +464,8 @@ bool SessionOverviewWindow::displaySessionProperties()
             eventsCaption.append(L"</b>");
 
             firstColStr.makeEmpty();
-            firstColStr.appendFormattedString(L"<b>%ls:</b> %ls", CP_overviewPageSessionType, acQStringToGTString(pSessionData->m_profileTypeStr).asCharArray());
+            firstColStr.appendFormattedString(L"<b>%ls:</b> %ls", CP_overviewPageSessionType,
+                                              acQStringToGTString(pSessionData->m_profileTypeStr).asCharArray());
             content.addHTMLItem(afHTMLContent::AP_HTML_LINE, firstColStr, eventsCaption);
 
             gtVector<gtString> eventsStrVector;
@@ -461,12 +474,14 @@ bool SessionOverviewWindow::displaySessionProperties()
             GT_ASSERT(rc);
 
             firstColStr.makeEmpty();
-            firstColStr.appendFormattedString(L"<b>%ls:</b> %ls", CP_overviewPageProfileStartTime, pProfileInfo->m_profStartTime.asCharArray());
+            firstColStr.appendFormattedString(L"<b>%ls:</b> %ls", CP_overviewPageProfileStartTime,
+                                              pProfileInfo->m_profStartTime.asCharArray());
             content.addHTMLItem(afHTMLContent::AP_HTML_LINE, firstColStr, secondColStr, 10);
 
             firstColStr.makeEmpty();
             secondColStr.makeEmpty();
-            firstColStr.appendFormattedString(L"<b>%ls:</b> %ls", CP_overviewPageProfileEndTime, pProfileInfo->m_profEndTime.asCharArray());
+            firstColStr.appendFormattedString(L"<b>%ls:</b> %ls", CP_overviewPageProfileEndTime,
+                                              pProfileInfo->m_profEndTime.asCharArray());
             content.addHTMLItem(afHTMLContent::AP_HTML_LINE, firstColStr, secondColStr, 10);
 
             firstColStr.makeEmpty();
@@ -483,7 +498,8 @@ bool SessionOverviewWindow::displaySessionProperties()
             content.addHTMLItem(afHTMLContent::AP_HTML_LINE, firstColStr);
 
             firstColStr.makeEmpty();
-            firstColStr.appendFormattedString(L"<b>%ls:</b> %d", CP_overviewPageTotalProcesses, m_pProfileReader->getProcessMap()->size());
+            firstColStr.appendFormattedString(L"<b>%ls:</b> %d", CP_overviewPageTotalProcesses,
+                                              m_pProfileReader->getProcessMap()->size());
             content.addHTMLItem(afHTMLContent::AP_HTML_LINE, firstColStr);
 
             firstColStr.makeEmpty();
@@ -505,33 +521,23 @@ bool SessionOverviewWindow::displaySessionDataTables()
     bool retVal = false;
 
     // Sanity check:
-    GT_IF_WITH_ASSERT((m_pModulesTable != nullptr) && (m_pProcessesTable != nullptr) && (m_pFunctionsTable != nullptr) && (m_pProcessesHeader != nullptr))
+    GT_IF_WITH_ASSERT((m_pModulesTable != nullptr) &&
+                      (m_pProcessesTable != nullptr) &&
+                      (m_pFunctionsTable != nullptr) &&
+                      (m_pProcessesHeader != nullptr))
     {
         retVal = true;
 
-        // If there are multiple processes:
-        if (m_isMultiProcesses)
-        {
-            // Display the data according to the requested filter:
-            bool rc = m_pProcessesTable->displayProfileData(m_pProfileReader) && retVal;
-            GT_ASSERT(rc);
-            retVal = retVal && rc;
-        }
-
-        // Show / hide the processes section:
-        m_pProcessesTable->setVisible(m_isMultiProcesses);
-        m_pProcessesHeader->setVisible(m_isMultiProcesses);
-
-        // Display the data according to the requested filter:
-        bool rc = m_pModulesTable->displayProfileData(m_pProfileReader) && retVal;
+        bool rc = m_pProcessesTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, m_counterIdx) && retVal;
         GT_ASSERT(rc);
-        retVal = retVal && rc;
 
-        // Display the data according to the requested filter:
-        rc = m_pFunctionsTable->displayProfileData(m_pProfileReader) && retVal;
+        rc = m_pFunctionsTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, m_counterIdx) && retVal;
         GT_ASSERT(rc);
-        retVal = retVal && rc;
+
+        rc = m_pModulesTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, m_counterIdx) && retVal;
+        GT_ASSERT(rc);
     }
+
 
     return retVal;
 }
@@ -541,7 +547,10 @@ bool SessionOverviewWindow::updateTablesHotspotIndicator()
     bool retVal = false;
 
     // Sanity check
-    GT_IF_WITH_ASSERT((m_pModulesTable != nullptr) && (m_pProcessesTable != nullptr) && (m_pFunctionsTable != nullptr) && (m_pProcessesHeader != nullptr))
+    GT_IF_WITH_ASSERT((m_pModulesTable != nullptr) &&
+                      (m_pProcessesTable != nullptr) &&
+                      (m_pFunctionsTable != nullptr) &&
+                      (m_pProcessesHeader != nullptr))
     {
         retVal = true;
 
@@ -577,7 +586,10 @@ void SessionOverviewWindow::openProcessesView()
     afApplicationCommands* pCommands = afApplicationCommands::instance();
     SessionViewCreator* pSessionViewCreator = AmdtCpuProfiling::sessionViewCreator();
 
-    GT_IF_WITH_ASSERT((pCommands != nullptr) && (pSessionViewCreator != nullptr) && (m_pFunctionsTable != nullptr) && (m_pDisplayedSessionItemData != nullptr))
+    GT_IF_WITH_ASSERT((pCommands != nullptr) &&
+                      (pSessionViewCreator != nullptr) &&
+                      (m_pFunctionsTable != nullptr) &&
+                      (m_pDisplayedSessionItemData != nullptr))
     {
         // Find the functions item data for this session:
         afApplicationTreeItemData* pActivatedItemMacthingItemData = ProfileApplicationTreeHandler::instance()->FindSessionChildItemData(m_pDisplayedSessionItemData, AF_TREE_ITEM_PROFILE_CPU_FUNCTIONS);
@@ -602,7 +614,8 @@ void SessionOverviewWindow::openModulesView()
     GT_IF_WITH_ASSERT(m_pDisplayedSessionItemData != nullptr)
     {
         // Get the modules item data for the current session:
-        afApplicationTreeItemData* pModulesItemData = CpuProfileTreeHandler::instance().findChildItemData(m_pDisplayedSessionItemData, AF_TREE_ITEM_PROFILE_CPU_MODULES);
+        afApplicationTreeItemData* pModulesItemData = CpuProfileTreeHandler::instance().findChildItemData(m_pDisplayedSessionItemData,
+                                                      AF_TREE_ITEM_PROFILE_CPU_MODULES);
         GT_IF_WITH_ASSERT((pModulesItemData != nullptr) && (pModulesItemData->m_pTreeWidgetItem != nullptr))
         {
             afApplicationCommands* pApplicationCommands = afApplicationCommands::instance();
@@ -646,7 +659,11 @@ bool SessionOverviewWindow::fillHotspotIndicatorCombo()
 
     SessionDisplaySettings* pSessionDisplaySettings = CurrentSessionDisplaySettings();
     const QComboBox* pHotSpotIndicatorComboBox = TopToolbarComboBox(m_pHotSpotIndicatorComboBoxAction);
-    GT_IF_WITH_ASSERT((m_pHotSpotIndicatorComboBoxAction != nullptr) && (pHotSpotIndicatorComboBox != nullptr) && (m_pDisplayedSessionItemData != nullptr) && (m_pProfileInfo != nullptr) && (pSessionDisplaySettings != nullptr))
+    GT_IF_WITH_ASSERT((m_pHotSpotIndicatorComboBoxAction != nullptr) &&
+                      (pHotSpotIndicatorComboBox != nullptr) &&
+                      (m_pDisplayedSessionItemData != nullptr) &&
+                      (m_pProfileInfo != nullptr) &&
+                      (pSessionDisplaySettings != nullptr))
     {
         // Sigal: Notice: Currently, we cannot support "separate by" display property in overview hot spot indicator.
         // The reason for that is that we use m_availableDataColumnCaptions for the hot spot indicators, and in
@@ -701,29 +718,38 @@ bool SessionOverviewWindow::fillHotspotIndicatorCombo()
 
 void SessionOverviewWindow::onHotSpotComboChanged(const QString& text)
 {
-    GT_IF_WITH_ASSERT((m_pFunctionsTable != nullptr) && (m_pModulesTable != nullptr) && (m_pProcessesTable != nullptr))
+    GT_IF_WITH_ASSERT((m_pFunctionsTable != nullptr) &&
+                      (m_pModulesTable != nullptr) &&
+                      (m_pProcessesTable != nullptr))
     {
-        GT_IF_WITH_ASSERT((m_pFunctionsTable->tableDisplaySettings() != nullptr) && (m_pModulesTable->tableDisplaySettings() != nullptr) && (m_pProcessesTable->tableDisplaySettings() != nullptr))
+        GT_IF_WITH_ASSERT((m_pFunctionsTable->tableDisplaySettings() != nullptr) &&
+                          (m_pModulesTable->tableDisplaySettings() != nullptr) &&
+                          (m_pProcessesTable->tableDisplaySettings() != nullptr))
         {
             Qt::SortOrder defaultSortOrder = Qt::DescendingOrder;
-
-            // Reset the sort indicator order:
-            if (m_isProfiledClu)
-            {
-                if (CPUProfileUtils::IsHotSpotBetterHigher(m_pSessionDisplaySettings->getEventsFile(), text))
-                {
-                    defaultSortOrder = Qt::AscendingOrder;
-                }
-            }
 
             // Set the default sort order:
             m_pFunctionsTable->tableDisplaySettings()->m_lastSortOrder = defaultSortOrder;
             m_pModulesTable->tableDisplaySettings()->m_lastSortOrder = defaultSortOrder;
             m_pProcessesTable->tableDisplaySettings()->m_lastSortOrder = defaultSortOrder;
+
+            auto itr = m_CounterIdxMap.find(text.toStdWString().c_str());
+
+            if (m_CounterIdxMap.end() != itr)
+            {
+                bool rc = m_pProcessesTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, itr->second);
+                GT_ASSERT(rc);
+
+                rc = m_pFunctionsTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, itr->second);
+                GT_ASSERT(rc);
+
+                rc = m_pModulesTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, itr->second);
+                GT_ASSERT(rc);
+            }
         }
     }
 
-    emit hotspotIndicatorChanged(text);
+    //emit hotspotIndicatorChanged(text);
 }
 
 void SessionOverviewWindow::onAfterHotSpotComboChanged(const QString& text)
@@ -792,9 +818,13 @@ void SessionOverviewWindow::initDisplayFilters()
     // Sanity check:
     SessionDisplaySettings* pSessionDisplaySettings = CurrentSessionDisplaySettings();
     const QComboBox* pHotSpotIndicatorComboBox = TopToolbarComboBox(m_pHotSpotIndicatorComboBoxAction);
-    GT_IF_WITH_ASSERT((m_pProfileInfo != nullptr) && (m_pProfileReader != nullptr)
-                      && (pHotSpotIndicatorComboBox != nullptr) && (pSessionDisplaySettings != nullptr)
-                      && (m_pFunctionsTable != nullptr) && (m_pModulesTable != nullptr) && (m_pProcessesTable != nullptr))
+    GT_IF_WITH_ASSERT((m_pProfileInfo != nullptr) &&
+                      (m_pProfileReader != nullptr) &&
+                      (pHotSpotIndicatorComboBox != nullptr) &&
+                      (pSessionDisplaySettings != nullptr) &&
+                      (m_pFunctionsTable != nullptr) &&
+                      (m_pModulesTable != nullptr) &&
+                      (m_pProcessesTable != nullptr))
     {
         // Get the view name from the combo:
         QString hotSpotIndicatorName = pHotSpotIndicatorComboBox->currentText();
@@ -846,7 +876,8 @@ void SessionOverviewWindow::initDisplayFilters()
         // Set the display filter for the functions table:
         m_functionsTablesFilter.m_amountOfItemsInDisplay = 5;
         m_functionsTablesFilter.m_hotSpotIndicatorColumnCaption = "";
-        m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::FUNCTION_NAME_COL);
+		m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::FUNCTION_ID);
+		m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::FUNCTION_NAME_COL);
         m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_COUNT_COL);
 
         if (!m_pProfileInfo->m_isProfilingCLU)
@@ -1121,11 +1152,23 @@ void SessionOverviewWindow::onTableContextMenuActionTriggered(CPUProfileDataTabl
 
             case CPUProfileDataTable::DISPLAY_FUNCTION_IN_CALLGRAPH_VIEW:
             {
-                const QList<ProcessIdType>* pPidList = m_pFunctionsTable->getFunctionPidList(pTableItem->row());
+				QString funcId = m_pFunctionsTable->getFunctionId(pTableItem->row());
+				AMDTProfileFunctionData  functionData;
+				m_pProfDataRdr->GetFunctionDetailedProfileData(funcId.toInt(), AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_THREADS, functionData);
 
-                GT_IF_WITH_ASSERT(nullptr != pPidList && !pPidList->isEmpty())
+				QList<ProcessIdType> pidList;
+
+				for (const auto& pid : functionData.m_pidsList)
+				{
+					pidList << pid;
+				}
+
+                //const QList<ProcessIdType>* pPidList = m_pFunctionsTable->getFunctionPidList(pTableItem->row());
+
+                GT_IF_WITH_ASSERT(!pidList.isEmpty())
                 {
-                    openCallGraphViewForFunction(m_pFunctionsTable->getFunctionName(pTableItem->row()), pPidList->first());
+					openCallGraphViewForFunction(m_pFunctionsTable->getFunctionName(pTableItem->row()), pidList.first());
+					//openCallGraphViewForFunction(m_pFunctionsTable->getFunctionName(pTableItem->row()), pPidList->first());
                 }
                 break;
             }
@@ -1177,6 +1220,19 @@ void SessionOverviewWindow::onTableContextMenuActionTriggered(CPUProfileDataTabl
 
 bool SessionOverviewWindow::openFunctionSourceCode(gtVAddr functionAddress, const CpuProfileModule* pModule)
 {
+    AMDTProfileDataVec funcSummaryData;
+    m_pProfDataRdr->GetFunctionSummary(AMDT_PROFILE_ALL_COUNTERS, funcSummaryData);
+
+    AMDTProfileDataVec funcProfileData;
+    m_pProfDataRdr->GetFunctionSummary(AMDT_PROFILE_ALL_MODULES, funcProfileData);
+
+    for (auto const& func : funcProfileData)
+    {
+        gtString srcFilePath;
+        AMDTSourceAndDisasmInfoVec srcInfoVec;
+        m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(func.m_id, srcFilePath, srcInfoVec);
+    }
+
     bool retVal = false;
     GT_IF_WITH_ASSERT(nullptr != m_pFunctionsTable)
     {
@@ -1251,19 +1307,26 @@ void SessionOverviewWindow::openFunctionViewForFunction(QTableWidgetItem* pTable
     afApplicationCommands* pCommands = afApplicationCommands::instance();
     SessionViewCreator* pSessionViewCreator = AmdtCpuProfiling::sessionViewCreator();
 
-    GT_IF_WITH_ASSERT((pCommands != nullptr) && (pSessionViewCreator != nullptr) && (m_pFunctionsTable != nullptr) && (m_pDisplayedSessionItemData != nullptr))
+    GT_IF_WITH_ASSERT((pCommands != nullptr) &&
+                      (pSessionViewCreator != nullptr) &&
+                      (m_pFunctionsTable != nullptr) &&
+                      (m_pDisplayedSessionItemData != nullptr))
     {
         // Find the functions item data for this session:
-        afApplicationTreeItemData* pActivatedItemMacthingItemData = ProfileApplicationTreeHandler::instance()->FindSessionChildItemData(m_pDisplayedSessionItemData, AF_TREE_ITEM_PROFILE_CPU_FUNCTIONS);
+        ProfileApplicationTreeHandler* instance = ProfileApplicationTreeHandler::instance();
+        afApplicationTreeItemData* pActivatedItemMacthingItemData = instance->FindSessionChildItemData(m_pDisplayedSessionItemData,
+                                                                    AF_TREE_ITEM_PROFILE_CPU_FUNCTIONS);
         GT_IF_WITH_ASSERT(pActivatedItemMacthingItemData != nullptr)
         {
             int itemRow = pTableItem->row();
-            QString functionName = m_pFunctionsTable->getFunctionName(itemRow);
+
+			// get the function id
+			QString funcId = m_pFunctionsTable->getFunctionId(itemRow);
 
             // Find the matching session window:
             CpuSessionWindow* pSessionWindow = pSessionViewCreator->findSessionWindow(pActivatedItemMacthingItemData);
 
-            GT_IF_WITH_ASSERT((pSessionWindow != nullptr) && (!functionName.isEmpty()))
+            GT_IF_WITH_ASSERT((pSessionWindow != nullptr) && (!funcId.isEmpty()))
             {
                 SessionFunctionView* pFunctionsView = pSessionWindow->sessionFunctionsView();
 
@@ -1274,12 +1337,17 @@ void SessionOverviewWindow::openFunctionViewForFunction(QTableWidgetItem* pTable
 
                 pFunctionsView = pSessionWindow->sessionFunctionsView();
 
+				pFunctionsView->selectFunction(funcId);
+
+#if 0
                 const QList<ProcessIdType>* pPidList = m_pFunctionsTable->getFunctionPidList(itemRow);
 
                 GT_IF_WITH_ASSERT(nullptr != pFunctionsView && nullptr != pPidList && !pPidList->isEmpty())
                 {
-                    pFunctionsView->selectFunction(functionName, pPidList->first());
+					//pFunctionsView->selectFunction(functionName, pPidList->first());
+					pFunctionsView->selectFunction(funcId, pPidList->first());
                 }
+#endif
             }
         }
     }
@@ -1392,7 +1460,11 @@ void SessionOverviewWindow::openFunctionViewForProcess(QTableWidgetItem* pTableI
     afApplicationCommands* pCommands = afApplicationCommands::instance();
     SessionViewCreator* pSessionViewCreator = AmdtCpuProfiling::sessionViewCreator();
 
-    GT_IF_WITH_ASSERT((pCommands != nullptr) && (pSessionViewCreator != nullptr) && (m_pProcessesTable != nullptr) && (m_pDisplayedSessionItemData != nullptr) && (pTableItem != nullptr))
+    GT_IF_WITH_ASSERT((pCommands != nullptr) &&
+                      (pSessionViewCreator != nullptr) &&
+                      (m_pProcessesTable != nullptr) &&
+                      (m_pDisplayedSessionItemData != nullptr) &&
+                      (pTableItem != nullptr))
     {
         // Find the functions item data for this session:
         afApplicationTreeItemData* pActivatedItemMacthingItemData = ProfileApplicationTreeHandler::instance()->FindSessionChildItemData(m_pDisplayedSessionItemData, AF_TREE_ITEM_PROFILE_CPU_FUNCTIONS);

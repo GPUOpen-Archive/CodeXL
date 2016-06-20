@@ -45,6 +45,8 @@ public:
     // returns modules table type
     TableType GetTableType() const;
 
+	bool findModueId(int rowIndex, AMDTModuleId & modId);
+
 public slots:
 
     /// Overrides CPUProfileDataTable:
@@ -54,6 +56,9 @@ protected:
 
     /// Fill the list data according to the requested item:
     bool fillListData();
+
+	virtual bool fillSummaryTables(int counterIdx); 
+	virtual bool fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> modIdVec = {});
 
     /// Check if the module should be displayed or filtered:
     /// \pModule - the requested module

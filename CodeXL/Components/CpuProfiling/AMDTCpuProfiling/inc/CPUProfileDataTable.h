@@ -76,7 +76,6 @@ class CPUProfileDataTable : public acListCtrl
 
 public:
 
-
     enum TableContextMenuActionType
     {
         DISPLAY_FUNCTION_IN_FUNCTIONS_VIEW,
@@ -98,7 +97,10 @@ public:
         MODULES_DATA_TABLE
     };
 
-    CPUProfileDataTable(QWidget* pParent, const gtVector<TableContextMenuActionType>& additionalContextMenuActions, SessionTreeNodeData* pSessionData);
+    CPUProfileDataTable(QWidget* pParent,
+						const gtVector<TableContextMenuActionType>& additionalContextMenuActions,
+						SessionTreeNodeData* pSessionData);
+
     virtual ~CPUProfileDataTable();
 
     /// Add the requested items to context menu:
@@ -109,6 +111,20 @@ public:
     /// \param displayFilter the requested display data
     /// \return true / false is succeeded or failed
     bool displayProfileData(CpuProfileReader* pProfileReader);
+
+	bool displayTableData(shared_ptr<cxlProfileDataReader> pProfDataRdr,
+							shared_ptr<DisplayFilter> diplayFilter,
+							AMDTProcessId procId,
+							AMDTModuleId modId,
+							std::vector<AMDTUInt64> moduleIdVec = {});
+
+	virtual bool fillTableData(AMDTProcessId procId,
+                            AMDTModuleId modId,
+                            std::vector<AMDTUInt64> modIdVec = {}) = 0;
+
+	bool displayTableSummaryData(shared_ptr<cxlProfileDataReader> pProfDataRdr, 
+		shared_ptr<DisplayFilter> pDisplayFilter,
+		int counterIdx);
 
     /// Sort the table according to the requested display filter:
     void sortTable();
@@ -181,6 +197,9 @@ protected:
     /// Fill the list data according to the requested item:
     virtual bool fillListData();
 
+	// Fill summary DataTables
+	virtual bool fillSummaryTables(int counterIdx) = 0;
+
     /// Build the map of the current hot spot values. The function is virtual, since functions table for instance,
     /// needs to implement it in a more performance wise implementation
     /// \return true / false is succeeded or failed
@@ -191,6 +210,8 @@ protected:
 
     /// Sets the list control columns according to the current displayed item:
     bool initializeListHeaders();
+
+	bool initializeTableHeaders(shared_ptr<DisplayFilter> diplayFilter);
 
     /// \brief Name:        setModuleCellValue
     /// \brief Description: Sets the data for the requested module column index
@@ -252,6 +273,10 @@ protected:
 
     /// checks the profiling mode and return true if Cache Line profiling
     bool IsCacheLineProfiling() const;
+	bool delegateSamplePercent(int colNum);
+
+	shared_ptr<DisplayFilter>  m_pDisplayFilter = nullptr;
+  shared_ptr<cxlProfileDataReader> m_pProfDataRdr = nullptr;
 
 protected slots:
 
@@ -261,9 +286,9 @@ protected slots:
 
 protected:
 
-    TableDisplaySettings* m_pTableDisplaySettings;                ///< Represents the currently displayed table filter
-    SessionDisplaySettings* m_pSessionDisplaySettings;        ///< Represents the currently displayed session filter
-    CpuProfileReader* m_pProfileReader;                      ///< A pointer to the session profile reader
+    TableDisplaySettings* m_pTableDisplaySettings = nullptr;                ///< Represents the currently displayed table filter
+    SessionDisplaySettings* m_pSessionDisplaySettings = nullptr;        ///< Represents the currently displayed session filter
+    CpuProfileReader* m_pProfileReader = nullptr;                      ///< A pointer to the session profile reader
 
     // Summarize the total value of sample counts:
     double m_totalSampleCount;
@@ -278,13 +303,13 @@ protected:
     SessionTreeNodeData* m_pDisplaySessionData;
 
     /// Contain the object that is responsible for the delegate of the CLU percent items:
-    acTablePercentItemDelegate* m_pCLUDelegate;
+    acTablePercentItemDelegate* m_pCLUDelegate = nullptr;
 
     // saves the empty table message row item
-    QTableWidgetItem* m_pEmptyRowTableItem;
+    QTableWidgetItem* m_pEmptyRowTableItem = nullptr;
 
     // saves the other samples message row item
-    QTableWidgetItem* m_pOtherSamplesRowItem;
+    QTableWidgetItem* m_pOtherSamplesRowItem = nullptr;
 
     // saves the index of the percent columns
     QList<int> m_percentColsNum;
@@ -305,6 +330,7 @@ protected:
 
     gtUInt32 m_elapsedTime[CPU_TABLE_MAX_VALUES];
     gtUInt32 m_startTime[CPU_TABLE_MAX_VALUES];
+
 };
 
 #endif //__CPUPROFILEDATATABLE_H

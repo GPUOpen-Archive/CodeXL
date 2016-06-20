@@ -36,6 +36,60 @@ ProcessesDataTable::~ProcessesDataTable()
 
 }
 
+bool ProcessesDataTable::fillSummaryTables(int counterIdx)
+{
+    bool retVal = false;
+
+    if (nullptr != m_pProfDataRdr)
+    {
+        AMDTProfileCounterDescVec counterDesc;
+        bool rc = m_pProfDataRdr->GetSampledCountersList(counterDesc);
+
+        AMDTProfileDataVec processProfileData;
+        rc = m_pProfDataRdr->GetProcessSummary(counterDesc.at(counterIdx).m_id,
+                                               processProfileData);
+        GT_ASSERT(rc);
+
+        setSortingEnabled(false);
+
+        for (auto profData : processProfileData)
+        {
+            // get the process info
+            AMDTProfileProcessInfoVec procInfo;
+            rc = m_pProfDataRdr->GetProcessInfo(profData.m_id, procInfo);
+
+            QStringList list;
+
+            if (profData.m_name != L"other")
+            {
+                list << procInfo.at(0).m_name.asASCIICharArray();
+                list << QString::number(procInfo.at(0).m_pid);
+            }
+            else
+            {
+                list << "other";
+                list << "";
+            }
+
+            QVariant sampleCount(profData.m_sampleValue.at(0).m_sampleCount);
+            list << sampleCount.toString();
+
+            QVariant sampleCountPercent(profData.m_sampleValue.at(0).m_sampleCountPercentage);
+            list << QString::number(profData.m_sampleValue.at(0).m_sampleCountPercentage, 'f', 2);
+
+            addRow(list, nullptr);
+
+            delegateSamplePercent(3);
+        }
+
+        setSortingEnabled(true);
+
+        retVal = true;
+    }
+
+    return retVal;
+}
+
 bool ProcessesDataTable::fillListData()
 {
     bool retVal = false;
@@ -322,8 +376,19 @@ bool ProcessesDataTable::calculateProcessSamplesCount(ProcessIdType pid, QString
 
 bool ProcessesDataTable::findProcessDetails(int rowIndex, ProcessIdType& pid, QString& processFileName)
 {
-    bool retVal = false;
+    bool retVal = true;
+	QTableWidgetItem* pidWidget = item(rowIndex, 1);
+	int pidInt = pidWidget->text().toInt();
+	pid = pidInt;
+	(void)processFileName;
 
+	QTableWidgetItem *qPid = item(rowIndex, 1);
+	QTableWidgetItem *qProcName = item(rowIndex, 0);
+
+	pid = qPid->text().toInt();
+	processFileName = qProcName->text();
+
+#if 0
     GT_IF_WITH_ASSERT(m_pTableDisplaySettings != nullptr)
     {
         // Find the process ID column index:
@@ -361,6 +426,8 @@ bool ProcessesDataTable::findProcessDetails(int rowIndex, ProcessIdType& pid, QS
             }
         }
     }
+
+#endif
 
     return retVal;
 }
@@ -437,4 +504,58 @@ bool ProcessesDataTable::shouldPIDBeDisplayed(ProcessIdType pid)
 CPUProfileDataTable::TableType ProcessesDataTable::GetTableType() const
 {
     return CPUProfileDataTable::PROCESSES_DATA_TABLE;
+}
+
+bool ProcessesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> modIdVec)
+{
+    bool retVal = false;
+
+    GT_IF_WITH_ASSERT((m_pProfDataRdr != nullptr) &&
+                      (m_pSessionDisplaySettings != nullptr) &&
+                      (m_pTableDisplaySettings != nullptr))
+    {
+        // get samples for Data cache access events
+        AMDTProfileSessionInfo sessionInfo;
+
+        bool rc = m_pProfDataRdr->GetProfileSessionInfo(sessionInfo);
+        GT_ASSERT(rc);
+
+        gtVector<AMDTProfileData> allProcessData;
+        rc = m_pProfDataRdr->GetProcessProfileData(procId, modId, allProcessData);
+        GT_ASSERT(rc);
+
+         setSortingEnabled(false);
+
+        for (auto profData : allProcessData)
+        {
+            QStringList list;
+
+            std::vector<gtString> selectedCounterList;
+
+            AMDTProfileProcessInfoVec procInfo;
+            rc = m_pProfDataRdr->GetProcessInfo(profData.m_id, procInfo);
+
+            list << procInfo.at(0).m_name.asASCIICharArray();
+            list << QString::number(procInfo.at(0).m_pid);
+
+
+            m_pDisplayFilter->GetSelectedCounterList(selectedCounterList);
+            int i = 0;
+
+            for (auto counter : selectedCounterList)
+            {
+                QVariant sampleCount(profData.m_sampleValue.at(i++).m_sampleCount);
+                list << sampleCount.toString();
+
+            }
+
+            addRow(list, nullptr);
+        }
+
+        setSortingEnabled(true);
+
+        retVal = true;
+    }
+
+    return retVal;
 }

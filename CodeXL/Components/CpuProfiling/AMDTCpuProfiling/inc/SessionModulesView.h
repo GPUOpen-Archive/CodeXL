@@ -109,27 +109,27 @@ private:
 private:
 
     // Widgets:
-    ProcessesDataTable* m_pTopProcessesTable;
-    ProcessesDataTable* m_pBottomProcessesTable;
-    ModulesDataTable* m_pTopModulesTable;
-    ModulesDataTable* m_pBottomModulesTable;
+    ProcessesDataTable* m_pTopProcessesTable = nullptr;
+    ProcessesDataTable* m_pBottomProcessesTable = nullptr;
+    ModulesDataTable* m_pTopModulesTable = nullptr;
+    ModulesDataTable* m_pBottomModulesTable = nullptr;
 
     // Display filters for the tables:
     TableDisplaySettings m_modulesTableFilter;
     TableDisplaySettings m_processesTableFilter;
 
-    QSplitter* m_pSplitterCentralWidget;
-    acWidgetAction* m_pComboBoxDisplayByAction;
+    QSplitter* m_pSplitterCentralWidget = nullptr;
+    acWidgetAction* m_pComboBoxDisplayByAction = nullptr;
 
-    QWidget* m_pProcessWidget;
-    QWidget* m_pModulesWidget;
-    QWidget* m_pHintFrame;
+    QWidget* m_pProcessWidget = nullptr;
+    QWidget* m_pModulesWidget = nullptr;
+    QWidget* m_pHintFrame = nullptr;
 
-    acWidgetAction* m_pTopLabelAction;
-    QLabel* m_pBottomLabel;
+    acWidgetAction* m_pTopLabelAction = nullptr;
+    QLabel* m_pBottomLabel = nullptr;
 
-    bool m_isProcessesUp;
-    enum LAST_SELECTED_TABLE m_latestSelectedTable;
+    bool m_isProcessesUp = true;
+    enum LAST_SELECTED_TABLE m_latestSelectedTable = TOTAL_TABLE_COUNT;
 };
 
 

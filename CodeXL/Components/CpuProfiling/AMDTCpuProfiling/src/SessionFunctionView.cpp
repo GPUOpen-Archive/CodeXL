@@ -37,7 +37,8 @@
 #include <inc/SessionFunctionView.h>
 
 SessionFunctionView::SessionFunctionView(QWidget* pParent, CpuSessionWindow* pSessionWindow)
-    :  DataTab(pParent, pSessionWindow), m_pFunctionTable(nullptr),
+    :  DataTab(pParent, pSessionWindow),
+       m_pFunctionTable(nullptr),
        m_pLabelModuleSelectedAction(nullptr), m_pPIDComboBoxAction(nullptr)
 {
     setMouseTracking(true);
@@ -177,11 +178,55 @@ bool SessionFunctionView::displaySessionDataTables()
     bool retVal = false;
 
     // Sanity check:
-    SessionDisplaySettings* pSessionDisplaySettings = CurrentSessionDisplaySettings();
+    //SessionDisplaySettings* pSessionDisplaySettings = CurrentSessionDisplaySettings();
     GT_IF_WITH_ASSERT((m_pFunctionTable != nullptr) && (m_pProfileReader != nullptr))
     {
-        pSessionDisplaySettings->calculateDisplayedColumns(m_pProfileReader->getTopologyMap());
-        retVal = m_pFunctionTable->displayProfileData(m_pProfileReader);
+        // Use case
+        //1. all module all process
+        //2. all module single process
+        int moduleShown = m_functionsTablesFilter.m_filterByModulePathsList.size();
+
+        // all module shown
+        if (0 == moduleShown)
+        {
+            // all process
+            int pid = AMDT_PROFILE_ALL_PROCESSES;
+
+            // single process
+            if (1 == m_functionsTablesFilter.m_filterByPIDsList.size())
+            {
+                pid = m_functionsTablesFilter.m_filterByPIDsList.at(0);
+            }
+
+            retVal = m_pFunctionTable->displayTableData(m_pProfDataRdr,
+                                                        m_pDisplayFilter,
+                                                        pid,
+                                                        AMDT_PROFILE_ALL_MODULES);
+        }
+        else
+        {
+            int selModSize = m_functionsTablesFilter.m_filterByModulePathsList.size();
+            std::vector<AMDTUInt64> selecedModIdVec;
+
+            for (int i = 0; i < selModSize; ++i)
+            {
+                gtString modName = acQStringToGTString(m_functionsTablesFilter.m_filterByModulePathsList.at(i));
+                auto itr = m_moduleNameIdMap.find(modName);
+
+                if (m_moduleNameIdMap.end() != itr)
+                {
+                    selecedModIdVec.push_back(itr->second);
+                }
+            }
+
+            retVal = m_pFunctionTable->displayTableData(m_pProfDataRdr,
+                                                        m_pDisplayFilter,
+                                                        AMDT_PROFILE_ALL_PROCESSES,
+                                                        AMDT_PROFILE_ALL_MODULES, selecedModIdVec);
+        }
+
+        //3. multiple/single module single Process
+        //4. multiple / single module all process
     }
 
     return retVal;
@@ -190,6 +235,7 @@ bool SessionFunctionView::displaySessionDataTables()
 void SessionFunctionView::initDisplayFilters()
 {
     // Set the display filter for the modules table:
+	m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::FUNCTION_ID);
     m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::FUNCTION_NAME_COL);
     m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::MODULE_NAME_COL);
 }
@@ -269,6 +315,37 @@ void SessionFunctionView::CreateToolbar()
     m_pPIDComboBoxAction = m_pTopToolbar->AddComboBox(QStringList(), SIGNAL(currentIndexChanged(int)), this, SLOT(onSelectPid(int)));
 }
 
+void SessionFunctionView::selectFunction(const QString& funcId)
+{
+	GT_IF_WITH_ASSERT(m_pFunctionTable != nullptr)
+	{
+		int itemRowIndex = -1;
+
+		for (int i = 0; i < m_pFunctionTable->rowCount(); i++)
+		{
+			QTableWidgetItem* pItem = m_pFunctionTable->item(i, 0);
+
+			if (pItem != nullptr)
+			{
+				if (pItem->text() == funcId)
+				{
+					itemRowIndex = i;
+					break;
+				}
+			}
+		}
+
+		// Select and ensure visible:
+		GT_IF_WITH_ASSERT(itemRowIndex < m_pFunctionTable->rowCount())
+		{
+			m_pFunctionTable->ensureRowVisible(itemRowIndex, true);
+			m_pFunctionTable->setFocus();
+			setFocus();
+			raise();
+			activateWindow();
+		}
+	}
+}
 void SessionFunctionView::selectFunction(const QString& functionName, ProcessIdType pid)
 {
     GT_IF_WITH_ASSERT(nullptr != m_pPIDComboBoxAction)
@@ -336,7 +413,9 @@ ProcessIdType SessionFunctionView::getCurrentPid()
 void SessionFunctionView::filterByPID(int pid)
 {
     const QComboBox* pPIDComboBox = TopToolbarComboBox(m_pPIDComboBoxAction);
-    GT_IF_WITH_ASSERT((m_pFunctionTable != nullptr) && (m_pPIDComboBoxAction != nullptr) && (pPIDComboBox != nullptr))
+    GT_IF_WITH_ASSERT((m_pFunctionTable != nullptr) && 
+			(m_pPIDComboBoxAction != nullptr) && 
+		(pPIDComboBox != nullptr))
     {
         // bool found = false;
         int count = pPIDComboBox->count();
@@ -399,7 +478,11 @@ void SessionFunctionView::onOpenModuleSelector(const QString& link)
         pSessionData = qobject_cast<CPUSessionTreeItemData*>(m_pDisplayedSessionItemData->extendedItemData());
     }
 
-    ModuleFilterDialog mfd(m_pProfileReader, &m_functionsTablesFilter, pSessionData, afMainAppWindow::instance());
+    //TODO: need to set the system module flag
+    ModuleFilterDialog mfd(m_pProfDataRdr, &m_functionsTablesFilter, pSessionData, true, afMainAppWindow::instance());
+
+    //get the selected modle list
+
 
     if (QDialog::Accepted == mfd.exec())
     {
@@ -483,11 +566,11 @@ void SessionFunctionView::fillPIDComb()
     {
         QStringList pidList;
 
-        // Go through the processes in the profile reader and add each of them to the combo box:
-        m_pProfileReader->getProcessMap()->begin()->first;
+        AMDTProfileProcessInfoVec procInfo;
+        m_pProfDataRdr->GetProcessInfo(AMDT_PROFILE_ALL_PROCESSES, procInfo);
 
         // Check if this session is a multi-process session:
-        bool isMultiProcess = m_pProfileReader->getProcessMap()->size() > 1;
+        bool isMultiProcess = procInfo.size() > 1;
 
         // If there are multiple processes, add "All Processes" item:
         if (isMultiProcess)
@@ -499,10 +582,9 @@ void SessionFunctionView::fillPIDComb()
         PidProcessMap::iterator pmStart = m_pProfileReader->getProcessMap()->begin();
         PidProcessMap::iterator pmEnd = m_pProfileReader->getProcessMap()->end();
 
-        for (PidProcessMap::iterator pmI = pmStart; pmI != pmEnd; ++ pmI)
+        for (const auto& proc : procInfo)
         {
-            QFileInfo fi(acGTStringToQString(pmI->second.getPath()));
-            QString pidAsString = QString("%1(%2)").arg(fi.fileName()).arg(pmI->first);
+            QString pidAsString = QString("%1(%2)").arg(acGTStringToQString(proc.m_name)).arg(proc.m_pid);
             pidList << pidAsString;
         }
 
@@ -520,6 +602,8 @@ void SessionFunctionView::fillPIDComb()
         m_pPIDComboBoxAction->UpdateCurrentIndex(index);
     }
 }
+
+#if 0
 void SessionFunctionView::addModulesForPID(uint pid)
 {
     // Update the modules list for the requested pid:
@@ -546,10 +630,12 @@ void SessionFunctionView::addModulesForPID(uint pid)
                 bool isSystemModule = AuxIsSystemModule(mit->first);
                 m_functionsTablesFilter.m_isSystemDllList.append(isSystemModule);
                 ++moduleCount;
+                ++counter;
             }
         }
     }
 }
+#endif
 
 void SessionFunctionView::onSelectPid(int index)
 {
@@ -576,7 +662,6 @@ void SessionFunctionView::onSelectPid(int index)
 
 void SessionFunctionView::updateDataFromPidComboBox()
 {
-    // Sanity check:
     const QComboBox* pPIDComboBox = TopToolbarComboBox(m_pPIDComboBoxAction);
     GT_IF_WITH_ASSERT((m_pFunctionTable != nullptr) && (pPIDComboBox != nullptr))
     {
@@ -587,37 +672,49 @@ void SessionFunctionView::updateDataFromPidComboBox()
         m_functionsTablesFilter.m_isModule32BitList.clear();
         m_functionsTablesFilter.m_isSystemDllList.clear();
 
+        AMDTUInt32 pid = 0;
+
         if (CP_profileAllProcesses == pPIDComboBox->currentText())
         {
+            pid = AMDT_PROFILE_ALL_PROCESSES;
             int count = pPIDComboBox->count();
 
             for (int i = 0; i < count; ++i)
             {
                 if (0 != pPIDComboBox->itemText(i).compare(CP_profileAllProcesses))
                 {
-                    ProcessIdType pid = 0;
-                    bool rc = ProcessNameToPID(pPIDComboBox->itemText(i), pid);
+                    AMDTUInt32 currentPID = 0;
+                    bool rc = ProcessNameToPID(pPIDComboBox->itemText(i), currentPID);
 
                     if (rc)
                     {
-                        m_functionsTablesFilter.m_filterByPIDsList.append(pid);
-
-                        // Add the modules for this PID:
-                        addModulesForPID(pid);
+                        m_functionsTablesFilter.m_filterByPIDsList.append(currentPID);
                     }
                 }
             }
         }
         else
         {
-            ProcessIdType pid = 0;
+            bool ret = ProcessNameToPID(pPIDComboBox->currentText(), pid);
 
-            bool rc = ProcessNameToPID(pPIDComboBox->currentText(), pid);
-
-            if (rc)
+            if (true == ret)
             {
                 m_functionsTablesFilter.m_filterByPIDsList.append(pid);
-                addModulesForPID(pid);
+            }
+        }
+
+        gtVector<AMDTProfileModuleInfo> modInfo;
+        bool ret = m_pProfDataRdr->GetModuleInfo(pid, AMDT_PROFILE_ALL_MODULES, modInfo);
+        GT_ASSERT(ret);
+
+        for (const auto& module : modInfo)
+        {
+            if (!m_functionsTablesFilter.m_allModulesFullPathsList.contains(acGTStringToQString(module.m_path)))
+            {
+                m_functionsTablesFilter.m_allModulesFullPathsList.append(acGTStringToQString(module.m_path));
+                m_functionsTablesFilter.m_isModule32BitList.append(module.m_is64Bit ? false : true);
+                m_functionsTablesFilter.m_isSystemDllList.append(module.m_isSystemModule);
+                m_moduleNameIdMap.emplace(module.m_path, module.m_moduleId);
             }
         }
     }

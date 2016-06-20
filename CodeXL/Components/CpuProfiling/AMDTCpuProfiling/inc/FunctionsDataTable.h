@@ -44,6 +44,7 @@ public:
     int getFunctionNameColumnIndex() const { return m_functionNameColIndex; }
 
     QString getFunctionName(int rowIndex) const;
+	QString getFunctionId(int rowIndex) const;
 
     /// Get the function address for the function in row row index
     gtVAddr getFunctionAddress(int rowIndex, const CpuProfileModule*& pModule) const;
@@ -80,6 +81,10 @@ protected:
 
     /// Fill the list data according to the requested item:
     bool fillListData();
+
+	virtual bool fillSummaryTables(int counterIdx); 
+	bool AddRowToTable(const gtVector<AMDTProfileData>& allModuleData);
+	virtual bool fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> modIdVec = {});
 
     /// Build the map of the current hot spot values.
     /// The values are taken from m_functionsInfosVec in order to save the

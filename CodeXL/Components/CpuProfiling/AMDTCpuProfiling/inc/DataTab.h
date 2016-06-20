@@ -252,6 +252,8 @@ protected:
     acToolBar* m_pTopToolbar;
     CpuSessionWindow* m_pParentSessionWindow;
     SessionDisplaySettings* m_pSessionDisplaySettings;
+	shared_ptr<DisplayFilter>  m_pDisplayFilter = nullptr ;
+
     bool m_enableOnlySystemDllInDisplaySettings;
 
     /// This flag keeps the type of change needs to be performed once the view is displayed.
@@ -275,6 +277,8 @@ protected:
 
     /// True iff we're in the update function (avoid multiple updates)
     bool m_isUpdatingData;
+	shared_ptr<cxlProfileDataReader> m_pProfDataRdr = nullptr;
+	std::map<gtString, AMDTUInt32>		m_CounterIdxMap;
 
 };
 
