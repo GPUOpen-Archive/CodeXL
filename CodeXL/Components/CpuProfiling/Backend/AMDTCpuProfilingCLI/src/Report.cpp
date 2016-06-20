@@ -653,7 +653,7 @@ HRESULT CpuProfileReport::ReportFromDb()
 
             AMDTProfileDataOptions options;
             options.m_coreMask = AMDT_PROFILE_ALL_CORES;
-            options.m_ignoreSystemModules = true;
+            options.m_ignoreSystemModules = false;
             options.m_doSort = true;
             options.m_summaryCount = 5;
             options.m_isSeperateByCore = false;
