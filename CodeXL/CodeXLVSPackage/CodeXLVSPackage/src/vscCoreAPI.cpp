@@ -230,7 +230,6 @@ CXLVSCORE_API bool vscGetCoreAPI(IVscCoreAPI* o_pCoreAPI)
         VSC_GET_CORE_FUNCTION(o_pCoreAPI, vsc_OnConfigureRemoteHost, retVal);
         VSC_GET_CORE_FUNCTION(o_pCoreAPI, vsc_OnStartButton, retVal);
         VSC_GET_CORE_FUNCTION(o_pCoreAPI, vsc_OnUpdateConfigureRemoteHost, retVal);
-        VSC_GET_CORE_FUNCTION(o_pCoreAPI, vsc_OnUpdateStartButtonGetText, retVal);
 
         // vscPackageCommandHandler
         VSC_GET_CORE_FUNCTION(o_pCoreAPI, vsc_FreeStrMemory, retVal);

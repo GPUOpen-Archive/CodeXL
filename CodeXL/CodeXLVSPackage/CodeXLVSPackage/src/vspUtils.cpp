@@ -30,16 +30,13 @@
 // Author:      Sigal Algranaty
 // Date:        22/5/2011
 // ---------------------------------------------------------------------------
-void vspGetStartActionCommandName(std::wstring& verbName, std::wstring& actionCommandStr, bool addKeyboardShortcut /*= false*/)
+void vspGetStartActionCommandName(std::wstring& verbName, std::wstring& actionCommandStr, bool addKeyboardShortcut /*= false*/, bool fullString /* = true */)
 {
-    GT_UNREFERENCED_PARAMETER(verbName);
-    GT_UNREFERENCED_PARAMETER(actionCommandStr);
-
     wchar_t* pVerbNameStr = NULL;
     wchar_t* pActionCommandStr = NULL;
 
     // Invoke core logic.
-    VSCORE(vscUtilsGetStartActionCommandName)(pVerbNameStr, pActionCommandStr, addKeyboardShortcut);
+    VSCORE(vscUtilsGetStartActionCommandName)(pVerbNameStr, pActionCommandStr, addKeyboardShortcut, fullString);
 
     // Assign the output buffers.
     assert(pVerbNameStr != NULL);

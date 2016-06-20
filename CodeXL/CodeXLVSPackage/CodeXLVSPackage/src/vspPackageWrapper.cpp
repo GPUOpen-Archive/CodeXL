@@ -192,7 +192,6 @@ void vspPackageWrapper::outputMessage(const std::wstring& messageString, bool ou
         {
             HRESULT rc = spOutputWindowPane->Activate();
             bool isOk = (rc == S_OK);
-            VSP_ASSERT(isOk);
 
             if (isOk)
             {
