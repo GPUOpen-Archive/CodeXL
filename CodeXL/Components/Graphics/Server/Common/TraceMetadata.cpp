@@ -196,8 +196,7 @@ bool ReadMetadataFile(const std::string& inPathToMetadataFile, TraceMetadata* ou
     // We have a path to a cached trace metadata file. Load the metadata file, and return the trace response text.
     std::wstring widePathToMetadataFile;
     widePathToMetadataFile.assign(inPathToMetadataFile.begin(), inPathToMetadataFile.end());
-    gtString metadataFilepathGTString;
-    metadataFilepathGTString.appendFormattedString(L"%s", widePathToMetadataFile.c_str());
+    gtString metadataFilepathGTString(widePathToMetadataFile.c_str());
 
     osFilePath metadataFilepath(metadataFilepathGTString);
     osFile metadataFile;
