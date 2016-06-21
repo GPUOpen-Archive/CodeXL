@@ -2229,7 +2229,15 @@ bool CXLDaemonClient::ValidateAppPaths(const osPortAddress& daemonAddress, const
 {
     const unsigned CONNECTION_VALIDATION_TIMEOUT_MS = 5000;
     isAppValid = isWorkingFolderValid = false;
-    bool ret = Init(daemonAddress, CONNECTION_VALIDATION_TIMEOUT_MS, true);
+    bool ret = true;
+    bool terminate = false;
+    if (IsInitialized(daemonAddress) == false)
+    {
+         ret = Init(daemonAddress, CONNECTION_VALIDATION_TIMEOUT_MS, true);
+         //we shall terminate session since, it's was only open for this specific validation
+         terminate = true;
+    }
+
     GT_IF_WITH_ASSERT(ret)
     {
         CXLDaemonClient* pClient = CXLDaemonClient::GetInstance();
@@ -2245,7 +2253,10 @@ bool CXLDaemonClient::ValidateAppPaths(const osPortAddress& daemonAddress, const
             {
                 //TODO check paths valid
                 ret = pClient->ValidateAppPaths(appFilePath, workingFolderPath, isAppValid, isWorkingFolderValid);
-                pClient->TerminateWholeSession();
+                if (terminate)
+                {
+                    pClient->TerminateWholeSession();
+                }
             }
         }
     }
