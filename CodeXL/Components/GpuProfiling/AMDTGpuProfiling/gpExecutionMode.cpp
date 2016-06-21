@@ -1212,12 +1212,14 @@ void gpExecutionMode::HandleSessionDeletion(GPUSessionTreeItemData* pSessionData
 void gpExecutionMode::onExecutionModeChanged()
 {
     OS_DEBUG_LOG_TRACER;
+    
+    
 
     if (afExecutionModeManager::instance().isActiveMode(PM_STR_FrameAnalysisMode))
     {
         InitializeCodeXLRemoteAgent();
     }
-    else
+    else  if (afProjectManager::instance().currentProjectSettings().isRemoteTarget() == false)
     {
         TerminateRemoteAgent();
     }
