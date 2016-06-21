@@ -5,22 +5,22 @@
 /// \brief An empty Windows window used for replaying API Frame Capture files.
 //==============================================================================
 
-#ifndef X11_WINDOW_H
-#define X11_WINDOW_H
+#ifndef XCB_WINDOW_H
+#define XCB_WINDOW_H
 
 #include <WinDefs.h>
 #include "WindowBase.h"
 
 /// An empty window used for replaying API Frame Capture files.
-class X11Window : public WindowBase
+class XcbWindow : public WindowBase
 {
 public:
 
     /// Constructor
-    X11Window(UINT width, UINT height);
+    XcbWindow(UINT width, UINT height);
 
     /// Destructor
-    virtual ~X11Window();
+    virtual ~XcbWindow();
 
     /// Create a new window and prepare it for use.
     /// \returns True if initialization is successful.
@@ -41,7 +41,7 @@ public:
     /// \returns The OS application instance.
     virtual const NativeInstanceType GetInstance() const
     {
-        return mDisplay;
+        return mConnection;
     }
 
     /// Open an initialized window in the system UI.
@@ -56,12 +56,21 @@ public:
     virtual bool Update();
 
 private:
+    /// Initialize a connection to XCB
+    /// \return true if connection can be made, false if error
+    bool InitConnection();
 
     /// A handle to the window that was opened to replay a capture.
     NativeWindowType mWindowHandle;
 
     /// The HINSTANCE of the player application.
-    NativeInstanceType mDisplay;
+    NativeInstanceType mConnection;
+
+    /// xcb screen handle
+    xcb_screen_t* mScreen;
+
+    /// no idea what this is
+    xcb_intern_atom_reply_t *atom_wm_delete_window;
 };
 
-#endif // X11_WINDOW_H
+#endif // XCB_WINDOW_H

@@ -8,8 +8,9 @@
 #include <X11/Xlib.h>
 #include "X11Window.h"
 
-const wchar_t* kWindowClassName = L"APIReplayWindow"; ///< Windows class name
-const wchar_t* kWindowTitle = L"Capture Player - [PLACEHOLDER].ACR"; ///< Window title
+#include "Logger.h"
+
+const char* kWindowTitle = "Capture Player - [PLACEHOLDER].ACR"; ///< Window title
 
 /// Constructor.
 /// \param inWidth The width of the player window
@@ -33,7 +34,7 @@ bool X11Window::Initialize()
     mDisplay = XOpenDisplay(NULL);
     if (!mDisplay)
     {
-        printf("Error: couldn't open display.\n");
+        Log(logERROR, "Error: couldn't open display.\n");
         return false;
     }
 
@@ -57,6 +58,19 @@ bool X11Window::Initialize()
 
     mWindowHandle = XCreateWindow(mDisplay, root, 0, 0, m_windowWidth, m_windowHeight,
         0, depth, InputOutput, visual, mask, &attr);
+
+    // set hints and properties
+    {
+        XSizeHints sizehints;
+        sizehints.x = 0;
+        sizehints.y = 0;
+        sizehints.width  = m_windowWidth;
+        sizehints.height = m_windowHeight;
+        sizehints.flags = USSize | USPosition;
+        XSetNormalHints(mDisplay, mWindowHandle, &sizehints);
+        XSetStandardProperties(mDisplay, mWindowHandle, kWindowTitle, kWindowTitle,
+                                None, (char **)NULL, 0, &sizehints);
+    }
 
     return true;
 }

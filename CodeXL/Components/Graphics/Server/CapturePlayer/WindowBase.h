@@ -14,9 +14,15 @@ typedef HWND NativeWindowType;
 typedef HINSTANCE NativeInstanceType;
 #else
 #include <X11/Xutil.h>
+#include <vulkan/vulkan.h>
+#if 1  // XCB
+typedef xcb_window_t NativeWindowType;
+typedef xcb_connection_t* NativeInstanceType;
+#else  // X11
 typedef Window NativeWindowType;
 typedef Display* NativeInstanceType;
 #endif
+#endif // WIN32
 
 /// An empty window used for replaying API Frame Capture files.
 class WindowBase

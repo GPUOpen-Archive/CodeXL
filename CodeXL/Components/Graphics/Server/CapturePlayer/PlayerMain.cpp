@@ -62,7 +62,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     UNREFERENCED_PARAMETER(nCmdShow);
 
 #else
-int main()
+int main(int argc, char* argv[])
 {
 #endif
 
@@ -80,6 +80,15 @@ int main()
         Log(logERROR, "Could not get the process information from: osGetProcessLaunchInfo\n");
         exit(EXIT_FAILURE);
     }
+
+#ifdef _LINUX
+    if (argc >= 2)
+    {
+        static wchar_t tmpCmdLine[2048];
+        gtASCIIStringToUnicodeString(argv[1], tmpCmdLine, 2048);
+        commandLine = tmpCmdLine;
+    }
+#endif
 
     // Create a meta data object to read the XML into
     TraceMetadata mtf;
