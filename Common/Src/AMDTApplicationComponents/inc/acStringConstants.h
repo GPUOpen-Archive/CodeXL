@@ -175,7 +175,7 @@
 #define AC_STR_SendErrorReportPrivacyPolicyButtonCaption "&Privacy Policy"
 #define AC_STR_SendErrorReportHeaderDescription "Information that will be sent to the %1 support team."
 #define AC_STR_SendErrorReportSucceededHeaderDescription "Thank you, information was submitted to the %1 support team."
-#define AC_STR_SendErrorReportFailedHeaderDescription "Error report failed.\n\nPlease add the issue to CodeXL forum https://github.com/GPUOpen-Tools/CodeXL/issues."
+#define AC_STR_SendErrorReportFailedHeaderDescription "Error report failed.\n\nPlease add the issue to CodeXL issues page https://github.com/GPUOpen-Tools/CodeXL/issues."
 #define AC_STR_SendErrorReportCallStackTitle "Call stack:"
 #define AC_STR_SendErrorReportOperatingSystemTitle "Operating System:"
 #define AC_STR_SendErrorReportDetailsDialogTitle " %1 error details"
