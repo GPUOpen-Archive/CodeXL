@@ -88,6 +88,37 @@ APIInfoManagerBase::~APIInfoManagerBase(void)
 {
 }
 
+std::string APIInfoManagerBase::GetTempFileName(osProcessId pid, osThreadId tid, std::string strExtension)
+{
+    stringstream ss;
+    std::string path;
+
+    if (GlobalSettings::GetInstance()->m_params.m_strOutputFile.empty())
+    {
+        path = FileUtils::GetDefaultOutputPath();
+    }
+    else
+    {
+        path = FileUtils::GetTempFragFilePath();
+    }
+
+    // File name: pid_tid.[modname.]<ext>
+    string fileName;
+
+    if (m_strTraceModuleName.empty())
+    {
+        ss << path << pid << "_" << tid;
+    }
+    else
+    {
+        ss << path << pid << "_" << tid << "." << m_strTraceModuleName;
+    }
+
+    ss << strExtension;
+
+    return ss.str();
+}
+
 void APIInfoManagerBase::FlushTraceData(bool bForceFlush)
 {
     SP_UNREFERENCED_PARAMETER(bForceFlush);
@@ -98,38 +129,9 @@ void APIInfoManagerBase::FlushTraceData(bool bForceFlush)
     for (TraceInfoMap::iterator mapIt = nonActiveMap.begin(); mapIt != nonActiveMap.end(); mapIt++)
     {
         osThreadId tid = mapIt->first;
-        stringstream ss;
-        string path;
 
-        if (GlobalSettings::GetInstance()->m_params.m_strOutputFile.empty())
-        {
-            path = FileUtils::GetDefaultOutputPath();
-        }
-        else
-        {
-            path = FileUtils::GetTempFragFilePath();
-        }
-
-        // File name: pid_tid.apitrace
-        string fileName;
-
-        if (m_strTraceModuleName.empty())
-        {
-            ss << path << pid << "_" << tid;
-        }
-        else
-        {
-            ss << path << pid << "_" << tid << "." << m_strTraceModuleName;
-        }
-
-        fileName = ss.str();
-        ss.str("");
-
-        ss << fileName << TMP_TRACE_EXT;
-        string tmpTraceFile = ss.str();
-        ss.str("");
-        ss << fileName << TMP_TIME_STAMP_EXT;
-        string tmpTimestampFile = ss.str();
+        string tmpTraceFile = GetTempFileName(pid, tid, TMP_TRACE_EXT);
+        string tmpTimestampFile = GetTempFileName(pid, tid, TMP_TIME_STAMP_EXT);
 
         bool bEnableStackTrace = GlobalSettings::GetInstance()->m_params.m_bStackTrace && StackTracer::Instance()->IsInitialized();
         string tmpStackTraceFile;
@@ -137,9 +139,7 @@ void APIInfoManagerBase::FlushTraceData(bool bForceFlush)
 
         if (bEnableStackTrace)
         {
-            ss.str("");
-            ss << fileName << TMP_TRACE_STACK_EXT;
-            tmpStackTraceFile = ss.str();
+            tmpStackTraceFile = GetTempFileName(pid, tid, TMP_TRACE_STACK_EXT);
             foutST.open(tmpStackTraceFile.c_str(), fstream::out | fstream::app);
             bEnableStackTrace = !foutST.fail();
         }
@@ -178,13 +178,6 @@ void APIInfoManagerBase::FlushTraceData(bool bForceFlush)
             delete item;
         }
 
-        ss.str("");
-        ss << fileName << TMP_KERNEL_TIME_STAMP_EXT;
-        string tmpKernelTimestampFile = ss.str();
-        ofstream foutKTS(tmpKernelTimestampFile.c_str(), fstream::out | fstream::app);
-        FlushNonAPITimestampData(foutKTS);
-        foutKTS.close();
-
         foutTrace.close();
         foutTS.close();
 
@@ -193,6 +186,11 @@ void APIInfoManagerBase::FlushTraceData(bool bForceFlush)
             foutST.close();
         }
     }
+
+    string tmpKernelTimestampFile = GetTempFileName(pid, 0, TMP_KERNEL_TIME_STAMP_EXT);
+    ofstream foutKTS(tmpKernelTimestampFile.c_str(), fstream::out | fstream::app);
+    FlushNonAPITimestampData(foutKTS);
+    foutKTS.close();
 
     m_mtxFlush.Unlock();
 }
