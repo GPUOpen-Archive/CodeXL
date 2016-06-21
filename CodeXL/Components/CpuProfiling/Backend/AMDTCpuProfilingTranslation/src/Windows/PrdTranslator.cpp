@@ -26,7 +26,7 @@
 #include <AMDTOSWrappers/Include/osProcess.h>
 #include <AMDTOSWrappers/Include/osDebugLog.h>
 #include <AMDTOSWrappers/Include/osGeneralFunctions.h>
-#include <AMDTApplicationFramework/src/afUtils.h>
+
 #include <AMDTCpuPerfEventUtils/inc/EventEncoding.h>
 #include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
 #include <AMDTExecutableFormat/inc/PeFile.h>
