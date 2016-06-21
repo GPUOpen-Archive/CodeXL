@@ -42,12 +42,14 @@
     <LinkIncremental>true</LinkIncremental>
     <LibraryPath>$(AMDTTeapotOutputDir);$(AMDAPPSDKROOT)\lib\x86;..\AMDTTeaPotLib\inc\CL;$(AMDTCommonAMD)\AMD\APPSDK\2-5\lib\;$(LibraryPath)</LibraryPath>
     <OutDir>$(AMDTTeapotOutputDir)</OutDir>
+    <TargetName>CXLTeaPot</TargetName>
     <IntDir>$(AMDTTeapotOutputDir)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <LibraryPath>$(AMDTTeapotOutputDir);$(AMDAPPSDKROOT)\lib\x86;..\AMDTTeaPotLib\inc\CL;$(AMDTCommonAMD)\AMD\APPSDK\2-5\lib\;$(LibraryPath)</LibraryPath>
     <OutDir>$(AMDTTeapotOutputDir)</OutDir>
+    <TargetName>CXLTeaPot</TargetName>
     <IntDir>$(AMDTTeapotOutputDir)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
