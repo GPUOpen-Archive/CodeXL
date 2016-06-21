@@ -21,18 +21,19 @@
 // Description:
 //
 
+#include <memory>
 #include <linux/perf_event.h>
 
-#include "CaPerfTranslatorIbs.h"
+#include <AMDTBaseTools/Include/gtFlatMap.h>
+#include <AMDTBaseTools/Include/gtList.h>
+#include <AMDTExecutableFormat/inc/ProcessWorkingSet.h>
+#include <AMDTCpuCallstackSampling/inc/CallGraph.h>
+#include <AMDTCpuProfilingRawData/inc/ProfilerDataDBWriter.h>
 #include <AMDTCpuProfilingRawData/inc/CpuProfileWriter.h>
 #include <AMDTCpuProfilingRawData/inc/Linux/CaPerfHeader.h>
 #include <ProfilingAgents/AMDTProfilingAgentsData/inc/JavaJncReader.h>
 
-#include <AMDTExecutableFormat/inc/ProcessWorkingSet.h>
-#include <AMDTCpuCallstackSampling/inc/CallGraph.h>
-#include <AMDTBaseTools/Include/gtFlatMap.h>
-#include <AMDTBaseTools/Include/gtList.h>
-
+#include "CaPerfTranslatorIbs.h"
 #include "../JitTaskInfo.h"
 
 // Aggregate the IBS derived event. Increase the derived event count by one
@@ -472,6 +473,8 @@ private:
 
     gtInt32 m_nextModInstanceId = 1;
     gtInt32 m_nextModuleId = 1;
+
+    std::unique_ptr<ProfilerDataDBWriter> m_dbWriter;
 };
 
 #endif //_CAPERFTRANSLATOR_H_

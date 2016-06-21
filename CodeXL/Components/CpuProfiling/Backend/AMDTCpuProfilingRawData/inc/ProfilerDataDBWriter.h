@@ -96,6 +96,14 @@ public:
     {
         if (m_pWriterThread != nullptr)
         {
+            // Wait till writer queue is empty
+            while (!isEmpty())
+            {
+                osSleep(100);
+            }
+
+            // Writer may be writing the last item
+            // Wait for some more time
             osTimeInterval timeout;
             timeout.setAsMilliSeconds(500);
             m_pWriterThread->waitForThreadEnd(timeout);
