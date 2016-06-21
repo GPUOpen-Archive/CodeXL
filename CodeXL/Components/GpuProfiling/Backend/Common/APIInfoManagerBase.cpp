@@ -88,7 +88,7 @@ APIInfoManagerBase::~APIInfoManagerBase(void)
 {
 }
 
-std::string APIInfoManagerBase::GetTempFileName(osProcessId pid, osThreadId tid, std::string strExtension)
+std::string APIInfoManagerBase::GetTempFileName(osProcessId pid, osThreadId tid, const std::string& strExtension)
 {
     stringstream ss;
     std::string path;
