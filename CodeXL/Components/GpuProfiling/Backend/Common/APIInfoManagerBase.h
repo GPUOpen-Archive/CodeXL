@@ -142,6 +142,13 @@ protected:
     /// \param strAPIName the name of the API to add to the filter
     virtual void AddAPIToFilter(const std::string& strAPIName);
 
+    /// Gets a temp file name based on process id, thread id and extension
+    /// \param pid the process id
+    /// \param tid the thread id
+    /// \param strExtension the extension
+    /// \return the full path of the temp file name
+    std::string GetTempFileName(osProcessId pid, osThreadId tid, std::string strExtension);
+
 protected:
     ULONGLONG     m_ullStart;            ///< first time stamp of the whole program
     ULONGLONG     m_ullEnd;              ///< end time stamp of the whole program
