@@ -250,7 +250,7 @@ void kcCLICommanderDX::ExtractIL(const std::string& deviceName, const Config& co
     GT_IF_WITH_ASSERT(pProgramBuilderDX != nullptr)
     {
         std::string ilBuffer;
-        backendRet = pProgramBuilderDX->GetDxShaderIL(deviceName, config.m_Function, config.m_Profile, ilBuffer);
+        backendRet = pProgramBuilderDX->GetDxShaderIL(deviceName, ilBuffer);
 
         if (backendRet == beStatus_SUCCESS)
         {
