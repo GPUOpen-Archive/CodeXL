@@ -128,6 +128,7 @@ GPS_env['GPS_PATH'] = \
 GPS_env['GPS_LIBPATH'] = \
 [
     '/usr/' + GPS_env.libConfig,
+    '/usr/lib',
     '/usr/lib/' + GPS_env.gnuConfig,
     '../../obj/' + GPS_env.platformPath + '/GPUPerfStudioLegacy/Server/Common',
     '../../obj/' + GPS_env.platformPath + '/GPUPerfStudioLegacy',
@@ -218,7 +219,7 @@ Depends(GPUPerfServer, APICommon_Obj + OSWrappers_Obj)
 targetName = GPS_env.targetRoot + "/" + GPS_env.projectName + GPS_env.projectSuffix
 Command(targetName, fullPath + "/GPUPerfStudioLegacy/Server/WebServer/GPUPerfServer", Copy("$TARGET", "$SOURCE"))
 
-CopySupportFiles(GPS_env)
+CopySupportFiles(GPS_env, buildCodeXL)
 
 # Build the linux test executable(s)
 if buildTests == True :

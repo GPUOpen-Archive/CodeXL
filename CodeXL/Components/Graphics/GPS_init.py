@@ -34,7 +34,7 @@ def ParseCommandLine(env, buildInternal):
         env.archConfig = 'x64'
         env.extConfig = 'x86_64'
         env.gnuConfig = 'x86-64-linux-gnu'
-        env.libConfig = 'lib'
+        env.libConfig = 'lib64'
         env.libGPA = 'libGPUPerfAPIGL' + env.buildSuffix + '.so'
         env.libGPA_GLES = 'libGPUPerfAPIGLES' + env.buildSuffix + '.so'
         env.archWin = '-x64'
@@ -115,7 +115,7 @@ def CopyJSON(env, pluginsTarget):
 
 #####################################################
 # Function to copy support files to the target folder
-def CopySupportFiles(env):
+def CopySupportFiles(env, buildCodeXL):
 
     configTarget = env.targetRoot
     pluginsTarget = configTarget + "/Plugins"
@@ -153,30 +153,31 @@ def CopySupportFiles(env):
     command + rmcmd + "/Plugins/VulkanServer" + env.platformSuffix + env.debugSuffix + ".so"
     os.system(command)
 
-    # copy script files into bin folder
-    command = "cp -n Server/Linux/*.sh "
-    command = command + configTarget
-    os.system(command)
-
-    # copy README file into bin folder. Make it writable first
-    destReadme = configTarget + "/README"
-    if os.path.exists(destReadme):
-        command = "chmod 664 "
-        command = command + destReadme
+    if buildCodeXL == False:
+        # copy script files into bin folder
+        command = "cp -n Server/Linux/*.sh "
+        command = command + configTarget
         os.system(command)
-    command = "cp Server/Linux/README "
-    command = command + configTarget
-    os.system(command)
 
-    #copy thirdpartylicenses.txt file into bin folder
-    destLicense = configTarget + "/thirdpartylicenses.txt"
-    if os.path.exists(destLicense):
-        command = "chmod 664 "
-        command = command + destLicense
+        # copy README file into bin folder. Make it writable first
+        destReadme = configTarget + "/README"
+        if os.path.exists(destReadme):
+            command = "chmod 664 "
+            command = command + destReadme
+            os.system(command)
+        command = "cp Server/Linux/README "
+        command = command + configTarget
         os.system(command)
-    command = "cp Server/thirdpartylicenses.txt "
-    command = command + configTarget
-    os.system(command)
+
+        #copy thirdpartylicenses.txt file into bin folder
+        destLicense = configTarget + "/thirdpartylicenses.txt"
+        if os.path.exists(destLicense):
+            command = "chmod 664 "
+            command = command + destLicense
+            os.system(command)
+        command = "cp Server/thirdpartylicenses.txt "
+        command = command + configTarget
+        os.system(command)
 
     # copy media files into target folder
     command = "cp -n Server/media/*.png "
@@ -188,9 +189,10 @@ def CopySupportFiles(env):
     command = command + configTarget
     os.system(command)
 
-    # copy GPA shared libraries into target folder
-    CopyGPA(env, env.libGPA, configTarget)
-    CopyGPA(env, env.libGPA_GLES, configTarget)
+    if buildCodeXL == False:
+        # copy GPA shared libraries into target folder
+        CopyGPA(env, env.libGPA, configTarget)
+        CopyGPA(env, env.libGPA_GLES, configTarget)
 
     # copy JSON files for Vulkan server
     CopyJSON(env, pluginsTarget)
