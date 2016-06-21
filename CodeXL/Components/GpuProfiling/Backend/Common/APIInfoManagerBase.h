@@ -147,7 +147,7 @@ protected:
     /// \param tid the thread id
     /// \param strExtension the extension
     /// \return the full path of the temp file name
-    std::string GetTempFileName(osProcessId pid, osThreadId tid, std::string strExtension);
+    std::string GetTempFileName(osProcessId pid, osThreadId tid, const std::string& strExtension);
 
 protected:
     ULONGLONG     m_ullStart;            ///< first time stamp of the whole program
