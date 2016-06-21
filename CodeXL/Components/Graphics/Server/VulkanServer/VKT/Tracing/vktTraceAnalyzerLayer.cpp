@@ -455,7 +455,9 @@ std::string VktTraceAnalyzerLayer::GetGPUTraceTXT()
             }
         }
 
+#ifdef _WIN32
         sort(flatResults.begin(), flatResults.end(), SortByStartTime);
+#endif
 
         // We'll need to insert the GPU Trace section header before the response data, even if there aren't any results.
         appendString += "//==GPU Trace==";
