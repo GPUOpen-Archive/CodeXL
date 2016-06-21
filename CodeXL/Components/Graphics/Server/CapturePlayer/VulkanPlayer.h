@@ -13,7 +13,6 @@
 #define VK_USE_PLATFORM_WIN32_KHR
 #else
 typedef void* HINSTANCE;
-#define VK_USE_PLATFORM_XLIB_KHR
 #endif
 
 #include <vulkan/vulkan.h>

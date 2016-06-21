@@ -40,6 +40,7 @@ env['LIBS'] = \
     "pthread",
     "dl",
     "X11",
+    "xcb"
 ]
 
 # build the Capture Player executable
@@ -57,7 +58,7 @@ sources = \
 
 # capture player
     "PlayerMain.cpp",
-    "X11Window.cpp",
+    "XcbWindow.cpp",
     "VulkanPlayer.cpp",
 ]
 

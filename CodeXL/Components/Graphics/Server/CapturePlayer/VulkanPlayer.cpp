@@ -1,12 +1,13 @@
 #include <malloc.h>
 #include <stdio.h>
 
+#include "../Common/Logger.h"
 #include "VulkanPlayer.h"
 
 #ifdef WIN32
 #include "WindowsWindow.h"
 #else
-#include "X11Window.h"
+#include "XcbWindow.h"
 #include <signal.h>
 #include "WinDefs.h"
 #define SW_MINIMIZE 1
@@ -26,7 +27,8 @@
 struct VulkanState
 {
     NativeInstanceType       hInstance; ///< Application instance.
-    NativeWindowType         hWnd; ///< Window Handle.
+    NativeWindowType         hWnd;      ///< Window Handle.
+
     bool                     initComplete; ///< Record if initialization has been done.
 
     VkSurfaceKHR             surface; ///< Render surface.
@@ -51,6 +53,116 @@ struct VulkanState
 
 /// Vulkan state
 static VulkanState s_vkState = {};
+
+// local Vulkan surface helper classes. Used to encapsulate the Vulkan surface info
+// depending on the underlying window interface. Use methods to return the data type
+// so code can be switched out easily
+class VulkanSurfaceBase
+{
+public:
+    VulkanSurfaceBase() {}
+
+    virtual ~VulkanSurfaceBase() {}
+
+    /// Is the value passed in a valid surface extension for this window type
+    /// \param extensionName the name of the extension to check
+    /// \return true if the extension name is valid, false if not
+    virtual bool IsSurfaceExtension(const char* extensionName) = 0;
+
+    /// Get the surface extension name for this window type
+    /// \return this window type's surface extension name
+    virtual char* GetSurfaceExtensionName() = 0;
+
+    virtual VkResult CreateSurface() = 0;
+};
+
+static VulkanSurfaceBase* s_vulkanSurface = nullptr;
+
+#ifdef _LINUX
+
+// Linux-only XCB Surface helper class
+class VulkanSurfaceXCB : public VulkanSurfaceBase
+{
+public:
+    VulkanSurfaceXCB() {}
+    virtual ~VulkanSurfaceXCB() {}
+
+    /// Is the value passed in a valid surface extension for this window type
+    /// \param extensionName the name of the extension to check
+    /// \return true if the extension name is valid, false if not
+    virtual bool IsSurfaceExtension(const char* extensionName)
+    {
+        if (!strcmp(VK_KHR_XCB_SURFACE_EXTENSION_NAME, extensionName))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /// Get the surface extension name for this window type
+    /// \return this window type's surface extension name
+    virtual char* GetSurfaceExtensionName()
+    {
+        static char* extensionName = VK_KHR_XCB_SURFACE_EXTENSION_NAME;
+        return extensionName;
+    }
+
+    virtual VkResult CreateSurface()
+    {
+        VkXcbSurfaceCreateInfoKHR createInfo;
+        createInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
+        createInfo.pNext = NULL;
+        createInfo.flags = 0;
+        createInfo.connection = s_vkState.hInstance;
+        createInfo.window = s_vkState.hWnd;
+
+        return vkCreateXcbSurfaceKHR(s_vkState.inst, &createInfo, nullptr, &s_vkState.surface);
+    }
+};
+
+#if 0
+// Linux-only X11 Surface helper class
+class VulkanSurfaceX11 : public VulkanSurfaceBase
+{
+public:
+    VulkanX11() {}
+    virtual ~VulkanSurfaceX11() {}
+
+    /// Is the value passed in a valid surface extension for this window type
+    /// \param extensionName the name of the extension to check
+    /// \return true if the extension name is valid, false if not
+    virtual bool IsSurfaceExtension(const char* extensionName)
+    {
+        if (!strcmp(VK_KHR_XLIB_SURFACE_EXTENSION_NAME, extensionName))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /// Get the surface extension name for this window type
+    /// \return this window type's surface extension name
+    virtual char* GetSurfaceExtensionName()
+    {
+        static char* extensionName = VK_KHR_XLIB_SURFACE_EXTENSION_NAME;
+        return extensionName;
+    }
+
+    virtual VkResult CreateSurface()
+    {
+        VkXlibSurfaceCreateInfoKHR createInfo;
+        createInfo.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
+        createInfo.pNext = nullptr;
+        createInfo.flags = 0;
+        createInfo.dpy = s_vkState.hInstance;
+        createInfo.window = s_vkState.hWnd;
+
+        return vkCreateXlibSurfaceKHR(s_vkState.inst, &createInfo, nullptr, &s_vkState.surface);
+    }
+};
+#endif 
+
+#endif // LINUX
 
 /// The application-defined function that processes messages sent to a window.Main message handler
 /// \param hWnd A handle to the window.
@@ -127,7 +239,11 @@ bool VulkanPlayer::InitializeWindow(HINSTANCE hInstance, UINT windowWidth, UINT 
 #ifdef WIN32
     m_pPlayerWindow = new WindowsWindow(windowWidth, windowHeight, hInstance, VulkanWindowProc);
 #else
-    m_pPlayerWindow = new X11Window(windowWidth, windowHeight);
+    // choose window type
+    m_pPlayerWindow = new XcbWindow(windowWidth, windowHeight);
+
+    // choose surface helper type
+    s_vulkanSurface = new VulkanSurfaceXCB();
 #endif
 
     if (m_pPlayerWindow == nullptr)
@@ -189,15 +305,31 @@ bool VulkanPlayer::InitializeGraphics()
                 s_vkState.pExtNames[s_vkState.extCount++] = (char*)VK_KHR_WIN32_SURFACE_EXTENSION_NAME;
             }
 #else
-            if (!strcmp(VK_KHR_XLIB_SURFACE_EXTENSION_NAME, pInstExts[i].extensionName))
+            if (s_vulkanSurface->IsSurfaceExtension(pInstExts[i].extensionName))
             {
                 platformSurfaceExtFound = 1;
-                s_vkState.pExtNames[s_vkState.extCount++] = (char*)VK_KHR_XLIB_SURFACE_EXTENSION_NAME;
+                s_vkState.pExtNames[s_vkState.extCount++] = s_vulkanSurface->GetSurfaceExtensionName();
             }
 #endif
         }
 
         free(pInstExts);
+    }
+
+    if (!surfaceExtFound)
+    {
+        Log(logERROR, "Failed to find the " VK_KHR_SURFACE_EXTENSION_NAME " extension.\n");
+        return false;
+    }
+
+    if (!platformSurfaceExtFound)
+    {
+#ifdef WIN32
+        Log(logERROR, "Failed to find the %s extension.\n", (char*)VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+#else
+        Log(logERROR, "Failed to find the %s extension.\n", s_vulkanSurface->GetSurfaceExtensionName());
+#endif
+        return false;
     }
 
     VkApplicationInfo appInfo = {};
@@ -284,14 +416,7 @@ bool VulkanPlayer::InitializeGraphics()
 
     m_lastErrorResult = vkCreateWin32SurfaceKHR(s_vkState.inst, &createInfo, nullptr, &s_vkState.surface);
 #else
-    VkXlibSurfaceCreateInfoKHR createInfo;
-    createInfo.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
-    createInfo.pNext = nullptr;
-    createInfo.flags = 0;
-    createInfo.dpy = s_vkState.hInstance;
-    createInfo.window = s_vkState.hWnd;
-
-    m_lastErrorResult = vkCreateXlibSurfaceKHR(s_vkState.inst, &createInfo, nullptr, &s_vkState.surface);
+    m_lastErrorResult = s_vulkanSurface->CreateSurface();
 #endif
 
     VkBool32* pSupportsPresent = (VkBool32 *)malloc(s_vkState.queueCount * sizeof(VkBool32));
@@ -500,4 +625,7 @@ void VulkanPlayer::Destroy()
     vkDestroyInstance(s_vkState.inst, nullptr);
 
     free(s_vkState.pQueueProps);
+
+    delete m_pPlayerWindow;
+    delete s_vulkanSurface;
 }
