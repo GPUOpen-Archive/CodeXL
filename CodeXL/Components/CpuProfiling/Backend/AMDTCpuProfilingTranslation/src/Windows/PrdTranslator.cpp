@@ -983,9 +983,7 @@ void PrdTranslator::InitNewModule(CpuProfileModule& mod,
     mod.m_base = pModInfo->ModuleStartAddr;
     mod.m_moduleId = pModInfo->moduleId;
     mod.m_moduleInstanceInfo.emplace_back(pModInfo->processID, pModInfo->ModuleStartAddr, pModInfo->instanceId);
-
-    // currently I don't use size and tsc in CA --Lei
-    mod.m_size = 0;
+    mod.m_size = pModInfo->Modulesize;
 
     if (m_is64Sys)
     {
