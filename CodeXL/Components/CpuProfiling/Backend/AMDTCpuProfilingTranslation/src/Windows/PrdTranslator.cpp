@@ -628,7 +628,7 @@ bool PrdTranslator::InitPrdReader(PrdReader* pReader, const wchar_t* pFileName, 
 
     if (S_OK != hr)
     {
-        gtString msg; 
+        gtString msg;
         msg.appendFormattedString(L"Can't open raw data file. (%ls)\nMaybe no samples were taken.", pFileName);
         OS_OUTPUT_DEBUG_LOG(msg.asCharArray(), OS_DEBUG_LOG_ERROR);
         errorString.fromWCharArray(msg.asCharArray());
@@ -2105,9 +2105,10 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
 
         if (nullptr != processList)
         {
+            processList->reserve(pidList.size());
+
             for (auto pid : pidList)
             {
-                processList->reserve(pidList.size());
                 auto p_it = processMap.find(pid);
 
                 if (processMap.end() != p_it)
@@ -2188,7 +2189,7 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
 
         // Populate module instance info
         // modInstanceInfoMap : Map of < instanceId, tuple of <modName, pid, loadAddr> >
-        CPAModuleInstanceList *moduleInstanceList = new CPAModuleInstanceList;
+        CPAModuleInstanceList *moduleInstanceList = new (std::nothrow) CPAModuleInstanceList;
 
         if (nullptr != moduleInstanceList)
         {
@@ -2812,7 +2813,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
         createDb = createDbEnvStr.isEqualNoCase(L"YES");
     }
 
-    //if (createDb)
+    if (createDb)
     {
         m_dbWriter.reset(new ProfilerDataDBWriter);
     }
