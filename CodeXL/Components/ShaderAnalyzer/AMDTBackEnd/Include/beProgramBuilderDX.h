@@ -142,7 +142,7 @@ public:
     /// \returns               a status.
     beKA::beStatus GetDxShaderISAText(const std::string& device, const std::string& shader,
                                       const std::string& target, std::string& isaBuffer);
-    beKA::beStatus GetDxShaderIL(const std::string& device, const std::string& shader, const std::string& target, std::string& isaBuffer);
+    beKA::beStatus GetDxShaderIL(const std::string& device, std::string& isaBuffer);
     /// Extract the size in bytes of ISA code.
     /// \param[in]  isaAsText       the ISA code as text.
     /// \param[out] sizeInBytes    the calculated size in bytes.
@@ -213,7 +213,7 @@ private: // functions
     beKA::beStatus CompileDXAsm(const std::string& programSource, const DXOptions& dxOptions);
     beKA::beStatus CompileDXAsmT(const std::string& programSource, const DXOptions& dxOptions);
     const CElfSection* GetISATextSection(const std::string& deviceName) const;
-    const CElfSection* GetILSection(const std::string& deviceName) const;
+    const CElfSection* GetILDisassemblySection(const std::string& deviceName) const;
     std::string ToLower(const std::string& str) const;
     /// Clears the member variables which hold the build outputs.
     void ClearFormerBuildOutputs();
