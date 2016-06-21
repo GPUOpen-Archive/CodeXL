@@ -40,9 +40,6 @@
 ///  Used to protect access to maps from multiple threads.
 static mutex s_mutex;
 
-/// Control the inclusion of the Vulkan code.
-#define ENABLE_VULKAN 1
-
 //--------------------------------------------------------------
 /// Generates XML that describes the injected processes and which
 /// plugins were injected.
@@ -1098,7 +1095,7 @@ bool ProcessTracker::PassRequestToPlugin(const char* strDestination,
 //--------------------------------------------------------------------------
 /// Setup Vulkan-specific environment variables
 //--------------------------------------------------------------------------
-#if ENABLE_VULKAN
+#ifndef _WIN32
 
 static void SetupVulkanEnvVariables()
 {
@@ -1120,7 +1117,7 @@ static void SetupVulkanEnvVariables()
     layerPath._value.append(L"Plugins");
 
     osEnvironmentVariable instanceLayerName;
-    instanceLayerName._name =  L"VK_INSTANCE_LAYERS";
+    instanceLayerName._name = L"VK_INSTANCE_LAYERS";
     instanceLayerName._value = layerName;
 
     osEnvironmentVariable deviceLayerName;
@@ -1132,7 +1129,7 @@ static void SetupVulkanEnvVariables()
     osSetCurrentProcessEnvVariable(deviceLayerName);
 }
 
-#endif // ENABLE_VULKAN
+#endif
 
 //--------------------------------------------------------------------------
 /// Before launching a new process, this function will initialize the environment for the
@@ -1157,9 +1154,7 @@ bool ProcessTracker::PrelaunchEnvironmentInitialization()
 
     // Set the LD_PRELOAD environment variable
     setenv("LD_PRELOAD", strLdPreload, 1);
-#endif
 
-#if ENABLE_VULKAN
     SetupVulkanEnvVariables();
 #endif
 

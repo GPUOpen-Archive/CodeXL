@@ -15,6 +15,9 @@
 #include "../Common/SharedGlobal.h"
 #include "../Common/Windows/DllReplacement.h"
 
+#include <AMDTOSWrappers/Include/osProcess.h>
+#include <AMDTOSWrappers/Include/osEnvironmentVariable.h>
+
 #include "MicroDLL.h"
 #include "MicroDLLName.h"
 
@@ -110,6 +113,58 @@ static void GetApplicationName(LPCSTR lpApplicationName, LPCSTR lpCommandLine, c
     {
         strcpy(buffer, lpApplicationName);
     }
+}
+
+//=============================================================================
+/// Setup Vulkan-specific environment variables
+//=============================================================================
+static void SetupVulkanEnvVariables()
+{
+#ifdef CODEXL_GRAPHICS
+    gtASCIIString layerNameA = "CXLGraphicsServerVulkan";
+#else
+    gtASCIIString layerNameA = "VulkanServer";
+#endif
+
+    char appPath[PS_MAX_PATH] = {};
+    GetModuleFileName(nullptr, appPath, PS_MAX_PATH);
+
+    osModuleArchitecture appBinaryType = OS_X86_64_ARCHITECTURE;
+
+    const bool readBinType = OSWrappers::GetBinaryType(appPath, &appBinaryType);
+
+    if (readBinType)
+    {
+        if (appBinaryType == OS_I386_ARCHITECTURE)
+        {
+            layerNameA.append(GDT_DEBUG_SUFFIX);
+        }
+        else if (appBinaryType == OS_X86_64_ARCHITECTURE)
+        {
+            layerNameA.append("-x64");
+            layerNameA.append(GDT_DEBUG_SUFFIX);
+        }
+    }
+
+    gtString layerName;
+    layerName.fromASCIIString(layerNameA.asCharArray());
+
+    osEnvironmentVariable layerPath;
+    layerPath._name = L"VK_LAYER_PATH";
+    layerPath._value.fromASCIIString(SG_GET_PATH(ServerPath));
+    layerPath._value.append(L"Plugins");
+
+    osEnvironmentVariable instanceLayerName;
+    instanceLayerName._name = L"VK_INSTANCE_LAYERS";
+    instanceLayerName._value = layerName;
+
+    osEnvironmentVariable deviceLayerName;
+    deviceLayerName._name = L"VK_DEVICE_LAYERS";
+    deviceLayerName._value = layerName;
+
+    osSetCurrentProcessEnvVariable(layerPath);
+    osSetCurrentProcessEnvVariable(instanceLayerName);
+    osSetCurrentProcessEnvVariable(deviceLayerName);
 }
 
 //=============================================================================
@@ -641,6 +696,8 @@ BOOL WINAPI Mine_CreateProcessW(LPCWSTR lpApplicationName,
 //=============================================================================
 bool HookCreateProcess()
 {
+    SetupVulkanEnvVariables();
+
     AMDT::BeginHook();
 
     LONG error = AMDT::HookAPICall(&(PVOID&)Real_CreateProcessA, Mine_CreateProcessA);
