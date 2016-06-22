@@ -156,7 +156,11 @@ moc_files = Split(
         'gpProjectSettingsExtension.h ' +
         'gpTraceView.h ' +
         'gpTraceSummaryWidget.h ' +
+        'gpCommandListSummaryTab.h ' +
         'gpTraceSummaryTab.h ' +
+        'gpSummaryTab.h ' +
+        'gpCommandListSummaryTable.h ' +
+        'gpSummaryTable.h ' +
         'gpTraceSummaryTable.h ' +
         'gpPerformanceCountersDataView.h '
         )
@@ -286,7 +290,11 @@ gpuprof_files = Split(
         'gpTraceDataModel.cpp ' +
         'gpTraceView.cpp ' +
         'gpTraceSummaryWidget.cpp ' +
+        'gpCommandListSummaryTab.cpp ' +
+        'gpSummaryTab.cpp ' +
         'gpTraceSummaryTab.cpp ' +
+        'gpCommandListSummaryTable.cpp ' +
+        'gpSummaryTable.cpp ' +
         'gpTraceSummaryTable.cpp ' +
         'gpPerformanceCountersDataView.cpp ' +
         'gpTreeHandler.cpp ' +

@@ -3,11 +3,12 @@
 //=====================================================================
 
 #include <AMDTGpuProfiling/gpTraceSummaryWidget.h>
+#include <AMDTGpuProfiling/gpTraceSummaryTab.h>
+#include <AMDTGpuProfiling/gpCommandListSummaryTab.h>
 #include <AMDTGpuProfiling/gpStringConstants.h>
 #include <AMDTApplicationFramework/Include/afProgressBarWrapper.h>
 
 const int DEFAULT_PROGRESS_FACTOR = 10000;
-static const char* tab_captions[] = { GPU_STR_API_Summary, GPU_STR_GPU_Summary, GPU_STR_Command_Lists_Summary, GPU_STR_Command_Buffers_Summary };
 
 /////////////////////////////////////////////////////////////////////////////////////
 // gpTraceSummaryWidget
@@ -23,6 +24,27 @@ gpTraceSummaryWidget::gpTraceSummaryWidget(QWidget* pParent)
 
 gpTraceSummaryWidget::~gpTraceSummaryWidget()
 {
+    bool rc = disconnect(this, SIGNAL(currentChanged(int)), this, SLOT(OnCurrentChanged(int)));
+    for (int nTab = 0; nTab < eCallType::MAX_TYPE; nTab++)
+    {
+        if (m_tabs[nTab] != nullptr)
+        {
+            rc = disconnect(m_tabs[nTab], SIGNAL(TabUseTimelineSelectionScopeChanged(bool)), this, SLOT(OnUseTimelineSelectionScopeChanged(bool)));
+            rc = disconnect(m_tabs[nTab], SIGNAL(TabSummaryItemClicked(ProfileSessionDataItem*)), this, SLOT(OnTabSummaryItemClicked(ProfileSessionDataItem*)));
+            if (nTab == eCallType::COMMAND_LIST)
+            {
+                gpCommandListSummaryTab* pCmdListTab = dynamic_cast<gpCommandListSummaryTab*>(m_tabs[nTab]);
+                if (pCmdListTab != nullptr)
+                {
+                    rc = disconnect(pCmdListTab, SIGNAL(TabSummaryCmdListDoubleClicked(const QString&)), this, SLOT(OnTabSummaryCmdListDoubleClicked(const QString&)));
+                }
+            }
+
+
+            delete m_tabs[nTab];
+            m_tabs[nTab] = nullptr;
+        }
+    }
 }
 
 void gpTraceSummaryWidget::Init(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView, quint64 timelineStartTime, quint64 timelineRange)
@@ -41,9 +63,13 @@ void gpTraceSummaryWidget::Init(gpTraceDataContainer* pDataContainer, gpTraceVie
 
     for (int i = 0; i < eCallType::MAX_TYPE; i++)
     {
-        if (i == eCallType::API_CALL || i == eCallType::GPU_CALL)
+        if (i == eCallType::API_CALL )
         {
-            m_tabs[i] = new gpTraceSummaryTab((eCallType)i, m_timelineAbsoluteStart);
+            m_tabs[i] = new gpCPUTraceSummaryTab((eCallType)i, m_timelineAbsoluteStart);
+        }
+        else if ( i == eCallType::GPU_CALL )
+        {
+            m_tabs[i] = new gpGPUTraceSummaryTab((eCallType)i, m_timelineAbsoluteStart);
         }
         else
         {
@@ -53,15 +79,7 @@ void gpTraceSummaryWidget::Init(gpTraceDataContainer* pDataContainer, gpTraceVie
         bool rc = m_tabs[i]->Init(pDataContainer, pSessionView, timelineStartTime, timelineRange);
         if (rc)
         {
-            if (i == eCallType::API_CALL || i == eCallType::GPU_CALL ||
-                i == eCallType::COMMAND_LIST && pDataContainer->SessionAPIType() == ProfileSessionDataItem::ProfileItemAPIType::DX12_API_PROFILE_ITEM)
-            {
-                addTab(m_tabs[i], QIcon(), tab_captions[i]);
-            }
-            else
-            {
-                addTab(m_tabs[i], QIcon(), tab_captions[i + 1]);
-            }
+            addTab(m_tabs[i], QIcon(), m_tabs[i]->getCaption());
 
             rc = connect(this, SIGNAL(currentChanged(int)), this, SLOT(OnCurrentChanged(int)));
             GT_ASSERT(rc);
@@ -130,8 +148,6 @@ void gpTraceSummaryWidget::ClearGPUSelection()
 
 void gpTraceSummaryWidget::OnTimelineChanged(const QPointF& rangePoint, bool isRelativeRangeStartTime)
 {
-    int activeTabIndex = currentIndex();
-
     if (isRelativeRangeStartTime)
     {
         m_timelineStart = m_timelineAbsoluteStart + rangePoint.x() ;
@@ -153,19 +169,20 @@ void gpTraceSummaryWidget::OnTimelineChanged(const QPointF& rangePoint, bool isR
 
     if (m_useTimelineSelectionScope == true)
     {
-        if (m_tabs[activeTabIndex] != nullptr && m_tabs[activeTabIndex])
+        gpSummaryTab* pCurrentTab = qobject_cast<gpSummaryTab*>(currentWidget());
+        if (pCurrentTab != nullptr )
         {
-            m_tabs[activeTabIndex]->RefreshAndMaintainSelection(true);
+            pCurrentTab->RefreshAndMaintainSelection(true);
         }
     }
 }
 void gpTraceSummaryWidget::OnTimelineFilterChanged(QMap<QString, bool>& threadNameVisibilityMap)
 {
     GT_UNREFERENCED_PARAMETER(threadNameVisibilityMap);
-    int activeTabIndex = currentIndex();
-    if (m_tabs[activeTabIndex] != nullptr && m_tabs[activeTabIndex])
+    gpSummaryTab* pCurrentTab = qobject_cast<gpSummaryTab*>(currentWidget());
+    if (pCurrentTab != nullptr )
     {
-        m_tabs[activeTabIndex]->OnTimelineFilterChanged();
+        pCurrentTab->OnTimelineFilterChanged();
     }
 }
 void gpTraceSummaryWidget::OnUseTimelineSelectionScopeChanged(bool check)
@@ -208,10 +225,12 @@ void gpTraceSummaryWidget::OnEditCopy()
 
 void gpTraceSummaryWidget::OnCurrentChanged(int activeTabIndex)
 {
-    if (m_tabs[activeTabIndex] != nullptr && m_tabs[activeTabIndex])
+    GT_UNREFERENCED_PARAMETER(activeTabIndex);
+    gpSummaryTab* pCurrentTab = qobject_cast<gpSummaryTab*>(currentWidget());
+    if (pCurrentTab != nullptr)
     {
-        m_tabs[activeTabIndex]->SetTimelineScope(m_useTimelineSelectionScope, m_timelineStart, m_timelineEnd);
-        m_tabs[activeTabIndex]->RefreshAndMaintainSelection(m_useTimelineSelectionScope);
+        pCurrentTab->SetTimelineScope(m_useTimelineSelectionScope, m_timelineStart, m_timelineEnd);
+        pCurrentTab->RefreshAndMaintainSelection(m_useTimelineSelectionScope);
     }
 }
 
