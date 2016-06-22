@@ -46,8 +46,8 @@ public:
     SessionSourceCodeView(QWidget* pParent, CpuSessionWindow* pSessionWindow, const QString& sessionDir);
     virtual ~SessionSourceCodeView();
 
-    bool DisplayModule(const CpuProfileModule* pModDetail);
-
+    //bool DisplayModule(const CpuProfileModule* pModDetail);
+	bool DisplayViewModule(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> funcModInfo);
     /// Add a source code item to the CodeXL explorer. This function is called when the source view is opened for
     /// a requested module
     void AddSourceCodeItemToExplorer();
@@ -144,7 +144,6 @@ private:
 
     /// Select the requested tree item in the tree. Select and ensure visible the matching item in the table
     void SetTreeSelection(SourceViewTreeItem* pItemToSelect);
-
 protected:
 
     // GUI Elements:
@@ -176,6 +175,12 @@ protected:
     // Selection:
     bool m_CLUNoteShown;
     bool m_ignoreVerticalScroll;
+
+	AMDTUInt32	m_moduleId;
+	AMDTUInt32	m_functionId;
+	AMDTUInt32	m_processId;
+	vector<AMDTUInt32> m_functionIdVec;
+	gtString m_srcFilePath;
 };
 
 

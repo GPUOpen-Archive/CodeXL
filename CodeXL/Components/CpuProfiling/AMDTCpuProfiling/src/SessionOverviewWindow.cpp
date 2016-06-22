@@ -52,6 +52,8 @@
 #include <inc/CPUProfileUtils.h>
 #include <inc/Auxil.h>
 
+#include <tuple>
+
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     #include <Driver/Windows/CpuProf/inc/UserAccess/CpuProfDriver.h>
 #endif
@@ -876,8 +878,8 @@ void SessionOverviewWindow::initDisplayFilters()
         // Set the display filter for the functions table:
         m_functionsTablesFilter.m_amountOfItemsInDisplay = 5;
         m_functionsTablesFilter.m_hotSpotIndicatorColumnCaption = "";
-		m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::FUNCTION_ID);
-		m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::FUNCTION_NAME_COL);
+        m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::FUNCTION_ID);
+        m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::FUNCTION_NAME_COL);
         m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_COUNT_COL);
 
         if (!m_pProfileInfo->m_isProfilingCLU)
@@ -1152,36 +1154,39 @@ void SessionOverviewWindow::onTableContextMenuActionTriggered(CPUProfileDataTabl
 
             case CPUProfileDataTable::DISPLAY_FUNCTION_IN_CALLGRAPH_VIEW:
             {
-				QString funcId = m_pFunctionsTable->getFunctionId(pTableItem->row());
-				AMDTProfileFunctionData  functionData;
-				m_pProfDataRdr->GetFunctionDetailedProfileData(funcId.toInt(), AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_THREADS, functionData);
+                QString funcId = m_pFunctionsTable->getFunctionId(pTableItem->row());
+                AMDTProfileFunctionData  functionData;
+                m_pProfDataRdr->GetFunctionDetailedProfileData(funcId.toInt(), AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_THREADS, functionData);
 
-				QList<ProcessIdType> pidList;
+                QList<ProcessIdType> pidList;
 
-				for (const auto& pid : functionData.m_pidsList)
-				{
-					pidList << pid;
-				}
+                for (const auto& pid : functionData.m_pidsList)
+                {
+                    pidList << pid;
+                }
 
                 //const QList<ProcessIdType>* pPidList = m_pFunctionsTable->getFunctionPidList(pTableItem->row());
 
                 GT_IF_WITH_ASSERT(!pidList.isEmpty())
                 {
-					openCallGraphViewForFunction(m_pFunctionsTable->getFunctionName(pTableItem->row()), pidList.first());
-					//openCallGraphViewForFunction(m_pFunctionsTable->getFunctionName(pTableItem->row()), pPidList->first());
+                    openCallGraphViewForFunction(m_pFunctionsTable->getFunctionName(pTableItem->row()), pidList.first());
+                    //openCallGraphViewForFunction(m_pFunctionsTable->getFunctionName(pTableItem->row()), pPidList->first());
                 }
                 break;
             }
 
             case CPUProfileDataTable::DISPLAY_FUNCTION_IN_SOURCE_CODE_VIEW:
             {
+                openSourceCodeView(pTableItem);
+
+#if 0
                 // Get the address for the activated function:
                 const CpuProfileModule* pModule = nullptr;
                 gtVAddr functionAddress = m_pFunctionsTable->getFunctionAddress(pTableItem->row(), pModule);
 
                 // Open function source code:
                 openFunctionSourceCode(functionAddress, pModule);
-
+#endif
                 break;
             }
 
@@ -1218,21 +1223,58 @@ void SessionOverviewWindow::onTableContextMenuActionTriggered(CPUProfileDataTabl
     }
 }
 
+bool SessionOverviewWindow::openSourceCodeView(QTableWidgetItem* pTableItem)
+{
+    bool ret = true;
+
+    GT_IF_WITH_ASSERT((m_pFunctionsTable != nullptr) &&
+                      (m_pDisplayedSessionItemData != nullptr))
+    {
+        // Find the functions item data for this session:
+        ProfileApplicationTreeHandler* instance = ProfileApplicationTreeHandler::instance();
+        afApplicationTreeItemData* pActivatedItemMacthingItemData = instance->FindSessionChildItemData(m_pDisplayedSessionItemData,
+                                                                    AF_TREE_ITEM_PROFILE_CPU_FUNCTIONS);
+        GT_IF_WITH_ASSERT(pActivatedItemMacthingItemData != nullptr)
+        {
+            int itemRow = pTableItem->row();
+
+            // get the function id
+            QString funcId = m_pFunctionsTable->getFunctionId(itemRow);
+			QString modPath = m_pFunctionsTable->getModuleName(itemRow);
+			AMDTUInt32 moduleId = AMDT_PROFILE_ALL_MODULES;
+			AMDTUInt32	processId = AMDT_PROFILE_ALL_PROCESSES;
+
+			//get the module id 
+			AMDTProfileModuleInfoVec moduleInfo;
+			m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, moduleInfo);
+
+			for (const auto& mod : moduleInfo)
+			{
+				if (mod.m_path == acQStringToGTString(modPath))
+				{
+					moduleId = mod.m_moduleId;
+					break;
+				}
+			}
+
+			AMDTProfileDataVec processProfileData;
+			m_pProfDataRdr->GetProcessProfileData(AMDT_PROFILE_ALL_PROCESSES, moduleId, processProfileData);
+			for (const auto& proc : processProfileData)
+			{
+				processId = proc.m_id;
+			}
+
+
+			auto funcModInfo = std::make_tuple(funcId.toInt(), acQStringToGTString(modPath), moduleId, processId);
+			// Emit a function activated signal (will open a source code view):
+			emit opensourceCodeViewSig(funcModInfo);
+        }
+    }
+    return ret;
+}
+
 bool SessionOverviewWindow::openFunctionSourceCode(gtVAddr functionAddress, const CpuProfileModule* pModule)
 {
-    AMDTProfileDataVec funcSummaryData;
-    m_pProfDataRdr->GetFunctionSummary(AMDT_PROFILE_ALL_COUNTERS, funcSummaryData);
-
-    AMDTProfileDataVec funcProfileData;
-    m_pProfDataRdr->GetFunctionSummary(AMDT_PROFILE_ALL_MODULES, funcProfileData);
-
-    for (auto const& func : funcProfileData)
-    {
-        gtString srcFilePath;
-        AMDTSourceAndDisasmInfoVec srcInfoVec;
-        m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(func.m_id, srcFilePath, srcInfoVec);
-    }
-
     bool retVal = false;
     GT_IF_WITH_ASSERT(nullptr != m_pFunctionsTable)
     {
@@ -1320,8 +1362,8 @@ void SessionOverviewWindow::openFunctionViewForFunction(QTableWidgetItem* pTable
         {
             int itemRow = pTableItem->row();
 
-			// get the function id
-			QString funcId = m_pFunctionsTable->getFunctionId(itemRow);
+            // get the function id
+            QString funcId = m_pFunctionsTable->getFunctionId(itemRow);
 
             // Find the matching session window:
             CpuSessionWindow* pSessionWindow = pSessionViewCreator->findSessionWindow(pActivatedItemMacthingItemData);
@@ -1337,15 +1379,15 @@ void SessionOverviewWindow::openFunctionViewForFunction(QTableWidgetItem* pTable
 
                 pFunctionsView = pSessionWindow->sessionFunctionsView();
 
-				pFunctionsView->selectFunction(funcId);
+                pFunctionsView->selectFunction(funcId);
 
 #if 0
                 const QList<ProcessIdType>* pPidList = m_pFunctionsTable->getFunctionPidList(itemRow);
 
                 GT_IF_WITH_ASSERT(nullptr != pFunctionsView && nullptr != pPidList && !pPidList->isEmpty())
                 {
-					//pFunctionsView->selectFunction(functionName, pPidList->first());
-					pFunctionsView->selectFunction(funcId, pPidList->first());
+                    //pFunctionsView->selectFunction(functionName, pPidList->first());
+                    pFunctionsView->selectFunction(funcId, pPidList->first());
                 }
 #endif
             }

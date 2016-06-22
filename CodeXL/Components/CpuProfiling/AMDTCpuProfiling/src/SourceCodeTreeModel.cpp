@@ -100,10 +100,14 @@ static void AppendCodeByte(QString& str, gtUByte byteCode)
 
 SourceCodeTreeModel::SourceCodeTreeModel(SessionDisplaySettings* pSessionDisplaySettings,
                                          const QString& sessionDir,
-                                         CpuProfileReader* pProfileReader) : QAbstractItemModel(nullptr),
+                                         CpuProfileReader* pProfileReader,
+                                         shared_ptr<cxlProfileDataReader> pProfDataRdr,
+                                         shared_ptr<DisplayFilter> displayFilter) : QAbstractItemModel(nullptr),
     m_pSessionDisplaySettings(pSessionDisplaySettings),
     m_pSessionSourceCodeTreeView(nullptr),
     m_pProfileReader(pProfileReader),
+    m_pProfDataRdr(pProfDataRdr),
+    m_pDisplayFilter(displayFilter),
     m_isDisplayingOnlyDasm(false),
     m_pExecutable(nullptr),
     m_isLongMode(true),
@@ -457,7 +461,7 @@ bool SourceCodeTreeModel::setHeaderData(int section, Qt::Orientation orientation
     return result;
 }
 
-
+#if 0
 bool SourceCodeTreeModel::BuildDisassemblyTree()
 {
     SourceViewTreeItem* pCurrentLineItem = nullptr;
@@ -705,7 +709,255 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
 
     return true;
 }
+#endif
 
+bool SourceCodeTreeModel::BuildDisassemblyTree()
+{
+    SourceViewTreeItem* pCurrentLineItem = nullptr;
+    SourceViewTreeItem* pAsmItem = nullptr;
+
+    // Setup disassembler
+    LibDisassembler dasm;
+
+    dasm.SetLongMode(m_isLongMode);
+
+    gtVAddr dasmStartOffset = 0;
+    gtVAddr dasmStopOffset = m_codeSize;
+    gtUInt32 codeOffset = 0;
+    gtUInt32 currentLineNumber = 0;
+    gtUInt32 oldLineNumber = GT_INT32_MAX;
+    OffsetLinenumMap::Iterator offsetLineIter = m_funOffsetLinenumMap.end();
+
+    // The first fetch should be of 1KB.
+    unsigned int dasmDisplayRange = FIRST_DISASSEMBLY_FETCH_BLOCK_SIZE;
+    unsigned int dasmMaxDisplayRange = FIRST_DISASSEMBLY_FETCH_BLOCK_SIZE * 4;
+
+    if (!m_funOffsetLinenumMap.isEmpty())
+    {
+        // Initialize the OffsetLinenumMap iterator.
+        offsetLineIter = m_funOffsetLinenumMap.begin();
+        currentLineNumber = offsetLineIter.value();
+    }
+    else if (m_codeSize >= dasmMaxDisplayRange)
+    {
+        // Displays dasm in [-2*DASM_DISPLAY_RANGE, +2*DASM_DISPLAY_RANGE] window around the m_newAddress
+        dasmStartOffset = m_newAddress - m_loadAddr;
+
+        // Set the end address
+        if (dasmStartOffset + dasmDisplayRange < m_codeSize)
+        {
+            dasmStopOffset = dasmStartOffset + dasmDisplayRange;
+        }
+
+        // Set the start address
+        if (dasmStartOffset < dasmDisplayRange)
+        {
+            dasmStartOffset = 0;
+        }
+        else
+        {
+            dasmStartOffset -= dasmDisplayRange;
+        }
+
+        if ((0 < dasmStartOffset) && (pAsmItem != nullptr))
+        {
+            // Add the "Double click to view..." item to the tree:
+            pAsmItem = AddDoubleClickItem(pAsmItem);
+        }
+    }
+
+    afProgressBarWrapper::instance().setProgressDetails(CP_sourceCodeViewProgressDisassemblyUpdate, dasmStopOffset - codeOffset);
+
+    // While there are instructions left
+    while (codeOffset < dasmStopOffset)
+    {
+        afProgressBarWrapper::instance().incrementProgressBar();
+
+        gtVAddr address = m_loadAddr + codeOffset;
+
+        // Here, we go through line info map which is sorted by offset.
+        // For each offset, we get the sourceline with the corresponded
+        // line number from the sourceline map, and add the dasm.
+        if (!m_isDisplayingOnlyDasm && (offsetLineIter != m_funOffsetLinenumMap.end()))
+        {
+            // If the current code offset matches the offsetLineIter,
+            // advance to new line.
+            if (codeOffset == offsetLineIter.key())
+            {
+                currentLineNumber = offsetLineIter.value();
+                offsetLineIter++;
+            }
+
+            // If the source line is different from the last iteration,
+            // find the source line item and locate the last dasm if any.
+            if (currentLineNumber != oldLineNumber)
+            {
+                oldLineNumber = currentLineNumber;
+
+                SourceLineAsmInfo info(currentLineNumber, -1);
+
+                // Get the source line item to add dasm
+                pCurrentLineItem = m_sourceTreeItemsMap[info];
+
+                // If source line is missing, something is wrong.
+                // Just stop adding dasm.
+                if (!pCurrentLineItem)
+                {
+                    break;
+                }
+
+                // If this line not already has the address, set one
+                if (pCurrentLineItem->data(SOURCE_VIEW_ADDRESS_COLUMN).toString().isEmpty())
+                {
+                    pCurrentLineItem->setData(SOURCE_VIEW_ADDRESS_COLUMN, "0x" + QString::number(address, 16));
+                }
+
+                // Get the last dasm line of the current source line to append to
+                int childIndex = pCurrentLineItem->childCount() - 1;
+                pAsmItem = (SourceViewTreeItem*)pCurrentLineItem->child(childIndex);
+
+                if (childIndex > 0)
+                {
+                    // If already existing dasm line, we add dasm break to
+                    // help separate the dasm block
+                    pAsmItem = new SourceViewTreeItem(m_pSessionDisplaySettings, SOURCE_VIEW_ASM_DEPTH, pCurrentLineItem);
+
+
+                    int dasmLineNumber = pCurrentLineItem->childCount() - 1;
+
+                    SourceLineAsmInfo asmInfo(currentLineNumber, dasmLineNumber);
+                    m_sourceTreeItemsMap[asmInfo] = pAsmItem;
+                    m_sourceLineToTreeItemsMap[pAsmItem] = asmInfo;
+
+                    pAsmItem->setData(SOURCE_VIEW_SOURCE_COLUMN, CP_sourceCodeViewBreak);
+                    pAsmItem->setForeground(SOURCE_VIEW_SOURCE_COLUMN, acRED_NUMBER_COLOUR);
+                }
+            }
+        }
+
+        // Get disassembly for the current opcode from the disassembler.
+        BYTE error_code;
+        UIInstInfoType temp_struct;
+        char dasmstring[256];
+        dasmstring[0] = 0;
+        unsigned strlength = 255;
+
+        HRESULT hr = dasm.UIDisassemble((unsigned char*)m_pCode, (unsigned int*)&strlength, (unsigned char*)dasmstring, &temp_struct, &error_code);
+
+        if (S_OK != hr)
+        {
+            temp_struct.NumBytesUsed = 1;
+            strcpy(dasmstring, "BAD DASM");
+        }
+
+        // Add disassembly to line:
+        if (pCurrentLineItem != nullptr)
+        {
+            pAsmItem = new SourceViewTreeItem(m_pSessionDisplaySettings, SOURCE_VIEW_ASM_DEPTH, pCurrentLineItem);
+
+
+            int currentDasmLineNumber = pCurrentLineItem->childCount() - 1;
+
+            SourceLineAsmInfo info(currentLineNumber, currentDasmLineNumber);
+            m_sourceTreeItemsMap[info] = pAsmItem;
+            m_sourceLineToTreeItemsMap[pAsmItem] = info;
+        }
+        else
+        {
+            if (codeOffset >= dasmStartOffset)
+            {
+                // Calculate the current dasm line number (the number of root children):
+                int currentDasmLineNumber = m_pRootItem->childCount();
+
+                // Create an item for the current disassembly line:
+                pAsmItem = new SourceViewTreeItem(m_pSessionDisplaySettings, SOURCE_VIEW_ASM_DEPTH, m_pRootItem);
+
+
+                SourceLineAsmInfo info(-1, currentDasmLineNumber);
+                m_sourceTreeItemsMap[info] = pAsmItem;
+                m_sourceLineToTreeItemsMap[pAsmItem] = info;
+            }
+        }
+
+        if ((nullptr != pAsmItem) && (codeOffset >= dasmStartOffset) && (m_pSessionSourceCodeTreeView != nullptr))
+        {
+            for (int j = 0; j < columnCount(); j++)
+            {
+                pAsmItem->setForeground(j, acQGREY_TEXT_COLOUR);
+            }
+
+            pAsmItem->setAsmLength(temp_struct.NumBytesUsed);
+            pAsmItem->setData(SOURCE_VIEW_ADDRESS_COLUMN, "0x" + QString::number(address, 16));
+
+            // Get code bytes
+            char codeBytes[16];
+            memcpy(codeBytes, m_pCode, temp_struct.NumBytesUsed);
+
+            int byteCount = 0;
+            QString codeByteString;
+
+            for (byteCount = 0; byteCount < temp_struct.NumBytesUsed; byteCount++)
+            {
+                AppendCodeByte(codeByteString, static_cast<gtUByte>(codeBytes[byteCount]));
+                codeByteString += ' ';
+            }
+
+            if (0 < temp_struct.NumBytesUsed)
+            {
+                codeByteString.chop(1);
+            }
+
+            // Get the current line and dasm line numbers:
+            int dasmLineNumber = topLevelItemCount() - 1;
+            int lineNumber = currentLineNumber;
+
+            if (pCurrentLineItem != nullptr)
+            {
+                dasmLineNumber = pCurrentLineItem->childCount() - 1;
+            }
+            else
+            {
+                lineNumber = -1;
+            }
+
+            // Map the current dasm line code bytes string:
+            SourceLineAsmInfo dasmLineInfo(lineNumber, dasmLineNumber);
+            m_sourceLineToCodeBytesMap[dasmLineInfo] = codeByteString;
+
+            // Add pc relative address
+            QString disasmString;
+
+            if (temp_struct.bIsPCRelative && temp_struct.bHasDispData)
+            {
+                disasmString = dasmstring + QString(" (0x") +
+                               QString::number((address +
+                                                static_cast<gtVAddr>(temp_struct.NumBytesUsed) +
+                                                static_cast<gtVAddr>(static_cast<int>(temp_struct.DispDataValue))), 16) + ")";
+            }
+            else
+            {
+                disasmString = dasmstring;
+            }
+
+            pAsmItem->setData(SOURCE_VIEW_SOURCE_COLUMN, disasmString);
+        }
+
+        //set current to next address
+        m_pCode += temp_struct.NumBytesUsed;
+        codeOffset += temp_struct.NumBytesUsed;
+    }
+
+    if ((nullptr == pCurrentLineItem) && (m_codeSize > dasmStopOffset) && (m_pSessionSourceCodeTreeView != nullptr))
+    {
+        // Add "Double click to render..." item to the tree:
+        AddDoubleClickItem(m_pRootItem);
+    }
+
+
+    afProgressBarWrapper::instance().hideProgressBar();
+
+    return true;
+}
 
 void SourceCodeTreeModel::InsertDasmLines(gtVAddr displayAddress, unsigned int startIndex)
 {
@@ -860,18 +1112,137 @@ void SourceCodeTreeModel::InsertDasmLines(gtVAddr displayAddress, unsigned int s
     }
 }
 
+void SourceCodeTreeModel::GetInstOffsets(gtUInt16 srcLine, AMDTSourceAndDisasmInfoVec& srcInfoVec, gtVector<gtVAddr>& instOffsetVec)
+{
+    for (auto& srcInfo : srcInfoVec)
+    {
+        if (srcInfo.m_sourceLine == srcLine)
+        {
+            instOffsetVec.push_back(srcInfo.m_offset);
+        }
+    }
+
+    return;
+}
+
+void SourceCodeTreeModel::GetDisasmString(gtVAddr offset, AMDTSourceAndDisasmInfoVec& srcInfoVec, gtString& disasm, gtString& codeByte)
+{
+    auto instData = std::find_if(srcInfoVec.begin(), srcInfoVec.end(),
+    [&offset](AMDTSourceAndDisasmInfo const & srcInfo) { return srcInfo.m_offset == offset; });
+
+    if (instData != srcInfoVec.end())
+    {
+        disasm = instData->m_disasmStr;
+        codeByte = instData->m_codeByteStr;
+    }
+
+    return;
+}
+
+void SourceCodeTreeModel::GetDisasmSampleValue(gtVAddr offset, AMDTProfileInstructionDataVec& dataVec, AMDTSampleValueVec& sampleValue)
+{
+    auto instData = std::find_if(dataVec.begin(), dataVec.end(),
+    [&offset](AMDTProfileInstructionData const & data) { return data.m_offset == offset; });
+
+    if (instData != dataVec.end())
+    {
+        sampleValue = instData->m_sampleValues;
+    }
+
+    return;
+}
+
+void SourceCodeTreeModel::PrintFunctionDetailData(AMDTProfileFunctionData data,
+                                                  gtString srcFilePath,
+                                                  AMDTSourceAndDisasmInfoVec srcInfoVec,
+	const std::vector<SourceViewTreeItem*>& srcLineViewTreeMap)
+{
+    SourceViewTreeItem* pLineItem = nullptr;
+
+    for (const auto& srcData : data.m_srcLineDataList)
+    {
+		pLineItem = srcLineViewTreeMap.at(srcData.m_sourceLineNumber);
+
+        // For this srcLine get the list of inst offsets..
+        gtVector<gtVAddr> instOffsetVec;
+        GetInstOffsets(srcData.m_sourceLineNumber, srcInfoVec, instOffsetVec);
+        bool flag = true;
+		int idx = 0;
+
+		for (auto& aSampleValue : srcData.m_sampleValues)
+		{
+			pLineItem->setData(SOURCE_VIEW_SAMPLES_COLUMN+idx, aSampleValue.m_sampleCount);
+			pLineItem->setForeground(SOURCE_VIEW_SAMPLES_COLUMN+idx, acRED_NUMBER_COLOUR);
+
+			pLineItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, aSampleValue.m_sampleCountPercentage);
+			pLineItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
+				//pLineItem->setTooltip(SOURCE_VIEW_SAMPLES_COLUMN, tooltipVar);
+				//pLineItem->setTooltip(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, tooltipVar);
+			idx++;
+		}
+
+        for (auto& instOffset : instOffsetVec)
+        {
+            SourceViewTreeItem* pAsmItem = new SourceViewTreeItem(m_pSessionDisplaySettings,
+                                                                  SOURCE_VIEW_ASM_DEPTH,
+                                                                  pLineItem);
+
+            gtString disasm;
+            gtString codeByte;
+
+            GetDisasmString(instOffset, srcInfoVec, disasm, codeByte);
+            AMDTSampleValueVec sampleValue;
+            GetDisasmSampleValue(instOffset, data.m_instDataList, sampleValue);
+
+            if (true == flag)
+            {
+                pLineItem->setData(SOURCE_VIEW_ADDRESS_COLUMN, "0x" + QString::number(instOffset, 16));
+                flag = false;
+            }
+
+            pAsmItem->setData(SOURCE_VIEW_ADDRESS_COLUMN, "0x" + QString::number(instOffset, 16));
+			pAsmItem->setForeground(SOURCE_VIEW_ADDRESS_COLUMN, acQGREY_TEXT_COLOUR);
+
+			pAsmItem->setData(SOURCE_VIEW_SOURCE_COLUMN, acGTStringToQString(disasm));
+			pAsmItem->setForeground(SOURCE_VIEW_SOURCE_COLUMN, acQGREY_TEXT_COLOUR);
+
+			pAsmItem->setData(SOURCE_VIEW_CODE_BYTES_COLUMN, acGTStringToQString(codeByte));
+			pAsmItem->setForeground(SOURCE_VIEW_CODE_BYTES_COLUMN, acQGREY_TEXT_COLOUR);
+		}
+    }
+}
+
+void SourceCodeTreeModel::BuildTree(const std::vector<SourceViewTreeItem*>& srcLineViewTreeMap)
+{
+    gtVector<AMDTProfileCounterDesc> counterDesc;
+    bool ret = m_pProfDataRdr->GetSampledCountersList(counterDesc);
+
+    AMDTProfileDataVec funcProfileData;
+    ret = m_pProfDataRdr->GetFunctionSummary(counterDesc.at(0).m_id, funcProfileData);
+
+    for (const auto& func : funcProfileData)
+    {
+        AMDTProfileFunctionData  functionData;
+        ret = m_pProfDataRdr->GetFunctionDetailedProfileData(func.m_id,
+                                                             AMDT_PROFILE_ALL_PROCESSES,
+                                                             AMDT_PROFILE_ALL_THREADS,
+                                                             functionData);
+
+        gtString srcFilePath;
+        AMDTSourceAndDisasmInfoVec srcInfoVec;
+        ret = m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(func.m_id, srcFilePath, srcInfoVec);
+        PrintFunctionDetailData(functionData, srcFilePath, srcInfoVec, srcLineViewTreeMap);
+    }
+
+}
 
 bool SourceCodeTreeModel::BuildSourceAndDASMTree()
 {
-    bool retVal = false;
-
+	std::vector<SourceViewTreeItem*> srcLineViewTreeMap;
     // Build the source lines tree:
-    BuildSourceLinesTree();
-
-    // Add the disassembly lines for the current displayed function:
-    retVal = BuildDisassemblyTree();
-
-    return retVal;
+    BuildSourceLinesTree(srcLineViewTreeMap);
+    BuildTree(srcLineViewTreeMap);
+    return true;
 
 }
 
@@ -1340,7 +1711,8 @@ void SourceCodeTreeModel::PopulateDasmLines(const SourceLineKey& sourceLineKey, 
     }
 }
 
-void SourceCodeTreeModel::SetupSymbolInfoListManaged()
+#if 0
+void SourceCodeTreeModel::SetupSymbolInfoListManaged(AMDTUInt32 modId, AMDTUInt32 pId)
 {
     // In case of Managed (i.e. Java, CLR, .NET), the symbol
     // which we care about are listed in the IMD file which
@@ -1363,6 +1735,7 @@ void SourceCodeTreeModel::SetupSymbolInfoListManaged()
         m_symbolsInfoList.push_back(symbol);
     }
 }
+#endif
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
 bool SourceCodeTreeModel::SetupSymbolInfoNgen(QString pjsFile)
@@ -1490,6 +1863,7 @@ bool SourceCodeTreeModel::GetClrOffsetFromSymbol(gtRVAddr& offset)
 }
 #endif // AMDT_WINDOWS_OS
 
+#if 0
 bool SourceCodeTreeModel::SetupSymbolInfoListUnmanaged()
 {
     if (!InitializeSymbolEngine())
@@ -1524,6 +1898,31 @@ bool SourceCodeTreeModel::SetupSymbolInfoListUnmanaged()
                 tmpSymbol.m_name = acGTStringToQString(function.getFuncName());
                 m_symbolsInfoList.push_back(tmpSymbol);
             }
+        }
+    }
+
+    return true;
+}
+#endif
+
+bool SourceCodeTreeModel::SetupSymbolInfoListUnmanaged(AMDTUInt32 modId, AMDTUInt32 pId)
+{
+    if (nullptr != m_pProfDataRdr)
+    {
+        AMDTProfileDataVec funcProfileData;
+        m_pProfDataRdr->GetFunctionProfileData(pId, modId, funcProfileData);
+
+        for (const auto& function : funcProfileData)
+        {
+            AMDTProfileFunctionData  functionData;
+
+            m_pProfDataRdr->GetFunctionDetailedProfileData(function.m_id, pId, AMDT_PROFILE_ALL_THREADS, functionData);
+
+            UiFunctionSymbolInfo tmpSymbol;
+            tmpSymbol.m_va = functionData.m_functionInfo.m_startOffset;
+            tmpSymbol.m_size = functionData.m_functionInfo.m_size;
+            tmpSymbol.m_name = acGTStringToQString(functionData.m_functionInfo.m_name);
+            m_symbolsInfoList.push_back(tmpSymbol);
         }
     }
 
@@ -2229,6 +2628,7 @@ bool SourceCodeTreeModel::SourceLineInstancesToOffsetLinenumMap(SrcLineInstanceM
     return true;
 }
 
+#if 0
 void SourceCodeTreeModel::BuildSourceLinesTree()
 {
     SourceViewTreeItem* pLineItem = nullptr;
@@ -2260,7 +2660,34 @@ void SourceCodeTreeModel::BuildSourceLinesTree()
         pLineItem->setForeground(SOURCE_VIEW_LINE_COLUMN, AC_SOURCE_CODE_EDITOR_MARGIN_FORE_COLOR);
     }
 }
+#endif
 
+void SourceCodeTreeModel::BuildSourceLinesTree(std::vector<SourceViewTreeItem*>& srcLineViewTreeMap)
+{
+    SourceViewTreeItem* pLineItem = nullptr;
+
+    m_sourceTreeItemsMap.clear();
+    m_sourceLineToTreeItemsMap.clear();
+
+    for (gtUInt32 line = m_startLine; line <= m_stopLine; line++)
+    {
+        pLineItem = new SourceViewTreeItem(m_pSessionDisplaySettings, SOURCE_VIEW_LINE_DEPTH, m_pRootItem);
+
+        // NOTE: Cache index start from 0 but line start from 1.
+        QString lineStr = m_srcLinesCache[line - 1];
+
+        // Add source:
+        if (line <= (gtUInt32)m_srcLinesCache.size())
+        {
+            pLineItem->setData(SOURCE_VIEW_SOURCE_COLUMN, lineStr.replace("\t", "    "));
+        }
+
+        // Add line number:
+        pLineItem->setData(SOURCE_VIEW_LINE_COLUMN, QVariant((uint)line));
+        pLineItem->setForeground(SOURCE_VIEW_LINE_COLUMN, AC_SOURCE_CODE_EDITOR_MARGIN_FORE_COLOR);
+		srcLineViewTreeMap.emplace_back(pLineItem);
+    }
+}
 
 
 bool SourceCodeTreeModel::SetSourceLines(const QString& filePath, unsigned int startLine, unsigned int stopLine)
@@ -2296,7 +2723,26 @@ bool SourceCodeTreeModel::SetSourceLines(const QString& filePath, unsigned int s
     return true;
 }
 
+void SourceCodeTreeModel::CreateSymbolInfoList(AMDTUInt32 modId, AMDTUInt32 pId)
+{
+    switch (m_modType)
+    {
+        case AMDT_MODULE_TYPE_NATIVE:
+        case AMDT_MODULE_TYPE_OCL:
+        case AMDT_MODULE_TYPE_JAVA:
+        case AMDT_MODULE_TYPE_MANAGEDDPE:
+        {
+            bool rc = SetupSymbolInfoListUnmanaged(modId, pId);
+            GT_ASSERT(rc);
+        }
+        break;
 
+        default:
+            break;
+    }
+}
+
+#if 0
 void SourceCodeTreeModel::CreateSymbolInfoList()
 {
     switch (m_moduleType)
@@ -2346,6 +2792,7 @@ void SourceCodeTreeModel::CreateSymbolInfoList()
             break;
     }
 }
+#endif
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
 
@@ -2699,6 +3146,7 @@ void SourceCodeTreeModel::CalculateTotalModuleCountVector(CpuProfileReader* pPro
     }
 }
 
+#if 0
 void SourceCodeTreeModel::SetModuleDetails(const CpuProfileModule* pModule)
 {
     // Sanity Check:
@@ -2711,5 +3159,30 @@ void SourceCodeTreeModel::SetModuleDetails(const CpuProfileModule* pModule)
         m_moduleName = acGTStringToQString(m_pModule->getPath());
 
         m_sessionTotalSamplesCount = m_pSessionDisplaySettings->m_pProfileInfo->m_numSamples;
+    }
+}
+#endif
+
+void SourceCodeTreeModel::SetModuleDetails(AMDTUInt32 moduleId, AMDTUInt32 processId)
+{
+    GT_IF_WITH_ASSERT((nullptr != m_pProfDataRdr) && (nullptr != m_pDisplayFilter))
+    {
+        AMDTProfileModuleInfoVec modInfo;
+        bool ret = m_pProfDataRdr->GetModuleInfo(processId, moduleId, modInfo);
+
+        if (true == ret)
+        {
+            for (const auto& module : modInfo)
+            {
+                // Fill in the details from the CpuProfileModule class:
+                m_modType = module.m_type;
+                //TODO: setting to 0 for now
+                m_moduleTotalSamplesCount = 0;
+                m_moduleName = acGTStringToQString(module.m_name);
+
+                //NOT USED
+                //m_sessionTotalSamplesCount = m_pSessionDisplaySettings->m_pProfileInfo->m_numSamples;
+            }
+        }
     }
 }

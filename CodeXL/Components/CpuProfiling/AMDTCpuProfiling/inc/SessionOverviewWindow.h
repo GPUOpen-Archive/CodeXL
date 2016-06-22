@@ -50,6 +50,7 @@ public:
     bool display(afApplicationTreeItemData* pItemData);
 
     bool openFunctionSourceCode(gtVAddr functionAddress, const CpuProfileModule* pModule);
+	bool openSourceCodeView(QTableWidgetItem* pTableItem);
 
     /// \brief Name:        findModuleHandler
     /// \brief Description: Finds the modules handler for the requested module file path
@@ -71,6 +72,7 @@ public slots:
 
 signals:
     void functionActivated(gtVAddr functionAddress, ProcessIdType pid, ThreadIdType tid, const CpuProfileModule* pModule);
+	void opensourceCodeViewSig(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> funcModInfo);
     void hotspotIndicatorChanged(const QString& text);
 
 protected slots:

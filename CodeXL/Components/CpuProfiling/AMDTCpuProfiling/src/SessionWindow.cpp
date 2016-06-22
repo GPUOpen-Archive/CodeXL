@@ -145,17 +145,19 @@ bool CpuSessionWindow::display()
     bool retVal = false;
     GT_IF_WITH_ASSERT((nullptr != m_pTabWidget) && (nullptr != m_pSessionTreeItemData))
     {
-		// Open the database file
-		OpenDataReader();
+        // Open the database file
+        OpenDataReader();
 
-		m_pDisplayFilter.reset(new DisplayFilter);
-		m_pDisplayFilter->SetProfDataReader(m_pProfDataRd);
-		retVal = m_pDisplayFilter->CreateConfigCounterMap();
-		if (retVal == true)
-		{
-			// init with default configuration
-			retVal = m_pDisplayFilter->InitToDefault();
-		}
+        m_pDisplayFilter.reset(new DisplayFilter);
+        m_pDisplayFilter->SetProfDataReader(m_pProfDataRd);
+        retVal = m_pDisplayFilter->CreateConfigCounterMap();
+
+        if (retVal == true)
+        {
+            // init with default configuration
+            retVal = m_pDisplayFilter->InitToDefault();
+        }
+
         m_sessionFile = m_pSessionTreeItemData->m_filePath;
 
         // Close the profile reader before opening it:
@@ -426,8 +428,8 @@ bool CpuSessionWindow::displayOverviewWindow(const osFilePath& filePath)
             m_pOverviewWindow = new SessionOverviewWindow(m_pTabWidget, this);
 
 
-            bool rc = connect(m_pOverviewWindow, SIGNAL(functionActivated(gtVAddr, ProcessIdType, ThreadIdType, const CpuProfileModule*)), this,
-                              SLOT(onViewSourceView(gtVAddr, ProcessIdType, ThreadIdType, const CpuProfileModule*)));
+            bool rc = connect(m_pOverviewWindow, SIGNAL(opensourceCodeViewSig(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32>)), this,
+                              SLOT(onViewSourceViewSlot(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32>)));
             GT_ASSERT(rc);
 
             rc = m_pOverviewWindow->display(pItemData);
@@ -499,6 +501,53 @@ bool CpuSessionWindow::onViewModulesView(SYSTEM_DATA_TAB_CONTENT aggregateBy)
     return ret;
 }
 
+void CpuSessionWindow::onViewSourceViewSlot(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> funcModInfo)
+{
+	QString modName = acGTStringToQString(std::get<1>(funcModInfo));
+	AMDTUInt32 pid = std::get<3>(funcModInfo);
+	QString caption = modName + " - Source/Disassembly";
+	QWidget* pOldTab = FindTab(caption);
+	SessionSourceCodeView* pSourceCodeView = (SessionSourceCodeView*)pOldTab;
+
+	bool createdNewView = false;
+
+	if (nullptr == pSourceCodeView)
+	{
+		// Create new source tab:
+		osDirectory sessionDir;
+		m_sessionFile.getFileDirectory(sessionDir);
+		QString sessionFileStr = acGTStringToQString(sessionDir.directoryPath().asString());
+		pSourceCodeView = new SessionSourceCodeView(m_pTabWidget, this, sessionFileStr);
+
+		createdNewView = true;
+		pSourceCodeView->setDisplayedItemData((afApplicationTreeItemData*)m_pSessionTreeItemData);
+
+		if (!pSourceCodeView->DisplayViewModule(funcModInfo))
+		{
+			QMessageBox::information(this, "Source/Disassembly View Error", "Failed to initialize Source/Disassembly tab for module :\n" + modName);
+			delete pSourceCodeView;
+			return;
+		}
+
+		pSourceCodeView->setWindowTitle(caption);
+
+		connect(&(CpuProfilingOptions::instance()), SIGNAL(settingsUpdated()), pSourceCodeView, SLOT(onViewChanged()));
+
+		// Look for the icon for this tab:
+		QPixmap* pPixmap = ProfileApplicationTreeHandler::instance()->TreeItemTypeToPixmap(AF_TREE_ITEM_PROFILE_CPU_SOURCE_CODE);
+
+		AddTabToNavigatorBar(pSourceCodeView, caption, pPixmap);
+	}
+
+	if (createdNewView)
+	{
+		// Do not redisplay address for alredy displayed source code view:
+		pSourceCodeView->DisplayAddress(0, pid, SHOW_ALL_TIDS);
+	}
+
+	m_pTabWidget->setCurrentWidget(pSourceCodeView);
+}
+
 void CpuSessionWindow::onViewSourceView(gtVAddr Address, ProcessIdType pid, ThreadIdType tid, const CpuProfileModule* pModDetail)
 {
 
@@ -521,13 +570,14 @@ void CpuSessionWindow::onViewSourceView(gtVAddr Address, ProcessIdType pid, Thre
         createdNewView = true;
         pSourceCodeView->setDisplayedItemData((afApplicationTreeItemData*)m_pSessionTreeItemData);
 
+#if 0
         if (!pSourceCodeView->DisplayModule(pModDetail))
         {
             QMessageBox::information(this, "Source/Disassembly View Error" , "Failed to initialize Source/Disassembly tab for module :\n" + modName);
             delete pSourceCodeView;
             return;
         }
-
+#endif
         pSourceCodeView->setWindowTitle(caption);
 
         connect(&(CpuProfilingOptions::instance()), SIGNAL(settingsUpdated()), pSourceCodeView, SLOT(onViewChanged()));
@@ -563,8 +613,9 @@ void CpuSessionWindow::onViewCallGraphView(unsigned long pid)
             m_pCallGraphTab = new SessionCallGraphView(m_pTabWidget, this, pCallGraphItemData);
 
 
-            bool rc = connect(m_pCallGraphTab, SIGNAL(functionActivated(gtVAddr, ProcessIdType, ThreadIdType, const CpuProfileModule*)), this,
-                              SLOT(onViewSourceView(gtVAddr, ProcessIdType, ThreadIdType, const CpuProfileModule*)));
+            bool rc = connect(m_pCallGraphTab, SIGNAL(opensourceCodeViewSig(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32>)),
+                              this,
+                              SLOT(onViewSourceViewSlot(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32>)));
             GT_ASSERT(rc);
 
             QString sessionFileStr = acGTStringToQString(m_sessionFile.asString());
@@ -598,8 +649,9 @@ void CpuSessionWindow::onViewFunctionTab(unsigned long pid)
             m_pSessionFunctionView =  new SessionFunctionView(m_pTabWidget, this);
 
 
-            connect(m_pSessionFunctionView, SIGNAL(functionActivated(gtVAddr, ProcessIdType, ThreadIdType, const CpuProfileModule*)),
-                    this, SLOT(onViewSourceView(gtVAddr, ProcessIdType, ThreadIdType, const CpuProfileModule*)));
+            connect(m_pSessionFunctionView, SIGNAL(opensourceCodeViewSig(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32>)),
+                    this,
+                    SLOT(onViewSourceViewSlot(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32>)));
 
             // Get the modules item data:
             afApplicationTreeItemData* pFunctionsItemData = CpuProfileTreeHandler::instance().findChildItemData(m_pSessionTreeItemData, AF_TREE_ITEM_PROFILE_CPU_FUNCTIONS);
@@ -991,6 +1043,7 @@ bool CpuSessionWindow::displaySessionSource()
             const CpuProfileModule* pModule = m_pOverviewWindow->findModuleHandler(moduleFilePath);
             GT_IF_WITH_ASSERT(pModule != nullptr)
             {
+                //TODO : aalok
                 onViewSourceView(0, 0, 0, pModule);
                 retVal = true;
             }
@@ -1332,43 +1385,45 @@ void CpuSessionWindow::BuildCSSProcessesList()
 
 bool CpuSessionWindow::OpenDataReader()
 {
-	bool result = false;
-	GT_IF_WITH_ASSERT((nullptr != m_pTabWidget) && (nullptr != m_pSessionTreeItemData))
-	{
-		// TODO:  to get the file path 
-		m_sessionFile = m_pSessionTreeItemData->m_filePath;
+    bool result = false;
+    GT_IF_WITH_ASSERT((nullptr != m_pTabWidget) && (nullptr != m_pSessionTreeItemData))
+    {
+        // TODO:  to get the file path
+        m_sessionFile = m_pSessionTreeItemData->m_filePath;
 
-		// get Session directory Path
-		gtString fileDir = m_sessionFile.fileDirectoryAsString();
+        // get Session directory Path
+        gtString fileDir = m_sessionFile.fileDirectoryAsString();
 
-		// set directory path for Db file
-		osFilePath dbFilePath;
-		dbFilePath.setFileDirectory(fileDir);
+        // set directory path for Db file
+        osFilePath dbFilePath;
+        dbFilePath.setFileDirectory(fileDir);
 
-		// set file path 
-		gtString fileName;
-		result = m_sessionFile.getFileName(fileName);
-		if (result)
-		{
-			dbFilePath.setFileName(fileName);
-			dbFilePath.setFileExtension(L"cxldb");
-		}
+        // set file path
+        gtString fileName;
+        result = m_sessionFile.getFileName(fileName);
 
-		// validate if file exists
-		if (!dbFilePath.isEmpty())
-		{
-			shared_ptr<cxlProfileDataReader> reader(new cxlProfileDataReader);
-			result = reader->OpenProfileData(dbFilePath.asString());
-			if (true == result)
-			{
-				m_pProfDataRd = reader;
-				// TODO: debug code need to be removed
-				AMDTProfileSessionInfo sessionInfo;
+        if (result)
+        {
+            dbFilePath.setFileName(fileName);
+            dbFilePath.setFileExtension(L"cxldb");
+        }
 
-				result = m_pProfDataRd->GetProfileSessionInfo(sessionInfo);
-			}
-		}
-	}
-	return result;
+        // validate if file exists
+        if (!dbFilePath.isEmpty())
+        {
+            shared_ptr<cxlProfileDataReader> reader(new cxlProfileDataReader);
+            result = reader->OpenProfileData(dbFilePath.asString());
+
+            if (true == result)
+            {
+                m_pProfDataRd = reader;
+                // TODO: debug code need to be removed
+                AMDTProfileSessionInfo sessionInfo;
+
+                result = m_pProfDataRd->GetProfileSessionInfo(sessionInfo);
+            }
+        }
+    }
+    return result;
 
 }

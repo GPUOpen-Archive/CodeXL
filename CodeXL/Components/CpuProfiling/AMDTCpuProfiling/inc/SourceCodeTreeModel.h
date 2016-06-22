@@ -43,7 +43,9 @@ class SourceCodeTreeModel : public QAbstractItemModel
     friend class SessionSourceCodeView;
 
 public:
-    SourceCodeTreeModel(SessionDisplaySettings* pSessionDisplaySettings, const QString& sessionDir, CpuProfileReader* pProfileReader);
+    SourceCodeTreeModel(SessionDisplaySettings* pSessionDisplaySettings, const QString& sessionDir, CpuProfileReader* pProfileReader,
+		shared_ptr<cxlProfileDataReader> pProfDataRdr, shared_ptr<DisplayFilter> displayFilter);
+
     ~SourceCodeTreeModel();
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const;
@@ -85,7 +87,7 @@ public:
     QModelIndex indexOfItem(SourceViewTreeItem* pItem);
 
     /// Fill the current file source lines:
-    void BuildSourceLinesTree();
+    void BuildSourceLinesTree(std::vector<SourceViewTreeItem*>& srcLineViewTreeMap);
 
     /// Fill the current file disassembly lines:
     bool BuildDisassemblyTree();
@@ -120,7 +122,17 @@ public:
     bool UpdateHeaders();
 
     /// Store module details:
-    void SetModuleDetails(const CpuProfileModule* pModule);
+    //void SetModuleDetails(const CpuProfileModule* pModule);
+	void SetModuleDetails(AMDTUInt32 moduleId, AMDTUInt32 pId);
+	void BuildTree(const std::vector<SourceViewTreeItem*>& srcLineViewTreeMap);
+
+	void PrintFunctionDetailData(AMDTProfileFunctionData  functionData,
+		gtString srcFilePath,
+		AMDTSourceAndDisasmInfoVec srcInfoVec, 
+		const std::vector<SourceViewTreeItem*>& srcLineViewTreeMap);
+	void GetInstOffsets(gtUInt16 srcLine, AMDTSourceAndDisasmInfoVec& srcInfoVec, gtVector<gtVAddr>& instOffsetVec);
+	void GetDisasmString(gtVAddr offset, AMDTSourceAndDisasmInfoVec& srcInfoVec, gtString& disasm, gtString& codeByte);
+	void GetDisasmSampleValue(gtVAddr offset, AMDTProfileInstructionDataVec& dataVec, AMDTSampleValueVec& sampleValue);
 
 private:
 
@@ -136,8 +148,10 @@ private:
     void CalculateTotalModuleCountVector(CpuProfileReader* pProfileReader);
 
     // Symbol list utilities:
-    bool SetupSymbolInfoListUnmanaged();
-    void SetupSymbolInfoListManaged();
+	bool SetupSymbolInfoListUnmanaged(AMDTUInt32 modId, AMDTUInt32 pId);
+	//bool SetupSymbolInfoListUnmanaged();
+	//void SetupSymbolInfoListManaged();
+	//void SetupSymbolInfoListManaged(AMDTUInt32 modId, AMDTUInt32 pId);
     bool SetupSourceInfoForUnManaged();
     bool SetupSourceInfoForJava(gtVAddr address);
 
@@ -152,7 +166,8 @@ private:
     bool SetupSourceInfoForOcl(gtVAddr address);
 #endif
 
-    void CreateSymbolInfoList();
+	void CreateSymbolInfoList(AMDTUInt32 modId, AMDTUInt32 pId);
+	//void CreateSymbolInfoList();
 
     SourceViewTreeItem* getItem(const QModelIndex& index) const;
 private:
@@ -214,6 +229,8 @@ private:
     const CpuProfileModule* m_pModule;
     const CpuProfileFunction* m_pDisplayedFunction;
 
+	AMDTModuleType m_modType;
+
     bool m_isModuleCached;
     long m_moduleTotalSamplesCount;
     long m_sessionTotalSamplesCount;
@@ -246,6 +263,9 @@ private:
     QStringList m_headerTooltips;
 
     QColor m_forgroundColor;
+
+	shared_ptr<cxlProfileDataReader> m_pProfDataRdr;
+	shared_ptr<DisplayFilter> m_pDisplayFilter;
 };
 
 #endif //__SOURCECODETREEMODEL_H
