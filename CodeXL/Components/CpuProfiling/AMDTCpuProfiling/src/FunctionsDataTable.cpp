@@ -537,21 +537,38 @@ gtVAddr FunctionsDataTable::getFunctionAddress(int rowIndex, const CpuProfileMod
     return funcAddr;
 }
 
+QString FunctionsDataTable::getModuleName(int rowIndex) const
+{
+	QString name;
+
+	GT_IF_WITH_ASSERT((rowIndex >= 0) && (rowIndex < rowCount()))
+	{
+		QTableWidgetItem* pNameTableItem = item(rowIndex, 4);
+
+		GT_IF_WITH_ASSERT(nullptr != pNameTableItem)
+		{
+			name = pNameTableItem->toolTip();
+		}
+	}
+
+	return name;
+}
+
 QString FunctionsDataTable::getFunctionName(int rowIndex) const
 {
-    QString name;
+	QString name;
 
-    GT_IF_WITH_ASSERT((rowIndex >= 0) && (rowIndex < rowCount()))
-    {
-        QTableWidgetItem* pNameTableItem = item(rowIndex, 1);
+	GT_IF_WITH_ASSERT((rowIndex >= 0) && (rowIndex < rowCount()))
+	{
+		QTableWidgetItem* pNameTableItem = item(rowIndex, 1);
 
-        GT_IF_WITH_ASSERT(nullptr != pNameTableItem)
-        {
-            name = pNameTableItem->text();
-        }
-    }
+		GT_IF_WITH_ASSERT(nullptr != pNameTableItem)
+		{
+			name = pNameTableItem->text();
+		}
+	}
 
-    return name;
+	return name;
 }
 
 QString FunctionsDataTable::getFunctionId(int rowIndex) const
@@ -915,6 +932,12 @@ bool FunctionsDataTable::fillSummaryTables(int counterIdx)
 #if 1 //test code aalok
 		for (auto const& func : funcProfileData)
 		{
+			AMDTProfileFunctionData  functionData;
+			m_pProfDataRdr->GetFunctionDetailedProfileData(func.m_id,
+				AMDT_PROFILE_ALL_PROCESSES,
+				AMDT_PROFILE_ALL_THREADS,
+				functionData);
+
 			gtString srcFilePath;
 			AMDTSourceAndDisasmInfoVec srcInfoVec;
 			m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(func.m_id, srcFilePath, srcInfoVec);
@@ -941,15 +964,23 @@ bool FunctionsDataTable::fillSummaryTables(int counterIdx)
             QVariant sampleCountPercent(profData.m_sampleValue.at(0).m_sampleCountPercentage);
             list << QString::number(profData.m_sampleValue.at(0).m_sampleCountPercentage, 'f', 2);
 
-            int row = columnCount();
-			GT_ASSERT(row);
-
             AMDTProfileModuleInfoVec procInfo;
             rc = m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_MAX_VALUE, profData.m_moduleId, procInfo);
             GT_ASSERT(rc);
             list << procInfo.at(0).m_name.asASCIICharArray();
 
             addRow(list, nullptr);
+
+			QString modulefullPath(procInfo.at(0).m_path.asASCIICharArray());
+			int row = rowCount()-1;
+			int col = 4;
+
+			QTableWidgetItem* pModuleNameItem = item(row, col);
+			if (pModuleNameItem != nullptr)
+			{
+				pModuleNameItem->setToolTip(modulefullPath);
+			}
+
 
 #if 0
 			QString modulePath(procInfo.at(0).m_path.asASCIICharArray());

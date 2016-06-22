@@ -44,6 +44,7 @@ public:
     int getFunctionNameColumnIndex() const { return m_functionNameColIndex; }
 
     QString getFunctionName(int rowIndex) const;
+	QString getModuleName(int rowIndex) const;
 	QString getFunctionId(int rowIndex) const;
 
     /// Get the function address for the function in row row index
