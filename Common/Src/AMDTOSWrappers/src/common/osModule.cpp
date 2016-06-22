@@ -14,6 +14,7 @@
 
 // Local:
 #include <AMDTOSWrappers/Include/osFilePath.h>
+#include <AMDTOSWrappers/Include/osDirectory.h>
 #include <AMDTOSWrappers/Include/osModule.h>
 #include <AMDTOSWrappers/Include/osProcess.h>
 #include <AMDTOSWrappers/Include/osStringConstants.h>
@@ -25,6 +26,9 @@
 
 #if AMDT_BUILD_TARGET == AMDT_LINUX_OS
     #include <cstdlib>
+    #include <algorithm>
+    #include <set>
+using namespace std;
 #endif
 
 
@@ -87,7 +91,55 @@ bool osIs64BitModule(const osFilePath& modulePath, bool& is64Bit)
     GT_RETURN_WITH_ASSERT(retVal);
 }
 
+#if ((AMDT_BUILD_TARGET == AMDT_LINUX_OS) && (AMDT_LINUX_VARIANT == AMDT_GENERIC_LINUX_VARIANT))
+static void GetEtcConfGLPaths(vector<osFilePath>& systemOGLModulePathStrings)
+{
+    //optimization, we do only once during process run scan etc conf files, thus in cosecutive calls of the function we use already read results
+    static bool readEtcConfFiles = false;
+    static set<osFilePath> systemOGLModulePathStringsInner;
 
+    //if already read etc conf files just insert systemOGLModulePathStringsInner to function output value
+    if (readEtcConfFiles)
+    {
+        std::copy(systemOGLModulePathStringsInner.begin(), systemOGLModulePathStringsInner.end(), std::back_inserter(systemOGLModulePathStrings));
+    }
+    else
+    {
+        osFilePath etcConfPath(L"/etc/ld.so.conf.d/");
+        osDirectory dir(etcConfPath);
+        gtList<osFilePath> filePaths;
+        dir.getContainedFilePaths(gtString(L"*GL*.conf"), osDirectory::SORT_BY_DATE_ASCENDING, filePaths);
+        dir.getContainedFilePaths(gtString(L"*fglrx*.conf"), osDirectory::SORT_BY_DATE_ASCENDING, filePaths, false);
+        dir.getContainedFilePaths(gtString(L"*amd*.conf"), osDirectory::SORT_BY_DATE_ASCENDING, filePaths, false);
+        //remove duplicates
+        filePaths.sort();
+        filePaths.unique();
+
+        for (const osFilePath& glConfPath : filePaths)
+        {
+            osFile file(glConfPath);
+            file.open(osChannel::OS_ASCII_TEXT_CHANNEL);
+            gtASCIIString line;
+            while (file.readLine(line))
+            {
+            	if (line.isEmpty() == false)
+            	{
+                   gtString glPath;
+                   glPath.fromASCIIString(line.asCharArray()).append(L"/" OS_OPENGL_MODULE_NAME);
+                   systemOGLModulePathStrings.push_back(glPath);
+                   systemOGLModulePathStringsInner.insert(glPath);	
+            	}
+            }
+        }
+
+        //make sure there are no duplicates in oputput value
+        std::sort(systemOGLModulePathStrings.begin(), systemOGLModulePathStrings.end());
+        systemOGLModulePathStrings.erase(std::unique(systemOGLModulePathStrings.begin(), systemOGLModulePathStrings.end()), systemOGLModulePathStrings.end());
+
+        readEtcConfFiles = true;
+    }
+}
+#endif
 // ---------------------------------------------------------------------------
 // Name:        osGetSystemOpenGLModulePath
 // Description: Calculates the System's OpenGL module (DLL / shared library / framework / etc) path.
@@ -228,7 +280,7 @@ void osGetSystemOpenGLModulePath(gtVector<osFilePath>& systemOGLModulePaths)
         // This is ugly and I don't like it =(
 #if ((AMDT_BUILD_TARGET == AMDT_LINUX_OS) && (AMDT_LINUX_VARIANT == AMDT_GENERIC_LINUX_VARIANT))
         {
-            std::vector<gtString> systemOGLModulePathStrings =
+            static const std::vector<gtString> systemOGLModulePathStrings =
             {
                 // Ubuntu locations for AMD open-source driver
                 L"/usr/lib/x86_64-linux-gnu/amdgpu-pro/" OS_OPENGL_MODULE_NAME,
@@ -245,12 +297,10 @@ void osGetSystemOpenGLModulePath(gtVector<osFilePath>& systemOGLModulePaths)
                 L"/usr/lib/x86_64-linux-gnu/mesa/" OS_OPENGL_MODULE_NAME
             };
 
-            for (std::vector<gtString>::iterator itPathStr = systemOGLModulePathStrings.begin();
-                 itPathStr != systemOGLModulePathStrings.end();
-                 ++itPathStr)
-            {
-                systemOGLModulePaths.push_back(*itPathStr);
-            }
+           
+            systemOGLModulePaths.insert(systemOGLModulePaths.end(), systemOGLModulePathStrings.begin(), systemOGLModulePathStrings.end());
+            //add additional paths from etc conf
+            GetEtcConfGLPaths(systemOGLModulePaths);
         }
 #endif
     }
