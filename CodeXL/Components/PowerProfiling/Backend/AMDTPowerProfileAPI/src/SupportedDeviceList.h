@@ -8,7 +8,7 @@
 
 #ifndef _SUPPORTEDDEVICELIST_H_
 #include <AMDTPowerProfileInternal.h>
-PciDeviceInfo g_deviceTable[] =
+PciDeviceInfo g_deviceTable[PWR_MAX_DEVICE_LIST_SIZE] =
 {
     // Kaveri -- will probably need multiple entries in g_deviceInfo for these
     { GDT_SPECTRE, 0x1304, DEVICE_TYPE_APU, "Spectre", "KV SPECTRE MOBILE 35W (1304)", "Kaveri", SMU_IPVERSION_7_0}, // OK tested
@@ -120,8 +120,22 @@ PciDeviceInfo g_deviceTable[] =
 
     // Stoney
     { GDT_STONEY, 0x98E4, DEVICE_TYPE_APU, "Stoney", "AMD Radeon Series", "STONEY", SMU_IPVERSION_8_1},
-
-    { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Invalid dGPU", "INVALID", "", SMU_IPVERSION_INVALID},
+    { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
+    { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
+    { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
+    { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
+    { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
+    { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
+    { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
+    { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
+    { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
+    { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
+    { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
+    { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
+    { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
+    { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
+    { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
+    { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
 };
 
 PlatformInfo g_platformTable[] =

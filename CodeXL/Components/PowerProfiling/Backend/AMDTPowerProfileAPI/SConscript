@@ -30,6 +30,7 @@ env.Replace(CPPFLAGS = compiler_base_flags)
 env.Append( CPPPATH = [ 
 	".",
 	"inc",
+        "Non-OpenSource",
 	"..",
 	"src",
 	env['PWRPROFDRIVERINCLUDES'],
@@ -67,6 +68,13 @@ sources = \
     "src/AMDTPowerProfileApi.cpp",
     "src/AMDTHistogram.cpp",
 ]
+
+if (env['CXL_build_conf'] == 'INTERNAL'):
+    sources += ["Non-OpenSource/AMDTPowerProfileSmu9Api-Internal.cpp",]
+
+if (env['CXL_build_conf'] == 'NDA'):
+    sources += ["Non-OpenSource/AMDTPowerProfileSmu9Api-Internal.cpp",]
+
 
 if (env['CXL_build_conf'] == 'INTERNAL'):
     sources += ["Non-OpenSource/AMDTPowerProfileApi-Internal.cpp",]

@@ -26,6 +26,7 @@
 #define BASIC_ATTR_VALUE_CNT    (3)
 #define AMD_VENDOR_ID           0x1002
 #define AMD_VENDOR_ID1          0x1022
+#define PWR_MAX_DEVICE_LIST_SIZE 150
 
 typedef enum CXLContextProfileType
 {
@@ -78,6 +79,8 @@ enum HardwareType
     GDT_FIJI,               ///< FIJI GPU
     GDT_OROCHI,               ///< OROCHI
     GDT_STONEY,               ///< STONEY
+    GDT_ELLESMERE,
+    GDT_BAFFIN,
     GDT_LAST,                   ///< last
     GDT_INVALID = 0xFFFFFFFF
 };
@@ -234,6 +237,16 @@ typedef struct
     AMDTFloat32  m_pRangeStartIndex[MAX_BIN_CNT + 1];
     AMDTFloat32  m_pRangeValue[MAX_BIN_CNT + 1];
 } Histogram;
+
+typedef struct PwrCounterDecodeInfo
+{
+    AMDTUInt32 m_clientId;
+    AMDTUInt32 m_basicId;
+    AMDTUInt32 m_pkgId;
+    AMDTUInt32 m_instanceId;
+    AMDTUInt32 m_category;
+    AMDTUInt32 m_smuIpVersion;
+} PwrCounterDecodeInfo;
 
 // DerivedCounter: to hold the accumulated and histogram counter value
 typedef struct
