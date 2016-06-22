@@ -133,8 +133,12 @@
     <ClCompile Include="gpRemoteGraphicsBackendHandler.cpp" />
     <ClCompile Include="gpTraceView.cpp" />
     <ClCompile Include="gpTraceSummaryWidget.cpp" />
+    <ClCompile Include="gpSummaryTab.cpp" />
     <ClCompile Include="gpTraceSummaryTab.cpp" />
+    <ClCompile Include="gpCommandListSummaryTab.cpp" />
+    <ClCompile Include="gpSummaryTable.cpp" />
     <ClCompile Include="gpTraceSummaryTable.cpp" />
+    <ClCompile Include="gpCommandListSummaryTable.cpp" />
     <ClCompile Include="gpPerformanceCountersDataView.cpp" />
     <ClCompile Include="gpTraceDataParser.cpp" />
     <ClCompile Include="gpTreeHandler.cpp" />
@@ -300,8 +304,12 @@
     <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpObjectView.cpp" />
     <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpObjectModels.cpp" />
     <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpTraceSummaryWidget.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpSummaryTab.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpCommandListSummaryTab.cpp" />
     <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpTraceSummaryTab.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpSummaryTable.cpp" />
     <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpTraceSummaryTable.cpp" />
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpCommandListSummaryTable.cpp" />
     <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpPerformanceCountersDataView.cpp" />
     <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpCountersSelectionDialog.cpp" />
     <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpSessionView.cpp" />
@@ -580,13 +588,37 @@
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp;%(Outputs)</Outputs>
       <AdditionalInputs>$(QTDIR)\bin\moc.exe;%(FullPath);%(AdditionalInputs)</AdditionalInputs>
     </CustomBuild>
-    <CustomBuild Include="gpTraceSummaryTab.h">
+    <CustomBuild Include="gpSummaryTab.h">
+      <Command>"$(QTDIR)\bin\moc.exe" -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB "-D$(GDT_BUILD)\." "-DGDT_BUILD_SUFFIX=""$(GDTBuildSuffix)""" "-DGDT_PROJECT_SUFFIX=""$(GDTProjectSuffix)""" -D_WINDOWS -DWIN32_LEAN_AND_MEAN -DSU_USE_NATIVE_STL -DWINVER=0x0502 -D_WIN32_WINNT=0x0502 -D_WIN32_WINDOWS=0x0502 -D_WINDLL  "-I.\GeneratedFiles" "-I$(QTDIR)\include" "-I.\GeneratedFiles\." "-I$(QTDIR)\include\qtmain" "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I." "%(FullPath)" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>Moc%27ing %(Filename)%(Extension)...</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp;%(Outputs)</Outputs>
+      <AdditionalInputs>$(QTDIR)\bin\moc.exe;%(FullPath);%(AdditionalInputs)</AdditionalInputs>
+    </CustomBuild> 
+	<CustomBuild Include="gpTraceSummaryTab.h">
+      <Command>"$(QTDIR)\bin\moc.exe" -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB "-D$(GDT_BUILD)\." "-DGDT_BUILD_SUFFIX=""$(GDTBuildSuffix)""" "-DGDT_PROJECT_SUFFIX=""$(GDTProjectSuffix)""" -D_WINDOWS -DWIN32_LEAN_AND_MEAN -DSU_USE_NATIVE_STL -DWINVER=0x0502 -D_WIN32_WINNT=0x0502 -D_WIN32_WINDOWS=0x0502 -D_WINDLL  "-I.\GeneratedFiles" "-I$(QTDIR)\include" "-I.\GeneratedFiles\." "-I$(QTDIR)\include\qtmain" "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I." "%(FullPath)" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>Moc%27ing %(Filename)%(Extension)...</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp;%(Outputs)</Outputs>
+      <AdditionalInputs>$(QTDIR)\bin\moc.exe;%(FullPath);%(AdditionalInputs)</AdditionalInputs>
+    </CustomBuild>	
+	<CustomBuild Include="gpCommandListSummaryTab.h">
+      <Command>"$(QTDIR)\bin\moc.exe" -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB "-D$(GDT_BUILD)\." "-DGDT_BUILD_SUFFIX=""$(GDTBuildSuffix)""" "-DGDT_PROJECT_SUFFIX=""$(GDTProjectSuffix)""" -D_WINDOWS -DWIN32_LEAN_AND_MEAN -DSU_USE_NATIVE_STL -DWINVER=0x0502 -D_WIN32_WINNT=0x0502 -D_WIN32_WINDOWS=0x0502 -D_WINDLL  "-I.\GeneratedFiles" "-I$(QTDIR)\include" "-I.\GeneratedFiles\." "-I$(QTDIR)\include\qtmain" "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I." "%(FullPath)" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>Moc%27ing %(Filename)%(Extension)...</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp;%(Outputs)</Outputs>
+      <AdditionalInputs>$(QTDIR)\bin\moc.exe;%(FullPath);%(AdditionalInputs)</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="gpSummaryTable.h">
       <Command>"$(QTDIR)\bin\moc.exe" -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB "-D$(GDT_BUILD)\." "-DGDT_BUILD_SUFFIX=""$(GDTBuildSuffix)""" "-DGDT_PROJECT_SUFFIX=""$(GDTProjectSuffix)""" -D_WINDOWS -DWIN32_LEAN_AND_MEAN -DSU_USE_NATIVE_STL -DWINVER=0x0502 -D_WIN32_WINNT=0x0502 -D_WIN32_WINDOWS=0x0502 -D_WINDLL  "-I.\GeneratedFiles" "-I$(QTDIR)\include" "-I.\GeneratedFiles\." "-I$(QTDIR)\include\qtmain" "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I." "%(FullPath)" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>Moc%27ing %(Filename)%(Extension)...</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp;%(Outputs)</Outputs>
       <AdditionalInputs>$(QTDIR)\bin\moc.exe;%(FullPath);%(AdditionalInputs)</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="gpTraceSummaryTable.h">
+      <Command>"$(QTDIR)\bin\moc.exe" -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB "-D$(GDT_BUILD)\." "-DGDT_BUILD_SUFFIX=""$(GDTBuildSuffix)""" "-DGDT_PROJECT_SUFFIX=""$(GDTProjectSuffix)""" -D_WINDOWS -DWIN32_LEAN_AND_MEAN -DSU_USE_NATIVE_STL -DWINVER=0x0502 -D_WIN32_WINNT=0x0502 -D_WIN32_WINDOWS=0x0502 -D_WINDLL  "-I.\GeneratedFiles" "-I$(QTDIR)\include" "-I.\GeneratedFiles\." "-I$(QTDIR)\include\qtmain" "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I." "%(FullPath)" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
+      <Message>Moc%27ing %(Filename)%(Extension)...</Message>
+      <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp;%(Outputs)</Outputs>
+      <AdditionalInputs>$(QTDIR)\bin\moc.exe;%(FullPath);%(AdditionalInputs)</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="gpCommandListSummaryTable.h">
       <Command>"$(QTDIR)\bin\moc.exe" -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB "-D$(GDT_BUILD)\." "-DGDT_BUILD_SUFFIX=""$(GDTBuildSuffix)""" "-DGDT_PROJECT_SUFFIX=""$(GDTProjectSuffix)""" -D_WINDOWS -DWIN32_LEAN_AND_MEAN -DSU_USE_NATIVE_STL -DWINVER=0x0502 -D_WIN32_WINNT=0x0502 -D_WIN32_WINDOWS=0x0502 -D_WINDLL  "-I.\GeneratedFiles" "-I$(QTDIR)\include" "-I.\GeneratedFiles\." "-I$(QTDIR)\include\qtmain" "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I." "%(FullPath)" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>Moc%27ing %(Filename)%(Extension)...</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp;%(Outputs)</Outputs>

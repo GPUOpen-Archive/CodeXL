@@ -4,7 +4,6 @@
 //=====================================================================
 
 #include <AMDTGpuProfiling/gpTraceSummaryTable.h>
-#include <AMDTGpuProfiling/gpTraceSummaryWidget.h>
 #include <AMDTGpuProfiling/gpTraceDataContainer.h>
 #include <AMDTGpuProfiling/APIColorMap.h>
 #include <AMDTGpuProfiling/gpTraceView.h>
@@ -18,15 +17,8 @@
 
 const int SUMMARY_INFO_ARRAY_SIZE = 500; // 130 DX12 call types, X Vulcan call types...
 
-
-void gpSummaryTable::Refresh(bool useTimelineScope, quint64 min, quint64 max)
-{
-    RebuildSummaryMap(useTimelineScope, min, max);
-    FillTable();
-}
-
-gpTraceSummaryTable::gpTraceSummaryTable(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView, eCallType callType, quint64 timelineAbsoluteStart)
-    : gpSummaryTable(pDataContainer, pSessionView, callType, timelineAbsoluteStart)
+gpTraceSummaryTable::gpTraceSummaryTable(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView, quint64 timelineAbsoluteStart)
+    : gpSummaryTable(pDataContainer, pSessionView, timelineAbsoluteStart)
 {
 
     QStringList columnCaptions;
@@ -244,228 +236,25 @@ void gpTraceSummaryTable::OnCellEntered(int row, int column)
     }
 }
 
-gpSummaryTable::gpSummaryTable(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView, eCallType callType, quint64 timelineAbsoluteStart)
-    :acListCtrl(nullptr), m_pSessionDataContainer(pDataContainer), m_pTraceView(pSessionView), m_lastSelectedRowIndex(-1), m_timelineAbsoluteStart(timelineAbsoluteStart), m_callType(callType)
-{
-}
-
-gpSummaryTable::~gpSummaryTable()
-{
-
-}
-
-void gpSummaryTable::SaveSelection(int row)
-{
-    m_lastSelectedRowIndex = row;
-}
-
-void gpSummaryTable::RestoreSelection()
-{
-    if (m_lastSelectedRowIndex != -1)
-    {
-        selectRow(m_lastSelectedRowIndex);
-    }
-}
-
-void gpSummaryTable::ClearSelection()
-{
-    clearSelection();
-    m_lastSelectedRowIndex = -1;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// gpTraceSummaryTable
-
-
-bool gpTraceSummaryTable::Init()
-{
-    bool rc = false;
-    switch (m_callType)
-    {
-    case API_CALL:
-        rc = InitAPIItems();
-        break;
-    case GPU_CALL:
-        rc = InitGPUItems();
-        break;
-    default:
-        GT_ASSERT(0);
-    }
-
-    if (rc == true)
-    {
-        // fill Table widget
-        FillTable();
-        setSortingEnabled(true);
-        setSelectionMode(QAbstractItemView::SingleSelection);
-        setContextMenuPolicy(Qt::NoContextMenu);
-
-        // Connect to the cell entered signal
-        setMouseTracking(true);
-        rc = connect(this, SIGNAL(cellEntered(int, int)), this, SLOT(OnCellEntered(int, int)));
-        GT_ASSERT(rc);
-    }
-
-    return rc;
-}
-
-bool gpTraceSummaryTable::InitAPIItems()
-{
-    bool rc = false;
-    GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
-    {
-        m_allCallItemsMultiMap.clear();
-        m_totalTimeMs = 0;
-        m_numTotalCalls = 0;
-        int threadCount = m_pSessionDataContainer->ThreadsCount();
-
-        // fill local array of SummaryInfo items
-        APISummaryTraceInfo infoArray[SUMMARY_INFO_ARRAY_SIZE] = {};
-
-        for (int i = 0; i < threadCount; i++)
-        {
-            afProgressBarWrapper::instance().incrementProgressBar();
-            osThreadId threadID = m_pSessionDataContainer->ThreadID(i);
-
-            int apiCount = m_pSessionDataContainer->ThreadAPICount(threadID);
-
-            for (int i = 0; i < apiCount; i++)
-            {
-                // Get the current API item
-                ProfileSessionDataItem* pItem = m_pSessionDataContainer->APIItem(threadID, i);
-                GT_IF_WITH_ASSERT(pItem != nullptr)
-                {
-                    unsigned int apiId;
-                    pItem->GetAPIFunctionID(apiId);
-                    m_allCallItemsMultiMap.insertMulti(apiId, pItem);
-                    quint64 startTime = pItem->StartTime();
-                    quint64 endTime = pItem->EndTime();
-                    m_totalTimeMs += (endTime - startTime);
-                    m_numTotalCalls++;
-                    APISummaryTraceInfo& info = infoArray[apiId];
-                    AddSessionItemToSummaryInfo(info, pItem, apiId);
-                }
-            }
-        }
-        if (threadCount > 0)
-        {
-            rc = true;
-            // insert array items to summary map
-            for (auto info : infoArray)
-            {
-                InsertSummaryInfoToMap(info);
-            }
-        }
-    }
-    return rc;
-}
-
-void gpTraceSummaryTable::AddSessionItemToSummaryInfo(APISummaryTraceInfo& info, ProfileSessionDataItem* pItem, unsigned int apiId)
-{
-    GT_IF_WITH_ASSERT(pItem != nullptr && m_pTraceView != nullptr)
-    {
-        APICallId callId;
-        callId.m_callIndex = apiId;
-        callId.m_tid = pItem->ThreadID();
-
-        bool showItem = true;
-
-        if (m_callType == API_CALL) // API items may be filtered out
-        {
-            acAPITimelineItem* pTimelineItem = m_pTraceView->GetAPITimelineItem(callId);
-
-            if (pTimelineItem != nullptr)
-            {
-                acTimelineBranch* pBranch = pTimelineItem->parentBranch();
-
-                if (pBranch && pBranch->IsVisible() == false)
-                {
-                    showItem = false;
-                }
-            }
-        }
-
-        if (showItem == true)
-        {
-            quint64 startTime = pItem->StartTime();
-            quint64 endTime = pItem->EndTime();
-            quint64 duration = endTime - startTime;
-
-            if (info.m_numCalls == 0)
-            {
-                info.m_call = pItem->GetColumnData(ProfileSessionDataItem::SESSION_ITEM_CALL_COLUMN).toString();
-                info.m_interface = pItem->GetColumnData(ProfileSessionDataItem::SESSION_ITEM_INTERFACE_COLUMN).toString();
-                info.m_typeColor = APIColorMap::Instance()->GetAPIColor(pItem->ItemType(), apiId, acQGREY_TEXT_COLOUR);
-            }
-
-            info.m_numCalls++;
-            info.m_callIndex = apiId;
-            info.m_cumulativeTime += duration;
-
-            if (duration > info.m_maxTimeMs)
-            {
-                info.m_maxTimeMs = duration;
-                info.m_pMaxTimeItem = pItem;
-            }
-
-            if (duration < info.m_minTimeMs || info.m_minTimeMs == std::numeric_limits<quint64>::max())
-            {
-                info.m_minTimeMs = duration;
-                info.m_pMinTimeItem = pItem;
-            }
-        }
-    }
-}
-
-bool gpTraceSummaryTable::InitGPUItems()
-{
-    bool rc = false;
-    GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
-    {
-        m_allCallItemsMultiMap.clear();
-        m_totalTimeMs = 0;
-        m_numTotalCalls = 0;
-        int queuesCount = m_pSessionDataContainer->GPUCallsContainersCount();
-        // fill local array of SummaryInfo items
-        APISummaryTraceInfo infoArray[SUMMARY_INFO_ARRAY_SIZE] = {};
-
-        for (int i = 0; i < queuesCount; i++)
-        {
-            afProgressBarWrapper::instance().incrementProgressBar();
-            QString queueName = m_pSessionDataContainer->GPUObjectName(i);
-            int apiCount = m_pSessionDataContainer->QueueItemsCount(queueName);
-
-            for (int i = 0; i < apiCount; i++)
-            {
-                // Get the current API item
-                ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItem(queueName, i);
-                GT_IF_WITH_ASSERT(pItem != nullptr)
-                {
-                    unsigned int apiId;
-                    pItem->GetAPIFunctionID(apiId);
-                    m_allCallItemsMultiMap.insertMulti(apiId, pItem);
-                    quint64 startTime = pItem->StartTime();
-                    quint64 endTime = pItem->EndTime();
-                    m_totalTimeMs += (endTime - startTime);
-                    m_numTotalCalls++;
-                    APISummaryTraceInfo& info = infoArray[apiId];
-                    AddSessionItemToSummaryInfo(info, pItem, apiId);
-                }
-            }
-        }
-        // insert array items to summary map
-        if (queuesCount > 0)
-        {
-            rc = true;
-            for (auto info : infoArray)
-            {
-                InsertSummaryInfoToMap(info);
-            }
-        }
-    }
-    return rc;
-}
-
+//bool gpTraceSummaryTable::Init()
+//{
+//    bool rc = InitItems();
+//    if (rc == true)
+//    {
+//        // fill Table widget
+//        FillTable();
+//        setSortingEnabled(true);
+//        setSelectionMode(QAbstractItemView::SingleSelection);
+//        setContextMenuPolicy(Qt::NoContextMenu);
+//
+//        // Connect to the cell entered signal
+//        setMouseTracking(true);
+//        rc = connect(this, SIGNAL(cellEntered(int, int)), this, SLOT(OnCellEntered(int, int)));
+//        GT_ASSERT(rc);
+//    }
+//
+//    return rc;
+//}
 
 
 void gpTraceSummaryTable::CollateAllItemsIntoSummaryMap()
@@ -545,21 +334,6 @@ void gpTraceSummaryTable::InsertSummaryInfoToMap(APISummaryTraceInfo& info)
     }
 }
 
-void gpSummaryTable::RebuildSummaryMap(bool useScope, quint64 startTime, quint64 endTime)
-{
-    // at this point m_apiItemsMap is already filled with all items,
-    // we only need to collate them into
-    if (useScope)
-    {
-        // m_allCallItemsMultiMap already contains all items, we just need to insert items within mintime and maxtime into summary map
-        BuildSummaryMapInTimelineScope(startTime, endTime);
-    }
-    else
-    {
-        // m_allCallItemsMultiMap already contains all items, we just need to collate m_allCallItemsMap into summary map
-        CollateAllItemsIntoSummaryMap();
-    }
-}
 
 APISummaryTraceInfo gpTraceSummaryTable::GetSummaryInfo(int apiCall)
 {
@@ -590,408 +364,210 @@ void gpTraceSummaryTable::Cleanup()
     m_apiCallInfoSummaryMap.clear();
 }
 
-/////////////////////////////////////////////////////////////////////////////////
-gpCommandListSummaryTable::gpCommandListSummaryTable(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView, quint64 timelineAbsoluteStart)
-    : gpSummaryTable(pDataContainer, pSessionView, (eCallType)3, timelineAbsoluteStart)
-{
-    m_pSessionDataContainer = pDataContainer;
-    bool isDx12 = (pDataContainer != nullptr && pDataContainer->SessionAPIType() == ProfileSessionDataItem::ProfileItemAPIType::DX12_API_PROFILE_ITEM);
-
-    QStringList columnCaptions;
-    if (isDx12)
-    {
-        columnCaptions << GP_STR_SummaryTableCommandListType;
-    }
-    else
-    { 
-        columnCaptions << GP_STR_SummaryTableCommandBufferType;
-    }
-
-    columnCaptions << GP_STR_SummaryTableCommandListExecutionTime;
-    columnCaptions << GP_STR_SummaryTableCommandListStartTime;
-    columnCaptions << GP_STR_SummaryTableCommandListEndTime;
-    columnCaptions << GP_STR_SummaryTableCommandListNumCommands;
-    columnCaptions << GP_STR_SummaryTableCommandListGPUQueue;
-
-    if (isDx12)
-    {
-        columnCaptions << GP_STR_SummaryTableCommandListAddress;
-    }
-    else
-    {
-        columnCaptions << GP_STR_SummaryTableCommandListHandle;
-    }
-
-    initHeaders(columnCaptions, false);
-    setShowGrid(true);
-}
-
-gpCommandListSummaryTable::~gpCommandListSummaryTable()
+/////////////////////////////////////////////////////
+// gpCPUTraceSummaryTable
+gpCPUTraceSummaryTable::gpCPUTraceSummaryTable(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView, quint64 timelineAbsoluteStart)
+    : gpTraceSummaryTable(pDataContainer, pSessionView, timelineAbsoluteStart)
 {
 
 }
 
-bool gpCommandListSummaryTable::Init()
-{
-    bool rc = InitCommandListItems();
-    if (rc == true)
-    {
-        // fill Table widget
-        FillTable();
-        setSortingEnabled(true);
-        setSelectionMode(QAbstractItemView::SingleSelection);
-        setContextMenuPolicy(Qt::NoContextMenu);
 
-        // Connect to the cell entered signal
-        setMouseTracking(true);
-        rc = connect(this, SIGNAL(cellEntered(int, int)), this, SLOT(OnCellEntered(int, int)));
-        GT_ASSERT(rc);
-    }
-    return rc;
-}
-
-void gpCommandListSummaryTable::CollateAllItemsIntoSummaryMap()
-{
-    GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
-    {
-        m_apiCallInfoSummaryMap.clear();
-
-        // insert items into map collated by call name
-        QList<QString> keys = m_allInfoSummaryMap.uniqueKeys();
-
-        foreach(QString key, keys)
-        {
-            APISummaryCommandListInfo info;
-            QList<APISummaryCommandListInfo> values = m_allInfoSummaryMap.values(key);
-
-            foreach(APISummaryCommandListInfo info, values)
-            {
-                 m_apiCallInfoSummaryMap.insert(key, info);
-            }
-        }
-    }
-}
-bool gpCommandListSummaryTable::InitCommandListItems()
+bool gpCPUTraceSummaryTable::InitItems()
 {
     bool rc = false;
     GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
     {
-        APISummaryCommandListInfo infoArray[SUMMARY_INFO_ARRAY_SIZE] = {};
-        const QVector<gpTraceDataContainer::CommandListInstanceData>& commandListsData = m_pSessionDataContainer->CommandListsData();
+        m_allCallItemsMultiMap.clear();
+        m_totalTimeMs = 0;
+        m_numTotalCalls = 0;
+        int threadCount = m_pSessionDataContainer->ThreadsCount();
 
-        int commandListIndex = 0;
-        auto iter = commandListsData.begin();
-        auto iterEnd = commandListsData.end();
-        for (; iter != iterEnd; iter++)
+        // fill local array of SummaryInfo items
+        APISummaryTraceInfo infoArray[SUMMARY_INFO_ARRAY_SIZE] = {};
+
+        for (int i = 0; i < threadCount; i++)
         {
-            if (!(*iter).m_commandListQueueName.isEmpty())
+            afProgressBarWrapper::instance().incrementProgressBar();
+            osThreadId threadID = m_pSessionDataContainer->ThreadID(i);
+
+            int apiCount = m_pSessionDataContainer->ThreadAPICount(threadID);
+
+            for (int i = 0; i < apiCount; i++)
             {
-                afProgressBarWrapper::instance().incrementProgressBar();
-                QString commandListName = m_pSessionDataContainer->CommandListNameFromPointer((*iter).m_commandListPtr, (*iter).m_instanceIndex);
-
-                APISummaryCommandListInfo& info = infoArray[commandListIndex];
-
-                info.m_index = commandListName;
-
-                info.m_gpuQueue = m_pSessionDataContainer->QueueDisplayName((*iter).m_commandListQueueName);
-                info.m_gpuQueueAddress = (*iter).m_commandListQueueName;
-
-                info.m_address = (*iter).m_commandListPtr;
-                info.m_minTimeMs = (*iter).m_startTime;
-                info.m_maxTimeMs = (*iter).m_endTime;
-
-                info.m_numCalls = (*iter).m_apiIndices.size();
-                info.m_executionTimeMS = ((*iter).m_endTime - (*iter).m_startTime);
-                info.m_typeColor = APIColorMap::Instance()->GetCommandListColor(commandListIndex);
-
-
-                for (auto apiIndex : (*iter).m_apiIndices)
+                // Get the current API item
+                ProfileSessionDataItem* pItem = m_pSessionDataContainer->APIItem(threadID, i);
+                GT_IF_WITH_ASSERT(pItem != nullptr)
                 {
-                    ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItemByItemCallIndex((*iter).m_commandListQueueName, apiIndex + 1);
-                    GT_IF_WITH_ASSERT(pItem != nullptr)
-                    {
-                        if (pItem->StartTime() == info.m_minTimeMs)
-                        {
-                            info.m_pMinTimeItem = pItem;
-                        }
-                        if (pItem->EndTime() == info.m_maxTimeMs)
-                        {
-                            info.m_pMaxTimeItem = pItem;
-                        }
-
-                        if (info.m_pMinTimeItem != nullptr && info.m_pMaxTimeItem != nullptr)
-                        {
-                            break;
-                        }
-                    }
+                    unsigned int apiId;
+                    pItem->GetAPIFunctionID(apiId);
+                    m_allCallItemsMultiMap.insertMulti(apiId, pItem);
+                    quint64 startTime = pItem->StartTime();
+                    quint64 endTime = pItem->EndTime();
+                    m_totalTimeMs += (endTime - startTime);
+                    m_numTotalCalls++;
+                    APISummaryTraceInfo& info = infoArray[apiId];
+                    AddSessionItemToSummaryInfo(info, pItem, apiId);
                 }
-                // normalize to timeline start
-                info.m_minTimeMs = (info.m_minTimeMs - m_timelineAbsoluteStart);
-                info.m_maxTimeMs = (info.m_maxTimeMs - m_timelineAbsoluteStart);
-
-                commandListIndex++;
-
-                m_allInfoSummaryMap.insert(commandListName, info);
-                m_apiCallInfoSummaryMap.insert(commandListName, info);
             }
         }
-        rc = (commandListIndex > 0);
+        if (threadCount > 0)
+        {
+            rc = true;
+            // insert array items to summary map
+            for (auto info : infoArray)
+            {
+                InsertSummaryInfoToMap(info);
+            }
+        }
     }
     return rc;
 }
 
-void gpCommandListSummaryTable::FillTable()
+void gpCPUTraceSummaryTable::AddSessionItemToSummaryInfo(APISummaryTraceInfo& info, ProfileSessionDataItem* pItem, unsigned int apiId)
 {
-    clearList();
-    int rowIndex = 0;
-
-    setSortingEnabled(false);
-
-    QMapIterator<QString, APISummaryCommandListInfo> it(m_apiCallInfoSummaryMap);
-    while (it.hasNext())
+    GT_IF_WITH_ASSERT(pItem != nullptr && m_pTraceView != nullptr)
     {
-        it.next();
-        AddSummaryRow(rowIndex, (APISummaryCommandListInfo*)&it.value());
+        APICallId callId;
+        callId.m_callIndex = apiId;
+        callId.m_tid = pItem->ThreadID();
 
-        rowIndex++;
-    }
-
-    setSortingEnabled(true);
-
-    sortByColumn(CommandListSummaryColumnIndex::COLUMN_EXECUTION_TIME);
-    horizontalHeader()->setSortIndicator(CommandListSummaryColumnIndex::COLUMN_EXECUTION_TIME, Qt::DescendingOrder);
-    horizontalHeader()->setSortIndicatorShown(true);
-    selectRow(0);
-}
-
-void gpCommandListSummaryTable::AddSummaryRow(int rowIndex, APISummaryInfo* pInfo)
-{
-    int rowCount = QTableWidget::rowCount();
-    GT_IF_WITH_ASSERT(pInfo != nullptr && rowIndex == rowCount)
-    {
-
-        QStringList rowStrings;
-        pInfo->TableItemsAsString(rowStrings);
-
-        insertRow(rowIndex);
+        bool showItem = true;
 
 
-        // Sanity check: make sure that the string are fully built
-        GT_IF_WITH_ASSERT(rowStrings.size() >= CommandListSummaryColumnIndex::COLUMN_COUNT - 1)
+        acAPITimelineItem* pTimelineItem = m_pTraceView->GetAPITimelineItem(callId);
+
+        if (pTimelineItem != nullptr)
         {
-            for (int i = 0; i < CommandListSummaryColumnIndex::COLUMN_COUNT; i++)
+            acTimelineBranch* pBranch = pTimelineItem->parentBranch();
+
+            if (pBranch && pBranch->IsVisible() == false)
             {
-                QTableWidgetItem* pItem = nullptr;
+                showItem = false;
+            }
+        }
 
-                bool shouldSetValue = true;
-                bool shouldSetCmdBufferTooltip = false;
+        if (showItem == true)
+        {
+            quint64 startTime = pItem->StartTime();
+            quint64 endTime = pItem->EndTime();
+            quint64 duration = endTime - startTime;
 
-                switch (i)
-                {
-                case COLUMN_ADDRESS:
-                case COLUMN_COMMAND_INDEX:
-                {
-                    pItem = allocateNewWidgetItem(rowStrings[i]);
-                    setItem(rowIndex, i, pItem);
-                    initItem(*pItem, rowStrings[i], nullptr, false, Qt::Unchecked, nullptr);
-                    setItemTextColor(rowIndex, i, pInfo->m_typeColor);
-                    shouldSetValue = false;
-                }
-                break;
-                case COLUMN_GPU_QUEUE:
-                {
-                    pItem = allocateNewWidgetItem(rowStrings[i]);
-                    setItem(rowIndex, i, pItem);
-                    initItem(*pItem, rowStrings[i], nullptr, false, Qt::Unchecked, nullptr);
-                    shouldSetValue = false;
-                }
-                break;
+            if (info.m_numCalls == 0)
+            {
+                info.m_call = pItem->GetColumnData(ProfileSessionDataItem::SESSION_ITEM_CALL_COLUMN).toString();
+                info.m_interface = pItem->GetColumnData(ProfileSessionDataItem::SESSION_ITEM_INTERFACE_COLUMN).toString();
+                info.m_typeColor = APIColorMap::Instance()->GetAPIColor(pItem->ItemType(), apiId, acQGREY_TEXT_COLOUR);
+            }
 
-                case COLUMN_START_TIME:
-                case COLUMN_END_TIME:
-                {
-                    pItem = new FormattedTimeItem();
-                    ((FormattedTimeItem*)pItem)->SetAsLink(true);
+            info.m_numCalls++;
+            info.m_callIndex = apiId;
+            info.m_cumulativeTime += duration;
 
-                }
-                break;
-                case COLUMN_EXECUTION_TIME:
-                {
-                    pItem = new FormattedTimeItem();
-                }
-                break;
-                case COLUMN_NUM_OF_COMMANDS:
-                {
-                    pItem = new QTableWidgetItem();
+            if (duration > info.m_maxTimeMs)
+            {
+                info.m_maxTimeMs = duration;
+                info.m_pMaxTimeItem = pItem;
+            }
 
-                    // For number of commands, set both text and value, to make sure that the column is sortable, and enable
-                    // display of N/A string for 0 calls 
-                    setItem(rowIndex, i, pItem);
-
-                    if (pInfo->m_numCalls == 0)
-                    {
-                        shouldSetCmdBufferTooltip = true;
-                    }
-                    QVariant dataVariant;
-                    dataVariant.setValue(rowStrings[i].toDouble());
-                    pItem->setData(Qt::EditRole, dataVariant);
-                    pItem->setData(Qt::DisplayRole, rowStrings[i]);
-                    shouldSetValue = false;
-                }
-                break;
-                }
-
-                if (shouldSetValue)
-                {
-                    setItem(rowIndex, i, pItem);
-                    QVariant dataVariant;
-                    dataVariant.setValue(rowStrings[i].toDouble());
-                    pItem->setData(Qt::DisplayRole, dataVariant);
-                }
-                if (shouldSetCmdBufferTooltip)
-                {
-                    pItem->setToolTip(GP_STR_SummaryCmdBufferToolTip);
-                }
-                else
-                {
-                    pItem->setToolTip(pItem->text());
-                }
-                pItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+            if (duration < info.m_minTimeMs || info.m_minTimeMs == std::numeric_limits<quint64>::max())
+            {
+                info.m_minTimeMs = duration;
+                info.m_pMinTimeItem = pItem;
             }
         }
     }
 }
 
-bool gpCommandListSummaryTable::GetItemCommandList(int row, QString& callName)const
-{
-    // Get the table widget item:
-    QTableWidgetItem* pItemInterface = item(row, COLUMN_COMMAND_INDEX);
 
-    if (pItemInterface != nullptr)
-    {
-        callName = pItemInterface->text();
-        return true;
-    }
-    return false;
+/////////////////////////////////////////////////////
+// gpGPUTraceSummaryTable
+gpGPUTraceSummaryTable::gpGPUTraceSummaryTable(gpTraceDataContainer* pDataContainer, gpTraceView* pSessionView, quint64 timelineAbsoluteStart)
+    : gpTraceSummaryTable(pDataContainer, pSessionView, timelineAbsoluteStart)
+{
+
 }
 
-bool gpCommandListSummaryTable::GetItemCommandListAddress(int row, QString& address)const
+bool gpGPUTraceSummaryTable::InitItems()
 {
-    // Get the table widget item:
-    QTableWidgetItem* pItemInterface = item(row, COLUMN_ADDRESS);
-
-    if (pItemInterface != nullptr)
-    {
-        address = pItemInterface->text();
-        return true;
-    }
-    return false;
-}
-
-bool gpCommandListSummaryTable::GetItemQueueName(int row, QString& queueName)const
-{
-    // Get the table widget item:
-    QTableWidgetItem* pItemInterface = item(row, COLUMN_GPU_QUEUE);
-
-    if (pItemInterface != nullptr)
-    {
-        queueName = pItemInterface->text();
-        return true;
-    }
-
-    return false;
-}
-
-void gpCommandListSummaryTable::OnCellEntered(int row, int column)
-{
-    GT_UNREFERENCED_PARAMETER(row);
-    GT_UNREFERENCED_PARAMETER(column);
-
-    setCursor(Qt::ArrowCursor);
-}
-
-void gpCommandListSummaryTable::BuildSummaryMapInTimelineScope(quint64 min, quint64 max)
-{
+    bool rc = false;
     GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
     {
-        m_apiCallInfoSummaryMap.clear();
-                    
-        // insert items into map collated by call name
-        QList<QString> keys = m_allInfoSummaryMap.uniqueKeys();
+        m_allCallItemsMultiMap.clear();
+        m_totalTimeMs = 0;
+        m_numTotalCalls = 0;
+        int queuesCount = m_pSessionDataContainer->GPUCallsContainersCount();
+        // fill local array of SummaryInfo items
+        APISummaryTraceInfo infoArray[SUMMARY_INFO_ARRAY_SIZE] = {};
 
-        foreach(QString key, keys)
+        for (int i = 0; i < queuesCount; i++)
         {
-            APISummaryCommandListInfo info;
-            QList<APISummaryCommandListInfo> values = m_allInfoSummaryMap.values(key);
+            afProgressBarWrapper::instance().incrementProgressBar();
+            QString queueName = m_pSessionDataContainer->GPUObjectName(i);
+            int apiCount = m_pSessionDataContainer->QueueItemsCount(queueName);
 
-            foreach(APISummaryCommandListInfo info, values)
+            for (int i = 0; i < apiCount; i++)
             {
-                if (info.m_minTimeMs >= min && info.m_maxTimeMs <= max)
+                // Get the current API item
+                ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItem(queueName, i);
+                GT_IF_WITH_ASSERT(pItem != nullptr)
                 {
-                    m_apiCallInfoSummaryMap.insert(key, info);
+                    unsigned int apiId;
+                    pItem->GetAPIFunctionID(apiId);
+                    m_allCallItemsMultiMap.insertMulti(apiId, pItem);
+                    quint64 startTime = pItem->StartTime();
+                    quint64 endTime = pItem->EndTime();
+                    m_totalTimeMs += (endTime - startTime);
+                    m_numTotalCalls++;
+                    APISummaryTraceInfo& info = infoArray[apiId];
+                    AddSessionItemToSummaryInfo(info, pItem, apiId);
                 }
             }
         }
+        // insert array items to summary map
+        if (queuesCount > 0)
+        {
+            rc = true;
+            for (auto info : infoArray)
+            {
+                InsertSummaryInfoToMap(info);
+            }
+        }
     }
+    return rc;
 }
 
-ProfileSessionDataItem* gpCommandListSummaryTable::GetRelatedItem(int rowIndex, int colIndex)
+void gpGPUTraceSummaryTable::AddSessionItemToSummaryInfo(APISummaryTraceInfo& info, ProfileSessionDataItem* pItem, unsigned int apiId)
 {
-    ProfileSessionDataItem* pItem = nullptr;
-    QString callName;
-
-    if (GetItemCommandList(rowIndex, callName))
+    GT_IF_WITH_ASSERT(pItem != nullptr && m_pTraceView != nullptr)
     {
-        APISummaryCommandListInfo info = GetSummaryInfo(callName);
+        quint64 startTime = pItem->StartTime();
+        quint64 endTime = pItem->EndTime();
+        quint64 duration = endTime - startTime;
 
-        if (colIndex == COLUMN_START_TIME)
+        if (info.m_numCalls == 0)
         {
-            pItem = info.m_pMinTimeItem;
-        }
-        else if (colIndex == COLUMN_END_TIME)
-        {
-            pItem = info.m_pMaxTimeItem;
-        }
-    }
-
-    return pItem;
-}
-
-APISummaryCommandListInfo gpCommandListSummaryTable::GetSummaryInfo(const QString& callName)
-{
-    APISummaryCommandListInfo dummyInfo;
-    QMap<QString, APISummaryCommandListInfo>::const_iterator apiCallInfoSummaryMapIter = m_apiCallInfoSummaryMap.find(callName);
-
-    if (apiCallInfoSummaryMapIter != m_apiCallInfoSummaryMap.end())
-    {
-        dummyInfo = apiCallInfoSummaryMapIter.value();
-    }
-
-    return dummyInfo;
-}
-
-void gpCommandListSummaryTable::SelectCommandList(const QString& commandListName)
-{
-    int rowCount = QTableWidget::rowCount();
-
-    for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
-    {
-        QString itemName;
-        QTableWidgetItem* pItemInterface = item(rowIndex, CommandListSummaryColumnIndex::COLUMN_ADDRESS);
-
-        if (pItemInterface != nullptr)
-        {
-            itemName = pItemInterface->text();
+            info.m_call = pItem->GetColumnData(ProfileSessionDataItem::SESSION_ITEM_CALL_COLUMN).toString();
+            info.m_interface = pItem->GetColumnData(ProfileSessionDataItem::SESSION_ITEM_INTERFACE_COLUMN).toString();
+            info.m_typeColor = APIColorMap::Instance()->GetAPIColor(pItem->ItemType(), apiId, acQGREY_TEXT_COLOUR);
         }
 
-        if (commandListName == itemName)
+        info.m_numCalls++;
+        info.m_callIndex = apiId;
+        info.m_cumulativeTime += duration;
+
+        if (duration > info.m_maxTimeMs)
         {
-            selectRow(rowIndex);
-            m_lastSelectedRowIndex = rowIndex;
-            QModelIndex modelIdx = model()->index(rowIndex, 0);
-            scrollTo(modelIdx);
-            break;
+            info.m_maxTimeMs = duration;
+            info.m_pMaxTimeItem = pItem;
+        }
+
+        if (duration < info.m_minTimeMs || info.m_minTimeMs == std::numeric_limits<quint64>::max())
+        {
+            info.m_minTimeMs = duration;
+            info.m_pMinTimeItem = pItem;
         }
     }
 }
+
 
