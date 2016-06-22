@@ -1525,7 +1525,7 @@ void kaApplicationTreeHandler::AddFileNodeToProgramBranch(const osFilePath& adde
         kaSourceFile* pFile = KA_PROJECT_DATA_MGR_INSTANCE.dataFileByPath(addedFilePath);
         GT_IF_WITH_ASSERT((pFile != nullptr))
         {
-            int fileID = KA_PROJECT_DATA_MGR_INSTANCE.GetFileID(pFile->filePath());
+            const int fileID = KA_PROJECT_DATA_MGR_INSTANCE.GetFileID(pFile->filePath());
             // If the child type is unknown, we should extract it from the file type
             if (programChildItemType == AF_TREE_ITEM_ITEM_NONE)
             {
@@ -1595,71 +1595,60 @@ void kaApplicationTreeHandler::AddFileNodeToProgramBranch(const osFilePath& adde
                                 }
                             }
                         }
-                    }
-
-                    GT_IF_WITH_ASSERT(pFileItemData != nullptr)
-                    {
-                        pFileTreeNode = pFileItemData->m_pTreeWidgetItem;
-                    }
+                    }                 
                 }
-                else
+               
+                // Connect the program to this file id in the data manager
+                KA_PROJECT_DATA_MGR_INSTANCE.Connect(pFile->id(), pProgram);
+                // add source file
+                bool shouldAddNewTreeNode = AddFileToProgram(pProgram, programChildItemType, fileID, pFile);
+
+                kaTreeDataExtension* pChildKAData = nullptr;
+
+                if (pFileItemData != nullptr)
                 {
-                    // Connect the program to this file id in the data manager
-                    KA_PROJECT_DATA_MGR_INSTANCE.Connect(pFile->id(), pProgram);
+                    pFileTreeNode = pFileItemData->m_pTreeWidgetItem;
+                    pChildKAData = qobject_cast<kaTreeDataExtension*>(pFileItemData->extendedItemData());
+                }
 
-                  
-                    // add source file
-                    bool shouldAddNewTreeNode = AddFileToProgram(pProgram, programChildItemType, fileID, pFile);
-
-                    kaTreeDataExtension* pChildKAData = nullptr;
-
-                    if (pFileItemData != nullptr)
+                if (shouldAddNewTreeNode || pFileTreeNode == nullptr)
+                {
+                    afApplicationTreeItemData* pNewItemData = AddProgramTreeItemChild(pProgramTreeItemData->m_pTreeWidgetItem, programChildItemType, pFile->filePath());
+                    GT_IF_WITH_ASSERT(pNewItemData != nullptr)
                     {
-                        pFileTreeNode = pFileItemData->m_pTreeWidgetItem;
-                        pChildKAData = qobject_cast<kaTreeDataExtension*>(pFileItemData->extendedItemData());
-                    }
-
-                    if (shouldAddNewTreeNode || (pFileTreeNode == nullptr))
-                    {
-                        afApplicationTreeItemData* pNewItemData = AddProgramTreeItemChild(pProgramTreeItemData->m_pTreeWidgetItem, programChildItemType, pFile->filePath());
-                        GT_IF_WITH_ASSERT(pNewItemData != nullptr)
-                        {
-                            pFileTreeNode = pNewItemData->m_pTreeWidgetItem;
-                            pChildKAData = qobject_cast<kaTreeDataExtension*>(pNewItemData->extendedItemData());
-                        }
-                    }
-
-                    GT_IF_WITH_ASSERT(pChildKAData != nullptr)
-                    {
-                        pChildKAData->SetProgram(pProgram);
-                        pChildKAData->setFilePath(pFile->filePath());
-                        pChildKAData->m_pParentData->m_filePath = pFile->filePath();
-                    }
-
-                    GT_IF_WITH_ASSERT(pFileTreeNode != nullptr)
-                    {
-                        gtString stageNameAsString = ProgramItemTypeAsText(programChildItemType, L"");
-                        QString nodeName = acGTStringToQString(stageNameAsString);
-
-                        if (!nodeName.isEmpty())
-                        {
-                            treeItemText = QString("%1 (%2)").arg(nodeName).arg(treeItemText);
-                        }
-
-                        pFileTreeNode->setText(0, treeItemText);
-                        gtString filePath = pFile->filePath().asString();
-
-                        if (!filePath.isEmpty())
-                        {
-                            pFileTreeNode->setToolTip(0, acGTStringToQString(filePath));
-                        }
-
-                        pFileTreeNode->setTextColor(0, Qt::black);
-                        pFileTreeNode->setIcon(0, m_pIconsArray[KA_PIXMAP_SOURCE]);
+                        pFileTreeNode = pNewItemData->m_pTreeWidgetItem;
+                        pChildKAData = qobject_cast<kaTreeDataExtension*>(pNewItemData->extendedItemData());
                     }
                 }
 
+                GT_IF_WITH_ASSERT(pChildKAData != nullptr)
+                {
+                    pChildKAData->SetProgram(pProgram);
+                    pChildKAData->setFilePath(pFile->filePath());
+                    pChildKAData->m_pParentData->m_filePath = pFile->filePath();
+                }
 
+                GT_IF_WITH_ASSERT(pFileTreeNode != nullptr)
+                {
+                    gtString stageNameAsString = ProgramItemTypeAsText(programChildItemType, L"");
+                    QString nodeName = acGTStringToQString(stageNameAsString);
+
+                    if (!nodeName.isEmpty())
+                    {
+                        treeItemText = QString("%1 (%2)").arg(nodeName).arg(treeItemText);
+                    }
+
+                    pFileTreeNode->setText(0, treeItemText);
+                    gtString filePath = pFile->filePath().asString();
+
+                    if (!filePath.isEmpty())
+                    {
+                        pFileTreeNode->setToolTip(0, acGTStringToQString(filePath));
+                    }
+
+                    pFileTreeNode->setTextColor(0, Qt::black);
+                    pFileTreeNode->setIcon(0, m_pIconsArray[KA_PIXMAP_SOURCE]);
+                }
                 GT_IF_WITH_ASSERT(pFileTreeNode != nullptr)
                 {
                     m_pApplicationTree->clearSelection();
