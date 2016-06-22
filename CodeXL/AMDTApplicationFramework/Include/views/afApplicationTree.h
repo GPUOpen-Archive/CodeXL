@@ -38,7 +38,7 @@ public:
     virtual bool BuildItemHTMLPropeties(const afApplicationTreeItemData& displayedItemId, afHTMLContent& htmlContent) = 0;
     virtual void SetItemsVisibility() = 0;
     virtual bool IsDragDropSupported(QDropEvent* pEvent, QString& dragDropFile, bool& shouldAccpet) { (void)(pEvent); (void)(dragDropFile); (void)(shouldAccpet); return false;};
-    virtual bool ExecuteDropEvent(QDropEvent* pEvent, const QString& dragDropFile) { (void)(pEvent); (void)(dragDropFile); return false;};
+    virtual bool ExecuteDropEvent(QWidget* receiver, QDropEvent* pEvent, const QString& dragDropFile) { (void)(receiver);  (void)(pEvent); (void)(dragDropFile); return false; };
     virtual void PostContextMenuAction() {};
 
     /// Can this item be dropped into?
@@ -150,7 +150,7 @@ public:
 
     // Drag & Drop:
     virtual bool ShouldAcceptDragDrop(QDropEvent* event, QString& dragDropFile);
-    virtual bool ExecuteDropEvent(QDropEvent* pEvent, QString& dragDropFile);
+    virtual bool ExecuteDropEvent(QWidget* receiver, QDropEvent* pEvent, QString& dragDropFile);
 
     // Execution changed:
     void onModeChanged();

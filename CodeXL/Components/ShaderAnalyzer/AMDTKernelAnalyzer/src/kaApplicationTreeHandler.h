@@ -84,14 +84,14 @@ public:
     virtual bool IsDragDropSupported(QDropEvent* pEvent, QString& dragDropFile, bool& shouldAccpet);
     virtual bool IsItemDroppable(QTreeWidgetItem* pItem);
     virtual bool CanItemBeDragged(QTreeWidgetItem* pItem);
-    virtual bool ExecuteDropEvent(QDropEvent* pEvent, const QString& dragDropFile);
+    virtual bool ExecuteDropEvent(QWidget* receiver, QDropEvent* pEvent, const QString& dragDropFile) override;
 
-    void ExecuteDropForDraggedTreeItem(const QMimeData* pMimeData, QDropEvent* pEvent);
+    void ExecuteDropForDraggedTreeItem(QWidget* receiver, const QMimeData* pMimeData, QDropEvent* pEvent);
 
     /// Executing drop on Program node dragged from OS items
     /// \param [in] pMimeData - to extract URLs
     /// \param [in] pEvent - to get destination node
-    void DropOutertemsOnRelevantProgram(const QMimeData* pMimeData, QDropEvent* pEvent);
+    void DropOutertemsOnRelevantProgram(QWidget* receiver, const QMimeData* pMimeData, QDropEvent* pEvent);
 
     /// manipulating tree:
     void setFilesRootNode(QTreeWidgetItem* iFilesRootNode) { m_pProgramsRootNode = iFilesRootNode; }
@@ -337,8 +337,11 @@ private:
     /// \return the filename of the devices file without ext
     void AddFilesToProgram(const kaProgram* pProgram, const gtVector<osFilePath>& addedFilePaths, 
                            const afApplicationTreeItemData* pProgramItemData, afTreeItemType destinationItemType);
-
-
+    /// Calculates and returns drop event position on tree widget
+    /// \param pEvent  pointer to the drop event
+    /// \param receiver  pointer to event reciever object - must be valid(not null)
+    /// \return QPoint position on tree widget of the drop event
+    QPoint ConvertToTreePosition(QDropEvent* pEvent, QWidget* receiver) const;
 public slots:
 
     /// Tree current selection changed - check if active program should be set

@@ -353,7 +353,7 @@ public:
     virtual afApplicationTree::DragAction DragActionForDropEvent(QDropEvent* pEvent);
 
     // Handle a drop event
-    void HandleDropEvent(QDropEvent* pEvent);
+    void HandleDropEvent(QWidget* receiver, QDropEvent* pEvent);
 
     /// save all mdi windows that are related to the supplied filepath
     virtual void SaveAllMDISubWindowsForFilePath(const osFilePath& filePath) = 0;

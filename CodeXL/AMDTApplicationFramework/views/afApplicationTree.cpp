@@ -1878,7 +1878,7 @@ bool afApplicationTree::ShouldAcceptDragDrop(QDropEvent* pEvent, QString& dragDr
 /// \brief Description: Returns true if currently the tree accepts drag an drop
 /// \param[in]          pEvent
 /// -----------------------------------------------------------------------------------------------
-bool afApplicationTree::ExecuteDropEvent(QDropEvent* pEvent, QString& dragDropFile)
+bool afApplicationTree::ExecuteDropEvent(QWidget* receiver, QDropEvent* pEvent, QString& dragDropFile)
 {
     bool retVal = false;
 
@@ -1893,7 +1893,7 @@ bool afApplicationTree::ExecuteDropEvent(QDropEvent* pEvent, QString& dragDropFi
 
             if (isHandling && shouldAccept)
             {
-                retVal = pTreeHandler->ExecuteDropEvent(pEvent, dragDropFile);
+                retVal = pTreeHandler->ExecuteDropEvent(receiver, pEvent, dragDropFile);
                 break;
             }
         }
@@ -2149,7 +2149,7 @@ void afApplicationTree::dropEvent(QDropEvent* pEvent)
     {
         if (pMimeData->hasUrls())
         {
-            afApplicationCommands::instance()->HandleDropEvent(pEvent);
+            afApplicationCommands::instance()->HandleDropEvent(treeControl(), pEvent);
         }
         else if (pMimeData->hasFormat("text/plain"))
         {
@@ -2161,7 +2161,7 @@ void afApplicationTree::dropEvent(QDropEvent* pEvent)
                 {
                     if (m_pTreeCtrl != nullptr && m_pTreeCtrl->IsDragging())
                     {
-                        pTreeHandler->ExecuteDropEvent(pEvent, QString());
+                        pTreeHandler->ExecuteDropEvent(treeControl(), pEvent, QString());
                     }
 
                     break;
@@ -2171,7 +2171,7 @@ void afApplicationTree::dropEvent(QDropEvent* pEvent)
     }
     else
     {
-        afApplicationCommands::instance()->HandleDropEvent(pEvent);
+        afApplicationCommands::instance()->HandleDropEvent(treeControl(), pEvent);
     }
 }
 
@@ -2183,7 +2183,7 @@ void afApplicationTree::OnTreeElementDropEvent(QDropEvent* pEvent)
     {
         if (pMimeData->hasUrls())
         {
-            afApplicationCommands::instance()->HandleDropEvent(pEvent);
+            afApplicationCommands::instance()->HandleDropEvent(treeControl(), pEvent);
         }
         else if (pMimeData->hasFormat("text/plain"))
         {
@@ -2195,7 +2195,7 @@ void afApplicationTree::OnTreeElementDropEvent(QDropEvent* pEvent)
                 {
                     if (m_pTreeCtrl != nullptr && m_pTreeCtrl->IsDragging())
                     {
-                        pTreeHandler->ExecuteDropEvent(pEvent, QString());
+                        pTreeHandler->ExecuteDropEvent(treeControl(), pEvent, QString());
                     }
 
                     break;
@@ -2205,7 +2205,7 @@ void afApplicationTree::OnTreeElementDropEvent(QDropEvent* pEvent)
     }
     else
     {
-        afApplicationCommands::instance()->HandleDropEvent(pEvent);
+        afApplicationCommands::instance()->HandleDropEvent(treeControl(), pEvent);
     }
 }
 
