@@ -3800,7 +3800,7 @@ void kaApplicationTreeHandler::BuildMenuForProgramItem(const afApplicationTreeIt
 }
 
 // ---------------------------------------------------------------------------
-bool kaApplicationTreeHandler::ExecuteDropEvent(QDropEvent* pEvent, const QString& dragDropFile)
+bool kaApplicationTreeHandler::ExecuteDropEvent(QWidget* receiver, QDropEvent* pEvent, const QString& dragDropFile)
 {
     GT_UNREFERENCED_PARAMETER(dragDropFile);
 
@@ -3825,12 +3825,12 @@ bool kaApplicationTreeHandler::ExecuteDropEvent(QDropEvent* pEvent, const QStrin
         {
             if (pMimeData->hasUrls())
             {
-                DropOutertemsOnRelevantProgram(pMimeData, pEvent);
+                DropOutertemsOnRelevantProgram(receiver, pMimeData, pEvent);
             }
             else if (pMimeData->hasFormat("text/plain"))
             {
                 // Dropped element is dragged from the tree, it should be a file element, and dropped into a program child
-                ExecuteDropForDraggedTreeItem(pMimeData, pEvent);
+                ExecuteDropForDraggedTreeItem(receiver, pMimeData, pEvent);
             }
         }
     }
@@ -3839,7 +3839,7 @@ bool kaApplicationTreeHandler::ExecuteDropEvent(QDropEvent* pEvent, const QStrin
 }
 
 
-void kaApplicationTreeHandler::DropOutertemsOnRelevantProgram(const QMimeData* pMimeData, QDropEvent* pEvent)
+void kaApplicationTreeHandler::DropOutertemsOnRelevantProgram(QWidget* receiver, const QMimeData* pMimeData, QDropEvent* pEvent)
 {
     afApplicationTreeItemData* pProgramItemData = nullptr;
     kaProgram* pProgram = nullptr;
@@ -3854,8 +3854,9 @@ void kaApplicationTreeHandler::DropOutertemsOnRelevantProgram(const QMimeData* p
             osFilePath droppedFilePath(fileUrl);
             addedFilePaths.push_back(droppedFilePath);
         }
-
-        QTreeWidgetItem* pDropDestinationItem = m_pApplicationTree->treeControl()->itemAt(pEvent->pos());
+      
+        QPoint treePos = ConvertToTreePosition(pEvent, receiver);
+        QTreeWidgetItem* pDropDestinationItem = m_pApplicationTree->treeControl()->itemAt(treePos);
 
         if (pDropDestinationItem != nullptr)
         {
@@ -3942,6 +3943,15 @@ void kaApplicationTreeHandler::DropOutertemsOnRelevantProgram(const QMimeData* p
     }
 }
 
+QPoint kaApplicationTreeHandler::ConvertToTreePosition(QDropEvent* pEvent, QWidget* receiver) const
+{
+    GT_ASSERT(receiver != nullptr);
+    QPoint activePos = pEvent->pos();
+    QPoint globalPos = receiver->mapToGlobal(activePos);
+    QPoint treePos   = m_pApplicationTree->treeControl()->mapFromGlobal(globalPos);
+    return treePos;
+}
+
 void kaApplicationTreeHandler::AddFilesToProgram(const kaProgram* pProgram, const gtVector<osFilePath>& addedFilePaths,
                                                  const afApplicationTreeItemData* pProgramItemData,
                                                  afTreeItemType destinationItemType)
@@ -3999,7 +4009,7 @@ void kaApplicationTreeHandler::AddFilesToProgram(const kaProgram* pProgram, cons
 }
 
 
-void kaApplicationTreeHandler::ExecuteDropForDraggedTreeItem(const QMimeData* pMimeData, QDropEvent* pEvent)
+void kaApplicationTreeHandler::ExecuteDropForDraggedTreeItem(QWidget* receiver, const QMimeData* pMimeData, QDropEvent* pEvent)
 {
     // Sanity check:
     GT_IF_WITH_ASSERT((pMimeData != nullptr) && (pEvent != nullptr) && (m_pApplicationTree != nullptr))
@@ -4023,7 +4033,8 @@ void kaApplicationTreeHandler::ExecuteDropForDraggedTreeItem(const QMimeData* pM
         // Dropped element is a tree elements dragged from the application tree
         // The dragged element (which is expected to be a source file)
         // should be set as the pipeline stage for the dropped target (which is expected to be a pipeline stage)
-        QTreeWidgetItem* pDroppedItem = m_pApplicationTree->treeControl()->itemAt(pEvent->pos());
+        QPoint treePos = ConvertToTreePosition(pEvent, receiver);
+        QTreeWidgetItem* pDroppedItem = m_pApplicationTree->treeControl()->itemAt(treePos);
 
         if (pDroppedItem != nullptr)
         {

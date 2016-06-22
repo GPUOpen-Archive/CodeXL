@@ -2290,9 +2290,10 @@ bool ProfileApplicationTreeHandler::GetNextSessionNameAndDir(const gtString& str
     return retVal;
 }
 
-bool ProfileApplicationTreeHandler::ExecuteDropEvent(QDropEvent* pEvent, const QString& dragDropFile)
+bool ProfileApplicationTreeHandler::ExecuteDropEvent(QWidget* receiver, QDropEvent* pEvent, const QString& dragDropFile)
 {
     Q_UNUSED(pEvent);
+    Q_UNUSED(receiver);
 
     bool retVal = true;
 

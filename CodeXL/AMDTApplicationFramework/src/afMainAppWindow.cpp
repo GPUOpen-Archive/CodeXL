@@ -485,7 +485,7 @@ void afMainAppWindow::dragMoveEvent(QDragMoveEvent* pEvent)
 /// ------------------------------------------------------------------------------------------------
 void afMainAppWindow::dropEvent(QDropEvent* pEvent)
 {
-    afApplicationCommands::instance()->HandleDropEvent(pEvent);
+    afApplicationCommands::instance()->HandleDropEvent(this, pEvent);
 }
 
 

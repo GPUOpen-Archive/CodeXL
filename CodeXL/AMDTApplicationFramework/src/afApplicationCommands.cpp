@@ -2806,7 +2806,7 @@ afApplicationTree::DragAction afApplicationCommands::DragActionForDropEvent(QDro
     return retVal;
 }
 
-void afApplicationCommands::HandleDropEvent(QDropEvent* pEvent)
+void afApplicationCommands::HandleDropEvent(QWidget* receiver, QDropEvent* pEvent)
 {
     // Sanity check
     GT_IF_WITH_ASSERT(pEvent != nullptr)
@@ -2870,7 +2870,7 @@ void afApplicationCommands::HandleDropEvent(QDropEvent* pEvent)
 
                             if (pEvent != nullptr)
                             {
-                                afApplicationCommands::instance()->applicationTree()->ExecuteDropEvent(pEvent, dragDropFile);
+                                afApplicationCommands::instance()->applicationTree()->ExecuteDropEvent(receiver, pEvent, dragDropFile);
                             }
                         }
                     }
@@ -2883,7 +2883,7 @@ void afApplicationCommands::HandleDropEvent(QDropEvent* pEvent)
 
                             if (pEvent != nullptr)
                             {
-                                afApplicationCommands::instance()->applicationTree()->ExecuteDropEvent(pEvent, dragDropFile);
+                                afApplicationCommands::instance()->applicationTree()->ExecuteDropEvent(receiver, pEvent, dragDropFile);
                             }
                         }
                     }
