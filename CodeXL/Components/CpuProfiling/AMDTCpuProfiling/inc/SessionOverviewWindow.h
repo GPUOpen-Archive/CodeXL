@@ -138,7 +138,8 @@ private:
     /// \brief Description: Open the functions view for the activated process
     /// \param[in]          pTableItem - the item activated in functions table
     void openFunctionViewForProcess(QTableWidgetItem* pTableItem);
-
+	bool displaySessionExecutionDetails(afHTMLContent& content);
+	bool displaySessionProfileDetails(afHTMLContent& content);
 private:
 
     // Widgets:

@@ -346,8 +346,7 @@ bool DisplayFilterDlg::populateColumnList()
 
 	for (auto configsName : configsNames)
 	{
-		QString str(configsName.asASCIICharArray());
-		m_pComboBoxViewes->addItem(str);
+		m_pComboBoxViewes->addItem(acGTStringToQString(configsName));
 	}
 
 	int index = m_pComboBoxViewes->findText(m_cofigName);

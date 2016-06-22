@@ -917,6 +917,42 @@ CPUProfileDataTable::TableType FunctionsDataTable::GetTableType() const
     return CPUProfileDataTable::FUNCTION_DATA_TABLE;
 }
 
+bool FunctionsDataTable::setModuleIcon(int row,
+	const AMDTProfileModuleInfo& moduleInfo)
+{
+	bool retVal = false;
+
+	GT_IF_WITH_ASSERT((m_pProfDataRdr != nullptr) &&
+		(m_pSessionDisplaySettings != nullptr) &&
+		(m_pTableDisplaySettings != nullptr))
+	{
+		osFilePath iconFile;
+		iconFile.setFileName(moduleInfo.m_name);
+		iconFile.setFullPathFromString(moduleInfo.m_path);
+
+		QPixmap* pIcon = CPUProfileDataTable::moduleIcon(iconFile, true);
+
+		// Initialize the function row:
+		//initRowItems(rowIndex, functionItemStringList, Qt::AlignVCenter | Qt::AlignLeft);
+		QTableWidgetItem* pNameItem = item(row, 0);
+
+		if (pNameItem != nullptr)
+		{
+			// Set the original position in function vector:
+			pNameItem->setData(FunctionDataIndexRole, QVariant(0));
+
+			if (pIcon != nullptr)
+			{
+				pNameItem->setIcon(QIcon(*pIcon));
+			}
+		}
+
+		retVal = true;
+	}
+
+	return retVal;
+}
+
 bool FunctionsDataTable::fillSummaryTables(int counterIdx)
 {
     bool retVal = false;
@@ -929,20 +965,6 @@ bool FunctionsDataTable::fillSummaryTables(int counterIdx)
         AMDTProfileDataVec funcProfileData;
         rc = m_pProfDataRdr->GetFunctionSummary(counterDesc.at(counterIdx).m_id,
                                                 funcProfileData);
-#if 1 //test code aalok
-		for (auto const& func : funcProfileData)
-		{
-			AMDTProfileFunctionData  functionData;
-			m_pProfDataRdr->GetFunctionDetailedProfileData(func.m_id,
-				AMDT_PROFILE_ALL_PROCESSES,
-				AMDT_PROFILE_ALL_THREADS,
-				functionData);
-
-			gtString srcFilePath;
-			AMDTSourceAndDisasmInfoVec srcInfoVec;
-			m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(func.m_id, srcFilePath, srcInfoVec);
-		}
-#endif
         GT_ASSERT(rc);
 
         setSortingEnabled(false);
@@ -972,27 +994,17 @@ bool FunctionsDataTable::fillSummaryTables(int counterIdx)
             addRow(list, nullptr);
 
 			QString modulefullPath(procInfo.at(0).m_path.asASCIICharArray());
-			int row = rowCount()-1;
-			int col = 4;
-
-			QTableWidgetItem* pModuleNameItem = item(row, col);
+			int row = rowCount() - 1;
+			QTableWidgetItem* pModuleNameItem = item(row, AMDT_FUNC_SUMMMARY_FUNC_MODULE_COL);
 			if (pModuleNameItem != nullptr)
 			{
 				pModuleNameItem->setToolTip(modulefullPath);
 			}
 
-
-#if 0
-			QString modulePath(procInfo.at(0).m_path.asASCIICharArray());
-
-            rc = setToolTip(row, sampleCountPercent.toString(), modulePath);
-
 			if (true == rc)
             {
                 rc = setModuleIcon(row, procInfo.at(0));
             }
-
-#endif
 
             if (true == rc)
             {
@@ -1001,6 +1013,13 @@ bool FunctionsDataTable::fillSummaryTables(int counterIdx)
         }
 
         setSortingEnabled(true);
+
+		hideColumn(AMDT_FUNC_SUMMMARY_FUNC_ID_COL);
+
+		resizeColumnToContents(AMDT_FUNC_SUMMMARY_FUNC_NAME_COL);
+		resizeColumnToContents(AMDT_FUNC_SUMMMARY_FUNC_SAMPLE_COL);
+		resizeColumnToContents(AMDT_FUNC_SUMMMARY_FUNC_PER_SAMPLE_COL);
+		resizeColumnToContents(AMDT_FUNC_SUMMMARY_FUNC_MODULE_COL);
 
         retVal = true;
     }

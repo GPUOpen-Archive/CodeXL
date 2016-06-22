@@ -1052,15 +1052,7 @@ GetConfigCounters(const QString& configName, CounterNameIdVec& counterDetails)
 	// set the member variable 
 	m_configurationName = configName;
 
-	// get wstring
-	std::wstring wstr = configName.toStdWString();
-	const wchar_t *cfgName = wstr.c_str();
-
-	gtString str(cfgName);
-	gtString gtStr;
-	acWideQStringToGTString(configName, gtStr);
-
-	auto itr = m_configCounterMap.find(cfgName);
+	auto itr = m_configCounterMap.find(acQStringToGTString(configName));
 	if (m_configCounterMap.end() != itr)
 	{
 		counterDetails = itr->second;
@@ -1163,13 +1155,7 @@ int DisplayFilter::GetCpuCoreCnt() const
 AMDTUInt64 DisplayFilter::GetCounterId(const QString & counterName) const
 {
 	AMDTUInt64 id = 0;
-	// get wstring
-	std::wstring wStr = counterName.toStdWString();
-	const wchar_t *cfgName = wStr.c_str();
-
-	gtString gStr(cfgName);
-
-	auto idItr = m_counterNameIdMap.find(cfgName);
+	auto idItr = m_counterNameIdMap.find(acQStringToGTString(counterName));
 	if (m_counterNameIdMap.end() != idItr)
 	{
 		id = idItr->second;
