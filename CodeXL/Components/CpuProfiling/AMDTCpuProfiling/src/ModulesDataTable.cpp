@@ -500,17 +500,9 @@ bool ModulesDataTable::fillSummaryTables(int counterIdx)
             filename += extName;
 
             list << filename.asASCIICharArray();
-#if 0
-			QString modulefullPath(moduleData.m_name.asASCIICharArray());
-			int row = rowCount(); 
-			int col = 0;
 
-			QTableWidgetItem* pModuleNameItem = item(row, col);
-			if (pModuleNameItem != nullptr)
-			{
-				pModuleNameItem->setToolTip(modulefullPath);
-			}
-#endif
+			QString modulefullPath(moduleData.m_name.asASCIICharArray());
+
             QVariant sampleCount(moduleData.m_sampleValue.at(0).m_sampleCount);
             list << sampleCount.toString();
 
@@ -519,14 +511,13 @@ bool ModulesDataTable::fillSummaryTables(int counterIdx)
 
             addRow(list, nullptr);
 
-			QString modulefullPath(moduleData.m_name.asASCIICharArray());
 			int row = rowCount() -1 ;
 			int col = 0;
 
 			QTableWidgetItem* pModuleNameItem = item(row, col);
 			if (pModuleNameItem != nullptr)
 			{
-				pModuleNameItem->setToolTip(modulefullPath);
+				pModuleNameItem->setToolTip(moduleData.m_name.asASCIICharArray());
 			}
 
             rc = delegateSamplePercent(2);

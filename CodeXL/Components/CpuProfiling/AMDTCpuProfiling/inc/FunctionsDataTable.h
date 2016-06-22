@@ -21,6 +21,14 @@
 
 class CpuSessionWindow;
 
+enum FunctionSummaryCol
+{
+	AMDT_FUNC_SUMMMARY_FUNC_ID_COL = 0,
+	AMDT_FUNC_SUMMMARY_FUNC_NAME_COL,
+	AMDT_FUNC_SUMMMARY_FUNC_SAMPLE_COL,
+	AMDT_FUNC_SUMMMARY_FUNC_PER_SAMPLE_COL,
+	AMDT_FUNC_SUMMMARY_FUNC_MODULE_COL
+};
 /// -----------------------------------------------------------------------------------------------
 /// \class Name: FunctionsDataTable : public CPUProfileDataTable
 /// \brief Description:  This class will be used to display functions in data table.
@@ -114,6 +122,7 @@ protected:
     bool shouldModuleBeDisplayed(const CpuProfileModule& module);
 
     const FunctionData* getFunctionData(int rowIndex) const;
+	bool setModuleIcon(int row, const AMDTProfileModuleInfo& moduleInfo);
 
 
 protected:
