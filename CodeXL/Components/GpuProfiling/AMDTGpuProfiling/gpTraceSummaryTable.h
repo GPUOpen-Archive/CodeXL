@@ -53,8 +53,6 @@ public :
     /// class destructor.
     virtual ~gpTraceSummaryTable();
 
-    //virtual bool Init();
-
     /// Returns a ProfileSessionDataItem* which belong to the specified call
     ProfileSessionDataItem* GetRelatedItem(int rowIndex, int colIndex);
 

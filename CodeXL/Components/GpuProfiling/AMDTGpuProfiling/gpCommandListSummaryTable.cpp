@@ -54,25 +54,6 @@ gpCommandListSummaryTable::~gpCommandListSummaryTable()
 
 }
 
-//bool gpCommandListSummaryTable::Init()
-//{
-//    bool rc = InitItems();
-//    if (rc == true)
-//    {
-//        // fill Table widget
-//        FillTable();
-//        setSortingEnabled(true);
-//        setSelectionMode(QAbstractItemView::SingleSelection);
-//        setContextMenuPolicy(Qt::NoContextMenu);
-//
-//        // Connect to the cell entered signal
-//        setMouseTracking(true);
-//        rc = connect(this, SIGNAL(cellEntered(int, int)), this, SLOT(OnCellEntered(int, int)));
-//        GT_ASSERT(rc);
-//    }
-//    return rc;
-//}
-
 void gpCommandListSummaryTable::CollateAllItemsIntoSummaryMap()
 {
     GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
