@@ -257,7 +257,7 @@ void gpNavigationRibbon::CalculateBuckets()
         double rangePerBucket = m_pTimeLineGrid->fullRange() * 1.0 / (LAYER_DISPLAY_LIMIT - 1);
 
         // Sanity check:
-        if (rangePerBucket > 0)
+        GT_IF_WITH_ASSERT(rangePerBucket > 0)
         {
             for (int nBin = 0; nBin < LAYER_DISPLAY_LIMIT; nBin++)
             {
