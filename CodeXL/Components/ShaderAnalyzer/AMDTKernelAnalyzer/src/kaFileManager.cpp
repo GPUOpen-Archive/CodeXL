@@ -115,11 +115,12 @@ bool kaFileManager::Remove(const int id)
                 rangeIterator = m_changeRecipientsMap.erase(rangeIterator);
             }
         }
+
+        //remove this entry from files map
+        delete itr->second;
+        m_sourceFiles.erase(itr);
     }
 
-    //remove this entry from files map
-    delete itr->second;
-    m_sourceFiles.erase(itr);
     return retVal;
 }
 
