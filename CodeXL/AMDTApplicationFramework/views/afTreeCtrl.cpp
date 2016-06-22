@@ -211,7 +211,7 @@ void afTreeCtrl::dropEvent(QDropEvent* pEvent)
 
                 while (!stream.atEnd())
                 {
-                    int row, col;
+                    int row(0), col(0);
                     QMap<int, QVariant> roleDataMap;
                     stream >> row >> col >> roleDataMap;
                     QString dropped = roleDataMap[0].toString();
