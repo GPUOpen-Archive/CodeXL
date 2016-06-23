@@ -775,6 +775,7 @@ void acSourceCodeView::SetMonoFont(int fontSize)
 }
 
 // ---------------------------------------------------------------------------
+// Precondition:  line parameter starts from '1', i.e the the first line value should be '1'
 void acSourceCodeView::SetCursorPositionToMiddle(int line, int index)
 {
     int firstLine = firstVisibleLine();
@@ -806,8 +807,9 @@ void acSourceCodeView::SetCursorPositionToMiddle(int line, int index)
             // by setting what should be the first line - control the cursor position
             setFirstVisibleLine(newFirstLine);
         }
-
-        setCursorPosition(line, index);
+        //we assume here that line number , starts numerations from '1'(i.e. like it's shown in UI), thus we reduce 1,
+        //in order to adjust the line parameter to "start from zero" numeration
+        setCursorPosition(line > 0 ? line - 1 : 0, index);
     }
 }
 
