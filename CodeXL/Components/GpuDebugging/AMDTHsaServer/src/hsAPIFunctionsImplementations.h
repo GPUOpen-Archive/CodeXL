@@ -10,6 +10,7 @@
 
 // Forward declarations:
 class osFilePath;
+struct apExpression;
 
 // Infra:
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
