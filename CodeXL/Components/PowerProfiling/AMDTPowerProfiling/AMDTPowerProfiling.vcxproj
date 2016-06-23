@@ -110,6 +110,7 @@
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
       <AdditionalInputs>$(AMDTCommonExt)QT\5.5\bin\moc.exe;src\%(Filename).cpp</AdditionalInputs>
     </CustomBuild>
+    <ClInclude Include="src\ppSessionActionsCreator.h" />
     <ClInclude Include="src\ppSessionController.h" />
     <ClInclude Include="src\ppSingletonsDelete.h" />
     <ClInclude Include="src\ppStackedBarGraphData.h" />
@@ -149,6 +150,7 @@
     <ClCompile Include="src\ppMultiLinePowerNonStackedPlot.cpp" />
     <ClCompile Include="src\ppMultiLinePowerStackedPlot.cpp" />
     <ClCompile Include="src\ppProjectSettingsExtension.cpp" />
+    <ClCompile Include="src\ppSessionActionsCreator.cpp" />
     <ClCompile Include="src\ppSessionController.cpp" />
     <ClCompile Include="src\ppSessionNavigationChart.cpp" />
     <ClCompile Include="src\ppSessionView.cpp" />

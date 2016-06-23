@@ -27,6 +27,7 @@
 #include <AMDTPowerProfiling/src/ppAppController.h>
 #include <AMDTPowerProfiling/src/ppMDIViewCreator.h>
 #include <AMDTPowerProfiling/src/ppSessionView.h>
+#include <AMDTPowerProfiling/src/ppSessionActionsCreator.h>
 #include <AMDTPowerProfiling/Include/ppStringConstants.h>
 
 // ---------------------------------------------------------------------------
@@ -37,7 +38,10 @@
 // ---------------------------------------------------------------------------
 ppMDIViewCreator::ppMDIViewCreator()
 {
+    // Create the view actions creator:
+    _pViewActionCreator = new ppSessionActionsCreator();
 
+    _pViewActionCreator->initializeCreator();
 }
 
 // ---------------------------------------------------------------------------
