@@ -242,7 +242,7 @@ struct AMDTProfileFunctionInfo
     AMDTModuleId      m_moduleId;
     gtString          m_modulePath; // TBD: Not Reqd
     gtUInt64          m_startOffset;
-    gtUInt32          m_size;
+    gtUInt32          m_size = 0;
 };
 
 struct AMDTSampleValue
@@ -316,8 +316,8 @@ struct AMDTProfileFunctionData
 // Source and Disassmebly info
 struct AMDTSourceAndDisasmInfo
 {
-    gtVAddr     m_offset;
-    gtUInt16    m_sourceLine;
+    gtVAddr     m_offset = 0;
+    gtUInt16    m_sourceLine = 0;
     gtString    m_disasmStr;
     gtString    m_codeByteStr;
 };

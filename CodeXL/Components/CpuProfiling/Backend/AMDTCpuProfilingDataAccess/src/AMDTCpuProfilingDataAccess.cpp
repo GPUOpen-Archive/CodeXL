@@ -77,6 +77,10 @@ struct ViewConfigInfo
 
 #define CXL_COMPUTED_COUNTER_START_ID       0x100
 
+#define CXL_UNKNOWN_FUNC_START_ID           0xF000
+#define IS_UNKNOWN_FUNC(id_) (((id_) & 0x0000FFFF) == 0) 
+#define GET_MODOFFSET_FOR_UNKNOWN_FUNC(mod_, offset_, val_) val_ = mod_; val_ = (val_ << 32) | offset_;
+
 // Sampling Configuration
 using AMDTCounterIdVec = gtVector<AMDTCounterId>;
 using CounterIdSampleConfigMap = gtMap<AMDTCounterId, AMDTProfileSamplingConfig>;
@@ -97,6 +101,7 @@ using ModuleIdExecutableMap = gtMap<AMDTModuleId, ExecutableFile*>;
 // Function Info
 using FuncIdSrcInfoMap = gtMap<AMDTFunctionId, AMDTSourceAndDisasmInfoVec>;
 using FuncIdInfoMap = gtMap<AMDTFunctionId, AMDTProfileFunctionInfo>;
+using ModOffsetFuncInfoMap = gtMap<gtUInt64, AMDTProfileFunctionInfo>;
 
 // Sample Totals
 using ProcessSampleTotalMap = gtMap<AMDTProcessId, AMDTSampleValueVec>;
@@ -142,6 +147,9 @@ public:
     // Paths to locate the source files
     gtVector<gtString>                  m_sourceFilePath;
 
+    // Path to locate binaries (used in import case)
+    gtVector<gtString>                  m_binaryFilePath;
+
     AMDTProfileSessionInfo              m_sessionInfo;
     AMDTCpuTopologyVec                  m_cpuToplogyVec;
 
@@ -162,6 +170,13 @@ public:
     AMDTProfileReportConfigVec          m_viewConfigs;
 
     AMDTProfileDataOptions              m_options;
+
+    // Unknwon functions
+    gtVector<AMDTProfileFunctionInfo>   m_unknownFuncsList;
+    FuncIdInfoMap                       m_unknownFuncIdInfoMap;
+    ModOffsetFuncInfoMap                m_modOffsetFuncInfoMap;
+    AMDTFunctionId                      m_currentUnknownFuncId = CXL_UNKNOWN_FUNC_START_ID;
+    bool                                m_readUnknownFuncs = false;
 
     FuncIdInfoMap                       m_funcIdInfoMap;
     FuncIdSrcInfoMap                    m_funcIdSrcInfoMap;
@@ -200,7 +215,8 @@ public:
         m_symbolServerPath.clear();
         m_symbolFilePath.clear();
         m_sourceFilePath.clear();
-        m_sourceFilePath.clear();
+        m_binaryFilePath.clear();
+        m_cachePath.clear();
 
         m_sessionInfo.Clear();
         m_cpuToplogyVec.clear();
@@ -263,6 +279,8 @@ public:
                 ret = ret && GetProfileSessionInfo(m_sessionInfo);
 
                 ret = ret && InitializeReportOption();
+
+                ret = ret && GetUnknownFunctionsInfo();
             }
         }
 
@@ -975,6 +993,15 @@ public:
         return ret;
     }
 
+    bool SetBinaryPaths(gtVector<gtString>& binaryDirPath)
+    {
+        bool ret = true;
+
+        m_binaryFilePath.insert(std::end(m_binaryFilePath), std::begin(binaryDirPath), std::end(binaryDirPath));
+
+        return ret;
+    }
+
     bool InitializeReportOption()
     {
         bool ret = true;
@@ -1532,11 +1559,72 @@ public:
                 {
                     funcSummaryData.erase(funcSummaryData.begin() + 5, funcSummaryData.end());
                 }
-
             }
+
+            ret = HandleUnknownFunctions(funcSummaryData);
         }
 
         return ret;
+    }
+
+    bool GetUnknownFunctionsInfo()
+    {
+        bool ret = false;
+
+        if (!m_readUnknownFuncs && nullptr != m_pDbAdapter)
+        {
+            ret = m_pDbAdapter->GetUnknownFunctions(m_unknownFuncsList);
+
+            // construct the required maps
+            for (auto& func : m_unknownFuncsList)
+            {
+                if (IS_UNKNOWN_FUNC(func.m_functionId))
+                {
+                    // Get the offset and moduleid
+                    gtUInt32 funcOffset = func.m_startOffset;
+                    AMDTModuleId moduleId = func.m_moduleId;
+                    gtUInt64 unknownFuncModOffset;
+                    GET_MODOFFSET_FOR_UNKNOWN_FUNC(moduleId, funcOffset, unknownFuncModOffset);
+
+                    // Set the new function id
+                    func.m_functionId |= m_currentUnknownFuncId++;
+
+                    m_unknownFuncIdInfoMap.insert({ func.m_functionId , func });
+                    m_modOffsetFuncInfoMap.insert({ unknownFuncModOffset , func });
+                }
+            }
+
+            m_readUnknownFuncs = true;
+        }
+
+        return ret;
+    }
+
+    // The unknown function ids will be generated here and they are not update in DB
+    bool HandleUnknownFunctions(AMDTProfileDataVec& funcProfileData)
+    {
+        for (auto& funcData : funcProfileData)
+        {
+            if ((AMDT_PROFILE_DATA_FUNCTION == funcData.m_type) && (IS_UNKNOWN_FUNC(funcData.m_id)))
+            {
+                gtUInt32 funcOffset = funcData.m_moduleId;
+                AMDTModuleId moduleId = (funcData.m_id & 0xffff0000) >> 16;
+                gtUInt64 unknownFuncModOffset;
+                GET_MODOFFSET_FOR_UNKNOWN_FUNC(moduleId, funcOffset, unknownFuncModOffset);
+
+                auto it = m_modOffsetFuncInfoMap.find(unknownFuncModOffset);
+
+                // update function info.
+                if (it != m_modOffsetFuncInfoMap.end())
+                {
+                    funcData.m_id = it->second.m_functionId;
+                    funcData.m_moduleId = moduleId;
+                    funcData.m_name = it->second.m_name;
+                }
+            }
+        }
+
+        return true;
     }
 
     // based on m_options.counters..
@@ -1834,14 +1922,36 @@ public:
 
     bool GetFunctionProfileData(AMDTProcessId procId, AMDTModuleId modId, AMDTProfileDataVec& funcProfileData)
     {
-        return GetSummaryData(AMDT_PROFILE_DATA_FUNCTION, procId, modId, funcProfileData);
+        bool ret = GetSummaryData(AMDT_PROFILE_DATA_FUNCTION, procId, modId, funcProfileData);
+
+        ret = ret && HandleUnknownFunctions(funcProfileData);
+
+        return ret;
     }
 
-    bool GetFunctionDetailedProfileData(AMDTFunctionId            funcId,
-                                        AMDTProcessId             processId,
-                                        AMDTThreadId              threadId,
-                                        AMDTProfileFunctionData&  functionData)
+    bool IsUnknownFunctionId(AMDTFunctionId funcId, AMDTFunctionId& origFuncId, gtUInt32& offset, gtString& name)
     {
+        bool ret = false;
+
+        auto it = m_unknownFuncIdInfoMap.find(funcId);
+
+        if (it != m_unknownFuncIdInfoMap.end())
+        {
+            origFuncId = funcId & 0xffff0000;
+            offset = it->second.m_startOffset;
+            name = it->second.m_name;
+            ret = true;
+        }
+
+        return ret;
+    }
+
+    int GetFunctionDetailedProfileData(AMDTFunctionId            funcId,
+                                       AMDTProcessId             processId,
+                                       AMDTThreadId              threadId,
+                                       AMDTProfileFunctionData&  functionData)
+    {
+        int retVal = 0;
         bool ret = false;
 
         if (nullptr != m_pDbAdapter)
@@ -1849,7 +1959,14 @@ public:
             AMDTCounterIdVec countersList;
             ret = GetCountersList(countersList);
 
-            ret = ret && m_pDbAdapter->GetFunctionProfileData(funcId,
+            AMDTFunctionId tmpFuncId = 0;
+            gtUInt32 unknownFuncOffset = 0;
+            gtString unknownFuncName;
+
+            bool isUnkownFunc = IsUnknownFunctionId(funcId, tmpFuncId, unknownFuncOffset, unknownFuncName);
+
+            ret = ret && m_pDbAdapter->GetFunctionProfileData(isUnkownFunc ? tmpFuncId : funcId,
+                                                              unknownFuncOffset,
                                                               processId,
                                                               threadId,
                                                               countersList,
@@ -1859,6 +1976,11 @@ public:
 
             if (ret)
             {
+                if (isUnkownFunc)
+                {
+                    functionData.m_functionInfo.m_name = unknownFuncName;
+                }
+
                 // if function size is zero, compute the size from instruction data.
                 gtUInt32 functionSize = functionData.m_functionInfo.m_size;
                 gtUInt32 startOffset = functionData.m_functionInfo.m_startOffset;
@@ -1868,7 +1990,12 @@ public:
                 {
                     gtUInt32 instStartOffset = functionData.m_instDataList[0].m_offset;
                     startOffset = (instStartOffset < startOffset) ? instStartOffset : startOffset;
-                    functionSize = functionData.m_instDataList[nbrInsts - 1].m_offset - instStartOffset;
+
+                    gtUInt32 tmpSize = functionData.m_instDataList[nbrInsts - 1].m_offset - instStartOffset;
+                    // FIXME: setting 16 as funcsize for functions with size 0
+                    functionSize = (tmpSize > 0) ? tmpSize : 16;
+                    // FIXME: Should i update the functionInfo with this dummy size?
+                    functionData.m_functionInfo.m_size = functionSize;
 
                     functionData.m_functionInfo.m_size = functionSize;
                     functionData.m_functionInfo.m_startOffset = startOffset;
@@ -1883,7 +2010,7 @@ public:
 
                 gtString srcFilePath;
                 AMDTSourceAndDisasmInfoVec srcInfoVec;
-                ret = GetFunctionSourceAndDisasmInfo(funcId, srcFilePath, srcInfoVec);
+                retVal = GetFunctionSourceAndDisasmInfo(funcId, srcFilePath, srcInfoVec);
 
                 AMDTProfileSourceLineDataVec& srcLineDataVec = functionData.m_srcLineDataList;
                 AMDTProfileInstructionDataVec& instDataVec = functionData.m_instDataList;
@@ -1933,7 +2060,7 @@ public:
             }
         }
 
-        return ret;
+        return retVal;
     }
 
     bool GetSrcFilePathForVaddr(ExecutableFile& exeFile, gtVAddr rvAddr, gtString& srcFilePath, gtUInt32& srcLine)
@@ -2022,15 +2149,16 @@ public:
         return GetSrcFilePathForFuncId(funcId, srcFilePath, srcLine);
     }
 
-    // TODO: Bool return is not sufficient
-    bool GetFunctionSourceAndDisasmInfo(AMDTFunctionId funcId,
-                                        gtString& srcFilePath,
-                                        AMDTSourceAndDisasmInfoVec& srcInfoVec)
+    int GetFunctionSourceAndDisasmInfo(AMDTFunctionId funcId,
+                                       gtString& srcFilePath,
+                                       AMDTSourceAndDisasmInfoVec& srcInfoVec)
     {
+        int rv = CXL_DATAACCESS_WARN_SRC_INFO_NOTAVAILABLE;
         bool ret = false;
         bool foundSrcInfo = false;
         bool foundSrcFilePath = false;
 
+        // TODO: This map is not yet filled-in
         auto funcSrcInfoIt = m_funcIdSrcInfoMap.find(funcId);
 
         if (funcSrcInfoIt != m_funcIdSrcInfoMap.end())
@@ -2061,7 +2189,10 @@ public:
                 ret = true;
             }
 
-            ret = ret && GetDisassembly(moduleId, offset, size, srcInfoVec);
+            if (ret)
+            {
+                rv = GetDisassembly(moduleId, offset, size, srcInfoVec);
+            }
         }
 
         if (!foundSrcFilePath)
@@ -2070,14 +2201,15 @@ public:
             foundSrcFilePath = GetSrcFilePathForFuncId(funcId, srcFilePath);
         }
 
-        return ret;
+        return rv;
     }
 
-    bool GetDisassembly(AMDTModuleId moduleId,
-                        AMDTUInt32 offset,
-                        AMDTUInt32 size,
-                        AMDTSourceAndDisasmInfoVec& disasmInfoVec)
+    int GetDisassembly(AMDTModuleId moduleId,
+                       AMDTUInt32 offset,
+                       AMDTUInt32 size,
+                       AMDTSourceAndDisasmInfoVec& disasmInfoVec)
     {
+        int retVal = CXL_DATAACCESS_WARN_SRC_INFO_NOTAVAILABLE;
         bool ret = false;
 
         if (nullptr != m_pDbAdapter)
@@ -2107,7 +2239,7 @@ public:
                 AMDTUInt32 bytesToRead = size;
                 gtVAddr currOffset = offset;
 
-                InitializeSymbolEngine(pExecutable);
+                ret = InitializeSymbolEngine(pExecutable);
                 SymbolEngine* pSymbolEngine = pExecutable->GetSymbolEngine();
 
                 while (bytesToRead > 0)
@@ -2130,8 +2262,13 @@ public:
 
                     if (nullptr != pSymbolEngine)
                     {
-                        pSymbolEngine->FindSourceLine(startRVAddr, srcData);
-                        disasmInfo.m_sourceLine = srcData.m_line;
+                        ret = pSymbolEngine->FindSourceLine(startRVAddr, srcData);
+
+                        if (ret)
+                        {
+                            disasmInfo.m_sourceLine = srcData.m_line;
+                            retVal = CXL_DATAACCESS_SUCCESS;
+                        }
                     }
 
                     if (pExecutable->GetSectionsCount() > sectionIndex)
@@ -2206,9 +2343,13 @@ public:
 
                 delete pExecutable;
             }
+            else
+            {
+                retVal = CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE;
+            }
         }
 
-        return ret;
+        return retVal;
     }
 
     bool GetCallGraphProcesses(gtVector<AMDTProcessId>& cssProcesses)
@@ -2945,6 +3086,18 @@ bool cxlProfileDataReader::SetSourcePaths(gtVector<gtString>& sourceDirPath)
     return ret;
 }
 
+bool cxlProfileDataReader::SetBinaryPaths(gtVector<gtString>& sourceDirPath)
+{
+    bool ret = false;
+
+    if (nullptr != m_pImpl)
+    {
+        ret = m_pImpl->SetBinaryPaths(sourceDirPath);
+    }
+
+    return ret;
+}
+
 bool cxlProfileDataReader::SetReportOption(AMDTProfileDataOptions& options)
 {
     bool ret = false;
@@ -3103,12 +3256,12 @@ bool cxlProfileDataReader::GetFunctionProfileData(AMDTProcessId procId, AMDTModu
     return ret;
 }
 
-bool cxlProfileDataReader::GetFunctionDetailedProfileData(AMDTFunctionId            funcId,
+int cxlProfileDataReader::GetFunctionDetailedProfileData(AMDTFunctionId            funcId,
                                                           AMDTProcessId             processId,
                                                           AMDTThreadId              threadId,
                                                           AMDTProfileFunctionData&  functionData)
 {
-    bool ret = false;
+    int ret = false;
 
     if (nullptr != m_pImpl)
     {
@@ -3121,9 +3274,9 @@ bool cxlProfileDataReader::GetFunctionDetailedProfileData(AMDTFunctionId        
     return ret;
 }
 
-bool cxlProfileDataReader::GetFunctionSourceAndDisasmInfo(AMDTFunctionId funcId, gtString& srcFilePath, AMDTSourceAndDisasmInfoVec& srcInfoVec)
+int cxlProfileDataReader::GetFunctionSourceAndDisasmInfo(AMDTFunctionId funcId, gtString& srcFilePath, AMDTSourceAndDisasmInfoVec& srcInfoVec)
 {
-    bool ret = false;
+    int ret = 0;
 
     if (nullptr != m_pImpl)
     {
@@ -3133,12 +3286,12 @@ bool cxlProfileDataReader::GetFunctionSourceAndDisasmInfo(AMDTFunctionId funcId,
     return ret;
 }
 
-bool cxlProfileDataReader::GetDisassembly(AMDTModuleId moduleId,
-                                          AMDTUInt32 offset,
-                                          AMDTUInt32 size,
-                                          AMDTSourceAndDisasmInfoVec& disasmInfoVec)
+int cxlProfileDataReader::GetDisassembly(AMDTModuleId moduleId,
+                                         AMDTUInt32 offset,
+                                         AMDTUInt32 size,
+                                         AMDTSourceAndDisasmInfoVec& disasmInfoVec)
 {
-    bool ret = false;
+    int ret = false;
 
     if (nullptr != m_pImpl)
     {

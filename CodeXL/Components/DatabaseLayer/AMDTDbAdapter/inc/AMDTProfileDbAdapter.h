@@ -140,12 +140,16 @@ public:
                         gtVector<AMDTProfileData>& dataList);
 
     bool GetFunctionProfileData(AMDTFunctionId              funcId,
+                                gtUInt32                    funcStartOffset,    // used only for unknonwn functions
                                 AMDTProcessId               processId,
                                 AMDTThreadId                threadId,
                                 gtVector<AMDTUInt32>&       counterIdList,
                                 AMDTUInt64                  coreMask,
                                 bool                        separateByCore,
                                 AMDTProfileFunctionData&    functionData);
+
+    // This returns from SampleContext table - IP samples
+    bool GetUnknownFunctions(gtVector<AMDTProfileFunctionInfo>& funcList);
 
     bool GetUnknownCallstackLeafsByProcessId(AMDTProcessId processId, CallstackFrameVec& leafs);
 

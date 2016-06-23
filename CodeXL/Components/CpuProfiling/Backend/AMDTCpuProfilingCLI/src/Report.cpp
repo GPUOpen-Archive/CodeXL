@@ -442,7 +442,12 @@ static void PrintFunctionDetailData(osFile& reportFile, AMDTProfileCounterDescVe
 
     gtVector<gtString> srcLines;
 
-    bool foundSrcLine = GetSourceLines(srcFilePath, srcLines);
+    // No debug-info and hence no srcfile path
+    bool foundSrcLine = false;
+    if (! srcFilePath.isEmpty())
+    {
+        foundSrcLine = GetSourceLines(srcFilePath, srcLines);
+    }
 
     for (auto& srcData : data.m_srcLineDataList)
     {
@@ -751,37 +756,25 @@ HRESULT CpuProfileReport::ReportFromDb()
             // FIXME: dont report func data..
             //funcProfileData.clear();
 
-            for (auto const& func : funcProfileData)
+            for (auto const& func : allFunctionData)
             {
                 if ((func.m_id != AMDT_PROFILE_ALL_FUNCTIONS) && ((func.m_id & 0x0000ffff) > 0) && (func.m_moduleId > 0))
                 {
                     fprintf(stderr, "%s \n", func.m_name.asASCIICharArray());
 
                     AMDTProfileFunctionData  functionData;
-                    ret = profileDbReader.GetFunctionDetailedProfileData(func.m_id,
-                        AMDT_PROFILE_ALL_PROCESSES,
-                        AMDT_PROFILE_ALL_THREADS,
-                        functionData);
+                    int retVal = profileDbReader.GetFunctionDetailedProfileData(func.m_id,
+                                                                                AMDT_PROFILE_ALL_PROCESSES,
+                                                                                AMDT_PROFILE_ALL_THREADS,
+                                                                                functionData);
+                    if (retVal != CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE)
+                    {
+                        gtString srcFilePath;
+                        AMDTSourceAndDisasmInfoVec srcInfoVec;
+                        retVal = profileDbReader.GetFunctionSourceAndDisasmInfo(func.m_id, srcFilePath, srcInfoVec);
 
-                    // if function size is zero, compute the size from instruction data.. 
-                    //gtUInt32 functionSize = functionData.m_functionInfo.m_size;
-                    //gtUInt32 startOffset = functionData.m_functionInfo.m_startOffset;
-                    //gtUInt32 nbrInsts = functionData.m_instDataList.size();
-
-                    //if (functionSize == 0 && nbrInsts)
-                    //{
-                    //    gtUInt32 instStartOffset = functionData.m_instDataList[0].m_offset;
-
-                    //    startOffset = (instStartOffset < startOffset) ? instStartOffset : startOffset;
-
-                    //    functionSize = functionData.m_instDataList[nbrInsts - 1].m_offset - instStartOffset;
-                    //}
-
-                    gtString srcFilePath;
-                    AMDTSourceAndDisasmInfoVec srcInfoVec;
-                    ret = profileDbReader.GetFunctionSourceAndDisasmInfo(func.m_id, srcFilePath, srcInfoVec);
-
-                    PrintFunctionDetailData(reportFile, reportConfigs[0].m_counterDescs, functionData, srcFilePath, srcInfoVec);
+                        PrintFunctionDetailData(reportFile, reportConfigs[0].m_counterDescs, functionData, srcFilePath, srcInfoVec);
+                    }
                 }
             }
 
