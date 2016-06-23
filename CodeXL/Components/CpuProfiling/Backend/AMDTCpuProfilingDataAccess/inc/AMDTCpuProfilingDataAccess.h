@@ -31,6 +31,11 @@
 #define CXLPROFILEDATA_READER_API
 #endif
 
+#define CXL_DATAACCESS_SUCCESS                               0
+#define CXL_DATAACCESS_ERROR_INTERNAL                       0xF0000001
+#define CXL_DATAACCESS_WARN_SRC_INFO_NOTAVAILABLE           0xF0000002   // debug info not available
+#define CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE         0xF0000003   // binary not available
+
 struct cgEdge
 {
     AMDTProfileFunctionInfo     m_funcInfo;
@@ -81,6 +86,7 @@ public:
 
     bool SetDebugInfoPaths(gtVector<gtString>& symbolServer, gtVector<gtString>& symbolDirectory);
     bool SetSourcePaths(gtVector<gtString>& sourceDirPath);
+    bool SetBinaryPaths(gtVector<gtString>& binaryDirPath);
     bool SetReportOption(AMDTProfileDataOptions& options);
     bool SetReportOption(AMDTReportOptionType type, gtUInt64 value);
     bool SetReportCounters(gtVector<AMDTUInt32>& countersList);
@@ -100,19 +106,19 @@ public:
     bool GetModuleProfileData(AMDTProcessId procId, AMDTModuleId modId, AMDTProfileDataVec& moduleProfileData);
     bool GetFunctionProfileData(AMDTProcessId procId, AMDTModuleId modId, AMDTProfileDataVec& funcProfileData);
 
-    bool GetFunctionDetailedProfileData(AMDTFunctionId            funcId,
-                                        AMDTProcessId             processId,
-                                        AMDTThreadId              threadId,
-                                        AMDTProfileFunctionData&  functionData);
+    int GetFunctionDetailedProfileData(AMDTFunctionId            funcId,
+                                       AMDTProcessId             processId,
+                                       AMDTThreadId              threadId,
+                                       AMDTProfileFunctionData&  functionData);
 
-    bool GetFunctionSourceAndDisasmInfo(AMDTFunctionId funcId,
-                                        gtString& srcFilePath,
-                                        AMDTSourceAndDisasmInfoVec& srcInfo);
+    int GetFunctionSourceAndDisasmInfo(AMDTFunctionId funcId,
+                                       gtString& srcFilePath,
+                                       AMDTSourceAndDisasmInfoVec& srcInfo);
 
-    bool GetDisassembly(AMDTModuleId moduleId,
-                        AMDTUInt32 offset,
-                        AMDTUInt32 size,
-                        AMDTSourceAndDisasmInfoVec& srcInfo);
+    int GetDisassembly(AMDTModuleId moduleId,
+                       AMDTUInt32 offset,
+                       AMDTUInt32 size,
+                       AMDTSourceAndDisasmInfoVec& srcInfo);
 
     bool GetCallGraphProcesses(gtVector<AMDTProcessId>& cssProcesses);
     bool IsProcessHasCssSamples(AMDTProcessId pid);

@@ -766,6 +766,7 @@ bool amdtProfileDbAdapter::GetProfileData(
 
 bool amdtProfileDbAdapter::GetFunctionProfileData(
     AMDTFunctionId              funcId,
+    gtUInt32                    funcStartOffset,    // used only for unknown functions
     AMDTProcessId               processId,
     AMDTThreadId                threadId,
     gtVector<AMDTUInt32>&       counterIdList,
@@ -778,12 +779,25 @@ bool amdtProfileDbAdapter::GetFunctionProfileData(
     if (m_pDbAccessor != nullptr)
     {
         ret = m_pDbAccessor->GetFunctionProfileData(funcId,
+                                                    funcStartOffset,
                                                     processId,
                                                     threadId,
                                                     counterIdList,
                                                     coreMask,
                                                     separateByCore,
                                                     functionData);
+    }
+
+    return ret;
+}
+
+bool amdtProfileDbAdapter::GetUnknownFunctions(gtVector<AMDTProfileFunctionInfo>& funcList)
+{
+    bool ret = false;
+
+    if (m_pDbAccessor != nullptr)
+    {
+        ret = m_pDbAccessor->GetUnknownFunctions(funcList);
     }
 
     return ret;

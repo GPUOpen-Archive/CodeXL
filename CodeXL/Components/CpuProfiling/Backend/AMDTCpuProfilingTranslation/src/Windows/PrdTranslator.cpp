@@ -873,7 +873,7 @@ void PrdTranslator::AggregateKnownModuleSampleData(
                     {
                         module.m_base = startAddress;
                         module.m_size = pExecutable->GetImageSize();
-
+                        module.m_symbolsLoaded = true;
                         sampInfo.address = addr;
 
                         if (nullptr != pFuncInfo->m_pName && L'!' != pFuncInfo->m_pName[0])
