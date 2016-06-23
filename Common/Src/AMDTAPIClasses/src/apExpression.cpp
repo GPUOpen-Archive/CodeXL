@@ -133,6 +133,33 @@ osTransferableObjectType apExpression::type() const
 // ---------------------------------------------------------------------------
 bool apExpression::writeSelfIntoChannel(osChannel& ipcChannel) const
 {
+    bool retVal = true;
+
+    // Write scalar members:
+    ipcChannel << m_name;
+    ipcChannel << m_value;
+    ipcChannel << m_valueHex;
+    ipcChannel << m_type;
+
+    // Recursively write children:
+    gtUInt32 childrenCount = (gtUInt32)m_children.size();
+    ipcChannel << childrenCount;
+    for (gtUInt32 i = 0; i < childrenCount; ++i)
+    {
+#if AMDT_BUILD_CONFIGURATION == AMDT_DEBUG_BUILD
+        // This validation would slow down the operation, so only perform it in debug builds:
+        GT_ASSERT(nullptr != m_children[i]);
+#endif
+        bool rcChld = m_children[i]->writeSelfIntoChannel(ipcChannel);
+        GT_ASSERT(rcChld);
+        retVal = retVal && rcChld;
+    }
+
+    return retVal;
+
+/*
+    // TO_DO: this optimization seems to cause some trouble...
+
     // Since this expression may have many descendants, we will first write it into
     // a raw memory stream, and write the stream into the channel.
     osRawMemoryStream expressionStream;
@@ -145,6 +172,7 @@ bool apExpression::writeSelfIntoChannel(osChannel& ipcChannel) const
     }
 
     return retVal;
+    */
 }
 
 // ---------------------------------------------------------------------------

@@ -913,9 +913,7 @@ vspCDebugProperty* vspExpressionEvaluator::evaluateExpression(vspCDebugExpressio
         osThreadId threadId = pExpression->threadId();
         int frameIndex = pExpression->frameIndex();
 
-        gtString variableValueString;
-        gtString variableValueStringHex;
-        gtString variableTypeString;
+        apExpression variableValue;
         bool rcVal = true;
 
         // We don't need to really evaluate the pseudo variable we use for refreshing the values:
@@ -931,11 +929,12 @@ vspCDebugProperty* vspExpressionEvaluator::evaluateExpression(vspCDebugExpressio
                 gaGetKernelDebuggingCurrentWorkItemCoordinate(1, currentWorkItemCoordinate[1]);
                 gaGetKernelDebuggingCurrentWorkItemCoordinate(2, currentWorkItemCoordinate[2]);
 
-                rcVal = gaGetKernelDebuggingVariableValueString(exprCode, currentWorkItemCoordinate, variableValueString, variableValueStringHex, variableTypeString);
+                // TO_DO: handle children more effectively:
+                rcVal = gaGetKernelDebuggingExpressionValue(exprCode, currentWorkItemCoordinate, 1, variableValue);
             }
             else if (gaCanGetHostVariables())
             {
-                rcVal = gaGetThreadVariableValue(threadId, frameIndex, exprCode, variableValueString, variableValueStringHex, variableTypeString);
+                rcVal = gaGetThreadExpressionValue(threadId, frameIndex, exprCode, 1, variableValue);
             }
         }
 
@@ -943,24 +942,21 @@ vspCDebugProperty* vspExpressionEvaluator::evaluateExpression(vspCDebugExpressio
         if (rcVal)
         {
             // Create the property:
-            retVal = new vspCDebugProperty(exprCode, variableValueString, variableValueStringHex, variableTypeString);
+            retVal = new vspCDebugProperty(exprCode, variableValue.m_value, variableValue.m_valueHex, variableValue.m_type);
 
             // If this is a real variable:
             if (!isPseudoVariable)
             {
-                // Check for children:
-                gtVector<gtString> memberNames;
-                bool rcChd = gaGetKernelDebuggingVariableMembers(exprCode, memberNames);
+                const gtVector<apExpression*>& children = variableValue.children();
 
-                if (rcChd)
+                // Add all the children:
+                for (const apExpression* pChild : children)
                 {
-                    // Add all the children:
-                    int numberOfChildren = (int)memberNames.size();
-
-                    for (int i = 0; i < numberOfChildren; i++)
+                    // Sanity check:
+                    GT_IF_WITH_ASSERT(nullptr != pChild)
                     {
                         // Sanity check:
-                        const gtString& currentMemberName = memberNames[i];
+                        const gtString& currentMemberName = pChild->m_name;
                         GT_IF_WITH_ASSERT(!currentMemberName.isEmpty())
                         {
                             // Get the full name for evaluation:
@@ -1014,17 +1010,18 @@ bool vspExpressionEvaluator::getCurrentLocals(gtVector<vspCDebugProperty*>& curr
     currentLocals.clear();
 
     // If we are in kernel debugging, get the variables in the kernel:
-    gtVector<gtString> localNames;
+    gtVector<apExpression> localNames;
     bool rcNm = false;
     bool isInKernelDebugging = gaIsInKernelDebugging() && kernelDebuggingContext;
 
     if (isInKernelDebugging)
     {
-        rcNm = gaGetKernelDebuggingAvailableVariables(localNames, false, stackFrameDepth);
+        // TO_DO: Handle locals more effectively
+        rcNm = gaGetKernelDebuggingAvailableVariables(0, localNames, false, stackFrameDepth, true);
     }
     else if (gaCanGetHostVariables())
     {
-        rcNm = gaGetThreadLocals(threadId, stackFrameDepth, localNames);
+        rcNm = gaGetThreadLocals(threadId, stackFrameDepth, 0, localNames, true);
     }
 
     if (rcNm)
@@ -1037,7 +1034,7 @@ bool vspExpressionEvaluator::getCurrentLocals(gtVector<vspCDebugProperty*>& curr
         for (int i = 0; i < numberOfLocals; i++)
         {
             // Make sure this variable exists:
-            const gtString& currentName = localNames[i];
+            const gtString& currentName = localNames[i].m_name;
 
             if (!currentName.isEmpty())
             {

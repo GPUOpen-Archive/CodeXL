@@ -16,6 +16,7 @@
 
 // Forward declaration:
 class gtString;
+struct apExpression;
 class gdApplicationCommands;
 
 // Infra:
@@ -61,7 +62,7 @@ private:
     void extendContextMenu();
     void updateCallStackDepth(const apEvent& eve);
 
-    void recursivelyAddLocalItemChildren(QTreeWidgetItem* pItem, const gtString& currentVariableName, const int currentWorkItemCoord[3]);
+    void recursivelyAddLocalItemChildren(QTreeWidgetItem* pItem, const apExpression& currentVariable, const gtString& currentVariableQualifiedName);
 
 protected:
     // Actions for context menu:

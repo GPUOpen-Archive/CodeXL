@@ -20,7 +20,7 @@ void gaHSAGetSourceFilePathStub(osSocket& apiSocket);
 void gaHSASetNextDebuggingCommandStub(osSocket& apiSocket);
 void gaHSASetBreakpointStub(osSocket& apiSocket);
 void gaHSAListVariablesStub(osSocket& apiSocket);
-void gaHSAGetVariableValueStub(osSocket& apiSocket);
+void gaHSAGetExpressionValueStub(osSocket& apiSocket);
 void gaHSAListWorkItemsStub(osSocket& apiSocket);
 void gaHSASetActiveWorkItemIndexStub(osSocket& apiSocket);
 void gaHSAGetWorkDimsStub(osSocket& apiSocket);
