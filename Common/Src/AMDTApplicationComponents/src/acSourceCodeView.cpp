@@ -807,8 +807,8 @@ void acSourceCodeView::SetCursorPositionToMiddle(int line, int index)
             // by setting what should be the first line - control the cursor position
             setFirstVisibleLine(newFirstLine);
         }
-        //we assume here that line number , starts numerations from '1'(i.e. like it's shown in UI), thus we reduce 1,
-        //in order to adjust the line parameter to "start from zero" numeration
+        //we assume here that line number, starts enumerations from '1'(i.e. like it's shown in UI), thus we reduce 1,
+        //in order to adjust the line parameter to "start from zero" enumeration
         setCursorPosition(line > 0 ? line - 1 : 0, index);
     }
 }
