@@ -108,6 +108,7 @@ void acTimelineFiltersDialog::InitializeLayout()
 
     setLayout(m_pMainLayout);
     setMaximumWidth(AC_TIMELINE_FILTERS_WIDTH);
+    setMinimumWidth(AC_TIMELINE_FILTERS_WIDTH);
     setMaximumHeight(AC_TIMELINE_FILTERS_HEIGHT);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
 }

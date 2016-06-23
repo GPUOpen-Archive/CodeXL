@@ -209,6 +209,8 @@ afStartupPage::afStartupPage() : QWebView()
 
     // Hide context menu:
     setContextMenuPolicy(Qt::NoContextMenu);
+
+    setTextSizeMultiplier(1.2);
 }
 
 // ---------------------------------------------------------------------------
