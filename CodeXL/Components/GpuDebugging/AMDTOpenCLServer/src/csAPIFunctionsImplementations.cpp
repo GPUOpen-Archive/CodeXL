@@ -10,6 +10,7 @@
 
 // Infra:
 #include <AMDTBaseTools/Include/gtAssert.h>
+#include <AMDTBaseTools/Include/gtQueue.h>
 #include <AMDTOSWrappers/Include/osDebuggingFunctions.h>
 #include <AMDTOSWrappers/Include/osDebugLog.h>
 #include <AMDTOSWrappers/Include/osThread.h>
@@ -27,6 +28,7 @@
 #include <AMDTAPIClasses/Include/apCLProgram.h>
 #include <AMDTAPIClasses/Include/apCLImage.h>
 #include <AMDTAPIClasses/Include/apExecutionMode.h>
+#include <AMDTAPIClasses/Include/apExpression.h>
 
 // Spies Utilities:
 #include <AMDTServerUtilities/Include/suGlobalVariables.h>
@@ -620,14 +622,14 @@ bool gaCanGetKernelVariableValueImpl(const gtString& variableName, const int coo
 }
 
 // ---------------------------------------------------------------------------
-// Name:        gaGetKernelDebuggingVariableValueStringImpl
-// Description: Implementation of gaGetKernelDebuggingVariableValueString()
+// Name:        gaGetKernelDebuggingExpressionValueImpl
+// Description: Implementation of gaGetKernelDebuggingExpressionValue()
 //   See its documentation for more details.
 // Return Val:  bool - Success / failure.
 // Author:      Uri Shomroni
 // Date:        23/1/2011
 // ---------------------------------------------------------------------------
-bool gaGetKernelDebuggingVariableValueStringImpl(const gtString& variableName, const int workItem[3], gtString& variableValue, gtString& variableValueHex, gtString& variableType)
+bool gaGetKernelDebuggingExpressionValueImpl(const gtString& variableName, const int workItem[3], int evalDepth, apExpression& variableValue)
 {
     bool retVal = false;
 
@@ -636,46 +638,64 @@ bool gaGetKernelDebuggingVariableValueStringImpl(const gtString& variableName, c
 
     if (kernelHandle != OA_CL_NULL_HANDLE)
     {
+        // Local struct used to evaluate values:
+        struct csMemberEvaluationHelper
+        {
+        public:
+            apExpression* m_pVariable;
+            gtString m_qualifiedName;
+            int m_depth;
+        };
+
+        variableValue.m_name = variableName;
+
         if (!suIKernelDebuggingManager::isPseudoVariable(variableName))
         {
-            retVal = cs_stat_pIKernelDebuggingManager->getVariableValueString(variableName, workItem, variableValue, variableValueHex, variableType);
-        }
-        else // suIKernelDebuggingManager::isPseudoVariable(variableName)
-        {
-            int globalWorkGeometry[10] = {0};
-            retVal = cs_stat_pIKernelDebuggingManager->getGlobalWorkGeometry(globalWorkGeometry[0], &globalWorkGeometry[1], &globalWorkGeometry[4], &globalWorkGeometry[7]);
+            retVal = cs_stat_pIKernelDebuggingManager->getVariableValueString(variableName, workItem, variableValue.m_value, variableValue.m_valueHex, variableValue.m_type);
 
-            if (retVal)
+            // If we are getting children:
+            if (retVal && (0 < evalDepth))
             {
-                retVal = suIKernelDebuggingManager::getPseudoVariableValueString(variableName, workItem, globalWorkGeometry, variableValue, variableValueHex, variableType);
+                gtQueue<csMemberEvaluationHelper> evalQueue;
+                csMemberEvaluationHelper rootEvalHelper = { &variableValue, variableName, 0 };
+                evalQueue.push(rootEvalHelper);
+
+                while (!evalQueue.empty())
+                {
+                    // Get the next member:
+                    csMemberEvaluationHelper nextEval = evalQueue.front();
+                    evalQueue.pop();
+
+                    apExpression* pCurrentVar = nextEval.m_pVariable;
+                    GT_IF_WITH_ASSERT(nullptr != pCurrentVar)
+                    {
+                        bool rcVal = cs_stat_pIKernelDebuggingManager->getVariableValueString(nextEval.m_qualifiedName, workItem, pCurrentVar->m_value, pCurrentVar->m_valueHex, pCurrentVar->m_type);
+                        GT_ASSERT(rcVal);
+
+                        // Only go down to the requested depth:
+                        if (nextEval.m_depth < evalDepth)
+                        {
+                            gtVector<gtString> memberNames;
+                            bool rcMem = cs_stat_pIKernelDebuggingManager->getVariableMembers(nextEval.m_qualifiedName, workItem, memberNames);
+                            GT_ASSERT(rcMem);
+
+                            for (const gtString& memNm : memberNames)
+                            {
+                                apExpression* pMember = pCurrentVar->addChild();
+                                GT_IF_WITH_ASSERT(nullptr != pMember)
+                                {
+                                    gtString qualifiedName = nextEval.m_qualifiedName;
+                                    qualifiedName.append('.').append(memNm);
+                                    pMember->m_name = memNm;
+                                    csMemberEvaluationHelper memEval = { pMember, qualifiedName, nextEval.m_depth + 1 };
+                                    evalQueue.push(memEval);
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
-    }
-
-    return retVal;
-}
-
-// ---------------------------------------------------------------------------
-// Name:        gaGetKernelDebuggingVariableMembersImpl
-// Description: Implementation of gaGetKernelDebuggingVariableMembers
-//   See its documentation for more details.
-// Return Val:  bool - Success / failure.
-// Author:      Uri Shomroni
-// Date:        23/5/2011
-// ---------------------------------------------------------------------------
-bool gaGetKernelDebuggingVariableMembersImpl(const gtString& variableName, const int coordinate[3], gtVector<gtString>& memberNames)
-{
-    bool retVal = false;
-
-    // If we are currently debugging any kernel:
-    oaCLKernelHandle kernelHandle = cs_stat_pIKernelDebuggingManager->currentlyDebuggedKernel();
-
-    if (kernelHandle != OA_CL_NULL_HANDLE)
-    {
-        if (!suIKernelDebuggingManager::isPseudoVariable(variableName))
-        {
-            retVal = cs_stat_pIKernelDebuggingManager->getVariableMembers(variableName, coordinate, memberNames);
-        }
         else // suIKernelDebuggingManager::isPseudoVariable(variableName)
         {
             int globalWorkGeometry[10] = {0};
@@ -683,7 +703,49 @@ bool gaGetKernelDebuggingVariableMembersImpl(const gtString& variableName, const
 
             if (retVal)
             {
-                retVal = suIKernelDebuggingManager::getPseudoVariableMembers(variableName, globalWorkGeometry, memberNames);
+                retVal = suIKernelDebuggingManager::getPseudoVariableValueString(variableName, workItem, globalWorkGeometry, variableValue.m_value, variableValue.m_valueHex, variableValue.m_type);
+
+                if (retVal && (0 < evalDepth))
+                {
+                    gtQueue<csMemberEvaluationHelper> evalQueue;
+                    csMemberEvaluationHelper rootEvalHelper = { &variableValue, variableName, 0 };
+                    evalQueue.push(rootEvalHelper);
+
+                    while (!evalQueue.empty())
+                    {
+                        // Get the next member:
+                        csMemberEvaluationHelper nextEval = evalQueue.front();
+                        evalQueue.pop();
+
+                        apExpression* pCurrentVar = nextEval.m_pVariable;
+                        GT_IF_WITH_ASSERT(nullptr != pCurrentVar)
+                        {
+                            bool rcVal = suIKernelDebuggingManager::getPseudoVariableValueString(nextEval.m_qualifiedName, workItem, globalWorkGeometry ,pCurrentVar->m_value, pCurrentVar->m_valueHex, pCurrentVar->m_type);
+                            GT_ASSERT(rcVal);
+
+                            // Only go down to the requested depth:
+                            if (nextEval.m_depth < evalDepth)
+                            {
+                                gtVector<gtString> memberNames;
+                                bool rcMem = suIKernelDebuggingManager::getPseudoVariableMembers(nextEval.m_qualifiedName, globalWorkGeometry, memberNames);
+                                GT_ASSERT(rcMem);
+
+                                for (const gtString& memNm : memberNames)
+                                {
+                                    apExpression* pMember = pCurrentVar->addChild();
+                                    GT_IF_WITH_ASSERT(nullptr != pMember)
+                                    {
+                                        gtString qualifiedName = nextEval.m_qualifiedName;
+                                        qualifiedName.append('.').append(memNm);
+                                        pMember->m_name = memNm;
+                                        csMemberEvaluationHelper memEval = { pMember, qualifiedName, nextEval.m_depth + 1 };
+                                        evalQueue.push(memEval);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -699,7 +761,7 @@ bool gaGetKernelDebuggingVariableMembersImpl(const gtString& variableName, const
 // Author:      Uri Shomroni
 // Date:        21/2/2011
 // ---------------------------------------------------------------------------
-bool gaGetKernelDebuggingAvailableVariablesImpl(const int coordinate[3], gtVector<gtString>& variableNames, bool getLeaves, int stackFrameDepth)
+bool gaGetKernelDebuggingAvailableVariablesImpl(const int coordinate[3], gtVector<apExpression>& variables, int evalDepth, bool getLeaves, int stackFrameDepth, bool onlyNames)
 {
     bool retVal = false;
 
@@ -708,6 +770,8 @@ bool gaGetKernelDebuggingAvailableVariablesImpl(const int coordinate[3], gtVecto
 
     if (kernelHandle != OA_CL_NULL_HANDLE)
     {
+        gtVector<gtString> variableNames;
+
         // Since these are pseudo-variables, they should not be reported in the list of actual variable leaf locations:
         if (!getLeaves)
         {
@@ -717,6 +781,26 @@ bool gaGetKernelDebuggingAvailableVariablesImpl(const int coordinate[3], gtVecto
 
         // Get the available variables:
         retVal = cs_stat_pIKernelDebuggingManager->getAvailableVariables(coordinate, variableNames, getLeaves, stackFrameDepth);
+
+        // We know the output vector size:
+        variables.reserve(variableNames.size());
+
+        for (const gtString& varNm : variableNames)
+        {
+            apExpression expr;
+
+            if (onlyNames)
+            {
+                expr.m_name = varNm;
+            }
+            else
+            {
+                bool rcVal = gaGetKernelDebuggingExpressionValueImpl(varNm, coordinate, getLeaves ? 0 : evalDepth, expr);
+                GT_ASSERT(rcVal);
+            }
+
+            variables.push_back(expr);
+        }
     }
 
     return retVal;

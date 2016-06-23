@@ -558,12 +558,8 @@ void apAPIFunctionIdToString(apAPIFunctionId functionId, gtString& functionIdAsS
             functionIdAsString = L"gaCanGetKernelVariableValue";
             break;
 
-        case GA_FID_gaGetKernelDebuggingVariableValueString:
-            functionIdAsString = L"gaGetKernelDebuggingVariableValueString";
-            break;
-
-        case GA_FID_gaGetKernelDebuggingVariableMembers:
-            functionIdAsString = L"gaGetKernelDebuggingVariableMembers";
+        case GA_FID_gaGetKernelDebuggingExpressionValue:
+            functionIdAsString = L"gaGetKernelDebuggingExpressionValue";
             break;
 
         case GA_FID_gaGetKernelDebuggingAvailableVariables:
@@ -978,8 +974,8 @@ void apAPIFunctionIdToString(apAPIFunctionId functionId, gtString& functionIdAsS
             functionIdAsString = L"gaHSAListVariables";
             break;
 
-        case GA_FID_gaHSAGetVariableValue:
-            functionIdAsString = L"gaHSAGetVariableValue";
+        case GA_FID_gaHSAGetExpressionValue:
+            functionIdAsString = L"gaHSAGetExpressionValue";
             break;
 
         case GA_FID_gaHSAListWorkItems:

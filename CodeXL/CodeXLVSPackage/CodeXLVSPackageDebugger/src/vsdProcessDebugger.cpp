@@ -16,6 +16,7 @@
 #include <AMDTOSWrappers/Include/osModule.h>
 #include <AMDTOSWrappers/Include/osStringConstants.h>
 #include <AMDTAPIClasses/Include/apDebugProjectSettings.h>
+#include <AMDTAPIClasses/Include/apExpression.h>
 #include <AMDTAPIClasses/Include/Events/apBreakpointHitEvent.h>
 #include <AMDTAPIClasses/Include/Events/apDebuggedProcessOutputStringEvent.h>
 #include <AMDTAPIClasses/Include/Events/apDebuggedProcessRunSuspendedEvent.h>
@@ -2234,19 +2235,19 @@ bool vsdProcessDebugger::canGetHostVariables() const
 {
     return true;
 }
-bool vsdProcessDebugger::getHostLocals(osThreadId threadId, int callStackFrameIndex, gtVector<gtString>& o_variables)
+bool vsdProcessDebugger::getHostLocals(osThreadId threadId, int callStackFrameIndex, int evaluationDepth, bool onlyNames, gtVector<apExpression>& o_locals)
 {
     bool retVal = false;
 
     vsdCDebugThread* pThread = getThreadFromId(threadId);
     GT_IF_WITH_ASSERT(nullptr != pThread)
     {
-        retVal = pThread->listLocalsForStackFrame(callStackFrameIndex, o_variables);
+        retVal = pThread->listLocalsForStackFrame(callStackFrameIndex, evaluationDepth, onlyNames, o_locals);
     }
 
     return retVal;
 }
-bool vsdProcessDebugger::getHostVariableValue(osThreadId threadId, int callStackFrameIndex, const gtString& variableName, gtString& o_varValue, gtString& o_varValueHex, gtString& o_varType)
+bool vsdProcessDebugger::getHostExpressionValue(osThreadId threadId, int callStackFrameIndex, const gtString& expressionText, int evaluationDepth, apExpression& o_exp)
 {
     bool retVal = false;
 
@@ -2254,7 +2255,7 @@ bool vsdProcessDebugger::getHostVariableValue(osThreadId threadId, int callStack
     GT_IF_WITH_ASSERT(nullptr != pThread)
     {
         int skippedFrames = pThread->skippedFrameCount(true);
-        retVal = pThread->evaluateVariableInStackFrame(callStackFrameIndex + skippedFrames, variableName, o_varValue, o_varValueHex, o_varType, true);
+        retVal = pThread->evaluateVariableInStackFrame(callStackFrameIndex + skippedFrames, expressionText, evaluationDepth, o_exp, true);
     }
 
     return retVal;
@@ -3378,7 +3379,7 @@ int vsdProcessDebugger::vsdCDebugThread::skippedFrameCount(bool hideSpyDLLsFunct
 // Author:      Uri Shomroni
 // Date:        10/1/2016
 // ---------------------------------------------------------------------------
-bool vsdProcessDebugger::vsdCDebugThread::listLocalsForStackFrame(int callStackFrameIndex, gtVector<gtString>& o_variables)
+bool vsdProcessDebugger::vsdCDebugThread::listLocalsForStackFrame(int callStackFrameIndex, int evaluationDepth, bool onlyNames, gtVector<apExpression>& o_locals)
 {
     bool retVal = false;
 
@@ -3431,7 +3432,18 @@ bool vsdProcessDebugger::vsdCDebugThread::listLocalsForStackFrame(int callStackF
                                 // Add it:
                                 if (!currentLocal.isEmpty())
                                 {
-                                    o_variables.push_back(currentLocal);
+                                    apExpression exp;
+                                    exp.m_name = currentLocal;
+                                    o_locals.push_back(exp);
+
+                                    if (!onlyNames)
+                                    {
+                                        // TO_DO: get values and types
+                                    }
+
+                                    // TO_DO: handle children down to evaluationDepth levels
+                                    GT_UNREFERENCED_PARAMETER(evaluationDepth);
+
                                     ++addedVars;
                                 }
 
@@ -3471,7 +3483,7 @@ bool vsdProcessDebugger::vsdCDebugThread::listLocalsForStackFrame(int callStackF
 // Author:      Uri Shomroni
 // Date:        10/1/2016
 // ---------------------------------------------------------------------------
-bool vsdProcessDebugger::vsdCDebugThread::evaluateVariableInStackFrame(int callStackFrameIndex, const gtString& variableName, gtString& o_varValue, gtString& o_varValueHex, gtString& o_varType, bool evalHex)
+bool vsdProcessDebugger::vsdCDebugThread::evaluateVariableInStackFrame(int callStackFrameIndex, const gtString& expressionText, int evaluationDepth, apExpression& o_exp, bool evalHex)
 {
     bool retVal = false;
 
@@ -3506,7 +3518,7 @@ bool vsdProcessDebugger::vsdCDebugThread::evaluateVariableInStackFrame(int callS
                         if (SUCCEEDED(hr) && (nullptr != piExprContext))
                         {
                             // Repeat for both bases:
-                            const wchar_t* varNameWCStr = variableName.asCharArray();
+                            const wchar_t* varNameWCStr = expressionText.asCharArray();
                             PARSEFLAGS parsFlg = PARSE_EXPRESSION;
                             EVALFLAGS evalFlg = EVAL_NOEVENTS;
                             DEBUG_PROPERTY_INFO propInfo = { 0 };
@@ -3515,7 +3527,7 @@ bool vsdProcessDebugger::vsdCDebugThread::evaluateVariableInStackFrame(int callS
                             for (DWORD rdx : radices)
                             {
                                 // Parse:
-                                gtString& varValue = (10 == rdx) ? o_varValue : o_varValueHex;
+                                gtString& varValue = (10 == rdx) ? o_exp.m_value : o_exp.m_valueHex;
                                 IDebugExpression2* piExpr = nullptr;
                                 BSTR errorText = nullptr;
                                 UINT errorIndex = S_OK;
@@ -3537,9 +3549,9 @@ bool vsdProcessDebugger::vsdCDebugThread::evaluateVariableInStackFrame(int callS
                                             SysFreeString(propInfo.bstrValue);
                                             propInfo.bstrValue = nullptr;
 
-                                            if (o_varType.isEmpty())
+                                            if (o_exp.m_type.isEmpty())
                                             {
-                                                o_varType = propInfo.bstrType;
+                                                o_exp.m_type = propInfo.bstrType;
                                             }
 
                                             SysFreeString(propInfo.bstrType);
@@ -3570,6 +3582,9 @@ bool vsdProcessDebugger::vsdCDebugThread::evaluateVariableInStackFrame(int callS
                                 if (!evalHex) { break; }
                             }
 
+                            // TO_DO: handle children down to evaluationDepth levels
+                            GT_UNREFERENCED_PARAMETER(evaluationDepth);
+
                             // Release the context:
                             piExprContext->Release();
                         }
@@ -3594,13 +3609,13 @@ bool vsdProcessDebugger::vsdCDebugThread::evaluateVariableInStackFrame(int callS
     // If we didn't get the value for one of the radices, copy from the other one:
     if (retVal)
     {
-        if (o_varValueHex.isEmpty())
+        if (o_exp.m_valueHex.isEmpty())
         {
-            o_varValueHex = o_varValue;
+            o_exp.m_valueHex = o_exp.m_value;
         }
-        else if (o_varValue.isEmpty())
+        else if (o_exp.m_value.isEmpty())
         {
-            o_varValue = o_varValueHex;
+            o_exp.m_value = o_exp.m_valueHex;
         }
     }
 
