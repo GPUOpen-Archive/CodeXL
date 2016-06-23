@@ -65,6 +65,9 @@
     <ClInclude Include="..\Backend\AMDTPowerProfileAPI\src\ppCountersStringConstants.h">
       <Filter>inc</Filter>
     </ClInclude>
+    <ClInclude Include="src\ppSessionActionsCreator.h">
+      <Filter>inc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\ppAppWrapper.cpp">
@@ -163,6 +166,9 @@
     <ClCompile Include="src\ppColors.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\ppSessionActionsCreator.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="src\ppProjectSettingsExtension.h">
@@ -201,8 +207,5 @@
     <CustomBuild Include="..\..\..\..\Common\Src\qcustomplot\1.3.1\qcustomplot.h">
       <Filter>Public Include</Filter>
     </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="AMDTPowerProfiling.licenseheader" />
   </ItemGroup>
 </Project>
