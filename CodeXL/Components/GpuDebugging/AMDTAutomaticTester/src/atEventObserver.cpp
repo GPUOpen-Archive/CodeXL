@@ -24,6 +24,7 @@
 #include <AMDTAPIClasses/Include/Events/apDebuggedProcessCreationFailureEvent.h>
 #include <AMDTAPIClasses/Include/Events/apEventsHandler.h>
 #include <AMDTAPIClasses/Include/Events/apExceptionEvent.h>
+#include <AMDTAPIClasses/Include/Events/apExpression.h>
 #include <AMDTApiFunctions/Include/gaGRApiFunctions.h>
 
 // Local:

@@ -14,6 +14,7 @@
 #include <AMDTOSWrappers/Include/osFilePath.h>
 #include <AMDTOSWrappers/Include/osSocket.h>
 #include <AMDTAPIClasses/Include/apAPIFunctionId.h>
+#include <AMDTAPIClasses/Include/Events/apExpression.h>
 #include <AMDTServerUtilities/Include/suSpyAPIFunctions.h>
 
 // Local:
