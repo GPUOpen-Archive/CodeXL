@@ -657,16 +657,14 @@ bool atEventObserver::testVariables(int lineNumber)
                                     workItem[j] = currentVar.workItem[j];
                                 }
 
-                                gtString variableValue;
-                                gtString variableValueHex;
-                                gtString variableType;
-                                bool rc = gaGetKernelDebuggingVariableValueString(currentVar.varName, workItem, variableValue, variableValueHex, variableType);
+                                apExpression variableValue;
+                                bool rc = gaGetKernelDebuggingExpressionValue(currentVar.varName, workItem, 0, variableValue);
 
                                 outputStr.appendFormattedString(L"Work Item (%d, %d, %d): ", workItem[0], workItem[1], workItem[2]);
 
                                 if (rc)
                                 {
-                                    outputStr.appendFormattedString(L"Variable value: %ls=%ls. Variable type: %ls", currentVar.varName.asCharArray(), variableValue.asCharArray(), variableType.asCharArray());
+                                    outputStr.appendFormattedString(L"Variable value: %ls=%ls. Variable type: %ls", currentVar.varName.asCharArray(), variableValue.m_value.asCharArray(), variableValue.m_type.asCharArray());
                                 }
                                 else
                                 {
@@ -719,14 +717,14 @@ bool atEventObserver::outputAllLocals(int lineNumber)
                         {
                             if (pKernelTest->_localsInLine[j] == lineNumber)
                             {
-                                gtVector<gtString> tempVariableNames;
+                                gtVector<apExpression> tempVariableNames;
                                 gtString outputStr = L"";
 
-                                bool rc = gaGetKernelDebuggingAvailableVariables(tempVariableNames, false, 0);
+                                bool rc = gaGetKernelDebuggingAvailableVariables(0, tempVariableNames, false, 0, true);
 
                                 for (int k = 0; k < (int)tempVariableNames.size(); k++)
                                 {
-                                    outputStr.append(tempVariableNames[k]);
+                                    outputStr.append(tempVariableNames[k].m_name);
                                     outputStr.append(L"\n");
                                 }
 
@@ -825,7 +823,7 @@ bool atEventObserver::testValueForAllWorkItems(int lineNumber)
                             if (currentVar.lineNumber == lineNumber)
                             {
                                 gtString outputStr;
-                                gtString variableValue, variableValueHex, variableType;
+                                apExpression variableValue;
 
                                 // Get the variable work items values
                                 int workItem[3] = {0, -1, -1};
@@ -839,13 +837,13 @@ bool atEventObserver::testValueForAllWorkItems(int lineNumber)
                                     workItem[1] = (yVal == -1 ? -1 : j);
                                     workItem[2] = (zVal == -1 ? -1 : j);
 
-                                    bool rc = gaGetKernelDebuggingVariableValueString(currentVar.varName, workItem, variableValue, variableValueHex, variableType);
+                                    bool rc = gaGetKernelDebuggingExpressionValue(currentVar.varName, workItem, 0, variableValue);
 
                                     outputStr.appendFormattedString(L"X:%d Y:%d Z:%d. ", workItem[0], workItem[1], workItem[2]);
 
                                     if (rc)
                                     {
-                                        outputStr.appendFormattedString(L"Variable value: %ls=%ls\n", currentVar.varName.asCharArray(), variableValue.asCharArray());
+                                        outputStr.appendFormattedString(L"Variable value: %ls=%ls\n", currentVar.varName.asCharArray(), variableValue.m_value.asCharArray());
                                     }
                                     else
                                     {
