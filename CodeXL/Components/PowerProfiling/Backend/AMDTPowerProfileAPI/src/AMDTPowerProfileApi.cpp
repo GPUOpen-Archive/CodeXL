@@ -978,7 +978,7 @@ AMDTResult AMDTPwrProfileInitialize(AMDTPwrProfileMode profileMode)
         if (AMDT_STATUS_OK == ret)
         {
             PwrSupportedCounterMap* pCounters = PwrGetSupportedCounterList();
-            totalCounters = pCounters->size();
+            totalCounters = (AMDTUInt32)pCounters->size();
 
             if (0 == totalCounters)
             {
@@ -1137,7 +1137,7 @@ AMDTResult AMDTPwrGetDeviceCounters(AMDTPwrDeviceId deviceID,
         if (g_clientCounters.size() > 0)
         {
             *ppCounterDescs = &g_clientCounters[0];
-            *pNumCounters = g_clientCounters.size();
+            *pNumCounters = (AMDTUInt32)g_clientCounters.size();
         }
         else
         {
@@ -1966,7 +1966,7 @@ AMDTResult AMDTPwrReadAllEnabledCounters(AMDTUInt32* pNumOfSamples,
         {
             if (g_result.size() > 0)
             {
-                *pNumOfSamples = g_result.size();
+                *pNumOfSamples = (AMDTUInt32)g_result.size();
                 *ppData = &g_result[0];
             }
         }

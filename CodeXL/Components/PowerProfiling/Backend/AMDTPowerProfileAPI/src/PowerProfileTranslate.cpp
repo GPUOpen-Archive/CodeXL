@@ -818,12 +818,14 @@ AMDTResult PowerProfileTranslate::TranslateRawData()
                             }
                             else if (SMU_IPVERSION_9_0 == pDecodeInfo->m_smuIpVersion)
                             {
+                            #if 0
                                 len = PWR_SMU9_DECODE_COUNTER(pDecodeInfo,
                                                               &m_data,
                                                               pRaw + offset,
                                                               &idx,
                                                               &m_sysInfo,
                                                               ((m_currentTs - m_prevTs) / g_countPerSeconds));
+                            #endif
                             }
                         }
                         else if (pDecodeInfo->m_pkgId > APU_SMU_ID)
@@ -840,7 +842,7 @@ AMDTResult PowerProfileTranslate::TranslateRawData()
                         offset += len;
                     }
 
-                    m_data.m_attrCnt = m_data.m_counters.size();
+                    m_data.m_attrCnt = (AMDTUInt32)m_data.m_counters.size();
 
                     if (cnt == (coreCnt - 1))
                     {
@@ -1905,12 +1907,14 @@ AMDTUInt32 PowerProfileTranslate::DecodeNodeCounters(PwrCounterDecodeInfo* pDeco
             case COUNTERID_FAMILY17_PKG_ENERGY:
             case COUNTERID_FAMILY17_CORE_ENERGY:
             {
+                #if 0
                 AMDTUInt32 data = *(AMDTUInt32*)(pRaw + offset);
                 PWR_FAMILY17_DECODE_MSR_COUNTER(pDecodeInfo, data, &counter.m_float32);
                 counter.m_instanceId = pDecodeInfo->m_instanceId;
                 counter.m_counterId = pDecodeInfo->m_clientId;
                 offset += sizeof(AMDTUInt32);
                 pOut->m_counters.insert(PwrDecodedCounterMap::value_type(counter.m_counterId, counter));
+                #endif
                 break;
             }
 
