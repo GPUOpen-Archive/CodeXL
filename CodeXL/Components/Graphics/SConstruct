@@ -44,6 +44,7 @@ GPS_env.projectSuffix = ""
 GPS_env.projectName = "GPUPerfServer"
 GPS_env.capturePlayerName = "CapturePlayer"
 GPS_env.vulkanPluginName = "VulkanServer"
+GPS_env.rootFolderName = "GPUPerfStudioLegacy"
 
 buildTests = False
 buildInternal = False
@@ -65,6 +66,7 @@ for key, value in ARGLIST:
         GPS_env.projectName = "CXLGraphicsServer"
         GPS_env.capturePlayerName = "CXLGraphicsServerPlayer"
         GPS_env.vulkanPluginName = "CXLGraphicsServerVulkan"
+        GPS_env.rootFolderName = "Graphics"
         buildCodeXL = True
     elif key == 'tests' and value == '1':
         buildTests = True
@@ -134,8 +136,8 @@ GPS_env['GPS_LIBPATH'] = \
     '/usr/' + GPS_env.libConfig,
     '/usr/lib',
     '/usr/lib/' + GPS_env.gnuConfig,
-    '../../obj/' + GPS_env.platformPath + '/GPUPerfStudioLegacy/Server/Common',
-    '../../obj/' + GPS_env.platformPath + '/GPUPerfStudioLegacy',
+    '../../obj/' + GPS_env.platformPath + '/' + GPS_env.rootFolderName + '/Server/Common',
+    '../../obj/' + GPS_env.platformPath + '/' + GPS_env.rootFolderName,
     GPS_env.CommonPath + '../../Common/Lib/Ext/Boost/boost_' + GPS_env.BoostVersion + '/lib/RHEL6/' + GPS_env.extConfig,
 ]
 
@@ -187,42 +189,42 @@ Export('GPS_env');
 OSWrappers_Obj = SConscript(['SConscript'], src_dir=GPS_env.CommonPath, variant_dir=fullPath, duplicate=0)
 
 # build script for Server/Common
-APICommon_Obj = SConscript(['Server/Common/SConscript'], variant_dir=fullPath + '/GPUPerfStudioLegacy/Server/Common', duplicate=0)
+APICommon_Obj = SConscript(['Server/Common/SConscript'], variant_dir=fullPath + '/' + GPS_env.rootFolderName +'/Server/Common', duplicate=0)
 Depends(APICommon_Obj, OSWrappers_Obj)
 
 if buildCodeXL == False:
     # build script for Server/GLServer
-    GLServer = SConscript(['Server/GLServer/SConscript'], variant_dir=fullPath + '/GPUPerfStudioLegacy/Server/GLServer', duplicate=0)
+    GLServer = SConscript(['Server/GLServer/SConscript'], variant_dir=fullPath + '/' + GPS_env.rootFolderName + '/Server/GLServer', duplicate=0)
     Depends(GLServer, APICommon_Obj + OSWrappers_Obj )
     targetName = "/Plugins/GLServer" + GPS_env.projectSuffix + ".so"
-    Command(GPS_env.targetRoot + targetName, fullPath + "/GPUPerfStudioLegacy/Server/GLServer/libGLServer.so", Copy("$TARGET", "$SOURCE"))
+    Command(GPS_env.targetRoot + targetName, fullPath + "/" + GPS_env.rootFolderName + "/Server/GLServer/libGLServer.so", Copy("$TARGET", "$SOURCE"))
 
     # build script for Server/GLESServer
     GPS_env.rootFolder = os.getcwd()
-    GLESServer = SConscript(['Server/GLESServer/SConscript'], variant_dir=fullPath + '/GPUPerfStudioLegacy/Server/GLESServer', duplicate=0)
+    GLESServer = SConscript(['Server/GLESServer/SConscript'], variant_dir=fullPath + '/' + GPS_env.rootFolderName + '/Server/GLESServer', duplicate=0)
     Depends(GLESServer, APICommon_Obj + OSWrappers_Obj)
     targetName = "/Plugins/GLESServer" + GPS_env.projectSuffix + ".so"
-    Command(GPS_env.targetRoot + targetName, fullPath + "/GPUPerfStudioLegacy/Server/GLESServer/libGLESServer.so", Copy("$TARGET", "$SOURCE"))
+    Command(GPS_env.targetRoot + targetName, fullPath + "/" + GPS_env.rootFolderName + "/Server/GLESServer/libGLESServer.so", Copy("$TARGET", "$SOURCE"))
 
 # build script for Server/VulkanServer
 GPS_env.rootFolder = os.getcwd()
-VulkanServer = SConscript(['Server/VulkanServer/SConscript'], variant_dir=fullPath + '/GPUPerfStudioLegacy/Server/VulkanServer', duplicate=0)
+VulkanServer = SConscript(['Server/VulkanServer/SConscript'], variant_dir=fullPath + '/' + GPS_env.rootFolderName + '/Server/VulkanServer', duplicate=0)
 Depends(VulkanServer, APICommon_Obj + OSWrappers_Obj)
 targetName = GPS_env.targetRoot + "/Plugins/" + GPS_env.vulkanPluginName + GPS_env.projectSuffix + ".so"
-Command(targetName, fullPath + "/GPUPerfStudioLegacy/Server/VulkanServer/libVulkanServer.so", Copy("$TARGET", "$SOURCE"))
+Command(targetName, fullPath + "/" + GPS_env.rootFolderName + "/Server/VulkanServer/libVulkanServer.so", Copy("$TARGET", "$SOURCE"))
 
 if buildCodeXL == True:
     # build script for Vulkan capture player
-    CapturePlayer = SConscript(['Server/CapturePlayer/SConscript'], variant_dir=fullPath + '/GPUPerfStudioLegacy/Server/CapturePlayer', duplicate=0)
+    CapturePlayer = SConscript(['Server/CapturePlayer/SConscript'], variant_dir=fullPath + '/' + GPS_env.rootFolderName + '/Server/CapturePlayer', duplicate=0)
     Depends(CapturePlayer, APICommon_Obj + OSWrappers_Obj)
     targetName = GPS_env.targetRoot + "/" + GPS_env.capturePlayerName + GPS_env.projectSuffix
-    Command(targetName, fullPath + "/GPUPerfStudioLegacy/Server/CapturePlayer/CapturePlayer", Copy("$TARGET", "$SOURCE"))
+    Command(targetName, fullPath + "/" + GPS_env.rootFolderName + "/CapturePlayer/CapturePlayer", Copy("$TARGET", "$SOURCE"))
 
 # Build the graphics server
-GPUPerfServer = SConscript(['Server/WebServer/SConscript'], variant_dir=fullPath+'/GPUPerfStudioLegacy/Server/WebServer', duplicate=0)
+GPUPerfServer = SConscript(['Server/WebServer/SConscript'], variant_dir=fullPath+'/' + GPS_env.rootFolderName + '/Server/WebServer', duplicate=0)
 Depends(GPUPerfServer, APICommon_Obj + OSWrappers_Obj)
 targetName = GPS_env.targetRoot + "/" + GPS_env.projectName + GPS_env.projectSuffix
-Command(targetName, fullPath + "/GPUPerfStudioLegacy/Server/WebServer/GPUPerfServer", Copy("$TARGET", "$SOURCE"))
+Command(targetName, fullPath + "/" + GPS_env.rootFolderName + "/Server/WebServer/GPUPerfServer", Copy("$TARGET", "$SOURCE"))
 
 CopySupportFiles(GPS_env, buildCodeXL)
 
@@ -240,6 +242,6 @@ if buildTests == True :
         os.makedirs(target)
 
     # Build the linux test executable(s)
-    Tests = SConscript(['Tests/LinuxTests/SConscript'], variant_dir=fullPath+'/GPUPerfStudioLegacy/Tests/LinuxTests', duplicate=0)
+    Tests = SConscript(['Tests/LinuxTests/SConscript'], variant_dir=fullPath+'/' + GPS_env.rootFolderName + '/Tests/LinuxTests', duplicate=0)
     Depends(Tests, OSWrappers_Obj)
-    Command(target + "/LinuxTests", fullPath + "/GPUPerfStudioLegacy/Tests/LinuxTests/LinuxTests", Copy("$TARGET", "$SOURCE"))
+    Command(target + "/LinuxTests", fullPath + "/" + GPS_env.rootFolderName + "/Tests/LinuxTests/LinuxTests", Copy("$TARGET", "$SOURCE"))
