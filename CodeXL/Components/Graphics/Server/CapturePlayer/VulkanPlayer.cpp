@@ -610,6 +610,11 @@ void VulkanPlayer::RenderLoop()
     {
 #ifdef WIN32
         RedrawWindow(s_vkState.hWnd, nullptr, nullptr, RDW_INTERNALPAINT);
+#else
+        if (s_vkState.initComplete)
+        {
+            VulkanPlayer::Present();
+        }
 #endif
     }
 }
