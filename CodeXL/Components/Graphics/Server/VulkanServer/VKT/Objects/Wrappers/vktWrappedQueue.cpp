@@ -12,6 +12,11 @@
 #include "../../vktDefines.h"
 #include "../../FrameDebugger/vktFrameDebuggerLayer.h"
 
+#ifdef _LINUX
+#define WINAPI
+typedef void* LPVOID;
+#endif
+
 //-----------------------------------------------------------------------------
 /// Profiler results collection worker function.
 /// \param lpParam A void pointer to the incoming VktWorkerInfo argument.
@@ -49,7 +54,7 @@ DWORD WINAPI ThreadFunc(LPVOID lpParam)
             const char* profilerErrorCode = VktCmdBufProfiler::PrintProfilerResult(profResult);
 
             // Report that a problem occurred in retrieving full profiler results.
-            Log(logERROR, "Failed to retrieve full profiler results: CmdBuf 0x%p, Queue 0x%p, ErrorCode %s\n",
+            Log(logERROR, "Failed to retrieve full profiler results: CmdBuf " POINTER_SUFFIX "%p, Queue " POINTER_SUFFIX "%p, ErrorCode %s\n",
                 pWorkerInfo->m_inputs.cmdBufData[i].pCmdBuf, pWorkerInfo->m_inputs.pQueue, profilerErrorCode);
         }
     }
@@ -173,7 +178,11 @@ void VktWrappedQueue::SpawnWorker(
             m_workerThreadInfo.push_back(pWorkerInfo);
 
             DWORD threadId = 0;
+#ifdef WIN32
             pWorkerInfo->m_threadInfo.threadHandle = CreateThread(nullptr, 0, ThreadFunc, pWorkerInfo, 0, &threadId);
+#else
+            pWorkerInfo->m_threadInfo.threadHandle = new std::thread(ThreadFunc, pWorkerInfo);
+#endif
         }
     }
 }
@@ -206,7 +215,9 @@ void VktWrappedQueue::EndCollection()
 
         m_workerThreadInfo[i]->m_outputs.results.clear();
 
+#ifdef WIN32
         CloseHandle(m_workerThreadInfo[i]->m_threadInfo.threadHandle);
+#endif
         SAFE_DELETE(m_workerThreadInfo[i]);
     }
 
@@ -377,11 +388,11 @@ VkResult VktWrappedQueue::QueueSubmit_ICD(VkQueue queue, uint32_t submitCount, c
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, 0x%p, 0x%p",
-            queue,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s, %s",
+            VktUtil::WritePointerAsString(queue),
             submitCount,
-            PrintArrayWithFormatter(submitCount, pSubmits, "0x%p").c_str(),
-            fence);
+            PrintArrayWithFormatter(submitCount, pSubmits, POINTER_SUFFIX "%p").c_str(),
+            VktUtil::WriteUint64AsString((uint64_t)fence));
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(queue)->QueueSubmit(queue, submitCount, pSubmits, fence);
@@ -409,7 +420,7 @@ VkResult VktWrappedQueue::QueueWaitIdle(VkQueue queue)
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p", queue);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s", VktUtil::WritePointerAsString(queue));
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(queue)->QueueWaitIdle(queue);
@@ -432,11 +443,11 @@ VkResult VktWrappedQueue::QueueBindSparse(VkQueue queue, uint32_t bindInfoCount,
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, 0x%p, 0x%p",
-            queue,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s, %s",
+            VktUtil::WritePointerAsString(queue),
             bindInfoCount,
-            PrintArrayWithFormatter(bindInfoCount, pBindInfo, "0x%p").c_str(),
-            fence);
+            PrintArrayWithFormatter(bindInfoCount, pBindInfo, POINTER_SUFFIX "%p").c_str(),
+            VktUtil::WriteUint64AsString((uint64_t)fence));
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(queue)->QueueBindSparse(queue, bindInfoCount, pBindInfo, fence);

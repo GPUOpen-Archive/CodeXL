@@ -386,7 +386,7 @@ void VktWrappedCmdBuf::DestroyDynamicProfilers()
 void VktWrappedCmdBuf::PrintCommands()
 {
     Log(logERROR, "===================================================\n");
-    Log(logERROR, "CmdBuf: 0x%p\n", this);
+    Log(logERROR, "CmdBuf: " POINTER_SUFFIX "%p\n", this);
 
     for (UINT i = 0; i < m_commands.size(); i++)
     {
@@ -547,7 +547,9 @@ VkResult VktWrappedCmdBuf::BeginCommandBuffer_ICD(VkCommandBuffer commandBuffer,
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p", commandBuffer, pBeginInfo);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s",
+                  VktUtil::WritePointerAsString(commandBuffer),
+                  VktUtil::WritePointerAsString(pBeginInfo));
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         result = device_dispatch_table(commandBuffer)->BeginCommandBuffer(commandBuffer, pBeginInfo);
@@ -572,7 +574,7 @@ VkResult VktWrappedCmdBuf::EndCommandBuffer_ICD(VkCommandBuffer commandBuffer)
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p", commandBuffer);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s", VktUtil::WritePointerAsString(commandBuffer));
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         result = device_dispatch_table(commandBuffer)->EndCommandBuffer(commandBuffer);
@@ -597,8 +599,8 @@ VkResult VktWrappedCmdBuf::ResetCommandBuffer_ICD(VkCommandBuffer commandBuffer,
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %s",
-            commandBuffer,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
             VktUtil::DecomposeCommandBufferResetFlagsEnumAsString(flags).c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
@@ -622,10 +624,10 @@ void VktWrappedCmdBuf::CmdBindPipeline(VkCommandBuffer commandBuffer, VkPipeline
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %s, 0x%p",
-            commandBuffer,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
             VktUtil::WritePipelineBindPointEnumAsString(pipelineBindPoint),
-            pipeline);
+            VktUtil::WriteUint64AsString((uint64_t)pipeline));
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdBindPipeline(commandBuffer, pipelineBindPoint, pipeline);
@@ -646,11 +648,11 @@ void VktWrappedCmdBuf::CmdSetViewport(VkCommandBuffer commandBuffer, uint32_t fi
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, %u, 0x%p",
-            commandBuffer,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %u, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
             firstViewport,
             viewportCount,
-            PrintArrayWithFormatter(viewportCount, pViewports, "0x%p").c_str());
+            PrintArrayWithFormatter(viewportCount, pViewports, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdSetViewport(commandBuffer, firstViewport, viewportCount, pViewports);
@@ -671,11 +673,11 @@ void VktWrappedCmdBuf::CmdSetScissor(VkCommandBuffer commandBuffer, uint32_t fir
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, %u, 0x%p",
-            commandBuffer,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %u, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
             firstScissor,
             scissorCount,
-            PrintArrayWithFormatter(scissorCount, pScissors, "0x%p").c_str());
+            PrintArrayWithFormatter(scissorCount, pScissors, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdSetScissor(commandBuffer, firstScissor, scissorCount, pScissors);
@@ -696,7 +698,7 @@ void VktWrappedCmdBuf::CmdSetLineWidth(VkCommandBuffer commandBuffer, float line
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %f", commandBuffer, lineWidth);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %f", VktUtil::WritePointerAsString(commandBuffer), lineWidth);
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdSetLineWidth(commandBuffer, lineWidth);
@@ -717,7 +719,7 @@ void VktWrappedCmdBuf::CmdSetDepthBias(VkCommandBuffer commandBuffer, float dept
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %f, %f, %f", commandBuffer, depthBiasConstantFactor, depthBiasClamp, depthBiasSlopeFactor);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %f, %f, %f", VktUtil::WritePointerAsString(commandBuffer), depthBiasConstantFactor, depthBiasClamp, depthBiasSlopeFactor);
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdSetDepthBias(commandBuffer, depthBiasConstantFactor, depthBiasClamp, depthBiasSlopeFactor);
@@ -738,7 +740,7 @@ void VktWrappedCmdBuf::CmdSetBlendConstants(VkCommandBuffer commandBuffer, const
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %f, %f, %f, %f", commandBuffer, blendConstants[0], blendConstants[1], blendConstants[2], blendConstants[3]);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %f, %f, %f, %f", VktUtil::WritePointerAsString(commandBuffer), blendConstants[0], blendConstants[1], blendConstants[2], blendConstants[3]);
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdSetBlendConstants(commandBuffer, blendConstants);
@@ -759,7 +761,7 @@ void VktWrappedCmdBuf::CmdSetDepthBounds(VkCommandBuffer commandBuffer, float mi
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %f, %f", commandBuffer, minDepthBounds, maxDepthBounds);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %f, %f", VktUtil::WritePointerAsString(commandBuffer), minDepthBounds, maxDepthBounds);
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdSetDepthBounds(commandBuffer, minDepthBounds, maxDepthBounds);
@@ -780,8 +782,8 @@ void VktWrappedCmdBuf::CmdSetStencilCompareMask(VkCommandBuffer commandBuffer, V
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %s, %u",
-            commandBuffer,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %u",
+            VktUtil::WritePointerAsString(commandBuffer),
             VktUtil::DecomposeStencilFaceFlagsEnumAsString(faceMask).c_str(),
             compareMask);
 
@@ -804,8 +806,8 @@ void VktWrappedCmdBuf::CmdSetStencilWriteMask(VkCommandBuffer commandBuffer, VkS
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %s, %u",
-            commandBuffer,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %u",
+            VktUtil::WritePointerAsString(commandBuffer),
             VktUtil::DecomposeStencilFaceFlagsEnumAsString(faceMask).c_str(),
             writeMask);
 
@@ -828,8 +830,8 @@ void VktWrappedCmdBuf::CmdSetStencilReference(VkCommandBuffer commandBuffer, VkS
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %s, %u",
-            commandBuffer,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %u",
+            VktUtil::WritePointerAsString(commandBuffer),
             VktUtil::DecomposeStencilFaceFlagsEnumAsString(faceMask).c_str(),
             reference);
 
@@ -852,15 +854,15 @@ void VktWrappedCmdBuf::CmdBindDescriptorSets(VkCommandBuffer commandBuffer, VkPi
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %s, 0x%p, %u, %u, 0x%p, %u, 0x%p",
-            commandBuffer,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %u, %u, %s, %u, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
             VktUtil::WritePipelineBindPointEnumAsString(pipelineBindPoint),
-            layout,
+            VktUtil::WriteUint64AsString((uint64_t)layout),
             firstSet,
             descriptorSetCount,
-            PrintArrayWithFormatter(descriptorSetCount, pDescriptorSets, "0x%p").c_str(),
+            PrintArrayWithFormatter(descriptorSetCount, pDescriptorSets, POINTER_SUFFIX "%p").c_str(),
             dynamicOffsetCount,
-            PrintArrayWithFormatter(dynamicOffsetCount, pDynamicOffsets, "0x%p").c_str());
+            PrintArrayWithFormatter(dynamicOffsetCount, pDynamicOffsets, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdBindDescriptorSets(commandBuffer, pipelineBindPoint, layout, firstSet, descriptorSetCount, pDescriptorSets, dynamicOffsetCount, pDynamicOffsets);
@@ -881,9 +883,9 @@ void VktWrappedCmdBuf::CmdBindIndexBuffer(VkCommandBuffer commandBuffer, VkBuffe
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %llu, %s",
-            commandBuffer,
-            buffer,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %llu, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
+            VktUtil::WriteUint64AsString((uint64_t)buffer),
             offset,
             VktUtil::WriteIndexTypeEnumAsString(indexType));
 
@@ -906,12 +908,12 @@ void VktWrappedCmdBuf::CmdBindVertexBuffers(VkCommandBuffer commandBuffer, uint3
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, %u, 0x%p, 0x%p",
-            commandBuffer,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %u, %s, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
             firstBinding,
             bindingCount,
-            PrintArrayWithFormatter(bindingCount, pBuffers, "0x%p").c_str(),
-            PrintArrayWithFormatter(bindingCount, pOffsets, "0x%p").c_str());
+            PrintArrayWithFormatter(bindingCount, pBuffers, POINTER_SUFFIX "%p").c_str(),
+            PrintArrayWithFormatter(bindingCount, pOffsets, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdBindVertexBuffers(commandBuffer, firstBinding, bindingCount, pBuffers, pOffsets);
@@ -932,7 +934,7 @@ void VktWrappedCmdBuf::CmdDraw(VkCommandBuffer commandBuffer, uint32_t vertexCou
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, %u, %u, %u", commandBuffer, vertexCount, instanceCount, firstVertex, firstInstance);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %u, %u, %u", VktUtil::WritePointerAsString(commandBuffer), vertexCount, instanceCount, firstVertex, firstInstance);
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdDraw(commandBuffer, vertexCount, instanceCount, firstVertex, firstInstance);
@@ -953,7 +955,7 @@ void VktWrappedCmdBuf::CmdDrawIndexed(VkCommandBuffer commandBuffer, uint32_t in
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, %u, %u, %u, %u", commandBuffer, indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %u, %u, %u, %u", VktUtil::WritePointerAsString(commandBuffer), indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdDrawIndexed(commandBuffer, indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
@@ -974,7 +976,12 @@ void VktWrappedCmdBuf::CmdDrawIndirect(VkCommandBuffer commandBuffer, VkBuffer b
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %llu, %u, %u", commandBuffer, buffer, offset, drawCount, stride);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %llu, %u, %u",
+                  VktUtil::WritePointerAsString(commandBuffer),
+                  VktUtil::WriteUint64AsString((uint64_t)buffer),
+                  offset,
+                  drawCount,
+                  stride);
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdDrawIndirect(commandBuffer, buffer, offset, drawCount, stride);
@@ -995,7 +1002,12 @@ void VktWrappedCmdBuf::CmdDrawIndexedIndirect(VkCommandBuffer commandBuffer, VkB
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %llu, %u, %u", commandBuffer, buffer, offset, drawCount, stride);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %llu, %u, %u",
+                  VktUtil::WritePointerAsString(commandBuffer),
+                  VktUtil::WriteUint64AsString((uint64_t)buffer),
+                  offset,
+                  drawCount,
+                  stride);
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdDrawIndexedIndirect(commandBuffer, buffer, offset, drawCount, stride);
@@ -1016,7 +1028,7 @@ void VktWrappedCmdBuf::CmdDispatch(VkCommandBuffer commandBuffer, uint32_t x, ui
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, %u, %u", commandBuffer, x, y, z);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %u, %u", VktUtil::WritePointerAsString(commandBuffer), x, y, z);
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdDispatch(commandBuffer, x, y, z);
@@ -1037,7 +1049,10 @@ void VktWrappedCmdBuf::CmdDispatchIndirect(VkCommandBuffer commandBuffer, VkBuff
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %llu", commandBuffer, buffer, offset);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %llu",
+                  VktUtil::WritePointerAsString(commandBuffer),
+                  VktUtil::WriteUint64AsString((uint64_t)buffer),
+                  offset);
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdDispatchIndirect(commandBuffer, buffer, offset);
@@ -1058,12 +1073,12 @@ void VktWrappedCmdBuf::CmdCopyBuffer(VkCommandBuffer commandBuffer, VkBuffer src
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, %u, 0x%p",
-            commandBuffer,
-            srcBuffer,
-            dstBuffer,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %u, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
+            VktUtil::WriteUint64AsString((uint64_t)srcBuffer),
+            VktUtil::WriteUint64AsString((uint64_t)dstBuffer),
             regionCount,
-            PrintArrayWithFormatter(regionCount, pRegions, "0x%p").c_str());
+            PrintArrayWithFormatter(regionCount, pRegions, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, regionCount, pRegions);
@@ -1084,14 +1099,14 @@ void VktWrappedCmdBuf::CmdCopyImage(VkCommandBuffer commandBuffer, VkImage srcIm
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %s, 0x%p, %s, %u, 0x%p",
-            commandBuffer,
-            srcImage,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s, %s, %u, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
+            VktUtil::WriteUint64AsString((uint64_t)srcImage),
             VktUtil::WriteImageLayoutEnumAsString(srcImageLayout),
-            dstImage,
+            VktUtil::WriteUint64AsString((uint64_t)dstImage),
             VktUtil::WriteImageLayoutEnumAsString(dstImageLayout),
             regionCount,
-            PrintArrayWithFormatter(regionCount, pRegions, "0x%p").c_str());
+            PrintArrayWithFormatter(regionCount, pRegions, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdCopyImage(commandBuffer, srcImage, srcImageLayout, dstImage, dstImageLayout, regionCount, pRegions);
@@ -1112,14 +1127,14 @@ void VktWrappedCmdBuf::CmdBlitImage(VkCommandBuffer commandBuffer, VkImage srcIm
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %s, 0x%p, %s, %u, 0x%p, %s",
-            commandBuffer,
-            srcImage,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s, %s, %u, %s, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
+            VktUtil::WriteUint64AsString((uint64_t)srcImage),
             VktUtil::WriteImageLayoutEnumAsString(srcImageLayout),
-            dstImage,
+            VktUtil::WriteUint64AsString((uint64_t)dstImage),
             VktUtil::WriteImageLayoutEnumAsString(dstImageLayout),
             regionCount,
-            PrintArrayWithFormatter(regionCount, pRegions, "0x%p").c_str(),
+            PrintArrayWithFormatter(regionCount, pRegions, POINTER_SUFFIX "%p").c_str(),
             VktUtil::WriteFilterEnumAsString(filter));
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
@@ -1141,13 +1156,13 @@ void VktWrappedCmdBuf::CmdCopyBufferToImage(VkCommandBuffer commandBuffer, VkBuf
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, %s, %u, 0x%p",
-            commandBuffer,
-            srcBuffer,
-            dstImage,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s, %u, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
+            VktUtil::WriteUint64AsString((uint64_t)srcBuffer),
+            VktUtil::WriteUint64AsString((uint64_t)dstImage),
             VktUtil::WriteImageLayoutEnumAsString(dstImageLayout),
             regionCount,
-            PrintArrayWithFormatter(regionCount, pRegions, "0x%p").c_str());
+            PrintArrayWithFormatter(regionCount, pRegions, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdCopyBufferToImage(commandBuffer, srcBuffer, dstImage, dstImageLayout, regionCount, pRegions);
@@ -1168,13 +1183,13 @@ void VktWrappedCmdBuf::CmdCopyImageToBuffer(VkCommandBuffer commandBuffer, VkIma
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %s, 0x%p, %u, 0x%p",
-            commandBuffer,
-            srcImage,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s, %u, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
+            VktUtil::WriteUint64AsString((uint64_t)srcImage),
             VktUtil::WriteImageLayoutEnumAsString(srcImageLayout),
-            dstBuffer,
+            VktUtil::WriteUint64AsString((uint64_t)dstBuffer),
             regionCount,
-            PrintArrayWithFormatter(regionCount, pRegions, "0x%p").c_str());
+            PrintArrayWithFormatter(regionCount, pRegions, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdCopyImageToBuffer(commandBuffer, srcImage, srcImageLayout, dstBuffer, regionCount, pRegions);
@@ -1195,7 +1210,12 @@ void VktWrappedCmdBuf::CmdUpdateBuffer(VkCommandBuffer commandBuffer, VkBuffer d
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %llu, %llu, 0x%p", commandBuffer, dstBuffer, dstOffset, dataSize, pData);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %llu, %llu, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
+            VktUtil::WriteUint64AsString((uint64_t)dstBuffer),
+            dstOffset,
+            dataSize,
+            VktUtil::WritePointerAsString(pData));
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdUpdateBuffer(commandBuffer, dstBuffer, dstOffset, dataSize, pData);
@@ -1216,7 +1236,12 @@ void VktWrappedCmdBuf::CmdFillBuffer(VkCommandBuffer commandBuffer, VkBuffer dst
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %llu, %llu, %u", commandBuffer, dstBuffer, dstOffset, size, data);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %llu, %llu, %u",
+            VktUtil::WritePointerAsString(commandBuffer),
+            VktUtil::WriteUint64AsString((uint64_t)dstBuffer),
+            dstOffset,
+            size,
+            data);
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdFillBuffer(commandBuffer, dstBuffer, dstOffset, size, data);
@@ -1237,13 +1262,13 @@ void VktWrappedCmdBuf::CmdClearColorImage(VkCommandBuffer commandBuffer, VkImage
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %s, 0x%p, %u, 0x%p",
-            commandBuffer,
-            image,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s, %u, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
+            VktUtil::WriteUint64AsString((uint64_t)image),
             VktUtil::WriteImageLayoutEnumAsString(imageLayout),
-            pColor,
+            VktUtil::WritePointerAsString(pColor),
             rangeCount,
-            PrintArrayWithFormatter(rangeCount, pRanges, "0x%p").c_str());
+            PrintArrayWithFormatter(rangeCount, pRanges, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdClearColorImage(commandBuffer, image, imageLayout, pColor, rangeCount, pRanges);
@@ -1264,13 +1289,13 @@ void VktWrappedCmdBuf::CmdClearDepthStencilImage(VkCommandBuffer commandBuffer, 
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %s, 0x%p, %u, 0x%p",
-            commandBuffer,
-            image,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s, %u, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
+            VktUtil::WriteUint64AsString((uint64_t)image),
             VktUtil::WriteImageLayoutEnumAsString(imageLayout),
-            pDepthStencil,
+            VktUtil::WritePointerAsString(pDepthStencil),
             rangeCount,
-            PrintArrayWithFormatter(rangeCount, pRanges, "0x%p").c_str());
+            PrintArrayWithFormatter(rangeCount, pRanges, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdClearDepthStencilImage(commandBuffer, image, imageLayout, pDepthStencil, rangeCount, pRanges);
@@ -1291,12 +1316,12 @@ void VktWrappedCmdBuf::CmdClearAttachments(VkCommandBuffer commandBuffer, uint32
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, 0x%p, %u, 0x%p",
-            commandBuffer,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s, %u, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
             attachmentCount,
-            PrintArrayWithFormatter(attachmentCount, pAttachments, "0x%p").c_str(),
+            PrintArrayWithFormatter(attachmentCount, pAttachments, POINTER_SUFFIX "%p").c_str(),
             rectCount,
-            PrintArrayWithFormatter(rectCount, pRects, "0x%p").c_str());
+            PrintArrayWithFormatter(rectCount, pRects, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdClearAttachments(commandBuffer, attachmentCount, pAttachments, rectCount, pRects);
@@ -1317,14 +1342,14 @@ void VktWrappedCmdBuf::CmdResolveImage(VkCommandBuffer commandBuffer, VkImage sr
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %s, 0x%p, %s, %u, 0x%p",
-            commandBuffer,
-            srcImage,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s, %s, %u, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
+            VktUtil::WriteUint64AsString((uint64_t)srcImage),
             VktUtil::WriteImageLayoutEnumAsString(srcImageLayout),
-            dstImage,
+            VktUtil::WriteUint64AsString((uint64_t)dstImage),
             VktUtil::WriteImageLayoutEnumAsString(dstImageLayout),
             regionCount,
-            PrintArrayWithFormatter(regionCount, pRegions, "0x%p").c_str());
+            PrintArrayWithFormatter(regionCount, pRegions, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdResolveImage(commandBuffer, srcImage, srcImageLayout, dstImage, dstImageLayout, regionCount, pRegions);
@@ -1345,9 +1370,9 @@ void VktWrappedCmdBuf::CmdSetEvent(VkCommandBuffer commandBuffer, VkEvent event,
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %s",
-            commandBuffer,
-            event,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
+            VktUtil::WriteUint64AsString((uint64_t)event),
             VktUtil::DecomposePipelineStageFlagsEnumAsString(stageMask).c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
@@ -1369,9 +1394,9 @@ void VktWrappedCmdBuf::CmdResetEvent(VkCommandBuffer commandBuffer, VkEvent even
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %s",
-            commandBuffer,
-            event,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
+            VktUtil::WriteUint64AsString((uint64_t)event),
             VktUtil::DecomposePipelineStageFlagsEnumAsString(stageMask).c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
@@ -1393,18 +1418,18 @@ void VktWrappedCmdBuf::CmdWaitEvents(VkCommandBuffer commandBuffer, uint32_t eve
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, 0x%p, %s, %s, %u, 0x%p, %u, 0x%p, %u, 0x%p",
-            commandBuffer,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s, %s, %s, %u, %s, %u, %s, %u, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
             eventCount,
-            PrintArrayWithFormatter(eventCount, pEvents, "0x%p").c_str(),
+            PrintArrayWithFormatter(eventCount, pEvents, POINTER_SUFFIX "%p").c_str(),
             VktUtil::DecomposePipelineStageFlagsEnumAsString(srcStageMask).c_str(),
             VktUtil::DecomposePipelineStageFlagsEnumAsString(dstStageMask).c_str(),
             memoryBarrierCount,
-            PrintArrayWithFormatter(memoryBarrierCount, pMemoryBarriers, "0x%p").c_str(),
+            PrintArrayWithFormatter(memoryBarrierCount, pMemoryBarriers, POINTER_SUFFIX "%p").c_str(),
             bufferMemoryBarrierCount,
-            PrintArrayWithFormatter(bufferMemoryBarrierCount, pBufferMemoryBarriers, "0x%p").c_str(),
+            PrintArrayWithFormatter(bufferMemoryBarrierCount, pBufferMemoryBarriers, POINTER_SUFFIX "%p").c_str(),
             imageMemoryBarrierCount,
-            PrintArrayWithFormatter(imageMemoryBarrierCount, pImageMemoryBarriers, "0x%p").c_str());
+            PrintArrayWithFormatter(imageMemoryBarrierCount, pImageMemoryBarriers, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdWaitEvents(commandBuffer, eventCount, pEvents, srcStageMask, dstStageMask, memoryBarrierCount, pMemoryBarriers, bufferMemoryBarrierCount, pBufferMemoryBarriers, imageMemoryBarrierCount, pImageMemoryBarriers);
@@ -1425,17 +1450,17 @@ void VktWrappedCmdBuf::CmdPipelineBarrier(VkCommandBuffer commandBuffer, VkPipel
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %s, %s, %s, %u, 0x%p, %u, 0x%p, %u, 0x%p",
-            commandBuffer,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s, %u, %s, %u, %s, %u, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
             VktUtil::DecomposePipelineStageFlagsEnumAsString(srcStageMask).c_str(),
             VktUtil::DecomposePipelineStageFlagsEnumAsString(dstStageMask).c_str(),
             VktUtil::DecomposeDependencyFlagsEnumAsString(dependencyFlags).c_str(),
             memoryBarrierCount,
-            PrintArrayWithFormatter(memoryBarrierCount, pMemoryBarriers, "0x%p").c_str(),
+            PrintArrayWithFormatter(memoryBarrierCount, pMemoryBarriers, POINTER_SUFFIX "%p").c_str(),
             bufferMemoryBarrierCount,
-            PrintArrayWithFormatter(bufferMemoryBarrierCount, pBufferMemoryBarriers, "0x%p").c_str(),
+            PrintArrayWithFormatter(bufferMemoryBarrierCount, pBufferMemoryBarriers, POINTER_SUFFIX "%p").c_str(),
             imageMemoryBarrierCount,
-            PrintArrayWithFormatter(imageMemoryBarrierCount, pImageMemoryBarriers, "0x%p").c_str());
+            PrintArrayWithFormatter(imageMemoryBarrierCount, pImageMemoryBarriers, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdPipelineBarrier(commandBuffer, srcStageMask, dstStageMask, dependencyFlags, memoryBarrierCount, pMemoryBarriers, bufferMemoryBarrierCount, pBufferMemoryBarriers, imageMemoryBarrierCount, pImageMemoryBarriers);
@@ -1456,9 +1481,9 @@ void VktWrappedCmdBuf::CmdBeginQuery(VkCommandBuffer commandBuffer, VkQueryPool 
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %u, %s",
-            commandBuffer,
-            queryPool,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %u, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
+            VktUtil::WriteUint64AsString((uint64_t)queryPool),
             query,
             VktUtil::DecomposeQueryControlFlagsEnumAsString(flags).c_str());
 
@@ -1481,7 +1506,10 @@ void VktWrappedCmdBuf::CmdEndQuery(VkCommandBuffer commandBuffer, VkQueryPool qu
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %u", commandBuffer, queryPool, query);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %u",
+            VktUtil::WritePointerAsString(commandBuffer),
+            VktUtil::WriteUint64AsString((uint64_t)queryPool),
+            query);
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdEndQuery(commandBuffer, queryPool, query);
@@ -1502,7 +1530,11 @@ void VktWrappedCmdBuf::CmdResetQueryPool(VkCommandBuffer commandBuffer, VkQueryP
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %u, %u", commandBuffer, queryPool, firstQuery, queryCount);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %u, %u",
+            VktUtil::WritePointerAsString(commandBuffer),
+            VktUtil::WriteUint64AsString((uint64_t)queryPool),
+            firstQuery,
+            queryCount);
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdResetQueryPool(commandBuffer, queryPool, firstQuery, queryCount);
@@ -1523,10 +1555,10 @@ void VktWrappedCmdBuf::CmdWriteTimestamp(VkCommandBuffer commandBuffer, VkPipeli
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %s, 0x%p, %u",
-            commandBuffer,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %u",
+            VktUtil::WritePointerAsString(commandBuffer),
             VktUtil::DecomposePipelineStageFlagsEnumAsString(pipelineStage).c_str(),
-            queryPool,
+            VktUtil::WriteUint64AsString((uint64_t)queryPool),
             query);
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
@@ -1548,12 +1580,12 @@ void VktWrappedCmdBuf::CmdCopyQueryPoolResults(VkCommandBuffer commandBuffer, Vk
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %u, %u, 0x%p, %llu, %llu, %s",
-            commandBuffer,
-            queryPool,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %u, %u, %s, %llu, %llu, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
+            VktUtil::WriteUint64AsString((uint64_t)queryPool),
             firstQuery,
             queryCount,
-            dstBuffer,
+            VktUtil::WriteUint64AsString((uint64_t)dstBuffer),
             dstOffset,
             stride,
             VktUtil::DecomposeQueryResultFlagsEnumAsString(flags).c_str());
@@ -1577,13 +1609,13 @@ void VktWrappedCmdBuf::CmdPushConstants(VkCommandBuffer commandBuffer, VkPipelin
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %s, %u, %u, 0x%p",
-            commandBuffer,
-            layout,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %u, %u, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
+            VktUtil::WriteUint64AsString((uint64_t)layout),
             VktUtil::DecomposeShaderStageFlagsEnumAsString(stageFlags).c_str(),
             offset,
             size,
-            pValues);
+            VktUtil::WritePointerAsString(pValues));
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdPushConstants(commandBuffer, layout, stageFlags, offset, size, pValues);
@@ -1604,9 +1636,9 @@ void VktWrappedCmdBuf::CmdBeginRenderPass(VkCommandBuffer commandBuffer, const V
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %s",
-            commandBuffer,
-            pRenderPassBegin,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
+            VktUtil::WritePointerAsString(pRenderPassBegin),
             VktUtil::WriteSubpassContentsEnumAsString(contents));
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
@@ -1628,8 +1660,8 @@ void VktWrappedCmdBuf::CmdNextSubpass(VkCommandBuffer commandBuffer, VkSubpassCo
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %s",
-            commandBuffer,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
             VktUtil::WriteSubpassContentsEnumAsString(contents));
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
@@ -1651,7 +1683,7 @@ void VktWrappedCmdBuf::CmdEndRenderPass(VkCommandBuffer commandBuffer)
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p", commandBuffer);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s", VktUtil::WritePointerAsString(commandBuffer));
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdEndRenderPass(commandBuffer);
@@ -1672,10 +1704,10 @@ void VktWrappedCmdBuf::CmdExecuteCommands(VkCommandBuffer commandBuffer, uint32_
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, 0x%p",
-            commandBuffer,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s",
+            VktUtil::WritePointerAsString(commandBuffer),
             commandBufferCount,
-            PrintArrayWithFormatter(commandBufferCount, pCommandBuffers, "0x%p").c_str());
+            PrintArrayWithFormatter(commandBufferCount, pCommandBuffers, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdExecuteCommands(commandBuffer, commandBufferCount, pCommandBuffers);
