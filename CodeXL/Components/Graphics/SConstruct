@@ -24,7 +24,12 @@ Help(GPS_vars.GenerateHelpText(GPS_env))
 GPS_env.PerfAPIVersion = "2_20"
 GPS_env.BoostVersion = "1_59_0"
 
+# Set the versions of external graphics libraries
+GPS_env.jpglib = "jpeg-9"
+GPS_env.libpng = "v1.6.19/src"
+
 # set the default build parameters
+GPS_env.CommonPath = "../"
 GPS_env.archConfig = "x64"
 GPS_env.buildConfig = "Debug"
 GPS_env.libConfig = ""
@@ -39,8 +44,6 @@ GPS_env.projectSuffix = ""
 GPS_env.projectName = "GPUPerfServer"
 GPS_env.capturePlayerName = "CapturePlayer"
 GPS_env.vulkanPluginName = "VulkanServer"
-GPS_env.jpglib = "jpeg-9"
-GPS_env.libpng = "v1.6.19/src"
 
 buildTests = False
 buildInternal = False
@@ -58,6 +61,7 @@ for key, value in ARGLIST:
         buildInternal = True
         GPS_env.buildSuffix = "-Internal"
     elif key == 'CodeXL' and value == '1':
+        GPS_env.CommonPath = "../../../"
         GPS_env.projectName = "CXLGraphicsServer"
         GPS_env.capturePlayerName = "CXLGraphicsServerPlayer"
         GPS_env.vulkanPluginName = "CXLGraphicsServerVulkan"
@@ -84,44 +88,44 @@ GPS_env.projectSuffix = GPS_env.platformSuffix + GPS_env.debugSuffix + GPS_env.b
 GPS_env.targetRoot = "bin/" + GPS_env.configPath
 if buildCodeXL == True:
     if GPS_env.archConfig == 'x64':
-        GPS_env.targetRoot = "Output_x86_64/" + GPS_env.configPath + "/bin"
+        GPS_env.targetRoot = GPS_env.CommonPath + "Output_x86_64/" + GPS_env.configPath + "/bin"
     else:
-        GPS_env.targetRoot = "Output_x86/" + GPS_env.configPath + "/bin"
+        GPS_env.targetRoot = GPS_env.CommonPath + "Output_x86/" + GPS_env.configPath + "/bin"
 
 # Compiler header include search directories
 # Include paths for BaseTools, OSWrappers and other libraries
 GPS_env['BASE_PATH'] = \
 [
-    '../Common',
-    '../Common/Lib/Ext/tinyxml/2.6.2',
-    '../Common/Lib/Ext/zlib/1.2.8',
-    '../Common/Src',
-    '../Common/Src/AMDTBaseTools/src',
-    '../Common/Src/AMDTOSWrappers/src',
-    '../Common/Src/AMDTOSWrappers/Include',
+    GPS_env.CommonPath + 'Common',
+    GPS_env.CommonPath + 'Common/Lib/Ext/tinyxml/2.6.2',
+    GPS_env.CommonPath + 'Common/Lib/Ext/zlib/1.2.8',
+    GPS_env.CommonPath + 'Common/Src',
+    GPS_env.CommonPath + 'Common/Src/AMDTBaseTools/src',
+    GPS_env.CommonPath + 'Common/Src/AMDTOSWrappers/src',
+    GPS_env.CommonPath + 'Common/Src/AMDTOSWrappers/Include',
 ]
 
 # Include paths for GLServer and WebServer
 GPS_env['GPS_PATH'] = \
 [
-    '../../Server/Common',
-    '../../Server/Common/Linux',
-    '../../../Common/Src',
-    '../../../Common/Src/ADLUtil',
-    '../../../Common/Src/AMDLoggingRegistration',
-    '../../../Common/Src/AMDTMutex',
-    '../../../Common/Src/DDS',
-    '../../../Common/Src/Sushi3/Common/include',
-    '../../../Common/Lib/AMD/ADL/include',
-    '../../../Common/Lib/AMD/ShaderDebugger/1.5/Include',
-    '../../../Common/Lib/AMD/GPUPerfAPI/' + GPS_env.PerfAPIVersion + '/Include',
-    '../../../Common/Lib/AMD/GPUThreadTrace/1_0/Include',
-    '../../../Common/Lib/Ext/Boost/boost_' + GPS_env.BoostVersion,
-    '../../../Common/Lib/Ext/libpng/' + GPS_env.libpng,
-    '../../../Common/Lib/Ext/jpglib/' + GPS_env.jpglib,
-    '../../../Common/Src/ShaderUtils',
-    '../../../Common/Src',
-    '../../../Common/Src/AMDTOSWrappers/Include',
+    GPS_env.CommonPath + '../Server/Common',
+    GPS_env.CommonPath + '../Server/Common/Linux',
+    GPS_env.CommonPath + '../../Common/Src',
+    GPS_env.CommonPath + '../../Common/Src/ADLUtil',
+    GPS_env.CommonPath + '../../Common/Src/AMDLoggingRegistration',
+    GPS_env.CommonPath + '../../Common/Src/AMDTMutex',
+    GPS_env.CommonPath + '../../Common/Src/DDS',
+    GPS_env.CommonPath + '../../Common/Src/Sushi3/Common/include',
+    GPS_env.CommonPath + '../../Common/Lib/AMD/ADL/include',
+    GPS_env.CommonPath + '../../Common/Lib/AMD/ShaderDebugger/1.5/Include',
+    GPS_env.CommonPath + '../../Common/Lib/AMD/GPUPerfAPI/' + GPS_env.PerfAPIVersion + '/Include',
+    GPS_env.CommonPath + '../../Common/Lib/AMD/GPUThreadTrace/1_0/Include',
+    GPS_env.CommonPath + '../../Common/Lib/Ext/Boost/boost_' + GPS_env.BoostVersion,
+    GPS_env.CommonPath + '../../Common/Lib/Ext/libpng/' + GPS_env.libpng,
+    GPS_env.CommonPath + '../../Common/Lib/Ext/jpglib/' + GPS_env.jpglib,
+    GPS_env.CommonPath + '../../Common/Src/ShaderUtils',
+    GPS_env.CommonPath + '../../Common/Src',
+    GPS_env.CommonPath + '../../Common/Src/AMDTOSWrappers/Include',
 ]
 
 # Additional linker library paths
@@ -132,7 +136,7 @@ GPS_env['GPS_LIBPATH'] = \
     '/usr/lib/' + GPS_env.gnuConfig,
     '../../obj/' + GPS_env.platformPath + '/GPUPerfStudioLegacy/Server/Common',
     '../../obj/' + GPS_env.platformPath + '/GPUPerfStudioLegacy',
-    '../../../Common/Lib/Ext/Boost/boost_' + GPS_env.BoostVersion + '/lib/RHEL6/' + GPS_env.extConfig,
+    GPS_env.CommonPath + '../../Common/Lib/Ext/Boost/boost_' + GPS_env.BoostVersion + '/lib/RHEL6/' + GPS_env.extConfig,
 ]
 
 # Compiler flags
@@ -180,7 +184,7 @@ initGtk(GPS_env);
 Export('GPS_env');
 
 # Build script for BaseTools / OSWrappers
-OSWrappers_Obj = SConscript(['SConscript'], src_dir='../', variant_dir=fullPath, duplicate=0)
+OSWrappers_Obj = SConscript(['SConscript'], src_dir=GPS_env.CommonPath, variant_dir=fullPath, duplicate=0)
 
 # build script for Server/Common
 APICommon_Obj = SConscript(['Server/Common/SConscript'], variant_dir=fullPath + '/GPUPerfStudioLegacy/Server/Common', duplicate=0)
@@ -207,13 +211,14 @@ Depends(VulkanServer, APICommon_Obj + OSWrappers_Obj)
 targetName = GPS_env.targetRoot + "/Plugins/" + GPS_env.vulkanPluginName + GPS_env.projectSuffix + ".so"
 Command(targetName, fullPath + "/GPUPerfStudioLegacy/Server/VulkanServer/libVulkanServer.so", Copy("$TARGET", "$SOURCE"))
 
-# build script for Vulkan capture player
-CapturePlayer = SConscript(['Server/CapturePlayer/SConscript'], variant_dir=fullPath + '/GPUPerfStudioLegacy/Server/CapturePlayer', duplicate=0)
-Depends(CapturePlayer, APICommon_Obj + OSWrappers_Obj)
-targetName = GPS_env.targetRoot + "/" + GPS_env.capturePlayerName + GPS_env.projectSuffix
-Command(targetName, fullPath + "/GPUPerfStudioLegacy/Server/CapturePlayer/CapturePlayer", Copy("$TARGET", "$SOURCE"))
+if buildCodeXL == True:
+    # build script for Vulkan capture player
+    CapturePlayer = SConscript(['Server/CapturePlayer/SConscript'], variant_dir=fullPath + '/GPUPerfStudioLegacy/Server/CapturePlayer', duplicate=0)
+    Depends(CapturePlayer, APICommon_Obj + OSWrappers_Obj)
+    targetName = GPS_env.targetRoot + "/" + GPS_env.capturePlayerName + GPS_env.projectSuffix
+    Command(targetName, fullPath + "/GPUPerfStudioLegacy/Server/CapturePlayer/CapturePlayer", Copy("$TARGET", "$SOURCE"))
 
-# Build the main executable
+# Build the graphics server
 GPUPerfServer = SConscript(['Server/WebServer/SConscript'], variant_dir=fullPath+'/GPUPerfStudioLegacy/Server/WebServer', duplicate=0)
 Depends(GPUPerfServer, APICommon_Obj + OSWrappers_Obj)
 targetName = GPS_env.targetRoot + "/" + GPS_env.projectName + GPS_env.projectSuffix
