@@ -149,8 +149,8 @@ int IntializeCoreData(CoreData* pCoreClientData,
     }
     else
     {
-        coreSpecficMask = config->m_apuCounterMask & PERCORE_ATTRIBUTE_MASK;
-        pCoreClientData->m_counterMask = coreSpecficMask | (config->m_apuCounterMask & 0xF);
+        coreSpecficMask = config->m_apuCounterMask & PWR_PERCORE_COUNTER_MASK;
+        pCoreClientData->m_counterMask = coreSpecficMask;
     }
 
     return 0;

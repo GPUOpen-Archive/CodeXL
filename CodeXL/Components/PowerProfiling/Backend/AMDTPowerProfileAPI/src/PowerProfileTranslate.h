@@ -28,6 +28,10 @@
     #include <CpuProfilingTranslationDLLBuild.h>
 #endif
 
+#if (defined (GDT_INTERNAL) || defined(GDT_NDA))
+    #include <AMDTPowerProfileSmu9Api-Internal.h>
+#endif
+
 #define TRANSLATION_POOL_SIZE 2*1048576 // 2MB
 // Maximum value to check the validity
 #define MAX_POWER         256
@@ -74,7 +78,25 @@
     };
 #define SMU8_PROCESS_RAWDATA(out, raw) {union IEEE754Decode pack; pack.u32 = raw; out = pack.f32;}
 
+#ifndef PWR_CONFIGURE_SMU9
+    #define PWR_CONFIGURE_SMU9
+#endif
 
+#ifndef PWR_SMU9_GET_DECODED_ENERGY
+    #define PWR_SMU9_GET_DECODED_ENERGY(raw, out) out = (AMDTFloat32)raw;
+#endif
+
+#ifndef PWR_FILL_SMU9_REGISTER_DETAILS
+    #define PWR_FILL_SMU9_REGISTER_DETAILS(psmu)
+#endif
+
+#ifndef PWR_SMU9_DECODE_COUNTER
+    #define PWR_SMU9_DECODE_COUNTER(decodeInfo, out, raw, idx, sys, time) 0
+#endif
+
+#ifndef PWR_FAMILY17_DECODE_MSR_COUNTER
+    #define PWR_FAMILY17_DECODE_MSR_COUNTER(decodeInfo, rawData, out) *out = (AMDTFloat32)rawData
+#endif
     /****************************************************************************/
     typedef struct SampleConfig
     {
@@ -83,6 +105,12 @@
         AMDTUInt16 m_sampleId;
         AMDTUInt16 m_counter[MAX_COUNTER_CNT];
     } SampleConfig;
+
+    typedef struct PwrCoreConfig
+    {
+        AMDTUInt32                        m_sampleId;
+        std::vector<PwrCounterDecodeInfo> m_counters;
+    } PwrCoreConfig;
 
     typedef struct SampleConfigList
     {
@@ -166,6 +194,9 @@
 
         AMDTResult GetProcessedList(AMDTPwrProcessedDataRecord* pData);
 
+        // InsertSampleToSystemTree: Insert each sample to system tree with corresponding power
+        AMDTResult InsertSampleToSystemTree(SampleData* pCtx, AMDTFloat32 power, AMDTUInt32 sampleCnt);
+
         // Get the profile start/end absolute time stamps
         AMDTResult GetSessionTimeStamps(AMDTUInt64& startTs, AMDTUInt64& endTs)
         {
@@ -180,9 +211,6 @@
         }
 
         RawDataReader* GetRawDataHandle() { return m_rawFileHld;}
-
-        //Prepare the configured attribute list
-        AMDTResult PrepareAttrList();
 
         //GetTargetSystemInfo
         AMDTResult GetTargetSystemInfo(AMDTUInt32* pFamily, AMDTUInt32* pModel, AMDTUInt32* pCoreCnt, AMDTUInt32* pCuCnt)\
@@ -206,24 +234,6 @@
     protected:
         RawDataReader* m_rawFileHld;
     private:
-
-        // Decode dGPU counter data
-        AMDTResult DecodeDgpuData(AMDTUInt8* pData,
-                                  AMDTUInt32* pOffset,
-                                  AMDTUInt32 counterId,
-                                  AMDTPwrAttributeInfo* pInfo,
-                                  AMDTUInt32* pLen);
-
-        //DecodeRegisters -decode register values to meaningful data
-        AMDTResult DecodeData(AMDTUInt32 coreId,
-                              AMDTUInt8* pData,
-                              AMDTUInt32* pOffset,
-                              AMDTUInt32 counterId,
-                              AMDTPwrAttributeInfo* pInfo,
-                              AMDTUInt32* pLen);
-
-        //GetAttributeLength
-        AMDTResult GetAttributeLength(AMDTUInt32 attrId, AMDTUInt32 coreCnt, AMDTUInt32* pLen);
 
         void SetElapsedTime(AMDTUInt64 raw, AMDTUInt64* pResult);
 
@@ -256,8 +266,16 @@
         // ProcessSample: Process each data sample for process/module/ip profiling
         AMDTResult ProcessSample(ContextData* pCtx, AMDTFloat32 ipc, AMDTUInt32 coreId);
 
-        // InsertSampleToSystemTree: Insert each sample to system tree with corresponding power
-        AMDTResult InsertSampleToSystemTree(SampleData* pCtx, AMDTFloat32 power, AMDTUInt32 sampleCnt);
+        AMDTResult PwrSetCoreConfigs(void);
+
+
+        PwrCoreConfig* PwrGetCoreConfig(AMDTUInt16 sampleId);
+
+
+        AMDTUInt32 DecodeNodeCounters(PwrCounterDecodeInfo* pDecodeInfo, AMDTPwrProcessedDataRecord* pOut, AMDTUInt8* pRaw);
+        AMDTUInt32 DecodeSmu7Counters(PwrCounterDecodeInfo* pDecodeInfo, AMDTPwrProcessedDataRecord* pOut, AMDTUInt8* pRaw, AMDTUInt32* pIdx);
+        AMDTUInt32 DecodeSmu8Counters(PwrCounterDecodeInfo* pDecodeInfo, AMDTPwrProcessedDataRecord* pOut, AMDTUInt8* pRaw, AMDTUInt32* pIdx);
+        AMDTUInt32 DecodeSmu7DgpuCounters(PwrCounterDecodeInfo* pDecodeInfo, AMDTPwrProcessedDataRecord* pOut, AMDTUInt8* pRaw);
 
         //Attribute list in the raw record
         SampleConfigList m_configList;
@@ -305,6 +323,8 @@
         AMDTUInt64 m_prevTs1;
         AMDTUInt64 m_perfCounter;
         AMDTUInt64 m_perfFreq;
+
+        std::vector <PwrCoreConfig> m_coreConfigs;
     };
 
 #endif //_POWER_PROFILE_TRANSLATE_H_

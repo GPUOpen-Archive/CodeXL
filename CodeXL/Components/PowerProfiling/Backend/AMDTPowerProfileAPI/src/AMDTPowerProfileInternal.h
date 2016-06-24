@@ -11,6 +11,8 @@
 #include <AMDTDefinitions.h>
 #include <AMDTRawDataFileHeader.h>
 #include <AMDTPowerProfileDataTypes.h>
+#include <AMDTBaseTools/Include/gtMap.h>
+#include <AMDTBaseTools/Include/gtVector.h>
 
 #define MAX_CORE_CNT (64)
 #define MAX_COUNTER_CNT (100)
@@ -26,7 +28,8 @@
 #define BASIC_ATTR_VALUE_CNT    (3)
 #define AMD_VENDOR_ID           0x1002
 #define AMD_VENDOR_ID1          0x1022
-#define PWR_MAX_DEVICE_LIST_SIZE 150
+#define PWR_MAX_DEVICE_LIST_SIZE 250
+
 
 typedef enum CXLContextProfileType
 {
@@ -97,7 +100,7 @@ enum DeviceType
 };
 
 // PciDeviceInfo: PCIe information
-struct PciDeviceInfo
+typedef struct PciDeviceInfo
 {
     HardwareType    m_hardwareType;
     AMDTUInt32      m_deviceId;
@@ -106,7 +109,7 @@ struct PciDeviceInfo
     char            m_name[PWR_MAX_NAME_LEN];
     char            m_shortName[PWR_MAX_NAME_LEN];
     AMDTUInt32      m_smuIpVersion;
-};
+}PciDeviceInfo;
 
 // PlatformInfo: AMD platform information
 struct PlatformInfo
@@ -144,6 +147,7 @@ struct AMDTPwrTargetSystemInfo
 enum PwrCategory
 {
     CATEGORY_POWER,        // Instantaneous power
+	CATEGORY_ENERGY,       // Energy in joules
     CATEGORY_FREQUENCY,    // Frequency
     CATEGORY_TEMPERATURE,  // Temperature in centegrade
     CATEGORY_VOLTAGE,      // Volatage
@@ -181,7 +185,7 @@ enum AMDTPwrAttributeInstanceType
 
 //Following structure are used in Data access APIs
 //AttributeTypeInfo: Attribute data type and length
-struct AMDTPwrAttributeTypeInfo
+struct AMDTPwrCounterBasicInfo
 {
     AMDTUInt32 m_attrId;
     AMDTUInt16 m_len;                             // Length in bytes
@@ -190,13 +194,15 @@ struct AMDTPwrAttributeTypeInfo
     AMDTPwrAttributeUnitType m_unitType;          // The attribute's unit type
     PwrCategory              m_category;
     AMDTPwrAttributeInstanceType m_instanceType;  // single/Cu/Core
+    AMDTDeviceType               m_deviceType;
+    AMDTUInt32                   m_aggr;
 };
 
 //AMDTPwrProfileAttributeList: Attribute list
 struct AMDTPwrProfileAttributeList
 {
     AMDTUInt32 attrCnt;
-    AMDTPwrAttributeTypeInfo* pAttrList;
+    AMDTPwrCounterBasicInfo* pAttrList;
 };
 
 // PwrInstrumentedPowerData:
@@ -216,10 +222,10 @@ struct AMDTPwrAttributeInfo
     AMDTUInt32      m_instanceId;
     union
     {
-        AMDTUInt64  m_value64;
-        AMDTFloat32 m_float32;
-    } u;
-    AMDTPwrAttributeTypeInfo*  m_pInfo;         //Attribute type information
+        AMDTUInt64        m_value64;
+        AMDTFloat32       m_float32;
+    };
+    AMDTUInt32            m_counterId;
 };
 
 // PowerData:
@@ -230,13 +236,6 @@ typedef struct PowerData
     AMDTFloat32      m_totalIpc;
     AMDTPwrProcessInfo  m_process[MAX_PID_CNT];
 } PowerData;
-
-typedef struct
-{
-    AMDTUInt32   m_binCnt;
-    AMDTFloat32  m_pRangeStartIndex[MAX_BIN_CNT + 1];
-    AMDTFloat32  m_pRangeValue[MAX_BIN_CNT + 1];
-} Histogram;
 
 typedef struct PwrCounterDecodeInfo
 {
@@ -249,14 +248,16 @@ typedef struct PwrCounterDecodeInfo
 } PwrCounterDecodeInfo;
 
 // DerivedCounter: to hold the accumulated and histogram counter value
-typedef struct
+typedef struct PwrDerivedCounter
 {
     union
     {
-        Histogram   m_histogram[MAX_INSTANCE_CNT];
-        AMDTFloat32 m_value[MAX_INSTANCE_CNT];
+        AMDTPwrHistogram   m_histogram;
+        AMDTFloat32        m_value;
     };
-} DerivedCounter;
+} PwrDerivedCounter;
+typedef gtMap<AMDTUInt32, AMDTPwrAttributeInfo>     PwrDecodedCounterMap;
+typedef gtMap<AMDTUInt32, AMDTUInt32>     TestMap;
 
 //AMDTPwrProcessedDataRecord: Processed profile data
 //A processed record is represent by AMDTPwrProcessedDataRecord.
@@ -272,7 +273,7 @@ struct AMDTPwrProcessedDataRecord
     AMDTUInt64                m_ts;
     AMDTPwrProcessedDataType  m_recordType;
     AMDTUInt32                m_attrCnt;                //Number of attributes in the record
-    AMDTPwrAttributeInfo      m_attr[MAX_COUNTER_CNT];
+    PwrDecodedCounterMap      m_counters;
 };
 
 // Process name structure
@@ -283,6 +284,19 @@ typedef struct ProcessName
     char       m_path[AMDT_PWR_EXE_PATH_LENGTH];
 
 } ProcessName;
+
+typedef struct PwrCounterInfo
+{
+    AMDTUInt32                    m_instanceId;
+    AMDTPwrAttributeInstanceType  m_instanceType;
+    bool                          m_isActive;
+    AMDTUInt32                    m_pkgId;
+    AMDTPwrCounterDesc            m_desc;
+    AMDTPwrCounterBasicInfo       m_basicInfo;
+} PwrCounterInfo;
+
+// counterId, CounterInfo
+typedef gtMap<AMDTUInt32, PwrCounterInfo> PwrSupportedCounterMap;
 
 #endif //_AMDTPOWERPROFILEPUBLIC_H_
 

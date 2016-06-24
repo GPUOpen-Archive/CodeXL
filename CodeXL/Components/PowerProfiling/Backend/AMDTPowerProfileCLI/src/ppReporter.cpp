@@ -302,9 +302,13 @@ void ppReporterText::ConstructProfiledCounterDataHdr(AMDTPwrSample*& sample)
     for (AMDTUInt32 j = 0; j < pSample->m_numOfValues; j++)
     {
         AMDTUInt32 counterId = pSample->m_counterValues[j].m_counterID;
-        gtString counterName = m_supportedCounterIdNameVec[counterId];
+        PwrSupportedCounterDetailsMap::iterator iter = g_supportedCounters.find(counterId);
 
-        sprintf(m_pDataStr, "%-17.17s ", counterName.asASCIICharArray());
+        if (iter != g_supportedCounters.end())
+        {
+            sprintf(m_pDataStr, "%-17.17s ", iter->second.m_modifiedName);
+        }
+
         m_dataStr.append(m_pDataStr);
     }
 

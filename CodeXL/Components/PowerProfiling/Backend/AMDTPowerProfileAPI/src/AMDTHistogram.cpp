@@ -11,11 +11,16 @@
 #include <AMDTPowerProfileApiInternal.h>
 #include <PowerProfileHelper.h>
 #include <AMDTHistogram.h>
+#include <PowerProfileHelper.h>
 #include <stdio.h>
 #include <string.h>
 
 #define FREQ_BIN_CNT 10
-static DerivedCounter g_derivedCounter[MAX_COUNTER_CNT];
+extern MemoryPool g_transPool;
+
+// counteris, DerivedCounter
+typedef gtMap<AMDTUInt32, PwrDerivedCounter> PwrDerivedCounterMap;
+static PwrDerivedCounterMap g_derivedCounter;
 
 CounterRange g_hisCounters[] =
 {
@@ -31,53 +36,59 @@ CounterRange g_hisCounters[] =
 // InitHistogram: Initialize histogram counters
 void InitializeHistogram()
 {
-    AMDTUInt32 cnt = 0;
-    AMDTUInt32 steps = 0;
-    AMDTUInt32 loop = 0;
+    g_derivedCounter.clear();
+}
 
-    memset(g_derivedCounter, 0, sizeof(DerivedCounter));
+// AddToHistogram: Add counter values to histogram
+void AddToCumulativeCounter(AMDTUInt32 counterId, AMDTFloat32 value)
+{
+    PwrDerivedCounterMap:: iterator iter = g_derivedCounter.find(counterId);
+    PwrDerivedCounter counter;
 
-    for (cnt = 0; cnt < sizeof(g_hisCounters) / sizeof(CounterRange); cnt++)
+    if (iter != g_derivedCounter.end())
     {
-        AMDTUInt32 idx = g_hisCounters[cnt].m_id;
-
-        for (loop = 0; loop < MAX_INSTANCE_CNT; loop++)
-        {
-            g_derivedCounter[idx].m_histogram[loop].m_binCnt = FREQ_BIN_CNT;
-            g_derivedCounter[idx].m_histogram[loop].m_pRangeStartIndex[0] = 0;
-
-            for (steps = 1; steps <= FREQ_BIN_CNT; steps++)
-            {
-                g_derivedCounter[idx].m_histogram[loop].m_pRangeStartIndex[steps] = steps * g_hisCounters[cnt].m_steps + 1;
-            }
-        }
+        iter->second.m_value += value;
+    }
+    else
+    {
+        counter.m_value = value;
+        g_derivedCounter.insert(PwrDerivedCounterMap::value_type(counterId, counter));
     }
 }
 
 // AddToHistogram: Add counter values to histogram
-void AddToCumulativeCounter(AMDTUInt32 counterId, AMDTUInt32 instanceId, AMDTFloat32 value)
+AMDTResult AddToHistogram(AMDTUInt32 counterId, AMDTFloat32 value)
 {
-    g_derivedCounter[counterId].m_value[instanceId] += value;
-}
-
-// AddToHistogram: Add counter values to histogram
-AMDTResult AddToHistogram(AMDTUInt32 counterId, AMDTUInt32 instanceId, AMDTFloat32 value)
-{
-    AMDTResult ret = AMDT_ERROR_INTERNAL;
+    AMDTResult ret = AMDT_STATUS_OK;
     AMDTUInt32 bucket = 0;
-    AMDTUInt32 cnt = 0;
-    AMDTFloat32 step = 0;
+    AMDTFloat32 step = 200;
+    PwrDerivedCounterMap::iterator iter = g_derivedCounter.find(counterId);
 
-    for (cnt = 0; cnt < sizeof(g_hisCounters) / sizeof(CounterRange); cnt++)
+    bucket = (AMDTUInt32)((value + step - 1) / step - 1);
+
+    if (iter != g_derivedCounter.end())
     {
-        if (counterId == g_hisCounters[cnt].m_id)
+        iter->second.m_histogram.m_pBins[bucket]++;
+    }
+    else
+    {
+        PwrDerivedCounter counter;
+        AMDTUInt32 loop = 0;
+        memset(&counter, 0, sizeof(PwrDerivedCounter));
+        counter.m_histogram.m_counterId = counterId;
+        counter.m_histogram.m_numOfBins = FREQ_BIN_CNT;
+        counter.m_histogram.m_pRange = (AMDTFloat32*)GetMemoryPoolBuffer(&g_transPool, (MAX_BIN_CNT + 1) * sizeof(AMDTFloat32));
+        memset(counter.m_histogram.m_pRange, 0, MAX_BIN_CNT * sizeof(AMDTFloat32));
+        counter.m_histogram.m_pBins = (AMDTFloat32*)GetMemoryPoolBuffer(&g_transPool, MAX_BIN_CNT * sizeof(AMDTFloat32));
+        memset(counter.m_histogram.m_pBins, 0, MAX_BIN_CNT * sizeof(AMDTFloat32));
+
+        for (loop = 1; loop <= FREQ_BIN_CNT + 1; loop++)
         {
-            step = g_hisCounters[cnt].m_steps;
-            bucket = (AMDTUInt32)((value + step - 1) / step - 1);
-            g_derivedCounter[counterId].m_histogram[instanceId].m_pRangeValue[bucket]++;
-            ret = AMDT_STATUS_OK;
-            break;
+            counter.m_histogram.m_pRange[loop] = (AMDTFloat32)(loop * 200 + 1);
         }
+
+        counter.m_histogram.m_pBins[bucket] = 1;
+        g_derivedCounter.insert(PwrDerivedCounterMap::value_type(counterId, counter));
     }
 
     if (AMDT_STATUS_OK != ret)
@@ -89,15 +100,34 @@ AMDTResult AddToHistogram(AMDTUInt32 counterId, AMDTUInt32 instanceId, AMDTFloat
 }
 
 // GetCumulativeCounter: Get the value of cumulative counter
-AMDTFloat32* GetCumulativeCounter(AMDTUInt32 counterId, AMDTUInt32 instanceId)
+AMDTFloat32* GetCumulativeCounter(AMDTUInt32 counterId)
 {
-    return &g_derivedCounter[counterId].m_value[instanceId];
+    PwrDerivedCounterMap::iterator iter = g_derivedCounter.find(counterId);
+
+    if (iter != g_derivedCounter.end())
+    {
+        return &iter->second.m_value;
+    }
+    else
+    {
+        return nullptr;
+    }
 
 }
 
 // GetHistogramCounter: Get the value of histogram counter
-Histogram* GetHistogramCounter(AMDTUInt32 counterId, AMDTUInt32 instanceId)
+AMDTPwrHistogram* GetHistogramCounter(AMDTUInt32 counterId)
 {
-    return &g_derivedCounter[counterId].m_histogram[instanceId];
+    PwrDerivedCounterMap::iterator iter = g_derivedCounter.find(counterId);
+
+    if (iter != g_derivedCounter.end())
+    {
+        return &iter->second.m_histogram;
+    }
+    else
+    {
+        return nullptr;
+    }
+
 }
 

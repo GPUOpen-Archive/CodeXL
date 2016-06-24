@@ -352,7 +352,23 @@ void ppCollect::ValidateProfileOptions()
     return;
 } // ValidateProfileOptions
 
+void GetModifiedName(char* str, char* dest)
+{
+    // counter name used in reporting
+    wchar_t counterNameW[OS_MAX_PATH];
+    memset(counterNameW, 0, sizeof(counterNameW));
 
+    if (NULL != str)
+    {
+        mbstowcs(counterNameW, str, OS_MAX_PATH - 1);
+    }
+
+    gtString counterName(counterNameW);
+    counterName.replace(L" - ", L"-");
+    counterName.replace(L" ", L"-");
+
+    memcpy(dest, counterName.asASCIICharArray(), OS_MAX_PATH);
+}
 AMDTResult ppCollect::EnableProfiling()
 {
     AMDTUInt32 minSamplingRate = 0;
@@ -505,6 +521,20 @@ AMDTResult ppCollect::EnableProfiling()
 
         for (AMDTUInt32 i = 0; i < m_nbrSupportedCounters; i++)
         {
+            PwrSupportedCounterDetails counterDetails;
+            memset(&counterDetails, 0, sizeof(PwrSupportedCounterDetails));
+            counterDetails.m_aggregation = m_pSupportedCountersDesc[i].m_aggregation;
+            counterDetails.m_category = m_pSupportedCountersDesc[i].m_category;
+            counterDetails.m_counterID = m_pSupportedCountersDesc[i].m_counterID;
+            memcpy(counterDetails.m_description , m_pSupportedCountersDesc[i].m_description, strlen(m_pSupportedCountersDesc[i].m_description));
+            counterDetails.m_deviceId = m_pSupportedCountersDesc[i].m_deviceId;
+            counterDetails.m_maxValue = m_pSupportedCountersDesc[i].m_maxValue;
+            counterDetails.m_minValue = m_pSupportedCountersDesc[i].m_minValue;
+            memcpy(counterDetails.m_name , m_pSupportedCountersDesc[i].m_name, strlen(m_pSupportedCountersDesc[i].m_name));
+            counterDetails.m_units = m_pSupportedCountersDesc[i].m_units;
+            GetModifiedName(counterDetails.m_name, counterDetails.m_modifiedName);
+            g_supportedCounters.insert(PwrSupportedCounterDetailsMap::value_type(counterDetails.m_counterID, counterDetails));
+
             // ID-Desc vector (counter-id is used as index)
             m_supportedCounterIdDescVec[m_pSupportedCountersDesc[i].m_counterID] = &m_pSupportedCountersDesc[i];
 

@@ -57,6 +57,8 @@
     <ResourceCompile Include="$(CommonProjectsDir)\VersionInfo\VersionResource.rc" />
   </ItemGroup>
   <ItemGroup>
+   <ClCompile Condition="'$(GDT_BUILD)'=='GDT_INTERNAL'" Include="Non-OpenSource\AMDTPowerProfileSmu9Api-Internal.cpp" />
+    <ClCompile Condition="'$(GDT_BUILD)'=='GDT_NDA'" Include="Non-OpenSource\AMDTPowerProfileSmu9Api-Internal.cpp" />
     <ClCompile Condition="'$(GDT_BUILD)'=='GDT_INTERNAL'" Include="Non-OpenSource\AMDTPowerProfileApi-Internal.cpp" />
     <ClCompile Condition="'$(GDT_BUILD)'=='GDT_NDA'" Include="Non-OpenSource\AMDTPowerProfileApi-Internal.cpp" />
     <ClCompile Include="src\AMDTHistogram.cpp" />

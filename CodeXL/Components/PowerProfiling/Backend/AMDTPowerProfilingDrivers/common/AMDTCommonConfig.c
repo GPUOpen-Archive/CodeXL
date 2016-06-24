@@ -67,6 +67,15 @@ bool FillSmuAccessData(SmuList* srcList, SmuList* destList)
             {
                 switch (destList->m_info[smuCnt].m_smuIpVersion)
                 {
+                    case SMU_IPVERSION_9_0:
+                    {
+                        pSmuFn->fnSmuInit = PwrSmu9SessionInitialize;
+                        pSmuFn->fnSmuClose = PwrSmu9SessionClose;
+                        pSmuFn->fnSmuReadCb = PwrSmu9CollectRegisterValues;
+                        ret = true;
+                        break;
+                    }
+
                     case SMU_IPVERSION_8_0:
                     case SMU_IPVERSION_8_1:
                     {
@@ -153,31 +162,13 @@ void ConfigureSmu(SmuList* pList, bool isOn)
                 continue;
             }
 
-            if ((SMU_IPVERSION_8_0 == pSmu->m_smuIpVersion)
-                || (SMU_IPVERSION_8_1 == pSmu->m_smuIpVersion))
+            if (true == isOn)
             {
-                if (true == isOn)
-                {
-                    pAccess->fnSmuInit(pSmu);
-                }
-                else
-                {
-                    pAccess->fnSmuClose(pSmu);
-                }
+                pAccess->fnSmuInit(pSmu);
             }
-            else if ((SMU_IPVERSION_7_0 == pSmu->m_smuIpVersion)
-                     || (SMU_IPVERSION_7_1 == pSmu->m_smuIpVersion)
-                     || (SMU_IPVERSION_7_2 == pSmu->m_smuIpVersion)
-                     || (SMU_IPVERSION_7_5 == pSmu->m_smuIpVersion))
+            else
             {
-                if (true == isOn)
-                {
-                    pAccess->fnSmuInit(pSmu);
-                }
-                else
-                {
-                    pAccess->fnSmuClose(pSmu);
-                }
+                pAccess->fnSmuClose(pSmu);
             }
         }
     }

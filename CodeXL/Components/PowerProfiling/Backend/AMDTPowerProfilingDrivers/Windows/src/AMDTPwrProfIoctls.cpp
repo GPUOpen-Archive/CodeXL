@@ -415,7 +415,7 @@ NTSTATUS IoctlAddProfConfigsHandler(IN PPWRPROF_DEV_EXTENSION pDevExt,
         }
 
         //Get core specific mask
-        coreCounterMask = pSrcCfg->m_apuCounterMask & PERCORE_ATTRIBUTE_MASK;
+        coreCounterMask = pSrcCfg->m_apuCounterMask & PWR_PERCORE_COUNTER_MASK;
         coreMask = pSrcCfg->m_samplingSpec.m_mask;
 
         // Iterate over all cores and check if mask is set for that core
@@ -520,11 +520,11 @@ NTSTATUS IoctlAddProfConfigsHandler(IN PPWRPROF_DEV_EXTENSION pDevExt,
             {
                 // Set only core specific attributes to other core config
                 // Also add first 3 MUST attributes to the mask
-                pCoreCfg->m_counterMask = coreCounterMask | (pSrcCfg->m_apuCounterMask & 0xF);
+                pCoreCfg->m_counterMask = coreCounterMask;
                 pCoreCfg->m_smuCfg = NULL;
             }
 
-
+            DRVPRINT("confCount %d mask 0x%x", confCount, pCoreCfg->m_counterMask);
             // Fill internal counters if any
             memcpy(&pCoreCfg->m_internalCounter, &internalCounter, sizeof(PwrInternalAddr));
 
@@ -608,7 +608,7 @@ NTSTATUS IoctlStartProfilerHandler(IN PPWRPROF_DEV_EXTENSION pDevExt,
         //intialize profile values
         pClient->m_profileState |= STATE_PROFILING;
     }
-//TODO remove this dead code!!!
+
     if (STATUS_SUCCESS == ret)
     {
         if (STATUS_SUCCESS != ret)

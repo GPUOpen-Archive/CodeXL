@@ -96,4 +96,10 @@ bool Smu7SessionInitialize(void* pSmu);
 // Smu7SessionClose
 bool Smu7SessionClose(void* pSmu);
 
+// GetSmu7CounterSize
+uint32 GetSmu7CounterSize(uint32 counterId);
+
+// GetSmu7DgpuCounterSize
+uint32 GetSmu7DgpuCounterSize(uint32 counterId);
+
 #endif //_SMU7_INTERFACE_H_

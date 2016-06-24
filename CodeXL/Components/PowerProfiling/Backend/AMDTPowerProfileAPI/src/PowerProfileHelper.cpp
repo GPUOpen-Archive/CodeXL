@@ -25,19 +25,6 @@
 
 AMDTPwrProfileAttributeList g_attributeList;
 
-//SetRawAttributeMask:
-AMDTResult SetRawAttributeMask(AMDTUInt16 attributeId, AMDTUInt64* pEventMask)
-{
-    if (attributeId > COUNTERID_MAX_CNT)
-    {
-        return AMDT_ERROR_FAIL;
-    }
-
-    pEventMask[attributeId / 64] |= (1ULL << (attributeId % 64));
-
-    return AMDT_STATUS_OK;
-}
-
 // ReadPciAddress : PCIe Device address read
 bool ReadPciAddress(AMDTUInt32 bus,
                     AMDTUInt32 dev,
@@ -277,7 +264,7 @@ AMDTResult GetCpuFamilyDetails(AMDTUInt32* pFamily, AMDTUInt32* pModel, bool* pI
 }
 
 // GetBitsCount: Get the number of set bits
-AMDTUInt32 GetBitsCount(AMDTUInt64 val)
+AMDTUInt32 GetMaskCount(AMDTUInt64 val)
 {
     AMDTUInt32 cnt; // c accumulates the total bits set in v
 
@@ -290,15 +277,26 @@ AMDTUInt32 GetBitsCount(AMDTUInt64 val)
 }
 
 // GetFirstSetBitIndex: Get the index of first set bit
-bool GetFirstSetBitIndex(AMDTUInt32* core_id, AMDTUInt32 mask)
+bool GetFirstSetBitIndex(AMDTUInt32* core_id, AMDTUInt64 mask)
 {
-#ifdef WIN32
-    return _BitScanForward((unsigned long*)core_id, mask) ? 1 : 0;
-#else
-    *core_id = ffsl(mask) - 1;
+    AMDTUInt32 idx = 0;
 
+    // return _BitScanForward((unsigned long*)core_id, mask) ? 1 : 0;
+    while (mask)
+    {
+        if (mask & 0x01)
+        {
+            break;
+        }
+
+        idx++;
+        mask = mask >> 1;
+
+    }
+
+    *core_id = idx;
     return *core_id ? 1 : 0;
-#endif
+
 }
 
 //GetActiveCoreCount
@@ -442,6 +440,63 @@ AMDTResult DecodeTctlTemperature(AMDTUInt32 raw, AMDTFloat32* pResult)
     }
 
     *pResult = temp;
+    return AMDT_STATUS_OK;
+}
+
+// Create memory pool: memory pool creation for interel use
+AMDTResult CreateMemoryPool(MemoryPool* pPool, AMDTUInt32 size)
+{
+    AMDTResult ret = AMDT_ERROR_OUTOFMEMORY;
+
+    if (NULL != pPool)
+    {
+        pPool->m_pBase = (AMDTUInt8*)malloc(size);
+
+        if (NULL != pPool->m_pBase)
+        {
+            pPool->m_offset = 0;
+            pPool->m_size = size;
+            ret = AMDT_STATUS_OK;
+        }
+    }
+
+    return ret;
+}
+
+// Get buffer from the pool pointer
+AMDTUInt8* GetMemoryPoolBuffer(MemoryPool* pPool, AMDTUInt32 size)
+{
+    AMDTUInt8* pBuffer = NULL;
+
+    if ((NULL == pPool) || ((pPool->m_offset + size) > pPool->m_size))
+    {
+        pBuffer = NULL;
+
+        // Serious error -print the error message?
+    }
+    else
+    {
+        pBuffer = pPool->m_pBase + pPool->m_offset;
+        pPool->m_offset += size;
+    }
+
+    return pBuffer;
+}
+
+// Delete the memory pool
+AMDTResult ReleaseMemoryPool(MemoryPool* pPool)
+{
+    if (NULL != pPool)
+    {
+        if (NULL != pPool->m_pBase)
+        {
+            free(pPool->m_pBase);
+            pPool->m_pBase = NULL;
+            pPool->m_size = 0;
+            pPool->m_offset = 0;
+        }
+    }
+
     return AMDT_STATUS_OK;
 }
 

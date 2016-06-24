@@ -34,7 +34,7 @@
 #define PCORE_MINOR_VERSION  11
 #define PCORE_BUILD_VERSION  0
 #define PWRPROF_MAJOR_VERSION  3
-#define PWRPROF_MINOR_VERSION  8
+#define PWRPROF_MINOR_VERSION  9
 #define PWRPROF_BUILD_VERSION  2
 
 // Linux version
@@ -65,85 +65,71 @@
 #define PWR_MAX_MARKER_CNT (10)
 #define PWR_INTERNAL_COUNTER_BASE (2 * sizeof(uint32) + PWR_MAX_MARKER_CNT * sizeof(MarkerTag))
 #define APU_SMU_ID (1)
-
-// PwrProfileAttrType
-//
-// Attributes for the profile record.
-// One or more attributes can be configure by masking
-// to form a record
-
-typedef enum
+typedef enum PwrBasicCounterIds
 {
-    COUNTERID_MUST_BASE = 1,
-    COUNTERID_SAMPLE_ID = COUNTERID_MUST_BASE,
+    COUNTERID_SAMPLE_ID,
     COUNTERID_RECORD_ID,
     COUNTERID_SAMPLE_TIME,
-    COUNTERID_MUST_MAX = COUNTERID_SAMPLE_TIME,
+    COUNTERID_BASIC_CNT
+} PwrBasicCounterIds;
 
-    //CU specific SMU attributes
-    //reserved from 4 to 39 including CU and non core specific
-    COUNTERID_CU_ATTR_BASE = 4,
-    COUNTERID_SMU7_APU_PWR_CU = COUNTERID_CU_ATTR_BASE,        // Calc Avg Power (CU0-SMU_PM_STATUS_22, CU1-SMU_PM_STATUS_34)
-    COUNTERID_SMU7_APU_TEMP_CU = 5,                                 // Calc Avg Temp(CU0-SMU_PM_STATUS_17, CU1-SMU_PM_STATUS_29)
-    COUNTERID_SMU7_APU_TEMP_MEAS_CU = 6,                            // Measured Avg Temp (CU0-SMU_PM_STATUS_14, CU1-SMU_PM_STATUS_25)
-    COUNTERID_SMU8_APU_PWR_CU = 7,
-    COUNTERID_SMU8_APU_TEMP_CU = 8,
-    COUNTERID_SMU8_APU_TEMP_MEAS_CU = 9,
-    COUNTERID_SMU8_APU_C0STATE_RES = 10,                           // C0 Residency
-    COUNTERID_SMU8_APU_C1STATE_RES = 11,                           // C1 Residency
-    COUNTERID_SMU8_APU_CC6_RES = 12,                              // CC6 Residency
-    COUNTERID_SMU8_APU_PC6_RES = 13,                              // PC6 Residency
-    // TODO: COUNTERID_PSTATE_RESIDENCY = 14, do we really need?
-    COUNTERID_CU_ATTR_MAX = COUNTERID_SMU8_APU_PC6_RES,
+typedef enum PwrNodeCounterIds
+{
+    COUNTERID_PID,
+    COUNTERID_TID,
+    COUNTERID_CEF,
+    COUNTERID_CSTATE_RES,
+    COUNTERID_PSTATE,
+    COUNTERID_FAMILY17_CORE_ENERGY,
+    COUNTERID_PERCORE_END = COUNTERID_FAMILY17_CORE_ENERGY,
+    COUNTERID_NODE_TCTL_TEPERATURE,
+    COUNTERID_SVI2_CORE_TELEMETRY,
+    COUNTERID_SVI2_NB_TELEMETRY,
+    COUNTERID_FAMILY17_PKG_ENERGY,
+    COUNTERID_NODE_MAX_CNT
+} PwrNodeCounterIds;
 
-    // SMU attributes-non core specific
-    COUNTERID_SMU7_APU_PWR_IGPU = 18,         // Calc Avg Power GPU              -  SMU_PM_STATUS_11
-    COUNTERID_SMU7_APU_PWR_PCIE = 19,        // Calc Avg Power PCIe Phy         - SMU_PM_STATUS_83
-    COUNTERID_SMU7_APU_PWR_DDR = 20,         // Calc Avg Power DDR Phy          -SMU_PM_STATUS_81
-    COUNTERID_SMU7_APU_PWR_DISPLAY = 21,     // Calc Avg Power Display Phy      -SMU_PM_STATUS_82
-    COUNTERID_SMU7_APU_PWR_PACKAGE = 22,     // Calc Avg Power Package          - SMU_PM_STATUS_95
-    COUNTERID_SMU7_APU_TEMP_IGPU = 23,        // Calc Avg Temp                   -    SMU_PM_STATUS_6
-    COUNTERID_SMU7_APU_TEMP_MEAS_IGPU = 24,   // Measured Avg Temp GPU         - SMU_PM_STATUS_2
-    COUNTERID_SMU7_APU_FREQ_IGPU = 25,           // Effective GPU frequency (SCLK)  SMU_PM_STATUS_77
-    // SMU8 counters
-    COUNTERID_SMU8_APU_PWR_VDDGFX = 26,
-    COUNTERID_SMU8_APU_PWR_APU = 27,
-    COUNTERID_SMU8_APU_TEMP_VDDGFX = 28,
-    COUNTERID_SMU8_APU_TEMP_MEAS_VDDGFX = 29,
-    COUNTERID_SMU8_APU_FREQ_IGPU = 30,
-    COUNTERID_SMU8_APU_PWR_VDDIO = 31,
-    COUNTERID_SMU8_APU_PWR_VDDNB = 32,
-    COUNTERID_SMU8_APU_PWR_VDDP = 33,
-    COUNTERID_SMU8_APU_PWR_UVD = 34,
-    COUNTERID_SMU8_APU_PWR_VCE = 35,
-    COUNTERID_SMU8_APU_PWR_ACP = 36,
-    COUNTERID_SMU8_APU_PWR_UNB = 37,
-    COUNTERID_SMU8_APU_PWR_SMU = 38,
-    COUNTERID_SMU8_APU_PWR_ROC = 39,
-    COUNTERID_SMU8_APU_FREQ_ACLK = 40,
-    COUNTERID_SMU_ATTR_MAX = COUNTERID_SMU8_APU_FREQ_ACLK,
+#define PWR_PERCORE_COUNTER_MASK ~(~0ULL << (COUNTERID_PERCORE_END +1) )
 
-    // Core Specific sample attributes - this either come from SMU or thru MSRs
-    // Reserved from 50 to 55
-    COUNTERID_CORE_ATTR_BASE = 50,
-    COUNTERID_PID = COUNTERID_CORE_ATTR_BASE,                    // Process Id
-    COUNTERID_TID = 51,                                          // Thread Id
-    COUNTERID_SAMPLE_CALLCHAIN = 52,                             // Call stack sample; TODO - !! NOT NOW !!
-    COUNTERID_CEF = 53,                                          // Core Effective Frequency
-    COUNTERID_CSTATE_RES = 54,                                   // C6 state residency; TODO !! NOT NOW !!
-    COUNTERID_PSTATE = 55,                                       // pState
-    COUNTERID_CORE_ATTR_MAX = COUNTERID_PSTATE,
+typedef enum PwrSmu7CounterIds
+{
+    COUNTERID_SMU7_APU_PWR_CU,
+    COUNTERID_SMU7_APU_TEMP_CU,
+    COUNTERID_SMU7_APU_TEMP_MEAS_CU,
+    COUNTERID_SMU7_APU_PWR_IGPU,
+    COUNTERID_SMU7_APU_PWR_PCIE,
+    COUNTERID_SMU7_APU_PWR_DDR,
+    COUNTERID_SMU7_APU_PWR_DISPLAY,
+    COUNTERID_SMU7_APU_PWR_PACKAGE,
+    COUNTERID_SMU7_APU_TEMP_IGPU,
+    COUNTERID_SMU7_APU_TEMP_MEAS_IGPU,
+    COUNTERID_SMU7_APU_FREQ_IGPU,
+    COUNTERID_SMU7_CNT
+} PwrSmu7CounterIds;
 
-    //Hardware specific non-core attributes
-    COUNTERID_NONCORE_ATTR_BASE = 56,
-    COUNTERID_NODE_TCTL_TEPERATURE = COUNTERID_NONCORE_ATTR_BASE,// Tctl temperature monitoring
-    COUNTERID_SVI2_CORE_TELEMETRY = 57,       // Volt & Current
-    COUNTERID_SVI2_NB_TELEMETRY = 58,         // Volt & Current
-    COUNTERID_NONCORE_ATTR_MAX = COUNTERID_SVI2_NB_TELEMETRY,
-
-    COUNTERID_APU_MAX_CNT  // Max 64 attributes are allowed
-} AMDTPwrProfileAttrType;
-
+typedef enum PwrSmu8CounterIds
+{
+    COUNTERID_SMU8_APU_PWR_CU,
+    COUNTERID_SMU8_APU_TEMP_CU,
+    COUNTERID_SMU8_APU_C0STATE_RES,
+    COUNTERID_SMU8_APU_C1STATE_RES,
+    COUNTERID_SMU8_APU_CC6_RES,
+    COUNTERID_SMU8_APU_PWR_VDDGFX,
+    COUNTERID_SMU8_APU_PWR_APU,
+    COUNTERID_SMU8_APU_TEMP_VDDGFX,
+    COUNTERID_SMU8_APU_FREQ_IGPU,
+    COUNTERID_SMU8_APU_PWR_VDDIO,
+    COUNTERID_SMU8_APU_PWR_VDDNB,
+    COUNTERID_SMU8_APU_PWR_VDDP,
+    COUNTERID_SMU8_APU_PWR_UVD,
+    COUNTERID_SMU8_APU_PWR_VCE,
+    COUNTERID_SMU8_APU_PWR_ACP,
+    COUNTERID_SMU8_APU_PWR_UNB,
+    COUNTERID_SMU8_APU_PWR_SMU,
+    COUNTERID_SMU8_APU_PWR_ROC,
+    COUNTERID_SMU8_APU_FREQ_ACLK,
+    COUNTERID_SMU8_CNT
+} PwrSmu8CounterIds;
 
 #define SMU_IPVERSION_INVALID 255
 #define SMU_IPVERSION_7_0     70
@@ -152,7 +138,7 @@ typedef enum
 #define SMU_IPVERSION_7_5     75
 #define SMU_IPVERSION_8_0     80
 #define SMU_IPVERSION_8_1     81
-
+#define SMU_IPVERSION_9_0     90
 typedef enum
 {
     COUNTERID_PKG_PWR_DGPU,

@@ -159,7 +159,7 @@ static void ReadCoreEffectiveFreqCounters(uint64* pAperf, uint64* pMperf, uint64
 }
 
 // CollectPerCoreCounters:
-bool CollectPerCoreCounters(CoreData* pCoreCfg, uint32* pLength)
+bool CollectNodeCounters(CoreData* pCoreCfg, uint32* pLength)
 {
     bool result = true;
     uint32 idx = 0;
@@ -181,7 +181,7 @@ bool CollectPerCoreCounters(CoreData* pCoreCfg, uint32* pLength)
         pData = pCoreCfg->m_pCoreBuffer->m_pBuffer;
         offset = *pLength;
 
-        for (idx = COUNTERID_CORE_ATTR_BASE; idx <= COUNTERID_CORE_ATTR_MAX; idx++)
+        for (idx = COUNTERID_PID; idx <= COUNTERID_NODE_MAX_CNT; idx++)
         {
             if (false == ((pCoreCfg->m_counterMask >> idx) & 0x01))
             {
@@ -207,9 +207,6 @@ bool CollectPerCoreCounters(CoreData* pCoreCfg, uint32* pLength)
                     offset += sizeof(uint64);
                     break;
                 }
-
-                case COUNTERID_SAMPLE_CALLCHAIN:
-                    break;
 
                 case COUNTERID_CEF:
                 {
@@ -259,48 +256,6 @@ bool CollectPerCoreCounters(CoreData* pCoreCfg, uint32* pLength)
                     break;
                 }
 
-                default:
-                    break;
-            }
-        }
-    }
-
-    *pLength = offset;
-
-    return result;
-}
-
-// CollectNonCoreCounters:
-bool CollectNonCoreCounters(CoreData* pCoreCfg, uint32* pLength)
-{
-    bool result = true;
-    uint32 idx = 0;
-    uint32 offset = 0;
-    uint32* value = NULL;
-    uint8* pData = NULL;
-
-    if ((NULL == pCoreCfg)
-        || (NULL == pCoreCfg->m_pCoreBuffer)
-        || (NULL == pCoreCfg->m_pCoreBuffer->m_pBuffer))
-    {
-        DRVPRINT("InvalidpCoreCfg or pCoreCfg->m_pCoreBuffer->m_pBuffer");
-        result = false;
-    }
-
-    if (true == result)
-    {
-        pData = pCoreCfg->m_pCoreBuffer->m_pBuffer;
-        offset = *pLength;
-
-        for (idx = COUNTERID_NONCORE_ATTR_BASE; idx <= COUNTERID_NONCORE_ATTR_MAX ; idx++)
-        {
-            if (false == ((pCoreCfg->m_counterMask >> idx) & 0x01))
-            {
-                continue;
-            }
-
-            switch (idx)
-            {
                 case COUNTERID_SVI2_CORE_TELEMETRY:
                 {
                     ACCESS_PCI pciData;
@@ -339,6 +294,25 @@ bool CollectNonCoreCounters(CoreData* pCoreCfg, uint32* pLength)
                     break;
                 }
 
+                case COUNTERID_FAMILY17_CORE_ENERGY:
+                {
+                    uint64 energy = HelpReadMsr64(pCoreCfg->m_internalCounter.m_coreEnergyMsr);
+                    value = (uint32*)&pData[offset];
+                    *value = (uint32)energy;
+                    offset += sizeof(uint32);
+                    break;
+                }
+
+                case COUNTERID_FAMILY17_PKG_ENERGY:
+                {
+                    uint64 energy = HelpReadMsr64(pCoreCfg->m_internalCounter.m_packageEnergyMsr);
+                    value = (uint32*)&pData[offset];
+                    *value = (uint32)energy;
+                    offset += sizeof(uint32);
+                    break;
+                }
+
+
                 default:
                     break;
             }
@@ -346,6 +320,7 @@ bool CollectNonCoreCounters(CoreData* pCoreCfg, uint32* pLength)
     }
 
     *pLength = offset;
+
     return result;
 }
 
@@ -372,13 +347,8 @@ bool CollectBasicCounters(CoreData* pCoreCfg, uint32* pLength)
         pData = pCoreCfg->m_pCoreBuffer->m_pBuffer;
         offset = *pLength;
 
-        for (idx = COUNTERID_MUST_BASE; idx <= COUNTERID_MUST_MAX ; idx++)
+        for (idx = 0; idx <= COUNTERID_BASIC_CNT ; idx++)
         {
-            if (false == ((pCoreCfg->m_counterMask >> idx) & 0x01))
-            {
-                continue;
-            }
-
             switch (idx)
             {
                 case COUNTERID_SAMPLE_ID:
@@ -446,5 +416,58 @@ void CloseGenericCounterAccess(void)
 {
     g_boostedPstateCnt = INVALID_UINT32_VALUE;
     ResetCoreEffectiveFreqCounters();
+}
+
+// GetBasicCounterSize
+uint32 GetBasicCounterSize()
+{
+    uint32 bufferLen = 0;
+    //COUNTERID_SAMPLE_ID:
+    bufferLen += sizeof(uint16);
+    //COUNTERID_RECORD_ID:
+    bufferLen += sizeof(uint64);
+    //COUNTERID_SAMPLE_TIME:
+    bufferLen += sizeof(uint64);
+    return bufferLen;
+}
+
+// GetNodeCounterSize
+uint32 GetNodeCounterSize(uint32 counterId)
+{
+    uint32 bufferLen = 0;
+
+    switch (counterId)
+    {
+        // 8 byte counters
+        case COUNTERID_PID:
+        case COUNTERID_TID:
+        {
+            bufferLen += sizeof(uint64);
+            break;
+        }
+
+        // 4 byte counters
+        case COUNTERID_CSTATE_RES:
+        case COUNTERID_PSTATE:
+        case COUNTERID_NODE_TCTL_TEPERATURE:
+        case COUNTERID_SVI2_CORE_TELEMETRY:
+        case COUNTERID_SVI2_NB_TELEMETRY:
+        {
+            bufferLen += sizeof(uint32);
+            break;
+        }
+
+        // 24 bytes counter
+        case COUNTERID_CEF:
+        {
+            bufferLen += (3 * sizeof(uint64));
+            break;
+        }
+
+        default:
+            break;
+    }
+
+    return bufferLen;
 }
 

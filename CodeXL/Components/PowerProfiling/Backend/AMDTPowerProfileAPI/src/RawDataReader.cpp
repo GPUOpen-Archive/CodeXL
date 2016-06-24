@@ -560,7 +560,7 @@ AMDTResult RawDataReader::ReadSections()
                 case RAW_FILE_SECTION_SAMPLE_CONFIG:
                 {
                     AMDTUInt64 coreMask = 0;
-                    AMDTUInt64 coreCountersMask = 0;
+                    AMDTUInt64 coreSpecificMask = 0;
                     AMDTUInt32 profileCnt = 0;
                     ProfileConfigList* pCfgList = nullptr;
                     ProfileConfig* pCfg = nullptr;
@@ -595,8 +595,7 @@ AMDTResult RawDataReader::ReadSections()
                     memset(pCfgList->m_profileConfig, 0, sizeof(ProfileConfig) * profileCnt);
                     pCfgList->m_configCnt = profileCnt;
                     coreMask = pCfg->m_samplingSpec.m_mask;
-                    coreCountersMask = (pCfg->m_apuCounterMask & 0x0f)
-                                       | (pCfg->m_apuCounterMask & PERCORE_ATTRIBUTE_MASK);
+                    coreSpecificMask = pCfg->m_apuCounterMask & PWR_PERCORE_COUNTER_MASK;
 
                     // Create per core configuration
                     for (cnt1 = 0; cnt1 < profileCnt; cnt1++)
@@ -614,15 +613,15 @@ AMDTResult RawDataReader::ReadSections()
                             pTempCfg->m_samplingSpec.m_maskCnt = 1;
 
                             // set the core mask
-                            GetFirstSetBitIndex((AMDTUInt32*)&coreIdx, (AMDTUInt32)coreMask);
+                            GetFirstSetBitIndex((AMDTUInt32*)&coreIdx, coreMask);
                             coreMask &= ~(1ULL << coreIdx);
                             pTempCfg->m_samplingSpec.m_mask = 1ULL << coreIdx;
 
                             // Set only core specific counters for other cores
                             if (0 != cnt1)
                             {
-                                pTempCfg->m_apuCounterMask = coreCountersMask;
-                                pTempCfg->m_attrCnt = (AMDTUInt16)GetBitsCount(coreCountersMask);
+                                pTempCfg->m_apuCounterMask = coreSpecificMask;
+                                pTempCfg->m_attrCnt = (AMDTUInt16)GetMaskCount(coreSpecificMask);
                             }
                         }
                     }

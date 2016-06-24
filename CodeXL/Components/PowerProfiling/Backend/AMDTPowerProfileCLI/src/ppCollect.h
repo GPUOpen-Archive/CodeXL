@@ -288,6 +288,8 @@ public:
     // DB specific functions
     bool InitDb(AMDTProfileSessionInfo& sessionInfo);
     bool WriteSamplesIntoDb();
+    AMDTPwrCounterIdDescVec   m_supportedCounterIdDescVec;    // ID-Desc vector
+    PwrSupportedCounterDetailsMap m_supportedCounters;
 
 private:
     ppParseArgs&              m_args;
@@ -311,7 +313,6 @@ private:
     AMDTUInt32                m_nbrSupportedCounters;
     AMDTPwrCounterDesc*       m_pSupportedCountersDesc;
 
-    AMDTPwrCounterIdDescVec   m_supportedCounterIdDescVec;    // ID-Desc vector
     AMDTPwrCounterIdNameVec   m_supportedCounterIdNameVec;    // ID-Name vector
     AMDTPwrCounterNameDescMap m_supportedCounterNameDescMap;  // Name-Desc map
 
