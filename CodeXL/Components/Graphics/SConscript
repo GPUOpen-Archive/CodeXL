@@ -10,8 +10,8 @@ env.Prepend (CPPPATH = ["../Common/Src"])
 base_env = Environment()
 base_env['CPPPATH'] = \
 [
-    "../Common/Lib/Ext/libpng/" + env.libpng,
-    "../Common/Lib/Ext/jpglib/" + env.jpglib,
+    env.CommonPath + "Common/Lib/Ext/libpng/" + env.libpng,
+    env.CommonPath + "Common/Lib/Ext/jpglib/" + env.jpglib,
 ]
 
 base_env['CCFLAGS'] = env['CCFLAGS']
@@ -43,7 +43,7 @@ sources = \
 # build the file list with the correct path prepended
 src = [];
 for file in sources:
-    src.append("../Common/Lib/Ext/zlib/1.2.8/" + file)
+    src.append(env.CommonPath + "Common/Lib/Ext/zlib/1.2.8/" + file)
 
 zlib_Obj = base_env.StaticLibrary('Zlib', src)
 
@@ -72,7 +72,7 @@ sources = \
 # build the file list with the correct path prepended
 src = [];
 for file in sources:
-    src.append("../Common/Lib/Ext/libpng/" + env.libpng + "/" + file)
+    src.append(env.CommonPath + "Common/Lib/Ext/libpng/" + env.libpng + "/" + file)
 
 libPng_Obj = base_env.StaticLibrary('libPng', src)
 
@@ -153,7 +153,7 @@ sources = \
 # build the file list with the correct path prepended
 src = [];
 for file in sources:
-    src.append("../Common/Lib/Ext/jpglib/" + env.jpglib + "/" + file)
+    src.append(env.CommonPath + "Common/Lib/Ext/jpglib/" + env.jpglib + "/" + file)
 
 jpgLib_Obj = base_env.StaticLibrary('libJpg', src)
 
@@ -169,7 +169,7 @@ libs = \
 #
 sources = \
 [
-    "../Common/Src/DDS/AMDT-DDS.cpp"
+    env.CommonPath + "Common/Src/DDS/AMDT-DDS.cpp"
 ]
 
 DDS_Obj = env.StaticLibrary('DDS', sources, LIBS=libs)
@@ -195,7 +195,7 @@ sources = \
 # build the file list with the correct path prepended
 src = [];
 for file in sources:
-    src.append("../Common/Src/AMDTBaseTools/" + file)
+    src.append(env.CommonPath + "Common/Src/AMDTBaseTools/" + file)
 
 BaseTools_Obj = env.StaticLibrary('AMDTBaseTools', src, LIBS=libs)
 
@@ -270,7 +270,7 @@ sources = \
 # build the file list with the correct path prepended
 src = [];
 for file in sources:
-    src.append("../Common/Src/AMDTOSWrappers/" + file)
+    src.append(env.CommonPath + "Common/Src/AMDTOSWrappers/" + file)
 
 # add the base tools to the start of the list
 libs.insert(0, env.configPath + "/libAMDTBaseTools")
