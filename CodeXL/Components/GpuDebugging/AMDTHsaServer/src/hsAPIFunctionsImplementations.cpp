@@ -9,7 +9,7 @@
 
 // Infra:
 #include <AMDTBaseTools/Include/gtAssert.h>
-#include <AMDTAPIClasses/Include/Events/apExpression.h>
+#include <AMDTAPIClasses/Include/apExpression.h>
 
 // Local:
 #include <src/hsAPIFunctionsImplementations.h>
