@@ -171,7 +171,10 @@ void SessionOverviewWindow::setSessionWindowLayout()
     bool rc = connect(m_pProcessesTable, SIGNAL(itemActivated(QTableWidgetItem*)), this, SLOT(onTableItemActivated(QTableWidgetItem*)));
     GT_ASSERT(rc);
 
-    rc = connect(m_pProcessesTable, SIGNAL(contextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType, QTableWidgetItem*)), this, SLOT(onTableContextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType, QTableWidgetItem*)));
+    rc = connect(m_pProcessesTable,
+                 SIGNAL(contextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType, QTableWidgetItem*)),
+                 this,
+                 SLOT(onTableContextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType, QTableWidgetItem*)));
     GT_ASSERT(rc);
 
     actions.clear();
@@ -183,10 +186,10 @@ void SessionOverviewWindow::setSessionWindowLayout()
     rc = connect(m_pModulesTable, SIGNAL(itemActivated(QTableWidgetItem*)), this, SLOT(onTableItemActivated(QTableWidgetItem*)));
     GT_ASSERT(rc);
 
-    rc = connect(m_pModulesTable, SIGNAL(contextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType, QTableWidgetItem*)),
+    rc = connect(m_pModulesTable,
+                 SIGNAL(contextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType, QTableWidgetItem*)),
                  this,
-                 SLOT(onTableContextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType,
-                                                        QTableWidgetItem*)));
+                 SLOT(onTableContextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType, QTableWidgetItem*)));
     GT_ASSERT(rc);
 
     actions.clear();
@@ -1303,19 +1306,19 @@ bool SessionOverviewWindow::buildEventsStringsVector(gtVector<gtString>& eventsS
             // IBS, only add "IBS Fetch All" and "IBS Ops":
             eventsStrVector.push_back(L"IBS Fetch All and IBS Ops");
         }
-		else
-		{
-			CounterNameIdVec eventsList;
-			retVal = m_pDisplayFilter->GetConfigCounters(viewName, eventsList);
+        else
+        {
+            CounterNameIdVec eventsList;
+            retVal = m_pDisplayFilter->GetConfigCounters(viewName, eventsList);
 
-			if (true == retVal)
-			{
-				for (const auto& events : eventsList)
-				{
-					eventsStrVector.push_back(events);
-				}
-			}
-		}
+            if (true == retVal)
+            {
+                for (const auto& events : eventsList)
+                {
+                    eventsStrVector.push_back(events);
+                }
+            }
+        }
 
         eventsAsHTMLTable.append(L"<table>");
 
@@ -1451,19 +1454,26 @@ void SessionOverviewWindow::onTableItemActivated(QTableWidgetItem* pActivateItem
         {
             if (pTable == m_pFunctionsTable)
             {
+                QTableWidgetItem* funcName = m_pFunctionsTable->item(rowNum, AMDT_FUNC_SUMMMARY_FUNC_NAME_COL);
+                gtString str = acQStringToGTString(funcName->text());
+                bool isOther = str.compare(L"other");
+
                 // if double click on "other" row  open functions table
-                if (rowNum == pTable->GetOtherSamplesItemRowNum())
+                if (!isOther)
                 {
                     openFunctionViewForModule(nullptr);
                 }
                 else
                 {
+#if 0
                     // Get the address for the activated function:
                     const CpuProfileModule* pModule = nullptr;
                     gtVAddr functionAddress = m_pFunctionsTable->getFunctionAddress(pActivateItem->row(), pModule);
 
                     // Open function source code:
                     openFunctionSourceCode(functionAddress, pModule);
+#endif
+                    openSourceCodeView(pActivateItem);
                 }
             }
             else if (pTable == m_pModulesTable)

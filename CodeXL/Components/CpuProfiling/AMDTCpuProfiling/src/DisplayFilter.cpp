@@ -1210,3 +1210,16 @@ bool DisplayFilter::GetSamplePercent()
 { 
 	return m_isSamplePercent; 
 }
+
+AMDTUInt32 DisplayFilter::GetCoreCount() const
+{
+	AMDTUInt32 coreCount = 0;
+	AMDTCpuTopologyVec cpuToplogy;
+	bool rc = m_pProfDataReader->GetCpuTopology(cpuToplogy);
+	if (true == rc)
+	{
+		coreCount = cpuToplogy.size();
+	}
+
+	return coreCount;
+}

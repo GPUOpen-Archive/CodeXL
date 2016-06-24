@@ -773,16 +773,51 @@ void SessionFunctionView::UpdateTableDisplay(unsigned int updateType)
 
 void SessionFunctionView::onTableItemActivated(QTableWidgetItem* pActivateItem)
 {
-    GT_IF_WITH_ASSERT(pActivateItem != nullptr)
-    {
-        const QComboBox* pPIDComboBox = TopToolbarComboBox(m_pPIDComboBoxAction);
-        GT_IF_WITH_ASSERT((m_pFunctionTable != nullptr) && (pPIDComboBox != nullptr))
-        {
-            // don't make action on empty table message row
-            if (pActivateItem->row() != m_pFunctionTable->GetEmptyTableItemRowNum())
-            {
-                // Get the address for the activated function:
-                const CpuProfileModule* pModule = nullptr;
+	GT_IF_WITH_ASSERT(pActivateItem != nullptr)
+	{
+		const QComboBox* pPIDComboBox = TopToolbarComboBox(m_pPIDComboBoxAction);
+		GT_IF_WITH_ASSERT((m_pFunctionTable != nullptr) && (pPIDComboBox != nullptr))
+		{
+			// don't make action on empty table message row
+			if (pActivateItem->row() != m_pFunctionTable->GetEmptyTableItemRowNum())
+			{
+				// Get the address for the activated function:
+				//const CpuProfileModule* pModule = nullptr;
+				QString funcIdStr = m_pFunctionTable->getFunctionId(pActivateItem->row());
+				AMDTUInt32 funcId = funcIdStr.toInt();
+				funcId = funcId;
+
+				QString modPath = m_pFunctionTable->getModuleName(pActivateItem->row());
+				AMDTUInt32 moduleId = AMDT_PROFILE_ALL_MODULES;
+				AMDTUInt32  processId = AMDT_PROFILE_ALL_PROCESSES;
+
+				//get the module id
+				AMDTProfileModuleInfoVec moduleInfo;
+				m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, moduleInfo);
+				for (const auto& mod : moduleInfo)
+				{
+					if (mod.m_path == acQStringToGTString(modPath))
+					{
+						moduleId = mod.m_moduleId;
+						break;
+					}
+				}
+
+				gtString processIdStr = acQStringToGTString(pPIDComboBox->currentText());
+
+				if (processIdStr != L"All Processes")
+				{
+					processId = pPIDComboBox->currentText().toInt();
+				}
+
+				auto funcModInfo = std::make_tuple(funcId, acQStringToGTString(modPath), moduleId, processId);
+				// Emit a function activated signal (will open a source code view):
+				emit opensourceCodeViewSig(funcModInfo);
+			}
+		}
+	}
+
+#if 0
                 gtVAddr address = m_pFunctionTable->getFunctionAddress(pActivateItem->row(), pModule);
 
                 // Get the current pid:
@@ -836,6 +871,7 @@ void SessionFunctionView::onTableItemActivated(QTableWidgetItem* pActivateItem)
             }
         }
     }
+#endif
 }
 
 void SessionFunctionView::onTableContextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType actionType, QTableWidgetItem* pTableItem)

@@ -320,6 +320,7 @@ public:
 	bool GetSamplePercent();
 	DisplayFilter();
 	bool IsSystemModuleIgnored();
+	AMDTUInt32 GetCoreCount() const;
 
 private:
 

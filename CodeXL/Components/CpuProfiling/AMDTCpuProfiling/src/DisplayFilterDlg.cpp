@@ -111,6 +111,11 @@ DisplayFilterDlg::displayDialog(const QString& sessionPath, bool enableOnlySyste
 			GT_IF_WITH_ASSERT((nullptr != m_pSessionTreeItemData) &&
 				(nullptr != m_pSessionTreeItemData))
 			{
+				m_pCheckBoxSeparateColumnsBy->setChecked(false);
+				m_pCheckBoxSeparateColumnsBy->setEnabled(false);
+				m_pRadioButtonSeparateByNUMA->setEnabled(false);
+				m_pRadioButtonSeparateByCore->setEnabled(false);
+#if 0 // Uncomment when NUMa/CORE supported 
 				if ((false == m_displayFilter->IsSeperatedByNumaEnabled()) ||
 					(false == m_displayFilter->IsSeperatedByCoreEnabled()))
 				{
@@ -137,6 +142,7 @@ DisplayFilterDlg::displayDialog(const QString& sessionPath, bool enableOnlySyste
 						m_pRadioButtonSeparateByCore->setChecked(true);
 					}
 				}
+#endif
 
 				m_pCheckBoxDisplaySystemDLLs->setChecked(m_displaySystemDLLs);
 				m_pCheckBoxShowPercentageBars->setChecked(m_displayPercentageInColumn);
@@ -471,6 +477,7 @@ void DisplayFilterDlg::onClickCoreItem(int state)
 
 	QObject::disconnect(m_pCheckBoxAllCore, SIGNAL(stateChanged(int)), this, SLOT(onClickAllCoreItem(int)));
 	m_pCheckBoxAllCore->setChecked(all);
+	m_displayFilter->SetCoreMask(AMDT_PROFILE_ALL_CORES);
 	QObject::connect(m_pCheckBoxAllCore, SIGNAL(stateChanged(int)), this, SLOT(onClickAllCoreItem(int)));
 }
 
@@ -535,6 +542,7 @@ void DisplayFilterDlg::onClickOk()
 			return;
 		}
 
+#if 0 // uncomment when NUMA/core enabled 
 		if (m_pCheckBoxSeparateColumnsBy->isChecked())
 		{
 
@@ -551,6 +559,7 @@ void DisplayFilterDlg::onClickOk()
 
 #endif
 		}
+#endif
 		m_displayPercentageInColumn = m_pCheckBoxShowPercentageBars->isChecked();
 		m_displayFilter->SetSamplePercent(m_displayPercentageInColumn);
 
@@ -617,6 +626,8 @@ void DisplayFilterDlg::disableAllControlsExceptSystemDll(bool disable)
 
 		m_pComboBoxViewes->setEnabled(!disable);
 		m_pCheckBoxShowPercentageBars->setEnabled(!disable);
+
+#if 0 //uncomment when NUMA/core enabled 
 		m_pCheckBoxSeparateColumnsBy->setEnabled(!disable);
 
 		if (m_pCheckBoxSeparateColumnsBy->isChecked())
@@ -626,6 +637,7 @@ void DisplayFilterDlg::disableAllControlsExceptSystemDll(bool disable)
 			m_pRadioButtonSeparateByNUMA->setEnabled(!disable);
 #endif
 		}
+#endif
 #if 0
 		// Notice: Sigal 10/9/2013: We have a bug, we cannot support separate by
 		// option in overview window. Therefore, we want to enable the user to change this option

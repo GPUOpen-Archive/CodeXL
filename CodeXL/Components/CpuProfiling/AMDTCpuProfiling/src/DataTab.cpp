@@ -53,6 +53,7 @@
 #include <inc/SessionViewCreator.h>
 #include <inc/SessionCallGraphView.h>
 
+#include <bitset>
 
 DataTab::DataTab(QWidget* pParent, CpuSessionWindow* pParentSessionWindow, const QString& sessionDir)
     : QMainWindow(pParent), m_pProfileReader(nullptr), m_pDisplayedSessionItemData(nullptr), m_exportString(""), m_pList(nullptr),
@@ -377,6 +378,7 @@ void DataTab::showInformationPanel(bool show)
 // Author:  AMD Developer Tools Team
 // Date:        29/4/2013
 // ---------------------------------------------------------------------------
+#if 0
 QString DataTab::displayFilterString()
 {
     QString retVal;
@@ -457,6 +459,79 @@ QString DataTab::displayFilterString()
         }
     }
 
+    return retVal;
+}
+#endif
+
+QString DataTab::displayFilterString()
+{
+    QString retVal;
+
+    GT_IF_WITH_ASSERT(m_pDisplayFilter != nullptr)
+    {
+		// add configuration name 
+		retVal.append(m_pDisplayFilter->GetCurrentCofigName());
+
+        // Add the system modules to the filter string:
+        QString displaySys = m_pDisplayFilter->IsSystemModuleIgnored() ? "System Modules Hidden" : "All Modules";
+
+        if (!retVal.isEmpty())
+        {
+            retVal.append(", ");
+        }
+
+        retVal.append(displaySys);
+
+        bool displayPercentageInColumn = m_pDisplayFilter->GetSamplePercent();
+
+        if (displayPercentageInColumn)
+        {
+            if (!retVal.isEmpty())
+            {
+                retVal.append(", ");
+            }
+
+            retVal.append("Percentages");
+        }
+
+        if ((m_pParentSessionWindow != nullptr))
+        {
+            AMDTUInt64 mask = m_pDisplayFilter->GetCoreMask();
+
+            std::bitset<32> maskBits(mask);
+            AMDTUInt32 amountOfDisplayedCores = maskBits.count();
+
+			if ((mask != AMDT_PROFILE_ALL_CORES) && 
+				(m_pDisplayFilter->GetCoreCount() != amountOfDisplayedCores))
+			{
+				if (!retVal.isEmpty())
+				{
+					retVal.append(", ");
+				}
+				QString coresFilter;
+				coresFilter.sprintf("%d Cores", amountOfDisplayedCores);
+				retVal.append(coresFilter);
+			}
+        }
+
+        if ((true == m_pDisplayFilter->IsSeperatedByCoreEnabled()) ||
+            (true == m_pDisplayFilter->IsSeperatedByNumaEnabled()))
+        {
+            if (!retVal.isEmpty())
+            {
+                retVal.append(", ");
+            }
+
+            if (true == m_pDisplayFilter->IsSeperatedByCoreEnabled())
+            {
+                retVal.append(CP_strCPUProfilePerCPU);
+            }
+            else
+            {
+                retVal.append(CP_strCPUProfilePerNuma);
+            }
+        }
+    }
     return retVal;
 }
 
