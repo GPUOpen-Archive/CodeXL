@@ -15,6 +15,8 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_COUNT,
     /*category*/(PwrCategory)CATEGORY_NUMBER,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_NONCORE_SINGLE,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_SYSTEM,
+    /*Aggregation type*/AMDT_PWR_VALUE_SINGLE,
 },
 {
     /*attr_id*/COUNTERID_RECORD_ID,
@@ -24,6 +26,8 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_COUNT,
     /*category*/(PwrCategory)CATEGORY_NUMBER,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_NONCORE_SINGLE,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_SYSTEM,
+    /*Aggregation type*/AMDT_PWR_VALUE_SINGLE,
 },
 {
     /*attr_id*/COUNTERID_SAMPLE_TIME,
@@ -33,4 +37,6 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_MILLI_SECOND,
     /*category*/(PwrCategory)CATEGORY_TIME,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_NONCORE_SINGLE,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_SYSTEM,
+    /*Aggregation type*/AMDT_PWR_VALUE_SINGLE,
 },
