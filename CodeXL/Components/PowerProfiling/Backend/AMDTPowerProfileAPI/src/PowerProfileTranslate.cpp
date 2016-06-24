@@ -1802,27 +1802,27 @@ AMDTUInt32 PowerProfileTranslate::DecodeNodeCounters(PwrCounterDecodeInfo* pDeco
         {
             case COUNTERID_PID:
             case COUNTERID_TID:
-            case COUNTERID_CSTATE_RES:
-            case COUNTERID_PSTATE:
             {
                 AMDTUInt64 data = *(AMDTUInt64*)(pRaw + offset);
                 counter.m_value64 = data;
                 counter.m_instanceId = pDecodeInfo->m_instanceId;
                 counter.m_counterId = pDecodeInfo->m_clientId;
-
-                if (COUNTERID_PSTATE == counterId)
-                {
-                    offset += sizeof(AMDTUInt32);
-                }
-                else
-                {
-                    offset += sizeof(AMDTUInt64);
-                }
-
+                offset += sizeof(AMDTUInt64);
                 pOut->m_counters.insert(PwrDecodedCounterMap::value_type(counter.m_counterId, counter));
                 break;
             }
 
+            case COUNTERID_PSTATE:
+            case COUNTERID_CSTATE_RES:
+            {
+                AMDTUInt32 data = *(AMDTUInt32*)(pRaw + offset);
+                counter.m_value64 = (AMDTUInt64)data;
+                counter.m_instanceId = pDecodeInfo->m_instanceId;
+                counter.m_counterId = pDecodeInfo->m_clientId;
+                offset += sizeof(AMDTUInt32);
+                pOut->m_counters.insert(PwrDecodedCounterMap::value_type(counter.m_counterId, counter));
+                break;
+            }
             case COUNTERID_CEF:
             {
                 AMDTUInt64 aPerf = 0;
