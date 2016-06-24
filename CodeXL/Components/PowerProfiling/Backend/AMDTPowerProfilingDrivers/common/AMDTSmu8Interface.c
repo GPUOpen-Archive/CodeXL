@@ -104,21 +104,24 @@ bool ConfigureCounterTable(Smu8Interface* pSmu)
     uint32 version = 0;
 
     listCnt = sizeof(CounterTableOffsetList) / sizeof(CounterTableInfo);
+
     if (NULL != pSmu)
     {
-       //Set the default table;
-       pSmu->m_tableBase = (uint64)&CounterTableOffsetList[0].m_table;
-       version = pSmu->m_tableVersion;
-       for (cnt = 0; cnt < listCnt; cnt++)
-       {
-           if (version == CounterTableOffsetList[cnt].m_versionId)
-           {
-               pSmu->m_tableBase = (uint64)&CounterTableOffsetList[cnt].m_table;
-               result = true;
-               break;
-           }
-       }
-	}
+        //Set the default table;
+        pSmu->m_tableBase = (uint64)&CounterTableOffsetList[0].m_table;
+        version = pSmu->m_tableVersion;
+
+        for (cnt = 0; cnt < listCnt; cnt++)
+        {
+            if (version == CounterTableOffsetList[cnt].m_versionId)
+            {
+                pSmu->m_tableBase = (uint64)&CounterTableOffsetList[cnt].m_table;
+                result = true;
+                break;
+            }
+        }
+    }
+
     return result;
 }
 
@@ -181,7 +184,7 @@ bool CollectSMU8RegisterValues(void* pSmuInfo, uint8* pData, uint32* pLength)
         uint32 idx = 0;
         baseOffset = tableBaseAddr + CARRIZO_BASE_ADDRESS;
 
-        for (idx = COUNTERID_SMU8_APU_PWR_CU; idx <= COUNTERID_SMU_ATTR_MAX; idx++)
+        for (idx = 0; idx <= COUNTERID_SMU8_CNT; idx++)
         {
             if (false == ((mask >> idx) & 0x01))
             {
@@ -478,3 +481,46 @@ bool Smu8SessionClose(void* pSmuInfo)
     return result;
 }
 
+uint32 GetSmu8CounterSize(uint32 counterId)
+{
+    uint32 bufferLen = 0;
+    uint32 cuCnt = GetComputeUnitCntPerNode();
+
+    switch (counterId)
+    {
+        case COUNTERID_SMU8_APU_PWR_CU:
+        case COUNTERID_SMU8_APU_TEMP_CU:
+        case COUNTERID_SMU8_APU_C0STATE_RES:
+        case COUNTERID_SMU8_APU_C1STATE_RES:
+        case COUNTERID_SMU8_APU_CC6_RES:
+        {
+            bufferLen += (cuCnt * sizeof(uint32));
+            break;
+        }
+
+        // 4 byte counters
+        case COUNTERID_SMU8_APU_PWR_VDDGFX:
+        case COUNTERID_SMU8_APU_PWR_APU:
+        case COUNTERID_SMU8_APU_TEMP_VDDGFX:
+        case COUNTERID_SMU8_APU_FREQ_IGPU:
+        case COUNTERID_SMU8_APU_PWR_VDDIO:
+        case COUNTERID_SMU8_APU_PWR_VDDNB:
+        case COUNTERID_SMU8_APU_PWR_VDDP:
+        case COUNTERID_SMU8_APU_PWR_UVD:
+        case COUNTERID_SMU8_APU_PWR_VCE:
+        case COUNTERID_SMU8_APU_PWR_ACP:
+        case COUNTERID_SMU8_APU_PWR_UNB:
+        case COUNTERID_SMU8_APU_PWR_SMU:
+        case COUNTERID_SMU8_APU_PWR_ROC:
+        case COUNTERID_SMU8_APU_FREQ_ACLK:
+        {
+            bufferLen += sizeof(uint32);
+            break;
+        }
+
+        default:
+            break;
+    }
+
+    return bufferLen;
+}

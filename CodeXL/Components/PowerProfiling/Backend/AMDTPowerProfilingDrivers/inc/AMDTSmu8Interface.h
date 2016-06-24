@@ -84,4 +84,7 @@ bool Smu8SessionInitialize(void* pSmu);
 // Smu8SessionClose
 bool Smu8SessionClose(void* pSmu);
 
+// GetSmu8CounterSize
+uint32 GetSmu8CounterSize(uint32 counterId);
+
 #endif //_SMU8_INTERFACE_H_

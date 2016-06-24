@@ -56,10 +56,15 @@ typedef union _ExtendedPciAddressSpace
     AMDTUInt32 address;
 } ExtendedPciAddressSpace;
 
+//MemoryPool: create memory pool for internal use
+typedef struct MemoryPool
+{
+    AMDTUInt8* m_pBase;
+    AMDTUInt32 m_offset;
+    AMDTUInt32 m_size;
+} MemoryPool;
 
 extern AMDTPwrProfileAttributeList g_attributeList;
-
-AMDTResult SetRawAttributeMask(AMDTUInt16 attributeId, AMDTUInt64* pEventMask);
 
 // GetSupportedTargetPlatformId: Provide the target system platform id
 // if it is supported by power profiler. Otherwise return PLATFORM_INVALID
@@ -86,11 +91,11 @@ AMDTResult ReadMMIOSpace(AMDTUInt64 address, AMDTUInt32* pData);
 AMDTResult WriteMMIOSpace(uint64 address, AMDTUInt32 data);
 
 
-// GetBitsCount: Get the number of set bits
-uint32 GetBitsCount(AMDTUInt64 val);
+// GetMaskCount: Get the number of set bits
+uint32 GetMaskCount(AMDTUInt64 val);
 
 // GetFirstSetBitIndex: Get the index of first set bit
-bool GetFirstSetBitIndex(AMDTUInt32* core_id, AMDTUInt32 mask);
+bool GetFirstSetBitIndex(AMDTUInt32* core_id, AMDTUInt64 mask);
 
 
 // GetActiveCoreCount: Provides number of active cores
@@ -129,6 +134,13 @@ AMDTResult DecodeTctlTemperature(AMDTUInt32 raw, AMDTFloat32* pResult);
 #else
     #define SLEEP_IN_MS(x) Sleep(x)
 #endif
+
+// Create memory pool
+AMDTResult CreateMemoryPool(MemoryPool* pPool, AMDTUInt32 size);
+// Get buffer from the pool
+AMDTUInt8* GetMemoryPoolBuffer(MemoryPool* pPool, AMDTUInt32 size);
+// Delete the memory pool
+AMDTResult ReleaseMemoryPool(MemoryPool* pPool);
 
 #endif //_POWERPROFILEHELPER_H_
 

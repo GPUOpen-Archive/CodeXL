@@ -24,16 +24,16 @@ typedef struct CounterRange
 void InitializeHistogram();
 
 // AddToHistogram: Add counter values to histogram
-AMDTResult AddToHistogram(AMDTUInt32 counterId, AMDTUInt32 instanceId, AMDTFloat32 value);
+AMDTResult AddToHistogram(AMDTUInt32 counterId, AMDTFloat32 value);
 
 // AddToHistogram: Add counter values to histogram
-void AddToCumulativeCounter(AMDTUInt32 counterId, AMDTUInt32 instanceId, AMDTFloat32 value);
+void AddToCumulativeCounter(AMDTUInt32 counterId, AMDTFloat32 value);
 
 // GetCumulativeCounter: Ge the value of cumulative counter
-AMDTFloat32* GetCumulativeCounter(AMDTUInt32 counterId, AMDTUInt32 instanceId);
+AMDTFloat32* GetCumulativeCounter(AMDTUInt32 counterId);
 
 // GetHistogramCounter: Get the value of histogram counter
-Histogram* GetHistogramCounter(AMDTUInt32 counterId, AMDTUInt32 instanceId);
+AMDTPwrHistogram* GetHistogramCounter(AMDTUInt32 counterId);
 
 #endif //_AMDTHISTOGRAM_H_
 

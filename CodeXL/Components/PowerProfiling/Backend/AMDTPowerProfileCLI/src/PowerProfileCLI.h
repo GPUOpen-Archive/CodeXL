@@ -104,6 +104,20 @@ typedef enum PowerProfileReportTypes
     PP_REPORT_TYPE_XML    = 3,
 } PowerProfileReportType;
 
+typedef struct PwrSupportedCounterDetails
+{
+    AMDTUInt32           m_counterID;
+    AMDTUInt32           m_deviceId;
+    char                 m_name[OS_MAX_PATH];
+    char                 m_description[OS_MAX_PATH];
+    AMDTPwrCategory      m_category;
+    AMDTPwrAggregation   m_aggregation;
+    AMDTFloat64          m_minValue;
+    AMDTFloat64          m_maxValue;
+    AMDTPwrUnit          m_units;
+    char                 m_modifiedName[OS_MAX_PATH];
+} PwrSupportedCounterDetails;
+
 typedef gtMap<gtString, AMDTPwrDevice*> AMDTPwrDeviceNameDescMap; // Device Name - Device Desc Map
 typedef gtVector<AMDTPwrDevice*> AMDTPwrDeviceIdDescVec; // Device ID-Desc vector
 typedef gtVector<gtString> AMDTPwrDeviceIdNameVec; // Device ID-Name vector
@@ -113,8 +127,10 @@ typedef gtMap<gtString, AMDTPwrCounterDesc*> AMDTPwrCounterNameDescMap; // Name 
 typedef gtVector<AMDTPwrCounterDesc*> AMDTPwrCounterIdDescVec; // ID-Desc vector
 typedef gtVector<gtString> AMDTPwrCounterIdNameVec; // CounterID-Name vector
 
+typedef gtMap <AMDTUInt32, PwrSupportedCounterDetails> PwrSupportedCounterDetailsMap;
 // Helper functions
 extern bool ReportError(bool appendDriverError, const char* pFormatString, ...);
+extern PwrSupportedCounterDetailsMap g_supportedCounters;
 
 
 // USE CASES

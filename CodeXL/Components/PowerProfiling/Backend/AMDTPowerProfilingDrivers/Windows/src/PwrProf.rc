@@ -52,7 +52,7 @@ BEGIN
             VALUE "LegalCopyright", "© 2014-2015 AMD Inc. All rights reserved."
             VALUE "OriginalFilename", "AMDTPwrProf.sys"
             VALUE "ProductName", "CodeXL - OpenCL and OpenGL Debugger and Profiler"
-            VALUE "ProductVersion", "1.9.0.0"
+            VALUE "ProductVersion", "2.0.0.0"
         END
     END
     BLOCK "VarFileInfo"

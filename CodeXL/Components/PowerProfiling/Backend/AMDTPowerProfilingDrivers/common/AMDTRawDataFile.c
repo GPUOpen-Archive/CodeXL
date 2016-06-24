@@ -372,158 +372,111 @@ bool GetRequiredBufferLength(CoreData* pCfg, uint32* pLength)
 {
     uint32 attrCnt = 0;
     uint32 bufferLen = 0;
-    uint64 mask = pCfg->m_counterMask;
+    uint64 mask = 0;
     uint32 smuCnt = 0;
     SmuList* pSmuList = NULL;
+    uint32 apuIpVersion = 0;
 
-    if (NULL != pLength)
+    if ((NULL != pLength) && (NULL != pCfg))
     {
-        if (0 != mask)
+        mask = pCfg->m_counterMask;
+
+        if ((NULL != pCfg->m_smuCfg) && (APU_SMU_ID == pCfg->m_smuCfg->m_info[0].m_packageId))
         {
-            uint32 cuCnt = 0;
-            //HelpGetBitsCount(mask, &attrCnt);
-
-            // Default length calculation for each counter
-            bufferLen = sizeof(RawRecordHdr);
-
-            if (mask & SMU_ATTRIBUTE_MASK)
-            {
-                cuCnt = GetComputeUnitCntPerNode();
-            }
-
-            for (attrCnt = 0; attrCnt < COUNTERID_MAX_CNT; attrCnt++)
-            {
-                if ((mask >> attrCnt) & 0x01)
-                {
-                    switch (attrCnt)
-                    {
-                        // 2 byte counters
-                        case COUNTERID_SAMPLE_ID:
-                        {
-                            bufferLen += sizeof(uint16);
-                            break;
-                        }
-
-                        // 8 byte counters
-                        case COUNTERID_RECORD_ID:
-                        case COUNTERID_SAMPLE_TIME:
-                        case COUNTERID_PID:
-                        case COUNTERID_TID:
-                        {
-                            bufferLen += sizeof(uint64);
-                            break;
-                        }
-
-                        // per cu counters
-                        case COUNTERID_SMU7_APU_PWR_CU:
-                        case COUNTERID_SMU7_APU_TEMP_CU:
-                        case COUNTERID_SMU7_APU_TEMP_MEAS_CU:
-                        case COUNTERID_SMU8_APU_PWR_CU:
-                        case COUNTERID_SMU8_APU_TEMP_CU:
-                        case COUNTERID_SMU8_APU_TEMP_MEAS_CU:
-                        case COUNTERID_SMU8_APU_C0STATE_RES:
-                        case COUNTERID_SMU8_APU_C1STATE_RES:
-                        case COUNTERID_SMU8_APU_CC6_RES:
-                        case COUNTERID_SMU8_APU_PC6_RES:
-                        {
-                            bufferLen += (cuCnt * sizeof(uint32));
-                            break;
-                        }
-
-                        // 4 byte counters
-                        case COUNTERID_SMU7_APU_PWR_IGPU:
-                        case COUNTERID_SMU7_APU_PWR_PCIE:
-                        case COUNTERID_SMU7_APU_PWR_DDR:
-                        case COUNTERID_SMU7_APU_PWR_DISPLAY:
-                        case COUNTERID_SMU7_APU_PWR_PACKAGE:
-                        case COUNTERID_SMU7_APU_TEMP_IGPU:
-                        case COUNTERID_SMU7_APU_TEMP_MEAS_IGPU:
-                        case COUNTERID_SMU7_APU_FREQ_IGPU:
-                        case COUNTERID_SMU8_APU_PWR_VDDGFX:
-                        case COUNTERID_SMU8_APU_PWR_APU:
-                        case COUNTERID_SMU8_APU_TEMP_VDDGFX:
-                        case COUNTERID_SMU8_APU_TEMP_MEAS_VDDGFX:
-                        case COUNTERID_SMU8_APU_FREQ_IGPU:
-                        case COUNTERID_SMU8_APU_PWR_VDDIO:
-                        case COUNTERID_SMU8_APU_PWR_VDDNB:
-                        case COUNTERID_SMU8_APU_PWR_VDDP:
-                        case COUNTERID_SMU8_APU_PWR_UVD:
-                        case COUNTERID_SMU8_APU_PWR_VCE:
-                        case COUNTERID_SMU8_APU_PWR_ACP:
-                        case COUNTERID_SMU8_APU_PWR_UNB:
-                        case COUNTERID_SMU8_APU_PWR_SMU:
-                        case COUNTERID_SMU8_APU_PWR_ROC:
-                        case COUNTERID_SMU8_APU_FREQ_ACLK:
-                        case COUNTERID_CSTATE_RES:
-                        case COUNTERID_PSTATE:
-                        case COUNTERID_NODE_TCTL_TEPERATURE:
-                        case COUNTERID_SVI2_CORE_TELEMETRY:
-                        case COUNTERID_SVI2_NB_TELEMETRY:
-                        {
-                            bufferLen += sizeof(uint32);
-                            break;
-                        }
-
-                        // valriable length counter
-                        case COUNTERID_SAMPLE_CALLCHAIN:
-                        {
-                            break;
-                        }
-
-                        // 24 bytes counter
-                        case COUNTERID_CEF:
-                        {
-                            bufferLen += (3 * sizeof(uint64));
-                            break;
-                        }
-
-                        default:
-                            break;
-
-                    }
-                }
-            }
-
+            apuIpVersion = pCfg->m_smuCfg->m_info[0].m_smuIpVersion;
         }
 
-        // If SMU is configured calculeted the Smu counters
+        // Default length calculation for each counter
+        bufferLen = sizeof(RawRecordHdr);
+        bufferLen += GetBasicCounterSize();
+
+        if (0 != mask)
+        {
+            switch (apuIpVersion)
+            {
+                case SMU_IPVERSION_9_0:
+                    break;
+
+                default:
+
+                    for (attrCnt = 0; attrCnt < COUNTERID_NODE_MAX_CNT; attrCnt++)
+                    {
+                        if ((mask >> attrCnt) & 0x01)
+                        {
+                            bufferLen += GetNodeCounterSize(attrCnt);
+                        }
+                    }
+
+                    break;
+            }
+        }
+
         if (NULL != pCfg->m_smuCfg)
         {
+            // If SMU is configured calculeted the Smu counters
             pSmuList = pCfg->m_smuCfg;
 
             for (smuCnt = 0; smuCnt < pSmuList->m_count; smuCnt++)
             {
+                mask = pSmuList->m_info[smuCnt].m_counterMask;
+
                 if (APU_SMU_ID == pSmuList->m_info[smuCnt].m_packageId)
                 {
+                    if (pSmuList->m_info[smuCnt].m_counterMask)
+                    {
+                        switch (pSmuList->m_info[smuCnt].m_smuIpVersion)
+                        {
+                            case SMU_IPVERSION_9_0:
+                            {
+                                break;
+                            }
+
+                            case SMU_IPVERSION_8_0:
+                            {
+                                for (attrCnt = 0; attrCnt < COUNTERID_SMU8_CNT; attrCnt++)
+                                {
+                                    if ((mask >> attrCnt) & 0x01)
+                                    {
+                                        bufferLen += GetSmu8CounterSize(attrCnt);
+                                    }
+                                }
+
+                                break;
+                            }
+
+                            default:
+                            {
+                                for (attrCnt = 0; attrCnt < COUNTERID_SMU7_CNT; attrCnt++)
+                                {
+                                    if ((mask >> attrCnt) & 0x01)
+                                    {
+                                        bufferLen += GetSmu7CounterSize(attrCnt);
+                                    }
+                                }
+
+                                break;
+                            }
+
+                        }
+                    }
+
                     continue;
                 }
 
-                mask = pSmuList->m_info[smuCnt].m_counterMask;
-
-                for (attrCnt = 0; attrCnt < DGPU_COUNTERS_MAX; attrCnt++)
+                // Size for dGPU
+                for (attrCnt = 0; attrCnt < COUNTERID_DGPU_MAX_CNT; attrCnt++)
                 {
                     if ((mask >> attrCnt) & 0x01)
                     {
-                        switch (attrCnt)
-                        {
-                            case COUNTERID_PKG_PWR_DGPU:
-                            case COUNTERID_TEMP_MEAS_DGPU:
-                            case COUNTERID_FREQ_DGPU:
-                            case COUNTERID_VOLT_VDDC_LOAD_DGPU:
-                            case COUNTERID_CURR_VDDC_DGPU:
-                                bufferLen += sizeof(uint32);
-                                break;
-
-                            default:
-                                break;
-                        }
+                        bufferLen += GetSmu7DgpuCounterSize(attrCnt);
                     }
                 }
             }
         }
-   
+
         *pLength = bufferLen;
-	}
+    }
+
     return true;
 }
 
@@ -718,6 +671,14 @@ int32 WriteSampleData(CoreData* pCoreCfg)
         // These attributes are common to all cores
         CollectBasicCounters(pCoreCfg, &offset);
 
+        attrMask = pCoreCfg->m_counterMask;
+
+        // Collect node counters
+        if (attrMask)
+        {
+            CollectNodeCounters(pCoreCfg, &offset);
+        }
+
         // Collect SMU counter data
         if ((1 == pCoreCfg->m_sampleId)
             && (NULL != pCoreCfg->m_smuCfg)
@@ -739,18 +700,6 @@ int32 WriteSampleData(CoreData* pCoreCfg)
                                          &offset);
                 }
             }
-        }
-
-        attrMask = pCoreCfg->m_counterMask;
-
-        if (attrMask & PERCORE_ATTRIBUTE_MASK)
-        {
-            CollectPerCoreCounters(pCoreCfg, &offset);
-        }
-
-        if (attrMask & NONCORE_ATTRIBUTE_MASK)
-        {
-            CollectNonCoreCounters(pCoreCfg, &offset);
         }
 
         // Check if smu is configured in master core

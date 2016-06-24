@@ -11,6 +11,8 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_COUNT,
     /*category*/(PwrCategory)CATEGORY_NUMBER,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_PER_CORE,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_CPU_CORE,
+    /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE),
 },
 {
     /*attr_id*/COUNTERID_TID,
@@ -20,6 +22,8 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_COUNT,
     /*category*/(PwrCategory)CATEGORY_NUMBER,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_PER_CORE,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_CPU_CORE,
+    /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE),
 },
 
 {
@@ -30,6 +34,8 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_MEGA_HERTZ,
     /*category*/(PwrCategory)CATEGORY_FREQUENCY,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_PER_CORE,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_CPU_CORE,
+    /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE) | (1 << AMDT_PWR_VALUE_HISTOGRAM),
 },
 #ifdef FAMILY15H16H_INTERNAL_COUNTERS
 {
@@ -50,6 +56,8 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_COUNT,
     /*category*/(PwrCategory)CATEGORY_DVFS,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_PER_CORE,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_CPU_CORE,
+    /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE),
 },
 #ifdef FAMILY15H16H_INTERNAL_COUNTERS
 // Removing node temperature (attr_id: COUNTERID_NODE_TCTL_TEPERATURE).
@@ -63,6 +71,8 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_VOLT,
     /*category*/(PwrCategory)CATEGORY_VOLTAGE,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_NONCORE_MULTIVALUE,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_SVI2,
+    /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE),
 },
 {
     /*attr_id*/COUNTERID_SVI2_NB_TELEMETRY,
@@ -72,5 +82,7 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_VOLT,
     /*category*/(PwrCategory)CATEGORY_VOLTAGE,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_NONCORE_MULTIVALUE,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_SVI2,
+    /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE),
 },
 #endif

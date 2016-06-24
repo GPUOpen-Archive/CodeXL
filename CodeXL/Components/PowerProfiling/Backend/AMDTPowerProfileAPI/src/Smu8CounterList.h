@@ -19,6 +19,8 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_WATT,
     /*category*/(PwrCategory)CATEGORY_POWER,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_PER_CU,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_CPU_COMPUTE_UNIT,
+    /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE) | (1 << AMDT_PWR_VALUE_CUMULATIVE),
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_TEMP_CU,
@@ -28,6 +30,8 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_CENTIGRADE,
     /*category*/(PwrCategory)CATEGORY_TEMPERATURE,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_PER_CU,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_CPU_COMPUTE_UNIT,
+    /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE),
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_C0STATE_RES,
@@ -37,6 +41,8 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_PERCENT,
     /*category*/(PwrCategory)CATEGORY_DVFS,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_PER_CU,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_CPU_COMPUTE_UNIT,
+    /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE),
 },
 
 {
@@ -47,6 +53,8 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_PERCENT,
     /*category*/(PwrCategory)CATEGORY_DVFS,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_PER_CU,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_CPU_COMPUTE_UNIT,
+    /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE),
 },
 
 {
@@ -57,6 +65,8 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_PERCENT,
     /*category*/(PwrCategory)CATEGORY_DVFS,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_PER_CU,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_CPU_COMPUTE_UNIT,
+    /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE),
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_PWR_VDDGFX,
@@ -66,6 +76,8 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_WATT,
     /*category*/(PwrCategory)CATEGORY_POWER,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_NONCORE_SINGLE,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_PACKAGE,
+    /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE),
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_PWR_APU,
@@ -75,6 +87,8 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_WATT,
     /*category*/(PwrCategory)CATEGORY_POWER,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_NONCORE_SINGLE,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_PACKAGE,
+    /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE) | (1 << AMDT_PWR_VALUE_CUMULATIVE),
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_TEMP_VDDGFX,
@@ -84,6 +98,8 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_CENTIGRADE,
     /*category*/(PwrCategory)CATEGORY_TEMPERATURE,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_NONCORE_SINGLE,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_PACKAGE,
+    /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE),
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_FREQ_IGPU,
@@ -93,6 +109,8 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_MEGA_HERTZ,
     /*category*/(PwrCategory)CATEGORY_FREQUENCY,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_NONCORE_SINGLE,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_INTERNAL_GPU,
+    /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE) | (1 << AMDT_PWR_VALUE_HISTOGRAM),
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_PWR_VDDIO,
@@ -102,6 +120,8 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_WATT,
     /*category*/(PwrCategory)CATEGORY_POWER,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_NONCORE_SINGLE,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_PACKAGE,
+    /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE),
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_PWR_VDDNB,
@@ -111,6 +131,8 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_WATT,
     /*category*/(PwrCategory)CATEGORY_POWER,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_NONCORE_SINGLE,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_PACKAGE,
+    /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE),
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_PWR_VDDP,
@@ -120,6 +142,8 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_WATT,
     /*category*/(PwrCategory)CATEGORY_POWER,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_NONCORE_SINGLE,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_PACKAGE,
+    /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE),
 },
 // Carrizo specifi counters
 {
@@ -130,6 +154,8 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_WATT,
     /*category*/(PwrCategory)CATEGORY_POWER,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_NONCORE_SINGLE,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_PACKAGE,
+    /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE),
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_PWR_VCE,
@@ -139,6 +165,8 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_WATT,
     /*category*/(PwrCategory)CATEGORY_POWER,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_NONCORE_SINGLE,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_PACKAGE,
+    /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE),
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_PWR_ACP,
@@ -148,6 +176,8 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_WATT,
     /*category*/(PwrCategory)CATEGORY_POWER,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_NONCORE_SINGLE,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_PACKAGE,
+    /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE),
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_PWR_UNB,
@@ -157,6 +187,8 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_WATT,
     /*category*/(PwrCategory)CATEGORY_POWER,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_NONCORE_SINGLE,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_PACKAGE,
+    /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE),
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_PWR_SMU,
@@ -166,6 +198,8 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_WATT,
     /*category*/(PwrCategory)CATEGORY_POWER,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_NONCORE_SINGLE,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_PACKAGE,
+    /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE),
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_PWR_ROC,
@@ -175,6 +209,8 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_WATT,
     /*category*/(PwrCategory)CATEGORY_POWER,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_NONCORE_SINGLE,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_PACKAGE,
+    /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE),
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_FREQ_ACLK,
@@ -184,4 +220,6 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_MEGA_HERTZ,
     /*category*/(PwrCategory)CATEGORY_FREQUENCY,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_NONCORE_SINGLE,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_PACKAGE,
+    /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE),
 },

@@ -12,6 +12,19 @@
 #include <AMDTPowerProfileDataTypes.h>
 
 #include <wchar.h>
+#include <AMDTBaseTools/Include/gtMap.h>
+#include <AMDTOSWrappers/Include/osApplication.h>
+
+using namespace std;
+typedef struct CounterInstance
+{
+    AMDTUInt32 m_instanceId; //CU or Core
+    AMDTUInt32 m_packageId;
+    AMDTPwrCounterBasicInfo m_counter;
+} CounterInstance;
+
+//Conter map (counterId, AMDTPwrCounterBasicInfo)
+typedef gtMap<AMDTUInt32, CounterInstance> CounterMap;
 
 // Smu definitions
 // SMU Message Commands used to START & SAMPLE the PM status logging
@@ -95,14 +108,6 @@ enum AMDTPwrAttributeProperty
     AMDTPWR_ATTRIBUTE_INSTANCE_TYPE     // per Core/CU/single attribute
 };
 
-//MemoryPool: create memory pool for internal use
-typedef struct MemoryPool
-{
-    AMDTUInt8* m_pBase;
-    AMDTUInt32 m_offset;
-    AMDTUInt32 m_size;
-} MemoryPool;
-
 typedef struct
 {
     AMDTUInt32 m_bus;
@@ -170,8 +175,6 @@ AMDTResult PwrRegisterClient(AMDTUInt32* clientId);
     \retval AMDT_ERROR_UNEXPECTED an unexpected error occurred
 */
 
-AMDTResult PwrSetProfilingConfiguration(
-    /*in*/ AMDTPwrProfileConfig* pConfig);
 
 /** If the profiler is not running, this will start the profiler, and cause the
     state to go to \ref ProfilingRunning.  It will start writing data onto the
@@ -266,13 +269,6 @@ AMDTResult AMDTPwrGetTargetSystemInfo(
 // IsCefSupported: Check from cpuid if core effective frequency is supported
 bool IsCefSupported(void);
 
-// Create memory pool
-AMDTResult CreateMemoryPool(MemoryPool* pPool, AMDTUInt32 size);
-// Get buffer from the pool
-AMDTUInt8* GetMemoryPoolBuffer(MemoryPool* pPool, AMDTUInt32 size);
-// Delete the memory pool
-AMDTResult ReleaseMemoryPool(MemoryPool* pPool);
-
 // GetPciDeviceInfo: Device name, vendor id etc and port address
 void GetPciDeviceInfo(AMDTUInt32 pkgId, PciDeviceInfo** ppDevInfo, PciPortAddress** ppAddress);
 
@@ -286,6 +282,14 @@ bool IsDgpuMMIOAccessible(AMDTUInt32 bus, AMDTUInt32 dev, AMDTUInt32 func);
 
 // PwrIsSVISupported: Check if SVI2 is supported
 bool PwrIsSVISupported(const AMDTPwrTargetSystemInfo& sysInfo);
+AMDTResult PwrGetSupportedCounters(CounterMap** pList);
+
+void PwrInsertDeviceCounters(AMDTPwrDevice* dev, AMDTUInt32 instId, AMDTUInt32 pkgId);
+
+PwrSupportedCounterMap* PwrGetSupportedCounterList(void);
+
+void PwrActivateCounter(AMDTUInt32 counterId, bool isActivate);
+AMDTResult PwrSetProfileConfiguration(ProfileConfig* pConfig, AMDTUInt32 clientId);
 
 #endif //_AMDTPOWERPROFILECONTROL_H_
 

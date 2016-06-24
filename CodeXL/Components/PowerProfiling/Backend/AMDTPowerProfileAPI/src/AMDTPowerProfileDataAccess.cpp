@@ -83,17 +83,6 @@ AMDTResult AMDTPwrOpenOnlineDataAccess(void* pParam)
     return ret;
 }
 
-//AMDTPwrOpenOfflineDataAccess:
-AMDTResult AMDTPwrOpenOfflineDataAccess(
-    /*in*/ const wchar_t* pFileName)
-{
-    GT_UNREFERENCED_PARAMETER(pFileName);
-
-    int ret = AMDT_STATUS_OK;
-
-    //Offline mode will be supported in future.
-    return ret;
-}
 
 //AMDTPwrCloseDataAccess:
 AMDTResult AMDTPwrCloseDataAccess()

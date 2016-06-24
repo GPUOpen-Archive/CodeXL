@@ -33,16 +33,19 @@ bool CollectBasicCounters(CoreData* pCoreCfg,
                           uint32* pLength);
 
 // CollectPerCoreCounters: Read core specific counters values
-bool CollectPerCoreCounters(CoreData* pCoreCfg,
-                            uint32* pLength);
+bool CollectNodeCounters(CoreData* pCoreCfg, uint32* pLength);
 
-// CollectNonCoreCounters: Read counter values which are independant of any core
-bool CollectNonCoreCounters(CoreData* pCoreCfg,
-                            uint32* pLength);
 // InitializeGenericCounterAccess:
 void InitializeGenericCounterAccess(uint32 core);
 
 // CloseGenericCounterAccess
 void CloseGenericCounterAccess(void);
+
+// GetBasicCounterSize
+uint32 GetBasicCounterSize();
+
+// GetNodeCounterSize
+uint32 GetNodeCounterSize(uint32 counterId);
+
 
 #endif //_COUNTER_ACCESS_INTERFACE_H_

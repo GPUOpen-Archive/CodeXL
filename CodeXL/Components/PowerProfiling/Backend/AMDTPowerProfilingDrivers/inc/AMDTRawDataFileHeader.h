@@ -26,6 +26,7 @@
 #define _RAW_DATA_FILE_HEADER_H_
 #include <AMDTPwrProfAttributes.h>
 #include <AMDTDriverTypedefs.h>
+#include <AMDTSmu9Interface.h>
 #include <AMDTSmu8Interface.h>
 #include <AMDTSmu7Interface.h>
 #include <AMDTAccessPmcData.h>
@@ -305,6 +306,7 @@ typedef struct SmuAccess
 {
     union
     {
+        Smu9Interface m_smu9;
         Smu8Interface m_smu8;
         Smu7Interface m_smu7;
     };
@@ -345,8 +347,8 @@ typedef struct ProfileConfig
     uint16            m_attrCnt;
     uint32            m_fill;
     SamplingSpec      m_samplingSpec;
-    uint64            m_apuCounterMask;
-    SmuList           m_activeList;
+    uint64            m_apuCounterMask; // Only node counters
+    SmuList           m_activeList;     // m_info[0] will have APU smu
 } ProfileConfig;
 
 // RawPowerConfigTable
@@ -405,6 +407,8 @@ typedef struct PwrInternalAddr
     uint32 m_sviNBTelemetry;
     uint32 m_timingControl4;
     uint32 m_timingControl6;
+    uint32 m_coreEnergyMsr;
+    uint32 m_packageEnergyMsr;
 } PwrInternalAddr;
 
 #endif  // _RAW_DATA_FILE_HEADER_H_

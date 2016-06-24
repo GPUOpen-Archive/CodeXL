@@ -51,6 +51,7 @@
 
 static ppCollect* g_pCollectHandle = nullptr;
 static ppReporter* g_pReporterHandle = nullptr;
+PwrSupportedCounterDetailsMap g_supportedCounters;
 
 #ifdef LINUX
 #include <unistd.h>
@@ -290,15 +291,8 @@ bool ReportDeviceDesc(AMDTPwrDeviceIdNameVec& deviceIdNameVec, AMDTPwrDeviceIdDe
 
         if (nullptr != pDevice)
         {
-            AMDTUInt32 numOfSupportedCounters = 0;
-            AMDTPwrCounterDesc* pBeSupportedCounters;
-            AMDTResult ret = AMDTPwrGetDeviceCounters(pDevice->m_deviceID, &numOfSupportedCounters, &pBeSupportedCounters);
-
-            if ((AMDT_STATUS_OK == ret) && (numOfSupportedCounters > 0))
-            {
-                fprintf(stderr, " %3d. %-20.20s        [%s]\n", pDevice->m_deviceID,
-                        deviceIdNameVec[i].asASCIICharArray(), pDevice->m_pDescription);
-            }
+            fprintf(stderr, " %3d. %-20.20s        [%s]\n", pDevice->m_deviceID,
+                    deviceIdNameVec[i].asASCIICharArray(), pDevice->m_pDescription);
         }
     }
 

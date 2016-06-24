@@ -101,6 +101,14 @@ bool CollectSMU7RegisterValues(void* pSmu, uint8* pData, uint32* pLength)
     SmuInfo* pSmuInfo = (SmuInfo*)pSmu;
     Smu7Interface* pSmuData = &pSmuInfo->m_access.m_smu7;
     Smu7CounterTable* pTable = NULL;
+    bool isPkgPwrSelected = false;
+    uint32 cu0Pwr = 0;
+    uint32 cu1Pwr = 0;
+    uint32 pciePwr = 0;
+    uint32 displayPwr = 0;
+    uint32 ddrPwr = 0;
+    uint32 igpuPwr = 0;
+    uint32 pkgPwr = 0;
 
     // Dump logging
     result = Smu7MessageMMIOSpec(pSmuData, pSmuData->m_logging.m_dump);
@@ -120,7 +128,27 @@ bool CollectSMU7RegisterValues(void* pSmu, uint8* pData, uint32* pLength)
         {
             mask = pSmuInfo->m_counterMask;
 
-            for (idx = COUNTERID_SMU7_APU_PWR_CU; idx <= COUNTERID_SMU_ATTR_MAX; idx++)
+            // Package power need to be calculated from all power counters
+            isPkgPwrSelected = (mask & COUNTERID_SMU7_APU_PWR_PACKAGE) ? true : false;
+
+            if (isPkgPwrSelected)
+            {
+                // Collect calculated Package power
+                SMU7ReadSmuIndirectMappingRegister(pSmuData, pTable->m_pwrCu0, &cu0Pwr);
+
+                if (2 == cuCnt)
+                {
+                    SMU7ReadSmuIndirectMappingRegister(pSmuData, pTable->m_pwrCu1, &cu1Pwr);
+                }
+
+                SMU7ReadSmuIndirectMappingRegister(pSmuData, pTable->m_pwrPcie, &pciePwr);
+                SMU7ReadSmuIndirectMappingRegister(pSmuData, pTable->m_pwrDisplay, &ddrPwr);
+                SMU7ReadSmuIndirectMappingRegister(pSmuData, pTable->m_pwrDdr, &displayPwr);
+                SMU7ReadSmuIndirectMappingRegister(pSmuData, pTable->m_pwriGpu, &igpuPwr);
+                pkgPwr += cu0Pwr + cu1Pwr + pciePwr + ddrPwr + displayPwr + igpuPwr;
+            }
+
+            for (idx = 0; idx <= COUNTERID_SMU7_CNT; idx++)
             {
                 if (false == ((mask >> idx) & 0x01))
                 {
@@ -131,15 +159,29 @@ bool CollectSMU7RegisterValues(void* pSmu, uint8* pData, uint32* pLength)
                 {
                     case COUNTERID_SMU7_APU_PWR_CU:
                     {
-                        // Collect power for CU0
-                        SMU7ReadSmuIndirectMappingRegister(pSmuData, pTable->m_pwrCu0, (uint32*)&pData[offset]);
-                        offset += sizeof(uint32);
-
-                        if (2 == cuCnt)
+                        if (isPkgPwrSelected)
                         {
-                            // Collect power for CU1
-                            SMU7ReadSmuIndirectMappingRegister(pSmuData, pTable->m_pwrCu1, (uint32*)&pData[offset]);
+                            memcpy((uint32*)&pData[offset], &cu0Pwr, sizeof(uint32));
                             offset += sizeof(uint32);
+
+                            if (2 == cuCnt)
+                            {
+                                memcpy((uint32*)&pData[offset], &cu1Pwr, sizeof(uint32));
+                                offset += sizeof(uint32);
+                            }
+                        }
+                        else
+                        {
+                            // Collect power for CU0
+                            SMU7ReadSmuIndirectMappingRegister(pSmuData, pTable->m_pwrCu0, (uint32*)&pData[offset]);
+                            offset += sizeof(uint32);
+
+                            if (2 == cuCnt)
+                            {
+                                // Collect power for CU1
+                                SMU7ReadSmuIndirectMappingRegister(pSmuData, pTable->m_pwrCu1, (uint32*)&pData[offset]);
+                                offset += sizeof(uint32);
+                            }
                         }
 
                         break;
@@ -179,41 +221,76 @@ bool CollectSMU7RegisterValues(void* pSmu, uint8* pData, uint32* pLength)
 
                     case COUNTERID_SMU7_APU_PWR_IGPU:
                     {
-                        // Collect calculated GPU power
-                        SMU7ReadSmuIndirectMappingRegister(pSmuData, pTable->m_pwriGpu, (uint32*)&pData[offset]);
-                        offset += sizeof(uint32);
+                        if (isPkgPwrSelected)
+                        {
+                            memcpy((uint32*)&pData[offset], &igpuPwr, sizeof(uint32));
+                            offset += sizeof(uint32);
+                        }
+                        else
+                        {
+                            // Collect calculated GPU power
+                            SMU7ReadSmuIndirectMappingRegister(pSmuData, pTable->m_pwriGpu, (uint32*)&pData[offset]);
+                            offset += sizeof(uint32);
+                        }
+
                         break;
                     }
 
                     case COUNTERID_SMU7_APU_PWR_PCIE:
                     {
-                        // Collect calculated PCIE power
-                        SMU7ReadSmuIndirectMappingRegister(pSmuData, pTable->m_pwrPcie, (uint32*)&pData[offset]);
-                        offset += sizeof(uint32);
+                        if (isPkgPwrSelected)
+                        {
+                            memcpy((uint32*)&pData[offset], &igpuPwr, sizeof(uint32));
+                            offset += sizeof(uint32);
+                        }
+                        else
+                        {
+                            // Collect calculated PCIE power
+                            SMU7ReadSmuIndirectMappingRegister(pSmuData, pTable->m_pwrPcie, (uint32*)&pData[offset]);
+                            offset += sizeof(uint32);
+                        }
+
                         break;
                     }
 
                     case COUNTERID_SMU7_APU_PWR_DDR:
                     {
-                        // Collect calculated DDR power
-                        SMU7ReadSmuIndirectMappingRegister(pSmuData, pTable->m_pwrDdr, (uint32*)&pData[offset]);
-                        offset += sizeof(uint32);
+                        if (isPkgPwrSelected)
+                        {
+                            memcpy((uint32*)&pData[offset], &igpuPwr, sizeof(uint32));
+                            offset += sizeof(uint32);
+                        }
+                        else
+                        {
+                            // Collect calculated DDR power
+                            SMU7ReadSmuIndirectMappingRegister(pSmuData, pTable->m_pwrDdr, (uint32*)&pData[offset]);
+                            offset += sizeof(uint32);
+                        }
+
                         break;
                     }
 
                     case COUNTERID_SMU7_APU_PWR_DISPLAY:
                     {
-                        // Collect calculated DDR power
-                        SMU7ReadSmuIndirectMappingRegister(pSmuData, pTable->m_pwrDisplay, (uint32*)&pData[offset]);
-                        offset += sizeof(uint32);
+                        if (isPkgPwrSelected)
+                        {
+                            memcpy((uint32*)&pData[offset], &igpuPwr, sizeof(uint32));
+                            offset += sizeof(uint32);
+                        }
+                        else
+                        {
+                            // Collect calculated DDR power
+                            SMU7ReadSmuIndirectMappingRegister(pSmuData, pTable->m_pwrDisplay, (uint32*)&pData[offset]);
+                            offset += sizeof(uint32);
+                        }
+
                         break;
                     }
 
 
                     case COUNTERID_SMU7_APU_PWR_PACKAGE:
                     {
-                        // Collect calculated Package power
-                        SMU7ReadSmuIndirectMappingRegister(pSmuData, pTable->m_pwrPackage, (uint32*)&pData[offset]);
+                        memcpy((uint32*)&pData[offset], &pkgPwr, sizeof(uint32));
                         offset += sizeof(uint32);
                         break;
                     }
@@ -252,7 +329,7 @@ bool CollectSMU7RegisterValues(void* pSmu, uint8* pData, uint32* pLength)
         {
             mask = pSmuInfo->m_counterMask;
 
-            for (idx = 0; idx < DGPU_COUNTERS_MAX; idx++)
+            for (idx = 0; idx < COUNTERID_DGPU_MAX_CNT; idx++)
             {
                 if (false == ((mask >> idx) & 0x01))
                 {
@@ -386,4 +463,63 @@ bool Smu7SessionClose(void* pSmu)
     return result;
 }
 
+uint32 GetSmu7CounterSize(uint32 counterId)
+{
+    uint32 bufferLen = 0;
+    uint32 cuCnt = GetComputeUnitCntPerNode();
+
+    switch (counterId)
+    {
+        // per cu counters
+        case COUNTERID_SMU7_APU_PWR_CU:
+        case COUNTERID_SMU7_APU_TEMP_CU:
+        case COUNTERID_SMU7_APU_TEMP_MEAS_CU:
+        {
+            bufferLen += (cuCnt * sizeof(uint32));
+            break;
+        }
+
+        // 4 byte counters
+        case COUNTERID_SMU7_APU_PWR_IGPU:
+        case COUNTERID_SMU7_APU_PWR_PCIE:
+        case COUNTERID_SMU7_APU_PWR_DDR:
+        case COUNTERID_SMU7_APU_PWR_DISPLAY:
+        case COUNTERID_SMU7_APU_PWR_PACKAGE:
+        case COUNTERID_SMU7_APU_TEMP_IGPU:
+        case COUNTERID_SMU7_APU_TEMP_MEAS_IGPU:
+        case COUNTERID_SMU7_APU_FREQ_IGPU:
+        {
+            bufferLen += sizeof(uint32);
+            break;
+        }
+
+        default:
+            break;
+    }
+
+    return bufferLen;
+}
+
+uint32 GetSmu7DgpuCounterSize(uint32 counterId)
+{
+    uint32 bufferLen = 0;
+
+    switch (counterId)
+    {
+        case COUNTERID_PKG_PWR_DGPU:
+        case COUNTERID_TEMP_MEAS_DGPU:
+        case COUNTERID_FREQ_DGPU:
+        case COUNTERID_VOLT_VDDC_LOAD_DGPU:
+        case COUNTERID_CURR_VDDC_DGPU:
+        {
+            bufferLen += sizeof(uint32);
+            break;
+        }
+
+        default:
+            break;
+    }
+
+    return bufferLen;
+}
 

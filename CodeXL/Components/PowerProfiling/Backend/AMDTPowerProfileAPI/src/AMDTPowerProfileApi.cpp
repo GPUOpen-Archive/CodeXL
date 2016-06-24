@@ -53,7 +53,6 @@ void __attribute__((destructor))  finiPowerProfileDriverInterface(void)
 }
 #endif
 
-bool g_internalCounters = false;
 bool g_isSVI2Supported = false;
 // Create API layer pool.
 static MemoryPool g_apiMemoryPool;
@@ -61,138 +60,83 @@ static MemoryPool g_apiMemoryPool;
 
 static AMDTUInt32 g_samplingPeriod = 0;
 static AMDTPwrProfileMode g_profileMode;
+AMDTUInt32 g_profileType = PROFILE_TYPE_TIMELINE;
+
 
 //Default option for output data is AMDT_PWR_SAMPLE_VALUE_INSTANTANEOUS
 static AMDTSampleValueOption g_outputOption = AMDT_PWR_SAMPLE_VALUE_INSTANTANEOUS;
 
-// Cofigured counter list from client
-static std::vector<AMDTUInt32> g_activeCounters;
-
 // Filter counter list from output list
 static std::vector <AMDTUInt32> g_filterCounters;
 
-// Supported counter count
-AMDTUInt32 g_counterCnt = 0;
-static CounterInfo g_counterList[MAX_SUPPORTED_COUNTERS];
-static AMDTPwrCounterDesc g_desc[MAX_SUPPORTED_COUNTERS];
-AMDTInt32 g_histcounterCnt = 0;
+// Single counter Output list
+gtVector<AMDTPwrSample> g_result;
+AMDTPwrCounterValue*     g_pCounterStorage = nullptr;
+#define PWR_COUNTER_STORAGE_POOL (256*100)
 
-// Dynamic list prepared for client request per device
-static AMDTPwrCounterDesc* g_pClientList = nullptr;
+// Cummulative counter Output list
+gtVector <AMDTFloat32> g_cummulativeResult;
 
-// Output result list
-AMDTPwrSample* g_pResult = nullptr;
+// Histogram counter Output list
+gtVector <AMDTPwrHistogram> g_histogramResult;
 
 // Topology: dynamic list created based of the platform used
 static AMDTPwrDevice* g_pTopology;
 // Memory pool created to avoid complexity during cleanup
 static AMDTPwrDevice* g_pDevPool;
 
-// Total device count
-static AMDTUInt32 g_deviceCnt = 0;
+static std::vector<AMDTPwrCounterDesc> g_clientCounters;
+static AMDTPwrTargetSystemInfo g_sysInfo;
 
-
-// Profile type
-AMDTUInt32 g_profileType = PROFILE_TYPE_TIMELINE;
-
-// Cummulative counter list
-AMDTFloat32 g_cumulativeCounterList[MAX_COUNTER_CNT];
-AMDTPwrHistogram g_histogramCounterList[MAX_COUNTER_CNT];
-
-
-static CounterMapping g_counterMapping[] = { \
-                                             // SMU7 APU specific counters
-{ COUNTER_SMU7_APU_PWR_CU, COUNTERID_SMU7_APU_PWR_CU},
-{ COUNTER_SMU7_APU_TEMP_CU, COUNTERID_SMU7_APU_TEMP_CU},
-{ COUNTER_SMU7_APU_PWR_PCIE, COUNTERID_SMU7_APU_PWR_PCIE},
-{ COUNTER_SMU7_APU_PWR_DDR, COUNTERID_SMU7_APU_PWR_DDR},
-{ COUNTER_SMU7_APU_PWR_PACKAGE, COUNTERID_SMU7_APU_PWR_PACKAGE},
-{ COUNTER_SMU7_APU_PWR_DISPLAY, COUNTERID_SMU7_APU_PWR_DISPLAY},
-{ COUNTER_SMU7_APU_PWR_IGPU, COUNTERID_SMU7_APU_PWR_IGPU},
-{ COUNTER_SMU7_APU_TEMP_IGPU, COUNTERID_SMU7_APU_TEMP_IGPU},
-{ COUNTER_SMU7_APU_FREQ_IGPU, COUNTERID_SMU7_APU_FREQ_IGPU},
-
-// SMU8 APU specific counters
-{ COUNTER_SMU8_APU_PWR_CU, COUNTERID_SMU8_APU_PWR_CU},
-{ COUNTER_SMU8_APU_TEMP_CU, COUNTERID_SMU8_APU_TEMP_CU},
-{ COUNTER_SMU8_APU_PWR_APU, COUNTERID_SMU8_APU_PWR_APU},
-{ COUNTER_SMU8_APU_PWR_VDDGFX, COUNTERID_SMU8_APU_PWR_VDDGFX},
-{ COUNTER_SMU8_APU_TEMP_VDDFFX, COUNTERID_SMU8_APU_TEMP_VDDGFX},
-{ COUNTER_SMU8_APU_FREQ_IGPU, COUNTERID_SMU8_APU_FREQ_IGPU},
-{ COUNTER_SMU8_APU_C0_RES, COUNTERID_SMU8_APU_C0STATE_RES},
-{ COUNTER_SMU8_APU_C1_RES, COUNTERID_SMU8_APU_C1STATE_RES},
-{ COUNTER_SMU8_APU_CC6_RES, COUNTERID_SMU8_APU_CC6_RES},
-{ COUNTER_SMU8_APU_PC6_RES, COUNTERID_SMU8_APU_PC6_RES},
-{ COUNTER_SMU8_APU_PWR_VDDIO, COUNTERID_SMU8_APU_PWR_VDDIO},
-{ COUNTER_SMU8_APU_PWR_VDDNB, COUNTERID_SMU8_APU_PWR_VDDNB},
-{ COUNTER_SMU8_APU_PWR_VDDP, COUNTERID_SMU8_APU_PWR_VDDP},
-{ COUNTER_SMU8_APU_PWR_UVD, COUNTERID_SMU8_APU_PWR_UVD},
-{ COUNTER_SMU8_APU_PWR_VCE, COUNTERID_SMU8_APU_PWR_VCE},
-{ COUNTER_SMU8_APU_PWR_ACP, COUNTERID_SMU8_APU_PWR_ACP},
-{ COUNTER_SMU8_APU_PWR_UNB, COUNTERID_SMU8_APU_PWR_UNB},
-{ COUNTER_SMU8_APU_PWR_SMU, COUNTERID_SMU8_APU_PWR_SMU},
-{ COUNTER_SMU8_APU_PWR_ROC, COUNTERID_SMU8_APU_PWR_ROC},
-{ COUNTER_SMU8_APU_FREQ_ACLK, COUNTERID_SMU8_APU_FREQ_ACLK},
-
-// Non SMU counters accessed by MSR/PCIe interface
-{ COUNTER_CORE_APU_PID, COUNTERID_PID},
-{ COUNTER_CORE_APU_TID, COUNTERID_TID},
-{ COUNTER_CORE_EFFECTIVE_FREQUENCY, COUNTERID_CEF},
-{ COUNTER_CORE_PSTATE, COUNTERID_PSTATE},
-{ COUNTER_NODE_TCTL_TEMPERATURE, COUNTERID_NODE_TCTL_TEPERATURE},
-{ COUNTER_NCORE_SVI2_CORE_TELEMETRY, COUNTERID_SVI2_CORE_TELEMETRY},
-{ COUNTER_NCORE_SVI2_NB_TELEMETRY, COUNTERID_SVI2_NB_TELEMETRY},
-{ COUNTER_MAX, COUNTERID_MAX_CNT}
-                                           };
 static AMDTUInt32 g_smu7PackagePwr[] =
 {
-    COUNTER_SMU7_APU_PWR_CU,
-    COUNTER_SMU7_APU_PWR_PCIE,
-    COUNTER_SMU7_APU_PWR_DDR,
-    COUNTER_SMU7_APU_PWR_DISPLAY,
-    COUNTER_SMU7_APU_PWR_IGPU
+    COUNTERID_SMU7_APU_PWR_CU,
+    COUNTERID_SMU7_APU_PWR_PCIE,
+    COUNTERID_SMU7_APU_PWR_DDR,
+    COUNTERID_SMU7_APU_PWR_DISPLAY,
+    COUNTERID_SMU7_APU_PWR_IGPU
 };
 
 static AMDTUInt32 g_smu8ApuPwr[] =
 {
-    COUNTER_SMU8_APU_PWR_CU,
-    COUNTER_SMU8_APU_PWR_VDDNB,
-    COUNTER_SMU8_APU_PWR_VDDGFX,
-    COUNTER_SMU8_APU_PWR_VDDIO,
-    COUNTER_SMU8_APU_PWR_VDDP,
-    COUNTER_SMU8_APU_PWR_ROC,
+    COUNTERID_SMU8_APU_PWR_CU,
+    COUNTERID_SMU8_APU_PWR_VDDNB,
+    COUNTERID_SMU8_APU_PWR_VDDGFX,
+    COUNTERID_SMU8_APU_PWR_VDDIO,
+    COUNTERID_SMU8_APU_PWR_VDDP,
+    COUNTERID_SMU8_APU_PWR_ROC,
 
 };
 static AMDTUInt32 g_smu8VddNbPwr[] =
 {
-    COUNTER_SMU8_APU_PWR_UVD,
-    COUNTER_SMU8_APU_PWR_VCE,
-    COUNTER_SMU8_APU_PWR_ACP,
-    COUNTER_SMU8_APU_PWR_UNB,
-    COUNTER_SMU8_APU_PWR_SMU
+    COUNTERID_SMU8_APU_PWR_UVD,
+    COUNTERID_SMU8_APU_PWR_VCE,
+    COUNTERID_SMU8_APU_PWR_ACP,
+    COUNTERID_SMU8_APU_PWR_UNB,
+    COUNTERID_SMU8_APU_PWR_SMU
 
 };
 
 static AMDTPwrCounterHierarchy g_InternalCounterHirarchy[] =
 {
-    {COUNTER_SMU7_APU_PWR_CU, COUNTER_SMU7_APU_PWR_PACKAGE, 0, nullptr},
-    {COUNTER_SMU7_APU_PWR_PCIE, COUNTER_SMU7_APU_PWR_PACKAGE, 0, nullptr},
-    {COUNTER_SMU7_APU_PWR_DDR, COUNTER_SMU7_APU_PWR_PACKAGE, 0, nullptr},
-    { COUNTER_SMU7_APU_PWR_DISPLAY, COUNTER_SMU7_APU_PWR_PACKAGE, 0, nullptr },
-    { COUNTER_SMU7_APU_PWR_IGPU, COUNTER_SMU7_APU_PWR_PACKAGE, 0, nullptr },
-    { COUNTER_SMU7_APU_PWR_PACKAGE, COUNTER_SMU7_APU_PWR_PACKAGE, sizeof(g_smu7PackagePwr) / sizeof(AMDTUInt32), g_smu7PackagePwr },
-    { COUNTER_SMU8_APU_PWR_CU, COUNTER_SMU8_APU_PWR_APU, 0, nullptr },
-    { COUNTER_SMU8_APU_PWR_APU, COUNTER_SMU8_APU_PWR_APU, sizeof(g_smu8ApuPwr) / sizeof(AMDTUInt32), g_smu8ApuPwr },
-    { COUNTER_SMU8_APU_PWR_VDDGFX, COUNTER_SMU8_APU_PWR_APU, 0, nullptr },
-    { COUNTER_SMU8_APU_PWR_VDDIO, COUNTER_SMU8_APU_PWR_APU, 0, nullptr },
-    { COUNTER_SMU8_APU_PWR_VDDNB, COUNTER_SMU8_APU_PWR_APU, sizeof(g_smu8VddNbPwr) / sizeof(AMDTUInt32), g_smu8VddNbPwr },
-    { COUNTER_SMU8_APU_PWR_VDDP, COUNTER_SMU8_APU_PWR_APU, 0, nullptr },
-    { COUNTER_SMU8_APU_PWR_UVD, COUNTER_SMU8_APU_PWR_VDDNB, 0, nullptr },
-    { COUNTER_SMU8_APU_PWR_VCE, COUNTER_SMU8_APU_PWR_VDDNB, 0, nullptr },
-    { COUNTER_SMU8_APU_PWR_ACP, COUNTER_SMU8_APU_PWR_VDDNB, 0, nullptr },
-    { COUNTER_SMU8_APU_PWR_UNB, COUNTER_SMU8_APU_PWR_VDDNB, 0, nullptr },
-    { COUNTER_SMU8_APU_PWR_SMU, COUNTER_SMU8_APU_PWR_VDDNB, 0, nullptr },
-    { COUNTER_SMU8_APU_PWR_ROC, COUNTER_SMU8_APU_PWR_APU, 0, nullptr },
+    {COUNTERID_SMU7_APU_PWR_CU, COUNTERID_SMU7_APU_PWR_PACKAGE, 0, nullptr},
+    {COUNTERID_SMU7_APU_PWR_PCIE, COUNTERID_SMU7_APU_PWR_PACKAGE, 0, nullptr},
+    {COUNTERID_SMU7_APU_PWR_DDR, COUNTERID_SMU7_APU_PWR_PACKAGE, 0, nullptr},
+    { COUNTERID_SMU7_APU_PWR_DISPLAY, COUNTERID_SMU7_APU_PWR_PACKAGE, 0, nullptr },
+    { COUNTERID_SMU7_APU_PWR_IGPU, COUNTERID_SMU7_APU_PWR_PACKAGE, 0, nullptr },
+    { COUNTERID_SMU7_APU_PWR_PACKAGE, COUNTERID_SMU7_APU_PWR_PACKAGE, sizeof(g_smu7PackagePwr) / sizeof(AMDTUInt32), g_smu7PackagePwr },
+    { COUNTERID_SMU8_APU_PWR_CU, COUNTERID_SMU8_APU_PWR_APU, 0, nullptr },
+    { COUNTERID_SMU8_APU_PWR_APU, COUNTERID_SMU8_APU_PWR_APU, sizeof(g_smu8ApuPwr) / sizeof(AMDTUInt32), g_smu8ApuPwr },
+    { COUNTERID_SMU8_APU_PWR_VDDGFX, COUNTERID_SMU8_APU_PWR_APU, 0, nullptr },
+    { COUNTERID_SMU8_APU_PWR_VDDIO, COUNTERID_SMU8_APU_PWR_APU, 0, nullptr },
+    { COUNTERID_SMU8_APU_PWR_VDDNB, COUNTERID_SMU8_APU_PWR_APU, sizeof(g_smu8VddNbPwr) / sizeof(AMDTUInt32), g_smu8VddNbPwr },
+    { COUNTERID_SMU8_APU_PWR_VDDP, COUNTERID_SMU8_APU_PWR_APU, 0, nullptr },
+    { COUNTERID_SMU8_APU_PWR_UVD, COUNTERID_SMU8_APU_PWR_VDDNB, 0, nullptr },
+    { COUNTERID_SMU8_APU_PWR_VCE, COUNTERID_SMU8_APU_PWR_VDDNB, 0, nullptr },
+    { COUNTERID_SMU8_APU_PWR_ACP, COUNTERID_SMU8_APU_PWR_VDDNB, 0, nullptr },
+    { COUNTERID_SMU8_APU_PWR_UNB, COUNTERID_SMU8_APU_PWR_VDDNB, 0, nullptr },
+    { COUNTERID_SMU8_APU_PWR_SMU, COUNTERID_SMU8_APU_PWR_VDDNB, 0, nullptr },
+    { COUNTERID_SMU8_APU_PWR_ROC, COUNTERID_SMU8_APU_PWR_APU, 0, nullptr },
 };
 
 static AMDTUInt32 g_ChildCounterList[COUNTERID_MAX_CNT];
@@ -203,9 +147,6 @@ static AMDTUInt32 g_ChildCounterList[COUNTERID_MAX_CNT];
 
 #define PP_INVALID_COUNTER_ID    0xFFFF
 
-static bool g_histogramEnabled;
-static CounterInfo  g_histogramCounters[MAX_SUPPORTED_COUNTERS];
-static AMDTUInt32   g_histogramCounterCount = 0;
 typedef std::pair<AMDTUInt8, bool> DgpuCountPair;
 //#define PWR_API_STUB_ENABLED
 #ifdef PWR_API_STUB_ENABLED
@@ -217,63 +158,11 @@ AMDTResult AllocateBuffers()
 {
     AMDTResult ret = AMDT_STATUS_OK;
 
-    //Allocate buffers for client device specific counter list
-    if (nullptr == g_pClientList)
+    if (nullptr == g_pCounterStorage)
     {
-        g_pClientList = (AMDTPwrCounterDesc*)GetMemoryPoolBuffer(&g_apiMemoryPool,
-                                                                 sizeof(AMDTPwrCounterDesc) * MAX_SUPPORTED_COUNTERS);
+        g_pCounterStorage = (AMDTPwrCounterValue*)GetMemoryPoolBuffer(&g_apiMemoryPool,
+                                                                      sizeof(AMDTPwrCounterValue) * PWR_COUNTER_STORAGE_POOL);
     }
-
-    if (nullptr == g_pClientList)
-    {
-        ret = AMDT_ERROR_OUTOFMEMORY;
-        PwrTrace("g_pClientList memory allocation failed");
-    }
-
-    // Allocation for result buffer
-    if (AMDT_STATUS_OK == ret)
-    {
-        if (nullptr != g_pResult)
-        {
-            ret = AMDT_ERROR_UNEXPECTED;
-            PwrTrace("g_pResult is corrupted");
-        }
-
-        if (AMDT_STATUS_OK == ret)
-        {
-            g_pResult = (AMDTPwrSample*)GetMemoryPoolBuffer(&g_apiMemoryPool,
-                                                            sizeof(AMDTPwrSample) * MAX_SAMPLES_PER_QUERY);
-
-            if (nullptr != g_pResult)
-            {
-                ret = AMDT_STATUS_OK;
-                memset(g_pResult, 0, sizeof(AMDTPwrSample) * MAX_SAMPLES_PER_QUERY);
-
-                for (AMDTUInt32 i = 0; i < MAX_SAMPLES_PER_QUERY; i++)
-                {
-                    AMDTPwrCounterValue* ptr = nullptr;
-                    ptr = (AMDTPwrCounterValue*)GetMemoryPoolBuffer(&g_apiMemoryPool,
-                                                                    sizeof(AMDTPwrCounterValue) * MAX_SUPPORTED_COUNTERS);
-
-                    if (nullptr != ptr)
-                    {
-                        memset(ptr, 0, sizeof(AMDTPwrCounterValue) * MAX_SUPPORTED_COUNTERS);
-                        g_pResult[i].m_counterValues = ptr;
-                    }
-                    else
-                    {
-                        ret = AMDT_ERROR_OUTOFMEMORY;
-                        PwrTrace("g_pResult memory allocation failed");
-                    }
-                }
-            }
-        }
-    }
-
-    // reserve memory for max supported counters
-    g_activeCounters.reserve(MAX_SUPPORTED_COUNTERS);
-
-    memset(g_desc, 0, sizeof(AMDTPwrCounterDesc)* MAX_SUPPORTED_COUNTERS);
 
     //Allocate memory for topology tree
     g_pDevPool = (AMDTPwrDevice*)GetMemoryPoolBuffer(&g_apiMemoryPool,
@@ -298,44 +187,7 @@ AMDTResult AllocateBuffers()
         ret = AMDT_ERROR_OUTOFMEMORY;
     }
 
-    g_counterCnt = 0;
-    g_histogramCounterCount = 0;
-    g_histogramEnabled = false;
-    g_histcounterCnt = 0;
-
-    memset(g_counterList, 0, sizeof(CounterInfo)* MAX_SUPPORTED_COUNTERS);
-    memset(g_histogramCounters, 0, sizeof(CounterInfo)* MAX_SUPPORTED_COUNTERS);
-
     return ret;
-}
-
-// SetSmu7ApuPkgPwrCounter: In case of SMU 7 total APU power is sum of
-// CU, PCIE, DDR, DISPLAY and IGPU power values.These counters value are added
-// to handle the delta observed
-void SetSmu7ApuPkgPwrCounter(const AMDTPwrProfileAttributeList& supportedList, AMDTUInt16* counterList,
-                             AMDTUInt32& cnt)
-{
-    // back end IDs for associative  counters
-    const AMDTUInt32 attributeIds[6] = { COUNTERID_SMU7_APU_PWR_CU,
-                                         COUNTERID_SMU7_APU_PWR_PCIE,
-                                         COUNTERID_SMU7_APU_PWR_DDR,
-                                         COUNTERID_SMU7_APU_PWR_DISPLAY,
-                                         COUNTERID_SMU7_APU_PWR_IGPU
-                                       };
-
-    for (AMDTUInt32 attrId : attributeIds)
-    {
-        for (AMDTUInt16 itr = 0; itr < supportedList.attrCnt; itr++)
-        {
-            if (attrId == supportedList.pAttrList[itr].m_attrId)
-            {
-                // enabling  counter to fetch there value,
-                // which will be summed to get total apu power
-                counterList[cnt++] = itr;
-                break;
-            }
-        }
-    }
 }
 
 // CleanBuffers: Clean all buffers which are allocated during
@@ -343,25 +195,8 @@ void SetSmu7ApuPkgPwrCounter(const AMDTPwrProfileAttributeList& supportedList, A
 AMDTResult CleanBuffers()
 {
     AMDTResult ret = AMDT_STATUS_OK;
-
-    g_pClientList = nullptr;
-    g_pResult = nullptr;
+    g_clientCounters.clear();
     g_pDevPool = nullptr;
-
-    // clear the active counters
-    g_activeCounters.clear();
-
-    g_counterCnt = 0;
-    g_histcounterCnt = 0;
-
-    // Clear all the histogram counters
-    g_histogramCounterCount = 0;
-    g_histogramEnabled = false;
-
-    memset(g_histogramCounters, 0, sizeof(CounterInfo)* MAX_SUPPORTED_COUNTERS);
-    memset(g_counterList, 0, sizeof(CounterInfo)* MAX_SUPPORTED_COUNTERS);
-
-    g_deviceCnt = 0;
 
     return ret;
 }
@@ -389,154 +224,6 @@ void ConvertTimeStamp(AMDTPwrSystemTime* pTimeStamp , AMDTUInt64 data)
 
 }
 
-//GetCoreCount: get number of cores from mask.
-AMDTUInt8 GetCoreCount(AMDTInt64 n)
-{
-    AMDTUInt8 c;
-
-    for (c = 0; n; c++)
-    {
-        n &= n - 1;
-    }
-
-    return c;
-}
-
-
-// GetClientCounterId: Get basic counter id from backend id
-static BasicCounters GetBaseCounterIdFromBackendId(AMDTPwrProfileAttrType id)
-{
-    AMDTUInt32 cnt = 0;
-    BasicCounters clientId = COUNTER_MAX;
-
-    for (cnt = 0; cnt < COUNTER_MAX; cnt++)
-    {
-        if ((AMDTUInt32)id == g_counterMapping[cnt].m_backendId)
-        {
-            clientId = (BasicCounters)g_counterMapping[cnt].m_clientId;
-            break;
-        }
-    }
-
-    return clientId;
-}
-
-// GetBackendCounterId: get backend counter id from basic counter id
-static AMDTPwrProfileAttrType GetBackendCounterIdFromBaseId(BasicCounters id)
-{
-    AMDTUInt32 cnt = 0;
-    AMDTPwrProfileAttrType clientId = COUNTERID_APU_MAX_CNT;
-
-    for (cnt = 0; cnt < COUNTER_MAX; cnt++)
-    {
-        if ((AMDTUInt32)id == g_counterMapping[cnt].m_clientId)
-        {
-            clientId = (AMDTPwrProfileAttrType)g_counterMapping[cnt].m_backendId;
-            break;
-        }
-    }
-
-    return clientId;
-}
-
-// GetBaseCounterInfoFromClientId: Comple base counter information from a
-// client space counter id
-static CounterInfo* GetBaseCounterInfoFromClientId(AMDTUInt32 ClientId)
-{
-    AMDTUInt32 cnt = 0;
-
-    for (cnt = 0; cnt < g_counterCnt; cnt++)
-    {
-        if (ClientId == g_counterList[cnt].m_pDesc->m_counterID)
-        {
-            return &g_counterList[cnt];
-        }
-    }
-
-    return nullptr;
-}
-
-// GetBaseCounterInfoFromClientId: Comple base counter information from a
-// client space counter id
-static AMDTUInt32 GetClientIdFromBaseCounterId(AMDTUInt32 baseId, AMDTUInt32 instId)
-{
-    AMDTUInt32 cnt = 0;
-
-    for (cnt = 0; cnt < g_counterCnt; cnt++)
-    {
-        if ((baseId == (AMDTUInt32)g_counterList[cnt].m_basicCounterId) && (instId == g_counterList[cnt].m_instanceId))
-        {
-            return g_counterList[cnt].m_pDesc->m_counterID;
-        }
-    }
-
-    return AMDT_STATUS_OK;
-}
-
-// AddInstanceString: Add instance type string with the base counter name
-void AddInstanceString(char* pName, char* pDesc, AMDTPwrAttributeTypeInfo* pInfo, AMDTUInt32 instId)
-{
-    // Description length is greater than name length so we use it as the size of the temp buffer becasue it supports both cases.
-    char tempString[PWR_MAX_DESC_LEN];
-
-    if (nullptr != pInfo)
-    {
-        if (INSTANCE_TYPE_NONCORE_SINGLE == pInfo->m_instanceType)
-        {
-            //No need to add anything
-        }
-
-        if (INSTANCE_TYPE_PER_CU == pInfo->m_instanceType)
-        {
-            sprintf(tempString, "CPU CU%d %s", instId, pName);
-            strcpy(pName, tempString);
-        }
-        else if (INSTANCE_TYPE_PER_CORE == pInfo->m_instanceType)
-        {
-            sprintf(tempString, "CPU Core%d %s", instId, pName);
-            strcpy(pName, tempString);
-        }
-        else if (INSTANCE_TYPE_NONCORE_MULTIVALUE == pInfo->m_instanceType)
-        {
-            if (g_internalCounters && g_isSVI2Supported)
-            {
-                if (COUNTERID_SVI2_CORE_TELEMETRY == pInfo->m_attrId)
-                {
-                    memset(pName, 0, PWR_MAX_NAME_LEN);
-                    memset(pDesc, 0, PWR_MAX_DESC_LEN);
-
-                    if (0 == instId)
-                    {
-                        sprintf(pName, "Measured CPU Core Voltage - SVI2");
-                        sprintf(pDesc, "CPU Core Voltage measured by the SVI2 (Serial Voltage identification Interface 2.0) Telemetry, reported in Volts.");
-                    }
-                    else
-                    {
-                        sprintf(pName, "Measured CPU Core Current - SVI2");
-                        sprintf(pDesc, "CPU Core Current measured by the SVI2 (Serial Voltage identification Interface 2.0) Telemetry, reported in Milli-Amperes.");
-                    }
-                }
-                else if (COUNTERID_SVI2_NB_TELEMETRY == pInfo->m_attrId)
-                {
-                    memset(pName, 0, PWR_MAX_NAME_LEN);
-                    memset(pDesc, 0, PWR_MAX_DESC_LEN);
-
-                    if (0 == instId)
-                    {
-                        sprintf(pName, "Measured NB Voltage - SVI2");
-                        sprintf(pDesc, "North-Bridge Voltage measured by the SVI2 (Serial Voltage identification Interface 2.0) Telemetry, reported in Volts.");
-                    }
-                    else
-                    {
-                        sprintf(pName, "Measured NB Current - SVI2");
-                        sprintf(pDesc, "North-Bridge Current measured by the SVI2 (Serial Voltage identification Interface 2.0) Telemetry, reported in Milli-Amperes.");
-                    }
-                }
-            }
-        }
-    }
-}
-
 // AllocateDevice: allocate device from free pool
 AMDTPwrDevice* AllocateDevice(AMDTUInt32* usedCnt)
 {
@@ -549,336 +236,7 @@ AMDTPwrDevice* AllocateDevice(AMDTUInt32* usedCnt)
 
     dev->m_isAccessible = false;
 
-    return  dev;
-}
-#define DGPU_AGGREGATED_COUNTER_OFFSET 7
-// FillCounterDetails: Populate the counter details
-void FillCounterDetails(AMDTUInt32 deviceId,
-                        AMDTUInt32 instId,
-                        AMDTUInt32 baseId,
-                        AMDTPwrAttributeInstanceType instType,
-                        AMDTPwrAggregation aggr,
-                        AMDTPwrAttributeTypeInfo* pData)
-{
-    AMDTUInt32 repeatCnt = 1;
-    AMDTUInt32 loop = 0;
-    char* desc;
-    char* name;
-
-    if ((COUNTERID_SVI2_CORE_TELEMETRY == pData->m_attrId)
-        || (COUNTERID_SVI2_NB_TELEMETRY == pData->m_attrId))
-    {
-        if (g_isSVI2Supported)
-        {
-            //Voltage & current
-            repeatCnt = 2;
-        }
-        else
-        {
-            // CARRIZO doesn't support SVI2 access via PCIe
-            repeatCnt = 0;
-        }
-    }
-
-
-    while (loop < repeatCnt)
-    {
-        if ((COUNTERID_SVI2_CORE_TELEMETRY == pData->m_attrId)
-            || (COUNTERID_SVI2_NB_TELEMETRY == pData->m_attrId))
-        {
-            instId = loop;
-        }
-
-        g_counterList[g_counterCnt].m_instanceId = instId;
-        g_counterList[g_counterCnt].m_pDesc = &g_desc[g_counterCnt];
-        //Found client id
-        g_counterList[g_counterCnt].m_instanceType = instType;
-        g_counterList[g_counterCnt].m_basicCounterId = (BasicCounters)baseId;
-        g_counterList[g_counterCnt].m_pDesc->m_counterID
-            = (DGPU_COUNTER_BASE_ID > baseId) ? g_counterCnt : baseId + DGPU_AGGREGATED_COUNTER_OFFSET;
-
-        g_counterList[g_counterCnt].m_pDesc->m_aggregation = aggr;
-        desc = (char*)GetMemoryPoolBuffer(&g_apiMemoryPool,
-                                          sizeof(char) * PWR_MAX_DESC_LEN);
-        memset(desc, '\0', sizeof(char)* PWR_MAX_DESC_LEN);
-
-        strncpy(desc, pData->m_description, PWR_MAX_DESC_LEN - 1);
-        desc[PWR_MAX_DESC_LEN - 1] = '\0';
-
-        name = (char*)GetMemoryPoolBuffer(&g_apiMemoryPool,
-                                          sizeof(char) * PWR_MAX_NAME_LEN);
-        memset(name, '\0', sizeof(char)* PWR_MAX_NAME_LEN);
-
-        strncpy(name, pData->m_name, PWR_MAX_NAME_LEN - 1);
-        name[PWR_MAX_NAME_LEN - 1] = '\0';
-
-        AddInstanceString(name, desc, pData, instId);
-
-        g_counterList[g_counterCnt].m_pDesc->m_name = name;
-        g_counterList[g_counterCnt].m_pDesc->m_description = desc;
-        g_counterList[g_counterCnt].m_pDesc->m_deviceId = deviceId;
-        g_counterList[g_counterCnt].m_pDesc->m_units = (AMDTPwrUnit)pData->m_unitType;
-        g_counterList[g_counterCnt].m_pDesc->m_category = (AMDTPwrCategory)pData->m_category;
-
-        if ((COUNTERID_SVI2_CORE_TELEMETRY == pData->m_attrId) || (COUNTERID_SVI2_NB_TELEMETRY == pData->m_attrId))
-        {
-            if (1 == instId)
-            {
-                g_counterList[g_counterCnt].m_pDesc->m_units = AMDT_PWR_UNIT_TYPE_MILLI_AMPERE;
-                g_counterList[g_counterCnt].m_pDesc->m_category = AMDT_PWR_CATEGORY_CURRENT;
-            }
-            else
-            {
-                g_counterList[g_counterCnt].m_pDesc->m_units = AMDT_PWR_UNIT_TYPE_VOLT;
-                g_counterList[g_counterCnt].m_pDesc->m_category = AMDT_PWR_CATEGORY_VOLTAGE;
-            }
-        }
-
-        //backend id needs to be stored
-        g_counterList[g_counterCnt].m_backendId = pData->m_attrId;
-        g_counterCnt++;
-
-        if (AMDT_PWR_VALUE_CUMULATIVE == aggr || AMDT_PWR_VALUE_HISTOGRAM == aggr)
-        {
-            g_histcounterCnt++;
-        }
-
-        loop++;
-    }
-}
-
-// GetBaseCounterInfo: provide the backend counter information
-// from basic counter
-AMDTPwrAttributeTypeInfo* GetBaseCounterInfo(BasicCounters counterId)
-{
-    AMDTResult ret = AMDT_STATUS_OK;
-    AMDTPwrProfileAttributeList list;
-    AMDTPwrAttributeTypeInfo* pData = nullptr;
-    bool found = false;
-    ret = PwrGetSupportedAttributeList(&list);
-
-    if (AMDT_STATUS_OK == ret)
-    {
-        AMDTUInt32 cnt = 0;
-
-        for (cnt = 0; cnt < list.attrCnt; cnt++)
-        {
-            BasicCounters basicId;
-            pData = (list.pAttrList + cnt);
-            basicId = GetBaseCounterIdFromBackendId((AMDTPwrProfileAttrType)pData->m_attrId);
-
-            if (counterId == basicId)
-            {
-                found = true;
-                break;
-            }
-        }
-    }
-
-    return found ? pData : nullptr;
-}
-
-
-// FillAggregatedCounterDetails: Populate the details of aggregated counter infomation
-void FillAggregatedCounterDetails(AMDTUInt32 cnt,
-                                  AMDTUInt32 deviceId,
-                                  AMDTUInt32 instId,
-                                  AMDTPwrAttributeInstanceType instType,
-                                  AMDTPwrAttributeTypeInfo* pData)
-{
-    AMDTPwrAttributeTypeInfo tmp;
-
-    switch (cnt)
-    {
-        case COUNTER_SMU7_APU_FREQ_IGPU:
-        {
-            strncpy(tmp.m_name, "iGPU Frequency Hist", PWR_MAX_NAME_LEN);
-            strncpy(tmp.m_description, "Histogram of Integrated-GPU Frequency.", PWR_MAX_DESC_LEN);
-            tmp.m_unitType = static_cast<AMDTPwrAttributeUnitType>(AMDT_PWR_UNIT_TYPE_MEGA_HERTZ);
-            tmp.m_category = static_cast<PwrCategory>(AMDT_PWR_CATEGORY_FREQUENCY);
-            tmp.m_attrId  = pData->m_attrId;
-            tmp.m_instanceType = pData->m_instanceType;
-
-            FillCounterDetails(deviceId,
-                               instId,
-                               cnt,
-                               instType,
-                               AMDT_PWR_VALUE_HISTOGRAM,
-                               &tmp);
-            break;
-        }
-
-        case COUNTER_SMU8_APU_FREQ_IGPU:
-        {
-            strncpy(tmp.m_name, "GFX Frequency Hist", PWR_MAX_NAME_LEN);
-            strncpy(tmp.m_description, "Histogram of Integrated-GPU Frequency.", PWR_MAX_DESC_LEN);
-            tmp.m_unitType = static_cast<AMDTPwrAttributeUnitType>(AMDT_PWR_UNIT_TYPE_MEGA_HERTZ);
-            tmp.m_category = static_cast<PwrCategory>(AMDT_PWR_CATEGORY_FREQUENCY);
-            tmp.m_attrId = pData->m_attrId;
-            tmp.m_instanceType = pData->m_instanceType;
-
-            FillCounterDetails(deviceId,
-                               instId,
-                               cnt,
-                               instType,
-                               AMDT_PWR_VALUE_HISTOGRAM,
-                               &tmp);
-            break;
-        }
-
-        case COUNTER_CORE_EFFECTIVE_FREQUENCY:
-        {
-            std::string str(pData->m_name);
-            str.append(" Hist");
-            strncpy(tmp.m_name, str.c_str(), PWR_MAX_NAME_LEN);
-            strncpy(tmp.m_description, "Histogram of CPU Core Effective Frequency.", PWR_MAX_DESC_LEN);
-            tmp.m_unitType = static_cast<AMDTPwrAttributeUnitType>(AMDT_PWR_UNIT_TYPE_MEGA_HERTZ);
-            tmp.m_category = static_cast<PwrCategory>(AMDT_PWR_CATEGORY_FREQUENCY);
-            tmp.m_attrId  = pData->m_attrId;
-            tmp.m_instanceType = pData->m_instanceType;
-
-            FillCounterDetails(deviceId,
-                               instId,
-                               cnt,
-                               instType,
-                               AMDT_PWR_VALUE_HISTOGRAM,
-                               &tmp);
-            break;
-        }
-
-        case COUNTER_SMU7_APU_PWR_CU:
-        case COUNTER_SMU8_APU_PWR_CU:
-        {
-            std::string str(pData->m_name);
-            str.append(" Cuml");
-            strncpy(tmp.m_name, str.c_str(), PWR_MAX_NAME_LEN);
-            strncpy(tmp.m_description, "Cumulative CPU Compute Unit Power, reported in Joules.", PWR_MAX_DESC_LEN);
-            tmp.m_unitType = static_cast<AMDTPwrAttributeUnitType>(AMDT_PWR_UNIT_TYPE_JOULE);
-            tmp.m_category = static_cast<PwrCategory>(AMDT_PWR_CATEGORY_POWER);
-            tmp.m_attrId  = pData->m_attrId;
-            tmp.m_instanceType = pData->m_instanceType;
-
-            FillCounterDetails(deviceId,
-                               instId,
-                               cnt,
-                               instType,
-                               AMDT_PWR_VALUE_CUMULATIVE,
-                               &tmp);
-            break;
-        }
-
-        case COUNTER_SMU7_APU_PWR_PACKAGE:
-        case COUNTER_SMU8_APU_PWR_APU:
-        {
-            std::string str(pData->m_name);
-            str.append(" Cuml");
-            strncpy(tmp.m_name, str.c_str(), PWR_MAX_NAME_LEN);
-            strncpy(tmp.m_description, "Cumulative APU Power, reported in Joules.", PWR_MAX_DESC_LEN);
-            tmp.m_unitType = static_cast<AMDTPwrAttributeUnitType>(AMDT_PWR_UNIT_TYPE_JOULE);
-            tmp.m_category = static_cast<PwrCategory>(AMDT_PWR_CATEGORY_POWER);
-            tmp.m_attrId  = pData->m_attrId;
-            tmp.m_instanceType = pData->m_instanceType;
-
-            FillCounterDetails(deviceId,
-                               instId,
-                               cnt,
-                               instType,
-                               AMDT_PWR_VALUE_CUMULATIVE,
-                               &tmp);
-            break;
-        }
-
-        case COUNTER_SMU7_APU_PWR_IGPU:
-        {
-            std::string str(pData->m_name);
-            str.append(" Cuml");
-            strncpy(tmp.m_name, str.c_str(), PWR_MAX_NAME_LEN);
-            strncpy(tmp.m_description, "Cumulative Integrated-GPU Power, reported in Joules.", PWR_MAX_DESC_LEN);
-            tmp.m_unitType = static_cast<AMDTPwrAttributeUnitType>(AMDT_PWR_UNIT_TYPE_JOULE);
-            tmp.m_category = static_cast<PwrCategory>(AMDT_PWR_CATEGORY_POWER);
-            tmp.m_attrId  = pData->m_attrId;
-            tmp.m_instanceType = pData->m_instanceType;
-
-            FillCounterDetails(deviceId,
-                               instId,
-                               cnt,
-                               instType,
-                               AMDT_PWR_VALUE_CUMULATIVE,
-                               &tmp);
-            break;
-        }
-
-        case COUNTER_SMU8_APU_PWR_VDDGFX:
-        {
-            std::string str(pData->m_name);
-            str.append(" Cuml");
-            strncpy(tmp.m_name, str.c_str(), PWR_MAX_NAME_LEN);
-            strncpy(tmp.m_description, "Cumulative VddGfx Power, reported in Joules.", PWR_MAX_DESC_LEN);
-            tmp.m_unitType = static_cast<AMDTPwrAttributeUnitType>(AMDT_PWR_UNIT_TYPE_JOULE);
-            tmp.m_category = static_cast<PwrCategory>(AMDT_PWR_CATEGORY_POWER);
-            tmp.m_attrId  = pData->m_attrId;
-            tmp.m_instanceType = pData->m_instanceType;
-
-            FillCounterDetails(deviceId,
-                               instId,
-                               cnt,
-                               instType,
-                               AMDT_PWR_VALUE_CUMULATIVE,
-                               &tmp);
-            break;
-        }
-
-        case DGPU_COUNTER_BASE_ID + COUNTERID_PKG_PWR_DGPU:
-        case DGPU_COUNTER_BASE_ID + DGPU_COUNTERS_MAX + COUNTERID_PKG_PWR_DGPU:
-        case DGPU_COUNTER_BASE_ID + (DGPU_COUNTERS_MAX * 2) + COUNTERID_PKG_PWR_DGPU:
-        case DGPU_COUNTER_BASE_ID + (DGPU_COUNTERS_MAX * 3) + COUNTERID_PKG_PWR_DGPU:
-        case DGPU_COUNTER_BASE_ID + (DGPU_COUNTERS_MAX * 4) + COUNTERID_PKG_PWR_DGPU:
-        {
-            std::string str(pData->m_name);
-            str.append(" Cuml");
-            strncpy(tmp.m_name, str.c_str(), PWR_MAX_NAME_LEN);
-            strncpy(tmp.m_description, "Cumulative dGPU Power, reported in Joules.", PWR_MAX_DESC_LEN);
-            tmp.m_unitType = static_cast<AMDTPwrAttributeUnitType>(AMDT_PWR_UNIT_TYPE_JOULE);
-            tmp.m_category = static_cast<PwrCategory>(AMDT_PWR_CATEGORY_POWER);
-            tmp.m_attrId  = pData->m_attrId;
-            tmp.m_instanceType = pData->m_instanceType;
-
-            FillCounterDetails(deviceId,
-                               instId,
-                               cnt,
-                               instType,
-                               AMDT_PWR_VALUE_CUMULATIVE,
-                               &tmp);
-            break;
-        }
-
-        case DGPU_COUNTER_BASE_ID + COUNTERID_FREQ_DGPU:
-        case DGPU_COUNTER_BASE_ID + DGPU_COUNTERS_MAX + COUNTERID_FREQ_DGPU:
-        case DGPU_COUNTER_BASE_ID + (DGPU_COUNTERS_MAX * 2) + COUNTERID_FREQ_DGPU:
-        case DGPU_COUNTER_BASE_ID + (DGPU_COUNTERS_MAX * 3) + COUNTERID_FREQ_DGPU:
-        case DGPU_COUNTER_BASE_ID + (DGPU_COUNTERS_MAX * 4) + COUNTERID_FREQ_DGPU:
-        {
-            std::string str(pData->m_name);
-            str.append(" Hist");
-            strncpy(tmp.m_name, str.c_str(), PWR_MAX_NAME_LEN);
-            strncpy(tmp.m_description, "Histogram of External-GPU Frequency.", PWR_MAX_DESC_LEN);
-            tmp.m_unitType = static_cast<AMDTPwrAttributeUnitType>(AMDT_PWR_UNIT_TYPE_MEGA_HERTZ);
-            tmp.m_category = static_cast<PwrCategory>(AMDT_PWR_CATEGORY_FREQUENCY);
-            tmp.m_attrId  = pData->m_attrId;
-            tmp.m_instanceType = pData->m_instanceType;
-
-            FillCounterDetails(deviceId,
-                               instId,
-                               cnt,
-                               instType,
-                               AMDT_PWR_VALUE_HISTOGRAM,
-                               &tmp);
-            break;
-        }
-
-    }
-
-    return;
+    return (nullptr != dev) ? dev : nullptr;
 }
 
 // Is node temprature supported on the platform
@@ -898,257 +256,6 @@ bool IsNodeTempSupported(const AMDTPwrTargetSystemInfo& sysInfo)
             default:
                 break;
         }
-    }
-
-    return ret;
-}
-
-// InsertDeviceCounters: Create counters for a device
-AMDTUInt32 InsertDeviceCounters(AMDTPwrDevice* dev, AMDTUInt32 instId)
-{
-    AMDTResult ret = AMDT_STATUS_OK;
-    AMDTUInt32 instIdx = 0;
-    AMDTUInt32 listCnt = 0;
-    AMDTPwrAttributeInstanceType type = INSTANCE_TYPE_NONCORE_SINGLE;
-    bool isSmuAvailable = false;
-    AMDTPwrTargetSystemInfo sysInfo;
-    BasicCounters list[COUNTER_MAX];
-    bool isFXSeries = false;
-
-    // Reset the counter list
-    memset(list, 0, sizeof(BasicCounters) * COUNTER_MAX);
-    memset(&sysInfo, 0, sizeof(AMDTPwrTargetSystemInfo));
-
-    if (AMDT_STATUS_OK == ret)
-    {
-        // Get the system info
-        ret = AMDTPwrGetTargetSystemInfo(&sysInfo);
-
-        if (true == sysInfo.m_isAmdApu)
-        {
-            // If there is a APU check the APU smu status
-            isSmuAvailable = IsIGPUAvailable() && sysInfo.m_smuTable.m_info[0].m_isAccessible;
-        }
-    }
-
-    if (AMDT_STATUS_OK == ret)
-    {
-        if (AMDT_PWR_DEVICE_PACKAGE == dev->m_type)
-        {
-            if (true == isSmuAvailable)
-            {
-                list[listCnt++] = COUNTER_SMU7_APU_PWR_PCIE;
-                list[listCnt++] = COUNTER_SMU7_APU_PWR_DDR;
-                list[listCnt++] = COUNTER_SMU7_APU_PWR_PACKAGE;
-                list[listCnt++] = COUNTER_SMU7_APU_PWR_DISPLAY;
-                list[listCnt++] = COUNTER_SMU8_APU_PWR_APU;
-                list[listCnt++] = COUNTER_SMU8_APU_PWR_VDDIO;
-                list[listCnt++] = COUNTER_SMU8_APU_PWR_VDDNB;
-                list[listCnt++] = COUNTER_SMU8_APU_PWR_VDDP;
-                list[listCnt++] = COUNTER_SMU8_APU_PWR_UVD;
-                list[listCnt++] = COUNTER_SMU8_APU_PWR_VCE;
-                list[listCnt++] = COUNTER_SMU8_APU_PWR_ACP;
-                list[listCnt++] = COUNTER_SMU8_APU_PWR_UNB;
-                list[listCnt++] = COUNTER_SMU8_APU_PWR_SMU;
-                list[listCnt++] = COUNTER_SMU8_APU_PWR_ROC;
-                list[listCnt++] = COUNTER_SMU8_APU_FREQ_ACLK;
-            }
-
-            if (true == sysInfo.m_isPlatformSupported)
-            {
-                if (true == IsNodeTempSupported(sysInfo))
-                {
-                    list[listCnt] = COUNTER_NODE_TCTL_TEMPERATURE;
-                }
-            }
-
-
-            instIdx = 0;
-            type = INSTANCE_TYPE_NONCORE_SINGLE;
-        }
-        else if ((AMDT_PWR_DEVICE_CPU_COMPUTE_UNIT == dev->m_type)
-                 && (true == isSmuAvailable))
-        {
-            list[listCnt++] = COUNTER_SMU7_APU_PWR_CU;
-            list[listCnt++] = COUNTER_SMU7_APU_TEMP_CU;
-            list[listCnt++] = COUNTER_SMU8_APU_PWR_CU;
-            list[listCnt++] = COUNTER_SMU8_APU_TEMP_CU;
-            list[listCnt++] = COUNTER_SMU8_APU_C0_RES;
-            list[listCnt++] = COUNTER_SMU8_APU_C1_RES;
-            list[listCnt++] = COUNTER_SMU8_APU_CC6_RES;
-            list[listCnt] = COUNTER_SMU8_APU_PC6_RES;
-            instIdx = instId;
-            type = INSTANCE_TYPE_PER_CU;
-        }
-        else if (AMDT_PWR_DEVICE_CPU_CORE == dev->m_type)
-        {
-            if ((0x15 == sysInfo.m_family) && (sysInfo.m_model <= 0x0f))
-            {
-                isFXSeries = true;
-            }
-
-            if (false == isFXSeries)
-            {
-                list[listCnt++] = COUNTER_CORE_APU_PID;
-                list[listCnt++] = COUNTER_CORE_APU_TID;
-                list[listCnt++] = COUNTER_CORE_EFFECTIVE_FREQUENCY;
-                list[listCnt] = COUNTER_CORE_PSTATE;
-                instIdx = instId;
-                type = INSTANCE_TYPE_PER_CORE;
-            }
-        }
-        else if ((AMDT_PWR_DEVICE_INTERNAL_GPU == dev->m_type)
-                 && (true == isSmuAvailable))
-        {
-            list[listCnt++] = COUNTER_SMU7_APU_PWR_IGPU;
-            list[listCnt++] = COUNTER_SMU7_APU_TEMP_IGPU;
-            list[listCnt++] = COUNTER_SMU7_APU_FREQ_IGPU;
-
-            if (true == sysInfo.m_isPlatformSupported)
-            {
-                bool isNodeStoney = ((NULL != sysInfo.m_pNodeInfo) &&
-                                     (GDT_STONEY == sysInfo.m_pNodeInfo->m_hardwareType)) ? true : false;
-
-                if (false == isNodeStoney)
-                {
-                    list[listCnt++] = COUNTER_SMU8_APU_PWR_VDDGFX;
-                }
-            }
-
-            list[listCnt++] = COUNTER_SMU8_APU_TEMP_VDDFFX;
-            list[listCnt] = COUNTER_SMU8_APU_FREQ_IGPU;
-            instIdx = instId;
-            type = INSTANCE_TYPE_NONCORE_SINGLE;
-        }
-        else if (g_internalCounters
-                 && g_isSVI2Supported
-                 && (AMDT_PWR_DEVICE_SVI2 == dev->m_type))
-        {
-            list[listCnt++] = COUNTER_NCORE_SVI2_CORE_TELEMETRY;
-            list[listCnt] = COUNTER_NCORE_SVI2_NB_TELEMETRY;
-            instIdx = instId;
-            type = INSTANCE_TYPE_NONCORE_MULTIVALUE;
-        }
-        else
-        {
-            ret = AMDT_ERROR_FAIL;
-            PwrTrace("Unknown device type");
-        }
-
-    }
-
-    if (AMDT_STATUS_OK == ret)
-    {
-        AMDTUInt32 cnt = 0;
-
-        for (cnt = 0; cnt <= listCnt; cnt++)
-        {
-            AMDTUInt32 idx = instIdx;
-            //Get backend attribute info
-            AMDTPwrAttributeTypeInfo* pData = nullptr;
-            pData = GetBaseCounterInfo(list[cnt]);
-
-            // Skip Core effective frequency if it is not supported
-            if (false == IsCefSupported())
-            {
-                continue;
-            }
-
-            if (nullptr != pData)
-            {
-                FillCounterDetails(dev->m_deviceID,
-                                   idx,
-                                   list[cnt],
-                                   type,
-                                   AMDT_PWR_VALUE_SINGLE,
-                                   pData);
-
-                FillAggregatedCounterDetails(list[cnt],
-                                             dev->m_deviceID,
-                                             idx,
-                                             type,
-                                             pData);
-
-            }
-        }
-    }
-
-    return ret;
-}
-
-// InsertDgpuCounters: Insert dgpu counters in the supported counter list
-AMDTUInt32 InsertDgpuCounters(AMDTPwrDevice* dev,
-                              AMDTPwrProfileAttributeList* pDgpu,
-                              AMDTUInt32 instId)
-{
-    AMDTResult ret = AMDT_STATUS_OK;
-    AMDTUInt32 cnt = 0;
-    AMDTUInt32 dgpuCounterId = 0;
-    AMDTUInt32 startIdx = DGPU_COUNTER_BASE_ID
-                          + (instId - APU_SMU_ID - 1)
-                          * DGPU_COUNTERS_MAX;
-
-    if (nullptr == pDgpu)
-    {
-        ret = AMDT_ERROR_INVALIDARG;
-        PwrTrace("pDGPU invalid");
-    }
-    else
-    {
-        for (cnt = 0; cnt < pDgpu->attrCnt; cnt++)
-        {
-            char* desc = nullptr;
-            char* name = nullptr;
-            AMDTUInt32 idx = 0;
-            AMDTPwrAttributeTypeInfo* pData = &pDgpu->pAttrList[cnt];
-
-            if (pData->m_attrId < startIdx)
-            {
-                continue;
-            }
-
-            if (pData->m_attrId >= (startIdx + DGPU_COUNTERS_MAX))
-            {
-                break;
-            }
-
-            idx = pData->m_attrId;
-            dgpuCounterId = (idx - DGPU_COUNTER_BASE_ID) % DGPU_COUNTERS_MAX;
-            g_counterList[g_counterCnt].m_backendId = idx;
-            g_counterList[g_counterCnt].m_instanceId = instId;
-            g_counterList[g_counterCnt].m_pDesc = &g_desc[g_counterCnt];
-            g_counterList[g_counterCnt].m_instanceType = pData->m_instanceType;
-            g_counterList[g_counterCnt].m_pDesc->m_counterID = idx;
-            desc = (char*)GetMemoryPoolBuffer(&g_apiMemoryPool,
-                                              sizeof(char) * PWR_MAX_DESC_LEN);
-            strncpy(desc, pData->m_description, PWR_MAX_DESC_LEN - 1);
-            name = (char*)GetMemoryPoolBuffer(&g_apiMemoryPool,
-                                              sizeof(char) * PWR_MAX_NAME_LEN);
-
-            sprintf(name, "%s ", dev->m_pName);
-            strncpy(&name[strlen(name)], pData->m_name, PWR_MAX_NAME_LEN - 1);
-            g_counterList[g_counterCnt].m_pDesc->m_counterID = idx;
-            g_counterList[g_counterCnt].m_pDesc->m_name = name;
-            g_counterList[g_counterCnt].m_pDesc->m_description = desc;
-            g_counterList[g_counterCnt].m_pDesc->m_deviceId = dev->m_deviceID;
-            g_counterList[g_counterCnt].m_pDesc->m_units    = (AMDTPwrUnit)pData->m_unitType;
-            g_counterList[g_counterCnt].m_pDesc->m_category = (AMDTPwrCategory)pData->m_category;
-            g_counterCnt++;
-
-            // Insert Dgpu histogram and cummulative counters
-            if ((COUNTERID_PKG_PWR_DGPU == dgpuCounterId)
-                || (COUNTERID_FREQ_DGPU == dgpuCounterId))
-            {
-                strncpy(pData->m_name, name, PWR_MAX_NAME_LEN - 1);
-                FillAggregatedCounterDetails(idx,
-                                             dev->m_deviceID,
-                                             0,
-                                             INSTANCE_TYPE_NONCORE_SINGLE,
-                                             pData);
-            }
-
-        }
-
     }
 
     return ret;
@@ -1220,23 +327,20 @@ AMDTResult PrepareSystemTopologyInfo()
     AMDTUInt32 corePerCuCnt = 0;
     AMDTUInt32 cuCnt = 0;
     AMDTPwrDevice* system;
-    AMDTPwrTargetSystemInfo sysInfo;
     AMDTUInt32 devCnt = 0;
-    AMDTPwrProfileAttributeList dgpuCounters;
-    SmuInfo* smuInfo = &sysInfo.m_smuTable.m_info[0];
+    SmuInfo* smuInfo = &g_sysInfo.m_smuTable.m_info[0];
     bool smuAccesible = false;
+    AMDTUInt32 deviceIdx = 0;
 
-    ret = AMDTPwrGetTargetSystemInfo(&sysInfo);
-
-    if ((AMDT_STATUS_OK == ret) && (true == sysInfo.m_isAmdApu))
+    if (true == g_sysInfo.m_isAmdApu)
     {
-        cuCnt = sysInfo.m_computeUnitCnt;
-        corePerCuCnt = sysInfo.m_coresPerCu;
+        cuCnt = g_sysInfo.m_computeUnitCnt;
+        corePerCuCnt = g_sysInfo.m_coresPerCu;
     }
 
     // Create the root node as system
     system = AllocateDevice(&devCnt);
-    system->m_deviceID = g_deviceCnt++;
+    system->m_deviceID = deviceIdx++;
     system->m_type = AMDT_PWR_DEVICE_SYSTEM;
     sprintf(system->m_pName, "System");
     sprintf(system->m_pDescription, "Root device");
@@ -1246,15 +350,21 @@ AMDTResult PrepareSystemTopologyInfo()
     // Considering only one package at this moment
     AMDTPwrDevice* pkg0 = AllocateDevice(&devCnt);
     system->m_pFirstChild = pkg0;
-    pkg0->m_deviceID = g_deviceCnt++;
+    pkg0->m_deviceID = deviceIdx++;
     pkg0->m_type = AMDT_PWR_DEVICE_PACKAGE;
-    sprintf(pkg0->m_pName, "Node-0");
-    sprintf(pkg0->m_pDescription, "First node");
+    PciDeviceInfo* pNodeInfo = nullptr;
+    GetPciDeviceInfo(APU_SMU_ID, &pNodeInfo, nullptr);
+
+    if (pNodeInfo)
+    {
+        sprintf(pkg0->m_pName, pNodeInfo->m_shortName);
+        sprintf(pkg0->m_pDescription, pNodeInfo->m_name);
+    }
 
     // ONLY if supported AMD platform
-    if ((true == sysInfo.m_isAmd) && (true == sysInfo.m_isPlatformSupported))
+    if ((true == g_sysInfo.m_isAmd) && (true == g_sysInfo.m_isPlatformSupported))
     {
-        InsertDeviceCounters(pkg0, 0);
+        PwrInsertDeviceCounters(pkg0, 0, 0);
     }
 
     AMDTUInt32 cnt = 0;
@@ -1269,7 +379,7 @@ AMDTResult PrepareSystemTopologyInfo()
     else
     {
         // APU SMU is not accessible. Throw and warning message
-        if (NULL != sysInfo.m_pNodeInfo && DEVICE_TYPE_APU == sysInfo.m_pNodeInfo->m_deviceType)
+        if (NULL != g_sysInfo.m_pNodeInfo && DEVICE_TYPE_APU == g_sysInfo.m_pNodeInfo->m_deviceType)
         {
             // smu is not available emit warning
             ret = AMDT_WARN_SMU_DISABLED;
@@ -1283,14 +393,14 @@ AMDTResult PrepareSystemTopologyInfo()
     {
         AMDTUInt32 cnt1 = 0;
         AMDTPwrDevice* newCu = AllocateDevice(&devCnt);
-        newCu->m_deviceID = g_deviceCnt++;
+        newCu->m_deviceID = deviceIdx++;
         newCu->m_type = AMDT_PWR_DEVICE_CPU_COMPUTE_UNIT;
         sprintf(newCu->m_pName, "CU-%d", cnt);
         sprintf(newCu->m_pDescription, "Compute Unit %d", cnt);
 
         if (true == smuAccesible)
         {
-            InsertDeviceCounters(newCu, cnt);
+            PwrInsertDeviceCounters(newCu, cnt, APU_SMU_ID);
             newCu->m_isAccessible = true;
         }
 
@@ -1299,12 +409,12 @@ AMDTResult PrepareSystemTopologyInfo()
         for (cnt1 = 0; cnt1 < corePerCuCnt; cnt1++)
         {
             AMDTPwrDevice* newCore = AllocateDevice(&devCnt);
-            newCore->m_deviceID = g_deviceCnt++;
+            newCore->m_deviceID = deviceIdx++;
             newCore->m_type = AMDT_PWR_DEVICE_CPU_CORE;
             sprintf(newCore->m_pName, "Core-%d", coreId);
             sprintf(newCore->m_pDescription, "Core %d", coreId);
             newCore->m_pFirstChild = nullptr;
-            InsertDeviceCounters(newCore, coreId);
+            PwrInsertDeviceCounters(newCore, coreId, 0);
             newCore->m_isAccessible = true;
             coreId++;
 
@@ -1345,18 +455,18 @@ AMDTResult PrepareSystemTopologyInfo()
     }
 
     // If there no compute units
-    if ((0 == cuCnt) && (true == sysInfo.m_isPlatformSupported))
+    if ((0 == cuCnt) && (true == g_sysInfo.m_isPlatformSupported))
     {
         AMDTPwrDevice* coreHead = nullptr;
 
-        for (cnt = 0; cnt < sysInfo.m_coreCnt; cnt++)
+        for (cnt = 0; cnt < g_sysInfo.m_coreCnt; cnt++)
         {
             AMDTPwrDevice* newCore = AllocateDevice(&devCnt);
-            newCore->m_deviceID = g_deviceCnt++;
+            newCore->m_deviceID = deviceIdx++;
             newCore->m_type = AMDT_PWR_DEVICE_CPU_CORE;
             sprintf(newCore->m_pName, "Core-%d", coreId);
             sprintf(newCore->m_pDescription, "Core %d", coreId);
-            InsertDeviceCounters(newCore, coreId);
+            PwrInsertDeviceCounters(newCore, coreId, 0);
             newCore->m_isAccessible = true;
             coreId++;
             newCore->m_pFirstChild = nullptr;
@@ -1381,13 +491,13 @@ AMDTResult PrepareSystemTopologyInfo()
         cuHead = coreHead;
     }
 
-    if (true == sysInfo.m_isAmdApu)
+    if (true == g_sysInfo.m_isAmdApu)
     {
         // check if Igpu is present
-        for (cnt = 0; cnt < sysInfo.m_igpuCnt; cnt++)
+        for (cnt = 0; cnt < g_sysInfo.m_igpuCnt; cnt++)
         {
             AMDTPwrDevice* igpu = AllocateDevice(&devCnt);
-            igpu->m_deviceID = g_deviceCnt++;
+            igpu->m_deviceID = deviceIdx++;
             igpu->m_type = AMDT_PWR_DEVICE_INTERNAL_GPU;
             sprintf(igpu->m_pName, "Igpu");
             sprintf(igpu->m_pDescription, "Integrated GPU");
@@ -1396,7 +506,7 @@ AMDTResult PrepareSystemTopologyInfo()
             // Show iGPU counters only if SMU is accessible
             if (true == smuAccesible)
             {
-                InsertDeviceCounters(igpu, 0);
+                PwrInsertDeviceCounters(igpu, 0, APU_SMU_ID);
                 igpu->m_isAccessible = true;
             }
 
@@ -1418,18 +528,18 @@ AMDTResult PrepareSystemTopologyInfo()
 
         }
 
-        if (g_internalCounters && g_isSVI2Supported)
+        if (g_isSVI2Supported)
         {
             //Fill discrete SVI2
-            for (cnt = 0; cnt < sysInfo.m_svi2Cnt; cnt++)
+            for (cnt = 0; cnt < g_sysInfo.m_svi2Cnt; cnt++)
             {
                 AMDTPwrDevice* svi2 = AllocateDevice(&devCnt);
-                svi2->m_deviceID = g_deviceCnt++;
+                svi2->m_deviceID = deviceIdx++;
                 svi2->m_type = AMDT_PWR_DEVICE_SVI2;
                 sprintf(svi2->m_pName, "svi2 telemetry");
                 sprintf(svi2->m_pDescription, "Serial Voltage Interface");
                 svi2->m_pFirstChild = nullptr;
-                InsertDeviceCounters(svi2, 0);
+                PwrInsertDeviceCounters(svi2, 0, 0);
                 svi2->m_isAccessible = true;
 
                 if (nullptr == cuHead)
@@ -1458,12 +568,12 @@ AMDTResult PrepareSystemTopologyInfo()
     // the SMU and a bool will be set if more then one instance
     // of device found.
     std::unordered_map<AMDTUInt32, DgpuCountPair> dGpuCntMap;
-    PrepareDgpuInstanceTable(sysInfo, dGpuCntMap);
+    PrepareDgpuInstanceTable(g_sysInfo, dGpuCntMap);
 
     //Fill discrete GPUs
-    for (cnt = 0; cnt < sysInfo.m_smuTable.m_count; cnt++)
+    for (cnt = 0; cnt < g_sysInfo.m_smuTable.m_count; cnt++)
     {
-        smuInfo = &sysInfo.m_smuTable.m_info[cnt];
+        smuInfo = &g_sysInfo.m_smuTable.m_info[cnt];
 
         if (APU_SMU_ID == smuInfo->m_packageId)
         {
@@ -1472,9 +582,8 @@ AMDTResult PrepareSystemTopologyInfo()
 
         PciDeviceInfo* pDevInfo = nullptr;
         AMDTPwrDevice* dgpu = AllocateDevice(&devCnt);
-        PwrGetSupportedAttributeList(&dgpuCounters);
 
-        dgpu->m_deviceID = g_deviceCnt++;
+        dgpu->m_deviceID = deviceIdx++;
         dgpu->m_type = AMDT_PWR_DEVICE_EXTERNAL_GPU;
 
         //Get the device information
@@ -1517,7 +626,7 @@ AMDTResult PrepareSystemTopologyInfo()
                 if (1 == smuInfo->m_isAccessible)
                 {
                     //Insert counters only if SMU logging is accessible
-                    InsertDgpuCounters(dgpu, &dgpuCounters, smuInfo->m_packageId);
+                    PwrInsertDeviceCounters(dgpu, 0, smuInfo->m_packageId);
                     dgpu->m_isAccessible = true;
                 }
                 else
@@ -1527,51 +636,6 @@ AMDTResult PrepareSystemTopologyInfo()
                 }
             }
         }
-    }
-
-    return ret;
-}
-
-// AMDTPwrGetNodeTemperature: This API provides the note temperature in tctl
-// scale or internally add any offset provided by the end user.
-AMDTResult AMDTPwrGetNodeTemperature(AMDTFloat32* pNodeTemp)
-{
-    AMDTPwrProfileState state = AMDT_PWR_PROFILE_STATE_UNINITIALIZED;
-    AMDTResult ret = AMDT_STATUS_OK;
-    AMDTPwrTargetSystemInfo sysInfo;
-    ret = AMDTPwrGetProfilingState(&state);
-    AMDTUInt32 data = 0;
-    AMDTFloat32 temp = 0.0;
-    bool isSupported = false;
-
-    if (AMDT_STATUS_OK == ret)
-    {
-        if (AMDT_PWR_PROFILE_STATE_UNINITIALIZED == state)
-        {
-            ret = AMDT_ERROR_DRIVER_UNINITIALIZED;
-        }
-    }
-
-    // Check if it is Orochi family
-    ret = AMDTPwrGetTargetSystemInfo(&sysInfo);
-
-    // Orochi
-    isSupported = ((0x15 == sysInfo.m_family)
-                   && ((0x00 == sysInfo.m_model) || ((0x00 < sysInfo.m_model) && (sysInfo.m_model <= 0x0f))));
-
-    isSupported |= ((0x15 == sysInfo.m_family) && ((0x30 <= sysInfo.m_model) && (sysInfo.m_model <= 0x3f))); // KV
-
-    if (false == isSupported)
-    {
-        ret = AMDT_ERROR_NOTSUPPORTED;
-    }
-
-    if (AMDT_STATUS_OK == ret)
-    {
-        temp = 0;
-        ReadPciAddress(0, 0x18, 0x3, 0xA4, &data);
-        DecodeTctlTemperature(data, &temp);
-        *pNodeTemp = (AMDTFloat32)temp;
     }
 
     return ret;
@@ -1597,18 +661,228 @@ bool isSupportedHypervisor()
     return ret;
 }
 
+// PwrEnableProcessProfileCounters
+bool PwrEnableProcessProfileCounters()
+{
+    bool ret = true;
+    AMDTUInt32 pwrCounter = 0;
+
+    if (g_sysInfo.m_isAmdApu)
+    {
+        AMDTUInt32 smuVersion = g_sysInfo.m_smuTable.m_info[0].m_smuIpVersion;
+
+        if (SMU_IPVERSION_8_0 == smuVersion)
+        {
+            pwrCounter = COUNTERID_SMU8_APU_PWR_CU;
+        }
+        else if ((SMU_IPVERSION_7_0 == smuVersion) || (SMU_IPVERSION_7_5 == smuVersion))
+        {
+            pwrCounter = COUNTERID_SMU7_APU_PWR_CU;
+        }
+        else
+        {
+            ret = false;
+            PwrTrace("Smu version %d not supported for process profiling", smuVersion);
+        }
+    }
+
+    if (ret)
+    {
+        PwrSupportedCounterMap* pCounters = PwrGetSupportedCounterList();
+
+        for (auto iter : *pCounters)
+        {
+            if ((1 == iter.second.m_pkgId)
+                && (pwrCounter == iter.second.m_basicInfo.m_attrId)
+                && (AMDT_PWR_VALUE_SINGLE == iter.second.m_basicInfo.m_aggr))
+            {
+                if (!iter.second.m_isActive)
+                {
+                    PwrActivateCounter(iter.first, true);
+                    g_filterCounters.push_back(iter.first);
+                    ret = true;
+                }
+            }
+        }
+    }
+
+    return ret;
+}
+
+void PwrConfigureHistogramCounters()
+{
+    PwrSupportedCounterMap* pCounters = PwrGetSupportedCounterList();
+
+    if (pCounters)
+    {
+        for (auto Iter : *pCounters)
+        {
+            if (Iter.second.m_isActive
+                && ((AMDT_PWR_VALUE_CUMULATIVE == Iter.second.m_desc.m_aggregation)
+                    || (AMDT_PWR_VALUE_CUMULATIVE == Iter.second.m_desc.m_aggregation)))
+            {
+
+                // Check is prevous basic counter is active
+                PwrSupportedCounterMap::iterator tempIter = pCounters->find(Iter.first - 1);
+
+                if (tempIter != pCounters->end())
+                {
+                    if (!tempIter->second.m_isActive)
+                    {
+                        g_filterCounters.push_back(Iter.first - 1);
+                        g_filterCounters.push_back(Iter.first - 1);
+                    }
+                }
+            }
+        }
+    }
+}
+
+AMDTUInt32 PwrGetCoreMask()
+{
+    AMDTUInt32 mask = 0;
+
+    if (PROFILE_TYPE_PROCESS_PROFILING == g_profileType)
+    {
+        mask = ~0 ^ (~0 << g_sysInfo.m_coreCnt);
+    }
+    else
+    {
+
+        PwrSupportedCounterMap* pCounters = PwrGetSupportedCounterList();
+
+        for (auto iter : *pCounters)
+        {
+            if (iter.second.m_isActive)
+            {
+                if (INSTANCE_TYPE_PER_CORE == iter.second.m_basicInfo.m_instanceType)
+                {
+                    mask |= 1 << iter.second.m_instanceId;
+                }
+            }
+        }
+    }
+
+    if (!mask)
+    {
+        mask = 0x01;
+    }
+
+    return mask;
+}
+
+// GetSubCompDevID: This function will provide a vector which contains deviceId of all the
+// subcomponents of given deviceId. Function traverse over device topology tree, if device found
+// capture id of the devices and its sub components (firstChild )in a vector.
+void GetSubCompDevID(AMDTPwrDeviceId deviceID, AMDTPwrDevice* node,
+                     std::vector<AMDTPwrDeviceId>& subCompDevIdVec, bool flag)
+{
+
+    if (nullptr != node)
+    {
+
+        if (node->m_deviceID == deviceID)
+        {
+            // Device found with the req. device Id
+            flag = true;
+        }
+
+        if (nullptr != node->m_pFirstChild)
+        {
+            // recursively called the last child of the topology tree.
+            GetSubCompDevID(deviceID, node->m_pFirstChild, subCompDevIdVec, flag);
+        }
+
+        if (true == flag)
+        {
+            // flag is set, means the devices encountered
+            // is either a device itself or its subcomponent
+            // push the device id in the vector
+            subCompDevIdVec.push_back(node->m_deviceID);
+        }
+
+        // iterated the the sub component of device, set the flag to false
+        if (node->m_deviceID == deviceID)
+        {
+            flag = false;
+        }
+
+        if (nullptr != node->m_pNextDevice)
+        {
+            // recursively call the right sibling of the device.
+            GetSubCompDevID(deviceID, node->m_pNextDevice, subCompDevIdVec, flag);
+        }
+    }
+}
+
+// PwrConfigureProfile
+bool PwrConfigureProfile()
+{
+    bool ret = true;
+    AMDTUInt32 clientId = 0;
+    ProfileConfig config;
+    AMDTUInt32 cnt = 0;
+    AMDTUInt64 nodeMask = 0;
+    PwrSupportedCounterMap* pCounters = PwrGetSupportedCounterList();
+    memset(&config, 0, sizeof(ProfileConfig));
+
+
+    // Prepare counter mask for all (APU + SMU + dGPU)
+    memcpy(&config.m_activeList, &g_sysInfo.m_smuTable, sizeof(SmuList));
+    config.m_samplingSpec.m_profileType = g_profileType;
+    config.m_samplingSpec.m_samplingPeriod = g_samplingPeriod;
+    config.m_samplingSpec.m_mask = PwrGetCoreMask();
+    config.m_samplingSpec.m_maskCnt = GetMaskCount(config.m_samplingSpec.m_mask);
+    config.m_sampleId = 0;
+
+    for (auto iter : *pCounters)
+    {
+        if (iter.second.m_isActive)
+        {
+            if (iter.second.m_pkgId > 0)
+            {
+                config.m_activeList.m_info[iter.second.m_pkgId - 1].m_counterMask |= (1ULL << iter.second.m_basicInfo.m_attrId);
+            }
+            else
+            {
+                nodeMask |= (1ULL << iter.second.m_basicInfo.m_attrId);
+            }
+        }
+    }
+
+    config.m_apuCounterMask = nodeMask;
+    config.m_attrCnt = (AMDTUInt16)GetMaskCount(nodeMask);
+
+    for (cnt = 0; cnt < config.m_activeList.m_count; cnt++)
+    {
+        config.m_attrCnt += (AMDTUInt16)GetMaskCount(config.m_activeList.m_info[cnt].m_counterMask);
+    }
+
+    // Register client for the driver
+    if (AMDT_STATUS_OK != PwrRegisterClient(&clientId))
+    {
+        PwrTrace("PwrRegisterClient failed");
+        ret = false;
+    }
+
+    if (ret)
+    {
+        ret = (AMDT_STATUS_OK == PwrSetProfileConfiguration(&config, clientId)) ? true : false;
+    }
+
+    return ret;
+}
+
 // AMDTPwrProfileInitialize: This function loads and initializes the AMDT Power Profile drivers.
 // This function should be the first one to be called.
 AMDTResult AMDTPwrProfileInitialize(AMDTPwrProfileMode profileMode)
 {
     AMDTResult ret = AMDT_STATUS_OK;
     AMDTPwrProfileInitParam param;
-    AMDTPwrTargetSystemInfo sysInfo;
     AMDTResult result = AMDT_STATUS_OK;
     AMDTPwrProfileState state = AMDT_PWR_PROFILE_STATE_UNINITIALIZED;
 
     memset(&param, 0, sizeof(AMDTPwrProfileInitParam));
-    memset(&sysInfo, 0, sizeof(AMDTPwrTargetSystemInfo));
 
     if ((AMDT_PWR_PROFILE_MODE_ONLINE != profileMode)
         && (AMDT_PWR_PROFILE_MODE_OFFLINE != profileMode))
@@ -1671,15 +945,16 @@ AMDTResult AMDTPwrProfileInitialize(AMDTPwrProfileMode profileMode)
     if (AMDT_STATUS_OK == ret)
     {
         // Get the system info
-        ret = AMDTPwrGetTargetSystemInfo(&sysInfo);
+        ret = AMDTPwrGetTargetSystemInfo(&g_sysInfo);
         PwrTrace("AMDTPwrGetTargetSystemInfo res 0x%x", ret);
-
-        g_internalCounters = PwrEnableInternalCounters(true);
-        g_isSVI2Supported = PwrIsSVISupported(sysInfo);
+        PwrEnableInternalCounters(true);
+        g_isSVI2Supported = PwrIsSVISupported(g_sysInfo);
     }
 
     if (AMDT_STATUS_OK == ret)
     {
+        AMDTUInt32 totalCounters = 0;
+
         // Unsupported platforms are detected inside the call to AMDTPwrGetTargetSystemInfo(), so we need
         // to check for them only after the call to AMDTPwrGetTargetSystemInfo().
         if (AMDT_ERROR_PLATFORM_NOT_SUPPORTED == ret)
@@ -1696,49 +971,20 @@ AMDTResult AMDTPwrProfileInitialize(AMDTPwrProfileMode profileMode)
 
         if (AMDT_STATUS_OK == ret)
         {
-            // Overwrite temerature to Measured in case of Godavari, Mulllins and Temash platform
-            // Mullins doesn't support Calculated temperature
-            bool isGodavari = false;
-
-            if ((0x15 == sysInfo.m_family) && (0x38 == sysInfo.m_model))
-            {
-                isGodavari = true;
-            }
-
-            if ((true == isGodavari) || (PLATFORM_MULLINS == sysInfo.m_platformId))
-            {
-                AMDTUInt32 cnt = 0;
-                AMDTUInt32 listSize = sizeof(g_counterMapping) / sizeof(CounterMapping);
-
-                // Find CU temperature
-                for (cnt = 0; cnt < listSize; cnt++)
-                {
-                    if (COUNTER_SMU7_APU_TEMP_CU == g_counterMapping[cnt].m_clientId)
-                    {
-                        g_counterMapping[cnt].m_backendId = COUNTERID_SMU7_APU_TEMP_MEAS_CU;
-                        break;
-                    }
-                }
-
-                // Find GPU temperature
-                for (cnt = 0; cnt < listSize; cnt++)
-                {
-                    if (COUNTER_SMU7_APU_TEMP_IGPU == g_counterMapping[cnt].m_clientId)
-                    {
-                        g_counterMapping[cnt].m_backendId = COUNTERID_SMU7_APU_TEMP_MEAS_IGPU;
-                        break;
-                    }
-                }
-            }
-
             //Prepare the counter list
             result = PrepareSystemTopologyInfo();
         }
 
-        if ((AMDT_STATUS_OK == ret) && (0 == g_counterCnt))
+        if (AMDT_STATUS_OK == ret)
         {
-            // No counters area available for profiler
-            ret = AMDT_ERROR_PLATFORM_NOT_SUPPORTED;
+            PwrSupportedCounterMap* pCounters = PwrGetSupportedCounterList();
+            totalCounters = pCounters->size();
+
+            if (0 == totalCounters)
+            {
+                // No counters area available for profiler
+                ret = AMDT_ERROR_PLATFORM_NOT_SUPPORTED;
+            }
         }
 
         if (AMDT_STATUS_OK == ret)
@@ -1750,8 +996,8 @@ AMDTResult AMDTPwrProfileInitialize(AMDTPwrProfileMode profileMode)
         if (AMDT_STATUS_OK == ret)
         {
             //Check if SMU is available
-            if ((true == sysInfo.m_isPlatformSupported)
-                && (true == sysInfo.m_isAmdApu)
+            if ((true == g_sysInfo.m_isPlatformSupported)
+                && (true == g_sysInfo.m_isAmdApu)
                 && !IsIGPUAvailable())
             {
                 ret = AMDT_WARN_IGPU_DISABLED;
@@ -1765,7 +1011,7 @@ AMDTResult AMDTPwrProfileInitialize(AMDTPwrProfileMode profileMode)
             }
         }
 
-        PwrTrace("Return code: 0x%x counters %d ", ret, g_counterCnt);
+        PwrTrace("Return code: 0x%x counters %d ", ret, totalCounters);
     }
 
     return ret;
@@ -1812,50 +1058,6 @@ AMDTResult AMDTPwrGetSystemTopology(AMDTPwrDevice** ppTopology)
     return ret;
 }
 
-// GetSubCompDevID: This function will provide a vector which contains deviceId of all the
-// subcomponents of given deviceId. Function traverse over device topology tree, if device found
-// capture id of the devices and its sub components (firstChild )in a vector.
-void GetSubCompDevID(AMDTPwrDeviceId deviceID, AMDTPwrDevice* node,
-                     std::vector<AMDTPwrDeviceId>& subCompDevIdVec, bool flag)
-{
-
-    if (nullptr != node)
-    {
-
-        if (node->m_deviceID == deviceID)
-        {
-            // Device found with the req. device Id
-            flag = true;
-        }
-
-        if (nullptr != node->m_pFirstChild)
-        {
-            // recursively called the last child of the topology tree.
-            GetSubCompDevID(deviceID, node->m_pFirstChild, subCompDevIdVec, flag);
-        }
-
-        if (true == flag)
-        {
-            // flag is set, means the devices encountered
-            // is either a device itself or its subcomponent
-            // push the device id in the vector
-            subCompDevIdVec.push_back(node->m_deviceID);
-        }
-
-        // iterated the the sub component of device, set the flag to false
-        if (node->m_deviceID == deviceID)
-        {
-            flag = false;
-        }
-
-        if (nullptr != node->m_pNextDevice)
-        {
-            // recursively call the right sibling of the device.
-            GetSubCompDevID(deviceID, node->m_pNextDevice, subCompDevIdVec, flag);
-        }
-    }
-}
-
 // AMDTPwrGetDeviceCounters: Function for retrieving the counters supported by
 // a specific device. The user specifies which device he is interested in.If
 // the deviceID is 0xFFFFFFFF, then counters for all the available devices will
@@ -1866,8 +1068,8 @@ AMDTResult AMDTPwrGetDeviceCounters(AMDTPwrDeviceId deviceID,
                                     AMDTPwrCounterDesc** ppCounterDescs)
 {
     AMDTResult ret = AMDT_STATUS_OK;
-    AMDTUInt32 cnt = 0;
     AMDTPwrProfileState state = AMDT_PWR_PROFILE_STATE_UNINITIALIZED;
+    PwrSupportedCounterMap* pCounters = PwrGetSupportedCounterList();
 
     ret = AMDTPwrGetProfilingState(&state);
 
@@ -1879,7 +1081,7 @@ AMDTResult AMDTPwrGetDeviceCounters(AMDTPwrDeviceId deviceID,
         }
         else
         {
-            if ((nullptr == pNumCounters) || (nullptr == ppCounterDescs))
+            if ((nullptr == pNumCounters) || (nullptr == ppCounterDescs) || (nullptr == pCounters))
             {
                 ret = AMDT_ERROR_INVALIDARG;
             }
@@ -1888,10 +1090,14 @@ AMDTResult AMDTPwrGetDeviceCounters(AMDTPwrDeviceId deviceID,
 
     if (AMDT_STATUS_OK == ret)
     {
+        g_clientCounters.clear();
+
         if (AMDT_PWR_ALL_DEVICES == deviceID)
         {
-            *ppCounterDescs = &g_desc[0];
-            *pNumCounters = g_counterCnt;
+            for (auto Iter : *pCounters)
+            {
+                g_clientCounters.push_back(Iter.second.m_desc);
+            }
         }
         else
         {
@@ -1916,23 +1122,33 @@ AMDTResult AMDTPwrGetDeviceCounters(AMDTPwrDeviceId deviceID,
             {
                 for (const auto& deviceId : supportedDeviceIDList)
                 {
-                    for (cnt = 0; cnt < g_counterCnt; cnt++)
+                    for (auto iter : *pCounters)
                     {
-                        if (deviceId == g_desc[cnt].m_deviceId)
+                        if (deviceId == iter.second.m_desc.m_deviceId)
                         {
-                            memcpy(&g_pClientList[*pNumCounters], &g_desc[cnt], sizeof(AMDTPwrCounterDesc));
+                            g_clientCounters.push_back(iter.second.m_desc);
                             (*pNumCounters)++;
                         }
                     }
                 }
-
-                *ppCounterDescs = &g_pClientList[0];
             }
+        }
+
+        if (g_clientCounters.size() > 0)
+        {
+            *ppCounterDescs = &g_clientCounters[0];
+            *pNumCounters = g_clientCounters.size();
+        }
+        else
+        {
+            *pNumCounters = 0;
+            ret = AMDT_ERROR_INVALID_DEVICEID;
         }
     }
 
     return ret;
 }
+
 
 // AMDTPwrGetCounterDesc: This API provides the description of the counter requested
 // by the client with counter index
@@ -1941,6 +1157,7 @@ AMDTResult AMDTPwrGetCounterDesc(AMDTUInt32 counterID,
 {
     AMDTPwrProfileState state = AMDT_PWR_PROFILE_STATE_UNINITIALIZED;
     AMDTResult ret = AMDT_STATUS_OK;
+    PwrSupportedCounterMap* pCounters = PwrGetSupportedCounterList();
 
     ret = AMDTPwrGetProfilingState(&state);
 
@@ -1962,7 +1179,7 @@ AMDTResult AMDTPwrGetCounterDesc(AMDTUInt32 counterID,
 
     if (AMDT_STATUS_OK == ret)
     {
-        if (g_counterCnt < counterID)
+        if (pCounters->size() < counterID)
         {
             ret = AMDT_ERROR_INVALID_COUNTERID;
         }
@@ -1970,7 +1187,12 @@ AMDTResult AMDTPwrGetCounterDesc(AMDTUInt32 counterID,
 
     if (AMDT_STATUS_OK == ret)
     {
-        *pCounterDesc = g_desc[counterID];
+        PwrSupportedCounterMap::iterator Iter = pCounters->find(counterID);
+
+        if (Iter != pCounters->end())
+        {
+            *pCounterDesc = Iter->second.m_desc;
+        }
     }
 
     return ret;
@@ -1982,8 +1204,6 @@ AMDTResult AMDTPwrEnableCounter(AMDTUInt32 counterID)
 {
     AMDTPwrProfileState state = AMDT_PWR_PROFILE_STATE_UNINITIALIZED;
     AMDTResult ret = AMDT_ERROR_FAIL;
-    AMDTUInt32 cnt = 0;
-    bool validCounter = false;
 
     ret = AMDTPwrGetProfilingState(&state);
 
@@ -2007,7 +1227,6 @@ AMDTResult AMDTPwrEnableCounter(AMDTUInt32 counterID)
     // If dGPU counter, check if it is still accessible
     if ((AMDT_STATUS_OK == ret) && (counterID >= DGPU_COUNTER_BASE_ID))
     {
-        AMDTPwrTargetSystemInfo sysInfo;
         AMDTUInt32 pkgId = 0;
         PciPortAddress* pAddress = nullptr;
         bool isAccessible = false;
@@ -2015,9 +1234,6 @@ AMDTResult AMDTPwrEnableCounter(AMDTUInt32 counterID)
         // Find the package id
         // dGpu pkgId will always start from index 2 irrespective of AMD or Intel platform
         pkgId = 2 + (counterID % DGPU_COUNTER_BASE_ID) / DGPU_COUNTERS_MAX;
-
-        // Check if there platform has a APU, add package id if it is APU
-        AMDTPwrGetTargetSystemInfo(&sysInfo);
 
         // Check if this dGPU package is accessible
         GetPciDeviceInfo(pkgId, nullptr, &pAddress);
@@ -2036,48 +1252,32 @@ AMDTResult AMDTPwrEnableCounter(AMDTUInt32 counterID)
 
     if (AMDT_STATUS_OK == ret)
     {
-        //Check for valid counter id
-        for (cnt = 0; cnt < MAX_SUPPORTED_COUNTERS; cnt++)
+        PwrSupportedCounterMap* pCounters = PwrGetSupportedCounterList();
+
+        if (pCounters)
         {
-            if (counterID == g_desc[cnt].m_counterID)
+
+            PwrSupportedCounterMap:: iterator Iter = pCounters->find(counterID);
+
+            if (Iter == pCounters->end())
             {
-                validCounter = true;
-                break;
+                ret = AMDT_ERROR_INVALID_COUNTERID;
+            }
+            else
+            {
+                if (Iter->second.m_isActive)
+                {
+                    ret = AMDT_ERROR_COUNTER_ALREADY_ENABLED;
+                }
+                else
+                {
+                    Iter->second.m_isActive = true;
+                }
             }
         }
-
-        if (false == validCounter)
+        else
         {
             ret = AMDT_ERROR_INVALID_COUNTERID;
-        }
-    }
-
-    if (AMDT_STATUS_OK == ret)
-    {
-        ret = AMDTPwrIsCounterEnabled(counterID);
-
-        if (AMDT_ERROR_COUNTER_NOT_ENABLED == ret)
-        {
-            // add it to the g_ActiveCounters list
-            if (AMDT_PWR_VALUE_SINGLE == g_desc[cnt].m_aggregation)
-            {
-                // Set the counter only in case of simple counters
-                g_activeCounters.push_back(counterID);
-            }
-
-            if ((AMDT_PWR_VALUE_HISTOGRAM == g_desc[cnt].m_aggregation)
-                || (AMDT_PWR_VALUE_CUMULATIVE == g_desc[cnt].m_aggregation))
-            {
-                //printf("\n Enabling Histogram for %s counterId = %d , backendId = %d\n", g_counterList[cnt].m_pDesc->m_name, g_counterList[cnt].m_pDesc->m_counterID,g_counterList[cnt].m_backendId);
-                g_histogramEnabled = true;
-                g_histogramCounters[g_histogramCounterCount++] = g_counterList[cnt];
-            }
-
-            ret = AMDT_STATUS_OK;
-        }
-        else if (AMDT_STATUS_OK == ret)
-        {
-            ret = AMDT_ERROR_COUNTER_ALREADY_ENABLED;
         }
     }
 
@@ -2090,8 +1290,6 @@ AMDTResult AMDTPwrDisableCounter(AMDTUInt32 counterID)
 {
     AMDTPwrProfileState state = AMDT_PWR_PROFILE_STATE_UNINITIALIZED;
     AMDTResult ret = AMDT_STATUS_OK;
-    AMDTUInt32 cnt = 0;
-    bool validCounter = false;
 
     ret = AMDTPwrGetProfilingState(&state);
 
@@ -2118,60 +1316,32 @@ AMDTResult AMDTPwrDisableCounter(AMDTUInt32 counterID)
 
     if (AMDT_STATUS_OK == ret)
     {
-        //Check for valid counter id
-        for (cnt = 0; cnt < MAX_SUPPORTED_COUNTERS; cnt++)
+        PwrSupportedCounterMap* pCounters = PwrGetSupportedCounterList();
+
+        if (pCounters)
         {
-            if (counterID == g_desc[cnt].m_counterID)
+
+            PwrSupportedCounterMap:: iterator Iter = pCounters->find(counterID);
+
+            if (Iter == pCounters->end())
             {
-                validCounter = true;
-                break;
+                ret = AMDT_ERROR_INVALID_COUNTERID;
             }
-        }
-
-        if (! validCounter)
-        {
-            ret = AMDT_ERROR_INVALID_COUNTERID;
-        }
-    }
-
-    if (AMDT_STATUS_OK == ret)
-    {
-        bool foundCounter = false;
-        auto first = g_activeCounters.begin();
-        auto last = g_activeCounters.end();
-
-        if (last != std::find(first, last, counterID))
-        {
-            g_activeCounters.erase(remove(first, last, counterID));
-            foundCounter = true;
-        }
-
-        // Check if it is a histogram counter
-        if (false == foundCounter)
-        {
-            for (cnt = 0; cnt < MAX_SUPPORTED_COUNTERS; cnt++)
+            else
             {
-                if ((nullptr != g_histogramCounters[cnt].m_pDesc) && (counterID == g_histogramCounters[cnt].m_pDesc->m_counterID))
+                if (Iter->second.m_isActive)
                 {
-                    foundCounter = true;
-
-                    // Delete the counter from the active list
-                    size_t size = (g_histogramCounterCount - (cnt + 1)) * sizeof(CounterInfo);
-
-                    memmove(&g_histogramCounters[cnt], &g_histogramCounters[cnt + 1], size);
-
-                    memset(&g_histogramCounters[g_histogramCounterCount - 1], 0, sizeof(CounterInfo));
-                    g_histogramCounters[g_histogramCounterCount].m_pDesc = nullptr;
-                    g_histogramCounterCount--;
-
-                    break;
+                    PwrActivateCounter(Iter->first, false);
+                }
+                else
+                {
+                    ret = AMDT_ERROR_COUNTER_NOT_ENABLED;
                 }
             }
         }
-
-        if (! foundCounter)
+        else
         {
-            ret = AMDT_ERROR_COUNTER_NOT_ENABLED;
+            ret = AMDT_ERROR_INVALID_COUNTERID;
         }
     }
 
@@ -2184,7 +1354,6 @@ AMDTResult AMDTPwrEnableAllCounters()
 {
     AMDTPwrProfileState state = AMDT_PWR_PROFILE_STATE_UNINITIALIZED;
     AMDTResult ret = AMDT_STATUS_OK;
-    AMDTUInt32 cnt = 0;
 
     ret = AMDTPwrGetProfilingState(&state);
 
@@ -2206,25 +1375,26 @@ AMDTResult AMDTPwrEnableAllCounters()
 
     if (AMDT_STATUS_OK == ret)
     {
-        // Check if total supported counter is same as
-        // active counters
-        if (g_activeCounters.size() == (g_counterCnt - g_histcounterCnt))
-        {
-            ret = AMDT_ERROR_COUNTER_ALREADY_ENABLED;
-        }
-    }
+        AMDTUInt32 counterCnt = 0;
+        PwrSupportedCounterMap* pCounters = PwrGetSupportedCounterList();
 
-    if (AMDT_STATUS_OK == ret)
-    {
-        // Erase the current counters
-        g_activeCounters.clear();
-
-        // Set all supported counters
-        for (cnt = 0; cnt < g_counterCnt; cnt++)
+        if (pCounters)
         {
-            if (AMDT_PWR_VALUE_SINGLE == g_desc[cnt].m_aggregation)
+            for (auto iter : *pCounters)
             {
-                g_activeCounters.push_back(g_desc[cnt].m_counterID);
+                if (AMDT_PWR_VALUE_SINGLE == iter.second.m_desc.m_aggregation)
+                {
+                    if (false == iter.second.m_isActive)
+                    {
+                        PwrActivateCounter(iter.first, true);
+                        counterCnt++;
+                    }
+                }
+            }
+
+            if (0 == counterCnt)
+            {
+                ret = AMDT_ERROR_COUNTER_ALREADY_ENABLED;
             }
         }
     }
@@ -2307,38 +1477,12 @@ AMDTResult AMDTPwrSetTimerSamplingPeriod(AMDTUInt32 interval)
     return ret;
 }
 
-// AMDTPwrSetProfileDataFile: This API specifies the path to a file in which
-// the raw profile data records will be stored. This API should be called
-// before starting a profile run. This is an OFFLINE mode ONLY API. This
-// cannot be called once the profile run in started.
-AMDTResult AMDTPwrSetProfileDataFile(const char* pFilePath, AMDTUInt32 len)
-{
-    AMDTResult ret = AMDT_STATUS_OK;
-    GT_UNREFERENCED_PARAMETER(pFilePath);
-    GT_UNREFERENCED_PARAMETER(len);
-    return ret;
-}
-
 // AMDTPwrStartProfiling: If the profiler is not running, this will start the
 // profiler.
 AMDTResult AMDTPwrStartProfiling()
 {
     AMDTPwrProfileState state = AMDT_PWR_PROFILE_STATE_UNINITIALIZED;
     AMDTResult ret = AMDT_STATUS_OK;
-    AMDTPwrProfileConfig cfg;
-    SamplingSpec spec;
-    AMDTUInt16 counterList[MAX_SUPPORTED_COUNTERS];
-    AMDTUInt32 counterListCnt = 0;
-    AMDTUInt16 cnt = 0;
-    AMDTUInt32 cuMask = 0;
-    AMDTUInt32 coreMask = 0;
-    AMDTUInt32 clientId = 0;
-    AMDTPwrTargetSystemInfo sysInfo;
-    AMDTUInt32 loop = 0;
-    bool found = false;
-
-    memset(&sysInfo, 0, sizeof(AMDTPwrTargetSystemInfo));
-    memset(&spec, 0, sizeof(SamplingSpec));
 
     ret = AMDTPwrGetProfilingState(&state);
 
@@ -2366,275 +1510,22 @@ AMDTResult AMDTPwrStartProfiling()
         }
     }
 
-    if (AMDT_STATUS_OK == ret)
+    // Set process profile counters
+    if ((AMDT_STATUS_OK == ret) && (PROFILE_TYPE_PROCESS_PROFILING == g_profileType))
     {
-        AMDTPwrGetTargetSystemInfo(&sysInfo);
-
-        // Set the CU power counters if the profile mode is process type
-        if (PROFILE_TYPE_PROCESS_PROFILING == g_profileType)
+        if (false == PwrEnableProcessProfileCounters())
         {
-            for (cnt = 0; cnt < g_counterCnt; cnt++)
-            {
-                AMDTUInt32 cuCnt = 0;
-
-                for (cuCnt = 0; cuCnt < sysInfo.m_computeUnitCnt; cuCnt++)
-                {
-                    if ((g_counterList[cnt].m_backendId == COUNTERID_SMU7_APU_PWR_CU)
-                        || (g_counterList[cnt].m_backendId == COUNTERID_SMU8_APU_PWR_CU))
-                    {
-                        if ((AMDT_PWR_VALUE_SINGLE == g_counterList[cnt].m_pDesc->m_aggregation)
-                            && (g_counterList[cnt].m_instanceId == cuCnt))
-                        {
-                            if (AMDT_ERROR_COUNTER_ALREADY_ENABLED !=
-                                AMDTPwrEnableCounter(g_counterList[cnt].m_pDesc->m_counterID))
-                            {
-                                g_filterCounters.push_back(g_counterList[cnt].m_pDesc->m_counterID);
-                            }
-                        }
-                    }
-                }
-            }
+            PwrTrace("EnableProcessProfileCounters failed");
+            ret = AMDT_ERROR_NOTSUPPORTED;
         }
     }
 
-    if (AMDT_STATUS_OK == ret)
-    {
-        if (g_activeCounters.empty() && !g_histogramEnabled)
-        {
-            ret = AMDT_ERROR_COUNTERS_NOT_ENABLED;
-        }
-    }
+    // Configure histogram counters
+    PwrConfigureHistogramCounters();
 
     if (AMDT_STATUS_OK == ret)
     {
-        //Configure the profile
-        cfg.m_specCnt = 1;
-        spec.m_samplingPeriod = g_samplingPeriod;
-
-        // Prepare the attribute list
-        memset(counterList, 0, MAX_SUPPORTED_COUNTERS);
-
-        // Set first three backend attributes (rec-id, sample id, time stamp
-        // by default
-        counterList[counterListCnt++] = 0;
-        counterList[counterListCnt++] = 1;
-        counterList[counterListCnt++] = 2;
-
-        AMDTPwrProfileAttributeList supportedList;
-        PwrGetSupportedAttributeList(&supportedList);
-        bool isSmu7PkgPower {false};
-
-        // check how platform measure total apu power
-        for (auto itr : g_activeCounters)
-        {
-            for (AMDTUInt32 k = 0; k < g_counterCnt; ++k)
-            {
-                if (itr == g_counterList[k].m_pDesc->m_counterID &&
-                    COUNTERID_SMU7_APU_PWR_PACKAGE == g_counterList[k].m_backendId)
-                {
-                    isSmu7PkgPower = true;
-                    break;
-                }
-            }
-        }
-
-
-        if (true == g_histogramEnabled)
-        {
-            for (AMDTUInt32 histCnt = 0; histCnt < g_histogramCounterCount; ++histCnt)
-            {
-                AMDTUInt32 backendId = g_histogramCounters[histCnt].m_backendId;
-
-                for (cnt = 0; cnt < supportedList.attrCnt; cnt++)
-                {
-                    if (backendId == supportedList.pAttrList[cnt].m_attrId)
-                    {
-                        if (COUNTERID_CEF == backendId)
-                        {
-                            coreMask |= (1 << g_histogramCounters[histCnt].m_instanceId);
-                        }
-
-                        counterList[counterListCnt++] = (DGPU_COUNTER_BASE_ID > backendId) ? cnt : (AMDTUInt16)backendId;
-
-                        if (COUNTERID_SMU7_APU_PWR_PACKAGE == backendId)
-                        {
-                            isSmu7PkgPower = true;
-                        }
-
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (true == isSmu7PkgPower)
-        {
-            SetSmu7ApuPkgPwrCounter(supportedList, counterList, counterListCnt);
-        }
-
-        for (auto itr : g_activeCounters)
-        {
-            AMDTPwrProfileAttrType id = COUNTERID_MUST_BASE;
-            AMDTPwrProfileAttributeList list;
-            AMDTUInt16 cnt1 = 0;
-            CounterInfo* pInfo = nullptr;
-            memset(&list, 0, sizeof(AMDTPwrProfileAttributeList));
-
-            // Get the counter from activated list
-            AMDTUInt32 cnt2 = 0;
-            found = false;
-
-            for (cnt2 = 0; cnt2 < g_counterCnt; cnt2++)
-            {
-                if (itr == g_counterList[cnt2].m_pDesc->m_counterID)
-                {
-                    found = true;
-                    break;
-                }
-            }
-
-            if (true == found)
-            {
-                pInfo = &g_counterList[cnt2];
-                ret = AMDT_STATUS_OK;
-            }
-            else
-            {
-                pInfo = nullptr;
-                ret = AMDT_ERROR_UNEXPECTED;
-                PwrTrace("Requested counter not found");
-            }
-
-            // If requested counter is supported prepare the counterList for preparing attribute mask
-            // Histogram counter will be ommited from the counterList
-            if (AMDT_STATUS_OK == ret)
-            {
-                AMDTPwrDevice dev;
-                GetDeviceInfo(pInfo->m_pDesc->m_deviceId, &dev);
-
-                if (AMDT_PWR_DEVICE_EXTERNAL_GPU == dev.m_type)
-                {
-                    // Check if this counter id is already added
-                    loop = 0;
-                    found = false;
-
-                    //Check if this counter is already set
-                    for (loop = 0; loop <= counterListCnt; loop++)
-                    {
-                        if (pInfo->m_pDesc->m_counterID == counterList[loop])
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
-
-                    // This counter is not yet set
-                    if (false == found)
-                    {
-                        counterList[counterListCnt++] = (AMDTUInt16)pInfo->m_pDesc->m_counterID;
-                    }
-
-                }
-                else
-                {
-                    if (AMDT_STATUS_OK == ret)
-                    {
-                        // 1. Get the correspomding backend id
-                        id = GetBackendCounterIdFromBaseId(pInfo->m_basicCounterId);
-
-                        if (COUNTERID_MAX_CNT == id)
-                        {
-                            ret = AMDT_ERROR_UNEXPECTED;
-                            PwrTrace("COUNTERID_MAX_CNT == id");
-                        }
-                    }
-
-                    if (AMDT_STATUS_OK == ret)
-                    {
-                        // Find the core mask and CU mask
-
-                        if (INSTANCE_TYPE_PER_CU == pInfo->m_instanceType)
-                        {
-                            // CU mask may not be useful at this moment as
-                            // specific CUs can not be selected in the driver as this moement
-                            cuMask |= (1 << pInfo->m_instanceId);
-                        }
-                        else if (INSTANCE_TYPE_PER_CORE == pInfo->m_instanceType)
-                        {
-                            AMDTUInt32 coreId = pInfo->m_instanceId;
-                            coreMask |= (1 << coreId);
-                        }
-
-                        ret = PwrGetSupportedAttributeList(&list);
-                    }
-
-                    if (AMDT_STATUS_OK == ret)
-                    {
-                        for (cnt1 = 0; cnt1 < list.attrCnt; cnt1++)
-                        {
-                            AMDTPwrAttributeTypeInfo* info = list.pAttrList + cnt1;
-
-                            if ((nullptr != info) && (info->m_attrId == (AMDTUInt32)id))
-                            {
-                                loop = 0;
-                                found = false;
-
-                                //Check if this counter is already set
-                                for (loop = 0; loop <= counterListCnt; loop++)
-                                {
-                                    if (cnt1 == counterList[loop])
-                                    {
-                                        found = true;
-                                        break;
-                                    }
-                                }
-
-                                // This counter is not yet set
-                                if (false == found)
-                                {
-                                    counterList[counterListCnt++] = cnt1;
-                                }
-
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    if (AMDT_STATUS_OK == ret)
-    {
-        cfg.m_attrCnt = counterListCnt;
-        spec.m_mask = coreMask;
-        spec.m_maskCnt = GetCoreCount(coreMask);
-        spec.m_profileType = g_profileType;
-
-        if (PROFILE_TYPE_PROCESS_PROFILING == g_profileType)
-        {
-            spec.m_maskCnt = sysInfo.m_coreCnt;
-            spec.m_mask = ~0 ^ (~0 << sysInfo.m_coreCnt);
-        }
-        else if (0 == spec.m_maskCnt)
-        {
-            spec.m_maskCnt = 1;
-            spec.m_mask = 1;
-        }
-
-        cfg.m_pSpecList = &spec;
-        cfg.m_pAttrList = &counterList[0];
-
-        if (AMDT_STATUS_OK == ret)
-        {
-            ret = PwrRegisterClient(&clientId);
-            cfg.m_clientId = clientId;
-        }
-
-        if (AMDT_STATUS_OK == ret)
-        {
-            ret = PwrSetProfilingConfiguration(&cfg);
-        }
+        ret = PwrConfigureProfile() ? AMDT_STATUS_OK : AMDT_ERROR_FAIL;
     }
 
     if (AMDT_STATUS_OK == ret)
@@ -2929,12 +1820,15 @@ AMDTResult AMDTPwrGetSampleValueOption(AMDTSampleValueOption* pOpt)
 AMDTResult AMDTPwrReadAllEnabledCounters(AMDTUInt32* pNumOfSamples,
                                          AMDTPwrSample** ppData)
 {
+    AMDTUInt32 counterPoolCnt = 0;
     AMDTPwrProfileState state = AMDT_PWR_PROFILE_STATE_UNINITIALIZED;
     AMDTResult ret = AMDT_STATUS_OK;
-    AMDTUInt32 sampleCnt = 0;
+    PwrSupportedCounterMap* pCounters = PwrGetSupportedCounterList();
 
     // Check for valid arguments
-    if ((nullptr == pNumOfSamples) || (nullptr == ppData))
+    if ((nullptr == pNumOfSamples)
+        || (nullptr == ppData)
+        || (nullptr == pCounters))
     {
         ret = AMDT_ERROR_INVALIDARG;
     }
@@ -2980,111 +1874,87 @@ AMDTResult AMDTPwrReadAllEnabledCounters(AMDTUInt32* pNumOfSamples,
     if (AMDT_STATUS_OK == ret)
     {
         bool isDataAvailable = false;
-        AMDTUInt32 resultCnt = 0;
-        AMDTPwrProcessedDataRecord* pData = nullptr;
-
         AMDTPwrProcessedDataRecord data;
 
-        if ((PROFILE_TYPE_PROCESS_PROFILING == g_profileType) && (!g_activeCounters.empty()))
+        // Remove counters which were set internally
+        if (g_filterCounters.size() > 0)
         {
-            for (auto fltr : g_filterCounters)
+
+            for (auto fltIter : g_filterCounters)
             {
-                g_activeCounters.erase(remove(g_activeCounters.begin(),
-                                              g_activeCounters.end(), fltr), g_activeCounters.end());
+                PwrSupportedCounterMap::iterator Iter = pCounters->find(fltIter);
+
+                if (Iter != pCounters->end())
+                {
+                    Iter->second.m_isActive = false;
+                }
             }
 
             g_filterCounters.clear();
         }
 
+        g_result.clear();
+
         while (AMDT_ERROR_NODATA != AMDTGetCounterValues(&data))
         {
-            pData = &data;
             isDataAvailable = true;
             AMDTUInt64 startTs = 0 ;
             AMDTUInt32 cnt = 0;
-            AMDTPwrAttributeInfo* info =  nullptr;
-            AMDTPwrSample* pResult = g_pResult + resultCnt++;
-            pResult->m_numOfValues = 0;
-            sampleCnt++;
+            AMDTPwrSample result;
+            memset(&result, 0, sizeof(AMDTPwrSample));
 
             // Fill the basic information
-            pResult->m_recordId = pData->m_recId;
+            result.m_recordId = data.m_recId;
 #ifdef LINUX
             // m_ts is actually micro-seconds on Linux, converting this to
             // milli-seconds and rounding off to nearest milli-second
-            double tmpMs = pData->m_ts / 1000.0 ;
-            pResult->m_elapsedTimeMs = (AMDTUInt64)nearbyint(tmpMs);
+            double tmpMs = data.m_ts / 1000.0 ;
+            result.m_elapsedTimeMs = (AMDTUInt64)nearbyint(tmpMs);
 #else
-            pResult->m_elapsedTimeMs = pData->m_ts;
+            result.m_elapsedTimeMs = data.m_ts;
 #endif
             AMDTPwrGetProfileTimeStamps(&startTs, nullptr);
-            ConvertTimeStamp(&pResult->m_systemTime, startTs);
+            ConvertTimeStamp(&result.m_systemTime, startTs);
+            result.m_counterValues = &g_pCounterStorage[counterPoolCnt];
 
-            // Iterate over the counters
-            for (auto cntr : g_activeCounters)
+            if ((counterPoolCnt + data.m_counters.size()) > PWR_COUNTER_STORAGE_POOL)
             {
-                AMDTUInt32 cnt1 = 0;
-                CounterInfo* pCounterInfo = GetBaseCounterInfoFromClientId(cntr);
-
-                if (nullptr != pCounterInfo)
-                {
-                    AMDTUInt32 backendId = pCounterInfo->m_backendId;
-                    AMDTUInt32 instanceId = pCounterInfo->m_instanceId;
-                    bool foundCounterId = false;
-
-                    // record id and sample id from processed list are ignored
-                    for (cnt1 = 0; cnt1 < pData->m_attrCnt; cnt1++)
-                    {
-                        info = &pData->m_attr[cnt1];
-
-                        // First check the counter id if it is found
-                        if ((backendId == info->m_pInfo->m_attrId)
-                            && (instanceId == info->m_instanceId))
-                        {
-                            foundCounterId = true;
-                            break;
-                        }
-                    }
-
-                    if (foundCounterId)
-                    {
-                        //Prepare the output data now
-                        if (PWR_UNIT_TYPE_COUNT == info->m_pInfo->m_unitType)
-                        {
-                            AMDTUInt64 counterValue = info->u.m_value64;
-                            pResult->m_counterValues[cnt].m_counterValue = (AMDTFloat32)counterValue;
-                        }
-                        else
-                        {
-                            AMDTFloat32 counterValue = info->u.m_float32;
-
-                            // Make sure that the counter's value does not go beyond the upper bound.
-                            pResult->m_counterValues[cnt].m_counterValue = static_cast<AMDTFloat32>(counterValue);
-                        }
-
-                        pResult->m_counterValues[cnt].m_counterID = cntr;
-                        pResult->m_numOfValues++;
-                        cnt++;
-                    }
-                    else
-                    {
-                        ret = AMDT_ERROR_INTERNAL;
-                    }
-                } // Counter info available
-                else
-                {
-                    printf("\n ERROR CounterInfo not available for %d\n", cnt);
-                }
-            }
-
-            // Check if buffer is full
-            if (resultCnt == MAX_SAMPLES_PER_QUERY)
-            {
-                // We don't have enough space to store
-                PwrTrace("MAX_SAMPLES_PER_QUERY exceeded");
+                PwrTrace("memory not available");
                 break;
             }
 
+            for (auto iter : data.m_counters)
+            {
+                PwrSupportedCounterMap:: iterator supIter = pCounters->find(iter.second.m_counterId);
+
+                if (supIter != pCounters->end())
+                {
+                    //Prepare the output data now
+                    if (PWR_UNIT_TYPE_COUNT == supIter->second.m_basicInfo.m_unitType)
+                    {
+                        result.m_counterValues[cnt].m_counterValue = (AMDTFloat32)iter.second.m_value64;
+                    }
+                    else
+                    {
+                        result.m_counterValues[cnt].m_counterValue = (AMDTFloat32)iter.second.m_float32;
+                    }
+
+                    result.m_counterValues[cnt].m_counterID = iter.second.m_counterId;
+                    counterPoolCnt++;
+                    cnt++;
+                }
+                else
+                {
+                    ret = AMDT_ERROR_INTERNAL;
+                    PwrTrace("counter not found");
+                }
+            }
+
+            if (cnt > 0)
+            {
+                result.m_numOfValues = cnt;
+                g_result.push_back(result);
+            }
         };
 
         if (false == isDataAvailable)
@@ -3094,8 +1964,11 @@ AMDTResult AMDTPwrReadAllEnabledCounters(AMDTUInt32* pNumOfSamples,
 
         if (AMDT_STATUS_OK == ret)
         {
-            *pNumOfSamples = sampleCnt;
-            *ppData = g_pResult;
+            if (g_result.size() > 0)
+            {
+                *pNumOfSamples = g_result.size();
+                *ppData = &g_result[0];
+            }
         }
     }
 
@@ -3109,8 +1982,9 @@ AMDTResult AMDTPwrReadCounterHistogram(AMDTUInt32 counterID,
                                        AMDTPwrHistogram** ppData)
 {
     AMDTResult ret = AMDT_STATUS_OK;
-    CounterInfo* pInfo = nullptr;
     AMDTPwrProfileState state = AMDT_PWR_PROFILE_STATE_UNINITIALIZED;
+    AMDTUInt32 instanceId = 0;
+    PwrSupportedCounterMap* pCounters = nullptr;
 
     // Check for valid arguments
     if ((nullptr == pNumEntries) || (nullptr == ppData))
@@ -3140,59 +2014,37 @@ AMDTResult AMDTPwrReadCounterHistogram(AMDTUInt32 counterID,
     // Check for valid counter id
     if (ret == AMDT_STATUS_OK)
     {
-        pInfo = GetBaseCounterInfoFromClientId(counterID);
+        pCounters = PwrGetSupportedCounterList();
 
-        if ((nullptr == pInfo) || (AMDT_PWR_VALUE_HISTOGRAM != pInfo->m_pDesc->m_aggregation))
+        PwrSupportedCounterMap::iterator iter = pCounters->find(counterID);
+
+        if (iter != pCounters->end())
         {
-            ret = AMDT_ERROR_INVALID_COUNTERID;
+            if (AMDT_PWR_VALUE_HISTOGRAM != iter->second.m_desc.m_aggregation)
+            {
+                ret = AMDT_ERROR_INVALID_COUNTERID;
+            }
+
+            instanceId = iter->second.m_instanceId;
         }
     }
 
     if (ret == AMDT_STATUS_OK)
     {
-        Histogram* pHistogram = nullptr;
-        memset(g_cumulativeCounterList, 0, sizeof(AMDTFloat32) * MAX_COUNTER_CNT);
+        AMDTPwrHistogram* pHistogram = nullptr;
 
-        if (AMDT_PWR_ALL_COUNTERS != counterID)
+        if (AMDT_PWR_ALL_COUNTERS == counterID)
         {
-            pHistogram = GetHistogramCounter(pInfo->m_backendId, pInfo->m_instanceId);
-
-            if (nullptr != pHistogram)
+            for (auto iter : *pCounters)
             {
-                g_histogramCounterList[0].m_counterId = counterID;
-                g_histogramCounterList[0].m_numOfBins = pHistogram->m_binCnt;
-                g_histogramCounterList[0].m_pRange = pHistogram->m_pRangeStartIndex;
-                g_histogramCounterList[0].m_pBins = pHistogram->m_pRangeValue;
-                *ppData = &g_histogramCounterList[0];
-                *pNumEntries = 1;
-            }
-            else
-            {
-                ret = AMDT_ERROR_INTERNAL;
-                PwrTrace("error: AMDT_ERROR_INTERNAL pHistogram==NULL");
-            }
-        }
-        else
-        {
-            AMDTUInt32 cnt = 0;
-            AMDTUInt32 entryCnt = 0;
-
-            for (cnt = 0; cnt < g_histogramCounterCount; cnt ++)
-            {
-                pInfo = GetBaseCounterInfoFromClientId(g_histogramCounters[cnt].m_pDesc->m_counterID);
-
-                if ((nullptr != pInfo)
-                    && (AMDT_PWR_VALUE_HISTOGRAM == pInfo->m_pDesc->m_aggregation))
+                if (AMDT_PWR_VALUE_HISTOGRAM == iter.second.m_desc.m_aggregation)
                 {
-                    pHistogram = GetHistogramCounter(pInfo->m_backendId, pInfo->m_instanceId);
+                    pHistogram = GetHistogramCounter(iter.first);
 
                     if (nullptr != pHistogram)
                     {
-                        g_histogramCounterList[entryCnt].m_counterId = g_histogramCounters[cnt].m_pDesc->m_counterID;
-                        g_histogramCounterList[entryCnt].m_numOfBins = pHistogram->m_binCnt;
-                        g_histogramCounterList[entryCnt].m_pRange = pHistogram->m_pRangeStartIndex;
-                        g_histogramCounterList[entryCnt].m_pBins = pHistogram->m_pRangeValue;
-                        *pNumEntries = entryCnt;
+                        g_histogramResult.push_back(*pHistogram);
+                        (*pNumEntries)++;
                     }
                     else
                     {
@@ -3200,11 +2052,23 @@ AMDTResult AMDTPwrReadCounterHistogram(AMDTUInt32 counterID,
                         PwrTrace("error: AMDT_ERROR_INTERNAL pHistogram==NULL for list");
                     }
                 }
-                else
-                {
-                    ret = AMDT_ERROR_INTERNAL;
-                    PwrTrace("error: AMDT_ERROR_INTERNAL pInfo==NULL");
-                }
+            }
+
+        }
+        else
+        {
+            pHistogram = GetHistogramCounter(counterID);
+
+            if (nullptr != pHistogram)
+            {
+                g_histogramResult.push_back(*pHistogram);
+                *ppData = &g_histogramResult[0];
+                *pNumEntries = 1;
+            }
+            else
+            {
+                ret = AMDT_ERROR_INTERNAL;
+                PwrTrace("error: AMDT_ERROR_INTERNAL pHistogram==NULL");
             }
         }
     }
@@ -3220,7 +2084,7 @@ AMDTResult AMDTPwrReadCumulativeCounter(AMDTUInt32 counterId,
 {
     AMDTResult ret = AMDT_STATUS_OK;
     AMDTPwrProfileState state = AMDT_PWR_PROFILE_STATE_UNINITIALIZED;
-    CounterInfo* pCounterInfo = nullptr;
+    PwrSupportedCounterMap* pCounters = nullptr;
 
     // Check for valid arguments
     if ((nullptr == pNumEntries) || (nullptr == ppData))
@@ -3250,46 +2114,52 @@ AMDTResult AMDTPwrReadCumulativeCounter(AMDTUInt32 counterId,
     // Check for valid counter id
     if (ret == AMDT_STATUS_OK)
     {
-        memset(g_cumulativeCounterList, 0, sizeof(AMDTFloat32) * MAX_COUNTER_CNT);
+        g_cummulativeResult.clear();
+        pCounters = PwrGetSupportedCounterList();
 
-        if (AMDT_PWR_ALL_COUNTERS != counterId)
+        if (AMDT_PWR_ALL_COUNTERS == counterId)
         {
-            pCounterInfo = GetBaseCounterInfoFromClientId(counterId);
-
-            if ((nullptr == pCounterInfo) || (AMDT_PWR_VALUE_CUMULATIVE != pCounterInfo->m_pDesc->m_aggregation))
+            for (auto iter : *pCounters)
             {
-                ret = AMDT_ERROR_INVALID_COUNTERID;
+                if (iter.second.m_isActive && (AMDT_PWR_VALUE_CUMULATIVE != iter.second.m_desc.m_aggregation))
+                {
+                    AMDTFloat32* value = GetCumulativeCounter(counterId);
+
+                    if (value)
+                    {
+                        g_cummulativeResult.push_back(*value);
+                        (*pNumEntries)++;
+                    }
+                }
             }
 
-            if (ret == AMDT_STATUS_OK)
+            if (g_cummulativeResult.size() > 0)
             {
-                memcpy(g_cumulativeCounterList,
-                       GetCumulativeCounter(pCounterInfo->m_backendId, pCounterInfo->m_instanceId),
-                       sizeof(AMDTFloat32));
-                *ppData = &g_cumulativeCounterList[0];
-                *pNumEntries = 1;
+                *ppData = &g_cummulativeResult[0];
             }
         }
         else
         {
-            AMDTUInt32 entryCnt = 0;
-            AMDTUInt32 cnt = 0;
 
-            for (cnt = 0; cnt < g_histogramCounterCount; cnt ++)
+            PwrSupportedCounterMap::iterator iter = pCounters->find(counterId);
+
+            if (iter != pCounters->end())
             {
-                pCounterInfo = GetBaseCounterInfoFromClientId(g_histogramCounters[cnt].m_pDesc->m_counterID);
+                AMDTFloat32* value = GetCumulativeCounter(counterId);
 
-                if ((nullptr != pCounterInfo)
-                    && (AMDT_PWR_VALUE_CUMULATIVE == pCounterInfo->m_pDesc->m_aggregation))
+                if (value)
                 {
-                    memcpy(&g_cumulativeCounterList[entryCnt++],
-                           GetCumulativeCounter(pCounterInfo->m_backendId, pCounterInfo->m_instanceId),
-                           sizeof(AMDTFloat32));
-                    *pNumEntries = entryCnt;
+                    g_cummulativeResult.push_back(*value);
+                    *ppData = &g_cummulativeResult[0];
+                    *pNumEntries = 1;
                 }
-            }
 
-            *ppData = g_cumulativeCounterList;
+                ret = AMDT_STATUS_OK;
+            }
+            else
+            {
+                ret = AMDT_ERROR_COUNTERS_NOT_ENABLED;
+            }
         }
     }
 
@@ -3335,10 +2205,8 @@ AMDTResult AMDTPwrGetTimerSamplingPeriod(AMDTUInt32* pIntervalMilliSec)
 //AMDTPwrIsCounterEnabled: This API is query API to check whether a counter is enabled
 AMDTResult AMDTPwrIsCounterEnabled(AMDTUInt32 counterID)
 {
-    AMDTResult ret = AMDT_STATUS_OK;
+    AMDTResult ret = AMDT_ERROR_INVALID_COUNTERID;
     AMDTPwrProfileState state = AMDT_PWR_PROFILE_STATE_UNINITIALIZED;
-    AMDTUInt32 cnt = 0;
-    bool validCounter = false;
 
     ret = AMDTPwrGetProfilingState(&state);
 
@@ -3356,42 +2224,12 @@ AMDTResult AMDTPwrIsCounterEnabled(AMDTUInt32 counterID)
 
     if (AMDT_STATUS_OK == ret)
     {
-        std::list<AMDTUInt32>::iterator cntr;
+        PwrSupportedCounterMap* pCounters = PwrGetSupportedCounterList();
+        PwrSupportedCounterMap::iterator iter = pCounters->find(counterID);
 
-        //Check for valid counter id
-        for (cnt = 0; cnt < MAX_SUPPORTED_COUNTERS; cnt++)
+        if (iter != pCounters->end())
         {
-            if (counterID == g_desc[cnt].m_counterID)
-            {
-                validCounter = true;
-                break;
-            }
-        }
-
-        if (validCounter)
-        {
-            bool counterEnabled = false;
-            auto foundCounter = std::find(g_activeCounters.begin(), g_activeCounters.end(), counterID);
-
-            if (foundCounter != g_activeCounters.end())
-            {
-                counterEnabled = true;
-            }
-
-            // Check in the histogram counters as well
-            if (!counterEnabled && g_histogramEnabled)
-            {
-                for (cnt = 0; cnt < g_histogramCounterCount; cnt++)
-                {
-                    if (counterID == g_histogramCounters[cnt].m_pDesc->m_counterID)
-                    {
-                        counterEnabled = true;
-                        break;
-                    }
-                }
-            }
-
-            ret = (counterEnabled) ? AMDT_STATUS_OK : AMDT_ERROR_COUNTER_NOT_ENABLED;
+            ret = iter->second.m_isActive ? AMDT_STATUS_OK : AMDT_ERROR_COUNTERS_NOT_ENABLED;
         }
         else
         {
@@ -3408,6 +2246,7 @@ AMDTResult AMDTPwrGetNumEnabledCounters(AMDTUInt32* pCount)
 {
     AMDTPwrProfileState state = AMDT_PWR_PROFILE_STATE_UNINITIALIZED;
     AMDTResult ret = AMDT_STATUS_OK;
+    AMDTUInt32 counter = 0;
 
     if (nullptr == pCount)
     {
@@ -3429,7 +2268,17 @@ AMDTResult AMDTPwrGetNumEnabledCounters(AMDTUInt32* pCount)
 
     if (AMDT_STATUS_OK == ret)
     {
-        *pCount = (AMDTUInt32)(g_activeCounters.size() + g_histogramCounterCount);
+        PwrSupportedCounterMap* pCounters = PwrGetSupportedCounterList();
+
+        for (auto iter : *pCounters)
+        {
+            if (iter.second.m_isActive)
+            {
+                counter++;
+            }
+        }
+
+        *pCount = counter;
     }
 
     return ret;
@@ -3481,13 +2330,10 @@ AMDTResult AMDTPwrGetCounterHierarchy(AMDTUInt32 id, AMDTPwrCounterHierarchy* pI
     AMDTPwrProfileState state = AMDT_PWR_PROFILE_STATE_UNINITIALIZED;
     AMDTResult ret = AMDT_ERROR_INVALIDARG;
     AMDTUInt32 cnt = 0;
-    CounterInfo* counterInfo = nullptr;
     AMDTPwrCounterHierarchy* pRel = nullptr;
     AMDTUInt32 childCnt = 0;
     AMDTUInt32 size = sizeof(g_InternalCounterHirarchy) / sizeof(AMDTPwrCounterHierarchy);
-    AMDTPwrTargetSystemInfo sysInfo;
-
-    memset(&sysInfo, 0, sizeof(sysInfo));
+    PwrSupportedCounterMap* pCounters = nullptr;
 
     if (nullptr != pInfo)
     {
@@ -3499,56 +2345,63 @@ AMDTResult AMDTPwrGetCounterHierarchy(AMDTUInt32 id, AMDTPwrCounterHierarchy* pI
         ret = AMDT_ERROR_DRIVER_UNINITIALIZED;
     }
 
-    if (AMDT_STATUS_OK == ret)
-    {
-        // Get the system info
-        ret = AMDTPwrGetTargetSystemInfo(&sysInfo);
-    }
-
     bool foundCounterHierarchy = false;
 
     if (AMDT_STATUS_OK == ret)
     {
-        counterInfo = GetBaseCounterInfoFromClientId(id);
-        pInfo->m_childCnt = 0;
 
-        if (nullptr == counterInfo)
+        PwrCounterInfo* pCounterInfo = nullptr;
+        pCounters = PwrGetSupportedCounterList();
+
+        PwrSupportedCounterMap::iterator iter = pCounters->find(id);
+
+        if (iter != pCounters->end())
+        {
+            pCounterInfo = &iter->second;
+        }
+        else
         {
             ret = AMDT_ERROR_INVALID_COUNTERID;
         }
+
+        pInfo->m_childCnt = 0;
 
         if (AMDT_STATUS_OK == ret)
         {
             // Find the hierarchy information from the table
             for (cnt = 0; cnt < size; cnt++)
             {
-                if ((AMDTUInt32)counterInfo->m_basicCounterId == g_InternalCounterHirarchy[cnt].m_counter)
+                if (pCounterInfo->m_basicInfo.m_attrId == g_InternalCounterHirarchy[cnt].m_counter)
                 {
                     AMDTUInt32 cnt1 = 0;
-                    AMDTUInt32 clientId = 0;
                     // Prepare Child list
                     pRel = &g_InternalCounterHirarchy[cnt];
 
                     for (cnt1 = 0; cnt1 < pRel->m_childCnt; cnt1++)
                     {
                         AMDTUInt32 childBaseId = *(pRel->m_pChildList + cnt1);
-                        clientId = GetClientIdFromBaseCounterId(childBaseId, 0);
-                        g_ChildCounterList[childCnt++] = clientId;
 
-                        if ((sysInfo.m_computeUnitCnt > 1) && ((COUNTER_SMU7_APU_PWR_CU == childBaseId) ||
-                                                               (COUNTER_SMU8_APU_PWR_CU == childBaseId)))
+                        for (auto Iter : *pCounters)
                         {
-                            // we need to add power counters for all othe CUs
-                            clientId = GetClientIdFromBaseCounterId(childBaseId, 1);
-                            g_ChildCounterList[childCnt++] = clientId;
+                            if (Iter.second.m_basicInfo.m_attrId == childBaseId)
+                            {
+                                g_ChildCounterList[childCnt++] = Iter.first;
+                            }
                         }
                     }
 
                     pInfo->m_childCnt = childCnt;
                     pInfo->m_pChildList = &g_ChildCounterList[0];
-                    pInfo->m_counter = counterInfo->m_pDesc->m_counterID;
-                    clientId = GetClientIdFromBaseCounterId(g_InternalCounterHirarchy[cnt].m_parent, 1);
-                    pInfo->m_parent = clientId;
+                    pInfo->m_counter = id;
+
+                    for (auto iterCtr : *pCounters)
+                    {
+                        if (iterCtr.second.m_basicInfo.m_attrId == g_InternalCounterHirarchy[cnt].m_parent)
+                        {
+                            pInfo->m_parent = iterCtr.first;
+                        }
+                    }
+
                     foundCounterHierarchy = true;
 
                     break;
@@ -3574,7 +2427,6 @@ AMDTResult AMDTEnableProcessProfiling()
 {
     AMDTPwrProfileState state = AMDT_PWR_PROFILE_STATE_UNINITIALIZED;
     AMDTResult ret = AMDT_STATUS_OK;
-    AMDTPwrTargetSystemInfo sysInfo;
 
     ret = AMDTPwrGetProfilingState(&state);
 
@@ -3592,10 +2444,7 @@ AMDTResult AMDTEnableProcessProfiling()
 
     if (AMDT_STATUS_OK == ret)
     {
-        // Get the system info
-        ret = AMDTPwrGetTargetSystemInfo(&sysInfo);
-
-        if ((false == sysInfo.m_isAmdApu) || (false == sysInfo.m_smuTable.m_info[0].m_isAccessible))
+        if ((false == g_sysInfo.m_isAmdApu) || (false == g_sysInfo.m_smuTable.m_info[0].m_isAccessible))
         {
             ret = AMDT_WARN_PROCESS_PROFILE_NOT_SUPPORTED;
         }
@@ -3645,6 +2494,47 @@ AMDTResult AMDTGetProcessProfileData(AMDTUInt32* pPIDCount,
         {
             ret = AMDTGetCummulativePidProfData(pPIDCount, ppData, pidVal, reset);
         }
+    }
+
+    return ret;
+}
+
+// AMDTPwrGetNodeTemperature: This API provides the note temperature in tctl
+// scale or internally add any offset provided by the end user.
+AMDTResult AMDTPwrGetNodeTemperature(AMDTFloat32* pNodeTemp)
+{
+    AMDTPwrProfileState state = AMDT_PWR_PROFILE_STATE_UNINITIALIZED;
+    AMDTResult ret = AMDT_STATUS_OK;
+    ret = AMDTPwrGetProfilingState(&state);
+    AMDTUInt32 data = 0;
+    AMDTFloat32 temp = 0.0;
+    bool isSupported = false;
+
+    if (AMDT_STATUS_OK == ret)
+    {
+        if (AMDT_PWR_PROFILE_STATE_UNINITIALIZED == state)
+        {
+            ret = AMDT_ERROR_DRIVER_UNINITIALIZED;
+        }
+    }
+
+    // Orochi
+    isSupported = ((0x15 == g_sysInfo.m_family)
+                   && ((0x00 == g_sysInfo.m_model) || ((0x00 < g_sysInfo.m_model) && (g_sysInfo.m_model <= 0x0f))));
+
+    isSupported |= ((0x15 == g_sysInfo.m_family) && ((0x30 <= g_sysInfo.m_model) && (g_sysInfo.m_model <= 0x3f))); // KV
+
+    if (false == isSupported)
+    {
+        ret = AMDT_ERROR_NOTSUPPORTED;
+    }
+
+    if (AMDT_STATUS_OK == ret)
+    {
+        temp = 0;
+        ReadPciAddress(0, 0x18, 0x3, 0xA4, &data);
+        DecodeTctlTemperature(data, &temp);
+        *pNodeTemp = (AMDTFloat32)temp;
     }
 
     return ret;
