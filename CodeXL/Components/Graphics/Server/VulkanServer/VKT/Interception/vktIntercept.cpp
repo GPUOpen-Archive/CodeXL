@@ -18,15 +18,6 @@
 
 static LOADER_PLATFORM_THREAD_ONCE_DECLARATION(initOnce);
 
-#pragma warning (push)
-#pragma warning (disable : 4477)
-
-// This prevents VS2015 from complaining about imperfect "%" formatting when printing Vulkan objects.
-// This only applies to the 32-bit version of VulkanServer.
-#ifndef X64
-    #pragma warning (disable : 4313)
-#endif
-
 //-----------------------------------------------------------------------------
 /// Hold whether WSI is enabled in this device
 //-----------------------------------------------------------------------------
@@ -354,7 +345,10 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateInstance(const VkIns
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", pCreateInfo, pAllocator, pInstance);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pInstance));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = fpCreateInstance(pCreateInfo, pAllocator, pInstance);
@@ -385,7 +379,9 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDestroyInstance(VkInstance ins
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p", instance, pAllocator);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s",
+                  VktUtil::WritePointerAsString(instance),
+                  VktUtil::WritePointerAsString(pAllocator));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         pDisp->DestroyInstance(instance, pAllocator);
@@ -410,10 +406,10 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkEnumeratePhysicalDevices(V
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, %s",
-                  instance,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s",
+                  VktUtil::WritePointerAsString(instance),
                   *pPhysicalDeviceCount,
-                  PrintArrayWithFormatter(*pPhysicalDeviceCount, pPhysicalDevices, "0x%p").c_str());
+                  PrintArrayWithFormatter(*pPhysicalDeviceCount, pPhysicalDevices, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = instance_dispatch_table(instance)->EnumeratePhysicalDevices(instance, pPhysicalDeviceCount, pPhysicalDevices);
@@ -434,7 +430,9 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkGetPhysicalDeviceFeatures(VkPh
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p", physicalDevice, pFeatures);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s",
+                  VktUtil::WritePointerAsString(physicalDevice),
+                  VktUtil::WritePointerAsString(pFeatures));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         instance_dispatch_table(physicalDevice)->GetPhysicalDeviceFeatures(physicalDevice, pFeatures);
@@ -453,10 +451,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkGetPhysicalDeviceFormatPropert
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %s, 0x%p",
-                  physicalDevice,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(physicalDevice),
                   VktUtil::WriteFormatEnumAsString(format),
-                  pFormatProperties);
+                  VktUtil::WritePointerAsString(pFormatProperties));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         instance_dispatch_table(physicalDevice)->GetPhysicalDeviceFormatProperties(physicalDevice, format, pFormatProperties);
@@ -477,14 +475,14 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkGetPhysicalDeviceImageForm
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %s, %s, %s, %s, %s, 0x%p",
-                  physicalDevice,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(physicalDevice),
                   VktUtil::WriteFormatEnumAsString(format),
                   VktUtil::WriteImageTypeEnumAsString(type),
                   VktUtil::WriteImageTilingEnumAsString(tiling),
                   VktUtil::DecomposeImageUsageFlagsEnumAsString(usage).c_str(),
                   VktUtil::DecomposeImageCreateFlagsEnumAsString(flags).c_str(),
-                  pImageFormatProperties);
+                  VktUtil::WritePointerAsString(pImageFormatProperties));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = instance_dispatch_table(physicalDevice)->GetPhysicalDeviceImageFormatProperties(physicalDevice, format, type, tiling, usage, flags, pImageFormatProperties);
@@ -505,7 +503,9 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkGetPhysicalDeviceProperties(Vk
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p", physicalDevice, pProperties);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s",
+                  VktUtil::WritePointerAsString(physicalDevice),
+                  VktUtil::WritePointerAsString(pProperties));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         instance_dispatch_table(physicalDevice)->GetPhysicalDeviceProperties(physicalDevice, pProperties);
@@ -524,7 +524,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkGetPhysicalDeviceQueueFamilyPr
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, 0x%p", physicalDevice, *pQueueFamilyPropertyCount, pQueueFamilyProperties);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s",
+                  VktUtil::WritePointerAsString(physicalDevice),
+                  *pQueueFamilyPropertyCount,
+                  VktUtil::WritePointerAsString(pQueueFamilyProperties));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         instance_dispatch_table(physicalDevice)->GetPhysicalDeviceQueueFamilyProperties(physicalDevice, pQueueFamilyPropertyCount, pQueueFamilyProperties);
@@ -543,7 +546,9 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkGetPhysicalDeviceMemoryPropert
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p", physicalDevice, pMemoryProperties);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s",
+                  VktUtil::WritePointerAsString(physicalDevice),
+                  VktUtil::WritePointerAsString(pMemoryProperties));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         instance_dispatch_table(physicalDevice)->GetPhysicalDeviceMemoryProperties(physicalDevice, pMemoryProperties);
@@ -569,11 +574,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateDevice(VkPhysicalDev
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p",
-                  physicalDevice,
-                  pCreateInfo,
-                  pAllocator,
-                  pDevice);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(physicalDevice),
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pDevice));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = fpCreateDevice(physicalDevice, pCreateInfo, pAllocator, pDevice);
@@ -607,7 +612,9 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDestroyDevice(VkDevice device,
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p", device, pAllocator);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WritePointerAsString(pAllocator));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         pDisp->DestroyDevice(device, pAllocator);
@@ -632,7 +639,10 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkEnumerateInstanceExtension
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, 0x%p", pLayerName, *pCount, pProperties);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s",
+                  VktUtil::WritePointerAsString(pLayerName),
+                  *pCount,
+                  VktUtil::WritePointerAsString(pProperties));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = util_GetExtensionProperties(0, nullptr, pCount, pProperties);
@@ -655,7 +665,9 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkEnumerateInstanceLayerProp
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%u, 0x%p", *pCount, pProperties);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%u, %s",
+                  *pCount,
+                  VktUtil::WritePointerAsString(pProperties));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = util_GetLayerProperties(ARRAY_SIZE(globalLayerProps), globalLayerProps, pCount, pProperties);
@@ -678,7 +690,10 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkEnumerateDeviceLayerProper
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, 0x%p", physicalDevice, *pCount, pProperties);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s",
+                  VktUtil::WritePointerAsString(physicalDevice),
+                  *pCount,
+                  VktUtil::WritePointerAsString(pProperties));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = util_GetLayerProperties(ARRAY_SIZE(deviceLayerProps), deviceLayerProps, pCount, pProperties);
@@ -705,7 +720,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkEnumerateDeviceExtensionPr
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %s, %u, 0x%p", physicalDevice, pLayerName, *pPropertyCount, pProperties);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %u, %s",
+                  VktUtil::WritePointerAsString(physicalDevice),
+                  pLayerName,
+                  *pPropertyCount,
+                  VktUtil::WritePointerAsString(pProperties));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = instance_dispatch_table(physicalDevice)->EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pPropertyCount, pProperties);
@@ -726,7 +745,11 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkGetDeviceQueue(VkDevice device
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, %u, 0x%p", device, queueFamilyIndex, queueIndex, pQueue);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %u, %s",
+                  VktUtil::WritePointerAsString(device),
+                  queueFamilyIndex,
+                  queueIndex,
+                  VktUtil::WritePointerAsString(pQueue));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->GetDeviceQueue(device, queueFamilyIndex, queueIndex, pQueue);
@@ -777,7 +800,7 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkDeviceWaitIdle(VkDevice de
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p", device);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s", VktUtil::WritePointerAsString(device));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->DeviceWaitIdle(device);
@@ -800,7 +823,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkAllocateMemory(VkDevice de
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p", device, pAllocateInfo, pAllocator, pMemory);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WritePointerAsString(pAllocateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pMemory));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->AllocateMemory(device, pAllocateInfo, pAllocator, pMemory);
@@ -821,7 +848,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkFreeMemory(VkDevice device, Vk
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", device, memory, pAllocator);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)memory),
+                  VktUtil::WritePointerAsString(pAllocator));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->FreeMemory(device, memory, pAllocator);
@@ -842,13 +872,13 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkMapMemory(VkDevice device,
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %llu, %llu, %s, 0x%p",
-                  device,
-                  memory,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %llu, %llu, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)memory),
                   offset,
                   size,
                   VktUtil::DecomposeMemoryMapFlagsEnumAsString(flags).c_str(),
-                  ppData);
+                  VktUtil::WritePointerAsString(ppData));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->MapMemory(device, memory, offset, size, flags, ppData);
@@ -869,7 +899,9 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkUnmapMemory(VkDevice device, V
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p", device, memory);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)memory));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->UnmapMemory(device, memory);
@@ -890,10 +922,10 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkFlushMappedMemoryRanges(Vk
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, 0x%p",
-                  device,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s",
+                  VktUtil::WritePointerAsString(device),
                   memoryRangeCount,
-                  PrintArrayWithFormatter(memoryRangeCount, pMemoryRanges, "0x%p").c_str());
+                  PrintArrayWithFormatter(memoryRangeCount, pMemoryRanges, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->FlushMappedMemoryRanges(device, memoryRangeCount, pMemoryRanges);
@@ -916,10 +948,10 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkInvalidateMappedMemoryRang
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, 0x%p",
-                  device,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s",
+                  VktUtil::WritePointerAsString(device),
                   memoryRangeCount,
-                  PrintArrayWithFormatter(memoryRangeCount, pMemoryRanges, "0x%p").c_str());
+                  PrintArrayWithFormatter(memoryRangeCount, pMemoryRanges, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->InvalidateMappedMemoryRanges(device, memoryRangeCount, pMemoryRanges);
@@ -940,7 +972,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkGetDeviceMemoryCommitment(VkDe
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %llu", device, memory, *pCommittedMemoryInBytes);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %llu",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)memory),
+                  *pCommittedMemoryInBytes);
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->GetDeviceMemoryCommitment(device, memory, pCommittedMemoryInBytes);
@@ -961,7 +996,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkBindBufferMemory(VkDevice 
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, %llu", device, buffer, memory, memoryOffset);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %llu",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)buffer),
+                  VktUtil::WriteUint64AsString((uint64_t)memory),
+                  memoryOffset);
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->BindBufferMemory(device, buffer, memory, memoryOffset);
@@ -984,7 +1023,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkBindImageMemory(VkDevice d
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, %llu", device, image, memory, memoryOffset);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %llu",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)image),
+                  VktUtil::WriteUint64AsString((uint64_t)memory),
+                  memoryOffset);
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->BindImageMemory(device, image, memory, memoryOffset);
@@ -1005,7 +1048,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkGetBufferMemoryRequirements(Vk
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", device, buffer, pMemoryRequirements);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)buffer),
+                  VktUtil::WritePointerAsString(pMemoryRequirements));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->GetBufferMemoryRequirements(device, buffer, pMemoryRequirements);
@@ -1024,7 +1070,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkGetImageMemoryRequirements(VkD
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", device, image, pMemoryRequirements);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)image),
+                  VktUtil::WritePointerAsString(pMemoryRequirements));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->GetImageMemoryRequirements(device, image, pMemoryRequirements);
@@ -1043,11 +1092,11 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkGetImageSparseMemoryRequiremen
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %u, 0x%p",
-                  device,
-                  image,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %u, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)image),
                   *pSparseMemoryRequirementCount,
-                  PrintArrayWithFormatter(*pSparseMemoryRequirementCount, pSparseMemoryRequirements, "0x%p").c_str());
+                  PrintArrayWithFormatter(*pSparseMemoryRequirementCount, pSparseMemoryRequirements, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->GetImageSparseMemoryRequirements(device, image, pSparseMemoryRequirementCount, pSparseMemoryRequirements);
@@ -1066,15 +1115,15 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkGetPhysicalDeviceSparseImageFo
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %s, %s, %u, %s, %s, %u, 0x%p",
-                  physicalDevice,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %u, %s, %s, %u, %s",
+                  VktUtil::WritePointerAsString(physicalDevice),
                   VktUtil::WriteFormatEnumAsString(format),
                   VktUtil::WriteImageTypeEnumAsString(type),
                   samples,
                   VktUtil::DecomposeImageUsageFlagsEnumAsString(usage).c_str(),
                   VktUtil::WriteImageTilingEnumAsString(tiling),
                   *pPropertyCount,
-                  PrintArrayWithFormatter(*pPropertyCount, pProperties, "0x%p").c_str());
+                  PrintArrayWithFormatter(*pPropertyCount, pProperties, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         instance_dispatch_table(physicalDevice)->GetPhysicalDeviceSparseImageFormatProperties(physicalDevice, format, type, samples, usage, tiling, pPropertyCount, pProperties);
@@ -1109,7 +1158,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateFence(VkDevice devic
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p", device, pCreateInfo, pAllocator, pFence);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pFence));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->CreateFence(device, pCreateInfo, pAllocator, pFence);
@@ -1130,7 +1183,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDestroyFence(VkDevice device, 
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", device, fence, pAllocator);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)fence),
+                  VktUtil::WritePointerAsString(pAllocator));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->DestroyFence(device, fence, pAllocator);
@@ -1151,10 +1207,10 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkResetFences(VkDevice devic
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, 0x%p",
-                  device,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s",
+                  VktUtil::WritePointerAsString(device),
                   fenceCount,
-                  PrintArrayWithFormatter(fenceCount, pFences, "0x%p").c_str());
+                  PrintArrayWithFormatter(fenceCount, pFences, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->ResetFences(device, fenceCount, pFences);
@@ -1177,7 +1233,9 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkGetFenceStatus(VkDevice de
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p", device, fence);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)fence));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->GetFenceStatus(device, fence);
@@ -1200,10 +1258,10 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkWaitForFences(VkDevice dev
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, 0x%p, %u, %llu",
-                  device,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s, %u, %llu",
+                  VktUtil::WritePointerAsString(device),
                   fenceCount,
-                  PrintArrayWithFormatter(fenceCount, pFences, "0x%p").c_str(),
+                  PrintArrayWithFormatter(fenceCount, pFences, POINTER_SUFFIX "%p").c_str(),
                   waitAll,
                   timeout);
 
@@ -1228,7 +1286,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateSemaphore(VkDevice d
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p", device, pCreateInfo, pAllocator, pSemaphore);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pSemaphore));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
 #ifdef WIN32
@@ -1257,7 +1319,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDestroySemaphore(VkDevice devi
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", device, semaphore, pAllocator);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)semaphore),
+                  VktUtil::WritePointerAsString(pAllocator));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->DestroySemaphore(device, semaphore, pAllocator);
@@ -1278,7 +1343,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateEvent(VkDevice devic
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p", device, pCreateInfo, pAllocator, pEvent);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pEvent));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
 
@@ -1309,7 +1378,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDestroyEvent(VkDevice device, 
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", device, event, pAllocator);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)event),
+                  VktUtil::WritePointerAsString(pAllocator));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->DestroyEvent(device, event, pAllocator);
@@ -1330,7 +1402,9 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkGetEventStatus(VkDevice de
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p", device, event);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)event));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->GetEventStatus(device, event);
@@ -1353,7 +1427,9 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkSetEvent(VkDevice device, 
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p", device, event);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s",
+            VktUtil::WritePointerAsString(device),
+            VktUtil::WriteUint64AsString((uint64_t)event));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->SetEvent(device, event);
@@ -1376,7 +1452,9 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkResetEvent(VkDevice device
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p", device, event);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s",
+            VktUtil::WritePointerAsString(device),
+            VktUtil::WriteUint64AsString((uint64_t)event));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->ResetEvent(device, event);
@@ -1399,7 +1477,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateQueryPool(VkDevice d
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p", device, pCreateInfo, pAllocator, pQueryPool);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pQueryPool));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->CreateQueryPool(device, pCreateInfo, pAllocator, pQueryPool);
@@ -1420,7 +1502,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDestroyQueryPool(VkDevice devi
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", device, queryPool, pAllocator);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)queryPool),
+                  VktUtil::WritePointerAsString(pAllocator));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->DestroyQueryPool(device, queryPool, pAllocator);
@@ -1441,13 +1526,13 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkGetQueryPoolResults(VkDevi
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %u, %u, %u, 0x%p, %llu, %s",
-                  device,
-                  queryPool,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %u, %u, %zu, %s, %llu, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)queryPool),
                   firstQuery,
                   queryCount,
                   dataSize,
-                  pData,
+                  VktUtil::WritePointerAsString(pData),
                   stride,
                   VktUtil::DecomposeQueryResultFlagsEnumAsString(flags).c_str());
 
@@ -1472,7 +1557,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateBuffer(VkDevice devi
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p", device, pCreateInfo, pAllocator, pBuffer);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pBuffer));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->CreateBuffer(device, pCreateInfo, pAllocator, pBuffer);
@@ -1493,7 +1582,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDestroyBuffer(VkDevice device,
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", device, buffer, pAllocator);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)buffer),
+                  VktUtil::WritePointerAsString(pAllocator));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->DestroyBuffer(device, buffer, pAllocator);
@@ -1514,7 +1606,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateBufferView(VkDevice 
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p", device, pCreateInfo, pAllocator, pView);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pView));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->CreateBufferView(device, pCreateInfo, pAllocator, pView);
@@ -1535,7 +1631,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDestroyBufferView(VkDevice dev
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", device, bufferView, pAllocator);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)bufferView),
+                  VktUtil::WritePointerAsString(pAllocator));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->DestroyBufferView(device, bufferView, pAllocator);
@@ -1556,7 +1655,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateImage(VkDevice devic
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p", device, pCreateInfo, pAllocator, pImage);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pImage));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->CreateImage(device, pCreateInfo, pAllocator, pImage);
@@ -1577,7 +1680,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDestroyImage(VkDevice device, 
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", device, image, pAllocator);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)image),
+                  VktUtil::WritePointerAsString(pAllocator));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->DestroyImage(device, image, pAllocator);
@@ -1596,7 +1702,11 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkGetImageSubresourceLayout(VkDe
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p", device, image, pSubresource, pLayout);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)image),
+                  VktUtil::WritePointerAsString(pSubresource),
+                  VktUtil::WritePointerAsString(pLayout));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->GetImageSubresourceLayout(device, image, pSubresource, pLayout);
@@ -1617,7 +1727,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateImageView(VkDevice d
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p", device, pCreateInfo, pAllocator, pView);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pView));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->CreateImageView(device, pCreateInfo, pAllocator, pView);
@@ -1638,7 +1752,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDestroyImageView(VkDevice devi
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", device, imageView, pAllocator);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)imageView),
+                  VktUtil::WritePointerAsString(pAllocator));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->DestroyImageView(device, imageView, pAllocator);
@@ -1659,7 +1776,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateShaderModule(VkDevic
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p", device, pCreateInfo, pAllocator, pShaderModule);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pShaderModule));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->CreateShaderModule(device, pCreateInfo, pAllocator, pShaderModule);
@@ -1680,7 +1801,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDestroyShaderModule(VkDevice d
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", device, shaderModule, pAllocator);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)shaderModule),
+                  VktUtil::WritePointerAsString(pAllocator));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->DestroyShaderModule(device, shaderModule, pAllocator);
@@ -1701,7 +1825,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreatePipelineCache(VkDevi
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p", device, pCreateInfo, pAllocator, pPipelineCache);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pPipelineCache));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->CreatePipelineCache(device, pCreateInfo, pAllocator, pPipelineCache);
@@ -1722,7 +1850,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDestroyPipelineCache(VkDevice 
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", device, pipelineCache, pAllocator);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)pipelineCache),
+                  VktUtil::WritePointerAsString(pAllocator));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->DestroyPipelineCache(device, pipelineCache, pAllocator);
@@ -1743,7 +1874,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkGetPipelineCacheData(VkDev
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %u, 0x%p", device, pipelineCache, *pDataSize, pData);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %zu, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)pipelineCache),
+                  *pDataSize,
+                  VktUtil::WritePointerAsString(pData));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->GetPipelineCacheData(device, pipelineCache, pDataSize, pData);
@@ -1766,11 +1901,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkMergePipelineCaches(VkDevi
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %u, 0x%p",
-                  device,
-                  dstCache,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %u, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)dstCache),
                   srcCacheCount,
-                  PrintArrayWithFormatter(srcCacheCount, pSrcCaches, "0x%p").c_str());
+                  PrintArrayWithFormatter(srcCacheCount, pSrcCaches, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->MergePipelineCaches(device, dstCache, srcCacheCount, pSrcCaches);
@@ -1793,13 +1928,13 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateGraphicsPipelines(Vk
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %u, 0x%p, 0x%p, 0x%p",
-                  device,
-                  pipelineCache,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %u, %s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)pipelineCache),
                   createInfoCount,
-                  PrintArrayWithFormatter(createInfoCount, pCreateInfos, "0x%p").c_str(),
-                  pAllocator,
-                  PrintArrayWithFormatter(createInfoCount, pPipelines, "0x%p").c_str());
+                  PrintArrayWithFormatter(createInfoCount, pCreateInfos, POINTER_SUFFIX "%p").c_str(),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  PrintArrayWithFormatter(createInfoCount, pPipelines, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->CreateGraphicsPipelines(device, pipelineCache, createInfoCount, pCreateInfos, pAllocator, pPipelines);
@@ -1822,13 +1957,13 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateComputePipelines(VkD
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %u, 0x%p, 0x%p, 0x%p",
-                  device,
-                  pipelineCache,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %u, %s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)pipelineCache),
                   createInfoCount,
-                  PrintArrayWithFormatter(createInfoCount, pCreateInfos, "0x%p").c_str(),
-                  pAllocator,
-                  PrintArrayWithFormatter(createInfoCount, pPipelines, "0x%p").c_str());
+                  PrintArrayWithFormatter(createInfoCount, pCreateInfos, POINTER_SUFFIX "%p").c_str(),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  PrintArrayWithFormatter(createInfoCount, pPipelines, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->CreateComputePipelines(device, pipelineCache, createInfoCount, pCreateInfos, pAllocator, pPipelines);
@@ -1849,7 +1984,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDestroyPipeline(VkDevice devic
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", device, pipeline, pAllocator);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)pipeline),
+                  VktUtil::WritePointerAsString(pAllocator));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->DestroyPipeline(device, pipeline, pAllocator);
@@ -1870,7 +2008,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreatePipelineLayout(VkDev
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p", device, pCreateInfo, pAllocator, pPipelineLayout);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pPipelineLayout));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->CreatePipelineLayout(device, pCreateInfo, pAllocator, pPipelineLayout);
@@ -1891,7 +2033,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDestroyPipelineLayout(VkDevice
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", device, pipelineLayout, pAllocator);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)pipelineLayout),
+                  VktUtil::WritePointerAsString(pAllocator));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->DestroyPipelineLayout(device, pipelineLayout, pAllocator);
@@ -1912,7 +2057,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateSampler(VkDevice dev
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p", device, pCreateInfo, pAllocator, pSampler);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pSampler));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->CreateSampler(device, pCreateInfo, pAllocator, pSampler);
@@ -1933,7 +2082,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDestroySampler(VkDevice device
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", device, sampler, pAllocator);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)sampler),
+                  VktUtil::WritePointerAsString(pAllocator));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->DestroySampler(device, sampler, pAllocator);
@@ -1954,7 +2106,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateDescriptorSetLayout(
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p", device, pCreateInfo, pAllocator, pSetLayout);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pSetLayout));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->CreateDescriptorSetLayout(device, pCreateInfo, pAllocator, pSetLayout);
@@ -1975,7 +2131,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDestroyDescriptorSetLayout(VkD
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", device, descriptorSetLayout, pAllocator);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)descriptorSetLayout),
+                  VktUtil::WritePointerAsString(pAllocator));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->DestroyDescriptorSetLayout(device, descriptorSetLayout, pAllocator);
@@ -1996,7 +2155,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateDescriptorPool(VkDev
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p", device, pCreateInfo, pAllocator, pDescriptorPool);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pDescriptorPool));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->CreateDescriptorPool(device, pCreateInfo, pAllocator, pDescriptorPool);
@@ -2017,7 +2180,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDestroyDescriptorPool(VkDevice
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", device, descriptorPool, pAllocator);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)descriptorPool),
+                  VktUtil::WritePointerAsString(pAllocator));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->DestroyDescriptorPool(device, descriptorPool, pAllocator);
@@ -2038,9 +2204,9 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkResetDescriptorPool(VkDevi
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %s",
-                  device,
-                  descriptorPool,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)descriptorPool),
                   VktUtil::DecomposeDescriptorPoolCreateFlagsEnumAsString(flags).c_str());
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
@@ -2064,7 +2230,10 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkAllocateDescriptorSets(VkD
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", device, pAllocateInfo, pDescriptorSets);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WritePointerAsString(pAllocateInfo),
+                  VktUtil::WritePointerAsString(pDescriptorSets));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->AllocateDescriptorSets(device, pAllocateInfo, pDescriptorSets);
@@ -2087,7 +2256,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkFreeDescriptorSets(VkDevic
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %u, 0x%p", device, descriptorPool, descriptorSetCount, pDescriptorSets);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %u, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)descriptorPool),
+                  descriptorSetCount,
+                  VktUtil::WritePointerAsString(pDescriptorSets));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->FreeDescriptorSets(device, descriptorPool, descriptorSetCount, pDescriptorSets);
@@ -2108,12 +2281,12 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkUpdateDescriptorSets(VkDevice 
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, 0x%p, %u, 0x%p",
-                  device,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s, %u, %s",
+                  VktUtil::WritePointerAsString(device),
                   descriptorWriteCount,
-                  PrintArrayWithFormatter(descriptorWriteCount, pDescriptorWrites, "0x%p").c_str(),
+                  PrintArrayWithFormatter(descriptorWriteCount, pDescriptorWrites, POINTER_SUFFIX "%p").c_str(),
                   descriptorCopyCount,
-                  PrintArrayWithFormatter(descriptorCopyCount, pDescriptorCopies, "0x%p").c_str());
+                  PrintArrayWithFormatter(descriptorCopyCount, pDescriptorCopies, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->UpdateDescriptorSets(device, descriptorWriteCount, pDescriptorWrites, descriptorCopyCount, pDescriptorCopies);
@@ -2134,7 +2307,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateFramebuffer(VkDevice
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p", device, pCreateInfo, pAllocator, pFramebuffer);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pFramebuffer));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->CreateFramebuffer(device, pCreateInfo, pAllocator, pFramebuffer);
@@ -2155,7 +2332,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDestroyFramebuffer(VkDevice de
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", device, framebuffer, pAllocator);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)framebuffer),
+                  VktUtil::WritePointerAsString(pAllocator));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->DestroyFramebuffer(device, framebuffer, pAllocator);
@@ -2176,7 +2356,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateRenderPass(VkDevice 
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p", device, pCreateInfo, pAllocator, pRenderPass);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pRenderPass));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->CreateRenderPass(device, pCreateInfo, pAllocator, pRenderPass);
@@ -2197,7 +2381,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDestroyRenderPass(VkDevice dev
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", device, renderPass, pAllocator);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)renderPass),
+                  VktUtil::WritePointerAsString(pAllocator));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->DestroyRenderPass(device, renderPass, pAllocator);
@@ -2216,7 +2403,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkGetRenderAreaGranularity(VkDev
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", device, renderPass, pGranularity);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)renderPass),
+                  VktUtil::WritePointerAsString(pGranularity));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->GetRenderAreaGranularity(device, renderPass, pGranularity);
@@ -2237,7 +2427,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateCommandPool(VkDevice
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p", device, pCreateInfo, pAllocator, pCommandPool);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pCommandPool));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->CreateCommandPool(device, pCreateInfo, pAllocator, pCommandPool);
@@ -2258,7 +2452,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDestroyCommandPool(VkDevice de
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", device, commandPool, pAllocator);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)commandPool),
+                  VktUtil::WritePointerAsString(pAllocator));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->DestroyCommandPool(device, commandPool, pAllocator);
@@ -2279,9 +2476,9 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkResetCommandPool(VkDevice 
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %s",
-                  device,
-                  commandPool,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)commandPool),
                   VktUtil::DecomposeCmdPoolResetFlagsEnumAsString(flags).c_str());
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
@@ -2305,7 +2502,10 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkAllocateCommandBuffers(VkD
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", device, pAllocateInfo, pCommandBuffers);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WritePointerAsString(pAllocateInfo),
+                  VktUtil::WritePointerAsString(pCommandBuffers));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->AllocateCommandBuffers(device, pAllocateInfo, pCommandBuffers);
@@ -2334,11 +2534,11 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkFreeCommandBuffers(VkDevice de
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %u, 0x%p",
-                  device,
-                  commandPool,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %u, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)commandPool),
                   commandBufferCount,
-                  PrintArrayWithFormatter(commandBufferCount, pCommandBuffers, "0x%p").c_str());
+                  PrintArrayWithFormatter(commandBufferCount, pCommandBuffers, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->FreeCommandBuffers(device, commandPool, commandBufferCount, pCommandBuffers);
@@ -2856,7 +3056,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDestroySurfaceKHR(VkInstance i
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", instance, surface, pAllocator);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(instance),
+                  VktUtil::WriteUint64AsString((uint64_t)surface),
+                  VktUtil::WritePointerAsString(pAllocator));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         instance_dispatch_table(instance)->DestroySurfaceKHR(instance, surface, pAllocator);
@@ -2877,7 +3080,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkGetPhysicalDeviceSurfaceSu
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, 0x%p, %u", physicalDevice, queueFamilyIndex, surface, *pSupported);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s, %u",
+                  VktUtil::WritePointerAsString(physicalDevice),
+                  queueFamilyIndex,
+                  VktUtil::WriteUint64AsString((uint64_t)surface),
+                  *pSupported);
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = instance_dispatch_table(physicalDevice)->GetPhysicalDeviceSurfaceSupportKHR(physicalDevice, queueFamilyIndex, surface, pSupported);
@@ -2900,7 +3107,10 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkGetPhysicalDeviceSurfaceCa
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", physicalDevice, surface, pSurfaceCapabilities);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(physicalDevice),
+                  VktUtil::WriteUint64AsString((uint64_t)surface),
+                  VktUtil::WritePointerAsString(pSurfaceCapabilities));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = instance_dispatch_table(physicalDevice)->GetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, pSurfaceCapabilities);
@@ -2923,11 +3133,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkGetPhysicalDeviceSurfaceFo
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %u, 0x%p",
-                  physicalDevice,
-                  surface,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %u, %s",
+                  VktUtil::WritePointerAsString(physicalDevice),
+                  VktUtil::WriteUint64AsString((uint64_t)surface),
                   *pSurfaceFormatCount,
-                  PrintArrayWithFormatter(*pSurfaceFormatCount, pSurfaceFormats, "0x%p").c_str());
+                  PrintArrayWithFormatter(*pSurfaceFormatCount, pSurfaceFormats, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = instance_dispatch_table(physicalDevice)->GetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, pSurfaceFormatCount, pSurfaceFormats);
@@ -2950,11 +3160,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkGetPhysicalDeviceSurfacePr
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %u, 0x%p",
-                  physicalDevice,
-                  surface,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %u, %s",
+                  VktUtil::WritePointerAsString(physicalDevice),
+                  VktUtil::WriteUint64AsString((uint64_t)surface),
                   *pPresentModeCount,
-                  PrintArrayWithFormatter(*pPresentModeCount, pPresentModes, "0x%p").c_str());
+                  PrintArrayWithFormatter(*pPresentModeCount, pPresentModes, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = instance_dispatch_table(physicalDevice)->GetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, pPresentModeCount, pPresentModes);
@@ -2982,7 +3192,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateSwapchainKHR(VkDevic
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p", device, pCreateInfo, pAllocator, pSwapchain);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pSwapchain));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->CreateSwapchainKHR(device, &createInfo, pAllocator, pSwapchain);
@@ -3008,7 +3222,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDestroySwapchainKHR(VkDevice d
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", device, swapchain, pAllocator);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)swapchain),
+                  VktUtil::WritePointerAsString(pAllocator));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         device_dispatch_table(device)->DestroySwapchainKHR(device, swapchain, pAllocator);
@@ -3029,11 +3246,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkGetSwapchainImagesKHR(VkDe
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %u, 0x%p",
-                  device,
-                  swapchain,
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %u, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)swapchain),
                   *pSwapchainImageCount,
-                  PrintArrayWithFormatter(*pSwapchainImageCount, pSwapchainImages, "0x%p").c_str());
+                  PrintArrayWithFormatter(*pSwapchainImageCount, pSwapchainImages, POINTER_SUFFIX "%p").c_str());
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->GetSwapchainImagesKHR(device, swapchain, pSwapchainImageCount, pSwapchainImages);
@@ -3056,7 +3273,13 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkAcquireNextImageKHR(VkDevi
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %llu, 0x%p, 0x%p, 0x%p", device, swapchain, timeout, semaphore, fence, pImageIndex);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %llu, %s, %s, %s",
+                  VktUtil::WritePointerAsString(device),
+                  VktUtil::WriteUint64AsString((uint64_t)swapchain),
+                  timeout,
+                  VktUtil::WriteUint64AsString((uint64_t)semaphore),
+                  VktUtil::WriteUint64AsString((uint64_t)fence),
+                  VktUtil::WritePointerAsString(pImageIndex));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(device)->AcquireNextImageKHR(device, swapchain, timeout, semaphore, fence, pImageIndex);
@@ -3095,7 +3318,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateWin32SurfaceKHR(VkIn
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p", instance, pCreateInfo, pAllocator, pSurface);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(instance),
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pSurface));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = instance_dispatch_table(instance)->CreateWin32SurfaceKHR(instance, pCreateInfo, pAllocator, pSurface);
@@ -3118,7 +3345,9 @@ VK_LAYER_EXPORT VKAPI_ATTR VkBool32 VKAPI_CALL Mine_vkGetPhysicalDeviceWin32Pres
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u", physicalDevice, queueFamilyIndex);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u",
+                  VktUtil::WritePointerAsString(physicalDevice),
+                  queueFamilyIndex);
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = instance_dispatch_table(physicalDevice)->GetPhysicalDeviceWin32PresentationSupportKHR(physicalDevice, queueFamilyIndex);
@@ -3134,6 +3363,118 @@ VK_LAYER_EXPORT VKAPI_ATTR VkBool32 VKAPI_CALL Mine_vkGetPhysicalDeviceWin32Pres
 
 #endif  // VK_USE_PLATFORM_WIN32_KHR
 
+#ifdef VK_USE_PLATFORM_XCB_KHR
+
+VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateXcbSurfaceKHR(VkInstance instance, const VkXcbSurfaceCreateInfoKHR* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkSurfaceKHR* pSurface)
+{
+    const FuncId funcId = FuncId_vkCreateXcbSurfaceKHR;
+
+    VkResult result = VK_INCOMPLETE;
+
+    if (g_pInterceptMgr->ShouldCollectTrace())
+    {
+        char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(instance),
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pSurface));
+
+        VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
+        result = instance_dispatch_table(instance)->CreateXcbSurfaceKHR(instance, pCreateInfo, pAllocator, pSurface);
+        g_pInterceptMgr->PostCall(pNewEntry, result);
+    }
+    else
+    {
+        result = instance_dispatch_table(instance)->CreateXcbSurfaceKHR(instance, pCreateInfo, pAllocator, pSurface);
+    }
+
+    return result;
+}
+
+VK_LAYER_EXPORT VKAPI_ATTR VkBool32 VKAPI_CALL Mine_vkGetPhysicalDeviceXcbPresentationSupportKHR(VkPhysicalDevice physicalDevice, uint32_t queueFamilyIndex, xcb_connection_t* connection, xcb_visualid_t visual_id)
+{
+    const FuncId funcId = FuncId_vkGetPhysicalDeviceXcbPresentationSupportKHR;
+
+    VkBool32 result = false;
+
+    if (g_pInterceptMgr->ShouldCollectTrace())
+    {
+        char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u",
+                  VktUtil::WritePointerAsString(physicalDevice),
+                  queueFamilyIndex);
+
+        VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
+        result = instance_dispatch_table(physicalDevice)->GetPhysicalDeviceXcbPresentationSupportKHR(physicalDevice, queueFamilyIndex, connection, visual_id);
+        g_pInterceptMgr->PostCall(pNewEntry, result);
+    }
+    else
+    {
+        result = instance_dispatch_table(physicalDevice)->GetPhysicalDeviceXcbPresentationSupportKHR(physicalDevice, queueFamilyIndex, connection, visual_id);
+    }
+
+    return result;
+}
+
+#endif // VK_USE_PLATFORM_XCB_KHR
+
+#ifdef VK_USE_PLATFORM_XLIB_KHR
+
+VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateXlibSurfaceKHR(VkInstance instance, const VkXlibSurfaceCreateInfoKHR* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkSurfaceKHR* pSurface)
+{
+    const FuncId funcId = FuncId_vkCreateXlibSurfaceKHR;
+
+    VkResult result = VK_INCOMPLETE;
+
+    if (g_pInterceptMgr->ShouldCollectTrace())
+    {
+        char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(instance),
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pSurface));
+
+        VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
+        result = instance_dispatch_table(instance)->CreateXlibSurfaceKHR(instance, pCreateInfo, pAllocator, pSurface);
+        g_pInterceptMgr->PostCall(pNewEntry, result);
+    }
+    else
+    {
+        result = instance_dispatch_table(instance)->CreateXlibSurfaceKHR(instance, pCreateInfo, pAllocator, pSurface);
+    }
+
+    return result;
+}
+
+VK_LAYER_EXPORT VKAPI_ATTR VkBool32 VKAPI_CALL Mine_vkGetPhysicalDeviceXlibPresentationSupportKHR(VkPhysicalDevice physicalDevice, uint32_t queueFamilyIndex, Display* dpy, VisualID visualID)
+{
+    const FuncId funcId = FuncId_vkGetPhysicalDeviceXlibPresentationSupportKHR;
+
+    VkBool32 result = false;
+
+    if (g_pInterceptMgr->ShouldCollectTrace())
+    {
+        char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u",
+                  VktUtil::WritePointerAsString(physicalDevice),
+                  queueFamilyIndex);
+
+        VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
+        result = instance_dispatch_table(physicalDevice)->GetPhysicalDeviceXlibPresentationSupportKHR(physicalDevice, queueFamilyIndex, dpy, visualID);
+        g_pInterceptMgr->PostCall(pNewEntry, result);
+    }
+    else
+    {
+        result = instance_dispatch_table(physicalDevice)->GetPhysicalDeviceXlibPresentationSupportKHR(physicalDevice, queueFamilyIndex, dpy, visualID);
+    }
+
+    return result;
+}
+
+#endif // VK_USE_PLATFORM_XLIB_KHR
+
 VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkGetPhysicalDeviceDisplayPropertiesKHR(VkPhysicalDevice physicalDevice, uint32_t* pPropertyCount, VkDisplayPropertiesKHR* pProperties)
 {
     const FuncId funcId = FuncId_vkGetPhysicalDeviceDisplayPropertiesKHR;
@@ -3143,7 +3484,10 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkGetPhysicalDeviceDisplayPr
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, 0x%p", physicalDevice, *pPropertyCount, pProperties);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s",
+                  VktUtil::WritePointerAsString(physicalDevice),
+                  *pPropertyCount,
+                  VktUtil::WritePointerAsString(pProperties));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = instance_dispatch_table(physicalDevice)->GetPhysicalDeviceDisplayPropertiesKHR(physicalDevice, pPropertyCount, pProperties);
@@ -3166,7 +3510,10 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkGetPhysicalDeviceDisplayPl
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, 0x%p", physicalDevice, *pPropertyCount, pProperties);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s",
+                  VktUtil::WritePointerAsString(physicalDevice),
+                  *pPropertyCount,
+                  VktUtil::WritePointerAsString(pProperties));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = instance_dispatch_table(physicalDevice)->GetPhysicalDeviceDisplayPlanePropertiesKHR(physicalDevice, pPropertyCount, pProperties);
@@ -3189,7 +3536,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkGetDisplayPlaneSupportedDi
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, %u, 0x%p", physicalDevice, planeIndex, *pDisplayCount, pDisplays);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %u, %s",
+                  VktUtil::WritePointerAsString(physicalDevice),
+                  planeIndex,
+                  *pDisplayCount,
+                  VktUtil::WritePointerAsString(pDisplays));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = instance_dispatch_table(physicalDevice)->GetDisplayPlaneSupportedDisplaysKHR(physicalDevice, planeIndex, pDisplayCount, pDisplays);
@@ -3212,7 +3563,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkGetDisplayModePropertiesKH
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %u, 0x%p", physicalDevice, display, *pPropertyCount, pProperties);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %u, %s",
+                  VktUtil::WritePointerAsString(physicalDevice),
+                  VktUtil::WriteUint64AsString((uint64_t)display),
+                  *pPropertyCount,
+                  VktUtil::WritePointerAsString(pProperties));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = instance_dispatch_table(physicalDevice)->GetDisplayModePropertiesKHR(physicalDevice, display, pPropertyCount, pProperties);
@@ -3235,7 +3590,12 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateDisplayModeKHR(VkPhy
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p, 0x%p", physicalDevice, display, pCreateInfo, pAllocator, pMode);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(physicalDevice),
+                  VktUtil::WriteUint64AsString((uint64_t)display),
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pMode));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = instance_dispatch_table(physicalDevice)->CreateDisplayModeKHR(physicalDevice, display, pCreateInfo, pAllocator, pMode);
@@ -3258,7 +3618,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkGetDisplayPlaneCapabilitie
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, %u, 0x%p", physicalDevice, mode, planeIndex, pCapabilities);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %u, %s",
+                  VktUtil::WritePointerAsString(physicalDevice),
+                  VktUtil::WriteUint64AsString((uint64_t)mode),
+                  planeIndex,
+                  VktUtil::WritePointerAsString(pCapabilities));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = instance_dispatch_table(physicalDevice)->GetDisplayPlaneCapabilitiesKHR(physicalDevice, mode, planeIndex, pCapabilities);
@@ -3281,7 +3645,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateDisplayPlaneSurfaceK
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p", instance, pCreateInfo, pAllocator, pSurface);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(instance),
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pSurface));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = instance_dispatch_table(instance)->CreateDisplayPlaneSurfaceKHR(instance, pCreateInfo, pAllocator, pSurface);
@@ -3304,7 +3672,11 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateDebugReportCallbackE
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p, 0x%p", instance, pCreateInfo, pAllocator, pCallback);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s, %s",
+                  VktUtil::WritePointerAsString(instance),
+                  VktUtil::WritePointerAsString(pCreateInfo),
+                  VktUtil::WritePointerAsString(pAllocator),
+                  VktUtil::WritePointerAsString(pCallback));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = instance_dispatch_table(instance)->CreateDebugReportCallbackEXT(instance, pCreateInfo, pAllocator, pCallback);
@@ -3325,7 +3697,10 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDestroyDebugReportCallbackEXT(
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p, 0x%p", instance, callback, pAllocator);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s, %s",
+                  VktUtil::WritePointerAsString(instance),
+                  VktUtil::WriteUint64AsString((uint64_t)callback),
+                  VktUtil::WritePointerAsString(pAllocator));
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         instance_dispatch_table(instance)->DestroyDebugReportCallbackEXT(instance, callback, pAllocator);
@@ -3344,7 +3719,15 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDebugReportMessageEXT(VkInstan
     if (g_pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, %u, %u, %llu, %u, %d, %s, %s", instance, flags, objectType, object, location, messageCode, pLayerPrefix, pMessage);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %u, %llu, %zu, %d, %s, %s",
+                  VktUtil::WritePointerAsString(instance),
+                  flags,
+                  objectType,
+                  object,
+                  location,
+                  messageCode,
+                  pLayerPrefix,
+                  pMessage);
 
         VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, argumentsBuffer);
         instance_dispatch_table(instance)->DebugReportMessageEXT(instance, flags, objectType, object, location, messageCode, pLayerPrefix, pMessage);
@@ -3356,13 +3739,20 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDebugReportMessageEXT(VkInstan
     }
 }
 
-VK_LAYER_EXPORT VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetDeviceProcAddr(VkDevice device, const char* funcName)
+//-----------------------------------------------------------------------------
+/// Mine function for GetDeviceProcAddr. This is the function returned if
+/// GetDeviceProcAddr is passed in "GetDeviceProcAddr". The name is
+/// explicitly called Mine_GetDeviceProcAddr to prevent name clashes with
+/// functions of the same name. On Linux, if vkGetDeviceProcAddr is returned,
+/// the function pointer in the loader is returned and not the function here
+//-----------------------------------------------------------------------------
+VK_LAYER_EXPORT VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL Mine_vkGetDeviceProcAddr(VkDevice device, const char* funcName)
 {
     loader_platform_thread_once(&initOnce, InitVulkanServer);
 
     // Core interception
     if (!strcmp(funcName, "vkGetDeviceProcAddr"))
-        return (PFN_vkVoidFunction)vkGetDeviceProcAddr;
+        return (PFN_vkVoidFunction)Mine_vkGetDeviceProcAddr;
     if (!strcmp(funcName, "vkDestroyDevice"))
         return (PFN_vkVoidFunction)Mine_vkDestroyDevice;
     if (!strcmp(funcName, "vkGetDeviceQueue"))
@@ -3529,6 +3919,8 @@ VK_LAYER_EXPORT VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetDeviceProcAddr(VkD
         return (PFN_vkVoidFunction)Mine_vkGetDeviceMemoryCommitment;
     if (!strcmp(funcName, "vkGetImageSparseMemoryRequirements"))
         return (PFN_vkVoidFunction)Mine_vkGetImageSparseMemoryRequirements;
+    if (!strcmp(funcName, "vkGetPhysicalDeviceSparseImageFormatProperties"))
+        return (PFN_vkVoidFunction)Mine_vkGetPhysicalDeviceSparseImageFormatProperties;
     if (!strcmp(funcName, "vkGetImageMemoryRequirements"))
         return (PFN_vkVoidFunction)Mine_vkGetImageMemoryRequirements;
     if (!strcmp(funcName, "vkGetBufferMemoryRequirements"))
@@ -3606,7 +3998,7 @@ VK_LAYER_EXPORT VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetDeviceProcAddr(VkD
 
     // Extension interception
     VkLayerDispatchTable* pDisp = device_dispatch_table(device);
-    if (s_deviceExtMap.size() == 0 || s_deviceExtMap[pDisp].wsiEnabled)
+    if (s_deviceExtMap.size() != 0 && s_deviceExtMap[pDisp].wsiEnabled)
     {
         if (!strcmp("vkCreateSwapchainKHR", funcName))
             return reinterpret_cast<PFN_vkVoidFunction>(Mine_vkCreateSwapchainKHR);
@@ -3633,13 +4025,28 @@ VK_LAYER_EXPORT VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetDeviceProcAddr(VkD
     return device_dispatch_table(device)->GetDeviceProcAddr(device, funcName);
 }
 
-VK_LAYER_EXPORT VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetInstanceProcAddr(VkInstance instance, const char* funcName)
+//-----------------------------------------------------------------------------
+/// External vkGetDeviceProcAddr function.
+//-----------------------------------------------------------------------------
+VK_LAYER_EXPORT VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetDeviceProcAddr(VkDevice device, const char* funcName)
+{
+    return Mine_vkGetDeviceProcAddr(device, funcName);
+}
+
+//-----------------------------------------------------------------------------
+/// Mine function for GetInstanceProcAddr. This is the function returned if
+/// GetInstanceProcAddr is passed in "GetInstanceProcAddr". The name is
+/// explicitly called Mine_GetDeviceProcAddr to prevent name clashes with
+/// functions of the same name. On Linux, if vkGetInstanceProcAddr is returned,
+/// the function pointer in the loader is returned and not the function here.
+//-----------------------------------------------------------------------------
+VK_LAYER_EXPORT VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL Mine_vkGetInstanceProcAddr(VkInstance instance, const char* funcName)
 {
     loader_platform_thread_once(&initOnce, InitVulkanServer);
 
     // Core interception
     if (!strcmp(funcName, "vkGetInstanceProcAddr"))
-        return (PFN_vkVoidFunction)vkGetInstanceProcAddr;
+        return (PFN_vkVoidFunction)Mine_vkGetInstanceProcAddr;
     if (!strcmp(funcName, "vkCreateInstance"))
         return (PFN_vkVoidFunction)Mine_vkCreateInstance;
     if (!strcmp(funcName, "vkDestroyInstance"))
@@ -3660,8 +4067,6 @@ VK_LAYER_EXPORT VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetInstanceProcAddr(V
         return (PFN_vkVoidFunction)Mine_vkGetPhysicalDeviceFeatures;
     if (!strcmp(funcName, "vkGetPhysicalDeviceFormatProperties"))
         return (PFN_vkVoidFunction)Mine_vkGetPhysicalDeviceFormatProperties;
-    if (!strcmp(funcName, "vkGetPhysicalDeviceSparseImageFormatProperties"))
-        return (PFN_vkVoidFunction)Mine_vkGetPhysicalDeviceSparseImageFormatProperties;
     if (!strcmp(funcName, "vkEnumerateInstanceLayerProperties"))
         return (PFN_vkVoidFunction)Mine_vkEnumerateInstanceLayerProperties;
     if (!strcmp(funcName, "vkEnumerateInstanceExtensionProperties"))
@@ -3671,17 +4076,32 @@ VK_LAYER_EXPORT VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetInstanceProcAddr(V
     if (!strcmp(funcName, "vkEnumerateDeviceExtensionProperties"))
         return (PFN_vkVoidFunction)Mine_vkEnumerateDeviceExtensionProperties;
 
-#ifdef VK_USE_PLATFORM_WIN32_KHR
-    if (!strcmp("vkCreateWin32SurfaceKHR", funcName))
-        return reinterpret_cast<PFN_vkVoidFunction>(Mine_vkCreateWin32SurfaceKHR);
-    if (!strcmp("vkGetPhysicalDeviceWin32PresentationSupportKHR", funcName))
-        return reinterpret_cast<PFN_vkVoidFunction>(Mine_vkGetPhysicalDeviceWin32PresentationSupportKHR);
-#endif
-
     // Extension interception
     VkLayerInstanceDispatchTable* pDisp = instance_dispatch_table(instance);
-    if (s_instanceExtMap.size() == 0 || s_instanceExtMap[pDisp].wsiEnabled)
+
+    if (s_instanceExtMap.size() != 0 && s_instanceExtMap[pDisp].wsiEnabled)
     {
+#ifdef VK_USE_PLATFORM_WIN32_KHR
+        if (!strcmp("vkCreateWin32SurfaceKHR", funcName))
+            return reinterpret_cast<PFN_vkVoidFunction>(Mine_vkCreateWin32SurfaceKHR);
+        if (!strcmp("vkGetPhysicalDeviceWin32PresentationSupportKHR", funcName))
+            return reinterpret_cast<PFN_vkVoidFunction>(Mine_vkGetPhysicalDeviceWin32PresentationSupportKHR);
+#endif
+
+#ifdef VK_USE_PLATFORM_XCB_KHR
+        if (!strcmp("vkCreateXcbSurfaceKHR", funcName))
+            return reinterpret_cast<PFN_vkVoidFunction>(Mine_vkCreateXcbSurfaceKHR);
+        if (!strcmp("vkGetPhysicalDeviceXcbPresentationSupportKHR", funcName))
+            return reinterpret_cast<PFN_vkVoidFunction>(Mine_vkGetPhysicalDeviceXcbPresentationSupportKHR);
+#endif
+
+#ifdef VK_USE_PLATFORM_XLIB_KHR
+        if (!strcmp("vkCreateXlibSurfaceKHR", funcName))
+            return reinterpret_cast<PFN_vkVoidFunction>(Mine_vkCreateXlibSurfaceKHR);
+        if (!strcmp("vkGetPhysicalDeviceXlibPresentationSupportKHR", funcName))
+            return reinterpret_cast<PFN_vkVoidFunction>(Mine_vkGetPhysicalDeviceXlibPresentationSupportKHR);
+#endif
+
         if (!strcmp("vkDestroySurfaceKHR", funcName))
             return reinterpret_cast<PFN_vkVoidFunction>(Mine_vkDestroySurfaceKHR);
         if (!strcmp("vkGetPhysicalDeviceSurfaceSupportKHR", funcName))
@@ -3728,4 +4148,11 @@ VK_LAYER_EXPORT VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetInstanceProcAddr(V
     return instance_dispatch_table(instance)->GetInstanceProcAddr(instance, funcName);
 }
 
-#pragma warning (pop)
+//-----------------------------------------------------------------------------
+/// External vkGetInstanceProcAddr function.
+//-----------------------------------------------------------------------------
+VK_LAYER_EXPORT VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetInstanceProcAddr(VkInstance instance, const char* funcName)
+{
+    return Mine_vkGetInstanceProcAddr(instance, funcName);
+}
+

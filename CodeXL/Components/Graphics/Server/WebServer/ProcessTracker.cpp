@@ -1144,16 +1144,20 @@ bool ProcessTracker::PrelaunchEnvironmentInitialization()
 #ifndef _WIN32
     // Get the server path. The GLServer plugin will be in the same place.
     // LD_PRELOAD has to be set up before the app is run so the plugin can be attached
-    const char* strServerPath;
-    strServerPath = SG_GET_PATH(ServerPath);
-    char ext[PS_MAX_PATH];
-    sprintf_s(ext, PS_MAX_PATH, "%s.so", GDT_PROJECT_SUFFIX);
-    char strLdPreload[PS_MAX_PATH];
-    sprintf_s(strLdPreload, PS_MAX_PATH, "%sPlugins/%sServer%s", strServerPath, m_injectedAppPluginName.c_str(), ext);
-    // LogConsole(logMESSAGE, "LD_PRELOAD is >>>%s<<<\n", strLdPreload);
 
-    // Set the LD_PRELOAD environment variable
-    setenv("LD_PRELOAD", strLdPreload, 1);
+    if (strcasecmp("Vulkan", m_injectedAppPluginName.c_str()) != 0)
+    {
+        const char* strServerPath;
+        strServerPath = SG_GET_PATH(ServerPath);
+        char ext[PS_MAX_PATH];
+        sprintf_s(ext, PS_MAX_PATH, "%s.so", GDT_PROJECT_SUFFIX);
+        char strLdPreload[PS_MAX_PATH];
+        sprintf_s(strLdPreload, PS_MAX_PATH, "%sPlugins/%sServer%s", strServerPath, m_injectedAppPluginName.c_str(), ext);
+        // LogConsole(logMESSAGE, "LD_PRELOAD is >>>%s<<<\n", strLdPreload);
+
+        // Set the LD_PRELOAD environment variable
+        setenv("LD_PRELOAD", strLdPreload, 1);
+    }
 
     SetupVulkanEnvVariables();
 #endif
