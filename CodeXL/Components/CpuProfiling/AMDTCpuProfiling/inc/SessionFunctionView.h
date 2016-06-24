@@ -65,6 +65,7 @@ public:
     bool m_CLUNoteShown;
 signals:
     void functionActivated(gtVAddr functionAddress, ProcessIdType pid, ThreadIdType tid, const CpuProfileModule* pModule);
+	void opensourceCodeViewSig(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> funcModInfo);
 
 public slots:
 

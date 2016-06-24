@@ -332,7 +332,6 @@ bool ModulesDataTable::shouldModuleBeDisplayed(const CpuProfileModule* pModule)
 void ModulesDataTable::onAboutToShowContextMenu()
 {
 	//TODO: Is required ??
-#if 0
     // Call the base class implementation:
     CPUProfileDataTable::onAboutToShowContextMenu();
 
@@ -406,7 +405,6 @@ void ModulesDataTable::onAboutToShowContextMenu()
             }
         }
     }
-#endif
 }
 
 bool ModulesDataTable::AreModuleSymbolsLoaded(int moduleRowIndex)
