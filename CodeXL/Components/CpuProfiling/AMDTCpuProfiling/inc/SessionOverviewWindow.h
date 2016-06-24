@@ -80,7 +80,9 @@ protected slots:
     void openProcessesView();
     void openModulesView();
     void openFunctionsView();
+#if 0
     void onAfterHotSpotComboChanged(const QString& text);
+#endif
     void onHotSpotComboChanged(const QString& text);
     void onTableItemActivated(QTableWidgetItem* pActivateItem);
     void onTableContextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType actionType, QTableWidgetItem* pTableItem);

@@ -181,6 +181,8 @@ protected:
 	AMDTUInt32	m_processId;
 	vector<AMDTUInt32> m_functionIdVec;
 	gtString m_srcFilePath;
+	std::vector<gtString> m_supportedCounterList;
+
 };
 
 

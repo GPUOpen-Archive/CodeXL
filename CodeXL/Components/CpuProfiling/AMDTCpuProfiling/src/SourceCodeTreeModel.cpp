@@ -117,10 +117,10 @@ SourceCodeTreeModel::SourceCodeTreeModel(SessionDisplaySettings* pSessionDisplay
     m_stopLine(0),
     m_sessionDir(""),
     m_moduleName(""),
-    m_pid(SHOW_ALL_PIDS),
-    m_newPid(SHOW_ALL_PIDS),
-    m_tid(SHOW_ALL_TIDS),
-    m_newTid(SHOW_ALL_PIDS),
+    m_pid(AMDT_PROFILE_ALL_PROCESSES),
+    m_newPid(AMDT_PROFILE_ALL_PROCESSES),
+    m_tid(AMDT_PROFILE_ALL_THREADS),
+    m_newTid(AMDT_PROFILE_ALL_THREADS),
     m_pModule(nullptr),
     m_pDisplayedFunction(nullptr),
     m_isModuleCached(false),
@@ -137,12 +137,12 @@ SourceCodeTreeModel::SourceCodeTreeModel(SessionDisplaySettings* pSessionDisplay
     m_newAddress = 0;
     m_currentSymbolIterator = m_symbolsInfoList.end();
     m_lastSymIt = m_symbolsInfoList.end();
-
+#if 0
     m_pid = SHOW_ALL_PIDS;
     m_newPid = SHOW_ALL_PIDS;
     m_tid = SHOW_ALL_TIDS;
     m_newTid = SHOW_ALL_TIDS;
-
+#endif
     m_isLongMode = true;
     m_pCode = nullptr;
     m_codeSize = 0;
@@ -194,9 +194,13 @@ int SourceCodeTreeModel::columnCount(const QModelIndex& parent) const
     int retVal = SOURCE_VIEW_SAMPLES_PERCENT_COLUMN + 1;
 
     // Sanity check:
-    GT_IF_WITH_ASSERT(m_pSessionDisplaySettings != nullptr)
+    GT_IF_WITH_ASSERT(m_pProfDataRdr != nullptr)
     {
-        retVal += m_pSessionDisplaySettings->m_availableDataColumnCaptions.size();
+        // only raw counters supported
+        AMDTProfileCounterDescVec counterDesc;
+        m_pProfDataRdr->GetSampledCountersList(counterDesc);
+
+        retVal += counterDesc.size();
     }
 
     return retVal;
@@ -1155,31 +1159,50 @@ void SourceCodeTreeModel::GetDisasmSampleValue(gtVAddr offset, AMDTProfileInstru
 void SourceCodeTreeModel::PrintFunctionDetailData(AMDTProfileFunctionData data,
                                                   gtString srcFilePath,
                                                   AMDTSourceAndDisasmInfoVec srcInfoVec,
-	const std::vector<SourceViewTreeItem*>& srcLineViewTreeMap)
+                                                  const std::vector<SourceViewTreeItem*>& srcLineViewTreeMap)
 {
     SourceViewTreeItem* pLineItem = nullptr;
+    m_srcLineDataVec.clear();
+    bool samplePercentSet = m_pDisplayFilter->GetSamplePercent();
+    AMDTUInt64 moduleBaseAddr = data.m_modBaseAddress;
+
+    m_srcLineDataVec = data.m_srcLineDataList;
 
     for (const auto& srcData : data.m_srcLineDataList)
     {
-		pLineItem = srcLineViewTreeMap.at(srcData.m_sourceLineNumber);
+        pLineItem = srcLineViewTreeMap.at(srcData.m_sourceLineNumber);
+
+        m_sampleSrcLnViewTreeList.emplace_back(make_pair(srcData, pLineItem));
 
         // For this srcLine get the list of inst offsets..
         gtVector<gtVAddr> instOffsetVec;
         GetInstOffsets(srcData.m_sourceLineNumber, srcInfoVec, instOffsetVec);
         bool flag = true;
-		int idx = 0;
 
-		for (auto& aSampleValue : srcData.m_sampleValues)
-		{
-			pLineItem->setData(SOURCE_VIEW_SAMPLES_COLUMN+idx, aSampleValue.m_sampleCount);
-			pLineItem->setForeground(SOURCE_VIEW_SAMPLES_COLUMN+idx, acRED_NUMBER_COLOUR);
+        // by default the hotspot is always DC Access(index = 0)
+        auto sampleValue = srcData.m_sampleValues.at(0).m_sampleCount;
+        auto sampleValuePer = srcData.m_sampleValues.at(0).m_sampleCountPercentage;
 
-			pLineItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, aSampleValue.m_sampleCountPercentage);
-			pLineItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
-				//pLineItem->setTooltip(SOURCE_VIEW_SAMPLES_COLUMN, tooltipVar);
-				//pLineItem->setTooltip(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, tooltipVar);
+        pLineItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, sampleValue);
+        pLineItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, sampleValuePer);
+        pLineItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
+        int idx = SOURCE_VIEW_SAMPLES_PERCENT_COLUMN + 1;
+
+        for (const auto& sample : srcData.m_sampleValues)
+        {
+            if (false == samplePercentSet)
+            {
+                pLineItem->setData(idx, sample.m_sampleCount);
+            }
+            else
+            {
+				QVariant var;
+				SetPercentFormat(sample.m_sampleCountPercentage, true, var);
+				pLineItem->setData(idx, var);
+			}
 			idx++;
-		}
+        }
+
 
         for (auto& instOffset : instOffsetVec)
         {
@@ -1194,21 +1217,41 @@ void SourceCodeTreeModel::PrintFunctionDetailData(AMDTProfileFunctionData data,
             AMDTSampleValueVec sampleValue;
             GetDisasmSampleValue(instOffset, data.m_instDataList, sampleValue);
 
+            idx = SOURCE_VIEW_SAMPLES_PERCENT_COLUMN + 1;
+
+            for (auto& aSampleValue : sampleValue)
+            {
+                if (false == samplePercentSet)
+                {
+                    double sampleCount = aSampleValue.m_sampleCount;
+                    pAsmItem->setData(idx, sampleCount);
+                }
+                else
+                {
+					QVariant var;
+					SetPercentFormat(aSampleValue.m_sampleCountPercentage, true, var);
+					pAsmItem->setData(idx, var);
+                }
+
+                idx++;
+            }
+
+
             if (true == flag)
             {
-                pLineItem->setData(SOURCE_VIEW_ADDRESS_COLUMN, "0x" + QString::number(instOffset, 16));
+                pLineItem->setData(SOURCE_VIEW_ADDRESS_COLUMN, "0x" + QString::number(moduleBaseAddr + instOffset, 16));
                 flag = false;
             }
 
-            pAsmItem->setData(SOURCE_VIEW_ADDRESS_COLUMN, "0x" + QString::number(instOffset, 16));
-			pAsmItem->setForeground(SOURCE_VIEW_ADDRESS_COLUMN, acQGREY_TEXT_COLOUR);
+            pAsmItem->setData(SOURCE_VIEW_ADDRESS_COLUMN, "0x" + QString::number(moduleBaseAddr + instOffset, 16));
+            pAsmItem->setForeground(SOURCE_VIEW_ADDRESS_COLUMN, acQGREY_TEXT_COLOUR);
 
-			pAsmItem->setData(SOURCE_VIEW_SOURCE_COLUMN, acGTStringToQString(disasm));
-			pAsmItem->setForeground(SOURCE_VIEW_SOURCE_COLUMN, acQGREY_TEXT_COLOUR);
+            pAsmItem->setData(SOURCE_VIEW_SOURCE_COLUMN, acGTStringToQString(disasm));
+            pAsmItem->setForeground(SOURCE_VIEW_SOURCE_COLUMN, acQGREY_TEXT_COLOUR);
 
-			pAsmItem->setData(SOURCE_VIEW_CODE_BYTES_COLUMN, acGTStringToQString(codeByte));
-			pAsmItem->setForeground(SOURCE_VIEW_CODE_BYTES_COLUMN, acQGREY_TEXT_COLOUR);
-		}
+            pAsmItem->setData(SOURCE_VIEW_CODE_BYTES_COLUMN, acGTStringToQString(codeByte));
+            pAsmItem->setForeground(SOURCE_VIEW_CODE_BYTES_COLUMN, acQGREY_TEXT_COLOUR);
+        }
     }
 }
 
@@ -1217,31 +1260,29 @@ void SourceCodeTreeModel::BuildTree(const std::vector<SourceViewTreeItem*>& srcL
     gtVector<AMDTProfileCounterDesc> counterDesc;
     bool ret = m_pProfDataRdr->GetSampledCountersList(counterDesc);
 
-    AMDTProfileDataVec funcProfileData;
-    ret = m_pProfDataRdr->GetFunctionSummary(counterDesc.at(0).m_id, funcProfileData);
-
-    for (const auto& func : funcProfileData)
-    {
+	if (true == ret)
+	{
         AMDTProfileFunctionData  functionData;
-        ret = m_pProfDataRdr->GetFunctionDetailedProfileData(func.m_id,
-                                                             AMDT_PROFILE_ALL_PROCESSES,
-                                                             AMDT_PROFILE_ALL_THREADS,
+        ret = m_pProfDataRdr->GetFunctionDetailedProfileData(m_funcId,
+                                                             m_pid,
+                                                             m_tid,
                                                              functionData);
 
         gtString srcFilePath;
         AMDTSourceAndDisasmInfoVec srcInfoVec;
-        ret = m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(func.m_id, srcFilePath, srcInfoVec);
+        ret = m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_funcId, srcFilePath, srcInfoVec);
         PrintFunctionDetailData(functionData, srcFilePath, srcInfoVec, srcLineViewTreeMap);
     }
-
 }
 
 bool SourceCodeTreeModel::BuildSourceAndDASMTree()
 {
-	std::vector<SourceViewTreeItem*> srcLineViewTreeMap;
+    m_srcLineViewTreeMap.clear();
+    m_sampleSrcLnViewTreeList.clear();
+
     // Build the source lines tree:
-    BuildSourceLinesTree(srcLineViewTreeMap);
-    BuildTree(srcLineViewTreeMap);
+    BuildSourceLinesTree(m_srcLineViewTreeMap);
+    BuildTree(m_srcLineViewTreeMap);
     return true;
 
 }
@@ -1311,7 +1352,7 @@ bool SourceCodeTreeModel::UpdateHeaders()
     bool retVal = false;
 
     // Sanity check:
-    GT_IF_WITH_ASSERT(m_pSessionDisplaySettings != nullptr)
+    GT_IF_WITH_ASSERT(m_pDisplayFilter != nullptr)
     {
         // Build the header captions and header tooltips:
         m_headerCaptions.clear();
@@ -1332,18 +1373,17 @@ bool SourceCodeTreeModel::UpdateHeaders()
         m_headerTooltips << CP_colCaptionSamplesTooltip;
         m_headerTooltips << CP_colCaptionSamplesPercentTooltip;
 
-        for (int i = 0; i < (int) m_pSessionDisplaySettings->m_displayedDataColumnsIndices.size(); i++)
+        AMDTProfileCounterDescVec counterDesc;
+        retVal = m_pProfDataRdr->GetSampledCountersList(counterDesc);
+
+        for (const auto& counter : counterDesc)
         {
-            // Get the displayed column index:
-            int displayedColIndex = m_pSessionDisplaySettings->m_displayedDataColumnsIndices[i];
+            m_headerCaptions << acGTStringToQString(counter.m_abbrev);
 
-            m_headerCaptions << m_pSessionDisplaySettings->m_availableDataColumnCaptions[displayedColIndex];
+            QString currentCaption = acGTStringToQString(counter.m_abbrev);
+            QString currentFullName = acGTStringToQString(counter.m_name);
+            QString currentDescription = acGTStringToQString(counter.m_description);
 
-            QString currentCaption = m_pSessionDisplaySettings->m_availableDataColumnCaptions[displayedColIndex];
-            QString currentFullName = m_pSessionDisplaySettings->m_availableDataFullNames[displayedColIndex];
-            QString currentDescription = m_pSessionDisplaySettings->m_availableDataColumnTooltips[displayedColIndex];
-
-            // Format the tooltip:
             QString tooltip;
             acBuildFormattedTooltip(currentFullName, currentDescription, tooltip);
 
@@ -1916,7 +1956,7 @@ bool SourceCodeTreeModel::SetupSymbolInfoListUnmanaged(AMDTUInt32 modId, AMDTUIn
         {
             AMDTProfileFunctionData  functionData;
 
-            m_pProfDataRdr->GetFunctionDetailedProfileData(function.m_id, pId, AMDT_PROFILE_ALL_THREADS, functionData);
+            m_pProfDataRdr->GetFunctionDetailedProfileData(function.m_id, pId, m_tid, functionData);
 
             UiFunctionSymbolInfo tmpSymbol;
             tmpSymbol.m_va = functionData.m_functionInfo.m_startOffset;
@@ -2685,7 +2725,7 @@ void SourceCodeTreeModel::BuildSourceLinesTree(std::vector<SourceViewTreeItem*>&
         // Add line number:
         pLineItem->setData(SOURCE_VIEW_LINE_COLUMN, QVariant((uint)line));
         pLineItem->setForeground(SOURCE_VIEW_LINE_COLUMN, AC_SOURCE_CODE_EDITOR_MARGIN_FORE_COLOR);
-		srcLineViewTreeMap.emplace_back(pLineItem);
+        srcLineViewTreeMap.emplace_back(pLineItem);
     }
 }
 
@@ -2909,6 +2949,7 @@ QModelIndex SourceCodeTreeModel::indexOfItem(SourceViewTreeItem* pItem)
     return createIndex(row, col, pItem);
 }
 
+#if 0
 void SourceCodeTreeModel::SetSingleItemDataValue(SourceViewTreeItem* pItem, int column, bool appendPercent)
 {
     // Sanity check:
@@ -2990,6 +3031,111 @@ void SourceCodeTreeModel::SetSingleItemDataValue(SourceViewTreeItem* pItem, int 
             }
         }
     }
+}
+#endif
+
+void SourceCodeTreeModel::SetPercentFormat(double  val, bool appendPercent, QVariant& data)
+{
+	int precision = afGlobalVariablesManager::instance().percentagePointPrecision();
+
+	if (val > 0)
+	{
+		if (fmod(val, (float)1.0) == 0.0)
+		{
+			precision = 0;
+		}
+
+		data = QVariant(QString::number(val, 'f', precision).toDouble());
+
+		if (appendPercent)
+		{
+			data.setValue(data.toString().append("%"));
+		}
+	}
+}
+
+
+void SourceCodeTreeModel::SetSingleItemDataValue(SourceViewTreeItem* pItem, int column, bool appendPercent)
+{
+	// Sanity check:
+	GT_IF_WITH_ASSERT(pItem != nullptr)
+	{
+		// Find the info matching this item:
+		SourceLineAsmInfo info(-1, -1);
+		bool wasItemFound = false;
+
+		// Find the matching source line for this item:
+		wasItemFound = m_sourceLineToTreeItemsMap.contains(pItem);
+
+		if (wasItemFound)
+		{
+			info = m_sourceLineToTreeItemsMap[pItem];
+			wasItemFound = true;
+		}
+
+		if (wasItemFound)
+		{
+			// Find the data value for this item:
+			const gtVector<float>& dataVector = m_sourceLinesToDataMap[info];
+			int precision = appendPercent ? afGlobalVariablesManager::instance().percentagePointPrecision() :
+				afGlobalVariablesManager::instance().floatingPointPrecision();
+
+			// Get the data for the column:
+			int positionInDataVector = column - SOURCE_VIEW_SAMPLES_PERCENT_COLUMN - 1;
+
+			// The following if block should only be executed for lines that have meaningful data for the counter columns
+			// This condition may fail, for example for dasm lines that contain the string "---- break ----"
+			if ((positionInDataVector >= 0) && (positionInDataVector < (int)dataVector.size()))
+			{
+				float valueToSetOnItem = dataVector[positionInDataVector];
+
+				if (valueToSetOnItem > 0)
+				{
+					// Set the item delegate for the current column:
+					bool isProfilingCLU = m_pSessionDisplaySettings->m_pProfileInfo->m_isProfilingCLU;
+					bool displayPercentageInColumn = CPUGlobalDisplayFilter::instance().m_displayPercentageInColumn && (!isProfilingCLU);
+
+					if (displayPercentageInColumn)
+					{
+						gtVector<int>::const_iterator valsItBegin = m_pSessionDisplaySettings->m_simpleValuesVector.begin();
+						gtVector<int>::const_iterator valsItEnd = m_pSessionDisplaySettings->m_simpleValuesVector.end();
+
+						gtVector<int>::const_iterator findIt = gtFind(valsItBegin, valsItEnd, positionInDataVector);
+
+						if (valsItEnd != findIt)
+						{
+							int totalIndex = m_pSessionDisplaySettings->m_totalValuesMap[positionInDataVector];
+
+							if (totalIndex < (int)m_currentFunctionTotalDataVector.size())
+							{
+								if (m_currentFunctionTotalDataVector.at(totalIndex) > 0)
+								{
+									valueToSetOnItem = (valueToSetOnItem * 100.0) / m_currentFunctionTotalDataVector.at(totalIndex);
+								}
+
+								precision = afGlobalVariablesManager::instance().floatingPointPrecision();
+
+								if (fmod(valueToSetOnItem, (float)1.0) == 0.0)
+								{
+									precision = 0;
+								}
+							}
+						}
+					}
+
+					QVariant data = QVariant(QString::number(valueToSetOnItem, 'f', precision).toDouble());
+
+					if (appendPercent)
+					{
+						data.setValue(data.toString().append("%"));
+					}
+
+					// Set the data on the item:
+					pItem->setData(column, data);
+				}
+			}
+		}
+	}
 }
 
 SourceViewTreeItem* SourceCodeTreeModel::AddDoubleClickItem(SourceViewTreeItem* pAsmItem)
@@ -3186,3 +3332,85 @@ void SourceCodeTreeModel::SetModuleDetails(AMDTUInt32 moduleId, AMDTUInt32 proce
         }
     }
 }
+
+void SourceCodeTreeModel::SetHotSpotSamples(AMDTUInt32 counterId)
+{
+    if (m_pDisplayFilter != nullptr)
+    {
+        SourceViewTreeItem* pLineItem = nullptr;
+
+        for (const auto& srcLn : m_sampleSrcLnViewTreeList)
+        {
+            pLineItem = srcLn.second;
+
+            for (const auto& counter : srcLn.first.m_sampleValues)
+            {
+                if (counterId == counter.m_counterId)
+                {
+                    QString strPrecision = QString::number(counter.m_sampleCount, 'f', 2);
+                    double valuePrecision = strPrecision.toDouble();
+
+                    pLineItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, valuePrecision);
+
+                    strPrecision = QString::number(counter.m_sampleCountPercentage, 'f', 2);
+                    valuePrecision = strPrecision.toDouble();
+                    pLineItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, valuePrecision);
+                    pLineItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
+                }
+            }
+        }
+    }
+}
+
+#if 0
+bool SourceCodeTreeModel::UpdateHeaders()
+{
+    bool retVal = false;
+
+    // Sanity check:
+    GT_IF_WITH_ASSERT(m_pSessionDisplaySettings != nullptr)
+    {
+        // Build the header captions and header tooltips:
+        m_headerCaptions.clear();
+        m_headerTooltips.clear();
+
+        // Add the data header captions and tooltips:
+        m_headerCaptions << CP_colCaptionLineNumber;
+        m_headerCaptions << CP_colCaptionAddress;
+        m_headerCaptions << CP_colCaptionLineSourceCode;
+        m_headerCaptions << CP_colCaptionCodeBytes;
+        m_headerCaptions << CP_colCaptionHotSpotSamples;
+        m_headerCaptions << CP_colCaptionSamplesPercent;
+
+        m_headerTooltips << CP_colCaptionLineNumberTooltip;
+        m_headerTooltips << CP_colCaptionAddressTooltip;
+        m_headerTooltips << CP_colCaptionLineSourceCodeTooltip;
+        m_headerTooltips << CP_colCaptionCodeBytesTooltip;
+        m_headerTooltips << CP_colCaptionSamplesTooltip;
+        m_headerTooltips << CP_colCaptionSamplesPercentTooltip;
+
+        for (int i = 0; i < (int)m_pSessionDisplaySettings->m_displayedDataColumnsIndices.size(); i++)
+        {
+            // Get the displayed column index:
+            int displayedColIndex = m_pSessionDisplaySettings->m_displayedDataColumnsIndices[i];
+
+            m_headerCaptions << m_pSessionDisplaySettings->m_availableDataColumnCaptions[displayedColIndex];
+
+            QString currentCaption = m_pSessionDisplaySettings->m_availableDataColumnCaptions[displayedColIndex];
+            QString currentFullName = m_pSessionDisplaySettings->m_availableDataFullNames[displayedColIndex];
+            QString currentDescription = m_pSessionDisplaySettings->m_availableDataColumnTooltips[displayedColIndex];
+
+            // Format the tooltip:
+            QString tooltip;
+            acBuildFormattedTooltip(currentFullName, currentDescription, tooltip);
+
+            m_headerTooltips << tooltip;
+        }
+
+        retVal = true;
+    }
+
+    return retVal;
+}
+#endif
+

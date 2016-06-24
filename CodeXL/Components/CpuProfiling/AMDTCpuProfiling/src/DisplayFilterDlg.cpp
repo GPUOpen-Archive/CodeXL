@@ -552,7 +552,8 @@ void DisplayFilterDlg::onClickOk()
 #endif
 		}
 		m_displayPercentageInColumn = m_pCheckBoxShowPercentageBars->isChecked();
-		
+		m_displayFilter->SetSamplePercent(m_displayPercentageInColumn);
+
 		m_displaySystemDLLs = m_pCheckBoxDisplaySystemDLLs->isChecked();
 		m_displayFilter->setIgnoreSysDLL(!m_displaySystemDLLs);
 		/*

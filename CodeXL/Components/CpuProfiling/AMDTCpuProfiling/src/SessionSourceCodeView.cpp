@@ -489,30 +489,34 @@ bool SessionSourceCodeView::FillHotspotIndicatorCombo()
 {
     bool retVal = false;
 
-    SessionDisplaySettings* pSessionDisplaySettings = CurrentSessionDisplaySettings();
     const QComboBox* pHotspotCombo = TopToolbarComboBox(m_pHotSpotIndicatorComboBoxAction);
-    GT_IF_WITH_ASSERT((pHotspotCombo != nullptr) && (m_pDisplayedSessionItemData != nullptr) && (m_pProfileInfo != nullptr) && (pSessionDisplaySettings != nullptr) && (m_pHotSpotIndicatorComboBoxAction != nullptr))
+    GT_IF_WITH_ASSERT((pHotspotCombo != nullptr) &&
+		(m_pDisplayedSessionItemData != nullptr) && 
+		(m_pDisplayFilter != nullptr) && 
+		(m_pHotSpotIndicatorComboBoxAction != nullptr))
     {
         // Find the profile type:
         SessionTreeNodeData* pSessionData = qobject_cast<SessionTreeNodeData*>(m_pDisplayedSessionItemData->extendedItemData());
+		m_supportedCounterList.clear();
         GT_IF_WITH_ASSERT(pSessionData != nullptr)
         {
             QStringList hotSpotColumns;
-            pSessionDisplaySettings->calculateDisplayedColumns(m_pProfileReader->getTopologyMap());
 
-            for (int i = 0 ; i < (int)pSessionDisplaySettings->m_availableDataColumnCaptions.size(); i++)
-            {
-                QString caption = pSessionDisplaySettings->m_availableDataColumnCaptions[i];
-                bool shouldShow = !m_pSessionDisplaySettings->m_filteredDataColumnsCaptions.contains(caption);
+			// counters for "All Data" config type selected
+			QString filterName = CP_strCPUProfileDisplayFilterAllData;
+			GT_IF_WITH_ASSERT(!filterName.isEmpty())
+			{
+				CounterNameIdVec countersName;
+				m_pDisplayFilter->GetConfigCounters(filterName, countersName);
 
-                if (shouldShow)
-                {
-                    QString fullName = pSessionDisplaySettings->m_availableDataFullNames[i];
-                    hotSpotColumns << fullName;
-                }
-            }
+				for (const auto& name : countersName)
+				{
+					hotSpotColumns << acGTStringToQString(name);
+					m_supportedCounterList.push_back(name);
+				}
 
-            retVal = true;
+				retVal = true;
+			}
 
             // Add the hot spot columns to the list:
             m_pHotSpotIndicatorComboBoxAction->UpdateStringList(hotSpotColumns);
@@ -542,7 +546,8 @@ void SessionSourceCodeView::CreateFunctionsComboBox()
 				AMDT_PROFILE_ALL_THREADS,
 				functionData);
 
-			gtUInt64 startOffset = functionData.m_functionInfo.m_startOffset;
+			gtUInt64 baseAddr = functionData.m_modBaseAddress;
+			gtUInt64 startOffset = baseAddr + functionData.m_functionInfo.m_startOffset;
 			gtUInt64 endOffset = startOffset + functionData.m_functionInfo.m_size;
 
 			QString addressStart = "0x" + QString::number(startOffset, 16);
@@ -1193,30 +1198,44 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
 	{
 		if (-1 == functionIndex) return;
 
-		AMDTUInt32 functionId = m_functionIdVec.at(functionIndex);
+		m_pTreeViewModel->m_funcId = m_functionIdVec.at(functionIndex);
 		AMDTProfileFunctionData  functionData;
-		bool rc = m_pProfDataRdr->GetFunctionDetailedProfileData(functionId, AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_THREADS, functionData);
+		bool rc = m_pProfDataRdr->GetFunctionDetailedProfileData(m_pTreeViewModel->m_funcId,
+			AMDT_PROFILE_ALL_PROCESSES, 
+			AMDT_PROFILE_ALL_THREADS, 
+			functionData);
 
 		 
 		gtString srcFilePath;
 		AMDTSourceAndDisasmInfoVec srcInfoVec;
-		rc = m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(functionId, srcFilePath, srcInfoVec);
+		rc = m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_pTreeViewModel->m_funcId, srcFilePath, srcInfoVec);
 
 		m_srcFilePath = srcFilePath;
 
 		if (true == rc)
 		{
+			m_pTreeViewModel->m_pid = AMDT_PROFILE_ALL_PROCESSES;
+			m_pTreeViewModel->m_tid = AMDT_PROFILE_ALL_THREADS;
+
 			bool isMultiPID = (functionData.m_pidsList.size() > 1);
 			bool isMultiTID = (functionData.m_threadsList.size() > 1);
 			QStringList pidList, tidList;
 
 			if (isMultiPID)
 			{
+				for (const auto& pid : functionData.m_pidsList)
+				{
+					pidList << (QString::number(pid));
+				}
 				pidList.insert(0, CP_profileAllProcesses);
 			}
 
 			if (isMultiTID)
 			{
+				for (const auto& tid : functionData.m_threadsList)
+				{
+					tidList << (QString::number(tid));
+				}
 				tidList.insert(0, CP_profileAllThreads);
 			}
 
@@ -1232,16 +1251,6 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
 			m_pTIDLabelAction->UpdateVisible(isMultiPID || isMultiTID);
 
 			m_pTIDComboBoxAction->UpdateEnabled(isMultiTID);
-
-			// Set current index for the new pid
-			m_pPIDComboBoxAction->UpdateCurrentIndex(functionData.m_pidsList.at(0));
-			m_pTreeViewModel->m_pid = m_pTreeViewModel->m_newPid;
-			m_pTreeViewModel->m_newPid = SHOW_ALL_PIDS;
-
-			// Set current index for the new tid
-			m_pTIDComboBoxAction->UpdateCurrentIndex(functionData.m_threadsList.at(0));
-			m_pTreeViewModel->m_tid = m_pTreeViewModel->m_newTid;
-			m_pTreeViewModel->m_newTid = SHOW_ALL_TIDS;
 
 			// Update the display:
 			ProtectedUpdateTableDisplay(UPDATE_TABLE_REBUILD);
@@ -1329,6 +1338,7 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
 
         return retVal;
     }
+
     void SessionSourceCodeView::UpdateWithNewSymbol()
     {
         //If there is no source, just show dasm
@@ -1448,7 +1458,7 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
     {
         if (index >= 0)
         {
-            m_pTreeViewModel->m_pid = SHOW_ALL_PIDS;
+            m_pTreeViewModel->m_pid = AMDT_PROFILE_ALL_PROCESSES;
             const QComboBox* pPIDComboBox = (QComboBox*)TopToolbarComboBox(m_pPIDComboBoxAction);
             const QComboBox* pTIDComboBox = (QComboBox*)TopToolbarComboBox(m_pTIDComboBoxAction);
             GT_IF_WITH_ASSERT((pPIDComboBox != nullptr) && (m_pPIDComboBoxAction != nullptr)
@@ -1456,9 +1466,11 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
             {
                 if (index != SHOW_ALL_PIDS)
                 {
-                    bool rc = ProcessNameToPID(pPIDComboBox->currentText(), m_pTreeViewModel->m_pid);
-                    GT_ASSERT(rc);
+					m_pTreeViewModel->m_pid = pPIDComboBox->currentText().toUInt();
                 }
+
+				// set tid to ALL_TIDS
+				m_pTreeViewModel->m_tid = AMDT_PROFILE_ALL_THREADS;
 
                 QStringList tidList;
 
@@ -1487,7 +1499,11 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
 
                 }
 
-                bool isMultiTID = (tidList.size() > 1);
+				bool isMultiTID =  false;
+				if (pTIDComboBox->count() > 0)
+				{
+					isMultiTID = true;
+				}
 
                 if (isMultiTID)
                 {
@@ -1507,12 +1523,6 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
 
                 m_pTIDComboBoxAction->UpdateEnabled(isMultiTID);
 
-                // If the currentItem has its address field empty, then focus to the beginning of the function:
-                if (m_pTreeViewModel->m_currentSymbolIterator != m_pTreeViewModel->m_symbolsInfoList.end())
-                {
-                    m_pTreeViewModel->m_newAddress = m_pTreeViewModel->m_currentSymbolIterator->m_va;
-                }
-
                 // Set the TID current index (source code table will be updated):
                 m_pTIDComboBoxAction->UpdateCurrentIndex(-1);
                 m_pTIDComboBoxAction->UpdateCurrentIndex(SHOW_ALL_TIDS);
@@ -1528,22 +1538,22 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
             const QComboBox* pTIDComboBox = TopToolbarComboBox(m_pTIDComboBoxAction);
             GT_IF_WITH_ASSERT((m_pTreeViewModel != nullptr) && (pTIDComboBox != nullptr))
             {
-
                 if (SHOW_ALL_TIDS == index)
                 {
-                    m_pTreeViewModel->m_tid = SHOW_ALL_TIDS;
+                    m_pTreeViewModel->m_tid = AMDT_PROFILE_ALL_THREADS;
                 }
                 else
                 {
                     m_pTreeViewModel->m_tid = pTIDComboBox->currentText().toUInt();
                 }
 
+#if 0
                 // If the currentItem has its address field empty, then focus to the beginning of the function:
                 if (m_pTreeViewModel->m_currentSymbolIterator != m_pTreeViewModel->m_symbolsInfoList.end())
                 {
                     m_pTreeViewModel->m_newAddress = m_pTreeViewModel->m_currentSymbolIterator->m_va;
                 }
-
+#endif
                 ProtectedUpdateTableDisplay(UPDATE_TABLE_REBUILD);
             }
         }
@@ -2011,8 +2021,18 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
         // Sanity check:
         GT_IF_WITH_ASSERT(m_pTreeViewModel != nullptr)
         {
-            // Re-Set the tree samples column:
-            m_pTreeViewModel->SetTreeSamples(text);
+			auto counterIdx = std::find(m_supportedCounterList.begin(), m_supportedCounterList.end(), acQStringToGTString(text));
+			if (counterIdx != m_supportedCounterList.end())
+			{
+				//int val = counterIdx - m_supportedCounterList.begin();
+				// Re-Set the tree samples column:
+				//m_pTreeViewModel->SetTreeSamples(text);
+				AMDTUInt32 counterId = m_pDisplayFilter->GetCounterId(text);
+				if (0 != counterId)
+				{
+					m_pTreeViewModel->SetHotSpotSamples(counterId);
+				}
+			}
 
             // Refresh the view:
             RefreshView();
@@ -2436,3 +2456,42 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
 
 
 
+#if 0
+	bool SessionSourceCodeView::FillHotspotIndicatorCombo()
+	{
+		bool retVal = false;
+
+		SessionDisplaySettings* pSessionDisplaySettings = CurrentSessionDisplaySettings();
+		const QComboBox* pHotspotCombo = TopToolbarComboBox(m_pHotSpotIndicatorComboBoxAction);
+		GT_IF_WITH_ASSERT((pHotspotCombo != nullptr) && (m_pDisplayedSessionItemData != nullptr) && (m_pProfileInfo != nullptr) && (pSessionDisplaySettings != nullptr) && (m_pHotSpotIndicatorComboBoxAction != nullptr))
+		{
+			// Find the profile type:
+			SessionTreeNodeData* pSessionData = qobject_cast<SessionTreeNodeData*>(m_pDisplayedSessionItemData->extendedItemData());
+			GT_IF_WITH_ASSERT(pSessionData != nullptr)
+			{
+				QStringList hotSpotColumns;
+				pSessionDisplaySettings->calculateDisplayedColumns(m_pProfileReader->getTopologyMap());
+
+				for (int i = 0; i < (int)pSessionDisplaySettings->m_availableDataColumnCaptions.size(); i++)
+				{
+					QString caption = pSessionDisplaySettings->m_availableDataColumnCaptions[i];
+					bool shouldShow = !m_pSessionDisplaySettings->m_filteredDataColumnsCaptions.contains(caption);
+
+					if (shouldShow)
+					{
+						QString fullName = pSessionDisplaySettings->m_availableDataFullNames[i];
+						hotSpotColumns << fullName;
+					}
+				}
+
+				retVal = true;
+
+				// Add the hot spot columns to the list:
+				m_pHotSpotIndicatorComboBoxAction->UpdateStringList(hotSpotColumns);
+				m_pHotSpotIndicatorComboBoxAction->UpdateEnabled(hotSpotColumns.size() > 1);
+			}
+
+		}
+		return retVal;
+	}
+#endif

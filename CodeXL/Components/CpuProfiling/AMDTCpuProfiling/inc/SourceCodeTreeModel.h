@@ -35,6 +35,9 @@
 #include <inc/SourceCodeViewUtils.h>
 #include <inc/StdAfx.h>
 
+#include <unordered_map>
+
+
 class SessionDisplaySettings;
 class CpuProfileReader;
 
@@ -109,11 +112,15 @@ public:
     /// Sets the samples and samples percent columns data and headers:
     void SetTreeSamples(const QString& hotSpotCaption);
 
+	void SetHotSpotSamples(AMDTUInt32 counterIdx);
+
     /// Sets the tree items data as percent / values:
     void SetDataPercentValues();
 
     /// Sets the value for the requested source view item:
     void SetSingleItemDataValue(SourceViewTreeItem* pItem, int column, bool appendPercent);
+	void SetPercentFormat(double  val, bool appendPercent, QVariant& data);
+
 
     /// Sets the data values on the data columns:
     bool SetDataValues(int lineNumber, int asmLineNumber, const gtVector<float>& dataVector);
@@ -223,6 +230,7 @@ private:
     ProcessIdType m_newPid;
     ThreadIdType m_tid;
     ThreadIdType m_newTid;
+	AMDTFunctionId m_funcId;
 
     CpuProfileModule::MOD_MODE_TYPE m_moduleType;
     AggregatedSample m_moduleAggregatedSample;
@@ -266,6 +274,12 @@ private:
 
 	shared_ptr<cxlProfileDataReader> m_pProfDataRdr;
 	shared_ptr<DisplayFilter> m_pDisplayFilter;
+
+	AMDTProfileSourceLineDataVec m_srcLineDataVec;
+	std::vector<SourceViewTreeItem*> m_srcLineViewTreeMap;
+
+	// srcLineNumber for sampled  --> SourceViewTreeItem
+	std::vector<std::pair<AMDTProfileSourceLineData, SourceViewTreeItem*>> m_sampleSrcLnViewTreeList;
 };
 
 #endif //__SOURCECODETREEMODEL_H
