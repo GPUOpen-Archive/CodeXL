@@ -181,6 +181,10 @@ VktTraceAnalyzerLayer::VktTraceAnalyzerLayer()
     mFunctionIndexToNameString[FuncId_vkGetPhysicalDeviceSurfacePresentModesKHR] = "vkGetPhysicalDeviceSurfacePresentModesKHR";
     mFunctionIndexToNameString[FuncId_vkCreateWin32SurfaceKHR] = "vkCreateWin32SurfaceKHR";
     mFunctionIndexToNameString[FuncId_vkGetPhysicalDeviceWin32PresentationSupportKHR] = "vkGetPhysicalDeviceWin32PresentationSupportKHR";
+    mFunctionIndexToNameString[FuncId_vkCreateXcbSurfaceKHR] = "vkCreateXcbSurfaceKHR";
+    mFunctionIndexToNameString[FuncId_vkGetPhysicalDeviceXcbPresentationSupportKHR] = "vkGetPhysicalDeviceXcbPresentationSupportKHR";
+    mFunctionIndexToNameString[FuncId_vkCreateXlibSurfaceKHR] = "vkCreateXlibSurfaceKHR";
+    mFunctionIndexToNameString[FuncId_vkGetPhysicalDeviceXlibPresentationSupportKHR] = "vkGetPhysicalDeviceXlibPresentationSupportKHR";
     mFunctionIndexToNameString[FuncId_vkGetPhysicalDeviceDisplayPropertiesKHR] = "vkGetPhysicalDeviceDisplayPropertiesKHR";
     mFunctionIndexToNameString[FuncId_vkGetPhysicalDeviceDisplayPlanePropertiesKHR] = "vkGetPhysicalDeviceDisplayPlanePropertiesKHR";
     mFunctionIndexToNameString[FuncId_vkGetDisplayPlaneSupportedDisplaysKHR] = "vkGetDisplayPlaneSupportedDisplaysKHR";
@@ -455,7 +459,7 @@ std::string VktTraceAnalyzerLayer::GetGPUTraceTXT()
             }
         }
 
-#ifdef _WIN32
+#ifdef WIN32
         sort(flatResults.begin(), flatResults.end(), SortByStartTime);
 #endif
 
@@ -536,7 +540,9 @@ void VktTraceAnalyzerLayer::OnPresent(VkQueue queue, const VkPresentInfoKHR* pPr
     if (pInterceptor->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "0x%p, 0x%p", queue, pPresentInfo);
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s",
+                  VktUtil::WritePointerAsString(queue),
+                  VktUtil::WritePointerAsString(pPresentInfo));
 
         // precall
         BeforeAPICall();
@@ -732,6 +738,10 @@ eAPIType VktTraceAnalyzerLayer::GetAPIGroupFromAPI(FuncId inAPIFuncId)
         case FuncId_vkGetPhysicalDeviceSurfacePresentModesKHR:
         case FuncId_vkCreateWin32SurfaceKHR:
         case FuncId_vkGetPhysicalDeviceWin32PresentationSupportKHR:
+        case FuncId_vkCreateXcbSurfaceKHR:
+        case FuncId_vkGetPhysicalDeviceXcbPresentationSupportKHR:
+        case FuncId_vkCreateXlibSurfaceKHR:
+        case FuncId_vkGetPhysicalDeviceXlibPresentationSupportKHR:
         case FuncId_vkGetPhysicalDeviceDisplayPropertiesKHR:
         case FuncId_vkGetPhysicalDeviceDisplayPlanePropertiesKHR:
         case FuncId_vkGetDisplayPlaneSupportedDisplaysKHR:
