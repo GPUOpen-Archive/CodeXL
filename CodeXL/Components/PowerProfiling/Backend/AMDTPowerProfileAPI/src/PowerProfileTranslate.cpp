@@ -35,7 +35,6 @@ static std::list <ProcessName> g_processNames;
 // Memory pool for translation layer
 MemoryPool g_transPool;
 
-static AMDTFloat32 g_totalApuPower = 0;
 #define MICROSEC_PER_SEC 1000000
 #define MILLISEC_PER_SEC 1000
 

@@ -2037,7 +2037,8 @@ AMDTResult AMDTPwrReadCounterHistogram(AMDTUInt32 counterID,
         {
             for (auto iter : *pCounters)
             {
-                if (AMDT_PWR_VALUE_HISTOGRAM == iter.second.m_desc.m_aggregation)
+                if ((AMDT_PWR_VALUE_HISTOGRAM == iter.second.m_desc.m_aggregation)
+                    && (instanceId == iter.second.m_instanceId))
                 {
                     pHistogram = GetHistogramCounter(iter.first);
 
