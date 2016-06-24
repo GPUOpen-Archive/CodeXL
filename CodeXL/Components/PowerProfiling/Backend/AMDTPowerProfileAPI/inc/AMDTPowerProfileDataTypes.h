@@ -83,6 +83,7 @@ typedef enum
 typedef enum
 {
     AMDT_PWR_CATEGORY_POWER,              /**< Instantaneous power */
+	AMDT_PWR_CATEGORY_ENERGY,             /**< Energy consumed */
     AMDT_PWR_CATEGORY_FREQUENCY,          /**< Frequency  */
     AMDT_PWR_CATEGORY_TEMPERATURE,        /**< Temperature in centigrade */
     AMDT_PWR_CATEGORY_VOLTAGE,            /**< Voltage */
