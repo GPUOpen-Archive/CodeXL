@@ -1574,7 +1574,17 @@ void PwrInsertDeviceCounters(AMDTPwrDevice* dev, AMDTUInt32 instId, AMDTUInt32 l
                                                                               sizeof(char) * PWR_MAX_DESC_LEN);
                     memset(counter.m_desc.m_name, '\0', sizeof(char)* PWR_MAX_DESC_LEN);
                     memset(counter.m_desc.m_description, '\0', sizeof(char)* PWR_MAX_NAME_LEN);
-                    sprintf(counter.m_desc.m_name, "%s-%s", dev->m_pName, pInfo->m_name);
+
+                    // GUI counters are based on name string
+                    // GUI needs to be changed before we change the names
+                    if (dev->m_deviceID != 1)
+                    {
+                        sprintf(counter.m_desc.m_name, "%s-%s", dev->m_pName, pInfo->m_name);
+                    }
+                    else
+                    {
+                        sprintf(counter.m_desc.m_name, "%s", pInfo->m_name);
+                    }
                     sprintf(counter.m_desc.m_description, "%s-%s", dev->m_pDescription, pInfo->m_description);
                     memcpy(&counter.m_basicInfo, pInfo, sizeof(AMDTPwrCounterBasicInfo));
                     g_supportedCounterMap.insert(PwrSupportedCounterMap::value_type(iter.first, counter));
