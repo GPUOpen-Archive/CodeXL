@@ -20,9 +20,6 @@ typedef void* HINSTANCE;
 /// This class implements the features required for a Vulkan capture player
 class VulkanPlayer: public BasePlayer
 {
-    /// Record the last error
-    VkResult m_lastErrorResult;
-
 public:
 
     /// Constructor
@@ -42,6 +39,8 @@ public:
     void RenderLoop();
 
     void Destroy();
+
+    static void ClearSwapchainImage();
 
     static void Present();
 };
