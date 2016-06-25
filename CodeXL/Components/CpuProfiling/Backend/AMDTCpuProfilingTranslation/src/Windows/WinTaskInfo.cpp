@@ -2447,7 +2447,9 @@ HRESULT WinTaskInfo::GetKernelModInfo(TiModuleInfo* pModInfo, TiTimeType systemT
             pModInfo->ModuleStartAddr = kemoditem.first.keModLoadAddr;
             pModInfo->Modulesize = kemoditem.second.keModEndAddr - kemoditem.first.keModLoadAddr;
             pModInfo->pPeFile = kemoditem.second.pPeFile;
-            pModInfo->instanceId = kemoditem.second.instanceId;
+            // Baskar: FIXME
+            // pModInfo->instanceId = kemoditem.second.instanceId;
+            pModInfo->instanceId = (pModInfo->processID & 0x000FFFFFUL) | ((kemoditem.second.instanceId & 0xFFF) << 20);
 
             if (!kemoditem.second.bNameConverted)
             {

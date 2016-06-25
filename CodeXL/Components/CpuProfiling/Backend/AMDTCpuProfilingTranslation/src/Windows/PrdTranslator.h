@@ -436,6 +436,14 @@ private:
                           int cpuFamily = 0, //FAMILY_UNKNOWN
                           int cpuModel = 0);
 
+    bool WriteMetaProfileDataIntoDB(PidProcessMap& processMap,
+                                    NameModuleMap& moduleMap,
+                                    ModInstanceMap& modInstanceMap);
+
+    bool WriteMetaProfileDataIntoDB(PidProcessList& processMapList,
+                                    NameModuleList& moduleMapList,
+                                    ModInstanceList& modInstanceMapList);
+    
     void AddIBSFetchEventsToMap(int cpuFamily, int cpuModel);
 
     void AddIBSOpEventsToMap(int cpuFamily, int cpuModel, bool addBr, bool addLS, bool addNB);
@@ -458,6 +466,14 @@ private:
     void AddIbsFetchEvent(unsigned int eventSelect);
     void AddIbsOpEvent(unsigned int eventSelect);
     void AddCluEvent(unsigned int eventSelect);
+
+    bool WriteProcessInfoIntoDB(PidProcessMap& processMap);
+    bool WriteThreadInfoIntoDB(PidProcessMap& processMap);
+    bool WriteModuleInfoIntoDB(NameModuleMap& moduleMap);
+    bool WriteModuleInstanceInfoIntoDB(NameModuleMap& moduleMap, ModInstanceMap& modInstanceMap);
+    bool WriteFunctionInfoIntoDB(NameModuleMap& moduleMap);
+    bool WriteSampleProfileDataIntoDB(const NameModuleMap& moduleMap);
+    bool WriteCallgraphProfileDataIntoDB(const NameModuleMap& modMap);
 
     QString m_dataFile;
     bool    m_collectStat;

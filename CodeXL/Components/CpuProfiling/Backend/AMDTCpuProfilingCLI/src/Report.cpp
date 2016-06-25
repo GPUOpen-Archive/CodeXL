@@ -272,7 +272,7 @@ static void PrintOverview(osFile& reportFile, gtString hdr, AMDTProfileCounterDe
             if (counterDesc.m_type == AMDT_PROFILE_COUNTER_TYPE_RAW)
             {
                 s.appendFormattedString(L",%lu", static_cast<gtUInt64>(aSampleValue.m_sampleCount));
-                s.appendFormattedString(L",%3.02f%%", static_cast<float>(aSampleValue.m_sampleCountPercentage));
+                //s.appendFormattedString(L",%3.02f%%", static_cast<float>(aSampleValue.m_sampleCountPercentage));
             }
             else if (counterDesc.m_type == AMDT_PROFILE_COUNTER_TYPE_COMPUTED)
             {
@@ -324,10 +324,7 @@ static void PrintAllData(osFile& reportFile, gtString hdr, AMDTProfileCounterDes
             if (counterDescVec[idx].m_type == AMDT_PROFILE_COUNTER_TYPE_RAW)
             {
                 s.appendFormattedString(L",%lu ", static_cast<gtUInt64>(aSampleValue.m_sampleCount));
-                s.appendFormattedString(L"(%3.02f%%)", static_cast<float>(aSampleValue.m_sampleCountPercentage));
-
-                //s.appendFormattedString(L",%lu", static_cast<gtUInt64>(aSampleValue.m_sampleCount));
-                //s.appendFormattedString(L",%3.02f%%", static_cast<float>(aSampleValue.m_sampleCountPercentage));
+                //s.appendFormattedString(L"(%3.02f%%)", static_cast<float>(aSampleValue.m_sampleCountPercentage));
             }
             else if (counterDescVec[idx].m_type == AMDT_PROFILE_COUNTER_TYPE_COMPUTED)
             {
@@ -756,7 +753,7 @@ HRESULT CpuProfileReport::ReportFromDb()
             // FIXME: dont report func data..
             //funcProfileData.clear();
 
-            for (auto const& func : allFunctionData)
+            for (auto const& func : funcProfileData)
             {
                 if ((func.m_id != AMDT_PROFILE_ALL_FUNCTIONS) && ((func.m_id & 0x0000ffff) > 0) && (func.m_moduleId > 0))
                 {

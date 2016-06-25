@@ -2098,102 +2098,150 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
 
     m_processInfosLock.unlockRead();
 
+    // Writing the processed profile data into .tbp/.ebp/.imd files should be
+    // done after processing all the records. This is done by the main thread
+
+    return m_ThreadHR;
+}
+
+bool PrdTranslator::WriteProcessInfoIntoDB(PidProcessMap& processMap)
+{
+    bool ret = false;
+
     if (m_dbWriter)
     {
         // Populate process info and insert into DB.
-        CPAProcessList *processList = new (std::nothrow) CPAProcessList;
+        CPAProcessList *pProcessList = new (std::nothrow) CPAProcessList;
 
-        if (nullptr != processList)
+        if (nullptr != pProcessList)
         {
-            processList->reserve(pidList.size());
+            pProcessList->reserve(128);
 
-            for (auto pid : pidList)
+            for (auto& proc : processMap)
             {
-                auto p_it = processMap.find(pid);
-
-                if (processMap.end() != p_it)
+                if (proc.second.getTotal())
                 {
-                    if (p_it->second.getTotal())
-                    {
-                        processList->emplace_back(p_it->first, p_it->second.getPath(), p_it->second.m_is32Bit, p_it->second.m_hasCss);
-                    }
+                    pProcessList->emplace_back(proc.first, proc.second.getPath(), proc.second.m_is32Bit, proc.second.m_hasCss);
                 }
             }
 
-            m_dbWriter->Push({ TRANSLATED_DATA_TYPE_PROCESS_INFO, (void*)processList });
-            processList = nullptr;
+            ret = pProcessList->size() > 0 ? true : false;
+
+            m_dbWriter->Push({ TRANSLATED_DATA_TYPE_PROCESS_INFO, (void*)pProcessList });
+            pProcessList = nullptr; // This will be freed by the dbwriter thread
         }
+    }
 
-        CPAProcessThreadList *procThreadIdList = new (std::nothrow) CPAProcessThreadList;
+    return ret;
+}
 
-        if (nullptr != procThreadIdList)
+bool PrdTranslator::WriteThreadInfoIntoDB(PidProcessMap& processMap)
+{
+    bool ret = false;
+
+    if (m_dbWriter)
+    {
+        // Insert the thread info into db
+        CPAProcessThreadList *pProcThreadIdList = new (std::nothrow) CPAProcessThreadList;
+
+        if (nullptr != pProcThreadIdList)
         {
-            procThreadIdList->reserve(pidList.size());
+            pProcThreadIdList->reserve(128);
 
-            for (auto pid : pidList)
+            for (auto& proc : processMap)
             {
-                TI_THREAD_INFO *threadInfoArray = nullptr;
-                auto numThreads = fnGetNumThreadInProcess(pid);
-
-                if (numThreads > 0)
+                if (proc.second.getTotal())
                 {
-                    threadInfoArray = new (std::nothrow) TI_THREAD_INFO[numThreads];
-                }
+                    ProcessIdType pid = proc.first;
+                    TI_THREAD_INFO *pThreadInfoArray = nullptr;
+                    
+                    auto numThreads = fnGetNumThreadInProcess(pid);
 
-                if (nullptr != threadInfoArray)
-                {
-                    if (S_OK == fnGetThreadInfoInProcess(pid, numThreads, threadInfoArray))
+                    if (numThreads > 0)
                     {
-                        for (unsigned int i = 0; i < numThreads; ++i)
+                        pThreadInfoArray = new (std::nothrow) TI_THREAD_INFO[numThreads];
+
+                        if (nullptr != pThreadInfoArray)
                         {
-                            gtUInt32 threadId = threadInfoArray[i].threadID;
-                            gtUInt64 ptId = pid;
-                            ptId = (ptId << 32) | threadId;
-                            procThreadIdList->emplace_back(ptId, static_cast<gtUInt64>(pid), threadId);
+                            if (S_OK == fnGetThreadInfoInProcess(pid, numThreads, pThreadInfoArray))
+                            {
+                                for (unsigned int i = 0; i < numThreads; ++i)
+                                {
+                                    gtUInt32 threadId = pThreadInfoArray[i].threadID;
+                                    gtUInt64 ptId = pid;
+                                    ptId = (ptId << 32) | threadId;
+                                    pProcThreadIdList->emplace_back(ptId, static_cast<gtUInt64>(pid), threadId);
+                                }
+                            }
+
+                            delete[] pThreadInfoArray;
+                            pThreadInfoArray = nullptr;
                         }
                     }
                 }
-
-                delete[] threadInfoArray;
-                threadInfoArray = nullptr;
             }
 
-            m_dbWriter->Push({ TRANSLATED_DATA_TYPE_THREAD_INFO, (void*)procThreadIdList });
-            procThreadIdList = nullptr;
+            ret = pProcThreadIdList->size() > 0 ? true : false;
+
+            m_dbWriter->Push({ TRANSLATED_DATA_TYPE_THREAD_INFO, (void*)pProcThreadIdList });
+            pProcThreadIdList = nullptr; // This will be freed by the dbwriter thread
         }
+    }
 
+    return ret;
+}
+
+bool PrdTranslator::WriteModuleInfoIntoDB(NameModuleMap& moduleMap)
+{
+    bool ret = false;
+
+    if (m_dbWriter)
+    {
         // Populate module info
-        CPAModuleList *moduleList = new (std::nothrow) CPAModuleList;
+        CPAModuleList *pModuleList = new (std::nothrow) CPAModuleList;
 
-        if (nullptr != moduleList)
+        if (nullptr != pModuleList)
         {
-            moduleList->reserve(moduleMap.size());
+            pModuleList->reserve(moduleMap.size());
 
             for (const auto& m : moduleMap)
             {
                 if (m.second.getTotal())
                 {
-                    moduleList->emplace_back(m.second.m_moduleId,
-                        m.first,
-                        m.second.m_size,
-                        m.second.m_modType,
-                        osIsSystemModule(m.first),
-                        m.second.m_is32Bit,
-                        m.second.m_isDebugInfoAvailable);
+                    pModuleList->emplace_back(m.second.m_moduleId,
+                                              m.first,
+                                              m.second.m_size,
+                                              m.second.m_modType,
+                                              osIsSystemModule(m.first),
+                                              m.second.m_is32Bit,
+                                              m.second.m_isDebugInfoAvailable);
                 }
             }
 
-            m_dbWriter->Push({ TRANSLATED_DATA_TYPE_MODULE_INFO, (void*)moduleList });
-            moduleList = nullptr;
+            ret = pModuleList->size() > 0 ? true : false;
+
+            m_dbWriter->Push({ TRANSLATED_DATA_TYPE_MODULE_INFO, (void*)pModuleList });
+            pModuleList = nullptr; // this will be freed  by the dbwriter thread
         }
+    }
+
+    return ret;
+}
+
+bool PrdTranslator::WriteModuleInstanceInfoIntoDB(NameModuleMap& moduleMap, ModInstanceMap& modInstanceMap)
+{
+    bool ret = false;
+
+    if (m_dbWriter)
+    {
 
         // Populate module instance info
         // modInstanceInfoMap : Map of < instanceId, tuple of <modName, pid, loadAddr> >
-        CPAModuleInstanceList *moduleInstanceList = new (std::nothrow) CPAModuleInstanceList;
+        CPAModuleInstanceList *pModuleInstanceList = new (std::nothrow) CPAModuleInstanceList;
 
-        if (nullptr != moduleInstanceList)
+        if (nullptr != pModuleInstanceList)
         {
-            moduleInstanceList->reserve(modInstanceMap.size());
+            pModuleInstanceList->reserve(modInstanceMap.size());
 
             for (const auto& modIt : modInstanceMap)
             {
@@ -2204,22 +2252,32 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
                 {
                     // Insert into DB only if the module has samples
                     moduleId = it->second.m_moduleId;
-                    moduleInstanceList->emplace_back(modIt.first, moduleId, std::get<1>(modIt.second), std::get<2>(modIt.second));
+                    pModuleInstanceList->emplace_back(modIt.first, moduleId, std::get<1>(modIt.second), std::get<2>(modIt.second));
                 }
             }
 
-            m_dbWriter->Push({ TRANSLATED_DATA_TYPE_MODINSTANCE_INFO, (void*)moduleInstanceList });
-            moduleInstanceList = nullptr;
-            modInstanceMap.clear();
+            ret = pModuleInstanceList->size() > 0 ? true : false;
+            m_dbWriter->Push({ TRANSLATED_DATA_TYPE_MODINSTANCE_INFO, (void*)pModuleInstanceList });
+            pModuleInstanceList = nullptr;
         }
+    }
 
+    return ret;
+}
+
+bool PrdTranslator::WriteFunctionInfoIntoDB(NameModuleMap& moduleMap)
+{
+    bool ret = false;
+
+    if (m_dbWriter)
+    {
         // Populate function info
-        CPAFunctionInfoList *funcInfoList = new (std::nothrow) CPAFunctionInfoList;
+        CPAFunctionInfoList *pFuncInfoList = new (std::nothrow) CPAFunctionInfoList;
 
-        if (nullptr != funcInfoList)
+        if (nullptr != pFuncInfoList)
         {
             // Let us assume one function from each module
-            funcInfoList->reserve(moduleMap.size());
+            pFuncInfoList->reserve(moduleMap.size());
 
             // Insert a dummy function as "Unknown Function"
             //gtString unknownFuncName = L"Unknown Function";
@@ -2242,87 +2300,279 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
                     // else insert function info into DB
                     if (!funcName.isEmpty())
                     {
-                        funcInfoList->emplace_back(funcId, modId, funcName, startOffset, size);
+                        pFuncInfoList->emplace_back(funcId, modId, funcName, startOffset, size);
                     }
                 }
             }
 
-            m_dbWriter->Push({ TRANSLATED_DATA_TYPE_FUNCTION_INFO, (void*)funcInfoList });
-            funcInfoList = nullptr;
+            ret = pFuncInfoList->size() > 0 ? true : false;
+
+            m_dbWriter->Push({ TRANSLATED_DATA_TYPE_FUNCTION_INFO, (void*)pFuncInfoList });
+            pFuncInfoList = nullptr;
         }
-
-        //// Populate sample info
-        //CPASampeInfoList *sampleList = new (std::nothrow) CPASampeInfoList;
-
-        //if (nullptr != sampleList)
-        //{
-        //    const gtUInt32 unusedBitsMask = 0x3FFFFFF;
-
-        //    // Assume minimum 1000 samples
-        //    sampleList->reserve(1000);
-
-        //    for (auto& module : moduleMap)
-        //    {
-        //        gtUInt32 modSize = module.second.m_size;
-
-        //        for (auto fit = module.second.getBeginFunction(); fit != module.second.getEndFunction(); ++fit)
-        //        {
-        //            gtUInt32 funcId = module.second.m_moduleId;
-        //            funcId = (funcId << 16) | fit->second.m_functionId;
-
-        //            for (auto aptIt = fit->second.getBeginSample(); aptIt != fit->second.getEndSample(); ++aptIt)
-        //            {
-        //                gtUInt64 pid = aptIt->first.m_pid;
-        //                gtUInt32 threadId = aptIt->first.m_tid;
-        //                gtVAddr  sampleAddr = aptIt->first.m_addr;
-        //                gtUInt32 moduleInstanceid = 0ULL;
-        //                gtVAddr  modLoadAddr = 0ULL;
-
-        //                for (const auto& it : module.second.m_moduleInstanceInfo)
-        //                {
-        //                    modLoadAddr = std::get<1>(it);
-        //                    gtVAddr modEndAddr = modLoadAddr + modSize;
-
-        //                    if ((std::get<0>(it) == pid))
-        //                    {
-        //                        // 1. sampleAddr falls within module size limit.
-        //                        // 2. module size is 0, pick the first match.
-        //                        if ((modLoadAddr <= sampleAddr) && ((sampleAddr < modEndAddr) || (0 == modSize)))
-        //                        {
-        //                            moduleInstanceid = std::get<2>(it);
-        //                            break;
-        //                        }
-        //                    }
-        //                }
-
-        //                // sample address offset is w.r.t. module load address
-        //                gtUInt64 sampleOffset = sampleAddr - modLoadAddr;
-        //                gtUInt64 processThreadId = pid;
-        //                processThreadId = (processThreadId << 32) | threadId;
-
-        //                for (auto skIt = aptIt->second.getBeginSample(); skIt != aptIt->second.getEndSample(); ++skIt)
-        //                {
-        //                    gtUInt64 sampleCount = skIt->second;
-        //                    gtUInt64 coreSamplingConfigId = skIt->first.cpu;
-        //                    coreSamplingConfigId = (coreSamplingConfigId << 32) | (skIt->first.event & unusedBitsMask);
-
-        //                    sampleList->emplace_back(processThreadId, moduleInstanceid, coreSamplingConfigId, funcId, sampleOffset, sampleCount);
-        //                }
-        //            }
-        //        }
-        //    }
-
-        //    m_dbWriter->Push({ TRANSLATED_DATA_TYPE_SAMPLE_INFO, (void*)sampleList });
-        //    sampleList = nullptr;
-        //}
     }
 
-    // Writing the processed profile data into .tbp/.ebp/.imd files should be
-    // done after processing all the records. This is done by the main thread
-
-    return m_ThreadHR;
+    return ret;
 }
 
+bool PrdTranslator::WriteSampleProfileDataIntoDB(const NameModuleMap& modMap)
+{
+    bool ret = false;
+
+    if (m_dbWriter)
+    {
+        // Populate sample info
+        CPASampeInfoList *pSampleList = new (std::nothrow) CPASampeInfoList;
+
+        if (nullptr != pSampleList)
+        {
+            const gtUInt32 unusedBitsMask = 0x3FFFFFF;
+
+            // Assume minimum 1000 samples
+            pSampleList->reserve(1000);
+
+            for (auto& module : modMap)
+            {
+                gtUInt32 modSize = module.second.m_size;
+
+                for (auto fit = module.second.getBeginFunction(); fit != module.second.getEndFunction(); ++fit)
+                {
+                    gtUInt32 funcId = module.second.m_moduleId;
+                    funcId = (funcId << 16) | fit->second.m_functionId;
+
+                    for (auto aptIt = fit->second.getBeginSample(); aptIt != fit->second.getEndSample(); ++aptIt)
+                    {
+                        gtUInt64 pid = aptIt->first.m_pid;
+                        gtUInt32 threadId = aptIt->first.m_tid;
+                        gtVAddr  sampleAddr = aptIt->first.m_addr;
+                        gtUInt32 moduleInstanceid = 0ULL;
+                        gtVAddr  modLoadAddr = 0ULL;
+
+                        for (const auto& it : module.second.m_moduleInstanceInfo)
+                        {
+                            modLoadAddr = std::get<1>(it);
+                            gtVAddr modEndAddr = modLoadAddr + modSize;
+
+                            if ((std::get<0>(it) == pid))
+                            {
+                                // 1. sampleAddr falls within module size limit.
+                                // 2. module size is 0, pick the first match.
+                                if ((modLoadAddr <= sampleAddr) && ((sampleAddr < modEndAddr) || (0 == modSize)))
+                                {
+                                    moduleInstanceid = std::get<2>(it);
+                                    break;
+                                }
+                            }
+                        }
+
+                        // sample address offset is w.r.t. module load address
+                        gtUInt64 sampleOffset = sampleAddr - modLoadAddr;
+                        gtUInt64 processThreadId = pid;
+                        processThreadId = (processThreadId << 32) | threadId;
+
+                        for (auto skIt = aptIt->second.getBeginSample(); skIt != aptIt->second.getEndSample(); ++skIt)
+                        {
+                            gtUInt64 sampleCount = skIt->second;
+                            gtUInt64 coreSamplingConfigId = skIt->first.cpu;
+                            coreSamplingConfigId = (coreSamplingConfigId << 32) | (skIt->first.event & unusedBitsMask);
+
+                            pSampleList->emplace_back(processThreadId, moduleInstanceid, coreSamplingConfigId, funcId, sampleOffset, sampleCount);
+                        }
+                    }
+                }
+            }
+
+            ret = pSampleList->size() > 0 ? true : false;
+
+            m_dbWriter->Push({ TRANSLATED_DATA_TYPE_SAMPLE_INFO, (void*)pSampleList });
+            pSampleList = nullptr; // This will be freed by the dbwriter
+        }
+    }
+
+    return ret;
+}
+
+bool PrdTranslator::WriteCallgraphProfileDataIntoDB(const NameModuleMap& moduleMap)
+{
+    bool ret = false;
+
+    if (m_dbWriter)
+    {
+        // Write the callstack info to DB
+        for (auto procIter = m_processInfos.begin(), procIterEnd = m_processInfos.end(); procIter != procIterEnd; ++procIter)
+        {
+            ProcessInfo* pProcessInfo = procIter->second;
+
+            if (nullptr != pProcessInfo && 0U != pProcessInfo->m_callGraph.GetOrder())
+            {
+                ProcessIdType pid = procIter->first;
+                CallGraph& callGraph = pProcessInfo->m_callGraph;
+                TiProcessWorkingSetQuery workingSet(pid);
+
+                gtUInt32 callStackId = 0;
+                CPACallStackFrameInfoList *csFrameInfoList = new (std::nothrow) CPACallStackFrameInfoList;
+                CPACallStackLeafInfoList  *csLeafInfoList = new (std::nothrow) CPACallStackLeafInfoList;
+
+                if (nullptr != csFrameInfoList && nullptr != csLeafInfoList)
+                {
+                    // This is just a safe random space reservation. Check if we can reserve more accurate space.
+                    csFrameInfoList->reserve(500);
+                    csLeafInfoList->reserve(100);
+
+                    for (auto stackIt = callGraph.GetBeginCallStack(), stackItEnd = callGraph.GetEndCallStack(); stackIt != stackItEnd; ++stackIt)
+                    {
+                        // **stackIt is a reference in callGraph, hence null check not required.
+                        CallStack& callStack = **stackIt;
+                        gtUInt16 callSiteDepth = 0;
+                        ++callStackId;
+
+                        for (auto siteIt = callStack.begin(), siteItEnd = callStack.end(); siteIt != siteItEnd; ++siteIt)
+                        {
+                            CallSite& callSite = *siteIt;
+                            ++callSiteDepth;
+                            gtUInt64 funcId = 0;
+
+                            ExecutableFile* pExe = workingSet.FindModule(callSite.m_traverseAddr);
+                            gtUInt64 loadAddr = (nullptr != pExe) ? pExe->GetLoadAddress() : 0ULL;
+                            gtUInt64 offset = callSite.m_traverseAddr - loadAddr;
+
+                            if (pExe != nullptr)
+                            {
+                                gtString moduleName = pExe->GetFilePath();
+                                auto modIt = moduleMap.find(moduleName);
+
+                                if (modIt != moduleMap.end())
+                                {
+                                    funcId = modIt->second.m_moduleId << 16;
+                                    auto pFunc = modIt->second.findFunction(callSite.m_traverseAddr);
+
+                                    if (pFunc != nullptr)
+                                    {
+                                        funcId |= pFunc->m_functionId;
+                                    }
+                                }
+                                else
+                                {
+                                    // TODO: sometime few modules observed by CSS are not present in module map
+                                }
+                            }
+
+                            csFrameInfoList->emplace_back(callStackId, pid, funcId, offset, callSiteDepth);
+                        }
+
+                        const EventSampleList& samples = callStack.GetEventSampleList();
+
+                        for (const auto& sampleInfo : samples)
+                        {
+                            gtUInt64 funcId = 0;
+
+                            ExecutableFile* pExe = workingSet.FindModule(sampleInfo.m_pSite->m_traverseAddr);
+                            gtUInt64 loadAddr = (nullptr != pExe) ? pExe->GetLoadAddress() : 0ULL;
+                            gtUInt64 offset = sampleInfo.m_pSite->m_traverseAddr - loadAddr;
+
+                            if (pExe != nullptr)
+                            {
+                                gtString moduleName = pExe->GetFilePath();
+                                auto modIt = moduleMap.find(moduleName);
+
+                                if (modIt != moduleMap.end())
+                                {
+                                    funcId = modIt->second.m_moduleId << 16;
+                                    auto pFunc = modIt->second.findFunction(sampleInfo.m_pSite->m_traverseAddr);
+
+                                    if (pFunc != nullptr)
+                                    {
+                                        funcId |= pFunc->m_functionId;
+                                    }
+                                }
+                            }
+
+                            csLeafInfoList->emplace_back(
+                                callStackId, pid, funcId, offset, sampleInfo.m_eventId, sampleInfo.m_count);
+                        }
+                    }
+
+                    m_dbWriter->Push({ TRANSLATED_DATA_TYPE_CSS_FRAME_INFO, (void*)csFrameInfoList });
+                    csFrameInfoList = nullptr;
+
+                    m_dbWriter->Push({ TRANSLATED_DATA_TYPE_CSS_LEAF_INFO, (void*)csLeafInfoList });
+                    csLeafInfoList = nullptr;
+
+                    ret = true;
+                }
+                else
+                {
+                    // At least one of the memory allocations failed.
+                    delete csFrameInfoList;
+                    delete csLeafInfoList;
+                    break;
+                }
+            }
+        }
+    }
+
+    return ret;
+}
+
+bool PrdTranslator::WriteMetaProfileDataIntoDB(
+    PidProcessMap& processMap,
+    NameModuleMap& moduleMap,
+    ModInstanceMap& modInstanceMap
+)
+{
+    bool ret = false;
+
+    if (m_dbWriter)
+    {
+        WriteProcessInfoIntoDB(processMap);
+
+        WriteThreadInfoIntoDB(processMap);
+        
+        WriteModuleInfoIntoDB(moduleMap);
+
+        WriteModuleInstanceInfoIntoDB(moduleMap, modInstanceMap);
+
+        WriteFunctionInfoIntoDB(moduleMap);
+
+        ret = true;
+    }
+
+    return ret;
+}
+
+bool PrdTranslator::WriteMetaProfileDataIntoDB(PidProcessList& processMapList,
+    NameModuleList& moduleMapList,
+    ModInstanceList& modInstanceMapList)
+{
+    bool ret = false;
+
+    if (m_dbWriter)
+    {
+        for (auto processMap : processMapList)
+        {
+            WriteProcessInfoIntoDB(*processMap);
+            WriteThreadInfoIntoDB(*processMap);
+        }
+
+        for (auto modMap : moduleMapList)
+        {
+            WriteModuleInfoIntoDB(*modMap);
+            WriteFunctionInfoIntoDB(*modMap);
+        }
+
+        NameModuleList::iterator modMapIter = moduleMapList.begin();
+        ModInstanceList::iterator modInstMapIter = modInstanceMapList.begin();
+
+        for (; (modMapIter != moduleMapList.end()) && (modInstMapIter != modInstanceMapList.end()); modMapIter++, modInstMapIter)
+        {
+            WriteModuleInstanceInfoIntoDB(*(*modMapIter), *(*modInstMapIter));
+        }
+
+        ret = true;
+    }
+
+    return ret;
+}
 
 // worker thread start point;
 //
@@ -3217,10 +3467,15 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
         PrintMemoryUsage(L"Memory Usage: After processing PRD records.");
     }
 
-    bool hasCluData = (m_runInfo->m_isProfilingClu && (nullptr != m_pCluInfo));
-
     InitializeProgressBar(L"Writing translated profile data...", false);
 
+    // Now write the profile meta data collected by the threads into db
+    if (m_dbWriter)
+    {
+        WriteMetaProfileDataIntoDB(procList, modList, modInstanceList);
+    }
+
+    
     // Aggregate all the processmaps and module maps
     startTime = GetTickCount();
     AggregateThreadMaps(procList, modList, modInstanceList);
@@ -3232,11 +3487,11 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
         PrintMemoryUsage(L"Memory Usage: After Aggregating CpuProfileProcess and CpuProfileModule maps.");
     }
 
+    bool hasCluData = (m_runInfo->m_isProfilingClu && (nullptr != m_pCluInfo));
     UpdateProgressBar((hasCluData ? 15ULL : 30ULL), 100ULL);
 
     PidProcessMap*  procMap = *(PidProcessList::iterator)procList.begin();
     NameModuleMap*  modMap = *(NameModuleList::iterator)modList.begin();
-    //ModInstanceMap* modInstanceMap = *(modInstanceList.begin());
 
     if (hasCluData)
     {
@@ -3260,6 +3515,10 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
 
     if (m_dbWriter)
     {
+        // This moduleMap is aggregated
+        WriteSampleProfileDataIntoDB(*modMap);
+        WriteCallgraphProfileDataIntoDB(*modMap);
+
         // Finish writing profile data
         m_dbWriter->Push({ TRANSLATED_DATA_TYPE_UNKNOWN_INFO, nullptr });
     }
@@ -3294,6 +3553,15 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
     }
 
     modList.clear();
+    
+    for (ModInstanceList::iterator i = modInstanceList.begin(); i != modInstanceList.end(); i++)
+    {
+        (*i)->clear();
+        delete *i;
+    }
+    modInstanceList.clear();
+
+    // Clear the modInstanceMap
 
     for (ThreadParamList::iterator i = plist.begin(); i != plist.end(); i++)
     {
@@ -3609,119 +3877,6 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
         return res;
     }
 
-    if (m_dbWriter)
-    {
-        // Write the callstack info to DB
-        for (auto procIter = m_processInfos.begin(), procIterEnd = m_processInfos.end(); procIter != procIterEnd; ++procIter)
-        {
-            ProcessInfo* pProcessInfo = procIter->second;
-
-            if (nullptr != pProcessInfo && 0U != pProcessInfo->m_callGraph.GetOrder())
-            {
-                ProcessIdType pid = procIter->first;
-                CallGraph& callGraph = pProcessInfo->m_callGraph;
-                TiProcessWorkingSetQuery workingSet(pid);
-
-                gtUInt32 callStackId = 0;
-                CPACallStackFrameInfoList *csFrameInfoList = new (std::nothrow) CPACallStackFrameInfoList;
-                CPACallStackLeafInfoList  *csLeafInfoList = new (std::nothrow) CPACallStackLeafInfoList;
-
-                if (nullptr != csFrameInfoList && nullptr != csLeafInfoList)
-                {
-                    // This is just a safe random space reservation. Check if we can reserve more accurate space.
-                    csFrameInfoList->reserve(500);
-                    csLeafInfoList->reserve(100);
-
-                    for (auto stackIt = callGraph.GetBeginCallStack(), stackItEnd = callGraph.GetEndCallStack(); stackIt != stackItEnd; ++stackIt)
-                    {
-                        // **stackIt is a reference in callGraph, hence null check not required.
-                        CallStack& callStack = **stackIt;
-                        gtUInt16 callSiteDepth = 0;
-                        ++callStackId;
-
-                        for (auto siteIt = callStack.begin(), siteItEnd = callStack.end(); siteIt != siteItEnd; ++siteIt)
-                        {
-                            CallSite& callSite = *siteIt;
-                            ++callSiteDepth;
-                            gtUInt64 funcId = 0;
-
-                            ExecutableFile* pExe = workingSet.FindModule(callSite.m_traverseAddr);
-                            gtUInt64 loadAddr = (nullptr != pExe) ? pExe->GetLoadAddress() : 0ULL;
-                            gtUInt64 offset = callSite.m_traverseAddr - loadAddr;
-
-                            if (pExe != nullptr)
-                            {
-                                gtString moduleName = pExe->GetFilePath();
-                                auto modIt = moduleMap.find(moduleName);
-
-                                if (modIt != moduleMap.end())
-                                {
-                                    funcId = modIt->second.m_moduleId << 16;
-                                    auto pFunc = modIt->second.findFunction(callSite.m_traverseAddr);
-
-                                    if (pFunc != nullptr)
-                                    {
-                                        funcId |= pFunc->m_functionId;
-                                    }
-                                }
-                                else
-                                {
-                                    // TODO: sometime few modules observed by CSS are not present in module map
-                                }
-                            }
-
-                            csFrameInfoList->emplace_back(callStackId, pid, funcId, offset, callSiteDepth);
-                        }
-
-                        const EventSampleList& samples = callStack.GetEventSampleList();
-
-                        for (const auto& sampleInfo : samples)
-                        {
-                            gtUInt64 funcId = 0;
-
-                            ExecutableFile* pExe = workingSet.FindModule(sampleInfo.m_pSite->m_traverseAddr);
-                            gtUInt64 loadAddr = (nullptr != pExe) ? pExe->GetLoadAddress() : 0ULL;
-                            gtUInt64 offset = sampleInfo.m_pSite->m_traverseAddr - loadAddr;
-
-                            if (pExe != nullptr)
-                            {
-                                gtString moduleName = pExe->GetFilePath();
-                                auto modIt = moduleMap.find(moduleName);
-
-                                if (modIt != moduleMap.end())
-                                {
-                                    funcId = modIt->second.m_moduleId << 16;
-                                    auto pFunc = modIt->second.findFunction(sampleInfo.m_pSite->m_traverseAddr);
-
-                                    if (pFunc != nullptr)
-                                    {
-                                        funcId |= pFunc->m_functionId;
-                                    }
-                                }
-                            }
-
-                            csLeafInfoList->emplace_back(
-                                callStackId, pid, funcId, offset, sampleInfo.m_eventId, sampleInfo.m_count);
-                        }
-                    }
-
-                    m_dbWriter->Push({ TRANSLATED_DATA_TYPE_CSS_FRAME_INFO, (void*)csFrameInfoList });
-                    csFrameInfoList = nullptr;
-
-                    m_dbWriter->Push({ TRANSLATED_DATA_TYPE_CSS_LEAF_INFO, (void*)csLeafInfoList });
-                    csLeafInfoList = nullptr;
-                }
-                else
-                {
-                    // At least one of the memory allocations failed.
-                    delete csFrameInfoList;
-                    delete csLeafInfoList;
-                    break;
-                }
-            }
-        }
-    }
-
     return res;
 }
 
@@ -3786,75 +3941,6 @@ bool PrdTranslator::WriteProfileFile(const gtString& path,
     }
 
     UpdateProgressBar(80ULL, 100ULL);
-
-    //TODO: this code block will be moved to ThreadTranslateDataPrdFile()
-    if (m_dbWriter)
-    {
-        // Populate sample info
-        CPASampeInfoList *sampleList = new (std::nothrow) CPASampeInfoList;
-
-        if (nullptr != sampleList)
-        {
-            const gtUInt32 unusedBitsMask = 0x3FFFFFF;
-
-            // Assume minimum 1000 samples
-            sampleList->reserve(1000);
-
-            for (auto& module : *modMap)
-            {
-                gtUInt32 modSize = module.second.m_size;
-
-                for (auto fit = module.second.getBeginFunction(); fit != module.second.getEndFunction(); ++fit)
-                {
-                    gtUInt32 funcId = module.second.m_moduleId;
-                    funcId = (funcId << 16) | fit->second.m_functionId;
-
-                    for (auto aptIt = fit->second.getBeginSample(); aptIt != fit->second.getEndSample(); ++aptIt)
-                    {
-                        gtUInt64 pid = aptIt->first.m_pid;
-                        gtUInt32 threadId = aptIt->first.m_tid;
-                        gtVAddr  sampleAddr = aptIt->first.m_addr;
-                        gtUInt32 moduleInstanceid = 0ULL;
-                        gtVAddr  modLoadAddr = 0ULL;
-
-                        for (const auto& it : module.second.m_moduleInstanceInfo)
-                        {
-                            modLoadAddr = std::get<1>(it);
-                            gtVAddr modEndAddr = modLoadAddr + modSize;
-
-                            if ((std::get<0>(it) == pid))
-                            {
-                                // 1. sampleAddr falls within module size limit.
-                                // 2. module size is 0, pick the first match.
-                                if ((modLoadAddr <= sampleAddr) && ((sampleAddr < modEndAddr) || (0 == modSize)))
-                                {
-                                    moduleInstanceid = std::get<2>(it);
-                                    break;
-                                }
-                            }
-                        }
-
-                        // sample address offset is w.r.t. module load address
-                        gtUInt64 sampleOffset = sampleAddr - modLoadAddr;
-                        gtUInt64 processThreadId = pid;
-                        processThreadId = (processThreadId << 32) | threadId;
-
-                        for (auto skIt = aptIt->second.getBeginSample(); skIt != aptIt->second.getEndSample(); ++skIt)
-                        {
-                            gtUInt64 sampleCount = skIt->second;
-                            gtUInt64 coreSamplingConfigId = skIt->first.cpu;
-                            coreSamplingConfigId = (coreSamplingConfigId << 32) | (skIt->first.event & unusedBitsMask);
-
-                            sampleList->emplace_back(processThreadId, moduleInstanceid, coreSamplingConfigId, funcId, sampleOffset, sampleCount);
-                        }
-                    }
-                }
-            }
-
-            m_dbWriter->Push({ TRANSLATED_DATA_TYPE_SAMPLE_INFO, (void*)sampleList });
-            sampleList = nullptr;
-        }
-    }
 
     if (!writer.Write(path, &info, procMap, modMap, pTopMap))
     {
