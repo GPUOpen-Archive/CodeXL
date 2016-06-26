@@ -188,11 +188,6 @@ afStartupPage::afStartupPage() : QWebView()
     // Set the zoom factor to fit the resolution. QWebView assumes 96 DPI.
     QWidget* pScreen = QApplication::desktop()->screen();
 
-    if (pScreen != nullptr)
-    {
-        const int horizontalDpi = pScreen->logicalDpiX();
-        setZoomFactor(horizontalDpi / 96.0);
-    }
 
     page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
     bool rc = connect(this, SIGNAL(linkClicked(const QUrl&)), this, SLOT(OnLinkClicked(const QUrl&)));
@@ -210,6 +205,11 @@ afStartupPage::afStartupPage() : QWebView()
     // Hide context menu:
     setContextMenuPolicy(Qt::NoContextMenu);
 
+    if (pScreen != nullptr)
+    {
+        const int horizontalDpi = pScreen->logicalDpiX();
+        setZoomFactor(horizontalDpi / 96.0);
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -445,5 +445,3 @@ bool afStartupPage::CanLinkBeClicked(const QUrl& url)
 
     return retVal;
 }
-
-
