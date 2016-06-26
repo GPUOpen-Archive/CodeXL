@@ -159,6 +159,7 @@ public:
     bool GetCallstackLeafData(AMDTProcessId       processId,
                               AMDTUInt32          counterId,
                               gtUInt32            callStackId,
+                              AMDTFunctionId      funcId,
                               CallstackFrameVec&  leafs);
 
     bool GetCallstackFrameData(AMDTProcessId       processId,
@@ -167,6 +168,7 @@ public:
 
     bool GetCallstackIds(AMDTProcessId        processId,
                          AMDTFunctionId       funcId,
+                         bool                 isLeafEntries,
                          gtVector<gtUInt32>&  csIds);
 
     bool GetMaxFunctionId(AMDTModuleId moduleId, gtUInt32& maxFuncId);

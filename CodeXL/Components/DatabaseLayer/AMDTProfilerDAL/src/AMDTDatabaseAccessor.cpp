@@ -4508,6 +4508,34 @@ public:
         return ret;
     }
 
+    bool IsSystemModule(AMDTModuleId modId, bool& isSysMod)
+    {
+        bool ret = false;
+
+        std::stringstream query;
+        query << "SELECT isSystemModule        \
+                  FROM Module       \
+                  WHERE id = ? ; ";
+
+        sqlite3_stmt* pQueryStmt = nullptr;
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+
+        if (rc == SQLITE_OK)
+        {
+            sqlite3_bind_int(pQueryStmt, 1, modId);
+
+            if ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
+            {
+                int i = sqlite3_column_int(pQueryStmt, 0);
+                isSysMod = (i == 1) ? true : false;
+            }
+        }
+
+        sqlite3_finalize(pQueryStmt);
+        ret = (SQLITE_DONE == rc || SQLITE_ROW == rc) ? true : false;
+        return ret;
+    }
+
     bool ConstructUnknownFunctionName(AMDTProfileFunctionInfo& funcInfo)
     {
         bool ret = GetModuleName(funcInfo.m_moduleId, funcInfo.m_name);
@@ -4575,7 +4603,7 @@ public:
                 size = sqlite3_column_int(pQueryStmt, 3);
             }
 
-            GetModulePath(funcInfo.m_moduleId, funcInfo.m_modulePath);
+            GetModulePath(moduleId, funcInfo.m_modulePath);
         }
 
         funcInfo.m_functionId = funcId;
@@ -5178,6 +5206,7 @@ public:
         AMDTProcessId       processId,
         AMDTUInt32          counterId,   // TODO: Is there a need to support ALL_COUNTERS?
         gtUInt32            callstackId, // AMDT_PROFILE_ALL_CALLPATHS
+        AMDTFunctionId      funcId,
         CallstackFrameVec&  leafs)
     {
         bool ret = false;
@@ -5185,8 +5214,11 @@ public:
         ret = GetCallstackLeafData__(processId,
                                      counterId,
                                      callstackId,
-                                     leafs,
-                                     false);
+                                     funcId,
+                                     false,
+                                     leafs);
+
+        // TODO: Need to fetch unknown functions too
 
         //ret = GetCallstackLeafData__(processId,
         //                             counterId,
@@ -5202,19 +5234,26 @@ public:
         AMDTProcessId       processId,
         AMDTUInt32          counterId,   // TODO: Is there a need to support ALL_COUNTERS?
         gtUInt32            callstackId, // AMDT_PROFILE_ALL_CALLPATHS
-        CallstackFrameVec&  leafs,
-        bool                queryUnknownFuncs)
+        AMDTFunctionId      functionId,
+        bool                queryUnknownFuncs,
+        CallstackFrameVec&  leafs)
     {
         bool ret = false;
 
         std::stringstream query;
-        query << "SELECT callstackId, functionId, offset, SUM(selfSamples) "  \
+        query << "SELECT callstackId, functionId, Module.isSystemModule, offset, SUM(selfSamples) "  \
                  "FROM  CallstackLeaf "     \
+                 "INNER JOIN Module on ((CallstackLeaf.functionId & 0xFFFF0000) >> 16) = Module.id " \
                  "WHERE processId = ? AND samplingConfigurationId = ? ";
 
         if (IS_CALLSTACK_QUERY(callstackId))
         {
             query << "AND callstackId = ? ";
+        }
+
+        if (IS_FUNCTION_QUERY(functionId))
+        {
+            query << "AND functionId = ? ";
         }
 
         if (!queryUnknownFuncs)
@@ -5223,7 +5262,7 @@ public:
         }
         else
         {
-            query << "group by callstackId, offset HAVING functionId & 0x0000ffff = 0 ;";
+            query << " AND functionId > 0 GROUP BY callstackId, offset HAVING functionId & 0x0000ffff = 0 ;";
         }
 
         sqlite3_stmt* pQueryStmt = nullptr;
@@ -5239,6 +5278,11 @@ public:
                 sqlite3_bind_int(pQueryStmt, 3, callstackId);
             }
 
+            if (IS_FUNCTION_QUERY(functionId))
+            {
+                sqlite3_bind_int(pQueryStmt, 4, functionId);
+            }
+
             // Execute the query.
             while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
             {
@@ -5247,13 +5291,15 @@ public:
                 aLeaf.m_callstackId = sqlite3_column_int(pQueryStmt, 0);
 
                 AMDTFunctionId funcId = sqlite3_column_int(pQueryStmt, 1);
-                gtUInt32 offset = sqlite3_column_int(pQueryStmt, 2);
+                gtUInt32 isSysMod = sqlite3_column_int(pQueryStmt, 2);
+                gtUInt32 offset = sqlite3_column_int(pQueryStmt, 3);
 
-                double value = sqlite3_column_double(pQueryStmt, 3);
+                double value = sqlite3_column_double(pQueryStmt, 4);
                 aLeaf.m_selfSamples = static_cast<gtUInt32>(value);
                 aLeaf.m_counterId = counterId;
                 aLeaf.m_depth = 0;
                 aLeaf.m_isLeaf = true;
+                aLeaf.m_isSystemodule = (isSysMod == 1) ? true : false;
 
                 GetFunctionInfo(funcId, offset, aLeaf.m_funcInfo);
                 // aLeaf.m_funcInfo.m_startOffset = offset;
@@ -5278,13 +5324,12 @@ public:
         gtUInt32            callstackId,
         CallstackFrameVec&  frames)
     {
-        GT_UNREFERENCED_PARAMETER(processId);
         bool ret = false;
 
         std::stringstream query;
         query << "SELECT callstackId, functionId, offset, depth "  \
                  "FROM  CallstackFrame "     \
-                 "WHERE callstackId = ? "    \
+                 "WHERE callstackId = ? AND processId = ? "    \
                  "ORDER BY depth ASC ;";
 
         sqlite3_stmt* pQueryStmt = nullptr;
@@ -5293,6 +5338,7 @@ public:
         if (rc == SQLITE_OK)
         {
             sqlite3_bind_int(pQueryStmt, 1, callstackId);
+            sqlite3_bind_int(pQueryStmt, 2, processId);
 
             // Execute the query.
             while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
@@ -5307,6 +5353,9 @@ public:
                 aLeaf.m_selfSamples = 0;
                 aLeaf.m_counterId = 0; // FIXME
                 aLeaf.m_isLeaf = false;
+
+                AMDTModuleId modId = ((funcId & 0xFFFF0000) >> 16);
+                IsSystemModule(modId, aLeaf.m_isSystemodule);
 
                 GetFunctionInfo(funcId, offset, aLeaf.m_funcInfo);
                 //aLeaf.m_funcInfo.m_startOffset = offset;
@@ -5331,61 +5380,71 @@ public:
     bool GetCallstackIds (
         AMDTProcessId        processId,
         AMDTFunctionId       funcId,
+        bool                 isLeafEntries, // if true, fetch from the CallstackLeaf table, otherwise from CallstackFrame
         gtVector<gtUInt32>&  csIds)
     {
-        GT_UNREFERENCED_PARAMETER(processId);
         bool ret = false;
         gtSet<gtUInt32> uniqueSet;
         gtUInt32 csId = 0;
-
         std::stringstream query;
-        query << "SELECT DISTINCT callstackId "        \
-                  "FROM  CallstackFrame "     \
-                  "WHERE functionId = ? ;";
-
         sqlite3_stmt* pQueryStmt = nullptr;
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+        int rc = 0;
 
-        if (rc == SQLITE_OK)
+        if (!isLeafEntries)
         {
-            sqlite3_bind_int(pQueryStmt, 1, funcId);
+            query << "SELECT DISTINCT callstackId "        \
+                "FROM  CallstackFrame "     \
+                "WHERE functionId = ? AND processId = ? ;";
 
-            // Execute the query.
-            while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
+            rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+
+            if (rc == SQLITE_OK)
             {
-                csId = sqlite3_column_int(pQueryStmt, 0);
-                uniqueSet.insert(csId);
+                sqlite3_bind_int(pQueryStmt, 1, funcId);
+                sqlite3_bind_int(pQueryStmt, 2, processId);
+
+                // Execute the query.
+                while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
+                {
+                    csId = sqlite3_column_int(pQueryStmt, 0);
+                    uniqueSet.insert(csId);
+                }
             }
+
+            // Finalize the statement.
+            sqlite3_finalize(pQueryStmt);
         }
-
-        // Finalize the statement.
-        sqlite3_finalize(pQueryStmt);
-
-        // Recursive function which has selfSamples, there will be duplicate callstackIds.
-        // Hence using unique set to avoid duplicate callstackIds
-        query.str("");
-        query << "SELECT DISTINCT callstackId "        \
+        else
+        {
+            // Recursive function which has selfSamples, there will be duplicate callstackIds.
+            // Hence using unique set to avoid duplicate callstackIds
+            query.str("");
+            query << "SELECT DISTINCT callstackId "        \
                 "FROM  CallstackLeaf "     \
-                "WHERE functionId = ? ;";
+                "WHERE functionId = ? AND processId = ? ;";
 
-        pQueryStmt = nullptr;
-        rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+            pQueryStmt = nullptr;
+            rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
 
-        if (rc == SQLITE_OK)
-        {
-            sqlite3_bind_int(pQueryStmt, 1, funcId);
-
-            // Execute the query.
-            while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
+            if (rc == SQLITE_OK)
             {
-                csId = sqlite3_column_int(pQueryStmt, 0);
-                uniqueSet.insert(csId);
+                sqlite3_bind_int(pQueryStmt, 1, funcId);
+                sqlite3_bind_int(pQueryStmt, 2, processId);
+
+                // Execute the query.
+                while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
+                {
+                    csId = sqlite3_column_int(pQueryStmt, 0);
+                    uniqueSet.insert(csId);
+                }
             }
+
+            // Finalize the statement.
+            sqlite3_finalize(pQueryStmt);
         }
 
-        // Finalize the statement.
-        sqlite3_finalize(pQueryStmt);
-
+        // TODO: Why do i need to use uniqueSet here, already only DISTINCT callstackids are returned
+        // by db layer
         for (auto& id : uniqueSet)
         {
             csIds.push_back(id);
@@ -6449,13 +6508,14 @@ bool AmdtDatabaseAccessor::GetUnknownCallstackLeafsByProcessId(AMDTProcessId    
 bool AmdtDatabaseAccessor::GetCallstackLeafData(AMDTProcessId       processId,
                                                 AMDTCounterId       counterId,
                                                 gtUInt32            callStackId,
+                                                AMDTFunctionId      funcId,
                                                 CallstackFrameVec&  leafs)
 {
     bool ret = false;
 
     if (m_pImpl != nullptr)
     {
-        ret = m_pImpl->GetCallstackLeafData(processId, counterId, callStackId, leafs);
+        ret = m_pImpl->GetCallstackLeafData(processId, counterId, callStackId, funcId, leafs);
     }
 
     return ret;
@@ -6478,13 +6538,14 @@ bool AmdtDatabaseAccessor::GetCallstackFrameData(AMDTProcessId       processId,
 
 bool AmdtDatabaseAccessor::GetCallstackIds(AMDTProcessId        processId,
                                            AMDTFunctionId       funcId,
+                                           bool                 isLeafEntries,
                                            gtVector<gtUInt32>&  csIds)
 {
     bool ret = false;
 
     if (m_pImpl != nullptr)
     {
-        ret = m_pImpl->GetCallstackIds(processId, funcId, csIds);
+        ret = m_pImpl->GetCallstackIds(processId, funcId, isLeafEntries, csIds);
     }
 
     return ret;

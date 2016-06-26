@@ -545,7 +545,10 @@ static void PrintCGFunctions(osFile& reportFile, AMDTCallGraphFunctionVec& funcs
     {
         s << p.m_functionInfo.m_name;
         s.appendFormattedString(L",%5.04f", static_cast<float>(p.m_totalSelfSamples));
-        s.appendFormattedString(L",%5.04f\n", static_cast<float>(p.m_totalDeepSamples));
+        s.appendFormattedString(L",%5.04f", static_cast<float>(p.m_totalDeepSamples));
+        s << L",";
+        s << p.m_srcFile;
+        s << L"\n";
     }
 
     s << L"\n";
@@ -593,11 +596,26 @@ static void PrintCGInfo(osFile& reportFile, AMDTCallGraphFunction& self, AMDTCal
 }
 
 
-//static void PrintCGPath(gtVector<AMDTCallGraphPath>&  paths)
-//{
-//    (void)(paths);
-//    return;
-//}
+static void PrintCGPath(osFile& reportFile, gtVector<AMDTCallGraphPath>&  paths)
+{
+    gtString s;
+
+    s << L"\n";
+
+    for (auto& p : paths)
+    {
+        for (auto& q : p)
+        {
+            s << ",";
+            s << q.m_functionInfo.m_name;
+        }
+        s << L"\n";
+    }
+
+    reportFile.writeString(s);
+
+    return;
+}
 
 #endif // AMDT_ENABLE_DB_SUPPORT
 
@@ -655,7 +673,7 @@ HRESULT CpuProfileReport::ReportFromDb()
 
             AMDTProfileDataOptions options;
             options.m_coreMask = AMDT_PROFILE_ALL_CORES;
-            options.m_ignoreSystemModules = false;
+            options.m_ignoreSystemModules = true;
             options.m_doSort = true;
             options.m_summaryCount = 5;
             options.m_isSeperateByCore = false;
@@ -751,7 +769,7 @@ HRESULT CpuProfileReport::ReportFromDb()
 
             // Get detailed function profiledata
             // FIXME: dont report func data..
-            //funcProfileData.clear();
+            funcProfileData.clear();
 
             for (auto const& func : funcProfileData)
             {
@@ -796,9 +814,9 @@ HRESULT CpuProfileReport::ReportFromDb()
                     ret = profileDbReader.GetCallGraphFunctionInfo(process.m_pid, cgFunc.m_functionInfo.m_functionId, parents, children);
                     PrintCGInfo(reportFile, cgFunc, parents, children);
 
-                    //gtVector<AMDTCallGraphPath> paths;
-                    //ret = profileDbReader.GetCallGraphPaths(process.m_pid, cgFunc.m_functionInfo.m_functionId, paths);
-                    //PrintCGPath(paths);
+                    gtVector<AMDTCallGraphPath> paths;
+                    ret = profileDbReader.GetCallGraphPaths(process.m_pid, cgFunc.m_functionInfo.m_functionId, paths);
+                    PrintCGPath(reportFile, paths);
                 }
             }
 

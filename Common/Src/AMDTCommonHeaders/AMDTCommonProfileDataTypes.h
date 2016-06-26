@@ -337,6 +337,7 @@ struct AMDTCallGraphFunction
     gtString                m_srcFile;
     gtUInt32                m_srcFileLine = 0;
     gtVAddr                 m_moduleBaseAddr = 0;
+    bool                    m_isSystemModule = false;
 
     gtUInt64                m_totalSelfSamples = 0;
     gtUInt64                m_totalDeepSamples = 0;
@@ -358,6 +359,7 @@ struct CallstackFrame
     AMDTProfileFunctionInfo m_funcInfo;
     gtUInt32                m_depth;
     bool                    m_isLeaf = false;
+    bool                    m_isSystemodule = false;
     gtVAddr                 m_moduleBaseAddr;
 
     gtUInt32                m_counterId;
