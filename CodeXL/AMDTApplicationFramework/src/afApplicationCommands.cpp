@@ -307,6 +307,13 @@ bool afApplicationCommands::ConvertSamplesFilePath(const osFilePath& srcFilePath
             gtString fileName, extension;
             srcFilePath.getFileName(fileName);
             srcFilePath.getFileExtension(extension);
+
+            #if AMDT_BUILD_TARGET == AMDT_LINUX_OS
+            if (folderEnum == osFilePath::OS_CODEXL_MAT_MUL_SAMPLE_PATH)
+            {
+                srcFilePath.appendSubDirectory(AF_STR_CodeXLMatMulSourceFolderName);
+            }
+            #endif
             localSrcFilePath.setFileName(fileName);
             localSrcFilePath.setFileExtension(extension);
         }
