@@ -372,25 +372,31 @@ void afSourceCodeView::onTextChanged()
 {
     if (!_ignoreTextChanged && !m_mdiFilePath.isEmpty())
     {
+        // Mark the file as modified:
+        m_isModified = QsciScintilla::isUndoAvailable();
         // Get the application commands instance:
-        GT_IF_WITH_ASSERT(m_pApplicationCommands != nullptr)
+        GT_IF_WITH_ASSERT(m_pApplicationCommands != nullptr )
         {
-            m_pApplicationCommands->MarkMDIWindowAsChanged(m_mdiFilePath, true);
-
-            // Mark the file as modified:
-            m_isModified = true;
-
-            // If tree selection is on:
-            if ((m_pMatchingTreeItemData != nullptr) && (m_pMatchingTreeItemData->m_pTreeWidgetItem != nullptr))
+            if (m_isModified)
             {
-                // Get the application tree:
-                afApplicationTree* pTree = m_pApplicationCommands->applicationTree();
-                GT_IF_WITH_ASSERT((pTree != nullptr) && (pTree->treeControl() != nullptr))
+                m_pApplicationCommands->MarkMDIWindowAsChanged(m_mdiFilePath, true);
+
+                // If tree selection is on:
+                if ((m_pMatchingTreeItemData != nullptr) && (m_pMatchingTreeItemData->m_pTreeWidgetItem != nullptr))
                 {
-                    // Select the item in tree:
-                    m_pMatchingTreeItemData->m_pTreeWidgetItem->setSelected(true);
-                    pTree->treeControl()->setCurrentItem(m_pMatchingTreeItemData->m_pTreeWidgetItem);
+                    // Get the application tree:
+                    afApplicationTree* pTree = m_pApplicationCommands->applicationTree();
+                    GT_IF_WITH_ASSERT((pTree != nullptr) && (pTree->treeControl() != nullptr))
+                    {
+                        // Select the item in tree:
+                        m_pMatchingTreeItemData->m_pTreeWidgetItem->setSelected(true);
+                        pTree->treeControl()->setCurrentItem(m_pMatchingTreeItemData->m_pTreeWidgetItem);
+                    }
                 }
+            }
+            else
+            {
+                m_pApplicationCommands->MarkMDIWindowAsChanged(m_mdiFilePath, false);
             }
         }
     }
