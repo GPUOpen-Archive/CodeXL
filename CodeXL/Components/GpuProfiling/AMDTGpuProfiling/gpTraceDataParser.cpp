@@ -325,11 +325,6 @@ void gpTraceDataParser::OnParse(VKAPIInfo* pAPIInfo, bool& stopParsing)
             // Add the item to the data container
             m_pSessionDataContainer->AddVKGPUTraceItem((VKGPUTraceInfo*)pAPIInfo);
         }
-
-        if (m_pSessionDataContainer->APICount() > GP_MAX_API_TO_PARSE)
-        {
-            stopParsing = true;
-        }
     }
 }
 

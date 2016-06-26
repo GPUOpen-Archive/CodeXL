@@ -31,6 +31,7 @@
 
 #include <AMDTOSWrappers/Include/osFilePath.h>
 #include <AMDTOSWrappers/Include/osFile.h>
+#include <AMDTOSWrappers/Include/osMachine.h>
 
 using namespace std;
 using namespace GPULogger;
@@ -42,6 +43,10 @@ const static std::string s_str_threadAPICountHeaderPrefix = "//ThreadAPICount=";
 // The Vulkan timestamps are double number. The data structures expect long long numbers, so we multiply the double timestamp by a GP_VK_TIMESTAMP_FACTOR
 // to make sure that we get integer value. In the front-end, we will perform the opposite operation
 #define GP_VK_TIMESTAMP_MILLISECONDS_TO_NANOSECONDS_FACTOR 1000000
+
+#define KILO_BYTE 1024
+#define MEGA_BYTE (KILO_BYTE * 1024)
+static const size_t s_min_vm_size_for_api_parse(100 * MEGA_BYTE);
 
 VKAtpFilePart::VKAtpFilePart(const Config& config, bool shouldReleaseMemory) : IAtpFilePart(config, shouldReleaseMemory),
     m_currentParsedTraceType(API), m_currentParsedThreadID(0), m_currentParsedThreadAPICount(0),
@@ -319,6 +324,7 @@ bool VKAtpFilePart::Parse(std::istream& in, std::string& outErrorMsg)
     bool retVal = true;
     int currentParsedAPI = 0;
     ErrorMessageUpdater errorMessageUpdater(outErrorMsg, this);
+    size_t fileLineCount = 0;
 
     do
     {
@@ -338,6 +344,35 @@ bool VKAtpFilePart::Parse(std::istream& in, std::string& outErrorMsg)
             // Skip empty lines in the trace
             if (!line.empty() && (line != "NODATA"))
             {
+                //**************** Patch for FA, we don't want to crash if VM is exceeded ******************************/
+                /***************** this should be removed when we implement SqlLite based parsing solution**************/
+                SP_TODO("Remove this patch when we implement SqlLite based solution for parsing")
+                    ++fileLineCount;
+
+                //check every 1000 lines if we still got enough virtual memory
+                if (fileLineCount % 1000 == 0)
+                {
+                    gtUInt64 totalRamSizet = 0;
+                    gtUInt64 availRamSizet = 0;
+                    gtUInt64 totalPageSizet = 0;
+                    gtUInt64 availPageSizet = 0;
+                    gtUInt64 totalVirtualSizet = 0;
+                    gtUInt64 availVirtualSizet = 0;
+
+                    bool res = osGetLocalMachineMemoryInformation(totalRamSizet, availRamSizet, totalPageSizet, availPageSizet, totalVirtualSizet, availVirtualSizet);
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+                    if (res && availVirtualSizet < s_min_vm_size_for_api_parse)
+#elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
+                    if (res && availPageSizet < s_min_vm_size_for_api_parse)
+#endif
+                    {
+                        m_shouldStopParsing = true;
+                        m_bWarning = false;
+                        m_strWarningMsg = outErrorMsg = "Low on Virtual Memory, stopped processing";
+                        retVal = false;
+                        break;
+                    }
+                }
 
                 bool rcParseLine = false;
                 bool isSectionHeader = ParseSectionHeaderLine(line);
