@@ -807,3 +807,23 @@ unsigned int fnForeachExecutableFile(gtUInt64 processId, bool kernel, void (*pfn
 {
     return g_TaskInfo.ForeachExecutableFile(processId, kernel, pfnProcessModule, pContext);
 }
+
+void fnGetJavaJitBlockInfo(gtVector<std::tuple<gtUInt32, gtString, gtUInt32, gtUInt64, gtUInt64, gtUInt64>>& jitBlockInfo)
+{
+    g_TaskInfo.GetJavaJitBlockInfo(jitBlockInfo);
+}
+
+void fnGetJavaJncInfo(gtVector<std::tuple<gtUInt32, gtString, gtString>>& jncInfoList)
+{
+    g_TaskInfo.GetJavaJncInfo(jncInfoList);
+}
+
+void fnGetClrJitBlockInfo(gtVector<std::tuple<gtUInt32, gtString, gtUInt32, gtUInt64, gtUInt64, gtUInt64>>& jitBlockInfo)
+{
+    g_TaskInfo.GetClrJitBlockInfo(jitBlockInfo);
+}
+
+void fnGetClrJncInfo(gtVector<std::tuple<gtUInt32, gtString, gtString>>& jncInfoList)
+{
+    g_TaskInfo.GetClrJncInfo(jncInfoList);
+}

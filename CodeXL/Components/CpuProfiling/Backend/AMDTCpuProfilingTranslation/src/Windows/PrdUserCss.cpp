@@ -496,7 +496,7 @@ void PrdUserCssRcuHandler::Copy(RcuData*& pSrc, RcuData*& pDest)
 #endif
 
 
-    TiModuleInfo modInfo = { 0 };
+    TiModuleInfo modInfo;
     modInfo.processID = pDestCssRecord->m_ProcessHandle;
     modInfo.cpuIndex = 0;
     modInfo.deltaTick = pDestCssRecord->m_TickStampBegin;

@@ -121,6 +121,8 @@ const std::vector<std::string> SQL_CREATE_DB_STMTS_AGGREGATION =
     "CREATE TABLE SampleContext (id INTEGER PRIMARY KEY AUTOINCREMENT, processThreadId INTEGER, moduleInstanceId INTEGER, coreSamplingConfigurationId INTEGER, functionId INTEGER, offset INTEGER, count INTEGER)", // FOREIGN KEY(processThreadId) REFERENCES ProcessThread(rowid), FOREIGN KEY(moduleInstanceId) REFERENCES ModuleInstance(id), FOREIGN KEY(coreSamplingConfigurationId) REFERENCES CoreSamplingConfiguration(id)
     "CREATE TABLE CallstackFrame (callstackId INTEGER, processId INTEGER, functionId INTEGER, offset INTEGER, depth INTEGER)", // FOREIGN KEY(functionId) REFERENCES Function(id)
     "CREATE TABLE CallstackLeaf (callstackId INTEGER, processId INTEGER, functionId INTEGER, offset INTEGER, samplingConfigurationId INTEGER, selfSamples INTEGER)", // FOREIGN KEY(functionId) REFERENCES Function(id)
+    "CREATE TABLE JITInstance (jitId INTEGER, functionId INTEGER, processId INTEGER, loadAddress INTEGER, size INTEGER)", // FOREIGN KEY(jitId) REFERENCES JITCodeBlob(id), FOREIGN KEY(functionId) REFERENCES Function(id), FOREIGN KEY(processId) REFERENCES Process(id)
+    "CREATE TABLE JITCodeBlob (id INTEGER PRIMARY KEY, srcFilePath TEXT, jncFilePath TEXT)",
     //"CREATE TABLE Callgraph (id INTEGER NOT NULL, callerId INTEGER, calleeId INTEGER, edgeLevel INTEGER)", // FOREIGN KEY(callerId) REFERENCES Function(id), FOREIGN KEY(calleeId) REFERENCES Function(id), FOREIGN KEY(samplingConfigurationId) REFERENCES SamplingConfiguration(id)
     //"CREATE TABLE CallgraphSampleAggregation (callgraphId INTEGER NOT NULL, sampleContextId INTEGER, selfSamples INTEGER, deepSamples INTEGER)", // FOREIGN KEY(callgraphId) REFERENCES Callgraph(id), FOREIGN KEY(sampleContextId) REFERENCES SampleContext(id)
     //"CREATE UNIQUE INDEX 'unique_samples' ON SampleContext (processThreadId, moduleInstanceId, coreSamplingConfigurationId, functionId, offset)",
@@ -233,6 +235,8 @@ public:
             sqlite3_finalize(m_pFunctionIdQueryStmt);
             sqlite3_finalize(m_pCallStackFrameInsertStmt);
             sqlite3_finalize(m_pCallStackLeafInsertStmt);
+            sqlite3_finalize(m_pJitCodeBlobInsertStmt);
+            sqlite3_finalize(m_pJitInstanceInsertStmt);
         }
 
         if (m_isCurrentDbOpenForRead)
@@ -532,6 +536,28 @@ public:
         return ret;
     }
 
+    bool PrepareInsertJitInstanceStatement()
+    {
+        bool ret = false;
+
+        const char* pCsSqlCmd = "INSERT INTO JITInstance (jitId, functionId, processId, loadAddress, size) VALUES(?, ?, ?, ?, ?);";
+        int rc = sqlite3_prepare_v2(m_pWriteDbConn, pCsSqlCmd, -1, &m_pJitInstanceInsertStmt, nullptr);
+        ret = (rc == SQLITE_OK);
+
+        return ret;
+    }
+
+    bool PrepareInsertJitCodeBlobStatement()
+    {
+        bool ret = false;
+
+        const char* pCsSqlCmd = "INSERT INTO JITCodeBlob (id, srcFilePath, jncFilePath) VALUES(?, ?, ?);";
+        int rc = sqlite3_prepare_v2(m_pWriteDbConn, pCsSqlCmd, -1, &m_pJitCodeBlobInsertStmt, nullptr);
+        ret = (rc == SQLITE_OK);
+
+        return ret;
+    }
+
     bool PrepareGetModuleIdStatement()
     {
         bool ret = false;
@@ -622,7 +648,9 @@ public:
                    PrepareInsertSampleContextStatement() &&
                    PrepareUpdateSampleContextStatement() &&
                    PrepareInsertCallStackFrameStatement() &&
-                   PrepareInsertCallStackLeafStatement();
+                   PrepareInsertCallStackLeafStatement() &&
+                   PrepareInsertJitInstanceStatement() &&
+                   PrepareInsertJitCodeBlobStatement();
 
         return ret;
     }
@@ -1605,6 +1633,43 @@ public:
         }
 
         sqlite3_reset(m_pModuleInstanceInsertStmt);
+        return ret;
+    }
+
+    bool InsertJitInstanceInfo(gtUInt32 jitId, gtUInt64 functionId, gtUInt64 pid, gtUInt64 loadAddr, gtUInt32 size)
+    {
+        bool ret = false;
+
+        sqlite3_bind_int(m_pJitInstanceInsertStmt, 1, jitId);
+        sqlite3_bind_int64(m_pJitInstanceInsertStmt, 2, functionId);
+        sqlite3_bind_int64(m_pJitInstanceInsertStmt, 3, pid);
+        sqlite3_bind_int64(m_pJitInstanceInsertStmt, 4, loadAddr);
+        sqlite3_bind_int(m_pJitInstanceInsertStmt, 5, size);
+
+        if (SQLITE_DONE == sqlite3_step(m_pJitInstanceInsertStmt))
+        {
+            ret = true;
+        }
+
+        sqlite3_reset(m_pJitInstanceInsertStmt);
+        return ret;
+    }
+
+    bool InsertJitCodeBlobInfo(gtUInt32 id, const std::string& sourceFilePath, const std::string& jncFilePath)
+    {
+        bool ret = false;
+
+        sqlite3_bind_int(m_pJitCodeBlobInsertStmt, 1, id);
+        sqlite3_bind_text(m_pJitCodeBlobInsertStmt, 2, sourceFilePath.c_str(), sourceFilePath.size(), SQLITE_STATIC);
+        //sqlite3_bind_blob(m_pJitCodeBlobInsertStmt, 3, pBlob, blobLength, SQLITE_STATIC);
+        sqlite3_bind_text(m_pJitCodeBlobInsertStmt, 3, jncFilePath.c_str(), jncFilePath.size(), SQLITE_STATIC);
+
+        if (SQLITE_DONE == sqlite3_step(m_pJitCodeBlobInsertStmt))
+        {
+            ret = true;
+        }
+
+        sqlite3_reset(m_pJitCodeBlobInsertStmt);
         return ret;
     }
 
@@ -5421,6 +5486,8 @@ public:
     sqlite3_stmt* m_pFunctionIdQueryStmt = nullptr;
     sqlite3_stmt* m_pCallStackFrameInsertStmt = nullptr;
     sqlite3_stmt* m_pCallStackLeafInsertStmt = nullptr;
+    sqlite3_stmt* m_pJitCodeBlobInsertStmt = nullptr;
+    sqlite3_stmt* m_pJitInstanceInsertStmt = nullptr;
 
     // This thread is used to commit data to the database (which might take time).
     // As we would like to avoid stalls in the main thread.
@@ -5785,6 +5852,37 @@ bool AmdtDatabaseAccessor::InsertCallStackLeaf(gtUInt32 callStackId, gtUInt64 pr
 
     return ret;
 }
+
+bool AmdtDatabaseAccessor::InsertJitInstance(gtUInt32 jitId, gtUInt64 functionId, gtUInt64 pid, gtUInt64 loadAddr, gtUInt32 size)
+{
+    bool ret = false;
+
+    if (m_pImpl != nullptr)
+    {
+        ret = m_pImpl->InsertJitInstanceInfo(jitId, functionId, pid, loadAddr, size);
+    }
+
+    return ret;
+}
+
+bool AmdtDatabaseAccessor::InsertJitCodeBlob(gtUInt32 id, const gtString& sourceFilePath, const gtString& jncFilePath)
+{
+    bool ret = false;
+
+    if (m_pImpl != nullptr)
+    {
+        std::string srcFileNameAsUtf8Str;
+        sourceFilePath.asUtf8(srcFileNameAsUtf8Str);
+
+        std::string jncFilePathAsUtf8Str;
+        jncFilePath.asUtf8(jncFilePathAsUtf8Str);
+
+        ret = m_pImpl->InsertJitCodeBlobInfo(id, srcFileNameAsUtf8Str, jncFilePathAsUtf8Str);
+    }
+
+    return ret;
+}
+
 
 //
 //  Update APIs

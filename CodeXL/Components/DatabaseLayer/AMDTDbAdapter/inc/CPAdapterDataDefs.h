@@ -144,10 +144,37 @@ struct CPACallStackLeafInfo
     gtUInt64 m_selfSamples = 0;
 
     CPACallStackLeafInfo(gtUInt32 callStackId, gtUInt64 processId, gtUInt64 funcId, gtUInt64 offset, gtUInt32 counterId, gtUInt64 selfSamples) :
-    m_callStackId(callStackId), m_processId(processId), m_funcId(funcId), m_offset(offset), m_counterId(counterId), m_selfSamples(selfSamples) {}
+        m_callStackId(callStackId), m_processId(processId), m_funcId(funcId), m_offset(offset), m_counterId(counterId), m_selfSamples(selfSamples) {}
 };
 
 using CPACallStackLeafInfoList = gtVector<CPACallStackLeafInfo>;
 
+struct CPAJitInstanceInfo
+{
+    gtUInt32 m_jitId = 0;
+    gtUInt64 m_funcId = 0;
+    gtUInt64 m_processId = 0;
+    gtUInt64 m_loadAddr = 0;
+    gtUInt32 m_size = 0;
+
+    CPAJitInstanceInfo(gtUInt32 jitId, gtUInt64 funcId, gtUInt64 processId, gtUInt64 loadAddr, gtUInt32 size) :
+        m_jitId(jitId), m_funcId(funcId), m_processId(processId), m_loadAddr(loadAddr), m_size(size) {}
+};
+
+using CPAJitInstanceInfoList = gtVector<CPAJitInstanceInfo>;
+
+struct CPAJitCodeBlobInfo
+{
+    gtUInt32 m_id = 0;
+    gtString m_srcFilePath;
+    //gtUByte *m_pCodeBlob = nullptr;
+    //gtUInt32 m_blobLength = 0;
+    gtString m_jncFilePath;
+
+    CPAJitCodeBlobInfo(gtUInt32 id, gtString srcFilePath, gtString jncFilePath) :
+        m_id(id), m_srcFilePath(srcFilePath), m_jncFilePath(jncFilePath) {}
+};
+
+using CPAJitCodeBlobInfoList = gtVector<CPAJitCodeBlobInfo>;
 
 #endif //_CPADAPTERDATADEFS_H_

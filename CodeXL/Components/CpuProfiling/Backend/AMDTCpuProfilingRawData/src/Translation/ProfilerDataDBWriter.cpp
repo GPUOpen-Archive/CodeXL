@@ -32,7 +32,7 @@ static inline gtUInt32 generateFuncId(gtUInt16 moduleId, gtUInt16 funcSeq)
 
 int ProfilerDataWriterThread::entryPoint()
 {
-    const unsigned WRITER_WAIT_MS = 50;
+    const unsigned WRITER_WAIT_MS = 5;
 
     while (true)
     {
@@ -142,6 +142,18 @@ void ProfilerDataDBWriter::ClearWriterQueue()
             {
                 CPACallStackLeafInfoList  *csLeafInfoList = reinterpret_cast<CPACallStackLeafInfoList*>(data);
                 delete csLeafInfoList;
+                break;
+            }
+            case TRANSLATED_DATA_TYPE_JITINSTANCE_INFO:
+            {
+                CPAJitInstanceInfoList *jitInstanceInfoList = reinterpret_cast<CPAJitInstanceInfoList*>(data);
+                delete jitInstanceInfoList;
+                break;
+            }
+            case TRANSLATED_DATA_TYPE_JITCODEBLOB_INFO:
+            {
+                CPAJitCodeBlobInfoList *jitCodeBlobInfoList = reinterpret_cast<CPAJitCodeBlobInfoList*>(data);
+                delete jitCodeBlobInfoList;
                 break;
             }
             default:
@@ -440,6 +452,26 @@ void ProfilerDataDBWriter::Write(TranslatedDataType type, void* data)
                 m_pCpuProfDbAdapter->InsertCallStackLeafs(*csLeafInfoList);
             }
             delete csLeafInfoList;
+            break;
+        }
+        case TRANSLATED_DATA_TYPE_JITINSTANCE_INFO:
+        {
+            CPAJitInstanceInfoList *jitInstanceInfoList = reinterpret_cast<CPAJitInstanceInfoList*>(data);
+            if (jitInstanceInfoList->size() > 0)
+            {
+                m_pCpuProfDbAdapter->InsertJitInstanceInfo(*jitInstanceInfoList);
+            }
+            delete jitInstanceInfoList;
+            break;
+        }
+        case TRANSLATED_DATA_TYPE_JITCODEBLOB_INFO:
+        {
+            CPAJitCodeBlobInfoList *jitCodeBlobInfoList = reinterpret_cast<CPAJitCodeBlobInfoList*>(data);
+            if (jitCodeBlobInfoList->size() > 0)
+            {
+                m_pCpuProfDbAdapter->InsertJitCodeBlobInfo(*jitCodeBlobInfoList);
+            }
+            delete jitCodeBlobInfoList;
             break;
         }
         default:

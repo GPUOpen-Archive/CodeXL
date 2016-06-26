@@ -1905,28 +1905,28 @@ void WinTaskInfo::GetDrivePartitionInfo()
     if (buffer)
     {
         wchar_t* temp = buffer;
-        
+
         //for each null-terminated drive string in the list
         while (temp[0] != 0)
         {
             //we strip off the trailing backslash for the QueryDosDevice call
             int curDriveSize = wcslen(temp);
-        
+
             if ((temp[curDriveSize - 1] == L'/') ||
                 (temp[curDriveSize - 1] == L'\\'))
             {
                 temp[curDriveSize - 1] = L'\0';
             }
-        
+
             if (QueryDosDevice(temp, deviceName, OS_MAX_PATH))
             {
                 // add it into drive map.
                 m_tiDriveMap.insert(DriveMap::value_type(deviceName, temp));
             }
-        
+
             temp += curDriveSize + 1;
         }
-        
+
         delete [] buffer;
     }
 
@@ -2385,6 +2385,7 @@ HRESULT WinTaskInfo::GetUserModInfo(TiModuleInfo* pModInfo, TiTimeType systemTim
 
         pModInfo->moduleType = item.second.moduleType;
 
+
         switch (item.second.moduleType)
         {
             case evPEModule:
@@ -2397,6 +2398,18 @@ HRESULT WinTaskInfo::GetUserModInfo(TiModuleInfo* pModInfo, TiTimeType systemTim
 
             case evManaged:
             case evJavaModule:
+                // This instanceId assignment should be done in JitTaskInfo.
+                // Also, m_nextModInstanceId declaration should be moved to JitTaskInfo.
+                if (item.second.instanceId == 0)
+                {
+                    item.second.instanceId = AtomicAdd(m_nextModInstanceId, 1);
+                }
+
+                if (item.second.moduleId == 0)
+                {
+                    item.second.moduleId = pModInfo->moduleId;
+                }
+
                 if (GetUserJitModInfo(pModInfo, systemTimeTick, item))
                 {
                     hr = S_OK;
@@ -5161,4 +5174,40 @@ unsigned int WinTaskInfo::ForeachExecutableFile(gtUInt64 processId, bool kernel,
     }
 
     return modulesCount;
+}
+
+void WinTaskInfo::GetClrJitBlockInfo(gtVector<std::tuple<gtUInt32, gtString, gtUInt32, gtUInt64, gtUInt64, gtUInt64>>& jitBlockInfo)
+{
+    for (const auto& it : m_tiModMap)
+    {
+        auto jitIt = m_JitClrMap.find(it.first);
+
+        if (m_JitClrMap.end() != jitIt && wcslen(jitIt->second.movedJncFileName) != 0)
+        {
+            gtUInt32 jncIndex = jitIt->second.jncIndex;
+            gtString moduleName = jitIt->second.categoryName;
+            gtUInt32 instanceId = it.second.instanceId;
+            gtUInt64 pid = it.first.processId;
+            gtUInt64 loadAddr = it.first.moduleLoadAddr;
+            gtUInt64 size = it.second.moduleSize;
+
+            // <jncIdx, moduleId, instanceId, pid, loadAddr>
+            jitBlockInfo.emplace_back(jncIndex, moduleName, instanceId, pid, loadAddr, size);
+        }
+    }
+}
+
+void WinTaskInfo::GetClrJncInfo(gtVector<std::tuple<gtUInt32, gtString, gtString>>& jncInfoList)
+{
+    for (const auto& it : m_JitClrMap)
+    {
+        if (wcslen(it.second.movedJncFileName) != 0)
+        {
+            // <jncIdx, srcFilePath, jncFilePath>
+            gtString jncFilePath(std::to_wstring(it.first.processId).c_str());
+            jncFilePath.append(osFilePath::osPathSeparator);
+            jncFilePath.append(it.second.movedJncFileName);
+            jncInfoList.emplace_back(it.second.jncIndex, it.second.srcFileName, jncFilePath);
+        }
+    }
 }

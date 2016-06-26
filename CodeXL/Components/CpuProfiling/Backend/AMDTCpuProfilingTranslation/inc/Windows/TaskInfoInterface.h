@@ -43,14 +43,14 @@ struct TI_THREAD_INFO
 // ModuleInfo: This structure is use for power profiler
 typedef struct LoadModuleInfo
 {
-	gtUInt32	m_pid;
-	gtUInt64	m_moduleStartAddr;
-	gtUInt32	m_modulesize;
-	ModTypeEnum m_moduleType;
-	char		m_pModulename[OS_MAX_PATH];
-	bool		m_isKernel;
-	gtUInt32	m_moduleId;
-	gtUInt32	m_instanceId;
+    gtUInt32	m_pid;
+    gtUInt64	m_moduleStartAddr;
+    gtUInt32	m_modulesize;
+    ModTypeEnum m_moduleType;
+    char		m_pModulename[OS_MAX_PATH];
+    bool		m_isKernel;
+    gtUInt32	m_moduleId;
+    gtUInt32	m_instanceId;
 } LoadModuleInfo;
 
 // start task info capturing, with optional directory for driver
@@ -175,5 +175,13 @@ void fnLoadProcessExecutableFiles(gtUInt64 processId, osSynchronizedQueue<gtStri
 PeFile* fnFindExecutableFile(gtUInt64 processId, gtUInt64 addr);
 
 unsigned int fnForeachExecutableFile(gtUInt64 processId, bool kernel, void (*pfnProcessModule)(ExecutableFile&, void*), void* pContext);
+
+void fnGetJavaJitBlockInfo(gtVector<std::tuple<gtUInt32, gtString, gtUInt32, gtUInt64, gtUInt64, gtUInt64>>& jitBlockInfo);
+
+void fnGetJavaJncInfo(gtVector<std::tuple<gtUInt32, gtString, gtString>>& jncInfoList);
+
+void fnGetClrJitBlockInfo(gtVector<std::tuple<gtUInt32, gtString, gtUInt32, gtUInt64, gtUInt64, gtUInt64>>& jitBlockInfo);
+
+void fnGetClrJncInfo(gtVector<std::tuple<gtUInt32, gtString, gtString>>& jncInfoList);
 
 #endif // _TASKINFOINTERFACE_H_
