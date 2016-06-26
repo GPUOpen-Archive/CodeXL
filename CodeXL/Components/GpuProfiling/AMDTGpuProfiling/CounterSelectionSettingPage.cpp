@@ -380,6 +380,23 @@ void CounterSelectionSettingWindow::RestoreDefaultProjectSettings()
         bool isInternalBuild = Util::IsInternalBuild();
         Util::SetCheckState(m_pCounterListTW, !isInternalBuild);
 
+        // Set the public counters as checked by default
+        QTreeWidgetItem* pGeneralTreeItem = Util::FindTreeItem(m_pCounterListTW, "General");
+        if (pGeneralTreeItem != nullptr)
+        {
+            pGeneralTreeItem->setCheckState(0, Qt::Checked);
+        }
+        QTreeWidgetItem* pLocalMemTreeItem = Util::FindTreeItem(m_pCounterListTW, "LocalMemory");
+        if (pGeneralTreeItem != nullptr)
+        {
+            pLocalMemTreeItem->setCheckState(0, Qt::Checked);
+        }
+        QTreeWidgetItem* pGlobalTreeItem = Util::FindTreeItem(m_pCounterListTW, "GlobalMemory");
+        if (pGlobalTreeItem != nullptr)
+        {
+            pGlobalTreeItem->setCheckState(0, Qt::Checked);
+        }
+
         UpdateCountersTreeCheckState();
 
         UpdateLabel();
