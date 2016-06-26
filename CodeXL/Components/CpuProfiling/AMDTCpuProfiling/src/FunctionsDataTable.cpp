@@ -989,10 +989,26 @@ bool FunctionsDataTable::fillSummaryTables(int counterIdx)
             AMDTProfileModuleInfoVec procInfo;
             rc = m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_MAX_VALUE, profData.m_moduleId, procInfo);
             GT_ASSERT(rc);
-            list << procInfo.at(0).m_name.asASCIICharArray();
+
+			if (profData.m_moduleId == AMDT_PROFILE_ALL_MODULES)
+			{
+				list << "";
+			}
+			else
+			{
+				list << procInfo.at(0).m_name.asASCIICharArray();
+
+			}
 
             addRow(list, nullptr);
 
+			SetIcon(procInfo.at(0).m_path,
+				rowCount()-1,
+				AMDT_FUNC_SUMMMARY_FUNC_NAME_COL,
+				AMDT_FUNC_SUMMMARY_FUNC_MODULE_COL,
+				!procInfo.at(0).m_is64Bit,
+				FunctionDataIndexRole);
+#if 0
 			QString modulefullPath(procInfo.at(0).m_path.asASCIICharArray());
 			int row = rowCount() - 1;
 			QTableWidgetItem* pModuleNameItem = item(row, AMDT_FUNC_SUMMMARY_FUNC_MODULE_COL);
@@ -1001,15 +1017,24 @@ bool FunctionsDataTable::fillSummaryTables(int counterIdx)
 				pModuleNameItem->setToolTip(modulefullPath);
 			}
 
-			if (true == rc)
-            {
-                rc = setModuleIcon(row, procInfo.at(0));
-            }
+			QPixmap* pIcon = CPUProfileDataTable::moduleIcon(procInfo.at(0).m_path, !procInfo.at(0).m_is64Bit);
+			QTableWidgetItem* pNameItem = item(row, AMDT_FUNC_SUMMMARY_FUNC_NAME_COL);
 
-            if (true == rc)
-            {
-                rc = delegateSamplePercent(3);
-            }
+			if (pNameItem != nullptr)
+			{
+				// Set the original position in function vector:
+				pNameItem->setData(FunctionDataIndexRole, QVariant(row));
+
+				if (pIcon != nullptr)
+				{
+					pNameItem->setIcon(QIcon(*pIcon));
+				}
+			}
+#endif
+			if (true == rc)
+			{
+				rc = delegateSamplePercent(AMDT_FUNC_SUMMMARY_FUNC_PER_SAMPLE_COL);
+			}
         }
 
         setSortingEnabled(true);
@@ -1062,6 +1087,14 @@ bool FunctionsDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allModul
 			}
 
 			addRow(list, nullptr);
+
+			SetIcon(procInfo.at(0).m_path,
+				rowCount() - 1,
+				AMDT_FUNC_SUMMMARY_FUNC_NAME_COL,
+				AMDT_FUNC_SUMMMARY_FUNC_MODULE_COL,
+				!procInfo.at(0).m_is64Bit,
+				FunctionDataIndexRole);
+
 		}
 	}
 
@@ -1102,6 +1135,10 @@ bool FunctionsDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId,
 		}
 
 		AddRowToTable(allModuleData);
+
+		hideColumn(AMDT_FUNC_SUMMMARY_FUNC_ID_COL);
+		resizeColumnToContents(AMDT_FUNC_SUMMMARY_FUNC_NAME_COL);
+		resizeColumnToContents(AMDT_FUNC_SUMMMARY_FUNC_NAME_COL + 1);
 
 	}
 

@@ -274,6 +274,7 @@ protected:
     /// checks the profiling mode and return true if Cache Line profiling
     bool IsCacheLineProfiling() const;
 	bool delegateSamplePercent(int colNum);
+	void SetIcon(gtString modulePath, AMDTUInt32 rowIndex, AMDTUInt32 iconColIndex, AMDTUInt32 toolTipColidx, bool is32Bit, int idxRole);
 
 	shared_ptr<DisplayFilter>  m_pDisplayFilter = nullptr;
   shared_ptr<cxlProfileDataReader> m_pProfDataRdr = nullptr;

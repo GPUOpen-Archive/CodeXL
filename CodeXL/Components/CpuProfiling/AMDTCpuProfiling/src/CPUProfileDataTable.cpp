@@ -1932,3 +1932,28 @@ bool CPUProfileDataTable::initializeTableHeaders(shared_ptr<DisplayFilter> dipla
     }
     return retVal;
 }
+
+
+void CPUProfileDataTable::SetIcon(gtString modulePath, AMDTUInt32 rowIndex, AMDTUInt32 iconColIndex, AMDTUInt32 toolTipColidx, bool is32Bit, int idxRole)
+{
+	QString modulefullPath(acGTStringToQString(modulePath));
+	QTableWidgetItem* pModuleNameItem = item(rowIndex, toolTipColidx);
+	if (pModuleNameItem != nullptr)
+	{
+		pModuleNameItem->setToolTip(modulefullPath);
+	}
+
+	QPixmap* pIcon = CPUProfileDataTable::moduleIcon(modulePath, is32Bit);
+	QTableWidgetItem* pNameItem = item(rowIndex, iconColIndex);
+
+	if (pNameItem != nullptr)
+	{
+		// Set the original position in function vector:
+		pNameItem->setData(idxRole, QVariant(rowIndex));
+
+		if (pIcon != nullptr)
+		{
+			pNameItem->setIcon(QIcon(*pIcon));
+		}
+	}
+}
