@@ -42,6 +42,8 @@ enum TranslatedDataType
     TRANSLATED_DATA_TYPE_SAMPLE_INFO,
     TRANSLATED_DATA_TYPE_CSS_FRAME_INFO,
     TRANSLATED_DATA_TYPE_CSS_LEAF_INFO,
+    TRANSLATED_DATA_TYPE_JITINSTANCE_INFO,
+    TRANSLATED_DATA_TYPE_JITCODEBLOB_INFO,
 };
 
 struct TranslatedDataContainer
@@ -69,7 +71,7 @@ public:
     ProfilerDataWriterThread& operator=(ProfilerDataWriterThread&) = delete;
     ProfilerDataWriterThread(ProfilerDataWriterThread&&) = default;
     ProfilerDataWriterThread& operator=(ProfilerDataWriterThread&&) = default;
-    ~ProfilerDataWriterThread() = default;
+    ~ProfilerDataWriterThread() {};
 
     int entryPoint() override;
 

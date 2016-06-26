@@ -21,6 +21,7 @@
 #include <assert.h>
 #include <wchar.h>
 #include <limits.h>
+#include <string>
 
 #include <AMDTOSWrappers/Include/osCriticalSectionLocker.h>
 #include <AMDTOSWrappers/Include/osFilePath.h>
@@ -529,6 +530,8 @@ bool JitTaskInfo::GetUserJitModInfo(TiModuleInfo* pModInfo, TiTimeType systemTim
 
         if (!item.second.bNameConverted)
         {
+            pJitBlock->jncIndex = m_jnc_counter;
+
             wchar_t tmpStr[64];
             swprintf(tmpStr, 64,  L"jnc_%d.jnc", m_jnc_counter++);
 
@@ -662,4 +665,40 @@ bool JitTaskInfo::IsJitProcess32Bit(gtUInt64 jitProcID) const
     }
 
     return bRet;
+}
+
+void JitTaskInfo::GetJavaJitBlockInfo(gtVector<std::tuple<gtUInt32, gtString, gtUInt32, gtUInt64, gtUInt64, gtUInt64>>& jitBlockInfo)
+{
+    for (const auto& it : m_tiModMap)
+    {
+        auto jitIt = m_JitInfoMap.find(it.first);
+
+        if (m_JitInfoMap.end() != jitIt && wcslen(jitIt->second.movedJncFileName) != 0)
+        {
+            gtUInt32 jncIndex = jitIt->second.jncIndex;
+            gtString moduleName = jitIt->second.categoryName;
+            gtUInt32 instanceId = it.second.instanceId;
+            gtUInt64 pid = it.first.processId;
+            gtUInt64 loadAddr = it.first.moduleLoadAddr;
+            gtUInt64 size = it.second.moduleSize;
+
+            // <jncIdx, moduleId, instanceId, pid, loadAddr>
+            jitBlockInfo.emplace_back(jncIndex, moduleName, instanceId, pid, loadAddr, size);
+        }
+    }
+}
+
+void JitTaskInfo::GetJavaJncInfo(gtVector<std::tuple<gtUInt32, gtString, gtString>>& jncInfoList)
+{
+    for (const auto& it : m_JitInfoMap)
+    {
+        if (wcslen(it.second.movedJncFileName) != 0)
+        {
+            // <jncIdx, srcFilePath, jncFilePath>
+            gtString jncFilePath(std::to_wstring(it.first.processId).c_str());
+            jncFilePath.append(osFilePath::osPathSeparator);
+            jncFilePath.append(it.second.movedJncFileName);
+            jncInfoList.emplace_back(it.second.jncIndex, it.second.srcFileName, jncFilePath);
+        }
+    }
 }

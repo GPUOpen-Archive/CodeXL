@@ -183,6 +183,10 @@ public:
 
     unsigned int ForeachExecutableFile(gtUInt64 processId, bool kernel, void (*pfnProcessModule)(ExecutableFile&, void*), void* pContext) const;
 
+    void GetClrJitBlockInfo(gtVector<std::tuple<gtUInt32, gtString, gtUInt32, gtUInt64, gtUInt64, gtUInt64>>& jitBlockInfo);
+
+    void GetClrJncInfo(gtVector<std::tuple<gtUInt32, gtString, gtString>>& jncInfoList);
+
 private:
     bool GetUserPeModInfo(TiModuleInfo* pModInfo, TiTimeType systemTimeTick, ModuleMap::value_type& item);
     bool GetUserOclModInfo(TiModuleInfo* pModInfo, TiTimeType systemTimeTick, ModuleMap::value_type& item);
@@ -282,18 +286,18 @@ private:
     // process map
     ProcessMap  m_tiProcMap;
 
-    // ModuleName/LoadAddress and PeFile map, to avoid crearting
+    // ModuleName/LoadAddress and PeFile map, to avoid creating
     // duplicate PeFile objects for the same DLL
     ModulePeFileMap m_modLoadAddrPEMap;
 
     // Baskar: During profile data collection, the TI contains information about all the processes
     // (and their load-modules) that are running/stopped during profile time (1000's of entries).
     // Where as typically samples will be attributed to only few processes and their loadmodules.
-    // m_tiModMap contains info of all the load modules that are discovered during profile durtion.
+    // m_tiModMap contains info of all the load modules that are discovered during profile duration.
     // And for each sample (IP and CSS RIPs) we need to discover the corresponding load-modules.
     // This upper/lower operations on such a huge set ("S) for reasonably big "n" (IP + CSS RIPs samples)
     // is time consuming. We cannot reduce the "n", but "S" can be greatly simplified by maintaining
-    // only the modules details about the relavant/interesting processes.
+    // only the modules details about the relevant/interesting processes.
     //
     // m_allModulesMap -> will be constructed while processing TI file and this will have details
     // about all the load modules identified during data collection.
@@ -334,7 +338,7 @@ private:
     osCriticalSection m_TIMutexKE;
     osCriticalSection m_TIMutexModule;
 
-    gtUInt32 m_nextModInstanceId = 1;
+    gtInt32 m_nextModInstanceId = 1;
     gtInt32 m_nextModuleId = 1;
 };
 

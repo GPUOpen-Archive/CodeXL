@@ -41,6 +41,10 @@ public:
     HRESULT ReadOldJitInfo(/* [in] */ const wchar_t* pDirectory);
 
     bool IsJitProcess32Bit(gtUInt64 jitProcID) const;
+
+    void GetJavaJitBlockInfo(gtVector<std::tuple<gtUInt32, gtString, gtUInt32, gtUInt64, gtUInt64, gtUInt64>>& jitBlockInfo);
+    void GetJavaJncInfo(gtVector<std::tuple<gtUInt32, gtString, gtString>>& jncInfoList);
+
     // clean up maps
     void CleanupMaps() { Cleanup(); }
 

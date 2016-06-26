@@ -36,30 +36,30 @@ enum ModTypeEnum
 
 struct TiModuleInfo
 {
-    /* [in]  */  gtUInt64 processID;
-    /* [in]  */  unsigned CSvalue;
-    /* [in]  */  gtUInt64 sampleAddr;
-    /* [in]  */  unsigned cpuIndex;
-    /* [in]  */  gtUInt64 deltaTick;
-    /* [out] */  gtUInt64 ModuleStartAddr;
-    /* [out] */  gtUInt64 Modulesize;
-    /* [out] */  ModTypeEnum moduleType;
-    /* [in]  */  unsigned funNameSize;
-    /* [out] */  wchar_t* pFunctionName;
-    /* [out] */  gtUInt64 FunStartAddr;
-    /* [in]  */  unsigned jncNameSize;
-    /* [out] */  wchar_t* pJncName;
-    /* [in]  */  unsigned namesize;
-    /* [out] */  wchar_t* pModulename;
-    /* [in]  */  unsigned srcfilesize;
-    /* [out] */  wchar_t* pJavaSrcFileName;  // This is for Java JITed block;
-    /* [out] */  bool kernel;                // Used for thread profiling.
-    /* [in]  */  unsigned sesdirsize;
-    /* [out] */  wchar_t* pSessionDir;
-    /* [out] */  gtUInt32 moduleId;
-    /* [out] */  gtUInt32 instanceId;
+    /* [in]  */  gtUInt64 processID = 0;
+    /* [in]  */  unsigned CSvalue = 0;
+    /* [in]  */  gtUInt64 sampleAddr = 0;
+    /* [in]  */  unsigned cpuIndex = 0;
+    /* [in]  */  gtUInt64 deltaTick = 0;
+    /* [out] */  gtUInt64 ModuleStartAddr = 0;
+    /* [out] */  gtUInt64 Modulesize = 0;
+    /* [out] */  ModTypeEnum moduleType = evInvalidType;
+    /* [in]  */  unsigned funNameSize = 0;
+    /* [out] */  wchar_t* pFunctionName = nullptr;
+    /* [out] */  gtUInt64 FunStartAddr = 0;
+    /* [in]  */  unsigned jncNameSize = 0;
+    /* [out] */  wchar_t* pJncName = nullptr;
+    /* [in]  */  unsigned namesize = 0;
+    /* [out] */  wchar_t* pModulename = nullptr;
+    /* [in]  */  unsigned srcfilesize = 0;
+    /* [out] */  wchar_t* pJavaSrcFileName = nullptr;  // This is for Java JITed block;
+    /* [out] */  bool kernel = false;                // Used for thread profiling.
+    /* [in]  */  unsigned sesdirsize = 0;
+    /* [out] */  wchar_t* pSessionDir = nullptr;
+    /* [out] */  gtUInt32 moduleId = 0;
+    /* [out] */  gtUInt32 instanceId = 0;
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    /* [out] */  PeFile* pPeFile;
+    /* [out] */  PeFile* pPeFile = nullptr;
 #endif
 };
 
@@ -167,6 +167,7 @@ struct JitBlockValue
     wchar_t jncFileName[OS_MAX_PATH];     // jnc file name
     wchar_t movedJncFileName[OS_MAX_PATH];    // jnc moved to user profile session dir.
     bool    bJncMoved;
+    int     jncIndex = 0;
 
     // default constructor
     JitBlockValue() : bJncMoved(false)

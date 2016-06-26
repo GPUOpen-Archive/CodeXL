@@ -334,6 +334,30 @@ bool amdtProfileDbAdapter::InsertSamples(const CPASampeInfoList& sampleList)
     return ret;
 }
 
+bool amdtProfileDbAdapter::InsertJitInstanceInfo(const CPAJitInstanceInfoList& jitInstanceInfoList)
+{
+    bool ret = false;
+
+    for (const auto& it : jitInstanceInfoList)
+    {
+        ret = m_pDbAccessor->InsertJitInstance(it.m_jitId, it.m_funcId, it.m_processId, it.m_loadAddr, it.m_size);
+    }
+
+    return ret;
+}
+
+bool amdtProfileDbAdapter::InsertJitCodeBlobInfo(CPAJitCodeBlobInfoList& jitCodeBlobInfoList)
+{
+    bool ret = false;
+
+    for (auto& it : jitCodeBlobInfoList)
+    {
+        ret = m_pDbAccessor->InsertJitCodeBlob(it.m_id, it.m_srcFilePath, it.m_jncFilePath);
+    }
+
+    return ret;
+}
+
 //
 //  Update APIs
 //

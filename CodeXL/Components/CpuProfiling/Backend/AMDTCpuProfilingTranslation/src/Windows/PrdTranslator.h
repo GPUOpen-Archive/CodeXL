@@ -201,7 +201,8 @@ public:
     bool GetProfileEventCount(int* pEventCount);
 
     bool GetTimerInterval(gtUInt64* resolution);
-    void addJavaInlinedMethods(CpuProfileModule&  mod);
+    void addJavaInlinedMethods(CpuProfileModule&  mod,
+        gtVector<std::tuple<gtUInt32, gtUInt32, gtUInt32, gtUInt64, gtUInt64, gtUInt64>>& inlinedJitInfo);
 
     void SetDebugSymbolsSearchPath(const wchar_t* pSearchPath, const wchar_t* pServerList, const wchar_t* pCachePath);
 
@@ -443,7 +444,7 @@ private:
     bool WriteMetaProfileDataIntoDB(PidProcessList& processMapList,
                                     NameModuleList& moduleMapList,
                                     ModInstanceList& modInstanceMapList);
-    
+
     void AddIBSFetchEventsToMap(int cpuFamily, int cpuModel);
 
     void AddIBSOpEventsToMap(int cpuFamily, int cpuModel, bool addBr, bool addLS, bool addNB);
@@ -454,11 +455,17 @@ private:
 
     bool CheckForNestedJavaInlinedFunction(CpuProfileFunction&   func,
                                            JavaInlineMap*        jilMap,
-                                           AddrFunctionMultMap&  inlinedFuncMap);
+                                           AddrFunctionMultMap&  inlinedFuncMap,
+                                           gtUInt32&             nextFuncId,
+                                           gtUInt32              moduleId,
+        gtVector<std::tuple<gtUInt32, gtUInt32, gtUInt32, gtUInt64, gtUInt64, gtUInt64>>& inlinedJitInfo);
 
     bool CheckForJavaInlinedFunction(CpuProfileFunction&  func,
                                      JavaInlineMap*        jilMap,
-                                     AddrFunctionMultMap&  inlinedFuncMap);
+                                     AddrFunctionMultMap&  inlinedFuncMap,
+                                     gtUInt32&             nextFuncId,
+                                     gtUInt32              moduleId,
+        gtVector<std::tuple<gtUInt32, gtUInt32, gtUInt32, gtUInt64, gtUInt64, gtUInt64>>& inlinedJitInfo);
 
     gtString GetJavaNestedFunctionParentName(JNCInlineMap& jilMap, gtString javaInlinedFunc);
 
@@ -474,6 +481,8 @@ private:
     bool WriteFunctionInfoIntoDB(NameModuleMap& moduleMap);
     bool WriteSampleProfileDataIntoDB(const NameModuleMap& moduleMap);
     bool WriteCallgraphProfileDataIntoDB(const NameModuleMap& modMap);
+    bool WriteJitInfoIntoDB(const NameModuleMap& modMap,
+        gtVector<std::tuple<gtUInt32, gtUInt32, gtUInt32, gtUInt64, gtUInt64, gtUInt64>>& inlinedJitInfo);
 
     QString m_dataFile;
     bool    m_collectStat;
