@@ -857,13 +857,14 @@ bool amdtProfileDbAdapter::GetUnknownCallstackLeafsByProcessId(AMDTProcessId pro
 bool amdtProfileDbAdapter::GetCallstackLeafData(AMDTProcessId       processId,
                                                 AMDTUInt32          counterId,
                                                 gtUInt32            callStackId,
+                                                AMDTFunctionId      funcId,
                                                 CallstackFrameVec&  leafs)
 {
     bool ret = false;
 
     if (m_pDbAccessor != nullptr)
     {
-        ret = m_pDbAccessor->GetCallstackLeafData(processId, counterId, callStackId, leafs);
+        ret = m_pDbAccessor->GetCallstackLeafData(processId, counterId, callStackId, funcId, leafs);
     }
 
     return ret;
@@ -885,13 +886,14 @@ bool amdtProfileDbAdapter::GetCallstackFrameData(AMDTProcessId       processId,
 
 bool amdtProfileDbAdapter::GetCallstackIds(AMDTProcessId        processId,
                                            AMDTFunctionId       funcId,
+                                           bool                 isLeafEntries,
                                            gtVector<gtUInt32>&  csIds)
 {
     bool ret = false;
 
     if (m_pDbAccessor != nullptr)
     {
-        ret = m_pDbAccessor->GetCallstackIds(processId, funcId, csIds);
+        ret = m_pDbAccessor->GetCallstackIds(processId, funcId, isLeafEntries, csIds);
     }
 
     return ret;

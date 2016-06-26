@@ -51,6 +51,9 @@ struct cgNode
 {
     AMDTProfileFunctionInfo     m_funcInfo;
     gtVAddr                     m_moduleBaseAddr = 0;
+    bool                        m_isSystemModule = false;
+
+    bool                        m_isVisited = false;
 
     cgEdgeVec                   m_callerVec;
     cgEdgeVec                   m_calleeVec;
