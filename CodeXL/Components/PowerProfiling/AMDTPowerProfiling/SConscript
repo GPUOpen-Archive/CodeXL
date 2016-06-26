@@ -20,16 +20,16 @@ env.Append( CPPPATH = [
     ".",
     "../",
     "./Include",
-	env['CXL_commonproj_dir'],
-	env['CXL_common_dir'] +"/../CodeXL/Components/PowerProfiling/",
-	env['CXL_common_dir'] +"/../CodeXL/Components/PowerProfiling/AMDTPowerProfiling/Include/",
-	env['CXL_common_dir'] +"/../CodeXL/Components/PowerProfiling/Backend/AMDTPowerProfileAPI/inc/",
-	env['CXL_common_dir'] +"/../CodeXL/Components/PowerProfiling/MiddleTier",
-	env['CXL_commonproj_dir'] + '/AMDTCommonHeaders/',
-	env['CXL_common_dir'] + "/Src/TSingleton",
-        env['CXL_common_dir'] + '/../CodeXL/Remote',
-        env['CXL_common_dir'] + '/../CodeXL',
-	env['CXL_common_dir'] + '/../CodeXL/Components',
+    env['CXL_commonproj_dir'],
+    env['CXL_common_dir'] +"/../CodeXL/Components/PowerProfiling/",
+    env['CXL_common_dir'] +"/../CodeXL/Components/PowerProfiling/AMDTPowerProfiling/Include/",
+    env['CXL_common_dir'] +"/../CodeXL/Components/PowerProfiling/Backend/AMDTPowerProfileAPI/inc/",
+    env['CXL_common_dir'] +"/../CodeXL/Components/PowerProfiling/MiddleTier",
+    env['CXL_commonproj_dir'] + '/AMDTCommonHeaders/',
+    env['CXL_common_dir'] + "/Src/TSingleton",
+    env['CXL_common_dir'] + '/../CodeXL/Remote',
+    env['CXL_common_dir'] + '/../CodeXL',
+    env['CXL_common_dir'] + '/../CodeXL/Components',
 ])
 
 moc_files = Split(
@@ -48,37 +48,38 @@ moc_files = Split(
 
 sources = \
 [
-	"src/ppColors.cpp",
-	"src/ppAidFunctions.cpp",
-	"src/ppAppController.cpp",
-	"src/ppAppWrapper.cpp",
-	"src/ppCountersSelectionDialog.cpp",
-	"src/ppCountersSortOrder.cpp",
-	"src/ppDataUtils.cpp",
-	"src/ppMDIViewCreator.cpp",
-	"src/ppMenuActionsExecutor.cpp",
-	"src/ppMultiLinePlot.cpp",
-	"src/ppMultiLinePowerStackedPlot.cpp",
+    "src/ppColors.cpp",
+    "src/ppAidFunctions.cpp",
+    "src/ppAppController.cpp",
+    "src/ppAppWrapper.cpp",
+    "src/ppCountersSelectionDialog.cpp",
+    "src/ppCountersSortOrder.cpp",
+    "src/ppDataUtils.cpp",
+    "src/ppMDIViewCreator.cpp",
+    "src/ppMenuActionsExecutor.cpp",
+    "src/ppMultiLinePlot.cpp",
+    "src/ppMultiLinePowerStackedPlot.cpp",
     "src/ppMultiLinePowerNonStackedPlot.cpp",
-	"src/ppProjectSettingsExtension.cpp",
+    "src/ppProjectSettingsExtension.cpp",
+    "src/ppSessionActionsCreator.cpp",
     "src/ppSessionController.cpp",
-	"src/ppSessionNavigationChart.cpp",
+    "src/ppSessionNavigationChart.cpp",
     "src/ppSessionView.cpp",
     "src/ppSingletonsDelete.cpp",
     "src/ppSummaryView.cpp",
-	"src/ppTimelineView.cpp",
-	"src/ppTreeHandler.cpp",
+    "src/ppTimelineView.cpp",
+    "src/ppTreeHandler.cpp",
     "src/ppWindowsManagerHelper.cpp",
 ]
 
 commonLinkedLibraries = \
 [
-	"CXLBaseTools",
-	"CXLOSWrappers",
-	"CXLDbAdapter",
-	"CXLAPIClasses",
-	"CXLAnalysisBackend",
-	"CXLApplicationFramework",
+    "CXLBaseTools",
+    "CXLOSWrappers",
+    "CXLDbAdapter",
+    "CXLAPIClasses",
+    "CXLAnalysisBackend",
+    "CXLApplicationFramework",
     "CXLProfilerDAL",
     "CXLPowerProfilingMidTier",
     "CXLPowerProfileAPI",
@@ -95,18 +96,18 @@ for moc_file in moc_files:
 # Contains all linked libraries:
 linkedLibraries = commonLinkedLibraries
 env.Prepend (LIBS = linkedLibraries)
-	
+
 # Creating object files	
 objFiles = env.SharedObject(sources + MOC_Generated)
 
 # Creating shared libraries
 soFiles = env.SharedLibrary(
-	target = libName, 
-	source = objFiles)
+    target = libName, 
+    source = objFiles)
 
 # Installing libraries
 libInstall = env.Install( 
-	dir = env['CXL_lib_dir'], 
-	source = (soFiles))
+    dir = env['CXL_lib_dir'], 
+    source = (soFiles))
 
 Return('libInstall')
