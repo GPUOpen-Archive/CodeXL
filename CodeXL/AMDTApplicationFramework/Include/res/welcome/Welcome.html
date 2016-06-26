@@ -136,26 +136,7 @@
             godebug();
             
             window.OSName = 'Linux';
-            if (navigator.appVersion.indexOf("Win") != -1) window.OSName = 'Windows';
-            if (window.OSName == 'Linux')
-            {
-                document.getElementById('d3d12multithreading_tr').style.visibility = 'hidden';
-                document.getElementById('fa_button_tr').style.visibility = 'hidden';
-                document.getElementById('fa_button_tr').style.minHeight = '0px';
-                document.getElementById('fa_button_tr').style.height = '0px';
-                
-                document.getElementById('frame_analyze_side_image').style.height = '0px';
-                document.getElementById('frame_analyze_side_image').style.minHeight = '0px';
-                document.getElementById('frame_analyze_side_image').style.visibility = 'hidden';
-                
-                document.getElementById('frame_analyze_image').style.height = '0px';
-                document.getElementById('frame_analyze_image').style.minHeight = '0px';
-                document.getElementById('frame_analyze_image').style.visibility = 'hidden';
-                
-                document.getElementById('frame_analyze_div').style.visibility = 'hidden';
-                document.getElementById('frame_analyze_div').style.minHeight = '0px';
-                document.getElementById('frame_analyze_div').style.height = '0px';
-            }
+            if (navigator.appVersion.indexOf("Win") != -1) window.OSName = 'Windows';            
         }
     </script>
     <link rel="stylesheet" type="text/css" href="welcome.css">
