@@ -927,7 +927,7 @@ bool SessionOverviewWindow::fillHotspotIndicatorCombo()
 
                         for (const auto& name : countersName)
                         {
-                            hotSpotColumns << acGTStringToQString(name);
+                            hotSpotColumns << acGTStringToQString(get<0>(name)); // counter name 
                         }
 
                         retVal = true;
@@ -1315,7 +1315,7 @@ bool SessionOverviewWindow::buildEventsStringsVector(gtVector<gtString>& eventsS
             {
                 for (const auto& events : eventsList)
                 {
-                    eventsStrVector.push_back(events);
+                    eventsStrVector.push_back(get<0>(events)); // counter name
                 }
             }
         }

@@ -13,6 +13,14 @@
 
 class CpuSessionWindow;
 
+enum ModuleTableCol
+{
+	AMDT_MOD_TABLE_SUMMARY_MOD_NAME = 0,
+	AMDT_MOD_TABLE_SUMMARY_SAMPLE, 
+	AMDT_MOD_TABLE_SUMMARY_SAMPLE_PER,
+	AMDT_MOD_TABLE_MOD_ID = 0,
+	AMDT_MOD_TABLE_MOD_NAME
+};
 /// -----------------------------------------------------------------------------------------------
 /// \class Name: ModulesDataTable : public CPUProfileDataTable
 /// \brief Description:  This class will be used to display modules in data table.

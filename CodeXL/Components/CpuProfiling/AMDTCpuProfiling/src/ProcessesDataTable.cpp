@@ -83,7 +83,7 @@ bool ProcessesDataTable::fillSummaryTables(int counterIdx)
         }
 
         setSortingEnabled(true);
-
+		resizeColumnToContents(0);
         retVal = true;
     }
 
@@ -553,6 +553,7 @@ bool ProcessesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId,
         }
 
         setSortingEnabled(true);
+		resizeColumnToContents(0);
 
         retVal = true;
     }

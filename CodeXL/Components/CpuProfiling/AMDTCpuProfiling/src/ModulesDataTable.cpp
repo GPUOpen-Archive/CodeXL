@@ -509,20 +509,33 @@ bool ModulesDataTable::fillSummaryTables(int counterIdx)
 
             addRow(list, nullptr);
 
-			int row = rowCount() -1 ;
-			int col = 0;
+			AMDTProfileModuleInfoVec procInfo;
+			m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, moduleData.m_moduleId, procInfo);
 
-			QTableWidgetItem* pModuleNameItem = item(row, col);
+			int row = rowCount() - 1;
+
+			QPixmap* pIcon = CPUProfileDataTable::moduleIcon(modulePath, !procInfo.at(0).m_is64Bit);
+			QTableWidgetItem* pNameItem = item(row, AMDT_MOD_TABLE_SUMMARY_MOD_NAME);
+
+			if (pNameItem != nullptr)
+			{
+				if (pIcon != nullptr)
+				{
+					pNameItem->setIcon(QIcon(*pIcon));
+				}
+			}
+
+			QTableWidgetItem* pModuleNameItem = item(row, AMDT_MOD_TABLE_SUMMARY_MOD_NAME);
 			if (pModuleNameItem != nullptr)
 			{
 				pModuleNameItem->setToolTip(moduleData.m_name.asASCIICharArray());
 			}
 
-            rc = delegateSamplePercent(2);
+            rc = delegateSamplePercent(AMDT_MOD_TABLE_SUMMARY_SAMPLE_PER);
         }
 
         setSortingEnabled(true);
-
+		resizeColumnToContents(AMDT_MOD_TABLE_SUMMARY_MOD_NAME);
         retVal = true;
     }
 
@@ -578,10 +591,32 @@ bool ModulesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, s
 
             addRow(list, nullptr);
 
+			AMDTProfileModuleInfoVec modInfo;
+			m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, profData.m_moduleId, modInfo);
+
+			int row = rowCount() - 1;
+
+			QPixmap* pIcon = CPUProfileDataTable::moduleIcon(modInfo.at(0).m_path, !procInfo.at(0).m_is64Bit);
+			QTableWidgetItem* pNameItem = item(row, AMDT_MOD_TABLE_MOD_NAME);
+
+			if (pNameItem != nullptr)
+			{
+				if (pIcon != nullptr)
+				{
+					pNameItem->setIcon(QIcon(*pIcon));
+				}
+			}
+
+			QTableWidgetItem* pModuleNameItem = item(row, AMDT_MOD_TABLE_MOD_NAME);
+			if (pModuleNameItem != nullptr)
+			{
+				pModuleNameItem->setToolTip(acGTStringToQString(modInfo.at(0).m_path));
+			}
+
         }
 
-		hideColumn(0);
-
+		hideColumn(AMDT_MOD_TABLE_MOD_ID);
+		resizeColumnToContents(AMDT_MOD_TABLE_MOD_NAME);
 		retVal = true;
     }
 

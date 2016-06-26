@@ -1263,14 +1263,14 @@ void SourceCodeTreeModel::BuildTree(const std::vector<SourceViewTreeItem*>& srcL
 	if (true == ret)
 	{
         AMDTProfileFunctionData  functionData;
-        ret = m_pProfDataRdr->GetFunctionDetailedProfileData(m_funcId,
+        int rc = m_pProfDataRdr->GetFunctionDetailedProfileData(m_funcId,
                                                              m_pid,
                                                              m_tid,
                                                              functionData);
 
         gtString srcFilePath;
         AMDTSourceAndDisasmInfoVec srcInfoVec;
-        ret = m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_funcId, srcFilePath, srcInfoVec);
+        rc = m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_funcId, srcFilePath, srcInfoVec);
         PrintFunctionDetailData(functionData, srcFilePath, srcInfoVec, srcLineViewTreeMap);
     }
 }
@@ -1373,16 +1373,17 @@ bool SourceCodeTreeModel::UpdateHeaders()
         m_headerTooltips << CP_colCaptionSamplesTooltip;
         m_headerTooltips << CP_colCaptionSamplesPercentTooltip;
 
-        AMDTProfileCounterDescVec counterDesc;
-        retVal = m_pProfDataRdr->GetSampledCountersList(counterDesc);
+		CounterNameIdVec counterDesc;
+		QString configName = m_pDisplayFilter->GetCurrentCofigName();
+		m_pDisplayFilter->GetConfigCounters(configName, counterDesc);
 
         for (const auto& counter : counterDesc)
         {
-            m_headerCaptions << acGTStringToQString(counter.m_abbrev);
+            m_headerCaptions << acGTStringToQString(std::get<1>(counter));
 
-            QString currentCaption = acGTStringToQString(counter.m_abbrev);
-            QString currentFullName = acGTStringToQString(counter.m_name);
-            QString currentDescription = acGTStringToQString(counter.m_description);
+            QString currentCaption = acGTStringToQString(std::get<1>(counter));
+            QString currentFullName = acGTStringToQString(std::get<0>(counter));
+            QString currentDescription = acGTStringToQString(std::get<2>(counter));
 
             QString tooltip;
             acBuildFormattedTooltip(currentFullName, currentDescription, tooltip);

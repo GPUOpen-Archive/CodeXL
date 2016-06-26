@@ -412,7 +412,7 @@ void DisplayFilterDlg::onChangeView(const QString& newlySelectedView)
 			for (const auto & counter : counterDetails)
 			{
 				//m_pCheckBoxColumns[idx].setText(counter.first.asASCIICharArray());
-				m_pCheckBoxColumns[idx].setText(counter.asASCIICharArray());
+				m_pCheckBoxColumns[idx].setText(acGTStringToQString(get<1>(counter))); // get abbrviation
 				m_pVBLayoutForColumn->addWidget(m_pCheckBoxColumns + idx);
 				m_pCheckBoxColumns[idx++].setChecked(true);
 			}

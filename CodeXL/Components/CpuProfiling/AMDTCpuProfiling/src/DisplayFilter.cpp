@@ -1030,7 +1030,8 @@ bool DisplayFilter::CreateConfigCounterMap()
 
 				for (const auto& counter : config.m_counterDescs)
 				{
-					counters.push_back(counter.m_name);
+					auto nameIdDesc = make_tuple(counter.m_name, counter.m_abbrev, counter.m_description);
+					counters.push_back(nameIdDesc);
 					m_counterNameIdMap.emplace(counter.m_name, counter.m_id);
 					m_counterIdNameMap.emplace(counter.m_id, counter.m_name);
 				}
