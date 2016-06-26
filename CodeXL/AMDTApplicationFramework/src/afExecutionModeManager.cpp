@@ -1508,6 +1508,9 @@ void afExecutionModeManager::UpdateHostsList()
             // Set the current host as the text for the start button:
             m_pStartAction->UpdateText(hostName);
 
+            // Set the start button shortcut:
+            m_pStartAction->UpdateShortcut(QKeySequence(AF_STR_StartDebuggingShortcut));
+
             newHostsList << AF_STR_modeToolbarHostConfigureSettings;
 
             m_pStartAction->UpdateStringList(newHostsList);
