@@ -3040,7 +3040,7 @@ then
     else
         # The pattern to match on in the file is 1,0,0,0
         # meaning major,minor,build,update
-        OLDPAT=0,0,0,0
+        OLDPAT=${VERSION_MAJOR},${VERSION_MINOR},0,0
         NEWPAT=${VERSION_MAJOR},${VERSION_MINOR},${VERSION_BUILD},0
         # And mangle
         sed -i "s/${OLDPAT}/${NEWPAT}/g" ${VERSIONINFO_FILE}
