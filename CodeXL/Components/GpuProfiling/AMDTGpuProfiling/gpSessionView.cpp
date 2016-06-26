@@ -192,20 +192,24 @@ void gpSessionView::InitLayout()
     rc = connect(m_pOpenTimelineButton, SIGNAL(clicked()), this, SLOT(OnOpenTimelineButtonClick()));
     GT_ASSERT(rc);
 
-    QPixmap captureButtonIcon;
     acIconSize largerButtonIcon = acGetScaledIconSize(AC_32x32_ICON);
     int iconDim = acIconSizeToPixelSize(largerButtonIcon);
     QSize iconSize(iconDim, iconDim);
+    QPixmap captureButtonIcon;
     acSetIconInPixmap(captureButtonIcon, AC_ICON_EXECUTION_CAPTURE, largerButtonIcon);
+    QPixmap captureButtonIconCPU;
+    acSetIconInPixmap(captureButtonIconCPU, AC_ICON_EXECUTION_CAPTURE_ONLY_CPU, largerButtonIcon);
+    QPixmap captureButtonIconGPU;
+    acSetIconInPixmap(captureButtonIconGPU, AC_ICON_EXECUTION_CAPTURE_ONLY_GPU, largerButtonIcon);
     m_pCaptureButton->setIcon(captureButtonIcon);
     m_pCaptureButton->setIconSize(iconSize);
     m_pCaptureButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     m_pCaptureButton->setFixedWidth(acScalePixelSizeToDisplayDPI(GP_SESSION_VIEW_BUTTON_SIZE));
-    m_pCaptureButtonCPU->setIcon(captureButtonIcon);
+    m_pCaptureButtonCPU->setIcon(captureButtonIconCPU);
     m_pCaptureButtonCPU->setIconSize(iconSize);
     m_pCaptureButtonCPU->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     m_pCaptureButtonCPU->setFixedWidth(acScalePixelSizeToDisplayDPI(GP_SESSION_VIEW_BUTTON_SIZE));
-    m_pCaptureButtonGPU->setIcon(captureButtonIcon);
+    m_pCaptureButtonGPU->setIcon(captureButtonIconGPU);
     m_pCaptureButtonGPU->setIconSize(iconSize);
     m_pCaptureButtonGPU->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     m_pCaptureButtonGPU->setFixedWidth(acScalePixelSizeToDisplayDPI(GP_SESSION_VIEW_BUTTON_SIZE));
