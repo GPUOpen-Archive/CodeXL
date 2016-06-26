@@ -1075,7 +1075,7 @@ PackageTheBuild()
 		mkdir -p ${PKG_NAME}
 		cp ${AMD_CODEXL}/../CodeXL/Installer-Linux/debian/main/amdcodexlicon.desktop ${PKG_NAME}
 		cp ${AMD_CODEXL}/../CodeXL/Installer-Linux/debian/main/amdremoteagenticon.desktop ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/AMD_CodeXL_Release_Notes.pdf             ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/CodeXL_Release_Notes.pdf             ${PKG_NAME}
 		cp -f Output_x86_64/release/bin/CXLRemoteDebuggingServer                ${PKG_NAME}
 		cp -f Output_x86_64/release/bin/CodeXL                                   ${PKG_NAME}
 		cp -f Output_x86_64/release/bin/CodeXLAnalyzer                           ${PKG_NAME}
