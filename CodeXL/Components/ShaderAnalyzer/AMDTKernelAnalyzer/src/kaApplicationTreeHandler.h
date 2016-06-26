@@ -337,6 +337,14 @@ private:
     /// \return the filename of the devices file without ext
     void AddFilesToProgram(const kaProgram* pProgram, const gtVector<osFilePath>& addedFilePaths, 
                            const afApplicationTreeItemData* pProgramItemData, afTreeItemType destinationItemType);
+
+
+    /// Add programs for given files to KA tree or opens dialog if files don't have DX or OpenCL extension
+    /// \param addedFilePaths input collection of file paths, depends on file types we create DX/OpenCl  program ,otherwise we open dialog for user to choose what new program shall be created
+    /// \param program output pointer to the newly created program
+    /// \param pProgramItemData output pointer to new program item data
+    void AddProgramForFiles(const  gtVector<osFilePath>& addedFilePaths, kaProgram** pProgram, afApplicationTreeItemData** pProgramItemData);
+
     /// Calculates and returns drop event position on tree widget
     /// \param pEvent  pointer to the drop event
     /// \param receiver  pointer to event reciever object - must be valid(not null)

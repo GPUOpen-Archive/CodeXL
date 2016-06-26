@@ -1343,20 +1343,31 @@ void kaApplicationTreeHandler::OnAddFile(afTreeItemType associateToItemType)
             gtVector<osFilePath> addedFilePaths;
             kaApplicationCommands::instance().AddFileCommand(addedFilePaths);
 
-            for (const osFilePath& it : addedFilePaths)
+             //create program for this files
+            if (pParentProgramItemData == nullptr)
             {
-                if (ShouldAddFileToProgramBranch(pSelectedItemData, pParentProgramItemData, it, associateToItemType))
-                {
-                    // Add the file to the program branch
-                    AddFileNodeToProgramBranch(it, pParentProgramItemData, associateToItemType);
-
-                    if (!IsAddingMultipleFilesToProgramBranchAllowed(pParentProgramItemData))
-                    {
-                        // pipeline programs don't allow adding multiple files - only first file is added
-                        break;
-                    }
-                }
+                kaProgram* pProgram = nullptr;
+                afApplicationTreeItemData* pParentProgItemData = nullptr;
+                AddProgramForFiles(addedFilePaths, &pProgram, &pParentProgItemData);
+                AddFilesToProgram(pProgram, addedFilePaths, pParentProgItemData, AF_TREE_ITEM_KA_ADD_FILE);
             }
+            else
+            {
+                for (const osFilePath& it : addedFilePaths)
+                {
+                    if (ShouldAddFileToProgramBranch(pSelectedItemData, pParentProgramItemData, it, associateToItemType))
+                    {
+                        // Add the file to the program branch
+                        AddFileNodeToProgramBranch(it, pParentProgramItemData, associateToItemType);
+
+                        if (!IsAddingMultipleFilesToProgramBranchAllowed(pParentProgramItemData))
+                        {
+                            // pipeline programs don't allow adding multiple files - only first file is added
+                            break;
+                        }
+                    }
+                }//for
+            }//else
         }
     }
 }
@@ -3908,27 +3919,35 @@ void kaApplicationTreeHandler::DropOutertemsOnRelevantProgram(QWidget* receiver,
                 }
                 else if (destinationItemType == AF_TREE_ITEM_KA_NEW_PROGRAM)
                 {
-                    kaProgramTypes programType = kaProgramTypes::kaProgramUnknown;
-                    if (kaProgram::GetProgramTypeFromFileExtention(addedFilePaths, programType))
-                    {
-                        pProgram = kaApplicationCommands::instance().CreateProgram(programType);
+                    AddProgramForFiles(addedFilePaths, &pProgram, &pProgramItemData);
+                    destinationItemType = AF_TREE_ITEM_KA_ADD_FILE;
 
-                        GT_IF_WITH_ASSERT(pProgram != nullptr)
-                        {
-                            pProgramItemData = AddProgram(true, pProgram);
-                            destinationItemType = AF_TREE_ITEM_KA_ADD_FILE;
-                            KA_PROJECT_DATA_MGR_INSTANCE.AddProgram(pProgram);
-                        }
-                    }
-                    else
-                    {
-                        OnNewProgram();
-                    }
                 }
 
                 AddFilesToProgram(pProgram, addedFilePaths, pProgramItemData, destinationItemType);
             }
         }
+    }
+}
+
+void kaApplicationTreeHandler::AddProgramForFiles(const gtVector<osFilePath>& addedFilePaths, kaProgram** pProgram, afApplicationTreeItemData** pProgramItemData)
+{
+    GT_ASSERT(pProgram != nullptr && pProgramItemData != nullptr);
+
+    kaProgramTypes programType = kaProgramTypes::kaProgramUnknown;
+    if (kaProgram::GetProgramTypeFromFileExtention(addedFilePaths, programType))
+    {
+        *pProgram = kaApplicationCommands::instance().CreateProgram(programType);
+
+        GT_IF_WITH_ASSERT(*pProgram != nullptr)
+        {
+            *pProgramItemData = AddProgram(true, *pProgram);
+            KA_PROJECT_DATA_MGR_INSTANCE.AddProgram(*pProgram);
+        }
+    }
+    else
+    {
+        OnNewProgram();
     }
 }
 
