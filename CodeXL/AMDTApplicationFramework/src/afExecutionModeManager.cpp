@@ -312,9 +312,9 @@ void afExecutionModeManager::createActionsToolbar(afMainAppWindow* pParentWindow
 
                 case AF_EXECUTION_ID_STOP:              acSetIconInPixmap(actionPixmap, AC_ICON_EXECUTION_STOP);                break;
 
-                // case AF_EXECUTION_ID_API_STEP:          acSetIconInPixmap(actionPixmap, AC_ICON_EXECUTION_API_STEP);            break;
-                // case AF_EXECUTION_ID_DRAW_STEP:         acSetIconInPixmap(actionPixmap, AC_ICON_EXECUTION_DRAW_STEP);           break;
-                // case AF_EXECUTION_ID_FRAME_STEP:        acSetIconInPixmap(actionPixmap, AC_ICON_EXECUTION_FRAME_STEP);          break;
+             // case AF_EXECUTION_ID_API_STEP:          acSetIconInPixmap(actionPixmap, AC_ICON_EXECUTION_API_STEP);            break;
+             // case AF_EXECUTION_ID_DRAW_STEP:         acSetIconInPixmap(actionPixmap, AC_ICON_EXECUTION_DRAW_STEP);           break;
+             // case AF_EXECUTION_ID_FRAME_STEP:        acSetIconInPixmap(actionPixmap, AC_ICON_EXECUTION_FRAME_STEP);          break;
                 case AF_EXECUTION_ID_STEP_OVER:         acSetIconInPixmap(actionPixmap, AC_ICON_EXECUTION_STEP_OVER);           break;
 
                 case AF_EXECUTION_ID_STEP_IN:           acSetIconInPixmap(actionPixmap, AC_ICON_EXECUTION_STEP_IN);             break;
@@ -326,8 +326,8 @@ void afExecutionModeManager::createActionsToolbar(afMainAppWindow* pParentWindow
                 case AF_EXECUTION_ID_CANCEL_BUILD:      acSetIconInPixmap(actionPixmap, AC_ICON_EXECUTION_CANCEL_BUILD);        break;
 
                 case AF_EXECUTION_ID_CAPTURE:           acSetIconInPixmap(actionPixmap, AC_ICON_EXECUTION_CAPTURE);             break;
-                case AF_EXECUTION_ID_CAPTURE_CPU:       acSetIconInPixmap(actionPixmap, AC_ICON_EXECUTION_CAPTURE);             break;
-                case AF_EXECUTION_ID_CAPTURE_GPU:       acSetIconInPixmap(actionPixmap, AC_ICON_EXECUTION_CAPTURE);             break;
+                case AF_EXECUTION_ID_CAPTURE_CPU:       acSetIconInPixmap(actionPixmap, AC_ICON_EXECUTION_CAPTURE_ONLY_CPU);    break;
+                case AF_EXECUTION_ID_CAPTURE_GPU:       acSetIconInPixmap(actionPixmap, AC_ICON_EXECUTION_CAPTURE_ONLY_GPU);    break;
 
                 default: break;
             }
