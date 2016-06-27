@@ -1070,7 +1070,7 @@ PackageTheBuild()
 		################################################################################################
 		# Copy the files for the CodeXL Internal version
 		################################################################################################
-		PKG_NAME=AMD_CodeXL_AMD_Internal_Only_Linux_x86_64_${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_BUILD}
+		PKG_NAME=CodeXL_Internal_Only_Linux_x86_64_${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_BUILD}
 
 		mkdir -p ${PKG_NAME}
 		cp ${AMD_CODEXL}/../CodeXL/Installer-Linux/debian/main/amdcodexlicon.desktop ${PKG_NAME}
@@ -2003,32 +2003,32 @@ PackageTheBuild()
 		mkdir -p ${PKG_NAME}/webhelp
 		cp -drf Output_x86_64/release/bin/webhelp/*	${PKG_NAME}/webhelp
 
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLOccupancyAgent32-Internal.so          ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLProfileAgent32-Internal.so            ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLTraceAgent32-Internal.so              ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLThreadTraceAgent32-Internal.so        ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUThreadTrace32-Internal.so                           ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libPerformanceExperimentFile32-Internal.so                ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUPerfAPICL32-Internal.so                             ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUPerfAPICounters32-Internal.so                       ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerPreloadXInitThreads32-Internal.so       ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/CodeXLGpuProfiler32-Internal                              ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/CodeXLGpuProfilerRun32                                    ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLOccupancyAgent32.so         ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLProfileAgent32.so           ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLTraceAgent32.so             ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLThreadTraceAgent32.so       ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libGPUThreadTrace32.so                         ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libPerformanceExperimentFile32.so              ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libGPUPerfAPICL32.so                           ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libGPUPerfAPICounters32.so                     ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libCXLGpuProfilerPreloadXInitThreads32.so      ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/CodeXLGpuProfiler32                            ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/CodeXLGpuProfilerRun32                         ${PKG_NAME}
 
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLOccupancyAgent-Internal.so         ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLProfileAgent-Internal.so           ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLTraceAgent-Internal.so             ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLThreadTraceAgent-Internal.so       ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUThreadTrace-Internal.so                          ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libPerformanceExperimentFile-Internal.so               ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerHSAProfileAgent-Internal.so          ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerHSATraceAgent-Internal.so            ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUPerfAPICL-Internal.so                            ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUPerfAPICounters-Internal.so                      ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUPerfAPIHSA-Internal.so                           ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerPreloadXInitThreads-Internal.so      ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/CodeXLGpuProfiler-Internal                             ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/CodeXLGpuProfilerRun                                   ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLOccupancyAgent.so        ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLProfileAgent.so          ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLTraceAgent.so            ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLThreadTraceAgent.so      ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libGPUThreadTrace.so                        ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libPerformanceExperimentFile.so             ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libCXLGpuProfilerHSAProfileAgent.so         ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libCXLGpuProfilerHSATraceAgent.so           ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libGPUPerfAPICL.so                          ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libGPUPerfAPICounters.so                    ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libGPUPerfAPIHSA.so                         ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libCXLGpuProfilerPreloadXInitThreads.so     ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/CodeXLGpuProfiler                           ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/CodeXLGpuProfilerRun                        ${PKG_NAME}
 
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/Vulkan/rev_1_0_0/Release/lnx64/amdspv               ${PKG_NAME}
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/Vulkan/rev_1_0_0/Release/lnx64/spvgen.so            ${PKG_NAME}
