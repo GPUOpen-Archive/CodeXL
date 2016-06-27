@@ -48,6 +48,7 @@ public:
     gtASCIIString& operator=(gtASCIIString&& otherString);
 #endif
 
+    static const int npos;
     const char* asCharArray() const;
     int length() const;
     bool isEmpty() const;

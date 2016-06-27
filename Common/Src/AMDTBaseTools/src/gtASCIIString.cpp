@@ -29,6 +29,8 @@
 #define GT_STR_MegabytesShort "MB"
 #define GT_STR_BytesShort "bytes"
 
+const int gtASCIIString::npos = static_cast<int>(std::string::npos);
+
 // ---------------------------------------------------------------------------
 // Name:        gtASCIIString::gtASCIIString
 // Description: Constructor - Initializes an empty string
@@ -1851,3 +1853,4 @@ gtASCIIString gtASCIIString::substr(int startPosition, int count) const
 {
     return _impl.substr(startPosition, count).c_str();
 }
+
