@@ -320,11 +320,13 @@ bool kaApplicationTreeHandler::BuildContextMenuForItems(const gtList<const afApp
 
             if (isMultiFileReferencesSelection)
             {
+                kaProgram* pActiveProgram = kaProjectDataManager::instance().GetActiveProgram();
+                const bool activeProgramHasFiles = pActiveProgram && pActiveProgram->HasFile();
                 // Add the "Build" action:
                 QString buildMenuStr = GetBuildCommandString();
                 m_pBuildAction->setText(buildMenuStr);
                 menu.addAction(m_pBuildAction);
-                m_pBuildAction->setEnabled(!isInBuild);
+                m_pBuildAction->setEnabled(!isInBuild && activeProgramHasFiles);
 
                 // Add the "Cancel Build" action:
                 QString cancelBuildMenuStr = KA_STR_CancelBuildASCII;
@@ -333,9 +335,9 @@ bool kaApplicationTreeHandler::BuildContextMenuForItems(const gtList<const afApp
                 m_pCancelBuildAction->setEnabled(isInBuild);
 
                 // Add the "Remove from program" action:
-                if (kaProjectDataManager::instance().GetActiveProgram() != nullptr)
+                if (pActiveProgram != nullptr)
                 {
-                    QString removeFromProgramMenuStr = QString(KA_STR_removeShadersFromProgramASCII).arg(acGTStringToQString(kaProjectDataManager::instance().GetActiveProgram()->GetProgramName()));
+                    QString removeFromProgramMenuStr = QString(KA_STR_removeShadersFromProgramASCII).arg(acGTStringToQString(pActiveProgram->GetProgramName()));
                     m_pRemoveAction->setText(removeFromProgramMenuStr);
                 }
                 else
@@ -345,7 +347,7 @@ bool kaApplicationTreeHandler::BuildContextMenuForItems(const gtList<const afApp
 
 
                 menu.addAction(m_pRemoveAction);
-                m_pRemoveAction->setEnabled(!isInBuild);
+                m_pRemoveAction->setEnabled(!isInBuild && activeProgramHasFiles);
             }
 
             if (isMultiFileSelection)
