@@ -38,7 +38,7 @@
     <Import Project="Server-Common.props" />
     <Import Project="$(CommonDir)\Lib\Ext\Windows-Kits\Global-WindowsSDK.props" />
     <Import Project="$(CommonDir)\Lib\Ext\Boost\Global-Boost-2015.props" />
-    <Import Project="AMDTOSWrappers.props" />
+    <Import Project="CodeXLGraphics.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(SolutionName)'=='CodeXL-AllProjects'">
     <Import Project="$(CommonDir)\Src\AMDTInterceptor\Interceptor.mhook-dllinjector-2015.props" />
