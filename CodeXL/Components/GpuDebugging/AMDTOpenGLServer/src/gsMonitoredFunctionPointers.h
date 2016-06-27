@@ -711,11 +711,12 @@ struct gsMonitoredFunctionPointers
     //////////////////////////////////////////////////////////////////////////
     // OpenGL 1.4 Extensions
     //////////////////////////////////////////////////////////////////////////
-
+#if ((AMDT_BUILD_TARGET == AMDT_LINUX_OS) && (AMDT_LINUX_VARIANT == AMDT_GENERIC_LINUX_VARIANT))
     unsigned int (APIENTRY* _loader_get_dispatch_table_size)();
     int (APIENTRY* _loader_get_proc_offset)(const char* name);
     int (APIENTRY* _loader_add_dispatch)(const char* const* names, const char* signature);    
     void (APIENTRY* _loader_set_dispatch)(const void* dispTable);
+#endif
 
     void (APIENTRY* glBlendFuncSeparate)(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha);
     void (APIENTRY* glFogCoordf)(GLfloat coord);

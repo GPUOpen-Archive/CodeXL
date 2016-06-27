@@ -2219,7 +2219,7 @@ GLAPI void GLAPIENTRY glGetProgramRegisterfvMESA(GLenum target, GLsizei len, con
 
 #endif /* GL_MESA_program_debug */
 
-#ifndef __WIN32__
+#ifndef _WIN32
 GLAPI unsigned int GLAPIENTRY _loader_get_dispatch_table_size(void);
 GLAPI int GLAPIENTRY _loader_get_proc_offset(const char* name);
 GLAPI int GLAPIENTRY _loader_add_dispatch(const char* const* names, const char* signature);

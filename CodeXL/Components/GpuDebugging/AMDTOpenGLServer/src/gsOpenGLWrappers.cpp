@@ -48,6 +48,8 @@
 
 #endif
 
+#if ((AMDT_BUILD_TARGET == AMDT_LINUX_OS) && (AMDT_LINUX_VARIANT == AMDT_GENERIC_LINUX_VARIANT))
+
 unsigned int APIENTRY _loader_get_dispatch_table_size(void)
 {
 #if ((AMDT_BUILD_TARGET == AMDT_LINUX_OS) && (AMDT_LINUX_VARIANT == AMDT_GENERIC_LINUX_VARIANT))
@@ -97,6 +99,7 @@ void APIENTRY _loader_set_dispatch(const void* dispTable)
 #endif
 }
 
+#endif
 
 // --------------------------------------------------------
 //             OpenGL Wrapper functions
