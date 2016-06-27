@@ -154,7 +154,6 @@ enum apMonitoredFunctionId
 
 #endif // AMDT_BUILD_TARGET
 
-
     // OpenGL 1.0 and 1.1 monitored functions:
     ap_glAccum,
     ap_glAlphaFunc,
@@ -590,11 +589,6 @@ enum apMonitoredFunctionId
     // Linux last base function index:
     apLastOpenGLBaseFunction = ap_glMultTransposeMatrixd,
 #endif
-
-    ap_loaderGetDispatchTableSize,
-    ap_loaderGetProcOffset,
-    ap_loaderAddDispatch,
-    ap_loaderSetDispatch,
 
     // OpenGL 1.4
     ap_glBlendFuncSeparate,

@@ -711,12 +711,6 @@ struct gsMonitoredFunctionPointers
     //////////////////////////////////////////////////////////////////////////
     // OpenGL 1.4 Extensions
     //////////////////////////////////////////////////////////////////////////
-
-    unsigned int (APIENTRY* _loader_get_dispatch_table_size)();
-    int (APIENTRY* _loader_get_proc_offset)(const char* name);
-    int (APIENTRY* _loader_add_dispatch)(const char* const* names, const char* signature);    
-    void (APIENTRY* _loader_set_dispatch)(const void* dispTable);
-
     void (APIENTRY* glBlendFuncSeparate)(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha);
     void (APIENTRY* glFogCoordf)(GLfloat coord);
     void (APIENTRY* glFogCoordfv)(const GLfloat* coord);
@@ -2814,6 +2808,7 @@ struct gsMonitoredFunctionPointers
     // GL_GREMEDY_frame_terminator Extension
     //////////////////////////////////////////////////////////////////////////
     void (APIENTRY* glFrameTerminatorGREMEDY)(void);
+
 };
 
 
