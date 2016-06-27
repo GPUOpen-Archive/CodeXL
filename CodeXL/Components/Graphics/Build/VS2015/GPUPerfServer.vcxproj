@@ -36,7 +36,7 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="Server-Common.props" />
-    <Import Project="AMDTOSWrappers.props" />
+    <Import Project="CodeXLGraphics.props" />
     <Import Project="$(CommonDir)\Lib\Ext\Windows-Kits\Global-WindowsSDK.props" />
     <Import Project="$(CommonDir)\Lib\Ext\Boost\Global-Boost-2015.props" />
     <Import Project="$(CommonDir)\Lib\AMD\GPUPerfAPI\Global-GPUPerfAPI.props" />

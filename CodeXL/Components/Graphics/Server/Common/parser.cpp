@@ -326,10 +326,10 @@ bool Parse4DWORDS(char** sIn, unsigned long* p1, unsigned long* p2, unsigned lon
 //---------------------------------------------------------------------------------------------------------------
 static bool GetConstantIDFromArgument(gtASCIIString sArgument, gtASCIIString cKey, unsigned int& nSlotID)
 {
-    unsigned int nKeyPosition = (unsigned int)sArgument.find(cKey);
+    int nKeyPosition = sArgument.find(cKey);
 
     // Check if cKey is not end of other argument
-    if (nKeyPosition == std::string::npos || (nKeyPosition != 0
+    if (nKeyPosition == gtASCIIString::npos || (nKeyPosition != 0
                                               && sArgument[nKeyPosition - 1] != '>' // code can be in HTML
                                               && sArgument[nKeyPosition - 1] != ' '))
 
@@ -338,11 +338,11 @@ static bool GetConstantIDFromArgument(gtASCIIString sArgument, gtASCIIString cKe
     } // End of if
 
     // Looking for not digital symbols in argument
-    unsigned int nNextNotDigit = (unsigned int)sArgument.find_first_not_of("0123456789", nKeyPosition + cKey.length());
+    int nNextNotDigit = (int)sArgument.find_first_not_of("0123456789", nKeyPosition + cKey.length());
 
     gtASCIIString sSlotID; // this variable contains string with the slot number
 
-    if (nNextNotDigit == std::string::npos)   // All character after cKey are digits
+    if (nNextNotDigit == gtASCIIString::npos)   // All character after cKey are digits
     {
         sSlotID = sArgument.substr(nKeyPosition + cKey.length());
     } // End of if
@@ -440,22 +440,22 @@ long GetConstantsFromCode(gtASCIIString code, gtASCIIString cKey, std::list<unsi
     ArgumentLength["texm3x3vspec"][1] = 3;
 
 
-    unsigned int nStartOfToken = 0;
+    int nStartOfToken = 0;
 
     // This loop splits code to tokens
-    while (nStartOfToken != std::string::npos)
+    while (nStartOfToken != gtASCIIString::npos)
     {
-        unsigned int nNextToken = (unsigned int)code.find('\n', nStartOfToken + 1);
+        int nNextToken = code.find('\n', nStartOfToken + 1);
 
         // comment
-        gtASCIIString sToken = (nNextToken == std::string::npos) ? code.substr(nStartOfToken) : code.substr(nStartOfToken, nNextToken - nStartOfToken);
+        gtASCIIString sToken = (nNextToken == gtASCIIString::npos) ? code.substr(nStartOfToken) : code.substr(nStartOfToken, nNextToken - nStartOfToken);
 
         if (sToken.length() > 1 && sToken.substr(0, 2) != "//")      // Skip comments and empty strings
         {
-            unsigned int nStartOfInstruction = (unsigned int)sToken.find_first_not_of(" \n", 0);      // comment
-            unsigned int nEndOfInstruction = (unsigned int)sToken.find(' ', nStartOfInstruction);
+            int nStartOfInstruction = (int)sToken.find_first_not_of(" \n", 0);      // comment
+            int nEndOfInstruction = (int)sToken.find(' ', nStartOfInstruction);
 
-            if (nEndOfInstruction == std::string::npos)
+            if (nEndOfInstruction == gtASCIIString::npos)
             {
                 nStartOfToken = nNextToken;
                 continue;
@@ -464,13 +464,13 @@ long GetConstantsFromCode(gtASCIIString code, gtASCIIString cKey, std::list<unsi
             gtASCIIString sCommand = sToken.substr(nStartOfInstruction, nEndOfInstruction - nStartOfInstruction);
 
             unsigned int nArgument = 0;
-            unsigned int nStartOfArgument = nEndOfInstruction + 1;
-            unsigned int nEndOfArgument;
+            int nStartOfArgument = nEndOfInstruction + 1;
+            int nEndOfArgument;
 
             do // This separates arguments of command
             {
-                nEndOfArgument = (unsigned int)sToken.find(',', nStartOfArgument);
-                gtASCIIString sArgument = (nEndOfArgument == std::string::npos) ?
+                nEndOfArgument = sToken.find(',', nStartOfArgument);
+                gtASCIIString sArgument = (nEndOfArgument == gtASCIIString::npos) ?
                                           sToken.substr(nStartOfArgument) :
                                           sToken.substr(nStartOfArgument, nEndOfArgument - nStartOfArgument);
                 unsigned int nSlotID;
@@ -485,9 +485,9 @@ long GetConstantsFromCode(gtASCIIString code, gtASCIIString cKey, std::list<unsi
                 // Calculation of used constants. Default is 1. Next 2 lines check if the command in "special cases map"
                 ArgIter = ArgumentLength.find(sCommand);
 
-                int nArgsCount = (ArgIter == ArgumentLength.end()) ? 1 :   // If coommand has not been find the lenth of argument is supposed 1
+                int nArgsCount = (ArgIter == ArgumentLength.end()) ? 1 :   // If command has not been found the length of argument is supposed 1
                                  (ArgIter->second.size() > nArgument ? ArgIter->second[nArgument] :
-                                  1);  // If there no information for considered argument its lenth is supposed 1
+                                  1);  // If there no information for considered argument its length is supposed 1
 
                 // This loop adds variables in the used constants list
                 for (unsigned int i = nSlotID; i < nSlotID + nArgsCount; i++)
@@ -512,7 +512,7 @@ long GetConstantsFromCode(gtASCIIString code, gtASCIIString cKey, std::list<unsi
                 nArgument++;
                 nStartOfArgument = nEndOfArgument + 1;
             }
-            while (nEndOfArgument != std::string::npos);
+            while (nEndOfArgument != gtASCIIString::npos);
         } // End of if ( sToken.size() > 1 && sToken.substr( 0, 1 ) != "//" )
 
         nStartOfToken = nNextToken;

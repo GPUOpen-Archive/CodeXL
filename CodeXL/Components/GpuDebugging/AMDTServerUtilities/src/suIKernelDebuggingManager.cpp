@@ -518,7 +518,7 @@ bool suIKernelDebuggingManager::shouldAppendLegacyBuildFlags(const gtASCIIString
 
     // If the flags already contain the legacy flag, or we are building an OpenCL 2.0 kernel,
     // There is no need to add the flag
-    if ((-1 == currentFlags.find(SU_STR_kernelDebuggingForcedBuildOptionLegacyASCII)) && (-1 == currentFlags.find("-cl-std=CL2.0")) && (-1 == currentFlags.find("-cl-std=cl2.0")))
+    if ((gtASCIIString::npos == currentFlags.find(SU_STR_kernelDebuggingForcedBuildOptionLegacyASCII)) && (gtASCIIString::npos == currentFlags.find("-cl-std=CL2.0")) && (gtASCIIString::npos == currentFlags.find("-cl-std=cl2.0")))
     {
         // Check if we are on a non-HSA driver (where AMDIL doesn't exist and kernel debugging is not expected to work with the AMDIL path anyway):
         if (!oaIsHSADriver())

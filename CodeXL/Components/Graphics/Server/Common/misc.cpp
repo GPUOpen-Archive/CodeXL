@@ -671,11 +671,6 @@ long find_non_ascii(unsigned char* buf, long len, long start, std::string& str)
             return start;
         }
 
-        if (val < 0)
-        {
-            return start;
-        }
-
         start++;
     }
 

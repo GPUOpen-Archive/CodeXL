@@ -179,7 +179,7 @@ bool _SetupLog(const bool console, const char* module, const char* file, int lin
 #if defined (WIN32)
         AttachConsole(ATTACH_PARENT_PROCESS);
 #elif defined (_LINUX)
-# warning IMPLEMENT ME!
+#pragma message("TODO: IMPLEMENT ME!")
 #endif
         s_ConsoleAttached = true;
     }
