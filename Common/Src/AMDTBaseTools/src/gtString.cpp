@@ -33,6 +33,8 @@
 #define GT_STR_MegabytesShort L"MB"
 #define GT_STR_BytesShort L"bytes"
 
+const int gtString::npos = static_cast<int>(std::wstring::npos);
+
 // ---------------------------------------------------------------------------
 // Name:        gtString::gtString
 // Description: Constructor - Initializes an empty string
