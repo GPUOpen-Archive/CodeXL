@@ -1007,6 +1007,13 @@ void apMonitoredFunctionsManager::initializeOpenGL14FunctionsData()
     functionBaseType = AP_OPENGL_GENERIC_FUNC;
 #endif
 
+    int api_type = AP_OPENGL_EXTENSION_FUNC | AP_OPENGL_GENERIC_FUNC;
+    _monitoredFunctionsData[ap_loaderGetDispatchTableSize] = MonitoredFunctionData(L"_loader_get_dispatch_table_size", api_type, 0);
+    _monitoredFunctionsData[ap_loaderGetProcOffset] = MonitoredFunctionData(L"_loader_get_proc_offset", api_type, 0);
+    _monitoredFunctionsData[ap_loaderAddDispatch] = MonitoredFunctionData(L"_loader_add_dispatch", api_type, 0);
+    _monitoredFunctionsData[ap_loaderSetDispatch] = MonitoredFunctionData(L"_loader_set_dispatch", api_type, 0);
+
+
     _monitoredFunctionsData[ap_glBlendFuncSeparate] = MonitoredFunctionData(L"glBlendFuncSeparate", functionBaseType | AP_OPENGL_ES_2_MAC_GENERIC_FUNC, AP_STATE_CHANGE_FUNC);
     _monitoredFunctionsData[ap_glFogCoordf] = MonitoredFunctionData(L"glFogCoordf", functionBaseType, AP_STATE_CHANGE_FUNC | AP_DEPRECATED_FUNC, AP_GL_VERSION_3_0, AP_GL_VERSION_3_1);
     _monitoredFunctionsData[ap_glFogCoordfv] = MonitoredFunctionData(L"glFogCoordfv", functionBaseType, AP_STATE_CHANGE_FUNC | AP_DEPRECATED_FUNC, AP_GL_VERSION_3_0, AP_GL_VERSION_3_1);
