@@ -966,37 +966,41 @@ bool kaRenderingProgram::SetFileID(PipelinedStage refType, int fileRefId)
 {
     bool retVal = false;
 
-    GT_IF_WITH_ASSERT((refType != KA_PIPELINE_STAGE_NONE) && (refType < (int)m_fileIDsVector.size()))
-
+    if (refType == KA_PIPELINE_STAGE_NONE || refType >= (int)m_fileIDsVector.size() || refType < 0)
     {
-        m_fileIDsVector[refType] = fileRefId;
-        bool isEmpty = true;
-        bool isUpdateNeeded = false;
+        //we add non valid files at first stage by default
+        refType = static_cast<PipelinedStage>(KA_PIPELINE_STAGE_NONE + 1);
+    }
 
-        for (int it : m_fileIDsVector)
-        {
-            isEmpty &= (it == -1);
-        }
 
-        if (!m_isEmpty && isEmpty)
-        {
-            m_isEmpty = true;
-            isUpdateNeeded = true;
-        }
-        else if (m_isEmpty && !isEmpty)
-        {
-            m_isEmpty = false;
-            isUpdateNeeded = true;
-        }
+    m_fileIDsVector[refType] = fileRefId;
+    bool isEmpty = true;
+    bool isUpdateNeeded = false;
 
-        if (isUpdateNeeded)
+    for (int it : m_fileIDsVector)
+    {
+        isEmpty &= (it == -1);
+    }
+
+    if (!m_isEmpty && isEmpty)
+    {
+        m_isEmpty = true;
+        isUpdateNeeded = true;
+    }
+    else if (m_isEmpty && !isEmpty)
+    {
+        m_isEmpty = false;
+        isUpdateNeeded = true;
+    }
+
+    if (isUpdateNeeded)
+    {
+        if (afGlobalVariablesManager::instance().isRunningInsideVisualStudio())
         {
-            if (afGlobalVariablesManager::instance().isRunningInsideVisualStudio())
-            {
-                afApplicationCommands::instance()->updateToolbarCommands();
-            }
+            afApplicationCommands::instance()->updateToolbarCommands();
         }
     }
+
 
     return retVal;
 }

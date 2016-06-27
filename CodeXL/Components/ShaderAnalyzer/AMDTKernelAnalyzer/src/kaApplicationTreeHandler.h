@@ -374,7 +374,7 @@ private slots:
     /// handlers for the menu items:
 
     /// handle the new program context menu command:
-    void OnNewProgram();
+    kaProgram* OnNewProgram();
 
 
     /// handle the cancel build context menu command:

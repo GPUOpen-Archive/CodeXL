@@ -1556,8 +1556,21 @@ void kaApplicationTreeHandler::AddFileNodeToProgramBranch(const osFilePath& adde
                 QTreeWidgetItem* pFileTreeNode = nullptr;
                 // Get or create the file item in tree and set it's data
                 const kaProgramTypes programType = pProgram->GetBuildType();
-                const bool shouldCompareFileType = ((programType == kaProgramDX) || programType == kaProgramCL);
-                osFilePath fileToSearch = shouldCompareFileType ? pFile->filePath() : osFilePath();
+                osFilePath fileToSearch;
+                if (AF_TREE_ITEM_KA_ADD_FILE == programChildItemType)
+                {
+                    if (KA_PROJECT_DATA_MGR_INSTANCE.IsProgramPipeLine(pProgram))
+                    {
+                        programChildItemType = KA_PROJECT_DATA_MGR_INSTANCE.IsRender(pProgram) ? AF_TREE_ITEM_KA_PROGRAM_GL_VERT : AF_TREE_ITEM_KA_PROGRAM_GL_COMP;
+                        fileToSearch.clear();
+                    }
+                }
+                else if (programType == kaProgramDX || programType == kaProgramCL)
+                {
+                    fileToSearch = pFile->filePath();
+                }
+               
+
                 afApplicationTreeItemData* pFileItemData = FindChildOfType(pProgramTreeItemData->m_pTreeWidgetItem, programChildItemType, fileToSearch);
 
                 // Check if the file already exists
@@ -3947,7 +3960,13 @@ void kaApplicationTreeHandler::AddProgramForFiles(const gtVector<osFilePath>& ad
     }
     else
     {
-        OnNewProgram();
+        *pProgram = OnNewProgram();
+        if (*pProgram)
+        {
+            QTreeWidgetItem* pProgramWidget = FindProgramTreeItem(*pProgram);
+            *pProgramItemData = m_pApplicationTree->getTreeItemData(pProgramWidget);
+        }
+       
     }
 }
 
@@ -3974,7 +3993,7 @@ void kaApplicationTreeHandler::AddFilesToProgram(const kaProgram* pProgram, cons
 
         if (!isProgramStage)
         {
-            if (AF_TREE_ITEM_KA_PROGRAM == destinationItemType)
+            if (AF_TREE_ITEM_KA_PROGRAM == destinationItemType || AF_TREE_ITEM_KA_ADD_FILE == destinationItemType)
             {
                 if (kaProgramTypes::kaProgramGL_Compute == programType || kaProgramVK_Compute == programType)
                 {
@@ -3988,31 +4007,28 @@ void kaApplicationTreeHandler::AddFilesToProgram(const kaProgram* pProgram, cons
             }
         }
 
-        if (isProgramStage || (!isProgramStage && (kaProgramDX == programType || kaProgramCL == programType)))
+        for (const osFilePath& it : addedFilePaths)
         {
-            for (const osFilePath& it : addedFilePaths)
+            // Add the file node to the program branch
+            if (AF_TREE_ITEM_KA_PROGRAM_GL_COMP == destinationItemType || !pProgram->HasFile(it, AF_TREE_ITEM_ITEM_NONE))
             {
-                // Add the file node to the program branch
-                if (!pProgram->HasFile(it, AF_TREE_ITEM_ITEM_NONE))
+
+                kaSourceFile* pCurrentFile = KA_PROJECT_DATA_MGR_INSTANCE.dataFileByPath(it);
+                if (pCurrentFile == nullptr)
                 {
-
-                    kaSourceFile* pCurrentFile = KA_PROJECT_DATA_MGR_INSTANCE.dataFileByPath(it);
-                    if (pCurrentFile == nullptr)
-                    {
-                        kaApplicationCommands::instance().AddSourceFile(it);
-                    }
-
-                    AddFileNodeToProgramBranch(it, pProgramItemData, destinationItemType);
-                    if (!IsAddingMultipleFilesToProgramBranchAllowed(pProgramItemData))
-                    {
-                        break;
-                    }
+                    kaApplicationCommands::instance().AddSourceFile(it);
                 }
-            }//for
 
-             // Save the project (so that the file is saved in this project):
-            afApplicationCommands::instance()->OnFileSaveProject();
-        }
+                AddFileNodeToProgramBranch(it, pProgramItemData, destinationItemType);
+                if (!IsAddingMultipleFilesToProgramBranchAllowed(pProgramItemData))
+                {
+                    break;
+                }
+            }
+        }//for
+
+         // Save the project (so that the file is saved in this project):
+        afApplicationCommands::instance()->OnFileSaveProject();
     }
 }
 
@@ -5895,8 +5911,9 @@ void kaApplicationTreeHandler::OnExportToCSVAction()
     }
 }
 
-void kaApplicationTreeHandler::OnNewProgram()
+kaProgram* kaApplicationTreeHandler::OnNewProgram()
 {
+    kaProgram* pProgramResult = nullptr;
     if (kaBackendManager::instance().isInBuild())
     {
         acMessageBox::instance().critical(afGlobalVariablesManager::ProductNameA(), KA_STR_ERR_CANNOT_CREATE_PROGRAM_DURING_BUILD);
@@ -5904,8 +5921,9 @@ void kaApplicationTreeHandler::OnNewProgram()
     else
     {
         // Create new Program (do not force project creation):
-        kaApplicationCommands::instance().NewProgramCommand(false);
+        pProgramResult = kaApplicationCommands::instance().NewProgramCommand(false);
     }
+    return pProgramResult;
 }
 
 afApplicationTreeItemData* kaApplicationTreeHandler::AddProgram(bool focusNode, kaProgram* pProgram)

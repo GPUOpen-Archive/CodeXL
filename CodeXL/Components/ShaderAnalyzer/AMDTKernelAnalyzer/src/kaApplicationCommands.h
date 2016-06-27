@@ -55,7 +55,7 @@ public:
 
     /// Perform the new program command:
     /// \param shouldForceProjectCreation when true, the function will always create default new project
-    void NewProgramCommand(bool shouldForceProjectCreation);
+    kaProgram* NewProgramCommand(bool shouldForceProjectCreation);
 
     /// Add an OpenCL file:
     /// \param clFilePath the cl file path
