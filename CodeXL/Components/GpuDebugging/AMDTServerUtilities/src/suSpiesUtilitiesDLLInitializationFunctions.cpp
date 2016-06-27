@@ -56,8 +56,7 @@ bool suInitializeSpiesUtilitiesModule()
     static bool stat_retVal = false;
 
     // Verify that we are only initialized once:
-//    static bool stat_wasInitialized = false;
-static bool stat_wasInitialized = true;
+    static bool stat_wasInitialized = false;
 
     if (!stat_wasInitialized)
     {

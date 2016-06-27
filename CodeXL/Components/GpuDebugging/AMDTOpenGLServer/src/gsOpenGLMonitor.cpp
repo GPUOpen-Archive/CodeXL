@@ -1113,13 +1113,6 @@ void gsOpenGLMonitor::addFunctionCall(apMonitoredFunctionId calledFunctionId, in
         _wasOpenGLServerInitialized = true;
     }
 
-
-    if (calledFunctionId == ap_loaderGetDispatchTableSize ||
-        calledFunctionId == ap_loaderGetProcOffset ||
-	calledFunctionId == ap_loaderAddDispatch || 
-        calledFunctionId == ap_loaderSetDispatch)
-	return;
-
     // Get the render context that is current to the calling thread:
     suContextMonitor* pRenderContextMonitor = currentThreadContextMonitor();
     GT_IF_WITH_ASSERT(pRenderContextMonitor != NULL)

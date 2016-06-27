@@ -48,34 +48,6 @@
 
 #endif
 
-unsigned int APIENTRY _loader_get_dispatch_table_size(void)
-{
-    gs_stat_openGLMonitorInstance.addFunctionCall(ap_loaderGetDispatchTableSize, 0);
-
-    return gs_stat_realFunctionPointers._loader_get_dispatch_table_size();
-}
-
-int APIENTRY _loader_get_proc_offset(const char* name)
-{
-    gs_stat_openGLMonitorInstance.addFunctionCall(ap_loaderGetProcOffset, 0);
-
-    return gs_stat_realFunctionPointers._loader_get_proc_offset(name);
-}
-
-int APIENTRY _loader_add_dispatch(const char* const* names, const char* signature)
-{
-    gs_stat_openGLMonitorInstance.addFunctionCall(ap_loaderAddDispatch, 0);
-
-    return gs_stat_realFunctionPointers._loader_add_dispatch(names, signature);
-}
-
-void APIENTRY _loader_set_dispatch(const void* dispTable)
-{
-    gs_stat_openGLMonitorInstance.addFunctionCall(ap_loaderSetDispatch, 0);
-
-    gs_stat_realFunctionPointers._loader_set_dispatch(dispTable);
-}
-
 
 // --------------------------------------------------------
 //             OpenGL Wrapper functions
