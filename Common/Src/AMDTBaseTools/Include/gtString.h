@@ -46,6 +46,7 @@ public:
     gtString& assign(gtString&& otherString);
 #endif
 
+    static const int npos;
     const wchar_t* asCharArray() const;
     const char* asUTF8CharArray() const;
     const char* asASCIICharArray() const;
