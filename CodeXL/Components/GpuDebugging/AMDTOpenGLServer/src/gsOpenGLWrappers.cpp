@@ -50,30 +50,51 @@
 
 unsigned int APIENTRY _loader_get_dispatch_table_size(void)
 {
+#if ((AMDT_BUILD_TARGET == AMDT_LINUX_OS) && (AMDT_LINUX_VARIANT == AMDT_GENERIC_LINUX_VARIANT))
     gs_stat_openGLMonitorInstance.addFunctionCall(ap_loaderGetDispatchTableSize, 0);
 
     return gs_stat_realFunctionPointers._loader_get_dispatch_table_size();
+#else
+    return 0;
+#endif
 }
 
 int APIENTRY _loader_get_proc_offset(const char* name)
 {
+    (void)name;
+
+#if ((AMDT_BUILD_TARGET == AMDT_LINUX_OS) && (AMDT_LINUX_VARIANT == AMDT_GENERIC_LINUX_VARIANT))
     gs_stat_openGLMonitorInstance.addFunctionCall(ap_loaderGetProcOffset, 0);
 
     return gs_stat_realFunctionPointers._loader_get_proc_offset(name);
+#else
+    return 0;
+#endif
 }
 
 int APIENTRY _loader_add_dispatch(const char* const* names, const char* signature)
 {
+    (void)names;
+    (void)signature;
+
+#if ((AMDT_BUILD_TARGET == AMDT_LINUX_OS) && (AMDT_LINUX_VARIANT == AMDT_GENERIC_LINUX_VARIANT))
     gs_stat_openGLMonitorInstance.addFunctionCall(ap_loaderAddDispatch, 0);
 
     return gs_stat_realFunctionPointers._loader_add_dispatch(names, signature);
+#else
+    return 0;
+#endif
 }
 
 void APIENTRY _loader_set_dispatch(const void* dispTable)
 {
+    (void)dispTable;
+
+#if ((AMDT_BUILD_TARGET == AMDT_LINUX_OS) && (AMDT_LINUX_VARIANT == AMDT_GENERIC_LINUX_VARIANT))
     gs_stat_openGLMonitorInstance.addFunctionCall(ap_loaderSetDispatch, 0);
 
     gs_stat_realFunctionPointers._loader_set_dispatch(dispTable);
+#endif
 }
 
 

@@ -2219,6 +2219,7 @@ GLAPI void GLAPIENTRY glGetProgramRegisterfvMESA(GLenum target, GLsizei len, con
 
 #endif /* GL_MESA_program_debug */
 
+#ifndef __WIN32__
 GLAPI unsigned int GLAPIENTRY _loader_get_dispatch_table_size(void);
 GLAPI int GLAPIENTRY _loader_get_proc_offset(const char* name);
 GLAPI int GLAPIENTRY _loader_add_dispatch(const char* const* names, const char* signature);
@@ -2227,6 +2228,7 @@ typedef unsigned int(*_DRI2_GLAPI_GET_DISPATCH_TABLE_SIZE)(void);
 typedef int(*_DRI2_GLAPI_GET_PROC_OFFSET)(const char* name);
 typedef int(*_DRI2_GLAPI_ADD_DISPATCH)(const char* const* names, const char* signature);
 typedef void(*_DRI2_GLAPI_SET_DISPATCH)(const void* dispTable);
+#endif
 
 
 #ifndef GL_ATI_blend_equation_separate
