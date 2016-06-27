@@ -1113,12 +1113,13 @@ void gsOpenGLMonitor::addFunctionCall(apMonitoredFunctionId calledFunctionId, in
         _wasOpenGLServerInitialized = true;
     }
 
-
+#if ((AMDT_BUILD_TARGET == AMDT_LINUX_OS) && (AMDT_LINUX_VARIANT == AMDT_GENERIC_LINUX_VARIANT))
     if (calledFunctionId == ap_loaderGetDispatchTableSize ||
         calledFunctionId == ap_loaderGetProcOffset ||
-	calledFunctionId == ap_loaderAddDispatch || 
+        calledFunctionId == ap_loaderAddDispatch || 
         calledFunctionId == ap_loaderSetDispatch)
-	return;
+        return;
+#endif
 
     // Get the render context that is current to the calling thread:
     suContextMonitor* pRenderContextMonitor = currentThreadContextMonitor();
