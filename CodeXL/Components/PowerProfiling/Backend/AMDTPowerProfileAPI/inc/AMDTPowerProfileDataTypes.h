@@ -201,8 +201,8 @@ typedef struct AMDTPwrCounterDesc
 {
     AMDTUInt32           m_counterID;       /**< Counter index */
     AMDTUInt32           m_deviceId;        /**< Device Id */
-    char*                m_name;            /**< Name of the counter */
-    char*                m_description;     /**< Description of the counter */
+    char*                m_name = nullptr;            /**< Name of the counter */
+    char*                m_description = nullptr;     /**< Description of the counter */
     AMDTPwrCategory      m_category;        /**< Power/Freq/Temperature */
     AMDTPwrAggregation   m_aggregation;     /**< Single/Histogram/Cumulative */
     AMDTFloat64          m_minValue;        /**< Minimum possible counter value */
