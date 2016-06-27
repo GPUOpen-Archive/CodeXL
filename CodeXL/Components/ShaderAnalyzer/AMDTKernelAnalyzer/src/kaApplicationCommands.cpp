@@ -714,8 +714,9 @@ bool kaApplicationCommands::AddSourceFile(const osFilePath& clFilePath, bool dis
 }
 
 // ---------------------------------------------------------------------------
-void kaApplicationCommands::NewProgramCommand(bool shouldForceProjectCreation)
+kaProgram* kaApplicationCommands::NewProgramCommand(bool shouldForceProjectCreation)
 {
+    kaProgram* pProgramResult = nullptr;
     // If there is no project, create one:
     bool isProjectSet = !afProjectManager::instance().currentProjectFilePath().isEmpty();
 
@@ -746,9 +747,11 @@ void kaApplicationCommands::NewProgramCommand(bool shouldForceProjectCreation)
     {
         if (isProjectSet && isInKAMode)
         {
-            CreateDefaultProgram(programDialog.GetSelectedProgramType());
+            pProgramResult = CreateDefaultProgram(programDialog.GetSelectedProgramType());
         }
     }
+
+    return pProgramResult;
 }
 
 // ---------------------------------------------------------------------------
