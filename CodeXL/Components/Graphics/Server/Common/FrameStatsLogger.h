@@ -60,7 +60,7 @@ public:
     //--------------------------------------------------------------------------
     /// Dump an individual stat file to disk
     //--------------------------------------------------------------------------
-    void WriteStatFile(StatFileType statType, char* fileName);
+    void WriteStatFile(StatFileType statType, const char* fileName);
 
 private:
     //--------------------------------------------------------------------------
