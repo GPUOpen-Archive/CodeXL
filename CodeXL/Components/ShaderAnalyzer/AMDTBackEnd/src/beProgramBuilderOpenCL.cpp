@@ -457,10 +457,6 @@ beKA::beStatus beProgramBuilderOpenCL::InitializeOpenCL()
                     break;
                 }
 
-                m_DeviceNames.insert(string(asicName));
-                m_DeviceIdNameMap[m_OpenCLDeviceIDs[i]] = string(asicName);
-                m_NameDeviceIdMap[string(asicName)] = m_OpenCLDeviceIDs[i];
-
                 cl_device_type deviceType;
                 status = m_TheOpenCLModule.GetDeviceInfo(m_OpenCLDeviceIDs[i], CL_DEVICE_TYPE, sizeof(cl_device_type), &deviceType, NULL);
 
@@ -474,7 +470,13 @@ beKA::beStatus beProgramBuilderOpenCL::InitializeOpenCL()
                     break;
                 }
 
-                m_NameDeviceTypeMap[string(asicName)] = deviceType;
+                if (deviceType != CL_DEVICE_TYPE_CPU)
+                {
+                    m_DeviceNames.insert(string(asicName));
+                    m_DeviceIdNameMap[m_OpenCLDeviceIDs[i]] = string(asicName);
+                    m_NameDeviceIdMap[string(asicName)] = m_OpenCLDeviceIDs[i];
+                    m_NameDeviceTypeMap[string(asicName)] = deviceType;
+                }
             }
         }
 
