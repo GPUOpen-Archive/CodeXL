@@ -1062,7 +1062,7 @@ bool FunctionsDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allModul
 		{
 			QStringList list;
 
-			std::vector<gtString> selectedCounterList;
+			CounterNameIdVec selectedCounterList;
 
 			// insert the function id 
 			QVariant mId(profData.m_id);

@@ -530,7 +530,7 @@ bool ProcessesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId,
         {
             QStringList list;
 
-            std::vector<gtString> selectedCounterList;
+			CounterNameIdVec selectedCounterList;
 
             AMDTProfileProcessInfoVec procInfo;
             rc = m_pProfDataRdr->GetProcessInfo(profData.m_id, procInfo);

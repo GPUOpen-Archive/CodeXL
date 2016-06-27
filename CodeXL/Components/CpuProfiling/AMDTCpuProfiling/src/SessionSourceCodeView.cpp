@@ -125,6 +125,7 @@ bool SessionSourceCodeView::DisplayViewModule(std::tuple<AMDTFunctionId, const g
     setCentralWidget(m_pWidget);
 
     // Create the symbols information:
+	//TODO : required ??
     m_pTreeViewModel->CreateSymbolInfoList(m_moduleId, m_processId);
 
     // Create the top layout:
@@ -137,7 +138,7 @@ bool SessionSourceCodeView::DisplayViewModule(std::tuple<AMDTFunctionId, const g
     ExtendTreeContextMenu();
 
     // Add a source code item to the tree:
-    AddSourceCodeItemToExplorer();
+    //AddSourceCodeItemToExplorer();
 
     // Update display filter string:
     updateDisplaySettingsString();
@@ -168,6 +169,7 @@ void SessionSourceCodeView::UpdateTableDisplay(unsigned int updateType)
         // Get the current precision:
         m_precision = afGlobalVariablesManager::instance().floatingPointPrecision();
 
+#if 0
         // Restore the currently selected address if not new address is requested:
         if (0 == m_pTreeViewModel->m_newAddress)
         {
@@ -182,6 +184,7 @@ void SessionSourceCodeView::UpdateTableDisplay(unsigned int updateType)
             m_pTreeViewModel->m_newAddress = m_pTreeViewModel->m_currentSymbolIterator->m_va;
         }
 
+#endif
         // Clear the tree and table items:
         m_pTreeViewModel->removeRows(0, m_pTreeViewModel->rowCount());
         m_pTreeViewModel->m_sourceTreeItemsMap.clear();
@@ -248,7 +251,6 @@ void SessionSourceCodeView::UpdateTableDisplay(unsigned int updateType)
             RefreshView();
 
         }
-
         qApp->restoreOverrideCursor();
     }
 }
@@ -416,7 +418,6 @@ void SessionSourceCodeView::CreateDisplayFilterLinkLabel()
             width = pTestLabel->fontMetrics().boundingRect(longestDisplayFilter).width();
         }
 
-
         // Create the display filter link:
         acToolbarActionData actionData(SIGNAL(linkActivated(const QString&)), this, SLOT(OnDisplaySettingsClicked()));
         actionData.m_actionType = acToolbarActionData::AC_LABEL_ACTION;
@@ -449,7 +450,8 @@ bool SessionSourceCodeView::FillHotspotIndicatorCombo()
             GT_IF_WITH_ASSERT(!filterName.isEmpty())
             {
                 CounterNameIdVec countersName;
-                m_pDisplayFilter->GetConfigCounters(filterName, countersName);
+				m_pDisplayFilter->GetSelectedCounterList(countersName);
+                //m_pDisplayFilter->GetConfigCounters(filterName, countersName);
 
                 for (const auto& name : countersName)
                 {
@@ -704,7 +706,9 @@ void SessionSourceCodeView::OnTreeItemClick(const QModelIndex& index)
     GT_IF_WITH_ASSERT(m_pTreeViewModel != nullptr)
     {
         // Extract the top level item index + the top level item child index for the current selection:
-        bool rc = m_pTreeViewModel->GetItemTopLevelIndex(index, m_userDisplayInformation.m_selectedTopLevelItemIndex, m_userDisplayInformation.m_selectedTopLevelChildItemIndex);
+        bool rc = m_pTreeViewModel->GetItemTopLevelIndex(index, 
+			m_userDisplayInformation.m_selectedTopLevelItemIndex, 
+			m_userDisplayInformation.m_selectedTopLevelChildItemIndex);
         GT_ASSERT(rc);
     }
 }
@@ -911,86 +915,6 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
     }
 }
 
-bool SessionSourceCodeView::FindRequestedFunctionInModule(int functionIndex)
-{
-    bool retVal = false;
-
-    // Can we safely bailout if functionIndex is -1 ?
-    if (-1 == functionIndex)
-    {
-        return false;
-    }
-
-    // Sanity check:
-    GT_IF_WITH_ASSERT(m_pTreeViewModel != nullptr)
-    {
-        // Check if the function is already in the current address:
-        retVal = IsAddressInCurrentFunction(m_pTreeViewModel->m_newAddress);
-
-        if (!retVal)
-        {
-            retVal = true;
-
-            // Reset the "Display only dasm flag":
-            m_pTreeViewModel->m_isDisplayingOnlyDasm = false;
-
-            // Reset the symbol iterator to the beginning of the function:
-            m_pTreeViewModel->m_currentSymbolIterator = m_pTreeViewModel->m_symbolsInfoList.begin();
-            FuncSymbolsList::iterator itEnd = m_pTreeViewModel->m_symbolsInfoList.end();
-
-            // Increment the iterator to point to the "functionIndex" position in the list:
-            for (int i = 0; i < functionIndex; ++i, ++m_pTreeViewModel->m_currentSymbolIterator)
-            {
-                if (m_pTreeViewModel->m_currentSymbolIterator == itEnd)
-                {
-                    // Function index exceeds the list size:
-                    retVal = false;
-                    break;
-                }
-            }
-
-
-            GT_IF_WITH_ASSERT(retVal)
-            {
-                if (0 == m_pTreeViewModel->m_newAddress)
-                {
-                    m_pTreeViewModel->m_newAddress = m_pTreeViewModel->m_currentSymbolIterator->m_va;
-                }
-
-                // Find the function within the module:
-                m_pTreeViewModel->m_pDisplayedFunction = m_pTreeViewModel->m_pModule->findFunction(m_pTreeViewModel->m_currentSymbolIterator->m_va);
-
-                if (m_pTreeViewModel->m_pDisplayedFunction == nullptr)
-                {
-                    m_pTreeViewModel->m_pDisplayedFunction = m_pTreeViewModel->m_pModule->getUnchartedFunction();
-                }
-
-                if (m_pTreeViewModel->m_pDisplayedFunction != nullptr)
-                {
-                    // Set the new display function properties:
-                    m_pTreeViewModel->m_loadAddr = m_pTreeViewModel->m_currentSymbolIterator->m_va;
-
-                    GT_IF_WITH_ASSERT(m_pTreeViewModel->m_pDisplayedFunction != nullptr)
-                    {
-                        if (CA_NO_SYMBOL == m_pTreeViewModel->m_currentSymbolIterator->m_name)
-                        {
-                            m_pTreeViewModel->m_loadAddr = m_pTreeViewModel->m_pDisplayedFunction->getBaseAddr();
-                        }
-                    }
-                }
-                else
-                {
-                    // Function not found:
-                    retVal = false;
-                }
-            }
-
-            UpdateWithNewSymbol();
-        }
-    }
-
-    return retVal;
-}
 
 void SessionSourceCodeView::UpdateWithNewSymbol()
 {
@@ -1846,11 +1770,6 @@ bool SessionSourceCodeView::CreateModelData()
             // Get the source file and store it in the cache
             if (GetActualSourceFile(acGTStringToQString(m_srcFilePath), tryFile))
             {
-                // Get source lines from source file:
-                //bool rc = (m_pTreeViewModel->m_funOffsetLinenumMap.size() > 0);
-
-                //if (rc)
-                //{
                 bool rc = m_pTreeViewModel->SetSourceLines(tryFile, 1, GT_INT32_MAX);
                 GT_IF_WITH_ASSERT(rc)
                 {
@@ -1887,9 +1806,9 @@ bool SessionSourceCodeView::CreateModelData()
         {
             // Render DASM
             retVal = m_pTreeViewModel->BuildDisassemblyTree();
+			m_pTreeViewModel->m_isDisplayingOnlyDasm = false;
         }
-    }
-
+	}
     return retVal;
 }
 
@@ -1907,6 +1826,7 @@ void SessionSourceCodeView::UpdateColumnWidths()
     }
 }
 
+#if 0
 void SessionSourceCodeView::UpdatePercentDelegate()
 {
     // Sanity check:
@@ -1940,6 +1860,20 @@ void SessionSourceCodeView::UpdatePercentDelegate()
         m_pTreeItemDelegate->SetPercentColumnsList(percentColumnsList);
         m_pTreeItemDelegate->SetPercentForgroundColor(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
     }
+}
+#endif
+
+void SessionSourceCodeView::UpdatePercentDelegate()
+{
+	// Sanity check:
+	GT_IF_WITH_ASSERT((m_pTreeItemDelegate != nullptr) && (m_pDisplayFilter != nullptr))
+	{
+		QList<int> percentColumnsList;
+		percentColumnsList << SOURCE_VIEW_SAMPLES_PERCENT_COLUMN;
+
+		m_pTreeItemDelegate->SetPercentColumnsList(percentColumnsList);
+		m_pTreeItemDelegate->SetPercentForgroundColor(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
+	}
 }
 
 void SessionSourceCodeView::RefreshView()
@@ -2335,6 +2269,7 @@ bool SessionSourceCodeView::DisplayModule(const CpuProfileModule* pModule)
     return retVal;
 }
 
+
 void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
 {
     // When the function is changed, clear the user selection information:
@@ -2567,5 +2502,86 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
             ProtectedUpdateTableDisplay(UPDATE_TABLE_REBUILD);
         }
     }
+}
+
+bool SessionSourceCodeView::FindRequestedFunctionInModule(int functionIndex)
+{
+	bool retVal = false;
+
+	// Can we safely bailout if functionIndex is -1 ?
+	if (-1 == functionIndex)
+	{
+		return false;
+	}
+
+	// Sanity check:
+	GT_IF_WITH_ASSERT(m_pTreeViewModel != nullptr)
+	{
+		// Check if the function is already in the current address:
+		retVal = IsAddressInCurrentFunction(m_pTreeViewModel->m_newAddress);
+
+		if (!retVal)
+		{
+			retVal = true;
+
+			// Reset the "Display only dasm flag":
+			m_pTreeViewModel->m_isDisplayingOnlyDasm = false;
+
+			// Reset the symbol iterator to the beginning of the function:
+			m_pTreeViewModel->m_currentSymbolIterator = m_pTreeViewModel->m_symbolsInfoList.begin();
+			FuncSymbolsList::iterator itEnd = m_pTreeViewModel->m_symbolsInfoList.end();
+
+			// Increment the iterator to point to the "functionIndex" position in the list:
+			for (int i = 0; i < functionIndex; ++i, ++m_pTreeViewModel->m_currentSymbolIterator)
+			{
+				if (m_pTreeViewModel->m_currentSymbolIterator == itEnd)
+				{
+					// Function index exceeds the list size:
+					retVal = false;
+					break;
+				}
+			}
+
+
+			GT_IF_WITH_ASSERT(retVal)
+			{
+				if (0 == m_pTreeViewModel->m_newAddress)
+				{
+					m_pTreeViewModel->m_newAddress = m_pTreeViewModel->m_currentSymbolIterator->m_va;
+				}
+
+				// Find the function within the module:
+				m_pTreeViewModel->m_pDisplayedFunction = m_pTreeViewModel->m_pModule->findFunction(m_pTreeViewModel->m_currentSymbolIterator->m_va);
+
+				if (m_pTreeViewModel->m_pDisplayedFunction == nullptr)
+				{
+					m_pTreeViewModel->m_pDisplayedFunction = m_pTreeViewModel->m_pModule->getUnchartedFunction();
+				}
+
+				if (m_pTreeViewModel->m_pDisplayedFunction != nullptr)
+				{
+					// Set the new display function properties:
+					m_pTreeViewModel->m_loadAddr = m_pTreeViewModel->m_currentSymbolIterator->m_va;
+
+					GT_IF_WITH_ASSERT(m_pTreeViewModel->m_pDisplayedFunction != nullptr)
+					{
+						if (CA_NO_SYMBOL == m_pTreeViewModel->m_currentSymbolIterator->m_name)
+						{
+							m_pTreeViewModel->m_loadAddr = m_pTreeViewModel->m_pDisplayedFunction->getBaseAddr();
+						}
+					}
+				}
+				else
+				{
+					// Function not found:
+					retVal = false;
+				}
+			}
+
+			UpdateWithNewSymbol();
+		}
+	}
+
+	return retVal;
 }
 #endif

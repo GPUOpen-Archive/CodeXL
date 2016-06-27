@@ -566,7 +566,7 @@ bool ModulesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, s
         {
             QStringList list;
 
-            std::vector<gtString> selectedCounterList;
+			CounterNameIdVec selectedCounterList;
 
             // insert module id
             QVariant mId(profData.m_moduleId);

@@ -138,7 +138,7 @@ private:
     /// Finds the requested function in the displayed module:
     /// \param functionIndex the function within the functions combo box
     /// \return true iff the function was found successfully
-    bool FindRequestedFunctionInModule(int functionIndex);
+    //bool FindRequestedFunctionInModule(int functionIndex);
 
     void HideFilteredColumns();
 

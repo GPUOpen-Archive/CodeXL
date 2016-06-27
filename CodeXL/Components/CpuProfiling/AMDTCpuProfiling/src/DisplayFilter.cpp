@@ -1030,7 +1030,7 @@ bool DisplayFilter::CreateConfigCounterMap()
 
 				for (const auto& counter : config.m_counterDescs)
 				{
-					auto nameIdDesc = make_tuple(counter.m_name, counter.m_abbrev, counter.m_description);
+					auto nameIdDesc = make_tuple(counter.m_name, counter.m_abbrev, counter.m_description, counter.m_id);
 					counters.push_back(nameIdDesc);
 					m_counterNameIdMap.emplace(counter.m_name, counter.m_id);
 					m_counterIdNameMap.emplace(counter.m_id, counter.m_name);
@@ -1125,7 +1125,7 @@ DisplayFilter::InitToDefault()
 		for (auto const& counter : m_reportConfigs[0].m_counterDescs)
 		{
 			m_options.m_counters.push_back(counter.m_id);
-			m_selectedCountersIdList.push_back(counter.m_name);
+			m_selectedCountersIdList.push_back(make_tuple(counter.m_name, counter.m_abbrev, counter.m_description, counter.m_id));
 		}
 
 		retVal = m_pProfDataReader->SetReportOption(m_options);
@@ -1134,7 +1134,7 @@ DisplayFilter::InitToDefault()
 	return retVal;
 }
 
-void DisplayFilter::GetSupportedCountersList(std::vector<gtString>& counterList)
+void DisplayFilter::GetSupportedCountersList(CounterNameIdVec& counterList)
 {
 	counterList = m_selectedCountersIdList;
 }
@@ -1184,7 +1184,7 @@ void DisplayFilter::SetProfileDataOption()
 
 	for (auto const& selCounter : m_selectedCountersIdList)
 	{
-		auto foundCountId = m_counterNameIdMap.find(selCounter);
+		auto foundCountId = m_counterNameIdMap.find(get<0>(selCounter));
 		if (m_counterNameIdMap.end() != foundCountId)
 		{
 			m_options.m_counters.push_back(foundCountId->second);
