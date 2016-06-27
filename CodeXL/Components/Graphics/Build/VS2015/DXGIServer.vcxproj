@@ -38,7 +38,7 @@
     <Import Project="Server-Common.props" />
     <Import Project="$(CommonDir)\Lib\Ext\Windows-Kits\Global-WindowsSDK.props" />
     <Import Project="$(CommonDir)\Lib\Ext\Boost\Global-Boost-2015.props" />
-    <Import Project="AMDTOSWrappers.props" />
+    <Import Project="CodeXLGraphics.props" />
     <Import Condition="'$(SolutionName)'!='CodeXL-AllProjects'" Project="$(CommonDir)\Lib\AMD\LiquidVR-SDK\Global-LiquidVR.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(SolutionName)'=='CodeXL-AllProjects'">

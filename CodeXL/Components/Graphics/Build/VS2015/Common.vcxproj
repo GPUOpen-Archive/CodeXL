@@ -45,7 +45,7 @@
     <Import Project="$(CommonDir)\Src\GPUPerfAPIUtils\Global-GPUPerfAPIUtils.props" />
     <Import Project="$(CommonDir)\Lib\AMD\GPUPerfAPI\Global-GPUPerfAPI.props" />
     <Import Condition="'$(SolutionName)'!='CodeXL-AllProjects'" Project="$(CommonDir)\Lib\AMD\ShaderDebugger\Global-ShaderDebugger-2015.props" />
-    <Import Project="AMDTOSWrappers.props" />
+    <Import Project="CodeXLGraphics.props" />
     <Import Condition="'$(GDT_BUILD)'=='GDT_INTERNAL'" Project="$(CommonDir)\Lib\AMD\GPUThreadTrace\Global-GPUThreadTrace.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -60,31 +60,31 @@
     <ClCompile />
     <Lib>
       <OutputFile>$(OutDir)$(GDTProjectName).lib</OutputFile>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>CXLBaseTools$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(BaseDir)CodeXL\Output\$(Configuration)\arch;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Lib>
       <OutputFile>$(OutDir)$(GDTProjectName).lib</OutputFile>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(BaseDir)CodeXL\Output\$(Configuration)\arch;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>CXLBaseTools$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <ClCompile />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Lib>
       <OutputFile>$(OutDir)$(GDTProjectName).lib</OutputFile>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>CXLBaseTools$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(BaseDir)CodeXL\Output\$(Configuration)\arch;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <ClCompile />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Lib>
       <OutputFile>$(OutDir)$(GDTProjectName).lib</OutputFile>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>CXLBaseTools$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(BaseDir)CodeXL\Output\$(Configuration)\arch;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <ClCompile />
   </ItemDefinitionGroup>

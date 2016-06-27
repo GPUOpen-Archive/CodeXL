@@ -40,7 +40,7 @@
     <Import Project="$(CommonDir)\Lib\Ext\tinyxml\Global-TinyXML-2015.props" />
     <Import Project="$(CommonDir)\Lib\Ext\Boost\Global-Boost-2015.props" />
     <Import Project="$(CommonDir)\Src\TSingleton\Global-TSingleton.props" />
-    <Import Project="AMDTOSWrappers.props" />
+    <Import Project="CodeXLGraphics.props" />
     <Import Project="$(CommonDir)\Src\GPUPerfAPIUtils\Global-GPUPerfAPIUtils.props" />
     <Import Project="$(CommonDir)\Lib\AMD\GPUPerfAPI\Global-GPUPerfAPI.props" />
   </ImportGroup>

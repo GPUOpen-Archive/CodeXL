@@ -114,8 +114,8 @@ private:
 /// Default constructor for the TraceMetadata class.
 //--------------------------------------------------------------------------
 TraceMetadata::TraceMetadata()
-    : mArchitecture(OS_UNKNOWN_ARCHITECTURE)
-    , mFrameInfo(NULL)
+    : mFrameInfo(NULL)
+    , mArchitecture(OS_UNKNOWN_ARCHITECTURE)
     , mAPICallCount(0)
     , mDrawCallCount(0)
     , mTracedFramesCount(0)
