@@ -56,7 +56,7 @@ void __attribute__((destructor))  finiPowerProfileDriverInterface(void)
 bool g_isSVI2Supported = false;
 // Create API layer pool.
 static MemoryPool g_apiMemoryPool;
-#define API_POOL_SIZE 1048576 // 1MB
+#define API_POOL_SIZE 10485760 // 10MB
 
 static AMDTUInt32 g_samplingPeriod = 0;
 static AMDTPwrProfileMode g_profileMode;
@@ -72,7 +72,7 @@ static std::vector <AMDTUInt32> g_filterCounters;
 // Single counter Output list
 gtVector<AMDTPwrSample> g_result;
 AMDTPwrCounterValue*     g_pCounterStorage = nullptr;
-#define PWR_COUNTER_STORAGE_POOL (256*100)
+#define PWR_COUNTER_STORAGE_POOL (1024*256)
 
 // Cummulative counter Output list
 gtVector <AMDTFloat32> g_cummulativeResult;
@@ -397,8 +397,8 @@ AMDTResult PrepareSystemTopologyInfo()
         AMDTPwrDevice* newCu = AllocateDevice(&devCnt);
         newCu->m_deviceID = deviceIdx++;
         newCu->m_type = AMDT_PWR_DEVICE_CPU_COMPUTE_UNIT;
-       //TODO: GUI shouldn't check for constant string
-	    sprintf(newCu->m_pName, "CPU CU%d", cnt);
+        //TODO: GUI shouldn't check for constant string
+        sprintf(newCu->m_pName, "CPU CU%d", cnt);
         sprintf(newCu->m_pDescription, "Compute Unit %d", cnt);
 
         if (true == smuAccesible)
