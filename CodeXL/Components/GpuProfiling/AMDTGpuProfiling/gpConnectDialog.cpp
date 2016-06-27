@@ -154,11 +154,11 @@ void gpConnectDialog::InitLayout()
         switch (settings.m_connection)
         {
             case gpProjectSettings::egpProcessConnection:
-                m_pOptionsEdit->setText(settings.m_processName);
+                m_pOptionsEdit->setText(settings.m_processNumber);
                 break;
 
             case gpProjectSettings::egpFirstApiInProcessConnection:
-                m_pOptionsEdit->setText(settings.m_processNumber);
+                m_pOptionsEdit->setText(settings.m_processName);
                 break;
 
             case gpProjectSettings::egpFirstApiConnection:
