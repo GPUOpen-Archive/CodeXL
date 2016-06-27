@@ -357,10 +357,10 @@ AMDTResult PrepareSystemTopologyInfo()
 
     if (pNodeInfo)
     {
-	    //TODO: GUI shouldn't check for constant string
+        //TODO: GUI shouldn't check for constant string
         memset(pkg0->m_pName, 0, AMDT_PWR_EXE_NAME_LENGTH);
         //sprintf(pkg0->m_pName, pNodeInfo->m_shortName);
-        sprintf(pkg0->m_pDescription, pNodeInfo->m_name);
+        sprintf(pkg0->m_pDescription, "%s",pNodeInfo->m_name);
     }
 
     // ONLY if supported AMD platform
