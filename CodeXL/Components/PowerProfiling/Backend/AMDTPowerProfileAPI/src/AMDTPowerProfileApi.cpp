@@ -357,8 +357,10 @@ AMDTResult PrepareSystemTopologyInfo()
 
     if (pNodeInfo)
     {
-        sprintf(pkg0->m_pName, "%s", pNodeInfo->m_shortName);
-        sprintf(pkg0->m_pDescription, "%s", pNodeInfo->m_name);
+	    //TODO: GUI shouldn't check for constant string
+        memset(pkg0->m_pName, 0, AMDT_PWR_EXE_NAME_LENGTH);
+        //sprintf(pkg0->m_pName, pNodeInfo->m_shortName);
+        sprintf(pkg0->m_pDescription, pNodeInfo->m_name);
     }
 
     // ONLY if supported AMD platform
@@ -395,7 +397,8 @@ AMDTResult PrepareSystemTopologyInfo()
         AMDTPwrDevice* newCu = AllocateDevice(&devCnt);
         newCu->m_deviceID = deviceIdx++;
         newCu->m_type = AMDT_PWR_DEVICE_CPU_COMPUTE_UNIT;
-        sprintf(newCu->m_pName, "CU-%d", cnt);
+       //TODO: GUI shouldn't check for constant string
+	    sprintf(newCu->m_pName, "CPU CU%d", cnt);
         sprintf(newCu->m_pDescription, "Compute Unit %d", cnt);
 
         if (true == smuAccesible)
@@ -411,8 +414,9 @@ AMDTResult PrepareSystemTopologyInfo()
             AMDTPwrDevice* newCore = AllocateDevice(&devCnt);
             newCore->m_deviceID = deviceIdx++;
             newCore->m_type = AMDT_PWR_DEVICE_CPU_CORE;
-            sprintf(newCore->m_pName, "Core-%d", coreId);
-            sprintf(newCore->m_pDescription, "Core %d", coreId);
+            //TODO: GUI shouldn't check for constant string
+            sprintf(newCore->m_pName, "CPU Core%d", coreId);
+            sprintf(newCore->m_pDescription, "Core%d", coreId);
             newCore->m_pFirstChild = nullptr;
             PwrInsertDeviceCounters(newCore, coreId, 0);
             newCore->m_isAccessible = true;
@@ -464,8 +468,9 @@ AMDTResult PrepareSystemTopologyInfo()
             AMDTPwrDevice* newCore = AllocateDevice(&devCnt);
             newCore->m_deviceID = deviceIdx++;
             newCore->m_type = AMDT_PWR_DEVICE_CPU_CORE;
-            sprintf(newCore->m_pName, "Core-%d", coreId);
-            sprintf(newCore->m_pDescription, "Core %d", coreId);
+            //TODO: GUI shouldn't check for constant string
+            sprintf(newCore->m_pName, "Core%d", coreId);
+            sprintf(newCore->m_pDescription, "Core%d", coreId);
             PwrInsertDeviceCounters(newCore, coreId, 0);
             newCore->m_isAccessible = true;
             coreId++;
@@ -499,7 +504,9 @@ AMDTResult PrepareSystemTopologyInfo()
             AMDTPwrDevice* igpu = AllocateDevice(&devCnt);
             igpu->m_deviceID = deviceIdx++;
             igpu->m_type = AMDT_PWR_DEVICE_INTERNAL_GPU;
-            sprintf(igpu->m_pName, "Igpu");
+            //TODO: GUI shouldn't check for constant string
+            memset(igpu->m_pName, 0, AMDT_PWR_EXE_NAME_LENGTH);
+            //sprintf(igpu->m_pName, "Igpu");
             sprintf(igpu->m_pDescription, "Integrated GPU");
             igpu->m_pFirstChild = nullptr;
 
