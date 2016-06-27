@@ -651,8 +651,6 @@ void ppReporterCsv::ConstructProfiledCounterDataHdr(AMDTPwrSample*& sample)
         m_dataStr.append(m_pDataStr);
     }
 
-    m_dataStr.append("\n");
-
     return;
 } // ConstructProfiledCounterDataHdr
 
