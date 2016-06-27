@@ -115,6 +115,7 @@ AMDTResult PwrProfileInitialize(
         PwrTrace("PwrProfileInitialize failed as pParam == NULL");
     }
 
+    g_supportedCounterMap.clear();
     g_isOnline = (bool)pParam->isOnline;
 
     if (AMDT_STATUS_OK == ret)
