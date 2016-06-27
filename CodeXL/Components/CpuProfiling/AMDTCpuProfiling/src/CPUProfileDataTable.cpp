@@ -1919,13 +1919,14 @@ bool CPUProfileDataTable::initializeTableHeaders(shared_ptr<DisplayFilter> dipla
             columnTooltipsByObjectType << colTooltip;
         }
 
-        std::vector<gtString> selectedCounterList;
+		CounterNameIdVec selectedCounterList;
 
         diplayFilter->GetSelectedCounterList(selectedCounterList);
 
         for (const auto& counter : selectedCounterList)
         {
-            columnsStringByObjectType << counter.asASCIICharArray();
+			// print counter abbreviation
+			columnsStringByObjectType << acGTStringToQString(get<1>(counter));
         }
 
         initHeaders(columnsStringByObjectType, false);

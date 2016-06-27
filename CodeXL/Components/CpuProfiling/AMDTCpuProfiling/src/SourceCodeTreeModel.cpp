@@ -717,6 +717,87 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
 
 bool SourceCodeTreeModel::BuildDisassemblyTree()
 {
+
+	gtVector<AMDTProfileCounterDesc> counterDesc;
+	gtString srcFilePath;
+	AMDTSourceAndDisasmInfoVec srcInfoVec;
+
+	AMDTProfileFunctionData  functionData;
+	int retVal = m_pProfDataRdr->GetFunctionDetailedProfileData(m_funcId,
+		m_pid,
+		m_tid,
+		functionData);
+
+	if (retVal != CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE)
+	{
+		retVal = m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_funcId, srcFilePath, srcInfoVec);
+	}
+
+
+	for (const auto& srcData : functionData.m_srcLineDataList)
+	{
+		bool samplePercentSet = m_pDisplayFilter->GetSamplePercent();
+		gtVector<gtVAddr> instOffsetVec;
+		GetInstOffsets(srcData.m_sourceLineNumber, srcInfoVec, instOffsetVec);
+
+		int idx = SOURCE_VIEW_SAMPLES_PERCENT_COLUMN + 1;
+		for (auto& instOffset : instOffsetVec)
+		{
+			SourceViewTreeItem* pAsmItem = new SourceViewTreeItem(m_pSessionDisplaySettings,
+				SOURCE_VIEW_ASM_DEPTH,
+				m_pRootItem);
+
+			gtString disasm;
+			gtString codeByte;
+
+			GetDisasmString(instOffset, srcInfoVec, disasm, codeByte);
+			AMDTSampleValueVec sampleValue;
+			GetDisasmSampleValue(instOffset, functionData.m_instDataList, sampleValue);
+
+			idx = SOURCE_VIEW_SAMPLES_PERCENT_COLUMN+1;
+			bool flag = true;
+
+			for (auto& aSampleValue : sampleValue)
+			{
+				if (true == flag)
+				{
+					pAsmItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, aSampleValue.m_sampleCount);
+					pAsmItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, aSampleValue.m_sampleCountPercentage);
+					pAsmItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
+					flag = false;
+				}
+
+				if (false == samplePercentSet)
+				{
+					double sampleCount = aSampleValue.m_sampleCount;
+					pAsmItem->setData(idx, sampleCount);
+				}
+				else
+				{
+					QVariant var;
+					SetPercentFormat(aSampleValue.m_sampleCountPercentage, true, var);
+					pAsmItem->setData(idx, var);
+				}
+
+				idx++;
+			}
+
+			pAsmItem->setData(SOURCE_VIEW_ADDRESS_COLUMN, "0x" + QString::number(instOffset, 16));
+			pAsmItem->setForeground(SOURCE_VIEW_ADDRESS_COLUMN, acQGREY_TEXT_COLOUR);
+
+			pAsmItem->setData(SOURCE_VIEW_SOURCE_COLUMN, acGTStringToQString(disasm));
+			pAsmItem->setForeground(SOURCE_VIEW_SOURCE_COLUMN, acQGREY_TEXT_COLOUR);
+
+			pAsmItem->setData(SOURCE_VIEW_CODE_BYTES_COLUMN, acGTStringToQString(codeByte));
+			pAsmItem->setForeground(SOURCE_VIEW_CODE_BYTES_COLUMN, acQGREY_TEXT_COLOUR);
+		}
+	}
+	return true;
+}
+
+#if 0
+bool SourceCodeTreeModel::BuildDisassemblyTree()
+{
     SourceViewTreeItem* pCurrentLineItem = nullptr;
     SourceViewTreeItem* pAsmItem = nullptr;
 
@@ -962,7 +1043,7 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
 
     return true;
 }
-
+#endif
 void SourceCodeTreeModel::InsertDasmLines(gtVAddr displayAddress, unsigned int startIndex)
 {
     // Sanity check:
@@ -1240,6 +1321,7 @@ void SourceCodeTreeModel::PrintFunctionDetailData(AMDTProfileFunctionData data,
             if (true == flag)
             {
                 pLineItem->setData(SOURCE_VIEW_ADDRESS_COLUMN, "0x" + QString::number(moduleBaseAddr + instOffset, 16));
+				m_newAddress = moduleBaseAddr + instOffset;
                 flag = false;
             }
 
@@ -1263,15 +1345,19 @@ void SourceCodeTreeModel::BuildTree(const std::vector<SourceViewTreeItem*>& srcL
 	if (true == ret)
 	{
         AMDTProfileFunctionData  functionData;
-        int rc = m_pProfDataRdr->GetFunctionDetailedProfileData(m_funcId,
+        int retVal = m_pProfDataRdr->GetFunctionDetailedProfileData(m_funcId,
                                                              m_pid,
                                                              m_tid,
                                                              functionData);
 
-        gtString srcFilePath;
-        AMDTSourceAndDisasmInfoVec srcInfoVec;
-        rc = m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_funcId, srcFilePath, srcInfoVec);
-        PrintFunctionDetailData(functionData, srcFilePath, srcInfoVec, srcLineViewTreeMap);
+		if (retVal != CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE)
+		{
+			gtString srcFilePath;
+			AMDTSourceAndDisasmInfoVec srcInfoVec;
+			retVal = m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_funcId, srcFilePath, srcInfoVec);
+
+			PrintFunctionDetailData(functionData, srcFilePath, srcInfoVec, srcLineViewTreeMap);
+		}
     }
 }
 
@@ -1374,9 +1460,11 @@ bool SourceCodeTreeModel::UpdateHeaders()
         m_headerTooltips << CP_colCaptionSamplesPercentTooltip;
 
 		CounterNameIdVec counterDesc;
+#if 0
 		QString configName = m_pDisplayFilter->GetCurrentCofigName();
 		m_pDisplayFilter->GetConfigCounters(configName, counterDesc);
-
+#endif
+		m_pDisplayFilter->GetSelectedCounterList(counterDesc);
         for (const auto& counter : counterDesc)
         {
             m_headerCaptions << acGTStringToQString(std::get<1>(counter));

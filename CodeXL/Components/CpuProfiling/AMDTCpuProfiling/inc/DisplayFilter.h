@@ -258,7 +258,7 @@ class cxlProfileDataReader;
 // TYPEDEFS
 //using CounterNameIdVec = std::vector<std::pair<gtString, AMDTUInt32>>;
 // name, abbreviation and description
-using CounterNameIdVec = std::vector<std::tuple<gtString, gtString, gtString>>;
+using CounterNameIdVec = std::vector<std::tuple<gtString, gtString, gtString, AMDTUInt32>>;
 using cofigNameCounterMap = std::map<gtString, CounterNameIdVec>;
 using cofigNameCounterPair = std::pair<gtString, CounterNameIdVec>;
 using CounterNameIdMap = std::map<gtString, AMDTUInt64>;
@@ -299,7 +299,7 @@ public:
     AMDTUInt64 GetCoreMask() const { return m_options.m_coreMask; }
     bool InitToDefault();
 
-    void GetSupportedCountersList(std::vector<gtString>& counterList);
+    void GetSupportedCountersList(CounterNameIdVec& counterList);
 
     int GetCpuCoreCnt() const;
     const void GetConfigName(std::vector<gtString>& configNameList) const { configNameList = m_configNameList; }
@@ -309,8 +309,8 @@ public:
     gtString GetCounterName(AMDTUInt64 counterId) const;
 
     // selected counterList
-    void SetSelectedCounterList(const std::vector<gtString>& list) { m_selectedCountersIdList.clear();  m_selectedCountersIdList = list; }
-    void GetSelectedCounterList(std::vector<gtString>& list) { list = m_selectedCountersIdList; }
+    void SetSelectedCounterList(const CounterNameIdVec& list) { m_selectedCountersIdList.clear();  m_selectedCountersIdList = list; }
+    void GetSelectedCounterList(CounterNameIdVec& list) { list = m_selectedCountersIdList; }
     void setIgnoreSysDLL(bool isChecked);
     void SetSamplePercent(bool isSet);
     bool GetSamplePercent();
@@ -333,7 +333,7 @@ private:
     std::vector<gtString>                   m_configNameList;
     CounterNameIdMap                        m_counterNameIdMap;
     CounterIdNameMap                        m_counterIdNameMap;
-    std::vector<gtString>                   m_selectedCountersIdList;
+	CounterNameIdVec						m_selectedCountersIdList;
     bool m_isSamplePercent = false;
 };
 
