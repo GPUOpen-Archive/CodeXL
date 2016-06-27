@@ -96,7 +96,7 @@
 // ---------------------------------------------------------------------------
 #ifdef SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC
 #define SU_START_FUNCTION_WRAPPER(funcId) \
-        suSWMRInstance::SharedLock();
+        suSWMRInstance::SharedLock(); 
     su_stat_functionInterceptionInfo[funcId]._isCurrentlyInsideWrapper = true;
 #else // !defined(SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC)
 #define SU_START_FUNCTION_WRAPPER(funcId) \
