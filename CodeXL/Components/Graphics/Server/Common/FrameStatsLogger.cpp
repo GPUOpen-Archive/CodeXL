@@ -148,7 +148,7 @@ void FrameStatsLogger::WriteStatsToLogFile()
     WriteStatFile(STAT_FILE_FPS, "fps.csv");
 }
 
-void FrameStatsLogger::WriteStatFile(StatFileType statType, char* fileName)
+void FrameStatsLogger::WriteStatFile(StatFileType statType, const char* fileName)
 {
     osModuleArchitecture moduleArchitecture;
     osRuntimePlatform currentPlatform;
