@@ -190,13 +190,31 @@ void gpExecutionMode::updateUI(afExecutionCommandId commandId, QAction* pAction)
             break;
 
             case AF_EXECUTION_ID_CAPTURE:
-            case AF_EXECUTION_ID_CAPTURE_CPU:
-            case AF_EXECUTION_ID_CAPTURE_GPU:
             {
                 isActionEnabled = IsCaptureEnabled();
                 gpExecutionMode* pFrameAnalysisManager = ProfileManager::Instance()->GetFrameAnalysisModeManager();
                 gpProjectSettings& settings = pFrameAnalysisManager->ProjectSettings();
                 QString buttonText = QString(GPU_STR_dashboard_CaptureTooltip).arg(settings.m_numFramesToCapture);
+                pAction->setText(buttonText);
+
+            }
+            break;
+            case AF_EXECUTION_ID_CAPTURE_CPU:
+            {
+                isActionEnabled = IsCaptureEnabled();
+                gpExecutionMode* pFrameAnalysisManager = ProfileManager::Instance()->GetFrameAnalysisModeManager();
+                gpProjectSettings& settings = pFrameAnalysisManager->ProjectSettings();
+                QString buttonText = QString(GPU_STR_dashboard_CaptureCPUTooltip).arg(settings.m_numFramesToCapture);
+                pAction->setText(buttonText);
+
+            }
+            break;
+            case AF_EXECUTION_ID_CAPTURE_GPU:
+            {
+                isActionEnabled = IsCaptureEnabled();
+                gpExecutionMode* pFrameAnalysisManager = ProfileManager::Instance()->GetFrameAnalysisModeManager();
+                gpProjectSettings& settings = pFrameAnalysisManager->ProjectSettings();
+                QString buttonText = QString(GPU_STR_dashboard_CaptureGPUTooltip).arg(settings.m_numFramesToCapture);
                 pAction->setText(buttonText);
 
             }
