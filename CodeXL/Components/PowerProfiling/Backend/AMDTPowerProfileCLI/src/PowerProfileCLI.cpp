@@ -143,9 +143,9 @@ static int PrintHelp()
     fprintf(stderr, "                                   dvfs - collect all the available dvfs counters\n");
     fprintf(stderr, "                                   all - collect all the supported counters\n");
     fprintf(stderr, "\n    -M  <profile mode>         Specify profile mode. Following profile modes are supported.\n");
-    fprintf(stderr, "                                   process - process profiling\n");
+    fprintf(stderr, "                                   process - process level profiling\n");
 #ifndef LINUX
-    fprintf(stderr, "                                   module - process profiling\n");
+    fprintf(stderr, "                                   module - module level profiling\n");
 #endif
     fprintf(stderr, "\n    -l                         List all the supported counters.\n");
 
