@@ -85,7 +85,7 @@ public:
     //--------------------------------------------------------------------------
     virtual bool VisitEnter(const TiXmlElement& inElement, const TiXmlAttribute* inFirstAttribute)
     {
-        UNREFERENCED_PARAMETER(inFirstAttribute);
+        GT_UNREFERENCED_PARAMETER(inFirstAttribute);
 
         const char* elementName = inElement.Value();
         const char* elementText = inElement.GetText();

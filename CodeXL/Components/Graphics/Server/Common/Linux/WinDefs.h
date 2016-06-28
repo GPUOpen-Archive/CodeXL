@@ -40,10 +40,6 @@
 #endif
 typedef int boolean;
 
-#ifndef UNREFERENCED_PARAMETER
-    #define UNREFERENCED_PARAMETER(p) (void)(p)
-#endif
-
 #ifndef FLT_MIN
     #define FLT_MIN __FLT_MIN__
 #endif
