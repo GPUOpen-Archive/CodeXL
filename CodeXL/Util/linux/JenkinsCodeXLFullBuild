@@ -196,6 +196,7 @@ PackageTheBuild()
 		cp -df Output_x86_64/release/bin/libCXLAnalyzer.so                      ${PKG_NAME}
 		cp -df Output_x86_64/release/bin/libCXLDbAdapter.so                     ${PKG_NAME}
 		cp -df Output_x86_64/release/bin/libCXLProfilerDAL.so                   ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLCpuProfilingDataAccess.so        ${PKG_NAME}
 		cp -df Output_x86_64/release/bin/libCXLPowerProfilingMidTier.so         ${PKG_NAME}
 		cp -df Output_x86_64/release/bin/libCXLPowerProfiling.so                ${PKG_NAME}
 		cp -df Output_x86_64/release/bin/libCXLAPIClasses.so                    ${PKG_NAME}
@@ -1098,6 +1099,7 @@ PackageTheBuild()
 		cp -df Output_x86_64/release/bin/libCXLAnalyzer.so                      ${PKG_NAME}
 		cp -df Output_x86_64/release/bin/libCXLDbAdapter.so                     ${PKG_NAME}
 		cp -df Output_x86_64/release/bin/libCXLProfilerDAL.so                   ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLCpuProfilingDataAccess.so        ${PKG_NAME}
 		cp -df Output_x86_64/release/bin/libCXLPowerProfilingMidTier.so         ${PKG_NAME}
 		cp -df Output_x86_64/release/bin/libCXLPowerProfiling.so                ${PKG_NAME}
 		cp -df Output_x86_64/release/bin/libCXLAPIClasses.so                    ${PKG_NAME}
@@ -2080,6 +2082,7 @@ PackageTheBuild()
 		cp -df Output_x86_64/release/bin/libCXLAnalyzer.so                      ${PKG_NAME}
 		cp -df Output_x86_64/release/bin/libCXLDbAdapter.so                     ${PKG_NAME}
 		cp -df Output_x86_64/release/bin/libCXLProfilerDAL.so                   ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLCpuProfilingDataAccess.so        ${PKG_NAME}
 		cp -df Output_x86_64/release/bin/libCXLPowerProfilingMidTier.so         ${PKG_NAME}
 		cp -df Output_x86_64/release/bin/libCXLPowerProfiling.so                ${PKG_NAME}
 		cp -df Output_x86_64/release/bin/libCXLAPIClasses.so                    ${PKG_NAME}
