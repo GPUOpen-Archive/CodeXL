@@ -106,8 +106,6 @@ SourceCodeTreeModel::SourceCodeTreeModel(SessionDisplaySettings* pSessionDisplay
     m_pSessionDisplaySettings(pSessionDisplaySettings),
     m_pSessionSourceCodeTreeView(nullptr),
     m_pProfileReader(pProfileReader),
-    m_pProfDataRdr(pProfDataRdr),
-    m_pDisplayFilter(displayFilter),
     m_isDisplayingOnlyDasm(false),
     m_pExecutable(nullptr),
     m_isLongMode(true),
@@ -127,7 +125,9 @@ SourceCodeTreeModel::SourceCodeTreeModel(SessionDisplaySettings* pSessionDisplay
     m_moduleTotalSamplesCount(0),
     m_sessionTotalSamplesCount(0),
     m_srcFile(""),
-    m_pRootItem(nullptr)
+    m_pRootItem(nullptr),
+    m_pProfDataRdr(pProfDataRdr),
+    m_pDisplayFilter(displayFilter)
 {
     m_sessionDir = sessionDir;
     m_sessionDir = m_sessionDir.replace('/', PATH_SLASH);
@@ -728,7 +728,7 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
 		m_tid,
 		functionData);
 
-	if (retVal != CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE)
+	if (retVal != static_cast<int>(CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE))
 	{
 		retVal = m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_funcId, srcFilePath, srcInfoVec);
 	}
@@ -1242,6 +1242,7 @@ void SourceCodeTreeModel::PrintFunctionDetailData(AMDTProfileFunctionData data,
                                                   AMDTSourceAndDisasmInfoVec srcInfoVec,
                                                   const std::vector<SourceViewTreeItem*>& srcLineViewTreeMap)
 {
+    (void)srcFilePath; //unused
     SourceViewTreeItem* pLineItem = nullptr;
     m_srcLineDataVec.clear();
     bool samplePercentSet = m_pDisplayFilter->GetSamplePercent();
@@ -1343,22 +1344,22 @@ void SourceCodeTreeModel::BuildTree(const std::vector<SourceViewTreeItem*>& srcL
     bool ret = m_pProfDataRdr->GetSampledCountersList(counterDesc);
 
 	if (true == ret)
-	{
-        AMDTProfileFunctionData  functionData;
-        int retVal = m_pProfDataRdr->GetFunctionDetailedProfileData(m_funcId,
-                                                             m_pid,
-                                                             m_tid,
-                                                             functionData);
+        {
+            AMDTProfileFunctionData  functionData;
+            int retVal = m_pProfDataRdr->GetFunctionDetailedProfileData(m_funcId,
+                    m_pid,
+                    m_tid,
+                    functionData);
 
-		if (retVal != CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE)
-		{
-			gtString srcFilePath;
-			AMDTSourceAndDisasmInfoVec srcInfoVec;
-			retVal = m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_funcId, srcFilePath, srcInfoVec);
+            if (retVal != static_cast<int>(CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE))
+            {
+                gtString srcFilePath;
+                AMDTSourceAndDisasmInfoVec srcInfoVec;
+                retVal = m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_funcId, srcFilePath, srcInfoVec);
 
-			PrintFunctionDetailData(functionData, srcFilePath, srcInfoVec, srcLineViewTreeMap);
-		}
-    }
+                PrintFunctionDetailData(functionData, srcFilePath, srcInfoVec, srcLineViewTreeMap);
+            }
+        }
 }
 
 bool SourceCodeTreeModel::BuildSourceAndDASMTree()

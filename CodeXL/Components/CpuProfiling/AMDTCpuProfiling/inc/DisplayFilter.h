@@ -291,7 +291,7 @@ public:
     void SetSeperatedbyCore(bool isSet) { m_options.m_isSeperateByCore = isSet; }
 
     //Set counter description
-    bool SetCounterDescription(const gtVector<AMDTUInt32>& counterDesp) { m_options.m_counters = counterDesp; }
+    void SetCounterDescription(const gtVector<AMDTUInt32>& counterDesp) { m_options.m_counters = counterDesp; }
     const gtVector<AMDTUInt32> GetCounterDescription() const { return m_options.m_counters; }
 
     //CoreMask
@@ -302,7 +302,7 @@ public:
     void GetSupportedCountersList(CounterNameIdVec& counterList);
 
     int GetCpuCoreCnt() const;
-    const void GetConfigName(std::vector<gtString>& configNameList) const { configNameList = m_configNameList; }
+    void GetConfigName(std::vector<gtString>& configNameList) { configNameList = m_configNameList; }
 
     // get couterid for counter name
     AMDTUInt64 GetCounterId(const QString& counterName)const;

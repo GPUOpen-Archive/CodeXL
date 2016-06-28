@@ -3345,6 +3345,7 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
     gettimeofday(&ebp_timerStop, nullptr);
     memcpy(&css_timerStart, &ebp_timerStop, sizeof(struct timeval));
 
+#if 0
     gtString createDbEnvStr;
     bool createDb = false;
 
@@ -3355,8 +3356,9 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
 
     if (createDb)
     {
+#endif
         m_dbWriter.reset(new ProfilerDataDBWriter);
-    }
+    //}
 
     if (m_dbWriter)
     {

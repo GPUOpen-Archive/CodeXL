@@ -2227,12 +2227,12 @@ void CallGraphButterfly::SetParentsFunction(shared_ptr<cxlProfileDataReader> pPr
     m_pParentsTreeControl->clear();
 
     AMDTCallGraphFunctionVec cgFuncs;
-    bool ret = pProfDataRdr->GetCallGraphFunctions(processId, counterId, cgFuncs);
+    pProfDataRdr->GetCallGraphFunctions(processId, counterId, cgFuncs);
 
     AMDTCallGraphFunctionVec parents;
     AMDTCallGraphFunctionVec children;
 
-    ret = pProfDataRdr->GetCallGraphFunctionInfo(processId, funcId, parents, children);
+    pProfDataRdr->GetCallGraphFunctionInfo(processId, funcId, parents, children);
 
     AMDTCallGraphFunction func = cgFuncs.at(0);
     const double totalDeepCount = func.m_totalDeepSamples;
@@ -2313,12 +2313,12 @@ void CallGraphButterfly::SetChildrenFunction(shared_ptr<cxlProfileDataReader> pP
     m_pChildrenTreeControl->clear();
 
     AMDTCallGraphFunctionVec cgFuncs;
-    bool ret = pProfDataRdr->GetCallGraphFunctions(processId, counterId, cgFuncs);
+    pProfDataRdr->GetCallGraphFunctions(processId, counterId, cgFuncs);
 
     AMDTCallGraphFunctionVec parents;
     AMDTCallGraphFunctionVec childrens;
 
-    ret = pProfDataRdr->GetCallGraphFunctionInfo(processId, funcId, parents, childrens);
+    pProfDataRdr->GetCallGraphFunctionInfo(processId, funcId, parents, childrens);
 
     AMDTCallGraphFunction func = cgFuncs.at(0);
     const double totalDeepCount = func.m_totalDeepSamples;
@@ -2860,14 +2860,12 @@ void SessionCallGraphView::OnSelectHotSpotIndicator(int index)
 
 bool SessionCallGraphView::fillCounterIndicatorCombo()
 {
-    bool ret = false;
-
     GT_IF_WITH_ASSERT((m_pProfDataRdr != nullptr) &&
                       (m_pHotSpotIndicatorComboBoxAction != nullptr) &&
                       (m_pParentSessionWindow != nullptr))
     {
         AMDTProfileCounterDescVec counterDesc;
-        ret = m_pProfDataRdr->GetSampledCountersList(counterDesc);
+        m_pProfDataRdr->GetSampledCountersList(counterDesc);
 
         QStringList supportedCounterList;
 
@@ -3043,10 +3041,10 @@ void SessionCallGraphView::fillPIDComb(unsigned int pid)
             int index = -1;
             QStringList cssProcessesList;
             gtVector<AMDTProcessId> cssProcesses;
-            bool ret = m_pProfDataRdr->GetCallGraphProcesses(cssProcesses);
+            m_pProfDataRdr->GetCallGraphProcesses(cssProcesses);
 
             gtVector<AMDTProfileProcessInfo> procInfo;
-            ret = m_pProfDataRdr->GetProcessInfo(AMDT_PROFILE_ALL_PROCESSES, procInfo);
+            m_pProfDataRdr->GetProcessInfo(AMDT_PROFILE_ALL_PROCESSES, procInfo);
 
 
             for (const auto& cssProcess : procInfo)
