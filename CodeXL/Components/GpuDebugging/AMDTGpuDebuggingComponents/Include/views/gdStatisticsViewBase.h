@@ -265,8 +265,9 @@ public:
     // Sort 2 items:
     bool isItemSmallerThen(gdStatisticsViewItemData* pItemData1, gdStatisticsViewItemData* pItemData2);
 
-public slots:
+    virtual const char* saveStatisticsDataFileName() = 0;
 
+public slots:
     virtual void onFind();
     virtual void onFindNext();
     virtual void onCopy();

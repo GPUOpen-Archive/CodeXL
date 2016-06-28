@@ -741,7 +741,7 @@ void gdMemoryAnalysisDetailsView::onSaveMemoryData()
     {
         // Show the save file as dialog:
         QString csvFilePathStr;
-        bool rc = pApplicationCommands->ShowQTSaveCSVFileDialog(csvFilePathStr, GD_STR_saveStateChageStatisticsFileName, this);
+        bool rc = pApplicationCommands->ShowQTSaveCSVFileDialog(csvFilePathStr, GD_STR_saveMemoryFileName, this);
 
         if (rc)
         {

@@ -42,9 +42,11 @@ public:
     // Overrides apIEventsObserver:
     virtual const wchar_t* eventObserverName() const { return L"StateChangeStatisticsView"; };
 
+    virtual const char* saveStatisticsDataFileName() override;
+
 public slots:
 
-    virtual void onSaveStatisticsData();
+    virtual void onSaveStatisticsData() override;
 
 protected:
 

@@ -854,3 +854,7 @@ gtString gdBatchStatisticsView::getItemTooltip(int itemIndex)
 
 }
 
+const char* gdBatchStatisticsView::saveStatisticsDataFileName()
+{
+    return GD_STR_saveVertexBatchStatisticsFileName;
+}

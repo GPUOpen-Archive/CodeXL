@@ -28,7 +28,6 @@
 class GD_API gdTotalStatisticsView: public gdStatisticsViewBase
 {
 public:
-
     gdTotalStatisticsView(QWidget* pParent);
     virtual ~gdTotalStatisticsView();
 
@@ -42,24 +41,20 @@ public:
     bool getItemNumOfCalls(int itemIndex, gtUInt64& numberOfCalls, bool& isItemAvailable);
     bool getItemFunctionType(int itemIndex, gdFuncCallsViewTypes& functionType);
 
-
     // Override for base class:
     virtual bool getItemChartColor(int itemIndex, int& amountOfCurrentItemsForColorSelection, bool useSavedColors, unsigned long& color);
-
     virtual gtString getItemTooltip(int itemIndex);
+    virtual const char* saveStatisticsDataFileName() override;
 
     // Overrides apIEventsObserver:
     virtual const wchar_t* eventObserverName() const { return L"TotalStatisticsView"; };
 
 protected:
-
     virtual void initListCtrlColumns();
     virtual void setListHeadingToolTips();
     virtual void initializeImageList();
 
-
 private:
-
     // Count the function by it's type:
     bool increaseCounterByType(const apFunctionCallStatistics& functionCallStatisticsData);
 
@@ -73,13 +68,11 @@ private:
     void shouldShowFunctionType(gdFuncCallsViewTypes functionType, bool& shouldAddFunctionTypeItem, bool& shouldAddUnavailableItem, gtString& unavailableMessage);
 
 private:
-
     bool addStatisticsItem(gtString functionTypeName, gtUInt64 amountOfCalls, gtUInt64 averageAmountOfCallsPerFrameForType, int icon, gdFuncCallsViewTypes functionType);
     bool addUnavailableItem(gtString functionTypeName, gdFuncCallsViewTypes functionType);
     void addTotalItemToList();
 
 private:
-
     // Strings for function type;
     gtString* _pFunctionTypeStrings;
 
@@ -94,7 +87,6 @@ private:
 
     // Amount of full frames count:
     gtUInt64 _amountOfFullFrames;
-
 };
 
 
