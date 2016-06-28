@@ -113,7 +113,7 @@ bool XcbWindow::Shutdown()
 /// \return True if success, false if fail.
 bool XcbWindow::OpenAndUpdate(int inNCmdShow)
 {
-    UNREFERENCED_PARAMETER(inNCmdShow);
+    GT_UNREFERENCED_PARAMETER(inNCmdShow);
     xcb_map_window(mConnection, mWindowHandle);
 	
     return true;
@@ -137,7 +137,7 @@ bool XcbWindow::Update()
         {
         case XCB_EXPOSE:
             {
-                // TODO: Resize window
+            // TODO: Resize window
             }
             break;
 
