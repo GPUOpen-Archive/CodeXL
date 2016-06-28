@@ -23,12 +23,25 @@
     <ClCompile Include="..\..\Server\CapturePlayer\PlayerMain.cpp" />
     <ClCompile Include="..\..\Server\CapturePlayer\VulkanPlayer.cpp" />
     <ClCompile Include="..\..\Server\CapturePlayer\WindowsWindow.cpp" />
+    <ClCompile Include="..\..\Server\CapturePlayer\XcbWindow.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Server\CapturePlayer\BasePlayer.h" />
     <ClInclude Include="..\..\Server\CapturePlayer\DX12Player.h" />
     <ClInclude Include="..\..\Server\CapturePlayer\VulkanPlayer.h" />
+    <ClInclude Include="..\..\Server\CapturePlayer\WindowBase.h" />
     <ClInclude Include="..\..\Server\CapturePlayer\WindowsWindow.h" />
+    <ClInclude Include="..\..\Server\CapturePlayer\XcbWindow.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(CommonDir)\Src\AMDTBaseTools\AMDTBaseToolsVS14.vcxproj">
