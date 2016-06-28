@@ -15,6 +15,12 @@ base_env['CPPPATH'] = \
 ]
 
 base_env['CCFLAGS'] = env['CCFLAGS']
+
+base_env.Prepend(CCFLAGS =
+[
+    '-std=c99',
+])
+
 base_env.Prepend (CPPPATH = env['BASE_PATH'])
 
 #
@@ -163,6 +169,11 @@ libs = \
     "rt",
     "pthread",
 ]
+
+env.Prepend(CCFLAGS =
+[
+    '-std=c++11',
+])
 
 #
 # Build the DDS library

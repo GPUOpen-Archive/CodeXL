@@ -12,6 +12,7 @@ env.Prepend(CCFLAGS =
 [
     '-Wall',
     '-Wextra',
+    '-std=c++11',
 
     "-D'LOG_MODULE=\"" + env.projectName + "\"'"
 ])

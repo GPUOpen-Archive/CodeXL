@@ -41,6 +41,7 @@ env.Prepend(CCFLAGS =
 [
     '-Wall',
     '-Wextra',
+    '-std=c++11',
 
     "-DVK_USE_PLATFORM_XCB_KHR",
     "-DVK_USE_PLATFORM_XLIB_KHR",
