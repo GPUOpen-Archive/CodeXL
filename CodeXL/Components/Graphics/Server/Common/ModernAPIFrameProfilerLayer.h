@@ -12,7 +12,7 @@
 #include "CommandProcessor.h"
 #include "CommonTypes.h"
 #include <GPUPerfAPI.h>
-#include <GPUPerfAPILoader.h>
+#include "GPUPerfAPIUtils/GPUPerfAPILoader.h"
 #include <unordered_set>
 #include <unordered_map>
 

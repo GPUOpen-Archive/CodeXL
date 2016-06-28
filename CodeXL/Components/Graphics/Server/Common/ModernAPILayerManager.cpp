@@ -113,6 +113,11 @@ bool ModernAPILayerManager::OnCreate(CREATION_TYPE type, void* pPtr)
                 if (appName.startsWith(capturePlayerExecutableName))
                 {
                     mbInCapturePlayer = true;
+#ifdef _LINUX
+                    // strip off the executable name from the command line if it exists, and remove leading and trailing whitespaces
+                    commandLine.replace(appName, gtString(L""), true);
+                    commandLine.trim();
+#endif
 
                     ParseCommandLine(commandLine.asASCIICharArray());
                 }
