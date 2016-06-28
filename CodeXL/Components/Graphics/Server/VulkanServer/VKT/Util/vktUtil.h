@@ -33,7 +33,7 @@
     #pragma warning (disable : 4100)
 #elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
     #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wunused-parameter
+    #pragma GCC diagnostic ignored "-Wunused-parameter"
 #else
     #error Unknown build target! No valid value for AMDT_BUILD_TARGET.
 #endif
@@ -45,10 +45,10 @@
 
 // pop the warning suppression pragmas
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-#pragma warning (pop)
-#pragma warning (disable : 4505)
+    #pragma warning (pop)
+    #pragma warning (disable : 4505)
 #elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
-#pragma GCC diagnostic pop
+    #pragma GCC diagnostic pop
 #endif
 
 #include "../../../Common/CommonTypes.h"
