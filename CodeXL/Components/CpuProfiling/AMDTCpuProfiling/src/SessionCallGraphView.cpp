@@ -1400,7 +1400,7 @@ bool CallGraphFuncList::FillDisplayFuncList(shared_ptr<cxlProfileDataReader> pPr
             }
 
             SetFunctionNameHeader(shown + hidden, shown);
-			m_FuncNameIdxMap.emplace(callGraphFunc.m_functionInfo.m_name, make_pair(idx++, callGraphFunc.m_functionInfo.m_functionId));
+			m_FuncNameIdxMap.insert(make_pair(callGraphFunc.m_functionInfo.m_name, make_pair(idx++, callGraphFunc.m_functionInfo.m_functionId)));
         }
 
         m_pFuncTable->setSortingEnabled(true);
