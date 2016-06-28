@@ -733,13 +733,6 @@ int main(int argc, char* argv[])
                 if ((AMDT_STATUS_OK == hResult) && (numOfHist1 > 0))
                 {
                     pReporter->ReportHistogramCounters(numOfHist1, hist);
-
-                    for (AMDTUInt32 i = 0; i < numOfHist1; i++)
-                    {
-                        // free the contents of the histogram pointers
-                        free(hist[i].m_pRange);
-                        free(hist[i].m_pBins);
-                    }
                 }
             }
 

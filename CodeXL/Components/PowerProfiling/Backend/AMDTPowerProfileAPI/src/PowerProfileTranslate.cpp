@@ -1420,6 +1420,8 @@ AMDTResult PowerProfileTranslate::PwrGetProfileData(CXLContextProfileType type, 
         if (m_processList.size() > 0)
         {
             *pPower = totalPower;
+            std::sort(m_moduleList.begin(), m_moduleList.end(),
+                [](AMDTPwrModuleData const& a, AMDTPwrModuleData const& b) { return a.m_power > b.m_power; });
             *pData = &m_processList[0];
             *pCnt = static_cast<AMDTUInt32>(m_processList.size());
         }
@@ -1472,6 +1474,8 @@ AMDTResult PowerProfileTranslate::PwrGetProfileData(CXLContextProfileType type, 
         if (m_moduleList.size() > 0)
         {
             *pPower = totalPower;
+            std::sort(m_moduleList.begin(), m_moduleList.end(),
+                [](AMDTPwrModuleData const& a, AMDTPwrModuleData const& b) { return a.m_power > b.m_power; });
             *pData = &m_moduleList[0];
             *pCnt = static_cast<AMDTUInt32>(m_moduleList.size());
         }

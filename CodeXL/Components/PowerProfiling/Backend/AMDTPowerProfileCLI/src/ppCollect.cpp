@@ -191,20 +191,6 @@ AMDTResult ppCollect::GetHistogramCounters(AMDTUInt32* pNumOfCounters, AMDTPwrHi
                 if (AMDT_STATUS_OK == ret)
                 {
                     memcpy(&pHist[i], pHistData, sizeof(AMDTPwrHistogram));
-
-                    pHist[i].m_pBins = (AMDTFloat32*) malloc(pHistData->m_numOfBins * sizeof(AMDTFloat32));
-
-                    if (nullptr != pHist[i].m_pBins)
-                    {
-                        memcpy(pHist[i].m_pBins, pHistData->m_pBins, pHistData->m_numOfBins * sizeof(AMDTFloat32));
-                    }
-
-                    pHist[i].m_pRange = (AMDTFloat32*) malloc((pHistData->m_numOfBins + 1) * sizeof(AMDTFloat32));
-
-                    if (nullptr != pHist[i].m_pRange)
-                    {
-                        memcpy(pHist[i].m_pRange, pHistData->m_pRange, (pHistData->m_numOfBins + 1) * sizeof(AMDTFloat32));
-                    }
                 }
                 else
                 {

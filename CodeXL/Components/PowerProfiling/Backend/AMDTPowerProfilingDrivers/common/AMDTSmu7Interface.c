@@ -240,7 +240,7 @@ bool CollectSMU7RegisterValues(void* pSmu, uint8* pData, uint32* pLength)
                     {
                         if (isPkgPwrSelected)
                         {
-                            memcpy((uint32*)&pData[offset], &igpuPwr, sizeof(uint32));
+                            memcpy((uint32*)&pData[offset], &pciePwr, sizeof(uint32));
                             offset += sizeof(uint32);
                         }
                         else
@@ -257,7 +257,7 @@ bool CollectSMU7RegisterValues(void* pSmu, uint8* pData, uint32* pLength)
                     {
                         if (isPkgPwrSelected)
                         {
-                            memcpy((uint32*)&pData[offset], &igpuPwr, sizeof(uint32));
+                            memcpy((uint32*)&pData[offset], &ddrPwr, sizeof(uint32));
                             offset += sizeof(uint32);
                         }
                         else
@@ -274,7 +274,7 @@ bool CollectSMU7RegisterValues(void* pSmu, uint8* pData, uint32* pLength)
                     {
                         if (isPkgPwrSelected)
                         {
-                            memcpy((uint32*)&pData[offset], &igpuPwr, sizeof(uint32));
+                            memcpy((uint32*)&pData[offset], &displayPwr, sizeof(uint32));
                             offset += sizeof(uint32);
                         }
                         else
