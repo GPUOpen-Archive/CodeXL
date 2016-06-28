@@ -212,13 +212,6 @@ Depends(VulkanServer, APICommon_Obj + OSWrappers_Obj)
 targetName = GPS_env.targetRoot + "/Plugins/" + GPS_env.vulkanPluginName + GPS_env.projectSuffix + ".so"
 Command(targetName, fullPath + "/" + GPS_env.rootFolderName + "/Server/VulkanServer/libVulkanServer.so", Copy("$TARGET", "$SOURCE"))
 
-# build script for Linux Vulkan environment variable helper plugin
-GPS_env.rootFolder = os.getcwd()
-VulkanEnv = SConscript(['Server/Linux/VulkanEnv/SConscript'], variant_dir=fullPath + '/' + GPS_env.rootFolderName + '/Server/Linux/VulkanEnv', duplicate=0)
-Depends(VulkanEnv, APICommon_Obj + OSWrappers_Obj)
-targetName = GPS_env.targetRoot + "/Plugins/VulkanEnv" + GPS_env.projectSuffix + ".so"
-Command(targetName, fullPath + "/" + GPS_env.rootFolderName + "/Server/Linux/VulkanEnv/libVulkanEnv.so", Copy("$TARGET", "$SOURCE"))
-
 if buildCodeXL == True:
     # build script for Vulkan capture player
     CapturePlayer = SConscript(['Server/CapturePlayer/SConscript'], variant_dir=fullPath + '/' + GPS_env.rootFolderName + '/Server/CapturePlayer', duplicate=0)
