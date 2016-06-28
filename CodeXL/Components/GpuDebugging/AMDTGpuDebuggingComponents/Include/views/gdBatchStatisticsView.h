@@ -50,10 +50,11 @@ public:
 
     virtual gtString getItemTooltip(int itemIndex);
 
+    virtual const char* saveStatisticsDataFileName() override;
+
     virtual const wchar_t* eventObserverName() const { return L"BatchStatisticsView"; };
 
 protected:
-
     virtual void initListCtrlColumns();
     virtual void initializeImageList();
 
@@ -68,7 +69,6 @@ protected:
     bool addStatisticsItemToSlice(gtUInt64& currentSliceVerticesAmount, const gtUInt64& verticesPerSlice, int verticesPerCall, const apRenderPrimitivesStatistics& renderStatistics, gtList<int>& visitedAmountsOfVertices, int& minRange, int& maxRange);
 
 private:
-
     // Should we show the detailed data, or collect the batched by range:
     bool _showDetailedData;
     bool _showDetailedDataEnabled;
@@ -79,7 +79,6 @@ private:
 
     // Map from batch item index to color index:
     static const int _pStaticBatchColorIndices[];
-
 };
 
 

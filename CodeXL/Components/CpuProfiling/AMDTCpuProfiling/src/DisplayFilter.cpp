@@ -1032,8 +1032,8 @@ bool DisplayFilter::CreateConfigCounterMap()
 				{
 					auto nameIdDesc = make_tuple(counter.m_name, counter.m_abbrev, counter.m_description, counter.m_id);
 					counters.push_back(nameIdDesc);
-					m_counterNameIdMap.emplace(counter.m_name, counter.m_id);
-					m_counterIdNameMap.emplace(counter.m_id, counter.m_name);
+					m_counterNameIdMap.insert(make_pair(counter.m_name, counter.m_id));
+					m_counterIdNameMap.insert(make_pair(counter.m_id, counter.m_name));
 				}
 
 				m_configCounterMap.insert(cofigNameCounterPair(config.m_name, counters));

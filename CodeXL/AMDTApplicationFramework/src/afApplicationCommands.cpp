@@ -897,7 +897,7 @@ bool afApplicationCommands::ShowQTSaveCSVFileDialog(QString& selectedFilePath, c
 
     osFilePath csvFileDefaultPath(osFilePath::OS_USER_DOCUMENTS);
 
-    bool retVal = ShowQTSaveFileDialog(selectedFilePath, fileNamePostFix, acGTStringToQString(csvFileDefaultPath.asString()), pParent, extension, title);
+    bool retVal = ShowQTSaveFileDialog(selectedFilePath, csvFileName, acGTStringToQString(csvFileDefaultPath.asString()), pParent, extension, title);
     return retVal;
 }
 

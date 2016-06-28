@@ -501,7 +501,7 @@ void SessionSourceCodeView::CreateFunctionsComboBox()
             QString functionStr = QString("[%1 - %2] : ").arg(addressStart).arg(addressEnd);
             functionStr += acGTStringToQString(functionData.m_functionInfo.m_name);
             functionsList << functionStr;
-            m_functionIdVec.emplace_back(functionData.m_functionInfo.m_functionId);
+            m_functionIdVec.push_back(functionData.m_functionInfo.m_functionId);
         }
 
         m_pTopToolbar->AddLabel(CP_sourceCodeViewFunctionPrefix);

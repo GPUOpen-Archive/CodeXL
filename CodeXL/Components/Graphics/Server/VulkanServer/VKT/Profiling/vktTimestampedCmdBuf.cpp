@@ -88,7 +88,7 @@ VkResult VktTimestampedCmdBuf::Init(const TimestampedCmdBufConfig& config)   ///
         m_pInstanceDT->GetPhysicalDeviceMemoryProperties(m_config.physicalDevice, &m_memProps);
 
         // Create command pool
-        VkCommandPoolCreateInfo cmdPoolCreateInfo = {};
+        VkCommandPoolCreateInfo cmdPoolCreateInfo = VkCommandPoolCreateInfo();
         cmdPoolCreateInfo.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
         cmdPoolCreateInfo.pNext            = nullptr;
         cmdPoolCreateInfo.queueFamilyIndex = m_config.queueFamilyIndex;
@@ -98,7 +98,7 @@ VkResult VktTimestampedCmdBuf::Init(const TimestampedCmdBufConfig& config)   ///
         // Create command buffer
         if (result == VK_SUCCESS)
         {
-            VkCommandBufferAllocateInfo cmdBufAllocInfo = {};
+            VkCommandBufferAllocateInfo cmdBufAllocInfo = VkCommandBufferAllocateInfo() ;
             cmdBufAllocInfo.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
             cmdBufAllocInfo.pNext              = nullptr;
             cmdBufAllocInfo.commandPool        = m_cmdPool;
@@ -110,7 +110,7 @@ VkResult VktTimestampedCmdBuf::Init(const TimestampedCmdBufConfig& config)   ///
         // Create query pool
         if (result == VK_SUCCESS)
         {
-            VkQueryPoolCreateInfo queryPoolCreateInfo = {};
+            VkQueryPoolCreateInfo queryPoolCreateInfo = VkQueryPoolCreateInfo();
             queryPoolCreateInfo.sType      = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO;
             queryPoolCreateInfo.pNext      = nullptr;
             queryPoolCreateInfo.queryType  = VK_QUERY_TYPE_TIMESTAMP;
@@ -121,7 +121,7 @@ VkResult VktTimestampedCmdBuf::Init(const TimestampedCmdBufConfig& config)   ///
         // Create timestamp buffer
         if (result == VK_SUCCESS)
         {
-            VkBufferCreateInfo bufferCreateInfo = {};
+            VkBufferCreateInfo bufferCreateInfo = VkBufferCreateInfo();
             bufferCreateInfo.sType                 = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
             bufferCreateInfo.pNext                 = nullptr;
             bufferCreateInfo.usage                 = VK_BUFFER_USAGE_TRANSFER_DST_BIT;
@@ -134,10 +134,10 @@ VkResult VktTimestampedCmdBuf::Init(const TimestampedCmdBufConfig& config)   ///
 
             if (result == VK_SUCCESS)
             {
-                VkMemoryRequirements memReqs = {};
+                VkMemoryRequirements memReqs = VkMemoryRequirements();
                 m_pDeviceDT->GetBufferMemoryRequirements(m_config.device, m_gpuRes.timestampBuffer, &memReqs);
 
-                VkMemoryAllocateInfo allocInfo = {};
+                VkMemoryAllocateInfo allocInfo = VkMemoryAllocateInfo();
                 allocInfo.sType          = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
                 allocInfo.pNext          = nullptr;
                 allocInfo.allocationSize = memReqs.size;
@@ -181,7 +181,7 @@ VkResult VktTimestampedCmdBuf::Init(const TimestampedCmdBufConfig& config)   ///
         // Fill in the command buffer
         if (result == VK_SUCCESS)
         {
-            VkCommandBufferInheritanceInfo cmdBufInheritInfo = {};
+            VkCommandBufferInheritanceInfo cmdBufInheritInfo = VkCommandBufferInheritanceInfo();
             cmdBufInheritInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
             cmdBufInheritInfo.pNext = nullptr;
             cmdBufInheritInfo.renderPass = VK_NULL_HANDLE;
@@ -191,7 +191,7 @@ VkResult VktTimestampedCmdBuf::Init(const TimestampedCmdBufConfig& config)   ///
             cmdBufInheritInfo.queryFlags = 0;
             cmdBufInheritInfo.pipelineStatistics = 0;
 
-            VkCommandBufferBeginInfo cmdBufBeginInfo = {};
+            VkCommandBufferBeginInfo cmdBufBeginInfo = VkCommandBufferBeginInfo();
             cmdBufBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
             cmdBufBeginInfo.pNext = nullptr;
             cmdBufBeginInfo.flags = 0;

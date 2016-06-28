@@ -2873,7 +2873,7 @@ bool SessionCallGraphView::fillCounterIndicatorCombo()
         {
             // TODO : change with abbreviation
             supportedCounterList << acGTStringToQString(counter.m_name);
-            m_hotSpotCounterIdMap.emplace_back(counter.m_id);
+            m_hotSpotCounterIdMap.push_back(counter.m_id);
         }
 
         if (!supportedCounterList.empty())

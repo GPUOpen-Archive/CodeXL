@@ -12,11 +12,27 @@
 #include "../Util/vktUtil.h"
 #include "../../../Common/SaveImage.h"
 
+// Disable some warnings set off by LunarG-provided code
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
 #pragma warning (push)
 #pragma warning (disable : 4100)
 #pragma warning (disable : 4458)
+#elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter
+#else
+#error Unknown build target! No valid value for AMDT_BUILD_TARGET.
+#endif
+
 #include <GlslangToSpv.h>
+
+// pop the warning suppression pragmas
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
 #pragma warning (pop)
+#pragma warning (disable : 4505)
+#elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
+#pragma GCC diagnostic pop
+#endif
 
 /// Bytes per pixel in render target
 static const UINT BytesPerPixel = 4;

@@ -94,10 +94,11 @@ bool kcCLICommanderOpenGL::GetSupportedDevices()
 
                         // Cache device info if needed.
                         OpenGLDeviceInfo deviceInfo;
-                        deviceInfo.m_deviceId = device.m_deviceID;
-                        bool isSupportedFamily = OpenGLDeviceInfo::HwGenToFamilyId(device.m_generation, deviceInfo.m_deviceFamilyId);
 
-                        if (isSupportedFamily && (m_deviceInfo.find(deviceName) == m_deviceInfo.end()))
+                        // Fetch the family and revision IDs from the backend.
+                        bool isSupportedDevice = m_pOglBuilder->GetDeviceGLInfo(deviceName, deviceInfo.m_deviceFamilyId, deviceInfo.m_deviceId);
+
+                        if (isSupportedDevice && (m_deviceInfo.find(deviceName) == m_deviceInfo.end()))
                         {
                             m_deviceInfo[deviceName] = deviceInfo;
                         }

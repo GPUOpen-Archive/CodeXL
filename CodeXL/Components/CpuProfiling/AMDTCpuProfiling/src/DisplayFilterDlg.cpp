@@ -806,7 +806,7 @@ void DisplayFilterDlg::updateHiddenColumnList()
 					{
 						if (get<1>(sel) == gStr)
 						{
-							selectedCounters.emplace_back(sel);
+							selectedCounters.push_back(sel);
 						}
 
 						//checkCounterName.push_back(gStr);

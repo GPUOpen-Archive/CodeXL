@@ -19,8 +19,8 @@
 //-----------------------------------------------------------------------------
 VktAPIEntry::VktAPIEntry(UINT inThreadId, FuncId inFunctionId, const std::string& inArguments, VktWrappedCmdBuf* pWrappedCmdBuf)
     : APIEntry(inThreadId, inFunctionId, inArguments)
-    , m_returnValue(VK_INCOMPLETE)
     , m_sampleId(0)
+    , m_returnValue(VK_INCOMPLETE)
     , m_pWrappedCmdBuf(pWrappedCmdBuf)
 {
 }

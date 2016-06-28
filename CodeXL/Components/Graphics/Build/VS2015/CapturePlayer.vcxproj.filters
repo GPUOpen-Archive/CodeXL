@@ -5,11 +5,14 @@
     <ClCompile Include="..\..\Server\CapturePlayer\DX12Player.cpp" />
     <ClCompile Include="..\..\Server\CapturePlayer\VulkanPlayer.cpp" />
     <ClCompile Include="..\..\Server\CapturePlayer\WindowsWindow.cpp" />
+    <ClCompile Include="..\..\Server\CapturePlayer\XcbWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Server\CapturePlayer\BasePlayer.h" />
     <ClInclude Include="..\..\Server\CapturePlayer\DX12Player.h" />
     <ClInclude Include="..\..\Server\CapturePlayer\VulkanPlayer.h" />
     <ClInclude Include="..\..\Server\CapturePlayer\WindowsWindow.h" />
+    <ClInclude Include="..\..\Server\CapturePlayer\WindowBase.h" />
+    <ClInclude Include="..\..\Server\CapturePlayer\XcbWindow.h" />
   </ItemGroup>
 </Project>

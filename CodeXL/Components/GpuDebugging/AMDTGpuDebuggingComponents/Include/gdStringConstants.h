@@ -215,7 +215,12 @@
 #define GD_STR_stateVarFileSample "CodeXLOGLStateVariables.txt"
 #define GD_STR_saveTotalStatistics L"Function Types"
 #define GD_STR_saveStateChageStatistics L"State Change"
+#define GD_STR_saveFunctionTypesStatisticsFileName "FunctionTypesStatisticsData"
+#define GD_STR_saveFunctionCallsStatisticsFileName "FunctionCallsStatisticsData"
+#define GD_STR_saveDeprecationStatisticsFileName "DeprecationStatisticsData"
+#define GD_STR_saveVertexBatchStatisticsFileName "VertexBatchStatisticsData"
 #define GD_STR_saveStateChageStatisticsFileName "StateChangeStatisticsData"
+#define GD_STR_saveMemoryFileName "MemoryData"
 #define GD_STR_stateVarFileDetails "Text Documents (*.txt)"
 #define GD_STR_saveStateVariablesDialogHeader "Save State Variables as"
 

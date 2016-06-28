@@ -101,7 +101,7 @@ bool VktFrameDebuggerLayer::CaptureFrameBuffer(unsigned int inWidth, unsigned in
 {
     if (m_pFrameBufferRenderer == NULL)
     {
-        VktImageRendererConfig rendererConfig = {};
+        VktImageRendererConfig rendererConfig = VktImageRendererConfig();
         rendererConfig.physicalDevice = m_lastPresentQueueInfo.physicalDevice;
         rendererConfig.device         = m_lastPresentQueueInfo.device;
         rendererConfig.queue          = m_lastPresentQueueInfo.queue;
@@ -121,7 +121,7 @@ bool VktFrameDebuggerLayer::CaptureFrameBuffer(unsigned int inWidth, unsigned in
         inHeight = m_swapChainInfo.swapChainExtents.height;
     }
 
-    CpuImage capturedImage = {};
+    CpuImage capturedImage = CpuImage();
     VkResult captureResult = m_pFrameBufferRenderer->CaptureImage(
                                  m_swapChainInfo.pSwapChainImages[0],
                                  VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,

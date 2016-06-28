@@ -269,7 +269,7 @@ void VktFrameProfilerLayer::PreCall(FuncId funcId, VktWrappedCmdBuf* pWrappedCmd
         {
             UINT64 nextSampleId = SetNextSampleId(pSampleInfo);
 
-            ProfilerMeasurementId measurementId = {};
+            ProfilerMeasurementId measurementId = ProfilerMeasurementId();
             VktUtil::ConstructMeasurementInfo(funcId, nextSampleId, pWrappedCmdBuf, VktLayerManager::GetLayerManager()->GetCurrentFrameIndex(), pWrappedCmdBuf->FillCount(), measurementId);
 
             ProfilerResultCode beginResult = pWrappedCmdBuf->BeginCmdMeasurement(&measurementId);
@@ -456,7 +456,7 @@ VkResult VktFrameProfilerLayer::CollectCalibrationTimestamps(VktWrappedQueue* pW
         VkQueue queue = pWrappedQueue->AppHandle();
         VkDevice device = pWrappedQueue->ParentDevice();
 
-        TimestampedCmdBufConfig config = {};
+        TimestampedCmdBufConfig config = TimestampedCmdBufConfig();
         config.device           = device;
         config.physicalDevice   = pWrappedQueue->PhysicalDevice();
         config.mapTimestampMem  = false;
@@ -469,7 +469,7 @@ VkResult VktFrameProfilerLayer::CollectCalibrationTimestamps(VktWrappedQueue* pW
         {
             const VkCommandBuffer cmdBufs[] = { pTimestampedCmdBuf->CmdBufHandle() };
 
-            VkSubmitInfo submitInfo = {};
+            VkSubmitInfo submitInfo = VkSubmitInfo();
             submitInfo.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
             submitInfo.pNext                = nullptr;
             submitInfo.waitSemaphoreCount   = 0;
@@ -481,7 +481,7 @@ VkResult VktFrameProfilerLayer::CollectCalibrationTimestamps(VktWrappedQueue* pW
             submitInfo.pSignalSemaphores    = nullptr;
 
             VkFence fence = VK_NULL_HANDLE;
-            VkFenceCreateInfo fenceCreateInfo = {};
+            VkFenceCreateInfo fenceCreateInfo = VkFenceCreateInfo();
             result = device_dispatch_table(queue)->CreateFence(device, &fenceCreateInfo, nullptr, &fence);
 
             if (result == VK_SUCCESS)
@@ -506,6 +506,7 @@ VkResult VktFrameProfilerLayer::CollectCalibrationTimestamps(VktWrappedQueue* pW
 #else
                 struct timespec ts;
                 int result = clock_gettime(CLOCK_REALTIME, &ts);
+                GT_UNREFERENCED_PARAMETER(result);
                 largeInt.QuadPart = (uint64)(ts.tv_sec * 1000000000) + ts.tv_nsec;
 #endif
                 pTimestamps->mBeforeExecutionCPUTimestamp = largeInt.QuadPart;

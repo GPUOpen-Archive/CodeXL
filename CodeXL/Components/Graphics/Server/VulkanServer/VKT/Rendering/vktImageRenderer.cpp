@@ -38,12 +38,12 @@ VktImageRenderer::VktImageRenderer() :
     m_cmdPool(VK_NULL_HANDLE),
     m_cmdBuf(VK_NULL_HANDLE),
     m_renderPass(VK_NULL_HANDLE),
-    m_pipeline(VK_NULL_HANDLE),
-    m_pipelineLayout(VK_NULL_HANDLE),
-    m_pipelineCache(VK_NULL_HANDLE),
-    m_descSet(VK_NULL_HANDLE),
     m_descPool(VK_NULL_HANDLE),
     m_descSetLayout(VK_NULL_HANDLE),
+    m_descSet(VK_NULL_HANDLE),
+    m_pipelineLayout(VK_NULL_HANDLE),
+    m_pipelineCache(VK_NULL_HANDLE),
+    m_pipeline(VK_NULL_HANDLE),
     m_sampler(VK_NULL_HANDLE)
 {
 }
@@ -125,7 +125,7 @@ VkResult VktImageRenderer::Init(const VktImageRendererConfig& config)
         }
 
         // Create command pool
-        VkCommandPoolCreateInfo cmdPoolCreateInfo = {};
+        VkCommandPoolCreateInfo cmdPoolCreateInfo = VkCommandPoolCreateInfo();
         cmdPoolCreateInfo.sType            = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
         cmdPoolCreateInfo.pNext            = nullptr;
         cmdPoolCreateInfo.queueFamilyIndex = graphicsQueueNodeIndex;
@@ -135,7 +135,7 @@ VkResult VktImageRenderer::Init(const VktImageRendererConfig& config)
         // Create command buffer
         if (result == VK_SUCCESS)
         {
-            VkCommandBufferAllocateInfo cmdBufAllocInfo = {};
+            VkCommandBufferAllocateInfo cmdBufAllocInfo = VkCommandBufferAllocateInfo();
             cmdBufAllocInfo.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
             cmdBufAllocInfo.pNext              = nullptr;
             cmdBufAllocInfo.commandPool        = m_cmdPool;
@@ -147,7 +147,7 @@ VkResult VktImageRenderer::Init(const VktImageRendererConfig& config)
         // Create render pass
         if (result == VK_SUCCESS)
         {
-            VkAttachmentDescription attachmentDescription[1] = {};
+            VkAttachmentDescription attachmentDescription[1] = { VkAttachmentDescription() };
             attachmentDescription[0].format         = VK_FORMAT_R8G8B8A8_UNORM;
             attachmentDescription[0].samples        = VK_SAMPLE_COUNT_1_BIT;
             attachmentDescription[0].loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;
@@ -157,11 +157,11 @@ VkResult VktImageRenderer::Init(const VktImageRendererConfig& config)
             attachmentDescription[0].initialLayout  = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
             attachmentDescription[0].finalLayout    = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-            VkAttachmentReference colorReference = {};
+            VkAttachmentReference colorReference = VkAttachmentReference();
             colorReference.attachment = 0;
             colorReference.layout     = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-            VkSubpassDescription subpass = {};
+            VkSubpassDescription subpass = VkSubpassDescription();
             subpass.pipelineBindPoint       = VK_PIPELINE_BIND_POINT_GRAPHICS;
             subpass.flags                   = 0;
             subpass.inputAttachmentCount    = 0;
@@ -173,7 +173,7 @@ VkResult VktImageRenderer::Init(const VktImageRendererConfig& config)
             subpass.preserveAttachmentCount = 0;
             subpass.pPreserveAttachments    = nullptr;
 
-            VkRenderPassCreateInfo rendePassCreateInfo = {};
+            VkRenderPassCreateInfo rendePassCreateInfo = VkRenderPassCreateInfo();
             rendePassCreateInfo.sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
             rendePassCreateInfo.pNext           = nullptr;
             rendePassCreateInfo.attachmentCount = 1;
@@ -188,7 +188,7 @@ VkResult VktImageRenderer::Init(const VktImageRendererConfig& config)
         // Create descriptor pool
         if (result == VK_SUCCESS)
         {
-            VkDescriptorPoolSize descPoolSize[3] = {};
+            VkDescriptorPoolSize descPoolSize[3] = { VkDescriptorPoolSize() };
             descPoolSize[0].type            = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
             descPoolSize[0].descriptorCount = 1;
             descPoolSize[1].type            = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -196,7 +196,7 @@ VkResult VktImageRenderer::Init(const VktImageRendererConfig& config)
             descPoolSize[2].type            = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
             descPoolSize[2].descriptorCount = 1;
 
-            VkDescriptorPoolCreateInfo descPoolCreateInfo = {};
+            VkDescriptorPoolCreateInfo descPoolCreateInfo = VkDescriptorPoolCreateInfo();
             descPoolCreateInfo.sType         = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
             descPoolCreateInfo.pNext         = nullptr;
             descPoolCreateInfo.maxSets       = 1;
@@ -208,7 +208,7 @@ VkResult VktImageRenderer::Init(const VktImageRendererConfig& config)
         // Create descriptor set layout
         if (result == VK_SUCCESS)
         {
-            VkDescriptorSetLayoutBinding descSetLayoutBindings[3] = {};
+            VkDescriptorSetLayoutBinding descSetLayoutBindings[3] = { VkDescriptorSetLayoutBinding() };
             descSetLayoutBindings[0].binding            = 0;
             descSetLayoutBindings[0].descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
             descSetLayoutBindings[0].descriptorCount    = 1;
@@ -225,7 +225,7 @@ VkResult VktImageRenderer::Init(const VktImageRendererConfig& config)
             descSetLayoutBindings[2].stageFlags         = VK_SHADER_STAGE_FRAGMENT_BIT;
             descSetLayoutBindings[2].pImmutableSamplers = nullptr;
 
-            VkDescriptorSetLayoutCreateInfo descLayoutCreateInfo = {};
+            VkDescriptorSetLayoutCreateInfo descLayoutCreateInfo = VkDescriptorSetLayoutCreateInfo();
             descLayoutCreateInfo.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
             descLayoutCreateInfo.pNext        = nullptr;
             descLayoutCreateInfo.bindingCount = 3;
@@ -236,7 +236,7 @@ VkResult VktImageRenderer::Init(const VktImageRendererConfig& config)
         // Create descriptor set
         if (result == VK_SUCCESS)
         {
-            VkDescriptorSetAllocateInfo descSetAllocInfo = {};
+            VkDescriptorSetAllocateInfo descSetAllocInfo = VkDescriptorSetAllocateInfo();
             descSetAllocInfo.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
             descSetAllocInfo.pNext              = nullptr;
             descSetAllocInfo.descriptorPool     = m_descPool;
@@ -248,7 +248,7 @@ VkResult VktImageRenderer::Init(const VktImageRendererConfig& config)
         // Create pipeline layout
         if (result == VK_SUCCESS)
         {
-            VkPipelineLayoutCreateInfo pipeLayoutCreateInfo = {};
+            VkPipelineLayoutCreateInfo pipeLayoutCreateInfo = VkPipelineLayoutCreateInfo();
             pipeLayoutCreateInfo.sType          = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
             pipeLayoutCreateInfo.pNext          = nullptr;
             pipeLayoutCreateInfo.setLayoutCount = 1;
@@ -259,7 +259,7 @@ VkResult VktImageRenderer::Init(const VktImageRendererConfig& config)
         // Create pipeline cache
         if (result == VK_SUCCESS)
         {
-            VkPipelineCacheCreateInfo pipelineCache = {};
+            VkPipelineCacheCreateInfo pipelineCache = VkPipelineCacheCreateInfo();
             pipelineCache.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
             result = m_pDeviceDT->CreatePipelineCache(m_config.device, &pipelineCache, nullptr, &m_pipelineCache);
         }
@@ -267,14 +267,14 @@ VkResult VktImageRenderer::Init(const VktImageRendererConfig& config)
         // Create pipeline
         if (result == VK_SUCCESS)
         {
-            VkPipelineVertexInputStateCreateInfo viState = {};
+            VkPipelineVertexInputStateCreateInfo viState = VkPipelineVertexInputStateCreateInfo();
             viState.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
-            VkPipelineInputAssemblyStateCreateInfo iaState = {};
+            VkPipelineInputAssemblyStateCreateInfo iaState = VkPipelineInputAssemblyStateCreateInfo();
             iaState.sType    = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
             iaState.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 
-            VkPipelineRasterizationStateCreateInfo rsState = {};
+            VkPipelineRasterizationStateCreateInfo rsState = VkPipelineRasterizationStateCreateInfo();
             rsState.sType                   = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
             rsState.polygonMode             = VK_POLYGON_MODE_FILL;
             rsState.cullMode                = VK_CULL_MODE_BACK_BIT;
@@ -283,29 +283,29 @@ VkResult VktImageRenderer::Init(const VktImageRendererConfig& config)
             rsState.rasterizerDiscardEnable = VK_FALSE;
             rsState.depthBiasEnable         = VK_FALSE;
 
-            VkPipelineColorBlendAttachmentState cbAttState[1] = {};
+            VkPipelineColorBlendAttachmentState cbAttState[1] = { VkPipelineColorBlendAttachmentState () };
             cbAttState[0].colorWriteMask = 0xf;
             cbAttState[0].blendEnable    = VK_FALSE;
 
-            VkPipelineColorBlendStateCreateInfo cbState = {};
+            VkPipelineColorBlendStateCreateInfo cbState = VkPipelineColorBlendStateCreateInfo();
             cbState.sType           = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
             cbState.attachmentCount = 1;
             cbState.pAttachments    = cbAttState;
 
-            VkDynamicState dynamicStateEnables[VK_DYNAMIC_STATE_RANGE_SIZE] = {};
+            VkDynamicState dynamicStateEnables[VK_DYNAMIC_STATE_RANGE_SIZE] = { VkDynamicState() };
 
-            VkPipelineDynamicStateCreateInfo dynamicState = {};
+            VkPipelineDynamicStateCreateInfo dynamicState = VkPipelineDynamicStateCreateInfo();
             dynamicState.sType          = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
             dynamicState.pDynamicStates = dynamicStateEnables;
 
-            VkPipelineViewportStateCreateInfo vpState = {};
+            VkPipelineViewportStateCreateInfo vpState = VkPipelineViewportStateCreateInfo();
             vpState.sType                                         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
             vpState.viewportCount                                 = 1;
             dynamicStateEnables[dynamicState.dynamicStateCount++] = VK_DYNAMIC_STATE_VIEWPORT;
             vpState.scissorCount                                  = 1;
             dynamicStateEnables[dynamicState.dynamicStateCount++] = VK_DYNAMIC_STATE_SCISSOR;
 
-            VkPipelineDepthStencilStateCreateInfo dsState = {};
+            VkPipelineDepthStencilStateCreateInfo dsState = VkPipelineDepthStencilStateCreateInfo();
             dsState.sType                 = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
             dsState.depthTestEnable       = VK_FALSE;
             dsState.depthWriteEnable      = VK_FALSE;
@@ -317,7 +317,7 @@ VkResult VktImageRenderer::Init(const VktImageRendererConfig& config)
             dsState.stencilTestEnable     = VK_FALSE;
             dsState.front                 = dsState.back;
 
-            VkPipelineMultisampleStateCreateInfo msState = {};
+            VkPipelineMultisampleStateCreateInfo msState = VkPipelineMultisampleStateCreateInfo();
             msState.sType                = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
             msState.pSampleMask          = nullptr;
             msState.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
@@ -330,12 +330,12 @@ VkResult VktImageRenderer::Init(const VktImageRendererConfig& config)
 #include "FsQuadToBuffer.frag"
                 ;
 
-            VkPipelineShaderStageCreateInfo shaderStages[2] = {};
+            VkPipelineShaderStageCreateInfo shaderStages[2] = { VkPipelineShaderStageCreateInfo() };
             result = InitShaders(m_config.device, shaderStages, vertShaderSrc.c_str(), fragShaderSrc.c_str());
 
             if (result == VK_SUCCESS)
             {
-                VkGraphicsPipelineCreateInfo pipeCreateInfo = {};
+                VkGraphicsPipelineCreateInfo pipeCreateInfo = VkGraphicsPipelineCreateInfo();
                 pipeCreateInfo.sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
                 pipeCreateInfo.layout              = m_pipelineLayout;
                 pipeCreateInfo.stageCount          = 2;
@@ -359,7 +359,7 @@ VkResult VktImageRenderer::Init(const VktImageRendererConfig& config)
         // Create sampler
         if (result == VK_SUCCESS)
         {
-            VkSamplerCreateInfo samplerCreateInfo = {};
+            VkSamplerCreateInfo samplerCreateInfo = VkSamplerCreateInfo();
             samplerCreateInfo.sType                   = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
             samplerCreateInfo.pNext                   = nullptr;
             samplerCreateInfo.magFilter               = VK_FILTER_LINEAR;
@@ -416,7 +416,7 @@ VkResult VktImageRenderer::InitShaders(
 
     if (result == VK_SUCCESS)
     {
-        VkShaderModuleCreateInfo vsModuleCreateInfo = {};
+        VkShaderModuleCreateInfo vsModuleCreateInfo = VkShaderModuleCreateInfo();
         vsModuleCreateInfo.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
         vsModuleCreateInfo.pNext    = nullptr;
         vsModuleCreateInfo.flags    = 0;
@@ -427,7 +427,7 @@ VkResult VktImageRenderer::InitShaders(
 
     if (result == VK_SUCCESS)
     {
-        VkShaderModuleCreateInfo fsModuleCreateInfo = {};
+        VkShaderModuleCreateInfo fsModuleCreateInfo = VkShaderModuleCreateInfo();
         fsModuleCreateInfo.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
         fsModuleCreateInfo.pNext    = nullptr;
         fsModuleCreateInfo.flags    = 0;
@@ -489,12 +489,12 @@ VkResult VktImageRenderer::CaptureImage(
     if ((srcImage != VK_NULL_HANDLE) && (pImgOut != nullptr) && (srcWidth > 0) && (srcHeight > 0))
     {
         // Create temp assets used in this capture
-        CaptureAssets assets = {};
+        CaptureAssets assets = CaptureAssets();
         result = CreateCaptureAssets(srcImage, dstWidth, dstHeight, flipX, flipY, assets);
 
         if (result == VK_SUCCESS)
         {
-            VkCommandBufferInheritanceInfo cmdBufInheritInfo = {};
+            VkCommandBufferInheritanceInfo cmdBufInheritInfo = VkCommandBufferInheritanceInfo();
             cmdBufInheritInfo.sType                = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
             cmdBufInheritInfo.pNext                = nullptr;
             cmdBufInheritInfo.renderPass           = VK_NULL_HANDLE;
@@ -504,13 +504,13 @@ VkResult VktImageRenderer::CaptureImage(
             cmdBufInheritInfo.queryFlags           = 0;
             cmdBufInheritInfo.pipelineStatistics   = 0;
 
-            VkCommandBufferBeginInfo cmdBufBeginInfo = {};
+            VkCommandBufferBeginInfo cmdBufBeginInfo = VkCommandBufferBeginInfo();
             cmdBufBeginInfo.sType            = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
             cmdBufBeginInfo.pNext            = nullptr;
             cmdBufBeginInfo.flags            = 0;
             cmdBufBeginInfo.pInheritanceInfo = &cmdBufInheritInfo;
 
-            VkSubmitInfo submitInfo = {};
+            VkSubmitInfo submitInfo = VkSubmitInfo();
             submitInfo.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
             submitInfo.pNext                = nullptr;
             submitInfo.waitSemaphoreCount   = 0;
@@ -520,13 +520,13 @@ VkResult VktImageRenderer::CaptureImage(
             submitInfo.signalSemaphoreCount = 0;
             submitInfo.pSignalSemaphores    = nullptr;
 
-            VkClearValue clearValues[1] = {};
+            VkClearValue clearValues[1] = { VkClearValue() };
             clearValues[0].color.float32[0] = 0.0f;
             clearValues[0].color.float32[1] = 0.0f;
             clearValues[0].color.float32[2] = 0.0f;
             clearValues[0].color.float32[3] = 1.0f;
 
-            VkRenderPassBeginInfo renderPassBeginInfo = {};
+            VkRenderPassBeginInfo renderPassBeginInfo = VkRenderPassBeginInfo();
             renderPassBeginInfo.sType                    = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
             renderPassBeginInfo.pNext                    = nullptr;
             renderPassBeginInfo.renderPass               = m_renderPass;
@@ -538,13 +538,13 @@ VkResult VktImageRenderer::CaptureImage(
             renderPassBeginInfo.clearValueCount          = 1;
             renderPassBeginInfo.pClearValues             = clearValues;
 
-            VkViewport viewport = {};
+            VkViewport viewport = VkViewport();
             viewport.width    = (float)dstWidth;
             viewport.height   = (float)dstHeight;
             viewport.minDepth = 0.0f;
             viewport.maxDepth = 1.0f;
 
-            VkRect2D scissor = {};
+            VkRect2D scissor = VkRect2D();
             scissor.extent.width  = dstWidth;
             scissor.extent.height = dstHeight;
             scissor.offset.x      = 0;
@@ -626,7 +626,7 @@ VkResult VktImageRenderer::CreateCaptureAssets(
     VkResult result = VK_INCOMPLETE;
 
     // Create render target
-    VkImageCreateInfo rtCreateInfo = {};
+    VkImageCreateInfo rtCreateInfo = VkImageCreateInfo();
     rtCreateInfo.sType       = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     rtCreateInfo.pNext       = nullptr;
     rtCreateInfo.imageType   = VK_IMAGE_TYPE_2D;
@@ -648,7 +648,7 @@ VkResult VktImageRenderer::CreateCaptureAssets(
     // Create render target view
     if (result == VK_SUCCESS)
     {
-        VkImageViewCreateInfo imageViewCreateInfo = {};
+        VkImageViewCreateInfo imageViewCreateInfo = VkImageViewCreateInfo();
         imageViewCreateInfo.sType            = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         imageViewCreateInfo.pNext            = nullptr;
         imageViewCreateInfo.format           = VK_FORMAT_R8G8B8A8_UNORM;
@@ -663,7 +663,7 @@ VkResult VktImageRenderer::CreateCaptureAssets(
     // Create frame buffer
     if (result == VK_SUCCESS)
     {
-        VkFramebufferCreateInfo frameBufferCreateInfo = {};
+        VkFramebufferCreateInfo frameBufferCreateInfo = VkFramebufferCreateInfo();
         frameBufferCreateInfo.sType           = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
         frameBufferCreateInfo.pNext           = nullptr;
         frameBufferCreateInfo.renderPass      = m_renderPass;
@@ -676,11 +676,11 @@ VkResult VktImageRenderer::CreateCaptureAssets(
     }
 
     // Create source image view
-    VkDescriptorImageInfo textureDescs[1] = {};
+    VkDescriptorImageInfo textureDescs[1] = { VkDescriptorImageInfo() };
 
     if (result == VK_SUCCESS)
     {
-        VkImageViewCreateInfo srcImageViewCreateInfo = {};
+        VkImageViewCreateInfo srcImageViewCreateInfo = VkImageViewCreateInfo();
         srcImageViewCreateInfo.sType            = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         srcImageViewCreateInfo.pNext            = nullptr;
         srcImageViewCreateInfo.image            = VK_NULL_HANDLE;
@@ -698,16 +698,16 @@ VkResult VktImageRenderer::CreateCaptureAssets(
     }
 
     // Setup uniform buffer
-    VkDescriptorBufferInfo uniformBufferInfo[1] = {};
+    VkDescriptorBufferInfo uniformBufferInfo[1] = { VkDescriptorBufferInfo() };
 
     if (result == VK_SUCCESS)
     {
-        UniformBuffer uniformData = {};
+        UniformBuffer uniformData = UniformBuffer();
         uniformData.rtWidth = dstWidth;
         uniformData.flipX = flipX ? 1 : 0;
         uniformData.flipY = flipY ? 1 : 0;
 
-        VkBufferCreateInfo uniformBufCreateInfo = {};
+        VkBufferCreateInfo uniformBufCreateInfo = VkBufferCreateInfo();
         uniformBufCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
         uniformBufCreateInfo.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
         uniformBufCreateInfo.size  = sizeof(uniformData);
@@ -734,13 +734,13 @@ VkResult VktImageRenderer::CreateCaptureAssets(
     }
 
     // Setup storage buffer
-    VkDescriptorBufferInfo storageBufferInfo[1] = {};
+    VkDescriptorBufferInfo storageBufferInfo[1] = { VkDescriptorBufferInfo() };
 
     if (result == VK_SUCCESS)
     {
         const UINT storageBufferSize = dstWidth * dstHeight * BytesPerPixel;
 
-        VkBufferCreateInfo storageBufCreateInfo = {};
+        VkBufferCreateInfo storageBufCreateInfo = VkBufferCreateInfo();
         storageBufCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
         storageBufCreateInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
         storageBufCreateInfo.size  = storageBufferSize;
@@ -753,7 +753,7 @@ VkResult VktImageRenderer::CreateCaptureAssets(
     }
 
     // Setup desc set
-    VkWriteDescriptorSet writeDescSets[3] = {};
+    VkWriteDescriptorSet writeDescSets[3] = { VkWriteDescriptorSet() };
     writeDescSets[0].sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     writeDescSets[0].dstSet          = m_descSet;
     writeDescSets[0].dstBinding      = 0;
@@ -828,10 +828,10 @@ VkResult VktImageRenderer::AllocBindImageMem(
 
     if ((pImage != nullptr) && (pMem != nullptr))
     {
-        VkMemoryRequirements imageMemReqs = {};
+        VkMemoryRequirements imageMemReqs = VkMemoryRequirements();
         m_pDeviceDT->GetImageMemoryRequirements(m_config.device, *pImage, &imageMemReqs);
 
-        VkMemoryAllocateInfo memAllocInfo = {};
+        VkMemoryAllocateInfo memAllocInfo = VkMemoryAllocateInfo();
         memAllocInfo.sType          = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         memAllocInfo.pNext          = nullptr;
         memAllocInfo.allocationSize = imageMemReqs.size;
@@ -878,10 +878,10 @@ VkResult VktImageRenderer::AllocBindBufferMem(
 
     if ((pBuf != nullptr) && (pMem != nullptr))
     {
-        VkMemoryRequirements bufMemReqs = {};
+        VkMemoryRequirements bufMemReqs = VkMemoryRequirements();
         m_pDeviceDT->GetBufferMemoryRequirements(m_config.device, *pBuf, &bufMemReqs);
 
-        VkMemoryAllocateInfo memAllocInfo = {};
+        VkMemoryAllocateInfo memAllocInfo = VkMemoryAllocateInfo();
         memAllocInfo.sType          = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         memAllocInfo.pNext          = nullptr;
         memAllocInfo.allocationSize = bufMemReqs.size;
@@ -927,7 +927,7 @@ void VktImageRenderer::ChangeImageLayout(
     VkImageLayout      prevLayout,
     VkImageLayout      newLayout)
 {
-    VkImageMemoryBarrier barrier = {};
+    VkImageMemoryBarrier barrier = VkImageMemoryBarrier();
     barrier.sType            = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     barrier.pNext            = nullptr;
     barrier.srcAccessMask    = 0;
@@ -1192,7 +1192,7 @@ VkResult VktImageRenderer::GLSLtoSPV(
     glslang::TProgram& program = *new glslang::TProgram;
     const char* pShaderStrings[1];
 
-    TBuiltInResource resources = {};
+    TBuiltInResource resources = TBuiltInResource();
     InitResources(resources);
 
     // Enable SPIR-V and Vulkan rules when parsing GLSL
