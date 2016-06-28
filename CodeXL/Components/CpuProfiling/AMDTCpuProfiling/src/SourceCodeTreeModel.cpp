@@ -1254,7 +1254,7 @@ void SourceCodeTreeModel::PrintFunctionDetailData(AMDTProfileFunctionData data,
     {
         pLineItem = srcLineViewTreeMap.at(srcData.m_sourceLineNumber);
 
-        m_sampleSrcLnViewTreeList.emplace_back(make_pair(srcData, pLineItem));
+        m_sampleSrcLnViewTreeList.push_back(make_pair(srcData, pLineItem));
 
         // For this srcLine get the list of inst offsets..
         gtVector<gtVAddr> instOffsetVec;
@@ -2815,7 +2815,7 @@ void SourceCodeTreeModel::BuildSourceLinesTree(std::vector<SourceViewTreeItem*>&
         // Add line number:
         pLineItem->setData(SOURCE_VIEW_LINE_COLUMN, QVariant((uint)line));
         pLineItem->setForeground(SOURCE_VIEW_LINE_COLUMN, AC_SOURCE_CODE_EDITOR_MARGIN_FORE_COLOR);
-        srcLineViewTreeMap.emplace_back(pLineItem);
+        srcLineViewTreeMap.push_back(pLineItem);
     }
 }
 
