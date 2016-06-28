@@ -972,11 +972,11 @@ bool FunctionsDataTable::fillSummaryTables(int counterIdx)
         for (auto profData : funcProfileData)
         {
             // create QstringList to hold the values
-			QStringList list;
+            QStringList list;
 
-			// insert the function id 
-			QVariant mId(profData.m_id);
-			list << mId.toString();
+            // insert the function id 
+            QVariant mId(static_cast<qlonglong>(profData.m_id));
+            list << mId.toString();
 
             list << profData.m_name.asASCIICharArray();
 
@@ -1065,7 +1065,7 @@ bool FunctionsDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allModul
 			CounterNameIdVec selectedCounterList;
 
 			// insert the function id 
-			QVariant mId(profData.m_id);
+            QVariant mId(static_cast<qlonglong>(profData.m_id));
 			list << mId.toString();
 
 			// Insert function name

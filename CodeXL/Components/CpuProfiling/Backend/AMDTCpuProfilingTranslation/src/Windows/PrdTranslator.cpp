@@ -3236,6 +3236,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
     m_progressThreshold = m_progressStride;
     InitializeProgressBar(L"Translating raw profile data...", true);
 
+#if 0
     gtString createDbEnvStr;
     bool createDb = false;
 
@@ -3246,8 +3247,10 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
 
     if (createDb)
     {
+#endif
+
         m_dbWriter.reset(new ProfilerDataDBWriter);
-    }
+    //}
 
     if (m_dbWriter)
     {

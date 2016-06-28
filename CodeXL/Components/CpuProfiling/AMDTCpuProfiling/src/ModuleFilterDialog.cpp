@@ -100,12 +100,12 @@ void ModuleFilterDialog::intializeLayout()
     }
     else
     {
-        bool isSystemWide = false;
+        //bool isSystemWide = false;
 		exeName = "System-wide Profiling";
 
         if ((m_pSessionData != nullptr) && (m_pSessionData->m_profileScope != PM_PROFILE_SCOPE_SINGLE_EXE))
         {
-            isSystemWide = true;
+           // isSystemWide = true;
 			exeName = "Multiple Processes";
         }
 

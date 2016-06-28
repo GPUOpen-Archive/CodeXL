@@ -508,6 +508,7 @@ CPUProfileDataTable::TableType ProcessesDataTable::GetTableType() const
 
 bool ProcessesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> modIdVec)
 {
+    (void)modIdVec;
     bool retVal = false;
 
     GT_IF_WITH_ASSERT((m_pProfDataRdr != nullptr) &&

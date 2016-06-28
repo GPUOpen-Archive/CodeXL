@@ -29,6 +29,7 @@ CPU_env.Append(LIBS = [
 	"CXLCpuProfilingRawData",
 	"CXLCpuProfilingControl",
 	"CXLSharedProfiling",
+        "CXLCpuProfilingDataAccess"
 ])
 
 ###################################################

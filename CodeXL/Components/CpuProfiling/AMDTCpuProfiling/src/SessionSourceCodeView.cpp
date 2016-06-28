@@ -855,7 +855,7 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
 
         m_pTreeViewModel->m_funcId = m_functionIdVec.at(functionIndex);
         AMDTProfileFunctionData  functionData;
-        bool rc = m_pProfDataRdr->GetFunctionDetailedProfileData(m_pTreeViewModel->m_funcId,
+        m_pProfDataRdr->GetFunctionDetailedProfileData(m_pTreeViewModel->m_funcId,
                                                                  AMDT_PROFILE_ALL_PROCESSES,
                                                                  AMDT_PROFILE_ALL_THREADS,
                                                                  functionData);
@@ -863,12 +863,10 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
 
         gtString srcFilePath;
         AMDTSourceAndDisasmInfoVec srcInfoVec;
-        rc = m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_pTreeViewModel->m_funcId, srcFilePath, srcInfoVec);
+        m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_pTreeViewModel->m_funcId, srcFilePath, srcInfoVec);
 
         m_srcFilePath = srcFilePath;
 
-        //if (true == rc)
-        {
             m_pTreeViewModel->m_pid = AMDT_PROFILE_ALL_PROCESSES;
             m_pTreeViewModel->m_tid = AMDT_PROFILE_ALL_THREADS;
 
@@ -911,7 +909,6 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
 
             // Update the display:
             ProtectedUpdateTableDisplay(UPDATE_TABLE_REBUILD);
-        }
     }
 }
 

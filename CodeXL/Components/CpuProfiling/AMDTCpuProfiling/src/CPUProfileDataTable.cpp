@@ -164,6 +164,7 @@ bool CPUProfileDataTable::displayTableSummaryData(shared_ptr<cxlProfileDataReade
 	shared_ptr<DisplayFilter> pDisplayFilter,
 	int counterIdx)
 {
+    (void)pDisplayFilter; //unused 
     bool retVal = false;
 
     if (nullptr != pProfDataRdr)
@@ -188,7 +189,7 @@ bool CPUProfileDataTable::displayTableSummaryData(shared_ptr<cxlProfileDataReade
 
     }
 
-    return true;
+    return retVal;
 }
 
 #if 0

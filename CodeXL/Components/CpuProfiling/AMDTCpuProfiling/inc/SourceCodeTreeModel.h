@@ -272,14 +272,14 @@ private:
 
     QColor m_forgroundColor;
 
-	shared_ptr<cxlProfileDataReader> m_pProfDataRdr;
-	shared_ptr<DisplayFilter> m_pDisplayFilter;
+    AMDTProfileSourceLineDataVec m_srcLineDataVec;
+    std::vector<SourceViewTreeItem*> m_srcLineViewTreeMap;
 
-	AMDTProfileSourceLineDataVec m_srcLineDataVec;
-	std::vector<SourceViewTreeItem*> m_srcLineViewTreeMap;
+    shared_ptr<cxlProfileDataReader> m_pProfDataRdr;
+    shared_ptr<DisplayFilter> m_pDisplayFilter;
 
-	// srcLineNumber for sampled  --> SourceViewTreeItem
-	std::vector<std::pair<AMDTProfileSourceLineData, SourceViewTreeItem*>> m_sampleSrcLnViewTreeList;
+    // srcLineNumber for sampled  --> SourceViewTreeItem
+    std::vector<std::pair<AMDTProfileSourceLineData, SourceViewTreeItem*>> m_sampleSrcLnViewTreeList;
 };
 
 #endif //__SOURCECODETREEMODEL_H

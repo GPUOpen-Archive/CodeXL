@@ -34,7 +34,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\..\Backend;$(ProjectDir)\..\Backend\ProfileAgents;$(ProjectDir)\..\ProfilingAgents;$(CommonDir)\Lib\Ext\Java\jdk1.7.0_17\include;$(CommonDir)\Lib\Ext\Java\jdk1.7.0_17\include\win32;$(ProjectDir)\..\..\ThreadProfiling\Backend\AMDTThreadProfileAPI\inc;$(CommonProjectsDir)\AMDTCommonHeaders;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>CXLCpuProfilingControl$(GDTProjectSuffix).lib;CXLDisassembler$(GDTProjectSuffix).lib;CXLCpuProfilingTranslation$(GDTProjectSuffix).lib;CXLCpuProfilingRawData$(GDTProjectSuffix).lib;CXLCpuPerfEventUtils$(GDTProjectSuffix).lib;CXLExecutableFormat$(GDTProjectSuffix).lib;CXLCpuCallstackSampling$(GDTProjectSuffix).lib;CXLProfilingAgentsData$(GDTProjectSuffix).lib;CXLThreadProfileAPI$(GDTProjectSuffix).lib;CXLCpuProfilingDataAccess$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CXLCpuProfilingControl$(GDTProjectSuffix).lib;CXLDisassembler$(GDTProjectSuffix).lib;CXLCpuProfilingTranslation$(GDTProjectSuffix).lib;CXLCpuProfilingDataAccess$(GDTProjectSuffix).lib;CXLCpuProfilingRawData$(GDTProjectSuffix).lib;CXLCpuPerfEventUtils$(GDTProjectSuffix).lib;CXLExecutableFormat$(GDTProjectSuffix).lib;CXLCpuCallstackSampling$(GDTProjectSuffix).lib;CXLProfilingAgentsData$(GDTProjectSuffix).lib;CXLThreadProfileAPI$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
