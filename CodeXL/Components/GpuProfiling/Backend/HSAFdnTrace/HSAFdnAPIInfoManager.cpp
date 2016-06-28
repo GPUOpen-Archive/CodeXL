@@ -25,6 +25,7 @@ HSAAPIInfoManager::HSAAPIInfoManager(void) : m_tracedApiCount(0)
     m_strTraceModuleName = "hsa";
 
     // add APIs that we should always intercept...
+    m_mustInterceptAPIs.insert(HSA_API_Type_hsa_queue_create);               // needed so we can create a profiled queue for kernel timestamps
     m_mustInterceptAPIs.insert(HSA_API_Type_hsa_executable_get_symbol);      // needed to extract kernel name
     m_mustInterceptAPIs.insert(HSA_API_Type_hsa_executable_symbol_get_info); // needed to extract kernel name
 }
