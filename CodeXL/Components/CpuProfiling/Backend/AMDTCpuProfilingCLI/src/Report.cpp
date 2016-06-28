@@ -785,7 +785,7 @@ HRESULT CpuProfileReport::ReportFromDb()
                                                                                 AMDT_PROFILE_ALL_PROCESSES,
                                                                                 AMDT_PROFILE_ALL_THREADS,
                                                                                 functionData);
-                    if (retVal != CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE)
+                    if (retVal != static_cast<int>(CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE))
                     {
                         gtString srcFilePath;
                         AMDTSourceAndDisasmInfoVec srcInfoVec;
