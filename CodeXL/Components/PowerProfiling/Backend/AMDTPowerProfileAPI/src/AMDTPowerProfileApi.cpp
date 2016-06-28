@@ -158,11 +158,6 @@ AMDTResult AllocateBuffers()
 {
     AMDTResult ret = AMDT_STATUS_OK;
 
-    if(nullptr != g_apiMemoryPool.m_pBase)
-    {
-        ReleaseMemoryPool(&g_apiMemoryPool);
-    }
-
     if (nullptr == g_pCounterStorage)
     {
         g_pCounterStorage = (AMDTPwrCounterValue*)GetMemoryPoolBuffer(&g_apiMemoryPool,
@@ -931,6 +926,10 @@ AMDTResult AMDTPwrProfileInitialize(AMDTPwrProfileMode profileMode)
 
     if (AMDT_STATUS_OK == ret)
     {
+        if(nullptr != g_apiMemoryPool.m_pBase)
+        {
+            ReleaseMemoryPool(&g_apiMemoryPool);
+        }
         // Create memory pool for API layer
         ret = CreateMemoryPool(&g_apiMemoryPool, API_POOL_SIZE);
     }
