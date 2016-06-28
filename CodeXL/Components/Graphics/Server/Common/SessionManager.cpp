@@ -105,7 +105,7 @@ bool SessionManager::GetSessionManagerData(SessionManagerData& smd)
     // Create an ascii string version of the path
     smd.pathToDataDirectory = systemTempDirectory.asString().asASCIICharArray();
     // Add the session name and the frame index string.
-    smd.pathToDataDirectory.appendFormattedString("\\%s\\Frame_%010d\\", m_strSessionNameString.asCharArray(), smd.frameIndex);
+    smd.pathToDataDirectory.appendFormattedString("/%s/Frame_%010d/", m_strSessionNameString.asCharArray(), smd.frameIndex);
 
     // Convert the full path back to a gtString
     gtString fullPathToDataDirectoryAsGTString;

@@ -46,7 +46,7 @@ static int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
     UINT  size = 0;         // size of the image encoder array
     // in bytes
 
-    ImageCodecInfo* pImageCodecInfo = NULL;
+    ImageCodecInfo* pImageCodecInfo = nullptr;
 
     GetImageEncodersSize(&num, &size);
 
@@ -56,9 +56,9 @@ static int GetEncoderClsid(const WCHAR* format, CLSID* pClsid)
     }
 
     pImageCodecInfo = (ImageCodecInfo*)(malloc(size));
-    PsAssert(pImageCodecInfo != NULL)
+    PsAssert(pImageCodecInfo != nullptr)
 
-    if (pImageCodecInfo == NULL)
+    if (pImageCodecInfo == nullptr)
     {
         return -1;
     }
@@ -83,9 +83,9 @@ static bool EncodeBitmap(Bitmap& image, const WCHAR* pcszEncodeFormat, UINT32* u
 {
     // Setup encoder parameters
     // Create stream with 0 size
-    IStream* pIStream = NULL;
+    IStream* pIStream = nullptr;
 
-    if (CreateStreamOnHGlobal(NULL, TRUE, (LPSTREAM*)&pIStream) != S_OK)
+    if (CreateStreamOnHGlobal(nullptr, TRUE, (LPSTREAM*)&pIStream) != S_OK)
     {
 
         Log(logERROR, "Failed to create stream on global memory!\n");
@@ -112,7 +112,7 @@ static bool EncodeBitmap(Bitmap& image, const WCHAR* pcszEncodeFormat, UINT32* u
     }
     else if (wcscmp(pcszEncodeFormat, L"image/png") == 0)
     {
-        pEncoderParameters = NULL;
+        pEncoderParameters = nullptr;
     }
     else
     {
@@ -147,7 +147,7 @@ static bool EncodeBitmap(Bitmap& image, const WCHAR* pcszEncodeFormat, UINT32* u
     }
 
     // now move the pointer to the beginning of the file
-    if (pIStream->Seek(lnOffset, STREAM_SEEK_SET, NULL) != S_OK)
+    if (pIStream->Seek(lnOffset, STREAM_SEEK_SET, nullptr) != S_OK)
     {
         pIStream->Release();
         Log(logERROR, "Failed to move the file pointer to the beginning of the stream!\n");
@@ -155,9 +155,9 @@ static bool EncodeBitmap(Bitmap& image, const WCHAR* pcszEncodeFormat, UINT32* u
     }
 
     unsigned char* pBuff = (unsigned char*)malloc((size_t)ulnSize.QuadPart);
-    PsAssert(pBuff != NULL)
+    PsAssert(pBuff != nullptr)
 
-    if (pBuff == NULL)
+    if (pBuff == nullptr)
     {
         return false;
     }
@@ -255,7 +255,7 @@ static bool _RGBtoJpeg(unsigned char* pDIB, int iWidth, int iHeight, UINT32* ulS
 
 static bool _RGBAtoPNG(unsigned char* pDIB, int iWidth, int iHeight, UINT32* ulSize, unsigned char** pData)
 {
-    if (pDIB == NULL || ulSize == NULL || pData == NULL)
+    if (pDIB == nullptr || ulSize == nullptr || pData == nullptr)
     {
         return false;
     }
@@ -282,7 +282,7 @@ static bool _RGBAtoPNG(unsigned char* pDIB, int iWidth, int iHeight, UINT32* ulS
     char* pDestData = (char*)bitmapData.Scan0;
 
     // copy the data, inverting the image top->bottom, and RGBA -> BGRA
-    unsigned char* pSrcData = NULL;
+    unsigned char* pSrcData = nullptr;
 
     for (INT row = bitmapData.Height - 1; row >= 0; --row)
     {
@@ -315,20 +315,20 @@ static bool _RGBAtoPNG(unsigned char* pDIB, int iWidth, int iHeight, UINT32* ulS
 ////////////////////////////////////////////////////////////////////////////////////
 OGL_IMAGE_FILE_FORMAT GetOGLFileFormat(std::string strFormat)
 {
-    if (strstr(strFormat.c_str(), "PNG") != NULL)
+    if (strstr(strFormat.c_str(), "PNG") != nullptr)
     {
         return OGL_IFF_PNG;
     }
-    else if (strstr(strFormat.c_str(), "JPG") != NULL)
+    else if (strstr(strFormat.c_str(), "JPG") != nullptr)
     {
         return OGL_IFF_JPG;
     }
     // Uncomment this when we have support for saving a texture as DDS.
-    //else if ( strstr ( strFormat.c_str(), "DDS" ) != NULL )
+    //else if ( strstr ( strFormat.c_str(), "DDS" ) != nullptr )
     //{
     //   return OGL_IFF_DDS;
     //}
-    else if (strstr(strFormat.c_str(), "BMP") != NULL)
+    else if (strstr(strFormat.c_str(), "BMP") != nullptr)
     {
         return OGL_IFF_BMP;
     }
@@ -408,7 +408,7 @@ struct State
 
 static  void    pngWriteData(png_structp png_ptr, png_bytep data, png_size_t length)
 {
-    if (png_ptr == NULL)
+    if (png_ptr == nullptr)
     {
         return;
     }
@@ -446,7 +446,7 @@ static  void    FlipImage(unsigned char* pImageData, int width, int height)
 
 static  bool    _RGBtoJpeg(unsigned char* pImageData, int width, int height, UINT32* outSize, unsigned char** outBuffer)
 {
-    unsigned char* writeBuffer = NULL;
+    unsigned char* writeBuffer = nullptr;
     static const int bytes_per_pixel = 4;
 
     struct jpeg_compress_struct cinfo;
@@ -538,7 +538,7 @@ static   bool    _RGBAtoPNG(unsigned char* pImageData, int width, int height, UI
     static const int bytes_per_pixel = 4;
 
     // initialize stuff
-    png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
 
     if (!png_ptr)
     {
@@ -550,7 +550,7 @@ static   bool    _RGBAtoPNG(unsigned char* pImageData, int width, int height, UI
 
     if (!info_ptr)
     {
-        png_destroy_write_struct(&png_ptr, NULL);
+        png_destroy_write_struct(&png_ptr, nullptr);
         Log(logERROR, "[write_png_file] png_create_info_struct failed");
         return false;
     }
@@ -650,7 +650,7 @@ bool RGBtoJpeg(unsigned char* pDIB, int iWidth, int iHeight, UINT32* ulSize, uns
 #ifdef _WIN32
     GdiplusStartupInput gdiplusStartupInput;
     ULONG_PTR gdiplusToken;
-    GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+    GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
 
     bool res = _RGBtoJpeg(pDIB, iWidth, iHeight, ulSize, pData);
 
@@ -667,7 +667,7 @@ bool RGBAtoPNG(unsigned char* pDIB, int iWidth, int iHeight, UINT32* ulSize, uns
 #ifdef _WIN32
     GdiplusStartupInput gdiplusStartupInput;
     ULONG_PTR gdiplusToken;
-    GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+    GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
 
     bool res = _RGBAtoPNG(pDIB, iWidth, iHeight, ulSize, pData);
 
@@ -681,11 +681,11 @@ bool RGBAtoPNG(unsigned char* pDIB, int iWidth, int iHeight, UINT32* ulSize, uns
 
 bool RGBAtoBMP(unsigned char* pImageData, int iWidth, int iHeight, UINT32* pulSize, unsigned char** ppOutData)
 {
-    if (pImageData == NULL ||
+    if (pImageData == nullptr ||
         iWidth == 0 ||
         iHeight == 0 ||
-        pulSize == NULL ||
-        ppOutData == NULL)
+        pulSize == nullptr ||
+        ppOutData == nullptr)
     {
         return false;
     }
@@ -700,7 +700,7 @@ bool RGBAtoBMP(unsigned char* pImageData, int iWidth, int iHeight, UINT32* pulSi
 
     char* pDataBuffer = (char*) malloc(dwSize);
 
-    if (pDataBuffer == NULL)
+    if (pDataBuffer == nullptr)
     {
         Log(logERROR, "Failed to allocate memory in %s\n", __FUNCTION__);
         return false;

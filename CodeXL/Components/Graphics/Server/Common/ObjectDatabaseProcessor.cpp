@@ -448,6 +448,12 @@ bool ObjectDatabaseProcessor::GetFrameStorageFullPath(gtString& FrameStorageFold
 
     ModernAPILayerManager* parentLayerManager = GetParentLayerManager();
 
+    if (parentLayerManager == nullptr)
+    {
+        Log(logERROR, "ObjectDatabaseProcessor::GetFrameStorageFullPath - parentLayerManager is NULL\n");
+        return false;
+    }
+
     smd.frameIndex = parentLayerManager->GetCapturedFrameStartIndex();
 
     bool bFolderRetrieved = SessionManager::Instance()->GetSessionManagerData(smd);
