@@ -185,7 +185,7 @@ const WrappedQueueMap& GetWrappedQueues()
 //-----------------------------------------------------------------------------
 static void StashCmdBuf(VkDevice device, const VkCommandBufferAllocateInfo* pAllocateInfo, VkCommandBuffer cmdBuf)
 {
-    WrappedCmdBufCreateInfo createInfo = {};
+    WrappedCmdBufCreateInfo createInfo = WrappedCmdBufCreateInfo();
     createInfo.physicalDevice = g_pInterceptMgr->FindDeviceInfo(device).physicalDevice;
     createInfo.device         = device;
     createInfo.allocInfo      = *pAllocateInfo;
@@ -219,7 +219,7 @@ static void StashQueue(VkDevice device, uint32_t queueFamilyIndex, uint32_t queu
     VkQueueFamilyProperties* pQueueProps = (VkQueueFamilyProperties*)malloc(queueCount * sizeof(VkQueueFamilyProperties));
     instance_dispatch_table(physicalDevice)->GetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueCount, pQueueProps);
 
-    WrappedQueueCreateInfo createInfo = {};
+    WrappedQueueCreateInfo createInfo = WrappedQueueCreateInfo();
     createInfo.physicalDevice   = physicalDevice;
     createInfo.device           = device;
     createInfo.queueFamilyIndex = queueFamilyIndex;
@@ -3185,7 +3185,7 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateSwapchainKHR(VkDevic
     VkResult result = VK_INCOMPLETE;
 
     // Need to hack the swapchain image to be readable by shader
-    VkSwapchainCreateInfoKHR createInfo = {};
+    VkSwapchainCreateInfoKHR createInfo = VkSwapchainCreateInfoKHR();
     memcpy(&createInfo, pCreateInfo, sizeof(createInfo));
     createInfo.imageUsage |= VK_IMAGE_USAGE_SAMPLED_BIT;
 

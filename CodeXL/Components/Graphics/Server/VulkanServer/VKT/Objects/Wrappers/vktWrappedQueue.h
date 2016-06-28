@@ -41,7 +41,7 @@ public:
     ~VktWrappedQueue() {}
 
     /// Store the app's handle in this wrapper
-    virtual void StoreAppHandle(UINT64 hAppObject) { UNREFERENCED_PARAMETER(hAppObject); }
+    virtual void StoreAppHandle(UINT64 hAppObject) { GT_UNREFERENCED_PARAMETER(hAppObject); }
 
     /// Return the app's handle for this wrapper
     VkQueue AppHandle() { return m_createInfo.appQueue; }
@@ -72,7 +72,7 @@ public:
     UINT WorkerThreadCount() { return (UINT)m_workerThreadInfo.size(); }
 
     /// Return the thread handle for a particular worker
-    HANDLE GetThreadHandle(int inIndex) { return m_workerThreadInfo[inIndex]->m_threadInfo.threadHandle; }
+    WorkerThreadHandle GetThreadHandle(int inIndex) { return m_workerThreadInfo[inIndex]->m_threadInfo.threadHandle; }
 
     /// Retrieve information about a particular worker
     VktWorkerInfo* GetWorkerInfo(int inIndex) { return m_workerThreadInfo[inIndex]; }

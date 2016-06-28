@@ -26,16 +26,30 @@
 #include <vk_layer.h>
 
 // Disable some warnings set off by LunarG-provided code
-#pragma warning (push)
-#pragma warning (disable : 4005)
-#pragma warning (disable : 4996)
-#pragma warning (disable : 4100)
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+    #pragma warning (push)
+    #pragma warning (disable : 4005)
+    #pragma warning (disable : 4996)
+    #pragma warning (disable : 4100)
+#elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-parameter
+#else
+    #error Unknown build target! No valid value for AMDT_BUILD_TARGET.
+#endif
+
 #include <vk_loader_platform.h>
 #include <vk_layer_table.h>
 #include <vk_layer_extension_utils.h>
 #include <vk_icd.h>
+
+// pop the warning suppression pragmas
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
 #pragma warning (pop)
 #pragma warning (disable : 4505)
+#elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
+#pragma GCC diagnostic pop
+#endif
 
 #include "../../../Common/CommonTypes.h"
 #include "../../../Common/misc.h"

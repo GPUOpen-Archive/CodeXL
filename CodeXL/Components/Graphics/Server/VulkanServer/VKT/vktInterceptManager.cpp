@@ -45,7 +45,7 @@ DeviceInfo VktInterceptManager::InitializeDeviceInfo(VkDevice device, VkPhysical
 {
     ScopeLock lock(&m_deviceInfoMapMutex);
 
-    DeviceInfo resultInfo = {};
+    DeviceInfo resultInfo = DeviceInfo();
 
     DeviceInfoMap::iterator deviceInfoIter = m_deviceInfoMap.find(device);
 
@@ -130,7 +130,7 @@ std::string VktInterceptManager::GetQueueDesc(VkQueue queue)
 //-----------------------------------------------------------------------------
 DeviceInfo VktInterceptManager::FindDeviceInfo(VkDevice device)
 {
-    DeviceInfo deviceInfo = {};
+    DeviceInfo deviceInfo = DeviceInfo();
 
     if (m_deviceInfoMap.find(device) != m_deviceInfoMap.end())
     {

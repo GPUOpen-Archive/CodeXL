@@ -42,7 +42,7 @@ public:
     void Free();
 
     /// Store the app's handle to this wrapper
-    virtual void StoreAppHandle(UINT64 hAppObject) { UNREFERENCED_PARAMETER(hAppObject); }
+    virtual void StoreAppHandle(UINT64 hAppObject) { GT_UNREFERENCED_PARAMETER(hAppObject); }
 
     /// Return the app's handle to this wrapper
     VkCommandBuffer AppHandle() { return m_createInfo.appCmdBuf; }

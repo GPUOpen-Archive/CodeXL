@@ -89,7 +89,7 @@ VktWrappedQueue::VktWrappedQueue(const WrappedQueueCreateInfo& createInfo)
     memcpy(&m_createInfo, &createInfo, sizeof(m_createInfo));
 
     UINT queueCount = 1;
-    VkQueueFamilyProperties queueProps = {};
+    VkQueueFamilyProperties queueProps = VkQueueFamilyProperties();
     instance_dispatch_table(m_createInfo.physicalDevice)->GetPhysicalDeviceQueueFamilyProperties(m_createInfo.physicalDevice, &queueCount, &queueProps);
 
     m_timestampsSupported = (queueProps.timestampValidBits != 0) ? true : false;
@@ -161,7 +161,7 @@ void VktWrappedQueue::SpawnWorker(
 
         for (size_t i = 0; i < cmdBufCount; i++)
         {
-            WrappedCmdBufData cmdBufData = {};
+            WrappedCmdBufData cmdBufData = WrappedCmdBufData();
             cmdBufData.pCmdBuf           = cmdBufs[i];
             cmdBufData.targetFillID      = cmdBufs[i]->FillCount();
             cmdBufData.profiledCallCount = cmdBufs[i]->GetProfiledCallCount();
@@ -177,12 +177,16 @@ void VktWrappedQueue::SpawnWorker(
 
             m_workerThreadInfo.push_back(pWorkerInfo);
 
+            
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
             DWORD threadId = 0;
-#ifdef WIN32
             pWorkerInfo->m_threadInfo.threadHandle = CreateThread(nullptr, 0, ThreadFunc, pWorkerInfo, 0, &threadId);
-#else
+#elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
             pWorkerInfo->m_threadInfo.threadHandle = new std::thread(ThreadFunc, pWorkerInfo);
+#else
+#error Unknown build target! No valid value for AMDT_BUILD_TARGET.
 #endif
+
         }
     }
 }
@@ -215,7 +219,7 @@ void VktWrappedQueue::EndCollection()
 
         m_workerThreadInfo[i]->m_outputs.results.clear();
 
-#ifdef WIN32
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
         CloseHandle(m_workerThreadInfo[i]->m_threadInfo.threadHandle);
 #endif
         SAFE_DELETE(m_workerThreadInfo[i]);
@@ -229,7 +233,7 @@ void VktWrappedQueue::EndCollection()
 //-----------------------------------------------------------------------------
 double VktWrappedQueue::GetTimestampFrequency()
 {
-    VkPhysicalDeviceProperties deviceProps = {};
+    VkPhysicalDeviceProperties deviceProps = VkPhysicalDeviceProperties();
 
     instance_dispatch_table(m_createInfo.physicalDevice)->GetPhysicalDeviceProperties(m_createInfo.physicalDevice, &deviceProps);
 
@@ -253,7 +257,7 @@ VkResult VktWrappedQueue::QueueSubmit(VkQueue queue, uint32_t submitCount, const
         VktFrameProfilerLayer* pFrameProfiler = VktFrameProfilerLayer::Instance();
 
         // Use this calibration timestamp structure to convert GPU events to the CPU timeline.
-        CalibrationTimestampPair calibrationTimestamps = {};
+        CalibrationTimestampPair calibrationTimestamps = CalibrationTimestampPair();
 
         VkFence fenceToWaitOn = fence;
         bool usingInternalFence = false;
@@ -271,7 +275,7 @@ VkResult VktWrappedQueue::QueueSubmit(VkQueue queue, uint32_t submitCount, const
             if (fenceToWaitOn == VK_NULL_HANDLE)
             {
                 // Create internal fence
-                VkFenceCreateInfo fenceCreateInfo = {};
+                VkFenceCreateInfo fenceCreateInfo = VkFenceCreateInfo();
                 VkResult fenceResult = VK_INCOMPLETE;
                 fenceResult = device_dispatch_table(queue)->CreateFence(m_createInfo.device, &fenceCreateInfo, nullptr, &fenceToWaitOn);
                 VKT_ASSERT(fenceResult == VK_SUCCESS);
@@ -350,7 +354,7 @@ VkResult VktWrappedQueue::QueuePresentKHR(VkQueue queue, const VkPresentInfoKHR*
 
     VktTraceAnalyzerLayer::Instance()->OnPresent(queue, pPresentInfo);
 
-    QueueInfo queueInfo = {};
+    QueueInfo queueInfo = QueueInfo();
     queueInfo.physicalDevice = m_createInfo.physicalDevice;
     queueInfo.device         = m_createInfo.device;
     queueInfo.queue          = queue;
