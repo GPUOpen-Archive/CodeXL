@@ -8,6 +8,8 @@
 #ifndef WINDOW_BASE_H
 #define WINDOW_BASE_H
 
+#include <AMDTBaseTools/Include/AMDTDefinitions.h>
+
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     #include <Windows.h>
     typedef HWND NativeWindowType;

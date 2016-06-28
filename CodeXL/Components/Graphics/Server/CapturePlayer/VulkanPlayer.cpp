@@ -51,7 +51,7 @@ struct VulkanState
     VkFramebuffer*           pFrameBuffers;      ///< Vulkan framebuffers.
     SwapchainBuffers*        pSwapchainBuffers;  ///< Wraps data about a swapchain.
 
-    char* pExtNames[64];        ///< Extension names.
+    const char* pExtNames[64];        ///< Extension names.
 
     UINT swapchainImgCount;     ///< Number of swapchain images.
     UINT extCount;              ///< Extension count.
@@ -82,7 +82,7 @@ public:
 
     /// Get the surface extension name for this window type
     /// \return this window type's surface extension name
-    virtual char* GetSurfaceExtensionName() = 0;
+    virtual const char* GetSurfaceExtensionName() = 0;
 
     virtual VkResult CreateSurface() = 0;
 };
@@ -112,9 +112,9 @@ public:
 
     /// Get the surface extension name for this window type
     /// \return this window type's surface extension name
-    virtual char* GetSurfaceExtensionName()
+    virtual const char* GetSurfaceExtensionName()
     {
-        static char* extensionName = VK_KHR_XCB_SURFACE_EXTENSION_NAME;
+        static char const* extensionName = VK_KHR_XCB_SURFACE_EXTENSION_NAME;
         return extensionName;
     }
 
@@ -153,7 +153,7 @@ public:
 
     /// Get the surface extension name for this window type
     /// \return this window type's surface extension name
-    virtual char* GetSurfaceExtensionName()
+    virtual const char* GetSurfaceExtensionName()
     {
         static char* extensionName = VK_KHR_XLIB_SURFACE_EXTENSION_NAME;
         return extensionName;
