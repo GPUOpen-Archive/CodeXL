@@ -749,3 +749,8 @@ gtString gdFunctionCallsStatisticsView::getItemTooltip(int itemIndex)
     return retVal;
 
 }
+
+const char* gdFunctionCallsStatisticsView::saveStatisticsDataFileName()
+{
+    return GD_STR_saveFunctionCallsStatisticsFileName;
+}

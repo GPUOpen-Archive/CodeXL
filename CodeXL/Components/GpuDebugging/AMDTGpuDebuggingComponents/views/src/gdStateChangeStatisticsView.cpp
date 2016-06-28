@@ -456,6 +456,10 @@ bool gdStateChangeStatisticsView::addFunctionToList(const apFunctionCallStatisti
     return retVal;
 }
 
+const char* gdStateChangeStatisticsView::saveStatisticsDataFileName()
+{
+    return GD_STR_saveStateChageStatisticsFileName;
+}
 
 // ---------------------------------------------------------------------------
 // Name:        gdStateChangeStatisticsView::onSaveStatisticsData
@@ -471,7 +475,7 @@ void gdStateChangeStatisticsView::onSaveStatisticsData()
     {
         // Show the save file as dialog:
         QString csvFilePathStr;
-        bool rc = pApplicationCommands->ShowQTSaveCSVFileDialog(csvFilePathStr, GD_STR_saveStateChageStatisticsFileName, this);
+        bool rc = pApplicationCommands->ShowQTSaveCSVFileDialog(csvFilePathStr, saveStatisticsDataFileName(), this);
 
         if (rc)
         {

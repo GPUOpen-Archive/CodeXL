@@ -44,13 +44,13 @@ public:
     /// Returns string to be used in a tool tip
     /// \param itemIndex description of item index
     virtual gtString getItemTooltip(int itemIndex);
+    virtual const char* saveStatisticsDataFileName() override;
 
     bool getItemDeprecationVersions(int itemIndex, apAPIVersion& deprecatedAtVersion, apAPIVersion& removedAtVersion);
     bool getItemDeprecationStatus(int itemIndex, apFunctionDeprecationStatus& functionDeprecationStatus);
     bool getItemFunctionId(int itemIndex, int& functionID);
 
 protected:
-
     virtual void initListCtrlColumns();
 
     // initialize the images list
@@ -63,13 +63,11 @@ protected:
     bool addFunctionToList(const apFunctionCallStatistics& functionStatistics, apFunctionDeprecationStatus deprecationStatus);
 
 protected:
-
     // Counter for total amount of function calls:
     gtUInt64 _totalAmountOfDeprecatedFunctionCalls;
 
     // Holds the total amount of function call in frame:
     gtUInt64 _totalAmountOfFunctionCallsInFrame;
-
 };
 
 

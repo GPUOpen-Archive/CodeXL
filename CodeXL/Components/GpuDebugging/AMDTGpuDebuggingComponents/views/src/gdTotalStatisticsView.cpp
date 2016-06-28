@@ -925,6 +925,11 @@ gtString gdTotalStatisticsView::getItemTooltip(int itemIndex)
 
 }
 
+const char* gdTotalStatisticsView::saveStatisticsDataFileName()
+{
+    return GD_STR_saveFunctionTypesStatisticsFileName;
+}
+
 // ---------------------------------------------------------------------------
 // Name:        gdTotalStatisticsView::setHeaderToolTips
 // Description: Set tooltips for columns headings

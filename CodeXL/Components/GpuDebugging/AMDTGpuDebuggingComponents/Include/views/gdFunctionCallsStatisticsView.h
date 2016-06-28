@@ -37,7 +37,6 @@ class apExceptionEvent;
 class GD_API gdFunctionCallsStatisticsView: public gdStatisticsViewBase
 {
 public:
-
     gdFunctionCallsStatisticsView(QWidget* pParent);
     virtual ~gdFunctionCallsStatisticsView();
 
@@ -51,8 +50,9 @@ public:
     /// Returns string to be used in a tool tip
     /// \param itemIndex description of item index
     virtual gtString getItemTooltip(int itemIndex);
-protected:
+    virtual const char* saveStatisticsDataFileName() override;
 
+protected:
     virtual void initListCtrlColumns();
     virtual void initializeImageList();
 
@@ -64,9 +64,7 @@ protected:
     bool getFunctionTypeString(apMonitoredFunctionId functionId, gtString& functionTypeString);
 
 protected:
-
     gtUInt64 _totalAmountOfFunctionCallsInFrame;
-
 };
 
 

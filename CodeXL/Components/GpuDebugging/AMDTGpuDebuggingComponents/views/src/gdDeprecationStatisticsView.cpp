@@ -634,3 +634,8 @@ gtString gdDeprecationStatisticsView::getItemTooltip(int itemIndex)
 
     return retVal;
 }
+
+const char* gdDeprecationStatisticsView::saveStatisticsDataFileName()
+{
+    return GD_STR_saveDeprecationStatisticsFileName;
+}
