@@ -43,8 +43,8 @@ MultithreadedTraceAnalyzerLayer::MultithreadedTraceAnalyzerLayer()
     , mbCollectingGPUTrace(false)
     , mbWaitingForAutocaptureClient(false)
     , mbLinkedTraceForCapture(false)
-    , mLastTracedFrameIndex(-1)
     , mbCollectApiTrace(false)
+    , mLastTracedFrameIndex(-1)
 {
     // Command that collects an API trace for a newly-rendered frame.
     AddCommand(CONTENT_TEXT, "TXTLog", "API Trace TXT", "Log.txt", DISPLAY, INCLUDE, m_apiTraceTXT);
