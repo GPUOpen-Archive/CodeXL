@@ -14,6 +14,7 @@ env.Prepend(CCFLAGS =
 [
     '-Wall',
     '-Wextra',
+    '-std=c++11',
 ])
 
 # build the Common Server static library

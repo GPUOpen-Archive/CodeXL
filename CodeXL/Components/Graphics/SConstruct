@@ -145,7 +145,6 @@ GPS_env['GPS_LIBPATH'] = \
 GPS_env.Prepend(CCFLAGS =
 [
     '-Wno-unknown-pragmas',         # ignore unknown pragmas
-    '-std=c++11',
 
     '-fmessage-length=0',
     '-pthread',
@@ -213,12 +212,19 @@ Depends(VulkanServer, APICommon_Obj + OSWrappers_Obj)
 targetName = GPS_env.targetRoot + "/Plugins/" + GPS_env.vulkanPluginName + GPS_env.projectSuffix + ".so"
 Command(targetName, fullPath + "/" + GPS_env.rootFolderName + "/Server/VulkanServer/libVulkanServer.so", Copy("$TARGET", "$SOURCE"))
 
+# build script for Linux Vulkan environment variable helper plugin
+GPS_env.rootFolder = os.getcwd()
+VulkanEnv = SConscript(['Server/Linux/VulkanEnv/SConscript'], variant_dir=fullPath + '/' + GPS_env.rootFolderName + '/Server/Linux/VulkanEnv', duplicate=0)
+Depends(VulkanEnv, APICommon_Obj + OSWrappers_Obj)
+targetName = GPS_env.targetRoot + "/Plugins/VulkanEnv" + GPS_env.projectSuffix + ".so"
+Command(targetName, fullPath + "/" + GPS_env.rootFolderName + "/Server/Linux/VulkanEnv/libVulkanEnv.so", Copy("$TARGET", "$SOURCE"))
+
 if buildCodeXL == True:
     # build script for Vulkan capture player
     CapturePlayer = SConscript(['Server/CapturePlayer/SConscript'], variant_dir=fullPath + '/' + GPS_env.rootFolderName + '/Server/CapturePlayer', duplicate=0)
     Depends(CapturePlayer, APICommon_Obj + OSWrappers_Obj)
     targetName = GPS_env.targetRoot + "/" + GPS_env.capturePlayerName + GPS_env.projectSuffix
-    Command(targetName, fullPath + "/" + GPS_env.rootFolderName + "/CapturePlayer/CapturePlayer", Copy("$TARGET", "$SOURCE"))
+    Command(targetName, fullPath + "/" + GPS_env.rootFolderName + "/Server/CapturePlayer/CapturePlayer", Copy("$TARGET", "$SOURCE"))
 
 # Build the graphics server
 GPUPerfServer = SConscript(['Server/WebServer/SConscript'], variant_dir=fullPath+'/' + GPS_env.rootFolderName + '/Server/WebServer', duplicate=0)

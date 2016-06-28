@@ -16,6 +16,7 @@ env.Prepend (CPPPATH =
     '../../../Common/Lib/Ext/Vulkan/' + env.VulkanAPIVersion + '/SDK/Source/loader',
 ])
 env.Prepend (LIBPATH = env['GPS_LIBPATH'])
+
 env.Prepend(CCFLAGS =
 [
     "-D'DATADIR=\"share\"'",
@@ -23,9 +24,40 @@ env.Prepend(CCFLAGS =
     "-DVK_USE_PLATFORM_XCB_KHR",
     "-DVK_USE_PLATFORM_XLIB_KHR",
     "-Dvulkan_EXPORTS",
-    "-std=c99",
     "-Wall",
     "-Wextra",
+])
+
+lib_env = env.Clone()
+
+env.Prepend(CCFLAGS =
+[
+    '-std=c++11',
+])
+
+lib_env.Prepend(CCFLAGS =
+[
+    "-std=c99"
+])
+
+lib_src = \
+[
+# loader
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/loader.c",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/trampoline.c",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/wsi.c",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/debug_report.c",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/cJSON.c",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/murmurhash.c",
+    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/dev_ext_trampoline.c",
+]
+
+loader_Obj = lib_env.StaticLibrary('loader', lib_src)
+
+# Add the loader library path
+env.Prepend (LIBPATH =
+[
+    '../../obj/' + env.platformPath + '/' + env.rootFolderName + '/Server/CapturePlayer',
 ])
 
 # These need to be in their dependency order. Most derived first
@@ -35,6 +67,7 @@ env['LIBS'] = \
     "libCommon",
     "libAMDTOSWrappers",
     "libAMDTBaseTools",
+    "libloader",
     #enternal libraries
     "rt",
     "pthread",
@@ -47,21 +80,13 @@ env['LIBS'] = \
 
 sources = \
 [
-# loader
-    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/loader.c",
-    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/trampoline.c",
-    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/wsi.c",
-    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/debug_report.c",
-    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/cJSON.c",
-    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/murmurhash.c",
-    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/dev_ext_trampoline.c",
-
-# capture player
     "PlayerMain.cpp",
     "XcbWindow.cpp",
     "VulkanPlayer.cpp",
 ]
 
 CapturePlayer = env.Program('CapturePlayer', sources)
+
+Depends(CapturePlayer, loader_Obj)
 
 Return('CapturePlayer')
