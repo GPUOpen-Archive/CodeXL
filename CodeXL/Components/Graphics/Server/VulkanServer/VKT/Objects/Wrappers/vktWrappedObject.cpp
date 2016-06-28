@@ -145,7 +145,7 @@ const VkLayerDispatchTable DeviceDispatchTable =
 //-----------------------------------------------------------------------------
 UINT64 CreateAppHandle(VktWrappedObject* pWrappedObject)
 {
-    UINT64 appHandle = NULL;
+    UINT64 appHandle = static_cast<UINT64>(NULL);
 
     if (pWrappedObject != NULL)
     {
@@ -170,7 +170,7 @@ UINT64 CreateAppHandle(VktWrappedObject* pWrappedObject)
 //-----------------------------------------------------------------------------
 void DestroyWrappedHandle(UINT64 handle)
 {
-    if (handle != NULL)
+    if (handle != static_cast<UINT64>(NULL))
     {
         IcdApiObject* pApiObject = reinterpret_cast<IcdApiObject*>(handle);
 

@@ -37,10 +37,10 @@ public:
     virtual ModernAPILayerManager* GetParentLayerManager();
 
     /// Called when creating this layer
-    virtual bool OnCreate(CREATION_TYPE type, void* pPtr) { UNREFERENCED_PARAMETER(type); UNREFERENCED_PARAMETER(pPtr); return true; }
+    virtual bool OnCreate(CREATION_TYPE type, void* pPtr) { GT_UNREFERENCED_PARAMETER(type); GT_UNREFERENCED_PARAMETER(pPtr); return true; }
 
     /// Called when destroying this layer
-    virtual bool OnDestroy(CREATION_TYPE type, void* pPtr) { UNREFERENCED_PARAMETER(type); UNREFERENCED_PARAMETER(pPtr); return true; }
+    virtual bool OnDestroy(CREATION_TYPE type, void* pPtr) { GT_UNREFERENCED_PARAMETER(type); GT_UNREFERENCED_PARAMETER(pPtr); return true; }
 
     /// Get derived layer settings
     virtual string GetDerivedSettings() { return ""; }

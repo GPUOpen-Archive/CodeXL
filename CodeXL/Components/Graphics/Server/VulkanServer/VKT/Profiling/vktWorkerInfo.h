@@ -44,15 +44,21 @@ struct WorkerOutputs
     std::vector<ProfilerResult> results;      ///< A vector containing all collected profiler results
 };
 
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+typedef HANDLE WorkerThreadHandle;
+#elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
+typedef std::thread* WorkerThreadHandle;
+#endif
+
 //-----------------------------------------------------------------------------
 /// Holds information about a worker thread.
 //-----------------------------------------------------------------------------
 struct WorkerThreadInfo
 {
-    UINT32     workerThreadCountID; ///< Incremented count per worker thread created - starts at 1
-    HANDLE     threadHandle;        ///< Handle to the thread that uses me
-    osThreadId parentThreadID;      ///< Thread ID of the parent that spawned us
-    osThreadId workerThreadID;      ///< The thread ID of the worker thread that uses me
+    UINT32              workerThreadCountID; ///< Incremented count per worker thread created - starts at 1
+    WorkerThreadHandle  threadHandle;        ///< On Windows: Handle to the thread that uses me. On Linux: Pointer to the thread object.
+    osThreadId          parentThreadID;      ///< Thread ID of the parent that spawned us
+    osThreadId          workerThreadID;      ///< The thread ID of the worker thread that uses me
 };
 
 //-----------------------------------------------------------------------------

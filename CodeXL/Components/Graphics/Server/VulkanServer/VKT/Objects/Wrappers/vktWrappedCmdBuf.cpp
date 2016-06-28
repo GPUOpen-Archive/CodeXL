@@ -35,10 +35,10 @@ VktWrappedCmdBuf* VktWrappedCmdBuf::Create(const WrappedCmdBufCreateInfo& create
 //-----------------------------------------------------------------------------
 VktWrappedCmdBuf::VktWrappedCmdBuf(const WrappedCmdBufCreateInfo& createInfo) :
     m_pDynamicProfiler(nullptr),
+    m_pStaticProfiler(nullptr),
     m_profiledCallCount(0),
     m_potentialProfiledCallCount(0),
     m_potentialProfiledCallCountHighest(0),
-    m_pStaticProfiler(nullptr),
     m_fillId(0)
 {
     memcpy(&m_createInfo, &createInfo, sizeof(m_createInfo));
@@ -218,15 +218,15 @@ ProfilerResultCode VktWrappedCmdBuf::GetStaticProfilerResults(UINT64 fillId, UIN
             m_pStaticProfiler->GetCmdBufResults(fillId, outResults);
         }
 #else
-        UNREFERENCED_PARAMETER(profiledCallCount);
+        GT_UNREFERENCED_PARAMETER(profiledCallCount);
 
         m_pStaticProfiler->GetCmdBufResults(fillId, outResults);
 #endif
     }
 #else
-    UNREFERENCED_PARAMETER(fillId);
-    UNREFERENCED_PARAMETER(profiledCallCount);
-    UNREFERENCED_PARAMETER(outResults);
+    GT_UNREFERENCED_PARAMETER(fillId);
+    GT_UNREFERENCED_PARAMETER(profiledCallCount);
+    GT_UNREFERENCED_PARAMETER(outResults);
 #endif
 
     return result;
@@ -415,7 +415,7 @@ VktCmdBufProfiler* VktWrappedCmdBuf::InitNewProfiler(ProfilerType profilerType)
 
 #endif
 
-    VktCmdBufProfilerConfig config = {};
+    VktCmdBufProfilerConfig config = VktCmdBufProfilerConfig();
     config.measurementsPerGroup   = measurementsPerGroup;
     config.measurementTypeFlags   = PROFILER_MEASUREMENT_TYPE_TIMESTAMPS;
     config.maxStaleResourceGroups = 0;
@@ -462,7 +462,7 @@ VkResult VktWrappedCmdBuf::BeginCommandBuffer(VkCommandBuffer commandBuffer, con
             // SampleID is just an identifier, so we could use the command buffer handle plus the current submit number
             UINT cmdBufId = ((UINT64)m_createInfo.appCmdBuf & 0xFFFFFFFF) + (UINT)m_fillId;
 
-            ProfilerMeasurementId measurementId = {};
+            ProfilerMeasurementId measurementId = ProfilerMeasurementId();
             VktUtil::ConstructMeasurementInfo(FuncId_WholeCmdBuf, cmdBufId, this, VktLayerManager::GetLayerManager()->GetCurrentFrameIndex(), m_fillId, measurementId);
 
             m_pStaticProfiler->BeginCmdMeasurement(&measurementId);

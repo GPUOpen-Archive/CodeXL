@@ -19,9 +19,9 @@
 //-----------------------------------------------------------------------------
 void VktWrappedObjectDatabase::GetObjectsByType(eObjectType inObjectType, WrappedInstanceVector& outObjectInstancesOfGivenType, bool inbOnlyCurrentObjects) const
 {
-    UNREFERENCED_PARAMETER(inObjectType);
-    UNREFERENCED_PARAMETER(outObjectInstancesOfGivenType);
-    UNREFERENCED_PARAMETER(inbOnlyCurrentObjects);
+    GT_UNREFERENCED_PARAMETER(inObjectType);
+    GT_UNREFERENCED_PARAMETER(outObjectInstancesOfGivenType);
+    GT_UNREFERENCED_PARAMETER(inbOnlyCurrentObjects);
 }
 
 //-----------------------------------------------------------------------------
@@ -31,7 +31,7 @@ void VktWrappedObjectDatabase::GetObjectsByType(eObjectType inObjectType, Wrappe
 //-----------------------------------------------------------------------------
 IInstanceBase* VktWrappedObjectDatabase::GetWrappedInstance(void* pInstanceHandle) const
 {
-    UNREFERENCED_PARAMETER(pInstanceHandle);
+    GT_UNREFERENCED_PARAMETER(pInstanceHandle);
     return nullptr;
 }
 
@@ -41,7 +41,7 @@ IInstanceBase* VktWrappedObjectDatabase::GetWrappedInstance(void* pInstanceHandl
 //-----------------------------------------------------------------------------
 void VktWrappedObjectDatabase::StoreWrappedInstance(IInstanceBase* pWrappedInstance)
 {
-    UNREFERENCED_PARAMETER(pWrappedInstance);
+    GT_UNREFERENCED_PARAMETER(pWrappedInstance);
 }
 
 //-----------------------------------------------------------------------------
@@ -50,5 +50,5 @@ void VktWrappedObjectDatabase::StoreWrappedInstance(IInstanceBase* pWrappedInsta
 //-----------------------------------------------------------------------------
 void VktWrappedObjectDatabase::OnDeviceDestroyed(IInstanceBase* pDeviceInstance)
 {
-    UNREFERENCED_PARAMETER(pDeviceInstance);
+    GT_UNREFERENCED_PARAMETER(pDeviceInstance);
 }
