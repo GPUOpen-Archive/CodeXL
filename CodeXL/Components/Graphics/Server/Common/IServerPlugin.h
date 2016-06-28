@@ -12,14 +12,6 @@
 #ifndef GPS_PLUGIN_INTERFACE
 #define GPS_PLUGIN_INTERFACE
 
-#ifdef GPS_PLUGIN_EXPORTS
-    #define GPS_PLUGIN_API extern "C" __declspec( dllexport ) ///< DLL export definition
-#elif defined GPS_PLUGIN_STATIC
-    #define GPS_PLUGIN_API extern "C" __attribute__ ((visibility ("default"))) ///< DLL definition
-#else
-    #define GPS_PLUGIN_API extern "C" __declspec( dllimport ) ///< DLL import definition
-#endif
-
 //=============================================================================
 //
 // EntryPoints for RequestProcessing

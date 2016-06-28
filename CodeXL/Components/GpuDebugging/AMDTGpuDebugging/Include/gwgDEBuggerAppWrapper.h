@@ -72,10 +72,11 @@ public:
     // marks if the prerequisite of this plugin were met
     static bool s_loadEnabled;
 
-protected:
-
+private:
     // Do not allow the use of my default constructor:
     gwgDEBuggerAppWrapper();
+
+    friend class gwSingletonsDelete;
 
     static gwgDEBuggerAppWrapper* m_spMySingleInstance;
 

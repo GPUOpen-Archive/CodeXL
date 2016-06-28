@@ -23,7 +23,7 @@ VktInstanceBase::VktInstanceBase()
 //-----------------------------------------------------------------------------
 void VktInstanceBase::AppendObjectXML(gtASCIIString& outObjectXML) const
 {
-    UNREFERENCED_PARAMETER(outObjectXML);
+    GT_UNREFERENCED_PARAMETER(outObjectXML);
 }
 
 //-----------------------------------------------------------------------------
@@ -32,7 +32,7 @@ void VktInstanceBase::AppendObjectXML(gtASCIIString& outObjectXML) const
 //-----------------------------------------------------------------------------
 bool VktInstanceBase::AppendTagDataXML(gtASCIIString& outTagDataString) const
 {
-    UNREFERENCED_PARAMETER(outTagDataString);
+    GT_UNREFERENCED_PARAMETER(outTagDataString);
 
     return false;
 }
@@ -43,7 +43,7 @@ bool VktInstanceBase::AppendTagDataXML(gtASCIIString& outTagDataString) const
 //-----------------------------------------------------------------------------
 void VktInstanceBase::PrintFormattedApplicationHandle(gtASCIIString& outHandleString) const
 {
-    UNREFERENCED_PARAMETER(outHandleString);
+    GT_UNREFERENCED_PARAMETER(outHandleString);
 }
 
 //-----------------------------------------------------------------------------

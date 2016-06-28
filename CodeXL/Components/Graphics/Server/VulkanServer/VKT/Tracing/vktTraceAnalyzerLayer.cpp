@@ -9,6 +9,7 @@
 ///         and managing profiler results.
 //==============================================================================
 
+#include <thread>
 #include "vktTraceAnalyzerLayer.h"
 #include "vktThreadTraceData.h"
 #include "../vktLayerManager.h"
@@ -251,6 +252,8 @@ bool VktTraceAnalyzerLayer::WaitSucceeded(DWORD waitRetVal, UINT numThreads)
 #ifdef WIN32
     return (waitRetVal >= WAIT_OBJECT_0) && (waitRetVal <= (WAIT_OBJECT_0 + numThreads - 1));
 #else
+    GT_UNREFERENCED_PARAMETER(waitRetVal);
+    GT_UNREFERENCED_PARAMETER(numThreads);
     return true;
 #endif
 }
@@ -267,10 +270,12 @@ void VktTraceAnalyzerLayer::WaitAndFetchResults(VktFrameProfilerLayer* pFramePro
 
     if (queues.size() > 0)
     {
-#ifdef WIN32
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
         std::vector<HANDLE> queueThreads;
-#else
+#elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
         std::vector<std::thread*> queueThreads;
+#else
+    #error Unknown build target! No valid value for AMDT_BUILD_TARGET.
 #endif
 
         for (UINT i = 0; i < queues.size(); i++)

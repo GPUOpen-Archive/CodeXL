@@ -27,7 +27,7 @@ ModernAPILayerManager* VktObjectDatabaseProcessor::GetParentLayerManager()
 //-----------------------------------------------------------------------------
 int VktObjectDatabaseProcessor::GetObjectTypeFromString(const gtASCIIString& inObjectTypeString) const
 {
-    UNREFERENCED_PARAMETER(inObjectTypeString);
+    GT_UNREFERENCED_PARAMETER(inObjectTypeString);
 
     return kObjectType_Undefined;
 }

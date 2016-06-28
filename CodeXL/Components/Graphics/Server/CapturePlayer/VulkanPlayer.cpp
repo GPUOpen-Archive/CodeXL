@@ -63,7 +63,7 @@ struct VulkanState
 };
 
 /// Vulkan state
-static VulkanState s_vkState = {};
+static VulkanState s_vkState = VulkanState();
 
 // local Vulkan surface helper classes. Used to encapsulate the Vulkan surface info
 // depending on the underlying window interface. Use methods to return the data type
@@ -204,7 +204,7 @@ void VulkanPlayer::Present()
 
     VkSemaphore presentCompleteSemaphore = VK_NULL_HANDLE;
 
-    VkSemaphoreCreateInfo presentCompleteSemaphoreCreateInfo = {};
+    VkSemaphoreCreateInfo presentCompleteSemaphoreCreateInfo = VkSemaphoreCreateInfo();
     presentCompleteSemaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
     presentCompleteSemaphoreCreateInfo.pNext = nullptr;
     presentCompleteSemaphoreCreateInfo.flags = 0;
@@ -222,7 +222,7 @@ void VulkanPlayer::Present()
 
     ClearSwapchainImage();
 
-    VkPresentInfoKHR present = {};
+    VkPresentInfoKHR present = VkPresentInfoKHR();
     present.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
     present.pNext = nullptr;
     present.swapchainCount = 1;
@@ -243,9 +243,10 @@ void VulkanPlayer::Present()
 /// \return True if success, false if failure
 bool VulkanPlayer::InitializeWindow(HINSTANCE hInstance, UINT windowWidth, UINT windowHeight)
 {
-#ifdef WIN32
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     m_pPlayerWindow = new WindowsWindow(windowWidth, windowHeight, hInstance, VulkanWindowProc);
-#else
+#elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
+    GT_UNREFERENCED_PARAMETER(hInstance);
     // choose window type
     m_pPlayerWindow = new XcbWindow(windowWidth, windowHeight);
 
@@ -340,7 +341,7 @@ bool VulkanPlayer::InitializeGraphics()
         return false;
     }
 
-    VkApplicationInfo appInfo = {};
+    VkApplicationInfo appInfo = VkApplicationInfo();
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     appInfo.pNext = nullptr;
     appInfo.pApplicationName = "APIReplayWindow";
@@ -349,7 +350,7 @@ bool VulkanPlayer::InitializeGraphics()
     appInfo.engineVersion = 0;
     appInfo.apiVersion = VK_API_VERSION_1_0;
 
-    VkInstanceCreateInfo instCreateInfo = {};
+    VkInstanceCreateInfo instCreateInfo = VkInstanceCreateInfo();
     instCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     instCreateInfo.pNext = nullptr;
     instCreateInfo.pApplicationInfo = &appInfo;
@@ -474,14 +475,14 @@ bool VulkanPlayer::InitializeGraphics()
 
     float queuePriorities[1] = { 0.0 };
 
-    VkDeviceQueueCreateInfo queueCreateInfo = {};
+    VkDeviceQueueCreateInfo queueCreateInfo = VkDeviceQueueCreateInfo();
     queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
     queueCreateInfo.pNext = nullptr;
     queueCreateInfo.queueFamilyIndex = s_vkState.gfxQueueNodeIdx;
     queueCreateInfo.queueCount = 1;
     queueCreateInfo.pQueuePriorities = queuePriorities;
 
-    VkDeviceCreateInfo device = {};
+    VkDeviceCreateInfo device = VkDeviceCreateInfo();
     device.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     device.pNext = nullptr;
     device.queueCreateInfoCount = 1;
@@ -520,7 +521,7 @@ bool VulkanPlayer::InitializeGraphics()
 
     VkSwapchainKHR oldSwapchain = s_vkState.swapchain;
 
-    VkSurfaceCapabilitiesKHR surfCapabilities = {};
+    VkSurfaceCapabilitiesKHR surfCapabilities = VkSurfaceCapabilitiesKHR();
     result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(s_vkState.gpu, s_vkState.surface, &surfCapabilities);
     CP_ASSERT(result == VK_SUCCESS);
 
@@ -536,7 +537,7 @@ bool VulkanPlayer::InitializeGraphics()
 
     free(pPresentModes);
 
-    VkExtent2D swapchainExtent = {};
+    VkExtent2D swapchainExtent = VkExtent2D();
     if (surfCapabilities.currentExtent.width == (UINT)-1)
     {
         swapchainExtent.width = s_vkState.width;
@@ -562,7 +563,7 @@ bool VulkanPlayer::InitializeGraphics()
         preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
     }
 
-    VkSwapchainCreateInfoKHR swapchainCreateInfo = {};
+    VkSwapchainCreateInfoKHR swapchainCreateInfo = VkSwapchainCreateInfoKHR();
     swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
     swapchainCreateInfo.pNext = nullptr;
     swapchainCreateInfo.surface = s_vkState.surface;
@@ -597,7 +598,7 @@ bool VulkanPlayer::InitializeGraphics()
 
     for (UINT i = 0; i < s_vkState.swapchainImgCount; i++)
     {
-        VkImageViewCreateInfo colorAttachmentView = {};
+        VkImageViewCreateInfo colorAttachmentView = VkImageViewCreateInfo();
         colorAttachmentView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         colorAttachmentView.pNext = NULL;
         colorAttachmentView.format = VK_FORMAT_B8G8R8A8_UNORM;
@@ -615,7 +616,7 @@ bool VulkanPlayer::InitializeGraphics()
 
     s_vkState.currSwapchainBuffer = 0;
 
-    VkAttachmentDescription attachmentDescription = {};
+    VkAttachmentDescription attachmentDescription = VkAttachmentDescription();
     attachmentDescription.format = VK_FORMAT_R8G8B8A8_UNORM;
     attachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
     attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
@@ -625,11 +626,11 @@ bool VulkanPlayer::InitializeGraphics()
     attachmentDescription.initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
     attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-    VkAttachmentReference colorReference = {};
+    VkAttachmentReference colorReference = VkAttachmentReference();
     colorReference.attachment = 0;
     colorReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-    VkSubpassDescription subpass = {};
+    VkSubpassDescription subpass = VkSubpassDescription();
     subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     subpass.flags = 0;
     subpass.inputAttachmentCount = 0;
@@ -641,7 +642,7 @@ bool VulkanPlayer::InitializeGraphics()
     subpass.preserveAttachmentCount = 0;
     subpass.pPreserveAttachments = nullptr;
 
-    VkRenderPassCreateInfo rendePassCreateInfo = {};
+    VkRenderPassCreateInfo rendePassCreateInfo = VkRenderPassCreateInfo();
     rendePassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
     rendePassCreateInfo.pNext = nullptr;
     rendePassCreateInfo.attachmentCount = 1;
@@ -655,7 +656,7 @@ bool VulkanPlayer::InitializeGraphics()
 
     VkImageView attachment = {};
 
-    VkFramebufferCreateInfo fbInfo = {};
+    VkFramebufferCreateInfo fbInfo = VkFramebufferCreateInfo();
     fbInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
     fbInfo.pNext = NULL;
     fbInfo.renderPass = s_vkState.renderPass;
@@ -674,7 +675,7 @@ bool VulkanPlayer::InitializeGraphics()
         CP_ASSERT(result == VK_SUCCESS);
     }
 
-    VkCommandPoolCreateInfo cmdPoolInfo = {};
+    VkCommandPoolCreateInfo cmdPoolInfo = VkCommandPoolCreateInfo();
     cmdPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     cmdPoolInfo.pNext = NULL;
     cmdPoolInfo.queueFamilyIndex = graphicsQueueNodeIndex;
@@ -682,7 +683,7 @@ bool VulkanPlayer::InitializeGraphics()
     result = vkCreateCommandPool(s_vkState.device, &cmdPoolInfo, NULL, &s_vkState.cmdPool);
     CP_ASSERT(result == VK_SUCCESS);
 
-    VkCommandBufferAllocateInfo cmdBufAllocInfo = {};
+    VkCommandBufferAllocateInfo cmdBufAllocInfo = VkCommandBufferAllocateInfo();
     cmdBufAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     cmdBufAllocInfo.pNext = NULL;
     cmdBufAllocInfo.commandPool = s_vkState.cmdPool;
@@ -699,7 +700,7 @@ void VulkanPlayer::ClearSwapchainImage()
 {
     VkResult result = VK_INCOMPLETE;
 
-    VkCommandBufferInheritanceInfo cmdBufInheritInfo = {};
+    VkCommandBufferInheritanceInfo cmdBufInheritInfo = VkCommandBufferInheritanceInfo();
     cmdBufInheritInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
     cmdBufInheritInfo.pNext = NULL;
     cmdBufInheritInfo.renderPass = VK_NULL_HANDLE;
@@ -709,13 +710,13 @@ void VulkanPlayer::ClearSwapchainImage()
     cmdBufInheritInfo.queryFlags = 0;
     cmdBufInheritInfo.pipelineStatistics = 0;
 
-    VkCommandBufferBeginInfo cmdBufInfo = {};
+    VkCommandBufferBeginInfo cmdBufInfo = VkCommandBufferBeginInfo();
     cmdBufInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     cmdBufInfo.pNext = NULL;
     cmdBufInfo.flags = 0;
     cmdBufInfo.pInheritanceInfo = &cmdBufInheritInfo;
 
-    VkRenderPassBeginInfo rpBeginInfo = {};
+    VkRenderPassBeginInfo rpBeginInfo = VkRenderPassBeginInfo();
     rpBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     rpBeginInfo.pNext = NULL;
     rpBeginInfo.renderPass = s_vkState.renderPass;
@@ -732,7 +733,7 @@ void VulkanPlayer::ClearSwapchainImage()
 
     VkImageSubresourceRange subResRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
 
-    VkImageMemoryBarrier imgMemBarrier = {};
+    VkImageMemoryBarrier imgMemBarrier = VkImageMemoryBarrier();
     imgMemBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     imgMemBarrier.pNext = NULL;
     imgMemBarrier.srcAccessMask = 0;
@@ -752,7 +753,7 @@ void VulkanPlayer::ClearSwapchainImage()
 
     vkCmdEndRenderPass(s_vkState.cmdBuf);
 
-    VkImageMemoryBarrier prePresentBarrier = {};
+    VkImageMemoryBarrier prePresentBarrier = VkImageMemoryBarrier();
     prePresentBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     prePresentBarrier.pNext = NULL;
     prePresentBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
@@ -771,7 +772,7 @@ void VulkanPlayer::ClearSwapchainImage()
 
     VkPipelineStageFlags pipeStage = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
 
-    VkSubmitInfo submitInfo = {};
+    VkSubmitInfo submitInfo = VkSubmitInfo();
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.pNext = NULL;
     submitInfo.waitSemaphoreCount = 0;

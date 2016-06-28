@@ -8,21 +8,24 @@
 #ifndef WINDOW_BASE_H
 #define WINDOW_BASE_H
 
-#ifdef WIN32
-#include <Windows.h>
-typedef HWND NativeWindowType;
-typedef HINSTANCE NativeInstanceType;
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+    #include <Windows.h>
+    typedef HWND NativeWindowType;
+    typedef HINSTANCE NativeInstanceType;
+#elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
+    #include <xcb/xcb.h>
+    #include <X11/Xutil.h>
+    #include <vulkan/vulkan.h>
+    #if 1  // XCB
+        typedef xcb_window_t NativeWindowType;
+        typedef xcb_connection_t* NativeInstanceType;
+    #else  // X11
+        typedef Window NativeWindowType;
+        typedef Display* NativeInstanceType;
+    #endif
 #else
-#include <X11/Xutil.h>
-#include <vulkan/vulkan.h>
-#if 1  // XCB
-typedef xcb_window_t NativeWindowType;
-typedef xcb_connection_t* NativeInstanceType;
-#else  // X11
-typedef Window NativeWindowType;
-typedef Display* NativeInstanceType;
-#endif
-#endif // WIN32
+    #error Unknown build target! No valid value for AMDT_BUILD_TARGET.
+#endif // AMDT_BUILD_TARGET
 
 /// An empty window used for replaying API Frame Capture files.
 class WindowBase

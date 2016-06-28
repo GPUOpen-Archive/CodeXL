@@ -73,7 +73,6 @@ gdStatisticsView::gdStatisticsView(afProgressBarWrapper* pProgressBar, QWidget* 
     // Allocate new statistics object:
     _pStatistics = new apStatistics();
 
-
     // Initialize pages display flags:
     for (int i = 0 ; i <= GD_STATISTICS_VIEW_LAST_VIEWER_INDEX; i++)
     {
@@ -402,19 +401,15 @@ void gdStatisticsView::createStatisticsPages()
     // Create the total statistics tab:
     _pages[GD_STATISTICS_VIEW_TOTAL_INDEX] = new gdTotalStatisticsView(this);
 
-
     // Create the function calls statistics tab:
     _pages[GD_STATISTICS_VIEW_FUNCTION_CALLS_INDEX] = new gdFunctionCallsStatisticsView(this);
-
 
     // Create the deprecation statistics tab:
     _pages[GD_STATISTICS_VIEW_DEPRECATION_INDEX] = new gdDeprecationStatisticsView(this);
 
-
     // Create the calls history statistics tab:
     _pages[GD_STATISTICS_VIEW_FUNCTION_CALLS_HISTORY_INDEX] = NULL;
     _pCallHistoryView = new gdAPICallsHistoryView(_pProgressBar, this, false, false);
-
 
     // Create the batch statistics tab:
     _pages[GD_STATISTICS_VIEW_BATCH_INDEX] = new gdBatchStatisticsView(this);

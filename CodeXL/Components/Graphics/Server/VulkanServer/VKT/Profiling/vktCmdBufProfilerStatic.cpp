@@ -112,7 +112,7 @@ ProfilerResultCode VktCmdBufProfilerStatic::BeginCmdMeasurement(const ProfilerMe
         m_activeSlot++;
 
         // Add a new measurement
-        ProfilerMeasurementInfo clientData = {};
+        ProfilerMeasurementInfo clientData = ProfilerMeasurementInfo();
         clientData.measurementNum = m_activeSlot;
 
         if (pIdInfo != nullptr)
@@ -233,7 +233,7 @@ ProfilerResultCode VktCmdBufProfilerStatic::GetCmdBufResults(UINT64 fillId, std:
 
             ProfilerInterval* pTimestampData = nullptr;
 
-            ProfilerInterval interval = {};
+            ProfilerInterval interval = ProfilerInterval();
 
             if (m_config.measurementTypeFlags & PROFILER_MEASUREMENT_TYPE_TIMESTAMPS)
             {
@@ -269,7 +269,7 @@ ProfilerResultCode VktCmdBufProfilerStatic::GetCmdBufResults(UINT64 fillId, std:
             // Report no results
             if (m_config.measurementTypeFlags == PROFILER_MEASUREMENT_TYPE_NONE)
             {
-                ProfilerResult profilerResult = {};
+                ProfilerResult profilerResult = ProfilerResult();
                 results.push_back(profilerResult);
             }
 
@@ -278,7 +278,7 @@ ProfilerResultCode VktCmdBufProfilerStatic::GetCmdBufResults(UINT64 fillId, std:
             {
                 profilerResultCode = PROFILER_SUCCESS;
 
-                ProfilerResult profilerResult = {};
+                ProfilerResult profilerResult = ProfilerResult();
 
                 memcpy(&profilerResult.measurementInfo, &currSlot.measurementInfo, sizeof(ProfilerMeasurementInfo));
 

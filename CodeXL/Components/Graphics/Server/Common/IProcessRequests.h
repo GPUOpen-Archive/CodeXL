@@ -10,15 +10,21 @@
 #define GPS_PROCESSREQUEST_INTERFACE
 
 // in order to be able to process requests, the code must be able to
-// initiallize the communication channel
+// initialize the communication channel
 #include "ICommunication.h"
 
-#ifdef GPS_PLUGIN_EXPORTS
-    #define GPS_PLUGIN_API extern "C" __declspec( dllexport ) ///< DLL Export Definition
-#elif defined GPS_PLUGIN_STATIC
-    #define GPS_PLUGIN_API extern "C" __attribute__ ((visibility ("default"))) ///< Export Definition
+#if (AMDT_BUILD_TARGET == AMDT_WINDOWS_OS)
+    #ifdef GPS_PLUGIN_EXPORTS
+        #define GPS_PLUGIN_API extern "C" __declspec( dllexport ) ///< DLL Export Definition
+    #elif defined GPS_PLUGIN_STATIC
+        #define GPS_PLUGIN_API extern "C" __attribute__ ((visibility ("default"))) ///< Export Definition
+    #else
+        #define GPS_PLUGIN_API extern "C" __declspec( dllimport ) ///< DLL Import Definition
+    #endif
+#elif (AMDT_BUILD_TARGET == AMDT_LINUX_OS)
+    #define GPS_PLUGIN_API 
 #else
-    #define GPS_PLUGIN_API extern "C" __declspec( dllimport ) ///< DLL Import Definition
+    #error Unknown build target! No valid value for AMDT_BUILD_TARGET.
 #endif
 
 //=============================================================================

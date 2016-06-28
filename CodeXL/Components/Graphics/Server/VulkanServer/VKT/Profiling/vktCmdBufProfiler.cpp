@@ -129,7 +129,7 @@ ProfilerResultCode VktCmdBufProfiler::BeginCmdMeasurement(const ProfilerMeasurem
         m_cmdBufData.cmdBufMeasurementCount++;
 
         // Add a new measurement
-        ProfilerMeasurementInfo clientData = {};
+        ProfilerMeasurementInfo clientData = ProfilerMeasurementInfo();
         clientData.measurementNum = m_cmdBufData.cmdBufMeasurementCount;
 
         if (pIdInfo != nullptr)
@@ -289,7 +289,7 @@ ProfilerResultCode VktCmdBufProfiler::GetCmdBufResults(std::vector<ProfilerResul
             {
                 for (UINT j = 0; j < currGroup.groupMeasurementCount; j++)
                 {
-                    ProfilerResult profilerResult = {};
+                    ProfilerResult profilerResult = ProfilerResult();
                     results.push_back(profilerResult);
                 }
             }
@@ -301,7 +301,7 @@ ProfilerResultCode VktCmdBufProfiler::GetCmdBufResults(std::vector<ProfilerResul
 
                 for (UINT j = 0; j < currGroup.groupMeasurementCount; j++)
                 {
-                    ProfilerResult profilerResult = {};
+                    ProfilerResult profilerResult = ProfilerResult();
 
                     memcpy(&profilerResult.measurementInfo, &currGroup.measurementInfos[j], sizeof(ProfilerMeasurementInfo));
 
@@ -417,7 +417,7 @@ VkResult VktCmdBufProfiler::CreateQueryBuffer(
 {
     VkResult result = VK_INCOMPLETE;
 
-    VkBufferCreateInfo bufferCreateInfo = {};
+    VkBufferCreateInfo bufferCreateInfo = VkBufferCreateInfo();
     bufferCreateInfo.sType                 = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     bufferCreateInfo.pNext                 = nullptr;
     bufferCreateInfo.usage                 = VK_BUFFER_USAGE_TRANSFER_DST_BIT;
@@ -430,10 +430,10 @@ VkResult VktCmdBufProfiler::CreateQueryBuffer(
 
     if (result == VK_SUCCESS)
     {
-        VkMemoryRequirements memReqs = {};
+        VkMemoryRequirements memReqs = VkMemoryRequirements();
         m_pDeviceDT->GetBufferMemoryRequirements(m_config.device, *pBuffer, &memReqs);
 
-        VkMemoryAllocateInfo allocInfo = {};
+        VkMemoryAllocateInfo allocInfo = VkMemoryAllocateInfo();
         allocInfo.sType          = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         allocInfo.pNext          = nullptr;
         allocInfo.allocationSize = memReqs.size;
@@ -496,7 +496,7 @@ VkResult VktCmdBufProfiler::SetupNewMeasurementGroup()
 {
     VkResult result = VK_SUCCESS;
 
-    ProfilerMeasurementGroup measurementGroup = {};
+    ProfilerMeasurementGroup measurementGroup = ProfilerMeasurementGroup();
 
     if (m_config.measurementTypeFlags & PROFILER_MEASUREMENT_TYPE_TIMESTAMPS)
     {
@@ -521,7 +521,7 @@ VkResult VktCmdBufProfiler::CreateGpuResourceGroup(ProfilerGpuResources& gpuRes)
 {
     VkResult result = VK_INCOMPLETE;
 
-    VkQueryPoolCreateInfo queryPoolCreateInfo = {};
+    VkQueryPoolCreateInfo queryPoolCreateInfo = VkQueryPoolCreateInfo();
     queryPoolCreateInfo.sType      = VK_STRUCTURE_TYPE_QUERY_POOL_CREATE_INFO;
     queryPoolCreateInfo.pNext      = nullptr;
     queryPoolCreateInfo.queryType  = VK_QUERY_TYPE_TIMESTAMP;
