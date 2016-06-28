@@ -49,9 +49,11 @@
 #if AMDT_BUILD_TARGET == AMDT_LINUX_OS
 #define LONG_FORMAT     L"%ld"
 #define LONG_FORMAT_HEX     L"%lx"
+#define STR_FORMAT L"%s"
 #else
 #define LONG_FORMAT     L"%lld"
 #define LONG_FORMAT_HEX     L"%llx"
+#define STR_FORMAT L"%S"
 #endif
 
 #define DB_MODULEID_MASK        0xFFFF0000UL
@@ -3395,7 +3397,7 @@ public:
             }
 
             gtString query;
-            query.appendFormattedString(L" MAX(CASE WHEN %S = " LONG_FORMAT L" THEN %S END) AS event" LONG_FORMAT, fromCol.c_str() , eventId, toCol.c_str(), eventId);
+            query.appendFormattedString(L" MAX(CASE WHEN " STR_FORMAT L" = " LONG_FORMAT L" THEN " STR_FORMAT L" END) AS event" LONG_FORMAT, fromCol.c_str() , eventId, toCol.c_str(), eventId);
 
             partialQuery << query.asASCIICharArray();
             addComma = true;

@@ -34,6 +34,9 @@
 
 #define TP_ALL_PIDS                0xFFFFFFFFUL
 
+// This ise used just for testing purpose
+#define REPORT_CONFIG_IDX 0
+
 // Backend:
 
 // External function.
@@ -679,7 +682,7 @@ HRESULT CpuProfileReport::ReportFromDb()
             options.m_isSeperateByCore = false;
 
             //for (auto const& counter : counterDesc)
-            for (auto const& counter : reportConfigs[0].m_counterDescs)
+            for (auto const& counter : reportConfigs[REPORT_CONFIG_IDX].m_counterDescs)
             {
                 options.m_counters.push_back(counter.m_id);
             }
@@ -733,17 +736,17 @@ HRESULT CpuProfileReport::ReportFromDb()
             // Process View - "All Data" view
             gtVector<AMDTProfileData> allProcessData;
             ret = profileDbReader.GetProcessProfileData(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, allProcessData);
-            PrintAllData(reportFile, L"Process", reportConfigs[0].m_counterDescs, allProcessData);
+            PrintAllData(reportFile, L"Process", reportConfigs[REPORT_CONFIG_IDX].m_counterDescs, allProcessData);
 
             // Module View - "All Data" view
             gtVector<AMDTProfileData> allModuleData;
             ret = profileDbReader.GetModuleProfileData(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, allModuleData);
-            PrintAllData(reportFile, L"Module", reportConfigs[0].m_counterDescs, allModuleData);
+            PrintAllData(reportFile, L"Module", reportConfigs[REPORT_CONFIG_IDX].m_counterDescs, allModuleData);
 
             // function View - "All Data" view
             gtVector<AMDTProfileData> allFunctionData;
             ret = profileDbReader.GetFunctionProfileData(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, allFunctionData);
-            PrintAllData(reportFile, L"Function", reportConfigs[0].m_counterDescs, allFunctionData);
+            PrintAllData(reportFile, L"Function", reportConfigs[REPORT_CONFIG_IDX].m_counterDescs, allFunctionData);
 
             // Get modules data for the process
             for (auto const& process : procInfo)
@@ -753,7 +756,7 @@ HRESULT CpuProfileReport::ReportFromDb()
                 ret = profileDbReader.GetModuleProfileData(process.m_pid, AMDT_PROFILE_ALL_MODULES, profData);
                 gtString hdr(L"Modules for Process -");
                 hdr.appendFormattedString(L"%d", process.m_pid);
-                PrintAllData(reportFile, hdr, reportConfigs[0].m_counterDescs, profData);
+                PrintAllData(reportFile, hdr, reportConfigs[REPORT_CONFIG_IDX].m_counterDescs, profData);
             }
 
             // Get processes data for the module
@@ -764,12 +767,12 @@ HRESULT CpuProfileReport::ReportFromDb()
                 ret = profileDbReader.GetProcessProfileData(AMDT_PROFILE_ALL_PROCESSES, mod.m_moduleId, profData);
                 gtString hdr(L"Processes for Module -");
                 hdr.appendFormattedString(L"%d", mod.m_moduleId);
-                PrintAllData(reportFile, hdr, reportConfigs[0].m_counterDescs, profData);
+                PrintAllData(reportFile, hdr, reportConfigs[REPORT_CONFIG_IDX].m_counterDescs, profData);
             }
 
             // Get detailed function profiledata
             // FIXME: dont report func data..
-            funcProfileData.clear();
+            // funcProfileData.clear();
 
             for (auto const& func : funcProfileData)
             {
@@ -788,7 +791,7 @@ HRESULT CpuProfileReport::ReportFromDb()
                         AMDTSourceAndDisasmInfoVec srcInfoVec;
                         retVal = profileDbReader.GetFunctionSourceAndDisasmInfo(func.m_id, srcFilePath, srcInfoVec);
 
-                        PrintFunctionDetailData(reportFile, reportConfigs[0].m_counterDescs, functionData, srcFilePath, srcInfoVec);
+                        PrintFunctionDetailData(reportFile, reportConfigs[REPORT_CONFIG_IDX].m_counterDescs, functionData, srcFilePath, srcInfoVec);
                     }
                 }
             }
