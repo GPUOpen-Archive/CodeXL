@@ -136,7 +136,9 @@ bool XcbWindow::Update()
         switch (event_code)
         {
         case XCB_EXPOSE:
-            // TODO: Resize window
+            {
+                // TODO: Resize window
+            }
             break;
 
         case XCB_CLIENT_MESSAGE:
@@ -147,6 +149,8 @@ bool XcbWindow::Update()
             break;
 
         case XCB_KEY_RELEASE:
+            {
+            }
             break;
 
         case XCB_CONFIGURE_NOTIFY:
@@ -161,6 +165,8 @@ bool XcbWindow::Update()
             break;
 
         default:
+            {
+            }
             break;
         }
     }
