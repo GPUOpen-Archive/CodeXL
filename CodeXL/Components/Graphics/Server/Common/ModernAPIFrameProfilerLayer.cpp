@@ -18,8 +18,8 @@ static const gpa_uint32 INVALID_GPA_SESSION_ID = 0x1337;
 /// Default constructor for ModernAPIFrameProfilerLayer.
 //--------------------------------------------------------------------------
 ModernAPIFrameProfilerLayer::ModernAPIFrameProfilerLayer()
-    : mCurrentProfilingSessionId(INVALID_GPA_SESSION_ID)
-    , mSampleIndex(FIRST_GPA_SAMPLE_ID)
+    : mSampleIndex(FIRST_GPA_SAMPLE_ID)
+    , mCurrentProfilingSessionId(INVALID_GPA_SESSION_ID)
     , mbProfilerEnabled(false)
 {
 }
