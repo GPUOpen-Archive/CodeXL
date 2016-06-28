@@ -168,7 +168,7 @@ AMDTResult AllocateBuffers()
     g_pDevPool = (AMDTPwrDevice*)GetMemoryPoolBuffer(&g_apiMemoryPool,
                                                      sizeof(AMDTPwrDevice) * MAX_DEVICE_CNT);
 
-    if (nullptr != g_pDevPool)
+    if ((nullptr != g_pDevPool) && (nullptr != g_pCounterStorage))
     {
         AMDTUInt32 cnt = 0;
 
@@ -1924,8 +1924,9 @@ AMDTResult AMDTPwrReadAllEnabledCounters(AMDTUInt32* pNumOfSamples,
             ConvertTimeStamp(&result.m_systemTime, startTs);
             result.m_counterValues = &g_pCounterStorage[counterPoolCnt];
 
-            if ((counterPoolCnt + data.m_counters.size()) > PWR_COUNTER_STORAGE_POOL)
+            if ((nullptr == g_pCounterStorage) || (counterPoolCnt + data.m_counters.size()) > PWR_COUNTER_STORAGE_POOL)
             {
+                ret = AMDT_ERROR_OUTOFMEMORY;
                 PwrTrace("memory not available");
                 break;
             }
