@@ -274,3 +274,41 @@ bool beProgramBuilderOpenGL::GetOpenGLVersion(gtString& glVersion)
 
     return isLaunchSuccess;
 }
+
+bool beProgramBuilderOpenGL::GetDeviceGLInfo(const std::string& deviceName, size_t& deviceFamilyId, size_t& deviceRevision) const
+{
+    bool ret = false;
+
+    // This map will hold the device values as expected by the OpenGL backend.
+    static std::map<std::string, std::pair<size_t, size_t>> glBackendValues;
+    if (glBackendValues.empty())
+    {
+        // Fill in the values if that's the first time.
+        glBackendValues["Bonaire"] = std::pair<int, int>(120, 20);
+        glBackendValues["Capeverde"] = std::pair<int, int>(110, 40);
+        glBackendValues["Carrizo"] = std::pair<int, int>(130, 1);
+        glBackendValues["Fiji"] = std::pair<int, int>(130, 60);
+        glBackendValues["Hainan"] = std::pair<int, int>(110, 75);
+        glBackendValues["Hawaii"] = std::pair<int, int>(120, 40);
+        glBackendValues["Iceland"] = std::pair<int, int>(130, 19);
+        glBackendValues["Kalindi"] = std::pair<int, int>(120, 129);
+        glBackendValues["Mullins"] = std::pair<int, int>(120, 161);
+        glBackendValues["Oland"] = std::pair<int, int>(110, 60);
+        glBackendValues["Pitcairn"] = std::pair<int, int>(110, 20);
+        glBackendValues["Spectre"] = std::pair<int, int>(120, 1);
+        glBackendValues["Spooky"] = std::pair<int, int>(120, 65);
+        glBackendValues["Tahiti"] = std::pair<int, int>(110, 0);
+        glBackendValues["Tonga"] = std::pair<int, int>(130, 20);
+    }
+
+    // Fetch the relevant value.
+    auto deviceIter = glBackendValues.find(deviceName);
+    if (deviceIter != glBackendValues.end())
+    {
+        deviceFamilyId = deviceIter->second.first;
+        deviceRevision = deviceIter->second.second;
+        ret = true;
+    }
+
+    return ret;
+}
