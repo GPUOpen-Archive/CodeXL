@@ -75,7 +75,7 @@ DataTab::DataTab(QWidget* pParent, CpuSessionWindow* pParentSessionWindow, const
 
         for (const auto& counter : counterDesc)
         {
-            m_CounterIdxMap.emplace(counter.m_name, idx++);
+            m_CounterIdxMap.insert(make_pair(counter.m_name, idx++));
         }
     }
 
