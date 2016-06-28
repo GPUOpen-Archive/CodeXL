@@ -65,6 +65,22 @@ gdGlobalDebugSettingsPage* gwgDEBuggerAppWrapper::m_spGlobalDebugSettingsPage = 
 gdExecutionMode* gwgDEBuggerAppWrapper::m_pExecutionMode = NULL;
 bool gwgDEBuggerAppWrapper::s_loadEnabled = false;
 
+// Helper class:
+// Since this is the only singleton class in this project, the singletons deleter
+// Can be implemented and defined here.
+class gwSingletonsDelete
+{
+public:
+    gwSingletonsDelete() {};
+    ~gwSingletonsDelete()
+    {
+        delete gwgDEBuggerAppWrapper::m_spMySingleInstance;
+        gwgDEBuggerAppWrapper::m_spMySingleInstance = nullptr;
+    }
+};
+
+static gwSingletonsDelete s_singletonsDeleter;
+
 // ---------------------------------------------------------------------------
 // Name:        gwgDEBuggerAppWrapper::gwgDEBuggerAppWrapper
 // Description: Constructor
