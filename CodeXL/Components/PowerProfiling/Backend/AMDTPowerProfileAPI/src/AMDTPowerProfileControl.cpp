@@ -1578,13 +1578,15 @@ void PwrInsertDeviceCounters(AMDTPwrDevice* dev, AMDTUInt32 instId, AMDTUInt32 l
 
                     // GUI counters are based on name string
                     // GUI needs to be changed before we change the names
-                    if ((1 != dev->m_deviceID) && (strlen(dev->m_pName) > 0))
-                    {
-                        sprintf(counter.m_desc.m_name, "%s %s", dev->m_pName, pInfo->m_name);
-                    }
-                    else
+
+                    if((AMDT_PWR_DEVICE_PACKAGE == dev->m_deviceID)
+                        ||(AMDT_PWR_DEVICE_INTERNAL_GPU == dev->m_deviceID))
                     {
                         sprintf(counter.m_desc.m_name, "%s", pInfo->m_name);
+                    }
+                    else if(strlen(dev->m_pName) > 0)
+                    {
+                        sprintf(counter.m_desc.m_name, "%s %s", dev->m_pName, pInfo->m_name);
                     }
                     sprintf(counter.m_desc.m_description, "%s-%s", dev->m_pDescription, pInfo->m_description);
                     memcpy(&counter.m_basicInfo, pInfo, sizeof(AMDTPwrCounterBasicInfo));

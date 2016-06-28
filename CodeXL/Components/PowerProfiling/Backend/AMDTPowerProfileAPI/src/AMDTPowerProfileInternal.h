@@ -247,17 +247,7 @@ typedef struct PwrCounterDecodeInfo
     AMDTUInt32 m_smuIpVersion;
 } PwrCounterDecodeInfo;
 
-// DerivedCounter: to hold the accumulated and histogram counter value
-typedef struct PwrDerivedCounter
-{
-    union
-    {
-        AMDTPwrHistogram   m_histogram;
-        AMDTFloat32        m_value;
-    };
-} PwrDerivedCounter;
 typedef gtMap<AMDTUInt32, AMDTPwrAttributeInfo>     PwrDecodedCounterMap;
-typedef gtMap<AMDTUInt32, AMDTUInt32>     TestMap;
 
 //AMDTPwrProcessedDataRecord: Processed profile data
 //A processed record is represent by AMDTPwrProcessedDataRecord.

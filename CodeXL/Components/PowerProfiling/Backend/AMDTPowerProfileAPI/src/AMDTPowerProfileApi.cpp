@@ -360,7 +360,7 @@ AMDTResult PrepareSystemTopologyInfo()
         //TODO: GUI shouldn't check for constant string
         memset(pkg0->m_pName, 0, AMDT_PWR_EXE_NAME_LENGTH);
         sprintf(pkg0->m_pName, pNodeInfo->m_shortName);
-        sprintf(pkg0->m_pDescription, "%s",pNodeInfo->m_name);
+        sprintf(pkg0->m_pDescription, "%s",pNodeInfo->m_shortName);
     }
 
     // ONLY if supported AMD platform
@@ -506,7 +506,7 @@ AMDTResult PrepareSystemTopologyInfo()
             igpu->m_type = AMDT_PWR_DEVICE_INTERNAL_GPU;
             //TODO: GUI shouldn't check for constant string
             memset(igpu->m_pName, 0, AMDT_PWR_EXE_NAME_LENGTH);
-            //sprintf(igpu->m_pName, "Igpu");
+            sprintf(igpu->m_pName, "Igpu");
             sprintf(igpu->m_pDescription, "Integrated GPU");
             igpu->m_pFirstChild = nullptr;
 

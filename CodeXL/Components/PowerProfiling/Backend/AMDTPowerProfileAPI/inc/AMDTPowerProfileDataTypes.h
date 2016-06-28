@@ -44,6 +44,10 @@ This macro denotes all the counters that are relevant to power profiling.
 */
 #define AMDT_PWR_MARKER_BUFFER_LENGTH 32
 
+/** Hisotgram maximum bin size
+*/
+#define AMDT_PWR_HISTOGRAM_MAX_BIN_COUNT 32
+
 /** Device Id
 */
 typedef AMDTUInt32 AMDTPwrDeviceId;
@@ -276,10 +280,10 @@ typedef struct AMDTPwrCounterHierarchy
 */
 typedef struct
 {
-    AMDTUInt32      m_counterId;    /**< Counter being aggregated */
-    AMDTUInt32      m_numOfBins;    /**< This is the number of histogram bins */
-    AMDTFloat32*    m_pRange;       /**< The ranges of the bins are stored in an array of n + 1 elements pointed to by range */
-    AMDTFloat32*    m_pBins;        /**< The counts for each bin are stored in an array of n elements pointed to by bin */
+    AMDTUInt32      m_counterId;                                /**< Counter being aggregated */
+    AMDTUInt32      m_numOfBins;                                /**< This is the number of histogram bins */
+    AMDTFloat32     m_range[AMDT_PWR_HISTOGRAM_MAX_BIN_COUNT + 1];  /**< The ranges of the bins are stored in an array of n + 1 elements pointed to by range */
+    AMDTFloat32     m_bins[AMDT_PWR_HISTOGRAM_MAX_BIN_COUNT];       /**< The counts for each bin are stored in an array of n elements pointed to by bin */
 } AMDTPwrHistogram;
 
 /** Represents process power info.

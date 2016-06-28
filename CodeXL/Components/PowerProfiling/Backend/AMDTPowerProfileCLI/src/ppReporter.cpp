@@ -403,11 +403,11 @@ void ppReporterText::ReportHistogramCounters(AMDTUInt32 num, AMDTPwrHistogram* p
 
         for (AMDTUInt32 j = 0; j < (tmp->m_numOfBins); j++)
         {
-            sprintf(m_pDataStr, "      %4d", static_cast<AMDTUInt32>(tmp->m_pRange[j]));
+            sprintf(m_pDataStr, "      %4d", static_cast<AMDTUInt32>(tmp->m_range[j]));
             m_dataStr.append(m_pDataStr);
-            sprintf(m_pDataStr, "      %4d", static_cast<AMDTUInt32>(tmp->m_pRange[j + 1] - 1));
+            sprintf(m_pDataStr, "      %4d", static_cast<AMDTUInt32>(tmp->m_range[j + 1] - 1));
             m_dataStr.append(m_pDataStr);
-            sprintf(m_pDataStr, "      %4d", static_cast<AMDTUInt32>(tmp->m_pBins[j]));
+            sprintf(m_pDataStr, "      %4d", static_cast<AMDTUInt32>(tmp->m_bins[j]));
             m_dataStr.append(m_pDataStr);
             m_dataStr.append("\n");
         }
@@ -738,11 +738,11 @@ void ppReporterCsv::ReportHistogramCounters(AMDTUInt32 num, AMDTPwrHistogram* pH
 
         for (AMDTUInt32 j = 0; j < (tmp->m_numOfBins); j++)
         {
-            sprintf(m_pDataStr, "%4d", static_cast<AMDTUInt32>(tmp->m_pRange[j]));
+            sprintf(m_pDataStr, "%4d", static_cast<AMDTUInt32>(tmp->m_range[j]));
             m_dataStr.append(m_pDataStr);
-            sprintf(m_pDataStr, ",%4d", static_cast<AMDTUInt32>(tmp->m_pRange[j + 1] - 1));
+            sprintf(m_pDataStr, ",%4d", static_cast<AMDTUInt32>(tmp->m_range[j + 1] - 1));
             m_dataStr.append(m_pDataStr);
-            sprintf(m_pDataStr, ",%4d", static_cast<AMDTUInt32>(tmp->m_pBins[j]));
+            sprintf(m_pDataStr, ",%4d", static_cast<AMDTUInt32>(tmp->m_bins[j]));
             m_dataStr.append(m_pDataStr);
             m_dataStr.append("\n");
         }
