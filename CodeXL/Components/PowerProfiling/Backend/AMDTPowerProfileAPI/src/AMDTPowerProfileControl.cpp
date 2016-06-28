@@ -1578,7 +1578,7 @@ void PwrInsertDeviceCounters(AMDTPwrDevice* dev, AMDTUInt32 instId, AMDTUInt32 l
 
                     // GUI counters are based on name string
                     // GUI needs to be changed before we change the names
-                    if (strlen(dev->m_pName) > 0)
+                    if ((1 != dev->m_deviceID) && (strlen(dev->m_pName) > 0))
                     {
                         sprintf(counter.m_desc.m_name, "%s %s", dev->m_pName, pInfo->m_name);
                     }
