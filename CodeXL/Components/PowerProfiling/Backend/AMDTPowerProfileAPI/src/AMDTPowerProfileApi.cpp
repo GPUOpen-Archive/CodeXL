@@ -158,6 +158,11 @@ AMDTResult AllocateBuffers()
 {
     AMDTResult ret = AMDT_STATUS_OK;
 
+    if(nullptr != g_apiMemoryPool.m_pBase)
+    {
+        ReleaseMemoryPool(&g_apiMemoryPool);
+    }
+
     if (nullptr == g_pCounterStorage)
     {
         g_pCounterStorage = (AMDTPwrCounterValue*)GetMemoryPoolBuffer(&g_apiMemoryPool,
