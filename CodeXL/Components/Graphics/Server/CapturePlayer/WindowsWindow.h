@@ -32,14 +32,14 @@ public:
 
     /// Retrieve the OS window handle for the ReplayWindow.
     /// \return The OS window handle for the ReplayWindow.
-    const NativeWindowType GetWindowHandle() const
+    NativeWindowType GetWindowHandle() const
     {
         return mWindowHandle;
     }
 
     /// Retrieve the application instance.
     /// \returns The OS application instance.
-    const NativeInstanceType GetInstance() const
+    NativeInstanceType GetInstance() const
     {
         return mhInstance;
     }
