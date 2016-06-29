@@ -17,6 +17,7 @@
 #include <AMDTBaseTools/Include/gtAssert.h>
 #include <AMDTApplicationComponents/Include/acIcons.h>
 #include <AMDTApplicationFramework/Include/afGlobalVariablesManager.h>
+#include <AMDTApplicationFramework/Include/afProjectManager.h>
 
 // AMDTGpuDebuggingComponents:
 #include <AMDTGpuDebuggingComponents/Include/gdApplicationCommands.h>
@@ -290,4 +291,17 @@ bool gdExecutionMode::IsRemoteEnabledForSessionType(const gtString& sessionType)
 bool gdExecutionMode::isModeEnabled()
 {
     return m_isModeEnabled;
+}
+
+void gdExecutionMode::GetToolbarStartButtonText(gtString& buttonText, bool fullString /*= true*/)
+{
+    gtString exeFileName;
+    afProjectManager::instance().currentProjectSettings().executablePath().getFileNameAndExtension(exeFileName);
+
+    buttonText = GD_STR_executionStartButton;
+
+    if (!exeFileName.isEmpty() && fullString)
+    {
+        buttonText.appendFormattedString(AF_STR_playButtonExeNameOnly, exeFileName.asCharArray());
+    }
 }

@@ -2718,6 +2718,7 @@
 #define GD_STR_executionModeVerb L"debug"
 #define GD_STR_executionModeDescription L"Perform API-level debugging of OpenGL and OpenCL and <br>kernel debugging for OpenCL kernels running on AMD GPUs."
 #define GD_STR_executionSesionType L"Debug"
+#define GD_STR_executionStartButton L"Host+GPU Debug"
 
 // Project settings extension:
 #define GD_STR_projectSettingsExtensionName L"GPUDebug"

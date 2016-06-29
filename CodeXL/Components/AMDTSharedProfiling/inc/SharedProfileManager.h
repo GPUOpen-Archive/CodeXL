@@ -217,6 +217,9 @@ public:
     /// Allow the mode to terminate gracefully at the end of CodeXL. by default nothing needs to be done
     virtual void Terminate();
 
+    /// Get the toolbar start button text
+    virtual void GetToolbarStartButtonText(gtString& buttonText, bool fullString = true);
+
     /// Show the appropriate project settings tab
     void onInvokeProjectSettings();
 

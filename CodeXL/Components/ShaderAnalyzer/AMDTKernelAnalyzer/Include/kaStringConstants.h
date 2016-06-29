@@ -60,6 +60,7 @@
 #define KA_STR_executionModeVerb   L"analyze"
 #define KA_STR_executionSesionType L"Analyze"
 #define KA_STR_executionModeStatusbarString L"Analyze Mode - Switch to Analyze Mode"
+#define KA_STR_executionStartButton L"Static Analysis"
 
 // Context menu commands
 #define KA_STR_openclBuildASCII "&Build"

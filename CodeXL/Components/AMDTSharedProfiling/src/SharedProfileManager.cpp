@@ -725,6 +725,41 @@ void SharedProfileManager::Terminate()
     osTerminateProcessesByName(processNames, currentProcessId, false);
 }
 
+void SharedProfileManager::GetToolbarStartButtonText(gtString& buttonText, bool fullString /*= true*/)
+{
+    buttonText = PM_STR_startButtonProfileMode;
+    gtString currentType = sessionTypeName(afExecutionModeManager::instance().activeSessionType());
+    if (currentType.startsWith(L"CPU"))
+    {
+        buttonText = PM_STR_startButtonProfileCPUMode;
+    }
+    else if (currentType.startsWith(L"GPU"))
+    {
+        buttonText = PM_STR_startButtonProfileGPUMode;
+    }
+    else
+    {
+        buttonText = PM_STR_startButtonProfilePowerMode;
+    }
+
+    gtString exeFileName;
+    afProjectManager::instance().currentProjectSettings().executablePath().getFileNameAndExtension(exeFileName);
+    bool isSystemWide = (SharedProfileSettingPage::Instance()->CurrentSharedProfileSettings().m_profileScope == PM_PROFILE_SCOPE_SYS_WIDE);
+
+    // add the (..) section if in profile and full info is needed
+    if (isSystemWide && fullString)
+    {
+        if (!exeFileName.isEmpty())
+        {
+            buttonText.appendFormattedString(PM_STR_startButtonExeAndSystemWide, exeFileName.asCharArray());
+        }
+        else
+        {
+            buttonText.append(PM_STR_startButtonSystemWide);
+        }
+    }
+}
+
 ///Visual studio direct ui check
 bool SharedProfileManager::enableVsProfileAction(int vsId, bool& shouldCheck, bool& shouldShow)
 {

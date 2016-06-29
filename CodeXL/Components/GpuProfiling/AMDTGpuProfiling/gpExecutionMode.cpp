@@ -1441,6 +1441,18 @@ void gpExecutionMode::Terminate()
     osTerminateProcessesByName(fileNamesToTerminate, currentProcessId, false);
 }
 
+void gpExecutionMode::GetToolbarStartButtonText(gtString& buttonText, bool fullString /*= true*/)
+{
+    gtString exeFileName;
+    afProjectManager::instance().currentProjectSettings().executablePath().getFileNameAndExtension(exeFileName);
+
+    buttonText = GPU_STR_executionStartButton;
+
+    if (!exeFileName.isEmpty() && fullString)
+    {
+        buttonText.appendFormattedString(AF_STR_playButtonExeNameOnly, exeFileName.asCharArray());
+    }
+}
 
 bool gpExecutionMode::PrepareTraceFile(const osFilePath& sessionFile, FrameIndex frameIndex, SessionTreeNodeData* pTreeNodeData, gpBaseSessionView* pTraceView, bool prepareTraceData)
 {

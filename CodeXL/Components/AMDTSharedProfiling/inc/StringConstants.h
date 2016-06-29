@@ -257,5 +257,13 @@
 #define PM_STR_lastBrowsedImportFolder "LastBrowsedImportFolder"
 #define PM_STR_lastBrowsedExportFolder "LastBrowsedExportFolder"
 
+/// toolbar start button
+#define PM_STR_startButtonProfileMode L"Profile"
+#define PM_STR_startButtonProfileGPUMode L"GPU Profile"
+#define PM_STR_startButtonProfileCPUMode L"CPU Profile"
+#define PM_STR_startButtonProfilePowerMode L"Power Profile"
+#define PM_STR_startButtonExeAndSystemWide L" (%ls + System-wide)"
+#define PM_STR_startButtonSystemWide L" (System-wide)"
+
 #endif //__STRINGCONSTANTS_H
 

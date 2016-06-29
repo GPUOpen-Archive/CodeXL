@@ -20,9 +20,6 @@
 #define VS_STR_CodeXL L"CodeXL"
 
 // Menu strings
-#define VSP_STR_StartPrefix L"Start CodeXL "
-#define VSP_STR_StartGeneric L"Start CodeXL"
-#define VSP_STR_Continue L"Continue"
 #define VSP_STR_StopDebugging L"Stop Debugging"
 #define VSP_STR_StopProfiling L"Stop Profiling"
 #define VSP_STR_StopFrameAnalysis L"Stop Frame Analysis"
@@ -34,16 +31,6 @@
 #define VSP_STR_ModuleUnloadedDebugMessage L"Unloaded \'"
 #define VSP_STR_BuildPrefix L"Build "
 #define VSP_STR_CaptureFrame L"Capture %ls frames for analysis"
-#define VSP_STR_ExeAndSystemWide L" (%ls + System-wide)"
-#define VSP_STR_SystemWide L" (System-wide)"
-#define VSP_STR_ExeNameOnly L" (%ls)"
-#define VSP_STR_DebugMode L"Host+GPU Debug"
-#define VSP_STR_ProfileMode L"Profile"
-#define VSP_STR_ProfileGPUMode L"GPU Profile"
-#define VSP_STR_ProfileCPUMode L"CPU Profile"
-#define VSP_STR_ProfilePowerMode L"Power Profile"
-#define VSP_STR_FrameAnalysisMode L"Frame Analysis"
-#define VSP_STR_StaticAnalysisMode L"Static Analysis"
 #define VSP_STR_VisualStudioRegistryRootPathPrefix L"Software\\Microsoft\\VisualStudio\\"
 #ifdef VSP_VS11BUILD
     #define VSP_STR_VisualStudioRegistryRootVersion L"11.0"
