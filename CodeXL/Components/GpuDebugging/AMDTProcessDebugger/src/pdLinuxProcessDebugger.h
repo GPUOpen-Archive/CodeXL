@@ -235,7 +235,7 @@ private:
     bool logDebuggedProcessPid();
     bool getAPIThreadGDBThreadID(gtString& apiThreadGDBId);
     bool getActiveThreadId(osThreadId& activeThreadId);
-    osThreadId getOSThreadIdByGDBIndex(int  gdbThreadId);
+    osThreadId getOSThreadIdByGDBIndex(int gdbThreadId);
     int getGDBThreadId(const osThreadId& threadId);
     bool isDriverThread(const osThreadId& threadId);
     bool switchGDBActiveThread(osThreadId threadId, bool bSync = true);
