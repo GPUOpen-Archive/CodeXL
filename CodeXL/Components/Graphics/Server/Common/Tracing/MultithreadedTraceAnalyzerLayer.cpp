@@ -126,6 +126,12 @@ void MultithreadedTraceAnalyzerLayer::BeginFrame()
         return;
     }
 
+    if (GetParentLayerManager() == nullptr)
+    {
+        Log(logERROR, "MultithreadedTraceAnalyzerLayer::BeginFrame - parentLayerManager is NULL\n");
+        return;
+    }
+
     bool bFrameCaptureWithSaveActive = GetParentLayerManager()->mCmdFrameCaptureWithSave.IsActive();
 
     // Check if automatic tracing is enabled for a specific frame. Determine which trace type by examining the result.
@@ -414,6 +420,19 @@ bool MultithreadedTraceAnalyzerLayer::GenerateLinkedTraceHeader(gtASCIIString& o
     if (osGetProcessLaunchInfo(osGetCurrentProcessId(), moduleArchitecture, currentPlatform, executablePath, commandLine, workingDirectory) == true)
     {
         outHeaderString.appendFormattedString("//ProcessExe=%s\n", executablePath.asASCIICharArray());
+
+#ifdef _LINUX
+        // strip off the executable name from the command line if it exists, and remove leading and trailing whitespaces
+        osFilePath executablePathDir;
+        executablePathDir.setFullPathFromString(executablePath);
+
+        gtString appName;
+        if (executablePathDir.getFileName(appName) == true)
+        {
+            commandLine.replace(appName, gtString(L""), true);
+            commandLine.trim();
+        }
+#endif
 
         // Build a timestamp.
         osTime currentTime;
