@@ -10,16 +10,6 @@ def DeleteFile(file, rootFolder):
     os.system(command)
 
 ###############################################################################
-# Method to clean up the temporary shared source files
-def VulkanCleanup(target, source, env):
-    for file in commonSources:
-        DeleteFile(file, env.rootFolder)
-
-    for file in headers:
-        DeleteFile(file, env.rootFolder)
-    return None
-
-###############################################################################
 # Main scons build file for VulkanServer
 
 Import('GPS_env')
@@ -39,47 +29,24 @@ env.Prepend (CPPPATH =
 env.Prepend (LIBPATH = env['GPS_LIBPATH'])
 env.Prepend(CCFLAGS =
 [
-    '-Wall',
-    '-Wextra',
     '-std=c++11',
 
     "-DVK_USE_PLATFORM_XCB_KHR",
     "-DVK_USE_PLATFORM_XLIB_KHR",
+])
+
+lib_env = env.Clone()
+
+env.Prepend(CCFLAGS =
+[
+    '-Wall',
+    '-Wextra',
 
     "-D'LOG_MODULE=\"VulkanServer\"'"
 ])
 
-# These need to be in their dependency order, with most derived first
-env['LIBS'] = \
-[
-    #local libraries
-    "libCommon",
-    "libAMDTOSWrappers",
-    "libAMDTBaseTools",
-    "libDDS",
-    "libJpg",
-    "libPng",
-    "libZlib",               #used by PNG
-    #boost
-    File('../../../Common/Lib/Ext/Boost/boost_' + env.BoostVersion + '/lib/RHEL6/' + env.extConfig + '/libboost_system.a'),
-    #external libraries
-    "dl",
-    "rt",
-    "pthread",
-]
-
-# Header files needed
-headers = \
-[
-]
-
-# Common source files
-commonSources = \
-[
-]
-
 # Vulkan specific source files
-sources = \
+lib_src = \
 [
 # glslang
     "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/glslang/glslang/MachineIndependent/glslang_tab.cpp",
@@ -136,7 +103,38 @@ sources = \
 # common sources
     "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/layers/vk_layer_extension_utils.cpp",
     "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/layers/vk_layer_table.cpp",
+]
 
+utils_Obj = lib_env.StaticLibrary('vkUtils', lib_src)
+
+# Add the loader library path
+env.Prepend (LIBPATH =
+[
+    '../../obj/' + env.platformPath + '/' + env.rootFolderName + '/Server/VulkanServer',
+])
+
+# These need to be in their dependency order, with most derived first
+env['LIBS'] = \
+[
+    #local libraries
+    "libCommon",
+    "libAMDTOSWrappers",
+    "libAMDTBaseTools",
+    "libDDS",
+    "libJpg",
+    "libPng",
+    "libZlib",               #used by PNG
+    "libvkUtils",
+    #boost
+    File('../../../Common/Lib/Ext/Boost/boost_' + env.BoostVersion + '/lib/RHEL6/' + env.extConfig + '/libboost_system.a'),
+    #external libraries
+    "dl",
+    "rt",
+    "pthread",
+]
+
+sources = \
+[
 # VKT sources
     "OS/Linux/VulkanServer.cpp",
 
@@ -172,8 +170,7 @@ sources = \
 # build the VulkanServer shared library
 VulkanServer = env.SharedLibrary('VulkanServer', sources)
 
-# clean up the source files when everything is built
-env.Command( 'done', 'libVulkanServer.so', VulkanCleanup )
+Depends(VulkanServer, utils_Obj)
 
 Return('VulkanServer')
 
