@@ -127,7 +127,7 @@ const std::vector<std::string> SQL_CREATE_DB_STMTS_AGGREGATION =
     "CREATE TABLE JITCodeBlob (id INTEGER PRIMARY KEY, srcFilePath TEXT, jncFilePath TEXT)",
     //"CREATE TABLE Callgraph (id INTEGER NOT NULL, callerId INTEGER, calleeId INTEGER, edgeLevel INTEGER)", // FOREIGN KEY(callerId) REFERENCES Function(id), FOREIGN KEY(calleeId) REFERENCES Function(id), FOREIGN KEY(samplingConfigurationId) REFERENCES SamplingConfiguration(id)
     //"CREATE TABLE CallgraphSampleAggregation (callgraphId INTEGER NOT NULL, sampleContextId INTEGER, selfSamples INTEGER, deepSamples INTEGER)", // FOREIGN KEY(callgraphId) REFERENCES Callgraph(id), FOREIGN KEY(sampleContextId) REFERENCES SampleContext(id)
-    //"CREATE UNIQUE INDEX 'unique_samples' ON SampleContext (processThreadId, moduleInstanceId, coreSamplingConfigurationId, functionId, offset)",
+    "CREATE UNIQUE INDEX 'unique_samples' ON SampleContext (processThreadId, moduleInstanceId, coreSamplingConfigurationId, functionId, offset)",
 };
 
 // Migrate table for version 1 - add new columns in tables "devices" and "counters"
@@ -4799,7 +4799,7 @@ public:
                     GetFunctionName(id, profileData.m_name);
 
                     AMDTModuleId mid = sqlite3_column_int(pQueryStmt, 2);
-                    
+
                     // FIXME: kludge. using m_moduleId to pass the offset to report layer for unknown functions.
                     // the report layer in turn will use this to construct the id for unknown-functions
                     // and replace this with the proper module-id value..
@@ -4843,7 +4843,7 @@ public:
         query << "SELECT functionId, moduleId, offset " \
                  "FROM SampleFunctionSummaryAllData "    \
                  "WHERE functionId & 0x0000ffff = 0;";
-            
+
         sqlite3_stmt* pQueryStmt = nullptr;
         int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
 
