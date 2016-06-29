@@ -72,7 +72,7 @@ static std::vector <AMDTUInt32> g_filterCounters;
 // Single counter Output list
 gtVector<AMDTPwrSample> g_result;
 AMDTPwrCounterValue*     g_pCounterStorage = nullptr;
-#define PWR_COUNTER_STORAGE_POOL (1024*256)
+#define PWR_COUNTER_STORAGE_POOL (1024*1024)
 
 // Cummulative counter Output list
 gtVector <AMDTFloat32> g_cummulativeResult;
@@ -1927,29 +1927,32 @@ AMDTResult AMDTPwrReadAllEnabledCounters(AMDTUInt32* pNumOfSamples,
             AMDTPwrGetProfileTimeStamps(&startTs, nullptr);
             ConvertTimeStamp(&result.m_systemTime, startTs);
 
-            if ((nullptr == g_pCounterStorage) || (counterPoolCnt + data.m_counters.size()) > PWR_COUNTER_STORAGE_POOL)
+            result.m_counterValues = &g_pCounterStorage[counterPoolCnt];
+
+            if ((nullptr == result.m_counterValues)
+                || ((counterPoolCnt + data.m_counters.size()) > PWR_COUNTER_STORAGE_POOL))
             {
-                ret = AMDT_ERROR_OUTOFMEMORY;
-                PwrTrace("memory not available");
+                PwrTrace("memory not available counterPoolCnt %d", counterPoolCnt);
                 break;
             }
-
-            result.m_counterValues = &g_pCounterStorage[counterPoolCnt];
+            PwrTrace("So far so good");
 
             for (auto iter : data.m_counters)
             {
                 PwrSupportedCounterMap:: iterator supIter = pCounters->find(iter.second.m_counterId);
 
-                if (supIter != pCounters->end())
+                AMDTFloat32* value = &result.m_counterValues[cnt].m_counterValue;
+
+                if ((nullptr != value) && supIter != pCounters->end())
                 {
                     //Prepare the output data now
                     if (PWR_UNIT_TYPE_COUNT == supIter->second.m_basicInfo.m_unitType)
                     {
-                        result.m_counterValues[cnt].m_counterValue = (AMDTFloat32)iter.second.m_value64;
+                        *value = (AMDTFloat32)iter.second.m_value64;
                     }
                     else
                     {
-                        result.m_counterValues[cnt].m_counterValue = (AMDTFloat32)iter.second.m_float32;
+                        *value = (AMDTFloat32)iter.second.m_float32;
                     }
 
                     result.m_counterValues[cnt].m_counterID = iter.second.m_counterId;
@@ -1969,7 +1972,7 @@ AMDTResult AMDTPwrReadAllEnabledCounters(AMDTUInt32* pNumOfSamples,
                 g_result.push_back(result);
             }
         };
-
+PwrTrace("samples %d, counters %d",g_result.size(),counterPoolCnt);
         if (false == isDataAvailable)
         {
             ret = AMDT_ERROR_NODATA;
