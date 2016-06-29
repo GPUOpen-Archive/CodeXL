@@ -200,6 +200,11 @@ void VktCmdBufProfilerStatic::NotifyCmdBufClosure()
         }
     }
 
+    if (result == PROFILER_FAIL)
+    {
+        Log(logERROR, "VktCmdBufProfilerStatic::NotifyCmdBufClosure(0 failed with PROFILER_FAIL\n");
+    }
+
     currSlot.state = PROFILER_STATE_CMD_BUF_CLOSED;
 }
 
@@ -264,6 +269,11 @@ ProfilerResultCode VktCmdBufProfilerStatic::GetCmdBufResults(UINT64 fillId, std:
 
                     pTimestampData = &interval;
                 }
+            }
+
+            if (result != VK_SUCCESS)
+            {
+                Log(logERROR, "VktCmdBufProfilerStatic::GetCmdBufResults() failed with %d\n", result);
             }
 
             // Report no results
