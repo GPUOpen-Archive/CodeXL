@@ -16,11 +16,12 @@
 
 // Infra
 #include <AMDTBaseTools/Include/gtList.h>
+#include <AMDTBaseTools/Include/gtVector.h>
 #include <AMDTBaseTools/Include/gtASCIIString.h>
 #include <AMDTOSWrappers/Include/osOSDefinitions.h>
 #include <AMDTOSWrappers/Include/osCallStack.h>
 #include <AMDTOSWrappers/Include/osFilePath.h>
-
+#include <AMDTAPIClasses/Include/apExpression.h>
 
 // ----------------------------------------------------------------------------------
 // Struct Name:          pdGDBData
@@ -234,7 +235,7 @@ public:
     /// \brief Constructor
     ///
     /// \param[in]  locals a list of "local variable name" <-> "local variable value" pairs
-    pdGDBFrameLocalsData(const gtList < std::pair<gtString, gtString> >& locals);
+    pdGDBFrameLocalsData(const gtVector < apExpression>& locals);
 
     ///////////////////////////////////////////////
     /// \brief Get current instance type
@@ -247,7 +248,7 @@ public:
     ///
     virtual ~pdGDBFrameLocalsData();
 
-    gtList < std::pair<gtString, gtString> >    _localsVariables; ///< list of "local variable name" <-> "local variable value" pairs
+    gtVector <apExpression>    _localsVariables; ///< list of "local variable name" <-> "local variable value" pairs
 
 
 private:
@@ -269,7 +270,7 @@ public:
     ///
     /// \param[in]  variableName a name of requested local variable
     /// \param[in]  variableValue a ASCII presentation of local variable value
-    pdGDBFrameLocalVariableValue(const gtString& variableName, const gtString&  variableValue);
+    pdGDBFrameLocalVariableValue(const apExpression& variable);
 
     ///////////////////////////////////////////////
     /// \brief Get current instance type
@@ -282,8 +283,7 @@ public:
     ///
     virtual ~pdGDBFrameLocalVariableValue();
 
-    gtString    _variableName;      ///< name of requested local variable
-    gtString    _variableValue;     ///< ASCII presentation of local variable value
+    apExpression    _variable;      ///< Local variable in all nested childs
 
 private:
     ///////////////////////////////////////////////

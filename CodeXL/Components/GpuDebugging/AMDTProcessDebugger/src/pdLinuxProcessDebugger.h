@@ -305,7 +305,6 @@ private:
     /// \date 30/03/2016
     bool fillThrdsRealizeCollection();
 
-
 #if AMDT_LINUX_VARIANT == AMDT_MAC_OS_X_LINUX_VARIANT
     bool loadProcessDebuggerESLauncher();
     bool launchApplicationWithiPhoneSimulator(const osFilePath& executablePath, const apDebugProjectSettings& processCreationData);
