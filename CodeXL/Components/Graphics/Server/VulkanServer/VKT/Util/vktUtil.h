@@ -25,6 +25,8 @@
 #include <vulkan.h>
 #include <vk_layer.h>
 
+#include <AMDTBaseTools/Include/AMDTDefinitions.h>
+
 // Disable some warnings set off by LunarG-provided code
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     #pragma warning (push)
