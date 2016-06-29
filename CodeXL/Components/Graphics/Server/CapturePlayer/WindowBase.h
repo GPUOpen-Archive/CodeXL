@@ -55,11 +55,11 @@ public:
 
     /// Retrieve the OS window handle for the ReplayWindow.
     /// \return The OS window handle for the ReplayWindow.
-    virtual const NativeWindowType GetWindowHandle() const = 0;
+    virtual NativeWindowType GetWindowHandle() const = 0;
 
     /// Retrieve the application instance.
     /// \return The OS application instance.
-    virtual const NativeInstanceType GetInstance() const = 0;
+    virtual NativeInstanceType GetInstance() const = 0;
 
     /// Open an initialized window in the system UI.
     /// \param inNCmdShow Controls how the window is to be shown.
