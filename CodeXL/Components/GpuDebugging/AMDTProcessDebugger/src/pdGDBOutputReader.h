@@ -14,6 +14,7 @@
 // Forward decelerations:
 class osPipeSocket;
 class pdGDBDriver;
+class apExpression;
 
 // Infra:
 #include <AMDTBaseTools/Include/gtAutoPtr.h>
@@ -228,6 +229,18 @@ private:
     /// \author Vadim Entov
     /// \date 18/01/2016
     int GetRunningThreadGDBId(const gtASCIIString& gdbOutputLine);
+
+    /////////////////////////////////////////////////////////////////////////////////////////
+    /// \brief Parse nested gdb values
+    ///
+    /// \param[in]  current value string
+    ///
+    /// \return vector of found childs
+    std::vector<apExpression> parseVariableValueChilds(const std::string& value_str);
+
+    void parseChildValue(const std::string& str, size_t & start_position, apExpression& parent);
+
+    bool findValueName(const std::string& str, size_t & start_position);
 
 private:
     // The executed GDB command:

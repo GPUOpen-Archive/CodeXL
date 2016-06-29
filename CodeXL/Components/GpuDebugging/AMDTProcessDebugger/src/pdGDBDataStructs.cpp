@@ -294,7 +294,7 @@ pdGDBFrameLocalsData::pdGDBFrameLocalsData() {}
 /// \brief Constructor
 ///
 /// \param[in]  locals a list of "local variable name" <-> "local variable value" pairs
-pdGDBFrameLocalsData::pdGDBFrameLocalsData(const gtList < std::pair<gtString, gtString> >& locals): _localsVariables(locals) {}
+pdGDBFrameLocalsData::pdGDBFrameLocalsData(const gtVector < apExpression>& locals): _localsVariables(locals) {}
 
 ///////////////////////////////////////////////
 /// \brief Standard virtual destructor
@@ -321,8 +321,8 @@ pdGDBFrameLocalVariableValue::pdGDBFrameLocalVariableValue() {}
 ///
 /// \param[in]  variableName a name of requested local variable
 /// \param[in]  variableValue a ASCII presentation of local variable value
-pdGDBFrameLocalVariableValue::pdGDBFrameLocalVariableValue(const gtString& variableName, const gtString&  variableValue):
-    _variableName(variableName), _variableValue(variableValue)
+pdGDBFrameLocalVariableValue::pdGDBFrameLocalVariableValue(const apExpression& variable):
+    _variable(variable)
 {
 }
 

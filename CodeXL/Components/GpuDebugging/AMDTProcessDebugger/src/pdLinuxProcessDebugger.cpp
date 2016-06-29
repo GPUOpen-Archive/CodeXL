@@ -3826,9 +3826,7 @@ bool pdLinuxProcessDebugger::getHostLocals(osThreadId threadId, int callStackFra
                     {
                         for (auto& it : localsData->_localsVariables)
                         {
-                            apExpression newVar;
-                            newVar.m_name = it.first;
-                            o_locals.push_back(newVar);
+                            o_locals.push_back(it);
 
                             if (!onlyNames)
                             {
@@ -3856,8 +3854,10 @@ bool pdLinuxProcessDebugger::getHostLocals(osThreadId threadId, int callStackFra
 
 bool pdLinuxProcessDebugger::getHostExpressionValue(osThreadId threadId, int callStackFrameIndex, const gtString& expressionText, int evaluationDepth, apExpression& o_exp)
 {
-    GT_UNREFERENCED_PARAMETER(threadId);
-    GT_UNREFERENCED_PARAMETER(callStackFrameIndex);
+    if (0 == evaluationDepth)
+    {
+        return true;
+    }
 
     gtASCIIString parametersString = "";
     bool returnResult = false;
@@ -3886,23 +3886,29 @@ bool pdLinuxProcessDebugger::getHostExpressionValue(osThreadId threadId, int cal
             GT_IF_WITH_ASSERT(_gdbDriver.executeGDBCommand(PD_SET_ACTIVE_FRAME_CMD, parametersString, nullptr))
             {
                 pdGDBFrameLocalVariableValue* localsData = nullptr;
+                pdGDBFVariableType* typeData = nullptr;
+
                 parametersString = expressionText.asASCIICharArray();
-                GT_IF_WITH_ASSERT(_gdbDriver.executeGDBCommand(PD_GET_LOCAL_VARIABLE_CMD, parametersString, (const pdGDBData**)(&localsData)))
+                GT_IF_WITH_ASSERT(_gdbDriver.executeGDBCommand(PD_GET_VARIABLE_TYPE_CMD, parametersString, (const pdGDBData**)(&typeData)))
                 {
-                    if (nullptr != localsData)
+                    if (nullptr != typeData)
                     {
-                        o_exp.m_name = expressionText;
-                        o_exp.m_value = localsData->_variableValue;
-
-                        // TO_DO: handle hexadecimal display:
-                        o_exp.m_valueHex = o_exp.m_value;
-
-                        pdGDBFVariableType* typeData = nullptr;
-                        GT_IF_WITH_ASSERT(_gdbDriver.executeGDBCommand(PD_GET_VARIABLE_TYPE_CMD, parametersString, (const pdGDBData**)(&typeData)))
+                        if (!typeData->_variableType.isEmpty())
                         {
-                            if (nullptr != typeData)
+                            if (typeData->_variableType.endsWith(L"*") || typeData->_variableType.endsWith(L"* const"))
                             {
+                                parametersString.prepend("*");
+                            }
+                        }
+
+                        GT_IF_WITH_ASSERT(_gdbDriver.executeGDBCommand(PD_GET_LOCAL_VARIABLE_CMD, parametersString, (const pdGDBData**)(&localsData)))
+                        {
+                            if (nullptr != localsData)
+                            {
+                                o_exp = localsData->_variable;
+                                o_exp.m_name = expressionText;
                                 o_exp.m_type = typeData->_variableType;
+
                                 returnResult = true;
                             }
                         }
