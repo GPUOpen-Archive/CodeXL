@@ -3919,8 +3919,6 @@ VK_LAYER_EXPORT VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL Mine_vkGetDeviceProcAdd
         return (PFN_vkVoidFunction)Mine_vkGetDeviceMemoryCommitment;
     if (!strcmp(funcName, "vkGetImageSparseMemoryRequirements"))
         return (PFN_vkVoidFunction)Mine_vkGetImageSparseMemoryRequirements;
-    if (!strcmp(funcName, "vkGetPhysicalDeviceSparseImageFormatProperties"))
-        return (PFN_vkVoidFunction)Mine_vkGetPhysicalDeviceSparseImageFormatProperties;
     if (!strcmp(funcName, "vkGetImageMemoryRequirements"))
         return (PFN_vkVoidFunction)Mine_vkGetImageMemoryRequirements;
     if (!strcmp(funcName, "vkGetBufferMemoryRequirements"))
@@ -4067,6 +4065,8 @@ VK_LAYER_EXPORT VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL Mine_vkGetInstanceProcA
         return (PFN_vkVoidFunction)Mine_vkGetPhysicalDeviceFeatures;
     if (!strcmp(funcName, "vkGetPhysicalDeviceFormatProperties"))
         return (PFN_vkVoidFunction)Mine_vkGetPhysicalDeviceFormatProperties;
+    if (!strcmp(funcName, "vkGetPhysicalDeviceSparseImageFormatProperties"))
+        return (PFN_vkVoidFunction)Mine_vkGetPhysicalDeviceSparseImageFormatProperties;
     if (!strcmp(funcName, "vkEnumerateInstanceLayerProperties"))
         return (PFN_vkVoidFunction)Mine_vkEnumerateInstanceLayerProperties;
     if (!strcmp(funcName, "vkEnumerateInstanceExtensionProperties"))
