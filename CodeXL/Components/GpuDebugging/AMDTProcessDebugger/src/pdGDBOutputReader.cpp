@@ -41,6 +41,7 @@
 #include <AMDTAPIClasses/Include/Events/apDebuggedProcessTerminatedEvent.h>
 #include <AMDTAPIClasses/Include/Events/apThreadCreatedEvent.h>
 #include <AMDTApiFunctions/Include/gaGRApiFunctions.h>
+#include <AMDTAPIClasses/Include/apExpression.h>
 
 
 // Local:
@@ -5705,7 +5706,7 @@ bool pdGDBOutputReader::handleSwitchToFrame(const gtASCIIString& gdbOutputString
 bool pdGDBOutputReader::handleGetLocalsFrame(const gtASCIIString& gdbOutputString, const pdGDBData** ppGDBOutputData)
 {
     bool result = false;
-    gtList<std::pair<gtString, gtString> > variablesList;
+    gtVector<apExpression> variablesList;
 
     GT_IF_WITH_ASSERT(nullptr != ppGDBOutputData)
     {
@@ -5764,7 +5765,18 @@ bool pdGDBOutputReader::handleGetLocalsFrame(const gtASCIIString& gdbOutputStrin
                             gtVariableValue.fromASCIIString(value.c_str());
                             gtVariableName.fromASCIIString(name.c_str());
 
-                            variablesList.insert(variablesList.begin(), std::make_pair(gtVariableName, gtVariableValue));
+                            apExpression valueToken;
+                            valueToken.m_name = gtVariableName;
+                            valueToken.m_value = gtVariableValue;
+
+                            std::vector<apExpression> childs = parseVariableValueChilds(value);
+
+                            for (auto child: childs)
+                            {
+                                 *valueToken.addChild() = child;
+                            }
+
+                            variablesList.push_back(valueToken);
                         }
                     }
 
@@ -5787,6 +5799,173 @@ bool pdGDBOutputReader::handleGetLocalsFrame(const gtASCIIString& gdbOutputStrin
     return result;
 }
 
+bool pdGDBOutputReader::findValueName(const std::string& str, size_t & start_position)
+{
+    bool ret = false;
+
+    if (str.length() <= start_position)
+    {
+        return false;
+    }
+
+    auto end_position = str.find(" = ", start_position);
+
+    if (std::string::npos != end_position)
+    {
+        start_position = end_position;
+        ret = true;    
+    }
+
+    return ret;
+}
+
+void pdGDBOutputReader::parseChildValue(const std::string& str, size_t & start_position, apExpression& parent)
+{
+    start_position += strlen(" = ");
+
+    if (str.length() <= start_position)
+    {
+        return;
+    }
+
+    bool miss_data = false;
+    size_t brackets_count = 0;
+    size_t eq_count = 0;
+
+    for (size_t i = start_position; i < str.length(); i++)
+    {
+        if (str[i] == 'L')
+        {
+            if (i + strlen("\\\"") < str.length())
+            {
+                if (str[i + 1] == '\\' && str[i + 2] == '\"')
+                {
+                    miss_data = true;
+                    i += strlen("\\\"");
+                }
+            }
+        }
+
+        if (str[i] == '\\')
+        {
+            if (i + 1 < str.length())
+            {
+                if (str[i + 1] == '\"')
+                {
+                    if (miss_data)
+                    {
+                        if (i + 2 < str.length())
+                        {                 
+                            if (str[i + 2] == ',')
+                            {
+                                if (i + 1 + strlen(", 'x' <repeats") < str.length())
+                                {
+                                    if (!(str[i + 2] == ',' && str[i + 4] == '\'' && str[i + 6] == '\'' && str[i + 8] == '<'))
+                                    {
+                                        miss_data = false;
+                                    }
+                                    else
+                                    {
+                                        i = str.find("\\\"", i) + 1;
+                                    }
+                                } 
+                            }
+                            else
+                            {
+                                if (i + 5 < str.length())
+                                {
+                                    if (str[i + 2] == '.' && str[i + 3] == '.' && str[i + 4] == '.' && str[i + 5] == ',')
+                                    {
+                                        miss_data = false;
+                                    }
+                                }
+                            }
+                        }
+                    }
+	            else
+                    {
+                        miss_data = true;
+                    }
+                }
+            }
+        }
+
+        if (str[i] == '{' && !miss_data)
+        {
+            brackets_count++;
+        }
+
+        if (str[i] == '}' && !miss_data)
+        {
+            brackets_count--;
+        }
+
+        if (str[i] == '<' && !miss_data)
+        {
+            eq_count++;
+        }
+
+        if (str[i] == '>' && !miss_data)
+        {
+            eq_count--;
+        }
+
+        if ((str[i] == ',' && !miss_data && 0 == brackets_count && 0 == eq_count) || i == str.length() - 1)
+        {
+            std::string value(std::begin(str) + start_position, std::begin(str) + i);
+
+            std::vector<apExpression> childs = parseVariableValueChilds(value);
+
+            parent.m_value.fromASCIIString(value.c_str());
+
+            for (auto child: childs)
+            {
+                *parent.addChild() = child;
+            }
+
+            start_position = i;
+
+            break;
+        }
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+/// \brief Parse nested gdb values
+///
+/// \param[in]  current value string
+///
+/// \return vector of found childs
+std::vector<apExpression> pdGDBOutputReader::parseVariableValueChilds(const std::string& value_str)
+{
+    std::vector<apExpression> result;
+
+    if (value_str.size())
+    {
+        size_t current_position = 0;
+
+        if (value_str[0] == '{')
+        {
+            current_position++;
+            size_t end_value_name_position = current_position;
+            while(findValueName(value_str, end_value_name_position))
+            {
+                apExpression currentValue;
+                std::string name(std::begin(value_str) + current_position, std::begin(value_str) + end_value_name_position);
+
+                currentValue.m_name.fromASCIIString(name.c_str());
+
+                parseChildValue(value_str, end_value_name_position, currentValue);
+
+                current_position = end_value_name_position + 1;
+
+                result.push_back(currentValue);
+            }        
+        }
+    }
+    return result;
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////
 /// \brief Process GDB's output on get variable value
 ///
@@ -5801,7 +5980,7 @@ bool pdGDBOutputReader::handleGetVariable(const gtASCIIString& gdbOutputString, 
     GT_UNREFERENCED_PARAMETER(gdbOutputString);
     GT_UNREFERENCED_PARAMETER(ppGDBOutputData);
 
-    gtString gtValue = L"";
+    apExpression localValue;
 
     GT_IF_WITH_ASSERT(nullptr != ppGDBOutputData)
     {
@@ -5815,11 +5994,18 @@ bool pdGDBOutputReader::handleGetVariable(const gtASCIIString& gdbOutputString, 
             if (std::string::npos != pos_end)
             {
                 std::string value(std::begin(gdbString) + strlen("^done,value=\""), std::begin(gdbString) + pos_end);
-                gtValue.fromASCIIString(value.c_str());
+                localValue.m_value.fromASCIIString(value.c_str());
+
+                std::vector<apExpression> childs = parseVariableValueChilds(value);
+
+                for (auto child: childs)
+                {
+                    *localValue.addChild() = child;
+                }
             }
         }
 
-        *ppGDBOutputData = new pdGDBFrameLocalVariableValue(L"", gtValue);
+        *ppGDBOutputData = new pdGDBFrameLocalVariableValue(localValue);
 
         GT_IF_WITH_ASSERT(nullptr != *ppGDBOutputData)
         {
