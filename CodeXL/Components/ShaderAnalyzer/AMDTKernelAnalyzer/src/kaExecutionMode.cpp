@@ -216,8 +216,11 @@ bool kaExecutionMode::ExecuteStartupAction(afStartupAction action)
 
     else if (action == AF_NO_PROJECT_USER_ACTION_ADD_FILE_FOR_ANALYZE)
     {
-        gtVector<osFilePath> addedFilePaths;
-        kaApplicationCommands::instance().AddFileCommand(addedFilePaths);
+        kaApplicationTreeHandler* pTreeHandler = kaApplicationTreeHandler::instance();
+        GT_IF_WITH_ASSERT(pTreeHandler)
+        {
+            pTreeHandler->OnAddFile(AF_TREE_ITEM_ITEM_NONE);
+        }
         retVal = true;
     }
 
