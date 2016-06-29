@@ -1580,7 +1580,7 @@ void PwrInsertDeviceCounters(AMDTPwrDevice* dev, AMDTUInt32 instId, AMDTUInt32 l
                     // GUI needs to be changed before we change the names
 
                     if((AMDT_PWR_DEVICE_PACKAGE == dev->m_deviceID)
-                        ||(AMDT_PWR_DEVICE_INTERNAL_GPU == dev->m_deviceID))
+                        ||(AMDT_PWR_DEVICE_INTERNAL_GPU == dev->m_type))
                     {
                         sprintf(counter.m_desc.m_name, "%s", pInfo->m_name);
                     }
