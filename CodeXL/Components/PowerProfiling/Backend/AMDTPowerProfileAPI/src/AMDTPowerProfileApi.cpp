@@ -1926,7 +1926,6 @@ AMDTResult AMDTPwrReadAllEnabledCounters(AMDTUInt32* pNumOfSamples,
 #endif
             AMDTPwrGetProfileTimeStamps(&startTs, nullptr);
             ConvertTimeStamp(&result.m_systemTime, startTs);
-            result.m_counterValues = &g_pCounterStorage[counterPoolCnt];
 
             if ((nullptr == g_pCounterStorage) || (counterPoolCnt + data.m_counters.size()) > PWR_COUNTER_STORAGE_POOL)
             {
@@ -1934,6 +1933,8 @@ AMDTResult AMDTPwrReadAllEnabledCounters(AMDTUInt32* pNumOfSamples,
                 PwrTrace("memory not available");
                 break;
             }
+
+            result.m_counterValues = &g_pCounterStorage[counterPoolCnt];
 
             for (auto iter : data.m_counters)
             {

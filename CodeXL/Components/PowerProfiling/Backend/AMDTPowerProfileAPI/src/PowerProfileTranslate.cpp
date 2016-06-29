@@ -1420,8 +1420,8 @@ AMDTResult PowerProfileTranslate::PwrGetProfileData(CXLContextProfileType type, 
         if (m_processList.size() > 0)
         {
             *pPower = totalPower;
-            std::sort(m_moduleList.begin(), m_moduleList.end(),
-                [](AMDTPwrModuleData const& a, AMDTPwrModuleData const& b) { return a.m_power > b.m_power; });
+            std::sort(m_processList.begin(), m_processList.end(),
+                [](AMDTPwrProcessInfo const& a, AMDTPwrProcessInfo const& b) { return a.m_power > b.m_power; });
             *pData = &m_processList[0];
             *pCnt = static_cast<AMDTUInt32>(m_processList.size());
         }
@@ -1972,6 +1972,7 @@ AMDTUInt32 PowerProfileTranslate::DecodeSmu7DgpuCounters(PwrCounterDecodeInfo* p
 
                 counter.m_float32 = res;
                 counter.m_instanceId = pDecodeInfo->m_instanceId;
+                counter.m_counterId = pDecodeInfo->m_clientId;
                 pOut->m_counters.insert(PwrDecodedCounterMap::value_type(counter.m_counterId, counter));
                 SaveCurrentSampleData(&counter);
                 offset += sizeof(AMDTUInt32);
