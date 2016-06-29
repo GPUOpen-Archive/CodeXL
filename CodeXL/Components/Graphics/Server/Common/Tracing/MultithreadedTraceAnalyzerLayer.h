@@ -1,7 +1,7 @@
 //==============================================================================
-// Copyright (c) 2015 Advanced Micro Devices, Inc. All rights reserved.
+/// Copyright (c) 2016 Advanced Micro Devices, Inc. All rights reserved.
 /// \author AMD Developer Tools Team
-/// \file
+/// \file   MultithreadedTraceAnalyzerLayer.h
 /// \brief  The baseclass for the Multithreaded Trace Analyzer.
 //==============================================================================
 
@@ -10,34 +10,36 @@
 
 #include "../../Common/ModernAPILayerManager.h"
 #include "../../Common/IModernAPILayer.h"
-#include "../../Common/OSwrappers.h"
+#include "../../Common/OSWrappers.h"
 #include "../../Common/CommandProcessor.h"
 #include "../../Common/TimingLog.h"
-#include "../../Common/Timer.h"
+#include "../../Common/timer.h"
 #include <unordered_map>
+
+#define ENABLE_MULTI_FRAME_TRACE 1
 
 //
 /// Forward declare these, since the definition exists in multiple places.
 //
 enum FuncId : int;
-    class TraceMetadata;
-    class ThreadTraceData;
+class TraceMetadata;
+class ThreadTraceData;
 
-    //--------------------------------------------------------------------------
-    /// Associate a FuncId with a string containing the name of the function.
-    //--------------------------------------------------------------------------
-    typedef std::map<FuncId, std::string> FuncIdToNamestringMap;
+//--------------------------------------------------------------------------
+/// Associate a FuncId with a string containing the name of the function.
+//--------------------------------------------------------------------------
+typedef std::map<FuncId, std::string> FuncIdToNamestringMap;
 
-    //--------------------------------------------------------------------------
-    /// A map used to associate a ThreadId with the structure that all the thread's results are stored in.
-    //--------------------------------------------------------------------------
-    typedef std::unordered_map<DWORD, ThreadTraceData*> ThreadIdToTraceData;
+//--------------------------------------------------------------------------
+/// A map used to associate a ThreadId with the structure that all the thread's results are stored in.
+//--------------------------------------------------------------------------
+typedef std::unordered_map<DWORD, ThreadTraceData*> ThreadIdToTraceData;
 
-    //--------------------------------------------------------------------------
-    /// Collects API Trace in a multi-threaded manner by mapping each submission
-    /// thread to its own buffer that it can dump logged calls to.
-    //--------------------------------------------------------------------------
-    class MultithreadedTraceAnalyzerLayer : public IModernAPILayer, public CommandProcessor
+//--------------------------------------------------------------------------
+/// Collects API Trace in a multi-threaded manner by mapping each submission
+/// thread to its own buffer that it can dump logged calls to.
+//--------------------------------------------------------------------------
+class MultithreadedTraceAnalyzerLayer : public IModernAPILayer, public CommandProcessor
 {
 public:
     //--------------------------------------------------------------------------
@@ -308,6 +310,11 @@ protected:
 
     /// Command to request the GPUTrace data to be sent back to the client.
     CommandResponse m_cmdGPUTrace;
+
+#if ENABLE_MULTI_FRAME_TRACE
+    /// A count of the number of Present calls to count before responding to commands.
+    IntCommandResponse mNumSequentialPresents;
+#endif // ENABLE_MULTI_FRAME_TRACE
 
     //--------------------------------------------------------------------------
     /// A CommandResponse that accepts a path to a trace metadata file, and will
