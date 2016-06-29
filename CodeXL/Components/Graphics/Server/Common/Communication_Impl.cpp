@@ -1402,7 +1402,11 @@ bool SendFileResponse(CommunicationID& requestID, const char* cpFile, NetSocket*
 
     // collect file data and generate response
     FILE* in;
-    size_t fileSize;
+#if defined WIN32 && !defined X64
+    long fileSize, bytesRead;
+#else
+    size_t fileSize, bytesRead;
+#endif
     char* fileBuffer;
     fopen_s(&in, cpFile, "rb");    // read binary
 
@@ -1420,14 +1424,14 @@ bool SendFileResponse(CommunicationID& requestID, const char* cpFile, NetSocket*
 
     // allocate Buffer_ and read in file contents
     fileBuffer = new char[fileSize];
-    size_t bytesRead = fread(fileBuffer, sizeof(char), fileSize, in);
+    bytesRead = fread(fileBuffer, sizeof(char), fileSize, in);
     if (bytesRead != fileSize)
     {
         Log(logERROR, "File read error in SendFileResponse()\n");
     }
     fclose(in);
 
-    bool bRes = Send(*pResponse, mimetypes[ FindMimeType(cpFile)].mime, fileBuffer, fileSize);
+    bool bRes = Send(*pResponse, mimetypes[ FindMimeType(cpFile)].mime, fileBuffer, (unsigned long)fileSize);
 
     if (bRes == false)
     {
