@@ -136,7 +136,11 @@
             godebug();
             
             window.OSName = 'Linux';
-            if (navigator.appVersion.indexOf("Win") != -1) window.OSName = 'Windows';            
+            if (navigator.appVersion.indexOf("Win") != -1) window.OSName = 'Windows';
+            if (window.OSName == 'Linux') {
+                document.getElementById('d3d12multithreading_tr').style.visibility = 'hidden';
+            }
+
         }
     </script>
     <link rel="stylesheet" type="text/css" href="welcome.css">
