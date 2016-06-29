@@ -78,10 +78,12 @@ DisplayFilterDlg::DisplayFilterDlg(QWidget* pParent) : QDialog(pParent)
 
 DisplayFilterDlg::~DisplayFilterDlg()
 {
-    if (nullptr != m_pCheckBoxCore)
+    for (auto it : m_pCheckBoxCore)
     {
-        delete[] m_pCheckBoxCore;
+        delete it;
     }
+
+    m_pCheckBoxCore.clear();
 }
 
 QDialog::DialogCode
@@ -115,7 +117,7 @@ DisplayFilterDlg::displayDialog(const QString& sessionPath, bool enableOnlySyste
                 m_pCheckBoxSeparateColumnsBy->setEnabled(false);
                 m_pRadioButtonSeparateByNUMA->setEnabled(false);
                 m_pRadioButtonSeparateByCore->setEnabled(false);
-#if 0 // Uncomment when NUMa/CORE supported 
+#if 0 // Uncomment when NUMa/CORE supported
 
                 if ((false == m_displayFilter->IsSeperatedByNumaEnabled()) ||
                     (false == m_displayFilter->IsSeperatedByCoreEnabled()))
@@ -274,13 +276,18 @@ bool DisplayFilterDlg::populateCoreList(int noOfCores)
         m_pLayoutForCoreList->setSizeConstraint(QLayout::SetMaximumSize);
 
         //Add new items
-        if (nullptr != m_pCheckBoxCore)
+        for (auto it : m_pCheckBoxCore)
         {
-            delete[] m_pCheckBoxCore;
+            delete it;
+        }
+        m_pCheckBoxCore.clear();
+
+        m_pCheckBoxCore.reserve(m_noOfCores);
+        for (int i = 0; i < m_noOfCores; ++i)
+        {
+            m_pCheckBoxCore.push_back(new QCheckBox);
         }
 
-        m_pCheckBoxCore = new QCheckBox[m_noOfCores];
-        RETURN_FALSE_IF_NULL(m_pCheckBoxCore);
         m_pCheckBoxAllCore = new QCheckBox;
         RETURN_FALSE_IF_NULL(m_pCheckBoxAllCore);
         //All
@@ -294,15 +301,15 @@ bool DisplayFilterDlg::populateCoreList(int noOfCores)
         for (int i = 0; i < m_noOfCores; ++i)
         {
             strCoreName = QString("%1 %2").arg(STR_CORE).arg(i);
-            m_pCheckBoxCore[i].setText(strCoreName);
+            m_pCheckBoxCore[i]->setText(strCoreName);
 
             if ((m_noOfCores > 10) && (1 == i % 2) && (i < 10))
             {
                 strCoreName.append(" ");
             }
 
-            m_pLayoutForCoreList->addWidget(m_pCheckBoxCore + i, i / 2 + 1, i % 2, Qt::AlignLeft);
-            QObject::connect(m_pCheckBoxCore + i, SIGNAL(stateChanged(int)), this, SLOT(onClickCoreItem(int)));
+            m_pLayoutForCoreList->addWidget(m_pCheckBoxCore[i], i / 2 + 1, i % 2, Qt::AlignLeft);
+            QObject::connect(m_pCheckBoxCore[i], SIGNAL(stateChanged(int)), this, SLOT(onClickCoreItem(int)));
         }
 
         m_pWidgetCoreList->setLayout(m_pLayoutForCoreList);
@@ -326,7 +333,7 @@ bool DisplayFilterDlg::populateCoreList(int noOfCores)
     {
         if (true == mask.test(idx))
         {
-            m_pCheckBoxCore[idx].setChecked(true);
+            m_pCheckBoxCore[idx]->setChecked(true);
         }
     }
 
@@ -394,14 +401,16 @@ void DisplayFilterDlg::onChangeView(const QString& newlySelectedView)
             // Remove old items:
             if (nullptr != m_pVBLayoutForColumn)
             {
-                const int noOfColumnOld = m_pVBLayoutForColumn->count();
+                //const int noOfColumnOld = m_pVBLayoutForColumn->count();
 
-                for (int i = 0; i < noOfColumnOld; ++i)
+                //for (int i = 0; i < noOfColumnOld; ++i)
+                for (auto it : m_pCheckBoxColumns)
                 {
-                    m_pVBLayoutForColumn->removeWidget(m_pCheckBoxColumns + i);
+                    m_pVBLayoutForColumn->removeWidget(it);
+                    delete it;
                 }
 
-                delete[] m_pCheckBoxColumns;
+                m_pCheckBoxColumns.clear();
                 delete m_pVBLayoutForColumn;
             }
 
@@ -412,29 +421,33 @@ void DisplayFilterDlg::onChangeView(const QString& newlySelectedView)
             m_pVBLayoutForColumn->setMargin(0);
 
             // Add new items:
-            m_pCheckBoxColumns = new QCheckBox[noOfColumn];
+            m_pCheckBoxColumns.reserve(noOfColumn);
+            for (int i = 0; i < noOfColumn; ++i)
+            {
+                m_pCheckBoxColumns.push_back(new QCheckBox);
+            }
 
             unsigned int idx = 0;
 
             for (const auto& counter : counterDetails)
             {
                 //m_pCheckBoxColumns[idx].setText(counter.first.asASCIICharArray());
-                m_pCheckBoxColumns[idx].setText(acGTStringToQString(get<1>(counter))); // get abbrviation
-                m_pVBLayoutForColumn->addWidget(m_pCheckBoxColumns + idx);
-                m_pCheckBoxColumns[idx++].setChecked(true);
+                m_pCheckBoxColumns[idx]->setText(acGTStringToQString(get<1>(counter))); // get abbreviation
+                m_pVBLayoutForColumn->addWidget(m_pCheckBoxColumns[idx]);
+                m_pCheckBoxColumns[idx++]->setChecked(true);
             }
 
             m_pVBLayoutForColumn->addStretch();
 
             for (int idx = 0; idx < m_noOfColumn; ++idx)
             {
-                QString checkboxName = m_pCheckBoxColumns[idx].text();
+                QString checkboxName = m_pCheckBoxColumns[idx]->text();
 
                 std::wstring wstr = checkboxName.toStdWString();
                 gtString counterName(wstr.c_str());
 
 #if 0
-				CounterNameIdVec selectedCounterList;
+                CounterNameIdVec selectedCounterList;
                 m_displayFilter->GetSelectedCounterList(selectedCounterList);
 #endif
                 auto beginItr = m_notChecked.begin();
@@ -443,11 +456,11 @@ void DisplayFilterDlg::onChangeView(const QString& newlySelectedView)
 
                 if (m_notChecked.end() != found)
                 {
-                    m_pCheckBoxColumns[idx].setChecked(false);
+                    m_pCheckBoxColumns[idx]->setChecked(false);
                 }
                 else
                 {
-                    m_pCheckBoxColumns[idx].setChecked(true);
+                    m_pCheckBoxColumns[idx]->setChecked(true);
                 }
             }
 
@@ -463,9 +476,9 @@ void DisplayFilterDlg::onClickAllCoreItem(int state)
 {
     for (int i = 0; i < m_noOfCores; ++i)
     {
-        QObject::disconnect(m_pCheckBoxCore + i, SIGNAL(stateChanged(int)), this, SLOT(onClickCoreItem(int)));
-        m_pCheckBoxCore[i].setChecked(state);
-        QObject::connect(m_pCheckBoxCore + i, SIGNAL(stateChanged(int)), this, SLOT(onClickCoreItem(int)));
+        QObject::disconnect(m_pCheckBoxCore[i], SIGNAL(stateChanged(int)), this, SLOT(onClickCoreItem(int)));
+        m_pCheckBoxCore[i]->setChecked(state);
+        QObject::connect(m_pCheckBoxCore[i], SIGNAL(stateChanged(int)), this, SLOT(onClickCoreItem(int)));
     }
 }
 
@@ -477,7 +490,7 @@ void DisplayFilterDlg::onClickCoreItem(int state)
 
     for (int i = 0; i < m_noOfCores; ++i)
     {
-        if (!m_pCheckBoxCore[i].isChecked())
+        if (!m_pCheckBoxCore[i]->isChecked())
         {
             all = false;
             break;
@@ -502,7 +515,7 @@ void DisplayFilterDlg::onClickOk()
 
         for (int i = 0; i < m_noOfCores; ++i)
         {
-            if (m_pCheckBoxCore[i].isChecked())
+            if (m_pCheckBoxCore[i]->isChecked())
             {
                 coreMask.set(i, true);
                 atLeastOneCore = true;
@@ -513,7 +526,7 @@ void DisplayFilterDlg::onClickOk()
 
         if ((0 < m_noOfCores) && ((static_cast<int>(coreMask.count())) == m_noOfCores))
         {
-            m_pCheckBoxCore[0].setChecked(true);
+            m_pCheckBoxCore[0]->setChecked(true);
             coreMask.reset();
         }
 
@@ -524,7 +537,7 @@ void DisplayFilterDlg::onClickOk()
         if ((0 < m_noOfColumn) &&
             (static_cast<int>(m_selectedCounters.size()) == m_noOfColumn))
         {
-            m_pCheckBoxColumns[0].setChecked(true);
+            m_pCheckBoxColumns[0]->setChecked(true);
             m_selectedCounters.clear();
             atLeastOneColumn = false;
         }
@@ -552,7 +565,7 @@ void DisplayFilterDlg::onClickOk()
             return;
         }
 
-#if 0 // uncomment when NUMA/core enabled 
+#if 0 // uncomment when NUMA/core enabled
 
         if (m_pCheckBoxSeparateColumnsBy->isChecked())
         {
@@ -616,30 +629,28 @@ void DisplayFilterDlg::onClickCheckBoxSeparateColumnsBy(int state)
 
 void DisplayFilterDlg::disableAllControlsExceptSystemDll(bool disable)
 {
-    GT_IF_WITH_ASSERT((m_pCheckBoxCore != nullptr) &&
-                      (m_pCheckBoxAllCore != nullptr) &&
+    GT_IF_WITH_ASSERT((m_pCheckBoxAllCore != nullptr) &&
                       (m_pComboBoxViewes != nullptr) &&
                       (m_pCheckBoxShowPercentageBars != nullptr) &&
                       (m_pRadioButtonSeparateByCore != nullptr) &&
                       (m_pRadioButtonSeparateByNUMA != nullptr))
     {
-        m_pCheckBoxCore->setEnabled(!disable);
         m_pCheckBoxAllCore->setEnabled(!disable);
 
         for (int i = 0; i < m_noOfCores; ++i)
         {
-            m_pCheckBoxCore[i].setEnabled(!disable);
+            m_pCheckBoxCore[i]->setEnabled(!disable);
         }
 
         for (int i = 0; i < m_noOfColumn; ++i)
         {
-            m_pCheckBoxColumns[i].setEnabled(!disable);
+            m_pCheckBoxColumns[i]->setEnabled(!disable);
         }
 
         m_pComboBoxViewes->setEnabled(!disable);
         m_pCheckBoxShowPercentageBars->setEnabled(!disable);
 
-#if 0 //uncomment when NUMA/core enabled 
+#if 0 //uncomment when NUMA/core enabled
         m_pCheckBoxSeparateColumnsBy->setEnabled(!disable);
 
         if (m_pCheckBoxSeparateColumnsBy->isChecked())
@@ -763,62 +774,62 @@ void DisplayFilterDlg::addFinalLayout()
 
 void DisplayFilterDlg::updateHiddenColumnList()
 {
-	// Sanity check:
-	GT_IF_WITH_ASSERT((m_pCheckBoxSeparateColumnsBy != nullptr) &&
-		(m_pRadioButtonSeparateByNUMA != nullptr) &&
-		(m_pRadioButtonSeparateByCore != nullptr))
-	{
-		std::vector<gtString> checkCounterName;
-		m_notChecked.clear();
+    // Sanity check:
+    GT_IF_WITH_ASSERT((m_pCheckBoxSeparateColumnsBy != nullptr) &&
+        (m_pRadioButtonSeparateByNUMA != nullptr) &&
+        (m_pRadioButtonSeparateByCore != nullptr))
+    {
+        std::vector<gtString> checkCounterName;
+        m_notChecked.clear();
 
-		// get Config name
-		QString configName = m_displayFilter->GetCurrentCofigName();
-		CounterNameIdVec counterDetails;
+        // get Config name
+        QString configName = m_displayFilter->GetCurrentCofigName();
+        CounterNameIdVec counterDetails;
 
-		//get supported counter list
-		if (!configName.isEmpty())
-		{
-			m_displayFilter->GetConfigCounters(configName, counterDetails);
-		}
+        //get supported counter list
+        if (!configName.isEmpty())
+        {
+            m_displayFilter->GetConfigCounters(configName, counterDetails);
+        }
 
-		if (nullptr != m_displayFilter)
-		{
-			QString configName = m_displayFilter->GetCurrentCofigName();
-			CounterNameIdVec counterDetails;
+        if (nullptr != m_displayFilter)
+        {
+            QString configName = m_displayFilter->GetCurrentCofigName();
+            CounterNameIdVec counterDetails;
 
-			//get supported counter list
-			if (!configName.isEmpty())
-			{
-				m_displayFilter->GetConfigCounters(configName, counterDetails);
-			}
+            //get supported counter list
+            if (!configName.isEmpty())
+            {
+                m_displayFilter->GetConfigCounters(configName, counterDetails);
+            }
 
-			CounterNameIdVec selectedCounters;
-			for (int i = 0; i < m_noOfColumn; ++i)
-			{
-				QString counterName = m_pCheckBoxColumns[i].text();
-				gtString gStr(acQStringToGTString(counterName));
+            CounterNameIdVec selectedCounters;
+            for (int i = 0; i < m_noOfColumn; ++i)
+            {
+                QString counterName = m_pCheckBoxColumns[i]->text();
+                gtString gStr(acQStringToGTString(counterName));
 
-				bool isChecked = m_pCheckBoxColumns[i].isChecked();
+                bool isChecked = m_pCheckBoxColumns[i]->isChecked();
 
-				for (const auto& sel : counterDetails)
-				{
-					if (isChecked)
-					{
-						if (get<1>(sel) == gStr)
-						{
-							selectedCounters.push_back(sel);
-						}
+                for (const auto& sel : counterDetails)
+                {
+                    if (isChecked)
+                    {
+                        if (get<1>(sel) == gStr)
+                        {
+                            selectedCounters.push_back(sel);
+                        }
 
-						//checkCounterName.push_back(gStr);
-					}
-					else
-					{
-						m_notChecked.push_back(gStr);
-					}
-				}
+                        //checkCounterName.push_back(gStr);
+                    }
+                    else
+                    {
+                        m_notChecked.push_back(gStr);
+                    }
+                }
 
-			}
-			m_displayFilter->SetSelectedCounterList(selectedCounters);
-		}
-	}
+            }
+            m_displayFilter->SetSelectedCounterList(selectedCounters);
+        }
+    }
 }
