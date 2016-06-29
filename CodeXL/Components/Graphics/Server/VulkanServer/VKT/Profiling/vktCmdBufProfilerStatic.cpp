@@ -111,10 +111,6 @@ ProfilerResultCode VktCmdBufProfilerStatic::BeginCmdMeasurement(const ProfilerMe
 
         m_activeSlot++;
 
-        // Add a new measurement
-        ProfilerMeasurementInfo clientData = ProfilerMeasurementInfo();
-        clientData.measurementNum = m_activeSlot;
-
         if (pIdInfo != nullptr)
         {
             memcpy(&currSlot.measurementInfo.idInfo, pIdInfo, sizeof(ProfilerMeasurementId));
