@@ -158,17 +158,11 @@ AMDTResult AllocateBuffers()
 {
     AMDTResult ret = AMDT_STATUS_OK;
 
-    if (nullptr == g_pCounterStorage)
-    {
-        g_pCounterStorage = (AMDTPwrCounterValue*)GetMemoryPoolBuffer(&g_apiMemoryPool,
-                                                                      sizeof(AMDTPwrCounterValue) * PWR_COUNTER_STORAGE_POOL);
-    }
-
     //Allocate memory for topology tree
     g_pDevPool = (AMDTPwrDevice*)GetMemoryPoolBuffer(&g_apiMemoryPool,
                                                      sizeof(AMDTPwrDevice) * MAX_DEVICE_CNT);
 
-    if ((nullptr != g_pDevPool) && (nullptr != g_pCounterStorage))
+    if (nullptr != g_pDevPool)
     {
         AMDTUInt32 cnt = 0;
 
@@ -1541,7 +1535,21 @@ AMDTResult AMDTPwrStartProfiling()
 
     if (AMDT_STATUS_OK == ret)
     {
-        ret = PwrStartProfiling();
+        if (nullptr != g_pCounterStorage)
+        {
+            free(g_pCounterStorage);
+        }
+
+        g_pCounterStorage = (AMDTPwrCounterValue*)malloc(sizeof(AMDTPwrCounterValue) * PWR_COUNTER_STORAGE_POOL);
+
+        if(nullptr != g_pCounterStorage)
+        {
+            ret = PwrStartProfiling();
+        }
+        else
+        {
+            ret = AMDT_ERROR_OUTOFMEMORY;
+        }
     }
 
     // Profile is started successfully. Create the data access service
