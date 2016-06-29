@@ -29,6 +29,31 @@ bool kcCLICommanderVulkan::GetSupportedDevices()
         if (pBackend != nullptr)
         {
             pBackend->GetSupportedPublicDevices(m_supportedDevicesCache);
+
+            // This temporary set will contain the unsupported devices.
+            std::set<std::string> unsupportedDevices;
+
+            // Identify the unsupported devices.
+            for (const std::string& device : m_supportedDevicesCache)
+            {
+                if (!m_pVulkanBuilder->IsSupportedDevice(device))
+                {
+                    unsupportedDevices.insert(device);
+                }
+            }
+
+            // Remove the unsupported devices.
+            for (auto it = m_supportedDevicesCache.begin(); it != m_supportedDevicesCache.end();) 
+            {
+                if (unsupportedDevices.find(*it) != unsupportedDevices.end()) 
+                {
+                    m_supportedDevicesCache.erase(it++);
+                }
+                else 
+                {
+                    ++it;
+                }
+            }
         }
     }
 

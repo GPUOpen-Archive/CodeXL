@@ -107,6 +107,9 @@ public:
     /// Extracts the OpenGL version of the installed runtime.
     bool GetVulkanVersion(gtString& vkVersion);
 
+    /// Returns true iff the device is supported by the Vulkan backend.
+    bool IsSupportedDevice(const std::string& deviceName) const;
+
 private:
 
     std::set<std::string> m_publicDevices;
