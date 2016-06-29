@@ -796,6 +796,9 @@ void afExecutionModeManager::onChangedModeEvent(apExecutionModeChangedEvent& eve
 
     // Update the tooltips for the mode actions:
     UpdateModeActionsTooltips();
+
+    // update the start button in the toolbar:
+    UpdateHostsList();
 }
 
 // ---------------------------------------------------------------------------
@@ -1502,11 +1505,11 @@ void afExecutionModeManager::UpdateHostsList()
                 }
             }
 
-            // Get the host name from current project:
-            QString hostName = afProjectManager::GetHostFromProjectName(currentProjectNamesStr);
-
+            gtString buttonText;
+            afGetStartButtonText(buttonText, false, false);
+            QString buttonTextAsQStr = acGTStringToQString(buttonText);
             // Set the current host as the text for the start button:
-            m_pStartAction->UpdateText(hostName);
+            m_pStartAction->UpdateText(buttonTextAsQStr);
 
             // Set the start button shortcut:
             m_pStartAction->UpdateShortcut(QKeySequence(AF_STR_StartDebuggingShortcut));

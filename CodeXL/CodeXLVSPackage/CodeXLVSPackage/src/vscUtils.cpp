@@ -68,46 +68,7 @@ void vscUtilsGetStartActionCommandName(wchar_t*& verbNameBuffer, wchar_t*& actio
         verbName = pExecMode->modeVerbString();
     }
 
-    bool processExists = (0 != ((AF_DEBUGGED_PROCESS_EXISTS)& afPluginConnectionManager::instance().getCurrentRunModeMask()));
-
-    if (processExists)
-    {
-        actionCommandStr = AF_STR_playButtonContinue;
-    }
-    else // !processExists
-    {
-        actionCommandStr = AF_STR_playButtonStartGeneric;
-
-        GT_IF_WITH_ASSERT(NULL != pExecMode)
-        {
-            pExecMode->GetToolbarStartButtonText(actionCommandStr, fullString);
-
-            // Add the "Start Code if is in the menu area and not tool bar
-            if (fullString)
-            {
-                actionCommandStr.prepend(AF_STR_playButtonStartPrefix);
-            }
-        }
-    }
-
-    // Add the remote location
-    bool isRemoteEnabled;
-    vsc_OnUpdateConfigureRemoteHost(isRemoteEnabled);
-
-    if (isRemoteEnabled)
-    {
-        bool isRemoteHost = !afProjectManager::instance().currentProjectSettings().remoteTargetName().isEmpty();
-
-        if (isRemoteHost)
-        {
-            actionCommandStr.appendFormattedString(L" @%ls",afProjectManager::instance().currentProjectSettings().remoteTargetName().asCharArray());
-        }
-    }
-
-    if (addKeyboardShortcut)
-    {
-        actionCommandStr.prepend('&');
-    }
+    afGetStartButtonText(actionCommandStr, addKeyboardShortcut, fullString);
 
     // Now allocate the output strings.
     actionCommandStrBuffer = vscAllocateAndCopy(actionCommandStr);

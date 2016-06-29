@@ -453,3 +453,49 @@ void IsApplicationPathsValid(const afIsValidApplicationInfo& isValidApplicationI
         isWorkingFolderValid = dir.exists() || isValidApplicationInfo.workingFolderPath.isEmpty();
     }
 }
+
+void afGetStartButtonText(gtString& buttonText, bool addKeyboardShortcut /*= false*/, bool fullString /* = true */)
+{
+    buttonText = L"";
+    // Get the current active mode
+    afIExecutionMode* pExecMode = afExecutionModeManager::instance().activeMode();
+
+    bool processExists = (0 != ((AF_DEBUGGED_PROCESS_EXISTS)& afPluginConnectionManager::instance().getCurrentRunModeMask()));
+
+    if (processExists)
+    {
+        buttonText = AF_STR_playButtonContinue;
+    }
+    else // !processExists
+    {
+        buttonText = AF_STR_playButtonStartGeneric;
+
+        GT_IF_WITH_ASSERT(NULL != pExecMode)
+        {
+            pExecMode->GetToolbarStartButtonText(buttonText, fullString);
+
+            // Add the "Start Code if is in the menu area and not tool bar
+            if (fullString)
+            {
+                buttonText.prepend(AF_STR_playButtonStartPrefix);
+            }
+        }
+    }
+
+    // Add the remote location
+    bool isRemoteEnabled = afProjectManager::instance().currentProjectSettings().isRemoteTarget();
+    if (isRemoteEnabled)
+    {
+        bool isRemoteHost = !afProjectManager::instance().currentProjectSettings().remoteTargetName().isEmpty();
+
+        if (isRemoteHost)
+        {
+            buttonText.appendFormattedString(L" @%ls", afProjectManager::instance().currentProjectSettings().remoteTargetName().asCharArray());
+        }
+    }
+
+    if (addKeyboardShortcut)
+    {
+        buttonText.prepend('&');
+    }
+}
