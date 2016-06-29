@@ -373,6 +373,7 @@
 #define GPU_STR_executionModeRefreshFromServerStatus L"Refresh sessions from server"
 #define GPU_STR_executionModeSetting L"Frame Analysis Se&ttings"
 #define GPU_STR_executionModeSettingsStatus L"Open the Frame Analysis settings dialog"
+#define GPU_STR_executionStartButton L"Frame Analysis"
 
 /// Tree item text:
 #define GPU_STR_TreeNodeDashboard L"Dashboard"

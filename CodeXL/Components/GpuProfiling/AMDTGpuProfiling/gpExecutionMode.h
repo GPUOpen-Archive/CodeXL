@@ -198,6 +198,9 @@ public:
     /// Allow the mode to terminate gracefully at the end of CodeXL.
     void Terminate();
 
+    /// Get the toolbar start button text
+    virtual void GetToolbarStartButtonText(gtString& buttonText, bool fullString = true);
+
     /// Prepares the trace file for the given frame
     /// \param sessionFilePath the session file path (cxlfovr)
     /// \param frameIndex the first and last frame indices (equal for single frame trace)
