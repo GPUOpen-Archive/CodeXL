@@ -73,6 +73,9 @@ public:
 
     virtual void onFrameTerminatorCall();
 
+    // Initialization:
+    void verifyOpenGLServerInitialized();
+
     // Debugged process threads:
     int threadCurrentRenderContext(const osThreadId& threadId) const;
     osThreadId renderContextCurrentThread(int renderContextId) const;

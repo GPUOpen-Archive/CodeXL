@@ -49,6 +49,9 @@ osModuleHandle gs_stat_systemsOpenGLModuleHandle = OS_NO_MODULE_HANDLE;
 // Contains pointers to the real implementation of the wrapped "base" functions:
 gsMonitoredFunctionPointers gs_stat_realFunctionPointers;
 
+// Contains pointers to the real implementation of driver-internal functions:
+gsDriverInternalFunctionPointers gs_stat_realDriverInternalFunctionPointers;
+
 // Reference to the singleton instances:
 gsOpenGLMonitor& gs_stat_openGLMonitorInstance = gsOpenGLMonitor::instance();
 gsExtensionsManager& gs_stat_extensionsManager = gsExtensionsManager::instance();

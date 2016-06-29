@@ -650,7 +650,6 @@ void gsExtensionsManager::onContextCreatedEvent(int contextSpyId)
             // Allocate the current structure:
             gsRenderContextExtensionsData* pStruct = new gsRenderContextExtensionsData;
 
-
             // Add it to the "extensions data" structures vector:
             _renderContextsExtensionsData.push_back(pStruct);
         }
