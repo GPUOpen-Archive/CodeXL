@@ -723,7 +723,7 @@ bool OSDependentModulesInitialization()
     //so it can have normal priority
     SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_NORMAL);
 #else
-#pragma message IMPLEMENT ME! (if thread priority needs changing)
+#pragma message "IMPLEMENT ME! (if thread priority needs changing)"
 #endif
 
     return true;
@@ -944,7 +944,7 @@ static bool ResolveShortcut(const char* shortcutPath, gtASCIIString& exePath, gt
 
     return true;
 #else
-#pragma message IMPLEMENT ME! (if dragging shortcut is supported)
+#pragma message "IMPLEMENT ME! (if dragging shortcut is supported)"
 
     PS_UNREFERENCED_PARAMETER(shortcutPath);
     PS_UNREFERENCED_PARAMETER(exePath);
