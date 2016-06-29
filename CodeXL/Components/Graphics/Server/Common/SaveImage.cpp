@@ -444,6 +444,16 @@ static  void    FlipImage(unsigned char* pImageData, int width, int height)
 }
 */
 
+// Use a wrapper to encapsulate the setjmp call to suppress Linux compile warning (-Wclobbered)
+static bool SetjmpWrapper(ErrorHandler& err)
+{
+    if (setjmp(err.setjmpBuffer))
+    {
+        return true;
+    }
+    return false;
+}
+
 static  bool    _RGBtoJpeg(unsigned char* pImageData, int width, int height, UINT32* outSize, unsigned char** outBuffer)
 {
     unsigned char* writeBuffer = nullptr;
@@ -452,7 +462,7 @@ static  bool    _RGBtoJpeg(unsigned char* pImageData, int width, int height, UIN
     struct jpeg_compress_struct cinfo;
     ErrorHandler err(&cinfo);
 
-    if (setjmp(err.setjmpBuffer))
+    if (SetjmpWrapper(err))
     {
         /* If we get here, the JPEG code has signaled an error.
         * We need to clean up the JPEG object, close the input file, and return.
