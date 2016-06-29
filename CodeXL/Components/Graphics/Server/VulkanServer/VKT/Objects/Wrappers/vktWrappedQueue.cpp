@@ -279,6 +279,10 @@ VkResult VktWrappedQueue::QueueSubmit(VkQueue queue, uint32_t submitCount, const
                 VkResult fenceResult = VK_INCOMPLETE;
                 fenceResult = device_dispatch_table(queue)->CreateFence(m_createInfo.device, &fenceCreateInfo, nullptr, &fenceToWaitOn);
                 VKT_ASSERT(fenceResult == VK_SUCCESS);
+                if (fenceResult != VK_SUCCESS)
+                {
+                    Log(logERROR, "CreateFence failed in VktWrappedQueue::QueueSubmit()\n");
+                }
 
                 usingInternalFence = true;
             }

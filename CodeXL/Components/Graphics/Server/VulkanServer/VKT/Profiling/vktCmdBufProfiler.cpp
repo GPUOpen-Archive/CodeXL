@@ -103,6 +103,10 @@ ProfilerResultCode VktCmdBufProfiler::BeginCmdMeasurement(const ProfilerMeasurem
             VkResult result = VK_INCOMPLETE;
             result = SetupNewMeasurementGroup();
             VKT_ASSERT(result == VK_SUCCESS);
+            if (result != VK_SUCCESS)
+            {
+                Log(logERROR, "SetupNewMeasurementGroup() failed in VktCmdBufProfiler::BeginCmdMeasurement()\n");
+            }
 
             m_pDeviceDT->CmdResetQueryPool(m_config.cmdBuf, m_cmdBufData.pActiveMeasurementGroup->gpuRes.timestampQueryPool, 0, m_maxQueriesPerGroup);
         }
@@ -224,6 +228,11 @@ void VktCmdBufProfiler::NotifyCmdBufClosure()
                 result = PROFILER_SUCCESS;
             }
         }
+    }
+
+    if (result == PROFILER_FAIL)
+    {
+        Log(logERROR, "VktCmdBufProfiler::NotifyCmdBufClosure() failed with PROFILER_FAIL\n");
     }
 
     m_cmdBufData.state = PROFILER_STATE_CMD_BUF_CLOSED;
@@ -352,6 +361,10 @@ ProfilerResultCode VktCmdBufProfiler::GetCmdBufResults(std::vector<ProfilerResul
     // We're done profiling this command buffer, so reset and we'll start over next time.
     result = ResetProfilerState();
     VKT_ASSERT(result == S_OK);
+    if (result != S_OK)
+    {
+        Log(logERROR, "ResetProfilerState() failed in VktCmdBufProfiler::GetCmdBufResults()\n");
+    }
 
     return profilerResultCode;
 }
