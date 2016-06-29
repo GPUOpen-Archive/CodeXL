@@ -2236,7 +2236,6 @@ bool PrdTranslator::WriteModuleInstanceInfoIntoDB(NameModuleMap& moduleMap, ModI
 
     if (m_dbWriter)
     {
-
         // Populate module instance info
         // modInstanceInfoMap : Map of < instanceId, tuple of <modName, pid, loadAddr> >
         CPAModuleInstanceList *pModuleInstanceList = new (std::nothrow) CPAModuleInstanceList;
@@ -2248,16 +2247,17 @@ bool PrdTranslator::WriteModuleInstanceInfoIntoDB(NameModuleMap& moduleMap, ModI
             for (const auto& modIt : modInstanceMap)
             {
                 gtUInt32 moduleId = 0;
-                const auto& it = moduleMap.find(std::get<0>(modIt.second));
+                auto it = moduleMap.find(std::get<0>(modIt.second));
 
                 // No need to process JAVA/CLR module instances
-                if (CpuProfileModule::JAVAMODULE == it->second.m_modType ||
+                if (moduleMap.end() == it ||
+                    CpuProfileModule::JAVAMODULE == it->second.m_modType ||
                     CpuProfileModule::MANAGEDPE == it->second.m_modType)
                 {
                     continue;
                 }
 
-                if (it != moduleMap.end() && it->second.getTotal())
+                if (it->second.getTotal())
                 {
                     // Insert into DB only if the module has samples
                     moduleId = it->second.m_moduleId;
