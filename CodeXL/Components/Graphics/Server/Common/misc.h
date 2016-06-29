@@ -31,6 +31,7 @@ static const int FUNCTION_RETURNS_VOID = -1;
 #include "defines.h"
 #include "CommonTypes.h"
 #include <stdlib.h>
+#include "ExportDefinitions.h"
 
 #if defined (_LINUX)
     #include <sys/time.h>
@@ -121,14 +122,6 @@ void MessageBoxError(gtASCIIString s);
     #define PS_UNREFERENCED_PARAMETER(p) (p) ///< Definition
 #else
     #define PS_UNREFERENCED_PARAMETER(p) (void)(p)
-#endif
-
-#ifdef GPS_PLUGIN_EXPORTS
-    #define GPS_PLUGIN_API extern "C" __declspec( dllexport ) ///< Definition
-#elif defined GPS_PLUGIN_STATIC
-    #define GPS_PLUGIN_API extern "C" __attribute__ ((visibility ("default"))) ///< Definition
-#else
-    #define GPS_PLUGIN_API extern "C" __declspec( dllimport ) ///< Definition
 #endif
 
 /// Converts a HRESULT to a string
