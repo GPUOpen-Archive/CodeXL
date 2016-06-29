@@ -158,14 +158,14 @@ void gpSessionView::InitLayout()
     m_pCaptureButtonCPU->setText(GPU_STR_dashboard_CaptureCPUButton);
     m_pCaptureButtonCPU->setStyleSheet(GP_SessionViewButtonStyle);
 
-    QString tooltipStrCPU = QString(GPU_STR_dashboard_CaptureCPUTooltip).arg(settings.m_numFramesToCapture);
+    QString tooltipStrCPU = QString(GPU_STR_dashboard_CaptureTooltip).arg(settings.m_numFramesToCapture);
     m_pCaptureButtonCPU->setToolTip(tooltipStrCPU);
 
     m_pCaptureButtonGPU = new QToolButton;
     m_pCaptureButtonGPU->setText(GPU_STR_dashboard_CaptureGPUButton);
     m_pCaptureButtonGPU->setStyleSheet(GP_SessionViewButtonStyle);
 
-    QString tooltipStrGPU = QString(GPU_STR_dashboard_CaptureGPUTooltip).arg(settings.m_numFramesToCapture);
+    QString tooltipStrGPU = QString(GPU_STR_dashboard_CaptureTooltip).arg(settings.m_numFramesToCapture);
     m_pCaptureButtonGPU->setToolTip(tooltipStrGPU);
 ///////////////////
 
@@ -729,9 +729,10 @@ void gpSessionView::OnUpdateUI()
 
             gpExecutionMode* pFrameAnalysisManager = ProfileManager::Instance()->GetFrameAnalysisModeManager();
             gpProjectSettings& settings = pFrameAnalysisManager->ProjectSettings();
-            m_pCaptureButton->setToolTip(QString(GPU_STR_dashboard_CaptureTooltip).arg(settings.m_numFramesToCapture));
-            m_pCaptureButtonCPU->setToolTip(QString(GPU_STR_dashboard_CaptureCPUTooltip).arg(settings.m_numFramesToCapture));
-            m_pCaptureButtonGPU->setToolTip(QString(GPU_STR_dashboard_CaptureGPUTooltip).arg(settings.m_numFramesToCapture));
+            QString tooltipStr = QString(GPU_STR_dashboard_CaptureTooltip).arg(settings.m_numFramesToCapture);
+            m_pCaptureButton->setToolTip(tooltipStr);
+            m_pCaptureButtonCPU->setToolTip(tooltipStr);
+            m_pCaptureButtonGPU->setToolTip(tooltipStr);
 
         }
     }
