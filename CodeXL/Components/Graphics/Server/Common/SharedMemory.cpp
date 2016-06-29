@@ -495,7 +495,11 @@ public:
         if (justCreated)
         {
             // make it the right size
-            ftruncate(m_handle, bufferSize);
+            int result = ftruncate(m_handle, bufferSize);
+            if (result != 0)
+            {
+                Log(logERROR, "ftruncate failed in SharedMemory::MemStatus  OpenOrCreate\n");
+            }
         }
 
         // map the memory into this process' address space

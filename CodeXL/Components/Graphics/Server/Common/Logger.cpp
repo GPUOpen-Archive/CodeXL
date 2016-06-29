@@ -556,7 +556,11 @@ void _LogHeader(void)
     else
     {
         char currentDir[PS_MAX_PATH];
-        getcwd(currentDir, PS_MAX_PATH);
+        char* result = getcwd(currentDir, PS_MAX_PATH);
+        if (result == nullptr)
+        {
+            _Log(logRAW, "getcwd failed\n");
+        }
         sprintf_s(szLibPath, PS_MAX_PATH, "%s/%s", currentDir, program_invocation_name);
     }
 
@@ -583,7 +587,11 @@ void _LogFooter(void)
     else
     {
         char currentDir[PS_MAX_PATH];
-        getcwd(currentDir, PS_MAX_PATH);
+        char* result = getcwd(currentDir, PS_MAX_PATH);
+        if (result == nullptr)
+        {
+            _Log(logRAW, "getcwd failed\n");
+        }
         sprintf_s(szLibPath, PS_MAX_PATH, "%s/%s", currentDir, program_invocation_name);
     }
 

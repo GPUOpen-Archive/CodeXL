@@ -143,7 +143,7 @@ bool GetDWORD(char** sIn, unsigned long* pNum)
 /// \return True or false
 bool GetLONG(char** sIn, long* pNum)
 {
-    unsigned long val;
+    unsigned long val = 0;
 
     bool res = GetDWORD(sIn, &val);
 
