@@ -233,6 +233,11 @@ void VulkanPlayer::Present()
 
     result = vkQueueWaitIdle(s_vkState.queue);
 
+    if (result != VK_SUCCESS)
+    {
+        Log(logERROR, "VulkanPlayer::Present() failed\n");
+    }
+
     vkDestroySemaphore(s_vkState.device, presentCompleteSemaphore, nullptr);
 }
 
@@ -379,7 +384,6 @@ bool VulkanPlayer::InitializeGraphics()
     }
 
     UINT deviceExtCount = 0;
-    VkBool32 swapchainExtFound = 0;
     s_vkState.extCount = 0;
     memset(s_vkState.pExtNames, 0, sizeof(s_vkState.pExtNames));
 
@@ -398,7 +402,6 @@ bool VulkanPlayer::InitializeGraphics()
         {
             if (!strcmp(VK_KHR_SWAPCHAIN_EXTENSION_NAME, pDeviceExts[i].extensionName))
             {
-                swapchainExtFound = 1;
                 s_vkState.pExtNames[s_vkState.extCount++] = (char*)VK_KHR_SWAPCHAIN_EXTENSION_NAME;
             }
         }
@@ -748,7 +751,7 @@ void VulkanPlayer::ClearSwapchainImage()
     vkCmdPipelineBarrier(s_vkState.cmdBuf, VK_PIPELINE_STAGE_ALL_COMMANDS_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0, NULL, 0, NULL, 1, &imgMemBarrier);
     vkCmdBeginRenderPass(s_vkState.cmdBuf, &rpBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-    VkClearColorValue clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+    VkClearColorValue clearColor = { { 0.0f, 0.0f, 0.0f, 1.0f } };
     vkCmdClearColorImage(s_vkState.cmdBuf, s_vkState.pSwapchainBuffers[s_vkState.currSwapchainBuffer].image, VK_IMAGE_LAYOUT_GENERAL, &clearColor, 1, &subResRange);
 
     vkCmdEndRenderPass(s_vkState.cmdBuf);
@@ -788,6 +791,11 @@ void VulkanPlayer::ClearSwapchainImage()
 
     result = vkQueueWaitIdle(s_vkState.queue);
     CP_ASSERT(result == VK_SUCCESS);
+
+    if (result != VK_SUCCESS)
+    {
+        Log(logERROR, "VulkanPlayer::ClearSwapchainImage() failed\n");
+    }
 }
 
 /// Implement the render loop.

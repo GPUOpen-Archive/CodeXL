@@ -308,6 +308,7 @@ static bool OutputHTTPError(NetSocket* socket, int nErrorCode)
 
 bool SendServerStatusMessageAsXML(GRAPHICS_SERVER_STATE eServerState, NetSocket* pClientSocket, gtASCIIString requestString)
 {
+    GT_UNREFERENCED_PARAMETER(requestString);
     /// generate the error code html
     static char headerBuffer[COMM_BUFFER_SIZE] = "";
     static char xmlBuffer[COMM_BUFFER_SIZE] = "";
@@ -1401,7 +1402,7 @@ bool SendFileResponse(CommunicationID& requestID, const char* cpFile, NetSocket*
 
     // collect file data and generate response
     FILE* in;
-    long fileSize;
+    size_t fileSize;
     char* fileBuffer;
     fopen_s(&in, cpFile, "rb");    // read binary
 
@@ -1419,7 +1420,11 @@ bool SendFileResponse(CommunicationID& requestID, const char* cpFile, NetSocket*
 
     // allocate Buffer_ and read in file contents
     fileBuffer = new char[fileSize];
-    fread(fileBuffer, sizeof(char), fileSize, in);
+    size_t bytesRead = fread(fileBuffer, sizeof(char), fileSize, in);
+    if (bytesRead != fileSize)
+    {
+        Log(logERROR, "File read error in SendFileResponse()\n");
+    }
     fclose(in);
 
     bool bRes = Send(*pResponse, mimetypes[ FindMimeType(cpFile)].mime, fileBuffer, fileSize);
