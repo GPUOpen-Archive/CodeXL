@@ -168,6 +168,7 @@
     <ClInclude Include="..\..\Server\Common\CommandTimingManager.h" />
     <ClInclude Include="..\..\Server\Common\Compressor.h" />
     <ClInclude Include="..\..\Server\Common\CpuTimer.h" />
+    <ClInclude Include="..\..\Server\Common\ExportDefinitions.h" />
     <ClInclude Condition="'$(SolutionName)'!='CodeXL-AllProjects'" Include="..\..\Server\Common\FDPipelineShaderStage.h" />
     <ClInclude Condition="'$(SolutionName)'!='CodeXL-AllProjects'" Include="..\..\Server\Common\FDPipelineStage.h" />
     <ClInclude Include="..\..\Server\Common\FrameInfo.h" />

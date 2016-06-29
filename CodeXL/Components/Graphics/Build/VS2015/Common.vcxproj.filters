@@ -232,5 +232,6 @@
     <ClInclude Include="..\..\Server\Common\Tracing\CaptureTypes.h">
       <Filter>Tracing</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Server\Common\ExportDefinitions.h" />
   </ItemGroup>
 </Project>
