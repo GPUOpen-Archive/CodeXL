@@ -6,13 +6,26 @@
 ///        reads command line arguments and starts the target application
 //==============================================================================
 
+// Suppress warnings for boost
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
 #pragma warning ( push, 3 ) // disable warning level 4 for boost
+#elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#endif
+
 // Boost libraries used for path manipulation
 #include <boost/filesystem/path.hpp>
 
 // Boost libraries used to parse command line options
 #include <boost/program_options.hpp>
+
+// pop the warning suppression pragmas
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
 #pragma warning ( pop )
+#elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
+#pragma GCC diagnostic pop
+#endif
 
 #include "ClientRequestThread.h"
 
@@ -710,7 +723,7 @@ bool OSDependentModulesInitialization()
     //so it can have normal priority
     SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_NORMAL);
 #else
-#warning IMPLEMENT ME! (if thread priority needs changing)
+#pragma message IMPLEMENT ME! (if thread priority needs changing)
 #endif
 
     return true;
@@ -931,7 +944,7 @@ static bool ResolveShortcut(const char* shortcutPath, gtASCIIString& exePath, gt
 
     return true;
 #else
-#warning IMPLEMENT ME! (if dragging shortcut is supported)
+#pragma message IMPLEMENT ME! (if dragging shortcut is supported)
 
     PS_UNREFERENCED_PARAMETER(shortcutPath);
     PS_UNREFERENCED_PARAMETER(exePath);

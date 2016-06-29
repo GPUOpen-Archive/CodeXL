@@ -69,6 +69,9 @@ public:
 
     /// get the properties view message to start the execution of the mode:
     virtual gtString HowToStartModeExecutionMessage();
+
+    /// Get the toolbar start button text
+    virtual void GetToolbarStartButtonText(gtString& buttonText, bool fullString = true);
 };
 #endif //__kaExecutionMode_H
 

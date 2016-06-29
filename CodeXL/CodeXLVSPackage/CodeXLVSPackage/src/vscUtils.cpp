@@ -60,18 +60,6 @@ void vscUtilsGetStartActionCommandName(wchar_t*& verbNameBuffer, wchar_t*& actio
     gtString actionCommandStr;
     gtString verbName;
 
-    // Get the exe file name:
-    gtString exeFileName;
-    afProjectManager::instance().currentProjectSettings().executablePath().getFileNameAndExtension(exeFileName);
-
-    // Check if we're in profile mode:
-    bool isProfiling = afExecutionModeManager::instance().isActiveMode(PM_STR_PROFILE_MODE);
-    bool isDebugging = afExecutionModeManager::instance().isActiveMode(GD_STR_executionMode);
-    bool isFrameAnalysis = afExecutionModeManager::instance().isActiveMode(PM_STR_FrameAnalysisMode);
-
-    bool isSystemWide = (SharedProfileSettingPage::Instance()->CurrentSharedProfileSettings().m_profileScope == PM_PROFILE_SCOPE_SYS_WIDE);
-    bool isExeSet = !exeFileName.isEmpty();
-
     // Get the current active mode
     afIExecutionMode* pExecMode = afExecutionModeManager::instance().activeMode();
     GT_IF_WITH_ASSERT(NULL != pExecMode)
@@ -84,69 +72,20 @@ void vscUtilsGetStartActionCommandName(wchar_t*& verbNameBuffer, wchar_t*& actio
 
     if (processExists)
     {
-        actionCommandStr = VSP_STR_Continue;
+        actionCommandStr = AF_STR_playButtonContinue;
     }
     else // !processExists
     {
-        actionCommandStr = VSP_STR_StartGeneric;
+        actionCommandStr = AF_STR_playButtonStartGeneric;
 
         GT_IF_WITH_ASSERT(NULL != pExecMode)
         {
-            // based on the execution mode set the prefix of the string:
-            if (isDebugging)
-            {
-                actionCommandStr = VSP_STR_DebugMode;
-            }
-            else if (isProfiling)
-            {
-                actionCommandStr = VSP_STR_ProfileMode;
-                if (pExecMode != nullptr)
-                {
-                    gtString currentType = pExecMode->sessionTypeName(afExecutionModeManager::instance().activeSessionType());
-                    if (currentType.startsWith(L"CPU"))
-                    {
-                        actionCommandStr = VSP_STR_ProfileCPUMode;
-                    }
-                    else if (currentType.startsWith(L"GPU"))
-                    {
-                        actionCommandStr = VSP_STR_ProfileGPUMode;
-                    }
-                    else
-                    {
-                        actionCommandStr = VSP_STR_ProfilePowerMode;
-                    }
-                }
-            }
-            else if (isFrameAnalysis)
-            {
-                actionCommandStr = VSP_STR_FrameAnalysisMode;
-            }
-            else
-            {
-                actionCommandStr = VSP_STR_StaticAnalysisMode;
-            }
+            pExecMode->GetToolbarStartButtonText(actionCommandStr, fullString);
 
             // Add the "Start Code if is in the menu area and not tool bar
             if (fullString)
             {
-                actionCommandStr.prepend(VSP_STR_StartPrefix);
-            }
-
-            // add the (..) section if in profile and full info is needed
-            if (isProfiling && isSystemWide && fullString)
-            {
-                if (isExeSet)
-                {
-                    actionCommandStr.appendFormattedString(VSP_STR_ExeAndSystemWide, exeFileName.asCharArray());
-                }
-                else
-                {
-                    actionCommandStr.append(VSP_STR_SystemWide);
-                }
-            }
-            else if (isExeSet && fullString)
-            {
-                actionCommandStr.appendFormattedString(VSP_STR_ExeNameOnly, exeFileName.asCharArray());
+                actionCommandStr.prepend(AF_STR_playButtonStartPrefix);
             }
         }
     }
@@ -179,7 +118,7 @@ void vscUtilsUpdateProjectSettingsFromStartupProject(const wchar_t* execPath, co
                                                      const wchar_t* cmdArgs, const wchar_t* execEnv, bool isProjectOpened, bool isProjectTypeSupported, bool isNonNativeProject)
 {
     GT_UNREFERENCED_PARAMETER(isProjectOpened);
-    // First clear currnet settings. This will make sure that all views are cleared from previous project +
+    // First clear current settings. This will make sure that all views are cleared from previous project +
     // will imitate SA mechanism -> first close current project then open the new one.
     apProjectSettings emptyProject;
     afProjectManager::instance().setCurrentProject(emptyProject);

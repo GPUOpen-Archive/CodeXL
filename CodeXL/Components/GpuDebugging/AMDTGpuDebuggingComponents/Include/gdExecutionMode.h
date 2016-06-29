@@ -83,6 +83,9 @@ public:
     /// set if the mode is enabled. needed since the upper layer (the gw) knows this and hold the gdExecution as a member
     void SetModeEnabled(bool isModeEnabled) { m_isModeEnabled = isModeEnabled; }
 
+    /// Get the toolbar start button text
+    virtual void GetToolbarStartButtonText(gtString& buttonText, bool fullString = true);
+
 protected:
     /// a flag to indicate if the mode is enabled. by default it is
     bool m_isModeEnabled;
