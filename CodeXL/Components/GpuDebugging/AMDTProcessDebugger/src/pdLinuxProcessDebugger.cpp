@@ -3439,7 +3439,15 @@ void pdLinuxProcessDebugger::onProcessRunSuspendedEventRegistration(apEvent& eve
     if (eve.triggeringThreadId() != OS_NO_THREAD_ID)
     {
         auto osId = getOSThreadIdByGDBIndex((int)eve.triggeringThreadId());
-        eve.setTriggeringThreadId(osId);
+
+        if (osId == OS_NO_THREAD_ID)
+        {
+             eve.setTriggeringThreadId(activeThreadId);
+        }
+        else
+        {
+             eve.setTriggeringThreadId(osId);
+        }
     }
     else
     {
@@ -4301,14 +4309,6 @@ bool pdLinuxProcessDebugger::performHostStep(osThreadId threadId, StepType stepT
     osCallStack visibleCallStack; // Call stack without spy functions
     int diff = 0;
 
-    /*if (_isDuringInternalContinue)
-    {
-        stackThread = getOSThreadIdByGDBIndex(m_triggeringThreadId);
-    }
-    else
-    {
-        stackThread = m_triggeringThreadId;
-    }*/
 
     /// Check if spy thread call stak present
     bool rcShow = getDebuggedThreadCallStack(threadId, realCallStack, false);

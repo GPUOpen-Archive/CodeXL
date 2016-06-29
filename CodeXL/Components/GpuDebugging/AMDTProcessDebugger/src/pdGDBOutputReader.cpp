@@ -1229,7 +1229,21 @@ bool pdGDBOutputReader::handleThreadsInfoLineOutput(const gtASCIIString& gdbOutp
     if (retVal && threadDataFound)
     {
         // Output the current line's thread data:
-        outputThreadsList._threadsDataList.push_front(currThreadData);
+        if (!outputThreadsList._threadsDataList.empty())
+        {
+            if (outputThreadsList._threadsDataList.front()._gdbThreadId > currThreadData._gdbThreadId)
+            {
+                outputThreadsList._threadsDataList.push_front(currThreadData);
+            }
+            else
+            {
+                outputThreadsList._threadsDataList.push_back(currThreadData);
+            }
+        }
+        else
+        {
+            outputThreadsList._threadsDataList.push_front(currThreadData);
+        }
     }
 
     return retVal;
