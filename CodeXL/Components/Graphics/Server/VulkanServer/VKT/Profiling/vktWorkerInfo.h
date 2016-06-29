@@ -11,6 +11,13 @@
 #include "../Profiling/vktFrameProfilerLayer.h"
 #include <AMDTOSWrappers/Include/osThread.h>
 
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+typedef HANDLE WorkerThreadHandle;
+#elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
+#include <thread>
+typedef std::thread* WorkerThreadHandle;
+#endif
+
 class VktWrappedQueue;
 
 //-----------------------------------------------------------------------------
@@ -44,11 +51,7 @@ struct WorkerOutputs
     std::vector<ProfilerResult> results;      ///< A vector containing all collected profiler results
 };
 
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-typedef HANDLE WorkerThreadHandle;
-#elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
-typedef std::thread* WorkerThreadHandle;
-#endif
+
 
 //-----------------------------------------------------------------------------
 /// Holds information about a worker thread.
