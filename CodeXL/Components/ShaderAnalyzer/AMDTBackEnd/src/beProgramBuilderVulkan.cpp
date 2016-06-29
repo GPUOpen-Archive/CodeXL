@@ -25,6 +25,44 @@ static bool GetAmdspvPath(std::string& amdspvPath)
     return true;
 }
 
+static bool GetGfxIpForVulkan(AMDTDeviceInfoUtils* pDeviceInfo, const VulkanOptions& vulkanOptions, std::string& gfxIpStr)
+{
+    bool ret = false;
+    gfxIpStr.clear();
+
+    if (vulkanOptions.m_targetDeviceName.compare(DEVICE_NAME_KALINDI) == 0 ||
+        vulkanOptions.m_targetDeviceName.compare(DEVICE_NAME_GODAVARI) == 0)
+    {
+        // Special case #1: 7.x devices.
+        gfxIpStr = "7.x";
+        ret = true;
+    }
+    else if (vulkanOptions.m_targetDeviceName.compare(DEVICE_NAME_STONEY) == 0 ||
+        vulkanOptions.m_targetDeviceName.compare(DEVICE_NAME_AMUR) == 0 ||
+        vulkanOptions.m_targetDeviceName.compare(DEVICE_NAME_NOLAN) == 0)
+    {
+        // Special case #2: 8.1 devices.
+        gfxIpStr = "8.1";
+        ret = true;
+    }
+    else
+    {
+        // The standard case.
+        size_t deviceGfxIp = 0;
+        GDT_HW_GENERATION hwGeneration;
+        bool isDeviceHwGenExtracted = pDeviceInfo->GetHardwareGeneration(vulkanOptions.m_targetDeviceName.c_str(), hwGeneration) &&
+            beUtils::GdtHwGenToNumericValue(hwGeneration, deviceGfxIp);
+
+        if (isDeviceHwGenExtracted && deviceGfxIp > 0)
+        {
+            gfxIpStr = std::to_string(deviceGfxIp);
+            ret = true;
+        }
+    }
+
+    return ret;
+}
+
 beProgramBuilderVulkan::beProgramBuilderVulkan()
 {
 }
@@ -108,21 +146,33 @@ beKA::beStatus beProgramBuilderVulkan::GetDeviceTable(std::vector<GDT_GfxCardInf
 
     // Go through the list of public devices, as received from the OpenCL runtime.
     std::vector<GDT_GfxCardInfo> cardList;
+    AMDTDeviceInfoUtils* pDeviceInfo = AMDTDeviceInfoUtils::Instance();
 
-    for (const std::string& publicDevice : m_publicDevices)
+    if (pDeviceInfo != nullptr)
     {
-        if (AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(publicDevice.c_str(), cardList))
+        for (const std::string& publicDevice : m_publicDevices)
         {
-            table.insert(table.end(), cardList.begin(), cardList.end());
-            cardList.clear();
+            if (pDeviceInfo->GetDeviceInfo(publicDevice.c_str(), cardList))
+            {
+                // Verify that this device is supported by the Vulkan backend.
+                VulkanOptions vulkanOptions;
+                vulkanOptions.m_targetDeviceName = publicDevice;
+                std::string deviceGfxIp;
+                bool isDeviceHwGenExtracted = GetGfxIpForVulkan(pDeviceInfo, vulkanOptions, deviceGfxIp);
+
+                if (isDeviceHwGenExtracted && !deviceGfxIp.empty())
+                {
+                    table.insert(table.end(), cardList.begin(), cardList.end());
+                    cardList.clear();
+                }
+            }
         }
-    }
 
-    std::sort(table.begin(), table.end(), beUtils::GfxCardInfoSortPredicate);
-
-    if (!table.empty())
-    {
-        ret = beKA::beStatus_SUCCESS;
+        if (!table.empty())
+        {
+            std::sort(table.begin(), table.end(), beUtils::GfxCardInfoSortPredicate);
+            ret = beKA::beStatus_SUCCESS;
+        }
     }
 
     return ret;
@@ -146,43 +196,6 @@ beKA::beStatus beProgramBuilderVulkan::Initialize(const std::string& sDllModule 
     return beKA::beStatus_SUCCESS;
 }
 
-bool GetGfxIpForVulkan(AMDTDeviceInfoUtils* pDeviceInfo, const VulkanOptions& vulkanOptions, std::string& gfxIpStr)
-{
-    bool ret = false;
-    gfxIpStr.clear();
-
-    if (vulkanOptions.m_targetDeviceName.compare(DEVICE_NAME_KALINDI) == 0 ||
-        vulkanOptions.m_targetDeviceName.compare(DEVICE_NAME_GODAVARI) == 0)
-    {
-        // Special case #1: 7.x devices.
-        gfxIpStr = "7.x";
-        ret = true;
-    }
-    else if (vulkanOptions.m_targetDeviceName.compare(DEVICE_NAME_STONEY) == 0 ||
-             vulkanOptions.m_targetDeviceName.compare(DEVICE_NAME_AMUR) == 0 ||
-             vulkanOptions.m_targetDeviceName.compare(DEVICE_NAME_NOLAN) == 0)
-    {
-        // Special case #2: 8.1 devices.
-        gfxIpStr = "8.1";
-        ret = true;
-    }
-    else
-    {
-        // The standard case.
-        size_t deviceGfxIp = 0;
-        GDT_HW_GENERATION hwGeneration;
-        bool isDeviceHwGenExtracted = pDeviceInfo->GetHardwareGeneration(vulkanOptions.m_targetDeviceName.c_str(), hwGeneration) &&
-                                      beUtils::GdtHwGenToNumericValue(hwGeneration, deviceGfxIp);
-
-        if (isDeviceHwGenExtracted && deviceGfxIp > 0)
-        {
-            gfxIpStr = std::to_string(deviceGfxIp);
-            ret = true;
-        }
-    }
-
-    return ret;
-}
 
 beKA::beStatus beProgramBuilderVulkan::Compile(const VulkanOptions& vulkanOptions, bool& cancelSignal, gtString& buildLog)
 {
@@ -588,4 +601,23 @@ bool beProgramBuilderVulkan::GetVulkanVersion(gtString& vkVersion)
 {
     vkVersion = BE_STR_VULKAN_VERSION;
     return true;
+}
+
+bool beProgramBuilderVulkan::IsSupportedDevice(const std::string& deviceName) const
+{
+    bool ret = false;
+    AMDTDeviceInfoUtils* pDeviceInfo = AMDTDeviceInfoUtils::Instance();
+    if (pDeviceInfo != nullptr)
+    {
+        size_t deviceGfxIp = 0;
+        GDT_HW_GENERATION hwGeneration;
+        bool isDeviceHwGenExtracted = pDeviceInfo->GetHardwareGeneration(deviceName.c_str(), hwGeneration) &&
+            beUtils::GdtHwGenToNumericValue(hwGeneration, deviceGfxIp);
+
+        if (isDeviceHwGenExtracted && deviceGfxIp > 0)
+        {
+            ret = true;
+        }
+    }
+    return ret;
 }
