@@ -36,6 +36,7 @@ AF_API bool afGetApplicationImagesPath(gtString& imagesDirPathAsString);
 AF_API bool afCanAllowDifferentSystemPath();
 AF_API bool afDefaultProjectFilePath(const osFilePath& executableFilePath, osFilePath& projectFilePath);
 AF_API void afGetVisualStudioProjectFilePath(const osFilePath& executablePath, const gtString& projectName, osFilePath& vsProjectFilePath);
+AF_API void afGetStartButtonText(gtString& buttonText, bool addKeyboardShortcut = false, bool fullString = true);
 
 class osPortAddress;
 struct AF_API afIsValidApplicationInfo
