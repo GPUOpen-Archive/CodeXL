@@ -156,6 +156,44 @@ bool gsConnectOpenGLWrappers(osModuleHandle hSystemOpenGLModule)
     return retVal;
 }
 
+// ---------------------------------------------------------------------------
+// Name:        gsConnectDriverInternalFunctionPointers
+// Description: Connects the driver internal functions to the real implementations.
+// Arguments:   hSystemOpenGLModule - A handle to the system's OpenGL module.
+// Author:      Uri Shomroni
+// Date:        29/6/2016
+// ---------------------------------------------------------------------------
+void gsConnectDriverInternalFunctionPointers(osModuleHandle hSystemOpenGLModule)
+{
+    static bool callOnce = true;
+    GT_ASSERT_EX(callOnce, L"gsConnectDriverInternalFunctionPointers called multiple times!");
+    callOnce = false;
+
+    // These number and array must be updated every time gsDriverInternalFunctionPointers is changed:
+#define GS_NUMBER_OF_INTERNAL_FUNCTIONS 4
+    const char* driverInternalFunctionNames[GS_NUMBER_OF_INTERNAL_FUNCTIONS] = {
+        // The order in this array must be exactly like the entry point order in gsDriverInternalFunctionPointers:
+        "loader_get_dispatch_table_size",
+        "_loader_get_proc_offset",
+        "_loader_add_dispatch",
+        "_loader_set_dispatch",
+    };
+
+    // Initialize the structure:
+    ::memset(&gs_stat_realDriverInternalFunctionPointers, 0, sizeof(gsDriverInternalFunctionPointers));
+
+    for (int i = 0; GS_NUMBER_OF_INTERNAL_FUNCTIONS > i; ++i)
+    {
+        // Get the functions pointer:
+        osProcedureAddress pRealFunction = nullptr;
+        bool rcPtr = osGetProcedureAddress(hSystemOpenGLModule, driverInternalFunctionNames[i], pRealFunction, false);
+        if (rcPtr && (nullptr != pRealFunction))
+        {
+            // Place it in the structure:
+            ((osProcedureAddress*)(&gs_stat_realDriverInternalFunctionPointers))[i] = pRealFunction;
+        }
+    }
+}
 
 // ---------------------------------------------------------------------------
 // Name:        gsLoadSystemsOpenGLModule
@@ -355,6 +393,10 @@ bool gsInitializeWrapperFunctions()
             // Connect the OpenGL wrapper functions to the system's OpenGL functions:
             bool rc1 = gsConnectOpenGLWrappers(hSystemOpenGLModule);
             s_retVal = rc1;
+
+            // Also connect the driver-internal functions. Since these are driver-dependant,
+            // there is no return value:
+            gsConnectDriverInternalFunctionPointers(hSystemOpenGLModule);
         }
 
         // On Mac OS X only:

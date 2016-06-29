@@ -28874,3 +28874,76 @@ void APIENTRY glFrameTerminatorGREMEDY(void)
 
 }
 
+//////////////////////////////////////////////////////////////////////////
+// Driver-internal functions (re-exported by the spy)
+//////////////////////////////////////////////////////////////////////////
+#define GS_CALL_DRIVER_INTERNAL_FUNCTION(functionPointerName, argumentsList)                        \
+{                                                                                                   \
+    /* If we have the requested function pointer - call it: */                                      \
+    GT_IF_WITH_ASSERT(nullptr != (gs_stat_realDriverInternalFunctionPointers.functionPointerName))  \
+    {                                                                                               \
+        (gs_stat_realDriverInternalFunctionPointers.functionPointerName) argumentsList;             \
+    }                                                                                               \
+    else                                                                                            \
+    {                                                                                               \
+        gtString errMsg;                                                                            \
+        errMsg.fromASCIIString(#functionPointerName);                                               \
+        GT_ASSERT_EX(false, errMsg.asCharArray());                                                  \
+    }                                                                                               \
+}
+
+#define GS_CALL_DRIVER_INTERNAL_FUNCTION_RETVAL(functionPointerName, argumentsList, retVal)         \
+{                                                                                                   \
+    /* If we have the requested function pointer - call it: */                                      \
+    GT_IF_WITH_ASSERT(nullptr != (gs_stat_realDriverInternalFunctionPointers.functionPointerName))  \
+    {                                                                                               \
+        retVal = (gs_stat_realDriverInternalFunctionPointers.functionPointerName) argumentsList;    \
+    }                                                                                               \
+    else                                                                                            \
+    {                                                                                               \
+        gtString errMsg;                                                                            \
+        errMsg.fromASCIIString(#functionPointerName);                                               \
+        GT_ASSERT_EX(false, errMsg.asCharArray());                                                  \
+    }                                                                                               \
+}
+
+//////////////////////////////////////////////////////////////////////////
+// AMD Driver-internal functions
+//////////////////////////////////////////////////////////////////////////
+unsigned int APIENTRY _loader_get_dispatch_table_size(void)
+{
+    gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
+
+    unsigned int retVal = 0;
+    GS_CALL_DRIVER_INTERNAL_FUNCTION_RETVAL(_loader_get_dispatch_table_size, (), retVal);
+
+    return retVal;
+}
+
+int APIENTRY _loader_get_proc_offset(const char* name)
+{
+    gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
+
+    int retVal = 0;
+    GS_CALL_DRIVER_INTERNAL_FUNCTION_RETVAL(_loader_get_proc_offset, (name), retVal);
+
+    return retVal;
+}
+
+int APIENTRY _loader_add_dispatch(const char* const* names, const char* signature)
+{
+    gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
+
+    int retVal = 0;
+    GS_CALL_DRIVER_INTERNAL_FUNCTION_RETVAL(_loader_add_dispatch, (names, signature), retVal);
+
+    return retVal;
+}
+
+void APIENTRY _loader_set_dispatch(const void* dispTable)
+{
+    gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
+
+    GS_CALL_DRIVER_INTERNAL_FUNCTION(_loader_set_dispatch, (dispTable));
+}
+

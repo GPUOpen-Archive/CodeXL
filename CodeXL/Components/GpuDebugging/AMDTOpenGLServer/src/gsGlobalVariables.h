@@ -30,6 +30,7 @@
 // Forward decelerations:
 class apMonitoredFunctionsManager;
 struct gsMonitoredFunctionPointers;
+struct gsDriverInternalFunctionPointers;
 class gsOpenGLMonitor;
 class gsExtensionsManager;
 class gsSpyPerformanceCountersManager;
@@ -73,6 +74,9 @@ void gsSetSystemsOpenGLModuleHandle(osModuleHandle systemsOpenGLModuleHandle);
 
 // Contains pointers to the real implementation of the wrapped "base" functions:
 extern gsMonitoredFunctionPointers gs_stat_realFunctionPointers;
+
+// Contains pointers to the real implementation of driver-internal functions:
+extern gsDriverInternalFunctionPointers gs_stat_realDriverInternalFunctionPointers;
 
 // References to singletons instances:
 extern gsOpenGLMonitor& gs_stat_openGLMonitorInstance;

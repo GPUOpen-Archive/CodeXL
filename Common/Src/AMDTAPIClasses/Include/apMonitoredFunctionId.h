@@ -589,12 +589,7 @@ enum apMonitoredFunctionId
 #if ((AMDT_BUILD_TARGET == AMDT_LINUX_OS) && (AMDT_LINUX_VARIANT == AMDT_GENERIC_LINUX_VARIANT))
     // Linux last base function index:
     apLastOpenGLBaseFunction = ap_glMultTransposeMatrixd,
-    ap_loaderGetDispatchTableSize,
-    ap_loaderGetProcOffset,
-    ap_loaderAddDispatch,
-    ap_loaderSetDispatch,
 #endif
-
 
     // OpenGL 1.4
     ap_glBlendFuncSeparate,

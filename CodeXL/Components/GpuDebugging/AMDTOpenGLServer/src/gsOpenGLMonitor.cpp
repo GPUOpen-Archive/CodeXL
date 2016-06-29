@@ -743,6 +743,22 @@ void gsOpenGLMonitor::onFrameTerminatorCall()
     }
 }
 
+// ---------------------------------------------------------------------------
+// Name:        gsOpenGLMonitor::verifyOpenGLServerInitialized
+// Description: Makes sure the OpenGL server is initialized.
+// Author:      Uri Shomroni
+// Date:        29/6/2016
+// ---------------------------------------------------------------------------
+void gsOpenGLMonitor::verifyOpenGLServerInitialized()
+{
+    // If the OpenGL Server was not initialized yet, initialize it:
+    if (!_wasOpenGLServerInitialized)
+    {
+        bool rcSpyInit = gsOpenGLSpyInit();
+        GT_ASSERT(rcSpyInit);
+        _wasOpenGLServerInitialized = true;
+    }
+}
 
 // ---------------------------------------------------------------------------
 // Name:        gsOpenGLMonitor::renderContextDeviceContext
@@ -1109,17 +1125,10 @@ void gsOpenGLMonitor::addFunctionCall(apMonitoredFunctionId calledFunctionId, in
     // If the OpenGL Server was not initialized yet, initialize it:
     if (!_wasOpenGLServerInitialized)
     {
-        gsOpenGLSpyInit();
+        bool rcSpyInit = gsOpenGLSpyInit();
+        GT_ASSERT(rcSpyInit);
         _wasOpenGLServerInitialized = true;
     }
-
-#if ((AMDT_BUILD_TARGET == AMDT_LINUX_OS) && (AMDT_LINUX_VARIANT == AMDT_GENERIC_LINUX_VARIANT))
-    if (calledFunctionId == ap_loaderGetDispatchTableSize ||
-        calledFunctionId == ap_loaderGetProcOffset ||
-        calledFunctionId == ap_loaderAddDispatch || 
-        calledFunctionId == ap_loaderSetDispatch)
-        return;
-#endif
 
     // Get the render context that is current to the calling thread:
     suContextMonitor* pRenderContextMonitor = currentThreadContextMonitor();
