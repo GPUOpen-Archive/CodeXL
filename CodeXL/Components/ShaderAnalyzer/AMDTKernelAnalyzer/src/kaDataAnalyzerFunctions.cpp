@@ -461,6 +461,13 @@ bool  ExpandMacros(string& inSourceCodeString, const wstring& rawSourceCodeFileN
         msg.append(rawSourceCodeFileName.c_str()).append(L", ").append(gtString().fromASCIIString(e.description()));
         OS_OUTPUT_DEBUG_LOG(msg.asCharArray(), OS_DEBUG_LOG_DEBUG);
     }
+    catch (std::exception const& e)
+    {
+        // some std error
+        gtString msg = L"General Error during parsing :";
+        msg.append(rawSourceCodeFileName.c_str()).append(L", ").append(gtString().fromASCIIString(e.what()));
+        OS_OUTPUT_DEBUG_LOG(msg.asCharArray(), OS_DEBUG_LOG_DEBUG);
+    }
 
     return result;
 }
