@@ -344,6 +344,11 @@
 #define AF_STR_modeToobarButtonBaseName "ModeButton"
 #define AF_STR_modeSwitchToTooltipPart1 "Switch to "
 #define AF_STR_modeSwitchToTooltipPart2 " Mode"
+#define AF_STR_playButtonContinue L"Continue"
+#define AF_STR_playButtonExeNameOnly L" (%ls)"
+#define AF_STR_playButtonStartPrefix L"Start CodeXL "
+#define AF_STR_playButtonStartGeneric L"Start CodeXL"
+
 
 // Menu items:
 #define AF_STR_CloseAllDocuments "C&lose All Documents"

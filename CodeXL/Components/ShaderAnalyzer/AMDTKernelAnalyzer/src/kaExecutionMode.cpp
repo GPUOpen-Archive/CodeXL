@@ -245,3 +245,10 @@ gtString kaExecutionMode::HowToStartModeExecutionMessage()
 
     return retStr;
 }
+
+void kaExecutionMode::GetToolbarStartButtonText(gtString& buttonText, bool fullString /*= true*/)
+{
+    GT_UNREFERENCED_PARAMETER(fullString);
+
+    buttonText = KA_STR_executionStartButton;
+}
