@@ -71,6 +71,7 @@ void RenderStallThread::CheckForRenderStall()
                         Log(logMESSAGE, "RenderStallThread::CheckForRenderStall(): Check messages in flight to see if process is still running\n");
                         RequestsInFlightDatabase::Instance()->CheckProcessesAreRunning();
                     }
+
 #endif
 #endif
 

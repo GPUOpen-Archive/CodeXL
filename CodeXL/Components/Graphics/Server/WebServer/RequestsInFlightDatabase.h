@@ -74,6 +74,7 @@ public:
     {
         ScopeLock sc(m_mutex);
         RequestsInFlightDBIter iter = m_RequestsInFlight.begin();
+
         while (iter != m_RequestsInFlight.end())
         {
             RequestInFlight* pRequest = iter->second;
@@ -89,6 +90,7 @@ public:
     {
         ScopeLock sc(m_mutex);
         RequestsInFlightDBIter iter = m_RequestsInFlight.begin();
+
         while (iter != m_RequestsInFlight.end())
         {
             NetSocket* pSock = iter->first;
