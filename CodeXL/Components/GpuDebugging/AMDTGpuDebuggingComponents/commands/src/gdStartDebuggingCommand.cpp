@@ -650,6 +650,12 @@ bool gdStartDebuggingCommand::StartDebugging()
                                 // On HSA systems where aticonfig is not found, there is no need to disable signal blocking:
                                 areLinuxSignalsBlocked = false;
                             }
+                            else
+                            {
+                                gtString logMsg = commandOutput;
+                                logMsg.prepend(L"Unexpected output from aticonfig: ");
+                                OS_OUTPUT_DEBUG_LOG(logMsg.asCharArray(), OS_DEBUG_LOG_DEBUG);
+                            }
                         }
                         else if ((commandOutput.find(trueString1) != -1) || (commandOutput.find(trueString2) != -1) || (commandOutput.find(trueString3) != -1) || (commandOutput.find('1') != -1))
                         {
