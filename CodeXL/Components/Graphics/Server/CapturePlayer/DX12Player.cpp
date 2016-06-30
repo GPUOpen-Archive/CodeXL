@@ -24,9 +24,9 @@ LRESULT CALLBACK DX12WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     // Handle destroy/shutdown messages.
     switch (uMsg)
     {
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        return 0;
+        case WM_DESTROY:
+            PostQuitMessage(0);
+            return 0;
     }
 
     // Handle any messages the switch statement didn't.
@@ -55,6 +55,7 @@ bool DX12Player::InitializeWindow(HINSTANCE hInstance, UINT windowWidth, UINT wi
     }
 
     bool bOpenAndUpdated = m_pPlayerWindow->OpenAndUpdate(SW_MINIMIZE);
+
     if (bOpenAndUpdated == false)
     {
         return false;

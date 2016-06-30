@@ -330,8 +330,8 @@ static bool GetConstantIDFromArgument(gtASCIIString sArgument, gtASCIIString cKe
 
     // Check if cKey is not end of other argument
     if (nKeyPosition == gtASCIIString::npos || (nKeyPosition != 0
-                                              && sArgument[nKeyPosition - 1] != '>' // code can be in HTML
-                                              && sArgument[nKeyPosition - 1] != ' '))
+                                                && sArgument[nKeyPosition - 1] != '>' // code can be in HTML
+                                                && sArgument[nKeyPosition - 1] != ' '))
 
     {
         return false;

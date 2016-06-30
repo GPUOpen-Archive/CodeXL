@@ -158,7 +158,7 @@ public:
             return 0;
         }
 
-        return  (unsigned int)index;
+        return (unsigned int)index;
     }
 
 private:

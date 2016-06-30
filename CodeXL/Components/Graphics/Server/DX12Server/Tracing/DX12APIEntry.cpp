@@ -178,6 +178,7 @@ const char* DX12APIEntry::GetParameterString() const
         // get the API function parameters from the raw memory buffer
         int arrayCount = 0;
         char* buffer = mParameterBuffer;
+
         if (buffer != nullptr)
         {
             for (UINT32 loop = 0; loop < mNumParameters; loop++)

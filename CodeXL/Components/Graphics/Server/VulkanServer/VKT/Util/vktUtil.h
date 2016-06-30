@@ -11,7 +11,7 @@
 #define __VKT_UTIL_H__
 
 #if defined _LINUX
-#include <signal.h>
+    #include <signal.h>
 #endif
 
 // Cross-platform

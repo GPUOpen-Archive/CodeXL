@@ -103,6 +103,7 @@ ProfilerResultCode VktCmdBufProfiler::BeginCmdMeasurement(const ProfilerMeasurem
             VkResult result = VK_INCOMPLETE;
             result = SetupNewMeasurementGroup();
             VKT_ASSERT(result == VK_SUCCESS);
+
             if (result != VK_SUCCESS)
             {
                 Log(logERROR, "SetupNewMeasurementGroup() failed in VktCmdBufProfiler::BeginCmdMeasurement()\n");
@@ -127,7 +128,7 @@ ProfilerResultCode VktCmdBufProfiler::BeginCmdMeasurement(const ProfilerMeasurem
                 m_config.cmdBuf,
                 VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
                 m_cmdBufData.pActiveMeasurementGroup->gpuRes.timestampQueryPool,
-                offset+1);
+                offset + 1);
         }
 
         m_cmdBufData.cmdBufMeasurementCount++;
@@ -361,6 +362,7 @@ ProfilerResultCode VktCmdBufProfiler::GetCmdBufResults(std::vector<ProfilerResul
     // We're done profiling this command buffer, so reset and we'll start over next time.
     result = ResetProfilerState();
     VKT_ASSERT(result == S_OK);
+
     if (result != S_OK)
     {
         Log(logERROR, "ResetProfilerState() failed in VktCmdBufProfiler::GetCmdBufResults()\n");
@@ -388,29 +390,29 @@ const char* VktCmdBufProfiler::PrintProfilerResult(ProfilerResultCode resultCode
 
     switch (resultCode)
     {
-    case PROFILER_SUCCESS:
-        pResult = "PROFILER_SUCCESS";
-        break;
+        case PROFILER_SUCCESS:
+            pResult = "PROFILER_SUCCESS";
+            break;
 
-    case PROFILER_FAIL:
-        pResult = "PROFILER_FAIL";
-        break;
+        case PROFILER_FAIL:
+            pResult = "PROFILER_FAIL";
+            break;
 
-    case PROFILER_THIS_CMD_BUF_WAS_NOT_MEASURED:
-        pResult = "PROFILER_THIS_CMD_BUF_WAS_NOT_MEASURED";
-        break;
+        case PROFILER_THIS_CMD_BUF_WAS_NOT_MEASURED:
+            pResult = "PROFILER_THIS_CMD_BUF_WAS_NOT_MEASURED";
+            break;
 
-    case PROFILER_MEASUREMENT_NOT_STARTED:
-        pResult = "PROFILER_MEASUREMENT_NOT_STARTED";
-        break;
+        case PROFILER_MEASUREMENT_NOT_STARTED:
+            pResult = "PROFILER_MEASUREMENT_NOT_STARTED";
+            break;
 
-    case PROFILER_ERROR_MEASUREMENT_ALREADY_BEGAN:
-        pResult = "PROFILER_STATE_MEASUREMENT_ALREADY_BEGAN";
-        break;
+        case PROFILER_ERROR_MEASUREMENT_ALREADY_BEGAN:
+            pResult = "PROFILER_STATE_MEASUREMENT_ALREADY_BEGAN";
+            break;
 
-    case PROFILER_THIS_CMD_BUF_WAS_NOT_CLOSED:
-        pResult = "PROFILER_THIS_CMD_BUF_WAS_NOT_CLOSED";
-        break;
+        case PROFILER_THIS_CMD_BUF_WAS_NOT_CLOSED:
+            pResult = "PROFILER_THIS_CMD_BUF_WAS_NOT_CLOSED";
+            break;
     }
 
     return pResult;
@@ -471,12 +473,12 @@ VkResult VktCmdBufProfiler::CreateQueryBuffer(
                         void* pMappedMem = nullptr;
 
                         result = m_pDeviceDT->MapMemory(
-                            m_config.device,
-                            *pMemory,
-                            0,
-                            VK_WHOLE_SIZE,
-                            0,
-                            &pMappedMem);
+                                     m_config.device,
+                                     *pMemory,
+                                     0,
+                                     VK_WHOLE_SIZE,
+                                     0,
+                                     &pMappedMem);
 
                         ProfilerInterval* pTimestampData = (ProfilerInterval*)pMappedMem;
 
@@ -544,9 +546,9 @@ VkResult VktCmdBufProfiler::CreateGpuResourceGroup(ProfilerGpuResources& gpuRes)
     if (result == VK_SUCCESS)
     {
         result = CreateQueryBuffer(
-            &gpuRes.timestampBuffer,
-            &gpuRes.timestampMem,
-            m_config.measurementsPerGroup * sizeof(ProfilerInterval));
+                     &gpuRes.timestampBuffer,
+                     &gpuRes.timestampMem,
+                     m_config.measurementsPerGroup * sizeof(ProfilerInterval));
     }
 
     return result;

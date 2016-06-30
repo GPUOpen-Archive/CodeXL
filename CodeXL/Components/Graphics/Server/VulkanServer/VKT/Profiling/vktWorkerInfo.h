@@ -12,10 +12,10 @@
 #include <AMDTOSWrappers/Include/osThread.h>
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-typedef HANDLE WorkerThreadHandle;
+    typedef HANDLE WorkerThreadHandle;
 #elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
-#include <thread>
-typedef std::thread* WorkerThreadHandle;
+    #include <thread>
+    typedef std::thread* WorkerThreadHandle;
 #endif
 
 class VktWrappedQueue;

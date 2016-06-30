@@ -134,7 +134,7 @@ static int my_lstrcmp(LPCSTR str1, LPCSTR str2)
             }
         }
 
-        result = (*(const unsigned char*)str1 - *(const unsigned char*)(str2 - 1));
+        result = (*(const unsigned char*)str1 - * (const unsigned char*)(str2 - 1));
     }
 
     return result;
@@ -162,7 +162,7 @@ static int my_lstrcmpW(LPCWSTR str1, LPCWSTR str2)
             }
         }
 
-        result = (*str1 - *(str2 - 1));
+        result = (*str1 - * (str2 - 1));
     }
 
     return result;

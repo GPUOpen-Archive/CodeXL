@@ -134,5 +134,6 @@ bool WindowsWindow::Update()
             return false;
         }
     }
+
     return true;
 }

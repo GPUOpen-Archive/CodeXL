@@ -143,9 +143,9 @@ VkResult VktTimestampedCmdBuf::Init(const TimestampedCmdBufConfig& config)   ///
                 allocInfo.allocationSize = memReqs.size;
 
                 result = MemTypeFromProps(
-                    memReqs.memoryTypeBits,
-                    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-                    &allocInfo.memoryTypeIndex);
+                             memReqs.memoryTypeBits,
+                             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+                             &allocInfo.memoryTypeIndex);
 
                 if (result == VK_SUCCESS)
                 {
@@ -160,12 +160,12 @@ VkResult VktTimestampedCmdBuf::Init(const TimestampedCmdBufConfig& config)   ///
                             void* pMappedMem = nullptr;
 
                             result = m_pDeviceDT->MapMemory(
-                                m_config.device,
-                                m_gpuRes.timestampMem,
-                                0,
-                                VK_WHOLE_SIZE,
-                                0,
-                                &pMappedMem);
+                                         m_config.device,
+                                         m_gpuRes.timestampMem,
+                                         0,
+                                         VK_WHOLE_SIZE,
+                                         0,
+                                         &pMappedMem);
 
                             if (result == VK_SUCCESS)
                             {
@@ -278,12 +278,12 @@ VkResult VktTimestampedCmdBuf::GetTimestampResult(UINT64* pOutClock)
         if (m_config.mapTimestampMem == true)
         {
             result = m_pDeviceDT->MapMemory(
-                m_config.device,
-                m_gpuRes.timestampMem,
-                0,
-                VK_WHOLE_SIZE,
-                0,
-                (void**)&pTimestampData);
+                         m_config.device,
+                         m_gpuRes.timestampMem,
+                         0,
+                         VK_WHOLE_SIZE,
+                         0,
+                         (void**)&pTimestampData);
 
             *pOutClock = *pTimestampData;
         }
@@ -292,14 +292,14 @@ VkResult VktTimestampedCmdBuf::GetTimestampResult(UINT64* pOutClock)
         else
         {
             result = m_pDeviceDT->GetQueryPoolResults(
-                m_config.device,
-                m_gpuRes.timestampQueryPool,
-                0,
-                1,
-                sizeof(UINT64),
-                pOutClock,
-                sizeof(UINT64),
-                VK_QUERY_RESULT_WAIT_BIT | VK_QUERY_RESULT_64_BIT);
+                         m_config.device,
+                         m_gpuRes.timestampQueryPool,
+                         0,
+                         1,
+                         sizeof(UINT64),
+                         pOutClock,
+                         sizeof(UINT64),
+                         VK_QUERY_RESULT_WAIT_BIT | VK_QUERY_RESULT_64_BIT);
         }
     }
 

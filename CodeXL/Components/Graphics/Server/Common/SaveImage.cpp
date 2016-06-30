@@ -451,6 +451,7 @@ static bool SetjmpWrapper(jmp_buf env)
     {
         return true;
     }
+
     return false;
 }
 

@@ -36,9 +36,9 @@
 /// MDO delta storage enumerations
 enum MdoDeltaStorage
 {
-MDO_DISABLED,
-MDO_DELTA_STORAGE_PER_MAP,
-MDO_DELTA_STORAGE_PER_BYTE,
+    MDO_DISABLED,
+    MDO_DELTA_STORAGE_PER_MAP,
+    MDO_DELTA_STORAGE_PER_BYTE,
 };
 
 /// MDO stat enumerations

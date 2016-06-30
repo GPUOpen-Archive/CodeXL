@@ -82,34 +82,34 @@ void MultithreadedTraceAnalyzerLayer::AfterAPITrace()
 }
 
 
-void MultithreadedTraceAnalyzerLayer::FilterTraceTypes(CaptureType captureType, bool &APITraceFlag, bool &GPUTraceFlag )
+void MultithreadedTraceAnalyzerLayer::FilterTraceTypes(CaptureType captureType, bool& APITraceFlag, bool& GPUTraceFlag)
 {
     switch (captureType)
     {
-    case CaptureType_APITrace:
-        APITraceFlag = true;
-        GPUTraceFlag = false;
-        break;
+        case CaptureType_APITrace:
+            APITraceFlag = true;
+            GPUTraceFlag = false;
+            break;
 
-    case CaptureType_GPUTrace:
-        APITraceFlag = false;
-        GPUTraceFlag = true;
-        break;
+        case CaptureType_GPUTrace:
+            APITraceFlag = false;
+            GPUTraceFlag = true;
+            break;
 
-    case CaptureType_LinkedTrace:
-        APITraceFlag = true;
-        GPUTraceFlag = true;
-        break;
+        case CaptureType_LinkedTrace:
+            APITraceFlag = true;
+            GPUTraceFlag = true;
+            break;
 
-    case CaptureType_FullFrameCapture:
-        APITraceFlag = false;
-        GPUTraceFlag = false;
-        Log(logERROR, "MultithreadedTraceAnalyzerLayer::BeginFrame - Unsupported: Full Frame Capture %d\n", captureType);
-        return;
+        case CaptureType_FullFrameCapture:
+            APITraceFlag = false;
+            GPUTraceFlag = false;
+            Log(logERROR, "MultithreadedTraceAnalyzerLayer::BeginFrame - Unsupported: Full Frame Capture %d\n", captureType);
+            return;
 
-    default:
-        Log(logERROR, "MultithreadedTraceAnalyzerLayer::BeginFrame - Unknown capture type %d\n", captureType);
-        return;
+        default:
+            Log(logERROR, "MultithreadedTraceAnalyzerLayer::BeginFrame - Unknown capture type %d\n", captureType);
+            return;
     }
 }
 
@@ -159,6 +159,7 @@ void MultithreadedTraceAnalyzerLayer::BeginFrame()
     if (bAPITraceNeeded || bGPUTraceNeeded)
     {
         int numFramesToTrace = GetParentLayerManager()->GetCaptureCount();
+
         if (numFramesToTrace > 1)
         {
             sbTracingMultipleFrames = true;
@@ -202,6 +203,7 @@ void MultithreadedTraceAnalyzerLayer::EndFrame()
     if (sbTracingMultipleFrames == true)
     {
         int numPresentsToWaitOn = GetParentLayerManager()->GetCaptureCount() - 1; // NOTE: subtraction of one
+
         if (sTracedFramesCount < numPresentsToWaitOn)
         {
             sTracedFramesCount++;
@@ -427,11 +429,13 @@ bool MultithreadedTraceAnalyzerLayer::GenerateLinkedTraceHeader(gtASCIIString& o
         executablePathDir.setFullPathFromString(executablePath);
 
         gtString appName;
+
         if (executablePathDir.getFileName(appName) == true)
         {
             commandLine.replace(appName, gtString(L""), true);
             commandLine.trim();
         }
+
 #endif
 
         // Build a timestamp.

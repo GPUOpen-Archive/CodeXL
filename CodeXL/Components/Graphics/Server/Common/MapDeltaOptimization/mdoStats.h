@@ -16,25 +16,25 @@ class MdoStats
 {
 public:
 
-static MdoStats* Create(const MdoConfig& mdoConfig);
-static void TrackHeapAlloc(UINT32 numBytes, void* pMem);
-static void TrackHeapFree(void* pMem);
-static void StartCpuTimer();
-static void StopCpuTimer(const std::string& desc);
-void TrackAlloc(UINT32 numBytes, void* pMem);
-void TrackFree(void* pMem);
-void StartTimer();
-double StopTimer(const std::string& desc);
-~MdoStats() {}
+    static MdoStats* Create(const MdoConfig& mdoConfig);
+    static void TrackHeapAlloc(UINT32 numBytes, void* pMem);
+    static void TrackHeapFree(void* pMem);
+    static void StartCpuTimer();
+    static void StopCpuTimer(const std::string& desc);
+    void TrackAlloc(UINT32 numBytes, void* pMem);
+    void TrackFree(void* pMem);
+    void StartTimer();
+    double StopTimer(const std::string& desc);
+    ~MdoStats() {}
 
 private:
 
-MdoStats(const MdoConfig& mdoConfig);
+    MdoStats(const MdoConfig& mdoConfig);
 
-MdoConfig                         m_mdoConfig;  ///< Config
-std::unordered_map<void*, UINT32> m_allocSizes; ///<  Allocated sizes
-UINT32                            m_totalConsumption; ///< Total memory usage
-MdoTimer                          m_timer; ///<  Timer
+    MdoConfig                         m_mdoConfig;  ///< Config
+    std::unordered_map<void*, UINT32> m_allocSizes; ///<  Allocated sizes
+    UINT32                            m_totalConsumption; ///< Total memory usage
+    MdoTimer                          m_timer; ///<  Timer
 };
 
 #endif

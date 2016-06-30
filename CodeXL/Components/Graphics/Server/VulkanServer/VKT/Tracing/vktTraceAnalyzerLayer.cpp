@@ -25,7 +25,7 @@
 //-----------------------------------------------------------------------------
 /// SortByStartTime
 //-----------------------------------------------------------------------------
-bool SortByStartTime(ProfilerResult* &lhs, ProfilerResult* &rhs)
+bool SortByStartTime(ProfilerResult*& lhs, ProfilerResult*& rhs)
 {
     return lhs->timestampResult.rawClocks.start < rhs->timestampResult.rawClocks.start;
 }
@@ -275,7 +275,7 @@ void VktTraceAnalyzerLayer::WaitAndFetchResults(VktFrameProfilerLayer* pFramePro
 #elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
         std::vector<std::thread*> queueThreads;
 #else
-    #error Unknown build target! No valid value for AMDT_BUILD_TARGET.
+#error Unknown build target! No valid value for AMDT_BUILD_TARGET.
 #endif
 
         for (UINT i = 0; i < queues.size(); i++)
@@ -300,10 +300,12 @@ void VktTraceAnalyzerLayer::WaitAndFetchResults(VktFrameProfilerLayer* pFramePro
 #ifdef WIN32
             DWORD retVal = WaitForMultipleObjects(queueWorkerCount, &queueThreads[0], TRUE, QUEUE_RESULTS_WORKER_TIMEOUT);
 #else
-            for(size_t it = 0; it < queueWorkerCount; it++)
+
+            for (size_t it = 0; it < queueWorkerCount; it++)
             {
                 queueThreads[it]->join();
             }
+
             DWORD retVal = 0;
 #endif
 

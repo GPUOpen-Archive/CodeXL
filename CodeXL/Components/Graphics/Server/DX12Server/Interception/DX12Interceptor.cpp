@@ -51,6 +51,7 @@ DX12APIEntry* DX12Interceptor::PreCall(IUnknown* inWrappedInterface, FuncId inFu
 
     // Forward the info to the frame profiler for now. In the future, the DX12Interceptor won't exist, and this will be handled automatically.
     DX12FrameProfilerLayer* frameProfiler = static_cast<DX12FrameProfilerLayer*>(GetParentLayerManager()->GetFrameProfilerLayer());
+
     if (frameProfiler != nullptr)
     {
         frameProfiler->PreCall(inWrappedInterface, inFunctionId);
@@ -74,9 +75,11 @@ void DX12Interceptor::PostCall(DX12APIEntry* pNewEntry, INT64 inReturnValue, Ret
 
     // Forward the info to the frame profiler for now. In the future, the DX12Interceptor won't exist, and this will be handled automatically.
     DX12FrameProfilerLayer* frameProfiler = static_cast<DX12FrameProfilerLayer*>(GetParentLayerManager()->GetFrameProfilerLayer());
+
     if (frameProfiler != nullptr)
     {
         frameProfiler->PostCall(pNewEntry, pNewEntry->mWrapperInterface, pNewEntry->mFunctionId);
     }
+
     pNewEntry->SetReturnValue(inReturnValue, inReturnValueFlags);
 }

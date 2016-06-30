@@ -13,7 +13,7 @@
 #include <AMDTOSWrappers/Include/osThread.h>
 
 #ifdef _LINUX
-#include "Linux/WinDefs.h"
+    #include "Linux/WinDefs.h"
 #endif
 
 namespace OSWrappers

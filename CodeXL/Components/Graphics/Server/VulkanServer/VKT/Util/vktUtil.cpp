@@ -1831,7 +1831,7 @@ const char* VktUtil::WritePointerAsString(const void* ptr)
 // This prevents VS2015 from complaining about imperfect "%" formatting when printing Vulkan objects.
 // This only applies to the 32-bit version of VulkanServer.
 #ifndef X64
-#pragma warning (disable : 4313)
+    #pragma warning (disable : 4313)
 #endif
 
 //-----------------------------------------------------------------------------

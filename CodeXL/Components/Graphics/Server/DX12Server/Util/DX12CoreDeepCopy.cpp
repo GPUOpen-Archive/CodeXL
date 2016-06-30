@@ -502,7 +502,8 @@ void DX12CoreDeepCopy::DeepCopy(const D3D12_CLEAR_VALUE* inStruct, D3D12_CLEAR_V
         clearCopy = new D3D12_CLEAR_VALUE;
         memcpy(clearCopy, inStruct, sizeof(D3D12_CLEAR_VALUE));
     }
-//TODO refactor below :  Assignment of function parameter has no effect outside the function. Did you forget dereferencing it?
+
+    //TODO refactor below :  Assignment of function parameter has no effect outside the function. Did you forget dereferencing it?
     outDestination = clearCopy;
 }
 

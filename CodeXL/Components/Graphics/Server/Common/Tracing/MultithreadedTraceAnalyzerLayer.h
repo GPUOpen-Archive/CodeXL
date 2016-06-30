@@ -296,7 +296,7 @@ protected:
     /// \param captureType Input capture type.
     /// \param APITraceFlag
     /// \param GPUTraceFlag
-    void FilterTraceTypes(CaptureType captureType, bool &APITraceFlag, bool &GPUTraceFlag);
+    void FilterTraceTypes(CaptureType captureType, bool& APITraceFlag, bool& GPUTraceFlag);
 
     //--------------------------------------------------------------------------
     /// The LinkedTrace CommandResponse can do two things:

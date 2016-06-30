@@ -8,10 +8,10 @@
 
 // Suppress warnings for boost
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-#pragma warning ( push, 3 ) // disable warning level 4 for boost
+    #pragma warning ( push, 3 ) // disable warning level 4 for boost
 #elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-variable"
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif
 
 // Boost libraries used for path manipulation
@@ -22,9 +22,9 @@
 
 // pop the warning suppression pragmas
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-#pragma warning ( pop )
+    #pragma warning ( pop )
 #elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
-#pragma GCC diagnostic pop
+    #pragma GCC diagnostic pop
 #endif
 
 #include "ClientRequestThread.h"

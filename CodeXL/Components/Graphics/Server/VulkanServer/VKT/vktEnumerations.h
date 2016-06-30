@@ -229,9 +229,9 @@ enum FuncId : int
     FuncId_WholeCmdBuf,
 
 #ifdef CODEXL_INCLUDE
-        FuncId_vkMAX,
+    FuncId_vkMAX,
 #else
-        FuncId_MAX,
+    FuncId_MAX,
 #endif
 };
 
