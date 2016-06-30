@@ -2,32 +2,38 @@
 #
 # Main scons build file for WebServer (GPUPerfStudio)
 #
+from CXL_init import *
 
-Import('GPS_env')
-env = GPS_env.Clone()
-env['CPPPATH'] = env['GPS_PATH']
-env.Prepend (CPPPATH = ["../Common/Linux"])
-env.Prepend (LIBPATH = env['GPS_LIBPATH'])
+Import('*')
+env = CXL_env.Clone()
+
+appName="CXLGraphicsServer"
+
+initGPSBackend (env)
+UseBoost(env)
+
 env.Prepend(CCFLAGS =
 [
-    '-Wall',
-    '-Wextra',
-    '-std=c++11',
-
-    "-D'LOG_MODULE=\"" + env.projectName + "\"'"
+    "-D'LOG_MODULE=\"" + appName + "\"'"
 ])
+
+env.Append (CPPPATH =[
+    env['CXL_commonproj_dir'],
+    env['CXL_commonproj_dir'] + '/../../CodeXL/Components/Graphics/Server/Common',
+    env['CXL_commonproj_dir'] + '/../../CodeXL/Components/Graphics/Server/Common/Linux',
+    ])
 
 # These need to be in their dependency order. Most derived first
 env['LIBS'] = \
 [
     #internal libraries
-    "libCommon",
-    "libAMDTOSWrappers",
-    "libAMDTBaseTools",
+    "libCXLGraphicsServerCommon",
+    "libCXLOSWrappers",
+    "libCXLBaseTools",
     #boost
-    File('../../../Common/Lib/Ext/Boost/boost_' + env.BoostVersion + '/lib/RHEL6/' + env.extConfig + '/libboost_program_options.a'),
-    File('../../../Common/Lib/Ext/Boost/boost_' + env.BoostVersion + '/lib/RHEL6/' + env.extConfig + '/libboost_filesystem.a'),
-    File('../../../Common/Lib/Ext/Boost/boost_' + env.BoostVersion + '/lib/RHEL6/' + env.extConfig + '/libboost_system.a'),
+    'libboost_program_options.a',
+    'libboost_filesystem.a',
+    'libboost_system.a',
     #enternal libraries
     "rt",
     "pthread",
@@ -49,6 +55,13 @@ sources = \
     "WebServer.cpp",
 ]
 
-GPUPerfServer = env.Program('GPUPerfServer', sources)
+exe = env.Program(
+    target = appName,
+    source = sources)
 
-Return('GPUPerfServer')
+# Installing libraries
+libInstall = env.Install(
+    dir = env['CXL_lib_dir'],
+    source = (exe))
+
+Return('libInstall')

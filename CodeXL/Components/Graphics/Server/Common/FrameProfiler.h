@@ -9,9 +9,9 @@
 #ifndef FRAMEPROFILER__H
 #define FRAMEPROFILER__H
 #include "ILayer.h"
+#include "GPUPerfAPIUtils/GPUPerfAPILoader.h"
 #include "CommandProcessor.h"
 #include "HTTPLogger.h"
-#include "GPUPerfAPIUtils/GPUPerfAPILoader.h"
 #include "IDrawCall.h"
 #include "timer.h"
 #include <vector>

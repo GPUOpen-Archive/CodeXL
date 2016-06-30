@@ -79,7 +79,7 @@ GPA_Status GPA_EnableCountersFromFile(GPUPerfAPILoader* pLoader, const char* pFi
                 {
                     // matches, so read next string
                     fgets(readBuf, sizeof(readBuf), pFile);
-                    scanResult = fscanf(pFile, "%s", &readBuf);
+                    scanResult = fscanf(pFile, "%s", &readBuf[0]);
                     continue;
                 }
                 else
@@ -99,7 +99,7 @@ GPA_Status GPA_EnableCountersFromFile(GPUPerfAPILoader* pLoader, const char* pFi
         if (readBuf[0] == ';' || skippingSection)
         {
             fgets(readBuf, sizeof(readBuf), pFile);
-            scanResult = fscanf(pFile, "%s", &readBuf);
+            scanResult = fscanf(pFile, "%s", &readBuf[0]);
             continue;
         }
 
@@ -115,7 +115,7 @@ GPA_Status GPA_EnableCountersFromFile(GPUPerfAPILoader* pLoader, const char* pFi
             return GPA_STATUS_ERROR_FAILED;
         }
 
-        scanResult = fscanf(pFile, "%s", &readBuf);
+        scanResult = fscanf(pFile, "%s", &readBuf[0]);
     }
 
     fclose(pFile);
