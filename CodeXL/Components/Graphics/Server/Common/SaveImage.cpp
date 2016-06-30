@@ -609,7 +609,7 @@ static   bool    _RGBAtoPNG(unsigned char* pImageData, int width, int height, UI
 
     png_bytepp row_pointers = new png_bytep[height];
 
-    unsigned int maxHeight = PNG_UINT_32_MAX / sizeof(png_bytep);
+    png_uint_32 maxHeight = PNG_UINT_32_MAX / sizeof(png_bytep);
 
     if (height > (int)maxHeight)
     {
