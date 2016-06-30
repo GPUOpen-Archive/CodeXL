@@ -4012,7 +4012,7 @@ void kaApplicationTreeHandler::AddFilesToProgram(const kaProgram* pProgram, cons
         for (const osFilePath& it : addedFilePaths)
         {
             // Add the file node to the program branch
-            if (AF_TREE_ITEM_KA_PROGRAM_GL_COMP == destinationItemType || !pProgram->HasFile(it, AF_TREE_ITEM_ITEM_NONE))
+            if (AF_TREE_ITEM_KA_PROGRAM_GL_COMP == destinationItemType || !pProgram->HasFile(it, destinationItemType))
             {
 
                 kaSourceFile* pCurrentFile = KA_PROJECT_DATA_MGR_INSTANCE.dataFileByPath(it);
