@@ -32,6 +32,7 @@ X11Window::~X11Window()
 bool X11Window::Initialize()
 {
     mDisplay = XOpenDisplay(NULL);
+
     if (!mDisplay)
     {
         Log(logERROR, "Error: couldn't open display.\n");
@@ -57,7 +58,7 @@ bool X11Window::Initialize()
     unsigned long mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
 
     mWindowHandle = XCreateWindow(mDisplay, root, 0, 0, m_windowWidth, m_windowHeight,
-        0, depth, InputOutput, visual, mask, &attr);
+                                  0, depth, InputOutput, visual, mask, &attr);
 
     // set hints and properties
     {
@@ -69,7 +70,7 @@ bool X11Window::Initialize()
         sizehints.flags = USSize | USPosition;
         XSetNormalHints(mDisplay, mWindowHandle, &sizehints);
         XSetStandardProperties(mDisplay, mWindowHandle, kWindowTitle, kWindowTitle,
-                                None, (char **)NULL, 0, &sizehints);
+                               None, (char**)NULL, 0, &sizehints);
     }
 
     return true;
@@ -116,31 +117,38 @@ bool X11Window::Update()
     while (XEventsQueued(xdisplay, QueuedAfterFlush))
     {
         XNextEvent(xdisplay, &evt);
+
         switch (evt.type)
         {
 
-        case ClientMessage:
-            // close window
-            if (evt.xmotion.window == xwin)
-            {
-                long wmdel;
-                wmdel = (long)XInternAtom(xdisplay, "WM_DELETE_WINDOW", True);
-                if (evt.xclient.data.l[0] == wmdel)
-                {
-                    result = false;
-                }
-            }
-            break;
+            case ClientMessage:
 
-        case ConfigureNotify:
-            // assume it's a window resize
-            if (evt.xconfigure.window == xwin)
-            {
-                w = evt.xconfigure.width;
-                h = evt.xconfigure.height;
-            }
-            break;
+                // close window
+                if (evt.xmotion.window == xwin)
+                {
+                    long wmdel;
+                    wmdel = (long)XInternAtom(xdisplay, "WM_DELETE_WINDOW", True);
+
+                    if (evt.xclient.data.l[0] == wmdel)
+                    {
+                        result = false;
+                    }
+                }
+
+                break;
+
+            case ConfigureNotify:
+
+                // assume it's a window resize
+                if (evt.xconfigure.window == xwin)
+                {
+                    w = evt.xconfigure.width;
+                    h = evt.xconfigure.height;
+                }
+
+                break;
         }
     }
+
     return result;
 }

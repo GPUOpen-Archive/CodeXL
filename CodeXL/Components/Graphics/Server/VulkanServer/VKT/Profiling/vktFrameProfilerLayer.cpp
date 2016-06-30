@@ -175,6 +175,7 @@ void VktFrameProfilerLayer::VerifyAlignAndStoreResults(
 #else
                 bool bAlignedSuccessfully = true;
 #endif
+
                 if (bAlignedSuccessfully)
                 {
                     // Store the final adjusted profiler results if they're valid.
@@ -451,6 +452,7 @@ VkResult VktFrameProfilerLayer::CollectCalibrationTimestamps(VktWrappedQueue* pW
     VkResult result = VK_INCOMPLETE;
 
 #if MANUAL_TIMESTAMP_CALIBRATION
+
     if ((pWrappedQueue != nullptr) && (pTimestamps != nullptr))
     {
         VkQueue queue = pWrappedQueue->AppHandle();
@@ -492,10 +494,12 @@ VkResult VktFrameProfilerLayer::CollectCalibrationTimestamps(VktWrappedQueue* pW
                 VKT_ASSERT(result == VK_SUCCESS);
 
                 VkResult waitResult = VK_TIMEOUT;
+
                 do
                 {
                     waitResult = device_dispatch_table(device)->WaitForFences(device, 1, &fence, VK_TRUE, GPU_FENCE_TIMEOUT_TIME);
-                } while (waitResult == VK_TIMEOUT);
+                }
+                while (waitResult == VK_TIMEOUT);
 
                 // Fetch the GPU counter
                 pTimestampedCmdBuf->GetTimestampResult(&pTimestamps->mBeforeExecutionGPUTimestamp);
@@ -520,6 +524,7 @@ VkResult VktFrameProfilerLayer::CollectCalibrationTimestamps(VktWrappedQueue* pW
             pTimestampedCmdBuf = nullptr;
         }
     }
+
 #else
     UNREFERENCED_PARAMETER(pWrappedQueue);
     UNREFERENCED_PARAMETER(pTimestamps);

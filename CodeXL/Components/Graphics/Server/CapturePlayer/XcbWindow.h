@@ -70,7 +70,7 @@ private:
     xcb_screen_t* mScreen;
 
     /// no idea what this is
-    xcb_intern_atom_reply_t *atom_wm_delete_window;
+    xcb_intern_atom_reply_t* atom_wm_delete_window;
 };
 
 #endif // XCB_WINDOW_H

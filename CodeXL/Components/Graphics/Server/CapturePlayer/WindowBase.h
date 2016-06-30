@@ -74,13 +74,15 @@ public:
 
     /// Retrieve the width of the window
     /// return The width of the window
-    inline UINT GetWindowWidth() const {
+    inline UINT GetWindowWidth() const
+    {
         return m_windowWidth;
     }
 
     /// Retrieve the height of the window
     /// return The height of the window
-    inline UINT GetWindowHeight() const {
+    inline UINT GetWindowHeight() const
+    {
         return m_windowHeight;
     }
 

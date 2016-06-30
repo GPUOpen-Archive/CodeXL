@@ -283,7 +283,7 @@ VkResult VktImageRenderer::Init(const VktImageRendererConfig& config)
             rsState.rasterizerDiscardEnable = VK_FALSE;
             rsState.depthBiasEnable         = VK_FALSE;
 
-            VkPipelineColorBlendAttachmentState cbAttState[1] = { VkPipelineColorBlendAttachmentState () };
+            VkPipelineColorBlendAttachmentState cbAttState[1] = { VkPipelineColorBlendAttachmentState() };
             cbAttState[0].colorWriteMask = 0xf;
             cbAttState[0].blendEnable    = VK_FALSE;
 

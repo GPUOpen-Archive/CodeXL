@@ -189,6 +189,7 @@ bool VktFrameDebuggerLayer::HandleFrameBufferRequest(PictureCommandResponse& inI
             // Read the image out of the file and into a temporary buffer.
             unsigned char* imageData = new unsigned char[numBytes];
             size_t bytesRead = fread(imageData, sizeof(unsigned char), numBytes, frameBufferImageFile);
+
             if (bytesRead != numBytes)
             {
                 Log(logERROR, "Read error in VktFrameDebuggerLayer::HandleFrameBufferRequest\n");

@@ -9,10 +9,10 @@
 #define BASE_PLAYER_H
 
 #ifdef WIN32
-#include <Windows.h>
+    #include <Windows.h>
 #else
-#include <WinDefs.h>
-typedef void* HINSTANCE;
+    #include <WinDefs.h>
+    typedef void* HINSTANCE;
 #endif
 #include "WindowBase.h"
 

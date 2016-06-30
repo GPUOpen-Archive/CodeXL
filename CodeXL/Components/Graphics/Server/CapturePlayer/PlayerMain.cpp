@@ -16,10 +16,10 @@
 #include <stdio.h>
 
 #ifdef WIN32
-#include "DX12Player.h"
+    #include "DX12Player.h"
 #else
-#include <signal.h>
-#include "WinDefs.h"
+    #include <signal.h>
+    #include "WinDefs.h"
 #endif
 
 #include "VulkanPlayer.h"
@@ -75,6 +75,7 @@ int main(int argc, char* argv[])
     // Get the process information
     bool bRes = osGetProcessLaunchInfo(osGetCurrentProcessId(), moduleArchitecture, currentPlatform, executablePathString, commandLine, workingDirectory);
     CP_ASSERT(bRes == true);
+
     if (bRes != true)
     {
         Log(logERROR, "Could not get the process information from: osGetProcessLaunchInfo\n");
@@ -82,12 +83,14 @@ int main(int argc, char* argv[])
     }
 
 #ifdef _LINUX
+
     if (argc >= 2)
     {
         static wchar_t tmpCmdLine[2048];
         gtASCIIStringToUnicodeString(argv[1], tmpCmdLine, 2048);
         commandLine = tmpCmdLine;
     }
+
 #endif
 
     // Create a meta data object to read the XML into
@@ -98,6 +101,7 @@ int main(int argc, char* argv[])
     // Read the XML data
     bRes = ReadMetadataFile(commandLine.asASCIICharArray(), &mtf);
     CP_ASSERT(bRes == true);
+
     if (bRes != true)
     {
         Log(logERROR, "ReadMetadataFile: FAILED reading %s\n", commandLine.asASCIICharArray());
@@ -109,6 +113,7 @@ int main(int argc, char* argv[])
 
 #ifdef WIN32
     size_t found = mtf.mAPIString.find("Vulkan");
+
     if (found != std::string::npos)
     {
         pPlayer = new VulkanPlayer();
@@ -116,28 +121,30 @@ int main(int argc, char* argv[])
     else
     {
         found = mtf.mAPIString.find("DX12");
+
         if (found != std::string::npos)
         {
             pPlayer = new DX12Player();
         }
         else
         {
-            // Default to using DX12 to support older traces that were prior to Vulkan support in GPS/CodeXL 
+            // Default to using DX12 to support older traces that were prior to Vulkan support in GPS/CodeXL
             pPlayer = new DX12Player();
         }
     }
 
-    // Initialize the render window 
+    // Initialize the render window
     bRes = pPlayer->InitializeWindow(hInstance, windowWidth, windowHeight);
 #else
     // Linux only has vulkan (for now)
     pPlayer = new VulkanPlayer();
 
-    // Initialize the render window 
+    // Initialize the render window
     bRes = pPlayer->InitializeWindow(nullptr, windowWidth, windowHeight);
 #endif
 
     CP_ASSERT(bRes == true);
+
     if (bRes != true)
     {
         Log(logERROR, "InitializeWindow FAILED.\n");
@@ -147,6 +154,7 @@ int main(int argc, char* argv[])
     // Initialize render loop graphics
     bRes = pPlayer->InitializeGraphics();
     CP_ASSERT(bRes == true);
+
     if (bRes != true)
     {
         Log(logERROR, "InitializeGraphics FAILED.\n");

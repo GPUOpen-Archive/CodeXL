@@ -13,9 +13,9 @@
 //-----------------------------------------------------------------------------
 
 #ifdef WIN32
-#define POINTER_SUFFIX "0x"
+    #define POINTER_SUFFIX "0x"
 #else
-#define POINTER_SUFFIX ""
+    #define POINTER_SUFFIX ""
 #endif
 
 /// A flag used to enable threaded worker profiler collection.

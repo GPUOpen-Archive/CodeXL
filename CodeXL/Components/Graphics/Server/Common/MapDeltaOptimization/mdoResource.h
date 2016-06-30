@@ -18,73 +18,73 @@ class MdoResource
 {
 public:
 
-/// Destructor
-virtual ~MdoResource();
+    /// Destructor
+    virtual ~MdoResource();
 
-/// Map member function
-/// \param mapInfo
-/// \param pMappedPtr
-/// \return True if success, false if failure
-virtual bool Map(const MdoResMapInfo& mapInfo, void** pMappedPtr) = 0;
+    /// Map member function
+    /// \param mapInfo
+    /// \param pMappedPtr
+    /// \return True if success, false if failure
+    virtual bool Map(const MdoResMapInfo& mapInfo, void** pMappedPtr) = 0;
 
-/// Unmap member function
-virtual bool Unmap() = 0;
+    /// Unmap member function
+    virtual bool Unmap() = 0;
 
-/// Skip any situations when we don't need to do any MDO capture work
-virtual bool RunMdoCaptureWork() = 0;
+    /// Skip any situations when we don't need to do any MDO capture work
+    virtual bool RunMdoCaptureWork() = 0;
 
-/// Skip any situations when we don't need to do any MDO playback work
-virtual bool RunMdoPlaybackWork() = 0;
+    /// Skip any situations when we don't need to do any MDO playback work
+    virtual bool RunMdoPlaybackWork() = 0;
 
-void NewMapEvent(const MdoResMapInfo& mapInfo);
-void NewUnmapEvent();
+    void NewMapEvent(const MdoResMapInfo& mapInfo);
+    void NewUnmapEvent();
 
-void CalcDeltaRegions();
-bool UploadMapDelta();
+    void CalcDeltaRegions();
+    bool UploadMapDelta();
 
-/// Get the byte size of the resource
-/// \return The size in bytes
-UINT32 ResourceByteSize()
-{
-    return m_size;
-}
+    /// Get the byte size of the resource
+    /// \return The size in bytes
+    UINT32 ResourceByteSize()
+    {
+        return m_size;
+    }
 
-void DeleteReflectionData();
-void NewReflectionData();
-void UpdateReferenceData();
+    void DeleteReflectionData();
+    void NewReflectionData();
+    void UpdateReferenceData();
 
-void TrackDirtyPage(const DataChunk& deltaData);
-void ResetMapEvents();
+    void TrackDirtyPage(const DataChunk& deltaData);
+    void ResetMapEvents();
 
 
-/// Get the reflection data
-/// \return Pointer to the reflection data
-ReflectionData* GetReflectionData()
-{
-    return &m_reflectionData;
-}
+    /// Get the reflection data
+    /// \return Pointer to the reflection data
+    ReflectionData* GetReflectionData()
+    {
+        return &m_reflectionData;
+    }
 
-bool Guard();
-bool Unguard();
+    bool Guard();
+    bool Unguard();
 
-bool OriginalMapSuccessful();
+    bool OriginalMapSuccessful();
 
 protected:
-MdoResource();
+    MdoResource();
 
-void CalcDeltaRegionsPerByteStorage();
-void CalcDeltaRegionsPerMapStorage();
+    void CalcDeltaRegionsPerByteStorage();
+    void CalcDeltaRegionsPerMapStorage();
 
-MdoState              m_state; ///< Mdo state
-MdoResourceCreateInfo m_createInfo; ///< Resource creation info
-ReflectionData        m_reflectionData; ///< Reflection data
-MapEvents             m_mapData; ///< Map data
-OrderedAccumDeltas    m_accumDeltas; ///< Deltas
+    MdoState              m_state; ///< Mdo state
+    MdoResourceCreateInfo m_createInfo; ///< Resource creation info
+    ReflectionData        m_reflectionData; ///< Reflection data
+    MapEvents             m_mapData; ///< Map data
+    OrderedAccumDeltas    m_accumDeltas; ///< Deltas
 
-int                   m_captureMapId; ///< capture map id
-int                   m_playbackMapId; ///< playback map id
-UINT32                m_size; ///< size
-int                   m_activeMappedCount; ///< map count
+    int                   m_captureMapId; ///< capture map id
+    int                   m_playbackMapId; ///< playback map id
+    UINT32                m_size; ///< size
+    int                   m_activeMappedCount; ///< map count
 };
 
 #endif

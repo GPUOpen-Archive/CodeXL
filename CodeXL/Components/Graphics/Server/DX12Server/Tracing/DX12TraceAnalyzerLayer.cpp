@@ -22,7 +22,7 @@
 //-----------------------------------------------------------------------------
 /// SortByStartTime
 //-----------------------------------------------------------------------------
-bool SortByStartTime(ProfilerResult* &lhs, ProfilerResult* &rhs)
+bool SortByStartTime(ProfilerResult*& lhs, ProfilerResult*& rhs)
 {
     return lhs->timestampResult.rawClocks.start <= rhs->timestampResult.rawClocks.start;
 }

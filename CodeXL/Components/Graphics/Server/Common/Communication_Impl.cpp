@@ -1425,10 +1425,12 @@ bool SendFileResponse(CommunicationID& requestID, const char* cpFile, NetSocket*
     // allocate Buffer_ and read in file contents
     fileBuffer = new char[fileSize];
     bytesRead = fread(fileBuffer, sizeof(char), fileSize, in);
+
     if (bytesRead != fileSize)
     {
         Log(logERROR, "File read error in SendFileResponse()\n");
     }
+
     fclose(in);
 
     bool bRes = Send(*pResponse, mimetypes[ FindMimeType(cpFile)].mime, fileBuffer, (unsigned long)fileSize);

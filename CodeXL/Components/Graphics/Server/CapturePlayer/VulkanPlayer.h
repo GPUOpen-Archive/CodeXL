@@ -10,9 +10,9 @@
 
 #include "BasePlayer.h"
 #ifdef WIN32
-#define VK_USE_PLATFORM_WIN32_KHR
+    #define VK_USE_PLATFORM_WIN32_KHR
 #else
-typedef void* HINSTANCE;
+    typedef void* HINSTANCE;
 #endif
 
 #include <vulkan/vulkan.h>

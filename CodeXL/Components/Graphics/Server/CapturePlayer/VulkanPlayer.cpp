@@ -5,12 +5,12 @@
 #include "VulkanPlayer.h"
 
 #ifdef WIN32
-#include "WindowsWindow.h"
+    #include "WindowsWindow.h"
 #else
-#include "XcbWindow.h"
-#include <signal.h>
-#include "WinDefs.h"
-#define SW_MINIMIZE 1
+    #include "XcbWindow.h"
+    #include <signal.h>
+    #include "WinDefs.h"
+    #define SW_MINIMIZE 1
 #endif
 
 #ifdef _DEBUG
@@ -24,7 +24,8 @@
 #endif
 
 /// Info about a swapchain
-struct SwapchainBuffers {
+struct SwapchainBuffers
+{
     VkImage     image;
     VkImageView view;
 };
@@ -107,6 +108,7 @@ public:
         {
             return true;
         }
+
         return false;
     }
 
@@ -148,6 +150,7 @@ public:
         {
             return true;
         }
+
         return false;
     }
 
@@ -187,9 +190,9 @@ LRESULT CALLBACK VulkanWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
     // Handle destroy/shutdown messages
     switch (uMsg)
     {
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        return 0;
+        case WM_DESTROY:
+            PostQuitMessage(0);
+            return 0;
     }
 
     // Handle any messages the switch statement didn't
@@ -213,12 +216,12 @@ void VulkanPlayer::Present()
 
     // Get the index of the next available swapchain image
     result = vkAcquireNextImageKHR(
-        s_vkState.device,
-        s_vkState.swapchain,
-        UINT64_MAX,
-        presentCompleteSemaphore,
-        VK_NULL_HANDLE,
-        &s_vkState.currSwapchainBuffer);
+                 s_vkState.device,
+                 s_vkState.swapchain,
+                 UINT64_MAX,
+                 presentCompleteSemaphore,
+                 VK_NULL_HANDLE,
+                 &s_vkState.currSwapchainBuffer);
 
     ClearSwapchainImage();
 
@@ -312,18 +315,23 @@ bool VulkanPlayer::InitializeGraphics()
                 surfaceExtFound = 1;
                 s_vkState.pExtNames[s_vkState.extCount++] = (char*)VK_KHR_SURFACE_EXTENSION_NAME;
             }
+
 #ifdef WIN32
+
             if (!strcmp(VK_KHR_WIN32_SURFACE_EXTENSION_NAME, pInstExts[i].extensionName))
             {
                 platformSurfaceExtFound = 1;
                 s_vkState.pExtNames[s_vkState.extCount++] = (char*)VK_KHR_WIN32_SURFACE_EXTENSION_NAME;
             }
+
 #else
+
             if (s_vulkanSurface->IsSurfaceExtension(pInstExts[i].extensionName))
             {
                 platformSurfaceExtFound = 1;
                 s_vkState.pExtNames[s_vkState.extCount++] = s_vulkanSurface->GetSurfaceExtensionName();
             }
+
 #endif
         }
 
@@ -432,7 +440,7 @@ bool VulkanPlayer::InitializeGraphics()
 
     CP_ASSERT(result == VK_SUCCESS);
 
-    VkBool32* pSupportsPresent = (VkBool32 *)malloc(s_vkState.queueCount * sizeof(VkBool32));
+    VkBool32* pSupportsPresent = (VkBool32*)malloc(s_vkState.queueCount * sizeof(VkBool32));
     CP_ASSERT(pSupportsPresent != nullptr);
 
     for (UINT i = 0; i < s_vkState.queueCount; i++)
@@ -442,6 +450,7 @@ bool VulkanPlayer::InitializeGraphics()
 
     UINT graphicsQueueNodeIndex = UINT32_MAX;
     UINT presentQueueNodeIndex = UINT32_MAX;
+
     for (UINT i = 0; i < s_vkState.queueCount; i++)
     {
         if ((s_vkState.pQueueProps[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) != 0)
@@ -532,7 +541,7 @@ bool VulkanPlayer::InitializeGraphics()
     result = vkGetPhysicalDeviceSurfacePresentModesKHR(s_vkState.gpu, s_vkState.surface, &presentModeCount, nullptr);
     CP_ASSERT(result == VK_SUCCESS);
 
-    VkPresentModeKHR* pPresentModes = (VkPresentModeKHR *)malloc(presentModeCount * sizeof(VkPresentModeKHR));
+    VkPresentModeKHR* pPresentModes = (VkPresentModeKHR*)malloc(presentModeCount * sizeof(VkPresentModeKHR));
     CP_ASSERT(pPresentModes != nullptr);
 
     result = vkGetPhysicalDeviceSurfacePresentModesKHR(s_vkState.gpu, s_vkState.surface, &presentModeCount, pPresentModes);
@@ -541,7 +550,8 @@ bool VulkanPlayer::InitializeGraphics()
     free(pPresentModes);
 
     VkExtent2D swapchainExtent = VkExtent2D();
-    if (surfCapabilities.currentExtent.width == (UINT)-1)
+
+    if (surfCapabilities.currentExtent.width == (UINT) - 1)
     {
         swapchainExtent.width = s_vkState.width;
         swapchainExtent.height = s_vkState.height;
@@ -561,6 +571,7 @@ bool VulkanPlayer::InitializeGraphics()
     }
 
     VkSurfaceTransformFlagBitsKHR preTransform = surfCapabilities.currentTransform;
+
     if (surfCapabilities.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR)
     {
         preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
@@ -597,7 +608,7 @@ bool VulkanPlayer::InitializeGraphics()
     VkImage* pSwapchainImages = (VkImage*)malloc(s_vkState.swapchainImgCount * sizeof(VkImage));
 
     result = vkGetSwapchainImagesKHR(s_vkState.device, s_vkState.swapchain, &s_vkState.swapchainImgCount, pSwapchainImages);
-    s_vkState.pSwapchainBuffers = (SwapchainBuffers *)malloc(s_vkState.swapchainImgCount * sizeof(SwapchainBuffers));
+    s_vkState.pSwapchainBuffers = (SwapchainBuffers*)malloc(s_vkState.swapchainImgCount * sizeof(SwapchainBuffers));
 
     for (UINT i = 0; i < s_vkState.swapchainImgCount; i++)
     {

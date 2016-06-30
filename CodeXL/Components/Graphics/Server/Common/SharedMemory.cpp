@@ -496,6 +496,7 @@ public:
         {
             // make it the right size
             int result = ftruncate(m_handle, bufferSize);
+
             if (result != 0)
             {
                 Log(logERROR, "ftruncate failed in SharedMemory::MemStatus  OpenOrCreate\n");

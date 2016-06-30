@@ -215,6 +215,7 @@ ProfilerResultCode VktCmdBufProfilerStatic::GetCmdBufResults(UINT64 fillId, std:
     ProfilerResultCode profilerResultCode = PROFILER_THIS_CMD_BUF_WAS_NOT_CLOSED;
 
     INT slot = -1;
+
     for (UINT i = 0; i < StaticMeasurementCount; i++)
     {
         if (m_slots[i].measurementInfo.idInfo.fillId == fillId)
@@ -242,26 +243,26 @@ ProfilerResultCode VktCmdBufProfilerStatic::GetCmdBufResults(UINT64 fillId, std:
                 if (m_config.mapTimestampMem == true)
                 {
                     result = m_pDeviceDT->MapMemory(
-                        m_config.device,
-                        currSlot.gpuRes.timestampMem,
-                        0,
-                        VK_WHOLE_SIZE,
-                        0,
-                        (void**)&pTimestampData);
+                                 m_config.device,
+                                 currSlot.gpuRes.timestampMem,
+                                 0,
+                                 VK_WHOLE_SIZE,
+                                 0,
+                                 (void**)&pTimestampData);
                 }
 
                 // We use vkGetQueryPoolResults
                 else
                 {
                     result = m_pDeviceDT->GetQueryPoolResults(
-                        m_config.device,
-                        currSlot.gpuRes.timestampQueryPool,
-                        0,
-                        3,
-                        sizeof(ProfilerInterval),
-                        &interval,
-                        sizeof(UINT64),
-                        VK_QUERY_RESULT_WAIT_BIT | VK_QUERY_RESULT_64_BIT);
+                                 m_config.device,
+                                 currSlot.gpuRes.timestampQueryPool,
+                                 0,
+                                 3,
+                                 sizeof(ProfilerInterval),
+                                 &interval,
+                                 sizeof(UINT64),
+                                 VK_QUERY_RESULT_WAIT_BIT | VK_QUERY_RESULT_64_BIT);
 
                     pTimestampData = &interval;
                 }

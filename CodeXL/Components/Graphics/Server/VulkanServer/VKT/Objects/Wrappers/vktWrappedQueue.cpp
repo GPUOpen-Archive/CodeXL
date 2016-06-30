@@ -13,8 +13,8 @@
 #include "../../FrameDebugger/vktFrameDebuggerLayer.h"
 
 #ifdef _LINUX
-#define WINAPI
-typedef void* LPVOID;
+    #define WINAPI
+    typedef void* LPVOID;
 #endif
 
 //-----------------------------------------------------------------------------
@@ -32,10 +32,13 @@ DWORD WINAPI ThreadFunc(LPVOID lpParam)
 
 #if GPU_FENCES_FOR_PROFILER_WAIT
     VkDevice device = pWorkerInfo->m_inputs.pQueue->ParentDevice();
+
     do
     {
         waitResult = device_dispatch_table(device)->WaitForFences(device, 1, &pWorkerInfo->m_inputs.fenceToWaitOn, VK_TRUE, GPU_FENCE_TIMEOUT_TIME);
-    } while (waitResult == VK_TIMEOUT);
+    }
+    while (waitResult == VK_TIMEOUT);
+
 #else
     VkQueue queue = pWorkerInfo->m_inputs.pQueue->AppHandle();
     waitResult = device_dispatch_table(queue)->QueueWaitIdle(queue);
@@ -177,7 +180,7 @@ void VktWrappedQueue::SpawnWorker(
 
             m_workerThreadInfo.push_back(pWorkerInfo);
 
-            
+
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
             DWORD threadId = 0;
             pWorkerInfo->m_threadInfo.threadHandle = CreateThread(nullptr, 0, ThreadFunc, pWorkerInfo, 0, &threadId);
@@ -279,6 +282,7 @@ VkResult VktWrappedQueue::QueueSubmit(VkQueue queue, uint32_t submitCount, const
                 VkResult fenceResult = VK_INCOMPLETE;
                 fenceResult = device_dispatch_table(queue)->CreateFence(m_createInfo.device, &fenceCreateInfo, nullptr, &fenceToWaitOn);
                 VKT_ASSERT(fenceResult == VK_SUCCESS);
+
                 if (fenceResult != VK_SUCCESS)
                 {
                     Log(logERROR, "CreateFence failed in VktWrappedQueue::QueueSubmit()\n");
@@ -302,10 +306,13 @@ VkResult VktWrappedQueue::QueueSubmit(VkQueue queue, uint32_t submitCount, const
             VkResult waitResult = VK_TIMEOUT;
 
 #if GPU_FENCES_FOR_PROFILER_WAIT
+
             do
             {
                 waitResult = device_dispatch_table(m_createInfo.device)->WaitForFences(m_createInfo.device, 1, &fenceToWaitOn, VK_TRUE, GPU_FENCE_TIMEOUT_TIME);
-            } while (waitResult == VK_TIMEOUT);
+            }
+            while (waitResult == VK_TIMEOUT);
+
 #else
             waitResult = device_dispatch_table(queue)->QueueWaitIdle(queue);
 #endif
@@ -328,14 +335,17 @@ VkResult VktWrappedQueue::QueueSubmit(VkQueue queue, uint32_t submitCount, const
             {
                 device_dispatch_table(m_createInfo.device)->DestroyFence(m_createInfo.device, fenceToWaitOn, nullptr);
             }
+
 #endif
         }
 
 #if GATHER_PROFILER_RESULTS_WITH_WORKERS == 0
+
         for (UINT i = 0; i < wrappedCmdBufs.size(); i++)
         {
             wrappedCmdBufs[i]->DestroyDynamicProfilers();
         }
+
 #endif
 
     }
@@ -384,7 +394,7 @@ VkResult VktWrappedQueue::QueuePresentKHR(VkQueue queue, const VkPresentInfoKHR*
 // This prevents VS2015 from complaining about imperfect "%" formatting when printing Vulkan objects.
 // This only applies to the 32-bit version of VulkanServer.
 #ifndef X64
-#pragma warning (disable : 4313)
+    #pragma warning (disable : 4313)
 #endif
 
 VkResult VktWrappedQueue::QueueSubmit_ICD(VkQueue queue, uint32_t submitCount, const VkSubmitInfo* pSubmits, VkFence fence)
@@ -397,10 +407,10 @@ VkResult VktWrappedQueue::QueueSubmit_ICD(VkQueue queue, uint32_t submitCount, c
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
         sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s, %s",
-            VktUtil::WritePointerAsString(queue),
-            submitCount,
-            PrintArrayWithFormatter(submitCount, pSubmits, POINTER_SUFFIX "%p").c_str(),
-            VktUtil::WriteUint64AsString((uint64_t)fence));
+                  VktUtil::WritePointerAsString(queue),
+                  submitCount,
+                  PrintArrayWithFormatter(submitCount, pSubmits, POINTER_SUFFIX "%p").c_str(),
+                  VktUtil::WriteUint64AsString((uint64_t)fence));
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(queue)->QueueSubmit(queue, submitCount, pSubmits, fence);
@@ -452,10 +462,10 @@ VkResult VktWrappedQueue::QueueBindSparse(VkQueue queue, uint32_t bindInfoCount,
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
         sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s, %s",
-            VktUtil::WritePointerAsString(queue),
-            bindInfoCount,
-            PrintArrayWithFormatter(bindInfoCount, pBindInfo, POINTER_SUFFIX "%p").c_str(),
-            VktUtil::WriteUint64AsString((uint64_t)fence));
+                  VktUtil::WritePointerAsString(queue),
+                  bindInfoCount,
+                  PrintArrayWithFormatter(bindInfoCount, pBindInfo, POINTER_SUFFIX "%p").c_str(),
+                  VktUtil::WriteUint64AsString((uint64_t)fence));
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(queue)->QueueBindSparse(queue, bindInfoCount, pBindInfo, fence);

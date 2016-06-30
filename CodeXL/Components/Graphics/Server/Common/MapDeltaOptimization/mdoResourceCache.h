@@ -16,38 +16,38 @@ class MdoResourceCache
 {
 public:
 
-static MdoResourceCache* Instance();
+    static MdoResourceCache* Instance();
 
-~MdoResourceCache() {}
+    ~MdoResourceCache() {}
 
-MdoResource* GetMdoResource(UINT64 resHandle, void* pDevice, bool newMdoResource);
-void ResetResources();
+    MdoResource* GetMdoResource(UINT64 resHandle, void* pDevice, bool newMdoResource);
+    void ResetResources();
 
-void TrackCreate(UINT64 resHandle);
-void TrackDestroy(UINT64 resHandle);
+    void TrackCreate(UINT64 resHandle);
+    void TrackDestroy(UINT64 resHandle);
 
-MdoResource* FindResource(UINT64 exceptionAddr);
+    MdoResource* FindResource(UINT64 exceptionAddr);
 
 protected:
-bool Init(const MdoConfig& mdoConfig);
-MdoResourceCache() {}
+    bool Init(const MdoConfig& mdoConfig);
+    MdoResourceCache() {}
 
-/// Register a resource
-/// \param pDevice Device associated with the resource
-/// \param resHandle Handle to the resource
-/// \return null or pointer to resource
-virtual MdoResource* RegisterResource(void* pDevice, UINT64 resHandle)
-{
-    UNREFERENCED_PARAMETER(pDevice);
-    UNREFERENCED_PARAMETER(resHandle);
-    return nullptr;
-}
+    /// Register a resource
+    /// \param pDevice Device associated with the resource
+    /// \param resHandle Handle to the resource
+    /// \return null or pointer to resource
+    virtual MdoResource* RegisterResource(void* pDevice, UINT64 resHandle)
+    {
+        UNREFERENCED_PARAMETER(pDevice);
+        UNREFERENCED_PARAMETER(resHandle);
+        return nullptr;
+    }
 
-bool UnregisterResource(UINT64 resHandle);
-bool ResHandleExists(UINT64 resHandle);
+    bool UnregisterResource(UINT64 resHandle);
+    bool ResHandleExists(UINT64 resHandle);
 
-MdoConfig   m_mdoConfig; ///< Mdo config
-ResourceMap m_resourceList; ///< List of resources
+    MdoConfig   m_mdoConfig; ///< Mdo config
+    ResourceMap m_resourceList; ///< List of resources
 };
 
 #endif

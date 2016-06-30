@@ -15,8 +15,8 @@
 //--------------------------------------------------------------------------
 ErrorImageBase::ErrorImageBase()
     : m_pImageData(nullptr),
-    m_nDataLength(0),
-    m_bReady(false)
+      m_nDataLength(0),
+      m_bReady(false)
 {
 }
 
