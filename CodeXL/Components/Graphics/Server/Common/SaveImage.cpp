@@ -445,9 +445,9 @@ static  void    FlipImage(unsigned char* pImageData, int width, int height)
 */
 
 // Use a wrapper to encapsulate the setjmp call to suppress Linux compile warning (-Wclobbered)
-static bool SetjmpWrapper(ErrorHandler& err)
+static bool SetjmpWrapper(jmp_buf env)
 {
-    if (setjmp(err.setjmpBuffer))
+    if (setjmp(env))
     {
         return true;
     }
@@ -462,7 +462,7 @@ static  bool    _RGBtoJpeg(unsigned char* pImageData, int width, int height, UIN
     struct jpeg_compress_struct cinfo;
     ErrorHandler err(&cinfo);
 
-    if (SetjmpWrapper(err))
+    if (SetjmpWrapper(err.setjmpBuffer))
     {
         /* If we get here, the JPEG code has signaled an error.
         * We need to clean up the JPEG object, close the input file, and return.
@@ -565,7 +565,7 @@ static   bool    _RGBAtoPNG(unsigned char* pImageData, int width, int height, UI
         return false;
     }
 
-    if (setjmp(png_jmpbuf(png_ptr)))
+    if (SetjmpWrapper(png_jmpbuf(png_ptr)))
     {
         png_destroy_write_struct(&png_ptr, &info_ptr);
         Log(logERROR, "[write_png_file] Error during init_io");
@@ -584,7 +584,7 @@ static   bool    _RGBAtoPNG(unsigned char* pImageData, int width, int height, UI
     png_set_write_fn(png_ptr, &state, pngWriteData, pngFlush);
 
     // write header
-    if (setjmp(png_jmpbuf(png_ptr)))
+    if (SetjmpWrapper(png_jmpbuf(png_ptr)))
     {
         png_destroy_write_struct(&png_ptr, &info_ptr);
         Log(logERROR, "[write_png_file] Error during writing header");
@@ -598,7 +598,7 @@ static   bool    _RGBAtoPNG(unsigned char* pImageData, int width, int height, UI
     png_write_info(png_ptr, info_ptr);
 
     // write bytes
-    if (setjmp(png_jmpbuf(png_ptr)))
+    if (SetjmpWrapper(png_jmpbuf(png_ptr)))
     {
         png_destroy_write_struct(&png_ptr, &info_ptr);
         Log(logERROR, "[write_png_file] Error during writing bytes");
@@ -609,9 +609,9 @@ static   bool    _RGBAtoPNG(unsigned char* pImageData, int width, int height, UI
 
     png_bytepp row_pointers = new png_bytep[height];
 
-    int maxHeight = PNG_UINT_32_MAX / sizeof(png_bytep);
+    unsigned int maxHeight = PNG_UINT_32_MAX / sizeof(png_bytep);
 
-    if (height > maxHeight)
+    if (height > (int)maxHeight)
     {
         Log(logERROR, "Image is too tall to process in memory");
     }
@@ -626,7 +626,7 @@ static   bool    _RGBAtoPNG(unsigned char* pImageData, int width, int height, UI
     //   FlipImage( pImageData, width, height);
 
     // end write
-    if (setjmp(png_jmpbuf(png_ptr)))
+    if (SetjmpWrapper(png_jmpbuf(png_ptr)))
     {
         png_destroy_write_struct(&png_ptr, &info_ptr);
         Log(logERROR, "[write_png_file] Error during end of write");
