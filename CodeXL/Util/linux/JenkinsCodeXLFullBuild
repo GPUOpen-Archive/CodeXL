@@ -1052,6 +1052,7 @@ PackageTheBuild()
     cp -f Output_x86_64/release/bin/libCXLGraphicsServerCommon.a                 ${PGK_NAME}
     mkdir -f ${PKG_NAME}/Plugins
     cp -f Output_x86_64/release/bin/Plugins/libCXLGraphicsServerVulkan.so        ${PGK_NAME}/Plugins
+    cp -f Output_x86_64/release/bin/Plugins/libCXLGraphicsServerVulkan.json      ${PGK_NAME}/Plugins
 		
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/Vulkan/rev_1_0_0/Release/lnx64/amdspv               ${PKG_NAME}
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/Vulkan/rev_1_0_0/Release/lnx64/spvgen.so            ${PKG_NAME}
