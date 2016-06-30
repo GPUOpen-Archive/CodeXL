@@ -1046,6 +1046,12 @@ PackageTheBuild()
 		cp -f Output_x86_64/release/bin/libCXLGpuProfilerPreloadXInitThreads.so     ${PKG_NAME}
 		cp -f Output_x86_64/release/bin/CodeXLGpuProfiler                            ${PKG_NAME}
 		cp -f Output_x86_64/release/bin/CodeXLGpuProfilerRun                         ${PKG_NAME}
+   
+    cp -f Output_x86_64/release/bin/CXLGraphicsServer                            ${PGK_NAME}
+    cp -f Output_x86_64/release/bin/CXLGraphicsServerPlayer                      ${PGK_NAME}
+    cp -f Output_x86_64/release/bin/libCXLGraphicsServerCommon.a                 ${PGK_NAME}
+    mkdir -f ${PKG_NAME}/Plugins
+    cp -f Output_x86_64/release/bin/Plugins/libCXLGraphicsServerVulkan.so        ${PGK_NAME}/Plugins
 		
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/Vulkan/rev_1_0_0/Release/lnx64/amdspv               ${PKG_NAME}
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/Vulkan/rev_1_0_0/Release/lnx64/spvgen.so            ${PKG_NAME}
@@ -1060,7 +1066,7 @@ PackageTheBuild()
 		cp -f Output_x86_64/release/bin/libCXLPowerProfileAPI.so           ${PKG_NAME}/SDK/CXLPowerProfile/bin/x86_64
 		mkdir -p ${PKG_NAME}/SDK/CXLPowerProfile/doc
 		cp -f ${AMD_CODEXL}/Components/PowerProfiling/Help/AMDTPowerProfileAPI.pdf        ${PKG_NAME}/SDK/CXLPowerProfile/doc
-
+   
 		tar czf ${PKG_NAME}.tar.gz ${PKG_NAME}
 
 

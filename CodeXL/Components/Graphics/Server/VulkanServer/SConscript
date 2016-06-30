@@ -118,7 +118,7 @@ install = soFiles
 
 # Installing libraries
 VulkanServer = env.Install(
-    dir = env['CXL_lib_dir'],
+    dir = env['CXL_lib_dir']+'/Plugins',
     source = (install))
 
 # clean up the source files when everything is built
