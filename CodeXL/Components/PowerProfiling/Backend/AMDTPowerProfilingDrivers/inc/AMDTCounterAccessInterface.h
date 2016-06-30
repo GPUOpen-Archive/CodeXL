@@ -42,7 +42,7 @@ void InitializeGenericCounterAccess(uint32 core);
 void CloseGenericCounterAccess(void);
 
 // GetBasicCounterSize
-uint32 GetBasicCounterSize();
+uint32 GetBasicCounterSize(void);
 
 // GetNodeCounterSize
 uint32 GetNodeCounterSize(uint32 counterId);
