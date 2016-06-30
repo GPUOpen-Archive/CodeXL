@@ -356,6 +356,12 @@ AMDTResult PrepareSystemTopologyInfo()
         sprintf(pkg0->m_pName, "%s", pNodeInfo->m_shortName);
         sprintf(pkg0->m_pDescription, "%s",pNodeInfo->m_shortName);
     }
+    else
+    {
+        memset(pkg0->m_pName, 0, AMDT_PWR_EXE_NAME_LENGTH);
+        sprintf(pkg0->m_pName, "%s", "Non-AMD");
+        sprintf(pkg0->m_pDescription, "%s", "Non-AMD device");
+    }
 
     // ONLY if supported AMD platform
     if ((true == g_sysInfo.m_isAmd) && (true == g_sysInfo.m_isPlatformSupported))
@@ -840,9 +846,17 @@ bool PwrConfigureProfile()
     {
         if (iter.second.m_isActive)
         {
+            AMDTUInt32 smuIdx = iter.second.m_pkgId - 1;
+            PwrTrace("smuIdx %d g_sysInfo.m_isAmdApu %d",smuIdx, g_sysInfo.m_isAmdApu);
+            if(!g_sysInfo.m_isAmdApu || !g_sysInfo.m_smuTable.m_info[0].m_isAccessible)
+            {
+                smuIdx = smuIdx - 1;
+                PwrTrace("NON AMD smuIdx %d", smuIdx);
+            }
+
             if (iter.second.m_pkgId > 0)
             {
-                config.m_activeList.m_info[iter.second.m_pkgId - 1].m_counterMask |= (1ULL << iter.second.m_basicInfo.m_attrId);
+                config.m_activeList.m_info[smuIdx].m_counterMask |= (1ULL << iter.second.m_basicInfo.m_attrId);
             }
             else
             {
@@ -1943,7 +1957,6 @@ AMDTResult AMDTPwrReadAllEnabledCounters(AMDTUInt32* pNumOfSamples,
                 PwrTrace("memory not available counterPoolCnt %d", counterPoolCnt);
                 break;
             }
-            PwrTrace("So far so good");
 
             for (auto iter : data.m_counters)
             {
@@ -1980,7 +1993,7 @@ AMDTResult AMDTPwrReadAllEnabledCounters(AMDTUInt32* pNumOfSamples,
                 g_result.push_back(result);
             }
         };
-PwrTrace("samples %d, counters %d",g_result.size(),counterPoolCnt);
+
         if (false == isDataAvailable)
         {
             ret = AMDT_ERROR_NODATA;
