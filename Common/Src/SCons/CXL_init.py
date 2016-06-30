@@ -664,21 +664,27 @@ def initVulkanSDK (env) :
 
 def initGPSBackend (env):
 
+    env.archWin = ""
+    env.archLinux = ""
+    GPS_platformSuffix = ""
+    GPS_buildSuffix = ""
+    GPS_debugSuffix= ""
+
     if (env['CXL_bitness'] == "32"):
         GPS_archConfig = 'x86'
         GPS_platformSuffix = "32"
+        env.archLinux = '32'
     else: 
         GPS_archConfig = 'x86_64'
-        GPS_platformSuffix = ""
+        env.archWin = '-x64'
 
     if (env['CXL_build_conf'] == 'INTERNAL'):
         GPS_buildInternal = True
         GPS_buildSuffix = "-Internal"
     else:
         GPS_buildInternal = False
-        GPS_buildSuffix = ""
     
-    GPS_debugSuffix= "" #temp to be change for debug build
+    
     GPSprojectssuffix=GPS_platformSuffix+GPS_debugSuffix + GPS_buildSuffix
     
     env.Append(CommonPath = env['CXL_common_dir'])
@@ -686,6 +692,10 @@ def initGPSBackend (env):
     env.Append(capturePlayerName = "CXLGraphicsServerPlayer")
     env.Append(vulkanPluginName = "CXLGraphicsServerVulkan")
     env.Append(rootFolderName = "Graphics")
+    env.Append(GPS_platformSuffix = GPS_platformSuffix)
+    env.Append(GPS_buildSuffix = GPS_buildSuffix)
+    env.Append(GPS_debugSuffix = GPS_debugSuffix)
+    env.Append(GPS_archConfig = GPS_archConfig)
     
     GDT_PLATFORM_SUFFIX="-D'GDT_PLATFORM_SUFFIX=\"" + GPS_platformSuffix + "\"'"
     GDT_BUILD_SUFFIX="-D'GDT_BUILD_SUFFIX=\"" + GPS_buildSuffix + "\"'"
@@ -696,6 +706,44 @@ def initGPSBackend (env):
     original_cpp_flag=env['CPPFLAGS']
     original_cpp_flag = original_cpp_flag + cpp_flags
     env.Replace(CPPFLAGS = original_cpp_flag) 
+
+##########################################################################################
+# Copy JSON files required by the Vulkan server
+# Share the windows JSON files to minimize maintainance. Once the files are copied, they
+# are modified to work with the Linux server. Uses the 'sed' utility to search and replace
+# strings
+def CopyJSON(env):
+
+    source = env['CXL_common_dir'] + "/../CodeXL/Components/Graphics/Server/VulkanServer/JSON/" + env['vulkanPluginName'] + env.archWin + env['GPS_debugSuffix'] + env['GPS_buildSuffix'] + ".json"
+    dest = env['CXL_lib_dir'] + "/Plugins/lib" + env['vulkanPluginName'] + env.archLinux + env['GPS_debugSuffix'] + env['GPS_buildSuffix'] + ".json"
+
+    command = "cp " + source + " " + dest
+    os.system(command)
+
+    # make target JSON file read/write
+    command = "chmod 664 " + dest
+    os.system(command)
+
+    # replace instances of '-x64' with ''
+    command = "sed -i 's/-x64//g' " + dest
+    os.system(command)
+
+    # replace 2 backslashes with single forward slash
+    command = "sed -i 's/\\\\\\\\/\//g' " + dest
+    os.system(command)
+
+    # add "lib" to new .so file name to match CodeXL naming
+    command = "sed -i 's/\.\//\.\/lib/g' " + dest
+    os.system(command) 
+    
+    # replace 'dll' with 'so'
+    command = "sed -i 's/dll/so/g' " + dest
+    os.system(command)
+
+    # append '32' to Server if 32-bit server
+    if env['GPS_archConfig'] == 'x86':
+        command = "sed -i 's/Server/Server" + env.archLinux + "/g' " + dest
+        os.system(command)
 
 #####################################
 # A component .py properties file takes the form
