@@ -346,7 +346,7 @@ bool ParseCmdLine(int argc, char* argv[], Config& config)
             cout << dxOpt << endl;
             cout << gldxOpt << endl;
             cout << "Examples:" << endl;
-            cout << " View supported ASICS for DirectX: " << programName << " -s hlsl " << "–" << "l" << endl;
+            cout << " View supported ASICS for DirectX: " << programName << " -s hlsl -l" << endl;
             cout << " Extract the ISA: " << programName << " -s hlsl -f VsMain -p vs_5_0 --isa c:\\files\\myShader.isa c:\\files\\myShader.hlsl" << endl ;
             cout << " Extract the ISA and perform live register analysis: " << programName << " -s hlsl -f VsMain -p vs_5_0 --isa c:\\output\\myShader.isa --livereg c:\\output\\ c:\\files\\myShader.hlsl" << endl;
             cout << " Output analysis: " << programName << " -s hlsl -f VsMain -p vs_5_0  -a c:\\files\\myShader.csv c:\\files\\myShader.hlsl" << endl;
