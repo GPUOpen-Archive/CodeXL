@@ -689,7 +689,7 @@
 #define GD_STR_OptionsAdvancedDebugLogLevel L"Debug log level:"
 
 // Start Debugging Command:
-#define GD_STR_LinuxBlockSignalsQueryCommand L"aticonfig --get-pcs-key=DDX,BlockSignalsOnLock"
+#define GD_STR_LinuxBlockSignalsQueryCommand L"aticonfig --get-pcs-key=DDX,BlockSignalsOnLock 2>&1"
 #define GD_STR_LinuxBlockSignalsMessageTitle "Warning - Driver configuration"
 #define GD_STR_LinuxBlockSignalsMessage "The AMD Radeon Software driver is currently not configured to allow debugging of OpenCL and OpenGL applications.\n\nPlease open a terminal window and input the following command as root:\n\naticonfig --sb off\nthen reboot the machine to apply the change.\n\nContinuing without making this change may result in hangs and crashes.\nDo you wish to continue debugging?"
 
