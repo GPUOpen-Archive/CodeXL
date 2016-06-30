@@ -1057,11 +1057,11 @@ bool CallGraphFuncList::FillDisplayFuncList(shared_ptr<cxlProfileDataReader> pPr
                                             AMDTFunctionId& funcIdMaxSamples)
 {
     bool ret = false;
+    GT_UNREFERENCED_PARAMETER(isSystemDLLSelected);
 
     GT_IF_WITH_ASSERT((nullptr != pProfDataRdr) &&
                       (m_pFuncTable != nullptr))
     {
-        const bool displaySystemModules = isSystemDLLSelected;
         m_pFuncTable->blockSignals(true);
         clear();
         m_pFuncTable->setSortingEnabled(false);
