@@ -833,7 +833,6 @@
 #define KA_STR_addFileVulkanTypesTitle "<b>Vulkan Shaders"
 #define KA_STR_addFileDescriptionTitle "<b>Description"
 #define KA_STR_addFileAssociateProgram "<b>Associate with Program/Folder"
-#define KA_STR_addFileProgramComboItemNone "None"
 #define KA_STR_addFileProgramComboItemNewProgram "Create New Program/Folder"
 // Created files
 #define KA_STR_createdFileHeader "/* Created with CodeXL */\n"

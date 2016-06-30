@@ -637,8 +637,6 @@ void kaAddFileDialog::FillProgramsCombo()
                     }
                 }
             }
-
-            m_pAssociatedProgramCombo->addItem(KA_STR_addFileProgramComboItemNone);
         }
     }
 }
