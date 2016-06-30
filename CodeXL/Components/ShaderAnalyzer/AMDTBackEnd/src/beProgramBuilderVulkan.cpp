@@ -543,6 +543,9 @@ beKA::beStatus beProgramBuilderVulkan::Compile(const VulkanOptions& vulkanOption
             tmpFilePath.setFileName(AMPSPV_TMP_OUTPUT_FILE);
             cmd << "out.glslLog=\"" << tmpFilePath.asString().asASCIICharArray() << "\" ";
 
+            // No default output (only generate the output files that we explicitly specified).
+            cmd << "defaultOutput=0";
+
             // Launch amdspv.
             gtString amdspvOutput;
             bool isLaunchSuccess = osExecAndGrabOutput(cmd.str().c_str(), cancelSignal, amdspvOutput);
