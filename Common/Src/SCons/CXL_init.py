@@ -195,7 +195,7 @@ def initInstallDirs (env) :
     env['ENV']['CXL_webhelp_dir'] = env['CXL_webhelp_dir']
 
 def initCompilerFlags (env) :
-    compiler_base_flags = " -Wall -Werror -Wextra -g -fmessage-length=0 -Wno-unknown-pragmas -pthread -DGDT_BUILD_SUFFIX= -std=c++11"    
+    compiler_base_flags = " -Wall -Werror -Wextra -g -fmessage-length=0 -Wno-unknown-pragmas -pthread -std=c++11 -D_LINUX"    
     linker_base_flags = ''
     
     if (env['CXL_build'] == 'debug'):
@@ -635,6 +635,67 @@ def UseAMDTQTControls(env):
 def UseAPPSDK (env):
     amdAPPSDK_dir =  env['CXL_common_dir'] + '/Lib/AMD/APPSDK/3-0/include/'
     env.Append(CPPPATH = [amdAPPSDK_dir])
+
+def UseGPUPerfAPI (env) :
+    libGPUPerfAPI_dir     = env['CXL_common_dir'] + '/Lib/AMD/GPUPerfAPI/2_20/'
+    libGPUPerfAPI_inc     = libGPUPerfAPI_dir + 'Include/'
+    libGPUPerfAPI_lib_dir = libGPUPerfAPI_dir + 'Bin/Linx64'
+
+    env.Append(CPPPATH = [libGPUPerfAPI_inc])
+    env.Append(LIBPATH = [libGPUPerfAPI_lib_dir])
+
+def initjpglib (env) :
+    jpglib_dir     = env['CXL_common_dir'] + '/Lib/Ext/jpglib/jpeg-9/'
+
+    env.Append(CPPPATH = [jpglib_dir])
+
+def initVulkanSDK (env) :
+    VulkanSDK_dir     = env['CXL_common_dir'] + '/Lib/Ext/Vulkan/1.0.13.0/SDK'
+    VulkanSDK_libs_dir = VulkanSDK_dir + '/x86_64/lib'
+    VulkanSDK_includes=[
+        VulkanSDK_dir +  '/Include',
+        VulkanSDK_dir +  '/Include/vulkan',
+        VulkanSDK_dir +  '/Source/layers',
+        VulkanSDK_dir +  '/Source/loader',
+        VulkanSDK_dir +  '/glslang/SPIRV',
+    ]
+    env.Append(LIBPATH = [VulkanSDK_libs_dir])
+    env.Append(CPPPATH = [VulkanSDK_includes])
+
+def initGPSBackend (env):
+
+    if (env['CXL_bitness'] == "32"):
+        GPS_archConfig = 'x86'
+        GPS_platformSuffix = "32"
+    else: 
+        GPS_archConfig = 'x86_64'
+        GPS_platformSuffix = ""
+
+    if (env['CXL_build_conf'] == 'INTERNAL'):
+        GPS_buildInternal = True
+        GPS_buildSuffix = "-Internal"
+    else:
+        GPS_buildInternal = False
+        GPS_buildSuffix = ""
+    
+    GPS_debugSuffix= "" #temp to be change for debug build
+    GPSprojectssuffix=GPS_platformSuffix+GPS_debugSuffix + GPS_buildSuffix
+    
+    env.Append(CommonPath = env['CXL_common_dir'])
+    env.Append(projectName = "CXLGraphicsServer")
+    env.Append(capturePlayerName = "CXLGraphicsServerPlayer")
+    env.Append(vulkanPluginName = "CXLGraphicsServerVulkan")
+    env.Append(rootFolderName = "Graphics")
+    
+    GDT_PLATFORM_SUFFIX="-D'GDT_PLATFORM_SUFFIX=\"" + GPS_platformSuffix + "\"'"
+    GDT_BUILD_SUFFIX="-D'GDT_BUILD_SUFFIX=\"" + GPS_buildSuffix + "\"'"
+    GDT_PROJECT_SUFFIX="-D'GDT_PROJECT_SUFFIX=\"" + GPSprojectssuffix + "\"'"
+
+    cpp_flags= ' ' + GDT_PLATFORM_SUFFIX + ' ' + GDT_BUILD_SUFFIX + ' ' + GDT_PROJECT_SUFFIX + ' -DGPS_PLUGIN_STATIC -DGL_FRAME_CAPTURE -DUSE_POINTER_SINGLETON -DGL_GLEXT_PROTOTYPES -DCODEXL_GRAPHICS '
+   
+    original_cpp_flag=env['CPPFLAGS']
+    original_cpp_flag = original_cpp_flag + cpp_flags
+    env.Replace(CPPFLAGS = original_cpp_flag) 
 
 #####################################
 # A component .py properties file takes the form

@@ -540,6 +540,40 @@ AMDTClassicMatMul += AMDTClassicMatMul_Obj
 
 ############################################
 #
+#  Graphics Server Backend Section
+#
+GPSBackend = []
+
+GPSAPICommon_Obj = SConscript(['Components/Graphics/Server/Common/SConscript'], variant_dir=obj_variant_dir+'/APICommon', duplicate=0)
+Depends(GPSAPICommon_Obj, OSWrappers_Obj)
+GPSBackend += GPSAPICommon_Obj
+
+# build script for Server/VulkanServer
+#GPS_env.rootFolder = os.getcwd()
+VulkanServer = SConscript(['Components/Graphics/Server/VulkanServer/SConscript'], variant_dir=obj_variant_dir+'/VulkanServer', duplicate=0)
+Depends(VulkanServer, GPSAPICommon_Obj + OSWrappers_Obj)
+#targetName = GPS_env.targetRoot + "/Plugins/" + GPS_env.vulkanPluginName + GPS_env.projectSuffix + ".so"
+#Command(targetName, fullPath + "/" + GPS_env.rootFolderName + "/Server/VulkanServer/libVulkanServer.so", Copy("$TARGET", "$SOURCE"))
+GPSBackend += VulkanServer
+
+# build script for Vulkan capture player
+CapturePlayer = SConscript(['Components/Graphics/Server/CapturePlayer/SConscript'], variant_dir=obj_variant_dir +'/CapturePlayer', duplicate=0)
+Depends(CapturePlayer, GPSAPICommon_Obj + OSWrappers_Obj)
+#targetName = GPS_env.targetRoot + "/" + GPS_env.capturePlayerName + GPS_env.projectSuffix
+#Command(targetName, fullPath + "/" + GPS_env.rootFolderName + "/CapturePlayer/CapturePlayer", Copy("$TARGET", "$SOURCE"))
+GPSBackend +=CapturePlayer
+
+# Build the graphics server
+GPUPerfServer = SConscript(['Components/Graphics/Server/WebServer/SConscript'], variant_dir=obj_variant_dir + '/GPUPerfServer', duplicate=0)
+Depends(GPUPerfServer, GPSAPICommon_Obj + OSWrappers_Obj)
+#targetName = GPS_env.targetRoot + "/" + GPS_env.projectName + GPS_env.projectSuffix
+#Command(targetName, fullPath + "/" + GPS_env.rootFolderName + "/Server/WebServer/GPUPerfServer", Copy("$TARGET", "$SOURCE"))
+GPSBackend +=GPUPerfServer
+
+
+
+############################################
+#
 # WebHelp content
 # The generation of the HTML files is performed by the WordToHelp tool in the Jenkins CodeXL-Doc job.
 # Here we only copy the quick start guide. The extraction of the HTML files from thier tar is performed 
@@ -564,7 +598,8 @@ CodeXL_Full = \
     AMDTSystemInformationHelper + \
     AMDTTeaPot + \
     AMDTClassicMatMul + \
-    KernelAnalyzer
+    KernelAnalyzer + \
+    GPSBackend
 
 Default(CodeXL_Full)
 #Feature group build
@@ -579,6 +614,7 @@ Alias( target='Teapot', source=(AMDTTeaPot))
 Alias( target='ClassicMatMul', source=(AMDTClassicMatMul))
 Alias( target='install'     , source=(CodeXL_Full))
 Alias( target='SysInfoHelper'     , source=(AMDTSystemInformationHelper))
+Alias( target='GPSBackend'     ,source=(GPSBackend))
 
 #Per project build support
 #FrameworkComponents
@@ -630,3 +666,8 @@ Alias( target='AMDTGpuProfiling'   , source=(GpuProf_Obj))
 Alias( target='AMDTBackEnd'   , source=(KernelAnalyzerBackend_Obj))
 Alias( target='AMDTKernelAnalyzer'   , source=(KernelAnalyzerFrontEnd_Obj))
 Alias( target='AMDTKernelAnalyzerCLI'   , source=(KernelAnalyzerCLI_Obj))
+#GPSBackend
+Alias( target='APICommon'   ,source=(GPSAPICommon_Obj))
+Alias( target='VulkanServer'   ,source=(VulkanServer))
+Alias( target='CapturePlayer'   ,source=(CapturePlayer))
+Alias( target='GPUPerfServer'   ,source=(GPUPerfServer))

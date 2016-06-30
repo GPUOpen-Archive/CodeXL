@@ -3,71 +3,38 @@
 # Main scons build file for Capture Player
 #
 
-Import('GPS_env')
-env = GPS_env.Clone()
-env.VulkanAPIVersion = "1.0.13.0"
-env['CPPPATH'] = env['GPS_PATH']
-env.Prepend (CPPPATH =
-[
-    '../Common/Linux',
-    '../../../Common/Lib/Ext/tinyxml/2.6.2',
-    '../../../Common/Lib/Ext/Vulkan/' + env.VulkanAPIVersion + '/SDK/Include',
-    '../../../Common/Lib/Ext/Vulkan/' + env.VulkanAPIVersion + '/SDK/Include/vulkan',
-    '../../../Common/Lib/Ext/Vulkan/' + env.VulkanAPIVersion + '/SDK/Source/loader',
-])
-env.Prepend (LIBPATH = env['GPS_LIBPATH'])
+from CXL_init import *
 
-env.Prepend(CCFLAGS =
-[
-    "-D'DATADIR=\"share\"'",
-    "-D'SYSCONFDIR=\"etc\"'",
-    "-DVK_USE_PLATFORM_XCB_KHR",
-    "-DVK_USE_PLATFORM_XLIB_KHR",
-    "-Dvulkan_EXPORTS",
-    "-Wall",
-    "-Wextra",
-])
+Import('*')
+env = CXL_env.Clone()
 
-lib_env = env.Clone()
+appName="CXLGraphicsServerPlayer"
 
-env.Prepend(CCFLAGS =
-[
-    '-std=c++11',
-])
+initGPSBackend (env)
+UseTinyXml (env)
+initVulkanSDK (env)
 
-lib_env.Prepend(CCFLAGS =
-[
-    "-std=c99"
-])
+env.Append (CPPPATH =[
+    env['CXL_commonproj_dir'],
+    env['CXL_commonproj_dir'] + '/../../CodeXL/Components/Graphics/Server/Common',
+    env['CXL_commonproj_dir'] + '/../../CodeXL/Components/Graphics/Server/Common/Linux',
+    ])
 
-lib_src = \
-[
-# loader
-    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/loader.c",
-    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/trampoline.c",
-    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/wsi.c",
-    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/debug_report.c",
-    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/cJSON.c",
-    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/murmurhash.c",
-    "../../../Common/Src/Vulkan/" + env.VulkanAPIVersion + "/SDK/Source/loader/dev_ext_trampoline.c",
-]
-
-loader_Obj = lib_env.StaticLibrary('loader', lib_src)
-
-# Add the loader library path
-env.Prepend (LIBPATH =
-[
-    '../../obj/' + env.platformPath + '/' + env.rootFolderName + '/Server/CapturePlayer',
-])
+GDT_DATADIR="-D'DATADIR=\"share\"'"
+GDT_SYSCONFDIR="-D'SYSCONFDIR=\"etc\"'"
+cpp_flags= ' ' + GDT_DATADIR + ' ' + GDT_SYSCONFDIR+ ' -Dvulkan_EXPORTS -DVK_USE_PLATFORM_XCB_KHR -DVK_USE_PLATFORM_XLIB_KHR '
+original_cpp_flag=env['CPPFLAGS']
+original_cpp_flag = original_cpp_flag + cpp_flags
+env.Replace(CPPFLAGS = original_cpp_flag) 
 
 # These need to be in their dependency order. Most derived first
 env['LIBS'] = \
 [
     #internal libraries
-    "libCommon",
-    "libAMDTOSWrappers",
-    "libAMDTBaseTools",
-    "libloader",
+    "libCXLGraphicsServerCommon",
+    "libCXLOSWrappers",
+    "libCXLBaseTools",
+    "libvulkan",
     #enternal libraries
     "rt",
     "pthread",
@@ -76,17 +43,19 @@ env['LIBS'] = \
     "xcb"
 ]
 
-# build the Capture Player executable
-
-sources = \
-[
+sources = [
     "PlayerMain.cpp",
     "XcbWindow.cpp",
     "VulkanPlayer.cpp",
-]
+    ]
 
-CapturePlayer = env.Program('CapturePlayer', sources)
+exe = env.Program(
+    target = appName,
+    source = sources)
 
-Depends(CapturePlayer, loader_Obj)
+# Installing libraries
+libInstall = env.Install(
+    dir = env['CXL_lib_dir'],
+    source = (exe))
 
-Return('CapturePlayer')
+Return('libInstall')

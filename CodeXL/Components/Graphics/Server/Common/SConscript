@@ -1,37 +1,36 @@
 #
-# Main scons build file for GLServer
+# Main scons build file for GraphicsServerCommon
 #
+from CXL_init import *
 
-Import('GPS_env')
-env = GPS_env.Clone()
-env['CPPPATH'] = env['GPS_PATH']
-env.Prepend (CPPPATH =
-[
-    '../../../Common/Lib/Ext/tinyxml/2.6.2',
-])
+Import('*')
+env = CXL_env.Clone()
 
-env.Prepend(CCFLAGS =
-[
-    '-Wall',
-    '-Wextra',
-    '-std=c++11',
-])
+libName = "CXLGraphicsServerCommon"
+
+initGPSBackend (env)
+UseTinyXml (env)
+UseGPUPerfAPI (env)
+UseBoost (env)
+initjpglib (env)
+
+env.Append(CPPPATH = [
+    env['CXL_commonproj_dir'] + '/../../CodeXL/Components/Graphics',
+    env['CXL_commonproj_dir'] + '/../../CodeXL/Components/Graphics/Server/Common',
+    env['CXL_commonproj_dir'] + '/../../CodeXL/Components/Graphics/Server/Common/Linux',
+    env['CXL_commonproj_dir'] + '/../../CodeXL/Components/Graphics/Server/Common/Tracing',
+    env['CXL_commonproj_dir'] + '/GPUPerfAPIUtils',
+    env['CXL_commonproj_dir'],
+    ])
 
 # build the Common Server static library
 
 sources = \
 [
-    # TinyXML
-    "../../../Common/Lib/Ext/tinyxml/2.6.2/tinystr.cpp",
-    "../../../Common/Lib/Ext/tinyxml/2.6.2/tinyxmlparser.cpp",
-    "../../../Common/Lib/Ext/tinyxml/2.6.2/tinyxml.cpp",
-    "../../../Common/Lib/Ext/tinyxml/2.6.2/tinyxmlerror.cpp",
 
     # Files needed for GPA
     "../../../Common/Src/GPUPerfAPIUtils/GPUPerfAPILoader.cpp",
     "../../../Common/Src/GPUPerfAPIUtils/GPUPerfAPIUtil.cpp",
-#    "../../../Common/Src/ADLUtil/ADLUtil.cpp",
-#    "../../../Common/Src/AMDTMutex/AMDTMutex.cpp",
 
     "BufferDelta.cpp",
     "Capture.cpp",
@@ -45,9 +44,6 @@ sources = \
     "DeltaAccumulationBuffer.cpp",
     "ErrorImage.cpp",
     "HookTimer.cpp",
-    "FDPipeline.cpp",
-    "FDPipelineShaderStage.cpp",
-    "FDPipelineStage.cpp",
     "FrameDebugger.cpp",
     "FrameInfo.cpp",
     "FrameProfiler.cpp",
@@ -96,5 +92,16 @@ sources = \
     "Linux/timerLinux.cpp"
 ]
 
-Common = env.StaticLibrary('Common', sources)
-Return('Common')
+# Creating object files	
+objFiles = env.SharedObject(sources)
+
+statFiles = env.StaticLibrary(
+    target = libName,
+    source =objFiles)
+install = statFiles
+
+# Installing libraries
+libInstall = env.Install(
+    dir = env['CXL_lib_dir'],
+    source = (install))
+Return('libInstall')

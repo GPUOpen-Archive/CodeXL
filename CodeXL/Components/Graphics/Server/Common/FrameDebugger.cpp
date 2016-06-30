@@ -15,10 +15,10 @@
 /// Constructor
 //--------------------------------------------------------------------------
 FrameDebugger::FrameDebugger() :
-    m_LastDrawCall(nullptr),
     m_dwBreakPoint(0),
-    m_bAutoRenderTarget(true),
     m_ulDrawCallCounter(0),
+    m_LastDrawCall(nullptr),
+    m_bAutoRenderTarget(true),
     m_bForceClear(true)
 {
     m_ClearColor[0] = 0.0f; // red
