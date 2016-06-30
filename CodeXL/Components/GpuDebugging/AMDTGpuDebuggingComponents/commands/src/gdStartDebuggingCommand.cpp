@@ -641,21 +641,28 @@ bool gdStartDebuggingCommand::StartDebugging()
                         static const gtString falseString2 = L"no";
                         static const gtString falseString3 = L"off";
 
-                        if (commandOutput.isEmpty() || (-1 != commandOutput.find(errorString)))
+                        static const gtString missingString1 = L"aticonfig";
+                        static const gtString missingString2 = L"not found";
+
+                        if (commandOutput.isEmpty() || ((-1 != commandOutput.find(missingString1)) && (-1 != commandOutput.find(missingString2))))
+                        {
+                            // aticonfig was not found, so signal blocking cannot be disabled:
+                            areLinuxSignalsBlocked = false;
+
+                            // This is expected on HSA systems:
+                            if (!isHSASystem)
+                            {
+                                // Also log this unexpected situation (happens e.g. with open-source drivers)
+                                OS_OUTPUT_DEBUG_LOG(L"AMD driver without aticonfig detected. Signal blocking may occur.", OS_DEBUG_LOG_DEBUG);
+                            }
+                        }
+                        else if ((-1 != commandOutput.find(errorString)))
                         {
                             // On any error, we assume default behavior, which is blocking:
                             areLinuxSignalsBlocked = true;
-                            GT_IF_WITH_ASSERT(isHSASystem && commandOutput.isEmpty())
-                            {
-                                // On HSA systems where aticonfig is not found, there is no need to disable signal blocking:
-                                areLinuxSignalsBlocked = false;
-                            }
-                            else
-                            {
-                                gtString logMsg = commandOutput;
-                                logMsg.prepend(L"Unexpected output from aticonfig: ");
-                                OS_OUTPUT_DEBUG_LOG(logMsg.asCharArray(), OS_DEBUG_LOG_DEBUG);
-                            }
+                            gtString logMsg = commandOutput;
+                            logMsg.prepend(L"Unexpected output from aticonfig: ");
+                            OS_OUTPUT_DEBUG_LOG(logMsg.asCharArray(), OS_DEBUG_LOG_DEBUG);
                         }
                         else if ((commandOutput.find(trueString1) != -1) || (commandOutput.find(trueString2) != -1) || (commandOutput.find(trueString3) != -1) || (commandOutput.find('1') != -1))
                         {
