@@ -78,6 +78,7 @@ void PluginResponseThread::WaitForPluginResponses(void* pData)
                     RequestsInFlightDatabase::Instance()->Remove(client_socket);
 #endif
 #endif
+
                     // now try to get the mime type
                     if (smGet("PLUGINS_TO_GPS", &pcMimeType, PS_MAX_PATH) > 0)
                     {

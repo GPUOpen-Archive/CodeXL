@@ -127,26 +127,26 @@ gtASCIIString ProcessTracker::GetProcessesXML()
                 // CodeXL does support connecting to the DXGI API and it appears in Vulkan/OpenGL apps which confuses the users.
                 if (wrapperIter->first != "DXGI")
                 {
-                if (SG_GET_BOOL(OptionDllReplacement) == false)
-                {
-                    strPluginName += pluginExtensions[loop];
-                }
-
-                if (IsLibraryLoadedInProcess(pid, strPluginName.asCharArray(), NULL))
-                {
-                    bool attached = false;
-
-                    if (g_activeWrappersMap.find(FormatText("%lu/%s", pid, wrapperIter->first.c_str()).asCharArray()) != g_activeWrappersMap.end())
+                    if (SG_GET_BOOL(OptionDllReplacement) == false)
                     {
-                        // the pid/plugin string was listed in the active wrappers map, so the plugin must be active.
-                        attached = true;
+                        strPluginName += pluginExtensions[loop];
                     }
 
-                    procXMLMap[pid] += XMLAttrib("API", FormatText("attached='%s'", attached ? "TRUE" : "FALSE").asCharArray(), wrapperIter->second.strPluginShortDesc.asCharArray());
+                    if (IsLibraryLoadedInProcess(pid, strPluginName.asCharArray(), NULL))
+                    {
+                        bool attached = false;
+
+                        if (g_activeWrappersMap.find(FormatText("%lu/%s", pid, wrapperIter->first.c_str()).asCharArray()) != g_activeWrappersMap.end())
+                        {
+                            // the pid/plugin string was listed in the active wrappers map, so the plugin must be active.
+                            attached = true;
+                        }
+
+                        procXMLMap[pid] += XMLAttrib("API", FormatText("attached='%s'", attached ? "TRUE" : "FALSE").asCharArray(), wrapperIter->second.strPluginShortDesc.asCharArray());
+                    }
                 }
             }
         }
-    }
     }
 
     // concatenate the process XML and additional info
