@@ -38,6 +38,14 @@
 #define GP_SESSION_VIEW_BUTTON_SIZE 72
 
 // ---------------------------------------------------------------------------
+// variable and function for loading cancellation
+bool m_sShouldCancelLoad = false;
+void OnCancelLoad()
+{
+    m_sShouldCancelLoad = true;
+}
+
+// ---------------------------------------------------------------------------
 // Name:        gpSessionView
 // Description: constructor
 // Author:      Gilad Yarnitzky
@@ -283,41 +291,47 @@ void gpSessionView::FillOfflineSessionThumbnails()
     QList<FrameIndex> frameIndicesList;
     gpUIManager::Instance()->GetListOfFrameFolders(m_sessionFilePath, frameIndicesList);
 
-    afProgressBarWrapper::instance().ShowProgressDialog(GPU_STR_TraceViewLoadingFASession, frameIndicesList.size());
+    m_sShouldCancelLoad = false;
+    afProgressBarWrapper::instance().ShowProgressDialog(GPU_STR_TraceViewLoadingFASession, frameIndicesList.size(), 0, true, &OnCancelLoad);
 
     foreach (FrameIndex frameIndex, frameIndicesList)
     {
-        // Get the directory, overview and thumbnail paths for this frame
-        QDir frameDir;
-        QString overviewFilePath, thumbnailFilePath;
-        FrameInfo currentFrameInfo;
-        bool rc = gpUIManager::Instance()->GetPathsForFrame(m_sessionFilePath, frameIndex, frameDir, overviewFilePath, thumbnailFilePath);
-        GT_IF_WITH_ASSERT(rc)
+        if (m_sShouldCancelLoad == false)
         {
-            // Get the frame info and thumb data
-            rc = gpUIManager::Instance()->GetFrameImageAndInfo(overviewFilePath, currentFrameInfo);
-
-            if (rc)
+            // Get the directory, overview and thumbnail paths for this frame
+            QDir frameDir;
+            QString overviewFilePath, thumbnailFilePath;
+            FrameInfo currentFrameInfo;
+            bool rc = gpUIManager::Instance()->GetPathsForFrame(m_sessionFilePath, frameIndex, frameDir, overviewFilePath, thumbnailFilePath);
+            GT_IF_WITH_ASSERT(rc)
             {
-                // Add the captured frame
-                AddCapturedFrame(currentFrameInfo);
-            }
+                // Get the frame info and thumb data
+                rc = gpUIManager::Instance()->GetFrameImageAndInfo(overviewFilePath, currentFrameInfo);
 
-            afProgressBarWrapper::instance().incrementProgressBar();
+                if (rc)
+                {
+                    // Add the captured frame
+                    AddCapturedFrame(currentFrameInfo);
+                }
+
+                afProgressBarWrapper::instance().incrementProgressBar();
+            }
         }
     }
 
     afProgressBarWrapper::instance().hideProgressBar();
-    GT_IF_WITH_ASSERT(m_pSnapshotsThumbView != nullptr)
+    if (m_sShouldCancelLoad == false)
     {
-        if (!frameIndicesList.isEmpty())
+        GT_IF_WITH_ASSERT(m_pSnapshotsThumbView != nullptr)
         {
-            // Select the first thumbnail (we want the main image to be filled with one of the frame)
-            m_pSnapshotsThumbView->SetSelected(0, true);
+            if (!frameIndicesList.isEmpty())
+            {
+                // Select the first thumbnail (we want the main image to be filled with one of the frame)
+                m_pSnapshotsThumbView->SetSelected(0, true);
+            }
         }
+        UpdateCaption();
     }
-    UpdateCaption();
-
 }
 
 bool gpSessionView::DisplaySession(const osFilePath& sessionFilePath, afTreeItemType sessionInnerPage, QString& errorMessage)
@@ -387,12 +401,20 @@ bool gpSessionView::DisplaySession(const osFilePath& sessionFilePath, afTreeItem
             {
                 FillOfflineSessionThumbnails();
             }
+            if (m_sShouldCancelLoad)
+            {
+                retVal = false;
 
-            int itemsCount = m_pSnapshotsThumbView->ItemsCount();
-            m_pOpenTimelineButton->setVisible(!m_isSessionRunning && (itemsCount > 0));
+                errorMessage = "Loading was canceled by the user";
+            }
+            else
+            {
+                int itemsCount = m_pSnapshotsThumbView->ItemsCount();
+                m_pOpenTimelineButton->setVisible(!m_isSessionRunning && (itemsCount > 0));
 
-            QString caption = m_isSessionRunning ? GPU_STR_dashboard_MainImageCaptionRunning : GPU_STR_dashboard_MainImageCaptionStopped;
-            m_pCurrentFrameCaptionLabel->setText(caption);
+                QString caption = m_isSessionRunning ? GPU_STR_dashboard_MainImageCaptionRunning : GPU_STR_dashboard_MainImageCaptionStopped;
+                m_pCurrentFrameCaptionLabel->setText(caption);
+            }
         }
     }
 

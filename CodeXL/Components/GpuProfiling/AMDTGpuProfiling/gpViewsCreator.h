@@ -257,7 +257,7 @@ private:
     /// \param pNewSessionWindow the session created window
     /// \param sessionFilePath the session file path
     /// \param displayItemInView the type of the item that should be displayed within the view
-    bool LoadFrameAnalysisView(SharedSessionWindow* pNewSessionWindow, const osFilePath& sessionFilePath, afTreeItemType displayItemInView);
+    bool LoadFrameAnalysisView(SharedSessionWindow* pNewSessionWindow, const osFilePath& sessionFilePath, afTreeItemType displayItemInView, QString& errorMessage);
 
     /// Convert a session path to a session name
     /// \param sessionFilePath the session full file path

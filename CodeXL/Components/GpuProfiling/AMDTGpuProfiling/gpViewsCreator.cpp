@@ -643,8 +643,8 @@ bool gpViewsCreator::GetWidgetForFilePath(GPUWindowType profileType, QWidget* pP
 
     GT_IF_WITH_ASSERT(nullptr != pCreatedSessionWindow)
     {
-        // Insert the session window to the map
-        m_filePathToSessionWindowsMap[pathToDisplay] = pCreatedSessionWindow;
+        //// Insert the session window to the map
+        //m_filePathToSessionWindowsMap[pathToDisplay] = pCreatedSessionWindow;
 
         pWidget = pCreatedSessionWindow;
 
@@ -666,7 +666,12 @@ bool gpViewsCreator::GetWidgetForFilePath(GPUWindowType profileType, QWidget* pP
         retVal = LoadFileToView(pCreatedSessionWindow, pathToDisplay, itemType, errorMessage);
     }
 
-    if (!retVal)
+    if (retVal)
+    {
+        // Insert the session window to the map
+        m_filePathToSessionWindowsMap[pathToDisplay] = pCreatedSessionWindow;
+    }
+    else
     {
         if (errorMessage.isEmpty())
         {
@@ -1125,7 +1130,7 @@ bool gpViewsCreator::LoadFileToView(SharedSessionWindow* pNewSessionWindow, cons
                 if (pSessionView != nullptr)
                 {
                     // Load the DX session
-                    retVal = LoadFrameAnalysisView(pNewSessionWindow, sessionFilePath, displayItemInView);
+                    retVal = LoadFrameAnalysisView(pNewSessionWindow, sessionFilePath, displayItemInView, errorMessage);
                 }
             }
         }
@@ -1135,7 +1140,7 @@ bool gpViewsCreator::LoadFileToView(SharedSessionWindow* pNewSessionWindow, cons
 
 }
 
-bool gpViewsCreator::LoadFrameAnalysisView(SharedSessionWindow* pNewSessionWindow, const osFilePath& sessionFilePath, afTreeItemType displayItemInView)
+bool gpViewsCreator::LoadFrameAnalysisView(SharedSessionWindow* pNewSessionWindow, const osFilePath& sessionFilePath, afTreeItemType displayItemInView, QString& errorMessage)
 {
     bool retVal = false;
 
@@ -1149,13 +1154,7 @@ bool gpViewsCreator::LoadFrameAnalysisView(SharedSessionWindow* pNewSessionWindo
         pSessionView->SetSessionFilePath(sessionFilePath);
 
         // Display the session
-        QString errorMessage;
         retVal = pSessionView->DisplaySession(sessionFilePath, displayItemInView, errorMessage);
-
-        if (!errorMessage.isEmpty())
-        {
-            Util::ShowErrorBox(errorMessage);
-        }
     }
     return retVal;
 

@@ -917,63 +917,66 @@ QWidget* appMainAppWindow::createSingleView(afViewCreatorAbstract* pCreator, int
             pQTWidget->setMinimumSize(initSize);
         }
 
-        // Create the QT window that is wrapping the widget:
-        GT_IF_WITH_ASSERT(pQTWidget != nullptr)
+        if (contentWasCreated)
         {
-            pRetVal = createQTWindowForView(viewIndex, pCreator, pQTWidget);
-            GT_IF_WITH_ASSERT(pRetVal)
+            // Create the QT window that is wrapping the widget:
+            GT_IF_WITH_ASSERT(pQTWidget != nullptr)
             {
-                // Create the view that is going to be wrapper:
-                if (!contentWasCreated)
+                pRetVal = createQTWindowForView(viewIndex, pCreator, pQTWidget);
+                GT_IF_WITH_ASSERT(pRetVal)
                 {
-                    QWidget* pContentWidget = nullptr;
-                    contentWasCreated = pCreator->createViewContent(viewIndex, pContentWidget, pRetVal);
-                }
-
-                GT_IF_WITH_ASSERT((pRetVal != nullptr) && contentWasCreated)
-                {
-                    // Get the icon pixmap:
-                    QPixmap* pIconPixmap = pCreator->iconAsPixmap(viewIndex);
-
-                    if (pIconPixmap != nullptr)
+                    // Create the view that is going to be wrapper:
+                    if (!contentWasCreated)
                     {
-                        pRetVal->setWindowIcon(*pIconPixmap);
-                    }
-                    else
-                    {
-                        // Set a default window icon:
-                        QPixmap icon16;
-                        acSetIconInPixmap(icon16, afGlobalVariablesManager::ProductIconID(), AC_16x16_ICON);
-                        pRetVal->setWindowIcon(icon16);
+                        QWidget* pContentWidget = nullptr;
+                        contentWasCreated = pCreator->createViewContent(viewIndex, pContentWidget, pRetVal);
                     }
 
-                    // Get the view type
-                    viewType = pCreator->type(viewIndex);
-
-                    if (viewType == afViewCreatorAbstract::AF_VIEW_mdi)
+                    GT_IF_WITH_ASSERT((pRetVal != nullptr) && contentWasCreated)
                     {
-                        // Get the view initial size:
-                        QSize initSize = pCreator->initialSize(viewIndex);
+                        // Get the icon pixmap:
+                        QPixmap* pIconPixmap = pCreator->iconAsPixmap(viewIndex);
 
-                        // If it is an MDI window, use the MdiArea size as the real size:
-                        initSize.setWidth(m_pMDIArea->size().width());
-                        initSize.setHeight(m_pMDIArea->size().height());
+                        if (pIconPixmap != nullptr)
+                        {
+                            pRetVal->setWindowIcon(*pIconPixmap);
+                        }
+                        else
+                        {
+                            // Set a default window icon:
+                            QPixmap icon16;
+                            acSetIconInPixmap(icon16, afGlobalVariablesManager::ProductIconID(), AC_16x16_ICON);
+                            pRetVal->setWindowIcon(icon16);
+                        }
 
-                        pRetVal->resize(initSize.width(), initSize.height());
+                        // Get the view type
+                        viewType = pCreator->type(viewIndex);
+
+                        if (viewType == afViewCreatorAbstract::AF_VIEW_mdi)
+                        {
+                            // Get the view initial size:
+                            QSize initSize = pCreator->initialSize(viewIndex);
+
+                            // If it is an MDI window, use the MdiArea size as the real size:
+                            initSize.setWidth(m_pMDIArea->size().width());
+                            initSize.setHeight(m_pMDIArea->size().height());
+
+                            pRetVal->resize(initSize.width(), initSize.height());
+                        }
+
+                        bool rcAddViewAction = addActionForView(pCreator, viewIndex, pRetVal);
+                        GT_ASSERT(rcAddViewAction);
+                        // Set visibility hidden if needed:
+                        bool isVisible = pCreator->visibility(viewIndex);
+
+                        // Set the item visibility:
+                        pRetVal->setVisible(isVisible);
+                        pQTWidget->setVisible(true);
+
+                        // Update the widget:
+                        pRetVal->update();
+                        m_pMDIArea->update();
                     }
-
-                    bool rcAddViewAction = addActionForView(pCreator, viewIndex, pRetVal);
-                    GT_ASSERT(rcAddViewAction);
-                    // Set visibility hidden if needed:
-                    bool isVisible = pCreator->visibility(viewIndex);
-
-                    // Set the item visibility:
-                    pRetVal->setVisible(isVisible);
-                    pQTWidget->setVisible(true);
-
-                    // Update the widget:
-                    pRetVal->update();
-                    m_pMDIArea->update();
                 }
             }
         }
