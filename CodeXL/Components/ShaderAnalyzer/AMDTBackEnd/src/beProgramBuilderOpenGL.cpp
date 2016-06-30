@@ -299,6 +299,8 @@ bool beProgramBuilderOpenGL::GetDeviceGLInfo(const std::string& deviceName, size
         glBackendValues["Spooky"] = std::pair<int, int>(120, 65);
         glBackendValues["Tahiti"] = std::pair<int, int>(110, 0);
         glBackendValues["Tonga"] = std::pair<int, int>(130, 20);
+        glBackendValues["Baffin"] = std::pair<int, int>(130, 91);
+        glBackendValues["Ellesmere"] = std::pair<int, int>(130, 89);
     }
 
     // Fetch the relevant value.
