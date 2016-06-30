@@ -292,16 +292,19 @@ kaProgram* kaRenderingProgram::Clone() const
 bool kaRenderingProgram::HasFile(int fileId, afTreeItemType itemType) const
 {
     bool retVal = false;
-
-    kaPipelinedProgram::PipelinedStage stage = TreeItemTypeToRenderingStage(itemType);
-
-    if (stage != KA_PIPELINE_STAGE_NONE)
+    //fileId == -1 means by default we don't have such file
+    if (fileId > -1)
     {
-        retVal = (m_fileIDsVector[stage] == fileId);
-    }
-    else
-    {
-        retVal = kaProgram::HasFile(fileId, AF_TREE_ITEM_ITEM_NONE);
+        kaPipelinedProgram::PipelinedStage stage = TreeItemTypeToRenderingStage(itemType);
+
+        if (stage != KA_PIPELINE_STAGE_NONE)
+        {
+            retVal = (m_fileIDsVector[stage] == fileId);
+        }
+        else
+        {
+            retVal = kaProgram::HasFile(fileId, AF_TREE_ITEM_ITEM_NONE);
+        }
     }
 
     return retVal;
