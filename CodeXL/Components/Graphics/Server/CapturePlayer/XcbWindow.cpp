@@ -8,7 +8,7 @@
 #include <X11/Xlib.h>
 #include "XcbWindow.h"
 
-#include "Logger.h"
+#include "../Common/Logger.h"
 
 const char* kWindowTitle = "Capture Player - [PLACEHOLDER].ACR"; ///< Window title
 
