@@ -419,7 +419,7 @@ void CloseGenericCounterAccess(void)
 }
 
 // GetBasicCounterSize
-uint32 GetBasicCounterSize()
+uint32 GetBasicCounterSize(void)
 {
     uint32 bufferLen = 0;
     //COUNTERID_SAMPLE_ID:
