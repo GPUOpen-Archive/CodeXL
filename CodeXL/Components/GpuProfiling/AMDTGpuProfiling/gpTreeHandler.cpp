@@ -31,6 +31,11 @@
 
 #define GP_PROGRESS_COEF 10
 
+bool m_sShouldCancelExport = false;
+void OnCancelExport()
+{
+    m_sShouldCancelExport = true;
+}
 
 /// compare directory based on session index
 /// \param sessionOneDir first directory
@@ -1103,22 +1108,24 @@ void gpTreeHandler::AddCountersDataFileToSession(const osFilePath& countersFileP
 
 bool gpTreeHandler::ExportFile(const osDirectory& sessionDir, const QString& exportFilePath, SessionTreeNodeData* pSessionData)
 {
+    bool success = false;
     SharedProfileManager::instance().setExportIsRunning(true);
     afApplicationCommands* pApplicationCommands = afApplicationCommands::instance();
     pApplicationCommands->updateToolbarCommands();
 
     PrepareTraceForSessionFrames(sessionDir, pSessionData);
+    if (m_sShouldCancelExport == false)
+    {
+        QString currentProjectPath = acGTStringToQString(afProjectManager::instance().currentProjectFilePath().fileDirectoryAsString());
+        osFilePath filePath;
+        acQStringToOSFilePath(currentProjectPath, filePath);
 
-    QString currentProjectPath = acGTStringToQString(afProjectManager::instance().currentProjectFilePath().fileDirectoryAsString());
-    osFilePath filePath;
-    acQStringToOSFilePath(currentProjectPath, filePath);
-
-    osDirectorySerializer dirSerailzer;
-    bool success = dirSerailzer.CompressDir(sessionDir, acQStringToGTString(exportFilePath));
+        osDirectorySerializer dirSerailzer;
+        success = dirSerailzer.CompressDir(sessionDir, acQStringToGTString(exportFilePath));
+    }
 
     SharedProfileManager::instance().setExportIsRunning(false);
     pApplicationCommands->updateToolbarCommands();
-
     return success;
 }
 
@@ -1143,40 +1150,44 @@ bool gpTreeHandler::PrepareTraceForSessionFrames(const osDirectory& sessionDir, 
 
     if (isFrameAnalysisExport)
     {
-        afProgressBarWrapper::instance().ShowProgressDialog(GP_STR_FrameAnalysisExportProgressMsg, frameIndicesList.size()*GP_PROGRESS_COEF);
+        m_sShouldCancelExport = false;
+        afProgressBarWrapper::instance().ShowProgressDialog(GP_STR_FrameAnalysisExportProgressMsg, frameIndicesList.size()*GP_PROGRESS_COEF, 0, true, &OnCancelExport);
         afProgressBarWrapper::instance().SetProgressDialogCaption(GP_STR_FrameAnalysisExportProgressHeader);
     }
 
     foreach (FrameIndex frameIndex, frameIndicesList)
     {
-        if (isFrameAnalysisExport)
+        if (m_sShouldCancelExport == false)
         {
-            gtString msg;
-            if (frameIndex.first == frameIndex.second)
+            if (isFrameAnalysisExport)
             {
-                msg.appendFormattedString(GP_STR_FrameAnalysisExportCapturingFrameSingleMsg, frameIndex.first);
+                gtString msg;
+                if (frameIndex.first == frameIndex.second)
+                {
+                    msg.appendFormattedString(GP_STR_FrameAnalysisExportCapturingFrameSingleMsg, frameIndex.first);
+                }
+                else
+                {
+                    msg.appendFormattedString(GP_STR_FrameAnalysisExportCapturingFrameMultiMsg, frameIndex.first, frameIndex.second);
+                }
+                afProgressBarWrapper::instance().setProgressText(msg);
+                afProgressBarWrapper::instance().incrementProgressBar(GP_PROGRESS_COEF / 2);
             }
-            else
+
+            // Get the directory, overview and thumbnail paths for this frame
+            QDir frameDir;
+            QString overviewFilePath, thumbnailFilePath;
+            FrameInfo currentFrameInfo;
+            bool rc = gpUIManager::Instance()->GetPathsForFrame(sessionFilePath, frameIndex, frameDir, overviewFilePath, thumbnailFilePath);
+            GT_IF_WITH_ASSERT(rc && pModeManager != nullptr)
             {
-                msg.appendFormattedString(GP_STR_FrameAnalysisExportCapturingFrameMultiMsg, frameIndex.first, frameIndex.second);
+                retVal &= pModeManager->PrepareTraceFile(sessionFilePath, frameIndex, pSessionData, nullptr, false);
             }
-            afProgressBarWrapper::instance().setProgressText(msg);
-            afProgressBarWrapper::instance().incrementProgressBar(GP_PROGRESS_COEF / 2);
-        }
 
-        // Get the directory, overview and thumbnail paths for this frame
-        QDir frameDir;
-        QString overviewFilePath, thumbnailFilePath;
-        FrameInfo currentFrameInfo;
-        bool rc = gpUIManager::Instance()->GetPathsForFrame(sessionFilePath, frameIndex, frameDir, overviewFilePath, thumbnailFilePath);
-        GT_IF_WITH_ASSERT(rc && pModeManager != nullptr)
-        {
-            retVal &= pModeManager->PrepareTraceFile(sessionFilePath, frameIndex, pSessionData, nullptr, false);
-        }
-
-        if (isFrameAnalysisExport)
-        {
-            afProgressBarWrapper::instance().incrementProgressBar(GP_PROGRESS_COEF / 2);
+            if (isFrameAnalysisExport)
+            {
+                afProgressBarWrapper::instance().incrementProgressBar(GP_PROGRESS_COEF / 2);
+            }
         }
     }
 

@@ -271,11 +271,6 @@ void ProfileManager::AddSessionToExplorer(GPUSessionTreeItemData* pSessionData, 
             // Also, notify the naming helper of the session being added (since the explorer won't do it for us here)
             m_deferredSessionList.append(pSessionData);
         }
-
-        if (doShow)
-        {
-            gpViewsCreator::Instance()->ShowSession(pSessionData, AF_TREE_ITEM_PROFILE_GPU_SUMMARY);
-        }
     }
 }
 

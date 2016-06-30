@@ -43,10 +43,10 @@
 #pragma message ("TODO: FA: remove GPUSessionTreeItemData from this class. Class should get a file path, and the occupancy data should be parsed differently")
 
 /// True iff the user canceled the operation
-bool m_sShouldCancelParsingObj = false;
+bool m_sShouldCancelExport = false;
 void OnCancelObj()
 {
-    m_sShouldCancelParsingObj = true;
+    m_sShouldCancelExport = true;
 }
 
 gpObjectDataParser::gpObjectDataParser() :
@@ -57,7 +57,7 @@ gpObjectDataParser::gpObjectDataParser() :
     /// Initialize the data container
     m_pSessionDataContainer = new gpObjectDataContainer;
 
-    m_sShouldCancelParsingObj = false;
+    m_sShouldCancelExport = false;
 }
 
 gpObjectDataParser::~gpObjectDataParser()
@@ -148,8 +148,8 @@ bool gpObjectDataParser::Parse(const osFilePath& objectFilePath, GPUSessionTreeI
             }
 
             // Set the user cancelation flag
-            wasParseCanceled = m_sShouldCancelParsingObj;
-            m_sShouldCancelParsingObj = false;
+            wasParseCanceled = m_sShouldCancelExport;
+            m_sShouldCancelExport = false;
         }
     }
 
@@ -161,7 +161,7 @@ void gpObjectDataParser::OnParse(CLAPIInfo* pAPIInfo, bool& stopParsing)
     // Sanity check:
     GT_IF_WITH_ASSERT(pAPIInfo != nullptr)
     {
-        stopParsing = m_sShouldCancelParsingObj;
+        stopParsing = m_sShouldCancelExport;
 
         if (m_pSessionDataContainer->APICount() > GP_MAX_OBJECT_TO_PARSE)
         {
@@ -175,7 +175,7 @@ void gpObjectDataParser::OnParse(HSAAPIInfo* pAPIInfo, bool& stopParsing)
     // Sanity check:
     GT_IF_WITH_ASSERT(pAPIInfo != nullptr)
     {
-        stopParsing = m_sShouldCancelParsingObj;
+        stopParsing = m_sShouldCancelExport;
 
         if (pAPIInfo->m_apiID != HSA_API_Type_Non_API_Dispatch)
         {
@@ -192,7 +192,7 @@ void gpObjectDataParser::OnParse(HSAAPIInfo* pAPIInfo, bool& stopParsing)
 
 void gpObjectDataParser::OnParse(SymbolFileEntry* pSymbolFileEntry, bool& stopParsing)
 {
-    stopParsing = m_sShouldCancelParsingObj;
+    stopParsing = m_sShouldCancelExport;
 
     // Sanity check
     GT_IF_WITH_ASSERT((pSymbolFileEntry != nullptr) && (m_pSessionDataContainer != nullptr))
@@ -237,7 +237,7 @@ void gpObjectDataParser::OnParse(DX12APIInfo* pAPIInfo, bool& stopParsing)
     // Sanity check:
     GT_IF_WITH_ASSERT((pAPIInfo != nullptr) && (m_pSessionDataContainer != nullptr))
     {
-        stopParsing = m_sShouldCancelParsingObj;
+        stopParsing = m_sShouldCancelExport;
 
         if (!pAPIInfo->m_isGPU)
         {
@@ -257,7 +257,7 @@ void gpObjectDataParser::OnParse(VKAPIInfo* pAPIInfo, bool& stopParsing)
     // Sanity check:
     GT_IF_WITH_ASSERT((pAPIInfo != nullptr) && (m_pSessionDataContainer != nullptr))
     {
-        stopParsing = m_sShouldCancelParsingObj;
+        stopParsing = m_sShouldCancelExport;
 
         if (!pAPIInfo->m_isGPU)
         {
