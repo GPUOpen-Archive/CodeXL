@@ -432,6 +432,7 @@ bool GetRequiredBufferLength(CoreData* pCfg, uint32* pLength)
                             }
 
                             case SMU_IPVERSION_8_0:
+                            case SMU_IPVERSION_8_1:
                             {
                                 for (attrCnt = 0; attrCnt < COUNTERID_SMU8_CNT; attrCnt++)
                                 {

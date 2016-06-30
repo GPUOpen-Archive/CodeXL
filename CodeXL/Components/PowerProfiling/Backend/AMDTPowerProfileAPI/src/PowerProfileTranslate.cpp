@@ -811,7 +811,8 @@ AMDTResult PowerProfileTranslate::TranslateRawData()
                             {
                                 len = DecodeSmu7Counters(pDecodeInfo, &m_data, pRaw + offset, &idx);
                             }
-                            else if (SMU_IPVERSION_8_0 == pDecodeInfo->m_smuIpVersion)
+                            else if ((SMU_IPVERSION_8_0 == pDecodeInfo->m_smuIpVersion)
+                                     || (SMU_IPVERSION_8_1 == pDecodeInfo->m_smuIpVersion))
                             {
                                 len = DecodeSmu8Counters(pDecodeInfo, &m_data, pRaw + offset, &idx);
                             }

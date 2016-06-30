@@ -678,7 +678,7 @@ bool PwrEnableProcessProfileCounters()
     {
         AMDTUInt32 smuVersion = g_sysInfo.m_smuTable.m_info[0].m_smuIpVersion;
 
-        if (SMU_IPVERSION_8_0 == smuVersion)
+        if ((SMU_IPVERSION_8_0 == smuVersion) || (SMU_IPVERSION_8_1 == smuVersion))
         {
             pwrCounter = COUNTERID_SMU8_APU_PWR_CU;
         }
@@ -847,7 +847,6 @@ bool PwrConfigureProfile()
         if (iter.second.m_isActive)
         {
             AMDTUInt32 smuIdx = iter.second.m_pkgId - 1;
-            PwrTrace("smuIdx %d g_sysInfo.m_isAmdApu %d",smuIdx, g_sysInfo.m_isAmdApu);
             if(!g_sysInfo.m_isAmdApu || !g_sysInfo.m_smuTable.m_info[0].m_isAccessible)
             {
                 smuIdx = smuIdx - 1;
