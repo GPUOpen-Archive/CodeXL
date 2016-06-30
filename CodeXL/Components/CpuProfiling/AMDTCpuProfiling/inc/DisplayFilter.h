@@ -258,7 +258,7 @@ class cxlProfileDataReader;
 // TYPEDEFS
 //using CounterNameIdVec = std::vector<std::pair<gtString, AMDTUInt32>>;
 // name, abbreviation and description
-using CounterNameIdVec = std::vector<std::tuple<gtString, gtString, gtString, AMDTUInt32>>;
+using CounterNameIdVec = std::vector<std::tuple<gtString, gtString, gtString, AMDTUInt32>>; // counter name, abbrev, description, counterId
 using cofigNameCounterMap = std::map<gtString, CounterNameIdVec>;
 using cofigNameCounterPair = std::pair<gtString, CounterNameIdVec>;
 using CounterNameIdMap = std::map<gtString, AMDTUInt64>;
