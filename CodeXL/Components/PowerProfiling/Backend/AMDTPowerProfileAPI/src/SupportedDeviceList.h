@@ -120,12 +120,23 @@ PciDeviceInfo g_deviceTable[PWR_MAX_DEVICE_LIST_SIZE] =
 
     // Stoney
     { GDT_STONEY, 0x98E4, DEVICE_TYPE_APU, "Stoney", "AMD Radeon Series", "STONEY", SMU_IPVERSION_8_1},
-    { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
-    { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
-    { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
-    { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
-    { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
-    { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
+        // Ellesmere
+    { GDT_ELLESMERE, 0x67DF, DEVICE_TYPE_DGPU, "Ellesmere", "AMD Radeon Series", "Ellesmere", SMU_IPVERSION_7_1 },
+    { GDT_ELLESMERE, 0x67C0, DEVICE_TYPE_DGPU, "Ellesmere", "AMD Radeon Series", "Ellesmere", SMU_IPVERSION_7_1 },
+    { GDT_ELLESMERE, 0x67C1, DEVICE_TYPE_DGPU, "Ellesmere", "AMD Radeon Series", "Ellesmere", SMU_IPVERSION_7_1 },
+    { GDT_ELLESMERE, 0x67C2, DEVICE_TYPE_DGPU, "Ellesmere", "AMD Radeon Series", "Ellesmere", SMU_IPVERSION_7_1 },
+    { GDT_ELLESMERE, 0x67C4, DEVICE_TYPE_DGPU, "Ellesmere", "AMD Radeon Series", "Ellesmere", SMU_IPVERSION_7_1 },
+    { GDT_ELLESMERE, 0x67C7, DEVICE_TYPE_DGPU, "Ellesmere", "AMD Radeon Series", "Ellesmere", SMU_IPVERSION_7_1 },
+
+    // Baffin
+    { GDT_BAFFIN, 0x67E0, DEVICE_TYPE_DGPU, "Baffin", "AMD Radeon Series", "Baffin", SMU_IPVERSION_7_1 },
+    { GDT_BAFFIN, 0x67E3, DEVICE_TYPE_DGPU, "Baffin", "AMD Radeon Series", "Baffin", SMU_IPVERSION_7_1 },
+    { GDT_BAFFIN, 0x67E8, DEVICE_TYPE_DGPU, "Baffin", "AMD Radeon Series", "Baffin", SMU_IPVERSION_7_1 },
+    { GDT_BAFFIN, 0x67EB, DEVICE_TYPE_DGPU, "Baffin", "AMD Radeon Series", "Baffin", SMU_IPVERSION_7_1 },
+    { GDT_BAFFIN, 0x67EF, DEVICE_TYPE_DGPU, "Baffin", "AMD Radeon Series", "Baffin", SMU_IPVERSION_7_1 },
+    { GDT_BAFFIN, 0x67FF, DEVICE_TYPE_DGPU, "Baffin", "AMD Radeon Series", "Baffin", SMU_IPVERSION_7_1 },
+
+	// Reserved
     { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
     { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
     { GDT_INVALID, 0xFFFF, DEVICE_TYPE_OTHERS, "Reserver", "Reserved", "", SMU_IPVERSION_INVALID},
