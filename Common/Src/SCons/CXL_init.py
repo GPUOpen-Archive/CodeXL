@@ -450,7 +450,7 @@ def initStdc(env):
     stdclib_dir = env['CXL_common_dir'] + '/Lib/Ext/libstdc/6.0.16/CentOS64/'
     if StrictVersion(env['CXXVERSION']) > StrictVersion('5.0.0'):
         stdclib_dir = env['CXL_common_dir'] + '/Lib/Ext/libstdc/6.0.21/CentOS64/'
-    elif StrictVersion(env['CXXVERSION']) > StrictVersion('4.8.2'):
+    elif StrictVersion(env['CXXVERSION']) > StrictVersion('4.8.5'):
         stdclib_dir = env['CXL_common_dir'] + '/Lib/Ext/libstdc/6.0.20/CentOS64/'
     elif StrictVersion(env['CXXVERSION']) > StrictVersion('4.7.2'):
         stdclib_dir = env['CXL_common_dir'] + '/Lib/Ext/libstdc/6.0.19/CentOS64/'
@@ -735,7 +735,7 @@ def CopyJSON(env):
     # add "lib" to new .so file name to match CodeXL naming
     command = "sed -i 's/\.\//\.\/lib/g' " + dest
     os.system(command) 
-    
+
     # replace 'dll' with 'so'
     command = "sed -i 's/dll/so/g' " + dest
     os.system(command)
