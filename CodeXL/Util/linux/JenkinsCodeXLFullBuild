@@ -1050,7 +1050,7 @@ PackageTheBuild()
     cp -f Output_x86_64/release/bin/CXLGraphicsServer                            ${PKG_NAME}
     cp -f Output_x86_64/release/bin/CXLGraphicsServerPlayer                      ${PKG_NAME}
     cp -f Output_x86_64/release/bin/libCXLGraphicsServerCommon.a                 ${PKG_NAME}
-    mkdir -f ${PKG_NAME}/Plugins
+    mkdir -p ${PKG_NAME}/Plugins
     cp -f Output_x86_64/release/bin/Plugins/libCXLGraphicsServerVulkan.so        ${PKG_NAME}/Plugins
     cp -f Output_x86_64/release/bin/Plugins/libCXLGraphicsServerVulkan.json      ${PKG_NAME}/Plugins
 		
