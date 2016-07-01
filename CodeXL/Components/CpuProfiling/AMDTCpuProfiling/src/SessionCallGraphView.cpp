@@ -296,7 +296,7 @@ void CallGraphPathFuncList::SetFunctionPath(shared_ptr<cxlProfileDataReader> pPr
                                             AMDTUInt32 processId,
                                             bool displaySystemModule)
 {
-	displaySystemModule = displaySystemModule;
+    GT_UNREFERENCED_PARAMETER(displaySystemModule);
     m_pFuncTable->blockSignals(true);
     clear();
 
@@ -308,25 +308,28 @@ void CallGraphPathFuncList::SetFunctionPath(shared_ptr<cxlProfileDataReader> pPr
 
     for (const auto& path : paths)
     {
-		CallGraphFuncListItem* pFuncListItem = nullptr;
+        CallGraphFuncListItem* pFuncListItem = nullptr;
+
         for (const auto& func : path)
         {
             moduleInfo.clear();
             pProfDataRdr->GetModuleInfo(processId, func.m_functionInfo.m_moduleId, moduleInfo);
 
-            if (moduleInfo.size() == 1)
+            // acquire only when module info available.
+            if (moduleInfo.size() > 0)
             {
                 pFuncListItem = AcquireChildItem(pFuncListItem,
                                                  func.m_functionInfo.m_functionId,
                                                  func.m_functionInfo.m_name,
                                                  func.m_functionInfo.m_modulePath);
+
+                pFuncListItem->setExpanded(true);
+                //m_pFuncTable->collapseItem(pFuncListItem);
+                pFuncListItem->AddCountValue(CALLGRAPH_PATH_SELF, func.m_totalSelfSamples);
+                pFuncListItem->AddCountValue(CALLGRAPH_PATH_DOWNSTREAM_SAMPLES, func.m_totalDeepSamples);
+                pFuncListItem->AddCountValue(CALLGRAPH_PATH_DOWNSTREAM_PERCENTAGE, func.m_deepSamplesPerc);
             }
 
-            pFuncListItem->setExpanded(true);
-            //m_pFuncTable->collapseItem(pFuncListItem);
-            pFuncListItem->AddCountValue(CALLGRAPH_PATH_SELF, func.m_totalSelfSamples);
-            pFuncListItem->AddCountValue(CALLGRAPH_PATH_DOWNSTREAM_SAMPLES, func.m_totalDeepSamples);
-            pFuncListItem->AddCountValue(CALLGRAPH_PATH_DOWNSTREAM_PERCENTAGE, func.m_deepSamplesPerc);
         }
     }
 
@@ -864,17 +867,17 @@ CallGraphFuncListItem* CallGraphFuncList::AddFuncListItem(AMDTFunctionId functio
                                                           gtString srcFile,
                                                           gtString moduleName,
                                                           gtUInt32 srcFileLine,
-														  AMDTUInt32 moduleId)
+                                                          AMDTUInt32 moduleId)
 {
     CallGraphFuncListItem* pFuncListItem = new CallGraphFuncListItem;
     m_pFuncTable->addTopLevelItem(pFuncListItem);
 
-	// set module id
-	pFuncListItem->m_moduleId = moduleId;
+    // set module id
+    pFuncListItem->m_moduleId = moduleId;
 
     //Function Name
     pFuncListItem->setText(CALLGRAPH_FUNCTION_NAME, acGTStringToQString(functionName));
-	pFuncListItem->m_functionName = functionName;
+    pFuncListItem->m_functionName = functionName;
 
     pFuncListItem->m_functionId = functionId;
 
@@ -888,7 +891,8 @@ CallGraphFuncListItem* CallGraphFuncList::AddFuncListItem(AMDTFunctionId functio
     {
         pFuncListItem->setText(CALLGRAPH_FUNCTION_SELF_SAMPLES, "");
     }
-	pFuncListItem->m_selfSample = totalSelfSamples;
+
+    pFuncListItem->m_selfSample = totalSelfSamples;
 
     //Deep counts
     if (0ULL != totalDeepSamples)
@@ -926,7 +930,7 @@ CallGraphFuncListItem* CallGraphFuncList::AddFuncListItem(AMDTFunctionId functio
 
     //Module Name
     QString modName = GetModuleNameEntry(moduleName);
-	pFuncListItem->m_moduleName = moduleName;
+    pFuncListItem->m_moduleName = moduleName;
 
     if (!moduleName.isEmpty())
     {
@@ -1080,8 +1084,8 @@ bool CallGraphFuncList::FillDisplayFuncList(shared_ptr<cxlProfileDataReader> pPr
                             callGraphFunc.m_pathCount,
                             callGraphFunc.m_srcFile,
                             callGraphFunc.m_functionInfo.m_modulePath,
-                            callGraphFunc.m_srcFileLine, 
-							callGraphFunc.m_functionInfo.m_moduleId);
+                            callGraphFunc.m_srcFileLine,
+                            callGraphFunc.m_functionInfo.m_moduleId);
 
             if (masSampleValue < callGraphFunc.m_totalSelfSamples)
             {
@@ -1951,7 +1955,7 @@ void SessionCallGraphView::FunctionListSelectionDone(AMDTFunctionId functionId)
 
 void SessionCallGraphView::editSource(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> info)
 {
-	emit opensourceCodeViewSig(info);
+    emit opensourceCodeViewSig(info);
 }
 
 // The display is for a particular PID
@@ -2571,8 +2575,8 @@ void SessionCallGraphView::SetViewLayout()
         rc = connect(this, SIGNAL(functionSelected(AMDTFunctionId)), m_pFuncTable, SLOT(selectAFunction(AMDTFunctionId)));
         GT_ASSERT(rc);
 
-        rc = connect(m_pFuncTable->functionsTreeControl(), SIGNAL(editSourceFile(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32>)), 
-														   SLOT(editSource(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32>)));
+        rc = connect(m_pFuncTable->functionsTreeControl(), SIGNAL(editSourceFile(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32>)),
+                     SLOT(editSource(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32>)));
         GT_ASSERT(rc);
 
         //allocate the butterfly widget
@@ -2592,18 +2596,18 @@ void SessionCallGraphView::SetViewLayout()
         rc = connect(m_pPathFuncTable, SIGNAL(functionSelected(AMDTFunctionId)), SLOT(FunctionListSelectionDone(AMDTFunctionId)));
         GT_ASSERT(rc);
 
-        rc = connect(m_pPathFuncTable->functionsTreeControl(), SIGNAL(editSourceFile(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32>)), 
-			SLOT(editSource(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32>)));
+        rc = connect(m_pPathFuncTable->functionsTreeControl(), SIGNAL(editSourceFile(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32>)),
+                     SLOT(editSource(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32>)));
         GT_ASSERT(rc);
 
         m_pButterfly->Initialize();
 
-        rc = connect(m_pButterfly->parentsTreeControl(), SIGNAL(editSourceFile(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32>)), 
-			SLOT(editSource(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32>)));
+        rc = connect(m_pButterfly->parentsTreeControl(), SIGNAL(editSourceFile(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32>)),
+                     SLOT(editSource(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32>)));
         GT_ASSERT(rc);
 
-        rc = connect(m_pButterfly->childrenTreeControl(), SIGNAL(editSourceFile(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32>)), 
-			SLOT(editSource(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32>)));
+        rc = connect(m_pButterfly->childrenTreeControl(), SIGNAL(editSourceFile(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32>)),
+                     SLOT(editSource(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32>)));
         GT_ASSERT(rc);
 
         m_pFuncTable->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
@@ -2758,8 +2762,8 @@ void FunctionsTreeCtrl::onAboutToShowContextMenu()
 
         if ((selectedItems().count() == 1) && (nullptr != pFuncListItem))
         {
-			enableFunctionsAction = (0ULL != pFuncListItem->m_selfSample);
-			enableSourceCodeAction = enableFunctionsAction; // Need to set module states if loaded && (nullptr != pMetadata->m_pModule);
+            enableFunctionsAction = (0ULL != pFuncListItem->m_selfSample);
+            enableSourceCodeAction = enableFunctionsAction; // Need to set module states if loaded && (nullptr != pMetadata->m_pModule);
         }
 
         m_pDisplayInFunctionsAction->setEnabled(enableFunctionsAction);
@@ -2803,12 +2807,12 @@ void FunctionsTreeCtrl::GoToSource()
     CallGraphFuncListItem* pFuncListItem = static_cast<CallGraphFuncListItem*>(currentItem());
 
 
-	auto funcModInfo = std::make_tuple(pFuncListItem->m_functionId,
-										pFuncListItem->m_moduleName,
-										pFuncListItem->m_moduleId, 
-										AMDT_PROFILE_ALL_PROCESSES);
+    auto funcModInfo = std::make_tuple(pFuncListItem->m_functionId,
+                                       pFuncListItem->m_moduleName,
+                                       pFuncListItem->m_moduleId,
+                                       AMDT_PROFILE_ALL_PROCESSES);
 
-	emit editSourceFile(funcModInfo);
+    emit editSourceFile(funcModInfo);
 }
 
 void FunctionsTreeCtrl::GoToFunctionsView()
