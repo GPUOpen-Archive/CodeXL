@@ -21,7 +21,7 @@
 #include <AMDTOSWrappers/Include/osFile.h>
 #include <AMDTOSWrappers/Include/osTime.h>
 
-#define AMDT_ENABLE_DB_SUPPORT  1
+//#define AMDT_ENABLE_DB_SUPPORT  1
 #include <AMDTCpuProfilingDataAccess/inc/AMDTCpuProfilingDataAccess.h>
 
 // Backend:
