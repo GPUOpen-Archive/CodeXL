@@ -736,6 +736,10 @@ def CopyJSON(env):
 
     # add "lib" to new .so file name to match CodeXL naming
     command = "sed -i 's/\.\//\.\/lib/g' " + dest
+    os.system(command)
+
+    # prepend "lib" to "name"
+    command = "sed -i 's/name\": \"/name\": \"lib/g' " + dest
     os.system(command) 
 
     # replace 'dll' with 'so'
