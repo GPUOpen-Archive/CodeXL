@@ -1361,12 +1361,23 @@ void PowerProfileTranslate::ExtractNameAndPath(char* pFullPath, char* pName, cha
     memset(pPath, 0, AMDT_PWR_EXE_PATH_LENGTH);
     memcpy(pName, &path[begin], strlen(&path[begin]) + 1);
     memcpy(pPath, &path[0], begin);
+
+    if (strlen(pName) == 0)
+    {
+        memcpy(pName, "unknown name", AMDT_PWR_EXE_NAME_LENGTH);
+    }
+
+    if (strlen(pPath) == 0)
+    {
+        memcpy(pPath, "unknown path", AMDT_PWR_EXE_PATH_LENGTH);
+    }
 }
 
 // PwrGetProfileData: Provide process data based on process/module/ip profile type
 AMDTResult PowerProfileTranslate::PwrGetProfileData(CXLContextProfileType type, void** pData, AMDTUInt32* pCnt, AMDTFloat32* pPower)
 {
     AMDTResult ret = AMDT_STATUS_OK;
+    wchar_t str[OS_MAX_PATH];
 
 #if (defined(_WIN64) || defined(LINUX))
 
@@ -1391,7 +1402,6 @@ AMDTResult PowerProfileTranslate::PwrGetProfileData(CXLContextProfileType type, 
 
         for (auto processIter : m_systemTreeMap)
         {
-            wchar_t str[OS_MAX_PATH];
             memset(&process, 0, sizeof(AMDTPwrProcessInfo));
             process.m_pid = processIter.first;
 
@@ -1400,16 +1410,6 @@ AMDTResult PowerProfileTranslate::PwrGetProfileData(CXLContextProfileType type, 
                 char path[OS_MAX_PATH];
                 wcstombs(path, str, OS_MAX_PATH);
                 ExtractNameAndPath(path, process.m_name, process.m_path);
-            }
-
-            if (strlen(process.m_name) == 0)
-            {
-                memcpy(process.m_name, "unknown name", AMDT_PWR_EXE_NAME_LENGTH);
-            }
-
-            if (strlen(process.m_path) == 0)
-            {
-                memcpy(process.m_path, "unknown path", AMDT_PWR_EXE_PATH_LENGTH);
             }
 
             process.m_sampleCnt = processIter.second.m_sampleCnt;
@@ -1450,24 +1450,22 @@ AMDTResult PowerProfileTranslate::PwrGetProfileData(CXLContextProfileType type, 
                     module.m_loadAddr = tabIter->second.m_moduleStartAddr;
                     module.m_size = tabIter->second.m_modulesize;
                     module.m_processId = (AMDTUInt32)processIter.first;
-                    ExtractNameAndPath(tabIter->second.m_pModulename, module.m_name, module.m_path);
+                    ExtractNameAndPath(tabIter->second.m_pModulename, module.m_moduleName, module.m_modulePath);
                 }
                 else
                 {
                     //PwrTrace("Error finding module pid %d module inst %d", (AMDTUInt32)processIter.first, moduleIter.first);
                 }
 
-                if (strlen(module.m_name) == 0)
-                {
-                    memcpy(module.m_name, "unknown name", AMDT_PWR_EXE_NAME_LENGTH);
-                }
-
-                if (strlen(module.m_path) == 0)
-                {
-                    memcpy(module.m_path, "unknown path", AMDT_PWR_EXE_PATH_LENGTH);
-                }
-
                 module.m_sampleCnt = moduleIter.second.m_sampleCnt;
+
+                // Get process name and path
+                if (S_OK == fnFindProcessName(module.m_processId, str, AMDT_PWR_EXE_PATH_LENGTH))
+                {
+                    char path[OS_MAX_PATH];
+                    wcstombs(path, str, OS_MAX_PATH);
+                    ExtractNameAndPath(path, module.m_processName, module.m_processPath);
+                }
                 m_moduleList.push_back(module);
             }
         }

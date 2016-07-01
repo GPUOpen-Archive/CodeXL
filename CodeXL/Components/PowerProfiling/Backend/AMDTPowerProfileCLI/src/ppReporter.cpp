@@ -42,10 +42,10 @@
     #define PROCESS_INFO_TXT_HDR_FORMAT    "\nSNo\tPID\tSamples\tPower(Joules)\tPower(%)\tName\t\t\t\t\t\tPath\n\n"
     #define PROCESS_INFO_CSV_FORMAT        "%d,%d,%d,%3.2f,%3.2f,%s,%s\n"
     #define PROCESS_INFO_CSV_HDR_FORMAT    "\nSNo,PID,Samples,Power(Joules),Power(%),Name,Path\n\n"
-    #define MODULE_INFO_TXT_FORMAT         "%d\t%d\t%d\t%d\t%3.2f\t\t%3.2f\t\t0x%-8.8llx\t\t%-1.8lld\t\t%-45.45s\t%s\n"
-    #define MODULE_INFO_TXT_HDR_FORMAT     "\nSNo\tPID\tSamples\tKernel\tPower(Joules)\tPower(%)\tLoad Addr\t\tsize\t\t\tName\t\t\t\t\t\tPath\n\n"
-    #define MODULE_INFO_CSV_FORMAT         "%d,%d,%d,%d,%3.2f,%3.2f,0x%llx,%lld,%s,%s\n"
-    #define MODULE_INFO_CSV_HDR_FORMAT     "\nSNo,PID,Samples,Kernel,Power(Joules),Power(%),Load Addr,size,Name,Path\n\n"
+    #define MODULE_INFO_TXT_FORMAT         "%d\t%d\t%-45.45s\t%-65.85s\t%d\t%d\t%3.2f\t\t%3.2f\t\t0x%-8.8llx\t\t%-1.8lld\t\t%-45.45s\t%s\n"
+    #define MODULE_INFO_TXT_HDR_FORMAT     "\nSNo\tPID\tProcess Name\t\t\t\t\tProcess Path\t\t\t\t\t\t\t\tSamples\tKernel\tPower(Joules)\tPower(%)\tLoad Addr\t\tsize\t\t\tName\t\t\t\t\t\tPath\n\n"
+    #define MODULE_INFO_CSV_FORMAT         "%d,%d,%s,%s,%d,%d,%3.2f,%3.2f,0x%llx,%lld,%s,%s\n"
+    #define MODULE_INFO_CSV_HDR_FORMAT     "\nSNo,PID,Process Name, Process Path, Samples,Kernel,Power(Joules),Power(%),Load Addr,size,Name,Path\n\n"
 #endif
 
 void ppReporter::ReportHeader()
@@ -516,17 +516,19 @@ void ppReporterText::WriteModuleData(AMDTUInt32 recCnt, AMDTPwrModuleData*& pInf
         if (nullptr != recInfo)
         {
             m_dataStr.clear();
-            sprintf(m_pDataStr,  MODULE_INFO_TXT_FORMAT,
+            sprintf(m_pDataStr, MODULE_INFO_TXT_FORMAT,
                     cnt,
                     recInfo->m_processId,
+                    recInfo->m_processName,
+                    recInfo->m_processPath,
                     recInfo->m_sampleCnt,
                     recInfo->m_isKernel,
                     recInfo->m_power,
                     (recInfo->m_power * 100) / totalPower,
                     recInfo->m_loadAddr,
                     recInfo->m_size,
-                    recInfo->m_name,
-                    recInfo->m_path);
+                    recInfo->m_moduleName,
+                    recInfo->m_modulePath);
 
             m_dataStr.append(m_pDataStr);
             m_reportFile.write(m_dataStr.c_str(), m_dataStr.length());
@@ -853,14 +855,16 @@ void ppReporterCsv::WriteModuleData(AMDTUInt32 recCnt, AMDTPwrModuleData*& pInfo
             sprintf(m_pDataStr,  MODULE_INFO_CSV_FORMAT,
                     cnt,
                     recInfo->m_processId,
+                    recInfo->m_processName,
+                    recInfo->m_processPath,
                     recInfo->m_sampleCnt,
                     recInfo->m_isKernel,
                     recInfo->m_power,
                     (recInfo->m_power * 100) / totalPower,
                     recInfo->m_loadAddr,
                     recInfo->m_size,
-                    recInfo->m_name,
-                    recInfo->m_path);
+                    recInfo->m_moduleName,
+                    recInfo->m_modulePath);
 
             m_dataStr.append(m_pDataStr);
             m_reportFile.write(m_dataStr.c_str(), m_dataStr.length());
