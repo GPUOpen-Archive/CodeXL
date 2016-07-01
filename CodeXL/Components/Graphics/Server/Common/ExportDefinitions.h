@@ -13,13 +13,15 @@
 #if (AMDT_BUILD_TARGET == AMDT_WINDOWS_OS)
     #ifdef GPS_PLUGIN_EXPORTS
         #define GPS_PLUGIN_API extern "C" __declspec( dllexport ) ///< DLL Export Definition
-    #elif defined GPS_PLUGIN_STATIC
-        #define GPS_PLUGIN_API extern "C" __attribute__ ((visibility ("default"))) ///< Export Definition
     #else
         #define GPS_PLUGIN_API extern "C" __declspec( dllimport ) ///< DLL Import Definition
     #endif
 #elif (AMDT_BUILD_TARGET == AMDT_LINUX_OS)
-    #define GPS_PLUGIN_API 
+    #ifdef GPS_PLUGIN_STATIC
+        #define GPS_PLUGIN_API extern "C" __attribute__ ((visibility ("default"))) ///< DLL definition
+    #else
+        #define GPS_PLUGIN_API
+    #endif 
 #else
     #error Unknown build target! No valid value for AMDT_BUILD_TARGET.
 #endif
