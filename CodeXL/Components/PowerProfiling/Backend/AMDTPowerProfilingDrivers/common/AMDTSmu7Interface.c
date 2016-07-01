@@ -142,8 +142,8 @@ bool CollectSMU7RegisterValues(void* pSmu, uint8* pData, uint32* pLength)
                 }
 
                 SMU7ReadSmuIndirectMappingRegister(pSmuData, pTable->m_pwrPcie, &pciePwr);
-                SMU7ReadSmuIndirectMappingRegister(pSmuData, pTable->m_pwrDisplay, &ddrPwr);
-                SMU7ReadSmuIndirectMappingRegister(pSmuData, pTable->m_pwrDdr, &displayPwr);
+                SMU7ReadSmuIndirectMappingRegister(pSmuData, pTable->m_pwrDisplay, &displayPwr);
+                SMU7ReadSmuIndirectMappingRegister(pSmuData, pTable->m_pwrDdr, &ddrPwr);
                 SMU7ReadSmuIndirectMappingRegister(pSmuData, pTable->m_pwriGpu, &igpuPwr);
                 pkgPwr += cu0Pwr + cu1Pwr + pciePwr + ddrPwr + displayPwr + igpuPwr;
             }

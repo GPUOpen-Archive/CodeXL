@@ -1370,58 +1370,65 @@ void PwrFillSupportedCounters(AMDTPwrCounterBasicInfo* pCounter,
 
         inst.m_instanceId = loop;
 
-        for (loop = 0; loop < repeat; loop++)
+        // Filter Stoney VDDGFX counter as it is not available
+        if(sysInfo.m_isAmdApu
+            && (SMU_IPVERSION_8_1 == sysInfo.m_smuTable.m_info[0].m_smuIpVersion)
+            && (COUNTERID_SMU8_APU_PWR_VDDGFX == pInfo->m_attrId))
         {
-            // Filter Measured/calculated temperature
-            if ((PLATFORM_KAVERI == sysInfo.m_platformId)
-                || (PLATFORM_MULLINS == sysInfo.m_platformId))
-            {
-                if (APU_SMU_ID == packageId)
-                {
-                    // Filter Measured / Calculated counters
-                    if (PLATFORM_KAVERI == sysInfo.m_platformId)
-                    {
-                        if ((COUNTERID_SMU7_APU_TEMP_MEAS_CU == pCounter[idx].m_attrId)
-                            || (COUNTERID_SMU7_APU_TEMP_MEAS_IGPU == pCounter[idx].m_attrId))
-                        {
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        if ((COUNTERID_SMU7_APU_TEMP_CU == pCounter[idx].m_attrId)
-                            || (COUNTERID_SMU7_APU_TEMP_IGPU == pCounter[idx].m_attrId))
-                        {
-                            continue;
-                        }
-                    }
-                }
-            }
+            continue;
+        }
 
-            // Filter SVI2/CSTATE counters
-            if (0 == packageId)
+        // Filter Measured/calculated temperature
+        if ((PLATFORM_KAVERI == sysInfo.m_platformId)
+            || (PLATFORM_MULLINS == sysInfo.m_platformId))
+        {
+            if (APU_SMU_ID == packageId)
             {
-                // Filter internal counters
-                if (internalSupported)
+                // Filter Measured / Calculated counters
+                if (PLATFORM_KAVERI == sysInfo.m_platformId)
                 {
-                    if (!PwrIsSVISupported(sysInfo) && ((COUNTERID_SVI2_CORE_TELEMETRY == pCounter[idx].m_attrId)
-                                                        || (COUNTERID_SVI2_NB_TELEMETRY == pCounter[idx].m_attrId)))
+                    if ((COUNTERID_SMU7_APU_TEMP_MEAS_CU == pInfo->m_attrId)
+                        || (COUNTERID_SMU7_APU_TEMP_MEAS_IGPU == pInfo->m_attrId))
                     {
                         continue;
                     }
                 }
                 else
                 {
-                    if ((COUNTERID_SVI2_CORE_TELEMETRY == pCounter[idx].m_attrId)
-                        || (COUNTERID_SVI2_NB_TELEMETRY == pCounter[idx].m_attrId)
-                        || (COUNTERID_CSTATE_RES == pCounter[idx].m_attrId))
+                    if ((COUNTERID_SMU7_APU_TEMP_CU == pInfo->m_attrId)
+                        || (COUNTERID_SMU7_APU_TEMP_IGPU == pInfo->m_attrId))
                     {
                         continue;
                     }
                 }
             }
+        }
+        
+        // Filter SVI2/CSTATE counters
+        if (0 == packageId)
+        {
+            // Filter internal counters
+            if (internalSupported)
+            {
+                if (!PwrIsSVISupported(sysInfo) && ((COUNTERID_SVI2_CORE_TELEMETRY == pInfo->m_attrId)
+                                                    || (COUNTERID_SVI2_NB_TELEMETRY == pInfo->m_attrId)))
+                {
+                    continue;
+                }
+            }
+            else
+            {
+                if ((COUNTERID_SVI2_CORE_TELEMETRY == pInfo->m_attrId)
+                    || (COUNTERID_SVI2_NB_TELEMETRY == pInfo->m_attrId)
+                    || (COUNTERID_CSTATE_RES == pInfo->m_attrId))
+                {
+                    continue;
+                }
+            }
+        }
 
-
+        for (loop = 0; loop < repeat; loop++)
+        {
             memcpy(&inst.m_counter, pInfo, sizeof(AMDTPwrCounterBasicInfo));
             inst.m_instanceId = loop;
             inst.m_packageId = packageId;
