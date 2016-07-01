@@ -1100,7 +1100,7 @@ bool ProcessTracker::PassRequestToPlugin(const char* strDestination,
 static void SetupVulkanEnvVariables()
 {
 #ifdef CODEXL_GRAPHICS
-    gtASCIIString layerNameA = "CXLGraphicsServerVulkan" GDT_PROJECT_SUFFIX;
+    gtASCIIString layerNameA = "libCXLGraphicsServerVulkan" GDT_PROJECT_SUFFIX;
 #else
     gtASCIIString layerNameA = "VulkanServer" GDT_PROJECT_SUFFIX;
 #endif
