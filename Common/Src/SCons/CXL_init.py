@@ -717,6 +717,8 @@ def CopyJSON(env):
     source = env['CXL_common_dir'] + "/../CodeXL/Components/Graphics/Server/VulkanServer/JSON/" + env['vulkanPluginName'] + env.archWin + env['GPS_debugSuffix'] + env['GPS_buildSuffix'] + ".json"
     dest = env['CXL_lib_dir'] + "/Plugins/lib" + env['vulkanPluginName'] + env.archLinux + env['GPS_debugSuffix'] + env['GPS_buildSuffix'] + ".json"
 
+    if not os.path.exists(env['CXL_lib_dir'] + "/Plugins"):
+        os.mkdir(env['CXL_lib_dir'] + "/Plugins")
     command = "cp " + source + " " + dest
     os.system(command)
 
