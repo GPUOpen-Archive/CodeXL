@@ -1603,25 +1603,29 @@ AMDTUInt32 PowerProfileTranslate::DecodeSmu7Counters(PwrCounterDecodeInfo* pDeco
             case COUNTERID_SMU7_APU_TEMP_MEAS_IGPU:
             case COUNTERID_SMU7_APU_FREQ_IGPU:
             {
+                AMDTFloat32 maxVal = 0;
                 AMDTUInt32 data = *(AMDTUInt32*)(pRaw + offset);
 
                 if (CATEGORY_POWER == pDecodeInfo->m_category)
                 {
                     res = SMU7_PROCESS_POWER_DATA(data);
+                    maxVal = MAX_POWER;
                 }
                 else if (CATEGORY_TEMPERATURE == pDecodeInfo->m_category)
                 {
                     res = SMU7_PROCESS_TEPERATURE_DATA(data);
+                    maxVal = MAX_TEMPERATURE;
                 }
                 else if (CATEGORY_FREQUENCY == pDecodeInfo->m_category)
                 {
                     res = SMU7_PROCESS_FREQUENCY_DATA(data);
+                    maxVal = MAX_GPU_FREQUENCY;
                 }
                 else if (CATEGORY_VOLTAGE == pDecodeInfo->m_category)
                 {
                 }
 
-                if (res > MAX_POWER)
+                if (res > maxVal)
                 {
                     res = GetPrevSampleData(counterId, 0);
                 }
