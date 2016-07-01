@@ -1379,6 +1379,7 @@ AMDTResult PowerProfileTranslate::PwrGetProfileData(CXLContextProfileType type, 
     AMDTResult ret = AMDT_STATUS_OK;
     wchar_t str[OS_MAX_PATH];
 
+    memset(str, 0, sizeof(wchar_t) * OS_MAX_PATH);
 #if (defined(_WIN64) || defined(LINUX))
 
     (void)type;
