@@ -85,6 +85,9 @@ protected slots:
     /// Handler for export to CSV context menu:
     void OnExportToCSV();
 
+    /// Is called when the table header is clicked for the first time
+    void OnTableHeaderPressed(int section);
+
 
 protected:
     /// Overridden handler to handle resizing of the column headers
@@ -115,6 +118,11 @@ private:
 
     /// Used for caching the symbol info between the context menu handler and the "Go to source" click handler
     SymbolInfo* m_pCahcedSymbolInfo;
+
+    /// This flag is true by default. The table columns are resized by default as long as the user don't touch the 
+    /// table header handles. When the user first touches the header, the flag becomes false.
+    /// This is a workaround. We would like to resize the table until the Qt view finishes resizing itself, but we don't know to track this point
+    bool m_shouldAutoResizeTableColumns;
 };
 
 #endif // _GPTRACETABLE_H_
