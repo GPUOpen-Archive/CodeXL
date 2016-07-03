@@ -35,7 +35,8 @@ gpTraceTable::gpTraceTable(osThreadId threadID, gpTraceDataContainer* pDataConta
     m_pCopyAction(nullptr),
     m_pSelectAllAction(nullptr),
     m_pExportToCSVAction(nullptr),
-    m_pCahcedSymbolInfo(nullptr)
+    m_pCahcedSymbolInfo(nullptr),
+    m_shouldAutoResizeTableColumns(true)
 {
     // Create the model for this table
     m_pDataModel = new gpTableModelBase(threadID, pDataContainer);
@@ -55,6 +56,10 @@ gpTraceTable::gpTraceTable(osThreadId threadID, gpTraceDataContainer* pDataConta
     QHeaderView* horzHeader = horizontalHeader();
     horzHeader->setSectionResizeMode(QHeaderView::Interactive);
     horzHeader->setHighlightSections(false);
+
+    // Connect to the header press signal
+    bool rc = connect(horzHeader, SIGNAL(sectionPressed(int)), this, SLOT(OnTableHeaderPressed(int)));
+    GT_ASSERT(rc);
 
     // Prepare the context menu
     BuildContextMenu();
@@ -97,6 +102,10 @@ gpTraceTable::gpTraceTable(const QString& queueName, gpTraceDataContainer* pData
             pHorizHeader->setSectionResizeMode(QHeaderView::Interactive);
             pHorizHeader->setHighlightSections(false);
             pHorizHeader->setDefaultAlignment(Qt::AlignLeft);
+
+            // Connect to the header press signal
+            bool rc = connect(pHorizHeader, SIGNAL(sectionPressed(int)), this, SLOT(OnTableHeaderPressed(int)));
+            GT_ASSERT(rc);
         }
 
         // Prepare the context menu
@@ -146,16 +155,20 @@ void gpTraceTable::SelectRow(int rowIndex)
 void gpTraceTable::resizeEvent(QResizeEvent* event)
 {
     QTableView::resizeEvent(event);
-    int newWidth = event->size().width();
 
-    if (event->oldSize().width() != newWidth)
+    if (m_shouldAutoResizeTableColumns)
     {
-        QHeaderView* horzHeader = horizontalHeader();
+        int newWidth = event->size().width();
 
-        for (int i = 0; i < horzHeader->count(); i++)
+        if (event->oldSize().width() != newWidth)
         {
-            int newSectionWidth = int(newWidth * GetSectionFillWeight(i));
-            horzHeader->resizeSection(i, newSectionWidth);
+            QHeaderView* horzHeader = horizontalHeader();
+
+            for (int i = 0; i < horzHeader->count(); i++)
+            {
+                int newSectionWidth = int(newWidth * GetSectionFillWeight(i));
+                horzHeader->resizeSection(i, newSectionWidth);
+            }
         }
     }
 }
@@ -353,6 +366,12 @@ void gpTraceTable::OnExportToCSV()
             }
         }
     }
+}
+
+void gpTraceTable::OnTableHeaderPressed(int section)
+{
+    GT_UNREFERENCED_PARAMETER(section);
+    m_shouldAutoResizeTableColumns = false;
 }
 
 void gpTraceTable::OnEditCopy()
