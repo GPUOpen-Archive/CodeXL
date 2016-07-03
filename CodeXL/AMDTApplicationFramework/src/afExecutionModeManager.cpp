@@ -1456,7 +1456,7 @@ void afExecutionModeManager::OnAPILevelStepAboutToShow()
 void afExecutionModeManager::UpdateHostsList()
 {
     // Sanity check:
-    GT_IF_WITH_ASSERT(m_pStartAction != nullptr)
+    if (m_pStartAction != nullptr)
     {
         QStringList newHostsList;
 
@@ -1518,6 +1518,12 @@ void afExecutionModeManager::UpdateHostsList()
 
             m_pStartAction->UpdateStringList(newHostsList);
         }
+    }
+    else // m_pStartAction == nullptr
+    {
+        // The toolbar does not exist in Visual Studio
+        static const bool isRunningInVS = afGlobalVariablesManager::instance().isRunningInsideVisualStudio();
+        GT_ASSERT(isRunningInVS);
     }
 }
 
