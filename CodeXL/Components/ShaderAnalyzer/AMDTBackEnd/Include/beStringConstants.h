@@ -200,22 +200,6 @@
 // SCALAR INSTRUCTIONS - END
 // *************************
 
-#define VOP1_V_FRACT_F32   "V_FRACT_F32"
-#define VOP1_V_TRUNC_F32   "V_TRUNC_F32"
-#define VOP2_V_MAX_LEGACY_F32   "V_MAX_LEGACY_F32"
-#define VOP2_V_MIN_LEGACY_F32   "V_MIN_LEGACY_F32"
-#define VOP2_V_MIN_F32   "V_MIN_F32"
-#define VOP2_V_MAX_F32   "V_MAX_F32"
-#define VOP2_V_CEIL_F32   "V_CEIL_F32"
-#define VOP2_V_RNDNE_F32   "V_RNDNE_F32"
-#define VOP2_V_FLOOR_F32   "V_FLOOR_F32"
-#define VOP2_V_MOV_FED_B32 "V_MOV_FED_B32"
-#define VOP2_V_MIN_I32   "V_MIN_I32"
-#define VOP2_V_MAX_U32   "V_MAX_U32"
-#define VOP2_V_MIN_U32   "V_MIN_U32"
-#define VOP2_V_ASHR_I32   "V_ASHR_I32"
-
-
 
 // ***************************
 // VECTOR INSTRUCTIONS - BEGIN
@@ -238,11 +222,25 @@
 #define VOP2_NO_HW_IMPL_V_LSHLREV_B32      "V_LSHLREV_B32"
 
 // Not documented.
-#define VOP2_NO_DOC_V_ADD_U32      "V_ADD_U32"
-#define VOP2_NO_DOC_V_SUB_U32      "V_SUB_U32"
+#define VOP2_V_MOV_FED_B32      "V_MOV_FED_B32"
 
-#define VOP1_V_MOV_B32 "V_MOV_B32"
-#define VOP1_V_NOT_B32 "V_NOT_B32"
+#define VOP2_NO_DOC_V_ADD_U32   "V_ADD_U32"
+#define VOP2_NO_DOC_V_SUB_U32   "V_SUB_U32"
+#define VOP1_V_FRACT_F32        "V_FRACT_F32"
+#define VOP1_V_TRUNC_F32        "V_TRUNC_F32"
+#define VOP2_V_MAX_LEGACY_F32   "V_MAX_LEGACY_F32"
+#define VOP2_V_MIN_LEGACY_F32   "V_MIN_LEGACY_F32"
+#define VOP2_V_MIN_F32          "V_MIN_F32"
+#define VOP2_V_MAX_F32          "V_MAX_F32"
+#define VOP2_V_CEIL_F32         "V_CEIL_F32"
+#define VOP2_V_RNDNE_F32        "V_RNDNE_F32"
+#define VOP2_V_FLOOR_F32        "V_FLOOR_F32"
+#define VOP2_V_MIN_I32          "V_MIN_I32"
+#define VOP2_V_MAX_U32          "V_MAX_U32"
+#define VOP2_V_MIN_U32          "V_MIN_U32"
+#define VOP2_V_ASHR_I32         "V_ASHR_I32"
+#define VOP1_V_MOV_B32          "V_MOV_B32"
+#define VOP1_V_NOT_B32          "V_NOT_B32"
 #define VOP1_V_CVT_F32_I32      "V_CVT_F32_I32"
 #define VOP1_V_CVT_F32_U32      "V_CVT_F32_U32"
 #define VOP1_V_CVT_U32_F32      "V_CVT_U32_F32"
