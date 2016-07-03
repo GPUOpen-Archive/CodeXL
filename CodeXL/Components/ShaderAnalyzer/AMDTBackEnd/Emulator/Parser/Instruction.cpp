@@ -329,6 +329,19 @@ void Instruction::SetUpHybridPerfTables()
         m_s_hybridDevicePerfTable[VI_V_CVT_F16_I16] = 4;
         m_s_hybridDevicePerfTable[VI_V_CVT_F16_U16] = 4;
         m_s_hybridDevicePerfTable[VI_V_CVT_PERM_B32] = 4;
+        m_s_hybridDevicePerfTable[VOP1_V_FRACT_F32] = 4;
+        m_s_hybridDevicePerfTable[VOP1_V_TRUNC_F32] = 4;
+        m_s_hybridDevicePerfTable[VOP2_V_MAX_LEGACY_F32] = 4;
+        m_s_hybridDevicePerfTable[VOP2_V_MIN_LEGACY_F32] = 4;
+        m_s_hybridDevicePerfTable[VOP2_V_MIN_F32] = 4;
+        m_s_hybridDevicePerfTable[VOP2_V_MAX_F32] = 4;
+        m_s_hybridDevicePerfTable[VOP2_V_CEIL_F32] = 4;
+        m_s_hybridDevicePerfTable[VOP2_V_RNDNE_F32] = 4;
+        m_s_hybridDevicePerfTable[VOP2_V_FLOOR_F32] = 4;
+        m_s_hybridDevicePerfTable[VOP2_V_MIN_I32] = 4;
+        m_s_hybridDevicePerfTable[VOP2_V_MAX_U32] = 4;
+        m_s_hybridDevicePerfTable[VOP2_V_MIN_U32] = 4;
+        m_s_hybridDevicePerfTable[VOP2_V_ASHR_I32] = 4;
 
         // 1/4 full rate.
         m_s_hybridDevicePerfTable[VOP3_V_DIV_SCALE_F32] = 16;
@@ -672,7 +685,19 @@ void Instruction::SetUpHalfDevicesPerfTables()
     m_s_halfDevicePerfTable[VOP3_V_DIV_SCALE_F32] = 4;
     m_s_halfDevicePerfTable[VOP3_V_DIV_FMAS_F32] = 4;
     m_s_halfDevicePerfTable[VOP3_V_DIV_FIXUP_F32] = 4;
-
+    m_s_halfDevicePerfTable[VOP1_V_FRACT_F32] = 4;
+    m_s_halfDevicePerfTable[VOP1_V_TRUNC_F32] = 4;
+    m_s_halfDevicePerfTable[VOP2_V_MAX_LEGACY_F32] = 4;
+    m_s_halfDevicePerfTable[VOP2_V_MIN_LEGACY_F32] = 4;
+    m_s_halfDevicePerfTable[VOP2_V_MIN_F32] = 4;
+    m_s_halfDevicePerfTable[VOP2_V_MAX_F32] = 4;
+    m_s_halfDevicePerfTable[VOP2_V_CEIL_F32] = 4;
+    m_s_halfDevicePerfTable[VOP2_V_RNDNE_F32] = 4;
+    m_s_halfDevicePerfTable[VOP2_V_FLOOR_F32] = 4;
+    m_s_halfDevicePerfTable[VOP2_V_MIN_I32] = 4;
+    m_s_halfDevicePerfTable[VOP2_V_MAX_U32] = 4;
+    m_s_halfDevicePerfTable[VOP2_V_MIN_U32] = 4;
+    m_s_halfDevicePerfTable[VOP2_V_ASHR_I32] = 4;
 
     // Half rate.
     m_s_halfDevicePerfTable[VOP1_V_LOG_F32] = 8;
@@ -953,7 +978,6 @@ void Instruction::SetUpScalarPerfTables()
         m_s_scalarPerfTable[SOPP_S_SETPC] = 1;
         m_s_scalarPerfTable[SOPP_S_SWAPPC] = 1;
     }
-
 }
 
 void Instruction::SetUpQuarterDevicesPerfTables()
@@ -1154,7 +1178,19 @@ void Instruction::SetUpQuarterDevicesPerfTables()
     m_s_quarterDevicePerfTable[VOP3_V_DIV_SCALE_F32] = 4;
     m_s_quarterDevicePerfTable[VOP3_V_DIV_FMAS_F32] = 4;
     m_s_quarterDevicePerfTable[VOP3_V_DIV_FIXUP_F32] = 4;
-
+    m_s_quarterDevicePerfTable[VOP1_V_FRACT_F32] = 4;
+    m_s_quarterDevicePerfTable[VOP2_V_MAX_LEGACY_F32] = 4;
+    m_s_quarterDevicePerfTable[VOP1_V_TRUNC_F32] = 4;
+    m_s_quarterDevicePerfTable[VOP2_V_MIN_LEGACY_F32] = 4;
+    m_s_quarterDevicePerfTable[VOP2_V_MIN_F32] = 4;
+    m_s_quarterDevicePerfTable[VOP2_V_MAX_F32] = 4;
+    m_s_quarterDevicePerfTable[VOP2_V_CEIL_F32] = 4;
+    m_s_quarterDevicePerfTable[VOP2_V_RNDNE_F32] = 4;
+    m_s_quarterDevicePerfTable[VOP2_V_FLOOR_F32] = 4;
+    m_s_quarterDevicePerfTable[VOP2_V_MIN_I32] = 4;
+    m_s_quarterDevicePerfTable[VOP2_V_MAX_U32] = 4;
+    m_s_quarterDevicePerfTable[VOP2_V_MIN_U32] = 4;
+    m_s_quarterDevicePerfTable[VOP2_V_ASHR_I32] = 4;
 
     // Half rate.
     m_s_quarterDevicePerfTable[VOP1_V_LOG_F32] = 8;
@@ -1287,7 +1323,6 @@ void Instruction::SetUpQuarterDevicesPerfTables()
     m_s_quarterDevicePerfTable[VOP1_V_SQRT_F64] = 16;
     m_s_quarterDevicePerfTable[VOP1_V_RSQ_CLAMP_F64] = 16;
     m_s_quarterDevicePerfTable[VOP1_V_RSQ_F64] = 16;
-
 }
 
 std::string Instruction::GetFunctionalUnitAsString(InstructionCategory category)
