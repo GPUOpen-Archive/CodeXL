@@ -62,7 +62,8 @@ namespace CodeXLVSPackageVSIX
         IClassificationType _macroType;
 
         // A list of OpenCL-only keywords, from the OpenCL specification:
-        static string[] openclCKeywords = {"__attribute__", "__generic", "__kernel_exec", "__read_only", "__read_write", "__write_only", "aligned", "atomic_double", "atomic_flag", "atomic_float",
+        static string[] openclCKeywords = {"__attribute__", "__constant", "__generic", "__global", "__kernel_exec", "__kernel", "__local", "__private",
+                                           "__read_only", "__read_write", "__write_only", "aligned", "atomic_double", "atomic_flag", "atomic_float",
                                            "atomic_int", "atomic_intptr_t", "atomic_long", "atomic_ptrdiff_t", "atomic_size_t", "atomic_uint", "atomic_uintptr_t", "atomic_ulong", "bool", "char",
                                            "char16", "char2", "char3", "char4", "char8", "cl_mem_fence_flags", "clk_event_t", "clk_profiling_info", "const", "device",
                                            "double", "double16", "double2", "double3", "double4", "double8", "endian", "even", "event_t", "extern",
