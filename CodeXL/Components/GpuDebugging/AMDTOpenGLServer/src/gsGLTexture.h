@@ -38,7 +38,7 @@ public:
     bool isTextureBoundToActiveFBO() const { return _isBoundToActiveFBO; };
 
     // Updates the OpenGL parameters for each of the texture mip levels:
-    bool updateTextureParameters(bool shouldUpdateOnlyMemoryParams);
+    bool updateTextureParameters(bool shouldUpdateOnlyMemoryParams, bool isOpenGL31CoreContext);
     void markAllParametersAsUpdated(bool isUpdated);
     void setNewMipLevelsAllocIds();
 
@@ -57,8 +57,8 @@ public:
 private:
 
     // Private parameters update functions:
-    bool updateTextureParameters(GLenum bindTarget, bool shouldUpdateOnlyMemoryParams);
-    bool updateTextureMipLevelsParameters(GLenum bindTarget, bool shouldUpdateOnlyMemoryParams);
+    bool updateTextureParameters(GLenum bindTarget, bool shouldUpdateOnlyMemoryParams, bool isOpenGL31CoreContext);
+    bool updateTextureMipLevelsParameters(GLenum bindTarget, bool shouldUpdateOnlyMemoryParams, bool isOpenGL31CoreContext);
     bool shouldFailOnTextureParameterUpdate(const apGLTextureParams& textureParams, GLenum paramName) const;
     bool isDeprecatedTexParam(GLenum paraName) const;
     bool isMemoryParameter(GLenum parameterName);

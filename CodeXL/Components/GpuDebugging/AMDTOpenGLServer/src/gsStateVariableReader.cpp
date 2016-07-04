@@ -303,20 +303,14 @@ bool gsStateVariableReader::getStateVariableValue(apParameter*& pStateVariableVa
             int removedMinorVersion = 0;
             apOpenGLVersionToInts(removedVersion, removedMajorVersion, removedMinorVersion);
 
-            int contextOpenGLVersion[2] = {0, 0};
-            _pMyRenderContextMtr->getOpenGLVersion(contextOpenGLVersion[0], contextOpenGLVersion[1]);
-
-            if ((removedMajorVersion < contextOpenGLVersion[0]) ||
-                ((removedMajorVersion == contextOpenGLVersion[0]) && (removedMinorVersion <= contextOpenGLVersion[1])))
-            {
-                wasRemoved = true;
-            }
+            // Compatibility contexts do not remove older state variables:
+            wasRemoved = _pMyRenderContextMtr->isOpenGLVersionOrNewerCoreContext(removedMajorVersion, removedMinorVersion);
         }
     }
 #endif // def _AMDT_OPENGLSERVER_EXPORTS
 
-    // Compatibility contexts do not remove older state variables:
-    if (wasRemoved && !(_pMyRenderContextMtr->isComaptibilityContext()))
+    // If this variable was removed:
+    if (wasRemoved)
     {
         // This state variable was removed at this (or a previous) version, return a parameter to show this:
         pStateVariableValue = new apRemovedParameter(removedVersion);

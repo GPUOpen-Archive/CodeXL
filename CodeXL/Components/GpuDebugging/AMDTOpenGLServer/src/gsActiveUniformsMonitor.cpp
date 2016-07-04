@@ -2898,7 +2898,7 @@ bool gsActiveUniformsMonitor::update20ProgramAvailableUniforms(apGLItemsCollecti
             // Add the program uniforms to the uniforms container:
             char uniformName[GS_MAX_UNIFORM_NAME + 1];
 
-            for (int i = 0; i < amountOfProgramUniforms; i++)
+            for (int i = 0; i < amountOfProgramUniformsBlocks; i++)
             {
                 // Get the current uniform details:
                 uniformName[0] = 0;

@@ -36,7 +36,7 @@ public:
     gsAttribStackItem& topItem() { return _attribStack.top(); };
 
     // On event functions:
-    void onFirstTimeContextMadeCurrent(const int contextOpenGLVersion[2], bool isCompatibilityContext);
+    void onFirstTimeContextMadeCurrent(bool attribStackSupported);
     void onViewPortSet(GLint x, GLint y, GLsizei width, GLsizei height);
     void onSetDrawBuffersCall(GLenum drawnBuffers);
     void onPolygonRasterModeSet(GLenum face, GLenum rasterMode);

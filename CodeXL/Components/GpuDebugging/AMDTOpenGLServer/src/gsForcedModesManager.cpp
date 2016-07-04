@@ -86,20 +86,9 @@ void gsForcedModesManager::onFirstTimeContextMadeCurrent(gsRenderContextMonitor&
     if (_pForcedRenderContextMonitor->spyId() != AP_NULL_CONTEXT_ID)
     {
         // Initialize the attribute stack:
-        int contextOpenGLVersion[2] = {0, 0};
-        forcedRenderContextMonitor.getOpenGLVersion(contextOpenGLVersion[0], contextOpenGLVersion[1]);
-        bool isCompatibilityContext = forcedRenderContextMonitor.isComaptibilityContext();
-        _attribStack.onFirstTimeContextMadeCurrent(contextOpenGLVersion, isCompatibilityContext);
-
-        if ((contextOpenGLVersion[0] > 3) || ((contextOpenGLVersion[0] == 3) && (contextOpenGLVersion[1] > 0)))
-        {
-            // OpenGL 3.1 and higher do not support separate polygon faces:
-            _separatePolygonModesSupported = false;
-        }
-        else
-        {
-            _separatePolygonModesSupported = true;
-        }
+        bool isOpenGL31CoreContext = forcedRenderContextMonitor.isOpenGLVersionOrNewerCoreContext();
+        _separatePolygonModesSupported = !isOpenGL31CoreContext;
+        _attribStack.onFirstTimeContextMadeCurrent(!isOpenGL31CoreContext);
     }
 }
 

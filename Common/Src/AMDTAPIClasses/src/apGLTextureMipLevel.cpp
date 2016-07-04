@@ -840,6 +840,12 @@ bool apGLTextureMipLevel::getDimensions(GLsizei& width, GLsizei& height, GLsizei
     {
         borderSize = (GLsizei)b;
     }
+    else
+    {
+        // Texture border is not supported for OpenGL 3.1 and higher core contexts:
+        borderSize = 0;
+        rc4 = true;
+    }
 
     if (!rc1 || !rc2 || !rc3 || !rc4)
     {

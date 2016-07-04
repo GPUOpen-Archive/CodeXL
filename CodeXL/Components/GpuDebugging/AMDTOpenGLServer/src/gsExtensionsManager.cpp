@@ -1058,6 +1058,8 @@ void gsExtensionsManager::calculateRenderContextSpyExtensionStrings(int contextS
                 GT_ASSERT(rcFunc);
             }
 
+            extensionStringsVector.reserve(numberOfExtensions + 2);
+
             GT_IF_WITH_ASSERT(contextRealFuncs.glGetStringi != NULL)
             {
                 SU_BEFORE_EXECUTING_REAL_FUNCTION(ap_glGetStringi);

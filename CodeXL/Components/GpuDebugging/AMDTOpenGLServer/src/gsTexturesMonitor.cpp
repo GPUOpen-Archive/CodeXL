@@ -144,7 +144,15 @@ void gsTexturesMonitor::beforeContextDeletion()
         // Update the texture parameters:
         GT_IF_WITH_ASSERT(pTexture != NULL)
         {
-            pTexture->updateTextureParameters(false);
+            // Get the OpenGL version and profile, for deprecation checking:
+            bool isOpenGL31CoreContext = false;
+            const gsRenderContextMonitor* pRenderContextMonitor = gsOpenGLMonitor::instance().renderContextMonitor(_spyContextId);
+            GT_IF_WITH_ASSERT(nullptr != pRenderContextMonitor)
+            {
+                isOpenGL31CoreContext = pRenderContextMonitor->isOpenGLVersionOrNewerCoreContext();
+            }
+
+            pTexture->updateTextureParameters(false, isOpenGL31CoreContext);
         }
     }
 }
