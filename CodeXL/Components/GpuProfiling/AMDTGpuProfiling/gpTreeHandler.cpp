@@ -469,6 +469,14 @@ void gpTreeHandler::BuildFrameAnalysisSessionTree(QTreeWidgetItem* pTreeItem, gp
                 // Build the frame index tree item
                 GetFrameTreeItem(pSessionData, frameIndex);
             }
+
+            // update tree item with frames number
+            int numFrames = framesIndices.size();
+            if (numFrames)
+            {
+                pItemData->m_pTreeWidgetItem->setText(0, QString(pSessionData->m_name).append(GPU_STR_dashboard_CapturedFramesCaptionNumFrames).arg(numFrames));
+            }
+
         }
     }
 }
