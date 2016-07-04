@@ -1282,14 +1282,15 @@ bool osExecAndGrabOutput(const char* cmd, const bool& cancelSignal, gtString& cm
 
 OS_API bool osIsParent(osProcessId parentProcessId, osProcessId processId)
 {
-    GT_UNREFERENCED_PARAMETER(parentProcessId);
-    GT_UNREFERENCED_PARAMETER(processId);
+    osProcessId originalParentProcessId;
+
+	osGetProcessIdentificationInfo(processId, &originalParentProcessId);
     bool retVal = false;
 
-    // TO DO
-    // To find the parent process ID of a given process, we will need to read this information from the / proc virtual file system.
-    // For example, when using shell, we can execute the following command : grep '^PPid' "/proc/$PID/status" | cut - f2
-    // An implementation that does a similar task(reads the / proc virtual file system) can be found at osGetCurrentApplicationPath
+    if (originalParentProcessId == parentProcessId)
+    {
+    	retVal = true;
+    }
 
     return retVal;
 }

@@ -416,7 +416,7 @@
     #define GPU_STR_GraphicsCapturePlayer64 L"CXLGraphicsServerPlayer-x64" GDT_DEBUG_SUFFIX_W
 #else
     #define GPU_STR_perfStudioServer64 L"CXLGraphicsServer-x64"
-    #define GPU_STR_CodeXLAgent L"CodeXLRemoteAgent"
+    #define GPU_STR_CodeXLAgent L"CodeXLRemoteAgent-bin"
     #define GPU_STR_GraphicsCapturePlayer64 L"CXLGraphicsServerPlayer-x64"
 #endif
 #define GPU_STR_CodeXLAgentHomeIP L"127.0.0.1"
