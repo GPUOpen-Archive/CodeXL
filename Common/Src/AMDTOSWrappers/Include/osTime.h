@@ -81,7 +81,7 @@ public:
     static void currentTimeAsString(gtString& currentTime, TimeFormat stringFormat, TimeZone timeZone);
 
     /// Get the current local time in string format, including milliseconds
-    static void currentPreciseTimeAsString(gtString& currentTime, TimeFormat stringFormat);
+    static bool currentPreciseTimeAsString(gtString& currentTime, TimeFormat stringFormat);
 
 private:
     // Contains the number of seconds elapsed since midnight (00:00:00), January 1, 1970,

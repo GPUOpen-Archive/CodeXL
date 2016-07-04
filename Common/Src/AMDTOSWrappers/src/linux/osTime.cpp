@@ -15,9 +15,10 @@
 // Author:      Doron Ofek
 // Date:        Dec-24, 2015
 // ---------------------------------------------------------------------------
-void osTime::currentPreciseTimeAsString(gtString& strTime, TimeFormat stringFormat)
+bool osTime::currentPreciseTimeAsString(gtString& strTime, TimeFormat stringFormat)
 {
     struct timespec timePoint;
+    bool retVal = false;
 
     int rc = clock_gettime(CLOCK_REALTIME, &timePoint);
     GT_IF_WITH_ASSERT(0 == rc)
@@ -36,9 +37,12 @@ void osTime::currentPreciseTimeAsString(gtString& strTime, TimeFormat stringForm
         {
             strTime.appendFormattedString(L".%03d", milliseconds);
         }
+        retVal = true;
     }
     else
     {
-        strTime = L"Failed to query system time";
+        strTime.makeEmpty();
     }
+
+    return retVal;
 }
