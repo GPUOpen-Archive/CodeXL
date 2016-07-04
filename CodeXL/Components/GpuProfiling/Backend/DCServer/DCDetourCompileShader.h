@@ -39,8 +39,14 @@ public:
 protected:
     ///// Detour D3DCompile
     bool OnAttach();
+
+    /// Hook the current loaded AttachD3DCompile symbol, detaching old hooks if they are outdated
     bool AttachD3DCompile();
+
+    /// Hook the current loaded AttachD3DCompile2 symbol, detaching old hooks if they are outdated
     bool AttachD3DCompile2();
+
+    /// Hook the current loaded AttachD3DCompileFromFile symbol, detaching old hooks if they are outdated
     bool AttachD3DCompileFromFile();
 
 private:

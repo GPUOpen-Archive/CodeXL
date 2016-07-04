@@ -51,21 +51,6 @@ typedef HRESULT(WINAPI* D3D11CreateDevice_type)(IDXGIAdapter* pAdapter,
                                                 D3D_FEATURE_LEVEL* pFeatureLevel,
                                                 ID3D11DeviceContext** ppImmediateContext);
 
-//typedef HRESULT(WINAPI* D3DX11CompileFromFileA_type)(LPCSTR pSrcFile, CONST D3D10_SHADER_MACRO* pDefines, LPD3D10INCLUDE pInclude,
-//                                                     LPCSTR pFunctionName, LPCSTR pProfile, UINT Flags1, UINT Flags2, ID3DX11ThreadPump* pPump, ID3D10Blob** ppShader, ID3D10Blob** ppErrorMsgs, HRESULT* pHResult);
-//
-//typedef HRESULT(WINAPI* D3DX11CompileFromFileW_type)(LPCWSTR pSrcFile, CONST D3D10_SHADER_MACRO* pDefines, LPD3D10INCLUDE pInclude,
-//                                                     LPCSTR pFunctionName, LPCSTR pProfile, UINT Flags1, UINT Flags2, ID3DX11ThreadPump* pPump, ID3D10Blob** ppShader, ID3D10Blob** ppErrorMsgs, HRESULT* pHResult);
-//
-//typedef HRESULT(WINAPI* D3DX11CompileFromResourceA_type)(HMODULE hSrcModule, LPCSTR pSrcResource, LPCSTR pSrcFileName, CONST D3D10_SHADER_MACRO* pDefines,
-//                                                         LPD3D10INCLUDE pInclude, LPCSTR pFunctionName, LPCSTR pProfile, UINT Flags1, UINT Flags2, ID3DX11ThreadPump* pPump, ID3D10Blob** ppShader, ID3D10Blob** ppErrorMsgs, HRESULT* pHResult);
-//
-//typedef HRESULT(WINAPI* D3DX11CompileFromResourceW_type)(HMODULE hSrcModule, LPCWSTR pSrcResource, LPCWSTR pSrcFileName, CONST D3D10_SHADER_MACRO* pDefines,
-//                                                         LPD3D10INCLUDE pInclude, LPCSTR pFunctionName, LPCSTR pProfile, UINT Flags1, UINT Flags2, ID3DX11ThreadPump* pPump, ID3D10Blob** ppShader, ID3D10Blob** ppErrorMsgs, HRESULT* pHResult);
-//
-//typedef HRESULT(WINAPI* D3DX11CompileFromMemory_type)(LPCSTR pSrcData, SIZE_T SrcDataLen, LPCSTR pFileName, CONST D3D10_SHADER_MACRO* pDefines, LPD3D10INCLUDE pInclude,
-//                                                      LPCSTR pFunctionName, LPCSTR pProfile, UINT Flags1, UINT Flags2, ID3DX11ThreadPump* pPump, ID3D10Blob** ppShader, ID3D10Blob** ppErrorMsgs, HRESULT* pHResult);
-
 typedef HRESULT(WINAPI* D3DCompile_type)(
     LPCVOID pSrcData,
     SIZE_T SrcDataSize,
@@ -122,14 +107,6 @@ extern IDXGIFactory1_CreateSwapChain_type Real_IDXGIFactory1_CreateSwapChain;
 
 extern D3D11CreateDeviceAndSwapChain_type Real_D3D11CreateDeviceAndSwapChain;
 extern D3D11CreateDevice_type Real_D3D11CreateDevice;
-
-//extern D3DX11CompileFromFileW_type Real_D3DX11CompileFromFileW;
-//extern D3DX11CompileFromResourceW_type Real_D3DX11CompileFromResourceW;
-//
-//extern D3DX11CompileFromFileA_type Real_D3DX11CompileFromFileA;
-//extern D3DX11CompileFromResourceA_type Real_D3DX11CompileFromResourceA;
-//
-//extern D3DX11CompileFromMemory_type Real_D3DX11CompileFromMemory;
 
 extern CreateDXGIFactory1_type Real_CreateDXGIFactory1;
 
