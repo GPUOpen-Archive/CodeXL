@@ -80,3 +80,13 @@ void ServerListenThread::beforeTermination()
         it->terminate();
     }
 }
+
+void ServerListenThread::~ServerListenThread()
+{
+    // free all allocated thread objects
+    for (auto it : m_spawnedThreads)
+    {
+        free *it;
+    }
+    m_spawnedThreads.clear();
+}
