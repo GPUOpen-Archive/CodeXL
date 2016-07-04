@@ -42,7 +42,7 @@ public:
         const char* elementText = inElement.GetText();
 
         // Step through each element, looking for specific names. Extract what we need to fill out our structure.
-        if (elementName != NULL && elementText != NULL)
+        if (elementName != nullptr && elementText != nullptr)
         {
             if (strcmp(elementName, "API") == 0)
             {
@@ -114,7 +114,7 @@ private:
 /// Default constructor for the TraceMetadata class.
 //--------------------------------------------------------------------------
 TraceMetadata::TraceMetadata()
-    : mFrameInfo(NULL)
+    : mFrameInfo(nullptr)
     , mArchitecture(OS_UNKNOWN_ARCHITECTURE)
     , mAPICallCount(0)
     , mDrawCallCount(0)
