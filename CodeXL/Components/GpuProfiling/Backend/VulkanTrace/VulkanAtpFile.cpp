@@ -49,8 +49,7 @@ const static std::string s_str_threadAPICountHeaderPrefix = "//ThreadAPICount=";
 static const size_t s_min_vm_size_for_api_parse(100 * MEGA_BYTE);
 
 VKAtpFilePart::VKAtpFilePart(const Config& config, bool shouldReleaseMemory) : IAtpFilePart(config, shouldReleaseMemory),
-    m_currentParsedTraceType(API), m_currentParsedThreadID(0), m_currentParsedThreadAPICount(0),
-    m_cpuStart(0), m_cpuEnd(0), m_gpuStart(0)
+    m_currentParsedTraceType(API), m_currentParsedThreadID(0), m_currentParsedThreadAPICount(0)
 {
 #define PART_NAME "vulkan"
     m_strPartName = PART_NAME;
@@ -159,20 +158,6 @@ bool VKAtpFilePart::ParseGPUAPICallString(const std::string& apiStr, VKGPUTraceI
 
         apiInfo.m_ullStart = ULONGLONG(timeStartDouble * GP_VK_TIMESTAMP_MILLISECONDS_TO_NANOSECONDS_FACTOR);
         apiInfo.m_ullEnd = ULONGLONG(timeEndDouble * GP_VK_TIMESTAMP_MILLISECONDS_TO_NANOSECONDS_FACTOR);
-
-        /// Store the GPU start time if it is not stored yet
-        /// GPU timestamps to fit the CPU timeline
-        if ((m_gpuStart == 0) || (m_gpuStart > apiInfo.m_ullStart))
-        {
-            m_gpuStart = apiInfo.m_ullStart;
-        }
-
-        if (m_cpuStart != 0)
-        {
-            // If the CPU start time is stored, "normalize" the GPU times according to the CPU time
-            apiInfo.m_ullStart = apiInfo.m_ullStart - m_gpuStart + m_cpuEnd - (m_cpuEnd - m_cpuStart) / 3;
-            apiInfo.m_ullEnd = apiInfo.m_ullEnd - m_gpuStart + m_cpuEnd - (m_cpuEnd - m_cpuStart) / 3;
-        }
 
         // Checking the status is done before attempting to read 'sample id' because 
         // the reading of 'sample id' is not critical and can fail without affecting the rest of the parsing.
@@ -299,16 +284,6 @@ bool VKAtpFilePart::ParseCPUAPICallString(const std::string& apiStr, VKAPIInfo& 
 
         apiInfo.m_ullStart = ULONGLONG(timeStartDouble * GP_VK_TIMESTAMP_MILLISECONDS_TO_NANOSECONDS_FACTOR);
         apiInfo.m_ullEnd = ULONGLONG(timeEndDouble * GP_VK_TIMESTAMP_MILLISECONDS_TO_NANOSECONDS_FACTOR);
-
-        // Store the CPU start and end time (if not stored yet)
-        if (m_cpuStart == 0)
-        {
-            m_cpuStart = apiInfo.m_ullStart;
-        }
-        if (apiInfo.m_ullEnd > m_cpuEnd)
-        {
-            m_cpuEnd = apiInfo.m_ullEnd;
-        }
 
         ss >> apiInfo.m_sampleId;
         CHECK_SS_ERROR(ss);
