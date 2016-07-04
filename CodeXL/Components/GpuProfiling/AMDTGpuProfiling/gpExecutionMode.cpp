@@ -1131,6 +1131,7 @@ void gpExecutionMode::HandleSpecialRunningProcesses()
     OS_DEBUG_LOG_TRACER;
     InitializeCodeXLRemoteAgent();
 
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     // Check if the raptr.exe or fraps.exe is running on the remote agent
     bool isRaptrRunning = false;
     bool isFrapsRunning = false;
@@ -1163,7 +1164,7 @@ void gpExecutionMode::HandleSpecialRunningProcesses()
             }
         }
     }
-
+#endif
     HandleRunningProjectProcess();
 
 }
