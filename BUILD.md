@@ -27,7 +27,7 @@ CodeXL uses the SCons build system on Linux.
 #### One time setup:
 * `sudo apt-get install gcc-multilib g++-multilib`
 * `sudo apt-get install gcc-4.9-multilib g++-4.9-multilib # added for Ubuntu 15.10 or above`
-* `sudo apt-get install libglu1-mesa-dev mesa-common-dev libgtk2.0-dev`
+* `sudo apt-get install libglu1-mesa-dev mesa-common-dev libgtk2.0-dev libpng16-dev libjpeg9-dev`
 * `sudo apt-get install zlib1g-dev libx11-dev:i386`
 * `sudo apt-get install scons`
 * Download and install latest JDK both for linux from : http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
