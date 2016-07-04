@@ -37,9 +37,7 @@
 #include <inc/SessionFunctionView.h>
 
 SessionFunctionView::SessionFunctionView(QWidget* pParent, CpuSessionWindow* pSessionWindow)
-    :  DataTab(pParent, pSessionWindow),
-       m_pFunctionTable(nullptr),
-       m_pLabelModuleSelectedAction(nullptr), m_pPIDComboBoxAction(nullptr)
+    :  DataTab(pParent, pSessionWindow)
 {
     setMouseTracking(true);
 
@@ -178,8 +176,9 @@ bool SessionFunctionView::displaySessionDataTables()
     bool retVal = false;
 
     // Sanity check:
-    //SessionDisplaySettings* pSessionDisplaySettings = CurrentSessionDisplaySettings();
-    GT_IF_WITH_ASSERT((m_pFunctionTable != nullptr) && (m_pProfileReader != nullptr))
+    GT_IF_WITH_ASSERT((m_pFunctionTable != nullptr) &&
+                      (m_pProfDataRdr != nullptr) &&
+                      (m_pDisplayFilter != nullptr))
     {
         // Use case
         //1. all module all process
@@ -205,6 +204,8 @@ bool SessionFunctionView::displaySessionDataTables()
         }
         else
         {
+            //3. multiple/single module single Process
+            //4. multiple / single module all process
             int selModSize = m_functionsTablesFilter.m_filterByModulePathsList.size();
             std::vector<AMDTUInt64> selecedModIdVec;
 
@@ -225,8 +226,6 @@ bool SessionFunctionView::displaySessionDataTables()
                                                         AMDT_PROFILE_ALL_MODULES, selecedModIdVec);
         }
 
-        //3. multiple/single module single Process
-        //4. multiple / single module all process
     }
 
     return retVal;
@@ -235,7 +234,7 @@ bool SessionFunctionView::displaySessionDataTables()
 void SessionFunctionView::initDisplayFilters()
 {
     // Set the display filter for the modules table:
-	m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::FUNCTION_ID);
+    m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::FUNCTION_ID);
     m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::FUNCTION_NAME_COL);
     m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::MODULE_NAME_COL);
 }
@@ -317,35 +316,36 @@ void SessionFunctionView::CreateToolbar()
 
 void SessionFunctionView::selectFunction(const QString& funcId)
 {
-	GT_IF_WITH_ASSERT(m_pFunctionTable != nullptr)
-	{
-		int itemRowIndex = -1;
+    GT_IF_WITH_ASSERT(m_pFunctionTable != nullptr)
+    {
+        int itemRowIndex = -1;
 
-		for (int i = 0; i < m_pFunctionTable->rowCount(); i++)
-		{
-			QTableWidgetItem* pItem = m_pFunctionTable->item(i, 0);
+        for (int i = 0; i < m_pFunctionTable->rowCount(); i++)
+        {
+            QTableWidgetItem* pItem = m_pFunctionTable->item(i, 0);
 
-			if (pItem != nullptr)
-			{
-				if (pItem->text() == funcId)
-				{
-					itemRowIndex = i;
-					break;
-				}
-			}
-		}
+            if (pItem != nullptr)
+            {
+                if (pItem->text() == funcId)
+                {
+                    itemRowIndex = i;
+                    break;
+                }
+            }
+        }
 
-		// Select and ensure visible:
-		GT_IF_WITH_ASSERT(itemRowIndex < m_pFunctionTable->rowCount())
-		{
-			m_pFunctionTable->ensureRowVisible(itemRowIndex, true);
-			m_pFunctionTable->setFocus();
-			setFocus();
-			raise();
-			activateWindow();
-		}
-	}
+        // Select and ensure visible:
+        GT_IF_WITH_ASSERT(itemRowIndex < m_pFunctionTable->rowCount())
+        {
+            m_pFunctionTable->ensureRowVisible(itemRowIndex, true);
+            m_pFunctionTable->setFocus();
+            setFocus();
+            raise();
+            activateWindow();
+        }
+    }
 }
+
 void SessionFunctionView::selectFunction(const QString& functionName, ProcessIdType pid)
 {
     GT_IF_WITH_ASSERT(nullptr != m_pPIDComboBoxAction)
@@ -413,9 +413,9 @@ ProcessIdType SessionFunctionView::getCurrentPid()
 void SessionFunctionView::filterByPID(int pid)
 {
     const QComboBox* pPIDComboBox = TopToolbarComboBox(m_pPIDComboBoxAction);
-    GT_IF_WITH_ASSERT((m_pFunctionTable != nullptr) && 
-			(m_pPIDComboBoxAction != nullptr) && 
-		(pPIDComboBox != nullptr))
+    GT_IF_WITH_ASSERT((m_pFunctionTable != nullptr) &&
+                      (m_pPIDComboBoxAction != nullptr) &&
+                      (pPIDComboBox != nullptr))
     {
         // bool found = false;
         int count = pPIDComboBox->count();
@@ -480,9 +480,6 @@ void SessionFunctionView::onOpenModuleSelector(const QString& link)
 
     //TODO: need to set the system module flag
     ModuleFilterDialog mfd(m_pProfDataRdr, &m_functionsTablesFilter, pSessionData, true, afMainAppWindow::instance());
-
-    //get the selected modle list
-
 
     if (QDialog::Accepted == mfd.exec())
     {
@@ -562,7 +559,7 @@ QString SessionFunctionView::updateModulesFilterLinkString()
 void SessionFunctionView::fillPIDComb()
 {
     // Sanity check:
-    GT_IF_WITH_ASSERT((m_pPIDComboBoxAction != nullptr) && (m_pProfileReader != nullptr))
+    GT_IF_WITH_ASSERT((m_pPIDComboBoxAction != nullptr) && (m_pProfDataRdr != nullptr))
     {
         QStringList pidList;
 
@@ -577,10 +574,6 @@ void SessionFunctionView::fillPIDComb()
         {
             pidList << CP_profileAllProcesses;
         }
-
-        // Go through the processes and add each of them to the combo box:
-        PidProcessMap::iterator pmStart = m_pProfileReader->getProcessMap()->begin();
-        PidProcessMap::iterator pmEnd = m_pProfileReader->getProcessMap()->end();
 
         for (const auto& proc : procInfo)
         {
@@ -602,40 +595,6 @@ void SessionFunctionView::fillPIDComb()
         m_pPIDComboBoxAction->UpdateCurrentIndex(index);
     }
 }
-
-#if 0
-void SessionFunctionView::addModulesForPID(uint pid)
-{
-    // Update the modules list for the requested pid:
-    NameModuleMap* pNameModuleMap = m_pProfileReader->getModuleMap();
-    int moduleCount = 0;
-
-    for (NameModuleMap::const_iterator mit = pNameModuleMap->begin(), mEnd = pNameModuleMap->end(); mit != mEnd; ++mit)
-    {
-        const CpuProfileModule& module = mit->second;
-
-        if (module.isIndirect())
-        {
-            continue;
-        }
-
-        if (module.getEndSample() != module.findSampleForPid(pid))
-        {
-            if (!m_functionsTablesFilter.m_allModulesFullPathsList.contains(acGTStringToQString(mit->first)))
-            {
-                m_functionsTablesFilter.m_allModulesFullPathsList.append(acGTStringToQString(mit->first));
-                m_functionsTablesFilter.m_isModule32BitList.append(mit->second.m_is32Bit);
-
-                // Check if this is a system dll:
-                bool isSystemModule = AuxIsSystemModule(mit->first);
-                m_functionsTablesFilter.m_isSystemDllList.append(isSystemModule);
-                ++moduleCount;
-                ++counter;
-            }
-        }
-    }
-}
-#endif
 
 void SessionFunctionView::onSelectPid(int index)
 {
@@ -773,105 +732,50 @@ void SessionFunctionView::UpdateTableDisplay(unsigned int updateType)
 
 void SessionFunctionView::onTableItemActivated(QTableWidgetItem* pActivateItem)
 {
-	GT_IF_WITH_ASSERT(pActivateItem != nullptr)
-	{
-		const QComboBox* pPIDComboBox = TopToolbarComboBox(m_pPIDComboBoxAction);
-		GT_IF_WITH_ASSERT((m_pFunctionTable != nullptr) && (pPIDComboBox != nullptr))
-		{
-			// don't make action on empty table message row
-			if (pActivateItem->row() != m_pFunctionTable->GetEmptyTableItemRowNum())
-			{
-				// Get the address for the activated function:
-				//const CpuProfileModule* pModule = nullptr;
-				QString funcIdStr = m_pFunctionTable->getFunctionId(pActivateItem->row());
-				AMDTUInt32 funcId = funcIdStr.toInt();
-				funcId = funcId;
+    GT_IF_WITH_ASSERT(pActivateItem != nullptr)
+    {
+        const QComboBox* pPIDComboBox = TopToolbarComboBox(m_pPIDComboBoxAction);
+        GT_IF_WITH_ASSERT((m_pFunctionTable != nullptr) && (pPIDComboBox != nullptr))
+        {
+            // don't make action on empty table message row
+            if (pActivateItem->row() != m_pFunctionTable->GetEmptyTableItemRowNum())
+            {
+                // Get the address for the activated function:
+                //const CpuProfileModule* pModule = nullptr;
+                QString funcIdStr = m_pFunctionTable->getFunctionId(pActivateItem->row());
+                AMDTUInt32 funcId = funcIdStr.toInt();
+                funcId = funcId;
 
-				QString modPath = m_pFunctionTable->getModuleName(pActivateItem->row());
-				AMDTUInt32 moduleId = AMDT_PROFILE_ALL_MODULES;
-				AMDTUInt32  processId = AMDT_PROFILE_ALL_PROCESSES;
+                QString modPath = m_pFunctionTable->getModuleName(pActivateItem->row());
+                AMDTUInt32 moduleId = AMDT_PROFILE_ALL_MODULES;
+                AMDTUInt32  processId = AMDT_PROFILE_ALL_PROCESSES;
 
-				//get the module id
-				AMDTProfileModuleInfoVec moduleInfo;
-				m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, moduleInfo);
-				for (const auto& mod : moduleInfo)
-				{
-					if (mod.m_path == acQStringToGTString(modPath))
-					{
-						moduleId = mod.m_moduleId;
-						break;
-					}
-				}
+                //get the module id
+                AMDTProfileModuleInfoVec moduleInfo;
+                m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, moduleInfo);
 
-				gtString processIdStr = acQStringToGTString(pPIDComboBox->currentText());
-
-				if (processIdStr != L"All Processes")
-				{
-					processId = pPIDComboBox->currentText().toInt();
-				}
-
-				auto funcModInfo = std::make_tuple(funcId, acQStringToGTString(modPath), moduleId, processId);
-				// Emit a function activated signal (will open a source code view):
-				emit opensourceCodeViewSig(funcModInfo);
-			}
-		}
-	}
-
-#if 0
-                gtVAddr address = m_pFunctionTable->getFunctionAddress(pActivateItem->row(), pModule);
-
-                // Get the current pid:
-                ProcessIdType pid = pPIDComboBox->currentText().toUInt();
-
-                GT_IF_WITH_ASSERT(pModule != nullptr)
+                for (const auto& mod : moduleInfo)
                 {
-                    switch (pModule->m_modType)
+                    if (mod.m_path == acQStringToGTString(modPath))
                     {
-                        case CpuProfileModule::UNMANAGEDPE:
-                        {
-                            // Check if the modules file path exists. Sometimes, when we import a session, the modules doesn't
-                            // exist on the machine, and in this case, source code view cannot be opened:
-
-                            if (AuxFileExists(acGTStringToQString(pModule->getPath())))
-                            {
-                                // Emit a function activated signal (will open a source code view):
-                                emit functionActivated(address, pid, SHOW_ALL_TIDS, pModule);
-                            }
-                            else
-                            {
-                                // Output a message stating that the source code cannot be opened:
-                                QString msg = QString(CP_functionsViewModuleDoesntExist).arg(acGTStringToQString(pModule->getPath()));
-                                acMessageBox::instance().information(AF_STR_InformationA, msg);
-                            }
-
-                            break;
-                        }
-
-                        case CpuProfileModule::JAVAMODULE:
-                        case CpuProfileModule::MANAGEDPE:
-                        case CpuProfileModule::UNKNOWNKERNELSAMPLES:
-                        {
-                            // For Java and CLR, no need to check whether the module file path exists or not.
-                            // We only need the JNC/JCL files which are already copied into profile-session-dir.
-
-                            // Emit a function activated signal (will open a source code view):
-                            emit functionActivated(address, pid, SHOW_ALL_TIDS, pModule);
-                            break;
-                        }
-
-#ifdef TBI
-
-                        case CpuProfileModule::OCLMODULE:
-#endif // TBI
-                        case CpuProfileModule::UNKNOWNMODULE:
-                        default:
-                            break;
+                        moduleId = mod.m_moduleId;
+                        break;
                     }
                 }
+
+                gtString processIdStr = acQStringToGTString(pPIDComboBox->currentText());
+
+                if (processIdStr != L"All Processes")
+                {
+                    processId = pPIDComboBox->currentText().toInt();
+                }
+
+                auto funcModInfo = std::make_tuple(funcId, acQStringToGTString(modPath), moduleId, processId);
+                // Emit a function activated signal (will open a source code view):
+                emit opensourceCodeViewSig(funcModInfo);
             }
         }
     }
-#endif
 }
 
 void SessionFunctionView::onTableContextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType actionType, QTableWidgetItem* pTableItem)
@@ -905,19 +809,8 @@ void SessionFunctionView::onTableContextMenuActionTriggered(CPUProfileDataTable:
         }
         else if (actionType == CPUProfileDataTable::DISPLAY_FUNCTION_IN_CALLGRAPH_VIEW)
         {
-            const QList<ProcessIdType>* pPidList = m_pFunctionTable->getFunctionPidList(pTableItem->row());
-
-            GT_IF_WITH_ASSERT(nullptr != pPidList && !pPidList->isEmpty())
-            {
-                ProcessIdType pid = getCurrentPid();
-
-                if (0 == pid)
-                {
-                    pid = pPidList->first();
-                }
-
-                openCallGraphViewForFunction(m_pFunctionTable->getFunctionName(pTableItem->row()), pid);
-            }
+            ProcessIdType pid = getCurrentPid();
+            openCallGraphViewForFunction(m_pFunctionTable->getFunctionName(pTableItem->row()), pid);
         }
     }
 }
@@ -953,7 +846,8 @@ void SessionFunctionView::displayModule(const QString& moduleFullPath)
 
 void SessionFunctionView::onCellChanged()
 {
-
+    //unused
+#if 0
     m_isProfiledClu = m_pSessionDisplaySettings->m_displayClu;
 
     if (m_isProfiledClu)
@@ -965,6 +859,8 @@ void SessionFunctionView::onCellChanged()
             UpdateNoteWindowContent(cluData);
         }
     }
+
+#endif
 }
 
 void SessionFunctionView::onEditCopy()

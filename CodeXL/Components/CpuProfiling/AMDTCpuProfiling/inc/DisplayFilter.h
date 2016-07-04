@@ -256,9 +256,11 @@ public:
 class cxlProfileDataReader;
 
 // TYPEDEFS
-//using CounterNameIdVec = std::vector<std::pair<gtString, AMDTUInt32>>;
-// name, abbreviation and description
-using CounterNameIdVec = std::vector<std::tuple<gtString, gtString, gtString, AMDTUInt32>>; // counter name, abbrev, description, counterId
+using CounterNameIdVec = std::vector<std::tuple<gtString,               // counter name
+      gtString,                                                         // counter abbreviation
+      gtString,                                                         // counter desc
+      AMDTUInt32,                                                       // counter-id
+      AMDTUInt32>>;                                                     // counter-type
 using cofigNameCounterMap = std::map<gtString, CounterNameIdVec>;
 using cofigNameCounterPair = std::pair<gtString, CounterNameIdVec>;
 using CounterNameIdMap = std::map<gtString, AMDTUInt64>;
@@ -333,8 +335,8 @@ private:
     std::vector<gtString>                   m_configNameList;
     CounterNameIdMap                        m_counterNameIdMap;
     CounterIdNameMap                        m_counterIdNameMap;
-	CounterNameIdVec						m_selectedCountersIdList;
-    bool m_isSamplePercent = false;
+    CounterNameIdVec                        m_selectedCountersIdList;
+    bool                                    m_isSamplePercent = false;
 };
 
 #endif //__DISPLAYFILTER_H

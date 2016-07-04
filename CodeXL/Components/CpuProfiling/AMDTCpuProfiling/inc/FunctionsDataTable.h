@@ -13,9 +13,6 @@
 #include <QtCore>
 #include <QtWidgets>
 
-// Executable:
-#include <AMDTExecutableFormat/inc/ExecutableFile.h>
-
 // Local:
 #include <inc/CPUProfileDataTable.h>
 
@@ -23,12 +20,16 @@ class CpuSessionWindow;
 
 enum FunctionSummaryCol
 {
-	AMDT_FUNC_SUMMMARY_FUNC_ID_COL = 0,
-	AMDT_FUNC_SUMMMARY_FUNC_NAME_COL,
-	AMDT_FUNC_SUMMMARY_FUNC_SAMPLE_COL,
-	AMDT_FUNC_SUMMMARY_FUNC_PER_SAMPLE_COL,
-	AMDT_FUNC_SUMMMARY_FUNC_MODULE_COL
+    AMDT_FUNC_SUMMMARY_FUNC_ID_COL = 0,
+    AMDT_FUNC_SUMMMARY_FUNC_NAME_COL,
+    AMDT_FUNC_SUMMMARY_FUNC_SAMPLE_COL,
+    AMDT_FUNC_SUMMMARY_FUNC_PER_SAMPLE_COL,
+    AMDT_FUNC_SUMMMARY_FUNC_MODULE_COL,
+    AMDT_FUNC_FUNC_NAME_COL = AMDT_FUNC_SUMMMARY_FUNC_NAME_COL,
+    AMDT_FUNC_FUNC_MODULE_COL,
+    AMDT_FUNC_START_SAMPLE
 };
+
 /// -----------------------------------------------------------------------------------------------
 /// \class Name: FunctionsDataTable : public CPUProfileDataTable
 /// \brief Description:  This class will be used to display functions in data table.
@@ -46,27 +47,15 @@ public:
                        CpuSessionWindow* pSessionWindow);
     virtual ~FunctionsDataTable();
 
-    /// Returns the amount of monitored threads in the profile reader:
-    int amountOfThreads() const { return (int)m_threads.size(); }
-
+    // TODO: Unused ??
     int getFunctionNameColumnIndex() const { return m_functionNameColIndex; }
 
     QString getFunctionName(int rowIndex) const;
-	QString getModuleName(int rowIndex) const;
-	QString getFunctionId(int rowIndex) const;
-
-    /// Get the function address for the function in row row index
-    gtVAddr getFunctionAddress(int rowIndex, const CpuProfileModule*& pModule) const;
-
-    const QList<ProcessIdType>* getFunctionPidList(int rowIndex) const;
+    QString getModuleName(int rowIndex) const;
+    QString getFunctionId(int rowIndex) const;
 
     /// Set the popup for missing files attribute:
     void setPopupToBrowseMissingFiles(bool popup) {m_popupToBrowseMissingFiles = popup;}
-
-    /// Finds the modules handler for the requested module file path
-    /// \param filePath - the modules file path
-    /// \return CpuProfileModule - the output module handler
-    const CpuProfileModule* findModuleHandler(const osFilePath& filePath) const;
 
     // returns functions table type
     TableType GetTableType() const;
@@ -78,75 +67,17 @@ public slots:
 
 protected:
 
-    class FunctionData
-    {
-    public:
-        QString m_functionName;
-        gtVAddr m_functionAddress;
-        gtVector<float> m_dataVector;
-        QList<ProcessIdType> m_pidList;
-        const CpuProfileModule* m_pModule;
-    };
-
-    /// Fill the list data according to the requested item:
-    bool fillListData();
-
-	virtual bool fillSummaryTables(int counterIdx); 
-	bool AddRowToTable(const gtVector<AMDTProfileData>& allModuleData);
-	virtual bool fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> modIdVec = {});
-
-    /// Build the map of the current hot spot values.
-    /// The values are taken from m_functionsInfosVec in order to save the
-    /// calculation of the whole table once changing the hot spot indicator
-    /// \return true / false is succeeded or failed
-    virtual bool buildHotSpotIndicatorMap();
-
-    /// handles event of changing the hotspot indicator combobox
-    /// \return true / false is succeeded or failed
+    virtual bool fillSummaryTables(int counterIdx);
+    virtual bool fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> modIdVec = {});
     virtual bool HandleHotSpotIndicatorSet();
 
-    /// Add all the function items for the module "pid"
-    /// \pModule - the module structure
-    /// \moduleFilePath - module file path
-    bool addFunctionsForModule(const CpuProfileModule* pModule, const QString& moduleFilePath, AggregatedSample& parentSamples);
-
-    /// Add the requested function to the table
-    /// \param rowIndex - the row index
-    /// \param functionData - the function information (name + address)
-    /// \param functionDataVector - the data vector for the function
-    /// \param moduleFilePath - the function module path
-    /// \param is32BitModule is the function module a 32bit module
-    bool addFunctionItem(int rowIndex, const FunctionData& functionData, const QString& moduleFilePath, bool is32BitModule);
-
-    /// Check if the input module path should be filtered:
-    bool shouldModuleBeDisplayed(const CpuProfileModule& module);
-
-    const FunctionData* getFunctionData(int rowIndex) const;
-	bool setModuleIcon(int row, const AMDTProfileModuleInfo& moduleInfo);
-
-
-protected:
-
-    // Testing performance:
-    bool fillListData1();
-    bool fillListData2();
-
-protected:
-
-    /// Member variables that are used for the calculations of functions:
-    gtVAddr m_lastParentAddr;
-
-    gtVector<FunctionData> m_functionsInfosVec;
-
-    /// Contain the currently displayed session amount of thread:
-    QList<int> m_threads;
-
-    /// True iff the user should receive a popup for missing files:
-    bool m_popupToBrowseMissingFiles;
+    bool setModuleIcon(int row, const AMDTProfileModuleInfo& moduleInfo);
+    bool AddRowToTable(const gtVector<AMDTProfileData>& allModuleData);
 
     /// Contain the indices for the function and module name columns:
     int m_functionNameColIndex;
     int m_moduleNameColIndex;
+    bool m_popupToBrowseMissingFiles;
 
     CpuSessionWindow* m_pParentSessionWindow;
 };

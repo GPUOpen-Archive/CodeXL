@@ -706,7 +706,7 @@ bool SessionOverviewWindow::displaySessionProfileDetails(afHTMLContent& content)
 #endif
 
             firstColStr.makeEmpty();
-            int threadsCount = m_pFunctionsTable->amountOfThreads();
+            int threadsCount = 0; //TODO: Needs to be implemented
             firstColStr.appendFormattedString(L"<b>%ls:</b> %d", CP_overviewPageTotalThreads, threadsCount);
             content.addHTMLItem(afHTMLContent::AP_HTML_LINE, firstColStr);
 
@@ -1424,7 +1424,8 @@ void SessionOverviewWindow::activateTableItem(QTableWidgetItem* pActivateItem, C
 
                             pFunctionsView = pSessionWindow->sessionFunctionsView();
 
-                            int itemRow = pActivateItem->row();
+#if 0
+							int itemRow = pActivateItem->row();
 
                             const QList<ProcessIdType>* pPidList = m_pFunctionsTable->getFunctionPidList(itemRow);
                             QString functionName = m_pFunctionsTable->getFunctionName(itemRow);
@@ -1433,6 +1434,7 @@ void SessionOverviewWindow::activateTableItem(QTableWidgetItem* pActivateItem, C
                             {
                                 pFunctionsView->selectFunction(functionName, pPidList->first());
                             }
+#endif
                         }
                     }
                 }
@@ -1689,12 +1691,14 @@ bool SessionOverviewWindow::openFunctionSourceCode(gtVAddr functionAddress, cons
 
 const CpuProfileModule* SessionOverviewWindow::findModuleHandler(const osFilePath& filePath) const
 {
-    const CpuProfileModule* pRetVal = nullptr;
-    GT_IF_WITH_ASSERT(m_pFunctionsTable != nullptr)
+	GT_UNREFERENCED_PARAMETER(filePath);
+	const CpuProfileModule* pRetVal = nullptr;
+#if 0
+	GT_IF_WITH_ASSERT(m_pFunctionsTable != nullptr)
     {
         pRetVal = m_pFunctionsTable->findModuleHandler(filePath);
     }
-
+#endif
     return pRetVal;
 }
 
