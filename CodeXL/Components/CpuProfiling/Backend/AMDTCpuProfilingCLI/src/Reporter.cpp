@@ -7,9 +7,6 @@
 ///
 //==================================================================================
 
-// Qt
-//#include <QtGui>
-
 // STL
 #include <map>
 
@@ -57,7 +54,6 @@ bool Reporter::Open()
 
     if (!m_reportFilePath.isEmpty())
     {
-        // m_reportFilePath.setFileExtension(L"csv");
         retVal = m_reportFile.open(m_reportFilePath, osChannel::OS_ASCII_TEXT_CHANNEL, osFile::OS_OPEN_TO_WRITE);
         m_error = S_OK;
     }
@@ -160,399 +156,253 @@ bool CSVReporter::ReportProfileData(gtVector<gtString> sectionHdrs, gtList<std::
     return true;
 }
 
-bool CSVReporter::ReportSamplingSpec(gtVector<gtString>   sectionHdrs,
-                                     EventEncodeVec&      eventEncodeVec,
-                                     EventConfig*         pEventConfig,
-                                     gtVector<gtString>   eventsNameVec)
+bool CSVReporter::ReportSamplingSpec(
+    gtVector<gtString>& sectionHdrs,
+    AMDTProfileCounterDescVec& counters,
+    AMDTProfileSamplingConfigVec& samplingConfig)
 {
     WriteSectionHeaders(sectionHdrs);
+    int idx = 0;
 
-    if (NULL != pEventConfig)
+    for (auto& counter : counters)
     {
+        gtString sampSpec(L"\n");
 
-        for (gtUInt32 i = 0; i < eventEncodeVec.size(); i++)
-        {
-            gtString sampSpec(L"\n");
-            sampSpec.appendFormattedString(L",\"" STR_FORMAT L"(%x)\"", eventsNameVec[i].asCharArray(),
-                                           pEventConfig[i].eventSelect);
-            sampSpec.appendFormattedString(L",%d", eventEncodeVec[i].eventCount);
-            sampSpec.appendFormattedString(L",%x", pEventConfig[i].eventUnitMask);
-            sampSpec.appendFormattedString(L"," STR_FORMAT, pEventConfig[i].bitUsr ? L"True" : L"False");
-            sampSpec.appendFormattedString(L"," STR_FORMAT, pEventConfig[i].bitOs ? L"True" : L"False");
+        sampSpec.appendFormattedString(L",\"" STR_FORMAT L"(%x)\"", counter.m_name.asCharArray(), samplingConfig[idx].m_hwEventId);
+        sampSpec.appendFormattedString(L",%d", samplingConfig[idx].m_samplingInterval);
+        sampSpec.appendFormattedString(L",%x", samplingConfig[idx].m_unitMask);
+        sampSpec.appendFormattedString(L"," STR_FORMAT, samplingConfig[idx].m_userMode ? L"True" : L"False");
+        sampSpec.appendFormattedString(L"," STR_FORMAT, samplingConfig[idx].m_osMode ? L"True" : L"False");
 
-            m_reportFile.writeString(sampSpec);
-        }
+        m_reportFile.writeString(sampSpec);
+        ++idx;
     }
 
     // Print a blank line at the end of the section
     m_reportFile.writeString(L"\n");
-
     return true;
 }
 
-bool CSVReporter::WriteOverviewFunction(gtVector<gtString>   sectionHdrs,
-                                        FunctionInfoList&    funcList,
-                                        gtVector<gtUInt64>&  totalSamples,
-                                        gtUInt32             nbrCols,
-                                        ColumnSpec*          pColumnSpec,
-                                        EventEncodeVec&      evtEncodeVec,
-                                        bool                 showPerc)
+bool CSVReporter::WriteOverviewFunction(
+    gtVector<gtString>&   sectionHdrs,
+    AMDTProfileDataVec&   funcProfileData,
+    bool                  showPerc)
 {
     WriteSectionHeaders(sectionHdrs);
+    m_reportFile.writeString(L"\n");
 
-    FunctionInfoMap funcMap;
+    int count = 1;
 
-    // Iterate over the function list and sort based on the sort-event mentioned by the user
-    for (FunctionInfoList::iterator iter = funcList.begin(); iter != funcList.end(); iter++)
+    for (const auto& funcInfo : funcProfileData)
     {
-        if (!(*iter).m_dataVector.empty())
+        if (count > 5)
         {
-            double value = static_cast<double>((*iter).m_dataVector[m_sortEventIndex]);
+            break;
+        }
 
-            // If this is CLU, the insert should be based on CLU values
-            if (m_isCLU)
+        gtString rowStr;
+        rowStr.appendFormattedString(L"%ls", funcInfo.m_name.asCharArray());
+
+        for (const auto& ev : funcInfo.m_sampleValue)
+        {
+            if (showPerc)
             {
-                value = GetCLUData((*iter).m_dataVector, nbrCols, pColumnSpec, evtEncodeVec);
+                rowStr.appendFormattedString(L",%0.2f%%", ev.m_sampleCountPercentage);
             }
-
-            funcMap.insert(FunctionInfoMap::value_type(value, (*iter)));
-        }
-    }
-
-    int nbrFunc = 0;
-
-    // TBD: Currently prints only the top 5 functions
-    if (CSVReporter::DESCENDING_ORDER == m_sortOrder)
-    {
-        for (FunctionInfoMap::reverse_iterator rit = funcMap.rbegin(); ((rit != funcMap.rend()) && (nbrFunc < 5)); rit++, nbrFunc++)
-        {
-            FunctionInfo& funcInfo = (*rit).second;
-            WriteFunctionData(funcInfo,
-                              totalSamples,
-                              nbrCols,
-                              pColumnSpec,
-                              evtEncodeVec,
-                              showPerc,
-                              false);
-        }
-    }
-    else if (CSVReporter::ASCENDING_ORDER == m_sortOrder)
-    {
-        for (FunctionInfoMap::iterator it = funcMap.begin(); ((it != funcMap.end()) && (nbrFunc < 5)); it++, nbrFunc++)
-        {
-            FunctionInfo& funcInfo = (*it).second;
-            WriteFunctionData(funcInfo,
-                              totalSamples,
-                              nbrCols,
-                              pColumnSpec,
-                              evtEncodeVec,
-                              showPerc,
-                              false);
-        }
-    }
-
-    // Print a blank line at the end of the section
-    m_reportFile.writeString(L"\n");
-
-    return true;
-}
-
-bool CSVReporter::WriteOverviewProcess(gtVector<gtString>   sectionHdrs,
-                                       PidProcessInfoMap&   pidProcInfoMap,
-                                       gtVector<gtUInt64>&  totalSamples,
-                                       gtUInt32             nbrCols,
-                                       ColumnSpec*          pColumnSpec,
-                                       EventEncodeVec&      evtEncodeVec,
-                                       bool                 showPerc)
-{
-    WriteSectionHeaders(sectionHdrs);
-
-    // Get the map based on number of samples
-    ProcessInfoMap procMap;
-
-    // Iterate over the process map and print
-    for (PidProcessInfoMap::iterator iter = pidProcInfoMap.begin(); iter != pidProcInfoMap.end(); iter++)
-    {
-        if (!(*iter).second.m_dataVector.empty())
-        {
-            double value = static_cast<double>((*iter).second.m_dataVector[m_sortEventIndex]);
-
-            // If this is CLU, the insert should be based on CLU values
-            if (m_isCLU)
+            else
             {
-                value = GetCLUData((*iter).second.m_dataVector, nbrCols, pColumnSpec, evtEncodeVec);
+                rowStr.appendFormattedString(L",%u", static_cast<unsigned int>(ev.m_sampleCount));
             }
-
-            procMap.insert(ProcessInfoMap::value_type(value, (*iter).second));
         }
-    }
 
-    int nbrProc = 0;
-
-    if (CSVReporter::DESCENDING_ORDER == m_sortOrder)
-    {
-        for (ProcessInfoMap::reverse_iterator rit = procMap.rbegin(); ((rit != procMap.rend()) && (nbrProc < 5)); rit++, nbrProc++)
-        {
-            ProcessInfo& procInfo = (*rit).second;
-            WriteProcessData(procInfo,
-                             totalSamples,
-                             nbrCols,
-                             pColumnSpec,
-                             evtEncodeVec,
-                             showPerc,
-                             false,
-                             true);
-        }
-    }
-    else if (CSVReporter::ASCENDING_ORDER == m_sortOrder)
-    {
-        for (ProcessInfoMap::iterator it = procMap.begin(); ((it != procMap.end()) && (nbrProc < 5)); it++, nbrProc++)
-        {
-            ProcessInfo& procInfo = (*it).second;
-            WriteProcessData(procInfo,
-                             totalSamples,
-                             nbrCols,
-                             pColumnSpec,
-                             evtEncodeVec,
-                             showPerc,
-                             false,
-                             true);
-        }
+        m_reportFile.writeString(rowStr);
+        m_reportFile.writeString(L"\n");
+        ++count;
     }
 
     // Print a blank line at the end of the section
     m_reportFile.writeString(L"\n");
-
     return true;
 }
 
-bool CSVReporter::WriteOverviewModule(gtVector<gtString>   sectionHdrs,
-                                      ModuleInfoList&      modList,
-                                      gtVector<gtUInt64>&  totalSamples,
-                                      gtUInt32             nbrCols,
-                                      ColumnSpec*          pColumnSpec,
-                                      EventEncodeVec&      evtEncodeVec,
-                                      bool                 showPerc)
+bool CSVReporter::WriteOverviewProcess(
+    gtVector<gtString>& sectionHdrs,
+    AMDTProfileDataVec& processProfileData,
+    bool                showPerc)
 {
     WriteSectionHeaders(sectionHdrs);
+    m_reportFile.writeString(L"\n");
 
-    // Get the map based on number of samples
-    ModuleInfoMap modMap;
-
-    // Iterate over the function list and print
-    for (ModuleInfoList::iterator iter = modList.begin(); iter != modList.end(); iter++)
+    for (const auto& proc : processProfileData)
     {
-        if (!(*iter).m_dataVector.empty())
-        {
-            double value = static_cast<double>((*iter).m_dataVector[m_sortEventIndex]);
+        gtString rowStr;
+        rowStr.appendFormattedString(L"%ls,%u", proc.m_name.asCharArray(), proc.m_id);
 
-            // If this is CLU, the insert should be based on CLU values
-            if (m_isCLU)
+        for (const auto& sample : proc.m_sampleValue)
+        {
+            if (showPerc)
             {
-                value = GetCLUData((*iter).m_dataVector, nbrCols, pColumnSpec, evtEncodeVec);
+                rowStr.appendFormattedString(L",%0.2f%%", sample.m_sampleCountPercentage);
             }
-
-            modMap.insert(ModuleInfoMap::value_type(value, (*iter)));
-        }
-    }
-
-    int nbrMod = 0;
-
-    if (CSVReporter::DESCENDING_ORDER == m_sortOrder)
-    {
-        for (ModuleInfoMap::reverse_iterator rit = modMap.rbegin(); ((rit != modMap.rend()) && (nbrMod < 5)); rit++, nbrMod++)
-        {
-            ModuleInfo modInfo = (*rit).second;
-            WriteModuleData(modInfo,
-                            totalSamples,
-                            nbrCols,
-                            pColumnSpec,
-                            evtEncodeVec,
-                            showPerc,
-                            false);
-        }
-    }
-    else if (CSVReporter::ASCENDING_ORDER == m_sortOrder)
-    {
-        for (ModuleInfoMap::iterator it = modMap.begin(); ((it != modMap.end()) && (nbrMod < 5)); it++, nbrMod++)
-        {
-            ModuleInfo modInfo = (*it).second;
-            WriteModuleData(modInfo,
-                            totalSamples,
-                            nbrCols,
-                            pColumnSpec,
-                            evtEncodeVec,
-                            showPerc,
-                            false);
-        }
-    }
-
-    // Print a blank line at the end of the section
-    m_reportFile.writeString(L"\n");
-
-    return true;
-}
-
-bool CSVReporter::WritePidSummary(gtVector<gtString>  sectionHdrs,
-                                  ProcessInfo&         procInfo,
-                                  gtVector<gtUInt64>&  totalSamples,
-                                  gtUInt32             nbrCols,
-                                  ColumnSpec*          pColumnSpec,
-                                  EventEncodeVec&      evtEncodeVec,
-                                  bool                 showPerc,
-                                  bool                 sepByCore)
-{
-    WriteSectionHeaders(sectionHdrs);
-
-    WriteProcessData(procInfo,
-                     totalSamples,
-                     nbrCols,
-                     pColumnSpec,
-                     evtEncodeVec,
-                     showPerc,
-                     sepByCore,
-                     false);
-
-    // Print a blank line at the end of the section
-    m_reportFile.writeString(L"\n");
-
-    return true;
-}
-
-bool CSVReporter::WritePidModuleSummary(gtVector<gtString>   sectionHdrs,
-                                        ModuleInfoList&      modList,
-                                        gtVector<gtUInt64>&  totalSamples,
-                                        gtUInt32             nbrCols,
-                                        ColumnSpec*          pColumnSpec,
-                                        EventEncodeVec&      evtEncodeVec,
-                                        bool                 showPerc,
-                                        bool                 sepByCore)
-{
-    WriteSectionHeaders(sectionHdrs);
-
-    // Get the map based on number of samples
-    typedef std::multimap<double, ModuleInfo> modInfoMap;
-    modInfoMap mMap;
-
-    // Iterate over the function list and print
-    for (ModuleInfoList::iterator iter = modList.begin(); iter != modList.end(); iter++)
-    {
-        if (!(*iter).m_dataVector.empty())
-        {
-            double value = static_cast<double>((*iter).m_dataVector[m_sortEventIndex]);
-
-            // If this is CLU, the insert should be based on CLU values
-            if (m_isCLU)
+            else
             {
-                value = GetCLUData((*iter).m_dataVector, nbrCols, pColumnSpec, evtEncodeVec);
+                rowStr.appendFormattedString(L",%u", static_cast<unsigned>(sample.m_sampleCount));
             }
-
-            mMap.insert(modInfoMap::value_type(value, (*iter)));
         }
+
+        m_reportFile.writeString(rowStr);
+        m_reportFile.writeString(L"\n");
     }
 
-    int nbrMod = 0;
-
-    if (CSVReporter::DESCENDING_ORDER == m_sortOrder)
-    {
-        for (modInfoMap::reverse_iterator rit = mMap.rbegin(); rit != mMap.rend(); rit++, nbrMod++)
-        {
-            ModuleInfo& modInfo = (*rit).second;
-
-            WriteModuleData(modInfo,
-                            totalSamples,
-                            nbrCols,
-                            pColumnSpec,
-                            evtEncodeVec,
-                            showPerc,
-                            sepByCore);
-        }
-    }
-    else if (CSVReporter::ASCENDING_ORDER == m_sortOrder)
-    {
-        for (modInfoMap::iterator it = mMap.begin(); it != mMap.end(); it++, nbrMod++)
-        {
-            ModuleInfo& modInfo = (*it).second;
-
-            WriteModuleData(modInfo,
-                            totalSamples,
-                            nbrCols,
-                            pColumnSpec,
-                            evtEncodeVec,
-                            showPerc,
-                            sepByCore);
-        }
-    }
-
-    // Print a blank line at the end of the section
     m_reportFile.writeString(L"\n");
-
     return true;
 }
 
-bool CSVReporter::WritePidFunctionSummary(gtVector<gtString>   sectionHdrs,
-                                          FunctionInfoList&    funcList,
-                                          gtVector<gtUInt64>&  totalSamples,
-                                          gtUInt32             nbrCols,
-                                          ColumnSpec*          pColumnSpec,
-                                          EventEncodeVec&      evtEncodeVec,
-                                          bool                 showPerc,
-                                          bool                 sepByCore)
+bool CSVReporter::WriteOverviewModule(
+    gtVector<gtString>& sectionHdrs,
+    AMDTProfileDataVec& moduleProfileData,
+    bool                showPerc)
 {
     WriteSectionHeaders(sectionHdrs);
+    m_reportFile.writeString(L"\n");
+    int count = 1;
 
-    // Get the map based on number of samples
-    typedef std::multimap<double, FunctionInfo> funcInfoMap;
-    funcInfoMap fMap;
-
-    // Iterate over the function list and print
-    for (FunctionInfoList::iterator iter = funcList.begin(); iter != funcList.end(); iter++)
+    for (const auto& module : moduleProfileData)
     {
-        double value = static_cast<double>((*iter).m_dataVector[m_sortEventIndex]);
-
-        // If this is CLU, the insert should be based on CLU values
-        if (m_isCLU)
+        if (count > 5)
         {
-            value = GetCLUData((*iter).m_dataVector, nbrCols, pColumnSpec, evtEncodeVec);
+            break;
         }
 
-        fMap.insert(funcInfoMap::value_type(value, (*iter)));
+        gtString rowStr;
+        rowStr.appendFormattedString(L"%ls", module.m_name.asCharArray());
+
+        for (const auto& sample : module.m_sampleValue)
+        {
+            if (showPerc)
+            {
+                rowStr.appendFormattedString(L",%0.2f%%", sample.m_sampleCountPercentage);
+            }
+            else
+            {
+                rowStr.appendFormattedString(L",%u", static_cast<unsigned>(sample.m_sampleCount));
+            }
+        }
+
+        m_reportFile.writeString(rowStr);
+        m_reportFile.writeString(L"\n");
+        ++count;
     }
 
-    if (CSVReporter::DESCENDING_ORDER == m_sortOrder)
-    {
-        for (funcInfoMap::reverse_iterator rit = fMap.rbegin(); rit != fMap.rend(); rit++)
-        {
-            FunctionInfo& funcInfo = (*rit).second;
+    m_reportFile.writeString(L"\n");
+    return true;
+}
 
-            WriteFunctionData(funcInfo,
-                              totalSamples,
-                              nbrCols,
-                              pColumnSpec,
-                              evtEncodeVec,
-                              showPerc,
-                              sepByCore);
+bool CSVReporter::WritePidSummary(
+    gtVector<gtString>&    sectionHdrs,
+    const AMDTProfileData& procInfo,
+    bool                   showPerc,
+    bool                   sepByCore)
+{
+    //TODO: use sepByCore while generating report
+    GT_UNREFERENCED_PARAMETER(sepByCore);
+
+    WriteSectionHeaders(sectionHdrs);
+    m_reportFile.writeString(L"\n");
+
+    gtString rowStr;
+    rowStr.appendFormattedString(L"%ls", procInfo.m_name.asCharArray());
+
+    for (const auto& sample : procInfo.m_sampleValue)
+    {
+        if (showPerc)
+        {
+            rowStr.appendFormattedString(L",%0.2f%%", sample.m_sampleCountPercentage);
+        }
+        else
+        {
+            rowStr.appendFormattedString(L",%u", static_cast<unsigned>(sample.m_sampleCount));
         }
     }
-    else if (CSVReporter::ASCENDING_ORDER == m_sortOrder)
-    {
-        for (funcInfoMap::iterator it = fMap.begin(); it != fMap.end(); it++)
-        {
-            FunctionInfo& funcInfo = (*it).second;
 
-            WriteFunctionData(funcInfo,
-                              totalSamples,
-                              nbrCols,
-                              pColumnSpec,
-                              evtEncodeVec,
-                              showPerc,
-                              sepByCore);
+    m_reportFile.writeString(rowStr);
+
+    // Print a blank line at the end of the section
+    m_reportFile.writeString(L"\n");
+    return true;
+}
+
+bool CSVReporter::WritePidModuleSummary(gtVector<gtString>&  sectionHdrs,
+    AMDTProfileDataVec&      modList,
+    bool                  showPerc,
+    bool                  sepByCore)
+{
+    //TODO: use sepByCore while generating report
+    GT_UNREFERENCED_PARAMETER(sepByCore);
+
+    WriteSectionHeaders(sectionHdrs);
+    m_reportFile.writeString(L"\n");
+
+    for (const auto& modInfo : modList)
+    {
+        gtString rowStr;
+        rowStr.appendFormattedString(L"%ls", modInfo.m_name.asCharArray());
+
+        for (const auto& sample : modInfo.m_sampleValue)
+        {
+            if (showPerc)
+            {
+                rowStr.appendFormattedString(L",%0.2f%%", sample.m_sampleCountPercentage);
+            }
+            else
+            {
+                rowStr.appendFormattedString(L",%u", static_cast<unsigned>(sample.m_sampleCount));
+            }
         }
+
+        m_reportFile.writeString(rowStr);
+        m_reportFile.writeString(L"\n");
     }
 
     // Print a blank line at the end of the section
     m_reportFile.writeString(L"\n");
+    return true;
+}
 
+bool CSVReporter::WritePidFunctionSummary(gtVector<gtString>&   sectionHdrs,
+    AMDTProfileDataVec& funcList,
+    bool                 showPerc,
+    bool                 sepByCore)
+{
+    //TODO: use sepByCore while generating report
+    GT_UNREFERENCED_PARAMETER(sepByCore);
+
+    WriteSectionHeaders(sectionHdrs);
+    m_reportFile.writeString(L"\n");
+
+    for (const auto& funcInfo : funcList)
+    {
+        gtString rowStr;
+        rowStr.appendFormattedString(L"%ls", funcInfo.m_name.asCharArray());
+
+        for (const auto& sample : funcInfo.m_sampleValue)
+        {
+            if (showPerc)
+            {
+                rowStr.appendFormattedString(L",%0.2f%%", sample.m_sampleCountPercentage);
+            }
+            else
+            {
+                rowStr.appendFormattedString(L",%u", static_cast<unsigned>(sample.m_sampleCount));
+            }
+        }
+
+        m_reportFile.writeString(rowStr);
+        m_reportFile.writeString(L"\n");
+    }
+
+    // Print a blank line at the end of the section
+    m_reportFile.writeString(L"\n");
     return true;
 }
 
@@ -897,96 +747,6 @@ void CSVReporter::WriteChildrenData(const CGFunctionInfo& funcNode, bool reportP
     }
 }
 
-bool CSVReporter::WriteColumData(gtVector<gtUInt64>&  totalSamples,
-                                 gtVector<gtUInt64>&  dataVector,
-                                 gtUInt32             nbrCols,
-                                 ColumnSpec*          pColumnSpec,
-                                 EventEncodeVec&      evtEncodeVec,
-                                 bool                 showPerc,
-                                 bool                 sepByCore,
-                                 gtString&            dataLine)
-{
-    (void)sepByCore; // unused
-    ColumnSpec* pColSpec = pColumnSpec;
-
-    for (gtUInt32 i = 0; i < nbrCols; i++)
-    {
-        float floatVal = 0.0;
-        EventMaskType eventLeft = EncodeEvent(pColSpec->dataSelectLeft.eventSelect, pColSpec->dataSelectLeft.eventUnitMask,
-                                              pColSpec->dataSelectLeft.bitOs, pColSpec->dataSelectLeft.bitUsr);
-        EventMaskType eventRight = EncodeEvent(pColSpec->dataSelectRight.eventSelect, pColSpec->dataSelectRight.eventUnitMask,
-                                               pColSpec->dataSelectRight.bitOs, pColSpec->dataSelectRight.bitUsr);
-
-        gtUInt64 eventLeftCount;
-        gtUInt64 eventRightCount;
-        gtUInt32 eventLeftIndex;
-        gtUInt32 eventRightIndex;
-
-        GetEventDetailForEventMask(evtEncodeVec, eventLeft, eventLeftIndex, eventLeftCount);
-        GetEventDetailForEventMask(evtEncodeVec, eventRight, eventRightIndex, eventRightCount);
-
-        switch (pColSpec->type)
-        {
-            case ColumnValue:
-                if (showPerc)
-                {
-                    dataLine.appendFormattedString(L",%ld", dataVector[eventLeftIndex]);
-                    AddPercentageValue(dataLine, static_cast<float>(dataVector[eventLeftIndex]), totalSamples[eventLeftIndex]);
-                }
-                else
-                {
-                    dataLine.appendFormattedString(L",%ld", dataVector[eventLeftIndex]);
-                }
-
-                break;
-
-            case ColumnSum:
-                dataLine.appendFormattedString(L",%ld", (dataVector[eventLeftIndex] +
-                                                         dataVector[eventRightIndex]));
-                break;
-
-            case ColumnDifference:
-                dataLine.appendFormattedString(L",%ld", (dataVector[eventLeftIndex] -
-                                                         dataVector[eventRightIndex]));
-                break;
-
-            case ColumnProduct:
-                dataLine.appendFormattedString(L",%ld", (dataVector[eventLeftIndex] *
-                                                         dataVector[eventRightIndex]));
-                break;
-
-            case ColumnRatio:
-                if ((static_cast<float>(dataVector[eventRightIndex]) > static_cast<float>(0.0))
-                    && (static_cast<float>(dataVector[eventLeftIndex]) > static_cast<float>(0.0)))
-                {
-                    floatVal = (static_cast<float>(dataVector[eventLeftIndex]) * eventLeftCount) /
-                               (static_cast<float>(dataVector[eventRightIndex] * eventRightCount));
-                }
-
-                dataLine.appendFormattedString(L",%3.02f", floatVal);
-                break;
-
-            case ColumnPercentage:
-                if ((static_cast<float>(dataVector[eventRightIndex]) > static_cast<float>(0.0))
-                    && (static_cast<float>(dataVector[eventLeftIndex]) > static_cast<float>(0.0)))
-                {
-                    floatVal = ((static_cast<float>(dataVector[eventLeftIndex]) / static_cast<float>(64.0)) /
-                                (static_cast<float>(dataVector[eventRightIndex]))) * static_cast<float>(100.0);
-                }
-
-                dataLine.appendFormattedString(L",%3.02f", floatVal);
-                break;
-
-            case ColumnInvalid:
-                break;
-        } // switch column type
-
-        pColSpec++;
-    } // for loop to iterate over all the columns
-
-    return true;
-}
-
 void CSVReporter::WriteSectionHeaders(gtVector<gtString>& sectionHdrs)
 {
     unsigned int idx;
@@ -1001,107 +761,6 @@ void CSVReporter::WriteSectionHeaders(gtVector<gtString>& sectionHdrs)
             m_reportFile.writeString(hdrStr);
         }
     }
-}
-
-bool CSVReporter::WriteFunctionData(FunctionInfo&          funcInfo,
-                                    gtVector<gtUInt64>&    totalSamples,
-                                    gtUInt32               nbrCols,
-                                    ColumnSpec*            pColumnSpec,
-                                    EventEncodeVec&        evtEncodeVec,
-                                    bool                   showPerc,
-                                    bool                   sepByCore)
-{
-    bool retVal = false;
-    gtString funcLine(L"\n");
-
-    // TODO: what to report if the function name is missing ?
-    if (!funcInfo.m_functionName.isEmpty())
-    {
-        funcLine.appendFormattedString(DQ_STR_FORMAT, funcInfo.m_functionName.asCharArray());
-
-        WriteColumData(totalSamples,
-                       funcInfo.m_dataVector,
-                       nbrCols,
-                       pColumnSpec,
-                       evtEncodeVec,
-                       showPerc,
-                       sepByCore, // separate by core
-                       funcLine);
-
-        gtString modName;
-        funcInfo.m_pModule->extractFileName(modName);
-        funcLine.appendFormattedString(L", " STR_FORMAT, modName.asCharArray());
-
-        m_reportFile.writeString(funcLine);
-        retVal = true;
-    }
-
-    return retVal;
-}
-
-bool CSVReporter::WriteProcessData(ProcessInfo&         procInfo,
-                                   gtVector<gtUInt64>&  totalSamples,
-                                   gtUInt32             nbrCols,
-                                   ColumnSpec*          pColumnSpec,
-                                   EventEncodeVec&      evtEncodeVec,
-                                   bool                 showPerc,
-                                   bool                 sepByCore,
-                                   bool                 appendPid)
-{
-    bool retVal = true;
-
-    gtString procLine(L"\n");
-
-    gtString procName = (!procInfo.m_processName.isEmpty()) ? procInfo.m_processName : L"NO PROCESS NAME";
-
-    procLine.appendFormattedString(STR_FORMAT, procName.asCharArray());
-
-    if (appendPid)
-    {
-        procLine.appendFormattedString(L",%ld", procInfo.m_pid);
-    }
-
-    WriteColumData(totalSamples,
-                   procInfo.m_dataVector,
-                   nbrCols,
-                   pColumnSpec,
-                   evtEncodeVec,
-                   showPerc,
-                   sepByCore,
-                   procLine);
-
-    m_reportFile.writeString(procLine);
-
-    return retVal;
-}
-
-bool CSVReporter::WriteModuleData(ModuleInfo&          modInfo,
-                                  gtVector<gtUInt64>&  totalSamples,
-                                  gtUInt32             nbrCols,
-                                  ColumnSpec*          pColumnSpec,
-                                  EventEncodeVec&      evtEncodeVec,
-                                  bool                 showPerc,
-                                  bool                 sepByCore)
-{
-    bool retVal = true;
-
-    gtString modLine(L"\n");
-
-    gtString modName = (!modInfo.m_moduleName.isEmpty()) ? modInfo.m_moduleName : L"NO MODULE NAME";
-    modLine.appendFormattedString(STR_FORMAT, modName.asCharArray());
-
-    WriteColumData(totalSamples,
-                   modInfo.m_dataVector,
-                   nbrCols,
-                   pColumnSpec,
-                   evtEncodeVec,
-                   showPerc,
-                   sepByCore, // separate by core
-                   modLine);
-
-    m_reportFile.writeString(modLine);
-
-    return retVal;
 }
 
 double CSVReporter::GetCLUData(gtVector<gtUInt64>&  dataVector,

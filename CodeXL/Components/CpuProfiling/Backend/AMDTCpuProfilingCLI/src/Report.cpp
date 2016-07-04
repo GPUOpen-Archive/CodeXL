@@ -7,9 +7,6 @@
 ///
 //==================================================================================
 
-// Qt
-//#include <QtGui>
-
 // Backend:
 #include <AMDTCpuPerfEventUtils/inc/ViewConfig.h>
 #include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
@@ -94,7 +91,9 @@ HRESULT CpuProfileReport::Translate()
             return hr;
         }
 
-        osFilePath outputFilePath = GetEBPFilePath();
+        osFilePath outputFilePath = GetDBFilePath();
+        //TODO: remove this line once EBP file support is removed.
+        outputFilePath.setFileExtension(L"ebp");
 
         osDirectory outDir;
         outputFilePath.getFileDirectory(outDir);
@@ -154,57 +153,50 @@ HRESULT CpuProfileReport::Report()
 {
     HRESULT hr = S_OK;
 
-    // If DB input file - -i has .cxldb file
-    if (m_isDbInputFile)
-    {
-        return ReportFromDb();
-    }
-
     // Initialize the report file
     bool retVal = InitializeReportFile();
 
     if (retVal)
     {
         // Input file - Processed profile data file
-        osFilePath ebpFilePath = GetEBPFilePath();
+        osFilePath dbFilePath = GetDBFilePath();
+        m_profileDbReader.OpenProfileData(dbFilePath.asString());
 
-        m_profileReader.open(ebpFilePath.asString().asCharArray());
+        AMDTProfileSessionInfo sessionInfo;
+        m_profileDbReader.GetProfileSessionInfo(sessionInfo);
+
+        AMDTCpuTopologyVec topologyVec;
+        m_profileDbReader.GetCpuTopology(topologyVec);
+        gtUInt32 nbrOfCpus = topologyVec.size();
 
 #if AMDT_BUILD_TARGET != AMDT_WINDOWS_OS
 
         // Disable CLU on Linux
-        if (m_profileReader.getProfileInfo()->m_isProfilingCLU)
+        //if (m_profileReader.getProfileInfo()->m_isProfilingCLU)
         {
-            reportError(false, L"CLU reporting is not yet supported!\n");
-            return E_FAIL;
+            //reportError(false, L"CLU reporting is not yet supported!\n");
+            //return E_FAIL;
         }
 
 #endif
 
         if (!m_args.GetSectionsToReport().isEmpty()
             && IsReportCallGraph()
-            && !m_profileReader.getProfileInfo()->m_isCSSEnabled)
+            && sessionInfo.m_cssEnabled)
         {
             reportError(false, L"Callgraph details are not available in the profile data file - " STR_FORMAT L".\n",
-                        ebpFilePath.asString().asCharArray());
+                        dbFilePath.asString().asCharArray());
         }
-
-        // Once you have the profile reader, initialize the cores-list
-        // and Obtain the profiled event's list
-        InitCoresList();
-        retVal = InitProfileEventsNameVec();
 
         if (retVal)
         {
-            // Initialize the output profile data view
-            InitializeViewData();
+            ReportExecution(sessionInfo, nbrOfCpus);
+            ReportProfileDetails(sessionInfo);
+            ReportMonitoredEventDetails();
 
-            ReportExecution();
-            ReportProfileDetails();
-
-            ReportOverviewData();
+            ReportOverviewData(sessionInfo);
             ReportProcessData();
-            ReportImixData();
+            //ReportImixData();
         }
     }
 
@@ -1261,9 +1253,9 @@ void CpuProfileReport::SetupEnvironment()
 void CpuProfileReport::ValidateOptions()
 {
     // REPORT Options
-    //  -i <input file - PRD/EBP>
+    //  -i <input file - PRD/EBP/CXLDB>
     //  -o <output path dir> output dir, in which processed or report files will be generated
-    //  -F csv | text        file format - only csv is supported // not reqd
+    //  -F csv | text        file format - only CSV format is supported (Optional)
     //  -V <view xmL>        by default only the raw data will be reported
     //
     //  -R <overview|process|module|callgraph|imix|all> Sections to be reported
@@ -1464,7 +1456,7 @@ void CpuProfileReport::ValidateOptions()
     }
 
     // Fill-in the m_coresList from the coreAffinity mask
-    // If seperate-by-core and core-affinity-mask not used, then report for all the cores
+    // If separate-by-core and core-affinity-mask not used, then report for all the cores
     if (m_args.IsReportByCore())
     {
         gtUInt64 coreMask = m_args.GetCoreAffinityMask();
@@ -1566,7 +1558,7 @@ osFilePath& CpuProfileReport::GetOutputFilePath()
         m_outputFilePath.reinterpretAsDirectory();
 
         // Get the basename from the input file and create a output dir
-        // in which the output files EBP/IMD will be created
+        // in which the output file CXLDB will be created
         osFilePath inputFile(m_args.GetInputFile());
         gtString inputFileName;
         inputFile.getFileName(inputFileName);
@@ -1589,13 +1581,13 @@ osFilePath& CpuProfileReport::GetOutputFilePath()
         gtString inputBaseName;
         m_inputFilePath.getFileName(inputBaseName);
         m_outputFilePath.setFileName(inputBaseName);
-        m_outputFilePath.setFileExtension(L"ebp");
+        m_outputFilePath.setFileExtension(L"cxldb");
     }
 
     return m_outputFilePath;
 }
 
-osFilePath& CpuProfileReport::GetEBPFilePath()
+osFilePath& CpuProfileReport::GetDBFilePath()
 {
     if (IsRawInputFile())
     {
@@ -1639,33 +1631,10 @@ bool CpuProfileReport::InitializeReportFile()
     return true;
 }
 
-void CpuProfileReport::ReadRunInfo()
-{
-    if (isOK())
-    {
-        // construct the RI file path
-        osFilePath rifilePath;
-        rifilePath = m_args.GetInputFile();
-
-        if (isOK())
-        {
-            rifilePath.setFileExtension(L"ri");
-
-            // populate RI data
-            // RunInfo rInfo;
-        }
-    }
-}
-
-void CpuProfileReport::ReportExecution()
+void CpuProfileReport::ReportExecution(AMDTProfileSessionInfo& sessionInfo, gtUInt32 numCpus)
 {
     gtVector<gtString> sectionHdrs;
-    gtList<std::pair<gtString, gtString> > sectionDataList;
-
-    // Get the profile session data from the profile reader:
-    CpuProfileInfo* pProfileInfo = m_profileReader.getProfileInfo();
-
-    gtString tmpStr;
+    gtList<std::pair<gtString, gtString>> sectionDataList;
 
     // EXECUTION
     //    Target Path:,classic.exe
@@ -1675,80 +1644,65 @@ void CpuProfileReport::ReportExecution()
     //    Cpu Details:
     //    Operating System:
 
-    if (nullptr != pProfileInfo)
+    sectionHdrs.push_back(CODEXL_REPORT_HDR);
+    sectionHdrs.push_back(EXECUTION_SECTION_HDR);
+
+    std::pair<gtString, gtString> keyValuePair;
+
+    // Target Path
+    keyValuePair.first = EXECUTION_TARGET_PATH;
+    keyValuePair.second = sessionInfo.m_targetAppPath;
+    sectionDataList.push_back(keyValuePair);
+
+    // Target Args
+    keyValuePair.first = EXECUTION_TARGET_ARGS;
+    keyValuePair.second = sessionInfo.m_targetAppCmdLineArgs;
+    sectionDataList.push_back(keyValuePair);
+
+    // Working Directory
+    keyValuePair.first = EXECUTION_WORK_DIR;
+    keyValuePair.second = sessionInfo.m_targetAppWorkingDir;
+    sectionDataList.push_back(keyValuePair);
+
+    // Environment Variables
+    keyValuePair.first = EXECUTION_TARGET_ENV_VARS;
+    keyValuePair.second = sessionInfo.m_targetAppEnvVars;
+    sectionDataList.push_back(keyValuePair);
+
+    // Cpu Details
+    keyValuePair.first = PROFILE_CPU_DETAILS;
+    gtString tmpStr;
+    tmpStr.appendFormattedString(L"Family(0x%lx), Model(0x%lx), Number of Cores(%ld)",
+        sessionInfo.m_cpuFamily, sessionInfo.m_cpuModel, numCpus);
+    keyValuePair.second = tmpStr;
+    sectionDataList.push_back(keyValuePair);
+
+    // Target Operating System
+    keyValuePair.first = PROFILE_TAREGET_OS;
+    tmpStr = sessionInfo.m_targetMachineName;
+
+    if (tmpStr.isEmpty())
     {
-        sectionHdrs.push_back(CODEXL_REPORT_HDR);
-        sectionHdrs.push_back(EXECUTION_SECTION_HDR);
-
-        std::pair<gtString, gtString> keyValuePair;
-
-        // Target Path
-        keyValuePair.first = EXECUTION_TARGET_PATH;
-        keyValuePair.second = m_profileReader.getProfileInfo()->m_targetPath;
-        sectionDataList.push_back(keyValuePair);
-
-        // Target Args
-        keyValuePair.first = EXECUTION_TARGET_ARGS;
-        keyValuePair.second = m_profileReader.getProfileInfo()->m_cmdArguments;
-        sectionDataList.push_back(keyValuePair);
-
-        // Working Directory
-        keyValuePair.first = EXECUTION_WORK_DIR;
-        keyValuePair.second = m_profileReader.getProfileInfo()->m_wrkDirectory;
-        sectionDataList.push_back(keyValuePair);
-
-        // Environment Variables
-        keyValuePair.first = EXECUTION_TARGET_ENV_VARS;
-        keyValuePair.second = m_profileReader.getProfileInfo()->m_envVariables;
-        sectionDataList.push_back(keyValuePair);
-
-        // Cpu Details
-        keyValuePair.first = PROFILE_CPU_DETAILS;
-        tmpStr = L"";//reuse variable
-        tmpStr.appendFormattedString(L"Family(0x%lx), Model(%ld), Number of Cores(%ld)",
-                                     m_profileReader.getProfileInfo()->m_cpuFamily,
-                                     m_profileReader.getProfileInfo()->m_cpuModel,
-                                     m_profileReader.getProfileInfo()->m_numCpus);
-        keyValuePair.second = tmpStr;
-        sectionDataList.push_back(keyValuePair);
-
-        // Target Operating System
-        keyValuePair.first = PROFILE_TAREGET_OS;
-
-        if (!(m_profileReader.getProfileInfo()->m_osName.isEmpty()))
-        {
-            tmpStr = m_profileReader.getProfileInfo()->m_osName;
-        }
-        else
-        {
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-            tmpStr = L"Windows";
+        tmpStr = L"Windows";
 #else
-            tmpStr = L"Linux";
+        tmpStr = L"Linux";
 #endif
-        }
-
-        keyValuePair.second = tmpStr;
-        sectionDataList.push_back(keyValuePair);
     }
+
+    keyValuePair.second = tmpStr;
+    sectionDataList.push_back(keyValuePair);
 
     if ((nullptr != m_pReporter) && m_pReporter->IsOpened())
     {
         m_pReporter->ReportExecution(sectionHdrs, sectionDataList);
     }
-
-    return;
 }
 
-void CpuProfileReport::ReportProfileDetails()
+void CpuProfileReport::ReportProfileDetails(AMDTProfileSessionInfo& sessionInfo)
 {
     gtVector<gtString> sectionHdrs;
-    gtList<std::pair<gtString, gtString> > sectionDataList;
-
-    // Get the profile session data from the profile reader:
-    CpuProfileInfo* pProfileInfo = m_profileReader.getProfileInfo();
-
-    gtString tmpStr;
+    gtList<std::pair<gtString, gtString>> sectionDataList;
 
     // PROFILE DETAILS
     // Profile Session Type:,TBP
@@ -1763,190 +1717,211 @@ void CpuProfileReport::ReportProfileDetails()
     //  ,cpu-cycles
     //  ,retired-instructions
 
-    if (nullptr != pProfileInfo)
+    sectionHdrs.push_back(PROFILE_DETAILS_SECTION_HDR);
+    std::pair<gtString, gtString> keyValuePair;
+
+    // Profile Session Type
+    keyValuePair.first = PROFILE_SESSION_TYPE;
+    keyValuePair.second = sessionInfo.m_sessionType;
+    sectionDataList.push_back(keyValuePair);
+
+    // Profile Scope
+    keyValuePair.first = PROFILE_SCOPE;
+    keyValuePair.second = sessionInfo.m_sessionScope;
+    sectionDataList.push_back(keyValuePair);
+
+    // Core Affinity Mask
+    keyValuePair.first = PROFILE_CPU_AFFINITY;
+    gtString tmpStr;
+    tmpStr.appendFormattedString(L"0x%lx", sessionInfo.m_coreAffinity);
+    keyValuePair.second = tmpStr;
+    sectionDataList.push_back(keyValuePair);
+
+    // Profile Start Time
+    keyValuePair.first = PROFILE_START_TIME;
+    keyValuePair.second = sessionInfo.m_sessionStartTime;
+    sectionDataList.push_back(keyValuePair);
+
+    // Profile End Time
+    keyValuePair.first = PROFILE_END_TIME;
+    keyValuePair.second = sessionInfo.m_sessionEndTime;
+    sectionDataList.push_back(keyValuePair);
+
+    // Profile Duration
+    keyValuePair.first = PROFILE_DURATION;
+    osTime startTime, endTime;
+    startTime.setFromDateTimeString(osTime::LOCAL, sessionInfo.m_sessionStartTime, osTime::NAME_SCHEME_FILE);
+    endTime.setFromDateTimeString(osTime::LOCAL, sessionInfo.m_sessionEndTime, osTime::NAME_SCHEME_FILE);
+    gtUInt64 profileDuration = endTime.secondsFrom1970() - startTime.secondsFrom1970();
+
+    tmpStr.makeEmpty();
+    tmpStr.appendFormattedString(L"%llu seconds", profileDuration);
+    keyValuePair.second = tmpStr;
+    sectionDataList.push_back(keyValuePair);
+
+    // Profile Data Folder
+    keyValuePair.first = PROFILE_DATA_FOLDER;
+    keyValuePair.second = sessionInfo.m_sessionDir; // TBD: Do we need to report this ?
+    sectionDataList.push_back(keyValuePair);
+
+    keyValuePair.first = PROFILE_CSS;
+    keyValuePair.second = sessionInfo.m_cssEnabled ? L"True" : L"False";
+    sectionDataList.push_back(keyValuePair);
+
+    keyValuePair.first = PROFILE_CSS_DEPTH;
+    tmpStr.makeEmpty();
+    tmpStr.appendFormattedString(L"%ld", sessionInfo.m_unwindDepth);
+    keyValuePair.second = tmpStr;
+    sectionDataList.push_back(keyValuePair);
+
+    const wchar_t* pCssScopeStr = nullptr;
+
+    switch (sessionInfo.m_unwindScope)
     {
-        sectionHdrs.push_back(PROFILE_DETAILS_SECTION_HDR);
+    case CP_CSS_SCOPE_USER:
+        pCssScopeStr = L"User space";
+        break;
 
-        std::pair<gtString, gtString> keyValuePair;
+    case CP_CSS_SCOPE_KERNEL:
+        pCssScopeStr = L"Kernel space";
+        break;
 
-        // Profile Session Type
-        keyValuePair.first = PROFILE_SESSION_TYPE;
-        keyValuePair.second = m_profileReader.getProfileInfo()->m_profType;
-        sectionDataList.push_back(keyValuePair);
+    case CP_CSS_SCOPE_ALL:
+        pCssScopeStr = L"User space and Kernel space";
+        break;
 
-        // Profile Scope
-        keyValuePair.first = PROFILE_SCOPE;
-        keyValuePair.second = m_profileReader.getProfileInfo()->m_profScope;
-        sectionDataList.push_back(keyValuePair);
+    default:
+        break;
+    }
 
-        // Core Affinity Mask
-        keyValuePair.first = PROFILE_CPU_AFFINITY;
-        CoreTopologyMap* pCoreTop = m_profileReader.getTopologyMap();
-        gtUInt64 coreMask = 0;
-
-        if (nullptr != pCoreTop)
-        {
-            CoreTopologyMap::iterator it = pCoreTop->begin();
-
-            for (; it != pCoreTop->end(); it++)
-            {
-                coreMask |= (1ULL << (*it).second.processor);
-            }
-        }
-
-        tmpStr.makeEmpty();//reuse var
-        tmpStr.appendFormattedString(L"0x%lx", coreMask);
-        keyValuePair.second = tmpStr;
-        sectionDataList.push_back(keyValuePair);
-
-        // Profile Start Time
-        keyValuePair.first = PROFILE_START_TIME;
-        keyValuePair.second = m_profileReader.getProfileInfo()->m_profStartTime;
-        sectionDataList.push_back(keyValuePair);
-
-        // Profile End Time
-        keyValuePair.first = PROFILE_END_TIME;
-        keyValuePair.second = m_profileReader.getProfileInfo()->m_profEndTime;
-        sectionDataList.push_back(keyValuePair);
-
-        // Profile Duration
-        keyValuePair.first = PROFILE_DURATION;
-        osTime startTime, endTime;
-        startTime.setFromDateTimeString(osTime::LOCAL, m_profileReader.getProfileInfo()->m_profStartTime, osTime::NAME_SCHEME_FILE);
-        endTime.setFromDateTimeString(osTime::LOCAL, m_profileReader.getProfileInfo()->m_profEndTime, osTime::NAME_SCHEME_FILE);
-        gtUInt64 profileDuration = endTime.secondsFrom1970() - startTime.secondsFrom1970();
-
-        tmpStr.makeEmpty();
-        tmpStr.appendFormattedString(L"%llu seconds", profileDuration);
-        keyValuePair.second = tmpStr;
-        sectionDataList.push_back(keyValuePair);
-
-        // Profile Data Folder
-        keyValuePair.first = PROFILE_DATA_FOLDER;
-        keyValuePair.second = m_profileReader.getProfileInfo()->m_profDirectory; // TBD: Do we need to report this ?
-        sectionDataList.push_back(keyValuePair);
-
-        keyValuePair.first = PROFILE_CSS;
-        keyValuePair.second = m_profileReader.getProfileInfo()->m_isCSSEnabled ? L"True" : L"False";
-        sectionDataList.push_back(keyValuePair);
-
-        keyValuePair.first = PROFILE_CSS_DEPTH;
-        tmpStr.makeEmpty();
-        tmpStr.appendFormattedString(L"%ld", m_profileReader.getProfileInfo()->m_cssUnwindDepth);
-        keyValuePair.second = tmpStr;
-        sectionDataList.push_back(keyValuePair);
-
-        const wchar_t* pCssScopeStr = nullptr;
-
-        switch (m_profileReader.getProfileInfo()->m_cssScope)
-        {
-            case CP_CSS_SCOPE_USER:
-                pCssScopeStr = L"User space";
-                break;
-
-            case CP_CSS_SCOPE_KERNEL:
-                pCssScopeStr = L"Kernel space";
-                break;
-
-            case CP_CSS_SCOPE_ALL:
-                pCssScopeStr = L"User space and Kernel space";
-                break;
-
-            default:
-                break;
-        }
-
-        if (nullptr != pCssScopeStr)
-        {
-            keyValuePair.first = PROFILE_CSS_SCOPE;
-            keyValuePair.second = pCssScopeStr;
-            sectionDataList.push_back(keyValuePair);
-        }
-
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-        keyValuePair.first = PROFILE_CSS_FPO;
-        keyValuePair.second = m_profileReader.getProfileInfo()->m_isCssSupportFpo ? L"True" : L"False";
-        sectionDataList.push_back(keyValuePair);
-#endif
-
-        keyValuePair.first = PROFILE_CSS_FREQUENCY;
-        tmpStr.makeEmpty();
-        tmpStr.appendFormattedString(L"%ld", 1); // TODO: update RI file
-        keyValuePair.second = tmpStr;
+    if (nullptr != pCssScopeStr)
+    {
+        keyValuePair.first = PROFILE_CSS_SCOPE;
+        keyValuePair.second = pCssScopeStr;
         sectionDataList.push_back(keyValuePair);
     }
+
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+    keyValuePair.first = PROFILE_CSS_FPO;
+    keyValuePair.second = sessionInfo.m_cssFPOEnabled ? L"True" : L"False";
+    sectionDataList.push_back(keyValuePair);
+#endif
+
+    keyValuePair.first = PROFILE_CSS_FREQUENCY;
+    tmpStr.makeEmpty();
+    tmpStr.appendFormattedString(L"%ld", 1); // TODO: update RI file
+    keyValuePair.second = tmpStr;
+    sectionDataList.push_back(keyValuePair);
 
     if ((nullptr != m_pReporter) && m_pReporter->IsOpened())
     {
         m_pReporter->ReportProfileData(sectionHdrs, sectionDataList);
     }
-
-    // Report Monitored events
-    ReportMonitoredEventDetails();
-
-    return;
 }
-
 
 void CpuProfileReport::ReportMonitoredEventDetails()
 {
     gtVector<gtString> sectionHdrs;
-
     sectionHdrs.push_back(PROFILE_SAMPLING_EVENTS);
-    m_pReporter->ReportSamplingSpec(sectionHdrs,
-                                    m_profileReader.getProfileInfo()->m_eventVec,
-                                    m_pEventConfig,
-                                    m_monitoredEventsNameVec);
 
-    return;
+    AMDTProfileCounterDescVec counterDesc;
+    AMDTProfileSamplingConfigVec samplingConfigVec;
+
+    m_profileDbReader.GetSampledCountersList(counterDesc);
+
+    for (const auto& counter : counterDesc)
+    {
+        AMDTProfileSamplingConfig sampleConfig;
+        m_profileDbReader.GetSamplingConfiguration(counter.m_id, sampleConfig);
+        samplingConfigVec.push_back(sampleConfig);
+    }
+
+    m_pReporter->ReportSamplingSpec(sectionHdrs, counterDesc, samplingConfigVec);
+
+    // set the sort event id, name
+    int sortEventIndex = m_args.GetSortEventIndex();
+
+    if (samplingConfigVec.size() < 1)
+    {
+        sortEventIndex = -1;
+    }
+    else if (sortEventIndex >= 0 && static_cast<unsigned int>(sortEventIndex) >= samplingConfigVec.size())
+    {
+        reportError(false, L"Invalid event index(%d) specified with option(-e).\n", sortEventIndex);
+        sortEventIndex = 0;
+    }
+
+    m_sortEventId = (-1 == sortEventIndex) ? -1 : samplingConfigVec[sortEventIndex].m_hwEventId;
+    m_sortCounterId = (-1 == sortEventIndex) ? -1 : samplingConfigVec[sortEventIndex].m_id;
+
+    if (m_sortEventId == 0xFFFFFFFF)
+    {
+        m_sortEventName = L"All Events";
+    }
+    else
+    {
+        m_sortEventName = L"???";
+    }
+
+    for (const auto& counter : counterDesc)
+    {
+        if (counter.m_hwEventId == m_sortEventId)
+        {
+            m_sortEventName = counter.m_name;
+            break;
+        }
+    }
+
+    m_profileEventsNameVec.clear();
+    for (const auto& configInfo : samplingConfigVec)
+    {
+        gtUInt32 eventId = configInfo.m_hwEventId;
+        gtString eventName(L"???");
+
+        for (const auto& counterInfo : counterDesc)
+        {
+            if (eventId == counterInfo.m_hwEventId)
+            {
+                eventName = counterInfo.m_name;
+                break;
+            }
+        }
+
+        m_profileEventsNameVec.push_back(eventName);
+    }
 }
 
-
-void CpuProfileReport::ReportOverviewData()
+void CpuProfileReport::ReportOverviewData(AMDTProfileSessionInfo& sessionInfo)
 {
-    gtVector<gtString> sectionHdrs;
-    gtString tmpStr;
-    gtVector<gtUInt64> totalProcSamples;
-
-    bool sepByCore = m_args.IsReportByCore();
-
-    gtUInt64 flags = m_args.IsIgnoreSystemModules() ? SAMPLE_IGNORE_SYSTEM_MODULES : 0;
-    flags |= m_args.IsReportByCore() ? SAMPLE_SEPARATE_BY_CORE : 0;
-
-    gtUInt64 coreMask = m_args.GetCoreAffinityMask();
-
-    bool rc = GetProcessInfoMap(m_profileReader,
-                                sepByCore,
-                                coreMask,
-                                m_procInfoMap);
-
-    // Get the module details
-    if (rc)
-    {
-        ProcessIdType pid = static_cast<ProcessIdType>(-1);
-        rc = GetModuleInfoList(m_profileReader,
-                               pid,
-                               flags,
-                               coreMask,
-                               m_moduleInfoList,
-                               m_totalModSamples,
-                               &m_procInfoMap);
-    }
-
-    // Get function data from all the processes
-    if (rc)
-    {
-        rc = GetOverviewFunctionData();
-    }
-
-    // Get the coloumn spec
-    gtUInt32 nbrCols = m_overviewConfig.GetNumberOfColumns();
-    ColumnSpec* columnArray = new ColumnSpec[nbrCols];
-    m_overviewConfig.GetColumnSpecs(columnArray);
-
     // Report Overview only if requested
-    if (rc && IsReportOverview())
+    if (IsReportOverview())
     {
+        gtVector<gtString> sectionHdrs;
+        gtString tmpStr;
+
+        bool sepByCore = m_args.IsReportByCore();
+        bool ignoreSysModules = m_args.IsIgnoreSystemModules();
+        gtUInt64 coreMask = sessionInfo.m_coreAffinity;
+
+
+        gtVector<AMDTProfileReportConfig> reportConfigs;
+        m_profileDbReader.GetReportConfigurations(reportConfigs);
+
+        AMDTProfileDataOptions options;
+        options.m_coreMask = coreMask;
+        options.m_ignoreSystemModules = ignoreSysModules;
+        options.m_doSort = true;
+        options.m_summaryCount = 5;
+        options.m_isSeperateByCore = sepByCore;
+        options.m_othersEntryInSummary = false;
+
+        for (const auto& counter : reportConfigs[REPORT_CONFIG_IDX].m_counterDescs)
+        {
+            options.m_counters.push_back(counter.m_id);
+        }
+
+        m_profileDbReader.SetReportOption(options);
+
         // Overview FUNCTIONS
         tmpStr = OVERVIEW_FUNCTIONS_SECTION_HDR;
         tmpStr.appendFormattedString(L" (Sort Event - ");
@@ -1966,18 +1941,12 @@ void CpuProfileReport::ReportOverviewData()
         tmpStr.appendFormattedString(L"," STR_FORMAT, OVERVIEW_SECTION_MODULE);
         sectionHdrs.push_back(tmpStr);
 
-        rc = m_pReporter->WriteOverviewFunction(sectionHdrs,
-                                                m_funcInfoList,
-                                                m_totalModSamples,
-                                                nbrCols,
-                                                columnArray,
-                                                m_profileReader.getProfileInfo()->m_eventVec,
-                                                m_args.IsShowPercentage());
-    }
+        AMDTProfileDataVec funcProfileData;
+        m_profileDbReader.GetFunctionSummary(m_sortCounterId, funcProfileData);
+        m_pReporter->WriteOverviewFunction(sectionHdrs, funcProfileData, m_args.IsShowPercentage());
+        funcProfileData.clear();
 
-    // Overview PROCESS
-    if (rc && IsReportOverview())
-    {
+        // Overview PROCESS
         sectionHdrs.clear();
         tmpStr.makeEmpty();
 
@@ -1988,7 +1957,7 @@ void CpuProfileReport::ReportOverviewData()
         sectionHdrs.push_back(tmpStr);
 
         tmpStr.makeEmpty();
-        tmpStr.appendFormattedString(STR_FORMAT L"," STR_FORMAT , OVERVIEW_SECTION_PROCESS, OVERVIEW_SECTION_PID);
+        tmpStr.appendFormattedString(STR_FORMAT L"," STR_FORMAT, OVERVIEW_SECTION_PROCESS, OVERVIEW_SECTION_PID);
 
         // Add the profiled event's names
         for (gtUInt32 i = 0; i < m_profileEventsNameVec.size(); i++)
@@ -1998,21 +1967,16 @@ void CpuProfileReport::ReportOverviewData()
 
         sectionHdrs.push_back(tmpStr);
 
-        if (m_procInfoMap.size() > 1)
+        AMDTProfileDataVec processProfileData;
+        m_profileDbReader.GetProcessSummary(m_sortCounterId, processProfileData);
+        // Don't print process overview if there is only 1 process.
+        if (processProfileData.size() > 1)
         {
-            rc = m_pReporter->WriteOverviewProcess(sectionHdrs,
-                                                   m_procInfoMap,
-                                                   m_totalModSamples,
-                                                   nbrCols,
-                                                   columnArray,
-                                                   m_profileReader.getProfileInfo()->m_eventVec,
-                                                   m_args.IsShowPercentage());
+            m_pReporter->WriteOverviewProcess(sectionHdrs, processProfileData, m_args.IsShowPercentage());
         }
-    }
+        processProfileData.clear();
 
-    // Overview - MODULE
-    if (rc && IsReportOverview())
-    {
+        // Overview - MODULE
         sectionHdrs.clear();
         tmpStr.makeEmpty();
 
@@ -2034,24 +1998,12 @@ void CpuProfileReport::ReportOverviewData()
 
         sectionHdrs.push_back(tmpStr);
 
-        rc = m_pReporter->WriteOverviewModule(sectionHdrs,
-                                              m_moduleInfoList,
-                                              m_totalModSamples,
-                                              nbrCols,
-                                              columnArray,
-                                              m_profileReader.getProfileInfo()->m_eventVec,
-                                              m_args.IsShowPercentage());
-
+        AMDTProfileDataVec moduleProfileData;
+        m_profileDbReader.GetModuleSummary(m_sortCounterId, moduleProfileData);
+        m_pReporter->WriteOverviewModule(sectionHdrs, moduleProfileData, m_args.IsShowPercentage());
+        moduleProfileData.clear();
     }
-
-    if (nullptr != columnArray)
-    {
-        delete[] columnArray;
-    }
-
-    return;
 }
-
 
 void CpuProfileReport::ReportProcessData()
 {
@@ -2063,102 +2015,39 @@ void CpuProfileReport::ReportProcessData()
     gtVector<gtString> sectionHdrs;
     gtString tmpStr;
 
-    gtUInt64 flags = m_args.IsIgnoreSystemModules() ? SAMPLE_IGNORE_SYSTEM_MODULES : 0;
-    flags |= m_args.IsReportByCore() ? SAMPLE_SEPARATE_BY_CORE : 0;
-    gtUInt64 coreMask = m_args.GetCoreAffinityMask();
-
-    // Get the column spec
-    gtUInt32 nbrCols = m_viewConfig.GetNumberOfColumns();
-    ColumnSpec* columnArray = new ColumnSpec[nbrCols];
-    m_viewConfig.GetColumnSpecs(columnArray);
-
-    // Now that we have got the columnspec from view config, check
-    // whether all the events are in event vector
-    for (gtUInt32 i = 0; i < nbrCols; i++)
-    {
-        EventMaskType eventLeft = EncodeEvent(columnArray[i].dataSelectLeft.eventSelect,
-                                              columnArray[i].dataSelectLeft.eventUnitMask,
-                                              columnArray[i].dataSelectLeft.bitOs,
-                                              columnArray[i].dataSelectLeft.bitUsr);
-        EventMaskType eventRight = EncodeEvent(columnArray[i].dataSelectRight.eventSelect,
-                                               columnArray[i].dataSelectRight.eventUnitMask,
-                                               columnArray[i].dataSelectRight.bitOs,
-                                               columnArray[i].dataSelectRight.bitUsr);
-
-        if (columnArray[i].dataSelectLeft.eventSelect
-            && (m_evtIndexMap.find(eventLeft) == m_evtIndexMap.end()))
-        {
-            reportError(false, L"Invalid/Incorrect View Config XML files is specified with option(-V).\n");
-            return;
-        }
-
-        if (columnArray[i].dataSelectRight.eventSelect
-            && (m_evtIndexMap.find(eventRight) == m_evtIndexMap.end()))
-        {
-            reportError(false, L"Invalid/Incorrect View Config XML files is specified with option(-V).\n");
-            return;
-        }
-    }
-
-    // Get the map based on number of samples
-    ProcessInfoMap pMap;
-    // Iterate over the process map and print
-    int sortEventIndex = m_args.GetSortEventIndex() == -1 ? 0 : m_args.GetSortEventIndex();
-
-    for (PidProcessInfoMap::iterator iter = m_procInfoMap.begin(); iter != m_procInfoMap.end(); iter++)
-    {
-        double value = static_cast<double>((*iter).second.m_dataVector[sortEventIndex]);
-        pMap.insert(ProcessInfoMap::value_type(value, (*iter).second));
-    }
-
-    int nbrProc = 0;
+    AMDTProfileDataVec processProfileData;
+    m_profileDbReader.GetProcessSummary(m_sortCounterId, processProfileData);
 
     // TBD - just print the top 5 processes
-    for (ProcessInfoMap::reverse_iterator it = pMap.rbegin(); ((it != pMap.rend()) && (nbrProc < 5)); it++, nbrProc++)
+    for (const auto& proc : processProfileData)
     {
-        ProcessInfo* pProc = &((*it).second);
-        ProcessIdType pid = pProc->m_pid;
+        ProcessIdType pid = proc.m_id;
 
         if (IsReportAggregateByProcess())
         {
             // PROCESS HEADER
             gtString procHdr(PROCESS_PROFILE_HDR);
-            procHdr.appendFormattedString(STR_FORMAT, pProc->m_processName.asCharArray());
-            procHdr.appendFormattedString(L" (PID - %ld)", pProc->m_pid);
+            procHdr.appendFormattedString(STR_FORMAT, proc.m_name.asCharArray());
+            procHdr.appendFormattedString(L" (PID - %ld)", pid);
 
             sectionHdrs.clear();
             sectionHdrs.push_back(procHdr);
             tmpStr.makeEmpty();
             tmpStr.appendFormattedString(STR_FORMAT, OVERVIEW_SECTION_PROCESS);
 
-            for (gtUInt32 i = 0; i < nbrCols; i++)
+            for (const auto& evName : m_profileEventsNameVec)
             {
-                tmpStr.appendFormattedString(L"," STR_FORMAT, convertToGTString(columnArray[i].title).asCharArray());
+                tmpStr.appendFormattedString(L"," STR_FORMAT, evName.asCharArray());
             }
 
             sectionHdrs.push_back(tmpStr);
 
             // REPORT the process
-            m_pReporter->WritePidSummary(sectionHdrs,
-                                         *pProc,
-                                         m_totalModSamples,
-                                         nbrCols,
-                                         columnArray,
-                                         m_profileReader.getProfileInfo()->m_eventVec,
-                                         m_args.IsShowPercentage(),
-                                         m_args.IsReportByCore());
+            m_pReporter->WritePidSummary(sectionHdrs, proc, m_args.IsShowPercentage(), m_args.IsReportByCore());
 
-            // Get the module data for this pid
-            ModuleInfoList modInfo;
-            gtVector<gtUInt64> totalModSamples;
-
-            GetModuleInfoList(m_profileReader,
-                              pid,
-                              flags,
-                              coreMask,
-                              modInfo,
-                              totalModSamples,
-                              nullptr);
+            //// Get the module data for this pid
+            AMDTProfileDataVec moduleProfileData;
+            m_profileDbReader.GetModuleProfileData(proc.m_id, AMDT_PROFILE_ALL_MODULES, moduleProfileData);
 
             // MODULE section Hdrs
             sectionHdrs.clear();
@@ -2166,77 +2055,62 @@ void CpuProfileReport::ReportProcessData()
             tmpStr.makeEmpty();
             tmpStr.appendFormattedString(STR_FORMAT, OVERVIEW_SECTION_MODULE);
 
-            for (gtUInt32 i = 0; i < nbrCols; i++)
+            for (const auto& evName : m_profileEventsNameVec)
             {
-                tmpStr.appendFormattedString(L"," STR_FORMAT, convertToGTString(columnArray[i].title).asCharArray());
+                tmpStr.appendFormattedString(L"," STR_FORMAT, evName.asCharArray());
             }
 
             sectionHdrs.push_back(tmpStr);
 
-            if (modInfo.empty())
+            if (moduleProfileData.empty())
             {
                 tmpStr.makeEmpty();
                 tmpStr.appendFormattedString(STR_FORMAT, NO_SAMPLES_TO_DISPLAY);
                 sectionHdrs.push_back(tmpStr);
             }
 
-            m_pReporter->WritePidModuleSummary(sectionHdrs,
-                                               modInfo,
-                                               totalModSamples,
-                                               nbrCols,
-                                               columnArray,
-                                               m_profileReader.getProfileInfo()->m_eventVec,
-                                               m_args.IsShowPercentage(),
-                                               m_args.IsReportByCore());
+            m_pReporter->WritePidModuleSummary(sectionHdrs, moduleProfileData, m_args.IsShowPercentage(), m_args.IsReportByCore());
+            moduleProfileData.clear();
 
             //  FUNCTIONS  SUMMARY
-            FunctionInfoList funcInfoList;
-            GetFunctionData(pid, (ThreadIdType) - 1, funcInfoList);
+            AMDTProfileDataVec functionProfileData;
+            m_profileDbReader.GetFunctionProfileData(proc.m_id, AMDT_PROFILE_ALL_MODULES, functionProfileData);
 
             sectionHdrs.clear();
             sectionHdrs.push_back(FUNCTION_SUMMARY_SECTION_HDR);
             tmpStr.makeEmpty();
             tmpStr.appendFormattedString(STR_FORMAT, OVERVIEW_SECTION_FUNCTIONS);
 
-            for (gtUInt32 i = 0; i < nbrCols; i++)
+            for (const auto& evName : m_profileEventsNameVec)
             {
-                tmpStr.appendFormattedString(L"," STR_FORMAT, convertToGTString(columnArray[i].title).asCharArray());
+                tmpStr.appendFormattedString(L"," STR_FORMAT, evName.asCharArray());
             }
 
             tmpStr.appendFormattedString(L"," STR_FORMAT, OVERVIEW_SECTION_MODULE);
 
             sectionHdrs.push_back(tmpStr);
 
-            if (funcInfoList.empty())
+            if (functionProfileData.empty())
             {
                 tmpStr.makeEmpty();
                 tmpStr.appendFormattedString(STR_FORMAT, NO_SAMPLES_TO_DISPLAY);
                 sectionHdrs.push_back(tmpStr);
             }
 
-            m_pReporter->WritePidFunctionSummary(sectionHdrs,
-                                                 funcInfoList,
-                                                 totalModSamples,
-                                                 nbrCols,
-                                                 columnArray,
-                                                 m_profileReader.getProfileInfo()->m_eventVec,
-                                                 m_args.IsShowPercentage(),
-                                                 m_args.IsReportByCore());
+            m_pReporter->WritePidFunctionSummary(sectionHdrs, functionProfileData, m_args.IsShowPercentage(), m_args.IsReportByCore());
+            functionProfileData.clear();
         }
 
         // Report CallGraph
-        if (IsReportCallGraph() && pProc->m_hasCSS)
+        //TODO: Fetch from DB if CSS available for each process.
+        if (IsReportCallGraph() /*&& proc.m_hasCSS*/)
         {
-            ReportCSSData(pProc->m_pid);
+            //ReportCSSData(proc.m_id);
         }
     } // iterate over the process list
-
-    if (nullptr != columnArray)
-    {
-        delete[] columnArray;
-    }
 }
 
+#if 0
 // Report is aggregated by Module
 // TODO: Add support for event filtering (option -e)
 void CpuProfileReport::ReportImixData()
@@ -2408,7 +2282,6 @@ bool CpuProfileReport::ReportCSSData(ProcessIdType pid)
     return retVal;
 }
 
-
 void CpuProfileReport::ClearCSSData()
 {
     CGFunctionInfoMap::iterator iter = m_callGraphFuncMap.begin();
@@ -2425,60 +2298,6 @@ void CpuProfileReport::ClearCSSData()
 
     m_callGraphFuncMap.clear();
 }
-
-
-bool CpuProfileReport::GetOverviewFunctionData()
-{
-    bool retVal = false;
-
-    // Ignore/Report system modules.
-    gtUInt64 flags = m_args.IsIgnoreSystemModules() ? SAMPLE_IGNORE_SYSTEM_MODULES : 0;
-    gtUInt64 coreMask = m_args.GetCoreAffinityMask();
-
-    // For overview, we need to do "group-by-module"
-    flags |= SAMPLE_GROUP_BY_MODULE;
-
-    // Retrieve the function data for all the PIDs
-    //  By default,
-    //      Ignore System Modules
-    //      Group By Process
-    //      No Group By Thread
-
-    retVal = GetFunctionInfoList(m_profileReader,
-                                 static_cast<ProcessIdType>(-1),
-                                 static_cast<ThreadIdType>(-1),
-                                 flags,
-                                 coreMask,          // core mask
-                                 m_funcInfoList);
-
-    return retVal;
-}
-
-
-bool CpuProfileReport::GetFunctionData(ProcessIdType pid, ThreadIdType tid, FunctionInfoList& funcInfoList)
-{
-    bool retVal = false;
-
-    // Ignore/Report system modules.
-    gtUInt64 flags = m_args.IsIgnoreSystemModules() ? SAMPLE_IGNORE_SYSTEM_MODULES : 0;
-    gtUInt64 coreMask = m_args.GetCoreAffinityMask();
-
-    // Retrieve the function data for all the PIDs
-    //  By default,
-    //      Ignore System Modules
-    //      Group By Process
-    //      No Group By Thread
-
-    retVal = GetFunctionInfoList(m_profileReader,
-                                 pid,
-                                 tid,
-                                 flags,
-                                 coreMask,          // core mask
-                                 funcInfoList);
-
-    return retVal;
-}
-
 
 CGFunctionInfo* GetCSSFuncNode(CGFunctionInfoMap& cgFunctionMap, gtString& funcName, CpuProfileFunction* pFunc, CpuProfileModule* pMod)
 {
@@ -2498,7 +2317,6 @@ CGFunctionInfo* GetCSSFuncNode(CGFunctionInfoMap& cgFunctionMap, gtString& funcN
     return pInfo;
 }
 
-
 bool CpuProfileReport::GetCSSData(ProcessIdType pid, EventMaskType eventSel, CGFunctionInfoMap& cgFunctionMap)
 {
     bool retVal = false;
@@ -2517,7 +2335,7 @@ bool CpuProfileReport::GetCSSData(ProcessIdType pid, EventMaskType eventSel, CGF
 
     m_pCss = new CGCallback(&m_profileReader);
 
-    gtString reportFilePath = GetEBPFilePath().fileDirectoryAsString();
+    gtString reportFilePath = GetDBFilePath().fileDirectoryAsString();
     reportFilePath.appendFormattedString(STR_FORMAT, PATH_SEPARATOR);
 
     retVal = m_pCss->Initialize(reportFilePath, pid);
@@ -2725,7 +2543,6 @@ bool CpuProfileReport::GetCSSData(ProcessIdType pid, EventMaskType eventSel, CGF
     return retVal;
 }
 
-
 bool CpuProfileReport::InitProfileEventsNameVec()
 {
     bool retVal = true;
@@ -2821,11 +2638,10 @@ bool CpuProfileReport::InitProfileEventsNameVec()
     return retVal;
 }
 
-
-bool CpuProfileReport::InitCoresList()
+bool CpuProfileReport::InitCoresList(gtUInt64 coreMask)
 {
     // Fill-in the m_coresList from the coreAffinity mask
-    // If seperate-by-core and core-affinity-mask not used, then report for all the cores
+    // If separate-by-core and core-affinity-mask not used, then report for all the cores
     if (m_args.IsReportByCore())
     {
         gtUInt64 coreMask = m_args.GetCoreAffinityMask();
@@ -2857,7 +2673,6 @@ bool CpuProfileReport::InitCoresList()
 
     return true;
 }
-
 
 bool CpuProfileReport::SetCLUViewConfig(ViewConfig& viewCfg)
 {
@@ -2927,7 +2742,6 @@ bool CpuProfileReport::SetCLUViewConfig(ViewConfig& viewCfg)
     return true;
 }
 
-
 bool CpuProfileReport::SetAllDataViewConfig(ViewConfig& viewCfg)
 {
     viewCfg.SetConfigName(QString("All Data"));
@@ -2946,7 +2760,6 @@ bool CpuProfileReport::SetAllDataViewConfig(ViewConfig& viewCfg)
 
     return true;
 }
-
 
 void CpuProfileReport::InitializeViewData()
 {
@@ -2978,3 +2791,4 @@ void CpuProfileReport::InitializeViewData()
 
     m_pReporter->SetSortEventIndex(sortEventIndex);
 }
+#endif

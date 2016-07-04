@@ -286,6 +286,10 @@ bool AmdtDatabaseAdapter::GetSessionConfiguration(AMDTProfileSessionInfo& sessio
         // Get the session start time.
         isOk = m_pDbAccessor->GetSessionInfoValue(gtString(AMDT_SESSION_INFO_KEY_SESSION_START_TIME), sessionInfo.m_sessionStartTime);
         GT_ASSERT(isOk);
+
+        // Get the session end time.
+        isOk = m_pDbAccessor->GetSessionInfoValue(gtString(AMDT_SESSION_INFO_KEY_SESSION_END_TIME), sessionInfo.m_sessionEndTime);
+        GT_ASSERT(isOk);
     }
 
     if (isOk && IsTimelineMode())
