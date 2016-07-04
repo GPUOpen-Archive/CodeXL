@@ -42,7 +42,7 @@ public:
     /// \param - functionName the function name
     /// \param - pid the process ID
     void selectFunction(const QString& functionName, ProcessIdType pid);
-	void selectFunction(const QString& funcId);
+    void selectFunction(const QString& funcId);
 
 
     /// Display the functions for the requested module
@@ -65,7 +65,7 @@ public:
     bool m_CLUNoteShown;
 signals:
     void functionActivated(gtVAddr functionAddress, ProcessIdType pid, ThreadIdType tid, const CpuProfileModule* pModule);
-	void opensourceCodeViewSig(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> funcModInfo);
+    void opensourceCodeViewSig(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> funcModInfo);
 
 public slots:
 
@@ -116,19 +116,19 @@ protected:
 
 private:
     // Widgets:
-    FunctionsDataTable* m_pFunctionTable;
+    FunctionsDataTable* m_pFunctionTable = nullptr;
 
     // Display filters for the tables:
-    TableDisplaySettings m_functionsTablesFilter;
-    acWidgetAction* m_pLabelModuleSelectedAction;
-    acWidgetAction* m_pPIDComboBoxAction;
+    TableDisplaySettings    m_functionsTablesFilter;
+    acWidgetAction* m_pLabelModuleSelectedAction = nullptr;
+    acWidgetAction* m_pPIDComboBoxAction         = nullptr;
 
     //void addModulesForPID(uint pid);
     void updateDataFromPidComboBox();
     ProcessIdType getCurrentPid();
     bool m_updateData;
 
-	std::map<gtString, AMDTUInt64> m_moduleNameIdMap;
+    std::map<gtString, AMDTUInt64> m_moduleNameIdMap;
 
 };
 
