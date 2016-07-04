@@ -38,45 +38,8 @@ public:
 
 protected:
 
-    /// Fill the list data according to the requested item:
-    bool fillListData();
-	virtual bool fillSummaryTables(int counterIdx);
-	virtual bool fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> modIdVec = {});
-
-    /// Add a module item to the table:
-    /// \param process - the process to add
-    /// \param pid - the process id
-    /// \return true on success false on failure
-    bool addProcessItem(ProcessIdType pid, const CpuProfileProcess& process);
-
-    /// The module data cells had already added before. This function collects the data itself after reading it from
-    /// the module samples
-    // \param process - the process to add
-    /// \param pid - the process id
-    /// \param rowIndex - the row index of the process
-    /// \param processDataVector - the values for the requested module
-    /// \return true on success false on failure
-    bool collectProcessDisplayedDataColumnValues(ProcessIdType pid, const CpuProfileProcess& process, int rowIndex, gtVector<float>& processDataVector);
-
-    /// Calculate the process item sample count string:
-    /// \param pid - the process id
-    /// \sampleCountStr[out] - the sample count as string
-    /// \sampleCount[out] - the sample count as gtUInt32
-    /// \return true on success false on failure
-    bool calculateProcessSamplesCount(ProcessIdType pid, QString& sampleCountStr, gtUInt32& moduleSampleCount);
-
-    /// Check if according to current filter settings, the process should be displayed
-    /// \param pid - the process id
-    bool shouldPIDBeDisplayed(ProcessIdType pid);
-
-    typedef struct
-    {
-        gtVector<float> procDataArray;
-    } ProgramItemValues;
-
-    typedef gtMap<gtString, ProgramItemValues> PathToValuesMap;
-    PathToValuesMap m_pathToValuesMap;
-
+    virtual bool fillSummaryTables(int counterIdx);
+    virtual bool fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> modIdVec = {});
 };
 
 

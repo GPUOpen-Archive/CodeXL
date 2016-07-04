@@ -39,299 +39,42 @@ ModulesDataTable::ModulesDataTable(QWidget* pParent,
 ModulesDataTable::~ModulesDataTable()
 {
 }
-
-bool ModulesDataTable::fillListData()
-{
-    bool retVal = false;
-
-    GT_IF_WITH_ASSERT((m_pProfileReader != nullptr) && (m_pSessionDisplaySettings != nullptr))
-    {
-        // Clear the total values vector:
-        m_totalDataValuesVector.clear();
-        m_totalDataValuesVector.resize(m_pSessionDisplaySettings->m_totalValuesMap.size());
-
-        NameModuleMap* pNameModuleMap = m_pProfileReader->getModuleMap();
-        GT_IF_WITH_ASSERT(pNameModuleMap != nullptr)
-        {
-            retVal = true;
-
-            gtVector<float> moduleDataVector;
-
-            // For each module
-            for (NameModuleMap::const_iterator it = pNameModuleMap->begin(), itEnd = pNameModuleMap->end(); it != itEnd; ++it)
-            {
-                // Get the current module:
-                const CpuProfileModule* pCurrentModule = &(it->second);
-
-                if (pCurrentModule->isIndirect())
-                {
-                    continue;
-                }
-
-                // Check if this modules should be displayed or filtered:
-                bool shouldDisplayModule = shouldModuleBeDisplayed(pCurrentModule);
-
-                if (shouldDisplayModule)
-                {
-                    // Add this module to the table:
-                    bool rc = addModuleItem(pCurrentModule);
-                    GT_ASSERT(rc);
-
-                    retVal &= rc;
-                }
-            }
-        }
-    }
-
-    retVal &= CPUProfileDataTable::fillListData();
-
-    return retVal;
-}
-
-bool ModulesDataTable::addModuleItem(const CpuProfileModule* pModule)
-{
-    bool retVal = false;
-    GT_IF_WITH_ASSERT((pModule != nullptr) && (m_pSessionDisplaySettings != nullptr) && (m_pTableDisplaySettings != nullptr) && (m_pTableDisplaySettings != nullptr))
-    {
-        QStringList moduleItemStringList;
-        QString modulePathStr = acGTStringToQString(pModule->getPath());
-        osFilePath modulePath;
-        retVal = true;
-
-        if (!pModule->m_isImdRead)
-        {
-            m_pParentSessionWindow->getModuleDetail(modulePathStr);
-        }
-
-        for (int i = 0; i < (int)m_pTableDisplaySettings->m_displayedColumns.size(); i++)
-        {
-            switch (m_pTableDisplaySettings->m_displayedColumns[i])
-            {
-
-                case TableDisplaySettings::MODULE_NAME_COL:
-                {
-                    modulePath.setFullPathFromString(pModule->getPath());
-                    gtString moduleName;
-                    modulePath.getFileNameAndExtension(moduleName);
-                    QString modName = acGTStringToQString(moduleName);
-                    moduleItemStringList << modName;
-                    break;
-                }
-
-                case TableDisplaySettings::MODULE_SYMBOLS_LOADED:
-                {
-                    // Check if the symbols are loaded for this module:
-                    bool isModuleUnknown = ((pModule->m_modType == CpuProfileModule::UNKNOWNMODULE) || (pModule->m_modType == CpuProfileModule::UNKNOWNKERNELSAMPLES));
-                    QString symbolsStr = (pModule->m_symbolsLoaded && !isModuleUnknown) ? CP_strLoaded : CP_strNotLoaded;
-                    moduleItemStringList << symbolsStr;
-                    break;
-                }
-
-                default:
-                {
-                    // Field will be re-calculated in post process:
-                    moduleItemStringList << "";
-                    retVal = true;
-                    break;
-                }
-            }
-        }
-
-        // Add dummy values for all the data columns:
-        // The real data is set in collectModuleDisplayedDataColumnValues:
-        bool showPercentSeperateColumns = IsShowSeperatePercentColumns();
-
-        if (m_pTableDisplaySettings->m_hotSpotIndicatorColumnCaption.isEmpty())
-        {
-            for (unsigned int i = 0; i < m_pSessionDisplaySettings->m_displayedDataColumnsIndices.size(); i++)
-            {
-                moduleItemStringList << "";
-
-                if (showPercentSeperateColumns)
-                {
-                    moduleItemStringList << "";
-                }
-            }
-        }
-
-        // Get the icon for this file:
-        QPixmap* pIcon = CPUProfileDataTable::moduleIcon(modulePath, pModule->m_is32Bit);
-
-        // Add the module row:
-        retVal = addRow(moduleItemStringList, pIcon, Qt::AlignVCenter | Qt::AlignLeft);
-        GT_IF_WITH_ASSERT(retVal)
-        {
-            int rowIndex = rowCount() - 1;
-
-            // Collect the data for the displayed data columns:
-            gtVector<float> moduleDataVector;
-            bool rc = collectModuleDisplayedDataColumnValues(pModule, moduleDataVector);
-            GT_IF_WITH_ASSERT(rc)
-            {
-                // Set the values for this row:
-                setTableDisplayedColumnsValues(rowIndex, moduleDataVector);
-            }
-
-            // Set items tooltips;
-            for (int i = 0; i < (int)m_pTableDisplaySettings->m_displayedColumns.size(); i++)
-            {
-                if (m_pTableDisplaySettings->m_displayedColumns[i] == TableDisplaySettings::MODULE_NAME_COL)
-                {
-                    QTableWidgetItem* pItem = item(rowIndex, i);
-                    GT_IF_WITH_ASSERT(pItem != nullptr)
-                    {
-                        if (pModule->isSystemModule())
-                        {
-                            pItem->setToolTip(modulePathStr + " (System)");
-                        }
-                        else
-                        {
-                            pItem->setToolTip(modulePathStr);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    return retVal;
-}
-
-bool ModulesDataTable::collectModuleDisplayedDataColumnValues(const CpuProfileModule* pModule, gtVector<float>& moduleDataVector)
-{
-    bool retVal = false;
-    GT_IF_WITH_ASSERT((m_pProfileReader != nullptr) && (pModule != nullptr) && (m_pSessionDisplaySettings != nullptr) && (m_pTableDisplaySettings != nullptr))
-    {
-
-        const int dataColsSize = m_pSessionDisplaySettings->m_availableDataColumnCaptions.size();
-
-        if (dataColsSize > 0)
-        {
-            gtVector<float> pidDataVector;
-            CacheFileMap cached;
-
-            // Prepare module data:
-            moduleDataVector.clear();
-            moduleDataVector.resize(dataColsSize + 1);
-
-            // For each process
-            PidAggregatedSampleMap::const_iterator pait = pModule->getBeginSample();
-            PidAggregatedSampleMap::const_iterator pa_end = pModule->getEndSample();
-
-            for (; pait != pa_end; ++pait)
-            {
-                // Get the current pid:
-                ProcessIdType pid = pait->first;
-
-                // Check if this pid should be calculated:
-                bool shouldPIDBeCalculated = true;
-
-                if (!m_pTableDisplaySettings->m_filterByPIDsList.isEmpty())
-                {
-                    shouldPIDBeCalculated = m_pTableDisplaySettings->m_filterByPIDsList.contains(pid);
-                }
-
-                // Add this pid samples if it is not filtered:
-                if (shouldPIDBeCalculated)
-                {
-                    // Prepare process data
-                    pidDataVector.clear();
-                    pidDataVector.resize(dataColsSize + 1);
-                    CPUProfileUtils::ConvertAggregatedSampleToArray(pait->second, pidDataVector, m_totalDataValuesVector, m_pSessionDisplaySettings, false);
-
-                    // Add the data for this pid to the module data array:
-                    CPUProfileUtils::AddDataArrays(moduleDataVector, pidDataVector);
-                }
-            }
-
-
-            if (m_pSessionDisplaySettings->m_displayClu)
-            {
-                CPUProfileUtils::CalculateCluMetrics(m_pSessionDisplaySettings, moduleDataVector);
-            }
-        }
-
-        retVal = true;
-    }
-
-    return retVal;
-}
-
-
-
 bool ModulesDataTable::findModuleFilePath(int moduleRowIndex, QString& moduleFileName)
 {
-    bool retVal = false;
+	bool retVal = false;
 
-    // Sanity check:
-    GT_IF_WITH_ASSERT(m_pTableDisplaySettings != nullptr)
-    {
-        for (int i = 0 ; i < (int)m_pTableDisplaySettings->m_displayedColumns.size(); i++)
-        {
-            if (m_pTableDisplaySettings->m_displayedColumns[i] == TableDisplaySettings::MODULE_NAME_COL)
-            {
-                QTableWidgetItem* pItem = item(moduleRowIndex, i);
-                GT_IF_WITH_ASSERT(pItem != nullptr)
-                {
-                    // Get the module file path (the full path is stored in the tooltip):
-                    moduleFileName = pItem->toolTip();
+	// Sanity check:
+	GT_IF_WITH_ASSERT(m_pTableDisplaySettings != nullptr)
+	{
+		for (int i = 0; i < (int)m_pTableDisplaySettings->m_displayedColumns.size(); i++)
+		{
+			if (m_pTableDisplaySettings->m_displayedColumns[i] == TableDisplaySettings::MODULE_NAME_COL)
+			{
+				QTableWidgetItem* pItem = item(moduleRowIndex, i);
+				GT_IF_WITH_ASSERT(pItem != nullptr)
+				{
+					// Get the module file path (the full path is stored in the tooltip):
+					moduleFileName = pItem->toolTip();
 
-                    // For system dll's - remove the "System" postfix from the tooltip:
-                    if (moduleFileName.endsWith(" (System)"))
-                    {
-                        moduleFileName = moduleFileName.replace(" (System)", "");
-                    }
+					// For system dll's - remove the "System" postfix from the tooltip:
+					if (moduleFileName.endsWith(" (System)"))
+					{
+						moduleFileName = moduleFileName.replace(" (System)", "");
+					}
 
-                    retVal = true;
-                    break;
-                }
-            }
-        }
-    }
+					retVal = true;
+					break;
+				}
+			}
+		}
+	}
 
-    return retVal;
-}
-
-bool ModulesDataTable::shouldModuleBeDisplayed(const CpuProfileModule* pModule)
-{
-    bool retVal = true;
-
-    // Sanity check:
-    GT_IF_WITH_ASSERT((pModule != nullptr) && (m_pTableDisplaySettings != nullptr))
-    {
-        // Check if the module should be filtered by PID:
-        if (!m_pTableDisplaySettings->m_filterByPIDsList.isEmpty())
-        {
-            retVal = false;
-
-            // Go through the list of PIDs for filter, and check against each of them if it is sampled in the current module:
-            foreach (ProcessIdType pid, m_pTableDisplaySettings->m_filterByPIDsList)
-            {
-                // Check if the requested filter PID is sampled in this module:
-                PidAggregatedSampleMap::const_iterator iter = pModule->findSampleForPid(pid);
-
-                if (iter != pModule->getEndSample())
-                {
-                    retVal = true;
-                    break;
-                }
-            }
-        }
-
-        // Filter out system dlls:
-        if (retVal && !CPUGlobalDisplayFilter::instance().m_displaySystemDLLs)
-        {
-            // Check if this is a system module:
-            retVal = !AuxIsSystemModule(pModule->getPath());
-        }
-    }
-
-    return retVal;
+	return retVal;
 }
 
 void ModulesDataTable::onAboutToShowContextMenu()
 {
-	//TODO: Is required ??
+    //TODO: Is required ??
     // Call the base class implementation:
     CPUProfileDataTable::onAboutToShowContextMenu();
 
@@ -379,6 +122,7 @@ void ModulesDataTable::onAboutToShowContextMenu()
                                 }
                             }
 
+#if 0
                             // Enable the action if one of the selected moeuls has loaded symbols:
                             isActionEnabled = false;
 
@@ -391,6 +135,7 @@ void ModulesDataTable::onAboutToShowContextMenu()
                                 }
                             }
 
+#endif
                         }
                     }
                     else
@@ -405,56 +150,6 @@ void ModulesDataTable::onAboutToShowContextMenu()
             }
         }
     }
-}
-
-bool ModulesDataTable::AreModuleSymbolsLoaded(int moduleRowIndex)
-{
-    bool retVal = false;
-
-    // Sanity check:
-    GT_IF_WITH_ASSERT(m_pTableDisplaySettings != nullptr)
-    {
-        // Check if there is a column stating if the symbols are loaded for the module:
-        int symbolsLoadedColumn = -1;
-
-        for (int i = 0; i < (int)m_pTableDisplaySettings->m_displayedColumns.size(); i++)
-        {
-            if (m_pTableDisplaySettings->m_displayedColumns[i] == TableDisplaySettings::MODULE_SYMBOLS_LOADED)
-            {
-                symbolsLoadedColumn = i;
-                break;
-            }
-        }
-
-        if (symbolsLoadedColumn >= 0)
-        {
-            QTableWidgetItem* pModuleLoadedColItem = item(moduleRowIndex, symbolsLoadedColumn);
-            {
-                // If one of the selected modules is loaded, the action should be enabled:
-                retVal = (pModuleLoadedColItem->text() == CP_strLoaded);
-            }
-        }
-        else
-        {
-            // Get the module file path:
-            QString moduleFilePath;
-            retVal = findModuleFilePath(moduleRowIndex, moduleFilePath);
-            GT_IF_WITH_ASSERT(retVal)
-            {
-                // Get the module structure:
-                CpuProfileModule* pModule = m_pParentSessionWindow->getModuleDetail(moduleFilePath);
-                GT_IF_WITH_ASSERT(pModule != nullptr)
-                {
-                    // Only known modules has loaded symbols:
-                    retVal = ((pModule->m_modType != CpuProfileModule::UNKNOWNMODULE) && (pModule->m_modType != CpuProfileModule::UNKNOWNKERNELSAMPLES));
-                }
-            }
-        }
-
-        // Get the module
-    }
-
-    return retVal;
 }
 
 CPUProfileDataTable::TableType ModulesDataTable::GetTableType() const
@@ -499,7 +194,7 @@ bool ModulesDataTable::fillSummaryTables(int counterIdx)
 
             list << filename.asASCIICharArray();
 
-			QString modulefullPath(moduleData.m_name.asASCIICharArray());
+            QString modulefullPath(moduleData.m_name.asASCIICharArray());
 
             QVariant sampleCount(moduleData.m_sampleValue.at(0).m_sampleCount);
             list << sampleCount.toString();
@@ -509,33 +204,34 @@ bool ModulesDataTable::fillSummaryTables(int counterIdx)
 
             addRow(list, nullptr);
 
-			AMDTProfileModuleInfoVec procInfo;
-			m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, moduleData.m_moduleId, procInfo);
+            AMDTProfileModuleInfoVec procInfo;
+            m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, moduleData.m_moduleId, procInfo);
 
-			int row = rowCount() - 1;
+            int row = rowCount() - 1;
 
-			QPixmap* pIcon = CPUProfileDataTable::moduleIcon(modulePath, !procInfo.at(0).m_is64Bit);
-			QTableWidgetItem* pNameItem = item(row, AMDT_MOD_TABLE_SUMMARY_MOD_NAME);
+            QPixmap* pIcon = CPUProfileDataTable::moduleIcon(modulePath, !procInfo.at(0).m_is64Bit);
+            QTableWidgetItem* pNameItem = item(row, AMDT_MOD_TABLE_SUMMARY_MOD_NAME);
 
-			if (pNameItem != nullptr)
-			{
-				if (pIcon != nullptr)
-				{
-					pNameItem->setIcon(QIcon(*pIcon));
-				}
-			}
+            if (pNameItem != nullptr)
+            {
+                if (pIcon != nullptr)
+                {
+                    pNameItem->setIcon(QIcon(*pIcon));
+                }
+            }
 
-			QTableWidgetItem* pModuleNameItem = item(row, AMDT_MOD_TABLE_SUMMARY_MOD_NAME);
-			if (pModuleNameItem != nullptr)
-			{
-				pModuleNameItem->setToolTip(moduleData.m_name.asASCIICharArray());
-			}
+            QTableWidgetItem* pModuleNameItem = item(row, AMDT_MOD_TABLE_SUMMARY_MOD_NAME);
+
+            if (pModuleNameItem != nullptr)
+            {
+                pModuleNameItem->setToolTip(moduleData.m_name.asASCIICharArray());
+            }
 
             rc = delegateSamplePercent(AMDT_MOD_TABLE_SUMMARY_SAMPLE_PER);
         }
 
         setSortingEnabled(true);
-		resizeColumnToContents(AMDT_MOD_TABLE_SUMMARY_MOD_NAME);
+        resizeColumnToContents(AMDT_MOD_TABLE_SUMMARY_MOD_NAME);
         retVal = true;
     }
 
@@ -561,25 +257,25 @@ bool ModulesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, s
         rc = m_pProfDataRdr->GetModuleProfileData(procId, modId, allProcessData);
         GT_ASSERT(rc);
 
-         setSortingEnabled(false);
+        setSortingEnabled(false);
 
         for (auto profData : allProcessData)
         {
             QStringList list;
 
-			CounterNameIdVec selectedCounterList;
+            CounterNameIdVec selectedCounterList;
 
             // insert module id
             QVariant mId(profData.m_moduleId);
             list << mId.toString();
 
-			AMDTProfileModuleInfoVec procInfo;
-			m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, profData.m_moduleId, procInfo);
+            AMDTProfileModuleInfoVec procInfo;
+            m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, profData.m_moduleId, procInfo);
             list << acGTStringToQString(procInfo.at(0).m_name);
 
             // TODO : need to discuss
-			gtString symbols = procInfo.at(0).m_loadAddress ? L"Loaded" : L"Not Loaded";
-			list << acGTStringToQString(symbols);
+            gtString symbols = procInfo.at(0).m_loadAddress ? L"Loaded" : L"Not Loaded";
+            list << acGTStringToQString(symbols);
 
             m_pDisplayFilter->GetSelectedCounterList(selectedCounterList);
             int i = 0;
@@ -592,33 +288,34 @@ bool ModulesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, s
 
             addRow(list, nullptr);
 
-			AMDTProfileModuleInfoVec modInfo;
-			m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, profData.m_moduleId, modInfo);
+            AMDTProfileModuleInfoVec modInfo;
+            m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, profData.m_moduleId, modInfo);
 
-			int row = rowCount() - 1;
+            int row = rowCount() - 1;
 
-			QPixmap* pIcon = CPUProfileDataTable::moduleIcon(modInfo.at(0).m_path, !procInfo.at(0).m_is64Bit);
-			QTableWidgetItem* pNameItem = item(row, AMDT_MOD_TABLE_MOD_NAME);
+            QPixmap* pIcon = CPUProfileDataTable::moduleIcon(modInfo.at(0).m_path, !procInfo.at(0).m_is64Bit);
+            QTableWidgetItem* pNameItem = item(row, AMDT_MOD_TABLE_MOD_NAME);
 
-			if (pNameItem != nullptr)
-			{
-				if (pIcon != nullptr)
-				{
-					pNameItem->setIcon(QIcon(*pIcon));
-				}
-			}
+            if (pNameItem != nullptr)
+            {
+                if (pIcon != nullptr)
+                {
+                    pNameItem->setIcon(QIcon(*pIcon));
+                }
+            }
 
-			QTableWidgetItem* pModuleNameItem = item(row, AMDT_MOD_TABLE_MOD_NAME);
-			if (pModuleNameItem != nullptr)
-			{
-				pModuleNameItem->setToolTip(acGTStringToQString(modInfo.at(0).m_path));
-			}
+            QTableWidgetItem* pModuleNameItem = item(row, AMDT_MOD_TABLE_MOD_NAME);
+
+            if (pModuleNameItem != nullptr)
+            {
+                pModuleNameItem->setToolTip(acGTStringToQString(modInfo.at(0).m_path));
+            }
 
         }
 
-		hideColumn(AMDT_MOD_TABLE_MOD_ID);
-		resizeColumnToContents(AMDT_MOD_TABLE_MOD_NAME);
-		retVal = true;
+        hideColumn(AMDT_MOD_TABLE_MOD_ID);
+        resizeColumnToContents(AMDT_MOD_TABLE_MOD_NAME);
+        retVal = true;
     }
 
     return retVal;
@@ -626,9 +323,9 @@ bool ModulesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, s
 
 bool ModulesDataTable::findModueId(int rowIndex, AMDTModuleId& modId)
 {
-	QTableWidgetItem* pidWidget = item(rowIndex, 0);
-	int moduleId = pidWidget->text().toInt();
-	modId = moduleId;
+    QTableWidgetItem* pidWidget = item(rowIndex, 0);
+    int moduleId = pidWidget->text().toInt();
+    modId = moduleId;
 
-	return true;
+    return true;
 }
