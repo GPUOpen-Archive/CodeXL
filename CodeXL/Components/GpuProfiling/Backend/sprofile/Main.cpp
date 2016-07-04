@@ -132,7 +132,7 @@ static int CreateProcessWithDetour(gtString& strDirPath, gtString& strAppCommand
 
     char szMicroDllPath[ MAX_PATH ];
     SP_strcpy(szMicroDllPath, MAX_PATH, dirPathAsUTF8.c_str());
-    SP_strcat(szMicroDllPath, MAX_PATH, "CxlGpuProfilerMicroDll" BITNESS DEBUG_PREFIX GDT_BUILD_SUFFIX LIB_SUFFIX);
+    SP_strcat(szMicroDllPath, MAX_PATH, MICRO_DLL);
 
     // Use Detours to launch the app and load our OpenCL server into the process
     STARTUPINFO si;
