@@ -108,6 +108,7 @@ commonLinkedLibraries = \
 	"CXLApplicationFramework",
 	"libboost_regex",
 	"libboost_filesystem",
+	"libboost_wave",
     "libpthread"
 ]
 
