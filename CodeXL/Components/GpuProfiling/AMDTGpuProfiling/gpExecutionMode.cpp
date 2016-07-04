@@ -1368,7 +1368,12 @@ bool gpExecutionMode::InitializeCodeXLRemoteAgent()
 #endif
         osFilePath workDir = codeXLAgent.fileDirectoryAsString();
 
-        if (osLaunchSuspendedProcess(codeXLAgent, L"", workDir, m_cxlAgentProcessID, processHandle, threadHandle, shouldDisplayServerWindow))
+#if AMDT_BUILD_TARGET == AMDT_LINUX_OS
+         const auto cxlAgentArgs = L"--ip 127.0.0.1";
+#else
+     const auto cxlAgentArgs = L"";
+#endif    
+        if (osLaunchSuspendedProcess(codeXLAgent, cxlAgentArgs, workDir, m_cxlAgentProcessID, processHandle, threadHandle, shouldDisplayServerWindow))
         {
             osResumeSuspendedProcess(m_cxlAgentProcessID, processHandle, threadHandle, true);
             retVal = true;
