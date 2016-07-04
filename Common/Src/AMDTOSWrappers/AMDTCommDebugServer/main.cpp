@@ -7,6 +7,7 @@
 
 int main(int argc, char* argv[])
 {
+    const int DEFAULT_PORT_NUMBER = 10000;
     int portNum = 0;
     std::wcout << L"AMDTCommDebugServer running, press any key to exit." << std::endl;
 
@@ -18,7 +19,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-        portNum = 10000;
+        portNum = DEFAULT_PORT_NUMBER;
     }
 
     ServerListenThread listenThread;
