@@ -1115,13 +1115,16 @@ bool gpExecutionMode::GetFrameAnalisysServerPaths(gtString& capturePlayerPathAsS
     gtString perfStudioServerName(GPU_STR_perfStudioServer64);
 
     serverPathAsStr.append(perfStudioServerName);
-    serverPathAsStr.append(L".");
-    serverPathAsStr.append(AF_STR_exeFileExtension);
-    serverPath.setFullPathFromString(serverPathAsStr);
+
     capturePlayerPathAsStr.append(GPU_STR_GraphicsCapturePlayer64);
 
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+    serverPathAsStr.append(L".");
+    serverPathAsStr.append(AF_STR_exeFileExtension);
     capturePlayerPathAsStr.append(L".");
     capturePlayerPathAsStr.append(AF_STR_exeFileExtension);
+#endif
+    serverPath.setFullPathFromString(serverPathAsStr);
 
     return true;
 }
@@ -1369,7 +1372,7 @@ bool gpExecutionMode::InitializeCodeXLRemoteAgent()
         osFilePath workDir = codeXLAgent.fileDirectoryAsString();
 
 #if AMDT_BUILD_TARGET == AMDT_LINUX_OS
-         const auto cxlAgentArgs = L"--ip 127.0.0.1";
+         const auto cxlAgentArgs = L"--ip " GPU_STR_CodeXLAgentHomeIP;
 #else
      const auto cxlAgentArgs = L"";
 #endif    

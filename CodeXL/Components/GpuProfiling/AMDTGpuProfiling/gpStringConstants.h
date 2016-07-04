@@ -415,9 +415,9 @@
     #define GPU_STR_CodeXLAgent L"CodeXLRemoteAgent" GDT_DEBUG_SUFFIX_W   L"." AF_STR_exeFileExtension
     #define GPU_STR_GraphicsCapturePlayer64 L"CXLGraphicsServerPlayer-x64" GDT_DEBUG_SUFFIX_W
 #else
-    #define GPU_STR_perfStudioServer64 L"CXLGraphicsServer-x64"
+    #define GPU_STR_perfStudioServer64 L"CXLGraphicsServer"
     #define GPU_STR_CodeXLAgent L"CodeXLRemoteAgent-bin"
-    #define GPU_STR_GraphicsCapturePlayer64 L"CXLGraphicsServerPlayer-x64"
+    #define GPU_STR_GraphicsCapturePlayer64 L"CXLGraphicsServerPlayer"
 #endif
 #define GPU_STR_CodeXLAgentHomeIP L"127.0.0.1"
 #define GPU_STR_RaptrExeName L"raptr.exe"
