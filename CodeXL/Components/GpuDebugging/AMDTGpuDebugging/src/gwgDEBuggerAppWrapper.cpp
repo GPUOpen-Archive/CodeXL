@@ -91,6 +91,50 @@ gwgDEBuggerAppWrapper::gwgDEBuggerAppWrapper()
 {
 
 }
+
+// ---------------------------------------------------------------------------
+// Name:        gwgDEBuggerAppWrapper::~gwgDEBuggerAppWrapper
+// Description: Destructor
+// Author:      Uri Shomroni
+// Date:        4/7/2016
+// ---------------------------------------------------------------------------
+gwgDEBuggerAppWrapper::~gwgDEBuggerAppWrapper()
+{
+    // Unregister the application command single instance:
+    gdApplicationCommands::cleanupGDInstance(true);
+
+    // US, 4/7/16 - afExecutionModeManager does not currently allow unregistering execution modes.
+    // afExecutionModeManager::instance().unregisterExecutionMode(m_pExecutionMode);
+    delete m_pExecutionMode;
+
+    // Destroy the event observer:
+    delete m_pApplicationEventObserver;
+
+    // Unregister the actions and views creators:
+    // US, 4/7/16 - afQtCreatorsManager does not currently allow unregistering action creators or view creators.
+    // We also do not hold a pointer to the main action creator for deletion:
+    // afQtCreatorsManager::instance().unregisterActionExecutor(m_pDebugActionsCreator);
+    // afQtCreatorsManager::instance().unregisterViewCreator(m_pDebugViewsCreator);
+    // afQtCreatorsManager::instance().unregisterViewCreator(m_pImageBuffersMDIViewCreator);
+    // afQtCreatorsManager::instance().unregisterActionExecutor(m_pStatisticsActionsExecutor);
+
+    // Destroy the creator objects:
+    // delete m_pDebugActionsCreator;
+    delete m_pDebugViewsCreator;
+    delete m_pImageBuffersMDIViewCreator;
+    delete m_pStatisticsActionsExecutor;
+
+    // Destroy the project settings object:
+    // US, 4/7/16 - afProjectManager does not currently allow unregistering setting extensions.
+    // afProjectManager::instance().unregisterProjectSettingsExtension(m_pProjectSettingsExtension);
+    delete m_pProjectSettingsExtension;
+
+    // Destroy the global settings page:
+    // US, 4/7/16 - afGlobalVariablesManager does not currently allow unregistering global setting pages.
+    // afGlobalVariablesManager::instance().unregisterGlobalSettingsPage(m_spGlobalDebugSettingsPage);
+    delete m_spGlobalDebugSettingsPage;
+}
+
 // ---------------------------------------------------------------------------
 // Name:        gwgDEBuggerAppWrapper::instance
 // Description:
@@ -123,7 +167,6 @@ void gwgDEBuggerAppWrapper::initialize()
     // Initialize the application command instance:
     gwApplicationCommands* pApplicationCommands = new gwApplicationCommands;
 
-
     // Register the application command single instance:
     bool rcRegsister = gdApplicationCommands::registerGDInstance(pApplicationCommands);
     GT_ASSERT_EX(rcRegsister, L"Only single instance of gdApplicationCommands should be registered");
@@ -142,17 +185,14 @@ void gwgDEBuggerAppWrapper::initialize()
     // Create an event observer:
     m_pApplicationEventObserver = new gwEventObserver;
 
-
     // Create the main menu actions creator:
     gwMenuActionsExecutor* pActionsCreator = new gwMenuActionsExecutor;
-
 
     // Register the actions creator:
     afQtCreatorsManager::instance().registerActionExecutor(pActionsCreator);
 
     // Create a debug views creator:
     m_pDebugViewsCreator = new gwDebugViewsCreator;
-
 
     // Initialize:
     m_pDebugViewsCreator->initialize();
@@ -163,7 +203,6 @@ void gwgDEBuggerAppWrapper::initialize()
     // Create a views creator:
     m_pImageBuffersMDIViewCreator = new gwImagesAndBuffersMDIViewCreator;
 
-
     // Initialize:
     m_pImageBuffersMDIViewCreator->initialize();
 
@@ -172,7 +211,6 @@ void gwgDEBuggerAppWrapper::initialize()
 
     // Create the statistics actions creator:
     m_pStatisticsActionsExecutor = new gwStatisticsActionsExecutor;
-
 
     // Register the actions creator:
     afQtCreatorsManager::instance().registerActionExecutor(m_pStatisticsActionsExecutor);

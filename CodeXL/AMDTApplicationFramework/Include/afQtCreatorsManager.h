@@ -43,10 +43,10 @@ public:
     void initialize();
 
     // Get the static view creators:
-    gtVector<afViewCreatorAbstract*>& viewsCreators() { return m_viewsCreators; }
+    const gtVector<afViewCreatorAbstract*>& viewsCreators() const { return m_viewsCreators; }
 
     // Get the actions creators:
-    gtVector<afActionExecutorAbstract*>& actionsCreators() { return m_actionsExecutors; }
+    const gtVector<afActionExecutorAbstract*>& actionsCreators() const { return m_actionsExecutors; }
 
     // register a view creator:
     void registerViewCreator(afViewCreatorAbstract* pViewCreator);

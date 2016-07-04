@@ -47,7 +47,6 @@ class gdDebugApplicationTreeData;
 class GW_API gwgDEBuggerAppWrapper
 {
 public:
-
     static gwgDEBuggerAppWrapper& instance();
     void initialize();
     void initializeIndependentWidgets();
@@ -75,6 +74,7 @@ public:
 private:
     // Do not allow the use of my default constructor:
     gwgDEBuggerAppWrapper();
+    ~gwgDEBuggerAppWrapper();
 
     friend class gwSingletonsDelete;
 

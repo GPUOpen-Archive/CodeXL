@@ -67,8 +67,7 @@ public:
     virtual bool BuildItemHTMLProperties(const afApplicationTreeItemData* pItemData, bool displayItemChildren, bool displayThumbnail, bool displayExtendedInformation, afHTMLContent& htmlContent);
     void setPropertiesFromText(const QString& htmlText);
 
-protected:
-
+private:
     // Overrides apIEventsObserver:
     virtual void onEvent(const apEvent& eve, bool& vetoEvent);
 
@@ -85,7 +84,9 @@ protected:
 
     // Set internal members info:
     void setPropertiesViewInfo();
+
 private:
+    friend class gdSingletonsDelete;
 
     // Static single instance:
     static gdPropertiesEventObserver* m_spMySingleInstance;

@@ -392,7 +392,7 @@ void appMainAppWindow::createApplicationInitialActions()
 {
     // Create the actions:
     // Get the actions creator:
-    gtVector<afActionExecutorAbstract*>& actionsExecutors = afQtCreatorsManager::instance().actionsCreators();
+    const gtVector<afActionExecutorAbstract*>& actionsExecutors = afQtCreatorsManager::instance().actionsCreators();
 
     // Get number of creators:
     int numberActionsExecutors = actionsExecutors.size();
@@ -820,7 +820,7 @@ acToolBar* appMainAppWindow::getToolbar(gtString& toolbarName)
 void appMainAppWindow::createApplicationInitialViews()
 {
     // Get the views creators:
-    gtVector<afViewCreatorAbstract*>& viewsCreators = afQtCreatorsManager::instance().viewsCreators();
+    const gtVector<afViewCreatorAbstract*>& viewsCreators = afQtCreatorsManager::instance().viewsCreators();
 
     // Get number of creators:
     int numberViewsCreators = (int)viewsCreators.size();
@@ -1941,7 +1941,7 @@ bool appMainAppWindow::closeMDISubWindow(afQMdiSubWindow* pSubWindow)
 void appMainAppWindow::restoreMinimalSize()
 {
     // Get the views creators:
-    gtVector<afViewCreatorAbstract*>& viewsCreators = afQtCreatorsManager::instance().viewsCreators();
+    const gtVector<afViewCreatorAbstract*>& viewsCreators = afQtCreatorsManager::instance().viewsCreators();
 
     // Get number of creators:
     int numberViewsCreators = (int)viewsCreators.size();
@@ -1971,7 +1971,7 @@ void appMainAppWindow::onIdleTimerTimeout()
     updateToolbarsCommands();
 
     // Get the views creators:
-    gtVector<afViewCreatorAbstract*>& viewsCreators = afQtCreatorsManager::instance().viewsCreators();
+    const gtVector<afViewCreatorAbstract*>& viewsCreators = afQtCreatorsManager::instance().viewsCreators();
 
     // Get number of creators:
     int numberViewsCreators = (int)viewsCreators.size();
@@ -2279,7 +2279,7 @@ afViewCreatorAbstract* appMainAppWindow::findCreatorForWidget(QWidget* pWidget, 
     GT_IF_WITH_ASSERT(pWidget != nullptr)
     {
         // Get the views creators:
-        gtVector<afViewCreatorAbstract*>& viewsCreators = afQtCreatorsManager::instance().viewsCreators();
+        const gtVector<afViewCreatorAbstract*>& viewsCreators = afQtCreatorsManager::instance().viewsCreators();
 
         // Get number of creators:
         int numberViewsCreators = (int)viewsCreators.size();
@@ -2622,18 +2622,17 @@ void appMainAppWindow::RemoveSubWindowFromViewCreators(afQMdiSubWindow* pSubWind
     }
 
     // Get the views creators:
-    gtVector<afViewCreatorAbstract*>& viewsCreators = afQtCreatorsManager::instance().viewsCreators();
-    {
-        // Get number of creators:
-        int numberViewsCreators = (int)viewsCreators.size();
+    const gtVector<afViewCreatorAbstract*>& viewsCreators = afQtCreatorsManager::instance().viewsCreators();
 
-        for (int viewCreatorIndex = 0; viewCreatorIndex < numberViewsCreators; viewCreatorIndex++)
+    // Get number of creators:
+    int numberViewsCreators = (int)viewsCreators.size();
+
+    for (int viewCreatorIndex = 0; viewCreatorIndex < numberViewsCreators; viewCreatorIndex++)
+    {
+        afViewCreatorAbstract* pCurrentCreator = viewsCreators[viewCreatorIndex];
+        GT_IF_WITH_ASSERT(pCurrentCreator != nullptr)
         {
-            afViewCreatorAbstract* pCurrentCreator = viewsCreators[viewCreatorIndex];
-            GT_IF_WITH_ASSERT(pCurrentCreator != nullptr)
-            {
-                pCurrentCreator->onMDISubWindowClose(pSubWindowAboutToBeClosed);
-            }
+            pCurrentCreator->onMDISubWindowClose(pSubWindowAboutToBeClosed);
         }
     }
 }

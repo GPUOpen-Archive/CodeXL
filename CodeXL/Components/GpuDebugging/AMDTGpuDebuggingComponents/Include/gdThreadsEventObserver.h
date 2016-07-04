@@ -36,7 +36,6 @@ class apDebuggedProcessRunSuspendedEvent;
 class GD_API gdThreadsEventObserver : public apIEventsObserver
 {
 public:
-
     virtual ~gdThreadsEventObserver();
 
     static gdThreadsEventObserver& instance();
@@ -51,11 +50,11 @@ protected:
     virtual const wchar_t* eventObserverName() const { return L"ThreadsCombobox"; };
 
 private:
-
     // Do not allow the use of my constructor:
     gdThreadsEventObserver();
 
 private:
+    friend class gdSingletonsDelete;
 
     // Single instance:
     static gdThreadsEventObserver* m_spMySingleInstance;

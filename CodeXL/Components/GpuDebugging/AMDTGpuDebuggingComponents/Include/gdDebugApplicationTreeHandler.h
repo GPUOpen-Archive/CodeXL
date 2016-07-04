@@ -67,11 +67,10 @@ class gdDebugApplicationTreeData;
 // ----------------------------------------------------------------------------------
 class GD_API gdDebugApplicationTreeHandler : public afApplicationTreeHandler, public apIEventsObserver
 {
-
+public:
     Q_OBJECT
 
 public:
-
     gdDebugApplicationTreeHandler();
     virtual ~gdDebugApplicationTreeHandler();
 
@@ -167,7 +166,7 @@ protected slots:
     void onItemViewMemory();
     void onContextStatistics();
 
-protected:
+private:
     virtual bool activateItem(QTreeWidgetItem* pItemToActivate);
 
     // OpenGL & OpenCL:
@@ -337,9 +336,12 @@ private:
     // My single instance:
     static gdDebugApplicationTreeHandler* m_pMySingleInstance;
 
-protected:
+    friend class gdSingletonsDelete;
+
+private:
     // Icons:
-    gtPtrVector<QPixmap*> m_treeItemsVector;
+    gtVector<QPixmap*> m_treeItemsVector;
+    QPixmap* m_iconsStorage;
 
     // Tree control:
     afApplicationTree* m_pApplicationTree;

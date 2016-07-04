@@ -101,7 +101,7 @@ gdDebugApplicationTreeHandler* gdDebugApplicationTreeHandler::m_pMySingleInstanc
 // Date:        26/10/2010
 // ---------------------------------------------------------------------------
 gdDebugApplicationTreeHandler::gdDebugApplicationTreeHandler():
-    m_pApplicationTree(NULL), m_pHeaderItem(NULL), m_isTextureMemoryDataUpdateRequired(false), m_isInfoUpdated(false),
+    m_iconsStorage(nullptr), m_pApplicationTree(NULL), m_pHeaderItem(NULL), m_isTextureMemoryDataUpdateRequired(false), m_isInfoUpdated(false),
     m_pPBuffersTreeId(NULL), m_pSyncObjectsTreeId(NULL), m_pLastMemoryLeakEvent(NULL),
     m_texture1DIconIndex(-1), m_texture2DIconIndex(-1), m_texture3DIconIndex(-1),
     m_texture1DArrayIconIndex(-1), m_texture2DArrayIconIndex(-1), m_texture2DMultisampleIconIndex(-1), m_texture2DMultisampleArrayIconIndex(-1), m_allTexturesIconIndex(-1), m_texturesShortcutIconIndex(-1),
@@ -322,6 +322,10 @@ void gdDebugApplicationTreeHandler::setItemIcon(QTreeWidgetItem* pItem, int icon
 // ---------------------------------------------------------------------------
 gdDebugApplicationTreeHandler::~gdDebugApplicationTreeHandler()
 {
+    m_treeItemsVector.clear();
+
+    delete[] m_iconsStorage;
+    m_iconsStorage = nullptr;
 }
 
 // ---------------------------------------------------------------------------
@@ -3047,196 +3051,202 @@ bool gdDebugApplicationTreeHandler::createAndLoadImageList()
     bool rc = true;
 
     // Add the Bitmaps into the recourse file
-#define GD_TREE_HANDLER_ICONS_COUNT 61
-    QPixmap* pPixmaps = new QPixmap[GD_TREE_HANDLER_ICONS_COUNT];
+#define GD_TREE_HANDLER_ICONS_COUNT 62
+    GT_ASSERT(nullptr == m_iconsStorage);
+    delete[] m_iconsStorage;
+    m_iconsStorage = new QPixmap[GD_TREE_HANDLER_ICONS_COUNT];
 
     int currentIdx = 0;
 
-    QPixmap* renderContextIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* renderContextIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*renderContextIcon, AC_ICON_DEBUG_APPTREE_GL_CONTEXT);
 
-    QPixmap* renderContextDeletedIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* renderContextDeletedIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*renderContextDeletedIcon, AC_ICON_DEBUG_APPTREE_GL_CONTEXTDELETED);
 
-    QPixmap* renderContextSharedIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* renderContextSharedIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*renderContextSharedIcon, AC_ICON_DEBUG_APPTREE_GL_CONTEXTSHARED);
 
-    QPixmap* renderContextDeletedSharedIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* renderContextDeletedSharedIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*renderContextDeletedSharedIcon, AC_ICON_DEBUG_APPTREE_GL_CONTEXTDELETEDSHARED);
 
-    QPixmap* allTexturesIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* allTexturesIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*allTexturesIcon, AC_ICON_DEBUG_APPTREE_GL_TEXGENERIC);
 
-    QPixmap* textures1DIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* textures1DIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*textures1DIcon, AC_ICON_DEBUG_APPTREE_GL_TEX1D);
 
-    QPixmap* textures2DIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* textures2DIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*textures2DIcon, AC_ICON_DEBUG_APPTREE_GL_TEX2D);
 
-    QPixmap* textures3DIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* textures3DIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*textures3DIcon, AC_ICON_DEBUG_APPTREE_GL_TEX3D);
 
-    QPixmap* textures1DArrayIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* textures1DArrayIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*textures1DArrayIcon, AC_ICON_DEBUG_APPTREE_GL_TEX1DA);
 
-    QPixmap* textures2DArrayIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* textures2DArrayIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*textures2DArrayIcon, AC_ICON_DEBUG_APPTREE_GL_TEX2DA);
 
-    QPixmap* textures2DMultisampleIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* textures2DMultisampleIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*textures2DMultisampleIcon, AC_ICON_DEBUG_APPTREE_GL_TEX2DMS);
 
-    QPixmap* textures2DMultisampleArrayIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* textures2DMultisampleArrayIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*textures2DMultisampleArrayIcon, AC_ICON_DEBUG_APPTREE_GL_TEX2DMSA);
 
-    QPixmap* texturesListIconRectangle = &(pPixmaps[currentIdx++]);
+    QPixmap* texturesListIconRectangle = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*texturesListIconRectangle, AC_ICON_DEBUG_APPTREE_GL_TEXRECT);
 
-    QPixmap* texturesListIconCubeMap = &(pPixmaps[currentIdx++]);
+    QPixmap* texturesListIconCubeMap = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*texturesListIconCubeMap, AC_ICON_DEBUG_APPTREE_GL_TEXCUBE);
 
-    QPixmap* texturesListIconCubeMapArray = &(pPixmaps[currentIdx++]);
+    QPixmap* texturesListIconCubeMapArray = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*texturesListIconCubeMapArray, AC_ICON_DEBUG_APPTREE_GL_TEXCUBEA);
 
-    QPixmap* texturesListIconBuffer = &(pPixmaps[currentIdx++]);
+    QPixmap* texturesListIconBuffer = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*texturesListIconBuffer, AC_ICON_DEBUG_APPTREE_GL_TEXBUFFER);
 
-    QPixmap* texturesUnknown = &(pPixmaps[currentIdx++]);
+    QPixmap* texturesUnknown = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*texturesUnknown, AC_ICON_DEBUG_APPTREE_GL_TEXUNKNOWN);
 
-    QPixmap* openGLBufferGenericIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* texturesShortcut = &(m_iconsStorage[currentIdx++]);
+    acSetIconInPixmap(*texturesShortcut, AC_ICON_DEBUG_APPTREE_GL_TEXGENERIC); // TO_DO: this requires its own icon
+
+    QPixmap* openGLBufferGenericIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openGLBufferGenericIcon, AC_ICON_DEBUG_APPTREE_GL_BUFFER_GENERIC);
 
-    QPixmap* openGLBufferArrayIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openGLBufferArrayIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openGLBufferArrayIcon, AC_ICON_DEBUG_APPTREE_GL_BUFFER_ARRAY);
 
-    QPixmap* openGLBufferDrawIndirIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openGLBufferDrawIndirIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openGLBufferDrawIndirIcon, AC_ICON_DEBUG_APPTREE_GL_BUFFER_DRAW_INDIRECT);
 
-    QPixmap* openGLBufferDispatchIndirIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openGLBufferDispatchIndirIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openGLBufferDispatchIndirIcon, AC_ICON_DEBUG_APPTREE_GL_BUFFER_DISPATCH_INDIRECT);
 
-    QPixmap* openGLBufferElementArrayIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openGLBufferElementArrayIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openGLBufferElementArrayIcon, AC_ICON_DEBUG_APPTREE_GL_BUFFER_ELEMENT_ARRAY);
 
-    QPixmap* openGLBufferPixelPackIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openGLBufferPixelPackIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openGLBufferPixelPackIcon, AC_ICON_DEBUG_APPTREE_GL_BUFFER_PIXEL_PACK);
 
-    QPixmap* openGLBufferPixelUnpackIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openGLBufferPixelUnpackIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openGLBufferPixelUnpackIcon, AC_ICON_DEBUG_APPTREE_GL_BUFFER_PIXEL_UNPACK);
 
-    QPixmap* openGLBufferCopyReadIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openGLBufferCopyReadIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openGLBufferCopyReadIcon, AC_ICON_DEBUG_APPTREE_GL_BUFFER_COPY_READ);
 
-    QPixmap* openGLBufferCopyWriteIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openGLBufferCopyWriteIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openGLBufferCopyWriteIcon, AC_ICON_DEBUG_APPTREE_GL_BUFFER_COPY_WRITE);
 
-    QPixmap* openGLBufferTransformFeedbackIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openGLBufferTransformFeedbackIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openGLBufferTransformFeedbackIcon, AC_ICON_DEBUG_APPTREE_GL_BUFFER_TRANSFORM_FEEDBACK);
 
-    QPixmap* openGLBufferUniformIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openGLBufferUniformIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openGLBufferUniformIcon, AC_ICON_DEBUG_APPTREE_GL_BUFFER_UNIFORM);
 
-    QPixmap* openGLBufferAtomicIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openGLBufferAtomicIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openGLBufferAtomicIcon, AC_ICON_DEBUG_APPTREE_GL_BUFFER_ATOMIC_COUNTER);
 
-    QPixmap* openGLBufferShaderStorageIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openGLBufferShaderStorageIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openGLBufferShaderStorageIcon, AC_ICON_DEBUG_APPTREE_GL_BUFFER_SHADER_STORAGE);
 
-    QPixmap* openGLBufferQueryIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openGLBufferQueryIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openGLBufferQueryIcon, AC_ICON_DEBUG_APPTREE_GL_BUFFER_QUERY);
 
-    QPixmap* openGLBufferTextureIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openGLBufferTextureIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openGLBufferTextureIcon, AC_ICON_DEBUG_APPTREE_GL_BUFFER_TEXTURE);
 
-    QPixmap* openGLBufferUnknownIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openGLBufferUnknownIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openGLBufferUnknownIcon, AC_ICON_DEBUG_APPTREE_GL_BUFFER_UNKNOWN);
 
-    QPixmap* glSamplerIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* glSamplerIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*glSamplerIcon, AC_ICON_DEBUG_APPTREE_GL_SAMPLER);
 
-    QPixmap* staticBuffersIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* staticBuffersIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*staticBuffersIcon, AC_ICON_DEBUG_APPTREE_GL_STATICBUFFER);
 
-    QPixmap* staticBuffersShortcutIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* staticBuffersShortcutIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*staticBuffersShortcutIcon, AC_ICON_DEBUG_APPTREE_GL_STATICBUFFERLINK);
 
-    QPixmap* renderBuffersIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* renderBuffersIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*renderBuffersIcon, AC_ICON_DEBUG_APPTREE_GL_RENDERBUFFER);
 
-    QPixmap* renderBufferShortcutIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* renderBufferShortcutIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*renderBufferShortcutIcon, AC_ICON_DEBUG_APPTREE_GL_RENDERBUFFERLINK);
 
-    QPixmap* fboIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* fboIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*fboIcon, AC_ICON_DEBUG_APPTREE_GL_FBO);
 
-    QPixmap* openGLProgramIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openGLProgramIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openGLProgramIcon, AC_ICON_DEBUG_APPTREE_GL_PROGRAM);
 
-    QPixmap* openGLProgramDeletedIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openGLProgramDeletedIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openGLProgramDeletedIcon, AC_ICON_DEBUG_APPTREE_GL_PROGRAMDELETED);
 
-    QPixmap* openGLShaderIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openGLShaderIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openGLShaderIcon, AC_ICON_DEBUG_APPTREE_GL_SHADER);
 
-    QPixmap* openGLShaderDeletedIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openGLShaderDeletedIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openGLShaderDeletedIcon, AC_ICON_DEBUG_APPTREE_GL_SHADERDELETED);
 
-    QPixmap* openGLProgramPipelineIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openGLProgramPipelineIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openGLProgramPipelineIcon, AC_ICON_DEBUG_APPTREE_GL_PIPELINE);
 
-    QPixmap* displayListIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* displayListIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*displayListIcon, AC_ICON_DEBUG_APPTREE_GL_DISPLAYLIST);
 
-    QPixmap* pbuffersIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* pbuffersIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*pbuffersIcon, AC_ICON_DEBUG_APPTREE_GL_PBUFFER);
 
-    QPixmap* syncIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* syncIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*syncIcon, AC_ICON_DEBUG_APPTREE_GL_SYNC);
 
-    QPixmap* computeContextIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* computeContextIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*computeContextIcon, AC_ICON_DEBUG_APPTREE_CL_CONTEXT);
 
-    QPixmap* computeContextDeletedIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* computeContextDeletedIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*computeContextDeletedIcon, AC_ICON_DEBUG_APPTREE_CL_CONTEXTDELETED);
 
-    QPixmap* openCLBufferIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openCLBufferIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openCLBufferIcon, AC_ICON_DEBUG_APPTREE_CL_BUFFER);
 
-    QPixmap* openCLPipeIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openCLPipeIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openCLPipeIcon, AC_ICON_DEBUG_APPTREE_CL_PIPE);
 
-    QPixmap* allCLTexturesIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* allCLTexturesIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*allCLTexturesIcon, AC_ICON_DEBUG_APPTREE_CL_IMAGEGENERIC);
 
-    QPixmap* textures2DIconCL = &(pPixmaps[currentIdx++]);
+    QPixmap* textures2DIconCL = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*textures2DIconCL, AC_ICON_DEBUG_APPTREE_CL_IMAGE2D);
 
-    QPixmap* textures3DIconCL = &(pPixmaps[currentIdx++]);
+    QPixmap* textures3DIconCL = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*textures3DIconCL, AC_ICON_DEBUG_APPTREE_CL_IMAGE3D);
 
-    QPixmap* openCLSamplerIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openCLSamplerIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openCLSamplerIcon, AC_ICON_DEBUG_APPTREE_CL_SAMPLER);
 
-    QPixmap* commandQueueIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* commandQueueIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*commandQueueIcon, AC_ICON_DEBUG_APPTREE_CL_QUEUE);
 
-    QPixmap* openCLEventIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openCLEventIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openCLEventIcon, AC_ICON_DEBUG_APPTREE_CL_EVENT);
 
-    QPixmap* openCLProgramIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openCLProgramIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openCLProgramIcon, AC_ICON_DEBUG_APPTREE_CL_PROGRAM);
 
-    QPixmap* openCLKernelIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* openCLKernelIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*openCLKernelIcon, AC_ICON_DEBUG_APPTREE_CL_KERNEL);
 
-    QPixmap* yellowWarningIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* yellowWarningIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*yellowWarningIcon, AC_ICON_WARNING_YELLOW);
 
-    QPixmap* informationIcon = &(pPixmaps[currentIdx++]);
+    QPixmap* informationIcon = &(m_iconsStorage[currentIdx++]);
     acSetIconInPixmap(*informationIcon, AC_ICON_WARNING_INFO);
 
+#if AMDT_BUILD_CONFIGURATION == AMDT_DEBUG_BUILD
     GT_ASSERT(GD_TREE_HANDLER_ICONS_COUNT == currentIdx);
-
+#endif
     m_treeItemsVector.reserve(GD_TREE_HANDLER_ICONS_COUNT);
 
     m_texture1DIconIndex = (int)m_treeItemsVector.size();
@@ -3267,7 +3277,7 @@ bool gdDebugApplicationTreeHandler::createAndLoadImageList()
     m_treeItemsVector.push_back(allTexturesIcon);
 
     m_texturesShortcutIconIndex = (int)m_treeItemsVector.size();
-    m_treeItemsVector.push_back(allTexturesIcon);
+    m_treeItemsVector.push_back(texturesShortcut);
 
     m_textureCubeMapIconIndex = (int)m_treeItemsVector.size();
     m_treeItemsVector.push_back(texturesListIconCubeMap);
@@ -3424,6 +3434,10 @@ bool gdDebugApplicationTreeHandler::createAndLoadImageList()
 
     m_informationIconIndex = (int)m_treeItemsVector.size();
     m_treeItemsVector.push_back(informationIcon);
+
+#if AMDT_BUILD_CONFIGURATION == AMDT_DEBUG_BUILD
+    GT_ASSERT(GD_TREE_HANDLER_ICONS_COUNT == m_treeItemsVector.size());
+#endif
 
     return rc;
 }
