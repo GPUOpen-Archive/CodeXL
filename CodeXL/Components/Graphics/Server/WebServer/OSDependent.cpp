@@ -313,11 +313,11 @@ static bool CollectWrapperInfo()
 {
     Log(logMESSAGE, "OSDependent: CollectWrapperInfo\n");
 
-    char strSearch[ PS_MAX_PATH ];
+    char strSearch[ PS_MAX_PATH ] = {};
 #ifdef _WIN32
     sprintf_s(strSearch, PS_MAX_PATH, "%s%s*.dll", s_LibPath.asCharArray(), s_GPSPluginsDir);
 #else
-    char dirSearch[PS_MAX_PATH];
+    char dirSearch[PS_MAX_PATH] = {};
     sprintf_s(strSearch, PS_MAX_PATH, "*.so");
     sprintf_s(dirSearch, PS_MAX_PATH, "%s%s", s_LibPath.asCharArray(), GPS_PLUGIN_DIR);
 #endif
@@ -396,10 +396,8 @@ static bool CollectWrapperInfo()
         dlerror();                           // Clear any existing error
 
         // only consider plugins of the same bitness as this server
-        const char* pLoc;
-        pLoc = strstr(pFile->d_name, "32");
-#ifdef X64
-
+        const char* pLoc = strstr(pFile->d_name, "32");
+#if AMDT_ADDRESS_SPACE_TYPE == AMDT_64_BIT_ADDRESS_SPACE
         if (pLoc != NULL)
 #else
         if (pLoc == NULL)
