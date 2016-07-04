@@ -62,7 +62,7 @@ private:
     gtString _hostName;
 
     // The port number:
-    unsigned short _portNumber;
+    unsigned short _portNumber = 0;
 };
 
 bool OS_API osRemotePortAddressFromString(const gtString& i_portAddressAsStr, osPortAddress& o_portAddress);

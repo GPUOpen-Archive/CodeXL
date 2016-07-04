@@ -699,10 +699,33 @@ bool osIsProcessAlive(osProcessId processId, bool& buffer)
 }
 
 
+bool osGetProcessIdentificationInfo(osProcessId& processId, char* pName, gtSize_t* pNameLen)
+{
+   GT_ASSERT(pName != nullptr);
+   GT_ASSERT(pNameLen != nullptr);
+   char buffer[1024] = {};
+   snprintf(buffer, sizeof(buffer), "/proc/%d/exe", processId);
+
+   bool ret = false;
+   char buf[512] = {};
+   int count = readlink(buffer, buf, sizeof(buf));
+   if (count >= 0 && count <= static_cast<int>(*pNameLen))
+   {
+     gtString name;
+     name.fromASCIIString(buf);
+     osFilePath path(name);
+     path.getFileName(name);
+     *pNameLen = name.length();
+     memcpy(pName, name.asASCIICharArray(), *pNameLen);
+     ret = true;
+   }
+  return ret;
+}
+
 bool osGetProcessIdentificationInfo(osProcessId& processId, osProcessId* pParentProcessId, osProcessId* pGroupId,
                                     char* pName, gtSize_t* pNameLen)
 {
-    char buffer[1024];
+    char buffer[1024]= {};
     snprintf(buffer, sizeof(buffer), "/proc/%d/status", processId);
 
     bool ret = false;
@@ -1058,27 +1081,25 @@ bool osProcessesEnumerator::next(osProcessId& processId, gtString* pName)
 {
     struct dirent entry, *pNext;
     bool ret = false;
+    GT_IF_WITH_ASSERT(nullptr != pName)
+     {               
+	 while (0 == readdir_r(reinterpret_cast<DIR*>(m_pEnumHandler), &entry, &pNext) && NULL != pNext)
+	   {
+	       if (isdigit(*entry.d_name))
+		{
+		    processId = static_cast<gtUInt32>(strtoul(entry.d_name, NULL, 10));
 
-    while (0 == readdir_r(reinterpret_cast<DIR*>(m_pEnumHandler), &entry, &pNext) && NULL != pNext)
-    {
-        if (isdigit(*entry.d_name))
-        {
-            processId = static_cast<gtUInt32>(strtoul(entry.d_name, NULL, 10));
+		    char name[OS_MAX_PATH] = {};
+		    gtSize_t maxLen = OS_MAX_PATH - 1;
 
-            char name[OS_MAX_PATH];
-            gtSize_t maxLen = OS_MAX_PATH - 1;
-
-            if (osGetProcessIdentificationInfo(processId, NULL, NULL, name, &maxLen))
-            {
-                if (NULL != pName)
-                {
-                    pName->fromUtf8String(name);
-                }
-
-                ret = true;
-                break;
-            }
-        }
+		    if (osGetProcessIdentificationInfo(processId, name, &maxLen))
+		    {
+		       pName->fromUtf8String(name);		      
+   	               ret = true;
+		       break;
+		    }
+		}
+	    }//while
     }
 
     return ret;
