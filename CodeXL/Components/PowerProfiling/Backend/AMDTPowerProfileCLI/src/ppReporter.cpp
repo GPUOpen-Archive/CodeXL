@@ -38,8 +38,9 @@
 
 #define MODULE_INFO_TXT_HDR_FORMAT     "\nSNo\tPID\tProcess Name\t\t\t\t\tProcess Path\t\t\t\t\t\t\t\tSamples\tKernel\tPower(Joules)\tPower(%%)\tLoad Addr\t\tsize\t\t\tName\t\t\t\t\t\tPath\n\n"
 #define MODULE_INFO_CSV_HDR_FORMAT     "\nSNo,PID,Process Name, Process Path, Samples,Kernel,Power(Joules),Power(%%),Load Addr,size,Name,Path\n\n"
-#define MODULE_INFO_TXT_FORMAT         "%d\t%d\t%-45.45s\t%-65.85s\t%d\t%d\t%3.2f\t\t%3.2f\t\t0x%-8.8"H_FORMAT"\t\t%-1.8"D_FORMAT"\t\t%-45.45s\t%s\n"
-#define MODULE_INFO_CSV_FORMAT         "%d,%d,%s,%s,%d,%d,%3.2f,%3.2f,0x%"H_FORMAT",%"D_FORMAT",%s,%s\n"
+#define MODULE_INFO_TXT_FORMAT         "%d\t%d\t%-45.45s\t%-65.85s\t%d\t%d\t%3.2f\t\t%3.2f\t\t0x%-8.8" H_FORMAT "\t\t%-1.8" D_FORMAT "\t\t%-45.45s\t%s\n"
+
+#define MODULE_INFO_CSV_FORMAT         "%d,%d,%s,%s,%d,%d,%3.2f,%3.2f,0x%" H_FORMAT ",%" D_FORMAT ",%s,%s\n"
 
 void ppReporter::ReportHeader()
 {
