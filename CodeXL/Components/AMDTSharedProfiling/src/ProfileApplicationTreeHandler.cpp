@@ -1773,7 +1773,7 @@ QTreeWidgetItem* ProfileApplicationTreeHandler::CreateItemForSession(SessionTree
                             }
                         }
 
-                        // Add the session to the tree:
+                        // Add the session to the tree (in frame analysis text will be replaced later, when we add the child frames)
                         pRetVal = m_pApplicationTree->insertTreeItem(acQStringToGTString(pNewItemSessionData->m_displayName), pNewItemSessionData->m_pParentData, pProfileTypeItem, pPreceding);
                         GT_IF_WITH_ASSERT((nullptr != pRetVal) && (nullptr != pPixmap))
                         {

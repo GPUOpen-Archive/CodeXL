@@ -630,6 +630,7 @@ void gpSessionView::AddCapturedFrame(const FrameInfo& frameInfo)
         afApplicationCommands::instance()->EndPerformancePrintout("Capture");
     }
     UpdateCaption();
+
 }
 
 
@@ -972,5 +973,8 @@ void gpSessionView::UpdateCaption()
     {
         int numFrames = gpUIManager::Instance()->GetNumberOfFrameFolders(m_sessionFilePath);
         m_pCapturedFramesCaptionLabel->setText(QString(GPU_STR_dashboard_CapturedFramesCaption).append(GPU_STR_dashboard_CapturedFramesCaptionNumFrames).arg(numFrames));
+
+        // update tree item
+        m_pSessionData->m_pParentData->m_pTreeWidgetItem->setText(0, QString(m_pSessionData->m_name).append(GPU_STR_dashboard_CapturedFramesCaptionNumFrames).arg(numFrames));
     }
 }
