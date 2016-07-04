@@ -54,6 +54,7 @@ env['LIBS'] = \
     "libCXLOSWrappers",
     "libCXLBaseTools",
     "libvulkan",
+    "libVkLayer_swapchain.so",
     "jpeg",
     "png",
     "z",               #used by PNG
