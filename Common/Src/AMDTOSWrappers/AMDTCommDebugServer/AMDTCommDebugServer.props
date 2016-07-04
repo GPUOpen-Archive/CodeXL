@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="UserMacros">
+    <CommonDir>$(ProjectDir)..\..\..\</CommonDir>
+    <AMDTOutputDir>$(CommonDir)..\CodeXL\Output\</AMDTOutputDir>
+  </PropertyGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(CommonDir)\Src\Vsprops\Global-Common.props" />
+  </ImportGroup>
+  <PropertyGroup>
+    <OutDir>$(AMDTOutputDir)$(Configuration)\bin\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <AdditionalIncludeDirectories>$(CommonDir)Src</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(AMDTOutputDir)$(Configuration)\arch;$(VSIntegrationLibraries);$(VSClearInstallIntegrationLibraries);$(IntDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="CommonDir">
+      <Value>$(CommonDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="AMDTOutputDir">
+      <Value>$(AMDTOutputDir)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>
