@@ -442,7 +442,22 @@ void gsRenderContextMonitor::onContextMadeCurrent(oaDeviceContextHandle deviceCo
                 GLenum pname = _pTexturesMonitor->maxTextureUnitsSymbolicName();
                 gs_stat_realFunctionPointers.glGetIntegerv(pname, &_maxTextureUnits);
 #else
-                gs_stat_realFunctionPointers.glGetIntegerv(GL_MAX_TEXTURE_UNITS, &_maxTextureUnits);
+                // In OpenGL versions before 2.0, GL_MAX_TEXTURE_IMAGE_UNITS was not yet supported:
+                if (2 > _oglVersion[0])
+                {
+                    gs_stat_realFunctionPointers.glGetIntegerv(GL_MAX_TEXTURE_UNITS, &_maxTextureUnits);
+                }
+                else
+                {
+                    // Note we are currently ignoring the granularity of the specific shader stage image units:
+                    // GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS
+                    // GL_MAX_GEOMETRY_TEXTURE_IMAGE_UNITS
+                    // GL_MAX_TESS_CONTROL_TEXTURE_IMAGE_UNITS
+                    // GL_MAX_TESS_EVALUATION_TEXTURE_IMAGE_UNITS
+                    // GL_MAX_COMPUTE_TEXTURE_IMAGE_UNITS
+                    // GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS
+                    gs_stat_realFunctionPointers.glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &_maxTextureUnits);
+                }
 #endif
                 SU_AFTER_EXECUTING_REAL_FUNCTION(ap_glGetIntegerv);
             }
@@ -556,6 +571,13 @@ void gsRenderContextMonitor::onContextMadeCurrent(oaDeviceContextHandle deviceCo
             }
         }
 #endif // AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+
+        // The context should never have errors on the first time it was made current - if there are any, we are to blame!
+        // Calling this will also clear the error flag, so as not to leave a "dirty" context for the actual application:
+        SU_BEFORE_EXECUTING_REAL_FUNCTION(ap_glGetError);
+        GLenum err = gs_stat_realFunctionPointers.glGetError();
+        SU_AFTER_EXECUTING_REAL_FUNCTION(ap_glGetError);
+        GT_ASSERT(GL_NONE == err);
     }
 
     // Get a pointer to the glGetInteger64v function:
@@ -3421,6 +3443,28 @@ void gsRenderContextMonitor::getOpenGLVersion(int& majorNumber, int& minorNumber
 {
     majorNumber = _oglVersion[0];
     minorNumber = _oglVersion[1];
+}
+// ---------------------------------------------------------------------------
+// Name:        gsRenderContextMonitor::isOpenGL31OrNewerCoreContext
+// Description: Returns true iff this context version is >= X.Y (default 3.1)
+//              and it is of the core (non-compatibility context).
+//              Such contexts will throw OpenGL errors for deprecated operations.
+// Author:      Uri Shomroni
+// Date:        4/7/2016
+// ---------------------------------------------------------------------------
+bool gsRenderContextMonitor::isOpenGLVersionOrNewerCoreContext(int maj, int min) const
+{
+    // Get the OpenGL version and profile, for deprecation checking:
+    bool retVal = false;
+    if (!isComaptibilityContext())
+    {
+        int versionMajor = 0;
+        int versionMinor = 0;
+        getOpenGLVersion(versionMajor, versionMinor);
+        retVal = ((maj < versionMajor) || ((maj == versionMajor) && (min <= versionMinor)));
+    }
+
+    return retVal;
 }
 
 

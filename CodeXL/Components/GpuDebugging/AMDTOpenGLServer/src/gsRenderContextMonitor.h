@@ -260,6 +260,7 @@ public:
     bool isInOpenGLBeginEndBlock() const;
     void getOpenGLVersion(int& majorNumber, int& minorNumber) const;
     bool isComaptibilityContext() const {return _isCompatibiltyContext;};
+    bool isOpenGLVersionOrNewerCoreContext(int maj = 3, int min = 1) const;
     bool isBackwardsCompatible() const {return _isForwardCompatibleContext;};
     bool isDebugContext() const {return _isDebugContext;};
     bool isDebugContextFlagForced() const {return _isDebugContextFlagForced;};

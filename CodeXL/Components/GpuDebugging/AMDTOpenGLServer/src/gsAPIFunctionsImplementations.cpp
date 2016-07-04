@@ -2094,6 +2094,9 @@ bool gaUpdateTextureParametersImpl(gsRenderContextMonitor* pRenderContextMonitor
     {
         retVal = true;
 
+        // Get the OpenGL version and profile, for deprecation checking:
+        bool isOpenGL31CoreContext = pRenderContextMonitor->isOpenGLVersionOrNewerCoreContext();
+
         // Iterate through the textures and update their raw data
         int amountOfIndicies = (int)texturesVector.size();
 
@@ -2117,7 +2120,7 @@ bool gaUpdateTextureParametersImpl(gsRenderContextMonitor* pRenderContextMonitor
                     texturesMtr->bindTextureForUpdate(textureId._textureName, bindTarget);
 
                     // Update the texture parameters:
-                    bool rc1 = pTextureObj->updateTextureParameters(shouldUpdateOnlyMemoryParams);
+                    bool rc1 = pTextureObj->updateTextureParameters(shouldUpdateOnlyMemoryParams, isOpenGL31CoreContext);
 
                     if (!rc1)
                     {

@@ -485,6 +485,9 @@ bool gsMemoryMonitor::updateTextureParameters(gsRenderContextMonitor* pRenderCon
     // Sanity check:
     GT_IF_WITH_ASSERT(pRenderContextMonitor != NULL)
     {
+        // Get the OpenGL version and profile, for deprecation checking:
+        bool isOpenGL31CoreContext = pRenderContextMonitor->isOpenGLVersionOrNewerCoreContext();
+
         // Get the texture monitor:
         gsTexturesMonitor* pTexturesMonitor = pRenderContextMonitor->texturesMonitor();
         GT_IF_WITH_ASSERT(pTexturesMonitor != NULL)
@@ -520,7 +523,7 @@ bool gsMemoryMonitor::updateTextureParameters(gsRenderContextMonitor* pRenderCon
                             pTexturesMonitor->bindTextureForUpdate(textureName, bindTarget);
 
                             // Update the texture parameters:
-                            rcUpdateParams = pTextureObj->updateTextureParameters(true);
+                            rcUpdateParams = pTextureObj->updateTextureParameters(true, isOpenGL31CoreContext);
 
                             if (!rcUpdateParams)
                             {

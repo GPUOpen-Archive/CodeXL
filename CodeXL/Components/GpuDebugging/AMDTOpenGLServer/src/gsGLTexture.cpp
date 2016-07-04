@@ -96,7 +96,7 @@ gsGLTexture& gsGLTexture::operator=(const gsGLTexture& other)
 // Author:      Sigal Algranaty
 // Date:        29/10/2008
 // ---------------------------------------------------------------------------
-bool gsGLTexture::updateTextureParameters(bool shouldUpdateOnlyMemoryParams)
+bool gsGLTexture::updateTextureParameters(bool shouldUpdateOnlyMemoryParams, bool isOpenGL31CoreContext)
 {
     bool retVal = true;
 
@@ -112,7 +112,7 @@ bool gsGLTexture::updateTextureParameters(bool shouldUpdateOnlyMemoryParams)
         if ((textureType() != AP_2D_TEXTURE_MULTISAMPLE_ARRAY) && (textureType() != AP_2D_TEXTURE_MULTISAMPLE))
         {
             // Update texture parameters:
-            rc1 = updateTextureParameters(bindTarget, shouldUpdateOnlyMemoryParams);
+            rc1 = updateTextureParameters(bindTarget, shouldUpdateOnlyMemoryParams, isOpenGL31CoreContext);
             GT_ASSERT(rc1);
         }
         else
@@ -122,7 +122,7 @@ bool gsGLTexture::updateTextureParameters(bool shouldUpdateOnlyMemoryParams)
         }
 
         // Update the texture mip levels parameters:
-        bool rc2 = updateTextureMipLevelsParameters(bindTarget, shouldUpdateOnlyMemoryParams);
+        bool rc2 = updateTextureMipLevelsParameters(bindTarget, shouldUpdateOnlyMemoryParams, isOpenGL31CoreContext);
         GT_ASSERT(rc2);
 
         retVal = rc1 && rc2;
@@ -242,7 +242,7 @@ void gsGLTexture::setNewMipLevelsAllocIds()
 // Author:      Sigal Algranaty
 // Date:        6/11/2008
 // ---------------------------------------------------------------------------
-bool gsGLTexture::updateTextureParameters(GLenum bindTarget, bool shouldUpdateOnlyMemoryParams)
+bool gsGLTexture::updateTextureParameters(GLenum bindTarget, bool shouldUpdateOnlyMemoryParams, bool isOpenGL31CoreContext)
 {
     bool retVal = true;
 
@@ -273,6 +273,11 @@ bool gsGLTexture::updateTextureParameters(GLenum bindTarget, bool shouldUpdateOn
             {
                 shouldUpdateCurrentParameter = isCompressed;
             }
+        }
+
+        if (shouldUpdateCurrentParameter && isDeprecatedTexParam(paramName))
+        {
+            shouldUpdateCurrentParameter = !isOpenGL31CoreContext;
         }
 
         if (shouldUpdateCurrentParameter)
@@ -342,7 +347,7 @@ bool gsGLTexture::updateTextureParameters(GLenum bindTarget, bool shouldUpdateOn
 // Author:      Sigal Algranaty
 // Date:        6/11/2008
 // ---------------------------------------------------------------------------
-bool gsGLTexture::updateTextureMipLevelsParameters(GLenum bindTarget, bool shouldUpdateOnlyMemoryParams)
+bool gsGLTexture::updateTextureMipLevelsParameters(GLenum bindTarget, bool shouldUpdateOnlyMemoryParams, bool isOpenGL31CoreContext)
 {
     bool retVal = true;
 
@@ -402,6 +407,11 @@ bool gsGLTexture::updateTextureMipLevelsParameters(GLenum bindTarget, bool shoul
                         {
                             shouldUpdateCurrentParameter = isCompressed;
                         }
+                    }
+
+                    if (shouldUpdateCurrentParameter && isDeprecatedTexParam(paramName))
+                    {
+                        shouldUpdateCurrentParameter = !isOpenGL31CoreContext;
                     }
 
                     if (shouldUpdateCurrentParameter)

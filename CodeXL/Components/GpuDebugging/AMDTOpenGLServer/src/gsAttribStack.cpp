@@ -39,13 +39,13 @@ gsAttribStack::gsAttribStack()
 // Author:      Yaki Tebeka
 // Date:        21/6/2005
 // ---------------------------------------------------------------------------
-void gsAttribStack::onFirstTimeContextMadeCurrent(const int contextOpenGLVersion[2], bool isCompatibilityContext)
+void gsAttribStack::onFirstTimeContextMadeCurrent(bool attribStackSupported)
 {
     // Get the maximal OpenGL attrib stack depth:
     SU_BEFORE_EXECUTING_REAL_FUNCTION(ap_glGetIntegerv);
 
     // Check the OpenGL version to see if the GL_MAX_ATTRIB_STACK_DEPTH parameter exists:
-    if (isCompatibilityContext || (contextOpenGLVersion[0] < 3) || ((contextOpenGLVersion[0] == 3) && (contextOpenGLVersion[1] == 0)))
+    if (attribStackSupported)
     {
         gs_stat_realFunctionPointers.glGetIntegerv(GL_MAX_ATTRIB_STACK_DEPTH, &_maxStackDepth);
     }
