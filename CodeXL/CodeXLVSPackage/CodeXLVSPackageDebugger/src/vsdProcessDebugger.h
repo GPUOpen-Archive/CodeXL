@@ -139,6 +139,8 @@ private:
     bool IsSpyFuncName(const gtString& funcName) const;
     bool IsDriverAddress(osInstructionPointer pc);
     bool IsDriverModuleName(const gtString& moduleNameLower) const;
+    void AnalyzeThreadLocation(IDebugThread2* piThread, bool& o_isThreadInsideSpy, osThreadId& o_threadId, osInstructionPointer* o_firstVisiblePointer) const;
+    void DeferStepCommand(IDebugThread2* piThread);
 
 private:
     class vsdCDebugThread
@@ -161,6 +163,8 @@ private:
         bool performStep(IDebugProcess3& riProcess3, IDebugProgram2& riProgram, StepType stepType);
         bool executeFunction(osProcedureAddress64 funcAddress, bool& waitingForExecutedFunctionFlag);
         bool markThreadAsSuspendedProcessEntryPoint();
+
+        void DeferStepCommand(vsdProcessDebugger* pPD) { pPD->DeferStepCommand(m_piDebugThread); };
 
     private:
         bool resumeThreadForExecution(bool& waitingForExecutedFunctionFlag);
