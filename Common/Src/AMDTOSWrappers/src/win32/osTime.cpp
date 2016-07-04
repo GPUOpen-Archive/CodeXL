@@ -14,13 +14,14 @@
 // Author:      Doron Ofek
 // Date:        Dec-24, 2015
 // ---------------------------------------------------------------------------
-void osTime::currentPreciseTimeAsString(gtString& strTime, TimeFormat stringFormat)
+bool osTime::currentPreciseTimeAsString(gtString& strTime, TimeFormat stringFormat)
 {
     FILETIME utcFileTime, localFileTime;
     GetSystemTimeAsFileTime(&utcFileTime);
     FileTimeToLocalFileTime(&utcFileTime, &localFileTime);
     SYSTEMTIME sysTime;
     FileTimeToSystemTime(&localFileTime, &sysTime);
+    bool retVal = false;
 
     switch (stringFormat)
     {
@@ -31,6 +32,7 @@ void osTime::currentPreciseTimeAsString(gtString& strTime, TimeFormat stringForm
                                           static_cast<int>(sysTime.wMinute),
                                           static_cast<int>(sysTime.wSecond),
                                           static_cast<int>(sysTime.wMilliseconds));
+            retVal = true;
         }
         break;
 
@@ -41,6 +43,7 @@ void osTime::currentPreciseTimeAsString(gtString& strTime, TimeFormat stringForm
                                           static_cast<int>(sysTime.wMinute),
                                           static_cast<int>(sysTime.wSecond),
                                           static_cast<int>(sysTime.wMilliseconds));
+            retVal = true;
         }
         break;
 
@@ -54,6 +57,7 @@ void osTime::currentPreciseTimeAsString(gtString& strTime, TimeFormat stringForm
                                           static_cast<int>(sysTime.wMinute),
                                           static_cast<int>(sysTime.wSecond),
                                           static_cast<int>(sysTime.wMilliseconds));
+            retVal = true;
         }
         break;
 
@@ -95,8 +99,10 @@ void osTime::currentPreciseTimeAsString(gtString& strTime, TimeFormat stringForm
                                           static_cast<int>(sysTime.wMinute),
                                           static_cast<int>(sysTime.wSecond),
                                           static_cast<int>(sysTime.wMilliseconds));
+            retVal = true;
         }
         break;
     }
 
+    return retVal;
 }
