@@ -168,7 +168,7 @@ bool gaAPIToSpyConnector::initialize(const osPortAddress& spyAPIPortAddress, con
                     _pSpiesAPIConnectingSocket = new osTCPSocketServerConnectionHandler;
 
                     // Uri, 4/11/09 - This timeout can be inifinite, since the if process will be stopped, we will kill the thread.
-                    _pSpiesAPIConnectingSocket->setReadOperationTimeOut(OS_CHANNEL_INFINIT_TIME_OUT);
+                    _pSpiesAPIConnectingSocket->setReadOperationTimeOut(OS_CHANNEL_INFINITE_TIME_OUT);
 
                     // Create a threads that will accept and handle the first incoming connection requests:
                     _pSpiesAPIConnectionWaiterThread = new gaTCPIPSpyConnectionWaiterThread(*_pPortListener, *((osTCPSocketServerConnectionHandler*)_pSpiesAPIConnectingSocket), AP_SPIES_UTILITIES_API_CONNECTION);

@@ -760,7 +760,7 @@ bool pdGDBDriver::wrapGDBCommunicationPipes()
     {
         // since we have a thread that waits for gdb a-synchronous commands outputs,
         // We cannot assume a fixed read timeout for gdb's outputs:
-        _pGDBCommunicationPipe->setReadOperationTimeOut(OS_CHANNEL_INFINIT_TIME_OUT);
+        _pGDBCommunicationPipe->setReadOperationTimeOut(OS_CHANNEL_INFINITE_TIME_OUT);
 
         retVal = true;
     }
@@ -805,7 +805,7 @@ bool pdGDBDriver::wrapGDBCommunicationPipes()
             thrd.join();
             // since we have a thread that waits for gdb a-synchronous commands outputs,
             // We cannot assume a fixed read timeout for gdb's outputs:
-            _pGDBProcessConsolePipe->setReadOperationTimeOut(OS_CHANNEL_INFINIT_TIME_OUT);
+            _pGDBProcessConsolePipe->setReadOperationTimeOut(OS_CHANNEL_INFINITE_TIME_OUT);
 
             retVal = true;
         }

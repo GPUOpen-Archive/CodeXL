@@ -43,7 +43,7 @@
 #include <AMDTRemoteDebuggingServer/Include/rdStringConstants.h>
 
 // TCP/IP timeout:
-#define PD_REMOTE_DEBUGGING_SERVER_TCP_IP_TIMEOUT OS_CHANNEL_INFINIT_TIME_OUT
+#define PD_REMOTE_DEBUGGING_SERVER_TCP_IP_TIMEOUT OS_CHANNEL_INFINITE_TIME_OUT
 
 // The timeout for the communication channel with the remote agent (in milliseconds):
 #define PD_REMOTE_DEBUGGING_SERVER_TCP_IP_CONNECTION_WAIT_TIMEOUT_MS 1500

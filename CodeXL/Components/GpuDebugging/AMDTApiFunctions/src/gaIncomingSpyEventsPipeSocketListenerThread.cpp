@@ -31,7 +31,7 @@ gaIncomingSpyEventsPipeSocketListenerThread::gaIncomingSpyEventsPipeSocketListen
 
 
     // Set the pipe's read timeout to infinite:
-    _pIncomingEventsSocket->setReadOperationTimeOut(OS_CHANNEL_INFINIT_TIME_OUT);
+    _pIncomingEventsSocket->setReadOperationTimeOut(OS_CHANNEL_INFINITE_TIME_OUT);
 
     // Open the pipe:
     bool rcOpen = _pIncomingEventsSocket->open();

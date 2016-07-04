@@ -1696,7 +1696,7 @@ bool siOpenCLInformationCollector::GenerateAndSendOpenCLDevicesInformation(gtStr
     GT_IF_WITH_ASSERT(rcCollectInfo)
     {
         osPipeSocketClient* pClient = new osPipeSocketClient(pipeName, L"System Information Connection Socket");
-        pClient->setWriteOperationTimeOut(OS_CHANNEL_INFINIT_TIME_OUT);
+        pClient->setWriteOperationTimeOut(OS_CHANNEL_INFINITE_TIME_OUT);
         bool rcOpenClient = pClient->open();
 
         GT_IF_WITH_ASSERT(rcOpenClient)
