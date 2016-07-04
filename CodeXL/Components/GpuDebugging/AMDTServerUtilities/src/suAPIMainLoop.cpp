@@ -50,7 +50,7 @@ void suAPIMainLoop(osSocket& apiSocket)
     do
     {
         // Wait infinitely until we have an input:
-        apiSocket.setReadOperationTimeOut(OS_CHANNEL_INFINIT_TIME_OUT);
+        apiSocket.setReadOperationTimeOut(OS_CHANNEL_INFINITE_TIME_OUT);
 
         // If needed, wait for a direct function execution to end:
         suWaitForDirectFunctionExecutionEnd();

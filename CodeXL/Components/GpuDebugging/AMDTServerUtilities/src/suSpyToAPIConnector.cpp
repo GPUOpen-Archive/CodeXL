@@ -104,8 +104,8 @@ bool suSpyToAPIConnector::initialize(const osPortAddress& portAddress)
         bool rcSocketOpen = pAPITCPSocketClient->open();
         GT_IF_WITH_ASSERT(rcSocketOpen)
         {
-            pAPITCPSocketClient->setReadOperationTimeOut(OS_CHANNEL_INFINIT_TIME_OUT);
-            pAPITCPSocketClient->setWriteOperationTimeOut(OS_CHANNEL_INFINIT_TIME_OUT);
+            pAPITCPSocketClient->setReadOperationTimeOut(OS_CHANNEL_INFINITE_TIME_OUT);
+            pAPITCPSocketClient->setWriteOperationTimeOut(OS_CHANNEL_INFINITE_TIME_OUT);
 
             // Display a message in the log:
             gtString logMsg;

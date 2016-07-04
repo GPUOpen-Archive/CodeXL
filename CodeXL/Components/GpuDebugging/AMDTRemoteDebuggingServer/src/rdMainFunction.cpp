@@ -28,7 +28,7 @@
 // Constants for the connection:
 // Uri, 29/8/13 - set an infinite timeout for now, as our controlling process (daemon / client)
 // can kill us if something fails.
-#define RD_TCP_IP_CONNECTION_DEFAULT_TIMEOUT OS_CHANNEL_INFINIT_TIME_OUT
+#define RD_TCP_IP_CONNECTION_DEFAULT_TIMEOUT OS_CHANNEL_INFINITE_TIME_OUT
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
 // ---------------------------------------------------------------------------
@@ -136,10 +136,10 @@ int main(int argc, char** argv)
                 GT_IF_WITH_ASSERT(rcOpen)
                 {
                     // Set the pipes' timeouts to be infinite:
-                    pSharedMemObjectPipeSocketClient->setReadOperationTimeOut(OS_CHANNEL_INFINIT_TIME_OUT);
-                    pSharedMemObjectPipeSocketClient->setWriteOperationTimeOut(OS_CHANNEL_INFINIT_TIME_OUT);
-                    pEventsSharedMemObjectPipeSocketClient->setReadOperationTimeOut(OS_CHANNEL_INFINIT_TIME_OUT);
-                    pEventsSharedMemObjectPipeSocketClient->setWriteOperationTimeOut(OS_CHANNEL_INFINIT_TIME_OUT);
+                    pSharedMemObjectPipeSocketClient->setReadOperationTimeOut(OS_CHANNEL_INFINITE_TIME_OUT);
+                    pSharedMemObjectPipeSocketClient->setWriteOperationTimeOut(OS_CHANNEL_INFINITE_TIME_OUT);
+                    pEventsSharedMemObjectPipeSocketClient->setReadOperationTimeOut(OS_CHANNEL_INFINITE_TIME_OUT);
+                    pEventsSharedMemObjectPipeSocketClient->setWriteOperationTimeOut(OS_CHANNEL_INFINITE_TIME_OUT);
 
                     // Return it:
                     pProcessDebuggerConnectionChannel = pSharedMemObjectPipeSocketClient;

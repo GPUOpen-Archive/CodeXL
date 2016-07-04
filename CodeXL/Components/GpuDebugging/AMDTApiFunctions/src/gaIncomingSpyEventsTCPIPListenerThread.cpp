@@ -29,7 +29,7 @@ gaIncomingSpyEventsTCPIPListenerThread::gaIncomingSpyEventsTCPIPListenerThread(c
     _pTCPSocketServer = new osTCPSocketServer;
 
 
-    _pTCPSocketServer->setReadOperationTimeOut(OS_CHANNEL_INFINIT_TIME_OUT);
+    _pTCPSocketServer->setReadOperationTimeOut(OS_CHANNEL_INFINITE_TIME_OUT);
 
     bool connectionSuccessful = false;
 

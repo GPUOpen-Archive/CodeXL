@@ -2594,7 +2594,7 @@ bool gaPersistentDataManager::initializeSpiesAPI()
     // be able to talk with us:
     osSocket& spiesAPISocket = gaSpiesAPISocket();
     long storedReadTimeout = spiesAPISocket.readOperationTimeOut();
-    spiesAPISocket.setReadOperationTimeOut(OS_CHANNEL_INFINIT_TIME_OUT);
+    spiesAPISocket.setReadOperationTimeOut(OS_CHANNEL_INFINITE_TIME_OUT);
 
     // Create the spies events forwarding socket:
     bool rcEvents = createSpiesEventsForwardingSocket();

@@ -12,7 +12,7 @@
 // CodeXL uses INFINITE timeout when waiting for graphics server replies because the web server responsiveness
 // may be delayed when games go through their heavy load initialization period.
 // There is no point in setting a short timeout because as long as the web server is alive we want to get any response it generates
-#define GRAPHIC_SERVER_READ_TIMEOUT OS_CHANNEL_INFINIT_TIME_OUT
+#define GRAPHIC_SERVER_READ_TIMEOUT OS_CHANNEL_INFINITE_TIME_OUT
 
 #define GP_GRAPHICS_SERVER_STATE_STALLED "GRAPHICS_SERVER_STATE_STALLED"
 #define GP_GRAPHICS_SERVER_STATE_PROCESS_NOT_RUNNING "GRAPHICS_SERVER_STATE_PROCESS_NOT_RUNNING"

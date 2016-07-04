@@ -16,7 +16,7 @@
 #include <AMDTOSWrappers/Include/osChannelOperators.h>
 
 // Infinite time out:
-#define OS_CHANNEL_INFINIT_TIME_OUT LONG_MAX
+#define OS_CHANNEL_INFINITE_TIME_OUT LONG_MAX
 
 // Use no time out (return immediately):
 #define OS_CHANNEL_NO_TIME_OUT 0

@@ -67,7 +67,7 @@ int pdRemoteProcessDebuggerEventsListenerThread::entryPoint()
     while (false == _terminated)
     {
         // Pause if needed:
-        osWaitForFlagToTurnOff(_listeningPaused, OS_CHANNEL_INFINIT_TIME_OUT);
+        osWaitForFlagToTurnOff(_listeningPaused, OS_CHANNEL_INFINITE_TIME_OUT);
 
         if (_pEventChannel != NULL)
         {
