@@ -84,8 +84,8 @@ rem copy CodeXL version XML:
 xcopy /r /d /y %VSIX_COPY_CODEXL_FOLDER%Data\Public\VersionSettings.xml %VSIX_COPY_TARGET_DIR%Data\
 
 rem copy GPA Counters DLL needed by GPU Profiler
-xcopy /r /d /y %VSIX_COPY_COMMON_FOLDER%Lib\AMD\GPUPerfAPI\2_20\Bin\x86\GPUPerfAPICounters.dll %VSIX_COPY_TARGET_DIR%x86\
-xcopy /r /d /y %VSIX_COPY_COMMON_FOLDER%Lib\AMD\GPUPerfAPI\2_20\Bin\x64\GPUPerfAPICounters-x64.dll %VSIX_COPY_TARGET_DIR%x64\
+xcopy /r /d /y %VSIX_COPY_COMMON_FOLDER%Lib\AMD\GPUPerfAPI\2_21\Bin\x86\GPUPerfAPICounters.dll %VSIX_COPY_TARGET_DIR%x86\
+xcopy /r /d /y %VSIX_COPY_COMMON_FOLDER%Lib\AMD\GPUPerfAPI\2_21\Bin\x64\GPUPerfAPICounters-x64.dll %VSIX_COPY_TARGET_DIR%x64\
 
 rem copy debugger libs:
 
