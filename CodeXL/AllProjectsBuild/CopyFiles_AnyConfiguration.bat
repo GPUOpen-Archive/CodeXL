@@ -562,8 +562,8 @@ rem Copy GPU Profiler's jqPlot JavaScript files
 XCopy /r /d /y  "..\Components\GpuProfiling\Backend\Common\jqPlot\*.*" "..\Output\%CONFIG_NAME%\bin\jqPlot\"
 
 rem Copy Graphics Backend files
-XCopy /r /d /y  "..\..\Common\Lib\AMD\GPUPerfAPI\2_20\Bin\x64\GPUPerfAPIDX12-x64.dll" ..\Output\%CONFIG_NAME%\bin
-XCopy /r /d /y  "..\..\Common\Lib\AMD\GPUPerfAPI\2_20\Bin\x86\GPUPerfAPIDX12.dll" ..\Output\%CONFIG_NAME%\bin
+XCopy /r /d /y  "..\..\Common\Lib\AMD\GPUPerfAPI\2_21\Bin\x64\GPUPerfAPIDX12-x64.dll" ..\Output\%CONFIG_NAME%\bin
+XCopy /r /d /y  "..\..\Common\Lib\AMD\GPUPerfAPI\2_21\Bin\x86\GPUPerfAPIDX12.dll" ..\Output\%CONFIG_NAME%\bin
 XCopy /r /d /y  "..\Components\Graphics\Server\media\ErrorImage.png" ..\Output\%CONFIG_NAME%\bin\Images
 XCopy /r /d /y  "..\Components\Graphics\Server\media\EmptyImage.png" ..\Output\%CONFIG_NAME%\bin\Images
 
