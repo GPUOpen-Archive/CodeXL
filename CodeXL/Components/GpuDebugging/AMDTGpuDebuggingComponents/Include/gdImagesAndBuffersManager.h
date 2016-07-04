@@ -61,7 +61,6 @@ enum gdImageActionId
 // ----------------------------------------------------------------------------------
 class GD_API gdImagesAndBuffersManager
 {
-    friend class vspSingletonsDelete;
 public:
     // Get my single instance:
     static gdImagesAndBuffersManager& instance();
@@ -115,6 +114,7 @@ private:
     gdImagesAndBuffersManager();
 
 private:
+    friend class gdSingletonsDelete;
 
     // Single instance static member:
     static gdImagesAndBuffersManager* _pMySingleInstance;

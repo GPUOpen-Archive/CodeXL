@@ -137,7 +137,7 @@ void appEventObserver::onEvent(const apEvent& eve, bool& vetoEvent)
 void appEventObserver::OnMDIViewEvent(const apMDIViewCreateEvent& mdiEvent)
 {
     // Get the views creators:
-    gtVector<afViewCreatorAbstract*>& viewsCreators = afQtCreatorsManager::instance().viewsCreators();
+    const gtVector<afViewCreatorAbstract*>& viewsCreators = afQtCreatorsManager::instance().viewsCreators();
 
     // Get number of creators:
     int numberViewsCreators = (int)viewsCreators.size();
