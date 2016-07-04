@@ -180,7 +180,7 @@ static void SetMicroDLLPathA(LPCSTR lpApplicationName, LPCSTR lpCommandLine)
     GetApplicationName(lpApplicationName, lpCommandLine, appName);
 
     // Get the binary type of the process this MicroDLL is running in.
-#if defined X64
+#if AMDT_ADDRESS_SPACE_TYPE == AMDT_64_BIT_ADDRESS_SPACE
     osModuleArchitecture appBinaryType = OS_X86_64_ARCHITECTURE;
     const osModuleArchitecture currentBinaryType = OS_X86_64_ARCHITECTURE;
 #else

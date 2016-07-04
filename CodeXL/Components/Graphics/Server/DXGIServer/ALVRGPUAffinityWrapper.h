@@ -32,7 +32,7 @@ bool GPUCount(ID3D11Device* pDevice, UINT* nCount)
 {
     HMODULE hDll = NULL;
 
-#ifdef X64
+#if AMDT_ADDRESS_SPACE_TYPE == AMDT_64_BIT_ADDRESS_SPACE
     hDll = GetModuleHandle("atidxx64.dll");
 #else
     hDll = GetModuleHandle("atidxx32.dll");
@@ -40,7 +40,7 @@ bool GPUCount(ID3D11Device* pDevice, UINT* nCount)
 
     if (hDll == NULL)
     {
-#ifdef X64
+#if AMDT_ADDRESS_SPACE_TYPE == AMDT_64_BIT_ADDRESS_SPACE
         Log(logERROR, "Unable to initialize because 'atidxx64.dll' is not available.");
 #else
         Log(logERROR, "Unable to initialize because 'atidxx32.dll' is not available.");

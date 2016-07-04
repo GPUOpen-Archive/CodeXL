@@ -218,7 +218,7 @@ static const int BUFFER_SIZE = 16;  ///< size of shared memory buffer
 // (with shared memory), 32 and 64-bit versions need to be unique, since the
 // shared memory consists of a data structure whose size is dependent on
 // the bitsize.
-#if defined X64
+#if AMDT_ADDRESS_SPACE_TYPE == AMDT_64_BIT_ADDRESS_SPACE
     static const char* EXT = "_x64";
 #else
     static const char* EXT = "_x86";

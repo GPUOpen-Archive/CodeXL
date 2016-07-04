@@ -261,7 +261,7 @@ gtASCIIString XMLHexPtr(const char* strNode, const void* ptr)
     // 32 or 64 bit hex value returned
     if (ptr == NULL)
     {
-#ifdef X64
+#if AMDT_ADDRESS_SPACE_TYPE == AMDT_64_BIT_ADDRESS_SPACE
         text = "0x000000000000000%d";
 #else
         text = "0x0000000%d";

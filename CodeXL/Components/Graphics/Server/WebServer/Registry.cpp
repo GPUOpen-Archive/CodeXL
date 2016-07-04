@@ -21,19 +21,19 @@
 #include "Registry.h"
 
 // registry key to use for "Open with" option
-#ifdef X64
+#if AMDT_ADDRESS_SPACE_TYPE == AMDT_64_BIT_ADDRESS_SPACE
     #ifdef DEBUG
         #define PS_OPEN_WITH_KEY "*\\shell\\Open with GPU PerfServer (x64 Debug)"
     #else
         #define PS_OPEN_WITH_KEY "*\\shell\\Open with GPU PerfServer (x64)"
     #endif
-#else // X64
+#else // #if AMDT_ADDRESS_SPACE_TYPE == AMDT_64_BIT_ADDRESS_SPACE
     #ifdef DEBUG
         #define PS_OPEN_WITH_KEY "*\\shell\\Open with GPU PerfServer (Debug)" ///< registry key to use for "Open with" option
     #else
         #define PS_OPEN_WITH_KEY "*\\shell\\Open with GPU PerfServer" ///< registry key to use for "Open with" option
     #endif
-#endif // X64
+#endif // #if AMDT_ADDRESS_SPACE_TYPE == AMDT_64_BIT_ADDRESS_SPACE
 
 #define APPINIT_PATH    "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Windows" ///< Registry path definition for AppInitDLL support keys
 #define APPINIT_KEY     "AppInit_DLLs" ///< AppInitDLL key

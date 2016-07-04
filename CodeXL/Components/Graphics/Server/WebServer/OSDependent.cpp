@@ -2025,7 +2025,7 @@ void DetectConflictingProcesses()
 
     if (SG_GET_BOOL(OptionDllReplacement) == true)
     {
-#ifdef X64
+#if AMDT_ADDRESS_SPACE_TYPE == AMDT_64_BIT_ADDRESS_SPACE
         sprintf_s(s_GPSPluginsDir, PS_MAX_PATH, "%sx64\\", GPS_PLUGIN_DIR);
 #else
         sprintf_s(s_GPSPluginsDir, PS_MAX_PATH, "%sx86\\", GPS_PLUGIN_DIR);
