@@ -1114,12 +1114,10 @@ bool osProcessesEnumerator::next(osProcessId& processId, gtString* pName)
 // ---------------------------------------------------------------------------
 OS_API bool osTerminateChildren(osProcessId processId)
 {
-    // Unused.
-    (void)processId;
+    GT_UNREFERENCED_PARAMETER(processId);
 
-    bool ret = false;
-    GT_ASSERT_EX(ret, OS_GEN_ERR_FUNCTION_NOT_IMPLEMENTED);
-    return ret;
+   //TODO "implement this code for linux"
+    return false;
 }
 
 // This is the data structure that is being used
@@ -1284,12 +1282,19 @@ OS_API bool osIsParent(osProcessId parentProcessId, osProcessId processId)
 {
     osProcessId originalParentProcessId;
 
-	osGetProcessIdentificationInfo(processId, &originalParentProcessId);
     bool retVal = false;
 
-    if (originalParentProcessId == parentProcessId)
+    bool rc = osGetProcessIdentificationInfo(processId, &originalParentProcessId);
+
+    while (rc && originalParentProcessId != 0)
     {
-    	retVal = true;
+	    if (originalParentProcessId == parentProcessId)
+        {
+            retVal = true;
+            break;
+	    }
+        processId = originalParentProcessId;
+        rc = osGetProcessIdentificationInfo(processId, &originalParentProcessId);
     }
 
     return retVal;
