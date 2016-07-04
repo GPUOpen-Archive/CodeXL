@@ -153,6 +153,7 @@
 #define PM_profileTypeInvestigateInstructionL2CacheAccess "Investigate L2 Cache Access"
 #define PM_profileTypePerformanceCounters "Performance Counters"
 #define PM_profileTypeApplicationTrace "Application Timeline Trace"
+#define PM_profileTypeApplicationTraceWide L"Application Timeline Trace"
 #define PM_profileTypePowerProfile "Power Profiling"
 #define PM_profileTypeFrameAnalysis "Frame Analysis"
 #define PM_profileTypeThreadProfile "Thread Profiling"

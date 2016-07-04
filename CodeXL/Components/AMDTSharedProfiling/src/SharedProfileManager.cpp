@@ -733,7 +733,7 @@ void SharedProfileManager::GetToolbarStartButtonText(gtString& buttonText, bool 
     {
         buttonText = PM_STR_startButtonProfileCPUMode;
     }
-    else if (currentType.startsWith(L"GPU"))
+    else if (currentType.startsWith(L"GPU") || currentType.startsWith(PM_profileTypeApplicationTraceWide))
     {
         buttonText = PM_STR_startButtonProfileGPUMode;
     }
