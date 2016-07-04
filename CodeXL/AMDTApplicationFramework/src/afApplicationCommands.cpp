@@ -2157,7 +2157,7 @@ void afApplicationCommands::BuildSampleCLFilesSection(const afCodeXLSampleID sam
             { L"tpSmokeSimulation.cl",                 L"debugVelocityLength",             L"1006", L"" },
             { L"tpSmokeSimulation.cl",                 L"debugFieldPressure",              L"1024", L"" },
 
-            { L"tpFragmentShader.catchMeIfYouCan.glsl",     L"Fragment",                        L"",    glProgram },
+            { L"tpFragmentShader.catchMeIfYouCan.glsl",L"Fragment",                        L"",    glProgram },
             { L"tpFragmentShader.glsl",                L"Fragment",                        L"",    glProgram },
             { L"tpVertexShader.glsl",                  L"Vertex",                          L"",    glProgram }
         };
@@ -2224,7 +2224,7 @@ void afApplicationCommands::BuildSampleCLFilesSection(const afCodeXLSampleID sam
 
         int sourceFileId = 0;
 
-        for (auto iter = filePaths.begin(); iter != filePaths.end(); sourceFileId++, iter++)
+        for (auto iter = filePaths.cbegin(); iter != filePaths.cend(); ++sourceFileId, ++iter)
         {
             // Get the current file path:
 
