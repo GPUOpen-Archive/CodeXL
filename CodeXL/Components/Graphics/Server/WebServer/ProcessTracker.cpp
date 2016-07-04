@@ -56,7 +56,7 @@ gtASCIIString ProcessTracker::GetProcessesXML()
     WrapperMap wrappers = GetWrapperMap();
 
     // the strPlatform is named this way to match options in the client.
-#ifdef X64
+#if AMDT_ADDRESS_SPACE_TYPE == AMDT_64_BIT_ADDRESS_SPACE
     gtASCIIString strPlatform = "Win64";
 #else
     gtASCIIString strPlatform = "Win32";
@@ -695,7 +695,7 @@ PROCESS_INFORMATION ProcessTracker::LaunchAppInNewProcess(gtASCIIString strApp, 
     }
     else
     {
-#ifdef X64
+#if AMDT_ADDRESS_SPACE_TYPE == AMDT_64_BIT_ADDRESS_SPACE
 
         // can only launch 64 bit applications
         if (binaryType != OS_X86_64_ARCHITECTURE)
@@ -720,7 +720,7 @@ PROCESS_INFORMATION ProcessTracker::LaunchAppInNewProcess(gtASCIIString strApp, 
                                                         microDLLPath);
         }
 
-#endif // X64
+#endif // #if AMDT_ADDRESS_SPACE_TYPE == AMDT_64_BIT_ADDRESS_SPACE
         else
         {
             succeeded = AMDT::CreateProcessAndInjectDll(strApp.asCharArray(), (LPSTR)strCmdLine.asCharArray(),

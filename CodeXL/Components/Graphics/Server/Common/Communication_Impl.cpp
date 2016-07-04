@@ -1402,7 +1402,7 @@ bool SendFileResponse(CommunicationID& requestID, const char* cpFile, NetSocket*
 
     // collect file data and generate response
     FILE* in;
-#if defined WIN32 && !defined X64
+#if defined WIN32 &&  (AMDT_ADDRESS_SPACE_TYPE == AMDT_32_BIT_ADDRESS_SPACE)
     long fileSize, bytesRead;
 #else
     size_t fileSize, bytesRead;

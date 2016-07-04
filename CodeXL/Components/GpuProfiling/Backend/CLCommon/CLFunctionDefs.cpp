@@ -24,7 +24,7 @@ void InitNextCLFunctions(cl_icd_dispatch_table& table)
 }
 
 #ifdef _WIN32
-    #ifdef X64
+   #if AMDT_ADDRESS_SPACE_TYPE == AMDT_64_BIT_ADDRESS_SPACE
         #define AMDOCL_MODULE_NAME "amdocl64.dll"
     #else
         #define AMDOCL_MODULE_NAME "amdocl.dll"

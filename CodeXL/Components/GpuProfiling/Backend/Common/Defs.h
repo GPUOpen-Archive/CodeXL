@@ -27,7 +27,7 @@ using namespace GPULogger;
 // @{
 
 #ifdef WIN32
-    #ifdef X64
+   #if AMDT_ADDRESS_SPACE_TYPE == AMDT_64_BIT_ADDRESS_SPACE
         #define BITNESS "-x64"
         #define NUMBITS "64"
     #else
@@ -67,7 +67,7 @@ using namespace GPULogger;
 #define HSA_PROFILE_AGENT_DLL LIB_PREFIX GPU_PROFILER_LIBRARY_NAME_PREFIX "HSAProfileAgent" BITNESS DEBUG_PREFIX GDT_BUILD_SUFFIX LIB_SUFFIX
 
 #ifdef WIN32
-    #ifdef X64
+   #if AMDT_ADDRESS_SPACE_TYPE == AMDT_64_BIT_ADDRESS_SPACE
         #define HSA_RUNTIME_TOOLS_LIB "hsa-runtime-tools64.dll"
     #else
         #define HSA_RUNTIME_TOOLS_LIB "hsa-runtime-tools.dll"
