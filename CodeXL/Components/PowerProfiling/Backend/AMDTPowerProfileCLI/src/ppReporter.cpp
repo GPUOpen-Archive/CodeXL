@@ -12,12 +12,16 @@
 
 #if AMDT_BUILD_TARGET == AMDT_LINUX_OS
     #define U_FORMAT "%lu"
+    #define D_FORMAT "ld"
+    #define H_FORMAT "lx"
     #ifndef _GLIBCXX_TR1_INTTYPES_H
         #define _GLIBCXX_TR1_INTTYPES_H 1
         #include <tr1/cinttypes>
     #endif // _GLIBCXX_TR1_INTTYPES_H
 #else
     #define U_FORMAT "%llu"
+    #define D_FORMAT "lld"
+    #define H_FORMAT "llx"
 #endif // Windows
 
 #include <inttypes.h>
@@ -27,28 +31,15 @@
 //
 //  Reporter
 //
-// FIXME: Need to be removed when IPC implemented for Linux
-#if AMDT_BUILD_TARGET == AMDT_LINUX_OS // Linux
-    #define PROCESS_INFO_TXT_FORMAT        "%d\t%d\t%d\t%3.2f\t\t%3.2f\t\t%-45.45s\t%s\n"
-    #define PROCESS_INFO_TXT_HDR_FORMAT    "\nSNo\tPID\tSamples\tPower(Joules)\tPower(%%)\tName\t\t\t\t\t\tPath\n\n"
-    #define PROCESS_INFO_CSV_FORMAT        "%d,%d,%d,%3.2f,%3.2f,%s,%s\n"
-    #define PROCESS_INFO_CSV_HDR_FORMAT    "\nSNo,PID,Samples,Power(Joules),Power(%%),Name,Path\n\n"
-  //#define MODULE_INFO_TXT_FORMAT         "%d\t%d\t                    %d\t%d\t%3.2f\t\t%3.2f\t\t0x%-8.8lx\t\t%-1.8ld\t\t%-45.45s\t%s\n"
-    #define MODULE_INFO_TXT_FORMAT         "%d\t%d\t%-45.45s\t%-65.85s\t%d\t%d\t%3.2f\t\t%3.2f\t\t0x%-8.8lx\t\t%-1.8ld\t\t%-45.45s\t%s\n"
-    #define MODULE_INFO_TXT_HDR_FORMAT     "\nSNo\tPID\tSamples\tKernel\tPower(Joules)\tPower(%%)\tLoad Addr\t\tsize\t\t\tName\t\t\t\t\t\tPath\n\n"
-  //#define MODULE_INFO_CSV_FORMAT         "%d,%d,      %d,%d,%3.2f,%3.2f,0x%lx,%ld,%s,%s\n"
-    #define MODULE_INFO_CSV_FORMAT         "%d,%d,%s,%s,%d,%d,%3.2f,%3.2f,0x%lx,%ld,%s,%s\n"
-    #define MODULE_INFO_CSV_HDR_FORMAT     "\nSNo,PID,Samples,Kernel,Power(Joules),Power(%%),Load Addr,size,Name,Path\n\n"
-#else // Windows
-    #define PROCESS_INFO_TXT_FORMAT        "%d\t%d\t%d\t%3.2f\t\t%3.2f\t\t%-45.45s\t%s\n"
-    #define PROCESS_INFO_TXT_HDR_FORMAT    "\nSNo\tPID\tSamples\tPower(Joules)\tPower(%%)\tName\t\t\t\t\t\tPath\n\n"
-    #define PROCESS_INFO_CSV_FORMAT        "%d,%d,%d,%3.2f,%3.2f,%s,%s\n"
-    #define PROCESS_INFO_CSV_HDR_FORMAT    "\nSNo,PID,Samples,Power(Joules),Power(%%),Name,Path\n\n"
-    #define MODULE_INFO_TXT_FORMAT         "%d\t%d\t%-45.45s\t%-65.85s\t%d\t%d\t%3.2f\t\t%3.2f\t\t0x%-8.8llx\t\t%-1.8lld\t\t%-45.45s\t%s\n"
-    #define MODULE_INFO_TXT_HDR_FORMAT     "\nSNo\tPID\tProcess Name\t\t\t\t\tProcess Path\t\t\t\t\t\t\t\tSamples\tKernel\tPower(Joules)\tPower(%%)\tLoad Addr\t\tsize\t\t\tName\t\t\t\t\t\tPath\n\n"
-    #define MODULE_INFO_CSV_FORMAT         "%d,%d,%s,%s,%d,%d,%3.2f,%3.2f,0x%llx,%lld,%s,%s\n"
-    #define MODULE_INFO_CSV_HDR_FORMAT     "\nSNo,PID,Process Name, Process Path, Samples,Kernel,Power(Joules),Power(%%),Load Addr,size,Name,Path\n\n"
-#endif
+#define PROCESS_INFO_TXT_HDR_FORMAT    "\nSNo\tPID\tSamples\tPower(Joules)\tPower(%%)\tName\t\t\t\t\t\tPath\n\n"
+#define PROCESS_INFO_CSV_HDR_FORMAT    "\nSNo,PID,Samples,Power(Joules),Power(%%),Name,Path\n\n"
+#define PROCESS_INFO_TXT_FORMAT        "%d\t%d\t%d\t%3.2f\t\t%3.2f\t\t%-45.45s\t%s\n"
+#define PROCESS_INFO_CSV_FORMAT        "%d,%d,%d,%3.2f,%3.2f,%s,%s\n"
+
+#define MODULE_INFO_TXT_HDR_FORMAT     "\nSNo\tPID\tProcess Name\t\t\t\t\tProcess Path\t\t\t\t\t\t\t\tSamples\tKernel\tPower(Joules)\tPower(%%)\tLoad Addr\t\tsize\t\t\tName\t\t\t\t\t\tPath\n\n"
+#define MODULE_INFO_CSV_HDR_FORMAT     "\nSNo,PID,Process Name, Process Path, Samples,Kernel,Power(Joules),Power(%%),Load Addr,size,Name,Path\n\n"
+#define MODULE_INFO_TXT_FORMAT         "%d\t%d\t%-45.45s\t%-65.85s\t%d\t%d\t%3.2f\t\t%3.2f\t\t0x%-8.8"H_FORMAT"\t\t%-1.8"D_FORMAT"\t\t%-45.45s\t%s\n"
+#define MODULE_INFO_CSV_FORMAT         "%d,%d,%s,%s,%d,%d,%3.2f,%3.2f,0x%"H_FORMAT",%"D_FORMAT",%s,%s\n"
 
 void ppReporter::ReportHeader()
 {
@@ -294,7 +285,7 @@ void ppReporterText::ConstructProfiledCounterDesc(gtString& counterName, const A
 
 void ppReporterText::ConstructProfiledCounterDataHdr(AMDTPwrSample*& sample)
 {
-    sprintf(m_pDataStr, "%-8.8s  ", PP_REPORT_PROFILE_RECORD_ID);
+    sprintf(m_pDataStr, "%-8.12s  ", PP_REPORT_PROFILE_RECORD_ID);
     m_dataStr.append(m_pDataStr);
     sprintf(m_pDataStr, "%-15.15s ", PP_REPORT_PROFILE_RECORD_TS);
     m_dataStr.append(m_pDataStr);
@@ -334,7 +325,7 @@ void ppReporterText::ConstructProfiledCounterData(AMDTUInt32& nbrSamples, AMDTPw
         char* pTimeStamp = ts;
         ConvertTimeStampToStr(pSample->m_systemTime, pSample->m_elapsedTimeMs, pTimeStamp);
 
-        sprintf(m_pDataStr, U_FORMAT"    ", pSample->m_recordId);
+        sprintf(m_pDataStr, "%d\t", (AMDTUInt32)pSample->m_recordId);
         m_dataStr.append(m_pDataStr);
         sprintf(m_pDataStr, "%-15.15s ", ts);
         m_dataStr.append(m_pDataStr);
