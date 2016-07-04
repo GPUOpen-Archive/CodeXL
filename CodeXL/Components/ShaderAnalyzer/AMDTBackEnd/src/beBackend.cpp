@@ -65,10 +65,12 @@ Backend::Backend() : m_supportedPublicDevices()
     m_driverVersionInfo.clear();
 }
 
-beKA::beStatus Backend::Initialize(BuiltProgramKind, LoggingCallBackFuncP callback, const string& sDllModule)
+beKA::beStatus Backend::Initialize(BuiltProgramKind ProgramKind, LoggingCallBackFuncP callback, const string& sDllModule)
 {
 #ifndef _WIN32
     GT_UNREFERENCED_PARAMETER(sDllModule);
+#else
+    GT_UNREFERENCED_PARAMETER(ProgramKind);
 #endif
     beKA::beStatus retVal = beStatus_General_FAILED;
     m_LogCallback = callback;
