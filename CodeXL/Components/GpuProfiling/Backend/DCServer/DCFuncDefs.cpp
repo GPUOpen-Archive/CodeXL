@@ -19,13 +19,6 @@ IDXGIFactory1_CreateSwapChain_type Real_IDXGIFactory1_CreateSwapChain = NULL;
 D3D11CreateDeviceAndSwapChain_type Real_D3D11CreateDeviceAndSwapChain = NULL;
 D3D11CreateDevice_type Real_D3D11CreateDevice = NULL;
 
-//D3DX11CompileFromFileW_type Real_D3DX11CompileFromFileW = NULL;
-//D3DX11CompileFromResourceW_type Real_D3DX11CompileFromResourceW = NULL;
-//
-//D3DX11CompileFromFileA_type Real_D3DX11CompileFromFileA = NULL;
-//D3DX11CompileFromResourceA_type Real_D3DX11CompileFromResourceA = NULL;
-//
-//D3DX11CompileFromMemory_type Real_D3DX11CompileFromMemory = NULL;
 CreateDXGIFactory1_type Real_CreateDXGIFactory1 = NULL;
 D3DCompile_type Real_D3DCompile = NULL;
 D3DCompile2_type Real_D3DCompile2 = NULL;
