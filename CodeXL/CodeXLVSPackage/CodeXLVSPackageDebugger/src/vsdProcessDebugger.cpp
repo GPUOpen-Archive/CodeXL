@@ -835,22 +835,45 @@ void vsdProcessDebugger::handleExceptionEvent(IDebugEvent2* piEvent, IDebugExcep
                 m_isKernelDebuggingAboutToStart = false;
                 m_isKernelDebuggingJustFinished = false;
             }
-            else // !m_isWaitingForProcessSuspension &&
+            else // !(m_isWaitingForProcessSuspension || m_waitingForExecutedFunction || m_isKernelDebuggingAboutToStart || m_isKernelDebuggingJustFinished)
             {
-                // TO_DO: handle kernel debugging entry and exit BPs
-                m_bpThreadId = threadId;
-                m_isAPIBreakpoint = isSpyException;
-
                 // If this is a break triggered by the process debugger:
                 if (AP_BREAK_COMMAND_HIT == m_hostBreakReason)
                 {
-                    // The breakpoint comes from a thread that CauseProcessBreak() creates.
-                    // Instead, select the main thread:
-                    osThreadId mainTid = mainThreadId();
-
-                    if (OS_NO_THREAD_ID != mainTid)
+                    // Try and see if any of the process threads is suspended in the spy:
+                    for (vsdCDebugThread* pThread : m_debuggedProcessThreads)
                     {
-                        threadId = mainTid;
+                        // Sanity check:
+                        GT_IF_WITH_ASSERT(nullptr != pThread)
+                        {
+                            // If we are hiding any spy frames:
+                            if (0 < pThread->skippedFrameCount(true))
+                            {
+                                // Do not report this exception:
+                                continueException = false;
+
+                                // Set the last "step" kind:
+                                m_lastStepKind = m_hostBreakReason;
+
+                                // Step on this thread:
+                                pThread->DeferStepCommand(this);
+
+                                // Stop looking:
+                                break;
+                            }
+                        }
+                    }
+
+                    if (continueException)
+                    {
+                        // The breakpoint comes from a thread that DebugBreakProcess() creates.
+                                            // Instead, select the main thread:
+                        osThreadId mainTid = mainThreadId();
+
+                        if (OS_NO_THREAD_ID != mainTid)
+                        {
+                            threadId = mainTid;
+                        }
                     }
                 }
                 else
@@ -859,16 +882,23 @@ void vsdProcessDebugger::handleExceptionEvent(IDebugEvent2* piEvent, IDebugExcep
                     m_hostBreakReason = AP_FOREIGN_BREAK_HIT;
                 }
 
-                bool rcSusp = suspendProcessThreads();
-                GT_IF_WITH_ASSERT(rcSusp)
+                if (continueException)
                 {
-                    // Notify observers about the breakpoint event:
-                    apBreakpointHitEvent event(threadId, exceptionAddress);
-                    apEventsHandler::instance().registerPendingDebugEvent(event);
+                    // TO_DO: handle kernel debugging entry and exit BPs
+                    m_bpThreadId = threadId;
+                    m_isAPIBreakpoint = isSpyException;
 
-                    // Notify observers that the debugged process run was suspended:
-                    apDebuggedProcessRunSuspendedEvent processSuspendedEvent(threadId);
-                    apEventsHandler::instance().registerPendingDebugEvent(processSuspendedEvent);
+                    bool rcSusp = suspendProcessThreads();
+                    GT_IF_WITH_ASSERT(rcSusp)
+                    {
+                        // Notify observers about the breakpoint event:
+                        apBreakpointHitEvent event(threadId, exceptionAddress);
+                        apEventsHandler::instance().registerPendingDebugEvent(event);
+
+                        // Notify observers that the debugged process run was suspended:
+                        apDebuggedProcessRunSuspendedEvent processSuspendedEvent(threadId);
+                        apEventsHandler::instance().registerPendingDebugEvent(processSuspendedEvent);
+                    }
                 }
             }
 
@@ -1157,108 +1187,17 @@ void vsdProcessDebugger::handleStepCompleteEvent(IDebugEvent2* piEvent, IDebugTh
     osThreadId threadId = OS_NO_THREAD_ID;
     osInstructionPointer bpAddress = (osInstructionPointer)0;
 
-    GT_IF_WITH_ASSERT(nullptr != piThread)
-    {
-        // Get the thread Id:
-        DWORD dwTID = 0;
-        HRESULT hr = piThread->GetThreadId(&dwTID);
-        GT_IF_WITH_ASSERT(SUCCEEDED(hr))
-        {
-            threadId = (osThreadId)dwTID;
-        }
-
-        // Get the exception address:
-        FRAMEINFO_FLAGS frameInfoFlags = FIF_DEBUG_MODULEP | FIF_STACKRANGE;
-        IEnumDebugFrameInfo2* piFramesInfo = nullptr;
-        hr = piThread->EnumFrameInfo(frameInfoFlags, 10, &piFramesInfo);
-
-        if (SUCCEEDED(hr) && (nullptr != piFramesInfo))
-        {
-            // Find the first non-spy frame:
-            bool hideSpyFrames = true;
-            FRAMEINFO frameInfo = { 0 };
-            ULONG readFrames = 0;
-            hr = piFramesInfo->Next(1, &frameInfo, &readFrames);
-
-            // Get the absolute path to the spies directory:
-            osFilePath resolvedSpiesPath;
-            GT_IF_WITH_ASSERT(nullptr != m_pProcessCreationData)
-            {
-                resolvedSpiesPath = m_pProcessCreationData->spiesDirectory().asString();
-                resolvedSpiesPath.resolveToAbsolutePath().reinterpretAsDirectory();
-            }
-
-            while (SUCCEEDED(hr) && (S_FALSE != hr) && (0 < readFrames))
-            {
-                osInstructionPointer frameAddress = (osInstructionPointer)frameInfo.m_addrMin;
-                bool isSpyModule = false;
-
-                // Query and release the current frame's info:
-                if (nullptr != frameInfo.m_pModule)
-                {
-                    MODULE_INFO moduleInfo = { 0 };
-                    hr = frameInfo.m_pModule->GetInfo(MIF_URL, &moduleInfo);
-
-                    if (SUCCEEDED(hr))
-                    {
-                        osFilePath modulePath = moduleInfo.m_bstrUrl;
-                        modulePath.clearFileName().clearFileExtension().resolveToAbsolutePath();
-
-                        if (modulePath == resolvedSpiesPath)
-                        {
-                            isSpyModule = true;
-                        }
-                    }
-
-#ifdef VSD_RELEASE_ENUMERATED_INTERFACES
-                    frameInfo.m_pModule->Release();
-                    frameInfo.m_pModule = nullptr;
-#endif
-                }
-
-                if (isSpyModule)
-                {
-                    if (hideSpyFrames)
-                    {
-                        bpAddress = (osInstructionPointer)0;
-                    }
-
-                    // Continue stepping until we exit the spy:
-                    ignoreStep = true;
-                }
-
-                if (((!isSpyModule) || (!hideSpyFrames)) && ((osInstructionPointer)0 == bpAddress))
-                {
-                    bpAddress = frameAddress;
-                    // Don't break, since we need to free the module data for the other frames.
-                }
-
-                // Get the next frame
-                hr = piFramesInfo->Next(1, &frameInfo, &readFrames);
-            }
-
-            piFramesInfo->Release();
-        }
-    }
+    // Figure out where did the step occur:
+    AnalyzeThreadLocation(piThread, ignoreStep, threadId, &bpAddress);
 
     // If we want to ignore the step:
     if (ignoreStep)
     {
-        // Wait for the main thread to execute the previous step command:
-        osWaitForFlagToTurnOff(m_waitingForDeferredStep, ULONG_MAX);
-
-        // Continue the debug event:
+        // Don't continue the debug event:
         continueStep = false;
 
-        // Set up the deferred step state:
-        GT_ASSERT(!m_waitingForDeferredStep);
-        m_waitingForDeferredStep = true;
-
-        // Send a deferred command, so that the main thread continues stepping after this is done.
-        // Calling IDebugProgram2::Step during IDebugEventCallback2::Event causes a deadlock.
-        apDeferredCommandEvent deferredStepEve(apDeferredCommandEvent::AP_DEFERRED_COMMAND_INTERNAL_HOST_STEP, apDeferredCommandEvent::AP_VSD_PROCESS_DEBUGGER);
-        deferredStepEve.setData((const void*)piThread, vsdDebugThreadReleaser, vsdDebugThreadCloner);
-        apEventsHandler::instance().registerPendingDebugEvent(deferredStepEve);
+        // Trigger a deferred step:
+        DeferStepCommand(piThread);
     }
 
     if (!ignoreStep)
@@ -2767,6 +2706,129 @@ bool vsdProcessDebugger::IsDriverModuleName(const gtString& moduleNameLower) con
     return retVal;
 }
 
+// ---------------------------------------------------------------------------
+// Name:        vsdProcessDebugger::AnalyzeThreadLocation
+// Description: Gets the location of the supplied thread object
+// Author:      Uri Shomroni
+// Date:        4/7/2016
+// ---------------------------------------------------------------------------
+void vsdProcessDebugger::AnalyzeThreadLocation(IDebugThread2* piThread, bool& o_isThreadInsideSpy, osThreadId& o_threadId, osInstructionPointer* o_firstVisiblePointer) const
+{
+    osInstructionPointer firstVisiblePointer = (osInstructionPointer)0;
+
+    GT_IF_WITH_ASSERT(nullptr != piThread)
+    {
+        // Get the thread Id:
+        DWORD dwTID = 0;
+        HRESULT hr = piThread->GetThreadId(&dwTID);
+        GT_IF_WITH_ASSERT(SUCCEEDED(hr))
+        {
+            o_threadId = (osThreadId)dwTID;
+        }
+
+        // Get the exception address:
+        FRAMEINFO_FLAGS frameInfoFlags = FIF_DEBUG_MODULEP | FIF_STACKRANGE;
+        IEnumDebugFrameInfo2* piFramesInfo = nullptr;
+        hr = piThread->EnumFrameInfo(frameInfoFlags, 10, &piFramesInfo);
+
+        if (SUCCEEDED(hr) && (nullptr != piFramesInfo))
+        {
+            // Find the first non-spy frame:
+            bool hideSpyFrames = true;
+            FRAMEINFO frameInfo = { 0 };
+            ULONG readFrames = 0;
+            hr = piFramesInfo->Next(1, &frameInfo, &readFrames);
+
+            // Get the absolute path to the spies directory:
+            osFilePath resolvedSpiesPath;
+            GT_IF_WITH_ASSERT(nullptr != m_pProcessCreationData)
+            {
+                resolvedSpiesPath = m_pProcessCreationData->spiesDirectory().asString();
+                resolvedSpiesPath.resolveToAbsolutePath().reinterpretAsDirectory();
+            }
+
+            while (SUCCEEDED(hr) && (S_FALSE != hr) && (0 < readFrames))
+            {
+                osInstructionPointer frameAddress = (osInstructionPointer)frameInfo.m_addrMin;
+                bool isSpyModule = false;
+
+                // Query and release the current frame's info:
+                if (nullptr != frameInfo.m_pModule)
+                {
+                    MODULE_INFO moduleInfo = { 0 };
+                    hr = frameInfo.m_pModule->GetInfo(MIF_URL, &moduleInfo);
+
+                    if (SUCCEEDED(hr))
+                    {
+                        osFilePath modulePath = moduleInfo.m_bstrUrl;
+                        modulePath.clearFileName().clearFileExtension().resolveToAbsolutePath();
+
+                        if (modulePath == resolvedSpiesPath)
+                        {
+                            isSpyModule = true;
+                        }
+                    }
+
+#ifdef VSD_RELEASE_ENUMERATED_INTERFACES
+                    frameInfo.m_pModule->Release();
+                    frameInfo.m_pModule = nullptr;
+#endif
+                }
+
+                if (isSpyModule)
+                {
+                    if (hideSpyFrames)
+                    {
+                        firstVisiblePointer = (osInstructionPointer)0;
+                    }
+
+                    // Continue stepping until we exit the spy:
+                    o_isThreadInsideSpy = true;
+                }
+
+                if (((!isSpyModule) || (!hideSpyFrames)) && ((osInstructionPointer)0 == firstVisiblePointer))
+                {
+                    firstVisiblePointer = frameAddress;
+                    // Don't break, since we need to free the module data for the other frames.
+                }
+
+                // Get the next frame
+                hr = piFramesInfo->Next(1, &frameInfo, &readFrames);
+            }
+
+            piFramesInfo->Release();
+        }
+    }
+
+    // Output optional parameter:
+    if (nullptr != o_firstVisiblePointer)
+    {
+        *o_firstVisiblePointer = firstVisiblePointer;
+    }
+}
+
+
+// ---------------------------------------------------------------------------
+// Name:        vsdProcessDebugger::DeferStepCommand
+// Description: Sends a deferred step command to be handled later by this class
+// Author:      Uri Shomroni
+// Date:        4/7/2016
+// ---------------------------------------------------------------------------
+void vsdProcessDebugger::DeferStepCommand(IDebugThread2* piThread)
+{
+    // Wait for the main thread to execute the previous step command:
+    osWaitForFlagToTurnOff(m_waitingForDeferredStep, ULONG_MAX);
+
+    // Set up the deferred step state:
+    GT_ASSERT(!m_waitingForDeferredStep);
+    m_waitingForDeferredStep = true;
+
+    // Send a deferred command, so that the main thread continues stepping after this is done.
+    // Calling IDebugProgram2::Step during IDebugEventCallback2::Event causes a deadlock.
+    apDeferredCommandEvent deferredStepEve(apDeferredCommandEvent::AP_DEFERRED_COMMAND_INTERNAL_HOST_STEP, apDeferredCommandEvent::AP_VSD_PROCESS_DEBUGGER);
+    deferredStepEve.setData((const void*)piThread, vsdDebugThreadReleaser, vsdDebugThreadCloner);
+    apEventsHandler::instance().registerPendingDebugEvent(deferredStepEve);
+}
 
 // ---------------------------------------------------------------------------
 // Name:        vsdProcessDebugger::vsdCDebugThread::vsdCDebugThread
