@@ -915,6 +915,7 @@ void ProfileApplicationTreeHandler::DeleteSessionNode(afApplicationTreeItemData*
                     else
                     {
                         QString errorStr = PS_STR_TREE_DELETE_FAILED_REPORT;
+                        errorStr.append(report);
                         acMessageBox::instance().critical(AF_STR_ErrorA, errorStr);
                     }
                 }
