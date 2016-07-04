@@ -21,14 +21,10 @@
 #include <AMDTOSWrappers/Include/osFile.h>
 #include <AMDTOSWrappers/Include/osTime.h>
 
-//#define AMDT_ENABLE_DB_SUPPORT  1
-#include <AMDTCpuProfilingDataAccess/inc/AMDTCpuProfilingDataAccess.h>
-
 // Backend:
-#include <AMDTCpuProfilingRawData/inc/CpuProfileReader.h>
-#include <AMDTCpuProfilingRawData/inc/RunInfo.h>
 #include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
 #include <AMDTCpuPerfEventUtils/inc/ViewConfig.h>
+#include <AMDTCpuProfilingDataAccess/inc/AMDTCpuProfilingDataAccess.h>
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     #include <AMDTExecutableFormat/inc/PeFile.h>
@@ -168,11 +164,6 @@ public:
             m_pEventConfig = NULL;
         }
 
-        if (m_profileReader.isOpen())
-        {
-            m_profileReader.close();
-        }
-
         if (NULL != m_pCss)
         {
             delete m_pCss;
@@ -188,19 +179,8 @@ public:
     // Thread profiler
     HRESULT ReportTP();
 
-    void ReadRunInfo();
-
-    bool InitProfileEventsNameVec();
-    gtVector<gtString>& GetProfileEventsNameVec()
-    {
-        InitProfileEventsNameVec();
-        return m_profileEventsNameVec;
-    }
-
     gtString GetProfileStartTime() const { return m_profStartTime; }
     gtString GetProfileEndTime() const { return m_profEndTime; }
-
-    void InitializeViewData();
 
     // thread profile data file
     bool IsTpInputFile() { return m_isTpInputFile; }
@@ -219,8 +199,8 @@ private:
     osFilePath          m_inputFilePath;
 
     Reporter*           m_pReporter = nullptr;
+    cxlProfileDataReader m_profileDbReader;
 
-    CpuProfileReader    m_profileReader;
     EventToIndexMap     m_evtIndexMap;
 
     gtString            m_profileType;
@@ -230,8 +210,10 @@ private:
     osFilePath          m_viewConfigXMLPath;
 
     gtString            m_sortEventName;
+    gtUInt32            m_sortEventId;
+    gtUInt32            m_sortCounterId;
     gtVector<gtString>  m_monitoredEventsNameVec; // this is the actual sampling events
-    gtVector<gtString>  m_profileEventsNameVec;   // this is used for coloumn headers..
+    gtVector<gtString>  m_profileEventsNameVec;   // this is used for column headers..
 
     gtVector<gtUInt32>  m_eventsVec;              // event selects
     EventConfig*        m_pEventConfig = nullptr;
@@ -263,7 +245,7 @@ private:
 
     osFilePath& GetInputFilePath() { return m_inputFilePath; }
     osFilePath& GetRawFilePath() { return m_inputFilePath; }
-    osFilePath& GetEBPFilePath();
+    osFilePath& GetDBFilePath();
     osFilePath& GetOutputFilePath();
 
     EventsFile& GetEventsXMLFile() { return m_eventsFile; }
@@ -279,22 +261,17 @@ private:
     bool SetCLUViewConfig(ViewConfig& viewCfg);
     bool SetAllDataViewConfig(ViewConfig& viewCfg);
 
-    void ReportExecution();
-    void ReportProfileDetails();
+    void ReportExecution(AMDTProfileSessionInfo& sessionInfo, gtUInt32 numCpus);
+    void ReportProfileDetails(AMDTProfileSessionInfo& sessionInfo);
     void ReportMonitoredEventDetails();
-    void ReportOverviewData();
+    void ReportOverviewData(AMDTProfileSessionInfo& sessionInfo);
     void ReportProcessData();
     bool ReportCSSData(ProcessIdType pid);
     void ReportImixData();
 
-    bool GetFunctionData(ProcessIdType pid, ThreadIdType tid, FunctionInfoList& funcInfoList);
-    bool GetOverviewFunctionData();
-
     // Callgraph related helper functions
     bool GetCSSData(ProcessIdType pid, EventMaskType eventSel, CGFunctionInfoMap& cgFunctionMap);
     void ClearCSSData();
-
-    bool InitCoresList();
 
     gtString GetTimeStr()
     {

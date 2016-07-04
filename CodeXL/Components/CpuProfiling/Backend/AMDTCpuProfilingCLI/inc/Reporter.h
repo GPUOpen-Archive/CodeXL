@@ -72,63 +72,38 @@ public:
 
     virtual bool ReportExecution(gtVector<gtString> sectionHdrs, gtList<std::pair<gtString, gtString> > sectionData) = 0;
     virtual bool ReportProfileData(gtVector<gtString> sectionHdrs, gtList<std::pair<gtString, gtString> > sectionData) = 0;
-    virtual bool ReportSamplingSpec(gtVector<gtString>   sectionHdrs,
-                                    EventEncodeVec&      eventEncodeVec,
-                                    EventConfig*         pEventConfig,
-                                    gtVector<gtString>   eventsNameVec) = 0;
+    virtual bool ReportSamplingSpec(gtVector<gtString>&           sectionHdrs,
+                                    AMDTProfileCounterDescVec&    counters,
+                                    AMDTProfileSamplingConfigVec& samplingConfig) = 0;
 
     // OVERVIEW Reporters
-    virtual bool WriteOverviewProcess(gtVector<gtString>   sectionHdrs,
-                                      PidProcessInfoMap&   pidProcInfoMap,
-                                      gtVector<gtUInt64>&  totalSamples,
-                                      gtUInt32             nbrCols,
-                                      ColumnSpec*          pColumnSpec,
-                                      EventEncodeVec&      evtEncodeVec,
-                                      bool                 showPerc) = 0;
+    virtual bool WriteOverviewProcess(gtVector<gtString>& sectionHdrs,
+        AMDTProfileDataVec& processProfileData,
+        bool                 showPerc) = 0;
 
-    virtual bool WriteOverviewModule(gtVector<gtString>   sectionHdrs,
-                                     ModuleInfoList&      modList,
-                                     gtVector<gtUInt64>&  totalSamples,
-                                     gtUInt32             nbrCols,
-                                     ColumnSpec*          pColumnSpec,
-                                     EventEncodeVec&      evtEncodeVec,
-                                     bool                 showPerc) = 0;
+    virtual bool WriteOverviewModule(gtVector<gtString>& sectionHdrs,
+        AMDTProfileDataVec& moduleProfileData,
+        bool                 showPerc) = 0;
 
-    virtual bool WriteOverviewFunction(gtVector<gtString>   sectionHdrs,
-                                       FunctionInfoList&    funcList,
-                                       gtVector<gtUInt64>&  totalSamples,
-                                       gtUInt32             nbrCols,
-                                       ColumnSpec*          pColumnSpec,
-                                       EventEncodeVec&      evtEncodeVec,
+    virtual bool WriteOverviewFunction(gtVector<gtString>&   sectionHdrs,
+                                       AMDTProfileDataVec&  funcProfileData,
                                        bool                 showPerc) = 0;
 
     // PROCESS Specific reporters
-    virtual bool WritePidSummary(gtVector<gtString>   sectionHdrs,
-                                 ProcessInfo&         procInfo,
-                                 gtVector<gtUInt64>&  totalSamples,
-                                 gtUInt32             nbrCols,
-                                 ColumnSpec*          pColumnSpec,
-                                 EventEncodeVec&      evtEncodeVec,
-                                 bool                 showPerc,
-                                 bool                 sepByCore) = 0;
+    virtual bool WritePidSummary(gtVector<gtString>&  sectionHdrs,
+        const AMDTProfileData&      procInfo,
+        bool                 showPerc,
+        bool                 sepByCore) = 0;
 
-    virtual bool WritePidModuleSummary(gtVector<gtString>   sectionHdrs,
-                                       ModuleInfoList&      modList,
-                                       gtVector<gtUInt64>&  totalSamples,
-                                       gtUInt32             nbrCols,
-                                       ColumnSpec*          pColumnSpec,
-                                       EventEncodeVec&      evtEncodeVec,
-                                       bool                 showPerc,
-                                       bool                 sepByCore) = 0;
+    virtual bool WritePidModuleSummary(gtVector<gtString>&  sectionHdrs,
+        AMDTProfileDataVec&      modList,
+        bool                  showPerc,
+        bool                  sepByCore) = 0;
 
-    virtual bool WritePidFunctionSummary(gtVector<gtString>   sectionHdrs,
-                                         FunctionInfoList&    funcList,
-                                         gtVector<gtUInt64>&  totalSamples,
-                                         gtUInt32             nbrCols,
-                                         ColumnSpec*          pColumnSpec,
-                                         EventEncodeVec&      evtEncodeVec,
-                                         bool                 showPerc,
-                                         bool                 sepByCore) = 0;
+     virtual bool WritePidFunctionSummary(gtVector<gtString>&   sectionHdrs,
+        AMDTProfileDataVec& funcList,
+        bool                 showPerc,
+        bool                 sepByCore) = 0;
 
     virtual bool WriteCallGraphFunctionSummary(gtVector<gtString>    sectionHdrs,
                                                CGSampleFunctionMap&  funcMap,
@@ -161,63 +136,44 @@ public:
 
     bool ReportExecution(gtVector<gtString> sectionHdrs, gtList<std::pair<gtString, gtString> > sectionData);
     bool ReportProfileData(gtVector<gtString> sectionHdrs, gtList<std::pair<gtString, gtString> > sectionData);
-    bool ReportSamplingSpec(gtVector<gtString>   sectionHdrs,
-                            EventEncodeVec&      eventEncodeVec,
-                            EventConfig*         pEventConfig,
-                            gtVector<gtString>   eventsNameVec);
+    bool ReportSamplingSpec(gtVector<gtString>& sectionHdrs,
+                            AMDTProfileCounterDescVec& counters,
+                            AMDTProfileSamplingConfigVec& samplingConfig);
 
     // OVERVIEW reporters
-    bool WriteOverviewProcess(gtVector<gtString>   sectionHdrs,
-                              PidProcessInfoMap&   pidProcInfoMap,
-                              gtVector<gtUInt64>&  totalSamples,
-                              gtUInt32             nbrCols,
-                              ColumnSpec*          pColumnSpec,
-                              EventEncodeVec&      evtEncodeVec,
-                              bool                 showPerc);
+    bool WriteOverviewProcess(
+        gtVector<gtString>& sectionHdrs,
+        AMDTProfileDataVec& processProfileData,
+        bool                showPerc);
 
-    bool WriteOverviewModule(gtVector<gtString>   sectionHdrs,
-                             ModuleInfoList&      modList,
-                             gtVector<gtUInt64>&  totalSamples,
-                             gtUInt32             nbrCols,
-                             ColumnSpec*          pColumnSpec,
-                             EventEncodeVec&      evtEncodeVec,
-                             bool                 showPerc);
+    bool WriteOverviewModule(
+        gtVector<gtString>& sectionHdrs,
+        AMDTProfileDataVec& moduleProfileData,
+        bool                showPerc);
 
-    bool WriteOverviewFunction(gtVector<gtString>   sectionHdrs,
-                               FunctionInfoList&    funcList,
-                               gtVector<gtUInt64>&  totalSamples,
-                               gtUInt32             nbrCols,
-                               ColumnSpec*          pColumnSpec,
-                               EventEncodeVec&      evtEncodeVec,
-                               bool                 showPerc);
+    bool WriteOverviewFunction(
+        gtVector<gtString>&  sectionHdrs,
+        AMDTProfileDataVec&  funcProfileData,
+        bool                 showPerc);
 
     // PROCESS reporters
-    bool WritePidSummary(gtVector<gtString>   sectionHdrs,
-                         ProcessInfo&         procInfo,
-                         gtVector<gtUInt64>&  totalSamples,
-                         gtUInt32             nbrCols,
-                         ColumnSpec*          pColumnSpec,
-                         EventEncodeVec&      evtEncodeVec,
-                         bool                 showPerc,
-                         bool                 sepByCore);
+    bool WritePidSummary(
+        gtVector<gtString>&    sectionHdrs,
+        const AMDTProfileData& procInfo,
+        bool                   showPerc,
+        bool                   sepByCore);
 
-    bool WritePidModuleSummary(gtVector<gtString>   sectionHdrs,
-                               ModuleInfoList&      modList,
-                               gtVector<gtUInt64>&  totalSamples,
-                               gtUInt32             nbrCols,
-                               ColumnSpec*          pColumnSpec,
-                               EventEncodeVec&      evtEncodeVec,
-                               bool                 showPerc,
-                               bool                 sepByCore);
+    bool WritePidModuleSummary(
+        gtVector<gtString>&  sectionHdrs,
+        AMDTProfileDataVec&  modList,
+        bool                 showPerc,
+        bool                 sepByCore);
 
-    bool WritePidFunctionSummary(gtVector<gtString>   sectionHdrs,
-                                 FunctionInfoList&    funcList,
-                                 gtVector<gtUInt64>&  totalSamples,
-                                 gtUInt32             nbrCols,
-                                 ColumnSpec*          pColumnSpec,
-                                 EventEncodeVec&      evtEncodeVec,
-                                 bool                 showPerc,
-                                 bool                 sepByCore);
+    bool WritePidFunctionSummary(
+        gtVector<gtString>& sectionHdrs,
+        AMDTProfileDataVec& funcList,
+        bool                showPerc,
+        bool                sepByCore);
 
     bool WriteCallGraphFunctionSummary(gtVector<gtString>    sectionHdrs,
                                        CGSampleFunctionMap&  funcMap,
@@ -243,38 +199,6 @@ private:
     void WriteParentsData(const CGFunctionInfo& funcNode, bool showPerc);
     void WriteChildrenData(const CGFunctionInfo& funcNode, bool showPerc);
     void WriteSelf(const CGFunctionInfo& funcNode, bool showPerc);
-
-    bool WriteColumData(gtVector<gtUInt64>&  totalSamples,
-                        gtVector<gtUInt64>&  dataVector,
-                        gtUInt32             nbrCols,
-                        ColumnSpec*          pColumnSpec,
-                        EventEncodeVec&      evtEncodeVec,
-                        bool                 showPerc,
-                        bool                 sepByCore,
-                        gtString&            dataLine);
-
-    bool WriteFunctionData(FunctionInfo&        funcInfo,
-                           gtVector<gtUInt64>&  totalSamples,
-                           gtUInt32             nbrCols,
-                           ColumnSpec*          pColumnSpec,
-                           EventEncodeVec&      evtEncodeVec,
-                           bool                 showPerc,
-                           bool                 sepByCore);
-    bool WriteProcessData(ProcessInfo&         procInfo,
-                          gtVector<gtUInt64>&  totalSamples,
-                          gtUInt32             nbrCols,
-                          ColumnSpec*          pColumnSpec,
-                          EventEncodeVec&      evtEncodeVec,
-                          bool                 showPerc,
-                          bool                 sepByCore,
-                          bool                 appendPid);
-    bool WriteModuleData(ModuleInfo&          modInfo,
-                         gtVector<gtUInt64>&  totalSamples,
-                         gtUInt32             nbrCols,
-                         ColumnSpec*          pColumnSpec,
-                         EventEncodeVec&      evtEncodeVec,
-                         bool                 showPerc,
-                         bool                 sepByCore);
 
     double GetCLUData(gtVector<gtUInt64>&  dataVector,
                       gtUInt32             nbrCols,
