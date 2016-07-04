@@ -6,9 +6,6 @@
 ///
 //==================================================================================
 
-// Qt:
-//#include <QtGui>
-
 // Backend
 #include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
 #include <AMDTDisassembler/inc/LibDisassembler.h>

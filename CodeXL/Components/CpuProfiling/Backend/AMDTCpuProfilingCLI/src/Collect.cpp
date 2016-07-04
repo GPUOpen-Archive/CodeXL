@@ -6,8 +6,6 @@
 ///
 //==================================================================================
 
-//#include <QtGui>
-
 // Backend:
 #include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
 #include <AMDTCpuProfilingControl/inc/CpuProfileControl.h>
