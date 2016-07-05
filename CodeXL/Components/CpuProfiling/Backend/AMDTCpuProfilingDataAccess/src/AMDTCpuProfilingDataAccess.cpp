@@ -1191,7 +1191,7 @@ public:
         return ret;
     }
 
-    bool AddOthersEntry(AMDTProfileDataVec& summaryDataVec, AMDTCounterId counterId)
+    bool AddOthersEntry(AMDTProfileDataType type, AMDTProfileDataVec& summaryDataVec, AMDTCounterId counterId)
     {
         bool ret = false;
         double totalValue = 0.0;
@@ -1221,7 +1221,7 @@ public:
                 otherEntry.m_id = AMDT_PROFILE_ALL_PROCESSES; // FIXME
                 otherEntry.m_name = L"other";
                 otherEntry.m_moduleId = AMDT_PROFILE_ALL_MODULES;   // FIXME
-                otherEntry.m_type = summaryDataVec[0].m_type;
+				otherEntry.m_type = type; /*summaryDataVec[0].m_type*/
 
                 AMDTSampleValue otherSampleValue;
                 otherSampleValue.m_counterId = counterId;
@@ -1259,7 +1259,7 @@ public:
                                                m_options.m_summaryCount,
                                                summaryDataVec);
 
-            ret = AddOthersEntry(summaryDataVec, counterId);
+            ret = AddOthersEntry(type, summaryDataVec, counterId);
 
             // calculate the percentage
             ret = CalculateRawCounterPercentage(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, counterIdList, summaryDataVec);
