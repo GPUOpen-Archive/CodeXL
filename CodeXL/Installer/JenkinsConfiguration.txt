@@ -180,7 +180,6 @@ Clean
     BuildSln "[ALLPROJECTS]\CodeXL-AllProjects.sln" "" "Clean" "Debug|x64"
     BuildSln "[CXLPATH]\CodeXLVSPackage\CodeXLVSPackageVS11.sln" "" "Clean" "Release|Win32"
     BuildSln "[CXLPATH]\CodeXLVSPackage\CodeXLVSPackageVS12.sln" "" "Clean" "Release|Win32"
-    BuildSln "[CXLPATH]\Examples\AMDTTeaPot\AMDTTeaPotVS2015.sln" "" "Clean" "Release|Win32"
     //Adding VS2013 extension
     BuildSln "[CXLPATH]\CodeXLVSPackage\CodeXLVSPackage.sln" "" "Clean" "Release|Win32"
 
@@ -211,7 +210,6 @@ Release
     BuildSln "[CXLPATH]\CodeXLVSPackage\CodeXLVSPackageVS11.sln" "" "BuildandTest" "Release|Win32"
     BuildSln "[CXLPATH]\CodeXLVSPackage\CodeXLVSPackageVS12.sln" "" "BuildandTest" "Release|Win32"
     BuildSln "[CXLPATH]\CodeXLVSPackage\CodeXLVSPackage.sln" "" "BuildandTest" "Release|Win32"
-    BuildSln "[CXLPATH]\Examples\AMDTTeaPot\AMDTTeaPotVS2015.sln" "" "BuildandTest" "Release|Win32"
     SendBuildErrors "[EMAIL]" "CodeXL All Projects Release Win32 Build Failed"
 
     SYSTEM "[CXLPATH]\Installer\VersionPatch.bat [CXLPATH]\Installer\VersionPatch.ps1 [ROOTPATH] [MAJOR].[MINOR].[BUILD].[UPDATE] Public"
@@ -226,7 +224,6 @@ ReleaseInternal
     BuildSln "[CXLPATH]\CodeXLVSPackage\CodeXLVSPackageVS12.sln" "" "BuildandTest" "Release|Win32"
     BuildSln "[CXLPATH]\CodeXLVSPackage\CodeXLVSPackage.sln" "" "BuildandTest" "Release|Win32"
     SendBuildErrors "[EMAIL]" "CodeXL All Projects Internal Release Win32 Build Failed"
-    BuildSln "[CXLPATH]\Examples\AMDTTeaPot\AMDTTeaPotVS2015.sln" "" "BuildandTest" "Release|Win32"
 
     SYSTEM "[CXLPATH]\Installer\VersionPatch.bat [CXLPATH]\Installer\VersionPatch.ps1 [ROOTPATH] [MAJOR].[MINOR].[BUILD].[UPDATE] internal"
 
