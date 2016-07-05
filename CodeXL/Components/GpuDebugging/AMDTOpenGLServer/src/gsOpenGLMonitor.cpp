@@ -694,6 +694,9 @@ void gsOpenGLMonitor::onContextMadeCurrent(oaDeviceContextHandle hDC, oaDrawable
             pContextMonitor->onContextMadeCurrent(hDC);
         }
     }
+
+    // Also update the TLS, if possible:
+    gsUpdateTLSVariableValues();
 }
 
 
