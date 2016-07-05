@@ -449,7 +449,6 @@ void ppAppController::InitMiddleTier(const bool isInitForCounterSelection /*= fa
     // Currently the details container is empty.
     // It will be filled when remote power profiling is integrated into the CodeXL UI.
     rcMidTier = m_middleTierCore.InitPowerProfiler(coreInitDetails);
-    GT_ASSERT(PPR_EXPECTED_RESULT(rcMidTier));
 
     if (rcMidTier < PPR_FIRST_ERROR)
     {
@@ -504,8 +503,6 @@ void ppAppController::InitMiddleTier(const bool isInitForCounterSelection /*= fa
     }
 
     m_midTierLastInitError = rcMidTier;
-
-
 }
 
 PPResult ppAppController::UpdateCountersInfoMap()

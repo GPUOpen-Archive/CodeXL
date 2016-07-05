@@ -8,6 +8,7 @@
 
 #include <AMDTPowerProfilingMidTier/include/PowerProfilerCore.h>
 #include <AMDTPowerProfilingMidTier/include/PPPollingThread.h>
+#include <AMDTPowerProfilingMidTier/include/PowerProfilerMidTierUtil.h>
 
 // Power Profiling Backend
 #include <AMDTPowerProfileAPI/inc/AMDTPowerProfileApi.h>
@@ -618,7 +619,17 @@ PPResult PowerProfilerCore::InitPowerProfiler(const PowerProfilerCoreInitDetails
     GT_IF_WITH_ASSERT(m_pImpl != NULL)
     {
         ret = m_pImpl->InitPowerProfiler(initDetails);
-        GT_ASSERT_EX(PPR_EXPECTED_RESULT(ret), L"PP Initialization");
+        gtString logMsg;
+        logMsg.appendFormattedString(L"Power Profiler initialization returned %ls", PowerProfilerMidTierUtil::CodeDescription(ret).asCharArray());
+
+        if (PowerProfilerMidTierUtil::isNonFailureResult(ret))
+        {
+            OS_OUTPUT_DEBUG_LOG(logMsg.asCharArray(), OS_DEBUG_LOG_INFO);
+        }
+        else
+        {
+            OS_OUTPUT_DEBUG_LOG(logMsg.asCharArray(), OS_DEBUG_LOG_ERROR);
+        }
     }
     return ret;
 }
