@@ -168,6 +168,7 @@ private:
 
     private:
         bool resumeThreadForExecution(bool& waitingForExecutedFunctionFlag);
+        void addChildrenToExpression(apExpression& parentExpr, IDebugProperty2* piProp, int evaluationDepth, bool onlyNames);
 
     private:
         vsdCDebugThread() = delete;
