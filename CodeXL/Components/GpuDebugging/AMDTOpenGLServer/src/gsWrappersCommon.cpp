@@ -27,6 +27,10 @@
 // (See gsEnableInitializationFunctionsLogging for more details)
 static bool stat_areInitializationFunctionsLogged = true;
 
+// TLS currently only supported on Linux:
+#if AMDT_BUILD_TARGET == AMDT_LINUX_OS
+#define GS_EXPORT_SERVER_TLS_VARIABLES 1
+#endif
 
 // ---------------------------------------------------------------------------
 // Name:        gsGetBaseOpenGLFunctionTypes
@@ -210,6 +214,9 @@ void gsConnectDriverInternalFunctionPointers(osModuleHandle hSystemOpenGLModule)
             ((osProcedureAddress*)(&gs_stat_realDriverInternalFunctionPointers))[i] = pRealFunction;
         }
     }
+
+    // Also connect the TLS value:
+    gsUpdateTLSVariableValues();
 }
 
 // ---------------------------------------------------------------------------
@@ -569,4 +576,32 @@ bool gsAreInitializationFunctionsLogged()
     return stat_areInitializationFunctionsLogged;
 }
 
+#ifdef GS_EXPORT_SERVER_TLS_VARIABLES
+__thread struct _glapi_table *_glapi_tls_Dispatch __attribute__((tls_model("initial-exec"))) = nullptr;
+#endif
+
+// ---------------------------------------------------------------------------
+// Name:        gsUpdateTLSVariableValues
+// Description: Updates the TLS variables from the real OpenGL druver
+// Author:      Uri Shomroni
+// Date:        5/7/2016
+// ---------------------------------------------------------------------------
+void gsUpdateTLSVariableValues()
+{
+#ifdef GS_EXPORT_SERVER_TLS_VARIABLES
+
+    // The system module must already be loaded, but make sure anyway:
+    osModuleHandle hSystemOpenGLModule = gsSystemsOpenGLModuleHandle();
+    GT_IF_WITH_ASSERT(nullptr != hSystemOpenGLModule)
+    {
+        // Get the TLS location by calling dlsym:
+        osProcedureAddress realTLSAsProcAddress = nullptr;
+        osGetProcedureAddress(hSystemOpenGLModule, "_glapi_tls_Dispatch", &realTLSAsProcAddress, false);
+
+        // Note that we do not check the return value as nullptr is a value that could appear:
+        _glapi_tls_Dispatch = (_glapi_tls_Dispatch*)realTLSAsProcAddress;
+    }
+
+#endif // GS_EXPORT_SERVER_TLS_VARIABLES
+}
 

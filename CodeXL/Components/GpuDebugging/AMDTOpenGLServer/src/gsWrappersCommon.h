@@ -33,6 +33,7 @@ osProcedureAddress gsGetSystemsOGLModuleProcAddress(const char* procname);
 const char* gsTextureCoordinateString(GLenum coord);
 void gsEnableInitializationFunctionsLogging(bool isLoggingEnabled);
 bool gsAreInitializationFunctionsLogged();
+void gsUpdateTLSVariableValues();
 
 
 #endif  // __GSWRAPPERSCOMMON
