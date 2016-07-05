@@ -402,9 +402,13 @@ void ProcessTracker::UpdateListOfInjectedProcesses()
     }
 
 #else
-    get_process_list("GLServer" GDT_PROJECT_SUFFIX ".so", localProcessInfoArray);
-    get_process_list("GLESServer" GDT_PROJECT_SUFFIX ".so", localProcessInfoArray);
-    get_process_list("VulkanServer" GDT_PROJECT_SUFFIX ".so", localProcessInfoArray);
+    #ifdef CODEXL_GRAPHICS
+        get_process_list("libCXLGraphicsServerVulkan" GDT_PROJECT_SUFFIX ".so", localProcessInfoArray);
+    #else
+        get_process_list("GLServer" GDT_PROJECT_SUFFIX ".so", localProcessInfoArray);
+        get_process_list("GLESServer" GDT_PROJECT_SUFFIX ".so", localProcessInfoArray);
+        get_process_list("VulkanServer" GDT_PROJECT_SUFFIX ".so", localProcessInfoArray);
+    #endif
 #endif
 
     for (ProcessInfoList::const_iterator iter = localProcessInfoArray.begin();
