@@ -78,6 +78,51 @@ GLAPI void APIENTRY glFramebufferTextureFace(GLenum target, GLenum attachment, G
 #define GL_UNPACK_RESAMPLE_SGIX_          0x842D
 #define GL_RESAMPLE_REPLICATE_SGIX_       0x842E
 #define GL_RESAMPLE_ZERO_FILL_SGIX_       0x842F
+
+// AMD Driver internal APIs:
+#ifndef GLAPIENTRY
+#define ADDED_GLAPIENTRY 1
+#define GLAPIENTRY APIENTRY
+#endif
+GLAPI unsigned int GLAPIENTRY _loader_get_dispatch_table_size(void);
+GLAPI int GLAPIENTRY _loader_get_proc_offset(const char* name);
+GLAPI int GLAPIENTRY _loader_add_dispatch(const char* const* names, const char* signature);
+GLAPI void GLAPIENTRY _loader_set_dispatch(const void* dispTable);
+typedef unsigned int(*_DRI2_GLAPI_GET_DISPATCH_TABLE_SIZE)(void);
+typedef int(*_DRI2_GLAPI_GET_PROC_OFFSET)(const char* name);
+typedef int(*_DRI2_GLAPI_ADD_DISPATCH)(const char* const* names, const char* signature);
+typedef void(*_DRI2_GLAPI_SET_DISPATCH)(const void* dispTable);
+#ifdef ADDED_GLAPIENTRY
+#undef GLAPIENTRY
+#undef ADDED_GLAPIENTRY
+#endif
+
+// MESA Driver internal APIs:
+// glapi.h
+
+// If we want to intercept / use it, the definition of the _glapi_table struct can be found in
+// the MESA glapitable.h header. See https://dri.freedesktop.org/doxygen/mesa/glapi/struct__glapi__table.html
+struct _glapi_table;
+typedef void(*_glapi_proc)(void); /* generic function pointer */
+typedef void(*_glapi_warning_func)(void *ctx, const char *str, ...);
+
+void _glapi_noop_enable_warnings(GLboolean enable);
+void _glapi_set_warning_func(_glapi_warning_func func);
+void _glapi_check_multithread(void);
+void _glapi_set_context(void *context); 
+void * _glapi_get_context(void);
+void _glapi_set_dispatch(struct _glapi_table *dispatch); 
+struct _glapi_table * _glapi_get_dispatch(void);
+int _glapi_begin_dispatch_override(struct _glapi_table *override); 
+void _glapi_end_dispatch_override(int layer);
+_glapi_table * _glapi_get_override_dispatch(int layer);
+GLuint _glapi_get_dispatch_table_size(void);
+void _glapi_check_table(const struct _glapi_table *table);
+int _glapi_add_dispatch(const char * const * function_names, const char * parameter_signature);
+GLint _glapi_get_proc_offset(const char *funcName);
+_glapi_proc _glapi_get_proc_address(const char *funcName);
+const char * _glapi_get_proc_name(GLuint offset);
+
 #ifdef __cplusplus
 }
 #endif
