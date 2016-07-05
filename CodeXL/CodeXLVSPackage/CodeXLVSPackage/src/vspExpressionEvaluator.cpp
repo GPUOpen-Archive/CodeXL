@@ -934,7 +934,7 @@ vspCDebugProperty* vspExpressionEvaluator::evaluateExpression(vspCDebugExpressio
             }
             else if (gaCanGetHostVariables())
             {
-                rcVal = gaGetThreadExpressionValue(threadId, frameIndex, exprCode, 1, variableValue);
+                rcVal = gaGetThreadExpressionValue(threadId, frameIndex, exprCode, 3, variableValue);
             }
         }
 
