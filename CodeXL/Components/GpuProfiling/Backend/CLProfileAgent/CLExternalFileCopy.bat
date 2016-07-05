@@ -28,4 +28,4 @@ IF EXIST %1\Bin%BUILDSUFFIX\%3\GPUPerfAPICounters%4%BUILDSUFFIX.dll COPY %1\Bin%
 
 :END
 
-: exit 0
+exit 0
