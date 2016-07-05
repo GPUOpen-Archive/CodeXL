@@ -171,7 +171,7 @@ ProfilerResultCode VktCmdBufProfilerStatic::EndCmdMeasurement()
 //-----------------------------------------------------------------------------
 void VktCmdBufProfilerStatic::NotifyCmdBufClosure()
 {
-    ProfilerResultCode result = PROFILER_FAIL;
+    ProfilerResultCode result = PROFILER_SUCCESS;
 
     MeasurementSlot& currSlot = m_slots[m_activeSlot - 1];
 
@@ -190,15 +190,17 @@ void VktCmdBufProfilerStatic::NotifyCmdBufClosure()
                     0,
                     sizeof(UINT64),
                     VK_QUERY_RESULT_WAIT_BIT | VK_QUERY_RESULT_64_BIT);
-
-                result = PROFILER_SUCCESS;
+            }
+            else
+            {
+                result = PROFILER_FAIL;
             }
         }
     }
 
     if (result == PROFILER_FAIL)
     {
-        Log(logERROR, "VktCmdBufProfilerStatic::NotifyCmdBufClosure(0 failed with PROFILER_FAIL\n");
+        Log(logERROR, "VktCmdBufProfilerStatic::NotifyCmdBufClosure() failed with PROFILER_FAIL\n");
     }
 
     currSlot.state = PROFILER_STATE_CMD_BUF_CLOSED;
