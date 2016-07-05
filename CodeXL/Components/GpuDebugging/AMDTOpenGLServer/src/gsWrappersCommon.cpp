@@ -578,6 +578,8 @@ bool gsAreInitializationFunctionsLogged()
 
 #ifdef GS_EXPORT_SERVER_TLS_VARIABLES
 __thread struct _glapi_table *_glapi_tls_Dispatch __attribute__((tls_model("initial-exec"))) = nullptr;
+__thread void * _glapi_tls_Context __attribute__((tls_model("initial-exec")));
+
 #endif
 
 // ---------------------------------------------------------------------------
@@ -595,11 +597,18 @@ void gsUpdateTLSVariableValues()
     GT_IF_WITH_ASSERT(nullptr != hSystemOpenGLModule)
     {
         // Get the TLS location by calling dlsym:
-        osProcedureAddress realTLSAsProcAddress = nullptr;
-        osGetProcedureAddress(hSystemOpenGLModule, "_glapi_tls_Dispatch", realTLSAsProcAddress, false);
+        osProcedureAddress realTLSDispatchAsProcAddress = nullptr;
+        osGetProcedureAddress(hSystemOpenGLModule, "_glapi_tls_Dispatch", realTLSDispatchAsProcAddress, false);
 
         // Note that we do not check the return value as nullptr is a value that could appear:
         _glapi_tls_Dispatch = (_glapi_table*)realTLSAsProcAddress;
+
+        // Get the TLS location by calling dlsym:
+        osProcedureAddress realTLSContextAsProcAddress = nullptr;
+        osGetProcedureAddress(hSystemOpenGLModule, "_glapi_tls_Context", realTLSContextAsProcAddress, false);
+
+        // Note that we do not check the return value as nullptr is a value that could appear:
+        _glapi_tls_Context = (void*)realTLSAsProcAddress;
     }
 
 #endif // GS_EXPORT_SERVER_TLS_VARIABLES
