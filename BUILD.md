@@ -70,6 +70,7 @@ CodeXL uses the SCons build system on Linux.
 * -j specify the number of concurrent jobs (-j6).
 * CXL\_build=[debug|release] - build type
 * CXL\_build\_verbose=1 - verbose output
+* CXL\_boost\_dir=[path to boost libraries] - override the bundled boost libraries with files in given path
 * When executing the backend\_build.sh script, the following switches are supported:
     * __debug__: performs a debug build
     * __skip-32bitbuild__: skips building the 32-bit binaries
