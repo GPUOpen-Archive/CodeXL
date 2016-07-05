@@ -1,0 +1,29 @@
+
+<cpu_events>
+
+<!--
+       AMD Family 15h Microarchitecture performance monitor events (internal)
+
+       Source: BIOS and Kernel Developer's Guide for the AMD Family 15h Models 70h-7Fh
+       Processors, Rev 3.00 - Jun 8, 2016
+       Copyright (c) 2016 Advanced Micro Devices, Inc.
+
+       Date: Jul 5, 2016
+
+
+       Event source to performance counter assignment table
+
+           Unit  PERF_CTL  Mask
+           ====  ========  ====
+            FP    [5:3]    0x38
+            LS    [5:0]    0x3F
+            DC    [5:0]    0x3F
+            CU    [2:0]    0x07
+            IC    [2:0]    0x07
+            EX    [5:0]    0x3F
+            DE    [2:0]    0x07
+            NB    [3:0]    0x0F
+-->
+
+
+</cpu_events>
