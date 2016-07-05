@@ -47,12 +47,13 @@ osCommunicationDebugManager::osCommunicationDebugManager()
 // ---------------------------------------------------------------------------
 osCommunicationDebugManager::~osCommunicationDebugManager()
 {
+    const int debugThreadSelfEndTimeout = 5000;
     m_isCommunicationDebugEnabled = false;
     GT_IF_WITH_ASSERT(m_pDebugThread != nullptr)
     {
         m_pDebugThread->requestExit();
         osTimeInterval timeout;
-        timeout.setAsMilliSeconds(5000);
+        timeout.setAsMilliSeconds(debugThreadSelfEndTimeout);
         m_pDebugThread->waitForThreadEnd(timeout);
         m_pDebugThread->terminate();
     }
