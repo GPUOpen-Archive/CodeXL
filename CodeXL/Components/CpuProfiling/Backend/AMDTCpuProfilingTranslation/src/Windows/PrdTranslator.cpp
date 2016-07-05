@@ -3653,8 +3653,11 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
 
     InitializeProgressBar(L"Writing translated profile data...", false);
 
+    bool hasCluData = (m_runInfo->m_isProfilingClu && (nullptr != m_pCluInfo));
+
     // Now write the profile meta data collected by the threads into db
-    if (m_dbWriter)
+    // For CLU profiling, write into DB only after processing CLU data.
+    if (m_dbWriter && !hasCluData)
     {
         WriteMetaProfileDataIntoDB(procList, modList, modInstanceList);
     }
@@ -3670,11 +3673,11 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
         PrintMemoryUsage(L"Memory Usage: After Aggregating CpuProfileProcess and CpuProfileModule maps.");
     }
 
-    bool hasCluData = (m_runInfo->m_isProfilingClu && (nullptr != m_pCluInfo));
     UpdateProgressBar((hasCluData ? 15ULL : 30ULL), 100ULL);
 
     PidProcessMap*  procMap = *(PidProcessList::iterator)procList.begin();
     NameModuleMap*  modMap = *(NameModuleList::iterator)modList.begin();
+    ModInstanceMap* modInstanceMap = *(ModInstanceList::iterator)modInstanceList.begin();
 
     if (hasCluData)
     {
@@ -3682,6 +3685,11 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
 
         // Aggregate and populate the CLU data
         AggregateCluData(procMap, modMap, proFile, (m_collectStat ? &globalStats : nullptr));
+
+        if (m_dbWriter)
+        {
+            WriteMetaProfileDataIntoDB(*procMap, *modMap, *modInstanceMap);
+        }
 
         UpdateProgressBar(30ULL, 100ULL);
     }
