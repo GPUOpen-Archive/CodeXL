@@ -190,6 +190,7 @@ public:
     osDebugLogTrace(const wchar_t* funcName, bool& retVal);
     osDebugLogTrace(const char* funcName);
     osDebugLogTrace(const char* funcName, bool& retVal);
+    osDebugLogTrace() = delete; // Remove the default constructor
 
     ~osDebugLogTrace();
 
