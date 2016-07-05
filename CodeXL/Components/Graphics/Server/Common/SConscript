@@ -27,11 +27,6 @@ env.Append(CPPPATH = [
 
 sources = \
 [
-
-    # Files needed for GPA
-    "../../../Common/Src/GPUPerfAPIUtils/GPUPerfAPILoader.cpp",
-    "../../../Common/Src/GPUPerfAPIUtils/GPUPerfAPIUtil.cpp",
-
     "BufferDelta.cpp",
     "Capture.cpp",
     "CaptureLayer.cpp",
