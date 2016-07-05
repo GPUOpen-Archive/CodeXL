@@ -1256,7 +1256,7 @@ bool GetAvailableSmuList(SmuList* pList)
                                             || (GDT_SPECTRE_LITE == pDevInfo->m_hardwareType))
                                         {
                                             apuSmuFeature = IsSMUFeatureEnabled();
-
+                                            PwrTrace("BAPM Status %s", apuSmuFeature ? "ON" : "Fail");
                                             if (false == apuSmuFeature)
                                             {
                                                 apuSmuFeature = PwrEnableSmu(true);
@@ -1304,11 +1304,6 @@ bool GetAvailableSmuList(SmuList* pList)
                                          pDevInfo->m_shortName,
                                          pDevInfo->m_smuIpVersion,
                                          smuAccess);
-                            }
-                            else
-                            {
-                                PwrTrace("SMU not supported for device Id B%dD%df%d: 0x%x ",
-                                         busCnt, devCnt, funcCnt, deviceId);
                             }
                         }
                     }
@@ -1499,7 +1494,9 @@ AMDTResult PwrGetSupportedCounters(CounterMap** pList)
             {
                 if ((AMDT_STATUS_OK == ret) && (true == sysInfo.m_isPlatformSupported))
                 {
-                    if ((true == sysInfo.m_isAmdApu) && (nullptr != sysInfo.m_pNodeInfo))
+                    if ((true == sysInfo.m_isAmdApu)
+                        && (nullptr != sysInfo.m_pNodeInfo)
+                        &&(1 == sysInfo.m_smuTable.m_info[0].m_isAccessible))
                     {
                         if (SMU_IPVERSION_7_0 == sysInfo.m_pNodeInfo->m_smuIpVersion)
 
