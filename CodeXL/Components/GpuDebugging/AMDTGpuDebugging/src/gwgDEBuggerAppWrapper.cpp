@@ -60,8 +60,6 @@ gwImagesAndBuffersMDIViewCreator* gwgDEBuggerAppWrapper::m_pImageBuffersMDIViewC
 gwEventObserver* gwgDEBuggerAppWrapper::m_pApplicationEventObserver = NULL;
 gwStatisticsActionsExecutor* gwgDEBuggerAppWrapper::m_pStatisticsActionsExecutor = NULL;
 gwKernelWorkItemToolbar* gwgDEBuggerAppWrapper::m_pKernelWorkItemToolbar = NULL;
-gdProjectSettingsExtension* gwgDEBuggerAppWrapper::m_pProjectSettingsExtension = NULL;
-gdGlobalDebugSettingsPage* gwgDEBuggerAppWrapper::m_spGlobalDebugSettingsPage = NULL;
 gdExecutionMode* gwgDEBuggerAppWrapper::m_pExecutionMode = NULL;
 bool gwgDEBuggerAppWrapper::s_loadEnabled = false;
 
@@ -124,15 +122,16 @@ gwgDEBuggerAppWrapper::~gwgDEBuggerAppWrapper()
     delete m_pImageBuffersMDIViewCreator;
     delete m_pStatisticsActionsExecutor;
 
+    // Setting pages are parented and destoryed by their respective Qt dialogs:
     // Destroy the project settings object:
     // US, 4/7/16 - afProjectManager does not currently allow unregistering setting extensions.
     // afProjectManager::instance().unregisterProjectSettingsExtension(m_pProjectSettingsExtension);
-    delete m_pProjectSettingsExtension;
+    // delete m_pProjectSettingsExtension;
 
     // Destroy the global settings page:
     // US, 4/7/16 - afGlobalVariablesManager does not currently allow unregistering global setting pages.
     // afGlobalVariablesManager::instance().unregisterGlobalSettingsPage(m_spGlobalDebugSettingsPage);
-    delete m_spGlobalDebugSettingsPage;
+    // delete m_spGlobalDebugSettingsPage;
 }
 
 // ---------------------------------------------------------------------------
@@ -216,14 +215,14 @@ void gwgDEBuggerAppWrapper::initialize()
     afQtCreatorsManager::instance().registerActionExecutor(m_pStatisticsActionsExecutor);
 
     // Create and register the project settings object:
-    m_pProjectSettingsExtension = new gdProjectSettingsExtension;
+    gdProjectSettingsExtension* pProjectSettingsExtension = new gdProjectSettingsExtension;
 
-    afProjectManager::instance().registerProjectSettingsExtension(m_pProjectSettingsExtension);
+    afProjectManager::instance().registerProjectSettingsExtension(pProjectSettingsExtension);
 
     // Create and register the global settings page:
-    m_spGlobalDebugSettingsPage = new gdGlobalDebugSettingsPage;
+    gdGlobalDebugSettingsPage* pGlobalDebugSettingsPage = new gdGlobalDebugSettingsPage;
 
-    afGlobalVariablesManager::instance().registerGlobalSettingsPage(m_spGlobalDebugSettingsPage);
+    afGlobalVariablesManager::instance().registerGlobalSettingsPage(pGlobalDebugSettingsPage);
 
     // Initialize the properties events handler:
     gdPropertiesEventObserver::instance();
