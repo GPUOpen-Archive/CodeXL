@@ -11,6 +11,9 @@
 #ifndef __VSPEXPRESSIONEVALUATOR_H
 #define __VSPEXPRESSIONEVALUATOR_H
 
+// Forward declarations:
+struct apExpression;
+
 // Infra:
 #include <AMDTBaseTools/Include/gtString.h>
 #include <AMDTBaseTools/Include/gtVector.h>
@@ -72,7 +75,8 @@ private:
 class vspCDebugProperty : public IDebugProperty2, vspCUnknown
 {
 public:
-    vspCDebugProperty(const gtString& nameAsString, const gtString& valueAsString, const gtString& valueAsHexString, const gtString& typeAsString);
+    vspCDebugProperty(const apExpression& expressionValue);
+    // vspCDebugProperty(const gtString& nameAsString, const gtString& valueAsString, const gtString& valueAsHexString, const gtString& typeAsString);
     virtual ~vspCDebugProperty();
 
     ////////////////////////////////////////////////////////////
@@ -95,12 +99,11 @@ public:
     STDMETHOD(GetReference)(IDebugReference2** ppReference);
     STDMETHOD(GetExtendedInfo)(REFGUID guidExtendedInfo, VARIANT* pExtendedInfo);
 
-    void addChild(vspCDebugProperty* pChild);
-    void setName(const gtString& newName);
-
 private:
     // Do not allow use of my default constructor:
-    vspCDebugProperty();
+    vspCDebugProperty() = delete;
+
+    void addChild(vspCDebugProperty* pChild);
 
 private:
     gtVector<vspCDebugProperty*> _children;

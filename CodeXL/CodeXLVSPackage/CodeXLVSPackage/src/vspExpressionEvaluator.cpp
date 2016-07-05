@@ -271,19 +271,31 @@ bool vspCDebugExpression::canEvaluate(gtString& errorText, int& errorCharIndex)
 // Author:      Uri Shomroni
 // Date:        10/11/2010
 // ---------------------------------------------------------------------------
-vspCDebugProperty::vspCDebugProperty(const gtString& nameAsString, const gtString& valueAsString, const gtString& valueAsHexString, const gtString& typeAsString) : _hexValueString(valueAsHexString)
+vspCDebugProperty::vspCDebugProperty(const apExpression& expressionValue) : _hexValueString(expressionValue.m_valueHex)
 {
     // Build the info:
     ::memset(&_propertyInfo, 0, sizeof(DEBUG_PROPERTY_INFO));
-    const wchar_t* nameAsCharArray = nameAsString.asCharArray();
+    const wchar_t* nameAsCharArray = expressionValue.m_name.asCharArray();
     _propertyInfo.dwFields = DEBUGPROP_INFO_FULLNAME | DEBUGPROP_INFO_NAME | DEBUGPROP_INFO_TYPE | DEBUGPROP_INFO_VALUE | DEBUGPROP_INFO_PROP | DEBUGPROP_INFO_ATTRIB;
     _propertyInfo.bstrFullName = SysAllocString(nameAsCharArray);
     _propertyInfo.bstrName = SysAllocString(nameAsCharArray);
-    _propertyInfo.bstrType = SysAllocString(typeAsString.asCharArray());
-    _propertyInfo.bstrValue = SysAllocString(valueAsString.asCharArray());
+    _propertyInfo.bstrType = SysAllocString(expressionValue.m_type.asCharArray());
+    _propertyInfo.bstrValue = SysAllocString(expressionValue.m_value.asCharArray());
     _propertyInfo.pProperty = this;
     // TO_DO: fill with real attributes:
     _propertyInfo.dwAttrib = DBG_ATTRIB_VALUE_READONLY | DBG_ATTRIB_VALUE_RAW_STRING | DBG_ATTRIB_ACCESS_PUBLIC | DBG_ATTRIB_STORAGE_REGISTER | DBG_ATTRIB_TYPE_NONE | DBG_ATTRIB_CHILD_ALL;
+
+    // Fill the children:
+    const gtVector<apExpression*>& exprChildren = expressionValue.children();
+    _children.reserve(exprChildren.size());
+    for (const apExpression* pChildExpr : exprChildren)
+    {
+        GT_IF_WITH_ASSERT(nullptr != pChildExpr)
+        {
+            vspCDebugProperty* pChild = new(std::nothrow) vspCDebugProperty(*pChildExpr);
+            addChild(pChild);
+        }
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -532,29 +544,6 @@ void vspCDebugProperty::addChild(vspCDebugProperty* pChild)
         {
             _propertyInfo.dwAttrib |= DBG_ATTRIB_OBJ_IS_EXPANDABLE;
         }
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Name:        vspCDebugProperty::setName
-// Description: Changes the property's name fields
-// Author:      Uri Shomroni
-// Date:        23/5/2011
-// ---------------------------------------------------------------------------
-void vspCDebugProperty::setName(const gtString& newName)
-{
-    // Set the name field if it is relevant:
-    if ((_propertyInfo.dwFields & DEBUGPROP_INFO_NAME) != 0)
-    {
-        SysFreeString(_propertyInfo.bstrName);
-        _propertyInfo.bstrName = SysAllocString(newName.asCharArray());
-    }
-
-    // Set the full name field if it is relevant:
-    if ((_propertyInfo.dwFields & DEBUGPROP_INFO_FULLNAME) != 0)
-    {
-        SysFreeString(_propertyInfo.bstrFullName);
-        _propertyInfo.bstrFullName = SysAllocString(newName.asCharArray());
     }
 }
 
@@ -903,6 +892,8 @@ bool vspExpressionEvaluator::canEvaluate(const vspCDebugExpression& expression, 
 // ---------------------------------------------------------------------------
 vspCDebugProperty* vspExpressionEvaluator::evaluateExpression(vspCDebugExpression* pExpression, EVALFLAGS dwFlags, bool sendEvent)
 {
+    GT_UNREFERENCED_PARAMETER(dwFlags);
+
     vspCDebugProperty* retVal = NULL;
 
     // Check we have an expression. If we are required to send an event but cannot, don't even try evaluating:
@@ -930,7 +921,7 @@ vspCDebugProperty* vspExpressionEvaluator::evaluateExpression(vspCDebugExpressio
                 gaGetKernelDebuggingCurrentWorkItemCoordinate(2, currentWorkItemCoordinate[2]);
 
                 // TO_DO: handle children more effectively:
-                rcVal = gaGetKernelDebuggingExpressionValue(exprCode, currentWorkItemCoordinate, 1, variableValue);
+                rcVal = gaGetKernelDebuggingExpressionValue(exprCode, currentWorkItemCoordinate, 3, variableValue);
             }
             else if (gaCanGetHostVariables())
             {
@@ -941,47 +932,11 @@ vspCDebugProperty* vspExpressionEvaluator::evaluateExpression(vspCDebugExpressio
         // If we succeeded:
         if (rcVal)
         {
+            // Make sure to copy the expression name:
+            variableValue.m_name = exprCode;
+
             // Create the property:
-            retVal = new vspCDebugProperty(exprCode, variableValue.m_value, variableValue.m_valueHex, variableValue.m_type);
-
-            // If this is a real variable:
-            if (!isPseudoVariable)
-            {
-                const gtVector<apExpression*>& children = variableValue.children();
-
-                // Add all the children:
-                for (const apExpression* pChild : children)
-                {
-                    // Sanity check:
-                    GT_IF_WITH_ASSERT(nullptr != pChild)
-                    {
-                        // Sanity check:
-                        const gtString& currentMemberName = pChild->m_name;
-                        GT_IF_WITH_ASSERT(!currentMemberName.isEmpty())
-                        {
-                            // Get the full name for evaluation:
-                            gtString currentMemberFullName = exprCode;
-                            currentMemberFullName.append('.').append(currentMemberName);
-
-                            // Evaluate the child expression:
-                            vspCDebugExpression* pMemberAsExpression = new vspCDebugExpression(currentMemberFullName, isKernelDebuggingExpression, threadId, frameIndex, false);
-                            vspCDebugProperty* pMemberAsProperty = evaluateExpression(pMemberAsExpression, dwFlags, false);
-                            pMemberAsExpression->Release();
-                            GT_IF_WITH_ASSERT(pMemberAsProperty != NULL)
-                            {
-                                // Set the member's name to be just the partial name:
-                                pMemberAsProperty->setName(currentMemberName);
-
-                                // Add it as a child:
-                                retVal->addChild(pMemberAsProperty);
-
-                                // Release the extra reference count:
-                                pMemberAsProperty->Release();
-                            }
-                        }
-                    }
-                }
-            }
+            retVal = new vspCDebugProperty(variableValue);
         }
 
         // If we succeeded and we were asked to, send an event:
