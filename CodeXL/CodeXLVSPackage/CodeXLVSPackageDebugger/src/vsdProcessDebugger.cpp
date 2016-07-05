@@ -3472,7 +3472,14 @@ bool vsdProcessDebugger::vsdCDebugThread::listLocalsForStackFrame(int callStackF
                         IEnumDebugPropertyInfo2* piProperties = nullptr;
                         // Uri, 10/1/16 - DEBUGPROP_INFO_FULLNAME gives the fully qualified name and not the contextual name.
                         // Use 10 as the radix, since we only want a list of variables at this point.
-                        hr = currentFrameInfo.m_pFrame->EnumProperties(DEBUGPROP_INFO_NAME, 10, guidFilterLocalsPlusArgs, VSD_EXPRESSION_EVAL_TIMEOUT_MS, &localsCount, &piProperties);
+                        DEBUGPROP_INFO_FLAGS infoFlgs = onlyNames ? DEBUGPROP_INFO_NAME : (DEBUGPROP_INFO_NAME | DEBUGPROP_INFO_VALUE | DEBUGPROP_INFO_TYPE | DEBUGPROP_INFO_PROP);
+                        bool getChildren = (0 < evaluationDepth);
+                        if (getChildren)
+                        {
+                            infoFlgs |= DEBUGPROP_INFO_PROP;
+                        }
+
+                        hr = currentFrameInfo.m_pFrame->EnumProperties(infoFlgs, 10, guidFilterLocalsPlusArgs, VSD_EXPRESSION_EVAL_TIMEOUT_MS, &localsCount, &piProperties);
                         GT_IF_WITH_ASSERT(SUCCEEDED(hr) && (nullptr != piProperties))
                         {
                             // Get the variables:
@@ -3483,6 +3490,9 @@ bool vsdProcessDebugger::vsdCDebugThread::listLocalsForStackFrame(int callStackF
                             DEBUG_PROPERTY_INFO currentProp = { 0 };
                             hr = piProperties->Next(1, &currentProp, &gotProp);
                             gtString currentLocal;
+                            gtString currentVal;
+                            gtString currentValHex;
+                            gtString currentType;
 
                             while (SUCCEEDED(hr) && (S_FALSE != hr) && (0 < gotProp))
                             {
@@ -3491,22 +3501,73 @@ bool vsdProcessDebugger::vsdCDebugThread::listLocalsForStackFrame(int callStackF
                                 SysFreeString(currentProp.bstrName);
                                 currentProp.bstrName = nullptr;
 
+                                // Get the value:
+                                if (nullptr != currentProp.bstrValue)
+                                {
+                                    currentVal = currentProp.bstrValue;
+                                    SysFreeString(currentProp.bstrValue);
+                                    currentProp.bstrValue = nullptr;
+                                }
+                                else
+                                {
+                                    currentVal.makeEmpty();
+                                }
+
+                                // Get the type:
+                                if (nullptr != currentProp.bstrType)
+                                {
+                                    currentType = currentProp.bstrType;
+                                    SysFreeString(currentProp.bstrType);
+                                    currentProp.bstrType = nullptr;
+                                }
+                                else
+                                {
+                                    currentType.makeEmpty();
+                                }
+
                                 // Add it:
                                 if (!currentLocal.isEmpty())
                                 {
                                     apExpression exp;
                                     exp.m_name = currentLocal;
-                                    o_locals.push_back(exp);
 
                                     if (!onlyNames)
                                     {
-                                        // TO_DO: get values and types
+                                        // Get the fields already present
+                                        exp.m_value = currentVal;
+
+                                        GT_IF_WITH_ASSERT(nullptr != currentProp.pProperty)
+                                        {
+                                            // Get the hex value:
+                                            DEBUG_PROPERTY_INFO propHex = { 0 };
+                                            hr = currentProp.pProperty->GetPropertyInfo(DEBUGPROP_INFO_VALUE, 16, VSD_EXPRESSION_EVAL_TIMEOUT_MS, nullptr, 0, &propHex);
+                                            GT_IF_WITH_ASSERT(SUCCEEDED(hr))
+                                            {
+                                                exp.m_valueHex = propHex.bstrValue;
+                                                SysFreeString(propHex.bstrValue);
+                                                propHex.bstrValue = nullptr;
+                                            }
+                                        }
                                     }
 
-                                    // TO_DO: handle children down to evaluationDepth levels
-                                    GT_UNREFERENCED_PARAMETER(evaluationDepth);
+                                    if (getChildren)
+                                    {
+                                        GT_IF_WITH_ASSERT(nullptr != currentProp.pProperty)
+                                        {
+                                            addChildrenToExpression(exp, currentProp.pProperty, evaluationDepth, onlyNames);
+                                        }
+                                    }
+
+                                    o_locals.push_back(exp);
 
                                     ++addedVars;
+                                }
+
+                                // If we have an interface, release it:
+                                if (nullptr != currentProp.pProperty)
+                                {
+                                    currentProp.pProperty->Release();
+                                    currentProp.pProperty = nullptr;
                                 }
 
                                 // Get the next:
@@ -3584,68 +3645,76 @@ bool vsdProcessDebugger::vsdCDebugThread::evaluateVariableInStackFrame(int callS
                             PARSEFLAGS parsFlg = PARSE_EXPRESSION;
                             EVALFLAGS evalFlg = EVAL_NOEVENTS;
                             DEBUG_PROPERTY_INFO propInfo = { 0 };
-                            DWORD radices[2] = { 10, 16 };
 
-                            for (DWORD rdx : radices)
+                            IDebugExpression2* piExpr = nullptr;
+                            BSTR errorText = nullptr;
+                            UINT errorIndex = S_OK;
+                            hr = piExprContext->ParseText(varNameWCStr, parsFlg, 10, &piExpr, &errorText, &errorIndex);
+
+                            if (SUCCEEDED(hr) && (nullptr != piExpr))
                             {
-                                // Parse:
-                                gtString& varValue = (10 == rdx) ? o_exp.m_value : o_exp.m_valueHex;
-                                IDebugExpression2* piExpr = nullptr;
-                                BSTR errorText = nullptr;
-                                UINT errorIndex = S_OK;
-                                hr = piExprContext->ParseText(varNameWCStr, parsFlg, rdx, &piExpr, &errorText, &errorIndex);
+                                // Evaluate:
+                                IDebugProperty2* piProp = nullptr;
+                                hr = piExpr->EvaluateSync(evalFlg, VSD_EXPRESSION_EVAL_TIMEOUT_MS, nullptr, &piProp);
 
-                                if (SUCCEEDED(hr) && (nullptr != piExpr))
+                                if (SUCCEEDED(hr) && (nullptr != piProp))
                                 {
-                                    // Evaluate:
-                                    IDebugProperty2* piProp = nullptr;
-                                    hr = piExpr->EvaluateSync(evalFlg, VSD_EXPRESSION_EVAL_TIMEOUT_MS, nullptr, &piProp);
-
-                                    if (SUCCEEDED(hr) && (nullptr != piProp))
+                                    // Get the value:
+                                    hr = piProp->GetPropertyInfo(DEBUGPROP_INFO_VALUE | DEBUGPROP_INFO_TYPE, 10, VSD_EXPRESSION_EVAL_TIMEOUT_MS, nullptr, 0, &propInfo);
+                                    GT_IF_WITH_ASSERT(SUCCEEDED(hr))
                                     {
-                                        // Get the value:
-                                        hr = piProp->GetPropertyInfo(DEBUGPROP_INFO_VALUE | DEBUGPROP_INFO_TYPE, rdx, VSD_EXPRESSION_EVAL_TIMEOUT_MS, nullptr, 0, &propInfo);
-                                        GT_IF_WITH_ASSERT(SUCCEEDED(hr))
+                                        o_exp.m_value = propInfo.bstrValue;
+                                        SysFreeString(propInfo.bstrValue);
+                                        propInfo.bstrValue = nullptr;
+
+                                        if (o_exp.m_type.isEmpty())
                                         {
-                                            varValue = propInfo.bstrValue;
-                                            SysFreeString(propInfo.bstrValue);
-                                            propInfo.bstrValue = nullptr;
-
-                                            if (o_exp.m_type.isEmpty())
-                                            {
-                                                o_exp.m_type = propInfo.bstrType;
-                                            }
-
-                                            SysFreeString(propInfo.bstrType);
-                                            propInfo.bstrType = nullptr;
-                                            retVal = true;
+                                            o_exp.m_type = propInfo.bstrType;
                                         }
 
-                                        // Release the property:
-                                        piProp->Release();
-                                        piProp = nullptr;
+                                        SysFreeString(propInfo.bstrType);
+                                        propInfo.bstrType = nullptr;
+                                        retVal = true;
                                     }
 
-                                    // Release the expression:
-                                    piExpr->Release();
-                                    piExpr = nullptr;
+                                    if (evalHex)
+                                    {
+                                        // Get the hex value:
+                                        DEBUG_PROPERTY_INFO propHex = { 0 };
+                                        hr = piProp->GetPropertyInfo(DEBUGPROP_INFO_VALUE, 16, VSD_EXPRESSION_EVAL_TIMEOUT_MS, nullptr, 0, &propHex);
+                                        GT_IF_WITH_ASSERT(SUCCEEDED(hr))
+                                        {
+                                            o_exp.m_valueHex = propHex.bstrValue;
+                                            SysFreeString(propHex.bstrValue);
+                                            propHex.bstrValue = nullptr;
+                                        }
+                                    }
+
+                                    if (0 < evaluationDepth)
+                                    {
+                                        addChildrenToExpression(o_exp, piProp, evaluationDepth, false);
+                                    }
+
+                                    // Release the property:
+                                    piProp->Release();
+                                    piProp = nullptr;
                                 }
-                                else if (nullptr != errorText)
-                                {
-                                    varValue = errorText;
-                                    retVal = true;
 
-                                    // TO_DO: add logging.
-                                }
+                                // Release the expression:
+                                piExpr->Release();
+                                piExpr = nullptr;
+                            }
+                            else if (nullptr != errorText)
+                            {
+                                o_exp.m_value = errorText;
+                                o_exp.m_valueHex = errorText;
+                                retVal = true;
 
-                                SysFreeString(errorText);
-                                errorText = nullptr;
-
-                                if (!evalHex) { break; }
+                                // TO_DO: add logging.
                             }
 
-                            // TO_DO: handle children down to evaluationDepth levels
-                            GT_UNREFERENCED_PARAMETER(evaluationDepth);
+                            SysFreeString(errorText);
+                            errorText = nullptr;
 
                             // Release the context:
                             piExprContext->Release();
@@ -3874,6 +3943,116 @@ bool vsdProcessDebugger::vsdCDebugThread::resumeThreadForExecution(bool& waiting
 
     return retVal;
 }
+
+// ---------------------------------------------------------------------------
+// Name:        vsdProcessDebugger::vsdCDebugThread::addChildrenToExpression
+// Description: Helper function used in expression evaluation
+// Author:      Uri Shomroni
+// Date:        5/7/2016
+// ---------------------------------------------------------------------------
+void vsdProcessDebugger::vsdCDebugThread::addChildrenToExpression(apExpression& parentExpr, IDebugProperty2* piProp, int evaluationDepth, bool onlyNames)
+{
+    if (0 < evaluationDepth)
+    {
+        // Get the property's children:
+        IEnumDebugPropertyInfo2* piProperties = nullptr;
+        // Uri, 10/1/16 - DEBUGPROP_INFO_FULLNAME gives the fully qualified name and not the contextual name.
+        // Use 10 as the radix, since we only want a list of variables at this point.
+        DEBUGPROP_INFO_FLAGS infoFlgs = onlyNames ? DEBUGPROP_INFO_NAME | DEBUGPROP_INFO_PROP : (DEBUGPROP_INFO_NAME | DEBUGPROP_INFO_VALUE | DEBUGPROP_INFO_TYPE | DEBUGPROP_INFO_PROP);
+
+        HRESULT hr = piProp->EnumChildren(infoFlgs, 10, guidFilterLocalsPlusArgs, DBG_ATTRIB_NONE, nullptr, VSD_EXPRESSION_EVAL_TIMEOUT_MS, &piProperties);
+        GT_IF_WITH_ASSERT(SUCCEEDED(hr))
+        {
+            // If there are no childre, S_FALSE is returned:
+            GT_ASSERT((S_FALSE == hr) || (nullptr != piProperties));
+
+            if (nullptr != piProperties)
+            {
+            ULONG gotProp = 0;
+            DEBUG_PROPERTY_INFO currentProp = { 0 };
+            hr = piProperties->Next(1, &currentProp, &gotProp);
+            gtString currentChild;
+            gtString currentVal;
+            gtString currentValHex;
+            gtString currentType;
+
+            while (SUCCEEDED(hr) && (S_FALSE != hr) && (0 < gotProp))
+            {
+                // Get the name:
+                currentChild = currentProp.bstrName;
+                SysFreeString(currentProp.bstrName);
+                currentProp.bstrName = nullptr;
+
+                // Get the value:
+                if (nullptr != currentProp.bstrValue)
+                {
+                    currentVal = currentProp.bstrValue;
+                    SysFreeString(currentProp.bstrValue);
+                    currentProp.bstrValue = nullptr;
+                }
+                else
+                {
+                    currentVal.makeEmpty();
+                }
+
+                // Get the type:
+                if (nullptr != currentProp.bstrType)
+                {
+                    currentType = currentProp.bstrType;
+                    SysFreeString(currentProp.bstrType);
+                    currentProp.bstrType = nullptr;
+                }
+                else
+                {
+                    currentType.makeEmpty();
+                }
+
+                // Add it:
+                if (!currentChild.isEmpty())
+                {
+                    apExpression& exp = *(parentExpr.addChild());
+                    exp.m_name = currentChild;
+
+                    GT_IF_WITH_ASSERT(nullptr != currentProp.pProperty)
+                    {
+                        if (!onlyNames)
+                        {
+                            // Get the fields already present
+                            exp.m_value = currentVal;
+
+                            // Get the hex value:
+                            DEBUG_PROPERTY_INFO propHex = { 0 };
+                            hr = currentProp.pProperty->GetPropertyInfo(DEBUGPROP_INFO_VALUE, 16, VSD_EXPRESSION_EVAL_TIMEOUT_MS, nullptr, 0, &propHex);
+                            GT_IF_WITH_ASSERT(SUCCEEDED(hr))
+                            {
+                                exp.m_valueHex = propHex.bstrValue;
+                                SysFreeString(propHex.bstrValue);
+                                propHex.bstrValue = nullptr;
+                            }
+                        }
+
+                        addChildrenToExpression(exp, currentProp.pProperty, evaluationDepth - 1, onlyNames);
+                    }
+                }
+
+                // If we have an interface, release it:
+                if (nullptr != currentProp.pProperty)
+                {
+                    currentProp.pProperty->Release();
+                    currentProp.pProperty = nullptr;
+                }
+
+                // Get the next:
+                hr = piProperties->Next(1, &currentProp, &gotProp);
+            }
+
+            // Release the properties enumerator interface:
+            piProperties->Release();
+            }
+        }
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Name:        vsdProcessDebugger::vsdCDebugThread::detectThreadEntryPoint
 // Description: Sets the value of m_threadStartAddress and m_isDriverThread members
