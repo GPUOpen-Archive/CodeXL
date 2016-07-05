@@ -170,13 +170,30 @@ void gsConnectDriverInternalFunctionPointers(osModuleHandle hSystemOpenGLModule)
     callOnce = false;
 
     // These number and array must be updated every time gsDriverInternalFunctionPointers is changed:
-#define GS_NUMBER_OF_INTERNAL_FUNCTIONS 4
+#define GS_NUMBER_OF_INTERNAL_FUNCTIONS 20
     const char* driverInternalFunctionNames[GS_NUMBER_OF_INTERNAL_FUNCTIONS] = {
         // The order in this array must be exactly like the entry point order in gsDriverInternalFunctionPointers:
         "loader_get_dispatch_table_size",
         "_loader_get_proc_offset",
         "_loader_add_dispatch",
         "_loader_set_dispatch",
+
+        "_glapi_noop_enable_warnings",
+        "_glapi_set_warning_func",
+        "_glapi_check_multithread",
+        "_glapi_set_context",
+        "_glapi_get_context",
+        "_glapi_set_dispatch",
+        "_glapi_get_dispatch",
+        "_glapi_begin_dispatch_override",
+        "_glapi_end_dispatch_override",
+        "_glapi_get_override_dispatch",
+        "_glapi_get_dispatch_table_size",
+        "_glapi_check_table",
+        "_glapi_add_dispatch",
+        "_glapi_get_proc_offset",
+        "_glapi_get_proc_address",
+        "_glapi_get_proc_name",
     };
 
     // Initialize the structure:

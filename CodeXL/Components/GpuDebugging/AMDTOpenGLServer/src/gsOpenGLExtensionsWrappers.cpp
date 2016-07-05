@@ -28947,3 +28947,146 @@ void APIENTRY _loader_set_dispatch(const void* dispTable)
     GS_CALL_DRIVER_INTERNAL_FUNCTION(_loader_set_dispatch, (dispTable));
 }
 
+//////////////////////////////////////////////////////////////////////////
+// MESA Driver-internal functions
+//////////////////////////////////////////////////////////////////////////
+void _glapi_noop_enable_warnings(GLboolean enable)
+{
+    gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
+
+    GS_CALL_DRIVER_INTERNAL_FUNCTION(_glapi_noop_enable_warnings, (enable));
+}
+
+void _glapi_set_warning_func(_glapi_warning_func func)
+{
+    gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
+
+    GS_CALL_DRIVER_INTERNAL_FUNCTION(_glapi_set_warning_func, (func));
+}
+
+void _glapi_check_multithread(void)
+{
+    gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
+
+    GS_CALL_DRIVER_INTERNAL_FUNCTION(_glapi_check_multithread, ());
+}
+
+void _glapi_set_context(void* context)
+{
+    gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
+
+    GS_CALL_DRIVER_INTERNAL_FUNCTION(_glapi_set_context, (context));
+}
+
+void* _glapi_get_context(void)
+{
+    gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
+
+    void* retVal = nullptr;
+    GS_CALL_DRIVER_INTERNAL_FUNCTION_RETVAL(_glapi_get_context, (), retVal);
+
+    return retVal;
+}
+
+void _glapi_set_dispatch(_glapi_table* dispatch)
+{
+    gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
+
+    GS_CALL_DRIVER_INTERNAL_FUNCTION(_glapi_set_dispatch, (dispatch));
+}
+
+_glapi_table* _glapi_get_dispatch(void)
+{
+    gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
+
+    _glapi_table* retVal = nullptr;
+    GS_CALL_DRIVER_INTERNAL_FUNCTION_RETVAL(_glapi_get_dispatch, (), retVal);
+
+    return retVal;
+}
+
+int _glapi_begin_dispatch_override(_glapi_table* override)
+{
+    gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
+
+    int retVal = -1;
+    GS_CALL_DRIVER_INTERNAL_FUNCTION_RETVAL(_glapi_begin_dispatch_override, (override), retVal);
+
+    return retVal;
+}
+
+void _glapi_end_dispatch_override(int layer)
+{
+    gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
+
+    GS_CALL_DRIVER_INTERNAL_FUNCTION(_glapi_end_dispatch_override, (layer));
+}
+
+_glapi_table* _glapi_get_override_dispatch(int layer)
+{
+    gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
+
+    _glapi_table* retVal = nullptr;
+    GS_CALL_DRIVER_INTERNAL_FUNCTION_RETVAL(_glapi_get_override_dispatch, (layer), retVal);
+
+    return retVal;
+}
+
+GLuint _glapi_get_dispatch_table_size(void)
+{
+    gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
+
+    GLuint retVal = 0;
+    GS_CALL_DRIVER_INTERNAL_FUNCTION_RETVAL(_glapi_get_dispatch_table_size, (), retVal);
+
+    return retVal;
+}
+
+void _glapi_check_table(const _glapi_table* table)
+{
+    gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
+
+    GS_CALL_DRIVER_INTERNAL_FUNCTION(_glapi_check_table, (table));
+}
+
+int _glapi_add_dispatch(const char* const* function_names, const char* parameter_signature)
+{
+    gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
+
+    int retVal = -1;
+    GS_CALL_DRIVER_INTERNAL_FUNCTION_RETVAL(_glapi_add_dispatch, (function_names, parameter_signature), retVal);
+
+    return retVal;
+}
+
+GLint _glapi_get_proc_offset(const char* funcName)
+{
+    gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
+
+    GLint retVal = 0;
+    GS_CALL_DRIVER_INTERNAL_FUNCTION_RETVAL(_glapi_get_proc_offset, (funcName), retVal);
+
+    return retVal;
+}
+
+_glapi_proc _glapi_get_proc_address(const char* funcName)
+{
+    gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
+
+    _glapi_proc retVal = nullptr;
+    GS_CALL_DRIVER_INTERNAL_FUNCTION_RETVAL(_glapi_get_proc_address, (funcName), retVal);
+
+    return retVal;
+}
+
+const char* _glapi_get_proc_name(GLuint offset)
+{
+    gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
+
+    const char* retVal = nullptr;
+    GS_CALL_DRIVER_INTERNAL_FUNCTION_RETVAL(_glapi_get_proc_name, (offset), retVal);
+
+    return retVal;
+}
+
+

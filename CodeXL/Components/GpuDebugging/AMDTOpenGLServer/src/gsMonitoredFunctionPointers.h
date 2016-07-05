@@ -2827,6 +2827,23 @@ struct gsDriverInternalFunctionPointers
     int (APIENTRY* _loader_get_proc_offset)(const char* name);
     int (APIENTRY* _loader_add_dispatch)(const char* const* names, const char* signature);
     void (APIENTRY* _loader_set_dispatch)(const void* dispTable);
+
+    void (*_glapi_noop_enable_warnings)(GLboolean enable);
+    void (*_glapi_set_warning_func)(_glapi_warning_func func);
+    void (*_glapi_check_multithread)(void);
+    void (*_glapi_set_context)(void* context);
+    void* (*_glapi_get_context)(void);
+    void (*_glapi_set_dispatch)(_glapi_table* dispatch);
+    _glapi_table* (*_glapi_get_dispatch)(void);
+    int (*_glapi_begin_dispatch_override)(struct _glapi_table* override);
+    void (*_glapi_end_dispatch_override)(int layer);
+    _glapi_table* (*_glapi_get_override_dispatch)(int layer);
+    GLuint (*_glapi_get_dispatch_table_size)(void);
+    void (*_glapi_check_table)(const _glapi_table* table);
+    int (*_glapi_add_dispatch)(const char* const* function_names, const char* parameter_signature);
+    GLint (*_glapi_get_proc_offset)(const char* funcName);
+    _glapi_proc (*_glapi_get_proc_address)(const char* funcName);
+    const char* (*_glapi_get_proc_name)(GLuint offset);
 };
 
 
