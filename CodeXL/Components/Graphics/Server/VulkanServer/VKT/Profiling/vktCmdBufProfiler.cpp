@@ -203,7 +203,7 @@ ProfilerResultCode VktCmdBufProfiler::EndCmdMeasurement() ///< [in] Handle to cm
 //-----------------------------------------------------------------------------
 void VktCmdBufProfiler::NotifyCmdBufClosure()
 {
-    ProfilerResultCode result = PROFILER_FAIL;
+    ProfilerResultCode result = PROFILER_SUCCESS;
 
     if (m_config.mapTimestampMem == true)
     {
@@ -225,8 +225,10 @@ void VktCmdBufProfiler::NotifyCmdBufClosure()
                         sizeof(UINT64),
                         VK_QUERY_RESULT_WAIT_BIT | VK_QUERY_RESULT_64_BIT);
                 }
-
-                result = PROFILER_SUCCESS;
+            }
+            else
+            {
+                result = PROFILER_FAIL;
             }
         }
     }
