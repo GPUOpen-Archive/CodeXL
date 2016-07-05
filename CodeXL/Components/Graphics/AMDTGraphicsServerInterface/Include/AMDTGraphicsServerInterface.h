@@ -160,7 +160,7 @@ private:
     /// current API http command for example : /DX12 or /Vulkan
     gtASCIIString   m_strApiHttpCommand;
 
-    bool m_isStopSignaled;
+    bool m_isStopSignaled = false;
 };
 
 #endif //__GraphicsServerCommunication_H

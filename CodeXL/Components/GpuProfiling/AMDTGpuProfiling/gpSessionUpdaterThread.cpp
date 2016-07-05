@@ -18,7 +18,12 @@
 #define GP_FRAME_CAPTURE_TIMEOUT_IN_SECONDS 25.0
 #define GP_THREAD_SLEEP_TIME_BETWEEN_CHECKING_FOR_NEW_REQUEST_IN_MS 50
 #define GP_GRAPHICS_SERVER_STATE_STALLED "GRAPHICS_SERVER_STATE_STALLED"
-gpSessionUpdaterThread::gpSessionUpdaterThread(QObject* pParent) : QThread(pParent), m_shouldCaptureFrame(false), m_isCaptureInProgress(false), m_endedWithError(false)
+gpSessionUpdaterThread::gpSessionUpdaterThread(QObject* pParent) 
+    : QThread(pParent)
+    , m_shouldCaptureFrame(false)
+    , m_isCaptureInProgress(false)
+    , m_endedWithError(false)
+    , m_pServerComm(nullptr)
 {
 }
 
