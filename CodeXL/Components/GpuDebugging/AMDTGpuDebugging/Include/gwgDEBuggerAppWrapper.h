@@ -12,31 +12,25 @@
 #define __GWGDEBUGGERAPPWRAPPER_H
 
 // Forward declarations:
-class gdPropertiesEventObserver;
-class gdDebugApplicationTreeHandler;
-class gdMemoryView;
 class gdAPICallsHistoryPanel;
+class gdBreakpointsView;
 class gdCallStackView;
 class gdCommandQueuesView;
 class gdDebuggedProcessEventsView;
+class gdExecutionMode;
+class gdLocalsView;
+class gdMemoryView;
 class gdMultiWatchView;
+class gdPropertiesEventObserver;
 class gdStateVariablesView;
 class gdStatisticsPanel;
-class gdPerformanceGraphView;
-class gdPerformanceDashboardView;
-class gdProjectSettingsExtension;
-class gwEventObserver;
-class gwViewsCreator;
+class gdWatchView;
 class gwDebugViewsCreator;
-class gwStatisticsActionsExecutor;
-class gwRecentProjectsActionsExecutor;
+class gwEventObserver;
 class gwImagesAndBuffersMDIViewCreator;
 class gwKernelWorkItemToolbar;
-class gdGlobalDebugSettingsPage;
-class gdBreakpointsView;
-class gdLocalsView;
-class gdWatchView;
-class gdExecutionMode;
+class gwRecentProjectsActionsExecutor;
+class gwStatisticsActionsExecutor;
 
 // AMDTGpuDebuggingComponents:
 class gdDebugApplicationTreeData;
@@ -94,12 +88,6 @@ private:
 
     // Kernel work items toolbar:
     static gwKernelWorkItemToolbar* m_pKernelWorkItemToolbar;
-
-    // Project settings extension:
-    static gdProjectSettingsExtension* m_pProjectSettingsExtension;
-
-    // Global settings page:
-    static gdGlobalDebugSettingsPage* m_spGlobalDebugSettingsPage;
 
     // Contain the application event observer:
     static gwEventObserver* m_pApplicationEventObserver;
