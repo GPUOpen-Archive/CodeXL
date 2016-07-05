@@ -598,7 +598,7 @@ void gsUpdateTLSVariableValues()
         osProcedureAddress realTLSDispatchAsProcAddress = nullptr;
         bool rcDsp = osGetProcedureAddress(hSystemOpenGLModule, "_glapi_tls_Dispatch", realTLSDispatchAsProcAddress, false);
 
-        if (rcDsp && (nullptr != realTLSContextAsProcAddress))
+        if (rcDsp && (nullptr != realTLSDispatchAsProcAddress))
         {
             // Note that we do not check the return value as nullptr is a value that could appear:
             *(_glapi_table**)realTLSDispatchAsProcAddress = _glapi_tls_Dispatch;
