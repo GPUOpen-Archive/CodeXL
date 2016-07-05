@@ -214,9 +214,6 @@ void gsConnectDriverInternalFunctionPointers(osModuleHandle hSystemOpenGLModule)
             ((osProcedureAddress*)(&gs_stat_realDriverInternalFunctionPointers))[i] = pRealFunction;
         }
     }
-
-    // Also connect the TLS value:
-    gsUpdateTLSVariableValues();
 }
 
 // ---------------------------------------------------------------------------
@@ -577,14 +574,15 @@ bool gsAreInitializationFunctionsLogged()
 }
 
 #ifdef GS_EXPORT_SERVER_TLS_VARIABLES
+// These values are updated by the OpenGL runtimes after glXMakeCurrent is called. We need to
+// update the corresponding values in the real libGL.so.1 each time that happens:
 __thread struct _glapi_table *_glapi_tls_Dispatch __attribute__((tls_model("initial-exec"))) = nullptr;
-__thread void * _glapi_tls_Context __attribute__((tls_model("initial-exec")));
-
+__thread void * _glapi_tls_Context __attribute__((tls_model("initial-exec"))) = nullptr;
 #endif
 
 // ---------------------------------------------------------------------------
 // Name:        gsUpdateTLSVariableValues
-// Description: Updates the TLS variables from the real OpenGL druver
+// Description: Updates the TLS variables to/from the real OpenGL driver
 // Author:      Uri Shomroni
 // Date:        5/7/2016
 // ---------------------------------------------------------------------------
@@ -598,17 +596,23 @@ void gsUpdateTLSVariableValues()
     {
         // Get the TLS location by calling dlsym:
         osProcedureAddress realTLSDispatchAsProcAddress = nullptr;
-        osGetProcedureAddress(hSystemOpenGLModule, "_glapi_tls_Dispatch", realTLSDispatchAsProcAddress, false);
+        bool rcDsp = osGetProcedureAddress(hSystemOpenGLModule, "_glapi_tls_Dispatch", realTLSDispatchAsProcAddress, false);
 
-        // Note that we do not check the return value as nullptr is a value that could appear:
-        _glapi_tls_Dispatch = (_glapi_table*)realTLSDispatchAsProcAddress;
+        if (rcDsp && (nullptr != realTLSContextAsProcAddress))
+        {
+            // Note that we do not check the return value as nullptr is a value that could appear:
+            *(_glapi_table**)realTLSDispatchAsProcAddress = _glapi_tls_Dispatch;
+        }
 
         // Get the TLS location by calling dlsym:
         osProcedureAddress realTLSContextAsProcAddress = nullptr;
-        osGetProcedureAddress(hSystemOpenGLModule, "_glapi_tls_Context", realTLSContextAsProcAddress, false);
+        bool rcCtx = osGetProcedureAddress(hSystemOpenGLModule, "_glapi_tls_Context", realTLSContextAsProcAddress, false);
 
-        // Note that we do not check the return value as nullptr is a value that could appear:
-        _glapi_tls_Context = (void*)realTLSContextAsProcAddress;
+        if (rcCtx && (nullptr != realTLSContextAsProcAddress))
+        {
+            // Note that we do not check the return value as nullptr is a value that could appear:
+            *(void**)realTLSContextAsProcAddress = _glapi_tls_Context;
+        }
     }
 
 #endif // GS_EXPORT_SERVER_TLS_VARIABLES
