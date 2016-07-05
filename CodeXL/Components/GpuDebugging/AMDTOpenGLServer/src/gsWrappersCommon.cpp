@@ -596,10 +596,10 @@ void gsUpdateTLSVariableValues()
     {
         // Get the TLS location by calling dlsym:
         osProcedureAddress realTLSAsProcAddress = nullptr;
-        osGetProcedureAddress(hSystemOpenGLModule, "_glapi_tls_Dispatch", &realTLSAsProcAddress, false);
+        osGetProcedureAddress(hSystemOpenGLModule, "_glapi_tls_Dispatch", realTLSAsProcAddress, false);
 
         // Note that we do not check the return value as nullptr is a value that could appear:
-        _glapi_tls_Dispatch = (_glapi_tls_Dispatch*)realTLSAsProcAddress;
+        _glapi_tls_Dispatch = (_glapi_table*)realTLSAsProcAddress;
     }
 
 #endif // GS_EXPORT_SERVER_TLS_VARIABLES
