@@ -349,7 +349,7 @@ AMDTResult PrepareSystemTopologyInfo()
     PciDeviceInfo* pNodeInfo = nullptr;
     GetPciDeviceInfo(APU_SMU_ID, &pNodeInfo, nullptr);
 
-    if (pNodeInfo)
+    if (pNodeInfo && (strlen(pNodeInfo->m_shortName) > 0))
     {
         //TODO: GUI shouldn't check for constant string
         memset(pkg0->m_pName, 0, AMDT_PWR_EXE_NAME_LENGTH);
@@ -359,8 +359,8 @@ AMDTResult PrepareSystemTopologyInfo()
     else
     {
         memset(pkg0->m_pName, 0, AMDT_PWR_EXE_NAME_LENGTH);
-        sprintf(pkg0->m_pName, "%s", "Non-AMD");
-        sprintf(pkg0->m_pDescription, "%s", "Non-AMD device");
+        sprintf(pkg0->m_pName, "%s", "Unsupported Apu");
+        sprintf(pkg0->m_pDescription, "%s", "Unsupported Apu device");
     }
 
     // ONLY if supported AMD platform
@@ -850,7 +850,7 @@ bool PwrConfigureProfile()
             if(!g_sysInfo.m_isAmdApu || !g_sysInfo.m_smuTable.m_info[0].m_isAccessible)
             {
                 smuIdx = smuIdx - 1;
-                PwrTrace("NON AMD smuIdx %d", smuIdx);
+                //PwrTrace("Apu doesn't have smu smuIdx %d", smuIdx);
             }
 
             if (iter.second.m_pkgId > 0)
@@ -863,6 +863,7 @@ bool PwrConfigureProfile()
             }
         }
     }
+
 
     config.m_apuCounterMask = nodeMask;
     config.m_attrCnt = (AMDTUInt16)GetMaskCount(nodeMask);
