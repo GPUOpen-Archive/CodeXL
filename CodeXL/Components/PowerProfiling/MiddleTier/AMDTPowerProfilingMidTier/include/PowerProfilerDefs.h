@@ -89,9 +89,6 @@ struct AMDTPOWERPROFILINGMIDTIER_API HistogramBucket
     double m_value;
 };
 
-// Returns true for any non-failure result:
-#define PPR_EXPECTED_RESULT(res) ((PPR_NO_ERROR == res) || (PPR_NOT_SUPPORTED == res) || (PPR_DRIVER_ALREADY_IN_USE == res) || (PPR_DRIVER_VERSION_MISMATCH == res))
-
 // Defines a callback which handles the new samples that were taken.
 typedef AMDTPOWERPROFILINGMIDTIER_API void(*PPSamplesDataHandler)(std::shared_ptr<const gtMap<int, PPSampledValuesBatch>> pSampledDataPerCounter, void* pParams);
 

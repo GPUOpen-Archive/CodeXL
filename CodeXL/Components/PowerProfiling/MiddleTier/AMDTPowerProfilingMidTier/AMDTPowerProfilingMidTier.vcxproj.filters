@@ -45,6 +45,9 @@
     <ClInclude Include="include\PPDevice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\PowerProfilerMidTierUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\LocalBackendAdapter.cpp">
@@ -68,8 +71,8 @@
     <ClCompile Include="src\PPDevice.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="AMDTPowerProfilingMidTier.licenseheader" />
+    <ClCompile Include="src\PowerProfilerMidTierUtil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

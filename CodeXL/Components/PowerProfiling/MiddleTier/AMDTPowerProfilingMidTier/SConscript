@@ -45,6 +45,7 @@ sources = \
 	"src/RemoteBackendAdapter.cpp",
 	"src/PowerProfilerBL.cpp",
 	"src/PowerProfilerCore.cpp",
+    "src/PowerProfilerMidTierUtil.cpp",
 	"src/PPPollingThread.cpp",
 	"src/PPDevice.cpp"
 ]

@@ -46,6 +46,7 @@
     <ClInclude Include="include\PowerProfilerBL.h" />
     <ClInclude Include="include\PowerProfilerCore.h" />
     <ClInclude Include="include\PowerProfilerDefs.h" />
+    <ClInclude Include="include\PowerProfilerMidTierUtil.h" />
     <ClInclude Include="include\PPDevice.h" />
     <ClInclude Include="include\PPPollingThread.h" />
     <ClInclude Include="include\RemoteBackendAdapter.h" />
@@ -55,6 +56,7 @@
     <ClCompile Include="src\LocalBackendAdapter.cpp" />
     <ClCompile Include="src\PowerProfilerBL.cpp" />
     <ClCompile Include="src\PowerProfilerCore.cpp" />
+    <ClCompile Include="src\PowerProfilerMidTierUtil.cpp" />
     <ClCompile Include="src\PPDevice.cpp" />
     <ClCompile Include="src\PPPollingThread.cpp" />
     <ClCompile Include="src\RemoteBackendAdapter.cpp" />
