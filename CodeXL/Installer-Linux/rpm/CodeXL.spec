@@ -124,7 +124,7 @@ mkdir -p ${RPM_BUILD_ROOT}/%{CXL_examples_dir}
 # CodeXL main, CpuProfiling, GpuProfiling, GpuDebugging
 cp -prf * 		${RPM_BUILD_ROOT}/%{CXL_install_dir}
 cd ${RPM_BUILD_ROOT}/%{CXL_install_dir}
-/usr/sbin/prelink -u ${RPM_BUILD_ROOT}/%{CXL_install_dir}/RuntimeLibs/x86_64/libstdc++.so.6.0.16
+/usr/sbin/prelink -u ${RPM_BUILD_ROOT}/%{CXL_install_dir}/RuntimeLibs/x86_64/libstdc++.so.6.0.19
 sed -i -e "s|CodeXL_Version_Menu|CodeXL_"%{CXL_ver}"|g" amdcodexlicon.desktop amdremoteagenticon.desktop
 mv amdcodexlicon.desktop ${RPM_BUILD_ROOT}/%{CXL_app_icon_dir}
 chmod +xw ${RPM_BUILD_ROOT}/%{CXL_app_icon_dir}/amdcodexlicon.desktop
