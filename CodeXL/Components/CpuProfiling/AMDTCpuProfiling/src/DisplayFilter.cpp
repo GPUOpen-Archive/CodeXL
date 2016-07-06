@@ -93,7 +93,7 @@ bool SessionDisplaySettings::calculateDisplayedColumns(CoreTopologyMap* pTopolog
         m_availableDataFullNames.clear();
         m_displayedDataColumnsIndices.clear();
 
-        m_eventToIndexMap.clear();
+        //m_eventToIndexMap.clear();
         m_calculatedDataColumns.clear();
         m_totalValuesMap.clear();
         m_simpleValuesVector.clear();
@@ -170,10 +170,12 @@ bool SessionDisplaySettings::calculateDisplayedColumns(CoreTopologyMap* pTopolog
             // we might have profiled, but might not be intrested in displaying it).
             // So use the new variable to control the CLU data visibility from here on.
 
-            CpuEventViewIndexMap::const_iterator itr = m_eventToIndexMap.begin();
+            CpuEventViewIndexMap::const_iterator itr = nullptr;
+            //CpuEventViewIndexMap::const_iterator itr = m_eventToIndexMap.begin();
             m_displayClu = false;
 
-            while (itr != m_eventToIndexMap.end())
+            while (itr != nullptr)
+                //while (itr != m_eventToIndexMap.end())
             {
                 SampleKeyType skey = itr.key();
                 EventMaskTypeEnc ev;
@@ -318,7 +320,7 @@ bool SessionDisplaySettings::handleSingleEvent(ColumnSpec* columnArray, int cpuI
         {
             // Associate the column index with the event select value
             m_complexMap[evKey] = columnIndex;
-            m_eventToIndexMap[evKey] = columnIndex;
+            //m_eventToIndexMap[evKey] = columnIndex;
         }
         else
         {
@@ -960,7 +962,7 @@ void SessionDisplaySettings::CopyFrom(const SessionDisplaySettings& other)
         m_simpleValuesVector.push_back(other.m_simpleValuesVector[i]);
     }
 
-    m_eventToIndexMap = other.m_eventToIndexMap;
+    //m_eventToIndexMap = other.m_eventToIndexMap;
 
     m_listOfDuplicatedEvents = other.m_listOfDuplicatedEvents;
     m_nextIndex = other.m_nextIndex;

@@ -65,8 +65,10 @@ DataTab::DataTab(QWidget* pParent, CpuSessionWindow* pParentSessionWindow, const
     GT_IF_WITH_ASSERT(pParentSessionWindow != nullptr)
     {
         m_pProfDataRdr = pParentSessionWindow->profDbReader();
+#if 0
         m_pProfileReader = &pParentSessionWindow->profileReader();
         m_pProfileInfo = m_pProfileReader->getProfileInfo();
+#endif
         m_pDisplayFilter = pParentSessionWindow->GetDisplayFilter();
 
         AMDTProfileCounterDescVec counterDesc;
@@ -96,12 +98,16 @@ DataTab::DataTab(QWidget* pParent, CpuSessionWindow* pParentSessionWindow, const
     m_isProfiledClu = false;
     GT_IF_WITH_ASSERT(m_pParentSessionWindow != nullptr)
     {
+        m_pSessionDisplaySettings = nullptr;
+#if 0
         m_pSessionDisplaySettings = m_pParentSessionWindow->sessionDisplaySettings();
 
         if ((m_pSessionDisplaySettings != nullptr) && (m_pSessionDisplaySettings->m_pProfileInfo != nullptr))
         {
             m_isProfiledClu = m_pSessionDisplaySettings->m_displayClu;
         }
+
+#endif
     }
 
     // Connect to the application focus changed signal:
@@ -469,8 +475,8 @@ QString DataTab::displayFilterString()
 
     GT_IF_WITH_ASSERT(m_pDisplayFilter != nullptr)
     {
-		// add configuration name 
-		retVal.append(m_pDisplayFilter->GetCurrentCofigName());
+        // add configuration name
+        retVal.append(m_pDisplayFilter->GetCurrentCofigName());
 
         // Add the system modules to the filter string:
         QString displaySys = m_pDisplayFilter->IsSystemModuleIgnored() ? "System Modules Hidden" : "All Modules";
@@ -501,17 +507,18 @@ QString DataTab::displayFilterString()
             std::bitset<32> maskBits(mask);
             AMDTUInt32 amountOfDisplayedCores = maskBits.count();
 
-			if ((mask != AMDT_PROFILE_ALL_CORES) && 
-				(m_pDisplayFilter->GetCoreCount() != amountOfDisplayedCores))
-			{
-				if (!retVal.isEmpty())
-				{
-					retVal.append(", ");
-				}
-				QString coresFilter;
-				coresFilter.sprintf("%d Cores", amountOfDisplayedCores);
-				retVal.append(coresFilter);
-			}
+            if ((mask != AMDT_PROFILE_ALL_CORES) &&
+                (m_pDisplayFilter->GetCoreCount() != amountOfDisplayedCores))
+            {
+                if (!retVal.isEmpty())
+                {
+                    retVal.append(", ");
+                }
+
+                QString coresFilter;
+                coresFilter.sprintf("%d Cores", amountOfDisplayedCores);
+                retVal.append(coresFilter);
+            }
         }
 
         if ((true == m_pDisplayFilter->IsSeperatedByCoreEnabled()) ||

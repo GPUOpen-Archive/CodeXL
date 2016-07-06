@@ -33,7 +33,6 @@ ModulesDataTable::ModulesDataTable(QWidget* pParent,
     CPUProfileDataTable(pParent, additionalContextMenuActions, pSessionData),
     m_pParentSessionWindow(pSessionWindow)
 {
-    m_tableRowHasIcon = true;
 }
 
 ModulesDataTable::~ModulesDataTable()
@@ -41,35 +40,35 @@ ModulesDataTable::~ModulesDataTable()
 }
 bool ModulesDataTable::findModuleFilePath(int moduleRowIndex, QString& moduleFileName)
 {
-	bool retVal = false;
+    bool retVal = false;
 
-	// Sanity check:
-	GT_IF_WITH_ASSERT(m_pTableDisplaySettings != nullptr)
-	{
-		for (int i = 0; i < (int)m_pTableDisplaySettings->m_displayedColumns.size(); i++)
-		{
-			if (m_pTableDisplaySettings->m_displayedColumns[i] == TableDisplaySettings::MODULE_NAME_COL)
-			{
-				QTableWidgetItem* pItem = item(moduleRowIndex, i);
-				GT_IF_WITH_ASSERT(pItem != nullptr)
-				{
-					// Get the module file path (the full path is stored in the tooltip):
-					moduleFileName = pItem->toolTip();
+    // Sanity check:
+    GT_IF_WITH_ASSERT(m_pTableDisplaySettings != nullptr)
+    {
+        for (int i = 0; i < (int)m_pTableDisplaySettings->m_displayedColumns.size(); i++)
+        {
+            if (m_pTableDisplaySettings->m_displayedColumns[i] == TableDisplaySettings::MODULE_NAME_COL)
+            {
+                QTableWidgetItem* pItem = item(moduleRowIndex, i);
+                GT_IF_WITH_ASSERT(pItem != nullptr)
+                {
+                    // Get the module file path (the full path is stored in the tooltip):
+                    moduleFileName = pItem->toolTip();
 
-					// For system dll's - remove the "System" postfix from the tooltip:
-					if (moduleFileName.endsWith(" (System)"))
-					{
-						moduleFileName = moduleFileName.replace(" (System)", "");
-					}
+                    // For system dll's - remove the "System" postfix from the tooltip:
+                    if (moduleFileName.endsWith(" (System)"))
+                    {
+                        moduleFileName = moduleFileName.replace(" (System)", "");
+                    }
 
-					retVal = true;
-					break;
-				}
-			}
-		}
-	}
+                    retVal = true;
+                    break;
+                }
+            }
+        }
+    }
 
-	return retVal;
+    return retVal;
 }
 
 void ModulesDataTable::onAboutToShowContextMenu()
@@ -244,7 +243,7 @@ bool ModulesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, s
     bool retVal = false;
 
     GT_IF_WITH_ASSERT((m_pProfDataRdr.get() != nullptr) &&
-                      (m_pSessionDisplaySettings != nullptr) &&
+                      (m_pDisplayFilter != nullptr) &&
                       (m_pTableDisplaySettings != nullptr))
     {
         // get samples for Data cache access events

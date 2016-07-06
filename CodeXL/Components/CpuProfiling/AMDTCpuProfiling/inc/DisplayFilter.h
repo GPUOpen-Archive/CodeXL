@@ -147,7 +147,7 @@ public:
     gtVector<int> m_simpleValuesVector;
 
     /// Event to index map (used to be indexes):
-    CpuEventViewIndexMap m_eventToIndexMap;
+    //CpuEventViewIndexMap m_eventToIndexMap;
 
     /// Member variables used while calculating the columns:
     QVector<unsigned int> m_listOfDuplicatedEvents;

@@ -142,6 +142,9 @@ void CpuProfileCss::Finalize()
 
 bool CpuProfileCss::AddModule(gtVAddr base, const wchar_t* pPath)
 {
+    GT_UNREFERENCED_PARAMETER(base);
+    GT_UNREFERENCED_PARAMETER(pPath);
+#if 0
     ExecutableFile* pExecutable = nullptr;
 
     int lenPath = static_cast<int>(wcslen(pPath));
@@ -178,11 +181,18 @@ bool CpuProfileCss::AddModule(gtVAddr base, const wchar_t* pPath)
     }
 
     m_modulesMap.insert(ModulesMap::value_type(pModule->getBaseAddr(), ModuleInfo(*pModule, pExecutable)));
+#endif
     return true;
 }
 
 bool CpuProfileCss::AddFunction(gtVAddr va, gtVAddr& startVa, gtVAddr& endVa)
 {
+    GT_UNREFERENCED_PARAMETER(va);
+    GT_UNREFERENCED_PARAMETER(startVa);
+    GT_UNREFERENCED_PARAMETER(endVa);
+    return true;
+
+#if 0
     bool ret = false;
 
     CpuProfileModule* pModule = nullptr;
@@ -367,6 +377,7 @@ bool CpuProfileCss::AddFunction(gtVAddr va, gtVAddr& startVa, gtVAddr& endVa)
     m_pLastAddedFunction = pFunction;
 
     return ret;
+#endif
 }
 
 bool CpuProfileCss::AddMetadata(gtVAddr va, void** ppMetadata)

@@ -40,7 +40,6 @@ FunctionsDataTable::FunctionsDataTable(QWidget* pParent,
     m_pParentSessionWindow(pSessionWindow)
 {
     m_functionNameColIndex = -1;
-    m_tableRowHasIcon = true;
 }
 
 FunctionsDataTable::~FunctionsDataTable()
@@ -102,7 +101,8 @@ bool FunctionsDataTable::HandleHotSpotIndicatorSet()
 {
     // call directly to setHotSpotIndicatorValues, without calling to displayProfileData first
     // boolean to function has no meaning
-    return setHotSpotIndicatorValues();
+    //return setHotSpotIndicatorValues();
+    return true;
 }
 
 void FunctionsDataTable::onAboutToShowContextMenu()
@@ -207,7 +207,7 @@ bool FunctionsDataTable::setModuleIcon(int row,
     bool retVal = false;
 
     GT_IF_WITH_ASSERT((m_pProfDataRdr != nullptr) &&
-                      (m_pSessionDisplaySettings != nullptr) &&
+                      (m_pDisplayFilter != nullptr) &&
                       (m_pTableDisplaySettings != nullptr))
     {
         osFilePath iconFile;

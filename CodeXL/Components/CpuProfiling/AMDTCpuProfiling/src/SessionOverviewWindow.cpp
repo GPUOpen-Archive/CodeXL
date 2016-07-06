@@ -341,10 +341,9 @@ void SessionOverviewWindow::setSessionWindowLayout()
     // Update display filter string:
     updateDisplaySettingsString();
 
-    // Set the hot spot indicator filter as the filter for the tables:
-    m_pFunctionsTable->setTableDisplaySettings(&m_functionsTablesFilter, &m_hotspotSessionSettings);
-    m_pModulesTable->setTableDisplaySettings(&m_modulesTablesFilter, &m_hotspotSessionSettings);
-    m_pProcessesTable->setTableDisplaySettings(&m_processesTablesFilter, &m_hotspotSessionSettings);
+    m_pFunctionsTable->setTableDisplaySettings(&m_functionsTablesFilter);
+    m_pModulesTable->setTableDisplaySettings(&m_modulesTablesFilter);
+    m_pProcessesTable->setTableDisplaySettings(&m_processesTablesFilter);
 
     m_editActionsWidgetsList << m_pFunctionsTable;
     m_editActionsWidgetsList << m_pModulesTable;
@@ -927,7 +926,7 @@ bool SessionOverviewWindow::fillHotspotIndicatorCombo()
 
                         for (const auto& name : countersName)
                         {
-                            hotSpotColumns << acGTStringToQString(get<0>(name)); // counter name 
+                            hotSpotColumns << acGTStringToQString(get<0>(name)); // counter name
                         }
 
                         retVal = true;
@@ -1163,14 +1162,22 @@ void SessionOverviewWindow::initDisplayFilters()
         m_processesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::PROCESS_NAME_COL);
         m_processesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::PID_COL);
         m_processesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_COUNT_COL);
-        m_processesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_PERCENT_COL);
+
+        if (false == m_isCLU)
+        {
+            m_processesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_PERCENT_COL);
+        }
 
         // Set the display filter for the modules table:
         m_modulesTablesFilter.m_amountOfItemsInDisplay = 5;
         m_modulesTablesFilter.m_hotSpotIndicatorColumnCaption = "";
         m_modulesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::MODULE_NAME_COL);
         m_modulesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_COUNT_COL);
-        m_modulesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_PERCENT_COL);
+
+        if (false == m_isCLU)
+        {
+            m_modulesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_PERCENT_COL);
+        }
 
         // Set the display filter for the functions table:
         m_functionsTablesFilter.m_amountOfItemsInDisplay = 5;
@@ -1178,112 +1185,28 @@ void SessionOverviewWindow::initDisplayFilters()
         m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::FUNCTION_ID);
         m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::FUNCTION_NAME_COL);
         m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_COUNT_COL);
-        m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_PERCENT_COL);
+
+        if (false == m_isCLU)
+        {
+            m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_PERCENT_COL);
+        }
 
         m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::MODULE_NAME_COL);
 
-        updateHint(CP_overviewInformationHint);
+
+        if (true == m_isCLU)
+        {
+            updateHint(CP_overviewInformationHintForCLU);
+        }
+        else
+        {
+            updateHint(CP_overviewInformationHint);
+        }
     }
 }
 
-#if 0
-bool SessionOverviewWindow::buildEventsStringsVector(gtVector<gtString>& eventsStrVector, gtString& eventsAsHTMLTable)
-{
-    bool retVal = false;
-
-    QString viewName;
-    SessionDisplaySettings* pSessionDisplaySettings = CurrentSessionDisplaySettings();
-    GT_IF_WITH_ASSERT((m_pProfileInfo != nullptr) && (m_pDisplayedSessionItemData != nullptr) && (pSessionDisplaySettings != nullptr))
-    {
-        bool isIBS = false;
-        // Find the profile type:
-        SessionTreeNodeData* pSessionData = qobject_cast<SessionTreeNodeData*>(m_pDisplayedSessionItemData->extendedItemData());
-        GT_IF_WITH_ASSERT(pSessionData != nullptr)
-        {
-            isIBS = (pSessionData->m_profileTypeStr == PM_profileTypeInstructionBasedSampling);
-        }
-
-        // Use this filter to extract the data:
-        viewName = pSessionDisplaySettings->m_displayFilterName;
-        pSessionDisplaySettings->m_displayFilterName = "All Data";
-        bool rc = pSessionDisplaySettings->calculateDisplayedColumns(m_pProfileReader->getTopologyMap());
-        GT_IF_WITH_ASSERT(rc)
-        {
-            if (isIBS)
-            {
-                // IBS, only add "IBS Fetch All" and "IBS Ops":
-                eventsStrVector.push_back(L"IBS Fetch All and IBS Ops");
-            }
-
-            else
-            {
-                // The map contain duplication of events, so extract it to a list:
-                CpuEventViewIndexMap::iterator iter = pSessionDisplaySettings->m_eventToIndexMap.begin();
-                CpuEventViewIndexMap::iterator iterEnd = pSessionDisplaySettings->m_eventToIndexMap.end();
-
-                QVector<int> eventIndicesNoDuplication;
-
-                for (; iter != iterEnd; iter++)
-                {
-                    int index = *iter;
-
-                    if (!eventIndicesNoDuplication.contains(index))
-                    {
-                        eventIndicesNoDuplication << index;
-                    }
-                }
-
-                foreach (int index, eventIndicesNoDuplication)
-                {
-                    GT_IF_WITH_ASSERT((index >= 0) && (index < (int)pSessionDisplaySettings->m_availableDataColumnCaptions.size())
-                                      && (index >= 0) && (index < (int)pSessionDisplaySettings->m_availableDataColumnTooltips.size()))
-                    {
-                        gtString eventFullName = acQStringToGTString(pSessionDisplaySettings->m_availableDataFullNames[index]);
-                        eventsStrVector.push_back(eventFullName);
-                    }
-                }
-            }
-
-            eventsAsHTMLTable.append(L"<table>");
-
-            for (int i = 0; i < (int)eventsStrVector.size(); i++)
-            {
-                int column = i % 3;
-
-                if (column == 0)
-                {
-                    eventsAsHTMLTable.append(L"<tr>");
-                }
-
-                eventsAsHTMLTable.appendFormattedString(L"<td>%ls</td>", eventsStrVector[i].asCharArray());
-
-                if (column == 2)
-                {
-                    eventsAsHTMLTable.append(L"</tr>");
-                }
-            }
-
-            if (eventsStrVector.size() % 3 != 0)
-            {
-                eventsAsHTMLTable.append(L"</tr>");
-            }
-
-            eventsAsHTMLTable.append(L"<table>");
-
-            retVal = true;
-        }
-    }
-
-    pSessionDisplaySettings->m_displayFilterName = viewName;
-
-    // Re-Calculate the settings with the saved view name:
-    pSessionDisplaySettings->calculateDisplayedColumns(m_pProfileReader->getTopologyMap());
-
-    return retVal;
-}
-#endif
-
-bool SessionOverviewWindow::buildEventsStringsVector(gtVector<gtString>& eventsStrVector, gtString& eventsAsHTMLTable)
+bool SessionOverviewWindow::buildEventsStringsVector(gtVector<gtString>& eventsStrVector,
+                                                     gtString& eventsAsHTMLTable)
 {
     bool retVal = false;
 
@@ -1425,7 +1348,7 @@ void SessionOverviewWindow::activateTableItem(QTableWidgetItem* pActivateItem, C
                             pFunctionsView = pSessionWindow->sessionFunctionsView();
 
 #if 0
-							int itemRow = pActivateItem->row();
+                            int itemRow = pActivateItem->row();
 
                             const QList<ProcessIdType>* pPidList = m_pFunctionsTable->getFunctionPidList(itemRow);
                             QString functionName = m_pFunctionsTable->getFunctionName(itemRow);
@@ -1499,7 +1422,8 @@ void SessionOverviewWindow::onTableItemActivated(QTableWidgetItem* pActivateItem
 }
 
 
-void SessionOverviewWindow::onTableContextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType actionType, QTableWidgetItem* pTableItem)
+void SessionOverviewWindow::onTableContextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType actionType,
+                                                              QTableWidgetItem* pTableItem)
 {
     GT_IF_WITH_ASSERT((pTableItem != nullptr) && (m_pFunctionsTable != nullptr))
     {
@@ -1632,7 +1556,7 @@ bool SessionOverviewWindow::openSourceCodeView(QTableWidgetItem* pTableItem)
     }
     return ret;
 }
-
+#if 0
 bool SessionOverviewWindow::openFunctionSourceCode(gtVAddr functionAddress, const CpuProfileModule* pModule)
 {
     bool retVal = false;
@@ -1688,13 +1612,13 @@ bool SessionOverviewWindow::openFunctionSourceCode(gtVAddr functionAddress, cons
     }
     return retVal;
 }
-
+#endif
 const CpuProfileModule* SessionOverviewWindow::findModuleHandler(const osFilePath& filePath) const
 {
-	GT_UNREFERENCED_PARAMETER(filePath);
-	const CpuProfileModule* pRetVal = nullptr;
+    GT_UNREFERENCED_PARAMETER(filePath);
+    const CpuProfileModule* pRetVal = nullptr;
 #if 0
-	GT_IF_WITH_ASSERT(m_pFunctionsTable != nullptr)
+    GT_IF_WITH_ASSERT(m_pFunctionsTable != nullptr)
     {
         pRetVal = m_pFunctionsTable->findModuleHandler(filePath);
     }

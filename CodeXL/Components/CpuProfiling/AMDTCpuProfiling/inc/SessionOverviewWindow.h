@@ -49,8 +49,7 @@ public:
 
     bool display(afApplicationTreeItemData* pItemData);
 
-    bool openFunctionSourceCode(gtVAddr functionAddress, const CpuProfileModule* pModule);
-	bool openSourceCodeView(QTableWidgetItem* pTableItem);
+    bool openSourceCodeView(QTableWidgetItem* pTableItem);
 
     /// \brief Name:        findModuleHandler
     /// \brief Description: Finds the modules handler for the requested module file path
@@ -72,7 +71,7 @@ public slots:
 
 signals:
     void functionActivated(gtVAddr functionAddress, ProcessIdType pid, ThreadIdType tid, const CpuProfileModule* pModule);
-	void opensourceCodeViewSig(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> funcModInfo);
+    void opensourceCodeViewSig(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> funcModInfo);
     void hotspotIndicatorChanged(const QString& text);
 
 protected slots:
@@ -140,8 +139,8 @@ private:
     /// \brief Description: Open the functions view for the activated process
     /// \param[in]          pTableItem - the item activated in functions table
     void openFunctionViewForProcess(QTableWidgetItem* pTableItem);
-	bool displaySessionExecutionDetails(afHTMLContent& content);
-	bool displaySessionProfileDetails(afHTMLContent& content);
+    bool displaySessionExecutionDetails(afHTMLContent& content);
+    bool displaySessionProfileDetails(afHTMLContent& content);
 private:
 
     // Widgets:
@@ -164,7 +163,7 @@ private:
     // Does the current displayed session have multiple sessions:
     bool m_isMultiProcesses;
 
-	int m_counterIdx = 0;
+    int m_counterIdx = 0;
 };
 
 #endif // __SessionOverviewWindow_H_

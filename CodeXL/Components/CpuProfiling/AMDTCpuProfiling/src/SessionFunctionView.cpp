@@ -153,7 +153,7 @@ void SessionFunctionView::setSessionWindowLayout()
     pMainLayout->addWidget(m_pFunctionTable);
 
     // Create CLU notes frame for CLU sessions:
-    createCLUNotesFrame(pMainLayout);
+    //createCLUNotesFrame(pMainLayout);
 
     pMainLayout->addWidget(pFrame);
 
@@ -168,7 +168,7 @@ void SessionFunctionView::setSessionWindowLayout()
     }
 
     // Set the table display settings:
-    m_pFunctionTable->setTableDisplaySettings(&m_functionsTablesFilter, CurrentSessionDisplaySettings());
+    m_pFunctionTable->setTableDisplaySettings(&m_functionsTablesFilter);
 }
 
 bool SessionFunctionView::displaySessionDataTables()

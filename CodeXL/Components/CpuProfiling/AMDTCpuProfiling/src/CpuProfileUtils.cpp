@@ -33,7 +33,8 @@ gtUInt32 CPUProfileUtils::ConvertAggregatedSampleToArray(const AggregatedSample&
             totalVector.resize(pSessionDisplaySettings->m_availableDataColumnCaptions.size() + 1);
         }
 
-        CpuEventViewIndexMap::const_iterator eventToIdxItEnd = pSessionDisplaySettings->m_eventToIndexMap.end();
+        //CpuEventViewIndexMap::const_iterator eventToIdxItEnd = pSessionDisplaySettings->m_eventToIndexMap.end();
+        CpuEventViewIndexMap::const_iterator eventToIdxItEnd = nullptr;
         TotalIndicesMap::const_iterator totalValuesItEnd = pSessionDisplaySettings->m_totalValuesMap.end();
         ComplexDependentMap::const_iterator complexItEnd = pSessionDisplaySettings->m_calculatedDataColumns.end();
 
@@ -47,7 +48,8 @@ gtUInt32 CPUProfileUtils::ConvertAggregatedSampleToArray(const AggregatedSample&
 
             SampleKeyType key(sampleIt->first.cpu, sampleIt->first.event);
 
-            CpuEventViewIndexMap::const_iterator eventToIdxIt = pSessionDisplaySettings->m_eventToIndexMap.find(key);
+            CpuEventViewIndexMap::const_iterator eventToIdxIt = nullptr;
+            //CpuEventViewIndexMap::const_iterator eventToIdxIt = pSessionDisplaySettings->m_eventToIndexMap.find(key);
 
             //if event is not shown for this view, skip
             if (eventToIdxItEnd == eventToIdxIt)
@@ -123,7 +125,7 @@ void CPUProfileUtils::AddDataArrays(gtVector<float>& destVector, const gtVector<
     { \
         key.cpu = i; \
         key.event = evMask; \
-        idxIt = pSessionDisplaySettings->m_eventToIndexMap.find(key); \
+        idxIt = nullptr; \
         index = *idxIt; \
     } \
 

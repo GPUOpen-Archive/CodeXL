@@ -1965,6 +1965,7 @@ bool SessionCallGraphView::Display(const QString& caption, unsigned int pid)
     m_indexOffset = CALLGRAPH_OFFSET_INDEX;
     m_sessionFile.setFile(caption);
 
+#if 0
     // Add all PIDs sampled for this module
     PidProcessMap* pProcMap = m_pProfileReader->getProcessMap();
 
@@ -1975,6 +1976,7 @@ bool SessionCallGraphView::Display(const QString& caption, unsigned int pid)
         return false;
     }
 
+#endif
     // Fill the process IDs combo box:
     fillPIDComb(pid);
 
@@ -2248,9 +2250,7 @@ int SessionCallGraphView::getPidFromProcessString(QString processString)
 
 void SessionCallGraphView::fillPIDComb(unsigned int pid)
 {
-    // Sanity check:
-    GT_IF_WITH_ASSERT((m_pProfileReader != nullptr) &&
-                      (m_pPidComboAction != nullptr) &&
+    GT_IF_WITH_ASSERT((m_pPidComboAction != nullptr) &&
                       (m_pTopToolbar != nullptr) &&
                       (m_pParentSessionWindow != nullptr) &&
                       (m_pProfDataRdr != nullptr))
@@ -2318,6 +2318,9 @@ void SessionCallGraphView::fillPIDComb(unsigned int pid)
 
 void  SessionCallGraphView::filterMonitoredEvent(QStringList& eventNameList)
 {
+    GT_UNREFERENCED_PARAMETER(eventNameList);
+#if 0
+
     if (TBPVER_BEFORE_RI >= m_pProfileReader->getProfileInfo()->m_tbpVersion)
     {
         //For tbp version before TBPVER_BEFORE_RI eventwise information is not available
@@ -2372,6 +2375,8 @@ void  SessionCallGraphView::filterMonitoredEvent(QStringList& eventNameList)
             eventNameList = finalList;
         }
     }
+
+#endif
 }
 
 void SessionCallGraphView::UpdateTableDisplay(unsigned int updateType)
