@@ -83,6 +83,24 @@ public:
     VSL_COMMAND_MAP_ENTRY(CMDSETID_StandardCommandSet97, cmdidCopy, &onQueryCopyAction, &onCopyAction)
     VSL_COMMAND_MAP_ENTRY(CMDSETID_StandardCommandSet97, cmdidSelectAll, &onQuerySelectAllAction, &onSelectAllAction)
 
+    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDBestFit, &onQueryCommandUpdate, &onCommandAction)
+    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDOrigSize, &onQueryCommandUpdate, &onCommandAction)
+    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDPan, &onQueryCommandUpdate, &onCommandAction)
+    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDSelect, &onQueryCommandUpdate, &onCommandAction)
+    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDRotateLeft, &onQueryCommandUpdate, &onCommandAction)
+    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDRotateRight, &onQueryCommandUpdate, &onCommandAction)
+    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDChannelRed, &onQueryCommandUpdate, &onCommandAction)
+    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDChannelGreen, &onQueryCommandUpdate, &onCommandAction)
+    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDChannelBlue, &onQueryCommandUpdate, &onCommandAction)
+    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDChannelAlpha, &onQueryCommandUpdate, &onCommandAction)
+    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDChannelInvert, &onQueryCommandUpdate, &onCommandAction)
+    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDChannelGrayscale, &onQueryCommandUpdate, &onCommandAction)
+
+    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDImageSizeComboGetList, &onQueryCommandUpdate, &onCommandAction)
+    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDImageSizeCombo, &onQueryCommandUpdate, &onCommandAction)
+    VSL_COMMAND_MAP_ENTRY(CMDSETID_StandardCommandSet97, cmdidZoomIn, &onQueryCommandUpdate, &onCommandAction)
+    VSL_COMMAND_MAP_ENTRY(CMDSETID_StandardCommandSet97, cmdidZoomOut, &onQueryCommandUpdate, &onCommandAction)
+
     // Terminate the definition of the command map
     VSL_END_VSCOMMAND_MAP()
 
@@ -212,6 +230,12 @@ protected:
     void onQuerySelectAllAction(const CommandHandler& rSender, _Inout_ OLECMD* pOleCmd, _Inout_ OLECMDTEXT* pOleText);
     void onCopyAction(_In_ CommandHandler* pSender, DWORD flags, _In_ VARIANT* pIn, _Out_ VARIANT* pOut);
     void onSelectAllAction(_In_ CommandHandler* pSender, DWORD flags, _In_ VARIANT* pIn, _Out_ VARIANT* pOut);
+
+    void onQueryCommandUpdate(const CommandHandler& rSender, _Inout_ OLECMD* pOleCmd, _Inout_ OLECMDTEXT* pOleText);
+    void onCommandAction(_In_ CommandHandler* pSender, DWORD flags, _In_ VARIANT* pIn, _Out_ VARIANT* pOut);
+
+    virtual void GetCommandUpdate(const CommandHandler& rSender, _Inout_ OLECMD* pOleCmd, _Inout_ OLECMDTEXT* pOleText);
+    virtual void ExecuteCommandAction(_In_ CommandHandler* pSender, DWORD flags, _In_ VARIANT* pIn, _Out_ VARIANT* pOut);
 
     // Utilities:
     bool SetEditorCaption(const wchar_t* filePath);
