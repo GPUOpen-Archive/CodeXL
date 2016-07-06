@@ -1536,7 +1536,7 @@ void acRibbonManager::LastRibbonCheck(bool openAction)
 
     // if there is only one ribbon change its status based on the action done
     // or there is a disabled ribbon and we are in an open action
-    if ((1 == numOpenRibbons && !openAction) || (disabledRibbon != -1 && openAction))
+    if ((1 == numOpenRibbons && !openAction) || (disabledRibbon != -1 && openAction) && (openRibbonIndex >= 0) && (openRibbonIndex < numRibbons))
     {
         QPixmap actionIcon;
         bool rc = acSetIconInPixmap(actionIcon, openAction ? AC_ICON_RIBBON_CLOSE : AC_ICON_RIBBON_CLOSE_DISABLED, AC_16x16_ICON);

@@ -84,7 +84,7 @@ public:
     void SetModeEnabled(bool isModeEnabled) { m_isModeEnabled = isModeEnabled; }
 
     /// Get the toolbar start button text
-    virtual void GetToolbarStartButtonText(gtString& buttonText, bool fullString = true);
+    virtual void GetToolbarStartButtonText(gtString& buttonText, bool fullString = true) override;
 
 protected:
     /// a flag to indicate if the mode is enabled. by default it is
