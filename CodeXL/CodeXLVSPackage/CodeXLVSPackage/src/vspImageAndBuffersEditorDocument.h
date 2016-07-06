@@ -52,40 +52,6 @@ class vspImageAndBuffersEditorDocument : public vspEditorDocument
     VSL_DECLARE_NOT_COPYABLE(vspImageAndBuffersEditorDocument)
 
 public:
-
-    /// Define the toolbar actions for the images and buffers MDI windows:
-    // IOleCommandTarget.
-    VSL_BEGIN_COMMAND_MAP()
-
-    // Every command is identified by the shell using a GUID/DWORD pair, so every the definition of
-    // commands must contain this information.
-
-    // The following command map entries define a GUID/DWORD pair to identify the command and a
-    // callback for the command execution and status queries.
-    VSL_COMMAND_MAP_ENTRY(CMDSETID_StandardCommandSet97, cmdidZoomIn, &onQueryImageAndBufferAction, &onImageAndBufferAction)
-    VSL_COMMAND_MAP_ENTRY(CMDSETID_StandardCommandSet97, cmdidZoomOut, &onQueryImageAndBufferAction, &onImageAndBufferAction)
-    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDBestFit, &onQueryImageAndBufferAction, &onImageAndBufferAction)
-    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDOrigSize, &onQueryImageAndBufferAction, &onImageAndBufferAction)
-    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDPan, &onQueryImageAndBufferAction, &onImageAndBufferAction)
-    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDSelect, &onQueryImageAndBufferAction, &onImageAndBufferAction)
-    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDRotateLeft, &onQueryImageAndBufferCheckedAction, &onImageAndBufferAction)
-    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDRotateRight, &onQueryImageAndBufferCheckedAction, &onImageAndBufferAction)
-    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDChannelRed, &onQueryImageAndBufferCheckedAction, &onImageAndBufferAction)
-    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDChannelGreen, &onQueryImageAndBufferCheckedAction, &onImageAndBufferAction)
-    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDChannelBlue, &onQueryImageAndBufferCheckedAction, &onImageAndBufferAction)
-    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDChannelAlpha, &onQueryImageAndBufferCheckedAction, &onImageAndBufferAction)
-    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDChannelInvert, &onQueryImageAndBufferCheckedAction, &onImageAndBufferAction)
-    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDChannelGrayscale, &onQueryImageAndBufferCheckedAction, &onImageAndBufferAction)
-
-    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDImageSizeComboGetList, &onQueryImageSizeGetList, &onImageSizeGetList)
-    VSL_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, commandIDImageSizeCombo, &onQueryImageSizeChanged, &onImageSizeChanged)
-
-    VSL_COMMAND_MAP_ENTRY(CMDSETID_StandardCommandSet97, cmdidCopy, &onQueryCopyAction, &onCopyAction)
-    VSL_COMMAND_MAP_ENTRY(CMDSETID_StandardCommandSet97, cmdidSelectAll, &onQuerySelectAllAction, &onSelectAllAction)
-
-    // Terminate the definition of the command map
-    VSL_END_VSCOMMAND_MAP()
-
     // Called by VSL::DocumentPersistanceBase::GetClassID, which is also called by
     // VSL::DocumentPersistanceBase::GetGuidEditorType)
     const GUID& GetEditorTypeGuid() const;
@@ -98,6 +64,8 @@ protected:
 
     ~vspImageAndBuffersEditorDocument();
 
+    virtual void GetCommandUpdate(const CommandHandler& rSender, _Inout_ OLECMD* pOleCmd, _Inout_ OLECMDTEXT* pOleText);
+    virtual void ExecuteCommandAction(_In_ CommandHandler* pSender, DWORD flags, _In_ VARIANT* pIn, _Out_ VARIANT* pOut);
 
     // Zoom action callbacks:
     void onImageAndBufferAction(_In_ CommandHandler* pSender, DWORD flags, _In_ VARIANT* pIn, _Out_ VARIANT* pOut);
@@ -110,9 +78,6 @@ protected:
 
     void onImageSizeChanged(_In_ CommandHandler* pSender, DWORD flags, _In_ VARIANT* pIn, _Out_ VARIANT* pOut);
     void onQueryImageSizeChanged(const CommandHandler& rSender, _Inout_ OLECMD* pOleCmd, _Inout_ OLECMDTEXT* pOleText);
-
-
-
 };
 
 #endif //__VSPIMAGEANDBUFFERSEDITORDOCUMENT_H

@@ -296,3 +296,67 @@ void vspImageAndBuffersEditorDocument::onQueryImageSizeChanged(const CommandHand
     }
 }
 
+void vspImageAndBuffersEditorDocument::GetCommandUpdate(const CommandHandler& rSender, _Inout_ OLECMD* pOleCmd, _Inout_ OLECMDTEXT* pOleText)
+{
+    DWORD commandId = rSender.GetId().GetId();
+    switch (commandId)
+    {
+    case cmdidZoomIn:
+    case cmdidZoomOut:
+    case commandIDBestFit:
+    case commandIDOrigSize:
+    case commandIDPan:
+    case commandIDSelect:
+        onQueryImageAndBufferAction(rSender, pOleCmd, pOleText);
+        break;
+
+    case commandIDRotateLeft:
+    case commandIDRotateRight:
+    case commandIDChannelRed:
+    case commandIDChannelGreen:
+    case commandIDChannelBlue:
+    case commandIDChannelAlpha:
+    case commandIDChannelInvert:
+    case commandIDChannelGrayscale:
+        onQueryImageAndBufferCheckedAction(rSender, pOleCmd, pOleText);
+        break;
+
+    case commandIDImageSizeComboGetList:
+    case commandIDImageSizeCombo:
+        onQueryImageSizeGetList(rSender, pOleCmd, pOleText);
+        break;
+    }
+}
+
+void vspImageAndBuffersEditorDocument::ExecuteCommandAction(_In_ CommandHandler* pSender, DWORD flags, _In_ VARIANT* pIn, _Out_ VARIANT* pOut)
+{
+    DWORD commandId = pSender->GetId().GetId();
+
+    switch (commandId)
+    {
+    case cmdidZoomIn:
+    case cmdidZoomOut:
+    case commandIDBestFit:
+    case commandIDOrigSize:
+    case commandIDPan:
+    case commandIDSelect:
+        onImageAndBufferAction(pSender, flags, pIn, pOut);
+        break;
+
+    case commandIDRotateLeft:
+    case commandIDRotateRight:
+    case commandIDChannelRed:
+    case commandIDChannelGreen:
+    case commandIDChannelBlue:
+    case commandIDChannelAlpha:
+    case commandIDChannelInvert:
+    case commandIDChannelGrayscale:
+        onImageAndBufferAction(pSender, flags, pIn, pOut);
+        break;
+
+    case commandIDImageSizeComboGetList:
+    case commandIDImageSizeCombo:
+        onImageSizeGetList(pSender, flags, pIn, pOut);
+        break;
+    }
+}

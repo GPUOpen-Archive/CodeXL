@@ -621,3 +621,29 @@ void vspEditorDocument::PostSetDirty()
     //GetControl().SetModified(IsFileDirty());
 }
 
+void vspEditorDocument::onQueryCommandUpdate(const CommandHandler& rSender, _Inout_ OLECMD* pOleCmd, _Inout_ OLECMDTEXT* pOleText)
+{
+    GetCommandUpdate(rSender, pOleCmd, pOleText);
+}
+
+void vspEditorDocument::onCommandAction(_In_ CommandHandler* pSender, DWORD flags, _In_ VARIANT* pIn, _Out_ VARIANT* pOut)
+{
+    ExecuteCommandAction(pSender, flags, pIn, pOut);
+}
+
+void vspEditorDocument::GetCommandUpdate(const CommandHandler& rSender, _Inout_ OLECMD* pOleCmd, _Inout_ OLECMDTEXT* pOleText)
+{
+    // by default the commands are disabled. A derived document can inherit the function and change behavior
+    GT_UNREFERENCED_PARAMETER(rSender);
+    GT_UNREFERENCED_PARAMETER(pOleText);
+    pOleCmd[0].cmdf = OLECMDSTATE_DISABLED;
+}
+
+void vspEditorDocument::ExecuteCommandAction(_In_ CommandHandler* pSender, DWORD flags, _In_ VARIANT* pIn, _Out_ VARIANT* pOut)
+{
+    // by default the commands does nothing. A derived document can inherit the function and change behavior
+    GT_UNREFERENCED_PARAMETER(pSender);
+    GT_UNREFERENCED_PARAMETER(flags);
+    GT_UNREFERENCED_PARAMETER(pIn);
+    GT_UNREFERENCED_PARAMETER(pOut);
+}
