@@ -112,7 +112,8 @@ bool gpCommandListSummaryTable::InitItems()
 
                 for (auto apiIndex : commandListData.m_apiIndices)
                 {
-                    ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItemByItemCallIndex(commandListData.m_commandListQueueName, apiIndex + 1);
+                    //ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItemByItemCallIndex(commandListData.m_commandListQueueName, apiIndex + 1);
+                    ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItem(commandListData.m_commandListQueueName, apiIndex);
                     GT_IF_WITH_ASSERT(pItem != nullptr)
                     {
                         if (pItem->StartTime() == info.m_minTimeMs)
