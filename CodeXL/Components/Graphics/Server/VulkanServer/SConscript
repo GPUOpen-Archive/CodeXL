@@ -41,7 +41,7 @@ env.Append (CPPPATH =[
     ])
 
 GDT_LOG_MODULE="-D'LOG_MODULE=\"VulkanServer\"'"
-cpp_flags= ' ' + GDT_LOG_MODULE + ' ' + ' -DVK_USE_PLATFORM_XCB_KHR -DVK_USE_PLATFORM_XLIB_KHR '
+cpp_flags= ' ' + GDT_LOG_MODULE + ' ' + ' -DVK_USE_PLATFORM_XCB_KHR -DVK_USE_PLATFORM_XLIB_KHR -fPIC'
 original_cpp_flag=env['CPPFLAGS']
 original_cpp_flag = original_cpp_flag + cpp_flags
 env.Replace(CPPFLAGS = original_cpp_flag) 
@@ -54,7 +54,6 @@ env['LIBS'] = \
     "libCXLOSWrappers",
     "libCXLBaseTools",
     "libvulkan",
-    "libVkLayer_swapchain.so",
     "jpeg",
     "png",
     "z",               #used by PNG
@@ -78,6 +77,10 @@ commonSources = \
 # Vulkan specific source files
 sources = \
 [
+
+# common sources
+    env['VulkanSDK_src_dir']+ "/layers/vk_layer_extension_utils.cpp",
+    env['VulkanSDK_src_dir']+ "/layers/vk_layer_table.cpp",
 
 # VKT sources
     "OS/Linux/VulkanServer.cpp",

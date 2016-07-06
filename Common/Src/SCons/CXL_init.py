@@ -659,6 +659,7 @@ def initVulkanSDK (env) :
         VulkanSDK_dir +  '/Source/loader',
         VulkanSDK_dir +  '/glslang/SPIRV',
     ]
+    env.Append(VulkanSDK_src_dir = env['CXL_common_dir'] + '/Src/Vulkan/1.0.13.0/SDK/Source')
     env.Append(LIBPATH = [VulkanSDK_libs_dir])
     env.Append(CPPPATH = [VulkanSDK_includes])
 
