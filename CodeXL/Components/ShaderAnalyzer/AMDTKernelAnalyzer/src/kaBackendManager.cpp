@@ -328,6 +328,8 @@ kaBackendManager::kaBackendManager() : m_firstTimeRun(true), m_isInBuild(false),
         GT_ASSERT(rc);
 
         m_pBoost->m_pBuildThread.reset(new BuildThread(*this));
+        rc = connect(this, SIGNAL(MessageReady()), this, SLOT(readLog()));
+        GT_ASSERT(rc);
 
         // compileResultReady should be the last slot to be called.
         // So connect it first.
@@ -764,7 +766,7 @@ void kaBackendManager::setUpForBuild(const QString& sourceCode, const std::strin
 
     std::string buildMessage(message.asCharArray());
     backendMessageCallback(buildMessage);
-    readLog();
+    emit MessageReady();
 
     if (m_pBoost->m_pBuildThread->m_buildType != DX_FXC_BUILD)
     {
@@ -1148,7 +1150,7 @@ void kaBackendManager::UpdateOBuildOption(QString& optionsStr)
                 optionsParam.removeAt(indexOfCreateLib);
                 std::string sMsg(KA_STR_RemovedOptionCreateLibrary);
                 backendMessageCallback(sMsg);
-                readLog();
+                emit MessageReady();
             }
         }
     }
@@ -1268,7 +1270,7 @@ void kaBackendManager::getBinary(const gtString& deviceName, const gtString& bin
         gtString msg;
         msg.appendFormattedString(KA_STR_NoBinariesForDevice, deviceName.asCharArray());
         backendMessageCallback(msg.asASCIICharArray());
-        readLog();
+        emit MessageReady();
     }
 }
 
@@ -1315,7 +1317,7 @@ void kaBackendManager::compileResultReady()
         }
 
         // Read the log to clear any pending messages.
-        readLog();
+        emit MessageReady();
 
         m_isInBuild = false;
 
@@ -1401,7 +1403,7 @@ bool kaBackendManager::BuildThread::BuildOpenclSourceFile(kaSourceFile* pCurrent
                         std::stringstream buildMsg;
                         buildMsg << std::endl << currBuildNumber++ << "> " << fileName.asASCIICharArray() << " for " << device << ": ";
                         backendMessageCallback(buildMsg.str());
-                        m_owner.readLog();
+                        m_owner.triggerMessageReady();
 
                         // Launch the session for that specific device.
                         cliOutput.clear();
@@ -1427,7 +1429,7 @@ bool kaBackendManager::BuildThread::BuildOpenclSourceFile(kaSourceFile* pCurrent
 
                         // Inform the user.
                         backendMessageCallback(cliOutput);
-                        m_owner.readLog();
+                        m_owner.triggerMessageReady();
                     }
                 }//for all devices
 
@@ -1539,7 +1541,7 @@ void kaBackendManager::BuildThread::BuildGlslShader(kaSourceFile* pCurrentFile,
                 std::stringstream buildMsg;
                 buildMsg << std::endl << currBuildNumber++ << "> " << device << ": ";
                 backendMessageCallback(buildMsg.str());
-                m_owner.readLog();
+                m_owner.triggerMessageReady();
 
                 // Launch the session for that specific device.
                 cliOutput.clear();
@@ -1548,7 +1550,7 @@ void kaBackendManager::BuildThread::BuildGlslShader(kaSourceFile* pCurrentFile,
 
                 // Inform the user.
                 backendMessageCallback(cliOutput);
-                m_owner.readLog();
+                m_owner.triggerMessageReady();
 
                 if (cliOutput.find(KA_CLI_STR_STATUS_SUCCESS) != string::npos)
                 {
@@ -1633,7 +1635,7 @@ bool kaBackendManager::BuildThread::BuildRenderProgram(const gtString& buildOutp
             std::stringstream buildMsg;
             buildMsg << std::endl << currBuildNumber++ << "> " << device << ": ";
             backendMessageCallback(buildMsg.str());
-            m_owner.readLog();
+            m_owner.triggerMessageReady();
 
             // Launch the session for that specific device.
             cliOutput.clear();
@@ -1644,7 +1646,7 @@ bool kaBackendManager::BuildThread::BuildRenderProgram(const gtString& buildOutp
 
             // Inform the user.
             backendMessageCallback(cliOutput);
-            m_owner.readLog();
+            m_owner.triggerMessageReady();
 
             if (cliOutput.find(KA_CLI_STR_STATUS_SUCCESS) != string::npos)
             {
@@ -1685,7 +1687,7 @@ bool kaBackendManager::BuildThread::BuildRenderProgram(const gtString& buildOutp
     bool result = m_shouldBeCanceled == false && (numOfBuildsOverall - numOfSuccessfulBuilds) == 0;
     return result;
 }
-void kaBackendManager::BuildThread::PrintBuildEpilogue(int numOfBuildsOverall, int numOfSuccessfulBuilds, const int devicesBuiltCount) const
+void kaBackendManager::BuildThread::PrintBuildEpilogue(int numOfBuildsOverall, int numOfSuccessfulBuilds, const int devicesBuiltCount)
 {
     gtASCIIString message;
 
@@ -1715,7 +1717,7 @@ void kaBackendManager::BuildThread::PrintBuildEpilogue(int numOfBuildsOverall, i
 
     // Print the output message.
     kaBackendManager::backendMessageCallback(message.asCharArray());
-    m_owner.readLog();
+    m_owner.triggerMessageReady();
 }
 
 gtString kaBackendManager::BuildThread::GetBuildOutputDir() const
@@ -1831,7 +1833,7 @@ bool kaBackendManager::BuildThread::BuildDxShader(kaSourceFile* pCurrentFile,
                     std::stringstream buildMsg;
                     buildMsg << std::endl << currBuildNumber++ << "> " << device << ": ";
                     backendMessageCallback(buildMsg.str());
-                    m_owner.readLog();
+                    m_owner.triggerMessageReady();
 
                     // Launch the session for that specific device.
                     cliOutput.clear();
@@ -1877,7 +1879,7 @@ bool kaBackendManager::BuildThread::BuildDxShader(kaSourceFile* pCurrentFile,
 
                     // Inform the user.
                     backendMessageCallback(cliOutput);
-                    m_owner.readLog();
+                    m_owner.triggerMessageReady();
 
                     if (cliOutput.find(KA_CLI_STR_STATUS_SUCCESS) != string::npos)
                     {
@@ -2047,7 +2049,7 @@ void kaBackendManager::printBuildSummary(int totalGoodBuild, int totalBuild)
     backendMessageCallback(std::string(message.toLatin1().data()));
 
     // Read log once more to make sure all contents are dumped.
-    readLog();
+    emit MessageReady();
 }
 
 
@@ -2342,7 +2344,7 @@ void kaBackendManager::PrintBuildPrologue(const gtString& programName, size_t nu
 
     std::string buildMessage(message.asCharArray());
     backendMessageCallback(buildMessage);
-    readLog();
+    emit MessageReady();
 }
 
 // ---------------------------------------------------------------------------

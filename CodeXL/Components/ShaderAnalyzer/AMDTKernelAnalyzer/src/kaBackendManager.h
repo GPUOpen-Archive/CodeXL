@@ -414,9 +414,10 @@ private:
         bool LaunchDxBuild(const gtString& buildOutputDir);
 
 #endif
+
     private:
         /// Prints the build epilogue.
-        void PrintBuildEpilogue(int numOfBuildsOverall, int numOfSuccessfulBuilds, const int devicesBuiltCount) const;
+        void PrintBuildEpilogue(int numOfBuildsOverall, int numOfSuccessfulBuilds, const int devicesBuiltCount);
         void UpdateStatisticsFileGroups(gtMap<gtString, gtVector<gtString>>& statisticsFilesGroups, const gtString& statisticsFileName, const std::string& device) const;
 
         void InitKaStageStatisticsGroups(gtMap<gtString, gtVector<gtString>>& statisticsFilesGroups) const;
@@ -565,6 +566,13 @@ private:
     //-----------------------------------------------------------------------------
     void printBuildSummary(int totalGoodBuild, int totalBuild);
 
+    //-----------------------------------------------------------------------------
+    /// This routine is used by the build thread to trigger the MessageReady event.
+    /// Qt does not allow an inner class to declare its own signals, so we are using
+    /// this method to bypass that limitation.
+    //-----------------------------------------------------------------------------
+    void triggerMessageReady() { emit MessageReady(); }
+
 public slots:
 
     //-----------------------------------------------------------------------------
@@ -581,6 +589,9 @@ public slots:
     void compileResultReady();
 
 signals:
+    
+    /// Notifies that there is a new message in the queue.
+    bool MessageReady();
 
     /// Send a device's text output, name and kernel name
     /// \param[in] text           A compile result text
