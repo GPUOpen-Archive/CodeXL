@@ -781,7 +781,7 @@ void acSourceCodeView::SetCursorPositionToMiddle(int line, int index)
     int firstLine = firstVisibleLine();
     int lastLine = -1;
 
-    if (line > 0 && line < lines())
+    if (line > 0 && line <= lines())
     {
         // calculate last line on display
         // creating a QPoint thats at the end of the display and use it to
@@ -809,7 +809,7 @@ void acSourceCodeView::SetCursorPositionToMiddle(int line, int index)
         }
         //we assume here that line number, starts enumerations from '1'(i.e. like it's shown in UI), thus we reduce 1,
         //in order to adjust the line parameter to "start from zero" enumeration
-        setCursorPosition(line > 0 ? line - 1 : 0, index);
+        setCursorPosition(line - 1, index);
     }
 }
 
