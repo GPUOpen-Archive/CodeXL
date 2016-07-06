@@ -125,7 +125,7 @@ bool SessionSourceCodeView::DisplayViewModule(std::tuple<AMDTFunctionId, const g
     setCentralWidget(m_pWidget);
 
     // Create the symbols information:
-	//TODO : required ??
+    //TODO : required ??
     m_pTreeViewModel->CreateSymbolInfoList(m_moduleId, m_processId);
 
     // Create the top layout:
@@ -170,6 +170,7 @@ void SessionSourceCodeView::UpdateTableDisplay(unsigned int updateType)
         m_precision = afGlobalVariablesManager::instance().floatingPointPrecision();
 
 #if 0
+
         // Restore the currently selected address if not new address is requested:
         if (0 == m_pTreeViewModel->m_newAddress)
         {
@@ -320,7 +321,7 @@ bool SessionSourceCodeView::CreateViewLayout()
     m_pMainVBoxLayout->addWidget(m_pSourceCodeTree, 1);
 
     // Create CLU notes frame for CLU sessions:
-    createCLUNotesFrame(m_pMainVBoxLayout);
+    //createCLUNotesFrame(m_pMainVBoxLayout);
 
     // Create the bottom information frame:
     QFrame* pHintFrame = createHintLabelFrame();
@@ -450,12 +451,12 @@ bool SessionSourceCodeView::FillHotspotIndicatorCombo()
             GT_IF_WITH_ASSERT(!filterName.isEmpty())
             {
                 CounterNameIdVec countersName;
-				m_pDisplayFilter->GetSelectedCounterList(countersName);
+                m_pDisplayFilter->GetSelectedCounterList(countersName);
                 //m_pDisplayFilter->GetConfigCounters(filterName, countersName);
 
                 for (const auto& name : countersName)
                 {
-					gtString counterName = std::get<0>(name);
+                    gtString counterName = std::get<0>(name);
                     hotSpotColumns << acGTStringToQString(counterName);
                     m_supportedCounterList.push_back(counterName);
                 }
@@ -567,10 +568,11 @@ void SessionSourceCodeView::CreateTopLayout()
 void SessionSourceCodeView::OnItemSelectChanged(const QModelIndex& current, const QModelIndex& previous)
 {
     Q_UNUSED(previous);
+    Q_UNUSED(current);
 
     if (m_isProfiledClu)
     {
-        SourceViewTreeItem* pSrcItem = m_pTreeViewModel->getItem(current);
+        //SourceViewTreeItem* pSrcItem = m_pTreeViewModel->getItem(current);
         gtVector<float> cluData;
         gtMap<int, int> idxList;
         int cluEndOffset = IBS_CLU_OFFSET(IBS_CLU_END);
@@ -590,6 +592,7 @@ void SessionSourceCodeView::OnItemSelectChanged(const QModelIndex& current, cons
                     SampleKeyType key;
                     key.event = evCluPercent;
                     key.cpu = cpuId;
+#if 0
                     CpuEventViewIndexMap::const_iterator idxIt = m_pSessionDisplaySettings->m_eventToIndexMap.find(key);
 
                     int idx = *idxIt;
@@ -602,6 +605,8 @@ void SessionSourceCodeView::OnItemSelectChanged(const QModelIndex& current, cons
                         float dataAsVariant = pSrcItem->data(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN + 1 + idx).toFloat();
                         cluData.push_back(dataAsVariant);
                     }
+
+#endif
                 }
             }
 
@@ -706,9 +711,9 @@ void SessionSourceCodeView::OnTreeItemClick(const QModelIndex& index)
     GT_IF_WITH_ASSERT(m_pTreeViewModel != nullptr)
     {
         // Extract the top level item index + the top level item child index for the current selection:
-        bool rc = m_pTreeViewModel->GetItemTopLevelIndex(index, 
-			m_userDisplayInformation.m_selectedTopLevelItemIndex, 
-			m_userDisplayInformation.m_selectedTopLevelChildItemIndex);
+        bool rc = m_pTreeViewModel->GetItemTopLevelIndex(index,
+                                                         m_userDisplayInformation.m_selectedTopLevelItemIndex,
+                                                         m_userDisplayInformation.m_selectedTopLevelChildItemIndex);
         GT_ASSERT(rc);
     }
 }
@@ -856,9 +861,9 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
         m_pTreeViewModel->m_funcId = m_functionIdVec.at(functionIndex);
         AMDTProfileFunctionData  functionData;
         m_pProfDataRdr->GetFunctionDetailedProfileData(m_pTreeViewModel->m_funcId,
-                                                                 AMDT_PROFILE_ALL_PROCESSES,
-                                                                 AMDT_PROFILE_ALL_THREADS,
-                                                                 functionData);
+                                                       AMDT_PROFILE_ALL_PROCESSES,
+                                                       AMDT_PROFILE_ALL_THREADS,
+                                                       functionData);
 
 
         gtString srcFilePath;
@@ -867,48 +872,48 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
 
         m_srcFilePath = srcFilePath;
 
-            m_pTreeViewModel->m_pid = AMDT_PROFILE_ALL_PROCESSES;
-            m_pTreeViewModel->m_tid = AMDT_PROFILE_ALL_THREADS;
+        m_pTreeViewModel->m_pid = AMDT_PROFILE_ALL_PROCESSES;
+        m_pTreeViewModel->m_tid = AMDT_PROFILE_ALL_THREADS;
 
-            bool isMultiPID = (functionData.m_pidsList.size() > 1);
-            bool isMultiTID = (functionData.m_threadsList.size() > 1);
-            QStringList pidList, tidList;
+        bool isMultiPID = (functionData.m_pidsList.size() > 1);
+        bool isMultiTID = (functionData.m_threadsList.size() > 1);
+        QStringList pidList, tidList;
 
-            if (isMultiPID)
+        if (isMultiPID)
+        {
+            for (const auto& pid : functionData.m_pidsList)
             {
-                for (const auto& pid : functionData.m_pidsList)
-                {
-                    pidList << (QString::number(pid));
-                }
-
-                pidList.insert(0, CP_profileAllProcesses);
+                pidList << (QString::number(pid));
             }
 
-            if (isMultiTID)
-            {
-                for (const auto& tid : functionData.m_threadsList)
-                {
-                    tidList << (QString::number(tid));
-                }
+            pidList.insert(0, CP_profileAllProcesses);
+        }
 
-                tidList.insert(0, CP_profileAllThreads);
+        if (isMultiTID)
+        {
+            for (const auto& tid : functionData.m_threadsList)
+            {
+                tidList << (QString::number(tid));
             }
 
-            // Update the PID and TID string lists:
-            m_pPIDComboBoxAction->UpdateStringList(pidList);
-            m_pTIDComboBoxAction->UpdateStringList(tidList);
+            tidList.insert(0, CP_profileAllThreads);
+        }
 
-            // Show / Hide the pid and tid combo boxes:
-            // Notice: Since a widget cannot be hide on a toolbar, we should hide the action of the widget:
-            m_pPIDComboBoxAction->UpdateVisible(isMultiPID);
-            m_pPIDLabelAction->UpdateVisible(isMultiPID);
-            m_pTIDComboBoxAction->UpdateVisible(isMultiPID || isMultiTID);
-            m_pTIDLabelAction->UpdateVisible(isMultiPID || isMultiTID);
+        // Update the PID and TID string lists:
+        m_pPIDComboBoxAction->UpdateStringList(pidList);
+        m_pTIDComboBoxAction->UpdateStringList(tidList);
 
-            m_pTIDComboBoxAction->UpdateEnabled(isMultiTID);
+        // Show / Hide the pid and tid combo boxes:
+        // Notice: Since a widget cannot be hide on a toolbar, we should hide the action of the widget:
+        m_pPIDComboBoxAction->UpdateVisible(isMultiPID);
+        m_pPIDLabelAction->UpdateVisible(isMultiPID);
+        m_pTIDComboBoxAction->UpdateVisible(isMultiPID || isMultiTID);
+        m_pTIDLabelAction->UpdateVisible(isMultiPID || isMultiTID);
 
-            // Update the display:
-            ProtectedUpdateTableDisplay(UPDATE_TABLE_REBUILD);
+        m_pTIDComboBoxAction->UpdateEnabled(isMultiTID);
+
+        // Update the display:
+        ProtectedUpdateTableDisplay(UPDATE_TABLE_REBUILD);
     }
 }
 
@@ -1342,7 +1347,8 @@ QString SessionSourceCodeView::FindSourceFile(QString fileName)
     QString srcDirs = acGTStringToQString(sourceDirectories);
 
     // add the working directory
-    QString wrkDir = QString::fromWCharArray(m_pProfileInfo->m_wrkDirectory.asCharArray());
+    //QString wrkDir = QString::fromWCharArray(m_pProfileInfo->m_wrkDirectory.asCharArray());
+    QString wrkDir = "";
 
     QStringList dirList;
 
@@ -1803,9 +1809,9 @@ bool SessionSourceCodeView::CreateModelData()
         {
             // Render DASM
             retVal = m_pTreeViewModel->BuildDisassemblyTree();
-			m_pTreeViewModel->m_isDisplayingOnlyDasm = false;
+            m_pTreeViewModel->m_isDisplayingOnlyDasm = false;
         }
-	}
+    }
     return retVal;
 }
 
@@ -1862,15 +1868,15 @@ void SessionSourceCodeView::UpdatePercentDelegate()
 
 void SessionSourceCodeView::UpdatePercentDelegate()
 {
-	// Sanity check:
-	GT_IF_WITH_ASSERT((m_pTreeItemDelegate != nullptr) && (m_pDisplayFilter != nullptr))
-	{
-		QList<int> percentColumnsList;
-		percentColumnsList << SOURCE_VIEW_SAMPLES_PERCENT_COLUMN;
+    // Sanity check:
+    GT_IF_WITH_ASSERT((m_pTreeItemDelegate != nullptr) && (m_pDisplayFilter != nullptr))
+    {
+        QList<int> percentColumnsList;
+        percentColumnsList << SOURCE_VIEW_SAMPLES_PERCENT_COLUMN;
 
-		m_pTreeItemDelegate->SetPercentColumnsList(percentColumnsList);
-		m_pTreeItemDelegate->SetPercentForgroundColor(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
-	}
+        m_pTreeItemDelegate->SetPercentColumnsList(percentColumnsList);
+        m_pTreeItemDelegate->SetPercentForgroundColor(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
+    }
 }
 
 void SessionSourceCodeView::RefreshView()
@@ -2503,82 +2509,82 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
 
 bool SessionSourceCodeView::FindRequestedFunctionInModule(int functionIndex)
 {
-	bool retVal = false;
+    bool retVal = false;
 
-	// Can we safely bailout if functionIndex is -1 ?
-	if (-1 == functionIndex)
-	{
-		return false;
-	}
+    // Can we safely bailout if functionIndex is -1 ?
+    if (-1 == functionIndex)
+    {
+        return false;
+    }
 
-	// Sanity check:
-	GT_IF_WITH_ASSERT(m_pTreeViewModel != nullptr)
-	{
-		// Check if the function is already in the current address:
-		retVal = IsAddressInCurrentFunction(m_pTreeViewModel->m_newAddress);
+    // Sanity check:
+    GT_IF_WITH_ASSERT(m_pTreeViewModel != nullptr)
+    {
+        // Check if the function is already in the current address:
+        retVal = IsAddressInCurrentFunction(m_pTreeViewModel->m_newAddress);
 
-		if (!retVal)
-		{
-			retVal = true;
+        if (!retVal)
+        {
+            retVal = true;
 
-			// Reset the "Display only dasm flag":
-			m_pTreeViewModel->m_isDisplayingOnlyDasm = false;
+            // Reset the "Display only dasm flag":
+            m_pTreeViewModel->m_isDisplayingOnlyDasm = false;
 
-			// Reset the symbol iterator to the beginning of the function:
-			m_pTreeViewModel->m_currentSymbolIterator = m_pTreeViewModel->m_symbolsInfoList.begin();
-			FuncSymbolsList::iterator itEnd = m_pTreeViewModel->m_symbolsInfoList.end();
+            // Reset the symbol iterator to the beginning of the function:
+            m_pTreeViewModel->m_currentSymbolIterator = m_pTreeViewModel->m_symbolsInfoList.begin();
+            FuncSymbolsList::iterator itEnd = m_pTreeViewModel->m_symbolsInfoList.end();
 
-			// Increment the iterator to point to the "functionIndex" position in the list:
-			for (int i = 0; i < functionIndex; ++i, ++m_pTreeViewModel->m_currentSymbolIterator)
-			{
-				if (m_pTreeViewModel->m_currentSymbolIterator == itEnd)
-				{
-					// Function index exceeds the list size:
-					retVal = false;
-					break;
-				}
-			}
+            // Increment the iterator to point to the "functionIndex" position in the list:
+            for (int i = 0; i < functionIndex; ++i, ++m_pTreeViewModel->m_currentSymbolIterator)
+            {
+                if (m_pTreeViewModel->m_currentSymbolIterator == itEnd)
+                {
+                    // Function index exceeds the list size:
+                    retVal = false;
+                    break;
+                }
+            }
 
 
-			GT_IF_WITH_ASSERT(retVal)
-			{
-				if (0 == m_pTreeViewModel->m_newAddress)
-				{
-					m_pTreeViewModel->m_newAddress = m_pTreeViewModel->m_currentSymbolIterator->m_va;
-				}
+            GT_IF_WITH_ASSERT(retVal)
+            {
+                if (0 == m_pTreeViewModel->m_newAddress)
+                {
+                    m_pTreeViewModel->m_newAddress = m_pTreeViewModel->m_currentSymbolIterator->m_va;
+                }
 
-				// Find the function within the module:
-				m_pTreeViewModel->m_pDisplayedFunction = m_pTreeViewModel->m_pModule->findFunction(m_pTreeViewModel->m_currentSymbolIterator->m_va);
+                // Find the function within the module:
+                m_pTreeViewModel->m_pDisplayedFunction = m_pTreeViewModel->m_pModule->findFunction(m_pTreeViewModel->m_currentSymbolIterator->m_va);
 
-				if (m_pTreeViewModel->m_pDisplayedFunction == nullptr)
-				{
-					m_pTreeViewModel->m_pDisplayedFunction = m_pTreeViewModel->m_pModule->getUnchartedFunction();
-				}
+                if (m_pTreeViewModel->m_pDisplayedFunction == nullptr)
+                {
+                    m_pTreeViewModel->m_pDisplayedFunction = m_pTreeViewModel->m_pModule->getUnchartedFunction();
+                }
 
-				if (m_pTreeViewModel->m_pDisplayedFunction != nullptr)
-				{
-					// Set the new display function properties:
-					m_pTreeViewModel->m_loadAddr = m_pTreeViewModel->m_currentSymbolIterator->m_va;
+                if (m_pTreeViewModel->m_pDisplayedFunction != nullptr)
+                {
+                    // Set the new display function properties:
+                    m_pTreeViewModel->m_loadAddr = m_pTreeViewModel->m_currentSymbolIterator->m_va;
 
-					GT_IF_WITH_ASSERT(m_pTreeViewModel->m_pDisplayedFunction != nullptr)
-					{
-						if (CA_NO_SYMBOL == m_pTreeViewModel->m_currentSymbolIterator->m_name)
-						{
-							m_pTreeViewModel->m_loadAddr = m_pTreeViewModel->m_pDisplayedFunction->getBaseAddr();
-						}
-					}
-				}
-				else
-				{
-					// Function not found:
-					retVal = false;
-				}
-			}
+                    GT_IF_WITH_ASSERT(m_pTreeViewModel->m_pDisplayedFunction != nullptr)
+                    {
+                        if (CA_NO_SYMBOL == m_pTreeViewModel->m_currentSymbolIterator->m_name)
+                        {
+                            m_pTreeViewModel->m_loadAddr = m_pTreeViewModel->m_pDisplayedFunction->getBaseAddr();
+                        }
+                    }
+                }
+                else
+                {
+                    // Function not found:
+                    retVal = false;
+                }
+            }
 
-			UpdateWithNewSymbol();
-		}
-	}
+            UpdateWithNewSymbol();
+        }
+    }
 
-	return retVal;
+    return retVal;
 }
 #endif

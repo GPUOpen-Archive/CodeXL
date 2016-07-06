@@ -160,7 +160,7 @@ bool ProcessesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId,
     bool retVal = false;
 
     GT_IF_WITH_ASSERT((m_pProfDataRdr != nullptr) &&
-                      (m_pSessionDisplaySettings != nullptr) &&
+                      (m_pDisplayFilter != nullptr) &&
                       (m_pTableDisplaySettings != nullptr))
     {
         // get samples for Data cache access events

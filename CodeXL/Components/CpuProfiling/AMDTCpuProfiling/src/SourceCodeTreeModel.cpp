@@ -718,81 +718,83 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
 bool SourceCodeTreeModel::BuildDisassemblyTree()
 {
 
-	gtVector<AMDTProfileCounterDesc> counterDesc;
-	gtString srcFilePath;
-	AMDTSourceAndDisasmInfoVec srcInfoVec;
+    gtVector<AMDTProfileCounterDesc> counterDesc;
+    gtString srcFilePath;
+    AMDTSourceAndDisasmInfoVec srcInfoVec;
 
-	AMDTProfileFunctionData  functionData;
-	int retVal = m_pProfDataRdr->GetFunctionDetailedProfileData(m_funcId,
-		m_pid,
-		m_tid,
-		functionData);
+    AMDTProfileFunctionData  functionData;
+    int retVal = m_pProfDataRdr->GetFunctionDetailedProfileData(m_funcId,
+                                                                m_pid,
+                                                                m_tid,
+                                                                functionData);
 
-	if (retVal != static_cast<int>(CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE))
-	{
-		retVal = m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_funcId, srcFilePath, srcInfoVec);
-	}
+    if (retVal != static_cast<int>(CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE))
+    {
+        retVal = m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_funcId, srcFilePath, srcInfoVec);
+    }
 
 
-	for (const auto& srcData : functionData.m_srcLineDataList)
-	{
-		bool samplePercentSet = m_pDisplayFilter->GetSamplePercent();
-		gtVector<gtVAddr> instOffsetVec;
-		GetInstOffsets(srcData.m_sourceLineNumber, srcInfoVec, instOffsetVec);
+    for (const auto& srcData : functionData.m_srcLineDataList)
+    {
+        bool samplePercentSet = m_pDisplayFilter->GetSamplePercent();
+        gtVector<gtVAddr> instOffsetVec;
+        GetInstOffsets(srcData.m_sourceLineNumber, srcInfoVec, instOffsetVec);
 
-		int idx = SOURCE_VIEW_SAMPLES_PERCENT_COLUMN + 1;
-		for (auto& instOffset : instOffsetVec)
-		{
-			SourceViewTreeItem* pAsmItem = new SourceViewTreeItem(m_pSessionDisplaySettings,
-				SOURCE_VIEW_ASM_DEPTH,
-				m_pRootItem);
+        int idx = SOURCE_VIEW_SAMPLES_PERCENT_COLUMN + 1;
 
-			gtString disasm;
-			gtString codeByte;
+        for (auto& instOffset : instOffsetVec)
+        {
+            SourceViewTreeItem* pAsmItem = new SourceViewTreeItem(m_pSessionDisplaySettings,
+                                                                  SOURCE_VIEW_ASM_DEPTH,
+                                                                  m_pRootItem);
 
-			GetDisasmString(instOffset, srcInfoVec, disasm, codeByte);
-			AMDTSampleValueVec sampleValue;
-			GetDisasmSampleValue(instOffset, functionData.m_instDataList, sampleValue);
+            gtString disasm;
+            gtString codeByte;
 
-			idx = SOURCE_VIEW_SAMPLES_PERCENT_COLUMN+1;
-			bool flag = true;
+            GetDisasmString(instOffset, srcInfoVec, disasm, codeByte);
+            AMDTSampleValueVec sampleValue;
+            GetDisasmSampleValue(instOffset, functionData.m_instDataList, sampleValue);
 
-			for (auto& aSampleValue : sampleValue)
-			{
-				if (true == flag)
-				{
-					pAsmItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, aSampleValue.m_sampleCount);
-					pAsmItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, aSampleValue.m_sampleCountPercentage);
-					pAsmItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
-					flag = false;
-				}
+            idx = SOURCE_VIEW_SAMPLES_PERCENT_COLUMN + 1;
+            bool flag = true;
 
-				if (false == samplePercentSet)
-				{
-					double sampleCount = aSampleValue.m_sampleCount;
-					pAsmItem->setData(idx, sampleCount);
-				}
-				else
-				{
-					QVariant var;
-					SetPercentFormat(aSampleValue.m_sampleCountPercentage, true, var);
-					pAsmItem->setData(idx, var);
-				}
+            for (auto& aSampleValue : sampleValue)
+            {
+                if (true == flag)
+                {
+                    pAsmItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, aSampleValue.m_sampleCount);
+                    pAsmItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, aSampleValue.m_sampleCountPercentage);
+                    pAsmItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
+                    flag = false;
+                }
 
-				idx++;
-			}
+                if (false == samplePercentSet)
+                {
+                    double sampleCount = aSampleValue.m_sampleCount;
+                    pAsmItem->setData(idx, sampleCount);
+                }
+                else
+                {
+                    QVariant var;
+                    SetPercentFormat(aSampleValue.m_sampleCountPercentage, true, var);
+                    pAsmItem->setData(idx, var);
+                }
 
-			pAsmItem->setData(SOURCE_VIEW_ADDRESS_COLUMN, "0x" + QString::number(instOffset, 16));
-			pAsmItem->setForeground(SOURCE_VIEW_ADDRESS_COLUMN, acQGREY_TEXT_COLOUR);
+                idx++;
+            }
 
-			pAsmItem->setData(SOURCE_VIEW_SOURCE_COLUMN, acGTStringToQString(disasm));
-			pAsmItem->setForeground(SOURCE_VIEW_SOURCE_COLUMN, acQGREY_TEXT_COLOUR);
+            pAsmItem->setData(SOURCE_VIEW_ADDRESS_COLUMN, "0x" + QString::number(instOffset, 16));
+            pAsmItem->setForeground(SOURCE_VIEW_ADDRESS_COLUMN, acQGREY_TEXT_COLOUR);
 
-			pAsmItem->setData(SOURCE_VIEW_CODE_BYTES_COLUMN, acGTStringToQString(codeByte));
-			pAsmItem->setForeground(SOURCE_VIEW_CODE_BYTES_COLUMN, acQGREY_TEXT_COLOUR);
-		}
-	}
-	return true;
+            pAsmItem->setData(SOURCE_VIEW_SOURCE_COLUMN, acGTStringToQString(disasm));
+            pAsmItem->setForeground(SOURCE_VIEW_SOURCE_COLUMN, acQGREY_TEXT_COLOUR);
+
+            pAsmItem->setData(SOURCE_VIEW_CODE_BYTES_COLUMN, acGTStringToQString(codeByte));
+            pAsmItem->setForeground(SOURCE_VIEW_CODE_BYTES_COLUMN, acQGREY_TEXT_COLOUR);
+        }
+    }
+
+    return true;
 }
 
 #if 0
@@ -1278,11 +1280,12 @@ void SourceCodeTreeModel::PrintFunctionDetailData(AMDTProfileFunctionData data,
             }
             else
             {
-				QVariant var;
-				SetPercentFormat(sample.m_sampleCountPercentage, true, var);
-				pLineItem->setData(idx, var);
-			}
-			idx++;
+                QVariant var;
+                SetPercentFormat(sample.m_sampleCountPercentage, true, var);
+                pLineItem->setData(idx, var);
+            }
+
+            idx++;
         }
 
 
@@ -1310,9 +1313,9 @@ void SourceCodeTreeModel::PrintFunctionDetailData(AMDTProfileFunctionData data,
                 }
                 else
                 {
-					QVariant var;
-					SetPercentFormat(aSampleValue.m_sampleCountPercentage, true, var);
-					pAsmItem->setData(idx, var);
+                    QVariant var;
+                    SetPercentFormat(aSampleValue.m_sampleCountPercentage, true, var);
+                    pAsmItem->setData(idx, var);
                 }
 
                 idx++;
@@ -1322,7 +1325,7 @@ void SourceCodeTreeModel::PrintFunctionDetailData(AMDTProfileFunctionData data,
             if (true == flag)
             {
                 pLineItem->setData(SOURCE_VIEW_ADDRESS_COLUMN, "0x" + QString::number(moduleBaseAddr + instOffset, 16));
-				m_newAddress = moduleBaseAddr + instOffset;
+                m_newAddress = moduleBaseAddr + instOffset;
                 flag = false;
             }
 
@@ -1343,23 +1346,23 @@ void SourceCodeTreeModel::BuildTree(const std::vector<SourceViewTreeItem*>& srcL
     gtVector<AMDTProfileCounterDesc> counterDesc;
     bool ret = m_pProfDataRdr->GetSampledCountersList(counterDesc);
 
-	if (true == ret)
+    if (true == ret)
+    {
+        AMDTProfileFunctionData  functionData;
+        int retVal = m_pProfDataRdr->GetFunctionDetailedProfileData(m_funcId,
+                                                                    m_pid,
+                                                                    m_tid,
+                                                                    functionData);
+
+        if (retVal != static_cast<int>(CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE))
         {
-            AMDTProfileFunctionData  functionData;
-            int retVal = m_pProfDataRdr->GetFunctionDetailedProfileData(m_funcId,
-                    m_pid,
-                    m_tid,
-                    functionData);
+            gtString srcFilePath;
+            AMDTSourceAndDisasmInfoVec srcInfoVec;
+            retVal = m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_funcId, srcFilePath, srcInfoVec);
 
-            if (retVal != static_cast<int>(CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE))
-            {
-                gtString srcFilePath;
-                AMDTSourceAndDisasmInfoVec srcInfoVec;
-                retVal = m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_funcId, srcFilePath, srcInfoVec);
-
-                PrintFunctionDetailData(functionData, srcFilePath, srcInfoVec, srcLineViewTreeMap);
-            }
+            PrintFunctionDetailData(functionData, srcFilePath, srcInfoVec, srcLineViewTreeMap);
         }
+    }
 }
 
 bool SourceCodeTreeModel::BuildSourceAndDASMTree()
@@ -1460,12 +1463,13 @@ bool SourceCodeTreeModel::UpdateHeaders()
         m_headerTooltips << CP_colCaptionSamplesTooltip;
         m_headerTooltips << CP_colCaptionSamplesPercentTooltip;
 
-		CounterNameIdVec counterDesc;
+        CounterNameIdVec counterDesc;
 #if 0
-		QString configName = m_pDisplayFilter->GetCurrentCofigName();
-		m_pDisplayFilter->GetConfigCounters(configName, counterDesc);
+        QString configName = m_pDisplayFilter->GetCurrentCofigName();
+        m_pDisplayFilter->GetConfigCounters(configName, counterDesc);
 #endif
-		m_pDisplayFilter->GetSelectedCounterList(counterDesc);
+        m_pDisplayFilter->GetSelectedCounterList(counterDesc);
+
         for (const auto& counter : counterDesc)
         {
             m_headerCaptions << acGTStringToQString(std::get<1>(counter));
@@ -1723,6 +1727,8 @@ void SourceCodeTreeModel::PopulateDasmLines(const SourceLineKey& sourceLineKey, 
 
             CpuProfileSampleMap::const_iterator sampleIt = ait->second.getBeginSample();
 
+#if 0
+
             for (; sampleIt != ait->second.getEndSample(); sampleIt++)
             {
                 SampleKeyType key(sampleIt->first.cpu, sampleIt->first.event);
@@ -1774,6 +1780,8 @@ void SourceCodeTreeModel::PopulateDasmLines(const SourceLineKey& sourceLineKey, 
                     (m_addressData[asmAddr])[complexIndex] = calc;
                 }
             }
+
+#endif
 
             if (sourceLineKey.m_lineNumber >= 0)
             {
@@ -3126,106 +3134,106 @@ void SourceCodeTreeModel::SetSingleItemDataValue(SourceViewTreeItem* pItem, int 
 
 void SourceCodeTreeModel::SetPercentFormat(double  val, bool appendPercent, QVariant& data)
 {
-	int precision = afGlobalVariablesManager::instance().percentagePointPrecision();
+    int precision = afGlobalVariablesManager::instance().percentagePointPrecision();
 
-	if (val > 0)
-	{
-		if (fmod(val, (float)1.0) == 0.0)
-		{
-			precision = 0;
-		}
+    if (val > 0)
+    {
+        if (fmod(val, (float)1.0) == 0.0)
+        {
+            precision = 0;
+        }
 
-		data = QVariant(QString::number(val, 'f', precision).toDouble());
+        data = QVariant(QString::number(val, 'f', precision).toDouble());
 
-		if (appendPercent)
-		{
-			data.setValue(data.toString().append("%"));
-		}
-	}
+        if (appendPercent)
+        {
+            data.setValue(data.toString().append("%"));
+        }
+    }
 }
 
 
 void SourceCodeTreeModel::SetSingleItemDataValue(SourceViewTreeItem* pItem, int column, bool appendPercent)
 {
-	// Sanity check:
-	GT_IF_WITH_ASSERT(pItem != nullptr)
-	{
-		// Find the info matching this item:
-		SourceLineAsmInfo info(-1, -1);
-		bool wasItemFound = false;
+    // Sanity check:
+    GT_IF_WITH_ASSERT(pItem != nullptr)
+    {
+        // Find the info matching this item:
+        SourceLineAsmInfo info(-1, -1);
+        bool wasItemFound = false;
 
-		// Find the matching source line for this item:
-		wasItemFound = m_sourceLineToTreeItemsMap.contains(pItem);
+        // Find the matching source line for this item:
+        wasItemFound = m_sourceLineToTreeItemsMap.contains(pItem);
 
-		if (wasItemFound)
-		{
-			info = m_sourceLineToTreeItemsMap[pItem];
-			wasItemFound = true;
-		}
+        if (wasItemFound)
+        {
+            info = m_sourceLineToTreeItemsMap[pItem];
+            wasItemFound = true;
+        }
 
-		if (wasItemFound)
-		{
-			// Find the data value for this item:
-			const gtVector<float>& dataVector = m_sourceLinesToDataMap[info];
-			int precision = appendPercent ? afGlobalVariablesManager::instance().percentagePointPrecision() :
-				afGlobalVariablesManager::instance().floatingPointPrecision();
+        if (wasItemFound)
+        {
+            // Find the data value for this item:
+            const gtVector<float>& dataVector = m_sourceLinesToDataMap[info];
+            int precision = appendPercent ? afGlobalVariablesManager::instance().percentagePointPrecision() :
+                            afGlobalVariablesManager::instance().floatingPointPrecision();
 
-			// Get the data for the column:
-			int positionInDataVector = column - SOURCE_VIEW_SAMPLES_PERCENT_COLUMN - 1;
+            // Get the data for the column:
+            int positionInDataVector = column - SOURCE_VIEW_SAMPLES_PERCENT_COLUMN - 1;
 
-			// The following if block should only be executed for lines that have meaningful data for the counter columns
-			// This condition may fail, for example for dasm lines that contain the string "---- break ----"
-			if ((positionInDataVector >= 0) && (positionInDataVector < (int)dataVector.size()))
-			{
-				float valueToSetOnItem = dataVector[positionInDataVector];
+            // The following if block should only be executed for lines that have meaningful data for the counter columns
+            // This condition may fail, for example for dasm lines that contain the string "---- break ----"
+            if ((positionInDataVector >= 0) && (positionInDataVector < (int)dataVector.size()))
+            {
+                float valueToSetOnItem = dataVector[positionInDataVector];
 
-				if (valueToSetOnItem > 0)
-				{
-					// Set the item delegate for the current column:
-					bool isProfilingCLU = m_pSessionDisplaySettings->m_pProfileInfo->m_isProfilingCLU;
-					bool displayPercentageInColumn = CPUGlobalDisplayFilter::instance().m_displayPercentageInColumn && (!isProfilingCLU);
+                if (valueToSetOnItem > 0)
+                {
+                    // Set the item delegate for the current column:
+                    bool isProfilingCLU = m_pSessionDisplaySettings->m_pProfileInfo->m_isProfilingCLU;
+                    bool displayPercentageInColumn = CPUGlobalDisplayFilter::instance().m_displayPercentageInColumn && (!isProfilingCLU);
 
-					if (displayPercentageInColumn)
-					{
-						gtVector<int>::const_iterator valsItBegin = m_pSessionDisplaySettings->m_simpleValuesVector.begin();
-						gtVector<int>::const_iterator valsItEnd = m_pSessionDisplaySettings->m_simpleValuesVector.end();
+                    if (displayPercentageInColumn)
+                    {
+                        gtVector<int>::const_iterator valsItBegin = m_pSessionDisplaySettings->m_simpleValuesVector.begin();
+                        gtVector<int>::const_iterator valsItEnd = m_pSessionDisplaySettings->m_simpleValuesVector.end();
 
-						gtVector<int>::const_iterator findIt = gtFind(valsItBegin, valsItEnd, positionInDataVector);
+                        gtVector<int>::const_iterator findIt = gtFind(valsItBegin, valsItEnd, positionInDataVector);
 
-						if (valsItEnd != findIt)
-						{
-							int totalIndex = m_pSessionDisplaySettings->m_totalValuesMap[positionInDataVector];
+                        if (valsItEnd != findIt)
+                        {
+                            int totalIndex = m_pSessionDisplaySettings->m_totalValuesMap[positionInDataVector];
 
-							if (totalIndex < (int)m_currentFunctionTotalDataVector.size())
-							{
-								if (m_currentFunctionTotalDataVector.at(totalIndex) > 0)
-								{
-									valueToSetOnItem = (valueToSetOnItem * 100.0) / m_currentFunctionTotalDataVector.at(totalIndex);
-								}
+                            if (totalIndex < (int)m_currentFunctionTotalDataVector.size())
+                            {
+                                if (m_currentFunctionTotalDataVector.at(totalIndex) > 0)
+                                {
+                                    valueToSetOnItem = (valueToSetOnItem * 100.0) / m_currentFunctionTotalDataVector.at(totalIndex);
+                                }
 
-								precision = afGlobalVariablesManager::instance().floatingPointPrecision();
+                                precision = afGlobalVariablesManager::instance().floatingPointPrecision();
 
-								if (fmod(valueToSetOnItem, (float)1.0) == 0.0)
-								{
-									precision = 0;
-								}
-							}
-						}
-					}
+                                if (fmod(valueToSetOnItem, (float)1.0) == 0.0)
+                                {
+                                    precision = 0;
+                                }
+                            }
+                        }
+                    }
 
-					QVariant data = QVariant(QString::number(valueToSetOnItem, 'f', precision).toDouble());
+                    QVariant data = QVariant(QString::number(valueToSetOnItem, 'f', precision).toDouble());
 
-					if (appendPercent)
-					{
-						data.setValue(data.toString().append("%"));
-					}
+                    if (appendPercent)
+                    {
+                        data.setValue(data.toString().append("%"));
+                    }
 
-					// Set the data on the item:
-					pItem->setData(column, data);
-				}
-			}
-		}
-	}
+                    // Set the data on the item:
+                    pItem->setData(column, data);
+                }
+            }
+        }
+    }
 }
 
 SourceViewTreeItem* SourceCodeTreeModel::AddDoubleClickItem(SourceViewTreeItem* pAsmItem)
@@ -3355,6 +3363,7 @@ void SourceCodeTreeModel::CalculateTotalModuleCountVector(CpuProfileReader* pPro
                             }
 
                             CpuProfileSampleMap::const_iterator sampleIt = aggregatedSampleIter->second.getBeginSample();
+#if 0
 
                             for (; sampleIt != aggregatedSampleIter->second.getEndSample(); sampleIt++)
                             {
@@ -3374,6 +3383,8 @@ void SourceCodeTreeModel::CalculateTotalModuleCountVector(CpuProfileReader* pPro
                                 // If this is a real line, aggregate it:
                                 m_currentModuleTotalDataVector[index] += sampleIt->second;
                             }
+
+#endif
                         }
                     }
                 }

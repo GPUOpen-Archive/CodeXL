@@ -100,8 +100,9 @@ public:
 
     CpuProfileModule* getModuleDetail(const QString& modulePath, QWidget* pParent = nullptr, ExecutableFile** ppExe = nullptr);
 
-	shared_ptr<cxlProfileDataReader> profDbReader() { return m_pProfDataRd; }
-	shared_ptr<DisplayFilter> GetDisplayFilter() { return m_pDisplayFilter; }
+    shared_ptr<cxlProfileDataReader> profDbReader() { return m_pProfDataRd; }
+    shared_ptr<DisplayFilter> GetDisplayFilter() { return m_pDisplayFilter; }
+    bool getCLUState() const { return m_isCLU; }
 
 public slots:
 
@@ -112,7 +113,7 @@ public slots:
     void onNavigateToDifferentTab(const QString& dest);
     bool onViewModulesView(SYSTEM_DATA_TAB_CONTENT aggregateBy);
     void onViewSourceView(gtVAddr Address, ProcessIdType pid, ThreadIdType tid, const CpuProfileModule* pModDetail);
-	void onViewSourceViewSlot(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> funcModInfo);
+    void onViewSourceViewSlot(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> funcModInfo);
     void onViewCallGraphView(unsigned long pid);
     void onViewFunctionTab(unsigned long pid);
 
@@ -156,8 +157,8 @@ protected:
 
 private:
 
-	//TODO: Hack to get database file needs to be taken care of
-	bool OpenDataReader();
+    //TODO: Hack to get database file needs to be taken care of
+    bool OpenDataReader();
 
     /// Session tree item data:
     const afApplicationTreeItemData* m_pSessionTreeItemData;
@@ -170,14 +171,15 @@ private:
     SessionDisplaySettings m_sessionDisplayFilter;
 
     /// Data tabs
-    SessionOverviewWindow*			m_pOverviewWindow		= nullptr;
-	SessionModulesView*				m_pSessionModulesView	= nullptr;
-    SessionFunctionView*			m_pSessionFunctionView	= nullptr;
-    SessionCallGraphView*           m_pCallGraphTab			= nullptr; 
+    SessionOverviewWindow*          m_pOverviewWindow       = nullptr;
+    SessionModulesView*             m_pSessionModulesView   = nullptr;
+    SessionFunctionView*            m_pSessionFunctionView  = nullptr;
+    SessionCallGraphView*           m_pCallGraphTab         = nullptr;
 
-	// database reader
-	shared_ptr<cxlProfileDataReader>    m_pProfDataRd	= nullptr;
-	shared_ptr<DisplayFilter>			m_pDisplayFilter = nullptr;
+    // database reader
+    shared_ptr<cxlProfileDataReader>    m_pProfDataRd   = nullptr;
+    shared_ptr<DisplayFilter>           m_pDisplayFilter = nullptr;
+    bool m_isCLU = false;
 
     /// Session window widgets
     QTabWidget*         m_pTabWidget;   // The widget that holds all the tabs

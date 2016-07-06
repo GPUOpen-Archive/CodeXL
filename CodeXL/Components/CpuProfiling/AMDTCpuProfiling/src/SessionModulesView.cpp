@@ -224,7 +224,7 @@ void SessionModulesView::setSessionWindowLayout()
 
 
     // Create CLU notes frame for CLU sessions:
-    createCLUNotesFrame(pNotesLayout);
+    //createCLUNotesFrame(pNotesLayout);
 
     pNotesWidget->setLayout(pNotesLayout);
     m_pSplitterCentralWidget->addWidget(pNotesWidget);
@@ -245,11 +245,10 @@ void SessionModulesView::setSessionWindowLayout()
     }
 
 
-    // Set the tables' display filter:
-    m_pTopModulesTable->setTableDisplaySettings(&m_modulesTableFilter, CurrentSessionDisplaySettings());
-    m_pBottomModulesTable->setTableDisplaySettings(&m_modulesTableFilter, CurrentSessionDisplaySettings());
-    m_pTopProcessesTable->setTableDisplaySettings(&m_processesTableFilter, CurrentSessionDisplaySettings());
-    m_pBottomProcessesTable->setTableDisplaySettings(&m_processesTableFilter, CurrentSessionDisplaySettings());
+    m_pTopModulesTable->setTableDisplaySettings(&m_modulesTableFilter);
+    m_pBottomModulesTable->setTableDisplaySettings(&m_modulesTableFilter);
+    m_pTopProcessesTable->setTableDisplaySettings(&m_processesTableFilter);
+    m_pBottomProcessesTable->setTableDisplaySettings(&m_processesTableFilter);
 
     // Show the tables:
     ProtectedUpdateTableDisplay(UPDATE_TABLE_REBUILD);
