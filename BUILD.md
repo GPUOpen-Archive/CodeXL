@@ -24,10 +24,21 @@ CodeXL build instructions
 
 CodeXL uses the SCons build system on Linux.
 
+#### Specific setup for Ubuntu 16.04
+* `sudo apt-get install gcc-multilib g++-multilib`
+* `sudo apt-get install libglu1-mesa-dev mesa-common-dev libgtk2.0-dev`
+* `sudo apt-get install zlib1g-dev libx11-dev:i386`
+* `sudo apt-get install scons`
+* `sudo apt-get install libboost-all-dev`
+* `sudo apt-get install libjpeg9-dev`
+* `sudo apt-get install libfltk1.3-dev`
+* Download and install latest JDK both for linux from : http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+* Go to the "Building CodeXL" section
+
 #### One time setup:
 * `sudo apt-get install gcc-multilib g++-multilib`
 * `sudo apt-get install gcc-4.9-multilib g++-4.9-multilib # added for Ubuntu 15.10 or above`
-* `sudo apt-get install libglu1-mesa-dev mesa-common-dev libgtk2.0-dev libpng16-dev libjpeg9-dev`
+* `sudo apt-get install libglu1-mesa-dev mesa-common-dev libgtk2.0-dev libjpeg9-dev`
 * `sudo apt-get install zlib1g-dev libx11-dev:i386`
 * `sudo apt-get install scons`
 * Download and install latest JDK both for linux from : http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
@@ -65,6 +76,13 @@ CodeXL uses the SCons build system on Linux.
 * CD to local copy of /CodeXL/Util/linux/
 * Run `./buildCodeXLFullLinuxProjects`
 
+#### Specific build instructions Ubuntu 16.04
+* To omit building the hsaprofiler, use:
+./backend_build.sh __skip-hsaprofiler__
+* Since Ubuntu 16.04 comes with gcc 5.3, use the installed boost libraries
+./buildCodeXLFullLinuxProjects -j5 CXL_build=debug CXL_boost_dir=/usr/lib/x86_64-linux-gnu
+./buildCodeXLFullLinuxProjects -j5 CXL_build=release CXL_boost_dir=/usr/lib/x86_64-linux-gnu
+
 #### Build Switches
 * all SCons general switches, like -c for clean , more info at http://scons.org/doc/HTML/scons-man.html
 * -j specify the number of concurrent jobs (-j6).
@@ -79,3 +97,6 @@ CodeXL uses the SCons build system on Linux.
     * __hsadir 'dir'__: by default, when building the HSA Profiler binaries, the build scripts will look for the HSA/ROCR headers under /opt/rocm/hsa.  You can override this location using the "hsadir" switch.
     * __quick__ or __incremental__: performs an incremental build (as opposed to a from-scratch build)
     * __clean__: performs a "clean" of all build targets, removing all intermediate and final output files
+
+#### Running CodeXL
+If CodeXL displays an error indicating that it is unable to establish a connection with the CodeXL remote agent, copy the CodeXLRemoteAgentConfig.xml file into your CodeXL binary folder. The source file is in the folder CodeXL/CodeXL/Remote/AMDTRemoteAgent/CodeXLRemoteAgentConfig.xml
