@@ -81,12 +81,13 @@ void ServerListenThread::beforeTermination()
     }
 }
 
-void ServerListenThread::~ServerListenThread()
+ServerListenThread::~ServerListenThread()
 {
     // free all allocated thread objects
     for (auto it : m_spawnedThreads)
     {
-        free *it;
+        ServerWorkerThread* pThread = it;
+        delete pThread;
     }
     m_spawnedThreads.clear();
 }
