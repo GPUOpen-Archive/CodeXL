@@ -1830,7 +1830,7 @@ const char* VktUtil::WritePointerAsString(const void* ptr)
 
 // This prevents VS2015 from complaining about imperfect "%" formatting when printing Vulkan objects.
 // This only applies to the 32-bit version of VulkanServer.
-#if AMDT_ADDRESS_SPACE_TYPE == AMDT_64_BIT_ADDRESS_SPACE
+#if AMDT_ADDRESS_SPACE_TYPE == AMDT_32_BIT_ADDRESS_SPACE
     #pragma warning (disable : 4313)
 #endif
 
