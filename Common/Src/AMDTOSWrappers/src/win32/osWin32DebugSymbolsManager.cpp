@@ -24,11 +24,12 @@
 #include <AMDTBaseTools/Include/gtString.h>
 
 // Local:
-#include <AMDTOSWrappers/Include/osOSDefinitions.h>
-#include <AMDTOSWrappers/Include/osWin32DebugSymbolsManager.h>
+#include <AMDTOSWrappers/Include/osDebugLog.h>
 #include <AMDTOSWrappers/Include/osFilePath.h>
 #include <AMDTOSWrappers/Include/osMutexLocker.h>
+#include <AMDTOSWrappers/Include/osOSDefinitions.h>
 #include <AMDTOSWrappers/Include/osStringConstants.h>
+#include <AMDTOSWrappers/Include/osWin32DebugSymbolsManager.h>
 
 // Static Variables:
 // Holds the loaded module size (See pdEnumerateLoadedModulesProc64)
@@ -229,6 +230,14 @@ bool osWin32DebugSymbolsManager::initializeProcessSymbolsServer(HANDLE hProcess,
         invadeProcessAsBOOL = TRUE;
     }
 
+#if AMDT_BUILD_CONFIGURATION == AMDT_RELEASE_BUILD
+    bool debugSymbolServer = false;
+#elif AMDT_BUILD_CONFIGURATION == AMDT_DEBUG_BUILD
+    bool debugSymbolServer = true;
+#else
+#error Unknown configuration!
+#endif
+
     // Get the Debug Symbols engine options:
     DWORD symOptions = SymGetOptions();
 
@@ -237,21 +246,42 @@ bool osWin32DebugSymbolsManager::initializeProcessSymbolsServer(HANDLE hProcess,
     //                           the symbols to be loaded.
     // - SYMOPT_LOAD_LINES - Loads line number information.
     // - SYMOPT_UNDNAME - All symbols are presented in undecorated form.
-
-    // It seems that in 64-bit Windows apps, the lazy loading causes some issues with the debug information.
-#if (AMDT_ADDRESS_SPACE_TYPE == AMDT_32_BIT_ADDRESS_SPACE)
-    DWORD forcedOptions = (SYMOPT_DEFERRED_LOADS | SYMOPT_LOAD_LINES | SYMOPT_UNDNAME);
-#elif (AMDT_ADDRESS_SPACE_TYPE == AMDT_64_BIT_ADDRESS_SPACE)
     DWORD forcedOptions = (SYMOPT_LOAD_LINES | SYMOPT_UNDNAME);
+    DWORD disabledOptions = 0;
+
+    // It seems that in 64-bit Windows apps, as well as newer dbghelp versions, the lazy loading causes some issues with the debug information.
+#if (AMDT_ADDRESS_SPACE_TYPE == AMDT_32_BIT_ADDRESS_SPACE)
+    // Use the common options.
+#elif (AMDT_ADDRESS_SPACE_TYPE == AMDT_64_BIT_ADDRESS_SPACE)
+    disabledOptions |= SYMOPT_DEFERRED_LOADS;
 #else
 #error Unknown address space size!
 #endif
-    SymSetOptions(symOptions | forcedOptions);
+
+    if (debugSymbolServer)
+    {
+        forcedOptions |= SYMOPT_DEBUG;
+    }
+    else
+    {
+        disabledOptions |= SYMOPT_DEBUG;
+    }
+
+    DWORD modifiedOptions = (symOptions | forcedOptions) & (~disabledOptions);
+    DWORD rcOpt = SymSetOptions(modifiedOptions);
+    GT_ASSERT(modifiedOptions == rcOpt);
 
     // Initialize the DbgHelp library:
     if (SymInitialize(hProcess, NULL, invadeProcessAsBOOL) == TRUE)
     {
         retVal = true;
+
+        // Set the debug callback if required:
+        if (debugSymbolServer)
+        {
+            BOOL rcCB = SymRegisterCallback64(hProcess, &dbghelpMessageCallbackFunction, (ULONG64)nullptr);
+            GT_ASSERT(TRUE == rcCB);
+        }
     }
 
     GT_ASSERT(retVal);
@@ -275,3 +305,75 @@ bool osWin32DebugSymbolsManager::clearProcessSymbolsServer(HANDLE hProcess)
 
     return retVal;
 }
+
+// ---------------------------------------------------------------------------
+// Name:        osWin32DebugSymbolsManager::dbghelpMessageCallbackFunction
+// Description: A callback function to be used for debugging the symbol mechanism
+// Author:      AMD Developer Tools Team
+// Date:        6/7/2016
+// ---------------------------------------------------------------------------
+BOOL CALLBACK osWin32DebugSymbolsManager::dbghelpMessageCallbackFunction(HANDLE hProcess, ULONG ActionCode, ULONG64 CallbackData, ULONG64 UserContext)
+{
+    GT_UNREFERENCED_PARAMETER(UserContext);
+
+    // No need to calculate anything if the log level is not high enough:
+    if (OS_DEBUG_LOG_EXTENSIVE <= osDebugLog::instance().loggedSeverity())
+    {
+        gtString logMsg;
+        logMsg.appendFormattedString(L"DbgHelp.dll symbol server log message: Process = %p, Action code = %#x", (void*)hProcess, (unsigned int)ActionCode);
+
+        switch (ActionCode)
+        {
+        case CBA_DEBUG_INFO:
+        case CBA_SRCSRV_INFO:
+            {
+                TCHAR* pDbgMsg = (TCHAR*)CallbackData;
+                logMsg.append(L", Message = ").append(pDbgMsg);
+            }
+            break;
+
+        case CBA_DEFERRED_SYMBOL_LOAD_CANCEL:
+        case CBA_DEFERRED_SYMBOL_LOAD_COMPLETE:
+        case CBA_DEFERRED_SYMBOL_LOAD_FAILURE:
+        case CBA_DEFERRED_SYMBOL_LOAD_PARTIAL:
+        case CBA_DEFERRED_SYMBOL_LOAD_START:
+            {
+                IMAGEHLP_DEFERRED_SYMBOL_LOAD64* pLoadInfo = (IMAGEHLP_DEFERRED_SYMBOL_LOAD64*)CallbackData;
+                logMsg.append(L", File name = ").append(pLoadInfo->FileName);
+            }
+            break;
+
+        case CBA_EVENT:
+        case CBA_SRCSRV_EVENT:
+            {
+                IMAGEHLP_CBA_EVENT* pEventInfo = (IMAGEHLP_CBA_EVENT*)CallbackData;
+                logMsg.appendFormattedString(L", Event code = %#x ", (unsigned int)pEventInfo->code);
+                if (nullptr != pEventInfo->desc)
+                {
+                    logMsg.append(pEventInfo->desc);
+                }
+            }
+            break;
+
+        case CBA_READ_MEMORY:
+            {
+                IMAGEHLP_CBA_READ_MEMORY* pReadMemInfo = (IMAGEHLP_CBA_READ_MEMORY*)CallbackData;
+                logMsg.appendFormattedString(L"%#x/%#x bytes read at %p", (unsigned int)pReadMemInfo->bytesread, (unsigned int)pReadMemInfo->bytes, (void*)pReadMemInfo->addr);
+            }
+            break;
+
+        case CBA_SET_OPTIONS:
+        case CBA_SYMBOLS_UNLOADED:
+            // No callback data.
+            break;
+        }
+
+        OS_OUTPUT_DEBUG_LOG(logMsg.asCharArray(), OS_DEBUG_LOG_EXTENSIVE);
+    }
+
+    // Note: This should only be changed if we want to thing being reported to be canceled.
+    BOOL retVal = FALSE;
+
+    return retVal;
+}
+

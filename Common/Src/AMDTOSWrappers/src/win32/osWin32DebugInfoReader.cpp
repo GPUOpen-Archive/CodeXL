@@ -158,7 +158,7 @@ bool osWin32DebugInfoReader::getFunctionFromAddress(DWORD64 address, DWORD64& fu
     BYTE symbolBuff[OS_SYM_BUFF_SIZE];
     PIMAGEHLP_SYMBOL64 pSym = (PIMAGEHLP_SYMBOL64)&symbolBuff;
     ZeroMemory(pSym , OS_SYM_BUFF_SIZE) ;
-    pSym->SizeOfStruct = sizeof(PIMAGEHLP_SYMBOL64) ;
+    pSym->SizeOfStruct = sizeof(IMAGEHLP_SYMBOL64) ;
     pSym->MaxNameLength = OS_SYM_BUFF_SIZE - sizeof(IMAGEHLP_SYMBOL64);
 
     // Will get the displacement of the input address from the address where the
