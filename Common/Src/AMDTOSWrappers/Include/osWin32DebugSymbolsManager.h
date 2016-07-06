@@ -41,6 +41,7 @@ public:
     bool loadModuleDebugSymbols(HANDLE hProcess, const osFilePath& modulePath, osInstructionPointer moduleLoadedAddress, ULONG moduleSize);
     bool unloadModuleDebugSymbols(HANDLE hProcess, const osFilePath& modulePath, osInstructionPointer moduleLoadedAddress);
     bool getLoadedModuleSize(HANDLE hProcess, osInstructionPointer moduleLoadedAddress, ULONG& moduleSize);
+    static BOOL CALLBACK dbghelpMessageCallbackFunction(HANDLE hProcess, ULONG ActionCode, ULONG64 CallbackData, ULONG64 UserContext);
 };
 
 
