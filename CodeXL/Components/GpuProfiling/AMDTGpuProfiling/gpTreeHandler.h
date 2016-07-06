@@ -119,6 +119,8 @@ public:
     /// Returns true if na export action is currently running
     bool IsExportInProgress()const;
 
+    static void OnCancelExport();
+
 private:
 
     // Do not allow the use of my default constructor:
@@ -178,5 +180,6 @@ private:
 
     // Static member:
     static gpTreeHandler* m_psMySingleInstance;
+    static bool m_sShouldCancelExport;
 };
 #endif // __GPTREEHANDLER_H

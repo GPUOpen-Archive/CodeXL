@@ -405,7 +405,7 @@ bool gpSessionView::DisplaySession(const osFilePath& sessionFilePath, afTreeItem
             {
                 retVal = false;
 
-                errorMessage = "Loading was canceled by the user";
+                errorMessage = GPU_STR_TraceViewLoadingCanceledByUser;
             }
             else
             {
