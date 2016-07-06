@@ -218,7 +218,7 @@ public:
     virtual void Terminate();
 
     /// Get the toolbar start button text
-    virtual void GetToolbarStartButtonText(gtString& buttonText, bool fullString = true);
+    virtual void GetToolbarStartButtonText(gtString& buttonText, bool fullString = true) override;
 
     /// Show the appropriate project settings tab
     void onInvokeProjectSettings();

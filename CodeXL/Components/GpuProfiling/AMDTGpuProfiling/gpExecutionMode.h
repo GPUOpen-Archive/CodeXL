@@ -199,7 +199,7 @@ public:
     void Terminate();
 
     /// Get the toolbar start button text
-    virtual void GetToolbarStartButtonText(gtString& buttonText, bool fullString = true);
+    virtual void GetToolbarStartButtonText(gtString& buttonText, bool fullString = true) override;
 
     /// Prepares the trace file for the given frame
     /// \param sessionFilePath the session file path (cxlfovr)

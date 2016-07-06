@@ -71,7 +71,7 @@ public:
     virtual gtString HowToStartModeExecutionMessage();
 
     /// Get the toolbar start button text
-    virtual void GetToolbarStartButtonText(gtString& buttonText, bool fullString = true);
+    virtual void GetToolbarStartButtonText(gtString& buttonText, bool fullString = true) override;
 };
 #endif //__kaExecutionMode_H
 

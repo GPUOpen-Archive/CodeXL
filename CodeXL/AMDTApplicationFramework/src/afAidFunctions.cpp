@@ -470,7 +470,7 @@ void afGetStartButtonText(gtString& buttonText, bool addKeyboardShortcut /*= fal
     {
         buttonText = AF_STR_playButtonStartGeneric;
 
-        GT_IF_WITH_ASSERT(NULL != pExecMode)
+        GT_IF_WITH_ASSERT(nullptr != pExecMode)
         {
             pExecMode->GetToolbarStartButtonText(buttonText, fullString);
 
