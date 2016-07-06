@@ -358,7 +358,7 @@ BOOL CALLBACK osWin32DebugSymbolsManager::dbghelpMessageCallbackFunction(HANDLE 
         case CBA_READ_MEMORY:
             {
                 IMAGEHLP_CBA_READ_MEMORY* pReadMemInfo = (IMAGEHLP_CBA_READ_MEMORY*)CallbackData;
-                logMsg.appendFormattedString(L"%#x/%#x bytes read at %p", (unsigned int)pReadMemInfo->bytesread, (unsigned int)pReadMemInfo->bytes, (void*)pReadMemInfo->addr);
+                logMsg.appendFormattedString(L"%#x/%#x bytes read at %p", *(unsigned int*)pReadMemInfo->bytesread, (unsigned int)pReadMemInfo->bytes, (void*)pReadMemInfo->addr);
             }
             break;
 
