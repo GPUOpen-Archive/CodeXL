@@ -41,10 +41,13 @@ env.Append (CPPPATH =[
     ])
 
 GDT_LOG_MODULE="-D'LOG_MODULE=\"VulkanServer\"'"
-cpp_flags= ' ' + GDT_LOG_MODULE + ' ' + ' -DVK_USE_PLATFORM_XCB_KHR -DVK_USE_PLATFORM_XLIB_KHR -fPIC'
+cpp_flags= ' ' + GDT_LOG_MODULE + ' ' + ' -DVK_USE_PLATFORM_XCB_KHR -DVK_USE_PLATFORM_XLIB_KHR -fPIC -Wno-error '
 original_cpp_flag=env['CPPFLAGS']
 original_cpp_flag = original_cpp_flag + cpp_flags
 env.Replace(CPPFLAGS = original_cpp_flag) 
+
+linker_flags = ' -Wl,-z,defs '
+env.Prepend(LINKFLAGS = linker_flags)
 
 # These need to be in their dependency order, with most derived first
 env['LIBS'] = \
@@ -64,23 +67,65 @@ env['LIBS'] = \
     "pthread",
 ]
 
-# Header files needed
-headers = \
-[
-]
-
-# Common source files
-commonSources = \
-[
-]
-
 # Vulkan specific source files
 sources = \
 [
 
+# glslang
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/glslang_tab.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/Constant.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/InfoSink.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/Initialize.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/IntermTraverse.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/Intermediate.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/ParseHelper.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/PoolAlloc.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/RemoveTree.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/Scan.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/ShaderLang.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/SymbolTable.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/Versions.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/intermOut.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/limits.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/linkValidate.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/parseConst.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/reflection.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/preprocessor/Pp.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/preprocessor/PpAtom.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/preprocessor/PpContext.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/preprocessor/PpMemory.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/preprocessor/PpScanner.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/preprocessor/PpSymbols.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/preprocessor/PpTokens.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/MachineIndependent/propagateNoContraction.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/GenericCodeGen/CodeGen.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/glslang/GenericCodeGen/Link.cpp",
+
+# OSDependent
+    env['VulkanSDK_src_dir']+ "glslang/glslang/OSDependent/Unix/ossource.cpp",
+
+# OGLCompilersDLL
+    env['VulkanSDK_src_dir']+ "glslang/OGLCompilersDLL/InitializeDll.cpp",
+
+# HLSL
+    env['VulkanSDK_src_dir']+ "glslang/hlsl/hlslParseHelper.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/hlsl/hlslScanContext.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/hlsl/hlslOpMap.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/hlsl/hlslTokenStream.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/hlsl/hlslGrammar.cpp",
+
+# SPIRV
+    env['VulkanSDK_src_dir']+ "glslang/SPIRV/GlslangToSpv.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/SPIRV/InReadableOrder.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/SPIRV/Logger.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/SPIRV/SpvBuilder.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/SPIRV/SPVRemapper.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/SPIRV/doc.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/SPIRV/disassemble.cpp",
+
 # common sources
-    env['VulkanSDK_src_dir']+ "/layers/vk_layer_extension_utils.cpp",
-    env['VulkanSDK_src_dir']+ "/layers/vk_layer_table.cpp",
+    env['VulkanSDK_src_dir']+ "layers/vk_layer_extension_utils.cpp",
+    env['VulkanSDK_src_dir']+ "layers/vk_layer_table.cpp",
 
 # VKT sources
     "OS/Linux/VulkanServer.cpp",
