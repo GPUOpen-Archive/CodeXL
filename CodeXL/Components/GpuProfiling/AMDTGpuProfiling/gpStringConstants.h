@@ -286,8 +286,9 @@
 #define GPU_STR_TraceViewLoadingAPITimelineItems L"Loading API items to timeline..."
 #define GPU_STR_TraceViewLoadingGPUTimelineItems L"Loading GPU items to timeline..."
 #define GPU_STR_TraceViewLoadingPerfMarkersTimelineItems L"Loading Performance Markers to timeline..."
-#define GPU_STR_TraceViewLoadingFASession L"Loading Frame analysis session..."
 #define GPU_STR_TraceViewLoadingThreadsConcurrency L"Calculating threads concurrency..."
+#define GPU_STR_TraceViewLoadingFASession L"Loading Frame analysis session..."
+#define GPU_STR_TraceViewLoadingCanceledByUser "Loading was canceled by the user"
 
 // Profile Manager error messages
 #define GPU_STR_ERR_NoCountersSelected "Unable to profile. At least one counter needs to be selected.\nCounter selection can be modified in the Project Settings dialog."

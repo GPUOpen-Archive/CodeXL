@@ -31,11 +31,8 @@
 
 #define GP_PROGRESS_COEF 10
 
-bool m_sShouldCancelExport = false;
-void OnCancelExport()
-{
-    m_sShouldCancelExport = true;
-}
+
+
 
 /// compare directory based on session index
 /// \param sessionOneDir first directory
@@ -47,6 +44,7 @@ bool CompareDirOnDate(QFileInfo sessionOneDir, QFileInfo sessionTwoDir)
 }
 
 gpTreeHandler* gpTreeHandler::m_psMySingleInstance = NULL;
+bool gpTreeHandler::m_sShouldCancelExport = false;
 
 gpTreeHandler::gpTreeHandler()
 {
@@ -1231,3 +1229,7 @@ bool gpTreeHandler::RefreshSessionsFromServer()
     return retVal;
 }
 
+void gpTreeHandler::OnCancelExport()
+{
+    m_sShouldCancelExport = true;
+}

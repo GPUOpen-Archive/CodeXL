@@ -643,9 +643,6 @@ bool gpViewsCreator::GetWidgetForFilePath(GPUWindowType profileType, QWidget* pP
 
     GT_IF_WITH_ASSERT(nullptr != pCreatedSessionWindow)
     {
-        //// Insert the session window to the map
-        //m_filePathToSessionWindowsMap[pathToDisplay] = pCreatedSessionWindow;
-
         pWidget = pCreatedSessionWindow;
 
         // Get the requested item type for the display
