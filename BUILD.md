@@ -78,10 +78,10 @@ CodeXL uses the SCons build system on Linux.
 
 #### Specific build instructions Ubuntu 16.04
 * To omit building the hsaprofiler, use:
-./backend_build.sh __skip-hsaprofiler__
+./backend\_build.sh \_\_skip-hsaprofiler\_\_
 * Since Ubuntu 16.04 comes with gcc 5.3, use the installed boost libraries
-./buildCodeXLFullLinuxProjects -j5 CXL_build=debug CXL_boost_dir=/usr/lib/x86_64-linux-gnu
-./buildCodeXLFullLinuxProjects -j5 CXL_build=release CXL_boost_dir=/usr/lib/x86_64-linux-gnu
+./buildCodeXLFullLinuxProjects -j5 CXL\_build=debug CXL\_boost\_dir=/usr/lib/x86\_64-linux-gnu
+./buildCodeXLFullLinuxProjects -j5 CXL\_build=release CXL\_boost\_dir=/usr/lib/x86\_64-linux-gnu
 
 #### Build Switches
 * all SCons general switches, like -c for clean , more info at http://scons.org/doc/HTML/scons-man.html
