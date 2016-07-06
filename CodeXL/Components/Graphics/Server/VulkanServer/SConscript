@@ -41,7 +41,7 @@ env.Append (CPPPATH =[
     ])
 
 GDT_LOG_MODULE="-D'LOG_MODULE=\"VulkanServer\"'"
-cpp_flags= ' ' + GDT_LOG_MODULE + ' ' + ' -DVK_USE_PLATFORM_XCB_KHR -DVK_USE_PLATFORM_XLIB_KHR -fPIC -Wno-error '
+cpp_flags= ' ' + GDT_LOG_MODULE + ' ' + ' -DVK_USE_PLATFORM_XCB_KHR -DVK_USE_PLATFORM_XLIB_KHR -fPIC -fvisibility=hidden -Wno-error '
 original_cpp_flag=env['CPPFLAGS']
 original_cpp_flag = original_cpp_flag + cpp_flags
 env.Replace(CPPFLAGS = original_cpp_flag) 
@@ -56,7 +56,6 @@ env['LIBS'] = \
     "libCXLGraphicsServerCommon",
     "libCXLOSWrappers",
     "libCXLBaseTools",
-    "libvulkan",
     "jpeg",
     "png",
     "z",               #used by PNG
