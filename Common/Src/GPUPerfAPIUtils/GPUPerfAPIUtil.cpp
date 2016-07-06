@@ -78,9 +78,18 @@ GPA_Status GPA_EnableCountersFromFile(GPUPerfAPILoader* pLoader, const char* pFi
                 if (strncmp(readBuf + 1, pActiveSectionLabel, strlen(pActiveSectionLabel)) == 0)
                 {
                     // matches, so read next string
-                    fgets(readBuf, sizeof(readBuf), pFile);
-                    scanResult = fscanf(pFile, "%s", &readBuf[0]);
-                    continue;
+                    if (nullptr != fgets(readBuf, sizeof(readBuf), pFile))
+                    {
+                        scanResult = fscanf(pFile, "%s", &readBuf[0]);
+                        continue;
+                    }
+                    else
+                    {
+                        *ppErrorText = "uanble to read a string from the file";
+                        fclose(pFile);
+                        return GPA_STATUS_ERROR_FAILED;
+                    }
+
                 }
                 else
                 {
@@ -98,9 +107,17 @@ GPA_Status GPA_EnableCountersFromFile(GPUPerfAPILoader* pLoader, const char* pFi
 
         if (readBuf[0] == ';' || skippingSection)
         {
-            fgets(readBuf, sizeof(readBuf), pFile);
-            scanResult = fscanf(pFile, "%s", &readBuf[0]);
-            continue;
+            if (nullptr != fgets(readBuf, sizeof(readBuf), pFile))
+            {
+                scanResult = fscanf(pFile, "%s", &readBuf[0]);
+                continue;
+            }
+            else
+            {
+                *ppErrorText = "uanble to read a string from the file";
+                fclose(pFile);
+                return GPA_STATUS_ERROR_FAILED;
+            }
         }
 
         // read a valid counter name, enable it
