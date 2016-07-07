@@ -22,73 +22,60 @@ CodeXL build instructions
 
 ## Linux
 
-CodeXL uses the SCons build system on Linux.
+* CodeXL uses the SCons build system on Linux.
+* CodeXL require GCC version 4.8.5 or higher. 
 
-#### Specific setup for Ubuntu 16.04
+#### Building on Ubuntu 15.04 or higher
 * `sudo apt-get install gcc-multilib g++-multilib`
 * `sudo apt-get install libglu1-mesa-dev mesa-common-dev libgtk2.0-dev`
 * `sudo apt-get install zlib1g-dev libx11-dev:i386`
 * `sudo apt-get install scons`
-* `sudo apt-get install libboost-all-dev`
 * `sudo apt-get install libjpeg9-dev`
 * `sudo apt-get install libfltk1.3-dev`
-* Download and install latest JDK both for linux from : http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
-* Go to the "Building CodeXL" section
+##### Ubuntu 16.04 specific 
+* `sudo apt-get install libboost-all-dev`
 
-#### One time setup:
-* `sudo apt-get install gcc-multilib g++-multilib`
-* `sudo apt-get install gcc-4.9-multilib g++-4.9-multilib # added for Ubuntu 15.10 or above`
-* `sudo apt-get install libglu1-mesa-dev mesa-common-dev libgtk2.0-dev libjpeg9-dev`
-* `sudo apt-get install zlib1g-dev libx11-dev:i386`
-* `sudo apt-get install scons`
-* Download and install latest JDK both for linux from : http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+ Go to the [Building the JAVA Agent](####Building-the-JAVA-Agent:) section
 
-#### Building on CENTOS 6.X
+#### Building on CENTOS 7.X
 
-##### Install compiler 4.7.2
+##### Install SCons
+* `wget http://prdownloads.sourceforge.net/scons/scons-2.5.0-1.noarch.rpm`
+* `sudo rpm -ivh scons-2.5.0-1.noarch.rpm`
 
-* `sudo wget http://people.centos.org/tru/devtools-1.1/devtools-1.1.repo -P /etc/yum.repos.d`
-* `sudo sh -c 'echo "enabled=1" >> /etc/yum.repos.d/devtools-1.1.repo'`
-* `sudo yum install devtoolset-1.1`
-* `wget http://people.centos.org/tru/devtools-1.1/6/i386/RPMS/devtoolset-1.1-libstdc++-devel-4.7.2-5.el6.i686.rpm`
-* `sudo yum install devtoolset-1.1-libstdc++-devel-4.7.2-5.el6.i686.rpm`
-* `sudo ln -s /opt/centos/devtoolset-1.1/root/usr/bin/* /usr/local/bin/`
-* `hash -r`
-* `gcc --version # verify that version 4.7.2 is displayed`
+##### Install additional dependencies  
+* `sudo yum install libX11-devel mesa-libGL-devel mesa-libGLU-devel`
+* `sudo yum install zlib-devel gtk2-devel libpng12`
+* `sudo yum install fltk-devel libjpeg-turbo-devel`
 
-##### Install zlib
+##### Install x86 dependencies
+* `yum -y install glibc-devel.i686 libstdc++-static.i686`
 
-* `yum install zlib-devel`
-
-##### Install glibc
-
-* `yum -y install glibc-devel.i686 glibc-devel`
+#### Building the JAVA Agent:
+* Install Java JDK (version 1.7.x or higher) from Linux distribution (`sudo yum install java-1.8.0-openjdk-devel` \ `sudo apt-get install java-1.8.0-openjdk-devel`).
+* Or download and install latest JDK for linux Oracle site: http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+*  Before build please define JAVA\_HOME variable for example : export JAVA\_HOME=/opt/java/jdk1.8.0\_77
+* If JAVA\_HOME variable is not defined the build will skip the Java agent project.
 
 #### Building the HSA/ROCm Profiler
 * In order to build the HSA/ROCm profiler, the rocm-dev package needs to be installed (so that the ROCR header files are available at build time).
-* The ROCm packages are available at https://github.com/RadeonOpenCompute/ROCm.  Please see the instructions in the [README.md](https://github.com/GPUOpen-Tools/CodeXL/releases) contained in that repository. To build CodeXL, only the rocm-dev package is needed.  In order to run and profile HSA/ROCm applications, the rocm package is needed.
+* The ROCm packages are available at https://github.com/RadeonOpenCompute/ROCm.  Please see the instructions in the [README.md](https://github.com/GPUOpen-Tools/CodeXL/releases) contained in that repository. To build CodeXL, only the **hsa-rocr-dev** package is needed.  In order to run and profile HSA/ROCm applications, the rocm package is needed.
 * If the ROCR header files are not available on the build system, you can skip this part of the build.  See the Build Switches section below for information on how to do this.
 
 #### Building CodeXL
-* Before build please define JAVA\_HOME variable for example : export JAVA\_HOME=/opt/java/jdk1.8.0\_77
-* CD to local copy of /CodeXL/Components/GpuProfiling/Build
-* Run `./backend_build.sh`
 * CD to local copy of /CodeXL/Util/linux/
 * Run `./buildCodeXLFullLinuxProjects`
-
-#### Specific build instructions Ubuntu 16.04
-* To omit building the hsaprofiler, use:
-./backend\_build.sh \_\_skip-hsaprofiler\_\_
-* Since Ubuntu 16.04 comes with gcc 5.3, use the installed boost libraries
-./buildCodeXLFullLinuxProjects -j5 CXL\_build=debug CXL\_boost\_dir=/usr/lib/x86\_64-linux-gnu
-./buildCodeXLFullLinuxProjects -j5 CXL\_build=release CXL\_boost\_dir=/usr/lib/x86\_64-linux-gnu
+* CD to local copy of /CodeXL/Components/GpuProfiling/Build
+* Run `./backend_build.sh`
 
 #### Build Switches
 * all SCons general switches, like -c for clean , more info at http://scons.org/doc/HTML/scons-man.html
-* -j specify the number of concurrent jobs (-j6).
-* CXL\_build=[debug|release] - build type
-* CXL\_build\_verbose=1 - verbose output
-* CXL\_boost\_dir=[path to boost libraries] - override the bundled boost libraries with files in given path
+* __-j__ specify the number of concurrent jobs (-j6).
+* __CXL\_build=[debug|release]__ - build type. If not stated default value is release. 
+* __CXL\_build\_verbose=1__ - verbose output
+* __CXL\_boost\_dir=[path to boost libraries]__ - override the bundled boost libraries with files in given path
+* __CXL\_hsa=[true|false]__ - define if to build HSA parts. If not stated default value is false (skip HSA)
+* __-c__ - performs a "clean" of all build targets.
 * When executing the backend\_build.sh script, the following switches are supported:
     * __debug__: performs a debug build
     * __skip-32bitbuild__: skips building the 32-bit binaries
@@ -98,5 +85,12 @@ CodeXL uses the SCons build system on Linux.
     * __quick__ or __incremental__: performs an incremental build (as opposed to a from-scratch build)
     * __clean__: performs a "clean" of all build targets, removing all intermediate and final output files
 
+#### Specific build instructions Ubuntu 16.04
+* Since Ubuntu 16.04 comes with gcc 5.3, use the installed system boost libraries. example - 
+./buildCodeXLFullLinuxProjects -j5 CXL\_build=debug CXL\_boost\_dir=/usr/lib/x86\_64-linux-gnu
+
 #### Running CodeXL
 If CodeXL displays an error indicating that it is unable to establish a connection with the CodeXL remote agent, copy the CodeXLRemoteAgentConfig.xml file into your CodeXL binary folder. The source file is in the folder CodeXL/CodeXL/Remote/AMDTRemoteAgent/CodeXLRemoteAgentConfig.xml
+
+
+----------
