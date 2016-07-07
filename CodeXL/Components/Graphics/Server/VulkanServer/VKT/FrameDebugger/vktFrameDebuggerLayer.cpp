@@ -121,6 +121,12 @@ bool VktFrameDebuggerLayer::CaptureFrameBuffer(unsigned int inWidth, unsigned in
         inHeight = m_swapChainInfo.swapChainExtents.height;
     }
 
+#ifdef _LINUX
+    const bool flipY = true;
+#else
+    const bool flipY = false;
+#endif
+
     CpuImage capturedImage = CpuImage();
     VkResult captureResult = m_pFrameBufferRenderer->CaptureImage(
                                  m_swapChainInfo.pSwapChainImages[0],
@@ -131,7 +137,7 @@ bool VktFrameDebuggerLayer::CaptureFrameBuffer(unsigned int inWidth, unsigned in
                                  inHeight,
                                  &capturedImage,
                                  false,
-                                 false);
+                                 flipY);
 
     bool pngSuccess = false;
 
