@@ -425,7 +425,12 @@ static bool FixTokenizedPathString(const gtString& tokenizedPath, gtString& fixe
 {
     // Should be read from dmnDefinitions.h.
     const gtString PATH_TOKEN = L"$$$";
+
+#if (AMDT_BUILD_TARGET == AMDT_WINDOWS_OS)
     const gtString CodeXLInstallPath = L"$CXL_Install_Path$\\";
+#else
+    const gtString CodeXLInstallPath = L"$CXL_Install_Path$/";
+#endif
     bool ret = false;
     fixedPath = tokenizedPath;
 
@@ -1780,7 +1785,7 @@ bool dmnSessionThread::SendFrameAnalysisFileData(const osFilePath& filePath)
 
             unique_ptr <gtByte[]> pBuffer;
             unsigned long fileSize;
-            retVal = ReadFile(filePath, pBuffer, fileSize);
+            retVal = ReadFile(filePath, isBinary, pBuffer, fileSize);
             GT_IF_WITH_ASSERT(retVal)
             {
                 // Write the file size to the CodeXL client
@@ -1796,7 +1801,7 @@ bool dmnSessionThread::SendFrameAnalysisFileData(const osFilePath& filePath)
     return retVal;
 }
 
-bool dmnSessionThread::ReadFile(const osFilePath& filePath, std::unique_ptr <gtByte[]>& pBuffer, unsigned long& fileSize) const
+bool dmnSessionThread::ReadFile(const osFilePath& filePath, const bool isBinary, std::unique_ptr <gtByte[]>& pBuffer, unsigned long& fileSize) const
 {
     // Read the file size
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS //on windows we have unicode file names
@@ -1804,7 +1809,7 @@ bool dmnSessionThread::ReadFile(const osFilePath& filePath, std::unique_ptr <gtB
 #else
     const char* fname = filePath.asString().asASCIICharArray();
 #endif
-    ifstream file(fname, ios::binary | ios::ate);
+    ifstream file(fname, (isBinary? (ios::binary | ios::ate) : ios::ate));
     fileSize = static_cast<unsigned long>(file.tellg());
     file.seekg(0, ios::beg);
 

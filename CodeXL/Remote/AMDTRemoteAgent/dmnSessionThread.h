@@ -73,7 +73,7 @@ private:
     /// \return true iff the file data was sent successfully
     bool SendFrameAnalysisFileData(const osFilePath& filePath);
 
-    bool ReadFile(const osFilePath& filePath, std::unique_ptr <gtByte[]>& pBuffer, unsigned long& fileSize) const;
+    bool ReadFile(const osFilePath& filePath, const bool isBinary, std::unique_ptr <gtByte[]>& pBuffer, unsigned long& fileSize) const;
 
     typedef std::function<bool(osFilePath)> FilePathFilter;
     bool CreateCapturedFramesInfoFile(const gtString& projectName, const  FilePathFilter& sessionFilterFunc, const FilePathFilter& frameFilterFunc);
