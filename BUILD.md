@@ -91,6 +91,8 @@ CodeXL build instructions
 ./buildCodeXLFullLinuxProjects -j5 CXL\_build=debug CXL\_boost\_dir=/usr/lib/x86\_64-linux-gnu
 
 #### Running CodeXL
+The folder containing the CodeXL binaries can be found in the root folder of CodeXL (Output_x86_64). 
+If a license agreement is not displayed, copy the file CodeXL/Setup/Legal/Public/EndUserLicenseAgreement-Linux.htm to the Legal subdirectory in the CodeXL binaries folder (Output_x86_64/release/bin/Legal)
 If CodeXL displays an error indicating that it is unable to establish a connection with the CodeXL remote agent, copy the CodeXLRemoteAgentConfig.xml file into your CodeXL binary folder. The source file is in the folder CodeXL/CodeXL/Remote/AMDTRemoteAgent/CodeXLRemoteAgentConfig.xml
 
 
