@@ -96,7 +96,6 @@ do
    elif [ "$1" = "hsadir" ]; then
       shift
       HSA_DIR_OVERRIDE="HSA_DIR=$1"
-   fi
    elif [ "$1" = "boostlibdir" ]; then
       shift
       BOOST_LIB_DIR_OVERRIDE="BOOST_LIB_DIR=$1"
