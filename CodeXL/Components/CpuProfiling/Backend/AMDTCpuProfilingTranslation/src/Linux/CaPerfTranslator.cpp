@@ -3325,17 +3325,17 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
     osFilePath tmpPath(woutputFile);
     m_javaModInfo.WriteJavaJncFiles(tmpPath.fileDirectoryAsString().asCharArray());
 
-    // Handle th java inlined methods
+    // <jitId, moduleId, instanceId, pid, loadAddr, size>
+    gtVector<std::tuple<gtUInt32, gtUInt32, gtUInt32, gtUInt64, gtUInt64, gtUInt64>> inlinedJitInfo;
+
+    // Handle the java inlined methods
     if (gInlineMode)
     {
-        NameModuleMap::iterator modit = m_modMap.begin();
-        NameModuleMap::iterator modit_end = m_modMap.end();
-
-        for (; modit != modit_end; modit++)
+        for (auto& modit : m_modMap)
         {
-            if (CpuProfileModule::JAVAMODULE == modit->second.getModType())
+            if (CpuProfileModule::JAVAMODULE == modit.second.getModType())
             {
-                addJavaInlinedMethods(modit->second);
+                addJavaInlinedMethods(modit.second, inlinedJitInfo);
             }
         }
     }
@@ -3635,28 +3635,45 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
             // Let us assume one function from each module
             funcInfoList->reserve(m_modMap.size());
 
-            // Insert a dummy function as "Unknown Function"
-            //gtString unknownFuncName = L"Unknown Function";
-            //funcInfoList->emplace_back(UNKNOWN_FUNCTION_ID, UNKNOWN_MODULE_ID, unknownFuncName, 0, 0);
-
-            for (const auto& module : m_modMap)
+            for (auto& module : m_modMap)
             {
-                gtUInt32 modId = module.second.m_moduleId;
-                gtUInt64 modLoadAddr = module.second.getBaseAddr();
-
-                for (auto fit = module.second.getBeginFunction(); fit != module.second.getEndFunction(); ++fit)
+                if (module.second.getTotal() > 0)
                 {
-                    gtString funcName = fit->second.getFuncName();
-                    gtUInt64 startOffset = fit->second.getBaseAddr() - modLoadAddr;
-                    gtUInt64 size = fit->second.getSize();
-                    gtUInt32 funcId = modId;
-                    funcId = (funcId << 16) | fit->second.m_functionId;
+                    gtUInt32 modId = module.second.m_moduleId;
+                    gtUInt64 modLoadAddr = module.second.getBaseAddr();
+                    gtUInt32 nextJavaFuncId = 0;
 
-                    // If function name is empty, it will be considered as unknown-function, don't insert into DB.
-                    // else insert function info into DB
-                    if (!funcName.isEmpty())
+                    // We might have assigned id to few functions in addJavaInlinedMethods().
+                    // Find the largest id assigned and assign next ids to rest of the functions.
+                    if (module.second.m_modType == CpuProfileModule::JAVAMODULE)
                     {
-                        funcInfoList->emplace_back(funcId, modId, funcName, startOffset, size);
+                        for (auto fit = module.second.getBeginFunction(); fit != module.second.getEndFunction(); ++fit)
+                        {
+                            nextJavaFuncId = std::max(nextJavaFuncId, fit->second.m_functionId);
+                        }
+
+                        ++nextJavaFuncId;
+                    }
+
+                    for (auto fit = module.second.getBeginFunction(); fit != module.second.getEndFunction(); ++fit)
+                    {
+                        if (module.second.m_modType == CpuProfileModule::JAVAMODULE && fit->second.m_functionId == 0)
+                        {
+                            fit->second.m_functionId = nextJavaFuncId++;
+                        }
+
+                        gtString funcName = fit->second.getFuncName();
+                        gtUInt64 startOffset = fit->second.getBaseAddr() - modLoadAddr;
+                        gtUInt64 size = fit->second.getSize();
+                        gtUInt32 funcId = modId;
+                        funcId = ((funcId << 16) | fit->second.m_functionId);
+
+                        // If function name is empty, it will be considered as unknown-function, don't insert into DB.
+                        // else insert function info into DB
+                        if (!funcName.isEmpty())
+                        {
+                            funcInfoList->emplace_back(funcId, modId, funcName, startOffset, size);
+                        }
                     }
                 }
             }
@@ -3867,10 +3884,88 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
                 }
             }
         }
-    }
 
-    if (m_dbWriter)
-    {
+        // Populate Java JIT instance info
+        CPAJitInstanceInfoList *jitInstanceInfoList = new (std::nothrow) CPAJitInstanceInfoList;
+
+        if (jitInstanceInfoList != nullptr)
+        {
+            // <jncIdx, moduleName, instanceId, pid, loadAddr, size>
+            gtVector<std::tuple<gtUInt32, gtString, gtUInt32, gtUInt64, gtUInt64, gtUInt64>> jitBlockInfo;
+
+            m_javaModInfo.GetJavaJitBlockInfo(jitBlockInfo);
+
+            jitInstanceInfoList->reserve(jitBlockInfo.size() + inlinedJitInfo.size());
+
+            for (const auto& it : jitBlockInfo)
+            {
+                gtUInt32 jitId = std::get<0>(it);
+
+                // Compute function id.
+                gtUInt64 funcId = 0;
+                gtString modName = std::get<1>(it);
+                auto modIt = m_modMap.find(modName);
+
+                if (m_modMap.end() != modIt)
+                {
+                    funcId = modIt->second.m_moduleId;
+                }
+
+                funcId = (funcId << 16) | std::get<2>(it);
+
+                gtUInt64 pid = std::get<3>(it);
+                gtUInt64 loadAddr = std::get<4>(it);
+                gtUInt32 size = static_cast<gtUInt32>(std::get<5>(it));
+
+                jitInstanceInfoList->emplace_back(jitId, funcId, pid, loadAddr, size);
+            }
+
+            jitBlockInfo.clear();
+
+            for (const auto& it : inlinedJitInfo)
+            {
+                gtUInt32 jitId = std::get<0>(it);
+
+                // Compute function id.
+                gtUInt64 funcId = std::get<1>(it);
+                funcId = (funcId << 16) | std::get<2>(it);
+
+                gtUInt64 pid = std::get<3>(it);
+                gtUInt64 loadAddr = std::get<4>(it);
+                gtUInt32 size = static_cast<gtUInt32>(std::get<5>(it));
+
+                jitInstanceInfoList->emplace_back(jitId, funcId, pid, loadAddr, size);
+            }
+
+            m_dbWriter->Push({ TRANSLATED_DATA_TYPE_JITINSTANCE_INFO, (void*)jitInstanceInfoList });
+            jitInstanceInfoList = nullptr;
+            inlinedJitInfo.clear();
+        }
+
+        // Populate Java Jnc info.
+        CPAJitCodeBlobInfoList *jitCodeBlobInfoList = new CPAJitCodeBlobInfoList;
+
+        if (jitCodeBlobInfoList != nullptr)
+        {
+            // <jncIdx, srcFilePath, jncFilePath>
+            gtVector<std::tuple<gtUInt32, gtString, gtString>> jncInfoList;
+
+            m_javaModInfo.GetJavaJncInfo(jncInfoList);
+
+            for (const auto& it : jncInfoList)
+            {
+                gtUInt32 jitId = std::get<0>(it);
+                gtString srcFilePath = std::get<1>(it);
+                gtString jncFilePath = std::get<2>(it);
+
+                jitCodeBlobInfoList->emplace_back(jitId, srcFilePath, jncFilePath);
+            }
+
+            jncInfoList.clear();
+            m_dbWriter->Push({ TRANSLATED_DATA_TYPE_JITCODEBLOB_INFO, (void*)jitCodeBlobInfoList });
+            jitCodeBlobInfoList = nullptr;
+        }
+
         // Finish writing profile data
         m_dbWriter->Push({ TRANSLATED_DATA_TYPE_UNKNOWN_INFO, nullptr });
     }
@@ -4788,9 +4883,19 @@ HRESULT CaPerfTranslator::_getJavaModuleforSample(TiModuleInfo* pModInfo, gtUInt
     return ret;
 }
 
-void CaPerfTranslator::addJavaInlinedMethods(CpuProfileModule&  mod)
+void CaPerfTranslator::addJavaInlinedMethods(CpuProfileModule&  mod,
+         gtVector<std::tuple<gtUInt32, gtUInt32, gtUInt32, gtUInt64, gtUInt64, gtUInt64>>& inlinedJitInfo)
 {
     AddrFunctionMultMap inlinedFuncMap;
+    gtUInt32 nextFuncId = 0;
+
+    for (auto funcIt = mod.getBeginFunction(), endIt = mod.getEndFunction(); funcIt != endIt; ++funcIt)
+    {
+        nextFuncId = std::max(nextFuncId, funcIt->second.m_functionId);
+    }
+
+    // Increment it to generate next unused Id.
+    ++nextFuncId;
 
     // Iterate over the AddrFunctionMultMap entries
     // Open JNC file
@@ -4798,7 +4903,7 @@ void CaPerfTranslator::addJavaInlinedMethods(CpuProfileModule&  mod)
     // if the inline entries are available
     //  Iterate over AptAggregatedSampleMap
     //  if the ip falls in Inlined method
-    //  create a new CA_Function fo this IP
+    //  create a new CA_Function for this IP
 
     if (CpuProfileModule::JAVAMODULE != mod.getModType())
     {
@@ -4905,8 +5010,28 @@ void CaPerfTranslator::addJavaInlinedMethods(CpuProfileModule&  mod)
                                                         (*listit).stopAddr - funcAddr,
                                                         it->second.getJncFileName(),
                                                         javaSrcFileName);
+                                func.m_functionId = ++nextFuncId;
                                 fit = inlinedFuncMap.insert(AddrFunctionMultMap::value_type(funcAddr, func));
                                 fit->second.insertSample(aAptKey, aSample);
+
+                                // Extract the jnc index
+                                gtUInt32 jncIndex = 0;
+                                const wchar_t* jncFileName = func.getJncFileName().asCharArray();
+
+                                while (*jncFileName != L'_' && *jncFileName != L'\0')
+                                {
+                                    ++jncFileName;
+                                }
+
+                                if (*jncFileName == L'_')
+                                {
+                                    ++jncFileName;
+                                    std::wstring str(jncFileName);
+                                    jncIndex = std::stoi(str);
+                                }
+
+                                inlinedJitInfo.emplace_back(
+                                        jncIndex, mod.m_moduleId, func.m_functionId, aAptKey.m_pid, funcAddr, func.getSize());
                             }
                             else
                             {

@@ -26,9 +26,7 @@
 enum ModTypeEnum
 {
     evInvalidType,
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     evPEModule,
-#endif
     evJavaModule,
     evManaged,
     evOCLModule
