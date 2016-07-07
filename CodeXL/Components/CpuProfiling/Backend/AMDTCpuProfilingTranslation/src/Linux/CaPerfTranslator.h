@@ -300,7 +300,8 @@ protected:
 
     CpuProfileModule* getJavaModuleforSample(TiModuleInfo* pModInfo, gtUInt32 pid, gtUInt64 time, gtUInt64 ip);
 
-    void addJavaInlinedMethods(CpuProfileModule&  mod);
+    void addJavaInlinedMethods(CpuProfileModule&  mod,
+            gtVector<std::tuple<gtUInt32, gtUInt32, gtUInt32, gtUInt64, gtUInt64, gtUInt64>>& inlinedJitInfo);
 
 private:
     void _init();
