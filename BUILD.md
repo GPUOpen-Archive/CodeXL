@@ -32,6 +32,7 @@ CodeXL build instructions
 * `sudo apt-get install scons`
 * `sudo apt-get install libjpeg9-dev`
 * `sudo apt-get install libfltk1.3-dev`
+
 ##### Ubuntu 16.04 specific 
 * `sudo apt-get install libboost-all-dev`
 
