@@ -214,7 +214,6 @@ typedef size_t gtSizeType;
     // Represents fixed size data types:
     typedef float gtFloat32;
     typedef char gtByte;
-    typedef char gtByte;
     typedef unsigned char gtUByte;
     typedef __int16_t gtInt16;
     typedef __uint16_t gtUInt16;

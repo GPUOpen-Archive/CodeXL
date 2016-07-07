@@ -1992,10 +1992,9 @@ public:
             gtString extension;
             m_tcpClient >> extension;
             m_tcpClient >> isBinary;
-
+            unsigned long dataSize = 0;
             if (isBinary)
             {
-                unsigned long dataSize = 0;
                 gtByte* pBuffer = nullptr;
 
                 // Read the data size from the remote agent
@@ -2047,7 +2046,13 @@ public:
                 if (extension.compareNoCase(FRAME_DESCRITPION_FILE_EXT) == 0)
                 {
                     // Read the frame info XML string from the remote agent
-                    m_tcpClient >> frameData.m_frameInfoXML;
+                    // Read the data size from the remote agent
+                    m_tcpClient >> dataSize;
+                    gtByte* pBuffer = new gtByte[dataSize+1]();
+                    bool rc = m_tcpClient.read((gtByte*)pBuffer, dataSize);
+                    GT_ASSERT(rc == true);
+                    frameData.m_frameInfoXML = pBuffer;
+                    delete [] pBuffer;
                 }
                 else if (extension.compareNoCase(FRAME_TRACE_FILE_EXT) == 0)
                 {
