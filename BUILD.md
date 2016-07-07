@@ -35,7 +35,7 @@ CodeXL build instructions
 ##### Ubuntu 16.04 specific 
 * `sudo apt-get install libboost-all-dev`
 
- Go to the [Building the JAVA Agent](####Building-the-JAVA-Agent:) section
+ Go to the [Building the JAVA Agent](#Building-the-JAVA-Agent) section
 
 #### Building on CENTOS 7.X
 
@@ -51,7 +51,7 @@ CodeXL build instructions
 ##### Install x86 dependencies
 * `yum -y install glibc-devel.i686 libstdc++-static.i686`
 
-#### Building the JAVA Agent:
+#### Building the JAVA Agent: <a id="Building-the-JAVA-Agent"></a>
 * Install Java JDK (version 1.7.x or higher) from Linux distribution (`sudo yum install java-1.8.0-openjdk-devel` \ `sudo apt-get install java-1.8.0-openjdk-devel`).
 * Or download and install latest JDK for linux Oracle site: http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 *  Before build please define JAVA\_HOME variable for example : export JAVA\_HOME=/opt/java/jdk1.8.0\_77
