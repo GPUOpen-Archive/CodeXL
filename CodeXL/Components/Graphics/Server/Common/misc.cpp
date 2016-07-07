@@ -681,7 +681,11 @@ long find_non_ascii(unsigned char* buf, long len, long start, std::string& str)
 /// \return String name
 const char* GetPerfStudioDirName()
 {
+#ifdef CODEXL_GRAPHICS
+    static const char* PERFSTUDIO_DIR_NAME = "CodeXL";
+#else
     static const char* PERFSTUDIO_DIR_NAME = "GPUPerfStudio";
+#endif
     return PERFSTUDIO_DIR_NAME;
 }
 
