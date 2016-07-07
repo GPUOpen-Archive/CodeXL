@@ -7,9 +7,10 @@
 
 #include <cstring>
 
+#include <AMDTBaseTools/Include/AMDTDefinitions.h>
+
 #include "CLFunctionDefs.h"
 #include "OpenCLModule.h"
-#include <cstring>
 
 cl_icd_dispatch_table g_nextDispatchTable;
 cl_icd_dispatch_table g_realDispatchTable;
