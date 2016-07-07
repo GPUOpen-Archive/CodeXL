@@ -49,6 +49,9 @@ b32bitbuild=true
 # HSA directory override
 HSA_DIR_OVERRIDE=
 
+# Boost Lib dir directory override
+BOOST_LIB_DIR_OVERRIDE=
+
 # Set build flag
 while [ "$*" != "" ]
 do
@@ -93,6 +96,10 @@ do
    elif [ "$1" = "hsadir" ]; then
       shift
       HSA_DIR_OVERRIDE="HSA_DIR=$1"
+   fi
+   elif [ "$1" = "boostlibdir" ]; then
+      shift
+      BOOST_LIB_DIR_OVERRIDE="BOOST_LIB_DIR=$1"
    fi
    shift
 done
@@ -323,7 +330,7 @@ if !($bZipOnly) ; then
          #make 64 bit
          echo "Build ${BASENAME}, 64-bit..." | tee -a $LOGFILE
 
-         if ! make -C $SUBDIR -j$CPU_COUNT $HSA_DIR_OVERRIDE $MAKE_TARGET >> $LOGFILE 2>&1; then
+         if ! make -C $SUBDIR -j$CPU_COUNT $HSA_DIR_OVERRIDE $BOOST_LIB_DIR_OVERRIDE $MAKE_TARGET >> $LOGFILE 2>&1; then
             echo "Failed to build ${BASENAME}, 64 bit"
             exit 1
          fi
@@ -340,7 +347,7 @@ if !($bZipOnly) ; then
             #make 32 bit
             echo "Build ${BASENAME}, 32-bit..." | tee -a $LOGFILE
 
-            if ! make -C $SUBDIR -j$CPU_COUNT $HSA_DIR_OVERRIDE $MAKE_TARGET$MAKE_TARGET_SUFFIX_X86 >> $LOGFILE 2>&1; then
+            if ! make -C $SUBDIR -j$CPU_COUNT $HSA_DIR_OVERRIDE $BOOST_LIB_DIR_OVERRIDE $MAKE_TARGET$MAKE_TARGET_SUFFIX_X86 >> $LOGFILE 2>&1; then
                echo "Failed to build ${BASENAME}, 32 bit"
                exit 1
             fi
