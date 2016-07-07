@@ -63,11 +63,7 @@ bool SessionManager::GetSessionManagerData(SessionManagerData& smd)
     osFilePath systemTempDirectory;
     systemTempDirectory.setPath(osFilePath::OS_TEMP_DIRECTORY);
 
-#ifdef CODEXL_GRAPHICS
-    smd.toolDirectory.fromASCIIString("CodeXL");
-#else
     smd.toolDirectory.fromASCIIString(GetPerfStudioDirName());
-#endif
     systemTempDirectory.appendSubDirectory(smd.toolDirectory);
 
     // Check to see if the user defined a project name
