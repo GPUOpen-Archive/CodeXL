@@ -351,6 +351,16 @@ beStatus Backend::GetDeviceChipFamilyRevision(
             chipFamily = FAMILY_VI;
             chipRevision = VI_FIJI_P_A0;
             break;
+
+        case GDT_BAFFIN:
+            chipFamily = FAMILY_VI;
+            chipRevision = VI_BAFFIN_M_A0;
+            break;
+
+        case GDT_ELLESMERE:
+            chipFamily = FAMILY_VI;
+            chipRevision = VI_ELLESMERE_P_A0;
+            break;
     }
 
     return retVal;

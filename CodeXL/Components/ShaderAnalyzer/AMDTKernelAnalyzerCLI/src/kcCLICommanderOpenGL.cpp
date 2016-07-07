@@ -365,8 +365,8 @@ void kcCLICommanderOpenGL::RunCompileCommands(const Config& config, LoggingCallB
                 }
                 else
                 {
-                    shouldAbort = true;
                     logMsg << STR_ERR_CANNOT_GET_DEVICE_INFO << device << std::endl;
+                    continue;
                 }
 
                 if (!shouldAbort)
