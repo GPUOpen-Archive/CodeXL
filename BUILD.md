@@ -88,7 +88,8 @@ CodeXL build instructions
     * __clean__: performs a "clean" of all build targets, removing all intermediate and final output files
 
 #### Specific build instructions Ubuntu 16.04
-* Since Ubuntu 16.04 comes with gcc 5.3, use the installed system boost libraries. example - 
+* Since Ubuntu 16.04 comes with gcc 5.3, use the installed system boost libraries. example -
+./backend\_build.sh boostlibdir /usr/lib/x86\_64-linux-gnu
 ./buildCodeXLFullLinuxProjects -j5 CXL\_build=debug CXL\_boost\_dir=/usr/lib/x86\_64-linux-gnu
 
 #### Running CodeXL
