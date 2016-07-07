@@ -612,9 +612,9 @@ static   bool    _RGBAtoPNG(unsigned char* pImageData, int width, int height, UI
 
     png_uint_32 maxHeight = PNG_UINT_32_MAX / sizeof(png_bytep);
 
-    if (height > (int)maxHeight)
+    if ((png_uint_32)height > maxHeight)
     {
-        Log(logERROR, "Image is too tall to process in memory");
+        Log(logERROR, "Image is too tall to process in memory.\n");
     }
 
     for (int k = 0; k < height; k++)
