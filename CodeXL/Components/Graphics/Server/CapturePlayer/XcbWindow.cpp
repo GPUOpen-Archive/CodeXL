@@ -91,8 +91,6 @@ bool XcbWindow::Initialize()
                         (*reply).atom, 4, 32, 1, &(*atom_wm_delete_window).atom);
     free(reply);
 
-    xcb_map_window(mConnection, mWindowHandle);
-
     // Force the x/y coordinates to 100,100 results are identical in consecutive
     // runs
     const uint32_t coords[] = { 100, 100 };
@@ -115,8 +113,10 @@ bool XcbWindow::Shutdown()
 /// \return True if success, false if fail.
 bool XcbWindow::OpenAndUpdate(int inNCmdShow)
 {
-    GT_UNREFERENCED_PARAMETER(inNCmdShow);
-    xcb_map_window(mConnection, mWindowHandle);
+    if (inNCmdShow != SW_MINIMIZE)
+    {
+        xcb_map_window(mConnection, mWindowHandle);
+    }
 
     return true;
 }

@@ -10,7 +10,6 @@
     #include "XcbWindow.h"
     #include <signal.h>
     #include "WinDefs.h"
-    #define SW_MINIMIZE 1
 #endif
 
 #ifdef _DEBUG

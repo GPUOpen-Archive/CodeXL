@@ -30,6 +30,7 @@
 
 #define _TRUNCATE ((size_t)-1)
 #define SOCKET_ERROR -1
+#define SW_MINIMIZE 6
 
 #define HAVE_BOOLEAN 1
 #ifndef TRUE
