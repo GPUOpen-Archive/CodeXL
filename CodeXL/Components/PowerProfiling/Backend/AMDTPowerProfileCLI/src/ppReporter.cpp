@@ -32,12 +32,12 @@
 //  Reporter
 //
 #define PROCESS_INFO_TXT_HDR_FORMAT    "\nSNo\tPID\tSamples\tPower(Joules)\tPower(%%)\tName\t\t\t\t\t\tPath\n\n"
-#define PROCESS_INFO_CSV_HDR_FORMAT    "\nSNo,PID,Samples,Power(Joules),Power(%%),Name,Path\n\n"
+#define PROCESS_INFO_CSV_HDR_FORMAT    "\nSNo,PID,Samples,Power(Joules),Power(%%),Name,Path\n"
 #define PROCESS_INFO_TXT_FORMAT        "%d\t%d\t%d\t%3.2f\t\t%3.2f\t\t%-45.45s\t%s\n"
 #define PROCESS_INFO_CSV_FORMAT        "%d,%d,%d,%3.2f,%3.2f,%s,%s\n"
 
-#define MODULE_INFO_TXT_HDR_FORMAT     "\nSNo\tPID\tProcess Name\t\t\t\t\tProcess Path\t\t\t\t\t\t\t\tSamples\tKernel\tPower(Joules)\tPower(%%)\tLoad Addr\t\tsize\t\t\tName\t\t\t\t\t\tPath\n\n"
-#define MODULE_INFO_CSV_HDR_FORMAT     "\nSNo,PID,Process Name, Process Path, Samples,Kernel,Power(Joules),Power(%%),Load Addr,size,Name,Path\n\n"
+#define MODULE_INFO_TXT_HDR_FORMAT     "\nSNo\tPID\tProcess Name\t\t\t\t\tProcess Path\t\t\t\t\t\t\t\tSamples\tKernel\tPower(Joules)\tPower(%%)\tLoad Addr\t\tsize\t\t\tModule Name\t\t\t\t\tModule Path\n\n"
+#define MODULE_INFO_CSV_HDR_FORMAT     "\nSNo,PID,Process Name, Process Path, Samples,Kernel,Power(Joules),Power(%%),Load Addr,size,Module Name,ModulePath\n"
 #define MODULE_INFO_TXT_FORMAT         "%d\t%d\t%-45.45s\t%-65.85s\t%d\t%d\t%3.2f\t\t%3.2f\t\t0x%-8.8" H_FORMAT "\t\t%-1.8" D_FORMAT "\t\t%-45.45s\t%s\n"
 
 #define MODULE_INFO_CSV_FORMAT         "%d,%d,%s,%s,%d,%d,%3.2f,%3.2f,0x%" H_FORMAT ",%" D_FORMAT ",%s,%s\n"
@@ -826,7 +826,6 @@ void ppReporterCsv::WriteProcessData(AMDTUInt32 recCnt, AMDTPwrProcessInfo*& pIn
             totalRecords);
 
     m_dataStr.append(m_pDataStr);
-    m_dataStr.append("\n");
     m_reportFile.write(m_dataStr.c_str(), m_dataStr.length());
 }
 void ppReporterCsv::WriteModuleData(AMDTUInt32 recCnt, AMDTPwrModuleData*& pInfo, AMDTFloat32 totalPower)
@@ -873,6 +872,5 @@ void ppReporterCsv::WriteModuleData(AMDTUInt32 recCnt, AMDTPwrModuleData*& pInfo
             recCnt);
 
     m_dataStr.append(m_pDataStr);
-    m_dataStr.append("\n");
     m_reportFile.write(m_dataStr.c_str(), m_dataStr.length());
 }

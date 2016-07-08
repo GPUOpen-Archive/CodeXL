@@ -290,10 +290,14 @@ AMDTResult PowerProfileTranslate::PwrSetCoreConfigs(void)
 
         if (pSrc)
         {
-            AMDTUInt64 tempCoreMask = 0;
+            AMDTUInt32 instanceId = 0;
+            AMDTUInt64 tempCoreCounterMask = 0;
             coreCfg.m_sampleId = pSrc->m_sampleId;
             PwrCounterDecodeInfo decodeInfo;
             memset(&decodeInfo, 0, sizeof(PwrCounterDecodeInfo));
+
+            // Get instance id from core mask and sample id
+            GetFirstSetBitIndex(&instanceId, cfgTab.m_profileConfig[cfgCnt].m_samplingSpec.m_mask);
 
             // Set the parameters
             m_profileType = (ProfileType)pSrc->m_samplingSpec.m_profileType;
@@ -309,14 +313,14 @@ AMDTResult PowerProfileTranslate::PwrSetCoreConfigs(void)
             }
 
             // Core counters
-            tempCoreMask = pSrc->m_apuCounterMask;
+            tempCoreCounterMask = pSrc->m_apuCounterMask;
             packageId = 0;
 
-            while (tempCoreMask > 0)
+            while (tempCoreCounterMask > 0)
             {
                 AMDTUInt32 counterId = 0;
-                GetFirstSetBitIndex(&counterId, tempCoreMask);
-                tempCoreMask &= ~(1ULL << counterId);
+                GetFirstSetBitIndex(&counterId, tempCoreCounterMask);
+                tempCoreCounterMask &= ~(1ULL << counterId);
                 PwrSupportedCounterMap* pCounters = PwrGetSupportedCounterList();
 
                 for (auto Iter : *pCounters)
@@ -324,7 +328,7 @@ AMDTResult PowerProfileTranslate::PwrSetCoreConfigs(void)
                     if ((Iter.second.m_pkgId == 0)
                         && (counterId == Iter.second.m_basicInfo.m_attrId)
                         && (AMDT_PWR_VALUE_SINGLE == Iter.second.m_basicInfo.m_aggr)
-                        && (cfgCnt == Iter.second.m_instanceId))
+                        && (instanceId == Iter.second.m_instanceId))
                     {
                         decodeInfo.m_clientId = Iter.first;
                         decodeInfo.m_basicId = counterId;
@@ -342,14 +346,14 @@ AMDTResult PowerProfileTranslate::PwrSetCoreConfigs(void)
             {
                 for (smuCnt = 0; smuCnt < pSrc->m_activeList.m_count; smuCnt++)
                 {
-                    tempCoreMask = pSrc->m_activeList.m_info[smuCnt].m_counterMask;
+                    tempCoreCounterMask = pSrc->m_activeList.m_info[smuCnt].m_counterMask;
                     packageId = pSrc->m_activeList.m_info[smuCnt].m_packageId;
 
-                    while (tempCoreMask)
+                    while (tempCoreCounterMask)
                     {
                         AMDTUInt32 counterId = 0;
-                        GetFirstSetBitIndex(&counterId, tempCoreMask);
-                        tempCoreMask &= ~(1ULL << counterId);
+                        GetFirstSetBitIndex(&counterId, tempCoreCounterMask);
+                        tempCoreCounterMask &= ~(1ULL << counterId);
                         PwrSupportedCounterMap* pCounters = PwrGetSupportedCounterList();
 
                         for (auto Iter : *pCounters)
@@ -773,6 +777,7 @@ AMDTResult PowerProfileTranslate::TranslateRawData()
                     PwrCoreConfig* pCoreCfg = nullptr;
                     // Read basic information
                     sampleId = *(AMDTUInt16*)(pRaw + offset);
+                    PwrTrace("sample id %d",sampleId);
                     offset += sizeof(AMDTUInt16);
                     recId = *(AMDTUInt64*)(pRaw + offset);
                     offset += sizeof(AMDTUInt64);
@@ -788,7 +793,6 @@ AMDTResult PowerProfileTranslate::TranslateRawData()
                         SetElapsedTime(tsRaw, &m_currentTs);
                         m_data.m_ts = m_currentTs;
                     }
-
                     pCoreCfg = PwrGetCoreConfig(sampleId);
                     AMDTUInt32 idx = 0;
 
@@ -1191,6 +1195,7 @@ AMDTResult PowerProfileTranslate::ReadSharedBuffer(SharedBuffer* pBuffer, AMDTUI
     AMDTUInt32 sharedOffset = PWRPROF_SHARED_METADATA_SIZE;
     AMDTUInt64 tempCoreMask = coreMask;
     AMDTUInt32 coreId = 0;
+    AMDTUInt32 idx = 0;
 
     if (AMDT_STATUS_OK == ret)
     {
@@ -1200,10 +1205,11 @@ AMDTResult PowerProfileTranslate::ReadSharedBuffer(SharedBuffer* pBuffer, AMDTUI
             tempCoreMask &= ~(1 << coreId);
             SharedBuffer* pSBuffer = &pBuffer[coreId];
 
-            AMDTUInt32 bufferBase = sharedOffset + coreId * (sizeof(PageBuffer) + PWRPROF_PERCORE_BUFFER_SIZE);
-            AMDTUInt32 rawBufferbase = sharedOffset + (coreId + 1) * sizeof(PageBuffer) + coreId * PWRPROF_PERCORE_BUFFER_SIZE;
+            AMDTUInt32 bufferBase = sharedOffset + idx * (sizeof(PageBuffer) + PWRPROF_PERCORE_BUFFER_SIZE);
+            AMDTUInt32 rawBufferbase = sharedOffset + (idx + 1) * sizeof(PageBuffer) + idx * PWRPROF_PERCORE_BUFFER_SIZE;
             PageBuffer* pCoreBuffer = (PageBuffer*)(g_pSharedBuffer + bufferBase);
             pSBuffer->m_size = 0;
+            idx++;
 
             ATOMIC_SET(&pSBuffer->m_currentOffset, pCoreBuffer->m_currentOffset);
             ATOMIC_SET(&pSBuffer->m_consumedOffset, pCoreBuffer->m_consumedOffset);
