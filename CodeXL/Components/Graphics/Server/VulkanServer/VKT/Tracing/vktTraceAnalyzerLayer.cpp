@@ -22,6 +22,8 @@
 #include "../Objects/Wrappers/vktWrappedCmdBuf.h"
 #include "../Objects/Wrappers/vktWrappedQueue.h"
 
+#ifdef WIN32
+
 //-----------------------------------------------------------------------------
 /// SortByStartTime
 //-----------------------------------------------------------------------------
@@ -29,6 +31,31 @@ bool SortByStartTime(ProfilerResult*& lhs, ProfilerResult*& rhs)
 {
     return lhs->timestampResult.rawClocks.start < rhs->timestampResult.rawClocks.start;
 }
+
+#else
+
+typedef int(*compfn)(const void*, const void*);
+
+//-----------------------------------------------------------------------------
+/// SortByStartTime
+//-----------------------------------------------------------------------------
+int SortByStartTime(ProfilerResult* pLhs, ProfilerResult *pRhs)
+{
+    if (pLhs->timestampResult.rawClocks.start < pRhs->timestampResult.rawClocks.start)
+    {
+        return -1;
+    }
+    else if (pLhs->timestampResult.rawClocks.start > pRhs->timestampResult.rawClocks.start)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+#endif
 
 //-----------------------------------------------------------------------------
 /// Constructor.
@@ -466,9 +493,7 @@ std::string VktTraceAnalyzerLayer::GetGPUTraceTXT()
             }
         }
 
-#ifdef WIN32
-        sort(flatResults.begin(), flatResults.end(), SortByStartTime);
-#endif
+        const UINT numResults = (UINT)flatResults.size();
 
         // We'll need to insert the GPU Trace section header before the response data, even if there aren't any results.
         appendString += "//==GPU Trace==";
@@ -479,13 +504,34 @@ std::string VktTraceAnalyzerLayer::GetGPUTraceTXT()
         appendString += "\n";
 
         appendString += "//CommandBufEventCount=";
-        appendString += IntToString((INT)flatResults.size());
+        appendString += IntToString((INT)numResults);
         appendString += "\n";
 
-        for (UINT i = 0; i < flatResults.size(); i++)
+#ifdef WIN32
+        sort(flatResults.begin(), flatResults.end(), SortByStartTime);
+
+        for (UINT i = 0; i < numResults; i++)
         {
             ProfilerResultToStr(flatResults[i], appendString);
         }
+#else
+        ProfilerResult* pFlatResults = new ProfilerResult[numResults];
+
+        for (UINT i = 0; i < numResults; i++)
+        {
+            pFlatResults[i] = *(flatResults[i]);
+        }
+
+        qsort(pFlatResults, numResults, sizeof(ProfilerResult), (compfn)SortByStartTime);
+
+        for (UINT i = 0; i < numResults; i++)
+        {
+            ProfilerResultToStr(&pFlatResults[i], appendString);
+        }
+
+        delete[] pFlatResults;
+        pFlatResults = nullptr;
+#endif
     }
     else
     {
