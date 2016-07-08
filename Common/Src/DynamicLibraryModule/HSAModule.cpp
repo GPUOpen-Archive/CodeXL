@@ -130,7 +130,7 @@ bool HSAModule::LoadModule(const std::string& moduleName)
             {
                 hsa_ven_amd_loaded_code_object_1_00_pfn_t loadedCodeObjectTable;
 #ifdef FUTURE_ROCR_VERSION 
-                status = system_get_extension_table((HSA_EXTENSION_AMD_LOADER, 1, 0, &loadedCodeObjectTable);
+                status = system_get_extension_table(HSA_EXTENSION_AMD_LOADER, 1, 0, &loadedCodeObjectTable);
 #else
                 status = system_get_extension_table(HSA_EXTENSION_AMD_LOADED_CODE_OBJECT, 1, 0, &loadedCodeObjectTable);
 #endif
