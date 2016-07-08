@@ -155,6 +155,7 @@ static void DeleteAllSharedMemories()
     static const char* FILE_TEMPLATES[] =
     {
         "OpenGL",
+        "Vulkan",
         "sem.",
         "GPS_",
         "PLUGINS_TO_GPS",
@@ -1029,13 +1030,36 @@ BOOL ConsoleCloseHandler(DWORD dwCtrlType)
 
 #ifdef _LINUX
 //--------------------------------------------------------------
-/// Linux-specific implementation of the same Windows function.
-/// Set up a handler which gets executed when Ctrl-C is pressed
-/// \param handler Signal handler
+/// Handler that gets called when the SIGHUP signal is caught
+/// \return Always returns true
 //--------------------------------------------------------------
-static void SetConsoleCtrlHandler(__sighandler_t handler)
+BOOL SigHupHandler(DWORD dwCtrlType)
 {
-    // use the sigaction() function to capture CTRL-C on Linux.
+    PS_UNREFERENCED_PARAMETER(dwCtrlType);
+    SendShutdownRequest();
+    return TRUE;
+}
+
+//--------------------------------------------------------------
+/// Handler that gets called when the SIGTERM signal is caught
+/// \return Always returns true
+//--------------------------------------------------------------
+BOOL SigTermHandler(DWORD dwCtrlType)
+{
+    PS_UNREFERENCED_PARAMETER(dwCtrlType);
+    SendShutdownRequest();
+    return TRUE;
+}
+
+//--------------------------------------------------------------
+/// Set up a signal handler. This sets up a callback that gets
+/// called when the signal is caught
+/// \param handler Signal handler callback function
+/// \signum the signal ID (SIGINT, SIGHUP etc)
+//--------------------------------------------------------------
+static void SetSignalHandler(__sighandler_t handler, int signum)
+{
+    // use the sigaction() function to capture the signal on Linux.
     // signal() could be used but sigaction is more robust
     struct sigaction new_action, old_action;
 
@@ -1044,15 +1068,24 @@ static void SetConsoleCtrlHandler(__sighandler_t handler)
     sigemptyset(&new_action.sa_mask);
     new_action.sa_flags = 0;
 
-    // set up the handler for all console signals needed. For now, just
-    // intercept CTRL-C (SIGINT)
-    // may need to handle SIGHUP & SIGTERM if these aren't handled elsewhere
-    sigaction(SIGINT, NULL, &old_action);
+    // set up the handler.
+    sigaction(signum, NULL, &old_action);
 
     if (old_action.sa_handler != SIG_IGN)
     {
-        sigaction(SIGINT, &new_action, NULL);
+        sigaction(signum, &new_action, NULL);
     }
+}
+
+//--------------------------------------------------------------
+/// Linux-specific implementation of the Windows function of the
+/// same name. Set up a handler which gets executed when Ctrl-C
+/// is pressed
+/// \param handler Signal handler
+//--------------------------------------------------------------
+static void SetConsoleCtrlHandler(__sighandler_t handler)
+{
+    SetSignalHandler(handler, SIGINT);
 }
 #endif
 
@@ -1943,7 +1976,7 @@ void DetectConflictingProcesses()
 {
     char globalMutexName[PS_MAX_PATH];
     bool remoteLaunch = false;
-    sprintf_s(globalMutexName, PS_MAX_PATH, "PerfStudio2_global_mutex");
+    sprintf_s(globalMutexName, PS_MAX_PATH, "Graphics_server_global_mutex");
     ProgramInstance SingleInstance(globalMutexName);
 
     if (SingleInstance.IsProgramAlreadyRunning())
@@ -2045,6 +2078,8 @@ void DetectConflictingProcesses()
     SetConsoleCtrlHandler((PHANDLER_ROUTINE)ConsoleCloseHandler, TRUE);
 #else
     SetConsoleCtrlHandler((__sighandler_t)ConsoleCloseHandler);
+    SetSignalHandler((__sighandler_t)SigHupHandler, SIGHUP);
+    SetSignalHandler((__sighandler_t)SigTermHandler, SIGTERM);
 #endif
 
     if (CollectWrapperInfo() == false)
@@ -2068,7 +2103,7 @@ void DetectConflictingProcesses()
         LogConsole(logMESSAGE, "See the README file or the help file provided with the client for more details and examples.\n");
 #else
         LogConsole(logMESSAGE, "Please restart by dragging and dropping your application onto the server.\n");
-        LogConsole(logMESSAGE, "In some cases shortcuts to your application and/or the GPU PerfStudio2 server can cause this error.\n");
+        LogConsole(logMESSAGE, "In some cases shortcuts to your application and/or the Graphics server can cause this error.\n");
         LogConsole(logMESSAGE, "Try again by dragging the actual application exe onto GPUPerfServer.exe\n");
 #endif // _LINUX
         smClose("ActivePlugins");
