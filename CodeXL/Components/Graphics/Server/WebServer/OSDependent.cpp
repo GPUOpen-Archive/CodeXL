@@ -992,7 +992,7 @@ static void SendShutdownRequest()
             osSleep(100);
             client_socket->close();               // close will delete the instance
             requestSent = true;
-            LogConsole(logMESSAGE, "PerfServer shutting down\n");
+            LogConsole(logMESSAGE, "Graphics server requesting shutdown\n");
 
             // reset the library path in shared memory
             SG_SET_PATH(GPUPerfAPIPath, "");
@@ -1051,42 +1051,61 @@ BOOL SigTermHandler(DWORD dwCtrlType)
     return TRUE;
 }
 
-//--------------------------------------------------------------
-/// Set up a signal handler. This sets up a callback that gets
-/// called when the signal is caught
-/// \param handler Signal handler callback function
-/// \signum the signal ID (SIGINT, SIGHUP etc)
-//--------------------------------------------------------------
-static void SetSignalHandler(__sighandler_t handler, int signum)
+/// Class to encapsulate linux signal handlers. A handler can be added for each
+/// signal type, and all signals can be removed when the program shutsdown normally.
+/// Uses the sigaction() function to capture the signal. signal() could be used but
+/// sigaction is more robust
+class SignalHandler
 {
-    // use the sigaction() function to capture the signal on Linux.
-    // signal() could be used but sigaction is more robust
-    struct sigaction new_action, old_action;
+public:
+    SignalHandler() {}
+    ~SignalHandler() {}
 
-    // Set up the structure to specify the new action
-    new_action.sa_handler = handler;
-    sigemptyset(&new_action.sa_mask);
-    new_action.sa_flags = 0;
-
-    // set up the handler.
-    sigaction(signum, NULL, &old_action);
-
-    if (old_action.sa_handler != SIG_IGN)
+    /// Add a signal handler. This sets up a callback that gets
+    /// called when the signal is caught
+    /// \param handler Signal handler callback function
+    /// \signum the signal ID (SIGINT, SIGHUP etc)
+    void AddHandler(__sighandler_t handler, int signum)
     {
-        sigaction(signum, &new_action, NULL);
-    }
-}
+        SignalData signalData;
 
-//--------------------------------------------------------------
-/// Linux-specific implementation of the Windows function of the
-/// same name. Set up a handler which gets executed when Ctrl-C
-/// is pressed
-/// \param handler Signal handler
-//--------------------------------------------------------------
-static void SetConsoleCtrlHandler(__sighandler_t handler)
-{
-    SetSignalHandler(handler, SIGINT);
-}
+        // Set up the structure to specify the new action
+        signalData.new_action.sa_handler = handler;
+        sigemptyset(&signalData.new_action.sa_mask);
+        signalData.new_action.sa_flags = 0;
+
+        // set up the handler. First, store the old handler info
+        sigaction(signum, NULL, &signalData.old_action);
+
+        if (signalData.old_action.sa_handler != SIG_IGN)
+        {
+            sigaction(signum, &signalData.new_action, nullptr);
+        }
+        m_signalMap.insert(std::make_pair(signum, signalData));
+    }
+
+    /// Remove all signal handlers and restore them to their default
+    /// handlers.
+    void RemoveHandlers()
+    {
+        std::map<int, SignalData>::iterator it;
+        for (it = m_signalMap.begin(); it != m_signalMap.end(); ++it);
+        {
+            sigaction(it->first, &(it->second.old_action), nullptr);
+        }
+        m_signalMap.clear();
+    }
+
+private:
+    /// structure to hold signal information
+    struct SignalData
+    {
+        struct sigaction new_action;     // the new signal information
+        struct sigaction old_action;     // the old signal information
+    };
+
+    std::map<int, SignalData> m_signalMap; // map containing a signal id to its new/old handler
+};
 #endif
 
 //--------------------------------------------------------------
@@ -2077,9 +2096,10 @@ void DetectConflictingProcesses()
 #if defined (_WIN32)
     SetConsoleCtrlHandler((PHANDLER_ROUTINE)ConsoleCloseHandler, TRUE);
 #else
-    SetConsoleCtrlHandler((__sighandler_t)ConsoleCloseHandler);
-    SetSignalHandler((__sighandler_t)SigHupHandler, SIGHUP);
-    SetSignalHandler((__sighandler_t)SigTermHandler, SIGTERM);
+    SignalHandler signalHandler;
+    signalHandler.AddHandler((__sighandler_t)ConsoleCloseHandler, SIGINT);
+    signalHandler.AddHandler((__sighandler_t)SigHupHandler, SIGHUP);
+    signalHandler.AddHandler((__sighandler_t)SigTermHandler, SIGTERM);
 #endif
 
     if (CollectWrapperInfo() == false)
@@ -2203,6 +2223,11 @@ void DetectConflictingProcesses()
     clientDoneSemaphore.Close();
 
     delete clientThread;
+
+#ifdef _LINUX
+    signalHandler.RemoveHandlers();
+    LogConsole(logMESSAGE, "Graphics server shutting down\n");
+#endif
 
     WebServerCleanup(server_socket);
 
