@@ -102,7 +102,6 @@ do
    elif [ "$1" = "boostlibdir" ]; then
       shift
       BOOST_LIB_DIR_OVERRIDE="BOOST_LIB_DIR=$1"
-   fi
    elif [ "$1" = "additionaldefines" ]; then
       shift
       ADDITIONAL_COMPILER_DEFINES_OVERRIDE="ADDITIONAL_COMPILER_DEFINES_FROM_BUILD_SCRIPT=$1"
