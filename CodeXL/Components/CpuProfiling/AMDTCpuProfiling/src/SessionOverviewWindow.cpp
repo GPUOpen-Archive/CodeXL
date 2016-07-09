@@ -113,21 +113,16 @@ bool SessionOverviewWindow::displaySession()
     bool retVal = false;
 
     // Display the hot spot indicator options:
-    bool rcHotSpot = fillHotspotIndicatorCombo();
-    GT_ASSERT(rcHotSpot);
+    retVal = fillHotspotIndicatorCombo();
 
     // Initialize the display filters:
     initDisplayFilters();
 
     // Display the session data table:
-    bool rcData = displaySessionDataTables();
-    GT_ASSERT(rcData);
+    retVal = displaySessionDataTables() && retVal;
 
     // Display the session HTML properties:
-    bool rcProps = displaySessionProperties();
-    GT_ASSERT(rcProps);
-
-    retVal = rcProps && rcData && rcHotSpot;
+    retVal = displaySessionProperties() && retVal;
 
     return retVal;
 }
@@ -747,18 +742,10 @@ bool SessionOverviewWindow::displaySessionDataTables()
                       (m_pFunctionsTable != nullptr) &&
                       (m_pProcessesHeader != nullptr))
     {
-        retVal = true;
-
-        bool rc = m_pProcessesTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, m_counterIdx) && retVal;
-        GT_ASSERT(rc);
-
-        rc = m_pFunctionsTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, m_counterIdx) && retVal;
-        GT_ASSERT(rc);
-
-        rc = m_pModulesTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, m_counterIdx) && retVal;
-        GT_ASSERT(rc);
+        retVal = m_pProcessesTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, m_counterIdx);
+        retVal = m_pFunctionsTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, m_counterIdx) && retVal;
+        retVal = m_pModulesTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, m_counterIdx) && retVal;
     }
-
 
     return retVal;
 }
@@ -885,7 +872,6 @@ bool SessionOverviewWindow::fillHotspotIndicatorCombo()
     GT_IF_WITH_ASSERT((m_pHotSpotIndicatorComboBoxAction != nullptr) &&
                       (pHotSpotIndicatorComboBox != nullptr) &&
                       (m_pDisplayedSessionItemData != nullptr) &&
-                      (m_pProfileInfo != nullptr) &&
                       (m_pDisplayFilter != nullptr))
     {
         if ((false == m_pDisplayFilter->IsSeperatedByCoreEnabled()) &&
