@@ -486,7 +486,13 @@ void CPUProfileDataTable::onAboutToShowContextMenu()
                                     }
                                     else
                                     {
-                                        itemText = QString(CA_STR_MENU_DISPLAY_BY_MODULE_ARG).arg(pItem->text());
+                                        // module name is at column 1
+                                        pItem = item(selectedIndex, 1);
+
+                                        if (pItem != nullptr)
+                                        {
+                                            itemText = QString(CA_STR_MENU_DISPLAY_BY_MODULE_ARG).arg(pItem->text());
+                                        }
                                     }
 
                                     pAction->setText(itemText);

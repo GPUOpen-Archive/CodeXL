@@ -1101,6 +1101,13 @@ SetReportConfig()
     if (nullptr != m_pProfDataReader.get())
     {
         SetProfileDataOption();
+        AMDTUInt64 mask = (1 << GetCoreCount()) - 1;
+
+        if (GetCoreMask() == mask)
+        {
+            SetCoreMask(AMDT_PROFILE_ALL_CORES);
+        }
+
         m_pProfDataReader->SetReportOption(m_options);
         ret = true;
     }
