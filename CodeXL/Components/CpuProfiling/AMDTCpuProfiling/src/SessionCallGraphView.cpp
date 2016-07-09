@@ -241,11 +241,15 @@ void CallGraphPathFuncList::InitializeItem(CallGraphFuncListItem* pFuncListItem,
 
     if (!modulePath.isEmpty())
     {
+
         pFuncListItem->setToolTip(CALLGRAPH_PATH_MODULE, acGTStringToQString(modulePath));
     }
 
-    //TODO:: change path to module name
-    pFuncListItem->setText(CALLGRAPH_PATH_MODULE, acGTStringToQString(modulePath));
+    osFilePath moduleFullPath(modulePath);
+    gtString modNameWithExt;
+    moduleFullPath.getFileNameAndExtension(modNameWithExt);
+
+    pFuncListItem->setText(CALLGRAPH_PATH_MODULE, acGTStringToQString(modNameWithExt));
 }
 
 
@@ -1853,11 +1857,19 @@ void CallGraphButterfly::SetChildrenFunction(shared_ptr<cxlProfileDataReader> pP
 
     for (const auto& children : childrens)
     {
+        gtString functionName = children.m_functionInfo.m_name;
+        double deepSamples = children.m_totalDeepSamples;
+
+        if (L"[self]" == functionName)
+        {
+            deepSamples = children.m_totalSelfSamples;
+        }
+
         AddTopLevelItem(*m_pChildrenTreeControl,
                         children.m_functionInfo.m_modulePath,
-                        children.m_functionInfo.m_name,
-                        children.m_totalDeepSamples,
-                        children.m_totalDeepSamples,
+                        functionName,
+                        deepSamples,
+                        deepSamples,    //TODO : redundant arg need to be removed
                         children.m_deepSamplesPerc,
                         noSamples);
 
