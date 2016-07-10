@@ -2141,7 +2141,7 @@ bool vsdProcessDebugger::canMakeThreadExecuteFunction(const osThreadId& threadId
         {
             // CODEXL-2946 - direct execution mode is currently causing call stack trouble.
             // We can currently only execute functions at threads suspended on API functions:
-            retVal = !pThread->isDriverThread() && (0 < pThread->skippedFrameCount(true));
+            retVal = !pThread->isDriverThread();
         }
     }
 

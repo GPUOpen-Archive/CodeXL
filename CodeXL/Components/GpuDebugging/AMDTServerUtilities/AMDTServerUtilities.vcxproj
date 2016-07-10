@@ -38,12 +38,25 @@
     <Import Project="$(SolutionDir)\AMDTGpuDebugging.props" />
     <Import Project="$(AMDTCommonAMD)\APPSDK\Global-OpenCL-NoLib.props" />
   </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="..\..\..\..\Common\Lib\Ext\Boost\Global-Boost-2015.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="..\..\..\..\Common\Lib\Ext\Boost\Global-Boost-2015.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="..\..\..\..\Common\Lib\Ext\Boost\Global-Boost-2015.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="..\..\..\..\Common\Lib\Ext\Boost\Global-Boost-2015.props" />
+  </ImportGroup>
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <PreprocessorDefinitions>_GR_SPIES_UTILITIES_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(CommonDir)$(BoostDir);$(ATIStreamSDKDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -86,12 +99,8 @@
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\suSpyToAPIConnector.cpp" />
-    <ClCompile Include="src\suSWMRImpl.cpp">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="src\suSWMRInstance.cpp">
-      <ExcludedFromBuild>true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="src\suSWMRImpl.cpp" />
+    <ClCompile Include="src\suSWMRInstance.cpp" />
     <ClCompile Include="src\suTechnologyMonitorsManager.cpp" />
   </ItemGroup>
   <ItemGroup>
