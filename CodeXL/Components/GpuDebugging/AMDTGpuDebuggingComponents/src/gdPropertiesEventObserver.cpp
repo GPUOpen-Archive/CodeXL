@@ -716,7 +716,7 @@ bool gdPropertiesEventObserver::BuildItemHTMLProperties(const afApplicationTreeI
                     GT_IF_WITH_ASSERT(rc)
                     {
                         gdHTMLProperties htmlPropsCreator;
-                        htmlPropsCreator.buildFBOHTMLPropertiesString(pGDData->_contextId, fboDetails, true, htmlContent);
+                        htmlPropsCreator.buildFBOHTMLPropertiesString(pGDData->_contextId, fboDetails, false, htmlContent);
                     }
                 }
                 break;
