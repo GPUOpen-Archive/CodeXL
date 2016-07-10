@@ -385,16 +385,29 @@ void CounterSelectionSettingWindow::RestoreDefaultProjectSettings()
         if (pGeneralTreeItem != nullptr)
         {
             pGeneralTreeItem->setCheckState(0, Qt::Checked);
+
+            for (int i = 0; i < pGeneralTreeItem->childCount(); i++)
+            {
+                pGeneralTreeItem->child(i)->setCheckState(0, Qt::Checked);
+            }
         }
         QTreeWidgetItem* pLocalMemTreeItem = Util::FindTreeItem(m_pCounterListTW, "LocalMemory");
-        if (pGeneralTreeItem != nullptr)
+        if (pLocalMemTreeItem != nullptr)
         {
             pLocalMemTreeItem->setCheckState(0, Qt::Checked);
+            for (int i = 0; i < pLocalMemTreeItem->childCount(); i++)
+            {
+                pLocalMemTreeItem->child(i)->setCheckState(0, Qt::Checked);
+            }
         }
         QTreeWidgetItem* pGlobalTreeItem = Util::FindTreeItem(m_pCounterListTW, "GlobalMemory");
         if (pGlobalTreeItem != nullptr)
         {
             pGlobalTreeItem->setCheckState(0, Qt::Checked);
+            for (int i = 0; i < pGlobalTreeItem->childCount(); i++)
+            {
+                pGlobalTreeItem->child(i)->setCheckState(0, Qt::Checked);
+            }
         }
 
         UpdateCountersTreeCheckState();
