@@ -198,7 +198,8 @@ void kaBuildToolbar::comboSelectionChange(int selectedItemIndex)
         {
             gtString functionName = acQStringToGTString(m_pKernelsAndEntriesCombo->itemText(selectedItemIndex));
             gtString typeName;
-            int lineNumber, fileId;
+            int lineNumber = 0;
+            int fileId = 0;
 
             KA_PROJECT_DATA_MGR_INSTANCE.SetEntryPointOrKernel(functionName, fileId, lineNumber, typeName);
             // Open the source file:
