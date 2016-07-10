@@ -1069,7 +1069,8 @@ bool vsc_IsCurrentPlatform(const wchar_t* candidatePlatform)
 
     if (kaProjectDataManager::instance().GetActiveProgram() != nullptr)
     {
-        if (wcscmp(candidatePlatform, kaProjectDataManager::instance().GetActiveProgram()->GetProgramTypeAsString(kaProjectDataManager::instance().GetActiveProgram()->GetBuildType()).asCharArray()) == 0)
+        gtString progName = kaProjectDataManager::instance().GetActiveProgram()->GetProgramTypeAsString(kaProjectDataManager::instance().GetActiveProgram()->GetBuildType());
+        if (wcscmp(candidatePlatform, progName.asCharArray()) == 0)
         {
             platformFits = true;
         }
