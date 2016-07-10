@@ -664,7 +664,7 @@ bool kaProjectDataManager::buildKernelList(const QString& fileData, const osFile
 
 
         //we return true only if added some kernels
-        retVal = analyseVecSize < pCurrentFileData->analyzeVector().size();
+        retVal = analyseVecSize <= pCurrentFileData->analyzeVector().size();
     }
     return retVal;
 }
@@ -735,14 +735,27 @@ void kaProjectDataManager::FillKernelNamesList(const QString& fileData, const os
 
                     if (token != tokens.end())
                     {
+                        auto returnValueToken = token;
                         //skip  spaces till kernel name
                         while (++token != tokens.end() && isspace(token->value[0]));
 
                         //we found real kernel, add it to analyze vector
                         if (token != tokens.end())
                         {
+                            
                             kaProjectDataManagerAnaylzeData newDataStruct;
-                            newDataStruct.m_kernelName = token->value.c_str();
+                            // this scenario when we have function with following syntax :
+                            // <return value>  __kernel <func name> ( <args >) 
+                            // for example : "void __kernel test_kernel(const int batchSize,      const float learningRateMultiplier)"
+                            // in such case we take one token before the left parenthesis
+                            if (token->value == "(")
+                            {
+                                newDataStruct.m_kernelName = returnValueToken->value.c_str();
+                            }
+                            else
+                            {
+                                newDataStruct.m_kernelName = token->value.c_str();
+                            }
                             newDataStruct.m_lineInSourceFile = token->line;
                             kernelList.push_back(newDataStruct);
                             ++token;
