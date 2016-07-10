@@ -130,6 +130,8 @@ public:
     /// and line number so it can post them separately in a way that enable connecting message to file and line listed in it
     virtual void AddStringToInformationView(const QString& messageToDisplay);
 
+    void handleShaderBuild(const QRegExp& glslStageExp, const QRegExp& clFilePathAndNamExp, QString& msg);
+
     // Service function:
     /// Close all open MDI views that were connected to the files in the directory
     /// go through all MDI and check that the file related to the MDI still exists:

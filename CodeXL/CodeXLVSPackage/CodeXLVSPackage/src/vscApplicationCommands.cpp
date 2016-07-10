@@ -834,21 +834,6 @@ void vscApplicationCommands::AddStringToInformationView(const QString& messageTo
 
         QRegExp glslStageExp(QString(AF_STR_BUILDING_STAGE_QREGEXP), Qt::CaseInsensitive);
 
-        // looking for line 123: so the line number can be isolated
-        QRegExp lineNumExp(QString(AF_STR_CL_LINENUM_QREGEXP));
-
-        // for directX files, looking for (123, in order to isolate line number
-        QRegExp hlsllineNumExp(AF_STR_HLSL_LINENUM_QREGEXP);
-
-        // for openGL files, looking for :digits:
-        QRegExp glsllineNumExp(AF_STR_GLSL_LINENUM_QREGEXP);
-
-        // Check if the line has line number
-        QStringList matched;
-        QString lineNumText;
-        // pathDelimiter indicates how file path is separated from the rest of error message
-        QChar pathDelimiter;
-
 
         while (msg.length() > 0)
         {
@@ -885,152 +870,174 @@ void vscApplicationCommands::AddStringToInformationView(const QString& messageTo
             }
             else
             {
-                //after build started check if it's stage shader build
-                if (!m_stagePathMap.empty())
-                {
-                    gtString msgToAdd = acQStringToGTString(msg);
-
-                    if (0 <= glsllineNumExp.indexIn(msg))
-                    {
-                        matched = glsllineNumExp.capturedTexts();
-                        lineNumText = matched[0].mid(1, matched[0].size() - 2);
-
-                        if (0 <= glslStageExp.indexIn(msg))
-                        {
-                            QString stageName = glslStageExp.capturedTexts()[0];
-                            QString stageFilePath = m_stagePathMap[stageName];
-                            bool lineNumOk = false;
-                            int line = lineNumText.toInt(&lineNumOk);
-
-                            if (lineNumOk)
-                            {
-                                // in the background, visual studio counts lines starting zero
-                                line = line > 0 ? (line - 1) : line;
-
-                                m_pOwner->OutputBuildMessage(msgToAdd.asCharArray(), false, acQStringToGTString(stageFilePath).asCharArray(), line);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        m_pOwner->OutputBuildMessage(msgToAdd.asCharArray(), false, L"", 0);
-                    }
-
-                    msg = "";
-                }
-                else
-                {
-                    // gets the start location of the file name and path
-                    int from = clFilePathAndNamExp.indexIn(msg);
-
-                    if (from < 0)
-                    {
-                        // the current message doesn't have file in it, post it as is
-                        gtString msgToAdd = acQStringToGTString(msg);
-                        m_pOwner->OutputBuildMessage(msgToAdd.asCharArray(), false, L"", 0);
-                        msg = "";
-                    }
-                    else
-                    {
-                        if (from > 0)
-                        {
-                            // current message has the format expected, however need to post the part of it that has no file attched
-                            gtString msgToAdd = acQStringToGTString(msg.mid(0, from));
-                            m_pOwner->OutputBuildMessage(msgToAdd.asCharArray(), false, L"", 0);
-                        }
-
-                        bool msgPosted = false;
-                        // find the end of the file path string
-
-                        // Check if the line has line number
-                        if (0 <= lineNumExp.indexIn(msg))
-                        {
-                            matched = lineNumExp.capturedTexts();
-                            lineNumText = matched[0];
-                            pathDelimiter = ',';
-                        }
-                        else if (0 <= hlsllineNumExp.indexIn(msg))
-                        {
-                            matched = hlsllineNumExp.capturedTexts();
-                            lineNumText = matched[0];
-                            pathDelimiter = '(';
-                        }
-                        else if (0 <= glsllineNumExp.indexIn(msg))
-                        {
-                            matched = glsllineNumExp.capturedTexts();
-                            lineNumText = matched[0].mid(1, matched[0].size() - 2);
-                            pathDelimiter = ' ';
-                        }
-
-                        int to = msg.indexOf(QRegExp(AF_STR_FILE_EXTENSIONS_QREGEXP), from);
-
-                        //find file path using pathDelimiter
-                        while ((to < msg.length() - 1) && (msg.at(to) != pathDelimiter))
-                        {
-                            to++;
-                        }
-
-                        int len = (to > from) ? to - from : 0;
-
-                        // extracting the file path and name
-                        QString filePathAndName = msg.mid(from, len);
-                        gtString file = acQStringToGTString(filePathAndName);
-                        osFilePath filePath(acQStringToGTString(filePathAndName));
-                        gtString fileExtension;
-                        bool extRes = filePath.getFileExtension(fileExtension);
-                        GT_ASSERT(extRes);
-
-                        // find the end of current message
-                        if (fileExtension.isEqualNoCase(L"cl"))
-                        {
-                            to = msg.indexOf(QString("^"), from);
-                        }
-                        else
-                        {
-                            to = msg.indexOf(QString("\n"), from);
-                        }
-
-                        QString curMsg = msg.mid(from, to - from);
-
-                        if (filePath.exists())
-                        {
-                            // Extract line number
-                            QRegExp numExp(QString("[0-9]+"));
-
-                            if (0 <= numExp.indexIn(lineNumText))
-                            {
-                                matched = numExp.capturedTexts();
-                                lineNumText = matched[0];
-                                bool lineNumOk = false;
-                                int line = lineNumText.toInt(&lineNumOk);
-
-                                if (lineNumOk)
-                                {
-                                    // in the background, visual studio counts lines starting zero
-                                    line = line > 0 ? (line - 1) : line;
-                                    gtString msgToAdd = acQStringToGTString(curMsg);
-                                    file = acQStringToGTString(filePathAndName);
-                                    m_pOwner->OutputBuildMessage(msgToAdd.asCharArray(), false, file.asCharArray(), line);
-                                    msgPosted = true;
-                                }
-                            }
-                        }
-
-                        if (!msgPosted)
-                        {
-                            // in case something went wrong with extracting file and line number, post message without spacial handling
-                            gtString msgToAdd = acQStringToGTString(curMsg.mid(0, from));
-                            m_pOwner->OutputBuildMessage(msgToAdd.asCharArray(), false, L"", 0);
-                        }
-
-                        // updating msg
-                        msg = msg.mid(from + curMsg.length());
-                    }
-                }
+                handleShaderBuild(glslStageExp, clFilePathAndNamExp, msg);
             }
         }
     }
 }
+
+void vscApplicationCommands::handleShaderBuild(const QRegExp& glslStageExp, const QRegExp& clFilePathAndNamExp, QString& msg)
+{
+    // looking for line 123: so the line number can be isolated
+    const QRegExp lineNumExp(QString(AF_STR_CL_LINENUM_QREGEXP));
+
+    // for openGL files, looking for :digits:
+    const QRegExp glsllineNumExp(AF_STR_GLSL_LINENUM_QREGEXP);
+
+    // for directX files, looking for (123, in order to isolate line number
+    const QRegExp hlsllineNumExp(AF_STR_HLSL_LINENUM_QREGEXP);
+
+
+    // Check if the line has line number
+    QStringList matched;
+    QString lineNumText;
+    // pathDelimiter indicates how file path is separated from the rest of error message
+    QChar pathDelimiter;
+
+    //after build started check if it's stage shader build
+    if (!m_stagePathMap.empty())
+    {
+        gtString msgToAdd = acQStringToGTString(msg);
+
+        if (0 <= glsllineNumExp.indexIn(msg))
+        {
+            matched = glsllineNumExp.capturedTexts();
+            lineNumText = matched[0].mid(1, matched[0].size() - 2);
+
+            if (0 <= glslStageExp.indexIn(msg))
+            {
+                QString stageName = glslStageExp.capturedTexts()[0];
+                QString stageFilePath = m_stagePathMap[stageName];
+                bool lineNumOk = false;
+                int line = lineNumText.toInt(&lineNumOk);
+
+                if (lineNumOk)
+                {
+                    // in the background, visual studio counts lines starting zero
+                    line = line > 0 ? (line - 1) : line;
+
+                    m_pOwner->OutputBuildMessage(msgToAdd.asCharArray(), false, acQStringToGTString(stageFilePath).asCharArray(), line);
+                }
+            }
+        }
+        else
+        {
+            m_pOwner->OutputBuildMessage(msgToAdd.asCharArray(), false, L"", 0);
+        }
+
+        msg = "";
+    }
+    else
+    {
+        // gets the start location of the file name and path
+        int from = clFilePathAndNamExp.indexIn(msg);
+
+        if (from < 0)
+        {
+            // the current message doesn't have file in it, post it as is
+            gtString msgToAdd = acQStringToGTString(msg);
+            m_pOwner->OutputBuildMessage(msgToAdd.asCharArray(), false, L"", 0);
+            msg = "";
+        }
+        else
+        {
+            if (from > 0)
+            {
+                // current message has the format expected, however need to post the part of it that has no file attached
+                gtString msgToAdd = acQStringToGTString(msg.mid(0, from));
+                m_pOwner->OutputBuildMessage(msgToAdd.asCharArray(), false, L"", 0);
+            }
+
+            bool msgPosted = false;
+            // find the end of the file path string
+
+            // Check if the line has line number
+            if (0 <= lineNumExp.indexIn(msg))
+            {
+                matched = lineNumExp.capturedTexts();
+                lineNumText = matched[0];
+                pathDelimiter = ',';
+            }
+            else if (0 <= hlsllineNumExp.indexIn(msg))
+            {
+                matched = hlsllineNumExp.capturedTexts();
+                lineNumText = matched[0];
+                pathDelimiter = '(';
+            }
+            else if (0 <= glsllineNumExp.indexIn(msg))
+            {
+                matched = glsllineNumExp.capturedTexts();
+                lineNumText = matched[0].mid(1, matched[0].size() - 2);
+                pathDelimiter = ' ';
+            }
+
+            int to = msg.indexOf(QRegExp(AF_STR_FILE_EXTENSIONS_QREGEXP), from);
+
+            //find file path using pathDelimiter
+            while ((to < msg.length() - 1) && (msg.at(to) != pathDelimiter))
+            {
+                to++;
+            }
+
+            int len = (to > from) ? to - from : 0;
+
+            // extracting the file path and name
+            QString filePathAndName = msg.mid(from, len);
+            gtString file = acQStringToGTString(filePathAndName);
+            osFilePath filePath(acQStringToGTString(filePathAndName));
+            gtString fileExtension;
+            bool extRes = filePath.getFileExtension(fileExtension);
+            GT_ASSERT(extRes);
+
+            // find the end of current message
+            if (fileExtension.isEqualNoCase(L"cl"))
+            {
+                to = msg.indexOf(QString("^"), from);
+            }
+            else
+            {
+                to = msg.indexOf(QString("\n"), from);
+            }
+
+            QString curMsg = msg.mid(from, to - from);
+
+            if (filePath.exists())
+            {
+                // Extract line number
+                QRegExp numExp(QString("[0-9]+"));
+
+                if (0 <= numExp.indexIn(lineNumText))
+                {
+                    matched = numExp.capturedTexts();
+                    lineNumText = matched[0];
+                    bool lineNumOk = false;
+                    int line = lineNumText.toInt(&lineNumOk);
+
+                    if (lineNumOk)
+                    {
+                        // in the background, visual studio counts lines starting zero
+                        line = line > 0 ? (line - 1) : line;
+                        gtString msgToAdd = acQStringToGTString(curMsg);
+                        file = acQStringToGTString(filePathAndName);
+                        m_pOwner->OutputBuildMessage(msgToAdd.asCharArray(), false, file.asCharArray(), line);
+                        msgPosted = true;
+                    }
+                }
+            }
+
+            if (!msgPosted)
+            {
+                // in case something went wrong with extracting file and line number, post message without spacial handling
+                gtString msgToAdd = acQStringToGTString(curMsg.mid(0, from));
+                m_pOwner->OutputBuildMessage(msgToAdd.asCharArray(), false, L"", 0);
+            }
+
+            // updating msg
+            msg = msg.mid(from + curMsg.length());
+        }
+    }
+}
+
 // ---------------------------------------------------------------------------
 void vscApplicationCommands::setOwner(IVscApplicationCommandsOwner* pOwner)
 {
