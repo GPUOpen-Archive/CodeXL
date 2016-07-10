@@ -646,8 +646,22 @@ def UseGPUPerfAPI (env) :
 
 def initjpglib (env) :
     jpglib_dir     = env['CXL_common_dir'] + '/Lib/Ext/jpglib/jpeg-9/'
-
     env.Append(CPPPATH = [jpglib_dir])
+
+def UseJpgLib (env):
+    jpglib_dir  = env['CXL_common_dir'] + '/Lib/Ext/jpglib/jpeg-9/bin'
+
+    if (env['CXL_arch'] == 'x86_64'):
+        jpglib_dir=jpglib_dir + '/x64'
+    else:
+        jpglib_dir=jpglib_dir + '/x86'
+
+    if (env['CXL_build'] == 'debug'):
+        jpglib_dir=jpglib_dir + '/Debug'
+    else:
+        jpglib_dir=jpglib_dir + '/Release'
+
+    env.Append(LIBPATH = [jpglib_dir])
 
 def initVulkanSDK (env) :
     VulkanSDK_dir     = env['CXL_common_dir'] + '/Lib/Ext/Vulkan/1.0.13.0/SDK'

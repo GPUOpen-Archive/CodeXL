@@ -33,6 +33,7 @@ initGPSBackend (env)
 UseTinyXml (env)
 UseGPUPerfAPI (env)
 initVulkanSDK (env)
+UseJpgLib (env)
 
 env.Append (CPPPATH =[
     env['CXL_commonproj_dir'],
@@ -56,7 +57,7 @@ env['LIBS'] = \
     "libCXLGraphicsServerCommon",
     "libCXLOSWrappers",
     "libCXLBaseTools",
-    "jpeg",
+    "libJpg",
     "png",
     "z",               #used by PNG
     "libboost_system.a",
