@@ -2471,12 +2471,10 @@ void appMainAppWindow::initializeApplicationBasicMenus()
         QMenu* pProfileMenu = getActionMenuItemParentMenu(menuString, nullptr, true);
         GT_ASSERT(nullptr != pProfileMenu);
 
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
         // Create the analyze menu:
         menuString = AF_STR_FrameAnalysisMenuString;
         QMenu* pFrameAnalysisMenu = getActionMenuItemParentMenu(menuString, nullptr, true);
         GT_ASSERT(nullptr != pFrameAnalysisMenu);
-#endif
 
         // Create the analyze menu:
         menuString = AF_STR_AnalyzeMenuString;
