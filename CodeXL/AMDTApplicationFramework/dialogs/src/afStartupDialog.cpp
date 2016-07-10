@@ -218,10 +218,8 @@ afStartupDialog::afStartupDialog(QWidget* pParent)
 
     pFrameAnalyzeLabel->setStyleSheet(AF_STR_CSSBold);
 
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     pLayout->addWidget(pFrameAnalyzeLabel);
     pLayout->addWidget(m_pNewProjectButtonForFrameAnalyze, 0, Qt::AlignLeft);
-#endif
 
     pLayout->addSpacing(AF_STARTUP_DLG_DEFAULT_LAYOUT_SPACING);
     QLabel* pAnalyzeLabel = new QLabel(AF_STR_StartupDialogAnalyzeCaption);
