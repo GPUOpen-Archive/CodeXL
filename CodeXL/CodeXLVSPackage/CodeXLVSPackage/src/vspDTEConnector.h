@@ -47,6 +47,8 @@ public:
     // Debugging:
     bool isSolutionLoaded();
     bool resumeDebugging();
+    bool breakDebugging();
+    bool stopDebugging();
     bool stepInto();
     bool stepOver();
     bool stepOut();

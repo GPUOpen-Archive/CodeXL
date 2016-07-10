@@ -1600,6 +1600,60 @@ bool vspDTEConnector::resumeDebugging()
 }
 
 // ---------------------------------------------------------------------------
+// Name:        vspDTEConnector::breakDebugging
+// Description: Suspends debugging, equivalent to pressing the F6 key
+//              (or the built-in "Pause" button)
+// Return Val:  bool - Success / failure.
+// Author:      Uri Shomroni
+// Date:        10/7/2016
+// ---------------------------------------------------------------------------
+bool vspDTEConnector::breakDebugging()
+{
+    bool retVal = false;
+
+    assert(_piDebugger != NULL);
+
+    if (_piDebugger != NULL)
+    {
+        // Tell the debugger to break:
+        HRESULT hr = _piDebugger->Break(VARIANT_FALSE);
+        retVal = SUCCEEDED(hr);
+
+        // TO_DO: there seems to be a problem that causes the built-in tool bars not to update.
+        // we need to find some sort of UI controller to tell to update.
+    }
+
+    return retVal;
+}
+
+// ---------------------------------------------------------------------------
+// Name:        vspDTEConnector::stopDebugging
+// Description: Stops debugging, equivalent to pressing the Shift+F5 key
+//              (or the built-in "Pause" button)
+// Return Val:  bool - Success / failure.
+// Author:      Uri Shomroni
+// Date:        10/7/2016
+// ---------------------------------------------------------------------------
+bool vspDTEConnector::stopDebugging()
+{
+    bool retVal = false;
+
+    assert(_piDebugger != NULL);
+
+    if (_piDebugger != NULL)
+    {
+        // Tell the debugger to stop:
+        HRESULT hr = _piDebugger->Stop(VARIANT_FALSE);
+        retVal = SUCCEEDED(hr);
+
+        // TO_DO: there seems to be a problem that causes the built-in tool bars not to update.
+        // we need to find some sort of UI controller to tell to update.
+    }
+
+    return retVal;
+}
+
+// ---------------------------------------------------------------------------
 // Name:        vspDTEConnector::addBreakpointInSourceLocation
 // Description: Adds a breakpoint at the requested location.
 // Return Val:  bool - Success / failure.
