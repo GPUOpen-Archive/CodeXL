@@ -25,7 +25,33 @@ GDT_SYSCONFDIR="-D'SYSCONFDIR=\"etc\"'"
 cpp_flags= ' ' + GDT_DATADIR + ' ' + GDT_SYSCONFDIR+ ' -Dvulkan_EXPORTS -DVK_USE_PLATFORM_XCB_KHR -DVK_USE_PLATFORM_XLIB_KHR '
 original_cpp_flag=env['CPPFLAGS']
 original_cpp_flag = original_cpp_flag + cpp_flags
-env.Replace(CPPFLAGS = original_cpp_flag) 
+env.Replace(CPPFLAGS = original_cpp_flag)
+
+# Remove the c++ flag for the env_no_c11 library
+env_no_c11 = env.Clone()
+fullBuildFlags = env_no_c11['CPPFLAGS']
+partBuildString = fullBuildFlags.replace('-std=c++11','-std=c99 -Wno-unused')
+env_no_c11.Replace( CPPFLAGS = partBuildString) 
+
+lib_src = \
+[
+# loader
+    env['VulkanSDK_src_dir']+ "loader/loader.c",
+    env['VulkanSDK_src_dir']+ "loader/trampoline.c",
+    env['VulkanSDK_src_dir']+ "loader/wsi.c",
+    env['VulkanSDK_src_dir']+ "loader/debug_report.c",
+    env['VulkanSDK_src_dir']+ "loader/cJSON.c",
+    env['VulkanSDK_src_dir']+ "loader/murmurhash.c",
+    env['VulkanSDK_src_dir']+ "loader/dev_ext_trampoline.c",
+]
+
+vulkanloader_Obj = env_no_c11.StaticLibrary('vulkanloader', lib_src)
+# Add the loader library path
+env.Prepend (LIBPATH =
+[
+    ".",
+])
+
 
 # These need to be in their dependency order. Most derived first
 env['LIBS'] = \
@@ -34,7 +60,7 @@ env['LIBS'] = \
     "libCXLGraphicsServerCommon",
     "libCXLOSWrappers",
     "libCXLBaseTools",
-    "libvulkan",
+    "libvulkanloader",
     #enternal libraries
     "rt",
     "pthread",
