@@ -664,7 +664,7 @@ bool kaProjectDataManager::buildKernelList(const QString& fileData, const osFile
 
 
         //we return true only if added some kernels
-        retVal = analyseVecSize <= pCurrentFileData->analyzeVector().size();
+        retVal = analyseVecSize < pCurrentFileData->analyzeVector().size();
     }
     return retVal;
 }
