@@ -822,8 +822,17 @@ HRESULT vspPackageCommandHandler::onBreak(vspCommandHandler* pSender, DWORD flag
     GT_UNREFERENCED_PARAMETER(pIn);
     GT_UNREFERENCED_PARAMETER(pOut);
 
-    // Invoke core logic.
-    VSCORE(vsc_OnBreak)();
+    // If we are not during debugging:
+    if (!VSCORE(vsc_IsDebuggedProcessExists)())
+    {
+        // Invoke core logic.
+        VSCORE(vsc_OnBreak)();
+    }
+    else // vsc_IsDebuggedProcessExists()
+    {
+        // Directly call the break button:
+        vspDTEConnector::instance().breakDebugging();
+    }
 
     return S_OK;
 }
@@ -854,8 +863,17 @@ HRESULT vspPackageCommandHandler::onStop(vspCommandHandler* pSender, DWORD flags
     GT_UNREFERENCED_PARAMETER(pIn);
     GT_UNREFERENCED_PARAMETER(pOut);
 
-    // Invoke core logic.
-    VSCORE(vsc_OnStop)();
+    // If we are not during debugging:
+    if (!VSCORE(vsc_IsDebuggedProcessExists)())
+    {
+        // Invoke core logic.
+        VSCORE(vsc_OnStop)();
+    }
+    else // vsc_IsDebuggedProcessExists()
+    {
+        // Directly call the stop button:
+        vspDTEConnector::instance().stopDebugging();
+    }
 
     return S_OK;
 }
