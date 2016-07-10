@@ -46,7 +46,8 @@ static char* NarrowStr(const wchar_t* str)
     ret = new char[sz + 1];
     memset(ret, 0, sz);
 
-    if (wcstombs(ret, str, sz == MINUS_ONE))
+    size_t retVal = wcstombs(ret, str, sz);
+    if (retVal > 0)
     {
         for (unsigned int rd = 0, wr = 0; rd < wcslen(str); rd++)
         {
@@ -81,6 +82,8 @@ MainWin::MainWin() :
 #endif
 
 {
+    char* errStrSmkNone = NarrowStr(TP_SMOKE_DIALOG_NO_ERROR);
+
 #if defined(__linux__)
     _pAMDTTeapotOGLCanvas = new AMDTTeapotOGLCanvas();
 
