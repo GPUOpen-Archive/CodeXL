@@ -412,11 +412,12 @@ void gdWatchView::updateWatchLineValue(int lineNum)
         if (openCLDebugging || hsaDebugging || hostDebugging)
         {
             variableValue.m_value = GD_STR_watchViewCannotEvaluateExpression;
+            useHex = false;
         }
     }
 
     // Update the list item:
-    const gtString& usedValue = useHex ? variableValue.m_value : variableValue.m_valueHex;
+    const gtString& usedValue = useHex ? variableValue.m_valueHex : variableValue.m_value;
     if (!usedValue.isEmpty())
     {
         QTableWidgetItem* pValueItem = new QTableWidgetItem(acGTStringToQString(usedValue));
@@ -590,6 +591,7 @@ bool gdWatchView::addWatch(const gtString& variableName)
             if (openclDebugging || hsaDebugging || hostDebugging)
             {
                 variableValue.m_value = GD_STR_watchViewCannotEvaluateExpression;
+                useHex = false;
             }
         }
 
@@ -599,7 +601,7 @@ bool gdWatchView::addWatch(const gtString& variableName)
         pNameItem->setFlags(pNameItem->flags() | Qt::ItemIsEditable);
         pNameItem->setSelected(true);
 
-        const gtString& usedValue = useHex ? variableValue.m_value : variableValue.m_valueHex;
+        const gtString& usedValue = useHex ? variableValue.m_valueHex : variableValue.m_value;
         if (!usedValue.isEmpty())
         {
             QTableWidgetItem* pValueItem = new QTableWidgetItem(acGTStringToQString(usedValue));
