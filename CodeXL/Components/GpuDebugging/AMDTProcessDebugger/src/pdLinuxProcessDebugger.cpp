@@ -2080,7 +2080,7 @@ bool pdLinuxProcessDebugger::setDebuggedProcessEnvVariables()
     {
         osEnvironmentVariable hsaToolsLibEnvVar;
         hsaToolsLibEnvVar._name = L"HSA_TOOLS_LIB";
-        hsaToolsLibEnvVar._value = L"libhsa-runtime-tools64.so.1 libAMDTHsaServer.so";
+        hsaToolsLibEnvVar._value = L"libhsa-runtime-tools64.so.1 " OS_CODEXL_HSA_SERVER_MODULE_NAME;
         gtString hsaToolsLibString;
         bool rc7 = processEnvVariableToString(hsaToolsLibEnvVar, hsaToolsLibString);
         GT_ASSERT(rc7);
