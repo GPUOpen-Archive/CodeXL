@@ -10,7 +10,7 @@ class ServerListenThread : public osThread
 {
 public:
     ServerListenThread();
-    ~ServerListenThread();
+    virtual ~ServerListenThread();
     bool init(int portNum);
 
 protected:
