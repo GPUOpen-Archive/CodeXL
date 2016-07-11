@@ -924,21 +924,22 @@
             <ButtonText>Open Teapot Sample Project</ButtonText>
         </Strings>
       </Button>
-        <Button guid="guidCodeXLVSPackageCmdSet" id="cmdidHelpOpenMatMulSample" priority="0x0100" type="Button">
-            <Parent guid="guidCodeXLVSPackageCmdSet" id="cmdidCodeXLHelpGroup" />
-            <Strings>
-                <CommandName>Open Matrix Multiply Sample Project</CommandName>
-                <ButtonText>Open Matrix Multiply Sample Project</ButtonText>
-            </Strings>
-        </Button>
-      <Button guid="guidCodeXLVSPackageCmdSet" id="cmdidHelpOpenD3D12MultithreadingSample" priority="0x0100" type="Button">
+      <Button guid="guidCodeXLVSPackageCmdSet" id="cmdidHelpOpenMatMulSample" priority="0x0110" type="Button">
+          <Parent guid="guidCodeXLVSPackageCmdSet" id="cmdidCodeXLHelpGroup" />
+          <Strings>
+              <CommandName>Open Matrix Multiply Sample Project</CommandName>
+              <ButtonText>Open Matrix Multiply Sample Project</ButtonText>
+          </Strings>
+      </Button>
+      <Button guid="guidCodeXLVSPackageCmdSet" id="cmdidHelpOpenD3D12MultithreadingSample" priority="0x0120" type="Button">
         <Parent guid="guidCodeXLVSPackageCmdSet" id="cmdidCodeXLHelpGroup" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
             <CommandName>Open D3D12Multithreading Sample Project</CommandName>
             <ButtonText>Open D3D12Multithreading Sample Project</ButtonText>
         </Strings>
       </Button>
-      <Button guid="guidCodeXLVSPackageCmdSet" id="cmdidViewHelp" priority="0x0100" type="Button">
+      <Button guid="guidCodeXLVSPackageCmdSet" id="cmdidViewHelp" priority="0x0130" type="Button">
         <Parent guid="guidCodeXLVSPackageCmdSet" id="cmdidCodeXLHelpMenuGroup" />
         <Icon guid="guidMenuCommandIcons" id="bmpViewHelp" />
         <Strings>

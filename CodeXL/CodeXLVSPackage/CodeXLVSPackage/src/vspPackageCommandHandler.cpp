@@ -1956,21 +1956,12 @@ void vspPackageCommandHandler::OnUpdateSample(vspCommandHandler& handler, OLECMD
 
         if (commandId == cmdidHelpOpenD3D12MultithreadingSample)
         {
-            // Only enable DX12 sample in VS15
-            // Identify the VS version.
-            VsWindowsManagementMode vsVersion = VS_WMM_UNKNOWN;
-            bool rc = GetVSVersion(vsVersion);
-
-            if (rc)
-            {
-                bool isVisible = (vsVersion == VS_WMM_VS14);
-
-                if (!isVisible)
-                {
-                    // Show the DX12 sample only for VS15
-                    pOleCmd->cmdf |= OLECMDF_INVISIBLE;
-                }
-            }
+#ifdef VSP_VS14BUILD
+// if vs15 do nothing, the item is visible
+#else
+// hide the item
+            pOleCmd->cmdf |= OLECMDF_INVISIBLE;
+#endif
         }
     }
 }
