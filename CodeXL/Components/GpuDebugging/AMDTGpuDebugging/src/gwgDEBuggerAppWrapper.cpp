@@ -13,6 +13,7 @@
 
 // Infra:
 #include <AMDTBaseTools/Include/gtAssert.h>
+#include <AMDTOSWrappers/Include/osDebugLog.h>
 #include <AMDTOSWrappers/Include/osProcess.h>
 #include <AMDTApiFunctions/Include/gaGRApiFunctions.h>
 
@@ -99,16 +100,20 @@ gwgDEBuggerAppWrapper::gwgDEBuggerAppWrapper()
 gwgDEBuggerAppWrapper::~gwgDEBuggerAppWrapper()
 {
     // Unregister the application command single instance:
+    OS_OUTPUT_DEBUG_LOG(L"gwgDEBuggerAppWrapper destructor - cleaning up gdApplicationCommands Instance", OS_DEBUG_LOG_EXTENSIVE);
     gdApplicationCommands::cleanupGDInstance(true);
 
     // US, 4/7/16 - afExecutionModeManager does not currently allow unregistering execution modes.
+    OS_OUTPUT_DEBUG_LOG(L"gwgDEBuggerAppWrapper destructor - deleting execution mode object", OS_DEBUG_LOG_EXTENSIVE);
     // afExecutionModeManager::instance().unregisterExecutionMode(m_pExecutionMode);
     delete m_pExecutionMode;
 
     // Destroy the event observer:
+    OS_OUTPUT_DEBUG_LOG(L"gwgDEBuggerAppWrapper destructor - deleting event observer object", OS_DEBUG_LOG_EXTENSIVE);
     delete m_pApplicationEventObserver;
 
     // Unregister the actions and views creators:
+    OS_OUTPUT_DEBUG_LOG(L"gwgDEBuggerAppWrapper destructor - unregistering action and view creators", OS_DEBUG_LOG_EXTENSIVE);
     // US, 4/7/16 - afQtCreatorsManager does not currently allow unregistering action creators or view creators.
     // We also do not hold a pointer to the main action creator for deletion:
     // afQtCreatorsManager::instance().unregisterActionExecutor(m_pDebugActionsCreator);
@@ -117,21 +122,26 @@ gwgDEBuggerAppWrapper::~gwgDEBuggerAppWrapper()
     // afQtCreatorsManager::instance().unregisterActionExecutor(m_pStatisticsActionsExecutor);
 
     // Destroy the creator objects:
+    OS_OUTPUT_DEBUG_LOG(L"gwgDEBuggerAppWrapper destructor - deleting action and view creators", OS_DEBUG_LOG_EXTENSIVE);
     // delete m_pDebugActionsCreator;
     delete m_pDebugViewsCreator;
     delete m_pImageBuffersMDIViewCreator;
     delete m_pStatisticsActionsExecutor;
 
     // Setting pages are parented and destoryed by their respective Qt dialogs:
+    OS_OUTPUT_DEBUG_LOG(L"gwgDEBuggerAppWrapper destructor - deleting project settings extension", OS_DEBUG_LOG_EXTENSIVE);
     // Destroy the project settings object:
     // US, 4/7/16 - afProjectManager does not currently allow unregistering setting extensions.
     // afProjectManager::instance().unregisterProjectSettingsExtension(m_pProjectSettingsExtension);
     // delete m_pProjectSettingsExtension;
 
     // Destroy the global settings page:
+    OS_OUTPUT_DEBUG_LOG(L"gwgDEBuggerAppWrapper destructor - deleting global settings extension", OS_DEBUG_LOG_EXTENSIVE);
     // US, 4/7/16 - afGlobalVariablesManager does not currently allow unregistering global setting pages.
     // afGlobalVariablesManager::instance().unregisterGlobalSettingsPage(m_spGlobalDebugSettingsPage);
     // delete m_spGlobalDebugSettingsPage;
+
+    OS_OUTPUT_DEBUG_LOG(L"gwgDEBuggerAppWrapper destructor - done", OS_DEBUG_LOG_EXTENSIVE);
 }
 
 // ---------------------------------------------------------------------------
@@ -164,33 +174,40 @@ gwgDEBuggerAppWrapper& gwgDEBuggerAppWrapper::instance()
 void gwgDEBuggerAppWrapper::initialize()
 {
     // Initialize the application command instance:
+    OS_OUTPUT_DEBUG_LOG(L"gwgDEBuggerAppWrapper::initialize - creating gwApplicationCommands", OS_DEBUG_LOG_EXTENSIVE);
     gwApplicationCommands* pApplicationCommands = new gwApplicationCommands;
 
     // Register the application command single instance:
+    OS_OUTPUT_DEBUG_LOG(L"gwgDEBuggerAppWrapper::initialize - registering gwApplicationCommands", OS_DEBUG_LOG_EXTENSIVE);
     bool rcRegsister = gdApplicationCommands::registerGDInstance(pApplicationCommands);
     GT_ASSERT_EX(rcRegsister, L"Only single instance of gdApplicationCommands should be registered");
 
     // Initialize the API package:
+    OS_OUTPUT_DEBUG_LOG(L"gwgDEBuggerAppWrapper::initialize - initializing API package", OS_DEBUG_LOG_EXTENSIVE);
     bool rcAPI = gaIntializeAPIPackage(/*_shouldInitPerformanceCounters*/ false);
     GT_ASSERT_EX(rcAPI, GD_STR_LogMsg_FailedToInitAPI);
 
     // 7/18/2012 Gilad: the execution modes needs to register before the gwEventObserver
     // register the execution mode manager
+    OS_OUTPUT_DEBUG_LOG(L"gwgDEBuggerAppWrapper::initialize - create execution mode object", OS_DEBUG_LOG_EXTENSIVE);
     m_pExecutionMode = new gdExecutionMode;
     m_pExecutionMode->SetModeEnabled(s_loadEnabled);
 
     afExecutionModeManager::instance().registerExecutionMode(m_pExecutionMode);
 
     // Create an event observer:
+    OS_OUTPUT_DEBUG_LOG(L"gwgDEBuggerAppWrapper::initialize - create event observer", OS_DEBUG_LOG_EXTENSIVE);
     m_pApplicationEventObserver = new gwEventObserver;
 
     // Create the main menu actions creator:
+    OS_OUTPUT_DEBUG_LOG(L"gwgDEBuggerAppWrapper::initialize - create and register menu actions creator", OS_DEBUG_LOG_EXTENSIVE);
     gwMenuActionsExecutor* pActionsCreator = new gwMenuActionsExecutor;
 
     // Register the actions creator:
     afQtCreatorsManager::instance().registerActionExecutor(pActionsCreator);
 
     // Create a debug views creator:
+    OS_OUTPUT_DEBUG_LOG(L"gwgDEBuggerAppWrapper::initialize - create and register debug views creator", OS_DEBUG_LOG_EXTENSIVE);
     m_pDebugViewsCreator = new gwDebugViewsCreator;
 
     // Initialize:
@@ -200,6 +217,7 @@ void gwgDEBuggerAppWrapper::initialize()
     afQtCreatorsManager::instance().registerViewCreator(m_pDebugViewsCreator);
 
     // Create a views creator:
+    OS_OUTPUT_DEBUG_LOG(L"gwgDEBuggerAppWrapper::initialize - create and register debug MDI views creator", OS_DEBUG_LOG_EXTENSIVE);
     m_pImageBuffersMDIViewCreator = new gwImagesAndBuffersMDIViewCreator;
 
     // Initialize:
@@ -209,23 +227,29 @@ void gwgDEBuggerAppWrapper::initialize()
     afQtCreatorsManager::instance().registerViewCreator(m_pImageBuffersMDIViewCreator);
 
     // Create the statistics actions creator:
+    OS_OUTPUT_DEBUG_LOG(L"gwgDEBuggerAppWrapper::initialize - create and register statistics action creator", OS_DEBUG_LOG_EXTENSIVE);
     m_pStatisticsActionsExecutor = new gwStatisticsActionsExecutor;
 
     // Register the actions creator:
     afQtCreatorsManager::instance().registerActionExecutor(m_pStatisticsActionsExecutor);
 
     // Create and register the project settings object:
+    OS_OUTPUT_DEBUG_LOG(L"gwgDEBuggerAppWrapper::initialize - create and register project settings extension", OS_DEBUG_LOG_EXTENSIVE);
     gdProjectSettingsExtension* pProjectSettingsExtension = new gdProjectSettingsExtension;
 
     afProjectManager::instance().registerProjectSettingsExtension(pProjectSettingsExtension);
 
     // Create and register the global settings page:
+    OS_OUTPUT_DEBUG_LOG(L"gwgDEBuggerAppWrapper::initialize - create and register global settings extension", OS_DEBUG_LOG_EXTENSIVE);
     gdGlobalDebugSettingsPage* pGlobalDebugSettingsPage = new gdGlobalDebugSettingsPage;
 
     afGlobalVariablesManager::instance().registerGlobalSettingsPage(pGlobalDebugSettingsPage);
 
     // Initialize the properties events handler:
+    OS_OUTPUT_DEBUG_LOG(L"gwgDEBuggerAppWrapper::initialize - create properties event observer", OS_DEBUG_LOG_EXTENSIVE);
     gdPropertiesEventObserver::instance();
+
+    OS_OUTPUT_DEBUG_LOG(L"gwgDEBuggerAppWrapper::initialize - done", OS_DEBUG_LOG_EXTENSIVE);
 }
 
 // ---------------------------------------------------------------------------
