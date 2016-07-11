@@ -46,7 +46,7 @@ class SourceCodeTreeModel : public QAbstractItemModel
     friend class SessionSourceCodeView;
 
 public:
-    SourceCodeTreeModel(SessionDisplaySettings* pSessionDisplaySettings, const QString& sessionDir, CpuProfileReader* pProfileReader,
+    SourceCodeTreeModel(SessionDisplaySettings* pSessionDisplaySettings, const QString& sessionDir, 
 		shared_ptr<cxlProfileDataReader> pProfDataRdr, shared_ptr<DisplayFilter> displayFilter);
 
     ~SourceCodeTreeModel();
@@ -167,7 +167,7 @@ private:
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     bool SetupSymbolInfoNgen(QString pjsFile);
-    bool SetupSourceInfoForClr(gtVAddr address);
+    //bool SetupSourceInfoForClr(gtVAddr address);
     bool GetSourceLineInfoForCLR(gtUInt32 clrSymOffset, OffsetLinenumMap& jitLineMap);
     bool GetClrOffsetFromSymbol(gtRVAddr& offset);
 #endif // AMDT_WINDOWS_OS
@@ -184,7 +184,6 @@ private:
 
     SessionDisplaySettings* m_pSessionDisplaySettings;
     SourceCodeTreeView* m_pSessionSourceCodeTreeView;
-    CpuProfileReader* m_pProfileReader;
 
     /// Source line -> tree item map:
     SourceViewTreeItemMap m_sourceTreeItemsMap;

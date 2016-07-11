@@ -590,11 +590,7 @@ void DisplayFilterDlg::onClickOk()
 
         m_displaySystemDLLs = m_pCheckBoxDisplaySystemDLLs->isChecked();
         m_displayFilter->setIgnoreSysDLL(!m_displaySystemDLLs);
-        /*
-        // Get the display filter configuration:
-        m_displaySettings.m_displayFilterName = m_pComboBoxViewes->currentText();
-        m_displaySettings.calculateDisplayedColumns(m_pProfileReader->getTopologyMap());
-        */
+
     }
 
     // set the report options

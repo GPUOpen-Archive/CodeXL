@@ -266,10 +266,9 @@ bool SessionModulesView::displaySessionDataTables()
 
     ProcessesDataTable* pProcessTable = m_isProcessesUp ? m_pTopProcessesTable : m_pBottomProcessesTable;
     ModulesDataTable* pModulesTable = m_isProcessesUp ? m_pBottomModulesTable : m_pTopModulesTable;
-    SessionDisplaySettings* pSessionDisplaySettings = CurrentSessionDisplaySettings();
 
     // Sanity check:
-    GT_IF_WITH_ASSERT((pModulesTable != nullptr) && (pProcessTable != nullptr) && (pSessionDisplaySettings != nullptr))
+    GT_IF_WITH_ASSERT((pModulesTable != nullptr) && (pProcessTable != nullptr))
     {
         retVal = true;
 
@@ -684,10 +683,10 @@ void SessionModulesView::activateTableItem(QTableWidgetItem* pActivateItem, CPUP
 
 void SessionModulesView::UpdateTableDisplay(unsigned int updateType)
 {
-    (void)(updateType); // unused
+    GT_UNREFERENCED_PARAMETER(updateType);
 
-    SessionDisplaySettings* pSessionDisplaySettings = CurrentSessionDisplaySettings();
-    GT_IF_WITH_ASSERT(pSessionDisplaySettings != nullptr)
+    GT_IF_WITH_ASSERT((m_pTopProcessesTable != nullptr) &&
+		(m_pTopModulesTable != nullptr))
     {
         // Update the table's selection:
         if (m_isProcessesUp)
