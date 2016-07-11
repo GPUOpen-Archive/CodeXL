@@ -21,7 +21,7 @@
 #include "MemoryMap.h"
 #include "CluInfo.h"
 #include <AMDTCpuPerfEventUtils/inc/EventEncoding.h>
-#include <AMDTCpuProfilingRawData/inc/CpuProfileWriter.h>
+//#include <AMDTCpuProfilingRawData/inc/CpuProfileWriter.h>
 #include <AMDTCpuProfilingRawData/inc/Windows/PrdReader.h>
 #include <AMDTCpuProfilingRawData/inc/RunInfo.h>
 #include <AMDTCpuProfilingTranslation/inc/Windows/TaskInfoInterface.h>
@@ -36,6 +36,8 @@
 #include <AMDTExecutableFormat/inc/ProcessWorkingSet.h>
 #include <AMDTBaseTools/Include/gtFlatMap.h>
 #include <AMDTCpuProfilingRawData/inc/ProfilerDataDBWriter.h>
+
+//#define ENABLE_OLD_PROFILE_WRITER 1
 
 class ExecutableAnalyzer;
 
@@ -428,6 +430,7 @@ private:
                          const PidProcessMap& processMap,
                          NameModuleMap& moduleMap);
 
+#if (ENABLE_OLD_PROFILE_WRITER == 1)
     bool WriteProfileFile(const gtString& path,
                           const PidProcessMap* procMap,
                           const NameModuleMap* modMap,
@@ -436,6 +439,7 @@ private:
                           gtUInt64 missedCount = 0,
                           int cpuFamily = 0, //FAMILY_UNKNOWN
                           int cpuModel = 0);
+#endif
 
     bool WriteMetaProfileDataIntoDB(PidProcessMap& processMap,
                                     NameModuleMap& moduleMap,

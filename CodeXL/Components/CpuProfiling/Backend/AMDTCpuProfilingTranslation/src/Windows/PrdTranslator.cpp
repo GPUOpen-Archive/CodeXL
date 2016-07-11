@@ -22,7 +22,7 @@
 #include <AMDTOSWrappers/Include/osAtomic.h>
 #include <AMDTOSWrappers/Include/osCpuid.h>
 #include <AMDTOSWrappers/Include/osDirectory.h>
-#include <AMDTOSWrappers/Include/osFilePath.h>
+#include <AMDTOSWrappers/Include/osFile.h>
 #include <AMDTOSWrappers/Include/osProcess.h>
 #include <AMDTOSWrappers/Include/osDebugLog.h>
 #include <AMDTOSWrappers/Include/osGeneralFunctions.h>
@@ -31,7 +31,7 @@
 #include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
 #include <AMDTExecutableFormat/inc/PeFile.h>
 #include <AMDTCpuCallstackSampling/inc/CallStackBuilder.h>
-#include <AMDTCpuCallstackSampling/inc/CssWriter.h>
+//#include <AMDTCpuCallstackSampling/inc/CssWriter.h>
 
 #include "ThreadPool.h"
 #include "PrdTranslator.h"
@@ -391,6 +391,12 @@ PrdTranslator::~PrdTranslator()
     if (nullptr != m_runInfo)
     {
         delete m_runInfo;
+
+        // Delete the RI file
+        osFilePath riFilePath(m_dataFile.toStdWString().c_str());
+        riFilePath.setFileExtension(L"ri");
+        osFile riFile(riFilePath);
+        riFile.deleteFile();
     }
 
     for (gtMap<ProcessIdType, ProcessInfo*>::iterator it = m_processInfos.begin(), itEnd = m_processInfos.end(); it != itEnd; ++it)
@@ -2518,7 +2524,7 @@ bool PrdTranslator::WriteSampleProfileDataIntoDB(const NameModuleMap& modMap)
 
                 bool isJitModule = ((CpuProfileModule::JAVAMODULE == module.second.getModType())
                                     || (CpuProfileModule::MANAGEDPE == module.second.getModType())) ? true : false;
-                
+
                 for (auto fit = module.second.getBeginFunction(); fit != module.second.getEndFunction(); ++fit)
                 {
                     gtUInt32 funcId = module.second.m_moduleId;
@@ -3760,8 +3766,6 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
     }
     modInstanceList.clear();
 
-    // Clear the modInstanceMap
-
     for (ThreadParamList::iterator i = plist.begin(); i != plist.end(); i++)
     {
         ThreadPrdData* pThreadData = reinterpret_cast<ThreadPrdData*>(*i);
@@ -3995,6 +3999,7 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
 {
     HRESULT  res = S_OK;
 
+#if (ENABLE_OLD_PROFILE_WRITER == 1)
     // Write the CSS files to the same directory as the profile file
     for (gtMap<ProcessIdType, ProcessInfo*>::iterator it = m_processInfos.begin(), itEnd = m_processInfos.end(); it != itEnd; ++it)
     {
@@ -4013,9 +4018,15 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
             cssWriter.Write(pProcessInfo->m_callGraph, workingSet, pid);
         }
     }
+#else
+    GT_UNREFERENCED_PARAMETER(processMap);
+    GT_UNREFERENCED_PARAMETER(pMissedInfo);
+    GT_UNREFERENCED_PARAMETER(tPrdReader);
+#endif
 
     UpdateProgressBar(60ULL, 100ULL);
 
+#if (ENABLE_OLD_PROFILE_WRITER == 1)
     int cpuFamily = tPrdReader.GetCpuFamily();
     int cpuModel = tPrdReader.GetCpuModel();
 
@@ -4040,6 +4051,7 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
             topMap.insert(CoreTopologyMap::value_type(j, topTemp));
         }
     }
+#endif
 
     //  Write out all the jit jnc that were sampled during the profile
     //  to the <session name>.dir directory, assumes that the output file is
@@ -4076,6 +4088,7 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
 
     UpdateProgressBar(70ULL, 100ULL);
 
+#if (ENABLE_OLD_PROFILE_WRITER == 1)
     if (!WriteProfileFile(proFile.toStdWString().c_str(),
                           &processMap,
                           &moduleMap,
@@ -4088,10 +4101,22 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
         res = E_UNEXPECTED;
         return res;
     }
+#endif
+
+    // Create an empty .ebp file till we remove complete dependency from GUI
+    osFilePath ebpFilePath(m_dataFile.toStdWString().c_str());
+    ebpFilePath.setFileExtension(L"ebp");
+
+    if (!ebpFilePath.exists())
+    {
+        osFile ebpFile(ebpFilePath);
+        ebpFile.open(osChannel::OS_ASCII_TEXT_CHANNEL, osFile::OS_OPEN_TO_WRITE);
+        ebpFile.close();
+    }
 
     return res;
 }
-
+#if (ENABLE_OLD_PROFILE_WRITER == 1)
 bool PrdTranslator::WriteProfileFile(const gtString& path,
                                      const PidProcessMap* procMap,
                                      const NameModuleMap* modMap,
@@ -4162,7 +4187,7 @@ bool PrdTranslator::WriteProfileFile(const gtString& path,
 
     return true;
 }
-
+#endif
 unsigned int PrdTranslator::GetCpuCount() const
 {
     SYSTEM_INFO sysinfo;

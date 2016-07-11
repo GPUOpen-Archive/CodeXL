@@ -49,12 +49,12 @@
 #define HAS_LIBCSS 1
 #if HAS_LIBCSS
     #include <AMDTCpuCallstackSampling/inc/CallStackBuilder.h>
-    #include <AMDTCpuCallstackSampling/inc/CssWriter.h>
+    //#include <AMDTCpuCallstackSampling/inc/CssWriter.h>
 #endif
 
 #include <AMDTBaseTools/Include/gtSet.h>
 #include <AMDTOSWrappers/Include/osCpuid.h>
-#include <AMDTOSWrappers/Include/osFilePath.h>
+#include <AMDTOSWrappers/Include/osFile.h>
 #include <AMDTOSWrappers/Include/osProcess.h>
 #include <AMDTOSWrappers/Include/osAtomic.h>
 #include <AMDTOSWrappers/Include/osDebugLog.h>
@@ -458,6 +458,18 @@ inline void CaPerfTranslator::_clearAllHandlers()
 
 CaPerfTranslator::~CaPerfTranslator()
 {
+    // Delete the RI file
+    gtString inputFile;
+    inputFile.fromUtf8String(m_inputFile);
+    osFilePath riFilePath(inputFile);
+    riFilePath.setFileExtension(L"ri");
+
+    if (riFilePath.exists())
+    {
+        osFile riFile(riFilePath);
+        riFile.deleteFile();
+    }
+
     if (m_pPerfDataRdr)
     {
         m_pPerfDataRdr->deinit();
@@ -3101,7 +3113,9 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_EXIT(struct perf_event_header* pHd
 int CaPerfTranslator::writeEbpOutput(const string& outputFile)
 {
     bool bRet = false;
+#if (ENABLE_OLD_PROFILE_WRITER == 1)
     CpuProfileWriter      profWriter;
+#endif
     CpuProfileInfo        profInfo;
     int numMod = 0;
     const PerfEventAttrVec* pAttrVec;
@@ -3340,7 +3354,21 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
         }
     }
 
+    bRet = true;
+#if (ENABLE_OLD_PROFILE_WRITER == 1)
     bRet = profWriter.Write(woutputFile, &profInfo, &m_procMap, &m_modMap, &topMap);
+#endif
+
+    // Create an empty .ebp file till we remove complete dependency from GUI
+    osFilePath ebpFilePath(woutputFile);
+    ebpFilePath.setFileExtension(L"ebp");
+
+    if (!ebpFilePath.exists())
+    {
+        osFile ebpFile(ebpFilePath);
+        ebpFile.open(osChannel::OS_ASCII_TEXT_CHANNEL, osFile::OS_OPEN_TO_WRITE);
+        ebpFile.close();
+    }
 
     gettimeofday(&ebp_timerStop, nullptr);
     memcpy(&css_timerStart, &ebp_timerStop, sizeof(struct timeval));
@@ -3748,6 +3776,7 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
         }
     }
 
+#if (ENABLE_OLD_PROFILE_WRITER == 1)
     // Write CSS too
     if (!m_cssFileDir.empty())
     {
@@ -3771,6 +3800,7 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
             }
         }
     }
+#endif
 
     // Write the callstack info to DB
     if (m_dbWriter)
