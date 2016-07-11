@@ -644,13 +644,19 @@ HRESULT HandleReportCommand(ParseArgs& args)
     }
     else
     {
-        // If raw data-file, translate
+        // If CAPERF/PRD raw data-file , then translate.
         if (S_OK == hr)
         {
             hr = report.Translate();
         }
 
-        // Read EBP/IMD file and generate Report
+        // If EBP/IMD file, then migrate to DB format.
+        if (S_OK == hr)
+        {
+            hr = report.Migrate();
+        }
+
+        // Read CXLDB file and generate Report.
         if (S_OK == hr)
         {
             hr = report.Report();

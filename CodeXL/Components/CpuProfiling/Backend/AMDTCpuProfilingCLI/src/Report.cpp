@@ -31,7 +31,7 @@
 
 #define TP_ALL_PIDS                0xFFFFFFFFUL
 
-// This ise used just for testing purpose
+// This is used just for testing purpose
 #define REPORT_CONFIG_IDX 0
 
 // Backend:
@@ -148,6 +148,17 @@ HRESULT CpuProfileReport::Translate()
     return hr;
 } // Translate
 
+HRESULT CpuProfileReport::Migrate()
+{
+    HRESULT hr = S_OK;
+
+    if (isOK() && m_isEbpInputFile)
+    {
+        hr = fnMigrateEBPToDB(m_inputFilePath);
+    }
+
+    return hr;
+}
 
 HRESULT CpuProfileReport::Report()
 {
@@ -160,6 +171,8 @@ HRESULT CpuProfileReport::Report()
     {
         // Input file - Processed profile data file
         osFilePath dbFilePath = GetDBFilePath();
+        //TODO: remove this line once EBP file support is removed.
+        dbFilePath.setFileExtension(L"cxldb");
         m_profileDbReader.OpenProfileData(dbFilePath.asString());
 
         AMDTProfileSessionInfo sessionInfo;
@@ -203,7 +216,7 @@ HRESULT CpuProfileReport::Report()
     return hr = (retVal) ? S_OK : E_FAIL;
 } // Report
 
-#ifdef AMDT_ENABLE_DB_SUPPORT
+#if 0
 
 #define STR_FORMAT L"%ls"
 #define DQ_STR_FORMAT L"\"%ls\""
@@ -612,17 +625,8 @@ static void PrintCGPath(osFile& reportFile, gtVector<AMDTCallGraphPath>&  paths)
     return;
 }
 
-#endif // AMDT_ENABLE_DB_SUPPORT
-
 HRESULT CpuProfileReport::ReportFromDb()
 {
-#ifndef AMDT_ENABLE_DB_SUPPORT
-
-    fprintf(stderr, " Report from DB is not yet supported.\n");
-    return E_FAIL;
-
-#else
-
     bool ret = false;
 
     cxlProfileDataReader profileDbReader;
@@ -821,8 +825,8 @@ HRESULT CpuProfileReport::ReportFromDb()
     }
 
     return S_OK;
-#endif // AMDT_ENABLE_DB_SUPPORT
 } // ReportFromDb
+#endif
 
 static AMDTResult printThreadSummary(AMDTThreadProfileDataHandle& tpReaderHandle, AMDTThreadId tid, osFile& reportFile, bool reportHdr);
 static AMDTResult printThreadSampleData(AMDTThreadProfileDataHandle& tpReaderHandle, AMDTThreadId tid, osFile& reportFile);

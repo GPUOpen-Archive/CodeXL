@@ -19,6 +19,7 @@
 //Commented out until config.h is added to repository or it is #ifdeffed only for Linux
 //#include "config.h"
 #include <CpuProfileDataTranslation.h>
+#include <CpuProfileDataMigrator.h>
 #include "CpuProfileDataAccess.h"
 
 #include <AMDTOSWrappers/Include/osProcess.h>
@@ -1276,4 +1277,20 @@ HRESULT fnGetCpuInfo(
     }
 
     return S_OK;
+}
+
+HRESULT fnMigrateEBPToDB(
+    /*in*/ const osFilePath& ebpFilePath)
+{
+    HRESULT hr = S_OK;
+
+    DataMigrator dataMigrator(ebpFilePath);
+    bool rc = dataMigrator.Migrate();
+
+    if (!rc)
+    {
+        hr = E_FAIL;
+    }
+
+    return hr;
 }
