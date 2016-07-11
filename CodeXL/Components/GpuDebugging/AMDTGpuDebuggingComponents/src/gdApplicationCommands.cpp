@@ -1697,6 +1697,27 @@ bool gdApplicationCommands::openFileAtLineWithAdditionSourceDir(const osFilePath
             {
                 retVal = afApplicationCommands::instance()->OpenFileAtLine(filePathToOpen, fileLine, programCounterIndex);
             }
+            else
+            {
+                gtVector<osFilePath> openedFiles;
+                afApplicationCommands::instance()->GetListOfOpenedWindowsForFile(L"", openedFiles);
+
+                gtString sourceFileName;
+                filePath.getFileNameAndExtension(sourceFileName);
+
+                for (auto it: openedFiles)
+                {
+                    gtString itFileName;
+                     
+                    it.getFileNameAndExtension(itFileName);
+
+                    if (itFileName == sourceFileName)
+                    {
+                        retVal = afApplicationCommands::instance()->OpenFileAtLine(it, fileLine, programCounterIndex);
+                        break;
+                    }
+                }
+            }
         }
     }
 
