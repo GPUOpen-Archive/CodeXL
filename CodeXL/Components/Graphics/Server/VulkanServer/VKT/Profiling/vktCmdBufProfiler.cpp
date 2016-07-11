@@ -363,9 +363,9 @@ ProfilerResultCode VktCmdBufProfiler::GetCmdBufResults(std::vector<ProfilerResul
 
     // We're done profiling this command buffer, so reset and we'll start over next time.
     result = ResetProfilerState();
-    VKT_ASSERT(result == S_OK);
+    VKT_ASSERT(result == VK_SUCCESS);
 
-    if (result != S_OK)
+    if (result != VK_SUCCESS)
     {
         Log(logERROR, "ResetProfilerState() failed in VktCmdBufProfiler::GetCmdBufResults()\n");
     }
