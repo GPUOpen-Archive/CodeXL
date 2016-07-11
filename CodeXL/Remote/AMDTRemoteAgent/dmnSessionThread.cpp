@@ -429,7 +429,7 @@ static bool FixTokenizedPathString(const gtString& tokenizedPath, gtString& fixe
 #if (AMDT_BUILD_TARGET == AMDT_WINDOWS_OS)
     const gtString CodeXLInstallPath = L"$CXL_Install_Path$\\";
 #else
-    const gtString CodeXLInstallPath = L"$CXL_Install_Path$/";
+    const gtString CodeXLInstallPath = L"$CXL_Install_Path$";
 #endif
     bool ret = false;
     fixedPath = tokenizedPath;
