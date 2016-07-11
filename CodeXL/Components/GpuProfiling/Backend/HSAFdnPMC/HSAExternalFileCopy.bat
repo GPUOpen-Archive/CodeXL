@@ -8,7 +8,7 @@
 
 : There is no NDA version of GPUPerfAPI, so map NDA to Public version
 set BUILDSUFFIX=%2
-IF [%BUILDSUFFIX%] == [-NDA] set BUILDSUFFIX=
+IF [%BUILDSUFFIX%] == ["-nda"] set BUILDSUFFIX=
 
 IF EXIST %1\Bin%BUILDSUFFIX%\%3\GPUPerfAPIHSA%4%BUILDSUFFIX%.dll ECHO Copying "GPUPerfAPIHSA%4%BUILDSUFFIX%.dll" into build directory
 IF EXIST %1\Bin%BUILDSUFFIX%\%3\GPUPerfAPIHSA%4%BUILDSUFFIX%.dll COPY %1\Bin%BUILDSUFFIX%\%3\GPUPerfAPIHSA%4%BUILDSUFFIX%.dll %5
