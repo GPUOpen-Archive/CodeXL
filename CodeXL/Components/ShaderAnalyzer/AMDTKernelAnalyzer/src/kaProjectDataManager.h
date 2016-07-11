@@ -490,8 +490,9 @@ private:
     /// \param in filePath - given file location
     /// \param in additionalMacros during file macro preprocessing this macros list used for as reference
     /// \param out kernelList kernel list, that was extracted from given file , after macro expansion
-    static void FillKernelNamesList(const QString& fileData, const osFilePath& filePath, const std::vector<std::string>& additionalMacros, gtVector<kaProjectDataManagerAnaylzeData>& kernelList);
-    static void AddMangledKernelName(std::vector<PreProcessedToken>::iterator& token, std::vector<PreProcessedToken>& tokens, gtVector<kaProjectDataManagerAnaylzeData>& kernelList);
+    /// \return true if found kernel function in file
+    static bool FillKernelNamesList(const QString& fileData, const osFilePath& filePath, const std::vector<std::string>& additionalMacros, gtVector<kaProjectDataManagerAnaylzeData>& kernelList);
+    static bool AddMangledKernelName(std::vector<PreProcessedToken>::iterator& token, std::vector<PreProcessedToken>& tokens, gtVector<kaProjectDataManagerAnaylzeData>& kernelList);
 
     /// build entry point list for a text file based on .hlsl file format
     /// \param in text file source

@@ -657,20 +657,16 @@ bool kaProjectDataManager::buildKernelList(const QString& fileData, const osFile
             }
         }
 
-        const size_t analyseVecSize = pCurrentFileData->analyzeVector().size();
         pCurrentFileData->analyzeVector().clear();
-
-        FillKernelNamesList(fileData, filePath, additionalMacros, pCurrentFileData->analyzeVector());
-
-
         //we return true only if added some kernels
-        retVal = analyseVecSize < pCurrentFileData->analyzeVector().size();
+        retVal = FillKernelNamesList(fileData, filePath, additionalMacros, pCurrentFileData->analyzeVector());
     }
     return retVal;
 }
 
-void kaProjectDataManager::FillKernelNamesList(const QString& fileData, const osFilePath& filePath, const std::vector<std::string>& additionalMacros, gtVector<kaProjectDataManagerAnaylzeData>& kernelList)
+bool kaProjectDataManager::FillKernelNamesList(const QString& fileData, const osFilePath& filePath, const std::vector<std::string>& additionalMacros, gtVector<kaProjectDataManagerAnaylzeData>& kernelList)
 {
+    bool result = false;
     vector<PreProcessedToken> tokens;
     string sourceCodeData = fileData.toUtf8().constData();
     ExpandMacros(sourceCodeData, filePath.asString().asCharArray(), additionalMacros, tokens);
@@ -696,7 +692,10 @@ void kaProjectDataManager::FillKernelNamesList(const QString& fileData, const os
 
             if (token->value == KERNEL_FUNCTION_MANGLED_NAME_ATTRIBUTE)
             {
-                AddMangledKernelName(token, tokens, kernelList);
+                if (AddMangledKernelName(token, tokens, kernelList))
+                {
+                    result = true;
+                }
             }
             else
             {
@@ -759,6 +758,7 @@ void kaProjectDataManager::FillKernelNamesList(const QString& fileData, const os
                             newDataStruct.m_lineInSourceFile = token->line;
                             kernelList.push_back(newDataStruct);
                             ++token;
+                            result = true;
                         }
                     }
                 }
@@ -766,10 +766,13 @@ void kaProjectDataManager::FillKernelNamesList(const QString& fileData, const os
         }
         while (token != tokens.end());
     }//if tokens not empty
+
+    return result;
 }
 
-void kaProjectDataManager::AddMangledKernelName(vector<PreProcessedToken>::iterator& token, vector<PreProcessedToken>& tokens, gtVector<kaProjectDataManagerAnaylzeData>& kernelList)
+bool kaProjectDataManager::AddMangledKernelName(std::vector<PreProcessedToken>::iterator& token, std::vector<PreProcessedToken>& tokens, gtVector<kaProjectDataManagerAnaylzeData>& kernelList)
 {
+    bool result = false;
     //skip  to mangled name
     while (++token != tokens.end() && (isspace(token->value[0]) || token->value == "("));
 
@@ -779,6 +782,7 @@ void kaProjectDataManager::AddMangledKernelName(vector<PreProcessedToken>::itera
         newDataStruct.m_kernelName = token->value.c_str();
         newDataStruct.m_lineInSourceFile = token->line;
         kernelList.push_back(newDataStruct);
+        result = true;
         //skip template name after mangled name
         token = find_if(token, tokens.end(), [](const PreProcessedToken & preprocessedToken) { return preprocessedToken.value == KERNEL_FUNCTION_KERNEL_ATTRIBUTE; });
 
@@ -787,6 +791,7 @@ void kaProjectDataManager::AddMangledKernelName(vector<PreProcessedToken>::itera
             ++token;
         }
     }
+    return result;
 }
 
 // ---------------------------------------------------------------------------
