@@ -18,8 +18,7 @@ std::string HSATraceStringUtils::GetHSAAPINameString(HSA_API_Type type)
             HSA_RUNTIME_API_TABLE
             HSA_EXT_FINALIZE_API_TABLE
             HSA_EXT_IMAGE_API_TABLE
-
-        //HSA_EXT_AMD_API_TABLE // pending discussion with RT team whether these should be added to interception table
+            HSA_EXT_AMD_API_TABLE
 
         default: return "";
 #undef X
@@ -106,21 +105,6 @@ std::string HSATraceStringUtils::Get_bool_Ptr_String(bool* pInput, bool input)
     }
 
     return SurroundWithDeRef(Get_bool_String(input));
-}
-
-std::string HSATraceStringUtils::Get_size_t_String(size_t input)
-{
-    return StringUtils::ToString(input);
-}
-
-std::string HSATraceStringUtils::Get_size_t_Ptr_String(size_t* pInput, size_t input)
-{
-    if (nullptr == pInput)
-    {
-        return "NULL";
-    }
-
-    return SurroundWithDeRef(Get_size_t_String(input));
 }
 
 std::string HSATraceStringUtils::Get_uint8_t_String(uint8_t input)
@@ -1025,6 +1009,143 @@ std::string HSATraceStringUtils::Get_hsa_ext_program_get_info_AttributeString(vo
                 // hsa_default_float_rounding_mode_t
                 case HSA_EXT_PROGRAM_INFO_DEFAULT_FLOAT_ROUNDING_MODE:
                     ss << HSATraceStringUtils::Get_hsa_default_float_rounding_mode_t_String(*(static_cast<hsa_default_float_rounding_mode_t*>(value)));
+                    break;
+
+                default:
+                    ss << StringUtils::ToString(*(static_cast<int*>(value)));
+                    break;
+            }
+        }
+
+        return SurroundWithDeRef(ss.str());
+    }
+}
+
+unsigned int HSATraceStringUtils::Get_hsa_amd_memory_pool_get_info_AttributeSize(hsa_amd_memory_pool_info_t attribute)
+{
+    switch (attribute)
+    {
+        // hsa_amd_segment_t
+        case HSA_AMD_MEMORY_POOL_INFO_SEGMENT:
+            return sizeof(hsa_amd_segment_t);
+
+        // uint32_t
+        case HSA_AMD_MEMORY_POOL_INFO_GLOBAL_FLAGS:
+            return sizeof(uint32_t);
+
+        // size_t
+        case HSA_AMD_MEMORY_POOL_INFO_SIZE:
+        case HSA_AMD_MEMORY_POOL_INFO_RUNTIME_ALLOC_GRANULE:
+        case HSA_AMD_MEMORY_POOL_INFO_RUNTIME_ALLOC_ALIGNMENT:
+            return sizeof(size_t);
+
+        // bool
+        case HSA_AMD_MEMORY_POOL_INFO_RUNTIME_ALLOC_ALLOWED:
+        case HSA_AMD_MEMORY_POOL_INFO_ACCESSIBLE_BY_ALL:
+            return sizeof(bool);
+
+        default:
+            return 0;
+    }
+}
+
+std::string HSATraceStringUtils::Get_hsa_amd_memory_pool_get_info_AttributeString(void* value, hsa_amd_memory_pool_info_t attribute, hsa_status_t retVal)
+{
+    if (NULL == value)
+    {
+        return "NULL";
+    }
+    else
+    {
+        std::ostringstream ss;
+
+        if (HSA_STATUS_SUCCESS == retVal)
+        {
+            switch (attribute)
+            {
+
+                // hsa_amd_segment_t
+                case HSA_AMD_MEMORY_POOL_INFO_SEGMENT:
+                    ss << HSATraceStringUtils::Get_hsa_amd_segment_t_String(*(static_cast<hsa_amd_segment_t*>(value)));
+                    break;
+
+                // uint32_t
+                case HSA_AMD_MEMORY_POOL_INFO_GLOBAL_FLAGS:
+                    ss << (*(static_cast<uint32_t*>(value)));
+                    break;
+
+                // size_t
+                case HSA_AMD_MEMORY_POOL_INFO_SIZE:
+                case HSA_AMD_MEMORY_POOL_INFO_RUNTIME_ALLOC_GRANULE:
+                case HSA_AMD_MEMORY_POOL_INFO_RUNTIME_ALLOC_ALIGNMENT:
+                    ss << StringUtils::ToString(*(static_cast<size_t*>(value)));
+                    break;
+
+                // bool
+                case HSA_AMD_MEMORY_POOL_INFO_RUNTIME_ALLOC_ALLOWED:
+                case HSA_AMD_MEMORY_POOL_INFO_ACCESSIBLE_BY_ALL:
+                    ss << (*(static_cast<bool*>(value)));
+                    break;
+
+                default:
+                    ss << StringUtils::ToString(*(static_cast<int*>(value)));
+                    break;
+            }
+        }
+
+        return SurroundWithDeRef(ss.str());
+    }
+}
+
+unsigned int HSATraceStringUtils::Get_hsa_amd_agent_memory_pool_get_info_AttributeSize(hsa_amd_agent_memory_pool_info_t attribute)
+{
+    switch (attribute)
+    {
+        // hsa_amd_memory_pool_access_t
+        case HSA_AMD_AGENT_MEMORY_POOL_INFO_ACCESS:
+            return sizeof(hsa_amd_memory_pool_access_t);
+
+        // uint32_t
+        case HSA_AMD_AGENT_MEMORY_POOL_INFO_NUM_LINK_HOPS:
+            return sizeof(uint32_t);
+
+        // hsa_amd_memory_pool_link_info_t
+        case HSA_AMD_AGENT_MEMORY_POOL_INFO_LINK_INFO:
+            return sizeof(hsa_amd_memory_pool_link_info_t);
+
+    default:
+        return 0;
+    }
+}
+
+std::string HSATraceStringUtils::Get_hsa_amd_agent_memory_pool_get_info_AttributeString(void* value, hsa_amd_agent_memory_pool_info_t attribute, hsa_status_t retVal)
+{
+    if (NULL == value)
+    {
+        return "NULL";
+    }
+    else
+    {
+        std::ostringstream ss;
+
+        if (HSA_STATUS_SUCCESS == retVal)
+        {
+            switch (attribute)
+            {
+
+                // hsa_amd_memory_pool_access_t
+                case HSA_AMD_AGENT_MEMORY_POOL_INFO_ACCESS:
+                    ss << HSATraceStringUtils::Get_hsa_amd_memory_pool_access_t_String(*(static_cast<hsa_amd_memory_pool_access_t*>(value)));
+                    break;
+
+                // uint32_t
+                case HSA_AMD_AGENT_MEMORY_POOL_INFO_NUM_LINK_HOPS:
+                    ss << (*(static_cast<uint32_t*>(value)));
+                    break;
+
+                // hsa_amd_memory_pool_link_info_t
+                case HSA_AMD_AGENT_MEMORY_POOL_INFO_LINK_INFO:
+                    ss << HSATraceStringUtils::Get_hsa_amd_memory_pool_link_info_t_String(*(static_cast<hsa_amd_memory_pool_link_info_t*>(value)));
                     break;
 
                 default:

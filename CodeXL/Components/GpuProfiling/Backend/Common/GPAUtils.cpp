@@ -543,7 +543,7 @@ void GPAUtils::GetCounterValues(gpa_uint32 uSessionID, CounterList& counterDataT
                     value /= 1024.0f;
                 }
 
-                str = StringUtils::ToString(value, precision);
+                str = StringUtils::ToStringPrecision(value, precision);
                 counterDataTable.push_back(str);
             }
             else if (type == GPA_TYPE_FLOAT64)
@@ -556,7 +556,7 @@ void GPAUtils::GetCounterValues(gpa_uint32 uSessionID, CounterList& counterDataT
                     value /= 1024.0f;
                 }
 
-                str = StringUtils::ToString(value, precision);
+                str = StringUtils::ToStringPrecision(value, precision);
                 counterDataTable.push_back(str);
             }
             else

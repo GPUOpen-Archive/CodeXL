@@ -94,7 +94,7 @@ void CLMemSummarizer::GenerateHTMLTable(std::ostream& sout)
             unsigned int mb = 1 << 20;
             double dSize = (double)info->m_uiTransferSize / mb;
             double dRate = dSize / ((double)ullDuration * 1e-9);
-            strRate = StringUtils::ToString(dRate, 3);  // + "MB/s"; //StringUtils::GetDataSizeStr( (unsigned int)ullRate, 3 ) + "/s";
+            strRate = StringUtils::ToStringPrecision(dRate, 3);  // + "MB/s"; //StringUtils::GetDataSizeStr( (unsigned int)ullRate, 3 ) + "/s";
         }
 
         HTMLTableRow row(&table);

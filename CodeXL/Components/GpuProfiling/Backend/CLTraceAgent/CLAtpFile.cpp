@@ -952,7 +952,7 @@ bool CLAtpFilePart::Parse(std::istream& in, std::string& outErrorMsg)
                     m_shouldStopParsing = true;
                     double progressPersentage = (apiNum > 0 ? double(i) / double(apiNum) : 0.0) * 100;
 
-                    m_strWarningMsg = StringUtils::Replace(OUT_OF_MEMORY_ERROR, "NN", StringUtils::ToString(progressPersentage, 2));
+                    m_strWarningMsg = StringUtils::Replace(OUT_OF_MEMORY_ERROR, "NN", StringUtils::ToStringPrecision(progressPersentage, 2));
                     return false;
                 }
             }

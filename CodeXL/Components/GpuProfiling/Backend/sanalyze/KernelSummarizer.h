@@ -164,7 +164,7 @@ public:
             .AddItem(1, (*it)->strDeviceName)
             .AddItem(2, StringUtils::ToString((*it)->uiNumCalls))
             .AddItem(3, StringUtils::NanosecToMillisec((*it)->ullTotalTime))
-            .AddItem(4, StringUtils::ToString(percentage, 2))
+            .AddItem(4, StringUtils::ToStringPrecision(percentage, 2))
             .AddItem(5, StringUtils::NanosecToMillisec((*it)->ullAve))
             .AddItem(6, strMaxItem)
             .AddItem(7, strMinItem);

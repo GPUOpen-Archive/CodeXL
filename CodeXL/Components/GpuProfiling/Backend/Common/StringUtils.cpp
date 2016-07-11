@@ -189,7 +189,7 @@ string StringUtils::NanosecToMillisec(ULONGLONG ullTime)
     }
     else
     {
-        return ToString(ullTime * 1e-6, 5);
+        return ToStringPrecision(ullTime * 1e-6, 5);
     }
 }
 
@@ -209,25 +209,25 @@ string StringUtils::GetDataSizeStr(unsigned int sizeInByte, int precision)
     if (sizeInByte > gb)
     {
         newSize = (double)sizeInByte / (double)gb;
-        ss << ToString(newSize, precision);
+        ss << ToStringPrecision(newSize, precision);
         ss << " GB";
     }
     else if (sizeInByte > mb)
     {
         newSize = (double)sizeInByte / (double)mb;
-        ss << ToString(newSize, precision);
+        ss << ToStringPrecision(newSize, precision);
         ss << " MB";
     }
     else if (sizeInByte > kb)
     {
         newSize = (double)sizeInByte / (double)kb;
-        ss << ToString(newSize, precision);
+        ss << ToStringPrecision(newSize, precision);
         ss << " KB";
     }
     else
     {
         newSize = sizeInByte;
-        ss << ToString(newSize, precision);
+        ss << ToStringPrecision(newSize, precision);
         ss << " Byte";
     }
 

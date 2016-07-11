@@ -128,7 +128,7 @@ bool HSAGPAProfiler::IsGPUDevice(hsa_agent_t agent)
     bool retVal = false;
 
     hsa_device_type_t deviceType;
-    hsa_status_t status = g_realHSAFunctions->hsa_agent_get_info_fn(agent, HSA_AGENT_INFO_DEVICE, &deviceType);
+    hsa_status_t status = g_pRealCoreFunctions->hsa_agent_get_info_fn(agent, HSA_AGENT_INFO_DEVICE, &deviceType);
 
     if (HSA_STATUS_SUCCESS == status && HSA_DEVICE_TYPE_GPU == deviceType)
     {
@@ -151,7 +151,7 @@ hsa_status_t HSAGPAProfiler::GetGPUDeviceIDs(hsa_agent_t agent, void* pData)
         if (IsGPUDevice(agent))
         {
             uint32_t deviceId;
-            status = g_realHSAFunctions->hsa_agent_get_info_fn(agent, static_cast<hsa_agent_info_t>(HSA_AMD_AGENT_INFO_CHIP_ID), &deviceId);
+            status = g_pRealCoreFunctions->hsa_agent_get_info_fn(agent, static_cast<hsa_agent_info_t>(HSA_AMD_AGENT_INFO_CHIP_ID), &deviceId);
 
             if (HSA_STATUS_SUCCESS == status)
             {
@@ -207,7 +207,7 @@ bool HSAGPAProfiler::Init(const Parameters& params, std::string& strErrorOut)
             return false;
 #else
             vector<uint32_t> gpuDeviceIds;
-            hsa_status_t status = g_realHSAFunctions->hsa_iterate_agents_fn(GetGPUDeviceIDs, &gpuDeviceIds);
+            hsa_status_t status = g_pRealCoreFunctions->hsa_iterate_agents_fn(GetGPUDeviceIDs, &gpuDeviceIds);
 
             if (HSA_STATUS_SUCCESS == status)
             {
@@ -401,11 +401,15 @@ bool HSAGPAProfiler::PopulateKernelStatsFromDispatchPacket(hsa_kernel_dispatch_p
         else
         {
             const void* pKernelHostAddress = nullptr;
-
+#ifdef FUTURE_ROCR_VERSION
+            if (nullptr != pHsaModule->ven_amd_loader_query_host_address)
+            {
+                hsa_status_t status = pHsaModule->ven_amd_loader_query_host_address(reinterpret_cast<const void*>(pAqlPacket->kernel_object), &pKernelHostAddress);
+#else
             if (nullptr != pHsaModule->ven_amd_loaded_code_object_query_host_address)
             {
                 hsa_status_t status = pHsaModule->ven_amd_loaded_code_object_query_host_address(reinterpret_cast<const void*>(pAqlPacket->kernel_object), &pKernelHostAddress);
-
+#endif
                 if (HSA_STATUS_SUCCESS == status)
                 {
                     pKernelCode = reinterpret_cast<const amd_kernel_code_t*>(pKernelHostAddress);
@@ -458,7 +462,7 @@ bool HSAGPAProfiler::Begin(const hsa_agent_t             device,
     bool retVal = true;
 
     uint32_t deviceId;
-    hsa_status_t status = g_realHSAFunctions->hsa_agent_get_info_fn(device, static_cast<hsa_agent_info_t>(HSA_AMD_AGENT_INFO_CHIP_ID), &deviceId);
+    hsa_status_t status = g_pRealCoreFunctions->hsa_agent_get_info_fn(device, static_cast<hsa_agent_info_t>(HSA_AMD_AGENT_INFO_CHIP_ID), &deviceId);
 
     std::string strAgentName = "<UnknownDeviceName>";
 
@@ -709,7 +713,7 @@ bool HSAGPAProfiler::AddOccupancyEntry(const KernelStats& kernelStats, const std
     pEntry->m_nGlobalItemCountMax = 0x1000000; // TODO: get value from runtime when available
 
     uint32_t numComputeUnit;
-    hsa_status_t status = g_realHSAFunctions->hsa_agent_get_info_fn(agent, static_cast<hsa_agent_info_t>(HSA_AMD_AGENT_INFO_COMPUTE_UNIT_COUNT), &numComputeUnit);
+    hsa_status_t status = g_pRealCoreFunctions->hsa_agent_get_info_fn(agent, static_cast<hsa_agent_info_t>(HSA_AMD_AGENT_INFO_COMPUTE_UNIT_COUNT), &numComputeUnit);
 
     if (HSA_STATUS_SUCCESS == status)
     {

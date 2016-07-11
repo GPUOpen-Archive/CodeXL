@@ -69,7 +69,7 @@ void HSA_PMC_hsa_agent_get_info_PostCallHelper(hsa_status_t retVal, hsa_agent_t 
         {
             // the min queue size is less than 128 -- let check to see if the max queue size is at least 128
             uint32_t maxQueueSize = 0;
-            hsa_status_t status = g_realHSAFunctions->hsa_agent_get_info_fn(agent, HSA_AGENT_INFO_QUEUE_MAX_SIZE, &maxQueueSize);
+            hsa_status_t status = g_pRealCoreFunctions->hsa_agent_get_info_fn(agent, HSA_AGENT_INFO_QUEUE_MAX_SIZE, &maxQueueSize);
 
             if (HSA_STATUS_SUCCESS == status && MIN_QUEUE_SIZE_FOR_SOFTCP <= maxQueueSize)
             {
@@ -132,7 +132,7 @@ void HSA_PMC_hsa_executable_get_symbol_PostCallHelper(hsa_status_t retVal, hsa_e
 
             uint64_t kernelObject;
 
-            if (g_realHSAFunctions->hsa_executable_symbol_get_info_fn(*symbol, HSA_EXECUTABLE_SYMBOL_INFO_KERNEL_OBJECT, &kernelObject) == HSA_STATUS_SUCCESS)
+            if (g_pRealCoreFunctions->hsa_executable_symbol_get_info_fn(*symbol, HSA_EXECUTABLE_SYMBOL_INFO_KERNEL_OBJECT, &kernelObject) == HSA_STATUS_SUCCESS)
             {
                 Log(logMESSAGE, "HSA_PMC_hsa_executable_get_symbol: Adding code handle/symbol handle pair to FinalizerInfoManager\n");
                 Log(logMESSAGE, "  CodeHandle: %llu, SymHandle: %llu\n", kernelObject, symbol->handle);
