@@ -5,6 +5,9 @@
 #include <string>
 #include <utility>
 
+// GSA.
+#include <AMDTBackEnd/Include/Common/AmdDxGsaCompile.h>
+
 using namespace beKA;
 class CElf;
 class CElfSection;
@@ -98,6 +101,8 @@ public:
         std::vector<std::pair<std::string, std::string> > m_defines;
 
         std::vector<std::string> m_includeDirectories;
+
+        bool m_isShaderIntrinsicsEnabled = false;
 
         /// Save the MS Blob as text
         bool m_bDumpMSIntermediate;

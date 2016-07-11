@@ -86,6 +86,7 @@ bool ParseCmdLine(int argc, char* argv[], Config& config)
          "   In order to use it, DXAsm must be specified. /Fo switch must be used and output file must be the same as input file for the CodeXLKernelAnalyzer.")
 #endif
         ("DumpMSIntermediate", po::value<string>(&config.m_DumpMSIntermediate), "Location to save the MS Blob as text. ")
+        ("intrinsics", "Enable AMD D3D11 Shader Intrinsics extension.")
         ;
 
         po::options_description macroAndIncludeOpt("Macro and Include paths Options");
@@ -171,6 +172,11 @@ bool ParseCmdLine(int argc, char* argv[], Config& config)
         if (vm.count("verbose"))
         {
             config.m_bVerbose = true;
+        }
+
+        if (vm.count("intrinsics"))
+        {
+            config.m_EnableShaderIntrinsics = true;
         }
 
         if (vm.count("retain-user-filename"))

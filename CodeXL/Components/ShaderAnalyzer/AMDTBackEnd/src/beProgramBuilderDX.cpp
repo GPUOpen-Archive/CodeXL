@@ -371,14 +371,23 @@ beKA::beStatus beProgramBuilderDX::CompileDXAsm(const string& programSource, con
     memset(&shaderInput, 0, sizeof(AmdDxGsaCompileShaderInput));
     AmdDxGsaCompileOption compileOptions[1];
     memset(compileOptions, 0, sizeof(AmdDxGsaCompileOption));
+    if (dxOptions.m_isShaderIntrinsicsEnabled)
+    {
+        // Enable D3D11 shader intrinsics. The value does not matter, only the setting does.
+        compileOptions[0].setting = AmdDxGsaCompileOptionEnum::AmdDxGsaEnableShaderIntrinsics;
+        shaderInput.numCompileOptions = 1;
+    }
+    else
+    {
+        shaderInput.numCompileOptions = 0;
+    }
+    shaderInput.pCompileOptions = compileOptions;
 
     shaderInput.chipFamily = dxOptions.m_ChipFamily;
     shaderInput.chipRevision = dxOptions.m_ChipRevision;
     // The code directly follows the header.
     shaderInput.pShaderByteCode = (char*)(byteCodeHeader + 1);
     shaderInput.byteCodeLength = byteCodeHeader->dwChunkDataSize;
-    shaderInput.pCompileOptions = compileOptions;
-    shaderInput.numCompileOptions = 0;
 
     AmdDxGsaCompileShaderOutput shaderOutput;
     memset(&shaderOutput, 0, sizeof(AmdDxGsaCompileShaderOutput));

@@ -628,6 +628,7 @@ bool kcCLICommanderDX::Compile(const Config& config, const GDT_GfxCardInfo& gfxC
     dxOptions.m_Target = config.m_Profile;
     dxOptions.m_DXFlags.flagsAsInt = config.m_DXFlags;
     dxOptions.m_bDumpMSIntermediate = (config.m_DumpMSIntermediate.size() > 0 ? true : false);
+    dxOptions.m_isShaderIntrinsicsEnabled = config.m_EnableShaderIntrinsics;
 
     // Process config.m_Defines
     // The interface for DX is different here.
