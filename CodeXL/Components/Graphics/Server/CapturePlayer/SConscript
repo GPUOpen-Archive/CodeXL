@@ -31,6 +31,7 @@ env.Replace(CPPFLAGS = original_cpp_flag)
 env_no_c11 = env.Clone()
 fullBuildFlags = env_no_c11['CPPFLAGS']
 partBuildString = fullBuildFlags.replace('-std=c++11','-std=c99 -Wno-unused')
+partBuildString = partBuildString.replace('-Wall -Werror -Wextra','') # Bypass issue in gcc 4.8-4.9 
 env_no_c11.Replace( CPPFLAGS = partBuildString) 
 
 lib_src = \
