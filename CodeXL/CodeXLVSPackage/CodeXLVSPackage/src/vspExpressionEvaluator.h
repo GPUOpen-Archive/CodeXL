@@ -76,7 +76,6 @@ class vspCDebugProperty : public IDebugProperty2, vspCUnknown
 {
 public:
     vspCDebugProperty(const apExpression& expressionValue);
-    // vspCDebugProperty(const gtString& nameAsString, const gtString& valueAsString, const gtString& valueAsHexString, const gtString& typeAsString);
     virtual ~vspCDebugProperty();
 
     ////////////////////////////////////////////////////////////

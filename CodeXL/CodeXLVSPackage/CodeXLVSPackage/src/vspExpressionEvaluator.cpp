@@ -22,6 +22,8 @@
 // Static member initializations:
 vspExpressionEvaluator* vspExpressionEvaluator::_pMySingleInstance = NULL;
 
+#define VSP_DEFAULT_EVALUATION_DEPTH 3
+
 // ---------------------------------------------------------------------------
 // Name:        vspCopyDebugPropertyInfo
 // Description: Copies src into dst, filtered by requestedFields
@@ -920,12 +922,11 @@ vspCDebugProperty* vspExpressionEvaluator::evaluateExpression(vspCDebugExpressio
                 gaGetKernelDebuggingCurrentWorkItemCoordinate(1, currentWorkItemCoordinate[1]);
                 gaGetKernelDebuggingCurrentWorkItemCoordinate(2, currentWorkItemCoordinate[2]);
 
-                // TO_DO: handle children more effectively:
-                rcVal = gaGetKernelDebuggingExpressionValue(exprCode, currentWorkItemCoordinate, 3, variableValue);
+                rcVal = gaGetKernelDebuggingExpressionValue(exprCode, currentWorkItemCoordinate, VSP_DEFAULT_EVALUATION_DEPTH, variableValue);
             }
             else if (gaCanGetHostVariables())
             {
-                rcVal = gaGetThreadExpressionValue(threadId, frameIndex, exprCode, 3, variableValue);
+                rcVal = gaGetThreadExpressionValue(threadId, frameIndex, exprCode, VSP_DEFAULT_EVALUATION_DEPTH, variableValue);
             }
         }
 
