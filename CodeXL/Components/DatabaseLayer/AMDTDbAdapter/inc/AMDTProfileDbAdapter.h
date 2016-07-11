@@ -142,6 +142,8 @@ public:
                         size_t count,              // AMDT_CP_MAX_COUNT - returns all the entries
                         gtVector<AMDTProfileData>& dataList);
 
+    bool GetJITFunctionInfo(AMDTFunctionId funcId, gtUInt64& loadAddr, gtString& srcFilePath, gtString& jncFilePath);
+
     bool GetFunctionProfileData(AMDTFunctionId              funcId,
                                 gtUInt32                    funcStartOffset,    // used only for unknonwn functions
                                 AMDTProcessId               processId,

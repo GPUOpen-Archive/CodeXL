@@ -508,8 +508,12 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
                 if (true == flag)
                 {
                     pAsmItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, aSampleValue.m_sampleCount);
-                    pAsmItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, aSampleValue.m_sampleCountPercentage);
+
+                    QVariant var;
+                    SetPercentFormat(aSampleValue.m_sampleCountPercentage, true, var);
+                    pAsmItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, var);
                     pAsmItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
+
                     flag = false;
                 }
 
@@ -764,7 +768,11 @@ void SourceCodeTreeModel::PrintFunctionDetailData(AMDTProfileFunctionData data,
         auto sampleValuePer = srcData.m_sampleValues.at(0).m_sampleCountPercentage;
 
         pLineItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, sampleValue);
+
+        QVariant var;
+        SetPercentFormat(sampleValuePer, true, var);
         pLineItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, sampleValuePer);
+
         pLineItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
         int idx = SOURCE_VIEW_SAMPLES_PERCENT_COLUMN + 1;
 
@@ -821,7 +829,7 @@ void SourceCodeTreeModel::PrintFunctionDetailData(AMDTProfileFunctionData data,
             if (true == flag)
             {
                 pLineItem->setData(SOURCE_VIEW_ADDRESS_COLUMN, "0x" + QString::number(moduleBaseAddr + instOffset, 16));
-                m_newAddress = moduleBaseAddr + instOffset;
+                //m_newAddress = moduleBaseAddr + instOffset;
                 flag = false;
             }
 
@@ -873,6 +881,7 @@ bool SourceCodeTreeModel::BuildSourceAndDASMTree()
 
 }
 
+#if 0
 void SourceCodeTreeModel::SetDataPercentValues()
 {
     // Sanity check:
@@ -932,6 +941,7 @@ void SourceCodeTreeModel::SetDataPercentValues()
 
     }
 }
+#endif //0
 
 bool SourceCodeTreeModel::UpdateHeaders()
 {
@@ -1471,7 +1481,8 @@ bool SourceCodeTreeModel::GetClrOffsetFromSymbol(gtRVAddr& offset)
 }
 #endif // AMDT_WINDOWS_OS
 
-bool SourceCodeTreeModel::SetupSymbolInfoListUnmanaged(AMDTUInt32 modId, AMDTUInt32 pId)
+// Baskar: FIXME: This function is not required as m_symbolsInfoList itself is not at all used
+bool SourceCodeTreeModel::SetupSymbolInfoList(AMDTUInt32 modId, AMDTUInt32 pId)
 {
     if (nullptr != m_pProfDataRdr)
     {
@@ -1482,21 +1493,36 @@ bool SourceCodeTreeModel::SetupSymbolInfoListUnmanaged(AMDTUInt32 modId, AMDTUIn
         {
             AMDTProfileFunctionData  functionData;
 
-            m_pProfDataRdr->GetFunctionDetailedProfileData(function.m_id, pId, m_tid, functionData);
-
-            UiFunctionSymbolInfo tmpSymbol;
-            tmpSymbol.m_va = functionData.m_functionInfo.m_startOffset;
-            tmpSymbol.m_size = functionData.m_functionInfo.m_size;
-            tmpSymbol.m_name = acGTStringToQString(functionData.m_functionInfo.m_name);
-            m_symbolsInfoList.push_back(tmpSymbol);
+            if (m_pProfDataRdr->GetFunctionData(function.m_id, pId, m_tid, functionData))
+            {
+                UiFunctionSymbolInfo tmpSymbol;
+                tmpSymbol.m_va = functionData.m_functionInfo.m_startOffset;
+                tmpSymbol.m_size = functionData.m_functionInfo.m_size;
+                tmpSymbol.m_name = acGTStringToQString(functionData.m_functionInfo.m_name);
+                m_symbolsInfoList.push_back(tmpSymbol);
+            }
         }
     }
 
     return true;
 }
 
+bool SourceCodeTreeModel::SetupSourceInfo()
+{
+    m_srcFile.clear();
 
+    gtString srcFile;
+    bool ret = m_pProfDataRdr->GetSourceFilePathForFunction(m_funcId, srcFile);
 
+    if (ret && (srcFile != L"Unknown Source File"))
+    {
+        m_srcFile = acGTStringToQString(srcFile);
+    }
+
+    return ret;
+}
+
+#if 0
 bool SourceCodeTreeModel::SetupSourceInfoForJava(gtVAddr address)
 {
     if (m_currentSymbolIterator == m_symbolsInfoList.end())
@@ -1633,8 +1659,9 @@ bool SourceCodeTreeModel::SetupSourceInfoForJava(gtVAddr address)
 
     return true;
 }
+#endif //0
 
-
+#if 0
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
 bool SourceCodeTreeModel::SetupSourceInfoForClr(gtVAddr address)
 {
@@ -1705,6 +1732,9 @@ bool SourceCodeTreeModel::SetupSourceInfoForClr(gtVAddr address)
     return true;
 }
 #endif
+#endif //0
+
+#if 0
 bool SourceCodeTreeModel::SetupSourceInfoForUnManaged()
 {
     if (m_currentSymbolIterator == m_symbolsInfoList.end())
@@ -1759,8 +1789,9 @@ bool SourceCodeTreeModel::SetupSourceInfoForUnManaged()
 
     return true;
 }
+#endif //0
 
-
+#if 0
 bool SourceCodeTreeModel::InitializeSymbolEngine()
 {
     bool retVal = false;
@@ -1862,6 +1893,8 @@ bool SourceCodeTreeModel::InitializeSymbolEngine()
 
     return retVal;
 }
+#endif //0
+
 
 void SourceCodeTreeModel::SetTreeSamples(const QString& hotSpotCaption)
 {
@@ -2161,6 +2194,7 @@ bool SourceCodeTreeModel::SetDataValues(int lineNumber, int asmLineNumber, const
     return retVal;
 }
 
+#if 0
 bool SourceCodeTreeModel::SourceLineInstancesToOffsetLinenumMap(SrcLineInstanceMap* pInstances)
 {
     // For sanity
@@ -2193,6 +2227,7 @@ bool SourceCodeTreeModel::SourceLineInstancesToOffsetLinenumMap(SrcLineInstanceM
 
     return true;
 }
+#endif //0
 
 #if 0
 void SourceCodeTreeModel::BuildSourceLinesTree()
@@ -2289,6 +2324,7 @@ bool SourceCodeTreeModel::SetSourceLines(const QString& filePath, unsigned int s
     return true;
 }
 
+#if 0
 void SourceCodeTreeModel::CreateSymbolInfoList(AMDTUInt32 modId, AMDTUInt32 pId)
 {
     switch (m_modType)
@@ -2298,7 +2334,7 @@ void SourceCodeTreeModel::CreateSymbolInfoList(AMDTUInt32 modId, AMDTUInt32 pId)
         case AMDT_MODULE_TYPE_JAVA:
         case AMDT_MODULE_TYPE_MANAGEDDPE:
         {
-            bool rc = SetupSymbolInfoListUnmanaged(modId, pId);
+            bool rc = SetupSymbolInfoList(modId, pId);
             GT_ASSERT(rc);
         }
         break;
@@ -2307,6 +2343,7 @@ void SourceCodeTreeModel::CreateSymbolInfoList(AMDTUInt32 modId, AMDTUInt32 pId)
             break;
     }
 }
+#endif //0
 
 #if 0
 void SourceCodeTreeModel::CreateSymbolInfoList()
@@ -2453,15 +2490,24 @@ QModelIndex SourceCodeTreeModel::indexOfItem(SourceViewTreeItem* pItem)
     int col = 0;
     int asmLine = -1;
 
-    SourceViewTreeItemMap::iterator iter = m_sourceTreeItemsMap.begin();
-    SourceViewTreeItemMap::iterator iterEnd = m_sourceTreeItemsMap.end();
+    //SourceViewTreeItemMap::iterator iter = m_sourceTreeItemsMap.begin();
+    //SourceViewTreeItemMap::iterator iterEnd = m_sourceTreeItemsMap.end();
 
-    for (int i = 0 ; iter != iterEnd; iter++, i++)
+    //for (int i = 0 ; iter != iterEnd; iter++, i++)
+    //{
+    //    if (iter->second == pItem)
+    //    {
+    //        row = iter->first.m_sourceLineNumber - 1;
+    //        asmLine = iter->first.m_asmLineNumber;
+    //        break;
+    //    }
+    //}
+
+    for (auto& item : m_sampleSrcLnViewTreeList)
     {
-        if (iter->second == pItem)
+        if (item.second == pItem)
         {
-            row = iter->first.m_sourceLineNumber - 1;
-            asmLine = iter->first.m_asmLineNumber;
+            row = item.first.m_sourceLineNumber - 1;
             break;
         }
     }
@@ -2562,7 +2608,8 @@ void SourceCodeTreeModel::SetSingleItemDataValue(SourceViewTreeItem* pItem, int 
 
 void SourceCodeTreeModel::SetPercentFormat(double  val, bool appendPercent, QVariant& data)
 {
-    int precision = afGlobalVariablesManager::instance().percentagePointPrecision();
+    int precision = appendPercent ? afGlobalVariablesManager::instance().percentagePointPrecision() :
+        afGlobalVariablesManager::instance().floatingPointPrecision();
 
     if (val > 0)
     {
@@ -2580,7 +2627,7 @@ void SourceCodeTreeModel::SetPercentFormat(double  val, bool appendPercent, QVar
     }
 }
 
-
+#if 0
 void SourceCodeTreeModel::SetSingleItemDataValue(SourceViewTreeItem* pItem, int column, bool appendPercent)
 {
     // Sanity check:
@@ -2663,6 +2710,7 @@ void SourceCodeTreeModel::SetSingleItemDataValue(SourceViewTreeItem* pItem, int 
         }
     }
 }
+#endif //0
 
 SourceViewTreeItem* SourceCodeTreeModel::AddDoubleClickItem(SourceViewTreeItem* pAsmItem)
 {
@@ -2843,6 +2891,8 @@ void SourceCodeTreeModel::SetModuleDetails(AMDTUInt32 moduleId, AMDTUInt32 proce
     GT_IF_WITH_ASSERT((nullptr != m_pProfDataRdr) && (nullptr != m_pDisplayFilter))
     {
         AMDTProfileModuleInfoVec modInfo;
+
+        // Baskar: FIXME what to do if the moduleId is ALL_MODULES?
         bool ret = m_pProfDataRdr->GetModuleInfo(processId, moduleId, modInfo);
 
         if (true == ret)

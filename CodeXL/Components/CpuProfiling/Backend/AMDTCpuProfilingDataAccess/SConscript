@@ -21,6 +21,7 @@ env.Append( CPPPATH = [
 	env['CXL_common_dir'] + '/Src',
 	env['CXL_common_dir'] + '/../CodeXL/Components/CpuProfiling/Backend',
 	env['CXL_common_dir'] + '/../CodeXL/Components/CpuProfiling',
+	env['CXL_common_dir'] + '/../CodeXL/Components/ProfilingAgents',
 	env['CXL_common_dir'] + '/../CodeXL/Components/DatabaseLayer',
 ])
 
@@ -31,7 +32,7 @@ env_no_c11.Append( CPPPATH = [
 	env['CXL_commonproj_dir'],
 ])
 
-UseQt4(env)
+UseQtNoGraphics(env)
 
 # There are uses of %llx in some spots
 env.Append(CPPFLAGS = '-fno-strict-aliasing')
@@ -44,6 +45,7 @@ env.Append (LIBS = [
     "CXLCpuPerfEventUtils",
     "CXLExecutableFormat",
     "CXLDisassembler",
+	"CXLProfilingAgentsData",
 ])
 
 sources = \

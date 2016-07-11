@@ -89,8 +89,13 @@ SessionSourceCodeView::SessionSourceCodeView(QWidget* pParent, CpuSessionWindow*
     m_pShowNoteAction = nullptr;
     m_CLUNoteShown = false;
     // Create the tree model object:
-    m_pTreeViewModel = new SourceCodeTreeModel(m_pSessionDisplaySettings, m_sessionDir, m_pProfileReader, m_pProfDataRdr, m_pDisplayFilter);
 
+    if (nullptr != pSessionWindow)
+    {
+        m_pSessionDisplaySettings = pSessionWindow->sessionDisplaySettings();
+    }
+
+    m_pTreeViewModel = new SourceCodeTreeModel(m_pSessionDisplaySettings, m_sessionDir, m_pProfileReader, m_pProfDataRdr, m_pDisplayFilter);
 }
 
 
@@ -126,7 +131,8 @@ bool SessionSourceCodeView::DisplayViewModule(std::tuple<AMDTFunctionId, const g
 
     // Create the symbols information:
     //TODO : required ??
-    m_pTreeViewModel->CreateSymbolInfoList(m_moduleId, m_processId);
+    // Baskar: FIXME Not required
+    // m_pTreeViewModel->CreateSymbolInfoList(m_moduleId, m_processId);
 
     // Create the top layout:
     CreateTopLayout();
@@ -482,27 +488,30 @@ void SessionSourceCodeView::CreateFunctionsComboBox()
         QStringList functionsList, toolTipList;
 
         AMDTProfileDataVec funcProfileData;
-        m_pProfDataRdr->GetFunctionProfileData(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, funcProfileData);
+        m_pProfDataRdr->GetFunctionProfileData(((m_processId > 0) ? m_processId : AMDT_PROFILE_ALL_PROCESSES), m_moduleId, funcProfileData);
 
         AMDTProfileFunctionData  functionData;
 
         for (auto const& func : funcProfileData)
         {
-            m_pProfDataRdr->GetFunctionDetailedProfileData(func.m_id,
-                                                           AMDT_PROFILE_ALL_PROCESSES,
-                                                           AMDT_PROFILE_ALL_THREADS,
-                                                           functionData);
+            bool ret = m_pProfDataRdr->GetFunctionData(func.m_id,
+                                                       AMDT_PROFILE_ALL_PROCESSES,
+                                                       AMDT_PROFILE_ALL_THREADS,
+                                                       functionData);
 
-            gtUInt64 baseAddr = functionData.m_modBaseAddress;
-            gtUInt64 startOffset = baseAddr + functionData.m_functionInfo.m_startOffset;
-            gtUInt64 endOffset = startOffset + functionData.m_functionInfo.m_size;
+            if (ret)
+            {
+                gtUInt64 baseAddr = functionData.m_modBaseAddress;
+                gtUInt64 startOffset = baseAddr + functionData.m_functionInfo.m_startOffset;
+                gtUInt64 endOffset = startOffset + functionData.m_functionInfo.m_size;
 
-            QString addressStart = "0x" + QString::number(startOffset, 16);
-            QString addressEnd = "0x" + QString::number(endOffset, 16);
-            QString functionStr = QString("[%1 - %2] : ").arg(addressStart).arg(addressEnd);
-            functionStr += acGTStringToQString(functionData.m_functionInfo.m_name);
-            functionsList << functionStr;
-            m_functionIdVec.push_back(functionData.m_functionInfo.m_functionId);
+                QString addressStart = "0x" + QString::number(startOffset, 16);
+                QString addressEnd = "0x" + QString::number(endOffset, 16);
+                QString functionStr = QString("[%1 - %2] : ").arg(addressStart).arg(addressEnd);
+                functionStr += acGTStringToQString(functionData.m_functionInfo.m_name);
+                functionsList << functionStr;
+                m_functionIdVec.push_back(functionData.m_functionInfo.m_functionId);
+            }
         }
 
         m_pTopToolbar->AddLabel(CP_sourceCodeViewFunctionPrefix);
@@ -837,8 +846,25 @@ void SessionSourceCodeView::DisplayAddress(gtVAddr addr, ProcessIdType pid, Thre
 
         if ((pFunctionsComboBox != nullptr) && (pFunctionsComboBox->count() > 0))
         {
+            //m_pFunctionsComboBoxAction->UpdateCurrentIndex(-1);
+            //m_pFunctionsComboBoxAction->UpdateCurrentIndex(0);
+
+            // Now find the index for this functionId
+            AMDTUInt32 index = 0;
+
+            for (auto &aFundId : m_functionIdVec)
+            {
+                if (aFundId == m_functionId)
+                {
+                    break;
+                }
+
+                index++;
+            }
+
+            // Baskar: This is used as hack to generate index change notification
             m_pFunctionsComboBoxAction->UpdateCurrentIndex(-1);
-            m_pFunctionsComboBoxAction->UpdateCurrentIndex(0);
+            m_pFunctionsComboBoxAction->UpdateCurrentIndex(index);
         }
     }
 }
@@ -849,75 +875,111 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
     // When the function is changed, clear the user selection information:
     m_userDisplayInformation.clear();
 
-
     GT_IF_WITH_ASSERT((m_pTreeViewModel != nullptr) &&
-                      (m_pTIDComboBoxAction != nullptr) &&
-                      (m_pPIDComboBoxAction != nullptr) &&
-                      (m_pPIDLabelAction != nullptr) &&
-                      (m_pTIDLabelAction != nullptr))
+        (m_pTIDComboBoxAction != nullptr) &&
+        (m_pPIDComboBoxAction != nullptr) &&
+        (m_pPIDLabelAction != nullptr) &&
+        (m_pTIDLabelAction != nullptr))
     {
-        if (-1 == functionIndex) { return; }
+        if (-1 != functionIndex)
+        {
+            m_pTreeViewModel->m_funcId = m_functionIdVec.at(functionIndex);
 
-        m_pTreeViewModel->m_funcId = m_functionIdVec.at(functionIndex);
-        AMDTProfileFunctionData  functionData;
-        m_pProfDataRdr->GetFunctionDetailedProfileData(m_pTreeViewModel->m_funcId,
+            AMDTProfileFunctionData  functionData;
+            QStringList pidList, tidList;
+            bool isMultiPID = false;
+            bool isMultiTID = false;
+
+            m_pTreeViewModel->m_pid = AMDT_PROFILE_ALL_PROCESSES;
+            m_pTreeViewModel->m_tid = AMDT_PROFILE_ALL_THREADS;
+
+            bool ret = m_pProfDataRdr->GetFunctionData(m_pTreeViewModel->m_funcId,
                                                        AMDT_PROFILE_ALL_PROCESSES,
                                                        AMDT_PROFILE_ALL_THREADS,
                                                        functionData);
 
-
-        gtString srcFilePath;
-        AMDTSourceAndDisasmInfoVec srcInfoVec;
-        m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_pTreeViewModel->m_funcId, srcFilePath, srcInfoVec);
-
-        m_srcFilePath = srcFilePath;
-
-        m_pTreeViewModel->m_pid = AMDT_PROFILE_ALL_PROCESSES;
-        m_pTreeViewModel->m_tid = AMDT_PROFILE_ALL_THREADS;
-
-        bool isMultiPID = (functionData.m_pidsList.size() > 1);
-        bool isMultiTID = (functionData.m_threadsList.size() > 1);
-        QStringList pidList, tidList;
-
-        if (isMultiPID)
-        {
-            for (const auto& pid : functionData.m_pidsList)
+            if (ret)
             {
-                pidList << (QString::number(pid));
+                m_pTreeViewModel->m_newAddress = functionData.m_modBaseAddress + functionData.m_instDataList[0].m_offset;
+                m_srcFilePath.makeEmpty();
+                m_pProfDataRdr->GetSourceFilePathForFunction(m_pTreeViewModel->m_funcId, m_srcFilePath);
+
+                isMultiPID = (functionData.m_pidsList.size() > 1);
+                isMultiTID = (functionData.m_threadsList.size() > 1);
+
+                if (isMultiPID)
+                {
+                    for (const auto& pid : functionData.m_pidsList)
+                    {
+                        pidList << (QString::number(pid));
+                    }
+
+                    pidList.insert(0, CP_profileAllProcesses);
+                }
+
+                if (isMultiTID)
+                {
+                    for (const auto& tid : functionData.m_threadsList)
+                    {
+                        tidList << (QString::number(tid));
+                    }
+
+                    tidList.insert(0, CP_profileAllThreads);
+                }
             }
 
-            pidList.insert(0, CP_profileAllProcesses);
+            // Update the PID and TID string lists:
+            m_pPIDComboBoxAction->UpdateStringList(pidList);
+            m_pTIDComboBoxAction->UpdateStringList(tidList);
+
+            // Show / Hide the pid and tid combo boxes:
+            // Notice: Since a widget cannot be hide on a toolbar, we should hide the action of the widget:
+            m_pPIDComboBoxAction->UpdateVisible(isMultiPID);
+            m_pPIDLabelAction->UpdateVisible(isMultiPID);
+            m_pTIDComboBoxAction->UpdateVisible(isMultiPID || isMultiTID);
+            m_pTIDLabelAction->UpdateVisible(isMultiPID || isMultiTID);
+
+            m_pTIDComboBoxAction->UpdateEnabled(isMultiTID);
+
+            // Update the display:
+            ProtectedUpdateTableDisplay(UPDATE_TABLE_REBUILD);
         }
-
-        if (isMultiTID)
-        {
-            for (const auto& tid : functionData.m_threadsList)
-            {
-                tidList << (QString::number(tid));
-            }
-
-            tidList.insert(0, CP_profileAllThreads);
-        }
-
-        // Update the PID and TID string lists:
-        m_pPIDComboBoxAction->UpdateStringList(pidList);
-        m_pTIDComboBoxAction->UpdateStringList(tidList);
-
-        // Show / Hide the pid and tid combo boxes:
-        // Notice: Since a widget cannot be hide on a toolbar, we should hide the action of the widget:
-        m_pPIDComboBoxAction->UpdateVisible(isMultiPID);
-        m_pPIDLabelAction->UpdateVisible(isMultiPID);
-        m_pTIDComboBoxAction->UpdateVisible(isMultiPID || isMultiTID);
-        m_pTIDLabelAction->UpdateVisible(isMultiPID || isMultiTID);
-
-        m_pTIDComboBoxAction->UpdateEnabled(isMultiTID);
-
-        // Update the display:
-        ProtectedUpdateTableDisplay(UPDATE_TABLE_REBUILD);
     }
 }
 
+void SessionSourceCodeView::UpdateWithNewSymbol()
+{
+    //If there is no source, just show dasm
+    //m_pTreeViewModel->m_srcFile.clear();
 
+    m_pTreeViewModel->SetupSourceInfo();
+
+    // If m_pTreeViewModel->m_srcFile is empty, no Source info available.
+    // So we clear the source info line map.
+    QString fileLocationStr;
+
+    if (m_pTreeViewModel->m_srcFile.isEmpty())
+    {
+        m_pTreeViewModel->m_funOffsetLinenumMap.clear();
+
+        fileLocationStr = QString("Module: ") + m_pTreeViewModel->m_moduleName;
+
+        // For JAVAMODULE and MANAGEDPE, we update the jnc file
+        // in the module label.
+        if (m_pTreeViewModel->m_modType == AMDT_MODULE_TYPE_MANAGEDDPE || m_pTreeViewModel->m_modType == AMDT_MODULE_TYPE_JAVA)
+        {
+            fileLocationStr += " (" + acGTStringToQString(m_pTreeViewModel->m_pDisplayedFunction->getJncFileName()) + ")";
+        }
+    }
+    else
+    {
+        fileLocationStr = m_pTreeViewModel->m_srcFile;
+    }
+
+    m_pModuleLocationInfoLabel->setText(fileLocationStr);
+}
+
+#if 0
 void SessionSourceCodeView::UpdateWithNewSymbol()
 {
     //If there is no source, just show dasm
@@ -1002,6 +1064,7 @@ void SessionSourceCodeView::UpdateWithNewSymbol()
 
     m_pModuleLocationInfoLabel->setText(fileLocationStr);
 }
+#endif //0
 
 bool SessionSourceCodeView::UpdateDisplay()
 {
@@ -1527,6 +1590,7 @@ bool SessionSourceCodeView::SetupSourceInfoForOcl(gtVAddr address)
 }
 #endif
 
+#if 0
 bool SessionSourceCodeView::ReadPE()
 {
     bool retVal = false;
@@ -1585,7 +1649,7 @@ bool SessionSourceCodeView::ReadPE()
 
     return retVal;
 }
-
+#endif //0
 
 void SessionSourceCodeView::OnHotSpotComboChanged(const QString& text)
 {

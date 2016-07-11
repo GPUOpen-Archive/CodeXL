@@ -97,6 +97,7 @@ public:
     bool GetProcessInfo(AMDTUInt32 pid, AMDTProfileProcessInfoVec& procInfo);
     bool GetModuleInfo(AMDTUInt32 pid, AMDTModuleId mid, AMDTProfileModuleInfoVec& procInfo);
     bool GetThreadInfo(AMDTUInt32 pid, AMDTThreadId tid, AMDTProfileThreadInfoVec& procInfo);
+    bool GetModuleInfoForFunction(AMDTFunctionId funcId, AMDTProfileModuleInfo& modInfo);
 
     //  Summary APIs
     bool GetProcessSummary(AMDTUInt32 counterId, AMDTProfileDataVec& processSummaryData);
@@ -109,6 +110,12 @@ public:
     bool GetModuleProfileData(AMDTProcessId procId, AMDTModuleId modId, AMDTProfileDataVec& moduleProfileData);
     bool GetFunctionProfileData(AMDTProcessId procId, AMDTModuleId modId, AMDTProfileDataVec& funcProfileData);
 
+    // This will not give src/inst level profile data
+    bool GetFunctionData(AMDTFunctionId            funcId,
+                         AMDTProcessId             processId,
+                         AMDTThreadId              threadId,
+                         AMDTProfileFunctionData&  functionData);
+
     int GetFunctionDetailedProfileData(AMDTFunctionId            funcId,
                                        AMDTProcessId             processId,
                                        AMDTThreadId              threadId,
@@ -118,10 +125,12 @@ public:
                                        gtString& srcFilePath,
                                        AMDTSourceAndDisasmInfoVec& srcInfo);
 
-    int GetDisassembly(AMDTModuleId moduleId,
-                       AMDTUInt32 offset,
-                       AMDTUInt32 size,
-                       AMDTSourceAndDisasmInfoVec& srcInfo);
+    bool GetSourceFilePathForFunction(AMDTFunctionId funcId, gtString& srcFilePath);
+
+    //int GetDisassembly(AMDTModuleId moduleId,
+    //                   AMDTUInt32 offset,
+    //                   AMDTUInt32 size,
+    //                   AMDTSourceAndDisasmInfoVec& srcInfo);
 
     bool GetCallGraphProcesses(gtVector<AMDTProcessId>& cssProcesses);
     bool IsProcessHasCssSamples(AMDTProcessId pid);

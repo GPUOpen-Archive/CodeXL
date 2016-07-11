@@ -118,7 +118,7 @@ private:
 
     bool IsAddressInCurrentFunction(gtVAddr addr);
 
-    bool ReadPE();
+    //bool ReadPE();
 
     bool UpdateDisplay();
 
