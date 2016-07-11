@@ -100,8 +100,10 @@ public:
         /// So -DDEBUG=1 would be "DEBUG", "1"
         std::vector<std::pair<std::string, std::string> > m_defines;
 
+        /// Additional include directories for searching included headers.
         std::vector<std::string> m_includeDirectories;
 
+        /// True to enable AMD D3D11 Shader Intrinsic extension.
         bool m_isShaderIntrinsicsEnabled = false;
 
         /// Save the MS Blob as text
