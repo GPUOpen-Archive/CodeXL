@@ -285,4 +285,6 @@ CodeXL/Help/CodeXL User Guide/webhelp/
 /CodeXL/Components/GpuProfiling/**/*.a
 /Common/Src/**/*.so
 /Common/Src/**/*.a
+/Common/Src/**/*.o
+
 
