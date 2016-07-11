@@ -29,12 +29,14 @@
 #include <AMDTExecutableFormat/inc/ProcessWorkingSet.h>
 #include <AMDTCpuCallstackSampling/inc/CallGraph.h>
 #include <AMDTCpuProfilingRawData/inc/ProfilerDataDBWriter.h>
-#include <AMDTCpuProfilingRawData/inc/CpuProfileWriter.h>
+//#include <AMDTCpuProfilingRawData/inc/CpuProfileWriter.h>
 #include <AMDTCpuProfilingRawData/inc/Linux/CaPerfHeader.h>
 #include <ProfilingAgents/AMDTProfilingAgentsData/inc/JavaJncReader.h>
 
 #include "CaPerfTranslatorIbs.h"
 #include "../JitTaskInfo.h"
+
+//#define ENABLE_OLD_PROFILE_WRITER 1
 
 // Aggregate the IBS derived event. Increase the derived event count by one
 #define AGG_IBS_EVENT(EV) _log_ibs(pProc, ldAddr, funcSize, pMod, ip, pid, tid, cpu, EV, 0, os, usr, 1, pFuncInfo)
