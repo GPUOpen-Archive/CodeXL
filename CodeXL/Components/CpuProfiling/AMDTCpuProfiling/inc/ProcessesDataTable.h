@@ -11,6 +11,11 @@
 
 #include <inc/CPUProfileDataTable.h>
 
+enum ProcessTableCol
+{
+    PROCESS_NAME_COL = 0,
+    PROCESS_ID_COL
+};
 /// -----------------------------------------------------------------------------------------------
 /// \class Name: ProcessesDataTable : public CPUProfileDataTable
 /// \brief Description:  This class will be used to display processes in data table.

@@ -39,12 +39,12 @@
 ModuleFilterDialog::ModuleFilterDialog(shared_ptr<cxlProfileDataReader> pProfDataRdr,
                                        TableDisplaySettings* pDisplaySettings,
                                        CPUSessionTreeItemData* pSessionData,
-									   bool isDisplaySysModEn,
+                                       bool isDisplaySysModEn,
                                        QWidget* pParent): acDialog(pParent),
-	m_pProfDataRdr(pProfDataRdr),
+    m_pProfDataRdr(pProfDataRdr),
     m_pTableDisplaySettings(pDisplaySettings),
     m_pSessionData(pSessionData),
-	m_isDisplaySysModEn(isDisplaySysModEn)
+    m_isDisplaySysModEn(isDisplaySysModEn)
 {
     setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
     intializeLayout();
@@ -56,7 +56,6 @@ ModuleFilterDialog::ModuleFilterDialog(shared_ptr<cxlProfileDataReader> pProfDat
     QObject::connect(m_pDisplaySystemDLL, SIGNAL(stateChanged(int)), this, SLOT(onCheckSystemDLL(int)));
     resize(QSize(600, 350));
 
-
     setWindowTitle(str_DialogCaption);
     afLoadTitleBarIcon(this);
 }
@@ -67,11 +66,11 @@ ModuleFilterDialog::~ModuleFilterDialog()
 
 void ModuleFilterDialog::intializeLayout()
 {
-    m_pPbOk					= new QPushButton("OK", this);
-    m_pPbCancel				= new QPushButton("Cancel", this);
-    m_pSelectAllModules		= new QCheckBox(str_SelectAllModules, this);
-    m_pDisplaySystemDLL		= new QCheckBox(str_DisplaySystemDLLs, this);
-    m_pProcessDescriptor	= new QLabel(str_Modules, this);
+    m_pPbOk                 = new QPushButton("OK", this);
+    m_pPbCancel             = new QPushButton("Cancel", this);
+    m_pSelectAllModules     = new QCheckBox(str_SelectAllModules, this);
+    m_pDisplaySystemDLL     = new QCheckBox(str_DisplaySystemDLLs, this);
+    m_pProcessDescriptor    = new QLabel(str_Modules, this);
 
     QString exeName;
     QString PID;
@@ -81,32 +80,32 @@ void ModuleFilterDialog::intializeLayout()
         gtUInt64 onePID = m_pTableDisplaySettings->m_filterByPIDsList.at(0);
         PID.setNum(onePID);
 
-		gtVector<AMDTProfileProcessInfo> procInfo;
-		bool ret = m_pProfDataRdr->GetProcessInfo(AMDT_PROFILE_ALL_PROCESSES, procInfo);
-		GT_ASSERT(ret);
+        gtVector<AMDTProfileProcessInfo> procInfo;
+        bool ret = m_pProfDataRdr->GetProcessInfo(AMDT_PROFILE_ALL_PROCESSES, procInfo);
+        GT_ASSERT(ret);
 
-		for (const auto& process : procInfo)
-		{
-			if (process.m_pid == onePID)
-			{
-				exeName = acGTStringToQString(process.m_name);
-				break;
-			}
-			else
-			{
-				exeName = "Process";
-			}
-		}
+        for (const auto& process : procInfo)
+        {
+            if (process.m_pid == onePID)
+            {
+                exeName = acGTStringToQString(process.m_name);
+                break;
+            }
+            else
+            {
+                exeName = "Process";
+            }
+        }
     }
     else
     {
         //bool isSystemWide = false;
-		exeName = "System-wide Profiling";
+        exeName = "System-wide Profiling";
 
         if ((m_pSessionData != nullptr) && (m_pSessionData->m_profileScope != PM_PROFILE_SCOPE_SINGLE_EXE))
         {
-           // isSystemWide = true;
-			exeName = "Multiple Processes";
+            // isSystemWide = true;
+            exeName = "Multiple Processes";
         }
 
         if (m_pTableDisplaySettings->m_filterByPIDsList.isEmpty())
@@ -171,8 +170,8 @@ void ModuleFilterDialog::intializeData()
 
 
         m_pDisplaySystemDLL->setChecked(m_pTableDisplaySettings->m_shouldDisplaySystemDllInModulesDlg);
-		m_pDisplaySystemDLL->setEnabled(m_isDisplaySysModEn);
-		//m_pDisplaySystemDLL->setEnabled(CPUGlobalDisplayFilter::instance().m_displaySystemDLLs);
+        m_pDisplaySystemDLL->setEnabled(m_isDisplaySysModEn);
+        //m_pDisplaySystemDLL->setEnabled(CPUGlobalDisplayFilter::instance().m_displaySystemDLLs);
 
         GT_IF_WITH_ASSERT(m_pTableDisplaySettings->m_allModulesFullPathsList.size() == m_pTableDisplaySettings->m_isModule32BitList.size())
         {
@@ -194,9 +193,9 @@ void ModuleFilterDialog::intializeData()
                 modulePath.setFullPathFromString(acQStringToGTString(qFilePath));
 
                 // Add a new table item for this module:
-                QTableWidgetItem* pItemName = new QTableWidgetItem(*CPUProfileDataTable::moduleIcon(modulePath, 
-																									m_pTableDisplaySettings->m_isModule32BitList.at(i)), 
-																									fInfo.fileName());
+                QTableWidgetItem* pItemName = new QTableWidgetItem(*CPUProfileDataTable::moduleIcon(modulePath,
+                                                                   m_pTableDisplaySettings->m_isModule32BitList.at(i)),
+                                                                   fInfo.fileName());
 
 
                 // Check if this module is a system module:
@@ -349,8 +348,8 @@ void ModuleFilterDialog::onClickModuleItem(QTableWidgetItem* item)
                 if (Qt::Checked == m_pModuleTree->item(i, 0)->checkState())
                 {
                     selectedCount++;
-					QTableWidgetItem* itemWid = m_pModuleTree->item(i, 0);
-					std::string str = itemWid->text().toStdString();
+                    QTableWidgetItem* itemWid = m_pModuleTree->item(i, 0);
+                    std::string str = itemWid->text().toStdString();
                 }
             }
         }

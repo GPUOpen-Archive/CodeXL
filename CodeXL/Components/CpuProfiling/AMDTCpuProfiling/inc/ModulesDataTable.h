@@ -19,7 +19,8 @@ enum ModuleTableCol
     AMDT_MOD_TABLE_SUMMARY_SAMPLE,
     AMDT_MOD_TABLE_SUMMARY_SAMPLE_PER,
     AMDT_MOD_TABLE_MOD_ID = 0,
-    AMDT_MOD_TABLE_MOD_NAME
+    AMDT_MOD_TABLE_MOD_NAME,
+    AMDT_MOD_TABLE_SYMBOL_LOADED
 };
 /// -----------------------------------------------------------------------------------------------
 /// \class Name: ModulesDataTable : public CPUProfileDataTable

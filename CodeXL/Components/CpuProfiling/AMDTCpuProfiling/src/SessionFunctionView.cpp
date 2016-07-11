@@ -478,8 +478,7 @@ void SessionFunctionView::onOpenModuleSelector(const QString& link)
         pSessionData = qobject_cast<CPUSessionTreeItemData*>(m_pDisplayedSessionItemData->extendedItemData());
     }
 
-    //TODO: need to set the system module flag
-    ModuleFilterDialog mfd(m_pProfDataRdr, &m_functionsTablesFilter, pSessionData, true, afMainAppWindow::instance());
+    ModuleFilterDialog mfd(m_pProfDataRdr, &m_functionsTablesFilter, pSessionData, !m_pDisplayFilter->IsSystemModuleIgnored(), afMainAppWindow::instance());
 
     if (QDialog::Accepted == mfd.exec())
     {

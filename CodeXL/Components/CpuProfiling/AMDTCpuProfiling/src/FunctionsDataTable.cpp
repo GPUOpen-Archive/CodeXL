@@ -352,7 +352,7 @@ bool FunctionsDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allModul
                     if (m_pDisplayFilter->GetSamplePercent() == true)
                     {
                         list << QString::number(profData.m_sampleValue.at(i++).m_sampleCountPercentage, 'f', 2);
-                        //delegateSamplePercent(AMDT_FUNC_START_SAMPLE + i-1);
+                        delegateSamplePercent(AMDT_FUNC_FUNC_MODULE_COL + i);
                         setSampleValue = false;
                     }
                 }
@@ -360,6 +360,7 @@ bool FunctionsDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allModul
                 if (true == setSampleValue)
                 {
                     double sampleCnt = profData.m_sampleValue.at(i++).m_sampleCount;
+                    setItemDelegateForColumn(AMDT_FUNC_FUNC_MODULE_COL + i, &acNumberDelegateItem::Instance());
 
                     if (0 == sampleCnt)
                     {
