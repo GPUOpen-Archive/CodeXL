@@ -81,7 +81,7 @@ public:
     virtual void SetItemsVisibility();
     virtual void PostContextMenuAction();
 
-    virtual bool IsDragDropSupported(QDropEvent* pEvent, QString& dragDropFile, bool& shouldAccpet);
+    virtual bool IsDragDropSupported(QWidget* receiver, QDropEvent* pEvent, QString& dragDropFile, bool& shouldAccpet) override;
     virtual bool IsItemDroppable(QTreeWidgetItem* pItem);
     virtual bool CanItemBeDragged(QTreeWidgetItem* pItem);
     virtual bool ExecuteDropEvent(QWidget* receiver, QDropEvent* pEvent, const QString& dragDropFile) override;

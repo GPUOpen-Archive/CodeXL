@@ -739,8 +739,9 @@ void ProfileApplicationTreeHandler::AddImportFileFilter(const QString& strDescri
     }
 }
 
-bool ProfileApplicationTreeHandler::IsDragDropSupported(QDropEvent* event, QString& dragDropFile, bool& shouldAccpet)
+bool ProfileApplicationTreeHandler::IsDragDropSupported(QWidget* receiver, QDropEvent* event, QString& dragDropFile, bool& shouldAccpet)
 {
+    GT_UNREFERENCED_PARAMETER(receiver);
     bool retVal = false;
 
     shouldAccpet = false;

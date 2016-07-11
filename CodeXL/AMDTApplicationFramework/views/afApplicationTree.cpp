@@ -1856,7 +1856,7 @@ bool afApplicationTree::ShouldAcceptDragDrop(QDropEvent* pEvent, QString& dragDr
         if (pTreeHandler != nullptr)
         {
             bool shouldAccept = false;
-            bool isHandling = pTreeHandler->IsDragDropSupported(pEvent, dragDropFile, shouldAccept);
+            bool isHandling = pTreeHandler->IsDragDropSupported(nullptr, pEvent, dragDropFile, shouldAccept);
 
             if (isHandling)
             {
@@ -1889,7 +1889,7 @@ bool afApplicationTree::ExecuteDropEvent(QWidget* receiver, QDropEvent* pEvent, 
         if (pTreeHandler != nullptr)
         {
             bool shouldAccept = false;
-            bool isHandling = pTreeHandler->IsDragDropSupported(pEvent, dragDropFile, shouldAccept);
+            bool isHandling = pTreeHandler->IsDragDropSupported(receiver, pEvent, dragDropFile, shouldAccept);
 
             if (isHandling && shouldAccept)
             {
