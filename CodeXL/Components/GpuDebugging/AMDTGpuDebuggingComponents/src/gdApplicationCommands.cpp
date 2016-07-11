@@ -1751,8 +1751,16 @@ bool gdApplicationCommands::ShowNoSourceMdi(osFilePath& filePath, const gtString
             tempPath.setFileName(acQStringToGTString(AF_STR_HtmlNoSourceFoundFileName));
             tempPath.setFileExtension(AF_STR_htmlFileExtension);
 
-            QString htmlFileData = (lineNumber != 1 ? QString(AF_STR_HtmlFindSourceWebpage).arg(acGTStringToQString(fileNameAndExt)).arg(lineNumber) :
-                                    QString(AF_STR_HtmlNoDebugInformationWebpage).arg(acGTStringToQString(fileNameAndExt)));
+            QFont defaultFont;
+            QString htmlFileData;
+            if (lineNumber != 1)
+            {
+                htmlFileData = QString(AF_STR_HtmlFindSourceWebpage).arg(defaultFont.defaultFamily()).arg(acGTStringToQString(fileNameAndExt)).arg(lineNumber);
+            }
+            else
+            {
+                htmlFileData = QString(AF_STR_HtmlNoDebugInformationWebpage).arg(defaultFont.defaultFamily()).arg(acGTStringToQString(fileNameAndExt));
+            }
 
             QString fileName(acGTStringToQString(tempPath.asString()));
             QFile fileToWrite(fileName);
