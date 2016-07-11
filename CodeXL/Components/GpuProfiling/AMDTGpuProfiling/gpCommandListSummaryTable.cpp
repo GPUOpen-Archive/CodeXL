@@ -149,7 +149,6 @@ bool gpCommandListSummaryTable::InitItems()
 void gpCommandListSummaryTable::FillTable()
 {
     clearList();
-    int rowIndex = 0;
 
     setSortingEnabled(false);
 
@@ -157,9 +156,7 @@ void gpCommandListSummaryTable::FillTable()
     while (it.hasNext())
     {
         it.next();
-        AddSummaryRow(rowIndex, (APISummaryCommandListInfo*)&it.value());
-
-        rowIndex++;
+        AddSummaryRow((APISummaryCommandListInfo*)&it.value());
     }
 
     setSortingEnabled(true);
@@ -170,99 +167,101 @@ void gpCommandListSummaryTable::FillTable()
     selectRow(0);
 }
 
-void gpCommandListSummaryTable::AddSummaryRow(int rowIndex, APISummaryInfo* pInfo)
+void gpCommandListSummaryTable::AddSummaryRow(APISummaryInfo* pInfo)
 {
-    int rowCount = QTableWidget::rowCount();
-    GT_IF_WITH_ASSERT(pInfo != nullptr && rowIndex == rowCount)
+    GT_IF_WITH_ASSERT(pInfo != nullptr)
     {
-
+        int rowIndex = QTableWidget::rowCount();
         QStringList rowStrings;
         pInfo->TableItemsAsString(rowStrings);
-
-        insertRow(rowIndex);
-
-
-        // Sanity check: make sure that the string are fully built
-        GT_IF_WITH_ASSERT(rowStrings.size() >= CommandListSummaryColumnIndex::COLUMN_COUNT - 1)
+        if (rowStrings.size() > 0)
         {
-            for (int i = 0; i < CommandListSummaryColumnIndex::COLUMN_COUNT; i++)
+
+            insertRow(rowIndex);
+
+
+            // Sanity check: make sure that the string are fully built
+            GT_IF_WITH_ASSERT(rowStrings.size() >= CommandListSummaryColumnIndex::COLUMN_COUNT - 1)
             {
-                QTableWidgetItem* pItem = nullptr;
-
-                bool shouldSetValue = true;
-                bool shouldSetCmdBufferTooltip = false;
-
-                switch (i)
+                for (int i = 0; i < CommandListSummaryColumnIndex::COLUMN_COUNT; i++)
                 {
-                case COLUMN_ADDRESS:
-                case COLUMN_COMMAND_INDEX:
-                {
-                    pItem = allocateNewWidgetItem(rowStrings[i]);
-                    setItem(rowIndex, i, pItem);
-                    initItem(*pItem, rowStrings[i], nullptr, false, Qt::Unchecked, nullptr);
-                    setItemTextColor(rowIndex, i, pInfo->m_typeColor);
-                    shouldSetValue = false;
-                }
-                break;
-                case COLUMN_GPU_QUEUE:
-                {
-                    pItem = allocateNewWidgetItem(rowStrings[i]);
-                    setItem(rowIndex, i, pItem);
-                    initItem(*pItem, rowStrings[i], nullptr, false, Qt::Unchecked, nullptr);
-                    shouldSetValue = false;
-                }
-                break;
+                    QTableWidgetItem* pItem = nullptr;
 
-                case COLUMN_START_TIME:
-                case COLUMN_END_TIME:
-                {
-                    pItem = new FormattedTimeItem();
-                    ((FormattedTimeItem*)pItem)->SetAsLink(true);
+                    bool shouldSetValue = true;
+                    bool shouldSetCmdBufferTooltip = false;
 
-                }
-                break;
-                case COLUMN_EXECUTION_TIME:
-                {
-                    pItem = new FormattedTimeItem();
-                }
-                break;
-                case COLUMN_NUM_OF_COMMANDS:
-                {
-                    pItem = new QTableWidgetItem();
-
-                    // For number of commands, set both text and value, to make sure that the column is sortable, and enable
-                    // display of N/A string for 0 calls 
-                    setItem(rowIndex, i, pItem);
-
-                    if (pInfo->m_numCalls == 0)
+                    switch (i)
                     {
-                        shouldSetCmdBufferTooltip = true;
+                    case COLUMN_ADDRESS:
+                    case COLUMN_COMMAND_INDEX:
+                    {
+                        pItem = allocateNewWidgetItem(rowStrings[i]);
+                        setItem(rowIndex, i, pItem);
+                        initItem(*pItem, rowStrings[i], nullptr, false, Qt::Unchecked, nullptr);
+                        setItemTextColor(rowIndex, i, pInfo->m_typeColor);
+                        shouldSetValue = false;
                     }
-                    QVariant dataVariant;
-                    dataVariant.setValue(rowStrings[i].toDouble());
-                    pItem->setData(Qt::EditRole, dataVariant);
-                    pItem->setData(Qt::DisplayRole, rowStrings[i]);
-                    shouldSetValue = false;
-                }
-                break;
-                }
+                    break;
+                    case COLUMN_GPU_QUEUE:
+                    {
+                        pItem = allocateNewWidgetItem(rowStrings[i]);
+                        setItem(rowIndex, i, pItem);
+                        initItem(*pItem, rowStrings[i], nullptr, false, Qt::Unchecked, nullptr);
+                        shouldSetValue = false;
+                    }
+                    break;
 
-                if (shouldSetValue)
-                {
-                    setItem(rowIndex, i, pItem);
-                    QVariant dataVariant;
-                    dataVariant.setValue(rowStrings[i].toDouble());
-                    pItem->setData(Qt::DisplayRole, dataVariant);
+                    case COLUMN_START_TIME:
+                    case COLUMN_END_TIME:
+                    {
+                        pItem = new FormattedTimeItem();
+                        ((FormattedTimeItem*)pItem)->SetAsLink(true);
+
+                    }
+                    break;
+                    case COLUMN_EXECUTION_TIME:
+                    {
+                        pItem = new FormattedTimeItem();
+                    }
+                    break;
+                    case COLUMN_NUM_OF_COMMANDS:
+                    {
+                        pItem = new QTableWidgetItem();
+
+                        // For number of commands, set both text and value, to make sure that the column is sortable, and enable
+                        // display of N/A string for 0 calls 
+                        setItem(rowIndex, i, pItem);
+
+                        if (pInfo->m_numCalls == 0)
+                        {
+                            shouldSetCmdBufferTooltip = true;
+                        }
+                        QVariant dataVariant;
+                        dataVariant.setValue(rowStrings[i].toDouble());
+                        pItem->setData(Qt::EditRole, dataVariant);
+                        pItem->setData(Qt::DisplayRole, rowStrings[i]);
+                        shouldSetValue = false;
+                    }
+                    break;
+                    }
+
+                    if (shouldSetValue)
+                    {
+                        setItem(rowIndex, i, pItem);
+                        QVariant dataVariant;
+                        dataVariant.setValue(rowStrings[i].toDouble());
+                        pItem->setData(Qt::DisplayRole, dataVariant);
+                    }
+                    if (shouldSetCmdBufferTooltip)
+                    {
+                        pItem->setToolTip(GP_STR_SummaryCmdBufferToolTip);
+                    }
+                    else
+                    {
+                        pItem->setToolTip(pItem->text());
+                    }
+                    pItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
                 }
-                if (shouldSetCmdBufferTooltip)
-                {
-                    pItem->setToolTip(GP_STR_SummaryCmdBufferToolTip);
-                }
-                else
-                {
-                    pItem->setToolTip(pItem->text());
-                }
-                pItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
             }
         }
     }
