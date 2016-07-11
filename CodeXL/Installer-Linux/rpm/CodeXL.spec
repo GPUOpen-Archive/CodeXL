@@ -200,9 +200,11 @@ exit 0
 #--------------------------------------------------------------------------
 %postun
 # Get rid of symbolic link
+rm -f %{CXL_install_dir}/examples
 rm -f %{CXL_install_dir}/CodeXL
 # Cleanup of empty directories
 rmdir --ignore-fail-on-non-empty %{CXL_install_dir}
+rmdir --ignore-fail-on-non-empty %{CXL_examples_dir}
 rm -rf /usr/share/applications/amdcodexlicon.desktop
 rm -rf /usr/share/applications/amdremoteagenticon.desktop
 exit 0
