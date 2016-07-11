@@ -281,8 +281,35 @@ bool ModulesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, s
 
             for (auto counter : selectedCounterList)
             {
-                QVariant sampleCount(profData.m_sampleValue.at(i++).m_sampleCount);
-                list << sampleCount.toString();
+                // get counter type
+                AMDTProfileCounterType counterType = static_cast<AMDTProfileCounterType>(std::get<4>(counter));
+                bool setSampleValue = true;
+
+                if (counterType == AMDT_PROFILE_COUNTER_TYPE_RAW)
+                {
+                    if (m_pDisplayFilter->GetSamplePercent() == true)
+                    {
+                        list << QString::number(profData.m_sampleValue.at(i++).m_sampleCountPercentage, 'f', 2);
+                        delegateSamplePercent(AMDT_MOD_TABLE_SYMBOL_LOADED + i);
+                        setSampleValue = false;
+                    }
+                }
+
+                if (true == setSampleValue)
+                {
+                    double sampleCnt = profData.m_sampleValue.at(i++).m_sampleCount;
+                    setItemDelegateForColumn(AMDT_MOD_TABLE_SYMBOL_LOADED + i, &acNumberDelegateItem::Instance());
+
+                    if (0 == sampleCnt)
+                    {
+                        list << "";
+                    }
+                    else
+                    {
+                        QVariant sampleCount(sampleCnt);
+                        list << sampleCount.toString();
+                    }
+                }
             }
 
             addRow(list, nullptr);

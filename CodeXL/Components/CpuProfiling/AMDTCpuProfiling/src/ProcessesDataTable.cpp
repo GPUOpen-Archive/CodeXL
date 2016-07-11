@@ -104,47 +104,6 @@ bool ProcessesDataTable::findProcessDetails(int rowIndex, ProcessIdType& pid, QS
     pid = qPid->text().toInt();
     processFileName = qProcName->text();
 
-#if 0
-    GT_IF_WITH_ASSERT(m_pTableDisplaySettings != nullptr)
-    {
-        // Find the process ID column index:
-        bool rc1 = false, rc2 = false;
-
-        for (int i = 0 ; i < (int)m_pTableDisplaySettings->m_displayedColumns.size(); i++)
-        {
-            if (m_pTableDisplaySettings->m_displayedColumns[i] == TableDisplaySettings::PID_COL)
-            {
-                QTableWidgetItem* pItem = item(rowIndex, i);
-                GT_IF_WITH_ASSERT(pItem != nullptr)
-                {
-                    // Get the process ID:
-                    pid = pItem->text().toUInt(&retVal);
-                    rc1 = true;
-                }
-            }
-
-            if (m_pTableDisplaySettings->m_displayedColumns[i] == TableDisplaySettings::PROCESS_NAME_COL)
-            {
-                QTableWidgetItem* pItem = item(rowIndex, i);
-                GT_IF_WITH_ASSERT(pItem != nullptr)
-                {
-                    // Get the process ID:
-                    processFileName = pItem->text();
-                    rc2 = true;
-                }
-            }
-
-            retVal = rc1 && rc2;
-
-            if (retVal)
-            {
-                break;
-            }
-        }
-    }
-
-#endif
-
     return retVal;
 }
 
@@ -193,9 +152,35 @@ bool ProcessesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId,
 
             for (auto counter : selectedCounterList)
             {
-                QVariant sampleCount(profData.m_sampleValue.at(i++).m_sampleCount);
-                list << sampleCount.toString();
+                // get counter type
+                AMDTProfileCounterType counterType = static_cast<AMDTProfileCounterType>(std::get<4>(counter));
+                bool setSampleValue = true;
 
+                if (counterType == AMDT_PROFILE_COUNTER_TYPE_RAW)
+                {
+                    if (m_pDisplayFilter->GetSamplePercent() == true)
+                    {
+                        list << QString::number(profData.m_sampleValue.at(i++).m_sampleCountPercentage, 'f', 2);
+                        delegateSamplePercent(PROCESS_ID_COL + i);
+                        setSampleValue = false;
+                    }
+                }
+
+                if (true == setSampleValue)
+                {
+                    double sampleCnt = profData.m_sampleValue.at(i++).m_sampleCount;
+                    setItemDelegateForColumn(PROCESS_ID_COL + i, &acNumberDelegateItem::Instance());
+
+                    if (0 == sampleCnt)
+                    {
+                        list << "";
+                    }
+                    else
+                    {
+                        QVariant sampleCount(sampleCnt);
+                        list << sampleCount.toString();
+                    }
+                }
             }
 
             addRow(list, nullptr);
