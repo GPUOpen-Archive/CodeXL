@@ -561,18 +561,8 @@ bool SessionOverviewWindow::displaySessionExecutionDetails(afHTMLContent& conten
             secondColStr.makeEmpty();
             firstColStr.makeEmpty();
             firstColStr.appendFormattedString(L"<b>%ls:</b> 0x%llx", CP_overviewPageProfileCPUAffinity, sessionInfo.m_coreAffinity);
-            gtString scopeStr = PM_STR_ProfileScopeSingleApplication;
 
-            if (sessionInfo.m_sessionScope == PM_PROFILE_SCOPE_SYS_WIDE)
-            {
-                scopeStr = PM_STR_ProfileScopeSystemWide;
-            }
-            else if (sessionInfo.m_sessionScope == PM_PROFILE_SCOPE_SYS_WIDE_FOCUS_ON_EXE)
-            {
-                scopeStr = PM_STR_ProfileScopeSystemWideWithFocus;
-            }
-
-            secondColStr.appendFormattedString(L"<b>%ls:</b> %ls", CP_overviewPageProfileScope, scopeStr.asCharArray());
+            secondColStr.appendFormattedString(L"<b>%ls:</b> %ls", CP_overviewPageProfileScope, sessionInfo.m_sessionScope.asCharArray());
             content.addHTMLItem(afHTMLContent::AP_HTML_LINE, firstColStr, secondColStr);
 
 
