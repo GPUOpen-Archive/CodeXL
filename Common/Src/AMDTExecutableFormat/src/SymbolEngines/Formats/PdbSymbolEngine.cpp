@@ -9,7 +9,6 @@
 
 #include <AMDTBaseTools/Include/gtAlgorithms.h>
 #include <AMDTBaseTools/Include/gtString.h>
-#include <AMDTBaseTools/Include/gtHashSet.h>
 #include <AMDTOSWrappers/Include/osDebugLog.h>
 #include <AMDTOSWrappers/Include/osCriticalSectionLocker.h>
 #include <AMDTOSWrappers/Include/osAtomic.h>
@@ -265,34 +264,23 @@ void PdbSymbolEngine::ClearFunctionsInfo()
 
 void PdbSymbolEngine::ClearInlinedFunctionInfo()
 {
-    gtHashSet<IDiaLineNumber*> tempLines;
-
     // m_inlineeLinesCache is map of one-to-many type. Multiple keys are mapped to same value.
     // Hence values are duplicated. Sequentially iterated free of value objects will lead to double-free error.
     // Use tempLines set to collect unique DIA object pointers and then free all.
     for (auto& it : m_inlineeLinesCache)
     {
-        tempLines.insert(it.second.pLine);
+        m_pendingLineObjectsToRelease.insert(it.second.pLine);
     }
 
     m_inlineeLinesCache.clear();
 
-
-    // Add the pending pLine objects to be released
-    for (auto it : m_pendingLineObjectsToRelease)
-    {
-        tempLines.insert(it);
-    }
-
-    m_pendingLineObjectsToRelease.clear();
-
     // release the collected unique DIA objects
-    for (auto& it : tempLines)
+    for (auto& it : m_pendingLineObjectsToRelease)
     {
         it->Release();
     }
 
-    tempLines.clear();
+    m_pendingLineObjectsToRelease.clear();
 
 
     // clear m_inlinedFuncsInfo here
@@ -875,7 +863,7 @@ bool PdbSymbolEngine::ProcessInlinedFunction(IDiaSymbol* pFunc) const
                                             else
                                             {
                                                 // Replace previous pLine with current pLine in LinesCache map
-                                                m_pendingLineObjectsToRelease.push_back(it->second.pLine);
+                                                m_pendingLineObjectsToRelease.insert(it->second.pLine);
                                                 it->second.len = inlineeLen;
                                                 it->second.pLine = pLine;
                                                 SysFreeString(inlineeFuncName);
