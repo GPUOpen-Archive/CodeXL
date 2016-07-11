@@ -142,18 +142,7 @@ std::string Get_bool_String(bool input);
 /// \return the string representation of the bool pointer
 std::string Get_bool_Ptr_String(bool* pInput, bool input);
 
-/// Gets the string representation of size_t
-/// \param input the input size_t
-/// \return the string representation of the size_t
-std::string Get_size_t_String(size_t input);
-
-/// Gets the string representation of a size_t pointer
-/// \param input the input size_t pointer
-/// \param de-referenced value of the input size_t
-/// \return the string representation of the size_t pointer
-std::string Get_size_t_Ptr_String(size_t* pInput, size_t input);
-
-/// Gets the string representation of uint8_t
+/// Gets the string representation of a uint8_t
 /// This method is needed so uint8_t values aren't displayed as char data
 /// \param input the input uint8_t
 /// \return the string representation of the uint8_t
@@ -264,8 +253,32 @@ unsigned int Get_hsa_ext_program_get_info_AttributeSize(hsa_ext_program_info_t a
 /// \param value the value whose string representation is needed
 /// \param attribute the attribute type
 /// \param the return value of the hsa_ext_program_get_info call
-/// \return the string representation of the specified agent alt_program data
+/// \return the string representation of the specified program data
 std::string Get_hsa_ext_program_get_info_AttributeString(void* value, hsa_ext_program_info_t attribute, hsa_status_t retVal);
+
+/// Gets the size of the underlying data for the specified memory pool attribute
+/// \param attribute the attribute whose size is needed
+/// \return the size of the underlying data for the specified memory pool attribute (0 for unsupported/unkown attributes)
+unsigned int Get_hsa_amd_memory_pool_get_info_AttributeSize(hsa_amd_memory_pool_info_t attribute);
+
+/// Gets the string representation of the specified memory pool data
+/// \param value the value whose string representation is needed
+/// \param attribute the attribute type
+/// \param the return value of the hsa_amd_memory_pool_get_info call
+/// \return the string representation of the specified memory pool data
+std::string Get_hsa_amd_memory_pool_get_info_AttributeString(void* value, hsa_amd_memory_pool_info_t attribute, hsa_status_t retVal);
+
+/// Gets the size of the underlying data for the specified agent memory pool attribute
+/// \param attribute the attribute whose size is needed
+/// \return the size of the underlying data for the specified agent memory pool attribute (0 for unsupported/unkown attributes)
+unsigned int Get_hsa_amd_agent_memory_pool_get_info_AttributeSize(hsa_amd_agent_memory_pool_info_t attribute);
+
+/// Gets the string representation of the specified agent memory pool data
+/// \param value the value whose string representation is needed
+/// \param attribute the attribute type
+/// \param the return value of the hsa_amd_agent_memory_pool_get_info call
+/// \return the string representation of the specified agent memory pool data
+std::string Get_hsa_amd_agent_memory_pool_get_info_AttributeString(void* value, hsa_amd_agent_memory_pool_info_t attribute, hsa_status_t retVal);
 }
 
 #endif //_HSA_TRACE_STRING_UTILS_H_

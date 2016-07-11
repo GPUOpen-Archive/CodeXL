@@ -33,6 +33,7 @@ LIBPATH = $(COMMON_LIB_PATHS)
 SO_OBJS = \
 	./$(OBJ_DIR)/HSAPMCAgent.o \
 	./$(OBJ_DIR)/HSAPMCInterceptionHelpers.o \
+	./$(OBJ_DIR)/HSAPMCInterceptionTable1_0.o \
 	./$(OBJ_DIR)/HSAGPAProfiler.o \
 	./$(OBJ_DIR)/HSAPMCInterception.o \
 	./$(OBJ_DIR)/CLCUInfoBase.o \

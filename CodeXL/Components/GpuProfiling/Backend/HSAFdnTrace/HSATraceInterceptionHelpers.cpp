@@ -48,7 +48,7 @@ void HSA_APITrace_hsa_executable_get_symbol_PostCallHelper(hsa_status_t retVal, 
 
             uint64_t kernelObject;
 
-            if (g_realHSAFunctions->hsa_executable_symbol_get_info_fn(*symbol, HSA_EXECUTABLE_SYMBOL_INFO_KERNEL_OBJECT, &kernelObject) == HSA_STATUS_SUCCESS)
+            if (g_pRealCoreFunctions->hsa_executable_symbol_get_info_fn(*symbol, HSA_EXECUTABLE_SYMBOL_INFO_KERNEL_OBJECT, &kernelObject) == HSA_STATUS_SUCCESS)
             {
                 Log(logMESSAGE, "HSA_API_Trace_hsa_executable_get_symbol: Adding code handle/symbol handle pair to FinalizerInfoManager\n");
                 Log(logMESSAGE, "  CodeHandle: %llu, SymHandle: %llu\n", kernelObject, symbol->handle);

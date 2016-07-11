@@ -14,6 +14,7 @@
 #include "FileUtils.h"
 #include "GlobalSettings.h"
 
+#include "HSAPMCInterceptionTable1_0.h"
 #include "HSAAgentUtils.h"
 
 #include "HSAGPAProfiler.h"
@@ -32,7 +33,7 @@ extern "C" DLL_PUBLIC void amdtCodeXLResumeProfiling()
     HSAGPAProfiler::Instance()->EnableProfiling(true);
 }
 
-extern "C" bool DLL_PUBLIC OnLoad(ApiTable* table, uint64_t runtimeVersion, uint64_t failedToolCount, const char* const* pFailedToolNames)
+extern "C" bool DLL_PUBLIC OnLoad(void* pTable, uint64_t runtimeVersion, uint64_t failedToolCount, const char* const* pFailedToolNames)
 {
 #ifdef _DEBUG
     FileUtils::CheckForDebuggerAttach();
@@ -49,7 +50,16 @@ extern "C" bool DLL_PUBLIC OnLoad(ApiTable* table, uint64_t runtimeVersion, uint
 
     std::cout << "CodeXL GPU Profiler " << GPUPROFILER_BACKEND_VERSION_STRING << " is enabled\n";
 
-    InitHSAAPIInterceptPMC(table);
+    if (0 == runtimeVersion)
+    {
+        InitHSAAPIInterceptPMC1_0(reinterpret_cast<ApiTable1_0*>(pTable));
+    }
+#ifdef FUTURE_ROCR_VERSION
+    else
+    {
+        InitHSAAPIInterceptPMC(reinterpret_cast<HsaApiTable*>(pTable));
+    }
+#endif
 
     Parameters params;
     FileUtils::GetParametersFromFile(params);

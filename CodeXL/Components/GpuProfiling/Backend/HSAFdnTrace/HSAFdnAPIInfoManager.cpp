@@ -87,7 +87,7 @@ bool HSAAPIInfoManager::WriteKernelTimestampEntry(std::ostream& sout, hsa_profil
     sout << std::left << std::setw(21) << record.time.end;
 
     uint32_t deviceId;
-    hsa_status_t status = g_realHSAFunctions->hsa_agent_get_info_fn(record.agent, static_cast<hsa_agent_info_t>(HSA_AMD_AGENT_INFO_CHIP_ID), &deviceId);
+    hsa_status_t status = g_pRealCoreFunctions->hsa_agent_get_info_fn(record.agent, static_cast<hsa_agent_info_t>(HSA_AMD_AGENT_INFO_CHIP_ID), &deviceId);
 
     std::string strDeviceName = "<UnknownDeviceName>";
 

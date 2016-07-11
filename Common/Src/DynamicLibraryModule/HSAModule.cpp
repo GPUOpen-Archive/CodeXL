@@ -41,6 +41,7 @@ void HSAModule::Initialize()
     HSA_EXT_FINALIZE_API_TABLE;
     HSA_EXT_IMAGE_API_TABLE;
     HSA_EXT_AMD_API_TABLE;
+    HSA_VEN_AMD_LOADER_API_TABLE;
 #undef X
 
     m_isModuleLoaded = false;
@@ -128,17 +129,18 @@ bool HSAModule::LoadModule(const std::string& moduleName)
 #endif
             if ((HSA_STATUS_SUCCESS == status) && extensionSupported)
             {
-                hsa_ven_amd_loaded_code_object_1_00_pfn_t loadedCodeObjectTable;
 #ifdef FUTURE_ROCR_VERSION 
+                hsa_ven_amd_loader_1_00_pfn_t loadedCodeObjectTable;
                 status = system_get_extension_table(HSA_EXTENSION_AMD_LOADER, 1, 0, &loadedCodeObjectTable);
 #else
+                hsa_ven_amd_loaded_code_object_1_00_pfn_t loadedCodeObjectTable;
                 status = system_get_extension_table(HSA_EXTENSION_AMD_LOADED_CODE_OBJECT, 1, 0, &loadedCodeObjectTable);
 #endif
                 if (HSA_STATUS_SUCCESS == status)
                 {
 
 #define X(SYM) SYM = loadedCodeObjectTable.hsa_##SYM;
-                    HSA_VEN_AMD_LOADED_CODE_OBJECT_API_TABLE;
+                    HSA_VEN_AMD_LOADER_API_TABLE;
 #undef X
                 }
             }

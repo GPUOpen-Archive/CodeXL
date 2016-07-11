@@ -48,12 +48,29 @@ std::string ToString(const T val)
     return ss.str();
 }
 
+/// Convert input pointer to string
+/// \param pVal Input pointer
+/// \param pVal Input value
+/// \return the string or NULL if pointer is null
+template <class T>
+std::string ToStringPtr(const T* pVal, const T val)
+{
+    if (nullptr == pVal)
+    {
+        return "NULL";
+    }
+
+    std::stringstream ss(std::stringstream::in | std::stringstream::out);
+    ss << val;
+    return ss.str();
+}
+
 /// Convert input to string
 /// \param val Input var
 /// \param precision specify the precision
 /// \return the string
 template <class T>
-std::string ToString(const T val, int precision)
+std::string ToStringPrecision(const T val, int precision)
 {
     std::stringstream ss(std::stringstream::in | std::stringstream::out);
     ss.precision(precision);

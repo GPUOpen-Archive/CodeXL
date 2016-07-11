@@ -153,7 +153,7 @@ void APISummarizer<T>::GenerateHTMLTable(std::ostream& sout)
         row.AddItem(0, (*it)->strName);
         row.AddItem(1, StringUtils::NanosecToMillisec((*it)->ullTotalTime));
         double percentage = ((double)(*it)->ullTotalTime / (double)m_ullTotalTime) * 100.0;
-        row.AddItem(2, StringUtils::ToString(percentage, 5));
+        row.AddItem(2, StringUtils::ToStringPrecision(percentage, 5));
         row.AddItem(3, StringUtils::ToString((*it)->uiNumCalls));
         row.AddItem(4, StringUtils::NanosecToMillisec((*it)->ullAve));
 
