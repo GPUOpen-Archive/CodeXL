@@ -1059,9 +1059,19 @@
 
 #define AF_STR_HtmlNoSourceFoundFileName "NoSource"
 #define AF_STR_HtmlFindSourceWebpageTitle L"No Source Available"
-#define AF_STR_HtmlFindSourceWebpage "<!doctype html><html lang=\"eng\"><head><meta charset=\"utf-8\"><title>No Source Available</title><style>body{font-family: \"Helvetica Neue\", clean, sans-serif;}h1{font-weight: bold;font-size: 1.5em;}</style></head><body><h1>%1 was not found</h1><p>CodeXL requires the location of this file to display the source for the current call stack frame.</p><p><a href = \"FindSource-%2\">Click to locate the file %1</a></p></body></html>"
-#define AF_STR_HtmlNoDebugInformationWebpage "<!doctype html><html lang=\"eng\"><head><meta charset=\"utf-8\"><title>No Debug Information</title><style>body{font-family: \"Helvetica Neue\", clean, sans-serif;}h1{font-weight: bold;font-size: 1.5em;}</style></head><body><h1>No debug information available for file %1</h1></body></html>"
-#define AF_STR_HtmlNoDebugInformationNoFileWebpage "<!doctype html><html lang=\"eng\"><head><meta charset=\"utf-8\"><title>No Debug Information</title><style>body{font-family: \"Helvetica Neue\", clean, sans-serif;}h1{font-weight: bold;font-size: 1.5em;}</style></head><body><h1>No debug information available</h1><p>The debugged module does not contain debug information. Try to build it with debug information (-g) and restart debug session.</p><p>Module details: %1</p></body></html>"
+#define AF_STR_HtmlFindSourceWebpage "<!doctype html><html lang=\"eng\"><head><meta charset=\"utf-8\">"\
+"<title>No Source Available</title><style>"\
+"body{font-family: %1, clean, sans-serif;}h1{font-weight: bold;font-size: 1.5em;}</style>"\
+"</head><body><h1>%2 was not found</h1><p>CodeXL requires the location of this file to display the source for the current call stack frame.</p><p><a href = \"FindSource-%3\">Click to locate the file %2</a></p></body></html>"
+
+#define AF_STR_HtmlNoDebugInformationWebpage "<!doctype html><html lang=\"eng\"><head><meta charset=\"utf-8\"><title>No Debug Information</title>"\
+"<style>body{font-family: %1, clean, sans-serif;}h1{font-weight: bold;font-size: 1.5em;}</style></head>"\
+"<body><h1>No debug information available for file %2</h1></body></html>"
+
+#define AF_STR_HtmlNoDebugInformationNoFileWebpage "<!doctype html><html lang=\"eng\"><head><meta charset=\"utf-8\"><title>No Debug Information</title>"\
+"<style>body{font-family: \"Helvetica Neue\", clean, sans-serif;}h1{font-weight: bold;font-size: 1.5em;}</style>"\
+            "</head><body><h1>No debug information available</h1><p>The debugged module does not contain debug information. Try to build it with debug information (-g) and restart debug session.</p><p>Module details: %1</p></body></html>"
+
 #define AF_STR_HtmlFindSourceLink "FindSource"
 
 // Execution mode HTML properties:
