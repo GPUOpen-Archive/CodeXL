@@ -225,16 +225,15 @@ AMDTResult DriverSignalInitialize(DRV_SIGINFO_CB fnDrvSignalInfo, AMDTUInt32 sam
     AMDTUInt64 out = 0;
 
     AMDTUInt32 paramSize = sizeof(AMDTUInt64);
-#ifndef LINUX
+    #ifndef LINUX
     BOOL is32on64Sys = FALSE;
     IsWow64Process(GetCurrentProcess(), &is32on64Sys);
 
-    if (false == is32on64Sys)
+    if(false == is32on64Sys)
     {
         paramSize = sizeof(AMDTUInt32);
     }
-
-#endif
+    #endif
 
     samplingPeriod = samplingPeriod;
 
@@ -477,7 +476,7 @@ bool InitializeTaskInfo()
 {
 
 #if (defined(_WIN64) || defined(LINUX))
-    return true;
+return true;
 #else
     HRESULT hr = S_OK;
     wchar_t dirPath[OS_MAX_PATH] = { L'\0' };
