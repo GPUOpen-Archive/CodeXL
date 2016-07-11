@@ -100,12 +100,10 @@ static void AppendCodeByte(QString& str, gtUByte byteCode)
 
 SourceCodeTreeModel::SourceCodeTreeModel(SessionDisplaySettings* pSessionDisplaySettings,
                                          const QString& sessionDir,
-                                         CpuProfileReader* pProfileReader,
                                          shared_ptr<cxlProfileDataReader> pProfDataRdr,
                                          shared_ptr<DisplayFilter> displayFilter) : QAbstractItemModel(nullptr),
     m_pSessionDisplaySettings(pSessionDisplaySettings),
     m_pSessionSourceCodeTreeView(nullptr),
-    m_pProfileReader(pProfileReader),
     m_isDisplayingOnlyDasm(false),
     m_pExecutable(nullptr),
     m_isLongMode(true),
@@ -1894,7 +1892,6 @@ bool SourceCodeTreeModel::InitializeSymbolEngine()
     return retVal;
 }
 #endif //0
-
 
 void SourceCodeTreeModel::SetTreeSamples(const QString& hotSpotCaption)
 {

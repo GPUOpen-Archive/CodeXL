@@ -178,11 +178,6 @@ protected:
     /// \return void
     void updateHint(const QString& hint);
 
-    SessionDisplaySettings* CurrentSessionDisplaySettings();
-
-    /// PID -> process name:
-    bool PIDToProcessName(ProcessIdType pid, QString& processName);
-
     /// Process name -> PID:
     bool ProcessNameToPID(const QString& processName, ProcessIdType& pid);
 
@@ -212,7 +207,6 @@ protected slots:
 protected:
 
     /// Data:
-    CpuProfileReader* m_pProfileReader;
     CpuProfileInfo*   m_pProfileInfo;
 
     /// Tree item data:

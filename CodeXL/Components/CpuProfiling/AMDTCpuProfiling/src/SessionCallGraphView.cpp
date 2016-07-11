@@ -1985,18 +1985,6 @@ bool SessionCallGraphView::Display(const QString& caption, unsigned int pid)
     m_indexOffset = CALLGRAPH_OFFSET_INDEX;
     m_sessionFile.setFile(caption);
 
-#if 0
-    // Add all PIDs sampled for this module
-    PidProcessMap* pProcMap = m_pProfileReader->getProcessMap();
-
-    if (nullptr == pProcMap)
-    {
-        qApp->restoreOverrideCursor();
-        acMessageBox::instance().critical(afGlobalVariablesManager::ProductNameA(), "Unable to get the css data");
-        return false;
-    }
-
-#endif
     // Fill the process IDs combo box:
     fillPIDComb(pid);
 
@@ -2152,7 +2140,6 @@ void SessionCallGraphView::OnSelectHotSpotIndicator(int index)
     // Sanity check:
     const QComboBox* pHotSpotIndicatorComboBox = TopToolbarComboBox(m_pHotSpotIndicatorComboBoxAction);
     GT_IF_WITH_ASSERT((nullptr != m_pParentSessionWindow) &&
-                      (nullptr != m_pParentSessionWindow->sessionDisplaySettings()) &&
                       (pHotSpotIndicatorComboBox != nullptr))
     {
         qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -2334,69 +2321,6 @@ void SessionCallGraphView::fillPIDComb(unsigned int pid)
             m_pPidComboAction->UpdateCurrentIndex(index);
         }
     }
-}
-
-void  SessionCallGraphView::filterMonitoredEvent(QStringList& eventNameList)
-{
-    GT_UNREFERENCED_PARAMETER(eventNameList);
-#if 0
-
-    if (TBPVER_BEFORE_RI >= m_pProfileReader->getProfileInfo()->m_tbpVersion)
-    {
-        //For tbp version before TBPVER_BEFORE_RI eventwise information is not available
-        //So we only display "All data" instead of listing monitoed events.
-        eventNameList.clear();
-    }
-    else
-    {
-        // Sanity check:
-        GT_IF_WITH_ASSERT((m_pParentSessionWindow != nullptr) && (m_pParentSessionWindow->sessionDisplaySettings() != nullptr))
-        {
-            int count =  eventNameList.size();
-            QStringList finalList;
-
-            EventsFile* pEventsFile = CurrentSessionDisplaySettings()->getEventsFile();
-
-            for (int i = 0; i < count; ++i)
-            {
-                QString eName = eventNameList.at(i);
-                ColumnSpec cSpec = m_pParentSessionWindow->sessionDisplaySettings()->getColumnSpecFromEventName(eName);
-
-                if (ColumnInvalid == cSpec.type)
-                {
-                    continue;
-                }
-
-                if ((pEventsFile == nullptr) && (IsTimerEvent(cSpec.dataSelectLeft.eventSelect)))
-                {
-                    finalList.append(eName);
-                }
-                else if ((pEventsFile == nullptr))
-                {
-                    continue;
-                }
-                else if (ColumnValue == cSpec.type)
-                {
-                    CpuEvent cpuevent;
-                    pEventsFile->FindEventByValue(cSpec.dataSelectLeft.eventSelect, cpuevent);
-
-                    if (IsTimerEvent(cpuevent.value) || IsPmcEvent(cpuevent.value))
-                    {
-                        finalList.append(eName);
-                    }
-                    else if ((IsIbsFetchEvent(cpuevent.value) && (GetIbsFetchEvent() == cpuevent.value)) ||
-                             (IsIbsOpEvent(cpuevent.value) && (GetIbsOpEvent() == cpuevent.value)))
-                    {
-                        finalList.append(eName);
-                    }
-                }
-            }
-
-            eventNameList = finalList;
-        }
-    }
-
-#endif
 }
 
 void SessionCallGraphView::UpdateTableDisplay(unsigned int updateType)

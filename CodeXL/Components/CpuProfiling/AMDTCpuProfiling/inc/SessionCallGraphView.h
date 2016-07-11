@@ -444,7 +444,6 @@ public slots:
     void OnButterflyClicked(QString funName, gtUInt64 address, bool parent);
     void editSource(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32>);
     void OnSelectHotSpotIndicator(int index);
-    void filterMonitoredEvent(QStringList& eventNameList);
     //overwriting
     virtual void onViewChanged();
     virtual void onEditCopy();

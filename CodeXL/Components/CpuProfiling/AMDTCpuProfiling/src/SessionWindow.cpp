@@ -103,7 +103,7 @@ CpuSessionWindow::~CpuSessionWindow()
     }
 
     delete m_pTabWidget;
-    m_profileReader.close();
+	m_pProfDataRd->CloseProfileData();
     m_pProfileInfo = nullptr;
 }
 
@@ -137,7 +137,7 @@ bool CpuSessionWindow::initialize()
 
 void CpuSessionWindow::OnBeforeDeletion()
 {
-    m_profileReader.close();
+	m_pProfDataRd->CloseProfileData();
 }
 
 bool CpuSessionWindow::display()
@@ -146,33 +146,41 @@ bool CpuSessionWindow::display()
     GT_IF_WITH_ASSERT((nullptr != m_pTabWidget) && (nullptr != m_pSessionTreeItemData))
     {
         // Open the database file
-        OpenDataReader();
+        retVal = OpenDataReader();
 
-        m_pDisplayFilter.reset(new DisplayFilter);
-        m_pDisplayFilter->SetProfDataReader(m_pProfDataRd);
-        retVal = m_pDisplayFilter->CreateConfigCounterMap();
+		if (retVal)
+		{
+			m_pDisplayFilter.reset(new DisplayFilter);
+			m_pDisplayFilter->SetProfDataReader(m_pProfDataRd);
+			retVal = m_pDisplayFilter->CreateConfigCounterMap();
 
-        if (retVal == true)
-        {
-            // init with default configuration
-            retVal = m_pDisplayFilter->InitToDefault();
-        }
+			if (retVal)
+			{
+				// init with default configuration
+				retVal = m_pDisplayFilter->InitToDefault();
 
-        m_sessionFile = m_pSessionTreeItemData->m_filePath;
+				if (retVal)
+				{
+					m_sessionFile = m_pSessionTreeItemData->m_filePath;
 
-        // Close the profile reader before opening it:
-        m_profileReader.close();
-
-        // If there is an available profile data file, open it
-        bool rc = m_profileReader.open(m_sessionFile.asString().asCharArray());
-
-        if (!rc)
-        {
+					if (!displayOverviewWindow(m_sessionFile))
+					{
+						if (m_pOverviewWindow != nullptr)
+						{
+							delete m_pOverviewWindow;
+							m_pOverviewWindow = nullptr;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
             gtString message;
             message.appendFormattedString(L"Failed to open profile file. File path: %ls", m_sessionFile.asString().asCharArray());
             OS_OUTPUT_DEBUG_LOG(message.asCharArray(), OS_DEBUG_LOG_ERROR);
         }
-
+#if 0
         m_pProfileInfo = m_profileReader.getProfileInfo();
         GT_IF_WITH_ASSERT(rc && (nullptr != m_pProfileInfo))
         {
@@ -197,6 +205,7 @@ bool CpuSessionWindow::display()
 
         // Prepare the list of processes that has CSS collection for this session:
         BuildCSSProcessesList();
+#endif
     }
 
     // Show / hide information panel:
@@ -468,9 +477,9 @@ bool CpuSessionWindow::displayOverviewWindow(const osFilePath& filePath)
 bool CpuSessionWindow::onViewModulesView(SYSTEM_DATA_TAB_CONTENT aggregateBy)
 {
     (void)(aggregateBy); // unused
-    bool ret = checkIfDataIsPresent();
+    //bool ret = checkIfDataIsPresent();
 
-    if (ret)
+    if (true)
     {
         if (m_pSessionModulesView == nullptr)
         {
@@ -498,7 +507,7 @@ bool CpuSessionWindow::onViewModulesView(SYSTEM_DATA_TAB_CONTENT aggregateBy)
         CPUProfileDataTable::m_CLUNoteShown = m_pSessionModulesView->m_CLUNoteShown;
     }
 
-    return ret;
+    return true;
 }
 
 void CpuSessionWindow::onViewSourceViewSlot(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> funcModInfo)
@@ -608,7 +617,8 @@ void CpuSessionWindow::onViewSourceView(gtVAddr Address, ProcessIdType pid, Thre
 
 void CpuSessionWindow::onViewCallGraphView(unsigned long pid)
 {
-    if (checkIfDataIsPresent())
+	if (true)
+		//if (checkIfDataIsPresent())
     {
         //This tab is not allocated until it's needed
         if (nullptr == m_pCallGraphTab)
@@ -650,7 +660,8 @@ void CpuSessionWindow::onViewFunctionTab(unsigned long pid)
 {
     (void)(pid); // unused
 
-    if (checkIfDataIsPresent())
+	//if (checkIfDataIsPresent())
+	if (true)
     {
         if (nullptr == m_pSessionFunctionView)
         {
@@ -876,7 +887,7 @@ void CpuSessionWindow::onBeforeSessionRename(SessionTreeNodeData* pAboutToRename
             }
 
             // Close the profile reader (in order to release the file handler, to allow rename of the file):
-            m_profileReader.close();
+			m_pProfDataRd->CloseProfileData();
         }
     }
 }
@@ -1115,92 +1126,9 @@ void CpuSessionWindow::onAboutToActivate()
 CpuProfileModule* CpuSessionWindow::getModuleDetail(const QString& modulePath, QWidget* pParent, ExecutableFile** ppExe)
 {
     CpuProfileModule* pModule = nullptr;
-
-    if (nullptr != ppExe)
-    {
-        *ppExe = nullptr;
-    }
-
-    NameModuleMap* pModuleMap = m_profileReader.getModuleMap();
-
-    if (nullptr != pModuleMap && !pModuleMap->empty())
-    {
-        gtString modulePathGt = acQStringToGTString(modulePath);
-
-        NameModuleMap::iterator mit = pModuleMap->find(modulePathGt);
-
-        if (pModuleMap->end() != mit)
-        {
-            if (mit->second.m_isImdRead)
-            {
-                pModule = &mit->second;
-
-                if (nullptr != ppExe)
-                {
-                    // Get an executable handler for this process:
-                    QString exePath;
-
-                    CPUSessionTreeItemData* pSessionData =
-                        qobject_cast<CPUSessionTreeItemData*>(m_pSessionTreeItemData->extendedItemData());
-
-                    if (AuxGetExecutablePath(exePath,
-                                             m_profileReader,
-                                             acGTStringToQString(pSessionData->SessionDir().directoryPath().asString()),
-                                             modulePath,
-                                             pParent,
-                                             pModule))
-                    {
-                        // Get an executable handler for this process:
-                        *ppExe = ExecutableFile::Open(exePath.toStdWString().c_str(), pModule->getBaseAddr());
-
-                        if (nullptr != *ppExe)
-                        {
-                            // Initialize executable symbol engine:
-                            AuxInitializeSymbolEngine(*ppExe);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                pModule = m_profileReader.getModuleDetail(modulePathGt);
-
-                if (nullptr != pModule)
-                {
-                    pModule->setSystemModule(AuxIsSystemModule(pModule->getPath()));
-
-                    CPUSessionTreeItemData* pSessionData =
-                        qobject_cast<CPUSessionTreeItemData*>(m_pSessionTreeItemData->extendedItemData());
-
-                    // Get an executable handler for this process:
-                    QString exePath;
-
-                    if (AuxGetExecutablePath(exePath,
-                                             m_profileReader,
-                                             acGTStringToQString(pSessionData->SessionDir().directoryPath().asString()),
-                                             modulePath,
-                                             pParent,
-                                             pModule))
-                    {
-                        pModule->m_symbolsLoaded = syncWithSymbolEngine(*pModule, exePath, ppExe);
-
-                        if (nullptr != ppExe && nullptr == *ppExe)
-                        {
-                            // Get an executable handler for this process:
-                            *ppExe = ExecutableFile::Open(exePath.toStdWString().c_str(), pModule->getBaseAddr());
-
-                            if (nullptr != *ppExe)
-                            {
-                                // Initialize executable symbol engine:
-                                AuxInitializeSymbolEngine(*ppExe);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
+	GT_UNREFERENCED_PARAMETER(modulePath);
+	GT_UNREFERENCED_PARAMETER(pParent);
+	GT_UNREFERENCED_PARAMETER(ppExe);
     return pModule;
 }
 
@@ -1361,34 +1289,6 @@ bool CpuSessionWindow::syncWithSymbolEngine(CpuProfileModule& module, const QStr
     }
 
     return ret;
-}
-
-void CpuSessionWindow::BuildCSSProcessesList()
-{
-    GT_IF_WITH_ASSERT(m_profileReader.getProcessMap() != nullptr)
-    {
-        PidProcessMap::iterator processIter = m_profileReader.getProcessMap()->begin();
-        PidProcessMap::iterator processIterEnd = m_profileReader.getProcessMap()->end();
-
-        for (; processIter != processIterEnd; ++processIter)
-        {
-            // Get the session id in the map:
-            ProcessIdType processID = processIter->first;
-            osFilePath cssFilePath = m_sessionFile;
-            gtString processIDStr;
-            processIDStr.appendFormattedString(L"%u", processID);
-            cssFilePath.setFileName(processIDStr);
-            cssFilePath.setFileExtension(L"css");
-
-            if (cssFilePath.exists())
-            {
-                // Keep this process file path:
-                QString filePath = acGTStringToQString(processIter->second.getPath());
-
-                m_CSSCollectedProcessesFilePathsMap[processID] = filePath;
-            }
-        }
-    }
 }
 
 bool CpuSessionWindow::OpenDataReader()

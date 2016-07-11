@@ -84,11 +84,7 @@ public:
 
     const osFilePath& displayedSessionFilePath() const {return m_sessionFile;}
 
-    /// Expose information:
-    CpuProfileReader& profileReader() { return m_profileReader; }
-
     bool displaySessionSource();
-    SessionDisplaySettings* sessionDisplaySettings() {return &m_sessionDisplayFilter;};
 
     /// Show / Hide information panel:
     void showInformationPanel(bool show);
@@ -142,14 +138,7 @@ public slots:
     /// Window activation:
     void onAboutToActivate();
 
-    /// Returns the map of file paths to process id of CSS collected processes:
-    const QMap<ProcessIdType, QString>& CollectedProcessesMap() const { return m_CSSCollectedProcessesFilePathsMap; }
-
 protected:
-
-    /// Builds a list of details for the processes that had CSS collection. This data is used in several inner views,
-    /// and we will need to re-use it:
-    void BuildCSSProcessesList();
 
     /// return true if data is present else provide error message and return false
     bool checkIfDataIsPresent();
@@ -164,11 +153,10 @@ private:
     const afApplicationTreeItemData* m_pSessionTreeItemData;
 
     /// Project/Profile related data structures
-    CpuProfileReader     m_profileReader;
     CpuProfileInfo*      m_pProfileInfo;
     osFilePath          m_sessionFile;
 
-    SessionDisplaySettings m_sessionDisplayFilter;
+    //SessionDisplaySettings m_sessionDisplayFilter;
 
     /// Data tabs
     SessionOverviewWindow*          m_pOverviewWindow       = nullptr;
@@ -189,10 +177,6 @@ private:
 
     /// Ignore first activation signal:
     bool m_firstActivation;
-
-    /// Contain the list of file paths for the processes with CSS collection:
-    QMap<ProcessIdType, QString> m_CSSCollectedProcessesFilePathsMap;
-
 };
 
 #endif //_CACpuSessionWindow_H

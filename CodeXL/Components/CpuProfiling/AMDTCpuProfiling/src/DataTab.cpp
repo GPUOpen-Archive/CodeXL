@@ -56,7 +56,7 @@
 #include <bitset>
 
 DataTab::DataTab(QWidget* pParent, CpuSessionWindow* pParentSessionWindow, const QString& sessionDir)
-    : QMainWindow(pParent), m_pProfileReader(nullptr), m_pDisplayedSessionItemData(nullptr), m_exportString(""), m_pList(nullptr),
+    : QMainWindow(pParent), m_pDisplayedSessionItemData(nullptr), m_exportString(""), m_pList(nullptr),
       m_indexOffset(0), m_pMenu(nullptr), m_pColumnMenu(nullptr), m_selectText(""),
       m_precision(0), m_sessionDir(""), m_shownTotal(0), m_pHintLabel(nullptr), m_pHintFrame(nullptr), m_pDisplaySettings(nullptr),
       m_pDisplaySettingsAction(nullptr), m_pTopToolbar(nullptr), m_pParentSessionWindow(pParentSessionWindow),
@@ -66,7 +66,6 @@ DataTab::DataTab(QWidget* pParent, CpuSessionWindow* pParentSessionWindow, const
     {
         m_pProfDataRdr = pParentSessionWindow->profDbReader();
 #if 0
-        m_pProfileReader = &pParentSessionWindow->profileReader();
         m_pProfileInfo = m_pProfileReader->getProfileInfo();
 #endif
         m_pDisplayFilter = pParentSessionWindow->GetDisplayFilter();
@@ -737,16 +736,6 @@ void DataTab::UpdateTableDisplaySettings()
     }
 }
 
-SessionDisplaySettings* DataTab::CurrentSessionDisplaySettings()
-{
-    SessionDisplaySettings* pRetVal = nullptr;
-    GT_IF_WITH_ASSERT(m_pParentSessionWindow != nullptr)
-    {
-        pRetVal = m_pParentSessionWindow->sessionDisplaySettings();
-    }
-    return pRetVal;
-}
-
 bool DataTab::ProcessNameToPID(const QString& processName, ProcessIdType& pid)
 {
     bool retVal = false;
@@ -768,35 +757,6 @@ bool DataTab::ProcessNameToPID(const QString& processName, ProcessIdType& pid)
 
     return retVal;
 
-}
-
-bool DataTab::PIDToProcessName(ProcessIdType pid, QString& processName)
-{
-    bool retVal = false;
-
-    // Sanity check:
-    GT_IF_WITH_ASSERT(m_pProfileReader != nullptr)
-    {
-        PidProcessMap::iterator iter = m_pProfileReader->getProcessMap()->find(pid);
-
-        if (iter != m_pProfileReader->getProcessMap()->end())
-        {
-            retVal = true;
-            QString processPath = acGTStringToQString(iter->second.getPath());
-
-            QFileInfo fi(processPath);
-
-            if (processPath.isEmpty())
-            {
-                processName = QString("%1").arg(pid);
-            }
-            else
-            {
-                processName = QString("%1(%2)").arg(fi.fileName()).arg(pid);
-            }
-        }
-    }
-    return retVal;
 }
 
 void DataTab::UpdateNoteWindowContent(gtVector<float>& cluDataVector)
