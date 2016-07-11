@@ -75,6 +75,9 @@
     <ClCompile Include="src\ExecutableAnalyzer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\CpuProfileDataMigrator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\..\..\Common\Src\VersionInfo\VersionResource.rc">
@@ -141,6 +144,9 @@
     </ClInclude>
     <ClInclude Include="src\ExecutableAnalyzer.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\CpuProfileDataMigrator.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

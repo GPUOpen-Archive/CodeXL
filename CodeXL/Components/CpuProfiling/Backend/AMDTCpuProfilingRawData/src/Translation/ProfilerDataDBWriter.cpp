@@ -180,7 +180,12 @@ bool ProfilerDataDBWriter::Initialize(const gtString& path)
 
         gtString dbExtn;
         m_pCpuProfDbAdapter->GetDbFileExtension(dbExtn);
-        dbPath.append(dbExtn);
+
+        if (!dbPath.endsWith(dbExtn))
+        {
+            dbPath.append(dbExtn);
+        }
+
         rc = m_pCpuProfDbAdapter->CreateDb(dbPath, AMDT_PROFILE_MODE_AGGREGATION);
     }
 

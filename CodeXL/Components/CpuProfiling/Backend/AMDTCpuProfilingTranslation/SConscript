@@ -42,6 +42,7 @@ sources = \
     "src/JitTaskInfo.cpp",
     "src/Linux/CaPerfTranslator.cpp",
     "src/Linux/CaPerfTranslatorIbs.cpp",
+    "src/CpuProfileDataMigrator.cpp",
 ]
 
 # Creating object files	

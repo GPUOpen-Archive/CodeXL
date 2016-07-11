@@ -173,8 +173,9 @@ public:
 
     HRESULT Initialize();
     HRESULT Translate();
+    HRESULT Migrate();
     HRESULT Report();
-    HRESULT ReportFromDb();
+    //HRESULT ReportFromDb();
 
     // Thread profiler
     HRESULT ReportTP();

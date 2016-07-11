@@ -108,6 +108,7 @@
 #ifndef _CPUPROFILEDATATRANSLATION_H_
 #define _CPUPROFILEDATATRANSLATION_H_
 
+#include <AMDTOSWrappers/Include/osFilePath.h>
 #include "CpuProfilingTranslationDLLBuild.h"
 #include "CPA_TIME.h"
 
@@ -1051,6 +1052,9 @@ CP_TRANS_API HRESULT fnGetNextRawRecord(
     /*in*/ ReaderHandle* pReaderHandle,
     /*out*/ RawDataType* pData,
     /*out*/ float* pPercentComplete);
+
+CP_TRANS_API HRESULT fnMigrateEBPToDB(
+    /*in*/ const osFilePath& ebpFilePath);
 
 //TODO:
 //  fnGetCssData();
