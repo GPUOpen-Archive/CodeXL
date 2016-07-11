@@ -569,9 +569,9 @@ bool HelpIsPMCCounterAvailable(void)
 
     dwEax = dwEbx = dwEcx = dwEdx = 0;
 
-    ReadCPUID(CPUID_FnAdvancePowerManagementInformation, 0, &dwEax, &dwEbx, &dwEcx, &dwEdx);
+    ReadCPUID(CPUID_FnAmdExtendedFeatures, 0, &dwEax, &dwEbx, &dwEcx, &dwEdx);
 
-    return (dwEdx & CPUID_FnAdvancePowerManagementInformation_EDX_EffFreqRO) != 0;
+    return (dwEdx & CPUID_FnAmdExtendedFeatures_ECX_PerfCtrExtCore) != 0;
 
 }
 
