@@ -2627,9 +2627,14 @@ public:
 
                     if (pCode != nullptr)
                     {
-                        bool isLongMode = jncReader.Is64Bit();
-                        int version = jncReader.GetJNCVersion();
+                        int version = 0;
+                        bool isLongMode = true;
                         bool isNativeMethod = (srcFilePath.compareNoCase(L"Unknown Source File") == 0) ? true : false;
+
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+                        isLongMode = jncReader.Is64Bit();
+                        version = jncReader.GetJNCVersion();
+#endif
 
                         OffsetLinenumMap funcOffsetLinenumMap;
 
@@ -2720,7 +2725,7 @@ public:
     {
         bool ret = false;
         BYTE errorCode;
-        UIInstInfoType instInfo = { 0 };
+        UIInstInfoType instInfo;
         char dasmArray[256] = { 0 };
         unsigned int strlength = 255;
 
@@ -2731,6 +2736,8 @@ public:
 
             // if the code is 64-bits
             dasm.SetLongMode(isLongMode);
+
+            memset(&instInfo, 0, sizeof(instInfo));
 
             // Get disassembly for the current pCode from the disassembler
             int hr = dasm.UIDisassemble((BYTE*)pCurrentCode, (unsigned int*)&strlength, (BYTE*)dasmArray, &instInfo, &errorCode);
