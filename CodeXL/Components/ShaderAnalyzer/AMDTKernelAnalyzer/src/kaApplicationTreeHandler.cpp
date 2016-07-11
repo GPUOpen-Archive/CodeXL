@@ -4136,7 +4136,7 @@ void kaApplicationTreeHandler::ExecuteDropForDraggedTreeItem(QWidget* receiver, 
 }
 
 // ---------------------------------------------------------------------------
-bool kaApplicationTreeHandler::IsDragDropSupported(QDropEvent* pEvent, QString& dragDropFile, bool& shouldAccpet)
+bool kaApplicationTreeHandler::IsDragDropSupported(QWidget* receiver, QDropEvent* pEvent, QString& dragDropFile, bool& shouldAccpet)
 {
     GT_UNREFERENCED_PARAMETER(pEvent);
     GT_UNREFERENCED_PARAMETER(dragDropFile);
@@ -4192,6 +4192,32 @@ bool kaApplicationTreeHandler::IsDragDropSupported(QDropEvent* pEvent, QString& 
                         {
                             retVal = retVal && true;
                             shouldAccpet = retVal;
+                        }
+                    }
+                }
+            }
+        }
+        //check if non-rendering program
+        if (retVal && receiver != nullptr)
+        {
+            QPoint treePos = ConvertToTreePosition(pEvent, receiver);
+            QTreeWidgetItem* pDropDestinationItem = m_pApplicationTree->treeControl()->itemAt(treePos);
+            if (pDropDestinationItem != nullptr)
+            {
+                afApplicationTreeItemData* pDropDestinationItemData = m_pApplicationTree->getTreeItemData(pDropDestinationItem);
+
+                if (pDropDestinationItemData != nullptr)
+                {
+                    afTreeItemType destinationItemType = pDropDestinationItemData->m_itemType;
+
+                    if (destinationItemType == AF_TREE_ITEM_KA_PROGRAM)
+                    {
+                        kaTreeDataExtension* pProgramKAItemData = qobject_cast<kaTreeDataExtension*>(pDropDestinationItemData->extendedItemData());
+
+                        if (pProgramKAItemData != nullptr)
+                        {
+                             kaProgram* pProgram = pProgramKAItemData->GetProgram();
+                             retVal = pProgram != nullptr && KA_PROJECT_DATA_MGR_INSTANCE.IsRender(pProgram) == false;
                         }
                     }
                 }
