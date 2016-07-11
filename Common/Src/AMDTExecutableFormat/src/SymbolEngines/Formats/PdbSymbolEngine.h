@@ -13,6 +13,7 @@
 #include <AMDTOSWrappers/Include/osReadWriteLock.h>
 #include <AMDTOSWrappers/Include/osCriticalSection.h>
 #include <AMDTBaseTools/Include/gtHashMap.h>
+#include <AMDTBaseTools/Include/gtHashSet.h>
 #include <AMDTBaseTools/Include/gtList.h>
 #include <SymbolEngine.h>
 #include <dia2.h>
@@ -228,7 +229,7 @@ private:
     typedef gtHashMap<gtRVAddr, gtVector<gtRVAddr>> NestedFuncMap;
     mutable NestedFuncMap m_nestedFuncMap;
 
-    mutable gtVector<IDiaLineNumber*> m_pendingLineObjectsToRelease;
+    mutable gtHashSet<IDiaLineNumber*> m_pendingLineObjectsToRelease;
 
     /// A flag to indicate if PdbSymbolEngine called CoInitialize
     bool m_needToCallCoUninitialize;
