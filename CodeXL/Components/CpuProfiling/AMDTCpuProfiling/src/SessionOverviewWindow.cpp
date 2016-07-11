@@ -527,8 +527,7 @@ bool SessionOverviewWindow::displaySessionExecutionDetails(afHTMLContent& conten
         CPUSessionTreeItemData* pSessionData = qobject_cast<CPUSessionTreeItemData*>(m_pDisplayedSessionItemData->extendedItemData());
         GT_IF_WITH_ASSERT((pSessionData != nullptr) &&
                           (m_pPropertiewView != nullptr) &&
-                          (m_pProfDataRdr.get() != nullptr) &&
-                          (m_pProfileInfo != nullptr))
+                          (m_pProfDataRdr.get() != nullptr))
         {
             AMDTProfileSessionInfo sessionInfo;
             m_pProfDataRdr->GetProfileSessionInfo(sessionInfo);
@@ -633,7 +632,7 @@ bool SessionOverviewWindow::displaySessionProfileDetails(afHTMLContent& content)
     GT_IF_WITH_ASSERT((m_pDisplayedSessionItemData != nullptr) && (m_pFunctionsTable != nullptr))
     {
         CPUSessionTreeItemData* pSessionData = qobject_cast<CPUSessionTreeItemData*>(m_pDisplayedSessionItemData->extendedItemData());
-        GT_IF_WITH_ASSERT((pSessionData != nullptr) && (m_pPropertiewView != nullptr) && (m_pProfDataRdr != nullptr) && (m_pProfileInfo != nullptr))
+        GT_IF_WITH_ASSERT((pSessionData != nullptr) && (m_pPropertiewView != nullptr) && (m_pProfDataRdr != nullptr))
         {
             AMDTProfileSessionInfo sessionInfo;
             m_pProfDataRdr->GetProfileSessionInfo(sessionInfo);
