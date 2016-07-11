@@ -777,7 +777,6 @@ AMDTResult PowerProfileTranslate::TranslateRawData()
                     PwrCoreConfig* pCoreCfg = nullptr;
                     // Read basic information
                     sampleId = *(AMDTUInt16*)(pRaw + offset);
-                    PwrTrace("sample id %d",sampleId);
                     offset += sizeof(AMDTUInt16);
                     recId = *(AMDTUInt64*)(pRaw + offset);
                     offset += sizeof(AMDTUInt64);
