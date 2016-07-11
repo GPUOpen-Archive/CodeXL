@@ -54,7 +54,8 @@ Config::Config() :
     m_DXFlags(0),
     m_DXLocation(),
     m_FXC(),
-    m_DumpMSIntermediate()
+    m_DumpMSIntermediate(),
+    m_EnableShaderIntrinsics(false)
 {
 }
 
@@ -77,6 +78,7 @@ Config::dump(ostream& out) const
     out << "m_bVerbose:              " << m_bVerbose << endl;
     out << "m_FXC:                  " << m_FXC << endl;
     out << "m_DumpMSIntermediate:   " << m_DumpMSIntermediate << endl;
+    out << "m_EnableShaderIntrinsics:   " << m_EnableShaderIntrinsics << endl;
 
     out << "m_ASICs:               ";
 

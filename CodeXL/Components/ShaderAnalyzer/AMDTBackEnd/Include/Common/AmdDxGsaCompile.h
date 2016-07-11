@@ -40,6 +40,7 @@ typedef enum _AmdDxGsaCompileOptionEnum
     AmdDxGsaIfConversionHeuristic,
     AmdDxGsaIfConversionHeuristicOgl,
     AmdDxGsaIfConversionAlways,
+    AmdDxGsaEnableShaderIntrinsics,
     AmdDxGsaCompileOptionLast
 } AmdDxGsaCompileOptionEnum;
 
@@ -61,13 +62,13 @@ typedef struct _AmdDxGsaCompileOption
 */
 typedef struct _AmdDxGsaCompileStats
 {
-    UINT numSgprsUsed;
-    UINT availableSgprs;
-    UINT numVgprsUsed;
-    UINT availableVgprs;
-    UINT usedLdsBytes;
-    UINT availableLdsBytes;
-    UINT usedScratchBytes;
+    UINT numSgprsUsed;       ///< Number of SGPRs used by the shader
+    UINT availableSgprs;     ///< Number of SGPRs available
+    UINT numVgprsUsed;       ///< Number of VGPRs used by the shader
+    UINT availableVgprs;     ///< Number of VGPRs available
+    UINT usedLdsBytes;       ///< Bytes of LDS used by a thread group
+    UINT availableLdsBytes;  ///< Bytes of LDS available to a thread group
+    UINT usedScratchBytes;   ///< Bytes of scratch space used by the shader
     UINT numAluInst;         ///< Number of ALU instructions in the shader
     UINT numControlFlowInst; ///< Number of control flow instructions in the shader
     UINT numTfetchInst;      ///< Number of HW TFETCHinstructions / Tx Units used
@@ -115,7 +116,12 @@ typedef struct _AmdDxGsaCompileShaderOutput
     /// Must be set to sizeof(AmdDxGsaCompileShaderOutput).
     SIZE_T size;
 
-    /// Output ELF object. Contains .amdil (IL), .text (ISA), and .stats (AmdDxGsaCompileStats)
+    /// Output ELF object. Contains the following sections:
+    // .amdil             - IL binary
+    // .amdil_disassembly - IL text string
+    // .text              - ISA binary
+    // .disassembly       - ISA text string
+    // .stats             - AmdDxGsaCompileStats structure
     VOID*  pShaderBinary;
 
     /// Size of the ELF object in bytes.
@@ -124,11 +130,11 @@ typedef struct _AmdDxGsaCompileShaderOutput
 
 HRESULT __cdecl AmdDxGsaCompileShader(const AmdDxGsaCompileShaderInput* pIn,
                                       AmdDxGsaCompileShaderOutput*      pOut);
-typedef HRESULT(__cdecl* PfnAmdDxGsaCompileShader)(const AmdDxGsaCompileShaderInput*,
-                                                   AmdDxGsaCompileShaderOutput*);
+typedef HRESULT (__cdecl *PfnAmdDxGsaCompileShader)(const AmdDxGsaCompileShaderInput*,
+                                                    AmdDxGsaCompileShaderOutput*);
 
 VOID __cdecl AmdDxGsaFreeCompiledShader(VOID* pShaderBinary);
-typedef VOID (__cdecl* PfnAmdDxGsaFreeCompiledShader)(VOID*);
+typedef VOID (__cdecl *PfnAmdDxGsaFreeCompiledShader)(VOID*);
 
 #if defined(__cplusplus)
 }
