@@ -89,25 +89,27 @@ ProfileSessionDataItem* gpTraceSummaryTable::GetRelatedItem(int rowIndex, int co
 
 
 
-void gpTraceSummaryTable::AddSummaryRow(int rowIndex, APISummaryInfo* pSummaryInfo)
+void gpTraceSummaryTable::AddSummaryRow( APISummaryInfo* pSummaryInfo)
 {
     APISummaryTraceInfo* pInfo = dynamic_cast<APISummaryTraceInfo*>(pSummaryInfo);
-    GT_IF_WITH_ASSERT(pInfo != nullptr && rowIndex == rowCount())
+    GT_IF_WITH_ASSERT(pInfo != nullptr)
     {
-
+        int rowIndex = rowCount();
         QStringList rowStrings;
         pInfo->TableItemsAsString(rowStrings);
 
-        insertRow(rowIndex);
-
-        for (int i = 0; i < TraceSummaryColumnIndex::COLUMN_COUNT; i++)
+        if (rowStrings.size() > 0)
         {
-            QTableWidgetItem* pItem = nullptr;
+            insertRow(rowIndex);
 
-            bool shouldSetValue = true;
-
-            switch (i)
+            for (int i = 0; i < TraceSummaryColumnIndex::COLUMN_COUNT; i++)
             {
+                QTableWidgetItem* pItem = nullptr;
+
+                bool shouldSetValue = true;
+
+                switch (i)
+                {
                 case COLUMN_CALL_NAME:
                 {
                     pItem = allocateNewWidgetItem(rowStrings[i]);
@@ -150,18 +152,19 @@ void gpTraceSummaryTable::AddSummaryRow(int rowIndex, APISummaryInfo* pSummaryIn
                     ((FormattedTimeItem*)pItem)->SetAsLink(true);
                 }
                 break;
-            }
+                }
 
-            if (shouldSetValue)
-            {
-                setItem(rowIndex, i, pItem);
-                QVariant dataVariant;
-                dataVariant.setValue(rowStrings[i].toDouble());
-                pItem->setData(Qt::DisplayRole, dataVariant);
-                pItem->setToolTip(pItem->text());
-            }
+                if (shouldSetValue)
+                {
+                    setItem(rowIndex, i, pItem);
+                    QVariant dataVariant;
+                    dataVariant.setValue(rowStrings[i].toDouble());
+                    pItem->setData(Qt::DisplayRole, dataVariant);
+                    pItem->setToolTip(pItem->text());
+                }
 
-            pItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+                pItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+            }
         }
     }
 }
@@ -171,16 +174,13 @@ void gpTraceSummaryTable::FillTable()
 {
     clearList();
     QMapIterator<CallIndexId, APISummaryTraceInfo> it(GetApiCallInfoSummaryMap());
-    int rowIndex = 0;
 
     setSortingEnabled(false);
 
     while (it.hasNext())
     {
         it.next();
-        AddSummaryRow(rowIndex, (APISummaryInfo*)&it.value());
-
-        rowIndex++;
+        AddSummaryRow((APISummaryInfo*)&it.value());
     }
 
     setSortingEnabled(true);
@@ -257,9 +257,11 @@ void gpTraceSummaryTable::CollateAllItemsIntoSummaryMap()
             }
         }
 
-        m_apiCallInfoSummaryMap.insert(info.m_callIndex, info);
-        
-        InsertSummaryInfoToMap(info);
+        if (info.m_numCalls > 0)
+        {
+            m_apiCallInfoSummaryMap.insert(info.m_callIndex, info);
+            InsertSummaryInfoToMap(info);
+        }
     }
 }
 
@@ -405,15 +407,16 @@ bool gpCPUTraceSummaryTable::InitItems()
 
 void gpCPUTraceSummaryTable::AddSessionItemToSummaryInfo(APISummaryTraceInfo& info, ProfileSessionDataItem* pItem, unsigned int apiId)
 {
+    GT_UNREFERENCED_PARAMETER(apiId);
     GT_IF_WITH_ASSERT(pItem != nullptr && m_pTraceView != nullptr)
     {
         APICallId callId;
-        callId.m_callIndex = apiId;
         callId.m_tid = pItem->ThreadID();
+        bool isValid = true;
+        // get CPU call index from table
+        callId.m_callIndex = pItem->GetColumnData(ProfileSessionDataItem::SESSION_ITEM_INDEX_COLUMN).toInt(&isValid);
 
         bool showItem = true;
-
-
         acAPITimelineItem* pTimelineItem = m_pTraceView->GetAPITimelineItem(callId);
 
         if (pTimelineItem != nullptr)

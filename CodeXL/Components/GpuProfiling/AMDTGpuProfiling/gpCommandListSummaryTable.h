@@ -70,7 +70,7 @@ protected:
     void FillTable();
 
     /// Adds a row to the table
-    virtual void AddSummaryRow(int rowIndex, APISummaryInfo* pInfo);
+    virtual void AddSummaryRow(APISummaryInfo* pInfo);
 
     virtual bool InitItems();
 

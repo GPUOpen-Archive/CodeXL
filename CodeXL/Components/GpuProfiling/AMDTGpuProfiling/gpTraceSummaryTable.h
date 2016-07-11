@@ -110,7 +110,7 @@ protected:
     virtual void FillTable();
 
     /// Adds a row to the table
-    void AddSummaryRow(int rowIndex, APISummaryInfo* pInfo);
+    void AddSummaryRow(APISummaryInfo* pInfo);
 
     /// Map containing UI information for each of the API calls. Each key may have multiple items
     QMap<CallIndexId, ProfileSessionDataItem*> m_allCallItemsMultiMap;
@@ -128,6 +128,7 @@ protected:
     /// Fill APISummaryInfo with relevant data fromProfileSessionDataItem
     virtual void AddSessionItemToSummaryInfo(APISummaryTraceInfo& info, ProfileSessionDataItem* pItem, unsigned int apiId);
     virtual bool InitItems();
+    int GetVisibleAPICount(const osThreadId& threadID)const;
 };
 
 class gpGPUTraceSummaryTable : public gpTraceSummaryTable

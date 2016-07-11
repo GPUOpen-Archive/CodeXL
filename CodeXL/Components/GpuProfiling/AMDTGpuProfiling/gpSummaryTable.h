@@ -162,7 +162,7 @@ protected:
     virtual void FillTable()=0;
 
     /// Adds a row to the table
-    virtual void AddSummaryRow(int rowIndex, APISummaryInfo* pInfo) = 0;
+    virtual void AddSummaryRow(APISummaryInfo* pInfo) = 0;
 
     /// Rebuilds the summary info map
     void RebuildSummaryMap(bool useScope, quint64 startTime, quint64 endTime);
