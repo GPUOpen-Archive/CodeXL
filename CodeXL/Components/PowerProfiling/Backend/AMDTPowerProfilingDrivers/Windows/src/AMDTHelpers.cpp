@@ -470,7 +470,7 @@ bool HelpIsPMCCounterAvailable()
     __cpuid(aCPUInfo, CPUID_FnAmdExtendedFeatures);
 
     // Effective Frequency is supported
-    result = (aCPUInfo[EDX_OFFSET] & CPUID_FnAmdExtendedFeatures_ECX_PerfCtrExtCore) != 0;
+    result = (aCPUInfo[ECX_OFFSET] & CPUID_FnAmdExtendedFeatures_ECX_PerfCtrExtCore) != 0;
     return result;
 
 }
