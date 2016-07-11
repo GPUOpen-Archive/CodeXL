@@ -509,7 +509,7 @@ void CpuSessionWindow::onViewSourceViewSlot(std::tuple<AMDTFunctionId, const gtS
 	QWidget* pOldTab = FindTab(caption);
 	SessionSourceCodeView* pSourceCodeView = (SessionSourceCodeView*)pOldTab;
 
-	bool createdNewView = false;
+	//bool createdNewView = false;
 
     if (nullptr == pSourceCodeView)
     {
@@ -519,7 +519,7 @@ void CpuSessionWindow::onViewSourceViewSlot(std::tuple<AMDTFunctionId, const gtS
         QString sessionFileStr = acGTStringToQString(sessionDir.directoryPath().asString());
         pSourceCodeView = new SessionSourceCodeView(m_pTabWidget, this, sessionFileStr);
 
-        createdNewView = true;
+        //createdNewView = true;
     }
 
     if (nullptr != pSourceCodeView)
