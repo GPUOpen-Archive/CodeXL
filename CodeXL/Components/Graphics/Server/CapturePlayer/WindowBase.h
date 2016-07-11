@@ -10,6 +10,10 @@
 
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
 
+// if USE_XCB is defined, use XCB window. Otherwise use X11
+// Comment out this line to use X11
+#define USE_XCB
+
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     #include <Windows.h>
     typedef HWND NativeWindowType;
@@ -18,7 +22,7 @@
     #include <xcb/xcb.h>
     #include <X11/Xutil.h>
     #include <vulkan/vulkan.h>
-    #if 1  // XCB
+    #ifdef USE_XCB  // XCB
         typedef xcb_window_t NativeWindowType;
         typedef xcb_connection_t* NativeInstanceType;
     #else  // X11

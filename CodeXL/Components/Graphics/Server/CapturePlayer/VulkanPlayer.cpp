@@ -91,6 +91,8 @@ static VulkanSurfaceBase* s_vulkanSurface = nullptr;
 
 #ifdef _LINUX
 
+#ifdef USE_XCB
+
 // Linux-only XCB Surface helper class
 class VulkanSurfaceXCB : public VulkanSurfaceBase
 {
@@ -132,7 +134,8 @@ public:
     }
 };
 
-#if 0
+#else
+
 // Linux-only X11 Surface helper class
 class VulkanSurfaceX11 : public VulkanSurfaceBase
 {
@@ -173,7 +176,7 @@ public:
         return vkCreateXlibSurfaceKHR(s_vkState.inst, &createInfo, nullptr, &s_vkState.surface);
     }
 };
-#endif
+#endif // USE_XCB
 
 #endif // LINUX
 
