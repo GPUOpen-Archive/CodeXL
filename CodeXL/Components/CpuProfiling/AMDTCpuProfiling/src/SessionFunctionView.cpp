@@ -746,22 +746,27 @@ void SessionFunctionView::onTableItemActivated(QTableWidgetItem* pActivateItem)
                 AMDTUInt32 funcId = funcIdStr.toInt();
                 funcId = funcId;
 
-                QString modPath = m_pFunctionTable->getModuleName(pActivateItem->row());
-                AMDTUInt32 moduleId = AMDT_PROFILE_ALL_MODULES;
-                AMDTUInt32  processId = AMDT_PROFILE_ALL_PROCESSES;
+                //QString modPath = m_pFunctionTable->getModuleName(pActivateItem->row());
+                //AMDTUInt32 moduleId = AMDT_PROFILE_ALL_MODULES;
+                //AMDTUInt32  processId = AMDT_PROFILE_ALL_PROCESSES;
 
                 //get the module id
-                AMDTProfileModuleInfoVec moduleInfo;
-                m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, moduleInfo);
+                AMDTProfileModuleInfo modInfo;
+                bool ret = m_pProfDataRdr->GetModuleInfoForFunction(funcId, modInfo);
+                AMDTModuleId moduleId = (ret) ? modInfo.m_moduleId : AMDT_PROFILE_ALL_MODULES;
+                AMDTUInt32  processId = AMDT_PROFILE_ALL_PROCESSES;
 
-                for (const auto& mod : moduleInfo)
-                {
-                    if (mod.m_path == acQStringToGTString(modPath))
-                    {
-                        moduleId = mod.m_moduleId;
-                        break;
-                    }
-                }
+                //AMDTProfileModuleInfoVec moduleInfo;
+                //m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, moduleInfo);
+
+                //for (const auto& mod : moduleInfo)
+                //{
+                //    if (mod.m_path == acQStringToGTString(modPath))
+                //    {
+                //        moduleId = mod.m_moduleId;
+                //        break;
+                //    }
+                //}
 
                 gtString processIdStr = acQStringToGTString(pPIDComboBox->currentText());
 
@@ -770,7 +775,7 @@ void SessionFunctionView::onTableItemActivated(QTableWidgetItem* pActivateItem)
                     processId = pPIDComboBox->currentText().toInt();
                 }
 
-                auto funcModInfo = std::make_tuple(funcId, acQStringToGTString(modPath), moduleId, processId);
+                auto funcModInfo = std::make_tuple(funcId, modInfo.m_path, moduleId, processId);
                 // Emit a function activated signal (will open a source code view):
                 emit opensourceCodeViewSig(funcModInfo);
             }

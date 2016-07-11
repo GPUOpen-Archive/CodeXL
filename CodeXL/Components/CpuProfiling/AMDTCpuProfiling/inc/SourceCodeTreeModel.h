@@ -115,10 +115,10 @@ public:
 	void SetHotSpotSamples(AMDTUInt32 counterIdx);
 
     /// Sets the tree items data as percent / values:
-    void SetDataPercentValues();
+    //void SetDataPercentValues();
 
     /// Sets the value for the requested source view item:
-    void SetSingleItemDataValue(SourceViewTreeItem* pItem, int column, bool appendPercent);
+    //void SetSingleItemDataValue(SourceViewTreeItem* pItem, int column, bool appendPercent);
 	void SetPercentFormat(double  val, bool appendPercent, QVariant& data);
 
 
@@ -144,9 +144,9 @@ public:
 private:
 
     // Symbol engine stuff
-    bool InitializeSymbolEngine();
+    //bool InitializeSymbolEngine();
 
-    bool SourceLineInstancesToOffsetLinenumMap(SrcLineInstanceMap* pInstances);
+    //bool SourceLineInstancesToOffsetLinenumMap(SrcLineInstanceMap* pInstances);
     bool SetSourceLines(const QString& filepath, unsigned int startLine, unsigned int stopLine);
 
     bool IsSourceLineMapped(const SourceLineKey& sourceLineKey);
@@ -155,12 +155,15 @@ private:
     void CalculateTotalModuleCountVector(CpuProfileReader* pProfileReader);
 
     // Symbol list utilities:
-	bool SetupSymbolInfoListUnmanaged(AMDTUInt32 modId, AMDTUInt32 pId);
+	//bool SetupSymbolInfoListUnmanaged(AMDTUInt32 modId, AMDTUInt32 pId);
 	//bool SetupSymbolInfoListUnmanaged();
 	//void SetupSymbolInfoListManaged();
 	//void SetupSymbolInfoListManaged(AMDTUInt32 modId, AMDTUInt32 pId);
-    bool SetupSourceInfoForUnManaged();
-    bool SetupSourceInfoForJava(gtVAddr address);
+    //bool SetupSourceInfoForUnManaged();
+    //bool SetupSourceInfoForJava(gtVAddr address);
+    
+    bool SetupSymbolInfoList(AMDTUInt32 modId, AMDTUInt32 pId);
+    bool SetupSourceInfo();
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     bool SetupSymbolInfoNgen(QString pjsFile);
@@ -173,7 +176,7 @@ private:
     bool SetupSourceInfoForOcl(gtVAddr address);
 #endif
 
-	void CreateSymbolInfoList(AMDTUInt32 modId, AMDTUInt32 pId);
+	//void CreateSymbolInfoList(AMDTUInt32 modId, AMDTUInt32 pId);
 	//void CreateSymbolInfoList();
 
     SourceViewTreeItem* getItem(const QModelIndex& index) const;

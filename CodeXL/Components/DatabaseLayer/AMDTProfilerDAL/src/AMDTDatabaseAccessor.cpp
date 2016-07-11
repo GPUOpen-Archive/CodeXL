@@ -4425,7 +4425,7 @@ public:
         return ret;
     }
 
-    bool GetModuleBaseAddressByModuleId(AMDTModuleId modId, AMDTProcessId procId, AMDTUInt64& baseAddr)
+    bool GetModuleBaseAddressByModuleId__(AMDTModuleId modId, AMDTProcessId procId, AMDTUInt64& baseAddr, bool isInstanceId)
     {
         bool ret = false;
 
@@ -4439,7 +4439,14 @@ public:
             query << " processId = ? AND ";
         }
 
-        query << " moduleID = ? LIMIT 1; ";
+        if (!isInstanceId)
+        {
+            query << " moduleID = ? LIMIT 1; ";
+        }
+        else
+        {
+            query << " id = ? LIMIT 1; ";
+        }
 
         sqlite3_stmt* pQueryStmt = nullptr;
         int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
@@ -4465,6 +4472,17 @@ public:
         sqlite3_finalize(pQueryStmt);
         ret = (SQLITE_DONE == rc || SQLITE_ROW == rc) ? true : false;
         return ret;
+    }
+
+
+    bool GetModuleBaseAddressByModuleId(AMDTModuleId modId, AMDTProcessId procId, AMDTUInt64& baseAddr)
+    {
+        return GetModuleBaseAddressByModuleId__(modId, procId, baseAddr, false);
+    }
+
+    bool GetModuleBaseAddressByModuleInstanceId(AMDTModuleId modInstId, AMDTProcessId procId, AMDTUInt64& baseAddr)
+    {
+        return GetModuleBaseAddressByModuleId__(modInstId, procId, baseAddr, true);
     }
 
     bool GetModuleBaseAddress(AMDTFunctionId funcId, AMDTProcessId procId, AMDTUInt64& baseAddr)
@@ -5013,6 +5031,47 @@ public:
         return ret;
     }
 
+    bool GetJITFunctionInfo(AMDTFunctionId funcId, gtUInt64& loadAddr, gtString& srcFilePath, gtString& jncFilePath)
+    {
+        bool ret = false;
+        std::stringstream query;
+
+        query << "SELECT JITInstance.loadAddress, " \
+                        "JITCodeBlob.srcFilePath, " \
+                        "JITCodeBlob.jncFilePath "  \
+                  "FROM JITInstance "               \
+                  "INNER JOIN JITCodeBlob ON JITInstance.jitId = JITCodeBlob.id "   \
+                  "WHERE JITInstance.functionId = ? ;";
+
+        sqlite3_stmt* pQueryStmt = nullptr;
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+
+        if (rc == SQLITE_OK)
+        {
+            sqlite3_bind_int(pQueryStmt, 1, funcId);
+
+            // Execute the query.
+            if ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
+            {
+                loadAddr = sqlite3_column_int64(pQueryStmt, 0);
+                const unsigned char* pSrcFilePath = sqlite3_column_text(pQueryStmt, 1);
+                const unsigned char* pJncFilePath = sqlite3_column_text(pQueryStmt, 2);
+
+                if (nullptr != pSrcFilePath && nullptr != pJncFilePath)
+                {
+                    srcFilePath.fromUtf8String((const char*)pSrcFilePath);
+                    jncFilePath.fromUtf8String((const char*)pJncFilePath);
+                }
+            }
+        }
+
+        // Finalize the statement.
+        sqlite3_finalize(pQueryStmt);
+        ret = (SQLITE_DONE == rc || SQLITE_ROW == rc) ? true : false;
+
+        return ret;
+    }
+
     bool GetFunctionProfileData(
         AMDTFunctionId              functionId,
         gtUInt32                    funcStartOffset,
@@ -5106,8 +5165,27 @@ public:
 
                     GetFunctionInfo(functionId, funcStartOffset, functionData.m_functionInfo);
 
-                    // GetModuleBaseAddress(functionId, processId, functionData.m_modBaseAddress);
-                    GetModuleBaseAddressByModuleId(modId, processId, functionData.m_modBaseAddress);
+                    gtVector<AMDTProfileModuleInfo> moduleInfoList;
+                    bool isJitModule = false;
+                    ret = GetModuleInfo(processId, modId, moduleInfoList);
+
+                    if (ret && moduleInfoList.size() > 0)
+                    {
+                        isJitModule = ((AMDT_MODULE_TYPE_JAVA == moduleInfoList[0].m_type) || (AMDT_MODULE_TYPE_MANAGEDDPE == moduleInfoList[0].m_type))
+                                            ? true : false;
+                    }
+
+                    if (!isJitModule)
+                    {
+                        // GetModuleBaseAddress(functionId, processId, functionData.m_modBaseAddress);
+                        GetModuleBaseAddressByModuleId(modId, processId, functionData.m_modBaseAddress);
+                    }
+                    else
+                    {
+                        AMDTModuleId modInstId = (functionId & 0x0000FFFF);
+                        GetModuleBaseAddressByModuleInstanceId(modInstId, processId, functionData.m_modBaseAddress);
+                        functionData.m_functionInfo.m_startOffset = 0; // FIXME
+                    }
 
                     // Execute the query.
                     while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
@@ -6449,6 +6527,21 @@ bool AmdtDatabaseAccessor::GetFunctionSummaryData(
                                               doSort,
                                               count,
                                               dataList);
+    }
+
+    return ret;
+}
+
+bool AmdtDatabaseAccessor::GetJITFunctionInfo(AMDTFunctionId funcId, gtUInt64& loadAddr, gtString& srcFilePath, gtString& jncFilePath)
+{
+    bool ret = false;
+
+    if (m_pImpl != nullptr)
+    {
+        ret = m_pImpl->GetJITFunctionInfo(funcId,
+                                          loadAddr,
+                                          srcFilePath,
+                                          jncFilePath);
     }
 
     return ret;

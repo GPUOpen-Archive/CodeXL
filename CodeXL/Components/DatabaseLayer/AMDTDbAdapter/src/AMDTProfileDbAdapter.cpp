@@ -788,6 +788,21 @@ bool amdtProfileDbAdapter::GetProfileData(
     return ret;
 }
 
+bool amdtProfileDbAdapter::GetJITFunctionInfo(AMDTFunctionId funcId, gtUInt64& loadAddr, gtString& srcFilePath, gtString& jncFilePath)
+{
+    bool ret = false;
+
+    if (m_pDbAccessor != nullptr)
+    {
+        ret = m_pDbAccessor->GetJITFunctionInfo(funcId,
+                                                loadAddr,
+                                                srcFilePath,
+                                                jncFilePath);
+    }
+
+    return ret;
+}
+
 bool amdtProfileDbAdapter::GetFunctionProfileData(
     AMDTFunctionId              funcId,
     gtUInt32                    funcStartOffset,    // used only for unknown functions

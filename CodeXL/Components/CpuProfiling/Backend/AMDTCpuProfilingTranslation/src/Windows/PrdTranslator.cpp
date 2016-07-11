@@ -2250,9 +2250,9 @@ bool PrdTranslator::WriteModuleInstanceInfoIntoDB(NameModuleMap& moduleMap, ModI
                 auto it = moduleMap.find(std::get<0>(modIt.second));
 
                 // No need to process JAVA/CLR module instances
-                if (moduleMap.end() == it ||
-                    CpuProfileModule::JAVAMODULE == it->second.m_modType ||
-                    CpuProfileModule::MANAGEDPE == it->second.m_modType)
+                if (moduleMap.end() == it)
+                //    CpuProfileModule::JAVAMODULE == it->second.m_modType ||
+                //    CpuProfileModule::MANAGEDPE == it->second.m_modType)
                 {
                     continue;
                 }
@@ -2516,6 +2516,9 @@ bool PrdTranslator::WriteSampleProfileDataIntoDB(const NameModuleMap& modMap)
             {
                 gtUInt32 modSize = module.second.m_size;
 
+                bool isJitModule = ((CpuProfileModule::JAVAMODULE == module.second.getModType())
+                                    || (CpuProfileModule::MANAGEDPE == module.second.getModType())) ? true : false;
+                
                 for (auto fit = module.second.getBeginFunction(); fit != module.second.getEndFunction(); ++fit)
                 {
                     gtUInt32 funcId = module.second.m_moduleId;
@@ -2544,6 +2547,11 @@ bool PrdTranslator::WriteSampleProfileDataIntoDB(const NameModuleMap& modMap)
                                     break;
                                 }
                             }
+                        }
+
+                        if (isJitModule)
+                        {
+                            modLoadAddr = fit->second.getBaseAddr();
                         }
 
                         // sample address offset is w.r.t. module load address

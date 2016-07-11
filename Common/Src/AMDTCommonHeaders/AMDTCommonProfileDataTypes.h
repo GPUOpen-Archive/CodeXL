@@ -299,7 +299,7 @@ struct AMDTProfileFunctionData
     gtVector<AMDTProcessId>         m_pidsList;
     gtVector<AMDTThreadId>          m_threadsList;
 
-    gtUInt64                        m_modBaseAddress;  // TBD: Not Reqduired?
+    gtUInt64                        m_modBaseAddress;
 
     AMDTProfileSourceLineDataVec    m_srcLineDataList;
     AMDTProfileInstructionDataVec   m_instDataList;

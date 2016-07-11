@@ -366,6 +366,7 @@ CXL_env.Depends( AMDTProfilingDataAccess_Obj,
 	libCpuPerfEventUtils_Obj +
 	libCpuProfilingDataAccess_Obj +
 	libCpuProfilingTranslation_Obj +
+	libProfilingAgentsData_Obj +
     AMDTDbAdapter_Obj)
 CpuProfilingPlugins += AMDTProfilingDataAccess_Obj
 

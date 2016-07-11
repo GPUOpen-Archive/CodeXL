@@ -511,41 +511,49 @@ void CpuSessionWindow::onViewSourceViewSlot(std::tuple<AMDTFunctionId, const gtS
 
 	bool createdNewView = false;
 
-	if (nullptr == pSourceCodeView)
-	{
-		// Create new source tab:
-		osDirectory sessionDir;
-		m_sessionFile.getFileDirectory(sessionDir);
-		QString sessionFileStr = acGTStringToQString(sessionDir.directoryPath().asString());
-		pSourceCodeView = new SessionSourceCodeView(m_pTabWidget, this, sessionFileStr);
+    if (nullptr == pSourceCodeView)
+    {
+        // Create new source tab:
+        osDirectory sessionDir;
+        m_sessionFile.getFileDirectory(sessionDir);
+        QString sessionFileStr = acGTStringToQString(sessionDir.directoryPath().asString());
+        pSourceCodeView = new SessionSourceCodeView(m_pTabWidget, this, sessionFileStr);
 
-		createdNewView = true;
-		pSourceCodeView->setDisplayedItemData((afApplicationTreeItemData*)m_pSessionTreeItemData);
+        createdNewView = true;
+    }
 
-		if (!pSourceCodeView->DisplayViewModule(funcModInfo))
-		{
-			QMessageBox::information(this, "Source/Disassembly View Error", "Failed to initialize Source/Disassembly tab for module :\n" + modName);
-			delete pSourceCodeView;
-			return;
-		}
+    if (nullptr != pSourceCodeView)
+    {
+        pSourceCodeView->setDisplayedItemData((afApplicationTreeItemData*)m_pSessionTreeItemData);
 
-		pSourceCodeView->setWindowTitle(caption);
+        if (!pSourceCodeView->DisplayViewModule(funcModInfo))
+        {
+            QMessageBox::information(this, "Source/Disassembly View Error", "Failed to initialize Source/Disassembly tab for module :\n" + modName);
+            delete pSourceCodeView;
+            return;
+        }
 
-		connect(&(CpuProfilingOptions::instance()), SIGNAL(settingsUpdated()), pSourceCodeView, SLOT(onViewChanged()));
+        pSourceCodeView->setWindowTitle(caption);
 
-		// Look for the icon for this tab:
-		QPixmap* pPixmap = ProfileApplicationTreeHandler::instance()->TreeItemTypeToPixmap(AF_TREE_ITEM_PROFILE_CPU_SOURCE_CODE);
+        connect(&(CpuProfilingOptions::instance()), SIGNAL(settingsUpdated()), pSourceCodeView, SLOT(onViewChanged()));
 
-		AddTabToNavigatorBar(pSourceCodeView, caption, pPixmap);
-	}
+        // Look for the icon for this tab:
+        QPixmap* pPixmap = ProfileApplicationTreeHandler::instance()->TreeItemTypeToPixmap(AF_TREE_ITEM_PROFILE_CPU_SOURCE_CODE);
 
-	if (createdNewView)
-	{
-		// Do not redisplay address for alredy displayed source code view:
-		pSourceCodeView->DisplayAddress(0, pid, SHOW_ALL_TIDS);
-	}
+        AddTabToNavigatorBar(pSourceCodeView, caption, pPixmap);
 
-	m_pTabWidget->setCurrentWidget(pSourceCodeView);
+        // Baskar: FIXME why?
+        //if (createdNewView)
+        //{
+        //    // Do not redisplay address for alredy displayed source code view:
+        //    pSourceCodeView->DisplayAddress(0, pid, SHOW_ALL_TIDS);
+        //}
+        
+        // TODO: Baskar: Shouldn't we pass the correct address?
+        pSourceCodeView->DisplayAddress(0, pid, SHOW_ALL_TIDS);
+
+        m_pTabWidget->setCurrentWidget(pSourceCodeView);
+    }
 }
 
 void CpuSessionWindow::onViewSourceView(gtVAddr Address, ProcessIdType pid, ThreadIdType tid, const CpuProfileModule* pModDetail)

@@ -166,12 +166,12 @@ void FunctionsDataTable::onAboutToShowContextMenu()
                             for (auto const& process : cssProcesses)
                             {
                                 AMDTProfileFunctionData  functionData;
-                                int retVal = m_pProfDataRdr->GetFunctionDetailedProfileData(funcId,
-                                                                                            process,
-                                                                                            AMDT_PROFILE_ALL_THREADS,
-                                                                                            functionData);
+                                bool retVal = m_pProfDataRdr->GetFunctionData(funcId,
+                                                                              process,
+                                                                              AMDT_PROFILE_ALL_THREADS,
+                                                                              functionData);
 
-                                if (retVal != static_cast<int>(CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE))
+                                if (retVal)
                                 {
                                     if (process == functionData.m_pidsList.at(0))
                                     {

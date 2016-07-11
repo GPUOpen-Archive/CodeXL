@@ -7,7 +7,8 @@
 //
 //=============================================================
 
-#include <QtGui>
+#include <qtIgnoreCompilerWarnings.h>
+#include <QtCore>
 
 #include <string.h>
 
@@ -30,6 +31,13 @@
 #include <AMDTExecutableFormat/inc/ExecutableFile.h>
 #include <AMDTExecutableFormat/inc/SymbolEngine.h>
 #include <AMDTDisassembler/inc/LibDisassembler.h>
+
+#include <AMDTProfilingAgentsData/inc/JavaJncReader.h>
+
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+#include <AMDTProfilingAgentsData/inc/Windows/ClrJncReader.h>
+#include <AMDTProfilingAgentsData/inc/Windows/PjsReader.h>
+#endif // AMDT_WINDOWS_OS
 
 //
 //  Data Structures
@@ -1959,12 +1967,11 @@ public:
         return true;
     }
 
-    int GetFunctionDetailedProfileData(AMDTFunctionId            funcId,
-                                       AMDTProcessId             processId,
-                                       AMDTThreadId              threadId,
-                                       AMDTProfileFunctionData&  functionData)
+    bool GetFunctionData(AMDTFunctionId            funcId,
+                         AMDTProcessId             processId,
+                         AMDTThreadId              threadId,
+                         AMDTProfileFunctionData&  functionData)
     {
-        int retVal = 0;
         bool ret = false;
 
         if (nullptr != m_pDbAdapter)
@@ -2015,57 +2022,76 @@ public:
                 }
 
                 AddFuncInfoToFuncIdInfoMap(funcId, functionData.m_functionInfo);
+            }
+        }
 
-                gtString srcFilePath;
-                AMDTSourceAndDisasmInfoVec srcInfoVec;
-                retVal = GetFunctionSourceAndDisasmInfo(funcId, srcFilePath, srcInfoVec);
+        return ret;
+    }
 
-                AMDTProfileSourceLineDataVec& srcLineDataVec = functionData.m_srcLineDataList;
-                AMDTProfileInstructionDataVec& instDataVec = functionData.m_instDataList;
+    int GetFunctionDetailedProfileData(AMDTFunctionId            funcId,
+                                       AMDTProcessId             processId,
+                                       AMDTThreadId              threadId,
+                                       AMDTProfileFunctionData&  functionData)
+    {
+        int retVal = 0;
+        bool ret = false;
 
-                for (auto& srcLineInfo : srcInfoVec)
+        ret = GetFunctionData(funcId, processId, threadId, functionData);
+
+        if (ret)
+        {
+            gtString srcFilePath;
+            AMDTSourceAndDisasmInfoVec srcInfoVec;
+            retVal = GetFunctionSourceAndDisasmInfo(funcId, srcFilePath, srcInfoVec);
+
+            AMDTProfileSourceLineDataVec& srcLineDataVec = functionData.m_srcLineDataList;
+            AMDTProfileInstructionDataVec& instDataVec = functionData.m_instDataList;
+
+            for (auto& srcLineInfo : srcInfoVec)
+            {
+                gtUInt32 srcLine = srcLineInfo.m_sourceLine;
+                gtUInt32 offset = srcLineInfo.m_offset;
+
+                // check whether this offset has samples (in functionData.m_instDataList)
+                auto instData = std::find_if(instDataVec.begin(), instDataVec.end(),
+                    [&offset](AMDTProfileInstructionData const& iData) { return iData.m_offset == offset; });
+
+                if (instData != instDataVec.end())
                 {
-                    gtUInt32 srcLine = srcLineInfo.m_sourceLine;
-                    gtUInt32 offset = srcLineInfo.m_offset;
+                    // Check wether we have see this srcline in srcLineDataVec
+                    // if so, update the profile data otherwise add a new line
+                    auto slData = std::find_if(srcLineDataVec.begin(), srcLineDataVec.end(),
+                        [&srcLine](AMDTProfileSourceLineData const& sData) { return sData.m_sourceLineNumber == srcLine; });
 
-                    // check whether this offset has samples (in functionData.m_instDataList)
-                    auto instData = std::find_if(instDataVec.begin(), instDataVec.end(),
-                        [&offset](AMDTProfileInstructionData const& iData) { return iData.m_offset == offset; });
-
-                    if (instData != instDataVec.end())
+                    if (slData == srcLineDataVec.end())
                     {
-                        // Check wether we have see this srcline in srcLineDataVec
-                        // if so, update the profile data otherwise add a new line
-                        auto slData = std::find_if(srcLineDataVec.begin(), srcLineDataVec.end(),
-                            [&srcLine](AMDTProfileSourceLineData const& sData) { return sData.m_sourceLineNumber == srcLine; });
+                        AMDTProfileSourceLineData srcLineData;
+                        srcLineData.m_sourceLineNumber = srcLine;
+                        srcLineData.m_sampleValues = instData->m_sampleValues;
 
-                        if (slData == srcLineDataVec.end())
+                        srcLineDataVec.push_back(srcLineData);
+                    }
+                    else
+                    {
+                        for (gtUInt32 i = 0; i < instData->m_sampleValues.size(); i++)
                         {
-                            AMDTProfileSourceLineData srcLineData;
-                            srcLineData.m_sourceLineNumber = srcLine;
-                            srcLineData.m_sampleValues = instData->m_sampleValues;
-
-                            srcLineDataVec.push_back(srcLineData);
-                        }
-                        else
-                        {
-                            for (gtUInt32 i = 0; i < instData->m_sampleValues.size(); i++)
-                            {
-                                slData->m_sampleValues[i].m_sampleCount += instData->m_sampleValues[i].m_sampleCount;
-                            }
+                            slData->m_sampleValues[i].m_sampleCount += instData->m_sampleValues[i].m_sampleCount;
                         }
                     }
                 }
-
-                // Now calculate the percentage
-                ret = CalculateRawCounterPercentage(funcId, processId, threadId, countersList, functionData);
-
-                // Now calculate the computed counter values
-                // Iterate over the profileDataVec and calculate the computed counter values
-                ret = ret && CalculateComputedCounters(functionData.m_srcLineDataList);
-
-                ret = ret && CalculateComputedCounters(functionData.m_instDataList);
             }
+
+            AMDTCounterIdVec countersList;
+            ret = GetCountersList(countersList);
+
+            // Now calculate the percentage
+            ret = ret && CalculateRawCounterPercentage(funcId, processId, threadId, countersList, functionData);
+
+            // Now calculate the computed counter values
+            // Iterate over the profileDataVec and calculate the computed counter values
+            ret = ret && CalculateComputedCounters(functionData.m_srcLineDataList);
+
+            ret = ret && CalculateComputedCounters(functionData.m_instDataList);
         }
 
         return retVal;
@@ -2137,6 +2163,70 @@ public:
         return ret;
     }
 
+    bool IsJitFunction(AMDTFunctionId funcId)
+    {
+        bool ret = false;
+
+        auto funcInfoIt = m_funcIdInfoMap.find(funcId);
+
+        if (funcInfoIt != m_funcIdInfoMap.end())
+        {
+            // profile data has been fetched for this function..
+            AMDTProfileFunctionInfo& funcInfo = funcInfoIt->second;
+            AMDTProfileModuleInfo modInfo;
+
+            if (GetModuleInfo(funcInfo.m_moduleId, modInfo))
+            {
+                ret = ((AMDT_MODULE_TYPE_JAVA == modInfo.m_type) || (AMDT_MODULE_TYPE_MANAGEDDPE == modInfo.m_type))
+                            ? true : false;
+            }
+        }
+
+        return ret;
+    }
+
+    bool IsJavaJitFunction(AMDTFunctionId funcId)
+    {
+        bool ret = false;
+
+        auto funcInfoIt = m_funcIdInfoMap.find(funcId);
+
+        if (funcInfoIt != m_funcIdInfoMap.end())
+        {
+            // profile data has been fetched for this function..
+            AMDTProfileFunctionInfo& funcInfo = funcInfoIt->second;
+            AMDTProfileModuleInfo modInfo;
+
+            if (GetModuleInfo(funcInfo.m_moduleId, modInfo))
+            {
+                ret = (AMDT_MODULE_TYPE_JAVA == modInfo.m_type) ? true : false;
+            }
+        }
+
+        return ret;
+    }
+
+    bool IsClrJitFunction(AMDTFunctionId funcId)
+    {
+        bool ret = false;
+
+        auto funcInfoIt = m_funcIdInfoMap.find(funcId);
+
+        if (funcInfoIt != m_funcIdInfoMap.end())
+        {
+            // profile data has been fetched for this function..
+            AMDTProfileFunctionInfo& funcInfo = funcInfoIt->second;
+            AMDTProfileModuleInfo modInfo;
+
+            if (GetModuleInfo(funcInfo.m_moduleId, modInfo))
+            {
+                ret = (AMDT_MODULE_TYPE_MANAGEDDPE == modInfo.m_type) ? true : false;
+            }
+        }
+
+        return ret;
+    }
+
     bool GetSrcFilePathForFuncId(AMDTFunctionId funcId, gtString& srcFilePath, gtUInt32& srcLine)
     {
         bool ret = false;
@@ -2149,16 +2239,29 @@ public:
         {
             // profile data has been fetched for this function..
             AMDTProfileFunctionInfo& funcInfo = funcInfoIt->second;
+            AMDTProfileModuleInfo modInfo;
 
-            moduleId = funcInfo.m_moduleId;
-            offset = funcInfo.m_startOffset;
+            if (GetModuleInfo(funcInfo.m_moduleId, modInfo))
+            {
+                if (AMDT_MODULE_TYPE_NATIVE == modInfo.m_type)
+                {
+                    moduleId = funcInfo.m_moduleId;
+                    offset = funcInfo.m_startOffset;
 
-            ret = true;
-        }
+                    ret = GetSrcFilePathForModuleOffset(moduleId, offset, srcFilePath, srcLine);
+                }
+                else if (AMDT_MODULE_TYPE_JAVA == modInfo.m_type)
+                {
+                    gtString jncPath;
+                    gtVAddr jitLoadAddr;
 
-        if (ret && nullptr != m_pDbAdapter)
-        {
-            ret = GetSrcFilePathForModuleOffset(moduleId, offset, srcFilePath, srcLine);
+                    ret = m_pDbAdapter->GetJITFunctionInfo(funcId, jitLoadAddr, srcFilePath, jncPath);
+                }
+                else if (AMDT_MODULE_TYPE_MANAGEDDPE == modInfo.m_type)
+                {
+                    // TODO:
+                }
+            }
         }
 
         return ret;
@@ -2175,7 +2278,6 @@ public:
                                        AMDTSourceAndDisasmInfoVec& srcInfoVec)
     {
         int rv = CXL_DATAACCESS_WARN_SRC_INFO_NOTAVAILABLE;
-        bool ret = false;
         bool foundSrcInfo = false;
         bool foundSrcFilePath = false;
 
@@ -2190,41 +2292,57 @@ public:
 
         if (!foundSrcInfo)
         {
-            AMDTModuleId moduleId = 0;
-            gtUInt32 offset = 0;
-            gtUInt32 size = 0;
+            rv = GetDisassembly(funcId, srcInfoVec);
 
-            auto funcInfoIt = m_funcIdInfoMap.find(funcId);
-
-            // TODO: Currently there is a limitation that GetFunctionDetailedProfileData()
-            // should be called before GetFunctionSourceAndDisasmInfo()
-            if (funcInfoIt != m_funcIdInfoMap.end())
+            if (!foundSrcFilePath)
             {
-                // profile data has been fetched for this function..
-                AMDTProfileFunctionInfo& funcInfo = funcInfoIt->second;
-
-                moduleId = funcInfo.m_moduleId;
-                offset = funcInfo.m_startOffset;
-                size = funcInfo.m_size;
-
-                ret = true;
+                // Find the srcFilePath
+                foundSrcFilePath = GetSrcFilePathForFuncId(funcId, srcFilePath);
             }
-
-            if (ret)
-            {
-                rv = GetDisassembly(moduleId, offset, size, srcInfoVec);
-            }
-        }
-
-        if (!foundSrcFilePath)
-        {
-            // Find the srcFilePath
-            foundSrcFilePath = GetSrcFilePathForFuncId(funcId, srcFilePath);
         }
 
         return rv;
     }
 
+    int GetDisassembly(AMDTFunctionId funcId, AMDTSourceAndDisasmInfoVec& disasmInfoVec)
+    {
+        int retVal = CXL_DATAACCESS_WARN_SRC_INFO_NOTAVAILABLE;
+
+        // TODO: Currently there is a limitation that GetFunctionDetailedProfileData()
+        // should be called before GetFunctionSourceAndDisasmInfo()
+        auto funcInfoIt = m_funcIdInfoMap.find(funcId);
+
+        if (funcInfoIt != m_funcIdInfoMap.end())
+        {
+            // profile data has been fetched for this function..
+            AMDTProfileFunctionInfo& funcInfo = funcInfoIt->second;
+            AMDTProfileModuleInfo modInfo;
+
+            if (GetModuleInfo(funcInfo.m_moduleId, modInfo))
+            {
+                if (AMDT_MODULE_TYPE_NATIVE == modInfo.m_type)
+                {
+                    retVal = GetNativeDisassembly(funcInfo.m_moduleId,
+                                                  funcInfo.m_startOffset,
+                                                  funcInfo.m_size,
+                                                  disasmInfoVec);
+
+                }
+                else if (AMDT_MODULE_TYPE_JAVA == modInfo.m_type)
+                {
+                    retVal = GetJavaJitDisassembly(funcInfo, disasmInfoVec);
+                }
+                else if (AMDT_MODULE_TYPE_MANAGEDDPE == modInfo.m_type)
+                {
+                    retVal = GetClrJitDisassembly(funcInfo, disasmInfoVec);
+                }
+            }
+        }
+
+        return retVal;
+    }
+
+#if 0
     int GetDisassembly(AMDTModuleId moduleId,
                        AMDTUInt32 offset,
                        AMDTUInt32 size,
@@ -2371,6 +2489,287 @@ public:
         }
 
         return retVal;
+    }
+#endif // 0
+
+    int GetNativeDisassembly(AMDTModuleId moduleId,
+                             AMDTUInt32 offset,
+                             AMDTUInt32 size,
+                             AMDTSourceAndDisasmInfoVec& disasmInfoVec)
+    {
+        int retVal = CXL_DATAACCESS_WARN_SRC_INFO_NOTAVAILABLE;
+        bool ret = false;
+
+        if (nullptr != m_pDbAdapter)
+        {
+            AMDTProfileModuleInfo modInfo;
+
+            ret = GetModuleInfo(moduleId, modInfo);
+
+            gtString exePath = modInfo.m_path;
+
+            gtVAddr loadAddress = modInfo.m_loadAddress;
+            ExecutableFile* pExecutable = ExecutableFile::Open(exePath.asCharArray(), loadAddress);
+
+            if (nullptr != pExecutable)
+            {
+                gtRVAddr startRVAddr = 0;
+                const gtUByte* pCode = nullptr;
+                gtRVAddr sectionStartRva = 0, sectionEndRva = 0;
+                unsigned int prevSectionIndex = static_cast<unsigned int>(-1);
+
+                bool isLongMode = pExecutable->Is64Bit();
+                AMDTUInt32 bytesToRead = size;
+                gtVAddr currOffset = offset;
+
+                ret = InitializeSymbolEngine(pExecutable);
+                SymbolEngine* pSymbolEngine = pExecutable->GetSymbolEngine();
+
+                while (bytesToRead > 0)
+                {
+                    AMDTSourceAndDisasmInfo disasmInfo;
+
+                    startRVAddr = pExecutable->VaToRva(loadAddress + currOffset);
+                    unsigned int sectionIndex = pExecutable->LookupSectionIndex(startRVAddr);
+
+                    gtRVAddr codeOffset = startRVAddr;
+                    const gtUByte* pCurrentCode = pCode;
+                    SourceLineInfo srcData;
+
+                    if (nullptr != pSymbolEngine)
+                    {
+                        ret = pSymbolEngine->FindSourceLine(startRVAddr, srcData);
+
+                        if (ret)
+                        {
+                            disasmInfo.m_sourceLine = srcData.m_line;
+                            retVal = CXL_DATAACCESS_SUCCESS;
+                        }
+                    }
+
+                    AMDTUInt32 NumBytesUsed = 0;
+
+                    if (pExecutable->GetSectionsCount() > sectionIndex)
+                    {
+                        if (sectionIndex == prevSectionIndex)
+                        {
+                            codeOffset = startRVAddr - sectionStartRva;
+                            pCurrentCode = pCode + codeOffset;
+                        }
+                        else
+                        {
+                            pCode = pExecutable->GetSectionBytes(sectionIndex);
+                            pExecutable->GetSectionRvaLimits(sectionIndex, sectionStartRva, sectionEndRva);
+
+                            // GetCodeBytes return the pointer to the sectionStart
+                            // We need to add the offset to the beginning of the function
+                            codeOffset = startRVAddr - sectionStartRva;
+                            pCurrentCode = pCode + codeOffset;
+                            prevSectionIndex = sectionIndex;
+                        }
+
+                        disasmInfo.m_offset = codeOffset + sectionStartRva;
+                        
+                        // Get disassembly for the current pCode from the disassembler
+                        ret = GetDisassemblyString((BYTE*)(pCurrentCode), isLongMode, disasmInfo, NumBytesUsed);
+                    }
+
+                    if (ret)
+                    {
+                        currOffset += NumBytesUsed;
+                        bytesToRead -= NumBytesUsed;
+                    }
+                    else
+                    {
+                        bytesToRead = 0;
+                    }
+
+                    disasmInfoVec.push_back(disasmInfo);
+                }
+
+                delete pExecutable;
+            }
+            else
+            {
+                retVal = CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE;
+            }
+        }
+
+        return retVal;
+    }
+
+    int GetJavaJitDisassembly(AMDTProfileFunctionInfo& funcInfo, AMDTSourceAndDisasmInfoVec& srcInfoVec)
+    {
+        int retVal = CXL_DATAACCESS_SUCCESS;
+
+        if (nullptr != m_pDbAdapter)
+        {
+            // Get the loadaddress, srcfilepath, jncfilepath for the given function id
+            gtString jncPath;
+            gtString srcFilePath;
+            gtVAddr jitLoadAddr;
+
+            if (m_pDbAdapter->GetJITFunctionInfo(funcInfo.m_functionId, jitLoadAddr, srcFilePath, jncPath))
+            {
+                JavaJncReader jncReader;
+                AMDTProfileSessionInfo sessionInfo;
+
+                GetProfileSessionInfo(sessionInfo);
+                gtString jncFilePath = sessionInfo.m_sessionDir;
+                jncFilePath.append(osFilePath::osPathSeparator);
+                jncFilePath.append(jncPath);
+
+                if (jncReader.Open(jncFilePath.asCharArray()))
+                {
+                    unsigned int sectionSize = 0;
+
+                    const gtUByte* pCode = jncReader.GetCodeBytesOfTextSection(&sectionSize);
+
+                    if (pCode != nullptr)
+                    {
+                        bool isLongMode = jncReader.Is64Bit();
+                        int version = jncReader.GetJNCVersion();
+                        bool isNativeMethod = (srcFilePath.compareNoCase(L"Unknown Source File") == 0) ? true : false;
+
+                        OffsetLinenumMap funcOffsetLinenumMap;
+
+                        if (version <= 0x3 || (isNativeMethod))
+                        {
+                            // This is for JNC version <= 3
+                            funcOffsetLinenumMap = jncReader.GetOffsetLines();
+                            retVal = CXL_DATAACCESS_WARN_SRC_INFO_NOTAVAILABLE;
+                        }
+                        else
+                        {
+                            gtString funcName = funcInfo.m_name;
+                            wstring javaFuncName;
+
+                            int pos = funcName.reverseFind(L"::");
+
+                            if (pos != -1)
+                            {
+                                gtString retStr;
+                                funcName.getSubString(pos + 2, funcName.length() - 1, retStr);
+                                javaFuncName = wstring(retStr.asCharArray());
+                            }
+                            else
+                            {
+                                javaFuncName = wstring(funcName.asCharArray());
+                            }
+
+                            funcOffsetLinenumMap = jncReader.GetOffsetLines(javaFuncName);
+                        }
+
+                        AMDTUInt32 currOffset = 0;
+                        AMDTUInt32 currLineNumber = funcOffsetLinenumMap.begin().value();
+
+                        for (auto offsetLineIt = funcOffsetLinenumMap.begin(); offsetLineIt != funcOffsetLinenumMap.end(); ++offsetLineIt)
+                        {
+                            AMDTUInt32 nextOffset = offsetLineIt.key();
+                            AMDTUInt32 nextLineNumber = offsetLineIt.value();
+                            AMDTUInt32 bytesToRead = nextOffset - currOffset;
+                            AMDTUInt32 bytesUsed = 0;
+
+                            while (bytesToRead > 0)
+                            {
+                                AMDTSourceAndDisasmInfo instInfo;
+
+                                instInfo.m_offset = currOffset;
+                                instInfo.m_sourceLine = currLineNumber;
+
+                                const gtUByte* pCurrentCode = pCode + instInfo.m_offset;
+
+                                bool rc = GetDisassemblyString((BYTE*)pCurrentCode, isLongMode, instInfo, bytesUsed);
+
+                                if (rc)
+                                {
+                                    srcInfoVec.push_back(instInfo);
+                                    bytesToRead = (bytesToRead > bytesUsed) ? (bytesToRead - bytesUsed) : 0;
+                                    currOffset += bytesUsed;
+                                }
+                                else
+                                {
+                                    bytesToRead = 0;
+                                }
+                            }
+
+                            currOffset = nextOffset;
+                            currLineNumber = nextLineNumber;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                retVal = CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE;
+            }
+        }
+
+        return retVal;
+    }
+
+    int GetClrJitDisassembly(AMDTProfileFunctionInfo& funcInfo, AMDTSourceAndDisasmInfoVec& srcInfoVec)
+    {
+        (void)funcInfo;
+        (void)srcInfoVec;
+        // Get the loadaddress, srcfilepath, jncfilepath for the given function id
+        return false;
+    }
+
+    bool GetDisassemblyString(BYTE* pCurrentCode, bool isLongMode, AMDTSourceAndDisasmInfo& disasmInfo, AMDTUInt32& bytesUsed)
+    {
+        bool ret = false;
+        BYTE errorCode;
+        UIInstInfoType instInfo = { 0 };
+        char dasmArray[256] = { 0 };
+        unsigned int strlength = 255;
+
+        if (nullptr != pCurrentCode)
+        {
+            // Setup disassembler
+            LibDisassembler dasm;
+
+            // if the code is 64-bits
+            dasm.SetLongMode(isLongMode);
+
+            // Get disassembly for the current pCode from the disassembler
+            int hr = dasm.UIDisassemble((BYTE*)pCurrentCode, (unsigned int*)&strlength, (BYTE*)dasmArray, &instInfo, &errorCode);
+
+            if (S_OK == hr)
+            {
+                bytesUsed = instInfo.NumBytesUsed;
+                gtString& disasmStr = disasmInfo.m_disasmStr;
+                disasmStr.fromASCIIString(dasmArray);
+
+                if (instInfo.bIsPCRelative && instInfo.bHasDispData)
+                {
+                    disasmStr.appendFormattedString(L"(0x%lx)", disasmInfo.m_offset + instInfo.NumBytesUsed + instInfo.DispDataValue);
+                }
+
+                // Get codebytes
+                char codeBytes[16];
+                memcpy(codeBytes, pCurrentCode, instInfo.NumBytesUsed);
+
+                for (int count = 0; count < instInfo.NumBytesUsed; count++)
+                {
+                    gtUByte byteCode = codeBytes[count];
+                    gtUByte btHigh = (byteCode >> 4);
+                    gtUByte btLow = (byteCode & 0xF);
+
+                    disasmInfo.m_codeByteStr.append((btHigh <= 9) ? ('0' + btHigh) : ('A' + btHigh - 0xA));
+                    disasmInfo.m_codeByteStr.append((btLow <= 9) ? ('0' + btLow) : ('A' + btLow - 0xA));
+                    disasmInfo.m_codeByteStr << L" ";
+                }
+
+                ret = true;
+            }
+            else
+            {
+                disasmInfo.m_disasmStr.fromASCIIString("BAD DASM");
+            }
+        }
+
+        return ret;
     }
 
     bool GetCallGraphProcesses(gtVector<AMDTProcessId>& cssProcesses)
@@ -3287,6 +3686,19 @@ bool cxlProfileDataReader::GetModuleInfo(AMDTUInt32 pid, AMDTModuleId mid, AMDTP
     return ret;
 }
 
+bool cxlProfileDataReader::GetModuleInfoForFunction(AMDTFunctionId funcId, AMDTProfileModuleInfo& modInfo)
+{
+    bool ret = false;
+
+    if (nullptr != m_pImpl)
+    {
+        AMDTModuleId modId = (funcId & 0xFFFF0000) >> 16;
+        ret = m_pImpl->GetModuleInfo(modId, modInfo);
+    }
+
+    return ret;
+}
+
 bool cxlProfileDataReader::GetThreadInfo(AMDTUInt32 pid, AMDTThreadId tid, AMDTProfileThreadInfoVec& threadInfo)
 {
     bool ret = false;
@@ -3384,6 +3796,24 @@ bool cxlProfileDataReader::GetFunctionProfileData(AMDTProcessId procId, AMDTModu
     return ret;
 }
 
+bool cxlProfileDataReader::GetFunctionData(AMDTFunctionId            funcId,
+                                           AMDTProcessId             processId,
+                                           AMDTThreadId              threadId,
+                                           AMDTProfileFunctionData&  functionData)
+{
+    int ret = false;
+
+    if (nullptr != m_pImpl)
+    {
+        if (funcId != 0xFFFFFFFFUL)
+        {
+            ret = m_pImpl->GetFunctionData(funcId, processId, threadId, functionData);
+        }
+    }
+
+    return ret;
+}
+
 int cxlProfileDataReader::GetFunctionDetailedProfileData(AMDTFunctionId            funcId,
                                                           AMDTProcessId             processId,
                                                           AMDTThreadId              threadId,
@@ -3402,6 +3832,18 @@ int cxlProfileDataReader::GetFunctionDetailedProfileData(AMDTFunctionId         
     return ret;
 }
 
+bool cxlProfileDataReader::GetSourceFilePathForFunction(AMDTFunctionId funcId, gtString& srcFilePath)
+{
+    bool ret = false;
+
+    if (nullptr != m_pImpl)
+    {
+        ret = m_pImpl->GetSrcFilePathForFuncId(funcId, srcFilePath);
+    }
+
+    return ret;
+}
+
 int cxlProfileDataReader::GetFunctionSourceAndDisasmInfo(AMDTFunctionId funcId, gtString& srcFilePath, AMDTSourceAndDisasmInfoVec& srcInfoVec)
 {
     int ret = 0;
@@ -3414,20 +3856,20 @@ int cxlProfileDataReader::GetFunctionSourceAndDisasmInfo(AMDTFunctionId funcId, 
     return ret;
 }
 
-int cxlProfileDataReader::GetDisassembly(AMDTModuleId moduleId,
-                                         AMDTUInt32 offset,
-                                         AMDTUInt32 size,
-                                         AMDTSourceAndDisasmInfoVec& disasmInfoVec)
-{
-    int ret = false;
-
-    if (nullptr != m_pImpl)
-    {
-        ret = m_pImpl->GetDisassembly(moduleId, offset, size, disasmInfoVec);
-    }
-
-    return ret;
-}
+//int cxlProfileDataReader::GetDisassembly(AMDTModuleId moduleId,
+//                                         AMDTUInt32 offset,
+//                                         AMDTUInt32 size,
+//                                         AMDTSourceAndDisasmInfoVec& disasmInfoVec)
+//{
+//    int ret = false;
+//
+//    if (nullptr != m_pImpl)
+//    {
+//        ret = m_pImpl->GetDisassembly(moduleId, offset, size, disasmInfoVec);
+//    }
+//
+//    return ret;
+//}
 
 bool cxlProfileDataReader::GetCallGraphProcesses(gtVector<AMDTProcessId>& cssProcesses)
 {

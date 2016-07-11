@@ -267,6 +267,8 @@ public:
                                 size_t                      count,
                                 gtVector<AMDTProfileData>&  dataList);
 
+    bool GetJITFunctionInfo(AMDTFunctionId funcId, gtUInt64& loadAddr, gtString& srcFilePath, gtString& jncFilePath);
+
     bool GetFunctionProfileData(AMDTFunctionId              funcId,
                                 gtUInt32                    funcStartOffset,
                                 AMDTProcessId               processId,
