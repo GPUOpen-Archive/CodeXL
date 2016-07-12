@@ -141,6 +141,8 @@ VSP_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, cmdidBreakProfiling, vspComma
 VSP_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, cmdidStopProfiling, vspCommandHandler::QueryStatusHandler(&onUpdateProfileMode), vspCommandHandler::ExecHandler(&onStop))
 
 VSP_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, cmdidCaptureFrame, vspCommandHandler::QueryStatusHandler(&onUpdateProfileMode), vspCommandHandler::ExecHandler(&onCapture))
+VSP_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, cmdidCaptureFrameGPU, vspCommandHandler::QueryStatusHandler(&onUpdateProfileMode), vspCommandHandler::ExecHandler(&onCapture))
+VSP_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, cmdidCaptureFrameCPU, vspCommandHandler::QueryStatusHandler(&onUpdateProfileMode), vspCommandHandler::ExecHandler(&onCapture))
 VSP_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, cmdidRefreshSessions, vspCommandHandler::QueryStatusHandler(&onUpdateRefreshSessions), vspCommandHandler::ExecHandler(&onRefreshSessions))
 
 VSP_COMMAND_MAP_ENTRY(CLSID_CodeXLVSPackageCmdSet, cmdidCpuAssessPerformanceProfiling, vspCommandHandler::QueryStatusHandler(&onUpdateProfileMode), vspCommandHandler::ExecHandler(&onProfileMode))
@@ -885,7 +887,9 @@ HRESULT vspPackageCommandHandler::onCapture(vspCommandHandler* pSender, DWORD fl
     GT_UNREFERENCED_PARAMETER(pIn);
     GT_UNREFERENCED_PARAMETER(pOut);
 
-    VSCORE(vsc_OnCapture)();
+    int commandID = pSender->GetId().GetId();
+
+    VSCORE(vsc_OnCapture)(commandID);
 
     return S_OK;
 }

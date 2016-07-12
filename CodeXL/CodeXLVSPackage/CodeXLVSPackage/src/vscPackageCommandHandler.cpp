@@ -208,6 +208,8 @@ void vsc_OnUpdateProfileMode(unsigned long commandId, int activeMode, bool& enab
         break;
 
         case cmdidCaptureFrame:
+        case cmdidCaptureFrameGPU:
+        case cmdidCaptureFrameCPU:
         {
             if (activeMode == vsFrameAnalyisMode)
             {
@@ -412,13 +414,31 @@ void vsc_OnStop()
     }
 }
 
-void vsc_OnCapture()
+void vsc_OnCapture(int commandID)
 {
     gpExecutionMode* pFrameAnalysisManager = ProfileManager::Instance()->GetFrameAnalysisModeManager();
 
     if (pFrameAnalysisManager != nullptr)
     {
-        pFrameAnalysisManager->OnFrameAnalysisCapture(gpExecutionMode::FrameAnalysisCaptureType_LinkedTrace); // NZ
+        switch (commandID)
+        {
+        case cmdidCaptureFrame:
+            pFrameAnalysisManager->OnFrameAnalysisCapture(gpExecutionMode::FrameAnalysisCaptureType_LinkedTrace);
+            break;
+
+        case cmdidCaptureFrameGPU:
+            pFrameAnalysisManager->OnFrameAnalysisCapture(gpExecutionMode::FrameAnalysisCaptureType_GPUTrace);
+            break;
+
+        case cmdidCaptureFrameCPU:
+            pFrameAnalysisManager->OnFrameAnalysisCapture(gpExecutionMode::FrameAnalysisCaptureType_APITrace);
+            break;
+
+        default:
+            // we should not reach here with any other command id
+            GT_ASSERT(false);
+            break;
+        }
     }
 }
 void vsc_OnUpdateOpenCLBuild_IsActionEnabled(bool& isActionEnabled)

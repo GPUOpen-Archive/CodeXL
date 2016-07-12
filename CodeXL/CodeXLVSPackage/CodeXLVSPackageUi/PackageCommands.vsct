@@ -678,6 +678,32 @@
         </Strings>
       </Button>
 
+      <Button guid="guidCodeXLVSPackageCmdSet" id="cmdidCaptureFrameGPU" priority="0x0160" type="Button">
+        <Parent guid="guidCodeXLVSPackageCmdSet" id="cmdidCodeXLProfilingActionsGroup"/>
+        <Icon guid="guidMenuCommandIcons" id="bmpCaptureGPU" />
+        <CommandFlag>TextChanges</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <CommandName>Capture Frame GPU only</CommandName>
+          <CanonicalName>Capture Frame GPU only</CanonicalName>
+          <ButtonText>Capture Frame GPU only</ButtonText>
+          <ToolTipText>CodeXL: Capture Frame GPU only</ToolTipText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidCodeXLVSPackageCmdSet" id="cmdidCaptureFrameCPU" priority="0x0170" type="Button">
+        <Parent guid="guidCodeXLVSPackageCmdSet" id="cmdidCodeXLProfilingActionsGroup"/>
+        <Icon guid="guidMenuCommandIcons" id="bmpCaptureCPU" />
+        <CommandFlag>TextChanges</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <CommandName>Capture Frame CPU only</CommandName>
+          <CanonicalName>Capture Frame CPU only</CanonicalName>
+          <ButtonText>Capture Frame CPU only</ButtonText>
+          <ToolTipText>CodeXL: Capture Frame CPU only</ToolTipText>
+        </Strings>
+      </Button>
+
       <Button guid="guidCodeXLVSPackageCmdSet" id="cmdidStopProfiling" priority="0x0200" type="Button">
         <Parent guid="guidCodeXLVSPackageCmdSet" id="cmdidCodeXLProfilingActionsGroup" />
         <Icon guid="guidMenuCommandIcons" id="bmpStop" />
@@ -1017,6 +1043,32 @@
           <CommandName>Capture Frame</CommandName>
           <ButtonText>Capture Frame</ButtonText>
           <ToolTipText>CodeXL: Capture Frame</ToolTipText>
+        </Strings>
+      </Button>
+      <Button guid="guidCodeXLVSPackageCmdSet" id="cmdidCaptureFrameGPU" priority="0x0310" type="Button">
+        <Parent guid="guidCodeXLVSPackageCmdSet" id="IDG_GDB_TLB_LAUNCH_DEBUGGING"/>
+        <Icon guid="guidMenuCommandIcons" id="bmpCaptureGPU" />
+        <CommandFlag>TextChanges</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <CanonicalName>Capture Frame GPU only</CanonicalName>
+          <CommandName>Capture Frame GPU only</CommandName>
+          <ButtonText>Capture Frame GPU only</ButtonText>
+          <ToolTipText>CodeXL: Capture Frame GPU only</ToolTipText>
+        </Strings>
+      </Button>
+      <Button guid="guidCodeXLVSPackageCmdSet" id="cmdidCaptureFrameCPU" priority="0x0320" type="Button">
+        <Parent guid="guidCodeXLVSPackageCmdSet" id="IDG_GDB_TLB_LAUNCH_DEBUGGING"/>
+        <Icon guid="guidMenuCommandIcons" id="bmpCaptureCPU" />
+        <CommandFlag>TextChanges</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <CanonicalName>Capture Frame CPU only</CanonicalName>
+          <CommandName>Capture Frame CPU only</CommandName>
+          <ButtonText>Capture Frame CPU only</ButtonText>
+          <ToolTipText>CodeXL: Capture Frame CPU only</ToolTipText>
         </Strings>
       </Button>
       <Button guid="guidCodeXLVSPackageCmdSet" id="cmdidStopProfiling" priority="0x0400" type="Button">
@@ -1460,7 +1512,7 @@
             inside a button definition. An important aspect of this declaration is that the element id 
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
       <Bitmap guid="guidImagesEditorToolbarIcons" resID="IDB_IMAGES_EDITOR_TOOLBAR_IMAGES" usedList="bmpRed, bmpGreen, bmpBlue, bmpAlpha, bmpInvert, bmpGrayscale, bmpLeftRotate, bmpRightRotate, bmpBestFit, bmpOrigSize, bmpSelect, bmpPan"/>
-      <Bitmap guid="guidMenuCommandIcons" resID="IDB_IMAGES_MENU_COMMANDS_IMAGES" usedList="bmpDebugMode, bmpProfileMode, bmpFrameAnalysisMode, bmpAnalyzeMode, bmpGo, bmpPause, bmpStop, bmpCapture, bmpStepIn, bmpStepOver, bmpAPIStep, bmpDrawStep, bmpFrameStep, bmpExplorer, bmpHistory, bmpProperties, bmpMultiWatch, bmpStateVars, bmpCommandQueues, bmpMemory, bmpStatistics, bmpSystemInfo, bmpBreakpoint, bmpViewHelp, bmpBuild, bmpBuildAna, bmpCancelBuild"/>
+      <Bitmap guid="guidMenuCommandIcons" resID="IDB_IMAGES_MENU_COMMANDS_IMAGES" usedList="bmpDebugMode, bmpProfileMode, bmpFrameAnalysisMode, bmpAnalyzeMode, bmpGo, bmpPause, bmpStop, bmpCapture, bmpCaptureGPU, bmpCaptureCPU, bmpStepIn, bmpStepOver, bmpAPIStep, bmpDrawStep, bmpFrameStep, bmpExplorer, bmpHistory, bmpProperties, bmpMultiWatch, bmpStateVars, bmpCommandQueues, bmpMemory, bmpStatistics, bmpSystemInfo, bmpBreakpoint, bmpViewHelp, bmpBuild, bmpBuildAna, bmpCancelBuild"/>
     </Bitmaps>
  
   </Commands>

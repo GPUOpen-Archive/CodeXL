@@ -219,7 +219,7 @@ struct IVscCoreAPI
     void (*vsc_OnStop)();
     void (*vsc_RefreshFrameAnalysisSessionsFromServer)();
     bool(*vsc_IsFrameAnalysisModeSelected)();
-    void(*vsc_OnCapture)();
+    void(*vsc_OnCapture)(int commandID);
     void (*vsc_OnOpenCLBuild)();
     void (*vsc_OnUpdateOpenCLBuild_IsActionEnabled)(bool& isActionEnabled);
     void (*vsc_OnUpdateOpenCLBuild_IsActionVisible)(bool& isActionVisible);
