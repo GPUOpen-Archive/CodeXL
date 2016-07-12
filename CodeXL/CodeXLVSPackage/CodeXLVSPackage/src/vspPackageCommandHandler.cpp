@@ -1960,11 +1960,11 @@ void vspPackageCommandHandler::OnUpdateSample(vspCommandHandler& handler, OLECMD
 
         if (commandId == cmdidHelpOpenD3D12MultithreadingSample)
         {
-#ifdef VSP_VS14BUILD
-// if vs15 do nothing, the item is visible
-#else
-// hide the item
+            // by default do not show the item
             pOleCmd->cmdf |= OLECMDF_INVISIBLE;
+#ifdef VSP_VS14BUILD
+// if vs15 do nothing, show the item
+            pOleCmd->cmdf &= ~OLECMDF_INVISIBLE;
 #endif
         }
     }
