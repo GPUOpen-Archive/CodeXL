@@ -2257,10 +2257,12 @@ public:
 
                     ret = m_pDbAdapter->GetJITFunctionInfo(funcId, jitLoadAddr, srcFilePath, jncPath);
                 }
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
                 else if (AMDT_MODULE_TYPE_MANAGEDDPE == modInfo.m_type)
                 {
-                    // TODO:
+                    GetClrJitSrcFilePath(funcInfo.m_functionId, srcFilePath);
                 }
+#endif // AMDT_WINDOWS_OS
             }
         }
 
@@ -2332,10 +2334,12 @@ public:
                 {
                     retVal = GetJavaJitDisassembly(funcInfo, disasmInfoVec);
                 }
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
                 else if (AMDT_MODULE_TYPE_MANAGEDDPE == modInfo.m_type)
                 {
                     retVal = GetClrJitDisassembly(funcInfo, disasmInfoVec);
                 }
+#endif // AMDT_WINDOWS_OS
             }
         }
 
@@ -2713,13 +2717,255 @@ public:
         return retVal;
     }
 
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+    bool GetClrOffsetFromSymbol(ClrJncReader& clrJncReader, ExecutableFile& exe, gtRVAddr& offset)
+    {
+        bool ret = false;
+        SymbolEngine* pSymbolEngine = exe.GetSymbolEngine();
+
+        // Get IL info from CLR JNC file
+        const gtUByte* pILMetaData = clrJncReader.GetILMetaData();
+        ret = (nullptr != pSymbolEngine) && (nullptr != pILMetaData);
+
+        unsigned int offsetToIl = 0;
+        unsigned int ilSize = 0;
+        ret = ret && clrJncReader.GetILInfo(&offsetToIl, &ilSize);
+
+        if (ret)
+        {
+            const IMAGE_COR_ILMETHOD* pMethodHeader = reinterpret_cast<const IMAGE_COR_ILMETHOD*>(pILMetaData);
+            bool bFatHeader = ((pMethodHeader->Fat.Flags & CorILMethod_FormatMask) == CorILMethod_FatFormat);
+
+            unsigned int headerSize = (bFatHeader) ? 0xC : 0x1;
+            unsigned int methodSize = ilSize - headerSize;
+
+            wchar_t funcName[MAX_PATH];
+            clrJncReader.GetFunctionName(funcName, MAX_PATH);
+
+            offset = pSymbolEngine->LoadSymbol(funcName, methodSize);
+            ret = GT_INVALID_RVADDR != offset;
+        }
+
+        return ret;
+    }
+
+    bool GetSourceLineInfoForCLR(ClrJncReader& clrJncReader, ExecutableFile& exe, gtUInt32 clrSymOffset, OffsetLinenumMap& jitLineMap)
+    {
+        bool ret = false;
+        const gtUInt32 CLR_HIDDEN_LINE = 0x00feefee;
+        //get map of il to native code
+        const COR_DEBUG_IL_TO_NATIVE_MAP* pIlNativeMap = clrJncReader.GetILNativeMapInfo();
+
+        if (nullptr != pIlNativeMap)
+        {
+            const COR_DEBUG_IL_TO_NATIVE_MAP* pILLineMap = pIlNativeMap;
+
+            unsigned int ilNativeMapCount = clrJncReader.GetILNativeMapCount();
+
+            jitLineMap.clear();
+
+            //read line number map
+            // Note: the key of map is the offset, the data is line number
+            gtUInt32 minline = 0xFFFFFFFF;
+            gtUInt32 maxline = 0;
+            gtUInt32 previousLine = 1;
+            gtUInt32 ilOffset = clrSymOffset;
+            gtUInt32 ilPrevious = clrSymOffset;
+            gtUInt32 maxNativeOffset = 0;
+
+            for (unsigned int mapI = 0; mapI < ilNativeMapCount; mapI++, pILLineMap++)
+            {
+                switch (pILLineMap->ilOffset)
+                {
+                case NO_MAPPING:
+                case PROLOG:
+                    //negative, map to first or previous source line for source file purposes
+                    ilOffset = ilPrevious;
+                    break;
+
+                case EPILOG:
+                    //should use previous line's offset, as last bit
+                    break;
+
+                default:
+                    ilOffset = clrSymOffset + pILLineMap->ilOffset;
+                    break;
+                }
+
+                ilPrevious = ilOffset;
+
+                // this is the IL that address belongs to
+                SourceLineInfo srcLine;
+
+                if (exe.GetSymbolEngine()->FindSourceLine(ilOffset, srcLine))
+                {
+                    if (CLR_HIDDEN_LINE == srcLine.m_line)
+                    {
+                        srcLine.m_line = previousLine;
+                    }
+
+                    previousLine = srcLine.m_line;
+                    jitLineMap[pILLineMap->nativeStartOffset] = srcLine.m_line;
+
+                    if (srcLine.m_line < minline)
+                    {
+                        minline = srcLine.m_line;
+                    }
+
+                    if (srcLine.m_line > maxline)
+                    {
+                        maxline = srcLine.m_line;
+                    }
+                }
+                else
+                {
+                    srcLine.m_line = previousLine;
+                }
+
+                if (pILLineMap->nativeEndOffset > maxNativeOffset)
+                {
+                    maxNativeOffset = pILLineMap->nativeEndOffset;
+                }
+            }
+
+            ret = true;
+        }
+
+        return ret;
+    }
+
+    bool GetClrJitSrcFilePath(AMDTFunctionId funcId, gtString& srcFilePath)
+    {
+        bool ret = false;
+        ExecutableFile* pExecutable = nullptr;
+        ClrJncReader jncReader;
+        gtRVAddr clrSymOffset;
+        SourceLineInfo srcLine;
+
+        ret = GetClrJitSrcLineInfo__(funcId, jncReader, pExecutable, clrSymOffset, srcLine);
+
+        if (ret)
+        {
+            srcFilePath = srcLine.m_filePath;
+            jncReader.Close();
+        }
+
+        return ret;
+    }
+
+    bool GetClrJitSrcLineInfo__(AMDTFunctionId funcId, ClrJncReader& jncReader, ExecutableFile*& pExecutable,
+                                gtRVAddr& clrSymOffset,
+                                SourceLineInfo& srcLine)
+    {
+        bool ret = false;
+
+        if (nullptr != m_pDbAdapter)
+        {
+            // Get the loadaddress, srcfilepath, jncfilepath for the given function id
+            gtString jncPath;
+            gtVAddr jitLoadAddr;
+            gtString srcFilePath; // This is from DB - which always contains "UnknownJITSource"
+
+            if (m_pDbAdapter->GetJITFunctionInfo(funcId, jitLoadAddr, srcFilePath, jncPath))
+            {
+                AMDTModuleId modId = (funcId & 0xFFFF0000) >> 16;
+                ret = GetModuleExecutable(modId, pExecutable, true);
+
+                if (ret && (nullptr != pExecutable))
+                {
+                    AMDTProfileSessionInfo sessionInfo;
+
+                    GetProfileSessionInfo(sessionInfo);
+                    gtString jncFilePath = sessionInfo.m_sessionDir;
+                    jncFilePath.append(osFilePath::osPathSeparator);
+                    jncFilePath.append(jncPath);
+
+                    if (jncReader.Open(jncFilePath.asCharArray()))
+                    {
+                        ret = GetClrOffsetFromSymbol(jncReader, *pExecutable, clrSymOffset);
+                        ret = ret && pExecutable->GetSymbolEngine()->FindSourceLine(clrSymOffset, srcLine);
+                    }
+                }
+            }
+        }
+
+        return ret;
+    }
+
     int GetClrJitDisassembly(AMDTProfileFunctionInfo& funcInfo, AMDTSourceAndDisasmInfoVec& srcInfoVec)
     {
-        (void)funcInfo;
-        (void)srcInfoVec;
         // Get the loadaddress, srcfilepath, jncfilepath for the given function id
-        return false;
+        int retVal = CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE;
+
+        if (nullptr != m_pDbAdapter)
+        {
+            ExecutableFile* pExecutable = nullptr;
+            ClrJncReader jncReader;
+            gtRVAddr clrSymOffset;
+            SourceLineInfo srcLine;
+
+            bool ret = GetClrJitSrcLineInfo__(funcInfo.m_functionId, jncReader, pExecutable, clrSymOffset, srcLine);
+
+            if (ret)
+            {
+                unsigned int codeOffset = 0;
+                unsigned int codeSize = 0;
+                const gtUByte* pCode = (ret) ? jncReader.GetCodeBytesOfTextSection(&codeOffset, &codeSize) : nullptr;
+
+                if (pCode != nullptr)
+                {
+                    bool isLongMode = jncReader.Is64Bit();
+                    OffsetLinenumMap funcOffsetLinenumMap;
+
+                    GetSourceLineInfoForCLR(jncReader, *pExecutable, clrSymOffset, funcOffsetLinenumMap);
+
+                    AMDTUInt32 currOffset = 0;
+                    AMDTUInt32 currLineNumber = funcOffsetLinenumMap.begin().value();
+
+                    for (auto offsetLineIt = funcOffsetLinenumMap.begin(); offsetLineIt != funcOffsetLinenumMap.end(); ++offsetLineIt)
+                    {
+                        AMDTUInt32 nextOffset = offsetLineIt.key();
+                        AMDTUInt32 nextLineNumber = offsetLineIt.value();
+                        AMDTUInt32 bytesToRead = nextOffset - currOffset;
+                        AMDTUInt32 bytesUsed = 0;
+
+                        while (bytesToRead > 0)
+                        {
+                            AMDTSourceAndDisasmInfo instInfo;
+
+                            instInfo.m_offset = currOffset;
+                            instInfo.m_sourceLine = currLineNumber;
+
+                            const gtUByte* pCurrentCode = pCode + instInfo.m_offset;
+
+                            bool rc = GetDisassemblyString((BYTE*)pCurrentCode, isLongMode, instInfo, bytesUsed);
+
+                            if (rc)
+                            {
+                                srcInfoVec.push_back(instInfo);
+                                bytesToRead = (bytesToRead > bytesUsed) ? (bytesToRead - bytesUsed) : 0;
+                                currOffset += bytesUsed;
+                            }
+                            else
+                            {
+                                bytesToRead = 0;
+                            }
+                        }
+
+                        currOffset = nextOffset;
+                        currLineNumber = nextLineNumber;
+                    }
+
+                    retVal = CXL_DATAACCESS_SUCCESS;
+                }
+
+                jncReader.Close();
+            }
+        }
+
+        return retVal;
     }
+#endif // AMDT_WINDOWS_OS
 
     bool GetDisassemblyString(BYTE* pCurrentCode, bool isLongMode, AMDTSourceAndDisasmInfo& disasmInfo, AMDTUInt32& bytesUsed)
     {
@@ -3434,7 +3680,15 @@ public:
 
             if (ret)
             {
-                pExe = ExecutableFile::Open(modInfo.m_path.asCharArray(), modInfo.m_loadAddress);
+                gtString exePath = modInfo.m_path;
+
+                // For CLR
+                if (exePath.endsWith(L".jit"))
+                {
+                    exePath.truncate(0, (exePath.length() - 4));
+                }
+
+                pExe = ExecutableFile::Open(exePath.asCharArray(), modInfo.m_loadAddress);
 
                 if (nullptr != pExe)
                 {

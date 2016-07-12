@@ -957,13 +957,7 @@ void SessionSourceCodeView::UpdateWithNewSymbol()
         m_pTreeViewModel->m_funOffsetLinenumMap.clear();
 
         fileLocationStr = QString("Module: ") + m_pTreeViewModel->m_moduleName;
-
-        // For JAVAMODULE and MANAGEDPE, we update the jnc file
-        // in the module label.
-        if (m_pTreeViewModel->m_modType == AMDT_MODULE_TYPE_MANAGEDDPE || m_pTreeViewModel->m_modType == AMDT_MODULE_TYPE_JAVA)
-        {
-            fileLocationStr += " (" + acGTStringToQString(m_pTreeViewModel->m_pDisplayedFunction->getJncFileName()) + ")";
-        }
+        // TODO: For JAVAMODULE and MANAGEDPE, we update the jnc file in the module label.
     }
     else
     {
