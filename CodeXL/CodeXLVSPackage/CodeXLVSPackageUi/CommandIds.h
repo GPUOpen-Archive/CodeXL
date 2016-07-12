@@ -156,6 +156,8 @@
 
 #define cmdidRefreshSessions 0xd01
 #define cmdidCaptureFrame 0xd02
+#define cmdidCaptureFrameGPU 0xd03
+#define cmdidCaptureFrameCPU 0xd04
 
 // Images and buffers tools:
 #define commandIDBestFit                0x2001
@@ -217,6 +219,8 @@
 #define bmpPause                6
 #define bmpStop                 7
 #define bmpCapture              8
+#define bmpCaptureGPU           8
+#define bmpCaptureCPU           8
 #define bmpStepIn               9
 #define bmpStepOver             10
 #define bmpAPIStep              11
