@@ -1793,7 +1793,7 @@ void kaBackendManager::BuildThread::InitKaStageStatisticsGroups(gtMap<gtString, 
 bool kaBackendManager::BuildThread::BuildDxShader(kaSourceFile* pCurrentFile,
                                                   const gtString& isaFileName, const gtString& dxAsmFileName, const gtString& binFileName, const gtString& statisticsFileName,
                                                   const std::string& sourceCodeFullPathName,
-                                                  int& numOfSuccessfulBuilds, const gtString& entryPoint, const gtString& profile)
+                                                  int& numOfSuccessfulBuilds, const gtString& entryPoint, const gtString& profile, bool isIntrinsicsEnabled)
 {
     bool result = false;
 
@@ -1853,7 +1853,7 @@ bool kaBackendManager::BuildThread::BuildDxShader(kaSourceFile* pCurrentFile,
                                              m_dxBuildOptions.m_buildOptions.toStdString(),
                                              m_dxBuildOptions, isaFileName.asASCIICharArray(), binFileName.asASCIICharArray(), "",
                                              currentStatsFilePath.asString().asASCIICharArray(), dxAsmFilePath.asString().asASCIICharArray(),
-                                             device, sourceCodeFullPathName, m_shouldBeCanceled, cliOutput);
+                                             device, sourceCodeFullPathName, isIntrinsicsEnabled, m_shouldBeCanceled, cliOutput);
 
                     // Rename the DX ASM file to align with the front-end's expected file name.
                     osFilePath fixedDxAsmFilePath(dxAsmFilePath);
@@ -1988,6 +1988,9 @@ bool kaBackendManager::BuildThread::LaunchDxBuild(const gtString& buildOutputDir
             GT_ASSERT(pDxCurrentProgram->GetFileProfile(currentFileId, profile));
             GT_ASSERT(pDxCurrentProgram->GetFileSelectedEntryPoint(currentFileId, entryPoint));
 
+            bool isShaderIntrinsicsEnabled = false;
+            isShaderIntrinsicsEnabled = kaProjectDataManager::instance().IsD3D11ShaderIntrinsicsExtensionEnabled();
+
             // Prepare the source code file's full path.
             std::string sourceCodeFullPathName;
             pCurrentFile->filePath().asString().asUtf8(sourceCodeFullPathName);
@@ -2002,7 +2005,7 @@ bool kaBackendManager::BuildThread::LaunchDxBuild(const gtString& buildOutputDir
                                                                             boftStatistics, buildOutputDir);
 
             result &= BuildDxShader(pCurrentFile, isaFileName, dxAsmFileName, binFileName,
-                                    statisticsFileName, sourceCodeFullPathName, numOfSuccessfulBuilds, entryPoint, profile);
+                                    statisticsFileName, sourceCodeFullPathName, numOfSuccessfulBuilds, entryPoint, profile, isShaderIntrinsicsEnabled);
         }
 
     }

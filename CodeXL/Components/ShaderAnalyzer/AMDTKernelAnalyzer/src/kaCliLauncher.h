@@ -172,6 +172,7 @@ bool LaunchDXSessionForDevice(AnalyzerBuildArchitecture& bitness,
                               const std::string& dxAsmFileName,
                               const std::string& selectedDevice,
                               const std::string& sourceCodeFullPathName,
+                              bool isIntrinsicsEnabled,
                               const bool& shouldBeCanceled,
                               std::string& cliOutput);
 

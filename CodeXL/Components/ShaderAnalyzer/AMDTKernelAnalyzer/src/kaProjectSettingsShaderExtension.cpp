@@ -39,7 +39,8 @@ kaProjectSettingsShaderExtension::kaProjectSettingsShaderExtension():
     m_pD3dPathCombox(NULL),
     m_pFxcPathCombox(NULL),
     m_pShaderIncludesLineEdit(NULL),
-    m_pShaderMacrosLineEdit(NULL)
+    m_pShaderMacrosLineEdit(NULL),
+    m_pShaderIntrinsicsCheckBox(NULL)
 {
     m_isBasicBuildOption = false;
 
@@ -194,6 +195,11 @@ bool kaProjectSettingsShaderExtension::SetSettingsFromXMLString(const gtString& 
         m_pShaderIncludesLineEdit->setText(includesStr);
     }
 
+    // Shader intrinsics extension
+    bool isShaderIntrinsicsEnabled = KA_PROJECT_DATA_MGR_INSTANCE.IsD3D11ShaderIntrinsicsExtensionEnabled();
+    m_pShaderIntrinsicsCheckBox->setChecked(isShaderIntrinsicsEnabled);
+
+
     return retVal;
 }
 
@@ -313,6 +319,12 @@ bool kaProjectSettingsShaderExtension::SaveCurrentSettings()
             KA_PROJECT_DATA_MGR_INSTANCE.SetShaderIncludes(m_pShaderIncludesLineEdit->text());
         }
 
+        // set shader intrinsics enablement
+        GT_IF_WITH_ASSERT(NULL != m_pShaderIntrinsicsCheckBox)
+        {
+            KA_PROJECT_DATA_MGR_INSTANCE.SetD3D11ShaderIntrinsicsExtensionEnabled(m_pShaderIntrinsicsCheckBox->isChecked());
+        }
+
         unsigned int commandMask = GetD3dBuildptionsMask();
         KA_PROJECT_DATA_MGR_INSTANCE.SetShaderD3dBuildOptionsMask(commandMask);
     }
@@ -342,6 +354,12 @@ void kaProjectSettingsShaderExtension::RestoreDefaultProjectSettings()
     GT_IF_WITH_ASSERT(NULL != m_pFxcPathCombox)
     {
         m_pFxcPathCombox->setEnabled(false);
+    }
+
+    // By default, D3D11 Shader Intrinsics extension is disabled.
+    GT_IF_WITH_ASSERT(NULL != m_pShaderIntrinsicsCheckBox)
+    {
+        m_pShaderIntrinsicsCheckBox->setChecked(false);
     }
 
     //update data manager with default compile type, d3d and fxc path
@@ -449,6 +467,24 @@ void kaProjectSettingsShaderExtension::GenerateOptionsTable()
 
         pDataFlag = AddTextEditOption(m_pGridLayout, KA_STR_HLSL_optionsDialogIncludeDirs, KA_STR_HLSL_optionsDialogIncludeDirsTooltip);
         m_pShaderIncludesLineEdit = qobject_cast<QLineEdit*>(pDataFlag->m_pWidget);
+
+        // AMD extensions section.
+        numRows = m_pGridLayout->rowCount();
+        QLabel* pAmdExtensionsLabel = new QLabel(KA_STR_optionsDialogAmdExtensions);
+        pAmdExtensionsLabel->setStyleSheet(AF_STR_captionLabelStyleSheetMain);
+        m_pGridLayout->addWidget(pAmdExtensionsLabel, numRows, 0, 1, 3);
+        
+        // Generate the tooltip string.
+        QString tooltipStr;
+        acWrapAndBuildFormattedTooltip(KA_STR_HLSL_optionsDialogEnableShaderIntrinsics, KA_STR_HLSL_optionsDialogAvoidShaderIntrinsicsToolTip, tooltipStr);
+
+        // Create the check box.
+        m_pShaderIntrinsicsCheckBox = new QCheckBox(KA_STR_HLSL_optionsDialogEnableShaderIntrinsics);
+        m_pShaderIntrinsicsCheckBox->setToolTip(tooltipStr);
+
+        // Add the check box to the grid.
+        numRows = m_pGridLayout->rowCount();
+        m_pGridLayout->addWidget(m_pShaderIntrinsicsCheckBox, numRows, 0, 1, 1);
 
         // Shader Build Options label
         numRows = m_pGridLayout->rowCount();

@@ -92,6 +92,9 @@ struct DXAdditionalBuildOptions
 
     // Additional build options.
     QString     m_buildOptions;
+
+    // true to enable AMD D3D11 Shader Intrinsics extension.
+    bool m_isShaderIntrinsicsExtEnabled = false;
 };
 
 /// OpenGL build options.
@@ -410,7 +413,7 @@ private:
         /// Launches a DX shader build.
         bool BuildDxShader(kaSourceFile* pCurrentFile,
                            const gtString& isaFileName, const gtString& dxAsmFileName, const gtString& binFileName, const gtString& statisticsFileName,
-                           const std::string& sourceCodeFullPathName, int& numOfSuccessfulBuilds, const gtString& entryPoint, const gtString& profile);
+                           const std::string& sourceCodeFullPathName, int& numOfSuccessfulBuilds, const gtString& entryPoint, const gtString& profile, bool isIntrinsicsEnabled);
         bool LaunchDxBuild(const gtString& buildOutputDir);
 
 #endif

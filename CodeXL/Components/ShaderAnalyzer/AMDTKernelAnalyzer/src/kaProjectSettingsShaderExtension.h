@@ -242,6 +242,8 @@ private:
     QLineEdit* m_pShaderIncludesLineEdit;   // shader includes inserted by user
     QLineEdit* m_pShaderMacrosLineEdit;     // shader macros inserted by user
 
+    QCheckBox* m_pShaderIntrinsicsCheckBox; // checked to enable D3D Shader Intrinsics extension
+
     gtString m_sD3dDllBrowsingPath;               // browsing directory path for d3d dll's
     gtString m_sFxcExeBrowsingPath;               // browsing directory path for Fxc exe files
 
