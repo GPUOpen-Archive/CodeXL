@@ -515,7 +515,7 @@ bool LaunchOpenGLSessionForDevice(AnalyzerBuildArchitecture bitness, const std::
 
 #if _WIN32
 
-static std::string GenerateDXShaderOptions(const std::string& dxTarget, const std::string& dxEntryPoint, bool isFxc)
+static std::string GenerateDXShaderOptions(const std::string& dxTarget, const std::string& dxEntryPoint, bool isFxc, bool isIntrinsicsEnabled)
 {
     std::stringstream outputStream;
 
@@ -526,6 +526,11 @@ static std::string GenerateDXShaderOptions(const std::string& dxTarget, const st
     else
     {
         outputStream << KA_STR_D3D_FXC_ShaderCommandLineOption << " " << "-p " << dxTarget << " " << "-f " << dxEntryPoint << " ";
+    }
+
+    if (isIntrinsicsEnabled)
+    {
+        outputStream << " --intrinsics ";
     }
 
     return outputStream.str();
@@ -601,6 +606,7 @@ bool LaunchDXSessionForDevice(AnalyzerBuildArchitecture& bitness,
                               const std::string& dxAsmFileName,
                               const std::string& selectedDevice,
                               const std::string& sourceCodeFullPathName,
+                              bool isIntrinsicsEnabled,
                               const bool& shouldBeCanceled,
                               std::string& cliOutput)
 {
@@ -612,7 +618,7 @@ bool LaunchDXSessionForDevice(AnalyzerBuildArchitecture& bitness,
     // Check if the compilation should go through FXC.
     bool isFxc = (additionalBuildOptions.m_builderType == KA_STR_DX_FXC_BUILD_TYPE);
 
-    dxOptionsOutputStream << GenerateDXShaderOptions(dxTarget, dxEntryPoint, isFxc);
+    dxOptionsOutputStream << GenerateDXShaderOptions(dxTarget, dxEntryPoint, isFxc, isIntrinsicsEnabled);
     std::string compilerBuildOptions;
 
     if (!isFxc)

@@ -193,6 +193,9 @@ bool kaProjectDataManager::getXMLSettingsString(gtString& projectAsXMLString)
     afUtils::addFieldToXML(projectAsXMLString, KA_STR_projectSettingShaderIncludesNode, acQStringToGTString(m_shaderIncludes));
     afUtils::addFieldToXML(projectAsXMLString, KA_STR_projectSettingKernelMacrosNode, acQStringToGTString(m_kernelMacros));
 
+    // D3D11 Shader Intrinsics extension.
+    afUtils::addFieldToXML(projectAsXMLString, KA_STR_projectSettingEnableIntrinsics, IsD3D11ShaderIntrinsicsExtensionEnabled());
+
     return retVal;
 }
 
@@ -410,6 +413,10 @@ bool kaProjectDataManager::setSettingsFromXMLString(const gtString& projectAsXML
         afUtils::getFieldFromXML(*pMainNode, KA_STR_projectSettingShaderIncludesNode, shaderIncludesString);
         commandStringQT = acGTStringToQString(shaderIncludesString);
         SetShaderIncludes(commandStringQT);
+
+        // AMD D3D11 Shader Intrinsics extension.
+        m_isD3DIntrinsicsEnabled = false;
+        afUtils::getFieldFromXML(*pMainNode, KA_STR_projectSettingEnableIntrinsics, m_isD3DIntrinsicsEnabled);
 
         // update the settings page with the new build options from XML
         gtString shaderCommandString;

@@ -298,6 +298,10 @@ public:
     /// Get the build architecture (32-bit, 64-bit, etc.) of the active file
     AnalyzerBuildArchitecture GetBuildArchitecture() const { return m_buildArchitecture; }
 
+    bool IsD3D11ShaderIntrinsicsExtensionEnabled() const { return m_isD3DIntrinsicsEnabled; }
+
+    void SetD3D11ShaderIntrinsicsExtensionEnabled(bool isEnabled) { m_isD3DIntrinsicsEnabled = isEnabled; }
+
     /// Set current file information
     void SetCurrentFileData(kaFileInformation fileInfoType, gtString& fileInfo);
 
@@ -593,6 +597,9 @@ private:
 
     /// maps last built program name to last built program
     std::unordered_map<std::wstring, kaProgram*> m_pLastBuildProgram;
+
+    /// true if AMD D3D11 Shader Intrinsics extension is enabled, false otherwise.
+    bool m_isD3DIntrinsicsEnabled = false;
 };
 #endif //__KAPROJECTDATAMANAGER_h
 
