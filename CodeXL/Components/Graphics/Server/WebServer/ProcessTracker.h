@@ -100,6 +100,9 @@ public:
     }
 
 #ifdef _LINUX
+    /// Setup Vulkan-specific environment variables
+    void SetupVulkanEnvVariables();
+
     /// Sets the plugin name required by the injected app
     /// (either 'GL' or 'GLES')
     void SetInjectedAppPluginName(const char* pluginName)
