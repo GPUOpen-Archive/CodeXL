@@ -4474,7 +4474,7 @@ void pdGDBOutputReader::handleSignalOutput(const gtASCIIString& gdbOutputLine, b
                         _wasDebuggedProcessSuspended = true;
                     }
 
-                    exceptionReason = OS_STANDALONE_THREAD_STOPPED;
+                    exceptionReason = (signalNameStr == sigThreadStopped) ? OS_STANDALONE_THREAD_STOPPED : OS_SIGINT_SIGNAL;
                 }
                 else
                 {
@@ -4488,12 +4488,9 @@ void pdGDBOutputReader::handleSignalOutput(const gtASCIIString& gdbOutputLine, b
                 }
 
             // If the debugged process encountered an exception:
-            if (exceptionReason != -1)
+            if ((-1 != exceptionReason) && (OS_STANDALONE_THREAD_STOPPED != exceptionReason) && (OS_SIGINT_SIGNAL != exceptionReason))
             {
-                if (OS_STANDALONE_THREAD_STOPPED != exceptionReason)
-                {
-                    handleException(exceptionReason);
-                }
+                handleException(exceptionReason);
             }
         }
     }
