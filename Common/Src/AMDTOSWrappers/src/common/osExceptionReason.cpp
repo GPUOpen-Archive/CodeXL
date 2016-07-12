@@ -207,9 +207,12 @@ static const wchar_t* stat_osExceptionReasonDescriptionToString[OS_AMOUNT_OF_EXC
     L"An unknown exception was encountered.",
 #elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
     L"An unknown signal was encountered.",
+#else
+#error Unknown target!
 #endif
 
-    L" Insufficient memory (used in cases an exception like std::bad_alloc is being thrown)"
+    L"A standalone thread has stopped running"
+    L"Insufficient memory (used in cases an exception like std::bad_alloc is being thrown)"
     L"The thread tried to read from or write to a virtual address to which it does not have access.",
     L"The thread tried to access an array element that is out of bounds and the underlying hardware supports bounds checking.",
     L"The thread tried to read or write data that is misaligned on hardware that does not provide alignment. For example, 16-bit values must be aligned on 2-byte boundaries; 32-bit values on 4-byte boundaries, and so on.",
