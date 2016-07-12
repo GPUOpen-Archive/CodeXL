@@ -82,6 +82,11 @@ void ClientRequestThread::WaitForClientRequests(NetSocket* server_socket)
         HandleHTTPRequest(client_socket, client_address.sin_addr, ++handle);
     }
 
+    // shutdown the shared memory
+    smClose("PLUGINS_TO_GPS");
+
+    LogConsole(logMESSAGE, "ClientRequestThread loop terminating\n");
+
     // when the shutdown event is signaled, the loop is exited
     // and we have to wait for the plugin thread and the shutdown thread to exit before returning to the main server
     // First, wait for threads to finish. Deleting the thread will automatically terminate the thread
@@ -105,6 +110,8 @@ void ClientRequestThread::WaitForClientRequests(NetSocket* server_socket)
     }
 
     delete renderStallThread;
+
+    LogConsole(logMESSAGE, "ClientRequestThread terminating\n");
 
     shutdownEvent.Close();
 }

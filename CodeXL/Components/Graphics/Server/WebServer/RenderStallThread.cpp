@@ -9,6 +9,7 @@
 #include "RenderStallThread.h"
 #include "../Common/GraphicsServerState.h"
 #include "../Common/SharedGlobal.h"
+#include "../Common/NamedEvent.h"
 #include "RequestsInFlightDatabase.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -21,7 +22,10 @@ void RenderStallThread::CheckForRenderStall()
     int delay = 0;
     int outerDelay = 0;
 
-    for (;;)    // loop forever
+    NamedEvent shutdownEvent;
+    bool opened = shutdownEvent.Open("GPS_SHUTDOWN_SERVER");
+
+    while (opened && false == shutdownEvent.IsSignaled())
     {
         if (GetServerShutdownState() == true)
         {
@@ -93,4 +97,7 @@ void RenderStallThread::CheckForRenderStall()
         // Wait a reasonable time. 10ms is too short as it is below a games 16ms typical update and will lead to diffs of zero (a stall condition).
         osSleep(GRAPHICS_SERVER_STATUS_STALL_LOOP_SLEEP_TIME);
     }
+    LogConsole(logMESSAGE, "RenderStallThread terminating\n");
+
+    shutdownEvent.Close();
 }

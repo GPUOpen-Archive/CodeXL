@@ -17,7 +17,9 @@
 //--------------------------------------------------------------
 void ShutdownThread::WaitForShutdownResponse(void* pluginThread, void* renderStallThread)
 {
-    NamedEvent shutdownEvent;
+    PS_UNREFERENCED_PARAMETER(pluginThread);
+    PS_UNREFERENCED_PARAMETER(renderStallThread);
+/*    NamedEvent shutdownEvent;
     shutdownEvent.Open("GPS_SHUTDOWN_SERVER");
 
     shutdownEvent.Wait();
@@ -45,5 +47,5 @@ void ShutdownThread::WaitForShutdownResponse(void* pluginThread, void* renderSta
 
     // shutdown the shared memory
     smClose("PLUGINS_TO_GPS");
-    shutdownEvent.Close();
+    shutdownEvent.Close();*/
 }
