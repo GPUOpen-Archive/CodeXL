@@ -1162,18 +1162,18 @@ NTSTATUS IoctlSetEvent(IN PPWRPROF_DEV_EXTENSION pDevExt,
     pIrp->IoStatus.Information = 0;
 
     //  Verifying parameters
-    if (pIrpStack->Parameters.DeviceIoControl.InputBufferLength != sizeof(HANDLE))
+    if (pIrpStack->Parameters.DeviceIoControl.InputBufferLength != sizeof(uint64))
     {
-        DRVPRINT("Input buffer length missmatch expected %d, actual %d", sizeof(HANDLE),
+        DRVPRINT("Input buffer length missmatch expected %d, actual %d", sizeof(uint64),
                  pIrpStack->Parameters.DeviceIoControl.InputBufferLength);
         ret = STATUS_INFO_LENGTH_MISMATCH;
     }
 
     if (STATUS_SUCCESS == ret)
     {
-        if (pIrpStack->Parameters.DeviceIoControl.OutputBufferLength < sizeof(HANDLE))
+        if (pIrpStack->Parameters.DeviceIoControl.OutputBufferLength < sizeof(uint64))
         {
-            DRVPRINT("Input buffer length missmatch expected %d, actual %d", sizeof(HANDLE),
+            DRVPRINT("Output buffer length missmatch expected %d, actual %d", sizeof(uint64),
                      pIrpStack->Parameters.DeviceIoControl.OutputBufferLength);
             ret = STATUS_BUFFER_TOO_SMALL;
         }

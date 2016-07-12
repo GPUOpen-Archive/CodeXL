@@ -224,18 +224,6 @@ AMDTResult DriverSignalInitialize(DRV_SIGINFO_CB fnDrvSignalInfo, AMDTUInt32 sam
     DWORD param;
     AMDTUInt64 out = 0;
 
-    AMDTUInt32 paramSize = sizeof(AMDTUInt64);
-#ifndef LINUX
-    BOOL is32on64Sys = FALSE;
-    IsWow64Process(GetCurrentProcess(), &is32on64Sys);
-
-    if (false == is32on64Sys)
-    {
-        paramSize = sizeof(AMDTUInt32);
-    }
-
-#endif
-
     samplingPeriod = samplingPeriod;
 
     isFlashedSignal = false;
@@ -252,7 +240,7 @@ AMDTResult DriverSignalInitialize(DRV_SIGINFO_CB fnDrvSignalInfo, AMDTUInt32 sam
         AMDTUInt64 hdl = (AMDTUInt64)g_eventCfg.m_hdl;
         g_eventCfg.m_isActive = true;
         // Send the event information to driver
-        status = POWER_DRIVER_IN_OUT(g_powerDrvHld, IOCTL_SET_EVENT, &hdl, paramSize, &out, paramSize, (DWORD*)&ret);
+        status = POWER_DRIVER_IN_OUT(g_powerDrvHld, IOCTL_SET_EVENT, &hdl, sizeof(AMDTUInt64), &out, sizeof(AMDTUInt64), (DWORD*)&ret);
         g_process = CreateThread(nullptr, 0, ProcessDriverMessage, nullptr, 0, &param);
     }
 
