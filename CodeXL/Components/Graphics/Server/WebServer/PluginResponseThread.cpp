@@ -39,6 +39,7 @@ void PluginResponseThread::WaitForPluginResponses(void* pData)
 
     while (opened && false == shutdownEvent.IsSignaled())
     {
+        // wait for incoming signals from the plugin indicating that there is new data in shared memory
         bEvent = semaphore.Wait();
 
         if (bEvent == false)
@@ -48,9 +49,10 @@ void PluginResponseThread::WaitForPluginResponses(void* pData)
             break;
         }
 
+        // check to see if the shutdownEvent has been signaled. When closing down, the PLUGINS_TO_GPS_SEMAPHORE is signaled to
+        // unblock the semaphore.Wait() above, in which case there is no data in shared memory and the thread needs to exit now
         if (shutdownEvent.IsSignaled())
         {
-            LogConsole(logMESSAGE, "Signaling PluginResponseThread to close\n");
             break;
         }
 
@@ -87,7 +89,6 @@ void PluginResponseThread::WaitForPluginResponses(void* pData)
                     RequestsInFlightDatabase::Instance()->Remove(client_socket);
 #endif
 #endif
-
                     // now try to get the mime type
                     if (smGet("PLUGINS_TO_GPS", &pcMimeType, PS_MAX_PATH) > 0)
                     {
@@ -175,6 +176,5 @@ void PluginResponseThread::WaitForPluginResponses(void* pData)
         }
     }
     semaphore.Close();
-    LogConsole(logMESSAGE, "PluginResponseThread terminating\n");
     shutdownEvent.Close();
 }

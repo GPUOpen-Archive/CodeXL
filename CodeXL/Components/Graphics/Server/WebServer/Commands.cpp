@@ -148,10 +148,8 @@ void ProcessGetMethod(HTTPRequestHeader* pRequestHeader, NetSocket* pClientSocke
     }
     else if (IsToken(&sCmd, "Shutdown"))
     {
-        LogConsole(logMESSAGE, "** Got Shutdown message\n");
         ProcessTracker::Instance()->KillAllProcesses();
         SendTextResponse(requestID, "OK", pClientSocket);
-        LogConsole(logMESSAGE, "** Signaling shutdownEvent\n");
         g_shutdownEvent.Signal();
 
         // signal the plugin thread. It's currently waiting on this semaphore
@@ -166,8 +164,6 @@ void ProcessGetMethod(HTTPRequestHeader* pRequestHeader, NetSocket* pClientSocke
 
             semaphore.Close();
         }
-
-        LogConsole(logMESSAGE, "** done signaling shutdownEvent\n");
     }
     else if (IsToken(&sCmd, "CommandTree.xml"))
     {
