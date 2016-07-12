@@ -10,6 +10,8 @@
 
 // Infra:
 #include <AMDTBaseTools/Include/gtAssert.h>
+#include <AMDTOSWrappers/Include/osCriticalSection.h>
+#include <AMDTOSWrappers/Include/osCriticalSectionLocker.h>
 #include <AMDTOSWrappers/Include/osDebugLog.h>
 #include <AMDTOSWrappers/Include/osTime.h>
 #include <AMDTAPIClasses/Include/Events/apDebuggedProcessCreatedEvent.h>
@@ -159,6 +161,8 @@ HRESULT vsdCDebugEventCallback::QueryInterface(REFIID riid, LPVOID* ppvObj)
 // IDebugEventCallback2 methods
 HRESULT vsdCDebugEventCallback::Event(IDebugEngine2* pEngine, IDebugProcess2* pProcess, IDebugProgram2* pProgram, IDebugThread2* pThread, IDebugEvent2* pEvent, REFIID riidEvent, DWORD dwAttrib)
 {
+    osCriticalSectionLocker eventCSLocker(m_eventCallbackCS);
+
     HRESULT retVal = S_OK;
 
     GT_UNREFERENCED_PARAMETER(pProcess);
@@ -445,4 +449,11 @@ HRESULT vsdCDebugEventCallback::Event(IDebugEngine2* pEngine, IDebugProcess2* pP
     OS_OUTPUT_DEBUG_LOG(L"vsdCDebugEventCallback - event handling end", OS_DEBUG_LOG_EXTENSIVE);
 
     return retVal;
-};
+}
+
+void vsdCDebugEventCallback::WaitForEventHandlingCriticalSection()
+{
+    osCriticalSectionLocker eventCSLocker(m_eventCallbackCS);
+}
+
+
