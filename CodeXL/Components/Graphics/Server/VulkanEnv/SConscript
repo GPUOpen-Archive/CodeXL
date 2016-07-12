@@ -1,0 +1,63 @@
+import os
+
+###############################################################################
+# Main scons build file for VulkanServer
+
+from CXL_init import *
+
+Import('*')
+env = CXL_env.Clone()
+
+libName="VulkanEnv"
+
+initGPSBackend (env)
+UseTinyXml (env)
+UseGPUPerfAPI (env)
+initVulkanSDK (env)
+UseJpgLib (env)
+
+env.Append (CPPPATH =[
+    env['CXL_commonproj_dir'],
+    env['CXL_commonproj_dir'] + '/../../CodeXL/Components/Graphics/Server/Common',
+    env['CXL_commonproj_dir'] + '/../../CodeXL/Components/Graphics/Server/Common/Linux',
+    ])
+
+cpp_flags= ' ' + ' -fPIC -fvisibility=hidden '
+original_cpp_flag=env['CPPFLAGS']
+original_cpp_flag = original_cpp_flag + cpp_flags
+env.Replace(CPPFLAGS = original_cpp_flag) 
+
+linker_flags = ' -Wl,-z,defs '
+env.Prepend(LINKFLAGS = linker_flags)
+
+# These need to be in their dependency order, with most derived first
+env['LIBS'] = \
+[
+    #local libraries
+    "libCXLGraphicsServerCommon",
+    "libCXLOSWrappers",
+    "libCXLBaseTools",
+    #external libraries
+    "dl",
+    "rt",
+    "pthread",
+]
+
+# Vulkan specific source files
+sources = \
+[
+    "VulkanEnv.cpp",
+]
+
+# build the VulkanServer shared library
+soFiles = env.SharedLibrary(
+    target = libName,
+    source = sources)
+install = soFiles
+
+# Installing libraries
+VulkanEnv = env.Install(
+    dir = env['CXL_lib_dir']+'/Plugins',
+    source = (install))
+
+Return('VulkanEnv')

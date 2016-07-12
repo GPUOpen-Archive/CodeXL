@@ -571,7 +571,10 @@ Depends(GPUPerfServer, GPSAPICommon_Obj + OSWrappers_Obj)
 #Command(targetName, fullPath + "/" + GPS_env.rootFolderName + "/Server/WebServer/GPUPerfServer", Copy("$TARGET", "$SOURCE"))
 GPSBackend +=GPUPerfServer
 
-
+# Build the Vulkan environment variable propagator shared library
+VulkanEnv = SConscript(['Components/Graphics/Server/VulkanEnv/SConscript'], variant_dir=obj_variant_dir+'/VulkanEnv', duplicate=0)
+Depends(VulkanEnv, GPSAPICommon_Obj + OSWrappers_Obj)
+GPSBackend += VulkanEnv
 
 ############################################
 #
@@ -672,3 +675,4 @@ Alias( target='APICommon'   ,source=(GPSAPICommon_Obj))
 Alias( target='VulkanServer'   ,source=(VulkanServer))
 Alias( target='CapturePlayer'   ,source=(CapturePlayer))
 Alias( target='GPUPerfServer'   ,source=(GPUPerfServer))
+Alias( target='VulkanEnv'   , source=(VulkanEnv))
