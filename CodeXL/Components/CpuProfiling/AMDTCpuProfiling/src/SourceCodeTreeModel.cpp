@@ -1512,7 +1512,7 @@ bool SourceCodeTreeModel::SetupSourceInfo()
     gtString srcFile;
     bool ret = m_pProfDataRdr->GetSourceFilePathForFunction(m_funcId, srcFile);
 
-    if (ret && (srcFile != L"Unknown Source File"))
+    if (ret && (srcFile != L"Unknown Source File") && (srcFile != L"UnknownJITSource"))
     {
         m_srcFile = acGTStringToQString(srcFile);
     }
