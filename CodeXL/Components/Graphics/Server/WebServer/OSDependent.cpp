@@ -2198,6 +2198,9 @@ void DetectConflictingProcesses()
         }
         else
         {
+#ifdef _LINUX
+            ProcessTracker::Instance()->SetupVulkanEnvVariables();
+#endif
             if (ProcessTracker::Instance()->CreateSharedMemory() == false)
             {
                 g_shutdownEvent.Signal();

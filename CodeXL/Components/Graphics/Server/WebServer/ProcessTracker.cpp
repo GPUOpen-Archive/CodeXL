@@ -23,6 +23,8 @@
 #ifdef _WIN32
     #include "../Common/Windows/DllReplacement.h"
     #include "../MicroDLL/MicroDLLName.h"
+#else
+    #include "../VulkanEnv/VulkanEnv.h"
 #endif
 
 #include "Inject.h"
@@ -1101,7 +1103,7 @@ bool ProcessTracker::PassRequestToPlugin(const char* strDestination,
 //--------------------------------------------------------------------------
 #ifndef _WIN32
 
-static void SetupVulkanEnvVariables()
+void ProcessTracker::SetupVulkanEnvVariables()
 {
 #ifdef CODEXL_GRAPHICS
     gtASCIIString layerNameA = "libCXLGraphicsServerVulkan" GDT_PROJECT_SUFFIX;
@@ -1131,6 +1133,33 @@ static void SetupVulkanEnvVariables()
     osSetCurrentProcessEnvVariable(layerPath);
     osSetCurrentProcessEnvVariable(instanceLayerName);
     osSetCurrentProcessEnvVariable(deviceLayerName);
+
+    // write the environment variables to a file so they can be loaded
+    // by the VulkanEnv plugin
+    gtString toolFolder;
+    toolFolder.fromASCIIString(GetPerfStudioDirName());
+
+    osFilePath envFilePath;
+    envFilePath.setPath(osFilePath::OS_TEMP_DIRECTORY);
+    envFilePath.appendSubDirectory(toolFolder);
+
+    gtString filePath = envFilePath.asString();
+    filePath += ENV_FILENAME;
+
+    FILE* fp = fopen(filePath.asASCIICharArray(), "wb");
+    if (fp)
+    {
+        const char* path = layerPath._value.asASCIICharArray();
+        const char* name = layerName.asASCIICharArray();
+        int32 pathLength = strlen(path);
+        int32 nameLength = strlen(name);
+
+        fwrite(&pathLength, sizeof(int32), 1, fp);
+        fwrite(&nameLength, sizeof(int32), 1, fp);
+        fwrite(path, pathLength, 1, fp);
+        fwrite(name, nameLength, 1, fp);
+        fclose(fp);
+    }
 }
 
 #endif
