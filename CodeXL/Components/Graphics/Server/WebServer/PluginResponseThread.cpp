@@ -12,6 +12,7 @@
 #include "../Common/SharedGlobal.h"
 #include "../Common/SharedMemoryManager.h"
 #include "../Common/NamedSemaphore.h"
+#include "../Common/NamedEvent.h"
 #include "../Common/ICommunication.h"
 #include "../Common/OSWrappers.h"
 #include "ProcessTracker.h"
@@ -33,7 +34,10 @@ void PluginResponseThread::WaitForPluginResponses(void* pData)
 
     bool bEvent;
 
-    for (;;)    // loop forever
+    NamedEvent shutdownEvent;
+    bool opened = shutdownEvent.Open("GPS_SHUTDOWN_SERVER");
+
+    while (opened && false == shutdownEvent.IsSignaled())
     {
         bEvent = semaphore.Wait();
 
@@ -41,8 +45,13 @@ void PluginResponseThread::WaitForPluginResponses(void* pData)
         {
             Log(logERROR, "Failed to wait on an event (Error %d). Closing response thread.\n", osGetLastSystemError());
             smClose("PLUGINS_TO_GPS");
-            semaphore.Close();
-            return;
+            break;
+        }
+
+        if (shutdownEvent.IsSignaled())
+        {
+            LogConsole(logMESSAGE, "Signaling PluginResponseThread to close\n");
+            break;
         }
 
         // the PLUGINS_TO_GPS_EVENT was signaled
@@ -165,4 +174,7 @@ void PluginResponseThread::WaitForPluginResponses(void* pData)
             Log(logERROR, "LockGet Failed\n");
         }
     }
+    semaphore.Close();
+    LogConsole(logMESSAGE, "PluginResponseThread terminating\n");
+    shutdownEvent.Close();
 }

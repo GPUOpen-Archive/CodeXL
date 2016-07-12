@@ -5,6 +5,8 @@
 /// \brief Process web commands received from the client
 //==============================================================================
 
+#include <AMDTOSWrappers/Include/osSystemError.h>
+
 // from Common
 #include "../Common/parser.h"
 #include "../Common/Logger.h"
@@ -12,6 +14,7 @@
 #include "../Common/PerfStudioServer_Version.h"
 #include "../Common/HTTPRequest.h"
 #include "../Common/SharedGlobal.h"
+#include "../Common/NamedSemaphore.h"
 
 #include "OSDependent.h"
 #include "ProcessTracker.h"
@@ -145,9 +148,26 @@ void ProcessGetMethod(HTTPRequestHeader* pRequestHeader, NetSocket* pClientSocke
     }
     else if (IsToken(&sCmd, "Shutdown"))
     {
+        LogConsole(logMESSAGE, "** Got Shutdown message\n");
         ProcessTracker::Instance()->KillAllProcesses();
         SendTextResponse(requestID, "OK", pClientSocket);
+        LogConsole(logMESSAGE, "** Signaling shutdownEvent\n");
         g_shutdownEvent.Signal();
+
+        // signal the plugin thread. It's currently waiting on this semaphore
+        NamedSemaphore semaphore;
+        bool opened = semaphore.Open("PLUGINS_TO_GPS_SEMAPHORE");
+        if (opened)
+        {
+            if (semaphore.Signal() == false)
+            {
+                Log(logWARNING, "Shutdown: Failed to signal PLUGINS_TO_GPS_SEMAPHORE. Response may be lost. Error is %d\n", osGetLastSystemError());
+            }
+
+            semaphore.Close();
+        }
+
+        LogConsole(logMESSAGE, "** done signaling shutdownEvent\n");
     }
     else if (IsToken(&sCmd, "CommandTree.xml"))
     {
