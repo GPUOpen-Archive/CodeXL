@@ -75,7 +75,6 @@ void RenderStallThread::CheckForRenderStall()
                         Log(logMESSAGE, "RenderStallThread::CheckForRenderStall(): Check messages in flight to see if process is still running\n");
                         RequestsInFlightDatabase::Instance()->CheckProcessesAreRunning();
                     }
-
 #endif
 #endif
 
@@ -97,7 +96,6 @@ void RenderStallThread::CheckForRenderStall()
         // Wait a reasonable time. 10ms is too short as it is below a games 16ms typical update and will lead to diffs of zero (a stall condition).
         osSleep(GRAPHICS_SERVER_STATUS_STALL_LOOP_SLEEP_TIME);
     }
-    LogConsole(logMESSAGE, "RenderStallThread terminating\n");
 
     shutdownEvent.Close();
 }
