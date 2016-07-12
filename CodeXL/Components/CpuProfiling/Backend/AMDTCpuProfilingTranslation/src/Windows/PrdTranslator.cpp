@@ -2538,26 +2538,29 @@ bool PrdTranslator::WriteSampleProfileDataIntoDB(const NameModuleMap& modMap)
                         gtUInt32 moduleInstanceid = 0ULL;
                         gtVAddr  modLoadAddr = 0ULL;
 
-                        for (const auto& it : module.second.m_moduleInstanceInfo)
+                        if (!isJitModule)
                         {
-                            modLoadAddr = std::get<1>(it);
-                            gtVAddr modEndAddr = modLoadAddr + modSize;
-
-                            if ((std::get<0>(it) == pid))
+                            for (const auto& it : module.second.m_moduleInstanceInfo)
                             {
-                                // 1. sampleAddr falls within module size limit.
-                                // 2. module size is 0, pick the first match.
-                                if ((modLoadAddr <= sampleAddr) && ((sampleAddr < modEndAddr) || (0 == modSize)))
+                                modLoadAddr = std::get<1>(it);
+                                gtVAddr modEndAddr = modLoadAddr + modSize;
+
+                                if ((std::get<0>(it) == pid))
                                 {
-                                    moduleInstanceid = std::get<2>(it);
-                                    break;
+                                    // 1. sampleAddr falls within module size limit.
+                                    // 2. module size is 0, pick the first match.
+                                    if ((modLoadAddr <= sampleAddr) && ((sampleAddr < modEndAddr) || (0 == modSize)))
+                                    {
+                                        moduleInstanceid = std::get<2>(it);
+                                        break;
+                                    }
                                 }
                             }
                         }
-
-                        if (isJitModule)
+                        else
                         {
                             modLoadAddr = fit->second.getBaseAddr();
+                            moduleInstanceid = fit->second.m_functionId;
                         }
 
                         // sample address offset is w.r.t. module load address
