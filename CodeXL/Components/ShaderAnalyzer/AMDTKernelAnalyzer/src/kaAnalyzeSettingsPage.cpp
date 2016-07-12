@@ -305,8 +305,6 @@ bool kaAnalyzeSettingsPage::saveCurrentSettings()
 // ---------------------------------------------------------------------------
 bool kaAnalyzeSettingsPage::IsPageDataValid()
 {
-    bool retVal = false;
-
     // Sanity check:
     GT_IF_WITH_ASSERT(m_pTargetDevicesTreeModel != nullptr)
     {
@@ -318,22 +316,14 @@ bool kaAnalyzeSettingsPage::IsPageDataValid()
             set<string> selectedDeviceName;
             kaApplicationCommands::instance().getSelectedDevices(selectedDeviceName);
 
-            if (!selectedDeviceName.empty())
-            {
-                retVal = true;
-            }
-            else
+            if (selectedDeviceName.empty())
             {
                 acMessageBox::instance().critical(AF_STR_WarningA, KA_STR_mustSelectDeviceError);
             }
         }
-        else
-        {
-            retVal = true;
-        }
     }
 
-    return retVal;
+    return true;
 }
 
 
