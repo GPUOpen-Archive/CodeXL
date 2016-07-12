@@ -104,6 +104,10 @@ bool gaHSAGetExpressionValueImpl(const gtString& varName, int evalDepth, apExpre
         // TO_DO: handle members and evalDepth:
         GT_UNREFERENCED_PARAMETER(evalDepth);
         retVal = pDebugInfo->EvaluateVariable(varName, varValue.m_value, &varValue.m_valueHex, &varValue.m_type);
+        if (retVal)
+        {
+            varValue.m_name = varName;
+        }
     }
 
     return retVal;
