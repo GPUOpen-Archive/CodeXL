@@ -14,6 +14,9 @@
 // Visual Studio:
 #include <msdbg.h>
 
+// Infra:
+#include <AMDTOSWrappers/Include/osCriticalSection.h>
+
 // Local:
 #include <CodeXLVSPackageDebugger/Include/vsdPackageDLLBuild.h>
 #include <CodeXLVSPackageDebugger/Include/vsdUnknown.h>
@@ -40,6 +43,11 @@ public:
     ////////////////////////////////////////////////////////////
     // IDebugEventCallback2 methods
     STDMETHOD(Event)(IDebugEngine2* pEngine, IDebugProcess2* pProcess, IDebugProgram2* pProgram, IDebugThread2* pThread, IDebugEvent2* pEvent, REFIID riidEvent, DWORD dwAttrib);
+
+    void WaitForEventHandlingCriticalSection();
+
+private:
+    osCriticalSection m_eventCallbackCS;
 };
 
 #endif //__VSDDEBUGEVENTCALLBACK_H

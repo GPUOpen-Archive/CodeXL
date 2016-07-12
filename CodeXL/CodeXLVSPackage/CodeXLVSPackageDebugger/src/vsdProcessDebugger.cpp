@@ -578,6 +578,10 @@ bool vsdProcessDebugger::internalResumeProcess()
 {
     bool retVal = false;
 
+    OS_OUTPUT_DEBUG_LOG(L"Internally resuming debugged process - waiting for current event handling to end", OS_DEBUG_LOG_DEBUG);
+
+    m_pDebugEventCallback->WaitForEventHandlingCriticalSection();
+
     OS_OUTPUT_DEBUG_LOG(L"Internally resuming debugged process", OS_DEBUG_LOG_DEBUG);
 
     // We come here in two situations:
