@@ -8,7 +8,7 @@
 
 // Local header files
 #include <AMDTMutex.h>
-#include "AMDTActivityLogger.h"
+#include "CXLActivityLogger.h"
 #include "AMDTCpuProfileControl.h"
 
 // Max path length of /proc/<pid>/stat
