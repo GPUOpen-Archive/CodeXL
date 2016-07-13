@@ -1998,6 +1998,7 @@ public:
             {
                 if (isUnkownFunc)
                 {
+                    functionData.m_functionInfo.m_functionId = funcId;
                     functionData.m_functionInfo.m_name = unknownFuncName;
                 }
 
@@ -2260,7 +2261,7 @@ public:
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
                 else if (AMDT_MODULE_TYPE_MANAGEDDPE == modInfo.m_type)
                 {
-                    GetClrJitSrcFilePath(funcInfo.m_functionId, srcFilePath);
+                    ret = GetClrJitSrcFilePath(funcInfo.m_functionId, srcFilePath);
                 }
 #endif // AMDT_WINDOWS_OS
             }
