@@ -15,7 +15,6 @@
 #include "../Common/CommandTimingManager.h"
 #include "../Common/SharedGlobal.h"
 #include "ProcessTracker.h"
-#include "ShutdownThread.h"
 #include "../Common/Logger.h"
 #include "PluginResponseThread.h"
 #include "RenderStallThread.h"
@@ -64,8 +63,6 @@ void ClientRequestThread::WaitForClientRequests(NetSocket* server_socket)
         return;
     }
 
-    osThread* shutdownThread = ForkAndWaitForShutdownResponse(pluginThread, renderStallThread);
-
     // while the shutdown event is not signaled (passing in 0 as a wait time causes the function to return WAIT_TIMEOUT immediately),
     // accept client connections and handle the requests
     while (false == shutdownEvent.IsSignaled())
@@ -86,15 +83,8 @@ void ClientRequestThread::WaitForClientRequests(NetSocket* server_socket)
     smClose("PLUGINS_TO_GPS");
 
     // when the shutdown event is signaled, the loop is exited
-    // and we have to wait for the plugin thread and the shutdown thread to exit before returning to the main server
+    // and we have to wait for the plugin thread and the renderStall thread to exit before returning to the main server
     // First, wait for threads to finish. Deleting the thread will automatically terminate the thread
-    while (shutdownThread->isAlive())
-    {
-        ;
-    }
-
-    delete shutdownThread;
-
     while (pluginThread->isAlive())
     {
         ;
@@ -161,26 +151,6 @@ osThread* ClientRequestThread::ForkAndWaitForRenderStalls()
     renderStallThread->execute();
 
     return renderStallThread;
-}
-
-//--------------------------------------------------------------
-/// Starts a new thread which listens for the shutdown signal
-/// Uses common code in the osWrappers.
-/// The execute method starts the thread running and eventually
-/// calls the entryPoint() method
-/// \param pluginThread pointer to the plugin thread, so that it can be terminated on shutdown
-/// \param renderStallThread pointer to the render stall thread, so that it can be terminated on shutdown
-/// \return osThread object pointer to the new thread
-//--------------------------------------------------------------
-osThread* ClientRequestThread::ForkAndWaitForShutdownResponse(osThread* pluginThread, osThread* renderStallThread)
-{
-    // The main code in this function.
-    gtString str;
-    str.fromASCIIString("ShutdownThread");
-    ShutdownThread* shutdownThread = new ShutdownThread(str, pluginThread, renderStallThread);
-    shutdownThread->execute();
-
-    return shutdownThread;
 }
 
 //--------------------------------------------------------------

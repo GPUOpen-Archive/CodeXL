@@ -51,7 +51,6 @@ sources = \
     "PluginResponseThread.cpp",
     "ProcessTracker.cpp",
     "RenderStallThread.cpp",
-    "ShutdownThread.cpp",
     "WebServer.cpp",
 ]
 

@@ -19,7 +19,6 @@
 #include "Commands.h"
 #include "ProcessTracker.h"
 #include "WebServer.h"
-#include "ShutdownThread.h"
 #include "ClientRequestThread.h"
 
 static osCriticalSection* s_output_criticalSection = NULL; ///< Critical section to manage how messages are written to the screen from separate threads

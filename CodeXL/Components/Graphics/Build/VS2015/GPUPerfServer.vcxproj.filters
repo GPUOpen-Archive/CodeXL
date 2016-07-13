@@ -28,7 +28,6 @@
     <ClCompile Include="..\..\Server\WebServer\WebServer.cpp" />
     <ClCompile Include="..\..\Server\WebServer\PluginResponseThread.cpp" />
     <ClCompile Include="..\..\Server\WebServer\RenderStallThread.cpp" />
-    <ClCompile Include="..\..\Server\WebServer\ShutdownThread.cpp" />
     <ClCompile Include="..\..\Server\WebServer\ClientRequestThread.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -42,7 +41,6 @@
     <ClInclude Include="..\..\Server\WebServer\WebServer.h" />
     <ClInclude Include="..\..\Server\WebServer\PluginResponseThread.h" />
     <ClInclude Include="..\..\Server\WebServer\RenderStallThread.h" />
-    <ClInclude Include="..\..\Server\WebServer\ShutdownThread.h" />
     <ClInclude Include="..\..\Server\WebServer\RequestInFlight.h" />
     <ClInclude Include="..\..\Server\WebServer\ClientRequestThread.h" />
     <ClInclude Include="..\..\Server\WebServer\RequestsInFlightDatabase.h" />

@@ -131,7 +131,6 @@
     <ClCompile Include="..\..\Server\WebServer\ProcessTracker.cpp" />
     <ClCompile Include="..\..\Server\WebServer\Registry.cpp" />
     <ClCompile Include="..\..\Server\WebServer\RenderStallThread.cpp" />
-    <ClCompile Include="..\..\Server\WebServer\ShutdownThread.cpp" />
     <ClCompile Include="..\..\Server\WebServer\WebServer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -147,7 +146,6 @@
     <ClInclude Include="..\..\Server\WebServer\RequestsInFlightDatabase.h" />
     <ClInclude Include="..\..\Server\WebServer\resource.h" />
     <ClInclude Include="..\..\Server\WebServer\ServerDefinitions.h" />
-    <ClInclude Include="..\..\Server\WebServer\ShutdownThread.h" />
     <ClInclude Include="..\..\Server\WebServer\WebServer.h" />
   </ItemGroup>
   <ItemGroup Condition="'$(SolutionName)'!='CodeXL-AllProjects'">
