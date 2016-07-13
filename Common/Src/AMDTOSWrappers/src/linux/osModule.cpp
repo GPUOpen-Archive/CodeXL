@@ -165,7 +165,7 @@ bool osGetLoadedModulePath(const osModuleHandle& moduleHandle, osFilePath& modul
         gtString errMsg;
         errMsg.fromASCIIString(::dlerror());
 
-        GT_ASSERT_EX(false, message.asCharArray());
+        GT_ASSERT_EX(false, errMsg.asCharArray());
     }
 
 #else // AMDT_LINUX_VARIANT != AMDT_GENERIC_LINUX_VARIANT

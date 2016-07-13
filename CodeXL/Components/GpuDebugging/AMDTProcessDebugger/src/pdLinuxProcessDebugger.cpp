@@ -30,6 +30,7 @@
 #include <AMDTOSWrappers/Include/osGeneralFunctions.h>
 #include <AMDTOSWrappers/Include/osModule.h>
 #include <AMDTOSWrappers/Include/osProcess.h>
+#include <AMDTOSWrappers/Include/osStringConstants.h>
 #include <AMDTOSWrappers/Include/osThread.h>
 #include <AMDTAPIClasses/Include/Events/apEventsHandler.h>
 #include <AMDTAPIClasses/Include/Events/apBreakpointHitEvent.h>
@@ -2035,7 +2036,9 @@ bool pdLinuxProcessDebugger::setDebuggedProcessEnvVariables()
     osModule glModule;
     gtString errorMessage;
     osFilePath libGLPath(OS_OPENGL_MODULE_NAME);
-    bool rcLoad = glModule.loadModule(libGLPath, &errorMessage, false);
+    bool rcload = glModule.loadModule(libGLPath, &errorMessage, false);
+
+    GT_UNREFERENCED_PARAMETER(rcload);
 
     GT_IF_WITH_ASSERT(errorMessage.isEmpty())
     {
