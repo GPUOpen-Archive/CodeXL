@@ -28,8 +28,9 @@
 // Local:
 #include <AMDTPowerProfiling/src/ppSessionController.h>
 
+#include <TSingleton.h>
 
-class PP_API ppMDIViewCreator : public afQtViewCreatorAbstract
+class PP_API ppMDIViewCreator : public afQtViewCreatorAbstract, public TSingleton<ppMDIViewCreator>
 {
 public:
 
@@ -107,6 +108,12 @@ public:
     /// Is called when a session is about to be deleted:
     /// \param deletedSessionFilePath the file path for the deleted session
     void OnSessionDelete(const gtString& deletedSessionFilePath);
+
+    /// Display existing session:
+    bool displayOpenSession(const osFilePath& filePath, int lineNumber);
+
+    /// Get access to the created views map
+    gtMap<gtString, QWidget*>& GetCreatedViews() { return m_createdViewsMap; }
 
 private:
 

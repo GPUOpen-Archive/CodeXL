@@ -582,3 +582,21 @@ void ppMDIViewCreator::OnSessionDelete(const gtString& deletedSessionFilePath)
 
 }
 
+bool ppMDIViewCreator::displayOpenSession(const osFilePath& filePath, int lineNumber)
+{
+    bool retVal = false;
+
+    gtString pathString = filePath.asString();
+    if (m_createdViewsMap.count(pathString) > 0)
+    {
+        QWidget* pWidget = m_createdViewsMap[pathString];
+        ppSessionView* pSessionView = dynamic_cast<ppSessionView*>(pWidget);
+        if (pSessionView != nullptr)
+        {
+            pSessionView->DisplayTab(lineNumber == AF_TREE_ITEM_PP_SUMMARY ? 1 : 0);
+            retVal = true;
+        }
+    }
+
+    return retVal;
+}

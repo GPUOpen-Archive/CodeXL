@@ -61,6 +61,9 @@
 #include <AMDTKernelAnalyzer/src/kaMultiSourceView.h>
 #include <AMDTKernelAnalyzer/src/kaSourceCodeView.h>
 
+// Power profiling
+#include <AMDTPowerProfiling/src/ppMDIViewCreator.h>
+
 // Local:
 #include <CodeXLVSPackage/Include/vspStringConstants.h>
 #include <src/vspGRApiFunctions.h>
@@ -233,10 +236,11 @@ bool vscApplicationCommands::OpenFileAtLine(const osFilePath& filePath, int line
         apEventsHandler::instance().registerPendingDebugEvent(*pGpuProfileViewEvent);
 
         // Get the session view creator:
-        gpViewsCreator* pCreator = gpViewsCreator::Instance();
+        ppMDIViewCreator* pCreator = ppMDIViewCreator::Instance();
         GT_IF_WITH_ASSERT(pCreator != NULL)
         {
             pCreator->setCreationEvent(pGpuProfileViewEvent);
+            pCreator->displayOpenSession(filePath, viewIndex);
         }
     }
 
