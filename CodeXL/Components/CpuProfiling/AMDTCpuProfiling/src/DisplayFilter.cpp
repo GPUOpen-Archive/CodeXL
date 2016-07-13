@@ -1007,6 +1007,8 @@ CPUGlobalDisplayFilter::CPUGlobalDisplayFilter()
     m_displayPercentageInColumn = false;
 }
 
+static bool g_isDisplaySystemModule = false;
+static bool g_isSamplePercent = false;
 
 DisplayFilter::DisplayFilter()
 {
@@ -1135,7 +1137,7 @@ DisplayFilter::InitToDefault()
         m_options.m_summaryCount = 5;
         m_options.m_isSeperateByCore = false;
         m_options.m_isSeperateByNuma = false;
-        m_options.m_ignoreSystemModules = true;
+        m_options.m_ignoreSystemModules = !g_isDisplaySystemModule;
 
         //setting all counters for config "All Data"
         for (auto const& counter : m_reportConfigs[0].m_counterDescs)
@@ -1222,17 +1224,18 @@ bool DisplayFilter::IsSystemModuleIgnored()
 
 void DisplayFilter::SetSamplePercent(bool isSet)
 {
-    m_isSamplePercent = isSet;
+    g_isSamplePercent = isSet;
 }
 
 void DisplayFilter::setIgnoreSysDLL(bool isChecked)
 {
     m_options.m_ignoreSystemModules = isChecked;
+    g_isDisplaySystemModule = !isChecked;
 }
 
 bool DisplayFilter::GetSamplePercent()
 {
-    return m_isSamplePercent;
+    return g_isSamplePercent;
 }
 
 AMDTUInt32 DisplayFilter::GetCoreCount() const

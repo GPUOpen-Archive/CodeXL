@@ -269,8 +269,6 @@ using CounterIdNameMap = std::map<AMDTUInt64, gtString>;
 class DisplayFilter
 {
 public:
-    // in: Configuration name
-    // out: Vector of configuration name and id
     bool GetConfigCounters(const QString& configName, CounterNameIdVec& counterDetails);
 
     bool SetProfileDataOptions(AMDTProfileDataOptions opts);
@@ -325,8 +323,6 @@ private:
     //static DisplayFilter* m_instance;
     void SetProfileDataOption();
 
-
-
     std::shared_ptr<cxlProfileDataReader>   m_pProfDataReader;
     gtVector<AMDTProfileReportConfig>       m_reportConfigs;
     AMDTProfileDataOptions                  m_options;
@@ -336,7 +332,6 @@ private:
     CounterNameIdMap                        m_counterNameIdMap;
     CounterIdNameMap                        m_counterIdNameMap;
     CounterNameIdVec                        m_selectedCountersIdList;
-    bool                                    m_isSamplePercent = false;
 };
 
 #endif //__DISPLAYFILTER_H
