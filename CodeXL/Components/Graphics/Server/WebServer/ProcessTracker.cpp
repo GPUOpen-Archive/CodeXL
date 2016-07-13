@@ -552,8 +552,6 @@ bool ProcessTracker::CreateSharedMemory()
 //--------------------------------------------------------------
 bool ProcessTracker::WritePluginsToSharedMemoryAndLaunchApp()
 {
-    bool bGetType = false;
-
     if (OSDependentModulesInitialization() == false)
     {
         Log(logERROR, "Failed to initialize for plugins\n");
@@ -561,8 +559,7 @@ bool ProcessTracker::WritePluginsToSharedMemoryAndLaunchApp()
     }
 
     osModuleArchitecture binaryType;
-
-    bGetType = OSWrappers::GetBinaryType(m_injectedAppName.c_str(), &binaryType);
+    bool bGetType = OSWrappers::GetBinaryType(m_injectedAppName.c_str(), &binaryType);
 
 #ifdef _WIN32
 
@@ -575,14 +572,15 @@ bool ProcessTracker::WritePluginsToSharedMemoryAndLaunchApp()
         bGetType = OSWrappers::GetBinaryType(m_injectedAppName.c_str(), &binaryType);
     }
 
-#endif // def _WIN32
-
     if (!bGetType)
     {
         // file is not executable
         LogConsole(logERROR, "%s is not an executable file\n", m_injectedAppName.c_str());
         return false;
     }
+#else
+    PS_UNREFERENCED_PARAMETER(bGetType);
+#endif // def _WIN32
 
     Log(logMESSAGE, "WritePluginsToSharedMemoryAndLaunchApp()\n");
 
@@ -739,8 +737,32 @@ PROCESS_INFORMATION ProcessTracker::LaunchAppInNewProcess(gtASCIIString strApp, 
 
 #else
 
-    // Create the app process
-    succeeded = CreateProcess(strApp.asCharArray(), strCmdLine.asCharArray(), strDir.asCharArray(), &pi);
+    // Create the app process. In Linux, this could be a binary executable or a script
+    FILE* fp = nullptr;
+    fopen_s(&fp, strApp.asCharArray(), "rt");
+    if (fp)
+    {
+        // read first 4 bytes of the target process. If it contains the '.ELF' header,
+        // it's a binary executable. Otherwise it's a script
+        char header[4] = {};
+        size_t bytesRead = fread(&header, 4, 1, fp); 
+        if (bytesRead != 4 || header[0] != 0x7f || header[1] != 0x45 || header[2] != 0x4c || header[3] != 0x46)    // '.ELF' binary executable file format
+        {
+            // file is a script
+            succeeded = CreateProcess(strApp.asCharArray(), strCmdLine.asCharArray(), strDir.asCharArray(), &pi);
+        }
+        else
+        {
+            // file is a binary executable
+            succeeded = CreateProcess(strApp.asCharArray(), strCmdLine.asCharArray(), strDir.asCharArray(), &pi);
+        }
+    }
+    else
+    {
+        Log(logERROR, "failed to open file %s\n", strApp.asCharArray());
+        succeeded = false;
+    }
+
 #endif // _WIN32
 
     if (!succeeded)
@@ -1178,12 +1200,12 @@ bool ProcessTracker::PrelaunchEnvironmentInitialization()
     // Get the server path. The GLServer plugin will be in the same place.
     // LD_PRELOAD has to be set up before the app is run so the plugin can be attached
 
+    const char* strServerPath;
+    strServerPath = SG_GET_PATH(ServerPath);
+    char ext[PS_MAX_PATH];
+    sprintf_s(ext, PS_MAX_PATH, "%s.so", GDT_PROJECT_SUFFIX);
     if (strcasecmp("Vulkan", m_injectedAppPluginName.c_str()) != 0)
     {
-        const char* strServerPath;
-        strServerPath = SG_GET_PATH(ServerPath);
-        char ext[PS_MAX_PATH];
-        sprintf_s(ext, PS_MAX_PATH, "%s.so", GDT_PROJECT_SUFFIX);
         char strLdPreload[PS_MAX_PATH];
         sprintf_s(strLdPreload, PS_MAX_PATH, "%sPlugins/%sServer%s", strServerPath, m_injectedAppPluginName.c_str(), ext);
         // LogConsole(logMESSAGE, "LD_PRELOAD is >>>%s<<<\n", strLdPreload);
@@ -1191,8 +1213,22 @@ bool ProcessTracker::PrelaunchEnvironmentInitialization()
         // Set the LD_PRELOAD environment variable
         setenv("LD_PRELOAD", strLdPreload, 1);
     }
+    else
+    {
+        SetupVulkanEnvVariables();
 
-    SetupVulkanEnvVariables();
+        char strLdPreload[PS_MAX_PATH];
+#ifdef CODEXL_GRAPHICS
+        const char* vulkanLibName = "libVulkanEnv";
+#else
+        const char* vulkanLibName = "VulkanEnv";
+#endif
+        sprintf_s(strLdPreload, PS_MAX_PATH, "%sPlugins/%s%s", strServerPath, vulkanLibName, ext);
+        // LogConsole(logMESSAGE, "LD_PRELOAD for vulkan environment plugin is >>>%s<<<\n", strLdPreload);
+
+        // Set the LD_PRELOAD environment variable
+        setenv("LD_PRELOAD", strLdPreload, 1);
+    }
 #endif
 
     return bEnvironmentInitialized;
