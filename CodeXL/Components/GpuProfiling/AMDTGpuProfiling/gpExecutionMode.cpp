@@ -288,7 +288,7 @@ bool gpExecutionMode::IsStartupActionSupported(afStartupAction action)
 bool gpExecutionMode::IsRemoteEnabledForSessionType(const gtString& sessionType)
 {
     GT_UNREFERENCED_PARAMETER(sessionType);
-    // We only support remote debugging in standalone:
+
     bool retVal = true;
 
     return retVal;
