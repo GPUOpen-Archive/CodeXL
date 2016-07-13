@@ -22,7 +22,7 @@
       <AdditionalLibraryDirectories>$(AMDTOutputDir)$(Configuration)\arch;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /r /d /y "$(ProjectDir)AMDTActivityLogger.h" "$(AMDTActivityLoggerOutputDir)\include\"
+      <Command>xcopy /r /d /y "$(ProjectDir)CXLActivityLogger.h" "$(AMDTActivityLoggerOutputDir)\include\"
 xcopy /r /d /y "$(ProjectDir).\Doc\AMDTActivityLogger.pdf" "$(AMDTActivityLoggerOutputDir)\doc\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

@@ -1,29 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="..\..\CodeXL\Components\GpuProfiling\Backend\Common\FileUtils.cpp">
-      <Filter>Shared</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CodeXL\Components\GpuProfiling\Backend\Common\LocaleSetting.cpp">
-      <Filter>Shared</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CodeXL\Components\GpuProfiling\Backend\Common\Logger.cpp">
-      <Filter>Shared</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CodeXL\Components\GpuProfiling\Backend\Common\OSUtils.cpp">
-      <Filter>Shared</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CodeXL\Components\GpuProfiling\Backend\Common\StringUtils.cpp">
-      <Filter>Shared</Filter>
-    </ClCompile>
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AMDTActivityLogger.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\Src\AMDTMutex\AMDTMutex.cpp">
-      <Filter>Shared</Filter>
     </ClCompile>
     <ClCompile Include="AMDTActivityLoggerProfileControl.cpp">
       <Filter>Source Files</Filter>
@@ -34,6 +16,12 @@
     <ClCompile Include="AMDTPowerProfileActivityLogger_Win.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\FileUtils.cpp" />
+    <ClCompile Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\LocaleSetting.cpp" />
+    <ClCompile Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\Logger.cpp" />
+    <ClCompile Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\OSUtils.cpp" />
+    <ClCompile Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\StringUtils.cpp" />
+    <ClCompile Include="..\AMDTMutex\AMDTMutex.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Shared">
@@ -50,34 +38,22 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\CodeXL\Components\GpuProfiling\Backend\Common\OSUtils.h">
-      <Filter>Shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CodeXL\Components\GpuProfiling\Backend\Common\FileUtils.h">
-      <Filter>Shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CodeXL\Components\GpuProfiling\Backend\Common\LocaleSetting.h">
-      <Filter>Shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CodeXL\Components\GpuProfiling\Backend\Common\Logger.h">
-      <Filter>Shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CodeXL\Components\GpuProfiling\Backend\Common\StringUtils.h">
-      <Filter>Shared</Filter>
-    </ClInclude>
-    <ClInclude Include="AMDTActivityLogger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\Src\AMDTMutex\AMDTMutex.h">
-      <Filter>Shared</Filter>
     </ClInclude>
     <ClInclude Include="AMDTActivityLoggerProfileControl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AMDTCpuProfileControl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\\AMDTMutex\AMDTMutex.h" />
+    <ClInclude Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\FileUtils.h" />
+    <ClInclude Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\LocaleSetting.h" />
+    <ClInclude Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\Logger.h" />
+    <ClInclude Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\OSUtils.h" />
+    <ClInclude Include="..\..\..\CodeXL\Components\GpuProfiling\Backend\Common\StringUtils.h" />
+    <ClInclude Include="CXLActivityLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -12,7 +12,7 @@
 
 #include "Common/OSUtils.h"
 
-#include "AMDTActivityLogger.h"
+#include "CXLActivityLogger.h"
 
 
 /// function typedef for the profiling control functions exported from the agent libraries

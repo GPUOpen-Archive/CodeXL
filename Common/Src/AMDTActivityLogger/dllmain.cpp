@@ -1,6 +1,6 @@
 // dllmain.cpp : Defines the entry point for the DLL application.
 #include "windows.h"
-#include "AMDTActivityLogger.h"
+#include "CXLActivityLogger.h"
 #include "AMDTCpuProfileControl.h"
 
 BOOL APIENTRY DllMain(HMODULE hModule,

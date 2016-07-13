@@ -2,7 +2,7 @@
 #include <Sddl.h>
 #include <stdio.h>
 #include <AMDTDriverTypedefs.h>
-#include "AMDTActivityLogger.h"
+#include "CXLActivityLogger.h"
 
 #pragma warning(disable: 4996)
 

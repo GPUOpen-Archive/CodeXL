@@ -86,7 +86,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\\AMDTMutex\AMDTMutex.h" />
-    <ClInclude Include="AMDTActivityLogger.h" />
+    <ClInclude Include="CXLActivityLogger.h" />
     <ClInclude Include="AMDTActivityLoggerProfileControl.h" />
     <ClInclude Include="AMDTCpuProfileControl.h" />
     <ClInclude Include="resource.h" />
