@@ -116,6 +116,7 @@
 // Additional Environment variables used to control standalone mode:
 #define OS_STR_envVar_debuggerInstallDir L"SU_DEBUGGER_INSTALL_DIR"
 #define OS_STR_envVar_systemModulesDirs L"SU_SYSTEM_MODULES_DIRS"
+#define OS_STR_envVar_suSystemOpenGLModulePath L"SU_SYSTEM_OPENGL_MODULE_PATH"
 #define OS_STR_envVar_logFilesPath L"SU_LOG_FILES_PATH"
 #define OS_STR_envVar_setAPIFunctionBreakpoint L"SU_SET_API_FUNCTION_BREAKPOINT"
 #define OS_STR_envVar_setKernelNameBreakpoint L"SU_SET_KERNEL_NAME_BREAKPOINT"

@@ -104,6 +104,8 @@ static const gtString s_libglDriversPathEnvVariableName = L"LIBGL_DRIVERS_PATH";
     #error Error: Unknown linux variant
 #endif
 
+static const gtString s_suSystemOpenGLModulePathVariableName = OS_STR_envVar_suSystemOpenGLModulePath;
+
 static const gtASCIIString emptyCmdParam;
 
 
@@ -2030,24 +2032,28 @@ bool pdLinuxProcessDebugger::setDebuggedProcessEnvVariables()
     // Make sure that errors here don't stop the loading process; MacOS
     // currently lacks an implementation of osGetLoadedModulePath, and it's
     // likely the child will run correctly on many systems anyway.
-    do {
-        gtString errorMessage;
-        GT_ASSERT(errorMessage.isEmpty());
-        OsModule glModule (osFilePath(L"libGL.so.1"), &errorMessage, false);
+    osModule glModule;
+    gtString errorMessage;
+    osFilePath libGLPath(OS_OPENGL_MODULE_NAME);
+    bool rcLoad = glModule.loadModule(libGLPath, &errorMessage, false);
 
-        if (!errorMessage.isEmpty ())
-            break;
-
+    GT_IF_WITH_ASSERT(errorMessage.isEmpty())
+    {
         osFilePath path;
-        if (!osGetLoadedModulePath (glModule.Get(), path))
-            break;
+        bool rcPth = osGetLoadedModulePath(glModule.GetModuleHandle(), path);
 
-        gtString envPair (L"SU_SYSTEM_OPENGL_MODULE_PATH=");
-        envPair.append (path.asString());
-
-        if (!_gdbDriver.executeGDBCommand(PD_SET_ENV_VARIABLE_CMD, envPair.asASCIICharArray ()))
-            break;
-    } while (0);
+        GT_IF_WITH_ASSERT(rcPth)
+        {
+            osEnvironmentVariable dummyEnvValue;
+            dummyEnvValue._name = s_suSystemOpenGLModulePathVariableName;
+            dummyEnvValue._value = path.asString();
+            gtString suSystemOpenGLModulePathString;
+            bool rc7 = processEnvVariableToString(dummyEnvValue, suSystemOpenGLModulePathString);
+            GT_ASSERT(rc7);
+            bool rc8 = _gdbDriver.executeGDBCommand(PD_SET_ENV_VARIABLE_CMD, suSystemOpenGLModulePathString.asASCIICharArray());
+            GT_ASSERT(rc8);
+        }
+    }
 
     // If the user didn't set the [DY]LD_LIBRARY_PATH variable, we still need to:
     if (!ldLibraryPathSet)

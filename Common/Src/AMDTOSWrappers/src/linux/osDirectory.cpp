@@ -335,7 +335,6 @@ bool osDirectory::getContainedFilePaths(const gtString& fileNameSearchString,
     {
         filePaths.clear();
     }
-    
 
     // Open the input directory:
     std::string utf8DirectoryPath;

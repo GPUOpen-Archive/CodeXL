@@ -35,15 +35,20 @@ OS_API bool osGetSystemOpenCLModulePath(gtVector<osFilePath>& systemOCLModulePat
 OS_API bool osGetSystemModuleVersionAsString(const gtString& moduleName, gtString& moduleVersion);
 
 ///Simple RAII class for load/unload library
-class OS_API OsModule
+class OS_API osModule
 {
 public:
-    OsModule() = delete;
-    OsModule(const osFilePath& modulePath, gtString* o_pErrMsg = nullptr, bool assertOnFail = true);
-    virtual ~OsModule();
-    const osModuleHandle& Get() { return _moduleHandle;}
+    osModule();
+    virtual ~osModule();
+
+    bool loadModule(const osFilePath& modulePath, gtString* o_pErrMsg = nullptr, bool assertOnFail = true);
+    const osModuleHandle& GetModuleHandle() const { return m_moduleHandle; };
+
 private:
-    osModuleHandle _moduleHandle;
+    void unloadModule();
+
+private:
+    osModuleHandle m_moduleHandle;
 };
 
 /// check if the moduleName dll file exist in searched paths.
