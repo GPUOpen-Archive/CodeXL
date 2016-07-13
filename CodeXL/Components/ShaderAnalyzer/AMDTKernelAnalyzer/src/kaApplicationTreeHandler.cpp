@@ -855,7 +855,12 @@ void kaApplicationTreeHandler::AddNonPipedLineFile(kaProgram* pProgram, QTreeWid
                 currentFilePath.getFileName(fileName);
                 int fileNamePos = joinedNameAsStr.reverseFind(fileName);
 
-                if (fileNamePos != -1 && fileNamePos > 1)
+                // Check if the whole file name is contained in the joined string.
+                // This ensures that even in a scenario where one of the input source files
+                // is a substring of another input file - we will get the tree built correctly.
+                bool isWholeFileNameContained = ((joinedNameAsStr.length() - fileNamePos) == fileName.length());
+
+                if (fileNamePos != -1 && fileNamePos > 1 && isWholeFileNameContained)
                 {
                     filePath = currentFilePath;
                     gtString kernelNameAsStr;
