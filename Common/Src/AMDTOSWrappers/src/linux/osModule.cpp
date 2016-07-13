@@ -143,31 +143,40 @@ bool osGetLoadedModuleHandle(const osFilePath& modulePath, osModuleHandle& modul
 // ---------------------------------------------------------------------------
 bool osGetLoadedModulePath(const osModuleHandle& moduleHandle, osFilePath& modulePath)
 {
+    bool retVal = false;
+
 #if AMDT_LINUX_VARIANT == AMDT_GENERIC_LINUX_VARIANT
-    struct link_map *lmap;
+
+    struct link_map* lmap = nullptr;
 
     // Prefer to query the linkmap over RTLD_DI_ORIGIN so we don't have to
     // worry about memory allocations or potentially work around PATHMAX.
-    if (dlinfo (moduleHandle, RTLD_DI_LINKMAP, &lmap)) {
-        gtString message;
-        message.fromASCIIString(dlerror ());
+    int rcInfo = ::dlinfo(moduleHandle, RTLD_DI_LINKMAP, &lmap);
+    if (0 == rcInfo)
+    {
+        gtString pathStr;
+        pathStr.fromASCIIString(lmap->l_name);
+        modulePath = pathStr;
 
-        OS_OUTPUT_DEBUG_LOG(message.asCharArray (), OS_DEBUG_LOG_ERROR);
-        return false;
+        retVal = true;
+    }
+    else // 0 != rcInfo
+    {
+        gtString errMsg;
+        errMsg.fromASCIIString(::dlerror());
+
+        GT_ASSERT_EX(false, message.asCharArray());
     }
 
-    gtString widePath;
-    widePath.fromASCIIString (lmap->l_name);
-    modulePath = std::move (widePath);
-    return true;
-#else
-    (void)moduleHandle;
-    (void)modulePath;
+#else // AMDT_LINUX_VARIANT != AMDT_GENERIC_LINUX_VARIANT
+    GT_UNREFERENCED_PARAMETER(moduleHandle);
+    GT_UNREFERENCED_PARAMETER(modulePath);
 
     // TO_DO: not implemented for MacOS due to lack of RTLD_DI_LINKMAP.
     // Support should be fairly straightforward to add though.
-    return false;
-#endif
+#endif // AMDT_LINUX_VARIANT
+
+    return retVal;
 }
 
 

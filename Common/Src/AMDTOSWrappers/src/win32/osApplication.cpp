@@ -532,15 +532,24 @@ bool osEnumerateInstalledWindowsStoreApps(gtList<WindowsStoreAppInfo>& storeApps
 
         if (nullptr == moduleHandle)
         {
-            osFilePath modulePath;
-            osGetLoadedModulePath(nullptr, modulePath);
-            modulePath.setFileName(AMDTWINCOMPONENTEXTUTILS_FILE_NAME);
-            modulePath.setFileExtension(OS_MODULE_EXTENSION);
-            static OsModule osmodule(modulePath);
-            moduleHandle = osmodule.Get();
-            GT_IF_WITH_ASSERT(moduleHandle != nullptr)
+            static osModule winComponentExtUtilsModule;
+            static bool loadedCompUtils = false;
+            if (!loadedCompUtils)
             {
-                fpGetAppInfo = (GetAppInfo)GetProcAddress(moduleHandle, "GetAppInfo");
+                osFilePath modulePath;
+                osGetLoadedModulePath(nullptr, modulePath);
+                modulePath.setFileName(AMDTWINCOMPONENTEXTUTILS_FILE_NAME);
+                modulePath.setFileExtension(OS_MODULE_EXTENSION);
+                loadedCompUtils = winComponentExtUtilsModule.loadModule(modulePath);
+            }
+
+            GT_IF_WITH_ASSERT(loadedCompUtils)
+            {
+                moduleHandle = winComponentExtUtilsModule.GetModuleHandle();
+                GT_IF_WITH_ASSERT(moduleHandle != nullptr)
+                {
+                    fpGetAppInfo = (GetAppInfo)GetProcAddress(moduleHandle, "GetAppInfo");
+                }
             }
         }
 

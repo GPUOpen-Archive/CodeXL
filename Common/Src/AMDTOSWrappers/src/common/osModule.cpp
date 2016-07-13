@@ -10,6 +10,7 @@
 
 // Infra:
 #include <AMDTBaseTools/Include/gtAssert.h>
+#include <AMDTBaseTools/Include/gtSet.h>
 #include <AMDTBaseTools/Include/gtStringTokenizer.h>
 
 // Local:
@@ -22,13 +23,6 @@
 // Mac only:
 #if ((AMDT_BUILD_TARGET == AMDT_LINUX_OS) && (AMDT_LINUX_VARIANT == AMDT_MAC_OS_X_LINUX_VARIANT))
     #include <AMDTOSWrappers/Include/osBundle.h>
-#endif
-
-#if AMDT_BUILD_TARGET == AMDT_LINUX_OS
-    #include <cstdlib>
-    #include <algorithm>
-    #include <set>
-using namespace std;
 #endif
 
 
@@ -92,26 +86,26 @@ bool osIs64BitModule(const osFilePath& modulePath, bool& is64Bit)
 }
 
 #if ((AMDT_BUILD_TARGET == AMDT_LINUX_OS) && (AMDT_LINUX_VARIANT == AMDT_GENERIC_LINUX_VARIANT))
-static void GetEtcConfGLPaths(vector<osFilePath>& systemOGLModulePathStrings)
+static void osGetEtcConfGLPaths(gtVector<osFilePath>& systemOGLModulePathStrings)
 {
-    //optimization, we do only once during process run scan etc conf files, thus in cosecutive calls of the function we use already read results
+    // Optimization, we do only once during process run scan etc conf files, thus in consecutive calls of the function we use already read results
     static bool readEtcConfFiles = false;
-    static set<osFilePath> systemOGLModulePathStringsInner;
+    static gtSet<osFilePath> systemOGLModulePathStringsInner;
 
-    //if already read etc conf files just insert systemOGLModulePathStringsInner to function output value
-    if (readEtcConfFiles)
-    {
-        std::copy(systemOGLModulePathStringsInner.begin(), systemOGLModulePathStringsInner.end(), std::back_inserter(systemOGLModulePathStrings));
-    }
-    else
+    // If this is the first time this is called, read etc conf files:
+    if (!readEtcConfFiles)
     {
         osFilePath etcConfPath(L"/etc/ld.so.conf.d/");
-        osDirectory dir(etcConfPath);
+        osDirectory etcConfDir(etcConfPath);
         gtList<osFilePath> filePaths;
-        dir.getContainedFilePaths(gtString(L"*GL*.conf"), osDirectory::SORT_BY_DATE_ASCENDING, filePaths);
-        dir.getContainedFilePaths(gtString(L"*fglrx*.conf"), osDirectory::SORT_BY_DATE_ASCENDING, filePaths, false);
-        dir.getContainedFilePaths(gtString(L"*amd*.conf"), osDirectory::SORT_BY_DATE_ASCENDING, filePaths, false);
-        //remove duplicates
+        bool rc1 = etcConfDir.getContainedFilePaths(L"*GL*.conf",    osDirectory::SORT_BY_DATE_ASCENDING, filePaths       );
+        GT_ASSERT(rc1);
+        bool rc2 = etcConfDir.getContainedFilePaths(L"*fglrx*.conf", osDirectory::SORT_BY_DATE_ASCENDING, filePaths, false);
+        GT_ASSERT(rc2);
+        bool rc3 = etcConfDir.getContainedFilePaths(L"*amd*.conf",   osDirectory::SORT_BY_DATE_ASCENDING, filePaths, false);
+        GT_ASSERT(rc3);
+
+        // Remove duplicates
         filePaths.sort();
         filePaths.unique();
 
@@ -122,24 +116,27 @@ static void GetEtcConfGLPaths(vector<osFilePath>& systemOGLModulePathStrings)
             gtASCIIString line;
             while (file.readLine(line))
             {
-            	if (line.isEmpty() == false)
-            	{
+                if (!line.isEmpty())
+                {
                    gtString glPath;
                    glPath.fromASCIIString(line.asCharArray()).append(L"/" OS_OPENGL_MODULE_NAME);
-                   systemOGLModulePathStrings.push_back(glPath);
-                   systemOGLModulePathStringsInner.insert(glPath);	
-            	}
+                   systemOGLModulePathStringsInner.insert(glPath);
+                }
             }
         }
 
-        //make sure there are no duplicates in oputput value
-        std::sort(systemOGLModulePathStrings.begin(), systemOGLModulePathStrings.end());
-        systemOGLModulePathStrings.erase(std::unique(systemOGLModulePathStrings.begin(), systemOGLModulePathStrings.end()), systemOGLModulePathStrings.end());
-
         readEtcConfFiles = true;
     }
+
+    // Add the pre-calculated paths:
+    systemOGLModulePathStrings.reserve(systemOGLModulePathStrings.size() + systemOGLModulePathStringsInner.size());
+    for (const osFilePath& fp : systemOGLModulePathStringsInner)
+    {
+        systemOGLModulePathStrings.push_back(fp);
+    }
 }
-#endif
+#endif // ((AMDT_BUILD_TARGET == AMDT_LINUX_OS) && (AMDT_LINUX_VARIANT == AMDT_GENERIC_LINUX_VARIANT))
+
 // ---------------------------------------------------------------------------
 // Name:        osGetSystemOpenGLModulePath
 // Description: Calculates the System's OpenGL module (DLL / shared library / framework / etc) path.
@@ -213,10 +210,12 @@ void osGetSystemOpenGLModulePath(gtVector<osFilePath>& systemOGLModulePaths)
         // Specifically, this won't break Linux systems which use /etc/ld.so.conf
         // to prioritise library paths outside of the typical system
         // directories.
-        if (auto c_path = ::getenv ("SU_SYSTEM_OPENGL_MODULE_PATH")) {
-            gtString w_path;
-            w_path.fromASCIIString (c_path);
-            systemOGLModulePaths.push_back(osFilePath(w_path));
+        gtString glModulePathStrFromEnvVar;
+        bool rcEnv = osGetCurrentProcessEnvVariableValue(OS_STR_envVar_suSystemOpenGLModulePath, glModulePathStrFromEnvVar);
+        if (rcEnv)
+        {
+            osFilePath glModulePathFromEnvVar(glModulePathStrFromEnvVar);
+            systemOGLModulePaths.push_back(glModulePathFromEnvVar);
         }
 
         // Next, look for an environment variable that contains the OpenGL driver path:
@@ -280,7 +279,7 @@ void osGetSystemOpenGLModulePath(gtVector<osFilePath>& systemOGLModulePaths)
         // This is ugly and I don't like it =(
 #if ((AMDT_BUILD_TARGET == AMDT_LINUX_OS) && (AMDT_LINUX_VARIANT == AMDT_GENERIC_LINUX_VARIANT))
         {
-            static const std::vector<gtString> systemOGLModulePathStrings =
+            static const gtVector<gtString> systemOGLModulePathStrings =
             {
                 // Ubuntu locations for AMD open-source driver
                 L"/usr/lib/x86_64-linux-gnu/amdgpu-pro/" OS_OPENGL_MODULE_NAME,
@@ -297,10 +296,10 @@ void osGetSystemOpenGLModulePath(gtVector<osFilePath>& systemOGLModulePaths)
                 L"/usr/lib/x86_64-linux-gnu/mesa/" OS_OPENGL_MODULE_NAME
             };
 
-           
             systemOGLModulePaths.insert(systemOGLModulePaths.end(), systemOGLModulePathStrings.begin(), systemOGLModulePathStrings.end());
-            //add additional paths from etc conf
-            GetEtcConfGLPaths(systemOGLModulePaths);
+
+            // Add additional paths from etc conf
+            osGetEtcConfGLPaths(systemOGLModulePaths);
         }
 #endif
     }
@@ -435,14 +434,32 @@ bool osGetSystemOpenCLModulePath(gtVector<osFilePath>& systemOCLModulePaths)
     return retVal;
 }
 
-OsModule::OsModule(const osFilePath& modulePath, gtString* o_pErrMsg/* = nullptr*/, bool assertOnFail/* = true*/)
+osModule::osModule()
+: m_moduleHandle(nullptr)
 {
-    osLoadModule(modulePath, _moduleHandle, o_pErrMsg, assertOnFail);
+
 }
-OsModule::~OsModule()
+
+osModule::~osModule()
 {
-    GT_IF_WITH_ASSERT(osReleaseModule(_moduleHandle))
+    unloadModule();
+}
+
+bool osModule::loadModule(const osFilePath& modulePath, gtString* o_pErrMsg/* = nullptr*/, bool assertOnFail/* = true*/)
+{
+    unloadModule();
+
+    bool retVal = osLoadModule(modulePath, m_moduleHandle, o_pErrMsg, assertOnFail);
+
+    return retVal;
+}
+
+void osModule::unloadModule()
+{
+    if (nullptr != m_moduleHandle)
     {
-        _moduleHandle = nullptr;
+        bool rcRel = osReleaseModule(m_moduleHandle);
+        GT_ASSERT(rcRel);
+        m_moduleHandle = nullptr;
     }
 }
