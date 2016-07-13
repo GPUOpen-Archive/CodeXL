@@ -773,7 +773,7 @@ ppSessionTreeNodeData* ppAppController::CreateSession(const gtString& profileTyp
     }
     if (profileScope != PM_PROFILE_SCOPE_SYS_WIDE)
     {
-        ::IsApplicationPathsValid(isValidApplicationInfo, isAppValid, isWorkingFolderValid);
+        afIsApplicationPathsValid(isValidApplicationInfo, isAppValid, isWorkingFolderValid);
     }
 
 
