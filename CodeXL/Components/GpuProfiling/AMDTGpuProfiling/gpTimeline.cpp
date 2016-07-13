@@ -135,6 +135,11 @@ void gpTimeline::BuildTimeline(gpTraceDataContainer* pDataContainer)
                     queueBranches.m_pQueueRootBranch->addSubBranch(queueBranches.m_pQueueCommandListsBranch);
                     queueBranches.m_pQueueRootBranch->addSubBranch(queueBranches.m_pQueueAPIBranch);
 
+                    if (m_pGPUTimelineBranch == nullptr)
+                    {
+                        m_pGPUTimelineBranch = new acTimelineBranch;
+                        m_pGPUTimelineBranch->setText(tr(GPU_STR_TraceViewGPU));
+                    }
                     m_pGPUTimelineBranch->addSubBranch(queueBranches.m_pQueueRootBranch);
                 }
             }

@@ -313,6 +313,8 @@ ProfileSessionDataItem* gpTraceDataContainer::AddVKGPUTraceItem(VKGPUTraceInfo* 
                 m_sampleIdToGPUItemMap.insertMulti(pAPIInfo->m_sampleId, pRetVal);
             }
         }
+        m_sessionAPIType = ProfileSessionDataItem::VK_API_PROFILE_ITEM;
+
     }
 
     return pRetVal;
