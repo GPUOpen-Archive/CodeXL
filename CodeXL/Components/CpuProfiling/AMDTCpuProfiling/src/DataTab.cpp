@@ -566,74 +566,24 @@ void DataTab::OnDisplaySettingsClicked()
 
     if (QDialog::Accepted == DisplayFilterDlg::instance().displayDialog(profileString, m_enableOnlySystemDllInDisplaySettings))
     {
-        // Update the display and the views' filters:
-        ProtectedUpdateTableDisplay(UPDATE_TABLE_COLUMNS_DATA);
+        // rebuild tables
+        ProtectedUpdateTableDisplay(UPDATE_TABLE_REBUILD);
 
         // Update the displayed string:
         updateDisplaySettingsString();
 
-#if 0
-        // Get the edited settings and the current session settings:
-        const SessionDisplaySettings& changedSettings = DisplayFilterDlg::instance().SessionSettings();
-        SessionDisplaySettings* pSessionSettings = m_pParentSessionWindow->sessionDisplaySettings();
+        gtVector<CpuSessionWindow*> openedWindowsVector = AmdtCpuProfiling::instance().sessionViewCreator()->currentlyOpenedSessionWindows();
 
-        // Compare both settings:
-        bool isGlobalFlagChanged = false;
-        unsigned int settingsChangeType = pSessionSettings->CompareSettings(changedSettings);
-
-        if (CPUGlobalDisplayFilter::instance().m_displaySystemDLLs != DisplayFilterDlg::instance().DisplaySystemDlls())
+        for (int i = 0; i < (int)openedWindowsVector.size(); i++)
         {
-            settingsChangeType = settingsChangeType | UPDATE_TABLE_REBUILD;
-            isGlobalFlagChanged = true;
-        }
-
-        if (CPUGlobalDisplayFilter::instance().m_displayPercentageInColumn != DisplayFilterDlg::instance().ShowPercentage())
-        {
-            settingsChangeType = settingsChangeType | UPDATE_TABLE_COLUMNS_DATA;
-            isGlobalFlagChanged = true;
-        }
-
-        if (settingsChangeType != UPDATE_TABLE_NONE)
-        {
-            // Set the new settings values:
-            pSessionSettings->CopyFrom(changedSettings);
-            CPUGlobalDisplayFilter::instance().m_displayPercentageInColumn = DisplayFilterDlg::instance().ShowPercentage();
-            CPUGlobalDisplayFilter::instance().m_displaySystemDLLs = DisplayFilterDlg::instance().DisplaySystemDlls();
-
-            // Update the display and the views' filters:
-            ProtectedUpdateTableDisplay(settingsChangeType);
-
-            // Update the displayed string:
-            updateDisplaySettingsString();
-        }
-
-        // If one of the global flags had changed, then views should be updated:
-        if (isGlobalFlagChanged)
-        {
-            gtVector<CpuSessionWindow*> openedWindowsVector = AmdtCpuProfiling::instance().sessionViewCreator()->currentlyOpenedSessionWindows();
-
-            for (int i = 0 ; i < (int)openedWindowsVector.size(); i++)
+            CpuSessionWindow* pWindow = openedWindowsVector[i];
+            GT_IF_WITH_ASSERT(pWindow != nullptr)
             {
-                CpuSessionWindow* pWindow = openedWindowsVector[i];
-                GT_IF_WITH_ASSERT(pWindow != nullptr)
-                {
-                    // Update the window display filter (delayed update for non-active session windows):
-                    bool isWindowActive = (pWindow == m_pParentSessionWindow);
-                    pWindow->UpdateDisplaySettings(isWindowActive, settingsChangeType);
-                }
+                // Update the window display filter (delayed update for non-active session windows):
+                bool isWindowActive = (pWindow == m_pParentSessionWindow);
+                pWindow->UpdateDisplaySettings(isWindowActive, UPDATE_TABLE_REBUILD);
             }
         }
-        else
-        {
-            // Update only the session views:
-            GT_IF_WITH_ASSERT(m_pParentSessionWindow != nullptr)
-            {
-                // Set a flag stating that the view should be updated:
-                m_pParentSessionWindow->UpdateDisplaySettings(true, settingsChangeType);
-            }
-        }
-
-#endif
     }
 }
 

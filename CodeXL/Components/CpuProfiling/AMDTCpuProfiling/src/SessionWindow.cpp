@@ -103,7 +103,7 @@ CpuSessionWindow::~CpuSessionWindow()
     }
 
     delete m_pTabWidget;
-	m_pProfDataRd->CloseProfileData();
+    m_pProfDataRd->CloseProfileData();
     m_pProfileInfo = nullptr;
 }
 
@@ -137,7 +137,7 @@ bool CpuSessionWindow::initialize()
 
 void CpuSessionWindow::OnBeforeDeletion()
 {
-	m_pProfDataRd->CloseProfileData();
+    m_pProfDataRd->CloseProfileData();
 }
 
 bool CpuSessionWindow::display()
@@ -148,64 +148,38 @@ bool CpuSessionWindow::display()
         // Open the database file
         retVal = OpenDataReader();
 
-		if (retVal)
-		{
-			m_pDisplayFilter.reset(new DisplayFilter);
-			m_pDisplayFilter->SetProfDataReader(m_pProfDataRd);
-			retVal = m_pDisplayFilter->CreateConfigCounterMap();
+        if (retVal)
+        {
+            m_pDisplayFilter.reset(new DisplayFilter);
+            m_pDisplayFilter->SetProfDataReader(m_pProfDataRd);
+            retVal = m_pDisplayFilter->CreateConfigCounterMap();
 
-			if (retVal)
-			{
-				// init with default configuration
-				retVal = m_pDisplayFilter->InitToDefault();
+            if (retVal)
+            {
+                // init with default configuration
+                retVal = m_pDisplayFilter->InitToDefault();
 
-				if (retVal)
-				{
-					m_sessionFile = m_pSessionTreeItemData->m_filePath;
+                if (retVal)
+                {
+                    m_sessionFile = m_pSessionTreeItemData->m_filePath;
 
-					if (!displayOverviewWindow(m_sessionFile))
-					{
-						if (m_pOverviewWindow != nullptr)
-						{
-							delete m_pOverviewWindow;
-							m_pOverviewWindow = nullptr;
-						}
-					}
-				}
-			}
-		}
-		else
-		{
+                    if (!displayOverviewWindow(m_sessionFile))
+                    {
+                        if (m_pOverviewWindow != nullptr)
+                        {
+                            delete m_pOverviewWindow;
+                            m_pOverviewWindow = nullptr;
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
             gtString message;
             message.appendFormattedString(L"Failed to open profile file. File path: %ls", m_sessionFile.asString().asCharArray());
             OS_OUTPUT_DEBUG_LOG(message.asCharArray(), OS_DEBUG_LOG_ERROR);
         }
-#if 0
-        m_pProfileInfo = m_profileReader.getProfileInfo();
-        GT_IF_WITH_ASSERT(rc && (nullptr != m_pProfileInfo))
-        {
-            if (m_pProfileInfo->m_numSamples > 0)
-            {
-                m_sessionDisplayFilter.initialize(m_pProfileInfo);
-
-                if (!displayOverviewWindow(m_sessionFile))
-                {
-                    if (m_pOverviewWindow != nullptr)
-                    {
-                        delete m_pOverviewWindow;
-                        m_pOverviewWindow = nullptr;
-                    }
-                }
-            }
-            else
-            {
-                QMessageBox::information(this, "No Samples available", "The selected session does not have any data, please try again.");
-            }
-        }
-
-        // Prepare the list of processes that has CSS collection for this session:
-        BuildCSSProcessesList();
-#endif
     }
 
     // Show / hide information panel:
@@ -512,13 +486,13 @@ bool CpuSessionWindow::onViewModulesView(SYSTEM_DATA_TAB_CONTENT aggregateBy)
 
 void CpuSessionWindow::onViewSourceViewSlot(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> funcModInfo)
 {
-	QString modName = acGTStringToQString(std::get<1>(funcModInfo));
-	AMDTUInt32 pid = std::get<3>(funcModInfo);
-	QString caption = modName + " - Source/Disassembly";
-	QWidget* pOldTab = FindTab(caption);
-	SessionSourceCodeView* pSourceCodeView = (SessionSourceCodeView*)pOldTab;
+    QString modName = acGTStringToQString(std::get<1>(funcModInfo));
+    AMDTUInt32 pid = std::get<3>(funcModInfo);
+    QString caption = modName + " - Source/Disassembly";
+    QWidget* pOldTab = FindTab(caption);
+    SessionSourceCodeView* pSourceCodeView = (SessionSourceCodeView*)pOldTab;
 
-	//bool createdNewView = false;
+    //bool createdNewView = false;
 
     if (nullptr == pSourceCodeView)
     {
@@ -557,7 +531,7 @@ void CpuSessionWindow::onViewSourceViewSlot(std::tuple<AMDTFunctionId, const gtS
         //    // Do not redisplay address for alredy displayed source code view:
         //    pSourceCodeView->DisplayAddress(0, pid, SHOW_ALL_TIDS);
         //}
-        
+
         // TODO: Baskar: Shouldn't we pass the correct address?
         pSourceCodeView->DisplayAddress(0, pid, SHOW_ALL_TIDS);
 
@@ -588,12 +562,14 @@ void CpuSessionWindow::onViewSourceView(gtVAddr Address, ProcessIdType pid, Thre
         pSourceCodeView->setDisplayedItemData((afApplicationTreeItemData*)m_pSessionTreeItemData);
 
 #if 0
+
         if (!pSourceCodeView->DisplayModule(pModDetail))
         {
             QMessageBox::information(this, "Source/Disassembly View Error" , "Failed to initialize Source/Disassembly tab for module :\n" + modName);
             delete pSourceCodeView;
             return;
         }
+
 #endif
         pSourceCodeView->setWindowTitle(caption);
 
@@ -617,8 +593,8 @@ void CpuSessionWindow::onViewSourceView(gtVAddr Address, ProcessIdType pid, Thre
 
 void CpuSessionWindow::onViewCallGraphView(unsigned long pid)
 {
-	if (true)
-		//if (checkIfDataIsPresent())
+    if (true)
+        //if (checkIfDataIsPresent())
     {
         //This tab is not allocated until it's needed
         if (nullptr == m_pCallGraphTab)
@@ -660,8 +636,8 @@ void CpuSessionWindow::onViewFunctionTab(unsigned long pid)
 {
     (void)(pid); // unused
 
-	//if (checkIfDataIsPresent())
-	if (true)
+    //if (checkIfDataIsPresent())
+    if (true)
     {
         if (nullptr == m_pSessionFunctionView)
         {
@@ -887,7 +863,7 @@ void CpuSessionWindow::onBeforeSessionRename(SessionTreeNodeData* pAboutToRename
             }
 
             // Close the profile reader (in order to release the file handler, to allow rename of the file):
-			m_pProfDataRd->CloseProfileData();
+            m_pProfDataRd->CloseProfileData();
         }
     }
 }
@@ -1126,9 +1102,9 @@ void CpuSessionWindow::onAboutToActivate()
 CpuProfileModule* CpuSessionWindow::getModuleDetail(const QString& modulePath, QWidget* pParent, ExecutableFile** ppExe)
 {
     CpuProfileModule* pModule = nullptr;
-	GT_UNREFERENCED_PARAMETER(modulePath);
-	GT_UNREFERENCED_PARAMETER(pParent);
-	GT_UNREFERENCED_PARAMETER(ppExe);
+    GT_UNREFERENCED_PARAMETER(modulePath);
+    GT_UNREFERENCED_PARAMETER(pParent);
+    GT_UNREFERENCED_PARAMETER(ppExe);
     return pModule;
 }
 
