@@ -1512,7 +1512,7 @@
             inside a button definition. An important aspect of this declaration is that the element id 
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
       <Bitmap guid="guidImagesEditorToolbarIcons" resID="IDB_IMAGES_EDITOR_TOOLBAR_IMAGES" usedList="bmpRed, bmpGreen, bmpBlue, bmpAlpha, bmpInvert, bmpGrayscale, bmpLeftRotate, bmpRightRotate, bmpBestFit, bmpOrigSize, bmpSelect, bmpPan"/>
-      <Bitmap guid="guidMenuCommandIcons" resID="IDB_IMAGES_MENU_COMMANDS_IMAGES" usedList="bmpDebugMode, bmpProfileMode, bmpFrameAnalysisMode, bmpAnalyzeMode, bmpGo, bmpPause, bmpStop, bmpCapture, bmpCaptureGPU, bmpCaptureCPU, bmpStepIn, bmpStepOver, bmpAPIStep, bmpDrawStep, bmpFrameStep, bmpExplorer, bmpHistory, bmpProperties, bmpMultiWatch, bmpStateVars, bmpCommandQueues, bmpMemory, bmpStatistics, bmpSystemInfo, bmpBreakpoint, bmpViewHelp, bmpBuild, bmpBuildAna, bmpCancelBuild"/>
+      <Bitmap guid="guidMenuCommandIcons" resID="IDB_IMAGES_MENU_COMMANDS_IMAGES" usedList="bmpDebugMode, bmpProfileMode, bmpFrameAnalysisMode, bmpAnalyzeMode, bmpGo, bmpPause, bmpStop, bmpCapture, bmpCaptureCPU, bmpCaptureGPU, bmpStepIn, bmpStepOver, bmpAPIStep, bmpDrawStep, bmpFrameStep, bmpExplorer, bmpHistory, bmpProperties, bmpMultiWatch, bmpStateVars, bmpCommandQueues, bmpMemory, bmpStatistics, bmpSystemInfo, bmpBreakpoint, bmpViewHelp, bmpBuild, bmpBuildAna, bmpCancelBuild"/>
     </Bitmaps>
  
   </Commands>
