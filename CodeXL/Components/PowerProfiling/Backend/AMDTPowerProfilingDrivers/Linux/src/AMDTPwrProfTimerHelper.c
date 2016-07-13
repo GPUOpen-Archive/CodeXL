@@ -72,13 +72,13 @@ int IntializeCoreData(CoreData* pCoreClientData,
     memset(pCoreClientData, 0, sizeof(CoreData));
 
     pCoreClientData->m_clientId             = clientId;
-    pCoreClientData->m_sampleId             = index;
+    pCoreClientData->m_sampleId             = index + 1;
     pCoreClientData->m_samplingInterval     = config->m_samplingSpec.m_samplingPeriod;
     pCoreClientData->m_recLen               = 0;
     pCoreClientData->m_coreId               = coreId;
 
     // point to the shared buffer
-    offset += (coreId * (sizeof(PageBuffer) + PWRPROF_PERCORE_BUFFER_SIZE));
+    offset += (index * (sizeof(PageBuffer) + PWRPROF_PERCORE_BUFFER_SIZE));
     pCoreClientData->m_pCoreBuffer = (PageBuffer*)(g_pSharedBuffer + offset);
 
     if (NULL == pCoreClientData->m_pCoreBuffer)
