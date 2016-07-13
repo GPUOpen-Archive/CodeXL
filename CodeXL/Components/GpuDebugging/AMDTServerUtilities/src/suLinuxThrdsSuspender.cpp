@@ -10,6 +10,7 @@
 #include <AMDTServerUtilities/Include/suLinuxThrdsSuspender.h>
 #include <thread>
 
+// Initialzing static variables
 std::set<pthread_t>        suLinuxThrdsSuspender::m_suspendedThreads;   ///< Set of suspended threads
 std::condition_variable    suLinuxThrdsSuspender::m_cvHandler;         ///< Thread suspended conditional variable
 std::mutex                 suLinuxThrdsSuspender::m_mtxCvHandler;     ///< Conditional variable synchronization objcet
@@ -93,6 +94,8 @@ void suLinuxThrdsSuspender::SuspendSignalHandler(int sig)
 /// \date 12/17/2015
 bool suLinuxThrdsSuspender::SuspendThreads(const std::vector<osThreadId>& thrds)
 {
+    bool retVal = true;
+
     int status = 0;
     std::unique_lock<std::mutex>    lock(m_mtx);
 
@@ -101,25 +104,30 @@ bool suLinuxThrdsSuspender::SuspendThreads(const std::vector<osThreadId>& thrds)
         if (m_suspendedThreads.find(it) != m_suspendedThreads.end())
         {
             /// One of requested threads already suspended
-            return false;
+            retVal = false;
+            break;
         }
     }
 
-    for (auto const& it : thrds)
+    if (retVal)
     {
-        status = pthread_kill(it, SIGCONT);
-
-        if (status != 0)
+        for (auto const& it : thrds)
         {
-            ResumeThreads();
-            return false;
-        }
+            status = pthread_kill(it, SIGCONT);
 
-        std::unique_lock<std::mutex> handler_lock(m_mtxCvHandler);
-        m_cvHandler.wait(handler_lock, [&] { return m_suspendedThreads.end() != m_suspendedThreads.find(it); });
+            if (status != 0)
+            {
+                ResumeThreads();
+                retVal = false;
+                break;
+            }
+
+            std::unique_lock<std::mutex> handler_lock(m_mtxCvHandler);
+            m_cvHandler.wait(handler_lock, [&] { return m_suspendedThreads.end() != m_suspendedThreads.find(it); });
+        }
     }
 
-    return status == 0;
+    return retVal ? status == 0 : false;
 }
 
 //////////////////////////////////////////////////////////////////
@@ -131,6 +139,8 @@ bool suLinuxThrdsSuspender::SuspendThreads(const std::vector<osThreadId>& thrds)
 /// \date 12/17/2015
 bool suLinuxThrdsSuspender::ResumeThreads()
 {
+    bool retVal = true;
+
     int status = 0;
     std::unique_lock<std::mutex>    lock(m_mtx);
 
@@ -140,11 +150,12 @@ bool suLinuxThrdsSuspender::ResumeThreads()
 
         if (status != 0)
         {
-            return false;
+            retVal = false;
+            break;
         }
     }
 
-    return true;
+    return retVal;
 }
 
 //////////////////////////////////////////////////////////////////

@@ -20,7 +20,7 @@ enum pdGDBCommandId
     PD_GDB_SET_ARCHITECTURE_CMD,            // Set the executable architecture (Used only in Mac)
     PD_GDB_START_DEBUGGED_PROCESS_CMD,      // Start debugging the debugged program, but break before the main procedure.
     PD_GDB_SUSPEND_DEBUGGED_PROCESS_CMD,    // Suspend the debugged program.
-    PD_GDB_STOP_THREAD_SYNC,                // Synchronius thread stop
+    PD_GDB_STOP_THREAD_SYNC,                // Synchronous thread stop
     PD_GDB_RESUME_DEBUGGED_PROCESS_CMD,     // Resume the debugged program.
     PD_GDB_RUN_DEBUGGED_PROCESS_CMD,        // Launch / resume the run of the debugged program.
     PD_GDB_ABORT_DEBUGGED_PROCESS_CMD,      // Abort (kill) the debugged process.
