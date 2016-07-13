@@ -2015,9 +2015,9 @@ PackageTheBuild()
 		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLOccupancyAgent32.so         ${PKG_NAME}
 		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLProfileAgent32.so           ${PKG_NAME}
 		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLTraceAgent32.so             ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLThreadTraceAgent32.so       ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUThreadTrace32.so                         ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libPerformanceExperimentFile32.so              ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLThreadTraceAgent32-Internal.so       ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libGPUThreadTrace32-Internal.so                         ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libPerformanceExperimentFile32-Internal.so              ${PKG_NAME}
 		cp -f Output_x86_64/release/bin/libGPUPerfAPICL32.so                           ${PKG_NAME}
 		cp -f Output_x86_64/release/bin/libGPUPerfAPICounters32.so                     ${PKG_NAME}
 		cp -f Output_x86_64/release/bin/libCXLGpuProfilerPreloadXInitThreads32.so      ${PKG_NAME}
@@ -2027,9 +2027,9 @@ PackageTheBuild()
 		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLOccupancyAgent.so        ${PKG_NAME}
 		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLProfileAgent.so          ${PKG_NAME}
 		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLTraceAgent.so            ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLThreadTraceAgent.so      ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libGPUThreadTrace.so                        ${PKG_NAME}
-		cp -f Output_x86_64/release/bin/libPerformanceExperimentFile.so             ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libCXLGpuProfilerCLThreadTraceAgent-Internal.so      ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libGPUThreadTrace-Internal.so                        ${PKG_NAME}
+		cp -f Output_x86_64/release/bin/libPerformanceExperimentFile-Internal.so             ${PKG_NAME}
 		cp -f Output_x86_64/release/bin/libCXLGpuProfilerHSAProfileAgent.so         ${PKG_NAME}
 		cp -f Output_x86_64/release/bin/libCXLGpuProfilerHSATraceAgent.so           ${PKG_NAME}
 		cp -f Output_x86_64/release/bin/libGPUPerfAPICL.so                          ${PKG_NAME}
