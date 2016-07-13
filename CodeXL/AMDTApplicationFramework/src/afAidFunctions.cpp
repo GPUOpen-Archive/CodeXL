@@ -428,7 +428,7 @@ void afGetUserDataFolderPath(osFilePath& userDataPath)
 }
 
 
-void IsApplicationPathsValid(const afIsValidApplicationInfo& isValidApplicationInfo, bool &isAppValid, bool &isWorkingFolderValid) 
+void afIsApplicationPathsValid(const afIsValidApplicationInfo& isValidApplicationInfo, bool &isAppValid, bool &isWorkingFolderValid) 
 {
     if (isValidApplicationInfo.isRemoteSession && isValidApplicationInfo.portAddress)
     {

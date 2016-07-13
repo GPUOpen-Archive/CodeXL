@@ -1523,23 +1523,26 @@ bool afNewProjectDialog::AreSettingsValid(gtString& invalidMessageStr, gtString&
 void afNewProjectDialog::IsApplicationPathsValid(bool& isAppValid, bool& isWorkingFolderValid) const
 {
     isAppValid = true;
-    GT_ASSERT(m_pWinStoreAppRadioButton != nullptr && m_pWorkingFolderTextEdit != nullptr && m_pRemoteHostRadioButton != nullptr)
-    afIsValidApplicationInfo isValidApplicationInfo;
-    isValidApplicationInfo.isWInStoreAppRadioButtonChecked = m_pWinStoreAppRadioButton->isChecked();
-    isValidApplicationInfo.workingFolderPath = acQStringToGTString(m_pWorkingFolderTextEdit->text());
-    isValidApplicationInfo.appFilePath = acQStringToGTString(m_pProgramExeTextEdit->text());
-    isValidApplicationInfo.isRemoteSession = m_pRemoteHostRadioButton->isChecked();
-    osPortAddress portAddress;
-
-    if (isValidApplicationInfo.isRemoteSession)
+    GT_IF_WITH_ASSERT(m_pWinStoreAppRadioButton != nullptr && m_pWorkingFolderTextEdit != nullptr && m_pRemoteHostRadioButton != nullptr)
     {
-        GT_IF_WITH_ASSERT(GetRemotePortAddress(portAddress))
+        afIsValidApplicationInfo isValidApplicationInfo;
+        isValidApplicationInfo.isWInStoreAppRadioButtonChecked = m_pWinStoreAppRadioButton->isChecked();
+        isValidApplicationInfo.workingFolderPath = acQStringToGTString(m_pWorkingFolderTextEdit->text());
+        isValidApplicationInfo.appFilePath = acQStringToGTString(m_pProgramExeTextEdit->text());
+        isValidApplicationInfo.isRemoteSession = m_pRemoteHostRadioButton->isChecked();
+
+        if (isValidApplicationInfo.isRemoteSession)
         {
-            isValidApplicationInfo.portAddress = &portAddress;
+            osPortAddress portAddress;
+            GT_IF_WITH_ASSERT(GetRemotePortAddress(portAddress))
+            {
+                isValidApplicationInfo.portAddress = &portAddress;
+            }
+
         }
-        
+        afIsApplicationPathsValid(isValidApplicationInfo, isAppValid, isWorkingFolderValid);
     }
-    ::IsApplicationPathsValid(isValidApplicationInfo, isAppValid, isWorkingFolderValid);
+   
 }
 
 bool afNewProjectDialog::GetRemotePortAddress(osPortAddress& dmnAddress) const

@@ -1902,7 +1902,7 @@ void WinTaskInfo::GetDrivePartitionInfo()
         buffer[0] = L'\0';
         GetLogicalDriveStrings(checkSize, buffer);
     }
-    if (buffer)
+    if (buffer != nullptr)
     {
         wchar_t* temp = buffer;
 

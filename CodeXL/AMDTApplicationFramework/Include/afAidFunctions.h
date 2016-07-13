@@ -47,7 +47,7 @@ struct AF_API afIsValidApplicationInfo
     gtString workingFolderPath;
     bool isWInStoreAppRadioButtonChecked = false;
 };
-AF_API void IsApplicationPathsValid(const afIsValidApplicationInfo& isValidApplicationInfo, bool &isAppValid, bool &isWorkingFolderValid);
+AF_API void afIsApplicationPathsValid(const afIsValidApplicationInfo& isValidApplicationInfo, bool &isAppValid, bool &isWorkingFolderValid);
 
 // Get version info:
 AF_API bool afGetVersionDetails(int& buildVersion, int& majorVersion, int& minorVersion, int& year, int& month, int& day);
