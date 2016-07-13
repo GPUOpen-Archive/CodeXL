@@ -17,7 +17,7 @@
 #include "../Common/GlobalSettings.h"
 #include "../Common/StringUtils.h"
 #include "../CLCommon/CLFunctionDefs.h"
-#include "AMDTActivityLogger/AMDTActivityLogger.h"
+#include "AMDTActivityLogger/CXLActivityLogger.h"
 #include "CLIntercept.h"
 #include "CLOccupancyInfoManager.h"
 

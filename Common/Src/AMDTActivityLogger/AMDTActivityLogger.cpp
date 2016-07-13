@@ -14,7 +14,7 @@
 #include <AMDTOSWrappers/Include/osProcess.h>
 #include <AMDTOSWrappers/Include/osThread.h>
 
-#include "AMDTActivityLogger.h"
+#include "CXLActivityLogger.h"
 #include "AMDTActivityLoggerProfileControl.h"
 #include "AMDTCpuProfileControl.h"
 #include "Common/OSUtils.h"

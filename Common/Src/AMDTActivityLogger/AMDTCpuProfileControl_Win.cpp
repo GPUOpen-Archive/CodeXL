@@ -4,7 +4,7 @@
 #include <cstdint>
 
 #include <AMDTMutex.h>
-#include "AMDTActivityLogger.h"
+#include "CXLActivityLogger.h"
 #include "AMDTCpuProfileControl.h"
 
 
