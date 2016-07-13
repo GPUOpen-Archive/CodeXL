@@ -58,7 +58,7 @@ public:
     APIAnalyzer() :
         m_bEnabled(true),
         m_bEndAnalyze(false),
-		m_strName(nullptr),
+        m_strName(nullptr),
         m_bRequireAPIFlattening(false)
     {}
 

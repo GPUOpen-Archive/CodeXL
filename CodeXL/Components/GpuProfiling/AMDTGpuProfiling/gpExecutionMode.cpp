@@ -1370,7 +1370,7 @@ bool gpExecutionMode::InitializeCodeXLRemoteAgent()
         shouldDisplayServerWindow = true;
 #endif
         osFilePath workDir = codeXLAgent.fileDirectoryAsString();
-
+//on Linux we use 127.0.0.1 ip in order to make RA local connections, due to naming resolving problem on some Ubuntu machines
 #if AMDT_BUILD_TARGET == AMDT_LINUX_OS
          const auto cxlAgentArgs = L"--ip " GPU_STR_CodeXLAgentHomeIP;
 #else

@@ -198,10 +198,10 @@ CaPerfConfig::CaPerfConfig(const CaPerfConfig& cfg) : PerfConfig(cfg), m_pmuTgt(
 
 CaPerfConfig& CaPerfConfig::operator=(const CaPerfConfig& cfg)
 {
-	if (&cfg == this)
-	{
-		return *this;
-	}
+    if (&cfg == this)
+    {
+      return *this;
+    }
     clear();
     PerfConfig::operator=(cfg);
 

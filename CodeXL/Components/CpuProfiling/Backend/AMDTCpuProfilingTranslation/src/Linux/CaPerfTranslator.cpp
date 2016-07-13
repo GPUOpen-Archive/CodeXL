@@ -1283,7 +1283,7 @@ HRESULT CaPerfTranslator::_getSampleBlockFromOffset(
 
     *ppData = calloc(1, blkSize);
 
-    if (!(*ppData))
+    if ((*ppData) == nullptr)
     {
         return E_OUTOFMEMORY;
     }
