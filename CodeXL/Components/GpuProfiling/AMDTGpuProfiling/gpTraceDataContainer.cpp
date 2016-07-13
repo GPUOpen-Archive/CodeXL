@@ -1340,6 +1340,7 @@ void gpTraceDataContainer::AddBakedCommandBuffer(VKGPUTraceInfo* pAPIInfo)
         bakedCommandBuffer.m_startTime = pAPIInfo->m_ullStart;
         bakedCommandBuffer.m_endTime = pAPIInfo->m_ullEnd;
         bakedCommandBuffer.m_commandListQueueName = QString::fromStdString(pAPIInfo->m_queueIndexStr);
+        bakedCommandBuffer.m_commandListPtr = QString::fromStdString(pAPIInfo->m_commandBufferHandleStr);
         m_commandListInstancesVector << bakedCommandBuffer;
     }
 }

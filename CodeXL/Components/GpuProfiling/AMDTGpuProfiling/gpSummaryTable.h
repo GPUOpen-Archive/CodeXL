@@ -115,7 +115,7 @@ public:
         membersStringsList << QString::number(m_maxTimeMs, 'f', 3);
         membersStringsList << numCallsStr;
         membersStringsList << m_gpuQueue;
-        QString addressStr = (m_numCalls > 0) ? m_address : AF_STR_NotAvailableA;
+        QString addressStr = (m_address.size() > 0) ? m_address : AF_STR_NotAvailableA;
         membersStringsList << addressStr;
     }
 

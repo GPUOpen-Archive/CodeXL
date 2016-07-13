@@ -102,6 +102,8 @@ bool gpCommandListSummaryTable::InitItems()
                 info.m_gpuQueueAddress = commandListData.m_commandListQueueName;
 
                 info.m_address = commandListData.m_commandListPtr;
+                //info.m_address = m_pSessionDataContainer->CommandListNameFromPointer(commandListName, commandListData.m_instanceIndex);
+
                 info.m_minTimeMs = commandListData.m_startTime;
                 info.m_maxTimeMs = commandListData.m_endTime;
 
