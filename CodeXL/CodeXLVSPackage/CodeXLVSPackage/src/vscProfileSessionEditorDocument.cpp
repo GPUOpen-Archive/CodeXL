@@ -17,11 +17,13 @@
 // AMDTGpuProfiling:
 #include <AMDTGpuProfiling/ProfileManager.h>
 
-
 // Local:
 #include "stdafx.h"
 #include <Include/vscProfileSessionEditorDocumentQt.h>
 #include <Include/Public/vscProfileSessionEditorDocument.h>
+
+// Power profiling
+#include <AMDTPowerProfiling/src/ppMDIViewCreator.h>
 
 ProfileMDIWindowHelper* ProfileMDIWindowHelper::m_spMySingleInstance = nullptr;
 
@@ -181,8 +183,14 @@ void vscProfileSessionEditorDocument::LoadDocData(const wchar_t* filePathStr)
                 // Set the new created window:
                 m_pInnerView = pSessionView;
 
+                // Add the view to the created view
+                ppMDIViewCreator* pCreator = ppMDIViewCreator::Instance();
+                gtString filePathAsString = m_filePath.asString();
+
+                pCreator->GetCreatedViews()[filePathAsString] = pSessionView;
+
                 // Load the session:
-                const apEvent* pEvent = gpViewsCreator::Instance()->CreationEvent();
+                const apEvent* pEvent = ppMDIViewCreator::Instance()->CreationEvent();
                 const apMDIViewCreateEvent* pCreationEvent = dynamic_cast<const apMDIViewCreateEvent*>(pEvent);
                 int viewIndex = AF_TREE_ITEM_PP_TIMELINE;
 
@@ -256,9 +264,18 @@ void vscProfileSessionEditorDocument::ClosePane()
                     pSessionViewCreator->removeSessionWindow(m_filePath, true);
                 }
             }
-            else if ((fileExtension == AF_STR_GpuProfileTraceFileExtension) || (fileExtension == AF_STR_GpuProfileSessionFileExtension) ||
-                     (fileExtension == AF_STR_PowerProfileSessionFileExtension))
+            else if ((fileExtension == AF_STR_GpuProfileTraceFileExtension) || (fileExtension == AF_STR_GpuProfileSessionFileExtension))
             {
+                delete m_pInnerView;
+                m_pInnerView = nullptr;
+            }
+            else if (fileExtension == AF_STR_PowerProfileSessionFileExtension)
+            {
+                // remove the view from the map first
+                ppMDIViewCreator* pCreator = ppMDIViewCreator::Instance();
+                gtString filePathAsString = m_filePath.asString();
+
+                pCreator->GetCreatedViews().erase(filePathAsString);
                 delete m_pInnerView;
                 m_pInnerView = nullptr;
             }
@@ -357,6 +374,12 @@ void vscProfileSessionEditorDocument::LoadSession()
 
                 // Set the new created window:
                 m_pInnerView = pSessionView;
+
+                // Add the view to the created view
+                ppMDIViewCreator* pCreator = ppMDIViewCreator::Instance();
+                gtString filePathAsString = m_filePath.asString();
+
+                pCreator->GetCreatedViews()[filePathAsString] = pSessionView;
 
                 // Load the session:
                 ProfileMDIWindowHelper::instance().LoadPowerProfileSessionContent(m_pInnerView, m_filePath);
