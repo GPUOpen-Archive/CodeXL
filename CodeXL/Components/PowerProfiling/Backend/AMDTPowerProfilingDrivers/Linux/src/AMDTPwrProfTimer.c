@@ -708,7 +708,7 @@ int ConfigureTimer(ProfileConfig* config, uint32 clientId)
     uint32 coreId               = 0;
     int cpuCnt                  = 0;
     bool isFirstConfig          = true;
-    int configIdx               = 1;
+    int configIdx               = 0;
     int ret                     = -1;
     PwrInternalAddr internalCounter;
 

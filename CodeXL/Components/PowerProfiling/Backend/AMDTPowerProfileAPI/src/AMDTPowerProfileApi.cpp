@@ -354,7 +354,7 @@ AMDTResult PrepareSystemTopologyInfo()
         //TODO: GUI shouldn't check for constant string
         memset(pkg0->m_pName, 0, AMDT_PWR_EXE_NAME_LENGTH);
         sprintf(pkg0->m_pName, "%s", pNodeInfo->m_shortName);
-        sprintf(pkg0->m_pDescription, "%s",pNodeInfo->m_shortName);
+        sprintf(pkg0->m_pDescription, "%s", pNodeInfo->m_shortName);
     }
     else
     {
@@ -847,7 +847,8 @@ bool PwrConfigureProfile()
         if (iter.second.m_isActive)
         {
             AMDTUInt32 smuIdx = iter.second.m_pkgId - 1;
-            if(!g_sysInfo.m_isAmdApu || !g_sysInfo.m_smuTable.m_info[0].m_isAccessible)
+
+            if (!g_sysInfo.m_isAmdApu || !g_sysInfo.m_smuTable.m_info[0].m_isAccessible)
             {
                 smuIdx = smuIdx - 1;
                 //PwrTrace("Apu doesn't have smu smuIdx %d", smuIdx);
@@ -934,10 +935,11 @@ AMDTResult AMDTPwrProfileInitialize(AMDTPwrProfileMode profileMode)
 
     if (AMDT_STATUS_OK == ret)
     {
-        if(nullptr != g_apiMemoryPool.m_pBase)
+        if (nullptr != g_apiMemoryPool.m_pBase)
         {
             ReleaseMemoryPool(&g_apiMemoryPool);
         }
+
         // Create memory pool for API layer
         ret = CreateMemoryPool(&g_apiMemoryPool, API_POOL_SIZE);
     }
@@ -1556,7 +1558,7 @@ AMDTResult AMDTPwrStartProfiling()
 
         g_pCounterStorage = (AMDTPwrCounterValue*)malloc(sizeof(AMDTPwrCounterValue) * PWR_COUNTER_STORAGE_POOL);
 
-        if(nullptr != g_pCounterStorage)
+        if (nullptr != g_pCounterStorage)
         {
             ret = PwrStartProfiling();
         }
@@ -1961,6 +1963,11 @@ AMDTResult AMDTPwrReadAllEnabledCounters(AMDTUInt32* pNumOfSamples,
             for (auto iter : data.m_counters)
             {
                 PwrSupportedCounterMap:: iterator supIter = pCounters->find(iter.second.m_counterId);
+
+                if (!supIter->second.m_isActive)
+                {
+                    continue;
+                }
 
                 AMDTFloat32* value = &result.m_counterValues[cnt].m_counterValue;
 
