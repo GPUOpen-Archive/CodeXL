@@ -895,8 +895,6 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
             if (ret)
             {
                 m_pTreeViewModel->m_newAddress = functionData.m_modBaseAddress + functionData.m_instDataList[0].m_offset;
-                m_srcFilePath.makeEmpty();
-                m_pProfDataRdr->GetSourceFilePathForFunction(m_pTreeViewModel->m_funcId, m_srcFilePath);
 
                 isMultiPID = (functionData.m_pidsList.size() > 1);
                 isMultiTID = (functionData.m_threadsList.size() > 1);
@@ -943,9 +941,6 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
 
 void SessionSourceCodeView::UpdateWithNewSymbol()
 {
-    //If there is no source, just show dasm
-    //m_pTreeViewModel->m_srcFile.clear();
-
     m_pTreeViewModel->SetupSourceInfo();
 
     // If m_pTreeViewModel->m_srcFile is empty, no Source info available.
@@ -1820,7 +1815,7 @@ bool SessionSourceCodeView::CreateModelData()
         if (!m_pTreeViewModel->m_isDisplayingOnlyDasm)
         {
             // Get the source file and store it in the cache
-            if (GetActualSourceFile(acGTStringToQString(m_srcFilePath), tryFile))
+            if (GetActualSourceFile(m_pTreeViewModel->m_srcFile, tryFile))
             {
                 bool rc = m_pTreeViewModel->SetSourceLines(tryFile, 1, GT_INT32_MAX);
                 GT_IF_WITH_ASSERT(rc)

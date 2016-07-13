@@ -2669,41 +2669,90 @@ public:
                             funcOffsetLinenumMap = jncReader.GetOffsetLines(javaFuncName);
                         }
 
+                        AMDTUInt32 bytesToRead = 0;
+                        AMDTUInt32 bytesUsed = 0;
                         AMDTUInt32 currOffset = 0;
-                        AMDTUInt32 currLineNumber = funcOffsetLinenumMap.begin().value();
+                        AMDTUInt32 currLineNumber = 0;
 
-                        for (auto offsetLineIt = funcOffsetLinenumMap.begin(); offsetLineIt != funcOffsetLinenumMap.end(); ++offsetLineIt)
+                        if (! funcOffsetLinenumMap.empty())
                         {
-                            AMDTUInt32 nextOffset = offsetLineIt.key();
-                            AMDTUInt32 nextLineNumber = offsetLineIt.value();
-                            AMDTUInt32 bytesToRead = nextOffset - currOffset;
-                            AMDTUInt32 bytesUsed = 0;
+                            currLineNumber = funcOffsetLinenumMap.begin().value();
 
-                            while (bytesToRead > 0)
+                            for (auto offsetLineIt = funcOffsetLinenumMap.begin(); offsetLineIt != funcOffsetLinenumMap.end(); ++offsetLineIt)
                             {
-                                AMDTSourceAndDisasmInfo instInfo;
+                                AMDTUInt32 nextOffset = offsetLineIt.key();
+                                AMDTUInt32 nextLineNumber = offsetLineIt.value();
+                                bytesToRead = nextOffset - currOffset;
+                                bytesUsed = 0;
 
-                                instInfo.m_offset = currOffset;
-                                instInfo.m_sourceLine = currLineNumber;
-
-                                const gtUByte* pCurrentCode = pCode + instInfo.m_offset;
-
-                                bool rc = GetDisassemblyString((BYTE*)pCurrentCode, isLongMode, instInfo, bytesUsed);
-
-                                if (rc)
+                                while (bytesToRead > 0)
                                 {
-                                    srcInfoVec.push_back(instInfo);
-                                    bytesToRead = (bytesToRead > bytesUsed) ? (bytesToRead - bytesUsed) : 0;
-                                    currOffset += bytesUsed;
+                                    AMDTSourceAndDisasmInfo instInfo;
+
+                                    instInfo.m_offset = currOffset;
+                                    instInfo.m_sourceLine = currLineNumber;
+
+                                    const gtUByte* pCurrentCode = pCode + instInfo.m_offset;
+
+                                    bool rc = GetDisassemblyString((BYTE*)pCurrentCode, isLongMode, instInfo, bytesUsed);
+
+                                    if (rc)
+                                    {
+                                        srcInfoVec.push_back(instInfo);
+                                        bytesToRead = (bytesToRead > bytesUsed) ? (bytesToRead - bytesUsed) : 0;
+                                        currOffset += bytesUsed;
+                                    }
+                                    else
+                                    {
+                                        bytesToRead = 0;
+                                    }
                                 }
-                                else
+
+                                currOffset = nextOffset;
+                                currLineNumber = nextLineNumber;
+                            }
+                        }
+                        else
+                        {
+                            // Hmm..
+                            AMDTProfileFunctionData functionData;
+                            GetFunctionData(funcInfo.m_functionId, AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_THREADS, functionData);
+
+                            for (auto& instData : functionData.m_instDataList)
+                            {
+                                AMDTUInt32 instOffset = instData.m_offset;
+
+                                if (currOffset > instOffset)
                                 {
-                                    bytesToRead = 0;
+                                    continue;
+                                }
+
+                                currOffset = instOffset;
+                                bytesToRead = sectionSize - currOffset;
+
+                                while (bytesToRead > 0)
+                                {
+                                    AMDTSourceAndDisasmInfo instInfo;
+
+                                    instInfo.m_offset = currOffset;
+                                    instInfo.m_sourceLine = currLineNumber;
+
+                                    const gtUByte* pCurrentCode = pCode + instInfo.m_offset;
+
+                                    bool rc = GetDisassemblyString((BYTE*)pCurrentCode, isLongMode, instInfo, bytesUsed);
+
+                                    if (rc)
+                                    {
+                                        srcInfoVec.push_back(instInfo);
+                                        bytesToRead = (bytesToRead > bytesUsed) ? (bytesToRead - bytesUsed) : 0;
+                                        currOffset += bytesUsed;
+                                    }
+                                    else
+                                    {
+                                        bytesToRead = 0;
+                                    }
                                 }
                             }
-
-                            currOffset = nextOffset;
-                            currLineNumber = nextLineNumber;
                         }
                     }
                 }
