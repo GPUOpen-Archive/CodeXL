@@ -113,7 +113,8 @@ kaSourceCodeTableView::~kaSourceCodeTableView()
 // --------------------------------------------------------------------------
 inline const QString& kaSourceCodeTableView::GetColorStringByInstructionCategory(Instruction::InstructionCategory instructionType)
 {
-    if ((int)instructionType < Instruction::InstructionsCategoriesCount)
+    int instructionTypeAsInt = static_cast<int>(instructionType);
+    if (instructionTypeAsInt < Instruction::InstructionsCategoriesCount && instructionTypeAsInt >= 0)
     {
         return m_colorStrings[instructionType];
     }
