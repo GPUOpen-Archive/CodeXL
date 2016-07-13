@@ -3291,7 +3291,7 @@ bool pdGDBOutputReader::isAnyThreadStoppedInSpy()
 #else
 #error Unknown Linux Variant!
 #endif
-    GT_IF_WITH_ASSERT(rc1 && (pGDBOutputData != NULL))
+    GT_IF_WITH_ASSERT(rc1 && (pGDBOutputData != NULL) && (nullptr != _pGDBDriver))
     {
         // Sanity check:
         GT_IF_WITH_ASSERT(pGDBOutputData->type() == pdGDBData::PD_GDB_THREAD_DATA_LIST)
