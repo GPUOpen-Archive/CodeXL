@@ -4628,7 +4628,7 @@ public:
 
         funcInfo.m_functionId = funcId;
         funcInfo.m_moduleId = moduleId;
-        funcInfo.m_startOffset = (startOffset > 0) ? startOffset : offset;
+        funcInfo.m_startOffset = (offset > 0) ? offset : startOffset;
         funcInfo.m_size = size;
 
         sqlite3_finalize(pQueryStmt);
@@ -5266,8 +5266,6 @@ public:
                 aLeaf.m_isLeaf = true;
 
                 GetFunctionInfo(funcId, offset, aLeaf.m_funcInfo);
-                //aLeaf.m_funcInfo.m_startOffset = offset;
-
                 GetModuleBaseAddressByModuleId(aLeaf.m_funcInfo.m_moduleId, processId, aLeaf.m_moduleBaseAddr);
 
                 leafs.push_back(aLeaf);
@@ -5382,7 +5380,6 @@ public:
                 aLeaf.m_isSystemodule = (isSysMod == 1) ? true : false;
 
                 GetFunctionInfo(funcId, offset, aLeaf.m_funcInfo);
-                // aLeaf.m_funcInfo.m_startOffset = offset;
 
                 GetModuleBaseAddress(funcId, processId, aLeaf.m_moduleBaseAddr);
 
@@ -5438,8 +5435,6 @@ public:
                 IsSystemModule(modId, aLeaf.m_isSystemodule);
 
                 GetFunctionInfo(funcId, offset, aLeaf.m_funcInfo);
-                //aLeaf.m_funcInfo.m_startOffset = offset;
-
                 GetModuleBaseAddress(funcId, processId, aLeaf.m_moduleBaseAddr);
 
                 frames.push_back(aLeaf);

@@ -2124,39 +2124,34 @@ public:
 
         if (nullptr != m_pDbAdapter)
         {
-            AMDTProfileModuleInfo modInfo;
+            ExecutableFile* pExecutable = nullptr;
+            ret = GetModuleExecutable(moduleId, pExecutable, true);
 
-            if (GetModuleInfo(moduleId, modInfo))
+            if (ret && (nullptr != pExecutable))
             {
+                AMDTProfileModuleInfo modInfo;
+                ret = GetModuleInfo(moduleId, modInfo);
                 gtVAddr loadAddress = modInfo.m_loadAddress;
-                gtString exePath = modInfo.m_path;
-                ExecutableFile* pExecutable = ExecutableFile::Open(exePath.asCharArray(), loadAddress);
 
-                if (nullptr != pExecutable)
+                SymbolEngine* pSymbolEngine = pExecutable->GetSymbolEngine();
+
+                if (nullptr != pSymbolEngine)
                 {
-                    InitializeSymbolEngine(pExecutable);
-                    SymbolEngine* pSymbolEngine = pExecutable->GetSymbolEngine();
+                    gtRVAddr startRVAddr = pExecutable->VaToRva(loadAddress + offset);
+                    unsigned int sectionIndex = pExecutable->LookupSectionIndex(startRVAddr);
 
-                    if (nullptr != pSymbolEngine)
+                    if (pExecutable->GetSectionsCount() > sectionIndex)
                     {
-                        gtRVAddr startRVAddr = pExecutable->VaToRva(loadAddress + offset);
-                        unsigned int sectionIndex = pExecutable->LookupSectionIndex(startRVAddr);
+                        SourceLineInfo srcData;
 
-                        if (pExecutable->GetSectionsCount() > sectionIndex)
+                        if (pSymbolEngine->FindSourceLine(startRVAddr, srcData))
                         {
-                            SourceLineInfo srcData;
+                            srcFilePath = srcData.m_filePath;
+                            srcLine = srcData.m_line;
 
-                            if (pSymbolEngine->FindSourceLine(startRVAddr, srcData))
-                            {
-                                srcFilePath = srcData.m_filePath;
-                                srcLine = srcData.m_line;
-
-                                ret = true;
-                            }
+                            ret = true;
                         }
                     }
-
-                    delete pExecutable;
                 }
             }
         }
@@ -2507,17 +2502,15 @@ public:
 
         if (nullptr != m_pDbAdapter)
         {
-            AMDTProfileModuleInfo modInfo;
+            ExecutableFile* pExecutable = nullptr;
+            ret = GetModuleExecutable(moduleId, pExecutable, true);
 
-            ret = GetModuleInfo(moduleId, modInfo);
-
-            gtString exePath = modInfo.m_path;
-
-            gtVAddr loadAddress = modInfo.m_loadAddress;
-            ExecutableFile* pExecutable = ExecutableFile::Open(exePath.asCharArray(), loadAddress);
-
-            if (nullptr != pExecutable)
+            if (ret && (nullptr != pExecutable))
             {
+                AMDTProfileModuleInfo modInfo;
+                ret = GetModuleInfo(moduleId, modInfo);
+                gtVAddr loadAddress = modInfo.m_loadAddress;
+
                 gtRVAddr startRVAddr = 0;
                 const gtUByte* pCode = nullptr;
                 gtRVAddr sectionStartRva = 0, sectionEndRva = 0;
@@ -2527,7 +2520,6 @@ public:
                 AMDTUInt32 bytesToRead = size;
                 gtVAddr currOffset = offset;
 
-                ret = InitializeSymbolEngine(pExecutable);
                 SymbolEngine* pSymbolEngine = pExecutable->GetSymbolEngine();
 
                 while (bytesToRead > 0)
@@ -2574,7 +2566,7 @@ public:
                         }
 
                         disasmInfo.m_offset = codeOffset + sectionStartRva;
-                        
+
                         // Get disassembly for the current pCode from the disassembler
                         ret = GetDisassemblyString((BYTE*)(pCurrentCode), isLongMode, disasmInfo, NumBytesUsed);
                     }
@@ -2582,7 +2574,7 @@ public:
                     if (ret)
                     {
                         currOffset += NumBytesUsed;
-                        bytesToRead -= NumBytesUsed;
+                        bytesToRead = (bytesToRead > NumBytesUsed) ? (bytesToRead - NumBytesUsed) : 0;
                     }
                     else
                     {
@@ -2591,13 +2583,11 @@ public:
 
                     disasmInfoVec.push_back(disasmInfo);
                 }
-
-                delete pExecutable;
             }
-            else
-            {
-                retVal = CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE;
-            }
+        }
+        else
+        {
+            retVal = CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE;
         }
 
         return retVal;
