@@ -30,7 +30,6 @@
 
 class CpuSessionWindow;
 class CpuProfileInfo;
-class CpuProfileReader;
 
 class DisplayFilterDlg : public QDialog
 {

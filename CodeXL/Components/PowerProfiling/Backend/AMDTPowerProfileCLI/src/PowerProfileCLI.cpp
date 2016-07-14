@@ -189,7 +189,7 @@ static int PrintHelp()
 
     fprintf(stderr, "\n    -h                         Display this help information.\n");
     fprintf(stderr, "\n    -v                         Print version string.\n");
-    fprintf(stderr, "\n    -z <db file output dir>    Export results to a *.cxldb file which can be imported to CodeXL GUI\n");
+    fprintf(stderr, "\n    -z <db file output dir>    Export results to a *.cxlcpdb file which can be imported to CodeXL GUI\n");
     fprintf(stderr, "                               application.\n");
 
     PrintExamples();

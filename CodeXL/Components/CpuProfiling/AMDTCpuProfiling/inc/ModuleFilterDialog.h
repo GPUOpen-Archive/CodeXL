@@ -23,8 +23,6 @@
 
 #include <qheaderview.h>
 
-#include <AMDTCpuProfilingRawData/inc/CpuProfileReader.h>
-
 // Infra:
 #include <AMDTBaseTools/Include/gtAssert.h>
 #include <AMDTApplicationComponents/Include/acListCtrl.h>

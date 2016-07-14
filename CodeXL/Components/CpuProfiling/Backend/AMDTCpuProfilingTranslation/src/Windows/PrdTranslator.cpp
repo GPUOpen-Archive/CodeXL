@@ -77,9 +77,9 @@ const QString UNKNOWN_MODULE_STR = "Unknown Module";
 
 const QString TI_FILE_EXT = ".ti";
 const QString PRD_FILE_EXT = ".prd";
-const QString TBS_FILE_EXT = ".tbp";
-const QString EBS_FILE_EXT = ".ebp";
-const QString RI_FILE_EXT = ".ri";
+//const QString TBS_FILE_EXT = ".tbp";
+//const QString EBS_FILE_EXT = ".ebp";
+//const QString RI_FILE_EXT = ".ri";
 
 #define MAX_CPUS            256
 
@@ -4107,7 +4107,7 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
 #endif
 
     // Create an empty .ebp file till we remove complete dependency from GUI
-    osFilePath ebpFilePath(m_dataFile.toStdWString().c_str());
+    /*osFilePath ebpFilePath(m_dataFile.toStdWString().c_str());
     ebpFilePath.setFileExtension(L"ebp");
 
     if (!ebpFilePath.exists())
@@ -4115,7 +4115,7 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
         osFile ebpFile(ebpFilePath);
         ebpFile.open(osChannel::OS_ASCII_TEXT_CHANNEL, osFile::OS_OPEN_TO_WRITE);
         ebpFile.close();
-    }
+    }*/
 
     return res;
 }

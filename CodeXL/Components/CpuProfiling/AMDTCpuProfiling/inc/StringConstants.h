@@ -86,16 +86,24 @@
 const wchar_t CPU_PREFIX[] = L"CPU: ";
 const char CPU_PREFIX_A[] = "CPU: ";
 
-//Raw data file extension
-const wchar_t PRD_EXT[] = L".prd";
-//Raw module data file extension
-const wchar_t TI_EXT[] = L".ti";
-//Aggregated data file extension
-const wchar_t DATA_EXT[] = L".ebp";
-//CAPerf raw data file extension
-const wchar_t CAPERF_EXT[] = L".caperf";
-//Raw run info file extension
-const wchar_t RI_EXT[] = L".ri";
+// PRD raw data file extension
+const wchar_t PRD_EXT[] = L"prd";
+
+// CAPerf raw data file extension
+const wchar_t CAPERF_EXT[] = L"caperf";
+
+// Raw module data file extension
+const wchar_t TI_EXT[] = L"ti";
+
+// Raw run info file extension
+const wchar_t RI_EXT[] = L"ri";
+
+// Aggregated old data file extension
+const wchar_t OLD_DATA_EXT[] = L"ebp";
+
+// Aggregated data file extension
+const wchar_t DATA_EXT[] = L"cxlcpdb";
+
 
 #define CP_STR_OverviewTabTitle "Profile Overview"
 #define CP_STR_ModulesTabTitle "Modules"
@@ -107,7 +115,6 @@ const wchar_t RI_EXT[] = L".ri";
 const wchar_t AMDT_CPU_PROFILING_PAUSE_KEY[] = L"AMD Cpu Profiling";
 
 const QString CPU_PROF_MESSAGE(QObject::tr("CPU Profiling Error"));
-const QString DATA_EXT_STR = ".ebp";
 
 // General views strings:
 #define CP_profileAllProcesses "All Processes"

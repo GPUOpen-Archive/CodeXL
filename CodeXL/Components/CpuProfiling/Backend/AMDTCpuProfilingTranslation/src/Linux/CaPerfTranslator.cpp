@@ -3360,7 +3360,7 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
 #endif
 
     // Create an empty .ebp file till we remove complete dependency from GUI
-    osFilePath ebpFilePath(woutputFile);
+    /*osFilePath ebpFilePath(woutputFile);
     ebpFilePath.setFileExtension(L"ebp");
 
     if (!ebpFilePath.exists())
@@ -3368,7 +3368,7 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
         osFile ebpFile(ebpFilePath);
         ebpFile.open(osChannel::OS_ASCII_TEXT_CHANNEL, osFile::OS_OPEN_TO_WRITE);
         ebpFile.close();
-    }
+    }*/
 
     gettimeofday(&ebp_timerStop, nullptr);
     memcpy(&css_timerStart, &ebp_timerStop, sizeof(struct timeval));

@@ -24,6 +24,7 @@
 #include <AMDTApplicationComponents/Include/acFunctions.h>
 #include <AMDTOSWrappers/Include/osMachine.h>
 #include <AMDTOSWrappers/Include/osApplication.h>
+#include <AMDTOSWrappers/Include/osTime.h>
 
 // AMDTApplicationFramework:
 #include <AMDTApplicationFramework/Include/afProjectManager.h>
@@ -38,10 +39,8 @@
 #include <AMDTSharedProfiling/inc/SharedProfileSettingPage.h>
 
 //Backend
-#include <AMDTCpuProfilingRawData/inc/CpuProfileReader.h>
-#include <AMDTCpuProfilingRawData/inc/RunInfo.h>
+#include <AMDTCpuProfilingDataAccess/inc/AMDTCpuProfilingDataAccess.h>
 #include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
-#include <AMDTOSWrappers/Include/osTime.h>
 
 // Local:
 #include <inc/AmdtCpuProfiling.h>
@@ -54,7 +53,6 @@
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     #include <AMDTExecutableFormat/inc/PeFile.h>
-    #include <Driver/Windows/CpuProf/inc/UserAccess/CpuProfDriver.h>
 #endif
 
 
@@ -995,7 +993,7 @@ const osFilePath& CpuProjectHandler::getAlphaProfilePath(const QString& profileN
     if (!buildPath.isEmpty())
     {
         // Add the profile directory and session instance directory and file name
-        buildPath.appendFormattedString(L"/ProfileOutput/%ls/%ls%ls", profileName.toStdWString().data(), profileName.toStdWString().data(), DATA_EXT_STR.toStdWString().data());
+        buildPath.appendFormattedString(L"/ProfileOutput/%ls/%ls.%ls", profileName.toStdWString().data(), profileName.toStdWString().data(), DATA_EXT);
         retPath.setFullPathFromString(buildPath);
     }
 
@@ -1055,6 +1053,7 @@ void CpuProjectHandler::onSharedSessionAvailable()
     GT_ASSERT(rc);
 
     m_pProfileTreeHandler->AddImportFileFilter("CPU Profiles", "*.ebp", PM_STR_PROFILE_MODE);
+    m_pProfileTreeHandler->AddImportFileFilter("CPU Profiles", "*.cxlcpdb", PM_STR_PROFILE_MODE);
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     //Only import raw files in debug mode
@@ -1225,235 +1224,33 @@ void CpuProjectHandler::onImportSession(const QString& strFileName, bool& import
     {
         // Find the imported file path:
         osFilePath importedSessionFilePath(acQStringToGTString(strFileName));
+
+        // Find the imported file extension
         gtString importedFileExtension;
         importedSessionFilePath.getFileExtension(importedFileExtension);
-        gtString caperfString(L"caperf");
 
-        if (0 == importedFileExtension.compareNoCase(caperfString))
+        if (0 == importedFileExtension.compareNoCase(CAPERF_EXT))
         {
             m_caperfImported = true;
         }
 
-        gtString importProfile;
-        importedSessionFilePath.getFileName(importProfile);
-        osDirectory projectPath;
-        afProjectManager::instance().currentProjectFilePath().getFileDirectory(projectPath);
-        gtString projName = afProjectManager::instance().currentProjectSettings().projectName();
-        gtString comparison(DATA_EXT);
-        comparison.removeChar(L'.');
-
-        bool isDataExt = (importedFileExtension == comparison);
-
-        if (!isDataExt)
+        // Import of raw data file: .prd or .caperf
+        if (0 == importedFileExtension.compareNoCase(PRD_EXT) || 0 == importedFileExtension.compareNoCase(CAPERF_EXT))
         {
-            handleNonEBPImport(importedSessionFilePath);
+            handleRawDataFileImport(importedSessionFilePath);
         }
-        else
+        // Import of old data file: .ebp
+        else if (0 == importedFileExtension.compareNoCase(OLD_DATA_EXT))
         {
-            // Allocate a new session data:
-
-            CPUSessionTreeItemData* pImportSessionData = new CPUSessionTreeItemData;
-            pImportSessionData->m_pParentData = new afApplicationTreeItemData;
-
-            pImportSessionData->m_displayName = acGTStringToQString(importProfile);
-            const QString suffixImport(" import");
-
-            if (m_caperfImported && (!pImportSessionData->m_displayName.endsWith(suffixImport)))
-            {
-                QString str = pImportSessionData->m_displayName;
-                int lastIndex = str.lastIndexOf(suffixImport);
-                pImportSessionData->m_displayName = str.left(lastIndex);
-            }
-
-            gtString profileFileName;
-            profileFileName.fromASCIIString(pImportSessionData->m_displayName.toLatin1().data());
-            osDirectory baseDir;
-            ProfileApplicationTreeHandler::instance()->GetNextSessionNameAndDir(projName, projectPath, profileFileName, baseDir);
-
-            // Make it relative to the project:
-            pImportSessionData->m_pParentData->m_filePath.setFileExtension(DATA_EXT);
-
-            osDirectory oldDir;
-            importedSessionFilePath.getFileDirectory(oldDir);
-
-            if (oldDir.directoryPath() != baseDir.directoryPath())
-            {
-                gtList<gtString> noFilter;
-                oldDir.copyFilesToDirectory(baseDir.directoryPath().asString(), noFilter);
-
-                // Update the imported files to the imported session name:
-                renameFilesInDir(baseDir, importProfile, profileFileName);
-
-                // Update the path for the rename:
-                pImportSessionData->m_pParentData->m_filePath = baseDir.directoryPath();
-
-                // Make it relative to the project:
-                pImportSessionData->m_pParentData->m_filePath.setFileExtension(L"ebp");
-                pImportSessionData->m_pParentData->m_filePath.setFileName(profileFileName);
-
-                // Read the current session cache:
-                CacheFileMap sessionFileCache;
-                QString newSessionDir = acGTStringToQString(baseDir.directoryPath().asString());
-                QString oldSessionDir = acGTStringToQString(oldDir.directoryPath().asString());
-                bool rc = ReadSessionCacheFileMap(newSessionDir, sessionFileCache);
-                GT_IF_WITH_ASSERT(rc)
-                {
-                    // Go through the mapped files and fix their paths with the new session folder:
-                    CacheFileMap::Iterator iter;
-
-                    for (iter = sessionFileCache.begin(); iter != sessionFileCache.end(); ++iter)
-                    {
-                        QString cachedFilePath = iter.value();
-
-                        // When we import a session from the local machine, then we expect to find the source folder in each of the mapped cached files:
-                        if (cachedFilePath.startsWith(oldSessionDir))
-                        {
-                            cachedFilePath.replace(oldSessionDir, newSessionDir);
-                            sessionFileCache[iter.key()] = cachedFilePath;
-                        }
-                        else
-                        {
-                            // The file is copied from other machine and imported:
-                            osFilePath oldFilePath(acQStringToGTString(cachedFilePath));
-                            oldFilePath.setFileDirectory(acQStringToGTString(newSessionDir));
-                            oldFilePath.appendSubDirectory(L"cache");
-                            sessionFileCache[iter.key()] = acGTStringToQString(oldFilePath.asString());
-                        }
-                    }
-
-                    // Write the updated cache file map:
-                    rc = WriteSessionCacheFileMap(newSessionDir, sessionFileCache);
-                    GT_ASSERT(rc);
-                }
-            }
-
-            CpuProfileReader profileReader;
-
-            if (profileReader.open(pImportSessionData->m_pParentData->m_filePath.asString().asCharArray()))
-            {
-                // Get the profile session data from the profile reader:
-                pImportSessionData->m_profileTypeStr = acGTStringToQString(profileReader.getProfileInfo()->m_profType);
-
-                if (pImportSessionData->m_profileTypeStr.isEmpty())
-                {
-                    gtString profileTypeStr = ProfileConfigs::instance().getProfileTypeByEventConfigs(profileReader.getProfileInfo()->m_eventVec);
-                    pImportSessionData->m_profileTypeStr = acGTStringToQString(profileTypeStr);
-                }
-
-                pImportSessionData->m_commandArguments = acGTStringToQString(profileReader.getProfileInfo()->m_cmdArguments);
-                pImportSessionData->m_envVariables = profileReader.getProfileInfo()->m_envVariables;
-                pImportSessionData->m_exeFullPath = acGTStringToQString(profileReader.getProfileInfo()->m_targetPath);
-                pImportSessionData->m_workingDirectory = acGTStringToQString(profileReader.getProfileInfo()->m_wrkDirectory);
-
-                gtString fileName;
-                osFilePath importedTargetPath(profileReader.getProfileInfo()->m_targetPath);
-
-                if (importedTargetPath.isEmpty())
-                {
-                    // Use the profile read ebp path:
-                    importedTargetPath = pImportSessionData->m_pParentData->m_filePath;
-                }
-
-                importedTargetPath.getFileName(fileName);
-                pImportSessionData->m_projectName = acGTStringToQString(fileName);
-
-                // Fill the imported session name:
-                pImportSessionData->m_name = pImportSessionData->m_displayName;
-
-                if (pImportSessionData->m_name.isEmpty())
-                {
-                    pImportSessionData->m_name = acGTStringToQString(profileReader.getProfileInfo()->m_timeStamp);
-                }
-
-                QString namePostfix;
-
-                if (fileName == afProjectManager::instance().currentProjectSettings().projectName())
-                {
-                    namePostfix.sprintf(" (%s)", PM_STR_ImportedSessionPostfix);
-
-                }
-                else if (m_caperfImported)
-                {
-                    namePostfix.sprintf(" (%s)", PM_STR_ImportedSessionPostfix);
-                }
-                else
-                {
-                    namePostfix.sprintf(" (%s - %s)", PM_STR_ImportedSessionPostfix, acGTStringToQString(fileName).toLatin1().data());
-                }
-
-                // For an imported Session read the affinity data from the RI file
-                osFilePath riFilePath;
-                riFilePath.setFromOtherPath(pImportSessionData->m_pParentData->m_filePath);
-                riFilePath.clearFileExtension();
-                riFilePath.setFileExtension(L"ri");
-                RunInfo runInfo;
-                HRESULT hr = fnReadRIFile(riFilePath.asString().asCharArray(), &runInfo);
-
-                if (hr == S_OK)
-                {
-                    pImportSessionData->m_startAffinity = runInfo.m_cpuAffinity;
-                }
-
-                // Initialize the session start + end time:
-                pImportSessionData->m_startTime = acGTStringToQString(runInfo.m_profStartTime);
-                pImportSessionData->m_endTime = acGTStringToQString(runInfo.m_profEndTime);
-
-                pImportSessionData->m_name.append(namePostfix);
-                pImportSessionData->m_displayName = pImportSessionData->m_name;
-                pImportSessionData->m_cores = profileReader.getProfileInfo()->m_numCpus;
-                pImportSessionData->SetShouldCollectCSS(profileReader.getProfileInfo()->m_isCSSEnabled);
-
-                if (pImportSessionData->IsTimeBasedProfiling())
-                {
-                    pImportSessionData->m_timeBasedCssDepthLevel = profileReader.getProfileInfo()->m_cssUnwindDepth;
-                    pImportSessionData->m_isTimeBasedCssSupportFpo = profileReader.getProfileInfo()->m_isCssSupportFpo;
-                }
-                else
-                {
-                    pImportSessionData->m_otherCpuCssDepthLevel = profileReader.getProfileInfo()->m_cssUnwindDepth;
-                    pImportSessionData->m_isOtherCpuCssSupportFpo = profileReader.getProfileInfo()->m_isCssSupportFpo;
-                }
-
-                osTime startTime, endTime;
-                startTime.setFromDateTimeString(osTime::LOCAL, profileReader.getProfileInfo()->m_profStartTime, osTime::NAME_SCHEME_FILE);
-                endTime.setFromDateTimeString(osTime::LOCAL, profileReader.getProfileInfo()->m_profEndTime, osTime::NAME_SCHEME_FILE);
-                pImportSessionData->m_profileDuration = endTime.secondsFrom1970() - startTime.secondsFrom1970();
-
-                pImportSessionData->m_isImported = true;
-                // Add the imported session to the tree:
-                addSession(pImportSessionData, true);
-                m_caperfImported = false;
-                //Save the session list to the project
-                afApplicationCommands::instance()->OnFileSaveProject();
-
-                imported = true;
-            }
-            else
-            {
-                profileReader.close();
-
-                //Remove the copied directory
-                if (baseDir.exists())
-                {
-                    baseDir.deleteRecursively();
-                }
-
-                gtString profileName;
-                importedSessionFilePath.getFileName(profileName);
-                QString qprofileName = acGTStringToQString(profileName);
-                pImportSessionData->m_name = qprofileName;
-                pImportSessionData->m_displayName = qprofileName;
-                QString msg = QString("The file selected for import is not valid: %1").arg(acGTStringToQString(importProfile));
-
-                //Warn the user the import was rejected
-                acMessageBox::instance().warning(CPU_PROF_MESSAGE, msg, QMessageBox::Ok);
-
-                //Add the attempted import to the log file
-                msg.append(": ");
-                msg.append(acGTStringToQString(importedSessionFilePath.asString()));
-                OS_OUTPUT_DEBUG_LOG(acQStringToGTString(msg).asCharArray(), OS_DEBUG_LOG_ERROR);
-                emit FileImportedComplete();
-            }
+            handleEBPFileImport(importedSessionFilePath);
+            importedSessionFilePath.setFileExtension(DATA_EXT);
+            handleDataFileImport(importedSessionFilePath);
+        }
+        // Import of new data file: .cxldb
+        else if (0 == importedFileExtension.compareNoCase(DATA_EXT))
+        {
+            handleDataFileImport(importedSessionFilePath);
+            imported = true;
         }
     }
 }
@@ -1462,12 +1259,9 @@ bool CpuProjectHandler::profileExists(const QString& profileName, QString& inval
 {
     bool retVal = false;
 
-    gtVector<ExplorerSessionId>::iterator it = m_sessions.begin();
-    gtVector<ExplorerSessionId>::iterator itEnd = m_sessions.end();
-
-    for (; it != itEnd; it++)
+    for (const auto& it : m_sessions)
     {
-        CPUSessionTreeItemData* pData = findSessionItemData(*it);
+        CPUSessionTreeItemData* pData = findSessionItemData(it);
 
         if (pData != nullptr)
         {
@@ -1490,12 +1284,9 @@ const gtString& CpuProjectHandler::getProfileName(const gtString& profilePath)
     static gtString retName;
     osFilePath target(profilePath);
 
-    gtVector<ExplorerSessionId>::iterator it = m_sessions.begin();
-    gtVector<ExplorerSessionId>::iterator itEnd = m_sessions.end();
-
-    for (; it != itEnd; it++)
+    for (const auto& it : m_sessions)
     {
-        CPUSessionTreeItemData* pData = findSessionItemData(*it);
+        CPUSessionTreeItemData* pData = findSessionItemData(it);
 
         if ((pData != nullptr) && (pData->m_pParentData != nullptr))
         {
@@ -1510,33 +1301,49 @@ const gtString& CpuProjectHandler::getProfileName(const gtString& profilePath)
     return retName;
 }
 
-void CpuProjectHandler::handleNonEBPImport(const osFilePath& importedFilePath)
+void CpuProjectHandler::handleRawDataFileImport(const osFilePath& importedFilePath)
 {
-    gtString importProfileName;
-    importedFilePath.getFileName(importProfileName);
     gtString importedFileExtension;
     importedFilePath.getFileExtension(importedFileExtension);
-    gtString projName = afProjectManager::instance().currentProjectSettings().projectName();
-
-    gtString win_comparison = PRD_EXT;
-    gtString lin_comparison = CAPERF_EXT;
-    win_comparison.removeChar(L'.');
-    lin_comparison.removeChar(L'.');
 
     // Check to see if it's a Cpu raw data file:
-    if (importedFileExtension != win_comparison && importedFileExtension != lin_comparison)
+    if (0 != importedFileExtension.compareNoCase(PRD_EXT) && 0 != importedFileExtension.compareNoCase(CAPERF_EXT))
     {
         emit FileImportedComplete();
-        return;
     }
-    else
+    else // Handle raw import
     {
-        // Handle raw import:
         ReaderHandle* pHandle = nullptr;
 
         HRESULT hRet = fnOpenProfile(importedFilePath.asString().asCharArray(), &pHandle);
 
-        if (!SUCCEEDED(hRet))
+        if (SUCCEEDED(hRet))
+        {
+            // Launch another thread to monitor the data translation
+
+            gtString importProfileName;
+            importedFilePath.getFileName(importProfileName);
+
+            gtString projName = afProjectManager::instance().currentProjectSettings().projectName();
+
+            osDirectory projectPath;
+            afProjectManager::instance().currentProjectFilePath().getFileDirectory(projectPath);
+
+            osDirectory baseDir;
+            ProfileApplicationTreeHandler::instance()->GetNextSessionNameAndDir(projName, projectPath, importProfileName, baseDir);
+
+            gtString translatedFile = baseDir.directoryPath().asString();
+            translatedFile.appendFormattedString(L"/%ls.%ls", importProfileName.asCharArray(), DATA_EXT);
+
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+            // Windows needs the path including the data file
+            CommandsHandler::instance()->startTranslating(pHandle, translatedFile, true);
+#else
+            gtString sessionDir = osFilePath(translatedFile).fileDirectoryAsString();
+            CommandsHandler::instance()->startTranslating(pHandle, sessionDir, true);
+#endif
+        }
+        else
         {
             gtString msg;
             msg.appendFormattedString(CP_strFailedToOpenRawProfileFile, importedFilePath.asString().asCharArray(), gtGetErrorString(hRet), hRet);
@@ -1544,29 +1351,227 @@ void CpuProjectHandler::handleNonEBPImport(const osFilePath& importedFilePath)
             acMessageBox::instance().critical(CPU_PROF_MESSAGE, QString::fromWCharArray(msg.asCharArray()), QMessageBox::Ok);
             emit FileImportedComplete();
         }
+    }
+}
 
-        if (SUCCEEDED(hRet))
+void CpuProjectHandler::handleEBPFileImport(const osFilePath& importProfileFilePath)
+{
+    fnMigrateEBPToDB(importProfileFilePath);
+    //emit FileImportedComplete();
+}
+
+void CpuProjectHandler::handleDataFileImport(const osFilePath& importedSessionFilePath)
+{
+    // Find imported file name
+    gtString importProfile;
+    importedSessionFilePath.getFileName(importProfile);
+
+    // Find project directory path
+    osDirectory projectPath;
+    afProjectManager::instance().currentProjectFilePath().getFileDirectory(projectPath);
+
+    // Find project name
+    gtString projName = afProjectManager::instance().currentProjectSettings().projectName();
+
+    // Allocate a new session data
+    CPUSessionTreeItemData* pImportSessionData = new CPUSessionTreeItemData;
+    pImportSessionData->m_pParentData = new afApplicationTreeItemData;
+
+    pImportSessionData->m_displayName = acGTStringToQString(importProfile);
+    const QString suffixImport(" import");
+
+    pImportSessionData->m_pParentData->m_filePath = importedSessionFilePath;
+
+#if 0
+    if (m_caperfImported && (!pImportSessionData->m_displayName.endsWith(suffixImport)))
+    {
+        QString str = pImportSessionData->m_displayName;
+        int lastIndex = str.lastIndexOf(suffixImport);
+        pImportSessionData->m_displayName = str.left(lastIndex);
+    }
+
+    gtString profileFileName;
+    profileFileName.fromASCIIString(pImportSessionData->m_displayName.toLatin1().data());
+    osDirectory baseDir;
+    ProfileApplicationTreeHandler::instance()->GetNextSessionNameAndDir(projName, projectPath, profileFileName, baseDir);
+
+    // Make it relative to the project:
+    pImportSessionData->m_pParentData->m_filePath.setFileExtension(DATA_EXT);
+
+    osDirectory oldDir;
+    importedSessionFilePath.getFileDirectory(oldDir);
+
+    if (oldDir.directoryPath() != baseDir.directoryPath())
+    {
+        gtList<gtString> noFilter;
+        oldDir.copyFilesToDirectory(baseDir.directoryPath().asString(), noFilter);
+
+        // Update the imported files to the imported session name:
+        renameFilesInDir(baseDir, importProfile, profileFileName);
+
+        // Update the path for the rename:
+        pImportSessionData->m_pParentData->m_filePath = baseDir.directoryPath();
+
+        // Make it relative to the project:
+        pImportSessionData->m_pParentData->m_filePath.setFileExtension(DATA_EXT);
+        pImportSessionData->m_pParentData->m_filePath.setFileName(profileFileName);
+
+        // Read the current session cache:
+        CacheFileMap sessionFileCache;
+        QString newSessionDir = acGTStringToQString(baseDir.directoryPath().asString());
+        QString oldSessionDir = acGTStringToQString(oldDir.directoryPath().asString());
+        bool rc = ReadSessionCacheFileMap(newSessionDir, sessionFileCache);
+
+        GT_IF_WITH_ASSERT(rc)
         {
-            //Launch another thread to monitor the data translation
+            // Go through the mapped files and fix their paths with the new session folder:
+            CacheFileMap::Iterator iter;
 
-            gtString profileFileName = importProfileName;
-            osDirectory baseDir;
-            osDirectory projectPath;
-            afProjectManager::instance().currentProjectFilePath().getFileDirectory(projectPath);
-            ProfileApplicationTreeHandler::instance()->GetNextSessionNameAndDir(projName, projectPath, importProfileName, baseDir);
+            for (iter = sessionFileCache.begin(); iter != sessionFileCache.end(); ++iter)
+            {
+                QString cachedFilePath = iter.value();
 
-            gtString translatedFile = baseDir.directoryPath().asString();
-            translatedFile.appendFormattedString(L"/%ls%ls", profileFileName.asCharArray(), DATA_EXT);
+                // When we import a session from the local machine, then we expect to find the source folder in each of the mapped cached files:
+                if (cachedFilePath.startsWith(oldSessionDir))
+                {
+                    cachedFilePath.replace(oldSessionDir, newSessionDir);
+                    sessionFileCache[iter.key()] = cachedFilePath;
+                }
+                else
+                {
+                    // The file is copied from other machine and imported:
+                    osFilePath oldFilePath(acQStringToGTString(cachedFilePath));
+                    oldFilePath.setFileDirectory(acQStringToGTString(newSessionDir));
+                    oldFilePath.appendSubDirectory(L"cache");
+                    sessionFileCache[iter.key()] = acGTStringToQString(oldFilePath.asString());
+                }
+            }
 
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-            //Windows needs the path including the data file
-            CommandsHandler::instance()->startTranslating(pHandle, translatedFile, true);
-#else
-            gtString sessionDir = osFilePath(translatedFile).fileDirectoryAsString();
-            CommandsHandler::instance()->startTranslating(pHandle, sessionDir, true);
-#endif
+            // Write the updated cache file map:
+            rc = WriteSessionCacheFileMap(newSessionDir, sessionFileCache);
+            GT_ASSERT(rc);
         }
     }
+#endif
+
+    cxlProfileDataReader profileReader;
+
+    if (profileReader.OpenProfileData(pImportSessionData->m_pParentData->m_filePath.asString()))
+    {
+        // Get the profile session data from the profile reader:
+        AMDTProfileSessionInfo sessionInfo;
+        profileReader.GetProfileSessionInfo(sessionInfo);
+        pImportSessionData->m_profileTypeStr = acGTStringToQString(sessionInfo.m_sessionType);
+
+        // TODO: take care when profile type is not saved in DB
+        //if (pImportSessionData->m_profileTypeStr.isEmpty())
+        //{
+        //    gtString profileTypeStr = ProfileConfigs::instance().getProfileTypeByEventConfigs(profileReader.getProfileInfo()->m_eventVec);
+        //    pImportSessionData->m_profileTypeStr = acGTStringToQString(profileTypeStr);
+        //}
+
+        pImportSessionData->m_commandArguments = acGTStringToQString(sessionInfo.m_targetAppCmdLineArgs);
+        pImportSessionData->m_envVariables = sessionInfo.m_targetAppEnvVars;
+        pImportSessionData->m_exeFullPath = acGTStringToQString(sessionInfo.m_targetAppPath);
+        pImportSessionData->m_workingDirectory = acGTStringToQString(sessionInfo.m_targetAppWorkingDir);
+
+        osFilePath importedTargetPath(sessionInfo.m_targetAppPath);
+
+        if (importedTargetPath.isEmpty())
+        {
+            // Use the profile read imported file path:
+            importedTargetPath = pImportSessionData->m_pParentData->m_filePath;
+        }
+
+        gtString fileName;
+        importedTargetPath.getFileName(fileName);
+        pImportSessionData->m_projectName = acGTStringToQString(fileName);
+
+        // Fill the imported session name:
+        pImportSessionData->m_name = pImportSessionData->m_displayName;
+
+        if (pImportSessionData->m_name.isEmpty())
+        {
+            pImportSessionData->m_name = acGTStringToQString(sessionInfo.m_sessionStartTime);
+        }
+
+        QString namePostfix;
+
+        if (fileName == afProjectManager::instance().currentProjectSettings().projectName())
+        {
+            namePostfix.sprintf(" (%s)", PM_STR_ImportedSessionPostfix);
+
+        }
+        else if (m_caperfImported)
+        {
+            namePostfix.sprintf(" (%s)", PM_STR_ImportedSessionPostfix);
+        }
+        else
+        {
+            namePostfix.sprintf(" (%s - %s)", PM_STR_ImportedSessionPostfix, acGTStringToQString(fileName).toLatin1().data());
+        }
+
+        pImportSessionData->m_startAffinity = sessionInfo.m_coreAffinity;
+
+        // Initialize the session start + end time:
+        pImportSessionData->m_startTime = acGTStringToQString(sessionInfo.m_sessionStartTime);
+        pImportSessionData->m_endTime = acGTStringToQString(sessionInfo.m_sessionEndTime);
+
+        pImportSessionData->m_name.append(namePostfix);
+        pImportSessionData->m_displayName = pImportSessionData->m_name;
+        // TODO: Add number of cores to SesstionInfo in DB
+        pImportSessionData->m_cores = 4;
+        pImportSessionData->SetShouldCollectCSS(sessionInfo.m_cssEnabled);
+
+        if (pImportSessionData->IsTimeBasedProfiling())
+        {
+            pImportSessionData->m_timeBasedCssDepthLevel = sessionInfo.m_unwindDepth;
+            pImportSessionData->m_isTimeBasedCssSupportFpo = sessionInfo.m_cssFPOEnabled;
+        }
+        else
+        {
+            pImportSessionData->m_otherCpuCssDepthLevel = sessionInfo.m_unwindDepth;
+            pImportSessionData->m_isOtherCpuCssSupportFpo = sessionInfo.m_cssFPOEnabled;
+        }
+
+        osTime startTime, endTime;
+        startTime.setFromDateTimeString(osTime::LOCAL, sessionInfo.m_sessionStartTime, osTime::NAME_SCHEME_FILE);
+        endTime.setFromDateTimeString(osTime::LOCAL, sessionInfo.m_sessionEndTime, osTime::NAME_SCHEME_FILE);
+        pImportSessionData->m_profileDuration = endTime.secondsFrom1970() - startTime.secondsFrom1970();
+
+        pImportSessionData->m_isImported = true;
+        // Add the imported session to the tree:
+        addSession(pImportSessionData, true);
+        m_caperfImported = false;
+        //Save the session list to the project
+        afApplicationCommands::instance()->OnFileSaveProject();
+    }
+    else
+    {
+        //Remove the copied directory
+        //if (baseDir.exists())
+        {
+        //    baseDir.deleteRecursively();
+        }
+
+        gtString profileName;
+        importedSessionFilePath.getFileName(profileName);
+        QString qprofileName = acGTStringToQString(profileName);
+        pImportSessionData->m_name = qprofileName;
+        pImportSessionData->m_displayName = qprofileName;
+        QString msg = QString("The file selected for import is not valid: %1").arg(acGTStringToQString(importProfile));
+
+        //Warn the user the import was rejected
+        acMessageBox::instance().warning(CPU_PROF_MESSAGE, msg, QMessageBox::Ok);
+
+        //Add the attempted import to the log file
+        msg.append(": ");
+        msg.append(acGTStringToQString(importedSessionFilePath.asString()));
+        OS_OUTPUT_DEBUG_LOG(acQStringToGTString(msg).asCharArray(), OS_DEBUG_LOG_ERROR);
+        emit FileImportedComplete();
+    }
+
+    profileReader.CloseProfileData();
 }
 
 void CpuProjectHandler::onSessionRename(SessionTreeNodeData* pRenamedSessionData, const osFilePath& oldSessionFilePath, const osDirectory& oldSessionDirectory)

@@ -26,7 +26,6 @@
 // Backend:
 #include <AMDTCpuPerfEventUtils/inc/ViewConfig.h>
 #include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
-#include <AMDTCpuProfilingRawData/inc/CpuProfileReader.h>
 
 /// Local:
 #include <inc/CPUProfileUtils.h>
