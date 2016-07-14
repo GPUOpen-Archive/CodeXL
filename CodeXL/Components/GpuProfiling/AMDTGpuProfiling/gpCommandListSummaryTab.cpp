@@ -201,7 +201,7 @@ QString gpCommandListSummaryTab::getCaption()const
 
     GT_IF_WITH_ASSERT(m_pSessionDataContainer)
     {
-        if (m_pSessionDataContainer->SessionAPIType() == ProfileSessionDataItem::ProfileItemAPIType::VK_GPU_PROFILE_ITEM)
+        if (m_pSessionDataContainer->SessionAPIType() == ProfileSessionDataItem::ProfileItemAPIType::VK_GPU_PROFILE_ITEM || m_pSessionDataContainer->SessionAPIType() == ProfileSessionDataItem::ProfileItemAPIType::VK_API_PROFILE_ITEM)
         {
             retVall = GPU_STR_Command_Buffers_Summary;
         }
