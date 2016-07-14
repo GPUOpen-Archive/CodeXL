@@ -140,7 +140,7 @@ private:
     bool IsDriverAddress(osInstructionPointer pc);
     bool IsDriverModuleName(const gtString& moduleNameLower) const;
     void AnalyzeThreadLocation(IDebugThread2* piThread, bool& o_isThreadInsideSpy, osThreadId& o_threadId, osInstructionPointer* o_firstVisiblePointer) const;
-    void DeferStepCommand(IDebugThread2* piThread);
+    void DeferStepCommand(IDebugThread2* piThread, apBreakReason stepKind);
 
 private:
     class vsdCDebugThread
@@ -164,7 +164,7 @@ private:
         bool executeFunction(osProcedureAddress64 funcAddress, bool& waitingForExecutedFunctionFlag);
         bool markThreadAsSuspendedProcessEntryPoint();
 
-        void DeferStepCommand(vsdProcessDebugger* pPD) { pPD->DeferStepCommand(m_piDebugThread); };
+        void DeferStepCommand(vsdProcessDebugger* pPD, apBreakReason sk) { pPD->DeferStepCommand(m_piDebugThread, sk); };
 
     private:
         bool resumeThreadForExecution(bool& waitingForExecutedFunctionFlag);
@@ -272,6 +272,7 @@ private:
     osFilePath m_currentBreakpointRequestedFile;
     int m_currentBreakpointRequestedLine;
     apBreakReason m_lastStepKind;
+    bool m_ignoredLastStep;
 
     // Spy frame hiding:
     bool m_waitingForDeferredStep;

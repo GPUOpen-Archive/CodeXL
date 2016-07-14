@@ -37,6 +37,38 @@
 // Under *_INFO structs should not be explicitly released:
 // #define VSD_RELEASE_ENUMERATED_INTERFACES 1
 
+
+// Helper struct to be passed by apDeferredCommandEvent(AP_DEFERRED_COMMAND_INTERNAL_HOST_STEP)
+struct vsdDeferredStepData
+{
+public:
+    vsdDeferredStepData(IDebugThread2* piThread, STEPKIND stepKind)
+    : m_piThread(piThread), m_stepKind(stepKind)
+    {
+        if (nullptr != m_piThread)
+        {
+            m_piThread->AddRef();
+        }
+    }
+
+    ~vsdDeferredStepData()
+    {
+        if (nullptr != m_piThread)
+        {
+            m_piThread->Release();
+            m_piThread = nullptr;
+        }
+    }
+
+    IDebugThread2* Thread() const { return m_piThread; };
+    STEPKIND StepKind() const { return m_stepKind; };
+
+private:
+    vsdDeferredStepData() = delete;
+    IDebugThread2* m_piThread;
+    STEPKIND m_stepKind;
+};
+
 // ---------------------------------------------------------------------------
 // Name:        vsdProcessDebugger::vsdProcessDebugger
 // Description: Constructor
@@ -49,7 +81,7 @@ vsdProcessDebugger::vsdProcessDebugger(IDebugEngine2& riNativeDebugEngine, IDebu
       m_mainThreadId(OS_NO_THREAD_ID), m_spiesAPIThreadId(OS_NO_THREAD_ID), m_gotIs64Bit(false), m_is64Bit(false), m_suspendThreadOnEntryPoint(false),
       m_isKernelDebuggingAboutToStart(false), m_isDuringKernelDebugging(false), m_isKernelDebuggingJustFinished(false),
       m_bpThreadId(OS_NO_THREAD_ID), m_isAPIBreakpoint(false), m_hostBreakReason(AP_FOREIGN_BREAK_HIT),
-      m_currentBreakpointRequestedLine(-1), m_lastStepKind(AP_FOREIGN_BREAK_HIT), m_waitingForDeferredStep(false),
+      m_currentBreakpointRequestedLine(-1), m_lastStepKind(AP_FOREIGN_BREAK_HIT), m_ignoredLastStep(false), m_waitingForDeferredStep(false),
       m_isWaitingForProcessSuspension(false), m_waitingForExecutedFunction(false), m_piEventToContinue(nullptr),
       m_skipContinueEvent(false), m_issuingStepCommand(false),
       m_piNativeDebugEngine(&riNativeDebugEngine), m_piNativeDebugEngineLaunch(NULL),
@@ -148,6 +180,7 @@ void vsdProcessDebugger::initialize()
     m_currentBreakpointRequestedFile.clear();
     m_currentBreakpointRequestedLine = -1;
     m_lastStepKind = AP_FOREIGN_BREAK_HIT;
+    m_ignoredLastStep = false;
 
     // m_isWaitingForProcessSuspension and m_piEventToContinue should always be already cleared,
     // So assert their values (and reset them to be on the safe side.
@@ -860,7 +893,7 @@ void vsdProcessDebugger::handleExceptionEvent(IDebugEvent2* piEvent, IDebugExcep
                                 m_lastStepKind = m_hostBreakReason;
 
                                 // Step on this thread:
-                                pThread->DeferStepCommand(this);
+                                pThread->DeferStepCommand(this, AP_STEP_OUT_BREAKPOINT_HIT);
 
                                 // Stop looking:
                                 break;
@@ -1149,12 +1182,12 @@ void vsdProcessDebugger::handleBreakpointEvent(IDebugEvent2* piEvent, IDebugBrea
 }
 
 // Helper functions used to transfer IDebugThread2* objects through our event system:
-void vsdDebugThreadReleaser(void* pData)
+void vsdDeferredStepDataReleaser(void* pData)
 {
     if (nullptr != pData)
     {
-        IDebugThread2* piThread = (IDebugThread2*)pData;
-        piThread->Release();
+        vsdDeferredStepData* pStepData = (vsdDeferredStepData*)pData;
+        delete pStepData;
     }
 }
 
@@ -1164,9 +1197,8 @@ void* vsdDebugThreadCloner(const void* pData)
 
     if (nullptr != pData)
     {
-        IDebugThread2* piThread = (IDebugThread2*)pData;
-        piThread->AddRef();
-        retVal = (void*)piThread;
+        vsdDeferredStepData* pStepData = (vsdDeferredStepData*)pData;
+        retVal = (void*)(new (std::nothrow)vsdDeferredStepData(pStepData->Thread(), pStepData->StepKind()));
     }
 
     return retVal;
@@ -1199,9 +1231,23 @@ void vsdProcessDebugger::handleStepCompleteEvent(IDebugEvent2* piEvent, IDebugTh
     {
         // Don't continue the debug event:
         continueStep = false;
+        m_ignoredLastStep = true;
 
-        // Trigger a deferred step:
-        DeferStepCommand(piThread);
+        // Trigger a deferred step out:
+        DeferStepCommand(piThread, AP_STEP_OUT_BREAKPOINT_HIT);
+    }
+    else if (m_ignoredLastStep)
+    {
+        // Don't do this if we are stepping out of a break or a breakpoint:
+        if ((AP_STEP_IN_BREAKPOINT_HIT == m_lastStepKind) || (AP_STEP_OVER_BREAKPOINT_HIT == m_lastStepKind) || (AP_STEP_OUT_BREAKPOINT_HIT == m_lastStepKind))
+        {
+            continueStep = false;
+            ignoreStep = true;
+            m_ignoredLastStep = false;
+
+            // Trigger a deferred step of the last requested kind:
+            DeferStepCommand(piThread, m_lastStepKind);
+        }
     }
 
     if (!ignoreStep)
@@ -1214,6 +1260,8 @@ void vsdProcessDebugger::handleStepCompleteEvent(IDebugEvent2* piEvent, IDebugTh
         {
             continueStep = false;
         }
+
+        m_ignoredLastStep = false;
     }
 
     // If we do not continue the event, save it to be resolved later:
@@ -1321,7 +1369,7 @@ void vsdProcessDebugger::onEvent(const apEvent& eve, bool& vetoEvent)
 
         case apEvent::AP_DEFERRED_COMMAND_EVENT:
         {
-            apDeferredCommandEvent deferredCommandEvent = (const apDeferredCommandEvent&)eve;
+            const apDeferredCommandEvent& deferredCommandEvent = (const apDeferredCommandEvent&)eve;
             apDeferredCommandEvent::apDeferredCommand command = deferredCommandEvent.command();
             apDeferredCommandEvent::apDeferredCommandTarget target = deferredCommandEvent.commandTarget();
 
@@ -1335,26 +1383,30 @@ void vsdProcessDebugger::onEvent(const apEvent& eve, bool& vetoEvent)
                         // Make sure the state is as expected:
                         GT_IF_WITH_ASSERT(m_waitingForDeferredStep)
                         {
-                            IDebugThread2* piThread = (IDebugThread2*)deferredCommandEvent.getData();
-                            GT_IF_WITH_ASSERT(nullptr != piThread)
+                            vsdDeferredStepData* pStepData = (vsdDeferredStepData*)deferredCommandEvent.getData();
+                            GT_IF_WITH_ASSERT(nullptr != pStepData)
                             {
                                 // Only ignore it if our step out operation worked
                                 GT_IF_WITH_ASSERT(nullptr != m_piProgram)
                                 {
                                     // We need to continue stepping out of the spy code:
-                                    HRESULT hr = m_piProgram->Step(piThread, STEP_OUT, STEP_LINE);
+                                    IDebugThread2* piThread = pStepData->Thread();
+                                    HRESULT hr = m_piProgram->Step(piThread, pStepData->StepKind(), STEP_LINE);
                                     bool rcStp = (SUCCEEDED(hr) && (S_FALSE != hr));
 
                                     // If we could not perform the internal step, report the suspension to the client:
                                     if (!rcStp)
                                     {
                                         osThreadId threadId = OS_NO_THREAD_ID;
-                                        DWORD dwTid = 0;
-                                        hr = piThread->GetThreadId(&dwTid);
-
-                                        if (SUCCEEDED(hr))
+                                        GT_IF_WITH_ASSERT(nullptr != piThread)
                                         {
-                                            threadId = (osThreadId)dwTid;
+                                            DWORD dwTid = 0;
+                                            hr = piThread->GetThreadId(&dwTid);
+
+                                            if (SUCCEEDED(hr))
+                                            {
+                                                threadId = (osThreadId)dwTid;
+                                            }
                                         }
 
                                         reportHostStep(threadId, (osInstructionPointer)0);
@@ -2818,7 +2870,7 @@ void vsdProcessDebugger::AnalyzeThreadLocation(IDebugThread2* piThread, bool& o_
 // Author:      Uri Shomroni
 // Date:        4/7/2016
 // ---------------------------------------------------------------------------
-void vsdProcessDebugger::DeferStepCommand(IDebugThread2* piThread)
+void vsdProcessDebugger::DeferStepCommand(IDebugThread2* piThread, apBreakReason stepKind)
 {
     // Wait for the main thread to execute the previous step command:
     osWaitForFlagToTurnOff(m_waitingForDeferredStep, ULONG_MAX);
@@ -2827,10 +2879,27 @@ void vsdProcessDebugger::DeferStepCommand(IDebugThread2* piThread)
     GT_ASSERT(!m_waitingForDeferredStep);
     m_waitingForDeferredStep = true;
 
+    // default to step out:
+    STEPKIND sk = STEP_OUT;
+    if (AP_STEP_IN_BREAKPOINT_HIT == stepKind)
+    {
+        sk = STEP_INTO;
+    }
+    else if (AP_STEP_OVER_BREAKPOINT_HIT == stepKind)
+    {
+        sk = STEP_OVER;
+    }
+    else
+    {
+        GT_ASSERT(AP_STEP_OUT_BREAKPOINT_HIT == stepKind);
+    }
+
     // Send a deferred command, so that the main thread continues stepping after this is done.
     // Calling IDebugProgram2::Step during IDebugEventCallback2::Event causes a deadlock.
+    vsdDeferredStepData* pStepData = new (std::nothrow)vsdDeferredStepData(piThread, sk);
+
     apDeferredCommandEvent deferredStepEve(apDeferredCommandEvent::AP_DEFERRED_COMMAND_INTERNAL_HOST_STEP, apDeferredCommandEvent::AP_VSD_PROCESS_DEBUGGER);
-    deferredStepEve.setData((const void*)piThread, vsdDebugThreadReleaser, vsdDebugThreadCloner);
+    deferredStepEve.setData((const void*)pStepData, vsdDeferredStepDataReleaser, vsdDebugThreadCloner);
     apEventsHandler::instance().registerPendingDebugEvent(deferredStepEve);
 }
 
