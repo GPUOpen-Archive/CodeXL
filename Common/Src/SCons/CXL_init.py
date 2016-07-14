@@ -364,14 +364,16 @@ def initQt4 (env) :
         for file in files:
             tmp = re.match( "^lib" + qtmod + dbgSuffix + ".so", file)
             if tmp:
-                copySharedLibrary(env, file, qt_lib_dir, env['CXL_lib_dir']) 
+                if not os.path.exists(env['CXL_lib_dir'] + "/RuntimeLibs/QT"):
+                    os.makedirs(env['CXL_lib_dir'] + "/RuntimeLibs/QT")
+                copySharedLibrary(env, file, qt_lib_dir, env['CXL_lib_dir']+ "/RuntimeLibs/QT") 
     
     # added libraries needed for Q5.3 25-may-2014
     files = os.listdir(qt_lib_dir)
     for file in files:
         tmp = re.match( "lib" + "ic*", file)
         if tmp:
-            copySharedLibrary(env, file, qt_lib_dir, env['CXL_lib_dir'])
+            copySharedLibrary(env, file, qt_lib_dir, env['CXL_lib_dir']+ "/RuntimeLibs/QT")
             #qt_extra_lib = file[0:file.find('.')]
             #lib_exist = qt_extra_lib in qt_libs
             #if (lib_exist):
