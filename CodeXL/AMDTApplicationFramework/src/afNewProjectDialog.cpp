@@ -1535,12 +1535,10 @@ void afNewProjectDialog::IsApplicationPathsValid(bool& isAppValid, bool& isWorki
         osPortAddress portAddress;
         if (isValidApplicationInfo.isRemoteSession)
         {
-         
             GT_IF_WITH_ASSERT(GetRemotePortAddress(portAddress))
             {
                 isValidApplicationInfo.portAddress = &portAddress;
             }
-
         }
         afIsApplicationPathsValid(isValidApplicationInfo, isAppValid, isWorkingFolderValid);
     }
