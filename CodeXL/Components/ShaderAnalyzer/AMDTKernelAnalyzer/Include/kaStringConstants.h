@@ -795,12 +795,7 @@
 #define KA_STR_addFileGLSLGeneric "Generic"
 
 // Create New Program dialog
-#if (AMDT_BUILD_TARGET == AMDT_WINDOWS_OS)
-    #define KA_STR_programTypesTitles L"glProgram,glProgram,vkProgram,vkProgram,clFolder,dxFolder"
-#else // Building for Linux
-    #define KA_STR_programTypesTitles L"glProgram,glProgram,vkProgram,vkProgram,clFolder"
-#endif // (AMDT_BUILD_TARGET == AMDT_WINDOWS_OS)
-
+#define KA_STR_programTypesTitles L"glProgram,glProgram,vkProgram,vkProgram,clFolder,dxFolder"
 
 #define KA_STR_programTypeGL_Rendering L"ProgramGL_Rendering"
 #define KA_STR_programTypeGL_Compute L"ProgramGL_Compute"
