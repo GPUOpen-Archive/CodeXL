@@ -446,7 +446,7 @@
 #define GPU_STR_dashboard_FPS "FPS: %1"
 #define GPU_STR_dashboard_Duration "Duration: %1"
 #define GPU_STR_dashboard_APICalls "API Calls: %1"
-#define GPU_STR_dashboard_DrawCalls "Draw Calls: %1"
+#define GPU_STR_dashboard_DrawCalls "Profiled GPU Cmds: %1"
 #define GPU_STR_dashboard_RunTimeDoubleClickMessage "Frame trace can be opened only after the session stops.\nDo you want to stop the session and open the timeline?"
 #define GPU_STR_dashboard_ItemTooltip "Double click to review frame data"
 #define GPU_STR_dashboard_serverdisconnectedError "The session was stopped because:\n- The application being analyzed was closed.\n- The analyzed application needs to be raised into focus."
