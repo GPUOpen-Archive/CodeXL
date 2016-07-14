@@ -131,9 +131,7 @@
     X(amd_coherency_get_type) \
     X(amd_coherency_set_type) \
     X(amd_profiling_set_profiler_enabled) \
-    X(amd_profiling_async_copy_enable) \
     X(amd_profiling_get_dispatch_time) \
-    X(amd_profiling_get_async_copy_time) \
     X(amd_profiling_convert_tick_to_system_domain) \
     X(amd_signal_async_handler) \
     X(amd_async_function) \
