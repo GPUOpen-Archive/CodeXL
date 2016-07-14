@@ -7,6 +7,7 @@
 
 #include <Strsafe.h>
 
+#include <AMDTBaseTools/Include/gtStringConstants.h>
 #include "DX12APIEntry.h"
 #include "../DX12Defines.h"
 #include "../DXCommonSource/StringifyDxgiFormatEnums.h"
@@ -416,7 +417,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
         {
             void* data = nullptr;
             memcpy(&data, pRawData, sizeof(void*));
-            StringCbPrintf(ioParameterString, bufferLength, "0x%p", data);
+            StringCbPrintf(ioParameterString, bufferLength, GT_POINTER_FORMAT, data);
             break;
         }
 
@@ -424,7 +425,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
         {
             void* data = nullptr;
             memcpy(&data, pRawData, sizeof(void*));
-            StringCbPrintf(ioParameterString, bufferLength, "+0x%p", data);
+            StringCbPrintf(ioParameterString, bufferLength, "+" GT_POINTER_FORMAT, data);
             break;
         }
 

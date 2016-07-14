@@ -5,6 +5,7 @@
 /// \brief  A wrapper for command buffers.
 //=============================================================================
 
+#include <AMDTBaseTools/Include/gtStringConstants.h>
 #include "vktWrappedCmdBuf.h"
 #include "../../vktLayerManager.h"
 #include "../../vktInterceptManager.h"
@@ -661,7 +662,7 @@ void VktWrappedCmdBuf::CmdSetViewport(VkCommandBuffer commandBuffer, uint32_t fi
                   VktUtil::WritePointerAsString(commandBuffer),
                   firstViewport,
                   viewportCount,
-                  PrintArrayWithFormatter(viewportCount, pViewports, POINTER_SUFFIX "%p").c_str());
+                  PrintArrayWithFormatter(viewportCount, pViewports, GT_POINTER_FORMAT).c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdSetViewport(commandBuffer, firstViewport, viewportCount, pViewports);
@@ -686,7 +687,7 @@ void VktWrappedCmdBuf::CmdSetScissor(VkCommandBuffer commandBuffer, uint32_t fir
                   VktUtil::WritePointerAsString(commandBuffer),
                   firstScissor,
                   scissorCount,
-                  PrintArrayWithFormatter(scissorCount, pScissors, POINTER_SUFFIX "%p").c_str());
+                  PrintArrayWithFormatter(scissorCount, pScissors, GT_POINTER_FORMAT).c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdSetScissor(commandBuffer, firstScissor, scissorCount, pScissors);
@@ -869,9 +870,9 @@ void VktWrappedCmdBuf::CmdBindDescriptorSets(VkCommandBuffer commandBuffer, VkPi
                   VktUtil::WriteUint64AsString((uint64_t)layout),
                   firstSet,
                   descriptorSetCount,
-                  PrintArrayWithFormatter(descriptorSetCount, pDescriptorSets, POINTER_SUFFIX "%p").c_str(),
+                  PrintArrayWithFormatter(descriptorSetCount, pDescriptorSets, GT_POINTER_FORMAT).c_str(),
                   dynamicOffsetCount,
-                  PrintArrayWithFormatter(dynamicOffsetCount, pDynamicOffsets, POINTER_SUFFIX "%p").c_str());
+                  PrintArrayWithFormatter(dynamicOffsetCount, pDynamicOffsets, GT_POINTER_FORMAT).c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdBindDescriptorSets(commandBuffer, pipelineBindPoint, layout, firstSet, descriptorSetCount, pDescriptorSets, dynamicOffsetCount, pDynamicOffsets);
@@ -921,8 +922,8 @@ void VktWrappedCmdBuf::CmdBindVertexBuffers(VkCommandBuffer commandBuffer, uint3
                   VktUtil::WritePointerAsString(commandBuffer),
                   firstBinding,
                   bindingCount,
-                  PrintArrayWithFormatter(bindingCount, pBuffers, POINTER_SUFFIX "%p").c_str(),
-                  PrintArrayWithFormatter(bindingCount, pOffsets, POINTER_SUFFIX "%p").c_str());
+                  PrintArrayWithFormatter(bindingCount, pBuffers, GT_POINTER_FORMAT).c_str(),
+                  PrintArrayWithFormatter(bindingCount, pOffsets, GT_POINTER_FORMAT).c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdBindVertexBuffers(commandBuffer, firstBinding, bindingCount, pBuffers, pOffsets);
@@ -1087,7 +1088,7 @@ void VktWrappedCmdBuf::CmdCopyBuffer(VkCommandBuffer commandBuffer, VkBuffer src
                   VktUtil::WriteUint64AsString((uint64_t)srcBuffer),
                   VktUtil::WriteUint64AsString((uint64_t)dstBuffer),
                   regionCount,
-                  PrintArrayWithFormatter(regionCount, pRegions, POINTER_SUFFIX "%p").c_str());
+                  PrintArrayWithFormatter(regionCount, pRegions, GT_POINTER_FORMAT).c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, regionCount, pRegions);
@@ -1115,7 +1116,7 @@ void VktWrappedCmdBuf::CmdCopyImage(VkCommandBuffer commandBuffer, VkImage srcIm
                   VktUtil::WriteUint64AsString((uint64_t)dstImage),
                   VktUtil::WriteImageLayoutEnumAsString(dstImageLayout),
                   regionCount,
-                  PrintArrayWithFormatter(regionCount, pRegions, POINTER_SUFFIX "%p").c_str());
+                  PrintArrayWithFormatter(regionCount, pRegions, GT_POINTER_FORMAT).c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdCopyImage(commandBuffer, srcImage, srcImageLayout, dstImage, dstImageLayout, regionCount, pRegions);
@@ -1143,7 +1144,7 @@ void VktWrappedCmdBuf::CmdBlitImage(VkCommandBuffer commandBuffer, VkImage srcIm
                   VktUtil::WriteUint64AsString((uint64_t)dstImage),
                   VktUtil::WriteImageLayoutEnumAsString(dstImageLayout),
                   regionCount,
-                  PrintArrayWithFormatter(regionCount, pRegions, POINTER_SUFFIX "%p").c_str(),
+                  PrintArrayWithFormatter(regionCount, pRegions, GT_POINTER_FORMAT).c_str(),
                   VktUtil::WriteFilterEnumAsString(filter));
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
@@ -1171,7 +1172,7 @@ void VktWrappedCmdBuf::CmdCopyBufferToImage(VkCommandBuffer commandBuffer, VkBuf
                   VktUtil::WriteUint64AsString((uint64_t)dstImage),
                   VktUtil::WriteImageLayoutEnumAsString(dstImageLayout),
                   regionCount,
-                  PrintArrayWithFormatter(regionCount, pRegions, POINTER_SUFFIX "%p").c_str());
+                  PrintArrayWithFormatter(regionCount, pRegions, GT_POINTER_FORMAT).c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdCopyBufferToImage(commandBuffer, srcBuffer, dstImage, dstImageLayout, regionCount, pRegions);
@@ -1198,7 +1199,7 @@ void VktWrappedCmdBuf::CmdCopyImageToBuffer(VkCommandBuffer commandBuffer, VkIma
                   VktUtil::WriteImageLayoutEnumAsString(srcImageLayout),
                   VktUtil::WriteUint64AsString((uint64_t)dstBuffer),
                   regionCount,
-                  PrintArrayWithFormatter(regionCount, pRegions, POINTER_SUFFIX "%p").c_str());
+                  PrintArrayWithFormatter(regionCount, pRegions, GT_POINTER_FORMAT).c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdCopyImageToBuffer(commandBuffer, srcImage, srcImageLayout, dstBuffer, regionCount, pRegions);
@@ -1277,7 +1278,7 @@ void VktWrappedCmdBuf::CmdClearColorImage(VkCommandBuffer commandBuffer, VkImage
                   VktUtil::WriteImageLayoutEnumAsString(imageLayout),
                   VktUtil::WritePointerAsString(pColor),
                   rangeCount,
-                  PrintArrayWithFormatter(rangeCount, pRanges, POINTER_SUFFIX "%p").c_str());
+                  PrintArrayWithFormatter(rangeCount, pRanges, GT_POINTER_FORMAT).c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdClearColorImage(commandBuffer, image, imageLayout, pColor, rangeCount, pRanges);
@@ -1304,7 +1305,7 @@ void VktWrappedCmdBuf::CmdClearDepthStencilImage(VkCommandBuffer commandBuffer, 
                   VktUtil::WriteImageLayoutEnumAsString(imageLayout),
                   VktUtil::WritePointerAsString(pDepthStencil),
                   rangeCount,
-                  PrintArrayWithFormatter(rangeCount, pRanges, POINTER_SUFFIX "%p").c_str());
+                  PrintArrayWithFormatter(rangeCount, pRanges, GT_POINTER_FORMAT).c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdClearDepthStencilImage(commandBuffer, image, imageLayout, pDepthStencil, rangeCount, pRanges);
@@ -1328,9 +1329,9 @@ void VktWrappedCmdBuf::CmdClearAttachments(VkCommandBuffer commandBuffer, uint32
         sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s, %u, %s",
                   VktUtil::WritePointerAsString(commandBuffer),
                   attachmentCount,
-                  PrintArrayWithFormatter(attachmentCount, pAttachments, POINTER_SUFFIX "%p").c_str(),
+                  PrintArrayWithFormatter(attachmentCount, pAttachments, GT_POINTER_FORMAT).c_str(),
                   rectCount,
-                  PrintArrayWithFormatter(rectCount, pRects, POINTER_SUFFIX "%p").c_str());
+                  PrintArrayWithFormatter(rectCount, pRects, GT_POINTER_FORMAT).c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdClearAttachments(commandBuffer, attachmentCount, pAttachments, rectCount, pRects);
@@ -1358,7 +1359,7 @@ void VktWrappedCmdBuf::CmdResolveImage(VkCommandBuffer commandBuffer, VkImage sr
                   VktUtil::WriteUint64AsString((uint64_t)dstImage),
                   VktUtil::WriteImageLayoutEnumAsString(dstImageLayout),
                   regionCount,
-                  PrintArrayWithFormatter(regionCount, pRegions, POINTER_SUFFIX "%p").c_str());
+                  PrintArrayWithFormatter(regionCount, pRegions, GT_POINTER_FORMAT).c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdResolveImage(commandBuffer, srcImage, srcImageLayout, dstImage, dstImageLayout, regionCount, pRegions);
@@ -1430,15 +1431,15 @@ void VktWrappedCmdBuf::CmdWaitEvents(VkCommandBuffer commandBuffer, uint32_t eve
         sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s, %s, %s, %u, %s, %u, %s, %u, %s",
                   VktUtil::WritePointerAsString(commandBuffer),
                   eventCount,
-                  PrintArrayWithFormatter(eventCount, pEvents, POINTER_SUFFIX "%p").c_str(),
+                  PrintArrayWithFormatter(eventCount, pEvents, GT_POINTER_FORMAT).c_str(),
                   VktUtil::DecomposePipelineStageFlagsEnumAsString(srcStageMask).c_str(),
                   VktUtil::DecomposePipelineStageFlagsEnumAsString(dstStageMask).c_str(),
                   memoryBarrierCount,
-                  PrintArrayWithFormatter(memoryBarrierCount, pMemoryBarriers, POINTER_SUFFIX "%p").c_str(),
+                  PrintArrayWithFormatter(memoryBarrierCount, pMemoryBarriers, GT_POINTER_FORMAT).c_str(),
                   bufferMemoryBarrierCount,
-                  PrintArrayWithFormatter(bufferMemoryBarrierCount, pBufferMemoryBarriers, POINTER_SUFFIX "%p").c_str(),
+                  PrintArrayWithFormatter(bufferMemoryBarrierCount, pBufferMemoryBarriers, GT_POINTER_FORMAT).c_str(),
                   imageMemoryBarrierCount,
-                  PrintArrayWithFormatter(imageMemoryBarrierCount, pImageMemoryBarriers, POINTER_SUFFIX "%p").c_str());
+                  PrintArrayWithFormatter(imageMemoryBarrierCount, pImageMemoryBarriers, GT_POINTER_FORMAT).c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdWaitEvents(commandBuffer, eventCount, pEvents, srcStageMask, dstStageMask, memoryBarrierCount, pMemoryBarriers, bufferMemoryBarrierCount, pBufferMemoryBarriers, imageMemoryBarrierCount, pImageMemoryBarriers);
@@ -1465,11 +1466,11 @@ void VktWrappedCmdBuf::CmdPipelineBarrier(VkCommandBuffer commandBuffer, VkPipel
                   VktUtil::DecomposePipelineStageFlagsEnumAsString(dstStageMask).c_str(),
                   VktUtil::DecomposeDependencyFlagsEnumAsString(dependencyFlags).c_str(),
                   memoryBarrierCount,
-                  PrintArrayWithFormatter(memoryBarrierCount, pMemoryBarriers, POINTER_SUFFIX "%p").c_str(),
+                  PrintArrayWithFormatter(memoryBarrierCount, pMemoryBarriers, GT_POINTER_FORMAT).c_str(),
                   bufferMemoryBarrierCount,
-                  PrintArrayWithFormatter(bufferMemoryBarrierCount, pBufferMemoryBarriers, POINTER_SUFFIX "%p").c_str(),
+                  PrintArrayWithFormatter(bufferMemoryBarrierCount, pBufferMemoryBarriers, GT_POINTER_FORMAT).c_str(),
                   imageMemoryBarrierCount,
-                  PrintArrayWithFormatter(imageMemoryBarrierCount, pImageMemoryBarriers, POINTER_SUFFIX "%p").c_str());
+                  PrintArrayWithFormatter(imageMemoryBarrierCount, pImageMemoryBarriers, GT_POINTER_FORMAT).c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdPipelineBarrier(commandBuffer, srcStageMask, dstStageMask, dependencyFlags, memoryBarrierCount, pMemoryBarriers, bufferMemoryBarrierCount, pBufferMemoryBarriers, imageMemoryBarrierCount, pImageMemoryBarriers);
@@ -1716,7 +1717,7 @@ void VktWrappedCmdBuf::CmdExecuteCommands(VkCommandBuffer commandBuffer, uint32_
         sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s",
                   VktUtil::WritePointerAsString(commandBuffer),
                   commandBufferCount,
-                  PrintArrayWithFormatter(commandBufferCount, pCommandBuffers, POINTER_SUFFIX "%p").c_str());
+                  PrintArrayWithFormatter(commandBufferCount, pCommandBuffers, GT_POINTER_FORMAT).c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer, this);
         device_dispatch_table(commandBuffer)->CmdExecuteCommands(commandBuffer, commandBufferCount, pCommandBuffers);
