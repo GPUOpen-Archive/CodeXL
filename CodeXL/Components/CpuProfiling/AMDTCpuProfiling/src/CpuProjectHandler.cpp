@@ -1382,7 +1382,6 @@ void CpuProjectHandler::handleDataFileImport(const osFilePath& importedSessionFi
 
     pImportSessionData->m_pParentData->m_filePath = importedSessionFilePath;
 
-#if 0
     if (m_caperfImported && (!pImportSessionData->m_displayName.endsWith(suffixImport)))
     {
         QString str = pImportSessionData->m_displayName;
@@ -1452,7 +1451,6 @@ void CpuProjectHandler::handleDataFileImport(const osFilePath& importedSessionFi
             GT_ASSERT(rc);
         }
     }
-#endif
 
     cxlProfileDataReader profileReader;
 
