@@ -116,7 +116,7 @@ bool gpCommandListSummaryTable::InitItems()
                 {
                     // weird but has to be done because:
                     // apiIndex is set to m_uiSeqID (see gpTraceDataContainer::AddGPUCallToCommandList() ln 1156)
-                    // QueueItemByItemCallIndex() dearches by m_itemIndex, which is set to  m_uiDisplaySeqID (see ProfileSessionDataItem Ctor)
+                    // QueueItemByItemCallIndex() searches by m_itemIndex, which is set to  m_uiDisplaySeqID (see ProfileSessionDataItem Ctor)
                     // VKAtpFilePart::Parse() ln 389 sets m_uiDisplaySeqID to be m_uiSeqID+1 
                     ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItemByItemCallIndex(commandListData.m_commandListQueueName, apiIndex + 1);
                     GT_IF_WITH_ASSERT(pItem != nullptr)
