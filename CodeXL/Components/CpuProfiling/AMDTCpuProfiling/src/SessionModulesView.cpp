@@ -433,19 +433,29 @@ void SessionModulesView::onProcessesTableCellChanged()
                       (m_pBottomLabel != nullptr))
     {
         ProcessIdType selectedProcessID = AMDT_PROFILE_ALL_PROCESSES;
+        std::vector<AMDTUInt64> selectedProcessIdVec;
 
         foreach (QTableWidgetItem* pSelectedItem, m_pTopProcessesTable->selectedItems())
         {
             QString processFileName;
             bool rc = m_pTopProcessesTable->findProcessDetails(pSelectedItem->row(), selectedProcessID, processFileName);
             GT_ASSERT(rc);
+
+            //insert unique elements
+            if (std::end(selectedProcessIdVec) == std::find(std::begin(selectedProcessIdVec), std::end(selectedProcessIdVec), selectedProcessID))
+            {
+                selectedProcessIdVec.push_back(selectedProcessID);
+            }
+
         }
 
         // Display the modules table with the updated filter:
         m_pBottomModulesTable->displayTableData(m_pProfDataRdr,
                                                 m_pDisplayFilter,
                                                 static_cast<AMDTProcessId>(selectedProcessID),
-                                                AMDT_PROFILE_ALL_MODULES);
+                                                AMDT_PROFILE_ALL_MODULES,
+                                                selectedProcessIdVec);
+
         m_pBottomLabel->setText(CP_strModulesFiltered);
     }
 }
@@ -458,19 +468,29 @@ void SessionModulesView::onModulesTableCellChanged()
     {
         AMDTModuleId modId = AMDT_PROFILE_ALL_MODULES;
 
+        std::vector<AMDTUInt64> selectedModIdVec;
+
         foreach (QTableWidgetItem* pSelectedItem, m_pTopModulesTable->selectedItems())
         {
             QString processFileName;
             bool rc = m_pTopModulesTable->findModueId(pSelectedItem->row(), modId);
             GT_ASSERT(rc);
+
+            //insert unique elements
+            if (std::end(selectedModIdVec) == std::find(std::begin(selectedModIdVec), std::end(selectedModIdVec), modId))
+            {
+                selectedModIdVec.push_back(modId);
+            }
         }
 
         // Display the modules table with the updated filter:
         m_pBottomProcessesTable->displayTableData(m_pProfDataRdr,
                                                   m_pDisplayFilter,
                                                   AMDT_PROFILE_ALL_PROCESSES,
-                                                  static_cast<AMDTProcessId>(modId));
-        m_pBottomLabel->setText(CP_strModulesFiltered);
+                                                  static_cast<AMDTProcessId>(modId),
+                                                  selectedModIdVec);
+
+        m_pBottomLabel->setText(CP_strProcessesFiltered);
     }
 }
 
@@ -686,7 +706,7 @@ void SessionModulesView::UpdateTableDisplay(unsigned int updateType)
     GT_UNREFERENCED_PARAMETER(updateType);
 
     GT_IF_WITH_ASSERT((m_pTopProcessesTable != nullptr) &&
-		(m_pTopModulesTable != nullptr))
+                      (m_pTopModulesTable != nullptr))
     {
         // Update the table's selection:
         if (m_isProcessesUp)
