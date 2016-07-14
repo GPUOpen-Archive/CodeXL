@@ -371,6 +371,7 @@ PackageTheBuild()
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/Public/0x15_0x1.xml ${PKG_NAME}/Data/Events/
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/Public/0x15_0x3.xml ${PKG_NAME}/Data/Events/
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/Public/0x15_0x6.xml ${PKG_NAME}/Data/Events/
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/Public/0x15_0x7.xml ${PKG_NAME}/Data/Events/
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/Public/0x16_0x0.xml ${PKG_NAME}/Data/Events/
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/Public/0x16_0x3.xml ${PKG_NAME}/Data/Events/
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/Public/0x6.xml      ${PKG_NAME}/Data/Events/
@@ -2264,8 +2265,9 @@ PackageTheBuild()
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/NDA/0x15_0x1.xml ${PKG_NAME}/Data/Events/
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/NDA/0x15_0x3.xml ${PKG_NAME}/Data/Events/
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/NDA/0x15_0x6.xml ${PKG_NAME}/Data/Events/
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/NDA/0x15_0x7.xml ${PKG_NAME}/Data/Events/
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/NDA/0x16_0x0.xml ${PKG_NAME}/Data/Events/
-		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/NDA/0x16_0x3.xml      ${PKG_NAME}/Data/Events/
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/NDA/0x16_0x3.xml ${PKG_NAME}/Data/Events/
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Events/NDA/0xf.xml      ${PKG_NAME}/Data/Events/
 
 		mkdir -p ${PKG_NAME}/Data/Profiles
