@@ -1285,7 +1285,6 @@ bool gpExecutionMode::LaunchServer(bool& messageShown, const gtASCIIString& fram
         gtString commandArgs;
         const apProjectSettings& currentSettings = afProjectManager::instance().currentProjectSettings();
         gtString exePath = frameXMLFullPath.isEmpty() ? currentSettings.executablePath().asString() : capturePlayerPathAsStr;
-        exePath.replace(L"\\", L"\\\\");
         commandArgs.appendFormattedString(L"\"%ls\"", exePath.asCharArray());
 
         if (frameXMLFullPath.isEmpty())
