@@ -1008,7 +1008,7 @@ void gpTimeline::UpdateCPUCaption()
         acTimelineBranch* pCPUBranch = m_subBranches[0];
         QString str = QString(GPU_STR_TraceViewCPUThreads).arg(visibleCPUThreadCount).arg(CPUThreadCount);
 
-        if (pCPUBranch != nullptr)
+        if (pCPUBranch != nullptr && visibleCPUThreadCount > 0)
         {
             pCPUBranch->setText(str);
         }
