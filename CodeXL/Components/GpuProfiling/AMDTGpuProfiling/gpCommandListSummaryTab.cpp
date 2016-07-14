@@ -135,8 +135,11 @@ void gpCommandListSummaryTab::FillTop20List(CallIndexId apiCall, const QString& 
                 // Add all the API indices for this command list instance
                 for (auto apiIndex : commandListsData[i].m_apiIndices)
                 {
+                    // weird but has to be done because:
+                    // apiIndex is set to m_uiSeqID (see gpTraceDataContainer::AddGPUCallToCommandList() ln 1156)
+                    // QueueItemByItemCallIndex() searches by m_itemIndex, which is set to  m_uiDisplaySeqID (see ProfileSessionDataItem Ctor)
+                    // VKAtpFilePart::Parse() ln 389 sets m_uiDisplaySeqID to be m_uiSeqID+1 
                     ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItemByItemCallIndex(commandListsData[i].m_commandListQueueName, apiIndex + 1);
-                    //ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItem(commandListsData[i].m_commandListQueueName, apiIndex) ;
                     GT_IF_WITH_ASSERT(pItem != nullptr)
                     {
                         m_top20ItemList.push_back(pItem);
