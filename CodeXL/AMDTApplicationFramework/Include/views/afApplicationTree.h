@@ -188,6 +188,7 @@ protected slots:
 
     void onBackTool();
     void onForwardTool();
+    void onPropertiesTimerTimeout();
 
     virtual void onContextMenuEvent(const QPoint& p);
     virtual void onObjectTreeActivation(QTreeWidgetItem* pActivated, int column);
@@ -281,7 +282,6 @@ protected:
 
     /// drag item
     QTreeWidgetItem* m_pDragItem;
-
 };
 
 
