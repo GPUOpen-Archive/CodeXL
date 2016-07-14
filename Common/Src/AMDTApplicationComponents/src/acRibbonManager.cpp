@@ -37,7 +37,11 @@ static const int RANGE_BOUNDING_LINE_WIDTH = 2;
 
 #define GRAY_ALPHA 150
 #define AC_RIBBON_BANNER_NAME "Banner"
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
 #define TIMELINE_LEGEND_WIDTH 160
+#else
+#define TIMELINE_LEGEND_WIDTH 200
+#endif
 #define TIMELINE_RIGHT_MARGIN 10
 
 #define AC_Str_SplitterGradientStyle "QSplitter::handle { background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #e0e0e0, stop: 0.4 #d0d0d0, stop: 0.5 #adadad, stop: 0.6 #d0d0d0, stop: 1 #e0e0e0); }"
