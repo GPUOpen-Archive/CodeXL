@@ -82,8 +82,6 @@ afApplicationTree::afApplicationTree(afProgressBarWrapper* pProgressBar, QWidget
 
     // Update toolbar buttons:
     updateToolbarButtons();
-
-
 }
 
 // ---------------------------------------------------------------------------
@@ -492,6 +490,58 @@ void afApplicationTree::onForwardTool()
 
             // Set tooltips for back and forward buttons:
             setTooltipsForNavigateButtons();
+        }
+    }
+}
+
+void afApplicationTree::onPropertiesTimerTimeout()
+{
+    GT_IF_WITH_ASSERT(m_pTreeCtrl != nullptr)
+    {
+        // Check if multiple items are selected:
+        QTreeWidgetItem* pFirstSelectedItem = m_pTreeCtrl->selectedItems().isEmpty() ? nullptr : m_pTreeCtrl->selectedItems().first();
+        bool areMultipleItemsSelected = (m_pTreeCtrl->selectedItems().size() > 1);
+
+        if (pFirstSelectedItem != nullptr)
+        {
+            // Get the tree item data:
+            afApplicationTreeItemData* pItemData = getTreeItemData(pFirstSelectedItem);
+
+            if (pItemData != nullptr)
+            {
+                if (!areMultipleItemsSelected)
+                {
+                    // Create an event handling the tree selection:
+                    apMonitoredObjectsTreeSelectedEvent treeItemEvent(pItemData);
+
+                    // Register the event:
+                    apEventsHandler::instance().registerPendingDebugEvent(treeItemEvent);
+
+                    // Display the selected item properties:
+                    DisplayItemProperties(pItemData);
+                }
+                else
+                {
+                    // Set an HTML properties string describing multiple selection:
+                    afHTMLContent htmlContent(AF_STR_HtmlMultipleItemsCaption);
+                    htmlContent.addHTMLItem(afHTMLContent::AP_HTML_LINE, AF_STR_HtmlMultipleItems);
+                    gtString htmlText;
+                    htmlContent.toString(htmlText);
+                    QString propsStr = acGTStringToQString(htmlText);
+                    afApplicationCommands::instance()->propertiesView()->setHTMLText(propsStr, nullptr);
+                }
+
+                // Add the item to the list of selected items:
+                addSelectedItem(pItemData, false);
+            }
+
+            if (m_treatSelectAsActivate)
+            {
+                onObjectTreeActivation(pFirstSelectedItem, 0);
+            }
+
+            // Update the toolbar buttons:
+            updateToolbarButtons();
         }
     }
 }
@@ -1219,55 +1269,11 @@ void afApplicationTree::onItemSelectionChanged()
 {
     if (!m_ignoreSelections)
     {
-        // Sanity check:
-        GT_IF_WITH_ASSERT(m_pTreeCtrl != nullptr)
-        {
-            // Check if multiple items are selected:
-            QTreeWidgetItem* pFirstSelectedItem = m_pTreeCtrl->selectedItems().isEmpty() ? nullptr : m_pTreeCtrl->selectedItems().first();
-            bool areMultipleItemsSelected = (m_pTreeCtrl->selectedItems().size() > 1);
-
-            if (pFirstSelectedItem != nullptr)
-            {
-                // Get the tree item data:
-                afApplicationTreeItemData* pItemData = getTreeItemData(pFirstSelectedItem);
-
-                if (pItemData != nullptr)
-                {
-                    if (!areMultipleItemsSelected)
-                    {
-                        // Create an event handling the tree selection:
-                        apMonitoredObjectsTreeSelectedEvent treeItemEvent(pItemData);
-
-                        // Register the event:
-                        apEventsHandler::instance().registerPendingDebugEvent(treeItemEvent);
-
-                        // Display the selected item properties:
-                        DisplayItemProperties(pItemData);
-                    }
-                    else
-                    {
-                        // Set an HTML properties string describing multiple selection:
-                        afHTMLContent htmlContent(AF_STR_HtmlMultipleItemsCaption);
-                        htmlContent.addHTMLItem(afHTMLContent::AP_HTML_LINE, AF_STR_HtmlMultipleItems);
-                        gtString htmlText;
-                        htmlContent.toString(htmlText);
-                        QString propsStr = acGTStringToQString(htmlText);
-                        afApplicationCommands::instance()->propertiesView()->setHTMLText(propsStr, nullptr);
-                    }
-
-                    // Add the item to the list of selected items:
-                    addSelectedItem(pItemData, false);
-                }
-
-                if (m_treatSelectAsActivate)
-                {
-                    onObjectTreeActivation(pFirstSelectedItem, 0);
-                }
-
-                // Update the toolbar buttons:
-                updateToolbarButtons();
-            }
-        }
+        // we can't do the selection changed action here since it takes time and we might lose the double
+        // click event because of it (CodeXL-3304) so fire a timer for .5 seconds and after that handle the selection
+        // and in those .5 seconds we have time to get the double click event (this will not work if the user configured
+        // the double click event for longer then that)
+        QTimer::singleShot(500, this, SLOT(onPropertiesTimerTimeout()));
     }
 }
 
