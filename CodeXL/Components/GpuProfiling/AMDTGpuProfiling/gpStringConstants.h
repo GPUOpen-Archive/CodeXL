@@ -451,7 +451,11 @@
 #define GPU_STR_dashboard_ItemTooltip "Double click to review frame data"
 #define GPU_STR_dashboard_serverdisconnectedError "The session was stopped because:\n- The application being analyzed was closed.\n- The analyzed application needs to be raised into focus."
 #define GPU_STR_dashboard_failedToLaunchError "Application failed to launch:\n- Please validate application exists at specified location\n- Please validate application can be launched."
-#define GPU_STR_dashboard_failedToConnectError "Application failed to launch:\nServer failed to connect to application, no DX12 component or profiled application need to be raised into focus."
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+    #define GPU_STR_dashboard_failedToConnectError "Application failed to launch:\nServer failed to connect to application, no DX12/Vulkan component or profiled application need to be raised into focus."
+#else
+    #define GPU_STR_dashboard_failedToConnectError "Application failed to launch:\nServer failed to connect to application, no Vulkan component or profiled application need to be raised into focus."
+#endif
 #define GPU_STR_dashboard_CapturedFramesCaptionNumFrames " (%1 Frames)"
 
 // Dashboard HTML description
