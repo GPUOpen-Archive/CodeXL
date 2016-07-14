@@ -26,7 +26,8 @@
 #endif
 
 // DB file name extension.
-const gtString DB_FILE_EXTENSION = L".cxldb";
+const gtString CPUP_DB_FILE_EXTENSION = L".cxlcpdb";
+const gtString PWRP_DB_FILE_EXTENSION = L".cxldb";
 
 class AMDTDBADAPTER_API AmdtDatabaseAdapter
 {

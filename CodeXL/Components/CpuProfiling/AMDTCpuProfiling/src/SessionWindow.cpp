@@ -1289,7 +1289,7 @@ bool CpuSessionWindow::OpenDataReader()
         if (result)
         {
             dbFilePath.setFileName(fileName);
-            dbFilePath.setFileExtension(L"cxldb");
+            dbFilePath.setFileExtension(DATA_EXT);
         }
 
         // validate if file exists

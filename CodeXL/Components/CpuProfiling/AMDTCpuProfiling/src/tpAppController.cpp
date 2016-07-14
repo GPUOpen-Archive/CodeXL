@@ -409,7 +409,7 @@ void tpAppController::WriteRunInfo()
         rInfo.m_executedPID = m_pCurrentlyRunningSessionData->m_pid;
 
         osFilePath riFilePath(m_pCurrentlyRunningSessionData->m_pParentData->m_filePath);
-        riFilePath.setFileExtension(L"ri");
+        riFilePath.setFileExtension(RI_EXT);
 
         HRESULT rc = fnWriteRIFile(riFilePath.asString().asCharArray(), &rInfo);
         GT_ASSERT(rc == S_OK);
@@ -742,7 +742,7 @@ void tpAppController::ReadRunInfo(const QString& strSessionFilePath, tpSessionTr
     {
         RunInfo runInfo;
         osFilePath riFilePath = acQStringToGTString(strSessionFilePath);
-        riFilePath.setFileExtension(L"ri");
+        riFilePath.setFileExtension(RI_EXT);
         HRESULT hr = fnReadRIFile(riFilePath.asString().asCharArray(), &runInfo);
         GT_ASSERT(hr == S_OK);
 

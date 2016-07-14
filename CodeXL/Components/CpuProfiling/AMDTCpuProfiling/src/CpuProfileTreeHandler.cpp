@@ -30,9 +30,6 @@
 #include <inc/CpuProjectHandler.h>
 #include <inc/StringConstants.h>
 
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    #include <Driver/Windows/CpuProf/inc/UserAccess/CpuProfDriver.h>
-#endif
 
 CpuProfileTreeHandler* CpuProfileTreeHandler::m_psMySingleInstance = nullptr;
 

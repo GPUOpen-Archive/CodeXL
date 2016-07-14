@@ -172,9 +172,9 @@ int PrintReportOptions()
 
     fprintf(stderr, "\n    -i <file name>             Input file name.\n");
     fprintf(stderr, "                               Either the raw profile data file (%s) or the \n", CPUPROFILE_RAWFILE_EXT_STR);
-    fprintf(stderr, "                               processed data file (.ebp) can be specified.\n");
+    fprintf(stderr, "                               processed data file (.ebp or .cxlcpdb) can be specified.\n");
 
-    fprintf(stderr, "\n    -o <output dir>            Output dir in which ebp and imd files will be created.\n");
+    fprintf(stderr, "\n    -o <output dir>            Output dir in which .cxlcpdb file will be created.\n");
     fprintf(stderr, "                               Default path will be %s<base-name-of-input-file>.\n", DEFAULT_TEMP_PATH);
 
     // TBD: Currently only CSV file format is supported

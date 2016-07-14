@@ -54,9 +54,6 @@
 
 #include <tuple>
 
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    #include <Driver/Windows/CpuProf/inc/UserAccess/CpuProfDriver.h>
-#endif
 
 SessionOverviewWindow::SessionOverviewWindow(QWidget* pParent, CpuSessionWindow* pSessionWindow)
     : DataTab(pParent, pSessionWindow)

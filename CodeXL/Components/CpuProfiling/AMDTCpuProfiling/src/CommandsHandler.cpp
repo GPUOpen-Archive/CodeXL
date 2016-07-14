@@ -313,7 +313,7 @@ HRESULT CommandsHandler::initializeSessionInfo()
 
         m_profileSession.m_pParentData->m_filePath.setFileDirectory(m_sessionPath);
         m_profileSession.m_pParentData->m_filePath.setFileName(profileName);
-        m_profileSession.m_pParentData->m_filePath.setFileExtension(L"ebp");
+        m_profileSession.m_pParentData->m_filePath.setFileExtension(DATA_EXT);
         m_profileSession.m_pParentData->m_filePathLineNumber = AF_TREE_ITEM_PROFILE_CPU_OVERVIEW;
 
         if (m_sessionPath.isEmpty())
@@ -339,10 +339,10 @@ HRESULT CommandsHandler::initializeSessionInfo()
         {
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
             // Windows currently requires backslashes
-            m_sessionPath.appendFormattedString(L"/%ls%ls", profileName.asCharArray(), PRD_EXT);
+            m_sessionPath.appendFormattedString(L"\\%ls.%ls", profileName.asCharArray(), PRD_EXT);
             m_sessionPath.replace(L"/", L"\\");
 #else
-            m_sessionPath.appendFormattedString(L"/%ls%ls", profileName.asCharArray(), CAPERF_EXT);
+            m_sessionPath.appendFormattedString(L"/%ls.%ls", profileName.asCharArray(), CAPERF_EXT);
             m_sessionPath.replace(L"\\", L"/");
 #endif
         }
@@ -1402,9 +1402,10 @@ void CommandsHandler::onEvent(const apEvent& eve, bool& vetoEvent)
                             rawFile.deleteFile();
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
                             // On windows, remove the supporting task info file:
-                            m_sessionPath.replace(PRD_EXT, TI_EXT);
-                            rawFile.setPath(m_sessionPath);
-                            rawFile.deleteFile();
+                            osFilePath tiFilePath(m_sessionPath);
+                            tiFilePath.setFileExtension(TI_EXT);
+                            osFile tiFile(tiFilePath);
+                            tiFile.deleteFile();
 #endif
                         }
 
@@ -1421,6 +1422,7 @@ void CommandsHandler::onEvent(const apEvent& eve, bool& vetoEvent)
                                 QString strSeparator(acGTStringToQString(strSep));
                                 int lastIndex = importedFileFullPath.lastIndexOf(strSeparator);
                                 QString strTemp = importedFileFullPath.mid(lastIndex + 1);
+                                strTemp += '.';
                                 strTemp += QString::fromWCharArray(DATA_EXT);
                                 importedFileFullPath.append(strSeparator);
                                 importedFileFullPath.append(strTemp);
@@ -1558,7 +1560,7 @@ HRESULT CommandsHandler::onStopProfiling(bool stopAndExit)
                 {
                     // construct the RI file path
                     osFilePath riFilePath(m_profileSession.m_pParentData->m_filePath);
-                    riFilePath.setFileExtension(L"ri");
+                    riFilePath.setFileExtension(RI_EXT);
 
                     // set the current time as profile end time
                     gtString profEndTime;
