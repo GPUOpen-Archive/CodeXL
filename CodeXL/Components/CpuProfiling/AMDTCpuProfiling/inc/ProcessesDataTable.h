@@ -45,6 +45,9 @@ protected:
 
     virtual bool fillSummaryTables(int counterIdx);
     virtual bool fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> modIdVec = {});
+
+private:
+    bool AddRowToTable(const gtVector<AMDTProfileData>& allProcessData);
 };
 
 
