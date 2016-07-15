@@ -1843,12 +1843,19 @@ const char* VktUtil::WritePointerAsString(const void* ptr)
 //-----------------------------------------------------------------------------
 const char* VktUtil::WriteUint64AsString(uint64_t value)
 {
-    static char string[32];
+    static char string[32] = {'\0'};
 
 #ifdef WIN32
     sprintf_s(string, 32, "0x%p", (void*)value);
 #else
-    sprintf_s(string, 32, "%p", value);
+    if (value == 0)
+    {
+        sprintf_s(string, 32, "%s", "0x0");
+    }
+    else
+    {
+        sprintf_s(string, 32, "%p", value);
+    }
 #endif
     return string;
 }
