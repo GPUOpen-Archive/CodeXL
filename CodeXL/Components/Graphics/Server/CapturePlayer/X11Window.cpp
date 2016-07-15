@@ -8,7 +8,7 @@
 #include <X11/Xlib.h>
 #include "X11Window.h"
 
-#include "Logger.h"
+#include "../Common/Logger.h"
 
 const char* kWindowTitle = "Capture Player - [PLACEHOLDER].ACR"; ///< Window title
 
@@ -18,7 +18,7 @@ const char* kWindowTitle = "Capture Player - [PLACEHOLDER].ACR"; ///< Window tit
 X11Window::X11Window(UINT windowWidth, UINT windowHeight)
     : WindowBase(windowWidth, windowHeight)
     , mWindowHandle(0)
-    , mDisplay(NULL)
+    , mDisplay(nullptr)
 {
 }
 
@@ -31,7 +31,7 @@ X11Window::~X11Window()
 /// \returns True if initialization is successful.
 bool X11Window::Initialize()
 {
-    mDisplay = XOpenDisplay(NULL);
+    mDisplay = XOpenDisplay(nullptr);
 
     if (!mDisplay)
     {
@@ -70,7 +70,7 @@ bool X11Window::Initialize()
         sizehints.flags = USSize | USPosition;
         XSetNormalHints(mDisplay, mWindowHandle, &sizehints);
         XSetStandardProperties(mDisplay, mWindowHandle, kWindowTitle, kWindowTitle,
-                               None, (char**)NULL, 0, &sizehints);
+                               None, (char**)nullptr, 0, &sizehints);
     }
 
     return true;
@@ -93,10 +93,11 @@ bool X11Window::Shutdown()
 /// \return True if success, false if fail.
 bool X11Window::OpenAndUpdate(int inNCmdShow)
 {
-    UNREFERENCED_PARAMETER(inNCmdShow);
-
-    // make the window visible
-    XMapWindow(mDisplay, mWindowHandle);
+    if (inNCmdShow != SW_MINIMIZE)
+    {
+        // make the window visible
+        XMapWindow(mDisplay, mWindowHandle);
+    }
 
     return true;
 }
@@ -111,8 +112,6 @@ bool X11Window::Update()
     Display* xdisplay = mDisplay;
     Window xwin = mWindowHandle;
     XEvent evt;
-    int w;
-    int h;
 
     while (XEventsQueued(xdisplay, QueuedAfterFlush))
     {
@@ -142,8 +141,6 @@ bool X11Window::Update()
                 // assume it's a window resize
                 if (evt.xconfigure.window == xwin)
                 {
-                    w = evt.xconfigure.width;
-                    h = evt.xconfigure.height;
                 }
 
                 break;
