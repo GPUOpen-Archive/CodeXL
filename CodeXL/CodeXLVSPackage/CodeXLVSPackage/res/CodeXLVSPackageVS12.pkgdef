@@ -175,7 +175,7 @@
 // vsTextKind
 
 [$RootKey$\Editors\{7DD989D1-F681-462C-9D06-B352F39F7068}\Extensions]
-"ebp"=dword:00000032
+"cxlcpdb"=dword:00000032
 "atp"=dword:00000032
 "ltr"=dword:00000032
 "gpsession"=dword:00000032
