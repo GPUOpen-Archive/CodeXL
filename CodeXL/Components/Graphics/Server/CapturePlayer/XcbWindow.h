@@ -24,22 +24,22 @@ public:
 
     /// Create a new window and prepare it for use.
     /// \returns True if initialization is successful.
-    virtual bool Initialize();
+    virtual bool Initialize() override;
 
     /// Shut down and clean up resources associated with a ReplayWindow instance.
     /// \returns True if cleanup and shutdown was successful.
-    virtual bool Shutdown();
+    virtual bool Shutdown() override;
 
     /// Retrieve the OS window handle for the ReplayWindow.
     /// \return The OS window handle for the ReplayWindow.
-    virtual NativeWindowType GetWindowHandle() const
+    virtual NativeWindowType GetWindowHandle() const override
     {
         return mWindowHandle;
     }
 
     /// Retrieve the application instance.
     /// \returns The OS application instance.
-    virtual NativeInstanceType GetInstance() const
+    virtual NativeInstanceType GetInstance() const override
     {
         return mConnection;
     }
@@ -47,13 +47,13 @@ public:
     /// Open an initialized window in the system UI.
     /// \param inNCmdShow Controls how the window is to be shown.
     /// \return True if success, false if fail.
-    virtual bool OpenAndUpdate(int inNCmdShow);
+    virtual bool OpenAndUpdate(int inNCmdShow) override;
 
     /// Update the window. This is the OS-dependent message loop
     /// implementation so should be called periodically.
     /// \return false if the message loop is to be terminated, true
     /// otherwise.
-    virtual bool Update();
+    virtual bool Update() override;
 
 private:
     /// Initialize a connection to XCB
