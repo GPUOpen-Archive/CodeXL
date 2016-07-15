@@ -1240,7 +1240,7 @@ bool ppCollect::InitDb(AMDTProfileSessionInfo& sessionInfo)
             // Append the extension
             gtString dbExtension;
 
-            m_pDbAdapter->GetDbFileExtension(dbExtension);
+            m_pDbAdapter->GetDbFileExtension(AMDT_PROFILE_MODE_TIMELINE, dbExtension);
             gtString dbFilePath = sessionInfo.m_sessionDbFullPath;
             dbFilePath.append(dbExtension);
 

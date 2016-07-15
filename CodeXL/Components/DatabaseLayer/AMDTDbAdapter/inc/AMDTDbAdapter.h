@@ -61,7 +61,7 @@ public:
     virtual bool FlushDbAsync();
 
     // Get DB file extension
-    virtual bool GetDbFileExtension(gtString& extension) const;
+    virtual bool GetDbFileExtension(AMDTProfileMode profileMode, gtString& extension) const;
 
     virtual bool InsertSessionInfoKeyValue(const gtString& key, gtString& value);
 
