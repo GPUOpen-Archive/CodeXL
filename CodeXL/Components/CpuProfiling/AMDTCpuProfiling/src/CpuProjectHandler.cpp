@@ -1329,18 +1329,15 @@ void CpuProjectHandler::handleRawDataFileImport(const osFilePath& importedFilePa
             osDirectory projectPath;
             afProjectManager::instance().currentProjectFilePath().getFileDirectory(projectPath);
 
-            //osDirectory baseDir;
-            //ProfileApplicationTreeHandler::instance()->GetNextSessionNameAndDir(projName, projectPath, importProfileName, baseDir);
+            osDirectory baseDir;
+            ProfileApplicationTreeHandler::instance()->GetNextSessionNameAndDir(projName, projectPath, importProfileName, baseDir);
 
-            //gtString translatedFile = baseDir.directoryPath().asString();
-            //translatedFile.appendFormattedString(L"/%ls.%ls", importProfileName.asCharArray(), DATA_EXT);
-
-            osFilePath translatedFilePath = importedFilePath;
-            translatedFilePath.setFileExtension(DATA_EXT);
+            gtString translatedFile = baseDir.directoryPath().asString();
+            translatedFile.appendFormattedString(L"/%ls.%ls", importProfileName.asCharArray(), DATA_EXT);
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
             // Windows needs the path including the data file
-            CommandsHandler::instance()->startTranslating(pHandle, translatedFilePath.asString(), true);
+            CommandsHandler::instance()->startTranslating(pHandle, translatedFile, true);
 #else
             gtString sessionDir = osFilePath(translatedFile).fileDirectoryAsString();
             CommandsHandler::instance()->startTranslating(pHandle, sessionDir, true);
