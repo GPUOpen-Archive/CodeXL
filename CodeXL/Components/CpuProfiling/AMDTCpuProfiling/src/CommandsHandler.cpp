@@ -301,8 +301,13 @@ HRESULT CommandsHandler::initializeSessionInfo()
 
     m_profileSession.m_displayName = acGTStringToQString(profileName);
 
-    // The start time is the same as the display name:
-    m_profileSession.m_startTime = m_profileSession.m_displayName;
+    osTime timing;
+    timing.setFromCurrentTime();
+
+    gtString startTime;
+    timing.dateAsString(startTime, osTime::NAME_SCHEME_FILE, osTime::LOCAL);
+
+    m_profileSession.m_startTime = acGTStringToQString(startTime);
 
     // Sanity check:
     GT_IF_WITH_ASSERT(m_profileSession.m_pParentData != nullptr)
@@ -1576,7 +1581,7 @@ HRESULT CommandsHandler::onStopProfiling(bool stopAndExit)
                     rInfo.m_envVariables = m_profileSession.m_envVariables;
                     rInfo.m_profType = acQStringToGTString(m_profileSession.m_profileTypeStr);
                     rInfo.m_profDirectory = riFilePath.fileDirectoryAsString();
-                    rInfo.m_profStartTime = acQStringToGTString(m_profileSession.m_displayName);
+                    rInfo.m_profStartTime = acQStringToGTString(m_profileSession.m_startTime);
                     rInfo.m_profEndTime = profEndTime;
                     rInfo.m_isCSSEnabled = m_profileSession.ShouldCollectCSS(false);
                     rInfo.m_cssUnwindDepth = m_profileSession.GetCssUnwindLevel();
