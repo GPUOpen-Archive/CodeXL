@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
 
     if (argc >= 2)
     {
-        static wchar_t tmpCmdLine[2048];
+        static wchar_t tmpCmdLine[2048] = {};
         gtASCIIStringToUnicodeString(argv[1], tmpCmdLine, 2048);
         commandLine = tmpCmdLine;
     }
