@@ -481,6 +481,7 @@ void SessionSourceCodeView::CreateFunctionsComboBox()
         // Prepare the string list for the functions combo box:
         QStringList functionsList, toolTipList;
 
+#if 0
         AMDTProfileDataVec funcProfileData;
         m_pProfDataRdr->GetFunctionProfileData(((m_processId > 0) ? m_processId : AMDT_PROFILE_ALL_PROCESSES), m_moduleId, funcProfileData);
 
@@ -505,6 +506,31 @@ void SessionSourceCodeView::CreateFunctionsComboBox()
                 functionStr += acGTStringToQString(functionData.m_functionInfo.m_name);
                 functionsList << functionStr;
                 m_functionIdVec.push_back(functionData.m_functionInfo.m_functionId);
+            }
+        }
+#endif //0
+
+        // Baskar: Though this approach will have folowing side effects, its OK for 2.2 release
+        //      - function combo box will have functions that do not have IP samples 
+        //              a) functions having only deep samples due to CSS
+        //              b) functions from some other instance of the same application (instance-1 may have ip samples
+        //                  but instance-2 may not have ip samples)
+        AMDTProfileFunctionInfoVec funcInfoVec;
+        gtVAddr baseAddr;
+
+        if (m_pProfDataRdr->GetFunctionInfoByModuleId(m_moduleId, funcInfoVec, baseAddr))
+        {
+            for (auto const& func : funcInfoVec)
+            {
+                gtUInt64 startOffset = baseAddr + func.m_startOffset;
+                gtUInt64 endOffset = startOffset + func.m_size;
+
+                QString addressStart = "0x" + QString::number(startOffset, 16);
+                QString addressEnd = "0x" + QString::number(endOffset, 16);
+                QString functionStr = QString("[%1 - %2] : ").arg(addressStart).arg(addressEnd);
+                functionStr += acGTStringToQString(func.m_name);
+                functionsList << functionStr;
+                m_functionIdVec.push_back(func.m_functionId);
             }
         }
 
@@ -840,9 +866,6 @@ void SessionSourceCodeView::DisplayAddress(gtVAddr addr, ProcessIdType pid, Thre
 
         if ((pFunctionsComboBox != nullptr) && (pFunctionsComboBox->count() > 0))
         {
-            //m_pFunctionsComboBoxAction->UpdateCurrentIndex(-1);
-            //m_pFunctionsComboBoxAction->UpdateCurrentIndex(0);
-
             // Now find the index for this functionId
             AMDTUInt32 index = 0;
 
@@ -894,7 +917,8 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
 
             if (ret)
             {
-                m_pTreeViewModel->m_newAddress = functionData.m_modBaseAddress + functionData.m_instDataList[0].m_offset;
+                //m_pTreeViewModel->m_newAddress = functionData.m_modBaseAddress + functionData.m_instDataList[0].m_offset;
+                m_pTreeViewModel->m_newAddress = functionData.m_modBaseAddress + functionData.m_functionInfo.m_startOffset;
 
                 isMultiPID = (functionData.m_pidsList.size() > 1);
                 isMultiTID = (functionData.m_threadsList.size() > 1);

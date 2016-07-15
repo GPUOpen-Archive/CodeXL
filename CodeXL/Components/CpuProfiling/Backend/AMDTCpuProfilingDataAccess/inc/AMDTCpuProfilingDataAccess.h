@@ -98,6 +98,7 @@ public:
     bool GetModuleInfo(AMDTUInt32 pid, AMDTModuleId mid, AMDTProfileModuleInfoVec& procInfo);
     bool GetThreadInfo(AMDTUInt32 pid, AMDTThreadId tid, AMDTProfileThreadInfoVec& procInfo);
     bool GetModuleInfoForFunction(AMDTFunctionId funcId, AMDTProfileModuleInfo& modInfo);
+    bool GetFunctionInfoByModuleId(AMDTModuleId modId, AMDTProfileFunctionInfoVec& funcInfoVec, gtVAddr& modBaseAddr);
 
     //  Summary APIs
     bool GetProcessSummary(AMDTUInt32 counterId, AMDTProfileDataVec& processSummaryData);
