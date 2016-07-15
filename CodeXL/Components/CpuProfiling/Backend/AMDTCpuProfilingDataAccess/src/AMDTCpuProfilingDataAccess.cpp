@@ -1211,6 +1211,15 @@ public:
             ret = ret && GetModuleInfo(modId, modInfo);
 
             modBaseAddr = (ret) ? modInfo.m_loadAddress : 0;
+
+            // Add the unknown functions for this module
+            for (auto& unknownFunc : m_unknownFuncsList)
+            {
+                if (unknownFunc.m_moduleId == modId)
+                {
+                    funcInfoVec.push_back(unknownFunc);
+                }
+            }
         }
 
         return ret;
