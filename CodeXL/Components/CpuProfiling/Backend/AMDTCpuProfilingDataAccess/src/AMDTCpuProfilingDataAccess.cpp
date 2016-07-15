@@ -77,7 +77,9 @@ struct ViewConfigInfo
 
 #define CXL_CLU_EVENT_CLU_PERCENTAGE_NAME_WSTR              L"Cache Line Utilization"
 #define CXL_CLU_EVENT_CLU_PERCENTAGE_NAME_STR               "Cache Line Utilization"
+#define CXL_CLU_EVENT_BYTES_PER_L1_EVICTION_NAME_WSTR       L"Bytes/L1 Eviction"
 #define CXL_CLU_EVENT_BYTES_PER_L1_EVICTION_NAME_STR        "Bytes/L1 Eviction"
+#define CXL_CLU_EVENT_ACCESSES_PER_L1_EVICTION_NAME_WSTR    L"Accesses/L1 Eviction"
 #define CXL_CLU_EVENT_ACCESSES_PER_L1_EVICTION_NAME_STR     "Accesses/L1 Eviction"
 
 #define CXL_PROFILE_TYPE_CLU_NAME_STR                       L"Cache Line Utilization"
@@ -812,46 +814,49 @@ public:
 
             gtUInt32 nbrEvents = m_sampledCounterDescVec.size();
 
-            // We will adding 2 computed counters for CLU
-            nbrEvents += 2;
-            ColumnSpec* pColumnSpec = new ColumnSpec[nbrEvents + 2];
+            ColumnSpec* pColumnSpec = new ColumnSpec[nbrEvents];
 
             if (nullptr != pColumnSpec)
             {
                 int i = 0;
 
+                // First Add the derived counters?
+                PrepareComputedCounterForCLU(CXL_CLU_EVENT_CLU_PERCENTAGE, pColumnSpec[i]);
+                PrepareComputedCounterForCLU(CXL_CLU_EVENT_BYTES_PER_L1_EVICTION, pColumnSpec[++i]);
+                PrepareComputedCounterForCLU(CXL_CLU_EVENT_ACCESSES_PER_L1_EVICTION, pColumnSpec[++i]);
+                i++;
+
                 for (auto& event : m_sampledCounterDescVec)
                 {
-                    if (CXL_CLU_EVENT_CLU_PERCENTAGE != event.m_id)
+                    if ((CXL_CLU_EVENT_CLU_PERCENTAGE == event.m_id)
+                        || (CXL_CLU_EVENT_BYTES_PER_L1_EVICTION == event.m_id)
+                        || (CXL_CLU_EVENT_ACCESSES_PER_L1_EVICTION == event.m_id))
                     {
-                        AMDTProfileSamplingConfig sampleConfig;
-                        ret = GetSamplingConfiguration(event.m_id, sampleConfig);
+                        continue;
+                    }
 
-                        if (ret)
-                        {
-                            pColumnSpec[i].type = ColumnValue;
-                            pColumnSpec[i].sorting = NoSort;
-                            pColumnSpec[i].visible = true;
-                            pColumnSpec[i].dataSelectRight.eventSelect = 0;
-                            pColumnSpec[i].dataSelectRight.eventUnitMask = 0;
-                            pColumnSpec[i].dataSelectRight.bitOs = 0;
-                            pColumnSpec[i].dataSelectRight.bitUsr = 0;
+                    AMDTProfileSamplingConfig sampleConfig;
+                    ret = GetSamplingConfiguration(event.m_id, sampleConfig);
 
-                            ConstructEventConfig(sampleConfig, pColumnSpec[i].dataSelectLeft);
-                            pColumnSpec[i].title = QString(event.m_name.asASCIICharArray());
+                    if (ret)
+                    {
+                        pColumnSpec[i].type = ColumnValue;
+                        pColumnSpec[i].sorting = NoSort;
+                        pColumnSpec[i].visible = true;
+                        pColumnSpec[i].dataSelectRight.eventSelect = 0;
+                        pColumnSpec[i].dataSelectRight.eventUnitMask = 0;
+                        pColumnSpec[i].dataSelectRight.bitOs = 0;
+                        pColumnSpec[i].dataSelectRight.bitUsr = 0;
 
-                            i++;
-                        }
+                        ConstructEventConfig(sampleConfig, pColumnSpec[i].dataSelectLeft);
+                        pColumnSpec[i].title = QString(event.m_name.asASCIICharArray());
+
+                        i++;
                     }
                 }
 
                 if (ret)
                 {
-                    // Add derived counters
-                    PrepareComputedCounterForCLU(CXL_CLU_EVENT_CLU_PERCENTAGE, pColumnSpec[i]);
-                    PrepareComputedCounterForCLU(CXL_CLU_EVENT_BYTES_PER_L1_EVICTION, pColumnSpec[++i]);
-                    PrepareComputedCounterForCLU(CXL_CLU_EVENT_ACCESSES_PER_L1_EVICTION, pColumnSpec[++i]);
-
                     viewCfgInfo.m_viewCfg.SetColumnSpecs(pColumnSpec, nbrEvents, false);
                     viewCfgInfo.m_viewCfg.SetDescription("This special view has all of the data from the profile available.");
 
@@ -871,26 +876,34 @@ public:
         // computing the percenatge based on evictions
         for (auto& eventDesc : m_sampledCounterDescVec)
         {
+            AMDTProfileCounterDesc cluCounterDesc;
+
             if (eventDesc.m_id == CXL_CLU_EVENT_CLU_PERCENTAGE)
             {
-                AMDTProfileCounterDesc cluCounterDesc;
-
                 if (GetComputedCounterByName(CXL_CLU_EVENT_CLU_PERCENTAGE_NAME_WSTR, cluCounterDesc))
                 {
                     eventDesc.m_id = cluCounterDesc.m_id;
                     eventDesc.m_type = cluCounterDesc.m_type;
                     eventDesc.m_unit = cluCounterDesc.m_unit;
-                    break;
                 }
             }
-        }
-
-        // For CLU add the computed counters to sampled counters.. ugly kludge
-        for (auto& counterDesc : m_computedCounterDescVec)
-        {
-            if (counterDesc.m_name.compareNoCase(CXL_CLU_EVENT_CLU_PERCENTAGE_NAME_WSTR) != 0)
+            else if (eventDesc.m_id == CXL_CLU_EVENT_BYTES_PER_L1_EVICTION)
             {
-                m_sampledCounterDescVec.push_back(counterDesc);
+                if (GetComputedCounterByName(CXL_CLU_EVENT_BYTES_PER_L1_EVICTION_NAME_WSTR, cluCounterDesc))
+                {
+                    eventDesc.m_id = cluCounterDesc.m_id;
+                    eventDesc.m_type = cluCounterDesc.m_type;
+                    eventDesc.m_unit = cluCounterDesc.m_unit;
+                }
+            }
+            else if (eventDesc.m_id == CXL_CLU_EVENT_ACCESSES_PER_L1_EVICTION)
+            {
+                if (GetComputedCounterByName(CXL_CLU_EVENT_ACCESSES_PER_L1_EVICTION_NAME_WSTR, cluCounterDesc))
+                {
+                    eventDesc.m_id = cluCounterDesc.m_id;
+                    eventDesc.m_type = cluCounterDesc.m_type;
+                    eventDesc.m_unit = cluCounterDesc.m_unit;
+                }
             }
         }
 
@@ -903,7 +916,7 @@ public:
 
         auto counterDesc = std::find_if(m_computedCounterDescVec.begin(), m_computedCounterDescVec.end(),
             [&counterName](AMDTProfileCounterDesc const& aEventDesc)
-            { return 0 == aEventDesc.m_name.compareNoCase(CXL_CLU_EVENT_CLU_PERCENTAGE_NAME_WSTR); });
+            { return 0 == aEventDesc.m_name.compareNoCase(counterName); });
 
         if (counterDesc != m_computedCounterDescVec.end())
         {
