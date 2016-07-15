@@ -30,7 +30,7 @@ static void ctor()
 
         VktLayerManager* pLayerManager = VktLayerManager::GetLayerManager();
 
-        if (pLayerManager->HasBeenInitialized() == false)
+        if (pLayerManager && pLayerManager->HasBeenInitialized() == false)
         {
             bool initialized = pLayerManager->InitializeLayerManager();
 
@@ -56,7 +56,7 @@ static void dtor()
     // Only shutdown the VulkanLayerManager if it was initialized.
     VktLayerManager* pLayerManager = VktLayerManager::GetLayerManager();
 
-    if (pLayerManager->HasBeenInitialized())
+    if (pLayerManager && pLayerManager->HasBeenInitialized())
     {
         if (pLayerManager->ShutdownLayerManager() == false)
         {
