@@ -1329,18 +1329,21 @@ void CpuProjectHandler::handleRawDataFileImport(const osFilePath& importedFilePa
             osDirectory projectPath;
             afProjectManager::instance().currentProjectFilePath().getFileDirectory(projectPath);
 
-            osDirectory baseDir;
-            ProfileApplicationTreeHandler::instance()->GetNextSessionNameAndDir(projName, projectPath, importProfileName, baseDir);
+            //osDirectory baseDir;
+            //ProfileApplicationTreeHandler::instance()->GetNextSessionNameAndDir(projName, projectPath, importProfileName, baseDir);
 
-            gtString translatedFile = baseDir.directoryPath().asString();
-            translatedFile.appendFormattedString(L"/%ls.%ls", importProfileName.asCharArray(), DATA_EXT);
+            //gtString translatedFile = baseDir.directoryPath().asString();
+            //translatedFile.appendFormattedString(L"/%ls.%ls", importProfileName.asCharArray(), DATA_EXT);
+
+            osFilePath translatedFile = importedFilePath;
+            translatedFile.setFileExtension(DATA_EXT);
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
             // Windows needs the path including the data file
-            CommandsHandler::instance()->startTranslating(pHandle, translatedFile, true);
+            CommandsHandler::instance()->startTranslating(pHandle, translatedFile.asString(), true);
 #else
-            gtString sessionDir = osFilePath(translatedFile).fileDirectoryAsString();
-            CommandsHandler::instance()->startTranslating(pHandle, sessionDir, true);
+            //gtString sessionDir = osFilePath(translatedFile).fileDirectoryAsString();
+            CommandsHandler::instance()->startTranslating(pHandle, translatedFile.fileDirectoryAsString(), true);
 #endif
         }
         else
