@@ -169,23 +169,6 @@ void SessionSourceCodeView::UpdateTableDisplay(unsigned int updateType)
         // Get the current precision:
         m_precision = afGlobalVariablesManager::instance().floatingPointPrecision();
 
-#if 0
-
-        // Restore the currently selected address if not new address is requested:
-        if (0 == m_pTreeViewModel->m_newAddress)
-        {
-            QModelIndex selectedItemIndex = m_pSourceCodeTree->selectionModel()->currentIndex();
-            QModelIndex sourceCodeIndex = m_pTreeViewModel->index(selectedItemIndex.row(), SOURCE_VIEW_ADDRESS_COLUMN);
-            m_pTreeViewModel->m_newAddress = m_pTreeViewModel->data(sourceCodeIndex, Qt::DisplayRole).toString().toULongLong(nullptr, 16);
-        }
-
-        // If the currentItem has its address field empty, then focus to the beginning of the function:
-        if (0 == m_pTreeViewModel->m_newAddress && m_pTreeViewModel->m_currentSymbolIterator != m_pTreeViewModel->m_symbolsInfoList.end())
-        {
-            m_pTreeViewModel->m_newAddress = m_pTreeViewModel->m_currentSymbolIterator->m_va;
-        }
-
-#endif
         // Clear the tree and table items:
         m_pTreeViewModel->removeRows(0, m_pTreeViewModel->rowCount());
         m_pTreeViewModel->m_sourceTreeItemsMap.clear();
@@ -481,37 +464,8 @@ void SessionSourceCodeView::CreateFunctionsComboBox()
         // Prepare the string list for the functions combo box:
         QStringList functionsList, toolTipList;
 
-#if 0
-        AMDTProfileDataVec funcProfileData;
-        m_pProfDataRdr->GetFunctionProfileData(((m_processId > 0) ? m_processId : AMDT_PROFILE_ALL_PROCESSES), m_moduleId, funcProfileData);
-
-        AMDTProfileFunctionData  functionData;
-
-        for (auto const& func : funcProfileData)
-        {
-            bool ret = m_pProfDataRdr->GetFunctionData(func.m_id,
-                                                       AMDT_PROFILE_ALL_PROCESSES,
-                                                       AMDT_PROFILE_ALL_THREADS,
-                                                       functionData);
-
-            if (ret)
-            {
-                gtUInt64 baseAddr = functionData.m_modBaseAddress;
-                gtUInt64 startOffset = baseAddr + functionData.m_functionInfo.m_startOffset;
-                gtUInt64 endOffset = startOffset + functionData.m_functionInfo.m_size;
-
-                QString addressStart = "0x" + QString::number(startOffset, 16);
-                QString addressEnd = "0x" + QString::number(endOffset, 16);
-                QString functionStr = QString("[%1 - %2] : ").arg(addressStart).arg(addressEnd);
-                functionStr += acGTStringToQString(functionData.m_functionInfo.m_name);
-                functionsList << functionStr;
-                m_functionIdVec.push_back(functionData.m_functionInfo.m_functionId);
-            }
-        }
-#endif //0
-
         // Baskar: Though this approach will have folowing side effects, its OK for 2.2 release
-        //      - function combo box will have functions that do not have IP samples 
+        //      - function combo box will have functions that do not have IP samples
         //              a) functions having only deep samples due to CSS
         //              b) functions from some other instance of the same application (instance-1 may have ip samples
         //                  but instance-2 may not have ip samples)
@@ -869,7 +823,7 @@ void SessionSourceCodeView::DisplayAddress(gtVAddr addr, ProcessIdType pid, Thre
             // Now find the index for this functionId
             AMDTUInt32 index = 0;
 
-            for (auto &aFundId : m_functionIdVec)
+            for (auto& aFundId : m_functionIdVec)
             {
                 if (aFundId == m_functionId)
                 {
@@ -893,10 +847,10 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
     m_userDisplayInformation.clear();
 
     GT_IF_WITH_ASSERT((m_pTreeViewModel != nullptr) &&
-        (m_pTIDComboBoxAction != nullptr) &&
-        (m_pPIDComboBoxAction != nullptr) &&
-        (m_pPIDLabelAction != nullptr) &&
-        (m_pTIDLabelAction != nullptr))
+                      (m_pTIDComboBoxAction != nullptr) &&
+                      (m_pPIDComboBoxAction != nullptr) &&
+                      (m_pPIDLabelAction != nullptr) &&
+                      (m_pTIDLabelAction != nullptr))
     {
         if (-1 != functionIndex)
         {
@@ -985,93 +939,6 @@ void SessionSourceCodeView::UpdateWithNewSymbol()
 
     m_pModuleLocationInfoLabel->setText(fileLocationStr);
 }
-
-#if 0
-void SessionSourceCodeView::UpdateWithNewSymbol()
-{
-    //If there is no source, just show dasm
-    m_pTreeViewModel->m_srcFile.clear();
-
-    // We need to query new source file every time the symbol is changed:
-    switch (m_pTreeViewModel->m_modType)
-    {
-        case AMDT_MODULE_TYPE_NATIVE:
-        {
-            m_pTreeViewModel->SetupSourceInfoForUnManaged();
-
-            bool rc = ReadPE();
-            GT_ASSERT(rc);
-
-        }
-        break;
-
-        case CpuProfileModule::JAVAMODULE:
-        {
-            // Each Java jitted module contains one Java symbol.
-            // So we need to repopulate the map everytime
-            // symbol is changed.
-            m_pTreeViewModel->SetupSourceInfoForJava(m_pTreeViewModel->m_loadAddr);
-
-            if ((m_pTreeViewModel->m_pDisplayedFunction->getSourceFile() != L"Unknown Source File")
-                && (m_pTreeViewModel->m_pDisplayedFunction->getSourceFile() != L"UnknownJITSource"))
-            {
-                m_pTreeViewModel->m_srcFile = acGTStringToQString(m_pTreeViewModel->m_pDisplayedFunction->getSourceFile());
-            }
-        }
-        break;
-
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-
-        case AMDT_MODULE_TYPE_MANAGEDDPE:
-        {
-            // Each CLR jitted module contains one CLR symbol.
-            // So we need to repopulate the map everytime
-            // symbol is changed.
-            //m_pTreeViewModel->SetupSourceInfoForClr(m_pTreeViewModel->m_currentSymbolIterator->m_va);
-        }
-        break;
-#endif // AMDT_WINDOWS_OS
-
-#ifdef TBI
-
-        case CpuProfileModule::OCLMODULE:
-        {
-            // Each OCL jitted module can contain multiple symbols.
-            bool rc = SetupSourceInfoForOcl(addr);
-            GT_ASSERT(rc);
-        }
-        break;
-#endif
-
-        default:
-            break;
-    }
-
-    // If m_pTreeViewModel->m_srcFile is empty, no Source info available.
-    // So we clear the source info line map.
-    QString fileLocationStr;
-
-    if (m_pTreeViewModel->m_srcFile.isEmpty())
-    {
-        m_pTreeViewModel->m_funOffsetLinenumMap.clear();
-
-        fileLocationStr = QString("Module: ") + m_pTreeViewModel->m_moduleName;
-
-        // For JAVAMODULE and MANAGEDPE, we update the jnc file
-        // in the module label.
-        if (m_pTreeViewModel->m_modType == AMDT_MODULE_TYPE_MANAGEDDPE || m_pTreeViewModel->m_modType == AMDT_MODULE_TYPE_JAVA)
-        {
-            fileLocationStr += " (" + acGTStringToQString(m_pTreeViewModel->m_pDisplayedFunction->getJncFileName()) + ")";
-        }
-    }
-    else
-    {
-        fileLocationStr = m_pTreeViewModel->m_srcFile;
-    }
-
-    m_pModuleLocationInfoLabel->setText(fileLocationStr);
-}
-#endif //0
 
 bool SessionSourceCodeView::UpdateDisplay()
 {
@@ -1597,66 +1464,6 @@ bool SessionSourceCodeView::SetupSourceInfoForOcl(gtVAddr address)
 }
 #endif
 
-#if 0
-bool SessionSourceCodeView::ReadPE()
-{
-    bool retVal = false;
-
-    // Sanity check:
-    GT_IF_WITH_ASSERT((m_pTreeViewModel != nullptr) && (m_pTreeViewModel->m_pExecutable != nullptr))
-    {
-        // Tell the disassembler if the code is 64-bits
-        m_pTreeViewModel->m_isLongMode = m_pTreeViewModel->m_pExecutable->Is64Bit();
-
-        gtRVAddr funStartAddr = static_cast<gtRVAddr>(m_pTreeViewModel->m_loadAddr - m_pTreeViewModel->m_pModule->getBaseAddr());
-
-        if (0 == funStartAddr)
-        {
-            funStartAddr = m_pTreeViewModel->m_pExecutable->GetCodeBase();
-        }
-
-        unsigned sectionIndex = m_pTreeViewModel->m_pExecutable->LookupSectionIndex(funStartAddr);
-
-        if (m_pTreeViewModel->m_pExecutable->GetSectionsCount() <= sectionIndex)
-        {
-            retVal = false;
-        }
-        else
-        {
-            m_pTreeViewModel->m_pCode = m_pTreeViewModel->m_pExecutable->GetSectionBytes(sectionIndex);
-
-            gtRVAddr sectionStartRva = 0, sectionEndRva = 0;
-            m_pTreeViewModel->m_pExecutable->GetSectionRvaLimits(sectionIndex, sectionStartRva, sectionEndRva);
-
-            // GetCodeBytes return the pointer to the sectionStart
-            // We need to add the offset to the beginning of the function
-            gtRVAddr sectionFuncOffset = funStartAddr - sectionStartRva;
-            m_pTreeViewModel->m_pCode += sectionFuncOffset;
-            m_pTreeViewModel->m_codeSize = m_pTreeViewModel->m_pExecutable->GetCodeSize();
-
-            // Do not pass beyond the section's limits!
-            unsigned int sectionVirtualSize = sectionEndRva - sectionStartRva;
-
-            if (sectionVirtualSize < m_pTreeViewModel->m_codeSize)
-            {
-                m_pTreeViewModel->m_codeSize = sectionVirtualSize;
-            }
-
-            // The code size is relative to the function's address
-            m_pTreeViewModel->m_codeSize -= sectionFuncOffset;
-
-            if (m_pTreeViewModel->m_currentSymbolIterator != m_pTreeViewModel->m_symbolsInfoList.end() && 0 < m_pTreeViewModel->m_currentSymbolIterator->m_size && m_pTreeViewModel->m_currentSymbolIterator->m_size < m_pTreeViewModel->m_codeSize)
-            {
-                m_pTreeViewModel->m_codeSize = m_pTreeViewModel->m_currentSymbolIterator->m_size;
-            }
-
-            retVal = true;
-        }
-    }
-
-    return retVal;
-}
-#endif //0
 
 void SessionSourceCodeView::OnHotSpotComboChanged(const QString& text)
 {
@@ -1897,43 +1704,6 @@ void SessionSourceCodeView::UpdateColumnWidths()
     }
 }
 
-#if 0
-void SessionSourceCodeView::UpdatePercentDelegate()
-{
-    // Sanity check:
-    GT_IF_WITH_ASSERT((m_pTreeItemDelegate != nullptr) && (m_pSessionDisplaySettings != nullptr))
-    {
-        QList<int> percentColumnsList;
-        percentColumnsList << SOURCE_VIEW_SAMPLES_PERCENT_COLUMN;
-
-        // Add the data items to the list of percent items, if percentage should be displayed:
-        bool isProfilingCLU = m_pSessionDisplaySettings->m_pProfileInfo->m_isProfilingCLU;
-        bool displayPercentageInColumn = CPUGlobalDisplayFilter::instance().m_displayPercentageInColumn && (!isProfilingCLU);
-
-        if (displayPercentageInColumn)
-        {
-            for (int i = 0; i < (int)m_pSessionDisplaySettings->m_availableDataColumnCaptions.size(); i++)
-            {
-                gtVector<int>::const_iterator valsItBegin = m_pSessionDisplaySettings->m_simpleValuesVector.begin();
-                gtVector<int>::const_iterator valsItEnd = m_pSessionDisplaySettings->m_simpleValuesVector.end();
-
-                // Check if this is a simple value counter:
-                gtVector<int>::const_iterator findIt = gtFind(valsItBegin, valsItEnd, i);
-
-                if (valsItEnd != findIt)
-                {
-                    // Add this column to the list:
-                    percentColumnsList << SOURCE_VIEW_SAMPLES_PERCENT_COLUMN + 1 + i;
-                }
-            }
-        }
-
-        m_pTreeItemDelegate->SetPercentColumnsList(percentColumnsList);
-        m_pTreeItemDelegate->SetPercentForgroundColor(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
-    }
-}
-#endif
-
 void SessionSourceCodeView::UpdatePercentDelegate()
 {
     // Sanity check:
@@ -1970,87 +1740,35 @@ void SessionSourceCodeView::RefreshView()
 
 void SessionSourceCodeView::applyUserDisplayInformation()
 {
-    // Do not record scroll position:
-    m_ignoreVerticalScroll = true;
-
-    // Sanity check:
     const QComboBox* pHotSpotIndicatorComboBox = TopToolbarComboBox(m_pHotSpotIndicatorComboBoxAction);
     GT_IF_WITH_ASSERT((m_pSourceCodeTree != nullptr) && (pHotSpotIndicatorComboBox != nullptr))
     {
-        // Go through all the expanded items, and expand it:
-        foreach (int topLevelItem, m_userDisplayInformation.m_expandedTreeItems)
-        {
-            SourceViewTreeItem* pItemToExpand = (SourceViewTreeItem*)m_pTreeViewModel->topLevelItem(topLevelItem);
-            GT_IF_WITH_ASSERT(pItemToExpand != nullptr)
-            {
-                // Get the item index:
-                QModelIndex index = m_pTreeViewModel->indexOfItem(pItemToExpand);
+        AMDTUInt64 firstSrcLine = m_pTreeViewModel->GetFuncSrcFirstLnNum();
+        const std::vector<SourceViewTreeItem*>& srcLineVec = m_pTreeViewModel->GetSrcLineViewMap();
 
-                // Expand the item:
-                m_pSourceCodeTree->expand(index);
-            }
-        }
+		if (!srcLineVec.empty())
+		{
+			auto pSelectedItem = srcLineVec.at(firstSrcLine);
 
-        if (m_userDisplayInformation.m_selectedTopLevelItemIndex >= 0)
-        {
-            // Select the requested table row:
-            SourceViewTreeItem* pSelectedItem = (SourceViewTreeItem*)m_pTreeViewModel->topLevelItem(m_userDisplayInformation.m_selectedTopLevelItemIndex);
+			if (pSelectedItem != nullptr)
+			{
+				// Apply the tree selection:
+				SetTreeSelection(pSelectedItem);
 
-            if (pSelectedItem != nullptr)
-            {
-                if (m_userDisplayInformation.m_selectedTopLevelChildItemIndex >= 0)
-                {
-                    // Get the selected child of the top level item:
-                    pSelectedItem = pSelectedItem->child(m_userDisplayInformation.m_selectedTopLevelChildItemIndex);
+				int max = m_pSourceCodeTree->verticalScrollBar()->maximum();
+				int totalLines = srcLineVec.size();
+				int scrollVal = max;
 
-                    if (m_userDisplayInformation.m_expandedTreeItems.contains(m_userDisplayInformation.m_selectedTopLevelItemIndex))
-                    {
-                        // Make sure that the item is expanded if necessary:
-                        m_userDisplayInformation.m_shouldExpandSelected = true;
-                    }
-                }
+				if (0 != totalLines)
+				{
+					//one line scaling is
+					int oneLineScaling = max / totalLines;
+					scrollVal = oneLineScaling * firstSrcLine;
+				}
 
-                if (pSelectedItem != nullptr)
-                {
-                    // Apply the tree selection:
-                    SetTreeSelection(pSelectedItem);
-                }
-            }
-        }
-        else
-        {
-            if (m_pTreeViewModel->m_newAddress != 0)
-            {
-                HighlightMatchingSourceLine(m_pTreeViewModel->m_newAddress);
-            }
-        }
-
-        if (m_userDisplayInformation.m_verticalScrollPosition >= 0)
-        {
-            m_pSourceCodeTree->verticalScrollBar()->setValue(m_userDisplayInformation.m_verticalScrollPosition);
-        }
-
-        m_ignoreVerticalScroll = false;
-
-        // Show / Hide address and code bytes columns according to the user selection:
-        OnShowAddress();
-        OnShowCodeBytes();
-
-        if (!m_userDisplayInformation.m_selectedHotSpot.isEmpty())
-        {
-            // Set the hot spot indicator combo box value:
-            int index = pHotSpotIndicatorComboBox->findText(m_userDisplayInformation.m_selectedHotSpot, Qt::MatchExactly);
-
-            if (index != pHotSpotIndicatorComboBox->currentIndex())
-            {
-                m_pHotSpotIndicatorComboBoxAction->UpdateCurrentIndex(index);
-
-                m_pTreeViewModel->UpdateModel();
-            }
-        }
-
-        //
-        m_pSourceCodeTree->setFocus(Qt::MouseFocusReason);
+				m_pSourceCodeTree->verticalScrollBar()->setValue(scrollVal);
+			}
+		}
     }
 }
 
