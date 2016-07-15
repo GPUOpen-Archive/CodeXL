@@ -3705,24 +3705,20 @@ void InitHSAAPIInterceptTrace(HsaApiTable* pTable)
         pTable->amd_ext_->hsa_amd_profiling_set_profiler_enabled_fn = HSA_API_Trace_hsa_amd_profiling_set_profiler_enabled;
     }
 
-    /* comment out until we get a runtime that supports profiling async copies
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_amd_profiling_async_copy_enable))
     {
         pTable->amd_ext_->hsa_amd_profiling_async_copy_enable_fn = HSA_API_Trace_hsa_amd_profiling_async_copy_enable;
     }
-    */
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_amd_profiling_get_dispatch_time))
     {
         pTable->amd_ext_->hsa_amd_profiling_get_dispatch_time_fn = HSA_API_Trace_hsa_amd_profiling_get_dispatch_time;
     }
 
-    /* comment out until we get a runtime that supports profiling async copies
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_amd_profiling_get_async_copy_time))
     {
         pTable->amd_ext_->hsa_amd_profiling_get_async_copy_time_fn = HSA_API_Trace_hsa_amd_profiling_get_async_copy_time;
     }
-    */
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_amd_profiling_convert_tick_to_system_domain))
     {
