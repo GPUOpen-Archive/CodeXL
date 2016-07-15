@@ -1199,6 +1199,23 @@ public:
         return ret;
     }
 
+    bool GetFunctionInfoByModuleId(AMDTModuleId modId, AMDTProfileFunctionInfoVec& funcInfoVec, gtVAddr& modBaseAddr)
+    {
+        bool ret = false;
+
+        if (nullptr != m_pDbAdapter)
+        {
+            ret = m_pDbAdapter->GetFunctionInfoByModuleId(modId, funcInfoVec);
+
+            AMDTProfileModuleInfo modInfo;
+            ret = ret && GetModuleInfo(modId, modInfo);
+
+            modBaseAddr = (ret) ? modInfo.m_loadAddress : 0;
+        }
+
+        return ret;
+    }
+
     bool AddOthersEntry(AMDTProfileDataType type, AMDTProfileDataVec& summaryDataVec, AMDTCounterId counterId)
     {
         bool ret = false;
@@ -4007,6 +4024,18 @@ bool cxlProfileDataReader::GetThreadInfo(AMDTUInt32 pid, AMDTThreadId tid, AMDTP
     if (nullptr != m_pImpl)
     {
         ret = m_pImpl->GetThreadInfo(pid, tid, threadInfo);
+    }
+
+    return ret;
+}
+
+bool cxlProfileDataReader::GetFunctionInfoByModuleId(AMDTModuleId modId, AMDTProfileFunctionInfoVec& funcInfoVec, gtVAddr& modBaseAddr)
+{
+    bool ret = false;
+
+    if (nullptr != m_pImpl)
+    {
+        ret = m_pImpl->GetFunctionInfoByModuleId(modId, funcInfoVec, modBaseAddr);
     }
 
     return ret;

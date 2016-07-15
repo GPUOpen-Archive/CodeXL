@@ -645,6 +645,18 @@ bool amdtProfileDbAdapter::GetThreadInfo(AMDTUInt32 pid, AMDTThreadId tid, gtVec
     return ret;
 }
 
+bool amdtProfileDbAdapter::GetFunctionInfoByModuleId(AMDTModuleId moduleId, AMDTProfileFunctionInfoVec& funcInfoVec)
+{
+    bool ret = false;
+
+    if (m_pDbAccessor != nullptr)
+    {
+        ret = m_pDbAccessor->GetFunctionInfoByModuleId(moduleId, funcInfoVec);
+    }
+
+    return ret;
+}
+
 bool amdtProfileDbAdapter::GetProcessesWithCallstackSamples(gtVector<AMDTProcessId>& cssProcessVec)
 {
     bool ret = false;

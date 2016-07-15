@@ -4636,6 +4636,44 @@ public:
         return ret;
     }
 
+    bool GetFunctionInfoByModuleId(AMDTModuleId moduleId, AMDTProfileFunctionInfoVec& funcInfoVec)
+    {
+        bool ret = false;
+        std::stringstream query;
+        query << "SELECT id, name, startOffset, size from Function where moduleId = ? ;";
+
+        sqlite3_stmt* pQueryStmt = nullptr;
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+
+        if (rc == SQLITE_OK)
+        {
+            sqlite3_bind_int(pQueryStmt, 1, moduleId);
+
+            gtString modulePath;
+            GetModulePath(moduleId, modulePath);
+
+            while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
+            {
+                AMDTProfileFunctionInfo funcInfo;
+
+                funcInfo.m_functionId = sqlite3_column_int(pQueryStmt, 0);
+                const unsigned char* path = sqlite3_column_text(pQueryStmt, 1);
+                funcInfo.m_name.fromUtf8String(reinterpret_cast<const char*>(path));
+
+                funcInfo.m_startOffset = sqlite3_column_int(pQueryStmt, 2);
+                funcInfo.m_size = sqlite3_column_int(pQueryStmt, 3);
+                funcInfo.m_moduleId = moduleId;
+                funcInfo.m_modulePath = modulePath;
+
+                funcInfoVec.push_back(funcInfo);
+            }
+        }
+
+        sqlite3_finalize(pQueryStmt);
+        ret = (SQLITE_DONE == rc) ? true : false;
+        return ret;
+    }
+
     // Possible Cases
     //  for all threads from all the processes (functionId = -1, threadId = -1, processId = -1)
     //  for all threads from the given process (threadId = -1, processId = <pid>)
@@ -6406,6 +6444,18 @@ bool AmdtDatabaseAccessor::GetThreadInfo(AMDTUInt32 pid, gtUInt32 tid, gtVector<
     if (m_pImpl != nullptr)
     {
         ret = m_pImpl->GetThreadInfo(pid, tid, threadInfoList);
+    }
+
+    return ret;
+}
+
+bool AmdtDatabaseAccessor::GetFunctionInfoByModuleId(AMDTModuleId moduleId, AMDTProfileFunctionInfoVec& funcInfoVec)
+{
+    bool ret = false;
+
+    if (m_pImpl != nullptr)
+    {
+        ret = m_pImpl->GetFunctionInfoByModuleId(moduleId, funcInfoVec);
     }
 
     return ret;
