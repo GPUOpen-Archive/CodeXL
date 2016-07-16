@@ -458,18 +458,6 @@ inline void CaPerfTranslator::_clearAllHandlers()
 
 CaPerfTranslator::~CaPerfTranslator()
 {
-    // Delete the RI file
-    gtString inputFile;
-    inputFile.fromUtf8String(m_inputFile);
-    osFilePath riFilePath(inputFile);
-    riFilePath.setFileExtension(L"ri");
-
-    if (riFilePath.exists())
-    {
-        osFile riFile(riFilePath);
-        riFile.deleteFile();
-    }
-
     if (m_pPerfDataRdr)
     {
         m_pPerfDataRdr->deinit();
