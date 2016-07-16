@@ -391,12 +391,6 @@ PrdTranslator::~PrdTranslator()
     if (nullptr != m_runInfo)
     {
         delete m_runInfo;
-
-        // Delete the RI file
-        osFilePath riFilePath(m_dataFile.toStdWString().c_str());
-        riFilePath.setFileExtension(L"ri");
-        osFile riFile(riFilePath);
-        riFile.deleteFile();
     }
 
     for (gtMap<ProcessIdType, ProcessInfo*>::iterator it = m_processInfos.begin(), itEnd = m_processInfos.end(); it != itEnd; ++it)

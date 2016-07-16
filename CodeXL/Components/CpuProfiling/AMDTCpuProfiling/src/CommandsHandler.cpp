@@ -1412,6 +1412,11 @@ void CommandsHandler::onEvent(const apEvent& eve, bool& vetoEvent)
                             osFile tiFile(tiFilePath);
                             tiFile.deleteFile();
 #endif
+                            // Remove the supporting run info file
+                            osFilePath riFilePath(m_sessionPath);
+                            riFilePath.setFileExtension(RI_EXT);
+                            osFile riFile(riFilePath);
+                            riFile.deleteFile();
                         }
 
                         if (m_profileSession.m_isImported)
