@@ -4628,11 +4628,49 @@ public:
 
         funcInfo.m_functionId = funcId;
         funcInfo.m_moduleId = moduleId;
-        funcInfo.m_startOffset = (startOffset > 0) ? startOffset : offset;
+        funcInfo.m_startOffset = (offset > 0) ? offset : startOffset;
         funcInfo.m_size = size;
 
         sqlite3_finalize(pQueryStmt);
         ret = (SQLITE_DONE == rc || SQLITE_ROW == rc) ? true : false;
+        return ret;
+    }
+
+    bool GetFunctionInfoByModuleId(AMDTModuleId moduleId, AMDTProfileFunctionInfoVec& funcInfoVec)
+    {
+        bool ret = false;
+        std::stringstream query;
+        query << "SELECT id, name, startOffset, size from Function where moduleId = ? ;";
+
+        sqlite3_stmt* pQueryStmt = nullptr;
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+
+        if (rc == SQLITE_OK)
+        {
+            sqlite3_bind_int(pQueryStmt, 1, moduleId);
+
+            gtString modulePath;
+            GetModulePath(moduleId, modulePath);
+
+            while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
+            {
+                AMDTProfileFunctionInfo funcInfo;
+
+                funcInfo.m_functionId = sqlite3_column_int(pQueryStmt, 0);
+                const unsigned char* path = sqlite3_column_text(pQueryStmt, 1);
+                funcInfo.m_name.fromUtf8String(reinterpret_cast<const char*>(path));
+
+                funcInfo.m_startOffset = sqlite3_column_int(pQueryStmt, 2);
+                funcInfo.m_size = sqlite3_column_int(pQueryStmt, 3);
+                funcInfo.m_moduleId = moduleId;
+                funcInfo.m_modulePath = modulePath;
+
+                funcInfoVec.push_back(funcInfo);
+            }
+        }
+
+        sqlite3_finalize(pQueryStmt);
+        ret = (SQLITE_DONE == rc) ? true : false;
         return ret;
     }
 
@@ -5266,8 +5304,6 @@ public:
                 aLeaf.m_isLeaf = true;
 
                 GetFunctionInfo(funcId, offset, aLeaf.m_funcInfo);
-                //aLeaf.m_funcInfo.m_startOffset = offset;
-
                 GetModuleBaseAddressByModuleId(aLeaf.m_funcInfo.m_moduleId, processId, aLeaf.m_moduleBaseAddr);
 
                 leafs.push_back(aLeaf);
@@ -5382,7 +5418,6 @@ public:
                 aLeaf.m_isSystemodule = (isSysMod == 1) ? true : false;
 
                 GetFunctionInfo(funcId, offset, aLeaf.m_funcInfo);
-                // aLeaf.m_funcInfo.m_startOffset = offset;
 
                 GetModuleBaseAddress(funcId, processId, aLeaf.m_moduleBaseAddr);
 
@@ -5438,8 +5473,6 @@ public:
                 IsSystemModule(modId, aLeaf.m_isSystemodule);
 
                 GetFunctionInfo(funcId, offset, aLeaf.m_funcInfo);
-                //aLeaf.m_funcInfo.m_startOffset = offset;
-
                 GetModuleBaseAddress(funcId, processId, aLeaf.m_moduleBaseAddr);
 
                 frames.push_back(aLeaf);
@@ -6411,6 +6444,18 @@ bool AmdtDatabaseAccessor::GetThreadInfo(AMDTUInt32 pid, gtUInt32 tid, gtVector<
     if (m_pImpl != nullptr)
     {
         ret = m_pImpl->GetThreadInfo(pid, tid, threadInfoList);
+    }
+
+    return ret;
+}
+
+bool AmdtDatabaseAccessor::GetFunctionInfoByModuleId(AMDTModuleId moduleId, AMDTProfileFunctionInfoVec& funcInfoVec)
+{
+    bool ret = false;
+
+    if (m_pImpl != nullptr)
+    {
+        ret = m_pImpl->GetFunctionInfoByModuleId(moduleId, funcInfoVec);
     }
 
     return ret;

@@ -194,7 +194,9 @@ public slots:
     void onRemoveSession(ExplorerSessionId sharedId, SessionExplorerDeleteType deleteType, bool& sessionDeleted);
     void onImportSession(const QString& strFileName, bool& imported);
 
-    void handleNonEBPImport(const osFilePath& importProfileFilePath);
+    void handleRawDataFileImport(const osFilePath& importProfileFilePath);
+    void handleEBPFileImport(const osFilePath& importProfileFilePath);
+    void handleDataFileImport(const osFilePath& importProfileFilePath);
 
     void onSessionRename(SessionTreeNodeData* pRenamedSessionData, const osFilePath& oldSessionFilePath, const osDirectory& oldSessionDirectory);
     void OnClearCurrentProjectSettings();

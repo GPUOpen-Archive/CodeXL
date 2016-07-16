@@ -40,7 +40,6 @@
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     #include <AMDTExecutableFormat/inc/PeFile.h>
-    #include <Driver/Windows/CpuProf/inc/UserAccess/CpuProfDriver.h>
 #endif
 
 // Local:

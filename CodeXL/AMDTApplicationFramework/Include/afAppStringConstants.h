@@ -265,7 +265,7 @@
 // CodeXL files:
 #define AF_STR_projectFileExtension L"cxl"
 #define AF_STR_exeFileExtension L"exe"
-#define AF_STR_profileFileExtension1 L"ebp"
+#define AF_STR_profileFileExtension1 L"cxlcpdb"
 #define AF_STR_profileFileExtension2 L"prd"
 #define AF_STR_profileFileExtension3 L"caperf"
 #define AF_STR_profileFileExtension4 L"csv"
@@ -318,7 +318,7 @@
 #define AF_STR_STAGE "stage:"
 #define AF_STR_COMPILING "Compiling"
 
-#define AF_STR_CpuProfileFileExtension L"ebp"
+#define AF_STR_CpuProfileFileExtension L"cxlcpdb"
 #define AF_STR_GpuProfileSessionFileExtension L"gpsession"
 #define AF_STR_GpuPerformanceCountersSessionFileExtension L"csv"
 #define AF_STR_PowerProfileSessionFileExtension L"cxldb"

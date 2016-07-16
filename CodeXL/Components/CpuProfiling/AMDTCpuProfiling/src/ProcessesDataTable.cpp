@@ -113,27 +113,14 @@ CPUProfileDataTable::TableType ProcessesDataTable::GetTableType() const
     return CPUProfileDataTable::PROCESSES_DATA_TABLE;
 }
 
-bool ProcessesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> modIdVec)
+bool ProcessesDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allProcessData)
 {
-    (void)modIdVec;
+    setSortingEnabled(false);
+
     bool retVal = false;
 
-    GT_IF_WITH_ASSERT((m_pProfDataRdr != nullptr) &&
-                      (m_pDisplayFilter != nullptr) &&
-                      (m_pTableDisplaySettings != nullptr))
+    if (!allProcessData.empty())
     {
-        // get samples for Data cache access events
-        AMDTProfileSessionInfo sessionInfo;
-
-        bool rc = m_pProfDataRdr->GetProfileSessionInfo(sessionInfo);
-        GT_ASSERT(rc);
-
-        gtVector<AMDTProfileData> allProcessData;
-        rc = m_pProfDataRdr->GetProcessProfileData(procId, modId, allProcessData);
-        GT_ASSERT(rc);
-
-        setSortingEnabled(false);
-
         for (auto profData : allProcessData)
         {
             QStringList list;
@@ -141,7 +128,7 @@ bool ProcessesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId,
             CounterNameIdVec selectedCounterList;
 
             AMDTProfileProcessInfoVec procInfo;
-            rc = m_pProfDataRdr->GetProcessInfo(profData.m_id, procInfo);
+            m_pProfDataRdr->GetProcessInfo(profData.m_id, procInfo);
 
             list << procInfo.at(0).m_name.asASCIICharArray();
             list << QString::number(procInfo.at(0).m_pid);
@@ -186,7 +173,45 @@ bool ProcessesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId,
             addRow(list, nullptr);
         }
 
-        setSortingEnabled(true);
+        retVal = true;
+    }
+
+    setSortingEnabled(true);
+    return retVal;
+}
+
+bool ProcessesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> modIdVec)
+{
+    (void)modIdVec;
+    bool retVal = false;
+
+    GT_IF_WITH_ASSERT((m_pProfDataRdr != nullptr) &&
+                      (m_pDisplayFilter != nullptr) &&
+                      (m_pTableDisplaySettings != nullptr))
+    {
+        gtVector<AMDTProfileData> allProcessData;
+
+        if (modIdVec.empty())
+        {
+            bool rc = m_pProfDataRdr->GetProcessProfileData(procId, modId, allProcessData);
+            GT_ASSERT(rc);
+        }
+        else
+        {
+            gtVector<AMDTProfileData> moduleData;
+
+            for (const auto& moduleId : modIdVec)
+            {
+                moduleData.clear();
+                bool rc = m_pProfDataRdr->GetProcessProfileData(procId, moduleId, moduleData);
+                GT_ASSERT(rc);
+                allProcessData.insert(allProcessData.end(), moduleData.begin(), moduleData.end());
+            }
+
+            mergedProfileDataVectors(allProcessData);
+        }
+
+        AddRowToTable(allProcessData);
         resizeColumnToContents(0);
 
         retVal = true;

@@ -57,11 +57,7 @@ bool gpSummaryTab::Init(gpTraceDataContainer* pDataContainer, gpTraceView* pSess
         QWidget* pWidgetLeft = new QWidget;
         QWidget* pWidgetRight = new QWidget;
 
-        QLabel* pLblCaption = new QLabel(getCaption());
         m_pChkboxUseScope = new QCheckBox(GPU_STR_Use_Scope_Summary);
-
-        pLeftHLayout->addWidget(pLblCaption, 0, Qt::AlignTop);
-
 
         QString styleSheetStr = QString("QDialog{border:1px solid gray;}");
         pLeftHLayout->addWidget(m_pChkboxUseScope, 0, Qt::AlignHCenter);

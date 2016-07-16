@@ -54,9 +54,6 @@
 
 #include <tuple>
 
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    #include <Driver/Windows/CpuProf/inc/UserAccess/CpuProfDriver.h>
-#endif
 
 SessionOverviewWindow::SessionOverviewWindow(QWidget* pParent, CpuSessionWindow* pSessionWindow)
     : DataTab(pParent, pSessionWindow)
@@ -494,7 +491,10 @@ bool SessionOverviewWindow::displaySessionProfileDetails(afHTMLContent& content)
 #endif
 
             firstColStr.makeEmpty();
-            int threadsCount = 0; //TODO: Needs to be implemented
+            AMDTProfileThreadInfoVec threadInfo;
+            retVal = m_pProfDataRdr->GetThreadInfo(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_THREADS, threadInfo);
+            int threadsCount = (retVal) ? threadInfo.size() : 0;
+
             firstColStr.appendFormattedString(L"<b>%ls:</b> %d", CP_overviewPageTotalThreads, threadsCount);
             content.addHTMLItem(afHTMLContent::AP_HTML_LINE, firstColStr);
 

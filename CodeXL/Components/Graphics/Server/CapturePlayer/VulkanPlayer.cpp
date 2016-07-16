@@ -7,6 +7,7 @@
 #ifdef WIN32
     #include "WindowsWindow.h"
 #else
+    #include "X11Window.h"
     #include "XcbWindow.h"
     #include <signal.h>
     #include "WinDefs.h"
@@ -140,7 +141,7 @@ public:
 class VulkanSurfaceX11 : public VulkanSurfaceBase
 {
 public:
-    VulkanX11() {}
+    VulkanSurfaceX11() {}
     virtual ~VulkanSurfaceX11() {}
 
     /// Is the value passed in a valid surface extension for this window type
@@ -160,7 +161,7 @@ public:
     /// \return this window type's surface extension name
     virtual const char* GetSurfaceExtensionName()
     {
-        static char* extensionName = VK_KHR_XLIB_SURFACE_EXTENSION_NAME;
+        static const char* extensionName = VK_KHR_XLIB_SURFACE_EXTENSION_NAME;
         return extensionName;
     }
 
@@ -257,11 +258,14 @@ bool VulkanPlayer::InitializeWindow(HINSTANCE hInstance, UINT windowWidth, UINT 
     m_pPlayerWindow = new WindowsWindow(windowWidth, windowHeight, hInstance, VulkanWindowProc);
 #elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
     GT_UNREFERENCED_PARAMETER(hInstance);
-    // choose window type
-    m_pPlayerWindow = new XcbWindow(windowWidth, windowHeight);
-
-    // choose surface helper type
-    s_vulkanSurface = new VulkanSurfaceXCB();
+    // choose window type and surface helper type
+    #ifdef USE_XCB
+        m_pPlayerWindow = new XcbWindow(windowWidth, windowHeight);
+        s_vulkanSurface = new VulkanSurfaceXCB();
+    #else
+        m_pPlayerWindow = new X11Window(windowWidth, windowHeight);
+        s_vulkanSurface = new VulkanSurfaceX11();
+    #endif
 #endif
 
     if (m_pPlayerWindow == nullptr)

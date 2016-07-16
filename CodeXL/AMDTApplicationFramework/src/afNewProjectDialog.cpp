@@ -1531,14 +1531,14 @@ void afNewProjectDialog::IsApplicationPathsValid(bool& isAppValid, bool& isWorki
         isValidApplicationInfo.appFilePath = acQStringToGTString(m_pProgramExeTextEdit->text());
         isValidApplicationInfo.isRemoteSession = m_pRemoteHostRadioButton->isChecked();
 
+        //used as reference inside isValidApplicationInfo, thus must exist in same scope as isValidApplicationInfo
+        osPortAddress portAddress;
         if (isValidApplicationInfo.isRemoteSession)
         {
-            osPortAddress portAddress;
             GT_IF_WITH_ASSERT(GetRemotePortAddress(portAddress))
             {
                 isValidApplicationInfo.portAddress = &portAddress;
             }
-
         }
         afIsApplicationPathsValid(isValidApplicationInfo, isAppValid, isWorkingFolderValid);
     }

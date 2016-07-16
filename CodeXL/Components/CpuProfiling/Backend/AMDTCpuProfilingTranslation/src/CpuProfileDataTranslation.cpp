@@ -26,16 +26,13 @@
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     // Windows only stuff
-
     #include <AMDTCpuProfilingTranslation/inc/Windows/TaskInfoInterface.h>
     #include "Windows/PrdTranslator.h"
-
-#else // WINDOWS_ONLY
+#else
     // Linux only stuff
     #include <unistd.h>
     #include "Linux/CaPerfTranslator.h"
-
-#endif // WINDOWS_ONLY
+#endif
 
 
 gtList<ReaderHandle*> g_validReaders;
@@ -43,17 +40,18 @@ gtList<ReaderHandle*> g_validReaders;
 //returns true if valid and false if not
 static bool helpCheckValidReader(const ReaderHandle* pReaderHandle)
 {
-    gtList<ReaderHandle*>::const_iterator it = g_validReaders.begin(), itEnd = g_validReaders.end();
+    bool found = false;
 
-    for (; it != itEnd; ++it)
+    for (const auto& it : g_validReaders)
     {
-        if (*it == pReaderHandle)
+        if (it == pReaderHandle)
         {
+            found = true;
             break;
         }
     }
 
-    return it != itEnd;
+    return found;
 }
 
 
@@ -67,12 +65,10 @@ static HRESULT helpValidatePath(const wchar_t* pPath)
     {
         return E_INVALIDARG;
     }
-
 #endif
 
     //Checking for existence
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-
     if (-1 == _waccess(pPath, 0))
 #else
     if (-1 == access(path, F_OK))
@@ -83,7 +79,6 @@ static HRESULT helpValidatePath(const wchar_t* pPath)
 
     // Checking for read
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-
     if (-1 == _waccess(pPath, 04))
 #else
     if (-1 == access(path, R_OK))
@@ -99,7 +94,6 @@ static HRESULT helpValidatePath(const wchar_t* pPath)
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
 static HRESULT helpHandlePrdFile(const wchar_t* pFilePath, ReaderHandle** pReaderHandle)
 {
-    ////////////////////////////////////////////////////
     //create new object
     CpuProfileDataAccess* pDataAccess = new CpuProfileDataAccess();
 
@@ -110,10 +104,8 @@ static HRESULT helpHandlePrdFile(const wchar_t* pFilePath, ReaderHandle** pReade
 
     *pReaderHandle = static_cast<ReaderHandle*>(pDataAccess);
 
-    HRESULT hr;
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     //add prd file to object
-    hr = pDataAccess->OpenPrdFile(pFilePath);
+    HRESULT hr = pDataAccess->OpenPrdFile(pFilePath);
 
     if (S_OK != hr)
     {
@@ -125,19 +117,14 @@ static HRESULT helpHandlePrdFile(const wchar_t* pFilePath, ReaderHandle** pReade
         g_validReaders.push_back(*pReaderHandle);
     }
 
-#else
-    hr = E_NOTIMPL;
-#endif // AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-
     return hr;
 }
+#endif // AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
 
-
-static HRESULT helpHandleEbpFile(
-    wchar_t* pFilePath,
-    ReaderHandle** pReaderHandle)
+#if 0
+// This one is deprecated
+static HRESULT helpHandleEbpFile(const wchar_t* pFilePath, ReaderHandle** pReaderHandle)
 {
-    ////////////////////////////////////////////////////
     //create new object
     CpuProfileDataAccess* pDataAccess = new CpuProfileDataAccess();
 
@@ -162,15 +149,13 @@ static HRESULT helpHandleEbpFile(
     }
 
     return hr;
-
 }
-
-#endif // AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+#endif
 
 #if AMDT_BUILD_TARGET == AMDT_LINUX_OS
-static HRESULT helpHandleCaPerfFile(wchar_t* pFilePath, ReaderHandle** pReaderHandle)
+static HRESULT helpHandleCaPerfFile(const wchar_t* pFilePath, ReaderHandle** pReaderHandle)
 {
-    HRESULT hr;
+    HRESULT hr = S_OK;
     gtString path = pFilePath;
 
     // Create CaPerfTranslator
@@ -183,15 +168,12 @@ static HRESULT helpHandleCaPerfFile(wchar_t* pFilePath, ReaderHandle** pReaderHa
 
     *pReaderHandle = static_cast<ReaderHandle*>(pTrans);
     g_validReaders.push_back(*pReaderHandle);
-    hr = S_OK;
 
     return hr;
 }
 #endif  // AMDT_BUILD_TARGET == AMDT_LINUX_OS
 
-// Note: This function currently handles:
-// - prd files
-// - ebp,tbp files
+// Note: This function currently handles: prd, caperf, ebp files
 HRESULT fnOpenProfile(
     /*in*/ const wchar_t* pPath,
     /*out*/ ReaderHandle** pReaderHandle)
@@ -214,43 +196,30 @@ HRESULT fnOpenProfile(
         return hr;
     }
 
-    ////////////////////////////////////////////////////
-    // Check file extension
-    wchar_t tempFileName[OS_MAX_PATH];
+    osFilePath filePath(pPath);
+
+    gtString fileExtn;
+    filePath.getFileExtension(fileExtn);
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    wcscpy_s(tempFileName, OS_MAX_PATH, pPath);
-
-    // Handle different types of input path
     // Check if prd file
-    if (0 == _wcsicmp(L".prd", &(tempFileName[wcslen(tempFileName) - 4])))
+    if (0 == fileExtn.compareNoCase(L"prd"))
     {
-        hr = helpHandlePrdFile(tempFileName, pReaderHandle);
+        hr = helpHandlePrdFile(pPath, pReaderHandle);
     }
-    // Check if tbp/ebp file
-    else if ((0 == _wcsicmp(L".ebp", &(tempFileName[wcslen(tempFileName) - 4])))
-             || (0 == _wcsicmp(L".tbp", &(tempFileName[wcslen(tempFileName) - 4]))))
-    {
-        hr = helpHandleEbpFile(tempFileName, pReaderHandle);
-    }
-
 #else
-    wcsncpy(tempFileName, pPath, OS_MAX_PATH);
-
-    // Handle different types of input path
     // Check if caperf file
-    if (0 == wcscmp(L".caperf", &(tempFileName[wcslen(tempFileName) - 7])))
+    if (0 == fileExtn.compareNoCase(L"caperf"))
     {
-        hr = helpHandleCaPerfFile(tempFileName, pReaderHandle);
+        hr = helpHandleCaPerfFile(pPath, pReaderHandle);
     }
-
 #endif
 
     return hr;
 }
 
 
-//TODO: [Suravee] This one is deprecated
+// This one is deprecated
 HRESULT fnOpenAggregatedProfile(
     /*in*/ wchar_t* pFileName,
     /*out*/ ReaderHandle** pReaderHandle)
@@ -288,8 +257,6 @@ HRESULT fnCloseProfile(
     }
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-
-    // BUG168352
     CpuProfileDataAccess* pDataAccess =  static_cast<CpuProfileDataAccess*>(*pReaderHandle);
 
     if (pDataAccess->IsAggregationInProgress())
@@ -301,12 +268,11 @@ HRESULT fnCloseProfile(
 #else
     CaPerfTranslator* pTrans = static_cast<CaPerfTranslator*>(*pReaderHandle);
     delete pTrans;
-
 #endif
+
     // All error conditions checked. Remove the reader from the list
     // of valid readers and delete the CpuProfileDataAccess object.
     g_validReaders.remove(*pReaderHandle);
-
 
     *pReaderHandle = NULL;
     return S_OK;
@@ -352,9 +318,8 @@ HRESULT fnClearTempJitDir()
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     return fnCleanupJitInformation();
 #else
-    //TODO: [Suravee]
     return E_NOTIMPL;
-#endif // AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+#endif
 }
 
 

@@ -46,8 +46,8 @@ class SourceCodeTreeModel : public QAbstractItemModel
     friend class SessionSourceCodeView;
 
 public:
-    SourceCodeTreeModel(SessionDisplaySettings* pSessionDisplaySettings, const QString& sessionDir, 
-		shared_ptr<cxlProfileDataReader> pProfDataRdr, shared_ptr<DisplayFilter> displayFilter);
+    SourceCodeTreeModel(SessionDisplaySettings* pSessionDisplaySettings, const QString& sessionDir,
+                        shared_ptr<cxlProfileDataReader> pProfDataRdr, shared_ptr<DisplayFilter> displayFilter);
 
     ~SourceCodeTreeModel();
 
@@ -112,14 +112,15 @@ public:
     /// Sets the samples and samples percent columns data and headers:
     void SetTreeSamples(const QString& hotSpotCaption);
 
-	void SetHotSpotSamples(AMDTUInt32 counterIdx);
+    void SetHotSpotSamples(AMDTUInt32 counterIdx);
 
     /// Sets the tree items data as percent / values:
     //void SetDataPercentValues();
 
     /// Sets the value for the requested source view item:
     //void SetSingleItemDataValue(SourceViewTreeItem* pItem, int column, bool appendPercent);
-	void SetPercentFormat(double  val, bool appendPercent, QVariant& data);
+    //void SetPercentFormat(double  val, bool appendPercent, QVariant& data);
+    void SetDisplayFormat(double  val, bool appendPercent, QVariant& data, const int precision);
 
 
     /// Sets the data values on the data columns:
@@ -130,16 +131,18 @@ public:
 
     /// Store module details:
     //void SetModuleDetails(const CpuProfileModule* pModule);
-	void SetModuleDetails(AMDTUInt32 moduleId, AMDTUInt32 pId);
-	void BuildTree(const std::vector<SourceViewTreeItem*>& srcLineViewTreeMap);
+    void SetModuleDetails(AMDTUInt32 moduleId, AMDTUInt32 pId);
+    void BuildTree(const std::vector<SourceViewTreeItem*>& srcLineViewTreeMap);
 
-	void PrintFunctionDetailData(AMDTProfileFunctionData  functionData,
-		gtString srcFilePath,
-		AMDTSourceAndDisasmInfoVec srcInfoVec, 
-		const std::vector<SourceViewTreeItem*>& srcLineViewTreeMap);
-	void GetInstOffsets(gtUInt16 srcLine, AMDTSourceAndDisasmInfoVec& srcInfoVec, gtVector<gtVAddr>& instOffsetVec);
-	void GetDisasmString(gtVAddr offset, AMDTSourceAndDisasmInfoVec& srcInfoVec, gtString& disasm, gtString& codeByte);
-	void GetDisasmSampleValue(gtVAddr offset, AMDTProfileInstructionDataVec& dataVec, AMDTSampleValueVec& sampleValue);
+    void PrintFunctionDetailData(AMDTProfileFunctionData  functionData,
+                                 gtString srcFilePath,
+                                 AMDTSourceAndDisasmInfoVec srcInfoVec,
+                                 const std::vector<SourceViewTreeItem*>& srcLineViewTreeMap);
+    void GetInstOffsets(gtUInt16 srcLine, AMDTSourceAndDisasmInfoVec& srcInfoVec, gtVector<gtVAddr>& instOffsetVec);
+    void GetDisasmString(gtVAddr offset, AMDTSourceAndDisasmInfoVec& srcInfoVec, gtString& disasm, gtString& codeByte);
+    void GetDisasmSampleValue(gtVAddr offset, AMDTProfileInstructionDataVec& dataVec, AMDTSampleValueVec& sampleValue);
+    AMDTUInt64 GetFuncSrcFirstLnNum() const { return m_funcFirstSrcLine; }
+    const std::vector<SourceViewTreeItem*> GetSrcLineViewMap() const { return m_srcLineViewTreeMap; }
 
 private:
 
@@ -155,13 +158,13 @@ private:
     void CalculateTotalModuleCountVector(CpuProfileReader* pProfileReader);
 
     // Symbol list utilities:
-	//bool SetupSymbolInfoListUnmanaged(AMDTUInt32 modId, AMDTUInt32 pId);
-	//bool SetupSymbolInfoListUnmanaged();
-	//void SetupSymbolInfoListManaged();
-	//void SetupSymbolInfoListManaged(AMDTUInt32 modId, AMDTUInt32 pId);
+    //bool SetupSymbolInfoListUnmanaged(AMDTUInt32 modId, AMDTUInt32 pId);
+    //bool SetupSymbolInfoListUnmanaged();
+    //void SetupSymbolInfoListManaged();
+    //void SetupSymbolInfoListManaged(AMDTUInt32 modId, AMDTUInt32 pId);
     //bool SetupSourceInfoForUnManaged();
     //bool SetupSourceInfoForJava(gtVAddr address);
-    
+
     bool SetupSymbolInfoList(AMDTUInt32 modId, AMDTUInt32 pId);
     bool SetupSourceInfo();
 
@@ -176,8 +179,8 @@ private:
     bool SetupSourceInfoForOcl(gtVAddr address);
 #endif
 
-	//void CreateSymbolInfoList(AMDTUInt32 modId, AMDTUInt32 pId);
-	//void CreateSymbolInfoList();
+    //void CreateSymbolInfoList(AMDTUInt32 modId, AMDTUInt32 pId);
+    //void CreateSymbolInfoList();
 
     SourceViewTreeItem* getItem(const QModelIndex& index) const;
 private:
@@ -232,14 +235,14 @@ private:
     ProcessIdType m_newPid;
     ThreadIdType m_tid;
     ThreadIdType m_newTid;
-	AMDTFunctionId m_funcId;
+    AMDTFunctionId m_funcId;
 
     CpuProfileModule::MOD_MODE_TYPE m_moduleType;
     AggregatedSample m_moduleAggregatedSample;
     const CpuProfileModule* m_pModule;
     const CpuProfileFunction* m_pDisplayedFunction;
 
-	AMDTModuleType m_modType;
+    AMDTModuleType m_modType;
 
     bool m_isModuleCached;
     long m_moduleTotalSamplesCount;
@@ -275,13 +278,15 @@ private:
     QColor m_forgroundColor;
 
     AMDTProfileSourceLineDataVec m_srcLineDataVec;
-    std::vector<SourceViewTreeItem*> m_srcLineViewTreeMap;
 
     shared_ptr<cxlProfileDataReader> m_pProfDataRdr;
     shared_ptr<DisplayFilter> m_pDisplayFilter;
+    AMDTUInt64  m_funcFirstSrcLine = 0;
 
     // srcLineNumber for sampled  --> SourceViewTreeItem
     std::vector<std::pair<AMDTProfileSourceLineData, SourceViewTreeItem*>> m_sampleSrcLnViewTreeList;
+    std::vector<SourceViewTreeItem*> m_srcLineViewTreeMap;
+
 };
 
 #endif //__SOURCECODETREEMODEL_H

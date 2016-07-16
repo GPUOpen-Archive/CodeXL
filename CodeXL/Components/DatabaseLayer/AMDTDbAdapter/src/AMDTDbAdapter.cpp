@@ -81,9 +81,17 @@ bool AmdtDatabaseAdapter::FlushDbAsync()
     return m_pDbAccessor->FlushDataAsync();
 }
 
-bool AmdtDatabaseAdapter::GetDbFileExtension(gtString& extension) const
+bool AmdtDatabaseAdapter::GetDbFileExtension(AMDTProfileMode profileMode, gtString& extension) const
 {
-    extension.assign(DB_FILE_EXTENSION);
+    if (profileMode == AMDT_PROFILE_MODE_AGGREGATION)
+    {
+        extension.assign(CPUP_DB_FILE_EXTENSION);
+    }
+    else if (profileMode == AMDT_PROFILE_MODE_TIMELINE)
+    {
+        extension.assign(PWRP_DB_FILE_EXTENSION);
+    }
+
     return true;
 }
 

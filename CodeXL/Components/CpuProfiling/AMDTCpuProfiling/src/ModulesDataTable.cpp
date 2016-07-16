@@ -237,25 +237,60 @@ bool ModulesDataTable::fillSummaryTables(int counterIdx)
     return retVal;
 }
 
-bool ModulesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> modIdVec)
+bool ModulesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> processIdVec)
 {
-    (void)modIdVec; //unused
     bool retVal = false;
 
     GT_IF_WITH_ASSERT((m_pProfDataRdr.get() != nullptr) &&
                       (m_pDisplayFilter != nullptr) &&
                       (m_pTableDisplaySettings != nullptr))
     {
-        // get samples for Data cache access events
-        AMDTProfileSessionInfo sessionInfo;
-
-        bool rc = m_pProfDataRdr->GetProfileSessionInfo(sessionInfo);
-        GT_ASSERT(rc);
-
         gtVector<AMDTProfileData> allProcessData;
-        rc = m_pProfDataRdr->GetModuleProfileData(procId, modId, allProcessData);
-        GT_ASSERT(rc);
 
+        if (processIdVec.empty())
+        {
+            bool rc = m_pProfDataRdr->GetModuleProfileData(procId, modId, allProcessData);
+            GT_ASSERT(rc);
+        }
+        else
+        {
+            gtVector<AMDTProfileData> processData;
+
+            for (const auto& processId : processIdVec)
+            {
+                processData.clear();
+                m_pProfDataRdr->GetModuleProfileData(processId, modId, processData);
+                allProcessData.insert(allProcessData.end(), processData.begin(), processData.end());
+            }
+
+            mergedProfileDataVectors(allProcessData);
+        }
+
+        AddRowToTable(allProcessData);
+
+        hideColumn(AMDT_MOD_TABLE_MOD_ID);
+        resizeColumnToContents(AMDT_MOD_TABLE_MOD_NAME);
+        retVal = true;
+    }
+
+    return retVal;
+}
+
+bool ModulesDataTable::findModueId(int rowIndex, AMDTModuleId& modId)
+{
+    QTableWidgetItem* pidWidget = item(rowIndex, 0);
+    int moduleId = pidWidget->text().toInt();
+    modId = moduleId;
+
+    return true;
+}
+
+bool ModulesDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allProcessData)
+{
+    bool retVal = false;
+
+    if (!allProcessData.empty())
+    {
         setSortingEnabled(false);
 
         for (auto profData : allProcessData)
@@ -337,21 +372,9 @@ bool ModulesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, s
                 pModuleNameItem->setToolTip(acGTStringToQString(modInfo.at(0).m_path));
             }
 
+            retVal = true;
         }
-
-        hideColumn(AMDT_MOD_TABLE_MOD_ID);
-        resizeColumnToContents(AMDT_MOD_TABLE_MOD_NAME);
-        retVal = true;
     }
 
     return retVal;
-}
-
-bool ModulesDataTable::findModueId(int rowIndex, AMDTModuleId& modId)
-{
-    QTableWidgetItem* pidWidget = item(rowIndex, 0);
-    int moduleId = pidWidget->text().toInt();
-    modId = moduleId;
-
-    return true;
 }

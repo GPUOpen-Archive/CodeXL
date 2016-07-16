@@ -31,6 +31,7 @@
 #include <SessionTreeNodeData.h>
 
 #define FunctionDataIndexRole  ((int)(Qt::UserRole) + 0)
+const AMDTFunctionId INVALID_FUNCTION_ID = 0;
 
 FunctionsDataTable::FunctionsDataTable(QWidget* pParent,
                                        const gtVector<TableContextMenuActionType>& additionalContextMenuActions,
@@ -127,12 +128,20 @@ void FunctionsDataTable::onAboutToShowContextMenu()
 
                     if (selectedItems().count() > 0)
                     {
+                        AMDTFunctionId funcId = INVALID_FUNCTION_ID;
+
                         // get the selected item (only one item)
                         QTableWidgetItem* pItem = selectedItems().first();
 
+                        if (nullptr != pItem)
+                        {
+                            int rowIndex = pItem->row();
+                            QString funcIdStr = getFunctionId(rowIndex);
+                            funcId = funcIdStr.toInt();
+                        }
+
                         // if its empty or is the "empty row" string item
-                        if (nullptr == pItem ||
-                            pItem->row() == -1)
+                        if (nullptr == pItem || pItem->row() == -1)
                         {
                             isActionEnabled = false;
                         }
@@ -146,39 +155,38 @@ void FunctionsDataTable::onAboutToShowContextMenu()
 
                         else if (DISPLAY_FUNCTION_IN_CALLGRAPH_VIEW == actionType)
                         {
-                            AMDTFunctionId funcId = 0;
                             isActionEnabled = false;
 
                             //get supported call graph process
                             gtVector<AMDTProcessId> cssProcesses;
                             bool rc = m_pProfDataRdr->GetCallGraphProcesses(cssProcesses);
 
-                            // get selected row, functionId
-                            QTableWidgetItem* pItem = selectedItems().first();
-
-                            if ((nullptr != pItem) && (true == rc))
+                            if ((INVALID_FUNCTION_ID != funcId) && (true == rc))
                             {
-                                int rowIndex = pItem->row();
-                                QString funcIdStr = getFunctionId(rowIndex);
-                                funcId = funcIdStr.toInt();
-                            }
-
-                            for (auto const& process : cssProcesses)
-                            {
-                                AMDTProfileFunctionData  functionData;
-                                bool retVal = m_pProfDataRdr->GetFunctionData(funcId,
-                                                                              process,
-                                                                              AMDT_PROFILE_ALL_THREADS,
-                                                                              functionData);
-
-                                if (retVal)
+                                for (auto const& process : cssProcesses)
                                 {
-                                    if (process == functionData.m_pidsList.at(0))
+                                    AMDTProfileFunctionData  functionData;
+                                    bool retVal = m_pProfDataRdr->GetFunctionData(funcId,
+                                                                                  process,
+                                                                                  AMDT_PROFILE_ALL_THREADS,
+                                                                                  functionData);
+
+                                    if (retVal)
                                     {
-                                        isActionEnabled = true;
-                                        break;
+                                        if (process == functionData.m_pidsList.at(0))
+                                        {
+                                            isActionEnabled = true;
+                                            break;
+                                        }
                                     }
                                 }
+                            }
+                        }
+                        else if (DISPLAY_FUNCTION_IN_SOURCE_CODE_VIEW == actionType)
+                        {
+                            if (INVALID_FUNCTION_ID == funcId)
+                            {
+                                isActionEnabled = false;
                             }
                         }
                     }

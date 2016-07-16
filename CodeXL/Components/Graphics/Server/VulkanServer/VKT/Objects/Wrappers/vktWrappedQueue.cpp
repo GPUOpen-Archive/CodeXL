@@ -5,6 +5,7 @@
 /// \brief  A wrapper for queues.
 //=============================================================================
 
+#include <AMDTBaseTools/Include/gtStringConstants.h>
 #include "vktWrappedQueue.h"
 #include "vktWrappedCmdBuf.h"
 #include "../../vktInterceptManager.h"
@@ -409,7 +410,7 @@ VkResult VktWrappedQueue::QueueSubmit_ICD(VkQueue queue, uint32_t submitCount, c
         sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s, %s",
                   VktUtil::WritePointerAsString(queue),
                   submitCount,
-                  PrintArrayWithFormatter(submitCount, pSubmits, POINTER_SUFFIX "%p").c_str(),
+                  PrintArrayWithFormatter(submitCount, pSubmits, GT_POINTER_FORMAT).c_str(),
                   VktUtil::WriteUint64AsString((uint64_t)fence));
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer);
@@ -464,7 +465,7 @@ VkResult VktWrappedQueue::QueueBindSparse(VkQueue queue, uint32_t bindInfoCount,
         sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s, %s",
                   VktUtil::WritePointerAsString(queue),
                   bindInfoCount,
-                  PrintArrayWithFormatter(bindInfoCount, pBindInfo, POINTER_SUFFIX "%p").c_str(),
+                  PrintArrayWithFormatter(bindInfoCount, pBindInfo, GT_POINTER_FORMAT).c_str(),
                   VktUtil::WriteUint64AsString((uint64_t)fence));
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer);

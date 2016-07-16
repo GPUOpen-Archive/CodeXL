@@ -2036,11 +2036,9 @@ bool pdLinuxProcessDebugger::setDebuggedProcessEnvVariables()
     osModule glModule;
     gtString errorMessage;
     osFilePath libGLPath(OS_OPENGL_MODULE_NAME);
-    bool rcload = glModule.loadModule(libGLPath, &errorMessage, false);
+    bool rcLoad = glModule.loadModule(libGLPath, &errorMessage, false);
 
-    GT_UNREFERENCED_PARAMETER(rcload);
-
-    GT_IF_WITH_ASSERT(errorMessage.isEmpty())
+    GT_IF_WITH_ASSERT(rcLoad && errorMessage.isEmpty())
     {
         osFilePath path;
         bool rcPth = osGetLoadedModulePath(glModule.GetModuleHandle(), path);

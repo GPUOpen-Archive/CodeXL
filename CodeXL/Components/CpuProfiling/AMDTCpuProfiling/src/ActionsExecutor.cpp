@@ -143,7 +143,7 @@ void ActionsExecutor::handleUiUpdate(int actionIndex)
             gtString ext;
             pSubWindow->filePath().getFileExtension(ext);
 
-            isActionEnabled = (ext == L"ebp");
+            isActionEnabled = (ext == DATA_EXT);
         }
     }
 

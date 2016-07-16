@@ -43,6 +43,8 @@ class acTablePercentItemDelegate;
     #define END_TICK_COUNT(field)
 #endif
 
+void mergedProfileDataVectors(gtVector<AMDTProfileData>& data);
+
 /// -----------------------------------------------------------------------------------------------
 /// \class Name: CPUProfileDataTable : public acListCtrl
 /// \brief Description:  This class will be used to display a table of data in CPU profiling views
@@ -191,6 +193,7 @@ protected:
                  AMDTUInt32 iconColIndex,
                  AMDTUInt32 toolTipColidx,
                  bool is32Bit, int idxRole);
+
 
     shared_ptr<DisplayFilter>  m_pDisplayFilter = nullptr;
     shared_ptr<cxlProfileDataReader> m_pProfDataRdr = nullptr;

@@ -57,7 +57,8 @@ bool XcbWindow::InitConnection()
 /// \returns True if initialization is successful.
 bool XcbWindow::Initialize()
 {
-    uint32_t value_mask, value_list[32];
+    uint32_t value_mask;
+    uint32_t value_list[32] = {};
 
     if (!InitConnection())
     {
@@ -129,9 +130,7 @@ bool XcbWindow::Update()
 {
     bool result = true;
 
-    xcb_generic_event_t* event;
-
-    event = xcb_poll_for_event(mConnection);
+    xcb_generic_event_t* event = xcb_poll_for_event(mConnection);
 
     if (event)
     {

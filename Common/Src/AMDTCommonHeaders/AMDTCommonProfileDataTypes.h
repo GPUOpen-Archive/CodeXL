@@ -245,6 +245,8 @@ struct AMDTProfileFunctionInfo
     gtUInt32          m_size = 0;
 };
 
+using AMDTProfileFunctionInfoVec = gtVector<AMDTProfileFunctionInfo>;
+
 struct AMDTSampleValue
 {
     AMDTCounterId           m_counterId = AMDT_PROFILE_ALL_COUNTERS;

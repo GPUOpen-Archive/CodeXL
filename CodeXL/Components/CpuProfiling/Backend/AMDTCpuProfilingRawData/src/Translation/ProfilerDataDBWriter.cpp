@@ -179,7 +179,7 @@ bool ProfilerDataDBWriter::Initialize(const gtString& path)
         }
 
         gtString dbExtn;
-        m_pCpuProfDbAdapter->GetDbFileExtension(dbExtn);
+        m_pCpuProfDbAdapter->GetDbFileExtension(AMDT_PROFILE_MODE_AGGREGATION, dbExtn);
 
         if (!dbPath.endsWith(dbExtn))
         {

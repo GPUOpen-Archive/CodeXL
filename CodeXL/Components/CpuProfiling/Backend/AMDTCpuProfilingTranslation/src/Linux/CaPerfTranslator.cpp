@@ -3360,7 +3360,7 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
 #endif
 
     // Create an empty .ebp file till we remove complete dependency from GUI
-    osFilePath ebpFilePath(woutputFile);
+    /*osFilePath ebpFilePath(woutputFile);
     ebpFilePath.setFileExtension(L"ebp");
 
     if (!ebpFilePath.exists())
@@ -3368,7 +3368,7 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
         osFile ebpFile(ebpFilePath);
         ebpFile.open(osChannel::OS_ASCII_TEXT_CHANNEL, osFile::OS_OPEN_TO_WRITE);
         ebpFile.close();
-    }
+    }*/
 
     gettimeofday(&ebp_timerStop, nullptr);
     memcpy(&css_timerStart, &ebp_timerStop, sizeof(struct timeval));
@@ -3724,6 +3724,9 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
             {
                 gtUInt32 modSize = module.second.m_size;
 
+                bool isJitModule = ((CpuProfileModule::JAVAMODULE == module.second.getModType())
+                    || (CpuProfileModule::MANAGEDPE == module.second.getModType())) ? true : false;
+
                 for (auto fit = module.second.getBeginFunction(); fit != module.second.getEndFunction(); ++fit)
                 {
                     gtUInt32 funcId = module.second.m_moduleId;
@@ -3737,21 +3740,29 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
                         gtUInt32 moduleInstanceid = 0ULL;
                         gtVAddr  modLoadAddr = 0ULL;
 
-                        for (const auto& it : module.second.m_moduleInstanceInfo)
+                        if (!isJitModule)
                         {
-                            modLoadAddr = std::get<1>(it);
-                            gtVAddr modEndAddr = modLoadAddr + modSize;
-
-                            if ((std::get<0>(it) == pid))
+                            for (const auto& it : module.second.m_moduleInstanceInfo)
                             {
-                                // 1. sampleAddr falls within module size limit.
-                                // 2. module size is 0, pick the first match.
-                                if ((modLoadAddr <= sampleAddr) && ((sampleAddr < modEndAddr) || (0 == modSize)))
+                                modLoadAddr = std::get<1>(it);
+                                gtVAddr modEndAddr = modLoadAddr + modSize;
+
+                                if ((std::get<0>(it) == pid))
                                 {
-                                    moduleInstanceid = std::get<2>(it);
-                                    break;
+                                    // 1. sampleAddr falls within module size limit.
+                                    // 2. module size is 0, pick the first match.
+                                    if ((modLoadAddr <= sampleAddr) && ((sampleAddr < modEndAddr) || (0 == modSize)))
+                                    {
+                                        moduleInstanceid = std::get<2>(it);
+                                        break;
+                                    }
                                 }
                             }
+                        }
+                        else
+                        {
+                            modLoadAddr = fit->second.getBaseAddr();
+                            moduleInstanceid = fit->second.m_functionId;
                         }
 
                         // sample address offset is w.r.t. module load address
