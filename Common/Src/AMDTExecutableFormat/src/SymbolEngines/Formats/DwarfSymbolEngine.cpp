@@ -298,6 +298,7 @@ bool DwarfSymbolEngine::AddInlinedFuncInfo(Dwarf_Die die, Dwarf_Addr addrLow, Dw
     funcInfo.m_size = static_cast<gtRVAddr>(addrHigh - addrLow);
     funcInfo.m_pName = ExtractSubprogramName(m_dbg, die);
     funcInfo.m_addrRanges = addrRanges;
+    funcInfo.m_funcId = AtomicAdd(m_nextFuncId, 1);
     UpdateInlinedFunctionName(funcInfo);
 
     auto res = m_inlinedFuncsInfo.insert(FunctionsMap::value_type(funcInfo, false));
