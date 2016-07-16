@@ -41,7 +41,7 @@ public:
     /// Select and set the focus on the selected function
     /// \param - functionName the function name
     /// \param - pid the process ID
-    void selectFunction(const QString& functionName, ProcessIdType pid);
+    //void selectFunction(const QString& functionName, ProcessIdType pid);
     void selectFunction(const QString& funcId);
 
 

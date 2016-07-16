@@ -63,7 +63,7 @@ enum CallGraphButterflyColumns
 
 enum CallGraphFunctionsColumns
 {
-	CALLGRAPH_FUNCTION_NAME = 0,
+    CALLGRAPH_FUNCTION_NAME = 0,
     CALLGRAPH_FUNCTION_SELF_SAMPLES,
     CALLGRAPH_FUNCTION_DEEP_SAMPLES,
     CALLGRAPH_FUNCTION_DEEP_SAMPLE_PERCENTAGE,
@@ -145,8 +145,8 @@ public:
     FunctionsTreeCtrl* functionsTreeControl() const {return m_pFuncTable;}
 
     bool setFunction(gtUInt64 functionIndex);
-	void SetFunctionPath(shared_ptr<cxlProfileDataReader> pProfDataRdr, AMDTFunctionId funcId, AMDTUInt32 processId, bool displaySysMod);
-	//void SetFunctionPath(CpuProfileCss& css, const FunctionGraph::Node& funcNode);
+    void SetFunctionPath(shared_ptr<cxlProfileDataReader> pProfDataRdr, AMDTFunctionId funcId, AMDTUInt32 processId, bool displaySysMod);
+    //void SetFunctionPath(CpuProfileCss& css, const FunctionGraph::Node& funcNode);
 
     void setWindowTitle(const QString& title)  // Overload this
     {
@@ -172,11 +172,11 @@ signals:
 
 private:
     //CallGraphFuncListItem* AcquireTopLevelItem(const FunctionGraph::Node* pFuncNode);
-	CallGraphFuncListItem* AcquireTopLevelItem(AMDTFunctionId funcId, gtString funcName, gtString modulePath);
+    CallGraphFuncListItem* AcquireTopLevelItem(AMDTFunctionId funcId, gtString funcName, gtString modulePath);
     //CallGraphFuncListItem* AcquireChildItem(CallGraphFuncListItem* pParentItem, const FunctionGraph::Node* pFuncNode);
-	CallGraphFuncListItem* AcquireChildItem(CallGraphFuncListItem* pParentItem, AMDTFunctionId funcId, gtString funcName, gtString modulePath);
-    void InitializeItem(CallGraphFuncListItem* pFuncListItem);
-	void InitializeItem(CallGraphFuncListItem* pFuncListItem, gtString funcName, gtString modulePath);
+    CallGraphFuncListItem* AcquireChildItem(CallGraphFuncListItem* pParentItem, AMDTFunctionId funcId, gtString funcName, gtString modulePath);
+    //void InitializeItem(CallGraphFuncListItem* pFuncListItem);
+    void InitializeItem(CallGraphFuncListItem* pFuncListItem, gtString funcName, gtString modulePath);
     /// resize function name column
     void ResizeFunctionNameColumn();
 
@@ -188,8 +188,9 @@ private:
 class CallGraphFuncListItem : public QTreeWidgetItem
 {
 public:
-	explicit CallGraphFuncListItem(const FunctionGraph::Node* pFuncNode = nullptr);
-	explicit CallGraphFuncListItem(AMDTFunctionId funcId) { m_functionId = funcId;}
+    //explicit CallGraphFuncListItem(const FunctionGraph::Node* pFuncNode = nullptr);
+    CallGraphFuncListItem();
+    explicit CallGraphFuncListItem(AMDTFunctionId funcId) { m_functionId = funcId;}
     CallGraphFuncListItem(acTreeCtrl* pParent, QTreeWidgetItem* pAfter);
     CallGraphFuncListItem(QTreeWidgetItem* pParent, QTreeWidgetItem* pAfter);
     virtual ~CallGraphFuncListItem();
@@ -199,11 +200,11 @@ public:
     void SetPercentageValue(int column, double numerator, double denominator);
 
     const FunctionGraph::Node* m_pFuncNode;
-	AMDTUInt32	m_functionId;
-	gtUInt64	m_selfSample;
-	gtUInt64	m_moduleId;
-	gtString	m_functionName;
-	gtString	m_moduleName;
+    AMDTUInt32  m_functionId;
+    gtUInt64    m_selfSample;
+    gtUInt64    m_moduleId;
+    gtString    m_functionName;
+    gtString    m_moduleName;
 };
 
 class CallGraphFuncList : public QWidget
@@ -216,7 +217,7 @@ public:
     void Initialize();
     void clear();
     void sortByColumn(int column, Qt::SortOrder order);
-    CallGraphFuncListItem* DisplayFunctions(CpuProfileCss& css, int precision);
+    //CallGraphFuncListItem* DisplayFunctions(CpuProfileCss& css, int precision);
     FunctionsTreeCtrl* functionsTreeControl() const { return m_pFuncTable; }
 
     void setWindowTitle(const QString& title);
@@ -227,7 +228,7 @@ public:
 
     void SetFunctionNameHeader(int totalFuncCount, int shownFuncCount);
 
-    CallGraphFuncListItem* FindTopLevelItem(const FunctionGraph::Node& funcNode);
+    //CallGraphFuncListItem* FindTopLevelItem(const FunctionGraph::Node& funcNode);
 
     // insert new row to list - indication for empty table
     void InitEmptyTableRow();
@@ -236,11 +237,11 @@ public:
     bool FillDisplayFuncList(shared_ptr<cxlProfileDataReader> pProfDataRdr,
                              bool isSystemDLLIgnored,
                              AMDTUInt32 counterId,
-                             AMDTUInt32 processId, 
-		AMDTFunctionId& funcIdMaxSamples);
+                             AMDTUInt32 processId,
+                             AMDTFunctionId& funcIdMaxSamples);
 
     CallGraphFuncListItem* AddFuncListItem(AMDTFunctionId functionId,
-										   gtString functionName,
+                                           gtString functionName,
                                            gtUInt64 totalSelfSamples,
                                            gtUInt64 totalDeepSamples,
                                            double   deepSamplesPerc,
@@ -248,9 +249,9 @@ public:
                                            gtString srcFile,
                                            gtString moduleName,
                                            gtUInt32 srcFileLine,
-										AMDTUInt32 moduleId);
+                                           AMDTUInt32 moduleId);
 
-	std::map<gtString, std::pair<int, AMDTFunctionId>> m_FuncNameIdxMap;
+    std::map<gtString, std::pair<int, AMDTFunctionId>> m_FuncNameIdxMap;
 
 public slots:
     void selectAFunction(AMDTFunctionId funcId);
@@ -275,12 +276,14 @@ protected:
     CallGraphFuncListItem* m_pEmptyTableMsgItem;
 
 private:
+#if 0
     CallGraphFuncListItem* AddTopLevelItem(const FunctionGraph::Node& funcNode,
                                            unsigned pathsNumber, gtUInt64 selfCount, gtUInt64 deepCount);
+#endif
     /// resize function name column
     void ResizeFunctionNameColumn();
-	QString GetFileNameEntry(const gtString& srcFile, int srcLIne);
-	QString GetModuleNameEntry(const gtString& moduleName);
+    QString GetFileNameEntry(const gtString& srcFile, int srcLIne);
+    QString GetModuleNameEntry(const gtString& moduleName);
 
     FunctionsTreeCtrl* m_pFuncTable;
     gtUInt64 m_DeepSampleTotal;
@@ -314,14 +317,14 @@ public:
     void SetParentsFunction(shared_ptr<cxlProfileDataReader> pProfDataRdr,
                             bool displaySystemModule,
                             AMDTUInt32 processId,
-                            AMDTUInt32 counterId, 
-		AMDTFunctionId	funcId);
+                            AMDTUInt32 counterId,
+                            AMDTFunctionId  funcId);
 
     void SetChildrenFunction(shared_ptr<cxlProfileDataReader> pProfDataRdr,
                              bool displaySystemModule,
                              AMDTUInt32 processId,
-                             AMDTUInt32 counterId, 
-		AMDTFunctionId	funcId);
+                             AMDTUInt32 counterId,
+                             AMDTFunctionId  funcId);
 
     void setWindowTitle(const QString& title)  // Overload this
     {
@@ -340,6 +343,8 @@ signals:
     void functionSelected(AMDTFunctionId funcId);
 
 private:
+
+#if 0
     CallGraphFuncListItem* AddTopLevelItem(FunctionsTreeCtrl& treeCtrl,
                                            const CpuProfileModule* pModule,
                                            const FunctionGraph::Node* pFuncNode,
@@ -348,14 +353,16 @@ private:
                                            double totalDeepCount,
                                            bool noSamples);
 
-
-	CallGraphFuncListItem* AddTopLevelItem(FunctionsTreeCtrl& treeCtrl,
-											const gtString modulePath,
-											const gtString& funcName,
-											double samplesCount,
-											double totalDeepCount,
-											double samplePercent,
-											bool noSamples);
+#endif
+    CallGraphFuncListItem* AddTopLevelItem(FunctionsTreeCtrl& treeCtrl,
+                                           const gtString modulePath,
+                                           AMDTModuleId moduleId,
+                                           const gtString& funcName,
+                                           AMDTFunctionId funcId,
+                                           double samplesCount,
+                                           double totalDeepCount,
+                                           double samplePercent,
+                                           bool noSamples);
     QTreeWidget* m_pLastTree;
     SessionCallGraphView* m_pCallGraphTab;
 
@@ -382,10 +389,11 @@ public:
 
     void showPid(unsigned int pid);
     //void ShowParentChild(CpuProfileCss& css, const FunctionGraph::Node& funcNode);
-	bool ShowParentChild(AMDTFunctionId functionId);
-    void selectFunction(AMDTFunctionId functionId);
-	void selectFunction(const QString& functionName, ProcessIdType pid);
-	void ShowPaths(AMDTFunctionId functionId);
+    bool ShowParentChild(AMDTFunctionId functionId);
+    //void selectFunction(AMDTFunctionId functionId);
+    //void selectFunction(const QString& functionName, ProcessIdType pid);
+    void selectFunction(AMDTFunctionId functionId, ProcessIdType pid);
+    void ShowPaths(AMDTFunctionId functionId);
 
     ColumnSpec m_cuurentColSpec;
 
@@ -395,7 +403,8 @@ public:
 
     EventMaskType getFilterEvent() const;
 
-    void displayInFunctionView(const QString& functionName);
+    //void displayInFunctionView(const QString& functionName);
+    void displayInFunctionView(AMDTFunctionId funcId);
 
 protected:
 
@@ -423,13 +432,13 @@ private:
     int getPidFromProcessString(QString processString);
 
     //selected pid and counterId
-    AMDTUInt32				m_selectedPID;
-	AMDTUInt32				m_selectedCounter;
-	AMDTFunctionId			m_selectedFuncId;
-	bool					m_isSystemDLLDisplayed	= false;
+    AMDTUInt32              m_selectedPID;
+    AMDTUInt32              m_selectedCounter;
+    AMDTFunctionId          m_selectedFuncId;
+    bool                    m_isSystemDLLDisplayed  = false;
 
     std::vector<AMDTUInt32> m_hotSpotCounterIdMap;
-	std::map<gtString, AMDTFunctionId> m_FunctionNameIdMap;
+    std::map<gtString, AMDTFunctionId> m_FunctionNameIdMap;
 
 public slots:
     void OnDblClicked(QTreeWidgetItem* pItem);
@@ -453,10 +462,10 @@ public slots:
 
 signals:
 
-	void functionSelected(AMDTFunctionId funcId);
+    void functionSelected(AMDTFunctionId funcId);
     void showParentChildFunction(gtUInt64 selFuncIndex);
     void showSelectedPaths(gtUInt64 selFuncIndex);
     //void functionActivated(gtVAddr functionAddress, ProcessIdType pid, ThreadIdType tid, const CpuProfileModule* pModule);
-	void opensourceCodeViewSig(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> funcModInfo);
+    void opensourceCodeViewSig(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> funcModInfo);
 
 };

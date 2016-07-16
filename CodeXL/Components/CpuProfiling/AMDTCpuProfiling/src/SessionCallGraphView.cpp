@@ -96,104 +96,9 @@ void CallGraphPathFuncList::clear()
     }
 }
 
-void CallGraphPathFuncList::InitializeItem(CallGraphFuncListItem* pFuncListItem)
-{
-    const CssFunctionMetadata* pMetadata = static_cast<const CssFunctionMetadata*>(pFuncListItem->m_pFuncNode->m_val);
-
-    pFuncListItem->setText(CALLGRAPH_PATH_TREE, pMetadata->m_funcName);
-
-    pFuncListItem->setText(CALLGRAPH_PATH_SELF, QString());
-    pFuncListItem->setTextAlignment(CALLGRAPH_PATH_SELF, Qt::AlignLeft | Qt::AlignVCenter);
-
-    pFuncListItem->setText(CALLGRAPH_PATH_DOWNSTREAM_SAMPLES, QString());
-    pFuncListItem->setTextAlignment(CALLGRAPH_PATH_DOWNSTREAM_SAMPLES, Qt::AlignLeft | Qt::AlignVCenter);
-
-    pFuncListItem->setText(CALLGRAPH_PATH_DOWNSTREAM_PERCENTAGE, QString());
-
-    gtString moduleName;
-
-    if (nullptr != pMetadata->m_pModule)
-    {
-        if (pMetadata->m_pModule->extractFileName(moduleName))
-        {
-            pFuncListItem->setToolTip(CALLGRAPH_PATH_MODULE, acGTStringToQString(pMetadata->m_pModule->getPath()));
-        }
-    }
-
-    pFuncListItem->setText(CALLGRAPH_PATH_MODULE, acGTStringToQString(moduleName));
-}
-
-#if 0
-CallGraphFuncListItem* CallGraphPathFuncList::AcquireTopLevelItem(const FunctionGraph::Node* pFuncNode)
-{
-    // Search for a matching top level item
-    CallGraphFuncListItem* pFuncListItem = nullptr;
-
-    for (int itemIndex = 0, itemsCount = m_pFuncTable->topLevelItemCount(); itemIndex < itemsCount; ++itemIndex)
-    {
-        CallGraphFuncListItem* pCurrFuncListItem = static_cast<CallGraphFuncListItem*>(m_pFuncTable->topLevelItem(itemIndex));
-
-        if (nullptr != pCurrFuncListItem && nullptr != pCurrFuncListItem->m_pFuncNode)
-        {
-            if (pFuncNode == pCurrFuncListItem->m_pFuncNode)
-            {
-                pFuncListItem = pCurrFuncListItem;
-                break;
-            }
-        }
-    }
-
-    if (nullptr == pFuncListItem)
-    {
-        pFuncListItem = new CallGraphFuncListItem(pFuncNode);
-        m_pFuncTable->addTopLevelItem(pFuncListItem);
-
-        InitializeItem(pFuncListItem);
-    }
-
-    return pFuncListItem;
-}
-
-CallGraphFuncListItem* CallGraphPathFuncList::AcquireChildItem(CallGraphFuncListItem* pParentItem, const FunctionGraph::Node* pFuncNode)
-{
-    CallGraphFuncListItem* pFuncListItem;
-
-    if (nullptr != pParentItem)
-    {
-        // Search for a matching child item
-        pFuncListItem = nullptr;
-
-        for (int itemIndex = 0, itemsCount = pParentItem->childCount(); itemIndex < itemsCount; ++itemIndex)
-        {
-            CallGraphFuncListItem* pCurrFuncListItem = static_cast<CallGraphFuncListItem*>(pParentItem->child(itemIndex));
-
-            if (nullptr != pCurrFuncListItem && nullptr != pCurrFuncListItem->m_pFuncNode)
-            {
-                if (pFuncNode == pCurrFuncListItem->m_pFuncNode)
-                {
-                    pFuncListItem = pCurrFuncListItem;
-                    break;
-                }
-            }
-        }
 
 
-        if (nullptr == pFuncListItem)
-        {
-            pFuncListItem = new CallGraphFuncListItem(pFuncNode);
-            pParentItem->addChild(pFuncListItem);
 
-            InitializeItem(pFuncListItem);
-        }
-    }
-    else
-    {
-        pFuncListItem = AcquireTopLevelItem(pFuncNode);
-    }
-
-    return pFuncListItem;
-}
-#endif
 
 CallGraphFuncListItem* CallGraphPathFuncList::AcquireTopLevelItem(AMDTFunctionId funcId, gtString funcName, gtString modulePath)
 {
@@ -372,6 +277,12 @@ void CallGraphPathFuncList::OnDblClicked(QTreeWidgetItem* pItem)
 
 void CallGraphPathFuncList::onSelectionChanged()
 {
+    CallGraphFuncListItem* pFuncListItem = static_cast<CallGraphFuncListItem*>(m_pFuncTable->currentItem());
+
+    if (nullptr != pFuncListItem)
+    {
+        emit functionSelected(pFuncListItem->m_functionId);
+    }
 }
 
 void CallGraphPathFuncList::onFunctionClicked(QTreeWidgetItem* pItem)
@@ -523,17 +434,18 @@ void CallGraphPathFuncList::ResizeFunctionNameColumn()
 // Class CallGraphFuncListItem
 // ***************************
 
-CallGraphFuncListItem::CallGraphFuncListItem(acTreeCtrl* pParent, QTreeWidgetItem* pAfter) : QTreeWidgetItem(pParent, pAfter),
-    m_pFuncNode(nullptr)
+CallGraphFuncListItem::CallGraphFuncListItem(acTreeCtrl* pParent, QTreeWidgetItem* pAfter) : QTreeWidgetItem(pParent, pAfter)/*,
+    m_pFuncNode(nullptr)*/
 {
 }
 
-CallGraphFuncListItem::CallGraphFuncListItem(QTreeWidgetItem* pParent, QTreeWidgetItem* pAfter) : QTreeWidgetItem(pParent, pAfter),
-    m_pFuncNode(nullptr)
+CallGraphFuncListItem::CallGraphFuncListItem(QTreeWidgetItem* pParent, QTreeWidgetItem* pAfter) : QTreeWidgetItem(pParent, pAfter)/*,
+    m_pFuncNode(nullptr)*/
 {
 }
 
-CallGraphFuncListItem::CallGraphFuncListItem(const FunctionGraph::Node* pFuncNode) : m_pFuncNode(pFuncNode)
+CallGraphFuncListItem::CallGraphFuncListItem(/*const FunctionGraph::Node* pFuncNode*/) /*: m_pFuncNode(pFuncNode)
+*/
 {
 }
 
@@ -611,7 +523,7 @@ void CallGraphFuncList::OnDblClicked(QTreeWidgetItem* pItem)
     {
         CallGraphFuncListItem* pFuncListItem = static_cast<CallGraphFuncListItem*>(pItem);
 
-        if (nullptr != pFuncListItem->m_pFuncNode)
+        if (nullptr != pFuncListItem)
         {
             emit functionSelected(pFuncListItem->m_functionId);
         }
@@ -637,7 +549,7 @@ void CallGraphFuncList::onFunctionClicked(QTreeWidgetItem* pItem)
     {
         CallGraphFuncListItem* pFuncListItem = static_cast<CallGraphFuncListItem*>(pItem);
 
-        if (nullptr != pFuncListItem->m_pFuncNode)
+        if (nullptr != pFuncListItem)
         {
             emit functionSelected(pFuncListItem->m_functionId);
         }
@@ -652,7 +564,60 @@ void CallGraphFuncList::sortIndicatorChanged(int col, Qt::SortOrder order)
 
 void CallGraphFuncList::selectAFunction(AMDTFunctionId funcId)
 {
-    funcId = funcId; //unused
+    GT_IF_WITH_ASSERT(nullptr != m_pCallGraphTab && nullptr != m_pFuncTable)
+    {
+        if (nullptr != m_pCallGraphTab->m_pPathFuncTable)
+        {
+            m_pCallGraphTab->m_pPathFuncTable->blockSignals(true);
+        }
+
+        if (nullptr != m_pCallGraphTab->m_pFuncTable)
+        {
+            m_pCallGraphTab->m_pFuncTable->blockSignals(true);
+        }
+
+        if (nullptr != m_pCallGraphTab->m_pButterfly)
+        {
+            m_pCallGraphTab->m_pButterfly->blockSignals(true);
+        }
+
+        for (QTreeWidgetItemIterator itemIterator(m_pFuncTable); nullptr != *itemIterator; ++itemIterator)
+        {
+            CallGraphFuncListItem* pFuncListItem = static_cast<CallGraphFuncListItem*>(*itemIterator);
+
+            if (funcId == pFuncListItem->m_functionId)
+            {
+                if (!pFuncListItem->isHidden())
+                {
+                    pFuncListItem->setSelected(true);
+                    m_pFuncTable->scrollToItem(pFuncListItem);
+                }
+                else
+                {
+                    pFuncListItem->setSelected(false);
+                }
+            }
+            else
+            {
+                pFuncListItem->setSelected(false);
+            }
+        }
+
+        if (nullptr != m_pCallGraphTab->m_pPathFuncTable)
+        {
+            m_pCallGraphTab->m_pPathFuncTable->blockSignals(false);
+        }
+
+        if (nullptr != m_pCallGraphTab->m_pFuncTable)
+        {
+            m_pCallGraphTab->m_pFuncTable->blockSignals(false);
+        }
+
+        if (nullptr != m_pCallGraphTab->m_pButterfly)
+        {
+            m_pCallGraphTab->m_pButterfly->blockSignals(false);
+        }
+    }
 }
 
 void CallGraphFuncList::onCurrentListItemChanged(QTreeWidgetItem* pItem)
@@ -806,26 +771,7 @@ void CallGraphFuncList::Initialize()
     GT_ASSERT(rc);
 }
 
-CallGraphFuncListItem* CallGraphFuncList::FindTopLevelItem(const FunctionGraph::Node& funcNode)
-{
-    CallGraphFuncListItem* pFuncListItem = nullptr;
 
-    for (int itemIndex = 0, itemsCount = m_pFuncTable->topLevelItemCount(); itemIndex < itemsCount; ++itemIndex)
-    {
-        CallGraphFuncListItem* pCurrFuncListItem = static_cast<CallGraphFuncListItem*>(m_pFuncTable->topLevelItem(itemIndex));
-
-        if (nullptr != pCurrFuncListItem && nullptr != pCurrFuncListItem->m_pFuncNode)
-        {
-            if (&funcNode == pCurrFuncListItem->m_pFuncNode)
-            {
-                pFuncListItem = pCurrFuncListItem;
-                break;
-            }
-        }
-    }
-
-    return pFuncListItem;
-}
 
 QString CallGraphFuncList::GetFileNameEntry(const gtString& srcFile, int srcFileLine)
 {
@@ -946,89 +892,7 @@ CallGraphFuncListItem* CallGraphFuncList::AddFuncListItem(AMDTFunctionId functio
     return pFuncListItem;
 }
 
-CallGraphFuncListItem* CallGraphFuncList::AddTopLevelItem(const FunctionGraph::Node& funcNode,
-                                                          unsigned pathsNumber, gtUInt64 selfCount, gtUInt64 deepCount)
-{
-    CallGraphFuncListItem* pFuncListItem = new CallGraphFuncListItem(&funcNode);
-    m_pFuncTable->addTopLevelItem(pFuncListItem);
 
-    CssFunctionMetadata* pMetadata = static_cast<CssFunctionMetadata*>(funcNode.m_val);
-
-    pMetadata->m_selfCount = selfCount;
-    pMetadata->m_deepCount = deepCount;
-
-    if (nullptr == pMetadata->m_pModule || nullptr == pMetadata->m_pFunction ||
-        pMetadata->m_pModule->isUnchartedFunction(*pMetadata->m_pFunction))
-    {
-        pFuncListItem->setToolTip(CALLGRAPH_FUNCTION_NAME, QString::fromWCharArray(L"No debug info available"));
-    }
-
-    pFuncListItem->setText(CALLGRAPH_FUNCTION_NAME, pMetadata->m_funcName);
-
-    if (0ULL != selfCount)
-    {
-        pFuncListItem->setData(CALLGRAPH_FUNCTION_SELF_SAMPLES, Qt::DisplayRole, QVariant(static_cast<qulonglong>(selfCount)));
-        pFuncListItem->setTextAlignment(CALLGRAPH_FUNCTION_SELF_SAMPLES, Qt::AlignLeft | Qt::AlignVCenter);
-    }
-    else
-    {
-        pFuncListItem->setText(CALLGRAPH_FUNCTION_SELF_SAMPLES, "");
-    }
-
-    if (0ULL != deepCount)
-    {
-        pFuncListItem->setData(CALLGRAPH_FUNCTION_DEEP_SAMPLES, Qt::DisplayRole, QVariant(static_cast<qulonglong>(deepCount)));
-        pFuncListItem->setTextAlignment(CALLGRAPH_FUNCTION_DEEP_SAMPLES, Qt::AlignLeft | Qt::AlignVCenter);
-    }
-    else
-    {
-        pFuncListItem->setText(CALLGRAPH_FUNCTION_DEEP_SAMPLES, "");
-    }
-
-    pFuncListItem->setText(CALLGRAPH_FUNCTION_DEEP_SAMPLE_PERCENTAGE, "");
-
-    if (0U != pathsNumber)
-    {
-        pFuncListItem->setData(CALLGRAPH_FUNCTION_PATH_CNT, Qt::DisplayRole,  QVariant(pathsNumber));
-        pFuncListItem->setTextAlignment(CALLGRAPH_FUNCTION_PATH_CNT, Qt::AlignLeft | Qt::AlignVCenter);
-    }
-    else
-    {
-        pFuncListItem->setText(CALLGRAPH_FUNCTION_PATH_CNT, "");
-    }
-
-#ifdef CSS_FUNC_PATH_INFO
-    //TODO: Remove path samples information!
-    pFuncListItem->setText(CALLGRAPH_FUNCTION_PATH_SAMPLES, "");
-    pFuncListItem->setText(CALLGRAPH_FUNCTION_PATH_SAMPLES_PER_PATH, "");
-#endif
-
-    gtString sourceInfo;
-
-    if (nullptr != pMetadata->m_pFunction)
-    {
-        pMetadata->m_pFunction->getSourceInfo(sourceInfo);
-
-        if (!sourceInfo.isEmpty())
-        {
-            pFuncListItem->setToolTip(CALLGRAPH_FUNCTION_SOURCE_FILE, acGTStringToQString(pMetadata->m_pFunction->getSourceFile()));
-        }
-    }
-
-    pFuncListItem->setText(CALLGRAPH_FUNCTION_SOURCE_FILE, acGTStringToQString(sourceInfo));
-
-    gtString modFileName;
-
-    if (nullptr != pMetadata->m_pModule && !pMetadata->m_pModule->getPath().isEmpty())
-    {
-        pMetadata->m_pModule->extractFileName(modFileName);
-        pFuncListItem->setToolTip(CALLGRAPH_FUNCTION_MODULE, acGTStringToQString(pMetadata->m_pModule->getPath()));
-    }
-
-    pFuncListItem->setText(CALLGRAPH_FUNCTION_MODULE, acGTStringToQString(modFileName));
-
-    return pFuncListItem;
-}
 
 bool SessionCallGraphView::ShowParentChild(AMDTFunctionId functionId)
 {
@@ -1042,15 +906,16 @@ bool SessionCallGraphView::ShowParentChild(AMDTFunctionId functionId)
         {
             m_pButterfly->clear();
 
-			AMDTProfileFunctionData  functionData;
-			ret = m_pProfDataRdr->GetFunctionData(functionId,
-												m_selectedPID,
-												AMDT_PROFILE_ALL_THREADS,
-												functionData);
-			if (ret)
-			{
-				m_pButterfly->setWindowTitle(tr("Immediate Parents and Children of Function: <b>") + acGTStringToQString(functionData.m_functionInfo.m_name) + "</b>");
-			}
+            AMDTProfileFunctionData  functionData;
+            ret = m_pProfDataRdr->GetFunctionData(functionId,
+                                                  m_selectedPID,
+                                                  AMDT_PROFILE_ALL_THREADS,
+                                                  functionData);
+
+            if (ret)
+            {
+                m_pButterfly->setWindowTitle(tr("Immediate Parents and Children of Function: <b>") + acGTStringToQString(functionData.m_functionInfo.m_name) + "</b>");
+            }
 
             m_pButterfly->SetChildrenFunction(m_pProfDataRdr,
                                               !m_pDisplayFilter->IsSystemModuleIgnored(),
@@ -1138,189 +1003,7 @@ bool CallGraphFuncList::FillDisplayFuncList(shared_ptr<cxlProfileDataReader> pPr
     return ret;
 }
 
-CallGraphFuncListItem* CallGraphFuncList::DisplayFunctions(CpuProfileCss& css, int precision)
-{
-    (void)precision; // Unused
 
-    CallGraphFuncListItem* pSelectedItem = nullptr;
-
-    if (m_pFuncTable != nullptr)
-    {
-        // Block the table model signals, otherwise the table is sorted while setting the data (which causes a mess).
-        m_pFuncTable->blockSignals(true);
-
-        clear();
-
-        m_pFuncTable->setSortingEnabled(false);
-
-        const bool displaySystemModules = CPUGlobalDisplayFilter::instance().m_displaySystemDLLs;
-
-        const EventMaskType eventId = css.GetEventId();
-        FunctionGraph& funcGraph = css.GetFunctionGraph();
-
-        int totalFuncCount = 0;
-        int shownFuncCount = 0;
-
-        gtUInt64 selfCountMax = 0ULL;
-        gtUInt64 deepCountMax = 0ULL;
-
-        gtUInt64 totalCount = 0ULL;
-
-        for (FunctionGraph::const_node_iterator itFunc = funcGraph.GetBeginNode(), itFuncEnd = funcGraph.GetEndNode();
-             itFunc != itFuncEnd; ++itFunc)
-        {
-            const FunctionGraph::Node& funcNode = *itFunc;
-
-            unsigned pathsNumber = 0U;
-            gtUInt64 selfCount = 0ULL;
-            gtUInt64 deepCount = 0ULL;
-
-            for (PathIndexSet::const_iterator it = funcNode.m_pathIndices.begin(), itEnd = funcNode.m_pathIndices.end();
-                 it != itEnd; ++it)
-            {
-                const FunctionGraph::Path& path = *funcGraph.GetPath(*it);
-                const LeafFunctionList& leaves = path.GetData();
-
-                bool isRootFound = false;
-
-                for (FunctionGraph::Path::const_iterator itNode = path.begin(), itNodeEnd = path.end(); itNode != itNodeEnd; ++itNode)
-                {
-                    if (&*itNode == &funcNode)
-                    {
-                        isRootFound = true;
-                        break;
-                    }
-                }
-
-                const FunctionGraph::Node* pPrevLeafNode = nullptr;
-
-                for (LeafFunctionList::const_iterator itLeaf = leaves.begin(), itLeafEnd = leaves.end(); itLeaf != itLeafEnd; ++itLeaf)
-                {
-                    const LeafFunction& leaf = *itLeaf;
-
-                    if (eventId == EventMaskType(-1) || eventId == leaf.m_eventId)
-                    {
-                        const bool isCurrentNode = (&funcNode == leaf.m_pNode);
-
-                        if (isCurrentNode)
-                        {
-                            selfCount += leaf.m_count;
-                        }
-
-                        if (isCurrentNode || isRootFound)
-                        {
-                            deepCount += leaf.m_count;
-
-                            if (pPrevLeafNode != leaf.m_pNode)
-                            {
-                                pPrevLeafNode = leaf.m_pNode;
-                                pathsNumber++;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (0U == pathsNumber)
-            {
-                continue;
-            }
-
-            totalCount += selfCount;
-            totalFuncCount++;
-
-            CallGraphFuncListItem* pFuncListItem = AddTopLevelItem(funcNode, pathsNumber, selfCount, deepCount);
-
-            bool hidden = false;
-
-            // If system libs hidden, determine whether this is a system library
-            if (!displaySystemModules)
-            {
-                const CssFunctionMetadata* pMetadata = static_cast<const CssFunctionMetadata*>(funcNode.m_val);
-
-                if (nullptr != pMetadata->m_pModule && pMetadata->m_pModule->isSystemModule())
-                {
-                    hidden = true;
-                }
-            }
-
-            // Hide this item if required
-            pFuncListItem->setHidden(hidden);
-
-            if (!hidden)
-            {
-                shownFuncCount++;
-
-                if (selfCountMax < selfCount)
-                {
-                    selfCountMax = selfCount;
-                    pSelectedItem = pFuncListItem;
-                }
-                else if (0 == selfCountMax && deepCountMax < deepCount)
-                {
-                    deepCountMax = deepCount;
-                    pSelectedItem = pFuncListItem;
-                }
-            }
-        }
-
-        if (0ULL != totalCount)
-        {
-            for (int itemIndex = 0, itemsCount = m_pFuncTable->topLevelItemCount(); itemIndex < itemsCount; ++itemIndex)
-            {
-                CallGraphFuncListItem* pFuncListItem = static_cast<CallGraphFuncListItem*>(m_pFuncTable->topLevelItem(itemIndex));
-
-                if (nullptr != pFuncListItem)
-                {
-                    qulonglong deepCount = pFuncListItem->GetCountValue(CALLGRAPH_FUNCTION_DEEP_SAMPLES);
-
-                    pFuncListItem->SetPercentageValue(CALLGRAPH_FUNCTION_DEEP_SAMPLE_PERCENTAGE,
-                                                      static_cast<double>(deepCount),
-                                                      static_cast<double>(totalCount));
-                }
-            }
-        }
-
-        SetFunctionNameHeader(totalFuncCount, shownFuncCount);
-
-        m_pFuncTable->setSortingEnabled(true);
-
-        // Sort the table with the last sorted parameters or with default:
-        if (m_lastSortColumn > 0)
-        {
-            m_pFuncTable->sortByColumn(m_lastSortColumn, Qt::DescendingOrder);
-        }
-        else
-        {
-            m_pFuncTable->sortByColumn(CALLGRAPH_FUNCTION_DEEP_SAMPLE_PERCENTAGE, m_lastSortOrder);
-        }
-
-        // resize CALLGRAPH_FUNCTION_NAME column
-        ResizeFunctionNameColumn();
-
-        bool isSortIndShown = m_pFuncTable->header()->isSortIndicatorShown();
-        // disable the sort indicator - for more accurate resizing (header size will not include sort indicator size)
-        m_pFuncTable->header()->setSortIndicatorShown(false);
-
-        m_pFuncTable->resizeColumnToContents(CALLGRAPH_FUNCTION_SELF_SAMPLES);
-        m_pFuncTable->resizeColumnToContents(CALLGRAPH_FUNCTION_DEEP_SAMPLES);
-        m_pFuncTable->resizeColumnToContents(CALLGRAPH_FUNCTION_PATH_CNT);
-        m_pFuncTable->resizeColumnToContents(CALLGRAPH_FUNCTION_DEEP_SAMPLE_PERCENTAGE);
-        m_pFuncTable->resizeColumnToContents(CALLGRAPH_FUNCTION_SOURCE_FILE);
-        m_pFuncTable->resizeColumnToContents(CALLGRAPH_FUNCTION_MODULE);
-
-        // set back the sort indicator
-        m_pFuncTable->header()->setSortIndicatorShown(isSortIndShown);
-
-        // Unblock the signals.
-        m_pFuncTable->blockSignals(false);
-
-        InitEmptyTableRow();
-        HandleDisplayEmptyTableItem(shownFuncCount);
-    }
-
-    return pSelectedItem;
-}
 
 void CallGraphFuncList::ResizeFunctionNameColumn()
 {
@@ -1556,7 +1239,7 @@ void CallGraphFuncList::HandleDisplayEmptyTableItem(int numberOfRow)
 void CallGraphFuncList::InitEmptyTableRow()
 {
     // Create new item with "empty table" message and insert into table:
-    m_pEmptyTableMsgItem = new CallGraphFuncListItem(nullptr);
+    m_pEmptyTableMsgItem = new CallGraphFuncListItem;
     m_pFuncTable->addTopLevelItem(m_pEmptyTableMsgItem);
 
     QString emptyTableMessage = CP_emptyTableMessage;
@@ -1740,50 +1423,7 @@ void CallGraphButterfly::clear()
     m_pChildrenTreeControl->clear();
 }
 
-CallGraphFuncListItem* CallGraphButterfly::AddTopLevelItem(FunctionsTreeCtrl& treeCtrl,
-                                                           const CpuProfileModule* pModule,
-                                                           const FunctionGraph::Node* pFuncNode,
-                                                           const QString& funcName,
-                                                           qulonglong samplesCount,
-                                                           double totalDeepCount,
-                                                           bool noSamples)
-{
-    CallGraphFuncListItem* pFuncListItem = new CallGraphFuncListItem(pFuncNode);
 
-    GT_IF_WITH_ASSERT(pFuncListItem != nullptr)
-    {
-        treeCtrl.addTopLevelItem(pFuncListItem);
-
-        pFuncListItem->setText(CALLGRAPH_BUTTERFLY_FUNCTION, funcName);
-
-        pFuncListItem->setData(CALLGRAPH_BUTTERFLY_SAMPLES, Qt::DisplayRole, QVariant(samplesCount));
-        pFuncListItem->setTextAlignment(CALLGRAPH_BUTTERFLY_SAMPLES, Qt::AlignLeft | Qt::AlignVCenter);
-
-        if (0ULL != samplesCount && !noSamples)
-        {
-            double deepPercentage = static_cast<double>(samplesCount) / totalDeepCount * 100.00;
-            GT_ASSERT(deepPercentage <= 100.0);
-            pFuncListItem->setData(CALLGRAPH_BUTTERFLY_PERCENTAGE, Qt::DisplayRole, QVariant(deepPercentage));
-        }
-        else
-        {
-            pFuncListItem->setText(CALLGRAPH_BUTTERFLY_PERCENTAGE, QString());
-        }
-
-
-        gtString modFileName;
-
-        if (nullptr != pModule && !pModule->getPath().isEmpty())
-        {
-            pModule->extractFileName(modFileName);
-            pFuncListItem->setToolTip(CALLGRAPH_BUTTERFLY_MODULE, acGTStringToQString(pModule->getPath()));
-        }
-
-        pFuncListItem->setText(CALLGRAPH_BUTTERFLY_MODULE, acGTStringToQString(modFileName));
-    }
-
-    return pFuncListItem;
-}
 
 void CallGraphButterfly::SetParentsFunction(shared_ptr<cxlProfileDataReader> pProfDataRdr,
                                             bool displaySystemModule,
@@ -1812,7 +1452,9 @@ void CallGraphButterfly::SetParentsFunction(shared_ptr<cxlProfileDataReader> pPr
     {
         AddTopLevelItem(*m_pParentsTreeControl,
                         parent.m_functionInfo.m_modulePath,
+                        parent.m_functionInfo.m_moduleId,
                         parent.m_functionInfo.m_name,
+                        parent.m_functionInfo.m_functionId,
                         parent.m_totalDeepSamples,
                         parent.m_totalDeepSamples,
                         parent.m_deepSamplesPerc,
@@ -1822,7 +1464,8 @@ void CallGraphButterfly::SetParentsFunction(shared_ptr<cxlProfileDataReader> pPr
 
     if (parents.empty())
     {
-        AddTopLevelItem(*m_pParentsTreeControl, nullptr, nullptr, "[system modules]", systemSamplesCount, totalDeepCount, noSamples);
+        AddTopLevelItem(*m_pParentsTreeControl, L"", AMDT_PROFILE_ALL_MODULES, L"[system modules]", AMDT_PROFILE_ALL_FUNCTIONS,
+                        systemSamplesCount, systemSamplesCount, totalDeepCount, noSamples);
     }
 
     bool isSortIndShown = m_pParentsTreeControl->header()->isSortIndicatorShown();
@@ -1866,6 +1509,8 @@ void CallGraphButterfly::SetChildrenFunction(shared_ptr<cxlProfileDataReader> pP
     for (const auto& children : childrens)
     {
         gtString functionName = children.m_functionInfo.m_name;
+        AMDTFunctionId functionId = children.m_functionInfo.m_functionId;
+
         double deepSamples = children.m_totalDeepSamples;
 
         if (L"[self]" == functionName)
@@ -1875,7 +1520,9 @@ void CallGraphButterfly::SetChildrenFunction(shared_ptr<cxlProfileDataReader> pP
 
         AddTopLevelItem(*m_pChildrenTreeControl,
                         children.m_functionInfo.m_modulePath,
+                        children.m_functionInfo.m_moduleId,
                         functionName,
+                        functionId,
                         deepSamples,
                         deepSamples,    //TODO : redundant arg need to be removed
                         children.m_deepSamplesPerc,
@@ -1910,7 +1557,7 @@ void CallGraphButterfly::onFunctionClicked(QTreeWidgetItem* pItem)
         {
             CallGraphFuncListItem* pFuncListItem = static_cast<CallGraphFuncListItem*>(pItem);
 
-            if (nullptr != pFuncListItem->m_pFuncNode)
+            if (nullptr != pFuncListItem)
             {
                 emit functionSelected(pFuncListItem->m_functionId);
             }
@@ -1968,13 +1615,17 @@ SessionCallGraphView::~SessionCallGraphView()
 
 void SessionCallGraphView::FunctionListSelectionDone(AMDTFunctionId functionId)
 {
-    ShowPaths(functionId);
-    ShowParentChild(functionId);
-    emit functionSelected(functionId);
+    if (0 != functionId)
+    {
+        ShowPaths(functionId);
+        ShowParentChild(functionId);
+        emit functionSelected(functionId);
+    }
 }
 
 void SessionCallGraphView::editSource(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> info)
 {
+    GT_UNREFERENCED_PARAMETER(info);
     emit opensourceCodeViewSig(info);
 }
 
@@ -2032,28 +1683,6 @@ void SessionCallGraphView::OnSelectionChange()
 
 void SessionCallGraphView::onOpenDisplayFilterDialog()
 {
-#if 0
-    Qt::SortOrder sortOrderOfFunctionTable = m_pFuncTable->functionsTreeControl()->header()->sortIndicatorOrder();
-    int columnIndexOfFunctionTable = m_pFuncTable->functionsTreeControl()->header()->sortIndicatorSection();
-    setEnableOnlySystemDllInfilterDlg(true);
-
-    const bool displaySystemModules = CPUGlobalDisplayFilter::instance().m_displaySystemDLLs;
-    OnDisplaySettingsClicked();
-
-    if (displaySystemModules != CPUGlobalDisplayFilter::instance().m_displaySystemDLLs)
-    {
-        if (CPUGlobalDisplayFilter::instance().m_displaySystemDLLs)
-        {
-            OnIncludeSystemModules();
-        }
-        else
-        {
-            OnExcludeSystemModules();
-        }
-    }
-
-    m_pFuncTable->sortByColumn(columnIndexOfFunctionTable, sortOrderOfFunctionTable);
-#endif
 }
 
 // When a list item is expanded, show the functions called for it
@@ -2339,7 +1968,7 @@ void SessionCallGraphView::UpdateTableDisplay(unsigned int updateType)
     qApp->restoreOverrideCursor();
 }
 
-void SessionCallGraphView::selectFunction(const QString& functionName, ProcessIdType pid)
+void SessionCallGraphView::selectFunction(AMDTFunctionId funcID, ProcessIdType pid)
 {
     GT_IF_WITH_ASSERT(nullptr != m_pPidComboAction)
     {
@@ -2368,15 +1997,10 @@ void SessionCallGraphView::selectFunction(const QString& functionName, ProcessId
 
     GT_IF_WITH_ASSERT(nullptr != m_pFuncTable && nullptr != m_pFuncTable->functionsTreeControl())
     {
-        auto itr = m_pFuncTable->m_FuncNameIdxMap.find(acQStringToGTString(functionName));
-
-        if (m_pFuncTable->m_FuncNameIdxMap.end() != itr)
-        {
-            AMDTFunctionId functionId = itr->second.second;
-            ShowPaths(functionId);
-            ShowParentChild(functionId);
-            emit functionSelected(functionId);
-        }
+        AMDTFunctionId functionId = funcID;
+        ShowPaths(functionId);
+        ShowParentChild(functionId);
+        emit functionSelected(functionId);
     }
 }
 
@@ -2607,7 +2231,8 @@ void SessionCallGraphView::SetViewLayout()
     }
 }
 
-void SessionCallGraphView::displayInFunctionView(const QString& functionName)
+
+void SessionCallGraphView::displayInFunctionView(AMDTFunctionId functionId)
 {
     // Get the tree instance:
     afApplicationCommands* pCommands = afApplicationCommands::instance();
@@ -2616,7 +2241,7 @@ void SessionCallGraphView::displayInFunctionView(const QString& functionName)
     GT_IF_WITH_ASSERT((pCommands != nullptr) && (pSessionViewCreator != nullptr))
     {
         afApplicationTree* pApplicationTree = pCommands->applicationTree();
-        GT_IF_WITH_ASSERT((m_pDisplayedSessionItemData != nullptr) && (pApplicationTree != nullptr) && (!functionName.isEmpty()))
+        GT_IF_WITH_ASSERT((m_pDisplayedSessionItemData != nullptr) && (pApplicationTree != nullptr))
         {
             afApplicationTreeItemData* pSessionItemData = ProfileApplicationTreeHandler::instance()->FindItemByProfileFilePath(m_pDisplayedSessionItemData->m_filePath);
             afApplicationTreeItemData* pActivatedItemMacthingItemData = ProfileApplicationTreeHandler::instance()->FindSessionChildItemData(pSessionItemData, AF_TREE_ITEM_PROFILE_CPU_FUNCTIONS);
@@ -2655,7 +2280,7 @@ void SessionCallGraphView::displayInFunctionView(const QString& functionName)
                         pFunctionsView = pSessionWindow->sessionFunctionsView();
                         GT_IF_WITH_ASSERT(pFunctionsView != nullptr)
                         {
-                            pFunctionsView->selectFunction(functionName, m_pid);
+                            pFunctionsView->selectFunction(QString::number(functionId));
                         }
                     }
                 }
@@ -2772,11 +2397,7 @@ void FunctionsTreeCtrl::GoToFunctionsView()
 
         if (nullptr != pFuncListItem)
         {
-            QString functionName = pFuncListItem->text(0);
-            GT_IF_WITH_ASSERT(!functionName.isEmpty())
-            {
-                m_pCallGraphTab->displayInFunctionView(functionName);
-            }
+            m_pCallGraphTab->displayInFunctionView(pFuncListItem->m_functionId);
         }
     }
 }
@@ -2788,7 +2409,9 @@ void FunctionsTreeCtrl::PathIndicatorToggled(int state)
 
 CallGraphFuncListItem* CallGraphButterfly::AddTopLevelItem(FunctionsTreeCtrl& treeCtrl,
                                                            const gtString modulePath,
+                                                           AMDTModuleId    moduleId,
                                                            const gtString& funcName,
+                                                           AMDTFunctionId funcId,
                                                            double samplesCount,
                                                            double totalDeepCount,
                                                            double samplePercent,
@@ -2804,6 +2427,10 @@ CallGraphFuncListItem* CallGraphButterfly::AddTopLevelItem(FunctionsTreeCtrl& tr
         pFuncListItem->setText(CALLGRAPH_BUTTERFLY_FUNCTION, acGTStringToQString(funcName));
         pFuncListItem->setData(CALLGRAPH_BUTTERFLY_SAMPLES, Qt::DisplayRole, QVariant(samplesCount));
         pFuncListItem->setTextAlignment(CALLGRAPH_BUTTERFLY_SAMPLES, Qt::AlignLeft | Qt::AlignVCenter);
+        pFuncListItem->m_functionId = funcId;
+        pFuncListItem->m_functionName = funcName;
+        pFuncListItem->m_moduleName = modulePath;
+        pFuncListItem->m_moduleId = moduleId;
 
         if (0ULL != samplesCount && !noSamples)
         {
@@ -2824,17 +2451,567 @@ CallGraphFuncListItem* CallGraphButterfly::AddTopLevelItem(FunctionsTreeCtrl& tr
 
         osFilePath path(modulePath);
         gtString filename;
-        gtString extName;
-        gtString seperator(L".");
-
-        path.getFileName(filename);
-        path.getFileExtension(extName);
-
-        filename += seperator;
-        filename += extName;
-
+        path.getFileNameAndExtension(filename);
         pFuncListItem->setText(CALLGRAPH_BUTTERFLY_MODULE, acGTStringToQString(filename));
     }
 
     return pFuncListItem;
 }
+
+#if 0
+void SessionCallGraphView::selectFunction(const QString& functionName, ProcessIdType pid)
+{
+    GT_IF_WITH_ASSERT(nullptr != m_pPidComboAction)
+    {
+        const QComboBox* pPIDComboBox = TopToolbarComboBox(m_pPidComboAction);
+
+        GT_IF_WITH_ASSERT(nullptr != pPIDComboBox)
+        {
+            // Construct the PID string suffix.
+            QString pidText = '(' + QString::number(pid) + ')';
+
+            // Search for the item in the Combo-Box with the requested PID, and select it.
+            for (int i = 0, num = pPIDComboBox->count(); i < num; ++i)
+            {
+                if (pPIDComboBox->itemText(i).endsWith(pidText))
+                {
+                    if (pPIDComboBox->currentIndex() != i)
+                    {
+                        m_pPidComboAction->UpdateCurrentIndex(i);
+                    }
+
+                    break;
+                }
+            }
+        }
+    }
+
+    GT_IF_WITH_ASSERT(nullptr != m_pFuncTable && nullptr != m_pFuncTable->functionsTreeControl())
+    {
+        auto itr = m_pFuncTable->m_FuncNameIdxMap.find(acQStringToGTString(functionName));
+
+        if (m_pFuncTable->m_FuncNameIdxMap.end() != itr)
+        {
+            AMDTFunctionId functionId = itr->second.second;
+            ShowPaths(functionId);
+            ShowParentChild(functionId);
+            emit functionSelected(functionId);
+        }
+    }
+}
+
+void SessionCallGraphView::displayInFunctionView(const QString& functionName)
+{
+    // Get the tree instance:
+    afApplicationCommands* pCommands = afApplicationCommands::instance();
+    SessionViewCreator* pSessionViewCreator = AmdtCpuProfiling::sessionViewCreator();
+
+    GT_IF_WITH_ASSERT((pCommands != nullptr) && (pSessionViewCreator != nullptr))
+    {
+        afApplicationTree* pApplicationTree = pCommands->applicationTree();
+        GT_IF_WITH_ASSERT((m_pDisplayedSessionItemData != nullptr) && (pApplicationTree != nullptr) && (!functionName.isEmpty()))
+        {
+            afApplicationTreeItemData* pSessionItemData = ProfileApplicationTreeHandler::instance()->FindItemByProfileFilePath(m_pDisplayedSessionItemData->m_filePath);
+            afApplicationTreeItemData* pActivatedItemMacthingItemData = ProfileApplicationTreeHandler::instance()->FindSessionChildItemData(pSessionItemData, AF_TREE_ITEM_PROFILE_CPU_FUNCTIONS);
+            GT_IF_WITH_ASSERT(pActivatedItemMacthingItemData != nullptr)
+            {
+                // Get the tree instance:
+                pApplicationTree->expandItem(pActivatedItemMacthingItemData->m_pTreeWidgetItem);
+                pApplicationTree->selectItem(pActivatedItemMacthingItemData, true);
+
+                CPUSessionTreeItemData* pSessionData = qobject_cast<CPUSessionTreeItemData*>(pActivatedItemMacthingItemData->extendedItemData());
+                GT_IF_WITH_ASSERT(pSessionData != nullptr)
+                {
+                    CpuSessionWindow* pSessionWindow = nullptr;
+                    const gtVector<CpuSessionWindow*>& openedSessions = pSessionViewCreator->currentlyOpenedSessionWindows();
+
+                    for (int i = 0; i < (int)openedSessions.size(); i++)
+                    {
+                        if (openedSessions[i] != nullptr)
+                        {
+                            if (openedSessions[i]->displayedSessionFilePath() == pActivatedItemMacthingItemData->m_filePath)
+                            {
+                                pSessionWindow = openedSessions[i];
+                            }
+                        }
+                    }
+
+                    GT_IF_WITH_ASSERT(pSessionWindow != nullptr)
+                    {
+                        SessionFunctionView* pFunctionsView = pSessionWindow->sessionFunctionsView();
+
+                        if (pFunctionsView == nullptr)
+                        {
+                            pSessionWindow->onViewFunctionTab(0U);
+                        }
+
+                        pFunctionsView = pSessionWindow->sessionFunctionsView();
+                        GT_IF_WITH_ASSERT(pFunctionsView != nullptr)
+                        {
+                            pFunctionsView->selectFunction(functionName, m_pid);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+CallGraphFuncListItem* CallGraphPathFuncList::AcquireTopLevelItem(const FunctionGraph::Node* pFuncNode)
+{
+    // Search for a matching top level item
+    CallGraphFuncListItem* pFuncListItem = nullptr;
+
+    for (int itemIndex = 0, itemsCount = m_pFuncTable->topLevelItemCount(); itemIndex < itemsCount; ++itemIndex)
+    {
+        CallGraphFuncListItem* pCurrFuncListItem = static_cast<CallGraphFuncListItem*>(m_pFuncTable->topLevelItem(itemIndex));
+
+        if (nullptr != pCurrFuncListItem && nullptr != pCurrFuncListItem->m_pFuncNode)
+        {
+            if (pFuncNode == pCurrFuncListItem->m_pFuncNode)
+            {
+                pFuncListItem = pCurrFuncListItem;
+                break;
+            }
+        }
+    }
+
+    if (nullptr == pFuncListItem)
+    {
+        pFuncListItem = new CallGraphFuncListItem(pFuncNode);
+        m_pFuncTable->addTopLevelItem(pFuncListItem);
+
+        InitializeItem(pFuncListItem);
+    }
+
+    return pFuncListItem;
+}
+
+CallGraphFuncListItem* CallGraphPathFuncList::AcquireChildItem(CallGraphFuncListItem* pParentItem, const FunctionGraph::Node* pFuncNode)
+{
+    CallGraphFuncListItem* pFuncListItem;
+
+    if (nullptr != pParentItem)
+    {
+        // Search for a matching child item
+        pFuncListItem = nullptr;
+
+        for (int itemIndex = 0, itemsCount = pParentItem->childCount(); itemIndex < itemsCount; ++itemIndex)
+        {
+            CallGraphFuncListItem* pCurrFuncListItem = static_cast<CallGraphFuncListItem*>(pParentItem->child(itemIndex));
+
+            if (nullptr != pCurrFuncListItem && nullptr != pCurrFuncListItem->m_pFuncNode)
+            {
+                if (pFuncNode == pCurrFuncListItem->m_pFuncNode)
+                {
+                    pFuncListItem = pCurrFuncListItem;
+                    break;
+                }
+            }
+        }
+
+
+        if (nullptr == pFuncListItem)
+        {
+            pFuncListItem = new CallGraphFuncListItem(pFuncNode);
+            pParentItem->addChild(pFuncListItem);
+
+            InitializeItem(pFuncListItem);
+        }
+    }
+    else
+    {
+        pFuncListItem = AcquireTopLevelItem(pFuncNode);
+    }
+
+    return pFuncListItem;
+}
+
+void SessionCallGraphView::onOpenDisplayFilterDialog()
+{
+#if 0
+    Qt::SortOrder sortOrderOfFunctionTable = m_pFuncTable->functionsTreeControl()->header()->sortIndicatorOrder();
+    int columnIndexOfFunctionTable = m_pFuncTable->functionsTreeControl()->header()->sortIndicatorSection();
+    setEnableOnlySystemDllInfilterDlg(true);
+
+    const bool displaySystemModules = CPUGlobalDisplayFilter::instance().m_displaySystemDLLs;
+    OnDisplaySettingsClicked();
+
+    if (displaySystemModules != CPUGlobalDisplayFilter::instance().m_displaySystemDLLs)
+    {
+        if (CPUGlobalDisplayFilter::instance().m_displaySystemDLLs)
+        {
+            OnIncludeSystemModules();
+        }
+        else
+        {
+            OnExcludeSystemModules();
+        }
+    }
+
+    m_pFuncTable->sortByColumn(columnIndexOfFunctionTable, sortOrderOfFunctionTable);
+#endif
+}
+
+void CallGraphPathFuncList::InitializeItem(CallGraphFuncListItem* pFuncListItem)
+{
+    const CssFunctionMetadata* pMetadata = static_cast<const CssFunctionMetadata*>(pFuncListItem->m_pFuncNode->m_val);
+
+    pFuncListItem->setText(CALLGRAPH_PATH_TREE, pMetadata->m_funcName);
+
+    pFuncListItem->setText(CALLGRAPH_PATH_SELF, QString());
+    pFuncListItem->setTextAlignment(CALLGRAPH_PATH_SELF, Qt::AlignLeft | Qt::AlignVCenter);
+
+    pFuncListItem->setText(CALLGRAPH_PATH_DOWNSTREAM_SAMPLES, QString());
+    pFuncListItem->setTextAlignment(CALLGRAPH_PATH_DOWNSTREAM_SAMPLES, Qt::AlignLeft | Qt::AlignVCenter);
+
+    pFuncListItem->setText(CALLGRAPH_PATH_DOWNSTREAM_PERCENTAGE, QString());
+
+    gtString moduleName;
+
+    if (nullptr != pMetadata->m_pModule)
+    {
+        if (pMetadata->m_pModule->extractFileName(moduleName))
+        {
+            pFuncListItem->setToolTip(CALLGRAPH_PATH_MODULE, acGTStringToQString(pMetadata->m_pModule->getPath()));
+        }
+    }
+
+    pFuncListItem->setText(CALLGRAPH_PATH_MODULE, acGTStringToQString(moduleName));
+}
+
+CallGraphFuncListItem* CallGraphFuncList::FindTopLevelItem(const FunctionGraph::Node& funcNode)
+{
+    CallGraphFuncListItem* pFuncListItem = nullptr;
+
+    for (int itemIndex = 0, itemsCount = m_pFuncTable->topLevelItemCount(); itemIndex < itemsCount; ++itemIndex)
+    {
+        CallGraphFuncListItem* pCurrFuncListItem = static_cast<CallGraphFuncListItem*>(m_pFuncTable->topLevelItem(itemIndex));
+
+        if (nullptr != pCurrFuncListItem && nullptr != pCurrFuncListItem->m_pFuncNode)
+        {
+            if (&funcNode == pCurrFuncListItem->m_pFuncNode)
+            {
+                pFuncListItem = pCurrFuncListItem;
+                break;
+            }
+        }
+    }
+
+    return pFuncListItem;
+}
+}
+
+CallGraphFuncListItem* CallGraphFuncList::AddTopLevelItem(const FunctionGraph::Node& funcNode,
+                                                          unsigned pathsNumber, gtUInt64 selfCount, gtUInt64 deepCount)
+{
+    CallGraphFuncListItem* pFuncListItem = new CallGraphFuncListItem(&funcNode);
+    m_pFuncTable->addTopLevelItem(pFuncListItem);
+
+    CssFunctionMetadata* pMetadata = static_cast<CssFunctionMetadata*>(funcNode.m_val);
+
+    pMetadata->m_selfCount = selfCount;
+    pMetadata->m_deepCount = deepCount;
+
+    if (nullptr == pMetadata->m_pModule || nullptr == pMetadata->m_pFunction ||
+        pMetadata->m_pModule->isUnchartedFunction(*pMetadata->m_pFunction))
+    {
+        pFuncListItem->setToolTip(CALLGRAPH_FUNCTION_NAME, QString::fromWCharArray(L"No debug info available"));
+    }
+
+    pFuncListItem->setText(CALLGRAPH_FUNCTION_NAME, pMetadata->m_funcName);
+
+    if (0ULL != selfCount)
+    {
+        pFuncListItem->setData(CALLGRAPH_FUNCTION_SELF_SAMPLES, Qt::DisplayRole, QVariant(static_cast<qulonglong>(selfCount)));
+        pFuncListItem->setTextAlignment(CALLGRAPH_FUNCTION_SELF_SAMPLES, Qt::AlignLeft | Qt::AlignVCenter);
+    }
+    else
+    {
+        pFuncListItem->setText(CALLGRAPH_FUNCTION_SELF_SAMPLES, "");
+    }
+
+    if (0ULL != deepCount)
+    {
+        pFuncListItem->setData(CALLGRAPH_FUNCTION_DEEP_SAMPLES, Qt::DisplayRole, QVariant(static_cast<qulonglong>(deepCount)));
+        pFuncListItem->setTextAlignment(CALLGRAPH_FUNCTION_DEEP_SAMPLES, Qt::AlignLeft | Qt::AlignVCenter);
+    }
+    else
+    {
+        pFuncListItem->setText(CALLGRAPH_FUNCTION_DEEP_SAMPLES, "");
+    }
+
+    pFuncListItem->setText(CALLGRAPH_FUNCTION_DEEP_SAMPLE_PERCENTAGE, "");
+
+    if (0U != pathsNumber)
+    {
+        pFuncListItem->setData(CALLGRAPH_FUNCTION_PATH_CNT, Qt::DisplayRole, QVariant(pathsNumber));
+        pFuncListItem->setTextAlignment(CALLGRAPH_FUNCTION_PATH_CNT, Qt::AlignLeft | Qt::AlignVCenter);
+    }
+    else
+    {
+        pFuncListItem->setText(CALLGRAPH_FUNCTION_PATH_CNT, "");
+    }
+
+#ifdef CSS_FUNC_PATH_INFO
+    //TODO: Remove path samples information!
+    pFuncListItem->setText(CALLGRAPH_FUNCTION_PATH_SAMPLES, "");
+    pFuncListItem->setText(CALLGRAPH_FUNCTION_PATH_SAMPLES_PER_PATH, "");
+#endif
+
+    gtString sourceInfo;
+
+    if (nullptr != pMetadata->m_pFunction)
+    {
+        pMetadata->m_pFunction->getSourceInfo(sourceInfo);
+
+        if (!sourceInfo.isEmpty())
+        {
+            pFuncListItem->setToolTip(CALLGRAPH_FUNCTION_SOURCE_FILE, acGTStringToQString(pMetadata->m_pFunction->getSourceFile()));
+        }
+    }
+
+    pFuncListItem->setText(CALLGRAPH_FUNCTION_SOURCE_FILE, acGTStringToQString(sourceInfo));
+
+    gtString modFileName;
+
+    if (nullptr != pMetadata->m_pModule && !pMetadata->m_pModule->getPath().isEmpty())
+    {
+        pMetadata->m_pModule->extractFileName(modFileName);
+        pFuncListItem->setToolTip(CALLGRAPH_FUNCTION_MODULE, acGTStringToQString(pMetadata->m_pModule->getPath()));
+    }
+
+    pFuncListItem->setText(CALLGRAPH_FUNCTION_MODULE, acGTStringToQString(modFileName));
+
+    return pFuncListItem;
+}
+
+CallGraphFuncListItem* CallGraphFuncList::DisplayFunctions(CpuProfileCss& css, int precision)
+{
+    (void)precision; // Unused
+
+    CallGraphFuncListItem* pSelectedItem = nullptr;
+
+    if (m_pFuncTable != nullptr)
+    {
+        // Block the table model signals, otherwise the table is sorted while setting the data (which causes a mess).
+        m_pFuncTable->blockSignals(true);
+
+        clear();
+
+        m_pFuncTable->setSortingEnabled(false);
+
+        const bool displaySystemModules = CPUGlobalDisplayFilter::instance().m_displaySystemDLLs;
+
+        const EventMaskType eventId = css.GetEventId();
+        FunctionGraph& funcGraph = css.GetFunctionGraph();
+
+        int totalFuncCount = 0;
+        int shownFuncCount = 0;
+
+        gtUInt64 selfCountMax = 0ULL;
+        gtUInt64 deepCountMax = 0ULL;
+
+        gtUInt64 totalCount = 0ULL;
+
+        for (FunctionGraph::const_node_iterator itFunc = funcGraph.GetBeginNode(), itFuncEnd = funcGraph.GetEndNode();
+             itFunc != itFuncEnd; ++itFunc)
+        {
+            const FunctionGraph::Node& funcNode = *itFunc;
+
+            unsigned pathsNumber = 0U;
+            gtUInt64 selfCount = 0ULL;
+            gtUInt64 deepCount = 0ULL;
+
+            for (PathIndexSet::const_iterator it = funcNode.m_pathIndices.begin(), itEnd = funcNode.m_pathIndices.end();
+                 it != itEnd; ++it)
+            {
+                const FunctionGraph::Path& path = *funcGraph.GetPath(*it);
+                const LeafFunctionList& leaves = path.GetData();
+
+                bool isRootFound = false;
+
+                for (FunctionGraph::Path::const_iterator itNode = path.begin(), itNodeEnd = path.end(); itNode != itNodeEnd; ++itNode)
+                {
+                    if (&*itNode == &funcNode)
+                    {
+                        isRootFound = true;
+                        break;
+                    }
+                }
+
+                const FunctionGraph::Node* pPrevLeafNode = nullptr;
+
+                for (LeafFunctionList::const_iterator itLeaf = leaves.begin(), itLeafEnd = leaves.end(); itLeaf != itLeafEnd; ++itLeaf)
+                {
+                    const LeafFunction& leaf = *itLeaf;
+
+                    if (eventId == EventMaskType(-1) || eventId == leaf.m_eventId)
+                    {
+                        const bool isCurrentNode = (&funcNode == leaf.m_pNode);
+
+                        if (isCurrentNode)
+                        {
+                            selfCount += leaf.m_count;
+                        }
+
+                        if (isCurrentNode || isRootFound)
+                        {
+                            deepCount += leaf.m_count;
+
+                            if (pPrevLeafNode != leaf.m_pNode)
+                            {
+                                pPrevLeafNode = leaf.m_pNode;
+                                pathsNumber++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (0U == pathsNumber)
+            {
+                continue;
+            }
+
+            totalCount += selfCount;
+            totalFuncCount++;
+
+            CallGraphFuncListItem* pFuncListItem = AddTopLevelItem(funcNode, pathsNumber, selfCount, deepCount);
+
+            bool hidden = false;
+
+            // If system libs hidden, determine whether this is a system library
+            if (!displaySystemModules)
+            {
+                const CssFunctionMetadata* pMetadata = static_cast<const CssFunctionMetadata*>(funcNode.m_val);
+
+                if (nullptr != pMetadata->m_pModule && pMetadata->m_pModule->isSystemModule())
+                {
+                    hidden = true;
+                }
+            }
+
+            // Hide this item if required
+            pFuncListItem->setHidden(hidden);
+
+            if (!hidden)
+            {
+                shownFuncCount++;
+
+                if (selfCountMax < selfCount)
+                {
+                    selfCountMax = selfCount;
+                    pSelectedItem = pFuncListItem;
+                }
+                else if (0 == selfCountMax && deepCountMax < deepCount)
+                {
+                    deepCountMax = deepCount;
+                    pSelectedItem = pFuncListItem;
+                }
+            }
+        }
+
+        if (0ULL != totalCount)
+        {
+            for (int itemIndex = 0, itemsCount = m_pFuncTable->topLevelItemCount(); itemIndex < itemsCount; ++itemIndex)
+            {
+                CallGraphFuncListItem* pFuncListItem = static_cast<CallGraphFuncListItem*>(m_pFuncTable->topLevelItem(itemIndex));
+
+                if (nullptr != pFuncListItem)
+                {
+                    qulonglong deepCount = pFuncListItem->GetCountValue(CALLGRAPH_FUNCTION_DEEP_SAMPLES);
+
+                    pFuncListItem->SetPercentageValue(CALLGRAPH_FUNCTION_DEEP_SAMPLE_PERCENTAGE,
+                                                      static_cast<double>(deepCount),
+                                                      static_cast<double>(totalCount));
+                }
+            }
+        }
+
+        SetFunctionNameHeader(totalFuncCount, shownFuncCount);
+
+        m_pFuncTable->setSortingEnabled(true);
+
+        // Sort the table with the last sorted parameters or with default:
+        if (m_lastSortColumn > 0)
+        {
+            m_pFuncTable->sortByColumn(m_lastSortColumn, Qt::DescendingOrder);
+        }
+        else
+        {
+            m_pFuncTable->sortByColumn(CALLGRAPH_FUNCTION_DEEP_SAMPLE_PERCENTAGE, m_lastSortOrder);
+        }
+
+        // resize CALLGRAPH_FUNCTION_NAME column
+        ResizeFunctionNameColumn();
+
+        bool isSortIndShown = m_pFuncTable->header()->isSortIndicatorShown();
+        // disable the sort indicator - for more accurate resizing (header size will not include sort indicator size)
+        m_pFuncTable->header()->setSortIndicatorShown(false);
+
+        m_pFuncTable->resizeColumnToContents(CALLGRAPH_FUNCTION_SELF_SAMPLES);
+        m_pFuncTable->resizeColumnToContents(CALLGRAPH_FUNCTION_DEEP_SAMPLES);
+        m_pFuncTable->resizeColumnToContents(CALLGRAPH_FUNCTION_PATH_CNT);
+        m_pFuncTable->resizeColumnToContents(CALLGRAPH_FUNCTION_DEEP_SAMPLE_PERCENTAGE);
+        m_pFuncTable->resizeColumnToContents(CALLGRAPH_FUNCTION_SOURCE_FILE);
+        m_pFuncTable->resizeColumnToContents(CALLGRAPH_FUNCTION_MODULE);
+
+        // set back the sort indicator
+        m_pFuncTable->header()->setSortIndicatorShown(isSortIndShown);
+
+        // Unblock the signals.
+        m_pFuncTable->blockSignals(false);
+
+        InitEmptyTableRow();
+        HandleDisplayEmptyTableItem(shownFuncCount);
+    }
+
+    return pSelectedItem;
+}
+
+CallGraphFuncListItem* CallGraphButterfly::AddTopLevelItem(FunctionsTreeCtrl& treeCtrl,
+                                                           const CpuProfileModule* pModule,
+                                                           const FunctionGraph::Node* pFuncNode,
+                                                           const QString& funcName,
+                                                           qulonglong samplesCount,
+                                                           double totalDeepCount,
+                                                           bool noSamples)
+{
+    CallGraphFuncListItem* pFuncListItem = new CallGraphFuncListItem(pFuncNode);
+
+    GT_IF_WITH_ASSERT(pFuncListItem != nullptr)
+    {
+        treeCtrl.addTopLevelItem(pFuncListItem);
+
+        pFuncListItem->setText(CALLGRAPH_BUTTERFLY_FUNCTION, funcName);
+
+        pFuncListItem->setData(CALLGRAPH_BUTTERFLY_SAMPLES, Qt::DisplayRole, QVariant(samplesCount));
+        pFuncListItem->setTextAlignment(CALLGRAPH_BUTTERFLY_SAMPLES, Qt::AlignLeft | Qt::AlignVCenter);
+
+        if (0ULL != samplesCount && !noSamples)
+        {
+            double deepPercentage = static_cast<double>(samplesCount) / totalDeepCount * 100.00;
+            GT_ASSERT(deepPercentage <= 100.0);
+            pFuncListItem->setData(CALLGRAPH_BUTTERFLY_PERCENTAGE, Qt::DisplayRole, QVariant(deepPercentage));
+        }
+        else
+        {
+            pFuncListItem->setText(CALLGRAPH_BUTTERFLY_PERCENTAGE, QString());
+        }
+
+
+        gtString modFileName;
+
+        if (nullptr != pModule && !pModule->getPath().isEmpty())
+        {
+            pModule->extractFileName(modFileName);
+            pFuncListItem->setToolTip(CALLGRAPH_BUTTERFLY_MODULE, acGTStringToQString(pModule->getPath()));
+        }
+
+        pFuncListItem->setText(CALLGRAPH_BUTTERFLY_MODULE, acGTStringToQString(modFileName));
+    }
+
+    return pFuncListItem;
+}
+#endif

@@ -179,17 +179,9 @@ bool ModulesDataTable::fillSummaryTables(int counterIdx)
             // create QstringList to hold the values
             QStringList list;
 
-            // TODO: to get Function name instead of complete path.
             osFilePath modulePath(moduleData.m_name);
             gtString filename;
-            gtString extName;
-            gtString seperator(L".");
-
-            modulePath.getFileName(filename);
-            modulePath.getFileExtension(extName);
-
-            filename += seperator;
-            filename += extName;
+            modulePath.getFileNameAndExtension(filename);
 
             list << filename.asASCIICharArray();
 
@@ -230,7 +222,7 @@ bool ModulesDataTable::fillSummaryTables(int counterIdx)
         }
 
         setSortingEnabled(true);
-        resizeColumnToContents(AMDT_MOD_TABLE_SUMMARY_MOD_NAME);
+        setColumnWidth(AMDT_MOD_TABLE_SUMMARY_MOD_NAME, MAX_MODULE_NAME_LEN);
         retVal = true;
     }
 
@@ -269,7 +261,7 @@ bool ModulesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, s
         AddRowToTable(allProcessData);
 
         hideColumn(AMDT_MOD_TABLE_MOD_ID);
-        resizeColumnToContents(AMDT_MOD_TABLE_MOD_NAME);
+        setColumnWidth(AMDT_MOD_TABLE_SUMMARY_MOD_NAME, MAX_MODULE_NAME_LEN);
         retVal = true;
     }
 

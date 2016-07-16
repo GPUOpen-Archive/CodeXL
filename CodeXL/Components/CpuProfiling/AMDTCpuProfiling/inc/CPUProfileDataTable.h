@@ -43,6 +43,10 @@ class acTablePercentItemDelegate;
     #define END_TICK_COUNT(field)
 #endif
 
+#define MAX_FUNCTION_NAME_LEN 300
+#define MAX_MODULE_NAME_LEN 300
+#define MAX_PROCESS_NAME_LEN 300
+
 void mergedProfileDataVectors(gtVector<AMDTProfileData>& data);
 
 /// -----------------------------------------------------------------------------------------------

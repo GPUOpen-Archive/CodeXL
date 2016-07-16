@@ -346,6 +346,7 @@ void SessionFunctionView::selectFunction(const QString& funcId)
     }
 }
 
+#if 0
 void SessionFunctionView::selectFunction(const QString& functionName, ProcessIdType pid)
 {
     GT_IF_WITH_ASSERT(nullptr != m_pPIDComboBoxAction)
@@ -379,6 +380,7 @@ void SessionFunctionView::selectFunction(const QString& functionName, ProcessIdT
 
     selectTableItem(m_pFunctionTable, functionName, m_pFunctionTable->getFunctionNameColumnIndex());
 }
+#endif
 
 ProcessIdType SessionFunctionView::getCurrentPid()
 {
@@ -814,7 +816,7 @@ void SessionFunctionView::onTableContextMenuActionTriggered(CPUProfileDataTable:
         else if (actionType == CPUProfileDataTable::DISPLAY_FUNCTION_IN_CALLGRAPH_VIEW)
         {
             ProcessIdType pid = getCurrentPid();
-            openCallGraphViewForFunction(m_pFunctionTable->getFunctionName(pTableItem->row()), pid);
+            openCallGraphViewForFunction(m_pFunctionTable->getFunctionId(pTableItem->row()).toInt(), pid);
         }
     }
 }

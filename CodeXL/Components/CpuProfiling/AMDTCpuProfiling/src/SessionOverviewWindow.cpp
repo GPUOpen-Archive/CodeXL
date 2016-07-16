@@ -1056,7 +1056,7 @@ void SessionOverviewWindow::onTableContextMenuActionTriggered(CPUProfileDataTabl
 
                 GT_IF_WITH_ASSERT(!pidList.isEmpty())
                 {
-                    openCallGraphViewForFunction(m_pFunctionsTable->getFunctionName(pTableItem->row()), pidList.first());
+                    openCallGraphViewForFunction(m_pFunctionsTable->getFunctionId(pTableItem->row()).toInt(), pidList.first());
                     //openCallGraphViewForFunction(m_pFunctionsTable->getFunctionName(pTableItem->row()), pPidList->first());
                 }
                 break;

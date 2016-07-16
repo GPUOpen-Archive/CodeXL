@@ -83,7 +83,7 @@ bool ProcessesDataTable::fillSummaryTables(int counterIdx)
         }
 
         setSortingEnabled(true);
-        resizeColumnToContents(0);
+        setColumnWidth(PROCESS_NAME_COL, MAX_PROCESS_NAME_LEN);
         retVal = true;
     }
 
@@ -212,8 +212,7 @@ bool ProcessesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId,
         }
 
         AddRowToTable(allProcessData);
-        resizeColumnToContents(0);
-
+        setColumnWidth(PROCESS_NAME_COL, MAX_PROCESS_NAME_LEN);
         retVal = true;
     }
 

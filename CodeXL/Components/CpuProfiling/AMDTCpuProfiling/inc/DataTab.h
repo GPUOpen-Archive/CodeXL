@@ -132,7 +132,8 @@ public:
     /// \brief Description: Open the call graph view for the activated function
     /// \param[in]          funcName - the name of the function
     /// \param[in]          pid the process ID of the function
-    void openCallGraphViewForFunction(const QString& funcName, ProcessIdType pid);
+    //void openCallGraphViewForFunction(const QString& funcName, ProcessIdType pid);
+    void openCallGraphViewForFunction(AMDTFunctionId funcId, ProcessIdType pid);
 
     /// Sets the flag stating which change should be performed once the view is displayed:
     /// The type of change that should be applied

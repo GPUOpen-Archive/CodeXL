@@ -310,7 +310,7 @@ bool FunctionsDataTable::fillSummaryTables(int counterIdx)
 
         hideColumn(AMDT_FUNC_SUMMMARY_FUNC_ID_COL);
 
-        resizeColumnToContents(AMDT_FUNC_SUMMMARY_FUNC_NAME_COL);
+        setColumnWidth(AMDT_FUNC_SUMMMARY_FUNC_NAME_COL, MAX_FUNCTION_NAME_LEN);
         resizeColumnToContents(AMDT_FUNC_SUMMMARY_FUNC_SAMPLE_COL);
         resizeColumnToContents(AMDT_FUNC_SUMMMARY_FUNC_PER_SAMPLE_COL);
         resizeColumnToContents(AMDT_FUNC_SUMMMARY_FUNC_MODULE_COL);
@@ -435,9 +435,9 @@ bool FunctionsDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId,
 
         AddRowToTable(allModuleData);
 
+        setColumnWidth(AMDT_FUNC_SUMMMARY_FUNC_NAME_COL, MAX_FUNCTION_NAME_LEN);
         hideColumn(AMDT_FUNC_SUMMMARY_FUNC_ID_COL);
-        resizeColumnToContents(AMDT_FUNC_SUMMMARY_FUNC_NAME_COL);
-        resizeColumnToContents(AMDT_FUNC_SUMMMARY_FUNC_NAME_COL + 1);
+        setColumnWidth(AMDT_FUNC_SUMMMARY_FUNC_NAME_COL + 1, MAX_MODULE_NAME_LEN);
 
     }
 

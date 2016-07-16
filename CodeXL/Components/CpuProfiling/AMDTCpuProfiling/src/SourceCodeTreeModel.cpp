@@ -509,10 +509,7 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
                 if (true == flag)
                 {
                     pAsmItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, aSampleValue.m_sampleCount);
-
-                    QVariant var;
-					SetDisplayFormat(aSampleValue.m_sampleCountPercentage, true, var, SAMPLE_PERCENT_PRECISION);
-                    pAsmItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, var);
+                    pAsmItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, aSampleValue.m_sampleCountPercentage);
                     pAsmItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
 
                     flag = false;

@@ -625,7 +625,7 @@ void DataTab::openCallGraphView()
 }
 
 
-void DataTab::openCallGraphViewForFunction(const QString& funcName, ProcessIdType pid)
+void DataTab::openCallGraphViewForFunction(AMDTFunctionId functionId, ProcessIdType pid)
 {
     // Make sure that the function view is opened for this session:
     openCallGraphView();
@@ -654,9 +654,10 @@ void DataTab::openCallGraphViewForFunction(const QString& funcName, ProcessIdTyp
         {
             pSessionWindow->onViewCallGraphView(pid);
             SessionCallGraphView* pCallGraphTab = pSessionWindow->sessionCallGraphTab();
-            GT_IF_WITH_ASSERT((pCallGraphTab != nullptr) && (!funcName.isEmpty()))
+
+            GT_IF_WITH_ASSERT((pCallGraphTab != nullptr)/* && (!funcName.isEmpty())*/)
             {
-                pCallGraphTab->selectFunction(funcName, pid);
+                pCallGraphTab->selectFunction(functionId, pid);
             }
         }
     }
@@ -946,3 +947,42 @@ void ProfileViewDisplayInformation::clear()
     m_selectedHotSpot = "";
 }
 
+
+#if 0
+void DataTab::openCallGraphViewForFunction(const QString& funcName, ProcessIdType pid)
+{
+    // Make sure that the function view is opened for this session:
+    openCallGraphView();
+
+    // Get the tree instance:
+    afApplicationCommands* pCommands = afApplicationCommands::instance();
+    SessionViewCreator* pSessionViewCreator = AmdtCpuProfiling::sessionViewCreator();
+
+    GT_IF_WITH_ASSERT((pCommands != nullptr) && (pSessionViewCreator != nullptr) && (m_pDisplayedSessionItemData != nullptr))
+    {
+        CpuSessionWindow* pSessionWindow = nullptr;
+        const gtVector<CpuSessionWindow*>& openedSessions = pSessionViewCreator->currentlyOpenedSessionWindows();
+
+        for (int i = 0; i < (int)openedSessions.size(); i++)
+        {
+            if (openedSessions[i] != nullptr)
+            {
+                if (openedSessions[i]->displayedSessionFilePath() == m_pDisplayedSessionItemData->m_filePath)
+                {
+                    pSessionWindow = openedSessions[i];
+                }
+            }
+        }
+
+        GT_IF_WITH_ASSERT(pSessionWindow != nullptr)
+        {
+            pSessionWindow->onViewCallGraphView(pid);
+            SessionCallGraphView* pCallGraphTab = pSessionWindow->sessionCallGraphTab();
+            GT_IF_WITH_ASSERT((pCallGraphTab != nullptr) && (!funcName.isEmpty()))
+            {
+                pCallGraphTab->selectFunction(funcName, pid);
+            }
+        }
+    }
+}
+#endif
