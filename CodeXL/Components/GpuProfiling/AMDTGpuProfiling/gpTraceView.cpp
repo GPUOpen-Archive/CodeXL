@@ -415,13 +415,23 @@ void gpTraceView::SyncSelectionInSummary(ProfileSessionDataItem* pDataItem)
         // sync selection in summary table
         QString call = pDataItem->GetColumnData(ProfileSessionDataItem::SESSION_ITEM_CALL_COLUMN).toString();
 
-        if (pDataItem->ItemType().m_itemMainType == ProfileSessionDataItem::DX12_API_PROFILE_ITEM)
+        if (pDataItem->ItemType().m_itemMainType == ProfileSessionDataItem::DX12_API_PROFILE_ITEM  || pDataItem->ItemType().m_itemMainType == ProfileSessionDataItem::VK_API_PROFILE_ITEM)
         {
             m_pSummaryTableTabWidget->SelectAPIRowByCallName(call);
         }
-        else
+        else if (pDataItem->ItemType().m_itemMainType == ProfileSessionDataItem::DX12_GPU_PROFILE_ITEM  || pDataItem->ItemType().m_itemMainType == ProfileSessionDataItem::VK_GPU_PROFILE_ITEM)
         {
             m_pSummaryTableTabWidget->SelectGPURowByCallName(call);
+        }
+        else
+        {
+            acTimelineItem* pTimelineItem = SessionItemToTimelineItem(pDataItem);
+            CommandListTimelineItem* pCmdListItem = dynamic_cast<CommandListTimelineItem*>(pTimelineItem);
+            if (pCmdListItem != nullptr)
+            {
+                m_pSummaryTableTabWidget->SelectCommandList(pCmdListItem->CpommandListPtr());
+            }
+
         }
     }
 }

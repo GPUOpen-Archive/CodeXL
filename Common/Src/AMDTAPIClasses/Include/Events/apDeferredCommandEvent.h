@@ -65,6 +65,11 @@ public:
     void setData(const void* pvData, apDeferredCommandDataReleaser pfnReleaser = nullptr, apDeferredCommandDataCloner pfnCloner = nullptr);
 
 private:
+    apDeferredCommandEvent& operator=(const apDeferredCommandEvent& other) = delete;
+    apDeferredCommandEvent& operator=(apDeferredCommandEvent&& other) = delete;
+    apDeferredCommandEvent(const apDeferredCommandEvent& other) = delete;
+    apDeferredCommandEvent(apDeferredCommandEvent&& other) = delete;
+
     apDeferredCommand m_command;
     apDeferredCommandTarget m_target;
     void* m_pvData;

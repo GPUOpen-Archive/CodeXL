@@ -26,7 +26,8 @@
 #endif
 
 // DB file name extension.
-const gtString DB_FILE_EXTENSION = L".cxldb";
+const gtString CPUP_DB_FILE_EXTENSION = L".cxlcpdb";
+const gtString PWRP_DB_FILE_EXTENSION = L".cxldb";
 
 class AMDTDBADAPTER_API AmdtDatabaseAdapter
 {
@@ -60,7 +61,7 @@ public:
     virtual bool FlushDbAsync();
 
     // Get DB file extension
-    virtual bool GetDbFileExtension(gtString& extension) const;
+    virtual bool GetDbFileExtension(AMDTProfileMode profileMode, gtString& extension) const;
 
     virtual bool InsertSessionInfoKeyValue(const gtString& key, gtString& value);
 

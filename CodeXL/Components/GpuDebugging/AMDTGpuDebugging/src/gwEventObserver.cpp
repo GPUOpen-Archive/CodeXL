@@ -368,7 +368,7 @@ void gwEventObserver::onEvent(const apEvent& eve, bool& vetoEvent)
 
         case apEvent::AP_DEFERRED_COMMAND_EVENT:
         {
-            apDeferredCommandEvent deferredCommandEvent = (const apDeferredCommandEvent&)eve;
+            const apDeferredCommandEvent& deferredCommandEvent = (const apDeferredCommandEvent&)eve;
             apDeferredCommandEvent::apDeferredCommand command = deferredCommandEvent.command();
             apDeferredCommandEvent::apDeferredCommandTarget target = deferredCommandEvent.commandTarget();
 

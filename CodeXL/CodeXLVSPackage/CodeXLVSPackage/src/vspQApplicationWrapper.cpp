@@ -49,6 +49,45 @@ vspQApplicationWrapper::vspQApplicationWrapper(int argc, char* argv[])
     GT_ASSERT(rc);
 }
 
+// ---------------------------------------------------------------------------
+// Name:        shouldSetFocus
+// Description: Check the focus policy of the widget
+// Author:      Gilad Yarnitzky
+// Date:        28/6/2012
+// ---------------------------------------------------------------------------
+static bool shouldSetFocus(QWidget* pWidget, Qt::FocusPolicy policy);
+static void SendFocusEventIfNeeded(QMouseEvent* pMouseEvent, QWidget* pTargetWidget, QEvent* e)
+{
+    if (pMouseEvent && pTargetWidget != nullptr)
+    {
+        if (pMouseEvent->spontaneous() && pTargetWidget->isEnabled() && e->type() == QEvent::MouseButtonPress)
+        {
+            QWidget* pFocusWidget = pTargetWidget;
+
+            while (pFocusWidget)
+            {
+                if (pFocusWidget->isEnabled() && shouldSetFocus(pFocusWidget, Qt::ClickFocus))
+                {
+                    pFocusWidget->setFocus(Qt::MouseFocusReason);
+                    break;
+                }
+
+                if (pFocusWidget->isWindow())
+                {
+                    break;
+                }
+
+                pFocusWidget = pFocusWidget->parentWidget();
+            }
+        }
+
+        if (e->type() == QEvent::MouseButtonPress || e->type() == QEvent::MouseButtonDblClick)
+        {
+            vscToolWindow::CallToolShowFunction(pTargetWidget);
+        }
+    }
+}
+
 
 // ---------------------------------------------------------------------------
 // Name:        vspQApplicationWrapper::notify
@@ -70,85 +109,43 @@ bool vspQApplicationWrapper::notify(QObject* receiver, QEvent* e)
     // and converted locally using the win32 API, a new event is created (it is not possible to update the passed event)
     // send the new event, and delete it when done
     // In all other cases the event is simply forwarded to the parent class
-    if (e->type() ==  QEvent::MouseButtonPress || e->type() ==  QEvent::MouseButtonRelease ||
-        e->type() ==  QEvent::MouseButtonDblClick || e->type() ==  QEvent::MouseMove)
+    const QEvent::Type eventType = e->type();
+    const bool isMouseEvent = eventType == QEvent::MouseButtonPress || eventType == QEvent::MouseButtonRelease ||
+                                    eventType == QEvent::MouseButtonDblClick || eventType == QEvent::MouseMove;
+
+    if (isMouseEvent)
     {
-        QMouseEvent* pMouseEvent = dynamic_cast<QMouseEvent*>(e);
         QWindow* pTargetWindow = qobject_cast<QWindow*>(receiver);
         QWidget* pTargetWidget = qobject_cast<QWidget*>(receiver);
-
-        if (pMouseEvent != NULL && (pTargetWidget != NULL || pTargetWindow != NULL))
+       
+        if (pTargetWidget != nullptr || pTargetWindow != nullptr)
         {
-            // Get the new correct position:
-            // Get the global position:
-
-            POINT globalPos;
-            globalPos.x = pMouseEvent->globalX();
-            globalPos.y = pMouseEvent->globalY();
-
-            // Get target HWND
-            HWND targetWin32;
-
-            if (pTargetWindow != NULL)
+            QMouseEvent* pMouseEvent = dynamic_cast<QMouseEvent*>(e);
+            if (pMouseEvent != nullptr)
             {
-                targetWin32 = (HWND)pTargetWindow->winId();
-            }
-            else
-            {
-                targetWin32 = (HWND)pTargetWidget->winId();
-            }
+                QPoint correctLocalPos = CalculateCorrectPosition(pMouseEvent->globalX(), pMouseEvent->globalY(), pTargetWindow, pTargetWidget);
 
-            // convert to local position
-            ::ScreenToClient(targetWin32, &globalPos);
-            QPoint  correctLocalPos(globalPos.x, globalPos.y);
+                // Create a new corrected mouse event
+                QEvent* pCorrectedEvent = new QMouseEvent(eventType, correctLocalPos, pMouseEvent->globalPos(),
+                                                          pMouseEvent->button(), pMouseEvent->buttons(), pMouseEvent->modifiers());
 
-            // Create a new corrected mouse event
-            QMouseEvent* pCorrectedMouseEvent = new QMouseEvent(e->type(), correctLocalPos, pMouseEvent->globalPos(),
-                                                                pMouseEvent->button(), pMouseEvent->buttons(), pMouseEvent->modifiers());
+                notifyResult = QApplication::notify(receiver, pCorrectedEvent);
 
-            notifyResult = QApplication::notify(receiver, pCorrectedMouseEvent);
+                delete pCorrectedEvent;
 
-            delete pCorrectedMouseEvent;
-
-            // Check if needs to send focus event (simulate Qt mechanism defined in QApplicationPrivate::giveFocusAccordingToFocusPolicy && QApplicationPrivate::shouldSetFocus:
-            if (pTargetWidget != NULL)
-            {
-                if (pMouseEvent->spontaneous() && pTargetWidget->isEnabled() && e->type() == QEvent::MouseButtonPress)
-                {
-                    QWidget* pFocusWidget = pTargetWidget;
-
-                    while (pFocusWidget)
-                    {
-                        if (pFocusWidget->isEnabled() && shouldSetFocus(pFocusWidget, Qt::ClickFocus))
-                        {
-                            pFocusWidget->setFocus(Qt::MouseFocusReason);
-                            break;
-                        }
-
-                        if (pFocusWidget->isWindow())
-                        {
-                            break;
-                        }
-
-                        pFocusWidget = pFocusWidget->parentWidget();
-                    }
-                }
-
-                if (e->type() == QEvent::MouseButtonPress || e->type() == QEvent::MouseButtonDblClick)
-                {
-                    vscToolWindow::CallToolShowFunction(pTargetWidget);
-                }
+                // Check if needs to send focus event (simulate Qt mechanism defined in QApplicationPrivate::giveFocusAccordingToFocusPolicy && QApplicationPrivate::shouldSetFocus:
+                SendFocusEventIfNeeded(pMouseEvent, pTargetWidget, e);
             }
         }
     }
-    else if ((e->type() == QEvent::ApplicationActivate) || (e->type() == QEvent::ApplicationDeactivated) || (e->type() == QEvent::WindowActivate))
+    else if ((eventType == QEvent::ApplicationActivate) || (eventType == QEvent::ApplicationDeactivated) || (eventType == QEvent::WindowActivate))
     {
-        if ((e->type() == QEvent::ApplicationActivate) || (e->type() == QEvent::ApplicationDeactivated))
+        if ((eventType == QEvent::ApplicationActivate) || (eventType == QEvent::ApplicationDeactivated))
         {
-            vspQTWindowPaneImpl::s_isApplicationActive = (e->type() == QEvent::ApplicationActivate);
+            vspQTWindowPaneImpl::s_isApplicationActive = (eventType == QEvent::ApplicationActivate);
         }
 
-        if ((e->type() == QEvent::ApplicationActivate) || (e->type() == QEvent::WindowActivate))
+        if ((eventType == QEvent::ApplicationActivate) || (eventType == QEvent::WindowActivate))
         {
             // bring progress dialog to front
             bool progressDlg = vscProgressBarWrapper::instance().IsDlgShown();
@@ -159,47 +156,10 @@ bool vspQApplicationWrapper::notify(QObject* receiver, QEvent* e)
             }
         }
     }
-    else if (e->type() == QEvent::Wheel && m_pActiveWidget != nullptr && !m_inWheelEvent)
+    else if (eventType == QEvent::Wheel && m_pActiveWidget != nullptr && !m_inWheelEvent)
     {
-        // the first wheel event we need to transfer to our qt control, after that we let qt take control
-        m_inWheelEvent = true;
-        QWheelEvent* pWheelEvent = dynamic_cast<QWheelEvent*>(e);
+        notifyResult = NotifyOnWheelEvent(e);
 
-        // if it is a wheel event and we have an active window check with it which widget should get the event
-        if (pWheelEvent != nullptr)
-        {
-            QPoint eventPosLocal = m_pActiveWidget->mapFromGlobal(pWheelEvent->globalPos());
-            // get the lowest child
-            QWidget* pTargetObject = m_pActiveWidget->childAt(eventPosLocal);
-            bool foundLowest = (pTargetObject == nullptr);
-
-            while (!foundLowest)
-            {
-                eventPosLocal = pTargetObject->mapFromGlobal(pWheelEvent->globalPos());
-                QWidget* pChild = pTargetObject->childAt(eventPosLocal);
-
-                if (pChild != nullptr)
-                {
-                    pTargetObject = pChild;
-                }
-
-                foundLowest = (pChild == nullptr);
-            }
-
-            if (pTargetObject != nullptr)
-            {
-                // Create a new corrected wheel event
-                QWheelEvent* pCorrectedWheelEvent = new QWheelEvent(eventPosLocal, pWheelEvent->globalPos(),
-                                                                    pWheelEvent->pixelDelta(), pWheelEvent->angleDelta(), pWheelEvent->angleDelta().ry(), pWheelEvent->orientation(), pWheelEvent->buttons(), Qt::NoModifier, pWheelEvent->phase());
-
-                notifyResult = QApplication::notify(pTargetObject, pCorrectedWheelEvent);
-
-                delete pCorrectedWheelEvent;
-
-            }
-        }
-
-        m_inWheelEvent = false;
     }
     else
     {
@@ -207,6 +167,78 @@ bool vspQApplicationWrapper::notify(QObject* receiver, QEvent* e)
     }
 
     return notifyResult;
+}
+
+bool vspQApplicationWrapper::NotifyOnWheelEvent(QEvent* e)
+{
+    bool notifyResult = false;
+    // the first wheel event we need to transfer to our qt control, after that we let qt take control
+    m_inWheelEvent = true;
+    QWheelEvent* pWheelEvent = dynamic_cast<QWheelEvent*>(e);
+
+    // if it is a wheel event and we have an active window check with it which widget should get the event
+    if (pWheelEvent != nullptr)
+    {
+        QPoint eventPosLocal = m_pActiveWidget->mapFromGlobal(pWheelEvent->globalPos());
+        // get the lowest child
+        QWidget* pTargetObject = m_pActiveWidget->childAt(eventPosLocal);
+        bool foundLowest = (pTargetObject == nullptr);
+
+        while (!foundLowest)
+        {
+            eventPosLocal = pTargetObject->mapFromGlobal(pWheelEvent->globalPos());
+            QWidget* pChild = pTargetObject->childAt(eventPosLocal);
+
+            if (pChild != nullptr)
+            {
+                pTargetObject = pChild;
+            }
+
+            foundLowest = (pChild == nullptr);
+        }
+
+        if (pTargetObject != nullptr)
+        {
+            // Create a new corrected wheel event
+            QWheelEvent* pCorrectedWheelEvent = new QWheelEvent(eventPosLocal, pWheelEvent->globalPos(),
+                pWheelEvent->pixelDelta(), pWheelEvent->angleDelta(), pWheelEvent->angleDelta().ry(), pWheelEvent->orientation(), pWheelEvent->buttons(), Qt::NoModifier, pWheelEvent->phase());
+
+            notifyResult = QApplication::notify(pTargetObject, pCorrectedWheelEvent);
+
+            delete pCorrectedWheelEvent;
+
+        }
+    }
+
+    m_inWheelEvent = false; 
+    return notifyResult;
+}
+
+QPoint vspQApplicationWrapper::CalculateCorrectPosition(const int globalX, const int globalY, QWindow* pTargetWindow, QWidget* pTargetWidget) const
+{
+    // Get the new correct position:
+    // Get the global position:
+
+    POINT globalPos;
+    globalPos.x = globalX;
+    globalPos.y = globalY;
+
+    // Get target HWND
+    HWND targetWin32;
+
+    if (pTargetWindow != NULL)
+    {
+        targetWin32 = (HWND)pTargetWindow->winId();
+    }
+    else
+    {
+        targetWin32 = (HWND)pTargetWidget->winId();
+    }
+
+    // convert to local position
+    ::ScreenToClient(targetWin32, &globalPos);
+    QPoint  correctLocalPos(globalPos.x, globalPos.y);
+    return correctLocalPos;
 }
 
 bool vspQApplicationWrapper::eventFilter(QObject* pObject, QEvent* pEvent)
@@ -292,12 +324,12 @@ void vspQApplicationWrapper::UnhandledExceptionHandler(osExceptionCode exception
 
 
 // ---------------------------------------------------------------------------
-// Name:        vspQApplicationWrapper::shouldSetFocus
+// Name:        shouldSetFocus
 // Description: Check the focus policy of the widget
 // Author:      Gilad Yarnitzky
 // Date:        28/6/2012
 // ---------------------------------------------------------------------------
-bool vspQApplicationWrapper::shouldSetFocus(QWidget* pWidget, Qt::FocusPolicy policy)
+bool shouldSetFocus(QWidget* pWidget, Qt::FocusPolicy policy)
 {
     bool retVal = true;
 

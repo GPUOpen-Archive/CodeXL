@@ -160,8 +160,9 @@ private:
     /// The overview window should have dedicated settings, since it is always displaying "All Data" display filter name:
     SessionDisplaySettings m_hotspotSessionSettings;
 
-    // Does the current displayed session have multiple sessions:
-    bool m_isMultiProcesses;
+    // Does the current displayed session have multiple processes?
+    // Right now set it to true always. Show the hot process table always.
+    bool m_isMultiProcesses = true;
 
     int m_counterIdx = 0;
 };

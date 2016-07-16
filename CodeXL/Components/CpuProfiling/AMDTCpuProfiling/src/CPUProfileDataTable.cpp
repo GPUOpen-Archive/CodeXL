@@ -44,6 +44,46 @@ bool CPUProfileDataTable::m_sIconsInitialized = false;
 bool CPUProfileDataTable::m_CLUNoteShown = true;
 
 
+void mergedProfileDataVectors(gtVector<AMDTProfileData>& data)
+{
+    if (data.empty())
+    {
+        return;
+    }
+
+    // create map from longest vector
+    std::map<AMDTUInt64, AMDTProfileData> mIdProfileDataMap;
+
+    for (const auto& elem : data)
+    {
+        auto itr = mIdProfileDataMap.find(elem.m_id);
+
+        if (itr == mIdProfileDataMap.end())
+        {
+            mIdProfileDataMap.insert(make_pair(elem.m_id, elem));
+        }
+        else
+        {
+            AMDTProfileData& profData = itr->second;
+            int idx = 0;
+
+            for (auto& counter : profData.m_sampleValue)
+            {
+                counter.m_sampleCount += elem.m_sampleValue.at(idx).m_sampleCount;
+                counter.m_sampleCountPercentage += elem.m_sampleValue.at(idx).m_sampleCountPercentage;
+                idx++;
+            }
+        }
+    }
+
+    data.clear();
+
+    for (const auto& elem : mIdProfileDataMap)
+    {
+        data.push_back(elem.second);
+    }
+}
+
 CPUProfileDataTable::CPUProfileDataTable(QWidget* pParent,
                                          const gtVector<CPUProfileDataTable::TableContextMenuActionType>& additionalContextMenuActions,
                                          SessionTreeNodeData* pSessionData)

@@ -41,9 +41,11 @@ public:
 public slots:
     void UnhandledExceptionHandler(osExceptionCode exceptionCode, void* pExceptionContext);
 
-protected:
-    bool shouldSetFocus(QWidget* pWidget, Qt::FocusPolicy policy);
+private:
+    QPoint CalculateCorrectPosition(const int globalX, const int globalY, QWindow* pTargetWindow, QWidget* pTargetWidget) const;
+    bool NotifyOnWheelEvent(QEvent* e);
 
+private:
     /// last active window from mdi
     QWidget* m_pActiveWidget;
 

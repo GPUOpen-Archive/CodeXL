@@ -41,7 +41,7 @@ public:
     bool Migrate(bool deleteSrcFiles = false);
 
     const wchar_t* SourceFileExt = L"ebp";
-    const wchar_t* TargetFileExt = L"cxldb";
+    const wchar_t* TargetFileExt = L"cxlcpdb";
 
 private:
     bool doValidate();

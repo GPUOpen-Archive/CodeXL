@@ -204,6 +204,8 @@ public:
     bool GetModuleInfo(AMDTUInt32 pid, AMDTModuleId mid, gtVector<AMDTProfileModuleInfo>& moduleInfoList);
     bool GetThreadInfo(AMDTUInt32 pid, gtUInt32 tid, gtVector<AMDTProfileThreadInfo>& threadInfoList);
 
+    bool GetFunctionInfoByModuleId(AMDTModuleId moduleId, AMDTProfileFunctionInfoVec& funcInfoVec);
+
     bool GetProcessesWithCallstackSamples(gtVector<AMDTProcessId>& cssProcessVec);
 
     bool GetProcessTotals(AMDTProcessId               procId,

@@ -172,7 +172,7 @@ HRESULT CpuProfileReport::Report()
         // Input file - Processed profile data file
         osFilePath dbFilePath = GetDBFilePath();
         //TODO: remove this line once EBP file support is removed.
-        dbFilePath.setFileExtension(L"cxldb");
+        dbFilePath.setFileExtension(L"cxlcpdb");
         m_profileDbReader.OpenProfileData(dbFilePath.asString());
 
         AMDTProfileSessionInfo sessionInfo;
@@ -1585,7 +1585,7 @@ osFilePath& CpuProfileReport::GetOutputFilePath()
         gtString inputBaseName;
         m_inputFilePath.getFileName(inputBaseName);
         m_outputFilePath.setFileName(inputBaseName);
-        m_outputFilePath.setFileExtension(L"cxldb");
+        m_outputFilePath.setFileExtension(L"cxlcpdb");
     }
 
     return m_outputFilePath;

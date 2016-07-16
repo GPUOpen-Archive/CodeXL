@@ -678,20 +678,7 @@
         </Strings>
       </Button>
 
-      <Button guid="guidCodeXLVSPackageCmdSet" id="cmdidCaptureFrameGPU" priority="0x0160" type="Button">
-        <Parent guid="guidCodeXLVSPackageCmdSet" id="cmdidCodeXLProfilingActionsGroup"/>
-        <Icon guid="guidMenuCommandIcons" id="bmpCaptureGPU" />
-        <CommandFlag>TextChanges</CommandFlag>
-        <CommandFlag>DynamicVisibility</CommandFlag>
-        <Strings>
-          <CommandName>Capture Frame GPU only</CommandName>
-          <CanonicalName>Capture Frame GPU only</CanonicalName>
-          <ButtonText>Capture Frame GPU only</ButtonText>
-          <ToolTipText>CodeXL: Capture Frame GPU only</ToolTipText>
-        </Strings>
-      </Button>
-
-      <Button guid="guidCodeXLVSPackageCmdSet" id="cmdidCaptureFrameCPU" priority="0x0170" type="Button">
+      <Button guid="guidCodeXLVSPackageCmdSet" id="cmdidCaptureFrameCPU" priority="0x0160" type="Button">
         <Parent guid="guidCodeXLVSPackageCmdSet" id="cmdidCodeXLProfilingActionsGroup"/>
         <Icon guid="guidMenuCommandIcons" id="bmpCaptureCPU" />
         <CommandFlag>TextChanges</CommandFlag>
@@ -701,6 +688,19 @@
           <CanonicalName>Capture Frame CPU only</CanonicalName>
           <ButtonText>Capture Frame CPU only</ButtonText>
           <ToolTipText>CodeXL: Capture Frame CPU only</ToolTipText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidCodeXLVSPackageCmdSet" id="cmdidCaptureFrameGPU" priority="0x0170" type="Button">
+        <Parent guid="guidCodeXLVSPackageCmdSet" id="cmdidCodeXLProfilingActionsGroup"/>
+        <Icon guid="guidMenuCommandIcons" id="bmpCaptureGPU" />
+        <CommandFlag>TextChanges</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <CommandName>Capture Frame GPU only</CommandName>
+          <CanonicalName>Capture Frame GPU only</CanonicalName>
+          <ButtonText>Capture Frame GPU only</ButtonText>
+          <ToolTipText>CodeXL: Capture Frame GPU only</ToolTipText>
         </Strings>
       </Button>
 
