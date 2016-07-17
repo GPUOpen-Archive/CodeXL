@@ -98,7 +98,7 @@ public:
 
     shared_ptr<cxlProfileDataReader> profDbReader() { return m_pProfDataRd; }
     shared_ptr<DisplayFilter> GetDisplayFilter() { return m_pDisplayFilter; }
-    bool getCLUState() const { return m_isCLU; }
+    bool IsProfilingTypeCLU();
 
 public slots:
 

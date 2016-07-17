@@ -48,43 +48,72 @@ bool ProcessesDataTable::fillSummaryTables(int counterIdx)
         AMDTProfileDataVec processProfileData;
         rc = m_pProfDataRdr->GetProcessSummary(counterDesc.at(counterIdx).m_id,
                                                processProfileData);
-        GT_ASSERT(rc);
 
-        setSortingEnabled(false);
-
-        for (auto profData : processProfileData)
+        if (rc)
         {
-            // get the process info
-            AMDTProfileProcessInfoVec procInfo;
-            rc = m_pProfDataRdr->GetProcessInfo(profData.m_id, procInfo);
+            setSortingEnabled(false);
 
-            QStringList list;
-
-            if (profData.m_name != L"other")
+            for (auto profData : processProfileData)
             {
-                list << procInfo.at(0).m_name.asASCIICharArray();
-                list << QString::number(procInfo.at(0).m_pid);
+                // get the process info
+                AMDTProfileProcessInfoVec procInfo;
+                rc = m_pProfDataRdr->GetProcessInfo(profData.m_id, procInfo);
+
+                QStringList list;
+
+                if (profData.m_name != L"other")
+                {
+                    list << procInfo.at(0).m_name.asASCIICharArray();
+                    list << QString::number(procInfo.at(0).m_pid);
+                }
+                else
+                {
+                    list << "other";
+                    list << "";
+                }
+
+                int precision = SAMPLE_VALUE_PRECISION;
+
+                if (m_isCLU)
+                {
+                    if (m_pDisplayFilter->isCLUPercentCaptionSet())
+                    {
+                        precision = SAMPLE_PERCENT_PRECISION;
+                    }
+
+                    list << QString::number(profData.m_sampleValue.at(0).m_sampleCount, 'f', precision);
+                }
+                else
+                {
+                    QVariant sampleCount(profData.m_sampleValue.at(0).m_sampleCount);
+                    list << sampleCount.toString();
+
+                    list << QString::number(profData.m_sampleValue.at(0).m_sampleCountPercentage, 'f', precision);
+                }
+
+                addRow(list, nullptr);
+
+                if (!m_isCLU)
+                {
+                    delegateSamplePercent(3);
+                }
+                else
+                {
+                    if (m_pDisplayFilter->isCLUPercentCaptionSet())
+                    {
+                        delegateSamplePercent(PROCESS_SAMPLE_COL);
+                    }
+                    else
+                    {
+                        setItemDelegateForColumn(PROCESS_SAMPLE_COL, &acNumberDelegateItem::Instance());
+                    }
+                }
             }
-            else
-            {
-                list << "other";
-                list << "";
-            }
 
-            QVariant sampleCount(profData.m_sampleValue.at(0).m_sampleCount);
-            list << sampleCount.toString();
-
-            QVariant sampleCountPercent(profData.m_sampleValue.at(0).m_sampleCountPercentage);
-            list << QString::number(profData.m_sampleValue.at(0).m_sampleCountPercentage, 'f', 2);
-
-            addRow(list, nullptr);
-
-            delegateSamplePercent(3);
+            setSortingEnabled(true);
+            setColumnWidth(PROCESS_NAME_COL, MAX_PROCESS_NAME_LEN);
+            retVal = true;
         }
-
-        setSortingEnabled(true);
-        setColumnWidth(PROCESS_NAME_COL, MAX_PROCESS_NAME_LEN);
-        retVal = true;
     }
 
     return retVal;
@@ -147,7 +176,7 @@ bool ProcessesDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allProce
                 {
                     if (m_pDisplayFilter->GetSamplePercent() == true)
                     {
-                        list << QString::number(profData.m_sampleValue.at(i++).m_sampleCountPercentage, 'f', 2);
+                        list << QString::number(profData.m_sampleValue.at(i++).m_sampleCountPercentage, 'f', SAMPLE_PERCENT_PRECISION);
                         delegateSamplePercent(PROCESS_ID_COL + i);
                         setSampleValue = false;
                     }
@@ -164,8 +193,7 @@ bool ProcessesDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allProce
                     }
                     else
                     {
-                        QVariant sampleCount(sampleCnt);
-                        list << sampleCount.toString();
+                        list << QString::number(sampleCnt, 'f', SAMPLE_VALUE_PRECISION);
                     }
                 }
             }

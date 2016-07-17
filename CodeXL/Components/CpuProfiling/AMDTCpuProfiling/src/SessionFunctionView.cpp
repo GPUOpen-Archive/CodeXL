@@ -223,7 +223,8 @@ bool SessionFunctionView::displaySessionDataTables()
             retVal = m_pFunctionTable->displayTableData(m_pProfDataRdr,
                                                         m_pDisplayFilter,
                                                         AMDT_PROFILE_ALL_PROCESSES,
-                                                        AMDT_PROFILE_ALL_MODULES, selecedModIdVec);
+                                                        AMDT_PROFILE_ALL_MODULES,
+                                                        selecedModIdVec);
         }
 
     }

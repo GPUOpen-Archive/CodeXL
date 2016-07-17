@@ -45,6 +45,31 @@ enum CPUTableUpdateType
     UPDATE_TABLE_REBUILD = 0x0004
 };
 
+// STANDARD INCLUDES
+#include <memory>
+#include <map>
+#include <vector>
+#include <utility>
+#include <tuple>
+//PROJECT INCLUDES
+#include <AMDTBaseTools/Include/AMDTDefinitions.h>
+#include <AMDTCpuProfilingDataAccess/inc/AMDTCpuProfilingDataAccess.h>
+
+// FORWARD DECLARATION
+class cxlProfileDataReader;
+
+// TYPEDEFS
+using CounterNameIdVec = std::vector<std::tuple<gtString,               // counter name
+      gtString,                                                         // counter abbreviation
+      gtString,                                                         // counter desc
+      AMDTUInt32,                                                       // counter-id
+      AMDTUInt32>>;                                                     // counter-type
+using cofigNameCounterMap = std::map<gtString, CounterNameIdVec>;
+using cofigNameCounterPair = std::pair<gtString, CounterNameIdVec>;
+using CounterNameIdMap = std::map<gtString, AMDTUInt64>;
+using CounterIdNameMap = std::map<AMDTUInt64, gtString>;
+const gtString CLU_PERCENTAGE_CAPTION = L"Cache Line Utilization Percentage";
+
 /// -----------------------------------------------------------------------------------------------
 /// \class Name: CPUGlobalDisplayFilter
 /// \brief Description:  This class is supposed to represent a global display filter for all profile
@@ -242,30 +267,6 @@ public:
     QString m_lastSortColumnCaption;
 };
 
-// STANDARD INCLUDES
-#include <memory>
-#include <map>
-#include <vector>
-#include <utility>
-#include <tuple>
-//PROJECT INCLUDES
-#include <AMDTBaseTools/Include/AMDTDefinitions.h>
-#include <AMDTCpuProfilingDataAccess/inc/AMDTCpuProfilingDataAccess.h>
-
-// FORWARD DECLARATION
-class cxlProfileDataReader;
-
-// TYPEDEFS
-using CounterNameIdVec = std::vector<std::tuple<gtString,               // counter name
-      gtString,                                                         // counter abbreviation
-      gtString,                                                         // counter desc
-      AMDTUInt32,                                                       // counter-id
-      AMDTUInt32>>;                                                     // counter-type
-using cofigNameCounterMap = std::map<gtString, CounterNameIdVec>;
-using cofigNameCounterPair = std::pair<gtString, CounterNameIdVec>;
-using CounterNameIdMap = std::map<gtString, AMDTUInt64>;
-using CounterIdNameMap = std::map<AMDTUInt64, gtString>;
-
 class DisplayFilter
 {
 public:
@@ -317,7 +318,9 @@ public:
     DisplayFilter();
     bool IsSystemModuleIgnored();
     AMDTUInt32 GetCoreCount() const;
-
+    void SetCLUOVHdrName(const QString& name);
+    const QString& GetCLUOVHdrName() const { return m_CLUOVHdrName; }
+    bool isCLUPercentCaptionSet() const { return m_isCLUPercent; }
 private:
 
     //static DisplayFilter* m_instance;
@@ -332,6 +335,8 @@ private:
     CounterNameIdMap                        m_counterNameIdMap;
     CounterIdNameMap                        m_counterIdNameMap;
     CounterNameIdVec                        m_selectedCountersIdList;
+    QString                                 m_CLUOVHdrName;
+    bool                                    m_isCLUPercent = true;
 };
 
 #endif //__DISPLAYFILTER_H

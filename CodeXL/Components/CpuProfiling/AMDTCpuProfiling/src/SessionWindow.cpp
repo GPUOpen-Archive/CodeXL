@@ -152,6 +152,8 @@ bool CpuSessionWindow::display()
         {
             m_pDisplayFilter.reset(new DisplayFilter);
             m_pDisplayFilter->SetProfDataReader(m_pProfDataRd);
+            m_isCLU = IsProfilingTypeCLU();
+
             retVal = m_pDisplayFilter->CreateConfigCounterMap();
 
             if (retVal)
@@ -1310,4 +1312,24 @@ bool CpuSessionWindow::OpenDataReader()
     }
     return result;
 
+}
+
+bool CpuSessionWindow::IsProfilingTypeCLU()
+{
+    bool retVal = false;
+
+    if (nullptr != m_pProfDataRd)
+    {
+        AMDTProfileSessionInfo sessionInfo;
+
+        if (m_pProfDataRd->GetProfileSessionInfo(sessionInfo))
+        {
+            if (sessionInfo.m_sessionType == L"Cache Line Utilization")
+            {
+                retVal = true;
+            }
+        }
+    }
+
+    return retVal;
 }

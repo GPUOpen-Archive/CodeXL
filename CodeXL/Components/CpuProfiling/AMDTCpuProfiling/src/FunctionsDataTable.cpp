@@ -51,9 +51,18 @@ QString FunctionsDataTable::getModuleName(int rowIndex) const
 {
     QString name;
 
+    // module column index varies for CLU and
+    // other profiling
+    int moduleColIdx = 4;
+
+    if (m_isCLU)
+    {
+        moduleColIdx = 3;
+    }
+
     GT_IF_WITH_ASSERT((rowIndex >= 0) && (rowIndex < rowCount()))
     {
-        QTableWidgetItem* pNameTableItem = item(rowIndex, 4);
+        QTableWidgetItem* pNameTableItem = item(rowIndex, moduleColIdx);
 
         GT_IF_WITH_ASSERT(nullptr != pNameTableItem)
         {
@@ -271,11 +280,25 @@ bool FunctionsDataTable::fillSummaryTables(int counterIdx)
 
             list << profData.m_name.asASCIICharArray();
 
-            QVariant sampleCount(profData.m_sampleValue.at(0).m_sampleCount);
-            list << sampleCount.toString();
+            int precision = SAMPLE_VALUE_PRECISION;
 
-            QVariant sampleCountPercent(profData.m_sampleValue.at(0).m_sampleCountPercentage);
-            list << QString::number(profData.m_sampleValue.at(0).m_sampleCountPercentage, 'f', 2);
+            if (m_isCLU)
+            {
+                if (m_pDisplayFilter->isCLUPercentCaptionSet())
+                {
+                    precision = SAMPLE_PERCENT_PRECISION;
+                }
+
+                list << QString::number(profData.m_sampleValue.at(0).m_sampleCount, 'f', precision);
+            }
+            else
+            {
+                QVariant sampleCount(profData.m_sampleValue.at(0).m_sampleCount);
+                list << sampleCount.toString();
+
+                QVariant sampleCountPercent(profData.m_sampleValue.at(0).m_sampleCountPercentage);
+                list << QString::number(profData.m_sampleValue.at(0).m_sampleCountPercentage, 'f', precision);
+            }
 
             AMDTProfileModuleInfoVec procInfo;
             rc = m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_MAX_VALUE, profData.m_moduleId, procInfo);
@@ -293,17 +316,36 @@ bool FunctionsDataTable::fillSummaryTables(int counterIdx)
 
             addRow(list, nullptr);
 
-            SetIcon(procInfo.at(0).m_path,
-                    rowCount() - 1,
-                    AMDT_FUNC_SUMMMARY_FUNC_NAME_COL,
-                    AMDT_FUNC_SUMMMARY_FUNC_MODULE_COL,
-                    !procInfo.at(0).m_is64Bit,
-                    FunctionDataIndexRole);
+            int functionCol = AMDT_FUNC_SUMMMARY_FUNC_NAME_COL;
+            int sampleCol = AMDT_FUNC_SUMMMARY_FUNC_MODULE_COL;
 
             if (true == rc)
             {
-                rc = delegateSamplePercent(AMDT_FUNC_SUMMMARY_FUNC_PER_SAMPLE_COL);
+                if (!m_isCLU)
+                {
+                    rc = delegateSamplePercent(AMDT_FUNC_SUMMMARY_FUNC_PER_SAMPLE_COL);
+                }
+                else
+                {
+                    if (m_pDisplayFilter->isCLUPercentCaptionSet())
+                    {
+                        delegateSamplePercent(AMDT_FUNC_SUMMMARY_FUNC_SAMPLE_COL);
+                    }
+                    else
+                    {
+                        setItemDelegateForColumn(AMDT_FUNC_SUMMMARY_FUNC_SAMPLE_COL, &acNumberDelegateItem::Instance());
+                    }
+
+                    sampleCol = AMDT_FUNC_SUMMMARY_FUNC_SAMPLE_COL + 1;
+                }
             }
+
+            SetIcon(procInfo.at(0).m_path,
+                    rowCount() - 1,
+                    functionCol,
+                    sampleCol,
+                    !procInfo.at(0).m_is64Bit,
+                    FunctionDataIndexRole);
         }
 
         setSortingEnabled(true);
@@ -359,7 +401,7 @@ bool FunctionsDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allModul
                 {
                     if (m_pDisplayFilter->GetSamplePercent() == true)
                     {
-                        list << QString::number(profData.m_sampleValue.at(i++).m_sampleCountPercentage, 'f', 2);
+                        list << QString::number(profData.m_sampleValue.at(i++).m_sampleCountPercentage, 'f', SAMPLE_PERCENT_PRECISION);
                         delegateSamplePercent(AMDT_FUNC_FUNC_MODULE_COL + i);
                         setSampleValue = false;
                     }
@@ -376,8 +418,7 @@ bool FunctionsDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allModul
                     }
                     else
                     {
-                        QVariant sampleCount(sampleCnt);
-                        list << sampleCount.toString();
+                        list << QString::number(sampleCnt, 'f', SAMPLE_VALUE_PRECISION);
                     }
                 }
             }

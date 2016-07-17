@@ -65,6 +65,7 @@ DataTab::DataTab(QWidget* pParent, CpuSessionWindow* pParentSessionWindow, const
     GT_IF_WITH_ASSERT(pParentSessionWindow != nullptr)
     {
         m_pProfDataRdr = pParentSessionWindow->profDbReader();
+        m_isCLU = pParentSessionWindow->IsProfilingTypeCLU();
 #if 0
         m_pProfileInfo = m_pProfileReader->getProfileInfo();
 #endif

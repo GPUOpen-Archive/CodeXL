@@ -46,6 +46,8 @@ class acTablePercentItemDelegate;
 #define MAX_FUNCTION_NAME_LEN 300
 #define MAX_MODULE_NAME_LEN 300
 #define MAX_PROCESS_NAME_LEN 300
+#define SAMPLE_VALUE_PRECISION 8
+#define SAMPLE_PERCENT_PRECISION 2
 
 void mergedProfileDataVectors(gtVector<AMDTProfileData>& data);
 
@@ -100,7 +102,7 @@ public:
 
     bool displayTableSummaryData(shared_ptr<cxlProfileDataReader> pProfDataRdr,
                                  shared_ptr<DisplayFilter> pDisplayFilter,
-                                 int counterIdx);
+                                 int counterIdx, bool isCLU);
 
     /// Sort the table according to the requested display filter:
     void sortTable();
@@ -201,6 +203,7 @@ protected:
 
     shared_ptr<DisplayFilter>  m_pDisplayFilter = nullptr;
     shared_ptr<cxlProfileDataReader> m_pProfDataRdr = nullptr;
+    bool m_isCLU = false;
 
 protected slots:
 

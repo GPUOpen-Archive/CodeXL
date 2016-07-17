@@ -169,6 +169,20 @@ DisplayFilterDlg::displayDialog(const QString& sessionPath, bool enableOnlySyste
     m_pCheckBoxDisplaySystemDLLs->setEnabled(true);
     disableAllControlsExceptSystemDll(m_enableOnlySystemDll);
 
+    //for CLU:: Need to be optimised
+    if (nullptr != m_pProfDataReader)
+    {
+        AMDTProfileSessionInfo sessionInfo;
+
+        if (m_pProfDataReader->GetProfileSessionInfo(sessionInfo))
+        {
+            if (sessionInfo.m_sessionType == L"Cache Line Utilization")
+            {
+                m_pCheckBoxShowPercentageBars->setEnabled(false);
+            }
+        }
+    }
+
     // Display the dialog:
     int rc = exec();
 
@@ -280,9 +294,11 @@ bool DisplayFilterDlg::populateCoreList(int noOfCores)
         {
             delete it;
         }
+
         m_pCheckBoxCore.clear();
 
         m_pCheckBoxCore.reserve(m_noOfCores);
+
         for (int i = 0; i < m_noOfCores; ++i)
         {
             m_pCheckBoxCore.push_back(new QCheckBox);
@@ -422,6 +438,7 @@ void DisplayFilterDlg::onChangeView(const QString& newlySelectedView)
 
             // Add new items:
             m_pCheckBoxColumns.reserve(noOfColumn);
+
             for (int i = 0; i < noOfColumn; ++i)
             {
                 m_pCheckBoxColumns.push_back(new QCheckBox);
@@ -772,8 +789,8 @@ void DisplayFilterDlg::updateHiddenColumnList()
 {
     // Sanity check:
     GT_IF_WITH_ASSERT((m_pCheckBoxSeparateColumnsBy != nullptr) &&
-        (m_pRadioButtonSeparateByNUMA != nullptr) &&
-        (m_pRadioButtonSeparateByCore != nullptr))
+                      (m_pRadioButtonSeparateByNUMA != nullptr) &&
+                      (m_pRadioButtonSeparateByCore != nullptr))
     {
         std::vector<gtString> checkCounterName;
         m_notChecked.clear();
@@ -800,6 +817,7 @@ void DisplayFilterDlg::updateHiddenColumnList()
             }
 
             CounterNameIdVec selectedCounters;
+
             for (int i = 0; i < m_noOfColumn; ++i)
             {
                 QString counterName = m_pCheckBoxColumns[i]->text();
@@ -825,6 +843,7 @@ void DisplayFilterDlg::updateHiddenColumnList()
                 }
 
             }
+
             m_displayFilter->SetSelectedCounterList(selectedCounters);
         }
     }

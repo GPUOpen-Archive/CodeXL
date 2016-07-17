@@ -116,14 +116,22 @@ CPUProfileDataTable::~CPUProfileDataTable()
 
 bool CPUProfileDataTable::displayTableSummaryData(shared_ptr<cxlProfileDataReader> pProfDataRdr,
                                                   shared_ptr<DisplayFilter> pDisplayFilter,
-                                                  int counterIdx)
+                                                  int counterIdx,
+                                                  bool isCLU)
 {
-    (void)pDisplayFilter; //unused
     bool retVal = false;
+
+    //TODO : for CLU backend support req, temp hack need to be removed
+    if (isCLU)
+    {
+        pDisplayFilter->InitToDefault();
+    }
 
     if (nullptr != pProfDataRdr)
     {
         m_pProfDataRdr = pProfDataRdr;
+        m_pDisplayFilter = pDisplayFilter;
+        m_isCLU = isCLU;
 
         // Clear table items:
         clear();
@@ -903,6 +911,12 @@ bool CPUProfileDataTable::initializeTableHeaders(shared_ptr<DisplayFilter> dipla
             bool rc = m_pTableDisplaySettings->colTypeAsString(m_pTableDisplaySettings->m_displayedColumns[i],
                                                                colStr, colTooltip);
             GT_ASSERT(rc);
+
+            if (m_isCLU && (colStr == "Samples"))
+            {
+                colStr = diplayFilter->GetCLUOVHdrName();
+                colTooltip = colStr;
+            }
 
             columnsStringByObjectType << colStr;
             columnTooltipsByObjectType << colTooltip;

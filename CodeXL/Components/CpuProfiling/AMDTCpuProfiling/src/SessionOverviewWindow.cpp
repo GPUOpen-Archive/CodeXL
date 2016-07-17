@@ -536,9 +536,9 @@ bool SessionOverviewWindow::displaySessionDataTables()
                       (m_pFunctionsTable != nullptr) &&
                       (m_pProcessesHeader != nullptr))
     {
-        retVal = m_pProcessesTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, m_counterIdx);
-        retVal = m_pFunctionsTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, m_counterIdx) && retVal;
-        retVal = m_pModulesTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, m_counterIdx) && retVal;
+        retVal = m_pProcessesTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, m_counterIdx, m_isCLU);
+        retVal = m_pFunctionsTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, m_counterIdx, m_isCLU) && retVal;
+        retVal = m_pModulesTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, m_counterIdx, m_isCLU) && retVal;
     }
 
     return retVal;
@@ -563,6 +563,10 @@ bool SessionOverviewWindow::updateTablesHotspotIndicator()
             bool rc = m_pProcessesTable->organizeTableByHotSpotIndicator() && retVal;
             retVal = retVal && rc;
         }
+
+        QTableWidgetItem* newItem = new QTableWidgetItem(acGTStringToQString(L"testing"));
+
+        m_pProcessesTable->setHorizontalHeaderItem(2, newItem);
 
         // Show / hide the processes section:
         m_pProcessesTable->setVisible(m_isMultiProcesses);
@@ -728,18 +732,19 @@ void SessionOverviewWindow::onHotSpotComboChanged(const QString& text)
             m_pFunctionsTable->tableDisplaySettings()->m_lastSortOrder = defaultSortOrder;
             m_pModulesTable->tableDisplaySettings()->m_lastSortOrder = defaultSortOrder;
             m_pProcessesTable->tableDisplaySettings()->m_lastSortOrder = defaultSortOrder;
+            m_pDisplayFilter->SetCLUOVHdrName(text);
 
             auto itr = m_CounterIdxMap.find(text.toStdWString().c_str());
 
             if (m_CounterIdxMap.end() != itr)
             {
-                bool rc = m_pProcessesTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, itr->second);
+                bool rc = m_pProcessesTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, itr->second, m_isCLU);
                 GT_ASSERT(rc);
 
-                rc = m_pFunctionsTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, itr->second);
+                rc = m_pFunctionsTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, itr->second, m_isCLU);
                 GT_ASSERT(rc);
 
-                rc = m_pModulesTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, itr->second);
+                rc = m_pModulesTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, itr->second, m_isCLU);
                 GT_ASSERT(rc);
             }
         }
@@ -1052,12 +1057,9 @@ void SessionOverviewWindow::onTableContextMenuActionTriggered(CPUProfileDataTabl
                     pidList << pid;
                 }
 
-                //const QList<ProcessIdType>* pPidList = m_pFunctionsTable->getFunctionPidList(pTableItem->row());
-
                 GT_IF_WITH_ASSERT(!pidList.isEmpty())
                 {
                     openCallGraphViewForFunction(m_pFunctionsTable->getFunctionId(pTableItem->row()).toInt(), pidList.first());
-                    //openCallGraphViewForFunction(m_pFunctionsTable->getFunctionName(pTableItem->row()), pPidList->first());
                 }
                 break;
             }

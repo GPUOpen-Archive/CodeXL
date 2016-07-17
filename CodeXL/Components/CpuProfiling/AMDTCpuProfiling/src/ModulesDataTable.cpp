@@ -120,21 +120,6 @@ void ModulesDataTable::onAboutToShowContextMenu()
                                     selectedRows << pItem->row();
                                 }
                             }
-
-#if 0
-                            // Enable the action if one of the selected moeuls has loaded symbols:
-                            isActionEnabled = false;
-
-                            for (int rowIndex : selectedRows)
-                            {
-                                if (AreModuleSymbolsLoaded(rowIndex))
-                                {
-                                    isActionEnabled = true;
-                                    break;
-                                }
-                            }
-
-#endif
                         }
                     }
                     else
@@ -186,12 +171,24 @@ bool ModulesDataTable::fillSummaryTables(int counterIdx)
             list << filename.asASCIICharArray();
 
             QString modulefullPath(moduleData.m_name.asASCIICharArray());
+            int precision = SAMPLE_VALUE_PRECISION;
 
-            QVariant sampleCount(moduleData.m_sampleValue.at(0).m_sampleCount);
-            list << sampleCount.toString();
+            if (m_isCLU)
+            {
+                if (m_pDisplayFilter->isCLUPercentCaptionSet())
+                {
+                    precision = SAMPLE_PERCENT_PRECISION;
+                }
 
-            QVariant sampleCountPercent(moduleData.m_sampleValue.at(0).m_sampleCountPercentage);
-            list << QString::number(moduleData.m_sampleValue.at(0).m_sampleCountPercentage, 'f', 2);
+                list << QString::number(moduleData.m_sampleValue.at(0).m_sampleCount, 'f', precision);
+            }
+            else
+            {
+                QVariant sampleCount(moduleData.m_sampleValue.at(0).m_sampleCount);
+                list << sampleCount.toString();
+                QVariant sampleCountPercent(moduleData.m_sampleValue.at(0).m_sampleCountPercentage);
+                list << QString::number(moduleData.m_sampleValue.at(0).m_sampleCountPercentage, 'f', precision);
+            }
 
             addRow(list, nullptr);
 
@@ -218,7 +215,21 @@ bool ModulesDataTable::fillSummaryTables(int counterIdx)
                 pModuleNameItem->setToolTip(moduleData.m_name.asASCIICharArray());
             }
 
-            rc = delegateSamplePercent(AMDT_MOD_TABLE_SUMMARY_SAMPLE_PER);
+            if (!m_isCLU)
+            {
+                rc = delegateSamplePercent(AMDT_MOD_TABLE_SUMMARY_SAMPLE_PER);
+            }
+            else
+            {
+                if (m_pDisplayFilter->isCLUPercentCaptionSet())
+                {
+                    delegateSamplePercent(AMDT_MOD_TABLE_CLU_HS_COL);
+                }
+                else
+                {
+                    setItemDelegateForColumn(AMDT_MOD_TABLE_CLU_HS_COL, &acNumberDelegateItem::Instance());
+                }
+            }
         }
 
         setSortingEnabled(true);
@@ -316,7 +327,7 @@ bool ModulesDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allProcess
                 {
                     if (m_pDisplayFilter->GetSamplePercent() == true)
                     {
-                        list << QString::number(profData.m_sampleValue.at(i++).m_sampleCountPercentage, 'f', 2);
+                        list << QString::number(profData.m_sampleValue.at(i++).m_sampleCountPercentage, 'f', SAMPLE_PERCENT_PRECISION);
                         delegateSamplePercent(AMDT_MOD_TABLE_SYMBOL_LOADED + i);
                         setSampleValue = false;
                     }
@@ -333,8 +344,7 @@ bool ModulesDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allProcess
                     }
                     else
                     {
-                        QVariant sampleCount(sampleCnt);
-                        list << sampleCount.toString();
+                        list << QString::number(sampleCnt, 'f', SAMPLE_VALUE_PRECISION);
                     }
                 }
             }

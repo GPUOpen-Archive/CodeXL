@@ -1011,7 +1011,7 @@ static bool g_isSamplePercent = false;
 
 DisplayFilter::DisplayFilter()
 {
-
+    m_CLUOVHdrName = acGTStringToQString(L"Cache Line Utilization Percentage");
 }
 
 bool DisplayFilter::CreateConfigCounterMap()
@@ -1127,6 +1127,7 @@ DisplayFilter::InitToDefault()
 {
     bool retVal = true;
     m_reportConfigs.clear();
+	m_selectedCountersIdList.clear();
 
     if (nullptr != m_pProfDataReader.get())
     {
@@ -1249,4 +1250,15 @@ AMDTUInt32 DisplayFilter::GetCoreCount() const
     }
 
     return coreCount;
+}
+
+void DisplayFilter::SetCLUOVHdrName(const QString& name)
+{
+    m_CLUOVHdrName = name;
+    m_isCLUPercent = false;
+
+    if (acGTStringToQString(CLU_PERCENTAGE_CAPTION) == name)
+    {
+        m_isCLUPercent = true;
+    }
 }
