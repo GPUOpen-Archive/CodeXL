@@ -312,16 +312,23 @@ static const acIconCoord ac_stat_icon16_coords[] =
     { AC_ICON_ANALYZE_APPTREE_FOLDER_DX,        20, 28 },
     { AC_ICON_ANALYZE_APPTREE_FOLDER,           21, 28 },
 
-    { AC_ICON_ANALYZE_APPTREE_KERNEL,       0, 29 },
-    { AC_ICON_ANALYZE_APPTREE_OVERVIEW,     1, 29 },
-    { AC_ICON_ANALYZE_APPTREE_ANALYSIS,     2, 29 },
-    { AC_ICON_ANALYZE_APPTREE_STATISTICS,   3, 29 },
-    { AC_ICON_ANALYZE_APPTREE_IL,           4, 29 },
-    { AC_ICON_ANALYZE_APPTREE_ISA,          5, 29 },
-    { AC_ICON_ANALYZE_APPTREE_IL_ISA,       6, 29 },
-    { AC_ICON_ANALYZE_APPTREE_ADDNEW,       7, 29 },
-    { AC_ICON_ANALYZE_APPTREE_OPEN,         8, 29 },
-    { AC_ICON_ANALYZE_APPTREE_SOURCE,       9, 29 },
+    { AC_ICON_ANALYZE_APPTREE_KERNEL,            0, 29 },
+    { AC_ICON_ANALYZE_APPTREE_OVERVIEW,          1, 29 },
+    { AC_ICON_ANALYZE_APPTREE_ANALYSIS,          2, 29 },
+    { AC_ICON_ANALYZE_APPTREE_STATISTICS,        3, 29 },
+    { AC_ICON_ANALYZE_APPTREE_IL,                4, 29 },
+    { AC_ICON_ANALYZE_APPTREE_ISA,               5, 29 },
+    { AC_ICON_ANALYZE_APPTREE_IL_ISA,            6, 29 },
+    { AC_ICON_ANALYZE_APPTREE_ADDNEW,            7, 29 },
+    { AC_ICON_ANALYZE_APPTREE_OPEN,              8, 29 },
+    { AC_ICON_ANALYZE_APPTREE_SOURCE,            9, 29 },
+    //-------------------------------------------------//
+    { AC_ICON_ANALYZE_APPTREE_VERTEX,           16, 29 },
+    { AC_ICON_ANALYZE_APPTREE_TESSCONT_HULL,    17, 29 },
+    { AC_ICON_ANALYZE_APPTREE_TESSEVAL_DOMAIN,  18, 29 },
+    { AC_ICON_ANALYZE_APPTREE_GEOMETRY,         19, 29 },
+    { AC_ICON_ANALYZE_APPTREE_FRAGMENT_PIXEL,   20, 29 },
+    { AC_ICON_ANALYZE_APPTREE_KERNEL_COMPUTE,   21, 29 },
 
     { AC_ICON_ANALYZE_STATISTICS_MEETS,     0, 30 },
     { AC_ICON_ANALYZE_STATISTICS_DEGRADE,   1, 30 },
@@ -338,6 +345,8 @@ static const acIconCoord ac_stat_icon16_coords[] =
     { AC_ICON_FRAME_ANALYSIS_APP_TREE_TIMELINE,             3, 34 },
     { AC_ICON_FRAME_ANALYSIS_APP_TREE_PERFORMANCE_PROFILE,  4, 34 },
     { AC_ICON_FRAME_ANALYSIS_APP_TREE_IMAGE,                5, 34 },
+    //------------------------------------------------------------//
+    { AC_ICON_FRAME_ANALYSIS_OPEN_TIMELINE,                16, 34 },
 
     { -1, -1, -1 }
 };

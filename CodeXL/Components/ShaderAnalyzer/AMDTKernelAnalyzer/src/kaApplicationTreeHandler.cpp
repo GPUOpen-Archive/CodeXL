@@ -116,6 +116,12 @@ kaApplicationTreeHandler::kaApplicationTreeHandler() : afApplicationTreeHandler(
     acSetIconInPixmap(m_pIconsArray[KA_PIXMAP_GL_FOLDER],       AC_ICON_ANALYZE_APPTREE_FOLDER_GL);
     acSetIconInPixmap(m_pIconsArray[KA_PIXMAP_DX_FOLDER],       AC_ICON_ANALYZE_APPTREE_FOLDER_DX);
     acSetIconInPixmap(m_pIconsArray[KA_PIXMAP_SOURCE],          AC_ICON_ANALYZE_APPTREE_SOURCE);
+    acSetIconInPixmap(m_pIconsArray[KA_PIXMAP_VERTEX],          AC_ICON_ANALYZE_APPTREE_VERTEX);
+    acSetIconInPixmap(m_pIconsArray[KA_PIXMAP_TESCON_HULL],     AC_ICON_ANALYZE_APPTREE_TESSCONT_HULL);
+    acSetIconInPixmap(m_pIconsArray[KA_PIXMAP_TESEVA_DOMAIN],   AC_ICON_ANALYZE_APPTREE_TESSEVAL_DOMAIN);
+    acSetIconInPixmap(m_pIconsArray[KA_PIXMAP_GEOMETRY],        AC_ICON_ANALYZE_APPTREE_GEOMETRY);
+    acSetIconInPixmap(m_pIconsArray[KA_PIXMAP_FRAG_PIXEL],      AC_ICON_ANALYZE_APPTREE_FRAGMENT_PIXEL);
+    acSetIconInPixmap(m_pIconsArray[KA_PIXMAP_COMP_KERNEL],     AC_ICON_ANALYZE_APPTREE_KERNEL_COMPUTE);
     acSetIconInPixmap(m_pIconsArray[KA_PIXMAP_OVERVIEW],        AC_ICON_ANALYZE_APPTREE_OVERVIEW);
     acSetIconInPixmap(m_pIconsArray[KA_PIXMAP_KERNEL],          AC_ICON_ANALYZE_APPTREE_KERNEL);
     acSetIconInPixmap(m_pIconsArray[KA_PIXMAP_ANALYSIS],        AC_ICON_ANALYZE_APPTREE_ANALYSIS);
@@ -485,10 +491,8 @@ QTreeWidgetItem* kaApplicationTreeHandler::AddNode(const gtString& nodeName, afT
     {
         // add the program child node
         afApplicationTreeItemData* pKATypeData = new afApplicationTreeItemData;
-        kaTreeDataExtension* pExtensionData;
-
         pKATypeData->m_itemType = nodeType;
-        pExtensionData = new kaTreeDataExtension;
+        kaTreeDataExtension* pExtensionData = new kaTreeDataExtension;
         pKATypeData->setExtendedData(pExtensionData);
         pExtensionData->setFilePath(filePath);
         pExtensionData->setLineNumber(lineNumber);
@@ -1678,7 +1682,7 @@ void kaApplicationTreeHandler::AddFileNodeToProgramBranch(const osFilePath& adde
                     }
 
                     pFileTreeNode->setTextColor(0, Qt::black);
-                    pFileTreeNode->setIcon(0, m_pIconsArray[KA_PIXMAP_SOURCE]);
+                    pFileTreeNode->setIcon(0, ProgramItemTypeAsIcon(programChildItemType));
                 }
                 GT_IF_WITH_ASSERT(pFileTreeNode != nullptr)
                 {
@@ -2019,9 +2023,7 @@ void kaApplicationTreeHandler::OnNewFile(afTreeItemType programChildItemType)
 
         // Create a new file, and set it on the program (if not null), attached to stage (for rendering programs)
         osFilePath createdFilePath;
-
         kaPipelinedProgram::PipelinedStage stage = kaRenderingProgram::TreeItemTypeToRenderingStage(programChildItemType);
-
 
         if (pProgram != nullptr)
         {
@@ -2868,8 +2870,7 @@ bool kaApplicationTreeHandler::AddFileAddTreeItem(QTreeWidgetItem* pParent)
                 pItemData->m_isItemRemovable = false;
 
                 // extension data is needed even empty so the search will work correctly:
-                kaTreeDataExtension* pExtensionData;
-                pExtensionData = new kaTreeDataExtension;
+                kaTreeDataExtension* pExtensionData = new kaTreeDataExtension;
                 pExtensionData->setFilePath(pKAData->filePath());
                 pItemData->setExtendedData(pExtensionData);
                 QTreeWidgetItem* pNewItem = m_pApplicationTree->addTreeItem(KA_STR_treeAddFileNode, pItemData, pParent);
@@ -2911,8 +2912,7 @@ bool kaApplicationTreeHandler::AddFileCreateTreeItem(QTreeWidgetItem* pParent)
                 pItemData->m_isItemRemovable = false;
 
                 // extension data is needed even empty so the search will work correctly:
-                kaTreeDataExtension* pExtensionData;
-                pExtensionData = new kaTreeDataExtension;
+                kaTreeDataExtension* pExtensionData = new kaTreeDataExtension;
                 pExtensionData->setFilePath(pKAData->filePath());
                 pItemData->setExtendedData(pExtensionData);
                 QTreeWidgetItem* pNewItem = m_pApplicationTree->addTreeItem(KA_STR_treeNewFileNode, pItemData, pParent);
@@ -2975,8 +2975,7 @@ bool kaApplicationTreeHandler::AddProgramCreateTreeItem()
                 pItemData->m_isItemRemovable = false;
 
                 // extension data is needed even empty so the search will work correctly:
-                kaTreeDataExtension* pExtensionData;
-                pExtensionData = new kaTreeDataExtension;
+                kaTreeDataExtension* pExtensionData = new kaTreeDataExtension;
                 pItemData->setExtendedData(pExtensionData);
 
                 m_pNewProgramTreeItem = m_pApplicationTree->addTreeItem(KA_STR_treeNewProgramNode, pItemData, m_pProgramsRootNode);
@@ -5628,7 +5627,7 @@ afApplicationTreeItemData* kaApplicationTreeHandler::AddProgramTreeItemChild(QTr
                         if (!nodeName.isEmpty())
                         {
                             childText = acQStringToGTString( QString("%1 (%2)").arg(nodeName).arg(acGTStringToQString(childText)));
-                        }                   
+                        }
                     }
                 }
                 else if (pComputeProgram != nullptr)
@@ -5677,7 +5676,7 @@ afApplicationTreeItemData* kaApplicationTreeHandler::AddProgramTreeItemChild(QTr
                     }
 
                     pNewNode->setTextColor(0, itemColor);
-                    pNewNode->setIcon(0, m_pIconsArray[KA_PIXMAP_SOURCE]);
+                    pNewNode->setIcon(0, ProgramItemTypeAsIcon(itemType));
                 }
             }
         }
@@ -5754,6 +5753,55 @@ gtString kaApplicationTreeHandler::ProgramItemTypeAsText(afTreeItemType itemType
     }
 
     return retVal;
+}
+
+const QPixmap& kaApplicationTreeHandler::ProgramItemTypeAsIcon(afTreeItemType itemType)
+{
+    const QPixmap* pRetVal = nullptr;
+
+    switch (itemType)
+    {
+    case AF_TREE_ITEM_KA_PROGRAM_GL_GEOM:
+        pRetVal = &m_pIconsArray[KA_PIXMAP_GEOMETRY];
+        break;
+
+    case AF_TREE_ITEM_KA_PROGRAM_GL_FRAG:
+        pRetVal = &m_pIconsArray[KA_PIXMAP_FRAG_PIXEL];
+        break;
+
+    case AF_TREE_ITEM_KA_PROGRAM_GL_TESC:
+        pRetVal = &m_pIconsArray[KA_PIXMAP_TESCON_HULL];
+        break;
+
+    case AF_TREE_ITEM_KA_PROGRAM_GL_TESE:
+        pRetVal = &m_pIconsArray[KA_PIXMAP_TESEVA_DOMAIN];
+        break;
+
+    case AF_TREE_ITEM_KA_PROGRAM_GL_VERT:
+        pRetVal = &m_pIconsArray[KA_PIXMAP_VERTEX];
+        break;
+
+    case AF_TREE_ITEM_KA_PROGRAM_GL_COMP:
+        pRetVal = &m_pIconsArray[KA_PIXMAP_COMP_KERNEL];
+        break;
+
+    case AF_TREE_ITEM_KA_ADD_FILE:
+        pRetVal = &m_pIconsArray[KA_PIXMAP_ADD_FILE];
+        break;
+    case AF_TREE_ITEM_KA_NEW_FILE:
+        pRetVal = &m_pIconsArray[KA_PIXMAP_NEW_FILE];
+        break;
+    case AF_TREE_ITEM_KA_PROGRAM:
+    case AF_TREE_ITEM_KA_PROGRAM_SHADER:
+        pRetVal = &m_pIconsArray[KA_PIXMAP_KERNELS];
+        break;
+
+    default:
+        GT_ASSERT_EX(false, L"Unsupported program item")
+            break;
+    }
+
+    return ((nullptr != pRetVal) ? *pRetVal : m_pIconsArray[KA_PIXMAP_SOURCE]);
 }
 
 void kaApplicationTreeHandler::BuildNPProgramTreeItemNode(kaNonPipelinedProgram* pNPProgram, QTreeWidgetItem* pProgramTreeNodeItem)
@@ -5973,9 +6021,9 @@ afApplicationTreeItemData* kaApplicationTreeHandler::AddProgram(bool focusNode, 
             pItemData = new afApplicationTreeItemData;
             pItemData->m_itemType = AF_TREE_ITEM_KA_PROGRAM;
             pItemData->m_isItemRemovable = false;
+
             // extension data is needed even empty so the search will work correctly:
-            kaTreeDataExtension* pExtensionData;
-            pExtensionData = new kaTreeDataExtension;
+            kaTreeDataExtension* pExtensionData = new kaTreeDataExtension;
             pExtensionData->SetProgram(pProgram);
             pItemData->setExtendedData(pExtensionData);
 

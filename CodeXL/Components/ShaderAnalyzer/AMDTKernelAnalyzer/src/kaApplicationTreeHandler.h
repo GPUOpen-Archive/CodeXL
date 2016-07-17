@@ -45,23 +45,29 @@ private:
 
     enum kaTreeIconIndex
     {
-        KA_PIXMAP_KERNELS,
-        KA_PIXMAP_VK_FOLDER,
-        KA_PIXMAP_CL_FOLDER,
-        KA_PIXMAP_GL_FOLDER,
-        KA_PIXMAP_DX_FOLDER,
-        KA_PIXMAP_SOURCE,
-        KA_PIXMAP_OVERVIEW,
-        KA_PIXMAP_KERNEL,
-        KA_PIXMAP_IL_FILE,
-        KA_PIXMAP_ISA_FILE,
-        KA_PIXMAP_IL_ISA_FILE,
-        KA_PIXMAP_STATISTICS,
-        KA_PIXMAP_ANALYSIS,
-        KA_PIXMAP_BUILD,
-        KA_PIXMAP_ADD_FILE,
-        KA_PIXMAP_NEW_FILE,
-        KA_PIXMAP_FOLDER,
+        KA_PIXMAP_KERNELS,      // Generic program object
+        KA_PIXMAP_VK_FOLDER,    // Vulkan program
+        KA_PIXMAP_CL_FOLDER,    // OpenCL program
+        KA_PIXMAP_GL_FOLDER,    // OpenGL program
+        KA_PIXMAP_DX_FOLDER,    // DirectX program
+        KA_PIXMAP_SOURCE,       // Generic shader / kernel
+        KA_PIXMAP_VERTEX,       // Vertex shader
+        KA_PIXMAP_TESCON_HULL,  // Tessellation control / hull shader
+        KA_PIXMAP_TESEVA_DOMAIN,// Tessellation evaluation / domain shader
+        KA_PIXMAP_GEOMETRY,     // Geometry shader
+        KA_PIXMAP_FRAG_PIXEL,   // Fragment / pixel shader
+        KA_PIXMAP_COMP_KERNEL,  // Compute shader / kernel
+        KA_PIXMAP_OVERVIEW,     // Overview tab
+        KA_PIXMAP_KERNEL,       // Kernel statistics tab
+        KA_PIXMAP_IL_FILE,      // IL binary + disasm
+        KA_PIXMAP_ISA_FILE,     // ISA binary + disasm
+        KA_PIXMAP_IL_ISA_FILE,  // IL+ISA binary + disasm
+        KA_PIXMAP_STATISTICS,   // Statistics tab
+        KA_PIXMAP_ANALYSIS,     // Analysis tab
+        KA_PIXMAP_BUILD,        // Build command
+        KA_PIXMAP_ADD_FILE,     // Add existing command
+        KA_PIXMAP_NEW_FILE,     // Add new command
+        KA_PIXMAP_FOLDER,       // Folder
         KA_PIXMAP_OBJECT_TYPES_AMOUNT
     };
 
@@ -520,6 +526,8 @@ private:
     QTreeWidgetItem* FindProgramFileBeforeItem(QTreeWidgetItem* pProgramItem);
 
     gtString ProgramItemTypeAsText(afTreeItemType itemType, const gtString& itemText);
+
+    const QPixmap& ProgramItemTypeAsIcon(afTreeItemType itemType);
 
     /// Sets the new file on the appropriate tree item
     void SetFileInTree(kaSourceFile* pFile, const afApplicationTreeItemData* pProgramTreeItemData, afTreeItemType addedTreeItemType);

@@ -235,7 +235,7 @@ void gpSessionView::InitLayout()
     m_pStopButton->setFixedWidth(acScalePixelSizeToDisplayDPI(GP_SESSION_VIEW_BUTTON_SIZE));
 
     QPixmap openTimelineButtonIcon;
-    acSetIconInPixmap(openTimelineButtonIcon, AC_ICON_FRAME_ANALYSIS_APP_TREE_TIMELINE, largerButtonIcon);
+    acSetIconInPixmap(openTimelineButtonIcon, AC_ICON_FRAME_ANALYSIS_OPEN_TIMELINE, largerButtonIcon);
     m_pOpenTimelineButton->setIcon(openTimelineButtonIcon);
     m_pOpenTimelineButton->setIconSize(iconSize);
     m_pOpenTimelineButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
