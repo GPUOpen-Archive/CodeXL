@@ -135,7 +135,8 @@ void gpRibbonDataCalculator::GetGPUOps(QVector<gpRibbonCallsData>& dataVector)
                 ProfileSessionDataItem* pCurrentItem = m_pData->QueueItem(queueName, nGPUOp);
                 GT_IF_WITH_ASSERT(pCurrentItem != nullptr)
                 {
-                    if (pCurrentItem->ItemType().m_itemMainType == ProfileSessionDataItem::DX12_GPU_PROFILE_ITEM)
+                    if (pCurrentItem->ItemType().m_itemMainType == ProfileSessionDataItem::DX12_GPU_PROFILE_ITEM || 
+                        pCurrentItem->ItemType().m_itemMainType == ProfileSessionDataItem::VK_GPU_PROFILE_ITEM)
                     {
                         gpRibbonCallsData newData;
                         newData.m_startTime = pCurrentItem->StartTime() - m_pTimeLine->startTime();
