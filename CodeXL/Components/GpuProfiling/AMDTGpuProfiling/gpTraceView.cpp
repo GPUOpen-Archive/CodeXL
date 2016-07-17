@@ -662,12 +662,12 @@ void gpTraceView::OnNavigationLayerVisibilityChanged()
         {
             m_pNavigationRibbon->CalculateConcurrency();
         }
+        // the navigation ribbon sets correctly the flags of the visibility layers since the check boxes are managed there
+        m_pNavigationRibbon->OnLayerVisibilityChanged(visibleGroup, visibleLayersByFlag);
 
         // This function is called again on purpose. CalculateConcurrency changes the visibility flag (it adds
-        // few more layers), so we need to set it again
+        // few more layers), so we need to set it again and it might also be changed by the navigation ribbon
         m_pNavigationRibbon->GetCurrentVisibility(visibleGroup, visibleLayersByFlag);
-
-        m_pNavigationRibbon->OnLayerVisibilityChanged(visibleGroup, visibleLayersByFlag);
 
         m_pDetailedDataRibbon->OnLayerVisibilityChanged(visibleGroup, visibleLayersByFlag);
 

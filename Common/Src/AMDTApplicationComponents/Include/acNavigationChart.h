@@ -184,7 +184,7 @@ public:
     };
 
     /// layer id of the layer. when adding a layer the system will check that there are no two layers with the same id so it must be set
-    /// corretly before adding the layer
+    /// correctly before adding the layer
     int m_layerId;
 
     /// type of layer
@@ -192,6 +192,9 @@ public:
 
     /// data of layer (using the main navigation chart x data
     QVector<double> m_layerYData;
+
+    /// data of layer (using the main navigation chart x data
+    QVector<double> m_layerOriginalYData;
 
     /// is the layer visible
     bool m_visible;
@@ -287,6 +290,9 @@ public:
     /// Updates the Y axis range depending on current Y value
     void UpdateYAxisRange();
 
+    /// Set min height values for all items in layers
+    void UpdateMinHeightValues();
+
     /// sets off-line data
     /// \param xData is the x data vector
     /// \param yData is the y data vector
@@ -369,6 +375,9 @@ public:
     /// \param layerID layer identification
     /// \param visible visibility mode
     void SetLayerVisiblity(int layerID, bool visible);
+
+    /// Update y range based on layers visibility
+    void UpdateYAxisRangeBasedOnVisibleLayers();
 
     /// set the units that the navigation chart is using
     void SetNavigationUnitsX(eNavigationUnits iUnits) { m_unitsX = iUnits; }

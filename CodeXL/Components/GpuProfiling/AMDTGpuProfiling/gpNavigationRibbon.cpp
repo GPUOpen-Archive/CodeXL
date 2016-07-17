@@ -399,6 +399,7 @@ void gpNavigationRibbon::AddIndexedLayer(acNavigationChartLayer*& pLayer, QVecto
         {
             pLayer = new acNavigationChartLayer;
             pLayer->m_layerYData = yData;
+            pLayer->m_layerOriginalYData = yData;
             pLayer->m_type = layerType;
             pLayer->m_visible = visible;
             pLayer->m_dimmedPen = QPen(dimmedPenColor);
@@ -416,6 +417,7 @@ void gpNavigationRibbon::AddIndexedLayer(acNavigationChartLayer*& pLayer, QVecto
         else
         {
             pLayer->m_layerYData = yData;
+            pLayer->m_layerOriginalYData = yData;
         }
     }
 }
@@ -430,6 +432,7 @@ void gpNavigationRibbon::AddNoneIndexedLayer(acNavigationChartLayerNonIndex*& pL
             pLayer = new acNavigationChartLayerNonIndex;
             pLayer->m_layerXData = xData;
             pLayer->m_layerYData = yData;
+            pLayer->m_layerOriginalYData = yData;
             pLayer->m_type = layerType;
             pLayer->m_visible = false;
             pLayer->m_dimmedPen = QPen(dimmedPenColor);
@@ -448,6 +451,7 @@ void gpNavigationRibbon::AddNoneIndexedLayer(acNavigationChartLayerNonIndex*& pL
         {
             pLayer->m_layerXData = xData;
             pLayer->m_layerYData = yData;
+            pLayer->m_layerOriginalYData = yData;
         }
     }
 }
@@ -476,20 +480,8 @@ void gpNavigationRibbon::UpdateAxisData()
 
 void gpNavigationRibbon::OnNavigateStateChanged(int state)
 {
-    QCheckBox* pSender = qobject_cast<QCheckBox*>(sender());
-
-    GT_IF_WITH_ASSERT(pSender != nullptr && m_pNavigationChart != nullptr && m_pTimeLine != nullptr)
-    {
-        // find the sender number
-        for (int nCheckBox = 0; nCheckBox < eNavigateLayersNum; nCheckBox++)
-        {
-            if (m_pNavigateLayer[nCheckBox] == pSender)
-            {
-                m_pNavigationChart->SetLayerVisiblity(nCheckBox, state == Qt::Checked);
-            }
-        }
-    }
-
+    GT_UNREFERENCED_PARAMETER(state);
+    // the update of the layer will be done in the layer visibility event 
     EmitLayersVisibility();
 }
 
@@ -565,9 +557,7 @@ void gpNavigationRibbon::OnGroupChanged(int index)
             bool isVisible = m_sLayerToGroupConnection[nLayer] == index;
             m_pNavigateLayer[nLayer]->setVisible(isVisible);
         }
-        bool isChecked = m_pNavigateLayer[nLayer]->isChecked();
-        bool isLayerVisible = m_sLayerToGroupConnection[nLayer] == index;
-        m_pNavigationChart->SetLayerVisiblity(nLayer, isChecked && isLayerVisible);
+        // the update of the layer will be done in the layer visibility event 
     }
 
     EmitLayersVisibility();
@@ -580,7 +570,7 @@ void gpNavigationRibbon::OnLayerVisibilityChanged(int visibleGroup, int visibleL
     GT_UNREFERENCED_PARAMETER(visibleLayersByFlag);
     GT_IF_WITH_ASSERT((m_pNavigationChart != nullptr) && (m_pFrameDataCalculator != nullptr))
     {
-        m_pNavigationChart->SetNavigationUnitsY(visibleGroup == 0 ? acNavigationChart::eNavigationNanoseconds : acNavigationChart::eNavigationSingleUnits);
+        m_pNavigationChart->SetNavigationUnitsY(visibleGroup == eNavigateGroupDuration ? acNavigationChart::eNavigationNanoseconds : acNavigationChart::eNavigationSingleUnits);
 
         for (int nLayer = 0; nLayer < eNavigateLayersNum; nLayer++)
         {
@@ -589,6 +579,14 @@ void gpNavigationRibbon::OnLayerVisibilityChanged(int visibleGroup, int visibleL
                 m_pNavigateLayer[nLayer]->setVisible(m_sLayerToGroupConnection[nLayer] == visibleGroup);
             }
             m_pNavigationChart->SetLayerVisiblity(nLayer, m_pNavigateLayer[nLayer]->checkState() == Qt::Checked && m_sLayerToGroupConnection[nLayer] == visibleGroup);
+        }
+
+        m_pNavigationChart->UpdateYAxisRangeBasedOnVisibleLayers();
+
+        // only for the visible group of duration do the min height calculation
+        if (visibleGroup == eNavigateGroupDuration)
+        {
+            m_pNavigationChart->UpdateMinHeightValues();
         }
 
         // create the new present bars

@@ -1466,6 +1466,32 @@ void acNavigationChart::UpdateYAxisRange()
     SetYAxisTickLabels();
 }
 
+void acNavigationChart::UpdateMinHeightValues()
+{
+    int numLayers = m_layersVector.size();
+
+    GT_IF_WITH_ASSERT(m_pYAxis != nullptr)
+    {
+        int lowerValue = m_pYAxis->axisRect()->bottom();
+        double minHeight = m_pYAxis->pixelToCoord(lowerValue-4);
+        for (int nLayer = 0; nLayer < numLayers; nLayer++)
+        {
+            acNavigationChartLayer* pCurrentLayer = m_layersVector[nLayer];
+            if (pCurrentLayer != nullptr && pCurrentLayer->m_visible)
+            {
+                int dataSize = pCurrentLayer->m_layerOriginalYData.size();
+                for (int nData = 0; nData < dataSize; nData++)
+                {
+                    if (pCurrentLayer->m_layerOriginalYData[nData] < minHeight && pCurrentLayer->m_layerOriginalYData[nData] != 0)
+                    {
+                        pCurrentLayer->m_layerYData[nData] = minHeight;
+                    }
+                }
+            }
+        }
+    }
+}
+
 double acNavigationChart::GetDefaultTimeRange()
 {
     double defaultTime = m_defaultTimeRange;
@@ -1972,31 +1998,30 @@ void acNavigationChart::SetLayerVisiblity(int layerID, bool visible)
             }
         }
     }
+}
 
-    // the layers indexes can be defined in the UI before the data is entered so layers can be "shown/hiden"
-    // before the data is added and layers can not be found this way so this is not an GT_ASSERT
-    if (foundLayer)
+void acNavigationChart::UpdateYAxisRangeBasedOnVisibleLayers()
+{
+    // calculate the max range
+    double maxVisible = -DBL_MAX;
+
+    int numLayers = m_layersVector.size();
+    for (int nLayer = 0; nLayer < numLayers; nLayer++)
     {
-        // calculate the max range
-        double maxVisible = -DBL_MAX;
-
-        for (int nLayer = 0; nLayer < numLayers; nLayer++)
+        acNavigationChartLayer* pCurrentLayer = m_layersVector[nLayer];
+        GT_IF_WITH_ASSERT(pCurrentLayer != nullptr)
         {
-            acNavigationChartLayer* pCurrentLayer = m_layersVector[nLayer];
-            GT_IF_WITH_ASSERT(pCurrentLayer != nullptr)
+            if (pCurrentLayer->m_visible && pCurrentLayer->m_layerMaxValue > maxVisible)
             {
-                if (pCurrentLayer->m_visible && pCurrentLayer->m_layerMaxValue > maxVisible)
-                {
-                    maxVisible = pCurrentLayer->m_layerMaxValue;
-                }
+                maxVisible = pCurrentLayer->m_layerMaxValue;
             }
         }
+    }
 
-        if (maxVisible != -DBL_MAX)
-        {
-            m_maxYSoFar = maxVisible;
-            UpdateYAxisRange();
-        }
+    if (maxVisible != -DBL_MAX)
+    {
+        m_maxYSoFar = maxVisible;
+        UpdateYAxisRange();
     }
 }
 
