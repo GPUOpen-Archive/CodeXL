@@ -78,7 +78,6 @@ commonLinkedLibraries = \
     "CXLOSWrappers",
     "CXLDbAdapter",
     "CXLAPIClasses",
-    "CXLAnalysisBackend",
     "CXLApplicationFramework",
     "CXLProfilerDAL",
     "CXLPowerProfilingMidTier",
