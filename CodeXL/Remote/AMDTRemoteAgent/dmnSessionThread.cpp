@@ -1721,9 +1721,15 @@ bool dmnSessionThread::CreateProcess(REMOTE_OPERATION_MODE mode, const gtString&
     // DTOR will clean the environment after child creation.
     osEnvVarScope envScope(envVars);
 
+        bool shouldDisplayWindow = false;
+#if AMDT_BUILD_CONFIGURATION == AMDT_DEBUG_BUILD
+        // When debugging CodeXL, open the window, in order to detect problems via console meesages
+        shouldDisplayWindow = true;
+#endif
+
     // Create the RDS/CodeXLGpuProfiler as a suspended process.
     // Note no regressions occur for the debugging scenario (which worked correctly with L"" for the cmdLineArgs.
-    isOk = osLaunchSuspendedProcess(filePathTemp, cmdLineArgs, dirPathTemp, procId, procHandle, procThreadHandle);
+    isOk = osLaunchSuspendedProcess(filePathTemp, cmdLineArgs, dirPathTemp, procId, procHandle, procThreadHandle, shouldDisplayWindow);
 
     GT_IF_WITH_ASSERT(isOk)
     {
