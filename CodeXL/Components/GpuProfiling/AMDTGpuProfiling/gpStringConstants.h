@@ -688,5 +688,9 @@
 #define GP_STR_FrameAnalysisExportCapturingFrameSingleMsg L"Capturing frame %d"
 #define GP_STR_FrameAnalysisExportCapturingFrameMultiMsg L"Capturing frames %d-%d"
 
+// Navigation chart
+#define GP_STR_NavigationChartNoCPUDataTitle "Error: No CPU data"
+#define GP_STR_NavigationChartNoCPUDataMsg "Filtering is available only for frame traces that include CPU data. Use the 'Capture' or 'Capture CPU' buttons to include CPU data in the frame trace."
+
 #endif //__GPSTRINGCONSTANTS_H
 

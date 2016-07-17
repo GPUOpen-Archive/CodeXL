@@ -138,7 +138,10 @@ public:
     virtual void onUpdateEdit_FindNext(bool& isEnabled);
 
     virtual void OnEditCopy();
-    virtual void OnEditSelectAll();
+    virtual void OnEditSelectAll();    
+    
+    gpTraceDataContainer* GetSessionDataContainer()const { return m_pSessionDataContainer; }
+
 
 public slots:
 

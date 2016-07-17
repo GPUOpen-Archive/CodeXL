@@ -11,6 +11,7 @@
 #include <AMDTApplicationComponents/Include/Timeline/acTimelineFiltersDialog.h>
 #include <AMDTApplicationComponents/Include/acColours.h>
 #include <AMDTApplicationComponents/Include/acIcons.h>
+#include <AMDTApplicationComponents/Include/acMessageBox.h>
 
 // AMDTApplicationFramework:
 #include <AMDTApplicationFramework/Include/afApplicationCommands.h>
@@ -21,6 +22,7 @@
 #include <AMDTGpuProfiling/gpTraceView.h>
 #include <AMDTGpuProfiling/gpRibbonDataCalculator.h>
 #include <AMDTGpuProfiling/gpUIManager.h>
+#include <AMDTGpuProfiling/gpStringConstants.h>
 
 #define LAYOUT_MARGINS 5 // as as the acTimeLineGrid ms_GRID_MARGIN
 
@@ -517,17 +519,28 @@ void gpNavigationRibbon::OnTimeLineZoomOrOffsetChanged()
 
 void gpNavigationRibbon::OnDisplayFiltersClicked()
 {
-    // open thread profiling settings dialog window
-    GT_IF_WITH_ASSERT(m_pThreadFilterDialog != nullptr)
-    {
-        m_pThreadFilterDialog->DisplayDialog(m_pTimeLine->GetBranches());
 
-        // if ok button was clicked - update the link label
-        if (QDialog::Accepted == m_pThreadFilterDialog->exec())
-        {
-            emit m_pTimeLine->VisibilityFilterChanged(m_pThreadFilterDialog->getThreadVisibilityMap());
-        }
-    }
+   bool threadsExistInSession = (m_pOwningSession->GetSessionDataContainer()->ThreadsCount() > 0);
+
+   if (threadsExistInSession)
+   {
+       // open thread profiling settings dialog window
+       GT_IF_WITH_ASSERT(m_pThreadFilterDialog != nullptr)
+       {
+           m_pThreadFilterDialog->DisplayDialog(m_pTimeLine->GetBranches());
+
+           // if ok button was clicked - update the link label
+           if (QDialog::Accepted == m_pThreadFilterDialog->exec())
+           {
+               emit m_pTimeLine->VisibilityFilterChanged(m_pThreadFilterDialog->getThreadVisibilityMap());
+           }
+       }
+   }
+   else
+   {
+       acMessageBox::instance().critical(GP_STR_NavigationChartNoCPUDataTitle, GP_STR_NavigationChartNoCPUDataMsg, QMessageBox::Ok);
+
+   }
 }
 
 /// Received when timeline filters are changed
