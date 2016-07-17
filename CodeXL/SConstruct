@@ -602,7 +602,7 @@ CodeXL_Full = \
     AMDTSystemInformationHelper + \
     AMDTTeaPot + \
     AMDTClassicMatMul + \
-    KernelAnalyzer + \
+#    KernelAnalyzer + \
     GPSBackend
 
 Default(CodeXL_Full)

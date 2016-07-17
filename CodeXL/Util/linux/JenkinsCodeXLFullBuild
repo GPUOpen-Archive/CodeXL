@@ -139,7 +139,9 @@ checkforerror()
 PackageTheBuild()
 
 {
-    set -e
+    # Using "set -e" instructs the script to fail if it can't locate one of the required files for the package
+    # There is a corresponding "+e" at the end of the function
+    #set -e
     BUILDTYPE=$1
 
     echo "---- TIMING: Packaging start: `date`"
@@ -2956,7 +2958,10 @@ PackageTheBuild()
 
 	fi
 
-    set +e
+    # Using "set -e" instructs the script to fail if it can't locate one of the required files for the package
+    # This is a corresponding "+e" at the end of the function
+    #set +e
+
     # And finally, create the xml files for the updater to use
     # Only a 64-bit version
     FULL_CONFIG_FILE=${CONFIG_FILE_BASE}64.xml
