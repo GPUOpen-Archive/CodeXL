@@ -1452,6 +1452,8 @@ bool gaPersistentDataManager::clearAllStepFlags()
 {
     bool retVal = true;
 
+    bool wasAnyFlagSet = (_suspendDebuggedProcessExecution || _breakOnNextMonitoredFunctionCall || _breakOnNextDrawFunctionCall || _breakOnNextFrame || _breakInMonitoredFunctionCall);
+
     // Clear the local flags (if the API connection is not active yet):
     _suspendDebuggedProcessExecution = false;
     _breakOnNextMonitoredFunctionCall = false;
@@ -1460,7 +1462,7 @@ bool gaPersistentDataManager::clearAllStepFlags()
     _breakInMonitoredFunctionCall = false;
 
     // If the API is active - clear the flags there as well:
-    if (gaIsAPIConnectionActive(AP_SPIES_UTILITIES_API_CONNECTION))
+    if (wasAnyFlagSet && gaIsAPIConnectionActive(AP_SPIES_UTILITIES_API_CONNECTION))
     {
         retVal = clearAllSpyStepFlags();
     }
