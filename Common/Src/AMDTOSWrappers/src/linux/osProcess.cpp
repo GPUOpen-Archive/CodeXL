@@ -496,7 +496,7 @@ bool osLaunchSuspendedProcess(
                     gtVector<gtString>::const_iterator endIt = strArgList.end();
                     offset = 0;
                     int argI(0);
-                    char utf8CmdBuf[FILENAME_MAX * 2];
+                    char utf8CmdBuf[FILENAME_MAX * 2] = {};
                     std::string utf8string;
 
                     //For each substring in the vector
