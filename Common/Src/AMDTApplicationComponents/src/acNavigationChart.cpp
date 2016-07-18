@@ -1482,6 +1482,7 @@ void acNavigationChart::UpdateMinHeightValues()
                 int dataSize = pCurrentLayer->m_layerOriginalYData.size();
                 for (int nData = 0; nData < dataSize; nData++)
                 {
+                    pCurrentLayer->m_layerYData[nData] = pCurrentLayer->m_layerOriginalYData[nData];
                     if (pCurrentLayer->m_layerOriginalYData[nData] < minHeight && pCurrentLayer->m_layerOriginalYData[nData] != 0)
                     {
                         pCurrentLayer->m_layerYData[nData] = minHeight;

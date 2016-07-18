@@ -95,7 +95,8 @@ gpTraceView::gpTraceView(QWidget* parent) : gpBaseSessionView(parent),
     m_frameIndex(-1, -1),
     m_isSessionLoaded(false),
     m_isCpuAPISelectionChangeInProgress(false),
-    m_isGpuAPISelectionChangeInProgress(false)
+    m_isGpuAPISelectionChangeInProgress(false),
+    m_initialResizeEvent(true)
 {
     // Set the background color to white
     QPalette p = palette();
@@ -257,9 +258,6 @@ bool gpTraceView::DisplaySession(const osFilePath& sessionFilePath, afTreeItemTy
                     m_pDetailedDataRibbon->SetTimeLine(m_pTimeline);
 
                     m_pDetailedDataRibbon->CalculateData();
-
-                    // After the data was initialized, and layers were created in navigation and detailed views, emit a signal with the visibility
-                    m_pNavigationRibbon->EmitLayersVisibility();
                 }
 
                 // API Summary
@@ -277,6 +275,19 @@ bool gpTraceView::DisplaySession(const osFilePath& sessionFilePath, afTreeItemTy
     }
 
     return retVal;
+}
+
+void gpTraceView::resizeEvent(QResizeEvent* event)
+{
+
+    if (isVisible() && m_initialResizeEvent)
+    {
+        m_initialResizeEvent = false;
+
+        // display the layers correctly in all views as if visibility was changed
+        OnNavigationLayerVisibilityChanged();
+    }
+    gpBaseSessionView::resizeEvent(event);
 }
 
 void gpTraceView::onFindClick()
@@ -672,6 +683,9 @@ void gpTraceView::OnNavigationLayerVisibilityChanged()
         m_pDetailedDataRibbon->OnLayerVisibilityChanged(visibleGroup, visibleLayersByFlag);
 
         afApplicationCommands::instance()->EndPerformancePrintout("OnNavigationLayerVisibilityChanged");
+        // force update of the data to show minimal values a bit crude but effective and since it is the initial appearance the extra time
+        // is ok.
+        emit m_pNavigationRibbon->NavigationChart()->RangeChangedByUser(m_pNavigationRibbon->NavigationChart()->GetCurrentRange());
 
     }
 }

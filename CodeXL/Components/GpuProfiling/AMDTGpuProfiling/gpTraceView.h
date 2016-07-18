@@ -189,6 +189,10 @@ public slots:
     /// \param pItem - the clicked item
     void OnSummaryItemClicked(ProfileSessionDataItem* pItem);
 
+    /// resize event
+    /// \param event
+    virtual void resizeEvent(QResizeEvent* event);
+
 protected:
 
     /// Clears the selection in CPU\GPU trace table
@@ -239,6 +243,9 @@ protected:
 
     /// True if the user selected an item in the GPU table
     bool m_isGpuAPISelectionChangeInProgress;
+
+    /// first initial visibile resize event
+    bool m_initialResizeEvent;
 
 };
 
