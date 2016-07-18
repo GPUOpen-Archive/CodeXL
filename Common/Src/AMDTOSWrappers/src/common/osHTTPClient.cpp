@@ -470,7 +470,7 @@ bool osHTTPClient::ReadTCPSocketIntoPage(gtASCIIString& outputPage, unsigned int
 
                 if (findNCNC <= firstSpaceLocation) { findNCNC = (int)totalDataRead; }
 
-                int headersEndLocation = min(min(findNLNL + 2, findCRCR + 2), min(findCNCN + 4, findNCNC + 4));
+                int headersEndLocation = std::min(std::min(findNLNL + 2, findCRCR + 2), std::min(findCNCN + 4, findNCNC + 4));
 
                 _httpResultBuffer.getSubString(headersEndLocation, -1, outputPage);
                 retVal = true;
@@ -502,7 +502,7 @@ bool osHTTPClient::ReadTCPSocketIntoPage(gtASCIIString& outputPage, unsigned int
 
                 if (findNCNC <= firstSpaceLocation) { findNCNC = (int)totalDataRead; }
 
-                int headersEndLocation = min(min(findNLNL + 2, findCRCR + 2), min(findCNCN + 4, findNCNC + 4));
+                int headersEndLocation = std::min(std::min(findNLNL + 2, findCRCR + 2), std::min(findCNCN + 4, findNCNC + 4));
 
                 _httpResultBuffer.getSubString(headersEndLocation, -1, outputPage);
                 _errorCode = OS_STR_packetLoss;

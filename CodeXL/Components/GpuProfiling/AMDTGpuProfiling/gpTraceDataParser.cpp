@@ -147,7 +147,7 @@ bool gpTraceDataParser::Parse(const osFilePath& traceFilePath, GPUSessionTreeIte
             retVal = parser.Parse();
 
             bool parseWarning = false;
-            string parseWarningMsg;
+            std::string parseWarningMsg;
             parser.GetParseWarning(parseWarning, parseWarningMsg);
 
             if (!(retVal) || parseWarning)

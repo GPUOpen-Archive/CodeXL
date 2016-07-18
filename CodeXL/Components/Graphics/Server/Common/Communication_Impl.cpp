@@ -761,7 +761,7 @@ void GetPendingRequests()
         // Check to see if POST data is present.
         if (pRequest->GetPostDataSize() > 0)
         {
-            string strError;
+            std::string strError;
             bool bRes = pRequest->ReadPostData(strError, g_strSharedMemoryName);
 
             if (bRes == false)
@@ -840,7 +840,7 @@ void GetSinglePendingRequest()
         // Check to see if POST data is present.
         if (pRequest->GetPostDataSize() > 0)
         {
-            string strError;
+            std::string strError;
             bool bRes = pRequest->ReadPostData(strError, g_strSharedMemoryName);
 
             if (bRes == false)

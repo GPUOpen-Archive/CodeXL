@@ -152,7 +152,7 @@ public:
 
     gtUInt64 len = 0;
     gtUInt64 pgoff = 0;
-    string name;
+    std::string name;
     CpuProfileProcess* pProc = nullptr;
     CpuProfileModule* pMod = nullptr;
     gtInt32  instanceId = 0;
@@ -162,7 +162,7 @@ public:
 // We use multimap here since we can have different
 // modules loaded at the same gtUInt64ess. For example,
 // when process is fork but not yet executed.
-typedef multimap<ModKey, ModInfo> ModLoadInfoMap;
+typedef std::multimap<ModKey, ModInfo> ModLoadInfoMap;
 
 //------------------------------------------------------------------------------
 
@@ -172,7 +172,7 @@ public:
     ProcInfo() : ppid(0) {}
 
     pid_t ppid;
-    string comm;
+    std::string comm;
     gtList<ThreadIdType> tidList;
 };
 
@@ -206,32 +206,32 @@ public:
     };
 
     CaPerfTranslator();
-    CaPerfTranslator(const string& perfDataPath);
+    CaPerfTranslator(const std::string& perfDataPath);
 
     virtual ~CaPerfTranslator();
 
     // Translate perf.data file to EBP/IMD files
-    int translatePerfDataToCaData(const string& outPath = "", const string& perfDataPath = "", bool bVerb = false);
+    int translatePerfDataToCaData(const std::string& outPath = "", const std::string& perfDataPath = "", bool bVerb = false);
 
-    HRESULT dumpPerfData(const string& perfDataPath);
+    HRESULT dumpPerfData(const std::string& perfDataPath);
 
     static int getCurrentPerfDataVersion();
 
     static int getCurrentCaDataVersion();
 
-    int writeEbpOutput(const string& outputFile);
+    int writeEbpOutput(const std::string& outputFile);
 
-    HRESULT setupLogFile(const string& logFile);
+    HRESULT setupLogFile(const std::string& logFile);
 
-    int setupCalogCssFile(const string& file);
+    int setupCalogCssFile(const std::string& file);
 
-    int setupCssFile(const string& file);
+    int setupCssFile(const std::string& file);
 
     void setupTranslateMode(gtUInt32 mode) { m_pass2Mode = mode; }
 
     PidProcInfoMap* getTargetProcessesAndThreads() { return & m_pidProcInfoMap; }
 
-    gtList<string>* getErrorList() { return & m_errorList; }
+    gtList<std::string>* getErrorList() { return &m_errorList; }
 
     void SetDebugSymbolsSearchPath(const wchar_t* pSearchPath, const wchar_t* pServerList, const wchar_t* pCachePath);
 
@@ -240,7 +240,7 @@ protected:
                                                         gtUInt32 pid, gtUInt64 time, gtUInt64 ip,
                                                         bool bStat, bool bIsUser);
 
-    CpuProfileModule* getModule(const string& modname);
+    CpuProfileModule* getModule(const std::string& modname);
 
     CpuProfileProcess* getProcess(ProcessIdType pid);
 
@@ -310,11 +310,11 @@ private:
 
     inline void _clearAllHandlers();
 
-    HRESULT _setupReader(const string& perfDataPath);
+    HRESULT _setupReader(const std::string& perfDataPath);
 
-    HRESULT _getModuleBitness(const string& modName, bool* pIs32Bit);
+    HRESULT _getModuleBitness(const std::string& modName, bool* pIs32Bit);
 
-    HRESULT _getElfFileType(const string& modName, gtUInt32* pElfType);
+    HRESULT _getElfFileType(const std::string& modName, gtUInt32* pElfType);
 
     ModLoadInfoMap::reverse_iterator _getModuleForSample(gtUInt32 pid, gtUInt64 time, gtUInt64 ip, bool bIsUser);
 
@@ -384,7 +384,7 @@ private:
     bool* m_aFakeFlags;
 #endif
 
-    string m_inputFile;
+    std::string m_inputFile;
     gtUInt64 m_sampleType;
     PerfDataReader* m_pPerfDataRdr;
     PidProcessMap m_procMap;
@@ -402,7 +402,7 @@ private:
     FILE* m_pLogFile;
 
     // CSS stuff
-    wstring m_cssFileDir;
+    std::wstring m_cssFileDir;
     struct calog* m_pCalogCss;
     gtVector<gtUInt64> m_cssBuffer;
 
@@ -448,8 +448,8 @@ private:
     JitTaskInfo   m_javaModInfo;
 
     // Error/Warning messages
-    gtList<string> m_errorList;
-    gtList<string> m_warningList;
+    gtList<std::string> m_errorList;
+    gtList<std::string> m_warningList;
 
     typedef gtFlatMap<VAddrRange, ExecutableAnalyzer*> ExecutableAnalyzersMap;
 

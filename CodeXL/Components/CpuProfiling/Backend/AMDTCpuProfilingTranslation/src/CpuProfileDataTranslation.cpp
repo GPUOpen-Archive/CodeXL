@@ -669,12 +669,12 @@ HRESULT fnWriteSetToFile(
 
     ///////////////////////////////////////////////////////
     // Get session Name
-    string sessionName;
-    sessionName = string(outDir.baseName().toLatin1());
+    std::string sessionName;
+    sessionName = std::string(outDir.baseName().toLatin1());
 
     ///////////////////////////////////////////////////////
     // Setup CSS file
-    string cssFile;
+    std::string cssFile;
     cssFile = cssFile + string(outDirPath.toLatin1());// + "/" + sessionName + ".css";
 
     if (S_OK != pTrans->setupCssFile(cssFile))
@@ -694,7 +694,7 @@ HRESULT fnWriteSetToFile(
 
     ///////////////////////////////////////////////////////
     // Write EBP
-    string ebpFile;
+    std::string ebpFile;
     ebpFile = ebpFile + string(outDirPath.toLatin1()) + "/" + sessionName + ".ebp";
 
     if ((S_OK == hr) && (0 != pTrans->writeEbpOutput(ebpFile)))

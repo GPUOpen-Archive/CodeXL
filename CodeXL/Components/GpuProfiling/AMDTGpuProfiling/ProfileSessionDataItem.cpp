@@ -440,7 +440,7 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
 
         // Separate the interface string to interface_call
         size_t pos = pApiInfo->m_strName.find('_');
-        GT_IF_WITH_ASSERT(pos != string::npos)
+        GT_IF_WITH_ASSERT(pos != std::string::npos)
         {
             m_data[ProfileSessionDataItem::SESSION_ITEM_INTERFACE_COLUMN] = QString::fromStdString(interfaceName.substr(0, pos));
             m_data[ProfileSessionDataItem::SESSION_ITEM_CALL_COLUMN] = QString::fromStdString(interfaceName.substr(pos + 1, interfaceName.size() - pos));
@@ -494,7 +494,7 @@ ProfileSessionDataItem::ProfileSessionDataItem(gpTraceDataContainer* pSessionDat
 
         // Separate the interface string to interface_call
         size_t pos = interfaceName.find('_');
-        GT_IF_WITH_ASSERT(pos != string::npos)
+        GT_IF_WITH_ASSERT(pos != std::string::npos)
         {
             m_data[ProfileSessionDataItem::SESSION_ITEM_INTERFACE_COLUMN] = QString::fromStdString(interfaceName.substr(0, pos));
             m_data[ProfileSessionDataItem::SESSION_ITEM_CALL_COLUMN] = QString::fromStdString(interfaceName.substr(pos + 1, interfaceName.size() - pos));

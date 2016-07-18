@@ -544,8 +544,8 @@ void acImageItem::setImageZoomLevel(int zoomLevel)
         int imageNewHeight = int((double) imageHeight * sizeMultiplier);
 
         // Make sure new width and height are at least 1
-        imageNewWidth = max(1, imageNewWidth);
-        imageNewHeight = max(1, imageNewHeight);
+        imageNewWidth = std::max(1, imageNewWidth);
+        imageNewHeight = std::max(1, imageNewHeight);
 
         // Change the zoomed image width and height
         m_zoomedImageSize = QSize(imageNewWidth, imageNewHeight);

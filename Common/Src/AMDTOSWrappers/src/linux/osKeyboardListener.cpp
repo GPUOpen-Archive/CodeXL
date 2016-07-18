@@ -39,7 +39,7 @@
 
 osKeyboardListener::osKeyboardListener()
 {
-    m_pListener.reset(new thread(&osKeyboardListener::Listen, this, GetKeyboardDescriptor()));
+    m_pListener.reset(new std::thread(&osKeyboardListener::Listen, this, GetKeyboardDescriptor()));
 
 }
 

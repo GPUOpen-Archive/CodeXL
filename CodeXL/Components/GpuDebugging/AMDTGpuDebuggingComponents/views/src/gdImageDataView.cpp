@@ -752,10 +752,10 @@ int gdImageDataView::getBestFitPercentage()
                     int bestFitPercentageX = int((double(imageAvailableSize.width() - GD_IMAGES_AND_BUFFERS_MARGIN) * double(GD_IMAGES_AND_BUFFERS_DEFAULT_ZOOM_LEVEL) / double(nOriginalWidth)));
                     int bestFitPercentageY = int((double(imageAvailableSize.height() - GD_IMAGES_AND_BUFFERS_MARGIN) * double(GD_IMAGES_AND_BUFFERS_DEFAULT_ZOOM_LEVEL) / double(nOriginalHeight)));
                     // Let's use the smaller between the two
-                    retVal = min(bestFitPercentageX, bestFitPercentageY);
+                    retVal = std::min(bestFitPercentageX, bestFitPercentageY);
                     retVal -= GD_IMAGES_AND_DATA_MIN_ZOOM_LEVEL;
                     // Make sure we are returning a positive integer, minimum is 1%
-                    retVal = max(retVal, 1);
+                    retVal = std::max(retVal, 1);
                     return retVal;
                 }
             }

@@ -217,7 +217,7 @@ bool gpRemoteGraphicsBackendHandler::RemoteSessionHelper(CXLDaemonClient* pDmnCl
                     // Set the relevant error message.
                     strErrorMessageOut = GPU_STR_REMOTE_TARGET_APP_PORT_OCCUPIED;
                     unsigned int port = ProfileManager::Instance()->GetFrameAnalysisModeManager()->ProjectSettings().m_serverConnectionPort;
-                    strErrorMessageOut.replace(GPU_STR_PORT_NNN, gtString(to_wstring(port).c_str()));
+                    strErrorMessageOut.replace(GPU_STR_PORT_NNN, gtString(std::to_wstring(port).c_str()));
 
                 }
                 else  if (errorCode == rceTargetAppIsAlreadyRunning)

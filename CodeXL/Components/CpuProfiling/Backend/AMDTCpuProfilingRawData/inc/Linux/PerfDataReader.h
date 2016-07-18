@@ -22,9 +22,9 @@
 #include "linux/perf_event.h"
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
 
-typedef vector<struct perf_event_attr> PerfEventAttrVec;
+typedef std::vector<struct perf_event_attr> PerfEventAttrVec;
 
-typedef map<gtUInt64, gtUInt64> PerfEvtIdToEvtTypeMap;
+typedef std::map<gtUInt64, gtUInt64> PerfEvtIdToEvtTypeMap;
 
 struct perf_trace_event_type;
 
@@ -43,7 +43,7 @@ public:
 
     virtual void clear();
 
-    virtual HRESULT init(const string& perfDataPath);
+    virtual HRESULT init(const std::string& perfDataPath);
 
     virtual void deinit();
 
@@ -137,8 +137,8 @@ protected:
     struct perf_file_header*                    m_pPerfHdr;
     PerfEventAttrVec                            m_perfEventAttrVec;
     PerfEvtIdToEvtTypeMap                       m_perfEvtIdToEvtTypeMap;
-    vector<struct perf_file_section>            m_perfFileSecVec;
-    vector<struct perf_trace_event_type>        m_perfEventTypeVec;
+    std::vector<struct perf_file_section>       m_perfFileSecVec;
+    std::vector<struct perf_trace_event_type>   m_perfEventTypeVec;
     bool m_bSeenComm;
 
     bool m_isEof;

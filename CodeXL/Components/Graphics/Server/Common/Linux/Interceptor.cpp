@@ -34,8 +34,8 @@ BOOL CreateProcess(const char* lpApplicationName,
 {
     PS_UNREFERENCED_PARAMETER(lpCurrentDirectory);
     // split the command line by spaces, taking into account quoted strings
-    vector<string> argList;
-    string s = lpCommandLine;
+    std::vector<std::string> argList;
+    std::string s = lpCommandLine;
     so_tokenizer tok(s, escaped_list_separator<char>('\\', ' ', '\"'));
 
     for (so_tokenizer::iterator tokIt = tok.begin(); tokIt != tok.end(); ++tokIt)

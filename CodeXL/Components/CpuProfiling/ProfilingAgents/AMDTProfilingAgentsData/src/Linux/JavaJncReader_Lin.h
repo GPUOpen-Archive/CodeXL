@@ -80,7 +80,7 @@ public:
     bool Open(const wchar_t* pFileName);
     void Close();
     void Clear();
-    bool GetStringFromOffset(unsigned int offset, string& str);
+    bool GetStringFromOffset(unsigned int offset, std::string& str);
     void DumpStringTable(FILE* f);
     void DumpJncMethodMap(FILE* f);
     void DumpAddressRangeTable(FILE* f);
@@ -89,17 +89,17 @@ public:
 
     bool GetSrcInfoFromAddressWithFile(gtUInt64  addr,
                                        int&                srcLine,
-                                       string&             srcFile);
+                                       std::string&        srcFile);
 
     bool GetSrcInfoFromAddress(gtUInt64  addr,
                                int&                 srcLine,
-                               string&              srcFile,
+                               std::string&         srcFile,
                                int&                 inlineDepth);
 
-    bool GetSymbolAndRangeFromAddr(gtUInt64  addr,
-                                   string&    symName,
-                                   gtUInt64&  startAddr,
-                                   gtUInt64&  endAddr);
+    bool GetSymbolAndRangeFromAddr(gtUInt64     addr,
+                                   std::string& symName,
+                                   gtUInt64&    startAddr,
+                                   gtUInt64&    endAddr);
 
     const std::string& GetJittedFunctionName() { return m_methodName; }
 
@@ -182,10 +182,10 @@ private:
     const gtUByte*  m_pBc2srcBuf;
     const gtUByte*  m_pPc2bcBuf;
 
-    bool _getSrcInfoFromBcAndMethodID(jint       bc,
-                                      jmethodID  id,
-                                      int&       srcLine,
-                                      string&    srcFile);
+    bool _getSrcInfoFromBcAndMethodID(jint         bc,
+                                      jmethodID    id,
+                                      int&         srcLine,
+                                      std::string& srcFile);
 
     // String table stuff
     JNCMethodMap        m_jncMethodMap;

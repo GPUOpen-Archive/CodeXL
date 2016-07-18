@@ -225,7 +225,7 @@ bool JavaJncReader::Open(const wchar_t* pWFileName)
 
 bool JavaJncReader::_process_inline_map()
 {
-    string file;
+    std::string file;
 
     JncPcStackInfoMap::iterator it = m_jncPcStackInfoMap.begin(), itEnd = m_jncPcStackInfoMap.end();
 
@@ -262,7 +262,7 @@ bool JavaJncReader::_process_inline_map()
                            nextPc);
 
         int parentLine;
-        string parentSource;
+        std::string parentSource;
         int xx = numFrames - 1;
 
         _getSrcInfoFromBcAndMethodID(bcisArray[xx],
@@ -318,8 +318,8 @@ bool JavaJncReader::_process_inline_map()
                             {
                                 if ((ilAR.startAddr >= (*arIt).startAddr) && (ilAR.startAddr <= (*arIt).stopAddr))
                                 {
-                                    (*arIt).startAddr = min((*arIt).startAddr, ilAR.startAddr);
-                                    (*arIt).stopAddr = max((*arIt).stopAddr, ilAR.stopAddr);
+                                    (*arIt).startAddr = std::min((*arIt).startAddr, ilAR.startAddr);
+                                    (*arIt).stopAddr = std::max((*arIt).stopAddr, ilAR.stopAddr);
                                     bDidMerge = true;
 
                                     // TODO: Need to check if adding this range should merge other ranges
@@ -469,7 +469,7 @@ JavaJncReader::_process_stringtable_section()
 
 
 bool
-JavaJncReader::GetStringFromOffset(unsigned int offset, string& str)
+JavaJncReader::GetStringFromOffset(unsigned int offset, std::string& str)
 {
     char*  pChar = nullptr;
 
@@ -480,7 +480,7 @@ JavaJncReader::GetStringFromOffset(unsigned int offset, string& str)
     }
 
     pChar = (char*)m_string_table_buf + offset;
-    str = string(pChar);
+    str = pChar;
     return true;
 }
 
@@ -488,7 +488,7 @@ JavaJncReader::GetStringFromOffset(unsigned int offset, string& str)
 void
 JavaJncReader::DumpStringTable(FILE* f)
 {
-    string str;
+    std::string str;
     unsigned int offset = 0;
 
     fprintf(f, "DumpStringTable - (size:%u) \n", m_string_table_size);
@@ -650,7 +650,7 @@ OffsetLinenumMap
 JavaJncReader::GetOffsetLines()
 {
     int line = -1;
-    string file;
+    std::string file;
 
     if (! m_lineMap.isEmpty())
     {
@@ -700,10 +700,10 @@ JavaJncReader::GetOffsetLines()
 // GetOffsetLines(wstring funcName)
 //
 OffsetLinenumMap
-JavaJncReader::GetOffsetLines(wstring funcName)
+JavaJncReader::GetOffsetLines(std::wstring funcName)
 {
     int line = -1;
-    string file;
+    std::string file;
 
     if (! m_lineMap.isEmpty())
     {

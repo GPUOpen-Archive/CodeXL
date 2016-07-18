@@ -201,7 +201,7 @@ CaPerfTranslator::CaPerfTranslator()
 }
 
 
-CaPerfTranslator::CaPerfTranslator(const string& perfDataPath)
+CaPerfTranslator::CaPerfTranslator(const std::string& perfDataPath)
 {
     _init();
     m_inputFile = perfDataPath;
@@ -520,7 +520,7 @@ CaPerfTranslator::~CaPerfTranslator()
 }
 
 
-HRESULT CaPerfTranslator::dumpPerfData(const string& perfDataPath)
+HRESULT CaPerfTranslator::dumpPerfData(const std::string& perfDataPath)
 {
     HRESULT retVal = S_OK;
 
@@ -606,7 +606,7 @@ CaPerfTranslator::_removeJavaJncTmpDir(const QString& directory)
 }
 
 
-HRESULT CaPerfTranslator::translatePerfDataToCaData(const string& outPath, const string& perfDataPath, bool bVerb)
+HRESULT CaPerfTranslator::translatePerfDataToCaData(const std::string& outPath, const std::string& perfDataPath, bool bVerb)
 {
     HRESULT retVal = S_OK;
 
@@ -968,7 +968,7 @@ HRESULT CaPerfTranslator::_translate_pass2_serialize()
     // Check if the translation finished prematurely
     if (!m_pPerfDataRdr->isEndOfFile())
     {
-        stringstream ss;
+        std::stringstream ss;
         ss << "Error: Data translation ended prematurely. ";
         ss << "Processed " << m_pPerfDataRdr->getCurrentDataSize() << " out of ";
         ss << m_pPerfDataRdr->getDataSectionSize() << " bytes (";
@@ -982,19 +982,19 @@ HRESULT CaPerfTranslator::_translate_pass2_serialize()
     // Print last EvBlk into EvBlkMap
     if (m_bVerb && 0 != m_lastEvBlkId)
     {
-        stringstream pre;
+        std::stringstream pre;
 
-        pre << " ----------- Sample Block " << setw(5) << m_numSampleBlocks - 1;
-        pre << ", rec:[" << setw(5) << dec <<  m_lastEvBlkRecIndex << " to " << recIndx << "]";
-        pre << ", size:" << setw(5) << dec << offset - m_curEvBlkOffset;
-        pre << ", num:" << setw(5) << dec << m_lastEvBlkNumEntries;
-        pre << ": id:0x" <<  hex << setw(16) << setfill('0') << m_lastEvBlkId;
-        pre << ": time:" <<  hex << "(0x"
-            << setw(16) << setfill('0') << m_lastEvBlkStartTs
+        pre << " ----------- Sample Block " << std::setw(5) << m_numSampleBlocks - 1;
+        pre << ", rec:[" << std::setw(5) << std::dec <<  m_lastEvBlkRecIndex << " to " << recIndx << "]";
+        pre << ", size:" << std::setw(5) << std::dec << offset - m_curEvBlkOffset;
+        pre << ", num:" << std::setw(5) << std::dec << m_lastEvBlkNumEntries;
+        pre << ": id:0x" <<  std::hex << std::setw(16) << std::setfill('0') << m_lastEvBlkId;
+        pre << ": time:" <<  std::hex << "(0x"
+            << std::setw(16) << std::setfill('0') << m_lastEvBlkStartTs
             << " to 0x"
-            << setw(16) << setfill('0') << m_lastEvBlkStopTs
+            << std::setw(16) << std::setfill('0') << m_lastEvBlkStopTs
             << ") = 0x"
-            << setw(16) << setfill('0') << (m_lastEvBlkStopTs - m_lastEvBlkStartTs);
+            << std::setw(16) << std::setfill('0') << (m_lastEvBlkStopTs - m_lastEvBlkStartTs);
         pre << " -----------" ;
 
         OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_INFO, L"%hs", pre.str().c_str());
@@ -1097,10 +1097,10 @@ HRESULT CaPerfTranslator::_translate_pass2_sort()
         // Sanity checking to make sure we are not seeing the reverse time
         if (m_lastSortTs > it->first)
         {
-            stringstream ss;
+            std::stringstream ss;
             ss << "Error : Sort translatoin error. ";
-            ss << "(LastTs = 0x" << hex << setw(16) << setfill('0') << m_lastSortTs;
-            ss << ",CurTs = 0x" << hex << setw(16) << setfill('0') << it->first;
+            ss << "(LastTs = 0x" << std::hex << std::setw(16) << std::setfill('0') << m_lastSortTs;
+            ss << ",CurTs = 0x" << std::hex << std::setw(16) << std::setfill('0') << it->first;
             m_errorList.push_back(ss.str());
         }
         else
@@ -1122,9 +1122,9 @@ HRESULT CaPerfTranslator::_translate_pass2_sort()
 
         if (0 == tit->second.numUnProcessed)
         {
-            stringstream ss;
+            std::stringstream ss;
             ss << "Error: Sort Error. Block for EvID (0x";
-            ss << hex << setw(16) << setfill('0') << m_lastProcessedEvId;
+            ss << std::hex << std::setw(16) << std::setfill('0') << m_lastProcessedEvId;
             ss << ") is already empty";
             m_errorList.push_back(ss.str());
         }
@@ -1152,9 +1152,9 @@ HRESULT CaPerfTranslator::_translate_pass2_sort()
                         m_lastProcessedEvId,
                         &(tit->second.pData)))
                 {
-                    stringstream ss;
+                    std::stringstream ss;
                     ss << "Error: Sort failed to pull in new block for ";
-                    ss << "EvId=0x" << hex << setw(16) << setfill('0') << m_lastProcessedEvId;
+                    ss << "EvId=0x" << std::hex << std::setw(16) << std::setfill('0') << m_lastProcessedEvId;
                     ss << ", offset=" << tit->second.offset;
                     ss << ", size=" << tit->second.bytes;
                     m_errorList.push_back(ss.str());
@@ -1167,9 +1167,9 @@ HRESULT CaPerfTranslator::_translate_pass2_sort()
                         tit->second.pData,
                         tit->second.numUnProcessed))
                 {
-                    stringstream ss;
+                    std::stringstream ss;
                     ss << "Error: Sort failed to prepare block for evID 0x";
-                    ss << hex << setw(16) << setfill('0') << m_lastProcessedEvId;
+                    ss << std::hex << std::setw(16) << std::setfill('0') << m_lastProcessedEvId;
                     m_errorList.push_back(ss.str());
                     return E_FAIL;
                 }
@@ -1197,14 +1197,14 @@ HRESULT CaPerfTranslator::_translate_pass2_sort()
     // Sanity check
     if (m_tsRecMap.size() != 0)
     {
-        stringstream ss;
+        std::stringstream ss;
         ss << "Error: Left over samples in merge map. (" << m_tsRecMap.size() << ")";
         m_errorList.push_back(ss.str());
     }
 
     if (m_evBlkIdMap.size() != 0)
     {
-        stringstream ss;
+        std::stringstream ss;
         ss << "Error: Left over sample blocks. ( " << m_evBlkIdMap.size() << ")";
         m_errorList.push_back(ss.str());
 
@@ -1233,7 +1233,7 @@ HRESULT CaPerfTranslator::_translate_pass2_sort()
     // Check if the translation finished prematurely
     if (!m_pPerfDataRdr->isEndOfFile())
     {
-        stringstream ss;
+        std::stringstream ss;
         ss << "Error: Data translation ended prematurely. ";
         ss << "Processed " << m_pPerfDataRdr->getCurrentDataSize() << " bytes out of ";
         ss << m_pPerfDataRdr->getDataSectionSize() << "bytes.(";
@@ -1339,8 +1339,8 @@ void CaPerfTranslator::_printPass2Log()
         }
 
         fprintf(m_pLogFile, "Num of Errors              : %u\n", static_cast<unsigned int>(m_errorList.size()));
-        gtList<string>::iterator eit = m_errorList.begin();
-        gtList<string>::iterator eEnd = m_errorList.end();
+        gtList<std::string>::iterator eit = m_errorList.begin();
+        gtList<std::string>::iterator eEnd = m_errorList.end();
 
         for (; eit != eEnd; eit++)
         {
@@ -1475,7 +1475,7 @@ const FunctionSymbolInfo* CaPerfTranslator::getFunctionSymbol(ProcessIdType pid,
 }
 
 
-CpuProfileModule* CaPerfTranslator::getModule(const string& modName)
+CpuProfileModule* CaPerfTranslator::getModule(const std::string& modName)
 {
     CpuProfileModule* pRet = nullptr;
     gtString wModName;
@@ -1642,7 +1642,7 @@ int CaPerfTranslator::process_PERF_RECORD_COMM(struct perf_event_header* pHdr, v
     }
 
     // Set process name
-    string procName(pRec->comm);
+    std::string procName(pRec->comm);
     gtString wProcName;
     wProcName.fromUtf8String(procName);
     pProc->setPath(wProcName);
@@ -1956,18 +1956,18 @@ int CaPerfTranslator::preprocess_PERF_RECORD_SAMPLE_into_block(struct perf_event
             // Print event block info
             if (m_bVerb && 0 != m_lastEvBlkId)
             {
-                stringstream pre;
-                pre << " ----------- Sample Block " << setw(5) << m_numSampleBlocks - 1;
-                pre << setw(5) << dec << ", rec:[" << m_lastEvBlkRecIndex << " to " << index << "]";
-                pre << ", size:" << setw(5) << dec << offset - m_curEvBlkOffset;
-                pre << ", num:" << setw(5) << dec << m_lastEvBlkNumEntries;
-                pre << ": id:0x" <<  hex << setw(16) << setfill('0') << m_lastEvBlkId;
-                pre << ": time:" <<  hex << "(0x"
-                    << setw(16) << setfill('0') << m_lastEvBlkStartTs
+                std::stringstream pre;
+                pre << " ----------- Sample Block " << std::setw(5) << m_numSampleBlocks - 1;
+                pre << std::setw(5) << std::dec << ", rec:[" << m_lastEvBlkRecIndex << " to " << index << "]";
+                pre << ", size:" << std::setw(5) << std::dec << offset - m_curEvBlkOffset;
+                pre << ", num:" << std::setw(5) << std::dec << m_lastEvBlkNumEntries;
+                pre << ": id:0x" <<  std::hex << std::setw(16) << std::setfill('0') << m_lastEvBlkId;
+                pre << ": time:" <<  std::hex << "(0x"
+                    << std::setw(16) << std::setfill('0') << m_lastEvBlkStartTs
                     << " to 0x"
-                    << setw(16) << setfill('0') << m_lastEvBlkStopTs
+                    << std::setw(16) << std::setfill('0') << m_lastEvBlkStopTs
                     << ") = 0x"
-                    << setw(16) << setfill('0') << (m_lastEvBlkStopTs - m_lastEvBlkStartTs);
+                    << std::setw(16) << std::setfill('0') << (m_lastEvBlkStopTs - m_lastEvBlkStartTs);
                 pre << " -----------" ;
                 OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_INFO, L"%hs\n", pre.str().c_str());
             }
@@ -2083,7 +2083,7 @@ HRESULT CaPerfTranslator::_prepareBlkForSorting(gtUInt32 blkSize, void* pBlk, gt
     // Sanity check
     if (totSize != blkSize)
     {
-        stringstream ss;
+        std::stringstream ss;
         ss << "Error, Block size miss match (blkSize = " << blkSize;
         ss << ", readSize = " << totSize;
         m_errorList.push_back(ss.str());
@@ -2118,33 +2118,33 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
 
     EventMaskType evMask;
 
-    stringstream pre;
+    std::stringstream pre;
 
-    stringstream ss;
+    std::stringstream ss;
 
     memset(&rec, 0, sizeof(struct CA_PERF_RECORD_SAMPLE));
 
     if (m_bVerb)
     {
 
-        ss << setw(5) << "rec#:" << index ;
+        ss << std::setw(5) << "rec#:" << index ;
 
         ss << ",SAMP: ";
 
         if (offset)
         {
-            ss << "offset:" << setw(10) << offset;
+            ss << "offset:" << std::setw(10) << offset;
         }
     }
 
     if (m_bVerb)
     {
-        ss << ", hdr.misc:0x" << hex << pHdr->misc;
+        ss << ", hdr.misc:0x" << std::hex << pHdr->misc;
     }
 
     if (m_bVerb && m_sampleType & PERF_SAMPLE_TIME)
     {
-        ss << ", time:0x" << hex << setw(16) << setfill('0') << *((u64*)(pCur + 8 + 4 + 4));
+        ss << ", time:0x" << std::hex << std::setw(16) << std::setfill('0') << *((u64*)(pCur + 8 + 4 + 4));
     }
 
     if (m_sampleType & PERF_SAMPLE_IP)
@@ -2154,7 +2154,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
 
         if (m_bVerb)
         {
-            ss << ", ip:0x" << hex << setw(16) << setfill('0') << rec.ip;
+            ss << ", ip:0x" << std::hex << std::setw(16) << std::setfill('0') << rec.ip;
         }
     }
 
@@ -2165,7 +2165,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
 
         if (m_bVerb)
         {
-            ss << ", pid:" << dec << setw(10) << rec.pid;
+            ss << ", pid:" << std::dec << std::setw(10) << rec.pid;
         }
 
         rec.tid = *((u32*)pCur);
@@ -2173,7 +2173,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
 
         if (m_bVerb)
         {
-            ss << ", tid:" << dec << setw(10) << rec.tid;
+            ss << ", tid:" << std::dec << std::setw(10) << rec.tid;
         }
     }
 
@@ -2199,7 +2199,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
         if (m_bVerb)
         {
             //OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_INFO, L"addr:0x%016llx", rec.ip);
-            ss << ", addr:0x" << hex << setw(16) << setfill('0') << rec.ip;
+            ss << ", addr:0x" << std::hex << std::setw(16) << std::setfill('0') << rec.ip;
         }
     }
 
@@ -2215,17 +2215,17 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
                 // Print event block info
                 if (m_bVerb && 0 != m_lastEvBlkId)
                 {
-                    pre << " ----------- Sample Block " << setw(5) << m_numSampleBlocks - 1;
-                    pre << setw(5) << dec << ", rec:[" << m_lastEvBlkRecIndex << " to " << index << "]";
-                    pre << ", size:" << setw(5) << dec << offset - m_curEvBlkOffset;
-                    pre << ", num:" << setw(5) << dec << m_lastEvBlkNumEntries;
-                    pre << ": id:0x" <<  hex << setw(16) << setfill('0') << m_lastEvBlkId;
-                    pre << ": time:" <<  hex << "(0x"
-                        << setw(16) << setfill('0') << m_lastEvBlkStartTs
+                    pre << " ----------- Sample Block " << std::setw(5) << m_numSampleBlocks - 1;
+                    pre << std::setw(5) << std::dec << ", rec:[" << m_lastEvBlkRecIndex << " to " << index << "]";
+                    pre << ", size:" << std::setw(5) << std::dec << offset - m_curEvBlkOffset;
+                    pre << ", num:" << std::setw(5) << std::dec << m_lastEvBlkNumEntries;
+                    pre << ": id:0x" <<  std::hex << std::setw(16) << std::setfill('0') << m_lastEvBlkId;
+                    pre << ": time:" <<  std::hex << "(0x"
+                        << std::setw(16) << std::setfill('0') << m_lastEvBlkStartTs
                         << " to 0x"
-                        << setw(16) << setfill('0') << m_lastEvBlkStopTs
+                        << std::setw(16) << std::setfill('0') << m_lastEvBlkStopTs
                         << ") = 0x"
-                        << setw(16) << setfill('0') << (m_lastEvBlkStopTs - m_lastEvBlkStartTs);
+                        << std::setw(16) << std::setfill('0') << (m_lastEvBlkStopTs - m_lastEvBlkStartTs);
                     pre << " -----------" ;
                 }
 
@@ -2248,7 +2248,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
         if (m_bVerb)
         {
             //OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_INFO, L"id:0x%016llx", rec.id);
-            ss << ", id:0x" << hex << setw(16) << setfill('0') << rec.id;
+            ss << ", id:0x" << std::hex << std::setw(16) << std::setfill('0') << rec.id;
 
         }
     }
@@ -2549,7 +2549,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
     if (m_bVerb)
     {
         gtString wModName = modRit->second.pMod->getPath();
-        string modName;
+        std::string modName;
         wModName.asUtf8(modName);
 
         OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_INFO, L", MmapTime:0x%016lx, MmapAddr:0x%016lx, MmapLen:0x%016lx, (%hs)%hs",
@@ -2560,7 +2560,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
         {
             for (size_t i = 0; i < rec.callchain->nr; i++)
             {
-                string tmp;
+                std::string tmp;
 
                 if (rec.callchain->ips[i] >= PERF_CONTEXT_MAX)
                 {
@@ -3098,7 +3098,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_EXIT(struct perf_event_header* pHd
 }
 
 
-int CaPerfTranslator::writeEbpOutput(const string& outputFile)
+int CaPerfTranslator::writeEbpOutput(const std::string& outputFile)
 {
     bool bRet = false;
 #if (ENABLE_OLD_PROFILE_WRITER == 1)
@@ -3166,7 +3166,7 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
     ////////////////////////////////
     // Get time.
     time_t wrTime = time(nullptr);
-    string str(ctime(&wrTime));
+    std::string str(ctime(&wrTime));
     profInfo.m_timeStamp.fromUtf8String(str);
 
     // Remove the newline at the end
@@ -4019,7 +4019,7 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
 }
 
 
-HRESULT CaPerfTranslator::_setupReader(const string& perfDataPath)
+HRESULT CaPerfTranslator::_setupReader(const std::string& perfDataPath)
 {
     if (m_pPerfDataRdr)
     {
@@ -4061,7 +4061,7 @@ HRESULT CaPerfTranslator::_setupReader(const string& perfDataPath)
 }
 
 
-HRESULT CaPerfTranslator::setupLogFile(const string& logFile)
+HRESULT CaPerfTranslator::setupLogFile(const std::string& logFile)
 {
     if (m_pLogFile)
     {
@@ -4083,7 +4083,7 @@ HRESULT CaPerfTranslator::setupLogFile(const string& logFile)
 }
 
 
-HRESULT CaPerfTranslator::setupCalogCssFile(const string& file)
+HRESULT CaPerfTranslator::setupCalogCssFile(const std::string& file)
 {
 #ifdef HAVE_CALOG
 
@@ -4108,9 +4108,9 @@ HRESULT CaPerfTranslator::setupCalogCssFile(const string& file)
 }
 
 
-int CaPerfTranslator::setupCssFile(const string& file)
+int CaPerfTranslator::setupCssFile(const std::string& file)
 {
-    m_cssFileDir = wstring(file.begin(), file.end());
+    m_cssFileDir = std::wstring(file.begin(), file.end());
 
     return S_OK;
 }
@@ -4119,7 +4119,7 @@ int CaPerfTranslator::setupCssFile(const string& file)
 // Note [Suravee]:
 // This can only be used with module name since PERF doesn't
 // always return fullpath as process name in COMM
-HRESULT CaPerfTranslator::_getModuleBitness(const string& modName, bool* pIs32Bit)
+HRESULT CaPerfTranslator::_getModuleBitness(const std::string& modName, bool* pIs32Bit)
 {
     int fd;
     int elfClass;
@@ -4177,7 +4177,7 @@ HRESULT CaPerfTranslator::_getModuleBitness(const string& modName, bool* pIs32Bi
 }
 
 
-HRESULT CaPerfTranslator::_getElfFileType(const string& modName, gtUInt32* pElfType)
+HRESULT CaPerfTranslator::_getElfFileType(const std::string& modName, gtUInt32* pElfType)
 {
     HRESULT ret = E_FAIL;
 
@@ -4951,8 +4951,8 @@ void CaPerfTranslator::addJavaInlinedMethods(CpuProfileModule&  mod,
     {
         // Construct the JNC file path and Open the JNCfile
         wchar_t jncName[OS_MAX_PATH] = { L'\0' };
-        osFilePath tmpPath((wstring(m_inputFile.begin(),
-                                    m_inputFile.end())).c_str());
+        osFilePath tmpPath((std::wstring(m_inputFile.begin(),
+                                         m_inputFile.end())).c_str());
 
         swprintf(jncName, OS_MAX_PATH, L"%S/%S",
                  tmpPath.fileDirectoryAsString().asCharArray(),

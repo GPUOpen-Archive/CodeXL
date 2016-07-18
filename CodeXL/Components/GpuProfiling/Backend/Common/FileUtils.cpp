@@ -90,12 +90,12 @@ void FileUtils::CheckForDebuggerAttach(void)
                    MB_OK | MB_ICONSTOP | MB_SETFOREGROUND | MB_TASKMODAL);
 #else
         ss << "Press 'y' to continue...";
-        cout << ss.str();
+        std::cout << ss.str();
         char ch = '\0';
 
         do
         {
-            cin >> ch;
+            std::cin >> ch;
         }
         while (ch != 'y');
 

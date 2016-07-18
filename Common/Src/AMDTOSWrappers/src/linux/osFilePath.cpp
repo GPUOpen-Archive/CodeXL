@@ -273,7 +273,7 @@ bool osFilePath::setPath(osPreDefinedFilePaths predefinedfilePath, bool applyRed
             GT_IF_WITH_ASSERT(rc != NULL)
             {
                 // Convert from UTF8 to unicode
-                wstring widePath;
+                std::wstring widePath;
                 int rc2 = gtUtf8StringToWideString(utf8Path, widePath);
                 wcsncpy(stringBuffer, widePath.c_str(), OS_PATH_STRING_BUFFER_SIZE);
                 retVal = (rc2 == 0);

@@ -2202,7 +2202,7 @@ bool gdMemoryAnalysisDetailsView::addShaderItem(QTreeWidgetItem* pshaderItemTree
             // Get the shader type:
             gtString shaderTypeString;
             int firstSpace = shaderName.find(' ');
-            firstSpace = max(0, firstSpace);
+            firstSpace = std::max(0, firstSpace);
             shaderName.getSubString(0, firstSpace - 1, shaderTypeString);
 
             // Build string list for this item:
@@ -3946,9 +3946,9 @@ bool gdMemoryAnalysisDetailsView::isItemSmallerThen(afApplicationTreeItemData* p
                 {
                     // Treat all non positive values the same - in case we accidentally set both 0 / -1 here
                     int itemRCId1 = pGDItemData1->_contextId._contextId;
-                    itemRCId1 = max(itemRCId1, 0);
+                    itemRCId1 = std::max(itemRCId1, 0);
                     int itemRCId2 = pGDItemData2->_contextId._contextId;
-                    itemRCId2 = max(itemRCId2, 0);
+                    itemRCId2 = std::max(itemRCId2, 0);
 
                     retVal = sortIntValues(_sortInfo._sortOrder, itemRCId1, itemRCId2);
                 }

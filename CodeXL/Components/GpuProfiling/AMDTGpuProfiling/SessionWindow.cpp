@@ -334,7 +334,7 @@ void GPUSessionWindow::CellContentClicked(const QModelIndex& index)
         {
             if (m_pCodeViewerWindow == NULL)
             {
-                m_pCodeViewerWindow = new(nothrow) CodeViewerWindow(this);
+                m_pCodeViewerWindow = new(std::nothrow) CodeViewerWindow(this);
 
                 if (!m_pCodeViewerWindow)
                 {

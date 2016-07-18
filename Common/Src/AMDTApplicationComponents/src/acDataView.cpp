@@ -1317,13 +1317,13 @@ void acDataView::getCellBestFit(int& minWidth, int& minHeight)
                         // Get cell best fit for this data type:
                         getCellBestFit(currentMinWidth, currentMinHeight, currentDataType);
 
-                        minCellWidth = max(currentMinWidth, minCellWidth);
-                        minCellHeight = max(currentMinHeight, minCellHeight);
+                        minCellWidth = std::max(currentMinWidth, minCellWidth);
+                        minCellHeight = std::max(currentMinHeight, minCellHeight);
                     }
 
                     // Now give the best fit size the largest among the largest cell size and largest label size
-                    minWidth = max(minCellWidth, minLabelWidth);
-                    minHeight = max(minCellHeight, minLabelHeight);
+                    minWidth = std::max(minCellWidth, minLabelWidth);
+                    minHeight = std::max(minCellHeight, minLabelHeight);
                 }
             }
         }

@@ -57,7 +57,7 @@ void PerfDataReader::clear()
 }
 
 
-HRESULT PerfDataReader::init(const string& perfDataPath)
+HRESULT PerfDataReader::init(const std::string& perfDataPath)
 {
     int retVal = S_OK;
 
