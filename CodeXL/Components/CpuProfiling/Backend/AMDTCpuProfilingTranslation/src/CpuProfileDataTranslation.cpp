@@ -675,7 +675,7 @@ HRESULT fnWriteSetToFile(
     ///////////////////////////////////////////////////////
     // Setup CSS file
     std::string cssFile;
-    cssFile = cssFile + string(outDirPath.toLatin1());// + "/" + sessionName + ".css";
+    cssFile = cssFile + std::string(outDirPath.toLatin1());// + "/" + sessionName + ".css";
 
     if (S_OK != pTrans->setupCssFile(cssFile))
     {
