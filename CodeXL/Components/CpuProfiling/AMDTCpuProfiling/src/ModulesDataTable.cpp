@@ -308,10 +308,16 @@ bool ModulesDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allProcess
 
             AMDTProfileModuleInfoVec procInfo;
             m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, profData.m_moduleId, procInfo);
+
+			if (procInfo.empty())
+			{
+				continue;
+			}
+
             list << acGTStringToQString(procInfo.at(0).m_name);
 
-            // TODO : need to discuss
-            gtString symbols = procInfo.at(0).m_loadAddress ? L"Loaded" : L"Not Loaded";
+            gtString symbols = procInfo.at(0).m_foundDebugInfo ? L"Loaded" : L"Not Loaded";
+
             list << acGTStringToQString(symbols);
 
             m_pDisplayFilter->GetSelectedCounterList(selectedCounterList);
