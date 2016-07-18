@@ -280,11 +280,11 @@ private:
     CallGraphFuncListItem* AddTopLevelItem(const FunctionGraph::Node& funcNode,
                                            unsigned pathsNumber, gtUInt64 selfCount, gtUInt64 deepCount);
 #endif
-    void CallGraphFuncList::GetFunctionCount(std::pair<int, int>& minMax,
-                                             const shared_ptr<DisplayFilter> pDisplayFilter,
-                                             shared_ptr<cxlProfileDataReader> pProfDataRdr,
-                                             AMDTUInt32 counterId,
-                                             AMDTUInt32 processId);
+    void GetFunctionCount(std::pair<int, int>& minMax,
+                          const shared_ptr<DisplayFilter> pDisplayFilter,
+                          shared_ptr<cxlProfileDataReader> pProfDataRdr,
+                          AMDTUInt32 counterId,
+                          AMDTUInt32 processId);
 
     /// resize function name column
     void ResizeFunctionNameColumn();
