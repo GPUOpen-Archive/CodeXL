@@ -510,11 +510,12 @@ kaProgram* kaProgramFactory::Create(const kaProgramTypes programType, const gtSt
         case kaProgramCL:
             pProgram = new kaNonPipelinedProgram;
             break;
-
+//create DX programs only on windows platform
+#if AMDT_BUILD_TARGET != AMDT_LINUX_OS
         case kaProgramDX:
             pProgram = new kaDxFolder;
             break;
-
+#endif
         default:
             break;
     }
