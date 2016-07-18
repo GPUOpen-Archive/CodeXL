@@ -19,6 +19,7 @@
 
 // Infra:
 #include <AMDTOSWrappers/Include/osDebuggingFunctions.h>
+#include <AMDTBaseTools/Include/gtHashSet.h>
 #include <AMDTApplicationComponents/Include/acQHTMLWindow.h>
 #include <AMDTApplicationComponents/Include/acFunctions.h>
 #include <AMDTApplicationComponents/Include/acToolBar.h>
@@ -490,12 +491,37 @@ bool SessionOverviewWindow::displaySessionProfileDetails(afHTMLContent& content)
             content.addHTMLItem(afHTMLContent::AP_HTML_LINE, firstColStr);
 #endif
 
-            firstColStr.makeEmpty();
-            AMDTProfileThreadInfoVec threadInfo;
-            retVal = m_pProfDataRdr->GetThreadInfo(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_THREADS, threadInfo);
-            int threadsCount = (retVal) ? threadInfo.size() : 0;
+            AMDTProfileDataOptions reportOptions;
+            reportOptions.m_doSort = false;
+            reportOptions.m_summaryCount = 0;
+            reportOptions.m_othersEntryInSummary = false;
+            reportOptions.m_coreMask = AMDT_PROFILE_ALL_CORES;
 
-            firstColStr.appendFormattedString(L"<b>%ls:</b> %d", CP_overviewPageTotalThreads, threadsCount);
+            m_pProfDataRdr->SetReportOption(reportOptions);
+
+            gtHashSet<gtUInt64> uniqueThreads;
+            AMDTProfileReportConfigVec reportConfigs;
+
+            retVal = m_pProfDataRdr->GetReportConfigurations(reportConfigs);
+
+            if (!reportConfigs.empty())
+            {
+                for (auto const& counter : reportConfigs[0].m_counterDescs)
+                {
+                    AMDTProfileDataVec threadsList;
+                    m_pProfDataRdr->GetThreadSummary(counter.m_id, threadsList);
+
+                    for (const auto threadInfo : threadsList)
+                    {
+                        uniqueThreads.insert(threadInfo.m_id);
+                    }
+                }
+            }
+
+            unsigned threadsCount = uniqueThreads.size();
+
+            firstColStr.makeEmpty();
+            firstColStr.appendFormattedString(L"<b>%ls:</b> %u", CP_overviewPageTotalThreads, threadsCount);
             content.addHTMLItem(afHTMLContent::AP_HTML_LINE, firstColStr);
 
             retVal = true;
