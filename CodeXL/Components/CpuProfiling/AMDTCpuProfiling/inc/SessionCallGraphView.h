@@ -235,7 +235,7 @@ public:
     // hides/unhides empty table item row in the table list
     void HandleDisplayEmptyTableItem(int count);
     bool FillDisplayFuncList(shared_ptr<cxlProfileDataReader> pProfDataRdr,
-                             bool isSystemDLLIgnored,
+                             shared_ptr<DisplayFilter> pDisplayFilter,
                              AMDTUInt32 counterId,
                              AMDTUInt32 processId,
                              AMDTFunctionId& funcIdMaxSamples);
@@ -280,6 +280,12 @@ private:
     CallGraphFuncListItem* AddTopLevelItem(const FunctionGraph::Node& funcNode,
                                            unsigned pathsNumber, gtUInt64 selfCount, gtUInt64 deepCount);
 #endif
+    void CallGraphFuncList::GetFunctionCount(std::pair<int, int>& minMax,
+                                             const shared_ptr<DisplayFilter> pDisplayFilter,
+                                             shared_ptr<cxlProfileDataReader> pProfDataRdr,
+                                             AMDTUInt32 counterId,
+                                             AMDTUInt32 processId);
+
     /// resize function name column
     void ResizeFunctionNameColumn();
     QString GetFileNameEntry(const gtString& srcFile, int srcLIne);

@@ -931,22 +931,71 @@ bool SessionCallGraphView::ShowParentChild(AMDTFunctionId functionId)
     return ret;
 }
 
+void CallGraphFuncList::GetFunctionCount(std::pair<int, int>& sysDllCount,
+                                         const shared_ptr<DisplayFilter> pDisplayFilter,
+                                         shared_ptr<cxlProfileDataReader> pProfDataRdr,
+                                         AMDTUInt32 counterId,
+                                         AMDTUInt32 processId)
+{
+    if (nullptr != pDisplayFilter)
+    {
+        AMDTCallGraphFunctionVec callGraphFuncs;
+
+        // save previous system module state
+        bool origState = pDisplayFilter->IsSystemModuleIgnored();
+
+
+        pProfDataRdr->GetCallGraphFunctions(processId, counterId, callGraphFuncs);
+        AMDTUInt32 shown = callGraphFuncs.size();
+        AMDTUInt32 total;
+
+        if (origState == false)
+        {
+            total = callGraphFuncs.size();
+        }
+        else
+        {
+            callGraphFuncs.clear();
+            pDisplayFilter->setIgnoreSysDLL(!origState);
+            pDisplayFilter->SetReportConfig();
+
+            pProfDataRdr->GetCallGraphFunctions(processId, counterId, callGraphFuncs);
+            total = callGraphFuncs.size();
+
+            //restore orignal state
+            pDisplayFilter->setIgnoreSysDLL(origState);
+            pDisplayFilter->SetReportConfig();
+        }
+
+        sysDllCount = std::make_pair(total, shown);
+    }
+
+
+}
+
 bool CallGraphFuncList::FillDisplayFuncList(shared_ptr<cxlProfileDataReader> pProfDataRdr,
-                                            bool isSystemDLLSelected,
+                                            shared_ptr<DisplayFilter> pDisplayFilter,
                                             AMDTUInt32 counterId,
                                             AMDTUInt32 processId,
                                             AMDTFunctionId& funcIdMaxSamples)
 {
     bool ret = false;
-    GT_UNREFERENCED_PARAMETER(isSystemDLLSelected);
 
     GT_IF_WITH_ASSERT((nullptr != pProfDataRdr) &&
-                      (m_pFuncTable != nullptr))
+                      (m_pFuncTable != nullptr) &&
+                      (pDisplayFilter != nullptr))
     {
         m_pFuncTable->blockSignals(true);
         clear();
         m_pFuncTable->setSortingEnabled(false);
         gtUInt64 masSampleValue = 0;
+
+        // first element contain shown and second total
+        std::pair<int, int> sysDllCount;
+        GetFunctionCount(sysDllCount, pDisplayFilter, pProfDataRdr,
+                         counterId, processId);
+
+        SetFunctionNameHeader(sysDllCount.first, sysDllCount.second);
 
         AMDTCallGraphFunctionVec callGraphFuncs;
         ret = pProfDataRdr->GetCallGraphFunctions(processId, counterId, callGraphFuncs);
@@ -1708,7 +1757,8 @@ void SessionCallGraphView::showPid(unsigned int pid)
         m_pFuncTable->clear();
 
         AMDTFunctionId funcIdMaxSamples = 0;
-        m_pFuncTable->FillDisplayFuncList(m_pProfDataRdr, m_isSystemDLLDisplayed, m_selectedCounter, m_selectedPID, funcIdMaxSamples);
+        m_pFuncTable->FillDisplayFuncList(m_pProfDataRdr, m_pDisplayFilter, m_selectedCounter, m_selectedPID, funcIdMaxSamples);
+
         ShowParentChild(funcIdMaxSamples);
         ShowPaths(funcIdMaxSamples);
     }
