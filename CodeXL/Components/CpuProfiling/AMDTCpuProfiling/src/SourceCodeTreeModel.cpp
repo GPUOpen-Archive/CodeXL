@@ -524,7 +524,7 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
                 else
                 {
                     QVariant var;
-					SetDisplayFormat(aSampleValue.m_sampleCountPercentage, true, var, SAMPLE_PERCENT_PRECISION);
+                    SetDisplayFormat(aSampleValue.m_sampleCountPercentage, true, var, SAMPLE_PERCENT_PRECISION);
                     pAsmItem->setData(idx, var);
                 }
 
@@ -787,7 +787,7 @@ void SourceCodeTreeModel::PrintFunctionDetailData(AMDTProfileFunctionData data,
         pLineItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, sampleValue);
 
         QVariant var;
-		SetDisplayFormat(sampleValuePer, true, var, SAMPLE_PERCENT_PRECISION);
+        SetDisplayFormat(sampleValuePer, true, var, SAMPLE_PERCENT_PRECISION);
         pLineItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, sampleValuePer);
 
         pLineItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
@@ -804,7 +804,7 @@ void SourceCodeTreeModel::PrintFunctionDetailData(AMDTProfileFunctionData data,
             else
             {
                 QVariant var;
-				SetDisplayFormat(sample.m_sampleCountPercentage, true, var, SAMPLE_PERCENT_PRECISION);
+                SetDisplayFormat(sample.m_sampleCountPercentage, true, var, SAMPLE_PERCENT_PRECISION);
                 pLineItem->setData(idx, var);
             }
 
@@ -834,7 +834,7 @@ void SourceCodeTreeModel::PrintFunctionDetailData(AMDTProfileFunctionData data,
                 pAsmItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, sampleCount);
 
                 QVariant var;
-				SetDisplayFormat(sampleValuePer, true, var, SAMPLE_PERCENT_PRECISION);
+                SetDisplayFormat(sampleValuePer, true, var, SAMPLE_PERCENT_PRECISION);
                 pAsmItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, sampleCountPer);
 
                 pAsmItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
@@ -851,7 +851,7 @@ void SourceCodeTreeModel::PrintFunctionDetailData(AMDTProfileFunctionData data,
                     else
                     {
                         QVariant var;
-						SetDisplayFormat(aSampleValue.m_sampleCountPercentage, true, var, SAMPLE_PERCENT_PRECISION);
+                        SetDisplayFormat(aSampleValue.m_sampleCountPercentage, true, var, SAMPLE_PERCENT_PRECISION);
                         pAsmItem->setData(idx, var);
                     }
 
@@ -2956,7 +2956,7 @@ void SourceCodeTreeModel::SetModuleDetails(AMDTUInt32 moduleId, AMDTUInt32 proce
                 m_modType = module.m_type;
                 //TODO: setting to 0 for now
                 m_moduleTotalSamplesCount = 0;
-                m_moduleName = acGTStringToQString(module.m_name);
+                m_moduleName = acGTStringToQString(module.m_path);
 
                 //NOT USED
                 //m_sessionTotalSamplesCount = m_pSessionDisplaySettings->m_pProfileInfo->m_numSamples;
@@ -3006,7 +3006,7 @@ void SourceCodeTreeModel::SetHotSpotSamples(AMDTUInt32 counterId)
                     pLineItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, sampleValue);
 
                     QVariant var;
-					SetDisplayFormat(sampleValuePer, true, var, SAMPLE_PERCENT_PRECISION);
+                    SetDisplayFormat(sampleValuePer, true, var, SAMPLE_PERCENT_PRECISION);
                     pLineItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, sampleValuePer);
                     pLineItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
 
@@ -3034,7 +3034,7 @@ void SourceCodeTreeModel::SetHotSpotSamples(AMDTUInt32 counterId)
                                     pAsmItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, sampleCount);
 
                                     QVariant var;
-									SetDisplayFormat(sampleValuePer, true, var, SAMPLE_PERCENT_PRECISION);
+                                    SetDisplayFormat(sampleValuePer, true, var, SAMPLE_PERCENT_PRECISION);
                                     pAsmItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, sampleCountPer);
                                     pAsmItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
                                 }

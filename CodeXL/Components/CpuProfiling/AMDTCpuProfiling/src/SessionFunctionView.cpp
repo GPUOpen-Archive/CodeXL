@@ -743,38 +743,28 @@ void SessionFunctionView::onTableItemActivated(QTableWidgetItem* pActivateItem)
             if (pActivateItem->row() != m_pFunctionTable->GetEmptyTableItemRowNum())
             {
                 // Get the address for the activated function:
-                //const CpuProfileModule* pModule = nullptr;
                 QString funcIdStr = m_pFunctionTable->getFunctionId(pActivateItem->row());
                 AMDTUInt32 funcId = funcIdStr.toInt();
-                funcId = funcId;
 
-                //QString modPath = m_pFunctionTable->getModuleName(pActivateItem->row());
-                //AMDTUInt32 moduleId = AMDT_PROFILE_ALL_MODULES;
-                //AMDTUInt32  processId = AMDT_PROFILE_ALL_PROCESSES;
-
-                //get the module id
+                // Get the module info
                 AMDTProfileModuleInfo modInfo;
                 bool ret = m_pProfDataRdr->GetModuleInfoForFunction(funcId, modInfo);
                 AMDTModuleId moduleId = (ret) ? modInfo.m_moduleId : AMDT_PROFILE_ALL_MODULES;
                 AMDTUInt32  processId = AMDT_PROFILE_ALL_PROCESSES;
 
-                //AMDTProfileModuleInfoVec moduleInfo;
-                //m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, AMDT_PROFILE_ALL_MODULES, moduleInfo);
-
-                //for (const auto& mod : moduleInfo)
-                //{
-                //    if (mod.m_path == acQStringToGTString(modPath))
-                //    {
-                //        moduleId = mod.m_moduleId;
-                //        break;
-                //    }
-                //}
-
                 gtString processIdStr = acQStringToGTString(pPIDComboBox->currentText());
 
                 if (processIdStr != L"All Processes")
                 {
-                    processId = pPIDComboBox->currentText().toInt();
+                    // Extract pid from processIdStr format: process_name(PID)
+                    int idxStart = processIdStr.reverseFind(L"(");
+                    int idxEnd = processIdStr.length() - 1;
+
+                    if (idxStart >= 0 && idxEnd > 1)
+                    {
+                        processIdStr.truncate(idxStart + 1, idxEnd - 1);
+                        processIdStr.toUnsignedIntNumber(processId);
+                    }
                 }
 
                 auto funcModInfo = std::make_tuple(funcId, modInfo.m_path, moduleId, processId);
