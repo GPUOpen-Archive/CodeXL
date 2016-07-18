@@ -702,6 +702,25 @@ void gpNavigationRibbon::GetCurrentVisibility(int& visibleGroup, int& visibleLay
     visibleLayersByFlag = m_visibleLayersByFlag;
 }
 
+void gpNavigationRibbon::EnableCpuGpuGroups(bool isCPUTraceDisplayed, bool isGPUTraceDisplayed)
+{
+    if (!isCPUTraceDisplayed)
+    {
+        m_pGroupComboBox->setEnabled(false);
+        m_pNavigateLayer[eNavigateLayerTopCPUApiCalls]->setEnabled(false);
+        m_pNavigateLayer[eNavigateLayerTopCPUApiCalls]->setChecked(false);
+        m_pNavigateLayer[eNavigateLayerCPUApiTime]->setEnabled(false);
+        m_pNavigateLayer[eNavigateLayerCPUApiTime]->setChecked(false);
+    }
+    if (!isGPUTraceDisplayed)
+    {
+        m_pNavigateLayer[eNavigateLayerTopGPUCmdsCalls]->setEnabled(false);
+        m_pNavigateLayer[eNavigateLayerTopGPUCmdsCalls]->setChecked(false);
+        m_pNavigateLayer[eNavigateLayerGPUOpsTime]->setEnabled(false);
+        m_pNavigateLayer[eNavigateLayerGPUOpsTime]->setChecked(false);
+    }
+}
+
 //////////////////////////////////////////////////////////////
 gpFilterButton::gpFilterButton(QWidget* pParent) : QPushButton(pParent), m_isMouseIn(false)
 {

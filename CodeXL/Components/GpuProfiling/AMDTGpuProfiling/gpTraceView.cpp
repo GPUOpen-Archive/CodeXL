@@ -96,7 +96,9 @@ gpTraceView::gpTraceView(QWidget* parent) : gpBaseSessionView(parent),
     m_isSessionLoaded(false),
     m_isCpuAPISelectionChangeInProgress(false),
     m_isGpuAPISelectionChangeInProgress(false),
-    m_initialResizeEvent(true)
+    m_initialResizeEvent(true),
+    m_isCPUTrace(false),
+    m_isGPUTrace(false)
 {
     // Set the background color to white
     QPalette p = palette();
@@ -258,6 +260,9 @@ bool gpTraceView::DisplaySession(const osFilePath& sessionFilePath, afTreeItemTy
                     m_pDetailedDataRibbon->SetTimeLine(m_pTimeline);
 
                     m_pDetailedDataRibbon->CalculateData();
+
+                    // enable navigation ribbon navigation controls based on the type of traces displayed
+                    m_pNavigationRibbon->EnableCpuGpuGroups(m_isCPUTrace, m_isGPUTrace);
                 }
 
                 // API Summary
@@ -537,18 +542,16 @@ void gpTraceView::SetProfileDataModel(gpTraceDataModel* pDataModel)
         m_pRibbonManager->AddRibbon(m_pTimeline, GPU_STR_ribbonNameTimeLine, 0);
         m_pRibbonManager->SetBoundFrameControlRibbons(m_pNavigationRibbon->NavigationChart(), m_pNavigationRibbon, m_pTimeline);
 
-        bool isGPUTrace = false, isCPUTrace = false;
-
         // Sanity check:
         GT_IF_WITH_ASSERT(m_pSessionDataContainer != nullptr)
         {
-            isGPUTrace = m_pSessionDataContainer->GPUCallsContainersCount() > 0;
-            isCPUTrace = m_pSessionDataContainer->ThreadsCount() > 0;
+            m_isGPUTrace = m_pSessionDataContainer->GPUCallsContainersCount() > 0;
+            m_isCPUTrace = m_pSessionDataContainer->ThreadsCount() > 0;
         }
 
         // If there is a GPU trace, add an horizontal splitter with the GPU trace table.
         // if there isn't add only the CPU \ GPU trace tab to the main vertical splitter
-        if (isGPUTrace && isCPUTrace)
+        if (m_isGPUTrace && m_isCPUTrace)
         {
             m_pGPUTraceTablesTabWidget = new acTabWidget(nullptr);
             m_pCPUTraceTablesTabWidget = new acTabWidget(nullptr);
@@ -562,7 +565,7 @@ void gpTraceView::SetProfileDataModel(gpTraceDataModel* pDataModel)
             pHSplitter->setSizes(sizes);
             m_pRibbonManager->AddRibbon(pHSplitter, GPU_STR_ribbonNameAPICalls, TABLE_HEIGHT);
         }
-        else if(isCPUTrace)
+        else if(m_isCPUTrace)
         {
             m_pCPUTraceTablesTabWidget = new acTabWidget(nullptr);
             m_pRibbonManager->AddRibbon(m_pCPUTraceTablesTabWidget, GPU_STR_ribbonNameAPICalls, TABLE_HEIGHT);

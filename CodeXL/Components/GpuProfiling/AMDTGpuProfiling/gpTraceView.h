@@ -244,9 +244,14 @@ protected:
     /// True if the user selected an item in the GPU table
     bool m_isGpuAPISelectionChangeInProgress;
 
-    /// first initial visibile resize event
+    /// first initial visible resize event
     bool m_initialResizeEvent;
 
+    /// Is CPU trace view
+    bool m_isCPUTrace;
+
+    /// Is GPU trace view
+    bool m_isGPUTrace;
 };
 
 

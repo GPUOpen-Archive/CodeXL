@@ -120,6 +120,11 @@ public:
     /// \param the current visibility filter
     void GetCurrentVisibility(int& visibleGroup, int& visibleLayersByFlag);
 
+    /// Enable navigation controls based on the type of sessions that are displayed (CPU/GPU)
+    /// \param isCPUTraceDisplayed is cpu traced displayed
+    /// \param isGPUTraceDisplayed is cpu traced displayed
+    void EnableCpuGpuGroups(bool isCPUTraceDisplayed, bool isGPUTraceDisplayed);
+
 signals:
     /// emitted when the user change the selection of visible layers (either by selecting a single layer check box or selecting a group of layers with the combobox)
     void LayerVisibilityChanged();
