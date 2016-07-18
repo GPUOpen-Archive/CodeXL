@@ -84,6 +84,7 @@
 #define PP_STR_Counter_AvgFreq_DGPU     "dGPU " PP_STR_FrequencyCounterPostfix
 #define PP_STR_Counter_AvgFreq_GFX      "GFX Core " PP_STR_FrequencyCounterPostfix
 #define PP_STR_Counter_AvgFreq_ACP      "ACP " PP_STR_FrequencyCounterPostfix
+#define PP_STR_Counter_Ave_Freq_Core    "Core%1 Avg Frequency"
 
 
 #define PP_STR_Counter_Voltage_CPUCore  "SVI2 CPU Cores"
@@ -96,6 +97,7 @@
 #define PP_STR_Counter_PState_Core1       "CPU Core1 P-State"
 #define PP_STR_Counter_PState_Core2       "CPU Core2 P-State"
 #define PP_STR_Counter_PState_Core3       "CPU Core3 P-State"
+#define PP_STR_Counter_PState_Core        "Core%1 P-State"
 
 #define PP_STR_Counter_C0Residency_CU0   "CPU CU0 C0 Residency"
 #define PP_STR_Counter_C0Residency_CU1   "CPU CU1 C0 Residency"

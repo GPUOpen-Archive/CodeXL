@@ -12,6 +12,8 @@
 ppColorsMap* ppColorsMap::m_colorsSingleInstance = nullptr;
 ppHierarchyMap* ppHierarchyMap::m_hierarchyMapSingleInstance = nullptr;
 
+#define MAX_SUPPORTED_CPU 8
+
 ppColorsMap::ppColorsMap()
 {
     m_dgpusCount = 0;
@@ -23,6 +25,12 @@ ppColorsMap::ppColorsMap()
         // Power
         m_colorsMap[PP_STR_Counter_Power_CU0] = acGetAMDColorScaleColor(AC_AMD_GREEN, 0);
         m_colorsMap[PP_STR_Counter_Power_CU1] = acGetAMDColorScaleColor(AC_AMD_GREEN, 1);
+
+        for (int nCpu = 0; nCpu < MAX_SUPPORTED_CPU; nCpu++)
+        {
+            QString cpuAvrStr = QString(PP_STR_Counter_Ave_Freq_Core).arg(nCpu);
+            m_colorsMap[cpuAvrStr] = acGetAMDColorScaleColor(AC_AMD_GREEN, nCpu);
+        }
 
         // On Kaveri "iGPU Power", on Carrizo "GFX Power"
         m_colorsMap[PP_STR_Counter_Power_IGPU] = acGetAMDColorScaleColor(AC_AMD_RED, 2);
@@ -101,6 +109,11 @@ ppColorsMap::ppColorsMap()
         m_colorsMap[PP_STR_Counter_PState_Core1] = acGetAMDColorScaleColor(AC_AMD_GREEN, 1);
         m_colorsMap[PP_STR_Counter_PState_Core2] = acGetAMDColorScaleColor(AC_AMD_GREEN, 2);
         m_colorsMap[PP_STR_Counter_PState_Core3] = acGetAMDColorScaleColor(AC_AMD_GREEN, 3);
+        for (int nCpu = 0; nCpu < MAX_SUPPORTED_CPU; nCpu++)
+        {
+            QString cpuPStateStr = QString(PP_STR_Counter_PState_Core).arg(nCpu);
+            m_colorsMap[cpuPStateStr] = acGetAMDColorScaleColor(AC_AMD_GREEN, nCpu);
+        }
 
         m_colorsMap[PP_STR_Counter_C0Residency_CU0] = acGetAMDColorScaleColor(AC_AMD_ORANGE, 0);
         m_colorsMap[PP_STR_Counter_C1Residency_CU0] = acGetAMDColorScaleColor(AC_AMD_ORANGE, 1);
