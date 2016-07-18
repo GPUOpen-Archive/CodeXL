@@ -5442,9 +5442,10 @@ public:
         bool ret = false;
 
         std::stringstream query;
+        // TODO: remove "AND functionId > 0" condition
         query << "SELECT callstackId, functionId, offset, depth "  \
                  "FROM  CallstackFrame "     \
-                 "WHERE callstackId = ? AND processId = ? "    \
+                 "WHERE callstackId = ? AND processId = ? AND functionId > 0 "    \
                  "ORDER BY depth ASC ;";
 
         sqlite3_stmt* pQueryStmt = nullptr;

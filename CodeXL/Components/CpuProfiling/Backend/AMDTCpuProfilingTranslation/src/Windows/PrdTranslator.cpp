@@ -742,6 +742,31 @@ bool PrdTranslator::InitPrdReader(PrdReader* pReader, const wchar_t* pFileName, 
     return bRet;
 }
 
+void PrdTranslator::AddNewModule(ProcessIdType pid, TiModuleInfo& pModInfo, NameModuleMap& pMMap)
+{
+    gtString funcName;
+    gtString jncFileName;
+    gtString srcFileName;
+    gtString ModName = gtString(pModInfo.pModulename);
+
+    NameModuleMap::iterator mit = pMMap.find(ModName);
+
+    if (mit == pMMap.end())
+    {
+        // Init
+        CpuProfileModule mod;
+        InitNewModule(mod, &pModInfo, ModName, funcName,
+                      jncFileName, srcFileName, pid);
+
+        // Insert
+        pMMap.insert(NameModuleMap::value_type(ModName, mod));
+
+        // Find again
+        mit = pMMap.find(ModName);
+    }
+
+    return;
+}
 
 void PrdTranslator::AggregateKnownModuleSampleData(
     SampleInfo& sampInfo,
@@ -1821,9 +1846,10 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
                 hr = GetModuleInfoHelper((void*) &prdRecord, &modInfo, evTBPEBPRecord, proFile);
                 END_TICK_COUNT(findModuleInfo);
 
-                if (modInstanceMap.end() == modInstanceMap.find(modInfo.instanceId))
+                if ((S_OK == hr ) && (modInstanceMap.end() == modInstanceMap.find(modInfo.instanceId)))
                 {
                     modInstanceMap.emplace(modInfo.instanceId, std::make_tuple(gtString(modInfo.pModulename), modInfo.processID, modInfo.ModuleStartAddr));
+                    //AddNewModule(processId, modInfo, moduleMap);
                 }
 
                 AggregateSampleData(prdRecord, &modInfo, &processMap, &moduleMap, pidModaddrItrMap, 1U, pStats);
@@ -1920,11 +1946,13 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
                     hr = GetModuleInfoHelper((void*)&ibsFetch, &modInfo, evIBSFetchRecord, proFile);
                     END_TICK_COUNT(findModuleInfo);
 
-                    if (modInstanceMap.end() == modInstanceMap.find(modInfo.instanceId))
+                    if ((S_OK == hr) && (modInstanceMap.end() == modInstanceMap.find(modInfo.instanceId)))
                     {
                         modInstanceMap.emplace(modInfo.instanceId,
                                                std::make_tuple(gtString(modInfo.pModulename),
                                                modInfo.processID, modInfo.ModuleStartAddr));
+
+                        //AddNewModule(processId, modInfo, moduleMap);
                     }
 
                     ProcessIbsFetchRecord(ibsFetch, &modInfo, &processMap, &moduleMap, pidModaddrItrMap, pStats);
@@ -2024,11 +2052,13 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
                     // Baskar: FIXME: This way of constructing modInstanceMap seems ineffective.
                     // The modInstanceMap can be constructed in AddLoadModules() in wintaskinfo.cpp
                     // Thus avoid accessing this map for every samples.
-                    if (modInstanceMap.end() == modInstanceMap.find(modInfo.instanceId))
+                    if ((S_OK == hr) && (modInstanceMap.end() == modInstanceMap.find(modInfo.instanceId)))
                     {
                         modInstanceMap.emplace(modInfo.instanceId,
                                                std::make_tuple(gtString(modInfo.pModulename),
                                                modInfo.processID, modInfo.ModuleStartAddr));
+
+                        //AddNewModule(processId, modInfo, moduleMap);
                     }
 
                     ProcessIbsOpRecord(ibsOp, &modInfo, &processMap,
@@ -2206,18 +2236,17 @@ bool PrdTranslator::WriteModuleInfoIntoDB(NameModuleMap& moduleMap)
         {
             pModuleList->reserve(moduleMap.size());
 
+            // Baskar: Some modules may only have the deep samples in CSS.
+            // We need to store details about all the load-modules of a process.
             for (const auto& m : moduleMap)
             {
-                if (m.second.getTotal())
-                {
-                    pModuleList->emplace_back(m.second.m_moduleId,
-                                              m.first,
-                                              m.second.m_size,
-                                              m.second.m_modType,
-                                              osIsSystemModule(m.first),
-                                              m.second.m_is32Bit,
-                                              m.second.m_isDebugInfoAvailable);
-                }
+                pModuleList->emplace_back(m.second.m_moduleId,
+                    m.first,
+                    m.second.m_size,
+                    m.second.m_modType,
+                    osIsSystemModule(m.first),
+                    m.second.m_is32Bit,
+                    m.second.m_isDebugInfoAvailable);
             }
 
             ret = pModuleList->size() > 0 ? true : false;
@@ -2249,17 +2278,10 @@ bool PrdTranslator::WriteModuleInstanceInfoIntoDB(NameModuleMap& moduleMap, ModI
                 gtUInt32 moduleId = 0;
                 auto it = moduleMap.find(std::get<0>(modIt.second));
 
-                // No need to process JAVA/CLR module instances
-                if (moduleMap.end() == it)
-                //    CpuProfileModule::JAVAMODULE == it->second.m_modType ||
-                //    CpuProfileModule::MANAGEDPE == it->second.m_modType)
+                if (moduleMap.end() != it)
                 {
-                    continue;
-                }
-
-                if (it->second.getTotal())
-                {
-                    // Insert into DB only if the module has samples
+                    // Baskar: Some modules may only have the deep samples in CSS.
+                    // We need to store details about all the load-modules of a process.
                     moduleId = it->second.m_moduleId;
                     pModuleInstanceList->emplace_back(modIt.first, moduleId, std::get<1>(modIt.second), std::get<2>(modIt.second));
                 }

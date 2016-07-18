@@ -3588,7 +3588,7 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
 
             for (const auto& m : m_modMap)
             {
-                if (m.second.getTotal())
+                //if (m.second.getTotal())
                 {
                     moduleList->emplace_back(m.second.m_moduleId,
                         m.first,
@@ -3627,7 +3627,8 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
                 gtUInt32 moduleId = 0;
                 const auto& it = m_modMap.find(modName);
 
-                if (it != m_modMap.end() && it->second.getTotal())
+                //if (it != m_modMap.end() && it->second.getTotal())
+                if (it != m_modMap.end())
                 {
                     // Insert into DB only if the module has samples
                     moduleId = it->second.m_moduleId;

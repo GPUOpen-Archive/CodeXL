@@ -92,6 +92,12 @@ struct ViewConfigInfo
 #define GET_MODOFFSET_FOR_UNKNOWN_FUNC(mod_, offset_, val_) val_ = mod_; val_ = (val_ << 32) | offset_;
 #define GET_MODULEID_FROM_FUNCTIONID(id_) (((id_) & 0xFFFF0000) >> 16)
 
+#if AMDT_BUILD_TARGET == AMDT_LINUX_OS
+#define LONG_FORMAT_HEX     L"%lx"
+#else
+#define LONG_FORMAT_HEX     L"%llx"
+#endif
+
 // Sampling Configuration
 using AMDTCounterIdVec = gtVector<AMDTCounterId>;
 using CounterIdSampleConfigMap = gtMap<AMDTCounterId, AMDTProfileSamplingConfig>;
@@ -183,7 +189,7 @@ public:
     AMDTProfileDataOptions              m_options;
 
     // Unknwon functions
-    gtVector<AMDTProfileFunctionInfo>   m_unknownFuncsList;
+    AMDTProfileFunctionInfoVec          m_unknownFuncsList;
     FuncIdInfoMap                       m_unknownFuncIdInfoMap;
     ModOffsetFuncInfoMap                m_modOffsetFuncInfoMap;
     AMDTFunctionId                      m_currentUnknownFuncId = CXL_UNKNOWN_FUNC_START_ID;
@@ -291,7 +297,7 @@ public:
 
                 ret = ret && InitializeReportOption();
 
-                ret = ret && GetUnknownFunctionsInfo();
+                ret = ret && GetUnknownFunctionsInfoFromIPSamples();
             }
         }
 
@@ -1615,7 +1621,7 @@ public:
         return ret;
     }
 
-    bool GetUnknownFunctionsInfo()
+    bool GetUnknownFunctionsInfoFromIPSamples()
     {
         bool ret = false;
 
@@ -1623,29 +1629,46 @@ public:
         {
             ret = m_pDbAdapter->GetUnknownFunctions(m_unknownFuncsList);
 
-            // construct the required maps
-            for (auto& func : m_unknownFuncsList)
-            {
-                if (IS_UNKNOWN_FUNC(func.m_functionId))
-                {
-                    // Get the offset and moduleid
-                    gtUInt32 funcOffset = func.m_startOffset;
-                    AMDTModuleId moduleId = func.m_moduleId;
-                    gtUInt64 unknownFuncModOffset;
-                    GET_MODOFFSET_FOR_UNKNOWN_FUNC(moduleId, funcOffset, unknownFuncModOffset);
+            ret = ret && AddUnknownFunctionsInfo(m_unknownFuncsList);
 
-                    // Set the new function id
-                    func.m_functionId |= m_currentUnknownFuncId++;
-
-                    m_unknownFuncIdInfoMap.insert({ func.m_functionId , func });
-                    m_modOffsetFuncInfoMap.insert({ unknownFuncModOffset , func });
-                }
-            }
-
-            m_readUnknownFuncs = true;
+            m_readUnknownFuncs = ret;
         }
 
         return ret;
+    }
+
+    bool AddUnknownFunctionsInfo(AMDTProfileFunctionInfoVec& funcInfoVec)
+    {
+        // construct the required maps
+        for (auto& func : funcInfoVec)
+        {
+            AddUnknownFunctionInfo(func);
+        }
+
+        return true;
+    }
+
+    void AddUnknownFunctionInfo(AMDTProfileFunctionInfo& func)
+    {
+        if (IS_UNKNOWN_FUNC(func.m_functionId))
+        {
+            // Get the offset and moduleid
+            gtUInt32 funcOffset = func.m_startOffset;
+            AMDTModuleId moduleId = func.m_moduleId;
+            gtUInt64 unknownFuncModOffset;
+            GET_MODOFFSET_FOR_UNKNOWN_FUNC(moduleId, funcOffset, unknownFuncModOffset);
+
+            auto it = m_modOffsetFuncInfoMap.find(unknownFuncModOffset);
+
+            if (it != m_modOffsetFuncInfoMap.end())
+            {
+                // Set the new function id
+                func.m_functionId |= m_currentUnknownFuncId++;
+
+                m_unknownFuncIdInfoMap.insert({ func.m_functionId , func });
+                m_modOffsetFuncInfoMap.insert({ unknownFuncModOffset , func });
+            }
+        }
     }
 
     // The unknown function ids will be generated here and they are not update in DB
@@ -3177,8 +3200,6 @@ public:
         bool ret = false;
         AMDTFunctionId funcId = frame.m_funcInfo.m_functionId;
 
-        Lookupfunction(frame.m_funcInfo);
-
         auto it = nodeMap.find(funcId);
 
         if (nodeMap.end() == it)
@@ -3359,6 +3380,19 @@ public:
         return ret;
     }
 
+    bool UpdateUnknownCallstackFrames(CallstackFrameVec& frames)
+    {
+        bool ret = false;
+
+        for (auto& frame : frames)
+        {
+            // Find the function info from debug info (if available) and update the tables
+            ret = Lookupfunction(frame.m_funcInfo);
+        }
+
+        return ret;
+    }
+
     // Callgraph
     bool ConstructCallGraph(AMDTProcessId pid, AMDTCounterId counterId)
     {
@@ -3417,6 +3451,8 @@ public:
 
                             if (ret)
                             {
+                                UpdateUnknownCallstackFrames(frames);
+
                                 cgNode* pCallerNode = nullptr;
                                 cgNode* pCalleeNode = pLeafNode;
                                 bool isCalleeLeaf = true;
@@ -3816,13 +3852,29 @@ public:
                     GetMaxFunctionIdByModuleId(funcInfo.m_moduleId, maxFuncId);
                     funcInfo.m_functionId = pFuncSymbol->m_funcId + maxFuncId;
 
-                    // TODO: Update CallstackFrame table and insert into Function table
                     m_pDbAdapter->InsertFunctionInfo(funcInfo);
                     m_pDbAdapter->UpdateCallstackLeaf(funcInfo);
                     m_pDbAdapter->UpdateCallstackFrame(funcInfo);
 
                     ret = true;
                 }
+            }
+
+            // Add the unknownfunction
+            if (!ret)
+            {
+                AMDTProfileModuleInfo modInfo;
+                ret = GetModuleInfo(funcInfo.m_moduleId, modInfo);
+
+                if (ret && !modInfo.m_name.isEmpty())
+                {
+                    funcInfo.m_name = modInfo.m_name;
+                    funcInfo.m_name.appendFormattedString(L"!0x" LONG_FORMAT_HEX, funcInfo.m_startOffset);
+                }
+
+                funcInfo.m_size = 16; // FIXME
+                AddUnknownFunctionInfo(funcInfo);
+                ret = true;
             }
         }
 
