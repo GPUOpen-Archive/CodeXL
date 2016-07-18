@@ -687,7 +687,7 @@ HRESULT fnWriteSetToFile(
     // Translate
     int ret = 0;
 
-    if ((S_OK == hr) && (0 != (ret = pTrans->translatePerfDataToCaData(string(outDirPath.toLatin1())))))
+    if ((S_OK == hr) && (0 != (ret = pTrans->translatePerfDataToCaData(std::string(outDirPath.toLatin1())))))
     {
         hr = ((static_cast<int>(E_NODATA) == ret) || (static_cast<int>(E_INVALIDDATA) == ret)) ? ret : E_FAIL;
     }
