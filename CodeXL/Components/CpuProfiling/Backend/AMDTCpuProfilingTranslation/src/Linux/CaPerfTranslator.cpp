@@ -3750,7 +3750,11 @@ int CaPerfTranslator::writeEbpOutput(const string& outputFile)
                         else
                         {
                             modLoadAddr = fit->second.getBaseAddr();
-                            moduleInstanceid = fit->second.m_functionId;
+
+                            if (!module.second.m_moduleInstanceInfo.empty())
+                            {
+                                moduleInstanceid = std::get<2>(module.second.m_moduleInstanceInfo.at(0));
+                            }
                         }
 
                         // sample address offset is w.r.t. module load address
