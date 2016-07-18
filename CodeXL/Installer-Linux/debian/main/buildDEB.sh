@@ -60,7 +60,7 @@ sed -i "s/com>/com> ${buildtime}/g" changelog
 #Set package folder size
 psize=$(du -s AMDExtractFolder/| sed 's/\s.*$//')
 sed -i "s/Installed-Size: /Installed-Size: ${psize}/g" control
-exit
+
 #Running FPM command
 # Reference command - fpm -f -C ~/Downloads/FromRPM --workdir ~/Downloads/testrpmdeb/ --deb-custom-control ~/Downloads/debscripts/control --after-install ~/Downloads/debscripts/postinst --before-remove ~/Downloads/debscripts/prerm -s dir -t deb -n amdcodexl -v 1.8-9000 opt/ usr/
 echo "Running fpm... (pack the directories to deb package)"
