@@ -141,7 +141,6 @@ void PowerProfileTranslate::ClosePowerProfileTranslate()
         m_rawFileHld->ReleaseBufferList();
         delete m_rawFileHld; // Destructor calls close
     }
-
 #if !(defined(_WIN64) || defined(LINUX))
     fnCleanupMaps();
 #endif
@@ -793,7 +792,6 @@ AMDTResult PowerProfileTranslate::TranslateRawData()
                         SetElapsedTime(tsRaw, &m_currentTs);
                         m_data.m_ts = m_currentTs;
                     }
-
                     pCoreCfg = PwrGetCoreConfig(sampleId);
                     AMDTUInt32 idx = 0;
 
@@ -823,14 +821,14 @@ AMDTResult PowerProfileTranslate::TranslateRawData()
                             }
                             else if (SMU_IPVERSION_9_0 == pDecodeInfo->m_smuIpVersion)
                             {
-#if 0
+                            #if 0
                                 len = PWR_SMU9_DECODE_COUNTER(pDecodeInfo,
                                                               &m_data,
                                                               pRaw + offset,
                                                               &idx,
                                                               &m_sysInfo,
                                                               ((m_currentTs - m_prevTs) / g_countPerSeconds));
-#endif
+                            #endif
                             }
                         }
                         else if (pDecodeInfo->m_pkgId > APU_SMU_ID)
@@ -1307,7 +1305,6 @@ AMDTResult PowerProfileTranslate::UpdateSharedBufferInfo(SharedBuffer* pBuffer, 
                      localBuffer->m_maxValidOffset);
             break;
         }
-
         idx++;
     }
 
@@ -1434,7 +1431,7 @@ AMDTResult PowerProfileTranslate::PwrGetProfileData(CXLContextProfileType type, 
         {
             *pPower = totalPower;
             std::sort(m_processList.begin(), m_processList.end(),
-            [](AMDTPwrProcessInfo const & a, AMDTPwrProcessInfo const & b) { return a.m_power > b.m_power; });
+                [](AMDTPwrProcessInfo const& a, AMDTPwrProcessInfo const& b) { return a.m_power > b.m_power; });
             *pData = &m_processList[0];
             *pCnt = static_cast<AMDTUInt32>(m_processList.size());
         }
@@ -1478,7 +1475,6 @@ AMDTResult PowerProfileTranslate::PwrGetProfileData(CXLContextProfileType type, 
                     wcstombs(path, str, OS_MAX_PATH);
                     ExtractNameAndPath(path, module.m_processName, module.m_processPath);
                 }
-
                 m_moduleList.push_back(module);
             }
         }
@@ -1487,7 +1483,7 @@ AMDTResult PowerProfileTranslate::PwrGetProfileData(CXLContextProfileType type, 
         {
             *pPower = totalPower;
             std::sort(m_moduleList.begin(), m_moduleList.end(),
-            [](AMDTPwrModuleData const & a, AMDTPwrModuleData const & b) { return a.m_power > b.m_power; });
+                [](AMDTPwrModuleData const& a, AMDTPwrModuleData const& b) { return a.m_power > b.m_power; });
             *pData = &m_moduleList[0];
             *pCnt = static_cast<AMDTUInt32>(m_moduleList.size());
         }
@@ -1843,7 +1839,6 @@ AMDTUInt32 PowerProfileTranslate::DecodeNodeCounters(PwrCounterDecodeInfo* pDeco
                 pOut->m_counters.insert(PwrDecodedCounterMap::value_type(counter.m_counterId, counter));
                 break;
             }
-
             case COUNTERID_CEF:
             {
                 AMDTUInt64 aPerf = 0;
@@ -1927,14 +1922,14 @@ AMDTUInt32 PowerProfileTranslate::DecodeNodeCounters(PwrCounterDecodeInfo* pDeco
             case COUNTERID_FAMILY17_PKG_ENERGY:
             case COUNTERID_FAMILY17_CORE_ENERGY:
             {
-#if 0
+                #if 0
                 AMDTUInt32 data = *(AMDTUInt32*)(pRaw + offset);
                 PWR_FAMILY17_DECODE_MSR_COUNTER(pDecodeInfo, data, &counter.m_float32);
                 counter.m_instanceId = pDecodeInfo->m_instanceId;
                 counter.m_counterId = pDecodeInfo->m_clientId;
                 offset += sizeof(AMDTUInt32);
                 pOut->m_counters.insert(PwrDecodedCounterMap::value_type(counter.m_counterId, counter));
-#endif
+                #endif
                 break;
             }
 
