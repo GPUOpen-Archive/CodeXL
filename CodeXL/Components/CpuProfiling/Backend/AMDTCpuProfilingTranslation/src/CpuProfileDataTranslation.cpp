@@ -695,7 +695,7 @@ HRESULT fnWriteSetToFile(
     ///////////////////////////////////////////////////////
     // Write EBP
     std::string ebpFile;
-    ebpFile = ebpFile + string(outDirPath.toLatin1()) + "/" + sessionName + ".ebp";
+    ebpFile = ebpFile + std::string(outDirPath.toLatin1()) + "/" + sessionName + ".ebp";
 
     if ((S_OK == hr) && (0 != pTrans->writeEbpOutput(ebpFile)))
     {
