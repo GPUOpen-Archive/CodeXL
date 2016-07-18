@@ -11,6 +11,9 @@
 //std
 #include <memory>
 
+// This should probably move to osOSDefinitions.h:88
+#define NOMINMAX 1
+
 // Local:
 #include <AMDTOSWrappers/Include/osStringConstants.h>
 #include <AMDTOSWrappers/Include/osHTTPClient.h>
