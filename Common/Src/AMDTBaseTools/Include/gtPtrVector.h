@@ -28,7 +28,7 @@
 // Author:      AMD Developer Tools Team
 // Creation Date:        4/4/2005
 // ----------------------------------------------------------------------------------
-template<class ElementType, class MemoryAllocator = allocator<ElementType> >
+template<class ElementType, class MemoryAllocator = std::allocator<ElementType> >
 class gtPtrVector : public gtVector<ElementType, MemoryAllocator>
 {
 public:

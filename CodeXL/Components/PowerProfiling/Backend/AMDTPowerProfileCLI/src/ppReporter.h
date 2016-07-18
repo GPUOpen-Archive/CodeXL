@@ -99,7 +99,7 @@ public:
 
     bool IsOpened() const { return m_reportFile.isOpened(); }
 
-    void SetProfileStartTime(string startTime) { m_profStartTime = startTime;  }
+    void SetProfileStartTime(std::string startTime) { m_profStartTime = startTime; }
 
     void SetCounterDesc(AMDTPwrCounterIdDescVec& supportedCounterIdDescVec,
                         AMDTPwrCounterIdNameVec& supportedCounterIdNameVec,
@@ -133,10 +133,10 @@ protected:
     ppParseArgs&  m_args;
     AMDTResult    m_error;
 
-    string        m_profStartTime;
+    std::string   m_profStartTime;
     const int     m_DataStrSize = 1024;
     char*         m_pDataStr;
-    string        m_dataStr;
+    std::string   m_dataStr;
 
     osFilePath    m_reportFilePath;  // output report
     osFile        m_reportFile;

@@ -599,13 +599,13 @@ bool kaProgram::GetProgramTypeFromFileExtention(const osFilePath& filePath, kaPr
 {
     struct CIComparator
     {
-        bool operator()(const wstring& rhs, const wstring& lhs) const
+        bool operator()(const std::wstring& rhs, const std::wstring& lhs) const
         {
             return boost::iequals(rhs, lhs);
         }
     };
 
-    static  const unordered_map<wstring, kaProgramTypes, hash<wstring>, CIComparator> knownExtentionsMap({
+    static const std::unordered_map<std::wstring, kaProgramTypes, std::hash<std::wstring>, CIComparator> knownExtentionsMap({
         { KA_STR_kernelFileExtension, kaProgramTypes::kaProgramCL },
 
         { KA_WSTR_CommonDXShaderExtension, kaProgramTypes::kaProgramDX },

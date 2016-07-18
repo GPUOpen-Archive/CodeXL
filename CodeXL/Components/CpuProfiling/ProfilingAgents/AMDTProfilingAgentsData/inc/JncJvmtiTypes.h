@@ -74,9 +74,9 @@ typedef gtVector<JncJvmtiLineNumberEntry> JncJvmtiLineNumberEntryVec;
 struct JncMethod
 {
     jmethodID                   id;
-    string                      name;
-    string                      signature;
-    string                      sourceName;
+    std::string                 name;
+    std::string                 signature;
+    std::string                 sourceName;
     JncJvmtiLineNumberEntryVec  lineNumberVec;
 };
 

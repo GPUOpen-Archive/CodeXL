@@ -125,15 +125,12 @@ void CollectWrapperInfo()
 //----------------------------------------------
 static bool IsPluginNeeded(gtASCIIString wrappedDLLs)
 {
-    list< gtASCIIString > dllList;
+    std::list< gtASCIIString > dllList;
     wrappedDLLs.Split(",", true, dllList);
 
-    for (list< gtASCIIString >::iterator iter = dllList.begin();
-         iter != dllList.end();
-         iter ++)
+    for (const gtASCIIString& iter : dllList)
     {
-
-        HMODULE hMod = GetModuleHandle(iter->asCharArray());
+        HMODULE hMod = GetModuleHandle(iter.asCharArray());
 
         if (hMod != NULL)
         {
@@ -277,13 +274,13 @@ void UpdateHooksOnLoadLibrary()
     for (unsigned int i = 0; i < g_wrapperArray.size(); i++)
     {
         // get the list of wrapped dll's
-        list< gtASCIIString > dllList;
+        std::list< gtASCIIString > dllList;
         g_wrapperArray[i].strWrappedDll.Split(",", true, dllList);
 
-        for (list< gtASCIIString >::iterator iter = dllList.begin(); iter != dllList.end(); ++iter)
+        for (const gtASCIIString& iter : dllList)
         {
             // check to see if this wrapped dll has been loaded
-            HMODULE hMod = GetModuleHandle(iter->asCharArray());
+            HMODULE hMod = GetModuleHandle(iter.asCharArray());
 
             if (hMod != NULL)
             {

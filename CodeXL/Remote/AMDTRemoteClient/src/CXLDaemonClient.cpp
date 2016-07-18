@@ -1110,14 +1110,14 @@ public:
         {
             if (m_asyncTasks[i] != NULL)
             {
-                wstringstream stream;
+                std::wstringstream stream;
                 stream << L"Daemon Thread Observer: terminating the following thread: " << m_asyncTasks[i]->id();
                 OS_OUTPUT_DEBUG_LOG(stream.str().c_str(), OS_DEBUG_LOG_DEBUG);
                 bool isOk = m_asyncTasks[i]->terminate();
 
                 if (!isOk)
                 {
-                    stream << L" FAILURE" << endl;
+                    stream << L" FAILURE" << std::endl;
                     OS_OUTPUT_DEBUG_LOG(stream.str().c_str(), OS_DEBUG_LOG_ERROR);
                 }
 

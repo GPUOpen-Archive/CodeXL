@@ -391,42 +391,42 @@ UINT32 RefTrackerCounter::GetRef()
 }
 
 #if defined (_WIN32)
-string GetErrorStringFromHRESULT(HRESULT hRes)
+std::string GetErrorStringFromHRESULT(HRESULT hRes)
 {
     switch (hRes)
     {
         case E_UNEXPECTED :
-            return string("E_UNEXPECTED");
+            return "E_UNEXPECTED";
 
         case E_NOTIMPL :
-            return string("E_NOTIMPL");
+            return "E_NOTIMPL";
 
         case E_OUTOFMEMORY :
-            return string("E_OUTOFMEMORY");
+            return "E_OUTOFMEMORY";
 
         case E_INVALIDARG :
-            return string("E_INVALIDARG");
+            return "E_INVALIDARG";
 
         case E_NOINTERFACE  :
-            return string("E_NOINTERFACE");
+            return "E_NOINTERFACE";
 
         case E_POINTER :
-            return string("E_POINTER");
+            return "E_POINTER";
 
         case E_HANDLE :
-            return string("E_HANDLE");
+            return "E_HANDLE";
 
         case E_ABORT :
-            return string("E_ABORT");
+            return "E_ABORT";
 
         case E_FAIL :
-            return string("E_FAIL");
+            return "E_FAIL";
 
         case E_ACCESSDENIED :
-            return string("E_ACCESSDENIED");
+            return "E_ACCESSDENIED";
 
         default:
-            return string("UNKNOWN");
+            return "UNKNOWN";
     }
 }
 #endif // _WIN32

@@ -1174,7 +1174,7 @@ QTreeWidgetItem* acTreeCtrl::FindDescendant(const QTreeWidgetItem* pParent, cons
     return pRetChild;
 }
 
-void acTreeCtrl::FindDescendants(const QTreeWidgetItem* pParent, const QString& searchNodeText, list<QTreeWidgetItem*>& result) const
+void acTreeCtrl::FindDescendants(const QTreeWidgetItem* pParent, const QString& searchNodeText, std::list<QTreeWidgetItem*>& result) const
 {
     GT_IF_WITH_ASSERT(pParent != nullptr)
     {

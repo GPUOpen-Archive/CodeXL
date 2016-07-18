@@ -384,7 +384,7 @@ gtASCIIString& gtASCIIString::appendFormattedString(const char* pFormatString, .
 // ---------------------------------------------------------------------------
 gtASCIIString& gtASCIIString::prepend(char character)
 {
-    string temp = "";
+    std::string temp = "";
     temp += character;
     temp.append(_impl);
     _impl = temp;
@@ -402,7 +402,7 @@ gtASCIIString& gtASCIIString::prepend(const char* pOtherString)
 {
     if (pOtherString != NULL)
     {
-        string temp;
+        std::string temp;
         temp.append(pOtherString);
         temp.append(_impl);
         _impl = temp;
@@ -424,7 +424,7 @@ gtASCIIString& gtASCIIString::prepend(const char* pOtherString, int length)
 {
     if (pOtherString != NULL)
     {
-        string temp;
+        std::string temp;
         temp.append(pOtherString, length);
         temp.append(_impl);
         _impl = temp;
@@ -442,7 +442,7 @@ gtASCIIString& gtASCIIString::prepend(const char* pOtherString, int length)
 // ---------------------------------------------------------------------------
 gtASCIIString& gtASCIIString::prepend(const gtASCIIString& otherString)
 {
-    string temp;
+    std::string temp;
     temp.append(otherString._impl);
     temp.append(_impl);
     _impl = temp;
@@ -477,7 +477,7 @@ gtASCIIString& gtASCIIString::prependFormattedString(const char* pFormatString, 
     int buffSize = 1024;
     bool goOn = true;
 
-    string temp;
+    std::string temp;
 
     while (goOn)
     {
@@ -485,8 +485,6 @@ gtASCIIString& gtASCIIString::prependFormattedString(const char* pFormatString, 
 
         // Allocate a buffer that will contain the formatted string:
         char* pBuff = new char[buffSize];
-
-
 
         // Write the formatted string into the buffer:
         int size = vsnprintf(pBuff, buffSize, pFormatString, argptr);
@@ -581,12 +579,12 @@ int gtASCIIString::findNextLine(int searchStartPosition) const
 
     if ((crPosition != -1) && (nlPosition != -1))
     {
-        nextLineStart = min(crPosition, nlPosition);
+        nextLineStart = std::min(crPosition, nlPosition);
     }
     else
     {
         // if we didn't find one of the line enders, choose the other or leave the value as -1
-        nextLineStart = max(nextLineStart, max(crPosition, nlPosition));
+        nextLineStart = std::max(nextLineStart, std::max(crPosition, nlPosition));
     }
 
     return nextLineStart;
@@ -950,11 +948,11 @@ gtASCIIString& gtASCIIString::removeTrailing(char c)
 {
     if (_impl.length() > 0)
     {
-        string::iterator startIter = _impl.begin();
-        string::iterator endIter = _impl.end();
+        std::string::iterator startIter = _impl.begin();
+        std::string::iterator endIter = _impl.end();
 
         // Look for the position of the last char that is not the input char:
-        string::iterator iter = endIter;
+        std::string::iterator iter = endIter;
 
         while (iter != startIter)
         {
@@ -987,7 +985,7 @@ gtASCIIString& gtASCIIString::removeTrailing(char c)
 // ---------------------------------------------------------------------------
 void gtASCIIString::getSubString(int startPosition, int endPosition, gtASCIIString& subString) const
 {
-    string subStr = _impl.substr(startPosition, (endPosition - startPosition + 1));
+    std::string subStr = _impl.substr(startPosition, (endPosition - startPosition + 1));
     subString = subStr.c_str();
 }
 
@@ -1778,7 +1776,7 @@ bool gtIsDigit(char c)
 // Author:      AMD Developer Tools Team
 // Date:        28/6/2013
 // ---------------------------------------------------------------------------
-void gtASCIIString::Split(const gtASCIIString& rSep, bool bCaseSensitive, list<gtASCIIString>& outList) const
+void gtASCIIString::Split(const gtASCIIString& rSep, bool bCaseSensitive, std::list<gtASCIIString>& outList) const
 {
     (void)(bCaseSensitive); // unused
 

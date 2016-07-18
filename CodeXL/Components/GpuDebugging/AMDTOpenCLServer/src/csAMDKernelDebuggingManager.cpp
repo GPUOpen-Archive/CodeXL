@@ -670,9 +670,9 @@ bool csAMDKernelDebuggingManager::setSteppingWorkItem(const int coordinate[3])
     GT_IF_WITH_ASSERT(_pCurrentKernelDebuggingSession != NULL)
     {
         // Make sure the values aren't our of range (but allow the coordinate 0 for invalid indices):
-        int maxX = max(_pCurrentKernelDebuggingSession->_debuggedKernelGlobalWorkSize[0], 1);
-        int maxY = max(_pCurrentKernelDebuggingSession->_debuggedKernelGlobalWorkSize[1], 1);
-        int maxZ = max(_pCurrentKernelDebuggingSession->_debuggedKernelGlobalWorkSize[2], 1);
+        int maxX = std::max(_pCurrentKernelDebuggingSession->_debuggedKernelGlobalWorkSize[0], 1);
+        int maxY = std::max(_pCurrentKernelDebuggingSession->_debuggedKernelGlobalWorkSize[1], 1);
+        int maxZ = std::max(_pCurrentKernelDebuggingSession->_debuggedKernelGlobalWorkSize[2], 1);
 
         if ((coordinate[0] < maxX) && (coordinate[1] < maxY) && (coordinate[2] < maxZ))
         {
@@ -1372,17 +1372,17 @@ bool csAMDKernelDebuggingManager::getVariableValueString(const gtString& variabl
         {
             // Calculate the item overall index from its coordinates:
             const int* globalWorkOffset = _pCurrentKernelDebuggingSession->_debuggedKernelGlobalWorkOffset;
-            int totalIndex = max(coordinate[0] - globalWorkOffset[0], 0);
+            int totalIndex = std::max(coordinate[0] - globalWorkOffset[0], 0);
             int workSizeX = _pCurrentKernelDebuggingSession->_debuggedKernelGlobalWorkSize[0];
             int workSizeY = _pCurrentKernelDebuggingSession->_debuggedKernelGlobalWorkSize[1];
 
             if (workSizeX > 0)
             {
-                totalIndex += workSizeX * max(coordinate[1] - globalWorkOffset[1], 0);
+                totalIndex += workSizeX * std::max(coordinate[1] - globalWorkOffset[1], 0);
 
                 if (workSizeY > 0)
                 {
-                    totalIndex += workSizeX * workSizeY * max(coordinate[2] - globalWorkOffset[2], 0);
+                    totalIndex += workSizeX * workSizeY * std::max(coordinate[2] - globalWorkOffset[2], 0);
                 }
             }
 
@@ -1519,12 +1519,12 @@ bool csAMDKernelDebuggingManager::getVariableValueString(const gtString& variabl
                 {
                     // We cannot get the base pointer by using "*(amdclDebugMemoryAddress*)valueData", since the hardware pointer size might be smaller than 64 bits.
                     amdclDebugMemoryAddress valuePointer = 0;
-                    gtSize_t pointerSize = min(sizeof(amdclDebugMemoryAddress), (gtSize_t)CS_KERNEL_DEBUGGING_DEFAULT_SIZE_OF_POINTER);
+                    gtSize_t pointerSize = std::min(sizeof(amdclDebugMemoryAddress), (gtSize_t)CS_KERNEL_DEBUGGING_DEFAULT_SIZE_OF_POINTER);
                     int dwarfPtrSize = _pCurrentKernelDebuggingSession->_pDWARFParser->dwarfPointerSize();
 
                     if (0 < dwarfPtrSize)
                     {
-                        pointerSize = min(sizeof(amdclDebugMemoryAddress), (gtSize_t)dwarfPtrSize);
+                        pointerSize = std::min(sizeof(amdclDebugMemoryAddress), (gtSize_t)dwarfPtrSize);
                     }
 
                     ::memcpy(&valuePointer, valueData, pointerSize);
@@ -1828,9 +1828,9 @@ bool csAMDKernelDebuggingManager::exportVariableValuesToFile(const gtString& var
     GT_IF_WITH_ASSERT(_pCurrentKernelDebuggingSession != NULL)
     {
         // Get the dimensions:
-        int dataXSize = max(_pCurrentKernelDebuggingSession->_debuggedKernelGlobalWorkSize[0], 1);
-        int dataYSize = max(_pCurrentKernelDebuggingSession->_debuggedKernelGlobalWorkSize[1], 1);
-        int dataZSize = max(_pCurrentKernelDebuggingSession->_debuggedKernelGlobalWorkSize[2], 1);
+        int dataXSize = std::max(_pCurrentKernelDebuggingSession->_debuggedKernelGlobalWorkSize[0], 1);
+        int dataYSize = std::max(_pCurrentKernelDebuggingSession->_debuggedKernelGlobalWorkSize[1], 1);
+        int dataZSize = std::max(_pCurrentKernelDebuggingSession->_debuggedKernelGlobalWorkSize[2], 1);
         int totalWorkSize = _pCurrentKernelDebuggingSession->_debuggedKernelTotalGlobalWorkSize;
 
         static const gtString executionMaskPseudoVariableName = CS_STR_KernelDebuggingExecutionMaskPseudoVariableName;
@@ -1898,7 +1898,7 @@ bool csAMDKernelDebuggingManager::exportVariableValuesToFile(const gtString& var
                             {
                                 copiedValues = true;
                                 // Copy the value to all locations:
-                                gtSize_t copySize = min((gtSize_t)variableValueSize, sizeof(gtUInt64));
+                                gtSize_t copySize = std::min((gtSize_t)variableValueSize, sizeof(gtUInt64));
 
                                 for (int i = 0; i < totalWorkSize; i++)
                                 {
@@ -2678,7 +2678,7 @@ void csAMDKernelDebuggingManager::updateValidWorkItems()
             {
                 // Copy the values to our mask:
                 GT_ASSERT(_pCurrentKernelDebuggingSession->_debuggedKernelTotalGlobalWorkSize == (int)maskSize);
-                int lowestIndex = min((int)maskSize, _pCurrentKernelDebuggingSession->_debuggedKernelTotalGlobalWorkSize);
+                int lowestIndex = std::min((int)maskSize, _pCurrentKernelDebuggingSession->_debuggedKernelTotalGlobalWorkSize);
                 bool* executionMask = _pCurrentKernelDebuggingSession->_debuggedKernelValidWorkItems;
 
                 for (int i = 0; i < lowestIndex; i++)

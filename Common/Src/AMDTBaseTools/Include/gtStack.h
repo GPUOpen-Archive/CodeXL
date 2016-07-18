@@ -18,9 +18,6 @@
 // Local:
 #include <AMDTBaseTools/Include/gtIgnoreCompilerWarnings.h>
 
-// Allow using types from the std namespace:
-using namespace std;
-
 
 // ----------------------------------------------------------------------------------
 // Class Name:           gtStack
@@ -31,11 +28,11 @@ using namespace std;
 // Author:      AMD Developer Tools Team
 // Creation Date:        11/5/2003
 // ----------------------------------------------------------------------------------
-template<class Type, class Container = deque<Type> >
-class gtStack : public stack<Type, Container>
+template<class Type, class Container = std::deque<Type> >
+class gtStack : public std::stack<Type, Container>
 {
 public:
-    typedef stack<Type, Container> StdStack;
+    typedef std::stack<Type, Container> StdStack;
 
     gtStack() {};
     gtStack(const gtStack& other) : StdStack(other) {}
@@ -47,11 +44,11 @@ public:
     }
 
 #if AMDT_HAS_CPP0X
-    gtStack(gtStack&& other) : StdStack(move(other)) {}
+    gtStack(gtStack&& other) : StdStack(std::move(other)) {}
 
     gtStack& operator=(gtStack&& other)
     {
-        static_cast<StdStack*>(this)->operator=(move(other));
+        static_cast<StdStack*>(this)->operator=(std::move(other));
         return *this;
     }
 #endif

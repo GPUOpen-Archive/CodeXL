@@ -17,9 +17,6 @@
 // Local:
 #include <AMDTBaseTools/Include/gtIgnoreCompilerWarnings.h>
 
-// Allow using types from the std namespace:
-using namespace std;
-
 
 // ---------------------------------------------------------------------------
 // Name:        gtFind

@@ -166,14 +166,14 @@ void ClientRequestThread::HandleHTTPRequest(NetSocket* client_socket, SockAddrIn
     ProcessTracker::Instance()->AddSocketToMap(handle, client_socket);
     pRequestHeader->SetClientIP(client_ip);
 
-    string strError;
+    std::string strError;
     // Now read the header.
     HTTP_REQUEST_RESULT result = pRequestHeader->ReadWebRequest(strError, client_socket);
 
     // Check for socket error
     if (result == HTTP_SOCKET_ERROR)
     {
-        string strFullError("Error SocketReadHeader.\n");
+        std::string strFullError("Error SocketReadHeader.\n");
 
         strFullError  += strError;
         OutputScreenError(strFullError.c_str());

@@ -545,7 +545,7 @@ bool CSVReporter::WriteImixSummaryInfo(gtVector<gtString>   sectionHdrs,
     WriteSectionHeaders(sectionHdrs);
 
     // Sort the map by samples count ascending order
-    multimap<gtUInt64, const string> sortedImixSummaryMap;
+    std::multimap<gtUInt64, const std::string> sortedImixSummaryMap;
 
     for (auto it : imixSummaryMap)
     {
@@ -604,7 +604,7 @@ bool CSVReporter::WriteImixInfo(gtVector<gtString>   sectionHdrs,
         m_reportFile.writeString(moduleHdr);
 
         // Sort the map by samples count ascending order
-        multimap<gtUInt64, const string> sortedImixMap;
+        std::multimap<gtUInt64, const std::string> sortedImixMap;
 
         for (auto sit : mit.m_InstMap)
         {

@@ -87,6 +87,7 @@ protected:
     void onProcessTerminate();
 
 protected:
+    typedef std::pair<int, int> afSourceLineAndPC;
 
     static afSourceCodeViewsManager* _pMySingleInstance;
 
@@ -94,7 +95,7 @@ protected:
     gtVector<afSourceCodeView*> _displayedSourceCodeViewsVector;
 
     // A mapping for the current line numbers and pc index for source code files:
-    gtMap<gtString, pair<int, int> > _sourceCodeFilesPCLineNumbers;
+    gtMap<gtString, afSourceLineAndPC > _sourceCodeFilesPCLineNumbers;
 
     // True iff the source code views should show white spaces:
     bool _showLineNumbers;

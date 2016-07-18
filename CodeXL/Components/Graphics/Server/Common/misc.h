@@ -38,8 +38,6 @@ static const int FUNCTION_RETURNS_VOID = -1;
     #include "Linux/SafeCRT.h"
 #endif // _LINUX
 
-using namespace std;
-
 // Forward declaration for usage in InterceptorBase.
 class ModernAPILayerManager;
 
@@ -128,7 +126,7 @@ void MessageBoxError(gtASCIIString s);
 /// \param hRes the HRESULT to convert
 /// \return The error string equivalent
 #if defined (_WIN32)
-    string GetErrorStringFromHRESULT(HRESULT hRes);
+    std::string GetErrorStringFromHRESULT(HRESULT hRes);
 #endif
 
 extern void hResultLogAndAssert(INT32 error, const char* strMessage);
@@ -657,8 +655,8 @@ class SystemFailure : public TSingleton< SystemFailure >
     /// Structure to relate the failure event to a function name
     struct StringPair
     {
-        string m_strFunction;   ///< The name of the function where the failure happened
-        string m_strEvent;      ///< String containing details of the faliure event
+        std::string m_strFunction;   ///< The name of the function where the failure happened
+        std::string m_strEvent;      ///< String containing details of the faliure event
     };
 
     /// map of a vtable to a map of objects which use that vtable
@@ -671,7 +669,7 @@ public:
     /// \param strFunction The function where the event happened.
     /// \param strEvent Details of the event.
     ///////////////////////////////////////////////////////////////////////////////////////////
-    void AddFailureEvent(string strFunction, string strEvent)
+    void AddFailureEvent(std::string strFunction, std::string strEvent)
     {
         StringPair* pEventPair = new StringPair();
         pEventPair->m_strFunction = strFunction;
@@ -719,7 +717,7 @@ public:
     ///////////////////////////////////////////////////////////////////////////////////////////
     /// Get the failure string from a specific failure event.
     ///////////////////////////////////////////////////////////////////////////////////////////
-    string GetFailureString(UINT32 nIndex)
+    std::string GetFailureString(UINT32 nIndex)
     {
         PsAssert(nIndex < m_Events.size());
 
@@ -730,7 +728,7 @@ public:
         }
         else
         {
-            return string("SystemFailure::GetFailure index out of range.");
+            return std::string("SystemFailure::GetFailure index out of range.");
         }
     }
 

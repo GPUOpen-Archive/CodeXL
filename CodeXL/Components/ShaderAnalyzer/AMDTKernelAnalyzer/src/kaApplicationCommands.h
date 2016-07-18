@@ -9,8 +9,6 @@
 // std:
 #include <set>
 #include <string>
-using std::set;
-using std::string;
 
 // Infra:
 #include <AMDTOSWrappers/Include/osFilePath.h>
@@ -138,7 +136,7 @@ public:
     void ActivateMDITreeItem(const osFilePath& filePath);
 
     /// Get selected devices in the format backend manager needs:
-    void getSelectedDevices(set<string>& selectedDeviceName) const;
+    void getSelectedDevices(std::set<std::string>& selectedDeviceName) const;
 
     /// get default d3d compiler dll file path
     /// \param (out) filePathStr is the default dll file path as string

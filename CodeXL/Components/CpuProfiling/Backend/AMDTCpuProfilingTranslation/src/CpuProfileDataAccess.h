@@ -418,7 +418,7 @@ struct CssDataInfo
     /** on which core was the css traced */
     int core;
     /** the css stack */
-    list <gtUInt64> stack;
+    gtList <gtUInt64> stack;
 };
 
 #if SUPPORT_CSS

@@ -192,7 +192,7 @@ HTTPHeaderData* HTTPRequestHeader::GetHeaderData()
 /// \param pClientSocket the socket to read
 /// \return True if success, false if fail.
 ////////////////////////////////////////////////////////////////////////////////////////////
-HTTP_REQUEST_RESULT HTTPRequestHeader::ReadWebRequest(string& strError, NetSocket* pClientSocket)
+HTTP_REQUEST_RESULT HTTPRequestHeader::ReadWebRequest(std::string& strError, NetSocket* pClientSocket)
 {
     gtSize_t nRead = 0;
 
@@ -251,7 +251,7 @@ HTTP_REQUEST_RESULT HTTPRequestHeader::ReadWebRequest(string& strError, NetSocke
 /// \param strError Output error string
 /// \return length of data to read or 0 if error.
 ////////////////////////////////////////////////////////////////////////////////////////////
-unsigned int HTTPRequestHeader::StartReadPostData(string& strError)
+unsigned int HTTPRequestHeader::StartReadPostData(std::string& strError)
 {
     // Clean up any existing data.
     if (m_pPostData != NULL)
@@ -289,7 +289,7 @@ unsigned int HTTPRequestHeader::StartReadPostData(string& strError)
 /// \param pClientSocket the socket to read
 /// \return True if success, False if fail.
 ////////////////////////////////////////////////////////////////////////////////////////////
-bool HTTPRequestHeader::ReadPostData(string& strError, NetSocket* pClientSocket)
+bool HTTPRequestHeader::ReadPostData(std::string& strError, NetSocket* pClientSocket)
 {
     unsigned int nContentLength = StartReadPostData(strError);
 
@@ -319,7 +319,7 @@ bool HTTPRequestHeader::ReadPostData(string& strError, NetSocket* pClientSocket)
 /// \param pSharedMemoryName name of the shared memory to read
 /// \return True if success, False if fail.
 ////////////////////////////////////////////////////////////////////////////////////////////
-bool HTTPRequestHeader::ReadPostData(string& strError, const char* pSharedMemoryName)
+bool HTTPRequestHeader::ReadPostData(std::string& strError, const char* pSharedMemoryName)
 {
     unsigned int nContentLength = StartReadPostData(strError);
 

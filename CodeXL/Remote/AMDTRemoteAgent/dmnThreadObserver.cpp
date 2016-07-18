@@ -30,14 +30,14 @@ void dmnThreadObserver::clean()
     {
         if ((*iter) != NULL)
         {
-            wstringstream stream;
+            std::wstringstream stream;
             stream << L"Daemon Thread Observer: terminating the following thread: " << (*iter)->id();
             OS_OUTPUT_DEBUG_LOG(stream.str().c_str(), OS_DEBUG_LOG_DEBUG);
             bool isOk = (*iter)->terminate();
 
             if (!isOk)
             {
-                stream << L" FAILURE" << endl;
+                stream << L" FAILURE" << std::endl;
                 OS_OUTPUT_DEBUG_LOG(stream.str().c_str(), OS_DEBUG_LOG_ERROR);
             }
 

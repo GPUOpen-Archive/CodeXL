@@ -1919,7 +1919,7 @@ bool apCLNativeKernelCommand::writeSelfIntoChannel(osChannel& ipcChannel) const
     if (num_mem_objects != amountOfArgMemLocations)
     {
         GT_ASSERT(num_mem_objects == amountOfArgMemLocations);
-        num_mem_objects = min(num_mem_objects, amountOfArgMemLocations);
+        num_mem_objects = std::min(num_mem_objects, amountOfArgMemLocations);
     }
 
     ipcChannel << (gtUInt32)num_mem_objects;

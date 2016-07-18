@@ -25,8 +25,6 @@
 #include <AMDTGpuProfiling/Util.h>
 
 
-using namespace std;
-
 /// Profile parameter
 class ProfileParam
 {

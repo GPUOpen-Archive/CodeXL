@@ -26,8 +26,6 @@
 #define COMM_MAX_URL_SIZE 8192 ///< Max comms URL size
 #define COMM_MAX_STREAM_RATE UINT_MAX ///< Max comms stream rate
 
-using std::string;
-
 /// Error return codes for the ReadWebRequest method.
 enum HTTP_REQUEST_RESULT
 {
@@ -227,7 +225,7 @@ public:
     /// \param pClientSocket the socket to read
     /// \return True if success, false if fail.
     ////////////////////////////////////////////////////////////////////////////////////////////
-    HTTP_REQUEST_RESULT ReadWebRequest(string& strError, NetSocket* pClientSocket);
+    HTTP_REQUEST_RESULT ReadWebRequest(std::string& strError, NetSocket* pClientSocket);
 
     ////////////////////////////////////////////////////////////////////////////////////////////
     /// Read the POST data section of a web request from shared memory
@@ -236,7 +234,7 @@ public:
     /// \param pSharedMemoryName name of the shared memory to read
     /// \return True if success, False if fail.
     ////////////////////////////////////////////////////////////////////////////////////////////
-    bool ReadPostData(string& strError, const char* pSharedMemoryName);
+    bool ReadPostData(std::string& strError, const char* pSharedMemoryName);
 
     ////////////////////////////////////////////////////////////////////////////////////////////
     /// Read the POST data section of a web request from a socket
@@ -245,7 +243,7 @@ public:
     /// \param pClientSocket the socket to read
     /// \return True if success, False if fail.
     ////////////////////////////////////////////////////////////////////////////////////////////
-    bool ReadPostData(string& strError, NetSocket* pClientSocket);
+    bool ReadPostData(std::string& strError, NetSocket* pClientSocket);
 
     ////////////////////////////////////////////////////////////////////////////////////////////
     /// Get the content length of the POST data
@@ -273,7 +271,7 @@ private:
     /// \param strError Output error string
     /// \return length of data to read or 0 if error.
     ////////////////////////////////////////////////////////////////////////////////////////////
-    unsigned int StartReadPostData(string& strError);
+    unsigned int StartReadPostData(std::string& strError);
 
     ////////////////////////////////////////////////////////////////////////////////////////////
     /// Initiaize the header data.

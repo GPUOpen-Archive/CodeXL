@@ -1168,7 +1168,7 @@ gtUInt32 SharedMemoryManager::Get(void* pOut, unsigned long dwBufferSize)
         {
             Log(logASSERT, "Num bytes read (%lu) > Expected size (%lu)\n", dwBytesRead + dwChunkSize, dwExpectedTotalSize);
             PsAssert(!(dwBytesRead + dwChunkSize > dwExpectedTotalSize));
-            dwChunkSize = min(dwExpectedTotalSize - dwBytesRead, dwChunkSize);
+            dwChunkSize = std::min(dwExpectedTotalSize - dwBytesRead, dwChunkSize);
         }
 
         // move past the chunk size
@@ -1329,7 +1329,7 @@ gtUInt32 SharedMemoryManager::Peek(void* pOut, unsigned long dwBufferSize)
         {
             Log(logASSERT, "Num bytes read (%lu) > Expected size (%lu)\n", dwBytesRead + dwChunkSize, dwExpectedTotalSize);
             PsAssert(!(dwBytesRead + dwChunkSize > dwExpectedTotalSize));
-            dwChunkSize = min(dwExpectedTotalSize - dwBytesRead, dwChunkSize);
+            dwChunkSize = std::min(dwExpectedTotalSize - dwBytesRead, dwChunkSize);
         }
 
         // move past the chunk size

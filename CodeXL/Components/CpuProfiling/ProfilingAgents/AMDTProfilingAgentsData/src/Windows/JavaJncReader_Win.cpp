@@ -703,7 +703,7 @@ JavaJncReader::_process_stringtable_section()
 
 
 bool
-JavaJncReader::GetStringFromOffset(jlong offset, string& str)
+JavaJncReader::GetStringFromOffset(jlong offset, std::string& str)
 {
     char*  pChar = nullptr;
 
@@ -714,7 +714,7 @@ JavaJncReader::GetStringFromOffset(jlong offset, string& str)
     }
 
     pChar = (char*)m_string_table_buf + offset;
-    str = string(pChar);
+    str = pChar;
     return true;
 }
 
@@ -736,7 +736,7 @@ JavaJncReader::_getSrcInfoFromBcAndMethodID(
     jint bc,
     jmethodID id,
     int& srcLine,
-    string& srcFile
+    std::string& srcFile
 )
 {
     bool ret = false;
@@ -793,7 +793,7 @@ JavaJncReader::_getSrcInfoFromBcAndMethodID(
 
 bool JavaJncReader::_process_inline_map()
 {
-    string file;
+    std::string file;
     JncPcStackInfoMap::iterator it = m_jncPcStackInfoMap.begin(), itEnd = m_jncPcStackInfoMap.end();
 
     bool ret = true;
@@ -829,7 +829,7 @@ bool JavaJncReader::_process_inline_map()
                            nextPc);
 
         int parentLine;
-        string parentSource;
+        std::string parentSource;
         int xx = numFrames - 1;
 
         _getSrcInfoFromBcAndMethodID(bcisArray[xx],
@@ -846,7 +846,6 @@ bool JavaJncReader::_process_inline_map()
             jilmit = itr;
             itr++;
         }
-
 
         if (jilmit == m_javaInlineMap.end())
         {
@@ -890,17 +889,12 @@ bool JavaJncReader::_process_inline_map()
 
                             AddressRangeList::iterator arIt = newmainit->second.addrs.begin(), arEnd = newmainit->second.addrs.end();
 
-
-
                             for (; arIt != arEnd; ++arIt)
                             {
-
                                 if ((ilAR.startAddr >= (*arIt).startAddr) && (ilAR.startAddr <= (*arIt).stopAddr))
                                 {
-
-
-                                    (*arIt).startAddr = min((*arIt).startAddr, ilAR.startAddr);
-                                    (*arIt).stopAddr = max((*arIt).stopAddr, ilAR.stopAddr);
+                                    (*arIt).startAddr = std::min((*arIt).startAddr, ilAR.startAddr);
+                                    (*arIt).stopAddr = std::max((*arIt).stopAddr, ilAR.stopAddr);
                                     bDidMerge = true;
 
                                     // TODO: Need to check if adding this range should merge other ranges
@@ -1111,7 +1105,7 @@ JavaJncReader::DumpStringTable(FILE* f)
         return;
     }
 
-    string str;
+    std::string str;
     unsigned int offset = 0;
 
     fprintf(f, "DumpStringTable - (size:%llu) \n", m_string_table_size);
@@ -1127,10 +1121,10 @@ JavaJncReader::DumpStringTable(FILE* f)
 }
 
 OffsetLinenumMap
-JavaJncReader::GetOffsetLines(wstring funcName)
+JavaJncReader::GetOffsetLines(std::wstring funcName)
 {
     int line = -1;
-    string file;
+    std::string file;
 
     if (! m_lineMap.isEmpty())
     {
@@ -1172,8 +1166,8 @@ JavaJncReader::GetOffsetLines(wstring funcName)
                 continue;
             }
 
-            wstring tmpStr(m_jncMethodMap[it->second->methods[i]].name.begin(),
-                           m_jncMethodMap[it->second->methods[i]].name.end());
+            std::wstring tmpStr(m_jncMethodMap[it->second->methods[i]].name.begin(),
+                                m_jncMethodMap[it->second->methods[i]].name.end());
 
             // parse method signature
             char parsedMethodSig[OS_MAX_PATH] = { 0 };
@@ -1284,7 +1278,7 @@ JavaJncReader::DumpJncPcStackInfoMap(FILE* f)
     }
 
     int line = -1;
-    string file;
+    std::string file;
 
     fprintf(f, "DumpJncPcStackInfoMap - (size:%u)\n",
             m_jncPcStackInfoMap.size());

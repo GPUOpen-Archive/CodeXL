@@ -2125,7 +2125,7 @@ void csDWARFParser::fillVariableWithInformationFromDIE(csDWARFVariable& variable
         {
             // Copy it into the struct:
             variableData._variableConstantValue = 0;
-            ::memcpy(&variableData._variableConstantValue, constValueBlock->bl_data, min((gtSize_t)constValueBlock->bl_len, sizeof(gtUInt64)));
+            ::memcpy(&variableData._variableConstantValue, constValueBlock->bl_data, std::min((gtSize_t)constValueBlock->bl_len, sizeof(gtUInt64)));
             variableData._variableConstantValueExists = true;
 
             // Release the block:

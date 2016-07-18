@@ -18,10 +18,6 @@
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
 #include <AMDTBaseTools/Include/gtIgnoreCompilerWarnings.h>
 
-// Allow using types from the std namespace:
-using namespace std;
-
-
 // ----------------------------------------------------------------------------------
 // Class Name:           gtSet
 // General Description:
@@ -38,11 +34,11 @@ using namespace std;
 
 #else
 
-template<class _Kty, class _Pr = less<_Kty>, class _Alloc = allocator<_Kty> >
-class gtSet : public set<_Kty, _Pr, _Alloc>
+template<class _Kty, class _Pr = std::less<_Kty>, class _Alloc = std::allocator<_Kty> >
+class gtSet : public std::set<_Kty, _Pr, _Alloc>
 {
 public:
-    typedef set<_Kty, _Pr, _Alloc> StdSet;
+    typedef std::set<_Kty, _Pr, _Alloc> StdSet;
 
     gtSet() {}
     gtSet(const gtSet& other) : StdSet(other) {}
@@ -54,11 +50,11 @@ public:
     }
 
 #if AMDT_HAS_CPP0X
-    gtSet(gtSet&& other) : StdSet(move(other)) {}
+    gtSet(gtSet&& other) : StdSet(std::move(other)) {}
 
     gtSet& operator=(gtSet&& other)
     {
-        static_cast<StdSet*>(this)->operator=(move(other));
+        static_cast<StdSet*>(this)->operator=(std::move(other));
         return *this;
     }
 #endif

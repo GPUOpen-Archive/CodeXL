@@ -170,7 +170,7 @@ bool dmnConfigManager::Init(std::wstring& errMsgBuffer)
             TiXmlElement* pElement = doc.FirstChildElement();
             GT_IF_WITH_ASSERT(pElement != NULL)
             {
-                string val = pElement->Value();
+                std::string val = pElement->Value();
                 m_isInitialized = (val.compare(SETTINGS_ELEM_NAME) == 0);
                 pElement = pElement->FirstChildElement();
                 m_isInitialized = pElement != NULL;
@@ -282,7 +282,7 @@ dmnConfigManager* dmnConfigManager::Instance()
 bool dmnConfigManager::TimeoutToString(long timeout, std::wstring& buffer) const
 {
     bool ret = true;
-    wstringstream stream;
+    std::wstringstream stream;
 
     try
     {

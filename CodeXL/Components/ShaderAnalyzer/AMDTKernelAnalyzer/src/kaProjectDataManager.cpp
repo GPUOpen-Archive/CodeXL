@@ -652,7 +652,7 @@ bool kaProjectDataManager::buildKernelList(const QString& fileData, const osFile
     GT_IF_WITH_ASSERT(pCurrentFileData != nullptr)
     {
         //TODO add here predefined by project macros
-        vector<std::string> additionalMacros;
+        std::vector<std::string> additionalMacros;
         const QStringList macroList = KernelMacros().split(";");
 
         for (const QString& str :  macroList)
@@ -674,8 +674,8 @@ bool kaProjectDataManager::buildKernelList(const QString& fileData, const osFile
 bool kaProjectDataManager::FillKernelNamesList(const QString& fileData, const osFilePath& filePath, const std::vector<std::string>& additionalMacros, gtVector<kaProjectDataManagerAnaylzeData>& kernelList)
 {
     bool result = false;
-    vector<PreProcessedToken> tokens;
-    string sourceCodeData = fileData.toUtf8().constData();
+    std::vector<PreProcessedToken> tokens;
+    std::string sourceCodeData = fileData.toUtf8().constData();
     ExpandMacros(sourceCodeData, filePath.asString().asCharArray(), additionalMacros, tokens);
 
     if (tokens.size() > 0)
@@ -2149,7 +2149,7 @@ bool kaProjectDataManager::IsBuilt(const kaProgram* pProgram, const AnalyzerBuil
                     //check if file with current id is contain in filePaths
                     auto itr = std::find_if(filePaths.begin(), filePaths.end(), [&](const  osFilePath & currentFilePath)
                     {
-                        return static_cast<int>(string::npos) != currentFilePath.asString().find(fileName);
+                        return static_cast<int>(std::string::npos) != currentFilePath.asString().find(fileName);
                     });
 
                     //if at least one source file not build we return false
@@ -2198,7 +2198,7 @@ void kaProjectDataManager::GetFilePathByID(int fileID, osFilePath& filePath) con
 
 std::set<osFilePath> kaProjectDataManager::GetFilePathsByIDs(const gtVector<int>& fileIDs) const
 {
-    set<osFilePath> filePathsSet;
+    std::set<osFilePath> filePathsSet;
 
     for (int id : fileIDs)
     {
@@ -2704,10 +2704,10 @@ void kaSourceFile::Serialize(gtString& xmlString)
 {
     xmlString.appendFormattedString(L"<%ls>", KA_STR_projectSettingFilesInfoNode);
 
-    afUtils::addFieldToXML(xmlString, KA_STR_sourceFileId, gtString(to_wstring(id()).c_str()));
+    afUtils::addFieldToXML(xmlString, KA_STR_sourceFileId, gtString(std::to_wstring(id()).c_str()));
 
     afUtils::addFieldToXML(xmlString, KA_STR_projectSettingFilePathNode, filePath().asString());
-    afUtils::addFieldToXML(xmlString, KA_STR_projectSettingFileType, gtString(to_wstring(FileType()).c_str()));
+    afUtils::addFieldToXML(xmlString, KA_STR_projectSettingFileType, gtString(std::to_wstring(FileType()).c_str()));
     afUtils::addFieldToXML(xmlString, KA_STR_projectSettingFileExecutionPathNode, buildDirectory().directoryPath().asString());
 
     QStringList& deviceListToSave = buildFiles();

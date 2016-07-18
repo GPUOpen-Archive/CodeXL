@@ -60,7 +60,7 @@ void mergedProfileDataVectors(gtVector<AMDTProfileData>& data)
 
         if (itr == mIdProfileDataMap.end())
         {
-            mIdProfileDataMap.insert(make_pair(elem.m_id, elem));
+            mIdProfileDataMap.insert(std::make_pair(elem.m_id, elem));
         }
         else
         {
@@ -114,8 +114,8 @@ CPUProfileDataTable::~CPUProfileDataTable()
 
 }
 
-bool CPUProfileDataTable::displayTableSummaryData(shared_ptr<cxlProfileDataReader> pProfDataRdr,
-                                                  shared_ptr<DisplayFilter> pDisplayFilter,
+bool CPUProfileDataTable::displayTableSummaryData(std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
+                                                  std::shared_ptr<DisplayFilter> pDisplayFilter,
                                                   int counterIdx,
                                                   bool isCLU)
 {
@@ -847,8 +847,8 @@ bool CPUProfileDataTable::delegateSamplePercent(int colNum)
 }
 
 bool CPUProfileDataTable::
-displayTableData(shared_ptr<cxlProfileDataReader> pProfDataRdr,
-                 shared_ptr<DisplayFilter> diplayFilter,
+displayTableData(std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
+                 std::shared_ptr<DisplayFilter> diplayFilter,
                  AMDTProcessId procId,
                  AMDTModuleId modId,
                  std::vector<AMDTUInt64> moduleIdVec)
@@ -892,7 +892,7 @@ displayTableData(shared_ptr<cxlProfileDataReader> pProfDataRdr,
     return retVal;
 }
 
-bool CPUProfileDataTable::initializeTableHeaders(shared_ptr<DisplayFilter> diplayFilter, bool isSummary)
+bool CPUProfileDataTable::initializeTableHeaders(std::shared_ptr<DisplayFilter> diplayFilter, bool isSummary)
 {
     bool retVal = true;
 
@@ -931,7 +931,7 @@ bool CPUProfileDataTable::initializeTableHeaders(shared_ptr<DisplayFilter> dipla
             for (const auto& counter : selectedCounterList)
             {
                 // print counter abbreviation
-                columnsStringByObjectType << acGTStringToQString(get<1>(counter));
+                columnsStringByObjectType << acGTStringToQString(std::get<1>(counter));
             }
         }
 

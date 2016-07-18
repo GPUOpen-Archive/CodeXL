@@ -44,8 +44,8 @@ public:
     virtual bool currentPosition(osStream::osStreamPosition positionReference, gtSize_t& offset) const = 0;
 
 protected:
-    ios_base::openmode fileOpenModeToIosOpenMode(osFile::osOpenMode openMode, osChannel::osChannelType fileType);
-    ios_base::seekdir streamPositionToIosSeekDir(osFile::osStreamPosition streamPosition);
+    std::ios_base::openmode fileOpenModeToIosOpenMode(osFile::osOpenMode openMode, osChannel::osChannelType fileType);
+    std::ios_base::seekdir streamPositionToIosSeekDir(osFile::osStreamPosition streamPosition);
 };
 
 

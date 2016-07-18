@@ -142,7 +142,7 @@ struct CGFunctionInfo
 };
 
 // Instruction and samples count map
-using InstructionSamplesMap = gtHashMap<string, gtUInt64>;
+using InstructionSamplesMap = gtHashMap<std::string, gtUInt64>;
 struct ModuleImixInfo
 {
     InstructionSamplesMap m_InstMap;
@@ -151,7 +151,7 @@ struct ModuleImixInfo
 };
 
 using ModuleImixInfoList = gtVector<ModuleImixInfo>;
-using ImixSummaryMap = gtHashMap<string, gtUInt64>;
+using ImixSummaryMap = gtHashMap<std::string, gtUInt64>;
 
 typedef gtMap<gtString, CGFunctionInfo*> CGFunctionInfoMap; // Function Name & Function Info - TODO can be based on address?
 typedef std::multimap<gtUInt64, CGFunctionInfo*> CGSampleFunctionMap; // Sample & Function Info

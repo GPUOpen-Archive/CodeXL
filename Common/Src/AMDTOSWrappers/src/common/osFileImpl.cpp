@@ -41,23 +41,23 @@ osFileImpl::~osFileImpl()
 // Author:      AMD Developer Tools Team
 // Date:        3/8/2004
 // ---------------------------------------------------------------------------
-ios_base::openmode osFileImpl::fileOpenModeToIosOpenMode(osFile::osOpenMode openMode, osChannel::osChannelType fileType)
+std::ios_base::openmode osFileImpl::fileOpenModeToIosOpenMode(osFile::osOpenMode openMode, osChannel::osChannelType fileType)
 {
     // Translate the open mode to ios::open_mode:
-    ios_base::openmode retVal = ios_base::in;
+    std::ios_base::openmode retVal = std::ios_base::in;
 
     if (openMode == osFile::OS_OPEN_TO_WRITE)
     {
-        retVal = ios_base::out | ios_base::trunc;
+        retVal = std::ios_base::out | std::ios_base::trunc;
     }
     else if (openMode == osFile::OS_OPEN_TO_APPEND)
     {
-        retVal = ios_base::out | ios_base::app;
+        retVal = std::ios_base::out | std::ios_base::app;
     }
 
     if ((fileType == osFile::OS_BINARY_CHANNEL) || (fileType == osFile::OS_UNICODE_TEXT_CHANNEL))
     {
-        retVal = retVal | ios_base::binary;
+        retVal = retVal | std::ios_base::binary;
     }
 
     return retVal;
@@ -73,20 +73,20 @@ ios_base::openmode osFileImpl::fileOpenModeToIosOpenMode(osFile::osOpenMode open
 // Author:      AMD Developer Tools Team
 // Date:        3/8/2004
 // ---------------------------------------------------------------------------
-ios_base::seekdir osFileImpl::streamPositionToIosSeekDir(osFile::osStreamPosition streamPosition)
+std::ios_base::seekdir osFileImpl::streamPositionToIosSeekDir(osFile::osStreamPosition streamPosition)
 {
     // Current stream position:
-    ios_base::seekdir retVal = ios_base::cur;
+    std::ios_base::seekdir retVal = std::ios_base::cur;
 
     if (streamPosition == osFile::OS_STREAM_BEGIN)
     {
         // Stream beginning:
-        retVal = ios_base::beg;
+        retVal = std::ios_base::beg;
     }
     else if (streamPosition == osFile::OS_STREAM_END)
     {
         // Stream end:
-        retVal = ios_base::end;
+        retVal = std::ios_base::end;
     }
 
     return retVal;

@@ -25,9 +25,6 @@
 #include <AMDTDisassembler/inc/LibDisassembler.h>
 #include <AMDTCpuProfilingTranslation/inc/Windows/TaskInfoInterface.h>
 
-using namespace std;
-
-
 #define MAX_UINT64 0xffffffffffffffffui64
 #define MAX_UINT32 0xffffffffU
 #define MAX_UINT8  0xffU
@@ -70,13 +67,13 @@ struct CLUModInfoData
     UINT32   codeOffset;
 };
 
-typedef map<wstring, CLUModInfoData > CLUModInfoMap;
+typedef std::map<std::wstring, CLUModInfoData > CLUModInfoMap;
 
 
-typedef pair<UINT64, UINT8 > TimeStampType; // Timestamp with bool isRemote
-typedef list<TimeStampType > AddrData;  // Timestamps
-typedef pair<gtVAddr, UINT64 > AddrMapKey;  // VA and PA
-typedef map<AddrMapKey, AddrData > AddrMap;
+typedef std::pair<UINT64, UINT8 > TimeStampType; // Timestamp with bool isRemote
+typedef std::list<TimeStampType > AddrData;  // Timestamps
+typedef std::pair<gtVAddr, UINT64 > AddrMapKey;  // VA and PA
+typedef std::map<AddrMapKey, AddrData > AddrMap;
 
 
 struct PidRIPData
@@ -144,7 +141,7 @@ struct PidRIPKey
     UINT8   core;
 };
 
-typedef map< PidRIPKey, PidRIPData > PidRIPMap; // Key is PID/RIP
+typedef std::map< PidRIPKey, PidRIPData > PidRIPMap; // Key is PID/RIP
 
 
 struct CacheDataStuff   // "For each cache line" data
@@ -171,9 +168,9 @@ struct CacheDataStuff   // "For each cache line" data
     UINT8       max_bytes;      // Maximum access size in bytes
 };
 
-typedef multimap<unsigned int, CacheDataStuff > CacheMap;   // Key is the cache index (phy addr[14:6]), data is cache lines
+typedef std::multimap<unsigned int, CacheDataStuff > CacheMap;   // Key is the cache index (phy addr[14:6]), data is cache lines
 
-typedef map<unsigned char, CacheMap > CoreCacheMap;     // Key is processor core
+typedef std::map<unsigned char, CacheMap > CoreCacheMap;     // Key is processor core
 
 
 
@@ -265,8 +262,8 @@ struct CLUData
         this->num_rw += other.num_rw;
         this->modIndex = other.modIndex;
         this->SpanCount += other.SpanCount;
-        this->min_bytes = min(this->min_bytes, other.min_bytes);
-        this->max_bytes = max(this->max_bytes, other.max_bytes);
+        this->min_bytes = std::min(this->min_bytes, other.min_bytes);
+        this->max_bytes = std::max(this->max_bytes, other.max_bytes);
         this->sumMax += other.max_bytes;
         this->bSizeUnknown = this->bSizeUnknown || other.bSizeUnknown;
 
@@ -311,7 +308,7 @@ struct CLUData
     UINT8   bSizeUnknown;   // Couldn't disassemble and determine size
 };
 
-typedef map<CLUKey, CLUData > CLUMap;
+typedef std::map<CLUKey, CLUData > CLUMap;
 
 
 struct CLUripData

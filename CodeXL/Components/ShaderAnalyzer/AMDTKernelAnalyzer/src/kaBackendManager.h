@@ -23,8 +23,6 @@
 #include <queue>
 #include <thread>
 
-using std::multimap;
-
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     #pragma warning(push)
     #pragma warning(disable : 4127)

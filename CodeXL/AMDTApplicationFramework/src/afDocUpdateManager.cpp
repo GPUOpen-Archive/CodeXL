@@ -98,12 +98,12 @@ void afDocUpdateManager::RegisterDocumentActivate(const osFile& filePath, afIDoc
         osWStat(fileNameAsStr, fileInfo);
         pData->m_lastUpdate = fileInfo.st_mtime;
 
-        list<afDocUpdateData*>::iterator docFound = m_activateDocUpdateDataList.end();
 
-        list<afDocUpdateData*>::iterator listBegin = m_activateDocUpdateDataList.begin();
-        list<afDocUpdateData*>::iterator listEnd = m_activateDocUpdateDataList.end();
+        std::list<afDocUpdateData*>::iterator listBegin = m_activateDocUpdateDataList.begin();
+        std::list<afDocUpdateData*>::iterator listEnd = m_activateDocUpdateDataList.end();
+        std::list<afDocUpdateData*>::iterator docFound = listEnd;
 
-        while (listBegin != listEnd)
+        for(; listBegin != listEnd; ++listBegin)
         {
             afDocUpdateData* pCurrentData = *listBegin;
 
@@ -112,11 +112,9 @@ void afDocUpdateManager::RegisterDocumentActivate(const osFile& filePath, afIDoc
                 docFound = listBegin;
                 break;
             }
-
-            listBegin++;
         }
 
-        if (m_activateDocUpdateDataList.end() == docFound)
+        if (listEnd == docFound)
         {
             m_activateDocUpdateDataList.push_back(pData);
         }
@@ -147,10 +145,10 @@ void afDocUpdateManager::UnregisterDocumentOfWidget(QWidget* pOwnedWidget)
 void afDocUpdateManager::UnregisterDocumentOfActivate(const osFile& filePath, afIDocUpdateHandler* updateHandler)
 {
     gtString filePathAsStr = filePath.path().asString();
-    list<afDocUpdateData*>::iterator listBegin = m_activateDocUpdateDataList.begin();
-    list<afDocUpdateData*>::iterator listEnd = m_activateDocUpdateDataList.end();
+    std::list<afDocUpdateData*>::iterator listBegin = m_activateDocUpdateDataList.begin();
+    std::list<afDocUpdateData*>::iterator listEnd = m_activateDocUpdateDataList.end();
 
-    while (listBegin != listEnd)
+    for(; listBegin != listEnd; ++listBegin)
     {
         afDocUpdateData* pData = *listBegin;
 
@@ -160,8 +158,6 @@ void afDocUpdateManager::UnregisterDocumentOfActivate(const osFile& filePath, af
             m_activateDocUpdateDataList.erase(listBegin);
             break;
         }
-
-        listBegin++;
     }
 }
 
@@ -193,10 +189,10 @@ void afDocUpdateManager::GetActivateDocumentList(osFilePath& docToActivate, gtVe
 
     gtString docToActivateStr = docToActivate.asString();
 
-    list<afDocUpdateData*>::iterator listBegin = m_activateDocUpdateDataList.begin();
-    list<afDocUpdateData*>::iterator listEnd = m_activateDocUpdateDataList.end();
+    std::list<afDocUpdateData*>::iterator listBegin = m_activateDocUpdateDataList.begin();
+    std::list<afDocUpdateData*>::iterator listEnd = m_activateDocUpdateDataList.end();
 
-    while (listBegin != listEnd)
+    for(; listBegin != listEnd; ++listBegin)
     {
         afDocUpdateData* pData = *listBegin;
 
@@ -208,8 +204,6 @@ void afDocUpdateManager::GetActivateDocumentList(osFilePath& docToActivate, gtVe
                 notifyUser |= pData->m_notifyUser;
             }
         }
-
-        listBegin++;
     }
 }
 
@@ -449,10 +443,10 @@ void afDocUpdateManager::CheckWidget(QWidget* pOwnedWidget, osFilePath& filePath
 // ---------------------------------------------------------------------------
 void afDocUpdateManager::ForceAlwasyUpdateDocuments()
 {
-    list<afDocUpdateData*>::iterator listBegin = m_activateDocUpdateDataList.begin();
-    list<afDocUpdateData*>::iterator listEnd = m_activateDocUpdateDataList.end();
+    std::list<afDocUpdateData*>::iterator listBegin = m_activateDocUpdateDataList.begin();
+    std::list<afDocUpdateData*>::iterator listEnd = m_activateDocUpdateDataList.end();
 
-    while (listBegin != listEnd)
+    for(; listBegin != listEnd; ++listBegin)
     {
         afDocUpdateData* pData = *listBegin;
 
@@ -468,8 +462,6 @@ void afDocUpdateManager::ForceAlwasyUpdateDocuments()
                 pData->m_pUpdateNotifier->UpdateDocument(filePath);
             }
         }
-
-        listBegin++;
     }
 }
 

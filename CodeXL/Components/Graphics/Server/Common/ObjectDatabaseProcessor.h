@@ -46,7 +46,7 @@ public:
     virtual void EndFrame();
 
     /// CommandProcessor
-    virtual string GetDerivedSettings() { return ""; }
+    virtual std::string GetDerivedSettings() { return ""; }
 
     //--------------------------------------------------------------------------
     /// Enable Object Database collection to disk

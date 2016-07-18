@@ -1374,7 +1374,7 @@ void ppTimeLineView::CalculateCurrentBottomRibbonsYCoord()
             {
                 QRect currentRibbonRect = pPlot->GetPlot()->geometry();
                 int currentBottom = currentRibbonRect.bottom() + navBottom + bottomPadding;
-                m_bottomRibbonYCoord = max(m_bottomRibbonYCoord, currentBottom);
+                m_bottomRibbonYCoord = std::max(m_bottomRibbonYCoord, currentBottom);
             }
         }
     }

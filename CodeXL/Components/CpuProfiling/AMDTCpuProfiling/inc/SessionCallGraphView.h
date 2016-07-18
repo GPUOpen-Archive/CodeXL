@@ -145,7 +145,7 @@ public:
     FunctionsTreeCtrl* functionsTreeControl() const {return m_pFuncTable;}
 
     bool setFunction(gtUInt64 functionIndex);
-    void SetFunctionPath(shared_ptr<cxlProfileDataReader> pProfDataRdr, AMDTFunctionId funcId, AMDTUInt32 processId, bool displaySysMod);
+    void SetFunctionPath(std::shared_ptr<cxlProfileDataReader> pProfDataRdr, AMDTFunctionId funcId, AMDTUInt32 processId, bool displaySysMod);
     //void SetFunctionPath(CpuProfileCss& css, const FunctionGraph::Node& funcNode);
 
     void setWindowTitle(const QString& title)  // Overload this
@@ -234,8 +234,8 @@ public:
     void InitEmptyTableRow();
     // hides/unhides empty table item row in the table list
     void HandleDisplayEmptyTableItem(int count);
-    bool FillDisplayFuncList(shared_ptr<cxlProfileDataReader> pProfDataRdr,
-                             shared_ptr<DisplayFilter> pDisplayFilter,
+    bool FillDisplayFuncList(std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
+                             std::shared_ptr<DisplayFilter> pDisplayFilter,
                              AMDTUInt32 counterId,
                              AMDTUInt32 processId,
                              AMDTFunctionId& funcIdMaxSamples);
@@ -281,8 +281,8 @@ private:
                                            unsigned pathsNumber, gtUInt64 selfCount, gtUInt64 deepCount);
 #endif
     void GetFunctionCount(std::pair<int, int>& minMax,
-                          const shared_ptr<DisplayFilter> pDisplayFilter,
-                          shared_ptr<cxlProfileDataReader> pProfDataRdr,
+                          const std::shared_ptr<DisplayFilter> pDisplayFilter,
+                          std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
                           AMDTUInt32 counterId,
                           AMDTUInt32 processId);
 
@@ -320,13 +320,13 @@ public:
     void SetChildrenFunction(CpuProfileCss& css, const FunctionGraph::Node& funcNode);
 #endif
 
-    void SetParentsFunction(shared_ptr<cxlProfileDataReader> pProfDataRdr,
+    void SetParentsFunction(std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
                             bool displaySystemModule,
                             AMDTUInt32 processId,
                             AMDTUInt32 counterId,
                             AMDTFunctionId  funcId);
 
-    void SetChildrenFunction(shared_ptr<cxlProfileDataReader> pProfDataRdr,
+    void SetChildrenFunction(std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
                              bool displaySystemModule,
                              AMDTUInt32 processId,
                              AMDTUInt32 counterId,

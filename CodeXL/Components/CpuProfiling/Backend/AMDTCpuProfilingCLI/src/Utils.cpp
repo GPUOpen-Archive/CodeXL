@@ -763,7 +763,7 @@ bool GetImixInfoList(CpuProfileReader&    profileReader,
                         prevSectionIndex = sectionIndex;
                     }
 
-                    string dasmString(dasmArray);
+                    std::string dasmString(dasmArray);
                     auto it = modInfo.m_InstMap.find(dasmString);
                     gtUInt64 sampleCount = sit->second.getTotal();
 

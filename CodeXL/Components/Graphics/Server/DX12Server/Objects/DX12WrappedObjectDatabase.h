@@ -16,7 +16,7 @@ class IInstanceBase;
 class IDX12InstanceBase;
 
 /// A map used to associate an application's D3D12 interface with a IDXInstanceBase metadata object.
-typedef unordered_map<IUnknown*, IDX12InstanceBase*> DXInterfaceToWrapperMetadata;
+typedef std::unordered_map<IUnknown*, IDX12InstanceBase*> DXInterfaceToWrapperMetadata;
 
 //-----------------------------------------------------------------------------
 /// The DX12WrappedObjectDatabase is responsible for tracking wrapped and destroyed objects.

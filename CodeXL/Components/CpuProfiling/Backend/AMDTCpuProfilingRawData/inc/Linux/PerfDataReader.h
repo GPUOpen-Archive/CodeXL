@@ -22,8 +22,6 @@
 #include "linux/perf_event.h"
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
 
-using namespace std;
-
 typedef vector<struct perf_event_attr> PerfEventAttrVec;
 
 typedef map<gtUInt64, gtUInt64> PerfEvtIdToEvtTypeMap;

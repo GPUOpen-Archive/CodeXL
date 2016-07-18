@@ -1596,7 +1596,7 @@ HRESULT PdbSymbolEngine::FindFrameInterface(gtVAddr va, IDiaFrameData** ppFrame)
                 if (NULL != *ppFrame)
                 {
                     m_funcsLock.lockWrite();
-                    gtMap<gtRVAddr, IDiaFrameData*>::_Pairib itb = m_framesCache.insert(make_pair(rva, *ppFrame));
+                    gtMap<gtRVAddr, IDiaFrameData*>::_Pairib itb = m_framesCache.insert(std::make_pair(rva, *ppFrame));
 
                     if (!itb.second)
                     {
@@ -1658,7 +1658,7 @@ HRESULT PdbSymbolEngine::FindSymbolInterface(gtVAddr va, IDiaSymbol** ppSymbol) 
                 if (NULL != *ppSymbol)
                 {
                     m_funcsLock.lockWrite();
-                    gtMap<gtRVAddr, IDiaSymbol*>::_Pairib itb = m_symbolsCache.insert(make_pair(rva, *ppSymbol));
+                    gtMap<gtRVAddr, IDiaSymbol*>::_Pairib itb = m_symbolsCache.insert(std::make_pair(rva, *ppSymbol));
 
                     if (!itb.second)
                     {

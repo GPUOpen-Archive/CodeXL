@@ -20,9 +20,6 @@
 // Local:
 #include <AMDTBaseTools/Include/gtIgnoreCompilerWarnings.h>
 
-// Allow using types from the std namespace:
-using namespace std;
-
 
 // ----------------------------------------------------------------------------------
 // Class Name:           gtList
@@ -39,11 +36,11 @@ using namespace std;
 // Author:      AMD Developer Tools Team
 // Creation Date:        11/5/2003
 // ----------------------------------------------------------------------------------
-template<typename _Tp, typename _Alloc = allocator<_Tp> >
-class gtList : public list<_Tp, _Alloc>
+template<typename _Tp, typename _Alloc = std::allocator<_Tp> >
+class gtList : public std::list<_Tp, _Alloc>
 {
 public:
-    typedef list<_Tp, _Alloc> StdList;
+    typedef std::list<_Tp, _Alloc> StdList;
     gtList() {};
     gtList(const gtList& other) : StdList(other) {};
 
@@ -54,11 +51,11 @@ public:
     }
 
 #if AMDT_HAS_CPP0X
-    gtList(gtList&& other) : StdList(move(other)) {}
+    gtList(gtList&& other) : StdList(std::move(other)) {}
 
     gtList& operator=(gtList&& other)
     {
-        static_cast<StdList*>(this)->operator=(move(other));
+        static_cast<StdList*>(this)->operator=(std::move(other));
         return *this;
     }
 #endif
@@ -76,8 +73,8 @@ public:
         int itemsAmount = 0;
 
         // Count the list items:
-        typename list<_Tp, _Alloc>::const_iterator endIter = gtList::end();
-        typename list<_Tp, _Alloc>::const_iterator iter = gtList::begin();
+        typename StdList::const_iterator endIter = gtList::end();
+        typename StdList::const_iterator iter = gtList::begin();
 
         while (iter != endIter)
         {

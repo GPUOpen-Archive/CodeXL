@@ -15,7 +15,6 @@
 #include <AMDTBaseTools/Include/gtMap.h>
 #include <AMDTOSWrappers/Include/osApplication.h>
 
-using namespace std;
 typedef struct CounterInstance
 {
     AMDTUInt32 m_instanceId; //CU or Core

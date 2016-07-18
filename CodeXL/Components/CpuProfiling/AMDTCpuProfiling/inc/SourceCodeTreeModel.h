@@ -47,7 +47,7 @@ class SourceCodeTreeModel : public QAbstractItemModel
 
 public:
     SourceCodeTreeModel(SessionDisplaySettings* pSessionDisplaySettings, const QString& sessionDir,
-                        shared_ptr<cxlProfileDataReader> pProfDataRdr, shared_ptr<DisplayFilter> displayFilter);
+                        std::shared_ptr<cxlProfileDataReader> pProfDataRdr, std::shared_ptr<DisplayFilter> displayFilter);
 
     ~SourceCodeTreeModel();
 
@@ -279,8 +279,8 @@ private:
 
     AMDTProfileSourceLineDataVec m_srcLineDataVec;
 
-    shared_ptr<cxlProfileDataReader> m_pProfDataRdr;
-    shared_ptr<DisplayFilter> m_pDisplayFilter;
+    std::shared_ptr<cxlProfileDataReader> m_pProfDataRdr;
+    std::shared_ptr<DisplayFilter> m_pDisplayFilter;
     AMDTUInt64  m_funcFirstSrcLine = 0;
 
     // srcLineNumber for sampled  --> SourceViewTreeItem

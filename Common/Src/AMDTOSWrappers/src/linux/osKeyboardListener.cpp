@@ -8,7 +8,6 @@
 
 //------------------------------ osKeyboardListener.cpp ------------------------------
 
-#if  AMDT_BUILD_TARGET == AMDT_LINUX_OS
 //C++
 #include <future>
 #include <algorithm>
@@ -38,37 +37,35 @@
 
 #pragma GCC diagnostic ignored "-Wwrite-strings"
 
-
-using namespace std;
 osKeyboardListener::osKeyboardListener()
 {
     m_pListener.reset(new thread(&osKeyboardListener::Listen, this, GetKeyboardDescriptor()));
 
 }
+
 osKeyboardListener::~osKeyboardListener()
 {
     m_Stop = true;
     m_pListener->join();
 }
 
-
 osKeyboardListener& osKeyboardListener::Instance()
 {
     static osKeyboardListener instance;
     return instance;
 }
+
 //Set callback function,which is to be called from keyboard pressed Hook
 void   osKeyboardListener::SetOnKbPressedCallback(OnKeyboardPressed callback)
 {
     m_callback = callback;
 }
+
 int osKeyboardListener::GetKeyboardDescriptor()
 {
-
     int fd(0);
 
     char name[256] = "Unknown";
-
 
     if ((getuid()) != 0)
     {
@@ -81,7 +78,7 @@ int osKeyboardListener::GetKeyboardDescriptor()
     deviceDir.getContainedFilePaths(L"*", osDirectory::SORT_BY_DATE_DESCENDING, devicePaths);
 
     //Open Device
-    for (osFilePath devicePath :  devicePaths)
+    for (osFilePath devicePath : devicePaths)
     {
         const char* deviceString = devicePath.asString().asASCIICharArray();
 
@@ -110,16 +107,17 @@ int osKeyboardListener::GetKeyboardDescriptor()
 
     return fd;
 }
+
 void osKeyboardListener::Listen(int fd)
 {
-    int rv(0),
-        value(0),
-        size = sizeof(struct input_event);
+    int rv = 0;
+    int value = 0;
+    int size = sizeof(struct input_event);
     struct timeval timeout;
     fd_set set;
     struct input_event ev[64];
 
-    while (false == m_Stop)
+    while (!m_Stop)
     {
         timeout.tv_sec = 0;
         timeout.tv_usec = 50000;//50 ms
@@ -143,9 +141,6 @@ void osKeyboardListener::Listen(int fd)
                     }
                 }
             }
-
         }
-
-    }//while
+    } //while
 }
-#endif

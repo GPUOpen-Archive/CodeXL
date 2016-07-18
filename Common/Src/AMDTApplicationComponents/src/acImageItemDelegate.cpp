@@ -409,9 +409,9 @@ void acImageItemDelegate::displayItemAsImage(QPainter* pPainter, QRect& imageRec
                     //calculate necessary zoom level if first time best fit
                     int bestFitPercentageX = int((double(nAvailableWidth - AC_IMAGE_MANAGER_SCROLLBAR_MARGIN) * double(100) / double(nOriginalWidth)));
                     int bestFitPercentageY = int((double(nAvailableHeight - AC_IMAGE_MANAGER_SCROLLBAR_MARGIN) * double(100) / double(nOriginalHeight)));
-                    nZoomLevel = min(bestFitPercentageX, bestFitPercentageY);
+                    nZoomLevel = std::min(bestFitPercentageX, bestFitPercentageY);
                     nZoomLevel -= AC_IMAGES_MANAGER_THUMBNAIL_MARGIN;
-                    nZoomLevel = max(nZoomLevel, 1);
+                    nZoomLevel = std::max(nZoomLevel, 1);
                     m_pImageManager->setFirstTimeBestFitZoom(nZoomLevel);
                     m_bFirstTimeBestFit = false;
                 }

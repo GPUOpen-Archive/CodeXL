@@ -225,7 +225,7 @@ private:
     //-----------------------------------------------------------------------------
     // No additional settings
     //-----------------------------------------------------------------------------
-    virtual string GetDerivedSettings() { return ""; }
+    virtual std::string GetDerivedSettings() { return ""; }
 
     //--------------------------------------------------------------------------
     /// Keep track of how many frames have been presented.

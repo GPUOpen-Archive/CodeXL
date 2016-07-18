@@ -2465,10 +2465,12 @@ void gaGetVBODetailsStub(osSocket& apiSocket)
     const apGLVBO* pVboDetails = NULL;
     bool retVal = gaGetVBODetailsImpl((int)contextIdAsInt32, (GLuint)vboNameAsUInt32, pVboDetails);
 
+    retVal = retVal && (nullptr != pVboDetails);
+
     // Return the return value:
     apiSocket << retVal;
 
-    if (retVal && (pVboDetails != NULL))
+    if (retVal)
     {
         pVboDetails->writeSelfIntoChannel(apiSocket);
     }

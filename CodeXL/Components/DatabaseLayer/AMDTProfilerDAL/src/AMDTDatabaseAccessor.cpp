@@ -1140,8 +1140,8 @@ public:
 
         // Bind the values to the parameters.
         // TODO: utf8 ?
-        string key(keyStr.asASCIICharArray());
-        string value(valueStr.asASCIICharArray());
+        std::string key(keyStr.asASCIICharArray());
+        std::string value(valueStr.asASCIICharArray());
 
         sqlite3_bind_text(m_pSessionInfoInsertStmt, 1, key.c_str(), key.size(), nullptr);
         sqlite3_bind_text(m_pSessionInfoInsertStmt, 2, value.c_str(), value.size(), nullptr);
@@ -2627,7 +2627,7 @@ public:
 
     // TODO: Use a single API for both PP and CP for counter table
     // Note: This is the actual PMC eventId
-    bool GetCounterNameAndDescription(AMDTUInt32 counterId, string& nameStr, string& abbrevStr, string& descStr)
+    bool GetCounterNameAndDescription(AMDTUInt32 counterId, std::string& nameStr, std::string& abbrevStr, std::string& descStr)
     {
         bool ret = false;
         sqlite3_stmt* pQueryStmt = nullptr;
@@ -2688,9 +2688,9 @@ public:
             while (sqlite3_step(pQueryStmt) == SQLITE_ROW)
             {
                 AMDTProfileCounterDesc counterDesc;
-                string name;
-                string abbrev;
-                string desc;
+                std::string name;
+                std::string abbrev;
+                std::string desc;
 
                 counterDesc.m_id = sqlite3_column_int(pQueryStmt, 0);
                 counterDesc.m_hwEventId = sqlite3_column_int(pQueryStmt, 1);
@@ -3416,7 +3416,7 @@ public:
 
         bool addComma = false;
         gtString query;
-        string comma(" , ");
+        std::string comma(" , ");
 
         for (auto id : coreSamplingConfigIds)
         {
@@ -3462,7 +3462,7 @@ public:
         bool addAddStr = false;
 
         query << L" (";
-        string addString(" + ");
+        std::string addString(" + ");
 
         for (auto id : coreSamplingConfigIds)
         {
@@ -3661,8 +3661,8 @@ public:
                                          SampleProcessSummaryData.foundDebugInfo, ";
 
             std::stringstream partialQuery;
-            string fromCol("CoreSamplingConfiguration.id");
-            string toCol("SampleProcessSummaryData.sampleCount");
+            std::string fromCol("CoreSamplingConfiguration.id");
+            std::string toCol("SampleProcessSummaryData.sampleCount");
             GetAllEventCorePartialQuery(partialQuery, fromCol, toCol);
 
             summaryViewCreate << partialQuery.str();
@@ -3761,8 +3761,8 @@ public:
                                          SampleFunctionSummaryData.functionId,";
 
             std::stringstream partialQuery;
-            string fromCol("CoreSamplingConfiguration.id");
-            string toCol("SampleFunctionSummaryData.sampleCount");
+            std::string fromCol("CoreSamplingConfiguration.id");
+            std::string toCol("SampleFunctionSummaryData.sampleCount");
             GetAllEventCorePartialQuery(partialQuery, fromCol, toCol);
 
             summaryViewCreate << partialQuery.str();
@@ -3816,8 +3816,8 @@ public:
                                    SampleContext.offset, ";
 
         std::stringstream partialQuery;
-        string fromCol("CoreSamplingConfiguration.id");
-        string toCol("SampleContext.count");
+        std::string fromCol("CoreSamplingConfiguration.id");
+        std::string toCol("SampleContext.count");
         GetAllEventCorePartialQuery(partialQuery, fromCol, toCol);
 
         viewCreateQuery << partialQuery.str();

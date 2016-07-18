@@ -96,8 +96,8 @@ public:
 
     CpuProfileModule* getModuleDetail(const QString& modulePath, QWidget* pParent = nullptr, ExecutableFile** ppExe = nullptr);
 
-    shared_ptr<cxlProfileDataReader> profDbReader() { return m_pProfDataRd; }
-    shared_ptr<DisplayFilter> GetDisplayFilter() { return m_pDisplayFilter; }
+    std::shared_ptr<cxlProfileDataReader> profDbReader() { return m_pProfDataRd; }
+    std::shared_ptr<DisplayFilter> GetDisplayFilter() { return m_pDisplayFilter; }
     bool IsProfilingTypeCLU();
 
 public slots:
@@ -159,14 +159,14 @@ private:
     //SessionDisplaySettings m_sessionDisplayFilter;
 
     /// Data tabs
-    SessionOverviewWindow*          m_pOverviewWindow       = nullptr;
-    SessionModulesView*             m_pSessionModulesView   = nullptr;
-    SessionFunctionView*            m_pSessionFunctionView  = nullptr;
-    SessionCallGraphView*           m_pCallGraphTab         = nullptr;
+    SessionOverviewWindow*          m_pOverviewWindow      = nullptr;
+    SessionModulesView*             m_pSessionModulesView  = nullptr;
+    SessionFunctionView*            m_pSessionFunctionView = nullptr;
+    SessionCallGraphView*           m_pCallGraphTab        = nullptr;
 
     // database reader
-    shared_ptr<cxlProfileDataReader>    m_pProfDataRd   = nullptr;
-    shared_ptr<DisplayFilter>           m_pDisplayFilter = nullptr;
+    std::shared_ptr<cxlProfileDataReader> m_pProfDataRd    = nullptr;
+    std::shared_ptr<DisplayFilter>        m_pDisplayFilter = nullptr;
     bool m_isCLU = false;
 
     /// Session window widgets

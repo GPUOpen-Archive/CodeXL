@@ -339,7 +339,7 @@ void gdBatchStatisticsView::addBatchesByRange(const apRenderPrimitivesStatistics
     const gtMap<int, gtUInt64>& renderPrimitivesStatsMap = renderPrimitivesStatistics.getStatisticsMap();
     gtMap<int, gtUInt64>::const_iterator iterRanges = renderPrimitivesStatsMap.begin();
     gtMap<int, gtUInt64>::const_iterator iterEndRanges = renderPrimitivesStatsMap.end();
-    gtList<pair<gtUInt64, int> > listOfStatistics;
+    gtList<gdBatchCountAndSize> listOfStatistics;
 
     // Loop through the statistics items, and calculate total vertices and batches counters:
     for (; iterRanges != iterEndRanges; iterRanges++)
@@ -354,7 +354,7 @@ void gdBatchStatisticsView::addBatchesByRange(const apRenderPrimitivesStatistics
             _totalAmountOfVertices += amountOfBatches * amountOfVertices;
 
             // Insert this statistics to the list of statistics:
-            pair<gtUInt64, int> currentStats;
+            gdBatchCountAndSize currentStats;
             currentStats.first = amountOfBatches * amountOfVertices;
             currentStats.second = amountOfVertices;
             listOfStatistics.insert(listOfStatistics.begin(), currentStats);
@@ -362,13 +362,13 @@ void gdBatchStatisticsView::addBatchesByRange(const apRenderPrimitivesStatistics
     }
 
     // Create a vector describes the order of the statistics added to the list control:
-    gtVector<pair<int, int> > rangesVector;
+    gtVector<gdBatchSizeRange> rangesVector;
     bool rc = createRangesVector(listOfStatistics, renderPrimitivesStatistics, rangesVector);
     GT_IF_WITH_ASSERT(rc)
     {
         // Loop through the ranges vector, and add each of the ranges:
-        gtVector<pair<int, int> >::const_iterator iter = rangesVector.begin();
-        gtVector<pair<int, int> >::const_iterator iterEnd = rangesVector.end();
+        gtVector<gdBatchSizeRange>::const_iterator iter = rangesVector.begin();
+        gtVector<gdBatchSizeRange>::const_iterator iterEnd = rangesVector.end();
 
         for (; iter != iterEnd; iter++)
         {
@@ -496,15 +496,14 @@ void gdBatchStatisticsView::addBatchToListControl(int minVertices, int maxVertic
 // ---------------------------------------------------------------------------
 // Name:        gdBatchStatisticsView::createRangesVector
 // Description:
-// Arguments: gtList<pair<int, gtUInt64> > sortedListOfStats
+// Arguments: gtList<gdBatchCountAndSize> sortedListOfStats
 //            const apRenderPrimitivesStatistics& renderStatistics - the statistics item
-//            gtVector<pair<int
-//            int> >& rangesVector
+//            gtVector<gdBatchSizeRange>& rangesVector
 // Return Val: bool  - Success / failure.
 // Author:      Sigal Algranaty
 // Date:        18/5/2009
 // ---------------------------------------------------------------------------
-bool gdBatchStatisticsView::createRangesVector(gtList<pair<gtUInt64, int> >& listOfStatistics, const apRenderPrimitivesStatistics& renderStatistics, gtVector<pair<int, int> >& rangesVector)
+bool gdBatchStatisticsView::createRangesVector(gtList<gdBatchCountAndSize>& listOfStatistics, const apRenderPrimitivesStatistics& renderStatistics, gtVector<gdBatchSizeRange>& rangesVector)
 {
     bool retVal = true;
     // Check how many vertices are in each range:
@@ -520,8 +519,8 @@ bool gdBatchStatisticsView::createRangesVector(gtList<pair<gtUInt64, int> >& lis
     gtUInt64 verticesLeftToCollect = _totalAmountOfVertices;
 
     // Loop the sorted statistics (in descending order):
-    gtList<pair<gtUInt64, int> >::const_reverse_iterator iter = listOfStatistics.rbegin();
-    gtList<pair<gtUInt64, int> >::const_reverse_iterator iterEnd = listOfStatistics.rend();
+    gtList<gdBatchCountAndSize>::const_reverse_iterator iter = listOfStatistics.rbegin();
+    gtList<gdBatchCountAndSize>::const_reverse_iterator iterEnd = listOfStatistics.rend();
 
     for (; iter != iterEnd; iter++)
     {
@@ -541,7 +540,7 @@ bool gdBatchStatisticsView::createRangesVector(gtList<pair<gtUInt64, int> >& lis
             GT_IF_WITH_ASSERT(rc)
             {
                 // Add the current range to the vector of ranges:
-                rangesVector.push_back(pair<int, int>(currentMinRange, currentMaxRange));
+                rangesVector.push_back(gdBatchSizeRange(currentMinRange, currentMaxRange));
 
                 // Reduce the amount of vertices added by this range:
                 verticesLeftToCollect -= currentSliceVerticesAmount;

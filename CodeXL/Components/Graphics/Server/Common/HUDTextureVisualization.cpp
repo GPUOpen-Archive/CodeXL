@@ -50,9 +50,9 @@ HUDTextureVisualization::~HUDTextureVisualization()
 /// \return XML indicating which channels of the texture should be editable
 ///   based on the texture format
 //--------------------------------------------------------------------------
-string HUDTextureVisualization::GetDerivedSettings()
+std::string HUDTextureVisualization::GetDerivedSettings()
 {
-    stringstream strOut;
+    std::stringstream strOut;
 
     strOut << XML("ShowRed",   ShowRedControl()).asCharArray();
     strOut << XML("ShowGreen", ShowGreenControl()).asCharArray();

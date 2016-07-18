@@ -54,7 +54,7 @@ public:
     virtual bool readSelfFromChannel(osChannel& ipcChannel);
 
 private:
-    typedef pair<cl_uint, oaCLContextProperty> apCLProperty;
+    typedef std::pair<cl_uint, oaCLContextProperty> apCLProperty;
     gtVector<apCLProperty> _properties;
 };
 

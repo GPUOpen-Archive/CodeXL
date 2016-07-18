@@ -132,7 +132,7 @@ protected:
     //--------------------------------------------------------------------------
     /// A map used to associate a ThreadId with a SampleInfo structure.
     //--------------------------------------------------------------------------
-    typedef unordered_map<DWORD, SampleInfo*> ThreadIdToSampleIdMap;
+    typedef std::unordered_map<DWORD, SampleInfo*> ThreadIdToSampleIdMap;
 
     //--------------------------------------------------------------------------
     /// An association of CPU ThreadId to a SampleInfo structure.

@@ -15,8 +15,6 @@
 
 #include "CluInfo.h"
 
-using namespace std;
-
 enum CacheNotifications
 {
     CACHE_NORMAL = 0,

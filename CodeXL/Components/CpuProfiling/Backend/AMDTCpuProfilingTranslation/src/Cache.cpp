@@ -87,7 +87,7 @@ CacheNotifications Cache::CacheAccess(gtVAddr address, CacheDataStuff** data, un
     {
         // First access from this core
         CacheMap cacheMap;
-        coreIt = m_pCoreCache->insert(pair <unsigned char, CacheMap > (core, cacheMap)).first;
+        coreIt = m_pCoreCache->insert(std::pair <unsigned char, CacheMap > (core, cacheMap)).first;
         assert(coreIt != m_pCoreCache->end());
     }
 

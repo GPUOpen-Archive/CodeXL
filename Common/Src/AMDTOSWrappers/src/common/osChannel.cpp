@@ -312,7 +312,7 @@ bool osChannel::readString(gtASCIIString& str)
 bool osChannel::writeStringImpl(const gtString& str)
 {
     bool retVal = false;
-    string converted_str = str.asASCIICharArray();
+    std::string converted_str = str.asASCIICharArray();
     gtInt32 stringLength = static_cast<gtInt32>(converted_str.length());
 
     // Do not write the string length into text channels:
@@ -416,16 +416,14 @@ bool osChannel::readStringImpl(gtString& str)
             // Read the string content:
             // Read the string as bytes pointer:
             // TO_DO: Unicode - use preprocessor definitions (http://www.firstobject.com/wchar_t-string-on-linux-osx-windows.htm)
-
-            unique_ptr<gtByte[]> buf_ptr(new gtByte[stringLength + 1]());
-            gtByte* buf = buf_ptr.get();
-
-
+            gtVector<gtByte> buf_ptr(stringLength + 1);
+            gtByte* buf = &buf_ptr[0];
             bool rc = read(buf, stringLength);
+            buf[stringLength] = (gtByte)0;
 
             if (rc)
             {
-                str.fromASCIIString(buf, stringLength);
+                str.fromASCIIString((const char*)buf, stringLength);
             }
             else
             {

@@ -48,7 +48,7 @@ public:
 
 private:
     // The output file stream:
-    ofstream _outputFileStream;
+    std::ofstream _outputFileStream;
 };
 
 #endif  // __OSOUTPUTFILEIMPL

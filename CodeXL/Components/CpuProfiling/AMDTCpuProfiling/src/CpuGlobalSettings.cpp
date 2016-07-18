@@ -185,7 +185,7 @@ void CpuGlobalSettings::updateGui(bool bReset)
             ++i;
             m_pSymServerList->addItem(pItem);
         }
-        while (!bReset && (i < min(servers.size(), 32)));
+        while (!bReset && (i < std::min(servers.size(), 32)));
     }
 }
 

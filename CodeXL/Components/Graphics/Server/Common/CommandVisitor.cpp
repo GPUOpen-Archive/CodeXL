@@ -114,12 +114,10 @@ void CommandVisitor::RecordCommandString(CommandResponse* pCommResp)
 {
     gtASCIIString strFinal;
 
-    for (vector< gtASCIIString >::iterator iter = vCommandTreeStack.begin();
-         iter != vCommandTreeStack.end();
-         iter ++)
+    for (const gtASCIIString& iter : vCommandTreeStack)
     {
         strFinal += "/";
-        strFinal += *iter;
+        strFinal += iter;
     }
 
     switch (pCommResp->GetEditableContent())
@@ -171,11 +169,9 @@ gtASCIIString CommandVisitor::GetCommandStrings()
 {
     gtASCIIString strFinal;
 
-    for (vector< gtASCIIString >::iterator iter = vFinalCommands.begin();
-         iter != vFinalCommands.end();
-         iter ++)
+    for (const gtASCIIString& iter : vFinalCommands)
     {
-        strFinal += *iter;
+        strFinal += iter;
         strFinal += "\n";
     }
 

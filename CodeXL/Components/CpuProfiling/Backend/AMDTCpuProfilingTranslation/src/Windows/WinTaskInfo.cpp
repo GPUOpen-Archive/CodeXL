@@ -2581,7 +2581,7 @@ HRESULT ConstructModuleName(ModuleValue& modValue, gtUInt64 pid, std::wstring& m
     if (modValue.moduleName[0] == L'\0')
     {
         // Module name is unknown
-        modName = to_wstring(pid);
+        modName = std::to_wstring(pid);
     }
     else
     {
@@ -2863,7 +2863,7 @@ HRESULT WinTaskInfo::GetModuleInfo(TiModuleInfo* pModInfo)
     if (pModInfo->pModulename[0] == L'\0')
     {
         // Module name is unknown
-        modName = to_wstring(pModInfo->processID);
+        modName = std::to_wstring(pModInfo->processID);
     }
     else
     {

@@ -68,8 +68,8 @@ public:
     QTreeWidgetItem* FindChild(const QTreeWidgetItem* pParent, QString& searchNodeText);
     QTreeWidgetItem* FindDescendant(const QTreeWidgetItem* pParent, const QString& searchNodeText) const;
     void FindDescendants(const QTreeWidgetItem* pParent, const QString& searchNodeText, std::list<QTreeWidgetItem*>& result) const;
-public slots:
 
+public slots:
     virtual void onAboutToShowContextMenu();
 
     // Edit commands implementations:

@@ -42,7 +42,7 @@ public:
     /// \brief Enables adding API specific texture data (like format) to the
     ///  command processors settings.
     //--------------------------------------------------------------------------
-    virtual string GetDerivedSettings();
+    virtual std::string GetDerivedSettings();
 
     //--------------------------------------------------------------------------
     /// \brief Sets the pipeline stage of this object

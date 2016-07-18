@@ -23,9 +23,6 @@
 
 class LayerManager;
 
-using std::string;
-using std::vector;
-
 /// The possible response states of a CommandObject and a CommandResponse
 enum ResponseState { NO_RESPONSE, DELAYED_RESPONSE, SENT_RESPONSE, ERROR_SENDING_RESPONSE, RESPONSE_COUNT  };
 
@@ -164,10 +161,10 @@ class CommandProcessorArrayNode;
 class CommandVisitor;
 
 /// List of command responses
-typedef vector < CommandResponse* >  CommandList;
+typedef std::vector < CommandResponse* >  CommandList;
 
 /// List of command processors
-typedef vector < CommandProcessor* > ProcessorList;
+typedef std::vector < CommandProcessor* > ProcessorList;
 
 /**
 * The CommandObject is responsible for tracking an incoming request as it is parsed by the CommandProcessors
@@ -272,7 +269,7 @@ private:
     /// \param rValue the variable to store the value in
     /// \return true if the parameter is found and the value can be extracted; false otherwise
     //--------------------------------------------------------------------------
-    bool GetParam(const char* pParamName, string& rValue);
+    bool GetParam(const char* pParamName, std::string& rValue);
 
     //--------------------------------------------------------------------------
     /// Parses the params member variable for the specified parameter and, if
@@ -805,14 +802,14 @@ public:
     /// Returns the CommandTree as XML based on the contents of this Processor
     /// \return XML describing the added commands and Processors
     //--------------------------------------------------------------------------
-    virtual string GetCommandTree();
+    virtual std::string GetCommandTree();
 
 protected:
 
     //--------------------------------------------------------------------------
     /// Returns the values of editable commands
     //--------------------------------------------------------------------------
-    string GetEditableCommandValues();
+    std::string GetEditableCommandValues();
 
     //--------------------------------------------------------------------------
     /// Returns a string of the full path to this point in the command tree.
@@ -825,21 +822,21 @@ protected:
     /// \param eDisplayMode The mode see UIDisplayMode enum
     /// \return The string "TRUE" or "FALSE"
     //--------------------------------------------------------------------------
-    string GetUIDisplayModeString(UIDisplayMode eDisplayMode);
+    std::string GetUIDisplayModeString(UIDisplayMode eDisplayMode);
 
 private:
 
     //--------------------------------------------------------------------------
     /// Allows derived classes to add additional settings.
     //--------------------------------------------------------------------------
-    virtual string GetDerivedSettings() = 0;
+    virtual std::string GetDerivedSettings() = 0;
 
     //--------------------------------------------------------------------------
     /// Allows derived classes to add additional attributes to the XML.  The
     /// string returned should be in the format:
     ///    name='value' (single-quotes needed)
     //--------------------------------------------------------------------------
-    virtual string GetDerivedAttributes();
+    virtual std::string GetDerivedAttributes();
 
     //--------------------------------------------------------------------------
     /// Sets the name of this object
@@ -1185,7 +1182,7 @@ public:
     }
 
     /// Overloaded string cast operator
-    operator string()
+    operator std::string()
     {
         return m_string;
     }
@@ -1198,7 +1195,7 @@ public:
 private:
 
     /// The value of this TextCommandResponse
-    string m_string;
+    std::string m_string;
 };
 
 //=============================================================================

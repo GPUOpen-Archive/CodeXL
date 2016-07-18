@@ -20,9 +20,6 @@
 #include <AMDTBaseTools/Include/gtIgnoreCompilerWarnings.h>
 #include <AMDTBaseTools/Include/gtGRBaseToolsDLLBuild.h>
 
-// Allow using types from the std namespace:
-using namespace std;
-
 // ----------------------------------------------------------------------------------
 // Class Name:           gtASCIIString
 // General Description: A string represented as characters array.
@@ -130,16 +127,16 @@ private:
 
 private:
     // The internal implementation of this class is an SGI STL string:
-    string _impl;
+    std::string _impl;
 
 
     // ----------------------------------------------------------------------------------
     // Legacy methods used by PerfStudio2. Assume that these are deprecated.
 public:
-    void Split(const gtASCIIString& rSep, bool bCaseSensitive, list<gtASCIIString>& outList) const;
+    void Split(const gtASCIIString& rSep, bool bCaseSensitive, std::list<gtASCIIString>& outList) const;
     size_t find_first_not_of(const char* srcStr, const size_t startIndex = 0) const;
     size_t find_last_of(const char* src, const int startIndex = -1) const;
-    gtASCIIString substr(int startPosition = 0, int count = static_cast<int>(string::npos)) const;
+    gtASCIIString substr(int startPosition = 0, int count = static_cast<int>(std::string::npos)) const;
 };
 
 

@@ -75,8 +75,8 @@ void CluInfo::AddToErrorMap(unsigned char err, gtVAddr RIPx, const char* mnemx)
         CLUripData dat1;
         dat1.count = 1;
         strncpy_s(dat1.mnem, (mnemx), 50);
-        dat0.errMap.insert(pair < gtVAddr, CLUripData > ((RIPx), dat1));
-        m_pCacheErrors->insert(pair<unsigned char, CLUERRData > ((err), dat0));
+        dat0.errMap.insert(std::pair < gtVAddr, CLUripData > ((RIPx), dat1));
+        m_pCacheErrors->insert(std::pair<unsigned char, CLUERRData > ((err), dat0));
     }
     else
     {
@@ -88,7 +88,7 @@ void CluInfo::AddToErrorMap(unsigned char err, gtVAddr RIPx, const char* mnemx)
             CLUripData dat1;
             dat1.count = 0;
             strncpy_s(dat1.mnem, (mnemx), 50);
-            it->second.errMap.insert(pair< gtVAddr, CLUripData > ((RIPx), dat1));
+            it->second.errMap.insert(std::pair< gtVAddr, CLUripData > ((RIPx), dat1));
             it2 = it->second.errMap.find((RIPx));
         }
 
@@ -144,7 +144,7 @@ unsigned char CluInfo::GetOperationSize(gtVAddr RIP,
         // Added a new module - initialize its values
         CLUModInfoData data;
         data.index = m_modIndex++;
-        m_pModInfoMap->insert(pair<wchar_t*, CLUModInfoData > (pModInfo->pModulename, data));
+        m_pModInfoMap->insert(std::pair<wchar_t*, CLUModInfoData > (pModInfo->pModulename, data));
         fmit = m_pModInfoMap->find(pModInfo->pModulename);
     }
 
@@ -212,7 +212,7 @@ unsigned char CluInfo::GetOperationSize(gtVAddr RIP,
 #else
         // Reduce the amount of memory - more alloc/free, but less memory used
         codeOffset = RIP - pModInfo->ModuleStartAddr - fmit->second.startRva;
-        csiz = min((DWORD)4096, (fmit->second.endRva - (fmit->second.startRva + codeOffset)));
+        csiz = std::min((DWORD)4096, (fmit->second.endRva - (fmit->second.startRva + codeOffset)));
         fmit->second.startRva = static_cast<gtRVAddr>(RIP - pModInfo->ModuleStartAddr);
         fmit->second.endRva = static_cast<gtRVAddr>(fmit->second.startRva + csiz - 1);
         unsigned char* tmp2 = (unsigned char*) calloc(1, csiz);
@@ -551,14 +551,14 @@ void CluInfo::CacheLineEviction(CacheDataStuff& cData, unsigned int index, unsig
 
         if (cluMap_it == m_pCacheUtilMap->end())
         {
-            cluMap_it = m_pCacheUtilMap->insert(pair <CLUKey, CLUData > (cluKey, cluData)).first;
+            cluMap_it = m_pCacheUtilMap->insert(std::pair <CLUKey, CLUData > (cluKey, cluData)).first;
         }
 
         // Update data for the instruction
         cluMap_it->second.byteMask |= pidrip_it->second.access_bitmap;
         cluMap_it->second.tot_evictions++;  // Increment # evictions
-        cluMap_it->second.min_bytes = min(bitmap, (UINT64)cluMap_it->second.min_bytes);
-        cluMap_it->second.max_bytes = max(bitmap, (UINT64)cluMap_it->second.max_bytes);
+        cluMap_it->second.min_bytes = std::min(bitmap, (UINT64)cluMap_it->second.min_bytes);
+        cluMap_it->second.max_bytes = std::max(bitmap, (UINT64)cluMap_it->second.max_bytes);
         cluMap_it->second.bSizeUnknown = pidrip_it->second.bSizeUnknown;
         cluMap_it->second.tot_rw += pidrip_it->second.rw_bytes;
         cluMap_it->second.num_rw += pidrip_it->second.rw_count;
@@ -587,8 +587,8 @@ void CluInfo::CacheLineEviction(CacheDataStuff& cData, unsigned int index, unsig
 #endif
 
         // Update data for the line
-        cData.max_bytes = max(bitmap, (UINT64)cData.max_bytes);
-        cData.min_bytes = min(bitmap, (UINT64)cData.min_bytes);
+        cData.max_bytes = std::max(bitmap, (UINT64)cData.max_bytes);
+        cData.min_bytes = std::min(bitmap, (UINT64)cData.min_bytes);
         cData.tot_rw += pidrip_it->second.rw_count;
         cData.tot_rw_bytes += pidrip_it->second.rw_bytes;
     }
@@ -628,7 +628,7 @@ void CluInfo::IncrCacheByteCount(CacheDataStuff& cacheData,
 
         PidRIPKey key(PID, TID, RIP, core);
 
-        it = cacheData.pidripmap.insert(pair < PidRIPKey, PidRIPData > (key, pidrip_data)).first;
+        it = cacheData.pidripmap.insert(std::pair < PidRIPKey, PidRIPData > (key, pidrip_data)).first;
     }
 
     it->second.rw_bytes += size;

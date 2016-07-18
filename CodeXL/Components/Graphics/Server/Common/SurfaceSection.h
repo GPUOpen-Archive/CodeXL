@@ -113,7 +113,7 @@ public:
 private:
 
     // No additional settings
-    virtual string GetDerivedSettings() { return ""; }
+    virtual std::string GetDerivedSettings() { return ""; }
 
     /// Clears the array of elements
     void ClearArray()

@@ -90,8 +90,8 @@ public:
 
     void extendContextMenu(const gtVector<TableContextMenuActionType>& contextMenuActions);
 
-    bool displayTableData(shared_ptr<cxlProfileDataReader> pProfDataRdr,
-                          shared_ptr<DisplayFilter> diplayFilter,
+    bool displayTableData(std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
+                          std::shared_ptr<DisplayFilter> diplayFilter,
                           AMDTProcessId procId,
                           AMDTModuleId modId,
                           std::vector<AMDTUInt64> moduleIdVec = {});
@@ -100,8 +100,8 @@ public:
                                AMDTModuleId modId,
                                std::vector<AMDTUInt64> modIdVec = {}) = 0;
 
-    bool displayTableSummaryData(shared_ptr<cxlProfileDataReader> pProfDataRdr,
-                                 shared_ptr<DisplayFilter> pDisplayFilter,
+    bool displayTableSummaryData(std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
+                                 std::shared_ptr<DisplayFilter> pDisplayFilter,
                                  int counterIdx, bool isCLU);
 
     /// Sort the table according to the requested display filter:
@@ -151,7 +151,7 @@ protected:
     // handles event of changing the hot-spot indicator combobox
     virtual bool HandleHotSpotIndicatorSet();
 
-    bool initializeTableHeaders(shared_ptr<DisplayFilter> diplayFilter, bool isSummary = false);
+    bool initializeTableHeaders(std::shared_ptr<DisplayFilter> diplayFilter, bool isSummary = false);
 
     /// \brief Name:        setModuleCellValue
     /// \brief Description: Sets the data for the requested module column index
@@ -201,8 +201,8 @@ protected:
                  bool is32Bit, int idxRole);
 
 
-    shared_ptr<DisplayFilter>  m_pDisplayFilter = nullptr;
-    shared_ptr<cxlProfileDataReader> m_pProfDataRdr = nullptr;
+    std::shared_ptr<DisplayFilter>  m_pDisplayFilter = nullptr;
+    std::shared_ptr<cxlProfileDataReader> m_pProfDataRdr = nullptr;
     bool m_isCLU = false;
 
 protected slots:

@@ -103,8 +103,8 @@ static void AppendCodeByte(QString& str, gtUByte byteCode)
 
 SourceCodeTreeModel::SourceCodeTreeModel(SessionDisplaySettings* pSessionDisplaySettings,
                                          const QString& sessionDir,
-                                         shared_ptr<cxlProfileDataReader> pProfDataRdr,
-                                         shared_ptr<DisplayFilter> displayFilter) : QAbstractItemModel(nullptr),
+                                         std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
+                                         std::shared_ptr<DisplayFilter> displayFilter) : QAbstractItemModel(nullptr),
     m_pSessionDisplaySettings(pSessionDisplaySettings),
     m_pSessionSourceCodeTreeView(nullptr),
     m_isDisplayingOnlyDasm(false),
@@ -773,7 +773,7 @@ void SourceCodeTreeModel::PrintFunctionDetailData(AMDTProfileFunctionData data,
             flag = false;
         }
 
-        m_sampleSrcLnViewTreeList.push_back(make_pair(srcData, pLineItem));
+        m_sampleSrcLnViewTreeList.push_back(std::make_pair(srcData, pLineItem));
 
         // For this srcLine get the list of inst offsets..
         gtVector<gtVAddr> instOffsetVec;

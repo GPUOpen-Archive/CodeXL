@@ -43,7 +43,7 @@ public:
     virtual bool OnDestroy(CREATION_TYPE type, void* pPtr) { GT_UNREFERENCED_PARAMETER(type); GT_UNREFERENCED_PARAMETER(pPtr); return true; }
 
     /// Get derived layer settings
-    virtual string GetDerivedSettings() { return ""; }
+    virtual std::string GetDerivedSettings() { return ""; }
 
     virtual void EndFrame();
     virtual bool CaptureFrameBuffer(unsigned int inWidth, unsigned int inHeight, unsigned char** ppFrameBufferPngData, unsigned int* pNumBytes, bool adjustAspectRatio);

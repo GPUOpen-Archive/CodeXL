@@ -111,14 +111,14 @@ private:
     QHBoxLayout* m_pNUMALayout = nullptr;
     QHBoxLayout* m_pButtonBox = nullptr;
     bool m_enableOnlySystemDll = false;
-    shared_ptr<DisplayFilter> m_displayFilter = nullptr;
+    std::shared_ptr<DisplayFilter> m_displayFilter = nullptr;
 
     std::shared_ptr<cxlProfileDataReader>   m_pProfDataReader;
-    shared_ptr<cofigNameCounterMap>         m_CongigrationMap;
+    std::shared_ptr<cofigNameCounterMap>    m_CongigrationMap;
     QString                                 m_cofigName;
     gtVector<AMDTUInt32>                    m_selectedCounters;
     std::map<int, int>                      m_colIdxCounterIdMap;
-    std::vector<gtString>					m_notChecked;
+    std::vector<gtString>                   m_notChecked;
 
 
 };

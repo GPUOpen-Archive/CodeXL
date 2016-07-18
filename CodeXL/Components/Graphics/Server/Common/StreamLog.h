@@ -18,8 +18,6 @@
     #include "Windows.h"
 #endif
 
-using namespace std;
-
 // Uncomment if you want to use stream logging
 #if defined (_WIN32)
     #define USE_STREAMLOG
@@ -32,9 +30,9 @@ using namespace std;
 /// A structure to store items specific to logging for a specific thread
 struct ThreadLogger
 {
-    string name;        /// Name of the log file
+    std::string name;        /// Name of the log file
     long threadID;      /// The ID of the thread
-    fstream* logFile;   /// file pointer
+    std::fstream* logFile;   /// file pointer
 };
 
 /// Map of loggers based in thread ID
@@ -55,7 +53,7 @@ private:
     ThreadLoggersMap m_threadLoggers;
 
     /// Base name of the log file
-    string m_baseNamePath;
+    std::string m_baseNamePath;
 
 public:
 
@@ -163,13 +161,13 @@ public:
             pLogger->threadID = threadID;
             // Create a unique name based on the basename and thread id
 
-            stringstream tt;
+            std::stringstream tt;
             tt << threadID;
-            string tidStr = tt.str();
+            std::string tidStr = tt.str();
 
-            string fileName = m_baseNamePath + "-" + tidStr + ".txt";
+            std::string fileName = m_baseNamePath + "-" + tidStr + ".txt";
             pLogger->name = fileName;
-            pLogger->logFile = new fstream(fileName, fstream::out);
+            pLogger->logFile = new std::fstream(fileName, std::fstream::out);
 
             // Add new item to the map
             m_threadLoggers[threadID] = pLogger;

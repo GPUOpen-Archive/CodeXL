@@ -3039,14 +3039,14 @@ void kaApplicationTreeHandler::selectFileNode(const osFilePath& clFilePath)
 
 void kaApplicationTreeHandler::OnBuildComplete(const gtString& programName)
 {
-
     // get the program that was build
     auto& lastBuildPrograms = KA_PROJECT_DATA_MGR_INSTANCE.GetLastBuildProgram();
     auto programItr = lastBuildPrograms.find(programName.asCharArray());
     GT_IF_WITH_ASSERT(programItr != lastBuildPrograms.end())
     {
         auto pBuiltProgram = programItr->second;
-		// remove from last programs hash_map , since it's needed only here for built completion operations only
+
+        // remove from last programs hash_map , since it's needed only here for built completion operations only
         lastBuildPrograms.erase(programItr);
 
         // check if this program wasn't deleted during build

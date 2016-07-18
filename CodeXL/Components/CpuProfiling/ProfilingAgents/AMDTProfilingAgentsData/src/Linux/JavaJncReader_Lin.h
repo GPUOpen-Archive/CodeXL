@@ -24,8 +24,6 @@
 // Note: the key of map is the offset, the data is line number
 typedef QMap<unsigned int, unsigned int> OffsetLinenumMap;
 
-using namespace std;
-
 #ifndef _ADDRESSRANGE_DEFINED
 #define _ADDRESSRANGE_DEFINED
 typedef struct _AddressRange
@@ -51,8 +49,8 @@ typedef std::list<addrRanges> AddressRangeList;
 typedef struct _LineNumSrc
 {
     int               lineNum;
-    string            sourceFile;
-    string            symName;
+    std::string       sourceFile;
+    std::string       symName;
     jmethodID         methodId;
     AddressRangeList  addrs;
 
@@ -103,7 +101,7 @@ public:
                                    gtUInt64&  startAddr,
                                    gtUInt64&  endAddr);
 
-    string GetJittedFunctionName() { return m_methodName; }
+    const std::string& GetJittedFunctionName() { return m_methodName; }
 
     bool GetJittedStartEndAddr(gtUInt64& startAddr, gtUInt64& endAddr)
     {
@@ -130,7 +128,7 @@ public:
     }
 
     bool GetJittedFunctionSrcInfo(
-        string& fileName,
+        std::string& fileName,
         unsigned int& startLine,
         unsigned int& possibleEndLine)
     {
@@ -151,7 +149,7 @@ public:
     const char* GetMethodName(jmethodID methodId);
 
     OffsetLinenumMap GetOffsetLines();
-    OffsetLinenumMap GetOffsetLines(wstring funcName);
+    OffsetLinenumMap GetOffsetLines(std::wstring funcName);
 
     const gtUByte* GetCodeBytesOfTextSection(unsigned int* pCodeSize);
 
@@ -201,9 +199,9 @@ private:
     JncPcStackInfoMap   m_jncPcStackInfoMap;
     JavaInlineMap       m_javaInlineMap;
 
-    gtVAddr               m_loadAddr;
-    string              m_methodName;
-    string              m_srcFile;
+    gtVAddr             m_loadAddr;
+    std::string         m_methodName;
+    std::string         m_srcFile;
     bool                m_mainInlineDepth;
     unsigned int        m_startLine;
     unsigned int        m_possibleEndLine;

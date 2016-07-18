@@ -27,11 +27,11 @@ public:
     }
 
 #if AMDT_HAS_CPP0X
-    gtFlatSet(gtFlatSet&& other) : _Mybase(move(other)) {}
+    gtFlatSet(gtFlatSet&& other) : _Mybase(std::move(other)) {}
 
     gtFlatSet& operator=(gtFlatSet&& other)
     {
-        static_cast<_Mybase*>(this)->operator=(move(other));
+        static_cast<_Mybase*>(this)->operator=(std::move(other));
         return *this;
     }
 #endif

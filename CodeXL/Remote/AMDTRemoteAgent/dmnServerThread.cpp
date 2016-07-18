@@ -32,8 +32,8 @@ const int LOOP_SLEEP_INTERVAL_MS = 50;
 // Outputs CodeXL Daemon's extracted settings to the user (console).
 static void OutputDaemonSettingsToConsole(bool isSuccessful, const gtString& ipString)
 {
-    wstring rdTimeout;
-    wstring wtTimeout;
+    std::wstring rdTimeout;
+    std::wstring wtTimeout;
 
     const dmnConfigManager* configManager = dmnConfigManager::Instance();
     GT_IF_WITH_ASSERT(configManager != NULL)
@@ -49,31 +49,31 @@ static void OutputDaemonSettingsToConsole(bool isSuccessful, const gtString& ipS
         osGetApplicationVersion(cxlProductVersion);
         gtString cxlVersionAsString = cxlProductVersion.toString();
 
-        wcout << DMN_STR_HEADER_LINE << endl;
-        wcout << DMN_STR_SETTINGS_EXTRACTED_OK << endl;
-        wcout << DMN_STR_SEPARATOR << endl;
-        wcout << DMN_STR_AGENT_VERSION << cxlVersionAsString.asCharArray() << endl;
-        wcout << DMN_STR_AGENT_READ_TIMEOUT << rdTimeout << endl;
-        wcout << DMN_STR_AGENT_WRITE_TIMEOUT << wtTimeout << endl;
-        wcout << DMN_STR_AGENT_PORT << ipString.asCharArray() << endl;
-        wcout << DMN_STR_END_LINE << endl << endl;
+        std::wcout << DMN_STR_HEADER_LINE << std::endl;
+        std::wcout << DMN_STR_SETTINGS_EXTRACTED_OK << std::endl;
+        std::wcout << DMN_STR_SEPARATOR << std::endl;
+        std::wcout << DMN_STR_AGENT_VERSION << cxlVersionAsString.asCharArray() << std::endl;
+        std::wcout << DMN_STR_AGENT_READ_TIMEOUT << rdTimeout << std::endl;
+        std::wcout << DMN_STR_AGENT_WRITE_TIMEOUT << wtTimeout << std::endl;
+        std::wcout << DMN_STR_AGENT_PORT << ipString.asCharArray() << std::endl;
+        std::wcout << DMN_STR_END_LINE << std::endl << std::endl;
 
         // Update the user regarding the agent's address.
         if (isSuccessful)
         {
-            wcout << DMN_STR_AGENT_LISTENING_ON << L"<" <<
-                  ipString.asCharArray() << L">" << endl << endl;
+            std::wcout << DMN_STR_AGENT_LISTENING_ON << L"<" <<
+                  ipString.asCharArray() << L">" << std::endl << std::endl;
         }
         else
         {
-            wcout << DMN_STR_ERR_CONNECTION << endl;
+            std::wcout << DMN_STR_ERR_CONNECTION << std::endl;
         }
 
-        wcout << DMN_STR_PRESS_ANY_KEY << endl << endl;
+        std::wcout << DMN_STR_PRESS_ANY_KEY << std::endl << std::endl;
 
         // On Windows, change the console title.
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-        wstringstream conTitle;
+        std::wstringstream conTitle;
         conTitle << DMN_STR_AGENT_LISTENING_ON << ipString.asCharArray();
         SetConsoleTitle(conTitle.str().c_str());
 #endif
@@ -83,8 +83,8 @@ static void OutputDaemonSettingsToConsole(bool isSuccessful, const gtString& ipS
 // Outputs CodeXL Daemon's extracted settings to the log.
 static void OutputDaemonSettingsToLog()
 {
-    wstring rdTimeout;
-    wstring wtTimeout;
+    std::wstring rdTimeout;
+    std::wstring wtTimeout;
 
     const dmnConfigManager* configManager = dmnConfigManager::Instance();
     GT_IF_WITH_ASSERT(configManager != NULL)
@@ -95,7 +95,7 @@ static void OutputDaemonSettingsToLog()
         isOk = configManager->TimeoutToString(configManager->GetWriteTimeout(), wtTimeout);
         GT_ASSERT_EX(isOk, L"DMN: WT TIMEOUT CONVERSION TO STRING.");
 
-        wstringstream stream;
+        std::wstringstream stream;
         stream << L"CodeXL Remote Agent settings: Port Number:'" << configManager->GetPortNumber() << L"', " <<
                L"RD Timeout: '" << rdTimeout << L"', WT Timeout: '" << wtTimeout << L"'";
 
@@ -108,9 +108,9 @@ static void OutputDaemonSettingsToLog()
 // and then terminates the agent.
 static void ExitOnCriticalNetworkError(const gtString& agentAddress)
 {
-    wcout << L"CodeXL Remote Agent failed to listen on " << agentAddress.asCharArray() << endl;
-    wcout << DMN_GENERIC_ERROR_MESSAGE << endl << endl;
-    wcout << DMN_BEFORE_EXIT_ERROR_MESSAGE << endl << endl;
+    std::wcout << L"CodeXL Remote Agent failed to listen on " << agentAddress.asCharArray() << std::endl;
+    std::wcout << DMN_GENERIC_ERROR_MESSAGE << std::endl << std::endl;
+    std::wcout << DMN_BEFORE_EXIT_ERROR_MESSAGE << std::endl << std::endl;
 
     dmnUtils::LogMessage(L"DMN: Fatal network error occurred. Aborting.", OS_DEBUG_LOG_ERROR);
 
@@ -179,10 +179,10 @@ int dmnServerThread::entryPoint()
 {
     if (m_pConfig == NULL)
     {
-        wstringstream stream;
+        std::wstringstream stream;
         stream << L"DMN Server Thread: Invalid configuration manager, aborting.";
         dmnUtils::LogMessage(stream.str(), OS_DEBUG_LOG_ERROR);
-        wcout << L"Unable to extract configuration. Aborting." << endl;
+        std::wcout << L"Unable to extract configuration. Aborting." << std::endl;
         return -1;
     }
 
@@ -203,7 +203,7 @@ int dmnServerThread::entryPoint()
 
     if (!isOk)
     {
-        wstringstream stream;
+        std::wstringstream stream;
         stream << L"DMN Server Thread: unable to open tcpServer on port " << m_pConfig->getDaemonPortNumber();
         dmnUtils::LogMessage(stream.str(), OS_DEBUG_LOG_ERROR);
         ExitOnCriticalNetworkError(agentAddress);
@@ -214,7 +214,7 @@ int dmnServerThread::entryPoint()
 
     if (!isOk)
     {
-        wstringstream stream;
+        std::wstringstream stream;
         stream << L"DMN Server Thread: unable to bind to port " << m_pConfig->getDaemonPortNumber();
         dmnUtils::LogMessage(stream.str(), OS_DEBUG_LOG_ERROR);
         ExitOnCriticalNetworkError(agentAddress);
@@ -225,7 +225,7 @@ int dmnServerThread::entryPoint()
 
     if (!isOk)
     {
-        wstringstream stream;
+        std::wstringstream stream;
         stream << L"DMN Server Thread: unable to listen to port " << m_pConfig->getDaemonPortNumber();
         dmnUtils::LogMessage(stream.str(), OS_DEBUG_LOG_ERROR);
         ExitOnCriticalNetworkError(agentAddress);
@@ -253,7 +253,7 @@ int dmnServerThread::entryPoint()
 
         if (!isOk)
         {
-            wstringstream stream;
+            std::wstringstream stream;
             stream << L"DMN Server Thread: unable to accept on port " << m_pConfig->getDaemonPortNumber();
             dmnUtils::LogMessage(stream.str(), OS_DEBUG_LOG_ERROR);
             ExitOnCriticalNetworkError(agentAddress);
@@ -265,32 +265,31 @@ int dmnServerThread::entryPoint()
             isOk = pConnHandler->getPeerHostAddress(peerAddr);
             GT_ASSERT_EX(isOk, L"DMN Session thread: failed to extract peer's address while receiving connection.");
             std::wstringstream msgStream;
-            msgStream << endl << L"*** Connection: Received a connection";
+            msgStream << std::endl << L"*** Connection: Received a connection";
 
             if (isOk)
             {
                 gtString peerAddrStr;
                 peerAddr.toString(peerAddrStr);
-                msgStream << L" from <" << peerAddrStr.asCharArray() << L"> ***" << endl;
+                msgStream << L" from <" << peerAddrStr.asCharArray() << L"> ***" << std::endl;
             }
             else
             {
-                msgStream << L" ***" << endl;
+                msgStream << L" ***" << std::endl;
             }
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
             // Add an extra empty line on Windows.
-            msgStream << endl;
+            msgStream << std::endl;
 #endif
 
             std::wcout << msgStream.str();
         }
 
         // Create a new Session Thread to handle the session.
-        wstringstream thNameStream;
+        std::wstringstream thNameStream;
         thNameStream << "Session Thread " << (++m_sessionThreadsCount);
         dmnSessionThread* pSessionTh = new(std::nothrow) dmnSessionThread(pConnHandler, thNameStream.str().c_str());
-
 
         // Start session.
         isOk = pSessionTh->execute();

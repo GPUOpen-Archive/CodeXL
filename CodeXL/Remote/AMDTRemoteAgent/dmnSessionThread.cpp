@@ -187,7 +187,7 @@ static bool CompressFile(const osFilePath& fileToCompress, osFilePath& compresse
 
             if (ret)
             {
-                gtByte* buffer = new(nothrow) gtByte[fileSize]();
+                gtByte* buffer = new(std::nothrow) gtByte[fileSize]();
 
                 gtSize_t amountRead = 0;
                 ret = src.readAvailableData(buffer, fileSize, amountRead);
@@ -198,7 +198,7 @@ static bool CompressFile(const osFilePath& fileToCompress, osFilePath& compresse
                 {
                     // Now compress it.
                     unsigned long sizeDataCompressed  = amountRead + (amountRead / 10) + 12;
-                    gtByte* dstBuffer = new(nothrow) gtByte[sizeDataCompressed]();
+                    gtByte* dstBuffer = new(std::nothrow) gtByte[sizeDataCompressed]();
 
                     int res = compress((unsigned char*)dstBuffer, &sizeDataCompressed, (unsigned char*)buffer, amountRead);
                     ret = (res == Z_OK);
@@ -315,7 +315,7 @@ static bool ExtractCmdLineString(osChannel* pChannel, gtString& buffer)
         GT_ASSERT(isOk);
 
         // Tracing.
-        wstringstream stream;
+        std::wstringstream stream;
         stream << L"DMN: RECEIVED CMD LINE ARGS -> \"";
         stream << buffer.asCharArray() << L"\"";
         dmnUtils::LogMessage(stream.str(), OS_DEBUG_LOG_DEBUG);
@@ -326,7 +326,7 @@ static bool ExtractCmdLineString(osChannel* pChannel, gtString& buffer)
     return isOk;
 }
 
-static bool ExtractEnvVariables(osChannel* pChannel, vector<osEnvironmentVariable>& envVarsBuffer, gtInt32& envVarsCountBuffer)
+static bool ExtractEnvVariables(osChannel* pChannel, std::vector<osEnvironmentVariable>& envVarsBuffer, gtInt32& envVarsCountBuffer)
 {
     bool isOk = false;
 
@@ -344,7 +344,7 @@ static bool ExtractEnvVariables(osChannel* pChannel, vector<osEnvironmentVariabl
         GT_IF_WITH_ASSERT(isOk)
         {
             // Tracing.
-            wstringstream _stream;
+            std::wstringstream _stream;
             _stream << L"DMN: Number of environment variables is: " << envVarsCountBuffer;
             dmnUtils::LogMessage(_stream.str(), OS_DEBUG_LOG_DEBUG);
 
@@ -393,7 +393,7 @@ static bool ExtractServerPath(osChannel* pChannel, osFilePath& serverPath)
         GT_IF_WITH_ASSERT(isOk)
         {
             // Tracing.
-            wstringstream _stream;
+            std::wstringstream _stream;
             _stream << L"DMN: Srever path is: " << serverPathStr.asCharArray();
             dmnUtils::LogMessage(_stream.str(), OS_DEBUG_LOG_DEBUG);
         }
@@ -773,7 +773,7 @@ static bool ReceiveRemoteFile(osChannel* pChannel, osDirectory& localTargetDir)
                 GT_ASSERT_EX(ret, L"DMN: Failed saving file to disk for CodeXLGpuProfiler.");
 
                 // Trace the status.
-                wstringstream msgStream;
+                std::wstringstream msgStream;
                 msgStream << L"DMN: Trying to receive the following file: " << fixedExpectedFileName.asCharArray();
                 GT_IF_WITH_ASSERT(ret)
                 {
@@ -1380,13 +1380,13 @@ void dmnSessionThread::LaunchProfiler(bool& isTerminationRequired)
                 GT_IF_WITH_ASSERT(isOk)
                 {
                     // Trace.
-                    wstringstream logMsgStream;
+                    std::wstringstream logMsgStream;
                     logMsgStream << L"CodeXLGpuProfiler command line args string: ";
                     logMsgStream << fixedCmdLineArgs.asCharArray();
                     dmnUtils::LogMessage(logMsgStream.str(), OS_DEBUG_LOG_DEBUG);
 
                     // Currently env vars for CodeXLGpuProfiler are empty.
-                    vector<osEnvironmentVariable> envVars;
+                    std::vector<osEnvironmentVariable> envVars;
 
                     // Create the process.
                     isOk = CreateProcess(romPROFILE, fixedCmdLineArgs, envVars);
@@ -1596,7 +1596,7 @@ bool dmnSessionThread::LaunchGraphicsBeckendServer()
 
                 if (m_sGraphicsProcId == 0)
                 {
-                    vector<osEnvironmentVariable> envVars;
+                    std::vector<osEnvironmentVariable> envVars;
 
                     // Create the process.
                     isOk = CreateProcess(romGRAPHICS, fixedCmdLineArgs, envVars, realServerPath, workDirectory);
@@ -1625,13 +1625,13 @@ unsigned short dmnSessionThread::GetGraphicServerPortFromArgs(const gtString& fi
     //find port in args
     try
     {
-        vector<wstring> argsSplitted;
-        wstring argsAsString = fixedCmdLineArgs.asCharArray();
+        std::vector<std::wstring> argsSplitted;
+        std::wstring argsAsString = fixedCmdLineArgs.asCharArray();
         boost::algorithm::split_regex(argsSplitted, argsAsString, boost::wregex(L"--port"));
 
         if (argsSplitted.size() > 1)
         {
-            wstring portStr = argsSplitted[1];
+            std::wstring portStr = argsSplitted[1];
 
             portStr.erase(remove(portStr.begin(), portStr.end(), '\"'), portStr.end());
             boost::trim(portStr);
@@ -1683,7 +1683,7 @@ static bool IsProfiledApp64Bit(const gtString& cmdLineArgs, bool& buffer)
 #error Unknown build target!
 #endif
 
-bool dmnSessionThread::CreateProcess(REMOTE_OPERATION_MODE mode, const gtString& cmdLineArgs, vector<osEnvironmentVariable>& envVars, const osFilePath& filePath, const osFilePath& dirPath)
+bool dmnSessionThread::CreateProcess(REMOTE_OPERATION_MODE mode, const gtString& cmdLineArgs, std::vector<osEnvironmentVariable>& envVars, const osFilePath& filePath, const osFilePath& dirPath)
 {
     osFilePath filePathTemp = filePath;
     osFilePath dirPathTemp = dirPath;
@@ -1751,15 +1751,15 @@ bool dmnSessionThread::CreateProcess(REMOTE_OPERATION_MODE mode, const gtString&
         }
         else
         {
-            wstringstream stream;
-            stream << L"Unable to resume a process: " << filePathTemp.asString().asCharArray() << endl;
+            std::wstringstream stream;
+            stream << L"Unable to resume a process: " << filePathTemp.asString().asCharArray() << std::endl;
             dmnUtils::LogMessage(stream.str(), OS_DEBUG_LOG_ERROR);
         }
     }
     else
     {
-        wstringstream stream;
-        stream << L"Unable to create a process: " << filePathTemp.asString().asCharArray() << endl;
+        std::wstringstream stream;
+        stream << L"Unable to create a process: " << filePathTemp.asString().asCharArray() << std::endl;
         dmnUtils::LogMessage(stream.str(), OS_DEBUG_LOG_ERROR);
     }
 
@@ -1785,7 +1785,7 @@ bool dmnSessionThread::SendFrameAnalysisFileData(const osFilePath& filePath)
             // Send the isBinary flag to CodeXL client
             (*m_pConnHandler) << isBinary;
 
-            unique_ptr <gtByte[]> pBuffer;
+            gtVector<gtByte> pBuffer;
             unsigned long fileSize;
             retVal = ReadFile(filePath, isBinary, pBuffer, fileSize);
             GT_IF_WITH_ASSERT(retVal)
@@ -1793,9 +1793,12 @@ bool dmnSessionThread::SendFrameAnalysisFileData(const osFilePath& filePath)
                 // Write the file size to the CodeXL client
                 (*m_pConnHandler) << fileSize;
 
-                // Send the binary file content
-                retVal = m_pConnHandler->write(pBuffer.get(), fileSize);
-                GT_ASSERT(retVal);
+                if (0 < fileSize)
+                {
+                    // Send the binary file content
+                    retVal = m_pConnHandler->write(&pBuffer[0], fileSize);
+                    GT_ASSERT(retVal);
+                }
             }
         }
     }
@@ -1803,7 +1806,7 @@ bool dmnSessionThread::SendFrameAnalysisFileData(const osFilePath& filePath)
     return retVal;
 }
 
-bool dmnSessionThread::ReadFile(const osFilePath& filePath, const bool isBinary, std::unique_ptr <gtByte[]>& pBuffer, unsigned long& fileSize) const
+bool dmnSessionThread::ReadFile(const osFilePath& filePath, const bool isBinary, gtVector<gtByte>& pBuffer, unsigned long& fileSize) const
 {
     // Read the file size
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS //on windows we have unicode file names
@@ -1811,14 +1814,20 @@ bool dmnSessionThread::ReadFile(const osFilePath& filePath, const bool isBinary,
 #else
     const char* fname = filePath.asString().asASCIICharArray();
 #endif
-    ifstream file(fname, (isBinary? (ios::binary | ios::ate) : ios::ate));
+    std::ifstream file(fname, (isBinary ? (std::ios::binary | std::ios::ate) : std::ios::ate));
     fileSize = static_cast<unsigned long>(file.tellg());
-    file.seekg(0, ios::beg);
+    file.seekg(0, std::ios::beg);
 
     // Allocate a buffer and read the file content into it
-    pBuffer.reset(new gtByte[fileSize]());
+    pBuffer.resize(fileSize);
 
-    bool retVal = file.read(pBuffer.get(), fileSize) ? true : false;
+    bool retVal = true;
+
+    if (0 < fileSize)
+    {
+        retVal = file.read(&(pBuffer[0]), fileSize) ? true : false;
+    }
+
     return retVal;
 }
 
@@ -1848,7 +1857,7 @@ bool dmnSessionThread::terminateProcess(REMOTE_OPERATION_MODE mode)
 
     if (!ret)
     {
-        wstringstream stream;
+        std::wstringstream stream;
         stream << "Unable to terminate process with mode: " << dmnUtils::OpModeToString(mode) << ".";
         dmnUtils::LogMessage(stream.str(), OS_DEBUG_LOG_ERROR);
     }
@@ -2196,7 +2205,7 @@ bool dmnSessionThread::CreateCapturedFramesInfoFile(const gtString& projectName,
         TiXmlPrinter printer;
         printer.SetIndent("\t");
         doc.Accept(&printer);
-        string xmltext = printer.CStr();
+        std::string xmltext = printer.CStr();
         gtString xmlWideStr;
         xmlWideStr.fromASCIIString(xmltext.c_str(), xmltext.length());
         m_pConnHandler->writeString(xmlWideStr);
@@ -2252,8 +2261,8 @@ void dmnSessionThread::notifyUserAboutDisconnection()
         osPortAddress peerAddr;
         bool isOk = m_pConnHandler->getPeerHostAddress(peerAddr);
         GT_ASSERT_EX(isOk, L"DMN Session thread: failed to extract peer's address during disconnection.");
-        wstringstream msgStream;
-        msgStream << endl << DMN_STR_SESSION_DISCONNECTION_A;
+        std::wstringstream msgStream;
+        msgStream << std::endl << DMN_STR_SESSION_DISCONNECTION_A;
 
         if (isOk)
         {
@@ -2262,8 +2271,8 @@ void dmnSessionThread::notifyUserAboutDisconnection()
             msgStream << L"<" << peerAddrStr.asCharArray() << L">";
         }
 
-        msgStream << DMN_STR_SESSION_DISCONNECTION_B << endl;
-        wcout << msgStream.str();
+        msgStream << DMN_STR_SESSION_DISCONNECTION_B << std::endl;
+        std::wcout << msgStream.str();
     }
 }
 
@@ -2308,7 +2317,7 @@ bool dmnSessionThread::GetRemoteFile()
 
     GT_IF_WITH_ASSERT(isOk)
     {
-        wstringstream stream;
+        std::wstringstream stream;
         stream << L"DMN: Received a request to transfer the following file: " << fileName.asASCIICharArray();
         dmnUtils::LogMessage(stream.str(), OS_DEBUG_LOG_DEBUG);
 
@@ -2360,7 +2369,7 @@ bool dmnSessionThread::LaunchRds()
     ExtractCmdLineString(m_pConnHandler, cmdLineArgsBuffer);
 
     // Aggregate the environment variables.
-    vector<osEnvironmentVariable> envVars;
+    std::vector<osEnvironmentVariable> envVars;
     gtInt32 envVarsCount;
     bool isOk = ExtractEnvVariables(m_pConnHandler, envVars, envVarsCount);
     GT_ASSERT_EX(isOk, L"DMN: Extracting env vars for debugging session.");

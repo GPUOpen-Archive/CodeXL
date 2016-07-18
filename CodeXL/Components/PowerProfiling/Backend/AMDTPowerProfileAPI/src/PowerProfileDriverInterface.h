@@ -102,7 +102,7 @@ AMDTResult ReleaseSharedBuffer();
 AMDTResult FlushDriverSignal();
 
 // PrepareInitialProcessList: Prepare the initial process list names
-AMDTResult PrepareInitialProcessList(list<ProcessName>& list);
+AMDTResult PrepareInitialProcessList(std::list<ProcessName>& list);
 
 // GetProcessNameFromPid: Get process name from a given PID
 bool GetProcessNameFromPid(AMDTPwrProcessInfo* pInfo);

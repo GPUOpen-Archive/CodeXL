@@ -951,7 +951,7 @@ void gdTotalStatisticsView::setListHeadingToolTips()
         headings.push_back(QString(GD_STR_TotalStatisticsViewerColumn4Tooltip).arg(_amountOfFullFrames));
         headings.push_back(QString(GD_STR_TotalStatisticsViewerColumn5Tooltip).arg(_amountOfFullFrames));
 
-        int numOfCol = min(pHeaderView->count(), int(headings.size()));
+        int numOfCol = std::min(pHeaderView->count(), int(headings.size()));
 
         for (int i = 0; i < numOfCol; i++)
         {

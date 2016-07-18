@@ -37,11 +37,11 @@ class ModuleFilterDialog : public acDialog
 
 public:
 
-    ModuleFilterDialog(shared_ptr<cxlProfileDataReader> m_pProfDataRdr,
-                        TableDisplaySettings* pDisplaySettings,
-                        CPUSessionTreeItemData* pSessionData,
-                        bool isDisplaySysModEn,
-                        QWidget* pParent = nullptr);
+    ModuleFilterDialog(std::shared_ptr<cxlProfileDataReader> m_pProfDataRdr,
+                       TableDisplaySettings* pDisplaySettings,
+                       CPUSessionTreeItemData* pSessionData,
+                       bool isDisplaySysModEn,
+                       QWidget* pParent = nullptr);
     virtual ~ModuleFilterDialog();
 
 private:
@@ -52,7 +52,7 @@ private:
     QLabel* m_pProcessDescriptor = nullptr;
     acListCtrl* m_pModuleTree = nullptr;
 
-    shared_ptr<cxlProfileDataReader> m_pProfDataRdr = nullptr;
+    std::shared_ptr<cxlProfileDataReader> m_pProfDataRdr = nullptr;
     TableDisplaySettings* m_pTableDisplaySettings = nullptr;
     CPUSessionTreeItemData* m_pSessionData = nullptr;
     bool m_isDisplaySysModEn = false;

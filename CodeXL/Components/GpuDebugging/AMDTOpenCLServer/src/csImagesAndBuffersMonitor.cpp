@@ -90,7 +90,7 @@ void csImagesAndBuffersMonitor::onBufferCreation(cl_mem bufferMemoryHandle, cl_m
     handlesMonitor.registerOpenCLHandle((oaCLHandle)bufferMemoryHandle, _spyContextId, objectIndex, OS_TOBJ_ID_CL_BUFFER, -1, bufferName);
 
     // Set the mapping for the buffer name:
-    _bufferNameToIndexMap.insert(pair<int, int>(bufferName, objectIndex));
+    _bufferNameToIndexMap[bufferName] = objectIndex;
 
     // Register a callback to handle this memory object deletion:
     if (_isMemObjectDestructorCallbackSupported && (cs_stat_realFunctionPointers.clSetMemObjectDestructorCallback != NULL))
@@ -237,7 +237,7 @@ void csImagesAndBuffersMonitor::onBufferCreationFromGLVBO(cl_mem bufferMemoryHan
     handlesMonitor.registerOpenCLHandle((oaCLHandle)bufferMemoryHandle, _spyContextId, bufferIndex, OS_TOBJ_ID_CL_BUFFER, -1, bufferName);
 
     // Set the mapping for the buffer name:
-    _bufferNameToIndexMap.insert(pair<int, int>(bufferName, bufferIndex));
+    _bufferNameToIndexMap[bufferName] = bufferIndex;
 
     // Register a callback to handle this memory object deletion:
     if (_isMemObjectDestructorCallbackSupported && (cs_stat_realFunctionPointers.clSetMemObjectDestructorCallback != NULL))
@@ -296,7 +296,7 @@ void csImagesAndBuffersMonitor::onBufferCreationFromDirectX(cl_mem bufferMemoryH
     handlesMonitor.registerOpenCLHandle((oaCLHandle)bufferMemoryHandle, _spyContextId, bufferIndex, OS_TOBJ_ID_CL_BUFFER, -1, bufferName);
 
     // Set the mapping for the buffer name:
-    _bufferNameToIndexMap.insert(pair<int, int>(bufferName, bufferIndex));
+    _bufferNameToIndexMap[bufferName] = bufferIndex;
 
     // Register a callback to handle this memory object deletion:
     if (_isMemObjectDestructorCallbackSupported && (cs_stat_realFunctionPointers.clSetMemObjectDestructorCallback != NULL))
@@ -1143,7 +1143,7 @@ void csImagesAndBuffersMonitor::onImageCreation(cl_mem imageHandle, const cl_ima
     handlesMonitor.registerOpenCLHandle((oaCLHandle)imageHandle, _spyContextId, imageIndex, OS_TOBJ_ID_CL_IMAGE, -1, imageName);
 
     // Set the mapping for the image name:
-    _bufferNameToIndexMap.insert(pair<int, int>(imageName, imageIndex));
+    _bufferNameToIndexMap[imageName] = imageIndex;
 
     // Register a callback to handle this memory object deletion:
     if (_isMemObjectDestructorCallbackSupported && (cs_stat_realFunctionPointers.clSetMemObjectDestructorCallback != NULL))
@@ -1180,8 +1180,8 @@ void csImagesAndBuffersMonitor::onImageCreation(cl_mem imageHandle, const cl_ima
 
             // Get the image dimensions:
             int width = (int)pImageDesc->image_width;
-            int height = max((int)pImageDesc->image_height, 1);
-            int depth = max((int)pImageDesc->image_depth, 1);
+            int height = std::max((int)pImageDesc->image_height, 1);
+            int depth = std::max((int)pImageDesc->image_depth, 1);
 
             if (textureType == AP_2D_ARRAY_TEXTURE)
             {
@@ -1227,7 +1227,7 @@ void csImagesAndBuffersMonitor::onImageCreation(cl_mem imageHandle, const cl_ima
             handlesMonitor.registerOpenCLHandle((oaCLHandle)imageHandle, _spyContextId, imageIndex, OS_TOBJ_ID_CL_IMAGE, -1, imageName);
 
             // Set the mapping for the image name:
-            _bufferNameToIndexMap.insert(pair<int, int>(imageName, imageIndex));
+            _bufferNameToIndexMap[imageName] = imageIndex;
 
             // Register a callback to handle this memory object deletion:
             if (_isMemObjectDestructorCallbackSupported && (cs_stat_realFunctionPointers.clSetMemObjectDestructorCallback != NULL))

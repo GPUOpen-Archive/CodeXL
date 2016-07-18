@@ -602,7 +602,7 @@ void afSystemInformationDialog::fillSysInfoDataIntoListCtrl(const gtList< gtList
                 }
 
                 // Set the remaining width to the last column:
-                pListCtrl->setColumnWidth(cols - 1, max(width, colWidth));
+                pListCtrl->setColumnWidth(cols - 1, std::max(width, colWidth));
             }
 
             if (enableHorizontalScrollbar)

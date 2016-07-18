@@ -197,7 +197,7 @@ private:
     //-----------------------------------------------------------------------------
     // No additional settings
     //-----------------------------------------------------------------------------
-    virtual string GetDerivedSettings() { return ""; }
+    virtual std::string GetDerivedSettings() { return ""; }
 
     //-----------------------------------------------------------------------------
     /// Profiler monitor command fail.
@@ -256,13 +256,13 @@ private:
     TextCommandResponse   m_ProfileRangeData;
 
     /// Drawcall profiler data response
-    string m_drawcallProfilerXML;
+    std::string m_drawcallProfilerXML;
 
     /// Stores the most recent GPA error string so that GPS2 can give the user better feedback when a counter fails.
-    static string m_sLastGPAError;
+    static std::string m_sLastGPAError;
 
     /// Profiler draw call list
-    string m_profilerDrawCalls;
+    std::string m_profilerDrawCalls;
 
     /// Counter Info response
     CommandResponse   m_counterInfo;

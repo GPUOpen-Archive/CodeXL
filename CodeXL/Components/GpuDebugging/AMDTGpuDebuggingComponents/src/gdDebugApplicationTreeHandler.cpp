@@ -1220,7 +1220,7 @@ bool gdDebugApplicationTreeHandler::updateGLTexturesList(int contextId, gtUInt32
 
                     // Iterate the textures and add each of them to the tree:
                     int maxItemsShown = gdGDebuggerGlobalVariablesManager::instance().maxTreeItemsPerType();
-                    int itemsToShow = min(amountOfTextures, maxItemsShown);
+                    int itemsToShow = std::min(amountOfTextures, maxItemsShown);
 
                     for (int i = 0; i < itemsToShow; i++)
                     {
@@ -2038,7 +2038,7 @@ bool gdDebugApplicationTreeHandler::updateRenderBuffersList(int contextId, gtUIn
                 {
                     // Iterate the buffers and add each of them to the tree:
                     int maxItemsShown = gdGDebuggerGlobalVariablesManager::instance().maxTreeItemsPerType();
-                    int itemsToShow = min(amountOfBuffers, maxItemsShown);
+                    int itemsToShow = std::min(amountOfBuffers, maxItemsShown);
 
                     for (int i = 0; i < itemsToShow; i++)
                     {
@@ -2132,7 +2132,7 @@ bool gdDebugApplicationTreeHandler::updateDisplayListsList(int contextId, gtUInt
                 {
                     // Iterate the lists and add them to the tree:
                     int maxItemsShown = gdGDebuggerGlobalVariablesManager::instance().maxTreeItemsPerType();
-                    int itemsToShow = min(amountOfDisplayLists, maxItemsShown);
+                    int itemsToShow = std::min(amountOfDisplayLists, maxItemsShown);
 
                     for (int i = 0; i < itemsToShow; i++)
                     {
@@ -2230,7 +2230,7 @@ bool gdDebugApplicationTreeHandler::updateFBOsList(int contextId, gtUInt32& fbos
                 {
                     // Iterate the FBOs and add them to the tree:
                     int maxItemsShown = gdGDebuggerGlobalVariablesManager::instance().maxTreeItemsPerType();
-                    int itemsToShow = min(amountOfFBOs, maxItemsShown);
+                    int itemsToShow = std::min(amountOfFBOs, maxItemsShown);
 
                     for (int i = 0; i < itemsToShow; i++)
                     {
@@ -2343,7 +2343,7 @@ bool gdDebugApplicationTreeHandler::updateStaticBuffersList(int contextId, gtUIn
                 {
                     // Iterate the static buffers and add each of them to the tree:
                     int maxItemsShown = gdGDebuggerGlobalVariablesManager::instance().maxTreeItemsPerType();
-                    int itemsToShow = min(amountOfStaticBuffers, maxItemsShown);
+                    int itemsToShow = std::min(amountOfStaticBuffers, maxItemsShown);
 
                     for (int i = 0; i < itemsToShow; i++)
                     {
@@ -2447,7 +2447,7 @@ bool gdDebugApplicationTreeHandler::updateVBOList(int contextId, gtUInt32& vboMe
                 {
                     // Iterate the VBOs and add each of them to the tree:
                     int maxItemsShown = gdGDebuggerGlobalVariablesManager::instance().maxTreeItemsPerType();
-                    int itemsToShow = min(amountOfVBO, maxItemsShown);
+                    int itemsToShow = std::min(amountOfVBO, maxItemsShown);
 
                     for (int i = 0; i < itemsToShow; i++)
                     {
@@ -2551,7 +2551,7 @@ bool gdDebugApplicationTreeHandler::updateProgramsList(int contextId, gtUInt32& 
                 {
                     // Iterate the programs and add each of them to the tree:
                     int maxItemsShown = gdGDebuggerGlobalVariablesManager::instance().maxTreeItemsPerType();
-                    int itemsToShow = min(amountOfPrograms, maxItemsShown);
+                    int itemsToShow = std::min(amountOfPrograms, maxItemsShown);
 
                     for (int i = 0; i < itemsToShow; i++)
                     {
@@ -2655,7 +2655,7 @@ bool gdDebugApplicationTreeHandler::updateShadersList(int contextId, gtUInt32& s
                 {
                     // Iterate the shaders and add each of them to the tree:
                     int maxItemsShown = gdGDebuggerGlobalVariablesManager::instance().maxTreeItemsPerType();
-                    int itemsToShow = min(amountOfShaders, maxItemsShown);
+                    int itemsToShow = std::min(amountOfShaders, maxItemsShown);
 
                     for (int i = 0; i < itemsToShow; i++)
                     {
@@ -2735,7 +2735,7 @@ bool gdDebugApplicationTreeHandler::updateApplicationPBuffers(unsigned int& obje
 
                 // Iterate the PBuffers units:
                 int maxItemsShown = gdGDebuggerGlobalVariablesManager::instance().maxTreeItemsPerType();
-                int itemsToShow = min(amountOfPBufferObjects, maxItemsShown);
+                int itemsToShow = std::min(amountOfPBufferObjects, maxItemsShown);
 
                 for (int pbufferID = 0; pbufferID < itemsToShow; pbufferID++)
                 {
@@ -2968,7 +2968,7 @@ bool gdDebugApplicationTreeHandler::updateApplicationSyncObjects(unsigned int& o
 
                 // Iterate the sync objects:
                 int maxItemsShown = gdGDebuggerGlobalVariablesManager::instance().maxTreeItemsPerType();
-                int itemsToShow = min(amountOfSyncObjects, maxItemsShown);
+                int itemsToShow = std::min(amountOfSyncObjects, maxItemsShown);
 
                 for (int syncObjectIndex = 0; syncObjectIndex < itemsToShow; syncObjectIndex++)
                 {
@@ -3573,7 +3573,7 @@ bool gdDebugApplicationTreeHandler::updateCLImagesList(apContextID contextID, gt
 
                 // Add the images to the tree:
                 int maxItemsShown = gdGDebuggerGlobalVariablesManager::instance().maxTreeItemsPerType();
-                int itemsToShow = min(amountOfImages, maxItemsShown);
+                int itemsToShow = std::min(amountOfImages, maxItemsShown);
 
                 for (int i = 0; i < itemsToShow; i++)
                 {
@@ -3681,7 +3681,7 @@ bool gdDebugApplicationTreeHandler::updateCLBuffersList(apContextID contextID, g
 
                 // Add the buffers to the tree:
                 int maxItemsShown = gdGDebuggerGlobalVariablesManager::instance().maxTreeItemsPerType();
-                int itemsToShow = min(amountOfBuffers, maxItemsShown);
+                int itemsToShow = std::min(amountOfBuffers, maxItemsShown);
 
                 for (int i = 0; i < itemsToShow; i++)
                 {
@@ -3787,7 +3787,7 @@ bool gdDebugApplicationTreeHandler::updateCLPipesList(apContextID contextID, gtU
 
                 // Add the pipes to the tree:
                 int maxItemsShown = gdGDebuggerGlobalVariablesManager::instance().maxTreeItemsPerType();
-                int itemsToShow = min(amountOfPipes, maxItemsShown);
+                int itemsToShow = std::min(amountOfPipes, maxItemsShown);
 
                 for (int i = 0; i < itemsToShow; i++)
                 {
@@ -3891,7 +3891,7 @@ bool gdDebugApplicationTreeHandler::updateCLSamplersList(apContextID contextID, 
 
                     // Add the samplers to the tree:
                     int maxItemsShown = gdGDebuggerGlobalVariablesManager::instance().maxTreeItemsPerType();
-                    int itemsToShow = min(amountOfSamplers, maxItemsShown);
+                    int itemsToShow = std::min(amountOfSamplers, maxItemsShown);
 
                     for (int i = 0; i < itemsToShow; i++)
                     {
@@ -3998,7 +3998,7 @@ bool gdDebugApplicationTreeHandler::updateCLEventsList(apContextID contextID, gt
 
                     // Add the events to the tree:
                     int maxItemsShown = gdGDebuggerGlobalVariablesManager::instance().maxTreeItemsPerType();
-                    int itemsToShow = min(amountOfEvents, maxItemsShown);
+                    int itemsToShow = std::min(amountOfEvents, maxItemsShown);
 
                     for (int i = 0; i < itemsToShow; i++)
                     {
@@ -4107,7 +4107,7 @@ bool gdDebugApplicationTreeHandler::updateCLCommandQueuesList(apContextID contex
 
                     // Add each of the command queues:
                     int maxItemsShown = gdGDebuggerGlobalVariablesManager::instance().maxTreeItemsPerType();
-                    int itemsToShow = min(amountOfCommandQueues, maxItemsShown);
+                    int itemsToShow = std::min(amountOfCommandQueues, maxItemsShown);
 
                     for (int i = 0; i < itemsToShow; i++)
                     {
@@ -4216,7 +4216,7 @@ bool gdDebugApplicationTreeHandler::updateCLProgramsList(apContextID contextID, 
 
                     // Add each of the programs:
                     int maxItemsShown = gdGDebuggerGlobalVariablesManager::instance().maxTreeItemsPerType();
-                    int itemsToShow = min(amountOfPrograms, maxItemsShown);
+                    int itemsToShow = std::min(amountOfPrograms, maxItemsShown);
 
                     for (int i = 0; i < itemsToShow; i++)
                     {
@@ -4297,7 +4297,7 @@ bool gdDebugApplicationTreeHandler::updateCLSubBuffersList(apContextID contextID
 
     // Iterate the sub buffers:
     int maxItemsShown = gdGDebuggerGlobalVariablesManager::instance().maxTreeItemsPerType();
-    int itemsToShow = min(subBuffersObjectsCount, maxItemsShown);
+    int itemsToShow = std::min(subBuffersObjectsCount, maxItemsShown);
 
     for (int i = 0; i < itemsToShow; i++)
     {
@@ -4379,7 +4379,7 @@ bool gdDebugApplicationTreeHandler::updateCLKernelsList(apContextID contextID, Q
     // Iterate the kernelHandles:
     int numberOfKernels = (int)progKernelHandles.size();
     int maxItemsShown = gdGDebuggerGlobalVariablesManager::instance().maxTreeItemsPerType();
-    int itemsToShow = min(numberOfKernels, maxItemsShown);
+    int itemsToShow = std::min(numberOfKernels, maxItemsShown);
 
     for (int i = 0; i < itemsToShow; i++)
     {
@@ -5731,7 +5731,7 @@ QTreeWidgetItem* gdDebugApplicationTreeHandler::appendItemToTree(QTreeWidgetItem
                 itemId.m_itemIndex = pItemTreeData->m_itemTreeIndex;
 
                 // Add the item data to the map:
-                m_itemIndexToItemDataMap.insert(pair<gdTreeItemId, afApplicationTreeItemData*>(itemId, pItemTreeData));
+                m_itemIndexToItemDataMap[itemId] = pItemTreeData;
                 pItemTreeData->m_pTreeWidgetItem = pRetVal;
             }
         }
@@ -8816,7 +8816,7 @@ bool gdDebugApplicationTreeHandler::updateProgramPipelinesList(int contextId, in
                 {
                     // Iterate the buffers and add each of them to the tree:
                     int maxItemsShown = gdGDebuggerGlobalVariablesManager::instance().maxTreeItemsPerType();
-                    int itemsToShow = min(pipelineObjectsCount, maxItemsShown);
+                    int itemsToShow = std::min(pipelineObjectsCount, maxItemsShown);
 
                     for (int i = 0; i < itemsToShow; i++)
                     {
@@ -8953,7 +8953,7 @@ bool gdDebugApplicationTreeHandler::updateOpenGlSamplersList(int contextId, int&
                 {
                     // Iterate the buffers and add each of them to the tree:
                     int maxItemsShown = gdGDebuggerGlobalVariablesManager::instance().maxTreeItemsPerType();
-                    int itemsToShow = min(samplerObjectsCount, maxItemsShown);
+                    int itemsToShow = std::min(samplerObjectsCount, maxItemsShown);
 
                     for (int i = 0; i < itemsToShow; i++)
                     {

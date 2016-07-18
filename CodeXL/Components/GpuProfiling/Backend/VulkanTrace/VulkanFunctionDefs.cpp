@@ -37,7 +37,7 @@ VkFuncId vulkanFunctionDefs::ToVKFuncType(const std::string& strName)
     Initialize();
 
     // Find the API in the map
-    map<string, VkFuncId>::iterator it = m_sVKAPIMap.find(strName);
+    std::map<std::string, VkFuncId>::iterator it = m_sVKAPIMap.find(strName);
 
     if (it != m_sVKAPIMap.end())
     {
@@ -55,7 +55,7 @@ vkAPIType vulkanFunctionDefs::TovkAPIType(const std::string& strAPIName)
     Initialize();
 
     // Find the API in the map
-    map<string, vkAPIType>::iterator it = m_sVKAPITypeMap.find(strAPIName);
+    std::map<std::string, vkAPIType>::iterator it = m_sVKAPITypeMap.find(strAPIName);
 
     if (it == m_sVKAPITypeMap.end())
     {
@@ -79,7 +79,7 @@ bool vulkanFunctionDefs::vkAPITypeToString(VkFuncId apiType, std::string& strAPI
     Initialize();
 
     // Find the API in the map
-    map<VkFuncId, string>::iterator it = m_sVKAPIStringsMap.find(apiType);
+    std::map<VkFuncId, std::string>::iterator it = m_sVKAPIStringsMap.find(apiType);
 
     if (it != m_sVKAPIStringsMap.end())
     {

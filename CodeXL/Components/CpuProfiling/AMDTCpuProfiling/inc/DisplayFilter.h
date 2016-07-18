@@ -279,7 +279,7 @@ public:
     const gtVector<AMDTProfileReportConfig>& GetReportConfig() const;
 
     const QString& GetCurrentCofigName() const { return m_configurationName; }
-    void SetProfDataReader(shared_ptr<cxlProfileDataReader> reader) { m_pProfDataReader = reader; }
+    void SetProfDataReader(std::shared_ptr<cxlProfileDataReader> reader) { m_pProfDataReader = reader; }
 
     bool CreateConfigCounterMap();
 

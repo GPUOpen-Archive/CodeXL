@@ -119,10 +119,10 @@ private:
     bool mbCollectingStats;
 
     /// Used to record the frame timings
-    vector<double> mFrameTimings;
+    std::vector<double> mFrameTimings;
 
     /// Used to record the FPS for each second of the collection period
-    vector<double> mFPS;
+    std::vector<double> mFPS;
 };
 
 #endif // FRAMESTATSLOGGER_H

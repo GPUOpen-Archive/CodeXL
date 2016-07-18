@@ -10,7 +10,6 @@
 
 #include <string>
 #include <vector>
-using std::string;
 
 /// OGL image file enumerations
 enum OGL_IMAGE_FILE_FORMAT

@@ -122,7 +122,7 @@ protected:
 
 private:
     // No additional settings
-    virtual string GetDerivedSettings() { return ""; }
+    virtual std::string GetDerivedSettings() { return ""; }
 };
 
 #endif // HUDELEMENT_H

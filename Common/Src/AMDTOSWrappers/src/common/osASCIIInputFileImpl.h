@@ -47,7 +47,7 @@ public:
 
 private:
     // The output file stream:
-    ifstream _inputFileStream;
+    std::ifstream _inputFileStream;
 };
 
 

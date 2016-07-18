@@ -356,7 +356,7 @@ bool afStartupPage::BuildRecentlyOpenedProjectsTable(QString& htmlText)
         gtVector<gtString> recentlyUsedProjectsNames;
         pApplicationCommands->FillRecentlyUsedProjectsNames(recentlyUsedProjectsNames, appName);
         int numberOfRecentProjects = (int)recentlyUsedProjectsNames.size();
-        int projectsForDisplayNumber = min(numberOfRecentProjects, 5);
+        int projectsForDisplayNumber = std::min(numberOfRecentProjects, 5);
 
         if (0 < projectsForDisplayNumber)
         {

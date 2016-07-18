@@ -300,7 +300,7 @@ bool CommandObject::GetParam(const char* pParamName, unsigned long& rValue)
 }
 
 //--------------------------------------------------------------------------
-bool CommandObject::GetParam(const char* pParamName, string& rValue)
+bool CommandObject::GetParam(const char* pParamName, std::string& rValue)
 {
     if (m_pChoppedCommand == NULL)
     {
@@ -539,7 +539,7 @@ void CommandResponse::Send(const char* pData, unsigned int uBytes)
         }
 
         // string which is used to add tags around XML and HTML responses
-        string strResponse;
+        std::string strResponse;
 
         bool bResult = false;
 
@@ -1053,7 +1053,7 @@ void CommandProcessor::HandleInternalCommands()
         StreamLog::Ref() << "\n CommandProcessor: HandleInternalCommands: Enter." << "--------------------------------------------" << "\n";
 #endif
 
-        string strTree;
+        std::string strTree;
         strTree += "<CommandTree>";
 
 #ifdef USE_C3_STREAMLOG
@@ -1207,7 +1207,7 @@ unsigned int CommandProcessor::GetEditableCount()
 /// Allows derived classes to add additional attributes to the XML.
 /// \return Empty string in the base class
 //--------------------------------------------------------------------------
-string CommandProcessor::GetDerivedAttributes()
+std::string CommandProcessor::GetDerivedAttributes()
 {
     return "";
 }
@@ -1216,9 +1216,9 @@ string CommandProcessor::GetDerivedAttributes()
 /// Returns the CommandTree as XML based on the contents of this Processor
 /// \return XML describing the added commands and Processors
 //--------------------------------------------------------------------------
-string CommandProcessor::GetCommandTree()
+std::string CommandProcessor::GetCommandTree()
 {
-    stringstream strOut;
+    std::stringstream strOut;
 
     // Add the link to the settings. Only add this link if there are editable items.
     if (GetEditableCount() > 0)
@@ -1257,7 +1257,7 @@ string CommandProcessor::GetCommandTree()
     }
 
     // Add the sub-tree
-    vector<CommandProcessor*>::const_iterator it;
+    std::vector<CommandProcessor*>::const_iterator it;
 
     for (it = m_Processors.begin() ; it < m_Processors.end(); ++it)
     {
@@ -1268,7 +1268,7 @@ string CommandProcessor::GetCommandTree()
         strOut << pProc->GetID() << "' display='" << GetUIDisplayModeString(pProc->GetUIDisplayMode());
         strOut << "' url='" << pProc->GetFullPathString().asCharArray() << "' prefix='" << GetTitlePrefix() << "'";
 
-        string derivedAttrs = pProc->GetDerivedAttributes();
+        std::string derivedAttrs = pProc->GetDerivedAttributes();
 
         if (!derivedAttrs.empty())
         {
@@ -1292,9 +1292,9 @@ string CommandProcessor::GetCommandTree()
 /// \param eDisplayMode The mode see UIDisplayMode enum
 /// \return The string "TRUE" or "FALSE"
 //--------------------------------------------------------------------------
-string CommandProcessor::GetUIDisplayModeString(UIDisplayMode eDisplayMode)
+std::string CommandProcessor::GetUIDisplayModeString(UIDisplayMode eDisplayMode)
 {
-    string strRet = "";
+    std::string strRet = "";
 
     switch (eDisplayMode)
     {
@@ -1323,9 +1323,9 @@ string CommandProcessor::GetUIDisplayModeString(UIDisplayMode eDisplayMode)
 /// Returns the values of editable commands
 /// \return XML containing the values of editable commands
 //--------------------------------------------------------------------------
-string CommandProcessor::GetEditableCommandValues()
+std::string CommandProcessor::GetEditableCommandValues()
 {
-    stringstream strOut;
+    std::stringstream strOut;
 
     // give derived classes a chance to update / add settings.
     strOut << GetDerivedSettings();

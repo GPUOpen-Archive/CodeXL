@@ -668,20 +668,20 @@ bool gsGLTexture::generateAutoMipmapLevels()
                         for (unsigned int level = baseLevel; level <= maxLevel; level++)
                         {
                             // Get this level dimensions:
-                            w = max(1.0F, (float)floor(w / 2));
+                            w = std::max(1.0F, (float)floor(w / 2));
 
                             apTextureType texType = textureType();
 
                             // 1D textures do not have height. 1D texture arrays' height does not shrink with mip levels:
                             if ((texType != AP_1D_TEXTURE) && (texType != AP_1D_ARRAY_TEXTURE))
                             {
-                                h = max(1.0F, (float)floor(h / 2));
+                                h = std::max(1.0F, (float)floor(h / 2));
                             }
 
                             // Only 3D textures (and 2D array textures) have depth, but 2D array textures' depth does not shrink with mip levels:
                             if (texType == AP_3D_TEXTURE)
                             {
-                                d = max(1.0F, (float)floor(d / 2));
+                                d = std::max(1.0F, (float)floor(d / 2));
                             }
 
                             // Check number of texture panes:

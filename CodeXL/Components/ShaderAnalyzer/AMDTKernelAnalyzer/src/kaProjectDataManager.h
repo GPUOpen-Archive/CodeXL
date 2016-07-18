@@ -403,7 +403,7 @@ public:
 
     /// Gets last build program
     /// \return m_pLastBuildProgram
-    std::unordered_map<wstring, kaProgram*>& GetLastBuildProgram() { return m_pLastBuildProgram; }
+    std::unordered_map<std::wstring, kaProgram*>& GetLastBuildProgram() { return m_pLastBuildProgram; }
 
     bool IsRender(const kaProgram* pProgram) const;
     bool IsActiveProgramRender() const;

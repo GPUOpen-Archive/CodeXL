@@ -17,9 +17,6 @@
 // Local:
 #include <AMDTBaseTools/Include/gtIgnoreCompilerWarnings.h>
 
-// Allow using types from the std namespace:
-using namespace std;
-
 
 // ----------------------------------------------------------------------------------
 // Class Name:           gtVector
@@ -29,11 +26,11 @@ using namespace std;
 // Author:      AMD Developer Tools Team
 // Creation Date:        11/5/2003
 // ----------------------------------------------------------------------------------
-template<class _Tp, class _Allocator = allocator<_Tp> >
-class gtVector : public vector<_Tp, _Allocator>
+template<class _Tp, class _Allocator = std::allocator<_Tp> >
+class gtVector : public std::vector<_Tp, _Allocator>
 {
 public:
-    typedef vector<_Tp, _Allocator> StdVector;
+    typedef std::vector<_Tp, _Allocator> StdVector;
 
     gtVector() {}
     gtVector(std::initializer_list<_Tp> l) : StdVector(l) {}
@@ -48,11 +45,11 @@ public:
     }
 
 #if AMDT_HAS_CPP0X
-    gtVector(gtVector&& other) : StdVector(move(other)) {}
+    gtVector(gtVector&& other) : StdVector(std::move(other)) {}
 
     gtVector& operator=(gtVector&& other)
     {
-        static_cast<StdVector*>(this)->operator=(move(other));
+        static_cast<StdVector*>(this)->operator=(std::move(other));
         return *this;
     }
 #endif

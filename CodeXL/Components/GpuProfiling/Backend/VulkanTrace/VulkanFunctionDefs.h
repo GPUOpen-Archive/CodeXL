@@ -4,8 +4,6 @@
 #include <string>
 #include <map>
 
-using namespace std;
-
 #define CODEXL_INCLUDE
 #include <Server/VulkanServer/VKT/vktEnumerations.h>
 #undef CODEXL_INCLUDE
@@ -65,14 +63,14 @@ private:
     static bool m_sIsInitialized;
 
     // Map from string to vulkan function type
-    static map<string, VkFuncId> m_sVKAPIMap;
+    static std::map<std::string, VkFuncId> m_sVKAPIMap;
 
     // Map from vulkan function type to string
-    static map<VkFuncId, std::string> m_sVKAPIStringsMap;
+    static std::map<VkFuncId, std::string> m_sVKAPIStringsMap;
 
     // Map from string to vulkan API type
-    static map<string, vkAPIType> m_sVKAPITypeMap;
-    static string m_sMissingInterfaces;
+    static std::map<std::string, vkAPIType> m_sVKAPITypeMap;
+    static std::string m_sMissingInterfaces;
 };
 
 

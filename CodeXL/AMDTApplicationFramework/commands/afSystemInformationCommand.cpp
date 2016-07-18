@@ -545,7 +545,7 @@ bool afSystemInformationCommand::getGraphicCardDetails(gtString& vendorString, g
 #endif
         }
     }
-    catch (exception& e)
+    catch (std::exception& e)
     {
         std::string eStr(e.what());
         gtString logMsgErrorDescription;

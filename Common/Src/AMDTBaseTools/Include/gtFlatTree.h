@@ -70,11 +70,11 @@ public:
     }
 
 #if AMDT_HAS_CPP0X
-    gtFlatTree(gtFlatTree&& other) : m_vec(move(other.m_vec)) {}
+    gtFlatTree(gtFlatTree&& other) : m_vec(std::move(other.m_vec)) {}
 
     gtFlatTree& operator=(gtFlatTree&& other)
     {
-        m_vec = move(other.m_vec);
+        m_vec = std::move(other.m_vec);
         return *this;
     }
 

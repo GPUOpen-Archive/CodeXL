@@ -1063,8 +1063,8 @@ void afGlobalVariablesManager::FindInstalledAMDComponents()
     vendor[1] = regs[3]; // EDX
     vendor[2] = regs[2]; // ECX
 
-    string cpuVendorOption1 = string((char*)vendor, 12);
-    string cpuVendorOption2 = string((char*)vendor, 28);
+    std::string cpuVendorOption1 = std::string((char*)vendor, 12);
+    std::string cpuVendorOption2 = std::string((char*)vendor, 28);
 
     if ("Advanced Micro Devices, Inc." == cpuVendorOption2 || ("AuthenticAMD" == cpuVendorOption1))
     {

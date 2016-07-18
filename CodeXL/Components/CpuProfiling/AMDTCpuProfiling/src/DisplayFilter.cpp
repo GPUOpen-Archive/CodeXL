@@ -1035,14 +1035,14 @@ bool DisplayFilter::CreateConfigCounterMap()
 
                 for (const auto& counter : config.m_counterDescs)
                 {
-                    auto nameIdDesc = make_tuple(counter.m_name,
-                                                 counter.m_abbrev,
-                                                 counter.m_description,
-                                                 counter.m_id,
-                                                 counter.m_type);
+                    auto nameIdDesc = std::make_tuple(counter.m_name,
+                                                      counter.m_abbrev,
+                                                      counter.m_description,
+                                                      counter.m_id,
+                                                      counter.m_type);
                     counters.push_back(nameIdDesc);
-                    m_counterNameIdMap.insert(make_pair(counter.m_name, counter.m_id));
-                    m_counterIdNameMap.insert(make_pair(counter.m_id, counter.m_name));
+                    m_counterNameIdMap.insert(std::make_pair(counter.m_name, counter.m_id));
+                    m_counterIdNameMap.insert(std::make_pair(counter.m_id, counter.m_name));
                 }
 
                 m_configCounterMap.insert(cofigNameCounterPair(config.m_name, counters));
@@ -1127,7 +1127,7 @@ DisplayFilter::InitToDefault()
 {
     bool retVal = true;
     m_reportConfigs.clear();
-	m_selectedCountersIdList.clear();
+    m_selectedCountersIdList.clear();
 
     if (nullptr != m_pProfDataReader.get())
     {
@@ -1143,11 +1143,11 @@ DisplayFilter::InitToDefault()
         for (auto const& counter : m_reportConfigs[0].m_counterDescs)
         {
             m_options.m_counters.push_back(counter.m_id);
-            m_selectedCountersIdList.push_back(make_tuple(counter.m_name,
-                                                          counter.m_abbrev,
-                                                          counter.m_description,
-                                                          counter.m_id,
-                                                          counter.m_type));
+            m_selectedCountersIdList.push_back(std::make_tuple(counter.m_name,
+                                                               counter.m_abbrev,
+                                                               counter.m_description,
+                                                               counter.m_id,
+                                                               counter.m_type));
         }
 
         retVal = m_pProfDataReader->SetReportOption(m_options);
@@ -1208,7 +1208,7 @@ void DisplayFilter::SetProfileDataOption()
 
     for (auto const& selCounter : m_selectedCountersIdList)
     {
-        auto foundCountId = m_counterNameIdMap.find(get<0>(selCounter));
+        auto foundCountId = m_counterNameIdMap.find(std::get<0>(selCounter));
 
         if (m_counterNameIdMap.end() != foundCountId)
         {

@@ -59,7 +59,7 @@ bool osASCIIInputFileImpl::open(const osFilePath& path, osChannel::osChannelType
     bool retVal = false;
 
     // Get the iso open mode:
-    ios_base::openmode isoOpenMode = fileOpenModeToIosOpenMode(osFile::OS_OPEN_TO_READ, fileType);
+    std::ios_base::openmode isoOpenMode = fileOpenModeToIosOpenMode(osFile::OS_OPEN_TO_READ, fileType);
 
     // Open the output file stream:
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
@@ -347,7 +347,7 @@ bool osASCIIInputFileImpl::seekCurrentPosition(osStream::osStreamPosition seekSt
     if (_inputFileStream.is_open())
     {
         // Translate the stream position to iostream terminology:
-        ios_base::seekdir iosStreamPosition = streamPositionToIosSeekDir(seekStartPosition);
+        std::ios_base::seekdir iosStreamPosition = streamPositionToIosSeekDir(seekStartPosition);
 
         // Seek the read position:
         _inputFileStream.seekg(offset, iosStreamPosition);
@@ -382,7 +382,7 @@ bool osASCIIInputFileImpl::currentPosition(osStream::osStreamPosition positionRe
         if (positionReference == osStream::OS_STREAM_BEGIN)
         {
             // Get the read position:
-            streampos streamPosition = ((osASCIIInputFileImpl*)(this))->_inputFileStream.tellg();
+            std::streampos streamPosition = ((osASCIIInputFileImpl*)(this))->_inputFileStream.tellg();
             offset = (gtSize_t)streamPosition;
             retVal = true;
         }

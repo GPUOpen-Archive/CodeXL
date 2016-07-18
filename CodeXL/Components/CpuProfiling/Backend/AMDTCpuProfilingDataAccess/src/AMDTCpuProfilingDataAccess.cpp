@@ -2704,7 +2704,7 @@ public:
                         else
                         {
                             gtString funcName = funcInfo.m_name;
-                            wstring javaFuncName;
+                            std::wstring javaFuncName;
 
                             int pos = funcName.reverseFind(L"::");
 
@@ -2712,11 +2712,11 @@ public:
                             {
                                 gtString retStr;
                                 funcName.getSubString(pos + 2, funcName.length() - 1, retStr);
-                                javaFuncName = wstring(retStr.asCharArray());
+                                javaFuncName = retStr.asCharArray();
                             }
                             else
                             {
-                                javaFuncName = wstring(funcName.asCharArray());
+                                javaFuncName = funcName.asCharArray();
                             }
 
                             funcOffsetLinenumMap = jncReader.GetOffsetLines(javaFuncName);

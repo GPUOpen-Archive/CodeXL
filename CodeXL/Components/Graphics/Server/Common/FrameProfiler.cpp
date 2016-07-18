@@ -30,7 +30,7 @@
 // Comment in the line below to use the original weighted average method
 //#define USE_WEIGHTED_AVERAGE
 
-string FrameProfiler::m_sLastGPAError;
+std::string FrameProfiler::m_sLastGPAError;
 
 //=============================================================================
 /// FrameProfiler

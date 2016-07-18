@@ -54,8 +54,8 @@ typedef std::list<addrRanges> AddressRangeList;
 typedef struct _LineNumSrc
 {
     int               lineNum;
-    string            sourceFile;
-    string            symName;
+    std::string       sourceFile;
+    std::string       symName;
     jmethodID         methodId;
     AddressRangeList  addrs;
 
@@ -107,7 +107,7 @@ public:
 
     JavaInlineMap* GetInlineMap() { return &m_javaInlineMap; }
 
-    bool GetStringFromOffset(jlong offset, string& str);
+    bool GetStringFromOffset(jlong offset, std::string& str);
 
     void DumpStringTable(FILE* f);
     void DumpJncMethodMap(FILE* f);
@@ -143,7 +143,7 @@ public:
         return version;
     }
 
-    OffsetLinenumMap GetOffsetLines(wstring funcName);
+    OffsetLinenumMap GetOffsetLines(std::wstring funcName);
 
 private:
     bool _process_stringtable_section();
@@ -161,10 +161,10 @@ private:
                             gtUInt64 thisPc,
                             gtUInt64 nextPc);
 
-    bool _getSrcInfoFromBcAndMethodID(jint       bc,
-                                      jmethodID  id,
-                                      int&       srcLine,
-                                      string&    srcFile);
+    bool _getSrcInfoFromBcAndMethodID(jint         bc,
+                                      jmethodID    id,
+                                      int&         srcLine,
+                                      std::string& srcFile);
 
     const char* GetMethodName(jmethodID methodId);
 

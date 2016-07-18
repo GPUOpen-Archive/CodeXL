@@ -583,7 +583,7 @@ void ObjectDatabaseProcessor::UpdateSelectedObject()
         bool bObjectSelected = false;
 
         gtASCIIString appHandleASCIIString(mSelectedObjectResponse.GetValue());
-        vector<void*> applicationHandles;
+        std::vector<void*> applicationHandles;
         ModernAPILayerManager* parentLayerManager = GetParentLayerManager();
 
         if (parentLayerManager == nullptr)

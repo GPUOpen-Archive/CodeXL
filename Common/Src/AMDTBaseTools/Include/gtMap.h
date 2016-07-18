@@ -18,9 +18,6 @@
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
 #include <AMDTBaseTools/Include/gtIgnoreCompilerWarnings.h>
 
-// Allow using types from the std namespace:
-using namespace std;
-
 
 // ----------------------------------------------------------------------------------
 // Class Name:           gtMap
@@ -39,11 +36,11 @@ using namespace std;
 
 #else
 
-template<class _K, class _Tp, class _Pr = less<_K>, class _A = allocator<pair<const _K, _Tp> > >
-class gtMap : public map< _K, _Tp, _Pr, _A>
+template<class _K, class _Tp, class _Pr = std::less<_K>, class _A = std::allocator<std::pair<const _K, _Tp> > >
+class gtMap : public std::map< _K, _Tp, _Pr, _A>
 {
 public:
-    typedef map< _K, _Tp, _Pr, _A> StdMap;
+    typedef std::map< _K, _Tp, _Pr, _A> StdMap;
 
     gtMap() {}
     gtMap(const gtMap& other) : StdMap(other) {}
@@ -55,11 +52,11 @@ public:
     }
 
 #if AMDT_HAS_CPP0X
-    gtMap(gtMap&& other) : StdMap(move(other)) {}
+    gtMap(gtMap&& other) : StdMap(std::move(other)) {}
 
     gtMap& operator=(gtMap&& other)
     {
-        static_cast<StdMap*>(this)->operator=(move(other));
+        static_cast<StdMap*>(this)->operator=(std::move(other));
         return *this;
     }
 #endif

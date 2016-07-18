@@ -18,9 +18,6 @@
 // Local:
 #include <AMDTBaseTools/Include/gtIgnoreCompilerWarnings.h>
 
-// Allow using types from the std namespace:
-using namespace std;
-
 
 // ----------------------------------------------------------------------------------
 // Class Name:           gtQueue
@@ -31,11 +28,11 @@ using namespace std;
 // Author:      AMD Developer Tools Team
 // Creation Date:        11/5/2003
 // ----------------------------------------------------------------------------------
-template<class Type, class Container = deque<Type> >
-class gtQueue : public queue<Type, Container>
+template<class Type, class Container = std::deque<Type> >
+class gtQueue : public std::queue<Type, Container>
 {
 public:
-    typedef queue<Type, Container> StdQueue;
+    typedef std::queue<Type, Container> StdQueue;
 
     gtQueue() {};
     gtQueue(const gtQueue& other) : StdQueue(other) {};
@@ -47,11 +44,11 @@ public:
     }
 
 #if AMDT_HAS_CPP0X
-    gtQueue(gtQueue&& other) : StdQueue(move(other)) {}
+    gtQueue(gtQueue&& other) : StdQueue(std::move(other)) {}
 
     gtQueue& operator=(gtQueue&& other)
     {
-        static_cast<StdQueue*>(this)->operator=(move(other));
+        static_cast<StdQueue*>(this)->operator=(std::move(other));
         return *this;
     }
 #endif

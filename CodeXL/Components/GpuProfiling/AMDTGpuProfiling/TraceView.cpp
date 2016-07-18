@@ -1002,7 +1002,7 @@ bool TraceView::LoadSessionUsingBackendParser(const osFilePath& sessionFile)
     retVal = parser.LoadFile(sessionFile.asString().asASCIICharArray());
     retVal &= parser.Parse();
     bool parseWarning;
-    string parseWarningMsg;
+    std::string parseWarningMsg;
     parser.GetParseWarning(parseWarning, parseWarningMsg);
 
     if (false == retVal || true == parseWarning)

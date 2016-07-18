@@ -574,7 +574,7 @@ bool FileUtils::ReadKernelListFile(Parameters& params, bool doOutputError)
 
         if (!retVal && doOutputError)
         {
-            cout << "Unable to read kernel list file: " << params.m_strKernelFile << ". All kernels will be profiled." << endl;
+            std::cout << "Unable to read kernel list file: " << params.m_strKernelFile << ". All kernels will be profiled." << endl;
         }
     }
 
@@ -1090,17 +1090,17 @@ bool FileUtils::MergeTmpTraceFiles(SP_outStream& sout,
     {
         bool bWriteHeader = false;
 
-        wstring strFullFilePath;
-        string strFileContent;
+        std::wstring strFullFilePath;
+        std::string strFileContent;
         osFilePath strFileAsFilePath;
         gtString strFileName;
-        wstring strFile;
-        wstring strTid;
-        wstring strExt;
+        std::wstring strFile;
+        std::wstring strTid;
+        std::wstring strExt;
         strFileContent.empty();
 
         int cumulativeAPICount = 0;
-        string cumulativeStrFileContent;
+        std::string cumulativeStrFileContent;
 
         for (gtList<osFilePath>::iterator it = files.begin(); it != files.end(); it++)
         {
@@ -1115,7 +1115,7 @@ bool FileUtils::MergeTmpTraceFiles(SP_outStream& sout,
 
             if (found != string::npos)
             {
-                wstring strPidTid = strFile.substr(0, found);
+                std::wstring strPidTid = strFile.substr(0, found);
                 strExt = strFile.substr(found);
                 found = strPidTid.find_first_of(L"_");
 

@@ -60,26 +60,26 @@ osDirectory& osDirectory::operator=(const osDirectory& other)
 
 #if AMDT_HAS_CPP0X
 
-osDirectory::osDirectory(osFilePath&& directoryPath) : _directoryPath(forward<osFilePath>(directoryPath))
+osDirectory::osDirectory(osFilePath&& directoryPath) : _directoryPath(std::forward<osFilePath>(directoryPath))
 {
 }
 
 
-osDirectory::osDirectory(osDirectory&& other) : _directoryPath(move(other._directoryPath))
+osDirectory::osDirectory(osDirectory&& other) : _directoryPath(std::move(other._directoryPath))
 {
 }
 
 
 osDirectory& osDirectory::operator=(osFilePath&& directoryPath)
 {
-    _directoryPath = forward<osFilePath>(directoryPath);
+    _directoryPath = std::forward<osFilePath>(directoryPath);
     return *this;
 }
 
 
 osDirectory& osDirectory::operator=(osDirectory&& other)
 {
-    _directoryPath = move(other._directoryPath);
+    _directoryPath = std::move(other._directoryPath);
     return *this;
 }
 

@@ -449,7 +449,7 @@ void DisplayFilterDlg::onChangeView(const QString& newlySelectedView)
             for (const auto& counter : counterDetails)
             {
                 //m_pCheckBoxColumns[idx].setText(counter.first.asASCIICharArray());
-                m_pCheckBoxColumns[idx]->setText(acGTStringToQString(get<1>(counter))); // get abbreviation
+                m_pCheckBoxColumns[idx]->setText(acGTStringToQString(std::get<1>(counter))); // get abbreviation
                 m_pVBLayoutForColumn->addWidget(m_pCheckBoxColumns[idx]);
                 m_pCheckBoxColumns[idx++]->setChecked(true);
             }
@@ -741,7 +741,7 @@ void DisplayFilterDlg::addFinalLayout()
     m_pScrollAreaCPUCoreLayout->addWidget(m_pScrollAreaCPUCore);
     m_pScrollAreaCPUCoreLayout->addSpacing(acScalePixelSizeToDisplayDPI(CP_DISPLAY_SETTINGS_HMARGIN));
     m_pMainLayout->addLayout(m_pScrollAreaCPUCoreLayout);
-    m_pLine = new(nothrow) QFrame(this);
+    m_pLine = new(std::nothrow) QFrame(this);
 
     m_pLine->setFrameShape(QFrame::HLine);
     m_pLine->setFixedHeight(1);
@@ -829,7 +829,7 @@ void DisplayFilterDlg::updateHiddenColumnList()
                 {
                     if (isChecked)
                     {
-                        if (get<1>(sel) == gStr)
+                        if (std::get<1>(sel) == gStr)
                         {
                             selectedCounters.push_back(sel);
                         }

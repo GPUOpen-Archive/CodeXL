@@ -30,11 +30,10 @@ static void LogMessageFromStream(const std::wstringstream& stream, osDebugLogSev
 
 void dmnUtils::HandleException(const std::exception& x)
 {
-    wstringstream msgStream;
+    std::wstringstream msgStream;
     msgStream << L"An exception caught in CodeXL Daemon. Exception Message = ";
     msgStream << x.what();
-    gtString msgString(msgStream.str().c_str());
-    OS_OUTPUT_DEBUG_LOG(msgString.asCharArray(), OS_DEBUG_LOG_ERROR);
+    OS_OUTPUT_DEBUG_LOG(msgStream.str().c_str(), OS_DEBUG_LOG_ERROR);
 }
 
 void dmnUtils::LogMessage(const std::wstring& msg, osDebugLogSeverity severity)
@@ -48,7 +47,7 @@ void dmnUtils::LogMessage(const std::string& msg, osDebugLogSeverity severity)
 {
     try
     {
-        wstringstream msgStream;
+        std::wstringstream msgStream;
         msgStream << msg.c_str();
         LogMessageFromStream(msgStream, severity);
     }
@@ -69,11 +68,11 @@ std::wstring dmnUtils::BufferToString(gtByte* buffer, unsigned int _bufSize)
 
     while (curPos < _bufSize)
     {
-        _stream << hex << " 0x" << (0x000000ff & static_cast<int>(*(pCur)++));
+        _stream << std::hex << " 0x" << (0x000000ff & static_cast<int>(*(pCur)++));
         ++curPos;
     }
 
-    _stream << " }" << endl;
+    _stream << " }" << std::endl;
     return std::wstring(_stream.str());
 }
 
@@ -99,7 +98,7 @@ bool dmnUtils::ToGtString(const std::string& str, gtString& buffer)
     try
     {
         buffer.makeEmpty();
-        wstringstream stream;
+        std::wstringstream stream;
         stream << str.c_str();
         buffer = gtString(stream.str().c_str());
         ret = true;

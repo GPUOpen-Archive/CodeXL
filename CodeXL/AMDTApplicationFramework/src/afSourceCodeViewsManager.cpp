@@ -192,7 +192,7 @@ afSourceCodeView* afSourceCodeViewsManager::getSourceCodeWindow(const osFilePath
     if (programCounterIndex >= 0)
     {
         // Add the mapping for the counter index and line number:
-        _sourceCodeFilesPCLineNumbers[sourceCodeFilePath.asString()] = pair<int, int> (lineNumber, programCounterIndex);
+        _sourceCodeFilesPCLineNumbers[sourceCodeFilePath.asString()] = afSourceLineAndPC(lineNumber, programCounterIndex);
     }
 
     return pRetVal;
@@ -493,7 +493,7 @@ bool afSourceCodeViewsManager::getLineNumberAndProgramCounter(const osFilePath& 
     programCounterIndex = -1;
 
     // Get the displayed file path details:
-    gtMap<gtString, pair<int, int> >::const_iterator iter = _sourceCodeFilesPCLineNumbers.find(filePath.asString());
+    gtMap<gtString, afSourceLineAndPC >::const_iterator iter = _sourceCodeFilesPCLineNumbers.find(filePath.asString());
 
     if (iter != _sourceCodeFilesPCLineNumbers.end())
     {
@@ -517,7 +517,7 @@ bool afSourceCodeViewsManager::getLineNumberAndProgramCounter(const osFilePath& 
 // ---------------------------------------------------------------------------
 void afSourceCodeViewsManager::setLineNumberAndProgramCounter(const osFilePath& filePath, int lineNumber, int programCounterIndex)
 {
-    _sourceCodeFilesPCLineNumbers[filePath.asString()] = pair<int, int> (lineNumber, programCounterIndex);
+    _sourceCodeFilesPCLineNumbers[filePath.asString()] = afSourceLineAndPC(lineNumber, programCounterIndex);
 }
 
 

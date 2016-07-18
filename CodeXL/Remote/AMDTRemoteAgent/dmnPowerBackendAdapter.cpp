@@ -360,7 +360,7 @@ bool dmnPowerBackendAdapter::handleStartPowerProfilingRequest()
     osFilePath targetAppFilePath;
     osFilePath targetWorkingDir;
     gtString cmdLineArgs;
-    vector<osEnvironmentVariable> envVars;
+    std::vector<osEnvironmentVariable> envVars;
 
     // Check if we need to launch an application.
     bool shouldLaunchApp = false;
@@ -428,7 +428,7 @@ bool dmnPowerBackendAdapter::handleStartPowerProfilingRequest()
         {
             // Log the error.
             std::wstringstream stream;
-            stream << L"Unable to resume a process: " << targetAppFilePath.asString().asCharArray() << endl;
+            stream << L"Unable to resume a process: " << targetAppFilePath.asString().asCharArray() << std::endl;
             dmnUtils::LogMessage(stream.str(), OS_DEBUG_LOG_ERROR);
         }
     }

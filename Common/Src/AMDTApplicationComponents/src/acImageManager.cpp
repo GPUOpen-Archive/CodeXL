@@ -1562,8 +1562,8 @@ void acImageManager::updateCellDimensions()
             {
                 rowH = size().height() - AC_IMAGES_MANAGER_THUMBNAIL_MARGIN;
                 rowW = size().width() - AC_IMAGES_MANAGER_THUMBNAIL_MARGIN;
-                rowW = max(rowW, m_imageActualRect.width() + AC_IMAGE_MANAGER_MARGIN);
-                rowH = max(rowH, m_imageActualRect.height() + AC_IMAGE_MANAGER_MARGIN);
+                rowW = std::max(rowW, m_imageActualRect.width() + AC_IMAGE_MANAGER_MARGIN);
+                rowH = std::max(rowH, m_imageActualRect.height() + AC_IMAGE_MANAGER_MARGIN);
             }
             else if (m_managerMode == AC_MANAGER_MODE_CUBEMAP_TEXTURE)
             {
@@ -1578,8 +1578,8 @@ void acImageManager::updateCellDimensions()
                         GT_IF_WITH_ASSERT(pImage != NULL)
                         {
                             QSize zoomedSize = pImageItem->zoomedImageSize();
-                            rowH = max(rowH, zoomedSize.height() + AC_IMAGE_MANAGER_MARGIN * 2);
-                            rowW = max(rowW, zoomedSize.width() + AC_IMAGES_MANAGER_THUMBNAIL_MARGIN * 2);
+                            rowH = std::max(rowH, zoomedSize.height() + AC_IMAGE_MANAGER_MARGIN * 2);
+                            rowW = std::max(rowW, zoomedSize.width() + AC_IMAGES_MANAGER_THUMBNAIL_MARGIN * 2);
                         }
                     }
                 }
@@ -1650,8 +1650,8 @@ QRect acImageManager::itemVisibleRect(const QModelIndex& index)
     {
         int w = width();
         int h = height();
-        int minW = min(retVal.width(), w);// width());
-        int minH = min(retVal.height(), h);// height());
+        int minW = std::min(retVal.width(), w);// width());
+        int minH = std::min(retVal.height(), h);// height());
         retVal.setSize(QSize(minW, minH));
     }
 

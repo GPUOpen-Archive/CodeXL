@@ -310,9 +310,9 @@
         AMDTUInt64 m_currentTs;
         AMDTPwrAttributeInfo m_prevSmuSampleData[MAX_PREV_COUNTERS];
 
-        vector <AMDTPwrProcessInfo> m_processList;
-        vector <ContextPowerData> m_contextList;
-        vector <AMDTPwrModuleData> m_moduleList;
+        std::vector <AMDTPwrProcessInfo> m_processList;
+        std::vector <ContextPowerData> m_contextList;
+        std::vector <AMDTPwrModuleData> m_moduleList;
 
         AMDTFloat32 m_sampleIpcLoad[MAX_CORE_CNT];
 #ifndef LINUX

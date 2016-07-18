@@ -28,11 +28,11 @@ public:
     }
 
 #if AMDT_HAS_CPP0X
-    gtFlatMap(gtFlatMap&& other) : _Mybase(move(other)) {}
+    gtFlatMap(gtFlatMap&& other) : _Mybase(std::move(other)) {}
 
     gtFlatMap& operator=(gtFlatMap&& other)
     {
-        static_cast<_Mybase*>(this)->operator=(move(other));
+        static_cast<_Mybase*>(this)->operator=(std::move(other));
         return *this;
     }
 #endif

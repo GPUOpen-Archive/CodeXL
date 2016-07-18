@@ -65,7 +65,9 @@ protected:
     void addBatchesByRange(const apRenderPrimitivesStatistics& renderPrimitivesStatistics);
     void addBatchToListControl(int minVertices, int maxVertices, gtUInt64 amountOfBatches, gtUInt64 totalAmountOfVertices, bool byRange);
 
-    bool createRangesVector(gtList<pair<gtUInt64, int> >& listOfStatistics, const apRenderPrimitivesStatistics& renderStatistics, gtVector<pair<int, int> >& rangesVector);
+    typedef std::pair<gtUInt64, int> gdBatchCountAndSize;
+    typedef std::pair<int, int> gdBatchSizeRange;
+    bool createRangesVector(gtList<gdBatchCountAndSize>& listOfStatistics, const apRenderPrimitivesStatistics& renderStatistics, gtVector<gdBatchSizeRange>& rangesVector);
     bool addStatisticsItemToSlice(gtUInt64& currentSliceVerticesAmount, const gtUInt64& verticesPerSlice, int verticesPerCall, const apRenderPrimitivesStatistics& renderStatistics, gtList<int>& visitedAmountsOfVertices, int& minRange, int& maxRange);
 
 private:

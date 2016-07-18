@@ -80,7 +80,7 @@ public:
     //-----------------------------------------------------------------------------
     /// Retrieve a Derived Settings string. Don't do anything in this case.
     //-----------------------------------------------------------------------------
-    virtual string GetDerivedSettings() { return ""; }
+    virtual std::string GetDerivedSettings() { return ""; }
 
     //-----------------------------------------------------------------------------
     /// Capture the current frame buffer image, and return an byte array of PNG-encoded image data. NOTE: Passing in both a width and height of 0 will causes the frame buffer's size to be used when generating the output image.

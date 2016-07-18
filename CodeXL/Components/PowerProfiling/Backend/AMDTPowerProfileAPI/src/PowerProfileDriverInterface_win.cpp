@@ -504,7 +504,7 @@ bool InitializeTaskInfo()
 
 // PrepareInitialProcessList: Prepare the initial process list before the
 // profile session
-AMDTResult PrepareInitialProcessList(list<ProcessName>& list)
+AMDTResult PrepareInitialProcessList(std::list<ProcessName>& list)
 {
     AMDTResult ret = AMDT_STATUS_OK;
 
