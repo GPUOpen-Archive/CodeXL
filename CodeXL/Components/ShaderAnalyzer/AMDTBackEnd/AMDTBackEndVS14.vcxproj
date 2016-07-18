@@ -39,7 +39,6 @@
     <ProjectGuid>{C1F67D19-DD6E-4946-B16D-F4F4D125424B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>AMDTAnalysisBackend</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)'=='Release'" Label="Configuration">
@@ -75,7 +74,6 @@
     <Import Project="$(CommonDir)\Lib\AMD\APPSDK\Global-OpenCL-NoLib.props" />
     <Import Project="$(CommonDir)\Lib\AMD\CAL\Global-CAL-NoLib.props" />
     <Import Project="$(CommonDir)\Lib\AMD\DX10ASM\Global-DX10ASM-VS2015.props" />
-    <Import Project="$(CommonDir)\Lib\AMD\sp3\Global-sp3-VS2015.props" />
     <Import Project="$(CommonDir)\Lib\Ext\Boost\Global-Boost-2015.props" />
     <Import Project="$(CommonDir)\Lib\Ext\Windows-Kits\Global-WindowsSDK.props" />
     <Import Project="$(CommonDir)\Lib\Ext\glew\Global-GLEW.props" />

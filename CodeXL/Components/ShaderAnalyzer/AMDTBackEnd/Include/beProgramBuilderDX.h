@@ -141,15 +141,23 @@ public:
     /// \param[in] dir the path where DX binaries should be searched.
     void AddDxSearchDir(const std::string& dir);
 
-    /// Extract the ISA code of a given shader as an ASCII text string.
+    /// Extract the ISA disassembly for a given target device.
     /// \param[in]  device   the name of the target device
-    /// \param[in]  shader   the name of the shader
-    /// \param[in]  shader   the name of the shader's target (PS, CS, VS, etc.)
     /// \param[out] shader   an output parameter to hold the extracted ISA text
     /// \returns               a status.
-    beKA::beStatus GetDxShaderISAText(const std::string& device, const std::string& shader,
-                                      const std::string& target, std::string& isaBuffer);
+    beKA::beStatus GetDxShaderISAText(const std::string& device, std::string& isaBuffer);
+
+    /// Extract the IL disassembly for a given target device.
+    /// \param[in]  device   the name of the target device
+    /// \param[out] shader   an output parameter to hold the extracted ISA text
+    /// \returns               a status.
     beKA::beStatus GetDxShaderIL(const std::string& device, std::string& isaBuffer);
+
+    /// Extracts the textual contents of an ELF section that contains text in its data.
+    /// \param[in]  pSection   a pointer to the ELF section
+    /// \param[out]  content   the textual contents as a string
+    void ExtractTextFromElfSection(const CElfSection* pSection, std::string& content);
+
     /// Extract the size in bytes of ISA code.
     /// \param[in]  isaAsText       the ISA code as text.
     /// \param[out] sizeInBytes    the calculated size in bytes.
@@ -221,6 +229,7 @@ private: // functions
     beKA::beStatus CompileDXAsmT(const std::string& programSource, const DXOptions& dxOptions);
     const CElfSection* GetISATextSection(const std::string& deviceName) const;
     const CElfSection* GetILDisassemblySection(const std::string& deviceName) const;
+    const CElfSection* GetElfSection(const std::string& deviceName, const std::string& sectionName) const;
     std::string ToLower(const std::string& str) const;
     /// Clears the member variables which hold the build outputs.
     void ClearFormerBuildOutputs();

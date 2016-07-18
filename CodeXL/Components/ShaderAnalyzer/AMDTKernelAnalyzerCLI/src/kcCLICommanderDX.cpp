@@ -188,7 +188,7 @@ void kcCLICommanderDX::ExtractISA(const string& deviceName, const Config& config
     beStatus backendRet = beStatus_Invalid;
     GT_IF_WITH_ASSERT(pProgramBuilderDX != nullptr)
     {
-        backendRet = pProgramBuilderDX->GetDxShaderISAText(deviceName, config.m_Function, config.m_Profile, isaBuffer);
+        backendRet = pProgramBuilderDX->GetDxShaderISAText(deviceName, isaBuffer);
         string fileName = config.m_ISAFile;
 
         if (backendRet == beStatus_SUCCESS)
@@ -286,7 +286,7 @@ bool kcCLICommanderDX::ExtractStats(const string& deviceName, const Config& conf
     {
         if (shouldDetectIsaSize)
         {
-            backendRet = m_pBackEndHandler->theOpenDXBuilder()->GetDxShaderISAText(deviceName, config.m_Function, config.m_Profile, isaBuffer);
+            backendRet = m_pBackEndHandler->theOpenDXBuilder()->GetDxShaderISAText(deviceName, isaBuffer);
 
 
             if (backendRet == beStatus_SUCCESS)

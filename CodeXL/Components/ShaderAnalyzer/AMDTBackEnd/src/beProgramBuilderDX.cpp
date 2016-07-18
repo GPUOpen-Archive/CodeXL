@@ -18,8 +18,6 @@
 #include <DeviceInfoUtils.h>
 
 #include <D3D10ShaderObject.h>
-#include <sp3.h>
-#include <sp3-int.h>
 
 // Infra.
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
@@ -689,200 +687,8 @@ int XLT_STDCALL outputString(XLT_PVOID pHandle, const char* pTranslatedString, .
     return 0;
 }
 
-int XLT_STDCALL outputBinary(XLT_PVOID pHandle,
-                             const void* pszTranslatedProgram,
-                             unsigned int nTranslatedProgramSize)
-{
-    (void)(pHandle); // Unreferenced parameter
-
-    return 0;
-
-    xlt::DX10AsmBuffer output;
-
-    // original code (don't need it):
-#if 0
-    int nDwords = nTranslatedProgramSize / 4;
-    unsigned long* ptr = (unsigned long*)pszTranslatedProgram;
-
-    print_info("-------- DX10 Binary ----------\n");
-
-    if (g_bSHDR)
-    {
-        print_info("0x%08X\n", dwSHDRToken);
-    }
-
-    for (int i = 0; i < nDwords; i++)
-    {
-        print_info("0x%08X\n", *ptr);
-        ptr++;
-    }
-
-    print_info("-----------------------------\n");
-#endif
-
-    output.attach((char*)(const_cast<void*>(pszTranslatedProgram)),
-                  nTranslatedProgramSize);
-
-    // output.save( g_szDstFile.c_str() );
-    if ((nTranslatedProgramSize != 0) && (pszTranslatedProgram != NULL))
-    {
-        ofstream ofs;
-
-        ofs.open(g_szBinFile.c_str(), ios::binary | ios::out);
-
-        if (!ofs.is_open())
-        {
-            // print_info("cannnot open %s\n",
-            //   g_szBinFile.c_str());
-            return -1;
-        }
-
-        if (g_bSHDR)
-        {
-            unsigned long dwSHDRToken1 = 0x6C04000; /* version 4.0 */
-            ofs.write((char*)&dwSHDRToken, 4);
-            ofs.write((char*)&dwSHDRToken1, 4);
-        }
-
-        ofs.write((char*)pszTranslatedProgram, nTranslatedProgramSize);
-        ofs.close();
-
-        // This code was commented and cleaned up as part of static analysis.
-        // TODO: Uncomment if desired for debug purposes.
-        //if (g_bSHDR)
-        //{
-        //    // Add the 'SHDR' DWORD size
-        //    nTranslatedProgramSize += 4;
-        //}
-
-        //if (g_bNoDebug == false)
-        //{
-        //    print_info("Wrote %d bytes to %s\n", nTranslatedProgramSize, g_szBinFile.c_str());
-        //}
-
-        return 0;
-    }
-    else
-    {
-        printf("Invalid Buffer, unable to write to file\n");
-
-        return -1;
-    }//end if else
-}
-
 string* beProgramBuilderDX::s_pTranslatedProgram;
 int* beProgramBuilderDX::s_pipTranslatedProgramSize;
-
-int XLT_STDCALL outputBinaryFull(XLT_PVOID pHandle,
-                                 const void* pszTranslatedProgram,
-                                 unsigned int nTranslatedProgramSize)
-{
-    (void)(pHandle); // Unreferenced parameter
-
-    string temp((char*)(const_cast<void*>(pszTranslatedProgram)), nTranslatedProgramSize);
-    (*beProgramBuilderDX::s_pTranslatedProgram) = temp;
-    *beProgramBuilderDX::s_pipTranslatedProgramSize = (int)nTranslatedProgramSize;
-
-    return 1;
-
-    // continue here if want to save the file
-
-    xlt::DX10AsmBuffer output;
-
-#if 0
-    int nDwords = nTranslatedProgramSize / 4;
-    unsigned long* ptr = (unsigned long*)pszTranslatedProgram;
-
-    print_info("-------- DX10 Binary ----------\n");
-
-    if (g_bSHDR)
-    {
-        print_info("0x%08X\n", dwSHDRToken);
-    }
-
-    for (int i = 0; i < nDwords; i++)
-    {
-        print_info("0x%08X\n", *ptr);
-        ptr++;
-    }
-
-    print_info("-----------------------------\n");
-#endif
-
-    output.attach((char*)(const_cast<void*>(pszTranslatedProgram)),
-                  nTranslatedProgramSize);
-
-    // output.save( g_szDstFile.c_str() );
-    if ((nTranslatedProgramSize != 0) && (pszTranslatedProgram != NULL))
-    {
-        if (!g_szFullBinFile.empty())
-        {
-            ofstream ofs;
-
-            ofs.open(g_szFullBinFile.c_str(), ios::binary | ios::out);
-
-            if (!ofs.is_open())
-            {
-                //print_info("cannnot open %s\n",
-                //    g_szFullBinFile.c_str());
-                return -1;
-            }
-
-            ofs.write((char*)pszTranslatedProgram, nTranslatedProgramSize);
-            ofs.close();
-
-            /*
-            if ( g_bNoDebug == false ) print_info( "Wrote %d bytes to %s\n", nTranslatedProgramSize, g_szFullBinFile.c_str() );
-            */
-        }
-
-        if (!g_szFullHexFile.empty())
-        {
-            ofstream ofs;
-
-            ofs.open(g_szFullHexFile.c_str(), ios::binary | ios::out);
-
-            if (!ofs.is_open())
-            {
-                //print_info("cannnot open %s\n",
-                //    g_szFullHexFile.c_str());
-                return -1;
-            }
-
-            DWORD* pdwTranslatedProgram = (DWORD*)pszTranslatedProgram;
-            DWORD dwTranslatedProgramSize = nTranslatedProgramSize / sizeof(DWORD);
-
-            for (DWORD i = 0; i < dwTranslatedProgramSize; i++)
-            {
-                char szText[13];
-                sprintf(szText, "0x%08x, ", *pdwTranslatedProgram++);
-                ofs << szText;
-
-                if ((i & 3) == 3)
-                {
-                    ofs << "\n";
-                }
-            }
-
-            ofs.close();
-
-            /*
-            if ( g_bNoDebug == false ) print_info( "Wrote %d bytes to %s\n", nTranslatedProgramSize, g_szFullBinFile.c_str() );
-            */
-        }
-
-        return 0;
-    }
-    else
-    {
-        printf("Invalid Buffer, unable to write to file\n");
-
-        return -1;
-    }//end if else
-}
-
-/// end callbacks
-
 
 beKA::beStatus beProgramBuilderDX::CompileDXAsmT(const string& programSource, const DXOptions& dxOptions)
 {
@@ -897,8 +703,6 @@ beKA::beStatus beProgramBuilderDX::CompileDXAsmT(const string& programSource, co
     xltCallbacks.AllocateSysMem = allocSysMem;
     xltCallbacks.FreeSysMem = freeSysMem;
     xltCallbacks.OutputString = outputString;
-    xltCallbacks.OutputBinary = outputBinary;
-    xltCallbacks.OutputBinaryFull = outputBinaryFull;
     xltCallbacks.Assert = NULL;
     xltCallbacks.flags = g_hlsl_flag;
     xltInput.pBuffer = (char*)programSource.c_str();
@@ -1002,42 +806,6 @@ void beProgramBuilderDX::AddDxSearchDir(const string& dir)
     }
 }
 
-static int GetShaderType(const string& target)
-{
-    int shaderType = SP3_SHTYPE_NONE;
-
-    if (target.compare("ps_") != string::npos)
-    {
-        shaderType = SP3_SHTYPE_PS;
-    }
-    else if (target.compare("vs_") != string::npos)
-    {
-        shaderType = SP3_SHTYPE_VS;
-    }
-    else if (target.compare("cs_") != string::npos)
-    {
-        shaderType = SP3_SHTYPE_CS;
-    }
-    else if (target.compare("gs_") != string::npos)
-    {
-        shaderType = SP3_SHTYPE_GS;
-    }
-    else if (target.compare("es_") != string::npos)
-    {
-        shaderType = SP3_SHTYPE_ES;
-    }
-    else if (target.compare("hs_") != string::npos)
-    {
-        shaderType = SP3_SHTYPE_HS;
-    }
-    else if (target.compare("ls_") != string::npos)
-    {
-        shaderType = SP3_SHTYPE_LS;
-    }
-
-    return shaderType;
-}
-
 const CElfSection* beProgramBuilderDX::GetISATextSection(const string& deviceName) const
 {
     // Get the relevant ELF section for the required device.
@@ -1054,7 +822,7 @@ const CElfSection* beProgramBuilderDX::GetISATextSection(const string& deviceNam
     return result;
 }
 
-const CElfSection* beProgramBuilderDX::GetILDisassemblySection(const std::string& deviceName) const
+const CElfSection* beProgramBuilderDX::GetElfSection(const std::string& deviceName, const std::string& sectionName) const
 {
     // Get the relevant ELF section for the required device.
     const CElfSection* result = nullptr;
@@ -1063,100 +831,33 @@ const CElfSection* beProgramBuilderDX::GetILDisassemblySection(const std::string
     if (pElf != nullptr)
     {
         // There is no symbol table.  We just need the ELF section.
-        const string IL_DISASSEMBLY_SECTION_NAME(".amdil_disassembly");
-        result = pElf->GetSection(IL_DISASSEMBLY_SECTION_NAME);
+        result = pElf->GetSection(sectionName);
     }
 
     return result;
 }
 
-beKA::beStatus beProgramBuilderDX::GetDxShaderISAText(const string& deviceName, const string& shader, const string& target, string& isaBuffer)
+const CElfSection* beProgramBuilderDX::GetILDisassemblySection(const std::string& deviceName) const
 {
-    beKA::beStatus ret = beStatus_Invalid;
+    const std::string IL_DISASSEMBLY_SECTION_NAME(".amdil_disassembly");
+    return GetElfSection(deviceName, IL_DISASSEMBLY_SECTION_NAME);
+}
 
-    // Get the relevant ELF section for the required device.
-    const CElfSection* pTextSection = GetISATextSection(deviceName);
+beKA::beStatus beProgramBuilderDX::GetDxShaderISAText(const std::string& device, std::string& isaBuffer)
+{
+    beKA::beStatus ret = beStatus_NO_ISA_FOR_DEVICE;
 
-    if (pTextSection != nullptr)
+    // Get the pointer to the ISA disassembly section.
+    const std::string ISA_DISASSEMBLY_SECTION_NAME(".disassembly");
+    const CElfSection* pElfSection = GetElfSection(device, ISA_DISASSEMBLY_SECTION_NAME);
+
+    // Extract the disassembly from the ELF section's data.
+    isaBuffer.clear();
+    ExtractTextFromElfSection(pElfSection, isaBuffer);
+    if (!isaBuffer.empty())
     {
-        // This is the binary image.
-        const vector<char>& sectionData = pTextSection->GetData();
-
-        // Use the sp3 library to do the disassembly.
-        // This only works with SI & CI for now.
-        // See on that matter: sc/Src/R1000/R1000Disassembler.cpp.
-        struct sp3_context* pDisasmState = sp3_new();
-        char* pDisassembledShader = nullptr;
-        sp3_vma* pVm = nullptr;
-
-        // Set the hardware generation.
-        for (const GDT_GfxCardInfo& cardInfo : m_DXDeviceTable)
-        {
-            if (cardInfo.m_szCALName == deviceName)
-            {
-                switch (cardInfo.m_generation)
-                {
-                    case GDT_HW_GENERATION_SOUTHERNISLAND:
-                        sp3_setasic(pDisasmState, "SI");
-                        break;
-
-                    case GDT_HW_GENERATION_SEAISLAND:
-                        sp3_setasic(pDisasmState, "CI");
-                        break;
-
-                    case GDT_HW_GENERATION_VOLCANICISLAND:
-                        sp3_setasic(pDisasmState, "VI");
-                        break;
-
-                    default:
-                        // Should not happen.
-                        GT_ASSERT_EX(false, L"Unknown HW generation.");
-                        sp3_setasic(pDisasmState, "SI");
-                        break;
-                }
-            }
-        }
-
-        // Prepare the tokens.
-        unsigned* pIsaTokens = (unsigned*)&sectionData[0];
-
-        if (pIsaTokens != nullptr)
-        {
-            size_t isaTokensLen = sectionData.size() / 4;
-            pVm = sp3_vm_new_ptr(0, isaTokensLen, pIsaTokens);
-
-            // Prepare the flags.
-            unsigned disasmFlags = 0;
-            disasmFlags |= SP3DIS_FORCEVALID;
-
-            // Get the shader type.
-            const int shaderType = GetShaderType(target);
-
-            // Disassemble the code.
-            pDisassembledShader = sp3_disasm(pDisasmState, pVm, 0, shader.c_str(),
-                                             shaderType, NULL, (unsigned)isaTokensLen, disasmFlags);
-
-            if (pDisassembledShader != nullptr)
-            {
-
-                // Fill the buffer.
-                isaBuffer = string(pDisassembledShader);
-
-                // We are done.
-                ret = beKA::beStatus_SUCCESS;
-            }
-        }
-
-        // Release the memory.
-        sp3_close(pDisasmState);
-        UsePlatformNativeLineEndings(isaBuffer);
-        sp3_free(pDisassembledShader);
-        sp3_vm_free(pVm);
-    }
-
-    else
-    {
-        ret = beStatus_NO_ISA_FOR_DEVICE;
+        // We are done.
+        ret = beKA::beStatus_SUCCESS;
     }
 
     return ret;
@@ -1165,24 +866,30 @@ beKA::beStatus beProgramBuilderDX::GetDxShaderISAText(const string& deviceName, 
 beKA::beStatus beProgramBuilderDX::GetDxShaderIL(const std::string& device, std::string& isaBuffer)
 {
     beKA::beStatus ret = beStatus_NO_IL_FOR_DEVICE;
+    isaBuffer.clear();
 
     // Get the relevant ELF section for the required device.
     const CElfSection* pAmdilDiassemblySection = GetILDisassemblySection(device);
 
-    if (pAmdilDiassemblySection != nullptr)
+    // Extract the disassembly from the ELF section.
+    ExtractTextFromElfSection(pAmdilDiassemblySection, isaBuffer);
+    if (!isaBuffer.empty())
     {
-        // This is the disassembly section (ASCII representation).
-        const vector<char>& sectionData = pAmdilDiassemblySection->GetData();
-        isaBuffer = std::string(sectionData.begin(), sectionData.end());
-
-        if (!isaBuffer.empty())
-        {
-            // We are done.
-            ret = beKA::beStatus_SUCCESS;
-        }
+        // We are done.
+        ret = beKA::beStatus_SUCCESS;
     }
 
     return ret;
+}
+
+void beProgramBuilderDX::ExtractTextFromElfSection(const CElfSection* pSection, std::string& content)
+{
+    if (pSection != nullptr)
+    {
+        // This is the disassembly section (ASCII representation).
+        const vector<char>& sectionData = pSection->GetData();
+        content = std::string(sectionData.begin(), sectionData.end());
+    }
 }
 
 bool beProgramBuilderDX::GetIsaSize(const string& isaAsText, size_t& sizeInBytes) const
