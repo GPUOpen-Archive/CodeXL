@@ -675,7 +675,7 @@ void SessionFunctionView::updateDataFromPidComboBox()
                 m_functionsTablesFilter.m_allModulesFullPathsList.append(acGTStringToQString(module.m_path));
                 m_functionsTablesFilter.m_isModule32BitList.append(module.m_is64Bit ? false : true);
                 m_functionsTablesFilter.m_isSystemDllList.append(module.m_isSystemModule);
-                m_moduleNameIdMap.insert(make_pair(module.m_path, module.m_moduleId));
+                m_moduleNameIdMap.insert(std::make_pair(module.m_path, module.m_moduleId));
             }
         }
     }

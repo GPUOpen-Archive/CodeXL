@@ -36,7 +36,7 @@
 
 #define CP_CPU_TABLE_ROW_HEIGHT 18
 
-ModuleFilterDialog::ModuleFilterDialog(shared_ptr<cxlProfileDataReader> pProfDataRdr,
+ModuleFilterDialog::ModuleFilterDialog(std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
                                        TableDisplaySettings* pDisplaySettings,
                                        CPUSessionTreeItemData* pSessionData,
                                        bool isDisplaySysModEn,

@@ -200,7 +200,7 @@ CallGraphFuncListItem* CallGraphPathFuncList::AcquireChildItem(CallGraphFuncList
 }
 
 
-void CallGraphPathFuncList::SetFunctionPath(shared_ptr<cxlProfileDataReader> pProfDataRdr,
+void CallGraphPathFuncList::SetFunctionPath(std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
                                             AMDTFunctionId funcId,
                                             AMDTUInt32 processId,
                                             bool displaySystemModule)
@@ -932,8 +932,8 @@ bool SessionCallGraphView::ShowParentChild(AMDTFunctionId functionId)
 }
 
 void CallGraphFuncList::GetFunctionCount(std::pair<int, int>& sysDllCount,
-                                         const shared_ptr<DisplayFilter> pDisplayFilter,
-                                         shared_ptr<cxlProfileDataReader> pProfDataRdr,
+                                         const std::shared_ptr<DisplayFilter> pDisplayFilter,
+                                         std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
                                          AMDTUInt32 counterId,
                                          AMDTUInt32 processId)
 {
@@ -973,8 +973,8 @@ void CallGraphFuncList::GetFunctionCount(std::pair<int, int>& sysDllCount,
 
 }
 
-bool CallGraphFuncList::FillDisplayFuncList(shared_ptr<cxlProfileDataReader> pProfDataRdr,
-                                            shared_ptr<DisplayFilter> pDisplayFilter,
+bool CallGraphFuncList::FillDisplayFuncList(std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
+                                            std::shared_ptr<DisplayFilter> pDisplayFilter,
                                             AMDTUInt32 counterId,
                                             AMDTUInt32 processId,
                                             AMDTFunctionId& funcIdMaxSamples)
@@ -1474,7 +1474,7 @@ void CallGraphButterfly::clear()
 
 
 
-void CallGraphButterfly::SetParentsFunction(shared_ptr<cxlProfileDataReader> pProfDataRdr,
+void CallGraphButterfly::SetParentsFunction(std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
                                             bool displaySystemModule,
                                             AMDTUInt32 processId,
                                             AMDTUInt32 counterId,
@@ -1532,7 +1532,7 @@ void CallGraphButterfly::SetParentsFunction(shared_ptr<cxlProfileDataReader> pPr
 
 }
 
-void CallGraphButterfly::SetChildrenFunction(shared_ptr<cxlProfileDataReader> pProfDataRdr,
+void CallGraphButterfly::SetChildrenFunction(std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
                                              bool displaySystemModule,
                                              AMDTUInt32 processId,
                                              AMDTUInt32 counterId,
@@ -1648,7 +1648,7 @@ SessionCallGraphView::SessionCallGraphView(QWidget* pParent,
 
         if (true == m_pDisplayFilter->GetConfigCounters(acGTStringToQString(configName), counterDetails))
         {
-            m_selectedCounter = get<3>(counterDetails.at(0));
+            m_selectedCounter = std::get<3>(counterDetails.at(0));
         }
     }
 }

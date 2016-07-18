@@ -1297,7 +1297,7 @@ bool CpuSessionWindow::OpenDataReader()
         // validate if file exists
         if (!dbFilePath.isEmpty())
         {
-            shared_ptr<cxlProfileDataReader> reader(new cxlProfileDataReader);
+            std::shared_ptr<cxlProfileDataReader> reader(new cxlProfileDataReader);
             result = reader->OpenProfileData(dbFilePath.asString());
 
             if (true == result)

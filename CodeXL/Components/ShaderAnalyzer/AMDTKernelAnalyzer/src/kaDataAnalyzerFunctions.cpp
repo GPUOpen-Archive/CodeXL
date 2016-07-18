@@ -301,8 +301,8 @@ bool kaFindFamilyName(QString& deviceName, QString& familyName)
             else
             {
                 // go over the name and replace funny characters with _ because we later make it as a file name
-                string tempdeviceName;
-                string sOrigin = copyDevice.toStdString();
+                std::string tempdeviceName;
+                std::string sOrigin = copyDevice.toStdString();
                 kaNormelizeDeviceName(sOrigin, tempdeviceName);
 
                 if (tempdeviceName.find(deviceName.toStdString()) != std::string::npos)
@@ -384,14 +384,14 @@ class custom_directives_hooks : public context_policies::default_preprocessing_h
 public:
     //override default policy to check include files
     template <typename ContextT>
-    bool found_include_directive(ContextT const&, string const&,  bool)
+    bool found_include_directive(ContextT const&, std::string const&,  bool)
     {
         // not ok to include this include file
         return true;
     }
 };
 
-bool  ExpandMacros(string& inSourceCodeString, const wstring& rawSourceCodeFileName, const vector<string>& additionalMacros, vector<PreProcessedToken>& tokens)
+bool ExpandMacros(std::string& inSourceCodeString, const std::wstring& rawSourceCodeFileName, const std::vector<std::string>& additionalMacros, std::vector<PreProcessedToken>& tokens)
 {
     bool result = false;
 
@@ -410,7 +410,7 @@ bool  ExpandMacros(string& inSourceCodeString, const wstring& rawSourceCodeFileN
         //  This is the resulting context type. The first template parameter should
         //  match the iterator type used during construction of the context
         //  instance (see below). It is the type of the underlying input stream.
-        using context_type = context<string::iterator, lex_iterator_type, iteration_context_policies::load_file_to_string, custom_directives_hooks>;
+        using context_type = context<std::string::iterator, lex_iterator_type, iteration_context_policies::load_file_to_string, custom_directives_hooks>;
         //  The preprocessor iterator shouldn't be constructed directly. It is
         //  generated through a wave::context<> object. This wave:context<> object
         //  is additionally used to initialize and define different parameters of
@@ -472,7 +472,7 @@ bool  ExpandMacros(string& inSourceCodeString, const wstring& rawSourceCodeFileN
     return result;
 }
 
-bool ExpandMacros(const wstring& rawSourceCodeFileName, const vector<string>& additionalMacros, vector<PreProcessedToken>& tokens)
+bool ExpandMacros(const std::wstring& rawSourceCodeFileName, const std::vector<std::string>& additionalMacros, std::vector<PreProcessedToken>& tokens)
 {
     bool result = false;
 
@@ -484,17 +484,17 @@ bool ExpandMacros(const wstring& rawSourceCodeFileName, const vector<string>& ad
         gtString filename = rawSourceCodeFileName.c_str();
         ifstream instream(filename.asASCIICharArray());
 #else
-        ifstream instream(rawSourceCodeFileName);
+        std::ifstream instream(rawSourceCodeFileName);
 #endif
 
         if (instream.is_open())
         {
-            instream.unsetf(ios::skipws);
-            string instring = string(istreambuf_iterator<char>(instream.rdbuf()), istreambuf_iterator<char>());
+            instream.unsetf(std::ios::skipws);
+            std::string instring = std::string(std::istreambuf_iterator<char>(instream.rdbuf()), std::istreambuf_iterator<char>());
             result = ExpandMacros(instring, rawSourceCodeFileName, additionalMacros, tokens);
         }//if
     }//try
-    catch (exception const& e)
+    catch (std::exception const& e)
     {
         // use last recognized token to retrieve the error position
         gtString msg = L"Failed to parse :";
