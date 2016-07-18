@@ -735,8 +735,8 @@ JavaJncReader::GetOffsetLines(std::wstring funcName)
 
         for (i = 0 ; i < it->second->numstackframes; i++)
         {
-            wstring tmpStr(m_jncMethodMap[it->second->methods[i]].name.begin(),
-                           m_jncMethodMap[it->second->methods[i]].name.end());
+            std::wstring tmpStr(m_jncMethodMap[it->second->methods[i]].name.begin(),
+                                m_jncMethodMap[it->second->methods[i]].name.end());
 
             // parse method signature
             char parsedMethodSig[OS_MAX_PATH] = { 0 };
@@ -858,7 +858,7 @@ JavaJncReader::DumpJncPcStackInfoMap(FILE* f)
     (void)(f); // unused
 #if 0
     int line = -1;
-    string file;
+    std::string file;
 
     fprintf(f, "DumpJncPcStackInfoMap - (size:%u) n",
             m_jncPcStackInfoMap.size());
@@ -895,7 +895,7 @@ JavaJncReader::_getSrcInfoFromBcAndMethodID(
     jint bc,
     jmethodID id,
     int& srcLine,
-    string& srcFile
+    std::string& srcFile
 )
 {
     bool ret = false;
@@ -998,9 +998,9 @@ JavaJncReader::_getLineFromAddrVec(
 
 bool
 JavaJncReader::GetSrcInfoFromAddressWithFile(
-    gtUInt64  addr,
+    gtUInt64            addr,
     int&                srcLine,
-    string&             srcFile
+    std::string&        srcFile
 )
 {
     // Check if this address belongs to the code section of this module
@@ -1052,7 +1052,7 @@ JavaJncReader::GetSrcInfoFromAddressWithFile(
 
         for (level = 0; level < rit->second->numstackframes; level++)
         {
-            string file;
+            std::string file;
             _getSrcInfoFromBcAndMethodID(rit->second->bcis[level],
                                          rit->second->methods[level],
                                          srcLine,
@@ -1077,9 +1077,9 @@ JavaJncReader::GetSrcInfoFromAddressWithFile(
 
 bool
 JavaJncReader::GetSrcInfoFromAddress(
-    gtUInt64  addr,
+    gtUInt64            addr,
     int&                srcLine,
-    string&             srcFile,
+    std::string&        srcFile,
     int&                inlineDepth
 )
 {
@@ -1149,10 +1149,10 @@ JavaJncReader::GetSrcInfoFromAddress(
 
 bool
 JavaJncReader::GetSymbolAndRangeFromAddr(
-    gtUInt64  addr,
-    string&    symName,
-    gtUInt64&  startAddr,
-    gtUInt64&  endAddr
+    gtUInt64     addr,
+    std::string& symName,
+    gtUInt64&    startAddr,
+    gtUInt64&    endAddr
 )
 {
     bool bRet = false;
