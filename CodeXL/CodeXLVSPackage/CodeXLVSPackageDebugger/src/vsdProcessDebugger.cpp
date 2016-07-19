@@ -921,6 +921,8 @@ void vsdProcessDebugger::handleExceptionEvent(IDebugEvent2* piEvent, IDebugExcep
 
                 if (continueException)
                 {
+                    osCriticalSectionLocker threadControlLocker(m_threadControlCS);
+
                     // TO_DO: handle kernel debugging entry and exit BPs
                     m_bpThreadId = threadId;
                     m_isAPIBreakpoint = isSpyException;
@@ -995,6 +997,8 @@ void vsdProcessDebugger::handleExceptionEvent(IDebugEvent2* piEvent, IDebugExcep
 // ---------------------------------------------------------------------------
 void vsdProcessDebugger::handleBreakpointEvent(IDebugEvent2* piEvent, IDebugBreakpointEvent2* piBreakpointEvent, IDebugThread2* piThread, bool& continueBreakpoint)
 {
+    osCriticalSectionLocker threadControlLocker(m_threadControlCS);
+
     continueBreakpoint = true;
 
     osThreadId threadId = OS_NO_THREAD_ID;
@@ -1203,6 +1207,7 @@ void vsdProcessDebugger::handleStepCompleteEvent(IDebugEvent2* piEvent, IDebugTh
     // This event will sometimes arrive while the step command issuing is still being processed.
     // Wait for that operation to complete before handling the event:
     osWaitForFlagToTurnOff(m_issuingStepCommand, ULONG_MAX);
+    osCriticalSectionLocker threadControlLocker(m_threadControlCS);
 
     continueStep = true;
 
