@@ -21,6 +21,8 @@
 #include <QShortcut>
 #include <QStatusBar>
 
+#include <algorithm>
+
 // Infra:
 #include <AMDTBaseTools/Include/gtHashMap.h>
 #include <AMDTApplicationComponents/Include/acItemDelegate.h>
@@ -1006,6 +1008,8 @@ bool CallGraphFuncList::FillDisplayFuncList(std::shared_ptr<cxlProfileDataReader
         AMDTCallGraphFunctionVec callGraphFuncs;
         ret = pProfDataRdr->GetCallGraphFunctions(processId, counterId, callGraphFuncs);
 
+        m_funcIdVec.clear();
+
         for (const auto& callGraphFunc : callGraphFuncs)
         {
             AddFuncListItem(callGraphFunc.m_functionInfo.m_functionId,
@@ -1024,6 +1028,8 @@ bool CallGraphFuncList::FillDisplayFuncList(std::shared_ptr<cxlProfileDataReader
                 masSampleValue      = callGraphFunc.m_totalSelfSamples;
                 funcIdMaxSamples    = callGraphFunc.m_functionInfo.m_functionId;
             }
+
+            m_funcIdVec.push_back(callGraphFunc.m_functionInfo.m_functionId);
         }
 
         m_pFuncTable->setSortingEnabled(true);
@@ -1681,8 +1687,10 @@ SessionCallGraphView::~SessionCallGraphView()
 
 void SessionCallGraphView::FunctionListSelectionDone(AMDTFunctionId functionId)
 {
-    if (0 != functionId)
+    if (m_pFuncIdSelected != functionId)
     {
+        m_pFuncIdSelected = functionId;
+
         ShowPaths(functionId);
         ShowParentChild(functionId);
         emit functionSelected(functionId);
@@ -1776,8 +1784,25 @@ void SessionCallGraphView::showPid(unsigned int pid)
         AMDTFunctionId funcIdMaxSamples = 0;
         m_pFuncTable->FillDisplayFuncList(m_pProfDataRdr, m_pDisplayFilter, m_selectedCounter, m_selectedPID, funcIdMaxSamples);
 
-        ShowParentChild(funcIdMaxSamples);
-        ShowPaths(funcIdMaxSamples);
+        // initially set the functionId to function having maximum samples.
+        if (AMDT_PROFILE_ALL_FUNCTIONS == m_pFuncIdSelected)
+        {
+            m_pFuncIdSelected = funcIdMaxSamples;
+        }
+
+        const std::vector<AMDTFunctionId>& funcVector = m_pFuncTable->m_funcIdVec;
+
+        // scenario when the selected funcid does not exist, point to the
+        // function having maximum samples.
+        if (std::end(funcVector) == std::find(std::begin(funcVector), std::end(funcVector), m_pFuncIdSelected))
+        {
+            m_pFuncIdSelected = funcIdMaxSamples;
+        }
+
+        ShowParentChild(m_pFuncIdSelected);
+        ShowPaths(m_pFuncIdSelected);
+        emit functionSelected(m_pFuncIdSelected);
+
     }
 }
 

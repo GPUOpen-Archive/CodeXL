@@ -251,7 +251,7 @@ public:
                                            gtUInt32 srcFileLine,
                                            AMDTUInt32 moduleId);
 
-    std::map<gtString, std::pair<int, AMDTFunctionId>> m_FuncNameIdxMap;
+	std::vector<AMDTFunctionId> m_funcIdVec;
 
 public slots:
     void selectAFunction(AMDTFunctionId funcId);
@@ -425,7 +425,7 @@ private:
     acWidgetAction* m_pPidComboAction = nullptr;
     CallGraphFuncList* m_pFuncTable = nullptr;
     CallGraphPathFuncList* m_pPathFuncTable = nullptr;
-
+	AMDTFunctionId m_pFuncIdSelected = AMDT_PROFILE_ALL_FUNCTIONS;
     QSplitter* m_pSplitter = nullptr;
 
     acWidgetAction* m_pHotSpotIndicatorComboBoxAction = nullptr;
