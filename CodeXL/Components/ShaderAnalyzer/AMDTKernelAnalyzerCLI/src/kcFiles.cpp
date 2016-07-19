@@ -33,7 +33,7 @@ using namespace std;
 
 bool KAUtils::ReadProgramSource(const string& inputFile, string& programSource)
 {
-    ifstream input;
+    std::ifstream input;
 
 #ifndef _WIN32
     // test if the input file is a directory.
@@ -60,11 +60,11 @@ bool KAUtils::ReadProgramSource(const string& inputFile, string& programSource)
         return false;
     }
 
-    ifstream::pos_type fileSize = 0;
+    std::ifstream::pos_type fileSize = 0;
 
     fileSize = input.tellg();
 
-    if (fileSize == static_cast<ifstream::pos_type>(0))
+    if (fileSize == static_cast<std::ifstream::pos_type>(0))
     {
         input.close();
         return false;
