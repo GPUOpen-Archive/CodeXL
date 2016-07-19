@@ -524,6 +524,10 @@ bool SessionOverviewWindow::displaySessionProfileDetails(afHTMLContent& content)
             firstColStr.appendFormattedString(L"<b>%ls:</b> %u", CP_overviewPageTotalThreads, threadsCount);
             content.addHTMLItem(afHTMLContent::AP_HTML_LINE, firstColStr);
 
+            // Reset reporting options
+            reportOptions = m_pDisplayFilter->GetProfileDataOptions();
+            m_pProfDataRdr->SetReportOption(reportOptions);
+
             retVal = true;
         }
     }
