@@ -2734,7 +2734,7 @@ bool PrdTranslator::WriteCallgraphProfileDataIntoDB(const NameModuleMap& moduleM
 
                                             pModuleInstanceList->emplace_back(modInfo.m_instanceId,
                                                 modInfo.m_moduleId,
-                                                modInfo.m_pid,
+                                                pid,
                                                 modInfo.m_moduleStartAddr);
                                         }
                                     }

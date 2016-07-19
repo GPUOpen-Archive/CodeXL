@@ -1673,7 +1673,7 @@ public:
 
             auto it = m_modOffsetFuncInfoMap.find(unknownFuncModOffset);
 
-            if (it != m_modOffsetFuncInfoMap.end())
+            if (it == m_modOffsetFuncInfoMap.end())
             {
                 // Set the new function id
                 func.m_functionId |= m_currentUnknownFuncId++;
@@ -1709,6 +1709,31 @@ public:
         }
 
         return true;
+    }
+
+    bool HandleUnknownFunction(AMDTProfileFunctionInfo& func)
+    {
+        bool ret = false;
+
+        if (IS_UNKNOWN_FUNC(func.m_functionId))
+        {
+            gtUInt32 funcOffset = func.m_startOffset;
+            AMDTModuleId moduleId = func.m_moduleId;
+            gtUInt64 unknownFuncModOffset;
+            GET_MODOFFSET_FOR_UNKNOWN_FUNC(moduleId, funcOffset, unknownFuncModOffset);
+
+            auto it = m_modOffsetFuncInfoMap.find(unknownFuncModOffset);
+
+            if (it != m_modOffsetFuncInfoMap.end())
+            {
+                func.m_functionId = it->second.m_functionId;
+                func.m_name = it->second.m_name;
+            }
+
+            ret = false;
+        }
+
+        return ret;
     }
 
     // based on m_options.counters..
@@ -3705,13 +3730,18 @@ public:
 
                 for (auto frameIt = frames.rbegin(); frameIt != frames.rend(); ++frameIt)
                 {
-                    AMDTCallGraphFunction cgFunc;
+                    AMDTProfileFunctionInfo& funcInfo = (*frameIt).m_funcInfo;
 
+                    if (IS_UNKNOWN_FUNC(funcInfo.m_functionId))
+                    {
+                        HandleUnknownFunction(funcInfo);
+                    }
+
+                    AMDTCallGraphFunction cgFunc;
                     CopyCGFunction(cgFunc, (*frameIt), samples);
                     aPath.push_back(cgFunc);
                 }
 
-                
                 if (aPath.size() > 0)
                 {
                     // add the leaf node
@@ -3767,8 +3797,14 @@ public:
 
                     for (auto frameIt = frames.rbegin(); frameIt != frames.rend(); ++frameIt)
                     {
-                        AMDTCallGraphFunction cgFunc;
+                        AMDTProfileFunctionInfo& funcInfo = (*frameIt).m_funcInfo;
 
+                        if (IS_UNKNOWN_FUNC(funcInfo.m_functionId))
+                        {
+                            HandleUnknownFunction(funcInfo);
+                        }
+
+                        AMDTCallGraphFunction cgFunc;
                         CopyCGFunction(cgFunc, (*frameIt), samples);
                         aPath.push_back(cgFunc);
                     }
@@ -3905,10 +3941,12 @@ public:
                     m_pDbAdapter->UpdateCallstackLeaf(funcInfo);
                     m_pDbAdapter->UpdateCallstackFrame(funcInfo);
 
-                    ret = true;
+                    // In case, if we have not seen the function that contains the sample address
+                    ret = ((pFuncSymbol->m_rva + funcSize) < funcInfo.m_startOffset) ? false : true;
                 }
             }
-            else
+            
+            if (!ret)
             {
                 // Add the unknownfunction
                 AMDTProfileModuleInfo modInfo;
