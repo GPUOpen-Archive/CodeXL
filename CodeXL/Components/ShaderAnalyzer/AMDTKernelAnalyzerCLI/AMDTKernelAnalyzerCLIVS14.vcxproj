@@ -97,10 +97,10 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Release_Static|Win32'">wsock32.lib;Ws2_32.lib;$(COMMONDIR)\Lib\AMD\sp3\Lib\VS2015\MD\Release\x86\sp3.lib;$(COMMONDIR)\Lib\AMD\DX10ASM\Lib\VS2015\Win32\Release\DX10ASMLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Release_Static|x64'">wsock32.lib;Ws2_32.lib;$(COMMONDIR)\Lib\AMD\sp3\Lib\VS2015\MD\Release\x64\sp3.lib;$(COMMONDIR)\Lib\AMD\DX10ASM\Lib\VS2015/x64\Release\DX10ASMLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug_Static|Win32'">wsock32.lib;Ws2_32.lib;$(COMMONDIR)\Lib\AMD\sp3\Lib\VS2015\MD\Debug\x86\SP3.lib;$(COMMONDIR)\Lib\AMD\DX10ASM\Lib\VS2015\Win32\Debug\DX10ASMLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug_Static|x64'">wsock32.lib;Ws2_32.lib;$(COMMONDIR)\Lib\AMD\sp3\Lib\VS2015\MD\Debug\x64\SP3.lib;$(COMMONDIR)\Lib\AMD\DX10ASM\Lib\VS2015\x64\Debug\DX10ASMLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Release_Static|Win32'">wsock32.lib;Ws2_32.lib;$(COMMONDIR)\Lib\AMD\DX10ASM\Lib\VS2015\Win32\Release\DX10ASMLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Release_Static|x64'">wsock32.lib;Ws2_32.lib;$(COMMONDIR)\Lib\AMD\DX10ASM\Lib\VS2015/x64\Release\DX10ASMLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug_Static|Win32'">wsock32.lib;Ws2_32.lib;$(COMMONDIR)\Lib\AMD\DX10ASM\Lib\VS2015\Win32\Debug\DX10ASMLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug_Static|x64'">wsock32.lib;Ws2_32.lib;$(COMMONDIR)\Lib\AMD\DX10ASM\Lib\VS2015\x64\Debug\DX10ASMLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CXLAnalysisBackend$(GDTProjectSuffix).lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CXLAnalysisBackend$(GDTProjectSuffix).lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CXLAnalysisBackend$(GDTProjectSuffix).lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
