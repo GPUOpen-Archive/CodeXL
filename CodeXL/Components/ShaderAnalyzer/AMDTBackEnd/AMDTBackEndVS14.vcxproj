@@ -39,6 +39,7 @@
     <ProjectGuid>{C1F67D19-DD6E-4946-B16D-F4F4D125424B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>AMDTAnalysisBackend</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.10586.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)'=='Release'" Label="Configuration">
