@@ -522,7 +522,11 @@ int main(int argc, char* argv[])
                         gtVector<AMDTUInt32> profiledCounterIdVec;
                         collect.GetProfiledCounterIdVec(profiledCounterIdVec);
 
-                        pReporter->SetCounterDesc(supportedCounterIdDescVec, supportedCounterIdNameVec, profiledCounterIdVec);
+                        AMDTPwrCounterMap counterMap;
+
+                        collect.GetSupportedCounterMap(counterMap);
+
+                        pReporter->SetCounterDesc(supportedCounterIdDescVec, counterMap, supportedCounterIdNameVec, profiledCounterIdVec);
 
                         pReporter->ReportHeader();
                     }

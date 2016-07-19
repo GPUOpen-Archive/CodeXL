@@ -125,6 +125,8 @@ typedef gtVector<gtString> AMDTPwrDeviceIdNameVec; // Device ID-Name vector
 
 typedef gtMap<gtString, AMDTPwrCounterDesc*> AMDTPwrCounterNameDescMap; // Name - Counter Desc Map
 typedef gtVector<AMDTPwrCounterDesc*> AMDTPwrCounterIdDescVec; // ID-Desc vector
+
+typedef gtMap<AMDTUInt32, AMDTPwrCounterDesc> AMDTPwrCounterMap;
 typedef gtVector<gtString> AMDTPwrCounterIdNameVec; // CounterID-Name vector
 
 typedef gtMap <AMDTUInt32, PwrSupportedCounterDetails> PwrSupportedCounterDetailsMap;

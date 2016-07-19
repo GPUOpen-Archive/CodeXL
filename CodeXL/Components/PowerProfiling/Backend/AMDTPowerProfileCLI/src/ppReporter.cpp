@@ -75,15 +75,28 @@ bool ppReporter::ReportProfiledCounterDesc()
     // Write Counter descriptors
     if (m_profiledCounterIdVec.size() > 0)
     {
-        for (AMDTUInt32 i = 0; i < m_profiledCounterIdVec.size(); i++)
+
+        for (auto iter : m_supportedCounterMap)
         {
-            AMDTUInt32 counterId = m_profiledCounterIdVec[i];
-            const AMDTPwrCounterDesc* pDesc = m_supportedCounterIdDescVec[counterId];
-            gtString counterName = m_supportedCounterIdNameVec[counterId];
+            bool isActivated = false;
 
-            ConstructProfiledCounterDesc(counterName, pDesc);
+            for (AMDTUInt32 i = 0; i < m_profiledCounterIdVec.size(); i++)
+            {
+                if (iter.first == m_profiledCounterIdVec[i])
+                {
+                    isActivated = true;
+                    break;
+                }
+            }
 
-            m_dataStr.append(m_pDataStr);
+            if (isActivated)
+            {
+                const AMDTPwrCounterDesc* pDesc = &iter.second;
+                gtString counterName = m_supportedCounterIdNameVec[iter.first];
+
+                ConstructProfiledCounterDesc(counterName, pDesc);
+                m_dataStr.append(m_pDataStr);
+            }
         }
     }
 
@@ -333,29 +346,37 @@ void ppReporterText::ConstructProfiledCounterData(AMDTUInt32& nbrSamples, AMDTPw
 
         for (AMDTUInt32 j = 0; j < pSample->m_numOfValues; j++)
         {
-            switch (m_supportedCounterIdDescVec[pSample->m_counterValues[j].m_counterID]->m_units)
+            AMDTPwrUnit unit = AMDT_PWR_UNIT_TYPE_PERCENT;
+            AMDTPwrCounterMap::iterator iter = m_supportedCounterMap.find(pSample->m_counterValues[j].m_counterID);
+
+            if (iter != m_supportedCounterMap.end())
             {
-                case AMDT_PWR_UNIT_TYPE_COUNT:
-                case AMDT_PWR_UNIT_TYPE_MILLI_SECOND:
-                    sprintf(m_pDataStr, "%6u            ", static_cast<AMDTUInt32>(pSample->m_counterValues[j].m_counterValue));
-                    break;
+                unit = iter->second.m_units;
 
-                case AMDT_PWR_UNIT_TYPE_PERCENT:
-                case AMDT_PWR_UNIT_TYPE_RATIO:
-                case AMDT_PWR_UNIT_TYPE_JOULE:
-                case AMDT_PWR_UNIT_TYPE_WATT:
-                case AMDT_PWR_UNIT_TYPE_MILLI_AMPERE:
-                case AMDT_PWR_UNIT_TYPE_MEGA_HERTZ:
-                case AMDT_PWR_UNIT_TYPE_CENTIGRADE:
-                    sprintf(m_pDataStr, "%8.3f          ", pSample->m_counterValues[j].m_counterValue);
-                    break;
+                switch (unit)
+                {
+                    case AMDT_PWR_UNIT_TYPE_COUNT:
+                    case AMDT_PWR_UNIT_TYPE_MILLI_SECOND:
+                        sprintf(m_pDataStr, "%6u            ", static_cast<AMDTUInt32>(pSample->m_counterValues[j].m_counterValue));
+                        break;
 
-                case AMDT_PWR_UNIT_TYPE_VOLT:
-                    sprintf(m_pDataStr, "%7.4f           ", pSample->m_counterValues[j].m_counterValue);
-                    break;
+                    case AMDT_PWR_UNIT_TYPE_PERCENT:
+                    case AMDT_PWR_UNIT_TYPE_RATIO:
+                    case AMDT_PWR_UNIT_TYPE_JOULE:
+                    case AMDT_PWR_UNIT_TYPE_WATT:
+                    case AMDT_PWR_UNIT_TYPE_MILLI_AMPERE:
+                    case AMDT_PWR_UNIT_TYPE_MEGA_HERTZ:
+                    case AMDT_PWR_UNIT_TYPE_CENTIGRADE:
+                        sprintf(m_pDataStr, "%8.3f          ", pSample->m_counterValues[j].m_counterValue);
+                        break;
 
-                default:
-                    break;
+                    case AMDT_PWR_UNIT_TYPE_VOLT:
+                        sprintf(m_pDataStr, "%7.4f           ", pSample->m_counterValues[j].m_counterValue);
+                        break;
+
+                    default:
+                        break;
+                }
             }
 
             m_dataStr.append(m_pDataStr);
@@ -673,26 +694,34 @@ void ppReporterCsv::ConstructProfiledCounterData(AMDTUInt32& nbrSamples, AMDTPwr
 
         for (AMDTUInt32 j = 0; j < pSample->m_numOfValues; j++)
         {
-            switch (m_supportedCounterIdDescVec[pSample->m_counterValues[j].m_counterID]->m_units)
+            AMDTPwrUnit unit = AMDT_PWR_UNIT_TYPE_PERCENT;
+            AMDTPwrCounterMap::iterator iter = m_supportedCounterMap.find(pSample->m_counterValues[j].m_counterID);
+
+            if (iter != m_supportedCounterMap.end())
             {
-                case AMDT_PWR_UNIT_TYPE_COUNT:
-                case AMDT_PWR_UNIT_TYPE_MILLI_SECOND:
-                    sprintf(m_pDataStr, ",%6u", static_cast<AMDTUInt32>(pSample->m_counterValues[j].m_counterValue));
-                    break;
+                unit = iter->second.m_units;
 
-                case AMDT_PWR_UNIT_TYPE_PERCENT:
-                case AMDT_PWR_UNIT_TYPE_RATIO:
-                case AMDT_PWR_UNIT_TYPE_JOULE:
-                case AMDT_PWR_UNIT_TYPE_WATT:
-                case AMDT_PWR_UNIT_TYPE_VOLT:
-                case AMDT_PWR_UNIT_TYPE_MILLI_AMPERE:
-                case AMDT_PWR_UNIT_TYPE_CENTIGRADE:
-                case AMDT_PWR_UNIT_TYPE_MEGA_HERTZ:
-                    sprintf(m_pDataStr, ",%8.3f", pSample->m_counterValues[j].m_counterValue);
-                    break;
+                switch (unit)
+                {
+                    case AMDT_PWR_UNIT_TYPE_COUNT:
+                    case AMDT_PWR_UNIT_TYPE_MILLI_SECOND:
+                        sprintf(m_pDataStr, ",%6u", static_cast<AMDTUInt32>(pSample->m_counterValues[j].m_counterValue));
+                        break;
 
-                default:
-                    break;
+                    case AMDT_PWR_UNIT_TYPE_PERCENT:
+                    case AMDT_PWR_UNIT_TYPE_RATIO:
+                    case AMDT_PWR_UNIT_TYPE_JOULE:
+                    case AMDT_PWR_UNIT_TYPE_WATT:
+                    case AMDT_PWR_UNIT_TYPE_VOLT:
+                    case AMDT_PWR_UNIT_TYPE_MILLI_AMPERE:
+                    case AMDT_PWR_UNIT_TYPE_CENTIGRADE:
+                    case AMDT_PWR_UNIT_TYPE_MEGA_HERTZ:
+                        sprintf(m_pDataStr, ",%8.3f", pSample->m_counterValues[j].m_counterValue);
+                        break;
+
+                    default:
+                        break;
+                }
             }
 
             m_dataStr.append(m_pDataStr);

@@ -116,6 +116,18 @@ public:
 
         return retVal;
     }
+    AMDTResult GetSupportedCounterMap(AMDTPwrCounterMap& counterMap)
+    {
+        m_error = AMDT_ERROR_FAIL;
+
+        if (!isProfileStateUninitialized())
+        {
+            counterMap = m_supportedCounterMap;
+            m_error = AMDT_STATUS_OK;
+        }
+
+        return m_error;
+    }
 
     AMDTResult GetSupportedCounterIdDescVec(AMDTPwrCounterIdDescVec& counterDescVec)
     {
@@ -289,6 +301,7 @@ public:
     bool InitDb(AMDTProfileSessionInfo& sessionInfo);
     bool WriteSamplesIntoDb();
     AMDTPwrCounterIdDescVec   m_supportedCounterIdDescVec;    // ID-Desc vector
+    AMDTPwrCounterMap         m_supportedCounterMap;
     PwrSupportedCounterDetailsMap m_supportedCounters;
 
 private:

@@ -525,6 +525,7 @@ AMDTResult ppCollect::EnableProfiling()
 
             // ID-Desc vector (counter-id is used as index)
             m_supportedCounterIdDescVec[m_pSupportedCountersDesc[i].m_counterID] = &m_pSupportedCountersDesc[i];
+            m_supportedCounterMap.insert(AMDTPwrCounterMap::value_type(m_pSupportedCountersDesc[i].m_counterID, *(m_pSupportedCountersDesc + i)));
 
             // counter name used in reporting
             wchar_t counterNameW[OS_MAX_PATH];
@@ -559,10 +560,6 @@ AMDTResult ppCollect::EnableProfiling()
             }
         }
     }
-
-    // FIXME
-    // m_supportedCounterIdDescVec.shrink_to_fit();
-    // m_supportedCounterIdNameVec.shrink_to_fit();
 
     m_isProfilingEnabled = (AMDT_STATUS_OK == m_error) ? true : false;
 

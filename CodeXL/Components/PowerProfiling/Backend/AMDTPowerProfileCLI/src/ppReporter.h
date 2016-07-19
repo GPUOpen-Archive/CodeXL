@@ -102,10 +102,12 @@ public:
     void SetProfileStartTime(std::string startTime) { m_profStartTime = startTime; }
 
     void SetCounterDesc(AMDTPwrCounterIdDescVec& supportedCounterIdDescVec,
+		                AMDTPwrCounterMap& supportedCountMap,
                         AMDTPwrCounterIdNameVec& supportedCounterIdNameVec,
                         gtVector<AMDTUInt32>& profiledCounterIdVec)
     {
         m_supportedCounterIdDescVec = supportedCounterIdDescVec;
+		m_supportedCounterMap = supportedCountMap;
         m_supportedCounterIdNameVec = supportedCounterIdNameVec;
         m_profiledCounterIdVec = profiledCounterIdVec;
     }
@@ -147,6 +149,7 @@ protected:
     AMDTPwrCounterIdDescVec   m_supportedCounterIdDescVec;
     AMDTPwrCounterIdNameVec   m_supportedCounterIdNameVec;    // ID-Name vector
     gtVector<AMDTUInt32>      m_profiledCounterIdVec; // vector of all profiled counter-ids
+    AMDTPwrCounterMap         m_supportedCounterMap;
 
 };
 
