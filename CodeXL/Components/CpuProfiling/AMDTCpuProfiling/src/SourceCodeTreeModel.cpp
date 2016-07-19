@@ -508,7 +508,10 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
             {
                 if (true == flag)
                 {
-                    pAsmItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, aSampleValue.m_sampleCount);
+                    QVariant var;
+                    SetDisplayFormat(aSampleValue.m_sampleCount, false, var, SAMPLE_PRECISION);
+                    pAsmItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, var);
+
                     pAsmItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, aSampleValue.m_sampleCountPercentage);
                     pAsmItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
 
@@ -789,10 +792,10 @@ void SourceCodeTreeModel::PrintFunctionDetailData(AMDTProfileFunctionData data,
         auto sampleValue = srcData.m_sampleValues.at(0).m_sampleCount;
         auto sampleValuePer = srcData.m_sampleValues.at(0).m_sampleCountPercentage;
 
-        pLineItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, sampleValue);
-
         QVariant var;
-        SetDisplayFormat(sampleValuePer, true, var, SAMPLE_PERCENT_PRECISION);
+        SetDisplayFormat(sampleValue, false, var, SAMPLE_PRECISION);
+        pLineItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, var);
+
         pLineItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, sampleValuePer);
 
         pLineItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
@@ -836,10 +839,10 @@ void SourceCodeTreeModel::PrintFunctionDetailData(AMDTProfileFunctionData data,
                 auto sampleCount = sampleValue.at(0).m_sampleCount;
                 auto sampleCountPer = sampleValue.at(0).m_sampleCountPercentage;
 
-                pAsmItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, sampleCount);
-
                 QVariant var;
-                SetDisplayFormat(sampleValuePer, true, var, SAMPLE_PERCENT_PRECISION);
+                SetDisplayFormat(sampleCount, false, var, SAMPLE_PRECISION);
+                pAsmItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, var);
+
                 pAsmItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, sampleCountPer);
 
                 pAsmItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
@@ -3005,13 +3008,12 @@ void SourceCodeTreeModel::SetHotSpotSamples(AMDTUInt32 counterId)
                     gtVector<gtVAddr> instOffsetVec;
                     GetInstOffsets(lineNumber, srcInfoVec, instOffsetVec);
 
-                    auto sampleValue = counter.m_sampleCount;
                     auto sampleValuePer = counter.m_sampleCountPercentage;
 
-                    pLineItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, sampleValue);
-
                     QVariant var;
-                    SetDisplayFormat(sampleValuePer, true, var, SAMPLE_PERCENT_PRECISION);
+                    SetDisplayFormat(sampleValuePer, false, var, SAMPLE_PRECISION);
+                    pLineItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, var);
+
                     pLineItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, sampleValuePer);
                     pLineItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
 
@@ -3036,10 +3038,11 @@ void SourceCodeTreeModel::SetHotSpotSamples(AMDTUInt32 counterId)
                                 {
                                     auto sampleCount = sample.m_sampleCount;
                                     auto sampleCountPer = sample.m_sampleCountPercentage;
-                                    pAsmItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, sampleCount);
 
                                     QVariant var;
-                                    SetDisplayFormat(sampleValuePer, true, var, SAMPLE_PERCENT_PRECISION);
+                                    SetDisplayFormat(sampleCount, false, var, SAMPLE_PRECISION);
+                                    pAsmItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, var);
+
                                     pAsmItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, sampleCountPer);
                                     pAsmItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
                                 }
