@@ -154,6 +154,7 @@ void CallGraphPathFuncList::InitializeItem(CallGraphFuncListItem* pFuncListItem,
     gtString modNameWithExt;
     moduleFullPath.getFileNameAndExtension(modNameWithExt);
 
+
     pFuncListItem->setText(CALLGRAPH_PATH_MODULE, acGTStringToQString(modNameWithExt));
 }
 
@@ -231,6 +232,11 @@ void CallGraphPathFuncList::SetFunctionPath(std::shared_ptr<cxlProfileDataReader
                                                  func.m_functionInfo.m_functionId,
                                                  func.m_functionInfo.m_name,
                                                  func.m_functionInfo.m_modulePath);
+
+                pFuncListItem->m_functionId = func.m_functionInfo.m_functionId;
+                pFuncListItem->m_functionName = func.m_functionInfo.m_name;
+                pFuncListItem->m_moduleName = func.m_functionInfo.m_modulePath;
+                pFuncListItem->m_moduleId = func.m_functionInfo.m_moduleId;
 
                 pFuncListItem->setExpanded(true);
                 //m_pFuncTable->collapseItem(pFuncListItem);
@@ -1491,12 +1497,12 @@ void CallGraphButterfly::SetParentsFunction(std::shared_ptr<cxlProfileDataReader
     AMDTCallGraphFunctionVec children;
 
     pProfDataRdr->GetCallGraphFunctionInfo(processId, funcId, parents, children);
-	double totalDeepCount = 0;
+    double totalDeepCount = 0;
 
-	if (!cgFuncs.empty())
-	{
-		totalDeepCount = cgFuncs.at(0).m_totalDeepSamples;
-	}
+    if (!cgFuncs.empty())
+    {
+        totalDeepCount = cgFuncs.at(0).m_totalDeepSamples;
+    }
 
     const bool noSamples = (0ULL == totalDeepCount);
     double systemSamplesCount = 0ULL;
@@ -1553,12 +1559,12 @@ void CallGraphButterfly::SetChildrenFunction(std::shared_ptr<cxlProfileDataReade
     AMDTCallGraphFunctionVec childrens;
 
     pProfDataRdr->GetCallGraphFunctionInfo(processId, funcId, parents, childrens);
-	double totalDeepCount = 0;
+    double totalDeepCount = 0;
 
-	if (!cgFuncs.empty())
-	{
-		totalDeepCount = cgFuncs.at(0).m_totalDeepSamples;
-	}
+    if (!cgFuncs.empty())
+    {
+        totalDeepCount = cgFuncs.at(0).m_totalDeepSamples;
+    }
 
     const bool noSamples = (0ULL == totalDeepCount);
     //qulonglong systemSamplesCount = 0ULL;
@@ -1656,10 +1662,10 @@ SessionCallGraphView::SessionCallGraphView(QWidget* pParent,
 
         if (true == m_pDisplayFilter->GetConfigCounters(acGTStringToQString(configName), counterDetails))
         {
-			if (!counterDetails.empty())
-			{
-				m_selectedCounter = std::get<3>(counterDetails.at(0));
-			}
+            if (!counterDetails.empty())
+            {
+                m_selectedCounter = std::get<3>(counterDetails.at(0));
+            }
         }
     }
 }
