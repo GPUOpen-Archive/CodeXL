@@ -25,6 +25,8 @@
 
 AMDTResult ppCollect::Initialize()
 {
+    m_cumulativeCounterIdVec.clear();
+
     // Validate the profile options
     ValidateProfileOptions();
 
@@ -584,10 +586,25 @@ AMDTResult ppCollect::ValidateCounters()
         // If any device id is specified
         gtList<AMDTUInt32> deviceIdList = m_args.GetDeviceIDList();
 
+
         for (gtList<AMDTUInt32>::iterator iter = deviceIdList.begin(); iter != deviceIdList.end(); iter++)
         {
             AMDTUInt32 deviceId = (*iter);
-            bool foundDevice = false;
+            //            bool foundDevice = false;
+            AMDTUInt32 count = 0;
+            AMDTPwrCounterDesc* pDesc = nullptr;
+
+            AMDTPwrGetDeviceCounters(deviceId, &count, &pDesc);
+
+            for (AMDTUInt32 i = 0; i < count; i++)
+            {
+                if (AMDTUInt32(AMDT_PWR_VALUE_SINGLE == (pDesc + i)->m_aggregation))
+                {
+                    AddValidCounterId((pDesc + i)->m_counterID);
+                }
+            }
+
+#if 0
 
             for (AMDTUInt32 i = 0; i < m_nbrSupportedCounters; i++)
             {
@@ -610,6 +627,8 @@ AMDTResult ppCollect::ValidateCounters()
                 ReportError(false, "Invalid device(%u).\n", deviceId);
                 m_error = AMDT_ERROR_FAIL;
             }
+
+#endif
         }
 
         gtList<AMDTUInt32> counterIdList = m_args.GetCounterIDList();
@@ -977,8 +996,17 @@ bool ppCollect::GetCounterAggregationType(AMDTUInt32 counterId, AMDTPwrAggregati
 {
     if (counterId < m_supportedCounterIdDescVec.max_size())
     {
-        aggregationType = m_supportedCounterIdDescVec[counterId]->m_aggregation;
-        return true;
+        AMDTUInt32 cnt = 0;
+
+        for (cnt = 0; cnt < m_supportedCounterIdDescVec.size(); cnt++)
+        {
+            if (counterId == m_supportedCounterIdDescVec[cnt]->m_counterID)
+            {
+                aggregationType = m_supportedCounterIdDescVec[cnt]->m_aggregation;
+                return true;
+                break;
+            }
+        }
     }
 
     return false;
@@ -1052,13 +1080,13 @@ AMDTResult ppCollect::LoadPcoreModule()
         // use that to get the major number of our device file.
         int nsize = 5;
         char somedata[5];
-        std::ifstream myfile;
+        ifstream myfile;
         myfile.open("/proc/pcore-device");
         myfile.read(somedata, nsize);
         myfile.close();
 
         int major;
-        std::stringstream convert(somedata); // stringstream used for the conversion initialized with the contents of Text
+        stringstream convert(somedata); // stringstream used for the conversion initialized with the contents of Text
 
         if (!(convert >> major))  //give the value to Result using the characters in the string
         {
