@@ -312,8 +312,8 @@ bool osChannel::readString(gtASCIIString& str)
 bool osChannel::writeStringImpl(const gtString& str)
 {
     bool retVal = false;
-    std::string converted_str = str.asASCIICharArray();
-    gtInt32 stringLength = static_cast<gtInt32>(converted_str.length());
+    const char* converted_str = str.asASCIICharArray();
+    gtInt32 stringLength = (gtInt32)strlen(converted_str);
 
     // Do not write the string length into text channels:
     if (channelType() == osChannel::OS_BINARY_CHANNEL)
@@ -326,7 +326,7 @@ bool osChannel::writeStringImpl(const gtString& str)
     if (stringLength > 0)
     {
         // Write the multi byte char pointer:
-        bool rc = write(converted_str.c_str(), stringLength);
+        bool rc = write((gtByte*)converted_str, stringLength);
         GT_IF_WITH_ASSERT(rc)
         {
             retVal = true;
