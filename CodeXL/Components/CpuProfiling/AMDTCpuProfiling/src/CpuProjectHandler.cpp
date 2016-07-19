@@ -1549,10 +1549,10 @@ void CpuProjectHandler::handleDataFileImport(const osFilePath& importedSessionFi
     }
     else
     {
-        //Remove the copied directory
-        //if (baseDir.exists())
+        // Remove the copied directory
+        if (baseDir.exists())
         {
-        //    baseDir.deleteRecursively();
+            baseDir.deleteRecursively();
         }
 
         gtString profileName;
