@@ -482,7 +482,7 @@ bool ExpandMacros(const std::wstring& rawSourceCodeFileName, const std::vector<s
         //  Open and read in the specified input file.
 #if AMDT_BUILD_TARGET == AMDT_LINUX_OS
         gtString filename = rawSourceCodeFileName.c_str();
-        ifstream instream(filename.asASCIICharArray());
+        std::ifstream instream(filename.asASCIICharArray());
 #else
         std::ifstream instream(rawSourceCodeFileName);
 #endif
