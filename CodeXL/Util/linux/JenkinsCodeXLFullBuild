@@ -449,6 +449,14 @@ PackageTheBuild()
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x6/ibs.xml          ${PKG_NAME}/Data/Profiles/0x15_0x6
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x6/inst_access.xml  ${PKG_NAME}/Data/Profiles/0x15_0x6
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x6/l2_access.xml    ${PKG_NAME}/Data/Profiles/0x15_0x6
+		mkdir -p ${PKG_NAME}/Data/Profiles/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x7/assess.xml       ${PKG_NAME}/Data/Profiles/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x7/branch.xml       ${PKG_NAME}/Data/Profiles/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x7/clu.xml          ${PKG_NAME}/Data/Profiles/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x7/data_access.xml  ${PKG_NAME}/Data/Profiles/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x7/ibs.xml          ${PKG_NAME}/Data/Profiles/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x7/inst_access.xml  ${PKG_NAME}/Data/Profiles/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x7/l2_access.xml    ${PKG_NAME}/Data/Profiles/0x15_0x7
 		mkdir -p ${PKG_NAME}/Data/Profiles/0x16_0x0
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x16_0x0/assess.xml			${PKG_NAME}/Data/Profiles/0x16_0x0
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x16_0x0/branch.xml			${PKG_NAME}/Data/Profiles/0x16_0x0
@@ -713,6 +721,36 @@ PackageTheBuild()
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/return_focus.xml            ${PKG_NAME}/Data/Views/0x15_0x6
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/taken_focus.xml             ${PKG_NAME}/Data/Views/0x15_0x6
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/triage_assess.xml           ${PKG_NAME}/Data/Views/0x15_0x6
+		mkdir -p ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/br_assess.xml           ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/dc_assess.xml           ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/dc_focus.xml            ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/dtlb_assess.xml         ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/dtlb_focus.xml          ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_fetch_ic.xml        ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_fetch_itlb.xml      ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_fetch_overall.xml   ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_fetch_page.xml      ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_op_branch.xml       ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_op_ls_dc.xml        ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_op_ls_dtlb.xml      ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_op_ls_expert.xml    ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_op_ls_memacc.xml    ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_op_ls_page.xml      ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_op_ls.xml           ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_op_nb_access.xml    ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_op_nb_cache.xml     ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_op_nb_service.xml   ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_op_overall.xml      ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_op_return.xml       ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ic_focus.xml            ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ipc_assess.xml          ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/itlb_focus.xml          ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/l2_focus.xml            ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/misalign_assess.xml     ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/return_focus.xml        ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/taken_focus.xml         ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/triage_assess.xml       ${PKG_NAME}/Data/Views/0x15_0x7
 		mkdir -p ${PKG_NAME}/Data/Views/0x16_0x0
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/br_assess.xml				${PKG_NAME}/Data/Views/0x16_0x0
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/dc_assess.xml				${PKG_NAME}/Data/Views/0x16_0x0
@@ -2341,6 +2379,15 @@ PackageTheBuild()
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x6/ibs.xml          ${PKG_NAME}/Data/Profiles/0x15_0x6
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x6/inst_access.xml  ${PKG_NAME}/Data/Profiles/0x15_0x6
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x6/l2_access.xml    ${PKG_NAME}/Data/Profiles/0x15_0x6
+		mkdir -p ${PKG_NAME}/Data/Profiles/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x7/assess.xml       ${PKG_NAME}/Data/Profiles/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x7/branch.xml       ${PKG_NAME}/Data/Profiles/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x7/clu.xml          ${PKG_NAME}/Data/Profiles/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x7/data_access.xml  ${PKG_NAME}/Data/Profiles/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x7/ibs.xml          ${PKG_NAME}/Data/Profiles/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x7/inst_access.xml  ${PKG_NAME}/Data/Profiles/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x15_0x7/l2_access.xml    ${PKG_NAME}/Data/Profiles/0x15_0x7
+
 		mkdir -p ${PKG_NAME}/Data/Profiles/0x16_0x0
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x16_0x0/assess.xml			${PKG_NAME}/Data/Profiles/0x16_0x0
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Profiles/0x16_0x0/branch.xml			${PKG_NAME}/Data/Profiles/0x16_0x0
@@ -2605,6 +2652,36 @@ PackageTheBuild()
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/return_focus.xml            ${PKG_NAME}/Data/Views/0x15_0x6
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/taken_focus.xml             ${PKG_NAME}/Data/Views/0x15_0x6
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x6/triage_assess.xml           ${PKG_NAME}/Data/Views/0x15_0x6
+		mkdir -p ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/br_assess.xml           ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/dc_assess.xml           ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/dc_focus.xml            ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/dtlb_assess.xml         ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/dtlb_focus.xml          ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_fetch_ic.xml        ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_fetch_itlb.xml      ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_fetch_overall.xml   ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_fetch_page.xml      ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_op_branch.xml       ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_op_ls_dc.xml        ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_op_ls_dtlb.xml      ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_op_ls_expert.xml    ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_op_ls_memacc.xml    ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_op_ls_page.xml      ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_op_ls.xml           ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_op_nb_access.xml    ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_op_nb_cache.xml     ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_op_nb_service.xml   ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_op_overall.xml      ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ibs_op_return.xml       ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ic_focus.xml            ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/ipc_assess.xml          ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/itlb_focus.xml          ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/l2_focus.xml            ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/misalign_assess.xml     ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/return_focus.xml        ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/taken_focus.xml         ${PKG_NAME}/Data/Views/0x15_0x7
+		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x15_0x7/triage_assess.xml       ${PKG_NAME}/Data/Views/0x15_0x7
 		mkdir -p ${PKG_NAME}/Data/Views/0x16_0x0
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/br_assess.xml				${PKG_NAME}/Data/Views/0x16_0x0
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/AMDTCpuPerfEventUtils/1.0/Data/Views/0x16_0x0/dc_assess.xml				${PKG_NAME}/Data/Views/0x16_0x0
