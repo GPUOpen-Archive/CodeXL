@@ -24,7 +24,7 @@ TEST(FillKernelNamesList, CheckAttributes)
 {
     QString sourceCode = "__kernel       __attribute__     	((reqd_work_group_size(LOCAL_XRES, LOCAL_YRES, 1)))   	    void    	    advancedSeparableConvolution(__global uchar4 *input, __global float *row_filter, __global float *col_filter,__global uchar4 *output, uint nWidth,	uint nHeight,uint nExWidth){} \n";
     osFilePath filePath(LR"(C:\Users\rbober\Downloads\AdvancedConvolution_Kernels.cl)");
-    vector<std::string> additionalMacros = {};
+    std::vector<std::string> additionalMacros = {};
     gtVector<kaProjectDataManagerAnaylzeData> result;
     kaProjectDataManager::FillKernelNamesList(sourceCode, filePath, additionalMacros, result);
 }
@@ -33,13 +33,13 @@ TEST(TestWave, ExpandMacros)
 #define KERNEL_NAME1 "OpenCL1"
 #define KERNEL_NAME2 "OpenCL2"
 
-    string sourceCode = "__kernel void " KERNEL_NAME1 " () { } MACRO void " KERNEL_NAME2 " () { }";
-    wstring fileName = L"dummy.cl";
-    string result;
+    std::string sourceCode = "__kernel void " KERNEL_NAME1 " () { } MACRO void " KERNEL_NAME2 " () { }";
+    std::wstring fileName = L"dummy.cl";
+    std::string result;
     std::vector<std::string> additionalMacros{ "MACRO=__kernel"};
     std::vector<PreProcessedToken> tokens;
     ExpandMacros(sourceCode, fileName, additionalMacros, tokens);
-    vector<pair<string, size_t>> kernelNamesPostions;
+    std::vector<std::pair<std::string, size_t>> kernelNamesPostions;
     auto  token = tokens.begin();
 
     while (token != tokens.end())
