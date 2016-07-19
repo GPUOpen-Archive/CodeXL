@@ -474,7 +474,7 @@ private:
     gtString GetJavaNestedFunctionParentName(JNCInlineMap& jilMap, gtString javaInlinedFunc);
 
 private:
-    void PrdTranslator::AddNewModule(ProcessIdType pid, TiModuleInfo& pModInfo, NameModuleMap& pMMap);
+    void AddNewModule(ProcessIdType pid, TiModuleInfo& pModInfo, NameModuleMap& pMMap);
     void AddIbsFetchEvent(unsigned int eventSelect);
     void AddIbsOpEvent(unsigned int eventSelect);
     void AddCluEvent(unsigned int eventSelect);

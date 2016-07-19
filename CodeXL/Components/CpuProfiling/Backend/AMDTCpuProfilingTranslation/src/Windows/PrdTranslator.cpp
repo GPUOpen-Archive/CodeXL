@@ -246,6 +246,34 @@ void GetFreeVM(gtUInt64& pFreeVM)
     return;
 }
 
+static bool Is32BitModule(gtUInt32 pid, gtUInt64 modStartAddress, ExecutableFile* pExe)
+{
+    bool isMod32Bit = false;
+    BOOL is64Sys = false;
+
+#if AMDT_ADDRESS_SPACE_TYPE != AMDT_64_BIT_ADDRESS_SPACE
+    IsWow64Process(GetCurrentProcess(), &is64Sys);
+#endif
+
+    if (is64Sys)
+    {
+        if (modStartAddress > KERNEL64_SPACE_START)
+        {
+            isMod32Bit = false;
+        }
+        else
+        {
+            isMod32Bit = (nullptr != pExe) ? !(pExe->Is64Bit()) : fnIsJITProcess32Bit(pid);
+        }
+    }
+    else
+    {
+        isMod32Bit = fnIsJITProcess32Bit(pid);
+    }
+
+    return isMod32Bit;
+}
+
 PrdTranslator::ProcessInfo::ProcessInfo(ProcessIdType processId) : m_processId(processId)
 {
     m_exeAnalyzers.reserve(64);
@@ -1849,7 +1877,6 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
                 if ((S_OK == hr ) && (modInstanceMap.end() == modInstanceMap.find(modInfo.instanceId)))
                 {
                     modInstanceMap.emplace(modInfo.instanceId, std::make_tuple(gtString(modInfo.pModulename), modInfo.processID, modInfo.ModuleStartAddr));
-                    //AddNewModule(processId, modInfo, moduleMap);
                 }
 
                 AggregateSampleData(prdRecord, &modInfo, &processMap, &moduleMap, pidModaddrItrMap, 1U, pStats);
@@ -1951,8 +1978,6 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
                         modInstanceMap.emplace(modInfo.instanceId,
                                                std::make_tuple(gtString(modInfo.pModulename),
                                                modInfo.processID, modInfo.ModuleStartAddr));
-
-                        //AddNewModule(processId, modInfo, moduleMap);
                     }
 
                     ProcessIbsFetchRecord(ibsFetch, &modInfo, &processMap, &moduleMap, pidModaddrItrMap, pStats);
@@ -2057,8 +2082,6 @@ HRESULT PrdTranslator::ThreadTranslateDataPrdFile(QString proFile,
                         modInstanceMap.emplace(modInfo.instanceId,
                                                std::make_tuple(gtString(modInfo.pModulename),
                                                modInfo.processID, modInfo.ModuleStartAddr));
-
-                        //AddNewModule(processId, modInfo, moduleMap);
                     }
 
                     ProcessIbsOpRecord(ibsOp, &modInfo, &processMap,
@@ -2272,10 +2295,10 @@ bool PrdTranslator::WriteModuleInstanceInfoIntoDB(NameModuleMap& moduleMap, ModI
         if (nullptr != pModuleInstanceList)
         {
             pModuleInstanceList->reserve(modInstanceMap.size());
+            gtUInt32 moduleId = 0;
 
             for (const auto& modIt : modInstanceMap)
             {
-                gtUInt32 moduleId = 0;
                 auto it = moduleMap.find(std::get<0>(modIt.second));
 
                 if (moduleMap.end() != it)
@@ -2284,6 +2307,19 @@ bool PrdTranslator::WriteModuleInstanceInfoIntoDB(NameModuleMap& moduleMap, ModI
                     // We need to store details about all the load-modules of a process.
                     moduleId = it->second.m_moduleId;
                     pModuleInstanceList->emplace_back(modIt.first, moduleId, std::get<1>(modIt.second), std::get<2>(modIt.second));
+                }
+            }
+
+            for (auto& module : moduleMap)
+            {
+                for (const auto& it : module.second.m_moduleInstanceInfo)
+                {
+                    gtUInt32 instanceId = std::get<2>(it);
+                    moduleId = module.second.m_moduleId;
+                    gtUInt64 pid = std::get<0>(it);
+                    gtUInt64 modLoadAddr = std::get<1>(it);
+
+                    pModuleInstanceList->emplace_back(instanceId, moduleId, pid, modLoadAddr);
                 }
             }
 
@@ -2612,6 +2648,9 @@ bool PrdTranslator::WriteCallgraphProfileDataIntoDB(const NameModuleMap& moduleM
 
     if (m_dbWriter)
     {
+        CPAModuleList *pModuleList = new (std::nothrow) CPAModuleList;
+        CPAModuleInstanceList *pModuleInstanceList = new (std::nothrow) CPAModuleInstanceList;
+
         // Write the callstack info to DB
         for (auto procIter = m_processInfos.begin(), procIterEnd = m_processInfos.end(); procIter != procIterEnd; ++procIter)
         {
@@ -2667,7 +2706,38 @@ bool PrdTranslator::WriteCallgraphProfileDataIntoDB(const NameModuleMap& moduleM
                                 }
                                 else
                                 {
-                                    // TODO: sometime few modules observed by CSS are not present in module map
+                                    gtUInt32 modInstId;
+                                    LoadModuleInfo modInfo;
+                                    HRESULT hr = fnGetModuleInstanceId(pid, callSite.m_traverseAddr, 0, modInstId);
+
+                                    if (S_OK == hr)
+                                    {
+                                        hr = fnGetModuleInfoByInstanceId(modInstId, &modInfo);
+                                    }
+
+                                    if (S_OK == hr)
+                                    {
+                                        funcId = modInfo.m_moduleId << 16;
+
+                                        if ((nullptr != pModuleList) && (nullptr != pModuleInstanceList))
+                                        {
+                                            gtString name;
+                                            name.fromASCIIString(modInfo.m_pModulename);
+
+                                            pModuleList->emplace_back(modInfo.m_moduleId,
+                                                name,
+                                                modInfo.m_modulesize,
+                                                CpuProfileModule::UNMANAGEDPE,
+                                                osIsSystemModule(name),
+                                                Is32BitModule(pid, modInfo.m_moduleStartAddr, pExe),
+                                                pExe->IsDebugInfoAvailable());
+
+                                            pModuleInstanceList->emplace_back(modInfo.m_instanceId,
+                                                modInfo.m_moduleId,
+                                                modInfo.m_pid,
+                                                modInfo.m_moduleStartAddr);
+                                        }
+                                    }
                                 }
                             }
 
@@ -2711,6 +2781,11 @@ bool PrdTranslator::WriteCallgraphProfileDataIntoDB(const NameModuleMap& moduleM
 
                     m_dbWriter->Push({ TRANSLATED_DATA_TYPE_CSS_LEAF_INFO, (void*)csLeafInfoList });
                     csLeafInfoList = nullptr;
+
+                    m_dbWriter->Push({ TRANSLATED_DATA_TYPE_MODULE_INFO, (void*)pModuleList });
+                    pModuleList = nullptr;
+                    m_dbWriter->Push({ TRANSLATED_DATA_TYPE_MODINSTANCE_INFO, (void*)pModuleInstanceList });
+                    pModuleInstanceList = nullptr;
 
                     ret = true;
                 }

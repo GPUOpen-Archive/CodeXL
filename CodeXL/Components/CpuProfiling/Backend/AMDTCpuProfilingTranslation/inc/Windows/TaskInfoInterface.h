@@ -43,14 +43,14 @@ struct TI_THREAD_INFO
 // ModuleInfo: This structure is use for power profiler
 typedef struct LoadModuleInfo
 {
-    gtUInt32	m_pid;
-    gtUInt64	m_moduleStartAddr;
-    gtUInt32	m_modulesize;
+    gtUInt32	m_pid = 0;
+    gtUInt64	m_moduleStartAddr = 0;
+    gtUInt32	m_modulesize = 0;
     ModTypeEnum m_moduleType;
     char		m_pModulename[OS_MAX_PATH];
-    bool		m_isKernel;
-    gtUInt32	m_moduleId;
-    gtUInt32	m_instanceId;
+    bool		m_isKernel = false;
+    gtUInt32	m_moduleId = 0;
+    gtUInt32	m_instanceId = 0;
 } LoadModuleInfo;
 
 // start task info capturing, with optional directory for driver

@@ -209,6 +209,12 @@ public:
     AMDTCounterId                         m_cgCounterId = 0;
     gtMap<AMDTProcessId, AMDTProcessId>   m_handleUnknownLeafs;
 
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+    bool                                  m_bGetSystemDir = true;
+    BOOL                                  m_is64BitSys = false;
+    wchar_t                               m_system32Dir[OS_MAX_PATH + 1];
+#endif // AMDT_WINDOWS_OS
+
     Impl()
     {
     }
@@ -287,6 +293,13 @@ public:
 
         if (nullptr == m_pDbAdapter)
         {
+
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+#if AMDT_ADDRESS_SPACE_TYPE != AMDT_64_BIT_ADDRESS_SPACE
+            IsWow64Process(GetCurrentProcess(), &m_is64BitSys);
+#endif
+#endif
+
             m_pDbAdapter = new amdtProfileDbAdapter;
 
             if (nullptr != m_pDbAdapter)
@@ -3803,6 +3816,32 @@ public:
                     exePath.truncate(0, (exePath.length() - 4));
                 }
 
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+                bool b64bitSystemDir = false;
+                PVOID oldValue = nullptr;
+
+                if (m_is64BitSys)
+                {
+                    if (m_bGetSystemDir)
+                    {
+                        m_system32Dir[0] = L'\0';
+                        // C:\windows\system32 or C:\winnt\system32
+                        GetSystemDirectoryW(m_system32Dir, OS_MAX_PATH);
+                        m_bGetSystemDir = false;
+                    }
+
+                    if (0 == _wcsnicmp(exePath.asCharArray(), m_system32Dir, wcslen(m_system32Dir)))
+                    {
+                        b64bitSystemDir = true;
+                    }
+
+                    if (b64bitSystemDir)
+                    {
+                        b64bitSystemDir = Wow64DisableWow64FsRedirection(&oldValue);
+                    }
+                }
+#endif // AMDT_WINDOWS_OS
+
                 pExe = ExecutableFile::Open(exePath.asCharArray(), modInfo.m_loadAddress);
 
                 if (nullptr != pExe)
@@ -3810,6 +3849,13 @@ public:
                     ret = (initSymbolEngine) ? InitializeSymbolEngine(pExe) : true;
                     m_moduleIdExeMap.insert({ moduleId, pExe });
                 }
+
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+                if (b64bitSystemDir)
+                {
+                    Wow64RevertWow64FsRedirection(oldValue);
+                }
+#endif // AMDT_WINDOWS_OS
             }
         }
 
@@ -3827,8 +3873,9 @@ public:
             ExecutableFile* pExecutable = nullptr;
 
             ret = GetModuleExecutable(funcInfo.m_moduleId, pExecutable, true);
+            ret = (ret && (nullptr != pExecutable)) ? true : false;
 
-            if (ret && nullptr != pExecutable)
+            if (ret)
             {
                 ret = false;
                 SymbolEngine* pSymbolEngine = pExecutable->GetSymbolEngine();
@@ -3840,9 +3887,11 @@ public:
                 {
                     gtUInt32 funcSize = pFuncSymbol->m_size;
 
-                    // TODO: if funcSize == 0 ?
-                    funcSize = ((funcSize == 0) && (GT_INVALID_RVADDR != funcRvaEnd))
-                                             ? funcRvaEnd - pFuncSymbol->m_rva : funcSize;
+                    if (funcSize == 0)
+                    {
+                        funcSize = (GT_INVALID_RVADDR != funcRvaEnd) ? funcRvaEnd - pFuncSymbol->m_rva
+                                            : (funcInfo.m_startOffset  + 16) - pFuncSymbol->m_rva;   // FIXME
+                    }
 
                     funcInfo.m_name = pFuncSymbol->m_pName;
                     funcInfo.m_startOffset = pFuncSymbol->m_rva;
@@ -3859,16 +3908,17 @@ public:
                     ret = true;
                 }
             }
-
-            // Add the unknownfunction
-            if (!ret)
+            else
             {
+                // Add the unknownfunction
                 AMDTProfileModuleInfo modInfo;
                 ret = GetModuleInfo(funcInfo.m_moduleId, modInfo);
 
-                if (ret && !modInfo.m_name.isEmpty())
+                if (ret && !modInfo.m_path.isEmpty())
                 {
-                    funcInfo.m_name = modInfo.m_name;
+                    osFilePath aPath(modInfo.m_path);
+                    aPath.getFileNameAndExtension(funcInfo.m_name);
+
                     funcInfo.m_name.appendFormattedString(L"!0x" LONG_FORMAT_HEX, funcInfo.m_startOffset);
                 }
 

@@ -2569,16 +2569,17 @@ HRESULT WinTaskInfo::FindModuleId(const wchar_t* pModuleName, gtInt32& moduleId)
     if (m_moduleIdMap.end() == iter)
     {
         auto ret = m_moduleIdMap.emplace(pModuleName, AtomicAdd(m_nextModuleId, 1));
-        moduleId = ret.second;
-        //hr = S_OK;
+        iter = ret.first;
     }
+
+    moduleId = iter->second;
 
     return hr;
 }
 
-HRESULT ConstructModuleName(ModuleValue& modValue, gtUInt64 pid, std::wstring& modName)
+HRESULT ConstructModuleName(wchar_t* pmoduleName, gtUInt64 pid, std::wstring& modName)
 {
-    if (modValue.moduleName[0] == L'\0')
+    if (pmoduleName[0] == L'\0')
     {
         // Module name is unknown
         modName = std::to_wstring(pid);
@@ -2586,7 +2587,7 @@ HRESULT ConstructModuleName(ModuleValue& modValue, gtUInt64 pid, std::wstring& m
     else
     {
         // Module name is known
-        modName = modValue.moduleName;
+        modName = pmoduleName;
     }
 
     return S_OK;
@@ -2598,6 +2599,7 @@ HRESULT WinTaskInfo::GetModuleInstanceId(gtUInt32 processId, gtUInt64 sampleAddr
 {
     HRESULT hr = S_FALSE;
     bool moduleFound = false;
+    wchar_t *pModName = nullptr;
 
     AddLoadModules(processId);
 
@@ -2632,11 +2634,9 @@ HRESULT WinTaskInfo::GetModuleInstanceId(gtUInt32 processId, gtUInt64 sampleAddr
         }
 
         modInstId = item.second.instanceId;
+        pModName = item.second.moduleName;
         hr = S_OK;
-        std::wstring modName;
-        ConstructModuleName(item.second, item.first.processId, modName);
 
-        FindModuleId(modName.c_str(), item.second.moduleId);
         moduleFound = true;
         break;
     }
@@ -2743,9 +2743,21 @@ HRESULT WinTaskInfo::GetModuleInstanceId(gtUInt32 processId, gtUInt64 sampleAddr
                     }
                 }
 
+                pModName = kemoditem.second.keModName;
                 break;
             }
         }
+    }
+
+    if (nullptr != pModName)
+    {
+        std::wstring modName;
+        gtInt32 moduleId;
+
+        ConstructModuleName(pModName, processId, modName);
+        FindModuleId(modName.c_str(), moduleId);
+
+        moduleId = moduleId;
     }
 
     return hr;
@@ -2778,8 +2790,13 @@ HRESULT WinTaskInfo::GetLoadModuleInfoByInstanceId(gtUInt32 instanceId, LoadModu
             pModInfo->m_moduleStartAddr = moditer.first.moduleLoadAddr;
             pModInfo->m_modulesize = (gtUInt32)moditer.second.moduleSize;
             pModInfo->m_moduleType = moditer.second.moduleType;
+
             wcstombs(pModInfo->m_pModulename, moditer.second.moduleName, OS_MAX_PATH);
-            pModInfo->m_moduleId = moditer.second.moduleId;
+
+            gtInt32 moduleId;
+            FindModuleId(moditer.second.moduleName, moduleId);
+            pModInfo->m_moduleId = static_cast<gtUInt32>(moduleId);
+
             pModInfo->m_isKernel = false;
             found = true;
             break;
@@ -2797,7 +2814,11 @@ HRESULT WinTaskInfo::GetLoadModuleInfoByInstanceId(gtUInt32 instanceId, LoadModu
                 pModInfo->m_modulesize = (gtUInt32)(moditer.second.keModEndAddr - moditer.first.keModLoadAddr);
                 pModInfo->m_isKernel = true;
                 wcstombs(pModInfo->m_pModulename, moditer.second.keModName, OS_MAX_PATH);
-                //pModInfo->m_moduleId = moditer.second.;
+
+                gtInt32 moduleId;
+                FindModuleId(moditer.second.keModName, moduleId);
+                pModInfo->m_moduleId = static_cast<gtUInt32>(moduleId);
+
                 found = true;
                 break;
             }
@@ -2873,15 +2894,9 @@ HRESULT WinTaskInfo::GetModuleInfo(TiModuleInfo* pModInfo)
 
     osCriticalSectionLocker lock(m_TIMutexModule);
 
-    auto iter = m_moduleIdMap.find(modName);
-
-    if (m_moduleIdMap.end() == iter)
-    {
-        auto ret = m_moduleIdMap.emplace(modName, AtomicAdd(m_nextModuleId, 1));
-        iter = ret.first;
-    }
-
-    pModInfo->moduleId = static_cast<gtUInt32>(iter->second);
+    gtInt32 moduleId;
+    FindModuleId(modName.c_str(), moduleId);
+    pModInfo->moduleId = static_cast<gtUInt32>(moduleId);
 
     return hr;
 }
@@ -3519,13 +3534,9 @@ HRESULT WinTaskInfo::ReadModuleInfoFile(const wchar_t* filename)
 
             m_tiKeModMap.insert(KernelModMap::value_type(t_keModKey, t_keModValue));
 
-            std::wstring modName(t_keModValue.keModName);
-            auto iter = m_moduleIdMap.find(modName);
-
-            if (m_moduleIdMap.end() == iter)
-            {
-                m_moduleIdMap.emplace(modName, AtomicAdd(m_nextModuleId, 1));
-            }
+            gtInt32 moduleId;
+            FindModuleId(t_keModValue.keModName, moduleId);
+            moduleId = moduleId; // UNUSED at this point. but we need to preserve this for future use
         }
 
         if (TASK_INFO_FILE_VERSION_2 <= versionNumber)
@@ -4073,13 +4084,7 @@ HRESULT WinTaskInfo::ReadCLRJitInformation(/* [in] */ const wchar_t* clrdirector
                             m_tiModMap.insert(ModuleMap::value_type(t_modKey, t_modValue));
                             m_JitModCount++;
 
-                            std::wstring modName(t_modValue.moduleName);
-                            auto iter = m_moduleIdMap.find(modName);
-
-                            if (m_moduleIdMap.end() == iter)
-                            {
-                                m_moduleIdMap.emplace(modName, AtomicAdd(m_nextModuleId, 1));
-                            }
+                            FindModuleId(t_modValue.moduleName, t_modValue.moduleId);
 
                             tModuleName.append(".jit");
                             QString repPath = QString::fromWCharArray(funcRec.jncFileName);
@@ -4953,15 +4958,9 @@ void WinTaskInfo::AddLoadModules(gtUInt64 processId)
                         modValue.instanceId = m_nextModInstanceId++;
                     }
 
+                    FindModuleId(modValue.moduleName, modValue.moduleId);
+
                     m_tiModMap.insert(ModuleMap::value_type(modKey, modValue));
-
-                    std::wstring modName(modValue.moduleName);
-                    auto iter = m_moduleIdMap.find(modName);
-
-                    if (m_moduleIdMap.end() == iter)
-                    {
-                        m_moduleIdMap.emplace(modName, AtomicAdd(m_nextModuleId, 1));
-                    }
                 }
             }
 
