@@ -169,24 +169,26 @@ bool ProfilerDataDBWriter::Initialize(const gtString& path)
 
     if (m_pCpuProfDbAdapter != nullptr)
     {
-        // Remove trailing '.ebp' from path
-        gtString dbPath = path;
-
-        if (dbPath.endsWith(gtString(L".ebp")))
-        {
-            int pos = dbPath.reverseFind(L".");
-            dbPath.extruct(pos, dbPath.length());
-        }
+        rc = true;
 
         gtString dbExtn;
         m_pCpuProfDbAdapter->GetDbFileExtension(AMDT_PROFILE_MODE_AGGREGATION, dbExtn);
+        // dbExtn includes prefix dot, which needs to removed. Fix adapter to return extn without dot.
+        dbExtn.extruct(0, 1);
 
-        if (!dbPath.endsWith(dbExtn))
+        osFilePath dbPath(path);
+        dbPath.setFileExtension(dbExtn);
+
+        if (dbPath.exists())
         {
-            dbPath.append(dbExtn);
+            osFile dbFile(dbPath);
+            rc = dbFile.deleteFile();
         }
 
-        rc = m_pCpuProfDbAdapter->CreateDb(dbPath, AMDT_PROFILE_MODE_AGGREGATION);
+        if (rc)
+        {
+            rc = m_pCpuProfDbAdapter->CreateDb(dbPath.asString(), AMDT_PROFILE_MODE_AGGREGATION);
+        }
     }
 
     if (rc)
@@ -194,7 +196,12 @@ bool ProfilerDataDBWriter::Initialize(const gtString& path)
         if (nullptr != m_pWriterThread && !m_pWriterThread->execute())
         {
             OS_OUTPUT_DEBUG_LOG(L"Could not dispatch DB Writer Thread", OS_DEBUG_LOG_ERROR);
+            rc = false;
         }
+    }
+    else
+    {
+        OS_OUTPUT_DEBUG_LOG(L"Could not initialize DB Writer", OS_DEBUG_LOG_ERROR);
     }
 
     return rc;

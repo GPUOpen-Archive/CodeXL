@@ -3344,26 +3344,21 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
     m_progressThreshold = m_progressStride;
     InitializeProgressBar(L"Translating raw profile data...", true);
 
-#if 0
-    gtString createDbEnvStr;
-    bool createDb = false;
-
-    if (osGetCurrentProcessEnvVariableValue(L"AMDT_CPUPROFILE_CREATE_DB", createDbEnvStr))
-    {
-        createDb = createDbEnvStr.isEqualNoCase(L"YES");
-    }
-
-    if (createDb)
-    {
-#endif
-
-        m_dbWriter.reset(new ProfilerDataDBWriter);
-    //}
+    m_dbWriter.reset(new ProfilerDataDBWriter);
 
     if (m_dbWriter)
     {
-        m_dbWriter->Initialize(proFile.toStdWString().c_str());
+        bool rc = m_dbWriter->Initialize(proFile.toStdWString().c_str());
 
+        if (!rc)
+        {
+            // Failed to create DB, reset the db writer
+            m_dbWriter.reset(nullptr);
+        }
+    }
+
+    if (m_dbWriter)
+    {
         // Populate profile session info
         AMDTProfileSessionInfo *info = new (std::nothrow) AMDTProfileSessionInfo;
 
