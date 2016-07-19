@@ -1080,13 +1080,13 @@ AMDTResult ppCollect::LoadPcoreModule()
         // use that to get the major number of our device file.
         int nsize = 5;
         char somedata[5];
-        ifstream myfile;
+        std::ifstream myfile;
         myfile.open("/proc/pcore-device");
         myfile.read(somedata, nsize);
         myfile.close();
 
         int major;
-        stringstream convert(somedata); // stringstream used for the conversion initialized with the contents of Text
+        std::stringstream convert(somedata); // stringstream used for the conversion initialized with the contents of Text
 
         if (!(convert >> major))  //give the value to Result using the characters in the string
         {

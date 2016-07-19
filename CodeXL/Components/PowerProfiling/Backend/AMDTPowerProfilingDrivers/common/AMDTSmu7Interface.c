@@ -129,7 +129,7 @@ bool CollectSMU7RegisterValues(void* pSmu, uint8* pData, uint32* pLength)
             mask = pSmuInfo->m_counterMask;
 
             // Package power need to be calculated from all power counters
-            isPkgPwrSelected = (mask & COUNTERID_SMU7_APU_PWR_PACKAGE) ? true : false;
+            isPkgPwrSelected = (mask & (1 << COUNTERID_SMU7_APU_PWR_PACKAGE)) ? true : false;
 
             if (isPkgPwrSelected)
             {
