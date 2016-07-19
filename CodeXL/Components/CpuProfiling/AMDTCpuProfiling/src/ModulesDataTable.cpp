@@ -173,6 +173,13 @@ bool ModulesDataTable::fillSummaryTables(int counterIdx)
             QString modulefullPath(moduleData.m_name.asASCIICharArray());
             int precision = SAMPLE_VALUE_PRECISION;
 
+            const AMDTSampleValueVec& sampleVector = moduleData.m_sampleValue;
+
+            if (sampleVector.empty() || sampleVector.at(0).m_sampleCount == 0)
+            {
+                continue;
+            }
+
             if (m_isCLU)
             {
                 if (m_pDisplayFilter->isCLUPercentCaptionSet())
@@ -180,20 +187,26 @@ bool ModulesDataTable::fillSummaryTables(int counterIdx)
                     precision = SAMPLE_PERCENT_PRECISION;
                 }
 
-                list << QString::number(moduleData.m_sampleValue.at(0).m_sampleCount, 'f', precision);
+                list << QString::number(sampleVector.at(0).m_sampleCount, 'f', precision);
             }
             else
             {
-                QVariant sampleCount(moduleData.m_sampleValue.at(0).m_sampleCount);
+                QVariant sampleCount(sampleVector.at(0).m_sampleCount);
                 list << sampleCount.toString();
-                QVariant sampleCountPercent(moduleData.m_sampleValue.at(0).m_sampleCountPercentage);
-                list << QString::number(moduleData.m_sampleValue.at(0).m_sampleCountPercentage, 'f', precision);
+                QVariant sampleCountPercent(sampleVector.at(0).m_sampleCountPercentage);
+                list << QString::number(sampleVector.at(0).m_sampleCountPercentage, 'f', precision);
             }
 
             addRow(list, nullptr);
 
             AMDTProfileModuleInfoVec procInfo;
             m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, moduleData.m_moduleId, procInfo);
+
+            // if module info null return
+            if (procInfo.empty())
+            {
+                continue;
+            }
 
             int row = rowCount() - 1;
 
@@ -309,10 +322,10 @@ bool ModulesDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allProcess
             AMDTProfileModuleInfoVec procInfo;
             m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, profData.m_moduleId, procInfo);
 
-			if (procInfo.empty())
-			{
-				continue;
-			}
+            if (procInfo.empty())
+            {
+                continue;
+            }
 
             list << acGTStringToQString(procInfo.at(0).m_name);
 

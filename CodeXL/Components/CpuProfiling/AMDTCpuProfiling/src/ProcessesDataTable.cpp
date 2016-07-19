@@ -61,6 +61,11 @@ bool ProcessesDataTable::fillSummaryTables(int counterIdx)
 
                 QStringList list;
 
+                if (procInfo.empty())
+                {
+                    continue;
+                }
+
                 if (profData.m_name != L"other")
                 {
                     list << procInfo.at(0).m_name.asASCIICharArray();
@@ -73,6 +78,12 @@ bool ProcessesDataTable::fillSummaryTables(int counterIdx)
                 }
 
                 int precision = SAMPLE_VALUE_PRECISION;
+                const AMDTSampleValueVec& sampleVector = profData.m_sampleValue;
+
+                if (sampleVector.empty() || sampleVector.at(0).m_sampleCount == 0)
+                {
+                    continue;
+                }
 
                 if (m_isCLU)
                 {
@@ -81,14 +92,14 @@ bool ProcessesDataTable::fillSummaryTables(int counterIdx)
                         precision = SAMPLE_PERCENT_PRECISION;
                     }
 
-                    list << QString::number(profData.m_sampleValue.at(0).m_sampleCount, 'f', precision);
+                    list << QString::number(sampleVector.at(0).m_sampleCount, 'f', precision);
                 }
                 else
                 {
-                    QVariant sampleCount(profData.m_sampleValue.at(0).m_sampleCount);
+                    QVariant sampleCount(sampleVector.at(0).m_sampleCount);
                     list << sampleCount.toString();
 
-                    list << QString::number(profData.m_sampleValue.at(0).m_sampleCountPercentage, 'f', precision);
+                    list << QString::number(sampleVector.at(0).m_sampleCountPercentage, 'f', precision);
                 }
 
                 addRow(list, nullptr);
@@ -158,6 +169,12 @@ bool ProcessesDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allProce
 
             AMDTProfileProcessInfoVec procInfo;
             m_pProfDataRdr->GetProcessInfo(profData.m_id, procInfo);
+
+            if (procInfo.empty())
+            {
+                continue;
+            }
+
 
             list << procInfo.at(0).m_name.asASCIICharArray();
             list << QString::number(procInfo.at(0).m_pid);

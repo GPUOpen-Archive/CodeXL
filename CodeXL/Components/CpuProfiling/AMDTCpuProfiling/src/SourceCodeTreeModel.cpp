@@ -780,6 +780,11 @@ void SourceCodeTreeModel::PrintFunctionDetailData(AMDTProfileFunctionData data,
         GetInstOffsets(srcData.m_sourceLineNumber, srcInfoVec, instOffsetVec);
         bool flag = true;
 
+        if (srcData.m_sampleValues.empty())
+        {
+            continue;
+        }
+
         // by default the hotspot is always DC Access(index = 0)
         auto sampleValue = srcData.m_sampleValues.at(0).m_sampleCount;
         auto sampleValuePer = srcData.m_sampleValues.at(0).m_sampleCountPercentage;

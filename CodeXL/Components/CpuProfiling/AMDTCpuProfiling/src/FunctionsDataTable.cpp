@@ -182,10 +182,13 @@ void FunctionsDataTable::onAboutToShowContextMenu()
 
                                     if (retVal)
                                     {
-                                        if (process == functionData.m_pidsList.at(0))
+                                        if (!functionData.m_pidsList.empty())
                                         {
-                                            isActionEnabled = true;
-                                            break;
+                                            if (process == functionData.m_pidsList.at(0))
+                                            {
+                                                isActionEnabled = true;
+                                                break;
+                                            }
                                         }
                                     }
                                 }
@@ -282,6 +285,13 @@ bool FunctionsDataTable::fillSummaryTables(int counterIdx)
 
             int precision = SAMPLE_VALUE_PRECISION;
 
+            const AMDTSampleValueVec& sampleVector = profData.m_sampleValue;
+
+            if (sampleVector.empty() || sampleVector.at(0).m_sampleCount == 0)
+            {
+                continue;
+            }
+
             if (m_isCLU)
             {
                 if (m_pDisplayFilter->isCLUPercentCaptionSet())
@@ -289,20 +299,25 @@ bool FunctionsDataTable::fillSummaryTables(int counterIdx)
                     precision = SAMPLE_PERCENT_PRECISION;
                 }
 
-                list << QString::number(profData.m_sampleValue.at(0).m_sampleCount, 'f', precision);
+                list << QString::number(sampleVector.at(0).m_sampleCount, 'f', precision);
             }
             else
             {
-                QVariant sampleCount(profData.m_sampleValue.at(0).m_sampleCount);
+                QVariant sampleCount(sampleVector.at(0).m_sampleCount);
                 list << sampleCount.toString();
 
-                QVariant sampleCountPercent(profData.m_sampleValue.at(0).m_sampleCountPercentage);
-                list << QString::number(profData.m_sampleValue.at(0).m_sampleCountPercentage, 'f', precision);
+                QVariant sampleCountPercent(sampleVector.at(0).m_sampleCountPercentage);
+                list << QString::number(sampleVector.at(0).m_sampleCountPercentage, 'f', precision);
             }
 
             AMDTProfileModuleInfoVec procInfo;
             rc = m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_MAX_VALUE, profData.m_moduleId, procInfo);
             GT_ASSERT(rc);
+
+            if (procInfo.empty())
+            {
+                continue;
+            }
 
             if (profData.m_moduleId == AMDT_PROFILE_ALL_MODULES)
             {
@@ -311,7 +326,6 @@ bool FunctionsDataTable::fillSummaryTables(int counterIdx)
             else
             {
                 list << procInfo.at(0).m_name.asASCIICharArray();
-
             }
 
             addRow(list, nullptr);
@@ -385,6 +399,12 @@ bool FunctionsDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allModul
             // insert module name
             AMDTProfileModuleInfoVec procInfo;
             m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, profData.m_moduleId, procInfo);
+
+            // if module info null return
+            if (procInfo.empty())
+            {
+                continue;
+            }
 
             list << acGTStringToQString(procInfo.at(0).m_name);
 

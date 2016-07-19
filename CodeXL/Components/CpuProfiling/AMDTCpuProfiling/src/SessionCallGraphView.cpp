@@ -1491,9 +1491,13 @@ void CallGraphButterfly::SetParentsFunction(std::shared_ptr<cxlProfileDataReader
     AMDTCallGraphFunctionVec children;
 
     pProfDataRdr->GetCallGraphFunctionInfo(processId, funcId, parents, children);
+	double totalDeepCount = 0;
 
-    AMDTCallGraphFunction func = cgFuncs.at(0);
-    const double totalDeepCount = func.m_totalDeepSamples;
+	if (!cgFuncs.empty())
+	{
+		totalDeepCount = cgFuncs.at(0).m_totalDeepSamples;
+	}
+
     const bool noSamples = (0ULL == totalDeepCount);
     double systemSamplesCount = 0ULL;
 
@@ -1549,9 +1553,13 @@ void CallGraphButterfly::SetChildrenFunction(std::shared_ptr<cxlProfileDataReade
     AMDTCallGraphFunctionVec childrens;
 
     pProfDataRdr->GetCallGraphFunctionInfo(processId, funcId, parents, childrens);
+	double totalDeepCount = 0;
 
-    AMDTCallGraphFunction func = cgFuncs.at(0);
-    const double totalDeepCount = func.m_totalDeepSamples;
+	if (!cgFuncs.empty())
+	{
+		totalDeepCount = cgFuncs.at(0).m_totalDeepSamples;
+	}
+
     const bool noSamples = (0ULL == totalDeepCount);
     //qulonglong systemSamplesCount = 0ULL;
 
@@ -1648,7 +1656,10 @@ SessionCallGraphView::SessionCallGraphView(QWidget* pParent,
 
         if (true == m_pDisplayFilter->GetConfigCounters(acGTStringToQString(configName), counterDetails))
         {
-            m_selectedCounter = std::get<3>(counterDetails.at(0));
+			if (!counterDetails.empty())
+			{
+				m_selectedCounter = std::get<3>(counterDetails.at(0));
+			}
         }
     }
 }
