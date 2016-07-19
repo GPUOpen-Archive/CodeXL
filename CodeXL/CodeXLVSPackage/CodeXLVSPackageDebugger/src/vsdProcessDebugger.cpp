@@ -929,12 +929,8 @@ void vsdProcessDebugger::handleExceptionEvent(IDebugEvent2* piEvent, IDebugExcep
                     GT_IF_WITH_ASSERT(rcSusp)
                     {
                         // Notify observers about the breakpoint event:
-                        apBreakpointHitEvent event(threadId, exceptionAddress);
-                        apEventsHandler::instance().registerPendingDebugEvent(event);
-
-                        // Notify observers that the debugged process run was suspended:
-                        apDebuggedProcessRunSuspendedEvent processSuspendedEvent(threadId);
-                        apEventsHandler::instance().registerPendingDebugEvent(processSuspendedEvent);
+                        apBreakpointHitEvent bpEvent(threadId, exceptionAddress);
+                        reportProcessSuspended(threadId, &bpEvent);
                     }
                 }
             }
@@ -955,11 +951,7 @@ void vsdProcessDebugger::handleExceptionEvent(IDebugEvent2* piEvent, IDebugExcep
 
             // Notify observers about the second chance exception event:
             apExceptionEvent exceptionEvent(threadId, exceptionReason, exceptionAddress, true);
-            apEventsHandler::instance().registerPendingDebugEvent(exceptionEvent);
-
-            // Notify observers that the debugged process run was suspended:
-            apDebuggedProcessRunSuspendedEvent processSuspendedEvent(threadId);
-            apEventsHandler::instance().registerPendingDebugEvent(processSuspendedEvent);
+            reportProcessSuspended(threadId, &exceptionEvent);
 
             // Continuing the exception would cause the process to die:
             continueException = false;
@@ -1148,12 +1140,8 @@ void vsdProcessDebugger::handleBreakpointEvent(IDebugEvent2* piEvent, IDebugBrea
     GT_IF_WITH_ASSERT(rcSusp)
     {
         // Notify observers about the breakpoint event:
-        apBreakpointHitEvent event(threadId, bpAddress);
-        apEventsHandler::instance().registerPendingDebugEvent(event);
-
-        // Notify observers that the debugged process run was suspended:
-        apDebuggedProcessRunSuspendedEvent processSuspendedEvent(threadId);
-        apEventsHandler::instance().registerPendingDebugEvent(processSuspendedEvent);
+        apBreakpointHitEvent bpEvent(threadId, bpAddress);
+        reportProcessSuspended(threadId, &bpEvent);
     }
 
     // If the Spies API thread does not yet exist, there is no need to use the internal resume mechanism:
@@ -1300,16 +1288,41 @@ void vsdProcessDebugger::reportHostStep(osThreadId threadId, osInstructionPointe
     bool rcSusp = suspendProcessThreads();
     GT_IF_WITH_ASSERT(rcSusp)
     {
-        apEventsHandler& theEventsHandler = apEventsHandler::instance();
-
         // Notify observers about the breakpoint event:
-        apBreakpointHitEvent event(threadId, bpAddress);
-        theEventsHandler.registerPendingDebugEvent(event);
-
-        // Notify observers that the debugged process run was suspended:
-        apDebuggedProcessRunSuspendedEvent processSuspendedEvent(threadId);
-        theEventsHandler.registerPendingDebugEvent(processSuspendedEvent);
+        apBreakpointHitEvent bpEvent(threadId, bpAddress);
+        reportProcessSuspended(threadId, &bpEvent);
     }
+}
+
+// ---------------------------------------------------------------------------
+// Name:        vsdProcessDebugger::reportProcessSuspended
+// Description: Sends an apDebuggedProcessRunSuspendedEvent (as well as an optional
+//              reason event) and syncs thread control with this operation.
+// Author:      Uri Shomroni
+// Date:        17/7/2016
+// ---------------------------------------------------------------------------
+void vsdProcessDebugger::reportProcessSuspended(osThreadId threadId, apEvent* pAdditionalEvent)
+{
+    apEventsHandler& theEventsHandler = apEventsHandler::instance();
+
+    // We cannot lock the critical section here, since we want it to lock and unlock from the main thread:
+    apDeferredCommandEvent lockThreadsCmd(apDeferredCommandEvent::AP_DEFERRED_COMMAND_LOCK_THREAD_CONTROL, apDeferredCommandEvent::AP_VSD_PROCESS_DEBUGGER);
+    theEventsHandler.registerPendingDebugEvent(lockThreadsCmd);
+
+    if (nullptr != pAdditionalEvent)
+    {
+        // If an additional event was received, send it before the breakpoint event:
+        theEventsHandler.registerPendingDebugEvent(*pAdditionalEvent);
+    }
+
+    // Notify observers that the debugged process run was suspended:
+    apDebuggedProcessRunSuspendedEvent processSuspendedEvent(threadId);
+    theEventsHandler.registerPendingDebugEvent(processSuspendedEvent);
+
+    // Finally, have the process debugger release the critical section:
+    apDeferredCommandEvent unlockThreadsCmd(apDeferredCommandEvent::AP_DEFERRED_COMMAND_UNLOCK_THREAD_CONTROL, apDeferredCommandEvent::AP_VSD_PROCESS_DEBUGGER);
+    theEventsHandler.registerPendingDebugEvent(unlockThreadsCmd);
+    
 }
 
 // ---------------------------------------------------------------------------
@@ -1426,6 +1439,18 @@ void vsdProcessDebugger::onEvent(const apEvent& eve, bool& vetoEvent)
 
                         // Prevent this event from propagating further:
                         vetoEvent = true;
+                    }
+                    break;
+
+                    case apDeferredCommandEvent::AP_DEFERRED_COMMAND_LOCK_THREAD_CONTROL:
+                    {
+                        m_threadControlCS.enter();
+                    }
+                    break;
+
+                    case apDeferredCommandEvent::AP_DEFERRED_COMMAND_UNLOCK_THREAD_CONTROL:
+                    {
+                        m_threadControlCS.leave();
                     }
                     break;
 
@@ -2060,14 +2085,15 @@ bool vsdProcessDebugger::suspendDebuggedProcess()
     if (retVal)
     {
         // Notify observers that the debugged process run was suspended:
-        apDebuggedProcessRunSuspendedEvent processSuspendedEvent(OS_NO_THREAD_ID);
-        apEventsHandler::instance().registerPendingDebugEvent(processSuspendedEvent);
+        reportProcessSuspended(OS_NO_THREAD_ID);
     }
 
     return retVal;
 }
 bool vsdProcessDebugger::resumeDebuggedProcess()
 {
+    osCriticalSectionLocker threadControlLocker(m_threadControlCS);
+
     bool retVal = true;
     osThreadId bpThreadId = m_bpThreadId;
     m_bpThreadId = OS_NO_THREAD_ID;
@@ -2400,6 +2426,8 @@ bool vsdProcessDebugger::performHostStep(osThreadId threadId, StepType stepType)
 {
     bool retVal = false;
 
+    osCriticalSectionLocker threadControlLocker(m_threadControlCS);
+
     // In some situations, the step ended event will appear during this function's execution.
     // Make the handling of that event wait until this operation completes (acting as a one-way critical section):
     m_issuingStepCommand = true;
@@ -2457,6 +2485,8 @@ bool vsdProcessDebugger::performHostStep(osThreadId threadId, StepType stepType)
 
 bool vsdProcessDebugger::suspendHostDebuggedProcess()
 {
+    osCriticalSectionLocker threadControlLocker(m_threadControlCS);
+
     bool retVal = false;
 
     osProcessHandle hProcess = debuggedProcessHandle();

@@ -72,6 +72,7 @@ public:
     void handleBreakpointEvent(IDebugEvent2* piEvent, IDebugBreakpointEvent2* piBreakpointEvent, IDebugThread2* piThread, bool& continueBreakpoint);
     void handleStepCompleteEvent(IDebugEvent2* piEvent, IDebugThread2* piThread, bool& continueStep);
     void reportHostStep(osThreadId threadId, osInstructionPointer bpAddress);
+    void reportProcessSuspended(osThreadId threadId, apEvent* pAdditionalEvent = nullptr);
 
     // Overrides apIEventsObserver:
     virtual void onEvent(const apEvent& eve, bool& vetoEvent);
@@ -298,6 +299,7 @@ private:
 
     // Instances of process information wrappers:
     osCriticalSection m_threadDataCS;
+    osCriticalSection m_threadControlCS;
     gtPtrVector<vsdCDebugThread*> m_debuggedProcessThreads;
     vsdCDebugThread* m_debuggedProcessSuspensionThread1;
     vsdCDebugThread* m_debuggedProcessSuspensionThread2;
