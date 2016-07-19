@@ -38,7 +38,6 @@ env.Append( CPPPATH = [
 	env['CXL_common_dir'] + '/Lib/AMD/ADL/include',
 	env['CXL_common_dir'] + '/Src/TSingleton',
 	env['CXL_common_dir'] + '/Src/DeviceInfo',
-	env['CXL_common_dir'] + '/Lib/AMD/sp3/Include/Public',
 	env['CXL_common_dir'] + '/Src/DynamicLibraryModule',
 	env['CXL_common_dir'] + '/Lib/AMD/APPSDK/3-0/include',
 	env['CXL_common_dir'] + '/Lib/AMD/ACL/TOT/include',
@@ -90,10 +89,6 @@ sources = \
 	"Emulator/Parser/Instruction.cpp",
 ]
 
-env.Append( LIBPATH = [ 
-	env['CXL_common_dir'] + '/Lib/AMD/sp3/Lib/Linux/Public/Release/x86_64',
-])
-
 commonLinkedLibraries = \
 [
 	"CXLBaseTools",
@@ -101,7 +96,6 @@ commonLinkedLibraries = \
 	"CXLOSAPIWrappers",
 	"libboost_system",
 	"dl",
-	"sp3",
 ]
 
 # Contains all linked libraries:
