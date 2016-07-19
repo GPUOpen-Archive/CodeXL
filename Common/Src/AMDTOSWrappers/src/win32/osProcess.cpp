@@ -1481,13 +1481,21 @@ OS_API bool osExecAndGrabOutput(const char* cmd, const bool& cancelSignal, gtStr
             if (tmpFilePath.exists())
             {
                 // Read the command's output.
-                std::ifstream file(tmpFilePath.asString().asASCIICharArray());
-                std::string tmpCmdOutput((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-                cmdOutput << tmpCmdOutput.c_str();
-                file.close();
+                osFile tmpFile(tmpFilePath);
+                bool rc1 = tmpFile.open(osChannel::OS_ASCII_TEXT_CHANNEL, osFile::OS_OPEN_TO_READ);
+                if (rc1)
+                {
+                    gtASCIIString cmdOutputASCII;
+                    rc1 = tmpFile.readIntoString(cmdOutputASCII);
+                    tmpFile.close();
+
+                    if (rc1)
+                    {
+                        cmdOutput.fromASCIIString(cmdOutputASCII.asCharArray());
+                    }
+                }
 
                 // Delete the temporary file.
-                osFile tmpFile(tmpFilePath);
                 tmpFile.deleteFile();
             }
 

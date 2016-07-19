@@ -96,7 +96,6 @@ bool osFile::open(const osFilePath& path, osChannel::osChannelType fileType, osO
                 // Open an unicode file:
                 osInputFileImpl* pInputFile = new osInputFileImpl;
 
-
                 // Set my file implementation:
                 _pFileImpl = pInputFile;
 
@@ -107,7 +106,6 @@ bool osFile::open(const osFilePath& path, osChannel::osChannelType fileType, osO
             {
                 // Open an ASCII file:
                 osASCIIInputFileImpl* pInputFile = new osASCIIInputFileImpl;
-
 
                 // Set my file implementation:
                 _pFileImpl = pInputFile;
@@ -120,7 +118,6 @@ bool osFile::open(const osFilePath& path, osChannel::osChannelType fileType, osO
         {
             // Create an output file implementation:
             osOutputFileImpl* pOutputFile = new osOutputFileImpl;
-
 
             // Open the input file:
             retVal = pOutputFile->open(path, fileType, openMode);
