@@ -39,7 +39,7 @@ MAKEDEPEND		:= $(CC) $(CFLAGS) $< | sed -n 's/^\# *[0-9][0-9]* *"\([^"]*\)".*/$*
 # Specifically required for library
 #######################################
 CC				= g++
-LIBS			= -lGL -lGLU -lAMDTTeaPot -lxml2 -ldl -lgobject-2.0 -lglib-2.0 -lX11 -lfltk_gl -lfltk -lXfixes -lXext -lXft -lfontconfig -lXcursor -lXinerama
+LIBS			= -lGL -lGLU -lAMDTTeaPot -ldl -lgobject-2.0 -lglib-2.0 -lX11 -lfltk_gl -lfltk -lXfixes -lXext -lXft -lfontconfig -lXcursor -lXinerama
 
 LIBPATHS		= -L../AMDTTeaPotLib -L/usr/local/lib -L"Replace with path to your local FLTK lib folder"
 SRCDIR			= src
@@ -60,7 +60,7 @@ else
 CFLAGS			+= -O2
 endif
 LDFLAGS			= `$(PKG_CONFIG) --libs gthread-2.0 gobject-2.0` $(LIBPATHS) $(LIBS)
-EXEC			= ../release/AMDTTeaPot-bin
+EXEC			= ../release/CXLTeaPot-bin
 
 $(info ***********************************)
 $(info Make sure fltk library is installed)
