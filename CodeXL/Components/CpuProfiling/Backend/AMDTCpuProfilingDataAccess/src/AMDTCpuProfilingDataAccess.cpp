@@ -1681,6 +1681,11 @@ public:
                 m_unknownFuncIdInfoMap.insert({ func.m_functionId , func });
                 m_modOffsetFuncInfoMap.insert({ unknownFuncModOffset , func });
             }
+            else
+            {
+                func.m_functionId = it->second.m_functionId;
+                func.m_name = it->second.m_name;
+            }
         }
     }
 
@@ -3462,6 +3467,7 @@ public:
                                                          counterId,
                                                          AMDT_PROFILE_ALL_CALLPATHS,
                                                          AMDT_PROFILE_ALL_FUNCTIONS,
+                                                         0, // funcOffset
                                                          leafs);
 
                 if (ret)
@@ -3471,6 +3477,11 @@ public:
 
                     for (auto& leaf : leafs)
                     {
+                        if (IS_UNKNOWN_FUNC(leaf.m_funcInfo.m_functionId))
+                        {
+                            HandleUnknownFunction(leaf.m_funcInfo);
+                        }
+
                         // Get the function Node
                         cgNode *pLeafNode = nullptr;
                         double sampleCount = leaf.m_selfSamples;
@@ -3497,6 +3508,11 @@ public:
 
                                 for (auto& frame : frames)
                                 {
+                                    if (IS_UNKNOWN_FUNC(frame.m_funcInfo.m_functionId))
+                                    {
+                                        HandleUnknownFunction(frame.m_funcInfo);
+                                    }
+
                                     // Handle recursion.
                                     if (frame.m_funcInfo.m_functionId != pCalleeNode->m_funcInfo.m_functionId)
                                     {
@@ -3688,15 +3704,21 @@ public:
     bool GetCallGraphPaths(AMDTProcessId processId, AMDTFunctionId funcId, gtVector<AMDTCallGraphPath>& paths)
     {
         bool ret = false;
+        AMDTFunctionId dbFuncId = 0;
+        gtUInt32 unknownFuncOffset = 0;
+        gtString unknownFuncName;
 
-        ret = GetCallGraphPathsForNonLeafFunction(processId, funcId, paths);
+        bool isUnkownFunc = IsUnknownFunctionId(funcId, dbFuncId, unknownFuncOffset, unknownFuncName);
+        AMDTFunctionId fid = (!isUnkownFunc) ? funcId : dbFuncId;
 
-        ret = GetCallGraphPathsForLeafFunction(processId, funcId, paths);
+        ret = GetCallGraphPathsForNonLeafFunction(processId, fid, unknownFuncOffset, paths);
+
+        ret = GetCallGraphPathsForLeafFunction(processId, fid, unknownFuncOffset, paths);
 
         return ret;
     }
 
-    bool GetCallGraphPathsForLeafFunction(AMDTProcessId processId, AMDTFunctionId funcId, gtVector<AMDTCallGraphPath>& paths)
+    bool GetCallGraphPathsForLeafFunction(AMDTProcessId processId, AMDTFunctionId funcId, gtUInt32 funcOffset, gtVector<AMDTCallGraphPath>& paths)
     {
         bool ret = false;
         gtVector<gtUInt32>  csIds;
@@ -3704,7 +3726,7 @@ public:
 
         // This returns the unique callstack-ids in which the function is in the
         // callpath as a leaf
-        ret = m_pDbAdapter->GetCallstackIds(processId, funcId, isLeafEntries, csIds);
+        ret = m_pDbAdapter->GetCallstackIds(processId, funcId, funcOffset, isLeafEntries, csIds);
 
         for (auto& csId : csIds)
         {
@@ -3714,11 +3736,17 @@ public:
                                                      m_cgCounterId,
                                                      csId,
                                                      funcId,
+                                                     funcOffset,
                                                      leafs);
 
             // Ideally, there will be only one leaf
             for (auto& leaf : leafs)
             {
+                if (IS_UNKNOWN_FUNC(leaf.m_funcInfo.m_functionId))
+                {
+                    HandleUnknownFunction(leaf.m_funcInfo);
+                }
+
                 gtUInt32 samples = leaf.m_selfSamples;
 
                 // Get the callstack/callpath for this csId
@@ -3760,6 +3788,7 @@ public:
 
     bool GetCallGraphPathsForNonLeafFunction(AMDTProcessId processId,
                                              AMDTFunctionId funcId,
+                                             gtUInt32 funcOffset,
                                              gtVector<AMDTCallGraphPath>& paths)
     {
         bool ret = false;
@@ -3768,7 +3797,7 @@ public:
 
         // This returns the unique callstack-ids in which the function is in the
         // callpath as a non-leaf
-        ret = m_pDbAdapter->GetCallstackIds(processId, funcId, isLeafEntries, csIds);
+        ret = m_pDbAdapter->GetCallstackIds(processId, funcId, funcOffset, isLeafEntries, csIds);
 
         for (auto& csId : csIds)
         {
@@ -3778,10 +3807,16 @@ public:
                                                      m_cgCounterId,
                                                      csId,
                                                      AMDT_PROFILE_ALL_FUNCTIONS,
+                                                     funcOffset,
                                                      leafs);
 
             for (auto &leaf : leafs)
             {
+                if (IS_UNKNOWN_FUNC(leaf.m_funcInfo.m_functionId))
+                {
+                    HandleUnknownFunction(leaf.m_funcInfo);
+                }
+
                 // Ignore the leaf-function with passed "funcId" as that callpath will be fetched by
                 // GetCallGraphPathsForLeafFunction()
                 if (leaf.m_funcInfo.m_functionId != funcId)

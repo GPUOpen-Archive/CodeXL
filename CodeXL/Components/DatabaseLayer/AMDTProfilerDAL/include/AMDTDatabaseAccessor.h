@@ -289,6 +289,7 @@ public:
                               AMDTCounterId       counterId,
                               gtUInt32            callStackId,
                               AMDTFunctionId      funcId,
+                              gtUInt32            funcOffset,
                               CallstackFrameVec&  leafs);
 
     bool GetCallstackFrameData(AMDTProcessId       processId,
@@ -297,6 +298,7 @@ public:
 
     bool GetCallstackIds(AMDTProcessId        processId,
                          AMDTFunctionId       funcId,
+                         gtUInt32             funcOffset,
                          bool                 isLeafEntries,
                          gtVector<gtUInt32>&  csIds);
 

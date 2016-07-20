@@ -5323,6 +5323,7 @@ public:
         AMDTUInt32          counterId,   // TODO: Is there a need to support ALL_COUNTERS?
         gtUInt32            callstackId, // AMDT_PROFILE_ALL_CALLPATHS
         AMDTFunctionId      funcId,
+        gtUInt32            funcOffset,
         CallstackFrameVec&  leafs)
     {
         bool ret = false;
@@ -5331,16 +5332,17 @@ public:
                                      counterId,
                                      callstackId,
                                      funcId,
+                                     funcOffset,
                                      false,
                                      leafs);
 
-        // TODO: Need to fetch unknown functions too
-
-        //ret = GetCallstackLeafData__(processId,
-        //                             counterId,
-        //                             callstackId,
-        //                             leafs,
-        //                             true);
+        ret = GetCallstackLeafData__(processId,
+                                     counterId,
+                                     callstackId,
+                                     funcId,
+                                     funcOffset,
+                                     true,
+                                     leafs);
 
         return ret;
     }
@@ -5351,35 +5353,52 @@ public:
         AMDTUInt32          counterId,   // TODO: Is there a need to support ALL_COUNTERS?
         gtUInt32            callstackId, // AMDT_PROFILE_ALL_CALLPATHS
         AMDTFunctionId      functionId,
+        gtUInt32            funcOffset,
         bool                queryUnknownFuncs,
         CallstackFrameVec&  leafs)
     {
         bool ret = false;
 
         std::stringstream query;
-        query << "SELECT callstackId, functionId, Module.isSystemModule, offset, SUM(selfSamples) "  \
-                 "FROM  CallstackLeaf "     \
-                 "INNER JOIN Module on ((CallstackLeaf.functionId & 0xFFFF0000) >> 16) = Module.id " \
-                 "WHERE processId = ? AND samplingConfigurationId = ? ";
-
-        if (IS_CALLSTACK_QUERY(callstackId))
-        {
-            query << "AND callstackId = ? ";
-        }
-
-        if (IS_FUNCTION_QUERY(functionId))
-        {
-            query << "AND functionId = ? ";
-        }
 
         if (!queryUnknownFuncs)
         {
-            query << "GROUP BY callstackId, functionId HAVING functionId & 0x0000ffff > 0 ;";
+            query << "SELECT callstackId, functionId, Module.isSystemModule, offset, SUM(selfSamples) "  \
+                "FROM  CallstackLeaf "     \
+                "INNER JOIN Module on ((CallstackLeaf.functionId & 0xFFFF0000) >> 16) = Module.id " \
+                "WHERE processId = ? AND samplingConfigurationId = ? ";
+
+            if (IS_CALLSTACK_QUERY(callstackId))
+            {
+                query << "AND callstackId = ? ";
+            }
+
+            if (IS_FUNCTION_QUERY(functionId))
+            {
+                query << "AND functionId = ? ";
+            }
+
+            query << "GROUP BY callstackId, functionId HAVING functionId & 0x0000ffff > 0 ";
         }
         else
         {
-            query << " AND functionId > 0 GROUP BY callstackId, offset HAVING functionId & 0x0000ffff = 0 ;";
+            query << "SELECT callstackId, functionId, Module.isSystemModule, offset, selfSamples "  \
+                "FROM  CallstackLeaf "     \
+                "INNER JOIN Module on ((CallstackLeaf.functionId & 0xFFFF0000) >> 16) = Module.id " \
+                "WHERE processId = ? AND samplingConfigurationId = ? AND (functionId & 0x0000ffff) = 0 ";
+
+            if (IS_CALLSTACK_QUERY(callstackId))
+            {
+                query << " AND callstackId = ? ";
+            }
+
+            if (IS_FUNCTION_QUERY(functionId))
+            {
+                query << " AND functionId = ? AND offset = ? ";
+            }            
         }
+
+        query << " ;";
 
         sqlite3_stmt* pQueryStmt = nullptr;
         int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
@@ -5397,6 +5416,11 @@ public:
             if (IS_FUNCTION_QUERY(functionId))
             {
                 sqlite3_bind_int(pQueryStmt, 4, functionId);
+
+                if (queryUnknownFuncs)
+                {
+                    sqlite3_bind_int(pQueryStmt, 5, funcOffset);
+                }
             }
 
             // Execute the query.
@@ -5494,6 +5518,7 @@ public:
     bool GetCallstackIds (
         AMDTProcessId        processId,
         AMDTFunctionId       funcId,
+        gtUInt32             funcOffset,
         bool                 isLeafEntries, // if true, fetch from the CallstackLeaf table, otherwise from CallstackFrame
         gtVector<gtUInt32>&  csIds)
     {
@@ -5508,7 +5533,14 @@ public:
         {
             query << "SELECT DISTINCT callstackId "        \
                 "FROM  CallstackFrame "     \
-                "WHERE functionId = ? AND processId = ? ;";
+                "WHERE functionId = ? AND processId = ? ";
+           
+            if ((IS_UNKNOWN_FUNC(funcId)) && (funcOffset > 0))
+            {
+                query << " AND offset = ? ";
+            }
+
+            query << " ; ";
 
             rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
 
@@ -5516,6 +5548,11 @@ public:
             {
                 sqlite3_bind_int(pQueryStmt, 1, funcId);
                 sqlite3_bind_int(pQueryStmt, 2, processId);
+
+                if ((IS_UNKNOWN_FUNC(funcId)) && (funcOffset > 0))
+                {
+                    sqlite3_bind_int(pQueryStmt, 3, funcOffset);
+                }
 
                 // Execute the query.
                 while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
@@ -5537,6 +5574,11 @@ public:
                 "FROM  CallstackLeaf "     \
                 "WHERE functionId = ? AND processId = ? ;";
 
+            if ((IS_UNKNOWN_FUNC(funcId)) && (funcOffset > 0))
+            {
+                query << " AND offset = ? ";
+            }
+
             pQueryStmt = nullptr;
             rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
 
@@ -5544,6 +5586,11 @@ public:
             {
                 sqlite3_bind_int(pQueryStmt, 1, funcId);
                 sqlite3_bind_int(pQueryStmt, 2, processId);
+
+                if ((IS_UNKNOWN_FUNC(funcId)) && (funcOffset > 0))
+                {
+                    sqlite3_bind_int(pQueryStmt, 3, funcOffset);
+                }
 
                 // Execute the query.
                 while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
@@ -6650,13 +6697,14 @@ bool AmdtDatabaseAccessor::GetCallstackLeafData(AMDTProcessId       processId,
                                                 AMDTCounterId       counterId,
                                                 gtUInt32            callStackId,
                                                 AMDTFunctionId      funcId,
+                                                gtUInt32            funcOffset,
                                                 CallstackFrameVec&  leafs)
 {
     bool ret = false;
 
     if (m_pImpl != nullptr)
     {
-        ret = m_pImpl->GetCallstackLeafData(processId, counterId, callStackId, funcId, leafs);
+        ret = m_pImpl->GetCallstackLeafData(processId, counterId, callStackId, funcId, funcOffset, leafs);
     }
 
     return ret;
@@ -6679,6 +6727,7 @@ bool AmdtDatabaseAccessor::GetCallstackFrameData(AMDTProcessId       processId,
 
 bool AmdtDatabaseAccessor::GetCallstackIds(AMDTProcessId        processId,
                                            AMDTFunctionId       funcId,
+                                           gtUInt32             funcOffset,
                                            bool                 isLeafEntries,
                                            gtVector<gtUInt32>&  csIds)
 {
@@ -6686,7 +6735,7 @@ bool AmdtDatabaseAccessor::GetCallstackIds(AMDTProcessId        processId,
 
     if (m_pImpl != nullptr)
     {
-        ret = m_pImpl->GetCallstackIds(processId, funcId, isLeafEntries, csIds);
+        ret = m_pImpl->GetCallstackIds(processId, funcId, funcOffset, isLeafEntries, csIds);
     }
 
     return ret;
