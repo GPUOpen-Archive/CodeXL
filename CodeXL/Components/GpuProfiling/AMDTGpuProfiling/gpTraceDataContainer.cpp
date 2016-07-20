@@ -1130,7 +1130,7 @@ QString gpTraceDataContainer::AddGPUCallToCommandList(APIInfo* pAPIInfo)
             }
             else
             {
-                m_commandListToQueueMap.insertMulti(commandListName, queueName);
+                m_commandListToQueueMap[commandListName] = queueName;
             }
 
             // Find the command list data for which this GPU call should be added
@@ -1138,7 +1138,8 @@ QString gpTraceDataContainer::AddGPUCallToCommandList(APIInfo* pAPIInfo)
             int commandListInstnaceIndex = -1;
             for (int i = 0; i < (int)m_commandListInstancesVector.size(); i++)
             {
-                if (m_commandListInstancesVector[i].m_sampleIds.contains(sampleID))
+                bool doesCommandListMatch = (m_commandListInstancesVector[i].m_commandListPtr == commandListName);
+                if (m_commandListInstancesVector[i].m_sampleIds.contains(sampleID) && doesCommandListMatch)
                 {
                     commandListInstnaceIndex = i;
                     break;
@@ -1152,6 +1153,13 @@ QString gpTraceDataContainer::AddGPUCallToCommandList(APIInfo* pAPIInfo)
             if ((commandListInstnaceIndex >= 0) && (commandListInstnaceIndex < m_commandListInstancesVector.size()))
             {
                 // Update the existing command list data with the current API call data
+                if (!m_commandListInstancesVector[commandListInstnaceIndex].m_commandListQueueName.isEmpty())
+                {
+                    if (m_commandListInstancesVector[commandListInstnaceIndex].m_commandListQueueName != queueName)
+                    {
+                        GT_ASSERT(false);
+                    }
+                }
                 m_commandListInstancesVector[commandListInstnaceIndex].m_commandListQueueName = queueName;
                 m_commandListInstancesVector[commandListInstnaceIndex].m_apiIndices.push_back(pAPIInfo->m_uiSeqID);
 
@@ -1167,6 +1175,10 @@ QString gpTraceDataContainer::AddGPUCallToCommandList(APIInfo* pAPIInfo)
 
                 commandListIndex = m_commandListInstancesVector[commandListInstnaceIndex].m_instanceIndex;
                 commandListPtr = m_commandListInstancesVector[commandListInstnaceIndex].m_commandListPtr;
+            }
+            else if (sampleID == 0)
+            { 
+                GT_ASSERT_EX(false, L"got here");
             }
 
             // Build containing command list instance name
