@@ -1408,6 +1408,16 @@ void CpuProjectHandler::handleDataFileImport(const osFilePath& importedSessionFi
         gtList<gtString> noFilter;
         oldDir.copyFilesToDirectory(baseDir.directoryPath().asString(), noFilter);
 
+        // Delete any .csv file copied. CSV files are treated as gpu-debugger profile data.
+        gtList<osFilePath> csvFilePathList;
+        baseDir.getContainedFilePaths(L"*.csv", osDirectory::SORT_BY_NAME_ASCENDING, csvFilePathList, false);
+
+        for (auto& csvFilePath : csvFilePathList)
+        {
+            osFile file(csvFilePath);
+            file.deleteFile();
+        }
+
         // Update the imported files to the imported session name:
         renameFilesInDir(baseDir, importProfile, profileFileName);
 
