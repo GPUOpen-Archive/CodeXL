@@ -726,7 +726,7 @@ void PwrConfigureHistogramCounters()
         {
             if (Iter.second.m_isActive
                 && ((AMDT_PWR_VALUE_CUMULATIVE == Iter.second.m_desc.m_aggregation)
-                    || (AMDT_PWR_VALUE_CUMULATIVE == Iter.second.m_desc.m_aggregation)))
+                    || (AMDT_PWR_VALUE_HISTOGRAM == Iter.second.m_desc.m_aggregation)))
             {
 
                 // Check is prevous basic counter is active
@@ -2099,6 +2099,7 @@ AMDTResult AMDTPwrReadCounterHistogram(AMDTUInt32 counterID,
                 }
             }
 
+            *ppData = &g_histogramResult[0];
         }
         else
         {
@@ -2107,7 +2108,7 @@ AMDTResult AMDTPwrReadCounterHistogram(AMDTUInt32 counterID,
             if (nullptr != pHistogram)
             {
                 g_histogramResult.push_back(*pHistogram);
-                *ppData = &g_histogramResult[0];
+                *ppData = pHistogram;
                 *pNumEntries = 1;
             }
             else

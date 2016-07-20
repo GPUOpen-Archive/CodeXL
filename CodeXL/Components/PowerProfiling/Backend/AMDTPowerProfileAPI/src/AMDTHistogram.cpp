@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define FREQ_BIN_CNT 10
+#define FREQ_BIN_CNT 20
 extern MemoryPool g_transPool;
 
 // counterid, AMDTPwrHistogram
