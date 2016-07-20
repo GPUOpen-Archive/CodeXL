@@ -128,6 +128,11 @@ const std::vector<std::string> SQL_CREATE_DB_STMTS_AGGREGATION =
     //"CREATE TABLE Callgraph (id INTEGER NOT NULL, callerId INTEGER, calleeId INTEGER, edgeLevel INTEGER)", // FOREIGN KEY(callerId) REFERENCES Function(id), FOREIGN KEY(calleeId) REFERENCES Function(id), FOREIGN KEY(samplingConfigurationId) REFERENCES SamplingConfiguration(id)
     //"CREATE TABLE CallgraphSampleAggregation (callgraphId INTEGER NOT NULL, sampleContextId INTEGER, selfSamples INTEGER, deepSamples INTEGER)", // FOREIGN KEY(callgraphId) REFERENCES Callgraph(id), FOREIGN KEY(sampleContextId) REFERENCES SampleContext(id)
     "CREATE UNIQUE INDEX 'unique_samples' ON SampleContext (processThreadId, moduleInstanceId, coreSamplingConfigurationId, functionId, offset)",
+    "CREATE INDEX callStackLeafIdx ON CallstackLeaf (processId, samplingConfigurationId, callstackId)",
+    "CREATE INDEX callStackLeafFunctionIdx ON CallstackLeaf (functionId, offset)",
+    "CREATE INDEX callStackFrameIdx ON CallstackFrame (callstackId)",
+    "CREATE INDEX callStackFrameFunctionIdx ON CallstackFrame (functionId, offset)",
+    "CREATE INDEX sampleContextIdx ON SampleContext (functionId, offset)",
 };
 
 // Migrate table for version 1 - add new columns in tables "devices" and "counters"

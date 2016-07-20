@@ -258,6 +258,12 @@ public:
         m_options.Clear();
 
         m_funcIdInfoMap.clear();
+
+        for (auto srcInfo : m_funcIdSrcInfoMap)
+        {
+            srcInfo.second.clear();
+        }
+
         m_funcIdSrcInfoMap.clear();
 
         m_processSampleTotalMap.clear();
@@ -2400,7 +2406,6 @@ public:
         bool foundSrcInfo = false;
         bool foundSrcFilePath = false;
 
-        // TODO: This map is not yet filled-in
         auto funcSrcInfoIt = m_funcIdSrcInfoMap.find(funcId);
 
         if (funcSrcInfoIt != m_funcIdSrcInfoMap.end())
@@ -2412,6 +2417,11 @@ public:
         if (!foundSrcInfo)
         {
             rv = GetDisassembly(funcId, srcInfoVec);
+
+            if (rv)
+            {
+                m_funcIdSrcInfoMap.insert({ funcId, srcInfoVec });
+            }
 
             if (!foundSrcFilePath)
             {
@@ -3659,7 +3669,8 @@ public:
 
                 for (auto& cgFunc : *pCgFunctionMap)
                 {
-                    if (!(m_options.m_ignoreSystemModules && cgFunc.second.m_isSystemModule))
+                    if (   (CXL_ROOT_FUNCTION_ID != cgFunc.first)
+                        && (!(m_options.m_ignoreSystemModules && cgFunc.second.m_isSystemModule)))
                     {
                         AMDTCallGraphFunction func;
                         CopyCGNode(func, cgFunc.second, totalDeepSamples);
