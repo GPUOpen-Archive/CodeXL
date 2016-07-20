@@ -4014,6 +4014,12 @@ public:
                     osFilePath aPath(modInfo.m_path);
                     aPath.getFileNameAndExtension(funcInfo.m_name);
 
+                    funcInfo.m_name.appendFormattedString(L"!0x" LONG_FORMAT_HEX, funcInfo.m_startOffset + modInfo.m_loadAddress);
+                }
+                else
+                {
+                    // FIXME: When will we hit this case?
+                    funcInfo.m_name = L"Unknown Function";
                     funcInfo.m_name.appendFormattedString(L"!0x" LONG_FORMAT_HEX, funcInfo.m_startOffset);
                 }
 

@@ -2815,6 +2815,27 @@ public:
     bool GetModuleInfo(AMDTUInt32 pid, AMDTModuleId mid, gtVector<AMDTProfileModuleInfo>& moduleInfoList)
     {
         bool ret = false;
+
+        ret = GetModuleInfo__(pid, mid, moduleInfoList);
+
+        if (!ret)
+        {
+            AMDTProfileModuleInfo moduleInfo;
+
+            ret = GetModuleInfo__(mid, moduleInfo);
+
+            if (ret)
+            {
+                moduleInfoList.push_back(moduleInfo);
+            }
+        }
+
+        return ret;
+    }
+
+    bool GetModuleInfo__(AMDTUInt32 pid, AMDTModuleId mid, gtVector<AMDTProfileModuleInfo>& moduleInfoList)
+    {
+        bool ret = false;
         sqlite3_stmt* pQueryStmt = nullptr;
         std::stringstream partialQuery;
 
@@ -2893,6 +2914,62 @@ public:
                 moduleInfo.m_isSystemModule = (systemModule == 0) ? false : true;
 
                 moduleInfoList.emplace_back(moduleInfo);
+            }
+
+            // Finalize the statement.
+            sqlite3_finalize(pQueryStmt);
+            ret = true;
+        }
+
+        return ret;
+    }
+
+    // For some weird reasons we only have an entry in Module table but there is no
+    // corresponding entry in ModuleInstance table.. to handle those scenarios...
+    bool GetModuleInfo__(AMDTModuleId mid, AMDTProfileModuleInfo& moduleInfo)
+    {
+        bool ret = false;
+        sqlite3_stmt* pQueryStmt = nullptr;
+        std::stringstream partialQuery;
+
+        partialQuery << "SELECT DISTINCT Module.id,                      \
+                                         Module.path,                    \
+                                         Module.size,                    \
+                                         Module.is32Bit,                 \
+                                         Module.foundDebugInfo,          \
+                                         Module.type,                    \
+                                         Module.isSystemModule           \
+                         FROM Module                                     \
+                         WHERE moduleId = ? ";
+
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, partialQuery.str().c_str(), -1, &pQueryStmt, nullptr);
+
+        if (SQLITE_OK == rc)
+        {
+            sqlite3_bind_int(pQueryStmt, 1, mid);
+
+            // Execute the query.
+            while (sqlite3_step(pQueryStmt) == SQLITE_ROW)
+            {
+                moduleInfo.m_moduleId = sqlite3_column_int(pQueryStmt, 0);
+                const unsigned char* path = sqlite3_column_text(pQueryStmt, 1);
+                moduleInfo.m_size = sqlite3_column_int(pQueryStmt, 2);
+                AMDTUInt32 is32Bit = sqlite3_column_int(pQueryStmt, 3);
+                AMDTUInt32 foundDebugInfo = sqlite3_column_int(pQueryStmt, 4);
+                AMDTUInt32 type = sqlite3_column_int(pQueryStmt, 5);
+                AMDTUInt32 systemModule = sqlite3_column_int(pQueryStmt, 6);
+
+                moduleInfo.m_path.fromUtf8String(reinterpret_cast<const char*>(path));
+
+                // Set the module name
+                GetNameFromPath(moduleInfo.m_path, moduleInfo.m_name);
+
+                // loadAddress is valid only if the PID is specified.
+                moduleInfo.m_loadAddress = 0; // AMDT_PROFILE_INVALID_ADDR;
+                moduleInfo.m_is64Bit = (is32Bit == 0) ? true : false;
+                moduleInfo.m_foundDebugInfo = (foundDebugInfo == 0) ? false : true;
+                moduleInfo.m_type = static_cast<AMDTModuleType>(type);
+                moduleInfo.m_isSystemModule = (systemModule == 0) ? false : true;
             }
 
             // Finalize the statement.
