@@ -25,6 +25,7 @@
 #include <AMDTBaseTools/Include/gtString.h>
 #include <AMDTOSWrappers/Include/osFilePath.h>
 #include <AMDTOSWrappers/Include/osDirectory.h>
+#include <AMDTOSWrappers/Include/osModule.h>
 
 using namespace std;
 using namespace D3D10ShaderObject;
@@ -159,29 +160,36 @@ beKA::beStatus beProgramBuilderDX::Initialize(const string& dxModuleToLoad/* = "
                 // Take the relevant module's name.
                 const char* pModuleName = (dxModuleToLoad.length() > 0) ?
                                           dxModuleToLoad.c_str() : D3DCompileModule::s_DefaultModuleName;
+                
+                // This flag will be true if the given D3D module's bitness is 64-bit, while
+                // this process' bitness is 32-bit.
+                bool is64from32Error = false;
+#ifndef _WIN64
+                // If we are in 32-bit mode, check if the module's bitness is 64-bit.
+                osFilePath modulePath;
+                gtString moduleFilaNameAsGtStr;
+                moduleFilaNameAsGtStr << pModuleName;
+                modulePath.setFileName(moduleFilaNameAsGtStr);
+                osIs64BitModule(moduleFilaNameAsGtStr, is64from32Error);
+#endif // !_WIN64
 
-                // We failed to load the module.
-                // Notice: This message receives an extra "\n", since later in the call chain, one is removed. We do want to remove them for
-                // the rest of the messages, so we only remove it for initialization messages:
+                // Generate the error message.
                 stringstream ss;
-                ss << "Error: " << pModuleName << " module not loaded. Error = " << errorCode << ". Please use D3D compiler version 43 or above." << endl << endl;
-
-                LogCallBack(ss.str());
-
-                if (errorCode == ERROR_PROC_NOT_FOUND)
+                if (is64from32Error)
                 {
-                    // GetProcAddress failed. This means that the D3DCompiler DLL version is incompatible with CodeXL. Probably too old.
-                    beRet = beStatus_D3DCompile_MODULE_NOT_SUPPORTED;
-                }
-                else if (errorCode == ERROR_FILE_NOT_FOUND || errorCode == ERROR_MOD_NOT_FOUND)
-                {
-                    // File was not found or module could not be loaded.
-                    beRet = beStatus_D3DCompile_MODULE_NOT_LOADED;
+                    ss << "Error: " << pModuleName << " is a 64-bit module, which cannot be loaded during a 32-bit build." << std::endl;
                 }
                 else
                 {
-                    beRet = beStatus_D3DCompile_MODULE_NOT_LOADED;
+                    // We failed to load the module.
+                    // Notice: This message receives an extra "\n", since later in the call chain, one is removed. We do want to remove them for
+                    // the rest of the messages, so we only remove it for initialization messages:
+                    ss << "Error: " << pModuleName << " module not loaded. Error = " << errorCode << ". Please use D3D compiler version 43 or above." << std::endl;
                 }
+
+                // Print the error message, and abort the build process.
+                LogCallBack(ss.str());
+                exit(-1);
             }
         }
     }

@@ -984,14 +984,6 @@ bool kaProjectSettingsShaderExtension::ValidateD3DPath(const osFilePath& path) c
         qFullName.append(acGTStringToQString(gtStr));
 
         isValid = rx.exactMatch(qFullName);
-
-        if (isValid)
-        {
-            // check that is not 64 bit dll
-            bool is64Bit = false;
-            osIs64BitModule(path, is64Bit);
-            isValid = !is64Bit;
-        }
     }
 
     return isValid;
