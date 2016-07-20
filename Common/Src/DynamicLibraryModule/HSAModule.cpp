@@ -6,6 +6,8 @@
 //==============================================================================
 
 #include <string>
+//#include <string.h>
+#include <cstring>
 #include "HSAModule.h"
 
 #if defined(_WIN64) || defined(__LP64__)
@@ -96,6 +98,7 @@ bool HSAModule::LoadModule(const std::string& moduleName)
             if ((HSA_STATUS_SUCCESS == status) && extensionSupported)
             {
                 hsa_ext_finalizer_1_00_pfn_t finalizerTable;
+                memset(&finalizerTable, 0, sizeof(hsa_ext_finalizer_1_00_pfn_t));
                 status = system_get_extension_table(HSA_EXTENSION_FINALIZER, 1, 0, &finalizerTable);
 
                 if (HSA_STATUS_SUCCESS == status)
@@ -112,6 +115,7 @@ bool HSAModule::LoadModule(const std::string& moduleName)
             if ((HSA_STATUS_SUCCESS == status) && extensionSupported)
             {
                 hsa_ext_images_1_00_pfn_t imagesTable;
+                memset(&imagesTable, 0, sizeof(hsa_ext_images_1_00_pfn_t));
                 status = system_get_extension_table(HSA_EXTENSION_IMAGES, 1, 0, &imagesTable);
 
                 if (HSA_STATUS_SUCCESS == status)
@@ -129,17 +133,18 @@ bool HSAModule::LoadModule(const std::string& moduleName)
 #endif
             if ((HSA_STATUS_SUCCESS == status) && extensionSupported)
             {
-#ifdef FUTURE_ROCR_VERSION 
-                hsa_ven_amd_loader_1_00_pfn_t loadedCodeObjectTable;
-                status = system_get_extension_table(HSA_EXTENSION_AMD_LOADER, 1, 0, &loadedCodeObjectTable);
+#ifdef FUTURE_ROCR_VERSION
+                hsa_ven_amd_loader_1_00_pfn_t loaderTable;
+                memset(&loaderTable, 0, sizeof(hsa_ven_amd_loader_1_00_pfn_t));
+                status = system_get_extension_table(HSA_EXTENSION_AMD_LOADER, 1, 0, &loaderTable);
 #else
-                hsa_ven_amd_loaded_code_object_1_00_pfn_t loadedCodeObjectTable;
-                status = system_get_extension_table(HSA_EXTENSION_AMD_LOADED_CODE_OBJECT, 1, 0, &loadedCodeObjectTable);
+                hsa_ven_amd_loaded_code_object_1_00_pfn_t loaderTable;
+                memset(&loaderTable, 0, sizeof(hsa_ven_amd_loaded_code_object_1_00_pfn_t));
+                status = system_get_extension_table(HSA_EXTENSION_AMD_LOADED_CODE_OBJECT, 1, 0, &loaderTable);
 #endif
                 if (HSA_STATUS_SUCCESS == status)
                 {
-
-#define X(SYM) SYM = loadedCodeObjectTable.hsa_##SYM;
+#define X(SYM) SYM = loaderTable.hsa_##SYM;
                     HSA_VEN_AMD_LOADER_API_TABLE;
 #undef X
                 }
@@ -154,9 +159,9 @@ bool HSAModule::LoadModule(const std::string& moduleName)
 
 #undef X
 
-        // Check if we initialized all the function pointers
+        // Check if we initialized all the core function pointers (all others are considered optional for the m_isModuleLoaded flag -- this is better for backwards compatibility)
 #define X(SYM) && SYM != nullptr
-        m_isModuleLoaded = true HSA_RUNTIME_API_TABLE HSA_EXT_FINALIZE_API_TABLE HSA_EXT_IMAGE_API_TABLE HSA_EXT_AMD_API_TABLE;
+        m_isModuleLoaded = true HSA_RUNTIME_API_TABLE;
 #undef X
 
     }
