@@ -202,6 +202,47 @@ CallGraphFuncListItem* CallGraphPathFuncList::AcquireChildItem(CallGraphFuncList
     return pFuncListItem;
 }
 
+gtUInt64 CallGraphPathFuncList::AddTreeSample(CallGraphFuncListItem* listItem)
+{
+    gtUInt64 deepSamples = 0;
+
+    if (nullptr != listItem)
+    {
+        for (int itemIndex = 0, itemsCount = listItem->childCount(); itemIndex < itemsCount; ++itemIndex)
+        {
+            CallGraphFuncListItem* pCurrFuncListItem = static_cast<CallGraphFuncListItem*>(listItem->child(itemIndex));
+            deepSamples += AddTreeSample(pCurrFuncListItem);
+        }
+
+        listItem->m_deepSamples = deepSamples;
+        deepSamples += listItem->m_selfSample;
+    }
+
+    return deepSamples;
+}
+
+
+void CallGraphPathFuncList::SetSamplePercent(CallGraphFuncListItem* listItem, gtUInt64 totalDeepCount)
+{
+    if (nullptr != listItem)
+    {
+        for (int itemIndex = 0, itemsCount = listItem->childCount(); itemIndex < itemsCount; ++itemIndex)
+        {
+            CallGraphFuncListItem* pCurrFuncListItem = static_cast<CallGraphFuncListItem*>(listItem->child(itemIndex));
+
+            if (nullptr != pCurrFuncListItem)
+            {
+                SetSamplePercent(pCurrFuncListItem, totalDeepCount);
+                pCurrFuncListItem->AddCountValue(CALLGRAPH_PATH_SELF, pCurrFuncListItem->m_selfSample);
+                pCurrFuncListItem->AddCountValue(CALLGRAPH_PATH_DOWNSTREAM_SAMPLES, pCurrFuncListItem->m_deepSamples);
+
+                pCurrFuncListItem->SetPercentageValue(CALLGRAPH_PATH_DOWNSTREAM_PERCENTAGE,
+                                                      static_cast<double>(pCurrFuncListItem->m_deepSamples + pCurrFuncListItem->m_selfSample),
+                                                      totalDeepCount);
+            }
+        }
+    }
+}
 
 void CallGraphPathFuncList::SetFunctionPath(std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
                                             AMDTFunctionId funcId,
@@ -220,6 +261,7 @@ void CallGraphPathFuncList::SetFunctionPath(std::shared_ptr<cxlProfileDataReader
 
     for (const auto& path : paths)
     {
+        const double totalDeepCount = static_cast<double>(path.at(0).m_totalDeepSamples);
         CallGraphFuncListItem* pFuncListItem = nullptr;
 
         for (const auto& func : path)
@@ -241,12 +283,29 @@ void CallGraphPathFuncList::SetFunctionPath(std::shared_ptr<cxlProfileDataReader
                 pFuncListItem->m_moduleId = func.m_functionInfo.m_moduleId;
 
                 pFuncListItem->setExpanded(true);
-                //m_pFuncTable->collapseItem(pFuncListItem);
-                pFuncListItem->AddCountValue(CALLGRAPH_PATH_SELF, func.m_totalSelfSamples);
-                pFuncListItem->AddCountValue(CALLGRAPH_PATH_DOWNSTREAM_SAMPLES, func.m_totalDeepSamples);
-                pFuncListItem->AddCountValue(CALLGRAPH_PATH_DOWNSTREAM_PERCENTAGE, func.m_deepSamplesPerc);
+                pFuncListItem->m_deepSamples = func.m_totalDeepSamples;
+                pFuncListItem->m_selfSample  = func.m_totalSelfSamples;
             }
+        }
+    }
 
+    //CallGraphFuncListItem* pFuncListItem = nullptr;
+
+    for (int itemIndex = 0, itemsCount = m_pFuncTable->topLevelItemCount(); itemIndex < itemsCount; ++itemIndex)
+    {
+        CallGraphFuncListItem* pCurrFuncListItem = static_cast<CallGraphFuncListItem*>(m_pFuncTable->topLevelItem(itemIndex));
+
+        if (nullptr != pCurrFuncListItem)
+        {
+            AddTreeSample(pCurrFuncListItem);
+            SetSamplePercent(pCurrFuncListItem, pCurrFuncListItem->m_deepSamples);
+
+            pCurrFuncListItem->AddCountValue(CALLGRAPH_PATH_SELF, pCurrFuncListItem->m_selfSample);
+            pCurrFuncListItem->AddCountValue(CALLGRAPH_PATH_DOWNSTREAM_SAMPLES, pCurrFuncListItem->m_deepSamples);
+            pCurrFuncListItem->SetPercentageValue(
+                CALLGRAPH_PATH_DOWNSTREAM_PERCENTAGE,
+                static_cast<double>(pCurrFuncListItem->m_deepSamples),
+                pCurrFuncListItem->m_deepSamples);
         }
     }
 

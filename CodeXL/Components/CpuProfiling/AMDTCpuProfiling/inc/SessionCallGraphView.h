@@ -179,6 +179,10 @@ private:
     void InitializeItem(CallGraphFuncListItem* pFuncListItem, gtString funcName, gtString modulePath);
     /// resize function name column
     void ResizeFunctionNameColumn();
+    gtUInt64 AddTreeSample(CallGraphFuncListItem* listItem);
+    void SetSamplePercent(CallGraphFuncListItem* listItem, gtUInt64 sampleCount);
+
+
 
     FunctionsTreeCtrl* m_pFuncTable;
     SessionCallGraphView* m_pCallGraphTab;
@@ -201,10 +205,12 @@ public:
 
     const FunctionGraph::Node* m_pFuncNode;
     AMDTUInt32  m_functionId;
-    gtUInt64    m_selfSample;
     gtUInt64    m_moduleId;
     gtString    m_functionName;
     gtString    m_moduleName;
+
+    gtUInt64    m_selfSample;
+    gtUInt64    m_deepSamples;
 };
 
 class CallGraphFuncList : public QWidget
@@ -251,7 +257,7 @@ public:
                                            gtUInt32 srcFileLine,
                                            AMDTUInt32 moduleId);
 
-	std::vector<AMDTFunctionId> m_funcIdVec;
+    std::vector<AMDTFunctionId> m_funcIdVec;
 
 public slots:
     void selectAFunction(AMDTFunctionId funcId);
@@ -425,7 +431,7 @@ private:
     acWidgetAction* m_pPidComboAction = nullptr;
     CallGraphFuncList* m_pFuncTable = nullptr;
     CallGraphPathFuncList* m_pPathFuncTable = nullptr;
-	AMDTFunctionId m_pFuncIdSelected = AMDT_PROFILE_ALL_FUNCTIONS;
+    AMDTFunctionId m_pFuncIdSelected = AMDT_PROFILE_ALL_FUNCTIONS;
     QSplitter* m_pSplitter = nullptr;
 
     acWidgetAction* m_pHotSpotIndicatorComboBoxAction = nullptr;
