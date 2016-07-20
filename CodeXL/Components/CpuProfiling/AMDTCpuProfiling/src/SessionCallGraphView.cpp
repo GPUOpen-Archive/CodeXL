@@ -261,7 +261,7 @@ void CallGraphPathFuncList::SetFunctionPath(std::shared_ptr<cxlProfileDataReader
 
     for (const auto& path : paths)
     {
-        const double totalDeepCount = static_cast<double>(path.at(0).m_totalDeepSamples);
+        //const double totalDeepCount = static_cast<double>(path.at(0).m_totalDeepSamples);
         CallGraphFuncListItem* pFuncListItem = nullptr;
 
         for (const auto& func : path)
