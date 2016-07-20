@@ -8,7 +8,11 @@
 #ifndef PERFSTUDIOSERVER_VERSION_H
 #define PERFSTUDIOSERVER_VERSION_H
 
-#define PERFSTUDIOSERVER_APP_NAME      "GPU PerfStudio Server" ///< Definition
+#ifdef CODEXL_GRAPHICS
+    #define PERFSTUDIOSERVER_APP_NAME      "CodeXL Graphics Server" ///< Definition
+#else
+    #define PERFSTUDIOSERVER_APP_NAME      "GPU PerfStudio Server" ///< Definition
+#endif // CODEXL_GRAPHICS
 
 #define PERFSTUDIOSERVER_MAJOR_VERSION 3 ///< Definition
 #define PERFSTUDIOSERVER_MINOR_VERSION 5 ///< Definition
