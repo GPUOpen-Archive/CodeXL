@@ -1004,11 +1004,6 @@ public:
                     ret = PrepareTimelineReadStatements();
                 }
 
-                if (ret && ((profileType & AMDT_PROFILE_MODE_AGGREGATION) == AMDT_PROFILE_MODE_AGGREGATION))
-                {
-                    ret = PrepareAggregationReadStatements();
-                }
-
                 m_isCurrentDbOpenForRead = ret;
             }
         }
@@ -1080,6 +1075,20 @@ public:
 
             sqlite3_finalize(pVersionStmt);
             pVersionStmt = nullptr;
+        }
+
+        return ret;
+    }
+
+    // This will create the required views 
+    bool PrepareProfilingDatabase(void)
+    {
+        bool ret = false;
+
+        if (    m_isCurrentDbOpenForRead
+            && ((m_profileType & AMDT_PROFILE_MODE_AGGREGATION) == AMDT_PROFILE_MODE_AGGREGATION))
+        {
+            ret = PrepareAggregationReadStatements();
         }
 
         return ret;
@@ -1750,6 +1759,43 @@ public:
         if (nullptr != pStmt)
         {
             sqlite3_finalize(pStmt);
+        }
+
+        return ret;
+    }
+
+    bool UpdateIPSample(const AMDTProfileFunctionInfo& funcInfo)
+    {
+        bool ret = false;
+
+        if (m_canUpdateDB)
+        {
+            sqlite3_stmt* pStmt = nullptr;
+            const char* pUpdateStmt = "UPDATE SampleContext set functionId = ? where functionId = ? AND offset >= ? AND offset < ? ;";
+
+            int rc = sqlite3_prepare_v2(m_pReadDbConn, pUpdateStmt, -1, &pStmt, nullptr);
+            ret = (SQLITE_OK == rc) ? true : false;
+
+            if (ret)
+            {
+                // Begin a transaction.
+                sqlite3_exec(m_pReadDbConn, SQL_CMD_TX_BEGIN, nullptr, nullptr, nullptr);
+
+                AMDTFunctionId unknownFuncID = funcInfo.m_functionId & DB_MODULEID_MASK;
+
+                sqlite3_bind_int(pStmt, 1, funcInfo.m_functionId);
+                sqlite3_bind_int(pStmt, 2, unknownFuncID);
+                sqlite3_bind_int64(pStmt, 3, funcInfo.m_startOffset);
+                sqlite3_bind_int64(pStmt, 4, funcInfo.m_startOffset + funcInfo.m_size);
+
+                rc = sqlite3_step(pStmt);
+                ret = (SQLITE_DONE == rc) ? true : false;
+
+                sqlite3_finalize(pStmt);
+
+                // Commit the transaction.
+                sqlite3_exec(m_pReadDbConn, SQL_CMD_TX_COMMIT, nullptr, nullptr, nullptr);
+            }
         }
 
         return ret;
@@ -3735,7 +3781,7 @@ public:
                             INNER JOIN ProcessThread ON processThreadId = ProcessThread.id       \
                             INNER JOIN ModuleInstance ON moduleInstanceId = ModuleInstance.id    \
                             INNER JOIN Module ON ModuleInstance.moduleId = Module.id             \
-                            GROUP BY threadId, functionId, SampleContext.coreSamplingConfigurationId;";
+                            GROUP BY threadId, functionId, offset, SampleContext.coreSamplingConfigurationId;";
 
         int rc = sqlite3_prepare_v2(m_pReadDbConn, viewCreateQuery.str().c_str(), -1, &pViewCreateStmt, nullptr);
 
@@ -3769,7 +3815,7 @@ public:
 
             summaryViewCreate << " FROM SampleFunctionSummaryData  \
                                    INNER JOIN CoreSamplingConfiguration ON SampleFunctionSummaryData.coreSamplingConfigurationId = CoreSamplingConfiguration.id    \
-                                   group by threadId, functionId;";
+                                   group by threadId, functionId, offset ;";
 
             //fprintf(stderr, " %s\n", summaryViewCreate.str().c_str());
 
@@ -4674,6 +4720,40 @@ public:
         return ret;
     }
 
+    bool GetUnknownFunctionsByIPSamples(gtVector<AMDTProfileFunctionInfo>& funcList)
+    {
+        bool ret = false;
+        std::stringstream query;
+        query << "SELECT functionId, offset " \
+            "FROM SampleContext "    \
+            "WHERE functionId & 0x0000ffff = 0;";
+
+        sqlite3_stmt* pQueryStmt = nullptr;
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+
+        if (rc == SQLITE_OK)
+        {
+            // Execute the query.
+            while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
+            {
+                AMDTProfileFunctionInfo funcInfo;
+                funcInfo.m_functionId = sqlite3_column_int(pQueryStmt, 0);
+                funcInfo.m_startOffset = sqlite3_column_int(pQueryStmt, 1);
+                funcInfo.m_moduleId = ((funcInfo.m_functionId & DB_MODULEID_MASK) >> 16);
+
+                ConstructUnknownFunctionName(funcInfo);
+
+                funcList.emplace_back(funcInfo);
+            }
+        }
+
+        // Finalize the statement.
+        sqlite3_finalize(pQueryStmt);
+        ret = (SQLITE_DONE == rc || SQLITE_ROW == rc) ? true : false;
+
+        return ret;
+    }
+
     // Possible Cases
     //  for all threads from all the processes (functionId = -1, threadId = -1, processId = -1)
     //  for all threads from the given process (threadId = -1, processId = <pid>)
@@ -4707,24 +4787,6 @@ public:
                                        count,
                                        dataList,
                                        false);
-
-        if ((count == 0) || (dataList.size() < count))
-        {
-            size_t tmpCount = (count) ? count - dataList.size() : 0;
-
-            ret = GetFunctionSummaryData__(processId,
-                                           threadId,
-                                           moduleId,
-                                           counterIdsList,
-                                           coreMask,
-                                           ignoreSystemModules,
-                                           separateByCore,
-                                           separateByProcess,
-                                           doSort,
-                                           tmpCount,
-                                           dataList,
-                                           true);
-        }
 
         return ret;
     }
@@ -4810,21 +4872,15 @@ public:
             }
 
             query << partQuery.asASCIICharArray();
-            query << " GROUP BY functionId ";
-
-            // TODO: When is this required?
-            if (separateByProcess)
-            {
-                query << " , processId ";
-            }
 
             if (!queryUnknownFuncs)
             {
-                query << " HAVING functionId & 0x0000ffff > 0 ";  // Don't aggregate for unknown functions
+                // query << " GROUP BY functionId HAVING functionId & 0x0000ffff > 0 ";  // Don't aggregate for unknown functions
+                query << " GROUP BY (CASE WHEN (functionId & 0x0000FFFF) > 0 THEN functionId ELSE offset END) ";
             }
             else
             {
-                query << " HAVING functionId & 0x0000ffff = 0 ";
+                query << " GROUP BY functionId, offset HAVING functionId & 0x0000ffff = 0 ";
             }
 
             if (doSort)
@@ -4860,7 +4916,7 @@ public:
                     // the report layer in turn will use this to construct the id for unknown-functions
                     // and replace this with the proper module-id value..
                     //profileData.m_moduleId = mid;
-                    profileData.m_moduleId = queryUnknownFuncs ? offset : mid;
+                    profileData.m_moduleId = ((id & 0x0000FFFF) == 0) ? offset : mid;
 
                     int idx = 3;
                     if (separateByProcess)
@@ -5772,6 +5828,17 @@ bool AmdtDatabaseAccessor::MigrateProfilingDatabase(const gtString& dbName)
     return ret;
 }
 
+bool AmdtDatabaseAccessor::PrepareProfilingDatabase(void)
+{
+    bool ret = false;
+
+    GT_IF_WITH_ASSERT(m_pImpl != nullptr)
+    {
+        ret = m_pImpl->PrepareProfilingDatabase();
+    }
+    return ret;
+}
+
 bool AmdtDatabaseAccessor::GetDbVersion(int& version)
 {
     bool ret = false;
@@ -6667,6 +6734,18 @@ bool AmdtDatabaseAccessor::GetFunctionProfileData(
     return ret;
 }
 
+bool AmdtDatabaseAccessor::GetUnknownFunctionsByIPSamples(AMDTProfileFunctionInfoVec& funcList)
+{
+    bool ret = false;
+
+    if (m_pImpl != nullptr)
+    {
+        ret = m_pImpl->GetUnknownFunctionsByIPSamples(funcList);
+    }
+
+    return ret;
+}
+
 bool AmdtDatabaseAccessor::GetUnknownFunctions(gtVector<AMDTProfileFunctionInfo>& funcList)
 {
     bool ret = false;
@@ -6736,6 +6815,18 @@ bool AmdtDatabaseAccessor::GetCallstackIds(AMDTProcessId        processId,
     if (m_pImpl != nullptr)
     {
         ret = m_pImpl->GetCallstackIds(processId, funcId, funcOffset, isLeafEntries, csIds);
+    }
+
+    return ret;
+}
+
+bool AmdtDatabaseAccessor::UpdateIPSample(const AMDTProfileFunctionInfo& funcInfo)
+{
+    bool ret = false;
+
+    if (m_pImpl != nullptr)
+    {
+        ret = m_pImpl->UpdateIPSample(funcInfo);
     }
 
     return ret;

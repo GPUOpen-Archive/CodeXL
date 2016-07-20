@@ -155,6 +155,9 @@ public:
                                 AMDTProfileFunctionData&    functionData);
 
     // This returns from SampleContext table - IP samples
+    bool GetUnknownFunctionsByIPSamples(AMDTProfileFunctionInfoVec& funcList);
+
+    // This returns from SampleContext table - IP samples
     bool GetUnknownFunctions(gtVector<AMDTProfileFunctionInfo>& funcList);
 
     bool GetUnknownCallstackLeafsByProcessId(AMDTProcessId processId, CallstackFrameVec& leafs);
@@ -178,6 +181,7 @@ public:
 
     bool GetMaxFunctionId(AMDTModuleId moduleId, gtUInt32& maxFuncId);
 
+    bool UpdateIPSample(const AMDTProfileFunctionInfo& funcInfo);
     bool UpdateCallstackLeaf(const AMDTProfileFunctionInfo& funcInfo);
     bool UpdateCallstackFrame(const AMDTProfileFunctionInfo& funcInfo);
     bool InsertFunctionInfo(const AMDTProfileFunctionInfo& funcInfo);

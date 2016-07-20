@@ -71,6 +71,10 @@ public:
 
     bool GetDbVersion(int& version);
 
+    // Should be called after OpenProfilingDatabase() for cpu-profiling
+    // to create the requried views while querying the db
+    bool PrepareProfilingDatabase(void);
+
     //
     // DB Update/Insert APIs
     //
@@ -280,6 +284,10 @@ public:
                                 bool                        separateByCore,
                                 AMDTProfileFunctionData&    functionData);
     
+    // This is from SampleContext table
+    bool GetUnknownFunctionsByIPSamples(AMDTProfileFunctionInfoVec& funcList);
+
+    // This is from the view
     bool GetUnknownFunctions(gtVector<AMDTProfileFunctionInfo>& funcList);
 
     bool GetUnknownCallstackLeafsByProcessId(AMDTProcessId       processId,
@@ -304,6 +312,7 @@ public:
 
     bool GetMaxFunctionId(AMDTModuleId moduleId, gtUInt32& maxFuncId);
 
+    bool UpdateIPSample(const AMDTProfileFunctionInfo& funcInfo);
     bool UpdateCallstackLeaf(const AMDTProfileFunctionInfo& funcInfo);
     bool UpdateCallstackFrame(const AMDTProfileFunctionInfo& funcInfo);
     bool InsertFunctionInfo(const AMDTProfileFunctionInfo& funcInfo);

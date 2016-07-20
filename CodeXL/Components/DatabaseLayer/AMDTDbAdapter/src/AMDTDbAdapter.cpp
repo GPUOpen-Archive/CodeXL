@@ -105,6 +105,18 @@ int AmdtDatabaseAdapter::GetSupportedDbVersion(void)
     return AMDT_CURRENT_PROFILE_DB_VERSION;
 }
 
+bool AmdtDatabaseAdapter::PrepareDb()
+{
+    bool ret = false;
+
+    if (IsAggregateMode())
+    {
+        ret = m_pDbAccessor->PrepareProfilingDatabase();
+    }
+
+    return ret;
+}
+
 bool AmdtDatabaseAdapter::InsertSessionInfoKeyValue(const gtString& key, gtString& value)
 {
     return m_pDbAccessor->InsertSessionInfoKeyValue(key, value);

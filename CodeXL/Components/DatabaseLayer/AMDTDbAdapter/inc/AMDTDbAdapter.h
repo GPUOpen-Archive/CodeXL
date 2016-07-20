@@ -60,6 +60,10 @@ public:
     // Commits all pending transactions to the DB asynchronously
     virtual bool FlushDbAsync();
 
+    // Prepare the required views for aggregate profile modes
+    // Should be called after OpenDb();
+    virtual bool PrepareDb();
+
     // Get DB file extension
     virtual bool GetDbFileExtension(AMDTProfileMode profileMode, gtString& extension) const;
 

@@ -842,6 +842,18 @@ bool amdtProfileDbAdapter::GetFunctionProfileData(
     return ret;
 }
 
+bool amdtProfileDbAdapter::GetUnknownFunctionsByIPSamples(AMDTProfileFunctionInfoVec& funcList)
+{
+    bool ret = false;
+
+    if (m_pDbAccessor != nullptr)
+    {
+        ret = m_pDbAccessor->GetUnknownFunctionsByIPSamples(funcList);
+    }
+
+    return ret;
+}
+
 bool amdtProfileDbAdapter::GetUnknownFunctions(gtVector<AMDTProfileFunctionInfo>& funcList)
 {
     bool ret = false;
@@ -923,6 +935,18 @@ bool amdtProfileDbAdapter::GetCallstackIds(AMDTProcessId        processId,
     if (m_pDbAccessor != nullptr)
     {
         ret = m_pDbAccessor->GetCallstackIds(processId, funcId, funcOffset, isLeafEntries, csIds);
+    }
+
+    return ret;
+}
+
+bool amdtProfileDbAdapter::UpdateIPSample(const AMDTProfileFunctionInfo& funcInfo)
+{
+    bool ret = false;
+
+    if (m_pDbAccessor != nullptr)
+    {
+        ret = m_pDbAccessor->UpdateIPSample(funcInfo);
     }
 
     return ret;

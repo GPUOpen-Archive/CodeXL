@@ -189,7 +189,6 @@ public:
     AMDTProfileDataOptions              m_options;
 
     // Unknwon functions
-    AMDTProfileFunctionInfoVec          m_unknownFuncsList;
     FuncIdInfoMap                       m_unknownFuncIdInfoMap;
     ModOffsetFuncInfoMap                m_modOffsetFuncInfoMap;
     AMDTFunctionId                      m_currentUnknownFuncId = CXL_UNKNOWN_FUNC_START_ID;
@@ -306,13 +305,25 @@ public:
             {
                 ret = m_pDbAdapter->OpenDb(profileFilePath, AMDT_PROFILE_MODE_AGGREGATION, false);
 
-                ret = ret && GetProfileSessionInfo(m_sessionInfo);
-
-                ret = ret && InitializeReportOption();
-
-                ret = ret && GetUnknownFunctionsInfoFromIPSamples();
+                ret = ret && PrepareDb();
             }
         }
+
+        return ret;
+    }
+
+    // Handle the unknown IP samples and create the required views
+    bool PrepareDb()
+    {
+        bool ret = false;
+
+        ret = ret && GetProfileSessionInfo(m_sessionInfo);
+
+        ret = ret && InitializeReportOption();
+
+        ret = GetUnknownFunctionsInfoFromIPSamples();
+
+        ret = m_pDbAdapter->PrepareDb();
 
         return ret;
     }
@@ -1245,11 +1256,11 @@ public:
             modBaseAddr = (ret) ? modInfo.m_loadAddress : 0;
 
             // Add the unknown functions for this module
-            for (auto& unknownFunc : m_unknownFuncsList)
+            for (auto& unknownFunc : m_unknownFuncIdInfoMap)
             {
-                if (unknownFunc.m_moduleId == modId)
+                if (unknownFunc.second.m_moduleId == modId)
                 {
-                    funcInfoVec.push_back(unknownFunc);
+                    funcInfoVec.push_back(unknownFunc.second);
                 }
             }
         }
@@ -1640,9 +1651,14 @@ public:
 
         if (!m_readUnknownFuncs && nullptr != m_pDbAdapter)
         {
-            ret = m_pDbAdapter->GetUnknownFunctions(m_unknownFuncsList);
+            AMDTProfileFunctionInfoVec unknownFuncVec;
+            ret = m_pDbAdapter->GetUnknownFunctionsByIPSamples(unknownFuncVec);
 
-            ret = ret && AddUnknownFunctionsInfo(m_unknownFuncsList);
+            for (auto& func : unknownFuncVec)
+            {
+                // Find the function info from debug info (if available) and update the tables
+                ret = Lookupfunction(func, true);
+            }
 
             m_readUnknownFuncs = ret;
         }
@@ -3413,7 +3429,7 @@ public:
                 for (auto& leaf : leafs)
                 {
                     // Find the function info from debug info (if available) and update the tables
-                    ret = Lookupfunction(leaf.m_funcInfo);
+                    ret = Lookupfunction(leaf.m_funcInfo, false);
                 }
 
                 m_handleUnknownLeafs.insert({ pid, pid });
@@ -3430,7 +3446,7 @@ public:
         for (auto& frame : frames)
         {
             // Find the function info from debug info (if available) and update the tables
-            ret = Lookupfunction(frame.m_funcInfo);
+            ret = Lookupfunction(frame.m_funcInfo, false);
         }
 
         return ret;
@@ -3934,7 +3950,7 @@ public:
         return ret;
     }
 
-    bool Lookupfunction(AMDTProfileFunctionInfo& funcInfo)
+    bool Lookupfunction(AMDTProfileFunctionInfo& funcInfo, bool updateIPSample)
     {
         bool ret = true;
         gtUInt32 symEngineFuncId = funcInfo.m_functionId & 0xFFFFUL;
@@ -3973,6 +3989,12 @@ public:
                     funcInfo.m_functionId = pFuncSymbol->m_funcId + maxFuncId;
 
                     m_pDbAdapter->InsertFunctionInfo(funcInfo);
+
+                    if (updateIPSample)
+                    {
+                        m_pDbAdapter->UpdateIPSample(funcInfo);
+                    }
+
                     m_pDbAdapter->UpdateCallstackLeaf(funcInfo);
                     m_pDbAdapter->UpdateCallstackFrame(funcInfo);
 
