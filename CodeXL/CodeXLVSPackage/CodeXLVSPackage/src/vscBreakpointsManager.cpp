@@ -154,36 +154,8 @@ void vscBreakpointsManager::releaseInterfaces()
         _piDebugger = NULL;
     }
 
-    // Release our breakpoints:
-    int numberOfBreakpoints = (int)_breakpoints.size();
-
-    for (int i = 0; i < numberOfBreakpoints; i++)
-    {
-        vspCDebugBreakpoint* pCurrentBreakpoint = _breakpoints[i];
-
-        if (pCurrentBreakpoint != NULL)
-        {
-            pCurrentBreakpoint->Release();
-            _breakpoints[i] = NULL;
-        }
-    }
-
-    // Clear map elements to avoid dangling pointers.
-    ClearBreakpointsMap(_breakpointByFuncId);
-    ClearBreakpointsMap(_breakpointByGenericType);
-    ClearBreakpointsMap(_breakpointByKernelFuncName);
-
-
-    // Release the callback interface:
-    if (_piDebugEventCallback != NULL)
-    {
-        _piDebugEventCallback->Release();
-        _piDebugEventCallback = NULL;
-    }
-
-    // Note that to avoid circular dependencies, we do not AddRef to the debug
-    // engine (see setDebugEngine() ). Instead we just override the pointer:
-    _pDebugEngine = NULL;
+    // Release our breakpoints and engine:
+    unbindAndRemoveAllBreakpointsAndEngine();
 }
 
 // ---------------------------------------------------------------------------
@@ -1795,7 +1767,6 @@ void vscBreakpointsManager::onBreakpointBindAttempt(vspCDebugBreakpoint& breakpo
             {
                 // Send the breakpoint unbound event:
                 vspCDebugBreakpointUnboundEvent* pDebugBreakpointUnboundEvent = new vspCDebugBreakpointUnboundEvent(&breakpoint, BPUR_BREAKPOINT_REBIND);
-
                 pDebugBreakpointUnboundEvent->send(_piDebugEventCallback, _pDebugEngine, NULL, NULL);
                 pDebugBreakpointUnboundEvent->Release();
             }
@@ -1805,7 +1776,6 @@ void vscBreakpointsManager::onBreakpointBindAttempt(vspCDebugBreakpoint& breakpo
             {
                 // Send the breakpoint bound event:
                 vspCDebugBreakpointBoundEvent* pDebugBreakpointBoundEvent = new vspCDebugBreakpointBoundEvent(&breakpoint);
-
                 pDebugBreakpointBoundEvent->send(_piDebugEventCallback, _pDebugEngine, NULL, NULL);
                 pDebugBreakpointBoundEvent->Release();
             }
@@ -1941,22 +1911,99 @@ void vscBreakpointsManager::setBreakpointType(vspCDebugBreakpoint& breakpoint, B
 void vscBreakpointsManager::removeBreakpointFromVectors(IDebugBreakpointRequest2* piBreakpointRequest)
 {
     // Iterate the breakpoints, looking for one created from the same request:
-    //int numberOfBreakpoints = (int)_breakpoints.size();
-    //vspCDebugBreakpoint* pFoundBreakpoint = NULL;
+    int numberOfBreakpoints = (int)_breakpoints.size();
+    vspCDebugBreakpoint* pFoundBreakpoint = nullptr;
 
-    auto iter = std::find_if(_breakpoints.begin(), _breakpoints.end(), [piBreakpointRequest](vspCDebugBreakpoint * pBp)
+    for (int i = 0; numberOfBreakpoints > i; ++i)
     {
-        return ((pBp != NULL) && (pBp->breakpointRequest() == piBreakpointRequest));
-    });
+        vspCDebugBreakpoint* pCurrentBP = _breakpoints[i];
+        // Look for the breakpoint by comparing requests:
+        if (nullptr == pFoundBreakpoint)
+        {
+            GT_IF_WITH_ASSERT(nullptr != pCurrentBP)
+            {
+                if (pCurrentBP->breakpointRequest() == piBreakpointRequest)
+                {
+                    pFoundBreakpoint = pCurrentBP;
+                }
+            }
+        }
+        else // nullptr != pFoundBreakpoint
+        {
+            // Verify here that we only had one breakpoint for that request:
+            GT_IF_WITH_ASSERT(nullptr != pCurrentBP)
+            {
+                GT_ASSERT(pCurrentBP->breakpointRequest() != piBreakpointRequest);
+            }
 
-    if (iter != _breakpoints.end())
+            // We already found the breakpoint, move all others back in the vector. Note that to get here,
+            // we must have been through at least one iteration, so (i - 1) is a valid index:
+            _breakpoints[i - 1] = pCurrentBP;
+        }
+    }
+
+    // If we found the breakpoint:
+    if (nullptr != pFoundBreakpoint)
     {
-        // Now remove the breakpoint from the vector.
+        // The last item in the vector is either the found breakpoint or a duplicated pointer.
+        // Either way, remove it:
+        _breakpoints.pop_back();
 
         // Release the breakpoint:
-        (*iter)->Release();
-        _breakpoints.erase(iter);
+        pFoundBreakpoint->Release();
     }
+
+}
+
+// ---------------------------------------------------------------------------
+// Name:        vscBreakpointsManager::unbindAndRemoveAllBreakpointsAndEngine
+// Description: Unbinds and removes all current breakpoints and the engine reference
+// Author:      Uri Shomroni
+// Date:        20/7/2016
+// ---------------------------------------------------------------------------
+void vscBreakpointsManager::unbindAndRemoveAllBreakpointsAndEngine()
+{
+    // Unbind all breakpoints and release them:
+    int numberOfBreakpoints = (int)_breakpoints.size();
+    for (int i = 0; i < numberOfBreakpoints; i++)
+    {
+        vspCDebugBreakpoint* pBreakpoint = _breakpoints[i];
+
+        GT_IF_WITH_ASSERT(nullptr != pBreakpoint)
+        {
+            // If the breakpoint was bound:
+            if (vspCDebugBreakpoint::VSP_BREAKPOINT_BOUND == pBreakpoint->breakpointStatus())
+            {
+                // Send the breakpoint unbound event:
+                vspCDebugBreakpointUnboundEvent* pDebugBreakpointUnboundEvent = new vspCDebugBreakpointUnboundEvent(pBreakpoint, BPUR_CODE_UNLOADED);
+                pDebugBreakpointUnboundEvent->send(_piDebugEventCallback, _pDebugEngine, NULL, NULL);
+                pDebugBreakpointUnboundEvent->Release();
+            }
+
+            // Release it anyway:
+            pBreakpoint->Release();
+
+            // Remove it from the vector:
+            _breakpoints[i] = nullptr;
+        }
+    }
+
+    // Clear map elements to avoid dangling pointers.
+    ClearBreakpointsMap(_breakpointByFuncId);
+    ClearBreakpointsMap(_breakpointByGenericType);
+    ClearBreakpointsMap(_breakpointByKernelFuncName);
+
+
+    // Release the callback interface:
+    if (_piDebugEventCallback != NULL)
+    {
+        _piDebugEventCallback->Release();
+        _piDebugEventCallback = NULL;
+    }
+
+    // Note that to avoid circular dependencies, we do not AddRef to the debug
+    // engine (see setDebugEngine() ). Instead we just override the pointer:
+    _pDebugEngine = nullptr;
 }
 
 // ---------------------------------------------------------------------------
@@ -1968,15 +2015,18 @@ void vscBreakpointsManager::removeBreakpointFromVectors(IDebugBreakpointRequest2
 void vscBreakpointsManager::onProcessTerminate()
 {
     // Reset all the breakpoints' hit count:
-    for (int i = 0; i < (int)_breakpoints.size() ; i++)
+    int numberOfBreakpoints = (int)_breakpoints.size();
+    for (int i = 0; i < numberOfBreakpoints ; i++)
     {
         vspCDebugBreakpoint* pBreakpoint = _breakpoints[i];
 
-        if (pBreakpoint != NULL)
+        GT_IF_WITH_ASSERT(nullptr != pBreakpoint)
         {
             pBreakpoint->SetHitCount(0);
         }
     }
+
+    unbindAndRemoveAllBreakpointsAndEngine();
 }
 
 void vscBreakpointsManager::setOwner(IVscBreakpointsManagerOwner* pOwner)

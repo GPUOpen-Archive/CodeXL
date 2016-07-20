@@ -101,6 +101,7 @@ private:
     void onBreakpointBindAttempt(vspCDebugBreakpoint& breakpoint, bool bindSuccess, bool bindAttempted, const BP_ERROR_TYPE& errorType, const gtString& errorMessage);
     void setBreakpointType(vspCDebugBreakpoint& breakpoint, BP_LOCATION_TYPE breakpointLocationKind, bool isCLCodeBreakpoint, oaCLProgramHandle openCLProgramHandle, const osFilePath& sourcePath, int lineNumber, apMonitoredFunctionId breakpointFuncId, const gtString& breakpointKernelFunctionName, apGenericBreakpointType breakpointType, bool bindSuccess);
     void removeBreakpointFromVectors(IDebugBreakpointRequest2* piBreakpointRequest);
+    void unbindAndRemoveAllBreakpointsAndEngine();
 
 private:
     friend class vspSingletonsDelete;
