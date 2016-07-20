@@ -74,6 +74,22 @@ struct CaptureAssets
 };
 
 //-----------------------------------------------------------------------------
+/// Define image capture settings.
+//-----------------------------------------------------------------------------
+struct ImgCaptureSettings
+{
+    bool          enable;      ///< Designate that image capture should be enabled
+    VkImage       srcImage;    ///< The source image to capture
+    VkImageLayout prevState;   ///< The source image's previous state
+    UINT          srcWidth;    ///< The source image width
+    UINT          srcHeight;   ///< The source image height
+    UINT          dstWidth;    ///< The destination RT width
+    UINT          dstHeight;   ///< The destination RT height
+    bool          flipX;       ///< Whether we want to flip the x-axis
+    bool          flipY;       ///< Whether we want to flip the y-axis
+};
+
+//-----------------------------------------------------------------------------
 /// This class is used to capture a screen shot of an app's frame buffer.
 //-----------------------------------------------------------------------------
 class VktImageRenderer
@@ -89,16 +105,21 @@ public:
 
     ~VktImageRenderer();
 
-    VkResult CaptureImage(
-        VkImage       res,
-        VkImageLayout prevState,
-        UINT          oldWidth,
-        UINT          oldHeight,
-        UINT          newWidth,
-        UINT          newHeight,
-        CpuImage*     pImgOut,
-        bool          flipX,
-        bool          flipY);
+    VkResult CaptureImage(ImgCaptureSettings& settings, CpuImage* pImgOut);
+
+    VkCommandBuffer PrepCmdBuf(
+        VkImage        srcImage,
+        VkImageLayout  prevState,
+        UINT           dstWidth,
+        UINT           dstHeight,
+        CaptureAssets& assets);
+
+    VkResult CreateCaptureAssets(VkImage srcImage, UINT newWidth, UINT newHeight, bool flipX, bool flipY, CaptureAssets& assets);
+
+    void FreeCaptureAssets(CaptureAssets& assets);
+
+    VkResult FetchResults(UINT width, UINT height, CaptureAssets& assets, CpuImage* pImgOut);
+
 private:
     VktImageRenderer();
 
@@ -113,10 +134,6 @@ private:
     void ChangeImageLayout(VkImage image, VkImageAspectFlags aspectMask, VkImageLayout prevLayout, VkImageLayout newLayout);
 
     VkResult MemTypeFromProps(UINT typeBits, VkFlags reqsMask, UINT* pTypeIdx);
-
-    VkResult CreateCaptureAssets(VkImage srcImage, UINT newWidth, UINT newHeight, bool flipX, bool flipY, CaptureAssets& assets);
-
-    void FreeCaptureAssets(CaptureAssets& assets);
 
     VkResult AllocBindImageMem(VkImage* pImage, VkDeviceMemory* pMem, VkDeviceSize* pMemSize);
     VkResult AllocBindBufferMem(VkDescriptorBufferInfo& bufferInfo, VkBuffer* pBuf, VkDeviceMemory* pMem, VkDeviceSize* pMemSize);

@@ -92,11 +92,32 @@ VktWrappedQueue::VktWrappedQueue(const WrappedQueueCreateInfo& createInfo)
 {
     memcpy(&m_createInfo, &createInfo, sizeof(m_createInfo));
 
+    memset(&m_imgCaptureSettings, 0, sizeof(m_imgCaptureSettings));
+    memset(&m_imgCaptureSettingsAux, 0, sizeof(m_imgCaptureSettingsAux));
+
     UINT queueCount = 1;
     VkQueueFamilyProperties queueProps = VkQueueFamilyProperties();
     instance_dispatch_table(m_createInfo.physicalDevice)->GetPhysicalDeviceQueueFamilyProperties(m_createInfo.physicalDevice, &queueCount, &queueProps);
 
     m_timestampsSupported = (queueProps.timestampValidBits != 0) ? true : false;
+}
+
+//-----------------------------------------------------------------------------
+/// Destructor.
+//-----------------------------------------------------------------------------
+VktWrappedQueue::~VktWrappedQueue()
+{
+    if (m_capturedImage.pData != nullptr)
+    {
+        delete[] (char*)m_capturedImage.pData;
+        m_capturedImage.pData = nullptr;
+    }
+
+    if (m_capturedImageAux.pData != nullptr)
+    {
+        delete[] (char*)m_capturedImageAux.pData;
+        m_capturedImageAux.pData = nullptr;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -180,7 +201,6 @@ void VktWrappedQueue::SpawnWorker(
             ScopeLock lock(&m_workerThreadInfoMutex);
 
             m_workerThreadInfo.push_back(pWorkerInfo);
-
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
             DWORD threadId = 0;
@@ -294,7 +314,7 @@ VkResult VktWrappedQueue::QueueSubmit(VkQueue queue, uint32_t submitCount, const
         }
 
         // Invoke the real call to execute on the GPU
-        result = QueueSubmit_ICD(queue, submitCount, pSubmits, fenceToWaitOn);
+        result = QueueSubmitWithCapture(queue, submitCount, pSubmits, fenceToWaitOn);
 
         if (pTraceAnalyzer->ShouldCollectTrace() && pFrameProfiler->ShouldCollectGPUTime())
         {
@@ -352,6 +372,151 @@ VkResult VktWrappedQueue::QueueSubmit(VkQueue queue, uint32_t submitCount, const
     }
     else
     {
+        result = QueueSubmitWithCapture(queue, submitCount, pSubmits, fence);
+    }
+
+    return result;
+}
+
+//-----------------------------------------------------------------------------
+/// Wrap each submit with code which could potentially trigger a frame buffer capture.
+/// \param queue The queue used by the app which will will capture with.
+/// \param submitCount The app submit count.
+/// \param pSubmits The number of batches.
+/// \param fence The fence used by the app.
+//-----------------------------------------------------------------------------
+VkResult VktWrappedQueue::QueueSubmitWithCapture(VkQueue queue, uint32_t submitCount, const VkSubmitInfo* pSubmits, VkFence fence)
+{
+    VkResult result = VK_INCOMPLETE;
+
+    if (m_imgCaptureSettings.enable == true)
+    {
+        if (submitCount > 0)
+        {
+            VktImageRenderer* pRenderer = VktFrameDebuggerLayer::Instance()->ImageRenderer();
+            VktImageRenderer* pRendererAux = VktFrameDebuggerLayer::Instance()->ImageRendererAux();
+
+            if ((pRenderer != nullptr) && (pRendererAux != nullptr))
+            {
+                if (m_capturedImage.pData != nullptr)
+                {
+                    delete[] (char*)m_capturedImage.pData;
+                    m_capturedImage.pData = nullptr;
+                }
+
+                if (m_capturedImageAux.pData != nullptr)
+                {
+                    delete[] (char*)m_capturedImageAux.pData;
+                    m_capturedImageAux.pData = nullptr;
+                }
+
+                // Create temp assets used in this capture
+                CaptureAssets assets = CaptureAssets();
+                result = pRenderer->CreateCaptureAssets(
+                    m_imgCaptureSettings.srcImage,
+                    m_imgCaptureSettings.dstWidth,
+                    m_imgCaptureSettings.dstHeight,
+                    m_imgCaptureSettings.flipX,
+                    m_imgCaptureSettings.flipY,
+                    assets);
+                VKT_ASSERT(result == VK_SUCCESS);
+
+                CaptureAssets assetsAux = CaptureAssets();
+                result = pRendererAux->CreateCaptureAssets(
+                    m_imgCaptureSettingsAux.srcImage,
+                    m_imgCaptureSettingsAux.dstWidth,
+                    m_imgCaptureSettingsAux.dstHeight,
+                    m_imgCaptureSettingsAux.flipX,
+                    m_imgCaptureSettingsAux.flipY,
+                    assetsAux);
+                VKT_ASSERT(result == VK_SUCCESS);
+
+                // Build the command buffer we want
+                VkCommandBuffer cmdBuf = pRenderer->PrepCmdBuf(
+                    m_imgCaptureSettings.srcImage,
+                    m_imgCaptureSettings.prevState,
+                    m_imgCaptureSettings.dstWidth,
+                    m_imgCaptureSettings.dstHeight,
+                    assets);
+                VKT_ASSERT(cmdBuf != VK_NULL_HANDLE);
+
+                VkCommandBuffer cmdBufAux = pRendererAux->PrepCmdBuf(
+                    m_imgCaptureSettingsAux.srcImage,
+                    m_imgCaptureSettingsAux.prevState,
+                    m_imgCaptureSettingsAux.dstWidth,
+                    m_imgCaptureSettingsAux.dstHeight,
+                    assetsAux);
+                VKT_ASSERT(cmdBufAux != VK_NULL_HANDLE);
+
+                // Make a new array of VkSubmitInfo
+                VkSubmitInfo* pReconstructedSubmits = new VkSubmitInfo[submitCount]();
+
+                // Fill in original Submit infos
+                for (UINT i = 0; i < submitCount; i++)
+                {
+                    pReconstructedSubmits[i] = pSubmits[i];
+                }
+
+                const UINT newCmdBufferCount = pReconstructedSubmits[0].commandBufferCount + 2;
+
+                // Make a new array of VkCommandBuffers
+                VkCommandBuffer* pReconstructedCmdBuffers = new VkCommandBuffer[newCmdBufferCount]();
+
+                // Inject our command buffers as the very first ones
+                pReconstructedCmdBuffers[0] = cmdBuf;
+                pReconstructedCmdBuffers[1] = cmdBufAux;
+
+                // Insert original command buffers after our internal one
+                for (UINT i = 0; i < pReconstructedSubmits[0].commandBufferCount; i++)
+                {
+                    pReconstructedCmdBuffers[i + 2] = pReconstructedSubmits[0].pCommandBuffers[i];
+                }
+
+                // Update the first submit info
+                pReconstructedSubmits[0].pCommandBuffers = pReconstructedCmdBuffers;
+                pReconstructedSubmits[0].commandBufferCount = newCmdBufferCount;
+
+                // Submit
+                result = QueueSubmit_ICD(queue, submitCount, pReconstructedSubmits, fence);
+                VKT_ASSERT(result == VK_SUCCESS);
+
+                // Wait for queue to drain
+                result = device_dispatch_table(queue)->QueueWaitIdle(queue);
+                VKT_ASSERT(result == VK_SUCCESS);
+
+                delete[] pReconstructedCmdBuffers;
+                pReconstructedCmdBuffers = nullptr;
+
+                delete[] pReconstructedSubmits;
+                pReconstructedSubmits = nullptr;
+
+                // Copy results into queue's output images
+                result = pRenderer->FetchResults(m_imgCaptureSettings.dstWidth, m_imgCaptureSettings.dstHeight, assets, &m_capturedImage);
+                VKT_ASSERT(result == VK_SUCCESS);
+
+                result = pRendererAux->FetchResults(m_imgCaptureSettingsAux.dstWidth, m_imgCaptureSettingsAux.dstHeight, assetsAux, &m_capturedImageAux);
+                VKT_ASSERT(result == VK_SUCCESS);
+
+                // Free temp assets used in this capture
+                pRenderer->FreeCaptureAssets(assets);
+
+                // Free temp assets used in this capture
+                pRendererAux->FreeCaptureAssets(assetsAux);
+            }
+            else
+            {
+                result = QueueSubmit_ICD(queue, submitCount, pSubmits, fence);
+            }
+
+            m_imgCaptureSettings.enable = false;
+        }
+        else
+        {
+            result = QueueSubmit_ICD(queue, submitCount, pSubmits, fence);
+        }
+    }
+    else
+    {
         result = QueueSubmit_ICD(queue, submitCount, pSubmits, fence);
     }
 
@@ -372,7 +537,7 @@ VkResult VktWrappedQueue::QueuePresentKHR(VkQueue queue, const VkPresentInfoKHR*
     QueueInfo queueInfo = QueueInfo();
     queueInfo.physicalDevice = m_createInfo.physicalDevice;
     queueInfo.device         = m_createInfo.device;
-    queueInfo.queue          = queue;
+    queueInfo.pWrappedQueue  = this;
     VktFrameDebuggerLayer::Instance()->OnPresent(queueInfo);
 
     VktLayerManager::GetLayerManager()->EndFrame();
@@ -381,6 +546,80 @@ VkResult VktWrappedQueue::QueuePresentKHR(VkQueue queue, const VkPresentInfoKHR*
     GetPendingRequests();
 
     VktLayerManager::GetLayerManager()->BeginFrame();
+
+    return result;
+}
+
+//-----------------------------------------------------------------------------
+/// Init capture images with blank data and dimensions based on swap chain.
+/// \swapchainInfo Information about the swap chain.
+//-----------------------------------------------------------------------------
+void VktWrappedQueue::InitCaptureImages(const SwapChainInfo& swapchainInfo)
+{
+    const UINT totaBytes = swapchainInfo.swapChainExtents.width * swapchainInfo.swapChainExtents.height * BytesPerPixel;
+
+    m_capturedImage.width  = swapchainInfo.swapChainExtents.width;
+    m_capturedImage.height = swapchainInfo.swapChainExtents.height;
+    m_capturedImage.pitch  = m_capturedImage.width * BytesPerPixel;
+    m_capturedImage.pData  = new char[totaBytes]();
+
+    m_capturedImageAux.width  = swapchainInfo.swapChainExtents.width;
+    m_capturedImageAux.height = swapchainInfo.swapChainExtents.height;
+    m_capturedImageAux.pitch  = m_capturedImage.width * BytesPerPixel;
+    m_capturedImageAux.pData  = new char[totaBytes]();
+}
+
+//-----------------------------------------------------------------------------
+/// Tell the queue to capture this image.
+/// \param settings Image capture settings.
+//-----------------------------------------------------------------------------
+void VktWrappedQueue::UpdateCaptureSettings(ImgCaptureSettings& settings)
+{
+    memcpy(&m_imgCaptureSettings, &settings, sizeof(m_imgCaptureSettings));
+    memcpy(&m_imgCaptureSettingsAux, &settings, sizeof(m_imgCaptureSettings));
+
+    // Aux renderer focuses on full-res capture
+    m_imgCaptureSettingsAux.dstWidth = m_imgCaptureSettingsAux.srcWidth;
+    m_imgCaptureSettingsAux.dstHeight = m_imgCaptureSettingsAux.srcHeight;
+}
+
+//-----------------------------------------------------------------------------
+/// Provide data for the last-captured image.
+/// \param queue The queue we're using to present.
+/// \param aux This capture is for the auxiliary renderer.
+//-----------------------------------------------------------------------------
+VkResult VktWrappedQueue::LastCapturedImage(CpuImage* pImgOut, bool aux)
+{
+    VkResult result = VK_INCOMPLETE;
+
+    if (pImgOut != nullptr)
+    {
+        CpuImage* pImg = nullptr;
+
+        if (aux == true)
+        {
+            pImg = &m_capturedImageAux;
+        }
+        else
+        {
+            pImg = &m_capturedImage;
+        }
+
+        if (pImg->pData != nullptr)
+        {
+            // Read back results
+            const UINT totalBytes = pImg->width * pImg->height * BytesPerPixel;
+
+            pImgOut->width  = pImg->width;
+            pImgOut->height = pImg->height;
+            pImgOut->pitch  = pImg->pitch;
+            pImgOut->pData  = new char[totalBytes];
+
+            memcpy(pImgOut->pData, pImg->pData, totalBytes);
+
+            result = VK_SUCCESS;
+        }
+    }
 
     return result;
 }
@@ -410,7 +649,7 @@ VkResult VktWrappedQueue::QueueSubmit_ICD(VkQueue queue, uint32_t submitCount, c
         sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s, %s",
                   VktUtil::WritePointerAsString(queue),
                   submitCount,
-                  PrintArrayWithFormatter(submitCount, pSubmits, GT_POINTER_FORMAT).c_str(),
+                  PrintArrayWithFormatter(submitCount, pSubmits, POINTER_SUFFIX).c_str(),
                   VktUtil::WriteUint64AsString((uint64_t)fence));
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer);
@@ -465,7 +704,7 @@ VkResult VktWrappedQueue::QueueBindSparse(VkQueue queue, uint32_t bindInfoCount,
         sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s, %s",
                   VktUtil::WritePointerAsString(queue),
                   bindInfoCount,
-                  PrintArrayWithFormatter(bindInfoCount, pBindInfo, GT_POINTER_FORMAT).c_str(),
+                  PrintArrayWithFormatter(bindInfoCount, pBindInfo, POINTER_SUFFIX).c_str(),
                   VktUtil::WriteUint64AsString((uint64_t)fence));
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer);

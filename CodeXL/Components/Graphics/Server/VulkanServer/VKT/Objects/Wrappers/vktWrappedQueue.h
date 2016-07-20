@@ -11,6 +11,8 @@
 #include "vktWrappedObject.h"
 #include "../../Util/vktUtil.h"
 #include "../../Profiling/vktWorkerInfo.h"
+#include "../../Rendering/vktImageRenderer.h"
+#include "../../FrameDebugger/vktFrameDebuggerLayer.h"
 
 class VktInterceptManager;
 
@@ -38,7 +40,7 @@ public:
     static VktWrappedQueue* Create(const WrappedQueueCreateInfo& createInfo);
 
     VktWrappedQueue(const WrappedQueueCreateInfo& createInfo);
-    ~VktWrappedQueue() {}
+    ~VktWrappedQueue();
 
     /// Store the app's handle in this wrapper
     virtual void StoreAppHandle(UINT64 hAppObject) { GT_UNREFERENCED_PARAMETER(hAppObject); }
@@ -78,7 +80,12 @@ public:
     VktWorkerInfo* GetWorkerInfo(int inIndex) { return m_workerThreadInfo[inIndex]; }
 
     VkResult QueueSubmit(VkQueue queue, uint32_t submitCount, const VkSubmitInfo* pSubmits, VkFence fence);
+    VkResult QueueSubmitWithCapture(VkQueue queue, uint32_t submitCount, const VkSubmitInfo* pSubmits, VkFence fence);
     VkResult QueuePresentKHR(VkQueue queue, const VkPresentInfoKHR* pPresentInfo);
+
+    void InitCaptureImages(const SwapChainInfo& swapchainInfo);
+    void UpdateCaptureSettings(ImgCaptureSettings& settings);
+    VkResult LastCapturedImage(CpuImage* pImgOut, bool aux);
 
     //-----------------------------------------------------------------------------
     /// ICD entry points.
@@ -100,6 +107,18 @@ private:
 
     /// Track whether this queue supports timestamps.
     bool m_timestampsSupported;
+
+    /// Image capture settings
+    ImgCaptureSettings m_imgCaptureSettings;
+
+    /// Image capture settings
+    ImgCaptureSettings m_imgCaptureSettingsAux;
+
+    /// Last-captured image by this queue
+    CpuImage m_capturedImage;
+
+    /// Last-captured image by this queue
+    CpuImage m_capturedImageAux;
 };
 
 #endif // __VKT_WRAPPED_QUEUE_H__

@@ -460,141 +460,166 @@ VkResult VktImageRenderer::InitShaders(
 }
 
 //-----------------------------------------------------------------------------
-/// Convert a Vulkan resource to a CPU - visible linear buffer of pixels.The data is filled  in a user - provided CpuImage struct.
-/// IMPORTANT: Memory inside pImgOut is allocated on behalf of the caller, so it is their responsibility to free it.
-/// \param srcImage The source image.
+/// Build command buffer which will read an image and flatten it into a byte array.
+/// \param srcImage The source image to capture.
 /// \param prevState The source image's previous state.
-/// \param srcWidth The source image width.
-/// \param srcHeight The source image height.
 /// \param dstWidth The destination RT width.
 /// \param dstHeight The destination RT height.
-/// \param pImgOut Pointer to output image.
-/// \param flipX Whether we want to flip the x-axis.
-/// \param flipY Whether we want to flip the y-axis.
+/// \return A handle to the renderer's internal command buffer.
+//-----------------------------------------------------------------------------
+VkCommandBuffer VktImageRenderer::PrepCmdBuf(
+    VkImage        srcImage,
+    VkImageLayout  prevState,
+    UINT           dstWidth,
+    UINT           dstHeight,
+    CaptureAssets& assets)
+{
+    VkCommandBufferInheritanceInfo cmdBufInheritInfo = VkCommandBufferInheritanceInfo();
+    cmdBufInheritInfo.sType                = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
+    cmdBufInheritInfo.pNext                = nullptr;
+    cmdBufInheritInfo.renderPass           = VK_NULL_HANDLE;
+    cmdBufInheritInfo.subpass              = 0;
+    cmdBufInheritInfo.framebuffer          = VK_NULL_HANDLE;
+    cmdBufInheritInfo.occlusionQueryEnable = VK_FALSE;
+    cmdBufInheritInfo.queryFlags           = 0;
+    cmdBufInheritInfo.pipelineStatistics   = 0;
+
+    VkCommandBufferBeginInfo cmdBufBeginInfo = VkCommandBufferBeginInfo();
+    cmdBufBeginInfo.sType            = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    cmdBufBeginInfo.pNext            = nullptr;
+    cmdBufBeginInfo.flags            = 0;
+    cmdBufBeginInfo.pInheritanceInfo = &cmdBufInheritInfo;
+
+    VkClearValue clearValues[1] = { VkClearValue() };
+    clearValues[0].color.float32[0] = 0.0f;
+    clearValues[0].color.float32[1] = 0.0f;
+    clearValues[0].color.float32[2] = 0.0f;
+    clearValues[0].color.float32[3] = 1.0f;
+
+    VkRenderPassBeginInfo renderPassBeginInfo = VkRenderPassBeginInfo();
+    renderPassBeginInfo.sType                    = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassBeginInfo.pNext                    = nullptr;
+    renderPassBeginInfo.renderPass               = m_renderPass;
+    renderPassBeginInfo.framebuffer              = assets.frameBuffer;
+    renderPassBeginInfo.renderArea.offset.x      = 0;
+    renderPassBeginInfo.renderArea.offset.y      = 0;
+    renderPassBeginInfo.renderArea.extent.width  = dstWidth;
+    renderPassBeginInfo.renderArea.extent.height = dstHeight;
+    renderPassBeginInfo.clearValueCount          = 1;
+    renderPassBeginInfo.pClearValues             = clearValues;
+
+    VkViewport viewport = VkViewport();
+    viewport.width    = (float)dstWidth;
+    viewport.height   = (float)dstHeight;
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
+
+    VkRect2D scissor = VkRect2D();
+    scissor.extent.width  = dstWidth;
+    scissor.extent.height = dstHeight;
+    scissor.offset.x      = 0;
+    scissor.offset.y      = 0;
+
+    m_pDeviceDT->ResetCommandBuffer(m_cmdBuf, 0);
+
+    // Start recording
+    m_pDeviceDT->BeginCommandBuffer(m_cmdBuf, &cmdBufBeginInfo);
+
+    // Change image state
+    ChangeImageLayout(assets.internalRT, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    ChangeImageLayout(srcImage, VK_IMAGE_ASPECT_COLOR_BIT, prevState, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+    m_pDeviceDT->CmdBeginRenderPass(m_cmdBuf, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+    m_pDeviceDT->CmdBindPipeline(m_cmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
+    m_pDeviceDT->CmdBindDescriptorSets(m_cmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descSet, 0, nullptr);
+    m_pDeviceDT->CmdSetViewport(m_cmdBuf, 0, 1, &viewport);
+    m_pDeviceDT->CmdSetScissor(m_cmdBuf, 0, 1, &scissor);
+    m_pDeviceDT->CmdDraw(m_cmdBuf, 3, 1, 0, 0);
+    m_pDeviceDT->CmdEndRenderPass(m_cmdBuf);
+
+    // Revert image state
+    ChangeImageLayout(srcImage, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, prevState);
+
+    // End recording
+    m_pDeviceDT->EndCommandBuffer(m_cmdBuf);
+
+    return m_cmdBuf;
+}
+
+//-----------------------------------------------------------------------------
+/// FetchResults
+/// \param width The destination RT width.
+/// \param height The destination RT height.
+/// \param assets Capture assets used during capture.
+/// \param pImgOut The output image with CPU-visible pixels.
 /// \return VK_SUCCESS if successful.
 //-----------------------------------------------------------------------------
-VkResult VktImageRenderer::CaptureImage(
-    VkImage       srcImage,
-    VkImageLayout prevState,
-    UINT          srcWidth,
-    UINT          srcHeight,
-    UINT          dstWidth,
-    UINT          dstHeight,
-    CpuImage*     pImgOut,
-    bool          flipX,
-    bool          flipY)
+VkResult VktImageRenderer::FetchResults(UINT width, UINT height, CaptureAssets& assets, CpuImage* pImgOut)
 {
     VkResult result = VK_INCOMPLETE;
 
-    if ((srcImage != VK_NULL_HANDLE) && (pImgOut != nullptr) && (srcWidth > 0) && (srcHeight > 0))
+    // Read back results
+    const UINT totalBytes = width * height * BytesPerPixel;
+
+    void* pStorageBufferData = nullptr;
+    result = m_pDeviceDT->MapMemory(m_config.device, assets.storageBufMem, 0, totalBytes, 0, (void**)&pStorageBufferData);
+
+    if (result == VK_SUCCESS)
+    {
+        pImgOut->pitch  = width * BytesPerPixel;
+        pImgOut->width  = width;
+        pImgOut->height = height;
+        pImgOut->pData  = new char[totalBytes];
+
+        memcpy(pImgOut->pData, pStorageBufferData, totalBytes);
+
+        m_pDeviceDT->UnmapMemory(m_config.device, assets.storageBufMem);
+    }
+
+    return result;
+}
+
+//-----------------------------------------------------------------------------
+/// Convert a Vulkan resource to a CPU - visible linear buffer of pixels.The data is filled  in a user - provided CpuImage struct.
+/// IMPORTANT: Memory inside pImgOut is allocated on behalf of the caller, so it is their responsibility to free it.
+/// \param settings Input settings for this capture.
+/// \param pImgOut Pointer to output image.
+/// \return VK_SUCCESS if successful.
+//-----------------------------------------------------------------------------
+VkResult VktImageRenderer::CaptureImage(ImgCaptureSettings& settings, CpuImage* pImgOut)
+{
+    VkResult result = VK_INCOMPLETE;
+
+    if ((settings.srcImage != VK_NULL_HANDLE) && (settings.srcWidth > 0) && (settings.srcHeight > 0) && (pImgOut != nullptr))
     {
         // Create temp assets used in this capture
         CaptureAssets assets = CaptureAssets();
-        result = CreateCaptureAssets(srcImage, dstWidth, dstHeight, flipX, flipY, assets);
+        result = CreateCaptureAssets(settings.srcImage, settings.dstWidth, settings.dstHeight, settings.flipX, settings.flipY, assets);
 
         if (result == VK_SUCCESS)
         {
-            VkCommandBufferInheritanceInfo cmdBufInheritInfo = VkCommandBufferInheritanceInfo();
-            cmdBufInheritInfo.sType                = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
-            cmdBufInheritInfo.pNext                = nullptr;
-            cmdBufInheritInfo.renderPass           = VK_NULL_HANDLE;
-            cmdBufInheritInfo.subpass              = 0;
-            cmdBufInheritInfo.framebuffer          = VK_NULL_HANDLE;
-            cmdBufInheritInfo.occlusionQueryEnable = VK_FALSE;
-            cmdBufInheritInfo.queryFlags           = 0;
-            cmdBufInheritInfo.pipelineStatistics   = 0;
+            VkCommandBuffer cmdBuf = PrepCmdBuf(settings.srcImage, settings.prevState, settings.dstWidth, settings.dstHeight, assets);
 
-            VkCommandBufferBeginInfo cmdBufBeginInfo = VkCommandBufferBeginInfo();
-            cmdBufBeginInfo.sType            = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-            cmdBufBeginInfo.pNext            = nullptr;
-            cmdBufBeginInfo.flags            = 0;
-            cmdBufBeginInfo.pInheritanceInfo = &cmdBufInheritInfo;
-
-            VkSubmitInfo submitInfo = VkSubmitInfo();
-            submitInfo.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-            submitInfo.pNext                = nullptr;
-            submitInfo.waitSemaphoreCount   = 0;
-            submitInfo.pWaitSemaphores      = nullptr;
-            submitInfo.commandBufferCount   = 1;
-            submitInfo.pCommandBuffers      = &m_cmdBuf;
-            submitInfo.signalSemaphoreCount = 0;
-            submitInfo.pSignalSemaphores    = nullptr;
-
-            VkClearValue clearValues[1] = { VkClearValue() };
-            clearValues[0].color.float32[0] = 0.0f;
-            clearValues[0].color.float32[1] = 0.0f;
-            clearValues[0].color.float32[2] = 0.0f;
-            clearValues[0].color.float32[3] = 1.0f;
-
-            VkRenderPassBeginInfo renderPassBeginInfo = VkRenderPassBeginInfo();
-            renderPassBeginInfo.sType                    = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-            renderPassBeginInfo.pNext                    = nullptr;
-            renderPassBeginInfo.renderPass               = m_renderPass;
-            renderPassBeginInfo.framebuffer              = assets.frameBuffer;
-            renderPassBeginInfo.renderArea.offset.x      = 0;
-            renderPassBeginInfo.renderArea.offset.y      = 0;
-            renderPassBeginInfo.renderArea.extent.width  = dstWidth;
-            renderPassBeginInfo.renderArea.extent.height = dstHeight;
-            renderPassBeginInfo.clearValueCount          = 1;
-            renderPassBeginInfo.pClearValues             = clearValues;
-
-            VkViewport viewport = VkViewport();
-            viewport.width    = (float)dstWidth;
-            viewport.height   = (float)dstHeight;
-            viewport.minDepth = 0.0f;
-            viewport.maxDepth = 1.0f;
-
-            VkRect2D scissor = VkRect2D();
-            scissor.extent.width  = dstWidth;
-            scissor.extent.height = dstHeight;
-            scissor.offset.x      = 0;
-            scissor.offset.y      = 0;
-
-            result = m_pDeviceDT->ResetCommandBuffer(m_cmdBuf, 0);
-
-            // Start recording
-            result = m_pDeviceDT->BeginCommandBuffer(m_cmdBuf, &cmdBufBeginInfo);
-
-            // Change image state
-            ChangeImageLayout(assets.internalRT, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-            ChangeImageLayout(srcImage, VK_IMAGE_ASPECT_COLOR_BIT, prevState, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
-            m_pDeviceDT->CmdBeginRenderPass(m_cmdBuf, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
-            m_pDeviceDT->CmdBindPipeline(m_cmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
-            m_pDeviceDT->CmdBindDescriptorSets(m_cmdBuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_descSet, 0, nullptr);
-            m_pDeviceDT->CmdSetViewport(m_cmdBuf, 0, 1, &viewport);
-            m_pDeviceDT->CmdSetScissor(m_cmdBuf, 0, 1, &scissor);
-            m_pDeviceDT->CmdDraw(m_cmdBuf, 3, 1, 0, 0);
-            m_pDeviceDT->CmdEndRenderPass(m_cmdBuf);
-
-            // Revert image state
-            ChangeImageLayout(srcImage, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, prevState);
-
-            // End recording
-            result = m_pDeviceDT->EndCommandBuffer(m_cmdBuf);
-
-            // Submit
-            result = m_pDeviceDT->QueueSubmit(m_config.queue, 1, &submitInfo, VK_NULL_HANDLE);
-
-            // Wait for results
-            result = m_pDeviceDT->QueueWaitIdle(m_config.queue);
-
-            // Read back results
-            const UINT totalBytes = dstWidth * dstHeight * BytesPerPixel;
-
-            void* pStorageBufferData = nullptr;
-            result = m_pDeviceDT->MapMemory(m_config.device, assets.storageBufMem, 0, totalBytes, 0, (void**)&pStorageBufferData);
-
-            if (result == VK_SUCCESS)
+            if (cmdBuf != VK_NULL_HANDLE)
             {
-                pImgOut->pitch  = dstWidth * BytesPerPixel;
-                pImgOut->width  = dstWidth;
-                pImgOut->height = dstHeight;
-                pImgOut->pData  = new char[totalBytes];
+                VkSubmitInfo submitInfo = VkSubmitInfo();
+                submitInfo.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+                submitInfo.pNext                = nullptr;
+                submitInfo.waitSemaphoreCount   = 0;
+                submitInfo.pWaitSemaphores      = nullptr;
+                submitInfo.commandBufferCount   = 1;
+                submitInfo.pCommandBuffers      = &cmdBuf;
+                submitInfo.signalSemaphoreCount = 0;
+                submitInfo.pSignalSemaphores    = nullptr;
 
-                memcpy(pImgOut->pData, pStorageBufferData, totalBytes);
+                // Submit
+                result = m_pDeviceDT->QueueSubmit(m_config.queue, 1, &submitInfo, VK_NULL_HANDLE);
 
-                m_pDeviceDT->UnmapMemory(m_config.device, assets.storageBufMem);
+                // Wait for results
+                result = m_pDeviceDT->QueueWaitIdle(m_config.queue);
+
+                // Copy results into output buffer
+                result = FetchResults(settings.dstWidth, settings.dstHeight, assets, pImgOut);
             }
         }
 

@@ -51,12 +51,18 @@ public:
     void OnPresent(const QueueInfo& queueInfo);
     void OnSwapchainCreated(VkDevice device, VkSwapchainKHR swapChain, VkExtent2D extents);
 
+    VktImageRenderer* ImageRenderer() { return m_pFrameBufferRenderer; }
+    VktImageRenderer* ImageRendererAux() { return m_pFrameBufferRendererAux; }
+
 private:
 
     bool HandleFrameBufferRequest(PictureCommandResponse& inImageCommand);
 
     /// Used to render the render target
     VktImageRenderer* m_pFrameBufferRenderer;
+
+    /// Used to render the render target
+    VktImageRenderer* m_pFrameBufferRendererAux;
 
     /// Command response which sends frame buffer image to client
     PictureCommandResponse m_getFrameBufferImage;

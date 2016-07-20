@@ -6,9 +6,11 @@
 //==============================================================================
 
 #include "vktFrameDebuggerLayer.h"
+#include "../vktDefines.h"
 #include "../vktLayerManager.h"
 #include "../Tracing/vktTraceAnalyzerLayer.h"
 #include "../Objects/vktObjectDatabaseProcessor.h"
+#include "../Objects/Wrappers/vktWrappedQueue.h"
 #include "../../../Common/ErrorImage.h"
 #include "../../../Common/SaveImage.h"
 #include "../../../Common/FrameInfo.h"
@@ -19,7 +21,8 @@
 //-----------------------------------------------------------------------------
 VktFrameDebuggerLayer::VktFrameDebuggerLayer() :
     ModernAPIFrameDebuggerLayer(),
-    m_pFrameBufferRenderer(nullptr)
+    m_pFrameBufferRenderer(nullptr),
+    m_pFrameBufferRendererAux(nullptr)
 {
     AddCommand(CONTENT_PNG, "GetFrameBufferImage", "GetFrameBufferImage", "GetFrameBufferImage.png", NO_DISPLAY, NO_INCLUDE, m_getFrameBufferImage);
     memset(&m_swapChainInfo, 0, sizeof(m_swapChainInfo));
@@ -32,6 +35,7 @@ VktFrameDebuggerLayer::VktFrameDebuggerLayer() :
 VktFrameDebuggerLayer::~VktFrameDebuggerLayer()
 {
     SAFE_DELETE(m_pFrameBufferRenderer);
+    SAFE_DELETE(m_pFrameBufferRendererAux);
 }
 
 //-----------------------------------------------------------------------------
@@ -88,7 +92,8 @@ void VktFrameDebuggerLayer::OnSwapchainCreated(VkDevice device, VkSwapchainKHR s
 }
 
 //-----------------------------------------------------------------------------
-/// Capture the current frame buffer image, and return an byte array of PNG-encoded image data. NOTE: Passing in both a width and height of 0 will causes the frame buffer's size to be used when generating the output image.
+/// Capture the current frame buffer image, and return an byte array of PNG-encoded image data.
+/// NOTE: Passing in both a width and height of 0 will causes the frame buffer's size to be used when generating the output image.
 /// Note that the output "ioFrameBufferPngData" array must be deleted when finished, or else it will leak.
 /// \param inWidth The requested width of the captured frame buffer image.
 /// \param inHeight The requested height of the captured frame buffer image.
@@ -104,7 +109,7 @@ bool VktFrameDebuggerLayer::CaptureFrameBuffer(unsigned int inWidth, unsigned in
         VktImageRendererConfig rendererConfig = VktImageRendererConfig();
         rendererConfig.physicalDevice = m_lastPresentQueueInfo.physicalDevice;
         rendererConfig.device         = m_lastPresentQueueInfo.device;
-        rendererConfig.queue          = m_lastPresentQueueInfo.queue;
+        rendererConfig.queue          = m_lastPresentQueueInfo.pWrappedQueue->AppHandle();
         m_pFrameBufferRenderer = VktImageRenderer::Create(rendererConfig);
     }
 
@@ -115,10 +120,12 @@ bool VktFrameDebuggerLayer::CaptureFrameBuffer(unsigned int inWidth, unsigned in
     }
 
     // If the requested size is 0 x 0 pixels then use the actual source resource size.
+    bool thumbnail = false;
     if (inWidth == 0 && inHeight == 0)
     {
         inWidth = m_swapChainInfo.swapChainExtents.width;
         inHeight = m_swapChainInfo.swapChainExtents.height;
+        thumbnail = true;
     }
 
 #ifdef _LINUX
@@ -127,24 +134,44 @@ bool VktFrameDebuggerLayer::CaptureFrameBuffer(unsigned int inWidth, unsigned in
     const bool flipY = false;
 #endif
 
+    ImgCaptureSettings captureSettings = {};
+    captureSettings.enable    = true;
+    captureSettings.srcImage  = m_swapChainInfo.pSwapChainImages[0];
+    captureSettings.prevState = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    captureSettings.srcWidth  = m_swapChainInfo.swapChainExtents.width;
+    captureSettings.srcHeight = m_swapChainInfo.swapChainExtents.height;
+    captureSettings.dstWidth  = inWidth;
+    captureSettings.dstHeight = inHeight;
+    captureSettings.flipX     = false;
+    captureSettings.flipY     = flipY;
+
     CpuImage capturedImage = CpuImage();
-    VkResult captureResult = m_pFrameBufferRenderer->CaptureImage(
-                                 m_swapChainInfo.pSwapChainImages[0],
-                                 VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-                                 m_swapChainInfo.swapChainExtents.width,
-                                 m_swapChainInfo.swapChainExtents.height,
-                                 inWidth,
-                                 inHeight,
-                                 &capturedImage,
-                                 false,
-                                 flipY);
+
+#if INSTANT_FRAMEBUFFER_CAPTURE
+    VkResult captureResult = m_pFrameBufferRenderer->CaptureImage(captureSettings, &capturedImage);
+#else
+    if (m_pFrameBufferRendererAux == NULL)
+    {
+        VktImageRendererConfig rendererConfig = VktImageRendererConfig();
+        rendererConfig.physicalDevice = m_lastPresentQueueInfo.physicalDevice;
+        rendererConfig.device         = m_lastPresentQueueInfo.device;
+        rendererConfig.queue          = m_lastPresentQueueInfo.pWrappedQueue->AppHandle();
+        m_pFrameBufferRendererAux = VktImageRenderer::Create(rendererConfig);
+
+        m_lastPresentQueueInfo.pWrappedQueue->InitCaptureImages(m_swapChainInfo);
+    }
+
+    VkResult captureResult = m_lastPresentQueueInfo.pWrappedQueue->LastCapturedImage(&capturedImage, thumbnail);
+
+    m_lastPresentQueueInfo.pWrappedQueue->UpdateCaptureSettings(captureSettings);
+#endif
 
     bool pngSuccess = false;
 
-    if (captureResult == S_OK)
+    if (captureResult == VK_SUCCESS)
     {
         // Convert the captured image's pixel data into a PNG byte array.
-        pngSuccess = RGBAtoPNG(static_cast<unsigned char*>(capturedImage.pData), inWidth, inHeight, pNumBytes, ppFrameBufferPngData);
+        pngSuccess = RGBAtoPNG(static_cast<unsigned char*>(capturedImage.pData), capturedImage.width, capturedImage.height, pNumBytes, ppFrameBufferPngData);
 
         // free memory allocated by VktFrameDebuggerLayer::CaptureImage
         free(capturedImage.pData);

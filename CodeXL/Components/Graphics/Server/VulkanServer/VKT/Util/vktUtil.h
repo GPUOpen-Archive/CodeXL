@@ -76,7 +76,7 @@ struct QueueInfo
 {
     VkPhysicalDevice physicalDevice; ///< The queue's physical device
     VkDevice         device;         ///< The queue's device
-    VkQueue          queue;          ///< the queue
+    VktWrappedQueue* pWrappedQueue;  ///< The queue's wrapper
 };
 
 //-----------------------------------------------------------------------------
