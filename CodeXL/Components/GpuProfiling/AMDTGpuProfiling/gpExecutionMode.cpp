@@ -917,6 +917,11 @@ void gpExecutionMode::ShutServerDown()
         GT_ASSERT(rc);
     }
 
+#if AMDT_BUILD_TARGET == AMDT_LINUX_OS
+    // wait for server process to terminate
+    osWaitForProcessToTerminate(m_serverProcessID, 100);
+#endif
+
     // Terminate the remote graphics server
     m_remoteGraphicsBackendServerLauncher.TerminateRemoteGraphicsBeckendServer();
 }
@@ -1274,6 +1279,9 @@ bool gpExecutionMode::LaunchServer(bool& messageShown, const gtASCIIString& fram
 {
     bool retVal = false;
     OS_DEBUG_LOG_TRACER_WITH_RETVAL(retVal);
+
+    // shut down the old server if it exists
+    ShutServerDown();
 
     messageShown = false;
     // launch the server:
