@@ -374,12 +374,8 @@ def initQt4 (env) :
         tmp = re.match( "lib" + "ic*", file)
         if tmp:
             copySharedLibrary(env, file, qt_lib_dir, env['CXL_lib_dir']+ "/RuntimeLibs/QT")
-            #qt_extra_lib = file[0:file.find('.')]
-            #lib_exist = qt_extra_lib in qt_libs
-            #if (lib_exist):
-            #    print "lib exists"
-            #else:
-            #    qt_libs.append(qt_extra_lib)
+            ## Add addtioanl copy to output folder in order to bypass GCC 5.3 issue ignoring LIB_PATH
+            copySharedLibrary(env, file, qt_lib_dir, env['CXL_lib_dir'])
     qt_extra_libs = ('icui18n','icuuc','icudata')
     qt_libs.append(qt_extra_libs)
 
