@@ -1720,12 +1720,6 @@ void acTimeline::SetVisibleRange(const quint64 startVisibleTime, const quint64 v
             m_nVisibleRange = m_nFullRange;
         }
 
-        // sanity check
-        //if (m_nVisibleStartTime + m_nVisibleRange > m_nFullRange + m_nStartTime)
-        //{
-        //    m_nVisibleRange = m_nFullRange - m_nVisibleStartTime;
-        //}
-
         // Set the zoom factors
         m_dZoomFactor = m_nFullRange * 1.0 / m_nVisibleRange;
         m_nRenderWidth = localRowWidth * m_dZoomFactor;
