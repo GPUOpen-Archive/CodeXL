@@ -3669,8 +3669,12 @@ public:
 
                 for (auto& cgFunc : *pCgFunctionMap)
                 {
+#if AMDT_BUILD_CONFIGURATION == AMDT_RELEASE_BUILD
                     if (   (CXL_ROOT_FUNCTION_ID != cgFunc.first)
                         && (!(m_options.m_ignoreSystemModules && cgFunc.second.m_isSystemModule)))
+#else
+                    if (!(m_options.m_ignoreSystemModules && cgFunc.second.m_isSystemModule))
+#endif
                     {
                         AMDTCallGraphFunction func;
                         CopyCGNode(func, cgFunc.second, totalDeepSamples);
@@ -3701,18 +3705,28 @@ public:
 
                 for (auto& parent : cgFuncIter->second.m_callerVec)
                 {
-                    AMDTCallGraphFunction parentFunc;
-                    CopyCGEdge(parentFunc, parent, totalDeepSamples);
+#if AMDT_BUILD_CONFIGURATION == AMDT_RELEASE_BUILD
+                    if (parent.m_funcInfo.m_functionId != CXL_ROOT_FUNCTION_ID)
+#endif
+                    {
+                        AMDTCallGraphFunction parentFunc;
+                        CopyCGEdge(parentFunc, parent, totalDeepSamples);
 
-                    parents.push_back(parentFunc);
+                        parents.push_back(parentFunc);
+                    }
                 }
 
                 for (auto& child : cgFuncIter->second.m_calleeVec)
                 {
-                    AMDTCallGraphFunction childFunc;
-                    CopyCGEdge(childFunc, child, totalDeepSamples);
+#if AMDT_BUILD_CONFIGURATION == AMDT_RELEASE_BUILD
+                    if (child.m_funcInfo.m_functionId != CXL_ROOT_FUNCTION_ID)
+#endif
+                    {
+                        AMDTCallGraphFunction childFunc;
+                        CopyCGEdge(childFunc, child, totalDeepSamples);
 
-                    children.push_back(childFunc);
+                        children.push_back(childFunc);
+                    }
                 }
 
                 // TBD: Should this [self] entry be added?
