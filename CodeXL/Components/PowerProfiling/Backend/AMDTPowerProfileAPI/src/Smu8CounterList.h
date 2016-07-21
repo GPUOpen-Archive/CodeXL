@@ -76,7 +76,7 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_WATT,
     /*category*/(PwrCategory)CATEGORY_POWER,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_NONCORE_SINGLE,
-    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_PACKAGE,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_INTERNAL_GPU,
     /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE),
 },
 {
@@ -98,7 +98,7 @@
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_CENTIGRADE,
     /*category*/(PwrCategory)CATEGORY_TEMPERATURE,
     /*instance type*/(AMDTPwrAttributeInstanceType)INSTANCE_TYPE_NONCORE_SINGLE,
-    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_PACKAGE,
+    /*device type*/(AMDTDeviceType)AMDT_PWR_DEVICE_INTERNAL_GPU,
     /*Aggregation type*/(1 << AMDT_PWR_VALUE_SINGLE),
 },
 {
