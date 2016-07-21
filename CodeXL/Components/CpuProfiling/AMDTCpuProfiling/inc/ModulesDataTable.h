@@ -23,6 +23,9 @@ enum ModuleTableCol
     AMDT_MOD_TABLE_SYMBOL_LOADED,
     AMDT_MOD_TABLE_CLU_HS_COL = 1
 };
+
+void mergedProfileModuleData(gtVector<AMDTProfileData>& data);
+
 /// -----------------------------------------------------------------------------------------------
 /// \class Name: ModulesDataTable : public CPUProfileDataTable
 /// \brief Description:  This class will be used to display modules in data table.

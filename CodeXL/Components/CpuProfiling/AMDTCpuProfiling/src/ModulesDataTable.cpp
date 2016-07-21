@@ -256,6 +256,7 @@ bool ModulesDataTable::fillSummaryTables(int counterIdx)
 bool ModulesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> processIdVec)
 {
     bool retVal = false;
+    GT_UNREFERENCED_PARAMETER(modId);
 
     GT_IF_WITH_ASSERT((m_pProfDataRdr.get() != nullptr) &&
                       (m_pDisplayFilter != nullptr) &&
@@ -279,7 +280,7 @@ bool ModulesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, s
                 allProcessData.insert(allProcessData.end(), processData.begin(), processData.end());
             }
 
-            mergedProfileDataVectors(allProcessData);
+            mergedProfileModuleData(allProcessData);
         }
 
         AddRowToTable(allProcessData);
@@ -398,4 +399,44 @@ bool ModulesDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allProcess
     }
 
     return retVal;
+}
+
+void mergedProfileModuleData(gtVector<AMDTProfileData>& data)
+{
+    if (data.empty())
+    {
+        return;
+    }
+
+    // create map from longest vector
+    std::map<AMDTUInt64, AMDTProfileData> mIdProfileDataMap;
+
+    for (const auto& elem : data)
+    {
+        auto itr = mIdProfileDataMap.find(elem.m_moduleId);
+
+        if (itr == mIdProfileDataMap.end())
+        {
+            mIdProfileDataMap.insert(std::make_pair(elem.m_moduleId, elem));
+        }
+        else
+        {
+            AMDTProfileData& profData = itr->second;
+            int idx = 0;
+
+            for (auto& counter : profData.m_sampleValue)
+            {
+                counter.m_sampleCount += elem.m_sampleValue.at(idx).m_sampleCount;
+                counter.m_sampleCountPercentage += elem.m_sampleValue.at(idx).m_sampleCountPercentage;
+                idx++;
+            }
+        }
+    }
+
+    data.clear();
+
+    for (const auto& elem : mIdProfileDataMap)
+    {
+        data.push_back(elem.second);
+    }
 }
