@@ -462,7 +462,6 @@ bool SourceCodeTreeModel::setHeaderData(int section, Qt::Orientation orientation
 
 bool SourceCodeTreeModel::BuildDisassemblyTree()
 {
-
     gtVector<AMDTProfileCounterDesc> counterDesc;
     gtString srcFilePath;
     AMDTSourceAndDisasmInfoVec srcInfoVec;
@@ -484,6 +483,7 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
     {
         bool samplePercentSet = m_pDisplayFilter->GetSamplePercent();
         gtVector<gtVAddr> instOffsetVec;
+
         GetInstOffsets(srcData.m_sourceLineNumber, srcInfoVec, instOffsetVec);
 
         int idx = SOURCE_VIEW_SAMPLES_PERCENT_COLUMN + 1;
@@ -542,6 +542,7 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
 
             pAsmItem->setData(SOURCE_VIEW_CODE_BYTES_COLUMN, acGTStringToQString(codeByte));
             pAsmItem->setForeground(SOURCE_VIEW_CODE_BYTES_COLUMN, acQGREY_TEXT_COLOUR);
+
         }
     }
 
@@ -865,7 +866,6 @@ void SourceCodeTreeModel::PrintFunctionDetailData(AMDTProfileFunctionData data,
 
                     idx++;
                 }
-
 
                 if (true == flag)
                 {
@@ -2973,56 +2973,42 @@ void SourceCodeTreeModel::SetModuleDetails(AMDTUInt32 moduleId, AMDTUInt32 proce
     }
 }
 
-void SourceCodeTreeModel::SetHotSpotSamples(AMDTUInt32 counterId)
+void SourceCodeTreeModel::SetHotSpotsrcLnSamples(AMDTUInt32 counterId,
+                                                 AMDTProfileFunctionData  functionData,
+                                                 AMDTSourceAndDisasmInfoVec srcInfoVec)
 {
-    if (m_pDisplayFilter != nullptr)
+    SourceViewTreeItem* pLineItem = nullptr;
+
+    for (const auto& srcLn : m_sampleSrcLnViewTreeList)
     {
-        //int counterIdx = 0;
-        SourceViewTreeItem* pLineItem = nullptr;
+        int lineNumber = srcLn.first.m_sourceLineNumber;
 
-        AMDTProfileFunctionData  functionData;
-        int retVal = m_pProfDataRdr->GetFunctionDetailedProfileData(m_funcId,
-                                                                    m_pid,
-                                                                    m_tid,
-                                                                    functionData);
-        GT_ASSERT(retVal);
+        pLineItem = srcLn.second;
 
-        AMDTSourceAndDisasmInfoVec srcInfoVec;
-        gtString srcFilePath;
-
-        if (retVal != static_cast<int>(CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE))
+        for (const auto& counter : srcLn.first.m_sampleValues)
         {
-            retVal = m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_funcId, srcFilePath, srcInfoVec);
-        }
-
-        for (const auto& srcLn : m_sampleSrcLnViewTreeList)
-        {
-            int lineNumber = srcLn.first.m_sourceLineNumber;
-
-            pLineItem = srcLn.second;
-
-            for (const auto& counter : srcLn.first.m_sampleValues)
+            if (counterId == counter.m_counterId)
             {
-                if (counterId == counter.m_counterId)
+                gtVector<gtVAddr> instOffsetVec;
+                GetInstOffsets(lineNumber, srcInfoVec, instOffsetVec);
+
+                auto sampleValuePer = counter.m_sampleCountPercentage;
+
+                QVariant var;
+                SetDisplayFormat(counter.m_sampleCount, false, var, SAMPLE_PRECISION);
+                pLineItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, var);
+
+                pLineItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, sampleValuePer);
+                pLineItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
+
+                int idx = 0;
+
+                for (auto& instOffset : instOffsetVec)
                 {
-                    gtVector<gtVAddr> instOffsetVec;
-                    GetInstOffsets(lineNumber, srcInfoVec, instOffsetVec);
+                    SourceViewTreeItem* pAsmItem = pLineItem->child(idx++);
 
-                    auto sampleValuePer = counter.m_sampleCountPercentage;
-
-                    QVariant var;
-                    SetDisplayFormat(sampleValuePer, false, var, SAMPLE_PRECISION);
-                    pLineItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, var);
-
-                    pLineItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, sampleValuePer);
-                    pLineItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
-
-                    int idx = 0;
-
-                    for (auto& instOffset : instOffsetVec)
+                    if (nullptr != pAsmItem)
                     {
-                        SourceViewTreeItem* pAsmItem = pLineItem->child(idx++);
-
                         gtString disasm;
                         gtString codeByte;
 
@@ -3049,12 +3035,90 @@ void SourceCodeTreeModel::SetHotSpotSamples(AMDTUInt32 counterId)
                             }
                         }
                     }
-
                 }
+
             }
         }
     }
 }
+
+
+void SourceCodeTreeModel::SetHotSpotDisamOnlySamples(AMDTUInt32 counterId,
+                                                     AMDTProfileFunctionData  functionData,
+                                                     AMDTSourceAndDisasmInfoVec srcInfoVec)
+{
+    int childIdx = 0;
+
+    for (const auto& srcData : functionData.m_srcLineDataList)
+    {
+        gtVector<gtVAddr> instOffsetVec;
+        GetInstOffsets(srcData.m_sourceLineNumber, srcInfoVec, instOffsetVec);
+
+        for (auto& instOffset : instOffsetVec)
+        {
+            gtString disasm;
+            gtString codeByte;
+
+            GetDisasmString(instOffset, srcInfoVec, disasm, codeByte);
+            AMDTSampleValueVec sampleValue;
+            GetDisasmSampleValue(instOffset, functionData.m_instDataList, sampleValue);
+
+            for (auto& aSampleValue : sampleValue)
+            {
+                if (counterId == aSampleValue.m_counterId)
+                {
+                    SourceViewTreeItem* pAsmItem = m_pRootItem->child(childIdx);
+
+                    QVariant var;
+                    SetDisplayFormat(aSampleValue.m_sampleCount, false, var, SAMPLE_PRECISION);
+                    pAsmItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, var);
+
+                    pAsmItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, aSampleValue.m_sampleCountPercentage);
+                    pAsmItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
+                }
+            }
+
+            childIdx++;
+        }
+    }
+}
+
+
+void SourceCodeTreeModel::SetHotSpotSamples(AMDTUInt32 counterId)
+{
+    GT_UNREFERENCED_PARAMETER(counterId);
+
+    if (m_pDisplayFilter != nullptr)
+    {
+        AMDTProfileFunctionData  functionData;
+        int retVal = m_pProfDataRdr->GetFunctionDetailedProfileData(m_funcId,
+                                                                    m_pid,
+                                                                    m_tid,
+                                                                    functionData);
+
+        if (retVal != static_cast<int>(CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE))
+        {
+            AMDTSourceAndDisasmInfoVec srcInfoVec;
+            gtString srcFilePath;
+
+            if (retVal != static_cast<int>(CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE))
+            {
+                retVal = m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_funcId, srcFilePath, srcInfoVec);
+            }
+
+            if (m_sampleSrcLnViewTreeList.empty())
+            {
+                SetHotSpotDisamOnlySamples(counterId, functionData, srcInfoVec);
+            }
+            else
+            {
+                SetHotSpotsrcLnSamples(counterId, functionData, srcInfoVec);
+            }
+
+        }
+    }
+}
+
 #if 0
 QString strPrecision = QString::number(counter.m_sampleCount, 'f', 2);
 double valuePrecision = strPrecision.toDouble();

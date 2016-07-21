@@ -183,6 +183,14 @@ private:
     //void CreateSymbolInfoList();
 
     SourceViewTreeItem* getItem(const QModelIndex& index) const;
+    void SetHotSpotsrcLnSamples(AMDTUInt32 counterId,
+                                AMDTProfileFunctionData  functionData,
+                                AMDTSourceAndDisasmInfoVec srcInfoVec);
+
+    void SetHotSpotDisamOnlySamples(AMDTUInt32 counterId,
+                                    AMDTProfileFunctionData  functionData,
+                                    AMDTSourceAndDisasmInfoVec srcInfoVec);
+
 private:
 
     SessionDisplaySettings* m_pSessionDisplaySettings;
