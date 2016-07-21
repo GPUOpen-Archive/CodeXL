@@ -1280,9 +1280,6 @@ bool gpExecutionMode::LaunchServer(bool& messageShown, const gtASCIIString& fram
     bool retVal = false;
     OS_DEBUG_LOG_TRACER_WITH_RETVAL(retVal);
 
-    // shut down the old server if it exists
-    ShutServerDown();
-
     messageShown = false;
     // launch the server:
     osFilePath serverPath;
