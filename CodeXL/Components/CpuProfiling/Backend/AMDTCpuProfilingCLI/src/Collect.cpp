@@ -1248,7 +1248,22 @@ void CpuProfileCollect::WriteRunInfo()
 
             // Is IBS OP sampling..
             rInfo.m_isProfilingIbsOp = IsIbsOPSampling();
-            rInfo.m_cpuAffinity      = m_args.GetCoreAffinityMask();
+
+            // If affinity is not passed as argument, then the default value is 0xFF...FF
+            gtUInt64 coreAffinityMask = m_args.GetCoreAffinityMask();
+
+            // If default value is 0xFF..FF, then compute the affinity using number of CPUs
+            if (coreAffinityMask + 1 == 0)
+            {
+                int nbrCpus = 0;
+
+                if (osGetAmountOfLocalMachineCPUs(nbrCpus))
+                {
+                    coreAffinityMask = (1 << nbrCpus) - 1;
+                }
+            }
+
+            rInfo.m_cpuAffinity = coreAffinityMask;
 
             // set OS name
             osGetOSShortDescriptionString(rInfo.m_osName);
