@@ -188,7 +188,6 @@ public:
     bool characters(const QString& ch) ;
     void emitFileImportedComplete();
 
-    void setCaperfImported(bool caperfImported) { m_caperfImported = caperfImported; }
 public slots:
     void onSharedSessionAvailable();
     void onRemoveSession(ExplorerSessionId sharedId, SessionExplorerDeleteType deleteType, bool& sessionDeleted);
