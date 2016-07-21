@@ -70,6 +70,8 @@ const int LOOP_SLEEP_INTERVAL_MS = 100;
 const int FS_REFRESH_INTERVAL_MS = 1000;
 const gtString COMPRESSED_FILE_SUFFIX = L"_zipped";
 
+#define GRAPHIC_SERVER_SHUTDOWN_MAX_WAIT_MS 5000
+
 // Executable names and paths:
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     #define DMN_REMOTE_DEBUGGING_SERVER_EXECUTABLE_NAME L"CXLRemoteDebuggingServer" GDT_PROJECT_SUFFIX_W
@@ -1850,6 +1852,12 @@ bool dmnSessionThread::terminateProcess(REMOTE_OPERATION_MODE mode)
     {
         procId = m_sGraphicsProcId;
         m_sGraphicsProcId = 0x0;
+#if AMDT_BUILD_TARGET == AMDT_LINUX_OS
+        // wait for server process to gracefully shutdown before termination:
+        // CXL client is requesting via HTTP connection to shutdown server before it sends this termination request
+        // thus we wait for process to be shutdown properly before trying to terminating it
+        osWaitForProcessToTerminate(procId, GRAPHIC_SERVER_SHUTDOWN_MAX_WAIT_MS);
+#endif
     }
 
     ret = TerminateProcess(procId);
