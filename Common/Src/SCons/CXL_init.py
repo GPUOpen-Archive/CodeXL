@@ -383,6 +383,8 @@ def initQt4 (env) :
     qt_libs_no_graphics =[]
     qt_libs_no_graphics.append('Qt5Core' + dbgSuffix)
     qt_libs_no_graphics.append('Qt5Xml' + dbgSuffix)
+    qt_libs_no_graphics.append('Qt5Network' + dbgSuffix)
+    qt_libs_no_graphics.append(qt_extra_libs)
     env.Append(CXL_qt_libs_no_graphics = qt_libs_no_graphics)
 
     # 13-Aug-2012 - update to match "classic" build

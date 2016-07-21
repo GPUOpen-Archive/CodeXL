@@ -62,6 +62,9 @@
     <ClInclude Include="inc\CommonUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="inc\StringConstants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="AMDTCpuProfilingCLI.rc">

@@ -56,6 +56,7 @@
     <ClInclude Include="inc\ParseArgs.h" />
     <ClInclude Include="inc\Report.h" />
     <ClInclude Include="inc\Reporter.h" />
+    <ClInclude Include="inc\StringConstants.h" />
     <ClInclude Include="inc\Utils.h" />
     <ClInclude Include="inc\CommonUtils.h" />
   </ItemGroup>

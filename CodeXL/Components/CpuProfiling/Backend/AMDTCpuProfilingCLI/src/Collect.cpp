@@ -24,7 +24,7 @@
 #include <AMDTOSWrappers/Include/osFilePath.h>
 
 // Project:
-#include <AMDTCpuProfiling/inc/StringConstants.h>
+#include <StringConstants.h>
 #include <Collect.h>
 #include <CommonUtils.h>
 
