@@ -404,7 +404,6 @@ void DisplayFilterDlg::onChangeView(const QString& newlySelectedView)
 
     CounterNameIdVec counterDetails;
     bool ret = m_displayFilter->GetConfigCounters(viewName, counterDetails);
-    m_cofigName = viewName;
 
     if (true == ret)
     {
@@ -527,6 +526,9 @@ void DisplayFilterDlg::onClickOk()
                       (nullptr != m_pSessionTreeItemData))
     {
         bool atLeastOneCore = false;
+
+        QString viewName = m_pComboBoxViewes->currentText();
+        m_cofigName = viewName;
 
         std::bitset<MAX_CORES_SUPPORTED> coreMask;
 
