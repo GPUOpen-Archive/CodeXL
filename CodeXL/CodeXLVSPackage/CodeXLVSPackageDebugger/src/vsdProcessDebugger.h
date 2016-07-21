@@ -140,7 +140,7 @@ private:
     bool IsSpyFuncName(const gtString& funcName) const;
     bool IsDriverAddress(osInstructionPointer pc);
     bool IsDriverModuleName(const gtString& moduleNameLower) const;
-    void AnalyzeThreadLocation(IDebugThread2* piThread, bool& o_isThreadInsideSpy, osThreadId& o_threadId, osInstructionPointer* o_firstVisiblePointer) const;
+    void AnalyzeThreadLocation(IDebugThread2* piThread, bool& o_isThreadInsideSpy, bool& o_isThreadInsideCRT, osThreadId& o_threadId, osInstructionPointer* o_firstVisiblePointer) const;
     void DeferStepCommand(IDebugThread2* piThread, apBreakReason stepKind);
 
 private:

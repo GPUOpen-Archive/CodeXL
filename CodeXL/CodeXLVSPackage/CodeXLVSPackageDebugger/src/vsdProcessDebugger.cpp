@@ -1211,13 +1211,18 @@ void vsdProcessDebugger::handleStepCompleteEvent(IDebugEvent2* piEvent, IDebugTh
 
     continueStep = true;
 
-    bool ignoreStep = false;
-
     osThreadId threadId = OS_NO_THREAD_ID;
     osInstructionPointer bpAddress = (osInstructionPointer)0;
 
     // Figure out where did the step occur:
-    AnalyzeThreadLocation(piThread, ignoreStep, threadId, &bpAddress);
+    bool steppedIntoSpy = false;
+    bool steppedIntoCRT = false;
+    AnalyzeThreadLocation(piThread, steppedIntoSpy, steppedIntoCRT, threadId, &bpAddress);
+
+    bool hideSpyFrames = true;
+
+    // Do not stop inside the CRT runtime checks, this tends to cause the spy to hang:
+    bool ignoreStep = (steppedIntoSpy && hideSpyFrames) || steppedIntoCRT;
 
     // If we want to ignore the step:
     if (ignoreStep)
@@ -2803,7 +2808,7 @@ bool vsdProcessDebugger::IsDriverModuleName(const gtString& moduleNameLower) con
 // Author:      Uri Shomroni
 // Date:        4/7/2016
 // ---------------------------------------------------------------------------
-void vsdProcessDebugger::AnalyzeThreadLocation(IDebugThread2* piThread, bool& o_isThreadInsideSpy, osThreadId& o_threadId, osInstructionPointer* o_firstVisiblePointer) const
+void vsdProcessDebugger::AnalyzeThreadLocation(IDebugThread2* piThread, bool& o_isThreadInsideSpy, bool& o_isThreadInsideCRT, osThreadId& o_threadId, osInstructionPointer* o_firstVisiblePointer) const
 {
     osInstructionPointer firstVisiblePointer = (osInstructionPointer)0;
 
@@ -2818,7 +2823,7 @@ void vsdProcessDebugger::AnalyzeThreadLocation(IDebugThread2* piThread, bool& o_
         }
 
         // Get the exception address:
-        FRAMEINFO_FLAGS frameInfoFlags = FIF_DEBUG_MODULEP | FIF_STACKRANGE;
+        FRAMEINFO_FLAGS frameInfoFlags = FIF_DEBUG_MODULEP | FIF_STACKRANGE | FIF_FUNCNAME;
         IEnumDebugFrameInfo2* piFramesInfo = nullptr;
         hr = piThread->EnumFrameInfo(frameInfoFlags, 10, &piFramesInfo);
 
@@ -2881,6 +2886,23 @@ void vsdProcessDebugger::AnalyzeThreadLocation(IDebugThread2* piThread, bool& o_
                 {
                     firstVisiblePointer = frameAddress;
                     // Don't break, since we need to free the module data for the other frames.
+                }
+
+                // If we have a function name:
+                if (nullptr != frameInfo.m_bstrFuncName)
+                {
+                    gtString funcName = frameInfo.m_bstrFuncName;
+
+                    static const gtString crtFuncName1 = L"_RTC_CheckEsp";
+                    static const gtString crtFuncName2 = L"_RTC_CheckStackVars";
+                    if (gtString::npos != funcName.find(crtFuncName1) ||
+                        gtString::npos != funcName.find(crtFuncName2))
+                    {
+                        o_isThreadInsideCRT = true;
+                    }
+
+                    SysFreeString(frameInfo.m_bstrFuncName);
+                    frameInfo.m_bstrFuncName = nullptr;
                 }
 
                 // Get the next frame
