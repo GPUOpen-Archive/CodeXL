@@ -1068,6 +1068,7 @@ bool CallGraphFuncList::FillDisplayFuncList(std::shared_ptr<cxlProfileDataReader
         ret = pProfDataRdr->GetCallGraphFunctions(processId, counterId, callGraphFuncs);
 
         m_funcIdVec.clear();
+        m_FunctionIdSampleMap.clear();
 
         for (const auto& callGraphFunc : callGraphFuncs)
         {
@@ -1089,6 +1090,9 @@ bool CallGraphFuncList::FillDisplayFuncList(std::shared_ptr<cxlProfileDataReader
             }
 
             m_funcIdVec.push_back(callGraphFunc.m_functionInfo.m_functionId);
+            m_FunctionIdSampleMap.insert(std::make_pair(callGraphFunc.m_functionInfo.m_functionId, 
+                                                        callGraphFunc.m_totalSelfSamples ? true : false));
+
         }
 
         m_pFuncTable->setSortingEnabled(true);
@@ -1758,8 +1762,13 @@ void SessionCallGraphView::FunctionListSelectionDone(AMDTFunctionId functionId)
 
 void SessionCallGraphView::editSource(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> info)
 {
-    GT_UNREFERENCED_PARAMETER(info);
-    emit opensourceCodeViewSig(info);
+    auto itr = m_pFuncTable->m_FunctionIdSampleMap.find(std::get<0>(info));
+
+    if ((m_pFuncTable->m_FunctionIdSampleMap.end() != itr) &&
+        (itr->second == true))
+    {
+        emit opensourceCodeViewSig(info);
+    }
 }
 
 // The display is for a particular PID

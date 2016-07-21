@@ -258,6 +258,8 @@ public:
                                            AMDTUInt32 moduleId);
 
     std::vector<AMDTFunctionId> m_funcIdVec;
+    std::map<AMDTFunctionId, bool> m_FunctionIdSampleMap;   // map function id with 0 if self sample count is 0 else  1
+
 
 public slots:
     void selectAFunction(AMDTFunctionId funcId);
@@ -400,10 +402,7 @@ public:
     bool fillCounterIndicatorCombo();
 
     void showPid(unsigned int pid);
-    //void ShowParentChild(CpuProfileCss& css, const FunctionGraph::Node& funcNode);
     bool ShowParentChild(AMDTFunctionId functionId);
-    //void selectFunction(AMDTFunctionId functionId);
-    //void selectFunction(const QString& functionName, ProcessIdType pid);
     void selectFunction(AMDTFunctionId functionId, ProcessIdType pid);
     void ShowPaths(AMDTFunctionId functionId);
 
@@ -455,9 +454,8 @@ private:
 public slots:
     void OnDblClicked(QTreeWidgetItem* pItem);
     void OnSelectionChange();
-    //void OnIncludeSystemModules();
-    //void OnExcludeSystemModules();
     void onOpenDisplayFilterDialog();
+
     // When a list item is expanded
     void OnExpandItem(QTreeWidgetItem* pItem);
     void OnSelectPid(int index);
@@ -477,7 +475,6 @@ signals:
     void functionSelected(AMDTFunctionId funcId);
     void showParentChildFunction(gtUInt64 selFuncIndex);
     void showSelectedPaths(gtUInt64 selFuncIndex);
-    //void functionActivated(gtVAddr functionAddress, ProcessIdType pid, ThreadIdType tid, const CpuProfileModule* pModule);
     void opensourceCodeViewSig(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> funcModInfo);
 
 };
