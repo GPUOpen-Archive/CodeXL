@@ -323,7 +323,7 @@ public:
     {
         bool ret = false;
 
-        ret = ret && GetProfileSessionInfo(m_sessionInfo);
+        ret = GetProfileSessionInfo(m_sessionInfo);
 
         ret = ret && InitializeReportOption();
 

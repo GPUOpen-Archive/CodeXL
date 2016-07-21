@@ -60,6 +60,9 @@
 #define DB_FUNCTIONID_MASK      0x0000FFFFUL
 #define DB_MODULEID_SHIFT_BITS  16
 
+#define CXL_CLU_EVENT_CLU_PERCENTAGE        0xFF00UL
+#define CXL_CLU_EVENT_L1_EVICTIONS          0xFF04UL
+
 #ifdef PP_DAL_TEST
 
     // Test.
@@ -4846,7 +4849,7 @@ public:
         AMDTProcessId               processId,           // for a given process or for all processes
         AMDTThreadId                threadId,
         AMDTModuleId                moduleId,
-        gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
+        gtVector<AMDTUInt32>&       counterIdsList,      // samplingConfigId
         AMDTUInt64                  coreMask,
         bool                        ignoreSystemModules,
         bool                        separateByCore,
@@ -4873,11 +4876,33 @@ public:
         return ret;
     }
 
+    bool HasCLU(gtVector<AMDTUInt32>& counterIdsList, gtString& lhsName, gtString& rhsName)
+    {
+        bool foundCLU = false;
+        bool foundL1Evictions = false;
+
+        for (auto& cid : counterIdsList)
+        {
+            if (CXL_CLU_EVENT_CLU_PERCENTAGE == cid)
+            {
+                foundCLU = true;
+                lhsName.appendFormattedString(L"eventTotal%d ", cid);
+            }
+            else if (CXL_CLU_EVENT_L1_EVICTIONS == cid)
+            {
+                foundL1Evictions = true;
+                rhsName.appendFormattedString(L"eventTotal%d ", cid);
+            }
+        }
+
+        return (foundCLU & foundL1Evictions);
+    }
+
     bool GetFunctionSummaryData__(
         AMDTProcessId               processId,           // for a given process or for all processes
         AMDTThreadId                threadId,
         AMDTModuleId                moduleId,
-        gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
+        gtVector<AMDTUInt32>&       counterIdsList,      // samplingConfigId
         AMDTUInt64                  coreMask,
         bool                        ignoreSystemModules,
         bool                        separateByCore,
@@ -4967,8 +4992,25 @@ public:
 
             if (doSort)
             {
-                query << " ORDER BY " << firstCountColName << " DESC ";
+                // Klude: handling proper sorting for CLU here?
+                gtString lhsEventName;
+                gtString rhsEventName;
+
+                if (HasCLU(counterIdsList, lhsEventName, rhsEventName))
+                {
+                    query << " ORDER BY ( ";
+                    query << lhsEventName.asASCIICharArray();
+                    query << " / ";
+                    query << rhsEventName.asASCIICharArray();
+                    query << " ) ASC ";
+                }
+                else
+                {
+                    query << " ORDER BY " << firstCountColName << " DESC ";
+                }
             }
+
+            query << " ; ";
 
             //fprintf(stderr, " %s \n", query.str().c_str());
 
@@ -6745,7 +6787,7 @@ bool AmdtDatabaseAccessor::GetFunctionSummaryData(
     AMDTProcessId               processId,           // for a given process or for all processes
     AMDTThreadId                threadId,
     AMDTModuleId                moduleId,
-    gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
+    gtVector<AMDTUInt32>&       counterIdsList,      // samplingConfigId
     AMDTUInt64                  coreMask,
     bool                        ignoreSystemModules,
     bool                        separateByCore,

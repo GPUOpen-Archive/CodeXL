@@ -264,7 +264,7 @@ public:
     bool GetFunctionSummaryData(AMDTProcessId               processId,           // for a given process or for all processes
                                 AMDTThreadId                threadId,
                                 AMDTModuleId                moduleId,
-                                gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
+                                gtVector<AMDTUInt32>&       counterIdsList,      // samplingConfigId
                                 AMDTUInt64                  coreMask,
                                 bool                        ignoreSystemModules,
                                 bool                        separateByCore,
