@@ -444,8 +444,9 @@ void gaGetDetectedErrorParametersStub(osSocket& apiSocket)
     bool retVal = false;
 
     // Call the function implementation:
-    apDetectedErrorParameters detectedErrorParameters;
-    retVal = gaGetDetectedErrorParametersImpl(detectedErrorParameters);
+    const apDetectedErrorParameters* pDetectedErrorParameters = nullptr;
+    retVal = gaGetDetectedErrorParametersImpl(pDetectedErrorParameters);
+    retVal = retVal && (nullptr != pDetectedErrorParameters);
 
     // Return the return value:
     apiSocket << retVal;
@@ -453,7 +454,7 @@ void gaGetDetectedErrorParametersStub(osSocket& apiSocket)
     if (retVal)
     {
         // Write output parameters:
-        bool rc1 = detectedErrorParameters.writeSelfIntoChannel(apiSocket);
+        bool rc1 = pDetectedErrorParameters->writeSelfIntoChannel(apiSocket);
         GT_ASSERT(rc1);
     }
 }
@@ -549,13 +550,16 @@ void gaGetBreakpointTriggeringContextIdStub(osSocket& apiSocket)
     bool retVal = false;
 
     // Call the function implementation:
-    apContextID contextId;
-    retVal = gaGetBreakpointTriggeringContextIdImpl(contextId);
+    const apContextID* pContextId = nullptr;
+    retVal = gaGetBreakpointTriggeringContextIdImpl(pContextId);
+    retVal = retVal && (nullptr != pContextId);
+
+    // Send the return value:
     apiSocket << retVal;
 
     if (retVal)
     {
-        contextId.writeSelfIntoChannel(apiSocket);
+        pContextId->writeSelfIntoChannel(apiSocket);
     }
 }
 
@@ -634,14 +638,15 @@ void gaGetAllocatedObjectCreationStackStub(osSocket& apiSocket)
     apiSocket >> allocatedObjectIdAsInt32;
 
     // Get the return value:
-    osCallStack callsStack;
-    bool retVal = gaGetAllocatedObjectCreationStackImpl((int)allocatedObjectIdAsInt32, callsStack);
+    const osCallStack* pCallsStack = nullptr;
+    bool retVal = gaGetAllocatedObjectCreationStackImpl((int)allocatedObjectIdAsInt32, pCallsStack);
+    retVal = retVal && (nullptr != pCallsStack);
 
     apiSocket << retVal;
 
     if (retVal)
     {
-        callsStack.writeSelfIntoChannel(apiSocket);
+        pCallsStack->writeSelfIntoChannel(apiSocket);
     }
 }
 

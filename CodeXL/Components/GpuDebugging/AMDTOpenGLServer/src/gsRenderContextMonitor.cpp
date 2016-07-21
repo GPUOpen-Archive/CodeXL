@@ -64,8 +64,6 @@ gsRenderContextMonitor::gsRenderContextMonitor(int contextSpyId,
                                                const int* attribList,
                                                bool isDebugFlagForced)
     : suContextMonitor(apContextID(AP_OPENGL_CONTEXT, contextSpyId)),
-      _objectSharingContext(-1),
-      _allocatedObjectId(-1),
       _deviceContextOSHandle(deviceContextOSHandle),
       _renderContextOSHandle(renderContextOSHandle),
       _pixelFormatId(OA_NO_PIXEL_FORMAT_ID),
@@ -95,10 +93,14 @@ gsRenderContextMonitor::gsRenderContextMonitor(int contextSpyId,
       _isDebugContextFlagForced(isDebugFlagForced),
       _vendorType(OA_VENDOR_UNKNOWN),
       _shouldTestForOpenGLErrorsAtNextFunctionCall(false),
-      _openCLSharedContextID(0),
       _glGetInteger64v(NULL),
       _glGetIntegerui64vNV(NULL)
 {
+    // Set the indices:
+    m_contextInfo.setSpyID(contextSpyId);
+    m_contextInfo.setSharingContextID(-1);
+    m_contextInfo.setOpenCLSpyID(0);
+
     // Parse our attrib list:
     parseAttribList(attribList);
 
@@ -144,9 +146,7 @@ gsRenderContextMonitor::gsRenderContextMonitor(int contextSpyId,
     if (contextSpyId > 0)
     {
         // Register in the allocated objects monitor:
-        apGLRenderContextInfo dummyRCInfo;
-        su_stat_theAllocatedObjectsMonitor.registerAllocatedObject(dummyRCInfo);
-        _allocatedObjectId = dummyRCInfo.getAllocatedObjectId();
+        su_stat_theAllocatedObjectsMonitor.registerAllocatedObject(m_contextInfo);
     }
 
     // Set the render primitive logger pointer to me:
@@ -230,7 +230,7 @@ gsRenderContextMonitor::~gsRenderContextMonitor()
 
             if (currentRC != NULL)
             {
-                if (currentRC->getObjectSharingContextID() == _contextID._contextId)
+                if (currentRC->getObjectSharingContextID() == spyId())
                 {
                     currentRC->setTexturesMonitor(NULL);
                     currentRC->setProgramsAndShadersMonitor(NULL);
@@ -376,10 +376,10 @@ void gsRenderContextMonitor::onContextMadeCurrent(oaDeviceContextHandle deviceCo
 
         // Notify the extensions manager about the context creation:
         gsExtensionsManager& theExtensionsMgr = gsExtensionsManager::instance();
-        theExtensionsMgr.onFirstTimeContextMadeCurrent(_contextID._contextId, _oglVersion, _isCompatibiltyContext);
+        theExtensionsMgr.onFirstTimeContextMadeCurrent(spyId(), _oglVersion, _isCompatibiltyContext);
 
         // Check for the compatibility extension:
-        if (theExtensionsMgr.isExtensionSupported(_contextID._contextId, AP_GL_ARB_compatibility))
+        if (theExtensionsMgr.isExtensionSupported(spyId(), AP_GL_ARB_compatibility))
         {
             _isCompatibiltyContext = true;
         }
@@ -424,6 +424,9 @@ void gsRenderContextMonitor::onContextMadeCurrent(oaDeviceContextHandle deviceCo
         }
 
         _buffersMonitor.onFirstTimeContextMadeCurrent(_oglVersion);
+
+        constructGraphicsInfo();
+
 #ifdef _GR_IPHONE_BUILD
         // EAGL does not have pixel formats, so we need to get some of the details manually from OpenGL ES:
         initializePixelFormatFromOpenGLES();
@@ -498,7 +501,7 @@ void gsRenderContextMonitor::onContextMadeCurrent(oaDeviceContextHandle deviceCo
 #if (AMDT_BUILD_TARGET == AMDT_WINDOWS_OS)
         {
             // GPU affinities are currently supported only on Windows:
-            if (gs_stat_extensionsManager.isExtensionSupported(_contextID._contextId, AP_WGL_NV_gpu_affinity))
+            if (gs_stat_extensionsManager.isExtensionSupported(spyId(), AP_WGL_NV_gpu_affinity))
             {
                 BOOL resultCode = FALSE;
 
@@ -557,7 +560,7 @@ void gsRenderContextMonitor::onContextMadeCurrent(oaDeviceContextHandle deviceCo
                                 {
                                     // There is a different problem, stop anyway:
                                     gtString errMsg;
-                                    errMsg.appendFormattedString(L"Error determining GPU affinities for Context %d. Error code is %lu", _contextID._contextId, errCode);
+                                    errMsg.appendFormattedString(L"Error determining GPU affinities for Context %d. Error code is %lu", spyId(), errCode);
                                     GT_ASSERT_EX(false, errMsg.asCharArray());
                                 }
 
@@ -3239,7 +3242,7 @@ bool gsRenderContextMonitor::updateContextDataSnapshot(bool sendEvents)
 
             for (int i = 0; i < amountOfTexUnits; i++)
             {
-                _textureUnitMonitors[i]->updateContextDataSnapshot(_contextID._contextId, _oglVersion);
+                _textureUnitMonitors[i]->updateContextDataSnapshot(spyId(), _oglVersion);
             }
 
             if (sendEvents)
@@ -3581,9 +3584,9 @@ void gsRenderContextMonitor::setObjectSharingContext(int objectSharingContext, g
     // The situation where we are called to point at ourselves is caused when the
     // user tried to connect multiple contexts more than once eg
     // 2->1, 3->1 and then 4->2 and 4->3.
-    if (_contextID._contextId != objectSharingContext)
+    if (spyId() != objectSharingContext)
     {
-        _objectSharingContext = objectSharingContext;
+        m_contextInfo.setSharingContextID(objectSharingContext);
     }
 
     // Sanity check:
@@ -3639,6 +3642,9 @@ void gsRenderContextMonitor::setObjectSharingContext(int objectSharingContext, g
         _pFBOMonitor = pOtherFBOMon;
         _pVBOMonitor = pOtherVBOMon;
         _pDisplayListMonitor = pOtherDispListMon;
+
+        // Update the other context's sharing information:
+        otherRC->updateSharedContextsList();
     }
 }
 
@@ -3650,14 +3656,12 @@ void gsRenderContextMonitor::setObjectSharingContext(int objectSharingContext, g
 // Author:      Uri Shomroni
 // Date:        19/3/2009
 // ---------------------------------------------------------------------------
-bool gsRenderContextMonitor::constructGraphicsInfo(apGLRenderContextGraphicsInfo& graphicsInfo) const
+void gsRenderContextMonitor::constructGraphicsInfo()
 {
-    bool retVal = false;
-
     // Set compatibility attributes:
-    graphicsInfo.setComaptibilityContext(_isCompatibiltyContext);
-    graphicsInfo.setForwardCompatible(_isForwardCompatibleContext);
-    graphicsInfo.setDebugFlagDetails(_isDebugContext, _isDebugContextFlagForced);
+    m_contextGraphicsInfo.setComaptibilityContext(_isCompatibiltyContext);
+    m_contextGraphicsInfo.setForwardCompatible(_isForwardCompatibleContext);
+    m_contextGraphicsInfo.setDebugFlagDetails(_isDebugContext, _isDebugContextFlagForced);
 
     // Make sure we have a pixel format and that its info was initialized:
     GT_IF_WITH_ASSERT(_pPixelFormatDescription != NULL)
@@ -3694,28 +3698,51 @@ bool gsRenderContextMonitor::constructGraphicsInfo(apGLRenderContextGraphicsInfo
 
             bool stereo = _pPixelFormatDescription->isStereoscopic();
             bool supportsNative = _pPixelFormatDescription->supportsNativeRendering();
-            graphicsInfo.setGeneralGraphicsInfo(pixelFormatIndex, _pPixelFormatDescription->isDoubleBuffered(), acceleration, stereo, supportsNative);
+            m_contextGraphicsInfo.setGeneralGraphicsInfo(pixelFormatIndex, _pPixelFormatDescription->isDoubleBuffered(), acceleration, stereo, supportsNative);
             oaPixelFormat::PixelType pixType = _pPixelFormatDescription->pixelType();
 
             if (pixType == oaPixelFormat::COLOR_INDEX)
             {
                 // Indexed pixel format:
-                graphicsInfo.setChannels(0, 0, 0, 0, _pPixelFormatDescription->amountOfColorBits(), _pPixelFormatDescription->amountOfZBufferBits(),
-                                         _pPixelFormatDescription->amountOfStencilBufferBits(), _pPixelFormatDescription->amountOfAccumulationBufferBits());
+                m_contextGraphicsInfo.setChannels(0, 0, 0, 0, _pPixelFormatDescription->amountOfColorBits(), _pPixelFormatDescription->amountOfZBufferBits(),
+                                                  _pPixelFormatDescription->amountOfStencilBufferBits(), _pPixelFormatDescription->amountOfAccumulationBufferBits());
             }
             else
             {
                 // RGBA pixel format:
                 GT_ASSERT(pixType == oaPixelFormat::RGBA);
-                graphicsInfo.setChannels(_pPixelFormatDescription->amountOfRedBits(), _pPixelFormatDescription->amountOfGreenBits(), _pPixelFormatDescription->amountOfBlueBits(),
-                                         _pPixelFormatDescription->amountOfAlphaBits(), 0, _pPixelFormatDescription->amountOfZBufferBits(), _pPixelFormatDescription->amountOfStencilBufferBits(), _pPixelFormatDescription->amountOfAccumulationBufferBits());
+                m_contextGraphicsInfo.setChannels(_pPixelFormatDescription->amountOfRedBits(), _pPixelFormatDescription->amountOfGreenBits(), _pPixelFormatDescription->amountOfBlueBits(),
+                                                  _pPixelFormatDescription->amountOfAlphaBits(), 0, _pPixelFormatDescription->amountOfZBufferBits(), _pPixelFormatDescription->amountOfStencilBufferBits(), _pPixelFormatDescription->amountOfAccumulationBufferBits());
             }
-
-            retVal = true;
         }
     }
 
-    if (_objectSharingContext == -1)
+    updateSharedContextsList();
+
+    m_contextGraphicsInfo.setOpenGLVersion(_oglVersion[0], _oglVersion[1]);
+
+    m_contextGraphicsInfo.setShadingLanguageVersionString(_openGLShadingLangVersionString);
+
+    int numberOfAffGPUs = (int)_gpuAffinities.size();
+
+    for (int i = 0; i < numberOfAffGPUs; i++)
+    {
+        m_contextGraphicsInfo.addGPUAffinity(_gpuAffinities[i]);
+    }
+
+    m_contextGraphicsInfo.setRendererInformation(_openGLVendorString, _openGLRendererString, m_openGLVersionString);
+}
+
+// ---------------------------------------------------------------------------
+// Name:        gsRenderContextMonitor::updateSharedContextsList
+// Description: Updates the list of contexts that use this context's object storage.
+// Author:      Uri Shomroni
+// Date:        21/7/2016
+// ---------------------------------------------------------------------------
+void gsRenderContextMonitor::updateSharedContextsList()
+{
+    // If we are sharing with another context, that context will hold the information:
+    if (!isSharingLists())
     {
         // If this context isn't sharing lists, see by which contexts (if any) it is shared:
         int amountOfContexts = gs_stat_openGLMonitorInstance.amountOfContexts();
@@ -3726,33 +3753,13 @@ bool gsRenderContextMonitor::constructGraphicsInfo(apGLRenderContextGraphicsInfo
             GT_IF_WITH_ASSERT(pCurrentContext != NULL)
             {
                 // If this context shares us:
-                if (pCurrentContext->getObjectSharingContextID() == _contextID._contextId)
+                if (pCurrentContext->getObjectSharingContextID() == spyId())
                 {
-                    graphicsInfo.addSharingContext(i);
+                    m_contextGraphicsInfo.addSharingContext(i);
                 }
-            }
-            else
-            {
-                // We failed to get the information:
-                retVal = false;
             }
         }
     }
-
-    graphicsInfo.setOpenGLVersion(_oglVersion[0], _oglVersion[1]);
-
-    graphicsInfo.setShadingLanguageVersionString(_openGLShadingLangVersionString);
-
-    int numberOfAffGPUs = (int)_gpuAffinities.size();
-
-    for (int i = 0; i < numberOfAffGPUs; i++)
-    {
-        graphicsInfo.addGPUAffinity(_gpuAffinities[i]);
-    }
-
-    graphicsInfo.setRendererInformation(_openGLVendorString, _openGLRendererString, m_openGLVersionString);
-
-    return retVal;
 }
 
 // ---------------------------------------------------------------------------
@@ -3937,7 +3944,7 @@ void gsRenderContextMonitor::logCreatedContextParameters()
 
     // Build a string that will be sent to the log file:
     gtString logFileString;
-    logFileString.appendFormattedString(GS_STR_renderContextIsCurrentForFirstTime, _contextID._contextId);
+    logFileString.appendFormattedString(GS_STR_renderContextIsCurrentForFirstTime, spyId());
     logFileString.append(L": ");
     logFileString.append(GS_STR_OGLVendor);
     logFileString.append(L": ");
@@ -4108,7 +4115,7 @@ void gsRenderContextMonitor::checkForSoftwareRenderer()
     if (isSoftwareRenderer)
     {
         gtString errorDescription;
-        errorDescription.appendFormattedString(GS_STR_usingSoftwareRenderer, _contextID._contextId, _openGLVendorString.asCharArray(), _openGLRendererString.asCharArray());
+        errorDescription.appendFormattedString(GS_STR_usingSoftwareRenderer, spyId(), _openGLVendorString.asCharArray(), _openGLRendererString.asCharArray());
 
         gsOpenGLMonitor& theOGLMtr = gsOpenGLMonitor::instance();
         theOGLMtr.reportDetectedError(AP_USING_SOFTWARE_RENDERER_ERROR, errorDescription);
@@ -4272,7 +4279,7 @@ bool gsRenderContextMonitor::disablelVerticalSync() const
     {
         // If the WGL_EXT_swap_control extension is supported by this render context:
         gsExtensionsManager& theExtensionsMgr = gsExtensionsManager::instance();
-        bool isWGL_EXT_swap_controlSupported = theExtensionsMgr.isExtensionSupported(_contextID._contextId, AP_WGL_EXT_swap_control);
+        bool isWGL_EXT_swap_controlSupported = theExtensionsMgr.isExtensionSupported(spyId(), AP_WGL_EXT_swap_control);
 
         if (isWGL_EXT_swap_controlSupported)
         {
@@ -4282,7 +4289,7 @@ bool gsRenderContextMonitor::disablelVerticalSync() const
             GT_IF_WITH_ASSERT(rc1 && rc2)
             {
                 // Get the extension functions implementations for the current context:
-                gsMonitoredFunctionPointers* pExtensionsRealImplementationPointers = theExtensionsMgr.extensionsRealImplementationPointers(_contextID._contextId);
+                gsMonitoredFunctionPointers* pExtensionsRealImplementationPointers = theExtensionsMgr.extensionsRealImplementationPointers(spyId());
                 GT_IF_WITH_ASSERT(pExtensionsRealImplementationPointers != NULL)
                 {
                     // Get a pointer to the wglSwapIntervalEXT function:
@@ -4345,7 +4352,7 @@ bool gsRenderContextMonitor::disablelVerticalSync() const
     {
         // Output a debug log message:
         gtString dbgMsg;
-        dbgMsg.appendFormattedString(GS_STR_disabled_vertical_sync_for_context, _contextID._contextId);
+        dbgMsg.appendFormattedString(GS_STR_disabled_vertical_sync_for_context, spyId());
         OS_OUTPUT_DEBUG_LOG(dbgMsg.asCharArray(), OS_DEBUG_LOG_DEBUG);
     }
 

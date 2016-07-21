@@ -19,6 +19,8 @@ class apGLRenderContextGraphicsInfo;
 #include <AMDTBaseTools/Include/gtVector.h>
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
 #include <AMDTAPIClasses/Include/apOpenGLExtensionsId.h>
+#include <AMDTAPIClasses/Include/apGLRenderContextGraphicsInfo.h>
+#include <AMDTAPIClasses/Include/apGLRenderContextInfo.h>
 
 // Spies utilities:
 #include <AMDTServerUtilities/Include/suContextMonitor.h>
@@ -120,25 +122,28 @@ public:
     bool onNamedTextureFloatParameterChanged(GLuint texture, GLenum pname, const GLfloat* pParam);
     bool onNamedTextureLevelFloatParameterChanged(GLuint texture, GLint level, GLenum pname, const GLfloat* pParam);
     bool onProgramUsed(GLuint programName);
-    void onBreakOnOpenGLErrorModeChanged(bool breakOnGLErrors) {_shouldTestForOpenGLErrorsAtNextFunctionCall = breakOnGLErrors;};
-    bool isOpenGLErrorCheckNeededOnModeTurnedOn() const {return _shouldTestForOpenGLErrorsAtNextFunctionCall;};
+    void onBreakOnOpenGLErrorModeChanged(bool breakOnGLErrors) { _shouldTestForOpenGLErrorsAtNextFunctionCall = breakOnGLErrors; };
+    bool isOpenGLErrorCheckNeededOnModeTurnedOn() const { return _shouldTestForOpenGLErrorsAtNextFunctionCall; };
     void checkForOpenGLErrorAfterModeChange();
     bool afterProgramRestoredFromStubFS(GLuint programName);
-    int openCLSharedContextID() const {return _openCLSharedContextID;}
-    void setOpenCLSharedContextID(int clID) {_openCLSharedContextID = clID;}
+    int openCLSharedContextID() const { return m_contextInfo.openCLSpyID(); };
+    void setOpenCLSharedContextID(int clID) { m_contextInfo.setOpenCLSpyID(clID); };
 
     // OpenGL ES Emulator functions:
     bool setTextureCropRectangle(GLenum target, const GLfloat* pRectangleAsFloatArray);
     bool setTextureCropRectangle(GLuint texture, GLenum target, const GLfloat* pRectangleAsFloatArray);
 
+    // Context Info:
+    const apGLRenderContextInfo& RenderContextInfo() const { return m_contextInfo; };
+
     // Spy Id and OS Handles:
-    int spyId() const { return _contextID._contextId; };
+    int spyId() const { return m_contextInfo.spyID(); };
     oaDeviceContextHandle deviceContextOSHandle() const { return _deviceContextOSHandle; };
     oaOpenGLRenderContextHandle renderContextOSHandle() const { return _renderContextOSHandle; };
     bool wasDeleted() const;
 
     // Allocated object Id:
-    int allocatedObjectId() const {return _allocatedObjectId;};
+    int allocatedObjectId() const { return m_contextInfo.getAllocatedObjectId(); };
 
     // Pixel format:
     void setPixelFormatId(oaPixelFormatId OSPixelFormatId);
@@ -219,7 +224,7 @@ public:
     // State variables:
     const gsStateVariablesSnapshot& getStateVariablesDefaultValues() const { return _stateVariablesDefaultValues; };
     const gsStateVariablesSnapshot& getStateVariablesSnapshot() const { return _stateVariablesSnapshot; };
-    void setStateVariableUpdateMode(bool shouldUpdate) { _shouldUpdateStateVariables = shouldUpdate;};
+    void setStateVariableUpdateMode(bool shouldUpdate) { _shouldUpdateStateVariables = shouldUpdate; };
 
     // Forced modes:
     const gsForcedModesManager& forcedModesManager() const { return _forcedModesManager; };
@@ -259,31 +264,34 @@ public:
     bool getGLObjectType(GLenum objectName, osTransferableObjectType& objType);
     bool isInOpenGLBeginEndBlock() const;
     void getOpenGLVersion(int& majorNumber, int& minorNumber) const;
-    bool isComaptibilityContext() const {return _isCompatibiltyContext;};
+    bool isComaptibilityContext() const { return _isCompatibiltyContext; };
     bool isOpenGLVersionOrNewerCoreContext(int maj = 3, int min = 1) const;
-    bool isBackwardsCompatible() const {return _isForwardCompatibleContext;};
-    bool isDebugContext() const {return _isDebugContext;};
-    bool isDebugContextFlagForced() const {return _isDebugContextFlagForced;};
+    bool isBackwardsCompatible() const { return _isForwardCompatibleContext; };
+    bool isDebugContext() const { return _isDebugContext; };
+    bool isDebugContextFlagForced() const { return _isDebugContextFlagForced; };
     bool flushContentToDrawSurface();
-    int getObjectSharingContextID() const { return _objectSharingContext;} ;
+    int getObjectSharingContextID() const { return m_contextInfo.sharingContextID(); };
     void setObjectSharingContext(int objectSharingContext, gsRenderContextMonitor* otherRC, bool deleteSubMonitors = false);
-    bool isSharingLists() const {return (_objectSharingContext != -1); };
-    bool constructGraphicsInfo(apGLRenderContextGraphicsInfo& graphicsInfo) const;
+    bool isSharingLists() const {return (0 < getObjectSharingContextID()); };
+    const apGLRenderContextGraphicsInfo& GraphicsInfo() const { return m_contextGraphicsInfo; };
 
     void startStateVariablesAnalyzeLogging(int calledFunctionId);
 
     // Extension functions to use in state variable reader. These function pointers are managed here
     // for performance:
-    PFNGLGETINTEGER64VPROC myGLGetInteger64v() const {return _glGetInteger64v;}
+    PFNGLGETINTEGER64VPROC myGLGetInteger64v() const { return _glGetInteger64v; };
 
     // Extension function pointer:
-    PFNGLGETINTEGERUI64VNVPROC myGLGetIntegerui64vNV() const {return _glGetIntegerui64vNV;}
+    PFNGLGETINTEGERUI64VNVPROC myGLGetIntegerui64vNV() const { return _glGetIntegerui64vNV; };
+
 private:
     void parseAttribList(const int* attribList);
     void logCreatedContextParameters();
     void updateOpenGLVersion();
     void updateVendorType();
     void checkForSoftwareRenderer();
+    void constructGraphicsInfo();
+    void updateSharedContextsList();
     int amountOfGLSupportedTextureUnits() const;
     bool disablelVerticalSync() const;
     int getIntChannelSizeParameterDefaultValue(apOpenGLStateVariableId channelStateVarId) const;
@@ -302,11 +310,14 @@ private:
     gsRenderContextMonitor(gsRenderContextMonitor&&) = delete;
 
 private:
-    // The internal id of a context this contexts shares lists with, or -1 if it doesn't
-    int _objectSharingContext;
+    // Context information (includes context Id, allocated object Id, and sharing information (GL+CL):
+    // - The internal id of a context this contexts shares lists with, or -1 if it doesn't
+    // - The context's allocated Object ID:
+    // - OpenCL shared context id:
+    apGLRenderContextInfo m_contextInfo;
 
-    // The context's allocated Object ID:
-    int _allocatedObjectId;
+    // Context graphics information:
+    apGLRenderContextGraphicsInfo m_contextGraphicsInfo;
 
     // The render context's "draw surface" native OS handle:
     // (The surface into which OpenGL draws using this render context)
@@ -448,9 +459,6 @@ private:
 
     // Contains true if we need to check for OpenGL errors that existed before turning on "Break on OpenGL Errors" mode:
     bool _shouldTestForOpenGLErrorsAtNextFunctionCall;
-
-    // OpenCL shared context id:
-    int _openCLSharedContextID;
 
     // Extension function pointer:
     PFNGLGETINTEGER64VPROC _glGetInteger64v;

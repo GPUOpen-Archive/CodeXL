@@ -130,7 +130,7 @@ bool gaGetAmountOfOpenCLEventsImpl(int contextId, int& amountOfEvents);
 bool gaGetOpenCLEventObjectDetailsImpl(int contextId, int queueIndex, const apCLEvent*& pCLEvent);
 
 // Context:
-bool gaGetOpenCLContextDetailsImpl(int contextId, apCLContext& contextInfo);
+bool gaGetOpenCLContextDetailsImpl(int contextId, const apCLContext*& pContextInfo);
 
 // OpenCL execution mode:
 bool gaSetOpenCLOperationExecutionImpl(apOpenCLExecutionType executionType, bool isExecutionOn);

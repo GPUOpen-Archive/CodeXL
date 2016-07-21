@@ -37,7 +37,7 @@ public:
     unsigned int numberOfAllocatedObjects() const {return (unsigned int)_allocatedObjectsCreationCallStacks.size();};
     bool registerAllocatedObject(apAllocatedObject& allocObj);
     bool registerAllocatedObjects(gtVector<apAllocatedObject*>& allocObjs);
-    bool getAllocatedObjectCreationCallStack(int index, osCallStack& callStack) const;
+    bool getAllocatedObjectCreationCallStack(int index, const osCallStack*& o_pCallsStack) const;
 
     void collectAllocatedObjectsCreationCallsStacks(bool collectCreationStacks);
 

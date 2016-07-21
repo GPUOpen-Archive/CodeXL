@@ -1602,7 +1602,7 @@ bool gaGetOpenCLEventObjectDetailsImpl(int contextId, int eventIndex, const apCL
 // Author:      Sigal Algranaty
 // Date:        7/11/2009
 // ---------------------------------------------------------------------------
-bool gaGetOpenCLContextDetailsImpl(int contextId, apCLContext& contextInfo)
+bool gaGetOpenCLContextDetailsImpl(int contextId, const apCLContext*& pContextInfo)
 {
     bool retVal = false;
 
@@ -1611,7 +1611,7 @@ bool gaGetOpenCLContextDetailsImpl(int contextId, apCLContext& contextInfo)
 
     if (pContextMonitor != NULL)
     {
-        contextInfo = pContextMonitor->contextInformation();
+        pContextInfo = &pContextMonitor->contextInformation();
         retVal = true;
     }
 

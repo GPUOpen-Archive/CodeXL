@@ -41,9 +41,8 @@ public:
 
     size_t GetAmountOfPipelineObjects() const;
 
-    // Fills buffer with the data of the program pipeline named pipelineName.
-    // If it doesn't find such pipeline, it returns false, otherwise it returns true.
-    bool GetPipelineData(GLuint pipelineName, apGLPipeline& buffer) const;
+    // Returns a pointer to the pipeline object:
+    const apGLPipeline* GetPipelineDetails(GLuint pipelineName) const;
 
     // Returns the name of the program pipeline which is stored at index pipelineIndex.
     // False is returned if on program pipeline is stored at that index, otherwise true is returned.

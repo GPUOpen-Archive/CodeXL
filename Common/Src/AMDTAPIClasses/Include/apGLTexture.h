@@ -88,8 +88,8 @@ public:
     void updateTextureDataFile(GLenum bindTarget, const osFilePath& textureDataFilePath, int mipLevel = 0);
 
     // Texture file paths:
-    bool getTextureDataFilePath(osFilePath& filePath, int fileIndex = apGLTextureMipLevel::AP_SINGLE_TEXTURE_FACE_INDEX, int mipLevel = 0) const;
-    bool getTextureImageFilePath(apFileType fileType, osFilePath& filePath, int fileIndex = apGLTextureMipLevel::AP_SINGLE_TEXTURE_FACE_INDEX, int mipLevel = 0);
+    bool getTextureDataFilePath(const osFilePath*& pFilePath, int fileIndex = apGLTextureMipLevel::AP_SINGLE_TEXTURE_FACE_INDEX, int mipLevel = 0) const;
+    bool getTextureImageFilePath(apFileType fileType, const osFilePath*& pFilePath, int fileIndex = apGLTextureMipLevel::AP_SINGLE_TEXTURE_FACE_INDEX, int mipLevel = 0);
 
     // Texel type, internal format and pixel format:
     GLenum texelsType(int mipLevel = 0) const ;

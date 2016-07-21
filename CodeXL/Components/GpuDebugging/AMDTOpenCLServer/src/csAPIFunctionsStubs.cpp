@@ -1675,15 +1675,16 @@ void gaGetOpenCLContextDetailsStub(osSocket& apiSocket)
     apiSocket >> contextIdAsInt32;
 
     // Call the function implementation:
-    apCLContext contextInfo;
-    bool rc = gaGetOpenCLContextDetailsImpl((int)contextIdAsInt32, contextInfo);
+    const apCLContext* pContextInfo = nullptr;
+    bool rc = gaGetOpenCLContextDetailsImpl((int)contextIdAsInt32, pContextInfo);
+    rc = rc && (nullptr != pContextInfo);
 
     // Return the return value:
     apiSocket << rc;
 
     if (rc)
     {
-        contextInfo.writeSelfIntoChannel(apiSocket);
+        pContextInfo->writeSelfIntoChannel(apiSocket);
     }
 }
 

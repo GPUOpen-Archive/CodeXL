@@ -627,12 +627,12 @@ bool gaClearAllStepFlagsImpl()
 // Author:      Yaki Tebeka
 // Date:        8/10/2007
 // ---------------------------------------------------------------------------
-bool gaGetDetectedErrorParametersImpl(apDetectedErrorParameters& detectedErrorParameters)
+bool gaGetDetectedErrorParametersImpl(const apDetectedErrorParameters*& pDetectedErrorParameters)
 {
     bool retVal = true;
 
     // Get the detected error parameters:
-    detectedErrorParameters = su_stat_theBreakpointsManager.getDetectedErrorPrameters();
+    pDetectedErrorParameters = &su_stat_theBreakpointsManager.getDetectedErrorPrameters();
 
     return retVal;
 }
@@ -664,11 +664,11 @@ bool gaGetBreakReasonImpl(apBreakReason& breakReason)
 // Author:      Sigal Algranaty
 // Date:        25/11/2009
 // ---------------------------------------------------------------------------
-bool gaGetBreakpointTriggeringContextIdImpl(apContextID& contextId)
+bool gaGetBreakpointTriggeringContextIdImpl(const apContextID*& pContextId)
 {
     bool retVal = true;
 
-    contextId = su_stat_theBreakpointsManager.breakpointTriggeringContextId();
+    pContextId = &su_stat_theBreakpointsManager.breakpointTriggeringContextId();
 
     return retVal;
 }
@@ -733,12 +733,12 @@ bool gaGetAmountOfRegisteredAllocatedObjectsImpl(unsigned int& amountOfAllocated
 // Author:      Uri Shomroni
 // Date:        26/10/2008
 // ---------------------------------------------------------------------------
-bool gaGetAllocatedObjectCreationStackImpl(int allocatedObjectId, osCallStack& callsStack)
+bool gaGetAllocatedObjectCreationStackImpl(int allocatedObjectId, const osCallStack*& pCallsStack)
 {
     bool retVal = false;
 
     // Get the creation stack of the item:
-    retVal = su_stat_theAllocatedObjectsMonitor.getAllocatedObjectCreationCallStack(allocatedObjectId, callsStack);
+    retVal = su_stat_theAllocatedObjectsMonitor.getAllocatedObjectCreationCallStack(allocatedObjectId, pCallsStack);
 
     return retVal;
 }

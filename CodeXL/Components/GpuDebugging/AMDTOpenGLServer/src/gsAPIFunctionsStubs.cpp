@@ -364,15 +364,16 @@ void gaGetRenderContextDetailsStub(osSocket& apiSocket)
     apiSocket >> contextIdAsInt32;
 
     // Call the function implementation:
-    apGLRenderContextInfo renderContextInfo;
-    bool rc = gaGetRenderContextDetailsImpl((int)contextIdAsInt32, renderContextInfo);
+    const apGLRenderContextInfo* pRenderContextInfo = nullptr;
+    bool rc = gaGetRenderContextDetailsImpl((int)contextIdAsInt32, pRenderContextInfo);
+    rc = rc && (nullptr != pRenderContextInfo);
 
     // Return the return value:
     apiSocket << rc;
 
     if (rc)
     {
-        renderContextInfo.writeSelfIntoChannel(apiSocket);
+        pRenderContextInfo->writeSelfIntoChannel(apiSocket);
     }
 }
 
@@ -389,15 +390,16 @@ void gaGetRenderContextGraphicsDetailsStub(osSocket& apiSocket)
     apiSocket >> contextIdAsInt32;
 
     // Call the function implementation:
-    apGLRenderContextGraphicsInfo renderContextGraphicsInfo;
-    bool rc = gaGetRenderContextGraphicsDetailsImpl((int)contextIdAsInt32, renderContextGraphicsInfo);
+    const apGLRenderContextGraphicsInfo* pRenderContextGraphicsInfo = nullptr;
+    bool rc = gaGetRenderContextGraphicsDetailsImpl((int)contextIdAsInt32, pRenderContextGraphicsInfo);
+    rc = rc && (nullptr != pRenderContextGraphicsInfo);
 
     // Return the return value:
     apiSocket << rc;
 
     if (rc)
     {
-        renderContextGraphicsInfo.writeSelfIntoChannel(apiSocket);
+        pRenderContextGraphicsInfo->writeSelfIntoChannel(apiSocket);
     }
 }
 
@@ -2210,15 +2212,16 @@ void gaGetTextureMiplevelDataFilePathStub(osSocket& apiSocket)
     apiSocket >> faceIndexAsInt32;
 
     // Call the function implementation:
-    osFilePath filePath;
-    bool retVal = gaGetTextureMiplevelDataFilePathImpl((int)contextIdAsInt32, miplevelId, (int)faceIndexAsInt32, filePath);
+    const osFilePath* pFilePath = nullptr;
+    bool retVal = gaGetTextureMiplevelDataFilePathImpl((int)contextIdAsInt32, miplevelId, (int)faceIndexAsInt32, pFilePath);
+    retVal = retVal && (nullptr != pFilePath);
 
     // Return the return value:
     apiSocket << retVal;
 
     if (retVal)
     {
-        filePath.writeSelfIntoChannel(apiSocket);
+        pFilePath->writeSelfIntoChannel(apiSocket);
     }
 }
 
@@ -3705,10 +3708,10 @@ void gaGetRenderPrimitivesStatisticsStub(osSocket& apiSocket)
     gtInt32 contextIdAsInt32 = -1;
     apiSocket >> contextIdAsInt32;
 
-    apRenderPrimitivesStatistics renderPrimitivesStatistics;
-
     // Call the function implementation:
-    bool retVal = gaGetRenderPrimitivesStatisticsImpl((int)contextIdAsInt32, renderPrimitivesStatistics);
+    const apRenderPrimitivesStatistics* pRenderPrimitivesStatistics = nullptr;
+    bool retVal = gaGetRenderPrimitivesStatisticsImpl((int)contextIdAsInt32, pRenderPrimitivesStatistics);
+    retVal = retVal && (nullptr != pRenderPrimitivesStatistics);
 
     // Send success value:
     apiSocket << retVal;
@@ -3716,7 +3719,7 @@ void gaGetRenderPrimitivesStatisticsStub(osSocket& apiSocket)
     GT_IF_WITH_ASSERT(retVal)
     {
         // Write the statistics object into the channel:
-        renderPrimitivesStatistics.writeSelfIntoChannel(apiSocket);
+        pRenderPrimitivesStatistics->writeSelfIntoChannel(apiSocket);
     }
 }
 
@@ -4341,15 +4344,16 @@ void gaGetPiplineObjectDetailsStub(osSocket& apiSocket)
     apiSocket >> pipelineNameAsUInt32;
 
     // Call the function implementation:
-    apGLPipeline pipelineBuffer;
-    bool retVal = gaGetPipelineObjectDetailsImpl((int)contextIdAsInt32, (GLuint)pipelineNameAsUInt32, pipelineBuffer);
+    const apGLPipeline* pPipelineDetails = nullptr;
+    bool retVal = gaGetPipelineObjectDetailsImpl((int)contextIdAsInt32, (GLuint)pipelineNameAsUInt32, pPipelineDetails);
+    retVal = retVal && (nullptr != pPipelineDetails);
 
     // Return the return value:
     apiSocket << retVal;
 
     if (retVal)
     {
-        pipelineBuffer.writeSelfIntoChannel(apiSocket);
+        pPipelineDetails->writeSelfIntoChannel(apiSocket);
     }
 }
 
@@ -4430,15 +4434,16 @@ void gaGetSamplerObjectDetailsStub(osSocket& apiSocket)
     apiSocket >> samplerNameAsUInt32;
 
     // Call the function implementation:
-    apGLSampler samplerBuffer;
-    bool retVal = gaGetSamplerObjectDetailsImpl((int)contextIdAsInt32, (GLuint)samplerNameAsUInt32, samplerBuffer);
+    const apGLSampler* pSamplerDetails = nullptr;
+    bool retVal = gaGetSamplerObjectDetailsImpl((int)contextIdAsInt32, (GLuint)samplerNameAsUInt32, pSamplerDetails);
+    retVal = retVal && (nullptr != pSamplerDetails);
 
     // Return the return value:
     apiSocket << retVal;
 
     if (retVal)
     {
-        samplerBuffer.writeSelfIntoChannel(apiSocket);
+        pSamplerDetails->writeSelfIntoChannel(apiSocket);
     }
 }
 

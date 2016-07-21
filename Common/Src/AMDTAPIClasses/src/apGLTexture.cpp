@@ -144,7 +144,7 @@ apGLTexture& apGLTexture::operator=(const apGLTexture& other)
 // Author:  AMD Developer Tools Team
 // Date:        30/1/2008
 // ---------------------------------------------------------------------------
-bool apGLTexture::getTextureImageFilePath(apFileType fileType, osFilePath& filePath, int fileIndex, int mipLevel)
+bool apGLTexture::getTextureImageFilePath(apFileType fileType, const osFilePath*& pFilePath, int fileIndex, int mipLevel)
 {
     (void)(mipLevel); // unused
     bool retVal = false;
@@ -155,11 +155,13 @@ bool apGLTexture::getTextureImageFilePath(apFileType fileType, osFilePath& fileP
     GT_IF_WITH_ASSERT(rc1)
     {
         // Get texture raw data file path
-        bool rc2 = getTextureDataFilePath(filePath, fileIndex);
-        GT_IF_WITH_ASSERT(rc2)
+        bool rc2 = getTextureDataFilePath(pFilePath, fileIndex);
+        GT_IF_WITH_ASSERT(rc2 && (nullptr != pFilePath))
         {
             // Set the file extension to the image file path
-            filePath.setFileExtension(fileExtension);
+            gtString outFileExt;
+            pFilePath->getFileExtension(outFileExt);
+            GT_ASSERT(fileExtension == outFileExt);
             retVal = true;
         }
     }
@@ -298,17 +300,15 @@ void apGLTexture::setTextureType(apTextureType texType)
 // Author:  AMD Developer Tools Team
 // Date:        6/10/2008
 // ---------------------------------------------------------------------------
-bool apGLTexture::getTextureDataFilePath(osFilePath& filePath, int fileIndex, int mipLevel) const
+bool apGLTexture::getTextureDataFilePath(const osFilePath*& pFilePath, int fileIndex, int mipLevel) const
 {
     bool retVal = false;
-    const osFilePath* pFilePath = NULL;
     const apGLTextureMipLevel* pTextureLevel = getTextureMipLevel(mipLevel);
     GT_IF_WITH_ASSERT(pTextureLevel != NULL)
     {
         pFilePath = pTextureLevel->getTextureDataFilePath(fileIndex);
         GT_IF_WITH_ASSERT(pFilePath != NULL)
         {
-            filePath = (*pFilePath);
             retVal = true;
         }
     }

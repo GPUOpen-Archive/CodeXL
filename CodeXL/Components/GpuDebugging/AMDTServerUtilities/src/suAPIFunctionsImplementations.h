@@ -56,9 +56,9 @@ bool gaBreakOnNextDrawFunctionCallImpl();
 bool gaBreakOnNextFrameImpl();
 bool gaBreakInMonitoredFunctionCallImpl(bool& replacedWithStepOver);
 bool gaClearAllStepFlagsImpl();
-bool gaGetDetectedErrorParametersImpl(apDetectedErrorParameters& detectedErrorParameters);
+bool gaGetDetectedErrorParametersImpl(const apDetectedErrorParameters*& pDetectedErrorParameters);
 bool gaGetBreakReasonImpl(apBreakReason& breakReason);
-bool gaGetBreakpointTriggeringContextIdImpl(apContextID& contextId);
+bool gaGetBreakpointTriggeringContextIdImpl(const apContextID*& pContextId);
 
 // Event forwarding:
 bool gaCreateEventForwardingTCPConnectionImpl(const osPortAddress& portAddress);
@@ -66,7 +66,7 @@ bool gaCreateEventForwardingPipeConnectionImpl(const gtString& eventsPipeName);
 
 // Allocated objects
 bool gaGetAmountOfRegisteredAllocatedObjectsImpl(unsigned int& amountOfAllocatedObjects);
-bool gaGetAllocatedObjectCreationStackImpl(int allocatedObjectId, osCallStack& callsStack);
+bool gaGetAllocatedObjectCreationStackImpl(int allocatedObjectId, const osCallStack*& pCallsStack);
 bool gaCollectAllocatedObjectsCreationCallsStacksImpl(bool collectCreationStacks);
 
 // Sending files through the API pipe:

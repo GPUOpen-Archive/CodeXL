@@ -202,21 +202,21 @@ void gsSamplersMonitor::bindSamplers(GLuint firstTextureImageUnit, GLuint sample
 // Author:      Amit Ben-Moshe
 // Date:        26/6/2014
 // ---------------------------------------------------------------------------
-apGLSampler* gsSamplersMonitor::getSampler(GLuint samplerName) const
+apGLSampler* gsSamplersMonitor::getSampler(GLuint samplerName)
 {
     apGLSampler* ret = NULL;
 
     // Run until we either went through all stored sampler or find the requested sampler.
-    for (size_t i = 0; (ret == NULL) && i < m_glSamplers.size(); i++)
+    for (apGLSampler* pCurSampler : m_glSamplers)
     {
         // Obtain a handle to the current sampler.
-        apGLSampler* pCurSampler = m_glSamplers[i];
         GT_IF_WITH_ASSERT(pCurSampler != NULL)
         {
             if (pCurSampler->samplerName() == samplerName)
             {
                 // We have found the requested sampler, we can terminate the loop.
                 ret = pCurSampler;
+                break;
             }
         }
     }
@@ -361,30 +361,33 @@ size_t gsSamplersMonitor::getAmountOfSamplerObjects() const
 }
 
 // ---------------------------------------------------------------------------
-// Name:        gsSamplersMonitor::getSamplerData
-// Description: Fills a sampler data object buffer with the data of the requested
-//              sampler object.
+// Name:        gsSamplersMonitor::GetSamplerDetails
+// Description: Finds the requested sampler and returns a handle to it
 // Arguments:   GLuint samplerName - the name of the requested sampler
-//              apGLSampler& buffer - an output parameter to be filled with the data
-// Return value:bool - Success / failure.
+// Return value:apGLSampler* - a handle to the requested sampler
 // Author:      Amit Ben-Moshe
 // Date:        26/6/2014
 // ---------------------------------------------------------------------------
-bool gsSamplersMonitor::getSamplerData(GLuint samplerName, apGLSampler& buffer) const
+const apGLSampler* gsSamplersMonitor::GetSamplerDetails(GLuint samplerName) const
 {
-    bool ret = false;
-    apGLSampler* pRequestedSampler = NULL;
+    const apGLSampler* retVal = nullptr;
 
-    // Search for the requested sampler.
-    pRequestedSampler = getSampler(samplerName);
-    GT_IF_WITH_ASSERT(pRequestedSampler != NULL)
+    // Run until we either went through all stored sampler or find the requested sampler.
+    for (const apGLSampler* pCurrentSampler : m_glSamplers)
     {
-        // If we have found it - fill the output buffer.
-        buffer = *pRequestedSampler;
-        ret = true;
+        // Obtain a handle to the current sampler.
+        GT_IF_WITH_ASSERT(pCurrentSampler != NULL)
+        {
+            if (pCurrentSampler->samplerName() == samplerName)
+            {
+                // We have found the requested sampler, we can terminate the loop.
+                retVal = pCurrentSampler;
+                break;
+            }
+        }
     }
 
-    return ret;
+    return retVal;
 }
 
 // ---------------------------------------------------------------------------

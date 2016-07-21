@@ -261,35 +261,29 @@ size_t gsPipelineMonitor::GetAmountOfPipelineObjects() const
 }
 
 // ---------------------------------------------------------------------------
-// Name:        gsPipelineMonitor::GetPipelineData
-// Description: Creates a copy of the pipeline object with the given name
-// Arguments:   GLuint pipelineName - the name of the pipeline
-//              apGLPipeline& buffer - an output parameter to hold the copy
-// Return value - bool (success/failure)
+// Name:        gsPipelineMonitor::GetPipelineDetails
+// Description: Returns a pointer to the requested pipeline object's details
+// Return value const apGLPipeline*
 // Author:      Amit Ben-Moshe
 // Date:        25/6/2014
 // ---------------------------------------------------------------------------
-bool gsPipelineMonitor::GetPipelineData(GLuint pipelineName, apGLPipeline& buffer) const
+const apGLPipeline* gsPipelineMonitor::GetPipelineDetails(GLuint pipelineName) const
 {
-    bool ret = false;
-    size_t pplnIndex = 0;
+    const apGLPipeline* retVal = nullptr;
 
-    for (size_t i = 0; !ret && i < m_glPipelines.size(); ++i)
+    for (const apGLPipeline* pCurrentPipeLine : m_glPipelines)
     {
-        if (m_glPipelines[i] != NULL && m_glPipelines[i]->pipelineName() == pipelineName)
+        GT_IF_WITH_ASSERT(nullptr != pCurrentPipeLine)
         {
-            // We found the relevant pipeline.
-            pplnIndex = i;
-            ret = true;
+            if (pCurrentPipeLine->pipelineName() == pipelineName)
+            {
+                // We found the relevant pipeline.
+                retVal = pCurrentPipeLine;
+            }
         }
     }
 
-    if (ret)
-    {
-        buffer = *(m_glPipelines[pplnIndex]);
-    }
-
-    return ret;
+    return retVal;
 }
 
 // ---------------------------------------------------------------------------

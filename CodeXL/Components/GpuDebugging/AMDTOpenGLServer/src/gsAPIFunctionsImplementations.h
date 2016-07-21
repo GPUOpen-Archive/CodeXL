@@ -61,8 +61,8 @@ bool gaGetThreadCurrentRenderContextImpl(const osThreadId& threadId, int& contex
 
 // OpenGL render contexts:
 bool gaGetAmoutOfRenderContextsImpl(int& contextsAmount);
-bool gaGetRenderContextDetailsImpl(int contextId, apGLRenderContextInfo& renderContextInfo);
-bool gaGetRenderContextGraphicsDetailsImpl(int contextId, apGLRenderContextGraphicsInfo& renderContextGraphicsInfo);
+bool gaGetRenderContextDetailsImpl(int contextId, const apGLRenderContextInfo*& pRenderContextInfo);
+bool gaGetRenderContextGraphicsDetailsImpl(int contextId, const apGLRenderContextGraphicsInfo*& pRenderContextGraphicsInfo);
 bool gaUpdateCurrentThreadRenderContextDataSnapshotImpl();
 
 // OpenGL state variables:
@@ -80,7 +80,7 @@ bool gaGetBoundTextureImpl(int contextId, int textureUnitId, apTextureType bindT
 bool gaGetTextureObjectNameImpl(int contextId, int textureId, GLuint& textureName);
 bool gaGetTextureObjectTypeImpl(int contextId, int textureId, apTextureType& textureType);
 bool gaGetTextureObjectDetailsImpl(int contextId, GLuint textureName, const apGLTexture*& prTextureDetails);
-bool gaGetTextureMiplevelDataFilePathImpl(int contextId, apGLTextureMipLevelID miplevelId, int faceIndex, osFilePath& filePath);
+bool gaGetTextureMiplevelDataFilePathImpl(int contextId, apGLTextureMipLevelID miplevelId, int faceIndex, const osFilePath*& pFilePath);
 bool gaMarkAllTextureImagesAsUpdatedImpl(int contextId, int textureId);
 bool gaUpdateTextureRawDataImpl(int contextId, const gtVector<apGLTextureMipLevelID>& texturesVector);
 bool gaUpdateCurrentThreadTextureRawDataImpl(const gtVector<apGLTextureMipLevelID>& texturesVector);
@@ -98,12 +98,12 @@ bool gaUpdateCurrentThreadRenderBufferRawDataImpl(const gtVector<GLuint>& render
 
 // Program pipelines:
 bool gaGetAmountOfPipelineObjectsImpl(int contextId, int& amountOfProgramPipelines);
-bool gaGetPipelineObjectDetailsImpl(int contextId, GLuint pipelineName, apGLPipeline& pipelineDataBuffer);
+bool gaGetPipelineObjectDetailsImpl(int contextId, GLuint pipelineName, const apGLPipeline*& pPipelineDetails);
 bool gaGetPipelineObjectNameImpl(int contextId, int pipelineIndex, GLuint& pipelineName);
 
 // Samplers:
 bool gaGetAmountOfSamplerObjectsImpl(int contextId, int& amountOfSamplers);
-bool gaGetSamplerObjectDetailsImpl(int contextId, GLuint samplerName, apGLSampler& samplerDataBuffer);
+bool gaGetSamplerObjectDetailsImpl(int contextId, GLuint samplerName, const apGLSampler*& pSamplerDetails);
 bool gaGetSamplerObjectNameImpl(int contextId, int samplerIndex, GLuint& samplerName);
 
 // FBOs:
@@ -181,7 +181,7 @@ bool gaFindCurrentFrameFunctionCallImpl(int contextId, apSearchDirection searchD
 bool gaGetCurrentStatisticsImpl(int contextId, apStatistics* pStatistics);
 bool gaClearFunctionCallsStatisticsImpl();
 bool gaIsInOpenGLBeginEndBlockImpl(int contextId);
-bool gaGetRenderPrimitivesStatisticsImpl(int contextId, apRenderPrimitivesStatistics& renderPrimitivesStatistics);
+bool gaGetRenderPrimitivesStatisticsImpl(int contextId, const apRenderPrimitivesStatistics*& pRenderPrimitivesStatistics);
 
 // String markers:
 bool gaFindStringMarkerImpl(int contextId, apSearchDirection searchDirection, int searchStartIndex, int& foundIndex);

@@ -20,7 +20,7 @@ public:
 
     void onFirstTimeContextMadeCurrent();
 
-    bool getSamplerData(GLuint samplerName, apGLSampler& buffer) const;
+    const apGLSampler* GetSamplerDetails(GLuint samplerName) const;
 
     bool getSamplerNameByIndex(size_t samplerIndex, GLuint& samplerNameBuffer) const;
 
@@ -60,8 +60,7 @@ public:
     void setRwrapMode(GLuint samplerName, GLenum rWrapMode);
 
 private:
-
-    apGLSampler* getSampler(GLuint samplerName) const;
+    apGLSampler* getSampler(GLuint samplerName);
     bool updateSingleSamplerData(apGLSampler* pSampler);
 
     // Monitored Sampler objects.

@@ -191,27 +191,21 @@ bool suAllocatedObjectsMonitor::registerAllocatedObjects(gtVector<apAllocatedObj
 // Author:      Uri Shomroni
 // Date:        20/10/2008
 // ---------------------------------------------------------------------------
-bool suAllocatedObjectsMonitor::getAllocatedObjectCreationCallStack(int index, osCallStack& callStack) const
+bool suAllocatedObjectsMonitor::getAllocatedObjectCreationCallStack(int index, const osCallStack*& o_pCallsStack) const
 {
     bool retVal = false;
 
-    GT_IF_WITH_ASSERT(index >= 0)
+    GT_IF_WITH_ASSERT((0 <= index) && ((int)_allocatedObjectsCreationCallStacks.size() > index))
     {
-        const osCallStack* pCallStack = _allocatedObjectsCreationCallStacks[index];
-
-        if (pCallStack != NULL)
+        o_pCallsStack = _allocatedObjectsCreationCallStacks[index];
+        if (nullptr != o_pCallsStack)
         {
-            callStack = *pCallStack;
             retVal = true;
-        }
-        else
-        {
-            callStack.clearStack();
         }
     }
     else
     {
-        callStack.clearStack();
+        o_pCallsStack = nullptr;
     }
 
     return retVal;

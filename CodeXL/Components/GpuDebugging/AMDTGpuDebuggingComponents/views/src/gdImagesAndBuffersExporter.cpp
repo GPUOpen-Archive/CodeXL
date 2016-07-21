@@ -191,11 +191,14 @@ bool gdImagesAndBuffersExporter::exportGLTexture(gdExportedTextureID exportedTex
                 // Get texture element file name:
                 // Get the current texture data file path:
                 osFilePath textureFile;
-                bool rc0 = textureDetails.getTextureDataFilePath(textureFile, i);
-                GT_ASSERT(rc0);
-
-                // Localize the path as needed:
-                gaRemoteToLocalFile(textureFile, false);
+                const osFilePath* pTextureFile = nullptr;
+                bool rc0 = textureDetails.getTextureDataFilePath(pTextureFile, i);
+                GT_IF_WITH_ASSERT(rc0 && (nullptr != pTextureFile))
+                {
+                    // Localize the path as needed:
+                    textureFile = *pTextureFile;
+                    gaRemoteToLocalFile(textureFile, false);
+                }
 
                 // Sets the output exported file name:
                 gtString outputFileName = _outputFileName;

@@ -365,14 +365,16 @@ void gsCallsHistoryLogger::getAssociatedTextureHTMLLogSection(const apAssociated
                                     }
 
                                     // Get the current texture data file path:
-                                    osFilePath textureDataFilePath;
-                                    bool rc0 = pTextureDetails->getTextureDataFilePath(textureDataFilePath, j);
-                                    GT_ASSERT(rc0);
-
                                     gtString textureFileName;
-                                    bool rc3 = textureDataFilePath.getFileName(textureFileName);
+                                    const osFilePath* pTextureDataFilePath = nullptr;
+                                    bool rc0 = pTextureDetails->getTextureDataFilePath(pTextureDataFilePath, j);
+                                    GT_IF_WITH_ASSERT(rc0 && (nullptr != pTextureDataFilePath))
+                                    {
+                                        bool rc3 = pTextureDataFilePath->getFileName(textureFileName);
+                                        GT_ASSERT(rc3);
+                                    }
 
-                                    if (rc3)
+                                    if (!textureFileName.isEmpty())
                                     {
                                         // Translate the file path into a relative URL:
                                         gtString fileRelativeURL = L"./";

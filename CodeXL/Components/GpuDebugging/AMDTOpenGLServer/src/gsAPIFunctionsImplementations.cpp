@@ -343,7 +343,7 @@ bool gaGetAmoutOfRenderContextsImpl(int& contextsAmount)
 // Author:      Uri Shomroni
 // Date:        11/6/2008
 // ---------------------------------------------------------------------------
-bool gaGetRenderContextDetailsImpl(int contextId, apGLRenderContextInfo& renderContextInfo)
+bool gaGetRenderContextDetailsImpl(int contextId, const apGLRenderContextInfo*& pRenderContextInfo)
 {
     bool retVal = false;
 
@@ -353,10 +353,7 @@ bool gaGetRenderContextDetailsImpl(int contextId, apGLRenderContextInfo& renderC
     if (pRenderContextMonitor != NULL)
     {
         // Get the render context's share lists target:
-        renderContextInfo.setSpyID(contextId);
-        renderContextInfo.setSharingContextID(pRenderContextMonitor->getObjectSharingContextID());
-        renderContextInfo.setOpenCLSpyID(pRenderContextMonitor->openCLSharedContextID());
-        renderContextInfo.setAllocatedObjectId(pRenderContextMonitor->allocatedObjectId(), true);
+        pRenderContextInfo = &pRenderContextMonitor->RenderContextInfo();
         retVal = true;
     }
 
@@ -371,7 +368,7 @@ bool gaGetRenderContextDetailsImpl(int contextId, apGLRenderContextInfo& renderC
 // Author:      Uri Shomroni
 // Date:        19/3/2009
 // ---------------------------------------------------------------------------
-bool gaGetRenderContextGraphicsDetailsImpl(int contextId, apGLRenderContextGraphicsInfo& renderContextGraphicsInfo)
+bool gaGetRenderContextGraphicsDetailsImpl(int contextId, const apGLRenderContextGraphicsInfo*& pRenderContextGraphicsInfo)
 {
     bool retVal = false;
 
@@ -380,7 +377,8 @@ bool gaGetRenderContextGraphicsDetailsImpl(int contextId, apGLRenderContextGraph
 
     if (pRenderContextMonitor != NULL)
     {
-        retVal = pRenderContextMonitor->constructGraphicsInfo(renderContextGraphicsInfo);
+        pRenderContextGraphicsInfo = &pRenderContextMonitor->GraphicsInfo();
+        retVal = true;
     }
 
     return retVal;
@@ -2193,7 +2191,7 @@ bool gaUpdateTextureParametersImpl(int contextId, const gtVector<apGLTextureMipL
 // Author:      Sigal Algranaty
 // Date:        13/1/2009
 // ---------------------------------------------------------------------------
-bool gaGetTextureMiplevelDataFilePathImpl(int contextId, apGLTextureMipLevelID miplevelId, int faceIndex, osFilePath& filePath)
+bool gaGetTextureMiplevelDataFilePathImpl(int contextId, apGLTextureMipLevelID miplevelId, int faceIndex, const osFilePath*& pFilePath)
 {
     bool retVal = false;
 
@@ -2210,7 +2208,7 @@ bool gaGetTextureMiplevelDataFilePathImpl(int contextId, apGLTextureMipLevelID m
 
             if (pTexObjDetails)
             {
-                retVal = pTexObjDetails->getTextureDataFilePath(filePath, faceIndex, miplevelId._textureMipLevel);
+                retVal = pTexObjDetails->getTextureDataFilePath(pFilePath, faceIndex, miplevelId._textureMipLevel);
             }
         }
     }
@@ -3451,7 +3449,7 @@ bool gaIsInOpenGLBeginEndBlockImpl(int contextId)
 // Author:      Sigal Algranaty
 // Date:        14/5/2009
 // ---------------------------------------------------------------------------
-bool gaGetRenderPrimitivesStatisticsImpl(int contextId, apRenderPrimitivesStatistics& renderPrimitivesStatistics)
+bool gaGetRenderPrimitivesStatisticsImpl(int contextId, const apRenderPrimitivesStatistics*& pRenderPrimitivesStatistics)
 {
     bool retVal = false;
 
@@ -3464,8 +3462,7 @@ bool gaGetRenderPrimitivesStatisticsImpl(int contextId, apRenderPrimitivesStatis
         gsRenderPrimitivesStatisticsLogger& renderPrimitivesStatisticsLogger = pRenderContextMon->renderPrimitivesStatisticsLogger();
 
         // Get the statistics:
-        renderPrimitivesStatistics = renderPrimitivesStatisticsLogger.getCurrentStatistics();
-
+        pRenderPrimitivesStatistics = &renderPrimitivesStatisticsLogger.getCurrentStatistics();
         retVal = true;
     }
 
@@ -4137,18 +4134,22 @@ bool gaGetAmountOfPipelineObjectsImpl(int contextId, int& amountOfProgramPipelin
 // Author:      Amit Ben-Moshe
 // Date:        22/6/2014
 // ---------------------------------------------------------------------------
-bool gaGetPipelineObjectDetailsImpl(int contextId, GLuint pipelineName, apGLPipeline& pipelineDataBuffer)
+bool gaGetPipelineObjectDetailsImpl(int contextId, GLuint pipelineName, const apGLPipeline*& pPipelineDetails)
 {
     bool retVal = false;
 
     // Get the appropriate render context monitor.
     gsRenderContextMonitor* pRenderContextMonitor = gsOpenGLMonitor::instance().renderContextMonitor(contextId);
 
-    if (pRenderContextMonitor != NULL)
+    GT_IF_WITH_ASSERT(pRenderContextMonitor != NULL)
     {
         // Get the pipelines monitor, and extract the relevant pipeline's details.
         gsPipelineMonitor& pplnMonitor = pRenderContextMonitor->pipelinesMonitor();
-        retVal = pplnMonitor.GetPipelineData(pipelineName, pipelineDataBuffer);
+        pPipelineDetails = pplnMonitor.GetPipelineDetails(pipelineName);
+        GT_IF_WITH_ASSERT(nullptr != pPipelineDetails)
+        {
+            retVal = true;
+        }
     }
 
     return retVal;
@@ -4224,7 +4225,7 @@ bool gaGetAmountOfSamplerObjectsImpl(int contextId, int& amountOfSamplers)
 // Author:      Amit Ben-Moshe
 // Date:        22/6/2014
 // ---------------------------------------------------------------------------
-bool gaGetSamplerObjectDetailsImpl(int contextId, GLuint samplerName, apGLSampler& samplerDataBuffer)
+bool gaGetSamplerObjectDetailsImpl(int contextId, GLuint samplerName, const apGLSampler*& pSamplerDetails)
 {
     bool retVal = false;
 
@@ -4235,8 +4236,11 @@ bool gaGetSamplerObjectDetailsImpl(int contextId, GLuint samplerName, apGLSample
     {
         // Get the samplers monitor, and extract the relevant sampler's details.
         gsSamplersMonitor& samplerMonitor = pRenderContextMonitor->samplersMonitor();
-        retVal = samplerMonitor.getSamplerData(samplerName, samplerDataBuffer);
-        GT_ASSERT(retVal);
+        pSamplerDetails = samplerMonitor.GetSamplerDetails(samplerName);
+        GT_IF_WITH_ASSERT(nullptr == pSamplerDetails)
+        {
+            retVal = true;
+        }
     }
 
     return retVal;
