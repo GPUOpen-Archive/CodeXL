@@ -3715,7 +3715,7 @@ bool gaGetCurrentOpenGLErrorImpl(GLenum& openGLError)
 // Author:      Yaki Tebeka
 // Date:        23/3/2005
 // ---------------------------------------------------------------------------
-bool gaGetContextLogFilePathImpl(int contextId, bool& logFileExists, osFilePath& filePath)
+bool gaGetContextLogFilePathImpl(int contextId, bool& logFileExists, const osFilePath*& filePath)
 {
     bool retVal = true;
 

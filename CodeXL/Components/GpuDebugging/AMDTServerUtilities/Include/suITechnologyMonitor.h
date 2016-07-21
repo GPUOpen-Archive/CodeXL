@@ -51,7 +51,7 @@ public:
     suContextMonitor* contextMonitor(int contextId);
 
     // Log files recording:
-    bool getHTMLLogFilePath(int contextId, bool& isLogFileExist, osFilePath& logFilesPath);
+    bool getHTMLLogFilePath(int contextId, bool& isLogFileExist, const osFilePath*& logFilesPath);
 
     void setShouldInitializePerformanceCounters(bool shouldInitCounters) {_shouldInitializePerformanceCounters = shouldInitCounters;}
     bool shouldInitializePerformanceCounters() const {return _shouldInitializePerformanceCounters;}

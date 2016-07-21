@@ -317,13 +317,9 @@ void gaGetOpenCLHandleObjectDetailsStub(osSocket& apiSocket)
     apiSocket >> handleAsUint64;
 
     // Call the function implementation:
-    const apCLObjectID* pCLOjbectIDDetails = NULL;
+    const apCLObjectID* pCLOjbectIDDetails = nullptr;
     bool rc = gaGetOpenCLHandleObjectDetailsImpl((oaCLHandle)handleAsUint64, pCLOjbectIDDetails);
-
-    if (pCLOjbectIDDetails == NULL)
-    {
-        rc = false;
-    }
+    rc = rc && (nullptr != pCLOjbectIDDetails);
 
     // Send the success value:
     apiSocket << rc;
@@ -1885,8 +1881,9 @@ void gaGetCLContextLogFilePathStub(osSocket& apiSocket)
 
     // Call the function implementation:
     bool logFileExists = false;
-    osFilePath logFilePath;
+    const osFilePath* logFilePath = nullptr;
     retVal = gaGetCLContextLogFilePathImpl((int)contextIdAsInt32, logFileExists, logFilePath);
+    logFileExists = logFileExists && (nullptr != logFilePath);
 
     // Return the return value:
     apiSocket << retVal;
@@ -1898,7 +1895,7 @@ void gaGetCLContextLogFilePathStub(osSocket& apiSocket)
 
         if (logFileExists)
         {
-            const gtString& logFileAsString = logFilePath.asString();
+            const gtString& logFileAsString = logFilePath->asString();
             apiSocket << logFileAsString;
         }
     }

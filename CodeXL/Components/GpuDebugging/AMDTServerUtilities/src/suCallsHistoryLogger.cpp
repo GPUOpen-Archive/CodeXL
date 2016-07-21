@@ -703,15 +703,15 @@ void suCallsHistoryLogger::stopHTMLLogFileRecording()
 // Author:      Yaki Tebeka
 // Date:        23/3/2005
 // ---------------------------------------------------------------------------
-bool suCallsHistoryLogger::getHTMLLogFilePath(osFilePath& logFilePath) const
+bool suCallsHistoryLogger::getHTMLLogFilePath(const osFilePath*& logFilePath) const
 {
     bool retVal = false;
 
-    gtString logFilePathAsString = _textLogFilePath.asString();
+    const gtString& logFilePathAsString = _textLogFilePath.asString();
 
     if (!logFilePathAsString.isEmpty())
     {
-        logFilePath = _textLogFilePath;
+        logFilePath = &_textLogFilePath;
         retVal = true;
     }
 

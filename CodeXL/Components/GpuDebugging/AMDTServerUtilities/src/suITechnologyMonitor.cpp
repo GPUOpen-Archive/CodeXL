@@ -195,20 +195,21 @@ void suITechnologyMonitor::onStopHTMLLogFileRecording()
 // Author:      Sigal Algranaty
 // Date:        23/3/2010
 // ---------------------------------------------------------------------------
-bool suITechnologyMonitor::getHTMLLogFilePath(int contextId, bool& isLogFileExist, osFilePath& logFilesPath)
+bool suITechnologyMonitor::getHTMLLogFilePath(int contextId, bool& isLogFileExist, const osFilePath*& logFilesPath)
 {
     bool retVal = false;
 
     // Get the appropriate context monitor:
     const suContextMonitor* pContextMonitor = contextMonitor(contextId);
 
-    if (pContextMonitor)
+    if (nullptr != pContextMonitor)
     {
         // Get its monitored functions calls logger:
         const suCallsHistoryLogger* pCallsLogger = pContextMonitor->callsHistoryLogger();
-        GT_IF_WITH_ASSERT(pCallsLogger != NULL)
+        GT_IF_WITH_ASSERT(nullptr != pCallsLogger)
         {
             isLogFileExist = pCallsLogger->getHTMLLogFilePath(logFilesPath);
+            isLogFileExist = isLogFileExist && (nullptr != logFilesPath);
             retVal = true;
         }
     }

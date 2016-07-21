@@ -1780,7 +1780,7 @@ bool gaGetOpenCLQueuePerformanceCountersValuesImpl(const double*& pValuesArray, 
 // Author:      Sigal Algranaty
 // Date:        23/3/2010
 // ---------------------------------------------------------------------------
-bool gaGetCLContextLogFilePathImpl(int contextId, bool& logFileExists, osFilePath& filePath)
+bool gaGetCLContextLogFilePathImpl(int contextId, bool& logFileExists, const osFilePath*& filePath)
 {
     bool retVal = true;
 

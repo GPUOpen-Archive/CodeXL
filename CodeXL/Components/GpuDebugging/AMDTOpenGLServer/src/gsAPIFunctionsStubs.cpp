@@ -3825,8 +3825,9 @@ void gaGetContextLogFilePathStub(osSocket& apiSocket)
 
     // Call the function implementation:
     bool logFileExists = false;
-    osFilePath logFilePath;
+    const osFilePath* logFilePath = nullptr;
     retVal = gaGetContextLogFilePathImpl((int)contextIdAsInt32, logFileExists, logFilePath);
+    logFileExists = logFileExists && (logFilePath != nullptr);
 
     // Return the return value:
     apiSocket << retVal;
@@ -3838,7 +3839,7 @@ void gaGetContextLogFilePathStub(osSocket& apiSocket)
 
         if (logFileExists)
         {
-            const gtString& logFileAsString = logFilePath.asString();
+            const gtString& logFileAsString = logFilePath->asString();
             apiSocket << logFileAsString;
         }
     }

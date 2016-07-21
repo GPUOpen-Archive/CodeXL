@@ -66,7 +66,7 @@ public:
     bool findFunctionCall(apSearchDirection searchDirection, int searchStartIndex,
                           const gtString& searchedString, bool isCaseSensitiveSearch, int& foundIndex) const;
     bool findStringMarker(apSearchDirection searchDirection, int searchStartIndex, int& foundIndex) const;
-    bool getHTMLLogFilePath(osFilePath& logFilePath) const;
+    bool getHTMLLogFilePath(const osFilePath*& logFilePath) const;
     bool startHTMLLogFileRecording();
     void stopHTMLLogFileRecording();
     bool isRecodringToHTMLLogFile() const { return _isHTMLLogFileActive; };

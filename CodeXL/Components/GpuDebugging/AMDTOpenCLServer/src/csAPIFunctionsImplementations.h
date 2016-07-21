@@ -56,7 +56,7 @@ bool gaGetAmountOfOpenCLContextsImpl(int& amountOfOpenCLContexts);
 bool gaUpdateOpenCLContextDataSnapshotImpl(int contextId);
 
 // Log file recording:
-bool gaGetCLContextLogFilePathImpl(int contextId, bool& logFileExists, osFilePath& filePath);
+bool gaGetCLContextLogFilePathImpl(int contextId, bool& logFileExists, const osFilePath*& filePath);
 
 // Programs:
 bool gaGetAmountOfOpenCLProgramObjectsImpl(int contextId, int& amountOfPrograms);

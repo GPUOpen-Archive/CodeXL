@@ -190,7 +190,7 @@ bool gaFindStringMarkerImpl(int contextId, apSearchDirection searchDirection, in
 bool gaGetCurrentOpenGLErrorImpl(GLenum& openGLError);
 
 // Log file recording:
-bool gaGetContextLogFilePathImpl(int contextId, bool& logFileExists, osFilePath& filePath);
+bool gaGetContextLogFilePathImpl(int contextId, bool& logFileExists, const osFilePath*& filePath);
 
 // Force OpenGL flush:
 bool gaForceOpenGLFlushImpl(bool isOpenGLFlushForced);
