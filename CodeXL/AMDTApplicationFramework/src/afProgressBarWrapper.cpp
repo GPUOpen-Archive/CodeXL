@@ -570,11 +570,9 @@ bool afProgressBarWrapper::ShowDialogIfNeeded()
 
     if (m_isProgressDlgShouldBeVisible && hasThresholdPeriodPassed && !m_isShuttingDown)
     {
-        afApplicationCommands* pApplicationCommands = afApplicationCommands::instance();
-        GT_IF_WITH_ASSERT(pApplicationCommands != nullptr)
+        GT_IF_WITH_ASSERT(m_pProgressDlg != nullptr)
         {
             m_pProgressDlg->show();
-
             retVal = true;
         }
     }
