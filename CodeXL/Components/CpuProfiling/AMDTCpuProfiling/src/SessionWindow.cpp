@@ -563,16 +563,6 @@ void CpuSessionWindow::onViewSourceView(gtVAddr Address, ProcessIdType pid, Thre
         createdNewView = true;
         pSourceCodeView->setDisplayedItemData((afApplicationTreeItemData*)m_pSessionTreeItemData);
 
-#if 0
-
-        if (!pSourceCodeView->DisplayModule(pModDetail))
-        {
-            QMessageBox::information(this, "Source/Disassembly View Error" , "Failed to initialize Source/Disassembly tab for module :\n" + modName);
-            delete pSourceCodeView;
-            return;
-        }
-
-#endif
         pSourceCodeView->setWindowTitle(caption);
 
         connect(&(CpuProfilingOptions::instance()), SIGNAL(settingsUpdated()), pSourceCodeView, SLOT(onViewChanged()));

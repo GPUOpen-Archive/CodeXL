@@ -332,15 +332,6 @@ bool DisplayFilterDlg::populateCoreList(int noOfCores)
         m_pScrollAreaCPUCore->setWidget(m_pWidgetCoreList);
     }
 
-#if 0
-
-    for (int i = 0; i < m_noOfCores; ++i)
-    {
-        m_pCheckBoxCore[i].setChecked(true);
-    }
-
-#endif
-
     //unsigned long val = m_options->m_coreMask;
     unsigned long val = m_displayFilter->GetCoreMask();
     std::bitset<MAX_CORES_SUPPORTED> mask(val);
@@ -353,17 +344,6 @@ bool DisplayFilterDlg::populateCoreList(int noOfCores)
         }
     }
 
-#if 0
-    CoreFilter::Iterator it;
-    CoreFilter::Iterator itStart = m_displaySettings.m_cpuFilter.begin();
-    CoreFilter::Iterator itEnd = m_displaySettings.m_cpuFilter.end();
-
-    for (it = itStart; it != itEnd; ++it)
-    {
-        m_pCheckBoxCore[(*it)].setChecked(false);
-    }
-
-#endif
 
     return retVal;
 }
@@ -462,10 +442,6 @@ void DisplayFilterDlg::onChangeView(const QString& newlySelectedView)
                 std::wstring wstr = checkboxName.toStdWString();
                 gtString counterName(wstr.c_str());
 
-#if 0
-                CounterNameIdVec selectedCounterList;
-                m_displayFilter->GetSelectedCounterList(selectedCounterList);
-#endif
                 auto beginItr = m_notChecked.begin();
                 auto endItr = m_notChecked.end();
                 auto found = std::find(beginItr, endItr, counterName);
@@ -616,10 +592,6 @@ void DisplayFilterDlg::onClickOk()
 
     // set the report options
     m_displayFilter->SetReportConfig();
-#if 0
-    m_pProfDataReader->SetReportOption(*m_options.get());
-    m_pProfDataReader->SetReportOption(m_displayFilter->Get);
-#endif
 
     accept();
 }

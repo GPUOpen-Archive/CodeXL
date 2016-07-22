@@ -218,11 +218,6 @@ void SessionOverviewWindow::setSessionWindowLayout()
 
     pModulesHeader->setFont(boldFont);
 
-#if 0
-    // Connect the hot spot combo to it's slot:
-    rc = connect(this, SIGNAL(hotspotIndicatorChanged(const QString&)), this, SLOT(onAfterHotSpotComboChanged(const QString&)));
-    GT_ASSERT(rc);
-#endif
     int colSpan = m_isMultiProcesses ? 2 : 4;
     int modulesCol = m_isMultiProcesses ? 2 : 0;
 
@@ -989,18 +984,6 @@ void SessionOverviewWindow::activateTableItem(QTableWidgetItem* pActivateItem, C
                             }
 
                             pFunctionsView = pSessionWindow->sessionFunctionsView();
-
-#if 0
-                            int itemRow = pActivateItem->row();
-
-                            const QList<ProcessIdType>* pPidList = m_pFunctionsTable->getFunctionPidList(itemRow);
-                            QString functionName = m_pFunctionsTable->getFunctionName(itemRow);
-
-                            GT_IF_WITH_ASSERT(nullptr != pFunctionsView && !functionName.isEmpty() && nullptr != pPidList && !pPidList->isEmpty())
-                            {
-                                pFunctionsView->selectFunction(functionName, pPidList->first());
-                            }
-#endif
                         }
                     }
                 }
@@ -1033,14 +1016,6 @@ void SessionOverviewWindow::onTableItemActivated(QTableWidgetItem* pActivateItem
                 }
                 else
                 {
-#if 0
-                    // Get the address for the activated function:
-                    const CpuProfileModule* pModule = nullptr;
-                    gtVAddr functionAddress = m_pFunctionsTable->getFunctionAddress(pActivateItem->row(), pModule);
-
-                    // Open function source code:
-                    openFunctionSourceCode(functionAddress, pModule);
-#endif
                     openSourceCodeView(pActivateItem);
                 }
             }
@@ -1101,15 +1076,6 @@ void SessionOverviewWindow::onTableContextMenuActionTriggered(CPUProfileDataTabl
             case CPUProfileDataTable::DISPLAY_FUNCTION_IN_SOURCE_CODE_VIEW:
             {
                 openSourceCodeView(pTableItem);
-
-#if 0
-                // Get the address for the activated function:
-                const CpuProfileModule* pModule = nullptr;
-                gtVAddr functionAddress = m_pFunctionsTable->getFunctionAddress(pTableItem->row(), pModule);
-
-                // Open function source code:
-                openFunctionSourceCode(functionAddress, pModule);
-#endif
                 break;
             }
 
@@ -1196,73 +1162,11 @@ bool SessionOverviewWindow::openSourceCodeView(QTableWidgetItem* pTableItem)
     }
     return ret;
 }
-#if 0
-bool SessionOverviewWindow::openFunctionSourceCode(gtVAddr functionAddress, const CpuProfileModule* pModule)
-{
-    bool retVal = false;
-    GT_IF_WITH_ASSERT(nullptr != m_pFunctionsTable)
-    {
-        GT_IF_WITH_ASSERT(nullptr != pModule)
-        {
-            switch (pModule->m_modType)
-            {
-                case CpuProfileModule::UNMANAGEDPE:
-                {
-                    // Check if the modules file path exists. Sometimes, when we import a session, the modules doesn't
-                    // exist on the machine, and in this case, source code view cannot be opened:
 
-                    if (AuxFileExists(acGTStringToQString(pModule->getPath())))
-                    {
-                        // Emit a function activated signal (will open a source code view):
-                        emit functionActivated(functionAddress, 0, SHOW_ALL_TIDS, pModule);
-                    }
-                    else
-                    {
-                        // Output a message stating that the source code cannot be opened:
-                        QString msg = QString(CP_functionsViewModuleDoesntExist).arg(acGTStringToQString(pModule->getPath()));
-                        acMessageBox::instance().information(AF_STR_InformationA, msg);
-                    }
-
-                    break;
-                }
-
-                case CpuProfileModule::JAVAMODULE:
-                case CpuProfileModule::MANAGEDPE:
-                case CpuProfileModule::UNKNOWNKERNELSAMPLES:
-                {
-                    // For Java and CLR, no need to check whether the module file path exists or not.
-                    // We only need the JNC/JCL files which are already copied into profile-session-dir.
-
-                    // Emit a function activated signal (will open a source code view):
-                    emit functionActivated(functionAddress, 0, SHOW_ALL_TIDS, pModule);
-                    break;
-                }
-
-#ifdef TBI
-
-                case CpuProfileModule::OCLMODULE:
-#endif // TBI
-                case CpuProfileModule::UNKNOWNMODULE:
-                default:
-                    break;
-            }
-
-            retVal = true;
-        }
-    }
-    return retVal;
-}
-#endif
 const CpuProfileModule* SessionOverviewWindow::findModuleHandler(const osFilePath& filePath) const
 {
     GT_UNREFERENCED_PARAMETER(filePath);
     const CpuProfileModule* pRetVal = nullptr;
-#if 0
-    GT_IF_WITH_ASSERT(m_pFunctionsTable != nullptr)
-    {
-        pRetVal = m_pFunctionsTable->findModuleHandler(filePath);
-    }
-#endif
     return pRetVal;
 }
 
@@ -1306,16 +1210,6 @@ void SessionOverviewWindow::openFunctionViewForFunction(QTableWidgetItem* pTable
                 pFunctionsView = pSessionWindow->sessionFunctionsView();
 
                 pFunctionsView->selectFunction(funcId);
-
-#if 0
-                const QList<ProcessIdType>* pPidList = m_pFunctionsTable->getFunctionPidList(itemRow);
-
-                GT_IF_WITH_ASSERT(nullptr != pFunctionsView && nullptr != pPidList && !pPidList->isEmpty())
-                {
-                    //pFunctionsView->selectFunction(functionName, pPidList->first());
-                    pFunctionsView->selectFunction(funcId, pPidList->first());
-                }
-#endif
             }
         }
     }

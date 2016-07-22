@@ -66,9 +66,6 @@ DataTab::DataTab(QWidget* pParent, CpuSessionWindow* pParentSessionWindow, const
     {
         m_pProfDataRdr = pParentSessionWindow->profDbReader();
         m_isCLU = pParentSessionWindow->IsProfilingTypeCLU();
-#if 0
-        m_pProfileInfo = m_pProfileReader->getProfileInfo();
-#endif
         m_pDisplayFilter = pParentSessionWindow->GetDisplayFilter();
 
         AMDTProfileCounterDescVec counterDesc;
@@ -99,15 +96,6 @@ DataTab::DataTab(QWidget* pParent, CpuSessionWindow* pParentSessionWindow, const
     GT_IF_WITH_ASSERT(m_pParentSessionWindow != nullptr)
     {
         m_pSessionDisplaySettings = nullptr;
-#if 0
-        m_pSessionDisplaySettings = m_pParentSessionWindow->sessionDisplaySettings();
-
-        if ((m_pSessionDisplaySettings != nullptr) && (m_pSessionDisplaySettings->m_pProfileInfo != nullptr))
-        {
-            m_isProfiledClu = m_pSessionDisplaySettings->m_displayClu;
-        }
-
-#endif
     }
 
     // Connect to the application focus changed signal:
@@ -384,90 +372,6 @@ void DataTab::showInformationPanel(bool show)
 // Author:  AMD Developer Tools Team
 // Date:        29/4/2013
 // ---------------------------------------------------------------------------
-#if 0
-QString DataTab::displayFilterString()
-{
-    QString retVal;
-
-    SessionDisplaySettings* pSessionDisplaySettings = CurrentSessionDisplaySettings();
-    GT_IF_WITH_ASSERT(pSessionDisplaySettings != nullptr)
-    {
-        if ((pSessionDisplaySettings != nullptr) && !m_enableOnlySystemDllInDisplaySettings)
-        {
-            // Add the view name to the filter string:
-            retVal.append(pSessionDisplaySettings->m_displayFilterName);
-        }
-
-        // Add the system modules to the filter string:
-        QString displaySys = CPUGlobalDisplayFilter::instance().m_displaySystemDLLs ? "All Modules" : "System Modules Hidden";
-
-        if (!retVal.isEmpty())
-        {
-            retVal.append(", ");
-        }
-
-        retVal.append(displaySys);
-
-        bool isProfilingCLU = false;
-
-        if (pSessionDisplaySettings->m_pProfileInfo != nullptr)
-        {
-            isProfilingCLU = pSessionDisplaySettings->m_pProfileInfo->m_isProfilingCLU;
-        }
-
-        bool displayPercentageInColumn = CPUGlobalDisplayFilter::instance().m_displayPercentageInColumn && (!isProfilingCLU);
-
-        if (displayPercentageInColumn && !m_enableOnlySystemDllInDisplaySettings)
-        {
-            if (!retVal.isEmpty())
-            {
-                retVal.append(", ");
-            }
-
-            retVal.append("Percentages");
-        }
-
-        if ((m_pParentSessionWindow != nullptr) && !m_enableOnlySystemDllInDisplaySettings)
-        {
-            // Get the CPU filter and separate options from session display settings:
-            CoreFilter cpuFilter = pSessionDisplaySettings->m_cpuFilter;
-            int separate = pSessionDisplaySettings->m_separateBy;
-
-            if (!cpuFilter.isEmpty())
-            {
-                if (!retVal.isEmpty())
-                {
-                    retVal.append(", ");
-                }
-
-                int amountOfDisplayedCores = (int)m_pParentSessionWindow->profileReader().getProfileInfo()->m_numCpus - (int)cpuFilter.size();
-                QString coresFilter;
-                coresFilter.sprintf("%d Cores", amountOfDisplayedCores);
-                retVal.append(coresFilter);
-            }
-
-            if (SEPARATE_BY_CORE == separate || SEPARATE_BY_NUMA == separate)
-            {
-                if (!retVal.isEmpty())
-                {
-                    retVal.append(", ");
-                }
-
-                if (SEPARATE_BY_CORE == separate)
-                {
-                    retVal.append(CP_strCPUProfilePerCPU);
-                }
-                else
-                {
-                    retVal.append(CP_strCPUProfilePerNuma);
-                }
-            }
-        }
-    }
-
-    return retVal;
-}
-#endif
 
 QString DataTab::displayFilterString()
 {
@@ -947,43 +851,3 @@ void ProfileViewDisplayInformation::clear()
     m_expandedTreeItems.clear();
     m_selectedHotSpot = "";
 }
-
-
-#if 0
-void DataTab::openCallGraphViewForFunction(const QString& funcName, ProcessIdType pid)
-{
-    // Make sure that the function view is opened for this session:
-    openCallGraphView();
-
-    // Get the tree instance:
-    afApplicationCommands* pCommands = afApplicationCommands::instance();
-    SessionViewCreator* pSessionViewCreator = AmdtCpuProfiling::sessionViewCreator();
-
-    GT_IF_WITH_ASSERT((pCommands != nullptr) && (pSessionViewCreator != nullptr) && (m_pDisplayedSessionItemData != nullptr))
-    {
-        CpuSessionWindow* pSessionWindow = nullptr;
-        const gtVector<CpuSessionWindow*>& openedSessions = pSessionViewCreator->currentlyOpenedSessionWindows();
-
-        for (int i = 0; i < (int)openedSessions.size(); i++)
-        {
-            if (openedSessions[i] != nullptr)
-            {
-                if (openedSessions[i]->displayedSessionFilePath() == m_pDisplayedSessionItemData->m_filePath)
-                {
-                    pSessionWindow = openedSessions[i];
-                }
-            }
-        }
-
-        GT_IF_WITH_ASSERT(pSessionWindow != nullptr)
-        {
-            pSessionWindow->onViewCallGraphView(pid);
-            SessionCallGraphView* pCallGraphTab = pSessionWindow->sessionCallGraphTab();
-            GT_IF_WITH_ASSERT((pCallGraphTab != nullptr) && (!funcName.isEmpty()))
-            {
-                pCallGraphTab->selectFunction(funcName, pid);
-            }
-        }
-    }
-}
-#endif

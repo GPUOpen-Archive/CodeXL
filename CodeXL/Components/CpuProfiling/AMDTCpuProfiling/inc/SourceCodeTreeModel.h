@@ -146,10 +146,6 @@ public:
 
 private:
 
-    // Symbol engine stuff
-    //bool InitializeSymbolEngine();
-
-    //bool SourceLineInstancesToOffsetLinenumMap(SrcLineInstanceMap* pInstances);
     bool SetSourceLines(const QString& filepath, unsigned int startLine, unsigned int stopLine);
 
     bool IsSourceLineMapped(const SourceLineKey& sourceLineKey);
@@ -157,20 +153,11 @@ private:
     /// Calculate the current module total sample count vector:
     void CalculateTotalModuleCountVector(CpuProfileReader* pProfileReader);
 
-    // Symbol list utilities:
-    //bool SetupSymbolInfoListUnmanaged(AMDTUInt32 modId, AMDTUInt32 pId);
-    //bool SetupSymbolInfoListUnmanaged();
-    //void SetupSymbolInfoListManaged();
-    //void SetupSymbolInfoListManaged(AMDTUInt32 modId, AMDTUInt32 pId);
-    //bool SetupSourceInfoForUnManaged();
-    //bool SetupSourceInfoForJava(gtVAddr address);
-
     bool SetupSymbolInfoList(AMDTUInt32 modId, AMDTUInt32 pId);
     bool SetupSourceInfo();
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     bool SetupSymbolInfoNgen(QString pjsFile);
-    //bool SetupSourceInfoForClr(gtVAddr address);
     bool GetSourceLineInfoForCLR(gtUInt32 clrSymOffset, OffsetLinenumMap& jitLineMap);
     bool GetClrOffsetFromSymbol(gtRVAddr& offset);
 #endif // AMDT_WINDOWS_OS
@@ -178,9 +165,6 @@ private:
 #ifdef TBI
     bool SetupSourceInfoForOcl(gtVAddr address);
 #endif
-
-    //void CreateSymbolInfoList(AMDTUInt32 modId, AMDTUInt32 pId);
-    //void CreateSymbolInfoList();
 
     SourceViewTreeItem* getItem(const QModelIndex& index) const;
     void SetHotSpotsrcLnSamples(AMDTUInt32 counterId,

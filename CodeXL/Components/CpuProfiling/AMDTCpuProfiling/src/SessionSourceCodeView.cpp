@@ -575,21 +575,6 @@ void SessionSourceCodeView::OnItemSelectChanged(const QModelIndex& current, cons
                     SampleKeyType key;
                     key.event = evCluPercent;
                     key.cpu = cpuId;
-#if 0
-                    CpuEventViewIndexMap::const_iterator idxIt = m_pSessionDisplaySettings->m_eventToIndexMap.find(key);
-
-                    int idx = *idxIt;
-
-                    if (idxList.find(idx) == idxList.end())
-                    {
-                        // The check is to avoid duplicate data in case the samples are separated by numa
-                        idxList.insert(std::pair<char, int>(idx, 0));
-
-                        float dataAsVariant = pSrcItem->data(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN + 1 + idx).toFloat();
-                        cluData.push_back(dataAsVariant);
-                    }
-
-#endif
                 }
             }
 
@@ -1746,29 +1731,29 @@ void SessionSourceCodeView::applyUserDisplayInformation()
         AMDTUInt64 firstSrcLine = m_pTreeViewModel->GetFuncSrcFirstLnNum();
         const std::vector<SourceViewTreeItem*>& srcLineVec = m_pTreeViewModel->GetSrcLineViewMap();
 
-		if (!srcLineVec.empty())
-		{
-			auto pSelectedItem = srcLineVec.at(firstSrcLine);
+        if (!srcLineVec.empty())
+        {
+            auto pSelectedItem = srcLineVec.at(firstSrcLine);
 
-			if (pSelectedItem != nullptr)
-			{
-				// Apply the tree selection:
-				SetTreeSelection(pSelectedItem);
+            if (pSelectedItem != nullptr)
+            {
+                // Apply the tree selection:
+                SetTreeSelection(pSelectedItem);
 
-				int max = m_pSourceCodeTree->verticalScrollBar()->maximum();
-				int totalLines = srcLineVec.size();
-				int scrollVal = max;
+                int max = m_pSourceCodeTree->verticalScrollBar()->maximum();
+                int totalLines = srcLineVec.size();
+                int scrollVal = max;
 
-				if (0 != totalLines)
-				{
-					//one line scaling is
-					int oneLineScaling = max / totalLines;
-					scrollVal = oneLineScaling * firstSrcLine;
-				}
+                if (0 != totalLines)
+                {
+                    //one line scaling is
+                    int oneLineScaling = max / totalLines;
+                    scrollVal = oneLineScaling * firstSrcLine;
+                }
 
-				m_pSourceCodeTree->verticalScrollBar()->setValue(scrollVal);
-			}
-		}
+                m_pSourceCodeTree->verticalScrollBar()->setValue(scrollVal);
+            }
+        }
     }
 }
 

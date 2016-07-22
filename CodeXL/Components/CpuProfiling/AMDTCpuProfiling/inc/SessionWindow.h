@@ -156,8 +156,6 @@ private:
     CpuProfileInfo*      m_pProfileInfo;
     osFilePath          m_sessionFile;
 
-    //SessionDisplaySettings m_sessionDisplayFilter;
-
     /// Data tabs
     SessionOverviewWindow*          m_pOverviewWindow      = nullptr;
     SessionModulesView*             m_pSessionModulesView  = nullptr;

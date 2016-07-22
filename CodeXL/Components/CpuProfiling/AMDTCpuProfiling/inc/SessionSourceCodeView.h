@@ -47,7 +47,7 @@ public:
     virtual ~SessionSourceCodeView();
 
     //bool DisplayModule(const CpuProfileModule* pModDetail);
-	bool DisplayViewModule(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> funcModInfo);
+    bool DisplayViewModule(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> funcModInfo);
     /// Add a source code item to the CodeXL explorer. This function is called when the source view is opened for
     /// a requested module
     void AddSourceCodeItemToExplorer();
@@ -135,11 +135,6 @@ private:
 
     QString FindSourceFile(QString fileName);
 
-    /// Finds the requested function in the displayed module:
-    /// \param functionIndex the function within the functions combo box
-    /// \return true iff the function was found successfully
-    //bool FindRequestedFunctionInModule(int functionIndex);
-
     void HideFilteredColumns();
 
     /// Select the requested tree item in the tree. Select and ensure visible the matching item in the table
@@ -176,9 +171,9 @@ protected:
     bool m_CLUNoteShown;
     bool m_ignoreVerticalScroll;
 
-    AMDTUInt32	m_moduleId;
-    AMDTUInt32	m_functionId;
-    AMDTUInt32	m_processId;
+    AMDTUInt32  m_moduleId;
+    AMDTUInt32  m_functionId;
+    AMDTUInt32  m_processId;
     std::vector<AMDTUInt32> m_functionIdVec;
     gtString m_srcFilePath;
     std::vector<gtString> m_supportedCounterList;

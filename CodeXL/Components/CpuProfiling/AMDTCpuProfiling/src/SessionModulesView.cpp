@@ -751,40 +751,12 @@ void SessionModulesView::displayByProcesses()
 
 void SessionModulesView::onBottomProcessesTableCellChanged()
 {
-#if 0
-
-    if (m_isProfiledClu)
-    {
-        foreach (QTableWidgetItem* pSelectedItem, m_pBottomProcessesTable->selectedItems())
-        {
-            gtVector<float> cluData;
-            m_pBottomProcessesTable->GetCluDataInRow(pSelectedItem->row(), SAMPLE_INDEX_IN_TABLE_PROCESS, cluData);
-            UpdateNoteWindowContent(cluData);
-        }
-
-        m_latestSelectedTable = TOP_PROCESS_TABLE;
-    }
-
-#endif
+    // unused
 }
 
 void SessionModulesView::onBottomModulesTableCellChanged()
 {
-#if 0
-
-    if (m_isProfiledClu)
-    {
-        foreach (QTableWidgetItem* pSelectedItem, m_pBottomModulesTable->selectedItems())
-        {
-            gtVector<float> cluData;
-            m_pBottomModulesTable->GetCluDataInRow(pSelectedItem->row(), SAMPLE_INDEX_IN_TABLE_MODULE, cluData);
-            UpdateNoteWindowContent(cluData);
-        }
-
-        m_latestSelectedTable = TOP_MODULE_TABLE;
-    }
-
-#endif
+    // unused
 }
 
 void SessionModulesView::onEditCopy()

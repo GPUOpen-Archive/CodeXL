@@ -347,42 +347,6 @@ void SessionFunctionView::selectFunction(const QString& funcId)
     }
 }
 
-#if 0
-void SessionFunctionView::selectFunction(const QString& functionName, ProcessIdType pid)
-{
-    GT_IF_WITH_ASSERT(nullptr != m_pPIDComboBoxAction)
-    {
-        const QComboBox* pPIDComboBox = TopToolbarComboBox(m_pPIDComboBoxAction);
-
-        GT_IF_WITH_ASSERT(nullptr != pPIDComboBox)
-        {
-            // We need to update the PID Combo-Box only if the current view is not containing the requested PID.
-            if (CP_profileAllProcesses != pPIDComboBox->currentText())
-            {
-                // Construct the PID string suffix.
-                QString pidText = '(' + QString::number(pid) + ')';
-
-                // Search for the item in the Combo-Box with the requested PID, and select it.
-                for (int i = 0, num = pPIDComboBox->count(); i < num; ++i)
-                {
-                    if (pPIDComboBox->itemText(i).endsWith(pidText))
-                    {
-                        if (pPIDComboBox->currentIndex() != i)
-                        {
-                            m_pPIDComboBoxAction->UpdateCurrentIndex(i);
-                        }
-
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    selectTableItem(m_pFunctionTable, functionName, m_pFunctionTable->getFunctionNameColumnIndex());
-}
-#endif
-
 ProcessIdType SessionFunctionView::getCurrentPid()
 {
     ProcessIdType pid = 0;
@@ -844,20 +808,6 @@ void SessionFunctionView::displayModule(const QString& moduleFullPath)
 void SessionFunctionView::onCellChanged()
 {
     //unused
-#if 0
-    m_isProfiledClu = m_pSessionDisplaySettings->m_displayClu;
-
-    if (m_isProfiledClu)
-    {
-        foreach (QTableWidgetItem* pSelectedItem, m_pFunctionTable->selectedItems())
-        {
-            gtVector<float> cluData;
-            m_pFunctionTable->GetCluDataInRow(pSelectedItem->row(), SAMPLE_INDEX_IN_TABLE_FUNCTION, cluData);
-            UpdateNoteWindowContent(cluData);
-        }
-    }
-
-#endif
 }
 
 void SessionFunctionView::onEditCopy()
