@@ -321,6 +321,10 @@ public:
     void SetCLUOVHdrName(const QString& name);
     const QString& GetCLUOVHdrName() const { return m_CLUOVHdrName; }
     bool isCLUPercentCaptionSet() const { return m_isCLUPercent; }
+
+    void SetViewName(const QString& viewName) { m_viewName = viewName; }
+    QString GetViewName() { return m_viewName; }
+
 private:
 
     //static DisplayFilter* m_instance;
@@ -337,6 +341,7 @@ private:
     CounterNameIdVec                        m_selectedCountersIdList;
     QString                                 m_CLUOVHdrName;
     bool                                    m_isCLUPercent = true;
+    QString                                 m_viewName;
 };
 
 #endif //__DISPLAYFILTER_H

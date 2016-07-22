@@ -523,12 +523,14 @@ void DisplayFilterDlg::onClickCoreItem(int state)
 void DisplayFilterDlg::onClickOk()
 {
     GT_IF_WITH_ASSERT((nullptr != m_pProfDataReader.get()) &&
-                      (nullptr != m_pSessionTreeItemData))
+                      (nullptr != m_pSessionTreeItemData) &&
+                      (nullptr != m_displayFilter))
     {
         bool atLeastOneCore = false;
 
         QString viewName = m_pComboBoxViewes->currentText();
         m_cofigName = viewName;
+        m_displayFilter->SetViewName(viewName);
 
         std::bitset<MAX_CORES_SUPPORTED> coreMask;
 

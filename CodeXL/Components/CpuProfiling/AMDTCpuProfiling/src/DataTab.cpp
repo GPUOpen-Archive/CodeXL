@@ -476,7 +476,7 @@ QString DataTab::displayFilterString()
     GT_IF_WITH_ASSERT(m_pDisplayFilter != nullptr)
     {
         // add configuration name
-        retVal.append(m_pDisplayFilter->GetCurrentCofigName());
+        retVal.append(m_pDisplayFilter->GetViewName());
 
         // Add the system modules to the filter string:
         QString displaySys = m_pDisplayFilter->IsSystemModuleIgnored() ? "System Modules Hidden" : "All Modules";
