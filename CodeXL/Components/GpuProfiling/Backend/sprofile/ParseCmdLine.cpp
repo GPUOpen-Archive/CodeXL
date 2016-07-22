@@ -87,11 +87,11 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
 
         po::options_description apiTraceOpt("Application Trace mode options (for --apitrace or --hsatrace)");
         apiTraceOpt.add_options()
-        ("apifilterfile,F", po::value<string>(), "Path to the API filter file which contains a list of OpenCL APIs to be filtered out when performing an API trace.")
+        ("apifilterfile,F", po::value<string>(), "Path to the API filter file which contains a list of OpenCL or HSA APIs to be filtered out when performing an API trace.")
 #ifdef _WIN32
-        ("interval,i", po::value<unsigned int>()->default_value(DEFAULT_TIMEOUT_INTERVAL), "Timeout interval. Ignored when not using timeout mode.")
+        ("interval,i", po::value<unsigned int>()->default_value(DEFAULT_TIMEOUT_INTERVAL), "Timeout interval in milliseconds. Ignored when not using timeout mode.")
 #else
-        ("interval,i", po::value<unsigned int>()->default_value(DEFAULT_TIMEOUT_INTERVAL), "Timeout interval.")
+        ("interval,i", po::value<unsigned int>()->default_value(DEFAULT_TIMEOUT_INTERVAL), "Timeout interval in milliseconds.")
 #endif
 #ifdef _WIN32
         ("timeout,m", "Flush Trace data periodically, default timeout interval is 100 milliseconds (can be changed with -i option).")
