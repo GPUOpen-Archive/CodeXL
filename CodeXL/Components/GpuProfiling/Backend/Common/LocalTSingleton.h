@@ -10,7 +10,7 @@
 #define _LOCAL_SINGLETON_H_
 
 #ifdef CL_UNITTEST_MOCK
-#include "../../Tests/TestCLMock/TestCLAPITraceMock.h"
+#include "../../Non-OpenSource/Tests/TestCLMock/TestCLAPITraceMock.h"
 #define TSingletonMockGen(ClassName,MockClassName)  class ClassName; \
     template<> \
     class TSingleton<ClassName>{ \
