@@ -9,6 +9,7 @@
 #define DETOURS_OPTION_BITS 1
 #ifndef X64
 #define DETOURS_32BIT 1
+#define DETOURS_X86 1
 #else
 #define DETOURS_64BIT 1
 #define DETOURS_X64 1
