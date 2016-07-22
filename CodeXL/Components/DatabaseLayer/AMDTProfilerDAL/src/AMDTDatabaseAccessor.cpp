@@ -3279,7 +3279,7 @@ public:
 
         if (IS_CORE_QUERY(coreMask))
         {
-            int i = 1;
+            int i = 0;
 
             while (coreMask)
             {
