@@ -464,6 +464,33 @@ void SessionSourceCodeView::CreateFunctionsComboBox()
         // Prepare the string list for the functions combo box:
         QStringList functionsList, toolTipList;
 
+        AMDTProfileDataVec funcProfileData;
+        m_pProfDataRdr->GetFunctionProfileData(((m_processId > 0) ? m_processId : AMDT_PROFILE_ALL_PROCESSES), m_moduleId, funcProfileData);
+
+        for (auto const& func : funcProfileData)
+        {
+            AMDTProfileFunctionData  functionData;
+
+            bool ret = m_pProfDataRdr->GetFunctionData(func.m_id,
+                                                       AMDT_PROFILE_ALL_PROCESSES,
+                                                       AMDT_PROFILE_ALL_THREADS,
+                                                       functionData);
+
+            if (ret)
+            {
+                gtUInt64 baseAddr = functionData.m_modBaseAddress;
+                gtUInt64 startOffset = baseAddr + functionData.m_functionInfo.m_startOffset;
+                gtUInt64 endOffset = startOffset + functionData.m_functionInfo.m_size;
+
+                QString addressStart = "0x" + QString::number(startOffset, 16);
+                QString addressEnd = "0x" + QString::number(endOffset, 16);
+                QString functionStr = QString("[%1 - %2] : ").arg(addressStart).arg(addressEnd);
+                functionStr += acGTStringToQString(functionData.m_functionInfo.m_name);
+                functionsList << functionStr;
+                m_functionIdVec.push_back(functionData.m_functionInfo.m_functionId);
+            }
+        }
+#if 0
         // Baskar: Though this approach will have folowing side effects, its OK for 2.2 release
         //      - function combo box will have functions that do not have IP samples
         //              a) functions having only deep samples due to CSS
@@ -487,6 +514,7 @@ void SessionSourceCodeView::CreateFunctionsComboBox()
                 m_functionIdVec.push_back(func.m_functionId);
             }
         }
+#endif //0
 
         m_pTopToolbar->AddLabel(CP_sourceCodeViewFunctionPrefix);
 
