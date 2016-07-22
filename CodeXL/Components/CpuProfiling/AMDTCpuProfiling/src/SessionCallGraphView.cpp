@@ -599,14 +599,21 @@ void CallGraphFuncList::OnDblClicked(QTreeWidgetItem* pItem)
 
 void CallGraphFuncList::onSelectionChanged()
 {
-    CallGraphFuncListItem* pFuncListItem = static_cast<CallGraphFuncListItem*>(m_pFuncTable->currentItem());
-
-    if (nullptr != pFuncListItem)
+    if (AMDT_PROFILE_ALL_FUNCTIONS == GetSelectedFuncId())
     {
+        CallGraphFuncListItem* pFuncListItem = static_cast<CallGraphFuncListItem*>(m_pFuncTable->currentItem());
+
         if (nullptr != pFuncListItem)
         {
-            emit functionSelected(pFuncListItem->m_functionId);
+            if (nullptr != pFuncListItem)
+            {
+                emit functionSelected(pFuncListItem->m_functionId);
+            }
         }
+    }
+    else
+    {
+        emit functionSelected(m_selectedFuncId);
     }
 }
 
@@ -658,6 +665,7 @@ void CallGraphFuncList::selectAFunction(AMDTFunctionId funcId)
                 {
                     pFuncListItem->setSelected(true);
                     m_pFuncTable->scrollToItem(pFuncListItem);
+                    m_selectedFuncId = funcId;
                 }
                 else
                 {
@@ -1090,7 +1098,7 @@ bool CallGraphFuncList::FillDisplayFuncList(std::shared_ptr<cxlProfileDataReader
             }
 
             m_funcIdVec.push_back(callGraphFunc.m_functionInfo.m_functionId);
-            m_FunctionIdSampleMap.insert(std::make_pair(callGraphFunc.m_functionInfo.m_functionId, 
+            m_FunctionIdSampleMap.insert(std::make_pair(callGraphFunc.m_functionInfo.m_functionId,
                                                         callGraphFunc.m_totalSelfSamples ? true : false));
 
         }
@@ -1869,6 +1877,7 @@ void SessionCallGraphView::showPid(unsigned int pid)
 
         ShowParentChild(m_pFuncIdSelected);
         ShowPaths(m_pFuncIdSelected);
+
         emit functionSelected(m_pFuncIdSelected);
 
     }

@@ -209,8 +209,8 @@ public:
     gtString    m_functionName;
     gtString    m_moduleName;
 
-    gtUInt64    m_selfSample;
-    gtUInt64    m_deepSamples;
+    gtUInt64    m_selfSample = 0;
+    gtUInt64    m_deepSamples = 0;
 };
 
 class CallGraphFuncList : public QWidget
@@ -260,6 +260,7 @@ public:
     std::vector<AMDTFunctionId> m_funcIdVec;
     std::map<AMDTFunctionId, bool> m_FunctionIdSampleMap;   // map function id with 0 if self sample count is 0 else  1
 
+    AMDTFunctionId GetSelectedFuncId() const { return m_selectedFuncId; }
 
 public slots:
     void selectAFunction(AMDTFunctionId funcId);
@@ -307,6 +308,7 @@ private:
     // Last sort information:
     Qt::SortOrder m_lastSortOrder;
     int m_lastSortColumn;
+    AMDTFunctionId m_selectedFuncId = AMDT_PROFILE_ALL_FUNCTIONS;
 };
 
 
