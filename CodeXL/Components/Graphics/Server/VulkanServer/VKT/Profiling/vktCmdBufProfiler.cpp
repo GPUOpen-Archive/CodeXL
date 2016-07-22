@@ -445,56 +445,59 @@ VkResult VktCmdBufProfiler::CreateQueryBuffer(
     bufferCreateInfo.flags                 = 0;
     result = m_pDeviceDT->CreateBuffer(m_config.device, &bufferCreateInfo, nullptr, pBuffer);
 
-    if (result == VK_SUCCESS)
+    if (m_config.mapTimestampMem == true)
     {
-        VkMemoryRequirements memReqs = VkMemoryRequirements();
-        m_pDeviceDT->GetBufferMemoryRequirements(m_config.device, *pBuffer, &memReqs);
-
-        VkMemoryAllocateInfo allocInfo = VkMemoryAllocateInfo();
-        allocInfo.sType          = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-        allocInfo.pNext          = nullptr;
-        allocInfo.allocationSize = memReqs.size;
-
-        result = MemTypeFromProps(
-                     memReqs.memoryTypeBits,
-                     VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-                     &allocInfo.memoryTypeIndex);
-
         if (result == VK_SUCCESS)
         {
-            result = m_pDeviceDT->AllocateMemory(m_config.device, &allocInfo, nullptr, pMemory);
+            VkMemoryRequirements memReqs = VkMemoryRequirements();
+            m_pDeviceDT->GetBufferMemoryRequirements(m_config.device, *pBuffer, &memReqs);
+
+            VkMemoryAllocateInfo allocInfo = VkMemoryAllocateInfo();
+            allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+            allocInfo.pNext = nullptr;
+            allocInfo.allocationSize = memReqs.size;
+
+            result = MemTypeFromProps(
+                memReqs.memoryTypeBits,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+                &allocInfo.memoryTypeIndex);
 
             if (result == VK_SUCCESS)
             {
-                result = m_pDeviceDT->BindBufferMemory(m_config.device, *pBuffer, *pMemory, 0);
+                result = m_pDeviceDT->AllocateMemory(m_config.device, &allocInfo, nullptr, pMemory);
 
-                if (m_config.newMemClear == true)
+                if (result == VK_SUCCESS)
                 {
-                    if (result == VK_SUCCESS)
+                    result = m_pDeviceDT->BindBufferMemory(m_config.device, *pBuffer, *pMemory, 0);
+
+                    if (m_config.newMemClear == true)
                     {
-                        void* pMappedMem = nullptr;
-
-                        result = m_pDeviceDT->MapMemory(
-                                     m_config.device,
-                                     *pMemory,
-                                     0,
-                                     VK_WHOLE_SIZE,
-                                     0,
-                                     &pMappedMem);
-
-                        ProfilerInterval* pTimestampData = (ProfilerInterval*)pMappedMem;
-
                         if (result == VK_SUCCESS)
                         {
-                            const ProfilerInterval storeVal = { m_config.newMemClearValue, m_config.newMemClearValue, m_config.newMemClearValue };
-                            const UINT numSets = size / sizeof(storeVal);
+                            void* pMappedMem = nullptr;
 
-                            for (UINT i = 0; i < numSets; i++)
+                            result = m_pDeviceDT->MapMemory(
+                                m_config.device,
+                                *pMemory,
+                                0,
+                                VK_WHOLE_SIZE,
+                                0,
+                                &pMappedMem);
+
+                            ProfilerInterval* pTimestampData = (ProfilerInterval*)pMappedMem;
+
+                            if (result == VK_SUCCESS)
                             {
-                                pTimestampData[i] = storeVal;
-                            }
+                                const ProfilerInterval storeVal = { m_config.newMemClearValue, m_config.newMemClearValue, m_config.newMemClearValue };
+                                const UINT numSets = size / sizeof(storeVal);
 
-                            m_pDeviceDT->UnmapMemory(m_config.device, *pMemory);
+                                for (UINT i = 0; i < numSets; i++)
+                                {
+                                    pTimestampData[i] = storeVal;
+                                }
+
+                                m_pDeviceDT->UnmapMemory(m_config.device, *pMemory);
+                            }
                         }
                     }
                 }
