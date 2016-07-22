@@ -485,12 +485,15 @@ bool SessionOverviewWindow::displaySessionProfileDetails(afHTMLContent& content)
                 content.addHTMLItem(afHTMLContent::AP_HTML_LINE, firstColStr);
             }
 
-#if 0 // TBD
+            // Disable display of number of processes till new API to fetch number processes added to Reporter.
+#if 0
             firstColStr.makeEmpty();
             firstColStr.appendFormattedString(L"<b>%ls:</b> %d", CP_overviewPageTotalProcesses, m_pProfileReader->getProcessMap()->size());
             content.addHTMLItem(afHTMLContent::AP_HTML_LINE, firstColStr);
 #endif
-
+            // GetThreadSummary() is a performance heavy API, delaying overview tab generation.
+            // Disable display of number of threads till new API to fetch number threads added to Reporter.
+#if 0
             AMDTProfileDataOptions reportOptions;
             reportOptions.m_doSort = false;
             reportOptions.m_summaryCount = 0;
@@ -518,15 +521,16 @@ bool SessionOverviewWindow::displaySessionProfileDetails(afHTMLContent& content)
                 }
             }
 
+            // Reset reporting options
+            reportOptions = m_pDisplayFilter->GetProfileDataOptions();
+            m_pProfDataRdr->SetReportOption(reportOptions);
+
             unsigned threadsCount = uniqueThreads.size();
 
             firstColStr.makeEmpty();
             firstColStr.appendFormattedString(L"<b>%ls:</b> %u", CP_overviewPageTotalThreads, threadsCount);
             content.addHTMLItem(afHTMLContent::AP_HTML_LINE, firstColStr);
-
-            // Reset reporting options
-            reportOptions = m_pDisplayFilter->GetProfileDataOptions();
-            m_pProfDataRdr->SetReportOption(reportOptions);
+#endif
 
             retVal = true;
         }
