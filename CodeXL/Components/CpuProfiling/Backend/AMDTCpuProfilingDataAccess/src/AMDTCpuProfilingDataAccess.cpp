@@ -2082,6 +2082,22 @@ public:
         return ret;
     }
 
+    bool IsUnknownFunctionId(AMDTFunctionId funcId, AMDTFunctionId& origFuncId, AMDTProfileFunctionInfo& funcInfo)
+    {
+        bool ret = false;
+
+        auto it = m_unknownFuncIdInfoMap.find(funcId);
+
+        if (it != m_unknownFuncIdInfoMap.end())
+        {
+            origFuncId = funcId & 0xffff0000;
+            funcInfo = it->second;
+            ret = true;
+        }
+
+        return ret;
+    }
+
     bool AddFuncInfoToFuncIdInfoMap(AMDTFunctionId funcId, AMDTProfileFunctionInfo& functionInfo)
     {
         auto it = m_funcIdInfoMap.find(funcId);
@@ -2106,14 +2122,18 @@ public:
             AMDTCounterIdVec countersList;
             ret = GetCountersList(countersList);
 
-            AMDTFunctionId tmpFuncId = 0;
-            gtUInt32 unknownFuncOffset = 0;
-            gtString unknownFuncName;
+            AMDTFunctionId dbFuncId = funcId;
+            gtUInt32 funcOffset = 0;
+            AMDTProfileFunctionInfo unknownFuncInfo;
+            bool isUnkownFunc = IsUnknownFunctionId(funcId, dbFuncId, unknownFuncInfo);
 
-            bool isUnkownFunc = IsUnknownFunctionId(funcId, tmpFuncId, unknownFuncOffset, unknownFuncName);
+            if (isUnkownFunc)
+            {
+                funcOffset = unknownFuncInfo.m_startOffset;
+            }
 
-            ret = ret && m_pDbAdapter->GetFunctionProfileData(isUnkownFunc ? tmpFuncId : funcId,
-                                                              unknownFuncOffset,
+            ret = ret && m_pDbAdapter->GetFunctionProfileData(dbFuncId,
+                                                              funcOffset,
                                                               processId,
                                                               threadId,
                                                               countersList,
@@ -2125,8 +2145,9 @@ public:
             {
                 if (isUnkownFunc)
                 {
-                    functionData.m_functionInfo.m_functionId = funcId;
-                    functionData.m_functionInfo.m_name = unknownFuncName;
+                    functionData.m_functionInfo.m_functionId = unknownFuncInfo.m_functionId;
+                    functionData.m_functionInfo.m_name = unknownFuncInfo.m_name;
+                    functionData.m_functionInfo.m_size = unknownFuncInfo.m_size;
                 }
 
                 // if function size is zero, compute the size from instruction data.
@@ -3745,16 +3766,16 @@ public:
     bool GetCallGraphPaths(AMDTProcessId processId, AMDTFunctionId funcId, gtVector<AMDTCallGraphPath>& paths)
     {
         bool ret = false;
-        AMDTFunctionId dbFuncId = 0;
-        gtUInt32 unknownFuncOffset = 0;
-        gtString unknownFuncName;
+        AMDTFunctionId dbFuncId = funcId;
+        AMDTProfileFunctionInfo unknownFuncInfo;
 
-        bool isUnkownFunc = IsUnknownFunctionId(funcId, dbFuncId, unknownFuncOffset, unknownFuncName);
-        AMDTFunctionId fid = (!isUnkownFunc) ? funcId : dbFuncId;
+        bool isUnkownFunc = IsUnknownFunctionId(funcId, dbFuncId, unknownFuncInfo);
+        
+        AMDTUInt32 funcOffset = (isUnkownFunc) ? unknownFuncInfo.m_startOffset : 0;
+        
+        ret = GetCallGraphPathsForNonLeafFunction(processId, dbFuncId, funcOffset, paths);
 
-        ret = GetCallGraphPathsForNonLeafFunction(processId, fid, unknownFuncOffset, paths);
-
-        ret = GetCallGraphPathsForLeafFunction(processId, fid, unknownFuncOffset, paths);
+        ret = GetCallGraphPathsForLeafFunction(processId, dbFuncId, funcOffset, paths);
 
         return ret;
     }
@@ -3811,16 +3832,13 @@ public:
                     aPath.push_back(cgFunc);
                 }
 
-                if (aPath.size() > 0)
-                {
-                    // add the leaf node
-                    AMDTCallGraphFunction leafFunc;
-                    CopyCGFunction(leafFunc, leaf, samples);
-                    aPath.push_back(leafFunc);
+                // add the leaf node
+                AMDTCallGraphFunction leafFunc;
+                CopyCGFunction(leafFunc, leaf, samples);
+                aPath.push_back(leafFunc);
 
-                    // push this callpath into output vector
-                    paths.push_back(aPath);
-                }
+                // push this callpath into output vector
+                paths.push_back(aPath);
             }
         }
 
@@ -3975,6 +3993,28 @@ public:
         return ret;
     }
 
+    bool ConstructFuncNameByModName(AMDTModuleId modId, gtUInt64 offset, gtString& funcName)
+    {
+        AMDTProfileModuleInfo modInfo;
+        bool ret = GetModuleInfo(modId, modInfo);
+
+        if (ret && !modInfo.m_path.isEmpty())
+        {
+            osFilePath aPath(modInfo.m_path);
+            aPath.getFileNameAndExtension(funcName);
+            funcName.appendFormattedString(L"!0x" LONG_FORMAT_HEX, offset + modInfo.m_loadAddress);
+        }
+        else
+        {
+            // Add the unknownfunction
+            funcName = L"Unknown Function";
+            funcName.appendFormattedString(L"!0x" LONG_FORMAT_HEX, offset);
+            ret = true; //?
+        }
+
+        return ret;
+    }
+
     bool Lookupfunction(AMDTProfileFunctionInfo& funcInfo, bool updateIPSample)
     {
         bool ret = true;
@@ -3999,54 +4039,54 @@ public:
                 {
                     gtUInt32 funcSize = pFuncSymbol->m_size;
 
+                    if ((funcSize == 0) && (GT_INVALID_RVADDR != funcRvaEnd))
+                    {
+                        funcSize = funcRvaEnd - pFuncSymbol->m_rva;
+                    }
+
                     if (funcSize == 0)
                     {
-                        funcSize = (GT_INVALID_RVADDR != funcRvaEnd) ? funcRvaEnd - pFuncSymbol->m_rva
-                                            : (funcInfo.m_startOffset  + 16) - pFuncSymbol->m_rva;   // FIXME
+                            // FIXME
+                        funcSize = (funcInfo.m_startOffset > pFuncSymbol->m_rva) ? (funcInfo.m_startOffset + 16) - pFuncSymbol->m_rva : 0;
                     }
 
-                    funcInfo.m_name = pFuncSymbol->m_pName;
-                    funcInfo.m_startOffset = pFuncSymbol->m_rva;
-                    funcInfo.m_size = funcSize;
-                    gtUInt32 maxFuncId = 0;
-
-                    GetMaxFunctionIdByModuleId(funcInfo.m_moduleId, maxFuncId);
-                    funcInfo.m_functionId = pFuncSymbol->m_funcId + maxFuncId;
-
-                    m_pDbAdapter->InsertFunctionInfo(funcInfo);
-
-                    if (updateIPSample)
+                    // Only if we have found the function
+                    if ((pFuncSymbol->m_rva <= funcInfo.m_startOffset) && ((pFuncSymbol->m_rva + funcSize) > funcInfo.m_startOffset))
                     {
-                        m_pDbAdapter->UpdateIPSample(funcInfo);
+                        if (nullptr != pFuncSymbol->m_pName && L'!' != pFuncSymbol->m_pName[0])
+                        {
+                            funcInfo.m_name = pFuncSymbol->m_pName;
+                        }
+                        else
+                        {
+                            ConstructFuncNameByModName(funcInfo.m_moduleId, pFuncSymbol->m_rva, funcInfo.m_name);
+                        }
+
+                        funcInfo.m_startOffset = pFuncSymbol->m_rva;
+                        funcInfo.m_size = funcSize;
+                        gtUInt32 maxFuncId = 0;
+
+                        GetMaxFunctionIdByModuleId(funcInfo.m_moduleId, maxFuncId);
+                        funcInfo.m_functionId = pFuncSymbol->m_funcId + maxFuncId;
+
+                        m_pDbAdapter->InsertFunctionInfo(funcInfo);
+
+                        if (updateIPSample)
+                        {
+                            m_pDbAdapter->UpdateIPSample(funcInfo);
+                        }
+
+                        m_pDbAdapter->UpdateCallstackLeaf(funcInfo);
+                        m_pDbAdapter->UpdateCallstackFrame(funcInfo);
+
+                        ret = true;
                     }
-
-                    m_pDbAdapter->UpdateCallstackLeaf(funcInfo);
-                    m_pDbAdapter->UpdateCallstackFrame(funcInfo);
-
-                    // In case, if we have not seen the function that contains the sample address
-                    ret = ((pFuncSymbol->m_rva + funcSize) < funcInfo.m_startOffset) ? false : true;
                 }
             }
             
             if (!ret)
             {
-                // Add the unknownfunction
-                AMDTProfileModuleInfo modInfo;
-                ret = GetModuleInfo(funcInfo.m_moduleId, modInfo);
-
-                if (ret && !modInfo.m_path.isEmpty())
-                {
-                    osFilePath aPath(modInfo.m_path);
-                    aPath.getFileNameAndExtension(funcInfo.m_name);
-
-                    funcInfo.m_name.appendFormattedString(L"!0x" LONG_FORMAT_HEX, funcInfo.m_startOffset + modInfo.m_loadAddress);
-                }
-                else
-                {
-                    // FIXME: When will we hit this case?
-                    funcInfo.m_name = L"Unknown Function";
-                    funcInfo.m_name.appendFormattedString(L"!0x" LONG_FORMAT_HEX, funcInfo.m_startOffset);
-                }
+                ConstructFuncNameByModName(funcInfo.m_moduleId, funcInfo.m_startOffset, funcInfo.m_name);
 
                 funcInfo.m_size = 16; // FIXME
                 AddUnknownFunctionInfo(funcInfo);

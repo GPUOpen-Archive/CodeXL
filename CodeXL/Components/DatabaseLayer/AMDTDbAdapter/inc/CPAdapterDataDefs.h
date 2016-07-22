@@ -51,6 +51,7 @@ struct CPAModuleInfo
         m_id(id), m_name(name), m_size(size), m_type(type), m_isSysModule(isSysModule), m_is32Bit(is32Bit), m_foundDebugInfo(foundDebugInfo) {}
 };
 
+using CPAModuleMap = gtMap<gtUInt32, CPAModuleInfo>;
 using CPAModuleList = gtVector<CPAModuleInfo>;
 
 struct CPAModuleInstanceInfo
@@ -64,6 +65,7 @@ struct CPAModuleInstanceInfo
         m_id(id), m_moduleId(moduleId), m_pid(pid), m_loadAddr(loadAddr) {}
 };
 
+using CPAModuleInstanceMap = gtMap<gtUInt32, CPAModuleInstanceInfo>;
 using CPAModuleInstanceList = gtVector<CPAModuleInstanceInfo>;
 
 struct CPAProcessThreadInfo
