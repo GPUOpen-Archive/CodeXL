@@ -26,7 +26,7 @@
 #include "../Common/StringUtils.h"
 #include "../Common/Defs.h"
 #ifdef CL_TRACE_TEST
-    #include "../../Tests/CLAPITraceTest/CLAPITraceTest.h"
+    #include "../../Non-OpenSource/Tests/CLAPITraceTest/CLAPITraceTest.h"
     #define FRIENDTESTCASE(classname) friend class CLAPITraceTest::classname##Test
 #else
     #define FRIENDTESTCASE(classname)
