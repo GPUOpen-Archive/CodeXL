@@ -938,9 +938,15 @@ void PrdTranslator::AggregateKnownModuleSampleData(
                         startAddress += pFuncInfo->m_rva;
                         funcSize = pFuncInfo->m_size;
 
-                        // TODO: Baskar: This requires revisit
-                        funcSize = ((funcSize == 0) && (GT_INVALID_RVADDR != funcRvaEnd))
-                                        ? funcRvaEnd - pFuncInfo->m_rva : funcSize;
+                        if ((funcSize == 0) && (GT_INVALID_RVADDR != funcRvaEnd))
+                        {
+                            funcSize = funcRvaEnd - pFuncInfo->m_rva;
+                        }
+
+                        if (funcSize == 0)
+                        {
+                            funcSize = (rva > pFuncInfo->m_rva) ? ((rva + 16) - pFuncInfo->m_rva) : 0;
+                        }
 
                         pFunc = module.findFunction(startAddress);
 

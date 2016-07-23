@@ -753,6 +753,7 @@ void SourceCodeTreeModel::GetDisasmSampleValue(InstOffsetSize& instInfo, AMDTPro
             for (gtUInt32 i = 0; i < instData->m_sampleValues.size(); i++)
             {
                 sampleValue[i].m_sampleCount += instData->m_sampleValues[i].m_sampleCount;
+                sampleValue[i].m_sampleCountPercentage += instData->m_sampleValues[i].m_sampleCountPercentage;
             }
         }
 

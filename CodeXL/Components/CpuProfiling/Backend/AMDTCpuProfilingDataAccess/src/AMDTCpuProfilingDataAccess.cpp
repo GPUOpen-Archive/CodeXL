@@ -2225,6 +2225,7 @@ public:
                         for (gtUInt32 i = 0; i < instData.m_sampleValues.size(); i++)
                         {
                             slData->m_sampleValues[i].m_sampleCount += instData.m_sampleValues[i].m_sampleCount;
+                            slData->m_sampleValues[i].m_sampleCountPercentage += instData.m_sampleValues[i].m_sampleCountPercentage;
                         }
                     }
                 }

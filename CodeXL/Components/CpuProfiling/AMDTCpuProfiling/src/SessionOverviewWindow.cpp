@@ -481,11 +481,12 @@ bool SessionOverviewWindow::displaySessionProfileDetails(afHTMLContent& content)
             }
 
             // Disable display of number of processes till new API to fetch number processes added to Reporter.
-#if 0
+            AMDTProfileProcessInfoVec processes;
+            m_pProfDataRdr->GetProcessInfo(AMDT_PROFILE_ALL_PROCESSES, processes);
             firstColStr.makeEmpty();
-            firstColStr.appendFormattedString(L"<b>%ls:</b> %d", CP_overviewPageTotalProcesses, m_pProfileReader->getProcessMap()->size());
+            firstColStr.appendFormattedString(L"<b>%ls:</b> %d", CP_overviewPageTotalProcesses, processes.size());
             content.addHTMLItem(afHTMLContent::AP_HTML_LINE, firstColStr);
-#endif
+
             // GetThreadSummary() is a performance heavy API, delaying overview tab generation.
             // Disable display of number of threads till new API to fetch number threads added to Reporter.
 #if 0
