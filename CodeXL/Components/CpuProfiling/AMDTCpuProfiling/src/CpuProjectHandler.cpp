@@ -1373,18 +1373,32 @@ void CpuProjectHandler::handleDataFileImport(const osFilePath& importedSessionFi
 
     if (oldDir.directoryPath() != baseDir.directoryPath())
     {
-        gtList<gtString> noFilter;
-        oldDir.copyFilesToDirectory(baseDir.directoryPath().asString(), noFilter);
+        // TODO : Copy of 'CacheFile.map' file and 'cache' sub-directory
 
-        // Delete any .csv file copied. CSV files are treated as gpu-debugger profile data.
-        gtList<osFilePath> csvFilePathList;
-        baseDir.getContainedFilePaths(L"*.csv", osDirectory::SORT_BY_NAME_ASCENDING, csvFilePathList, false);
+        // Copy .cxlcpdb file
+        gtList<osFilePath> dbFilePaths;
+        gtString sourceFileName(importProfile);
+        sourceFileName.append(L".");
+        sourceFileName.append(DATA_EXT);
+        oldDir.getContainedFilePaths(sourceFileName, osDirectory::SORT_BY_NAME_ASCENDING, dbFilePaths);
 
-        for (auto& csvFilePath : csvFilePathList)
+        // We should get only one db file, but still iterate over.
+        for (const auto& oldFilePath : dbFilePaths)
         {
-            osFile file(csvFilePath);
-            file.deleteFile();
+            gtString newFilePath;
+            oldFilePath.getFileNameAndExtension(newFilePath);
+            newFilePath.prepend(osFilePath::osPathSeparator);
+            newFilePath.prepend(baseDir.directoryPath().asString());
+
+            osCopyFile(oldFilePath, newFilePath, true);
         }
+
+        // Copy *.jnc files
+        gtList<gtString> filter;
+        filter.emplace_back(L"*.jnc");
+        // TODO : Copy only required subdirectories which contain jnc files related to current db
+        // Once jnc files added to DB, copy of jnc files not required.
+        oldDir.copyFilesToDirectory(baseDir.directoryPath().asString(), filter);
 
         // Update the imported files to the imported session name:
         renameFilesInDir(baseDir, importProfile, profileFileName);

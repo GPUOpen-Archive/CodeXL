@@ -272,7 +272,7 @@ bool osDirectory::copyFilesToDirectory(const gtString& destinationPathString, gt
             while ((retVal) && (iter != endIter))
             {
                 // get all the file names for each filter
-                retVal = getContainedFilePaths((*iter), fileList);
+                retVal = getContainedFilePaths((*iter), fileList, false);
                 ++iter;
             }
         }
@@ -316,7 +316,6 @@ bool osDirectory::copyFilesToDirectory(const gtString& destinationPathString, gt
             retVal = subDir.copyFilesToDirectory(subDirPath, filenameFilter);
             ++iter;
         }
-
     }
 
     return retVal;
