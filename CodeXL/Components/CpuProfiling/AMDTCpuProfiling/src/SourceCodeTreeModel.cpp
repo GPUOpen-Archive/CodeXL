@@ -482,7 +482,7 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
     for (const auto& srcData : functionData.m_srcLineDataList)
     {
         bool samplePercentSet = m_pDisplayFilter->GetSamplePercent();
-        gtVector<gtVAddr> instOffsetVec;
+        gtVector<InstOffsetSize> instOffsetVec;
 
         GetInstOffsets(srcData.m_sourceLineNumber, srcInfoVec, instOffsetVec);
 
@@ -497,7 +497,7 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
             gtString disasm;
             gtString codeByte;
 
-            GetDisasmString(instOffset, srcInfoVec, disasm, codeByte);
+            GetDisasmString(instOffset.m_offset, srcInfoVec, disasm, codeByte);
             AMDTSampleValueVec sampleValue;
             GetDisasmSampleValue(instOffset, functionData.m_instDataList, sampleValue);
 
@@ -534,7 +534,7 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
                 idx++;
             }
 
-            pAsmItem->setData(SOURCE_VIEW_ADDRESS_COLUMN, "0x" + QString::number(instOffset + moduleBaseAddr, 16));
+            pAsmItem->setData(SOURCE_VIEW_ADDRESS_COLUMN, "0x" + QString::number(instOffset.m_offset + moduleBaseAddr, 16));
             pAsmItem->setForeground(SOURCE_VIEW_ADDRESS_COLUMN, acQGREY_TEXT_COLOUR);
 
             pAsmItem->setData(SOURCE_VIEW_SOURCE_COLUMN, acGTStringToQString(disasm));
@@ -702,13 +702,17 @@ void SourceCodeTreeModel::InsertDasmLines(gtVAddr displayAddress, unsigned int s
     }
 }
 
-void SourceCodeTreeModel::GetInstOffsets(gtUInt16 srcLine, AMDTSourceAndDisasmInfoVec& srcInfoVec, gtVector<gtVAddr>& instOffsetVec)
+void SourceCodeTreeModel::GetInstOffsets(gtUInt16 srcLine, AMDTSourceAndDisasmInfoVec& srcInfoVec, gtVector<InstOffsetSize>& instOffsetVec)
 {
     for (auto& srcInfo : srcInfoVec)
     {
         if (srcInfo.m_sourceLine == srcLine)
         {
-            instOffsetVec.push_back(srcInfo.m_offset);
+            InstOffsetSize instOffset;
+            instOffset.m_offset = srcInfo.m_offset;
+            instOffset.m_size = srcInfo.m_size;
+
+            instOffsetVec.emplace_back(instOffset);
         }
     }
 
@@ -729,14 +733,32 @@ void SourceCodeTreeModel::GetDisasmString(gtVAddr offset, AMDTSourceAndDisasmInf
     return;
 }
 
-void SourceCodeTreeModel::GetDisasmSampleValue(gtVAddr offset, AMDTProfileInstructionDataVec& dataVec, AMDTSampleValueVec& sampleValue)
+void SourceCodeTreeModel::GetDisasmSampleValue(InstOffsetSize& instInfo, AMDTProfileInstructionDataVec& dataVec, AMDTSampleValueVec& sampleValue)
 {
     auto instData = std::find_if(dataVec.begin(), dataVec.end(),
-    [&offset](AMDTProfileInstructionData const & data) { return data.m_offset == offset; });
+        [&instInfo](AMDTProfileInstructionData const & data) 
+        { return ((data.m_offset >= instInfo .m_offset) && (data.m_offset < (instInfo.m_offset + instInfo.m_size))); });
 
-    if (instData != dataVec.end())
+    bool found = false;
+
+    while (instData != dataVec.end())
     {
-        sampleValue = instData->m_sampleValues;
+        if (!found)
+        {
+            sampleValue = instData->m_sampleValues;
+            found = true;
+        }
+        else
+        {
+            for (gtUInt32 i = 0; i < instData->m_sampleValues.size(); i++)
+            {
+                sampleValue[i].m_sampleCount += instData->m_sampleValues[i].m_sampleCount;
+            }
+        }
+
+        instData = std::find_if(++instData, dataVec.end(),
+            [&instInfo](AMDTProfileInstructionData const & data)
+            { return ((data.m_offset >= instInfo.m_offset) && (data.m_offset < (instInfo.m_offset + instInfo.m_size))); });
     }
 
     return;
@@ -780,7 +802,7 @@ void SourceCodeTreeModel::PrintFunctionDetailData(AMDTProfileFunctionData data,
         m_sampleSrcLnViewTreeList.push_back(std::make_pair(srcData, pLineItem));
 
         // For this srcLine get the list of inst offsets..
-        gtVector<gtVAddr> instOffsetVec;
+        gtVector<InstOffsetSize> instOffsetVec;
         GetInstOffsets(srcData.m_sourceLineNumber, srcInfoVec, instOffsetVec);
         bool flag = true;
 
@@ -830,7 +852,7 @@ void SourceCodeTreeModel::PrintFunctionDetailData(AMDTProfileFunctionData data,
             gtString disasm;
             gtString codeByte;
 
-            GetDisasmString(instOffset, srcInfoVec, disasm, codeByte);
+            GetDisasmString(instOffset.m_offset, srcInfoVec, disasm, codeByte);
             AMDTSampleValueVec sampleValue;
             GetDisasmSampleValue(instOffset, data.m_instDataList, sampleValue);
 
@@ -869,12 +891,12 @@ void SourceCodeTreeModel::PrintFunctionDetailData(AMDTProfileFunctionData data,
 
                 if (true == flag)
                 {
-                    pLineItem->setData(SOURCE_VIEW_ADDRESS_COLUMN, "0x" + QString::number(moduleBaseAddr + instOffset, 16));
+                    pLineItem->setData(SOURCE_VIEW_ADDRESS_COLUMN, "0x" + QString::number(moduleBaseAddr + instOffset.m_offset, 16));
                     flag = false;
                 }
             }
 
-            pAsmItem->setData(SOURCE_VIEW_ADDRESS_COLUMN, "0x" + QString::number(moduleBaseAddr + instOffset, 16));
+            pAsmItem->setData(SOURCE_VIEW_ADDRESS_COLUMN, "0x" + QString::number(moduleBaseAddr + instOffset.m_offset, 16));
             pAsmItem->setForeground(SOURCE_VIEW_ADDRESS_COLUMN, acQGREY_TEXT_COLOUR);
 
             pAsmItem->setData(SOURCE_VIEW_SOURCE_COLUMN, acGTStringToQString(disasm));
@@ -2089,7 +2111,7 @@ void SourceCodeTreeModel::SetHotSpotsrcLnSamples(AMDTUInt32 counterId,
         {
             if (counterId == counter.m_counterId)
             {
-                gtVector<gtVAddr> instOffsetVec;
+                gtVector<InstOffsetSize> instOffsetVec;
                 GetInstOffsets(lineNumber, srcInfoVec, instOffsetVec);
 
                 auto sampleValuePer = counter.m_sampleCountPercentage;
@@ -2112,7 +2134,7 @@ void SourceCodeTreeModel::SetHotSpotsrcLnSamples(AMDTUInt32 counterId,
                         gtString disasm;
                         gtString codeByte;
 
-                        GetDisasmString(instOffset, srcInfoVec, disasm, codeByte);
+                        GetDisasmString(instOffset.m_offset, srcInfoVec, disasm, codeByte);
                         AMDTSampleValueVec sampleValue;
                         GetDisasmSampleValue(instOffset, functionData.m_instDataList, sampleValue);
 
@@ -2151,7 +2173,7 @@ void SourceCodeTreeModel::SetHotSpotDisamOnlySamples(AMDTUInt32 counterId,
 
     for (const auto& srcData : functionData.m_srcLineDataList)
     {
-        gtVector<gtVAddr> instOffsetVec;
+        gtVector<InstOffsetSize> instOffsetVec;
         GetInstOffsets(srcData.m_sourceLineNumber, srcInfoVec, instOffsetVec);
 
         for (auto& instOffset : instOffsetVec)
@@ -2159,7 +2181,7 @@ void SourceCodeTreeModel::SetHotSpotDisamOnlySamples(AMDTUInt32 counterId,
             gtString disasm;
             gtString codeByte;
 
-            GetDisasmString(instOffset, srcInfoVec, disasm, codeByte);
+            GetDisasmString(instOffset.m_offset, srcInfoVec, disasm, codeByte);
             AMDTSampleValueVec sampleValue;
             GetDisasmSampleValue(instOffset, functionData.m_instDataList, sampleValue);
 

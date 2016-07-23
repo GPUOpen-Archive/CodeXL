@@ -37,6 +37,11 @@
 
 #include <unordered_map>
 
+struct InstOffsetSize
+{
+    gtVAddr     m_offset = 0;
+    gtUInt32    m_size = 0;
+};
 
 class SessionDisplaySettings;
 class CpuProfileReader;
@@ -138,9 +143,9 @@ public:
                                  gtString srcFilePath,
                                  AMDTSourceAndDisasmInfoVec srcInfoVec,
                                  const std::vector<SourceViewTreeItem*>& srcLineViewTreeMap);
-    void GetInstOffsets(gtUInt16 srcLine, AMDTSourceAndDisasmInfoVec& srcInfoVec, gtVector<gtVAddr>& instOffsetVec);
+    void GetInstOffsets(gtUInt16 srcLine, AMDTSourceAndDisasmInfoVec& srcInfoVec, gtVector<InstOffsetSize>& instOffsetVec);
     void GetDisasmString(gtVAddr offset, AMDTSourceAndDisasmInfoVec& srcInfoVec, gtString& disasm, gtString& codeByte);
-    void GetDisasmSampleValue(gtVAddr offset, AMDTProfileInstructionDataVec& dataVec, AMDTSampleValueVec& sampleValue);
+    void GetDisasmSampleValue(InstOffsetSize& instInfo, AMDTProfileInstructionDataVec& dataVec, AMDTSampleValueVec& sampleValue);
     AMDTUInt64 GetFuncSrcFirstLnNum() const { return m_funcFirstSrcLine; }
     const std::vector<SourceViewTreeItem*> GetSrcLineViewMap() const { return m_srcLineViewTreeMap; }
 

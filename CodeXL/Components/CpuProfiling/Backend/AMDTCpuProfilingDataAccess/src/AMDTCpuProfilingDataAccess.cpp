@@ -2196,17 +2196,17 @@ public:
             AMDTProfileSourceLineDataVec& srcLineDataVec = functionData.m_srcLineDataList;
             AMDTProfileInstructionDataVec& instDataVec = functionData.m_instDataList;
 
-            for (auto& srcLineInfo : srcInfoVec)
+            for (auto& instData : instDataVec)
             {
-                gtUInt32 srcLine = srcLineInfo.m_sourceLine;
-                gtUInt32 offset = srcLineInfo.m_offset;
-
                 // check whether this offset has samples (in functionData.m_instDataList)
-                auto instData = std::find_if(instDataVec.begin(), instDataVec.end(),
-                    [&offset](AMDTProfileInstructionData const& iData) { return iData.m_offset == offset; });
+                auto srcData = std::find_if(srcInfoVec.begin(), srcInfoVec.end(),
+                    [&instData](AMDTSourceAndDisasmInfo const& sData)
+                    { return ((instData.m_offset >= sData.m_offset) && (instData.m_offset < (sData.m_offset + sData.m_size))); });
 
-                if (instData != instDataVec.end())
+                if (srcData != srcInfoVec.end())
                 {
+                    gtUInt32 srcLine = (*srcData).m_sourceLine;
+
                     // Check wether we have see this srcline in srcLineDataVec
                     // if so, update the profile data otherwise add a new line
                     auto slData = std::find_if(srcLineDataVec.begin(), srcLineDataVec.end(),
@@ -2216,15 +2216,15 @@ public:
                     {
                         AMDTProfileSourceLineData srcLineData;
                         srcLineData.m_sourceLineNumber = srcLine;
-                        srcLineData.m_sampleValues = instData->m_sampleValues;
+                        srcLineData.m_sampleValues = instData.m_sampleValues;
 
                         srcLineDataVec.push_back(srcLineData);
                     }
                     else
                     {
-                        for (gtUInt32 i = 0; i < instData->m_sampleValues.size(); i++)
+                        for (gtUInt32 i = 0; i < instData.m_sampleValues.size(); i++)
                         {
-                            slData->m_sampleValues[i].m_sampleCount += instData->m_sampleValues[i].m_sampleCount;
+                            slData->m_sampleValues[i].m_sampleCount += instData.m_sampleValues[i].m_sampleCount;
                         }
                     }
                 }
@@ -3206,6 +3206,7 @@ public:
                     disasmInfo.m_codeByteStr << L" ";
                 }
 
+                disasmInfo.m_size = bytesUsed;
                 ret = true;
             }
             else
