@@ -22,7 +22,7 @@
 #include "../Common/StringUtils.h"
 
 #ifdef CL_TRACE_TEST
-    #include "../../Tests/CLAPITraceTest/CLAPITraceTest.h"
+    #include "../../Non-OpenSource/Tests/CLAPITraceTest/CLAPITraceTest.h"
     #define FRIENDTESTCASE(classname) friend class CLAPITraceTest::classname##Test
     #define RETVALMIN(x,y) x <= y ? x : y
     #define REPLACEDNULLVAL(x,y) x ? NULL : y
