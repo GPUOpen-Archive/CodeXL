@@ -80,6 +80,7 @@
 
 // Static members definitions:
 IVscEventObserverOwner* vspEventObserver::_pOwner = NULL;
+gtVector<vspEventObserver*> vspEventObserver::ms_registeredObservers;
 
 // ---------------------------------------------------------------------------
 // Name:        vspEventObserver::vspEventObserver
