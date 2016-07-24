@@ -87,7 +87,6 @@ typedef enum
 typedef enum
 {
     AMDT_PWR_CATEGORY_POWER,              /**< Instantaneous power */
-	AMDT_PWR_CATEGORY_ENERGY,             /**< Energy consumed */
     AMDT_PWR_CATEGORY_FREQUENCY,          /**< Frequency  */
     AMDT_PWR_CATEGORY_TEMPERATURE,        /**< Temperature in centigrade */
     AMDT_PWR_CATEGORY_VOLTAGE,            /**< Voltage */
@@ -96,7 +95,8 @@ typedef enum
     AMDT_PWR_CATEGORY_PROCESS,            /**< PID, TID */
     AMDT_PWR_CATEGORY_TIME,               /**< Time */
     AMDT_PWR_CATEGORY_COUNT,              /**< Generic count value */
-    AMDT_PWR_CATEGORY_CNT                 /**< Total category count */
+    AMDT_PWR_CATEGORY_ENERGY,             /**< Energy consumed */
+    AMDT_PWR_CATEGORY_CNT,                /**< Total category count */
 } AMDTPwrCategory;
 
 /** Following is the list of aggregation types supported by power profiler.
