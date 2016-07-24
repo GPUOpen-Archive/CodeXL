@@ -25,6 +25,7 @@
 #include <AMDTAPIClasses/Include/Events/apFlushTextureImageEvent.h>
 #include <AMDTAPIClasses/Include/Events/apHexChangedEvent.h>
 #include <AMDTAPIClasses/Include/Events/apKernelDebuggingFailedEvent.h>
+#include <AMDTAPIClasses/Include/Events/apKernelDebuggingInterruptedEvent.h>
 #include <AMDTAPIClasses/Include/Events/apKernelWorkItemChangedEvent.h>
 #include <AMDTAPIClasses/Include/Events/apMDIViewActivatedEvent.h>
 #include <AMDTAPIClasses/Include/Events/apDeferredCommandEvent.h>
@@ -284,19 +285,26 @@ void gwEventObserver::onEvent(const apEvent& eve, bool& vetoEvent)
 
         case apEvent::AP_KERNEL_DEBUGGING_INTERRUPTED_EVENT:
         {
-            // Display a warning message about the interrupted kernel debugging:
-            QMessageBox::StandardButton userAnswer = acMessageBox::instance().question(GD_STR_KernelDebuggingInterruptedTitle,
-                                                     GD_STR_QuestionKernelDebuggingInterrupted,
-                                                     QMessageBox::Yes | QMessageBox::No);
-
-            if (userAnswer == QMessageBox::Yes)
+            const apKernelDebuggingInterruptedEvent& kernelInterruptedEvent = (const apKernelDebuggingInterruptedEvent&)eve;
+            GT_IF_WITH_ASSERT(!kernelInterruptedEvent.userDecided())
             {
-                // Temporarily disable all breakpoints so when we resume the process execution it will continue until the debugged kernel execution begins
-                gaTemporarilyDisableAllBreakpoints();
+                // Display a warning message about the interrupted kernel debugging:
+                QMessageBox::StandardButton userAnswer = acMessageBox::instance().question(GD_STR_KernelDebuggingInterruptedTitle,
+                                                         GD_STR_QuestionKernelDebuggingInterrupted,
+                                                         QMessageBox::Yes | QMessageBox::No);
 
-                // Send an event to resume debugged process after the event handling is complete
-                apDeferredCommandEvent deferredCommandEvent(apDeferredCommandEvent::AP_DEFERRED_COMMAND_RESUME_DEBUGGED_PROCESS, apDeferredCommandEvent::AP_GW_EVENT_OBSERVER);
-                apEventsHandler::instance().registerPendingDebugEvent(deferredCommandEvent);
+                bool userChoseSkip = (QMessageBox::Yes == userAnswer);
+                if (userChoseSkip)
+                {
+                    // Temporarily disable all breakpoints so when we resume the process execution it will continue until the debugged kernel execution begins
+                    gaTemporarilyDisableAllBreakpoints();
+
+                    // Send an event to resume debugged process after the event handling is complete
+                    apDeferredCommandEvent deferredCommandEvent(apDeferredCommandEvent::AP_DEFERRED_COMMAND_RESUME_DEBUGGED_PROCESS, apDeferredCommandEvent::AP_GW_EVENT_OBSERVER);
+                    apEventsHandler::instance().registerPendingDebugEvent(deferredCommandEvent);
+                }
+
+                kernelInterruptedEvent.handleUserDecision(userChoseSkip);
             }
         }
         break;

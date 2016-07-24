@@ -27,6 +27,7 @@
 #include <AMDTAPIClasses/Include/Events/apEventsHandler.h>
 #include <AMDTAPIClasses/Include/Events/apFlushTextureImageEvent.h>
 #include <AMDTAPIClasses/Include/Events/apKernelDebuggingFailedEvent.h>
+#include <AMDTAPIClasses/Include/Events/apKernelDebuggingInterruptedEvent.h>
 #include <AMDTAPIClasses/Include/Events/apKernelSourceBreakpointsUpdatedEvent.h>
 #include <AMDTAPIClasses/Include/Events/apModuleLoadedEvent.h>
 #include <AMDTAPIClasses/Include/Events/apModuleUnloadedEvent.h>
@@ -348,11 +349,6 @@ void vspEventObserver::onEvent(const apEvent& eve, bool& vetoEvent)
             // Reset the kernel debugging flag:
             _debugEngine.setIsCurrentlyKernelDebugging(false);
 
-            int exitCode = ((const apDebuggedProcessTerminatedEvent&)eve).processExitCode();
-            vspCDebugProgramDestroyEvent* pProgramDestroyEvent = new vspCDebugProgramDestroyEvent(exitCode);
-            pProgramDestroyEvent->send(_piDebugEventCallback, (IDebugEngine2*)(&_debugEngine), (IDebugProgram2*)(&_debugEngine), nullptr);
-            pProgramDestroyEvent->Release();
-
             // Go through all the existing threads and send thread destroy events:
             // NOTICE: this solves the situation where not all threads are destroyed, and debug engine is not released because of this
             // (because vspDebugThread holds the debug engine com pointer):
@@ -392,6 +388,11 @@ void vspEventObserver::onEvent(const apEvent& eve, bool& vetoEvent)
 
             // Destroy the handles in the debug engine:
             _debugEngine.onProcessTermination();
+
+            int exitCode = ((const apDebuggedProcessTerminatedEvent&)eve).processExitCode();
+            vspCDebugProgramDestroyEvent* pProgramDestroyEvent = new vspCDebugProgramDestroyEvent(exitCode);
+            pProgramDestroyEvent->send(_piDebugEventCallback, (IDebugEngine2*)(&_debugEngine), (IDebugProgram2*)(&_debugEngine), nullptr);
+            pProgramDestroyEvent->Release();
 
             // Our Debug engine implementation also represents the IDebugProcess2 interface, so we need to release it when the process dies:
             _debugEngine.Release();
@@ -539,22 +540,29 @@ void vspEventObserver::onEvent(const apEvent& eve, bool& vetoEvent)
 
         case apEvent::AP_KERNEL_DEBUGGING_INTERRUPTED_EVENT:
         {
-            // Display a warning message about the interrupted kernel debugging:
-            QMessageBox::StandardButton userAnswer = acMessageBox::instance().question(GD_STR_KernelDebuggingInterruptedTitle,
-                                                     GD_STR_QuestionKernelDebuggingInterrupted,
-                                                     QMessageBox::Yes | QMessageBox::No);
-
-            if (userAnswer == QMessageBox::Yes)
+            const apKernelDebuggingInterruptedEvent& kernelInterruptedEvent = (const apKernelDebuggingInterruptedEvent&)eve;
+            GT_IF_WITH_ASSERT(!kernelInterruptedEvent.userDecided())
             {
-                // Temporarily disable all breakpoints so when we resume the process execution it will continue until the debugged kernel execution begins
-                gaTemporarilyDisableAllBreakpoints();
+                // Display a warning message about the interrupted kernel debugging:
+                QMessageBox::StandardButton userAnswer = acMessageBox::instance().question(GD_STR_KernelDebuggingInterruptedTitle,
+                                                         GD_STR_QuestionKernelDebuggingInterrupted,
+                                                         QMessageBox::Yes | QMessageBox::No);
 
-                // Send an event to resume debugged process after the event handling is complete
-                apDeferredCommandEvent deferredCommandEvent(apDeferredCommandEvent::AP_DEFERRED_COMMAND_RESUME_DEBUGGED_PROCESS, apDeferredCommandEvent::AP_VSP_EVENT_OBSERVER);
-                apEventsHandler::instance().registerPendingDebugEvent(deferredCommandEvent);
+                bool userChoseSkip = (QMessageBox::Yes == userAnswer);
+                if (userChoseSkip)
+                {
+                    // Temporarily disable all breakpoints so when we resume the process execution it will continue until the debugged kernel execution begins
+                    gaTemporarilyDisableAllBreakpoints();
 
-                // Show a waiting dialog:
-                showDeferredCommandDialog(GD_STR_resumingDebuggedApplication);
+                    // Send an event to resume debugged process after the event handling is complete
+                    apDeferredCommandEvent deferredCommandEvent(apDeferredCommandEvent::AP_DEFERRED_COMMAND_RESUME_DEBUGGED_PROCESS, apDeferredCommandEvent::AP_VSP_EVENT_OBSERVER);
+                    apEventsHandler::instance().registerPendingDebugEvent(deferredCommandEvent);
+
+                    // Show a waiting dialog:
+                    showDeferredCommandDialog(GD_STR_resumingDebuggedApplication);
+                }
+
+                kernelInterruptedEvent.handleUserDecision(userChoseSkip);
             }
         }
         break;

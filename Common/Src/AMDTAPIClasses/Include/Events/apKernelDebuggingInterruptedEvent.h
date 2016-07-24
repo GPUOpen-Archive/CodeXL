@@ -36,6 +36,20 @@ public:
     // Overrides apEvent:
     virtual EventType eventType() const;
     virtual apEvent* clone() const;
+
+    void handleUserDecision(bool shouldSkip) const { m_userChoice = (shouldSkip ? AP_USER_CHOSE_SKIP : AP_USER_CHOSE_STOP); };
+    bool userDecided() const { return (AP_USER_NOT_DECIDED != m_userChoice); };
+    bool shouldSkip() const { return (AP_USER_CHOSE_SKIP == m_userChoice); };
+
+    enum apKernelDebuggingInterruptionStatus
+    {
+        AP_USER_NOT_DECIDED,
+        AP_USER_CHOSE_SKIP,
+        AP_USER_CHOSE_STOP,
+    };
+
+private:
+    mutable apKernelDebuggingInterruptionStatus m_userChoice;
 };
 
 
