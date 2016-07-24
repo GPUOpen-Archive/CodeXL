@@ -3861,11 +3861,6 @@ bool pdLinuxProcessDebugger::getHostLocals(osThreadId threadId, int callStackFra
 
 bool pdLinuxProcessDebugger::getHostExpressionValue(osThreadId threadId, int callStackFrameIndex, const gtString& expressionText, int evaluationDepth, apExpression& o_exp)
 {
-    if (0 == evaluationDepth)
-    {
-        return true;
-    }
-
     gtASCIIString parametersString = "";
     bool returnResult = false;
     bool suspendBefore = true;
