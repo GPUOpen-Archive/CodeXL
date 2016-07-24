@@ -590,6 +590,11 @@ beKA::beStatus beProgramBuilderOpenCL::GetKernels(const std::string& device, std
             const string kernelPrefixHsail("__OpenCL_&__OpenCL_");
             const string kernelSuffixHsail("_kernel_metadata");
 
+            // Apparently there is a new variant for the format of the ELF symbol name, 
+            // when AMDIL compilation path is used.
+            const string kernelSuffixAmdilAlternative("_binary");
+            const string kernelPrefixAmdilAlternative("__ISA_");
+
             if (elf.GetSection(".text") == NULL)
             {
                 if (elf.GetSection(".amdil") != NULL)
@@ -625,6 +630,12 @@ beKA::beStatus beProgramBuilderOpenCL::GetKernels(const std::string& device, std
                 {
                     // Fallback to the HSAIL (BIF) scenario.
                     kernels.push_back(name.substr(kernelPrefixHsail.size(), name.length() - kernelPrefixHsail.size() - kernelSuffixHsail.size()));
+                }
+                else if (name.substr(0, kernelPrefixAmdilAlternative.size()) == kernelPrefixAmdilAlternative &&
+                    name.substr(name.length() - kernelSuffixAmdilAlternative.size(), kernelSuffixAmdilAlternative.size()) == kernelSuffixAmdilAlternative)
+                {
+                    // Fallback to using the alternative symbol names for AMDIL.
+                    kernels.push_back(name.substr(kernelPrefixAmdilAlternative.size(), name.length() - kernelPrefixAmdilAlternative.size() - kernelSuffixAmdilAlternative.size()));
                 }
             }
         }
@@ -1043,6 +1054,21 @@ beKA::beStatus beProgramBuilderOpenCL::GetKernelILText(const std::string& device
             std::string amdilName;
             amdilName = "__OpenCL_" + kernel + "_amdil";
             ret = GetKernelSectionText(device, amdilName, il);
+
+            if (ret != beKA::beStatus_SUCCESS)
+            {
+                // Retry with an alternative name.
+                amdilName = "__AMDIL_" + kernel + "_text";
+                ret = GetKernelSectionText(device, amdilName, il);
+                
+                if (ret != beKA::beStatus_SUCCESS && m_NameDeviceTypeMap[device] == CL_DEVICE_TYPE_GPU)
+                {
+                    // Inform the user about the failure. CPUs are ignored.
+                    stringstream ss;
+                    ss << "Error: No IL for device \'" << device << "\'.\n";
+                    LogCallBack(ss.str());
+                }
+            }
         }
     }
 
@@ -1081,15 +1107,6 @@ beKA::beStatus beProgramBuilderOpenCL::GetKernelSectionText(const std::string& d
 
             if (symIt == symtab.SymbolsEnd())
             {
-                // Don't give a log message about not having IL for CPU.
-                // Just return the right status.
-                if (m_NameDeviceTypeMap[device] == CL_DEVICE_TYPE_GPU)
-                {
-                    stringstream ss;
-                    ss << "Error: No IL for device \'" << device << "\'.\n";
-                    LogCallBack(ss.str());
-                }
-
                 retVal = beKA::beStatus_NO_IL_FOR_DEVICE;
             }
 
