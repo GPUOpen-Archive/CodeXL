@@ -106,7 +106,7 @@ void pdProcessDebuggersManager::adjustProcessDebuggerToProcessCreationData(const
 
             if (pCurrentProcessDebugger != NULL)
             {
-                theEventsHandler.unregisterEventsObserver(*pCurrentProcessDebugger);
+                theEventsHandler.unregisterEventsObserver(*pCurrentProcessDebugger, false);
 
                 // Process debuggers also listen to events registration:
                 theEventsHandler.unregisterEventsRegistrationObserver(*pCurrentProcessDebugger);

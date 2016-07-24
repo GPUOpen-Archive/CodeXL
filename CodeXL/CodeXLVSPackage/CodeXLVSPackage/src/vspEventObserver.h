@@ -56,6 +56,8 @@ private:
     IDebugEventCallback2* _piDebugEventCallback;
     acProgressDlg* m_pWaitingForDeferredCommandDlg;
 
+    static gtVector<vspEventObserver*> ms_registeredObservers;
+
     static IVscEventObserverOwner* _pOwner;
 };
 

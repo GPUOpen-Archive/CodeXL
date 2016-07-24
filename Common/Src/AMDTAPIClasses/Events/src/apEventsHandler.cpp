@@ -175,8 +175,10 @@ void apEventsHandler::registerEventsObserver(apIEventsObserver& observer, apEven
 //  caused a crash when an observer called unregisterEventsObserver from an
 //  observer callback function.
 // ---------------------------------------------------------------------------
-void apEventsHandler::unregisterEventsObserver(apIEventsObserver& observer)
+void apEventsHandler::unregisterEventsObserver(apIEventsObserver& observer, bool assertOnFail)
 {
+    bool observerFound = false;
+
     // Iterate the observer priorities:
     for (int pri = 0; pri < AP_NUMBER_OF_EVENTS_HANDLING_PRIORITIES; pri++)
     {
@@ -194,14 +196,16 @@ void apEventsHandler::unregisterEventsObserver(apIEventsObserver& observer)
                 // Remove its registration:
                 rpCurrentObserver = NULL;
 
+                observerFound = true;
+
                 // Exit the loop:
                 break;
             }
         }
     }
 
-    // The process debuggers manager unregisters all process debuggers periodically, so don't assert here:
-    // GT_ASSERT(observerFound);
+    // The process debuggers manager unregisters all process debuggers periodically, so don't assert here in that case:
+    GT_ASSERT(observerFound || !assertOnFail);
 }
 
 // ---------------------------------------------------------------------------

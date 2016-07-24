@@ -99,8 +99,26 @@ vspEventObserver::vspEventObserver(vspCDebugEngine& debugEngine, IDebugEventCall
     // vspCDebugEngineCreateEvent Should theoretically be sent here, but since the debug engine has not
     // yet finished construction, this causes all sorts of issues.
 
+    // To avoid double handling of events, make sure no event observers are registered:
+    apEventsHandler& theEventsHandler = apEventsHandler::instance();
+    if (0 < ms_registeredObservers.size())
+    {
+        GT_ASSERT(false);
+        for (vspEventObserver* pObs : ms_registeredObservers)
+        {
+            GT_IF_WITH_ASSERT(nullptr != pObs)
+            {
+                // Only I am allowed to remain:
+                theEventsHandler.unregisterEventsObserver(*pObs);
+            }
+        }
+    }
+
     // Register as an events observer:
-    apEventsHandler::instance().registerEventsObserver(*this, AP_APPLICATION_COMPONENTS_EVENTS_HANDLING_PRIORITY);
+    theEventsHandler.registerEventsObserver(*this, AP_APPLICATION_COMPONENTS_EVENTS_HANDLING_PRIORITY);
+
+    // My event observer registered itself when created:
+    ms_registeredObservers.push_back(this);
 }
 
 // ---------------------------------------------------------------------------
@@ -111,6 +129,30 @@ vspEventObserver::vspEventObserver(vspCDebugEngine& debugEngine, IDebugEventCall
 // ---------------------------------------------------------------------------
 vspEventObserver::~vspEventObserver()
 {
+    // Remove me from the observers vector:
+    bool foundMe = false;
+    int numberOfObservers = (int)ms_registeredObservers.size();
+    GT_ASSERT(1 == numberOfObservers);
+    for (int i = 0; numberOfObservers > i; ++i)
+    {
+        if (foundMe)
+        {
+            // This can only happen with i >=1
+            ms_registeredObservers[i - 1] = ms_registeredObservers[i];
+        }
+        else if (ms_registeredObservers[i] == this)
+        {
+            foundMe = true;
+        }
+    }
+
+    GT_IF_WITH_ASSERT(foundMe)
+    {
+        // Remove the last item from the vector, it is (normally) my pointer or
+        // (in error / leak cases) a duplicate pointer that was moved:
+        ms_registeredObservers.pop_back();
+    }
+
     // Register as an events observer:
     apEventsHandler::instance().unregisterEventsObserver(*this);
 

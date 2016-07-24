@@ -64,7 +64,7 @@ public:
 
     // Enables clients to listen to events:
     void registerEventsObserver(apIEventsObserver& observer, apEventsHandlingPriority priority);
-    void unregisterEventsObserver(apIEventsObserver& observer);
+    void unregisterEventsObserver(apIEventsObserver& observer, bool assertOnFail = true);
 
     // Enables clients to listen to the registration of events:
     void registerEventsRegistrationObserver(apIEventsObserver& observer);
