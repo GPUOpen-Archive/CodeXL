@@ -200,6 +200,9 @@ public:
     bool setKernelDebuggingEnable(bool kernelDebugging);
     bool setMultipleKernelDebugDispatchMode(apMultipleKernelDebuggingDispatchMode mode);
 
+    // HSA kernel debugging:
+    bool isInHSAKernelDebugging() const { return m_isInHSAKernelDebugging; };
+
     // OpenGL Debug output setting:
     bool enableGLDebugOutputLogging(bool enableGLDebugOutputLogging);
     void getGLDebugOutputLoggingStatus(bool& glDebugOutputLoggingEnabled) const { glDebugOutputLoggingEnabled = _GLDebugOutputLoggingEnabled; };
@@ -381,7 +384,7 @@ private:
     // (Active when _isOpenGLRasterModeForced is true):
     apRasterMode _forcedOpenGLRasterMode;
 
-    // Kernel debugging:
+    // OpenCL Kernel debugging:
     bool _waitingForKernelDebuggingToStart;
     bool _kernelDebuggingInterruptedWarningIssued;
     bool _isInKernelDebugging;
@@ -392,6 +395,9 @@ private:
     int _kernelDebuggingCurrentWorkItem[3];
     osThreadId _kernelDebuggingThreadId;
     gtVector<osFilePath> _kernelSourceCodePaths;
+
+    // HSA kernel debugging:
+    bool m_isInHSAKernelDebugging;
 
     // Contains true iff we the GL Debug Output integration is enabled:
     bool _GLDebugOutputLoggingEnabled;

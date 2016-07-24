@@ -103,6 +103,7 @@ gaPersistentDataManager::gaPersistentDataManager()
       _isInKernelDebugging(false),
       m_isInKernelDebuggingBreakpoint(false),
       _kernelDebuggingThreadId(OS_NO_THREAD_ID),
+      m_isInHSAKernelDebugging(false),
       _GLDebugOutputLoggingEnabled(false),
       m_debugOutputKindsMask(0),
       _isAPIConnectionEstablished(false),
@@ -2442,6 +2443,7 @@ void gaPersistentDataManager::onEvent(const apEvent& eve, bool& vetoEvent)
             onProcessTerminatedEvent();
             _isInKernelDebugging = false;
             m_isInKernelDebuggingBreakpoint = false;
+            m_isInHSAKernelDebugging = false;
             _kernelDebuggingThreadId = OS_NO_THREAD_ID;
             _waitingForKernelDebuggingToStart = false;
             _kernelDebuggingInterruptedWarningIssued = false;
@@ -2524,23 +2526,41 @@ void gaPersistentDataManager::onEvent(const apEvent& eve, bool& vetoEvent)
         case apEvent::AP_BEFORE_KERNEL_DEBUGGING_EVENT:
         {
             const apBeforeKernelDebuggingEvent& beforeKernelDebuggingEvent = (const apBeforeKernelDebuggingEvent&)eve;
-            _kernelDebuggingGlobalWorkOffset[0] = (int)beforeKernelDebuggingEvent.globalWorkOffsetX();
-            _kernelDebuggingGlobalWorkOffset[1] = (int)beforeKernelDebuggingEvent.globalWorkOffsetY();
-            _kernelDebuggingGlobalWorkOffset[2] = (int)beforeKernelDebuggingEvent.globalWorkOffsetZ();
-            _kernelDebuggingGlobalWorkSize[0] = (int)beforeKernelDebuggingEvent.globalWorkSizeX();
-            _kernelDebuggingGlobalWorkSize[1] = (int)beforeKernelDebuggingEvent.globalWorkSizeY();
-            _kernelDebuggingGlobalWorkSize[2] = (int)beforeKernelDebuggingEvent.globalWorkSizeZ();
-            _kernelDebuggingLocalWorkSize[0] = (int)beforeKernelDebuggingEvent.localWorkSizeX();
-            _kernelDebuggingLocalWorkSize[1] = (int)beforeKernelDebuggingEvent.localWorkSizeY();
-            _kernelDebuggingLocalWorkSize[2] = (int)beforeKernelDebuggingEvent.localWorkSizeZ();
-            _kernelDebuggingCurrentWorkItem[0] = (int)beforeKernelDebuggingEvent.globalWorkOffsetX();
-            _kernelDebuggingCurrentWorkItem[1] = (int)beforeKernelDebuggingEvent.globalWorkOffsetY();
-            _kernelDebuggingCurrentWorkItem[2] = (int)beforeKernelDebuggingEvent.globalWorkOffsetZ();
-            _isInKernelDebugging = true;
-            _kernelDebuggingEnteredAtLeastOnce = true;
-            _kernelDebuggingThreadId = beforeKernelDebuggingEvent.triggeringThreadId();
-            _waitingForKernelDebuggingToStart = false;
-            _kernelDebuggingInterruptedWarningIssued = false;
+            switch (beforeKernelDebuggingEvent.debuggingType())
+            {
+            case apBeforeKernelDebuggingEvent::AP_OPENCL_SOFTWARE_KERNEL_DEBUGGING:
+                {
+                    // Data relevant to OpenCL kernel debugging:
+                    _kernelDebuggingGlobalWorkOffset[0] = (int)beforeKernelDebuggingEvent.globalWorkOffsetX();
+                    _kernelDebuggingGlobalWorkOffset[1] = (int)beforeKernelDebuggingEvent.globalWorkOffsetY();
+                    _kernelDebuggingGlobalWorkOffset[2] = (int)beforeKernelDebuggingEvent.globalWorkOffsetZ();
+                    _kernelDebuggingGlobalWorkSize[0] = (int)beforeKernelDebuggingEvent.globalWorkSizeX();
+                    _kernelDebuggingGlobalWorkSize[1] = (int)beforeKernelDebuggingEvent.globalWorkSizeY();
+                    _kernelDebuggingGlobalWorkSize[2] = (int)beforeKernelDebuggingEvent.globalWorkSizeZ();
+                    _kernelDebuggingLocalWorkSize[0] = (int)beforeKernelDebuggingEvent.localWorkSizeX();
+                    _kernelDebuggingLocalWorkSize[1] = (int)beforeKernelDebuggingEvent.localWorkSizeY();
+                    _kernelDebuggingLocalWorkSize[2] = (int)beforeKernelDebuggingEvent.localWorkSizeZ();
+                    _kernelDebuggingCurrentWorkItem[0] = (int)beforeKernelDebuggingEvent.globalWorkOffsetX();
+                    _kernelDebuggingCurrentWorkItem[1] = (int)beforeKernelDebuggingEvent.globalWorkOffsetY();
+                    _kernelDebuggingCurrentWorkItem[2] = (int)beforeKernelDebuggingEvent.globalWorkOffsetZ();
+                    _isInKernelDebugging = true;
+                    _kernelDebuggingEnteredAtLeastOnce = true;
+                    _kernelDebuggingThreadId = beforeKernelDebuggingEvent.triggeringThreadId();
+                    _waitingForKernelDebuggingToStart = false;
+                    _kernelDebuggingInterruptedWarningIssued = false;
+                }
+                break;
+            case apBeforeKernelDebuggingEvent::AP_HSA_HARDWARE_KERNEL_DEBUGGING:
+                {
+                    // Data relevant to HSA kernel debugging:
+                    m_isInHSAKernelDebugging = true;
+                }
+                break;
+            default:
+                // Unexpected value!
+                GT_ASSERT(false);
+                break;
+            }
         }
         break;
 
@@ -2553,6 +2573,7 @@ void gaPersistentDataManager::onEvent(const apEvent& eve, bool& vetoEvent)
             _kernelDebuggingThreadId = OS_NO_THREAD_ID;
             _waitingForKernelDebuggingToStart = false;
             _kernelDebuggingInterruptedWarningIssued = false;
+            m_isInHSAKernelDebugging = false;
         }
         break;
 

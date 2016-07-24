@@ -549,6 +549,7 @@ public:
     virtual bool gaGetCrashReportAdditionalInformation(bool& openCLEnglineLoaded, bool& openGLEnglineLoaded, bool& kernelDebuggingEnteredAtLeastOnce);
 
     // HSA debugging:
+    virtual bool gaIsInHSAKernelDebugging();
     virtual bool gaIsInHSAKernelBreakpoint();
     virtual bool gaHSAGetCurrentLine(gtUInt64& line, gtUInt64& addr);
     virtual bool gaHSAGetSourceFilePath(osFilePath& srcPath, gtString& kernelName);
@@ -977,6 +978,7 @@ GA_API bool gaIsHexDisplayMode();
 GA_API bool gaGetCrashReportAdditionalInformation(bool& openCLEnglineLoaded, bool& openGLEnglineLoaded, bool& kernelDebuggingEnteredAtLeastOnce);
 
 // HSA debugging:
+GA_API bool gaIsInHSAKernelDebugging();
 GA_API bool gaIsInHSAKernelBreakpoint();
 GA_API bool gaHSAGetCurrentLine(gtUInt64& line, gtUInt64& addr);
 GA_API bool gaHSAGetSourceFilePath(osFilePath& srcPath, gtString& kernelName);

@@ -369,6 +369,7 @@ private:
 
     // Flags related to the various steps in kernel debugging::
     bool _isDuringKernelDebugging;
+    bool m_isDuringHSAKernelDebugging;
 
     // Will get true iff we are during a debugged process suspension that was caused
     // by a fatal signal received by the debugged process:

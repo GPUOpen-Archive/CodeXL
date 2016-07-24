@@ -2325,7 +2325,7 @@ void csAMDKernelDebuggingManager::onKernelDebuggingStartedBreakpoint(amdclDebugC
                                      (globalWorkSizeFromSession[2] > 0) ? (gtSize_t)localWorkSizeFromSession[2] : 1
                                     };
 
-        apBeforeKernelDebuggingEvent beforeKernelDebuggingEvent(currentThreadId, currentlyDebuggedKernelWorkDimension(), globalWorkOffset, globalWorkSize, localWorkSize);
+        apBeforeKernelDebuggingEvent beforeKernelDebuggingEvent(apBeforeKernelDebuggingEvent::AP_OPENCL_SOFTWARE_KERNEL_DEBUGGING, currentThreadId, currentlyDebuggedKernelWorkDimension(), globalWorkOffset, globalWorkSize, localWorkSize);
         bool rcEve = suForwardEventToClient(beforeKernelDebuggingEvent);
         GT_ASSERT(rcEve);
 

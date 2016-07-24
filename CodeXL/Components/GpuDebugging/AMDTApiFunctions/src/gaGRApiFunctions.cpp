@@ -11560,6 +11560,13 @@ bool gaGRApiFunctions::gaGetCrashReportAdditionalInformation(bool& openCLEngline
     return retVal;
 }
 
+bool gaGRApiFunctions::gaIsInHSAKernelDebugging()
+{
+    bool retVal = gaPersistentDataManager::instance().isInHSAKernelDebugging();
+
+    return retVal;
+}
+
 bool gaGRApiFunctions::gaIsInHSAKernelBreakpoint()
 {
     bool retVal = false;
@@ -12564,6 +12571,7 @@ GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaIsHexDisplayMode, bool, (), 
 GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaGetCrashReportAdditionalInformation, bool, (bool& openCLEnglineLoaded, bool& openGLEnglineLoaded, bool& kernelDebuggingEnteredAtLeastOnce), (openCLEnglineLoaded, openGLEnglineLoaded, kernelDebuggingEnteredAtLeastOnce));
 
 // HSA Debugging:
+GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaIsInHSAKernelDebugging, bool, (), ());
 GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaIsInHSAKernelBreakpoint, bool, (), ());
 GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaHSAGetCurrentLine, bool, (gtUInt64& line, gtUInt64& addr), (line, addr));
 GA_CONNECT_API_FUNCTION_WRAPPER_TO_GRAPIFUNCTIONS(gaHSAGetSourceFilePath, bool, (osFilePath& srcPath, gtString& kernelName), (srcPath, kernelName));

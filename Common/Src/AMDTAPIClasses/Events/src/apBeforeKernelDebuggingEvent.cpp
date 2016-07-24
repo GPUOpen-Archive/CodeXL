@@ -21,8 +21,8 @@
 // Author:  AMD Developer Tools Team
 // Date:        28/10/2010
 // ---------------------------------------------------------------------------
-apBeforeKernelDebuggingEvent::apBeforeKernelDebuggingEvent(osThreadId triggeringThreadID, unsigned int workDimension, const gtSize_t* globalWorkOffset, const gtSize_t* globalWorkSize, const gtSize_t* localWorkSize)
-    : apEvent(triggeringThreadID)
+apBeforeKernelDebuggingEvent::apBeforeKernelDebuggingEvent(apKernelDebuggingType debuggingType, osThreadId triggeringThreadID, unsigned int workDimension, const gtSize_t* globalWorkOffset, const gtSize_t* globalWorkSize, const gtSize_t* localWorkSize)
+    : apEvent(triggeringThreadID), m_debuggingType(debuggingType)
 {
     bool isXValid = (workDimension > 0);
     bool isYValid = (workDimension > 1);
@@ -94,6 +94,9 @@ bool apBeforeKernelDebuggingEvent::writeSelfIntoChannel(osChannel& ipcChannel) c
     // Call my parent class's version of this function:
     bool retVal = apEvent::writeSelfIntoChannel(ipcChannel);
 
+    // Write the debugging type:
+    ipcChannel << (gtInt32)m_debuggingType;
+
     // Write the global work offset:
     ipcChannel << (gtUInt64)_globalWorkOffset[0];
     ipcChannel << (gtUInt64)_globalWorkOffset[1];
@@ -136,6 +139,11 @@ bool apBeforeKernelDebuggingEvent::readSelfFromChannel(osChannel& ipcChannel)
 {
     // Call my parent class's version of this function:
     bool retVal = apEvent::readSelfFromChannel(ipcChannel);
+
+    // Read the debugging type:
+    gtInt32 debuggingTypeAsInt32 = -1;
+    ipcChannel >> debuggingTypeAsInt32;
+    m_debuggingType = (apKernelDebuggingType)debuggingTypeAsInt32;
 
     // Read the global work offset:
     gtUInt64 globalWorkOffset0AsUInt64 = GT_UINT64_MAX;
@@ -206,8 +214,7 @@ apEvent::EventType apBeforeKernelDebuggingEvent::eventType() const
 // ---------------------------------------------------------------------------
 apEvent* apBeforeKernelDebuggingEvent::clone() const
 {
-    apBeforeKernelDebuggingEvent* pClone = new apBeforeKernelDebuggingEvent(triggeringThreadId(), 3, _globalWorkOffset, _globalWorkSize, _localWorkSize);
-
+    apBeforeKernelDebuggingEvent* pClone = new apBeforeKernelDebuggingEvent(m_debuggingType, triggeringThreadId(), 3, _globalWorkOffset, _globalWorkSize, _localWorkSize);
 
     return pClone;
 }

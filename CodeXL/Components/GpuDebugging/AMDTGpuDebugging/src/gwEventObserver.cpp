@@ -18,7 +18,6 @@
 #include <AMDTOSWrappers/Include/osCallStack.h>
 #include <AMDTOSWrappers/Include/osDebugLog.h>
 #include <AMDTAPIClasses/Include/Events/apAddWatchEvent.h>
-#include <AMDTAPIClasses/Include/Events/apAfterKernelDebuggingEvent.h>
 #include <AMDTAPIClasses/Include/Events/apBeforeKernelDebuggingEvent.h>
 #include <AMDTAPIClasses/Include/Events/apDebuggedProcessRunSuspendedEvent.h>
 #include <AMDTAPIClasses/Include/Events/apEventsHandler.h>
@@ -144,10 +143,10 @@ void gwEventObserver::onEvent(const apEvent& eve, bool& vetoEvent)
                 gwKernelWorkItemToolbar* pKernelWorkItemsToolbar = gwgDEBuggerAppWrapper::kernelWorkItemToolbar();
                 GT_IF_WITH_ASSERT(pKernelWorkItemsToolbar != NULL)
                 {
-                    pKernelWorkItemsToolbar->onAfterKernelDebuggingEvent((const apAfterKernelDebuggingEvent&)eve);
+                    pKernelWorkItemsToolbar->onAfterKernelDebuggingEvent();
                 }
-                updateWIToolbar(true, true);
 
+                updateWIToolbar(true, true);
             }
         }
         break;
@@ -256,7 +255,7 @@ void gwEventObserver::onEvent(const apEvent& eve, bool& vetoEvent)
             gwKernelWorkItemToolbar* pKernelWorkItemsToolbar = gwgDEBuggerAppWrapper::kernelWorkItemToolbar();
             GT_IF_WITH_ASSERT(pKernelWorkItemsToolbar != NULL)
             {
-                pKernelWorkItemsToolbar->onAfterKernelDebuggingEvent((const apAfterKernelDebuggingEvent&)eve);
+                pKernelWorkItemsToolbar->onAfterKernelDebuggingEvent();
             }
             updateWIToolbar(false, true);
         }

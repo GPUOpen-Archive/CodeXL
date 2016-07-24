@@ -26,6 +26,8 @@
 #include <AMDTOSWrappers/Include/osSocket.h>
 #include <AMDTOSWrappers/Include/osStringConstants.h>
 #include <AMDTOSWrappers/Include/osThread.h>
+#include <AMDTAPIClasses/Include/Events/apAfterKernelDebuggingEvent.h>
+#include <AMDTAPIClasses/Include/Events/apBeforeKernelDebuggingEvent.h>
 #include <AMDTAPIClasses/Include/Events/apKernelDebuggingFailedEvent.h>
 #include <AMDTServerUtilities/Include/suBreakpointsManager.h>
 #include <AMDTServerUtilities/Include/suSpyAPIFunctions.h>
@@ -551,9 +553,17 @@ bool hsDebuggingManager::StartDebugging(void* hDebugContext, const gtString& ker
         firstTime = false;
     }
 
-    // Send an error event to the client:
-    if (!retVal && sendFailMessage)
+    if (retVal)
     {
+        // Send a "before kernel debugging" event to the client:
+        osThreadId currentThreadId = osGetCurrentThreadId();
+        apBeforeKernelDebuggingEvent beforeKernelDebuggingEvent(apBeforeKernelDebuggingEvent::AP_HSA_HARDWARE_KERNEL_DEBUGGING, currentThreadId);
+        bool rcEve = suForwardEventToClient(beforeKernelDebuggingEvent);
+        GT_ASSERT(rcEve);
+    }
+    else if (sendFailMessage)
+    {
+        // Send an error event to the client:
         apKernelDebuggingFailedEvent failedEve(apKernelDebuggingFailedEvent::AP_KERNEL_DEBUG_FAILURE, CL_SUCCESS, osGetCurrentThreadId(), errMsg);
         bool rcFailEve = suForwardEventToClient(failedEve);
         GT_ASSERT(rcFailEve);
@@ -900,6 +910,12 @@ int hsDebuggingManager::hsDebugEventThread::entryPoint()
     }
 
     m_hDebugContext = nullptr;
+
+    // Send an "after kernel debugging" event to the client:
+    osThreadId currentThreadId = osGetCurrentThreadId();
+    apAfterKernelDebuggingEvent afterKernelDebuggingEvent(currentThreadId);
+    bool rcEve = suForwardEventToClient(afterKernelDebuggingEvent);
+    GT_ASSERT(rcEve);
 
     HwDbgStatus rcEnd = HwDbgEndDebugContext(hDbgCtx);
     GT_ASSERT(HWDBG_STATUS_SUCCESS == rcEnd);

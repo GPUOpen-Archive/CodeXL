@@ -25,7 +25,14 @@
 class AP_API apBeforeKernelDebuggingEvent : public apEvent
 {
 public:
-    apBeforeKernelDebuggingEvent(osThreadId triggeringThreadID = OS_NO_THREAD_ID, unsigned int workDimension = 0, const gtSize_t* globalWorkOffset = NULL, const gtSize_t* globalWorkSize = NULL, const gtSize_t* localWorkSize = NULL);
+    enum apKernelDebuggingType
+    {
+        AP_OPENCL_SOFTWARE_KERNEL_DEBUGGING,
+        AP_HSA_HARDWARE_KERNEL_DEBUGGING,
+    };
+
+public:
+    apBeforeKernelDebuggingEvent(apKernelDebuggingType debuggingType = AP_OPENCL_SOFTWARE_KERNEL_DEBUGGING, osThreadId triggeringThreadID = OS_NO_THREAD_ID, unsigned int workDimension = 0, const gtSize_t* globalWorkOffset = NULL, const gtSize_t* globalWorkSize = NULL, const gtSize_t* localWorkSize = NULL);
     ~apBeforeKernelDebuggingEvent();
 
     // Overrides osTransferableObject:
@@ -36,6 +43,8 @@ public:
     // Overrides apEvent:
     virtual EventType eventType() const;
     virtual apEvent* clone() const;
+
+    apKernelDebuggingType debuggingType() const { return m_debuggingType; };
 
     gtSize_t globalWorkOffsetX() const {return _globalWorkOffset[0];};
     gtSize_t globalWorkOffsetY() const {return _globalWorkOffset[1];};
@@ -48,6 +57,7 @@ public:
     gtSize_t localWorkSizeZ() const {return _localWorkSize[2];};
 
 private:
+    apKernelDebuggingType m_debuggingType;
     gtSize_t _globalWorkOffset[3];
     gtSize_t _globalWorkSize[3];
     gtSize_t _localWorkSize[3];

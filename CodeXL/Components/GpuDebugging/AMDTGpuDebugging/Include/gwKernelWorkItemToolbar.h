@@ -15,10 +15,6 @@
 #include <QComboBox>
 #include <QLabel>
 
-// Forward declaration:
-class apBeforeKernelDebuggingEvent;
-class apAfterKernelDebuggingEvent;
-
 // Infra:
 #include <AMDTApplicationComponents/Include/acToolBar.h>
 
@@ -55,7 +51,7 @@ public:
     void updateToolbarValues();
     void resetTooblarValues(bool rebuildThreadValues, bool rebuildWIValues);
 
-    void onAfterKernelDebuggingEvent(const apAfterKernelDebuggingEvent& event);
+    void onAfterKernelDebuggingEvent();
 
 protected slots:
     void comboSelectionChange(int selectedItemIndex);

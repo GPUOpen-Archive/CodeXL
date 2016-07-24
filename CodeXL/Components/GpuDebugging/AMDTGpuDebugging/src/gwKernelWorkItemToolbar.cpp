@@ -17,8 +17,6 @@
 // Infra:
 #include <AMDTBaseTools/Include/gtASCIIString.h>
 #include <AMDTBaseTools/Include/gtAssert.h>
-#include <AMDTAPIClasses/Include/Events/apAfterKernelDebuggingEvent.h>
-#include <AMDTAPIClasses/Include/Events/apBeforeKernelDebuggingEvent.h>
 #include <AMDTAPIClasses/Include/Events/apEventsHandler.h>
 #include <AMDTAPIClasses/Include/Events/apKernelWorkItemChangedEvent.h>
 #include <AMDTApplicationComponents/Include/acDefinitions.h>
@@ -435,9 +433,8 @@ void gwKernelWorkItemToolbar::updateToolbarWorkItemValues()
 // Author:      Sigal Algranaty
 // Date:        15/9/2011
 // ---------------------------------------------------------------------------
-void gwKernelWorkItemToolbar::onAfterKernelDebuggingEvent(const apAfterKernelDebuggingEvent& event)
+void gwKernelWorkItemToolbar::onAfterKernelDebuggingEvent()
 {
-    (void)(event); // unused
     // Disable the WI combos:
     m_areWIComboBoxesEnabled[0] = false;
     m_areWIComboBoxesEnabled[1] = false;

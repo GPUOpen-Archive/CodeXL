@@ -34,6 +34,7 @@
 #include <AMDTOSWrappers/Include/osThread.h>
 #include <AMDTAPIClasses/Include/Events/apEventsHandler.h>
 #include <AMDTAPIClasses/Include/Events/apBreakpointHitEvent.h>
+#include <AMDTAPIClasses/Include/Events/apBeforeKernelDebuggingEvent.h>
 #include <AMDTAPIClasses/Include/Events/apDebuggedProcessRunResumedEvent.h>
 #include <AMDTAPIClasses/Include/Events/apDebuggedProcessRunStartedEvent.h>
 #include <AMDTAPIClasses/Include/Events/apDebuggedProcessRunSuspendedEvent.h>
@@ -1196,15 +1197,47 @@ void pdLinuxProcessDebugger::onEventRegistration(apEvent& eve, bool& vetoEvent)
     // can ignore the breakpoints that immediately follow them:
     if (eventType == apEvent::AP_BEFORE_KERNEL_DEBUGGING_EVENT)
     {
-        // Kernel debugging is about to start, mark this:
-        _gdbDriver.kernelDebuggingAboutToStart();
-        _isDuringKernelDebugging = true;
+        // Make sure only one flag is raised:
+        GT_ASSERT((!_isDuringKernelDebugging) && (!m_isDuringHSAKernelDebugging));
+
+        // Get the debugging type:
+        const apBeforeKernelDebuggingEvent& beforeKernelDebuggingEvent = (const apBeforeKernelDebuggingEvent&)eve;
+        switch (beforeKernelDebuggingEvent.debuggingType())
+        {
+        case apBeforeKernelDebuggingEvent::AP_OPENCL_SOFTWARE_KERNEL_DEBUGGING:
+            {
+                // Kernel debugging is about to start, mark this:
+                _gdbDriver.kernelDebuggingAboutToStart();
+                _isDuringKernelDebugging = true;
+            }
+            break;
+        case apBeforeKernelDebuggingEvent::AP_HSA_HARDWARE_KERNEL_DEBUGGING:
+            {
+                // Nothing to do, HW debugger information is only handled on breakpoints.
+                m_isDuringHSAKernelDebugging = true;
+            }
+            break;
+        default:
+            // Unexpected value!
+            GT_ASSERT(false);
+            break;
+        }
     }
     else if (eventType == apEvent::AP_AFTER_KERNEL_DEBUGGING_EVENT)
     {
-        // Kernel debugging just ended, mark this:
-        _isDuringKernelDebugging = false;
-        _gdbDriver.kernelDebuggingJustFinished();
+        // Make sure only one flag is raised:
+        GT_ASSERT(_isDuringKernelDebugging != m_isDuringHSAKernelDebugging);
+        if (_isDuringKernelDebugging)
+        {
+            // Kernel debugging just ended, mark this:
+            _isDuringKernelDebugging = false;
+            _gdbDriver.kernelDebuggingJustFinished();
+        }
+        else if (m_isDuringHSAKernelDebugging)
+        {
+            // Mark that debugging ended:
+            m_isDuringHSAKernelDebugging = false;
+        }
     }
 }
 
@@ -1872,6 +1905,7 @@ void pdLinuxProcessDebugger::initialize()
     _isDuringGDBSynchronusCommandExecution = false;
     _isDuringFunctionExecution = false;
     _isDuringKernelDebugging = false;
+    m_isDuringHSAKernelDebugging = false;
     _isDuringFatalSignalSuspension = false;
 
     delete _pDebuggedProcessThreadsData;
