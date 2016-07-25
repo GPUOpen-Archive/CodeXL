@@ -54,7 +54,7 @@ OS_API bool osResumeSuspendedProcess(const osProcessId& processId, const osProce
 OS_API bool osWaitForProcessToTerminate(osProcessId processId, unsigned long timeoutMsec, long* pExitCode = NULL, bool child = true);
 OS_API bool osIsProcessAlive(osProcessId processId, bool& isAliveBuffer);
 OS_API bool osIsProcessAlive(const gtString& processName);
-OS_API bool osTerminateProcess(osProcessId processId, long exitCode = 0);
+OS_API bool osTerminateProcess(osProcessId processId, long exitCode = 0, bool isTerminateChildren = true);
 OS_API void osTerminateProcessesByName(const gtVector<gtString>& processNames, const osProcessId parentProcessId = 0, const bool exactMatch = true);
 OS_API void osCloseProcessRedirectionFiles();
 OS_API bool osIsParent(osProcessId parentProcessId, osProcessId processId);

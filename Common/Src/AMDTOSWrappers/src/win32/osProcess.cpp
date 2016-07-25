@@ -485,11 +485,15 @@ bool osWaitForProcessToTerminate(osProcessId processId, unsigned long timeoutMse
 // Author:      AMD Developer Tools Team
 // Date:        17/8/2009
 // ---------------------------------------------------------------------------
-bool osTerminateProcess(osProcessId processId, long exitCode)
+bool osTerminateProcess(osProcessId processId, long exitCode, bool isTerminateChildren)
 {
     bool retVal = false;
 
-    osTerminateChildren(processId);
+    if (isTerminateChildren)
+    {
+        osTerminateChildren(processId);
+    }
+
     // Get a handle to the process:
     osProcessHandle processHandle = ::OpenProcess(PROCESS_TERMINATE, FALSE, processId);
 

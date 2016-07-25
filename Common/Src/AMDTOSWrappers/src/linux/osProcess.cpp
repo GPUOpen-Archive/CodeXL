@@ -306,7 +306,7 @@ bool osWaitForProcessToTerminate(osProcessId processId, unsigned long timeoutMse
 // Author:      AMD Developer Tools Team
 // Date:        11/1/2010
 // ---------------------------------------------------------------------------
-bool osTerminateProcess(osProcessId processId, long exitCode)
+bool osTerminateProcess(osProcessId processId, long exitCode, bool isTerminateChildren)
 {
     bool retVal = false;
 
@@ -325,7 +325,10 @@ bool osTerminateProcess(osProcessId processId, long exitCode)
 
 #endif
 
-    osTerminateChildren(processId);
+    if (isTerminateChildren)
+    {
+        osTerminateChildren(processId);
+    }
 
     // If
     if (!retVal)
@@ -1112,11 +1115,39 @@ bool osProcessesEnumerator::next(osProcessId& processId, gtString* pName)
 // Author:      AMD Developer Tools Team
 // Date:        19/02/2013
 // ---------------------------------------------------------------------------
-OS_API bool osTerminateChildren(osProcessId processId)
+OS_API bool osTerminateChildren(osProcessId parentProcessId)
 {
-    GT_UNREFERENCED_PARAMETER(processId);
+    bool retVal = false;
+    std::vector<osProcessId> children;
+    osProcessesEnumerator processEnum;
 
-   //TODO "implement this code for linux"
+    if (processEnum.initialize())
+    {
+        osProcessId processId;
+        gtString executableName;
+
+        while (processEnum.next(processId, &executableName))
+        {
+            if (((osProcessId)0) == processId || parentProcessId == processId)
+            {
+                continue;
+            }
+
+            bool isChildProcess = osIsParent(parentProcessId, processId);
+            if (isChildProcess)
+            {
+                children.push_back(processId);
+            }
+        }
+        retVal = true;
+    }
+
+    for (auto childProcessId : children)
+    {
+        bool isSuccessfulTermination = osTerminateProcess(childProcessId, 0, false);
+        retVal = isSuccessfulTermination;
+    }
+
     return false;
 }
 
