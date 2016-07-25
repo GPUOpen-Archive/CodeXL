@@ -411,15 +411,15 @@
 
 #define GPU_STR_atrHeader L"//API:DX12\n=====CodeXL dx12 API Trace Output=====\n"
 
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    #define GPU_STR_perfStudioServer64 L"CXLGraphicsServer-x64" GDT_DEBUG_SUFFIX_W
-    #define GPU_STR_CodeXLAgent L"CodeXLRemoteAgent" GDT_DEBUG_SUFFIX_W   L"." AF_STR_exeFileExtension
-    #define GPU_STR_GraphicsCapturePlayer64 L"CXLGraphicsServerPlayer-x64" GDT_DEBUG_SUFFIX_W
-#else
-    #define GPU_STR_perfStudioServer64 L"CXLGraphicsServer"
-    #define GPU_STR_CodeXLAgent L"CodeXLRemoteAgent-bin"
-    #define GPU_STR_GraphicsCapturePlayer64 L"CXLGraphicsServerPlayer"
-#endif
+
+#define GPU_STR_perfStudioServer64_WIN L"CXLGraphicsServer-x64" GDT_DEBUG_SUFFIX_W
+#define GPU_STR_CodeXLAgent_WIN L"CodeXLRemoteAgent" GDT_DEBUG_SUFFIX_W   L"." AF_STR_exeFileExtension
+#define GPU_STR_GraphicsCapturePlayer64_WIN L"CXLGraphicsServerPlayer-x64" GDT_DEBUG_SUFFIX_W
+
+#define GPU_STR_perfStudioServer64_LNX L"CXLGraphicsServer"
+#define GPU_STR_CodeXLAgent_LNX L"CodeXLRemoteAgent-bin"
+#define GPU_STR_GraphicsCapturePlayer64_LNX L"CXLGraphicsServerPlayer"
+
 #define GPU_STR_CodeXLAgentHomeIP L"127.0.0.1"
 #define GPU_STR_RaptrExeName L"raptr.exe"
 #define GPU_STR_FrapsExeName L"fraps.exe"

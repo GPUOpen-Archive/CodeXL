@@ -383,6 +383,8 @@ static bool ExtractServerPath(osChannel* pChannel, osFilePath& serverPath)
     {
         gtString serverPathStr;
         (*pChannel) >> serverPathStr;
+        auto installPath = osFilePath(osFilePath::OS_CODEXL_BINARIES_PATH);
+        serverPathStr.prepend(installPath.asString(true));
         serverPath = serverPathStr;
 
         isOk = (serverPath.exists());
@@ -1871,7 +1873,7 @@ bool dmnSessionThread::terminateProcess(REMOTE_OPERATION_MODE mode)
         stream << "Unable to terminate process with mode: " << dmnUtils::OpModeToString(mode) << ".";
         dmnUtils::LogMessage(stream.str(), OS_DEBUG_LOG_ERROR);
     }
-     
+
     CleanupProcessLeftOvers(mode);
     return ret;
 }

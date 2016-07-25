@@ -40,6 +40,9 @@
 
 #include <zlib.h>
 
+
+#define PLATFORM_LINUX L"Linux"
+#define PLATFROM_WINDOWS L"Windows"
 // STATIC STORAGE - START.
 
 // True if we need a new impl.
@@ -47,7 +50,7 @@ static bool gs_IsDirty = false;
 static bool gs_IsInitialized = false;
 static long gs_ReadTimeout = 0;
 static osPortAddress gs_DaemonAddress;
-static CXLDaemonClient* gs_Instance = NULL;
+static CXLDaemonClient* gs_Instance = nullptr;
 static osMutex gs_InstanceLock;
 
 // TCP KeepAlive settings (relevant only to Windows OS).
@@ -1162,10 +1165,10 @@ public:
         switch (platform)
         {
             case dpWindows:
-                return L"Windows";
+                return PLATFROM_WINDOWS;
 
             case dpLinux:
-                return L"Linux";
+                return PLATFORM_LINUX;
 
             case dpUnknown:
             default:
@@ -1230,9 +1233,9 @@ public:
     gtString GetClientPlatform()
     {
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-        return L"Windows";
+        return PLATFROM_WINDOWS;
 #elif AMDT_BUILD_TARGET == AMDT_LINUX_OS
-        return L"Linux";
+        return PLATFORM_LINUX;
 #else
         return L"Unknown";
 #endif
@@ -2266,6 +2269,18 @@ bool CXLDaemonClient::ValidateAppPaths(const osPortAddress& daemonAddress, const
         }
     }
     return ret;
+}
+
+bool CXLDaemonClient::IsAgentPlatformLinux() const
+{
+    bool result = false;
+    if (gs_IsInitialized)
+    {
+        gtString platformBuffer;
+        m_pImpl->GetDaemonPlatform(platformBuffer);
+        result = platformBuffer.compare(PLATFORM_LINUX) == 0;
+    }
+    return result;
 }
 
 CXLDaemonClient::~CXLDaemonClient(void)

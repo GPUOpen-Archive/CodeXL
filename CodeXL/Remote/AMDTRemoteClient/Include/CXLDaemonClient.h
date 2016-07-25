@@ -261,6 +261,7 @@ public:
     bool IsHSAEnabled();
 
     bool ValidateAppPaths(const gtString& appFilePath, const gtString& workingFolderPath, bool& isAppValid, bool& isWorkingFolderValid);
+    bool IsAgentPlatformLinux() const;
 
 private:
 

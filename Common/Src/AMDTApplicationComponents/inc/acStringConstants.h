@@ -329,10 +329,7 @@
 #define AC_STR_UnitsMilliseconds "ms"
 
 // replacement string
-#if (AMDT_BUILD_TARGET == AMDT_WINDOWS_OS)
-#define AC_STR_PathReplacementString L"$CXL_Install_Path$\\"
-#else
-#define AC_STR_PathReplacementString L"$CXL_Install_Path$/"
-#endif
+
+#define AC_STR_PathReplacementString L"$CXL_Install_Path$"
 
 #endif  // __ACSTRINGCONSTANTS
