@@ -258,6 +258,7 @@ void gpMenuActionsExecutor::handleUiUpdate(int actionIndex)
             case ID_GP_SETTINGS:
             {
                 isActionEnabled = (afExecutionModeManager::instance().isActiveMode(GPU_STR_executionMode));
+                isActionEnabled = isActionEnabled && (m_pModeManager->IsSessionRunning());
             }
             break;
 

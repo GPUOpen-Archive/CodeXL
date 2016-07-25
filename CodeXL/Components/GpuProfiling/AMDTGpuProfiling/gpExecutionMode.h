@@ -215,6 +215,9 @@ public:
     /// \param pSessionData the deleted session data
     void HandleSessionDeletion(GPUSessionTreeItemData* pSessionData);
 
+    /// Is a frame analysis currently running?
+    bool IsSessionRunning() const { return m_isFrameAnalysisRunning; }
+
 protected:
 
     /// Check that the project settings are valid for frame analysis
