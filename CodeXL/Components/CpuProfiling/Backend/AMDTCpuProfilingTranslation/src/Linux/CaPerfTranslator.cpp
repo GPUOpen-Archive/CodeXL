@@ -1826,12 +1826,17 @@ void CaPerfTranslator::_addSampleToProcessAndModule(CpuProfileProcess* pProc,
         // fwprintf(stderr, L"insert java function  : %S\n",
         //       javaFuncName.c_str());
 
-        pMod->recordSample(sampInfo, count,
+        gtUInt32 functionId = (pFuncInfo != nullptr) ? pFuncInfo->m_funcId : 0;
+
+        pMod->recordSample(sampInfo,
+                           count,
                            gJavaJclModInfo.ModuleStartAddr,
                            funcSize,
                            javaFuncName,
                            jncNameStr,
-                           javaSrcFileName);
+                           javaSrcFileName,
+                           0,
+                           functionId);
     }
 }
 
@@ -2504,6 +2509,18 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
                 }
 
                 isJavaProcess = true;
+
+                TiModuleInfo modInfo;
+                modInfo.processID = rec.pid;
+                modInfo.sampleAddr = rec.ip;
+                modInfo.deltaTick = rec.time;
+                modInfo.instanceId = 0;
+                m_javaModInfo.GetModuleInfo(&modInfo);
+
+                FunctionSymbolInfo funcInfo;
+                funcInfo.m_funcId = modInfo.instanceId;
+
+                pFuncInfo = &funcInfo;
             }
             else
             {
@@ -2693,7 +2710,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
                 ibsOffset,
                 rec.pid, rec.tid, cpu,
                 os, usr, weight,
-                nullptr);
+                pFuncInfo);
         }
         else
         {
@@ -2801,8 +2818,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
             ibsOffset = ibsOffset << 32;
             ibsOffset += trans_op.ibs_op_lin_addr_low;
 
-            if (isJavaProcess)
-            {
+            if (isJavaProcess) {
                 trans_ibs_op(
                     &trans_op, ibs_op_selected_flag,
                     pJavaProc,
@@ -2811,7 +2827,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
                     pJavaMod,
                     ibsOffset, rec.pid, rec.tid, cpu,
                     os, usr, weight,
-                    nullptr);
+                    pFuncInfo);
 
                 trans_ibs_op_ls(
                     &trans_op, ibs_op_ls_selected_flag,
@@ -2821,7 +2837,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
                     pJavaMod,
                     ibsOffset, rec.pid, rec.tid, cpu,
                     os, usr, weight,
-                    nullptr);
+                    pFuncInfo);
 
                 trans_ibs_op_nb(
                     &trans_op, ibs_op_nb_selected_flag,
@@ -2831,8 +2847,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
                     pJavaMod,
                     ibsOffset, rec.pid, rec.tid, cpu,
                     os, usr, weight,
-                    nullptr);
-
+                    pFuncInfo);
             }
             else
             {
@@ -2930,7 +2945,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
                         rec.ip, rec.pid, rec.tid, cpu,
                         f_event, f_umask, f_os, f_usr,
                         weight,
-                        nullptr);
+                        pFuncInfo);
 
                 }
 
@@ -2957,7 +2972,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_SAMPLE(struct perf_event_header* p
                 rec.ip, rec.pid, rec.tid, cpu,
                 event, umask, os, usr,
                 weight,
-                nullptr);
+                pFuncInfo);
         }
         else
         {
@@ -3658,27 +3673,9 @@ int CaPerfTranslator::writeEbpOutput(const std::string& outputFile)
                 {
                     gtUInt32 modId = module.second.m_moduleId;
                     gtUInt64 modLoadAddr = module.second.getBaseAddr();
-                    gtUInt32 nextJavaFuncId = 0;
-
-                    // We might have assigned id to few functions in addJavaInlinedMethods().
-                    // Find the largest id assigned and assign next ids to rest of the functions.
-                    if (module.second.m_modType == CpuProfileModule::JAVAMODULE)
-                    {
-                        for (auto fit = module.second.getBeginFunction(); fit != module.second.getEndFunction(); ++fit)
-                        {
-                            nextJavaFuncId = std::max(nextJavaFuncId, fit->second.m_functionId);
-                        }
-
-                        ++nextJavaFuncId;
-                    }
 
                     for (auto fit = module.second.getBeginFunction(); fit != module.second.getEndFunction(); ++fit)
                     {
-                        if (module.second.m_modType == CpuProfileModule::JAVAMODULE && fit->second.m_functionId == 0)
-                        {
-                            fit->second.m_functionId = nextJavaFuncId++;
-                        }
-
                         gtString funcName = fit->second.getFuncName();
                         gtUInt64 startOffset = fit->second.getBaseAddr() - modLoadAddr;
                         gtUInt64 size = fit->second.getSize();

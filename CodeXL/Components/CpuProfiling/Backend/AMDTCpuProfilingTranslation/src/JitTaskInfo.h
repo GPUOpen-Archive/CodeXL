@@ -78,6 +78,12 @@ protected:
 #if defined(TI_MULTITHREADED)
     osCriticalSection m_TIMutexJIT;
 #endif
+
+#if AMDT_BUILD_TARGET == AMDT_LINUX_OS
+    // This id is assigned each instance of java function
+    // This id is treated as function id by CaPerfTranslator
+    gtUInt32 m_nextModInstanceId = 1;
+#endif
 };
 
 #endif // _JITTASKINFO_H_

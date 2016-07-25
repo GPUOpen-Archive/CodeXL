@@ -220,6 +220,9 @@ HRESULT JitTaskInfo::ReadJavaJitInformation(const wchar_t* pDirectory, const wch
 
                     ModuleValue t_modValue(0, jitLoadBlock.blockEndAddr - jitLoadBlock.blockStartAddr,
                                            TI_TIMETYPE_MAX, jitLoadBlock.classFunctionName, evJavaModule);
+#if AMDT_BUILD_TARGET == AMDT_LINUX_OS
+                    t_modValue.instanceId = m_nextModInstanceId++;
+#endif
 
                     m_tiModMap.insert(ModuleMap::value_type(t_modKey, t_modValue));
                     m_JitModCount++;
