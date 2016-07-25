@@ -167,11 +167,13 @@ public:
                               gtUInt32            callStackId,
                               AMDTFunctionId      funcId,
                               gtUInt32            funcOffset,
+                              bool                groupByCSId,
                               CallstackFrameVec&  leafs);
 
     bool GetCallstackFrameData(AMDTProcessId       processId,
                                gtUInt32            callstackId,
-                               CallstackFrameVec&  frames);
+                               CallstackFrameVec&  frames,
+                               bool                ascendingOrder);
 
     bool GetCallstackIds(AMDTProcessId        processId,
                          AMDTFunctionId       funcId,

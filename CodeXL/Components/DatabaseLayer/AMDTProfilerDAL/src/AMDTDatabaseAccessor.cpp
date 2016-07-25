@@ -5504,6 +5504,7 @@ public:
         gtUInt32            callstackId, // AMDT_PROFILE_ALL_CALLPATHS
         AMDTFunctionId      funcId,
         gtUInt32            funcOffset,
+        bool                isGroupByCSId,  // group by callstack id
         CallstackFrameVec&  leafs)
     {
         bool ret = false;
@@ -5514,6 +5515,7 @@ public:
                                      funcId,
                                      funcOffset,
                                      false,
+                                     isGroupByCSId,
                                      leafs);
 
         ret = GetCallstackLeafData__(processId,
@@ -5522,6 +5524,7 @@ public:
                                      funcId,
                                      funcOffset,
                                      true,
+                                     isGroupByCSId,
                                      leafs);
 
         return ret;
@@ -5535,6 +5538,7 @@ public:
         AMDTFunctionId      functionId,
         gtUInt32            funcOffset,
         bool                queryUnknownFuncs,
+        bool                isGroupByCSId,
         CallstackFrameVec&  leafs)
     {
         bool ret = false;
@@ -5558,14 +5562,21 @@ public:
                 query << "AND functionId = ? ";
             }
 
-            query << "GROUP BY callstackId, functionId HAVING functionId & 0x0000ffff > 0 ";
+            if (isGroupByCSId)
+            {
+                query << "GROUP BY callstackId ";
+            }
+            else
+            {
+                query << "GROUP BY callstackId, functionId HAVING functionId & 0x0000ffff > 0 ";
+            }
         }
         else
         {
             query << "SELECT callstackId, functionId, Module.isSystemModule, offset, selfSamples "  \
-                "FROM  CallstackLeaf "     \
-                "INNER JOIN Module on ((CallstackLeaf.functionId & 0xFFFF0000) >> 16) = Module.id " \
-                "WHERE processId = ? AND samplingConfigurationId = ? AND (functionId & 0x0000ffff) = 0 ";
+                     "FROM  CallstackLeaf "     \
+                     "INNER JOIN Module on ((CallstackLeaf.functionId & 0xFFFF0000) >> 16) = Module.id " \
+                     "WHERE processId = ? AND samplingConfigurationId = ? AND (functionId & 0x0000ffff) = 0 ";
 
             if (IS_CALLSTACK_QUERY(callstackId))
             {
@@ -5641,7 +5652,8 @@ public:
     bool GetCallstackFrameData(
         AMDTProcessId       processId,
         gtUInt32            callstackId,
-        CallstackFrameVec&  frames)
+        CallstackFrameVec&  frames,
+        bool                ascendingOrder)
     {
         bool ret = false;
 
@@ -5649,8 +5661,16 @@ public:
         // TODO: remove "AND functionId > 0" condition
         query << "SELECT callstackId, functionId, offset, depth "  \
                  "FROM  CallstackFrame "     \
-                 "WHERE callstackId = ? AND processId = ? AND functionId > 0 "    \
-                 "ORDER BY depth ASC ;";
+                 "WHERE callstackId = ? AND processId = ? AND functionId > 0 ";
+
+        if (ascendingOrder)
+        {
+            query << " ORDER BY depth ASC ;";
+        }
+        else
+        {
+            query << " ORDER BY depth DESC ;";
+        }
 
         sqlite3_stmt* pQueryStmt = nullptr;
         int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
@@ -6901,13 +6921,14 @@ bool AmdtDatabaseAccessor::GetCallstackLeafData(AMDTProcessId       processId,
                                                 gtUInt32            callStackId,
                                                 AMDTFunctionId      funcId,
                                                 gtUInt32            funcOffset,
+                                                bool                groupByCSId,
                                                 CallstackFrameVec&  leafs)
 {
     bool ret = false;
 
     if (m_pImpl != nullptr)
     {
-        ret = m_pImpl->GetCallstackLeafData(processId, counterId, callStackId, funcId, funcOffset, leafs);
+        ret = m_pImpl->GetCallstackLeafData(processId, counterId, callStackId, funcId, funcOffset, groupByCSId, leafs);
     }
 
     return ret;
@@ -6916,13 +6937,14 @@ bool AmdtDatabaseAccessor::GetCallstackLeafData(AMDTProcessId       processId,
 // Query CallStackFrame to retrieve the callpath for the given callstackIdx
 bool AmdtDatabaseAccessor::GetCallstackFrameData(AMDTProcessId       processId,
                                                  gtUInt32            callstackId,
-                                                 CallstackFrameVec&  frames)
+                                                 CallstackFrameVec&  frames,
+                                                 bool                ascendingOrder)
 {
     bool ret = false;
 
     if (m_pImpl != nullptr)
     {
-        ret = m_pImpl->GetCallstackFrameData(processId, callstackId, frames);
+        ret = m_pImpl->GetCallstackFrameData(processId, callstackId, frames, ascendingOrder);
     }
 
     return ret;

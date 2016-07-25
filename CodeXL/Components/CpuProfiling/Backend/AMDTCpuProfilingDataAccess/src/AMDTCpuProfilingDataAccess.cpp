@@ -3517,6 +3517,129 @@ public:
                                                          AMDT_PROFILE_ALL_CALLPATHS,
                                                          AMDT_PROFILE_ALL_FUNCTIONS,
                                                          0, // funcOffset
+                                                         true, // aggregate all the leafs that corresponds to a callstackid
+                                                         leafs);
+
+                for (auto& leaf : leafs)
+                {
+                    // get the unique leafs of this callstack id...
+                    CallstackFrameVec uniqueleafs;
+                    ret = m_pDbAdapter->GetCallstackLeafData(pid,
+                                                             counterId,
+                                                             leaf.m_callstackId,
+                                                             AMDT_PROFILE_ALL_FUNCTIONS,
+                                                             0, // funcOffset
+                                                             false, // don't aggregate all the leafs that corresponds to a callstackid
+                                                             uniqueleafs);
+
+                    double sampleCount = leaf.m_selfSamples; // deep samples
+                    gtUInt32 pathCount = uniqueleafs.size();
+
+                    // Set all the nodes as "not visited"
+                    ResetVisitFlagInFunctionNodes(*pCgFunctionMap);
+
+                    // get the callstack frames (in order - 1 to depth (n-1))
+                    CallstackFrameVec frames;
+                    ret = m_pDbAdapter->GetCallstackFrameData(pid, leaf.m_callstackId, frames, false);
+
+                    if (ret)
+                    {
+                        cgNode* pCallerNode = nullptr;
+                        cgNode* pCalleeNode = nullptr;
+
+                        UpdateUnknownCallstackFrames(frames);
+
+                        // Connect this to [ROOT] node
+                        ret = GetFunctionNode(*pCgFunctionMap, dummyRootFrame, sampleCount, pathCount, pCallerNode);
+
+                        for (auto& frame : frames)
+                        {
+                            if (IS_UNKNOWN_FUNC(frame.m_funcInfo.m_functionId))
+                            {
+                                HandleUnknownFunction(frame.m_funcInfo);
+                            }
+
+                            ret = GetFunctionNode(*pCgFunctionMap, frame, sampleCount, pathCount, pCalleeNode);
+
+                            // Handle recursion.
+                            if ((nullptr != pCalleeNode) && (pCallerNode->m_funcInfo.m_functionId != pCalleeNode->m_funcInfo.m_functionId))
+                            {
+                                ret = ret && AddCallerToCalleeEdge(pCallerNode, pCalleeNode, sampleCount, false);
+                                ret = ret && AddCalleeToCallerEdge(pCallerNode, pCalleeNode, sampleCount);
+
+                                pCallerNode = pCalleeNode;
+                            }
+
+                            pCalleeNode = nullptr;
+                        }
+
+                        // Now add the unique leafs of this callstack id...
+                        for (auto& uniqueleaf : uniqueleafs)
+                        {
+                            cgNode *pLeafNode = nullptr;
+                            pathCount = 1;
+                            sampleCount = static_cast<gtUInt32>(uniqueleaf.m_selfSamples);
+
+                            ret = GetFunctionNode(*pCgFunctionMap, uniqueleaf, sampleCount, 1, pLeafNode);
+
+                            if (nullptr != pLeafNode)
+                            {
+                                if (IS_UNKNOWN_FUNC(uniqueleaf.m_funcInfo.m_functionId))
+                                {
+                                    HandleUnknownFunction(uniqueleaf.m_funcInfo);
+                                }
+
+                                ret = ret && AddCallerToCalleeEdge(pCallerNode, pLeafNode, sampleCount, true);
+                                ret = ret && AddCalleeToCallerEdge(pCallerNode, pLeafNode, sampleCount);
+                            }
+                        }
+
+                        uniqueleafs.clear();
+                        frames.clear();
+                    }
+                }
+            }
+
+            m_cgCounterId = (ret) ? counterId : 0;
+        }
+
+        return ret;
+    }
+
+#if 0
+    // Callgraph
+    bool ConstructCallGraph(AMDTProcessId pid, AMDTCounterId counterId)
+    {
+        bool ret = false;
+
+        if (IsProcessHasCssSamples(pid))
+        {
+            functionIdcgNodeMap* pCgFunctionMap = nullptr;
+
+            ret = GetNodeFunctionMap(pid, counterId, pCgFunctionMap);
+
+            // Callgraph is not yet constructed
+            if (!ret && (nullptr != pCgFunctionMap))
+            {
+                // Get list of Leaf nodes for the given process
+                // For each Leaf node
+                //      get the callstack frames 
+                //      construct the arc details and update node and edge details
+
+                UpdateUnknownCallstackLeafs(pid);
+
+                // Add [ROOT] Node
+                cgNode* pRootNode = nullptr;
+                CallstackFrame dummyRootFrame;
+                ret = AddRootNode(*pCgFunctionMap, dummyRootFrame, pRootNode);
+
+                CallstackFrameVec leafs;
+                ret = m_pDbAdapter->GetCallstackLeafData(pid,
+                                                         counterId,
+                                                         AMDT_PROFILE_ALL_CALLPATHS,
+                                                         AMDT_PROFILE_ALL_FUNCTIONS,
+                                                         0, // funcOffset
+                                                         false,
                                                          leafs);
 
                 if (ret)
@@ -3545,7 +3668,7 @@ public:
                         {
                             // get the callstack frames (in reverse order - depth (n-1) to 1)
                             CallstackFrameVec frames;
-                            ret = m_pDbAdapter->GetCallstackFrameData(pid, leaf.m_callstackId, frames);
+                            ret = m_pDbAdapter->GetCallstackFrameData(pid, leaf.m_callstackId, frames, true);
 
                             if (ret)
                             {
@@ -3594,6 +3717,7 @@ public:
 
         return ret;
     }
+#endif //0
 
     bool CopyCGNode(AMDTCallGraphFunction& cgFunc, cgNode& node, gtUInt32 totalDeepSamples)
     {
@@ -3801,6 +3925,7 @@ public:
                                                      csId,
                                                      funcId,
                                                      funcOffset,
+                                                     false,
                                                      leafs);
 
             // Ideally, there will be only one leaf
@@ -3815,7 +3940,7 @@ public:
 
                 // Get the callstack/callpath for this csId
                 CallstackFrameVec frames;
-                ret = m_pDbAdapter->GetCallstackFrameData(processId, csId, frames);
+                ret = m_pDbAdapter->GetCallstackFrameData(processId, csId, frames, true);
 
                 // construct callpath
                 AMDTCallGraphPath aPath;
@@ -3869,6 +3994,7 @@ public:
                                                      csId,
                                                      AMDT_PROFILE_ALL_FUNCTIONS,
                                                      funcOffset,
+                                                     false,
                                                      leafs);
 
             for (auto &leaf : leafs)
@@ -3886,7 +4012,7 @@ public:
 
                     // Get the callstack/callpath for this csId
                     CallstackFrameVec frames;
-                    ret = m_pDbAdapter->GetCallstackFrameData(processId, csId, frames);
+                    ret = m_pDbAdapter->GetCallstackFrameData(processId, csId, frames, true);
 
                     // construct callpath
                     AMDTCallGraphPath aPath;

@@ -898,13 +898,14 @@ bool amdtProfileDbAdapter::GetCallstackLeafData(AMDTProcessId       processId,
                                                 gtUInt32            callStackId,
                                                 AMDTFunctionId      funcId,
                                                 gtUInt32            funcOffset,
+                                                bool                groupByCSId,
                                                 CallstackFrameVec&  leafs)
 {
     bool ret = false;
 
     if (m_pDbAccessor != nullptr)
     {
-        ret = m_pDbAccessor->GetCallstackLeafData(processId, counterId, callStackId, funcId, funcOffset, leafs);
+        ret = m_pDbAccessor->GetCallstackLeafData(processId, counterId, callStackId, funcId, funcOffset, groupByCSId, leafs);
     }
 
     return ret;
@@ -912,13 +913,14 @@ bool amdtProfileDbAdapter::GetCallstackLeafData(AMDTProcessId       processId,
 
 bool amdtProfileDbAdapter::GetCallstackFrameData(AMDTProcessId       processId,
                                                  gtUInt32            callstackId,
-                                                 CallstackFrameVec&  frames)
+                                                 CallstackFrameVec&  frames,
+                                                 bool                ascendingOrder)
 {
     bool ret = false;
 
     if (m_pDbAccessor != nullptr)
     {
-        ret = m_pDbAccessor->GetCallstackFrameData(processId, callstackId, frames);
+        ret = m_pDbAccessor->GetCallstackFrameData(processId, callstackId, frames, ascendingOrder);
     }
 
     return ret;
