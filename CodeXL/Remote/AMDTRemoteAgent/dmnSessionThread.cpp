@@ -1896,6 +1896,8 @@ void dmnSessionThread::CleanupProcessLeftOvers(const REMOTE_OPERATION_MODE mode)
            dmnUtils::LogMessage("Failed to clean shared memory files", OS_DEBUG_LOG_ERROR);
         }
        }
+#else
+    GT_UNREFERENCED_PARAMETER(mode);
 #endif
 
 }
