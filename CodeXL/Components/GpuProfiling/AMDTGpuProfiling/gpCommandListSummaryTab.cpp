@@ -127,6 +127,9 @@ void gpCommandListSummaryTab::FillTop20List(CallIndexId apiCall, const QString& 
         const QVector<gpTraceDataContainer::CommandListInstanceData>& commandListsData = m_pSessionDataContainer->CommandListsData();
         for (int i = 0; i < commandListsData.size(); i++)
         {
+            QString queueName;
+            bool rc = m_pSessionDataContainer->GetCommandListQueue(commandListsData[i].m_commandListPtr, queueName);
+            GT_ASSERT(rc);
             QString cmdListPtr = commandListsData[i].m_commandListPtr;
             int instanceIndex = commandListsData[i].m_instanceIndex;
             QString currentCmdListName = m_pSessionDataContainer->CommandListNameFromPointer(cmdListPtr, instanceIndex);
@@ -139,7 +142,7 @@ void gpCommandListSummaryTab::FillTop20List(CallIndexId apiCall, const QString& 
                     // apiIndex is set to m_uiSeqID (see gpTraceDataContainer::AddGPUCallToCommandList() ln 1156)
                     // QueueItemByItemCallIndex() searches by m_itemIndex, which is set to  m_uiDisplaySeqID (see ProfileSessionDataItem Ctor)
                     // VKAtpFilePart::Parse() ln 389 sets m_uiDisplaySeqID to be m_uiSeqID+1 
-                    ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItemByItemCallIndex(commandListsData[i].m_commandListQueueName, apiIndex + 1);
+                    ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItemByItemCallIndex(queueName, apiIndex + 1);
                     GT_IF_WITH_ASSERT(pItem != nullptr)
                     {
                         m_top20ItemList.push_back(pItem);

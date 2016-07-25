@@ -49,17 +49,20 @@ public:
         /// Constructor
         CommandListInstanceData();
 
-        /// The queue for which the command list belongs to
-        QString m_commandListQueueName;
-
         /// A list of API calls indices
         QList<int> m_apiIndices;
 
         /// The command list start time
-        quint64 m_startTime;
+        quint64 m_startTimeGPU;
 
         /// The command list end time
-        quint64 m_endTime;
+        quint64 m_endTimeGPU;
+
+        /// The command list start time
+        quint64 m_startTimeCPU;
+
+        /// The command list end time
+        quint64 m_endTimeCPU;
 
         /// The index of this command list instance execution
         int m_instanceIndex;
@@ -275,6 +278,12 @@ public:
     /// Returns the number of command lists \ buffers
     int CommandListCount()const;
 
+    /// Get the queue name for the requested command list
+    /// \param commandListName the command list name (pointer)
+    /// \param queueName [out] the matching queue name
+    /// \true if the command list queue was found
+    bool GetCommandListQueue(const QString& commandListName, QString& queueName);
+
 private:
 
     /// Map from thread id to API count
@@ -348,8 +357,6 @@ private:
     /// Contain the api type for this session
     ProfileSessionDataItem::ProfileItemAPIType m_sessionAPIType;
 
-    /// List of calls which has sample id and are not attached to a command list
-    QList<ProfileSessionDataItem*> m_commandListUnAttachedCalls;
 };
 
 #endif // _GPTRACEDATACONTAINER_H_

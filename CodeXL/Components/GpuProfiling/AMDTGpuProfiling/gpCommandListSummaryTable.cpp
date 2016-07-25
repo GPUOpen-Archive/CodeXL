@@ -89,7 +89,10 @@ bool gpCommandListSummaryTable::InitItems()
         for (; iter != iterEnd; iter++)
         {
             gpTraceDataContainer::CommandListInstanceData commandListData = *iter;
-            if (!commandListData.m_commandListQueueName.isEmpty())
+            QString queueName;
+            bool rc = m_pSessionDataContainer->GetCommandListQueue(commandListData.m_commandListPtr, queueName);
+            GT_ASSERT(rc);
+            if (!queueName.isEmpty())
             {
                 afProgressBarWrapper::instance().incrementProgressBar();
                 QString commandListName = m_pSessionDataContainer->CommandListNameFromPointer(commandListData.m_commandListPtr, commandListData.m_instanceIndex);
@@ -98,17 +101,17 @@ bool gpCommandListSummaryTable::InitItems()
 
                 info.m_index = commandListName;
 
-                info.m_gpuQueue = m_pSessionDataContainer->QueueDisplayName(commandListData.m_commandListQueueName);
-                info.m_gpuQueueAddress = commandListData.m_commandListQueueName;
+                info.m_gpuQueue = m_pSessionDataContainer->QueueDisplayName(queueName);
+                info.m_gpuQueueAddress = queueName;
 
                 info.m_address = commandListData.m_commandListPtr;
                 //info.m_address = m_pSessionDataContainer->CommandListNameFromPointer(commandListName, commandListData.m_instanceIndex);
 
-                info.m_minTimeMs = commandListData.m_startTime;
-                info.m_maxTimeMs = commandListData.m_endTime;
+                info.m_minTimeMs = commandListData.m_startTimeGPU;
+                info.m_maxTimeMs = commandListData.m_endTimeGPU;
 
                 info.m_numCalls = commandListData.m_apiIndices.size();
-                info.m_executionTimeMS = (commandListData.m_endTime - commandListData.m_startTime);
+                info.m_executionTimeMS = (commandListData.m_endTimeGPU - commandListData.m_startTimeGPU);
                 info.m_typeColor = APIColorMap::Instance()->GetCommandListColor(commandListIndex);
 
 
@@ -118,7 +121,7 @@ bool gpCommandListSummaryTable::InitItems()
                     // apiIndex is set to m_uiSeqID (see gpTraceDataContainer::AddGPUCallToCommandList() ln 1156)
                     // QueueItemByItemCallIndex() searches by m_itemIndex, which is set to  m_uiDisplaySeqID (see ProfileSessionDataItem Ctor)
                     // VKAtpFilePart::Parse() ln 389 sets m_uiDisplaySeqID to be m_uiSeqID+1 
-                    ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItemByItemCallIndex(commandListData.m_commandListQueueName, apiIndex + 1);
+                    ProfileSessionDataItem* pItem = m_pSessionDataContainer->QueueItemByItemCallIndex(queueName, apiIndex + 1);
                     GT_IF_WITH_ASSERT(pItem != nullptr)
                     {
                         if (pItem->StartTime() == info.m_minTimeMs)

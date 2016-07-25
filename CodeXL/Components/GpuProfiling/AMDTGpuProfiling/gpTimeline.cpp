@@ -293,14 +293,15 @@ void gpTimeline::AddCommandListsToTimeline()
             int instnaceIndex = (*iter).m_instanceIndex;
 
             // Make sure that the queue name is not empty
-            QString queueName = (*iter).m_commandListQueueName;
-            if (!queueName.isEmpty())
+            QString queueName;
+            bool rc = m_pSessionDataContainer->GetCommandListQueue(commandListName, queueName);
+            GT_IF_WITH_ASSERT (rc)
             {
                 acTimelineBranch* pQueueBranch = GetCommandListBranch(queueName);
                 GT_IF_WITH_ASSERT(pQueueBranch != nullptr)
                 {
                     // Create the command list timeline item
-                    CommandListTimelineItem* pNewItem = new CommandListTimelineItem((*iter).m_startTime, (*iter).m_endTime, commandListName);
+                    CommandListTimelineItem* pNewItem = new CommandListTimelineItem((*iter).m_startTimeGPU, (*iter).m_endTimeGPU, commandListName);
 
                     // Set the command list name as the item text
                     QString commandListDisplayName = m_pSessionDataContainer->CommandListNameFromPointer(commandListName, instnaceIndex);

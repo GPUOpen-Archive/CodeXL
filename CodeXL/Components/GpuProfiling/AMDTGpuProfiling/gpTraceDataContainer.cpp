@@ -170,9 +170,7 @@ ProfileSessionDataItem* gpTraceDataContainer::AddDX12APIItem(DX12APIInfo* pAPIIn
         // If this call has a sample id, add it to the list of calls and to the map of CPU - GPU ids
         if (pAPIInfo->m_sampleId > 0)
         {
-            m_commandListUnAttachedCalls << pRetVal;
             m_sampleIdToCPUItemMap.insertMulti(pAPIInfo->m_sampleId, pRetVal);
-
         }
 
         // Analyze the command list close API call
@@ -256,7 +254,6 @@ ProfileSessionDataItem* gpTraceDataContainer::AddVKAPIItem(VKAPIInfo* pAPIInfo)
         // If this call has a sample id, add it to the list of calls
         if (pAPIInfo->m_sampleId > 0)
         {
-            m_commandListUnAttachedCalls << pRetVal;
             m_sampleIdToCPUItemMap.insertMulti(pAPIInfo->m_sampleId, pRetVal);
         }
 
@@ -1036,8 +1033,10 @@ void gpTraceDataContainer::CloseCommandList(APIInfo* pAPIInfo)
                 commandListPtr = QString::fromStdString(pDXAPIInfo->m_interfacePtrStr);
             }
 
-            // Count other command list instance with the same command list pointer
+            // Count other command list instance with the same command list pointer.
+            // If another command list instance exists, get its end time as start time for this one
             int newCommandListIndex = -1;
+            quint64 startTime = std::numeric_limits<quint64>::max();
             for (int i = 0; i < m_commandListInstancesVector.size(); i++)
             {
                 if (m_commandListInstancesVector[i].m_commandListPtr == commandListPtr)
@@ -1050,6 +1049,15 @@ void gpTraceDataContainer::CloseCommandList(APIInfo* pAPIInfo)
 
                     // Find the next available index for the new instance
                     newCommandListIndex = qMax(newCommandListIndex, m_commandListInstancesVector[i].m_instanceIndex + 1);
+
+                    if (startTime == std::numeric_limits<quint64>::max())
+                    {
+                        startTime = m_commandListInstancesVector[i].m_endTimeCPU;
+                    }
+                    else
+                    {
+                        startTime = qMax(startTime, m_commandListInstancesVector[i].m_endTimeCPU);
+                    }
                 }
             }
 
@@ -1058,36 +1066,13 @@ void gpTraceDataContainer::CloseCommandList(APIInfo* pAPIInfo)
             currentInstanceData.m_instanceIndex = newCommandListIndex;
             currentInstanceData.m_commandListPtr = commandListPtr;
 
-            // This list accumulates all items that should be removed from m_commandListUnAttachedCalls after the iteration
-            QList<ProfileSessionDataItem*> itemsToRemove;
+            // The time range for this command list instance will be:
+            // End time should be the close API call start time
+            // Start time should be: either the instance before end time, or max (which should be updated when adding commands to this instance)
+            currentInstanceData.m_endTimeCPU = pAPIInfo->m_ullStart;
+            currentInstanceData.m_startTimeCPU = startTime;
 
-            // Go through all the calls, and check if the command list pointer is in it's parameter's list
-            for (auto iter = m_commandListUnAttachedCalls.begin(); iter != m_commandListUnAttachedCalls.end(); iter++)
-            {
-                ProfileSessionDataItem* pCurrentItem = *iter;
-                if (pCurrentItem != nullptr)
-                {
-                    QString params = pCurrentItem->GetColumnData(ProfileSessionDataItem::SESSION_ITEM_PARAMETERS_COLUMN).toString();
-                    QString interfacePtr = pCurrentItem->InterfacePtr();
-                    if ((interfacePtr == commandListPtr) || params.contains(commandListPtr))
-                    {
-                        // Add this sample id to the list of samples for this instance, and remove the item from the unattached list
-                        currentInstanceData.m_sampleIds << pCurrentItem->SampleId();
-                        itemsToRemove << pCurrentItem;
-                        currentInstanceData.m_commandListQueueName = m_commandListToQueueMap[commandListPtr];
-                    }
-                }
-            }
-
-            foreach(ProfileSessionDataItem* pItem, itemsToRemove)
-            {
-                m_commandListUnAttachedCalls.removeOne(pItem);
-            }
-
-            if (!currentInstanceData.m_sampleIds.isEmpty())
-            {
-                m_commandListInstancesVector << currentInstanceData;
-            }
+            m_commandListInstancesVector << currentInstanceData;
         }
     }
 }
@@ -1133,56 +1118,87 @@ QString gpTraceDataContainer::AddGPUCallToCommandList(APIInfo* pAPIInfo)
                 m_commandListToQueueMap[commandListName] = queueName;
             }
 
-            // Find the command list data for which this GPU call should be added
-            // The right command list instance is the one containing this sample id
-            int commandListInstnaceIndex = -1;
-            for (int i = 0; i < (int)m_commandListInstancesVector.size(); i++)
-            {
-                bool doesCommandListMatch = (m_commandListInstancesVector[i].m_commandListPtr == commandListName);
-                if (m_commandListInstancesVector[i].m_sampleIds.contains(sampleID) && doesCommandListMatch)
-                {
-                    commandListInstnaceIndex = i;
-                    break;
-                }
-            }
+            // Get the matching list of profile session items
+            QList<ProfileSessionDataItem*> matchingCPUItems;
+            GetCPUItemsBySampleId(sampleID, matchingCPUItems);
 
-            int commandListIndex = -1;
-            QString commandListPtr = commandListName;
-
-            // The sample id should be contained in one of the lists
-            if ((commandListInstnaceIndex >= 0) && (commandListInstnaceIndex < m_commandListInstancesVector.size()))
+            ProfileSessionDataItem* pMatchingCPUItem = nullptr;
+            auto iter = matchingCPUItems.begin();
+            auto iterEnd = matchingCPUItems.end();
+            for (; iter != iterEnd; iter++)
             {
-                // Update the existing command list data with the current API call data
-                if (!m_commandListInstancesVector[commandListInstnaceIndex].m_commandListQueueName.isEmpty())
+                ProfileSessionDataItem* pCurrentItem = *iter;
+                if (pCurrentItem != nullptr)
                 {
-                    if (m_commandListInstancesVector[commandListInstnaceIndex].m_commandListQueueName != queueName)
+                    QString params = pCurrentItem->GetColumnData(ProfileSessionDataItem::SESSION_ITEM_PARAMETERS_COLUMN).toString();
+                    QString interfacePtr = pCurrentItem->InterfacePtr();
+                    if ((interfacePtr == commandListName) || params.contains(commandListName))
                     {
-                        GT_ASSERT(false);
+                        pMatchingCPUItem = pCurrentItem;
+                        break;
                     }
                 }
-                m_commandListInstancesVector[commandListInstnaceIndex].m_commandListQueueName = queueName;
-                m_commandListInstancesVector[commandListInstnaceIndex].m_apiIndices.push_back(pAPIInfo->m_uiSeqID);
-
-                if ((m_commandListInstancesVector[commandListInstnaceIndex].m_startTime == std::numeric_limits<quint64>::max()) || (m_commandListInstancesVector[commandListInstnaceIndex].m_startTime > pAPIInfo->m_ullStart))
-                {
-                    m_commandListInstancesVector[commandListInstnaceIndex].m_startTime = pAPIInfo->m_ullStart;
-                }
-
-                if ((m_commandListInstancesVector[commandListInstnaceIndex].m_endTime == std::numeric_limits<quint64>::min()) || (m_commandListInstancesVector[commandListInstnaceIndex].m_endTime < pAPIInfo->m_ullEnd))
-                {
-                    m_commandListInstancesVector[commandListInstnaceIndex].m_endTime = pAPIInfo->m_ullEnd;
-                }
-
-                commandListIndex = m_commandListInstancesVector[commandListInstnaceIndex].m_instanceIndex;
-                commandListPtr = m_commandListInstancesVector[commandListInstnaceIndex].m_commandListPtr;
-            }
-            else if (sampleID == 0)
-            { 
-                GT_ASSERT_EX(false, L"got here");
             }
 
-            // Build containing command list instance name
-            retVal = CommandListNameFromPointer(commandListPtr, commandListIndex);
+            if (pMatchingCPUItem != nullptr)
+            {
+                // Find the command list data for which this GPU call should be added
+                // The right command list instance is the one containing this sample id
+                int commandListInstnaceIndex = -1;
+                for (int i = 0; i < (int)m_commandListInstancesVector.size(); i++)
+                {
+                    bool doesCommandListMatch = (m_commandListInstancesVector[i].m_commandListPtr == commandListName);
+                    if (doesCommandListMatch)
+                    {
+                        bool doesTimeMatch = m_commandListInstancesVector[i].m_endTimeCPU > pMatchingCPUItem->EndTime();
+                        if (doesTimeMatch)
+                        {
+                            if (m_commandListInstancesVector[i].m_startTimeCPU != std::numeric_limits<quint64>::max())
+                            {
+                                doesTimeMatch = m_commandListInstancesVector[i].m_startTimeCPU < pMatchingCPUItem->StartTime();
+                            }
+
+                            if (doesTimeMatch)
+                            {
+                                commandListInstnaceIndex = i;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                int commandListIndex = -1;
+                QString commandListPtr = commandListName;
+
+                // The sample id should be contained in one of the lists
+                if ((commandListInstnaceIndex >= 0) && (commandListInstnaceIndex < m_commandListInstancesVector.size()))
+                {
+                    m_commandListInstancesVector[commandListInstnaceIndex].m_sampleIds << sampleID;
+                    m_commandListInstancesVector[commandListInstnaceIndex].m_apiIndices.push_back(pAPIInfo->m_uiSeqID);
+
+                    if ((m_commandListInstancesVector[commandListInstnaceIndex].m_startTimeGPU == std::numeric_limits<quint64>::max()) || (m_commandListInstancesVector[commandListInstnaceIndex].m_startTimeGPU > pAPIInfo->m_ullStart))
+                    {
+                        m_commandListInstancesVector[commandListInstnaceIndex].m_startTimeGPU = pAPIInfo->m_ullStart;
+                    }
+
+                    if ((m_commandListInstancesVector[commandListInstnaceIndex].m_endTimeGPU == std::numeric_limits<quint64>::min()) || (m_commandListInstancesVector[commandListInstnaceIndex].m_endTimeGPU < pAPIInfo->m_ullEnd))
+                    {
+                        m_commandListInstancesVector[commandListInstnaceIndex].m_endTimeGPU = pAPIInfo->m_ullEnd;
+                    }
+
+                    commandListIndex = m_commandListInstancesVector[commandListInstnaceIndex].m_instanceIndex;
+                    commandListPtr = m_commandListInstancesVector[commandListInstnaceIndex].m_commandListPtr;
+
+                    if (m_commandListInstancesVector[commandListInstnaceIndex].m_startTimeGPU == std::numeric_limits<quint64>::max())
+                    {
+                        m_commandListInstancesVector[commandListInstnaceIndex].m_startTimeGPU = pMatchingCPUItem->StartTime();
+                    }
+
+                    // Build containing command list instance name
+                    retVal = CommandListNameFromPointer(commandListPtr, commandListIndex);
+                }
+            }
+
         }
     }
 
@@ -1343,24 +1359,35 @@ int gpTraceDataContainer::CommandListCount()const
     return retVal;
 }
 
+bool gpTraceDataContainer::GetCommandListQueue(const QString& commandListName, QString& queueName)
+{
+    bool retVal = false;
+    if (m_commandListToQueueMap.contains(commandListName))
+    {
+        retVal = true;
+        queueName = m_commandListToQueueMap[commandListName];
+    }
+    return retVal;
+}
+
 void gpTraceDataContainer::AddBakedCommandBuffer(VKGPUTraceInfo* pAPIInfo)
 {
     // Sanity check:
     GT_IF_WITH_ASSERT(pAPIInfo != nullptr)
     {
         CommandListInstanceData bakedCommandBuffer;
-        bakedCommandBuffer.m_startTime = pAPIInfo->m_ullStart;
-        bakedCommandBuffer.m_endTime = pAPIInfo->m_ullEnd;
-        bakedCommandBuffer.m_commandListQueueName = QString::fromStdString(pAPIInfo->m_queueIndexStr);
+        bakedCommandBuffer.m_startTimeGPU = pAPIInfo->m_ullStart;
+        bakedCommandBuffer.m_endTimeGPU = pAPIInfo->m_ullEnd;
         bakedCommandBuffer.m_commandListPtr = QString::fromStdString(pAPIInfo->m_commandBufferHandleStr);
         m_commandListInstancesVector << bakedCommandBuffer;
     }
 }
 
 gpTraceDataContainer::CommandListInstanceData::CommandListInstanceData() :
-    m_commandListQueueName(""),
-    m_startTime(std::numeric_limits<quint64>::max()),
-    m_endTime(std::numeric_limits<quint64>::min()),
+    m_startTimeGPU(std::numeric_limits<quint64>::max()),
+    m_endTimeGPU(std::numeric_limits<quint64>::min()),
+    m_startTimeCPU(std::numeric_limits<quint64>::max()),
+    m_endTimeCPU(std::numeric_limits<quint64>::min()),
     m_instanceIndex(-1),
     m_commandListPtr("")
 {
