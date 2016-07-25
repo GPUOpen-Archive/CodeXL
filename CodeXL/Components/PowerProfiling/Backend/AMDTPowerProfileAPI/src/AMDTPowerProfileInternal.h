@@ -147,7 +147,6 @@ struct AMDTPwrTargetSystemInfo
 enum PwrCategory
 {
     CATEGORY_POWER,        // Instantaneous power
-	CATEGORY_ENERGY,       // Energy in joules
     CATEGORY_FREQUENCY,    // Frequency
     CATEGORY_TEMPERATURE,  // Temperature in centegrade
     CATEGORY_VOLTAGE,      // Volatage
@@ -156,6 +155,7 @@ enum PwrCategory
     CATEGORY_PROCESS,      // PID, TID
     CATEGORY_TIME,         // Time
     CATEGORY_NUMBER,       // generic count value
+    //CATEGORY_ENERGY,       // Energy in joules
 };
 
 
