@@ -2737,7 +2737,10 @@ public:
                     }
                     else
                     {
-                        bytesToRead = 0;
+                        // FIXME
+                        NumBytesUsed = 1;
+                        currOffset += NumBytesUsed;
+                        bytesToRead = (bytesToRead > NumBytesUsed) ? (bytesToRead - NumBytesUsed) : 0;
                     }
 
                     disasmInfoVec.push_back(disasmInfo);
