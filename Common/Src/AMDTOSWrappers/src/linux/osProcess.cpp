@@ -1148,7 +1148,7 @@ OS_API bool osTerminateChildren(osProcessId parentProcessId)
         retVal = isSuccessfulTermination;
     }
 
-    return false;
+    return retVal;
 }
 
 // This is the data structure that is being used
