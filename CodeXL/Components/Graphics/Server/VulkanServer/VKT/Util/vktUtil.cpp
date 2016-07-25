@@ -1820,7 +1820,14 @@ const char* VktUtil::WritePointerAsString(const void* ptr)
 #ifdef WIN32
     sprintf_s(string, 32, "0x%p", ptr);
 #else
-    sprintf_s(string, 32, "%p", ptr);
+    if (value == 0)
+    {
+        sprintf_s(string, 32, "%s", "0x0");
+    }
+    else
+    {
+        sprintf_s(string, 32, "%p", value);
+    }
 #endif
     return string;
 }
