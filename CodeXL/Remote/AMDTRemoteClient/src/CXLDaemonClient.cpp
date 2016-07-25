@@ -2273,7 +2273,13 @@ bool CXLDaemonClient::ValidateAppPaths(const osPortAddress& daemonAddress, const
 
 bool CXLDaemonClient::IsAgentPlatformLinux() const
 {
+    //set result to default platform
+#if AMDT_BUILD_TARGET == AMDT_LINUX_OS 
+    bool result = true;
+#else
     bool result = false;
+#endif
+
     if (gs_IsInitialized)
     {
         gtString platformBuffer;
