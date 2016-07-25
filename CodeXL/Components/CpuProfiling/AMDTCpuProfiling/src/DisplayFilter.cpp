@@ -1132,7 +1132,11 @@ DisplayFilter::InitToDefault()
     if (nullptr != m_pProfDataReader.get())
     {
         retVal = m_pProfDataReader->GetReportConfigurations(m_reportConfigs);
-        m_options.m_coreMask = AMDT_PROFILE_ALL_CORES;
+
+        AMDTProfileSessionInfo sessionInfo;
+        m_pProfDataReader->GetProfileSessionInfo(sessionInfo);
+
+        m_options.m_coreMask = sessionInfo.m_coreAffinity;
         m_options.m_doSort = true;
         m_options.m_summaryCount = 5;
         m_options.m_isSeperateByCore = false;

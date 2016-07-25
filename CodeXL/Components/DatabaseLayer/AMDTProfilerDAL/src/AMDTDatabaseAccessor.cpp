@@ -1088,7 +1088,7 @@ public:
         return ret;
     }
 
-    // This will create the required views 
+    // This will create the required views
     bool PrepareProfilingDatabase(void)
     {
         bool ret = false;
@@ -5022,9 +5022,10 @@ public:
             query << " ; ";
 
             //fprintf(stderr, " %s \n", query.str().c_str());
+            const char* queryStr = query.str().c_str();
 
             sqlite3_stmt* pQueryStmt = nullptr;
-            int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+            int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr, -1, &pQueryStmt, nullptr);
 
             if (rc == SQLITE_OK)
             {
@@ -5595,7 +5596,7 @@ public:
             if (IS_FUNCTION_QUERY(functionId))
             {
                 query << " AND functionId = ? AND offset = ? ";
-            }            
+            }
         }
 
         query << " ;";
@@ -5743,7 +5744,7 @@ public:
             query << "SELECT DISTINCT callstackId "        \
                 "FROM  CallstackFrame "     \
                 "WHERE functionId = ? AND processId = ? ";
-           
+
             if ((IS_UNKNOWN_FUNC(funcId)) && (funcOffset > 0))
             {
                 query << " AND offset = ? ";
