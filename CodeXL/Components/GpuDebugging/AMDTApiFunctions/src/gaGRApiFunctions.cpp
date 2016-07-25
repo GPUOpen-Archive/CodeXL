@@ -1043,28 +1043,10 @@ bool gaGRApiFunctions::gaGetThreadId(int threadIndex, osThreadId& threadId)
     // Verify that the debugged process is suspended:
     if (gaIsDebuggedProcessSuspended())
     {
-        // Get the spy APIs thread index:
-        pdProcessDebugger& theProcessDebugger = pdProcessDebugger::instance();
-        int spiesAPIThreadIndex = theProcessDebugger.spiesAPIThreadIndex();
+        // Translate to process debugger thread index:
+        int pdThreadIndex = UserThreadIndexToProcessDebuggerThreadIndex(threadIndex);
 
-        // Check if we are during debugged process termination:
-        bool isDuringDebuggedProcessTermination = stat_thePersistentDataMgr.isDuringDebuggedProcessTermination();
-
-        // If the spy API thread is not known yet or we are during debugged process termination:
-        if ((spiesAPIThreadIndex == -1) || isDuringDebuggedProcessTermination)
-        {
-            spiesAPIThreadIndex = INT_MAX;
-        }
-
-        // Get the input thread id, ignore (jump over) spy API threads:
-        int amountOfThreadsToJumpOver = 0;
-
-        if (spiesAPIThreadIndex <= threadIndex)
-        {
-            amountOfThreadsToJumpOver++;
-        }
-
-        retVal = theProcessDebugger.getThreadId(threadIndex + amountOfThreadsToJumpOver, threadId);
+        retVal = pdProcessDebugger::instance().getThreadId(pdThreadIndex, threadId);
     }
 
     return retVal;
@@ -1084,8 +1066,23 @@ bool gaGRApiFunctions::gaGetBreakpointTriggeringThreadIndex(int& threadIndex)
 
     if (gaIsDebuggedProcessSuspended())
     {
+        // Get the value from the process debugger:
         pdProcessDebugger& theProcessDebugger = pdProcessDebugger::instance();
-        retVal = theProcessDebugger.getBreakpointTriggeringThreadIndex(threadIndex);
+        int pdThreadIndex = -1;
+        bool rcPD = theProcessDebugger.getBreakpointTriggeringThreadIndex(pdThreadIndex);
+        GT_IF_WITH_ASSERT(rcPD)
+        {
+            // The spies thread has no user ID. It should also never be the breakpoint triggering ID,
+            // except during process termination (e.g. memory leak checks):
+            bool isDuringDebuggedProcessTermination = stat_thePersistentDataMgr.isDuringDebuggedProcessTermination();
+            int spiesAPIThreadIndex = (isDuringDebuggedProcessTermination ? -1 : theProcessDebugger.spiesAPIThreadIndex());
+
+            GT_IF_WITH_ASSERT((-1 < pdThreadIndex) && (spiesAPIThreadIndex != pdThreadIndex))
+            {
+                retVal = true;
+                threadIndex = ProcessDebuggerThreadIndexToUserThreadIndex(pdThreadIndex);
+            }
+        }
     }
 
     return retVal;
@@ -11881,6 +11878,67 @@ bool gaGRApiFunctions::gaHSAGetWorkDims(gtUByte& dims)
             // Receive output value:
             spyConnectionSocket >> dims;
         }
+    }
+
+    return retVal;
+}
+
+int gaGRApiFunctions::ProcessDebuggerThreadIndexToUserThreadIndex(int pdThreadIndex)
+{
+    int retVal = pdThreadIndex;
+
+    // Get the spy APIs thread index:
+    pdProcessDebugger& theProcessDebugger = pdProcessDebugger::instance();
+    int spiesAPIThreadIndex = theProcessDebugger.spiesAPIThreadIndex();
+
+    // Check if we are during debugged process termination:
+    bool isDuringDebuggedProcessTermination = stat_thePersistentDataMgr.isDuringDebuggedProcessTermination();
+
+    // If the spy API thread is not known yet or we are during debugged process termination:
+    if ((spiesAPIThreadIndex == -1) || isDuringDebuggedProcessTermination)
+    {
+        spiesAPIThreadIndex = INT_MAX;
+    }
+
+    // The spy thread does not have a user index, and this function should not be called for it:
+    if (spiesAPIThreadIndex == pdThreadIndex)
+    {
+        GT_ASSERT(false);
+
+        // Choose the first / main thread:
+        retVal = 0;
+    }
+    else if (spiesAPIThreadIndex < pdThreadIndex)
+    {
+        // Get the input thread id, ignore (skip) spy API thread:
+        retVal--;
+    }
+
+    return retVal;
+}
+
+int gaGRApiFunctions::UserThreadIndexToProcessDebuggerThreadIndex(int userThreadIndex)
+{
+    int retVal = userThreadIndex;
+
+    // Get the spy APIs thread index:
+    pdProcessDebugger& theProcessDebugger = pdProcessDebugger::instance();
+    int spiesAPIThreadIndex = theProcessDebugger.spiesAPIThreadIndex();
+
+    // Check if we are during debugged process termination:
+    bool isDuringDebuggedProcessTermination = stat_thePersistentDataMgr.isDuringDebuggedProcessTermination();
+
+    // If the spy API thread is not known yet or we are during debugged process termination:
+    if ((spiesAPIThreadIndex == -1) || isDuringDebuggedProcessTermination)
+    {
+        spiesAPIThreadIndex = INT_MAX;
+    }
+
+    // If the spy thread is a lower index than the chosen thread:
+    if (spiesAPIThreadIndex <= userThreadIndex)
+    {
+        // Get the input thread id, ignore (skip) spy API thread:
+        retVal++;
     }
 
     return retVal;

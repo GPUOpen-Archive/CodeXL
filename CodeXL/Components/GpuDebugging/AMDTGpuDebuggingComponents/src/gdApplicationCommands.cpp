@@ -728,28 +728,39 @@ void gdApplicationCommands::onDebugStepIn()
         {
             // If we are at an API breakpoint:
             bool APIStepInIssued = false;
+            bool isHostDebuggingSupported = gaCanGetHostDebugging();
 
             if (!gaIsHostBreakPoint())
             {
                 // Get the breakpoint thread index:
-                int bpThreadIdx = -1;
-                bool rcBPThd = gaGetBreakpointTriggeringThreadIndex(bpThreadIdx);
-                GT_IF_WITH_ASSERT(rcBPThd)
+                // In host debugging, only step into an API if the API breakpoint thread is selected.
+                // On non-host debugging, we should do this from any thread:
+                bool isAPIBreakpointContext = !isHostDebuggingSupported;
+                if (!isAPIBreakpointContext)
                 {
-                    // If the API breakpoint thread is selected:
-                    if (bpThreadIdx == chosenThread)
+                    int bpThreadIdx = -1;
+                    bool rcBPThd = gaGetBreakpointTriggeringThreadIndex(bpThreadIdx);
+                    GT_IF_WITH_ASSERT(rcBPThd)
                     {
-                        bool canStepIn = canStepIntoCurrentFunction();
-
-                        if (canStepIn)
+                        if (bpThreadIdx == chosenThread)
                         {
-                            // Perform a "step in":
-                            bool rcStp = gaBreakInMonitoredFunctionCall();
-                            GT_IF_WITH_ASSERT(rcStp)
-                            {
-                                APIStepInIssued = true;
-                                shouldResume = true;
-                            }
+                            isAPIBreakpointContext = true;
+                        }
+                    }
+                }
+
+                if (isAPIBreakpointContext)
+                {
+                    bool canStepIn = canStepIntoCurrentFunction();
+
+                    if (canStepIn)
+                    {
+                        // Perform a "step in":
+                        bool rcStp = gaBreakInMonitoredFunctionCall();
+                        GT_IF_WITH_ASSERT(rcStp)
+                        {
+                            APIStepInIssued = true;
+                            shouldResume = true;
                         }
                     }
                 }
@@ -759,7 +770,7 @@ void gdApplicationCommands::onDebugStepIn()
             if (!APIStepInIssued)
             {
                 // Step in should be disabled if we don't have host debugging:
-                GT_IF_WITH_ASSERT(gaCanGetHostDebugging())
+                GT_IF_WITH_ASSERT(isHostDebuggingSupported)
                 {
                     osThreadId currentTID = OS_NO_THREAD_ID;
                     bool rcThrd = gaGetThreadId(chosenThread, currentTID);

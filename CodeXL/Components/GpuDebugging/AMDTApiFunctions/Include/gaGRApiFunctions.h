@@ -566,6 +566,10 @@ protected:
     // Allow subclasses to query whether an instance was already registered:
     static bool wasInstanceRegistered() {return (_pMySingleInstance != NULL);};
 
+    // Helper functions should be accessible to subclasses:
+    int ProcessDebuggerThreadIndexToUserThreadIndex(int pdThreadIndex);
+    int UserThreadIndexToProcessDebuggerThreadIndex(int userThreadIndex);
+
 private:
     static void deleteInstance();
 
