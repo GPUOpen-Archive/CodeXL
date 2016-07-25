@@ -758,7 +758,7 @@ bool csContextMonitor::updateOpenCLContextCreationProperties()
                 if ((s_contextProperties.size() * sizeof(cl_context_properties)) < propertiesDataSize)
                 {
                     size_t newSize = (propertiesDataSize / sizeof(cl_context_properties)) + 1;
-                    s_contextProperties.resize(newSize)
+                    s_contextProperties.resize(newSize);
                 }
 
                 cl_context_properties* pContextProperties = &(s_contextProperties[0]);
