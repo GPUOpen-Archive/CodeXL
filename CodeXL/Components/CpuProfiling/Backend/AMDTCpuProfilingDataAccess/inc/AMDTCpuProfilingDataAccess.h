@@ -87,9 +87,9 @@ public:
     bool GetSamplingConfiguration(AMDTUInt32 counterId, AMDTProfileSamplingConfig& counterDesc);
     bool GetReportConfigurations(AMDTProfileReportConfigVec& reportConfigs);
 
-    bool SetDebugInfoPaths(gtVector<gtString>& symbolServer, gtVector<gtString>& symbolDirectory);
-    bool SetSourcePaths(gtVector<gtString>& sourceDirPath);
-    bool SetBinaryPaths(gtVector<gtString>& binaryDirPath);
+    bool SetDebugInfoPaths(gtString& symbolDirectory, gtString& symbolServer, gtString& downloadPath);
+    bool SetSourcePaths(gtString& sourceDirPath);
+    bool SetBinaryPaths(gtString& binaryDirPath);
     bool SetReportOption(AMDTProfileDataOptions& options);
     bool SetReportOption(AMDTReportOptionType type, gtUInt64 value);
     bool SetReportCounters(gtVector<AMDTUInt32>& countersList);

@@ -157,15 +157,15 @@ public:
     gtString                            m_dbPathStr;
 
     // Symbol Dir, Symbol Server and Cached Dir paths
-    gtVector<gtString>                  m_symbolServerPath;
-    gtVector<gtString>                  m_symbolFilePath;
-    gtVector<gtString>                  m_cachePath;
+    gtString                            m_symbolServerPath;
+    gtString                            m_symbolFilePath;
+    gtString                            m_symbolDownloadPath;
 
     // Paths to locate the source files
-    gtVector<gtString>                  m_sourceFilePath;
+    gtString                            m_sourceFilePath;
 
     // Path to locate binaries (used in import case)
-    gtVector<gtString>                  m_binaryFilePath;
+    gtString                            m_binaryFilePath;
 
     AMDTProfileSessionInfo              m_sessionInfo;
     AMDTCpuTopologyVec                  m_cpuToplogyVec;
@@ -234,11 +234,11 @@ public:
 
         m_dbPathStr.makeEmpty();
 
-        m_symbolServerPath.clear();
-        m_symbolFilePath.clear();
-        m_sourceFilePath.clear();
-        m_binaryFilePath.clear();
-        m_cachePath.clear();
+        m_symbolServerPath.makeEmpty();
+        m_symbolFilePath.makeEmpty();
+        m_sourceFilePath.makeEmpty();
+        m_binaryFilePath.makeEmpty();
+        m_symbolDownloadPath.makeEmpty();
 
         m_sessionInfo.Clear();
         m_cpuToplogyVec.clear();
@@ -1032,30 +1032,31 @@ public:
         return ret;
     }
 
-    bool SetDebugInfoPaths(gtVector<gtString>& symbolServer, gtVector<gtString>& symbolDirectory)
+    bool SetDebugInfoPaths(gtString& symbolDirectory, gtString& symbolServer, gtString& cachePath)
     {
         bool ret = true;
 
-        m_symbolServerPath.insert(std::end(m_symbolServerPath), std::begin(symbolServer), std::end(symbolServer));
-        m_symbolFilePath.insert(std::end(m_symbolFilePath), std::begin(symbolDirectory), std::end(symbolDirectory));
+        m_symbolServerPath = symbolServer;
+        m_symbolFilePath = symbolDirectory;
+        m_symbolDownloadPath = cachePath;
 
         return ret;
     }
 
-    bool SetSourcePaths(gtVector<gtString>& sourceDirPath)
+    bool SetSourcePaths(gtString& sourceDirPath)
     {
         bool ret = true;
 
-        m_sourceFilePath.insert(std::end(m_sourceFilePath), std::begin(sourceDirPath), std::end(sourceDirPath));
+        m_sourceFilePath = sourceDirPath;
 
         return ret;
     }
 
-    bool SetBinaryPaths(gtVector<gtString>& binaryDirPath)
+    bool SetBinaryPaths(gtString& binaryDirPath)
     {
         bool ret = true;
 
-        m_binaryFilePath.insert(std::end(m_binaryFilePath), std::begin(binaryDirPath), std::end(binaryDirPath));
+        m_binaryFilePath = binaryDirPath;
 
         return ret;
     }
@@ -1173,12 +1174,11 @@ public:
 
         if (NULL != pExecutable)
         {
-            // TODO:
-            const wchar_t* pSearchPath = NULL;
-            const wchar_t* pServerList = NULL;
-            const wchar_t* pCachePath = NULL;
+            const wchar_t* pSearchPath = m_symbolFilePath.asCharArray();
+            const wchar_t* pServerList = m_symbolServerPath.asCharArray();
+            const wchar_t* pSymDownloadPath = m_symbolDownloadPath.asCharArray();
 
-            retVal = pExecutable->InitializeSymbolEngine(pSearchPath, pServerList, pCachePath);
+            retVal = pExecutable->InitializeSymbolEngine(pSearchPath, pServerList, pSymDownloadPath);
         }
 
         return retVal;
@@ -4199,19 +4199,19 @@ bool cxlProfileDataReader::GetReportConfigurations(AMDTProfileReportConfigVec& r
     return ret;
 }
 
-bool cxlProfileDataReader::SetDebugInfoPaths(gtVector<gtString>& symbolServer, gtVector<gtString>& symbolDirectory)
+bool cxlProfileDataReader::SetDebugInfoPaths(gtString& symbolDirectory, gtString& symbolServer, gtString& downloadPath)
 {
     bool ret = false;
 
     if (nullptr != m_pImpl)
     {
-        ret = m_pImpl->SetDebugInfoPaths(symbolServer, symbolDirectory);
+        ret = m_pImpl->SetDebugInfoPaths(symbolDirectory, symbolServer, downloadPath);
     }
 
     return ret;
 }
 
-bool cxlProfileDataReader::SetSourcePaths(gtVector<gtString>& sourceDirPath)
+bool cxlProfileDataReader::SetSourcePaths(gtString& sourceDirPath)
 {
     bool ret = false;
 
@@ -4223,7 +4223,7 @@ bool cxlProfileDataReader::SetSourcePaths(gtVector<gtString>& sourceDirPath)
     return ret;
 }
 
-bool cxlProfileDataReader::SetBinaryPaths(gtVector<gtString>& sourceDirPath)
+bool cxlProfileDataReader::SetBinaryPaths(gtString& sourceDirPath)
 {
     bool ret = false;
 

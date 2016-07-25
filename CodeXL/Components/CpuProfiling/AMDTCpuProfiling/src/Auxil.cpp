@@ -44,7 +44,10 @@ void AuxGetSymbolSearchPath(gtString& searchPath, gtString& serverList, gtString
 
     PROFILE_OPTIONS* pao = CpuProfilingOptions::instance().options();
 
-    searchPath = acQStringToGTString(pao->debugSearchPaths);
+    if (pao->addDebug)
+    {
+        searchPath = acQStringToGTString(pao->debugSearchPaths);
+    }
 
     QString symServerList;
 

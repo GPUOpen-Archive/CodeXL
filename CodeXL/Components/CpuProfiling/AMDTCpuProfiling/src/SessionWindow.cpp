@@ -1288,6 +1288,15 @@ bool CpuSessionWindow::OpenDataReader()
         if (!dbFilePath.isEmpty())
         {
             std::shared_ptr<cxlProfileDataReader> reader(new cxlProfileDataReader);
+
+            gtString symbolSearchPath;
+            gtString symbolServerPath;
+            gtString symbolsDownloadPath;
+
+            // We need to set the symbol server and symbol dir path before opening the database
+            AuxGetSymbolSearchPath(symbolSearchPath, symbolServerPath, symbolsDownloadPath);
+            reader->SetDebugInfoPaths(symbolSearchPath, symbolServerPath, symbolsDownloadPath);
+
             result = reader->OpenProfileData(dbFilePath.asString());
 
             if (true == result)

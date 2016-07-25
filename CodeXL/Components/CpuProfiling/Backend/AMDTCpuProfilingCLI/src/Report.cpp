@@ -171,8 +171,16 @@ HRESULT CpuProfileReport::Report()
     {
         // Input file - Processed profile data file
         osFilePath dbFilePath = GetDBFilePath();
+
         //TODO: remove this line once EBP file support is removed.
         dbFilePath.setFileExtension(L"cxlcpdb");
+
+        // Set the symboldirectory and symbol server path
+        gtString searchPath = m_args.GetDebugSymbolPath();
+        gtString serverList = m_args.GetSymbolServerPath();
+        gtString cachePath = m_args.GetSymbolCachePath();
+        m_profileDbReader.SetDebugInfoPaths(searchPath, serverList, cachePath);
+
         m_profileDbReader.OpenProfileData(dbFilePath.asString());
 
         AMDTProfileSessionInfo sessionInfo;
