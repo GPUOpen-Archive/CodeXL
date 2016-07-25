@@ -95,7 +95,7 @@ typedef enum
     AMDT_PWR_CATEGORY_PROCESS,            /**< PID, TID */
     AMDT_PWR_CATEGORY_TIME,               /**< Time */
     AMDT_PWR_CATEGORY_COUNT,              /**< Generic count value */
-    AMDT_PWR_CATEGORY_ENERGY,             /**< Energy consumed */
+//    AMDT_PWR_CATEGORY_ENERGY,             /**< Energy consumed */
     AMDT_PWR_CATEGORY_CNT,                /**< Total category count */
 } AMDTPwrCategory;
 
