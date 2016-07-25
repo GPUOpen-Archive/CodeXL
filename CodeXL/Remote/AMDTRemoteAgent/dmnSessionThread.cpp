@@ -16,6 +16,7 @@
 // Boost
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string_regex.hpp>
+#include <boost/filesystem.hpp>
 
 #ifdef _WIN32
     #pragma warning ( pop )
@@ -1127,7 +1128,7 @@ bool dmnSessionThread::TerminateGraphicsBeckendServerSession()
     dmnUtils::LogMessage(L"DMN: RECEIVED REMOTE OPCODE -> TERMINATE PERFSTUDIO SESSION REQUEST.", OS_DEBUG_LOG_DEBUG);
     isOk = HandleProcessTerminationRequest(m_sGraphicsProcId);
     GT_ASSERT_EX(isOk, L"PERFSTUDIO Termination.");
-
+    CleanupProcessLeftOvers(romGRAPHICS);
     // Respond.
     ReportResult(isOk, m_pConnHandler);                        return isOk;
 }
@@ -1136,6 +1137,7 @@ bool dmnSessionThread::TerminateProfilingSession()
 {
     bool isOk = false;
     dmnUtils::LogMessage(L"DMN: RECEIVED REMOTE OPCODE -> TERMINATE PROFILING SESSION REQUEST.", OS_DEBUG_LOG_DEBUG);
+
     isOk = HandleProcessTerminationRequest(m_sProfProcId);
     GT_ASSERT_EX(isOk, L"CodeXLGpuProfiler Termination.");
 
@@ -1869,10 +1871,34 @@ bool dmnSessionThread::terminateProcess(REMOTE_OPERATION_MODE mode)
         stream << "Unable to terminate process with mode: " << dmnUtils::OpModeToString(mode) << ".";
         dmnUtils::LogMessage(stream.str(), OS_DEBUG_LOG_ERROR);
     }
-
+     
+    CleanupProcessLeftOvers(mode);
     return ret;
 }
+void dmnSessionThread::CleanupProcessLeftOvers(const REMOTE_OPERATION_MODE mode) const
+{
+#if AMDT_BUILD_TARGET == AMDT_LINUX_OS
+//cleanup shared memory files
+       if (mode == romGRAPHICS)
+       {
+        try
+        {
 
+          namespace fs=boost::filesystem;
+          fs::path path_to_remove("/dev/shm/");
+          for (fs::directory_iterator end_dir_it, it(path_to_remove); it!=end_dir_it; ++it) 
+          {
+             fs::remove_all(it->path());
+          }
+        }
+        catch(...)
+        {
+           dmnUtils::LogMessage("Failed to clean shared memory files", OS_DEBUG_LOG_ERROR);
+        }
+       }
+#endif
+
+}
 void dmnSessionThread::releaseResources()
 {
     if (m_pConnHandler != NULL)

@@ -49,6 +49,7 @@ protected:
     virtual int entryPoint() override;
 
 private:
+    void CleanupProcessLeftOvers(const REMOTE_OPERATION_MODE mode) const;
     void LaunchProfiler(bool& isTerminationRequired);
     bool LaunchGraphicsBeckendServer();
 
