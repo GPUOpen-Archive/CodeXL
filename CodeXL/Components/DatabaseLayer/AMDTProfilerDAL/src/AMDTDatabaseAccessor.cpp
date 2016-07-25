@@ -1787,7 +1787,7 @@ public:
             if (ret)
             {
                 // Begin a transaction.
-                sqlite3_exec(m_pReadDbConn, SQL_CMD_TX_BEGIN, nullptr, nullptr, nullptr);
+                //sqlite3_exec(m_pReadDbConn, SQL_CMD_TX_BEGIN, nullptr, nullptr, nullptr);
 
                 AMDTFunctionId unknownFuncID = funcInfo.m_functionId & DB_MODULEID_MASK;
 
@@ -1802,7 +1802,7 @@ public:
                 sqlite3_finalize(pStmt);
 
                 // Commit the transaction.
-                sqlite3_exec(m_pReadDbConn, SQL_CMD_TX_COMMIT, nullptr, nullptr, nullptr);
+                //sqlite3_exec(m_pReadDbConn, SQL_CMD_TX_COMMIT, nullptr, nullptr, nullptr);
             }
         }
 
@@ -1824,7 +1824,7 @@ public:
             if (ret)
             {
                 // Begin a transaction.
-                sqlite3_exec(m_pReadDbConn, SQL_CMD_TX_BEGIN, nullptr, nullptr, nullptr);
+                //sqlite3_exec(m_pReadDbConn, SQL_CMD_TX_BEGIN, nullptr, nullptr, nullptr);
 
                 AMDTFunctionId unknownFuncID = funcInfo.m_functionId & DB_MODULEID_MASK;
 
@@ -1839,7 +1839,7 @@ public:
                 sqlite3_finalize(pStmt);
 
                 // Commit the transaction.
-                sqlite3_exec(m_pReadDbConn, SQL_CMD_TX_COMMIT, nullptr, nullptr, nullptr);
+                //sqlite3_exec(m_pReadDbConn, SQL_CMD_TX_COMMIT, nullptr, nullptr, nullptr);
             }
         }
 
@@ -1861,7 +1861,7 @@ public:
             if (ret)
             {
                 // Begin a transaction.
-                sqlite3_exec(m_pReadDbConn, SQL_CMD_TX_BEGIN, nullptr, nullptr, nullptr);
+                //sqlite3_exec(m_pReadDbConn, SQL_CMD_TX_BEGIN, nullptr, nullptr, nullptr);
 
                 AMDTFunctionId unknownFuncID = funcInfo.m_functionId & DB_MODULEID_MASK;
 
@@ -1876,7 +1876,7 @@ public:
                 sqlite3_finalize(pStmt);
 
                 // Commit the transaction.
-                sqlite3_exec(m_pReadDbConn, SQL_CMD_TX_COMMIT, nullptr, nullptr, nullptr);
+                //sqlite3_exec(m_pReadDbConn, SQL_CMD_TX_COMMIT, nullptr, nullptr, nullptr);
             }
         }
 
@@ -2106,6 +2106,15 @@ public:
 
             // Begin a new transaction right away.
             sqlite3_exec(m_pWriteDbConn, SQL_CMD_TX_BEGIN, nullptr, nullptr, nullptr);
+        }
+
+        if (m_canUpdateDB)
+        {
+            // Commit the transaction.
+            sqlite3_exec(m_pReadDbConn, SQL_CMD_TX_COMMIT, nullptr, nullptr, nullptr);
+
+            // Begin a new transaction right away.
+            sqlite3_exec(m_pReadDbConn, SQL_CMD_TX_BEGIN, nullptr, nullptr, nullptr);
         }
     }
 

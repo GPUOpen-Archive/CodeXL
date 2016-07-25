@@ -1657,6 +1657,9 @@ public:
 
         if (!m_readUnknownFuncs && nullptr != m_pDbAdapter)
         {
+            // Commit and create new transaction
+            m_pDbAdapter->FlushDb();
+
             AMDTProfileFunctionInfoVec unknownFuncVec;
             ret = m_pDbAdapter->GetUnknownFunctionsByIPSamples(unknownFuncVec);
 
@@ -1667,6 +1670,9 @@ public:
             }
 
             m_readUnknownFuncs = ret;
+
+            // Commit the updates
+            m_pDbAdapter->FlushDb();
         }
 
         return ret;
@@ -3499,6 +3505,9 @@ public:
             // Callgraph is not yet constructed
             if (!ret && (nullptr != pCgFunctionMap))
             {
+                // Commit and create new transaction
+                m_pDbAdapter->FlushDb();
+
                 // Get list of Leaf nodes for the given process
                 // For each Leaf node
                 //      get the callstack frames 
@@ -3598,6 +3607,9 @@ public:
                         frames.clear();
                     }
                 }
+
+                // Commit the changes
+                m_pDbAdapter->FlushDb();
             }
 
             m_cgCounterId = (ret) ? counterId : 0;
