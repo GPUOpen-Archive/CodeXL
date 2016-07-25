@@ -411,6 +411,9 @@
 
 #define GPU_STR_atrHeader L"//API:DX12\n=====CodeXL dx12 API Trace Output=====\n"
 
+#ifndef GDT_DEBUG_SUFFIX_W
+#define GDT_DEBUG_SUFFIX_W
+#endif
 
 #define GPU_STR_perfStudioServer64_WIN L"CXLGraphicsServer-x64" GDT_DEBUG_SUFFIX_W
 #define GPU_STR_CodeXLAgent_WIN L"CodeXLRemoteAgent" GDT_DEBUG_SUFFIX_W   L"." AF_STR_exeFileExtension
