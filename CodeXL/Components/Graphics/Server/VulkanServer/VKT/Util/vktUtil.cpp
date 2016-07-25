@@ -1816,8 +1816,11 @@ std::string VktUtil::DecomposeCompositeAlphaFlagsEnumAsString(uint32 flags)
 const char* VktUtil::WritePointerAsString(const void* ptr)
 {
     static char string[32] = { '\0' };
-
-    sprintf_s(string, 32, GT_POINTER_FORMAT, reinterpret_cast<unsigned long>(ptr));
+#if AMDT_ADDRESS_SPACE_TYPE == AMDT_32_BIT_ADDRESS_SPACE
+    sprintf_s(string, 32, GT_POINTER_FORMAT, reinterpret_cast<gtUInt32>(ptr));
+#else
+    sprintf_s(string, 32, GT_POINTER_FORMAT, reinterpret_cast<gtUInt64>(ptr));
+#endif
     return string;
 }
 
