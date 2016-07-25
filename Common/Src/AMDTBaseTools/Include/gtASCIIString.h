@@ -152,11 +152,5 @@ GT_API bool operator!=(const char* pString, const gtASCIIString& str2);
 // Aid functions:
 GT_API bool gtIsDigit(char c);
 
-// Aid functions - Windows only:
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    GT_API size_t gtASCIIStringToUnicodeString(const char* pANSIString, wchar_t* pUnicodeStringBuff, size_t UnicodeStringBuffSize);
-    GT_API size_t gtUnicodeStringToASCIIString(const wchar_t* pUnicodeString, char* pANSIStringBuff, size_t ANSIStringBuffSize);
-#endif
-
 #endif //__gtASCIIString_H
 

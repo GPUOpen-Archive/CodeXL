@@ -23,6 +23,8 @@
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
 #include <AMDTBaseTools/Include/gtAssert.h>
 #include <AMDTBaseTools/Include/gtASCIIString.h>
+#include <AMDTBaseTools/Include/gtString.h>
+#include <AMDTBaseTools/Include/gtVector.h>
 
 // General Strings:
 #define GT_STR_KilobytesShort "KB"
@@ -222,21 +224,18 @@ gtASCIIString& gtASCIIString::append(const wchar_t* pOtherString)
     if (pOtherString != NULL)
     {
         // Get the wide char length:
-        size_t wStrLength = wcslen(pOtherString);
-        size_t buffSize = wStrLength + 1;
+        size_t buffSize = gtUnicodeStringToASCIIStringSize(pOtherString);
+        size_t stringLength = (0 < buffSize) ? (buffSize - 1) : 0;
 
         // Allocate a string to copy to:
-        char* pANSIString = new char[buffSize];
-
+        gtVector<char> ansiString(buffSize);
+        char* pANSIString = &(ansiString[0]);
 
         // Copy the wide char string to me:
         gtUnicodeStringToASCIIString(pOtherString, pANSIString, buffSize);
 
         // Append the string to me:
-        _impl.append(pANSIString, wStrLength);
-
-        // Release the memory:
-        delete[] pANSIString;
+        _impl.append(pANSIString, stringLength);
     }
 
     return (*this);
@@ -298,8 +297,7 @@ gtASCIIString& gtASCIIString::appendFormattedString(const char* pFormatString, .
             goOn = false;
 
             // Allocate a buffer that will contain the formatted string:
-            char* pBuff = new char[buffSize]();
-
+            char* pBuff = new char[buffSize];
 
             // Write the formatted string into the buffer:
             int size = vsnprintf_s(pBuff, buffSize - 1, _TRUNCATE, pFormatString, argptr);
@@ -341,8 +339,7 @@ gtASCIIString& gtASCIIString::appendFormattedString(const char* pFormatString, .
         {
             // Allocate buffer that will contain the formatted string:
             int buffSize = formattedStringSize + 1;
-            char* pBuff = new char[buffSize]();
-
+            char* pBuff = new char[buffSize];
 
             // Restart the arguments pointer:
             va_end(argptr);

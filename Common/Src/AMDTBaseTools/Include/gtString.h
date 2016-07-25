@@ -199,7 +199,9 @@ GT_API int gtUtf8StringToWideString(const std::string& org, std::wstring& dst);
 
 // Aid functions - Windows only:
 GT_API size_t gtASCIIStringToUnicodeString(const char* pANSIString, wchar_t* pUnicodeStringBuff, size_t UnicodeStringBuffSize);
+GT_API size_t gtASCIIStringToUnicodeStringSize(const char* pANSIString);
 GT_API size_t gtUnicodeStringToASCIIString(const wchar_t* pUnicodeString, char* pANSIStringBuff, size_t ANSIStringBuffSize);
+GT_API size_t gtUnicodeStringToASCIIStringSize(const wchar_t* pUnicodeString);
 
 // Implements strtok for unicode:
 // TO_DO: Unicode: implement (can copy implementation from WX)

@@ -21,6 +21,7 @@
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
 #include <AMDTBaseTools/Include/gtAssert.h>
 #include <AMDTBaseTools/Include/gtString.h>
+#include <AMDTBaseTools/Include/gtVector.h>
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     #include <windows.h>
@@ -165,30 +166,40 @@ const wchar_t* gtString::asCharArray() const
 const char* gtString::asASCIICharArray() const
 {
     // Get the length:
-    gtSize_t amountOfChars = length() + 1;
-    gtSize_t currentBufferLength = 0;
+    const wchar_t* pImplCSTR = _impl.c_str();
+    gtSize_t amountOfChars = 0;
+    if (!isEmpty())
+    {
+        amountOfChars = gtUnicodeStringToASCIIStringSize(pImplCSTR);
+    }
 
+    // The string will be empty if the original string is empty, or if
+    // the conversion fails.
+    bool emptyStr = (0 == amountOfChars);
+
+    gtSize_t currentBufferLength = 0;
     if (nullptr != _stringAsASCIICharArray)
     {
         currentBufferLength = strlen(_stringAsASCIICharArray) + 1;
     }
 
-    if (amountOfChars != currentBufferLength)
+    if (emptyStr || (amountOfChars != currentBufferLength))
     {
         delete[] _stringAsASCIICharArray;
         _stringAsASCIICharArray = nullptr;
     }
 
-    if (amountOfChars > 0)
+    if (!emptyStr)
     {
         // Convert me to a char*
         _stringAsASCIICharArray = new char[amountOfChars];
 
-        gtSize_t rc = gtUnicodeStringToASCIIString(_impl.c_str(), _stringAsASCIICharArray, amountOfChars);
-        GT_ASSERT(rc == 0);
+        gtSize_t rc = gtUnicodeStringToASCIIString(pImplCSTR, _stringAsASCIICharArray, amountOfChars);
+        GT_ASSERT(0 == rc);
     }
 
-    return _stringAsASCIICharArray;
+    static const char* const emptyCSTR = "";
+    return (emptyStr ? emptyCSTR : _stringAsASCIICharArray);
 }
 
 // ---------------------------------------------------------------------------
@@ -204,19 +215,47 @@ const char* gtString::asASCIICharArray() const
 const char* gtString::asASCIICharArray(int amountOfCharactersToCopy) const
 {
     // Get the length:
-    int amountOfChars = (int)length();
-
-    delete[] _stringAsASCIICharArray;
-    _stringAsASCIICharArray = nullptr;
-
-    GT_IF_WITH_ASSERT(amountOfCharactersToCopy <= amountOfChars)
+    const wchar_t* pImplCSTR = _impl.c_str();
+    size_t amountOfChars = 0;
+    if (!isEmpty())
     {
+        amountOfChars = gtUnicodeStringToASCIIStringSize(pImplCSTR);
+    }
+
+    // Truncate the string:
+    if ((-1 < amountOfCharactersToCopy) && ((int)amountOfChars > amountOfCharactersToCopy))
+    {
+        amountOfChars = amountOfCharactersToCopy;
+    }
+
+    // The string will be empty if the original string is empty, or if
+    // the conversion fails.
+    bool emptyStr = (0 == amountOfChars);
+
+    gtSize_t currentBufferLength = 0;
+    if (nullptr != _stringAsASCIICharArray)
+    {
+        currentBufferLength = strlen(_stringAsASCIICharArray) + 1;
+    }
+
+    if ((amountOfCharactersToCopy + 1) != (int)currentBufferLength)
+    {
+        delete[] _stringAsASCIICharArray;
+        _stringAsASCIICharArray = nullptr;
+
+        // Reserve the requested buffer size even if it is more than needed:
         _stringAsASCIICharArray = new char[amountOfCharactersToCopy + 1];
+    }
 
-
+    if (!emptyStr)
+    {
         // Convert the string:
-        gtSize_t charsConverted = gtUnicodeStringToASCIIString(_impl.c_str(), _stringAsASCIICharArray, amountOfChars);
-        GT_ASSERT(charsConverted == 0);
+        gtSize_t rc = gtUnicodeStringToASCIIString(pImplCSTR, _stringAsASCIICharArray, amountOfChars);
+        GT_ASSERT(0 == rc);
+    }
+    else
+    {
+        _stringAsASCIICharArray[0] = (char)0;
     }
 
     return _stringAsASCIICharArray;
@@ -446,7 +485,6 @@ gtString& gtString::appendFormattedString(const wchar_t* pFormatString, ...)
             // Allocate a buffer that will contain the formatted string:
             wchar_t* pBuff = new wchar_t[buffSize];
 
-
             // Write the formatted string into the buffer:
             int size = vswprintf(pBuff, buffSize - 1, pFormatString, argptr);
 
@@ -525,7 +563,6 @@ gtString& gtString::appendFormattedString(const wchar_t* pFormatString, ...)
             // Allocate buffer that will contain the formatted string:
             int buffSize = formattedStringSize + 1;
             wchar_t* pBuff = new wchar_t[buffSize];
-
 
             // Restart the arguments pointer:
             va_start(argptr, pFormatString);
@@ -684,8 +721,6 @@ gtString& gtString::prependFormattedString(const wchar_t* pFormatString, ...)
 
         // Allocate a buffer that will contain the formatted string:
         wchar_t* pBuff = new wchar_t[buffSize];
-
-
 
         // Write the formatted string into the buffer:
         int size = vswprintf(pBuff, buffSize, pFormatString, argptr);
@@ -1075,13 +1110,13 @@ gtString& gtString::fromASCIIString(const char* pOtherString)
     if (pOtherString != nullptr)
     {
         // Get the string length:
-        gtSize_t strLength = strlen(pOtherString) + 1;
+        gtSize_t strLength = gtASCIIStringToUnicodeStringSize(pOtherString);
 
         if (strLength > 0)
         {
             // Allocate a unicode string:
-            wchar_t* pUnicodeString = new wchar_t[strLength];
-
+            gtVector<wchar_t> unicodeStr(strLength);
+            wchar_t* pUnicodeString = &(unicodeStr[0]);
 
             // Convert the characters:
             gtSize_t rc = gtASCIIStringToUnicodeString(pOtherString, pUnicodeString, strLength);
@@ -1090,9 +1125,6 @@ gtString& gtString::fromASCIIString(const char* pOtherString)
                 // Add the unicode string to me:
                 append(pUnicodeString);
             }
-
-            // Release the allocated memory:
-            delete[] pUnicodeString;
         }
     }
 
@@ -1118,7 +1150,8 @@ gtString& gtString::fromASCIIString(const char* pOtherString, int stringLength)
         if (stringLength > 0)
         {
             // Allocate a unicode string:
-            wchar_t* pUnicodeString = new wchar_t[stringLength + 1]();
+            gtVector<wchar_t> unicodeString(stringLength + 1);
+            wchar_t* pUnicodeString = &(unicodeString[0]);
 
             // Convert the characters:
             gtSize_t rc = gtASCIIStringToUnicodeString(pOtherString, pUnicodeString, stringLength + 1);
@@ -1127,9 +1160,6 @@ gtString& gtString::fromASCIIString(const char* pOtherString, int stringLength)
                 // Add the unicode string to me:
                 append(pUnicodeString, stringLength);
             }
-
-            // Release the allocated memory:
-            delete[] pUnicodeString;
         }
     }
 
@@ -1199,22 +1229,19 @@ bool gtString::isEqual(const char* pOtherString)
     if (pOtherString != nullptr)
     {
         // Get the ASCII string length:
-        gtSize_t length = strlen(pOtherString) + 1;
+        gtSize_t unicodeLength = gtASCIIStringToUnicodeStringSize(pOtherString);
 
         // Allocate a unicode string:
-        wchar_t* pUnicodeString = new wchar_t[length];
+        gtVector<wchar_t> unicodeString(unicodeLength);
+        wchar_t* pUnicodeString = &(unicodeString[0]);
 
-
-        gtSize_t rc = gtASCIIStringToUnicodeString(pOtherString, pUnicodeString, length);
+        gtSize_t rc = gtASCIIStringToUnicodeString(pOtherString, pUnicodeString, unicodeLength);
         GT_IF_WITH_ASSERT(rc == 0)
         {
             // Build the string to compare to:
             gtString compareToStr(pUnicodeString);
             retVal = (compareToStr == (*this));
         }
-
-        // Delete the allocated string:
-        delete[] pUnicodeString;
     }
     else // pOtherString == nullptr
     {
@@ -2491,6 +2518,29 @@ size_t gtASCIIStringToUnicodeString(const char* pANSIString, wchar_t* pUnicodeSt
     return retVal;
 }
 
+// ---------------------------------------------------------------------------
+// Name:        gtANSIStringToUnicodeString
+// Description: Returns the buffer size needed to convert an ASCII String to Unicode.
+// Arguments:   pANSIString - The input ANSI string.
+// Return Val:  Buffer size, in wide characters, including the null terminator
+// Author:      AMD Developer Tools Team
+// Date:        25/7/2016
+// ---------------------------------------------------------------------------
+size_t gtASCIIStringToUnicodeStringSize(const char* pANSIString)
+{
+    size_t retVal = 0;
+
+    // Perform the Unicode -> ANSI string conversion:
+    size_t amountOfCharsConverted = 0;
+    size_t rcConv = mbstowcs_s(&amountOfCharsConverted, nullptr, 0, pANSIString, 0);
+
+    GT_IF_WITH_ASSERT(0 == rcConv)
+    {
+        retVal = amountOfCharsConverted;
+    }
+
+    return retVal;
+}
 
 // ---------------------------------------------------------------------------
 // Name:        gtUnicodeStringToANSIString
@@ -2516,6 +2566,30 @@ size_t gtUnicodeStringToASCIIString(const wchar_t* pUnicodeString, char* pANSISt
     return retVal;
 }
 
+// ---------------------------------------------------------------------------
+// Name:        gtANSIStringToUnicodeString
+// Description: Returns the buffer size needed to convert a Unicode String to ASCII.
+// Arguments:   pUnicodeString - The input Unicode string.
+// Return Val:  Buffer size, in narrow characters, including the null terminator
+// Author:      AMD Developer Tools Team
+// Date:        25/7/2016
+// ---------------------------------------------------------------------------
+size_t gtUnicodeStringToASCIIStringSize(const wchar_t* pUnicodeString)
+{
+    size_t retVal = 0;
+
+    // Perform the Unicode -> ANSI string conversion:
+    size_t amountOfCharsConverted = 0;
+    size_t rcConv = wcstombs_s(&amountOfCharsConverted, nullptr, 0, pUnicodeString, 0);
+
+    GT_IF_WITH_ASSERT(0 == rcConv)
+    {
+        retVal = amountOfCharsConverted;
+    }
+
+    return retVal;
+}
+
 #else
 // ---------------------------------------------------------------------------
 // Name:        gtANSIStringToUnicodeString
@@ -2531,10 +2605,33 @@ size_t gtUnicodeStringToASCIIString(const wchar_t* pUnicodeString, char* pANSISt
 // ---------------------------------------------------------------------------
 size_t gtASCIIStringToUnicodeString(const char* pANSIString, wchar_t* pUnicodeStringBuff, size_t UnicodeStringBuffSize)
 {
-    int amountOfCharsConverted = mbstowcs(pUnicodeStringBuff, pANSIString, UnicodeStringBuffSize);
-    GT_ASSERT(amountOfCharsConverted != -1);
+    size_t amountOfCharsConverted = mbstowcs(pUnicodeStringBuff, pANSIString, UnicodeStringBuffSize);
+    GT_ASSERT((size_t)-1 != amountOfCharsConverted);
 
-    int retVal = (amountOfCharsConverted == -1);
+    size_t retVal = ((size_t)-1 == amountOfCharsConverted) ? (size_t)-1 : 0;
+
+    return retVal;
+}
+
+// ---------------------------------------------------------------------------
+// Name:        gtANSIStringToUnicodeString
+// Description: Returns the buffer size needed to convert an ASCII String to Unicode.
+// Arguments:   pANSIString - The input ANSI string.
+// Return Val:  Buffer size, in wide characters, including the null terminator
+// Author:      AMD Developer Tools Team
+// Date:        25/7/2016
+// ---------------------------------------------------------------------------
+size_t gtASCIIStringToUnicodeStringSize(const char* pANSIString)
+{
+    size_t retVal = 0;
+
+    // Perform the Unicode -> ANSI string conversion:
+    size_t amountOfCharsConverted = mbstowcs(nullptr, pANSIString, 0);
+    GT_IF_WITH_ASSERT((size_t)-1 != amountOfCharsConverted)
+    {
+        // Add 1 for the null terminator:
+        retVal = amountOfCharsConverted + 1;
+    }
 
     return retVal;
 }
@@ -2556,10 +2653,34 @@ size_t gtASCIIStringToUnicodeString(const char* pANSIString, wchar_t* pUnicodeSt
 // ---------------------------------------------------------------------------
 size_t gtUnicodeStringToASCIIString(const wchar_t* pUnicodeString, char* pANSIStringBuff, size_t ANSIStringBuffSize)
 {
-    int amountOfCharsConverted = wcstombs(pANSIStringBuff, pUnicodeString, ANSIStringBuffSize);
-    GT_ASSERT(amountOfCharsConverted != -1);
+    size_t amountOfCharsConverted = wcstombs(pANSIStringBuff, pUnicodeString, ANSIStringBuffSize);
+    GT_ASSERT(amountOfCharsConverted != (size_t)-1);
 
-    int retVal = (amountOfCharsConverted == -1);
+    size_t retVal = ((size_t)-1 == amountOfCharsConverted) ? (size_t)-1 : 0;
+
+    return retVal;
+}
+
+// ---------------------------------------------------------------------------
+// Name:        gtANSIStringToUnicodeString
+// Description: Returns the buffer size needed to convert a Unicode String to ASCII.
+// Arguments:   pUnicodeString - The input Unicode string.
+// Return Val:  Buffer size, in narrow characters, including the null terminator
+// Author:      AMD Developer Tools Team
+// Date:        25/7/2016
+// ---------------------------------------------------------------------------
+size_t gtUnicodeStringToASCIIStringSize(const wchar_t* pUnicodeString)
+{
+    size_t retVal = 0;
+
+    // Perform the Unicode -> ANSI string conversion:
+    size_t amountOfCharsConverted = wcstombs(nullptr, pUnicodeString, 0);
+
+    GT_IF_WITH_ASSERT((size_t)-1 != amountOfCharsConverted)
+    {
+        // Add 1 for the null terminator:
+        retVal = amountOfCharsConverted + 1;
+    }
 
     return retVal;
 }

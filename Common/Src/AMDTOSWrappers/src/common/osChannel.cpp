@@ -312,8 +312,13 @@ bool osChannel::readString(gtASCIIString& str)
 bool osChannel::writeStringImpl(const gtString& str)
 {
     bool retVal = false;
-    const char* converted_str = str.asASCIICharArray();
-    gtInt32 stringLength = (gtInt32)strlen(converted_str);
+    const char* converted_str = nullptr;
+    gtInt32 stringLength = 0; 
+    if (!str.isEmpty())
+    {
+        converted_str = str.asASCIICharArray();
+        stringLength = (gtInt32)strlen(converted_str);
+    }
 
     // Do not write the string length into text channels:
     if (channelType() == osChannel::OS_BINARY_CHANNEL)
@@ -401,7 +406,7 @@ bool osChannel::readStringImpl(gtString& str)
     if ((channelType() == osChannel::OS_ASCII_TEXT_CHANNEL) || (channelType() == osChannel::OS_UNICODE_TEXT_CHANNEL))
     {
         str = L"Error - operator>> is trying to read a string from a text channel !!";
-        GT_ASSERT(0);
+        GT_ASSERT(false);
     }
     else
     {
@@ -428,15 +433,14 @@ bool osChannel::readStringImpl(gtString& str)
             else
             {
                 // An error occurred:
-                GT_ASSERT(0);
+                GT_ASSERT(false);
                 retVal = false;
             }
         }
         else
         {
             // This is an empty string:
-            gtString emptyString;
-            str = emptyString;
+            str.makeEmpty();
         }
     }
 
@@ -460,7 +464,7 @@ bool osChannel::readStringImpl(gtASCIIString& str)
     if ((channelType() == osChannel::OS_ASCII_TEXT_CHANNEL) || (channelType() == osChannel::OS_UNICODE_TEXT_CHANNEL))
     {
         str = "Error - operator>> is trying to read a string from a text channel !!";
-        GT_ASSERT(0);
+        GT_ASSERT(false);
     }
     else
     {
@@ -474,8 +478,8 @@ bool osChannel::readStringImpl(gtASCIIString& str)
         {
             // Read the string content:
             int bufferSize = stringLength + 1;
-            char* pStringContent = new char[bufferSize];
-
+            gtVector<char> stringData(bufferSize);
+            char* pStringContent = &(stringData[0]);
 
             // Read the string as bytes pointer:
             bool rc = read((gtByte*)pStringContent, stringLength);
@@ -490,17 +494,14 @@ bool osChannel::readStringImpl(gtASCIIString& str)
             else
             {
                 // An error occurred:
-                GT_ASSERT(0);
+                GT_ASSERT(false);
                 retVal = false;
             }
-
-            delete[] pStringContent;
         }
         else
         {
             // This is an empty string:
-            gtASCIIString emptyString;
-            str = emptyString;
+            str.makeEmpty();
         }
     }
 
