@@ -1237,6 +1237,7 @@ bool csProgramsAndKernelsMonitor::logProgramSourceCodeUpdate(apCLProgram& progra
     bool programFound = false;
     gtVector<osFilePath> programsFilePaths = csOpenCLMonitor::instance().programsFilePath();
     int numPrograms = (int)programsFilePaths.size();
+    gtVector<char> currentProgramSource;
 
     for (int nProgram = 0 ; nProgram < numPrograms ; nProgram++)
     {
@@ -1251,7 +1252,8 @@ bool csProgramsAndKernelsMonitor::logProgramSourceCodeUpdate(apCLProgram& progra
         GT_ASSERT(rc);
 
         // allocate a buffer:
-        char* programBuffer = (char*)malloc(programSize);
+        currentProgramSource.resize(programSize);
+        char* programBuffer = &(currentProgramSource[0]);
 
         // Read the program into the buffer:
         gtSize_t programRead;
@@ -1275,8 +1277,6 @@ bool csProgramsAndKernelsMonitor::logProgramSourceCodeUpdate(apCLProgram& progra
 
             break;
         }
-
-        free(programBuffer);
     }
 
     if (!programFound)

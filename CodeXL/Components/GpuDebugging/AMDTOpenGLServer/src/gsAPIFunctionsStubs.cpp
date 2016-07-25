@@ -3144,8 +3144,9 @@ void gaGetShaderObjectDetailsStub(osSocket& apiSocket)
     apiSocket >> shaderNameAsUInt32;
 
     // Call the function implementation:
-    gtAutoPtr<apGLShaderObject> aptrShaderDetails;
-    bool retVal = gaGetShaderObjectDetailsImpl((int)contextIdAsInt32, (GLuint)shaderNameAsUInt32, aptrShaderDetails);
+    const apGLShaderObject* pShaderDetails = nullptr;
+    bool retVal = gaGetShaderObjectDetailsImpl((int)contextIdAsInt32, (GLuint)shaderNameAsUInt32, pShaderDetails);
+    retVal = retVal && (nullptr != pShaderDetails);
 
     // Return the return value:
     apiSocket << retVal;
@@ -3153,7 +3154,7 @@ void gaGetShaderObjectDetailsStub(osSocket& apiSocket)
     if (retVal)
     {
         // Return output arguments:
-        osTransferableObject* pShaderObjDetails = aptrShaderDetails.pointedObject();
+        const osTransferableObject* pShaderObjDetails = pShaderDetails;
         apiSocket << *pShaderObjDetails;
     }
 }

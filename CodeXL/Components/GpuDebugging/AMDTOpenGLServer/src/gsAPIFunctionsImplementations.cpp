@@ -3024,31 +3024,23 @@ bool gaGetShaderObjectNameImpl(int contextId, int shaderId, GLuint& shaderName)
 // Author:      Yaki Tebeka
 // Date:        27/4/2005
 // ---------------------------------------------------------------------------
-bool gaGetShaderObjectDetailsImpl(int contextId, GLuint shaderName, gtAutoPtr<apGLShaderObject>& aptrShaderDetails)
+bool gaGetShaderObjectDetailsImpl(int contextId, GLuint shaderName, const apGLShaderObject*& pShaderDetails)
 {
     bool retVal = false;
 
     // Get the queried context monitor:
     const gsRenderContextMonitor* pRenderContextMtr = gsOpenGLMonitor::instance().renderContextMonitor(contextId);
-    GT_IF_WITH_ASSERT(pRenderContextMtr != NULL)
+    GT_IF_WITH_ASSERT(nullptr != pRenderContextMtr)
     {
         // Get its Programs and Shaders monitor:
         const gsProgramsAndShadersMonitor* programsAndShadersMtr = pRenderContextMtr->programsAndShadersMonitor();
-        GT_IF_WITH_ASSERT(programsAndShadersMtr != NULL)
+        GT_IF_WITH_ASSERT(nullptr != programsAndShadersMtr)
         {
             // Get the shader details:
-            const apGLShaderObject* pShaderObjDetails = programsAndShadersMtr->shaderObjectDetails(shaderName);
-            GT_IF_WITH_ASSERT(pShaderObjDetails != NULL)
+            pShaderDetails = programsAndShadersMtr->shaderObjectDetails(shaderName);
+            GT_IF_WITH_ASSERT(nullptr != pShaderDetails)
             {
-                // Clone the shader object details:
-                apGLShaderObject* pShaderObjDetailsClone = (apGLShaderObject*)(pShaderObjDetails->clone());
-                GT_IF_WITH_ASSERT(pShaderObjDetailsClone != NULL)
-                {
-                    // Output the shader object details:
-                    aptrShaderDetails = pShaderObjDetailsClone;
-
-                    retVal = true;
-                }
+                retVal = true;
             }
         }
     }
@@ -3600,7 +3592,6 @@ bool gaGetLastFunctionCallImpl(int contextId, gtAutoPtr<apFunctionCall>& aptrFun
                 // Logging is disabled, we can only return the last called function id:
                 apMonitoredFunctionId lastCalledFuncId = pCallsLogger->lastCalledFunctionId();
                 apFunctionCall* pLastFunctionCall = new apFunctionCall(lastCalledFuncId);
-
 
                 aptrFunctionCall = pLastFunctionCall;
                 retVal = true;

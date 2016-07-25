@@ -739,46 +739,53 @@ bool csContextMonitor::updateOpenCLContextGLSharedContext(oaOpenGLRenderContextH
 // ---------------------------------------------------------------------------
 bool csContextMonitor::updateOpenCLContextCreationProperties()
 {
-    bool retVal = false;
+    // Context creation properties cannot change. Thus, if we have them, no need to update again:
+    bool retVal = (0 < _contextInformation.contextCreationProperties().amountOfProperties());
 
-    SU_BEFORE_EXECUTING_REAL_FUNCTION(ap_clGetContextInfo);
-    size_t propertiesDataSize = 0;
-    cl_uint rcGetPropsDataSize = cs_stat_realFunctionPointers.clGetContextInfo(cl_context(_hContext), CL_CONTEXT_PROPERTIES, 0, 0, &propertiesDataSize);
-    GT_IF_WITH_ASSERT(rcGetPropsDataSize == CL_SUCCESS)
+    if (!retVal)
     {
-        retVal = true;
-
-        if (propertiesDataSize > 0)
+        SU_BEFORE_EXECUTING_REAL_FUNCTION(ap_clGetContextInfo);
+        size_t propertiesDataSize = 0;
+        cl_uint rcGetPropsDataSize = cs_stat_realFunctionPointers.clGetContextInfo(cl_context(_hContext), CL_CONTEXT_PROPERTIES, 0, 0, &propertiesDataSize);
+        GT_IF_WITH_ASSERT(rcGetPropsDataSize == CL_SUCCESS)
         {
-            // Allocate space to contain the device list:
-            cl_context_properties* pContextProperties = (cl_context_properties*)malloc(propertiesDataSize);
+            retVal = true;
 
-            // Get the context's associated properties:
-            cl_uint rcGetProperties = cs_stat_realFunctionPointers.clGetContextInfo(cl_context(_hContext), CL_CONTEXT_PROPERTIES, propertiesDataSize, pContextProperties, 0);
-            GT_IF_WITH_ASSERT(rcGetProperties == CL_SUCCESS)
+            if (propertiesDataSize > 0)
             {
-                // Set the context properties:
-                _contextInformation.setContextCreationProperties(pContextProperties);
-
-                // Get the context creation properties:
-                const apCLContextProperties& contextProperties = _contextInformation.contextCreationProperties();
-
-                // Check if the properties contain an OpenGL context property:
-                oaCLContextProperty openGLContextHandle = contextProperties.clPropertyValue(CL_GL_CONTEXT_KHR);
-
-                if (openGLContextHandle != 0)
+                // Allocate space to contain the device list:
+                static gtVector<cl_context_properties> s_contextProperties;
+                if ((s_contextProperties.size() * sizeof(cl_context_properties)) < propertiesDataSize)
                 {
-                    bool rc = updateOpenCLContextGLSharedContext((oaOpenGLRenderContextHandle)openGLContextHandle);
-                    GT_ASSERT(rc);
+                    size_t newSize = (propertiesDataSize / sizeof(cl_context_properties)) + 1;
+                    s_contextProperties.resize(newSize)
+                }
+
+                cl_context_properties* pContextProperties = &(s_contextProperties[0]);
+
+                // Get the context's associated properties:
+                cl_uint rcGetProperties = cs_stat_realFunctionPointers.clGetContextInfo(cl_context(_hContext), CL_CONTEXT_PROPERTIES, propertiesDataSize, pContextProperties, 0);
+                GT_IF_WITH_ASSERT(rcGetProperties == CL_SUCCESS)
+                {
+                    // Set the context properties:
+                    _contextInformation.setContextCreationProperties(pContextProperties);
+
+                    // Get the context creation properties:
+                    const apCLContextProperties& contextProperties = _contextInformation.contextCreationProperties();
+
+                    // Check if the properties contain an OpenGL context property:
+                    oaCLContextProperty openGLContextHandle = contextProperties.clPropertyValue(CL_GL_CONTEXT_KHR);
+
+                    if (openGLContextHandle != 0)
+                    {
+                        bool rc = updateOpenCLContextGLSharedContext((oaOpenGLRenderContextHandle)openGLContextHandle);
+                        GT_ASSERT(rc);
+                    }
                 }
             }
-
-            free((void*)pContextProperties);
         }
+        SU_AFTER_EXECUTING_REAL_FUNCTION(ap_clGetContextInfo);
     }
-    SU_AFTER_EXECUTING_REAL_FUNCTION(ap_clGetContextInfo);
-
-    retVal = true;
 
     return retVal;
 }
@@ -792,104 +799,111 @@ bool csContextMonitor::updateOpenCLContextCreationProperties()
 // ---------------------------------------------------------------------------
 bool csContextMonitor::updateOpenCLContextDeviceList()
 {
-    bool retVal = false;
+    // Context devices cannot change after creation, so if we have the device list, no need to re-update it.
+    bool retVal = (0 < _contextInformation.deviceIDs().size()) && (OA_CL_NULL_HANDLE != _contextInformation.contextPlatform());
 
-    _contextInformation.clearDeviceIDs();
-    oaCLPlatformID platform = OA_CL_NULL_HANDLE;
-    bool isAMDPlatform = false;
-
-    SU_BEFORE_EXECUTING_REAL_FUNCTION(ap_clGetContextInfo);
-
-    // Get the context's associated devices data size:
-    size_t devicesDataSize;
-    cl_uint rcGetDevDataSize = cs_stat_realFunctionPointers.clGetContextInfo((cl_context)_hContext, CL_CONTEXT_DEVICES, 0, 0, &devicesDataSize);
-    GT_IF_WITH_ASSERT(rcGetDevDataSize == CL_SUCCESS)
+    if (!retVal)
     {
-        retVal = true;
+        _contextInformation.clearDeviceIDs();
+        oaCLPlatformID platform = OA_CL_NULL_HANDLE;
+        bool isAMDPlatform = false;
 
-        if (devicesDataSize > 0)
+        SU_BEFORE_EXECUTING_REAL_FUNCTION(ap_clGetContextInfo);
+
+        // Get the context's associated devices data size:
+        size_t devicesDataSize = 0;
+        cl_uint rcGetDevDataSize = cs_stat_realFunctionPointers.clGetContextInfo((cl_context)_hContext, CL_CONTEXT_DEVICES, 0, 0, &devicesDataSize);
+        GT_IF_WITH_ASSERT(rcGetDevDataSize == CL_SUCCESS)
         {
-            // Allocate space to contain the device list:
-            cl_device_id* pDeviceIDs = (cl_device_id*)malloc(devicesDataSize);
+            retVal = true;
 
-            // Get the context's associated devices:
-            cl_uint rcGetDevices = cs_stat_realFunctionPointers.clGetContextInfo((cl_context)_hContext, CL_CONTEXT_DEVICES, devicesDataSize, pDeviceIDs, 0);
-            GT_IF_WITH_ASSERT(rcGetDevices == CL_SUCCESS)
+            if (devicesDataSize > 0)
             {
-                // Log the associated devices:
-                csOpenCLMonitor& theOpenCLMonitor = csOpenCLMonitor::instance();
-                csDevicesMonitor& theDevicesMonitor = theOpenCLMonitor.devicesMonitor();
-
-                size_t devicesAmount = devicesDataSize / sizeof(cl_device_id);
-                bool isFirstValidDeviceVersion = true;
-                isAMDPlatform = true;
-
-                for (size_t i = 0; i < devicesAmount; i++)
+                // Allocate space to contain the device list:
+                static gtVector<cl_device_id> s_contextDevices;
+                if ((s_contextDevices.size() * sizeof(cl_device_id)) < devicesDataSize)
                 {
-                    cl_device_id currDeviceOCLId = pDeviceIDs[i];
-                    int deviceAPIID = theDevicesMonitor.getDeviceObjectAPIID((oaCLDeviceID)currDeviceOCLId);
-                    GT_IF_WITH_ASSERT(deviceAPIID != -1)
+                    size_t newSize = (devicesDataSize / sizeof(cl_device_id)) + 1;
+                    s_contextDevices.resize(newSize);
+                }
+
+                cl_device_id* pDeviceIDs = &(s_contextDevices[0]);
+
+                // Get the context's associated devices:
+                cl_uint rcGetDevices = cs_stat_realFunctionPointers.clGetContextInfo((cl_context)_hContext, CL_CONTEXT_DEVICES, devicesDataSize, pDeviceIDs, 0);
+                GT_IF_WITH_ASSERT(rcGetDevices == CL_SUCCESS)
+                {
+                    // Log the associated devices:
+                    csOpenCLMonitor& theOpenCLMonitor = csOpenCLMonitor::instance();
+                    csDevicesMonitor& theDevicesMonitor = theOpenCLMonitor.devicesMonitor();
+
+                    size_t devicesAmount = devicesDataSize / sizeof(cl_device_id);
+                    bool isFirstValidDeviceVersion = true;
+                    isAMDPlatform = true;
+
+                    for (size_t i = 0; i < devicesAmount; i++)
                     {
-                        _contextInformation.addDeviceId(deviceAPIID);
-
-                        // Get the device's OpenCL version:
-                        const apCLDevice* pCurrentDevice = theDevicesMonitor.getDeviceObjectDetailsByIndex(deviceAPIID);
-                        GT_IF_WITH_ASSERT(pCurrentDevice != NULL)
+                        cl_device_id currDeviceOCLId = pDeviceIDs[i];
+                        int deviceAPIID = theDevicesMonitor.getDeviceObjectAPIID((oaCLDeviceID)currDeviceOCLId);
+                        GT_IF_WITH_ASSERT(deviceAPIID != -1)
                         {
-                            // Get the platform ID:
-                            oaCLPlatformID currentPlatform = pCurrentDevice->platformID();
+                            _contextInformation.addDeviceId(deviceAPIID);
 
-                            if (OA_CL_NULL_HANDLE == platform)
+                            // Get the device's OpenCL version:
+                            const apCLDevice* pCurrentDevice = theDevicesMonitor.getDeviceObjectDetailsByIndex(deviceAPIID);
+                            GT_IF_WITH_ASSERT(pCurrentDevice != NULL)
                             {
-                                // Set it to the context:
-                                GT_IF_WITH_ASSERT(OA_CL_NULL_HANDLE != currentPlatform)
+                                // Get the platform ID:
+                                oaCLPlatformID currentPlatform = pCurrentDevice->platformID();
+
+                                if (OA_CL_NULL_HANDLE == platform)
                                 {
-                                    platform = currentPlatform;
+                                    // Set it to the context:
+                                    GT_IF_WITH_ASSERT(OA_CL_NULL_HANDLE != currentPlatform)
+                                    {
+                                        platform = currentPlatform;
+                                    }
+                                }
+                                else // OA_CL_NULL_HANDLE != platform
+                                {
+                                    // All devices in the context are expected to belong to the same platform:
+                                    GT_ASSERT(platform == currentPlatform);
+                                }
+
+                                // If this is the first device or this version is lower than the one we have, copy the value:
+                                int currentDeviceCLVersion[2] = {pCurrentDevice->clMajorVersion(), pCurrentDevice->clMinorVersion()};
+
+                                if (isFirstValidDeviceVersion ||
+                                    (_contextMinimalOpenCLVersion[0] > currentDeviceCLVersion[0]) ||
+                                    ((_contextMinimalOpenCLVersion[0] == currentDeviceCLVersion[0]) && (_contextMinimalOpenCLVersion[1] > currentDeviceCLVersion[1])))
+                                {
+                                    // Set the minimal version:
+                                    isFirstValidDeviceVersion = false;
+                                    _contextMinimalOpenCLVersion[0] = currentDeviceCLVersion[0];
+                                    _contextMinimalOpenCLVersion[1] = currentDeviceCLVersion[1];
                                 }
                             }
-                            else // OA_CL_NULL_HANDLE != platform
-                            {
-                                // All devices in the context are expected to belong to the same platform:
-                                GT_ASSERT(platform == currentPlatform);
-                            }
-
-                            // If this is the first device or this version is lower than the one we have, copy the value:
-                            int currentDeviceCLVersion[2] = {pCurrentDevice->clMajorVersion(), pCurrentDevice->clMinorVersion()};
-
-                            if (isFirstValidDeviceVersion ||
-                                (_contextMinimalOpenCLVersion[0] > currentDeviceCLVersion[0]) ||
-                                ((_contextMinimalOpenCLVersion[0] == currentDeviceCLVersion[0]) && (_contextMinimalOpenCLVersion[1] > currentDeviceCLVersion[1])))
-                            {
-                                // Set the minimal version:
-                                isFirstValidDeviceVersion = false;
-                                _contextMinimalOpenCLVersion[0] = currentDeviceCLVersion[0];
-                                _contextMinimalOpenCLVersion[1] = currentDeviceCLVersion[1];
-                            }
                         }
-                    }
-                    else
-                    {
-                        retVal = false;
-                    }
+                        else
+                        {
+                            retVal = false;
+                        }
 
-                    isAMDPlatform = isAMDPlatform && theDevicesMonitor.isAMDDevice((oaCLDeviceID)currDeviceOCLId);
+                        isAMDPlatform = isAMDPlatform && theDevicesMonitor.isAMDDevice((oaCLDeviceID)currDeviceOCLId);
+                    }
+                }
+                else
+                {
+                    retVal = false;
                 }
             }
-            else
-            {
-                retVal = false;
-            }
-
-            // Clean up:
-            free(pDeviceIDs);
-            pDeviceIDs = NULL;
         }
+
+        // Also update the platform id:
+        _contextInformation.setContextPlatform(platform, isAMDPlatform);
+
+        SU_AFTER_EXECUTING_REAL_FUNCTION(ap_clGetContextInfo);
     }
-
-    // Also update the platform id:
-    _contextInformation.setContextPlatform(platform, isAMDPlatform);
-
-    SU_AFTER_EXECUTING_REAL_FUNCTION(ap_clGetContextInfo);
 
     return retVal;
 }

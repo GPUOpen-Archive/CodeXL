@@ -160,7 +160,7 @@ bool gaValidateCurrentThreadProgramObjectImpl(GLuint programName, bool& wasValid
 
 bool gaGetAmountOfShaderObjectsImpl(int contextId, int& amountOfShaders);
 bool gaGetShaderObjectNameImpl(int contextId, int shaderId, GLuint& shaderName);
-bool gaGetShaderObjectDetailsImpl(int contextId, GLuint shaderName, gtAutoPtr<apGLShaderObject>& aptrShaderDetails);
+bool gaGetShaderObjectDetailsImpl(int contextId, GLuint shaderName, const apGLShaderObject*& pShaderDetails);
 bool gaMarkShaderObjectSourceCodeAsForcedImpl(int contextId, GLuint shaderName, bool isSourceCodeForced);
 bool gaSetShaderObjectSourceCodeImpl(int contextId, GLuint shaderName, const osFilePath& sourceCodeFile);
 bool gaSetCurrentThreadShaderObjectSourceCodeImpl(GLuint shaderName, const osFilePath& sourceCodeFile);
