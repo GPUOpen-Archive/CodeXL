@@ -1972,6 +1972,7 @@ AMDTUInt32 PowerProfileTranslate::DecodeSmu7DgpuCounters(PwrCounterDecodeInfo* p
                 AMDTUInt32 data = *(AMDTUInt32*)(pRaw + offset);
                 DECODE_SMU7_RAW_DATA(data, res, pDecodeInfo->m_category);
                 limit = (COUNTERID_FREQ_DGPU == counterId) ? MAX_GPU_FREQUENCY : MAX_POWER;
+                counter.m_counterId = pDecodeInfo->m_clientId;
 
                 if (res > limit)
                 {
