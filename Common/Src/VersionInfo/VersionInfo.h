@@ -9,8 +9,8 @@
 //   \CodeXL\CodeXLVSPackage\CodeXLVSPackage\CodeXLVSPackageVS11VSIX\Properties\AssemblyInfo.cs
 //   \CodeXL\CodeXLVSPackage\CodeXLVSPackage\CodeXLVSPackageVS12VSIX\Properties\AssemblyInfo.cs
 //   \CodeXL\CodeXLVSPackage\CodeXLVSPackage\CodeXLVSPackageVS14VSIX\Properties\AssemblyInfo.cs
-#define CODEXL_MAJOR_AND_MINOR_VERSION       2,2,0,0
-#define CODEXL_MAJOR_AND_MINOR_VERSION_STR L"2,2,0,0\0"
+#define CODEXL_MAJOR_AND_MINOR_VERSION       2,3,0,0
+#define CODEXL_MAJOR_AND_MINOR_VERSION_STR L"2,3,0,0\0"
 
 #define FILEVER                     CODEXL_MAJOR_AND_MINOR_VERSION
 #define PRODUCTVER                  CODEXL_MAJOR_AND_MINOR_VERSION
