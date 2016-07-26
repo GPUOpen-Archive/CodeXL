@@ -212,6 +212,8 @@ bool gpConnectDialog::Connect()
                 retVal = true;
             }
         }
+        m_sampleTimer.stop();
+
     }
 
     return retVal;
@@ -468,6 +470,8 @@ void gpConnectDialog::OnAccept()
     // Sanity check:
     GT_IF_WITH_ASSERT(m_pConnectionsTable != nullptr)
     {
+        m_sampleTimer.stop();
+
         // if no pid was selected try and get it from the list
         if (m_pidToConnectTo.isEmpty())
         {
