@@ -2881,8 +2881,9 @@ public:
         }
 
         partialQuery << ";";
+        const std::string& queryStr = partialQuery.str();
 
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, partialQuery.str().c_str(), -1, &pQueryStmt, nullptr);
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
         if (SQLITE_OK == rc)
         {
@@ -2959,7 +2960,8 @@ public:
                          FROM Module                                     \
                          WHERE moduleId = ? ";
 
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, partialQuery.str().c_str(), -1, &pQueryStmt, nullptr);
+        const std::string& queryStr = partialQuery.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
         if (SQLITE_OK == rc)
         {
@@ -3019,8 +3021,8 @@ public:
         }
 
         partialQuery << ";";
-
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, partialQuery.str().c_str(), -1, &pQueryStmt, nullptr);
+        const std::string& queryStr = partialQuery.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
         if (SQLITE_OK == rc)
         {
@@ -3096,7 +3098,8 @@ public:
             partialQuery << ";";
         }
 
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, partialQuery.str().c_str(), -1, &pQueryStmt, nullptr);
+        const std::string& queryStr = partialQuery.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
         if (SQLITE_OK == rc)
         {
@@ -3158,8 +3161,8 @@ public:
         }
 
         partialQuery << ";";
-
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, partialQuery.str().c_str(), -1, &pQueryStmt, nullptr);
+        const std::string& queryStr = partialQuery.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
         if (SQLITE_OK == rc)
         {
@@ -3202,7 +3205,9 @@ public:
         std::stringstream query;
 
         query << "SELECT id FROM Process WHERE hasCSS = 1;";
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+
+        const std::string& queryStr = query.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
         if (SQLITE_OK == rc)
         {
@@ -3244,8 +3249,8 @@ public:
         }
 
         partialQuery << ";";
-
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, partialQuery.str().c_str(), -1, &pQueryStmt, nullptr);
+        const std::string& queryStr = partialQuery.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
         if (SQLITE_OK == rc)
         {
@@ -3346,8 +3351,8 @@ public:
         }
 
         partialQuery << ";";
-
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, partialQuery.str().c_str(), -1, &pQueryStmt, nullptr);
+        const std::string& queryStr = partialQuery.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
         if (rc == SQLITE_OK)
         {
@@ -3715,7 +3720,8 @@ public:
                             FROM CoreSamplingConfiguration                                          \
                             INNER JOIN SamplingConfiguration ON samplingConfigurationId = SamplingConfiguration.id;";
 
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, viewCreateQuery.str().c_str(), -1, &pViewCreateStmt, nullptr);
+        const std::string& queryStr = viewCreateQuery.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pViewCreateStmt, nullptr);
 
         if (SQLITE_OK == rc)
         {
@@ -3778,7 +3784,8 @@ public:
                             INNER JOIN Module ON ModuleInstance.moduleId = Module.id             \
                             GROUP BY threadId, moduleId, SampleContext.coreSamplingConfigurationId;";
 
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, viewCreateQuery.str().c_str(), -1, &pViewCreateStmt, nullptr);
+        const std::string& queryStr = viewCreateQuery.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pViewCreateStmt, nullptr);
 
         if (SQLITE_OK == rc)
         {
@@ -3813,7 +3820,8 @@ public:
 
             //fprintf(stderr, " %s\n", summaryViewCreate.str().c_str());
 
-            rc = sqlite3_prepare_v2(m_pReadDbConn, summaryViewCreate.str().c_str(), -1, &pViewCreateStmt, nullptr);
+            const std::string& queryStr1 = summaryViewCreate.str();
+            rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr1.c_str(), -1, &pViewCreateStmt, nullptr);
 
             if (SQLITE_OK == rc)
             {
@@ -3877,7 +3885,8 @@ public:
                             INNER JOIN Module ON ModuleInstance.moduleId = Module.id             \
                             GROUP BY threadId, functionId, offset, SampleContext.coreSamplingConfigurationId;";
 
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, viewCreateQuery.str().c_str(), -1, &pViewCreateStmt, nullptr);
+        const std::string& queryStr = viewCreateQuery.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pViewCreateStmt, nullptr);
 
         if (SQLITE_OK == rc)
         {
@@ -3913,7 +3922,8 @@ public:
 
             //fprintf(stderr, " %s\n", summaryViewCreate.str().c_str());
 
-            rc = sqlite3_prepare_v2(m_pReadDbConn, summaryViewCreate.str().c_str(), -1, &pViewCreateStmt, nullptr);
+            const std::string& queryStr1 = summaryViewCreate.str();
+            rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr1.c_str(), -1, &pViewCreateStmt, nullptr);
 
             if (SQLITE_OK == rc)
             {
@@ -3974,7 +3984,8 @@ public:
 
         //fprintf(stderr, " %s\n", viewCreateQuery.str().c_str());
 
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, viewCreateQuery.str().c_str(), -1, &pViewCreateStmt, nullptr);
+        const std::string& queryStr = viewCreateQuery.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pViewCreateStmt, nullptr);
 
         if (SQLITE_OK == rc)
         {
@@ -3995,7 +4006,8 @@ public:
 
         viewCreateQuery << "DROP VIEW SampleFunctionDetailedData;";
 
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, viewCreateQuery.str().c_str(), -1, &pViewCreateStmt, nullptr);
+        const std::string& queryStr = viewCreateQuery.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pViewCreateStmt, nullptr);
 
         if (SQLITE_OK == rc)
         {
@@ -4075,7 +4087,8 @@ public:
             //fprintf(stderr, " %s \n", query.str().c_str());
 
             sqlite3_stmt* pQueryStmt = nullptr;
-            int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+            const std::string& queryStr = query.str();
+            int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
             if (rc == SQLITE_OK)
             {
@@ -4192,7 +4205,8 @@ public:
             //fprintf(stderr, " %s \n", query.str().c_str());
 
             sqlite3_stmt* pQueryStmt = nullptr;
-            int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+            const std::string& queryStr = query.str();
+            int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
             if (rc == SQLITE_OK)
             {
@@ -4301,7 +4315,8 @@ public:
             //fprintf(stderr, " %s \n", query.str().c_str());
 
             sqlite3_stmt* pQueryStmt = nullptr;
-            int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+            const std::string& queryStr = query.str();
+            int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
             if (rc == SQLITE_OK)
             {
@@ -4382,7 +4397,8 @@ public:
             //fprintf(stderr, " %s \n", query.str().c_str());
 
             sqlite3_stmt* pQueryStmt = nullptr;
-            int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+            const std::string& queryStr = query.str();
+            int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
             if (rc == SQLITE_OK)
             {
@@ -4462,7 +4478,8 @@ public:
                 //fprintf(stderr, " %s \n", query.str().c_str());
 
                 sqlite3_stmt* pQueryStmt = nullptr;
-                int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+                const std::string& queryStr = query.str();
+                int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
                 if (rc == SQLITE_OK)
                 {
@@ -4501,7 +4518,8 @@ public:
         query << "SELECT name from Process where id = ? ;";
 
         sqlite3_stmt* pQueryStmt = nullptr;
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+        const std::string& queryStr = query.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
         if (rc == SQLITE_OK)
         {
@@ -4529,7 +4547,8 @@ public:
         query << "SELECT path from Module where id = ? ;";
 
         sqlite3_stmt* pQueryStmt = nullptr;
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+        const std::string& queryStr = query.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
         if (rc == SQLITE_OK)
         {
@@ -4589,7 +4608,8 @@ public:
         }
 
         sqlite3_stmt* pQueryStmt = nullptr;
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+        const std::string& queryStr = query.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
         if (rc == SQLITE_OK)
         {
@@ -4643,7 +4663,8 @@ public:
         query << " moduleID = (SELECT moduleId from Function WHERE id = ? LIMIT 1);";
 
         sqlite3_stmt* pQueryStmt = nullptr;
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+        const std::string& queryStr = query.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
         if (rc == SQLITE_OK)
         {
@@ -4678,7 +4699,8 @@ public:
                   WHERE id = ? ; ";
 
         sqlite3_stmt* pQueryStmt = nullptr;
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+        const std::string& queryStr = query.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
         if (rc == SQLITE_OK)
         {
@@ -4717,7 +4739,8 @@ public:
         query << "SELECT name from Function where id = ? ;";
 
         sqlite3_stmt* pQueryStmt = nullptr;
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+        const std::string& queryStr = query.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
         if (rc == SQLITE_OK)
         {
@@ -4743,7 +4766,8 @@ public:
         query << "SELECT name, moduleId, startOffset, size from Function where id = ? ;";
 
         sqlite3_stmt* pQueryStmt = nullptr;
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+        const std::string& queryStr = query.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
         gtUInt32 offset = 0;
         gtUInt32 size = 0;
@@ -4783,7 +4807,8 @@ public:
         query << "SELECT id, name, startOffset, size from Function where moduleId = ? ;";
 
         sqlite3_stmt* pQueryStmt = nullptr;
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+        const std::string& queryStr = query.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
         if (rc == SQLITE_OK)
         {
@@ -4823,7 +4848,8 @@ public:
             "WHERE functionId & 0x0000ffff = 0;";
 
         sqlite3_stmt* pQueryStmt = nullptr;
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+        const std::string& queryStr = query.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
         if (rc == SQLITE_OK)
         {
@@ -5021,11 +5047,11 @@ public:
 
             query << " ; ";
 
-            //fprintf(stderr, " %s \n", query.str().c_str());
-            const char* queryStr = query.str().c_str();
+            const std::string& queryStr = query.str();
+            // fprintf(stderr, " %s \n", queryStr.c_str());
 
             sqlite3_stmt* pQueryStmt = nullptr;
-            int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr, -1, &pQueryStmt, nullptr);
+            int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
             if (rc == SQLITE_OK)
             {
@@ -5091,7 +5117,8 @@ public:
                  "WHERE functionId & 0x0000ffff = 0;";
 
         sqlite3_stmt* pQueryStmt = nullptr;
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+        const std::string& queryStr = query.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
         if (rc == SQLITE_OK)
         {
@@ -5135,7 +5162,9 @@ public:
 
             // TODO: Need to use the counterIdsList and coreMask
             query << "SELECT DISTINCT processId, threadId FROM SampleFunctionSummaryAllData WHERE functionId = ? ;";
-            int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+
+            const std::string& queryStr = query.str();
+            int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
             if (rc == SQLITE_OK)
             {
@@ -5226,7 +5255,8 @@ public:
             //fprintf(stderr, " %s \n", query.str().c_str());
 
             sqlite3_stmt* pQueryStmt = nullptr;
-            int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+            const std::string& queryStr = query.str();
+            int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
             if (rc == SQLITE_OK)
             {
@@ -5272,7 +5302,8 @@ public:
                   "WHERE JITInstance.functionId = ? ;";
 
         sqlite3_stmt* pQueryStmt = nullptr;
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+        const std::string& queryStr = query.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
         if (rc == SQLITE_OK)
         {
@@ -5383,7 +5414,8 @@ public:
                 //fprintf(stderr, " %s \n", query.str().c_str());
 
                 sqlite3_stmt* pQueryStmt = nullptr;
-                int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+                const std::string& queryStr = query.str();
+                int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
                 if (rc == SQLITE_OK)
                 {
@@ -5474,7 +5506,8 @@ public:
                  "WHERE processId = ? AND functionId & 0x0000ffff = 0 ;";
 
         sqlite3_stmt* pQueryStmt = nullptr;
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+        const std::string& queryStr = query.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
         if (rc == SQLITE_OK)
         {
@@ -5602,7 +5635,8 @@ public:
         query << " ;";
 
         sqlite3_stmt* pQueryStmt = nullptr;
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+        const std::string& queryStr = query.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
         if (rc == SQLITE_OK)
         {
@@ -5683,7 +5717,8 @@ public:
         }
 
         sqlite3_stmt* pQueryStmt = nullptr;
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+        const std::string& queryStr = query.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
         if (rc == SQLITE_OK)
         {
@@ -5752,7 +5787,8 @@ public:
 
             query << " ; ";
 
-            rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+            const std::string& queryStr = query.str();
+            rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
             if (rc == SQLITE_OK)
             {
@@ -5790,7 +5826,8 @@ public:
             }
 
             pQueryStmt = nullptr;
-            rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+            const std::string& queryStr = query.str();
+            rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
             if (rc == SQLITE_OK)
             {
@@ -5837,7 +5874,8 @@ public:
                  "WHERE moduleId = ? ;";
 
         sqlite3_stmt* pQueryStmt = nullptr;
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+        const std::string& queryStr = query.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
 
         if (rc == SQLITE_OK)
         {
