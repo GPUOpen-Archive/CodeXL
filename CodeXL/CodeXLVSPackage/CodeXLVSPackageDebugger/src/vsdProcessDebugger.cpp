@@ -883,20 +883,24 @@ void vsdProcessDebugger::handleExceptionEvent(IDebugEvent2* piEvent, IDebugExcep
                         // Sanity check:
                         GT_IF_WITH_ASSERT(nullptr != pThread)
                         {
-                            // If we are hiding any spy frames:
-                            if (0 < pThread->skippedFrameCount(true))
+                            // Do not check the spy API thread:
+                            if (pThread->threadId() != m_spiesAPIThreadId)
                             {
-                                // Do not report this exception:
-                                continueException = false;
+                                // If we are hiding any spy frames:
+                                if (0 < pThread->skippedFrameCount(true))
+                                {
+                                    // Do not report this exception:
+                                    continueException = false;
 
-                                // Set the last "step" kind:
-                                m_lastStepKind = m_hostBreakReason;
+                                    // Set the last "step" kind:
+                                    m_lastStepKind = m_hostBreakReason;
 
-                                // Step on this thread:
-                                pThread->DeferStepCommand(this, AP_STEP_OUT_BREAKPOINT_HIT);
+                                    // Step on this thread:
+                                    pThread->DeferStepCommand(this, AP_STEP_OUT_BREAKPOINT_HIT);
 
-                                // Stop looking:
-                                break;
+                                    // Stop looking:
+                                    break;
+                                }
                             }
                         }
                     }
@@ -1221,8 +1225,9 @@ void vsdProcessDebugger::handleStepCompleteEvent(IDebugEvent2* piEvent, IDebugTh
 
     bool hideSpyFrames = true;
 
-    // Do not stop inside the CRT runtime checks, this tends to cause the spy to hang:
-    bool ignoreStep = (steppedIntoSpy && hideSpyFrames) || steppedIntoCRT;
+    // Do not stop inside the CRT runtime checks, this tends to cause the spy to hang.
+    // If somehow a step ended inside the spy API thread, don't step out, since that will cause us to hand on the API call handling loop:
+    bool ignoreStep = (steppedIntoSpy && hideSpyFrames && (threadId != m_spiesAPIThreadId)) || steppedIntoCRT;
 
     // If we want to ignore the step:
     if (ignoreStep)
