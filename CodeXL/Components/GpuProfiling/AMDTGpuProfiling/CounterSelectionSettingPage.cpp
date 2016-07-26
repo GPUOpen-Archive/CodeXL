@@ -1161,6 +1161,30 @@ Qt::CheckState CounterSelectionSettingWindow::GetItemCheckStateByChildrenState(Q
         "MemUnitStalled"
     };
 
+    static const QStringList InternalDefaultCheckedList =
+    {
+        "CacheHit",
+        "FetchSize",
+        "FlatLDSInsts",
+        "FlatVMemInsts",
+        "GDSInsts",
+        "LDSBankConflict",
+        "LDSInsts",
+        "MemUnitBusy",
+        "MemUnitStalled",
+        "SALUBusy",
+        "SALUInsts",
+        "SFetchInsts",
+        "VALUBusy",
+        "VALUInsts",
+        "VALUUtilization",
+        "VFetchInsts",
+        "VWriteInsts",
+        "Wavefronts",
+        "WriteSize",
+        "WriteUnitStalled"
+    };
+
     GT_IF_WITH_ASSERT(nullptr != pParent)
     {
         int numOfChildren = pParent->childCount();
@@ -1186,8 +1210,14 @@ Qt::CheckState CounterSelectionSettingWindow::GetItemCheckStateByChildrenState(Q
                 //by default set counter unchecked
                 else
                 {
+                    bool isCounterChecked = true;
+                    if (Util::IsInternalBuild())
+                    {
+                        isCounterChecked = InternalDefaultCheckedList.contains(name);
+                    }
+
                     //in internal builds disable check boxes by default
-                    cs = (Util::IsInternalBuild() == true)? Qt::Unchecked : Qt::Checked;
+                    cs = (isCounterChecked)? Qt::Checked : Qt::Unchecked;
                 }
                 pParent->setCheckState(0, cs);
             }
