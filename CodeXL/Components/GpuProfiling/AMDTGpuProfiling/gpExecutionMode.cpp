@@ -1303,7 +1303,8 @@ bool gpExecutionMode::LaunchServer(bool& messageShown, const gtASCIIString& fram
         gtString commandArgs;
         const apProjectSettings& currentSettings = afProjectManager::instance().currentProjectSettings();
         gtString exePath = frameXMLFullPath.isEmpty() ? currentSettings.executablePath().asString() : capturePlayerPathAsStr;
-        if (CXL_DAEMON_CLIENT->IsAgentPlatformLinux())
+        const bool isRemoteAgentLinux = CXL_DAEMON_CLIENT->IsAgentPlatformLinux();
+        if (isRemoteAgentLinux)
         {
             exePath.replace(L"\\", L"/");
         }
@@ -1333,6 +1334,10 @@ bool gpExecutionMode::LaunchServer(bool& messageShown, const gtASCIIString& fram
         if (!currentSettings.workDirectory().asString().isEmpty())
         {
             gtString workDir = currentSettings.workDirectory().asString().asCharArray();
+            if (isRemoteAgentLinux)
+            {
+                workDir.replace(L"\\", L"/");
+            }
             workDir.append(osFilePath::osPathSeparator);
             workDir.replace(L"\\", L"\\\\");
 
