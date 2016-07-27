@@ -1109,13 +1109,14 @@ QString gpTraceDataContainer::AddGPUCallToCommandList(APIInfo* pAPIInfo)
 
 
             // Add this command list to the queue names map. Make sure that the command list was not added with a different name before
-            if (m_commandListToQueueMap.contains(commandListName) && !m_commandListToQueueMap[commandListName].isEmpty())
+            // Notice: in Vulkan, the command buffer names can sometimes be sent to the functions with lower case. We keep the names in the map always lower case
+            if (m_commandListToQueueMap.contains(commandListName.toLower()) && !m_commandListToQueueMap[commandListName.toLower()].isEmpty())
             {
-                GT_ASSERT_EX(m_commandListToQueueMap[commandListName] == queueName, L"This command list was already added with another queue name");
+                GT_ASSERT_EX(m_commandListToQueueMap[commandListName.toLower()] == queueName, L"This command list was already added with another queue name");
             }
             else
             {
-                m_commandListToQueueMap[commandListName] = queueName;
+                m_commandListToQueueMap[commandListName.toLower()] = queueName;
             }
 
             // Get the matching list of profile session items
@@ -1132,7 +1133,7 @@ QString gpTraceDataContainer::AddGPUCallToCommandList(APIInfo* pAPIInfo)
                 {
                     QString params = pCurrentItem->GetColumnData(ProfileSessionDataItem::SESSION_ITEM_PARAMETERS_COLUMN).toString();
                     QString interfacePtr = pCurrentItem->InterfacePtr();
-                    if ((interfacePtr == commandListName) || params.contains(commandListName))
+                    if ((interfacePtr == commandListName) || params.contains(commandListName) || params.contains(commandListName.toLower()))
                     {
                         pMatchingCPUItem = pCurrentItem;
                         break;
@@ -1150,7 +1151,7 @@ QString gpTraceDataContainer::AddGPUCallToCommandList(APIInfo* pAPIInfo)
                 int commandListInstnaceIndex = -1;
                 for (int i = 0; i < (int)m_commandListInstancesVector.size(); i++)
                 {
-                    bool doesCommandListMatch = (m_commandListInstancesVector[i].m_commandListPtr == commandListName);
+                    bool doesCommandListMatch = (m_commandListInstancesVector[i].m_commandListPtr == commandListName) || (m_commandListInstancesVector[i].m_commandListPtr == commandListName.toLower());
                     if (doesCommandListMatch)
                     {
                         bool doesTimeMatch = m_commandListInstancesVector[i].m_endTimeCPU > pMatchingCPUItem->EndTime();
@@ -1366,10 +1367,10 @@ int gpTraceDataContainer::CommandListCount()const
 bool gpTraceDataContainer::GetCommandListQueue(const QString& commandListName, QString& queueName)
 {
     bool retVal = false;
-    if (m_commandListToQueueMap.contains(commandListName))
+    if (m_commandListToQueueMap.contains(commandListName.toLower()))
     {
         retVal = true;
-        queueName = m_commandListToQueueMap[commandListName];
+        queueName = m_commandListToQueueMap[commandListName.toLower()];
     }
     return retVal;
 }
