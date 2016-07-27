@@ -728,7 +728,7 @@ bool amdtProfileDbAdapter::GetProfileData(
     AMDTProcessId               processId,
     AMDTModuleId                moduleId,
     AMDTThreadId                threadId,
-    gtVector<AMDTUInt32>        counterIdList,
+    gtVector<AMDTUInt32>&       counterIdList,
     AMDTUInt64                  coreMask,
     bool                        ignoreSystemModules,
     bool                        separateByCore,

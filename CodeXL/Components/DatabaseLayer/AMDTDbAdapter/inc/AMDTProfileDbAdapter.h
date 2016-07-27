@@ -134,7 +134,7 @@ public:
                         AMDTProcessId processId,   // can be AMDT_CP_ALL_PROCESSES for process summary
                         AMDTModuleId moduleId,     // can be AMDT_CP_ALL_MODULES
                         AMDTThreadId threadId,     // can be AMDT_CP_ALL_THREAD
-                        gtVector<AMDTUInt32> counterIdList,
+                        gtVector<AMDTUInt32>& counterIdList,
                         AMDTUInt64 coreMask,       // can be AMDT_CP_ALL_CORES
                         bool ignoreSystemModules,
                         bool separateByCore,
