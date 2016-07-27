@@ -9,6 +9,8 @@ if [ "$1" = "--help" ]; then
 	echo "Number of concurrent jobs -j(number of jobs)"
 	echo "Debug CXL_build=debug"
 	echo "x86 - set "x86" as the first argument"
+	echo "CXL_boost_lib_dir = [path to boost libraries] - override the bundled boost libraries with files in given path"
+ 	echo "CXL_boost_include_dir = [path to boost headers] - override the bundled boost headers with files in given path"
 	exit 0
 fi 
 commandLineArgs=$*
