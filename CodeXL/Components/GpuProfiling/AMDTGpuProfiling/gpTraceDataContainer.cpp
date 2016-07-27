@@ -1380,10 +1380,22 @@ void gpTraceDataContainer::AddBakedCommandBuffer(VKGPUTraceInfo* pAPIInfo)
     GT_IF_WITH_ASSERT(pAPIInfo != nullptr)
     {
         CommandListInstanceData bakedCommandBuffer;
+        QString commandListName = QString::fromStdString(pAPIInfo->m_commandBufferHandleStr);
         bakedCommandBuffer.m_startTimeGPU = pAPIInfo->m_ullStart;
         bakedCommandBuffer.m_endTimeGPU = pAPIInfo->m_ullEnd;
-        bakedCommandBuffer.m_commandListPtr = QString::fromStdString(pAPIInfo->m_commandBufferHandleStr);
+        bakedCommandBuffer.m_commandListPtr = commandListName;
         m_commandListInstancesVector << bakedCommandBuffer;
+
+        // Add this command list to the queue names map. Make sure that the command list was not added with a different name before
+        QString queueName = QString::fromStdString(pAPIInfo->m_queueIndexStr);
+        if (m_commandListToQueueMap.contains(commandListName) && !m_commandListToQueueMap[commandListName].isEmpty())
+        {
+            GT_ASSERT_EX(m_commandListToQueueMap[commandListName] == queueName, L"This command list was already added with another queue name");
+        }
+        else
+        {
+            m_commandListToQueueMap[commandListName] = queueName;
+        }
     }
 }
 
