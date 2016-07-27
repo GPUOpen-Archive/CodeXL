@@ -103,15 +103,6 @@ const int MAX_ENV_VAR_COUNT = 1024;
 
 // *************** INTERNALLY-LINKED UTILITY FUNCTIONS - START ***************  //
 
-static bool TerminateProcess(osProcessId procId)
-{
-    bool ret = false;
-    GT_IF_WITH_ASSERT(procId != 0)
-    {
-        ret = osTerminateProcess(procId);
-    }
-    return ret;
-}
 
 static bool FillPathBuffers(REMOTE_OPERATION_MODE mode, bool is64BitTarget, osFilePath& fileBuffer, osFilePath& pathBuffer)
 {
@@ -697,9 +688,9 @@ static bool HandleProcessTerminationRequest(osProcessId& processId)
 {
     // before terminating the process - terminate its children. This prevents the children from remaining as zombies
     // and may also help to free the process itself.
-    osTerminateChildren(processId);
+    bool isTerminateChildren = true;
 
-    bool isOk = TerminateProcess(processId);
+    bool isOk = osTerminateProcess(processId, 0, isTerminateChildren, true);
 
     if (isOk)
     {
@@ -1127,9 +1118,17 @@ void dmnSessionThread::GetDaemonPlatform()
 bool dmnSessionThread::TerminateGraphicsBeckendServerSession()
 {
     bool isOk = false;
-    dmnUtils::LogMessage(L"DMN: RECEIVED REMOTE OPCODE -> TERMINATE PERFSTUDIO SESSION REQUEST.", OS_DEBUG_LOG_DEBUG);
+    dmnUtils::LogMessage(L"DMN: RECEIVED REMOTE OPCODE -> TERMINATE GRAPHICS SESSION REQUEST.", OS_DEBUG_LOG_DEBUG);
+
+#if AMDT_BUILD_TARGET == AMDT_LINUX_OS
+    // wait for server process to gracefully shutdown before termination:
+    // CXL client is requesting via HTTP connection to shutdown server before it sends this termination request
+    // thus we wait for process to be shutdown properly before trying to terminating it
+    osWaitForProcessToTerminate(m_sGraphicsProcId, GRAPHIC_SERVER_SHUTDOWN_MAX_WAIT_MS);
+#endif
+
     isOk = HandleProcessTerminationRequest(m_sGraphicsProcId);
-    GT_ASSERT_EX(isOk, L"PERFSTUDIO Termination.");
+    GT_ASSERT_EX(isOk, L"CXLGraphicsServer Termination.");
     CleanupProcessLeftOvers(romGRAPHICS);
     // Respond.
     ReportResult(isOk, m_pConnHandler);                        return isOk;
@@ -1196,7 +1195,7 @@ bool dmnSessionThread::KillRunningProcess()
 
         gtVector<gtString> processNames;
         processNames.push_back(processName);
-        osTerminateProcessesByName(processNames);
+        osTerminateProcessesByName(processNames, 0, true, true);
 
         retVal = true;
 
@@ -1837,46 +1836,6 @@ bool dmnSessionThread::ReadFile(const osFilePath& filePath, const bool isBinary,
     return retVal;
 }
 
-bool dmnSessionThread::terminateProcess(REMOTE_OPERATION_MODE mode)
-{
-    bool ret = false;
-    osProcessId procId = 0;
-
-    if (mode == romDEBUG)
-    {
-        procId = m_rdsProcId;
-        m_rdsProcId = 0x0;
-    }
-    else if (mode == romPROFILE)
-    {
-        procId = m_sProfProcId;
-        m_sProfProcId = 0x0;
-    }
-    else if (mode == romGRAPHICS)
-    {
-        procId = m_sGraphicsProcId;
-        m_sGraphicsProcId = 0x0;
-#if AMDT_BUILD_TARGET == AMDT_LINUX_OS
-        // wait for server process to gracefully shutdown before termination:
-        // CXL client is requesting via HTTP connection to shutdown server before it sends this termination request
-        // thus we wait for process to be shutdown properly before trying to terminating it
-        osWaitForProcessToTerminate(procId, GRAPHIC_SERVER_SHUTDOWN_MAX_WAIT_MS);
-#endif
-    }
-
-    ret = TerminateProcess(procId);
-    GT_ASSERT(ret);
-
-    if (!ret)
-    {
-        std::wstringstream stream;
-        stream << "Unable to terminate process with mode: " << dmnUtils::OpModeToString(mode) << ".";
-        dmnUtils::LogMessage(stream.str(), OS_DEBUG_LOG_ERROR);
-    }
-
-    CleanupProcessLeftOvers(mode);
-    return ret;
-}
 void dmnSessionThread::CleanupProcessLeftOvers(const REMOTE_OPERATION_MODE mode) const
 {
 #if AMDT_BUILD_TARGET == AMDT_LINUX_OS
@@ -1913,40 +1872,21 @@ void dmnSessionThread::releaseResources()
 
     if (m_rdsProcId != 0)
     {
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-
-        // First, terminate RDS's child processes.
-        // This is currently only supported on Windows.
-        osTerminateChildren(m_rdsProcId);
-#endif
         // Terminate the RDS itself.
-        TerminateProcess(m_rdsProcId);
+        osTerminateProcess(m_rdsProcId,0,true);
     }
 
     if (m_sProfProcId != 0)
     {
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-
-        // First, terminate RDS's child processes.
-        // This is currently only supported on Windows.
-        osTerminateChildren(m_sProfProcId);
-#endif
-
-        TerminateProcess(m_sProfProcId);
+        osTerminateProcess(m_sProfProcId,0,true);
     }
 
     if (m_sGraphicsProcId != 0)
     {
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-
-        // First, terminate PerfStudio's child processes.
-        // This is currently only supported on Windows.
-        osTerminateChildren(m_sGraphicsProcId);
-#endif
-
-        TerminateProcess(m_sGraphicsProcId);
+        osTerminateProcess(m_sGraphicsProcId,0,true,true);
     }
 }
+
 void dmnSessionThread::KillDependantProcesses()
 {
     osProcessesEnumerator processEnum;
@@ -1983,7 +1923,7 @@ void dmnSessionThread::KillServerExistingProcess(const osFilePath& serverPath)
     gtVector<gtString> fileNamesToTerminate;
     fileNamesToTerminate.push_back(fileName);
 
-    osTerminateProcessesByName(fileNamesToTerminate);
+    osTerminateProcessesByName(fileNamesToTerminate, 0, true, true);
 }
 
 bool dmnSessionThread::GetCapturedFramesByTime()
