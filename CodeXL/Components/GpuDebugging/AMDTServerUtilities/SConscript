@@ -7,18 +7,17 @@ Import('*')
 libName = "CXLServerUtilities"
 
 env = CXL_env.Clone()
+
+UseAPPSDK(env);
+UseBoost(env)
+
 env.Append( CPPPATH = [ 
 	".",
 	"./..",
 	"Include",
-	"/home/tlv/work/CodeXL/Common/Lib/Ext/Boost/boost_1_59_0",
 	env['CXL_commonproj_dir'],
 	env['CXL_commonproj_dir'] + "/AMDTOSWrappers/Include",
 ])
-
-UseAPPSDK(env);
-initBoost(env)
-UseBoost(env)
 
 
 #special case for the slow motion file

@@ -78,8 +78,14 @@ def initCXLVars (CXL_vars) :
 
     # CxL support for system_boost
     CXL_vars.Add(
-        key = 'CXL_boost_dir',
-        help = 'Specify Boost directory to use',
+        key = 'CXL_boost_lib_dir',
+        help = 'Specify Boost binaries directory to use',
+        default = '',)
+
+    # CxL support for system_boost
+    CXL_vars.Add(
+        key = 'CXL_boost_include_dir',
+        help = 'Specify Boost headers directory to use',
         default = '',)
 
 def initJava (env) :
@@ -581,7 +587,7 @@ def initGLEW (env) :
     copySharedLibrary(env, "libGLEW.so", amdglew_dir, env['CXL_lib_dir']) 
 
 def initBoost (env) :
-    if (env['CXL_boost_dir'] == ''):
+    if (env['CXL_boost_lib_dir'] == ''):
       boost_lib_dir =  env['CXL_common_dir'] + '/Lib/Ext/Boost/boost_1_59_0/lib/RHEL6'
   
       if (env['CXL_arch'] == 'x86_64'):
@@ -597,18 +603,19 @@ def initBoost (env) :
       else:
         boost_lib_dir = boost_lib_dir + '/x86/'
     else:
-      boost_lib_dir=env['CXL_boost_dir']
+      boost_lib_dir=env['CXL_boost_lib_dir']
 
     env.Append(LIBPATH = [boost_lib_dir])
 
 def UseBoost (env):
     compiler_base_flags = ' -Wno-deprecated-declarations '
     env.Append(CPPFLAGS = compiler_base_flags)
-    if (env['CXL_boost_dir'] == ''):
+    if (env['CXL_boost_include_dir'] == ''):
       boost_include_dir =  env['CXL_common_dir'] + '/Lib/Ext/Boost/boost_1_59_0'
-      env.Append(CPPPATH = [boost_include_dir])
-    else:  
-      env.Append(CPPPATH = [env['CXL_boost_dir']])
+    else: 
+      boost_include_dir =  env['CXL_boost_include_dir']
+    
+    env.Append(CPPPATH = [boost_include_dir])
 
 def UseFltk (env):
     amdfltk_dir =  env['CXL_common_dir'] + '/Lib/Ext/fltk/1.1.0/'

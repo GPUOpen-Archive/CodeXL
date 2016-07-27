@@ -74,7 +74,8 @@ CodeXL build instructions
 * __-j__ specify the number of concurrent jobs (-j6).
 * __CXL\_build=[debug|release]__ - build type. If not stated default value is release. 
 * __CXL\_build\_verbose=1__ - verbose output
-* __CXL\_boost\_dir=[path to boost libraries]__ - override the bundled boost libraries with files in given path
+* __CXL\_boost\_lib\_dir=[path to boost libraries]__ - override the bundled boost libraries with files in given path
+* __CXL\_boost\_include\_dir=[path to boost headers]__ - override the bundled boost headers with files in given path
 * __CXL\_hsa=[true|false]__ - define if to build HSA parts. If not stated default value is false (skip HSA)
 * __-c__ - performs a "clean" of all build targets.
 * When executing the backend\_build.sh script, the following switches are supported:
@@ -90,7 +91,7 @@ CodeXL build instructions
 #### Specific build instructions Ubuntu 16.04
 * Since Ubuntu 16.04 comes with gcc 5.3, use the installed system boost libraries. example -
 ./backend\_build.sh boostlibdir /usr/lib/x86\_64-linux-gnu
-./buildCodeXLFullLinuxProjects -j5 CXL\_build=debug CXL\_boost\_dir=/usr/lib/x86\_64-linux-gnu
+./buildCodeXLFullLinuxProjects -j5 CXL\_build=debug CXL\_boost\_lib\_dir=/usr/lib/x86\_64-linux-gnu CXL\_boost\_include\_dir=/usr/include/boost
 
 #### Running CodeXL
 The folder containing the CodeXL binaries can be found in the root folder of CodeXL (Output_x86_64). 
