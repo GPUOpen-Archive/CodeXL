@@ -302,11 +302,14 @@ bool osWaitForProcessToTerminate(osProcessId processId, unsigned long timeoutMse
 // Description: Terminates a process, running on the local machine.
 // Arguments: processId - The id of the process to be terminated.
 //            exitCode - ignored on Linux (used only in iPhone on-device).
+//            isTerminateChildren - should processes spawned by the target process be terminated too
+//            isGracefulShutdownRequired - attempts to close the process gracefully before forcefully terminating it. 
+//                                          This option is currently not implemented on Windows.
 // Return Val: bool  - Success / failure.
 // Author:      AMD Developer Tools Team
-// Date:        11/1/2010
+// Date:        17/8/2009
 // ---------------------------------------------------------------------------
-bool osTerminateProcess(osProcessId processId, long exitCode, bool isTerminateChildren)
+bool osTerminateProcess(osProcessId processId, long exitCode, bool isTerminateChildren, bool isGracefulShutdownRequired)
 {
     bool retVal = false;
 
@@ -327,10 +330,21 @@ bool osTerminateProcess(osProcessId processId, long exitCode, bool isTerminateCh
 
     if (isTerminateChildren)
     {
-        osTerminateChildren(processId);
+        osTerminateChildren(processId, isGracefulShutdownRequired);
     }
 
-    // If
+    if (isGracefulShutdownRequired)
+    {
+        int rcKill = ::kill(processId, SIGTERM);
+
+        if (rcKill == 0)
+        {
+            const unsigned long timeoutWaitingForGracefulShutdownInMilliseconds = 2000;
+            retVal = osWaitForProcessToTerminate(processId, timeoutWaitingForGracefulShutdownInMilliseconds);
+        }
+    }
+
+    // If process is not dead yet
     if (!retVal)
     {
         int rcKill = ::kill(processId, SIGKILL);
@@ -338,7 +352,6 @@ bool osTerminateProcess(osProcessId processId, long exitCode, bool isTerminateCh
         if (rcKill == 0)
         {
             retVal = true;
-
             waitpid(processId, NULL, 0);
         }
     }
@@ -1115,7 +1128,7 @@ bool osProcessesEnumerator::next(osProcessId& processId, gtString* pName)
 // Author:      AMD Developer Tools Team
 // Date:        19/02/2013
 // ---------------------------------------------------------------------------
-OS_API bool osTerminateChildren(osProcessId parentProcessId)
+OS_API bool osTerminateChildren(osProcessId parentProcessId, bool isGracefulShutdownRequired)
 {
     bool retVal = false;
     std::vector<osProcessId> children;
@@ -1144,7 +1157,7 @@ OS_API bool osTerminateChildren(osProcessId parentProcessId)
 
     for (auto childProcessId : children)
     {
-        bool isSuccessfulTermination = osTerminateProcess(childProcessId, 0, false);
+        bool isSuccessfulTermination = osTerminateProcess(childProcessId, 0, true, isGracefulShutdownRequired);
         retVal = isSuccessfulTermination;
     }
 

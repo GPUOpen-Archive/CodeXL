@@ -1089,12 +1089,16 @@ public:
             gtInt32 opStatus = dosFailure;
             m_tcpClient >> opStatus;
             ret = (opStatus == dosSuccess);
-            GT_ASSERT_EX(ret, L"Terminate RDS opcode submission.");
+            GT_ASSERT_EX(ret, L"Terminate remote process opcode submission.");
 
             // Verify termination.
             m_tcpClient >> opStatus;
             ret = (opStatus == dosSuccess);
-            GT_ASSERT_EX(ret, L"RDS Termination.");
+            if (!ret)
+            {
+                OS_OUTPUT_DEBUG_LOG(L"CodeXLRemoteAgent reported failure to terminate a remote process. Note: in case of Graphics Server it may have already shutdown due to separate command.", OS_DEBUG_LOG_ERROR);
+            }
+            
         }
 
         return ret;

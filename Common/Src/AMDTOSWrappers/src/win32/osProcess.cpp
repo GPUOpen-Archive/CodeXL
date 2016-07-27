@@ -18,6 +18,8 @@
 #include <Windows.h>
 #include <shellapi.h>
 #include <psapi.h>
+#include <tlhelp32.h>
+#include <aclapi.h>
 
 // Infra:
 #include <AMDTBaseTools/Include/gtAssert.h>
@@ -31,6 +33,7 @@
 #include <AMDTOSWrappers/Include/osProcessSharedFile.h>
 #include <AMDTOSWrappers/Include/osUser.h>
 #include <AMDTOSWrappers/Include/osDebugLog.h>
+#include <AMDTOSWrappers/Include/osSystemError.h>
 #include <AMDTOSWrappers/Include/osThread.h>
 #include <AMDTOSWrappers/Include/osTime.h>
 
@@ -194,6 +197,161 @@ static bool ReadProcessPlatformWow64(HANDLE hProcess, osRuntimePlatform& platfor
 // redirection files:
 osProcessSharedFile g_outputRedirectFile;
 osProcessSharedFile g_inputRedirectFile;
+
+#if !defined ( SID_REVISION )
+#define SID_REVISION ( 1 ) ///< SID definition
+#endif
+
+bool osEnableTokenPrivilege(HANDLE htok, LPCTSTR szPrivilege, TOKEN_PRIVILEGES* tpOld)
+{
+    TOKEN_PRIVILEGES tp;
+    tp.PrivilegeCount = 1;
+    tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+
+    if (LookupPrivilegeValue(0, szPrivilege, &tp.Privileges[0].Luid))
+    {
+        DWORD cbOld = sizeof(*tpOld);
+
+        if (AdjustTokenPrivileges(htok, FALSE, &tp, cbOld, tpOld, &cbOld))
+        {
+            return (ERROR_NOT_ALL_ASSIGNED != osGetLastSystemError());
+        }
+        else
+        {
+            OS_OUTPUT_DEBUG_LOG(L"osAdjustDACL() failed", OS_DEBUG_LOG_ERROR);
+
+            return false;
+        }
+    }
+    else
+    {
+        OS_OUTPUT_DEBUG_LOG(L"osAdjustDACL() failed", OS_DEBUG_LOG_ERROR);
+
+        return (FALSE);
+    }
+}
+// ---------------------------------------------------------------------------
+// Name:        osAdjustDacl
+// Description: Adjust the  discretionary access control list (DACL) of a windows object
+// Arguments:   h - handle of the Windows object
+//              dwAccessRights - the desired access rights
+// Return Val:  true if DACL was adjusted to provide the desired access was successfully
+// Author:      AMD Developer Tools Team
+// Date:        
+// ---------------------------------------------------------------------------
+static bool osAdjustDACL(HANDLE h, DWORD dwDesiredAccess)
+{
+    bool retVal = false;
+    SID world = { SID_REVISION, 1, SECURITY_WORLD_SID_AUTHORITY, 0 };
+
+    EXPLICIT_ACCESS ea =
+    {
+        0,
+        SET_ACCESS,
+        NO_INHERITANCE,
+        {
+            0,
+            NO_MULTIPLE_TRUSTEE,
+        TRUSTEE_IS_SID,
+        TRUSTEE_IS_USER,
+        0
+        }
+    };
+
+    ACL* pdacl = 0;
+    DWORD err = SetEntriesInAcl(1, &ea, 0, &pdacl);
+
+    ea.grfAccessPermissions = dwDesiredAccess;
+    ea.Trustee.ptstrName = (LPTSTR)(&world);
+
+    if (err == ERROR_SUCCESS)
+    {
+        err = SetSecurityInfo(h, SE_KERNEL_OBJECT, DACL_SECURITY_INFORMATION, 0, 0, pdacl, 0);
+        LocalFree(pdacl);
+
+        retVal = (err == ERROR_SUCCESS);
+    }
+    else
+    {
+        OS_OUTPUT_DEBUG_LOG(L"osAdjustDACL() failed", OS_DEBUG_LOG_ERROR);
+    }
+
+    return retVal;
+}
+
+// ---------------------------------------------------------------------------
+// Name:        osAdvancedOpenProcess
+// Description: Makes every effort possible to open a process handle
+// Arguments:   pid - The process id of the process to open
+//              dwAccessRights - the desired access rights
+// Return Val:  The handle to the target process
+// Author:      AMD Developer Tools Team
+// Date:        
+// ---------------------------------------------------------------------------
+static osProcessHandle osAdvancedOpenProcess(osProcessId pid, DWORD dwAccessRights)
+{
+    osProcessHandle hProcess = OpenProcess(dwAccessRights, FALSE, pid);
+
+    if (hProcess == NULL)
+    {
+        osProcessHandle hpWriteDAC = OpenProcess(WRITE_DAC, FALSE, pid);
+
+        if (hpWriteDAC == NULL)
+        {
+            HANDLE htok;
+            TOKEN_PRIVILEGES tpOld;
+
+            if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES, &htok) == false)
+            {
+                return (FALSE);
+            }
+
+            if (osEnableTokenPrivilege(htok, SE_TAKE_OWNERSHIP_NAME, &tpOld))
+            {
+                osProcessHandle hpWriteOwner = OpenProcess(WRITE_OWNER, FALSE, pid);
+
+                if (hpWriteOwner != NULL)
+                {
+                    BYTE buf[512];
+                    DWORD cb = sizeof buf;
+
+                    if (GetTokenInformation(htok, TokenUser, buf, cb, &cb))
+                    {
+                        DWORD err = SetSecurityInfo(hpWriteOwner, SE_KERNEL_OBJECT, OWNER_SECURITY_INFORMATION, ((TOKEN_USER*)(buf))->User.Sid, 0, 0, 0);
+
+                        if (err == ERROR_SUCCESS)
+                        {
+                            if (!DuplicateHandle(GetCurrentProcess(), hpWriteOwner, GetCurrentProcess(), &hpWriteDAC, WRITE_DAC, FALSE, 0))
+                            {
+                                hpWriteDAC = NULL;
+                            }
+                        }
+                    }
+
+                    CloseHandle(hpWriteOwner);
+                }
+
+                AdjustTokenPrivileges(htok, FALSE, &tpOld, 0, 0, 0);
+            }
+
+            CloseHandle(htok);
+        }
+
+        if (hpWriteDAC)
+        {
+            osAdjustDACL(hpWriteDAC, dwAccessRights);
+
+            if (!DuplicateHandle(GetCurrentProcess(), hpWriteDAC, GetCurrentProcess(), &hProcess, dwAccessRights, FALSE, 0))
+            {
+                hProcess = NULL;
+            }
+
+            CloseHandle(hpWriteDAC);
+        }
+    }
+
+    return hProcess;
+}
 
 // ---------------------------------------------------------------------------
 // Name:        osSetCurrentProcessEnvVariable
@@ -481,26 +639,30 @@ bool osWaitForProcessToTerminate(osProcessId processId, unsigned long timeoutMse
 // Description: Terminates a process, running on the local machine.
 // Arguments: processId - The id of the process to be terminated.
 //            exitCode - The terminated process exit code.
+//            isTerminateChildren - should processes spawned by the target process be terminated too
+//            isGracefulShutdownRequired - attempts to close the process gracefully before forcefully terminating it. 
+//                                          This option is currently not implemented on Windows.
 // Return Val: bool  - Success / failure.
 // Author:      AMD Developer Tools Team
 // Date:        17/8/2009
 // ---------------------------------------------------------------------------
-bool osTerminateProcess(osProcessId processId, long exitCode, bool isTerminateChildren)
+bool osTerminateProcess(osProcessId processId, long exitCode, bool isTerminateChildren, bool isGracefulShutdownRequired)
 {
     bool retVal = false;
 
     if (isTerminateChildren)
     {
-        osTerminateChildren(processId);
+        osTerminateChildren(processId, isGracefulShutdownRequired);
     }
 
     // Get a handle to the process:
-    osProcessHandle processHandle = ::OpenProcess(PROCESS_TERMINATE, FALSE, processId);
+    osProcessHandle processHandle = osAdvancedOpenProcess(processId, PROCESS_TERMINATE);
 
     GT_IF_WITH_ASSERT(processHandle != NULL)
     {
         // Terminates the process:
         int rc = ::TerminateProcess(processHandle, (UINT)exitCode);
+        CloseHandle(processHandle);
 
         retVal = (rc != 0);
 
@@ -508,6 +670,7 @@ bool osTerminateProcess(osProcessId processId, long exitCode, bool isTerminateCh
 
     return retVal;
 }
+
 
 // ----------------------------------------------------------------------------------
 // Name:        osRemoveRedirectionFromCmdLine
@@ -802,7 +965,7 @@ OS_API bool osIsProcessAlive(osProcessId processId, bool& buffer)
 // Author:      AMD Developer Tools Team
 // Date:        08/10/2013
 // ---------------------------------------------------------------------------
-OS_API bool osTerminateChildren(osProcessId processId)
+OS_API bool osTerminateChildren(osProcessId processId, bool isGracefulShutdownRequired)
 {
     // Take a snapshot of all processes that are currently running in the system.
     HANDLE h = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -823,7 +986,7 @@ OS_API bool osTerminateChildren(osProcessId processId)
                 if (pe.th32ParentProcessID == processId)
                 {
                     // Terminate this child.
-                    bool isOk = osTerminateProcess(pe.th32ProcessID);
+                    bool isOk = osTerminateProcess(pe.th32ProcessID, isGracefulShutdownRequired);
                     GT_ASSERT_EX(isOk, L"Failed to terminate a child process.");
                     ret = ret && isOk;
                 }

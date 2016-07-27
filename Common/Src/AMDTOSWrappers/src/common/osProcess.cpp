@@ -13,7 +13,7 @@
 // Local:
 #include <AMDTOSWrappers/Include/osProcess.h>
 
-OS_API void osTerminateProcessesByName(const gtVector<gtString>& processNames, const osProcessId parentProcessId, const bool exactMatch)
+OS_API void osTerminateProcessesByName(const gtVector<gtString>& processNames, const osProcessId parentProcessId, const bool exactMatch, bool isGracefulShutdownRequired)
 {
     osProcessesEnumerator processEnum;
 
@@ -39,7 +39,7 @@ OS_API void osTerminateProcessesByName(const gtVector<gtString>& processNames, c
                     if (0 == parentProcessId || osIsParent(parentProcessId, processId))
                     {
                         // Terminate the process
-                        osTerminateProcess(processId);
+                        osTerminateProcess(processId,0,true, isGracefulShutdownRequired);
 
                         if (exactMatch)
                         {
