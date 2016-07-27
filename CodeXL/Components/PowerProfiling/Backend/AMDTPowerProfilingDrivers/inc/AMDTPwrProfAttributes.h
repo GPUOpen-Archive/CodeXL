@@ -42,7 +42,7 @@
 // Major version should be changed after every release
 // Minor version should be changed for any change in driver code
 // Please update the version number in file located at ../Linux/CodeXLPwrProfVersion
-#define LINUX_PWR_DRV_MAJOR 4
+#define LINUX_PWR_DRV_MAJOR 5
 #define LINUX_PWR_DRV_MINOR 10
 
 #define POWER_PROFILE_DRIVER_VERSION \
