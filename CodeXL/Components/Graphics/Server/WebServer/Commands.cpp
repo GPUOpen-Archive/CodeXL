@@ -148,6 +148,7 @@ void ProcessGetMethod(HTTPRequestHeader* pRequestHeader, NetSocket* pClientSocke
     }
     else if (IsToken(&sCmd, "Shutdown"))
     {
+        osTerminateChildren(osGetCurrentProcessId(), true);
         ProcessTracker::Instance()->KillAllProcesses();
         SendTextResponse(requestID, "OK", pClientSocket);
         g_shutdownEvent.Signal();
