@@ -53,7 +53,7 @@ CodeXL build instructions
 * `yum -y install glibc-devel.i686 libstdc++-static.i686`
 
 #### Building the JAVA Agent: <a id="Building-the-JAVA-Agent"></a>
-* Install Java JDK (version 1.7.x or higher) from Linux distribution (`sudo yum install java-1.8.0-openjdk-devel` \ `sudo apt-get install java-1.8.0-openjdk-devel`).
+* Install Java JDK (version 1.7.x or higher) from Linux distribution (for example: `sudo yum install java-1.8.0-openjdk-devel` \ `sudo apt-get install openjdk-8-jdk-headless`).
 * Or download and install latest JDK for linux Oracle site: http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 *  Before build please define JAVA\_HOME variable for example : export JAVA\_HOME=/opt/java/jdk1.8.0\_77
 * If JAVA\_HOME variable is not defined the build will skip the Java agent project.
