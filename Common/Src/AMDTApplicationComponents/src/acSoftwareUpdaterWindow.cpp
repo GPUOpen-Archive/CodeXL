@@ -121,6 +121,9 @@ void  acSoftwareUpdaterWindow::connectSlots()
     bool rc = connect(m_pChkUpdateFrequencyComboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(onUpdateCheckDaysChanged(const QString&)));
     GT_ASSERT(rc);
 
+    rc = connect(m_pCheckOnStartUpCheckBox, SIGNAL(stateChanged(int)), this, SLOT(checkUpdateOnStartupStateChanged(int)));
+    GT_ASSERT(rc);
+
     rc = connect(m_pInstallButton, SIGNAL(clicked(bool)), this, SLOT(onInstallClick()));
     GT_ASSERT(rc);
 
@@ -270,7 +273,6 @@ void acSoftwareUpdaterWindow::checkUpdateOnStartupStateChanged(int state)
     saveUserProfile();
 
 }
-
 
 bool acSoftwareUpdaterWindow::downloadAndInstall()
 {
@@ -610,6 +612,8 @@ void acSoftwareUpdaterWindow::onUpdateCheckDaysChanged(const QString& text)
     {
         m_iNextCheckScheduleInDay = 30;
     }
+
+    saveUserProfile();
 }
 
 void acSoftwareUpdaterWindow::setStatusLabel(const QString& message, int progress)
