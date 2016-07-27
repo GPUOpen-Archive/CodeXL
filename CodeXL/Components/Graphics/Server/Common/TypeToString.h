@@ -9,6 +9,7 @@
 #define TYPETOSTRING_H
 
 #include <AMDTBaseTools/Include/gtASCIIString.h>
+#include <AMDTBaseTools/Include/gtStringConstants.h>
 
 #include "misc.h"
 
@@ -94,9 +95,9 @@ inline gtASCIIString UINTToString(UINT uVal)
 /// Converts a UINT64 to a hex string
 /// \param uVal
 /// \return String version of the input data
-inline gtASCIIString UINT64ToHexString(UINT64 uVal)
+inline gtASCIIString UINT64ToHexString(gtUInt64 uVal)
 {
-    return FormatText("%p", uVal);
+    return FormatText(GT_64_BIT_POINTER_ASCII_FORMAT_LOWERCASE, uVal);
 }
 
 /// Converts a bool to a UINT64
