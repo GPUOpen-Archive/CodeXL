@@ -4843,9 +4843,16 @@ public:
     {
         bool ret = false;
         std::stringstream query;
+
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
         query << "SELECT functionId, offset " \
             "FROM SampleContext "    \
             "WHERE functionId & 0x0000ffff = 0;";
+#else
+        query << "SELECT functionId, offset " \
+            "FROM SampleContext "    \
+            "WHERE (functionId & 65535) = 0;";
+#endif
 
         sqlite3_stmt* pQueryStmt = nullptr;
         const std::string& queryStr = query.str();
@@ -5018,11 +5025,19 @@ public:
             if (!queryUnknownFuncs)
             {
                 // query << " GROUP BY functionId HAVING functionId & 0x0000ffff > 0 ";  // Don't aggregate for unknown functions
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
                 query << " GROUP BY (CASE WHEN (functionId & 0x0000FFFF) > 0 THEN functionId ELSE offset END) ";
+#else
+                query << " GROUP BY (CASE WHEN (functionId & 65535) > 0 THEN functionId ELSE offset END) ";
+#endif
             }
             else
             {
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
                 query << " GROUP BY functionId, offset HAVING functionId & 0x0000ffff = 0 ";
+#else
+                query << " GROUP BY functionId, offset HAVING (functionId & 65535) = 0 ";
+#endif
             }
 
             if (doSort)
@@ -5112,9 +5127,16 @@ public:
     {
         bool ret = false;
         std::stringstream query;
+
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
         query << "SELECT functionId, moduleId, offset " \
                  "FROM SampleFunctionSummaryAllData "    \
                  "WHERE functionId & 0x0000ffff = 0;";
+#else
+        query << "SELECT functionId, moduleId, offset " \
+                 "FROM SampleFunctionSummaryAllData "    \
+                 "WHERE (functionId & 65535) = 0;";
+#endif
 
         sqlite3_stmt* pQueryStmt = nullptr;
         const std::string& queryStr = query.str();
@@ -5501,9 +5523,16 @@ public:
         bool ret = false;
 
         std::stringstream query;
+
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
         query << "SELECT callstackId, functionId, offset, samplingConfigurationId, selfSamples "  \
                  "FROM  CallstackLeaf "     \
                  "WHERE processId = ? AND functionId & 0x0000ffff = 0 ;";
+#else
+        query << "SELECT callstackId, functionId, offset, samplingConfigurationId, selfSamples "  \
+                 "FROM  CallstackLeaf "     \
+                 "WHERE processId = ? AND (functionId & 65535) = 0 ;";
+#endif
 
         sqlite3_stmt* pQueryStmt = nullptr;
         const std::string& queryStr = query.str();
@@ -5590,10 +5619,18 @@ public:
 
         if (!queryUnknownFuncs)
         {
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
             query << "SELECT callstackId, functionId, Module.isSystemModule, offset, SUM(selfSamples) "  \
                 "FROM  CallstackLeaf "     \
                 "INNER JOIN Module on ((CallstackLeaf.functionId & 0xFFFF0000) >> 16) = Module.id " \
                 "WHERE processId = ? AND samplingConfigurationId = ? ";
+#else
+            query << "SELECT callstackId, functionId, Module.isSystemModule, offset, SUM(selfSamples) "  \
+                "FROM  CallstackLeaf "     \
+                "INNER JOIN Module on ((CallstackLeaf.functionId & 4294901760) >> 16) = Module.id " \
+                "WHERE processId = ? AND samplingConfigurationId = ? ";
+#endif
+
 
             if (IS_CALLSTACK_QUERY(callstackId))
             {
@@ -5611,15 +5648,26 @@ public:
             }
             else
             {
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
                 query << "GROUP BY callstackId, functionId HAVING functionId & 0x0000ffff > 0 ";
+#else
+                query << "GROUP BY callstackId, functionId HAVING (functionId & 65535) > 0 ";
+#endif
             }
         }
         else
         {
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
             query << "SELECT callstackId, functionId, Module.isSystemModule, offset, selfSamples "  \
                      "FROM  CallstackLeaf "     \
                      "INNER JOIN Module on ((CallstackLeaf.functionId & 0xFFFF0000) >> 16) = Module.id " \
                      "WHERE processId = ? AND samplingConfigurationId = ? AND (functionId & 0x0000ffff) = 0 ";
+#else
+            query << "SELECT callstackId, functionId, Module.isSystemModule, offset, selfSamples "  \
+                     "FROM  CallstackLeaf "     \
+                     "INNER JOIN Module on ((CallstackLeaf.functionId & 4294901760) >> 16) = Module.id " \
+                     "WHERE processId = ? AND samplingConfigurationId = ? AND (functionId & 65535) = 0 ";
+#endif
 
             if (IS_CALLSTACK_QUERY(callstackId))
             {
