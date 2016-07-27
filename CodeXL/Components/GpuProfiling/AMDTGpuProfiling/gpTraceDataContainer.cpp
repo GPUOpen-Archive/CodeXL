@@ -1140,6 +1140,9 @@ QString gpTraceDataContainer::AddGPUCallToCommandList(APIInfo* pAPIInfo)
                 }
             }
 
+            int commandListIndex = -1;
+            QString commandListPtr = commandListName;
+
             if (pMatchingCPUItem != nullptr)
             {
                 // Find the command list data for which this GPU call should be added
@@ -1167,8 +1170,6 @@ QString gpTraceDataContainer::AddGPUCallToCommandList(APIInfo* pAPIInfo)
                     }
                 }
 
-                int commandListIndex = -1;
-                QString commandListPtr = commandListName;
 
                 // The sample id should be contained in one of the lists
                 if ((commandListInstnaceIndex >= 0) && (commandListInstnaceIndex < m_commandListInstancesVector.size()))
@@ -1198,7 +1199,10 @@ QString gpTraceDataContainer::AddGPUCallToCommandList(APIInfo* pAPIInfo)
                     retVal = CommandListNameFromPointer(commandListPtr, commandListIndex);
                 }
             }
-
+            else 
+            {
+                retVal = CommandListNameFromPointer(commandListPtr, commandListIndex);
+            }
         }
     }
 
