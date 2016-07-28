@@ -31,6 +31,7 @@
 
 #include <AMDTBaseTools/Include/gtAssert.h>
 #include <AMDTOSWrappers/Include/osApplication.h>
+#include <AMDTOSWrappers/Include/osDebugLog.h>
 #include <AMDTOSWrappers/Include/osProcess.h>
 #include <AMDTOSWrappers/Include/osStringConstants.h>
 #include <AMDTOSAPIWrappers/Include/oaDriver.h>
@@ -293,7 +294,7 @@ void CounterManager::LoadCountersModule()
         modulePath.setFileName(dllName);
         modulePath.setFileExtension(OS_MODULE_EXTENSION);
 
-        bool successfulLoad = osLoadModule(modulePath, m_gpaCountersModuleHandle);
+        bool successfulLoad = osLoadModule(modulePath, m_gpaCountersModuleHandle, nullptr, true);
 
         if (successfulLoad)
         {
