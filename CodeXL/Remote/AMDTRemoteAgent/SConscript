@@ -45,6 +45,12 @@ sources = \
 # Creating object files    
 objFiles = env.SharedObject(sources)
 
+otherResources = \
+[
+    "./CodeXLRemoteAgent",
+    "./CodeXLRemoteAgentConfig.xml",
+]
+
 linkerFlags = []
 
 env.Append (LIBS = [
@@ -73,5 +79,10 @@ exe = env.Program(
 libInstall = env.Install( 
     dir = env['CXL_bin_dir'], 
     source = (exe))
+
+# Install additional items - shell script, config file, etc.
+libInstall += env.Install(
+    dir = env['CXL_bin_dir'], 
+    source = (otherResources))
 
 Return('libInstall')
