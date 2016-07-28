@@ -15,6 +15,7 @@
 #include <sys/wait.h>
 #include <sys/time.h>
 #include <unistd.h>
+#include <algorithm>
 
 // POSIX:
 #include <signal.h>
@@ -260,29 +261,38 @@ bool osWaitForProcessToTerminate(osProcessId processId, unsigned long timeoutMse
         long        nanoSeconds;
         long        seconds;
         long        fractional;
+        long accumulatedWaitTimeNanoseconds = 0;
+        long nanoSecondsInSingleWait = 0;
+        long timeoutNanoseconds = timeoutMsec * 1000 * 1000;
 
+        
         // pay attention to the possibility of overflow for a 32-bit long
         // basically, don't convert the number into nanoseconds and then clean it up.
         seconds = timeoutMsec / 1000;
         fractional = timeoutMsec - (seconds * 1000);
         nanoSeconds = fractional * 1000 * 1000;
+        nanoSecondsInSingleWait = std::min<long>(50 * 1000 * 1000, nanoSeconds);
 
-        toSleep.tv_sec = seconds;
-        toSleep.tv_nsec = nanoSeconds;
-        (void) nanosleep(&toSleep, NULL);
-
-        if (child)
+        while (false == theProcessExited && accumulatedWaitTimeNanoseconds < timeoutNanoseconds)
         {
-            // And now do a non-blocking wait
-            waitPid = waitpid(processId, &status, WNOHANG);
+            toSleep.tv_sec = 0;
+            toSleep.tv_nsec = nanoSecondsInSingleWait;
+            (void)nanosleep(&toSleep, NULL);
 
-            // 0 means child exists
-            theProcessExited = (waitPid != 0);
-        }
-        else
-        {
-            osIsProcessAlive(processId, theProcessExited);
-            theProcessExited = !theProcessExited;
+            if (child)
+            {
+                // And now do a non-blocking wait
+                waitPid = waitpid(processId, &status, WNOHANG);
+
+                // 0 means child exists
+                theProcessExited = (waitPid != 0);
+            }
+            else
+            {
+                osIsProcessAlive(processId, theProcessExited);
+                theProcessExited = !theProcessExited;
+            }
+            accumulatedWaitTimeNanoseconds += nanoSecondsInSingleWait;
         }
     }
 
