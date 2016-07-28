@@ -173,7 +173,6 @@ Version
     MakeWriteable "[GPUPPATH]\Backend\Common\Version.h"
     Replace "[GPUPPATH]\Backend\Common\Version.h" "#define GPUPROFILER_BACKEND_BUILD_NUMBER [0-9]+" "#define GPUPROFILER_BACKEND_BUILD_NUMBER [BUILD]"
 
-Detours
     /// Update project files to enable Detours build - note these are destructive changes and will impact all subsequent builds
     MakeWriteable "[CXLPATH]\Components\GpuProfiling\Backend\DCServer\AMDTGpuProfilerDCServer.vcxproj"
     Replace "[CXLPATH]\Components\GpuProfiling\Backend\DCServer\AMDTGpuProfilerDCServer.vcxproj"  "Interceptor.mhook-dllinjector-2015.props" "Global-Interceptor-2015.props"
