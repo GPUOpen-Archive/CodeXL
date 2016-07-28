@@ -986,7 +986,7 @@ OS_API bool osTerminateChildren(osProcessId processId, bool isGracefulShutdownRe
                 if (pe.th32ParentProcessID == processId)
                 {
                     // Terminate this child.
-                    bool isOk = osTerminateProcess(pe.th32ProcessID, isGracefulShutdownRequired);
+                    bool isOk = osTerminateProcess(pe.th32ProcessID, 0, true, isGracefulShutdownRequired);
                     GT_ASSERT_EX(isOk, L"Failed to terminate a child process.");
                     ret = ret && isOk;
                 }
