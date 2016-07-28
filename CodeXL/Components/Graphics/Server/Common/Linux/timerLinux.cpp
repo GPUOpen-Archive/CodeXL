@@ -368,7 +368,7 @@ unsigned long Timer::GetAbsolute()
 ///
 /// \return the value from QueryPerformanceCounter
 //---------------------------------------------------------------------
-GPS_TIMESTAMP Timer::GetRaw()
+GPS_TIMESTAMP Timer::GetRaw() const
 {
     GPS_TIMESTAMP time;
 

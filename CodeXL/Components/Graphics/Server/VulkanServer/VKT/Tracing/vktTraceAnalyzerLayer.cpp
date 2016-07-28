@@ -555,6 +555,8 @@ ThreadTraceData* VktTraceAnalyzerLayer::CreateThreadTraceDataInstance()
 //-----------------------------------------------------------------------------
 void VktTraceAnalyzerLayer::LogAPICall(VktAPIEntry* pApiEntry)
 {
+    GPS_TIMESTAMP endTime = mFramestartTimer.GetRaw();
+
     ScopeLock logAPICallLock(&mTraceMutex);
 
     ThreadTraceData* pCurrentThreadData = FindOrCreateThreadData(pApiEntry->mThreadId);
@@ -567,7 +569,7 @@ void VktTraceAnalyzerLayer::LogAPICall(VktAPIEntry* pApiEntry)
         Log(logERROR, "There was a problem setting the start time for API call '%s' on Thread with Id '%d'.\n", pFuncNameString, pApiEntry->mThreadId);
     }
 
-    pCurrentThreadData->AddAPIEntry(pCurrentThreadData->m_startTime, pApiEntry);
+    pCurrentThreadData->AddAPIEntry(pCurrentThreadData->m_startTime, endTime, pApiEntry);
 }
 
 //-----------------------------------------------------------------------------
