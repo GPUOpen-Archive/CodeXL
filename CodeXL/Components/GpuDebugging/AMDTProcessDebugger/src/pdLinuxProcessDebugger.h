@@ -415,7 +415,7 @@ private:
     std::set<int>                               m_GDBIdsOfThreadsToRelease;      ///< Collection of opencl driver threads and additional spy thread gdb id which will
     ///< be resumed on host breakpoint or host break
 
-    enum { SUSPEND_PROCESS_WAITING_TIMEOUT = 200 };
+    enum { SUSPEND_PROCESS_WAITING_TIMEOUT = 1000 };
 };
 
 
