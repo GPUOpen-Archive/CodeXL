@@ -62,7 +62,7 @@ public:
         return m_cpuTimer.GetRaw();
     }
 
-    /// Add a new itme to the log.
+    /// Add a new item to the log.
     void Add(UINT32 thread, GPS_TIMESTAMP startTime)
     {
         CallsTiming ct;
@@ -70,6 +70,18 @@ public:
         ct.m_ThreadID = thread;
         ct.m_startTime = startTime;
         ct.m_endTime = m_cpuTimer.GetRaw();
+
+        m_TimingLog.push_back(ct);
+    }
+
+    /// Add a new item to the log.
+    void Add(UINT32 thread, GPS_TIMESTAMP startTime, GPS_TIMESTAMP endTime)
+    {
+        CallsTiming ct;
+
+        ct.m_ThreadID = thread;
+        ct.m_startTime = startTime;
+        ct.m_endTime = endTime;
 
         m_TimingLog.push_back(ct);
     }

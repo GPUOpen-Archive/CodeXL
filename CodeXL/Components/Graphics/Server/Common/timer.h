@@ -69,7 +69,7 @@ public:
     unsigned long GetAbsolute();
 
     /// Gets the raw QPC time
-    GPS_TIMESTAMP GetRaw();
+    GPS_TIMESTAMP GetRaw() const;
 
 private:
     /// time when the timer was reset

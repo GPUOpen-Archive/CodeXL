@@ -22,7 +22,7 @@
 //-----------------------------------------------------------------------------
 /// SortByStartTime
 //-----------------------------------------------------------------------------
-bool SortByStartTime(ProfilerResult*& lhs, ProfilerResult*& rhs)
+bool SortByStartTime(ProfilerResult* &lhs, ProfilerResult* &rhs)
 {
     return lhs->timestampResult.rawClocks.start <= rhs->timestampResult.rawClocks.start;
 }
@@ -475,6 +475,8 @@ ThreadTraceData* DX12TraceAnalyzerLayer::CreateThreadTraceDataInstance()
 //-----------------------------------------------------------------------------
 void DX12TraceAnalyzerLayer::LogAPICall(DX12APIEntry* inAPIEntry)
 {
+    GPS_TIMESTAMP endTime = mFramestartTimer.GetRaw();
+
     ScopeLock logAPICallLock(&mTraceMutex);
 
     ThreadTraceData* currentThreadData = FindOrCreateThreadData(inAPIEntry->mThreadId);
@@ -486,7 +488,7 @@ void DX12TraceAnalyzerLayer::LogAPICall(DX12APIEntry* inAPIEntry)
     }
 
     // Create a new entry for this traced API call, and add it to the list for the current thread.
-    currentThreadData->AddAPIEntry(currentThreadData->m_startTime, inAPIEntry);
+    currentThreadData->AddAPIEntry(currentThreadData->m_startTime, endTime, inAPIEntry);
 }
 
 //-----------------------------------------------------------------------------

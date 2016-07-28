@@ -33,12 +33,13 @@ ThreadTraceData::~ThreadTraceData()
 //--------------------------------------------------------------------------
 /// Insert the latest API call information into our list of traced calls.
 /// \param inStartTime The timestamp collected directly before the traced API call.
+/// \param inEndTime The timestamp collected directly after the traced API call.
 /// \param inNewEntry An APIEntry instance containing the details of the traced call.
 //--------------------------------------------------------------------------
-void ThreadTraceData::AddAPIEntry(GPS_TIMESTAMP inStartTime, APIEntry* inNewEntry)
+void ThreadTraceData::AddAPIEntry(GPS_TIMESTAMP inStartTime, GPS_TIMESTAMP inEndTime, APIEntry* inNewEntry)
 {
     // Insert a new logged duration into the call timer.
-    mAPICallTimer.Add(inNewEntry->mThreadId, inStartTime);
+    mAPICallTimer.Add(inNewEntry->mThreadId, inStartTime, inEndTime);
 
     // Now insert the APIEntry into the list of traced API calls for this thread.
     mLoggedCallVector.push_back(inNewEntry);
