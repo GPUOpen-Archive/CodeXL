@@ -272,9 +272,6 @@ private:
     /// Graphics communication server
     GraphicsServerCommunication* m_pGraphicsServerCommunication;
 
-    /// process id of the launched
-    osProcessId m_serverProcessID;
-
     /// executed application process id
     gtASCIIString m_applicationProcessID;
 

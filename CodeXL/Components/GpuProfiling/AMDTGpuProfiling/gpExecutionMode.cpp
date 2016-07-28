@@ -66,7 +66,6 @@
 gpExecutionMode::gpExecutionMode() :
     m_isFrameAnalysisRunning(false),
     m_pGraphicsServerCommunication(nullptr),
-    m_serverProcessID(0),
     m_cxlAgentProcessID(0),
     m_isCapturing(false),
     m_isFrameAnalysisConnecting(false)
@@ -918,11 +917,6 @@ void gpExecutionMode::ShutServerDown()
         GT_ASSERT(rc);
     }
     const bool isRemoteAgentLinux = CXL_DAEMON_CLIENT->IsAgentPlatformLinux();
-    if (isRemoteAgentLinux)
-    {
-        // wait for server process to terminate
-        osWaitForProcessToTerminate(m_serverProcessID, 100);
-    }
 
     // Terminate the remote graphics server
     m_remoteGraphicsBackendServerLauncher.TerminateRemoteGraphicsBeckendServer();
