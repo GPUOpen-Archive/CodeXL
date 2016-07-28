@@ -414,7 +414,7 @@ void VktTraceAnalyzerLayer::ProfilerResultToStr(
     profiledCommandsLinesStr += IntToString(pResult->measurementInfo.idInfo.pWrappedQueue->GetQueueIndex());
     profiledCommandsLinesStr += " ";
 
-    profiledCommandsLinesStr += UINT64ToHexString((gtUInt64)pResult->measurementInfo.idInfo.pWrappedCmdBuf->AppHandle());
+    profiledCommandsLinesStr += VktUtil::WritePointerAsString(pResult->measurementInfo.idInfo.pWrappedCmdBuf->AppHandle());
     profiledCommandsLinesStr += " ";
 
     profiledCommandsLinesStr += IntToString(VktTraceAnalyzerLayer::Instance()->GetAPIGroupFromAPI(funcId));
