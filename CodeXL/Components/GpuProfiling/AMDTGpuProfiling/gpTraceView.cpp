@@ -657,7 +657,7 @@ void gpTraceView::OnTimelineItemActivated(acTimelineItem* pTimelineItem)
             CommandListTimelineItem* pCmdListItem = dynamic_cast<CommandListTimelineItem*>(pTimelineItem);
             if (pCmdListItem != nullptr)
             {
-                m_pSummaryTableTabWidget->SelectCommandList(pCmdListItem->CpommandListPtr());
+                m_pSummaryTableTabWidget->SelectCommandList(pCmdListItem->text());
             }
         }
     }
