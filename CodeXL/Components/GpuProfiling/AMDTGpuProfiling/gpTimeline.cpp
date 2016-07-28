@@ -317,7 +317,7 @@ void gpTimeline::AddCommandListsToTimeline()
                     // Index for coloring
                     commandListIndex++;
 
-                    m_cmdListTimelineItemMap.insert(commandListName, pNewItem);
+                    m_cmdListTimelineItemMap.insert(commandListDisplayName, pNewItem);
                 }
             }
         }
