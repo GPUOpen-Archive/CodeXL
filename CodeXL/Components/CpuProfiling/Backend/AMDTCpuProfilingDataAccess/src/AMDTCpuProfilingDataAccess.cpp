@@ -2680,6 +2680,7 @@ public:
                 gtVAddr currOffset = offset;
 
                 SymbolEngine* pSymbolEngine = pExecutable->GetSymbolEngine();
+                gtUInt32 nbrInst = 0;
 
                 while (bytesToRead > 0)
                 {
@@ -2744,6 +2745,11 @@ public:
                     }
 
                     disasmInfoVec.push_back(disasmInfo);
+
+                    if ((++nbrInst) > 1024)
+                    {
+                        bytesToRead = 0;
+                    }
                 }
             }
         }
