@@ -136,6 +136,11 @@ const std::vector<std::string> SQL_CREATE_DB_STMTS_AGGREGATION =
     "CREATE INDEX callStackFrameIdx ON CallstackFrame (callstackId)",
     "CREATE INDEX callStackFrameFunctionIdx ON CallstackFrame (functionId, offset)",
     "CREATE INDEX sampleContextIdx ON SampleContext (functionId, offset)",
+    "CREATE INDEX processThreadIdx ON ProcessThread(processId, threadId)",
+    "CREATE INDEX processThreadIdx1 ON ProcessThread(id)",
+    "CREATE INDEX moduleInstanceIdx ON ModuleInstance(id)",
+    "CREATE INDEX moduleIdx ON Module(id)",
+    "CREATE INDEX SampleContextIdx1 ON SampleContext(coreSamplingConfigurationId)",
 };
 
 // Migrate table for version 1 - add new columns in tables "devices" and "counters"
@@ -2959,7 +2964,7 @@ public:
                                          Module.type,                    \
                                          Module.isSystemModule           \
                          FROM Module                                     \
-                         WHERE moduleId = ? ";
+                         WHERE id = ? ";
 
         const std::string& queryStr = partialQuery.str();
         int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
@@ -5184,10 +5189,9 @@ public:
             sqlite3_stmt* pQueryStmt = nullptr;
 
             // TODO: Need to use the counterIdsList and coreMask
-            query << "SELECT DISTINCT processId, threadId FROM SampleFunctionSummaryAllData WHERE functionId = ? ;";
-
-            const std::string& queryStr = query.str();
-            int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
+            // query << "SELECT DISTINCT processId, threadId FROM SampleFunctionSummaryAllData WHERE functionId = ? ;";
+            query << "SELECT DISTINCT processId, threadId FROM SampleFunctionDetailedData WHERE functionId = ? ;";
+            int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
 
             if (rc == SQLITE_OK)
             {
@@ -5502,16 +5506,16 @@ public:
                 ret = (SQLITE_DONE == rc) ? true : false;
             }
 
+            // Get the list of processes and threads for which this function has samples
+            ret = ret && GetProcessAndThreadListForFunction(functionId,
+                                                            counterIdsList,
+                                                            coreMask,
+                                                            functionData.m_pidsList,
+                                                            functionData.m_threadsList);
+
             // Drop the view
             ret = DropFunctionDetailedDataView();
         }
-
-        // Get the list of processes and threads for which this function has samples
-        ret = ret && GetProcessAndThreadListForFunction(functionId,
-                                                        counterIdsList,
-                                                        coreMask,
-                                                        functionData.m_pidsList,
-                                                        functionData.m_threadsList);
 
         return ret;
     }

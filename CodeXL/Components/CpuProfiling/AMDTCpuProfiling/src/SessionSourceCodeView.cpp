@@ -465,7 +465,7 @@ void SessionSourceCodeView::CreateFunctionsComboBox()
         QStringList functionsList, toolTipList;
 
         AMDTProfileDataVec funcProfileData;
-        m_pProfDataRdr->GetFunctionProfileData(((m_processId > 0) ? m_processId : AMDT_PROFILE_ALL_PROCESSES), m_moduleId, funcProfileData);
+        m_pProfDataRdr->GetFunctionProfileData(AMDT_PROFILE_ALL_PROCESSES, m_moduleId, funcProfileData);
 
         for (auto const& func : funcProfileData)
         {
