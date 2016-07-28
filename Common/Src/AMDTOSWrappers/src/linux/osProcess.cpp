@@ -258,25 +258,18 @@ bool osWaitForProcessToTerminate(osProcessId processId, unsigned long timeoutMse
         // have been created during the sleep period, we will report the result incorrectly.
         // Unlikely, but possible.
         timespec    toSleep;
-        long        nanoSeconds;
-        long        seconds;
-        long        fractional;
         long accumulatedWaitTimeNanoseconds = 0;
         long nanoSecondsInSingleWait = 0;
         long timeoutNanoseconds = timeoutMsec * 1000 * 1000;
-
         
         // pay attention to the possibility of overflow for a 32-bit long
         // basically, don't convert the number into nanoseconds and then clean it up.
-        seconds = timeoutMsec / 1000;
-        fractional = timeoutMsec - (seconds * 1000);
-        nanoSeconds = fractional * 1000 * 1000;
         nanoSecondsInSingleWait = std::min<long>(50 * 1000 * 1000, timeoutNanoseconds);
+        toSleep.tv_sec = 0;
+        toSleep.tv_nsec = nanoSecondsInSingleWait;
 
         while (false == theProcessExited && accumulatedWaitTimeNanoseconds < timeoutNanoseconds)
         {
-            toSleep.tv_sec = 0;
-            toSleep.tv_nsec = nanoSecondsInSingleWait;
             (void)nanosleep(&toSleep, NULL);
 
             if (child)
