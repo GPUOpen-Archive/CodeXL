@@ -271,7 +271,7 @@ bool osWaitForProcessToTerminate(osProcessId processId, unsigned long timeoutMse
         seconds = timeoutMsec / 1000;
         fractional = timeoutMsec - (seconds * 1000);
         nanoSeconds = fractional * 1000 * 1000;
-        nanoSecondsInSingleWait = std::min<long>(50 * 1000 * 1000, nanoSeconds);
+        nanoSecondsInSingleWait = std::min<long>(50 * 1000 * 1000, timeoutNanoseconds);
 
         while (false == theProcessExited && accumulatedWaitTimeNanoseconds < timeoutNanoseconds)
         {
