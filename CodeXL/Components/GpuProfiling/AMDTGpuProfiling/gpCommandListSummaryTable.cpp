@@ -390,7 +390,7 @@ void gpCommandListSummaryTable::SelectCommandList(const QString& commandListName
     for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
     {
         QString itemName;
-        QTableWidgetItem* pItemInterface = item(rowIndex, CommandListSummaryColumnIndex::COLUMN_ADDRESS);
+        QTableWidgetItem* pItemInterface = item(rowIndex, CommandListSummaryColumnIndex::COLUMN_COMMAND_INDEX);
 
         if (pItemInterface != nullptr)
         {
