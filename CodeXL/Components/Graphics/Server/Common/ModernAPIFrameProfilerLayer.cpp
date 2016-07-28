@@ -158,6 +158,9 @@ ModernAPIFrameProfilerLayer::SampleInfo* ModernAPIFrameProfilerLayer::GetSampleI
 {
     SampleInfo* pResult = nullptr;
 
+    // Protect access into mSampleIdMap
+    ScopeLock sampleLock(&mUniqueSampleIdMutex);
+
     if (mSampleIdMap.find(inThreadId) != mSampleIdMap.end())
     {
         // mSampleIdMap already has a key for the incoming thread. Update the current sampleInfo.
@@ -165,9 +168,6 @@ ModernAPIFrameProfilerLayer::SampleInfo* ModernAPIFrameProfilerLayer::GetSampleI
     }
     else
     {
-        // We need to insert a new key into the mSampleIdMap. Need to lock it first.
-        ScopeLock sampleLock(&mUniqueSampleIdMutex);
-
         pResult = new SampleInfo;
 
         mSampleIdMap[inThreadId] = pResult;
