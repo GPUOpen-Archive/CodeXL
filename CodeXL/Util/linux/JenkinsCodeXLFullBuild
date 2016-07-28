@@ -35,7 +35,7 @@ export AMD_OUTPUT=$AMD_BRANCH_ROOT/
 
 # Version Number stuff
 VERSION_MAJOR=2
-VERSION_MINOR=3
+VERSION_MINOR=2
 VERSION_BUILD=0
 # VERSION_UPDATE=0
 VERSIONINFO_FILE=${AMD_CODEXL}/../Common/Src/VersionInfo/VersionInfo.h
@@ -1094,6 +1094,7 @@ PackageTheBuild()
     mkdir -p ${PKG_NAME}/Plugins
     cp -f Output_x86_64/release/bin/Plugins/libCXLGraphicsServerVulkan.so        ${PKG_NAME}/Plugins
     cp -f Output_x86_64/release/bin/Plugins/libCXLGraphicsServerVulkan.json      ${PKG_NAME}/Plugins
+    cp -f Output_x86_64/release/bin/Plugins/libVulkanEnv.so                      ${PKG_NAME}/Plugins
 		
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/Vulkan/rev_1_0_0/Release/lnx64/amdspv               ${PKG_NAME}
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/Vulkan/rev_1_0_0/Release/lnx64/spvgen.so            ${PKG_NAME}
@@ -2080,6 +2081,11 @@ PackageTheBuild()
 		cp -f Output_x86_64/release/bin/CodeXLGpuProfiler                           ${PKG_NAME}
 		cp -f Output_x86_64/release/bin/CodeXLGpuProfilerRun                        ${PKG_NAME}
 
+    mkdir -p ${PKG_NAME}/Plugins
+    cp -f Output_x86_64/release/bin/Plugins/libCXLGraphicsServerVulkan.so        ${PKG_NAME}/Plugins
+    cp -f Output_x86_64/release/bin/Plugins/libCXLGraphicsServerVulkan.json      ${PKG_NAME}/Plugins
+    cp -f Output_x86_64/release/bin/Plugins/libVulkanEnv.so                      ${PKG_NAME}/Plugins
+
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/Vulkan/rev_1_0_0/Release/lnx64/amdspv               ${PKG_NAME}
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/Vulkan/rev_1_0_0/Release/lnx64/spvgen.so            ${PKG_NAME}
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/OpenGL/VirtualContext/Release/lnx64/VirtualContext  ${PKG_NAME}
@@ -3018,7 +3024,12 @@ PackageTheBuild()
 		cp -f Output_x86_64/release/bin/libCXLGpuProfilerPreloadXInitThreads.so     ${PKG_NAME}
 		cp -f Output_x86_64/release/bin/CodeXLGpuProfiler                            ${PKG_NAME}
 		cp -f Output_x86_64/release/bin/CodeXLGpuProfilerRun                         ${PKG_NAME}
-		
+
+    mkdir -p ${PKG_NAME}/Plugins
+    cp -f Output_x86_64/release/bin/Plugins/libCXLGraphicsServerVulkan.so        ${PKG_NAME}/Plugins
+    cp -f Output_x86_64/release/bin/Plugins/libCXLGraphicsServerVulkan.json      ${PKG_NAME}/Plugins
+    cp -f Output_x86_64/release/bin/Plugins/libVulkanEnv.so                      ${PKG_NAME}/Plugins
+
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/Vulkan/rev_1_0_0/Release/lnx64/amdspv               ${PKG_NAME}
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/Vulkan/rev_1_0_0/Release/lnx64/spvgen.so            ${PKG_NAME}
 		cp -f ${AMD_CODEXL}/../Common/Lib/AMD/OpenGL/VirtualContext/Release/lnx64/VirtualContext  ${PKG_NAME}
