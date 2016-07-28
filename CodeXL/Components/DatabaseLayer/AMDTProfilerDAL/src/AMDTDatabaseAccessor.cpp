@@ -5181,6 +5181,7 @@ public:
     {
         GT_UNREFERENCED_PARAMETER(coreMask);
         GT_UNREFERENCED_PARAMETER(counterIdsList);
+        GT_UNREFERENCED_PARAMETER(funcId);
         bool ret = false;
 
         if (IS_FUNCTION_QUERY(funcId))
@@ -5190,7 +5191,7 @@ public:
 
             // TODO: Need to use the counterIdsList and coreMask
             // query << "SELECT DISTINCT processId, threadId FROM SampleFunctionSummaryAllData WHERE functionId = ? ;";
-            query << "SELECT DISTINCT processId, threadId FROM SampleFunctionDetailedData WHERE functionId = ? ;";
+            query << "SELECT DISTINCT processId, threadId FROM SampleFunctionDetailedData ;";
             int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
 
             if (rc == SQLITE_OK)
@@ -5198,7 +5199,7 @@ public:
                 gtSet<AMDTProcessId> pidUniqueSet;
                 gtSet<AMDTThreadId> tidUniqueSet;
 
-                sqlite3_bind_int(pQueryStmt, 1, funcId);
+                //sqlite3_bind_int(pQueryStmt, 1, funcId);
 
                 // Execute the query.
                 while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
