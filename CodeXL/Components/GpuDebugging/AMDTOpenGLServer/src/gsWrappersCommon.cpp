@@ -177,7 +177,7 @@ void gsConnectDriverInternalFunctionPointers(osModuleHandle hSystemOpenGLModule)
 #define GS_NUMBER_OF_INTERNAL_FUNCTIONS 20
     const char* driverInternalFunctionNames[GS_NUMBER_OF_INTERNAL_FUNCTIONS] = {
         // The order in this array must be exactly like the entry point order in gsDriverInternalFunctionPointers:
-        "loader_get_dispatch_table_size",
+        "_loader_get_dispatch_table_size",
         "_loader_get_proc_offset",
         "_loader_add_dispatch",
         "_loader_set_dispatch",
@@ -576,8 +576,12 @@ bool gsAreInitializationFunctionsLogged()
 #ifdef GS_EXPORT_SERVER_TLS_VARIABLES
 // These values are updated by the OpenGL runtimes after glXMakeCurrent is called. We need to
 // update the corresponding values in the real libGL.so.1 each time that happens:
-__thread struct _glapi_table *_glapi_tls_Dispatch __attribute__((tls_model("initial-exec"))) = nullptr;
-__thread void * _glapi_tls_Context __attribute__((tls_model("initial-exec"))) = nullptr;
+__thread struct _glapi_table*_glapi_tls_Dispatch __attribute__((tls_model("initial-exec"))) = nullptr;
+static __thread struct _glapi_table*_glapi_tls_Dispatch_LastValue __attribute__((tls_model("initial-exec"))) = nullptr;
+__thread void* _glapi_tls_Context __attribute__((tls_model("initial-exec"))) = nullptr;
+static __thread void* _glapi_tls_Context_LastValue __attribute__((tls_model("initial-exec"))) = nullptr;
+__thread void* __glX_tls_Context __attribute__((tls_model("initial-exec"))) = nullptr;
+static __thread void* __glX_tls_Context_LastValue __attribute__((tls_model("initial-exec"))) = nullptr;
 #endif
 
 // ---------------------------------------------------------------------------
@@ -600,8 +604,27 @@ void gsUpdateTLSVariableValues()
 
         if (rcDsp && (nullptr != realTLSDispatchAsProcAddress))
         {
-            // Note that we do not check the return value as nullptr is a value that could appear:
-            *(_glapi_table**)realTLSDispatchAsProcAddress = _glapi_tls_Dispatch;
+            // This value can be changed either externally (e.g. by libamdgpu_dri.so) - making the spy value newer,
+            // or internally (e.g. by glXMakeCurrent) - making the real value newer.
+            // Thus, we need to check which value is newer and copy it over the other one.
+            _glapi_table*& real_glapi_tls_Dispatch = *(_glapi_table**)realTLSDispatchAsProcAddress;
+            bool newSpyValue = (_glapi_tls_Dispatch_LastValue != _glapi_tls_Dispatch);
+            bool newRealValue = (_glapi_tls_Dispatch_LastValue != real_glapi_tls_Dispatch);
+            if (newSpyValue)
+            {
+                // If both values changed, something critically wrong happened. Use the spy value anyway:
+                GT_ASSERT_EX(!newRealValue, L"_glapi_tls_Dispatch changed in both OpenGL server and OpenGL runtime. overriding with server value.");
+
+                // Note that we do not check the return value as nullptr is a value that could appear:
+                real_glapi_tls_Dispatch = _glapi_tls_Dispatch;
+                _glapi_tls_Dispatch_LastValue = _glapi_tls_Dispatch;
+            }
+            else if (newRealValue)
+            {
+                // Note that we do not check the return value as nullptr is a value that could appear:
+                _glapi_tls_Dispatch = real_glapi_tls_Dispatch;
+                _glapi_tls_Dispatch_LastValue = _glapi_tls_Dispatch;
+            }
         }
 
         // Get the TLS location by calling dlsym:
@@ -610,8 +633,50 @@ void gsUpdateTLSVariableValues()
 
         if (rcCtx && (nullptr != realTLSContextAsProcAddress))
         {
-            // Note that we do not check the return value as nullptr is a value that could appear:
-            *(void**)realTLSContextAsProcAddress = _glapi_tls_Context;
+            void*& real_glapi_tls_Context = *(void**)realTLSContextAsProcAddress;
+            bool newSpyValue = (_glapi_tls_Context_LastValue != _glapi_tls_Context);
+            bool newRealValue = (_glapi_tls_Context_LastValue != real_glapi_tls_Context);
+            if (newSpyValue)
+            {
+                // If both values changed, something critically wrong happened. Use the spy value anyway:
+                GT_ASSERT_EX(!newRealValue, L"_glapi_tls_Context changed in both OpenGL server and OpenGL runtime. overriding with server value.");
+
+                // Note that we do not check the return value as nullptr is a value that could appear:
+                real_glapi_tls_Context = _glapi_tls_Context;
+                _glapi_tls_Context_LastValue = _glapi_tls_Context;
+            }
+            else if (newRealValue)
+            {
+                // Note that we do not check the return value as nullptr is a value that could appear:
+                _glapi_tls_Context = real_glapi_tls_Context;
+                _glapi_tls_Context_LastValue = _glapi_tls_Context;
+            }
+        }
+
+        // Get the TLS location by calling dlsym:
+        osProcedureAddress realTLSGLXContextAsProcAddress = nullptr;
+        bool rcXCtx = osGetProcedureAddress(hSystemOpenGLModule, "__glX_tls_Context", realTLSGLXContextAsProcAddress, false);
+
+        if (rcXCtx && (nullptr != realTLSGLXContextAsProcAddress))
+        {
+            void*& real__glX_tls_Context = *(void**)realTLSGLXContextAsProcAddress;
+            bool newSpyValue = (__glX_tls_Context_LastValue != __glX_tls_Context);
+            bool newRealValue = (__glX_tls_Context_LastValue != real__glX_tls_Context);
+            if (newSpyValue)
+            {
+                // If both values changed, something critically wrong happened. Use the spy value anyway:
+                GT_ASSERT_EX(!newRealValue, L"__glX_tls_Context changed in both OpenGL server and OpenGL runtime. overriding with server value.");
+
+                // Note that we do not check the return value as nullptr is a value that could appear:
+                real__glX_tls_Context = __glX_tls_Context;
+                __glX_tls_Context_LastValue = __glX_tls_Context;
+            }
+            else if (newRealValue)
+            {
+                // Note that we do not check the return value as nullptr is a value that could appear:
+                __glX_tls_Context = real__glX_tls_Context;
+                __glX_tls_Context_LastValue = __glX_tls_Context;
+            }
         }
     }
 

@@ -28975,12 +28975,21 @@ void _glapi_set_context(void* context)
 {
     gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
 
+    // Sync the TLS values before this change to flush any spy-side changes:
+    gsUpdateTLSVariableValues();
+
     GS_CALL_DRIVER_INTERNAL_FUNCTION(_glapi_set_context, (context));
+
+    // And sync again afterwards, in case the real function changed a TLS value:
+    gsUpdateTLSVariableValues();
 }
 
 void* _glapi_get_context(void)
 {
     gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
+
+    // Sync the TLS values before fetching the context:
+    gsUpdateTLSVariableValues();
 
     void* retVal = nullptr;
     GS_CALL_DRIVER_INTERNAL_FUNCTION_RETVAL(_glapi_get_context, (), retVal);
@@ -28992,12 +29001,21 @@ void _glapi_set_dispatch(_glapi_table* dispatch)
 {
     gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
 
+    // Sync the TLS values before this change to flush any spy-side changes:
+    gsUpdateTLSVariableValues();
+
     GS_CALL_DRIVER_INTERNAL_FUNCTION(_glapi_set_dispatch, (dispatch));
+
+    // And sync again afterwards, in case the real function changed a TLS value:
+    gsUpdateTLSVariableValues();
 }
 
 _glapi_table* _glapi_get_dispatch(void)
 {
     gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
+
+    // Sync the TLS values before fetching the dispatch:
+    gsUpdateTLSVariableValues();
 
     _glapi_table* retVal = nullptr;
     GS_CALL_DRIVER_INTERNAL_FUNCTION_RETVAL(_glapi_get_dispatch, (), retVal);
@@ -29009,8 +29027,14 @@ int _glapi_begin_dispatch_override(_glapi_table* override)
 {
     gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
 
+    // Sync the TLS values before this change to flush any spy-side changes:
+    gsUpdateTLSVariableValues();
+
     int retVal = -1;
     GS_CALL_DRIVER_INTERNAL_FUNCTION_RETVAL(_glapi_begin_dispatch_override, (override), retVal);
+
+    // And sync again afterwards, in case the real function changed a TLS value:
+    gsUpdateTLSVariableValues();
 
     return retVal;
 }
@@ -29019,12 +29043,21 @@ void _glapi_end_dispatch_override(int layer)
 {
     gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
 
+    // Sync the TLS values before this change to flush any spy-side changes:
+    gsUpdateTLSVariableValues();
+
     GS_CALL_DRIVER_INTERNAL_FUNCTION(_glapi_end_dispatch_override, (layer));
+
+    // And sync again afterwards, in case the real function changed a TLS value:
+    gsUpdateTLSVariableValues();
 }
 
 _glapi_table* _glapi_get_override_dispatch(int layer)
 {
     gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
+
+    // Sync the TLS values before fetching the dispatch:
+    gsUpdateTLSVariableValues();
 
     _glapi_table* retVal = nullptr;
     GS_CALL_DRIVER_INTERNAL_FUNCTION_RETVAL(_glapi_get_override_dispatch, (layer), retVal);
@@ -29046,12 +29079,18 @@ void _glapi_check_table(const _glapi_table* table)
 {
     gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
 
+    // Sync the TLS values before checking the dispatch:
+    gsUpdateTLSVariableValues();
+
     GS_CALL_DRIVER_INTERNAL_FUNCTION(_glapi_check_table, (table));
 }
 
 int _glapi_add_dispatch(const char* const* function_names, const char* parameter_signature)
 {
     gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
+
+    // Sync the TLS values before changing the dispatch:
+    gsUpdateTLSVariableValues();
 
     int retVal = -1;
     GS_CALL_DRIVER_INTERNAL_FUNCTION_RETVAL(_glapi_add_dispatch, (function_names, parameter_signature), retVal);
@@ -29063,6 +29102,9 @@ GLint _glapi_get_proc_offset(const char* funcName)
 {
     gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
 
+    // Sync the TLS values before querying the dispatch:
+    gsUpdateTLSVariableValues();
+
     GLint retVal = 0;
     GS_CALL_DRIVER_INTERNAL_FUNCTION_RETVAL(_glapi_get_proc_offset, (funcName), retVal);
 
@@ -29073,6 +29115,9 @@ _glapi_proc _glapi_get_proc_address(const char* funcName)
 {
     gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
 
+    // Sync the TLS values before querying the dispatch:
+    gsUpdateTLSVariableValues();
+
     _glapi_proc retVal = nullptr;
     GS_CALL_DRIVER_INTERNAL_FUNCTION_RETVAL(_glapi_get_proc_address, (funcName), retVal);
 
@@ -29082,6 +29127,9 @@ _glapi_proc _glapi_get_proc_address(const char* funcName)
 const char* _glapi_get_proc_name(GLuint offset)
 {
     gs_stat_openGLMonitorInstance.verifyOpenGLServerInitialized();
+
+    // Sync the TLS values before querying the dispatch:
+    gsUpdateTLSVariableValues();
 
     const char* retVal = nullptr;
     GS_CALL_DRIVER_INTERNAL_FUNCTION_RETVAL(_glapi_get_proc_name, (offset), retVal);
