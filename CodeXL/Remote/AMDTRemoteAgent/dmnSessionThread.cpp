@@ -1791,7 +1791,7 @@ bool dmnSessionThread::SendFrameAnalysisFileData(const osFilePath& filePath)
             (*m_pConnHandler) << isBinary;
 
             gtVector<gtByte> pBuffer;
-            unsigned long fileSize;
+            gtUInt32 fileSize;
             retVal = ReadFile(filePath, isBinary, pBuffer, fileSize);
             GT_IF_WITH_ASSERT(retVal)
             {
@@ -1811,7 +1811,7 @@ bool dmnSessionThread::SendFrameAnalysisFileData(const osFilePath& filePath)
     return retVal;
 }
 
-bool dmnSessionThread::ReadFile(const osFilePath& filePath, const bool isBinary, gtVector<gtByte>& pBuffer, unsigned long& fileSize) const
+bool dmnSessionThread::ReadFile(const osFilePath& filePath, const bool isBinary, gtVector<gtByte>& pBuffer, gtUInt32& fileSize) const
 {
     // Read the file size
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS //on windows we have unicode file names

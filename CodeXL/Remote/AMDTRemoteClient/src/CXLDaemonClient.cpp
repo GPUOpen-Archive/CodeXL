@@ -1999,7 +1999,7 @@ public:
             gtString extension;
             m_tcpClient >> extension;
             m_tcpClient >> isBinary;
-            unsigned long dataSize = 0;
+            gtUInt32 dataSize = 0;
             if (isBinary)
             {
                 gtByte* pBuffer = nullptr;
