@@ -2882,17 +2882,6 @@ public:
         sqlite3_stmt* pQueryStmt = nullptr;
         std::stringstream partialQuery;
 
-        //partialQuery << "SELECT DISTINCT Module.id,                      \
-        //                                 Module.path,                    \
-        //                                 ModuleInstance.loadAddress,     \
-        //                                 Module.size,                    \
-        //                                 Module.is32Bit,                 \
-        //                                 Module.foundDebugInfo,          \
-        //                                 Module.type,                    \
-        //                                 Module.isSystemModule           \
-        //                 FROM Module                                     \
-        //                 INNER JOIN ModuleInstance ON Module.id = ModuleInstance.moduleId ";
-
         partialQuery << "SELECT id,                      \
                                 path,                    \
                                 loadAddress,             \
