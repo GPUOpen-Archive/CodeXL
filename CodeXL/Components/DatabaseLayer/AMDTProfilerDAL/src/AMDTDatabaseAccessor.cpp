@@ -893,11 +893,6 @@ public:
         bool ret = true;
 
         // Create the required Views
-        // create event-core sampling config view
-        ret = CreateSampledCounterCoreConfig();
-
-        ret = ret && CreateModuleInfoView();
-
         ret = ret && CreateProcessTotalsView();
 
         // Process/Thread/Module summary View
@@ -1023,6 +1018,14 @@ public:
                 if (ret && ((profileType & AMDT_PROFILE_MODE_TIMELINE) == AMDT_PROFILE_MODE_TIMELINE))
                 {
                     ret = PrepareTimelineReadStatements();
+                }
+
+                if (ret && ((m_profileType & AMDT_PROFILE_MODE_AGGREGATION) == AMDT_PROFILE_MODE_AGGREGATION))
+                {
+                    // create event-core sampling config view
+                    ret = CreateSampledCounterCoreConfig();
+
+                    ret = ret && CreateModuleInfoView();
                 }
 
                 m_isCurrentDbOpenForRead = ret;

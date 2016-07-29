@@ -92,6 +92,9 @@ struct ViewConfigInfo
 #define GET_MODOFFSET_FOR_UNKNOWN_FUNC(mod_, offset_, val_) val_ = mod_; val_ = (val_ << 32) | offset_;
 #define GET_MODULEID_FROM_FUNCTIONID(id_) (((id_) & 0xFFFF0000) >> 16)
 
+#define CXL_MAX_DISASM_INSTS            2048
+#define CXL_MAX_UNKNOWN_FUNC_SIZE       4096
+
 #if AMDT_BUILD_TARGET == AMDT_LINUX_OS
 #define LONG_FORMAT_HEX     L"%lx"
 #else
@@ -2249,42 +2252,48 @@ public:
         {
             gtString srcFilePath;
             AMDTSourceAndDisasmInfoVec srcInfoVec;
-            retVal = GetFunctionSourceAndDisasmInfo(funcId, srcFilePath, srcInfoVec);
+            AMDTProfileFunctionData* pCurrFunctionData = &functionData;
+            retVal = GetFunctionSourceAndDisasmInfo__(funcId, srcFilePath, srcInfoVec, pCurrFunctionData);
 
             AMDTProfileSourceLineDataVec& srcLineDataVec = functionData.m_srcLineDataList;
             AMDTProfileInstructionDataVec& instDataVec = functionData.m_instDataList;
 
             for (auto& instData : instDataVec)
             {
-                // check whether this offset has samples (in functionData.m_instDataList)
-                auto srcData = std::find_if(srcInfoVec.begin(), srcInfoVec.end(),
-                    [&instData](AMDTSourceAndDisasmInfo const& sData)
+                gtUInt32 srcLine = 0;
+
+                if (CXL_DATAACCESS_WARN_SRC_INFO_NOTAVAILABLE != retVal)
+                {
+                    // check whether this offset has samples (in functionData.m_instDataList)
+                    auto srcData = std::find_if(srcInfoVec.begin(), srcInfoVec.end(),
+                        [&instData](AMDTSourceAndDisasmInfo const& sData)
                     { return ((instData.m_offset >= sData.m_offset) && (instData.m_offset < (sData.m_offset + sData.m_size))); });
 
-                if (srcData != srcInfoVec.end())
-                {
-                    gtUInt32 srcLine = (*srcData).m_sourceLine;
-
-                    // Check wether we have see this srcline in srcLineDataVec
-                    // if so, update the profile data otherwise add a new line
-                    auto slData = std::find_if(srcLineDataVec.begin(), srcLineDataVec.end(),
-                        [&srcLine](AMDTProfileSourceLineData const& sData) { return sData.m_sourceLineNumber == srcLine; });
-
-                    if (slData == srcLineDataVec.end())
+                    if (srcData != srcInfoVec.end())
                     {
-                        AMDTProfileSourceLineData srcLineData;
-                        srcLineData.m_sourceLineNumber = srcLine;
-                        srcLineData.m_sampleValues = instData.m_sampleValues;
-
-                        srcLineDataVec.push_back(srcLineData);
+                        srcLine = (*srcData).m_sourceLine;
                     }
-                    else
+                }
+
+                // Check wether we have see this srcline in srcLineDataVec
+                // if so, update the profile data otherwise add a new line
+                auto slData = std::find_if(srcLineDataVec.begin(), srcLineDataVec.end(),
+                    [&srcLine](AMDTProfileSourceLineData const& sData) { return sData.m_sourceLineNumber == srcLine; });
+
+                if (slData == srcLineDataVec.end())
+                {
+                    AMDTProfileSourceLineData srcLineData;
+                    srcLineData.m_sourceLineNumber = srcLine;
+                    srcLineData.m_sampleValues = instData.m_sampleValues;
+
+                    srcLineDataVec.push_back(srcLineData);
+                }
+                else
+                {
+                    for (gtUInt32 i = 0; i < instData.m_sampleValues.size(); i++)
                     {
-                        for (gtUInt32 i = 0; i < instData.m_sampleValues.size(); i++)
-                        {
-                            slData->m_sampleValues[i].m_sampleCount += instData.m_sampleValues[i].m_sampleCount;
-                            slData->m_sampleValues[i].m_sampleCountPercentage += instData.m_sampleValues[i].m_sampleCountPercentage;
-                        }
+                        slData->m_sampleValues[i].m_sampleCount += instData.m_sampleValues[i].m_sampleCount;
+                        slData->m_sampleValues[i].m_sampleCountPercentage += instData.m_sampleValues[i].m_sampleCountPercentage;
                     }
                 }
             }
@@ -2479,8 +2488,18 @@ public:
     }
 
     int GetFunctionSourceAndDisasmInfo(AMDTFunctionId funcId,
-                                       gtString& srcFilePath,
-                                       AMDTSourceAndDisasmInfoVec& srcInfoVec)
+        gtString& srcFilePath,
+        AMDTSourceAndDisasmInfoVec& srcInfoVec)
+    {
+        AMDTProfileFunctionData* pFuncData = nullptr;
+
+        return GetFunctionSourceAndDisasmInfo__(funcId, srcFilePath, srcInfoVec, pFuncData);
+    }
+
+    int GetFunctionSourceAndDisasmInfo__(AMDTFunctionId funcId,
+                                         gtString& srcFilePath,
+                                         AMDTSourceAndDisasmInfoVec& srcInfoVec,
+                                         AMDTProfileFunctionData* pFuncData)
     {
         int rv = CXL_DATAACCESS_WARN_SRC_INFO_NOTAVAILABLE;
         bool foundSrcInfo = false;
@@ -2496,7 +2515,7 @@ public:
 
         if (!foundSrcInfo)
         {
-            rv = GetDisassembly(funcId, srcInfoVec);
+            rv = GetDisassembly(funcId, srcInfoVec, pFuncData);
 
             if (rv)
             {
@@ -2513,7 +2532,7 @@ public:
         return rv;
     }
 
-    int GetDisassembly(AMDTFunctionId funcId, AMDTSourceAndDisasmInfoVec& disasmInfoVec)
+    int GetDisassembly(AMDTFunctionId funcId, AMDTSourceAndDisasmInfoVec& disasmInfoVec, AMDTProfileFunctionData* pFuncData)
     {
         int retVal = CXL_DATAACCESS_WARN_SRC_INFO_NOTAVAILABLE;
 
@@ -2534,6 +2553,7 @@ public:
                     retVal = GetNativeDisassembly(funcInfo.m_moduleId,
                                                   funcInfo.m_startOffset,
                                                   funcInfo.m_size,
+                                                  pFuncData,
                                                   disasmInfoVec);
 
                 }
@@ -2706,6 +2726,7 @@ public:
     int GetNativeDisassembly(AMDTModuleId moduleId,
                              AMDTUInt32 offset,
                              AMDTUInt32 size,
+                             AMDTProfileFunctionData* pFuncData,
                              AMDTSourceAndDisasmInfoVec& disasmInfoVec)
     {
         int retVal = CXL_DATAACCESS_WARN_SRC_INFO_NOTAVAILABLE;
@@ -2733,6 +2754,26 @@ public:
 
                 SymbolEngine* pSymbolEngine = pExecutable->GetSymbolEngine();
                 gtUInt32 nbrInst = 0;
+                startRVAddr = pExecutable->VaToRva(loadAddress + currOffset);
+                bool hasSrcLineInfo = false;
+
+                if (nullptr != pSymbolEngine)
+                {
+                    SourceLineInfo sInfo;
+                    hasSrcLineInfo = pSymbolEngine->FindSourceLine(startRVAddr, sInfo);
+
+                    if (!hasSrcLineInfo && size > CXL_MAX_UNKNOWN_FUNC_SIZE)
+                    {
+                        if (nullptr != pFuncData && pFuncData->m_instDataList.size() > 0)
+                        {
+                            currOffset = pFuncData->m_instDataList.front().m_offset;
+                            startRVAddr = pExecutable->VaToRva(loadAddress + currOffset);
+
+                            bytesToRead = pFuncData->m_instDataList.back().m_offset - pFuncData->m_instDataList.front().m_offset;
+                            bytesToRead += 16; // in case if there is only one inst
+                        }
+                    }
+                }
 
                 while (bytesToRead > 0)
                 {
@@ -2745,7 +2786,7 @@ public:
                     const gtUByte* pCurrentCode = pCode;
                     SourceLineInfo srcData;
 
-                    if (nullptr != pSymbolEngine)
+                    if (hasSrcLineInfo)
                     {
                         ret = pSymbolEngine->FindSourceLine(startRVAddr, srcData);
 
@@ -2798,7 +2839,7 @@ public:
 
                     disasmInfoVec.push_back(disasmInfo);
 
-                    if ((++nbrInst) > 1024)
+                    if ((CXL_DATAACCESS_WARN_SRC_INFO_NOTAVAILABLE == retVal) && ((++nbrInst) > CXL_MAX_DISASM_INSTS))
                     {
                         bytesToRead = 0;
                     }
@@ -3279,6 +3320,7 @@ public:
             }
             else
             {
+                disasmInfo.m_size = 1;
                 disasmInfo.m_disasmStr.fromASCIIString("BAD DASM");
             }
         }
