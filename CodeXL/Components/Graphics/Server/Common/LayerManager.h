@@ -231,8 +231,8 @@ private:
     //--------------------------------------------------------------------------
     /// Keep track of how many frames have been presented.
     //--------------------------------------------------------------------------
-    unsigned int    m_frameCount;                        ///< the total number of frames rendered by the app so far
-    unsigned int    m_captureFrame;                      ///< index of frame to capture
+    int    m_frameCount;                        ///< the total number of frames rendered by the app so far
+    int    m_captureFrame;                      ///< index of frame to capture
 
     eInstantCaptureState m_instantCaptureState; ///< is instance capture allowed. Can only capture once for each server/app launch
 

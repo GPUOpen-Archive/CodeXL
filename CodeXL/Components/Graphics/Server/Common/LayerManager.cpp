@@ -340,7 +340,7 @@ void LayerManager::SetupInstantCapture()
 bool LayerManager::DoInstantCapture()
 {
     //    LogConsole(logMESSAGE, "Instant Capture Frame: Current frame: %d, Required frame: %d\n", m_frameCount, m_captureFrame);
-    unsigned int captureFrame = (unsigned int)SG_GET_INT(OptionCaptureFrame);
+    int captureFrame = SG_GET_INT(OptionCaptureFrame);
 
     int timeOverrideMode;
     int filterDrawCallMask;
@@ -411,11 +411,11 @@ void LayerManager::ReleaseCapture()
         // advance m_stepFrame frames from current frame
         m_captureFrame = m_frameCount + stepCount;
     }
-    //else
-    //{
-    //    // disable autocapture for subsequent frames
-    //    m_captureFrame = -1;
-    //}
+    else
+    {
+        // disable autocapture for subsequent frames
+        m_captureFrame = -1;
+    }
 
     m_FrameCaptured = false;
 }
