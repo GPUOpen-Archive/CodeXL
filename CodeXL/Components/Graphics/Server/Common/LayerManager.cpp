@@ -230,64 +230,30 @@ void LayerManager::EndFrame()
 
 void LayerManager::UpdateFrameTimingInfo()
 {
-    double currentTime = mFrameTimer.GetAbsolute();
+    double currentTime = mFrameTimer.GetAbsoluteMicroseconds();
     static double previousTime = currentTime;
-    static long rollingCount = 0;
-
-    // Roll around when we reach end of array
-    if (rollingCount >= FRAMES_TO_MEASURE)
-    {
-        rollingCount = 0;
-    }
 
     mPreviousFrameDurationMilliseconds = mLastFrameDurationMilliseconds;
-
     mLastFrameDurationMilliseconds = currentTime - previousTime;
+    mPreviousAverageFramesPerSecond = mAverageFramesPerSecond;
+
+    //Log(logERROR, "previousTime: %lf, currentTime: %lf,  mLastFrameDurationMilliseconds: %lf\n", currentTime, previousTime, mLastFrameDurationMilliseconds);
+
+    // Update the shared memory with our current rendering time.
+    SG_SET_DOUBLE(LastPresentTime, currentTime);
 
     // This catches the first usage where the time delta is zero
     if (mLastFrameDurationMilliseconds == 0)
     {
         previousTime = currentTime;
-
-        // Update the shared memory with our current rendering time.
-        SG_SET_DOUBLE(LastPresentTime, currentTime);
+        mPreviousAverageFramesPerSecond = mAverageFramesPerSecond = 1.0;
         return;
     }
 
-    // Update the shared memory with our current rendering time.
-    SG_SET_DOUBLE(LastPresentTime, currentTime);
-
-    //Log(logERROR, "mLastFrameDurationMilliseconds: %lf\n", mLastFrameDurationMilliseconds);
-    //Log(logDEBUG, "1) UpdateFrameTimingInfo: F: %ld C: %lf P: %lf D: %lf Duration(current frame): %lf\n", GetFrameCount(), currentTime, previousTime, mFrameDuration, mFrameDuration);
-
-    mFrameDurationsMilliseconds[rollingCount] = mLastFrameDurationMilliseconds;
-    rollingCount++;
-
-    int sampleCount = 0;
-    double totalDuration = 0.0;
-
-    for (int i = 0; i < FRAMES_TO_MEASURE; i++)
-    {
-        //Log(logDEBUG, "2) UpdateFrameTimingInfo: Loop Count: %d, mFrameTimes[i] = %lf\n", i, mFrameTimes[i]);
-
-        if (mFrameDurationsMilliseconds[i] > 0.0)
-        {
-            sampleCount++;
-            totalDuration += mFrameDurationsMilliseconds[i];
-
-            //Log(logDEBUG, "3) UpdateFrameTimingInfo: Loop Count: %d, Sample Count: %d,  Duration: %lf, Total Duration: %lf\n", i, sampleCount, mFrameTimes[i], totalDuration);
-        }
-    }
-
-    double averageDuration = totalDuration / (double)sampleCount;
-    mAverageFramesPerSecond = 1000.0f / averageDuration;
-
-    //Log(logDEBUG, "4) UpdateFrameTimingInfo: Total Duration: %lf, SampleCount: %d, Average Duration: %lf, Average FPS: %lf\n\n", totalDuration, sampleCount, averageDuration, mComputedFPS);
+    mAverageFramesPerSecond = 1000000.0 / mLastFrameDurationMilliseconds;
 
     previousTime = currentTime;
 }
-
-
 
 
 /// A handler invoked when Autocapture mode has been triggered.
@@ -374,7 +340,7 @@ void LayerManager::SetupInstantCapture()
 bool LayerManager::DoInstantCapture()
 {
     //    LogConsole(logMESSAGE, "Instant Capture Frame: Current frame: %d, Required frame: %d\n", m_frameCount, m_captureFrame);
-    int captureFrame = SG_GET_INT(OptionCaptureFrame);
+    unsigned int captureFrame = (unsigned int)SG_GET_INT(OptionCaptureFrame);
 
     int timeOverrideMode;
     int filterDrawCallMask;
@@ -445,11 +411,11 @@ void LayerManager::ReleaseCapture()
         // advance m_stepFrame frames from current frame
         m_captureFrame = m_frameCount + stepCount;
     }
-    else
-    {
-        // disable autocapture for subsequent frames
-        m_captureFrame = -1;
-    }
+    //else
+    //{
+    //    // disable autocapture for subsequent frames
+    //    m_captureFrame = -1;
+    //}
 
     m_FrameCaptured = false;
 }

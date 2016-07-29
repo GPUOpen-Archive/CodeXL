@@ -59,7 +59,8 @@ protected:
 
     Timer mFrameTimer; ///< Timing object used to support CPU timings
     double mFrameDurationsMilliseconds[FRAMES_TO_MEASURE]; ///< Array of frame durations in milliseconds
-    double mAverageFramesPerSecond; ///< The average FPS for the number of frames being measured
+    double mAverageFramesPerSecond; ///< The FPS of the currently rendered frame
+    double mPreviousAverageFramesPerSecond; ///< The average FPS for the previously rendered frame
     double mLastFrameDurationMilliseconds; ///< The frame duration of the last frame rendered
     double mPreviousFrameDurationMilliseconds; ///< The frame duration of the last but one frame rendered
 
@@ -182,7 +183,7 @@ public:
     //--------------------------------------------------------------------------
     double GetAverageFPS() const
     {
-        return mAverageFramesPerSecond;
+        return mPreviousAverageFramesPerSecond;
     }
 
 protected:
@@ -230,8 +231,8 @@ private:
     //--------------------------------------------------------------------------
     /// Keep track of how many frames have been presented.
     //--------------------------------------------------------------------------
-    int    m_frameCount;                        ///< the total number of frames rendered by the app so far
-    int    m_captureFrame;                      ///< index of frame to capture
+    unsigned int    m_frameCount;                        ///< the total number of frames rendered by the app so far
+    unsigned int    m_captureFrame;                      ///< index of frame to capture
 
     eInstantCaptureState m_instantCaptureState; ///< is instance capture allowed. Can only capture once for each server/app launch
 

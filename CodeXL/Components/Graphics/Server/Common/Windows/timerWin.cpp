@@ -279,9 +279,9 @@ double Timer::LapDouble()
 ///
 /// GetAbsolute method for the Timer class.
 ///
-/// \return the current time
+/// \return the current time in milliseconds
 //---------------------------------------------------------------------
-unsigned long Timer::GetAbsolute()
+unsigned long Timer::GetAbsoluteMilliseconds()
 {
     GPS_TIMESTAMP time;
 
@@ -295,6 +295,28 @@ unsigned long Timer::GetAbsolute()
     }
 
     return (unsigned long)((1000 * time.QuadPart) / m_iFreq);
+}
+
+//---------------------------------------------------------------------
+///
+/// GetAbsolute method for the Timer class.
+///
+/// \return the current time in microseconds
+//---------------------------------------------------------------------
+unsigned long Timer::GetAbsoluteMicroseconds()
+{
+    GPS_TIMESTAMP time;
+
+    if (Real_QueryPerformanceCounter == NULL)
+    {
+        QueryPerformanceCounter(&time);
+    }
+    else
+    {
+        Real_QueryPerformanceCounter(&time);
+    }
+
+    return (unsigned long)((1000000 * time.QuadPart) / m_iFreq);
 }
 
 //---------------------------------------------------------------------

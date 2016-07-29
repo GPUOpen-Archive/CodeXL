@@ -634,7 +634,7 @@ bool ShouldResponseBeSent(CommunicationID requestID, bool bUpdateTime)
             return false;
         }
 
-        DWORD dwCurrTime = g_streamTimer.GetAbsolute();
+        DWORD dwCurrTime = g_streamTimer.GetAbsoluteMilliseconds();
 
         if (dwCurrTime - pResponse->m_dwLastSent >= 1000 / pResponse->m_dwMaxStreamsPerSecond)
         {

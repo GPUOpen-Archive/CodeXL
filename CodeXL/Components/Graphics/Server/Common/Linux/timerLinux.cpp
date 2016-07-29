@@ -341,9 +341,9 @@ double Timer::LapDouble()
 ///
 /// GetAbsolute method for the Timer class.
 ///
-/// \return the current time
+/// \return the current time in milliseconds
 //---------------------------------------------------------------------
-unsigned long Timer::GetAbsolute()
+unsigned long Timer::GetAbsoluteMilliseconds()
 {
     GPS_TIMESTAMP time;
 
@@ -361,6 +361,32 @@ unsigned long Timer::GetAbsolute()
 
     time.QuadPart = (uint64)(ts.tv_sec * ONE_BILLION) + ts.tv_nsec;
     return (unsigned long)((1000 * time.QuadPart) / m_iFreq);
+}
+
+//---------------------------------------------------------------------
+///
+/// GetAbsolute method for the Timer class.
+///
+/// \return the current time in micro seconds
+//---------------------------------------------------------------------
+unsigned long Timer::GetAbsoluteMicroseconds()
+{
+    GPS_TIMESTAMP time;
+
+    struct timespec ts;
+
+    if (Real_clock_gettime == NULL)
+    {
+        clock_gettime_type fn = (clock_gettime_type)dlsym(RTLD_NEXT, "clock_gettime");
+        fn(CLOCK_REALTIME, &ts);
+    }
+    else
+    {
+        Real_clock_gettime(CLOCK_REALTIME, &ts);
+    }
+
+    time.QuadPart = (uint64)(ts.tv_sec * ONE_BILLION) + ts.tv_nsec;
+    return (unsigned long)((1000000 * time.QuadPart) / m_iFreq);
 }
 
 //---------------------------------------------------------------------
