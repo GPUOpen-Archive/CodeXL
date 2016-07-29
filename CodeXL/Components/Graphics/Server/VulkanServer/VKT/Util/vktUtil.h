@@ -166,8 +166,8 @@ const char* WriteIndexTypeEnumAsString(int inEnumVal);
 const char* WriteSubpassContentsEnumAsString(int inEnumVal);
 const char* WriteColorSpaceKHREnumAsString(int enumVal);
 const char* WritePresentModeKHREnumAsString(int enumVal);
-const char* WritePointerAsString(const void* ptr);
-const char* WriteUint64AsString(uint64_t value);
+std::string WritePointerAsString(const void* ptr);
+std::string WriteUint64AsString(uint64_t value);
 
 std::string DecomposeFormatFeatureFlagsEnumAsString(UINT flags);
 std::string DecomposeImageUsageFlagsEnumAsString(UINT flags);

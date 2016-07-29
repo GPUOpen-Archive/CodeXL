@@ -414,7 +414,7 @@ void VktTraceAnalyzerLayer::ProfilerResultToStr(
     profiledCommandsLinesStr += IntToString(pResult->measurementInfo.idInfo.pWrappedQueue->GetQueueIndex());
     profiledCommandsLinesStr += " ";
 
-    profiledCommandsLinesStr += VktUtil::WritePointerAsString(pResult->measurementInfo.idInfo.pWrappedCmdBuf->AppHandle());
+    profiledCommandsLinesStr += VktUtil::WritePointerAsString(pResult->measurementInfo.idInfo.pWrappedCmdBuf->AppHandle()).c_str();
     profiledCommandsLinesStr += " ";
 
     profiledCommandsLinesStr += IntToString(VktTraceAnalyzerLayer::Instance()->GetAPIGroupFromAPI(funcId));
@@ -595,8 +595,8 @@ void VktTraceAnalyzerLayer::OnPresent(VkQueue queue, const VkPresentInfoKHR* pPr
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
         sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s",
-                  VktUtil::WritePointerAsString(queue),
-                  VktUtil::WritePointerAsString(pPresentInfo));
+                  VktUtil::WritePointerAsString(queue).c_str(),
+                  VktUtil::WritePointerAsString(pPresentInfo).c_str());
 
         // precall
         BeforeAPICall();
