@@ -2262,7 +2262,7 @@ public:
             {
                 gtUInt32 srcLine = 0;
 
-                if (CXL_DATAACCESS_WARN_SRC_INFO_NOTAVAILABLE != retVal)
+                if (CXL_DATAACCESS_WARN_SRC_INFO_NOTAVAILABLE != static_cast<unsigned int>(retVal))
                 {
                     // check whether this offset has samples (in functionData.m_instDataList)
                     auto srcData = std::find_if(srcInfoVec.begin(), srcInfoVec.end(),
@@ -2839,7 +2839,7 @@ public:
 
                     disasmInfoVec.push_back(disasmInfo);
 
-                    if ((CXL_DATAACCESS_WARN_SRC_INFO_NOTAVAILABLE == retVal) && ((++nbrInst) > CXL_MAX_DISASM_INSTS))
+                    if ((CXL_DATAACCESS_WARN_SRC_INFO_NOTAVAILABLE == static_cast<unsigned int>(retVal)) && ((++nbrInst) > CXL_MAX_DISASM_INSTS))
                     {
                         bytesToRead = 0;
                     }
