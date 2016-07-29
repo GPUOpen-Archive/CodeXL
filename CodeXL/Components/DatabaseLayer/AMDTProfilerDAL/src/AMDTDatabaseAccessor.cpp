@@ -170,6 +170,7 @@ const char* SQL_CMD_TX_COMMIT = "COMMIT TRANSACTION";
 // Sqlite Version
 const char* SQL_CMD_SET_USER_VERSION = "PRAGMA user_version=1";
 const char* SQL_CMD_GET_USER_VERSION = "PRAGMA user_version";
+const char* SQL_CMD_SET_SYNCHRONOUS = "PRAGMA synchronous=0";
 
 // A reference counter for number of sqlite connections.
 // Will be used to decide whether to shutdown sqlite.
@@ -895,6 +896,10 @@ public:
         // create event-core sampling config view
         ret = CreateSampledCounterCoreConfig();
 
+        ret = ret && CreateModuleInfoView();
+
+        ret = ret && CreateProcessTotalsView();
+
         // Process/Thread/Module summary View
         ret = ret && CreateProcessSummaryView();
 
@@ -1009,6 +1014,9 @@ public:
             // Prepare the read statements only if the DB is the latest version.
             if (AMDT_CURRENT_PROFILE_DB_VERSION == m_dbVersion)
             {
+                // Turn off synchronous
+                SetSynchronousOff();
+
                 // Now the database is open. Let's prepare all the read statements.
                 ret = PrepareCommonReadStatements();
 
@@ -1056,6 +1064,18 @@ public:
         GT_IF_WITH_ASSERT(m_pDbTxCommitThread != nullptr)
         {
             ret = m_pDbTxCommitThread->TriggerDbTxCommit();
+        }
+
+        return ret;
+    }
+
+    bool SetSynchronousOff()
+    {
+        bool ret = true;
+
+        if (m_canUpdateDB && (nullptr != m_pReadDbConn))
+        {
+            sqlite3_exec(m_pReadDbConn, SQL_CMD_SET_SYNCHRONOUS, nullptr, nullptr, nullptr);
         }
 
         return ret;
@@ -2861,28 +2881,38 @@ public:
         sqlite3_stmt* pQueryStmt = nullptr;
         std::stringstream partialQuery;
 
-        partialQuery << "SELECT DISTINCT Module.id,                      \
-                                         Module.path,                    \
-                                         ModuleInstance.loadAddress,     \
-                                         Module.size,                    \
-                                         Module.is32Bit,                 \
-                                         Module.foundDebugInfo,          \
-                                         Module.type,                    \
-                                         Module.isSystemModule           \
-                         FROM Module                                     \
-                         INNER JOIN ModuleInstance ON Module.id = ModuleInstance.moduleId ";
+        //partialQuery << "SELECT DISTINCT Module.id,                      \
+        //                                 Module.path,                    \
+        //                                 ModuleInstance.loadAddress,     \
+        //                                 Module.size,                    \
+        //                                 Module.is32Bit,                 \
+        //                                 Module.foundDebugInfo,          \
+        //                                 Module.type,                    \
+        //                                 Module.isSystemModule           \
+        //                 FROM Module                                     \
+        //                 INNER JOIN ModuleInstance ON Module.id = ModuleInstance.moduleId ";
+
+        partialQuery << "SELECT id,                      \
+                                path,                    \
+                                loadAddress,             \
+                                size,                    \
+                                is32Bit,                 \
+                                foundDebugInfo,          \
+                                type,                    \
+                                isSystemModule           \
+                         FROM ModuleInfo ";
 
         if (IS_PROCESS_MODULE_QUERY(pid, mid))
         {
-            partialQuery << " WHERE ModuleInstance.processId = ? AND moduleId = ? ";
+            partialQuery << " WHERE processId = ? AND id = ? ";
         }
         else if (IS_PROCESS_QUERY(pid))
         {
-            partialQuery << " WHERE ModuleInstance.processId = ? ";
+            partialQuery << " WHERE processId = ? ";
         }
         else if (IS_MODULE_QUERY(mid))
         {
-            partialQuery << " WHERE moduleId = ? ";
+            partialQuery << " WHERE id = ? ";
         }
 
         partialQuery << ";";
@@ -2925,9 +2955,6 @@ public:
                 // Set the module name
                 GetNameFromPath(moduleInfo.m_path, moduleInfo.m_name);
 
-                // loadAddress is valid only if the PID is specified.
-                // FIXME.. what will be the value if the pid is -1
-                // moduleInfo.m_loadAddress = (IS_PROCESS_QUERY(pid)) ? loadAddress : AMDT_PROFILE_INVALID_ADDR;
                 moduleInfo.m_loadAddress = loadAddress;
                 moduleInfo.m_size = size;
                 moduleInfo.m_is64Bit = (is32Bit == 0) ? true : false;
@@ -3734,6 +3761,39 @@ public:
 
     } // CreateSampledCounterCoreConfig
 
+    bool CreateModuleInfoView()
+    {
+        bool ret = false;
+        sqlite3_stmt* pViewCreateStmt = nullptr;
+        std::stringstream viewCreateQuery;
+
+        viewCreateQuery << "CREATE TEMP VIEW IF NOT EXISTS ModuleInfo AS     \
+                            SELECT Module.id,                      \
+                                   Module.path,                    \
+                                   ModuleInstance.processId,           \
+                                   ModuleInstance.id AS instanceId,    \
+                                   ModuleInstance.loadAddress,     \
+                                   Module.size,                    \
+                                   Module.is32Bit,                 \
+                                   Module.foundDebugInfo,          \
+                                   Module.type,                    \
+                                   Module.isSystemModule           \
+                         FROM Module                               \
+                         INNER JOIN ModuleInstance ON Module.id = ModuleInstance.moduleId; ";
+
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, viewCreateQuery.str().c_str(), -1, &pViewCreateStmt, nullptr);
+
+        if (SQLITE_OK == rc)
+        {
+            rc = sqlite3_step(pViewCreateStmt);
+            sqlite3_finalize(pViewCreateStmt);
+        }
+
+        ret = (SQLITE_DONE == rc) ? true : false;
+
+        return ret;
+    }
+
     bool CreateProcessSummaryView()
     {
         //create view sampleProcessSummaryData as
@@ -3831,6 +3891,64 @@ public:
 
         return ret;
     } // CreateProcessSummaryView
+
+    bool CreateProcessTotalsView()
+    {
+        bool ret = false;
+        sqlite3_stmt* pViewCreateStmt = nullptr;
+        std::stringstream viewCreateQuery;
+
+        viewCreateQuery << "CREATE TEMP VIEW SampleProcessTotalsData AS        \
+                            SELECT  ProcessThread.processId,                    \
+                                    SampleContext.coreSamplingConfigurationId,  \
+                                    sum(count) as sampleCount                   \
+                            FROM SampleContext                                  \
+                            INNER JOIN ProcessThread ON processThreadId = ProcessThread.id       \
+                            GROUP BY SampleContext.coreSamplingConfigurationId;";
+
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, viewCreateQuery.str().c_str(), -1, &pViewCreateStmt, nullptr);
+
+        if (SQLITE_OK == rc)
+        {
+            rc = sqlite3_step(pViewCreateStmt);
+            sqlite3_finalize(pViewCreateStmt);
+        }
+
+        ret = (SQLITE_DONE == rc) ? true : false;
+
+        if (ret)
+        {
+            std::stringstream summaryViewCreate;
+            pViewCreateStmt = nullptr;
+
+            summaryViewCreate << "CREATE TEMP VIEW SampleProcessTotalsAllData AS     \
+                                  SELECT SampleProcessTotalsData.processId,  ";
+
+            std::stringstream partialQuery;
+            std::string fromCol("CoreSamplingConfiguration.id");
+            std::string toCol("SampleProcessTotalsData.sampleCount");
+            GetAllEventCorePartialQuery(partialQuery, fromCol, toCol);
+
+            summaryViewCreate << partialQuery.str();
+
+            summaryViewCreate << " FROM SampleProcessTotalsData  \
+                                   INNER JOIN CoreSamplingConfiguration ON SampleProcessTotalsData.coreSamplingConfigurationId = CoreSamplingConfiguration.id;";
+
+            //fprintf(stderr, " %s\n", summaryViewCreate.str().c_str());
+
+            rc = sqlite3_prepare_v2(m_pReadDbConn, summaryViewCreate.str().c_str(), -1, &pViewCreateStmt, nullptr);
+
+            if (SQLITE_OK == rc)
+            {
+                rc = sqlite3_step(pViewCreateStmt);
+                sqlite3_finalize(pViewCreateStmt);
+            }
+
+            ret = (SQLITE_DONE == rc) ? true : false;
+        }
+
+        return ret;
+    } // SampleProcessTotalsData
 
     bool CreateFunctionSummaryView()
     {
@@ -4372,7 +4490,7 @@ public:
 
         ret = GetEventCorePartialQuery(counterIdsList, coreMask, separateByCore, partialQuery, firstCountColName, sampleInfoVec);
         query << partialQuery.str();
-        query << " FROM SampleProcessSummaryAllData ";
+        query << " FROM SampleProcessTotalsAllData ";
 
         if (ret)
         {

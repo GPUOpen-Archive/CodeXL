@@ -1351,6 +1351,22 @@ public:
         return ret;
     }
 
+    bool GetAllSampledCountersIdList(AMDTCounterIdVec& counterIdList)
+    {
+        AMDTProfileCounterDescVec sampledCounterDescVec;
+        bool ret = GetSampledCountersList(sampledCounterDescVec);
+
+        if (ret)
+        {
+            for (auto& aCounterDesc : sampledCounterDescVec)
+            {
+                counterIdList.push_back(aCounterDesc.m_id);
+            }
+        }
+
+        return ret;
+    }
+
     // Totals is always for all the cores and no separtateBCore
     bool GetTotals(AMDTProfileDataType type,
                    AMDTProcessId procId,
@@ -1369,11 +1385,47 @@ public:
         case AMDT_PROFILE_DATA_PROCESS:
             {
                 auto procTotalIt = m_processSampleTotalMap.find(procId);
+                AMDTSampleValueVec totalSamplesValueVec;
 
-                if (procTotalIt != m_processSampleTotalMap.end())
+                if (procTotalIt == m_processSampleTotalMap.end())
                 {
-                    totalValueVec = procTotalIt->second;
+                    AMDTCounterIdVec allCounterIdList;                   
+
+                    ret = GetAllSampledCountersIdList(allCounterIdList);
+
+                    ret = m_pDbAdapter->GetCounterTotals(type,
+                                                         procId,
+                                                         threadId,
+                                                         moduleId,
+                                                         funcId,
+                                                         allCounterIdList,
+                                                         coreMask,
+                                                         separateByCore,
+                                                         totalSamplesValueVec);
+
+                    if (ret)
+                    {
+                        m_processSampleTotalMap.insert({ procId, totalSamplesValueVec });
+                    }
+                }
+                else
+                {
+                    totalSamplesValueVec = procTotalIt->second;
                     ret = true;
+                }
+
+                if (ret)
+                {
+                    for (auto &id : counterIdList)
+                    {
+                        auto counterTotal = std::find_if(totalSamplesValueVec.begin(), totalSamplesValueVec.end(),
+                            [&id](AMDTSampleValue const& aData) { return aData.m_counterId == id; });
+
+                        if (counterTotal != totalSamplesValueVec.end())
+                        {
+                            totalValueVec.push_back(*counterTotal);
+                        }
+                    }
                 }
             }
             break;
