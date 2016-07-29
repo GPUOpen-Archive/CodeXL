@@ -1809,19 +1809,19 @@ std::string VktUtil::DecomposeCompositeAlphaFlagsEnumAsString(uint32 flags)
 
 //-----------------------------------------------------------------------------
 /// Write a pointer value as a string. Used to display pointer values in the
-/// form 0x... 
+/// form 0x...
 /// \param ptr the pointer to be displayed
 /// \return string containing the pointer
 //-----------------------------------------------------------------------------
-const char* VktUtil::WritePointerAsString(const void* ptr)
+std::string VktUtil::WritePointerAsString(const void* ptr)
 {
-    static char string[32] = { '\0' };
+    char string[32] = { '\0' };
 #if AMDT_ADDRESS_SPACE_TYPE == AMDT_32_BIT_ADDRESS_SPACE
     sprintf_s(string, 32, GT_POINTER_FORMAT, reinterpret_cast<gtUInt32>(ptr));
 #else
     sprintf_s(string, 32, GT_POINTER_FORMAT, reinterpret_cast<gtUInt64>(ptr));
 #endif
-    return string;
+    return std::string(string);
 }
 
 #pragma warning (push)
@@ -1840,12 +1840,12 @@ const char* VktUtil::WritePointerAsString(const void* ptr)
 /// \param value the pointer to be displayed
 /// \return string containing the pointer
 //-----------------------------------------------------------------------------
-const char* VktUtil::WriteUint64AsString(uint64_t value)
+std::string VktUtil::WriteUint64AsString(uint64_t value)
 {
-    static char string[32] = {'\0'};
+    char string[32] = {'\0'};
 
     sprintf_s(string, 32, GT_64_BIT_POINTER_ASCII_FORMAT_LOWERCASE, value);
-    return string;
+    return std::string(string);
 }
 
 #pragma warning (pop)

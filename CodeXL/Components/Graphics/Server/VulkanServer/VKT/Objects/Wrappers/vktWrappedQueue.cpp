@@ -647,10 +647,10 @@ VkResult VktWrappedQueue::QueueSubmit_ICD(VkQueue queue, uint32_t submitCount, c
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
         sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s, %s",
-                  VktUtil::WritePointerAsString(queue),
+                  VktUtil::WritePointerAsString(queue).c_str(),
                   submitCount,
                   PrintArrayWithFormatter(submitCount, pSubmits, GT_POINTER_FORMAT).c_str(),
-                  VktUtil::WriteUint64AsString((uint64_t)fence));
+                  VktUtil::WriteUint64AsString((uint64_t)fence).c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(queue)->QueueSubmit(queue, submitCount, pSubmits, fence);
@@ -678,7 +678,7 @@ VkResult VktWrappedQueue::QueueWaitIdle(VkQueue queue)
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s", VktUtil::WritePointerAsString(queue));
+        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s", VktUtil::WritePointerAsString(queue).c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(queue)->QueueWaitIdle(queue);
@@ -702,10 +702,10 @@ VkResult VktWrappedQueue::QueueBindSparse(VkQueue queue, uint32_t bindInfoCount,
     {
         char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
         sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s, %s",
-                  VktUtil::WritePointerAsString(queue),
+                  VktUtil::WritePointerAsString(queue).c_str(),
                   bindInfoCount,
                   PrintArrayWithFormatter(bindInfoCount, pBindInfo, GT_POINTER_FORMAT).c_str(),
-                  VktUtil::WriteUint64AsString((uint64_t)fence));
+                  VktUtil::WriteUint64AsString((uint64_t)fence).c_str());
 
         VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer);
         result = device_dispatch_table(queue)->QueueBindSparse(queue, bindInfoCount, pBindInfo, fence);
