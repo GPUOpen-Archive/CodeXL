@@ -1721,7 +1721,7 @@ public:
             for (auto& func : unknownFuncVec)
             {
                 // Find the function info from debug info (if available) and update the tables
-                ret = Lookupfunction(func, true);
+                ret = Lookupfunction(func, true, true);
             }
 
             m_readUnknownFuncs = ret;
@@ -1768,6 +1768,7 @@ public:
             {
                 func.m_functionId = it->second.m_functionId;
                 func.m_name = it->second.m_name;
+                func.m_size = it->second.m_size;
             }
         }
     }
@@ -1799,6 +1800,7 @@ public:
         return true;
     }
 
+    // returns true if the unknown was already seen
     bool HandleUnknownFunction(AMDTProfileFunctionInfo& func)
     {
         bool ret = false;
@@ -1816,9 +1818,10 @@ public:
             {
                 func.m_functionId = it->second.m_functionId;
                 func.m_name = it->second.m_name;
-            }
+                func.m_size = it->second.m_size;
 
-            ret = false;
+                ret = true;
+            }
         }
 
         return ret;
@@ -3571,7 +3574,7 @@ public:
                 for (auto& leaf : leafs)
                 {
                     // Find the function info from debug info (if available) and update the tables
-                    ret = Lookupfunction(leaf.m_funcInfo, false);
+                    ret = Lookupfunction(leaf.m_funcInfo, false, true);
                 }
 
                 m_handleUnknownLeafs.insert({ pid, pid });
@@ -3588,7 +3591,7 @@ public:
         for (auto& frame : frames)
         {
             // Find the function info from debug info (if available) and update the tables
-            ret = Lookupfunction(frame.m_funcInfo, false);
+            ret = Lookupfunction(frame.m_funcInfo, false, false);
         }
 
         return ret;
@@ -3692,15 +3695,15 @@ public:
                             pathCount = 1;
                             sampleCount = static_cast<gtUInt32>(uniqueleaf.m_selfSamples);
 
+                            if (IS_UNKNOWN_FUNC(uniqueleaf.m_funcInfo.m_functionId))
+                            {
+                                HandleUnknownFunction(uniqueleaf.m_funcInfo);
+                            }
+
                             ret = GetFunctionNode(*pCgFunctionMap, uniqueleaf, sampleCount, 1, pLeafNode);
 
                             if (nullptr != pLeafNode)
                             {
-                                if (IS_UNKNOWN_FUNC(uniqueleaf.m_funcInfo.m_functionId))
-                                {
-                                    HandleUnknownFunction(uniqueleaf.m_funcInfo);
-                                }
-
                                 ret = ret && AddCallerToCalleeEdge(pCallerNode, pLeafNode, sampleCount, true);
                                 ret = ret && AddCalleeToCallerEdge(pCallerNode, pLeafNode, sampleCount);
                             }
@@ -4258,12 +4261,18 @@ public:
         return ret;
     }
 
-    bool Lookupfunction(AMDTProfileFunctionInfo& funcInfo, bool updateIPSample)
+    bool Lookupfunction(AMDTProfileFunctionInfo& funcInfo, bool updateIPSample, bool updateLeafs)
     {
         bool ret = true;
         gtUInt32 symEngineFuncId = funcInfo.m_functionId & 0xFFFFUL;
 
         if (0 == symEngineFuncId)
+        {
+            ret = HandleUnknownFunction(funcInfo);
+        }
+
+        // If we haven't seen this unknown function yet, process it
+        if (!ret)
         {
             ExecutableFile* pExecutable = nullptr;
 
@@ -4319,7 +4328,11 @@ public:
                             m_pDbAdapter->UpdateIPSample(funcInfo);
                         }
 
-                        m_pDbAdapter->UpdateCallstackLeaf(funcInfo);
+                        if (updateLeafs)
+                        {
+                            m_pDbAdapter->UpdateCallstackLeaf(funcInfo);
+                        }
+
                         m_pDbAdapter->UpdateCallstackFrame(funcInfo);
 
                         ret = true;

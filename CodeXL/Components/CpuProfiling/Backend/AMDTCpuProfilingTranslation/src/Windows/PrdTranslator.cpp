@@ -2352,10 +2352,6 @@ bool PrdTranslator::WriteFunctionInfoIntoDB(NameModuleMap& moduleMap)
             // Let us assume one function from each module
             pFuncInfoList->reserve(moduleMap.size());
 
-            // Insert a dummy function as "Unknown Function"
-            //gtString unknownFuncName = L"Unknown Function";
-            //funcInfoList->emplace_back(UNKNOWN_FUNCTION_ID, UNKNOWN_MODULE_ID, unknownFuncName, 0, 0);
-
             for (auto& module : moduleMap)
             {
                 gtUInt32 modId = module.second.m_moduleId;
@@ -2369,9 +2365,18 @@ bool PrdTranslator::WriteFunctionInfoIntoDB(NameModuleMap& moduleMap)
                     gtUInt32 funcId = modId;
                     funcId = (funcId << 16) | fit->second.m_functionId;
 
-                    // If function name is empty, it will be considered as unknown-function, don't insert into DB.
-                    // else insert function info into DB
-                    if (!funcName.isEmpty())
+                    // If function name is empty, construct using module name and offset
+                    bool doInsert = funcName.isEmpty() ? false : true;
+
+                    if ((!doInsert) && ((funcId & 0x0000ffff) > 0))
+                    {
+                        osFilePath aPath(module.second.getPath());
+                        aPath.getFileNameAndExtension(funcName);
+                        funcName.appendFormattedString(L"!0x%llx", startOffset + modLoadAddr);
+                        doInsert = true;
+                    }
+
+                    if (doInsert)
                     {
                         pFuncInfoList->emplace_back(funcId, modId, funcName, startOffset, size);
                     }

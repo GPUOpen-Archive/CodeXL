@@ -141,6 +141,7 @@ const std::vector<std::string> SQL_CREATE_DB_STMTS_AGGREGATION =
     "CREATE INDEX moduleInstanceIdx ON ModuleInstance(id)",
     "CREATE INDEX moduleIdx ON Module(id)",
     "CREATE INDEX SampleContextIdx1 ON SampleContext(coreSamplingConfigurationId)",
+    "CREATE INDEX FunctionIdx ON Function(id)",
 };
 
 // Migrate table for version 1 - add new columns in tables "devices" and "counters"
@@ -4834,6 +4835,24 @@ public:
         return ret;
     }
 
+    bool ConstructUnknownFunctionInfo(AMDTFunctionId funcId, gtUInt64 offset, AMDTProfileFunctionInfo& funcInfo)
+    {
+        bool ret = false;
+
+        AMDTModuleId modId = (funcId & 0xffff0000) >> 16;
+
+        funcInfo.m_functionId = funcId;
+        funcInfo.m_moduleId = modId;
+        funcInfo.m_size = 0; // CXL_UNKNOWN_FUNC_SIZE;
+        funcInfo.m_startOffset = offset;
+
+        ret = GetModulePath(modId, funcInfo.m_modulePath);
+
+        // TODO: if required construct name from modulepath and offset
+
+        return ret;
+    }
+
     bool ConstructUnknownFunctionName(AMDTProfileFunctionInfo& funcInfo)
     {
         bool ret = GetModuleName(funcInfo.m_moduleId, funcInfo.m_name);
@@ -4842,7 +4861,7 @@ public:
         // AMDTUInt64 baseAddr = 0;
         // ret = GetModuleBaseAddressByModuleId(funcInfo.m_moduleId, procId, baseAddr);
 
-        funcInfo.m_name.appendFormattedString(L"!0x" LONG_FORMAT_HEX, funcInfo.m_startOffset);
+       funcInfo.m_name.appendFormattedString(L"!0x" LONG_FORMAT_HEX, funcInfo.m_startOffset);
 
         return ret;
     }
@@ -4867,11 +4886,12 @@ public:
                 const unsigned char* path = sqlite3_column_text(pQueryStmt, 0);
 
                 funcName.fromUtf8String(reinterpret_cast<const char*>(path));
+                ret = true;
             }
         }
 
         sqlite3_finalize(pQueryStmt);
-        ret = (SQLITE_DONE == rc || SQLITE_ROW == rc) ? true : false;
+        // ret = (SQLITE_DONE == rc || SQLITE_ROW == rc) ? true : false;
         return ret;
     }
 
@@ -4984,7 +5004,7 @@ public:
                 funcInfo.m_startOffset = sqlite3_column_int(pQueryStmt, 1);
                 funcInfo.m_moduleId = ((funcInfo.m_functionId & DB_MODULEID_MASK) >> 16);
 
-                ConstructUnknownFunctionName(funcInfo);
+                ConstructUnknownFunctionInfo(funcInfo.m_functionId, funcInfo.m_startOffset, funcInfo);
 
                 funcList.emplace_back(funcInfo);
             }
@@ -5208,7 +5228,7 @@ public:
                     // and replace this with the proper module-id value..
                     //profileData.m_moduleId = mid;
                     profileData.m_moduleId = ((id & 0x0000FFFF) == 0) ? offset : mid;
-
+                  
                     int idx = 3;
                     if (separateByProcess)
                     {
@@ -5268,7 +5288,7 @@ public:
                 funcInfo.m_moduleId = sqlite3_column_int(pQueryStmt, 1);
                 funcInfo.m_startOffset = sqlite3_column_int(pQueryStmt, 2);
 
-                ConstructUnknownFunctionName(funcInfo);
+                ConstructUnknownFunctionInfo(funcInfo.m_functionId, funcInfo.m_startOffset, funcInfo);
 
                 funcList.emplace_back(funcInfo);
             }
@@ -5671,7 +5691,7 @@ public:
                 aLeaf.m_depth = 0;
                 aLeaf.m_isLeaf = true;
 
-                GetFunctionInfo(funcId, offset, aLeaf.m_funcInfo);
+                ConstructUnknownFunctionInfo(funcId, offset, aLeaf.m_funcInfo);
                 GetModuleBaseAddressByModuleId(aLeaf.m_funcInfo.m_moduleId, processId, aLeaf.m_moduleBaseAddr);
 
                 leafs.push_back(aLeaf);
@@ -5840,9 +5860,16 @@ public:
                 aLeaf.m_isLeaf = true;
                 aLeaf.m_isSystemodule = (isSysMod == 1) ? true : false;
 
-                GetFunctionInfo(funcId, offset, aLeaf.m_funcInfo);
-
-                GetModuleBaseAddress(funcId, processId, aLeaf.m_moduleBaseAddr);
+                if (queryUnknownFuncs)
+                {
+                    ConstructUnknownFunctionInfo(funcId, offset, aLeaf.m_funcInfo);
+                    GetModuleBaseAddressByModuleId(aLeaf.m_funcInfo.m_moduleId, processId, aLeaf.m_moduleBaseAddr);
+                }
+                else
+                {
+                    GetFunctionInfo(funcId, offset, aLeaf.m_funcInfo);
+                    GetModuleBaseAddress(funcId, processId, aLeaf.m_moduleBaseAddr);
+                }
 
                 leafs.push_back(aLeaf);
             }
@@ -5906,8 +5933,18 @@ public:
                 AMDTModuleId modId = ((funcId & 0xFFFF0000) >> 16);
                 IsSystemModule(modId, aLeaf.m_isSystemodule);
 
-                GetFunctionInfo(funcId, offset, aLeaf.m_funcInfo);
-                GetModuleBaseAddress(funcId, processId, aLeaf.m_moduleBaseAddr);
+                bool isUnknownFunc = ((funcId & 0x0000ffff) == 0) ? true : false;
+
+                if (isUnknownFunc)
+                {
+                    ConstructUnknownFunctionInfo(funcId, offset, aLeaf.m_funcInfo);
+                    GetModuleBaseAddressByModuleId(aLeaf.m_funcInfo.m_moduleId, processId, aLeaf.m_moduleBaseAddr);
+                }
+                else
+                {
+                    GetFunctionInfo(funcId, offset, aLeaf.m_funcInfo);
+                    GetModuleBaseAddress(funcId, processId, aLeaf.m_moduleBaseAddr);
+                }
 
                 frames.push_back(aLeaf);
             }
