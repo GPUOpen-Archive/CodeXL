@@ -3682,9 +3682,17 @@ int CaPerfTranslator::writeEbpOutput(const std::string& outputFile)
                         gtUInt32 funcId = modId;
                         funcId = ((funcId << 16) | fit->second.m_functionId);
 
-                        // If function name is empty, it will be considered as unknown-function, don't insert into DB.
-                        // else insert function info into DB
-                        if (!funcName.isEmpty())
+                        bool doInsert = funcName.isEmpty() ? false : true;
+
+                        if ((!doInsert) && ((funcId & 0x0000ffff) > 0))
+                        {
+                            osFilePath aPath(module.second.getPath());
+                            aPath.getFileNameAndExtension(funcName);
+                            funcName.appendFormattedString(L"!0x%lx", startOffset + modLoadAddr);
+                            doInsert = true;
+                        }
+
+                        if (doInsert)
                         {
                             funcInfoList->emplace_back(funcId, modId, funcName, startOffset, size);
                         }
