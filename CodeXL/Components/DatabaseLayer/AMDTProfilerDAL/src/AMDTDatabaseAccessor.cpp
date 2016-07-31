@@ -295,6 +295,8 @@ public:
             int rc = sqlite3_shutdown();
             GT_ASSERT(rc == SQLITE_OK);
         }
+
+        m_moduleIdInfoMap.clear();
     }
 
     bool PrepareInsertPowerProfilingSampleStatement()
@@ -2861,18 +2863,67 @@ public:
     bool GetModuleInfo(AMDTUInt32 pid, AMDTModuleId mid, gtVector<AMDTProfileModuleInfo>& moduleInfoList)
     {
         bool ret = false;
+        AMDTProfileModuleInfo moduleInfo;
 
-        ret = GetModuleInfo__(pid, mid, moduleInfoList);
+        ret = GetCachedModuleInfo(mid, moduleInfo);
 
-        if (!ret)
+        if (ret)
         {
-            AMDTProfileModuleInfo moduleInfo;
+            moduleInfoList.push_back(moduleInfo);
+        }
+        else
+        {
+            ret = GetModuleInfo__(pid, mid, moduleInfoList);
 
-            ret = GetModuleInfo__(mid, moduleInfo);
-
-            if (ret)
+            if (ret && moduleInfoList.size() > 0)
             {
-                moduleInfoList.push_back(moduleInfo);
+                CacheModuleInfo(mid, moduleInfoList[0]);
+            }
+            else
+            {
+                ret = GetModuleInfo__(mid, moduleInfo);
+
+                if (ret)
+                {
+                    CacheModuleInfo(mid, moduleInfo);
+                    moduleInfoList.push_back(moduleInfo);
+                }
+            }
+        }
+
+        return ret;
+    }
+
+    bool GetCachedModuleInfo(AMDTModuleId mid, AMDTProfileModuleInfo& moduleInfo)
+    {
+        bool ret = false;
+
+        if (IS_MODULE_QUERY(mid))
+        {
+            auto mInfo = m_moduleIdInfoMap.find(mid);
+
+            if (mInfo != m_moduleIdInfoMap.end())
+            {
+                moduleInfo = mInfo->second;
+                ret = true;
+            }
+        }
+
+        return ret;
+    }
+
+    bool CacheModuleInfo(AMDTModuleId mid, AMDTProfileModuleInfo& moduleInfo)
+    {
+        bool ret = false;
+
+        if (IS_MODULE_QUERY(mid))
+        {
+            auto mInfo = m_moduleIdInfoMap.find(mid);
+
+            if (mInfo == m_moduleIdInfoMap.end())
+            {
+                m_moduleIdInfoMap.insert({ mid, moduleInfo });
+                ret = true;
             }
         }
 
@@ -6130,6 +6181,8 @@ public:
     bool m_isCreateDb = false;
     bool m_isCurrentDbOpenForRead = false;
     int m_dbVersion = -1;
+
+    gtMap<AMDTModuleId, AMDTProfileModuleInfo> m_moduleIdInfoMap;
 };
 
 AmdtDatabaseAccessor::AmdtDatabaseAccessor() : m_pImpl(new AmdtDatabaseAccessor::Impl(this))
