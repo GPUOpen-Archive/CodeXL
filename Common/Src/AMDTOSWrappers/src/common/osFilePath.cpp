@@ -80,9 +80,9 @@ osFilePath::osFilePath(osApplicationSpecialDirectories predefinedFilePath, bool 
 // Author:      AMD Developer Tools Team
 // Date:        15/5/2004
 // ---------------------------------------------------------------------------
-osFilePath::osFilePath(const gtString& fileFullPath)
+osFilePath::osFilePath(const gtString& fileFullPath, bool adjustToOS /* = true*/)
 {
-    setFullPathFromString(fileFullPath);
+    setFullPathFromString(fileFullPath, adjustToOS);
 }
 
 // ---------------------------------------------------------------------------

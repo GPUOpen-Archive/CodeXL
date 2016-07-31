@@ -82,6 +82,7 @@ public:
 
     /// handle ending of the application execution
     bool TerminateRemoteGraphicsBeckendServer();
+    bool IsRemoteAgentLinux();
 private:
     /// handle the remote application execution
     bool ExecuteRemoteCommand(bool isRetryEnabled,
@@ -181,6 +182,13 @@ protected:
 
 };
 
+struct IsRemoteAgentLinuxCommand : public gpRemoteCommand
+{
+    IsRemoteAgentLinuxCommand(bool& isRemoteAgentLinux) : m_isRemoteAgentLinux(isRemoteAgentLinux) {};
+    virtual bool ExecuteCommand(CXLDaemonClient* pDmnClient, RemoteClientError& errorCode) const override;
+private:
+    bool& m_isRemoteAgentLinux;
+};
 
 #endif //__GPREMOTEGRAPHICSBACKENDLAUNCHER_H
 

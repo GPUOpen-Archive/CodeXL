@@ -250,7 +250,7 @@ protected:
 
 private:
     void TerminateRemoteAgent();
-    bool GetFrameAnalisysServerPaths(gtString& capturePlayerPathAsStr, osFilePath& serverPath) const;
+    bool GetFrameAnalisysServerPaths(gtString& capturePlayerPathAsStr, osFilePath& serverPath);
     /// Kills running Raptr.exe or project defined processes, that could jeopardize the FA execution
     /// \return None
     void HandleSpecialRunningProcesses();
