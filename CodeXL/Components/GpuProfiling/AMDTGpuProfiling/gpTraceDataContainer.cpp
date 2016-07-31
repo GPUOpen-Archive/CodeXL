@@ -1202,6 +1202,44 @@ QString gpTraceDataContainer::AddGPUCallToCommandList(APIInfo* pAPIInfo)
             else 
             {
                 retVal = CommandListNameFromPointer(commandListPtr, commandListIndex);
+                // Add new command list instance to the vector
+                bool newCommandLIst = true;
+
+                for (int i = 0; i < (int)m_commandListInstancesVector.size(); i++)
+                {
+                    bool doesCommandListMatch = (m_commandListInstancesVector[i].m_commandListPtr == commandListName);
+                    if (doesCommandListMatch)
+                    {
+                        newCommandLIst = false;
+                        m_commandListInstancesVector[i].m_apiIndices.push_back(pAPIInfo->m_uiSeqID);
+
+                        if (m_commandListInstancesVector[i].m_startTimeGPU > pAPIInfo->m_ullStart)
+                        {
+                            m_commandListInstancesVector[i].m_startTimeGPU = pAPIInfo->m_ullStart;
+                        }
+
+                        if (m_commandListInstancesVector[i].m_endTimeGPU < pAPIInfo->m_ullEnd)
+                        {
+                            m_commandListInstancesVector[i].m_endTimeGPU = pAPIInfo->m_ullEnd;
+                        }
+                    }
+                }
+
+                if (newCommandLIst)
+                {
+                    CommandListInstanceData currentInstanceData;
+                    currentInstanceData.m_instanceIndex = commandListIndex;
+                    currentInstanceData.m_commandListPtr = commandListPtr;
+
+                    currentInstanceData.m_startTimeGPU = pAPIInfo->m_ullStart;
+                    currentInstanceData.m_endTimeGPU = pAPIInfo->m_ullEnd;
+
+                    currentInstanceData.m_sampleIds << sampleID;
+
+                    currentInstanceData.m_apiIndices.push_back(pAPIInfo->m_uiSeqID);
+
+                    m_commandListInstancesVector << currentInstanceData;
+                }
             }
         }
     }
