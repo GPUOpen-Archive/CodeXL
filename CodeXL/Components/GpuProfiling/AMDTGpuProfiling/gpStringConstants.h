@@ -363,7 +363,7 @@
 #define GPU_STR_executionModeVerb   L"Frame Analysis"
 #define GPU_STR_executionSesionType L"Frame Analysis"
 #define GPU_STR_executionModeStatusbarString L"Frame Analysis Mode - Switch to Frame Analysis Mode"
-#define GPU_STR_executionModeDescription L"Perform frame analysis of an image."
+#define GPU_STR_executionModeDescription L"Capture and analyze frames from graphic apps."
 #define GPU_STR_executionModeStart L"&Start Frame Analysis"
 #define GPU_STR_executionModeStartStatus L"Start an application and capture a frame for analysis"
 #define GPU_STR_executionModeCapture L"&Capture a Frame"
