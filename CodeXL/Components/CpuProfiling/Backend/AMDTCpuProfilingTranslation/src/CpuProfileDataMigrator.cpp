@@ -199,7 +199,8 @@ bool DataMigrator::WriteSessionInfoIntoDB(const CpuProfileInfo& profileInfo, con
         info->m_sessionDir = profileInfo.m_profDirectory;
         info->m_sessionStartTime = profileInfo.m_profStartTime;
         info->m_sessionEndTime = profileInfo.m_profEndTime;
-        info->m_cssEnabled = profileInfo.m_isCSSEnabled;
+        // Disable CSS while importing EBP file till complete CSS import support added.
+        info->m_cssEnabled = false; // profileInfo.m_isCSSEnabled;
         info->m_unwindDepth = static_cast<gtUInt16>(profileInfo.m_cssUnwindDepth);
         info->m_unwindScope = static_cast<gtUInt16>(profileInfo.m_cssScope);
         info->m_cssFPOEnabled = profileInfo.m_isCssSupportFpo;
