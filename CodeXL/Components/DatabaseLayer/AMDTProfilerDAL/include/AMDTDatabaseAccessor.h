@@ -61,19 +61,19 @@ public:
     bool MigrateProfilingDatabase(const gtString& dbName);
 
     // Commits all pending transactions to the DB.
-    bool FlushData(void);
+    bool FlushData();
 
     // Commits all pending transactions to the DB asynchronously.
-    bool FlushDataAsync(void);
+    bool FlushDataAsync();
 
     // Closes all the DB connections.
-    bool CloseAllConnections(void);
+    bool CloseAllConnections();
 
     bool GetDbVersion(int& version);
 
     // Should be called after OpenProfilingDatabase() for cpu-profiling
-    // to create the requried views while querying the db
-    bool PrepareProfilingDatabase(void);
+    // to create the required views while querying the db
+    bool PrepareProfilingDatabase();
 
     //
     // DB Update/Insert APIs
@@ -99,14 +99,14 @@ public:
     bool InsertSamplingInterval(unsigned samplingIntervalMs, unsigned quantizedTime);
 
     bool InsertCoreInfo(gtUInt32 coreId, gtUInt32 processorId, gtUInt32 numaNodeId);
-    bool InsertSamplingCounter(gtUInt32 eventId, gtString name, gtString abbrev, gtString description);
+    bool InsertSamplingCounter(gtUInt32 eventId, const gtString& name, const gtString& abbrev, const gtString& description);
     bool InsertSamplingConfig(gtUInt32 id, gtUInt16 counterId, gtUInt64 samplingInterval, gtUInt16 unitMask, bool isUserMode, bool isOsMode, bool edge);
     bool InsertCoreSamplingConfig(gtUInt64 id, gtUInt16 coreId, gtUInt32 samplingConfigId);
     bool InsertProcessInfo(gtUInt64 pid, const gtString& path, bool is32Bit, bool hasCSS);
     bool InsertModuleInfo(gtUInt32 id, const gtString& path, bool isSystemModule, bool is32Bit, gtUInt32 type, gtUInt32 size, bool foundDebugInfo);
     bool InsertModuleInstanceInfo(gtUInt32 moduleInstanceId, gtUInt32 moduleId, gtUInt64 pid, gtUInt64 loadAddr);
     bool InsertProcessThreadInfo(gtUInt64 id, gtUInt64 pid, gtUInt64 threadId);
-    bool InsertSamples(CPSampleData& sampleData);
+    bool InsertSamples(const CPSampleData& sampleData);
     bool InsertFunction(gtUInt32 funcId, gtUInt32 modId, const gtString& funcName, gtUInt64 offset, gtUInt64 size);
     bool InsertCallStackFrame(gtUInt32 callStackId, gtUInt64 processId, gtUInt64 funcId, gtUInt64 m_offset, gtUInt16 depth);
     bool InsertCallStackLeaf(gtUInt32 callStackId, gtUInt64 processId, gtUInt64 funcId, gtUInt64 offset, gtUInt32 counterId, gtUInt64 selfSamples);
@@ -144,20 +144,20 @@ public:
     bool GetCounterNames(gtMap<gtString, int>& counterNames);
 
     // Utility function that retrieves the details of all of the counters which were enabled during the session.
-    // TODO: map may not be reqd..
+    // TODO: map may not be required
     bool GetCountersDescription(gtMap<int, AMDTProfileCounterDesc*>& counterDetails);
 
     // Fetch the name of the counter based on counter id
-    bool GetCounterIdByName(std::string& counterName, int& counterId);
+    bool GetCounterIdByName(const std::string& counterName, int& counterId);
 
     // Utility function that retrieves the counters which were enabled during the session and that
     // have category of type counterCategory.
-    bool GetCountersByCategory(std::string& counterCategoryStr, gtVector<int>& counterIds);
-    bool GetCountersByCategory(int& counterCategoryId, gtVector<int>& counterIds);
+    bool GetCountersByCategory(const std::string& counterCategoryStr, gtVector<int>& counterIds);
+    bool GetCountersByCategory(int counterCategoryId, gtVector<int>& counterIds);
 
     // Utility function that retrieves the counters which were enabled during the session and that
     // are linked to devices of type deviceType and have category of type counterCategory.
-    bool GetCountersByDeviceAndCategory(std::string& deviceType, std::string& counterCategory, gtVector<int>& counterIds);
+    bool GetCountersByDeviceAndCategory(const std::string& deviceType, const std::string& counterCategory, gtVector<int>& counterIds);
     bool GetCountersByDeviceAndCategory(int deviceTypeId, int counterCategoryId, gtVector<int>& counterIds);
 
     // Retrieves the sampling interval for the current session.
@@ -188,13 +188,13 @@ public:
     // Retrieves the sampled values for each counter in the specified time range.
     // Output args: gtVector<double>>& sampledValuesPerCounter.
     bool GetSamplesByCounterIdAndRange(const gtVector<int>& counterIds,
-                                       SamplingTimeRange& samplingTimeRange,
+                                       const SamplingTimeRange& samplingTimeRange,
                                        gtMap<int, gtVector<SampledValue>>& sampledValuesPerCounter);
 
     // Retrieves the global maximum and minimum of sampled values in the specified range.
     // Output args: double& minValue, double& maxValue.
     bool GetMinMaxSampleByCounterId(const gtVector<int>& counterIds,
-                                    SamplingTimeRange& samplingTimeRange,
+                                    const SamplingTimeRange& samplingTimeRange,
                                     double& minValue,
                                     double& maxValue);
 
@@ -213,29 +213,29 @@ public:
     bool GetProcessesWithCallstackSamples(gtVector<AMDTProcessId>& cssProcessVec);
 
     bool GetProcessTotals(AMDTProcessId               procId,
-                          gtVector<AMDTUInt32>        counterIdsList,
+                          const gtVector<AMDTUInt32>& counterIdsList,
                           AMDTUInt64                  coreMask,
                           bool                        separateByCore,
                           AMDTSampleValueVec&         sampleValueVec);
 
     bool GetModuleTotals(AMDTModuleId                moduleId,
                          AMDTProcessId               processId,
-                         gtVector<AMDTUInt32>        counterIdsList,
+                         const gtVector<AMDTUInt32>& counterIdsList,
                          AMDTUInt64                  coreMask,
                          bool                        separateByCore,
                          AMDTSampleValueVec&         sampleValueVec);
 
-    bool GetFunctionTotals(AMDTFunctionId         funcId,
-                           AMDTProcessId          processId,
-                           AMDTThreadId           threadId,
-                           gtVector<AMDTUInt32>&  counterIdsList,
-                           AMDTUInt64             coreMask,
-                           bool                   separateByCore,
-                           AMDTSampleValueVec&    sampleValueVec);
+    bool GetFunctionTotals(AMDTFunctionId              funcId,
+                           AMDTProcessId               processId,
+                           AMDTThreadId                threadId,
+                           const gtVector<AMDTUInt32>& counterIdsList,
+                           AMDTUInt64                  coreMask,
+                           bool                        separateByCore,
+                           AMDTSampleValueVec&         sampleValueVec);
 
     bool GetProcessSummaryData(AMDTProcessId               processId,
                                AMDTModuleId                moduleId,
-                               gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
+                               const gtVector<AMDTUInt32>& counterIdsList,      // samplingConfigId
                                AMDTUInt64                  coreMask,
                                bool                        separateByCore,
                                bool                        doSort,
@@ -244,7 +244,7 @@ public:
 
     bool GetModuleSummaryData(AMDTProcessId               processId,           // for a given process or for all processes
                               AMDTModuleId                moduleId,
-                              gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
+                              const gtVector<AMDTUInt32>& counterIdsList,      // samplingConfigId
                               AMDTUInt64                  coreMask,
                               bool                        ignoreSystemModules,
                               bool                        separateByCore,
@@ -254,7 +254,7 @@ public:
 
     bool GetThreadSummaryData(AMDTProcessId               processId,           // for a given process or for all processes
                               AMDTThreadId                threadId,
-                              gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
+                              const gtVector<AMDTUInt32>& counterIdsList,      // samplingConfigId
                               AMDTUInt64                  coreMask,
                               bool                        separateByCore,
                               bool                        doSort,
@@ -279,11 +279,11 @@ public:
                                 gtUInt32                    funcStartOffset,
                                 AMDTProcessId               processId,
                                 AMDTThreadId                threadId,
-                                gtVector<AMDTUInt32>        counterIdsList,
+                                const gtVector<AMDTUInt32>& counterIdsList,
                                 AMDTUInt64                  coreMask,
                                 bool                        separateByCore,
                                 AMDTProfileFunctionData&    functionData);
-    
+
     // This is from SampleContext table
     bool GetUnknownFunctionsByIPSamples(AMDTProfileFunctionInfoVec& funcList);
 

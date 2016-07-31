@@ -1089,7 +1089,7 @@ public:
     }
 
     // This will create the required views
-    bool PrepareProfilingDatabase(void)
+    bool PrepareProfilingDatabase()
     {
         bool ret = false;
 
@@ -1924,7 +1924,7 @@ public:
         // Execute the query.
         while (sqlite3_step(m_pGetAllSessionInfoStmt) == SQLITE_ROW)
         {
-            std::string infoValueAsUtf8;
+            //std::string infoValueAsUtf8;
             const unsigned char* pKey = sqlite3_column_text(m_pGetAllSessionInfoStmt, 0);
             const unsigned char* pValue = sqlite3_column_text(m_pGetAllSessionInfoStmt, 1);
 
@@ -1948,8 +1948,8 @@ public:
         return ret;
     }
 
-
-    bool GetModuleIdByName(std::string moduleName, gtUInt64& moduleId)
+#if 0
+    bool GetModuleIdByName(const std::string& moduleName, gtUInt64& moduleId)
     {
         bool ret = false;
         moduleId = 0;
@@ -1965,6 +1965,7 @@ public:
         sqlite3_reset(m_pModuleIdQueryStmt);
         return ret;
     }
+#endif
 
     bool GetSamplingConfigId(gtUInt16 eventId, gtUByte unitMask, bool bitOs, bool bitUsr, gtUInt64& samplingConfigId)
     {
@@ -2233,7 +2234,7 @@ public:
     }
 
     // By Device and Category.
-    bool GetCountersByDeviceAndCategory(std::string& deviceTypeAsStr, std::string& counterCategoryAsStr, gtVector<int>& counterIds)
+    bool GetCountersByDeviceAndCategory(const std::string& deviceTypeAsStr, const std::string& counterCategoryAsStr, gtVector<int>& counterIds)
     {
         bool ret = false;
         counterIds.clear();
@@ -2283,7 +2284,7 @@ public:
     }
 
     // Only by Category.
-    bool GetCountersByCategory(std::string& counterCategoryAsStr, gtVector<int>& counterIds)
+    bool GetCountersByCategory(const std::string& counterCategoryAsStr, gtVector<int>& counterIds)
     {
         bool ret = false;
         counterIds.clear();
@@ -2414,7 +2415,7 @@ public:
         return ret;
     }
 
-    bool GetCounterIdByName(std::string& counterName, int& counterId)
+    bool GetCounterIdByName(const std::string& counterName, int& counterId)
     {
         bool ret = false;
         counterId = -1;
@@ -2540,7 +2541,7 @@ public:
         return ret;
     }
 
-    bool GetSamplesByCounterIdAndRange(const gtVector<int>& counterIds, SamplingTimeRange& samplingTimeRange,
+    bool GetSamplesByCounterIdAndRange(const gtVector<int>& counterIds, const SamplingTimeRange& samplingTimeRange,
                                        gtMap<int, gtVector<SampledValue>>& sampledValuesPerCounter)
     {
         bool ret = false;
@@ -2600,7 +2601,7 @@ public:
         return ret;
     }
 
-    bool GetMinMaxSampleByCounterId(const gtVector<int>& counterIds, SamplingTimeRange& samplingTimeRange,
+    bool GetMinMaxSampleByCounterId(const gtVector<int>& counterIds, const SamplingTimeRange& samplingTimeRange,
                                     double& minValue, double& maxValue)
     {
         bool ret = false;
@@ -3645,7 +3646,7 @@ public:
         return addAddStr;
     } // GetEventAllCorePartialQuery
 
-    bool GetEventCorePartialQuery(gtVector<AMDTUInt32> counterIdsList, AMDTUInt64 coreMask, bool separateByCore,
+    bool GetEventCorePartialQuery(const gtVector<AMDTUInt32>& counterIdsList, AMDTUInt64 coreMask, bool separateByCore,
                                   std::stringstream& partialQuery, std::string& firstCountColName,
                                   gtVector<AMDTSampleValue>& sampleInfoVec)
     {
@@ -4033,7 +4034,7 @@ public:
     bool GetProcessSummaryData(
         AMDTProcessId               processId,
         AMDTModuleId                moduleId,
-        gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
+        const gtVector<AMDTUInt32>& counterIdsList,      // samplingConfigId
         AMDTUInt64                  coreMask,
         bool                        separateByCore,
         bool                        doSort,
@@ -4141,7 +4142,7 @@ public:
     bool GetModuleSummaryData(
         AMDTModuleId                moduleId,
         AMDTProcessId               processId,           // for a given process or for all processes
-        gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
+        const gtVector<AMDTUInt32>& counterIdsList,      // samplingConfigId
         AMDTUInt64                  coreMask,
         bool                        ignoreSystemModules,
         bool                        separateByCore,
@@ -4261,7 +4262,7 @@ public:
     bool GetThreadSummaryData(
         AMDTProcessId               processId,           // for a given process or for all processes
         AMDTThreadId                threadId,
-        gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
+        const gtVector<AMDTUInt32>& counterIdsList,      // samplingConfigId
         AMDTUInt64                  coreMask,
         bool                        separateByCore,
         bool                        doSort,
@@ -4360,7 +4361,7 @@ public:
     // otherwise, given process
     bool GetProcessTotals(
         AMDTProcessId               processId,           // for a given process or for all processes
-        gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
+        const gtVector<AMDTUInt32>& counterIdsList,      // samplingConfigId
         AMDTUInt64                  coreMask,
         bool                        separateByCore,
         AMDTSampleValueVec&         sampleValueVec)
@@ -4434,7 +4435,7 @@ public:
     bool GetModuleTotals(
         AMDTModuleId                moduleId,
         AMDTProcessId               processId,           // for a given process or for all processes
-        gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
+        const gtVector<AMDTUInt32>& counterIdsList,      // samplingConfigId
         AMDTUInt64                  coreMask,
         bool                        separateByCore,
         AMDTSampleValueVec&         sampleValueVec)
@@ -4487,7 +4488,7 @@ public:
                     while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
                     {
                         AMDTModuleId mid = sqlite3_column_int(pQueryStmt, 0);
-                        mid = mid; // module ID
+                        GT_UNREFERENCED_PARAMETER(mid);
 
                         int idx = 1;
                         for (auto& sample : sampleInfoVec)
@@ -5097,7 +5098,7 @@ public:
                     if (separateByProcess)
                     {
                         AMDTProcessId pid = sqlite3_column_int(pQueryStmt, idx);
-                        pid = pid;
+                        GT_UNREFERENCED_PARAMETER(pid);
                         idx++;
                     }
 
@@ -5232,7 +5233,7 @@ public:
         AMDTFunctionId              funcId,
         AMDTProcessId               processId,
         AMDTThreadId                threadId,
-        gtVector<AMDTUInt32>        counterIdsList,
+        const gtVector<AMDTUInt32>& counterIdsList,
         AMDTUInt64                  coreMask,
         bool                        separateByCore,
         AMDTSampleValueVec&         sampleValueVec)
@@ -5358,7 +5359,7 @@ public:
         gtUInt32                    funcStartOffset,
         AMDTProcessId               processId,
         AMDTThreadId                threadId,
-        gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
+        const gtVector<AMDTUInt32>& counterIdsList,      // samplingConfigId
         AMDTUInt64                  coreMask,
         bool                        separateByCore,
         AMDTProfileFunctionData&    functionData)
@@ -6068,7 +6069,7 @@ bool AmdtDatabaseAccessor::MigrateProfilingDatabase(const gtString& dbName)
     return ret;
 }
 
-bool AmdtDatabaseAccessor::PrepareProfilingDatabase(void)
+bool AmdtDatabaseAccessor::PrepareProfilingDatabase()
 {
     bool ret = false;
 
@@ -6214,7 +6215,7 @@ bool AmdtDatabaseAccessor::InsertCoreInfo(gtUInt32 coreId, gtUInt32 processor, g
     return ret;
 }
 
-bool AmdtDatabaseAccessor::InsertSamplingCounter(gtUInt32 eventId, gtString name, gtString abbrev, gtString description)
+bool AmdtDatabaseAccessor::InsertSamplingCounter(gtUInt32 eventId, const gtString& name, const gtString& abbrev, const gtString& description)
 {
     bool ret = false;
 
@@ -6325,7 +6326,7 @@ bool AmdtDatabaseAccessor::InsertProcessThreadInfo(gtUInt64 id, gtUInt64 pid, gt
     return ret;
 }
 
-bool AmdtDatabaseAccessor::InsertSamples(CPSampleData& sampleData)
+bool AmdtDatabaseAccessor::InsertSamples(const CPSampleData& sampleData)
 {
     bool ret = false;
 
@@ -6487,7 +6488,7 @@ bool AmdtDatabaseAccessor::GetSampleCountByCounterId(const gtVector<int>& counte
     return ret;
 }
 
-bool AmdtDatabaseAccessor::GetSamplesByCounterIdAndRange(const gtVector<int>& counterIds, SamplingTimeRange& samplingTimeRange,
+bool AmdtDatabaseAccessor::GetSamplesByCounterIdAndRange(const gtVector<int>& counterIds, const SamplingTimeRange& samplingTimeRange,
                                                          gtMap<int, gtVector<SampledValue>>& sampledValuesPerCounter)
 {
     bool ret = false;
@@ -6498,7 +6499,7 @@ bool AmdtDatabaseAccessor::GetSamplesByCounterIdAndRange(const gtVector<int>& co
     return ret;
 }
 
-bool AmdtDatabaseAccessor::GetMinMaxSampleByCounterId(const gtVector<int>& counterIds, SamplingTimeRange& samplingTimeRange, double& minValue, double& maxValue)
+bool AmdtDatabaseAccessor::GetMinMaxSampleByCounterId(const gtVector<int>& counterIds, const SamplingTimeRange& samplingTimeRange, double& minValue, double& maxValue)
 {
     bool ret = false;
     GT_IF_WITH_ASSERT(m_pImpl != nullptr)
@@ -6548,7 +6549,7 @@ bool AmdtDatabaseAccessor::GetSamplingInterval(unsigned& samplingIntervalMs)
     return ret;
 }
 
-bool AmdtDatabaseAccessor::GetCounterIdByName(std::string& counterName, int& counterId)
+bool AmdtDatabaseAccessor::GetCounterIdByName(const std::string& counterName, int& counterId)
 {
     bool ret = false;
     GT_IF_WITH_ASSERT(m_pImpl != nullptr)
@@ -6629,7 +6630,7 @@ bool AmdtDatabaseAccessor::GetSamplesGroupByCounterId(const gtVector<int>& count
     return ret;
 }
 
-bool AmdtDatabaseAccessor::GetCountersByCategory(std::string& counterCategoryStr, gtVector<int>& counterIds)
+bool AmdtDatabaseAccessor::GetCountersByCategory(const std::string& counterCategoryStr, gtVector<int>& counterIds)
 {
     bool ret = false;
     GT_IF_WITH_ASSERT(m_pImpl != nullptr)
@@ -6639,7 +6640,7 @@ bool AmdtDatabaseAccessor::GetCountersByCategory(std::string& counterCategoryStr
     return ret;
 }
 
-bool AmdtDatabaseAccessor::GetCountersByCategory(int& counterCategoryId, gtVector<int>& counterIds)
+bool AmdtDatabaseAccessor::GetCountersByCategory(int counterCategoryId, gtVector<int>& counterIds)
 {
     bool ret = false;
     GT_IF_WITH_ASSERT(m_pImpl != nullptr)
@@ -6649,7 +6650,7 @@ bool AmdtDatabaseAccessor::GetCountersByCategory(int& counterCategoryId, gtVecto
     return ret;
 }
 
-bool AmdtDatabaseAccessor::GetCountersByDeviceAndCategory(std::string& deviceTypeStr, std::string& counterCategoryStr, gtVector<int>& counterIds)
+bool AmdtDatabaseAccessor::GetCountersByDeviceAndCategory(const std::string& deviceTypeStr, const std::string& counterCategoryStr, gtVector<int>& counterIds)
 {
     bool ret = false;
     GT_IF_WITH_ASSERT(m_pImpl != nullptr)
@@ -6717,8 +6718,9 @@ bool AmdtDatabaseAccessor::GetProcessesWithCallstackSamples(gtVector<AMDTProcess
     return ret;
 }
 
-bool AmdtDatabaseAccessor::GetProcessTotals(AMDTProcessId               procId,
-    gtVector<AMDTUInt32>        counterIdsList,
+bool AmdtDatabaseAccessor::GetProcessTotals(
+    AMDTProcessId               procId,
+    const gtVector<AMDTUInt32>& counterIdsList,
     AMDTUInt64                  coreMask,
     bool                        separateByCore,
     AMDTSampleValueVec&         sampleValueVec)
@@ -6733,12 +6735,13 @@ bool AmdtDatabaseAccessor::GetProcessTotals(AMDTProcessId               procId,
     return ret;
 }
 
-bool AmdtDatabaseAccessor::GetModuleTotals(AMDTModuleId             moduleId,
-    AMDTProcessId            processId,
-    gtVector<AMDTUInt32>     counterIdsList,
-    AMDTUInt64               coreMask,
-    bool                     separateByCore,
-    AMDTSampleValueVec&      sampleValueVec)
+bool AmdtDatabaseAccessor::GetModuleTotals(
+    AMDTModuleId                moduleId,
+    AMDTProcessId               processId,
+    const gtVector<AMDTUInt32>& counterIdsList,
+    AMDTUInt64                  coreMask,
+    bool                        separateByCore,
+    AMDTSampleValueVec&         sampleValueVec)
 {
     bool ret = false;
 
@@ -6750,10 +6753,11 @@ bool AmdtDatabaseAccessor::GetModuleTotals(AMDTModuleId             moduleId,
     return ret;
 }
 
-bool AmdtDatabaseAccessor::GetFunctionTotals(AMDTFunctionId         funcId,
+bool AmdtDatabaseAccessor::GetFunctionTotals(
+    AMDTFunctionId         funcId,
     AMDTProcessId          processId,
     AMDTThreadId           threadId,
-    gtVector<AMDTUInt32>&  counterIdsList,
+    const gtVector<AMDTUInt32>&  counterIdsList,
     AMDTUInt64             coreMask,
     bool                   separateByCore,
     AMDTSampleValueVec&    sampleValueVec)
@@ -6819,7 +6823,7 @@ bool AmdtDatabaseAccessor::GetFunctionInfoByModuleId(AMDTModuleId moduleId, AMDT
 bool AmdtDatabaseAccessor::GetProcessSummaryData(
     AMDTProcessId               processId,
     AMDTModuleId                moduleId,
-    gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
+    const gtVector<AMDTUInt32>& counterIdsList,      // samplingConfigId
     AMDTUInt64                  coreMask,
     bool                        separateByCore,
     bool                        doSort,
@@ -6846,7 +6850,7 @@ bool AmdtDatabaseAccessor::GetProcessSummaryData(
 bool AmdtDatabaseAccessor::GetModuleSummaryData(
     AMDTProcessId               processId,           // for a given process or for all processes
     AMDTModuleId                moduleId,
-    gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
+    const gtVector<AMDTUInt32>& counterIdsList,      // samplingConfigId
     AMDTUInt64                  coreMask,
     bool                        ignoreSystemModules,
     bool                        separateByCore,
@@ -6875,7 +6879,7 @@ bool AmdtDatabaseAccessor::GetModuleSummaryData(
 bool AmdtDatabaseAccessor::GetThreadSummaryData(
     AMDTProcessId               processId,           // for a given process or for all processes
     AMDTThreadId                threadId,
-    gtVector<AMDTUInt32>        counterIdsList,      // samplingConfigId
+    const gtVector<AMDTUInt32>& counterIdsList,      // samplingConfigId
     AMDTUInt64                  coreMask,
     bool                        separateByCore,
     bool                        doSort,
@@ -6952,7 +6956,7 @@ bool AmdtDatabaseAccessor::GetFunctionProfileData(
     gtUInt32                    funcStartOffset,
     AMDTProcessId               processId,
     AMDTThreadId                threadId,
-    gtVector<AMDTUInt32>        counterIdsList,
+    const gtVector<AMDTUInt32>& counterIdsList,
     AMDTUInt64                  coreMask,
     bool                        separateByCore,
     AMDTProfileFunctionData&    functionData)

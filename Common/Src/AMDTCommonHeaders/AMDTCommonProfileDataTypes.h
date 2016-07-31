@@ -380,8 +380,8 @@ using CallstackFrameVec = gtVector<CallstackFrame>;
 struct CPSampleData
 {
     gtUInt64    m_processThreadId = 0;
-    gtUInt32    m_moduleInstanceId = 0;
     gtUInt64    m_coreSamplingConfigId = 0;
+    gtUInt32    m_moduleInstanceId = 0;
     gtUInt32    m_functionId = 0;
     gtUInt64    m_offset = 0;
     gtUInt64    m_count = 0;
