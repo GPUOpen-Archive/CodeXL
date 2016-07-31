@@ -3422,6 +3422,7 @@ public:
             {
                 it->second.m_totalSelfSamples.m_sampleCount += frame.m_selfSamples;
                 it->second.m_totalDeepSamples.m_sampleCount += frame.m_selfSamples;
+                it->second.m_pathCount += pathCount;
             }
             else
             {
@@ -3430,10 +3431,10 @@ public:
                 {
                     it->second.m_totalDeepSamples.m_sampleCount += deepSamples;
                     it->second.m_isVisited = true;
+                    it->second.m_pathCount += pathCount;
                 }
             }
 
-            it->second.m_pathCount += pathCount;
             it->second.m_moduleBaseAddr = frame.m_moduleBaseAddr;
             it->second.m_isSystemModule = frame.m_isSystemodule;
 
@@ -3674,15 +3675,18 @@ public:
                                 HandleUnknownFunction(frame.m_funcInfo);
                             }
 
-                            ret = GetFunctionNode(*pCgFunctionMap, frame, sampleCount, pathCount, pCalleeNode);
-
                             // Handle recursion.
-                            if ((nullptr != pCalleeNode) && (pCallerNode->m_funcInfo.m_functionId != pCalleeNode->m_funcInfo.m_functionId))
+                            if (frame.m_funcInfo.m_functionId != pCallerNode->m_funcInfo.m_functionId)
                             {
-                                ret = ret && AddCallerToCalleeEdge(pCallerNode, pCalleeNode, sampleCount, false);
-                                ret = ret && AddCalleeToCallerEdge(pCallerNode, pCalleeNode, sampleCount);
+                                ret = GetFunctionNode(*pCgFunctionMap, frame, sampleCount, pathCount, pCalleeNode);
 
-                                pCallerNode = pCalleeNode;
+                                if (nullptr != pCalleeNode)
+                                {
+                                    ret = ret && AddCallerToCalleeEdge(pCallerNode, pCalleeNode, sampleCount, false);
+                                    ret = ret && AddCalleeToCallerEdge(pCallerNode, pCalleeNode, sampleCount);
+
+                                    pCallerNode = pCalleeNode;
+                                }
                             }
 
                             pCalleeNode = nullptr;
