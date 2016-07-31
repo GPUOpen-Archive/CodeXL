@@ -95,7 +95,7 @@ public:
     osFilePath();
     osFilePath(osPreDefinedFilePaths predefinedfilePath, bool applyRedirection = false);
     osFilePath(osApplicationSpecialDirectories predefinedFilePath, bool convertToLower = true);
-    osFilePath(const gtString& fileFullPath);
+    osFilePath(const gtString& fileFullPath, bool adjustToOS = true);
     osFilePath(osPreDefinedFilePaths predefinedfilePath, const gtString& fileName, const gtString& fileExtension, bool applyRedirection = false);
     osFilePath(const osFilePath& other);
 

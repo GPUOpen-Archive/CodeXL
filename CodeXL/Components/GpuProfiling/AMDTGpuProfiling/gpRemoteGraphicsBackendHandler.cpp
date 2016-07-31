@@ -265,6 +265,20 @@ bool gpRemoteGraphicsBackendHandler::TerminateRemoteGraphicsBeckendServer()
     return retVal;
 }
 
+bool gpRemoteGraphicsBackendHandler::IsRemoteAgentLinux()
+{
+#if AMDT_BUILD_TARGET == AMDT_LINUX_OS
+    bool bResult = true;
+#else
+    bool bResult = false;
+#endif
+    
+    IsRemoteAgentLinuxCommand isRemoteAgentLinuxCommand(bResult);
+    gtString strErrorMessageOut;
+    ExecuteRemoteCommand(false, strErrorMessageOut, &isRemoteAgentLinuxCommand);
+    return bResult;
+}
+
 bool gpRemoteGraphicsBackendHandler::GetCapturedFrames(const gtString& projectName,
                                                        gtString& capturedFramesXmlStr,
                                                        bool&     isRetryEnabled,
@@ -447,6 +461,19 @@ bool DeleteRemoteSessionCommand::ExecuteCommand(CXLDaemonClient* pDmnClient, Rem
     {
         // Delete the requested session on the remote agent machine
         retVal = pDmnClient->DeleteFrameAnalysisSession(m_projectName, m_sessionName, errorCode);
+    }
+    return retVal;
+}
+
+bool IsRemoteAgentLinuxCommand::ExecuteCommand(CXLDaemonClient* pDmnClient, RemoteClientError& errorCode) const
+{
+    bool retVal = false;
+    GT_UNREFERENCED_PARAMETER(errorCode);
+    GT_IF_WITH_ASSERT(pDmnClient != nullptr)
+    {
+        // Delete the requested session on the remote agent machine
+        m_isRemoteAgentLinux = pDmnClient->IsAgentPlatformLinux();
+        retVal = true;
     }
     return retVal;
 }

@@ -504,7 +504,7 @@ bool gpExecutionMode::RefreshLoadedProjectSessionsFromServer()
 void gpExecutionMode::TerminateRemoteAgent()
 {
     OS_DEBUG_LOG_TRACER;
-    const bool isRemoteAgentLinux = CXL_DAEMON_CLIENT->IsAgentPlatformLinux();
+    const bool isRemoteAgentLinux = m_remoteGraphicsBackendServerLauncher.IsRemoteAgentLinux();
     gtVector<gtString> fileNamesToTerminate{ isRemoteAgentLinux? GPU_STR_CodeXLAgent_LNX : GPU_STR_CodeXLAgent_WIN};
     osProcessId currentProcessId = osGetCurrentProcessId();
 
@@ -916,7 +916,6 @@ void gpExecutionMode::ShutServerDown()
         rc = m_pGraphicsServerCommunication->Disconnect();
         GT_ASSERT(rc);
     }
-    const bool isRemoteAgentLinux = CXL_DAEMON_CLIENT->IsAgentPlatformLinux();
 
     // Terminate the remote graphics server
     m_remoteGraphicsBackendServerLauncher.TerminateRemoteGraphicsBeckendServer();
@@ -1102,12 +1101,11 @@ gpSessionTreeNodeData* gpExecutionMode::CreateSession(gtString& projectName, gtS
     return pRetVal;
 }
 
-bool gpExecutionMode::GetFrameAnalisysServerPaths(gtString& capturePlayerPathAsStr, osFilePath& serverPath) const
+bool gpExecutionMode::GetFrameAnalisysServerPaths(gtString& capturePlayerPathAsStr, osFilePath& serverPath)
 {
     OS_DEBUG_LOG_TRACER;
-    const bool  isRemoteAgentLinux = CXL_DAEMON_CLIENT->IsAgentPlatformLinux();
+    const bool  isRemoteAgentLinux = m_remoteGraphicsBackendServerLauncher.IsRemoteAgentLinux();
     // Get the server location: assume it is where CodeXL is located
-    //serverPath = osFilePath(osFilePath::OS_CODEXL_BINARIES_PATH);
     gtString serverPathAsStr = serverPath.asString();
     serverPathAsStr.append(osFilePath::osPathSeparator);
 
@@ -1144,7 +1142,7 @@ void gpExecutionMode::HandleSpecialRunningProcesses()
 {
     OS_DEBUG_LOG_TRACER;
     InitializeCodeXLRemoteAgent();
-    const bool isRemoteAgentLinux = CXL_DAEMON_CLIENT->IsAgentPlatformLinux();
+    const bool isRemoteAgentLinux = m_remoteGraphicsBackendServerLauncher.IsRemoteAgentLinux();
     if (false == isRemoteAgentLinux)
     {
         // Check if the raptr.exe or fraps.exe is running on the remote agent
@@ -1297,7 +1295,7 @@ bool gpExecutionMode::LaunchServer(bool& messageShown, const gtASCIIString& fram
         gtString commandArgs;
         const apProjectSettings& currentSettings = afProjectManager::instance().currentProjectSettings();
         gtString exePath = frameXMLFullPath.isEmpty() ? currentSettings.executablePath().asString() : capturePlayerPathAsStr;
-        const bool isRemoteAgentLinux = CXL_DAEMON_CLIENT->IsAgentPlatformLinux();
+        const bool isRemoteAgentLinux = m_remoteGraphicsBackendServerLauncher.IsRemoteAgentLinux();
         if (isRemoteAgentLinux)
         {
             exePath.replace(L"\\", L"/");
@@ -1324,18 +1322,19 @@ bool gpExecutionMode::LaunchServer(bool& messageShown, const gtASCIIString& fram
 
             commandArgs.appendFormattedString(L" --appargs \"%ls\"", xmlAsArg.asCharArray());
         }
-
-        if (!currentSettings.workDirectory().asString().isEmpty())
+        gtString currentWorkDir = currentSettings.workDirectory().asString();
+        if (isRemoteAgentLinux)
         {
-            gtString workDir = currentSettings.workDirectory().asString().asCharArray();
-            if (isRemoteAgentLinux)
-            {
-                workDir.replace(L"\\", L"/");
-            }
-            workDir.append(osFilePath::osPathSeparator);
-            workDir.replace(L"\\", L"\\\\");
+            currentWorkDir.replace(L"\\", L"/");
+        }
 
-            commandArgs.appendFormattedString(L" --appworkingdir \"%ls\"", workDir.asCharArray());
+        if (!currentWorkDir.isEmpty())
+        {
+            gtString cmdWorkDir = currentWorkDir;
+            cmdWorkDir.append(isRemoteAgentLinux? '/' : '\\');
+            cmdWorkDir.replace(L"\\", L"\\\\");
+
+            commandArgs.appendFormattedString(L" --appworkingdir \"%ls\"", cmdWorkDir.asCharArray());
         }
 
         // Add the port number to the command line arguments
@@ -1343,8 +1342,8 @@ bool gpExecutionMode::LaunchServer(bool& messageShown, const gtASCIIString& fram
 
         // Initialize the CodeXL remote agent
         retVal = InitializeCodeXLRemoteAgent();
-
-        m_remoteGraphicsBackendServerLauncher.Init(serverPath, commandArgs, currentSettings.workDirectory());
+        
+        m_remoteGraphicsBackendServerLauncher.Init(serverPath, commandArgs, osDirectory(osFilePath(currentWorkDir, false)));
         gtString errorMsg;
         retVal = m_remoteGraphicsBackendServerLauncher.ExecuteRemoteGraphicsBackendServer(true, errorMsg);
 
@@ -1368,7 +1367,7 @@ bool gpExecutionMode::InitializeCodeXLRemoteAgent()
 {
     bool retVal = true;
     OS_DEBUG_LOG_TRACER_WITH_RETVAL(retVal);
-    const bool isRemoteAgentLinux = CXL_DAEMON_CLIENT->IsAgentPlatformLinux();
+    const bool isRemoteAgentLinux = m_remoteGraphicsBackendServerLauncher.IsRemoteAgentLinux();
     const bool isRemoteTarget = afProjectManager::instance().currentProjectSettings().isRemoteTarget();
     // initiate the remote agent
     if (isRemoteTarget == false && (0 == m_cxlAgentProcessID || osIsProcessAlive(isRemoteAgentLinux? GPU_STR_CodeXLAgent_LNX : GPU_STR_CodeXLAgent_WIN) == false))
@@ -1469,7 +1468,7 @@ void gpExecutionMode::UpdateCapturedFrameFromServer()
 void gpExecutionMode::Terminate()
 {
     gtVector<gtString> fileNamesToTerminate;
-    bool isRemoteAgentLinux = CXL_DAEMON_CLIENT->IsAgentPlatformLinux();
+    bool isRemoteAgentLinux = m_remoteGraphicsBackendServerLauncher.IsRemoteAgentLinux();
     if (isRemoteAgentLinux)
     {
         fileNamesToTerminate = { GPU_STR_CodeXLAgent_LNX, GPU_STR_perfStudioServer64_LNX, GPU_STR_GraphicsCapturePlayer64_LNX };
