@@ -78,6 +78,8 @@
 #define    ALL_Data  "All data"
 #define    MAX_NAME_COLUMN_SIZE_OF_WINDOW 0.4
 
+static gtUInt32 gDeepSamples = 0;
+
 // ****************************
 // Class CallGraphPathFuncList
 // ***************************
@@ -97,10 +99,6 @@ void CallGraphPathFuncList::clear()
         m_pFuncTable->clear();
     }
 }
-
-
-
-
 
 CallGraphFuncListItem* CallGraphPathFuncList::AcquireTopLevelItem(AMDTFunctionId funcId, gtString funcName, gtString modulePath)
 {
@@ -283,8 +281,8 @@ void CallGraphPathFuncList::SetFunctionPath(std::shared_ptr<cxlProfileDataReader
                 pFuncListItem->m_moduleId = func.m_functionInfo.m_moduleId;
 
                 pFuncListItem->setExpanded(true);
-                pFuncListItem->m_deepSamples = func.m_totalDeepSamples;
-                pFuncListItem->m_selfSample  = func.m_totalSelfSamples;
+                pFuncListItem->m_deepSamples += func.m_totalDeepSamples;
+                pFuncListItem->m_selfSample  += func.m_totalSelfSamples;
             }
         }
     }
@@ -298,14 +296,15 @@ void CallGraphPathFuncList::SetFunctionPath(std::shared_ptr<cxlProfileDataReader
         if (nullptr != pCurrFuncListItem)
         {
             AddTreeSample(pCurrFuncListItem);
-            SetSamplePercent(pCurrFuncListItem, pCurrFuncListItem->m_deepSamples);
+            gtUInt64 deepSamples = (gDeepSamples > 0) ? gDeepSamples : pCurrFuncListItem->m_deepSamples;
+            SetSamplePercent(pCurrFuncListItem, deepSamples);
 
             pCurrFuncListItem->AddCountValue(CALLGRAPH_PATH_SELF, pCurrFuncListItem->m_selfSample);
             pCurrFuncListItem->AddCountValue(CALLGRAPH_PATH_DOWNSTREAM_SAMPLES, pCurrFuncListItem->m_deepSamples);
             pCurrFuncListItem->SetPercentageValue(
                 CALLGRAPH_PATH_DOWNSTREAM_PERCENTAGE,
                 static_cast<double>(pCurrFuncListItem->m_deepSamples),
-                pCurrFuncListItem->m_deepSamples);
+                deepSamples);
         }
     }
 
@@ -1656,6 +1655,7 @@ void CallGraphButterfly::SetChildrenFunction(std::shared_ptr<cxlProfileDataReade
         if (L"[self]" == functionName)
         {
             deepSamples = children.m_totalSelfSamples;
+            gDeepSamples = children.m_totalDeepSamples; // this is used to compute percentage in paths view
         }
 
         AddTopLevelItem(*m_pChildrenTreeControl,
@@ -1762,8 +1762,8 @@ void SessionCallGraphView::FunctionListSelectionDone(AMDTFunctionId functionId)
     {
         m_pFuncIdSelected = functionId;
 
-        ShowPaths(functionId);
         ShowParentChild(functionId);
+        ShowPaths(functionId);
         emit functionSelected(functionId);
     }
 }
@@ -2167,8 +2167,8 @@ void SessionCallGraphView::selectFunction(AMDTFunctionId funcID, ProcessIdType p
     GT_IF_WITH_ASSERT(nullptr != m_pFuncTable && nullptr != m_pFuncTable->functionsTreeControl())
     {
         AMDTFunctionId functionId = funcID;
-        ShowPaths(functionId);
         ShowParentChild(functionId);
+        ShowPaths(functionId);
         emit functionSelected(functionId);
     }
 }
