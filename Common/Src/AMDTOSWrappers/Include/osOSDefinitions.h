@@ -201,6 +201,7 @@
 
     // Our HSA Module name
     #define OS_CODEXL_HSA_SERVER_MODULE_NAME L"cxlhsaserver.dll"
+    #define OS_HSA_HWDBE_DEFAULT_INSTALL_DIRECTORY L"C:\\Windows\\System32\\"
 
     // NVIDIA driver dll names:
     #define OS_NVIDIA_OGL_DRIVER_DLL_NAME L"nvoglnt"
@@ -348,6 +349,8 @@
 
         // Our HSA Module name:
         #define OS_CODEXL_HSA_SERVER_MODULE_NAME L"libCXLHsaServer.so"
+        #define OS_HSA_HWDBE_DEFAULT_INSTALL_DIRECTORY L"/opt/rocm/gpudebugsdk/lib/x86_64/"
+
         // ATI DLL Names
         #define OS_ATI_CALXY_DRIVER_DLL_NAME L"libatiadlxy"
         #define OS_ATI_CALXX_DRIVER_DLL_NAME L"libatiadlxx"
@@ -428,6 +431,8 @@
 
         // Our HSA Module name:
         #define OS_CODEXL_HSA_SERVER_MODULE_NAME L"libCXLHsaServer.dylib"
+        #define OS_HSA_HWDBE_DEFAULT_INSTALL_DIRECTORY L"/opt/rocm/gpudebugsdk/lib/x86_64/" // Should be /usr/local/ ? ROCm SDK isn't currently available for Mac OS X
+
         // Mac OS X application bundle sub folder names:
         #define OS_MAC_APPLICATION_BUNDLE_FILE_EXTENSION L"app"
         #define OS_MAC_APPLICATION_BUNDLE_INTERNAL_PATH1 L"Contents"
