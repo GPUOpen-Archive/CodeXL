@@ -72,6 +72,4 @@ void ModernAPIFrameDebuggerLayer::GetFrameInfo(FrameInfo* outFrameInfo)
     outFrameInfo->mTotalElapsedTime = GetParentLayerManager()->GetElapsedTimeMilliseconds();
     outFrameInfo->mFrameDuration = GetParentLayerManager()->GetLastFrameDurationMilliseconds();
     outFrameInfo->mRunningFPS = GetParentLayerManager()->GetAverageFPS();
-
-    Log(logERROR, "5) ModernAPIFrameDebuggerLayer::GetFrameInfo FPS: %lf, Frame Count: %d\n", outFrameInfo->mRunningFPS, outFrameInfo->mFrameNumber);
 }
