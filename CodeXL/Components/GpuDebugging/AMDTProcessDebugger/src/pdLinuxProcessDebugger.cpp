@@ -2357,6 +2357,13 @@ bool pdLinuxProcessDebugger::processLibraryPathEnvVariableValue(gtString& ldLibr
         ldLibraryPathValue += thisProcessLdlibrarypath;
     }
 
+    // CODEXL-3526 - If we are debugging HSA kernels, add the HSA DBE default install path to the library path, in case the user hasn't copied the DBE to the CodeXL folder.
+    // Note we add it after the CodeXL path and the user's paths so that the user may choose to use another DBE version if so desired.
+    if (_debuggedProcessCreationData.shouldDebugHSAKernels())
+    {
+        ldLibraryPathValue.append(osFilePath::osEnvironmentVariablePathsSeparator).append(OS_HSA_HWDBE_DEFAULT_INSTALL_DIRECTORY);
+    }
+
     // BUG404491: Starting with Catalyst 13.6Beta and newer, the fglrx_dri.so OpenGL driver needs to be able to load symbols from the libGL.so.1.2 OpenGL runtime.
     // This runtime is placed in one of the LIBGL_DRIVERS_PATH folders. To minimize impact on the user app, we add this at the _end_ of the variable value.
     // We do not assume or assert the variable is present to allow this to work on non-AMD systems.
