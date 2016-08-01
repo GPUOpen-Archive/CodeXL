@@ -3632,9 +3632,7 @@ void pdGDBOutputReader::handleSignalOutput(const gtASCIIString& gdbOutputLine, b
 
             GetStoppedThreadGDBId(output);
         }
-        while (!_pGDBDriver->IsAllThreadsStopped() || !_wasGDBPrompt);
-
-        _wasGDBPrompt = false;
+        while (!_pGDBDriver->IsAllThreadsStopped());
     }
 
     // Will get true iff the signal represents a breakpoint hit:
@@ -3680,21 +3678,6 @@ void pdGDBOutputReader::handleSignalOutput(const gtASCIIString& gdbOutputLine, b
                 if (wasBreakpointHit)
                 {
                     int triggeringThreadsId = GetStoppedThreadGDBId(gdbOutputLine);
-                    /*
-                                        if (nullptr != _pGDBCommunicationPipe && nullptr != _pGDBDriver)
-                                        {
-                                            std::string cmd = "-exec-interrupt --all\n";
-                                            _pGDBCommunicationPipe->write(cmd.c_str(), cmd.length());
-
-                                            do
-                                            {
-                                                gtASCIIString output;
-                                                readGDBOutputLine(output);
-
-                                                GetStoppedThreadId(output);
-                                            } while (!_pGDBDriver->IsAllThreadsStopped());
-                                        }
-                                        */
 
                     _debuggedProcessCurrentThreadGDBId = triggeringThreadsId;
                     _debuggedProcessCurrentThreadId = threadIdFromGDBId(_debuggedProcessCurrentThreadGDBId);
