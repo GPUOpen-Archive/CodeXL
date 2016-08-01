@@ -431,11 +431,12 @@ void gpTraceView::SyncSelectionInSummary(ProfileSessionDataItem* pDataItem)
         // sync selection in summary table
         QString call = pDataItem->GetColumnData(ProfileSessionDataItem::SESSION_ITEM_CALL_COLUMN).toString();
 
-        if (pDataItem->ItemType().m_itemMainType == ProfileSessionDataItem::DX12_API_PROFILE_ITEM  || pDataItem->ItemType().m_itemMainType == ProfileSessionDataItem::VK_API_PROFILE_ITEM)
+        const auto itemType = pDataItem->ItemType();
+        if (itemType.m_itemMainType == ProfileSessionDataItem::DX12_API_PROFILE_ITEM  || itemType.m_itemMainType == ProfileSessionDataItem::VK_API_PROFILE_ITEM)
         {
             m_pSummaryTableTabWidget->SelectAPIRowByCallName(call);
         }
-        else if (pDataItem->ItemType().m_itemMainType == ProfileSessionDataItem::DX12_GPU_PROFILE_ITEM  || pDataItem->ItemType().m_itemMainType == ProfileSessionDataItem::VK_GPU_PROFILE_ITEM)
+        else if (itemType.m_itemMainType == ProfileSessionDataItem::DX12_GPU_PROFILE_ITEM  || itemType.m_itemMainType == ProfileSessionDataItem::VK_GPU_PROFILE_ITEM)
         {
             m_pSummaryTableTabWidget->SelectGPURowByCallName(call);
         }
