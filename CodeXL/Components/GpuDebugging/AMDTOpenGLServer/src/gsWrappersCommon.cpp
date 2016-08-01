@@ -608,18 +608,18 @@ void gsUpdateTLSVariableValues()
             // or internally (e.g. by glXMakeCurrent) - making the real value newer.
             // Thus, we need to check which value is newer and copy it over the other one.
             _glapi_table*& real_glapi_tls_Dispatch = *(_glapi_table**)realTLSDispatchAsProcAddress;
-            bool newSpyValue = (_glapi_tls_Dispatch_LastValue != _glapi_tls_Dispatch);
-            bool newRealValue = (_glapi_tls_Dispatch_LastValue != real_glapi_tls_Dispatch);
-            if (newSpyValue)
+            bool isSpyValueNew = (_glapi_tls_Dispatch_LastValue != _glapi_tls_Dispatch);
+            bool isRealValueNew = (_glapi_tls_Dispatch_LastValue != real_glapi_tls_Dispatch);
+            if (isSpyValueNew)
             {
                 // If both values changed, something critically wrong happened. Use the spy value anyway:
-                GT_ASSERT_EX(!newRealValue, L"_glapi_tls_Dispatch changed in both OpenGL server and OpenGL runtime. overriding with server value.");
+                GT_ASSERT_EX(!isRealValueNew, L"_glapi_tls_Dispatch changed in both OpenGL server and OpenGL runtime. overriding with server value.");
 
                 // Note that we do not check the return value as nullptr is a value that could appear:
                 real_glapi_tls_Dispatch = _glapi_tls_Dispatch;
                 _glapi_tls_Dispatch_LastValue = _glapi_tls_Dispatch;
             }
-            else if (newRealValue)
+            else if (isRealValueNew)
             {
                 // Note that we do not check the return value as nullptr is a value that could appear:
                 _glapi_tls_Dispatch = real_glapi_tls_Dispatch;
@@ -634,18 +634,18 @@ void gsUpdateTLSVariableValues()
         if (rcCtx && (nullptr != realTLSContextAsProcAddress))
         {
             void*& real_glapi_tls_Context = *(void**)realTLSContextAsProcAddress;
-            bool newSpyValue = (_glapi_tls_Context_LastValue != _glapi_tls_Context);
-            bool newRealValue = (_glapi_tls_Context_LastValue != real_glapi_tls_Context);
-            if (newSpyValue)
+            bool isSpyValueNew = (_glapi_tls_Context_LastValue != _glapi_tls_Context);
+            bool isRealValueNew = (_glapi_tls_Context_LastValue != real_glapi_tls_Context);
+            if (isSpyValueNew)
             {
                 // If both values changed, something critically wrong happened. Use the spy value anyway:
-                GT_ASSERT_EX(!newRealValue, L"_glapi_tls_Context changed in both OpenGL server and OpenGL runtime. overriding with server value.");
+                GT_ASSERT_EX(!isRealValueNew, L"_glapi_tls_Context changed in both OpenGL server and OpenGL runtime. overriding with server value.");
 
                 // Note that we do not check the return value as nullptr is a value that could appear:
                 real_glapi_tls_Context = _glapi_tls_Context;
                 _glapi_tls_Context_LastValue = _glapi_tls_Context;
             }
-            else if (newRealValue)
+            else if (isRealValueNew)
             {
                 // Note that we do not check the return value as nullptr is a value that could appear:
                 _glapi_tls_Context = real_glapi_tls_Context;
@@ -660,18 +660,18 @@ void gsUpdateTLSVariableValues()
         if (rcXCtx && (nullptr != realTLSGLXContextAsProcAddress))
         {
             void*& real__glX_tls_Context = *(void**)realTLSGLXContextAsProcAddress;
-            bool newSpyValue = (__glX_tls_Context_LastValue != __glX_tls_Context);
-            bool newRealValue = (__glX_tls_Context_LastValue != real__glX_tls_Context);
-            if (newSpyValue)
+            bool isSpyValueNew = (__glX_tls_Context_LastValue != __glX_tls_Context);
+            bool isRealValueNew = (__glX_tls_Context_LastValue != real__glX_tls_Context);
+            if (isSpyValueNew)
             {
                 // If both values changed, something critically wrong happened. Use the spy value anyway:
-                GT_ASSERT_EX(!newRealValue, L"__glX_tls_Context changed in both OpenGL server and OpenGL runtime. overriding with server value.");
+                GT_ASSERT_EX(!isRealValueNew, L"__glX_tls_Context changed in both OpenGL server and OpenGL runtime. overriding with server value.");
 
                 // Note that we do not check the return value as nullptr is a value that could appear:
                 real__glX_tls_Context = __glX_tls_Context;
                 __glX_tls_Context_LastValue = __glX_tls_Context;
             }
-            else if (newRealValue)
+            else if (isRealValueNew)
             {
                 // Note that we do not check the return value as nullptr is a value that could appear:
                 __glX_tls_Context = real__glX_tls_Context;

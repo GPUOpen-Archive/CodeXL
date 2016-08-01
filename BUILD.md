@@ -98,5 +98,18 @@ The folder containing the CodeXL binaries can be found in the root folder of Cod
 If a license agreement is not displayed, copy the file CodeXL/Setup/Legal/Public/EndUserLicenseAgreement-Linux.htm to the Legal subdirectory in the CodeXL binaries folder (Output_x86_64/release/bin/Legal)
 If CodeXL displays an error indicating that it is unable to establish a connection with the CodeXL remote agent, copy the CodeXLRemoteAgentConfig.xml file into your CodeXL binary folder. The source file is in the folder CodeXL/CodeXL/Remote/AMDTRemoteAgent/CodeXLRemoteAgentConfig.xml
 
+#### Using Detours Express 3.0 for graphics backend injection with Windows builds of CodeXL
+* For some Steam games the default injection technique used by CodeXL may not work. In most cases this can be fixed by using Detours Express 3.0.
+* Download Detours Express 3.0
+  * Download the Detours express package from Microsoft: https://www.microsoft.com/en-us/download/details.aspx?id=52586
+  * Or, by searching for "Detours express 3.0 download".
+* Install Detours Express 3.0
+  * We assume the Detours Express is installed in the following location: "CodeXL\Common\Lib\Ext\Detours Express 3.0"
+  * The detours files that are used are included by the following file: "\CodeXL\Common\Src\AMDTInterceptor\mhook-dllInjector\dllInjectorDetours.inl"
+  * Detours can be installed elsewhere but the paths for the included detours files (creatwth.cpp and modules.cpp) will need modifying in dllInjectorDetours.inl
+* Edit "CodeXL\Common\Lib\Ext\Detours Express 3.0\src\creatwth.cpp"
+  * Change the line: "DETOUR_EXE_RESTORE der;" to: "static DETOUR_EXE_RESTORE der;". This struct is quite large and can a cause stack overflow on some systems.
+* Replace both occurrences of '#1' in creatwth.cpp with 'InjectDLL'
+* Uncomment the #define USE_DETOURS line below and rebuild the solution.
 
 ----------
