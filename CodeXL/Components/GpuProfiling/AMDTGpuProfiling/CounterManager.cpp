@@ -40,6 +40,10 @@
 #include <AMDTGpuProfiling/AMDTGpuProfilerDefs.h>
 #include "CounterManager.h"
 
+// Backend headaers
+#include "CLUtils.h"
+#include "CLFunctionDefs.h"
+
 // AMDTApplicationFramework.
 #include <AMDTApplicationFramework/Include/afGlobalVariablesManager.h>
 #include <AMDTApplicationFramework/Include/afProjectManager.h>
@@ -191,6 +195,29 @@ void CounterManager::Init(bool isRemoteSession)
             for (AsicInfoList::const_iterator it = asicInfoList.begin(); it != asicInfoList.end(); ++it)
             {
                 AddDeviceId(it->deviceID, it->revID);
+            }
+        }
+
+        if (0 == asicInfoList.size())
+        {
+            // fallback path when running on systems where ADL is not available or reports no devices
+            InitRealCLFunctions();
+
+            CLPlatformSet platformInfo;
+
+            if (CLUtils::GetPlatformInfo(platformInfo))
+            {
+                CLPlatformSet::const_iterator itPlatformInfo;
+
+                for (itPlatformInfo = platformInfo.begin(); itPlatformInfo != platformInfo.end(); itPlatformInfo++)
+                {
+                    std::string deviceName = (*itPlatformInfo).strDeviceName;
+                    std::vector<GDT_GfxCardInfo> cardList;
+                    if (AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceName.c_str(), cardList))
+                    {
+                        AddDeviceId(cardList[0].m_deviceID, cardList[0].m_revID);
+                    }
+                }
             }
         }
     }
