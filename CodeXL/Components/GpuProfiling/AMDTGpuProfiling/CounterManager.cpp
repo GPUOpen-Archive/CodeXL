@@ -194,6 +194,37 @@ void CounterManager::Init(bool isRemoteSession)
                 AddDeviceId(it->deviceID, it->revID);
             }
         }
+<<<<<<< HEAD
+=======
+
+        if (0 == asicInfoList.size())
+        {
+            // fallback path when running on systems where ADL is not available or reports no devices
+            InitRealCLFunctions();
+
+            CLPlatformSet platformInfo;
+
+            if (CLUtils::GetPlatformInfo(platformInfo))
+            {
+                CLPlatformSet::const_iterator itPlatformInfo;
+
+                for (itPlatformInfo = platformInfo.begin(); itPlatformInfo != platformInfo.end(); itPlatformInfo++)
+                {
+                    std::string boardName = (*itPlatformInfo).strBoardName;
+                    std::string deviceName = (*itPlatformInfo).strDeviceName;
+                    std::vector<GDT_GfxCardInfo> cardList;
+                    if (!boardName.empty() && AMDTDeviceInfoUtils::Instance()->GetDeviceInfoMarketingName(boardName.c_str(), cardList))
+                    {
+                        AddDeviceId(cardList[0].m_deviceID, cardList[0].m_revID);
+                    }
+                    else if (!deviceName.empty() && AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceName.c_str(), cardList))
+                    {
+                        AddDeviceId(cardList[0].m_deviceID, cardList[0].m_revID);
+                    }
+                }
+            }
+        }
+>>>>>>> e29c2fd... GPU Profiler: Add a fallback mechanism using the OCL runtime to query devices in cases where ADL fails or is missing.  Addresses CODEXL-3493
     }
 
     gtVector<gtUInt32> hsadevices;
