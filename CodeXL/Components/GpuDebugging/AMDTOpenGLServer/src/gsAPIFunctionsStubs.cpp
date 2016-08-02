@@ -39,11 +39,13 @@
 #include <AMDTServerUtilities/Include/suAPIMainLoop.h>
 #include <AMDTServerUtilities/Include/suGlobalVariables.h>
 #include <AMDTServerUtilities/Include/suSpyAPIFunctions.h>
+#include <AMDTServerUtilities/Include/suSWMRInstance.h>
 
 // Local:
 #include <src/gsAPIFunctionsImplementations.h>
 #include <src/gsAPIFunctionsStubs.h>
 #include <src/gsStringConstants.h>
+
 
 // iPhone on-device only items:
 #ifdef _GR_IPHONE_DEVICE_BUILD
@@ -227,7 +229,7 @@ void gsHandleAPIInitializationCalls()
         {
             osSleep(20);
         }
-
+        suSWMRInstance::ResetUnlockMode();
         OS_OUTPUT_DEBUG_LOG(GS_STR_DebugLog_MainThreadFinishedWaitingForAPIThreadToHandleOGLAPIInitialization, OS_DEBUG_LOG_DEBUG);
     }
 

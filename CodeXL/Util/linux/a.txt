@@ -1,0 +1,146 @@
+AMD_CODEXL dir = /home/tlv/work/CodeXL/CodeXL
+
+
+Building all Linux projects
+===========================
+Build arguments passed to scons: CXL_build=debug -k -j6
+
+
+========================================== 
+----------- Start building --------------- 
+cd /home/tlv/work/CodeXL/CodeXL
+scons CXL_common_dir=/home/tlv/work/CodeXL/CodeXL/../Common CXL_prefix=/home/tlv/work/CodeXL/CodeXL/../ CXL_build=debug -k -j6
+Mon Jul 18 20:30:43 IDT 2016
+========================================== 
+mkdir: cannot create directory ‘../Output_x86_64/release/bin/Help/’: File exists
+variant_debug/AMDTProfilingAgentsData/src/Linux/JavaJncReader_Lin.cpp: In member function 'OffsetLinenumMap JavaJncReader::GetOffsetLines(std::wstring)':
+variant_debug/AMDTProfilingAgentsData/src/Linux/JavaJncReader_Lin.cpp:738:13: error: 'wstring' was not declared in this scope
+             wstring tmpStr(m_jncMethodMap[it->second->methods[i]].name.begin(),
+             ^
+variant_debug/AMDTProfilingAgentsData/src/Linux/JavaJncReader_Lin.cpp:738:13: note: suggested alternative:
+In file included from /usr/include/c++/4.9/string:39:0,
+                 from /usr/include/c++/4.9/random:40,
+                 from /usr/include/c++/4.9/bits/stl_algo.h:66,
+                 from /usr/include/c++/4.9/algorithm:62,
+                 from /home/tlv/work/CodeXL/Common/Src/AMDTBaseTools/Include/gtAlgorithms.h:15,
+                 from variant_debug/AMDTProfilingAgentsData/src/Linux/JavaJncReader_Lin.cpp:12:
+/usr/include/c++/4.9/bits/stringfwd.h:68:33: note:   'std::wstring'
+   typedef basic_string<wchar_t> wstring;   
+                                 ^
+variant_debug/AMDTProfilingAgentsData/src/Linux/JavaJncReader_Lin.cpp:745:13: error: 'tmpStr' was not declared in this scope
+             tmpStr.append(parsedMethodSig, parsedMethodSig + strlen(parsedMethodSig));
+             ^
+variant_debug/AMDTProfilingAgentsData/src/Linux/JavaJncReader_Lin.cpp: At global scope:
+variant_debug/AMDTProfilingAgentsData/src/Linux/JavaJncReader_Lin.cpp:898:5: error: 'string' has not been declared
+     string& srcFile
+     ^
+variant_debug/AMDTProfilingAgentsData/src/Linux/JavaJncReader_Lin.cpp:894:1: error: prototype for 'bool JavaJncReader::_getSrcInfoFromBcAndMethodID(jint, jmethodID, int&, int&)' does not match any in class 'JavaJncReader'
+ JavaJncReader::_getSrcInfoFromBcAndMethodID(
+ ^
+In file included from variant_debug/AMDTProfilingAgentsData/src/Linux/JavaJncReader_Lin.cpp:15:0:
+variant_debug/AMDTProfilingAgentsData/src/Linux/JavaJncReader_Lin.h:185:10: error: candidate is: bool JavaJncReader::_getSrcInfoFromBcAndMethodID(jint, jmethodID, int&, std::string&)
+     bool _getSrcInfoFromBcAndMethodID(jint         bc,
+          ^
+variant_debug/AMDTProfilingAgentsData/src/Linux/JavaJncReader_Lin.cpp:1003:5: error: 'string' has not been declared
+     string&             srcFile
+     ^
+variant_debug/AMDTProfilingAgentsData/src/Linux/JavaJncReader_Lin.cpp:1000:1: error: prototype for 'bool JavaJncReader::GetSrcInfoFromAddressWithFile(gtUInt64, int&, int&)' does not match any in class 'JavaJncReader'
+ JavaJncReader::GetSrcInfoFromAddressWithFile(
+ ^
+In file included from variant_debug/AMDTProfilingAgentsData/src/Linux/JavaJncReader_Lin.cpp:15:0:
+variant_debug/AMDTProfilingAgentsData/src/Linux/JavaJncReader_Lin.h:90:10: error: candidate is: bool JavaJncReader::GetSrcInfoFromAddressWithFile(gtUInt64, int&, std::string&)
+     bool GetSrcInfoFromAddressWithFile(gtUInt64  addr,
+          ^
+variant_debug/AMDTProfilingAgentsData/src/Linux/JavaJncReader_Lin.cpp:1082:5: error: 'string' has not been declared
+     string&             srcFile,
+     ^
+variant_debug/AMDTProfilingAgentsData/src/Linux/JavaJncReader_Lin.cpp:1079:1: error: prototype for 'bool JavaJncReader::GetSrcInfoFromAddress(gtUInt64, int&, int&, int&)' does not match any in class 'JavaJncReader'
+ JavaJncReader::GetSrcInfoFromAddress(
+ ^
+In file included from variant_debug/AMDTProfilingAgentsData/src/Linux/JavaJncReader_Lin.cpp:15:0:
+variant_debug/AMDTProfilingAgentsData/src/Linux/JavaJncReader_Lin.h:94:10: error: candidate is: bool JavaJncReader::GetSrcInfoFromAddress(gtUInt64, int&, std::string&, int&)
+     bool GetSrcInfoFromAddress(gtUInt64  addr,
+          ^
+variant_debug/AMDTProfilingAgentsData/src/Linux/JavaJncReader_Lin.cpp:1153:5: error: 'string' has not been declared
+     string&    symName,
+     ^
+variant_debug/AMDTProfilingAgentsData/src/Linux/JavaJncReader_Lin.cpp:1151:1: error: prototype for 'bool JavaJncReader::GetSymbolAndRangeFromAddr(gtUInt64, int&, gtUInt64&, gtUInt64&)' does not match any in class 'JavaJncReader'
+ JavaJncReader::GetSymbolAndRangeFromAddr(
+ ^
+In file included from variant_debug/AMDTProfilingAgentsData/src/Linux/JavaJncReader_Lin.cpp:15:0:
+variant_debug/AMDTProfilingAgentsData/src/Linux/JavaJncReader_Lin.h:99:10: error: candidate is: bool JavaJncReader::GetSymbolAndRangeFromAddr(gtUInt64, std::string&, gtUInt64&, gtUInt64&)
+     bool GetSymbolAndRangeFromAddr(gtUInt64     addr,
+          ^
+variant_debug/AMDTCpuProfilingTranslation/src/CpuProfileDataTranslation.cpp: In function 'HRESULT fnWriteSetToFile(ReaderHandle*, const wchar_t*, const wchar_t*, PfnProgressBarCallback, const wchar_t*, const wchar_t*, const wchar_t*)':
+variant_debug/AMDTCpuProfilingTranslation/src/CpuProfileDataTranslation.cpp:678:53: error: 'string' was not declared in this scope
+     cssFile = cssFile + string(outDirPath.toLatin1());// + "/" + sessionName + ".css";
+                                                     ^
+variant_debug/AMDTCpuProfilingTranslation/src/CpuProfileDataTranslation.cpp:678:53: note: suggested alternative:
+In file included from /usr/include/c++/4.9/string:39:0,
+                 from /usr/include/c++/4.9/random:40,
+                 from /usr/include/c++/4.9/bits/stl_algo.h:66,
+                 from /usr/include/c++/4.9/algorithm:62,
+                 from /home/tlv/work/CodeXL/Common/Lib/Ext/Qt/5.5/Build/CentOS66/x86_64/release/include/QtCore/qglobal.h:85,
+                 from /home/tlv/work/CodeXL/Common/Lib/Ext/Qt/5.5/Build/CentOS66/x86_64/release/include/QtCore/qnamespace.h:37,
+                 from /home/tlv/work/CodeXL/Common/Lib/Ext/Qt/5.5/Build/CentOS66/x86_64/release/include/QtCore/qobjectdefs.h:41,
+                 from /home/tlv/work/CodeXL/Common/Lib/Ext/Qt/5.5/Build/CentOS66/x86_64/release/include/QtCore/qobject.h:40,
+                 from /home/tlv/work/CodeXL/Common/Lib/Ext/Qt/5.5/Build/CentOS66/x86_64/release/include/QtCore/qabstractanimation.h:37,
+                 from /home/tlv/work/CodeXL/Common/Lib/Ext/Qt/5.5/Build/CentOS66/x86_64/release/include/QtCore/QtCore:4,
+                 from variant_debug/AMDTCpuProfilingTranslation/src/CpuProfileDataTranslation.cpp:15:
+/usr/include/c++/4.9/bits/stringfwd.h:62:33: note:   'std::string'
+   typedef basic_string<char>    string;   
+                                 ^
+scons: *** [variant_debug/AMDTProfilingAgentsData/src/Linux/JavaJncReader_Lin.os] Error 1
+scons: *** [variant_debug/AMDTCpuProfilingTranslation/src/CpuProfileDataTranslation.os] Error 1
+scons: Reading SConscript files ...
+Warning: CXL_common_dir not available. Using SConstruct variable.
+Copying Driver Installation Files
+./build/x86_64
+scons: done reading SConscript files.
+scons: Building targets ...
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/libCXLProfilerDAL.so' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/libCXLDbAdapter.so' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/libCXLPowerProfileAPI.so' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/libCXLProcessDebugger.so' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/libCXLApiFunctions.so' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/CXLRemoteDebuggingServer' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/libCXLServerUtilities.so' is up to date.
+Install file: "variant_debug/AMDTOpenCLServer/libOpenCLTemp.so" as "/home/tlv/work/CodeXL/Output_x86_64/debug/bin/spies/libOpenCLTemp.so"
+( cd /home/tlv/work/CodeXL/CodeXL/..//Output_x86_64/debug/bin/spies && mv libOpenCLTemp.so libOpenCL.so.1 && ln -s -f libOpenCL.so.1 libOpenCL.so )
+Install file: "variant_debug/AMDTOpenGLServer/libGLTemp.so" as "/home/tlv/work/CodeXL/Output_x86_64/debug/bin/spies/libGLTemp.so"
+( cd /home/tlv/work/CodeXL/CodeXL/..//Output_x86_64/debug/bin/spies && mv libGLTemp.so libGL.so.1 && ln -s -f libGL.so.1 libGL.so )
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/libCXLGpuDebuggingComponents.so' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/libCXLGpuDebugging.so' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/libCXLDisassembler.so' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/libCXLExecutableFormat.so' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/libCXLCpuCallstackSampling.so' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/libCXLCpuPerfEventUtils.so' is up to date.
+Compiling: variant_debug/AMDTProfilingAgentsData/src/Linux/JavaJncReader_Lin.cpp
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/libCXLCpuProfilingRawData.so' is up to date.
+Compiling: variant_debug/AMDTCpuProfilingTranslation/src/CpuProfileDataTranslation.cpp
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/CodeXLPwrProfDriverSource.tar.gz' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/CodeXLPwrProfVersion' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/CodeXLPwrProfDriver.sh' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/CodeXLPowerProfiler-bin' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/CodeXLPowerProfiler' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/libCXLPowerProfilingMidTier.so' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/libCXLPowerProfiling.so' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/libCXLGraphicsServerInterface.so' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/libCXLGpuProfiling.so' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/CXLSystemInformationHelper-x64' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/examples/Teapot/release/libCXLTeaPot.a' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/examples/Teapot/release/CXLTeaPot-bin' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/CXLClassicMatMul-bin' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/libCXLGraphicsServerCommon.a' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/Plugins/libCXLGraphicsServerVulkan.so' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/CXLGraphicsServerPlayer' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/CXLGraphicsServer' is up to date.
+scons: `/home/tlv/work/CodeXL/Output_x86_64/debug/bin/Plugins/libVulkanEnv.so' is up to date.
+scons: done building targets (errors occurred during build).
+*** ERROR during the build of this subcomponent ***
+========================================== 
+----------- End building ----------------- 
+Mon Jul 18 20:31:08 IDT 2016
+========================================== 
+*** ERROR ***
+*** the build failed - see the logs for details ***

@@ -11,7 +11,7 @@
 ///
 /// \author AMD Developer Tools Team
 /// \date 11/05/2016
-suSWMRImpl::suSWMRImpl(): m_bUniqLocked(false)
+suSWMRImpl::suSWMRImpl(): m_bUniqLocked(false), m_dontLockState(true)
 {
 }
 
@@ -53,12 +53,15 @@ void suSWMRImpl::SharedUnLock()
 /// \date 11/05/2016
 void suSWMRImpl::UniqueLock()
 {
-    std::unique_lock<std::mutex>   lock(m_mtxUniqLockedVariable);
-
-    if (!m_bUniqLocked)
+    if (!m_dontLockState)
     {
-        m_mtxShared.lock();
-        m_bUniqLocked = true;
+        std::unique_lock<std::mutex>   lock(m_mtxUniqLockedVariable);
+
+        if (!m_bUniqLocked)
+        {
+            m_mtxShared.lock();
+            m_bUniqLocked = true;
+        }
     }
 };
 

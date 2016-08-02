@@ -460,6 +460,10 @@ private:
     apMultipleKernelDebuggingDispatchMode m_multipleKernelDebugDispatchMode;
 
     std::mutex  _mtxProcessCreating;
+
+    bool m_apiConnectionInitialized;
+    bool m_apiOpenCLConnection;
+    bool m_apiOpenGLConnection;
 };
 
 

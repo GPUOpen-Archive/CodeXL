@@ -62,6 +62,11 @@
 #include <AMDTGpuDebuggingComponents/Include/views/gdStateVariablesView.h>
 #include <AMDTGpuDebuggingComponents/Include/views/gdWatchView.h>
 
+
+// STL:
+#include <thread>
+
+
 // Static member initialization:
 gdApplicationCommands* gdApplicationCommands::_pMySingleInstance = NULL;
 
@@ -805,10 +810,20 @@ void gdApplicationCommands::onDebugBreak()
     bool canBreak = false;
     onUpdateDebugBreak(canBreak);
 
+
     if (canBreak)
     {
-        bool rc = gaSuspendDebuggedProcess();
-        GT_ASSERT(rc);
+            bool rc = gaSuspendDebuggedProcess();
+            GT_ASSERT(rc);
+/*
+        auto thrd = std::thread([]()
+        {
+            bool rc = gaSuspendDebuggedProcess();
+            GT_ASSERT(rc);
+        });
+        
+        thrd.detach();
+*/
     }
 }
 

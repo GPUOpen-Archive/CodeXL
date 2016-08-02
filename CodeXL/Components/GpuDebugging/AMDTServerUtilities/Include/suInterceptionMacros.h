@@ -393,8 +393,7 @@
 // Date:        30/11/2006
 // ---------------------------------------------------------------------------
 #ifdef SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC
-#define SU_START_DRAW_FUNCTION_WRAPPER(funcId) if (gs_stat_isInNullOpenGLImplementationMode) { return; }; \
-    suSWMRInstance::SharedLock();
+#define SU_START_DRAW_FUNCTION_WRAPPER(funcId)     suSWMRInstance::SharedLock(); if (gs_stat_isInNullOpenGLImplementationMode) { return; }; 
 #else // !defined(SU_USE_SINGLE_WRITE_MULTIPLE_READ_SYNC)
 #define SU_START_DRAW_FUNCTION_WRAPPER(funcId) if (gs_stat_isInNullOpenGLImplementationMode) { return; };
 #endif

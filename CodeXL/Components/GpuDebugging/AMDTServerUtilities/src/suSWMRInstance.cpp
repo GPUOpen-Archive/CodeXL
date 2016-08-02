@@ -45,4 +45,23 @@ void suSWMRInstance::UniqueUnLock()
     suSWMRImpl::GetInstance().UniqueUnLock();
 }
 
+////////////////////////////////////////////////////////////////////////////////////
+/// \brief Set the suSWMRImpl to unlock state. Every UniqLock call will be deferred
+///
+/// \author AMD Developer Tools Team
+/// \date 02/08/2016
+void suSWMRInstance::SetUnlockMode()
+{
+    suSWMRImpl::GetInstance().SetUnlockMode();
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+/// \brief Reset the suSWMRImpl to unlock state. Every UniqLock call will be deferred
+///
+/// \author AMD Developer Tools Team
+/// \date 02/08/2016
+void suSWMRInstance::ResetUnlockMode()
+{
+    suSWMRImpl::GetInstance().ResetUnlockMode();
+}
 

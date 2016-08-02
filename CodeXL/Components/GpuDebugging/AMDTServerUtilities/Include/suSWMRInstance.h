@@ -59,6 +59,20 @@ public:
     /// \date 11/05/2016
     static void UniqueUnLock();
 
+    ////////////////////////////////////////////////////////////////////////////////////
+    /// \brief Set the suSWMRImpl to unlock state. Every UniqLock call will be deferred
+    ///
+    /// \author AMD Developer Tools Team
+    /// \date 02/08/2016
+    static void SetUnlockMode();
+
+    ////////////////////////////////////////////////////////////////////////////////////
+    /// \brief Reset the suSWMRImpl to unlock state. Every UniqLock call will be deferred
+    ///
+    /// \author AMD Developer Tools Team
+    /// \date 02/08/2016
+    static void ResetUnlockMode();
+
 
 private:
 };

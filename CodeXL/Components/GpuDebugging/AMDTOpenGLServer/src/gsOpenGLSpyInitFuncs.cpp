@@ -57,6 +57,7 @@
 #include <src/gsSingletonsDelete.h>
 #include <src/gsStringConstants.h>
 #include <src/gsWrappersCommon.h>
+#include <AMDTServerUtilities/Include/suSWMRInstance.h>
 
 // Desktop OpenGL Servers only:
 #ifdef _AMDT_OPENGLSERVER_EXPORTS
@@ -302,6 +303,8 @@ bool gsSetOpenGLESFrameworkPathFromEnvironmentVariable()
 bool gsOpenGLSpyInit()
 {
     static bool stat_retVal = false;
+
+    suSWMRInstance::SetUnlockMode();
 
     // Verify that we are only initialized once:
     static bool stat_wasInitialized = false;

@@ -57,6 +57,20 @@ public:
     void UniqueUnLock();
 
     ////////////////////////////////////////////////////////////////////////////////////
+    /// \brief Set the suSWMRImpl to unlock state. Every UniqLock call will be deferred
+    ///
+    /// \author AMD Developer Tools Team
+    /// \date 02/08/2016
+    void SetUnlockMode() { m_dontLockState = true; };
+
+    ////////////////////////////////////////////////////////////////////////////////////
+    /// \brief Reset the suSWMRImpl to unlock state. 
+    ///
+    /// \author AMD Developer Tools Team
+    /// \date 02/08/2016
+    void ResetUnlockMode() { m_dontLockState = false; }
+
+    ////////////////////////////////////////////////////////////////////////////////////
     /// \brief Get singleton instance
     ///
     /// \return Reference to the suSWMRInstance 
@@ -90,6 +104,8 @@ private:
     bool                            m_bUniqLocked;           ///! True in case resource was uniq locked already and false vice versa.
                                                              ///! Uses for prevent to unlock the unique locked shared mutex without lock him previously.
                                                              ///! Call the "shared_unlock" on unlocked shared mutex leading to boost::exception
+
+    bool                            m_dontLockState;         ///! Sets by spy thread during first spy initialization. Prevent lock on "user break" command
 
     std::mutex                      m_mtxUniqLockedVariable; ///! The bUniqLocked flax synchronization object
 

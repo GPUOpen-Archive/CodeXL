@@ -1224,6 +1224,10 @@ void pdGDBDriver::OnThreadCreated(int threadGDBId)
     auto stoppedIt = m_processStoppedThreads.find(threadGDBId);
     GT_IF_WITH_ASSERT((m_processExistingThreads.end() == existingIt) && (m_processStoppedThreads.end() == stoppedIt))
     {
+       gtString debugMsg;
+       debugMsg.appendFormattedString(L"New thread created, gdbId: %d", threadGDBId);
+       OS_OUTPUT_DEBUG_LOG(debugMsg.asCharArray(), OS_DEBUG_LOG_DEBUG);
+
         m_processExistingThreads.insert(threadGDBId);
         m_createdProcessThread = true;
     }
@@ -1243,6 +1247,10 @@ void pdGDBDriver::OnThreadExit(int threadGDBId)
     auto stoppedIt = m_processStoppedThreads.find(threadGDBId);
     GT_IF_WITH_ASSERT(m_processExistingThreads.end() != existingIt)
     {
+        gtString debugMsg;
+        debugMsg.appendFormattedString(L"Thread exited, gdbId: %d", threadGDBId);
+        OS_OUTPUT_DEBUG_LOG(debugMsg.asCharArray(), OS_DEBUG_LOG_DEBUG);
+
         m_processExistingThreads.erase(existingIt);
 
         if (m_processStoppedThreads.end() != stoppedIt)

@@ -49,6 +49,9 @@
 #include <AMDTAPIClasses/Include/apAPIFunctionId.h>
 #include <AMDTApiFunctions/Include/gaGRApiFunctions.h>
 
+// STL:
+#include <thread>
+
 
 // Static members initializations:
 gaPersistentDataManager* gaPersistentDataManager::_pMySingleInstance = NULL;
@@ -117,7 +120,10 @@ gaPersistentDataManager::gaPersistentDataManager()
       _openGLEnglineLoaded(false),
       _kernelDebuggingEnteredAtLeastOnce(false),
       _kernelDebuggingEnable(true),
-      m_multipleKernelDebugDispatchMode(AP_MULTIPLE_KERNEL_DISPATCH_WAIT)
+      m_multipleKernelDebugDispatchMode(AP_MULTIPLE_KERNEL_DISPATCH_WAIT),
+      m_apiConnectionInitialized(false),
+      m_apiOpenCLConnection(false),
+      m_apiOpenGLConnection(false)
 {
     // Register myself to listen to debugged process events:
     apEventsHandler::instance().registerEventsObserver(*this, AP_PERSISTENT_DATA_MANAGER_EVENTS_HANDLING_PRIORITY);
@@ -198,7 +204,25 @@ bool gaPersistentDataManager::suspendDebuggedProcessExecution()
     {
         if (gaDebuggedProcessExists())
         {
-            std::unique_lock<std::mutex> _lock(_mtxProcessCreating);
+//            std::unique_lock<std::mutex> _lock(_mtxProcessCreating);
+
+            if (gaIsAPIConnectionActive(AP_SPIES_UTILITIES_API_CONNECTION))
+            {
+                if (!m_apiConnectionInitialized)
+                    return false;
+            }
+
+            if (gaIsAPIConnectionActive(AP_OPENCL_API_CONNECTION))
+            {
+                if (!m_apiOpenCLConnection)
+                    return false;
+            }
+
+            if (gaIsAPIConnectionActive(AP_OPENGL_API_CONNECTION))
+            {
+                if (!m_apiOpenGLConnection)
+                    return false;
+            }
 
             retVal = pdProcessDebugger::instance().suspendHostDebuggedProcess();
         }
@@ -369,34 +393,37 @@ void gaPersistentDataManager::onAPIConnectionEstablishedEvent(const apApiConnect
 
         case AP_SPIES_UTILITIES_API_CONNECTION:
         {
-            std::unique_lock<std::mutex> _lock(_mtxProcessCreating);
+//            std::unique_lock<std::mutex> _lock(_mtxProcessCreating);
 
             // The Spies Utilities API connection was established:
             onSpiesUtilitiesAPIConnection();
+            m_apiConnectionInitialized = true;
         }
         break;
 
         case AP_OPENGL_API_CONNECTION:
         {
-            std::unique_lock<std::mutex> _lock(_mtxProcessCreating);
+  //          std::unique_lock<std::mutex> _lock(_mtxProcessCreating);
 
             // OpenGL API connection was established:
             onOpenGLServerAPIConnection();
+            m_apiOpenGLConnection = true;
         }
         break;
 
         case AP_OPENCL_API_CONNECTION:
         {
-            std::unique_lock<std::mutex> _lock(_mtxProcessCreating);
+    //        std::unique_lock<std::mutex> _lock(_mtxProcessCreating);
 
             // OpenCL API connection was established:
             onOpenCLServerAPIConnection();
+            m_apiOpenCLConnection = true;
         }
         break;
 
         case AP_HSA_API_CONNECTION:
         {
-            std::unique_lock<std::mutex> _lock(_mtxProcessCreating);
+      //      std::unique_lock<std::mutex> _lock(_mtxProcessCreating);
 
             // HSA API connection was established:
             onHSAServerAPIConnection();
@@ -2435,6 +2462,10 @@ void gaPersistentDataManager::onEvent(const apEvent& eve, bool& vetoEvent)
             break;
 
         case apEvent::AP_DEBUGGED_PROCESS_CREATED:
+            m_apiConnectionInitialized = false;
+            m_apiOpenCLConnection = false;
+            m_apiOpenGLConnection = false;
+
             onProcessCreatedEvent();
             break;
 
