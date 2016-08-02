@@ -31,7 +31,6 @@
 
 #include <AMDTBaseTools/Include/gtAssert.h>
 #include <AMDTOSWrappers/Include/osApplication.h>
-#include <AMDTOSWrappers/Include/osDebugLog.h>
 #include <AMDTOSWrappers/Include/osProcess.h>
 #include <AMDTOSWrappers/Include/osStringConstants.h>
 #include <AMDTOSAPIWrappers/Include/oaDriver.h>
@@ -40,6 +39,10 @@
 
 #include <AMDTGpuProfiling/AMDTGpuProfilerDefs.h>
 #include "CounterManager.h"
+
+// Backend headaers
+#include "CLUtils.h"
+#include "CLFunctionDefs.h"
 
 // AMDTApplicationFramework.
 #include <AMDTApplicationFramework/Include/afGlobalVariablesManager.h>
@@ -194,6 +197,41 @@ void CounterManager::Init(bool isRemoteSession)
                 AddDeviceId(it->deviceID, it->revID);
             }
         }
+
+        if (0 == asicInfoList.size())
+        {
+            // fallback path when running on systems where ADL is not available or reports no devices
+            InitRealCLFunctions();
+
+            CLPlatformSet platformInfo;
+
+            if (CLUtils::GetPlatformInfo(platformInfo))
+            {
+                CLPlatformSet::const_iterator itPlatformInfo;
+
+                for (itPlatformInfo = platformInfo.begin(); itPlatformInfo != platformInfo.end(); itPlatformInfo++)
+                {
+                    std::string boardName = (*itPlatformInfo).strBoardName;
+                    std::string deviceName = (*itPlatformInfo).strDeviceName;
+                    std::vector<GDT_GfxCardInfo> cardList;
+                    if (!boardName.empty() && AMDTDeviceInfoUtils::Instance()->GetDeviceInfoMarketingName(boardName.c_str(), cardList))
+                    {
+                        for (const auto& cardInfo : cardList)
+                        {
+                            if (0 == deviceName.compare(cardInfo.m_szCALName))
+                            {
+                                AddDeviceId(cardInfo.m_deviceID, cardInfo.m_revID);
+                                break;
+                            }
+                        }
+                    }
+                    else if (!deviceName.empty() && AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceName.c_str(), cardList))
+                    {
+                        AddDeviceId(cardList[0].m_deviceID, cardList[0].m_revID);
+                    }
+                }
+            }
+        }
     }
 
     gtVector<gtUInt32> hsadevices;
@@ -294,7 +332,7 @@ void CounterManager::LoadCountersModule()
         modulePath.setFileName(dllName);
         modulePath.setFileExtension(OS_MODULE_EXTENSION);
 
-        bool successfulLoad = osLoadModule(modulePath, m_gpaCountersModuleHandle, nullptr, true);
+        bool successfulLoad = osLoadModule(modulePath, m_gpaCountersModuleHandle);
 
         if (successfulLoad)
         {

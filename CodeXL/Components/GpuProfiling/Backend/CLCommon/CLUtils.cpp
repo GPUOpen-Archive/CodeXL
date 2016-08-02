@@ -247,6 +247,14 @@ bool CLUtils::GetPlatformInfo(CLPlatformSet& platformList)
                             platformInfo.uiNbrAddressBits = nDeviceAddressBits;
                         }
 
+                        strcpy(szInfoBuffer, "");
+                        status |= g_realDispatchTable.GetDeviceInfo(pDevices[i], CL_DEVICE_BOARD_NAME_AMD, MAX_INFO_BUFFER_SIZE, szInfoBuffer, &nBytesRead);
+
+                        if (status == CL_SUCCESS)
+                        {
+                            platformInfo.strBoardName.assign(szInfoBuffer);
+                        }
+
                         if (status == CL_SUCCESS)
                         {
                             platformList.insert(platformInfo);

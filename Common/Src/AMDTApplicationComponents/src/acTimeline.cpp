@@ -400,7 +400,6 @@ void acTimeline::ShowItem(acTimelineItem* item, ItemDisplayOpt itemDisplayType)
         {
             setZoomFactor(1.0);
             setPivot(itemStartPercent + ((itemWidthPercent * m_nRenderWidth * 0.5) * invRowWidth));
-            return;
         }
         else
         {
