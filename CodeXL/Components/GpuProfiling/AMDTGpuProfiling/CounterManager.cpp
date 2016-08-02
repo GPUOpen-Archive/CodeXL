@@ -31,7 +31,6 @@
 
 #include <AMDTBaseTools/Include/gtAssert.h>
 #include <AMDTOSWrappers/Include/osApplication.h>
-#include <AMDTOSWrappers/Include/osDebugLog.h>
 #include <AMDTOSWrappers/Include/osProcess.h>
 #include <AMDTOSWrappers/Include/osStringConstants.h>
 #include <AMDTOSAPIWrappers/Include/oaDriver.h>
@@ -40,6 +39,10 @@
 
 #include <AMDTGpuProfiling/AMDTGpuProfilerDefs.h>
 #include "CounterManager.h"
+
+// Backend headaers
+#include "CLUtils.h"
+#include "CLFunctionDefs.h"
 
 // AMDTApplicationFramework.
 #include <AMDTApplicationFramework/Include/afGlobalVariablesManager.h>
@@ -194,8 +197,6 @@ void CounterManager::Init(bool isRemoteSession)
                 AddDeviceId(it->deviceID, it->revID);
             }
         }
-<<<<<<< HEAD
-=======
 
         if (0 == asicInfoList.size())
         {
@@ -224,7 +225,6 @@ void CounterManager::Init(bool isRemoteSession)
                 }
             }
         }
->>>>>>> e29c2fd... GPU Profiler: Add a fallback mechanism using the OCL runtime to query devices in cases where ADL fails or is missing.  Addresses CODEXL-3493
     }
 
     gtVector<gtUInt32> hsadevices;
@@ -325,7 +325,7 @@ void CounterManager::LoadCountersModule()
         modulePath.setFileName(dllName);
         modulePath.setFileExtension(OS_MODULE_EXTENSION);
 
-        bool successfulLoad = osLoadModule(modulePath, m_gpaCountersModuleHandle, nullptr, true);
+        bool successfulLoad = osLoadModule(modulePath, m_gpaCountersModuleHandle);
 
         if (successfulLoad)
         {
