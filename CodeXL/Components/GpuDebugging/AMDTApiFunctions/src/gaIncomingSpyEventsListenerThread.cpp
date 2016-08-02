@@ -96,12 +96,12 @@ int gaIncomingSpyEventsListenerThread::entryPoint()
                         apEventsHandler& theEventsHandler = apEventsHandler::instance();
                         theEventsHandler.registerPendingDebugEvent(*pEve);
 
-                        // Uri, 26/6/11 - We have to synchronize these three events to avoid race conditions
+                        // Uri, 26/6/11 - We have to synchronize some event types to avoid race conditions
                         // with the process debugger:
                         apEvent::EventType eveType = pEve->eventType();
 
-                        // This type list must match the list in suForwardEventToClient (suSpyAPIFunctions.cpp)!
-                        if ((apEvent::AP_BEFORE_KERNEL_DEBUGGING_EVENT == eveType) || (apEvent::AP_AFTER_KERNEL_DEBUGGING_EVENT == eveType) || (apEvent::AP_MEMORY_LEAK == eveType) || (apEvent::AP_DEBUGGED_PROCESS_IS_DURING_TERMINATION == eveType))
+                        // Check if this is one of the event types that require confirmation:
+                        if (apEvent::DoesEventTypeRequireForwardingConfirmation(eveType))
                         {
                             // Write back a boolean to synchronize:
                             *_pIncomingEventsSocket << true;

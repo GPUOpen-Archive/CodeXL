@@ -126,6 +126,13 @@ public:
     virtual EventType eventType() const = 0;
     virtual apEvent* clone() const = 0;
 
+    static inline bool DoesEventTypeRequireForwardingConfirmation(EventType eveType)
+    {
+        return (AP_BEFORE_KERNEL_DEBUGGING_EVENT == eveType) || (AP_AFTER_KERNEL_DEBUGGING_EVENT           == eveType) ||
+               (AP_MEMORY_LEAK                   == eveType) || (AP_DEBUGGED_PROCESS_IS_DURING_TERMINATION == eveType) ||
+               (AP_API_CONNECTION_ESTABLISHED    == eveType) || (AP_API_CONNECTION_ENDED                   == eveType);
+    }
+
 private:
     // The id of the debugged process thread that triggered the event:
     osThreadId _triggeringThreadId;

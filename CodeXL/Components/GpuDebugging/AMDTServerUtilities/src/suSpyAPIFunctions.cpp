@@ -117,12 +117,9 @@ void suRegisterAPIConnectionAsActive(apAPIConnectionType apiType)
     // Sanity check:
     GT_IF_WITH_ASSERT((0 <= apiType) && (apiType < AP_AMOUNT_OF_API_CONNECTION_TYPES))
     {
-        osSocket* pEventsSocket = suSpyToAPIConnector::instance().eventForwardingSocket();
-        GT_IF_WITH_ASSERT(pEventsSocket != NULL)
-        {
-            apApiConnectionEstablishedEvent apiConnectionEstablishedEvent(apiType);
-            *pEventsSocket << apiConnectionEstablishedEvent;
-        }
+        apApiConnectionEstablishedEvent apiConnectionEstablishedEvent(apiType);
+        bool rcEve = suForwardEventToClient(apiConnectionEstablishedEvent);
+        GT_ASSERT(rcEve);
     }
 }
 
@@ -139,12 +136,9 @@ void suRegisterAPIConnectionAsInactive(apAPIConnectionType apiType)
     // Sanity check:
     GT_IF_WITH_ASSERT((0 <= apiType) && (apiType < AP_AMOUNT_OF_API_CONNECTION_TYPES))
     {
-        osSocket* pEventsSocket = suSpyToAPIConnector::instance().eventForwardingSocket();
-        GT_IF_WITH_ASSERT(pEventsSocket != NULL)
-        {
-            apApiConnectionEndedEvent apiConnectionEndedEvent(apiType);
-            *pEventsSocket << apiConnectionEndedEvent;
-        }
+        apApiConnectionEndedEvent apiConnectionEndedEvent(apiType);
+        bool rcEve = suForwardEventToClient(apiConnectionEndedEvent);
+        GT_ASSERT(rcEve);
     }
 }
 
@@ -326,8 +320,8 @@ bool suForwardEventToClient(const apEvent& eve)
         retVal = true;
         apEvent::EventType eveType = eve.eventType();
 
-        // This type list must match the list in gaIncomingSpyEventsListenerThread::entryPoint
-        if ((apEvent::AP_BEFORE_KERNEL_DEBUGGING_EVENT == eveType) || (apEvent::AP_AFTER_KERNEL_DEBUGGING_EVENT == eveType) || (apEvent::AP_MEMORY_LEAK == eveType) || (apEvent::AP_DEBUGGED_PROCESS_IS_DURING_TERMINATION == eveType))
+        // Check if this is one of the event types that require confirmation:
+        if (apEvent::DoesEventTypeRequireForwardingConfirmation(eveType))
         {
             // Uri, 26/6/11 - We must synchronize these events - see comment in gaIncomingSpyEventsListenerThread::entryPoint()
             bool rcSync = false;
