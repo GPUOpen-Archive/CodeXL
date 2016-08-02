@@ -282,6 +282,7 @@ ProfileSessionDataItem* gpTraceDataContainer::AddVKGPUTraceItem(VKGPUTraceInfo* 
         }
         else
         {
+            m_sessionAPIType = ProfileSessionDataItem::VK_API_PROFILE_ITEM;
             // Create a Vulkan profile item
             pRetVal = new ProfileSessionDataItem(this, pAPIInfo);
 
@@ -310,7 +311,6 @@ ProfileSessionDataItem* gpTraceDataContainer::AddVKGPUTraceItem(VKGPUTraceInfo* 
                 m_sampleIdToGPUItemMap.insertMulti(pAPIInfo->m_sampleId, pRetVal);
             }
         }
-        m_sessionAPIType = ProfileSessionDataItem::VK_API_PROFILE_ITEM;
 
     }
 
