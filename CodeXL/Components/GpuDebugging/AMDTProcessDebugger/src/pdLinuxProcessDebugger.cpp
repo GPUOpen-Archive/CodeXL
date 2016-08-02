@@ -4745,7 +4745,7 @@ bool pdLinuxProcessDebugger::suspendHostDebuggedProcess()
 
     gaLockDriverThreads();
     result = trySuspendProcess(bSuspendedBefore);
-    osSleep(100);
+    osSleep(GDB_LISTENER_THREAD_GAP);
 
     GT_IF_WITH_ASSERT(result)
     {

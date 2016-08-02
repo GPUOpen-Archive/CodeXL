@@ -416,6 +416,7 @@ private:
     ///< be resumed on host breakpoint or host break
 
     enum { SUSPEND_PROCESS_WAITING_TIMEOUT = 1000 };
+    enum { GDB_LISTENER_THREAD_GAP = 100 };
 };
 
 
