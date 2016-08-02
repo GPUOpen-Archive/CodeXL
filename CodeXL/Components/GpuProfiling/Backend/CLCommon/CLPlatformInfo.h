@@ -25,6 +25,7 @@ typedef struct platform_info
     std::string strDriverVersion;   ///< Compute Abstraction Layer version information}
     std::string strCLRuntime;       ///< CL runtime version
     unsigned int uiNbrAddressBits;  ///< Number of address bits used by application (application 'bitness')
+    std::string strBoardName;       ///< Compute board name
 } platform_info_struct;
 
 struct CLPlatformInfoCompare

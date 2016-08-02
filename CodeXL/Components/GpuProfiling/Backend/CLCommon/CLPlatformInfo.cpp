@@ -65,8 +65,22 @@ bool CLPlatformInfoCompare::operator()(const CLPlatformInfo::platform_info pi1, 
                                     }
                                     else
                                     {
-                                        return false;
-                                    }
+                                        if (pi1.strCLRuntime > pi2.strCLRuntime)
+                                        {
+                                            return false;
+                                        }
+                                        else
+                                        {
+                                            if (pi1.strBoardName < pi2.strBoardName)
+                                            {
+                                                return true;
+                                            }
+                                            else
+                                            {
+                                                return false;
+                                            }
+                                        }
+                                    } // end if - pi1.strCLRuntime
                                 }
                             } //end if - pi1.uiNbrAddressBits
                         }

@@ -211,9 +211,14 @@ void CounterManager::Init(bool isRemoteSession)
 
                 for (itPlatformInfo = platformInfo.begin(); itPlatformInfo != platformInfo.end(); itPlatformInfo++)
                 {
+                    std::string boardName = (*itPlatformInfo).strBoardName;
                     std::string deviceName = (*itPlatformInfo).strDeviceName;
                     std::vector<GDT_GfxCardInfo> cardList;
-                    if (AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceName.c_str(), cardList))
+                    if (!boardName.empty() && AMDTDeviceInfoUtils::Instance()->GetDeviceInfoMarketingName(boardName.c_str(), cardList))
+                    {
+                        AddDeviceId(cardList[0].m_deviceID, cardList[0].m_revID);
+                    }
+                    else if (!deviceName.empty() && AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceName.c_str(), cardList))
                     {
                         AddDeviceId(cardList[0].m_deviceID, cardList[0].m_revID);
                     }
