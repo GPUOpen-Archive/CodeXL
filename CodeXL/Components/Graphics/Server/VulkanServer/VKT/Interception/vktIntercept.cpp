@@ -5,7 +5,6 @@
 /// \brief  API interception happens here.
 //=============================================================================
 
-#include <AMDTBaseTools/Include/gtStringConstants.h>
 #include "vktIntercept.h"
 
 #include "../vktDefines.h"

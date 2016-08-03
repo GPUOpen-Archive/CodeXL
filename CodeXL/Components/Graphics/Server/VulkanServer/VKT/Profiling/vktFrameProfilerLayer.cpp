@@ -95,7 +95,7 @@ bool VktFrameProfilerLayer::ValidateProfilerResult(const ProfilerResult& result)
     {
         validResult = false;
 
-        Log(logERROR, "Detected empty timestamp. PreStartRawClock: %llu || StartRawClock: %llu || EndRawClock: %llu || SampleID: %d || Frame: %d || Cmd: %s || CmdBuf: " POINTER_SUFFIX "%p || CmdBufMeasurementNum: %d || CmdBufMeasurementCount: %d\n",
+        Log(logERROR, "Detected empty timestamp. PreStartRawClock: %llu || StartRawClock: %llu || EndRawClock: %llu || SampleID: %d || Frame: %d || Cmd: %s || CmdBuf: %p || CmdBufMeasurementNum: %d || CmdBufMeasurementCount: %d\n",
             result.timestampResult.rawClocks.preStart,
             result.timestampResult.rawClocks.start,
             result.timestampResult.rawClocks.end,
@@ -114,7 +114,7 @@ bool VktFrameProfilerLayer::ValidateProfilerResult(const ProfilerResult& result)
     {
         validResult = false;
 
-        Log(logERROR, "Detected (Start>End) timestamp. PreStartRawClock: %llu || StartRawClock: %llu || EndRawClock: %llu || SampleID: %d || Frame: %d || Cmd: %s || CmdBuf: " POINTER_SUFFIX "%p || CmdBufMeasurementNum: %d || CmdBufMeasurementCount: %d\n",
+        Log(logERROR, "Detected (Start>End) timestamp. PreStartRawClock: %llu || StartRawClock: %llu || EndRawClock: %llu || SampleID: %d || Frame: %d || Cmd: %s || CmdBuf: %p || CmdBufMeasurementNum: %d || CmdBufMeasurementCount: %d\n",
             result.timestampResult.rawClocks.preStart,
             result.timestampResult.rawClocks.start,
             result.timestampResult.rawClocks.end,
@@ -282,7 +282,7 @@ void VktFrameProfilerLayer::PreCall(FuncId funcId, VktWrappedCmdBuf* pWrappedCmd
             }
             else
             {
-                Log(logERROR, "Failed BeginCmdMeasurement. CmdBuf='" POINTER_SUFFIX "%p' SampleId='%d'\n", pWrappedCmdBuf->AppHandle(), measurementId.sampleId);
+                Log(logERROR, "Failed BeginCmdMeasurement. CmdBuf='%p' SampleId='%d'\n", pWrappedCmdBuf->AppHandle(), measurementId.sampleId);
             }
         }
         else
@@ -319,7 +319,7 @@ void VktFrameProfilerLayer::PostCall(VktAPIEntry* pNewAPIEntry, FuncId inFuncId,
                 }
                 else
                 {
-                    Log(logERROR, "Failed EndCmdMeasurement. CmdBuf='" POINTER_SUFFIX "%p' SampleId='%d'\n", pWrappedCmdBuf->AppHandle(), pSampleInfo->mSampleId);
+                    Log(logERROR, "Failed EndCmdMeasurement. CmdBuf='%p' SampleId='%d'\n", pWrappedCmdBuf->AppHandle(), pSampleInfo->mSampleId);
                 }
             }
             else

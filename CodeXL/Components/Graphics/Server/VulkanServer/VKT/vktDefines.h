@@ -8,18 +8,16 @@
 #ifndef __VKT_DEFINES_H__
 #define __VKT_DEFINES_H__
 
+#include <AMDTBaseTools/Include/gtStringConstants.h>
+
 //-----------------------------------------------------------------------------
 // The following defines are experimental switches to tweak server behavior.
 //-----------------------------------------------------------------------------
 
 #ifdef WIN32
-    #define POINTER_SUFFIX "0x"
-
     /// Capture render target by issuing a new queue submit. Else, piggyback off of the application's next queue submit.
     #define INSTANT_FRAMEBUFFER_CAPTURE      1
 #else
-    #define POINTER_SUFFIX ""
-
     /// Capture render target by issuing a new queue submit. Else, piggyback off of the application's next queue submit.
     #define INSTANT_FRAMEBUFFER_CAPTURE      0
 #endif

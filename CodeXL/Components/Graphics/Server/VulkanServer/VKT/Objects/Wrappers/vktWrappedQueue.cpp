@@ -5,7 +5,6 @@
 /// \brief  A wrapper for queues.
 //=============================================================================
 
-#include <AMDTBaseTools/Include/gtStringConstants.h>
 #include "vktWrappedQueue.h"
 #include "vktWrappedCmdBuf.h"
 #include "../../vktInterceptManager.h"
@@ -58,7 +57,7 @@ DWORD WINAPI ThreadFunc(LPVOID lpParam)
             const char* profilerErrorCode = VktCmdBufProfiler::PrintProfilerResult(profResult);
 
             // Report that a problem occurred in retrieving full profiler results.
-            Log(logERROR, "Failed to retrieve full profiler results: CmdBuf " POINTER_SUFFIX "%p, Queue " POINTER_SUFFIX "%p, ErrorCode %s\n",
+            Log(logERROR, "Failed to retrieve full profiler results: CmdBuf %p, Queue %p, ErrorCode %s\n",
                 pWorkerInfo->m_inputs.cmdBufData[i].pCmdBuf, pWorkerInfo->m_inputs.pQueue, profilerErrorCode);
         }
     }

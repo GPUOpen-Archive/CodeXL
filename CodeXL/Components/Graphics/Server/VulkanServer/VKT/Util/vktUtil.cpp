@@ -7,8 +7,9 @@
 ///         throughout the Vulkan server.
 //==============================================================================
 
-#include <AMDTBaseTools/Include/gtStringConstants.h>
 #include "vktUtil.h"
+
+#include "../vktDefines.h"
 
 //-----------------------------------------------------------------------------
 /// Construct a measurement info structure for each call that will be profiled.

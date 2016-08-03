@@ -5,7 +5,6 @@
 /// \brief  A wrapper for command buffers.
 //=============================================================================
 
-#include <AMDTBaseTools/Include/gtStringConstants.h>
 #include "vktWrappedCmdBuf.h"
 #include "../../vktLayerManager.h"
 #include "../../vktInterceptManager.h"
