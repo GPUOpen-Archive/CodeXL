@@ -49,6 +49,9 @@
 #include <AMDTAPIClasses/Include/apAPIFunctionId.h>
 #include <AMDTApiFunctions/Include/gaGRApiFunctions.h>
 
+// STL:
+#include <thread>
+
 
 // Static members initializations:
 gaPersistentDataManager* gaPersistentDataManager::_pMySingleInstance = NULL;
@@ -2450,7 +2453,17 @@ void gaPersistentDataManager::onEvent(const apEvent& eve, bool& vetoEvent)
             break;
 
         case apEvent::AP_API_CONNECTION_ESTABLISHED:
-            onAPIConnectionEstablishedEvent((const apApiConnectionEstablishedEvent&)eve);
+            {
+//                         onAPIConnectionEstablishedEvent((const apApiConnectionEstablishedEvent&)eve);
+
+                apApiConnectionEstablishedEvent * establishedEvent = (apApiConnectionEstablishedEvent*)eve.clone();
+                auto thrd = std::thread([this](apApiConnectionEstablishedEvent * establishedEvent)
+                     {
+                         onAPIConnectionEstablishedEvent(*establishedEvent);
+                         delete establishedEvent;
+                     }, establishedEvent);
+                thrd.detach();
+            }
             break;
 
         case apEvent::AP_DEBUGGED_PROCESS_CREATED:

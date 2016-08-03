@@ -188,6 +188,15 @@ public:
     /// \date 18/02/2016
     bool ResumeThread(int threadGDBId);
 
+    /////////////////////////////////////////////////////////////////////////////////////
+    /// \brief Return if any thread really running in launching process. Created thread and
+    ///   launching thrad it's not the same 
+    ///
+    /// \return true - first thread running after creation
+    /// \author Vadim Entov
+    /// \date 03/08/2016
+    bool IsProcessStarted() const { return m_firstThreadRunning;}
+
 private:
     const char** getGDBExecutionCommandLineArguments(const gtString& gdbExecutable) const;
     bool setGDBUsedShell();
@@ -240,10 +249,11 @@ private:
     // (See setGDBUsedShell() for more details)
     gtString _storedShellEnvVariableValue;
 
-    gtSet<int>          m_processExistingThreads;    ///< Set of existing threads of debugged process
-    gtSet<int>          m_processStoppedThreads;     ///< Set of currently stopped threads of debugged process
+    gtSet<int>          m_processExistingThreads;   ///< Set of existing threads of debugged process
+    gtSet<int>          m_processStoppedThreads;    ///< Set of currently stopped threads of debugged process
     osCriticalSection   m_threadsInfoCS;            ///< Synchrinzation primitive of debugged process threads info
-    unsigned int        m_createdProcessThread;      ///< True after first process thread was created and false after last thread exit
+    unsigned int        m_createdProcessThread;     ///< True after first process thread was created and false after last thread exit
+    bool                m_firstThreadRunning;       ///< First process thread running flag   
 };
 
 

@@ -345,6 +345,7 @@ bool pdLinuxProcessDebugger::launchDebuggedProcess()
     bool retVal = false;
 
     bool reportedFailure = false;
+    m_GDBIdsOfThreadsToRelease.clear();
 
     if (_currentGDBState == gdb_state::gdb_initialized_state)
     {
@@ -4747,38 +4748,46 @@ bool pdLinuxProcessDebugger::prepareProcessToTerminate()
 /// \date 09/02/2016
 bool pdLinuxProcessDebugger::suspendHostDebuggedProcess()
 {
-    bool result = false;
-    bool bSuspendedBefore = false;
+    bool retVal = false;
 
-    gaLockDriverThreads();
-    result = trySuspendProcess(bSuspendedBefore);
-    osSleep(GDB_LISTENER_THREAD_GAP);
-
-    GT_IF_WITH_ASSERT(result)
+    if (_gdbDriver.IsProcessStarted())
     {
-        _isDebuggedProcssSuspended = true;
-        _isDuringInternalContinue = true;
-        _isUnderHostBreakpoint = true;
-        m_hostBreakReason = AP_BREAK_COMMAND_HIT;
+        OS_OUTPUT_DEBUG_LOG(L"Get process really running flag", OS_DEBUG_LOG_DEBUG);
 
-        GT_IF_WITH_ASSERT(updateDebuggedProcessThreadsData())
+        bool result = false;
+        bool bSuspendedBefore = false;
+
+        gaLockDriverThreads();
+        result = trySuspendProcess(bSuspendedBefore);
+        osSleep(GDB_LISTENER_THREAD_GAP);
+
+        GT_IF_WITH_ASSERT(result)
         {
+            _isDebuggedProcssSuspended = true;
+            _isDuringInternalContinue = true;
+            _isUnderHostBreakpoint = true;
+            m_hostBreakReason = AP_BREAK_COMMAND_HIT;
 
-            GT_IF_WITH_ASSERT(ReleaseSpyThread())
+            GT_IF_WITH_ASSERT(updateDebuggedProcessThreadsData())
             {
-                apBreakpointHitEvent* pBPEvent = new apBreakpointHitEvent(1, NULL);
-                pBPEvent->setBreakReason(apBreakReason::AP_BREAK_COMMAND_HIT);
+                GT_IF_WITH_ASSERT(ReleaseSpyThread())
+                {
+                    apBreakpointHitEvent* pBPEvent = new apBreakpointHitEvent(1, NULL);
+                    pBPEvent->setBreakReason(apBreakReason::AP_BREAK_COMMAND_HIT);
+    
+                    apEventsHandler::instance().registerPendingDebugEvent(*pBPEvent);
 
-                apEventsHandler::instance().registerPendingDebugEvent(*pBPEvent);
+                    apDebuggedProcessRunSuspendedEvent* suspendEvent = new apDebuggedProcessRunSuspendedEvent(1, true);
 
-                apDebuggedProcessRunSuspendedEvent* suspendEvent = new apDebuggedProcessRunSuspendedEvent(1, true);
+                    apEventsHandler::instance().registerPendingDebugEvent(*suspendEvent);
 
-                apEventsHandler::instance().registerPendingDebugEvent(*suspendEvent);
+                    retVal = true;
+                }
             }
         }
     }
 
-    return true;
+    return retVal;
 }
 
 

@@ -123,7 +123,7 @@ void pdBorkenPipeSignalHandler(int signalNumber)
 // ---------------------------------------------------------------------------
 pdGDBDriver::pdGDBDriver()
     : _wasInitialized(false), _gdbProcessId(0), m_pGDBProcessWaiterThread(NULL), _pGDBCommunicationPipe(NULL), _pGDBProcessConsolePipe(nullptr), _pGDBProcessConsolePipeClient(nullptr),
-      _pGDBListenerThread(NULL), _pDebuggedAppOutputReaderThread(NULL)
+      _pGDBListenerThread(NULL), _pDebuggedAppOutputReaderThread(NULL), m_firstThreadRunning(false)
 {
     // Initialize the GDB communication pipe names:
     clearGDBCommunicationPipeNames();
@@ -373,6 +373,7 @@ bool pdGDBDriver::terminate()
 
     m_processExistingThreads.clear();
     m_processStoppedThreads.clear();
+    m_firstThreadRunning = false;
 
     return retVal;
 }
@@ -480,6 +481,16 @@ bool pdGDBDriver::executeGDBCommand(pdGDBCommandId gdbCommandId,
 
     if (pCommandInfo)
     {
+        if (gdbCommandId == PD_GDB_RUN_DEBUGGED_PROCESS_CMD)
+        {
+            m_processExistingThreads.clear();
+            m_processStoppedThreads.clear();
+            m_firstThreadRunning = false;
+
+            OS_OUTPUT_DEBUG_LOG(L"Set process really running flag to false", OS_DEBUG_LOG_DEBUG);
+
+        }
+    
         // Build the GDB command string:
         gtASCIIString commandString;
         bool rc1 = buildGDBCommandString(gdbCommandId, commandArgs, commandString);
@@ -955,6 +966,7 @@ bool pdGDBDriver::initializeGDB()
     pdGDBOutputReader gdbOutputReader;
     bool ignoredS = false;
     bool ignoredT = false;
+
     bool rc1 = gdbOutputReader.readGDBOutput(*_pGDBCommunicationPipe, *this, PD_GDB_NULL_CMD, ignoredS, ignoredT);
     GT_IF_WITH_ASSERT(rc1)
     {
@@ -1229,6 +1241,7 @@ void pdGDBDriver::OnThreadCreated(int threadGDBId)
        OS_OUTPUT_DEBUG_LOG(debugMsg.asCharArray(), OS_DEBUG_LOG_DEBUG);
 
         m_processExistingThreads.insert(threadGDBId);
+
         m_createdProcessThread = true;
     }
 };
@@ -1293,6 +1306,8 @@ void pdGDBDriver::OnThreadGDBResumed(int threadGDBId)
 {
     osCriticalSectionLocker lock(m_threadsInfoCS);
 
+    OS_OUTPUT_DEBUG_LOG(L"Set process really running flag to true", OS_DEBUG_LOG_DEBUG);
+
     auto existingIt = m_processExistingThreads.find(threadGDBId);
     auto stoppedIt = m_processStoppedThreads.find(threadGDBId);
 
@@ -1309,6 +1324,8 @@ void pdGDBDriver::OnThreadGDBResumed(int threadGDBId)
     gtString debugMsg;
     debugMsg.appendFormattedString(L"Resume thread gdbId: %d Stopped threads count: %d", threadGDBId, (int)m_processStoppedThreads.size());
     OS_OUTPUT_DEBUG_LOG(debugMsg.asCharArray(), OS_DEBUG_LOG_DEBUG);
+
+    m_firstThreadRunning = true;
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////
