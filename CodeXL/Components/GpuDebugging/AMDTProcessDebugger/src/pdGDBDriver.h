@@ -195,7 +195,7 @@ public:
     /// \return true - first thread running after creation
     /// \author Vadim Entov
     /// \date 03/08/2016
-    bool IsProcessStarted() const { return m_firstThreadRunning;}
+    bool IsProcessStarted() const { return m_firstThreadRunning && m_processExistingThreads.size() != 0;}
 
 private:
     const char** getGDBExecutionCommandLineArguments(const gtString& gdbExecutable) const;

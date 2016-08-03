@@ -396,9 +396,22 @@ void gaPersistentDataManager::onAPIConnectionEstablishedEvent(const apApiConnect
 
         case AP_SPIES_UTILITIES_API_CONNECTION:
         {
+            bool suspendAfter = false;
+
+            if (pdProcessDebugger::instance().isDebuggedProcssSuspended())
+            {
+                pdProcessDebugger::instance().suspendDebuggedProcess();
+                suspendAfter = true;
+            }
+
             // The Spies Utilities API connection was established:
             onSpiesUtilitiesAPIConnection();
             m_apiConnectionInitialized = true;
+
+            if (suspendAfter)
+            {
+                pdProcessDebugger::instance().resumeDebuggedProcess();
+            }
         }
         break;
 
@@ -2454,15 +2467,7 @@ void gaPersistentDataManager::onEvent(const apEvent& eve, bool& vetoEvent)
 
         case apEvent::AP_API_CONNECTION_ESTABLISHED:
             {
-//                         onAPIConnectionEstablishedEvent((const apApiConnectionEstablishedEvent&)eve);
-
-                apApiConnectionEstablishedEvent * establishedEvent = (apApiConnectionEstablishedEvent*)eve.clone();
-                auto thrd = std::thread([this](apApiConnectionEstablishedEvent * establishedEvent)
-                     {
-                         onAPIConnectionEstablishedEvent(*establishedEvent);
-                         delete establishedEvent;
-                     }, establishedEvent);
-                thrd.detach();
+                onAPIConnectionEstablishedEvent((const apApiConnectionEstablishedEvent&)eve);
             }
             break;
 
