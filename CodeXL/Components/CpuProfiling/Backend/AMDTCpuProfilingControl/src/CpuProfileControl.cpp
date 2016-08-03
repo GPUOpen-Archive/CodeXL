@@ -479,6 +479,7 @@ HRESULT fnGetProfilerState(
 
 HRESULT fnStartProfiling(
     /*in*/ bool startPaused,
+    /*in*/ bool pauseIndefinite,
     /*in*/ const wchar_t* pauseKey,
     /*out*/ ProfileState* pProfileState)
 {
@@ -510,6 +511,7 @@ HRESULT fnStartProfiling(
 
     HRESULT hr = S_OK;
     hr = CpuPerfStartProfiling(startPaused,
+                               pauseIndefinite,
                                pauseKey,
                                pProfileState);
 

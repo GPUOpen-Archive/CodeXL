@@ -305,6 +305,7 @@ CP_CTRL_API HRESULT fnGetProfilerState(
 */
 CP_CTRL_API HRESULT fnStartProfiling(
     /*in*/ bool startPaused,
+    /*in*/ bool pauseIndefinite,
     /*in*/ const wchar_t* pauseKey,
     /*out*/ ProfileState* pProfileState);
 

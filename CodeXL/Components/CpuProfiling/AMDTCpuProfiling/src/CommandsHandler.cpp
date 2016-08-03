@@ -723,7 +723,11 @@ HRESULT CommandsHandler::tryStartProfiling(int retries) const
             OS_OUTPUT_DEBUG_LOG(msg.asCharArray(), OS_DEBUG_LOG_INFO);
         }
 
-        hr = fnStartProfiling((0 < m_profileSession.m_startDelay || m_profileSession.m_isProfilePaused), AMDT_CPU_PROFILING_PAUSE_KEY, nullptr);
+        hr = fnStartProfiling(
+                        (0 < m_profileSession.m_startDelay || m_profileSession.m_isProfilePaused), //startPaused
+                        m_profileSession.m_isProfilePaused,                                        //pauseIndefinite
+                        AMDT_CPU_PROFILING_PAUSE_KEY,
+                        nullptr);
 
         if (S_OK != hr)
         {

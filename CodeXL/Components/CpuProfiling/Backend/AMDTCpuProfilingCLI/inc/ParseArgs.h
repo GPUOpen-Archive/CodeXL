@@ -122,45 +122,51 @@ private:
     gtList<gtUInt64>    m_rawEventsList; // UNUSED. will be used with -e option
     gtVector<int>       m_pidsList;
 
-    gtUInt64  m_coreAffinityMask;
+    gtUInt64  m_coreAffinityMask = static_cast<gtUInt64>(-1);
 
-    int       m_debugLogLevel;
-    int       m_tbpSamplingInterval;      // TBP sampling interval in milli-secons
-    int       m_profileDuration;          // Profile Duration in Seconds
-    int       m_startDelay;               // start delay duration in Seconds
+    int       m_debugLogLevel = 0;
+    int       m_tbpSamplingInterval = 0;  // TBP sampling interval in milli-seconds
+    int       m_profileDuration = 0;      // Profile Duration in Seconds
+    int       m_startDelay = -1;          // start delay duration in Seconds
 
-    int       m_unwindInterval;
-    int       m_unwindDepth;
-    CpuProfileCssScope  m_cssScope;
-    bool      m_cssSupportFpo;
+    int       m_unwindInterval = CP_CSS_DEFAULT_UNWIND_INTERVAL;
+    int       m_unwindDepth = CP_CSS_DEFAULT_UNWIND_DEPTH;
 
-    bool      m_isPrintHelp;
-    bool      m_isPrintVersion;
-    bool      m_isSWP;
-    bool      m_isAttach;
-    bool      m_isCSSEnabled;
-    bool      m_cssWithDefaultValues;
-    bool      m_isPredefinedProfile;
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
+    CpuProfileCssScope m_cssScope = CP_CSS_SCOPE_USER;
+#else
+    CpuProfileCssScope m_cssScope = CP_CSS_SCOPE_UNKNOWN;
+#endif
 
-    bool      m_profileChildren;
-    bool      m_terminateLaunchApp;
+    bool      m_cssSupportFpo = false;
+
+    bool      m_isPrintHelp = false;
+    bool      m_isPrintVersion = false;
+    bool      m_isSWP = false;
+    bool      m_isAttach = false;
+    bool      m_isCSSEnabled = false;
+    bool      m_cssWithDefaultValues = false;
+    bool      m_isPredefinedProfile = false;
+
+    bool      m_profileChildren = false;
+    bool      m_terminateLaunchApp = false;
 
     // Report Options
     gtString  m_sectionsToReport;
     gtString  m_inputFile;
-    gtString  m_outputFileFormat; // csv of text
+    gtString  m_outputFileFormat = L"csv";
     gtString  m_viewConfigName;
     gtString  m_debugSymbolPaths;
     gtString  m_symbolServerDirs;
     gtString  m_cachePath;
 
-    int       m_sortEventIndex;
+    int       m_sortEventIndex = 0;
 
-    bool      m_ignoreSystemModules;
-    bool      m_showPercentage;
-    bool      m_reportByNuma;
-    bool      m_reportByCore;
-    bool      m_enableCache;
+    bool      m_ignoreSystemModules = false;
+    bool      m_showPercentage = false;
+    bool      m_reportByNuma = false;
+    bool      m_reportByCore = false;
+    bool      m_enableCache = false;
 
     bool InitializeArgs(int nbrArgs, wchar_t* args[]);
 };

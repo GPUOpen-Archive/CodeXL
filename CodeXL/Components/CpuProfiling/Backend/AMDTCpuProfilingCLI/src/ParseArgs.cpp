@@ -142,31 +142,7 @@ static int getOption(int argc, wchar_t* const argv[], const char* optstring)
     return (optOption);  // return option letter
 }
 
-ParseArgs::ParseArgs() : m_coreAffinityMask((gtUInt64) - 1),
-    m_debugLogLevel(0),
-    m_tbpSamplingInterval(0), m_profileDuration(0), m_startDelay((int) - 1),
-    m_unwindInterval(CP_CSS_DEFAULT_UNWIND_INTERVAL),
-    m_unwindDepth(CP_CSS_DEFAULT_UNWIND_DEPTH),
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    m_cssScope(CP_CSS_SCOPE_USER),
-#else
-    m_cssScope(CP_CSS_SCOPE_UNKNOWN),
-#endif
-    m_cssSupportFpo(false),
-    m_isPrintHelp(false), m_isPrintVersion(false),
-    m_isSWP(false), m_isAttach(false), m_isCSSEnabled(false),
-    m_cssWithDefaultValues(false),
-    m_isPredefinedProfile(false), m_profileChildren(false),
-    m_terminateLaunchApp(false),
-    m_outputFileFormat(L"csv"),
-    m_sortEventIndex(0),
-    m_ignoreSystemModules(false),
-    m_showPercentage(false),
-    m_reportByNuma(false),
-    m_reportByCore(false),
-    m_enableCache(false)
-{
-}
+ParseArgs::ParseArgs() { }
 
 
 bool ParseArgs::Initialize(int nbrArgs, char* args[])

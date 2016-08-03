@@ -145,7 +145,11 @@ HRESULT CpuProfileCollect::StartProfiling(unsigned int* pPidArray, int numPids)
         {
             m_profStartTime = GetTimeStr();
 
-            m_error = fnStartProfiling((0 <= m_args.GetStartDelay()), AMDT_CPU_PROFILING_PAUSE_KEY, nullptr);
+            m_error = fnStartProfiling(
+                0 <= m_args.GetStartDelay(), //startPaused
+                0 == m_args.GetStartDelay(), //pauseIndefinite
+                AMDT_CPU_PROFILING_PAUSE_KEY,
+                nullptr);
 
             if (S_OK == m_error)
             {

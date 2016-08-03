@@ -152,7 +152,7 @@ int PrintCollectOptions()
     fprintf(stderr, "                               collection.\n");
     fprintf(stderr, "\n    -s <n>                     Start Delay (n in seconds).\n");
     fprintf(stderr, "                               Start profiling after the specified duration.\n");
-    fprintf(stderr, "                               If n is 0, then wait indefinitely.\n");
+    fprintf(stderr, "                               If n is 0, then wait indefinitely, used for profile control.\n");
     fprintf(stderr, "\n    -v                         Print version string.\n");
     fprintf(stderr, "\n    -w                         Specify the working directory.\n");
     fprintf(stderr, "                               Default will be the path of the launched application.\n");

@@ -1116,10 +1116,11 @@ HRESULT CpuPerfGetProfilerState(
 
 HRESULT CpuPerfStartProfiling(
     /*in*/ bool            startPaused,
+    /*in*/ bool            pauseIndefinite,
     /*in*/ const wchar_t*  pauseKey,    // UNUSED in Linux PERF
     /*out*/ ProfileState*  pProfileState)
 {
-    (void)(pauseKey); // unused
+    GT_UNREFERENCED_PARAMETER(pauseKey);
     HRESULT hr = S_OK;
     gtUInt32 clientId = helpGetClientId();
 
@@ -1318,11 +1319,15 @@ HRESULT CpuPerfStartProfiling(
         {
             g_profilingState[clientId] = ProfilingPaused;
             g_sharedObj->paused = true;
-            g_pcMonitor = new ProfileControlMonitor(getpid(), true);
 
-            if (nullptr != g_pcMonitor)
+            if (pauseIndefinite)
             {
-                g_pcMonitor->execute();
+                g_pcMonitor = new ProfileControlMonitor(getpid(), true);
+
+                if (nullptr != g_pcMonitor)
+                {
+                    g_pcMonitor->execute();
+                }
             }
         }
     }

@@ -138,7 +138,7 @@ AMDTResult tpCollectImpl::tpStartThreadProfile()
         {
             //bool isCollectCStack = m_callstack;
 
-            retVal = fnStartProfiling(false, NULL, NULL);
+            retVal = fnStartProfiling(false, false, NULL, NULL);
 
             if (S_OK == retVal)
             {

@@ -49,6 +49,7 @@ HRESULT CpuPerfGetProfilerState(
 
 HRESULT CpuPerfStartProfiling(
     /*in*/ bool startPaused,
+    /*in*/ bool pauseIndefinite,
     /*in*/ const wchar_t* pauseKey,
     /*out*/ ProfileState* pProfileState);
 
