@@ -3640,11 +3640,20 @@ public:
                 {
                     // get the unique leafs of this callstack id...
                     CallstackFrameVec uniqueleafs;
+                    gtUInt32 funcOffset = 0;
+                    AMDTFunctionId funcId = AMDT_PROFILE_ALL_FUNCTIONS;
+
+                    if (IS_UNKNOWN_FUNC(leaf.m_funcInfo.m_functionId))
+                    {
+                        funcId = leaf.m_funcInfo.m_functionId;
+                        funcOffset = leaf.m_funcInfo.m_startOffset;
+                    }
+
                     ret = m_pDbAdapter->GetCallstackLeafData(pid,
                                                              counterId,
                                                              leaf.m_callstackId,
-                                                             AMDT_PROFILE_ALL_FUNCTIONS,
-                                                             0, // funcOffset
+                                                             funcId,
+                                                             funcOffset,
                                                              false, // don't aggregate all the leafs that corresponds to a callstackid
                                                              uniqueleafs);
 

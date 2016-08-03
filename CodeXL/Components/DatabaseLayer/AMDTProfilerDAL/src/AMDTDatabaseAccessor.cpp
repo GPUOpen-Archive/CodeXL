@@ -133,7 +133,7 @@ const std::vector<std::string> SQL_CREATE_DB_STMTS_AGGREGATION =
     "CREATE UNIQUE INDEX 'unique_samples' ON SampleContext (processThreadId, moduleInstanceId, coreSamplingConfigurationId, functionId, offset)",
     "CREATE INDEX callStackLeafIdx ON CallstackLeaf (processId, samplingConfigurationId, callstackId)",
     "CREATE INDEX callStackLeafFunctionIdx ON CallstackLeaf (functionId, offset)",
-    "CREATE INDEX callStackFrameIdx ON CallstackFrame (callstackId)",
+    "CREATE INDEX callStackFrameIdx ON CallstackFrame (callstackId, processId)",
     "CREATE INDEX callStackFrameFunctionIdx ON CallstackFrame (functionId, offset)",
     "CREATE INDEX sampleContextIdx ON SampleContext (functionId, offset)",
     "CREATE INDEX processThreadIdx ON ProcessThread(processId, threadId)",
@@ -5800,7 +5800,7 @@ public:
 
             if (isGroupByCSId)
             {
-                query << "GROUP BY callstackId ";
+                query << "GROUP BY callstackId HAVING (functionId & 0x0000ffff) > 0 ";
             }
             else
             {
