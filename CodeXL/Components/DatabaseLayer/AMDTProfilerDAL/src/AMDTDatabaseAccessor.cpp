@@ -5831,7 +5831,11 @@ public:
 
             if (isGroupByCSId)
             {
+#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
                 query << "GROUP BY callstackId HAVING (functionId & 0x0000ffff) > 0 ";
+#else
+                query << "GROUP BY callstackId HAVING (functionId & 65535) > 0 ";
+#endif
             }
             else
             {
