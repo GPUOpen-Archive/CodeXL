@@ -1770,12 +1770,19 @@ void SessionCallGraphView::FunctionListSelectionDone(AMDTFunctionId functionId)
 
 void SessionCallGraphView::editSource(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> info)
 {
-    auto itr = m_pFuncTable->m_FunctionIdSampleMap.find(std::get<0>(info));
+    gtString modName = std::get<1>(info);
 
-    if ((m_pFuncTable->m_FunctionIdSampleMap.end() != itr) &&
-        (itr->second == true))
+    // if module is unknown do not proceed
+    if (!modName.isEmpty() &&
+        (false == modName.startsWith(L"Unknown Module")))
     {
-        emit opensourceCodeViewSig(info);
+        auto itr = m_pFuncTable->m_FunctionIdSampleMap.find(std::get<0>(info));
+
+        if ((m_pFuncTable->m_FunctionIdSampleMap.end() != itr) &&
+            (itr->second == true))
+        {
+            emit opensourceCodeViewSig(info);
+        }
     }
 }
 

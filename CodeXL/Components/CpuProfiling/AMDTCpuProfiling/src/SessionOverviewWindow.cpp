@@ -779,7 +779,6 @@ void SessionOverviewWindow::onHotSpotComboChanged(const QString& text)
             }
         }
     }
-
     //emit hotspotIndicatorChanged(text);
 }
 
@@ -1008,16 +1007,20 @@ void SessionOverviewWindow::onTableItemActivated(QTableWidgetItem* pActivateItem
             {
                 QTableWidgetItem* funcName = m_pFunctionsTable->item(rowNum, AMDT_FUNC_SUMMMARY_FUNC_NAME_COL);
                 gtString str = acQStringToGTString(funcName->text());
-                bool isOther = str.compare(L"other");
+                bool isOther = str.compare(L"other") == 0;
+                bool isUnknown = str.startsWith(L"Unknown Module");
 
                 // if double click on "other" row  open functions table
-                if (!isOther)
+                if (isOther)
                 {
                     openFunctionViewForModule(nullptr);
                 }
                 else
                 {
-                    openSourceCodeView(pActivateItem);
+                    if (!isUnknown)
+                    {
+                        openSourceCodeView(pActivateItem);
+                    }
                 }
             }
             else if (pTable == m_pModulesTable)

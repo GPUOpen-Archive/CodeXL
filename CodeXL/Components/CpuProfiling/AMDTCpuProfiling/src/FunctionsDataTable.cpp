@@ -196,6 +196,19 @@ void FunctionsDataTable::onAboutToShowContextMenu()
                         }
                         else if (DISPLAY_FUNCTION_IN_SOURCE_CODE_VIEW == actionType)
                         {
+                            QTableWidgetItem* pItem = selectedItems().first();
+
+                            if (nullptr != pItem)
+                            {
+                                int rowIndex = pItem->row();
+                                gtString funcName = acQStringToGTString(getFunctionName(rowIndex));
+
+                                if (funcName.startsWith(L"Unknown Module"))
+                                {
+                                    isActionEnabled = false;
+                                }
+                            }
+
                             if (INVALID_FUNCTION_ID == funcId)
                             {
                                 isActionEnabled = false;

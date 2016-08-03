@@ -706,34 +706,39 @@ void SessionFunctionView::onTableItemActivated(QTableWidgetItem* pActivateItem)
             // don't make action on empty table message row
             if (pActivateItem->row() != m_pFunctionTable->GetEmptyTableItemRowNum())
             {
-                // Get the address for the activated function:
-                QString funcIdStr = m_pFunctionTable->getFunctionId(pActivateItem->row());
-                AMDTUInt32 funcId = funcIdStr.toInt();
+                gtString functionName = acQStringToGTString(m_pFunctionTable->getFunctionName(pActivateItem->row()));
 
-                // Get the module info
-                AMDTProfileModuleInfo modInfo;
-                bool ret = m_pProfDataRdr->GetModuleInfoForFunction(funcId, modInfo);
-                AMDTModuleId moduleId = (ret) ? modInfo.m_moduleId : AMDT_PROFILE_ALL_MODULES;
-                AMDTUInt32  processId = AMDT_PROFILE_ALL_PROCESSES;
-
-                gtString processIdStr = acQStringToGTString(pPIDComboBox->currentText());
-
-                if (processIdStr != L"All Processes")
+                if (!functionName.startsWith(L"Unknown Module"))
                 {
-                    // Extract pid from processIdStr format: process_name(PID)
-                    int idxStart = processIdStr.reverseFind(L"(");
-                    int idxEnd = processIdStr.length() - 1;
+                    // Get the address for the activated function:
+                    QString funcIdStr = m_pFunctionTable->getFunctionId(pActivateItem->row());
+                    AMDTUInt32 funcId = funcIdStr.toInt();
 
-                    if (idxStart >= 0 && idxEnd > 1)
+                    // Get the module info
+                    AMDTProfileModuleInfo modInfo;
+                    bool ret = m_pProfDataRdr->GetModuleInfoForFunction(funcId, modInfo);
+                    AMDTModuleId moduleId = (ret) ? modInfo.m_moduleId : AMDT_PROFILE_ALL_MODULES;
+                    AMDTUInt32  processId = AMDT_PROFILE_ALL_PROCESSES;
+
+                    gtString processIdStr = acQStringToGTString(pPIDComboBox->currentText());
+
+                    if (processIdStr != L"All Processes")
                     {
-                        processIdStr.truncate(idxStart + 1, idxEnd - 1);
-                        processIdStr.toUnsignedIntNumber(processId);
-                    }
-                }
+                        // Extract pid from processIdStr format: process_name(PID)
+                        int idxStart = processIdStr.reverseFind(L"(");
+                        int idxEnd = processIdStr.length() - 1;
 
-                auto funcModInfo = std::make_tuple(funcId, modInfo.m_path, moduleId, processId);
-                // Emit a function activated signal (will open a source code view):
-                emit opensourceCodeViewSig(funcModInfo);
+                        if (idxStart >= 0 && idxEnd > 1)
+                        {
+                            processIdStr.truncate(idxStart + 1, idxEnd - 1);
+                            processIdStr.toUnsignedIntNumber(processId);
+                        }
+                    }
+
+                    auto funcModInfo = std::make_tuple(funcId, modInfo.m_path, moduleId, processId);
+                    // Emit a function activated signal (will open a source code view):
+                    emit opensourceCodeViewSig(funcModInfo);
+                }
             }
         }
     }
