@@ -59,7 +59,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <CustomBuildStep>
-      <Command>"$(CodeXLGpuProfilingDir)\Backend\DCServer\DCExternalFileCopy.bat" "$(GPUPerfAPIDir)" "$(GDTBuildSuffix)" "$(GDTPlatform)" "$(GDTPlatformSuffix)" "$(OutDir)" "$(CodeXLGpuProfilerDeliverDir)"</Command>
+      <Command>"$(CodeXLGpuProfilingDir)\Backend\DCServer\DCExternalFileCopy.bat" "$(GPUPerfAPIDir)" "$(GDTBuildSuffix)" "$(GDTPlatform)" "$(GDTPlatformSuffix)" "$(OutDir)" "$(CodeXLGpuProfilerDeliverDir)\"</Command>
       <Outputs>$(OutDir)\GPUPerfAPIDX11$(GDTPlatformSuffix)$(GDT_BUILD_SUFFIX).dll;$(OutDir)\GPUPerfAPICounters$(GDTPlatformSuffix)$(GDT_BUILD_SUFFIX).dll;$(Outputs)</Outputs>
     </CustomBuildStep>
     <Link>
