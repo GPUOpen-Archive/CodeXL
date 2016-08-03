@@ -165,12 +165,37 @@ osProcedureAddress csExtensionsManager::wrapperFunctionAddress(const gtString& f
                 // current render context:
                 csMonitoredFunctionPointers* pExtensionsRealImplPtrs = extensionsRealImplementationPointers();
 
-                if (pExtensionsRealImplPtrs)
+                if (nullptr != pExtensionsRealImplPtrs)
                 {
-                    ((osProcedureAddress*)(pExtensionsRealImplPtrs))[functionIndex] = realExtensionAddress;
+                    // If the get function got the wrong value, we might have the correct value cached:
+                    osProcedureAddress& realPointersStructSlot = ((osProcedureAddress*)(pExtensionsRealImplPtrs))[functionIndex];
+                    if ((nullptr == realExtensionAddress) || (wrapperFuncAddress == realExtensionAddress))
+                    {
+                        realExtensionAddress = realPointersStructSlot;
+                    }
 
-                    // Return the wrapper function address:
-                    retVal = wrapperFuncAddress;
+                    // If we somehow got the wrapper address as the "real" address - don't save it,
+                    // since it will cause a stack overflow when the real function is called.
+                    GT_IF_WITH_ASSERT(realExtensionAddress != wrapperFuncAddress)
+                    {
+                        // Sanity check - we should be overwriting a null value or the same value:
+                        GT_ASSERT((realExtensionAddress == realPointersStructSlot) || (nullptr == realPointersStructSlot));
+
+                        if ((realExtensionAddress != realPointersStructSlot) && (nullptr != realPointersStructSlot))
+                        {
+                            OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_DEBUG, L"Warning: Overwriting real function pointer %p with %p (function %ls)", realPointersStructSlot, realExtensionAddress, functionName.asCharArray());
+                        }
+
+                        realPointersStructSlot = realExtensionAddress;
+
+                        // Return the wrapper function address:
+                        retVal = wrapperFuncAddress;
+                    }
+                    else
+                    {
+                        // We do not have the real function pointer anywhere, so we should not export the wrapper:
+                        retVal = nullptr;
+                    }
                 }
             }
         }
@@ -248,12 +273,37 @@ osProcedureAddress csExtensionsManager::wrapperFunctionAddress(cl_platform_id pl
                     // current render context:
                     csMonitoredFunctionPointers* pExtensionsRealImplPtrs = extensionsRealImplementationPointers();
 
-                    if (pExtensionsRealImplPtrs)
+                    if (nullptr != pExtensionsRealImplPtrs)
                     {
-                        ((osProcedureAddress*)(pExtensionsRealImplPtrs))[functionIndex] = realExtensionAddress;
+                        // If the get function got the wrong value, we might have the correct value cached:
+                        osProcedureAddress& realPointersStructSlot = ((osProcedureAddress*)(pExtensionsRealImplPtrs))[functionIndex];
+                        if ((nullptr == realExtensionAddress) || (wrapperFuncAddress == realExtensionAddress))
+                        {
+                            realExtensionAddress = realPointersStructSlot;
+                        }
 
-                        // Return the wrapper function address:
-                        retVal = wrapperFuncAddress;
+                        // If we somehow got the wrapper address as the "real" address - don't save it,
+                        // since it will cause a stack overflow when the real function is called.
+                        GT_IF_WITH_ASSERT(realExtensionAddress != wrapperFuncAddress)
+                        {
+                            // Sanity check - we should be overwriting a null value or the same value:
+                            GT_ASSERT((realExtensionAddress == realPointersStructSlot) || (nullptr == realPointersStructSlot));
+
+                            if ((realExtensionAddress != realPointersStructSlot) && (nullptr != realPointersStructSlot))
+                            {
+                                OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_DEBUG, L"Warning: Overwriting real function pointer %p with %p (function %ls)", realPointersStructSlot, realExtensionAddress, functionName.asCharArray());
+                            }
+
+                            realPointersStructSlot = realExtensionAddress;
+
+                            // Return the wrapper function address:
+                            retVal = wrapperFuncAddress;
+                        }
+                        else
+                        {
+                            // We do not have the real function pointer anywhere, so we should not export the wrapper:
+                            retVal = nullptr;
+                        }
                     }
                 }
             }
