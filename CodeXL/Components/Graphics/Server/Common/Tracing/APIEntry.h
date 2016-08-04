@@ -14,12 +14,13 @@
 
 enum FuncId : int;
 
-    //-----------------------------------------------------------------------------
-    /// List of parameter types used for the API trace parameters.
-    /// Data is stored as binary and reconstituted before sending the data back to the client.
-    //-----------------------------------------------------------------------------
-    enum PARAMETER_TYPE
+//-----------------------------------------------------------------------------
+/// List of parameter types used for the API trace parameters.
+/// Data is stored as binary and reconstituted before sending the data back to the client.
+//-----------------------------------------------------------------------------
+enum PARAMETER_TYPE
 {
+    // Generic data types
     PARAMETER_POINTER,
     PARAMETER_POINTER_SPECIAL,
     PARAMETER_INT,
@@ -29,24 +30,22 @@ enum FuncId : int;
     PARAMETER_BOOL,
     PARAMETER_UINT64,
     PARAMETER_SIZE_T,
-
-    // Data types requiring special treatment.
-    PARAMETER_GUID,
-    PARAMETER_REFIID,
-    PARAMETER_DXGI_FORMAT,
-    PARAMETER_PRIMITIVE_TOPOLOGY,
-    PARAMETER_QUERY_TYPE,
-    PARAMETER_PREDICATION_OP,
-    PARAMETER_COMMAND_LIST,
-    PARAMETER_FEATURE,
-    PARAMETER_DESCRIPTOR_HEAP,
-    PARAMETER_HEAP_TYPE,
-    PARAMETER_RESOURCE_STATES,
-
     PARAMETER_STRING,
     PARAMETER_WIDE_STRING,
-
     PARAMETER_ARRAY,
+
+    // DX12-specific data types requiring special treatment
+    PARAMETER_DX12_GUID,
+    PARAMETER_DX12_REFIID,
+    PARAMETER_DX12_DXGI_FORMAT,
+    PARAMETER_DX12_PRIMITIVE_TOPOLOGY,
+    PARAMETER_DX12_QUERY_TYPE,
+    PARAMETER_DX12_PREDICATION_OP,
+    PARAMETER_DX12_COMMAND_LIST,
+    PARAMETER_DX12_FEATURE,
+    PARAMETER_DX12_DESCRIPTOR_HEAP,
+    PARAMETER_DX12_HEAP_TYPE,
+    PARAMETER_DX12_RESOURCE_STATES,
 };
 
 //-----------------------------------------------------------------------------
@@ -91,8 +90,9 @@ public:
     /// Constructor used to initialize members of new CallData instances.
     /// \param inThreadId The thread Id that the call was invoked from.
     /// \param inFuncId The function ID of this API call
+    /// \param inNumParameters The number of params for this api call
     //--------------------------------------------------------------------------
-    APIEntry(UINT inThreadId, FuncId inFuncId);
+    APIEntry(UINT inThreadId, FuncId inFuncId, UINT32 inNumParameters);
 
     //--------------------------------------------------------------------------
     /// Virtual destructor since this is subclassed elsewhere.
@@ -119,12 +119,28 @@ public:
     virtual bool IsDrawCall() const = 0;
 
     //-----------------------------------------------------------------------------
+    /// Convert an API parameter from raw data to a string for display
+    /// \param paramType the data type of the parameter
+    /// \param dataLength the number of bytes used to contain the data
+    /// \param pRawData a pointer to the raw data
+    /// \param ioParameterString a buffer passed in where the string is to be stored
+    //-----------------------------------------------------------------------------
+    virtual void GetParameterAsString(PARAMETER_TYPE paramType, const char dataLength, const char* pRawData, char* ioParameterString) const = 0;
+
+    //-----------------------------------------------------------------------------
     /// Convert a numeric return value into a human-readable string.
     /// \param inReturnValue A numeric return value. Could be an HRESULT, or a number.
     /// \param inDisplayType A flag indicating how the return value should be displayed
     /// \param ioReturnValue A string used to write the return value to
     //-----------------------------------------------------------------------------
     void PrintReturnValue(const INT64 inReturnValue, const ReturnDisplayType inDisplayType, gtASCIIString& ioReturnValue) const;
+
+    //-----------------------------------------------------------------------------
+    /// Get the API parameters as a single string. Build the string from the
+    /// individual parameters if necessary
+    /// \return parameter string
+    //-----------------------------------------------------------------------------
+    const char* GetParameterString() const;
 
     //--------------------------------------------------------------------------
     /// The ID of the thread that the call was invoked/logged in.
@@ -140,6 +156,16 @@ public:
     /// An instance of the FuncId enum. Will be converted to a string before seen in the client.
     //--------------------------------------------------------------------------
     FuncId mFunctionId;
+
+protected:
+    /// The number of parameters this API call takes
+    UINT32 mNumParameters;
+
+    /// Buffer used to store raw parameter data for formatting later
+    char* mParameterBuffer;
+
+private:
+    APIEntry() {}
 };
 
 #endif // APIENTRY_H

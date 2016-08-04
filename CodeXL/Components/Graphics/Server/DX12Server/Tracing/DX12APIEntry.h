@@ -41,7 +41,7 @@ public:
     //-----------------------------------------------------------------------------
     /// Default destructor
     //-----------------------------------------------------------------------------
-    virtual ~DX12APIEntry();
+    virtual ~DX12APIEntry() {}
 
     //-----------------------------------------------------------------------------
     /// Use API-specific methods to determine the API name for this entry.
@@ -110,11 +110,8 @@ private:
     /// \param pRawData a pointer to the raw data
     /// \param ioParameterString a buffer passed in where the string is to be stored
     //-----------------------------------------------------------------------------
-    void GetParameterAsString(PARAMETER_TYPE paramType, const char dataLength, const char* pRawData, char* ioParameterString) const;
-
-    /// The number of parameters this API call takes
-    UINT32 mNumParameters;
-
+    virtual void GetParameterAsString(PARAMETER_TYPE paramType, const char dataLength, const char* pRawData, char* ioParameterString) const;
+    
     /// A flag set when results are retrieved from GPA.
     bool mbGotProfileResults;
 
@@ -123,9 +120,6 @@ private:
 
     /// The post-Bottom timestamp for this entry
     double mPostBottomTimestamp;
-
-    /// buffer used to store raw parameter data for formatting later
-    char* mParameterBuffer;
 };
 
 #endif // DX12APIENTRY_H

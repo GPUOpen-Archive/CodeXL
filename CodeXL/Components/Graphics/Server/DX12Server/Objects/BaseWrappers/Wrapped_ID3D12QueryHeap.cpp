@@ -46,11 +46,11 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12QueryHeap::QueryInterface(REFIID riid, v
     {
         DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-        if (interceptor && interceptor->ShouldCollectTrace())
+        if (interceptor->ShouldCollectTrace())
         {
             ParameterEntry parameters[] =
             {
-                { PARAMETER_REFIID, &riid },
+                { PARAMETER_DX12_REFIID, &riid },
                 { PARAMETER_POINTER, ppvObject },
             };
 
@@ -89,7 +89,7 @@ ULONG STDMETHODCALLTYPE Wrapped_ID3D12QueryHeap::AddRef()
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         DX12APIEntry* pNewEntry = interceptor->PreCall(this, FuncId_IUnknown_AddRef, 0, nullptr);
         result = mRealQueryHeap->AddRef();
@@ -116,7 +116,7 @@ ULONG STDMETHODCALLTYPE Wrapped_ID3D12QueryHeap::Release()
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         DX12APIEntry* pNewEntry = interceptor->PreCall(this, FuncId_IUnknown_Release, 0, nullptr);
         result = mRealQueryHeap->Release();
@@ -154,11 +154,11 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12QueryHeap::GetPrivateData(REFGUID guid, 
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
-            { PARAMETER_GUID, &guid },
+            { PARAMETER_DX12_GUID, &guid },
             { PARAMETER_POINTER, pDataSize },
             { PARAMETER_POINTER, pData },
         };
@@ -189,11 +189,11 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12QueryHeap::SetPrivateData(REFGUID guid, 
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
-            { PARAMETER_GUID, &guid },
+            { PARAMETER_DX12_GUID, &guid },
             { PARAMETER_UNSIGNED_INT, &DataSize },
             { PARAMETER_POINTER, pData },
         };
@@ -224,11 +224,11 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12QueryHeap::SetPrivateDataInterface(REFGU
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
-            { PARAMETER_GUID, &guid },
+            { PARAMETER_DX12_GUID, &guid },
             { PARAMETER_POINTER_SPECIAL, pData },
         };
 
@@ -258,7 +258,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12QueryHeap::SetName(LPCWSTR Name)
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -291,11 +291,11 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12QueryHeap::GetDevice(REFIID riid, void**
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
-            { PARAMETER_REFIID, &riid },
+            { PARAMETER_DX12_REFIID, &riid },
             { PARAMETER_POINTER, ppvDevice },
         };
 

@@ -46,11 +46,11 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12PipelineState::QueryInterface(REFIID rii
     {
         DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-        if (interceptor && interceptor->ShouldCollectTrace())
+        if (interceptor->ShouldCollectTrace())
         {
             ParameterEntry parameters[] =
             {
-                { PARAMETER_REFIID, &riid },
+                { PARAMETER_DX12_REFIID, &riid },
                 { PARAMETER_POINTER, ppvObject },
             };
 
@@ -89,7 +89,7 @@ ULONG STDMETHODCALLTYPE Wrapped_ID3D12PipelineState::AddRef()
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         DX12APIEntry* pNewEntry = interceptor->PreCall(this, FuncId_IUnknown_AddRef, 0, nullptr);
         result = mRealPipelineState->AddRef();
@@ -116,7 +116,7 @@ ULONG STDMETHODCALLTYPE Wrapped_ID3D12PipelineState::Release()
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         DX12APIEntry* pNewEntry = interceptor->PreCall(this, FuncId_IUnknown_Release, 0, nullptr);
         result = mRealPipelineState->Release();
@@ -154,11 +154,11 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12PipelineState::GetPrivateData(REFGUID gu
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
-            { PARAMETER_GUID, &guid },
+            { PARAMETER_DX12_GUID, &guid },
             { PARAMETER_POINTER, pDataSize },
             { PARAMETER_POINTER, pData },
         };
@@ -189,11 +189,11 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12PipelineState::SetPrivateData(REFGUID gu
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
-            { PARAMETER_GUID, &guid },
+            { PARAMETER_DX12_GUID, &guid },
             { PARAMETER_UNSIGNED_INT, &DataSize },
             { PARAMETER_POINTER, pData },
         };
@@ -224,11 +224,11 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12PipelineState::SetPrivateDataInterface(R
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
-            { PARAMETER_GUID, &guid },
+            { PARAMETER_DX12_GUID, &guid },
             { PARAMETER_POINTER_SPECIAL, pData },
         };
 
@@ -258,7 +258,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12PipelineState::SetName(LPCWSTR Name)
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -291,11 +291,11 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12PipelineState::GetDevice(REFIID riid, vo
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
-            { PARAMETER_REFIID, &riid },
+            { PARAMETER_DX12_REFIID, &riid },
             { PARAMETER_POINTER, ppvDevice },
         };
 
@@ -331,7 +331,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12PipelineState::GetCachedBlob(ID3DBlob** 
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {

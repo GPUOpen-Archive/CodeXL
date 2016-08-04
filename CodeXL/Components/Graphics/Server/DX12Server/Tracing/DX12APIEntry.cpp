@@ -30,8 +30,6 @@
 DX12APIEntry::DX12APIEntry(UINT inThreadId, IUnknown* inInterfaceWrapper, FuncId inFunctionId, const std::string& inArguments, INT64 inReturnValue, ReturnDisplayType inReturnValueFlags)
     : APIEntry(inThreadId, inFunctionId, inArguments)
     , mWrapperInterface(inInterfaceWrapper)
-    , mNumParameters(0)
-    , mParameterBuffer(nullptr)
     , mReturnValue(inReturnValue)
     , mReturnValueFlags(inReturnValueFlags)
     , mSampleId(0)
@@ -50,10 +48,8 @@ DX12APIEntry::DX12APIEntry(UINT inThreadId, IUnknown* inInterfaceWrapper, FuncId
 /// \param inParameters A ParameterEntry structure describing the parameter metadata for this API call.
 //-----------------------------------------------------------------------------
 DX12APIEntry::DX12APIEntry(UINT inThreadId, IUnknown* inInterfaceWrapper, FuncId inFunctionId, UINT32 inNumParameters, ParameterEntry* inParameters)
-    : APIEntry(inThreadId, inFunctionId)
+    : APIEntry(inThreadId, inFunctionId, inNumParameters)
     , mWrapperInterface(inInterfaceWrapper)
-    , mNumParameters(inNumParameters)
-    , mParameterBuffer(nullptr)
     , mReturnValue(FUNCTION_RETURNS_VOID)
     , mReturnValueFlags(RETURN_VALUE_DECIMAL)
     , mSampleId(0)
@@ -61,25 +57,12 @@ DX12APIEntry::DX12APIEntry(UINT inThreadId, IUnknown* inInterfaceWrapper, FuncId
     , mPostBottomTimestamp(0)
     , mbGotProfileResults(false)
 {
-    if (inNumParameters != 0)
+    if (mParameterBuffer != nullptr)
     {
-        mParameterBuffer = new char[inNumParameters * BYTES_PER_PARAMETER];
-
-        for (UINT32 loop = 0; loop < inNumParameters; loop++)
+        for (UINT32 i = 0; i < inNumParameters; i++)
         {
-            AddParameter(loop, inParameters[loop].mType, inParameters[loop].mData);
+            AddParameter(i, inParameters[i].mType, inParameters[i].mData);
         }
-    }
-}
-
-//-----------------------------------------------------------------------------
-/// Virtual destructor since this is a derived class.
-//-----------------------------------------------------------------------------
-DX12APIEntry::~DX12APIEntry()
-{
-    if (mParameterBuffer)
-    {
-        SAFE_DELETE_ARRAY(mParameterBuffer);
     }
 }
 
@@ -316,42 +299,6 @@ void DX12APIEntry::AddParameter(unsigned int index, int type, const void* pParam
                 length = (char)sizeof(size_t);
                 break;
 
-            case PARAMETER_DXGI_FORMAT:
-                length = (char)sizeof(DXGI_FORMAT);
-                break;
-
-            case PARAMETER_PRIMITIVE_TOPOLOGY:
-                length = (char)sizeof(D3D12_PRIMITIVE_TOPOLOGY);
-                break;
-
-            case PARAMETER_QUERY_TYPE:
-                length = (char)sizeof(D3D12_QUERY_TYPE);
-                break;
-
-            case PARAMETER_PREDICATION_OP:
-                length = (char)sizeof(D3D12_PREDICATION_OP);
-                break;
-
-            case PARAMETER_COMMAND_LIST:
-                length = (char)sizeof(D3D12_COMMAND_LIST_TYPE);
-                break;
-
-            case PARAMETER_FEATURE:
-                length = (char)sizeof(D3D12_FEATURE);
-                break;
-
-            case PARAMETER_DESCRIPTOR_HEAP:
-                length = (char)sizeof(D3D12_DESCRIPTOR_HEAP_TYPE);
-                break;
-
-            case PARAMETER_HEAP_TYPE:
-                length = (char)sizeof(D3D12_HEAP_TYPE);
-                break;
-
-            case PARAMETER_RESOURCE_STATES:
-                length = (char)sizeof(D3D12_RESOURCE_STATES);
-                break;
-
             case PARAMETER_STRING:
                 length = (char)strlen((const char*)pParameterValue);
                 length++;                       // add null terminator to length
@@ -375,6 +322,42 @@ void DX12APIEntry::AddParameter(unsigned int index, int type, const void* pParam
                     length = ((bufferLength - 2) & 0xfffffffe);
                 }
 
+                break;
+
+            case PARAMETER_DX12_DXGI_FORMAT:
+                length = (char)sizeof(DXGI_FORMAT);
+                break;
+
+            case PARAMETER_DX12_PRIMITIVE_TOPOLOGY:
+                length = (char)sizeof(D3D12_PRIMITIVE_TOPOLOGY);
+                break;
+
+            case PARAMETER_DX12_QUERY_TYPE:
+                length = (char)sizeof(D3D12_QUERY_TYPE);
+                break;
+
+            case PARAMETER_DX12_PREDICATION_OP:
+                length = (char)sizeof(D3D12_PREDICATION_OP);
+                break;
+
+            case PARAMETER_DX12_COMMAND_LIST:
+                length = (char)sizeof(D3D12_COMMAND_LIST_TYPE);
+                break;
+
+            case PARAMETER_DX12_FEATURE:
+                length = (char)sizeof(D3D12_FEATURE);
+                break;
+
+            case PARAMETER_DX12_DESCRIPTOR_HEAP:
+                length = (char)sizeof(D3D12_DESCRIPTOR_HEAP_TYPE);
+                break;
+
+            case PARAMETER_DX12_HEAP_TYPE:
+                length = (char)sizeof(D3D12_HEAP_TYPE);
+                break;
+
+            case PARAMETER_DX12_RESOURCE_STATES:
+                length = (char)sizeof(D3D12_RESOURCE_STATES);
                 break;
 
             default:
@@ -477,7 +460,28 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
             break;
         }
 
-        case PARAMETER_GUID:
+        case PARAMETER_SIZE_T:
+        {
+            size_t data = 0;
+            memcpy(&data, pRawData, sizeof(size_t));
+            StringCbPrintf(ioParameterString, bufferLength, "%Iu", data);
+            break;
+        }
+
+        case PARAMETER_STRING:
+        {
+            // copy string data directly to output buffer
+            memcpy_s(ioParameterString, bufferLength, pRawData, dataLength);
+            break;
+        }
+
+        case PARAMETER_WIDE_STRING:
+        {
+            StringCbPrintf(ioParameterString, bufferLength, "%ls", pRawData);
+            break;
+        }
+
+        case PARAMETER_DX12_GUID:
         {
             GUID guid = {};
             memcpy(&guid, pRawData, sizeof(GUID));
@@ -487,7 +491,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
             break;
         }
 
-        case PARAMETER_REFIID:
+        case PARAMETER_DX12_REFIID:
         {
             IID riid = {};
             memcpy(&riid, pRawData, sizeof(IID));
@@ -497,15 +501,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
             break;
         }
 
-        case PARAMETER_SIZE_T:
-        {
-            size_t data = 0;
-            memcpy(&data, pRawData, sizeof(size_t));
-            StringCbPrintf(ioParameterString, bufferLength, "%Iu", data);
-            break;
-        }
-
-        case PARAMETER_DXGI_FORMAT:
+        case PARAMETER_DX12_DXGI_FORMAT:
         {
             DXGI_FORMAT format = {};
             memcpy(&format, pRawData, sizeof(DXGI_FORMAT));
@@ -514,7 +510,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
             break;
         }
 
-        case PARAMETER_PRIMITIVE_TOPOLOGY:
+        case PARAMETER_DX12_PRIMITIVE_TOPOLOGY:
         {
             D3D12_PRIMITIVE_TOPOLOGY primitiveTopology = {};
             memcpy(&primitiveTopology, pRawData, sizeof(D3D12_PRIMITIVE_TOPOLOGY));
@@ -522,7 +518,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
             break;
         }
 
-        case PARAMETER_QUERY_TYPE:
+        case PARAMETER_DX12_QUERY_TYPE:
         {
             D3D12_QUERY_TYPE type = {};
             memcpy(&type, pRawData, sizeof(D3D12_QUERY_TYPE));
@@ -530,7 +526,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
             break;
         }
 
-        case PARAMETER_PREDICATION_OP:
+        case PARAMETER_DX12_PREDICATION_OP:
         {
             D3D12_PREDICATION_OP operation = {};
             memcpy(&operation, pRawData, sizeof(D3D12_PREDICATION_OP));
@@ -538,7 +534,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
             break;
         }
 
-        case PARAMETER_COMMAND_LIST:
+        case PARAMETER_DX12_COMMAND_LIST:
         {
             D3D12_COMMAND_LIST_TYPE type = {};
             memcpy(&type, pRawData, sizeof(D3D12_COMMAND_LIST_TYPE));
@@ -546,7 +542,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
             break;
         }
 
-        case PARAMETER_FEATURE:
+        case PARAMETER_DX12_FEATURE:
         {
             D3D12_FEATURE feature = {};
             memcpy(&feature, pRawData, sizeof(D3D12_FEATURE));
@@ -554,7 +550,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
             break;
         }
 
-        case PARAMETER_DESCRIPTOR_HEAP:
+        case PARAMETER_DX12_DESCRIPTOR_HEAP:
         {
             D3D12_DESCRIPTOR_HEAP_TYPE type = {};
             memcpy(&type, pRawData, sizeof(D3D12_DESCRIPTOR_HEAP_TYPE));
@@ -562,7 +558,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
             break;
         }
 
-        case PARAMETER_HEAP_TYPE:
+        case PARAMETER_DX12_HEAP_TYPE:
         {
             D3D12_HEAP_TYPE type = {};
             memcpy(&type, pRawData, sizeof(D3D12_HEAP_TYPE));
@@ -570,7 +566,7 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
             break;
         }
 
-        case PARAMETER_RESOURCE_STATES:
+        case PARAMETER_DX12_RESOURCE_STATES:
         {
             D3D12_RESOURCE_STATES states = {};
             memcpy(&states, pRawData, sizeof(D3D12_RESOURCE_STATES));
@@ -578,17 +574,10 @@ void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dat
             break;
         }
 
-        case PARAMETER_STRING:
-            // copy string data directly to output buffer
-            memcpy_s(ioParameterString, bufferLength, pRawData, dataLength);
-            break;
-
-        case PARAMETER_WIDE_STRING:
-            StringCbPrintf(ioParameterString, bufferLength, "%ls", pRawData);
-            break;
-
         default:
+        {
             PsAssert(0);
             break;
+        }
     }
 }

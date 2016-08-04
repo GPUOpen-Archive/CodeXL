@@ -17,6 +17,8 @@
 APIEntry::APIEntry(UINT inThreadId, FuncId inFuncId, const std::string& inArguments)
     : mThreadId(inThreadId)
     , mFunctionId(inFuncId)
+    , mNumParameters(0)
+    , mParameterBuffer(nullptr)
 {
     mParameters = inArguments.c_str();
 }
@@ -25,11 +27,19 @@ APIEntry::APIEntry(UINT inThreadId, FuncId inFuncId, const std::string& inArgume
 /// Constructor used to initialize members of new CallData instances.
 /// \param inThreadId The thread Id that the call was invoked from.
 /// \param inFuncId The function ID of this API call
+/// \param inNumParameters The number of params for this api call
 //--------------------------------------------------------------------------
-APIEntry::APIEntry(UINT inThreadId, FuncId inFuncId)
+APIEntry::APIEntry(UINT inThreadId, FuncId inFuncId, UINT32 inNumParameters)
     : mThreadId(inThreadId)
     , mFunctionId(inFuncId)
+    , mNumParameters(inNumParameters)
+    , mParameterBuffer(nullptr)
+    , mParameters("")
 {
+    if (inNumParameters != 0)
+    {
+        mParameterBuffer = new char[inNumParameters * BYTES_PER_PARAMETER];
+    }
 }
 
 //--------------------------------------------------------------------------
@@ -37,6 +47,7 @@ APIEntry::APIEntry(UINT inThreadId, FuncId inFuncId)
 //--------------------------------------------------------------------------
 APIEntry::~APIEntry()
 {
+    SAFE_DELETE_ARRAY(mParameterBuffer);
 }
 
 //-----------------------------------------------------------------------------
@@ -82,5 +93,79 @@ void APIEntry::PrintReturnValue(const INT64 inReturnValue, const ReturnDisplayTy
     else
     {
         ioReturnValue.appendFormattedString("%s", resultString);
+    }
+}
+
+//-----------------------------------------------------------------------------
+/// Get the API parameters as a single string. Build the string from the
+/// individual parameters if necessary
+/// \return parameter string
+//-----------------------------------------------------------------------------
+const char* APIEntry::GetParameterString() const
+{
+    static gtASCIIString parameterString;
+
+    if (mNumParameters == 0)
+    {
+        return mParameters.asCharArray();
+    }
+    else
+    {
+        parameterString = "";
+        // get the API function parameters from the raw memory buffer
+        int arrayCount = 0;
+        char* buffer = mParameterBuffer;
+
+        if (buffer != nullptr)
+        {
+            for (UINT32 loop = 0; loop < mNumParameters; loop++)
+            {
+                char* ptr = buffer;
+                PARAMETER_TYPE paramType;
+                memcpy(&paramType, ptr, sizeof(PARAMETER_TYPE));
+                ptr += sizeof(PARAMETER_TYPE);
+                unsigned char length = *ptr++;
+
+                if (length < BYTES_PER_PARAMETER)
+                {
+                    // if an array token is found, add an opening brace and start the array elements countdown
+                    if (paramType == PARAMETER_ARRAY)
+                    {
+                        memcpy(&arrayCount, ptr, sizeof(unsigned int));
+                        parameterString += "[ ";
+                    }
+                    else
+                    {
+                        char parameter[BYTES_PER_PARAMETER] = {};
+
+                        GetParameterAsString(paramType, length, ptr, parameter);
+                        parameterString += parameter;
+
+                        // check to see if this is the last array element. If so, output a closing brace
+                        // before the comma separator (if needed)
+                        if (arrayCount > 0)
+                        {
+                            arrayCount--;
+
+                            if (arrayCount == 0)
+                            {
+                                parameterString += " ]";
+                            }
+                        }
+
+                        // if there are more parameters to come, insert a comma delimiter
+                        if ((loop + 1) < mNumParameters)
+                        {
+                            parameterString += ", ";
+                        }
+                    }
+                }
+
+                // point to next parameter in the buffer
+                buffer += BYTES_PER_PARAMETER;
+            }
+        }
+
+        return parameterString.asCharArray();
     }
 }

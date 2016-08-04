@@ -54,11 +54,11 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::QueryInterface(REFIID riid, void
     {
         DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-        if (interceptor && interceptor->ShouldCollectTrace())
+        if (interceptor->ShouldCollectTrace())
         {
             ParameterEntry parameters[] =
             {
-                { PARAMETER_REFIID, &riid },
+                { PARAMETER_DX12_REFIID, &riid },
                 { PARAMETER_POINTER, ppvObject },
             };
 
@@ -97,7 +97,7 @@ ULONG STDMETHODCALLTYPE Wrapped_ID3D12Device::AddRef()
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         DX12APIEntry* pNewEntry = interceptor->PreCall(this, FuncId_IUnknown_AddRef, 0, nullptr);
         result = mRealDevice->AddRef();
@@ -124,7 +124,7 @@ ULONG STDMETHODCALLTYPE Wrapped_ID3D12Device::Release()
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         DX12APIEntry* pNewEntry = interceptor->PreCall(this, FuncId_IUnknown_Release, 0, nullptr);
         result = mRealDevice->Release();
@@ -164,11 +164,11 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::GetPrivateData(REFGUID guid, UIN
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
-            { PARAMETER_GUID, &guid },
+            { PARAMETER_DX12_GUID, &guid },
             { PARAMETER_POINTER, pDataSize },
             { PARAMETER_POINTER, pData },
         };
@@ -199,11 +199,11 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::SetPrivateData(REFGUID guid, UIN
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
-            { PARAMETER_GUID, &guid },
+            { PARAMETER_DX12_GUID, &guid },
             { PARAMETER_UNSIGNED_INT, &DataSize },
             { PARAMETER_POINTER, pData },
         };
@@ -234,11 +234,11 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::SetPrivateDataInterface(REFGUID 
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
-            { PARAMETER_GUID, &guid },
+            { PARAMETER_DX12_GUID, &guid },
             { PARAMETER_POINTER_SPECIAL, pData },
         };
 
@@ -268,7 +268,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::SetName(LPCWSTR Name)
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -301,7 +301,7 @@ UINT STDMETHODCALLTYPE Wrapped_ID3D12Device::GetNodeCount()
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         DX12APIEntry* pNewEntry = interceptor->PreCall(this, FuncId_ID3D12Device_GetNodeCount, 0, nullptr);
         result = mRealDevice->GetNodeCount();
@@ -328,12 +328,12 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::CreateCommandQueue(const D3D12_C
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
             { PARAMETER_POINTER, pDesc },
-            { PARAMETER_REFIID, &riid },
+            { PARAMETER_DX12_REFIID, &riid },
             { PARAMETER_POINTER, ppCommandQueue },
         };
 
@@ -372,12 +372,12 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::CreateCommandAllocator(D3D12_COM
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
-            { PARAMETER_COMMAND_LIST, &type },
-            { PARAMETER_REFIID, &riid },
+            { PARAMETER_DX12_COMMAND_LIST, &type },
+            { PARAMETER_DX12_REFIID, &riid },
             { PARAMETER_POINTER, ppCommandAllocator },
         };
 
@@ -418,12 +418,12 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::CreateGraphicsPipelineState(cons
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
             { PARAMETER_POINTER, pDesc },
-            { PARAMETER_REFIID, &riid },
+            { PARAMETER_DX12_REFIID, &riid },
             { PARAMETER_POINTER, ppPipelineState },
         };
 
@@ -461,12 +461,12 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::CreateComputePipelineState(const
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
             { PARAMETER_POINTER, pDesc },
-            { PARAMETER_REFIID, &riid },
+            { PARAMETER_DX12_REFIID, &riid },
             { PARAMETER_POINTER, ppPipelineState },
         };
 
@@ -506,15 +506,15 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::CreateCommandList(UINT nodeMask,
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
             { PARAMETER_UNSIGNED_INT, &nodeMask },
-            { PARAMETER_COMMAND_LIST, &type },
+            { PARAMETER_DX12_COMMAND_LIST, &type },
             { PARAMETER_POINTER_SPECIAL, pCommandAllocator },
             { PARAMETER_POINTER_SPECIAL, pInitialState },
-            { PARAMETER_REFIID, &riid },
+            { PARAMETER_DX12_REFIID, &riid },
             { PARAMETER_POINTER, ppCommandList },
         };
 
@@ -558,11 +558,11 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::CheckFeatureSupport(D3D12_FEATUR
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
-            { PARAMETER_FEATURE, &Feature },
+            { PARAMETER_DX12_FEATURE, &Feature },
             { PARAMETER_POINTER, pFeatureSupportData },
             { PARAMETER_UNSIGNED_INT, &FeatureSupportDataSize },
         };
@@ -593,12 +593,12 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::CreateDescriptorHeap(const D3D12
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
             { PARAMETER_POINTER, pDescriptorHeapDesc },
-            { PARAMETER_REFIID, &riid },
+            { PARAMETER_DX12_REFIID, &riid },
             { PARAMETER_POINTER, ppvHeap },
         };
 
@@ -637,11 +637,11 @@ UINT STDMETHODCALLTYPE Wrapped_ID3D12Device::GetDescriptorHandleIncrementSize(D3
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
-            { PARAMETER_DESCRIPTOR_HEAP, &DescriptorHeapType },
+            { PARAMETER_DX12_DESCRIPTOR_HEAP, &DescriptorHeapType },
         };
 
         int numParameters = (sizeof(parameters) / sizeof(parameters[0]));
@@ -670,14 +670,14 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::CreateRootSignature(UINT nodeMas
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
             { PARAMETER_UNSIGNED_INT, &nodeMask },
             { PARAMETER_POINTER, pBlobWithRootSignature },
             { PARAMETER_SIZE_T, &blobLengthInBytes },
-            { PARAMETER_REFIID, &riid },
+            { PARAMETER_DX12_REFIID, &riid },
             { PARAMETER_POINTER, ppvRootSignature },
         };
 
@@ -714,7 +714,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12Device::CreateConstantBufferView(const D3D1
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -747,7 +747,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12Device::CreateShaderResourceView(ID3D12Reso
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -783,7 +783,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12Device::CreateUnorderedAccessView(ID3D12Res
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -818,7 +818,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12Device::CreateRenderTargetView(ID3D12Resour
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -852,7 +852,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12Device::CreateDepthStencilView(ID3D12Resour
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -883,7 +883,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12Device::CreateSampler(const D3D12_SAMPLER_D
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -913,7 +913,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12Device::CopyDescriptors(UINT NumDestDescrip
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         int maxParameters = ((NumDestDescriptorRanges + NumSrcDescriptorRanges) * 2) + 3;
         int numParameters = 0;
@@ -969,7 +969,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12Device::CopyDescriptors(UINT NumDestDescrip
             }
         }
 
-        parameters[numParameters].mType = PARAMETER_DESCRIPTOR_HEAP;
+        parameters[numParameters].mType = PARAMETER_DX12_DESCRIPTOR_HEAP;
         parameters[numParameters].mData = &DescriptorHeapsType;
         numParameters++;
 
@@ -995,14 +995,14 @@ void STDMETHODCALLTYPE Wrapped_ID3D12Device::CopyDescriptorsSimple(UINT NumDescr
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
             { PARAMETER_UNSIGNED_INT, &NumDescriptors },
             { PARAMETER_POINTER, (void*)DestDescriptorRangeStart.ptr },
             { PARAMETER_POINTER, (void*)SrcDescriptorRangeStart.ptr },
-            { PARAMETER_DESCRIPTOR_HEAP, &DescriptorHeapsType },
+            { PARAMETER_DX12_DESCRIPTOR_HEAP, &DescriptorHeapsType },
         };
 
         int numParameters = (sizeof(parameters) / sizeof(parameters[0]));
@@ -1029,7 +1029,7 @@ D3D12_RESOURCE_ALLOCATION_INFO STDMETHODCALLTYPE Wrapped_ID3D12Device::GetResour
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1065,12 +1065,12 @@ D3D12_HEAP_PROPERTIES STDMETHODCALLTYPE Wrapped_ID3D12Device::GetCustomHeapPrope
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
             { PARAMETER_UNSIGNED_INT, &nodeMask },
-            { PARAMETER_HEAP_TYPE, &heapType },
+            { PARAMETER_DX12_HEAP_TYPE, &heapType },
         };
 
         int numParameters = (sizeof(parameters) / sizeof(parameters[0]));
@@ -1100,16 +1100,16 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::CreateCommittedResource(const D3
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
             { PARAMETER_POINTER, pHeapProperties },
             { PARAMETER_UNSIGNED_INT, &HeapFlags },
             { PARAMETER_POINTER, pResourceDesc },
-            { PARAMETER_RESOURCE_STATES, &InitialResourceState },
+            { PARAMETER_DX12_RESOURCE_STATES, &InitialResourceState },
             { PARAMETER_POINTER, pOptimizedClearValue },
-            { PARAMETER_REFIID, &riidResource },
+            { PARAMETER_DX12_REFIID, &riidResource },
             { PARAMETER_POINTER, ppvResource },
         };
 
@@ -1148,12 +1148,12 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::CreateHeap(const D3D12_HEAP_DESC
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
             { PARAMETER_POINTER, pDesc },
-            { PARAMETER_REFIID, &riid },
+            { PARAMETER_DX12_REFIID, &riid },
             { PARAMETER_POINTER, ppvHeap },
         };
 
@@ -1194,16 +1194,16 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::CreatePlacedResource(ID3D12Heap*
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
             { PARAMETER_POINTER_SPECIAL, pHeap },
             { PARAMETER_UINT64, &HeapOffset },
             { PARAMETER_POINTER, pDesc },
-            { PARAMETER_RESOURCE_STATES, &InitialState },
+            { PARAMETER_DX12_RESOURCE_STATES, &InitialState },
             { PARAMETER_POINTER, pOptimizedClearValue },
-            { PARAMETER_REFIID, &riid },
+            { PARAMETER_DX12_REFIID, &riid },
             { PARAMETER_POINTER, ppvResource },
         };
 
@@ -1242,14 +1242,14 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::CreateReservedResource(const D3D
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
             { PARAMETER_POINTER, pDesc },
-            { PARAMETER_RESOURCE_STATES, &InitialState },
+            { PARAMETER_DX12_RESOURCE_STATES, &InitialState },
             { PARAMETER_POINTER, pOptimizedClearValue },
-            { PARAMETER_REFIID, &riid },
+            { PARAMETER_DX12_REFIID, &riid },
             { PARAMETER_POINTER, ppvResource },
         };
 
@@ -1290,7 +1290,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::CreateSharedHandle(ID3D12DeviceC
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1327,12 +1327,12 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::OpenSharedHandle(HANDLE NTHandle
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
             { PARAMETER_POINTER, NTHandle },
-            { PARAMETER_REFIID, &riid },
+            { PARAMETER_DX12_REFIID, &riid },
             { PARAMETER_POINTER, ppvObj },
         };
 
@@ -1362,7 +1362,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::OpenSharedHandleByName(LPCWSTR N
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1409,7 +1409,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::MakeResident(UINT NumObjects, ID
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         int numParameters = NumObjects + 1;
         ParameterEntry* parameters = new ParameterEntry[numParameters];
@@ -1462,7 +1462,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::Evict(UINT NumObjects, ID3D12Pag
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         int numParameters = NumObjects + 1;
         ParameterEntry* parameters = new ParameterEntry[numParameters];
@@ -1503,13 +1503,13 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::CreateFence(UINT64 InitialValue,
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
             { PARAMETER_UINT64, &InitialValue },
             { PARAMETER_UNSIGNED_INT, &Flags },
-            { PARAMETER_REFIID, &riid },
+            { PARAMETER_DX12_REFIID, &riid },
             { PARAMETER_POINTER, ppFence },
         };
 
@@ -1548,7 +1548,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::GetDeviceRemovedReason()
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         DX12APIEntry* pNewEntry = interceptor->PreCall(this, FuncId_ID3D12Device_GetDeviceRemovedReason, 0, nullptr);
         result = mRealDevice->GetDeviceRemovedReason();
@@ -1573,7 +1573,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12Device::GetCopyableFootprints(const D3D12_R
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         UINT numRows = pNumRows != nullptr ? *pNumRows : 0;
         UINT64 rowSizeInBytes = pRowSizeInBytes != nullptr ? *pRowSizeInBytes : 0;
@@ -1615,12 +1615,12 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::CreateQueryHeap(const D3D12_QUER
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
             { PARAMETER_POINTER, pDesc },
-            { PARAMETER_REFIID, &riid },
+            { PARAMETER_DX12_REFIID, &riid },
             { PARAMETER_POINTER, ppvHeap },
         };
 
@@ -1659,7 +1659,7 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::SetStablePowerState(BOOL Enable)
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
@@ -1694,13 +1694,13 @@ HRESULT STDMETHODCALLTYPE Wrapped_ID3D12Device::CreateCommandSignature(const D3D
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         ParameterEntry parameters[] =
         {
             { PARAMETER_POINTER_SPECIAL, pDesc },
             { PARAMETER_POINTER_SPECIAL, pRootSignature },
-            { PARAMETER_REFIID, &riid },
+            { PARAMETER_DX12_REFIID, &riid },
             { PARAMETER_POINTER, ppvCommandSignature },
         };
 
@@ -1741,7 +1741,7 @@ void STDMETHODCALLTYPE Wrapped_ID3D12Device::GetResourceTiling(ID3D12Resource* p
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         // print variables with nullptr pointer check
         UINT numTilesForEntireResource = 0;
@@ -1793,7 +1793,7 @@ LUID STDMETHODCALLTYPE Wrapped_ID3D12Device::GetAdapterLuid()
 
     DX12Interceptor* interceptor = GetDX12LayerManager()->GetInterceptor();
 
-    if (interceptor && interceptor->ShouldCollectTrace())
+    if (interceptor->ShouldCollectTrace())
     {
         DX12APIEntry* pNewEntry = interceptor->PreCall(this, FuncId_ID3D12Device_GetAdapterLuid, 0);
         result = mRealDevice->GetAdapterLuid();
