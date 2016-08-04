@@ -288,8 +288,9 @@ private:
     void DisplayItemInPropertiesView(acTimelineItem* pItem);
 
     /// Checks whether the parser should be stopped due to too many api calls
+    /// \param curEndTime the end time of the item being parsed
     /// \return true if the parser should stop, false otherwise
-    bool CheckStopParsing();
+    bool CheckStopParsing(quint64 curEndTime);
 
     TraceSession*                            m_pCurrentSession;        ///< the current session
     QSplitter*                               m_pMainSplitter;           ///< the splitter for the main view
@@ -338,7 +339,8 @@ private:
     unsigned int m_parseCallsCounter;                                   /// <Is used to count the amount of parse calls, so that we will update the UI only every 1000 calls
 
     bool m_alreadyDisplayedAPILimitMessage;                             /// <Flag indicating whether or not we've already displayed the api limit message for this session
-    bool m_shouldStopParsing;                                           /// <Flag indicating whether or not we should stop parsing. (We parse until we exceed a pre-defined limit, and then ask the user if we should continue):
+    bool m_shouldStopParsing;                                           /// <Flag indicating whether or not we should stop parsing. (We parse until we exceed a pre-defined limit, and then ask the user if we should continue)
+    quint64 m_maxTimestampWhenParsingStopped;                           /// <The max end timestamp for the timeline -- used to know where parsing stopped when the API limit was reached
 
     APIToTrace                              m_api;                      /// < API type for the currently loaded session
     bool m_isProgressRangeSet;                                          /// < true iff the progress range from the backend parser is already set

@@ -281,12 +281,30 @@ bool HSAAtpFilePart::Parse(std::istream& in, std::string& outErrorMsg)
 
     do
     {
+        string line;
+
         if (m_shouldStopParsing)
         {
-            break;
+            // proceed to the next section and continue parsing there
+            line.clear();
+
+            while (line[0] != '=')
+            {
+                READLINE(line)
+            }
+
+            if (line.length() == 0)
+            {
+                continue;
+            }
+
+            if (line[0] == '=')
+            {
+                m_shouldStopParsing = false;
+                RewindToPreviousPos(in);
+            }
         }
 
-        string line;
         READLINE(line)
 
         if (line.length() == 0)
@@ -309,7 +327,7 @@ bool HSAAtpFilePart::Parse(std::istream& in, std::string& outErrorMsg)
                 {
                     bKTSStart = true;
                     strProgressMessage = "Parsing Kernel Timestamp Data...";
-                    // read thread id
+                    // read api count
                     ReadLine(in, line);
                 }
                 else

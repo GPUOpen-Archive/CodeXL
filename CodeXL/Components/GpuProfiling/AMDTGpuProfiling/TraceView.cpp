@@ -82,6 +82,7 @@ TraceView::TraceView(QWidget* parent) : gpBaseSessionView(parent),
     m_parseCallsCounter(0),
     m_alreadyDisplayedAPILimitMessage(false),
     m_shouldStopParsing(false),
+    m_maxTimestampWhenParsingStopped(0),
     m_isProgressRangeSet(false)
 {
     BuildWindowLayout();
@@ -138,6 +139,7 @@ bool TraceView::DisplaySession(const osFilePath& sessionFilePath, afTreeItemType
         m_pCurrentSession = nullptr;
         m_alreadyDisplayedAPILimitMessage = false;
         m_shouldStopParsing = false;
+        m_maxTimestampWhenParsingStopped = 0;
         m_pCurrentSession = qobject_cast <TraceSession*> (m_pSessionData);
 
 
@@ -828,7 +830,7 @@ void TraceView::SetAPINum(osThreadId threadId, unsigned int apiNum)
     }
 }
 
-bool TraceView::CheckStopParsing()
+bool TraceView::CheckStopParsing(quint64 curEndTime)
 {
     bool stopParsing = false;
 
@@ -836,6 +838,13 @@ bool TraceView::CheckStopParsing()
     // On linux this limitation is not relevant, so we do not stop parse:
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     stopParsing = m_parseCallsCounter >= s_MAX_TRACE_ENTRIES;
+
+    if (stopParsing)
+    {
+        // CODEXL-3550: If the API limit was reached, continue to parse additional items (HSA kernel timestamps, perf markers, etc.), up to the point (in time) where api parsing stopped.
+        // This ensures that the partial timeline shown will at least be complete (in the sense that all items in the given timespan will be shown):
+        stopParsing = ((0 == m_maxTimestampWhenParsingStopped || curEndTime != std::numeric_limits<quint64>::max()) && curEndTime > m_maxTimestampWhenParsingStopped);
+    }
 
     if (stopParsing && !m_alreadyDisplayedAPILimitMessage)
     {
@@ -845,6 +854,11 @@ bool TraceView::CheckStopParsing()
         m_shouldStopParsing = stopParsing = (userAnswer == QMessageBox::Yes);
 
         m_alreadyDisplayedAPILimitMessage = true;
+
+        if (m_shouldStopParsing)
+        {
+            m_maxTimestampWhenParsingStopped = curEndTime;
+        }
     }
     else if (stopParsing && m_alreadyDisplayedAPILimitMessage)
     {
@@ -861,9 +875,13 @@ void TraceView::OnParse(CLAPIInfo* pAPIInfo, bool& stopParsing)
     // Save the API type for later use:
     m_api = APIToTrace_OPENCL;
 
+    stopParsing = CheckStopParsing(pAPIInfo->m_ullEnd);
     m_parseCallsCounter++;
-    HandleCLAPIInfo(pAPIInfo);
-    stopParsing = CheckStopParsing();
+
+    if (!stopParsing)
+    {
+        HandleCLAPIInfo(pAPIInfo);
+    }
 }
 
 void TraceView::OnParse(HSAAPIInfo* pAPIInfo, bool& stopParsing)
@@ -871,24 +889,36 @@ void TraceView::OnParse(HSAAPIInfo* pAPIInfo, bool& stopParsing)
     // Save the API type for later use:
     m_api = APIToTrace_HSA;
 
+    stopParsing = CheckStopParsing(pAPIInfo->m_ullEnd);
     m_parseCallsCounter++;
-    HandleHSAAPIInfo(pAPIInfo);
-    stopParsing = CheckStopParsing();
+
+    if (!stopParsing)
+    {
+        HandleHSAAPIInfo(pAPIInfo);
+    }
 }
 
 void TraceView::OnParse(SymbolFileEntry* pSymFileEntry, bool& stopParsing)
 {
     AGP_TODO("should check the module of pSymFileEntry and match it up to that module's APIs. This will be needed to properly support multi-module traces (i.e. traces that contain both HSA and OCL)")
     m_parseCallsCounter++;
-    HandleSymFileEntry(pSymFileEntry);
-    stopParsing = CheckStopParsing();
+    stopParsing = CheckStopParsing(std::numeric_limits<quint64>::max());
+
+    if (!stopParsing)
+    {
+        HandleSymFileEntry(pSymFileEntry);
+    }
 }
 
 void TraceView::OnParse(PerfMarkerEntry* pPerfMarkerEntry, bool& stopParsing)
 {
+    stopParsing = CheckStopParsing(pPerfMarkerEntry->m_timestamp);
     m_parseCallsCounter++;
-    HandlePerfMarkerEntry(pPerfMarkerEntry);
-    stopParsing = CheckStopParsing();
+
+    if (!stopParsing)
+    {
+        HandlePerfMarkerEntry(pPerfMarkerEntry);
+    }
 }
 
 void TraceView::OnParserProgress(const std::string& strProgressMessage, unsigned int uiCurItem, unsigned int uiTotalItems)
