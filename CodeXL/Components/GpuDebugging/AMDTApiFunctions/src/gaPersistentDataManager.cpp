@@ -400,7 +400,7 @@ void gaPersistentDataManager::onAPIConnectionEstablishedEvent(const apApiConnect
 
             if (pdProcessDebugger::instance().isDebuggedProcssSuspended())
             {
-                pdProcessDebugger::instance().suspendDebuggedProcess();
+                pdProcessDebugger::instance().resumeDebuggedProcess();
                 suspendAfter = true;
             }
 
@@ -410,7 +410,7 @@ void gaPersistentDataManager::onAPIConnectionEstablishedEvent(const apApiConnect
 
             if (suspendAfter)
             {
-                pdProcessDebugger::instance().resumeDebuggedProcess();
+                pdProcessDebugger::instance().suspendHostDebuggedProcess();
             }
         }
         break;
