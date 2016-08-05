@@ -87,7 +87,7 @@ RunTheBuild()
     GPUPROFILER_BACKEND_BUILD=${AMD_BRANCH_ROOT}/CodeXL/Components/GpuProfiling/Build
     GPUPROFILER_BACKEND_BUILD_SCRIPT=${GPUPROFILER_BACKEND_BUILD}/backend_build.sh
 
-    GPUP_BUILD_OPTS="bldnum ${VERSION_BUILD} workspace ${AMD_PERFORCE_ROOT} release-root ${AMD_BRANCH_PART}"
+    GPUP_BUILD_OPTS="bldnum ${VERSION_BUILD}"
     if [ ${BUILDTYPE} = "INTERNAL" ]
     then
        GPUP_BUILD_OPTS=$GPUP_BUILD_OPTS" build-internal-only"
