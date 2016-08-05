@@ -191,19 +191,6 @@ void VktAPIEntry::AddParameter(unsigned int index, int type, const void* pParame
 
             break;
 
-        case PARAMETER_WIDE_STRING:
-            length = (char)wcslen((const LPCWSTR)pParameterValue);
-            length++;                       // add null terminator to length
-            length *= sizeof(WCHAR);        // convert length to bytes
-
-            if (length > bufferLength)
-            {
-                // round down length to even number
-                length = ((bufferLength - 2) & 0xfffffffe);
-            }
-
-            break;
-
         default:
             break;
         }

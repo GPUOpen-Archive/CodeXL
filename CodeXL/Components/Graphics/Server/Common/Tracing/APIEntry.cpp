@@ -31,10 +31,10 @@ APIEntry::APIEntry(UINT inThreadId, FuncId inFuncId, const std::string& inArgume
 //--------------------------------------------------------------------------
 APIEntry::APIEntry(UINT inThreadId, FuncId inFuncId, UINT32 inNumParameters)
     : mThreadId(inThreadId)
+    , mParameters("")
     , mFunctionId(inFuncId)
     , mNumParameters(inNumParameters)
     , mParameterBuffer(nullptr)
-    , mParameters("")
 {
     if (inNumParameters != 0)
     {
