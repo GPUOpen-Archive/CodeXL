@@ -45,7 +45,8 @@ public:
     /// Determine whether we are API-tracing
     inline bool ShouldCollectGPUTime() const { return VktFrameProfilerLayer::Instance()->ShouldCollectGPUTime(); }
 
-    VktAPIEntry* PreCall(FuncId funcId, const char* pArgsString, VktWrappedCmdBuf* pWrappedCmdBuf = nullptr);
+    VktAPIEntry* PreCall(FuncId funcId, ParameterEntry* pParams, int paramCount, VktWrappedCmdBuf* pWrappedCmdBuf = nullptr);
+
     void PostCall(VktAPIEntry* pNewEntry, int returnValue = FUNCTION_RETURNS_VOID);
 
     DeviceInfo InitializeDeviceInfo(VkDevice inDevice, VkPhysicalDevice inGpuHandle);

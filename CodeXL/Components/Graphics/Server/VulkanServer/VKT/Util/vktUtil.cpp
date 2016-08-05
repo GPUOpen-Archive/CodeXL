@@ -1008,6 +1008,63 @@ const char* VktUtil::WritePresentModeKHREnumAsString(int enumVal)
     return pResultString;
 }
 
+const char* VktUtil::WriteDebugReportObjectTypeEXTEnumAsString(int enumVal)
+{
+    const char* pResultString = nullptr;
+
+    switch (enumVal)
+    {
+        // *INDENT-OFF*  to prevent astyle from wrongly indenting this next section
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_UNKNOWN_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_INSTANCE_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_PHYSICAL_DEVICE_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_DEVICE_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_QUEUE_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_SEMAPHORE_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_BUFFER_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_FENCE_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_DEVICE_MEMORY_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_EVENT_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_QUERY_POOL_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_BUFFER_VIEW_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_IMAGE_VIEW_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_SHADER_MODULE_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_CACHE_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_LAYOUT_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_RENDER_PASS_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_PIPELINE_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_SAMPLER_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_DESCRIPTOR_POOL_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_DESCRIPTOR_SET_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_FRAMEBUFFER_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_COMMAND_POOL_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_SURFACE_KHR_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_SWAPCHAIN_KHR_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_OBJECT_TYPE_DEBUG_REPORT_EXT, pResultString);
+        // *INDENT-ON*
+    }
+
+    return pResultString;
+}
+
+const char* VktUtil::WriteDebugReportErrorEXTEnumAsString(int enumVal)
+{
+    const char* pResultString = nullptr;
+
+    switch (enumVal)
+    {
+        // *INDENT-OFF*  to prevent astyle from wrongly indenting this next section
+        PRINTENUMCASE(VK_DEBUG_REPORT_ERROR_NONE_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_ERROR_CALLBACK_REF_EXT, pResultString);
+        // *INDENT-ON*
+    }
+
+    return pResultString;
+}
+
 const char* WriteFormatFeatureFlagsEnumAsString(uint32 flags)
 {
     const char* pResultString = nullptr;
@@ -1805,6 +1862,32 @@ std::string VktUtil::DecomposeCompositeAlphaFlagsEnumAsString(uint32 flags)
 {
     gtASCIIString flagsString;
     VktUtil::DecomposeFlags(flags, flagsString, WriteCompositeAlphaFlagsEnumAsString, VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR, VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR);
+    return flagsString.asCharArray();
+}
+
+const char* WriteDebugReportFlagsEXTEnumAsString(uint32 flags)
+{
+    const char* pResultString = nullptr;
+
+    switch (flags)
+    {
+        // *INDENT-OFF*  to prevent astyle from wrongly indenting this next section
+        PRINTENUMCASE(VK_DEBUG_REPORT_INFORMATION_BIT_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_WARNING_BIT_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_ERROR_BIT_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_DEBUG_BIT_EXT, pResultString);
+        PRINTENUMCASE(VK_DEBUG_REPORT_FLAG_BITS_MAX_ENUM_EXT, pResultString);
+        // *INDENT-ON*
+    }
+
+    return pResultString;
+}
+
+std::string VktUtil::DecomposeDebugReportFlagsEXTEnumAsString(uint32 flags)
+{
+    gtASCIIString flagsString;
+    VktUtil::DecomposeFlags(flags, flagsString, WriteDebugReportFlagsEXTEnumAsString, VK_DEBUG_REPORT_INFORMATION_BIT_EXT, VK_DEBUG_REPORT_FLAG_BITS_MAX_ENUM_EXT);
     return flagsString.asCharArray();
 }
 

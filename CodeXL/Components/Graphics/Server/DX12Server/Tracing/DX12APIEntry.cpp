@@ -144,80 +144,6 @@ void DX12APIEntry::AppendAPITraceLine(gtASCIIString& out, double inStartTime, do
 }
 
 //-----------------------------------------------------------------------------
-/// Get the API parameters as a single string. Build the string from the
-/// individual parameters if necessary
-/// \return parameter string
-//-----------------------------------------------------------------------------
-const char* DX12APIEntry::GetParameterString() const
-{
-    static gtASCIIString parameterString;
-
-    if (mNumParameters == 0)
-    {
-        return mParameters.asCharArray();
-    }
-    else
-    {
-        parameterString = "";
-        // get the API function parameters from the raw memory buffer
-        int arrayCount = 0;
-        char* buffer = mParameterBuffer;
-
-        if (buffer != nullptr)
-        {
-            for (UINT32 loop = 0; loop < mNumParameters; loop++)
-            {
-                char* ptr = buffer;
-                PARAMETER_TYPE paramType;
-                memcpy(&paramType, ptr, sizeof(PARAMETER_TYPE));
-                ptr += sizeof(PARAMETER_TYPE);
-                unsigned char length = *ptr++;
-
-                if (length < BYTES_PER_PARAMETER)
-                {
-                    // if an array token is found, add an opening brace and start the array elements countdown
-                    if (paramType == PARAMETER_ARRAY)
-                    {
-                        memcpy(&arrayCount, ptr, sizeof(unsigned int));
-                        parameterString += "[ ";
-                    }
-                    else
-                    {
-                        char parameter[BYTES_PER_PARAMETER] = {};
-
-                        GetParameterAsString(paramType, length, ptr, parameter);
-                        parameterString += parameter;
-
-                        // check to see if this is the last array element. If so, output a closing brace
-                        // before the comma separator (if needed)
-                        if (arrayCount > 0)
-                        {
-                            arrayCount--;
-
-                            if (arrayCount == 0)
-                            {
-                                parameterString += " ]";
-                            }
-                        }
-
-                        // if there are more parameters to come, insert a comma delimiter
-                        if ((loop + 1) < mNumParameters)
-                        {
-                            parameterString += ", ";
-                        }
-                    }
-                }
-
-                // point to next parameter in the buffer
-                buffer += BYTES_PER_PARAMETER;
-            }
-        }
-
-        return parameterString.asCharArray();
-    }
-}
-
-//-----------------------------------------------------------------------------
 /// Check if this logged APIEntry is a Draw call.
 /// \returns True if the API is a draw call. False if it's not.
 //-----------------------------------------------------------------------------
@@ -390,7 +316,7 @@ void DX12APIEntry::AddParameter(unsigned int index, int type, const void* pParam
 /// \param pRawData a pointer to the raw data
 /// \param ioParameterString a buffer passed in where the string is to be stored
 //-----------------------------------------------------------------------------
-void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, const char dataLength, const char* pRawData, char* ioParameterString) const
+void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, UINT dataLength, const char* pRawData, char* ioParameterString) const
 {
     int bufferLength = BYTES_PER_PARAMETER - 5;
 

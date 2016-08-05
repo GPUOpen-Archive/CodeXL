@@ -53,6 +53,8 @@
     #pragma GCC diagnostic pop
 #endif
 
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
+
 #include "../../../Common/CommonTypes.h"
 #include "../../../Common/misc.h"
 #include "../vktEnumerations.h"
@@ -130,42 +132,45 @@ void ConstructMeasurementInfo(FuncId inFuncId, UINT64 sampleId, VktWrappedCmdBuf
 void DecomposeFlags(UINT flags, gtASCIIString& ioFlagsString, WriteEnum_Hook inWriteHook, UINT inMinFlag, UINT inMaxFlag);
 
 const char* WritePipelineCacheHeaderVersionEnumAsString(int enumVal);
-const char* WriteResultCodeEnumAsString(int inEnumVal);
-const char* WriteStructureTypeEnumAsString(int inEnumVal);
-const char* WriteSystemAllocationScopeEnumAsString(int inEnumVal);
-const char* WriteInternalAllocationTypeEnumAsString(int inEnumVal);
-const char* WriteFormatEnumAsString(int inEnumVal);
-const char* WriteImageTypeEnumAsString(int inEnumVal);
-const char* WriteImageTilingEnumAsString(int inEnumVal);
-const char* WritePhysicalDeviceTypeEnumAsString(int inEnumVal);
-const char* WriteQueryTypeEnumAsString(int inEnumVal);
-const char* WriteSharingModeEnumAsString(int inEnumVal);
-const char* WriteImageLayoutEnumAsString(int inEnumVal);
-const char* WriteImageViewTypeEnumAsString(int inEnumVal);
-const char* WriteComponentSwizzleEnumAsString(int inEnumVal);
-const char* WriteVertexInputRateEnumAsString(int inEnumVal);
-const char* WritePrimitiveTopologyEnumAsString(int inEnumVal);
-const char* WritePolygonModeEnumAsString(int inEnumVal);
-const char* WriteFrontFaceEnumAsString(int inEnumVal);
-const char* WriteCompareOpEnumAsString(int inEnumVal);
-const char* WriteStencilOpEnumAsString(int inEnumVal);
-const char* WriteLogicOpEnumAsString(int inEnumVal);
-const char* WriteBlendFactorEnumAsString(int inEnumVal);
-const char* WriteBlendOpEnumAsString(int inEnumVal);
-const char* WriteDynamicStateEnumAsString(int inEnumVal);
-const char* WriteFilterEnumAsString(int inEnumVal);
-const char* WriteSamplerMipmapModeEnumAsString(int inEnumVal);
-const char* WriteSamplerAddressModeEnumAsString(int inEnumVal);
-const char* WriteBorderColorEnumAsString(int inEnumVal);
-const char* WriteDescriptorTypeEnumAsString(int inEnumVal);
-const char* WriteAttachmentLoadOpEnumAsString(int inEnumVal);
-const char* WriteAttachmentStoreOpEnumAsString(int inEnumVal);
-const char* WritePipelineBindPointEnumAsString(int inEnumVal);
-const char* WriteCmdBufferLevelEnumAsString(int inEnumVal);
-const char* WriteIndexTypeEnumAsString(int inEnumVal);
-const char* WriteSubpassContentsEnumAsString(int inEnumVal);
+const char* WriteResultCodeEnumAsString(int enumVal);
+const char* WriteStructureTypeEnumAsString(int enumVal);
+const char* WriteSystemAllocationScopeEnumAsString(int enumVal);
+const char* WriteInternalAllocationTypeEnumAsString(int enumVal);
+const char* WriteFormatEnumAsString(int enumVal);
+const char* WriteImageTypeEnumAsString(int enumVal);
+const char* WriteImageTilingEnumAsString(int enumVal);
+const char* WritePhysicalDeviceTypeEnumAsString(int enumVal);
+const char* WriteQueryTypeEnumAsString(int enumVal);
+const char* WriteSharingModeEnumAsString(int enumVal);
+const char* WriteImageLayoutEnumAsString(int enumVal);
+const char* WriteImageViewTypeEnumAsString(int enumVal);
+const char* WriteComponentSwizzleEnumAsString(int enumVal);
+const char* WriteVertexInputRateEnumAsString(int enumVal);
+const char* WritePrimitiveTopologyEnumAsString(int enumVal);
+const char* WritePolygonModeEnumAsString(int enumVal);
+const char* WriteFrontFaceEnumAsString(int enumVal);
+const char* WriteCompareOpEnumAsString(int enumVal);
+const char* WriteStencilOpEnumAsString(int enumVal);
+const char* WriteLogicOpEnumAsString(int enumVal);
+const char* WriteBlendFactorEnumAsString(int enumVal);
+const char* WriteBlendOpEnumAsString(int enumVal);
+const char* WriteDynamicStateEnumAsString(int enumVal);
+const char* WriteFilterEnumAsString(int enumVal);
+const char* WriteSamplerMipmapModeEnumAsString(int enumVal);
+const char* WriteSamplerAddressModeEnumAsString(int enumVal);
+const char* WriteBorderColorEnumAsString(int enumVal);
+const char* WriteDescriptorTypeEnumAsString(int enumVal);
+const char* WriteAttachmentLoadOpEnumAsString(int enumVal);
+const char* WriteAttachmentStoreOpEnumAsString(int enumVal);
+const char* WritePipelineBindPointEnumAsString(int enumVal);
+const char* WriteCmdBufferLevelEnumAsString(int enumVal);
+const char* WriteIndexTypeEnumAsString(int enumVal);
+const char* WriteSubpassContentsEnumAsString(int enumVal);
 const char* WriteColorSpaceKHREnumAsString(int enumVal);
 const char* WritePresentModeKHREnumAsString(int enumVal);
+const char* WriteDebugReportObjectTypeEXTEnumAsString(int enumVal);
+const char* WriteDebugReportErrorEXTEnumAsString(int enumVal);
+
 std::string WritePointerAsString(const void* ptr);
 std::string WriteUint64AsString(uint64_t value);
 
@@ -201,6 +206,7 @@ std::string DecomposeQueryControlFlagsEnumAsString(UINT flags);
 std::string DecomposeCommandBufferResetFlagsEnumAsString(UINT flags);
 std::string DecomposeSurfaceTransformFlagBitsKHRFlagsEnumAsString(uint32 flags);
 std::string DecomposeCompositeAlphaFlagsEnumAsString(uint32 flags);
+std::string DecomposeDebugReportFlagsEXTEnumAsString(uint32 flags);
 }
 
 #ifdef _DEBUG

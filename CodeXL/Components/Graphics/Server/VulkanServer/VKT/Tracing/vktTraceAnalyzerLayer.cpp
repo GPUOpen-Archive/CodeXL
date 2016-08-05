@@ -593,17 +593,18 @@ void VktTraceAnalyzerLayer::OnPresent(VkQueue queue, const VkPresentInfoKHR* pPr
 
     if (pInterceptor->ShouldCollectTrace())
     {
-        char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %s",
-                  VktUtil::WritePointerAsString(queue).c_str(),
-                  VktUtil::WritePointerAsString(pPresentInfo).c_str());
+        ParameterEntry parameters[] =
+        {
+            { PARAMETER_VK_HANDLE, &queue },
+            { PARAMETER_VK_HANDLE, &pPresentInfo },
+        };
 
         // precall
         BeforeAPICall();
 
         // postcall
         DWORD threadId = osGetCurrentThreadId();
-        VktAPIEntry* pNewEntry = new VktAPIEntry(threadId, FuncId_vkQueuePresentKHR, argumentsBuffer, nullptr);
+        VktAPIEntry* pNewEntry = new VktAPIEntry(threadId, FuncId_vkQueuePresentKHR, parameters, ARRAY_SIZE(parameters), nullptr);
         pInterceptor->PostCall(pNewEntry);
     }
 }

@@ -143,15 +143,16 @@ DeviceInfo VktInterceptManager::FindDeviceInfo(VkDevice device)
 //-----------------------------------------------------------------------------
 /// Handler used before the real runtime implementation of an API call has been invoked.
 /// \param funcId The function ID for the call being traced.
-/// \param pArgsString The function's arguments.
+/// \param pParams The function's arguments.
+/// \param paramCount The function's number of arguments.
 /// \param pWrappedCmdBuf The number of parameters for this API call.
 //-----------------------------------------------------------------------------
-VktAPIEntry* VktInterceptManager::PreCall(FuncId funcId, const char* pArgsString, VktWrappedCmdBuf* pWrappedCmdBuf)
+VktAPIEntry* VktInterceptManager::PreCall(FuncId funcId, ParameterEntry* pParams, int paramCount, VktWrappedCmdBuf* pWrappedCmdBuf)
 {
     VktTraceAnalyzerLayer* pTraceAnalyzerLayer = VktTraceAnalyzerLayer::Instance();
 
     DWORD threadId = osGetCurrentThreadId();
-    VktAPIEntry* pNewEntry = new VktAPIEntry(threadId, funcId, pArgsString, pWrappedCmdBuf);
+    VktAPIEntry* pNewEntry = new VktAPIEntry(threadId, funcId, pParams, paramCount, pWrappedCmdBuf);
 
     if (pWrappedCmdBuf != nullptr)
     {

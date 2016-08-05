@@ -60,7 +60,7 @@ private:
     /// \param pRawData a pointer to the raw data
     /// \param ioParameterString a buffer passed in where the string is to be stored
     //-----------------------------------------------------------------------------
-    virtual void GetParameterAsString(PARAMETER_TYPE paramType, const char dataLength, const char* pRawData, char* ioParameterString) const;
+    virtual void GetParameterAsString(PARAMETER_TYPE paramType, UINT dataLength, const char* pRawData, char* ioParameterString) const;
 };
 
 #endif // __VKT_API_ENTRY_H__

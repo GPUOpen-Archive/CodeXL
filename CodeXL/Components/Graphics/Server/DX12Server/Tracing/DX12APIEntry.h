@@ -58,13 +58,6 @@ public:
     virtual void AppendAPITraceLine(gtASCIIString& out, double inStartTime, double inEndTime) const;
 
     //-----------------------------------------------------------------------------
-    /// Get the API parameters as a single string. Build the string from the
-    /// individual parameters if necessary
-    /// \return parameter string
-    //-----------------------------------------------------------------------------
-    const char* GetParameterString() const;
-
-    //-----------------------------------------------------------------------------
     /// Check if this logged APIEntry is a Draw call.
     /// \returns True if the API is a draw call. False if it's not.
     //-----------------------------------------------------------------------------
@@ -110,8 +103,8 @@ private:
     /// \param pRawData a pointer to the raw data
     /// \param ioParameterString a buffer passed in where the string is to be stored
     //-----------------------------------------------------------------------------
-    virtual void GetParameterAsString(PARAMETER_TYPE paramType, const char dataLength, const char* pRawData, char* ioParameterString) const;
-    
+    virtual void GetParameterAsString(PARAMETER_TYPE paramType, UINT dataLength, const char* pRawData, char* ioParameterString) const;
+
     /// A flag set when results are retrieved from GPA.
     bool mbGotProfileResults;
 

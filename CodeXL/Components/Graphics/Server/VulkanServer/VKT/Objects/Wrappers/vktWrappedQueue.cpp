@@ -644,14 +644,15 @@ VkResult VktWrappedQueue::QueueSubmit_ICD(VkQueue queue, uint32_t submitCount, c
 
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
-        char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s, %s",
-                  VktUtil::WritePointerAsString(queue).c_str(),
-                  submitCount,
-                  PrintArrayWithFormatter(submitCount, pSubmits, GT_POINTER_FORMAT).c_str(),
-                  VktUtil::WriteUint64AsString((uint64_t)fence).c_str());
+        ParameterEntry parameters[] =
+        {
+            { PARAMETER_VK_HANDLE, &queue },
+            { PARAMETER_UNSIGNED_INT, &submitCount },
+            { PARAMETER_POINTER, pSubmits },
+            { PARAMETER_VK_HANDLE, &fence },
+        };
 
-        VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer);
+        VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, parameters, ARRAY_SIZE(parameters));
         result = device_dispatch_table(queue)->QueueSubmit(queue, submitCount, pSubmits, fence);
         m_createInfo.pInterceptMgr->PostCall(pNewEntry, result);
     }
@@ -676,10 +677,12 @@ VkResult VktWrappedQueue::QueueWaitIdle(VkQueue queue)
 
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
-        char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s", VktUtil::WritePointerAsString(queue).c_str());
+        ParameterEntry parameters[] =
+        {
+            { PARAMETER_VK_HANDLE, &queue },
+        };
 
-        VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer);
+        VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, parameters, ARRAY_SIZE(parameters));
         result = device_dispatch_table(queue)->QueueWaitIdle(queue);
         m_createInfo.pInterceptMgr->PostCall(pNewEntry, result);
     }
@@ -699,14 +702,15 @@ VkResult VktWrappedQueue::QueueBindSparse(VkQueue queue, uint32_t bindInfoCount,
 
     if (m_createInfo.pInterceptMgr->ShouldCollectTrace())
     {
-        char argumentsBuffer[ARGUMENTS_BUFFER_SIZE];
-        sprintf_s(argumentsBuffer, ARGUMENTS_BUFFER_SIZE, "%s, %u, %s, %s",
-                  VktUtil::WritePointerAsString(queue).c_str(),
-                  bindInfoCount,
-                  PrintArrayWithFormatter(bindInfoCount, pBindInfo, GT_POINTER_FORMAT).c_str(),
-                  VktUtil::WriteUint64AsString((uint64_t)fence).c_str());
+        ParameterEntry parameters[] =
+        {
+            { PARAMETER_VK_HANDLE, &queue },
+            { PARAMETER_UNSIGNED_INT, &bindInfoCount },
+            { PARAMETER_POINTER, pBindInfo },
+            { PARAMETER_VK_HANDLE, &fence },
+        };
 
-        VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, argumentsBuffer);
+        VktAPIEntry* pNewEntry = m_createInfo.pInterceptMgr->PreCall(funcId, parameters, ARRAY_SIZE(parameters));
         result = device_dispatch_table(queue)->QueueBindSparse(queue, bindInfoCount, pBindInfo, fence);
         m_createInfo.pInterceptMgr->PostCall(pNewEntry, result);
     }

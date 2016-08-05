@@ -46,6 +46,81 @@ enum PARAMETER_TYPE
     PARAMETER_DX12_DESCRIPTOR_HEAP,
     PARAMETER_DX12_HEAP_TYPE,
     PARAMETER_DX12_RESOURCE_STATES,
+
+    // Vulkan-specific data types requiring special treatment
+    PARAMETER_VK_HANDLE,
+    PARAMETER_VK_VkPipelineCacheHeaderVersion,
+    PARAMETER_VK_VkResultCode,
+    PARAMETER_VK_VkStructureType,
+    PARAMETER_VK_VkSystemAllocationScope,
+    PARAMETER_VK_VkInternalAllocationType,
+    PARAMETER_VK_VkFormat,
+    PARAMETER_VK_VkImageType,
+    PARAMETER_VK_VkImageTiling,
+    PARAMETER_VK_VkPhysicalDeviceType,
+    PARAMETER_VK_VkQueryType,
+    PARAMETER_VK_VkSharingMode,
+    PARAMETER_VK_VkImageLayout,
+    PARAMETER_VK_VkImageViewType,
+    PARAMETER_VK_VkComponentSwizzle,
+    PARAMETER_VK_VkVertexInputRate,
+    PARAMETER_VK_VkPrimitiveTopology,
+    PARAMETER_VK_VkPolygonMode,
+    PARAMETER_VK_VkFrontFace,
+    PARAMETER_VK_VkCompareOp,
+    PARAMETER_VK_VkStencilOp,
+    PARAMETER_VK_VkLogicOp,
+    PARAMETER_VK_VkBlendFactor,
+    PARAMETER_VK_VkBlendOp,
+    PARAMETER_VK_VkDynamicState,
+    PARAMETER_VK_VkFilter,
+    PARAMETER_VK_VkSamplerMipmapMode,
+    PARAMETER_VK_VkSamplerAddressMode,
+    PARAMETER_VK_VkBorderColor,
+    PARAMETER_VK_VkDescriptorType,
+    PARAMETER_VK_VkAttachmentLoadOp,
+    PARAMETER_VK_VkAttachmentStoreOp,
+    PARAMETER_VK_VkPipelineBindPoint,
+    PARAMETER_VK_VkCmdBufferLevel,
+    PARAMETER_VK_VkIndexType,
+    PARAMETER_VK_VkSubpassContents,
+    PARAMETER_VK_VkColorSpaceKHR,
+    PARAMETER_VK_VkPresentModeKHR,
+    PARAMETER_VK_VkDebugReportObjectTypeEXT,
+    PARAMETER_VK_VkDebugReportErrorEXT,
+    PARAMETER_VK_VkFormatFeatureFlags,
+    PARAMETER_VK_VkImageUsageFlags,
+    PARAMETER_VK_VkImageCreateFlags,
+    PARAMETER_VK_VkSampleCountFlags,
+    PARAMETER_VK_VkQueueFlags,
+    PARAMETER_VK_VkMemoryPropertyFlags,
+    PARAMETER_VK_VkMemoryMapFlags,
+    PARAMETER_VK_VkSparseImageFormatFlags,
+    PARAMETER_VK_VkSparseMemoryBindFlags,
+    PARAMETER_VK_VkFenceCreateFlags,
+    PARAMETER_VK_VkQueryPipelineStatisticFlags,
+    PARAMETER_VK_VkQueryResultFlags,
+    PARAMETER_VK_VkBufferUsageFlags,
+    PARAMETER_VK_VkBufferCreateFlags,
+    PARAMETER_VK_VkImageAspectFlags,
+    PARAMETER_VK_VkColorComponentFlags,
+    PARAMETER_VK_VkDescriptorPoolCreateFlags,
+    PARAMETER_VK_VkPipelineCreateFlags,
+    PARAMETER_VK_VkShaderStageFlags,
+    PARAMETER_VK_VkCullModeFlags,
+    PARAMETER_VK_VkAttachmentDescriptionFlags,
+    PARAMETER_VK_VkPipelineStageFlags,
+    PARAMETER_VK_VkAccessFlags,
+    PARAMETER_VK_VkDependencyFlags,
+    PARAMETER_VK_VkCmdPoolCreateFlags,
+    PARAMETER_VK_VkCmdPoolResetFlags,
+    PARAMETER_VK_VkCmdBufferUsageFlags,
+    PARAMETER_VK_VkStencilFaceFlags,
+    PARAMETER_VK_VkQueryControlFlags,
+    PARAMETER_VK_VkCommandBufferResetFlags,
+    PARAMETER_VK_VkSurfaceTransformFlagBitsKHRFlags,
+    PARAMETER_VK_VkCompositeAlphaFlags,
+    PARAMETER_VK_VkDebugReportFlagsEXT,
 };
 
 //-----------------------------------------------------------------------------
@@ -70,7 +145,7 @@ struct ParameterEntry
 //-----------------------------------------------------------------------------
 /// Amount of memory needed for each parameter.
 //-----------------------------------------------------------------------------
-static const int BYTES_PER_PARAMETER = 128;
+static const int BYTES_PER_PARAMETER = 512;
 
 //--------------------------------------------------------------------------
 /// The APIEntry structure is used to track all calls that are traced at runtime.
@@ -125,7 +200,7 @@ public:
     /// \param pRawData a pointer to the raw data
     /// \param ioParameterString a buffer passed in where the string is to be stored
     //-----------------------------------------------------------------------------
-    virtual void GetParameterAsString(PARAMETER_TYPE paramType, const char dataLength, const char* pRawData, char* ioParameterString) const = 0;
+    virtual void GetParameterAsString(PARAMETER_TYPE paramType, UINT dataLength, const char* pRawData, char* ioParameterString) const = 0;
 
     //-----------------------------------------------------------------------------
     /// Convert a numeric return value into a human-readable string.
