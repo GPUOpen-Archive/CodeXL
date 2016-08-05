@@ -263,6 +263,9 @@ Common/Src/AMDTApplicationComponents/tmp/
 # User Guide output files
 CodeXL/Help/CodeXL User Guide/HTML help/
 CodeXL/Help/CodeXL User Guide/webhelp/
+
+# Non-OpenSource files (internal to AMD)
+CodeXL/Components/GpuProfiling/Non-OpenSource
  
 # JetBrains Rider
 .idea/
