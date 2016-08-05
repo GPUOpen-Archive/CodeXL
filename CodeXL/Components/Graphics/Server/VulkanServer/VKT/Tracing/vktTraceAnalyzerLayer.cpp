@@ -401,7 +401,7 @@ void VktTraceAnalyzerLayer::ProfilerResultToStr(
             // Convert the functionID and return values from integers into full strings that we can use in the response.
             funcName = GetFunctionNameFromId(pResultEntry->mFunctionId);
             retVal = (pResultEntry->m_returnValue != -1) ? VktUtil::WriteResultCodeEnumAsString(pResultEntry->m_returnValue) : "void";
-            params = pResultEntry->mParameters.asCharArray();
+            params = pResultEntry->GetParameterString();
         }
     }
 
