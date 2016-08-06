@@ -142,10 +142,21 @@ bool DataMigrator::doMigrate()
     if (rc)
     {
         RunInfo runInfo;
-
         osFilePath riFilePath = m_sourceFilePath;
         riFilePath.setFileExtension(L"ri");
-        fnReadRIFile(riFilePath.asString().asCharArray(), &runInfo);
+
+        HRESULT hr = fnReadRIFile(riFilePath.asString().asCharArray(), &runInfo);
+
+        // If RunInfo file is missing, populate default/estimated values
+        if (hr != S_OK)
+        {
+            runInfo.m_cpuCount = pProfileInfo->m_numCpus;
+            // So far .ebp files were generated on less than 64 core processors.
+            // Hence it is safe to compute affinity using : ((1 << cpuCount) - 1).
+            runInfo.m_cpuAffinity = (1 << runInfo.m_cpuCount) - 1;
+            runInfo.m_cssInterval = 1;
+            runInfo.m_codexlVersion = L"Unknown";
+        }
 
         m_dbWriter.reset(new ProfilerDataDBWriter);
 
@@ -207,6 +218,10 @@ bool DataMigrator::WriteSessionInfoIntoDB(const CpuProfileInfo& profileInfo, con
         info->m_systemDetails = profileInfo.m_osName;
         info->m_sessionScope = profileInfo.m_profScope;
         info->m_coreAffinity = runInfo.m_cpuAffinity;
+        info->m_coreCount = runInfo.m_cpuCount;
+        info->m_cssInterval = static_cast<gtUInt16>(runInfo.m_cssInterval);
+        info->m_codexlCollectorVer = runInfo.m_codexlVersion;
+        info->m_codexlTranslatorVer = runInfo.m_codexlVersion;
 
         m_dbWriter->Push({ TRANSLATED_DATA_TYPE_SESSION_INFO, (void*)info });
         info = nullptr;

@@ -38,10 +38,15 @@
 #define AMDT_SESSION_INFO_CPU_FAMILY                    L"CPU Family"
 #define AMDT_SESSION_INFO_CPU_MODEL                     L"CPU Model"
 #define AMDT_SESSION_INFO_CORE_AFFNITY                  L"CPU Affinity"
+#define AMDT_SESSION_INFO_CORE_COUNT                    L"Number of Cores"
 #define AMDT_SESSION_INFO_CSS_UNWIND_DEPTH              L"CSS Unwind Depth"
 #define AMDT_SESSION_INFO_CSS_UNWIND_SCOPE              L"CSS Unwind Scope"
 #define AMDT_SESSION_INFO_CSS_ENABLED                   L"CSS Enabled"
+#define AMDT_SESSION_INFO_CSS_INTERVAL                  L"CSS Interval"
 #define AMDT_SESSION_INFO_FPO_ENABLED                   L"CSS FPO Enabled"
+
+#define AMDT_SESSION_INFO_COLLECTOR_VERSION             L"CodeXL Collector Version"
+#define AMDT_SESSION_INFO_TRANSLATOR_VERSION            L"CodeXL Translator Version"
 
 #define AMDT_SESSION_INFO_VALUE_NO                      L"No"
 #define AMDT_SESSION_INFO_VALUE_YES                     L"Yes"
@@ -71,6 +76,8 @@ struct AMDTProfileSessionInfo
         m_sessionStartTime.makeEmpty();
         m_sessionEndTime.makeEmpty();
         m_systemDetails.makeEmpty();
+        m_codexlCollectorVer.makeEmpty();
+        m_codexlTranslatorVer.makeEmpty();
 
         m_cpuFamily         = 0;
         m_cpuModel          = 0;
@@ -79,6 +86,8 @@ struct AMDTProfileSessionInfo
         m_unwindScope       = 0;
         m_cssEnabled        = false;
         m_cssFPOEnabled     = false;
+        m_coreCount         = 0;
+        m_cssInterval       = 0;
     };
 
     // DB full path.
@@ -116,12 +125,16 @@ struct AMDTProfileSessionInfo
 
     // System details.
     gtString    m_systemDetails;
+    gtString    m_codexlCollectorVer;
+    gtString    m_codexlTranslatorVer;
 
     gtUInt32    m_cpuFamily = 0;
     gtUInt32    m_cpuModel = 0;
     gtUInt64    m_coreAffinity = 0;
+    gtUInt32    m_coreCount = 0;
     gtUInt16    m_unwindDepth = 0;
     gtUInt16    m_unwindScope = 0;
+    gtUInt16    m_cssInterval = 0;
     bool        m_cssEnabled = false;
     bool        m_cssFPOEnabled = false;
 };

@@ -1102,11 +1102,13 @@ SetReportConfig()
     if (nullptr != m_pProfDataReader.get())
     {
         SetProfileDataOption();
+
+        //TODO: Logic is unclear. Need to revisit this piece of code.
         AMDTUInt64 mask = (1 << GetCoreCount()) - 1;
 
         if (GetCoreMask() == mask)
         {
-            SetCoreMask(AMDT_PROFILE_ALL_CORES);
+            SetCoreMask(GT_UINT64_MAX);
         }
 
         m_pProfDataReader->SetReportOption(m_options);
@@ -1244,13 +1246,16 @@ bool DisplayFilter::GetSamplePercent()
 
 AMDTUInt32 DisplayFilter::GetCoreCount() const
 {
-    AMDTUInt32 coreCount = 0;
-    AMDTCpuTopologyVec cpuToplogy;
-    bool rc = m_pProfDataReader->GetCpuTopology(cpuToplogy);
+    // TODO: Can we use the value saved in m_cpuCount?
+    // Otherwise, can we save the value into m_cpuCount once,
+    // instead of calling GetProfileSessionInfo() again and again
 
-    if (true == rc)
+    AMDTUInt32 coreCount = 0;
+    AMDTProfileSessionInfo sessionInfo;
+
+    if (m_pProfDataReader->GetProfileSessionInfo(sessionInfo))
     {
-        coreCount = cpuToplogy.size();
+        coreCount = sessionInfo.m_coreCount;
     }
 
     return coreCount;

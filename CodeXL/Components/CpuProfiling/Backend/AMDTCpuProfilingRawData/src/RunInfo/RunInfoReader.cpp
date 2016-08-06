@@ -283,6 +283,39 @@ HRESULT RunInfoReader::Read(const wchar_t* pfilePath)
                         break;
                     }
 
+                    case RI_REC_CSS_INTERVAL:
+                    {
+                        int retVal = 0;
+                        unsigned int value = 0;
+                        retVal = swscanf(riRecord.pValue, L"%u", &value);
+
+                        if (retVal == 1)
+                        {
+                            m_Info.m_cssInterval = value;
+                        }
+
+                        break;
+                    }
+
+                    case RI_REC_CPU_COUNT:
+                    {
+                        int retVal = 0;
+                        unsigned int value = 0;
+                        retVal = swscanf(riRecord.pValue, L"%u", &value);
+
+                        if (retVal == 1)
+                        {
+                            m_Info.m_cpuCount = value;
+                        }
+
+                        break;
+                    }
+
+                    case RI_REC_CXL_VERSION:
+                    {
+                        m_Info.m_codexlVersion = riRecord.pValue;
+                        break;
+                    }
 
                     default:
                         break;

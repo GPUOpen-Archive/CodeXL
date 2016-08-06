@@ -491,7 +491,7 @@ void DisplayFilterDlg::onClickCoreItem(int state)
 
     QObject::disconnect(m_pCheckBoxAllCore, SIGNAL(stateChanged(int)), this, SLOT(onClickAllCoreItem(int)));
     m_pCheckBoxAllCore->setChecked(all);
-    m_displayFilter->SetCoreMask(AMDT_PROFILE_ALL_CORES);
+    m_displayFilter->SetCoreMask(GT_UINT64_MAX);
     QObject::connect(m_pCheckBoxAllCore, SIGNAL(stateChanged(int)), this, SLOT(onClickAllCoreItem(int)));
 }
 

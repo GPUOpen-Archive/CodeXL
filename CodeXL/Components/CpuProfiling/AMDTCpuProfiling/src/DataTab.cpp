@@ -55,6 +55,9 @@
 
 #include <bitset>
 
+// This is also defined in DisplayFilterDlg. Need to keep at a common header.
+const unsigned int MAX_CORES_SUPPORTED = 64;
+
 DataTab::DataTab(QWidget* pParent, CpuSessionWindow* pParentSessionWindow, const QString& sessionDir)
     : QMainWindow(pParent), m_pDisplayedSessionItemData(nullptr), m_exportString(""), m_pList(nullptr),
       m_indexOffset(0), m_pMenu(nullptr), m_pColumnMenu(nullptr), m_selectText(""),
@@ -408,11 +411,10 @@ QString DataTab::displayFilterString()
         {
             AMDTUInt64 mask = m_pDisplayFilter->GetCoreMask();
 
-            std::bitset<32> maskBits(mask);
+            std::bitset<MAX_CORES_SUPPORTED> maskBits(mask);
             AMDTUInt32 amountOfDisplayedCores = maskBits.count();
 
-            if ((mask != AMDT_PROFILE_ALL_CORES) &&
-                (m_pDisplayFilter->GetCoreCount() != amountOfDisplayedCores))
+            if (m_pDisplayFilter->GetCoreCount() != amountOfDisplayedCores)
             {
                 if (!retVal.isEmpty())
                 {

@@ -87,15 +87,18 @@ CPUSessionTreeItemData::CPUSessionTreeItemData(const CPUSessionTreeItemData& oth
 }
 void CPUSessionTreeItemData::Init()
 {
-    m_cores = 1;
     m_name = "Session";
     m_startDelay = 0;
+
 #pragma message ("TODO: handle more than 64-m_cores here")
-    // The default affinity is all available m_cores
-    int coreCount(0);
+
+    int coreCount = 0;
     osGetAmountOfLocalMachineCPUs(coreCount);
+
+    m_cores = coreCount;
     m_startAffinity = 0;
 
+    // The default affinity is all available m_cores
     for (int core = 0; core < coreCount; core++)
     {
         m_startAffinity <<= 1;
@@ -1507,8 +1510,7 @@ void CpuProjectHandler::handleDataFileImport(const osFilePath& importedSessionFi
         pImportSessionData->m_name.append(namePostfix);
         pImportSessionData->m_displayName = pImportSessionData->m_name;
 
-        // TODO: Add number of cores to SesstionInfo in DB
-        pImportSessionData->m_cores = 4;
+        pImportSessionData->m_cores = sessionInfo.m_coreCount;
         pImportSessionData->SetShouldCollectCSS(sessionInfo.m_cssEnabled);
 
         if (pImportSessionData->IsTimeBasedProfiling())

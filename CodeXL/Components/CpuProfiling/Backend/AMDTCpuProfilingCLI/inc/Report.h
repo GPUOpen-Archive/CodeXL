@@ -262,7 +262,7 @@ private:
     bool SetCLUViewConfig(ViewConfig& viewCfg);
     bool SetAllDataViewConfig(ViewConfig& viewCfg);
 
-    void ReportExecution(AMDTProfileSessionInfo& sessionInfo, gtUInt32 numCpus);
+    void ReportExecution(AMDTProfileSessionInfo& sessionInfo);
     void ReportProfileDetails(AMDTProfileSessionInfo& sessionInfo);
     void ReportMonitoredEventDetails();
     void ReportOverviewData(AMDTProfileSessionInfo& sessionInfo);

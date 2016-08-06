@@ -171,11 +171,9 @@ HRESULT CpuProfileReport::Report()
     {
         // Input file - Processed profile data file
         osFilePath dbFilePath = GetDBFilePath();
-
-        //TODO: remove this line once EBP file support is removed.
         dbFilePath.setFileExtension(L"cxlcpdb");
 
-        // Set the symboldirectory and symbol server path
+        // Set the symbol directory and symbol server path
         gtString searchPath = m_args.GetDebugSymbolPath();
         gtString serverList = m_args.GetSymbolServerPath();
         gtString cachePath = m_args.GetSymbolCachePath();
@@ -185,10 +183,6 @@ HRESULT CpuProfileReport::Report()
 
         AMDTProfileSessionInfo sessionInfo;
         m_profileDbReader.GetProfileSessionInfo(sessionInfo);
-
-        AMDTCpuTopologyVec topologyVec;
-        m_profileDbReader.GetCpuTopology(topologyVec);
-        gtUInt32 nbrOfCpus = topologyVec.size();
 
 #if AMDT_BUILD_TARGET != AMDT_WINDOWS_OS
 
@@ -211,7 +205,7 @@ HRESULT CpuProfileReport::Report()
 
         if (retVal)
         {
-            ReportExecution(sessionInfo, nbrOfCpus);
+            ReportExecution(sessionInfo);
             ReportProfileDetails(sessionInfo);
             ReportMonitoredEventDetails();
 
@@ -1447,20 +1441,24 @@ void CpuProfileReport::ValidateOptions()
 
     // Validate the core affinity mask
     // TODO: Currently this supports only upto 64 cores
-    if (static_cast<gtUInt64>(-1) != m_args.GetCoreAffinityMask())
+    if (GT_UINT64_MAX == m_args.GetCoreAffinityMask())
     {
-        int nbrCores;
+        int nbrCores = 0;
+        gtUInt64 maxAffinity = 0;
+
+        // TODO: this should be read from DB
         osGetAmountOfLocalMachineCPUs(nbrCores);
 
-        gtUInt64 tmpAffinity = 0;
-
-        for (int core = 0; core < nbrCores; core++)
+        if (nbrCores < 64)
         {
-            tmpAffinity <<= 1;
-            tmpAffinity |= 1;
+            maxAffinity = (1ULL << nbrCores) - 1;
+        }
+        else
+        {
+            maxAffinity = GT_UINT64_MAX;
         }
 
-        if (tmpAffinity < m_args.GetCoreAffinityMask())
+        if (maxAffinity < m_args.GetCoreAffinityMask())
         {
             reportError(false, L"Invalid core affinity mask (0x%lx) specified with option(-c).\n", m_args.GetCoreAffinityMask());
             return;
@@ -1473,17 +1471,20 @@ void CpuProfileReport::ValidateOptions()
     {
         gtUInt64 coreMask = m_args.GetCoreAffinityMask();
 
-        if (static_cast<gtUInt64>(-1) == coreMask)
+        if (GT_UINT64_MAX == coreMask)
         {
-            int nbrCores;
+            int nbrCores = 0;
 
-            // FIXME.. this should be from profile reader
+            // TODO: this should be read from profile reader
             osGetAmountOfLocalMachineCPUs(nbrCores);
 
-            for (int core = 0; core < nbrCores; core++)
+            if (nbrCores < 64)
             {
-                coreMask <<= 1;
-                coreMask |= 1;
+                coreMask = (1ULL << nbrCores) - 1;
+            }
+            else
+            {
+                coreMask = GT_UINT64_MAX;
             }
         }
 
@@ -1560,7 +1561,7 @@ osFilePath& CpuProfileReport::GetOutputFilePath()
             GetTempPathW(OS_MAX_PATH, tmpPath);
             outputFile = gtString(tmpPath);
 #else
-            // TODO: USe P_tmpdir on Linux
+            // TODO: Use P_tmpdir on Linux
             wchar_t  tmpPath[OS_MAX_PATH] = L"/tmp/";
             outputFile = gtString(tmpPath);
 #endif // AMDT_BUILD_TARGET
@@ -1643,7 +1644,7 @@ bool CpuProfileReport::InitializeReportFile()
     return true;
 }
 
-void CpuProfileReport::ReportExecution(AMDTProfileSessionInfo& sessionInfo, gtUInt32 numCpus)
+void CpuProfileReport::ReportExecution(AMDTProfileSessionInfo& sessionInfo)
 {
     gtVector<gtString> sectionHdrs;
     gtList<std::pair<gtString, gtString>> sectionDataList;
@@ -1684,8 +1685,8 @@ void CpuProfileReport::ReportExecution(AMDTProfileSessionInfo& sessionInfo, gtUI
     // Cpu Details
     keyValuePair.first = PROFILE_CPU_DETAILS;
     gtString tmpStr;
-    tmpStr.appendFormattedString(L"Family(0x%lx), Model(0x%lx), Number of Cores(%ld)",
-        sessionInfo.m_cpuFamily, sessionInfo.m_cpuModel, numCpus);
+    tmpStr.appendFormattedString(L"Family(0x%lx), Model(0x%lx), Number of Cores(%u)",
+        sessionInfo.m_cpuFamily, sessionInfo.m_cpuModel, sessionInfo.m_coreCount);
     keyValuePair.second = tmpStr;
     sectionDataList.push_back(keyValuePair);
 
@@ -1821,7 +1822,7 @@ void CpuProfileReport::ReportProfileDetails(AMDTProfileSessionInfo& sessionInfo)
 
     keyValuePair.first = PROFILE_CSS_FREQUENCY;
     tmpStr.makeEmpty();
-    tmpStr.appendFormattedString(L"%ld", 1); // TODO: update RI file
+    tmpStr.appendFormattedString(L"%u", sessionInfo.m_cssInterval);
     keyValuePair.second = tmpStr;
     sectionDataList.push_back(keyValuePair);
 

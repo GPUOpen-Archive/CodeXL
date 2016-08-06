@@ -22,6 +22,7 @@
 #include <AMDTOSWrappers/Include/osMachine.h>
 #include <AMDTOSWrappers/Include/osGeneralFunctions.h>
 #include <AMDTOSWrappers/Include/osFilePath.h>
+#include <AMDTOSWrappers/Include/osProductVersion.h>
 
 // Project:
 #include <StringConstants.h>
@@ -328,18 +329,21 @@ void CpuProfileCollect::ValidateProfile()
     // TODO: Currently this supports only upto 64 cores
     if (static_cast<gtUInt64>(-1) != m_args.GetCoreAffinityMask())
     {
-        int nbrCores;
+        int nbrCores = 0;
+        gtUInt64 maxAffinity = 0;
+
         osGetAmountOfLocalMachineCPUs(nbrCores);
 
-        gtUInt64 tmpAffinity = 0;
-
-        for (int core = 0; core < nbrCores; core++)
+        if (nbrCores < 64)
         {
-            tmpAffinity <<= 1;
-            tmpAffinity |= 1;
+            maxAffinity = (1ULL << nbrCores) - 1;
+        }
+        else
+        {
+            maxAffinity = GT_UINT64_MAX;
         }
 
-        if (tmpAffinity < m_args.GetCoreAffinityMask())
+        if (maxAffinity < m_args.GetCoreAffinityMask())
         {
             reportError(false, L"Invalid core affinity mask (0x%lx) specified with option(-c).\n", m_args.GetCoreAffinityMask());
             return;
@@ -1144,7 +1148,7 @@ void CpuProfileCollect::GetOutputFilePath(osFilePath& outfilePath)
             GetTempPathW(OS_MAX_PATH, tmpPath);
             outputFile = gtString(tmpPath);
 #else
-            // TODO: USe P_tmpdir on Linux
+            // TODO: Use P_tmpdir on Linux
             wchar_t  tmpPath[OS_MAX_PATH] = L"/tmp/";
             outputFile = gtString(tmpPath);
 #endif // AMDT_BUILD_TARGET
@@ -1210,10 +1214,6 @@ void CpuProfileCollect::WriteRunInfo()
         {
             rifilePath.setFileExtension(L"ri");
 
-            // TODO: Following attributes have to be added in RunInfo and the frontend should start using
-            // the run-info
-            //      unwind interval
-
             // populate RI data
             RunInfo rInfo;
 
@@ -1231,6 +1231,7 @@ void CpuProfileCollect::WriteRunInfo()
             rInfo.m_cssUnwindDepth   = m_args.GetUnwindDepth();
             rInfo.m_cssScope         = m_args.GetCSSScope();
             rInfo.m_isCssSupportFpo  = m_args.IsCSSWithFpoSupport();
+            rInfo.m_cssInterval      = m_args.GetUnwindInterval();
             rInfo.m_isProfilingClu   = (DCConfigCLU == m_profileDcConfig.GetConfigType()) ? true : false;
 
             // detect and set profile scope
@@ -1253,17 +1254,22 @@ void CpuProfileCollect::WriteRunInfo()
             // Is IBS OP sampling..
             rInfo.m_isProfilingIbsOp = IsIbsOPSampling();
 
+            // Get number of cores
+            int nbrCores = 0;
+            if (osGetAmountOfLocalMachineCPUs(nbrCores))
+            {
+                rInfo.m_cpuCount = static_cast<unsigned int>(nbrCores);
+            }
+
             // If affinity is not passed as argument, then the default value is 0xFF...FF
             gtUInt64 coreAffinityMask = m_args.GetCoreAffinityMask();
 
-            // If default value is 0xFF..FF, then compute the affinity using number of CPUs
+            // If default value is 0xFF..FF, then compute the affinity using number of cores
             if (coreAffinityMask + 1 == 0)
             {
-                int nbrCpus = 0;
-
-                if (osGetAmountOfLocalMachineCPUs(nbrCpus))
+                if (nbrCores < 64)
                 {
-                    coreAffinityMask = (1 << nbrCpus) - 1;
+                    coreAffinityMask = (1ULL << nbrCores) - 1;
                 }
             }
 
@@ -1271,6 +1277,11 @@ void CpuProfileCollect::WriteRunInfo()
 
             // set OS name
             osGetOSShortDescriptionString(rInfo.m_osName);
+
+            // Get CodeXL version
+            osProductVersion cxlVersion;
+            osGetApplicationVersion(cxlVersion);
+            rInfo.m_codexlVersion = cxlVersion.toString();
 
             // write the RI file
             m_error = fnWriteRunInfo(rifilePath.asString().asCharArray(), &rInfo);

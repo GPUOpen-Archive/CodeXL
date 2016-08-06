@@ -226,7 +226,6 @@ bool AmdtDatabaseAdapter::InsertSessionConfiguration(const AMDTProfileSessionInf
     {
         gtString valueStr;
 
-        // TODO: add affinity/css stuff
         m_pDbAccessor->InsertSessionInfoKeyValue(AMDT_SESSION_INFO_KEY_SESSION_END_TIME, sessionInfo.m_sessionEndTime);
 
         m_pDbAccessor->InsertSessionInfoKeyValue(AMDT_SESSION_INFO_CSS_ENABLED, sessionInfo.m_cssEnabled ? AMDT_SESSION_INFO_VALUE_YES : AMDT_SESSION_INFO_VALUE_NO);
@@ -237,6 +236,10 @@ bool AmdtDatabaseAdapter::InsertSessionConfiguration(const AMDTProfileSessionInf
         valueStr.makeEmpty();
         valueStr << sessionInfo.m_unwindScope;
         m_pDbAccessor->InsertSessionInfoKeyValue(AMDT_SESSION_INFO_CSS_UNWIND_SCOPE, valueStr);
+
+        valueStr.makeEmpty();
+        valueStr << sessionInfo.m_cssInterval;
+        m_pDbAccessor->InsertSessionInfoKeyValue(AMDT_SESSION_INFO_CSS_INTERVAL, valueStr);
 
         m_pDbAccessor->InsertSessionInfoKeyValue(AMDT_SESSION_INFO_FPO_ENABLED, sessionInfo.m_cssFPOEnabled ? AMDT_SESSION_INFO_VALUE_YES : AMDT_SESSION_INFO_VALUE_NO);
 
@@ -249,8 +252,15 @@ bool AmdtDatabaseAdapter::InsertSessionConfiguration(const AMDTProfileSessionInf
         m_pDbAccessor->InsertSessionInfoKeyValue(AMDT_SESSION_INFO_CPU_MODEL, valueStr);
 
         valueStr.makeEmpty();
-        valueStr << (unsigned long)sessionInfo.m_coreAffinity; // TODO - convert to hex
+        valueStr << sessionInfo.m_coreCount;
+        m_pDbAccessor->InsertSessionInfoKeyValue(AMDT_SESSION_INFO_CORE_COUNT, valueStr);
+
+        valueStr.makeEmpty();
+        valueStr << (unsigned long)sessionInfo.m_coreAffinity;
         m_pDbAccessor->InsertSessionInfoKeyValue(AMDT_SESSION_INFO_CORE_AFFNITY, valueStr);
+
+        m_pDbAccessor->InsertSessionInfoKeyValue(AMDT_SESSION_INFO_COLLECTOR_VERSION, sessionInfo.m_codexlCollectorVer);
+        m_pDbAccessor->InsertSessionInfoKeyValue(AMDT_SESSION_INFO_TRANSLATOR_VERSION, sessionInfo.m_codexlTranslatorVer);
     }
 
     // Insert the DB scheme version.

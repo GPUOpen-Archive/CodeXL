@@ -59,6 +59,8 @@
 #include <AMDTOSWrappers/Include/osAtomic.h>
 #include <AMDTOSWrappers/Include/osDebugLog.h>
 #include <AMDTOSWrappers/Include/osGeneralFunctions.h>
+#include <AMDTOSWrappers/Include/osProductVersion.h>
+#include <AMDTOSWrappers/Include/osApplication.h>
 #include <AMDTCpuProfilingRawData/inc/Linux/CaPerfDataReader.h>
 #include <AMDTCpuProfilingRawData/inc/Linux/PerfData.h>
 #include <AMDTCpuProfilingRawData/inc/RunInfo.h>
@@ -3112,7 +3114,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_EXIT(struct perf_event_header* pHd
     return S_OK;
 }
 
-
+//TODO: rename the function name to writeDBOutput
 int CaPerfTranslator::writeEbpOutput(const std::string& outputFile)
 {
     bool bRet = false;
@@ -3362,34 +3364,10 @@ int CaPerfTranslator::writeEbpOutput(const std::string& outputFile)
     bRet = profWriter.Write(woutputFile, &profInfo, &m_procMap, &m_modMap, &topMap);
 #endif
 
-    // Create an empty .ebp file till we remove complete dependency from GUI
-    /*osFilePath ebpFilePath(woutputFile);
-    ebpFilePath.setFileExtension(L"ebp");
-
-    if (!ebpFilePath.exists())
-    {
-        osFile ebpFile(ebpFilePath);
-        ebpFile.open(osChannel::OS_ASCII_TEXT_CHANNEL, osFile::OS_OPEN_TO_WRITE);
-        ebpFile.close();
-    }*/
-
     gettimeofday(&ebp_timerStop, nullptr);
     memcpy(&css_timerStart, &ebp_timerStop, sizeof(struct timeval));
 
-#if 0
-    gtString createDbEnvStr;
-    bool createDb = false;
-
-    if (osGetCurrentProcessEnvVariableValue(L"AMDT_CPUPROFILE_CREATE_DB", createDbEnvStr))
-    {
-        createDb = createDbEnvStr.isEqualNoCase(L"YES");
-    }
-
-    if (createDb)
-    {
-#endif
-        m_dbWriter.reset(new ProfilerDataDBWriter);
-    //}
+    m_dbWriter.reset(new ProfilerDataDBWriter);
 
     if (m_dbWriter)
     {
@@ -3425,6 +3403,14 @@ int CaPerfTranslator::writeEbpOutput(const std::string& outputFile)
             info->m_systemDetails = runInfo.m_osName;
             info->m_sessionScope = runInfo.m_profScope;
             info->m_coreAffinity = runInfo.m_cpuAffinity;
+            info->m_coreCount = runInfo.m_cpuCount;
+            info->m_cssInterval = runInfo.m_cssInterval;
+            info->m_codexlCollectorVer = runInfo.m_codexlVersion;
+
+            // Get CodeXL version
+            osProductVersion cxlVersion;
+            osGetApplicationVersion(cxlVersion);
+            info->m_codexlTranslatorVer = cxlVersion.toString();
 
             m_dbWriter->Push({ TRANSLATED_DATA_TYPE_SESSION_INFO, (void*)info });
             info = nullptr;

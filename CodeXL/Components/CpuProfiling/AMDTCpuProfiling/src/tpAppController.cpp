@@ -395,9 +395,9 @@ void tpAppController::WriteRunInfo()
         // environment variables
         rInfo.m_envVariables = m_pCurrentlyRunningSessionData->m_envVariables;
         // call stack sampling enabled/disabled
-        rInfo.m_isCSSEnabled = false; //TO DO
+        rInfo.m_isCSSEnabled = false; //TODO
         // stack depth
-        rInfo.m_cssUnwindDepth = 1; //TO DO
+        rInfo.m_cssUnwindDepth = 1;   //TODO
 
         // profile session type
         rInfo.m_profType = CP_STR_InfoViewThreadProfiling;
@@ -407,6 +407,9 @@ void tpAppController::WriteRunInfo()
         rInfo.m_profEndTime = acQStringToGTString(m_pCurrentlyRunningSessionData->m_endTime);
 
         rInfo.m_executedPID = m_pCurrentlyRunningSessionData->m_pid;
+        rInfo.m_cssInterval = 1;          //TODO
+        rInfo.m_cpuCount = 1;             //TODO
+        rInfo.m_codexlVersion = L"0.0.0"; //TODO
 
         osFilePath riFilePath(m_pCurrentlyRunningSessionData->m_pParentData->m_filePath);
         riFilePath.setFileExtension(RI_EXT);

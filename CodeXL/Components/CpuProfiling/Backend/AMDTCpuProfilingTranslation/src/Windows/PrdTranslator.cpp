@@ -26,6 +26,8 @@
 #include <AMDTOSWrappers/Include/osProcess.h>
 #include <AMDTOSWrappers/Include/osDebugLog.h>
 #include <AMDTOSWrappers/Include/osGeneralFunctions.h>
+#include <AMDTOSWrappers/Include/osProductVersion.h>
+#include <AMDTOSWrappers/Include/osApplication.h>
 
 #include <AMDTCpuPerfEventUtils/inc/EventEncoding.h>
 #include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
@@ -3396,6 +3398,14 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
                 info->m_systemDetails = m_runInfo->m_osName;
                 info->m_sessionScope = m_runInfo->m_profScope;
                 info->m_coreAffinity = m_runInfo->m_cpuAffinity;
+                info->m_coreCount = m_runInfo->m_cpuCount;
+                info->m_cssInterval = m_runInfo->m_cssInterval;
+                info->m_codexlCollectorVer = m_runInfo->m_codexlVersion;
+
+                // Get CodeXL version
+                osProductVersion cxlVersion;
+                osGetApplicationVersion(cxlVersion);
+                info->m_codexlTranslatorVer = cxlVersion.toString();
             }
 
             m_dbWriter->Push({ TRANSLATED_DATA_TYPE_SESSION_INFO, (void*)info });

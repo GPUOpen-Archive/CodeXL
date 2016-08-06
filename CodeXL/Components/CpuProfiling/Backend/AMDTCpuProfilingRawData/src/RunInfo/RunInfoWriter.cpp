@@ -137,7 +137,7 @@ HRESULT RunInfoWriter::Write(const wchar_t* pfilePath, const RunInfo* pRunInfo)
     {
         riRecord.type = RI_REC_CSS_UNWIND_DEPTH;
         wchar_t buff[50];
-        (void) swprintf(buff, 50, L"%d", pRunInfo->m_cssUnwindDepth);
+        (void) swprintf(buff, 50, L"%u", pRunInfo->m_cssUnwindDepth);
         riRecord.length = wcslen(buff);
         riRecord.pValue = buff;
         bRet = WriteNextRIRecord(file, &riRecord);
@@ -237,9 +237,37 @@ HRESULT RunInfoWriter::Write(const wchar_t* pfilePath, const RunInfo* pRunInfo)
     {
         riRecord.type = RI_REC_EXECUTED_PROCESS_ID;
         wchar_t buff[50];
-        (void)swprintf(buff, 50, L"%d", pRunInfo->m_executedPID);
+        (void)swprintf(buff, 50, L"%u", pRunInfo->m_executedPID);
         riRecord.length = wcslen(buff);
         riRecord.pValue = buff;
+        bRet = WriteNextRIRecord(file, &riRecord);
+    }
+
+    if (bRet == true)
+    {
+        riRecord.type = RI_REC_CSS_INTERVAL;
+        wchar_t buff[50];
+        (void)swprintf(buff, 50, L"%u", pRunInfo->m_cssInterval);
+        riRecord.length = wcslen(buff);
+        riRecord.pValue = buff;
+        bRet = WriteNextRIRecord(file, &riRecord);
+    }
+
+    if (bRet == true)
+    {
+        riRecord.type = RI_REC_CPU_COUNT;
+        wchar_t buff[50];
+        (void)swprintf(buff, 50, L"%u", pRunInfo->m_cpuCount);
+        riRecord.length = wcslen(buff);
+        riRecord.pValue = buff;
+        bRet = WriteNextRIRecord(file, &riRecord);
+    }
+
+    if (bRet == true)
+    {
+        riRecord.type = RI_REC_CXL_VERSION;
+        riRecord.length = pRunInfo->m_codexlVersion.length();
+        riRecord.pValue = const_cast<wchar_t*>(pRunInfo->m_codexlVersion.asCharArray());
         bRet = WriteNextRIRecord(file, &riRecord);
     }
 

@@ -21,8 +21,6 @@
 #include <AMDTOSWrappers/Include/osFile.h>
 
 // Backend:
-#include <AMDTCpuProfilingRawData/inc/CpuProfileReader.h>
-#include <AMDTCpuProfilingRawData/inc/RunInfo.h>
 #include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
 #include <AMDTCpuPerfEventUtils/inc/ViewConfig.h>
 #include <AMDTOSWrappers/Include/osTime.h>

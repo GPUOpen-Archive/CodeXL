@@ -49,6 +49,7 @@
 #include <AMDTOSWrappers/Include/osApplication.h>
 #include <AMDTOSWrappers/Include/osGeneralFunctions.h>
 #include <AMDTOSWrappers/Include/osUser.h>
+#include <AMDTOSWrappers/Include/osProductVersion.h>
 #include <AMDTAPIClasses/Include/Events/apExecutionModeChangedEvent.h>
 
 #include <AMDTApplicationComponents/Include/acMessageBox.h>
@@ -1596,9 +1597,11 @@ HRESULT CommandsHandler::onStopProfiling(bool stopAndExit)
                     rInfo.m_cssUnwindDepth = m_profileSession.GetCssUnwindLevel();
                     rInfo.m_cssScope = m_profileSession.m_cssScope;
                     rInfo.m_isCssSupportFpo = m_profileSession.IsFpoChecked();
+                    rInfo.m_cssInterval = m_profileSession.m_cssInterval;
                     rInfo.m_isProfilingClu = m_profileSession.m_cluSample;
                     rInfo.m_isProfilingIbsOp = m_profileSession.m_opSample;
                     rInfo.m_cpuAffinity = m_profileSession.m_startAffinity;
+                    rInfo.m_cpuCount = m_profileSession.m_cores;
 
                     m_profileSession.m_endTime = acGTStringToQString(profEndTime);
 
@@ -1618,6 +1621,11 @@ HRESULT CommandsHandler::onStopProfiling(bool stopAndExit)
 
                     // set OS name
                     osGetOSShortDescriptionString(rInfo.m_osName);
+
+                    // Get CodeXL version
+                    osProductVersion cxlVersion;
+                    osGetApplicationVersion(cxlVersion);
+                    rInfo.m_codexlVersion = cxlVersion.toString();
 
                     // write the RI file
                     hr = fnWriteRunInfo(riFilePath.asString().asCharArray(), &rInfo);

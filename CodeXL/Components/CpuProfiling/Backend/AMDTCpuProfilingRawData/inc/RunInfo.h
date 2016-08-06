@@ -34,6 +34,9 @@ enum RiRecordType
     RI_REC_OS_NAME = 0x10,
     RI_REC_PROF_SCOPE = 0x11,
     RI_REC_EXECUTED_PROCESS_ID = 0x12,
+    RI_REC_CSS_INTERVAL = 0x13,
+    RI_REC_CPU_COUNT = 0x14,
+    RI_REC_CXL_VERSION = 0x15,
     RI_REC_INVALID = 0xFF
 };
 
@@ -78,12 +81,15 @@ public:
     CpuProfileCssScope  m_cssScope;
     bool                m_isCssSupportFpo;
     bool                m_isCSSEnabled;
+    unsigned int        m_cssInterval = 0;
     bool                m_isProfilingClu;
     bool                m_isProfilingIbsOp;
     unsigned long long  m_cpuAffinity;
+    unsigned int        m_cpuCount = 0;
     gtString            m_osName;
     gtString            m_profScope;
     unsigned int        m_executedPID;
+    gtString            m_codexlVersion;
 };
 
 
