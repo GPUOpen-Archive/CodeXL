@@ -2934,7 +2934,7 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkCmdCopyImageToBuffer(VkCommand
     }
 }
 
-VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkCmdUpdateBuffer(VkCommandBuffer commandBuffer, VkBuffer dstBuffer, VkDeviceSize dstOffset, VkDeviceSize dataSize, const uint32_t* pData)
+VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkCmdUpdateBuffer(VkCommandBuffer commandBuffer, VkBuffer dstBuffer, VkDeviceSize dstOffset, VkDeviceSize dataSize, const void* pData)
 {
     VktWrappedCmdBuf* pWrappedCmdBuf = GetWrappedCmdBuf(commandBuffer);
 

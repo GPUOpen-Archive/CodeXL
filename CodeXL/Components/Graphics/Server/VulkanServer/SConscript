@@ -113,6 +113,7 @@ sources = \
     env['VulkanSDK_src_dir']+ "glslang/hlsl/hlslOpMap.cpp",
     env['VulkanSDK_src_dir']+ "glslang/hlsl/hlslTokenStream.cpp",
     env['VulkanSDK_src_dir']+ "glslang/hlsl/hlslGrammar.cpp",
+    env['VulkanSDK_src_dir']+ "glslang/hlsl/hlslParseables.cpp",
 
 # SPIRV
     env['VulkanSDK_src_dir']+ "glslang/SPIRV/GlslangToSpv.cpp",

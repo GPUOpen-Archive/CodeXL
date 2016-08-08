@@ -1267,7 +1267,7 @@ void VktWrappedCmdBuf::CmdCopyImageToBuffer(VkCommandBuffer commandBuffer, VkIma
     }
 }
 
-void VktWrappedCmdBuf::CmdUpdateBuffer(VkCommandBuffer commandBuffer, VkBuffer dstBuffer, VkDeviceSize dstOffset, VkDeviceSize dataSize, const uint32_t* pData)
+void VktWrappedCmdBuf::CmdUpdateBuffer(VkCommandBuffer commandBuffer, VkBuffer dstBuffer, VkDeviceSize dstOffset, VkDeviceSize dataSize, const void* pData)
 {
     const FuncId funcId = FuncId_vkCmdUpdateBuffer;
 
