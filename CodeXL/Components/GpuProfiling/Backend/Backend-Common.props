@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="UserMacros">
-    <WorkspaceRootDir Condition="'$(SolutionName)'=='CodeXLGPUProfiler-Backend'">$(SolutionDir)..\..\..\..</WorkspaceRootDir>
+    <WorkspaceRootDir Condition="'$(SolutionName)'=='CodeXLGPUProfiler-Backend'">$(SolutionDir)..\..\..\..\..</WorkspaceRootDir>
     <WorkspaceRootDir Condition="'$(SolutionName)'=='CodeXL-AllProjects'">$(SolutionDir)..\..</WorkspaceRootDir>
     <CommonDir>$(WorkspaceRootDir)\Common</CommonDir>
     <CodeXLDir>$(WorkspaceRootDir)\CodeXL</CodeXLDir>
