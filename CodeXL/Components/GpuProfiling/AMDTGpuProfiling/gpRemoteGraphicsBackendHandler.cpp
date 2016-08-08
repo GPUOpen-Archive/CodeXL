@@ -273,9 +273,16 @@ bool gpRemoteGraphicsBackendHandler::IsRemoteAgentLinux()
     bool bResult = false;
 #endif
     
-    IsRemoteAgentLinuxCommand isRemoteAgentLinuxCommand(bResult);
-    gtString strErrorMessageOut;
-    ExecuteRemoteCommand(false, strErrorMessageOut, &isRemoteAgentLinuxCommand);
+    const apProjectSettings& projectSettings = afProjectManager::instance().currentProjectSettings();
+    const bool isRemoteTarget = projectSettings.isRemoteTarget();
+
+    if (isRemoteTarget)
+    {
+        IsRemoteAgentLinuxCommand isRemoteAgentLinuxCommand(bResult);
+        gtString strErrorMessageOut;
+        ExecuteRemoteCommand(false, strErrorMessageOut, &isRemoteAgentLinuxCommand);
+    }
+    
     return bResult;
 }
 
