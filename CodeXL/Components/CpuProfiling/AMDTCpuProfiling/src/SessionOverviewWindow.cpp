@@ -768,18 +768,14 @@ void SessionOverviewWindow::onHotSpotComboChanged(const QString& text)
 
             if (m_CounterIdxMap.end() != itr)
             {
-                bool rc = m_pProcessesTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, itr->second, m_isCLU);
-                GT_ASSERT(rc);
+                m_counterIdx = itr->second;
 
-                rc = m_pFunctionsTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, itr->second, m_isCLU);
-                GT_ASSERT(rc);
-
-                rc = m_pModulesTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, itr->second, m_isCLU);
-                GT_ASSERT(rc);
+                bool rc = m_pProcessesTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, m_counterIdx, m_isCLU);
+                rc = m_pFunctionsTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, m_counterIdx, m_isCLU) && rc ;
+                rc = m_pModulesTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, m_counterIdx, m_isCLU) && rc;
             }
         }
     }
-    //emit hotspotIndicatorChanged(text);
 }
 
 void SessionOverviewWindow::initDisplayFilters()
