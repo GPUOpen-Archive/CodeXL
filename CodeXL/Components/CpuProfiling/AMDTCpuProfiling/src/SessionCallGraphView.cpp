@@ -980,15 +980,16 @@ bool SessionCallGraphView::ShowParentChild(AMDTFunctionId functionId)
         {
             m_pButterfly->clear();
 
-            AMDTProfileFunctionData  functionData;
-            ret = m_pProfDataRdr->GetFunctionData(functionId,
-                                                  m_selectedPID,
-                                                  AMDT_PROFILE_ALL_THREADS,
-                                                  functionData);
+            AMDTProfileFunctionInfo  functionInfo;
+            ret = m_pProfDataRdr->GetFunctionInfo(functionId,
+                                                  functionInfo,
+                                                  nullptr,
+                                                  nullptr,
+                                                  nullptr);
 
             if (ret)
             {
-                m_pButterfly->setWindowTitle(tr("Immediate Parents and Children of Function: <b>") + acGTStringToQString(functionData.m_functionInfo.m_name) + "</b>");
+                m_pButterfly->setWindowTitle(tr("Immediate Parents and Children of Function: <b>") + acGTStringToQString(functionInfo.m_name) + "</b>");
             }
 
             m_pButterfly->SetChildrenFunction(m_pProfDataRdr,

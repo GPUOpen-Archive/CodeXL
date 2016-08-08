@@ -117,6 +117,11 @@ public:
     bool GetModuleInfo(AMDTUInt32 pid, AMDTModuleId mid, gtVector<AMDTProfileModuleInfo>& moduleInfoList);
     bool GetThreadInfo(AMDTUInt32 pid, AMDTThreadId tid, gtVector<AMDTProfileThreadInfo>& threadInfoList);
     bool GetFunctionInfoByModuleId(AMDTModuleId moduleId, AMDTProfileFunctionInfoVec& funcInfoVec);
+    bool GetFunctionInfo(AMDTFunctionId functionId, gtUInt32 funcStartOffset, AMDTProfileFunctionInfo& functionInfo);
+    bool GetProcessAndThreadListForFunction(AMDTFunctionId              funcId,
+                                            AMDTUInt32                  funcStartOffset,
+                                            gtVector<AMDTProcessId>&    processList,
+                                            gtVector<AMDTThreadId>&     threadList);
 
     bool GetProcessesWithCallstackSamples(gtVector<AMDTProcessId>& cssProcessVec);
 

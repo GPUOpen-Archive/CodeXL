@@ -469,25 +469,27 @@ void SessionSourceCodeView::CreateFunctionsComboBox()
 
         for (auto const& func : funcProfileData)
         {
-            AMDTProfileFunctionData  functionData;
+            AMDTProfileFunctionInfo  functionInfo;
+            gtUInt64 modBaseAddress = 0;
 
-            bool ret = m_pProfDataRdr->GetFunctionData(func.m_id,
-                                                       AMDT_PROFILE_ALL_PROCESSES,
-                                                       AMDT_PROFILE_ALL_THREADS,
-                                                       functionData);
+            bool ret = m_pProfDataRdr->GetFunctionInfo(func.m_id,
+                                                       functionInfo,
+                                                       &modBaseAddress,
+                                                       nullptr,
+                                                       nullptr);
 
             if (ret)
             {
-                gtUInt64 baseAddr = functionData.m_modBaseAddress;
-                gtUInt64 startOffset = baseAddr + functionData.m_functionInfo.m_startOffset;
-                gtUInt64 endOffset = startOffset + functionData.m_functionInfo.m_size;
+                gtUInt64 baseAddr = modBaseAddress;
+                gtUInt64 startOffset = baseAddr + functionInfo.m_startOffset;
+                gtUInt64 endOffset = startOffset + functionInfo.m_size;
 
                 QString addressStart = "0x" + QString::number(startOffset, 16);
                 QString addressEnd = "0x" + QString::number(endOffset, 16);
                 QString functionStr = QString("[%1 - %2] : ").arg(addressStart).arg(addressEnd);
-                functionStr += acGTStringToQString(functionData.m_functionInfo.m_name);
+                functionStr += acGTStringToQString(functionInfo.m_name);
                 functionsList << functionStr;
-                m_functionIdVec.push_back(functionData.m_functionInfo.m_functionId);
+                m_functionIdVec.push_back(functionInfo.m_functionId);
             }
         }
 #if 0
@@ -869,7 +871,10 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
         {
             m_pTreeViewModel->m_funcId = m_functionIdVec.at(functionIndex);
 
-            AMDTProfileFunctionData  functionData;
+            AMDTProfileFunctionInfo  functionInfo;
+            gtVAddr modBaseAddress = 0;
+            gtVector<AMDTProcessId> pidsList;
+            gtVector<AMDTThreadId> threadsList;
             QStringList pidList, tidList;
             bool isMultiPID = false;
             bool isMultiTID = false;
@@ -877,22 +882,23 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
             m_pTreeViewModel->m_pid = AMDT_PROFILE_ALL_PROCESSES;
             m_pTreeViewModel->m_tid = AMDT_PROFILE_ALL_THREADS;
 
-            bool ret = m_pProfDataRdr->GetFunctionData(m_pTreeViewModel->m_funcId,
-                                                       AMDT_PROFILE_ALL_PROCESSES,
-                                                       AMDT_PROFILE_ALL_THREADS,
-                                                       functionData);
+            bool ret = m_pProfDataRdr->GetFunctionInfo(m_pTreeViewModel->m_funcId,
+                                                       functionInfo,
+                                                       &modBaseAddress,
+                                                       &pidsList,
+                                                       &threadsList);
 
             if (ret)
             {
                 //m_pTreeViewModel->m_newAddress = functionData.m_modBaseAddress + functionData.m_instDataList[0].m_offset;
-                m_pTreeViewModel->m_newAddress = functionData.m_modBaseAddress + functionData.m_functionInfo.m_startOffset;
+                m_pTreeViewModel->m_newAddress = modBaseAddress + functionInfo.m_startOffset;
 
-                isMultiPID = (functionData.m_pidsList.size() > 1);
-                isMultiTID = (functionData.m_threadsList.size() > 1);
+                isMultiPID = (pidsList.size() > 1);
+                isMultiTID = (threadsList.size() > 1);
 
                 if (isMultiPID)
                 {
-                    for (const auto& pid : functionData.m_pidsList)
+                    for (const auto& pid : pidsList)
                     {
                         pidList << (QString::number(pid));
                     }
@@ -902,7 +908,7 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
 
                 if (isMultiTID)
                 {
-                    for (const auto& tid : functionData.m_threadsList)
+                    for (const auto& tid : threadsList)
                     {
                         tidList << (QString::number(tid));
                     }

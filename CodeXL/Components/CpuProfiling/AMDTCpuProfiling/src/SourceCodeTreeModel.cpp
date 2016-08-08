@@ -1434,14 +1434,18 @@ bool SourceCodeTreeModel::SetupSymbolInfoList(AMDTUInt32 modId, AMDTUInt32 pId)
 
         for (const auto& function : funcProfileData)
         {
-            AMDTProfileFunctionData  functionData;
+            AMDTProfileFunctionInfo  functionInfo;
 
-            if (m_pProfDataRdr->GetFunctionData(function.m_id, pId, m_tid, functionData))
+            if (m_pProfDataRdr->GetFunctionInfo(function.m_id,
+                                                functionInfo,
+                                                nullptr,
+                                                nullptr,
+                                                nullptr))
             {
                 UiFunctionSymbolInfo tmpSymbol;
-                tmpSymbol.m_va = functionData.m_functionInfo.m_startOffset;
-                tmpSymbol.m_size = functionData.m_functionInfo.m_size;
-                tmpSymbol.m_name = acGTStringToQString(functionData.m_functionInfo.m_name);
+                tmpSymbol.m_va = functionInfo.m_startOffset;
+                tmpSymbol.m_size = functionInfo.m_size;
+                tmpSymbol.m_name = acGTStringToQString(functionInfo.m_name);
                 m_symbolsInfoList.push_back(tmpSymbol);
             }
         }

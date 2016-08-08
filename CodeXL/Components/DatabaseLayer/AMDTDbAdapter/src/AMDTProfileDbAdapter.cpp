@@ -815,6 +815,37 @@ bool amdtProfileDbAdapter::GetJITFunctionInfo(AMDTFunctionId funcId, gtUInt64& l
     return ret;
 }
 
+bool amdtProfileDbAdapter::GetFunctionInfo(
+    AMDTFunctionId              functionId,
+    gtUInt32                    funcStartOffset,
+    AMDTProfileFunctionInfo&    functionInfo)
+{
+    bool ret = false;
+
+    if (m_pDbAccessor != nullptr)
+    {
+        ret = m_pDbAccessor->GetFunctionInfo(functionId, funcStartOffset, functionInfo);
+    }
+
+    return ret;
+}
+
+bool amdtProfileDbAdapter::GetProcessAndThreadListForFunction(
+    AMDTFunctionId              funcId,
+    AMDTUInt32                  funcStartOffset,
+    gtVector<AMDTProcessId>&    processList,
+    gtVector<AMDTThreadId>&     threadList)
+{
+    bool ret = false;
+
+    if (m_pDbAccessor != nullptr)
+    {
+        ret = m_pDbAccessor->GetProcessAndThreadListForFunction(funcId, funcStartOffset, processList, threadList);
+    }
+
+    return ret;
+}
+
 bool amdtProfileDbAdapter::GetFunctionProfileData(
     AMDTFunctionId              funcId,
     gtUInt32                    funcStartOffset,    // used only for unknown functions

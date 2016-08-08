@@ -87,6 +87,10 @@ struct ViewConfigInfo
 
 #define CXL_COMPUTED_COUNTER_START_ID       0x100
 
+#define CXL_DB_MODULEID_MASK            0xFFFF0000
+#define CXL_DB_MODULEID_SHIFT_BITS      16
+#define CXL_GET_DB_MODULE_ID(funcId_)   (((funcId_) & CXL_DB_MODULEID_MASK) >> CXL_DB_MODULEID_SHIFT_BITS)
+
 #define CXL_UNKNOWN_FUNC_START_ID           0xF000
 #define IS_UNKNOWN_FUNC(id_) (((id_) & 0x0000FFFF) == 0) 
 #define GET_MODOFFSET_FOR_UNKNOWN_FUNC(mod_, offset_, val_) val_ = mod_; val_ = (val_ << 32) | offset_;
@@ -2235,6 +2239,44 @@ public:
                 }
 
                 AddFuncInfoToFuncIdInfoMap(funcId, functionData.m_functionInfo);
+            }
+        }
+
+        return ret;
+    }
+
+    bool GetFunctionInfo(AMDTFunctionId            functionId,
+                         AMDTProfileFunctionInfo&  functionInfo,
+                         gtUInt64*                 pModLoadAddress,
+                         gtVector<AMDTProcessId>*  pProcessList,
+                         gtVector<AMDTThreadId>*   pThreadList)
+    {
+        bool ret = false;
+        gtUInt32 funcStartOffset = 0;
+
+        if (nullptr != m_pDbAdapter)
+        {
+            if (IS_UNKNOWN_FUNC(functionId))
+            {
+                functionInfo.m_functionId = functionId;
+                functionInfo.m_moduleId = CXL_GET_DB_MODULE_ID(functionId);
+
+                HandleUnknownFunction(functionInfo);
+                funcStartOffset = functionInfo.m_startOffset;
+            }
+
+            ret = m_pDbAdapter->GetFunctionInfo(functionId, funcStartOffset, functionInfo);
+
+            if (nullptr != pModLoadAddress)
+            {
+                AMDTProfileModuleInfo modInfo;
+                ret = GetModuleInfo(functionInfo.m_moduleId, modInfo);
+                *pModLoadAddress = modInfo.m_loadAddress;
+            }
+
+            if (nullptr != pProcessList && nullptr != pThreadList)
+            {
+                ret = m_pDbAdapter->GetProcessAndThreadListForFunction(functionId, funcStartOffset, *pProcessList, *pThreadList);
             }
         }
 
@@ -4595,6 +4637,23 @@ bool cxlProfileDataReader::GetFunctionInfoByModuleId(AMDTModuleId modId, AMDTPro
     if (nullptr != m_pImpl)
     {
         ret = m_pImpl->GetFunctionInfoByModuleId(modId, funcInfoVec, modBaseAddr);
+    }
+
+    return ret;
+}
+
+bool cxlProfileDataReader::GetFunctionInfo(
+    AMDTFunctionId             functionId,
+    AMDTProfileFunctionInfo&   functionInfo,
+    gtUInt64*                  pModLoadAddress,
+    gtVector<AMDTProcessId>*  pProcessList,
+    gtVector<AMDTThreadId>*   pThreadList)
+{
+    bool ret = false;
+
+    if (nullptr != m_pImpl)
+    {
+        ret = m_pImpl->GetFunctionInfo(functionId, functionInfo, pModLoadAddress, pProcessList, pThreadList);
     }
 
     return ret;

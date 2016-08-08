@@ -59,6 +59,10 @@
 #define DB_MODULEID_MASK        0xFFFF0000UL
 #define DB_FUNCTIONID_MASK      0x0000FFFFUL
 #define DB_MODULEID_SHIFT_BITS  16
+#define CXL_GET_DB_MODULE_ID(funcId_)   (((funcId_) & DB_MODULEID_MASK) >> DB_MODULEID_SHIFT_BITS)
+
+// For JIT modules funtion-id is also the module-instance-id
+#define CXL_GET_DB_JIT_MODULE_INSTANCE_ID(funcId_)   ((funcId_) & DB_FUNCTIONID_MASK)
 
 #define CXL_CLU_EVENT_CLU_PERCENTAGE        0xFF00UL
 #define CXL_CLU_EVENT_L1_EVICTIONS          0xFF04UL
@@ -171,7 +175,7 @@ const char* SQL_CMD_TX_COMMIT = "COMMIT TRANSACTION";
 // Sqlite Version
 const char* SQL_CMD_SET_USER_VERSION = "PRAGMA user_version=1";
 const char* SQL_CMD_GET_USER_VERSION = "PRAGMA user_version";
-const char* SQL_CMD_SET_SYNCHRONOUS = "PRAGMA synchronous=0";
+const char* SQL_CMD_SET_SYNCHRONOUS = "PRAGMA synchronous=0"; // off
 
 // A reference counter for number of sqlite connections.
 // Will be used to decide whether to shutdown sqlite.
@@ -5412,6 +5416,61 @@ public:
         return ret;
     }
 
+    // Retrives the list of processes and threads for which the given function-id has samples
+    bool GetProcessAndThreadListForFunction(
+        AMDTFunctionId              funcId,
+        AMDTUInt32                  funcStartOffset,
+        gtVector<AMDTProcessId>&    processList,
+        gtVector<AMDTThreadId>&     threadList)
+    {
+        bool ret = false;
+
+        if (IS_FUNCTION_QUERY(funcId))
+        {
+            std::stringstream query;
+            sqlite3_stmt* pQueryStmt = nullptr;
+            bool isUnknownFunc = IS_UNKNOWN_FUNC(funcId);
+
+            query << "SELECT DISTINCT processId, threadId FROM SampleFunctionSummaryAllData WHERE functionId = ? ";
+
+            if (isUnknownFunc && (funcStartOffset > 0))
+            {
+                query << " and offset = ? ";
+            }
+
+            query << " ; ";
+
+            int rc = sqlite3_prepare_v2(m_pReadDbConn, query.str().c_str(), -1, &pQueryStmt, nullptr);
+
+            if (rc == SQLITE_OK)
+            {
+                gtSet<AMDTProcessId> pidUniqueSet;
+                gtSet<AMDTThreadId> tidUniqueSet;
+
+                sqlite3_bind_int(pQueryStmt, 1, funcId);
+
+                if (isUnknownFunc)
+                {
+                    sqlite3_bind_int(pQueryStmt, 2, funcStartOffset);
+                }
+
+                // Execute the query.
+                while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
+                {
+                    processList.push_back(sqlite3_column_int(pQueryStmt, 0));
+                    threadList.push_back(sqlite3_column_int(pQueryStmt, 1));
+                }
+            }
+
+            // Finalize the statement.
+            sqlite3_finalize(pQueryStmt);
+
+            ret = (SQLITE_DONE == rc) ? true : false;
+        }
+
+        return ret;
+    }
+
     // Supported
     //      process (all processes, given process)
     //      thread (all processes, given process)
@@ -5702,6 +5761,60 @@ public:
         return ret;
     }
 
+#if 0
+    bool GetFunctionInfo(
+        AMDTFunctionId              functionId,
+        gtUInt32                    funcStartOffset,
+        AMDTProfileFunctionData&    functionData)
+    {
+        bool ret = true;
+        bool isUnknownFunc = IS_UNKNOWN_FUNC(functionId);
+
+        if (!isUnknownFunc)
+        {
+            ret = GetFunctionInfo(functionId, funcStartOffset, functionData.m_functionInfo);
+        }
+
+        if (ret)
+        {
+            gtVector<AMDTProfileModuleInfo> moduleInfoList;
+            AMDTModuleId modId = CXL_GET_DB_MODULE_ID(functionId);
+            AMDTProcessId procId = AMDT_PROFILE_ALL_PROCESSES;
+
+            bool isJitModule = false;
+            ret = GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, modId, moduleInfoList);
+
+            if (ret && moduleInfoList.size() > 0)
+            {
+                isJitModule = ((AMDT_MODULE_TYPE_JAVA == moduleInfoList[0].m_type) || (AMDT_MODULE_TYPE_MANAGEDDPE == moduleInfoList[0].m_type))
+                    ? true : false;
+            }
+
+            if (!isJitModule)
+            {
+                GetModuleBaseAddressByModuleId(modId, procId, functionData.m_modBaseAddress);
+            }
+            else
+            {
+                AMDTModuleId modInstId = CXL_GET_DB_JIT_MODULE_INSTANCE_ID(functionId);
+                GetModuleBaseAddressByModuleInstanceId(modInstId, procId, functionData.m_modBaseAddress);
+                functionData.m_functionInfo.m_startOffset = 0;
+            }
+        }
+
+        if (ret)
+        {
+            // Get the list of processes and threads for which this function has samples
+            ret = ret && GetProcessAndThreadListForFunction(functionId,
+                                                            funcStartOffset,
+                                                            functionData.m_pidsList,
+                                                            functionData.m_threadsList);
+        }
+
+        return ret;
+    }
+#endif //0
+
     // Query CallStackLeaf to get the unknown functions
     bool GetUnknownCallstackLeafsByProcessId(
         AMDTProcessId       processId,
@@ -5948,10 +6061,9 @@ public:
         bool ret = false;
 
         std::stringstream query;
-        // TODO: remove "AND functionId > 0" condition
         query << "SELECT callstackId, functionId, offset, depth "  \
                  "FROM  CallstackFrame "     \
-                 "WHERE callstackId = ? AND processId = ? AND functionId > 0 ";
+                 "WHERE callstackId = ? AND processId = ? ";
 
         if (ascendingOrder)
         {
@@ -7024,6 +7136,37 @@ bool AmdtDatabaseAccessor::GetFunctionInfoByModuleId(AMDTModuleId moduleId, AMDT
     if (m_pImpl != nullptr)
     {
         ret = m_pImpl->GetFunctionInfoByModuleId(moduleId, funcInfoVec);
+    }
+
+    return ret;
+}
+
+bool AmdtDatabaseAccessor::GetFunctionInfo(
+    AMDTFunctionId              functionId,
+    gtUInt32                    funcStartOffset,
+    AMDTProfileFunctionInfo&    functionInfo)
+{
+    bool ret = false;
+
+    if (m_pImpl != nullptr)
+    {
+        ret = m_pImpl->GetFunctionInfo(functionId, funcStartOffset, functionInfo);
+    }
+
+    return ret;
+}
+
+bool AmdtDatabaseAccessor::GetProcessAndThreadListForFunction(
+    AMDTFunctionId              funcId,
+    AMDTUInt32                  funcStartOffset,
+    gtVector<AMDTProcessId>&    processList,
+    gtVector<AMDTThreadId>&     threadList)
+{
+    bool ret = false;
+
+    if (m_pImpl != nullptr)
+    {
+        ret = m_pImpl->GetProcessAndThreadListForFunction(funcId, funcStartOffset, processList, threadList);
     }
 
     return ret;

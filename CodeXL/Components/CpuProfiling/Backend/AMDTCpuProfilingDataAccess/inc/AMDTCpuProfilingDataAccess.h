@@ -100,6 +100,12 @@ public:
     bool GetModuleInfoForFunction(AMDTFunctionId funcId, AMDTProfileModuleInfo& modInfo);
     bool GetFunctionInfoByModuleId(AMDTModuleId modId, AMDTProfileFunctionInfoVec& funcInfoVec, gtVAddr& modBaseAddr);
 
+    bool GetFunctionInfo(AMDTFunctionId             functionId,
+                         AMDTProfileFunctionInfo&   functionInfo,
+                         gtUInt64*                  pModLoadAddress,
+                         gtVector<AMDTProcessId>*   pProcessList,
+                         gtVector<AMDTThreadId>*    pThreadList);
+
     //  Summary APIs
     bool GetProcessSummary(AMDTUInt32 counterId, AMDTProfileDataVec& processSummaryData);
     bool GetThreadSummary(AMDTUInt32 counterId, AMDTProfileDataVec& threadSummaryData);
