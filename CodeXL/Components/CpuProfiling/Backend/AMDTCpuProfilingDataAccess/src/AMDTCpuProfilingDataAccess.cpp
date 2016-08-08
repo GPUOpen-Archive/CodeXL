@@ -2267,6 +2267,11 @@ public:
 
             ret = m_pDbAdapter->GetFunctionInfo(functionId, funcStartOffset, functionInfo);
 
+            if (ret)
+            {
+                AddFuncInfoToFuncIdInfoMap(functionId, functionInfo);
+            }
+
             if (nullptr != pModLoadAddress)
             {
                 AMDTProfileModuleInfo modInfo;
