@@ -956,6 +956,9 @@ public:
 
             GT_IF_WITH_ASSERT(rc == SQLITE_OK)
             {
+                // Turn off synchronous
+                SetSynchronousOff();
+
                 ret = CreateTables(SQL_CREATE_DB_STMTS_COMMON);
 
                 if (ret && ((profileType & AMDT_PROFILE_MODE_TIMELINE) == AMDT_PROFILE_MODE_TIMELINE))
