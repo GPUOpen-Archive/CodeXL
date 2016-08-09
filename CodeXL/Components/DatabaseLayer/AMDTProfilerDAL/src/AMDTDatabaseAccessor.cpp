@@ -60,6 +60,7 @@
 #define DB_FUNCTIONID_MASK      0x0000FFFFUL
 #define DB_MODULEID_SHIFT_BITS  16
 #define CXL_GET_DB_MODULE_ID(funcId_)   (((funcId_) & DB_MODULEID_MASK) >> DB_MODULEID_SHIFT_BITS)
+#define CXL_DB_GET_PROC_MOD_ID(proc_, mod_, id_)  id_ = proc_; id_ = (((id_) << 32) | mod_);
 
 // For JIT modules funtion-id is also the module-instance-id
 #define CXL_GET_DB_JIT_MODULE_INSTANCE_ID(funcId_)   ((funcId_) & DB_FUNCTIONID_MASK)
@@ -4717,6 +4718,28 @@ public:
 
     bool GetModulePath(AMDTModuleId modId, gtString& modPath)
     {
+        bool ret = true;
+        auto pathIt = m_moduleIdPathMap.find(modId);
+
+        if (pathIt != m_moduleIdPathMap.end())
+        {
+            modPath = pathIt->second;
+        }
+        else
+        {
+            ret = GetModulePath__(modId, modPath);
+
+            if (ret)
+            {
+                m_moduleIdPathMap.insert({ modId, modPath });
+            }
+        }
+
+        return ret;
+    }
+
+    bool GetModulePath__(AMDTModuleId modId, gtString& modPath)
+    {
         bool ret = false;
 
         std::stringstream query;
@@ -4822,6 +4845,32 @@ public:
     }
 
     bool GetModuleBaseAddress(AMDTFunctionId funcId, AMDTProcessId procId, AMDTUInt64& baseAddr)
+    {
+        bool ret = true;
+        AMDTUInt64 procModId = 0;
+        AMDTModuleId modId = CXL_GET_DB_MODULE_ID(funcId);
+        CXL_DB_GET_PROC_MOD_ID(procId, modId, procModId);
+
+        auto modAddrIt = m_modIdLoadAddrMap.find(procModId);
+
+        if (modAddrIt != m_modIdLoadAddrMap.end())
+        {
+            baseAddr = (*modAddrIt).second;
+        }
+        else
+        {
+            ret = GetModuleBaseAddress__(funcId, procId, baseAddr);
+
+            if (ret)
+            {
+                m_modIdLoadAddrMap.insert({ procModId, baseAddr });
+            }
+        }
+
+        return ret;
+    }
+
+    bool GetModuleBaseAddress__(AMDTFunctionId funcId, AMDTProcessId procId, AMDTUInt64& baseAddr)
     {
         bool ret = false;
         AMDTModuleId modId = CXL_GET_DB_MODULE_ID(funcId);
@@ -4955,7 +5004,7 @@ public:
         // ret = (SQLITE_DONE == rc || SQLITE_ROW == rc) ? true : false;
         return ret;
     }
-
+    
     bool GetFunctionInfo(AMDTFunctionId funcId, gtUInt32 startOffset, AMDTProfileFunctionInfo& funcInfo)
     {
         bool ret = false;
@@ -6341,6 +6390,8 @@ public:
     int m_dbVersion = -1;
 
     gtMap<AMDTModuleId, AMDTProfileModuleInfo> m_moduleIdInfoMap;
+    gtMap<AMDTModuleId, gtString> m_moduleIdPathMap;
+    gtMap<gtUInt64, gtUInt64> m_modIdLoadAddrMap; // {procModId, modLoadAddress}
 };
 
 AmdtDatabaseAccessor::AmdtDatabaseAccessor() : m_pImpl(new AmdtDatabaseAccessor::Impl(this))
