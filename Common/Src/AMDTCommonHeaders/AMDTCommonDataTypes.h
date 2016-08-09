@@ -19,9 +19,25 @@
 //  Macros
 //
 
+// String declaration helper
+#define CODEXL_STR__(x) #x
+#define CODEXL_STR_(x) CODEXL_STR__(x)
+
+// Wide string declaration helper
+#define CODEXL_WSTR__(x) L ## x
+#define CODEXL_WSTR_(x)  CODEXL_WSTR__(x)
+
+// Version History:
+// 1.0 = Power profile DB schema
+// 2.0 = Added Cpu profile DB schema
+// 2.1 = Added 4 new fields to session info table: core count, css interval, codexl collector/translator versions
+#define CODEXL_DB_SCHEME_VERSION_MAJOR     2
+#define CODEXL_DB_SCHEME_VERSION_MINOR     1
+
+
 // Session Info Keys
 #define AMDT_SESSION_INFO_KEY_DB_SCHEME_VERSION         L"DB Scheme Version"
-#define AMDT_SESSION_INFO_VALUE_DB_SCHEME_VERSION       L"2.0"
+#define AMDT_SESSION_INFO_VALUE_DB_SCHEME_VERSION       CODEXL_WSTR_( CODEXL_STR_(CODEXL_DB_SCHEME_VERSION_MAJOR) ) L"." CODEXL_WSTR_( CODEXL_STR_(CODEXL_DB_SCHEME_VERSION_MINOR) )
 
 #define AMDT_SESSION_INFO_KEY_TARGET_MACHINE            L"Target Machine Name"
 #define AMDT_SESSION_INFO_KEY_TARGET_APP_WORKING_DIR    L"Target App Working Dir"

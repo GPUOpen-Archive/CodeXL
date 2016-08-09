@@ -402,6 +402,54 @@ bool AmdtDatabaseAdapter::GetSessionConfiguration(AMDTProfileSessionInfo& sessio
         {
             sessionInfo.m_cssFPOEnabled = (valueStr.compareNoCase(L"YES") == 0) ? true : false;
         }
+
+        valueStr.makeEmpty();
+        isOk = m_pDbAccessor->GetSessionInfoValue(gtString(AMDT_SESSION_INFO_KEY_DB_SCHEME_VERSION), valueStr);
+
+        if (isOk)
+        {
+            gtUInt16 major = CODEXL_DB_SCHEME_VERSION_MAJOR;
+            gtUInt16 minor = CODEXL_DB_SCHEME_VERSION_MINOR;
+
+            if (valueStr.length() > 2)
+            {
+                major = valueStr[0] - L'0';
+                minor = valueStr[2] - L'0';
+            }
+
+            bool isEqOrHigherVersion_2_1 = (major > 2 || (major == 2 && minor >= 1)) ? true : false;
+
+            if (isEqOrHigherVersion_2_1)
+            {
+                valueStr.makeEmpty();
+                isOk = m_pDbAccessor->GetSessionInfoValue(gtString(AMDT_SESSION_INFO_CORE_COUNT), valueStr);
+
+                if (isOk)
+                {
+                    gtUInt32 coreCount = 0;
+                    valueStr.toUnsignedIntNumber(coreCount);
+                    sessionInfo.m_coreCount = coreCount;
+                }
+
+                valueStr.makeEmpty();
+                isOk = m_pDbAccessor->GetSessionInfoValue(gtString(AMDT_SESSION_INFO_CSS_INTERVAL), valueStr);
+
+                if (isOk)
+                {
+                    gtUInt32 cssInterval = 0;
+                    valueStr.toUnsignedIntNumber(cssInterval);
+                    sessionInfo.m_cssInterval = static_cast<gtUInt16>(cssInterval);
+                }
+            }
+            else
+            {
+                gtVector<AMDTCpuTopology> cpuTopology;
+                m_pDbAccessor->GetCpuTopology(cpuTopology);
+
+                sessionInfo.m_coreCount = cpuTopology.size();
+                sessionInfo.m_cssInterval = 1;
+            }
+        }
     }
 
     return isOk;
