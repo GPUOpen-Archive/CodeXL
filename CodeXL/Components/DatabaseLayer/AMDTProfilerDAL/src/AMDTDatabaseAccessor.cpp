@@ -143,6 +143,7 @@ const std::vector<std::string> SQL_CREATE_DB_STMTS_AGGREGATION =
     "CREATE INDEX processThreadIdx ON ProcessThread(processId, threadId)",
     "CREATE INDEX processThreadIdx1 ON ProcessThread(id)",
     "CREATE INDEX moduleInstanceIdx ON ModuleInstance(id)",
+    "CREATE INDEX moduleInstanceIdx1 ON ModuleInstance(processId, moduleId)",
     "CREATE INDEX moduleIdx ON Module(id)",
     "CREATE INDEX SampleContextIdx1 ON SampleContext(coreSamplingConfigurationId)",
     "CREATE INDEX FunctionIdx ON Function(id)",
@@ -4823,6 +4824,7 @@ public:
     bool GetModuleBaseAddress(AMDTFunctionId funcId, AMDTProcessId procId, AMDTUInt64& baseAddr)
     {
         bool ret = false;
+        AMDTModuleId modId = CXL_GET_DB_MODULE_ID(funcId);
 
         std::stringstream query;
         //select loadAddress from ModuleInstance where processId = 7828 and moduleId = (select moduleId from Function where id = 6);
@@ -4835,7 +4837,8 @@ public:
             query << " processId = ? AND ";
         }
 
-        query << " moduleID = (SELECT moduleId from Function WHERE id = ? LIMIT 1);";
+        //query << " moduleID = (SELECT moduleId from Function WHERE id = ? LIMIT 1);";
+        query << " moduleID = ? ;";
 
         sqlite3_stmt* pQueryStmt = nullptr;
         const std::string& queryStr = query.str();
@@ -4846,11 +4849,11 @@ public:
             if (IS_PROCESS_QUERY(procId))
             {
                 sqlite3_bind_int(pQueryStmt, 1, procId);
-                sqlite3_bind_int(pQueryStmt, 2, funcId);
+                sqlite3_bind_int(pQueryStmt, 2, modId);
             }
             else
             {
-                sqlite3_bind_int(pQueryStmt, 1, funcId);
+                sqlite3_bind_int(pQueryStmt, 1, modId);
             }
 
             if ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
