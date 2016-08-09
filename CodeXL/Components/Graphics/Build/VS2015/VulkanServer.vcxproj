@@ -150,8 +150,8 @@
     <ClInclude Include="..\..\Server\VulkanServer\VKT\vktLayerManager.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\Common\Src\Vulkan\1.0.13.0\SDK\Source\layers\vk_layer_extension_utils.cpp" />
-    <ClCompile Include="..\..\..\..\..\Common\Src\Vulkan\1.0.13.0\SDK\Source\layers\vk_layer_table.cpp" />
+    <ClCompile Include="..\..\..\..\..\Common\Src\Vulkan\1.0.21.1\SDK\Source\layers\vk_layer_extension_utils.cpp" />
+    <ClCompile Include="..\..\..\..\..\Common\Src\Vulkan\1.0.21.1\SDK\Source\layers\vk_layer_table.cpp" />
     <ClCompile Include="..\..\Server\VulkanServer\OS\Windows\DllMain.cpp" />
     <ClCompile Include="..\..\Server\VulkanServer\VKT\FrameDebugger\vktFrameDebuggerLayer.cpp" />
     <ClCompile Include="..\..\Server\VulkanServer\VKT\Interception\vktIntercept.cpp" />
