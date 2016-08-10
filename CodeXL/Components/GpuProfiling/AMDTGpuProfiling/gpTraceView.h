@@ -142,6 +142,7 @@ public:
     
     gpTraceDataContainer* GetSessionDataContainer()const { return m_pSessionDataContainer; }
 
+    acTimelineBranch* GetBranchFromText(const QString& branchText) const;
 
 public slots:
 
@@ -192,6 +193,7 @@ public slots:
     /// resize event
     /// \param event
     virtual void resizeEvent(QResizeEvent* event);
+
 
 protected:
 

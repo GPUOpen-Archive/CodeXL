@@ -520,27 +520,17 @@ void gpNavigationRibbon::OnTimeLineZoomOrOffsetChanged()
 void gpNavigationRibbon::OnDisplayFiltersClicked()
 {
 
-   bool threadsExistInSession = (m_pOwningSession->GetSessionDataContainer()->ThreadsCount() > 0);
+   // open thread profiling settings dialog window
+    GT_IF_WITH_ASSERT(m_pThreadFilterDialog != nullptr)
+    {
+        m_pThreadFilterDialog->DisplayDialog(m_pTimeLine->GetBranches());
 
-   if (threadsExistInSession)
-   {
-       // open thread profiling settings dialog window
-       GT_IF_WITH_ASSERT(m_pThreadFilterDialog != nullptr)
-       {
-           m_pThreadFilterDialog->DisplayDialog(m_pTimeLine->GetBranches());
-
-           // if ok button was clicked - update the link label
-           if (QDialog::Accepted == m_pThreadFilterDialog->exec())
-           {
-               emit m_pTimeLine->VisibilityFilterChanged(m_pThreadFilterDialog->getThreadVisibilityMap());
-           }
-       }
-   }
-   else
-   {
-       acMessageBox::instance().critical(GP_STR_NavigationChartNoCPUDataTitle, GP_STR_NavigationChartNoCPUDataMsg, QMessageBox::Ok);
-
-   }
+        // if ok button was clicked - update the link label
+        if (QDialog::Accepted == m_pThreadFilterDialog->exec())
+        {
+            emit m_pTimeLine->VisibilityFilterChanged(m_pThreadFilterDialog->getThreadVisibilityMap());
+        }
+    }
 }
 
 /// Received when timeline filters are changed

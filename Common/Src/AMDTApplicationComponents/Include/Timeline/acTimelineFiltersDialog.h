@@ -62,9 +62,7 @@ private:
 
     void UpdateCheckStatesFromTree();
 
-    bool IsCPUTRootNode(acTimelineBranch* pBranch)const;
-
-    void UpdateCheckStateFromItem(QTreeWidgetItem* pItem, acTimelineBranch* pBranch, bool isCPUItem, bool isRootItem);
+    void UpdateCheckStateFromItem(QTreeWidgetItem* pItem, acTimelineBranch* pBranch, bool isRootItem);
 
 
     /// vertical layout UI items

@@ -1050,3 +1050,7 @@ acTimelineItem* gpTraceView::SessionItemToTimelineItem(ProfileSessionDataItem* p
     }
     return pItem;
 }
+acTimelineBranch* gpTraceView::GetBranchFromText(const QString& branchText) const
+{
+    return m_pTimeline->getBranchFromText(branchText, true, true);
+}

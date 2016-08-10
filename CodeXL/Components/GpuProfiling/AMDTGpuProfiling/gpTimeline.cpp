@@ -986,12 +986,14 @@ void gpTimeline::UpdateCPUCaption()
     {
         int visibleCPUThreadCount = 0;
         int CPUThreadCount = 0;
+        acTimelineBranch* pCPUBranch = nullptr;
 
         // change caption of CPU branch: add num visible threads
         for (auto pBranch : m_subBranches)
         {
             if (pBranch->text().contains("CPU"))
             {
+                pCPUBranch = pBranch;
                 CPUThreadCount = pBranch->subBranchCount();
 
                 for (int i = 0; i < CPUThreadCount; i++)
@@ -1006,36 +1008,23 @@ void gpTimeline::UpdateCPUCaption()
             }
         }
 
-        acTimelineBranch* pCPUBranch = m_subBranches[0];
-        QString str = QString(GPU_STR_TraceViewCPUThreads).arg(visibleCPUThreadCount).arg(CPUThreadCount);
-
-        if (pCPUBranch != nullptr && visibleCPUThreadCount > 0)
+        if (pCPUBranch != nullptr)
         {
-            pCPUBranch->setText(str);
+            QString str = QString(GPU_STR_TraceViewCPUThreads).arg(visibleCPUThreadCount).arg(CPUThreadCount);
+
+            if (pCPUBranch != nullptr && visibleCPUThreadCount > 0)
+            {
+                pCPUBranch->setText(str);
+            }
         }
     }
 }
 
 void gpTimeline::OnVisibilityFilterChanged(QMap<QString, bool>& threadNameVisibilityMap)
 {
-    int CPUThreadCount = threadNameVisibilityMap.size();
-    int visibleCPUThreadCount = 0;
+    GT_UNREFERENCED_PARAMETER(threadNameVisibilityMap);
 
-    for (auto e : threadNameVisibilityMap.keys())
-    {
-        if (threadNameVisibilityMap.value(e) == true)
-        {
-            visibleCPUThreadCount++;
-        }
-    }
-
-    acTimelineBranch* pCPUBranch = m_subBranches[0];
-    QString str = QString(GPU_STR_TraceViewCPUThreads).arg(visibleCPUThreadCount).arg(CPUThreadCount);
-
-    if (pCPUBranch != nullptr)
-    {
-        pCPUBranch->setText(str);
-    }
+    UpdateCPUCaption();
 }
 
 /// Overridden QWidget method called when this widget needs to be painted.

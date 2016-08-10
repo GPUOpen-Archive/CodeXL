@@ -246,14 +246,29 @@ void gpTraceSummaryTable::CollateAllItemsIntoSummaryMap()
     {
         APISummaryTraceInfo info;
         QList<ProfileSessionDataItem*> values = m_allCallItemsMultiMap.values(key);
+        bool showQueue = true;
+
 
         foreach (ProfileSessionDataItem* pItem, values)
         {
-            if (pItem != nullptr)
+            if (showQueue)
             {
-                unsigned int apiId;
-                pItem->GetAPIFunctionID(apiId);
-                AddSessionItemToSummaryInfo(info, pItem, apiId);
+                if (pItem != nullptr)
+                {
+                    QString queueDisplayName = pItem->QueueDisplayName(pItem->QueueName());
+                    acTimelineBranch* pTimelineItem = m_pTraceView->GetBranchFromText(queueDisplayName);
+
+                    // GetBranchFromText returns only visible items
+                    if (pTimelineItem == nullptr || pTimelineItem->IsVisible() == false)
+                    {
+                        showQueue = false;
+                        break;
+                    }
+
+                    unsigned int apiId;
+                    pItem->GetAPIFunctionID(apiId);
+                    AddSessionItemToSummaryInfo(info, pItem, apiId);
+                }
             }
         }
 

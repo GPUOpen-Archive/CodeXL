@@ -107,9 +107,10 @@ void acTimelineFiltersDialog::InitializeLayout()
     m_pMainLayout->addLayout(m_pButtonBox);
 
     setLayout(m_pMainLayout);
-    setMaximumWidth(AC_TIMELINE_FILTERS_WIDTH);
     setMinimumWidth(AC_TIMELINE_FILTERS_WIDTH);
-    setMaximumHeight(AC_TIMELINE_FILTERS_HEIGHT);
+    setMinimumHeight(AC_TIMELINE_FILTERS_HEIGHT);
+    setMaximumWidth(AC_TIMELINE_FILTERS_WIDTH+200);
+    setMaximumHeight(AC_TIMELINE_FILTERS_HEIGHT+200);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
 }
 
@@ -154,21 +155,17 @@ void acTimelineFiltersDialog::BuildItemTree()
         for (QList<acTimelineBranch*>::const_iterator iter = m_pSubBranches->begin(); iter != m_pSubBranches->end(); ++iter)
         {
             acTimelineBranch* pBranch = (*iter);
-            bool isCPUItem = IsCPUTRootNode(pBranch);
 
-            if (isCPUItem == true)
-            {
-                QTreeWidgetItem* pTopItem = new QTreeWidgetItem();
+            QTreeWidgetItem* pTopItem = new QTreeWidgetItem();
 
-                m_pItemsTree->addTopLevelItem(pTopItem);
-                m_pItemsTree->expandItem(pTopItem);
-                AddItemToTree(pBranch, pTopItem);
+            m_pItemsTree->addTopLevelItem(pTopItem);
+            m_pItemsTree->expandItem(pTopItem);
+            AddItemToTree(pBranch, pTopItem);
 
-                m_pVLayout->addStretch();
+            m_pVLayout->addStretch();
 
-                // connected to tree item checked state changed
-                connect(m_pItemsTree, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(OnTreeItemChanged(QTreeWidgetItem*, int)));
-            }
+            // connected to tree item checked state changed
+            connect(m_pItemsTree, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(OnTreeItemChanged(QTreeWidgetItem*, int)));
         }
     }
 }
@@ -180,11 +177,7 @@ void acTimelineFiltersDialog::AddItemToTree(acTimelineBranch* pBranch, QTreeWidg
         pTreeItem->setFlags(pTreeItem->flags() | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
         pTreeItem->setText(0, pBranch->text());
 
-
-        if (IsCPUTRootNode(pBranch) == false)
-        {
-            m_threadNameVisibilityMap.insert(pBranch->text(), pBranch->IsVisible());
-        }
+        m_threadNameVisibilityMap.insert(pBranch->text(), pBranch->IsVisible());
 
         int visibleSubBranchesCount = 0;
         int subBranchesCount = pBranch->subBranchCount();
@@ -207,11 +200,11 @@ void acTimelineFiltersDialog::AddItemToTree(acTimelineBranch* pBranch, QTreeWidg
 
         if (pBranch->IsVisible() == true)
         {
-            if (visibleSubBranchesCount == subBranchesCount && pBranch->IsVisible() == true)
+            if (visibleSubBranchesCount == subBranchesCount )
             {
                 state = Qt::Checked;
             }
-            else
+            else if (subBranchesCount > 1)
             {
                 state = Qt::PartiallyChecked;
             }
@@ -294,45 +287,37 @@ void acTimelineFiltersDialog::UpdateCheckStatesFromTree()
         for (QList<acTimelineBranch*>::iterator iter = m_pSubBranches->begin(); iter != m_pSubBranches->end(); ++iter)
         {
             acTimelineBranch* pBranch = (*iter);
-            bool isCPUItem = IsCPUTRootNode(pBranch);
 
             // get top level item
             QTreeWidgetItem* pTopItem = m_pItemsTree->topLevelItem(i);
 
-            UpdateCheckStateFromItem(pTopItem, pBranch, isCPUItem, true);
+            UpdateCheckStateFromItem(pTopItem, pBranch, true);
             i++;
+            m_isAllItemsChecked = (m_pSubBranches->count() == m_visibleCPUThreadCount ? Qt::Checked : (m_visibleCPUThreadCount ? Qt::PartiallyChecked : Qt::Unchecked));
         }
     }
 }
 
-bool acTimelineFiltersDialog::IsCPUTRootNode(acTimelineBranch* pBranch)const
-{
-    GT_IF_WITH_ASSERT(pBranch != nullptr)
-    {
-        return pBranch->text().contains("CPU");
-    }
-    return false;
-}
-
-void acTimelineFiltersDialog::UpdateCheckStateFromItem(QTreeWidgetItem* pItem, acTimelineBranch* pBranch, bool isCPUItem, bool isRootItem)
+void acTimelineFiltersDialog::UpdateCheckStateFromItem(QTreeWidgetItem* pItem, acTimelineBranch* pBranch, bool isRootItem)
 {
     if (pItem != nullptr && pBranch != nullptr)
     {
         Qt::CheckState state = pItem->checkState(0);
-        m_isAllItemsChecked &= (state != Qt::Unchecked);
-
-        if (isRootItem == false)
+        //m_isAllItemsChecked &= (state != Qt::Unchecked);
+        if (isRootItem == true)
         {
-            if (isCPUItem == true)
+            m_visibleCPUThreadCount = 0;
+        }
+        else
+        {
+
+            m_CPUThreadCount++;
+
+            if (state != Qt::Unchecked)
             {
-                m_CPUThreadCount++;
-
-                if (state != Qt::Unchecked)
-                {
-                    m_visibleCPUThreadCount++;
-                }
+                m_visibleCPUThreadCount++;
             }
-
+            
             pBranch->setVisibility(state != Qt::Unchecked);
             m_threadNameVisibilityMap[pBranch->text()] = state != Qt::Unchecked;
 
@@ -344,7 +329,7 @@ void acTimelineFiltersDialog::UpdateCheckStateFromItem(QTreeWidgetItem* pItem, a
         {
             QTreeWidgetItem* pSubItem = pItem->child(j);
             acTimelineBranch* pSubBranch = pBranch->getSubBranch(j);
-            UpdateCheckStateFromItem(pSubItem, pSubBranch, isCPUItem, false);
+            UpdateCheckStateFromItem(pSubItem, pSubBranch, false);
         }
     }
 }
