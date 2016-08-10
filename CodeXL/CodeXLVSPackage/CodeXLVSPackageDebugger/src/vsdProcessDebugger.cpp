@@ -1419,6 +1419,7 @@ void vsdProcessDebugger::onEvent(const apEvent& eve, bool& vetoEvent)
                                 {
                                     // We need to continue stepping out of the spy code:
                                     IDebugThread2* piThread = pStepData->Thread();
+                                    OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_EXTENSIVE, L"Performing deferred step - Thread: %p, StepKind: %#x", piThread, pStepData->StepKind());
                                     HRESULT hr = m_piProgram->Step(piThread, pStepData->StepKind(), STEP_LINE);
                                     bool rcStp = (SUCCEEDED(hr) && (S_FALSE != hr));
 
