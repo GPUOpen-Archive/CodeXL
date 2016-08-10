@@ -758,6 +758,10 @@ void SharedProfileManager::GetToolbarStartButtonText(gtString& buttonText, bool 
             buttonText.append(PM_STR_startButtonSystemWide);
         }
     }
+    else if (!exeFileName.isEmpty() && fullString)
+    {
+        buttonText.appendFormattedString(AF_STR_playButtonExeNameOnly, exeFileName.asCharArray());
+    }
 }
 
 ///Visual studio direct ui check
