@@ -1533,16 +1533,38 @@ void vscCLSIDToIUnknownWithIVsLoader(const wchar_t* vsRegistryRootPath, const GU
     }
 }
 
+
 // ---------------------------------------------------------------------------
-// Name:        vsc_InitPackageDebugger
-//              (CCodeXLVSPackagePackage::sendParametersToVSPackageCode)
-// Description: Gets the details needed to initialize the gDEBuggerVSPackageCode
-//              project, and send it to them
+// Name:        vscLoadDebugEngineByGUID
+// Description: Uses the AD7Metrics to determine an engine's CLSID from its GUID
+//              and loads it with the VS loader
 // Author:      Uri Shomroni
-// Date:        22/12/2011
+// Date:        2/8/2016
 // ---------------------------------------------------------------------------
-void vsc_InitPackageDebugger(const wchar_t* vsRegistryRootPath, const wchar_t* vsTempRegistryRootPath)
+bool vscLoadDebugEngineByGUID(const wchar_t* vsRegistryRootPath, const wchar_t* vsTempRegistryRootPath, const GUID& engineGUID, IUnknown*& rpiDebugEngineAsUnknown)
 {
+    // Use this only if something is not working with the registry:
+// #define VSC_USE_DEBUG_ENGINE_STATIC_CLSIDS 1
+#ifndef VSC_USE_DEBUG_ENGINE_STATIC_CLSIDS
+    CLSID CLSID_FreeUsedEngine = { 0x3B476D36, 0xA401, 0x11D2,{ 0xAA, 0xD4, 0x00, 0xC0, 0x4F, 0x99, 0x01, 0x71 } }; // Default to the native engine.
+
+    HRESULT hr = ::GetMetric(nullptr, metrictypeEngine, engineGUID, metricCLSID, &CLSID_FreeUsedEngine, (const unsigned short*)vsTempRegistryRootPath);
+    // TO_DO: Might need both root paths to be passed - but we don't expect the native engine to be temporary...
+    if (!SUCCEEDED(hr))
+    {
+        hr = ::GetMetric(nullptr, metrictypeEngine, engineGUID, metricCLSID, &CLSID_FreeUsedEngine, (const unsigned short*)vsRegistryRootPath);
+        if (!SUCCEEDED(hr))
+        {
+            GT_ASSERT_EX(false, L"Failed to find debug engine CLSID. Using native engine CLSID by default");
+        }
+    }
+
+
+#else // defined VSC_USE_DEBUG_ENGINE_STATIC_CLSIDS
+#define VSC_EQUAL_GUID(g1, g2) ((g1.Data1    == g2.Data1)    && (g1.Data2    == g2.Data2)    && (g1.Data3    == g2.Data3)    && (g1.Data4[0] == g2.Data4[0]) && \
+                                (g1.Data4[1] == g2.Data4[1]) && (g1.Data4[2] == g2.Data4[2]) && (g1.Data4[3] == g2.Data4[3]) && (g1.Data4[4] == g2.Data4[4]) && \
+                                (g1.Data4[5] == g2.Data4[5]) && (g1.Data4[6] == g2.Data4[6]) && (g1.Data4[7] == g2.Data4[7]))
+
     //////////////////////////////////////////////////////////////////////////
     // See http://romanmarusyk.livejournal.com/5046.html and http://social.msdn.microsoft.com/Forums/ar/vsx/thread/3b75164e-31c4-49c8-923f-2b91be49080a:
     //////////////////////////////////////////////////////////////////////////
@@ -1553,21 +1575,55 @@ void vsc_InitPackageDebugger(const wchar_t* vsRegistryRootPath, const wchar_t* v
     // The values are:
     // Engine           Engine GUID                             Engine CLSID
     // CodeXL           {D0B58E07-BEA0-44BB-AB51-458FFEA38665}  {D0B58E07-BEA0-44BB-AB51-458FFEA38665}
-    // Native Only      {3B476D35-A401-11D2-AAD4-00C04F990171}  {3B476D36-A401-11D2-AAD4-00C04F990171}
+    // Native Only      {3B476D35-A401-11D2-AAD4-00C04F990171}  {3B476D36-A401-11D2-AAD4-00C04F990171} *
+    // New Native Only  {3B476D35-A401-11D2-AAD4-00C04F990171}  {9FD54F8A-66FA-47df-AEA7-CF486A791E54} *
+    // Native + GPU     {F4453496-1DB8-47F8-A7D5-31EBDDC2EC96}  {014D0C8F-3FBD-4A8F-A6F1-14190DD7C090}
     // COM Plus Native  {92EF0900-2251-11D2-B72E-0000F87572EF}  {A8403605-9923-4605-BFBA-F47A4739AB43}
-    GUID CLSID_FreeNativeOnlyEngine = { 0x3B476D36, 0x0A401, 0x11D2, { 0xAA, 0xD4, 0x00, 0xC0, 0x4F, 0x99, 0x01, 0x71 } };
-    GUID CLSID_FreeComPlusNativeEngine = { 0xA8403605, 0x9923, 0x4605, {0xBF, 0xBA, 0xF4, 0x7A, 0x47, 0x39, 0xAB, 0x43 } };
+    //
+    // * The old (natdbgde) and new (concord) native-only debug engines are differentiated by a compatibility
+    //   flag in the SDM. Otherwise, they share the same engine ID.
+    GUID CLSID_FreeNativeOnlyEngine = { 0x3B476D36, 0xA401, 0x11D2,{ 0xAA, 0xD4, 0x00, 0xC0, 0x4F, 0x99, 0x01, 0x71 } };
+    GUID CLSID_FreeNativeAndGpuEngine = { 0x014D0C8F, 0x3FBD, 0x4A8F,{ 0xA6, 0xF1, 0x14, 0x19, 0x0D, 0xD7, 0xC0, 0x90 } };
+    GUID CLSID_FreeNewNativeOnlyEngine = { 0x9FD54F8A, 0x66FA, 0x47DF,{ 0xAE, 0xA7, 0xCF, 0x48, 0x6A, 0x79, 0x1E, 0x54 } };
+    GUID CLSID_FreeComPlusNativeEngine = { 0xA8403605, 0x9923, 0x4605,{ 0xBF, 0xBA, 0xF4, 0x7A, 0x47, 0x39, 0xAB, 0x43 } };
+
+    // This value is copied rather than taken from msdbg110.h, to avoid a dependency on the VS11 libraries when running in VS10:
+    GUID guidConcordGpuEng = { 0xF4453496, 0x1DB8, 0x47F8,{ 0xA7, 0xD5, 0x31, 0xEB, 0xDD, 0xC2, 0xEC, 0x96 } };
+
+    GUID& CLSID_FreeUsedEngine = (VSC_EQUAL_GUID(guidConcordGpuEng, engineGUID) ? CLSID_FreeNativeAndGpuEngine :
+                                 (VSC_EQUAL_GUID(guidNativeOnlyEng, engineGUID) ? CLSID_FreeNativeOnlyEngine :
+                                 (VSC_EQUAL_GUID(guidCOMPlusNativeEng, engineGUID) ? CLSID_FreeComPlusNativeEngine : 
+                                  CLSID_FreeNativeOnlyEngine))); // Default to the native value 
+#undef VSC_EQUAL_GUID
+
+#endif // VSC_USE_DEBUG_ENGINE_STATIC_CLSIDS
+
+    vscCLSIDToIUnknownWithIVsLoader(vsTempRegistryRootPath, CLSID_FreeUsedEngine, rpiDebugEngineAsUnknown);
+
+    if (nullptr == rpiDebugEngineAsUnknown)
+    {
+        vscCLSIDToIUnknownWithIVsLoader(vsRegistryRootPath, CLSID_FreeUsedEngine, rpiDebugEngineAsUnknown);
+    }
+
+    return (nullptr != rpiDebugEngineAsUnknown);
+}
+
+// ---------------------------------------------------------------------------
+// Name:        vsc_InitPackageDebugger
+//              (CCodeXLVSPackagePackage::sendParametersToVSPackageCode)
+// Description: Gets the details needed to initialize the gDEBuggerVSPackageCode
+//              project, and send it to them
+// Author:      Uri Shomroni
+// Date:        22/12/2011
+// ---------------------------------------------------------------------------
+void vsc_InitPackageDebugger(const wchar_t* vsRegistryRootPath, const wchar_t* vsTempRegistryRootPath)
+{
     bool useNativeOnly = true;
-    GUID& CLSID_FreeUsedEngine = useNativeOnly ? CLSID_FreeNativeOnlyEngine : CLSID_FreeComPlusNativeEngine;
     GUID& guidUsedEngine = useNativeOnly ? guidNativeOnlyEng : guidCOMPlusNativeEng;
 
     IUnknown* piDebugEngineAsUnknown = nullptr;
-    vscCLSIDToIUnknownWithIVsLoader(vsTempRegistryRootPath, CLSID_FreeUsedEngine, piDebugEngineAsUnknown);
-
-    if (nullptr == piDebugEngineAsUnknown)
-    {
-        vscCLSIDToIUnknownWithIVsLoader(vsRegistryRootPath, CLSID_FreeUsedEngine, piDebugEngineAsUnknown);
-    }
+    bool rcEng = vscLoadDebugEngineByGUID(vsRegistryRootPath, vsTempRegistryRootPath, guidUsedEngine, piDebugEngineAsUnknown);
+    GT_ASSERT(rcEng);
 
     GT_IF_WITH_ASSERT(nullptr != piDebugEngineAsUnknown)
     {
