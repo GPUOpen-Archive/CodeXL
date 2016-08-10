@@ -29,33 +29,6 @@
 
 const int NUM_OF_SHADER_MODELS = 3;
 
-
-
-bool GetVSVersion(VsWindowsManagementMode& vsVersion)
-{
-    bool ret = false;
-    vsVersion = VS_WMM_UNKNOWN;
-
-#ifdef VSP_VS10BUILD
-    vsVersion = VS_WMM_VS10;
-    ret = true;
-#elif defined VSP_VS11BUILD
-    vsVersion = VS_WMM_VS11;
-    ret = true;
-#elif defined VSP_VS12BUILD
-    vsVersion = VS_WMM_VS12;
-    ret = true;
-#elif defined VSP_VS14BUILD
-    vsVersion = VS_WMM_VS14;
-    ret = true;
-#else
-#error Unknown MSVC version
-#endif
-
-    return ret;
-}
-
-
 // ---------------------------------------------------------------------------
 // Name:        vspPackageCommandHandler::vspPackageCommandHandler
 // Description: Constructor

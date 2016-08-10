@@ -324,7 +324,7 @@ void vspWindowsManager::OpenSample(afCodeXLSampleID sampleId)
         GT_IF_WITH_ASSERT_EX(rcOpenSample, errorMessage.asCharArray())
         {
             // Get the VS version
-            VsWindowsManagementMode vsVersion = GetVSVersion();
+            VsWindowsManagementMode vsVersion = GetVsWindowsManagementModeFromOwner();
             GT_IF_WITH_ASSERT_EX((vsVersion != VS_WMM_UNKNOWN), L"Unknown VS version")
             {
                 // Find the suffix according to the VS version.
@@ -1050,7 +1050,7 @@ int vspWindowsManager::commandIdFromWidget(QWidget* pWidget)
     return retVal;
 }
 
-VsWindowsManagementMode vspWindowsManager::GetVSVersion() const
+VsWindowsManagementMode vspWindowsManager::GetVsWindowsManagementModeFromOwner() const
 {
     VsWindowsManagementMode retVal = VS_WMM_UNKNOWN;
     GT_IF_WITH_ASSERT(_pOwner != nullptr)

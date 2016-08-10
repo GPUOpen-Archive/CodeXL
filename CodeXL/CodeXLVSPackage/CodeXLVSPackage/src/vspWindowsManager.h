@@ -108,7 +108,7 @@ public:
 
     int commandIdFromWidget(QWidget* pWidget);
 
-    VsWindowsManagementMode GetVSVersion() const ;
+    VsWindowsManagementMode GetVsWindowsManagementModeFromOwner() const ;
 
 private:
     friend class vspSingletonsDelete;
