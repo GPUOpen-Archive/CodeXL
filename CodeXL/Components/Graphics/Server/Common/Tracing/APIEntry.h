@@ -217,6 +217,18 @@ public:
     //-----------------------------------------------------------------------------
     const char* GetParameterString() const;
 
+    //-----------------------------------------------------------------------------
+    /// Track whether we got to gather GPU time for this call.
+    /// \param gathered True if results were gathered, and false if not.
+    //-----------------------------------------------------------------------------
+    void SetGatheredGpuTime(bool gathered) { m_gatheredGpuTime = gathered; }
+
+    //-----------------------------------------------------------------------------
+    /// Return whether we got to gather GPU time for this call.
+    /// \return True if results were gathered, and false if not.
+    //-----------------------------------------------------------------------------
+    bool GatheredGpuTime() { return m_gatheredGpuTime; }
+
     //--------------------------------------------------------------------------
     /// The ID of the thread that the call was invoked/logged in.
     //--------------------------------------------------------------------------
@@ -241,6 +253,9 @@ protected:
 
 private:
     APIEntry() {}
+
+    /// Track whether we got to gather GPU time for this call
+    bool m_gatheredGpuTime;
 };
 
 #endif // APIENTRY_H

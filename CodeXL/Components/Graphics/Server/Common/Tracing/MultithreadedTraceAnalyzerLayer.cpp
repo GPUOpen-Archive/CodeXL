@@ -82,34 +82,34 @@ void MultithreadedTraceAnalyzerLayer::AfterAPITrace()
 }
 
 
-void MultithreadedTraceAnalyzerLayer::FilterTraceTypes(CaptureType captureType, bool& APITraceFlag, bool& GPUTraceFlag)
+void MultithreadedTraceAnalyzerLayer::FilterTraceTypes(CaptureType captureType, bool &APITraceFlag, bool &GPUTraceFlag )
 {
     switch (captureType)
     {
-        case CaptureType_APITrace:
-            APITraceFlag = true;
-            GPUTraceFlag = false;
-            break;
+    case CaptureType_APITrace:
+        APITraceFlag = true;
+        GPUTraceFlag = false;
+        break;
 
-        case CaptureType_GPUTrace:
-            APITraceFlag = false;
-            GPUTraceFlag = true;
-            break;
+    case CaptureType_GPUTrace:
+        APITraceFlag = false;
+        GPUTraceFlag = true;
+        break;
 
-        case CaptureType_LinkedTrace:
-            APITraceFlag = true;
-            GPUTraceFlag = true;
-            break;
+    case CaptureType_LinkedTrace:
+        APITraceFlag = true;
+        GPUTraceFlag = true;
+        break;
 
-        case CaptureType_FullFrameCapture:
-            APITraceFlag = false;
-            GPUTraceFlag = false;
-            Log(logERROR, "MultithreadedTraceAnalyzerLayer::BeginFrame - Unsupported: Full Frame Capture %d\n", captureType);
-            return;
+    case CaptureType_FullFrameCapture:
+        APITraceFlag = false;
+        GPUTraceFlag = false;
+        Log(logERROR, "MultithreadedTraceAnalyzerLayer::BeginFrame - Unsupported: Full Frame Capture %d\n", captureType);
+        return;
 
-        default:
-            Log(logERROR, "MultithreadedTraceAnalyzerLayer::BeginFrame - Unknown capture type %d\n", captureType);
-            return;
+    default:
+        Log(logERROR, "MultithreadedTraceAnalyzerLayer::BeginFrame - Unknown capture type %d\n", captureType);
+        return;
     }
 }
 
@@ -804,7 +804,7 @@ uint32 MultithreadedTraceAnalyzerLayer::GetNumTracedDrawCalls()
         {
             APIEntry* currentEntry = traceData->mLoggedCallVector[callIndex];
 
-            if (currentEntry->IsDrawCall())
+            if (currentEntry->GatheredGpuTime())
             {
                 totalDrawCalls++;
             }

@@ -344,6 +344,8 @@ void DX12TraceAnalyzerLayer::ProfilerResultToStr(
 {
     DX12APIEntry* pResultEntry = DX12FrameProfilerLayer::Instance()->FindInvocationBySampleId(pResult->measurementInfo.idInfo.mSampleId);
 
+    pResultEntry->SetGatheredGpuTime(true);
+
     gtASCIIString returnValueString;
     pResultEntry->PrintReturnValue(pResultEntry->mReturnValue, pResultEntry->mReturnValueFlags, returnValueString);
 

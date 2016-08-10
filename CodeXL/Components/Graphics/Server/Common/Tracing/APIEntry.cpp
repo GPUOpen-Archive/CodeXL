@@ -19,6 +19,7 @@ APIEntry::APIEntry(UINT inThreadId, FuncId inFuncId, const std::string& inArgume
     , mFunctionId(inFuncId)
     , mNumParameters(0)
     , mParameterBuffer(nullptr)
+    , m_gatheredGpuTime(false)
 {
     mParameters = inArguments.c_str();
 }
@@ -35,6 +36,7 @@ APIEntry::APIEntry(UINT inThreadId, FuncId inFuncId, UINT32 inNumParameters)
     , mFunctionId(inFuncId)
     , mNumParameters(inNumParameters)
     , mParameterBuffer(nullptr)
+    , m_gatheredGpuTime(false)
 {
     if (inNumParameters != 0)
     {
