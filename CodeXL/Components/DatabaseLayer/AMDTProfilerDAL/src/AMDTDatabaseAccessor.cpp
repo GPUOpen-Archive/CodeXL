@@ -178,6 +178,7 @@ const char* SQL_CMD_TX_COMMIT = "COMMIT TRANSACTION";
 const char* SQL_CMD_SET_USER_VERSION = "PRAGMA user_version=1";
 const char* SQL_CMD_GET_USER_VERSION = "PRAGMA user_version";
 const char* SQL_CMD_SET_SYNCHRONOUS = "PRAGMA synchronous=0"; // off
+const char* SQL_CMD_SET_TEMP_STORE = "PRAGMA temp_store=2"; // memory
 
 // A reference counter for number of sqlite connections.
 // Will be used to decide whether to shutdown sqlite.
@@ -281,6 +282,8 @@ public:
             sqlite3_finalize(m_pGetAllSessionInfoStmt);
             sqlite3_finalize(m_pGetSessionSamplingIntervalStmt);
             sqlite3_finalize(m_pGetSessionCounterIdsByNameStmt);
+
+            sqlite3_finalize(m_pSystemModuleQueryStmt);
         }
 
         // Close the write connection.
@@ -871,6 +874,20 @@ public:
         return ret;
     }
 
+    bool PrepareSystemModuleQuery()
+    {
+        bool ret = false;
+
+        //const char* pQuery = "SELECT id FROM SystemModule WHERE id = ? ; ";
+        const char* pQuery = "SELECT EXISTS (SELECT 1 FROM SystemModule WHERE id = ? LIMIT 1);";
+
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, pQuery, -1, &m_pSystemModuleQueryStmt, nullptr);
+
+        ret = (rc == SQLITE_OK);
+
+        return ret;
+    }
+
     bool PrepareCommonReadStatements()
     {
         bool ret = PrepareGetSessionInfoValueStatement()        &&
@@ -923,24 +940,33 @@ public:
 
         for (const std::string& createStr : createStmts)
         {
-            sqlite3_stmt* pStmt = nullptr;
-
-            // Prepare the common table creation statements
-            int rc = sqlite3_prepare_v2(m_pWriteDbConn, createStr.c_str(), createStr.size(), &pStmt, nullptr);
-
-            if (SQLITE_OK == rc)
-            {
-                rc = sqlite3_step(pStmt);
-                sqlite3_finalize(pStmt);
-            }
-
-            ret = (SQLITE_DONE == rc) ? true : false;
+            ret = CreateTable__(createStr);
 
             if (!ret)
             {
                 break;
             }
         }
+
+        return ret;
+    }
+
+    bool CreateTable__(const std::string& createStr)
+    {
+        bool ret = false;
+        sqlite3_stmt* pStmt = nullptr;
+        sqlite3 *db = (!m_canUpdateDB) ? m_pWriteDbConn : m_pReadDbConn;
+
+        // Prepare the common table creation statements
+        int rc = sqlite3_prepare_v2(db, createStr.c_str(), createStr.size(), &pStmt, nullptr);
+
+        if (SQLITE_OK == rc)
+        {
+            rc = sqlite3_step(pStmt);
+            sqlite3_finalize(pStmt);
+        }
+
+        ret = (SQLITE_DONE == rc) ? true : false;
 
         return ret;
     }
@@ -960,6 +986,9 @@ public:
             {
                 // Turn off synchronous
                 SetSynchronousOff();
+
+                // Set temp_store to memory
+                SetTempStoreMemory();
 
                 ret = CreateTables(SQL_CREATE_DB_STMTS_COMMON);
 
@@ -1024,6 +1053,9 @@ public:
                 // Turn off synchronous
                 SetSynchronousOff();
 
+                // Set temp_store to memory
+                SetTempStoreMemory();
+
                 // Now the database is open. Let's prepare all the read statements.
                 ret = PrepareCommonReadStatements();
 
@@ -1038,11 +1070,26 @@ public:
                     ret = CreateSampledCounterCoreConfig();
 
                     ret = ret && CreateModuleInfoView();
+
+                    ret = ret && CreateSystemModule();
+
+                    ret = ret && PrepareSystemModuleQuery();
                 }
 
                 m_isCurrentDbOpenForRead = ret;
             }
         }
+
+        return ret;
+    }
+
+    bool CreateSystemModule()
+    {
+        bool ret = false;
+        const char* CREATE_SYSTEM_MODULE = "CREATE TEMP TABLE SystemModule AS SELECT Module.id FROM Module where Module.isSystemModule = 1;";
+        std::string query = CREATE_SYSTEM_MODULE;
+
+        ret = CreateTable__(query.c_str());
 
         return ret;
     }
@@ -1091,6 +1138,18 @@ public:
         if (m_canUpdateDB && (nullptr != m_pReadDbConn))
         {
             sqlite3_exec(m_pReadDbConn, SQL_CMD_SET_SYNCHRONOUS, nullptr, nullptr, nullptr);
+        }
+
+        return ret;
+    }
+
+    bool SetTempStoreMemory()
+    {
+        bool ret = true;
+
+        if (m_canUpdateDB && (nullptr != m_pReadDbConn))
+        {
+            sqlite3_exec(m_pReadDbConn, SQL_CMD_SET_TEMP_STORE, nullptr, nullptr, nullptr);
         }
 
         return ret;
@@ -4916,7 +4975,24 @@ public:
         return ret;
     }
 
-    bool IsSystemModule(AMDTModuleId modId, bool& isSysMod)
+    void IsSystemModule(AMDTModuleId modId, bool& isSysMod)
+    {
+        int rc = 0;
+
+        if (nullptr != m_pSystemModuleQueryStmt)
+        {
+            sqlite3_bind_int(m_pSystemModuleQueryStmt, 1, modId);
+
+            if ((rc = sqlite3_step(m_pSystemModuleQueryStmt)) == SQLITE_ROW)
+            {
+                int i = sqlite3_column_int(m_pSystemModuleQueryStmt, 0);
+                isSysMod = (i == 1) ? true : false;
+            }
+        }
+    }
+
+    // UNUSED
+    bool IsSystemModule__(AMDTModuleId modId, bool& isSysMod)
     {
         bool ret = false;
 
@@ -6379,6 +6455,8 @@ public:
     sqlite3_stmt* m_pCallStackLeafInsertStmt = nullptr;
     sqlite3_stmt* m_pJitCodeBlobInsertStmt = nullptr;
     sqlite3_stmt* m_pJitInstanceInsertStmt = nullptr;
+
+    sqlite3_stmt* m_pSystemModuleQueryStmt = nullptr;
 
     // This thread is used to commit data to the database (which might take time).
     // As we would like to avoid stalls in the main thread.
