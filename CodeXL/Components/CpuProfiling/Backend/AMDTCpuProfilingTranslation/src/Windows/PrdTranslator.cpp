@@ -4109,7 +4109,7 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
 {
     HRESULT  res = S_OK;
 
-#if (ENABLE_OLD_PROFILE_WRITER == 1)
+#if ENABLE_OLD_PROFILE_WRITER
     // Write the CSS files to the same directory as the profile file
     for (gtMap<ProcessIdType, ProcessInfo*>::iterator it = m_processInfos.begin(), itEnd = m_processInfos.end(); it != itEnd; ++it)
     {
@@ -4136,7 +4136,7 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
 
     UpdateProgressBar(60ULL, 100ULL);
 
-#if (ENABLE_OLD_PROFILE_WRITER == 1)
+#if ENABLE_OLD_PROFILE_WRITER
     int cpuFamily = tPrdReader.GetCpuFamily();
     int cpuModel = tPrdReader.GetCpuModel();
 
@@ -4198,7 +4198,7 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
 
     UpdateProgressBar(70ULL, 100ULL);
 
-#if (ENABLE_OLD_PROFILE_WRITER == 1)
+#if ENABLE_OLD_PROFILE_WRITER
     if (!WriteProfileFile(proFile.toStdWString().c_str(),
                           &processMap,
                           &moduleMap,
@@ -4226,7 +4226,7 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
 
     return res;
 }
-#if (ENABLE_OLD_PROFILE_WRITER == 1)
+#if ENABLE_OLD_PROFILE_WRITER
 bool PrdTranslator::WriteProfileFile(const gtString& path,
                                      const PidProcessMap* procMap,
                                      const NameModuleMap* modMap,

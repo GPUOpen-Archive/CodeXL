@@ -21,7 +21,6 @@
 #include "MemoryMap.h"
 #include "CluInfo.h"
 #include <AMDTCpuPerfEventUtils/inc/EventEncoding.h>
-//#include <AMDTCpuProfilingRawData/inc/CpuProfileWriter.h>
 #include <AMDTCpuProfilingRawData/inc/Windows/PrdReader.h>
 #include <AMDTCpuProfilingRawData/inc/RunInfo.h>
 #include <AMDTCpuProfilingTranslation/inc/Windows/TaskInfoInterface.h>
@@ -37,7 +36,13 @@
 #include <AMDTBaseTools/Include/gtFlatMap.h>
 #include <AMDTCpuProfilingRawData/inc/ProfilerDataDBWriter.h>
 
-//#define ENABLE_OLD_PROFILE_WRITER 1
+// Enable this macro to enable .ebp/.imd files generation, only for debugging purpose
+#define ENABLE_OLD_PROFILE_WRITER  0
+
+
+#if ENABLE_OLD_PROFILE_WRITER
+#include <AMDTCpuProfilingRawData/inc/CpuProfileWriter.h>
+#endif
 
 class ExecutableAnalyzer;
 
@@ -430,7 +435,7 @@ private:
                          const PidProcessMap& processMap,
                          NameModuleMap& moduleMap);
 
-#if (ENABLE_OLD_PROFILE_WRITER == 1)
+#if ENABLE_OLD_PROFILE_WRITER
     bool WriteProfileFile(const gtString& path,
                           const PidProcessMap* procMap,
                           const NameModuleMap* modMap,

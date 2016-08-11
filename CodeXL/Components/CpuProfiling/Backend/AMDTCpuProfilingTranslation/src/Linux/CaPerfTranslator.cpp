@@ -47,9 +47,12 @@
 #include <AMDTCpuProfilingBackendUtils/3rdParty/linux/perfStruct.h>
 
 #define HAS_LIBCSS 1
+
 #if HAS_LIBCSS
     #include <AMDTCpuCallstackSampling/inc/CallStackBuilder.h>
-    //#include <AMDTCpuCallstackSampling/inc/CssWriter.h>
+#if ENABLE_OLD_PROFILE_WRITER
+    #include <AMDTCpuCallstackSampling/inc/CssWriter.h>
+#endif
 #endif
 
 #include <AMDTBaseTools/Include/gtSet.h>
@@ -3118,7 +3121,7 @@ HRESULT CaPerfTranslator::process_PERF_RECORD_EXIT(struct perf_event_header* pHd
 int CaPerfTranslator::writeEbpOutput(const std::string& outputFile)
 {
     bool bRet = false;
-#if (ENABLE_OLD_PROFILE_WRITER == 1)
+#if ENABLE_OLD_PROFILE_WRITER
     CpuProfileWriter      profWriter;
 #endif
     CpuProfileInfo        profInfo;
@@ -3360,7 +3363,7 @@ int CaPerfTranslator::writeEbpOutput(const std::string& outputFile)
     }
 
     bRet = true;
-#if (ENABLE_OLD_PROFILE_WRITER == 1)
+#if ENABLE_OLD_PROFILE_WRITER
     bRet = profWriter.Write(woutputFile, &profInfo, &m_procMap, &m_modMap, &topMap);
 #endif
 
@@ -3771,7 +3774,7 @@ int CaPerfTranslator::writeEbpOutput(const std::string& outputFile)
         }
     }
 
-#if (ENABLE_OLD_PROFILE_WRITER == 1)
+#if ENABLE_OLD_PROFILE_WRITER
     // Write CSS too
     if (!m_cssFileDir.empty())
     {
