@@ -11,6 +11,7 @@
 #include "timer.h"
 #include "mymutex.h"
 #include "HookTimer.h"
+#include <AMDTBaseTools/Include/gtAssert.h>
 
 // #define TRACE_TIMER   // enable this to turn on API Trace logging for timer functions.
 // Disabled by default due to volume of messages and performance implications
@@ -359,8 +360,10 @@ unsigned long Timer::GetAbsoluteMilliseconds()
         Real_clock_gettime(CLOCK_REALTIME, &ts);
     }
 
+    GT_ASSERT (m_iFreq != 0);
+
     time.QuadPart = (uint64)(ts.tv_sec * ONE_BILLION) + ts.tv_nsec;
-    return (unsigned long)((1000 * time.QuadPart) / m_iFreq);
+    return static_cast<unsigned long>((1000 * time.QuadPart) / m_iFreq);
 }
 
 //---------------------------------------------------------------------
@@ -385,8 +388,10 @@ unsigned long Timer::GetAbsoluteMicroseconds()
         Real_clock_gettime(CLOCK_REALTIME, &ts);
     }
 
+    GT_ASSERT (m_iFreq != 0);
+
     time.QuadPart = (uint64)(ts.tv_sec * ONE_BILLION) + ts.tv_nsec;
-    return (unsigned long)((1000000 * time.QuadPart) / m_iFreq);
+    return static_cast<unsigned long>((1000000 * time.QuadPart) / m_iFreq);
 }
 
 //---------------------------------------------------------------------
