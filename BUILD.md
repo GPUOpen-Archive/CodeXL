@@ -109,6 +109,6 @@ If CodeXL displays an error indicating that it is unable to establish a connecti
 * Edit "CodeXL\Common\Lib\Ext\Detours Express 3.0\src\creatwth.cpp"
   * Change the line: "DETOUR_EXE_RESTORE der;" to: "static DETOUR_EXE_RESTORE der;". This struct is quite large and can a cause stack overflow on some systems.
 * Replace both occurrences of '#1' in creatwth.cpp with 'InjectDLL'
-* Uncomment the #define USE_DETOURS line below and rebuild the solution.
+* Uncomment the #define USE_DETOURS and rebuild the solution.
 
 ----------
