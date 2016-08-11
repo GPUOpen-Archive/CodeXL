@@ -13,12 +13,25 @@
 #include <AMDTCpuCallstackSampling/inc/CssReader.h>
 #include <CpuProfileDataMigrator.h>
 
-gtString DataMigrator::GetSourceFilePath()
+
+DataMigrator::DataMigrator(const gtString& inFileStr) : m_sourceFilePath(inFileStr)
+{
+    m_targetFilePath = m_sourceFilePath;
+    m_targetFilePath.setFileExtension(TargetFileExt);
+}
+
+DataMigrator::DataMigrator(const osFilePath& inFilePath) : m_sourceFilePath(inFilePath)
+{
+    m_targetFilePath = m_sourceFilePath;
+    m_targetFilePath.setFileExtension(TargetFileExt);
+}
+
+gtString DataMigrator::GetSourceFilePath() const
 {
     return m_sourceFilePath.asString(true);
 }
 
-gtString DataMigrator::GetTargetFilePath()
+gtString DataMigrator::GetTargetFilePath() const
 {
     return m_targetFilePath.asString(true);
 }
@@ -27,20 +40,6 @@ bool DataMigrator::Migrate(bool deleteSrcFiles)
 {
     bool ret = false;
 
-    ret = doValidate();
-    ret = ret && doMigrate();
-
-    if (ret && deleteSrcFiles)
-    {
-        ret = doDeleteSrcFiles();
-    }
-
-    return ret;
-}
-
-bool DataMigrator::doValidate()
-{
-    bool rc = false;
     gtString inFileExt;
     m_sourceFilePath.getFileExtension(inFileExt);
 
@@ -50,20 +49,31 @@ bool DataMigrator::doValidate()
         // File should be present
         if (m_sourceFilePath.exists())
         {
-            rc = true;
+            ret = true;
         }
     }
 
-    if (rc)
+    if (ret)
     {
+        // Delete the target DB file if already existing.
         if (m_targetFilePath.exists())
         {
             osFile oldFile(m_targetFilePath);
-            rc = oldFile.deleteFile();
+            ret = oldFile.deleteFile();
         }
     }
 
-    return rc;
+    if (ret)
+    {
+        ret = doMigrate();
+    }
+
+    if (ret && deleteSrcFiles)
+    {
+        ret = doDeleteSrcFiles();
+    }
+
+    return ret;
 }
 
 bool DataMigrator::doMigrate()
@@ -180,6 +190,7 @@ bool DataMigrator::doMigrate()
             WriteProcessInfoIntoDB(*pProcInfo);
             WriteThreadInfoIntoDB(*pModMap);
             WriteModuleInfoIntoDB(*pModMap);
+            updateModuleInstanceInfo(*pModMap);
             WriteModuleInstanceInfoIntoDB(*pModMap);
             WriteFunctionInfoIntoDB(*pModMap);
             WriteSampleProfileDataIntoDB(*pModMap);
@@ -451,7 +462,37 @@ bool DataMigrator::WriteModuleInfoIntoDB(const NameModuleMap& moduleMap)
     return ret;
 }
 
-bool DataMigrator::WriteModuleInstanceInfoIntoDB(NameModuleMap& moduleMap)
+bool DataMigrator::updateModuleInstanceInfo(NameModuleMap& moduleMap)
+{
+    gtUInt32 nextInstanceId = 1;
+
+    for (auto& modIt : moduleMap)
+    {
+        gtSet<ProcessIdType> uniquePids;
+
+        for (auto funcIt = modIt.second.getBeginFunction(); funcIt != modIt.second.getEndFunction(); ++funcIt)
+        {
+            for (auto sampleIt = funcIt->second.getBeginSample(); sampleIt != funcIt->second.getEndSample(); ++sampleIt)
+            {
+                uniquePids.insert(sampleIt->first.m_pid);
+            }
+        }
+
+        for (auto pid : uniquePids)
+        {
+            modIt.second.m_moduleInstanceInfo.emplace_back(
+                static_cast<gtUInt64>(pid),
+                static_cast<gtUInt64>(modIt.second.getBaseAddr()),
+                nextInstanceId);
+
+            ++nextInstanceId;
+        }
+    }
+
+    return true;
+}
+
+bool DataMigrator::WriteModuleInstanceInfoIntoDB(const NameModuleMap& moduleMap)
 {
     bool ret = false;
 
@@ -464,29 +505,15 @@ bool DataMigrator::WriteModuleInstanceInfoIntoDB(NameModuleMap& moduleMap)
         {
             pModuleInstanceList->reserve(moduleMap.size());
 
-            gtUInt32 nextInstanceId = 1;
-
-            for (auto& modIt : moduleMap)
+            for (const auto& modIt : moduleMap)
             {
-                gtSet<ProcessIdType> uniquePids;
-
-                for (auto funcIt = modIt.second.getBeginFunction(); funcIt != modIt.second.getEndFunction(); ++funcIt)
+                for (const auto& modInstanceInfo : modIt.second.m_moduleInstanceInfo)
                 {
-                    for (auto sampleIt = funcIt->second.getBeginSample(); sampleIt != funcIt->second.getEndSample(); ++sampleIt)
-                    {
-                        uniquePids.insert(sampleIt->first.m_pid);
-                    }
-                }
+                    gtUInt64 pid = std::get<0>(modInstanceInfo);
+                    gtUInt64 baseAddr = std::get<1>(modInstanceInfo);
+                    gtUInt32 instanceId = std::get<2>(modInstanceInfo);
 
-                for (auto pid : uniquePids)
-                {
-                    modIt.second.m_moduleInstanceInfo.emplace_back(
-                        static_cast<gtUInt64>(pid),
-                        static_cast<gtUInt64>(modIt.second.getBaseAddr()),
-                        nextInstanceId);
-
-                    pModuleInstanceList->emplace_back(nextInstanceId, modIt.second.m_moduleId, pid, modIt.second.getBaseAddr());
-                    ++nextInstanceId;
+                    pModuleInstanceList->emplace_back(instanceId, modIt.second.m_moduleId, pid, baseAddr);
                 }
             }
 
@@ -625,6 +652,8 @@ bool DataMigrator::WriteSampleProfileDataIntoDB(const NameModuleMap& modMap)
 
     return ret;
 }
+
+// Uncomment these code, when add support for .css file import.
 #if 0
 class MigratorCssCallback : public CssCallback
 {
@@ -794,7 +823,10 @@ bool DataMigrator::WriteJitInfoIntoDB(const NameModuleMap& modMap)
         else
         {
             delete jitInstanceInfoList;
+            jitInstanceInfoList = nullptr;
+
             delete jitCodeBlobInfoList;
+            jitCodeBlobInfoList = nullptr;
         }
     }
 

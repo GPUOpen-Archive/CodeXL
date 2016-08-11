@@ -19,34 +19,23 @@
 class DataMigrator
 {
 public:
-    explicit DataMigrator(const gtString& inFileStr) : m_sourceFilePath(inFileStr)
-    {
-        m_targetFilePath = m_sourceFilePath;
-        m_targetFilePath.setFileExtension(TargetFileExt);
-    }
-
-    explicit DataMigrator(const osFilePath& inFilePath) : m_sourceFilePath(inFilePath)
-    {
-        m_targetFilePath = m_sourceFilePath;
-        m_targetFilePath.setFileExtension(TargetFileExt);
-    }
-
-    ~DataMigrator() {}
-
+    explicit DataMigrator(const gtString& inFileStr);
+    explicit DataMigrator(const osFilePath& inFilePath);
     DataMigrator(const DataMigrator&) = delete;
     DataMigrator& operator=(const DataMigrator&) = delete;
+    virtual ~DataMigrator() {}
 
-    gtString GetSourceFilePath();
-    gtString GetTargetFilePath();
+    gtString GetSourceFilePath() const;
+    gtString GetTargetFilePath() const;
     bool Migrate(bool deleteSrcFiles = false);
 
     const wchar_t* SourceFileExt = L"ebp";
     const wchar_t* TargetFileExt = L"cxlcpdb";
 
 private:
-    bool doValidate();
     bool doMigrate();
     bool doDeleteSrcFiles();
+    bool updateModuleInstanceInfo(NameModuleMap& moduleMap);
 
     bool WriteSessionInfoIntoDB(const CpuProfileInfo& profileInfo, const RunInfo& runInfo);
     bool WriteTopologyInfoIntoDB(const CoreTopologyMap& topMap);
@@ -56,9 +45,10 @@ private:
     bool WriteProcessInfoIntoDB(const PidProcessMap& processMap);
     bool WriteThreadInfoIntoDB(const NameModuleMap& moduleMap);
     bool WriteModuleInfoIntoDB(const NameModuleMap& moduleMap);
-    bool WriteModuleInstanceInfoIntoDB(NameModuleMap& moduleMap);
+    bool WriteModuleInstanceInfoIntoDB(const NameModuleMap& moduleMap);
     bool WriteFunctionInfoIntoDB(const NameModuleMap& moduleMap);
     bool WriteSampleProfileDataIntoDB(const NameModuleMap& modMap);
+    // Uncomment this line, when add support for .css import
     //bool WriteCallgraphProfileDataIntoDB(const PidProcessMap& processMap, const NameModuleMap& moduleMap);
     bool WriteJitInfoIntoDB(const NameModuleMap& modMap);
     bool WriteFinish();
