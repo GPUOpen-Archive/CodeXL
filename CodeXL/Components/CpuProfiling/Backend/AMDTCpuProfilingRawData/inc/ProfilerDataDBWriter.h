@@ -71,7 +71,7 @@ public:
     ProfilerDataWriterThread& operator=(ProfilerDataWriterThread&) = delete;
     ProfilerDataWriterThread(ProfilerDataWriterThread&&) = default;
     ProfilerDataWriterThread& operator=(ProfilerDataWriterThread&&) = default;
-    ~ProfilerDataWriterThread() {};
+    virtual ~ProfilerDataWriterThread() {};
 
     int entryPoint() override;
 

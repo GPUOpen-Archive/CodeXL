@@ -1779,6 +1779,7 @@ public:
 
         sqlite3_bind_int(m_pJitCodeBlobInsertStmt, 1, id);
         sqlite3_bind_text(m_pJitCodeBlobInsertStmt, 2, sourceFilePath.c_str(), sourceFilePath.size(), SQLITE_STATIC);
+        // Uncomment this line, when add jit blob to DB.
         //sqlite3_bind_blob(m_pJitCodeBlobInsertStmt, 3, pBlob, blobLength, SQLITE_STATIC);
         sqlite3_bind_text(m_pJitCodeBlobInsertStmt, 3, jncFilePath.c_str(), jncFilePath.size(), SQLITE_STATIC);
 
@@ -5080,7 +5081,7 @@ public:
         // ret = (SQLITE_DONE == rc || SQLITE_ROW == rc) ? true : false;
         return ret;
     }
-    
+
     bool GetFunctionInfo(AMDTFunctionId funcId, gtUInt32 startOffset, AMDTProfileFunctionInfo& funcInfo)
     {
         bool ret = false;
@@ -5414,7 +5415,7 @@ public:
                     // and replace this with the proper module-id value..
                     //profileData.m_moduleId = mid;
                     profileData.m_moduleId = ((id & 0x0000FFFF) == 0) ? offset : mid;
-                  
+
                     int idx = 3;
                     if (separateByProcess)
                     {

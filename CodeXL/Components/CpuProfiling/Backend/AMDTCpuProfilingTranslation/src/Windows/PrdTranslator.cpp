@@ -2457,7 +2457,7 @@ bool PrdTranslator::WriteJitInfoIntoDB(const NameModuleMap& modMap,
 
 
         // Populate Java Jnc info.
-        CPAJitCodeBlobInfoList *jitCodeBlobInfoList = new CPAJitCodeBlobInfoList;
+        CPAJitCodeBlobInfoList *jitCodeBlobInfoList = new (std::nothrow) CPAJitCodeBlobInfoList;
 
         if (jitCodeBlobInfoList != nullptr)
         {
@@ -2537,7 +2537,7 @@ bool PrdTranslator::WriteJitInfoIntoDB(const NameModuleMap& modMap,
         }
 
         // Populate CLR Jnc info.
-        jitCodeBlobInfoList = new CPAJitCodeBlobInfoList;
+        jitCodeBlobInfoList = new (std::nothrow) CPAJitCodeBlobInfoList;
 
         if (jitCodeBlobInfoList != nullptr)
         {
@@ -2824,14 +2824,9 @@ bool PrdTranslator::WriteMetaProfileDataIntoDB(
     if (m_dbWriter)
     {
         WriteProcessInfoIntoDB(processMap);
-
         WriteThreadInfoIntoDB(processMap);
-
         WriteModuleInfoIntoDB(moduleMap);
-
         WriteModuleInstanceInfoIntoDB(moduleMap, modInstanceMap);
-
-        //WriteFunctionInfoIntoDB(moduleMap);
 
         ret = true;
     }

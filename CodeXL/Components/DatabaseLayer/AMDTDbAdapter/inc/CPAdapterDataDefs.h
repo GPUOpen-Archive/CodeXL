@@ -169,6 +169,7 @@ struct CPAJitCodeBlobInfo
 {
     gtUInt32 m_id = 0;
     gtString m_srcFilePath;
+    // Uncomment these lines when add jit blob to DB.
     //gtUByte *m_pCodeBlob = nullptr;
     //gtUInt32 m_blobLength = 0;
     gtString m_jncFilePath;
