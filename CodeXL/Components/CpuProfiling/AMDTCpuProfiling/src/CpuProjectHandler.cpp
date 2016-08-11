@@ -1251,15 +1251,12 @@ bool CpuProjectHandler::profileExists(const QString& profileName, QString& inval
     {
         CPUSessionTreeItemData* pData = findSessionItemData(it);
 
-        if (pData != nullptr)
+        if ((pData != nullptr) && (pData->m_name == profileName))
         {
-            if (pData->m_name == profileName)
-            {
-                invalidMessage.clear();
-                invalidMessage.sprintf("Profile '%s' already exists", profileName.toLatin1().data());
-                retVal = true;
-                break;
-            }
+            invalidMessage.clear();
+            invalidMessage.sprintf("Profile '%s' already exists", profileName.toLatin1().data());
+            retVal = true;
+            break;
         }
     }
 
