@@ -136,7 +136,7 @@ HRESULT RunInfoWriter::Write(const wchar_t* pfilePath, const RunInfo* pRunInfo)
     if (bRet == true)
     {
         riRecord.type = RI_REC_CSS_UNWIND_DEPTH;
-        wchar_t buff[50];
+        wchar_t buff[50] = { 0 };
         (void) swprintf(buff, 50, L"%u", pRunInfo->m_cssUnwindDepth);
         riRecord.length = wcslen(buff);
         riRecord.pValue = buff;
@@ -146,7 +146,7 @@ HRESULT RunInfoWriter::Write(const wchar_t* pfilePath, const RunInfo* pRunInfo)
     if (bRet == true && CP_CSS_SCOPE_UNKNOWN != pRunInfo->m_cssScope)
     {
         riRecord.type = RI_REC_CSS_SCOPE;
-        wchar_t buff[50];
+        wchar_t buff[50] = { 0 };
         (void) swprintf(buff, 50, L"0x%X", static_cast<unsigned int>(pRunInfo->m_cssScope));
         riRecord.length = wcslen(buff);
         riRecord.pValue = buff;
@@ -210,7 +210,7 @@ HRESULT RunInfoWriter::Write(const wchar_t* pfilePath, const RunInfo* pRunInfo)
     if (bRet == true)
     {
         riRecord.type = RI_REC_CPU_AFFINITY;
-        wchar_t buff[50];
+        wchar_t buff[50] = { 0 };
         (void) swprintf(buff, 50, L"%llu", pRunInfo->m_cpuAffinity);
         riRecord.length = wcslen(buff);
         riRecord.pValue = buff;
@@ -236,7 +236,7 @@ HRESULT RunInfoWriter::Write(const wchar_t* pfilePath, const RunInfo* pRunInfo)
     if (bRet == true)
     {
         riRecord.type = RI_REC_EXECUTED_PROCESS_ID;
-        wchar_t buff[50];
+        wchar_t buff[50] = { 0 };
         (void)swprintf(buff, 50, L"%u", pRunInfo->m_executedPID);
         riRecord.length = wcslen(buff);
         riRecord.pValue = buff;
@@ -246,7 +246,7 @@ HRESULT RunInfoWriter::Write(const wchar_t* pfilePath, const RunInfo* pRunInfo)
     if (bRet == true)
     {
         riRecord.type = RI_REC_CSS_INTERVAL;
-        wchar_t buff[50];
+        wchar_t buff[50] = { 0 };
         (void)swprintf(buff, 50, L"%u", pRunInfo->m_cssInterval);
         riRecord.length = wcslen(buff);
         riRecord.pValue = buff;
@@ -256,7 +256,7 @@ HRESULT RunInfoWriter::Write(const wchar_t* pfilePath, const RunInfo* pRunInfo)
     if (bRet == true)
     {
         riRecord.type = RI_REC_CPU_COUNT;
-        wchar_t buff[50];
+        wchar_t buff[50] = { 0 };
         (void)swprintf(buff, 50, L"%u", pRunInfo->m_cpuCount);
         riRecord.length = wcslen(buff);
         riRecord.pValue = buff;
