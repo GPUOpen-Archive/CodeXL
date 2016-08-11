@@ -284,6 +284,7 @@ public:
             sqlite3_finalize(m_pGetSessionCounterIdsByNameStmt);
 
             sqlite3_finalize(m_pSystemModuleQueryStmt);
+            sqlite3_finalize(m_pFunctionInfoQueryStmt);
         }
 
         // Close the write connection.
@@ -888,6 +889,16 @@ public:
         return ret;
     }
 
+    bool PrepareFunctionInfoQuery()
+    {
+        std::stringstream query;
+        const char* pQuery = "SELECT name, moduleId, startOffset, size from Function where id = ? ;";
+
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, pQuery, -1, &m_pFunctionInfoQueryStmt, nullptr);
+
+        return (rc == SQLITE_OK);
+    }
+
     bool PrepareCommonReadStatements()
     {
         bool ret = PrepareGetSessionInfoValueStatement()        &&
@@ -1074,6 +1085,8 @@ public:
                     ret = ret && CreateSystemModule();
 
                     ret = ret && PrepareSystemModuleQuery();
+
+                    ret = ret && PrepareFunctionInfoQuery();
                 }
 
                 m_isCurrentDbOpenForRead = ret;
@@ -4989,6 +5002,8 @@ public:
                 int i = sqlite3_column_int(m_pSystemModuleQueryStmt, 0);
                 isSysMod = (i == 1) ? true : false;
             }
+
+            sqlite3_reset(m_pSystemModuleQueryStmt);
         }
     }
 
@@ -5085,41 +5100,41 @@ public:
     bool GetFunctionInfo(AMDTFunctionId funcId, gtUInt32 startOffset, AMDTProfileFunctionInfo& funcInfo)
     {
         bool ret = false;
-        std::stringstream query;
-        query << "SELECT name, moduleId, startOffset, size from Function where id = ? ;";
 
-        sqlite3_stmt* pQueryStmt = nullptr;
-        const std::string& queryStr = query.str();
-        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
-
-        gtUInt32 offset = 0;
-        gtUInt32 size = 0;
-        AMDTModuleId moduleId = (funcId & DB_MODULEID_MASK) >> 16;
-
-        if (rc == SQLITE_OK)
+        if (IS_FUNCTION_QUERY(funcId))
         {
-            sqlite3_bind_int(pQueryStmt, 1, funcId);
+            int rc = 0;
+            gtUInt32 offset = 0;
+            gtUInt32 size = 0;
+            AMDTModuleId moduleId = (funcId & DB_MODULEID_MASK) >> 16;
 
-            if ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
+            if (nullptr != m_pFunctionInfoQueryStmt)
             {
-                const unsigned char* path = sqlite3_column_text(pQueryStmt, 0);
-                funcInfo.m_name.fromUtf8String(reinterpret_cast<const char*>(path));
+                sqlite3_bind_int(m_pFunctionInfoQueryStmt, 1, funcId);
 
-                moduleId = sqlite3_column_int(pQueryStmt, 1);
-                offset = sqlite3_column_int(pQueryStmt, 2);
-                size = sqlite3_column_int(pQueryStmt, 3);
+                if ((rc = sqlite3_step(m_pFunctionInfoQueryStmt)) == SQLITE_ROW)
+                {
+                    const unsigned char* path = sqlite3_column_text(m_pFunctionInfoQueryStmt, 0);
+                    funcInfo.m_name.fromUtf8String(reinterpret_cast<const char*>(path));
+
+                    moduleId = sqlite3_column_int(m_pFunctionInfoQueryStmt, 1);
+                    offset = sqlite3_column_int(m_pFunctionInfoQueryStmt, 2);
+                    size = sqlite3_column_int(m_pFunctionInfoQueryStmt, 3);
+                }
+
+                GetModulePath(moduleId, funcInfo.m_modulePath);
+
+                sqlite3_reset(m_pFunctionInfoQueryStmt);
             }
 
-            GetModulePath(moduleId, funcInfo.m_modulePath);
+            funcInfo.m_functionId = funcId;
+            funcInfo.m_moduleId = moduleId;
+            funcInfo.m_startOffset = (offset > 0) ? offset : startOffset;
+            funcInfo.m_size = size;
+
+            ret = true;
         }
 
-        funcInfo.m_functionId = funcId;
-        funcInfo.m_moduleId = moduleId;
-        funcInfo.m_startOffset = (offset > 0) ? offset : startOffset;
-        funcInfo.m_size = size;
-
-        sqlite3_finalize(pQueryStmt);
-        ret = (SQLITE_DONE == rc || SQLITE_ROW == rc) ? true : false;
         return ret;
     }
 
@@ -6458,6 +6473,7 @@ public:
     sqlite3_stmt* m_pJitInstanceInsertStmt = nullptr;
 
     sqlite3_stmt* m_pSystemModuleQueryStmt = nullptr;
+    sqlite3_stmt* m_pFunctionInfoQueryStmt = nullptr;
 
     // This thread is used to commit data to the database (which might take time).
     // As we would like to avoid stalls in the main thread.
