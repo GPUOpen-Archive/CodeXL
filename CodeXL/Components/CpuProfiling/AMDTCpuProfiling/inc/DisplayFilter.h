@@ -51,6 +51,7 @@ enum CPUTableUpdateType
 #include <vector>
 #include <utility>
 #include <tuple>
+
 //PROJECT INCLUDES
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
 #include <AMDTCpuProfilingDataAccess/inc/AMDTCpuProfilingDataAccess.h>
@@ -86,19 +87,17 @@ public:
     bool m_displayPercentageInColumn;
 
 private:
+    CPUGlobalDisplayFilter();
+    CPUGlobalDisplayFilter(const CPUGlobalDisplayFilter& other);
 
-    CPUGlobalDisplayFilter();                                     ///< Constructor
-    CPUGlobalDisplayFilter(const CPUGlobalDisplayFilter& other);        ///< Copy constructor
-
-private:
     static CPUGlobalDisplayFilter* m_psMySingleInstance;
 };
 
 typedef gtMap<QString, ViewElementType> ConfigurationMap;
+
 class SessionDisplaySettings
 {
 public:
-
     SessionDisplaySettings();
     virtual ~SessionDisplaySettings();
 
@@ -187,14 +186,13 @@ public:
 
     // Is the CLU data being filtered out or not?
     bool m_displayClu;
-private:
 
+private:
     /// Read the available views from XML files:
     void readAvailableViews();
     void addAllDataView();
     void addConfiguration(const gtString& configFileName);
     bool handleSingleEvent(ColumnSpec* columnArray, int cpuIndex, int eventIndex);
-
 };
 
 
@@ -205,7 +203,6 @@ private:
 class TableDisplaySettings
 {
 public:
-
     TableDisplaySettings();
     TableDisplaySettings(const TableDisplaySettings& other);
 
@@ -270,64 +267,72 @@ public:
 class DisplayFilter
 {
 public:
-    bool GetConfigCounters(const QString& configName, CounterNameIdVec& counterDetails);
+    DisplayFilter();
+    bool InitToDefault();
 
+    // Profile reader
+    void SetProfDataReader(std::shared_ptr<cxlProfileDataReader> reader) { m_pProfDataReader = reader; }
+
+    // Config
+    bool CreateConfigCounterMap();
+    bool GetConfigCounters(const QString& configName, CounterNameIdVec& counterDetails);
+    void GetConfigName(std::vector<gtString>& configNameList) const { configNameList = m_configNameList; }
+    const QString& GetCurrentCofigName() const { return m_configurationName; }
+
+    // Options
     bool SetProfileDataOptions(AMDTProfileDataOptions opts);
     const AMDTProfileDataOptions& GetProfileDataOptions() const;
 
+    // Reporter config
     bool SetReportConfig();
     const gtVector<AMDTProfileReportConfig>& GetReportConfig() const;
 
-    const QString& GetCurrentCofigName() const { return m_configurationName; }
-    void SetProfDataReader(std::shared_ptr<cxlProfileDataReader> reader) { m_pProfDataReader = reader; }
-
-    bool CreateConfigCounterMap();
-
-    // ACCESS FUNCTIONS
+    // Numa settings
+    void SetSeperatedbyNuma(bool isSet) { m_options.m_isSeperateByNuma = isSet; }
     bool IsSeperatedByNumaEnabled() const { return m_options.m_isSeperateByNuma; }
+
+    // Core settings
+    void SetSeperatedbyCore(bool isSet) { m_options.m_isSeperateByCore = isSet; }
     bool IsSeperatedByCoreEnabled() const { return m_options.m_isSeperateByCore; }
 
-    //SET
-    void SetSeperatedbyNuma(bool isSet) { m_options.m_isSeperateByNuma = isSet; }
-    void SetSeperatedbyCore(bool isSet) { m_options.m_isSeperateByCore = isSet; }
-
-    //Set counter description
+    // Counter Description
     void SetCounterDescription(const gtVector<AMDTUInt32>& counterDesp) { m_options.m_counters = counterDesp; }
     const gtVector<AMDTUInt32> GetCounterDescription() const { return m_options.m_counters; }
 
-    //CoreMask
-    void SetCoreMask(AMDTUInt64 mask) { m_options.m_coreMask = mask; }
-    AMDTUInt64 GetCoreMask() const { return m_options.m_coreMask; }
-    bool InitToDefault();
-
-    void GetSupportedCountersList(CounterNameIdVec& counterList);
-
-    int GetCpuCoreCnt() const;
-    void GetConfigName(std::vector<gtString>& configNameList) { configNameList = m_configNameList; }
-
-    // get couterid for counter name
-    AMDTUInt64 GetCounterId(const QString& counterName)const;
+    // Counter id
+    AMDTUInt64 GetCounterId(const QString& counterName) const;
     gtString GetCounterName(AMDTUInt64 counterId) const;
 
-    // selected counterList
+    // Counter list
     void SetSelectedCounterList(const CounterNameIdVec& list) { m_selectedCountersIdList.clear();  m_selectedCountersIdList = list; }
-    void GetSelectedCounterList(CounterNameIdVec& list) { list = m_selectedCountersIdList; }
-    void setIgnoreSysDLL(bool isChecked);
-    void SetSamplePercent(bool isSet);
-    bool GetSamplePercent();
-    DisplayFilter();
-    bool IsSystemModuleIgnored();
+    void GetSupportedCountersList(CounterNameIdVec& counterList) const;
+    void GetSelectedCounterList(CounterNameIdVec& list) const { list = m_selectedCountersIdList; }
+
+    // Core Mask
+    void SetCoreMask(AMDTUInt64 mask) { m_options.m_coreMask = mask; }
+    AMDTUInt64 GetCoreMask() const { return m_options.m_coreMask; }
+
+    // Core Count
     AMDTUInt32 GetCoreCount() const;
+
+    // System Module
+    void setIgnoreSysDLL(bool isChecked);
+    bool IsSystemModuleIgnored() const;
+
+    // Sample Percent
+    void SetSamplePercent(bool isSet);
+    bool GetSamplePercent() const;
+
+    // CLU
     void SetCLUOVHdrName(const QString& name);
     const QString& GetCLUOVHdrName() const { return m_CLUOVHdrName; }
     bool isCLUPercentCaptionSet() const { return m_isCLUPercent; }
 
+    // View
     void SetViewName(const QString& viewName) { m_viewName = viewName; }
-    QString GetViewName() { return m_viewName; }
+    QString GetViewName() const { return m_viewName; }
 
 private:
-
-    //static DisplayFilter* m_instance;
     void SetProfileDataOption();
 
     std::shared_ptr<cxlProfileDataReader>   m_pProfDataReader;
@@ -342,6 +347,7 @@ private:
     QString                                 m_CLUOVHdrName;
     bool                                    m_isCLUPercent = true;
     QString                                 m_viewName;
+    gtUInt32                                m_coreCount;
 };
 
 #endif //__DISPLAYFILTER_H

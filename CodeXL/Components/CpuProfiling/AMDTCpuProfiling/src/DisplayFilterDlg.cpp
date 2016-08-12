@@ -105,7 +105,7 @@ DisplayFilterDlg::displayDialog(const QString& sessionPath, bool enableOnlySyste
             m_pProfDataReader = m_pCurrentSessionWindow->profDbReader();
 
             m_displayFilter = m_pCurrentSessionWindow->GetDisplayFilter();
-            m_noOfCores = m_displayFilter->GetCpuCoreCnt();
+            m_noOfCores = m_displayFilter->GetCoreCount();
 
             m_pSessionTreeItemData = (afApplicationTreeItemData*)
                                      m_pCurrentSessionWindow->displayedItemData();

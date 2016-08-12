@@ -179,7 +179,7 @@ const QString CPU_PROF_MESSAGE(QObject::tr("CPU Profiling Error"));
 #define CP_overviewPageProfileDuration L"Profile Duration"
 #define CP_overviewPageProfileCPUAffinity L"CPU Affinity"
 #define CP_overviewPageProfileCPUDetails L"CPU Details"
-#define CP_overviewPageProfileCPUDetailsStr L"Family 0x%x, Model %d, %d core(s)"
+#define CP_overviewPageProfileCPUDetailsStr L"Family 0x%x, Model 0x%x, %d core(s)"
 #define CP_overviewPageTotalProcesses L"Total Processes in Profile"
 #define CP_overviewPageTotalThreads L"Total Threads in Profile"
 #define CP_overviewCallStackSampling L"Call Stack Sampling"

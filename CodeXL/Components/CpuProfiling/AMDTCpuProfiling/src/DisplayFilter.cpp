@@ -27,11 +27,15 @@
 #include <AMDTCpuPerfEventUtils/inc/ViewConfig.h>
 #include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
 
-/// Local:
+// Local:
 #include <inc/CPUProfileUtils.h>
 #include <inc/DisplayFilter.h>
 #include <inc/StdAfx.h>
 #include <inc/StringConstants.h>
+
+// Global:
+static bool g_isDisplaySystemModule = false;
+static bool g_isSamplePercent = false;
 
 // Static member initialization:
 CPUGlobalDisplayFilter* CPUGlobalDisplayFilter::m_psMySingleInstance = nullptr;
@@ -92,7 +96,6 @@ bool SessionDisplaySettings::calculateDisplayedColumns(CoreTopologyMap* pTopolog
         m_availableDataFullNames.clear();
         m_displayedDataColumnsIndices.clear();
 
-        //m_eventToIndexMap.clear();
         m_calculatedDataColumns.clear();
         m_totalValuesMap.clear();
         m_simpleValuesVector.clear();
@@ -166,15 +169,13 @@ bool SessionDisplaySettings::calculateDisplayedColumns(CoreTopologyMap* pTopolog
         {
             // KARTHIK :
             // The m_isProfilingCLU is a misnomer in the display world ( since we can filter out data
-            // we might have profiled, but might not be intrested in displaying it).
+            // we might have profiled, but might not be interested in displaying it).
             // So use the new variable to control the CLU data visibility from here on.
 
             CpuEventViewIndexMap::const_iterator itr = nullptr;
-            //CpuEventViewIndexMap::const_iterator itr = m_eventToIndexMap.begin();
             m_displayClu = false;
 
             while (itr != nullptr)
-                //while (itr != m_eventToIndexMap.end())
             {
                 SampleKeyType skey = itr.key();
                 EventMaskTypeEnc ev;
@@ -200,7 +201,6 @@ bool SessionDisplaySettings::handleSingleEvent(ColumnSpec* columnArray, int cpuI
 {
     bool retVal = false;
 
-    // Sanity check:
     SampleKeyType evKey;
     evKey.cpu = 0;
     int columnIndex;
@@ -319,7 +319,6 @@ bool SessionDisplaySettings::handleSingleEvent(ColumnSpec* columnArray, int cpuI
         {
             // Associate the column index with the event select value
             m_complexMap[evKey] = columnIndex;
-            //m_eventToIndexMap[evKey] = columnIndex;
         }
         else
         {
@@ -604,7 +603,7 @@ void SessionDisplaySettings::readAvailableViews()
     gtList<osFilePath>::iterator it;
     gtList<osFilePath>::iterator endIt;
 
-    // Remove all but all data
+    // Remove all but 'all data'
     ConfigurationMap::iterator remIt = m_configurationsMap.begin();
 
     while (remIt != m_configurationsMap.end())
@@ -618,7 +617,6 @@ void SessionDisplaySettings::readAvailableViews()
         }
     }
 
-    // Read TBP
     if (baseDir.getContainedFilePaths(L"*.XML", osDirectory::SORT_BY_NAME_DESCENDING, filePaths))
     {
         it = filePaths.begin();
@@ -961,8 +959,6 @@ void SessionDisplaySettings::CopyFrom(const SessionDisplaySettings& other)
         m_simpleValuesVector.push_back(other.m_simpleValuesVector[i]);
     }
 
-    //m_eventToIndexMap = other.m_eventToIndexMap;
-
     m_listOfDuplicatedEvents = other.m_listOfDuplicatedEvents;
     m_nextIndex = other.m_nextIndex;
     m_totalIndex = other.m_totalIndex;
@@ -1005,9 +1001,6 @@ CPUGlobalDisplayFilter::CPUGlobalDisplayFilter()
     m_displaySystemDLLs = false;
     m_displayPercentageInColumn = false;
 }
-
-static bool g_isDisplaySystemModule = false;
-static bool g_isSamplePercent = false;
 
 DisplayFilter::DisplayFilter()
 {
@@ -1054,8 +1047,8 @@ bool DisplayFilter::CreateConfigCounterMap()
     return ret;
 }
 
-bool DisplayFilter::
-GetConfigCounters(const QString& configName, CounterNameIdVec& counterDetails)
+bool DisplayFilter::GetConfigCounters(const QString& configName,
+                                      CounterNameIdVec& counterDetails)
 {
     bool ret = false;
 
@@ -1073,8 +1066,7 @@ GetConfigCounters(const QString& configName, CounterNameIdVec& counterDetails)
     return ret;
 }
 
-bool DisplayFilter::
-SetProfileDataOptions(AMDTProfileDataOptions opts)
+bool DisplayFilter::SetProfileDataOptions(AMDTProfileDataOptions opts)
 {
     m_options.m_coreMask = opts.m_coreMask;
     m_options.m_doSort = opts.m_doSort;
@@ -1088,14 +1080,12 @@ SetProfileDataOptions(AMDTProfileDataOptions opts)
     return true;
 }
 
-const AMDTProfileDataOptions&
-DisplayFilter::GetProfileDataOptions() const
+const AMDTProfileDataOptions& DisplayFilter::GetProfileDataOptions() const
 {
     return m_options;
 }
 
-bool DisplayFilter::
-SetReportConfig()
+bool DisplayFilter::SetReportConfig()
 {
     bool ret = false;
 
@@ -1118,14 +1108,12 @@ SetReportConfig()
     return ret;
 }
 
-const  gtVector<AMDTProfileReportConfig>&
-DisplayFilter::GetReportConfig() const
+const gtVector<AMDTProfileReportConfig>& DisplayFilter::GetReportConfig() const
 {
     return m_reportConfigs;
 }
 
-bool
-DisplayFilter::InitToDefault()
+bool DisplayFilter::InitToDefault()
 {
     bool retVal = true;
     m_reportConfigs.clear();
@@ -1157,28 +1145,17 @@ DisplayFilter::InitToDefault()
         }
 
         retVal = m_pProfDataReader->SetReportOption(m_options);
+
+        // Set core count
+        m_coreCount = sessionInfo.m_coreCount;
     }
 
     return retVal;
 }
 
-void DisplayFilter::GetSupportedCountersList(CounterNameIdVec& counterList)
+void DisplayFilter::GetSupportedCountersList(CounterNameIdVec& counterList) const
 {
     counterList = m_selectedCountersIdList;
-}
-
-int DisplayFilter::GetCpuCoreCnt() const
-{
-    int coresCnt = 0;
-
-    if (nullptr != m_pProfDataReader.get())
-    {
-        AMDTCpuTopologyVec topologyVec;
-        m_pProfDataReader->GetCpuTopology(topologyVec);
-        coresCnt = topologyVec.size();
-    }
-
-    return coresCnt;
 }
 
 AMDTUInt64 DisplayFilter::GetCounterId(const QString& counterName) const
@@ -1223,7 +1200,7 @@ void DisplayFilter::SetProfileDataOption()
     }
 }
 
-bool DisplayFilter::IsSystemModuleIgnored()
+bool DisplayFilter::IsSystemModuleIgnored() const
 {
     return m_options.m_ignoreSystemModules;
 }
@@ -1239,26 +1216,14 @@ void DisplayFilter::setIgnoreSysDLL(bool isChecked)
     g_isDisplaySystemModule = !isChecked;
 }
 
-bool DisplayFilter::GetSamplePercent()
+bool DisplayFilter::GetSamplePercent() const
 {
     return g_isSamplePercent;
 }
 
 AMDTUInt32 DisplayFilter::GetCoreCount() const
 {
-    // TODO: Can we use the value saved in m_cpuCount?
-    // Otherwise, can we save the value into m_cpuCount once,
-    // instead of calling GetProfileSessionInfo() again and again
-
-    AMDTUInt32 coreCount = 0;
-    AMDTProfileSessionInfo sessionInfo;
-
-    if (m_pProfDataReader->GetProfileSessionInfo(sessionInfo))
-    {
-        coreCount = sessionInfo.m_coreCount;
-    }
-
-    return coreCount;
+    return m_coreCount;
 }
 
 void DisplayFilter::SetCLUOVHdrName(const QString& name)

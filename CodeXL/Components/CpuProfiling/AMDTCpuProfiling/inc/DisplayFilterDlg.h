@@ -19,12 +19,13 @@
 // AMDTApplicationFramework:
 #include <AMDTApplicationFramework/Include/afMainAppWindow.h>
 #include <AMDTApplicationFramework/Include/views/afApplicationTreeItemData.h>
-#include <inc/SessionWindow.h>
 
+// Standard:
 #include <memory>
 #include <vector>
 
 // Local:
+#include <inc/SessionWindow.h>
 #include <inc/DisplayFilter.h>
 #include <AMDTCpuProfilingDataAccess/inc/AMDTCpuProfilingDataAccess.h>
 
@@ -34,8 +35,8 @@ class CpuProfileInfo;
 class DisplayFilterDlg : public QDialog
 {
     Q_OBJECT
-public:
 
+public:
     /// Returns my single instance:
     static DisplayFilterDlg& instance();
 
@@ -48,7 +49,6 @@ public:
     virtual ~DisplayFilterDlg();
 
 private:
-
     DisplayFilterDlg(QWidget* pParent);
 
     bool initializeConfiguration();
@@ -60,7 +60,7 @@ private:
     void updateHiddenColumnList();
     bool createConfigCounterMap();
 
-    private slots:
+private slots:
     void onClickAllCoreItem(int state);
     void onClickCoreItem(int state);
     void onChangeView(const QString& newlySelectedView);
@@ -69,7 +69,6 @@ private:
     void onClickCheckBoxSeparateColumnsBy(int state);
 
 private:
-
     static DisplayFilterDlg* m_psMySingleInstance;
     osFilePath          m_sessionFile;
 
@@ -119,8 +118,6 @@ private:
     gtVector<AMDTUInt32>                    m_selectedCounters;
     std::map<int, int>                      m_colIdxCounterIdMap;
     std::vector<gtString>                   m_notChecked;
-
-
 };
 
 
