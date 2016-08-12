@@ -214,6 +214,7 @@ public:
     gtMap<gtUInt64, functionIdcgNodeMap*> m_pidCgFunctionMap;
     AMDTCounterId                         m_cgCounterId = 0;
     gtMap<AMDTProcessId, AMDTProcessId>   m_handleUnknownLeafs;
+    gtVector<cgNode*>                     m_cgNodeVisitedList;
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     bool                                  m_bGetSystemDir = true;
@@ -3437,13 +3438,14 @@ public:
         return ret;
     }
 
-    bool ResetVisitFlagInFunctionNodes(functionIdcgNodeMap& nodeMap)
+    bool ResetVisitFlagInFunctionNodes()
     {
-        for (auto& aFuncNode : nodeMap)
+        for (auto& aFuncNode : m_cgNodeVisitedList)
         {
-            aFuncNode.second.m_isVisited = false;
+            aFuncNode->m_isVisited = false;
         }
 
+        m_cgNodeVisitedList.clear();
         return true;
     }
 
@@ -3480,6 +3482,7 @@ public:
                     it->second.m_totalDeepSamples.m_sampleCount += deepSamples;
                     it->second.m_isVisited = true;
                     it->second.m_pathCount += pathCount;
+                    m_cgNodeVisitedList.push_back(&(it->second));
                 }
             }
 
@@ -3663,6 +3666,8 @@ public:
                 // Commit and create new transaction
                 m_pDbAdapter->FlushDb();
 
+                m_cgNodeVisitedList.clear();
+
                 // Get list of Leaf nodes for the given process
                 // For each Leaf node
                 //      get the callstack frames 
@@ -3709,7 +3714,7 @@ public:
                     gtUInt32 pathCount = uniqueleafs.size();
 
                     // Set all the nodes as "not visited"
-                    ResetVisitFlagInFunctionNodes(*pCgFunctionMap);
+                    ResetVisitFlagInFunctionNodes();
 
                     // get the callstack frames (in order - 1 to depth (n-1))
                     CallstackFrameVec frames;
