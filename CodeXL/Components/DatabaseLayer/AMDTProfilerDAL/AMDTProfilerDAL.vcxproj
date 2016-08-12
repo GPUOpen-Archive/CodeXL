@@ -31,7 +31,7 @@
   </ImportGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <PreprocessorDefinitions>AMDTPROFILEDAL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>AMDTPROFILEDAL_EXPORTS;SQLITE_OMIT_EXPLAIN;SQLITE_OMIT_TRACE;SQLITE_OMIT_TRIGGER;SQLITE_OMIT_LOAD_EXTENSION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4996;4592</DisableSpecificWarnings>
       <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4996;4592</DisableSpecificWarnings>
     </ClCompile>

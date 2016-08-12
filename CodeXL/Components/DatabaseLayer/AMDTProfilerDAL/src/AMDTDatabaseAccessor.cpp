@@ -138,7 +138,7 @@ const std::vector<std::string> SQL_CREATE_DB_STMTS_AGGREGATION =
     "CREATE UNIQUE INDEX 'unique_samples' ON SampleContext (processThreadId, moduleInstanceId, coreSamplingConfigurationId, functionId, offset)",
     "CREATE INDEX callStackLeafIdx ON CallstackLeaf (processId, samplingConfigurationId, callstackId)",
     "CREATE INDEX callStackLeafFunctionIdx ON CallstackLeaf (functionId, offset)",
-    "CREATE INDEX callStackFrameIdx ON CallstackFrame (callstackId, processId)",
+    "CREATE INDEX callStackFrameIdx ON CallstackFrame (callstackId, processId, depth)",
     "CREATE INDEX callStackFrameFunctionIdx ON CallstackFrame (functionId, offset)",
     "CREATE INDEX sampleContextIdx ON SampleContext (functionId, offset)",
     "CREATE INDEX processThreadIdx ON ProcessThread(processId, threadId)",
@@ -177,8 +177,26 @@ const char* SQL_CMD_TX_COMMIT = "COMMIT TRANSACTION";
 // Sqlite Version
 const char* SQL_CMD_SET_USER_VERSION = "PRAGMA user_version=1";
 const char* SQL_CMD_GET_USER_VERSION = "PRAGMA user_version";
-const char* SQL_CMD_SET_SYNCHRONOUS = "PRAGMA synchronous=0"; // off
-const char* SQL_CMD_SET_TEMP_STORE = "PRAGMA temp_store=2"; // memory
+
+const std::vector<std::string> SQL_CREATE_DB_PRAGMAS =
+{
+    "PRAGMA synchronous=0", // off
+    "PRAGMA journal_mode=off", // off
+    "PRAGMA temp_store=2", // memory
+    "PRAGMA page_size=4096",
+    "PRAGMA cache_size=8192",
+    "PRAGMA legacy_file_format=0"
+};
+
+const std::vector<std::string> SQL_READ_DB_PRAGMAS =
+{
+    "PRAGMA synchronous=0", // off
+    "PRAGMA journal_mode=off", // off
+    "PRAGMA temp_store=2", // memory
+    "PRAGMA locking_mode=query"
+    "PRAGMA page_size=4096",
+    "PRAGMA cache_size=8192",
+};
 
 // A reference counter for number of sqlite connections.
 // Will be used to decide whether to shutdown sqlite.
@@ -995,11 +1013,8 @@ public:
 
             GT_IF_WITH_ASSERT(rc == SQLITE_OK)
             {
-                // Turn off synchronous
-                SetSynchronousOff();
-
-                // Set temp_store to memory
-                SetTempStoreMemory();
+                // Set the required pragma settings
+                SetCreateDbPragmas();
 
                 ret = CreateTables(SQL_CREATE_DB_STMTS_COMMON);
 
@@ -1062,10 +1077,7 @@ public:
             if (AMDT_CURRENT_PROFILE_DB_VERSION == m_dbVersion)
             {
                 // Turn off synchronous
-                SetSynchronousOff();
-
-                // Set temp_store to memory
-                SetTempStoreMemory();
+                SetReadDbPragmas();
 
                 // Now the database is open. Let's prepare all the read statements.
                 ret = PrepareCommonReadStatements();
@@ -1144,28 +1156,30 @@ public:
         return ret;
     }
 
-    bool SetSynchronousOff()
+    void SetCreateDbPragmas()
     {
-        bool ret = true;
-
-        if (m_canUpdateDB && (nullptr != m_pReadDbConn))
+        for (const std::string& createStr : SQL_CREATE_DB_PRAGMAS)
         {
-            sqlite3_exec(m_pReadDbConn, SQL_CMD_SET_SYNCHRONOUS, nullptr, nullptr, nullptr);
-        }
+            int rc = sqlite3_exec(m_pWriteDbConn, createStr.c_str(), nullptr, nullptr, nullptr);
 
-        return ret;
+            if (SQLITE_OK != rc)
+            {
+                break;
+            }
+        }
     }
 
-    bool SetTempStoreMemory()
+    void SetReadDbPragmas()
     {
-        bool ret = true;
-
-        if (m_canUpdateDB && (nullptr != m_pReadDbConn))
+        for (const std::string& createStr : SQL_READ_DB_PRAGMAS)
         {
-            sqlite3_exec(m_pReadDbConn, SQL_CMD_SET_TEMP_STORE, nullptr, nullptr, nullptr);
-        }
+            int rc = sqlite3_exec(m_pReadDbConn, createStr.c_str(), nullptr, nullptr, nullptr);
 
-        return ret;
+            if (SQLITE_OK != rc)
+            {
+                break;
+            }
+        }
     }
 
     bool SetDbVersion()

@@ -167,7 +167,7 @@ public:
     gtString                            m_symbolServerPath;
     gtString                            m_symbolFilePath;
     gtString                            m_symbolDownloadPath;
-
+    bool                                m_isDebugSearchPathAvailable = false;
     // Paths to locate the source files
     gtString                            m_sourceFilePath;
 
@@ -1046,6 +1046,7 @@ public:
         m_symbolServerPath = symbolServer;
         m_symbolFilePath = symbolDirectory;
         m_symbolDownloadPath = cachePath;
+        m_isDebugSearchPathAvailable = true;
 
         return ret;
     }
@@ -4330,6 +4331,19 @@ public:
         {
             ret = HandleUnknownFunction(funcInfo);
         }
+
+        // If it is system module and the user hasn't provide any path for debug-info/symbol-server, 
+        // then don't continue further
+        //if (!ret)
+        //{
+        //    AMDTProfileModuleInfo modInfo;
+        //    AMDTModuleId modId = CXL_GET_DB_MODULE_ID(funcInfo.m_functionId);
+
+        //    if (GetModuleInfo(modId, modInfo) && modInfo.m_isSystemModule && !m_isDebugSearchPathAvailable)
+        //    {
+        //        ret = true;
+        //    }
+        //}
 
         // If we haven't seen this unknown function yet, process it
         if (!ret)
