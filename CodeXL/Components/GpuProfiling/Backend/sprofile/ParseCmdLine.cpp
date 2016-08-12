@@ -31,8 +31,8 @@
 namespace po = boost::program_options;
 using namespace std;
 
-void PrintCounters(const std::string& strOutputFile, const bool detailedCounter = false);
-void PrintCounters(CounterList& counterList, const string& strGenerationName, const std::string& outputFile, const bool detailedCounter = false);
+void PrintCounters(const std::string& strOutputFile, const bool shouldIncludeCounterDescriptions = false);
+void PrintCounters(CounterList& counterList, const string& strGenerationName, const std::string& outputFile, const bool shouldIncludeCounterDescriptions = false);
 std::string RemoveGroupFromCounterDescriptionIfPresent(std::string counterDescription);
 inline void ShowExamples();
 
@@ -57,7 +57,7 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
         ("envvarfile,E", po::value<string>(), "Path to a file containing a list of environment variables that should be defined when running the profiled application. The file should contain one line for each variable in the format NAME=VALUE.")
         ("fullenv,f", "The environment variables specified with the envvar or envvarfile switch represent the full environment block.  If not specified, then the environment variables represent additions or changes to the system environment block.")
         ("list,l", "Print a list of valid counter names.")
-        ("listdetailed,L", "Print a list of valid counter names with description")
+        ("listdetailed,L", "Print a list of valid counter names with descriptions")
         ("sessionname,N", po::value<string>(), "Name of the generated session.")
 #ifdef _WIN32
         ("outputfile,o", po::value<string>(), "Path to OutputFile (the default is Session1.csv in an \"CodeXL\" directory under the current user's Documents directory; when performing an API trace, the default is apitrace.atp in the same location).")
@@ -966,7 +966,7 @@ std::string GetCounterListOutputFileName(const std::string& strOutputFile, const
 }
 
 // print a list of public counters
-void PrintCounters(const std::string& strOutputFile, const bool detailedCounter)
+void PrintCounters(const std::string& strOutputFile, const bool shouldIncludeCounterDescriptions)
 {
     gtString strDirPath = FileUtils::GetExePathAsUnicode();
     string strErrorOut;
@@ -992,13 +992,13 @@ void PrintCounters(const std::string& strOutputFile, const bool detailedCounter)
         {
             GPA_HW_GENERATION hwGen = static_cast<GPA_HW_GENERATION>(gen);
 
-            if (gpaUtils.GetAvailableCounters(hwGen, counterList, detailedCounter))
+            if (gpaUtils.GetAvailableCounters(hwGen, counterList, shouldIncludeCounterDescriptions))
             {
                 string strGenerationName;
 
                 if (GetGenerationName(hwGen, strGenerationName))
                 {
-                    PrintCounters(counterList, strGenerationName, GetCounterListOutputFileName(strOutputFile, "OpenCL", strGenerationName), detailedCounter);
+                    PrintCounters(counterList, strGenerationName, GetCounterListOutputFileName(strOutputFile, "OpenCL", strGenerationName), shouldIncludeCounterDescriptions);
                 }
             }
         }
@@ -1023,13 +1023,13 @@ void PrintCounters(const std::string& strOutputFile, const bool detailedCounter)
         {
             GPA_HW_GENERATION hwGen = static_cast<GPA_HW_GENERATION>(gen);
 
-            if (gpaUtils.GetAvailableCounters(hwGen, counterList, detailedCounter))
+            if (gpaUtils.GetAvailableCounters(hwGen, counterList, shouldIncludeCounterDescriptions))
             {
                 string strGenerationName;
 
                 if (GetGenerationName(hwGen, strGenerationName))
                 {
-                    PrintCounters(counterList, strGenerationName, GetCounterListOutputFileName(strOutputFile, "HSA", strGenerationName), detailedCounter);
+                    PrintCounters(counterList, strGenerationName, GetCounterListOutputFileName(strOutputFile, "HSA", strGenerationName), shouldIncludeCounterDescriptions);
                 }
             }
         }
@@ -1055,14 +1055,14 @@ void PrintCounters(const std::string& strOutputFile, const bool detailedCounter)
         {
             GPA_HW_GENERATION hwGen = static_cast<GPA_HW_GENERATION>(gen);
 
-            if (gpaUtils.GetAvailableCounters(hwGen, counterList, detailedCounter))
+            if (gpaUtils.GetAvailableCounters(hwGen, counterList, shouldIncludeCounterDescriptions))
             {
-                gpaUtils.FilterNonComputeCounters(hwGen, counterList, detailedCounter);
+                gpaUtils.FilterNonComputeCounters(hwGen, counterList, shouldIncludeCounterDescriptions);
                 string strGenerationName;
 
                 if (GetGenerationName(hwGen, strGenerationName))
                 {
-                    PrintCounters(counterList, strGenerationName, GetCounterListOutputFileName(strOutputFile, "DirectCompute", strGenerationName), detailedCounter);
+                    PrintCounters(counterList, strGenerationName, GetCounterListOutputFileName(strOutputFile, "DirectCompute", strGenerationName), shouldIncludeCounterDescriptions);
                 }
             }
         }
@@ -1074,7 +1074,7 @@ void PrintCounters(const std::string& strOutputFile, const bool detailedCounter)
 }
 
 // helper function
-void PrintCounters(CounterList& counterList, const string& strGenerationName, const std::string& outputFile, const bool detailedCounter)
+void PrintCounters(CounterList& counterList, const string& strGenerationName, const std::string& outputFile, const bool shouldIncludeCounterDescriptions)
 {
     const unsigned int nLineBreak = 5;
     unsigned int curItem = 0;
@@ -1102,7 +1102,7 @@ void PrintCounters(CounterList& counterList, const string& strGenerationName, co
 
         if (shouldWriteToFile)
         {
-            if (!detailedCounter)
+            if (!shouldIncludeCounterDescriptions)
             {
                 fout << *it << std::endl;
             }
@@ -1110,16 +1110,17 @@ void PrintCounters(CounterList& counterList, const string& strGenerationName, co
             {
                 fout << it->c_str();
                 it++;
-                fout<<'\t' << RemoveGroupFromCounterDescriptionIfPresent(*it)<< std::endl;
+                fout << '\t' << RemoveGroupFromCounterDescriptionIfPresent(*it) << std::endl;
             }
         }
         else
         {
             cout << *it;
-            if (detailedCounter)
+
+            if (shouldIncludeCounterDescriptions)
             {
                 std::string description = RemoveGroupFromCounterDescriptionIfPresent((++it)->c_str());
-                cout << "\t"<<description;
+                cout << "\t" << description;
             }
 
             if (*it != counterList.back())
@@ -1127,7 +1128,7 @@ void PrintCounters(CounterList& counterList, const string& strGenerationName, co
                 cout << ", ";
             }
 
-            if (detailedCounter)
+            if (shouldIncludeCounterDescriptions)
             {
                 std::cout << std::endl;
             }
@@ -1162,9 +1163,8 @@ void PrintCounters(CounterList& counterList, const string& strGenerationName, co
 std::string RemoveGroupFromCounterDescriptionIfPresent(std::string counterDescription)
 {
     std::vector<std::string> tempStringVector;
-    StringUtils::Split(tempStringVector, counterDescription, "#", true,true);
-    std::string trimmedString = tempStringVector[tempStringVector.size() - 1 ];
-    trimmedString.push_back('\0');
+    StringUtils::Split(tempStringVector, counterDescription, "#", true, true);
+    std::string trimmedString = tempStringVector.size() > 0 ? tempStringVector[tempStringVector.size() - 1 ] : NULL;
     return trimmedString;
 }
 

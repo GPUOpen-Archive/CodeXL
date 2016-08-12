@@ -69,6 +69,7 @@ public:
     /// Filters non-compute counters out of the specified Counter List (used for DirectCompute only)
     /// \param[in] gen the hardware generation whose counters are being filtered
     /// \param[out] counterList the list of counters to filter
+    /// \param counterListWithDescription to specify counterlist contains description or not
     void FilterNonComputeCounters(GPA_HW_GENERATION gen, CounterList& counterList, bool counterListWithDescription = false);
 
     /// Filters non-compute counters out of the specified Counter List (used for DirectCompute only)
@@ -83,10 +84,10 @@ public:
 
     /// Get available counters from GPA offline
     /// \param generation Hardware generation
-    /// \param availableCounters Output list of counters
-    /// \optional param to add description to the output list of the counters
+    /// \param availableCounters Output list of counters (optionally with descriptions)
+    /// \param shouldIncludeCounterDescriptions optional param to add description to the output list of the counters
     /// \return true if successful
-    bool GetAvailableCounters(GPA_HW_GENERATION generation, CounterList& availableCounters, const bool detailedCounter = false);
+    bool GetAvailableCounters(GPA_HW_GENERATION generation, CounterList& availableCounters, const bool shouldIncludeCounterDescriptions = false);
 
     /// Get available counters from GPA offline
     /// \param generation Hardware generation
@@ -167,9 +168,9 @@ private:
 
     /// Get counter by generation, non-thread safe
     /// \param generation Hardware generation
-    /// \optional param to add description to the returning list of the counters
+    /// \param shouldIncludeCounterDescriptions optional param to add description to the output list of the counters
     /// \return the list of counters for thie specified generation
-    CounterList& GetCounters(GPA_HW_GENERATION generation, const bool detailed = false);
+    CounterList& GetCounters(GPA_HW_GENERATION generation, const bool shouldIncludeCounterDescriptions = false);
 
     /// Get counters by deviceID, non-thread safe
     /// \param uDeviceid the device id to get counters for

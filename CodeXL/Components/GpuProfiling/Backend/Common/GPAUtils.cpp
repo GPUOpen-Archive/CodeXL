@@ -97,10 +97,12 @@ void GPAUtils::FilterNonComputeCounters(GPA_HW_GENERATION gen, CounterList& coun
             if (strCounterName.compare("GPUTime") == 0)
             {
                 ++it;
+
                 if (counterListWithDescription)
                 {
                     ++it;
                 }
+
                 continue;
             }
             else if (strCounterName.find("CS") == 0)
@@ -109,15 +111,18 @@ void GPAUtils::FilterNonComputeCounters(GPA_HW_GENERATION gen, CounterList& coun
                 if (0 != strCounterName.compare("CSBusy") && 0 != strCounterName.compare("CSTime"))
                 {
                     ++it;
+
                     if (counterListWithDescription)
                     {
                         ++it;
                     }
+
                     continue;
                 }
             }
 
         it = counterList.erase(it);
+
         if (counterListWithDescription)
         {
             it = counterList.erase(it);
@@ -598,7 +603,7 @@ gpa_uint32 GPAUtils::GetEnabledCounterNames(CounterList& enabledCounters)
     return count;
 }
 
-CounterList& GPAUtils::GetCounters(GPA_HW_GENERATION generation, const bool detailed)
+CounterList& GPAUtils::GetCounters(GPA_HW_GENERATION generation, const bool shouldIncludeCounterDescriptions)
 {
     CounterList& list = m_HWCounterMap[generation];
 
@@ -615,13 +620,15 @@ CounterList& GPAUtils::GetCounters(GPA_HW_GENERATION generation, const bool deta
         }
 
         gpa_uint32 nCounters = pAccessor->GetNumCounters();
-        list.resize(detailed ? nCounters*2 : nCounters);
+        list.resize(shouldIncludeCounterDescriptions ? nCounters * 2 : nCounters);
 
         unsigned int counterListIndex = 0;
+
         for (gpa_uint32 i = 0; i < nCounters; ++i)
         {
             list[counterListIndex++] = pAccessor->GetCounterName(i);
-            if (detailed)
+
+            if (shouldIncludeCounterDescriptions)
             {
                 list[counterListIndex++] = pAccessor->GetCounterDescription(i);
             }
@@ -680,7 +687,7 @@ bool GPAUtils::SetEnabledCounters(const CounterList& countersToEnable)
     return true;
 }
 
-bool GPAUtils::GetAvailableCounters(GPA_HW_GENERATION generation, CounterList& availableCounters, const bool detailedCounter)
+bool GPAUtils::GetAvailableCounters(GPA_HW_GENERATION generation, CounterList& availableCounters, const bool shouldIncludeCounterDescriptions)
 {
     bool retVal = true;
 
@@ -699,7 +706,7 @@ bool GPAUtils::GetAvailableCounters(GPA_HW_GENERATION generation, CounterList& a
 
     if (retVal)
     {
-        availableCounters = GetCounters(generation, detailedCounter);
+        availableCounters = GetCounters(generation, shouldIncludeCounterDescriptions);
     }
 
     return retVal;
