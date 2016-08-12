@@ -55,6 +55,7 @@ struct VktImageRendererConfig
     VkPhysicalDevice physicalDevice; ///< The renderer's physical device
     VkDevice         device;         ///< The renderer's device
     VkQueue          queue;          ///< The queue used by the renderer
+    VkFormat         imageFormat;    ///< Default image format used by renderer
 };
 
 //-----------------------------------------------------------------------------

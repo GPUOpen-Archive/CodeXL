@@ -74,12 +74,13 @@ void VktFrameDebuggerLayer::OnPresent(const QueueInfo& queueInfo)
 /// \param swapChain The newly created swap chain.
 /// \param extents The swap chain dimensions.
 //-----------------------------------------------------------------------------
-void VktFrameDebuggerLayer::OnSwapchainCreated(VkDevice device, VkSwapchainKHR swapChain, VkExtent2D extents)
+void VktFrameDebuggerLayer::OnSwapchainCreated(VkDevice device, VkSwapchainKHR swapChain, VkExtent2D extents, VkFormat format)
 {
     VkResult result = VK_INCOMPLETE;
 
     m_swapChainInfo.appSwapChain = swapChain;
     m_swapChainInfo.swapChainExtents = extents;
+    m_swapChainInfo.swapChainFormat = format;
 
     result = device_dispatch_table(device)->GetSwapchainImagesKHR(device, swapChain, &m_swapChainInfo.swapChainImageCount, nullptr);
 
@@ -110,6 +111,7 @@ bool VktFrameDebuggerLayer::CaptureFrameBuffer(unsigned int inWidth, unsigned in
         rendererConfig.physicalDevice = m_lastPresentQueueInfo.physicalDevice;
         rendererConfig.device         = m_lastPresentQueueInfo.device;
         rendererConfig.queue          = m_lastPresentQueueInfo.pWrappedQueue->AppHandle();
+        rendererConfig.imageFormat    = m_swapChainInfo.swapChainFormat;
         m_pFrameBufferRenderer = VktImageRenderer::Create(rendererConfig);
     }
 
@@ -156,6 +158,7 @@ bool VktFrameDebuggerLayer::CaptureFrameBuffer(unsigned int inWidth, unsigned in
         rendererConfig.physicalDevice = m_lastPresentQueueInfo.physicalDevice;
         rendererConfig.device         = m_lastPresentQueueInfo.device;
         rendererConfig.queue          = m_lastPresentQueueInfo.pWrappedQueue->AppHandle();
+        rendererConfig.imageFormat    = m_swapChainInfo.swapChainFormat;
         m_pFrameBufferRendererAux = VktImageRenderer::Create(rendererConfig);
 
         m_lastPresentQueueInfo.pWrappedQueue->InitCaptureImages(m_swapChainInfo);

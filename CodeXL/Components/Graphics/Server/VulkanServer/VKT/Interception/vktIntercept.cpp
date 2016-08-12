@@ -3300,7 +3300,7 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateSwapchainKHR(VkDevic
 
     if (result == VK_SUCCESS)
     {
-        g_pFrameDebuggerLayer->OnSwapchainCreated(device, *pSwapchain, pCreateInfo->imageExtent);
+        g_pFrameDebuggerLayer->OnSwapchainCreated(device, *pSwapchain, pCreateInfo->imageExtent, pCreateInfo->imageFormat);
     }
 
     return result;

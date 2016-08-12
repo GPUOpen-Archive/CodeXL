@@ -20,6 +20,7 @@ struct SwapChainInfo
     VkImage*       pSwapChainImages;     ///< The images backing the swap chain
     UINT           swapChainImageCount;  ///< The number os swap chain images
     VkExtent2D     swapChainExtents;     ///< The swap chain dimensions
+    VkFormat       swapChainFormat;      ///< The swap chain's pixel format
 };
 
 //-----------------------------------------------------------------------------
@@ -49,7 +50,7 @@ public:
     virtual bool CaptureFrameBuffer(unsigned int inWidth, unsigned int inHeight, unsigned char** ppFrameBufferPngData, unsigned int* pNumBytes, bool adjustAspectRatio);
 
     void OnPresent(const QueueInfo& queueInfo);
-    void OnSwapchainCreated(VkDevice device, VkSwapchainKHR swapChain, VkExtent2D extents);
+    void OnSwapchainCreated(VkDevice device, VkSwapchainKHR swapChain, VkExtent2D extents, VkFormat format);
 
     VktImageRenderer* ImageRenderer() { return m_pFrameBufferRenderer; }
     VktImageRenderer* ImageRendererAux() { return m_pFrameBufferRendererAux; }

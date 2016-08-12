@@ -99,6 +99,17 @@ VkResult VktImageRenderer::Init(const VktImageRendererConfig& config)
     {
         memcpy(&m_config, &config, sizeof(m_config));
 
+        // Interpret sRGB as UNORM
+        switch (m_config.imageFormat)
+        {
+        case VK_FORMAT_R8G8B8A8_SRGB:
+            m_config.imageFormat = VK_FORMAT_R8G8B8A8_UNORM;
+            break;
+        case VK_FORMAT_B8G8R8A8_SRGB:
+            m_config.imageFormat = VK_FORMAT_B8G8R8A8_UNORM;
+            break;
+        }
+
         m_pInstanceDT = instance_dispatch_table(config.physicalDevice);
         m_pDeviceDT = device_dispatch_table(config.device);
 
@@ -148,7 +159,7 @@ VkResult VktImageRenderer::Init(const VktImageRendererConfig& config)
         if (result == VK_SUCCESS)
         {
             VkAttachmentDescription attachmentDescription[1] = { VkAttachmentDescription() };
-            attachmentDescription[0].format         = VK_FORMAT_R8G8B8A8_UNORM;
+            attachmentDescription[0].format         = m_config.imageFormat;
             attachmentDescription[0].samples        = VK_SAMPLE_COUNT_1_BIT;
             attachmentDescription[0].loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;
             attachmentDescription[0].storeOp        = VK_ATTACHMENT_STORE_OP_STORE;
@@ -655,7 +666,7 @@ VkResult VktImageRenderer::CreateCaptureAssets(
     rtCreateInfo.sType       = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     rtCreateInfo.pNext       = nullptr;
     rtCreateInfo.imageType   = VK_IMAGE_TYPE_2D;
-    rtCreateInfo.format      = VK_FORMAT_R8G8B8A8_UNORM;
+    rtCreateInfo.format      = m_config.imageFormat;
     rtCreateInfo.extent      = { dstWidth, dstHeight, 1 };
     rtCreateInfo.mipLevels   = 1;
     rtCreateInfo.arrayLayers = 1;
@@ -676,7 +687,7 @@ VkResult VktImageRenderer::CreateCaptureAssets(
         VkImageViewCreateInfo imageViewCreateInfo = VkImageViewCreateInfo();
         imageViewCreateInfo.sType            = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         imageViewCreateInfo.pNext            = nullptr;
-        imageViewCreateInfo.format           = VK_FORMAT_R8G8B8A8_UNORM;
+        imageViewCreateInfo.format           = m_config.imageFormat;
         imageViewCreateInfo.components       = { VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_G, VK_COMPONENT_SWIZZLE_B, VK_COMPONENT_SWIZZLE_A, };
         imageViewCreateInfo.subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
         imageViewCreateInfo.viewType         = VK_IMAGE_VIEW_TYPE_2D;
@@ -710,7 +721,7 @@ VkResult VktImageRenderer::CreateCaptureAssets(
         srcImageViewCreateInfo.pNext            = nullptr;
         srcImageViewCreateInfo.image            = VK_NULL_HANDLE;
         srcImageViewCreateInfo.viewType         = VK_IMAGE_VIEW_TYPE_2D;
-        srcImageViewCreateInfo.format           = VK_FORMAT_B8G8R8A8_UNORM;
+        srcImageViewCreateInfo.format           = m_config.imageFormat;
         srcImageViewCreateInfo.components       = { VK_COMPONENT_SWIZZLE_R, VK_COMPONENT_SWIZZLE_G, VK_COMPONENT_SWIZZLE_B, VK_COMPONENT_SWIZZLE_A, };
         srcImageViewCreateInfo.subresourceRange = { VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, 1 };
         srcImageViewCreateInfo.flags            = 0;
