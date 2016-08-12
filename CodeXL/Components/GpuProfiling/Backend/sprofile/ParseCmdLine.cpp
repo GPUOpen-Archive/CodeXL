@@ -31,8 +31,10 @@
 namespace po = boost::program_options;
 using namespace std;
 
-void PrintCounters(const std::string& strOutputFile);
-void PrintCounters(CounterList& counterList, const string& strGenerationName, const std::string& outputFile);
+void PrintCounters(const std::string& strOutputFile, const bool detailedCounter = false);
+void PrintCounters(CounterList& counterList, const string& strGenerationName, const std::string& outputFile, const bool detailedCounter = false);
+std::string RemoveGroupFromCounterDescriptionIfPresent(std::string counterDescription);
+inline void ShowExamples();
 
 pair<string, string> Parser(const string& strOptionToParse);
 
@@ -55,6 +57,7 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
         ("envvarfile,E", po::value<string>(), "Path to a file containing a list of environment variables that should be defined when running the profiled application. The file should contain one line for each variable in the format NAME=VALUE.")
         ("fullenv,f", "The environment variables specified with the envvar or envvarfile switch represent the full environment block.  If not specified, then the environment variables represent additions or changes to the system environment block.")
         ("list,l", "Print a list of valid counter names.")
+        ("listdetailed,L", "Print a list of valid counter names with description")
         ("sessionname,N", po::value<string>(), "Name of the generated session.")
 #ifdef _WIN32
         ("outputfile,o", po::value<string>(), "Path to OutputFile (the default is Session1.csv in an \"CodeXL\" directory under the current user's Documents directory; when performing an API trace, the default is apitrace.atp in the same location).")
@@ -673,6 +676,12 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
             return false;
         }
 
+        if (unicodeOptionsMap.count("listdetailed") > 0)
+        {
+            PrintCounters(configOut.strOutputFile, true);
+            return false;
+        }
+
         if (unicodeOptionsMap.count("help") > 0)
         {
             // when user asks for help (CodeXLGpuProfiler --help), always display the general options
@@ -724,6 +733,8 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
             }
 
 #endif
+            //Show examples when --help or -h option is used
+            ShowExamples();
 
             return false;
         }
@@ -763,6 +774,9 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
                      << subkernelOrPerfCounterProfilingOpt << endl << endl
 #endif
                      << traceSummaryOpt << endl << endl;
+
+                //Show the examples when used with no options
+                ShowExamples();
                 return false;
             }
         }
@@ -952,7 +966,7 @@ std::string GetCounterListOutputFileName(const std::string& strOutputFile, const
 }
 
 // print a list of public counters
-void PrintCounters(const std::string& strOutputFile)
+void PrintCounters(const std::string& strOutputFile, const bool detailedCounter)
 {
     gtString strDirPath = FileUtils::GetExePathAsUnicode();
     string strErrorOut;
@@ -978,13 +992,13 @@ void PrintCounters(const std::string& strOutputFile)
         {
             GPA_HW_GENERATION hwGen = static_cast<GPA_HW_GENERATION>(gen);
 
-            if (gpaUtils.GetAvailableCounters(hwGen, counterList))
+            if (gpaUtils.GetAvailableCounters(hwGen, counterList, detailedCounter))
             {
                 string strGenerationName;
 
                 if (GetGenerationName(hwGen, strGenerationName))
                 {
-                    PrintCounters(counterList, strGenerationName, GetCounterListOutputFileName(strOutputFile, "OpenCL", strGenerationName));
+                    PrintCounters(counterList, strGenerationName, GetCounterListOutputFileName(strOutputFile, "OpenCL", strGenerationName), detailedCounter);
                 }
             }
         }
@@ -1009,13 +1023,13 @@ void PrintCounters(const std::string& strOutputFile)
         {
             GPA_HW_GENERATION hwGen = static_cast<GPA_HW_GENERATION>(gen);
 
-            if (gpaUtils.GetAvailableCounters(hwGen, counterList))
+            if (gpaUtils.GetAvailableCounters(hwGen, counterList, detailedCounter))
             {
                 string strGenerationName;
 
                 if (GetGenerationName(hwGen, strGenerationName))
                 {
-                    PrintCounters(counterList, strGenerationName, GetCounterListOutputFileName(strOutputFile, "HSA", strGenerationName));
+                    PrintCounters(counterList, strGenerationName, GetCounterListOutputFileName(strOutputFile, "HSA", strGenerationName), detailedCounter);
                 }
             }
         }
@@ -1041,14 +1055,14 @@ void PrintCounters(const std::string& strOutputFile)
         {
             GPA_HW_GENERATION hwGen = static_cast<GPA_HW_GENERATION>(gen);
 
-            if (gpaUtils.GetAvailableCounters(hwGen, counterList))
+            if (gpaUtils.GetAvailableCounters(hwGen, counterList, detailedCounter))
             {
-                gpaUtils.FilterNonComputeCounters(hwGen, counterList);
+                gpaUtils.FilterNonComputeCounters(hwGen, counterList, detailedCounter);
                 string strGenerationName;
 
                 if (GetGenerationName(hwGen, strGenerationName))
                 {
-                    PrintCounters(counterList, strGenerationName, GetCounterListOutputFileName(strOutputFile, "DirectCompute", strGenerationName));
+                    PrintCounters(counterList, strGenerationName, GetCounterListOutputFileName(strOutputFile, "DirectCompute", strGenerationName), detailedCounter);
                 }
             }
         }
@@ -1060,7 +1074,7 @@ void PrintCounters(const std::string& strOutputFile)
 }
 
 // helper function
-void PrintCounters(CounterList& counterList, const string& strGenerationName, const std::string& outputFile)
+void PrintCounters(CounterList& counterList, const string& strGenerationName, const std::string& outputFile, const bool detailedCounter)
 {
     const unsigned int nLineBreak = 5;
     unsigned int curItem = 0;
@@ -1088,26 +1102,47 @@ void PrintCounters(CounterList& counterList, const string& strGenerationName, co
 
         if (shouldWriteToFile)
         {
-            fout << *it << std::endl;
+            if (!detailedCounter)
+            {
+                fout << *it << std::endl;
+            }
+            else
+            {
+                fout << it->c_str();
+                it++;
+                fout<<'\t' << RemoveGroupFromCounterDescriptionIfPresent(*it)<< std::endl;
+            }
         }
         else
         {
             cout << *it;
+            if (detailedCounter)
+            {
+                std::string description = RemoveGroupFromCounterDescriptionIfPresent((++it)->c_str());
+                cout << "\t"<<description;
+            }
 
             if (*it != counterList.back())
             {
                 cout << ", ";
             }
 
-            // line break
-            if (curItem && (curItem + 1) % nLineBreak == 0)
+            if (detailedCounter)
             {
-                cout << endl;
-                curItem = 0;
+                std::cout << std::endl;
             }
             else
             {
-                curItem++;
+                // line break
+                if (curItem && (curItem + 1) % nLineBreak == 0)
+                {
+                    cout << endl;
+                    curItem = 0;
+                }
+                else
+                {
+                    curItem++;
+                }
             }
         }
     }
@@ -1121,6 +1156,16 @@ void PrintCounters(CounterList& counterList, const string& strGenerationName, co
     {
         cout << endl << endl;
     }
+}
+
+//Helper Function
+std::string RemoveGroupFromCounterDescriptionIfPresent(std::string counterDescription)
+{
+    std::vector<std::string> tempStringVector;
+    StringUtils::Split(tempStringVector, counterDescription, "#", true,true);
+    std::string trimmedString = tempStringVector[tempStringVector.size() - 1 ];
+    trimmedString.push_back('\0');
+    return trimmedString;
 }
 
 
@@ -1157,3 +1202,31 @@ void set_s_strInjectedAppArgs(string val)
 }
 
 #endif
+
+
+//Helper Function
+inline void ShowExamples()
+{
+    std::cout << "Examples\n\n";
+
+    std::cout << "\tAn example to collect OpenCL or DirectCompute performance counters: \n";
+    std::cout << "\tCodeXLGpuProfiler - o \"/path/to/output.csv\" -p -w \"/path/to/app/working/directory\" \"/path/to/app.exe\" --device gpu\n\n";
+
+    std::cout << "\tAn example to collect an OpenCL API trace:\n";
+    std::cout << "\tCodeXLGpuProfiler -o \"/path/to/output.atp\" -t -w \"/path/to/app/working/directory\" \"/path/to/app.exe\" --device gpu\n\n";
+
+    std::cout << "\tAn example to collect HSA performance counters (Linux only): \n";
+    std::cout << "\tCodeXLGpuProfiler -o \"/path/to/output.csv\" -C -w \"/path/to/app/working/directory\" \"/path/to/app.exe\"\n\n";
+
+    std::cout << "\tAn example to collect an HSA API trace(Linux only) :\n";
+    std::cout << "\tCodeXLGpuProfiler -o \"/path/to/output.atp\" -A -w \"/path/to/app/working/directory\" \"/path/to/app.exe\"\n\n";
+
+    std::cout << "\tAn example to collect an OpenCL API trace with summary pages:\n";
+    std::cout << "\tCodeXLGpuProfiler -o \"/path/to/output.atp\" -t -T -w \"/path/to/app/working/directory\" \"/path/to/app.exe\" --device gpu\n\n";
+
+    std::cout << "\tAn example to generate summary pages from an .atp file:\n";
+    std::cout << "\tCodeXLGpuProfiler -a \"/path/to/output.atp\" -T\n\n";
+
+    std::cout << "\tAn example to generate an occupancy display page:\n";
+    std::cout << "\tCodeXLGpuProfiler -P \"/path/to/occupancy/params/file.txt\" -o \"path/to/output.html\"\n\n";
+}
