@@ -64,10 +64,6 @@ SessionOverviewWindow::SessionOverviewWindow(QWidget* pParent, CpuSessionWindow*
 
     // Only display system dll's in filter:
     setEnableOnlySystemDllInfilterDlg(true);
-
-    // Set the display filter for the display filter dialog:
-    //m_pDisplaySettings = &m_functionsTablesFilter;
-
 }
 
 SessionOverviewWindow::~SessionOverviewWindow()
@@ -218,8 +214,8 @@ void SessionOverviewWindow::setSessionWindowLayout()
 
     pModulesHeader->setFont(boldFont);
 
-    int colSpan = m_isMultiProcesses ? 2 : 4;
-    int modulesCol = m_isMultiProcesses ? 2 : 0;
+    const int colSpan = 2;
+    const int modulesCol = 2;
 
     QWidget* emptySpacer = new QWidget;
     emptySpacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -267,11 +263,8 @@ void SessionOverviewWindow::setSessionWindowLayout()
     pGridLayout->addWidget(m_pFunctionsTable , 1, 0, 1, 4);
 
     // Third and forth rows - process, and modules tables  and captions:
-    if (m_isMultiProcesses)
-    {
-        pGridLayout->addWidget(m_pProcessesHeader , 2, 0, 1, 2);
-        pGridLayout->addWidget(m_pProcessesTable, 3, 0, 1, 2);
-    }
+    pGridLayout->addWidget(m_pProcessesHeader , 2, 0, 1, 2);
+    pGridLayout->addWidget(m_pProcessesTable, 3, 0, 1, 2);
 
     pGridLayout->addWidget(pModulesHeader , 2, modulesCol, 1, colSpan);
     pGridLayout->addWidget(m_pModulesTable, 3, modulesCol, 1, colSpan);
@@ -560,7 +553,6 @@ bool SessionOverviewWindow::displaySessionDataTables()
 {
     bool retVal = false;
 
-    // Sanity check:
     GT_IF_WITH_ASSERT((m_pModulesTable != nullptr) &&
                       (m_pProcessesTable != nullptr) &&
                       (m_pFunctionsTable != nullptr) &&
@@ -569,46 +561,6 @@ bool SessionOverviewWindow::displaySessionDataTables()
         retVal = m_pProcessesTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, m_counterIdx, m_isCLU);
         retVal = m_pFunctionsTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, m_counterIdx, m_isCLU) && retVal;
         retVal = m_pModulesTable->displayTableSummaryData(m_pProfDataRdr, m_pDisplayFilter, m_counterIdx, m_isCLU) && retVal;
-    }
-
-    return retVal;
-}
-
-bool SessionOverviewWindow::updateTablesHotspotIndicator()
-{
-    bool retVal = false;
-
-    // Sanity check
-    GT_IF_WITH_ASSERT((m_pModulesTable != nullptr) &&
-                      (m_pProcessesTable != nullptr) &&
-                      (m_pFunctionsTable != nullptr) &&
-                      (m_pProcessesHeader != nullptr))
-    {
-        retVal = true;
-
-        // If there are multiple processes:
-        if (m_isMultiProcesses)
-        {
-            // Display the data according to the new hot spot indicator:
-            bool rc = m_pProcessesTable->organizeTableByHotSpotIndicator() && retVal;
-            retVal = retVal && rc;
-        }
-
-        QTableWidgetItem* newItem = new QTableWidgetItem(acGTStringToQString(L"testing"));
-
-        m_pProcessesTable->setHorizontalHeaderItem(2, newItem);
-
-        // Show / hide the processes section:
-        m_pProcessesTable->setVisible(m_isMultiProcesses);
-        m_pProcessesHeader->setVisible(m_isMultiProcesses);
-
-        // Display the data according to the new hot spot indicator:
-        bool rc = m_pModulesTable->organizeTableByHotSpotIndicator() && retVal;
-        retVal = retVal && rc;
-
-        // Display the data according to the requested filter:
-        rc = m_pFunctionsTable->organizeTableByHotSpotIndicator() && retVal;
-        retVal = retVal && rc;
     }
 
     return retVal;

@@ -79,9 +79,6 @@ protected slots:
     void openProcessesView();
     void openModulesView();
     void openFunctionsView();
-#if 0
-    void onAfterHotSpotComboChanged(const QString& text);
-#endif
     void onHotSpotComboChanged(const QString& text);
     void onTableItemActivated(QTableWidgetItem* pActivateItem);
     void onTableContextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType actionType, QTableWidgetItem* pTableItem);
@@ -95,7 +92,6 @@ private:
 
     bool displaySessionProperties();
     bool displaySessionDataTables();
-    bool updateTablesHotspotIndicator();
     bool fillHotspotIndicatorCombo();
 
     /// \brief Name:        setSessionWindowLayout
@@ -144,25 +140,18 @@ private:
 private:
 
     // Widgets:
-    ProcessesDataTable* m_pProcessesTable = nullptr;
-    ModulesDataTable* m_pModulesTable = nullptr;
-    FunctionsDataTable* m_pFunctionsTable = nullptr;
-    QSplitter* m_pSplitterCentralWidget = nullptr;
-    acQHTMLWindow* m_pPropertiewView = nullptr;
-    QLabel* m_pProcessesHeader = nullptr;
-    acWidgetAction* m_pHotSpotIndicatorComboBoxAction = nullptr;
+    ProcessesDataTable*     m_pProcessesTable           = nullptr;
+    ModulesDataTable*       m_pModulesTable             = nullptr;
+    FunctionsDataTable*     m_pFunctionsTable           = nullptr;
+    QSplitter*              m_pSplitterCentralWidget    = nullptr;
+    acQHTMLWindow*          m_pPropertiewView           = nullptr;
+    QLabel*                 m_pProcessesHeader          = nullptr;
+    acWidgetAction*         m_pHotSpotIndicatorComboBoxAction = nullptr;
 
     // Display filters for the tables:
     TableDisplaySettings m_processesTablesFilter;
     TableDisplaySettings m_modulesTablesFilter;
     TableDisplaySettings m_functionsTablesFilter;
-
-    /// The overview window should have dedicated settings, since it is always displaying "All Data" display filter name:
-    SessionDisplaySettings m_hotspotSessionSettings;
-
-    // Does the current displayed session have multiple processes?
-    // Right now set it to true always. Show the hot process table always.
-    bool m_isMultiProcesses = true;
 
     int m_counterIdx = 0;
 };
