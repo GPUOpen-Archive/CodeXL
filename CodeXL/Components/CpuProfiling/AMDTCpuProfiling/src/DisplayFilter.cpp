@@ -1092,17 +1092,7 @@ bool DisplayFilter::SetReportConfig()
     if (nullptr != m_pProfDataReader.get())
     {
         SetProfileDataOption();
-
-        //TODO: Logic is unclear. Need to revisit this piece of code.
-        AMDTUInt64 mask = (1 << GetCoreCount()) - 1;
-
-        if (GetCoreMask() == mask)
-        {
-            SetCoreMask(GT_UINT64_MAX);
-        }
-
-        m_pProfDataReader->SetReportOption(m_options);
-        ret = true;
+        ret = m_pProfDataReader->SetReportOption(m_options);
     }
 
     return ret;

@@ -3448,10 +3448,13 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
 
         if (nullptr != coreSamplingConfigList)
         {
-            gtUInt32 coreAffinity = static_cast<gtUInt32>(m_runInfo->m_cpuAffinity);
+            gtUInt64 coreAffinity = static_cast<gtUInt64>(m_runInfo->m_cpuAffinity);
             gtUInt32 numProfiledCores = 0;
 
-            numProfiledCores = __popcnt(coreAffinity);
+            // __popcnt64() is supported only on x64 build
+            // Use __popcnt() twice to compute set bits of 64-bit value
+            numProfiledCores = __popcnt(coreAffinity & 0xFFFFFFFF) + __popcnt(coreAffinity >> 32);
+
             coreSamplingConfigList->reserve(numProfiledCores * m_eventMap.size());
 
             const gtUInt32 unusedBitsMask = 0x3FFFFFF;
@@ -3459,7 +3462,7 @@ HRESULT PrdTranslator::TranslateDataPrdFile(QString proFile,
 
             while (numProfiledCores)
             {
-                if (coreAffinity & (1 << coreIndex))
+                if (coreAffinity & (1ull << coreIndex))
                 {
                     for (const auto& event : m_eventMap)
                     {

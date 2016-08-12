@@ -3463,10 +3463,10 @@ int CaPerfTranslator::writeEbpOutput(const std::string& outputFile)
 
         if (nullptr != coreSamplingConfigList)
         {
-            gtUInt32 coreAffinity = static_cast<gtUInt32>(runInfo.m_cpuAffinity);
+            gtUInt64 coreAffinity = static_cast<gtUInt64>(runInfo.m_cpuAffinity);
             gtUInt32 numProfiledCores = 0;
 
-            numProfiledCores =  __builtin_popcount(coreAffinity);
+            numProfiledCores =  __builtin_popcountll(coreAffinity);
             coreSamplingConfigList->reserve(numProfiledCores * profInfo.m_numEvents);
 
             const gtUInt32 unusedBitsMask = 0x3FFFFFF;
@@ -3474,7 +3474,7 @@ int CaPerfTranslator::writeEbpOutput(const std::string& outputFile)
 
             while (numProfiledCores)
             {
-                if (coreAffinity & (1 << coreIndex))
+                if (coreAffinity & (1ull << coreIndex))
                 {
                     for (const auto& event : profInfo.m_eventVec)
                     {
