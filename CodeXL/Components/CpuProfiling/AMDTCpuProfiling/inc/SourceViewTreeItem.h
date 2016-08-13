@@ -35,7 +35,6 @@ enum SOURCE_VIEW_COLUMNS
     SOURCE_VIEW_SAMPLES_PERCENT_COLUMN,
     SOURCE_VIEW_INVALID
 };
-class SessionDisplaySettings;
 class SourceCodeTreeView;
 //------------------------------------------------------------------------------
 
@@ -44,7 +43,7 @@ class SourceViewTreeItem
 public:
 
     // Constructors:
-    SourceViewTreeItem(SessionDisplaySettings* pDisplaySettings, SOURCE_TREE_ITEM_DEPTH dep, SourceViewTreeItem* pParentItem);
+    SourceViewTreeItem(SOURCE_TREE_ITEM_DEPTH dep, SourceViewTreeItem* pParentItem);
     SourceViewTreeItem(const QVector<QVariant>& data, SourceViewTreeItem* pParent = nullptr);
     virtual ~SourceViewTreeItem();
 
@@ -86,13 +85,7 @@ public:
     void DebugPrintChildrenList();
 #endif
 
-
-protected:
-
-    SessionDisplaySettings* m_pSessionDisplaySettings;
-
 private:
-
 
 protected:
     SOURCE_TREE_ITEM_DEPTH m_depth;

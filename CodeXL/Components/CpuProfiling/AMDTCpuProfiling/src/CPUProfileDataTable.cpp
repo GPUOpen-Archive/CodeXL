@@ -669,51 +669,6 @@ void CPUProfileDataTable::GetCluDataInRow(int row, int sampleIndex, gtVector<flo
     GT_UNREFERENCED_PARAMETER(row);
     GT_UNREFERENCED_PARAMETER(sampleIndex);
     GT_UNREFERENCED_PARAMETER(cluData);
-#if 0
-    gtMap<int, int> idxList;
-    int cluEndOffset = IBS_CLU_OFFSET(IBS_CLU_END);
-    GT_IF_WITH_ASSERT(m_pSessionDisplaySettings != nullptr)
-    {
-        for (int cpuId = 0; cpuId < m_pSessionDisplaySettings->m_cpuCount; cpuId++)
-        {
-            if ((m_pSessionDisplaySettings->m_separateBy == SEPARATE_BY_NONE) && (cpuId > 0))
-            {
-                // If samples are not separated by core/numa, no need to loop for each cpu
-                break;
-            }
-
-            for (int i = 0; i <= cluEndOffset; i++)
-            {
-                EventMaskType evClu = EncodeEvent((IBS_CLU_BASE + i), 0, true, true);
-                SampleKeyType key;
-                key.event = evClu;
-                key.cpu = cpuId;
-                CpuEventViewIndexMap::const_iterator idxIt = m_pSessionDisplaySettings->m_eventToIndexMap.find(key);
-
-                if (idxIt != m_pSessionDisplaySettings->m_eventToIndexMap.end())
-                {
-
-                    int idx = *idxIt;
-
-                    if (idxList.find(idx) == idxList.end())
-                    {
-                        // The check is to avoid duplicate data in case the samples are separated by numa:
-                        idxList.insert(std::pair<char, int>(idx, 0));
-
-                        QTableWidgetItem* pItem = this->item(row, sampleIndex + idx);
-                        float data1 = pItem->text().toFloat();
-                        cluData.push_back(data1);
-                    }
-
-                }
-                else
-                {
-                    cluData.push_back(0);
-                }
-            }
-        }
-    }
-#endif
 }
 
 

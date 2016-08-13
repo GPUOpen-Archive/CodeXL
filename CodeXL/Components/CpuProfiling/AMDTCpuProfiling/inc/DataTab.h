@@ -246,7 +246,7 @@ protected:
     acWidgetAction* m_pDisplaySettingsAction;
     acToolBar* m_pTopToolbar;
     CpuSessionWindow* m_pParentSessionWindow;
-    SessionDisplaySettings* m_pSessionDisplaySettings;
+
     std::shared_ptr<DisplayFilter>  m_pDisplayFilter = nullptr ;
 
     bool m_enableOnlySystemDllInDisplaySettings;

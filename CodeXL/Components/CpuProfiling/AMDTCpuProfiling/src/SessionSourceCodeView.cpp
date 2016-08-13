@@ -64,32 +64,14 @@
 
 #define FUNCTIONS_COMBO_MAX_LEN 75
 
-SessionSourceCodeView::SessionSourceCodeView(QWidget* pParent, CpuSessionWindow* pSessionWindow, const QString& sessionDir) :
-    DataTab(pParent, pSessionWindow, sessionDir),
-    m_pWidget(nullptr),
-    m_pMainVBoxLayout(nullptr),
-    m_pModuleLocationInfoLabel(nullptr),
-    m_pExpandAllAction(nullptr),
-    m_pCollapseAllAction(nullptr),
-    m_pFunctionsComboBoxAction(nullptr),
-    m_pPIDComboBoxAction(nullptr),
-    m_pTIDComboBoxAction(nullptr),
-    m_pHotSpotIndicatorComboBoxAction(nullptr),
-    m_pPIDLabelAction(nullptr),
-    m_pTIDLabelAction(nullptr),
-    m_pShowCodeBytesAction(nullptr),
-    m_pShowAddressAction(nullptr),
-    m_pSourceCodeTree(nullptr),
-    m_pTreeViewModel(nullptr),
-    m_pTreeItemDelegate(nullptr),
-    m_ignoreVerticalScroll(false)
+SessionSourceCodeView::SessionSourceCodeView(QWidget* pParent,
+                                             CpuSessionWindow* pSessionWindow,
+                                             const QString& sessionDir) : DataTab(pParent, pSessionWindow, sessionDir)
 {
     m_exportString = CP_sourceCodeViewExportString;
-    m_pShowNoteAction = nullptr;
-    m_CLUNoteShown = false;
 
     // Create the tree model object:
-    m_pTreeViewModel = new SourceCodeTreeModel(m_pSessionDisplaySettings, m_sessionDir, m_pProfDataRdr, m_pDisplayFilter);
+    m_pTreeViewModel = new SourceCodeTreeModel(m_sessionDir, m_pProfDataRdr, m_pDisplayFilter);
 }
 
 
@@ -123,11 +105,6 @@ bool SessionSourceCodeView::DisplayViewModule(std::tuple<AMDTFunctionId, const g
 
     setCentralWidget(m_pWidget);
 
-    // Create the symbols information:
-    //TODO : required ??
-    // Baskar: FIXME Not required
-    // m_pTreeViewModel->CreateSymbolInfoList(m_moduleId, m_processId);
-
     // Create the top layout:
     CreateTopLayout();
 
@@ -136,9 +113,6 @@ bool SessionSourceCodeView::DisplayViewModule(std::tuple<AMDTFunctionId, const g
 
     // Create the view's context menu:
     ExtendTreeContextMenu();
-
-    // Add a source code item to the tree:
-    //AddSourceCodeItemToExplorer();
 
     // Update display filter string:
     updateDisplaySettingsString();
@@ -195,7 +169,7 @@ void SessionSourceCodeView::UpdateTableDisplay(unsigned int updateType)
                     m_pHotSpotIndicatorComboBoxAction->UpdateCurrentIndex(0);
                 }
 
-                m_pTreeViewModel->PopulateCurrentFunction(pHotspotCombo->currentText());
+                //m_pTreeViewModel->PopulateCurrentFunction(pHotspotCombo->currentText());
             }
 
             if (!m_pTreeViewModel->m_isDisplayingOnlyDasm)
@@ -217,18 +191,6 @@ void SessionSourceCodeView::UpdateTableDisplay(unsigned int updateType)
             // Hide the filtered columns:
             HideFilteredColumns();
 
-            GT_IF_WITH_ASSERT(m_pSessionDisplaySettings != nullptr)
-            {
-                if (m_pSessionDisplaySettings->m_pProfileInfo->m_isProfilingCLU)
-                {
-                    // Hide column "% of hotspot samples for CLU":
-                    m_pSourceCodeTree->hideColumn(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN);
-                }
-            }
-
-            // Set the table percent values if needed:
-            //m_pTreeViewModel->SetDataPercentValues();
-
             m_pSourceCodeTree->FixColumnSizes();
 
             // Refresh the view:
@@ -241,27 +203,7 @@ void SessionSourceCodeView::UpdateTableDisplay(unsigned int updateType)
 
 void SessionSourceCodeView::HideFilteredColumns()
 {
-    // Sanity check:
-    GT_IF_WITH_ASSERT(m_pSessionDisplaySettings != nullptr)
-    {
-        // Iterate each of the columns and hide the filtered ones:
-        int colsAmount = m_pTreeViewModel->columnCount();
 
-        for (int col = 0; col < colsAmount; ++col)
-        {
-            QString headerText = m_pTreeViewModel->headerData(col, Qt::Horizontal, Qt::DisplayRole).toString();
-            bool shouldShow = !m_pSessionDisplaySettings->m_filteredDataColumnsCaptions.contains(headerText);
-
-            if (shouldShow)
-            {
-                m_pSourceCodeTree->header()->showSection(col);
-            }
-            else
-            {
-                m_pSourceCodeTree->header()->hideSection(col);
-            }
-        }
-    }
 }
 
 
@@ -492,6 +434,7 @@ void SessionSourceCodeView::CreateFunctionsComboBox()
                 m_functionIdVec.push_back(functionInfo.m_functionId);
             }
         }
+
 #if 0
         // Baskar: Though this approach will have folowing side effects, its OK for 2.2 release
         //      - function combo box will have functions that do not have IP samples
@@ -516,6 +459,7 @@ void SessionSourceCodeView::CreateFunctionsComboBox()
                 m_functionIdVec.push_back(func.m_functionId);
             }
         }
+
 #endif //0
 
         m_pTopToolbar->AddLabel(CP_sourceCodeViewFunctionPrefix);
@@ -582,124 +526,17 @@ void SessionSourceCodeView::OnItemSelectChanged(const QModelIndex& current, cons
 {
     Q_UNUSED(previous);
     Q_UNUSED(current);
-
-    if (m_isProfiledClu)
-    {
-        //SourceViewTreeItem* pSrcItem = m_pTreeViewModel->getItem(current);
-        gtVector<float> cluData;
-        gtMap<int, int> idxList;
-        int cluEndOffset = IBS_CLU_OFFSET(IBS_CLU_END);
-        GT_IF_WITH_ASSERT(m_pSessionDisplaySettings != nullptr)
-        {
-            for (int cpuId = 0; cpuId < m_pSessionDisplaySettings->m_cpuCount; cpuId++)
-            {
-                if ((m_pSessionDisplaySettings->m_separateBy == SEPARATE_BY_NONE) && (cpuId > 0))
-                {
-                    // If samples are not separated by core/numa, no need to loop for each cpu
-                    break;
-                }
-
-                for (int i = 0; i <= cluEndOffset; i++)
-                {
-                    EventMaskType evCluPercent = EncodeEvent((IBS_CLU_BASE + i), 0, true, true);
-                    SampleKeyType key;
-                    key.event = evCluPercent;
-                    key.cpu = cpuId;
-                }
-            }
-
-            UpdateNoteWindowContent(cluData);
-        }
-    }
-}
-
-void SessionSourceCodeView::OnFetchInstrucionsRequest(SourceViewTreeItem* pSrcItem)
-{
-    if ((nullptr != pSrcItem) && m_pTreeViewModel->m_isDisplayingOnlyDasm)
-    {
-        bool isItemDoubleClickable = true;
-
-        // Only the top/bottom most lines are double-clickable:
-        int srcItemIndex = m_pTreeViewModel->indexOfTopLevelItem(pSrcItem);
-        int topCount = m_pTreeViewModel->topLevelItemCount();
-
-        if (!m_userDisplayInformation.isAtBottom() && (srcItemIndex != 0) && (srcItemIndex != (topCount - 1)))
-        {
-            isItemDoubleClickable = false;
-        }
-
-        // Check if this row is already filled with dasm code.
-        else if (!pSrcItem->data(SOURCE_VIEW_ADDRESS_COLUMN).toString().isEmpty())
-        {
-            isItemDoubleClickable = false;
-        }
-
-        if (isItemDoubleClickable)
-        {
-            qApp->setOverrideCursor(QCursor(Qt::WaitCursor));
-
-            gtVAddr displayAddress = 0;
-
-            bool itemFound = false;
-
-            if (srcItemIndex == 0)
-            {
-                SourceViewTreeItem* pTopAddressItem = (SourceViewTreeItem*)m_pTreeViewModel->topLevelItem(srcItemIndex + 1);
-
-                if (nullptr != pTopAddressItem)
-                {
-                    QString addressText = pTopAddressItem->data(SOURCE_VIEW_ADDRESS_COLUMN).toString();
-                    displayAddress = addressText.toULongLong(nullptr, 0);
-
-                    // Insert disassembly lines:
-                    m_pTreeViewModel->InsertDasmLines(displayAddress, srcItemIndex + 1);
-
-                    itemFound = true;
-                }
-            }
-            else
-            {
-                SourceViewTreeItem* pLastAddressItem =
-                    (SourceViewTreeItem*)m_pTreeViewModel->topLevelItem(srcItemIndex - 1);
-
-                if (nullptr != pLastAddressItem)
-                {
-                    QString addressText = pLastAddressItem->data(SOURCE_VIEW_ADDRESS_COLUMN).toString();
-                    displayAddress = addressText.toULongLong(nullptr, 0) + pLastAddressItem->asmLength();
-
-                    // Insert disassembly lines:
-                    m_pTreeViewModel->InsertDasmLines(displayAddress, srcItemIndex);
-
-                    itemFound = true;
-                }
-            }
-
-            if (itemFound)
-            {
-                const QComboBox* pHotSpotCombo = TopToolbarComboBox(m_pHotSpotIndicatorComboBoxAction);
-                GT_IF_WITH_ASSERT(pHotSpotCombo != nullptr)
-                {
-                    // Populate Data
-                    m_pTreeViewModel->PopulateCurrentFunction(pHotSpotCombo->currentText());
-                }
-
-                // Refresh the view:
-                RefreshView();
-            }
-
-            qApp->restoreOverrideCursor();
-        }
-    }
 }
 
 void SessionSourceCodeView::OnTreeItemDoubleClick(const QModelIndex& index)
 {
+    GT_UNREFERENCED_PARAMETER(index);
     // Sanity check:
     GT_IF_WITH_ASSERT((m_pTreeViewModel != nullptr) && (m_pHotSpotIndicatorComboBoxAction != nullptr))
     {
         // Get the item for this index:
-        SourceViewTreeItem* pSrcItem = m_pTreeViewModel->getItem(index);
-        OnFetchInstrucionsRequest(pSrcItem);
+        //SourceViewTreeItem* pSrcItem = m_pTreeViewModel->getItem(index);
+        //OnFetchInstrucionsRequest(pSrcItem);
     }
 }
 
@@ -746,13 +583,11 @@ void SessionSourceCodeView::OnTreeVerticalScrollPositionChange(int value, bool i
                 {
                     // Extract the index of the last item.
                     int lastItemIndex = m_pTreeViewModel->topLevelItemCount() - 1;
-                    SourceViewTreeItem* pItem = m_pTreeViewModel->topLevelItem(lastItemIndex);
+                    //SourceViewTreeItem* pItem = m_pTreeViewModel->topLevelItem(lastItemIndex);
 
                     // First, set the display settings so that we will get back at where we were.
                     m_userDisplayInformation.m_selectedTopLevelItemIndex = lastItemIndex;
 
-                    // Fetch additional instructions.
-                    OnFetchInstrucionsRequest(pItem);
                 }
             }
         }

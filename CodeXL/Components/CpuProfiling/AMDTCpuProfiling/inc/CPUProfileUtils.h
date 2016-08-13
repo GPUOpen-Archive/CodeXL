@@ -40,8 +40,6 @@ class CPUProfileUtils
 
 public:
 
-    /// Convert an aggregated sample to data array
-    static gtUInt32 ConvertAggregatedSampleToArray(const AggregatedSample& sm, gtVector<float>& dataVector, gtVector<float>& totalVector, SessionDisplaySettings* pSessionDisplaySettings, bool shouldClearTotal = true) ;
 
     /// \brief Name:        addDataArrays
     /// \brief Description: Utility: add 2 data arrays
@@ -49,8 +47,6 @@ public:
     /// \param[in]          pSourceArray - the source array
     static void AddDataArrays(gtVector<float>& destVector, const gtVector<float>& sourceVector) ;
 
-    /// Calculate some CLU metrics derived from other CLU metrics
-    static void CalculateCluMetrics(SessionDisplaySettings* pSessionDisplaySettings, gtVector<float>& dataVector);
 
     /// Return the column full name according to the column type and title:
     /// \param[in]          colType the requested column type

@@ -109,7 +109,6 @@ protected:
 
 private:
     // Helper function to setup GUI stuff
-    void OnFetchInstrucionsRequest(SourceViewTreeItem* pSrcItem);
     void CreateFunctionsComboBox();
     void CreatePidTidComboBoxes();
     void CreateDisplayFilterLinkLabel();
@@ -142,34 +141,34 @@ private:
 protected:
 
     // GUI Elements:
-    QWidget* m_pWidget;
-    QVBoxLayout* m_pMainVBoxLayout;
-    QLabel* m_pModuleLocationInfoLabel;
+    QWidget* m_pWidget = nullptr;
+    QVBoxLayout* m_pMainVBoxLayout = nullptr;
+    QLabel* m_pModuleLocationInfoLabel = nullptr;
 
-    QAction* m_pExpandAllAction;
-    QAction* m_pCollapseAllAction;
+    QAction* m_pExpandAllAction = nullptr;
+    QAction* m_pCollapseAllAction = nullptr;
 
     // Top toolbar actions:
-    acWidgetAction* m_pFunctionsComboBoxAction;
-    acWidgetAction* m_pPIDComboBoxAction;
-    acWidgetAction* m_pTIDComboBoxAction;
-    acWidgetAction* m_pHotSpotIndicatorComboBoxAction;
-    acWidgetAction* m_pPIDLabelAction;
-    acWidgetAction* m_pTIDLabelAction;
+    acWidgetAction* m_pFunctionsComboBoxAction = nullptr;
+    acWidgetAction* m_pPIDComboBoxAction = nullptr;
+    acWidgetAction* m_pTIDComboBoxAction = nullptr;
+    acWidgetAction* m_pHotSpotIndicatorComboBoxAction = nullptr;
+    acWidgetAction* m_pPIDLabelAction = nullptr;
+    acWidgetAction* m_pTIDLabelAction = nullptr;
 
-    QAction* m_pShowCodeBytesAction;
-    QAction* m_pShowAddressAction;
-    QAction* m_pShowNoteAction;
+    QAction* m_pShowCodeBytesAction = nullptr;
+    QAction* m_pShowAddressAction = nullptr;
+    QAction* m_pShowNoteAction = nullptr;
 
-    SourceCodeTreeView* m_pSourceCodeTree;
-    SourceCodeTreeModel* m_pTreeViewModel;
+    SourceCodeTreeView* m_pSourceCodeTree = nullptr;
+    SourceCodeTreeModel* m_pTreeViewModel = nullptr;
 
     // Delegate:
-    acTreeItemDeletate* m_pTreeItemDelegate;
+    acTreeItemDeletate* m_pTreeItemDelegate = nullptr;
 
     // Selection:
-    bool m_CLUNoteShown;
-    bool m_ignoreVerticalScroll;
+    bool m_CLUNoteShown = false;
+    bool m_ignoreVerticalScroll = false;
 
     AMDTUInt32  m_moduleId;
     AMDTUInt32  m_functionId;
@@ -182,4 +181,3 @@ protected:
 
 
 #endif //__SESSIONSOURCECODEVIEW_H
-

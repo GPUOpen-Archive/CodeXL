@@ -24,8 +24,9 @@
 #include <inc/SourceViewTreeItem.h>
 #include <inc/DisplayFilter.h>
 
-SourceViewTreeItem::SourceViewTreeItem(SessionDisplaySettings* pDisplaySettings, SOURCE_TREE_ITEM_DEPTH dep, SourceViewTreeItem* pParentItem) :
-    m_pSessionDisplaySettings(pDisplaySettings), m_depth(dep), m_pParentItem(pParentItem)
+SourceViewTreeItem::SourceViewTreeItem(SOURCE_TREE_ITEM_DEPTH dep, SourceViewTreeItem* pParentItem) :
+    m_depth(dep),
+    m_pParentItem(pParentItem)
 {
 #ifdef CLU_TAB
     m_pCLUData = nullptr;

@@ -43,7 +43,6 @@ struct InstOffsetSize
     gtUInt32    m_size = 0;
 };
 
-class SessionDisplaySettings;
 class CpuProfileReader;
 
 class SourceCodeTreeModel : public QAbstractItemModel
@@ -51,7 +50,7 @@ class SourceCodeTreeModel : public QAbstractItemModel
     friend class SessionSourceCodeView;
 
 public:
-    SourceCodeTreeModel(SessionDisplaySettings* pSessionDisplaySettings, const QString& sessionDir,
+    SourceCodeTreeModel(const QString& sessionDir,
                         std::shared_ptr<cxlProfileDataReader> pProfDataRdr, std::shared_ptr<DisplayFilter> displayFilter);
 
     ~SourceCodeTreeModel();
@@ -106,36 +105,16 @@ public:
     /// Prepare the tree items for the current file source and dasm lines:
     bool BuildSourceAndDASMTree();
 
-    /// Insert the disassembly line at the end of the source code tree;
-    void InsertDasmLines(gtVAddr displayAddress, unsigned int startIndex);
-
-    void PopulateCurrentFunction(const QString& hotSpotCaption);
-    void PopulateSourceLine(int lineIndex, SourceLineKey& sourceLineKey);
-    void DiscoverAsmLine(int iAsm, SourceViewTreeItem* pLineItem, const SourceLineKey& sourceLineKey, QMap <gtVAddr, SourceViewTreeItem*>& asmItemMap);
-    void PopulateDasmLines(const SourceLineKey& sourceLineKey, QMap <gtVAddr, SourceViewTreeItem*>& asmItemMap);
-
-    /// Sets the samples and samples percent columns data and headers:
-    void SetTreeSamples(const QString& hotSpotCaption);
-
     void SetHotSpotSamples(AMDTUInt32 counterIdx);
 
-    /// Sets the tree items data as percent / values:
-    //void SetDataPercentValues();
-
-    /// Sets the value for the requested source view item:
-    //void SetSingleItemDataValue(SourceViewTreeItem* pItem, int column, bool appendPercent);
-    //void SetPercentFormat(double  val, bool appendPercent, QVariant& data);
     void SetDisplayFormat(double  val, bool appendPercent, QVariant& data, const int precision);
 
 
-    /// Sets the data values on the data columns:
-    bool SetDataValues(int lineNumber, int asmLineNumber, const gtVector<float>& dataVector);
 
     /// Update the displayed headers:
     bool UpdateHeaders();
 
     /// Store module details:
-    //void SetModuleDetails(const CpuProfileModule* pModule);
     void SetModuleDetails(AMDTUInt32 moduleId, AMDTUInt32 pId);
     void BuildTree(const std::vector<SourceViewTreeItem*>& srcLineViewTreeMap);
 
@@ -155,15 +134,11 @@ private:
 
     bool IsSourceLineMapped(const SourceLineKey& sourceLineKey);
 
-    /// Calculate the current module total sample count vector:
-    void CalculateTotalModuleCountVector(CpuProfileReader* pProfileReader);
 
-    bool SetupSymbolInfoList(AMDTUInt32 modId, AMDTUInt32 pId);
     bool SetupSourceInfo();
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     bool SetupSymbolInfoNgen(QString pjsFile);
-    bool GetSourceLineInfoForCLR(gtUInt32 clrSymOffset, OffsetLinenumMap& jitLineMap);
     bool GetClrOffsetFromSymbol(gtRVAddr& offset);
 #endif // AMDT_WINDOWS_OS
 
@@ -182,7 +157,6 @@ private:
 
 private:
 
-    SessionDisplaySettings* m_pSessionDisplaySettings;
     SourceCodeTreeView* m_pSessionSourceCodeTreeView;
 
     /// Source line -> tree item map:

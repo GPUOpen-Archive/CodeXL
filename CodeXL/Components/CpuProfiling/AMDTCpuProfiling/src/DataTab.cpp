@@ -96,10 +96,6 @@ DataTab::DataTab(QWidget* pParent, CpuSessionWindow* pParentSessionWindow, const
     m_pNoteWidget = nullptr;
     m_pNoteHeader = nullptr;
     m_isProfiledClu = false;
-    GT_IF_WITH_ASSERT(m_pParentSessionWindow != nullptr)
-    {
-        m_pSessionDisplaySettings = nullptr;
-    }
 
     // Connect to the application focus changed signal:
     bool rc = connect(qApp, SIGNAL(focusChanged(QWidget*, QWidget*)), this, SLOT(OnApplicationFocusChanged(QWidget*, QWidget*)));
@@ -300,7 +296,7 @@ QFrame* DataTab::createHintLabelFrame()
 
 void DataTab::createCLUNotesFrame(QLayout* pLayout)
 {
-    if (m_pSessionDisplaySettings->m_displayClu && (pLayout != nullptr))
+    if (/*m_pSessionDisplaySettings->m_displayClu && */(pLayout != nullptr))
     {
         m_pNoteWidget = new QTextEdit;
 
@@ -619,55 +615,7 @@ bool DataTab::ProcessNameToPID(const QString& processName, ProcessIdType& pid)
 
 void DataTab::UpdateNoteWindowContent(gtVector<float>& cluDataVector)
 {
-    if (m_pSessionDisplaySettings->m_displayClu)
-    {
-        int countSeperateBy = 1;
-        QString strSeperateBy;
-        int cluDataCount = IBS_CLU_OFFSET(IBS_CLU_END) + 1;
-        GT_IF_WITH_ASSERT(m_pSessionDisplaySettings != nullptr)
-        {
-            if (m_pSessionDisplaySettings->m_separateBy != SEPARATE_BY_NONE)
-            {
-                countSeperateBy = cluDataVector.size() / cluDataCount;
-
-                if (m_pSessionDisplaySettings->m_separateBy == SEPARATE_BY_CORE)
-                {
-                    strSeperateBy = "Core ";
-                }
-                else if (m_pSessionDisplaySettings->m_separateBy == SEPARATE_BY_NUMA)
-                {
-                    strSeperateBy = "Numa ";
-                }
-            }
-        }
-
-        m_pNoteWidget->clear();
-
-        gtVector<float> cluDataSeperateBy;
-        gtVector<float>::iterator it = cluDataVector.begin();
-        QString str;
-
-        for (int i = 0; i < countSeperateBy; i++)
-        {
-            cluDataSeperateBy.clear();
-            cluDataSeperateBy.insert(cluDataSeperateBy.begin(),
-                                     it + (i * cluDataCount),
-                                     it + ((i * cluDataCount) + cluDataCount));
-
-            if (m_pSessionDisplaySettings->m_separateBy != SEPARATE_BY_NONE)
-            {
-                str += strSeperateBy + QString::number(i) + ":\n";
-            }
-
-            str += GetNoteString(cluDataSeperateBy);
-            str.append("\n");
-        }
-
-        if (m_pNoteWidget != nullptr)
-        {
-            m_pNoteWidget->setText(str);
-        }
-    }
+    GT_UNREFERENCED_PARAMETER(cluDataVector);
 }
 
 QString DataTab::GetNoteString(gtVector<float>& cluDataVector)
