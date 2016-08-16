@@ -88,7 +88,7 @@ public:
 
 private:
     CPUGlobalDisplayFilter();
-    CPUGlobalDisplayFilter(const CPUGlobalDisplayFilter& other);
+    CPUGlobalDisplayFilter(const CPUGlobalDisplayFilter& other) = delete;
 
     static CPUGlobalDisplayFilter* m_psMySingleInstance;
 };
