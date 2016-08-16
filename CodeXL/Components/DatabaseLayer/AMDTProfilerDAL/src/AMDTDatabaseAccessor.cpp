@@ -68,6 +68,9 @@
 #define CXL_CLU_EVENT_CLU_PERCENTAGE        0xFF00UL
 #define CXL_CLU_EVENT_L1_EVICTIONS          0xFF04UL
 
+// Create the callstack indices after inserting all the rows
+#define CXL_DB_CREATE_INDEX_AFTER_INSERT    1
+
 #ifdef PP_DAL_TEST
 
     // Test.
@@ -135,11 +138,11 @@ const std::vector<std::string> SQL_CREATE_DB_STMTS_AGGREGATION =
     "CREATE TABLE JITCodeBlob (id INTEGER PRIMARY KEY, srcFilePath TEXT, jncFilePath TEXT)",
     //"CREATE TABLE Callgraph (id INTEGER NOT NULL, callerId INTEGER, calleeId INTEGER, edgeLevel INTEGER)", // FOREIGN KEY(callerId) REFERENCES Function(id), FOREIGN KEY(calleeId) REFERENCES Function(id), FOREIGN KEY(samplingConfigurationId) REFERENCES SamplingConfiguration(id)
     //"CREATE TABLE CallgraphSampleAggregation (callgraphId INTEGER NOT NULL, sampleContextId INTEGER, selfSamples INTEGER, deepSamples INTEGER)", // FOREIGN KEY(callgraphId) REFERENCES Callgraph(id), FOREIGN KEY(sampleContextId) REFERENCES SampleContext(id)
+};
+
+const std::vector<std::string> SQL_CREATE_INDEX_STMTS_AGGREGATION =
+{
     "CREATE UNIQUE INDEX 'unique_samples' ON SampleContext (processThreadId, moduleInstanceId, coreSamplingConfigurationId, functionId, offset)",
-    "CREATE INDEX callStackLeafIdx ON CallstackLeaf (processId, samplingConfigurationId, callstackId)",
-    "CREATE INDEX callStackLeafFunctionIdx ON CallstackLeaf (functionId, offset)",
-    "CREATE INDEX callStackFrameIdx ON CallstackFrame (callstackId, processId, depth)",
-    "CREATE INDEX callStackFrameFunctionIdx ON CallstackFrame (functionId, offset)",
     "CREATE INDEX sampleContextIdx ON SampleContext (functionId, offset)",
     "CREATE INDEX processThreadIdx ON ProcessThread(processId, threadId)",
     "CREATE INDEX processThreadIdx1 ON ProcessThread(id)",
@@ -148,6 +151,14 @@ const std::vector<std::string> SQL_CREATE_DB_STMTS_AGGREGATION =
     "CREATE INDEX moduleIdx ON Module(id)",
     "CREATE INDEX SampleContextIdx1 ON SampleContext(coreSamplingConfigurationId)",
     "CREATE INDEX FunctionIdx ON Function(id)",
+};
+
+const std::vector<std::string> SQL_CREATE_CSS_INDEX_STMTS_AGGREGATION =
+{
+    "CREATE INDEX callStackLeafIdx ON CallstackLeaf (processId, samplingConfigurationId, callstackId)",
+    "CREATE INDEX callStackLeafFunctionIdx ON CallstackLeaf (functionId, offset)",
+    "CREATE INDEX callStackFrameIdx ON CallstackFrame (callstackId, processId, depth)",
+    "CREATE INDEX callStackFrameFunctionIdx ON CallstackFrame (functionId, offset)"
 };
 
 // Migrate table for version 1 - add new columns in tables "devices" and "counters"
@@ -229,6 +240,13 @@ public:
 
     ~Impl()
     {
+        // Create the requried indexes.
+        if (m_pWriteDbConn != nullptr)
+        {
+            // Create the indices for callstackframe and callstackleaf tables
+            CreateCssIndices();
+        }
+
         // Commit pending transactions.
         FlushData();
 
@@ -980,6 +998,36 @@ public:
         return ret;
     }
 
+    bool CreateIndices(const std::vector<std::string>& createStmts)
+    {
+        bool ret = false;
+
+        for (const std::string& createStr : createStmts)
+        {
+            ret = CreateIndex__(createStr);
+
+            if (!ret)
+            {
+                break;
+            }
+        }
+
+        return ret;
+    }
+
+    bool CreateCssIndices()
+    {
+        bool ret = false;
+
+        if (m_isCreateIndex)
+        {
+            ret = CreateIndices(SQL_CREATE_CSS_INDEX_STMTS_AGGREGATION);
+            m_isCreateIndex = false;
+        }
+
+        return ret;
+    }
+
     bool CreateTable__(const std::string& createStr)
     {
         bool ret = false;
@@ -988,6 +1036,25 @@ public:
 
         // Prepare the common table creation statements
         int rc = sqlite3_prepare_v2(db, createStr.c_str(), createStr.size(), &pStmt, nullptr);
+
+        if (SQLITE_OK == rc)
+        {
+            rc = sqlite3_step(pStmt);
+            sqlite3_finalize(pStmt);
+        }
+
+        ret = (SQLITE_DONE == rc) ? true : false;
+
+        return ret;
+    }
+
+    bool CreateIndex__(const std::string& createStr)
+    {
+        bool ret = false;
+        sqlite3_stmt* pStmt = nullptr;
+
+        // Prepare the index creation statements
+        int rc = sqlite3_prepare_v2(m_pWriteDbConn, createStr.c_str(), createStr.size(), &pStmt, nullptr);
 
         if (SQLITE_OK == rc)
         {
@@ -1029,6 +1096,13 @@ public:
                 {
                     ret = CreateTables(SQL_CREATE_DB_STMTS_AGGREGATION);
 
+                    m_isCreateIndex = true;
+                    ret = ret && CreateIndices(SQL_CREATE_INDEX_STMTS_AGGREGATION);
+
+#ifndef CXL_DB_CREATE_INDEX_AFTER_INSERT
+                    // Indices for CallStackLeaf and CallStackFrame tables
+                    ret = ret && CreateCssIndices();
+#endif
                     ret = ret && PrepareAllCpuProfWriteStatements();
                 }
 
@@ -6496,6 +6570,7 @@ public:
     bool m_isFirstInsert = true;
     bool m_isCreateDb = false;
     bool m_isCurrentDbOpenForRead = false;
+    bool m_isCreateIndex = false;
     int m_dbVersion = -1;
 
     gtMap<AMDTModuleId, AMDTProfileModuleInfo> m_moduleIdInfoMap;

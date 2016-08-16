@@ -1047,7 +1047,8 @@ public:
         m_symbolServerPath = symbolServer;
         m_symbolFilePath = symbolDirectory;
         m_symbolDownloadPath = cachePath;
-        m_isDebugSearchPathAvailable = true;
+
+        m_isDebugSearchPathAvailable = (m_symbolServerPath.isEmpty() && m_symbolFilePath.isEmpty()) ? false : true;
 
         return ret;
     }
@@ -4377,7 +4378,7 @@ public:
 
                     if (funcSize == 0)
                     {
-                            // FIXME
+                        // FIXME
                         funcSize = (funcInfo.m_startOffset > pFuncSymbol->m_rva) ? (funcInfo.m_startOffset + 16) - pFuncSymbol->m_rva : 0;
                     }
 
@@ -4418,7 +4419,7 @@ public:
                     }
                 }
             }
-            
+
             if (!ret)
             {
                 ConstructFuncNameByModName(funcInfo.m_moduleId, funcInfo.m_startOffset, funcInfo.m_name);
