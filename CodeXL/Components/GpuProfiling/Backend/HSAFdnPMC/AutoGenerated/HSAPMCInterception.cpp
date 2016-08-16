@@ -91,7 +91,7 @@ void DoneHSAAPIInterceptPMC()
 {
     free(g_pRealCoreFunctions);
     free(g_pRealFinalizerExtFunctions);
-#ifdef FUTURE_ROCR_VERSION	
+#ifdef FUTURE_ROCR_VERSION
     free(g_pRealImageExtFunctions);
     free(g_pRealAmdExtFunctions);
 #endif
