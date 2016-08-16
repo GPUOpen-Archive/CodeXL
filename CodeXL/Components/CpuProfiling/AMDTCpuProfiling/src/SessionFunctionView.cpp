@@ -647,12 +647,14 @@ void SessionFunctionView::updateDataFromPidComboBox()
 
 void SessionFunctionView::UpdateTableDisplay(unsigned int updateType)
 {
-    (void)(updateType); // unused
+    GT_UNREFERENCED_PARAMETER(updateType);
+
+    bool displaySystemDLLs = !m_pDisplayFilter->IsSystemModuleIgnored();
 
     // This function is called after the session display filter is changed:
-    if (m_functionsTablesFilter.m_shouldDisplaySystemDllInModulesDlg != CPUGlobalDisplayFilter::instance().m_displaySystemDLLs)
+    if (m_functionsTablesFilter.m_shouldDisplaySystemDllInModulesDlg != displaySystemDLLs)
     {
-        m_functionsTablesFilter.m_shouldDisplaySystemDllInModulesDlg = CPUGlobalDisplayFilter::instance().m_displaySystemDLLs;
+        m_functionsTablesFilter.m_shouldDisplaySystemDllInModulesDlg = displaySystemDLLs;
 
         if (m_functionsTablesFilter.m_filterByModulePathsList.size() > 0)
         {
@@ -665,8 +667,10 @@ void SessionFunctionView::UpdateTableDisplay(unsigned int updateType)
                 if (m_functionsTablesFilter.m_isSystemDllList[i])
                 {
                     // Check if the modules should be added / remove from the filter list:
-                    bool shouldAdd = m_functionsTablesFilter.m_shouldDisplaySystemDllInModulesDlg && !m_functionsTablesFilter.m_filterByModulePathsList.contains(moduleFilePath);
-                    bool shouldRemove = !m_functionsTablesFilter.m_shouldDisplaySystemDllInModulesDlg && m_functionsTablesFilter.m_filterByModulePathsList.contains(moduleFilePath);
+                    bool shouldAdd = m_functionsTablesFilter.m_shouldDisplaySystemDllInModulesDlg &&
+                                     !m_functionsTablesFilter.m_filterByModulePathsList.contains(moduleFilePath);
+                    bool shouldRemove = m_functionsTablesFilter.m_shouldDisplaySystemDllInModulesDlg &&
+                                        m_functionsTablesFilter.m_filterByModulePathsList.contains(moduleFilePath);
 
                     if (shouldAdd)
                     {
