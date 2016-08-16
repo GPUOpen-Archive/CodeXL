@@ -223,6 +223,11 @@ VktTraceAnalyzerLayer::VktTraceAnalyzerLayer()
     mFunctionIndexToNameString[FuncId_vkCreateDebugReportCallbackEXT] = "vkCreateDebugReportCallbackEXT";
     mFunctionIndexToNameString[FuncId_vkDestroyDebugReportCallbackEXT] = "vkDestroyDebugReportCallbackEXT";
     mFunctionIndexToNameString[FuncId_vkDebugReportMessageEXT] = "vkDebugReportMessageEXT";
+    mFunctionIndexToNameString[FuncId_vkDebugMarkerSetObjectTagEXT] = "vkDebugMarkerSetObjectTagEXT";
+    mFunctionIndexToNameString[FuncId_vkDebugMarkerSetObjectNameEXT] = "vkDebugMarkerSetObjectNameEXT";
+    mFunctionIndexToNameString[FuncId_vkCmdDebugMarkerBeginEXT] = "vkCmdDebugMarkerBeginEXT";
+    mFunctionIndexToNameString[FuncId_vkCmdDebugMarkerEndEXT] = "vkCmdDebugMarkerEndEXT";
+    mFunctionIndexToNameString[FuncId_vkCmdDebugMarkerInsertEXT] = "vkCmdDebugMarkerInsertEXT";
     mFunctionIndexToNameString[FuncId_WholeCmdBuf] = "WholeCmdBuf";
 }
 
@@ -809,6 +814,11 @@ eAPIType VktTraceAnalyzerLayer::GetAPIGroupFromAPI(FuncId inAPIFuncId)
         case FuncId_vkCreateDebugReportCallbackEXT:
         case FuncId_vkDestroyDebugReportCallbackEXT:
         case FuncId_vkDebugReportMessageEXT:
+        case FuncId_vkDebugMarkerSetObjectTagEXT:
+        case FuncId_vkDebugMarkerSetObjectNameEXT:
+        case FuncId_vkCmdDebugMarkerBeginEXT:
+        case FuncId_vkCmdDebugMarkerEndEXT:
+        case FuncId_vkCmdDebugMarkerInsertEXT:
             apiType = kAPIType_KHR;
             break;
 

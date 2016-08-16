@@ -334,6 +334,132 @@ static void CreateInstanceRegisterExtensions(const VkInstanceCreateInfo* pCreate
     }
 }
 
+//-----------------------------------------------------------------------------
+/// This is a list of extensions provided/supported by this layer.
+//-----------------------------------------------------------------------------
+static const VkExtensionProperties s_providedExtensions[] = {
+    { VK_EXT_DEBUG_MARKER_EXTENSION_NAME },
+};
+
+//-----------------------------------------------------------------------------
+/// Comparison function used to sort extension props alphabetically.
+//-----------------------------------------------------------------------------
+typedef int(*compfn)(const void*, const void*);
+int SortByExtName(VkExtensionProperties* x, VkExtensionProperties* y)
+{
+    return strcmp(x->extensionName, y->extensionName);
+}
+
+//-----------------------------------------------------------------------------
+/// Implement counting of the number of extension properties and list them out.
+//-----------------------------------------------------------------------------
+static VkResult FillPropertyCountAndList(
+    UINT                         srcPropsCount,
+    const VkExtensionProperties* pSrcProps,
+    UINT*                        pDstPropsCount,
+    VkExtensionProperties*       pDstProps)
+{
+    VkResult result = VK_INCOMPLETE;
+
+    if ((pDstPropsCount != nullptr) && (pDstProps == nullptr))
+    {
+        *pDstPropsCount = srcPropsCount;
+
+        result = VK_SUCCESS;
+    }
+    else if ((pDstPropsCount != nullptr) && (pDstProps != nullptr))
+    {
+        UINT dstSpace = *pDstPropsCount;
+
+        *pDstPropsCount = (srcPropsCount < dstSpace) ? srcPropsCount : dstSpace;
+
+        memcpy(pDstProps, pSrcProps, sizeof(VkExtensionProperties) * (*pDstPropsCount));
+
+        if (dstSpace >= srcPropsCount)
+        {
+            result = VK_SUCCESS;
+        }
+    }
+
+    return result;
+}
+
+//-----------------------------------------------------------------------------
+/// Call into the ICD to get extension props and track this call.
+//-----------------------------------------------------------------------------
+VkResult EnumerateDeviceExtensionProperties(
+    VkPhysicalDevice       physicalDevice,
+    const char*            pLayerName,
+    uint32_t*              pPropertyCount,
+    VkExtensionProperties* pProperties)
+{
+    const FuncId funcId = FuncId_vkEnumerateInstanceExtensionProperties;
+
+    VkResult result = VK_INCOMPLETE;
+
+    if (g_pInterceptMgr->ShouldCollectTrace())
+    {
+        ParameterEntry parameters[] =
+        {
+            { PARAMETER_VK_HANDLE, &physicalDevice },
+            { PARAMETER_STRING, pLayerName },
+            { PARAMETER_POINTER, pPropertyCount },
+            { PARAMETER_POINTER, pProperties },
+        };
+
+        VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, parameters, ARRAY_SIZE(parameters));
+        result = instance_dispatch_table(physicalDevice)->EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pPropertyCount, pProperties);
+        g_pInterceptMgr->PostCall(pNewEntry, result);
+    }
+    else
+    {
+        result = instance_dispatch_table(physicalDevice)->EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pPropertyCount, pProperties);
+    }
+
+    return result;
+}
+
+//-----------------------------------------------------------------------------
+/// Append VK_EXT_DEBUG_MARKER_SPEC_VERSION when app asks for device extension list.
+//-----------------------------------------------------------------------------
+VkResult EnumerateAppendDbgMarkerExtension(
+    VkPhysicalDevice       physicalDevice,
+    uint32_t*              pPropertyCount,
+    VkExtensionProperties* pProperties)
+{
+    VkResult result = VK_INCOMPLETE;
+
+    uint32_t numExts = 0;
+    result = instance_dispatch_table(physicalDevice)->EnumerateDeviceExtensionProperties(physicalDevice, NULL, &numExts, NULL);
+
+    if (result == VK_SUCCESS)
+    {
+        // Make room for debug marker extension
+        numExts++;
+
+        VkExtensionProperties* pAllExts = new VkExtensionProperties[numExts]();
+        result = EnumerateDeviceExtensionProperties(physicalDevice, NULL, &numExts, pAllExts);
+
+        if (result == VK_SUCCESS)
+        {
+            // Need to increase this size again because the ICD re-writes it
+            numExts++;
+
+            strcpy(pAllExts[numExts - 1].extensionName, VK_EXT_DEBUG_MARKER_EXTENSION_NAME);
+            pAllExts[numExts - 1].specVersion = VK_EXT_DEBUG_MARKER_SPEC_VERSION;
+
+            qsort(pAllExts, numExts, sizeof(VkExtensionProperties), (compfn)SortByExtName);
+
+            result = FillPropertyCountAndList(numExts, pAllExts, pPropertyCount, pProperties);
+        }
+
+        delete[] pAllExts;
+        pAllExts = nullptr;
+    }
+
+    return result;
+}
+
 VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateInstance(const VkInstanceCreateInfo* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkInstance* pInstance)
 {
     const FuncId funcId = FuncId_vkCreateInstance;
@@ -723,35 +849,25 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkEnumerateDeviceLayerProper
 }
 
 VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkEnumerateDeviceExtensionProperties(
-    VkPhysicalDevice                            physicalDevice,
-    const char*                                 pLayerName,
-    uint32_t*                                   pPropertyCount,
-    VkExtensionProperties*                      pProperties)
+    VkPhysicalDevice       physicalDevice,
+    const char*            pLayerName,
+    uint32_t*              pPropertyCount,
+    VkExtensionProperties* pProperties)
 {
-    const FuncId funcId = FuncId_vkEnumerateInstanceExtensionProperties;
+#ifdef _LINUX
 
-    VkResult result = VK_INCOMPLETE;
+    return EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pPropertyCount, pProperties);
 
-    if (g_pInterceptMgr->ShouldCollectTrace())
+#else
+
+    if ((physicalDevice != NULL) && ((pLayerName == NULL) || strcmp(pLayerName, VktUtil::GetLayerName().c_str())))
     {
-        ParameterEntry parameters[] =
-        {
-            { PARAMETER_VK_HANDLE, &physicalDevice },
-            { PARAMETER_STRING, pLayerName },
-            { PARAMETER_POINTER, pPropertyCount },
-            { PARAMETER_POINTER, pProperties },
-        };
-
-        VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, parameters, ARRAY_SIZE(parameters));
-        result = instance_dispatch_table(physicalDevice)->EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pPropertyCount, pProperties);
-        g_pInterceptMgr->PostCall(pNewEntry, result);
-    }
-    else
-    {
-        result = instance_dispatch_table(physicalDevice)->EnumerateDeviceExtensionProperties(physicalDevice, pLayerName, pPropertyCount, pProperties);
+        return EnumerateAppendDbgMarkerExtension(physicalDevice, pPropertyCount, pProperties);
     }
 
-    return result;
+    return FillPropertyCountAndList(ARRAY_SIZE(s_providedExtensions), s_providedExtensions, pPropertyCount, pProperties);
+
+#endif
 }
 
 VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkGetDeviceQueue(VkDevice device, uint32_t queueFamilyIndex, uint32_t queueIndex, VkQueue* pQueue)
@@ -3852,6 +3968,102 @@ VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDebugReportMessageEXT(VkInstan
     }
 }
 
+VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkDebugMarkerSetObjectTagEXT(VkDevice device, VkDebugMarkerObjectTagInfoEXT* pTagInfo)
+{
+    const FuncId funcId = FuncId_vkDebugMarkerSetObjectTagEXT;
+
+    if (g_pInterceptMgr->ShouldCollectTrace())
+    {
+        ParameterEntry parameters[] =
+        {
+            { PARAMETER_VK_HANDLE, &device },
+            { PARAMETER_POINTER, pTagInfo },
+        };
+
+        VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, parameters, ARRAY_SIZE(parameters));
+        g_pInterceptMgr->PostCall(pNewEntry);
+    }
+
+    return VK_SUCCESS;
+}
+
+VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkDebugMarkerSetObjectNameEXT(VkDevice device, VkDebugMarkerObjectNameInfoEXT* pNameInfo)
+{
+    const FuncId funcId = FuncId_vkDebugMarkerSetObjectNameEXT;
+
+    if (g_pInterceptMgr->ShouldCollectTrace())
+    {
+        ParameterEntry parameters[] =
+        {
+            { PARAMETER_VK_HANDLE, &device },
+            { PARAMETER_POINTER, pNameInfo },
+        };
+
+        VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, parameters, ARRAY_SIZE(parameters));
+        g_pInterceptMgr->PostCall(pNewEntry);
+    }
+
+    return VK_SUCCESS;
+}
+
+VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkCmdDebugMarkerBeginEXT(VkCommandBuffer commandBuffer, VkDebugMarkerMarkerInfoEXT* pMarkerInfo)
+{
+    const FuncId funcId = FuncId_vkCmdDebugMarkerBeginEXT;
+
+    if (g_pInterceptMgr->ShouldCollectTrace())
+    {
+        ParameterEntry parameters[] =
+        {
+            { PARAMETER_VK_HANDLE, &commandBuffer },
+            { PARAMETER_STRING, pMarkerInfo->pMarkerName },
+
+// CodeXL UI doesn't seem to parse these properly, so exclude.
+#ifndef CODEXL_GRAPHICS
+            { PARAMETER_FLOAT, &pMarkerInfo->color[0] },
+            { PARAMETER_FLOAT, &pMarkerInfo->color[1] },
+            { PARAMETER_FLOAT, &pMarkerInfo->color[2] },
+            { PARAMETER_FLOAT, &pMarkerInfo->color[3] },
+#endif
+        };
+
+        VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, parameters, ARRAY_SIZE(parameters));
+        g_pInterceptMgr->PostCall(pNewEntry);
+    }
+}
+
+VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkCmdDebugMarkerEndEXT(VkCommandBuffer commandBuffer)
+{
+    const FuncId funcId = FuncId_vkCmdDebugMarkerEndEXT;
+
+    if (g_pInterceptMgr->ShouldCollectTrace())
+    {
+        ParameterEntry parameters[] =
+        {
+            { PARAMETER_VK_HANDLE, &commandBuffer },
+        };
+
+        VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, parameters, ARRAY_SIZE(parameters));
+        g_pInterceptMgr->PostCall(pNewEntry);
+    }
+}
+
+VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkCmdDebugMarkerInsertEXT(VkCommandBuffer commandBuffer, VkDebugMarkerMarkerInfoEXT* pMarkerInfo)
+{
+    const FuncId funcId = FuncId_vkCmdDebugMarkerInsertEXT;
+
+    if (g_pInterceptMgr->ShouldCollectTrace())
+    {
+        ParameterEntry parameters[] =
+        {
+            { PARAMETER_VK_HANDLE, &commandBuffer },
+            { PARAMETER_POINTER, pMarkerInfo },
+        };
+
+        VktAPIEntry* pNewEntry = g_pInterceptMgr->PreCall(funcId, parameters, ARRAY_SIZE(parameters));
+        g_pInterceptMgr->PostCall(pNewEntry);
+    }
+}
+
 //-----------------------------------------------------------------------------
 /// Mine function for GetDeviceProcAddr. This is the function returned if
 /// GetDeviceProcAddr is passed in "GetDeviceProcAddr". The name is
@@ -4469,6 +4681,31 @@ VK_LAYER_EXPORT VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL Mine_vkGetDeviceProcAdd
         return (PFN_vkVoidFunction)Mine_vkCmdExecuteCommands;
     }
 
+    if (!strcmp(funcName, "vkDebugMarkerSetObjectTagEXT"))
+    {
+        return (PFN_vkVoidFunction)Mine_vkDebugMarkerSetObjectTagEXT;
+    }
+
+    if (!strcmp(funcName, "vkDebugMarkerSetObjectNameEXT"))
+    {
+        return (PFN_vkVoidFunction)Mine_vkDebugMarkerSetObjectNameEXT;
+    }
+
+    if (!strcmp(funcName, "vkCmdDebugMarkerBeginEXT"))
+    {
+        return (PFN_vkVoidFunction)Mine_vkCmdDebugMarkerBeginEXT;
+    }
+
+    if (!strcmp(funcName, "vkCmdDebugMarkerEndEXT"))
+    {
+        return (PFN_vkVoidFunction)Mine_vkCmdDebugMarkerEndEXT;
+    }
+
+    if (!strcmp(funcName, "vkCmdDebugMarkerInsertEXT"))
+    {
+        return (PFN_vkVoidFunction)Mine_vkCmdDebugMarkerInsertEXT;
+    }
+
     // Extension interception
     VkLayerDispatchTable* pDisp = device_dispatch_table(device);
 
@@ -4756,4 +4993,3 @@ VK_LAYER_EXPORT VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetInstanceProcAddr(V
 {
     return Mine_vkGetInstanceProcAddr(instance, funcName);
 }
-

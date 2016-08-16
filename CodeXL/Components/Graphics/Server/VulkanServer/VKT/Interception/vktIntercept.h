@@ -195,6 +195,12 @@ VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkCreateDebugReportCallbackE
 VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDestroyDebugReportCallbackEXT(VkInstance instance, VkDebugReportCallbackEXT callback, const VkAllocationCallbacks* pAllocator);
 VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkDebugReportMessageEXT(VkInstance instance, VkDebugReportFlagsEXT flags, VkDebugReportObjectTypeEXT objectType, uint64_t object, size_t location, int32_t messageCode, const char* pLayerPrefix, const char* pMessage);
 
+VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkDebugMarkerSetObjectTagEXT(VkDevice device, VkDebugMarkerObjectTagInfoEXT* pTagInfo);
+VK_LAYER_EXPORT VKAPI_ATTR VkResult VKAPI_CALL Mine_vkDebugMarkerSetObjectNameEXT(VkDevice device, VkDebugMarkerObjectNameInfoEXT* pNameInfo);
+VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkCmdDebugMarkerBeginEXT(VkCommandBuffer commandBuffer, VkDebugMarkerMarkerInfoEXT* pMarkerInfo);
+VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkCmdDebugMarkerEndEXT(VkCommandBuffer commandBuffer);
+VK_LAYER_EXPORT VKAPI_ATTR void VKAPI_CALL Mine_vkCmdDebugMarkerInsertEXT(VkCommandBuffer commandBuffer, VkDebugMarkerMarkerInfoEXT* pMarkerInfo);
+
 VK_LAYER_EXPORT VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetDeviceProcAddr(VkDevice device, const char* funcName);
 VK_LAYER_EXPORT VKAPI_ATTR PFN_vkVoidFunction VKAPI_CALL vkGetInstanceProcAddr(VkInstance instance, const char* funcName);
 

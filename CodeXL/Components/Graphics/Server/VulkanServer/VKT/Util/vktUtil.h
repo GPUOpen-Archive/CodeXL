@@ -130,6 +130,7 @@ namespace VktUtil
 {
 void ConstructMeasurementInfo(FuncId inFuncId, UINT64 sampleId, VktWrappedCmdBuf* pWrappedCmdBuf, UINT frameNum, UINT64 fillId, ProfilerMeasurementId& measurementId);
 void DecomposeFlags(UINT flags, gtASCIIString& ioFlagsString, WriteEnum_Hook inWriteHook, UINT inMinFlag, UINT inMaxFlag);
+std::string GetLayerName();
 
 const char* WritePipelineCacheHeaderVersionEnumAsString(int enumVal);
 const char* WriteResultCodeEnumAsString(int enumVal);

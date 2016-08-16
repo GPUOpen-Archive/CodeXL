@@ -225,6 +225,11 @@ enum FuncId : int
     FuncId_vkCreateDebugReportCallbackEXT,
     FuncId_vkDestroyDebugReportCallbackEXT,
     FuncId_vkDebugReportMessageEXT,
+    FuncId_vkDebugMarkerSetObjectTagEXT,
+    FuncId_vkDebugMarkerSetObjectNameEXT,
+    FuncId_vkCmdDebugMarkerBeginEXT,
+    FuncId_vkCmdDebugMarkerEndEXT,
+    FuncId_vkCmdDebugMarkerInsertEXT,
 
     FuncId_WholeCmdBuf,
 

@@ -10,6 +10,7 @@
 #include "vktUtil.h"
 
 #include "../vktDefines.h"
+#include "../../../Common/OSWrappers.h"
 
 //-----------------------------------------------------------------------------
 /// Construct a measurement info structure for each call that will be profiled.
@@ -78,6 +79,53 @@ void VktUtil::DecomposeFlags(uint32 flags, gtASCIIString& ioFlagsString, WriteEn
         }
         while (currentFlag <= inMaxFlag);
     }
+}
+
+//-----------------------------------------------------------------------------
+/// Determine what the name of this Vulkan server is.
+/// \return The name of this backend/DLL.
+//-----------------------------------------------------------------------------
+std::string VktUtil::GetLayerName()
+{
+#ifdef _LINUX
+
+#ifdef CODEXL_GRAPHICS
+    std::string layerNameA = "libCXLGraphicsServerVulkan";
+#else
+    std::string layerNameA = "libVulkanServer";
+#endif
+
+#else
+
+#ifdef CODEXL_GRAPHICS
+    std::string layerNameA = "CXLGraphicsServerVulkan";
+#else
+    std::string layerNameA = "VulkanServer";
+#endif
+
+    char appPath[PS_MAX_PATH] = {};
+    GetModuleFileName(nullptr, appPath, PS_MAX_PATH);
+
+    osModuleArchitecture appBinaryType = OS_X86_64_ARCHITECTURE;
+
+    const bool readBinType = OSWrappers::GetBinaryType(appPath, &appBinaryType);
+
+    if (readBinType)
+    {
+        if (appBinaryType == OS_I386_ARCHITECTURE)
+        {
+            layerNameA.append(GDT_DEBUG_SUFFIX);
+        }
+        else if (appBinaryType == OS_X86_64_ARCHITECTURE)
+        {
+            layerNameA.append("-x64");
+            layerNameA.append(GDT_DEBUG_SUFFIX);
+        }
+    }
+
+#endif
+
+    return layerNameA;
 }
 
 const char* VktUtil::WritePipelineCacheHeaderVersionEnumAsString(int enumVal)
