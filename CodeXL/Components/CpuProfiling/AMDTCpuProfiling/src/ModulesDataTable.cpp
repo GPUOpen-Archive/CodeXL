@@ -161,7 +161,6 @@ bool ModulesDataTable::fillSummaryTables(int counterIdx)
 
         for (auto moduleData : moduleProfileData)
         {
-            // create QstringList to hold the values
             QStringList list;
 
             osFilePath modulePath(moduleData.m_name);
@@ -171,78 +170,33 @@ bool ModulesDataTable::fillSummaryTables(int counterIdx)
             list << filename.asASCIICharArray();
 
             QString modulefullPath(moduleData.m_name.asASCIICharArray());
-            int precision = SAMPLE_VALUE_PRECISION;
 
-            const AMDTSampleValueVec& sampleVector = moduleData.m_sampleValue;
-
-            if (sampleVector.empty() || sampleVector.at(0).m_sampleCount == 0)
+            if (!SetSampleCountAndPercent(moduleData.m_sampleValue, list))
             {
                 continue;
-            }
-
-            if (m_isCLU)
-            {
-                if (m_pDisplayFilter->isCLUPercentCaptionSet())
-                {
-                    precision = SAMPLE_PERCENT_PRECISION;
-                }
-
-                list << QString::number(sampleVector.at(0).m_sampleCount, 'f', precision);
-            }
-            else
-            {
-                QVariant sampleCount(sampleVector.at(0).m_sampleCount);
-                list << sampleCount.toString();
-                QVariant sampleCountPercent(sampleVector.at(0).m_sampleCountPercentage);
-                list << QString::number(sampleVector.at(0).m_sampleCountPercentage, 'f', precision);
             }
 
             addRow(list, nullptr);
 
-            AMDTProfileModuleInfoVec procInfo;
-            m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, moduleData.m_moduleId, procInfo);
+            SetSummaryTabDelegateItemCol(AMDT_MOD_TABLE_CLU_HS_COL);
 
-            // if module info null return
-            if (procInfo.empty())
+            if (!SetSummaryTabIcon(AMDT_MOD_TABLE_SUMMARY_MOD_NAME,
+                                   AMDT_MOD_TABLE_SUMMARY_SAMPLE_PER,
+                                   AMDT_MOD_TABLE_SUMMARY_SAMPLE,
+                                   moduleData.m_moduleId,
+                                   modulePath))
             {
                 continue;
             }
 
-            int row = rowCount() - 1;
-
-            QPixmap* pIcon = CPUProfileDataTable::moduleIcon(modulePath, !procInfo.at(0).m_is64Bit);
-            QTableWidgetItem* pNameItem = item(row, AMDT_MOD_TABLE_SUMMARY_MOD_NAME);
-
-            if (pNameItem != nullptr)
-            {
-                if (pIcon != nullptr)
-                {
-                    pNameItem->setIcon(QIcon(*pIcon));
-                }
-            }
-
-            QTableWidgetItem* pModuleNameItem = item(row, AMDT_MOD_TABLE_SUMMARY_MOD_NAME);
+            //tooltip
+            QTableWidgetItem* pModuleNameItem = item(rowCount() - 1, AMDT_MOD_TABLE_SUMMARY_MOD_NAME);
 
             if (pModuleNameItem != nullptr)
             {
                 pModuleNameItem->setToolTip(moduleData.m_name.asASCIICharArray());
             }
 
-            if (!m_isCLU)
-            {
-                rc = delegateSamplePercent(AMDT_MOD_TABLE_SUMMARY_SAMPLE_PER);
-            }
-            else
-            {
-                if (m_pDisplayFilter->isCLUPercentCaptionSet())
-                {
-                    delegateSamplePercent(AMDT_MOD_TABLE_CLU_HS_COL);
-                }
-                else
-                {
-                    setItemDelegateForColumn(AMDT_MOD_TABLE_CLU_HS_COL, &acNumberDelegateItem::Instance());
-                }
-            }
         }
 
         setSortingEnabled(true);

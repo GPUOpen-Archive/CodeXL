@@ -296,31 +296,9 @@ bool FunctionsDataTable::fillSummaryTables(int counterIdx)
 
             list << profData.m_name.asASCIICharArray();
 
-            int precision = SAMPLE_VALUE_PRECISION;
-
-            const AMDTSampleValueVec& sampleVector = profData.m_sampleValue;
-
-            if (sampleVector.empty() || sampleVector.at(0).m_sampleCount == 0)
+            if (!SetSampleCountAndPercent(profData.m_sampleValue, list))
             {
                 continue;
-            }
-
-            if (m_isCLU)
-            {
-                if (m_pDisplayFilter->isCLUPercentCaptionSet())
-                {
-                    precision = SAMPLE_PERCENT_PRECISION;
-                }
-
-                list << QString::number(sampleVector.at(0).m_sampleCount, 'f', precision);
-            }
-            else
-            {
-                QVariant sampleCount(sampleVector.at(0).m_sampleCount);
-                list << sampleCount.toString();
-
-                QVariant sampleCountPercent(sampleVector.at(0).m_sampleCountPercentage);
-                list << QString::number(sampleVector.at(0).m_sampleCountPercentage, 'f', precision);
             }
 
             AMDTProfileModuleInfoVec procInfo;
@@ -343,36 +321,26 @@ bool FunctionsDataTable::fillSummaryTables(int counterIdx)
 
             addRow(list, nullptr);
 
-            int functionCol = AMDT_FUNC_SUMMMARY_FUNC_NAME_COL;
-            int sampleCol = AMDT_FUNC_SUMMMARY_FUNC_MODULE_COL;
+            SetSummaryTabDelegateItemCol(AMDT_FUNC_SUMMMARY_FUNC_SAMPLE_COL);
 
-            if (true == rc)
+            if (!SetSummaryTabIcon(AMDT_FUNC_SUMMMARY_FUNC_NAME_COL,
+                                   AMDT_FUNC_SUMMMARY_FUNC_PER_SAMPLE_COL,
+                                   AMDT_FUNC_SUMMMARY_FUNC_SAMPLE_COL,
+                                   profData.m_moduleId,
+                                   procInfo.at(0).m_path))
             {
-                if (!m_isCLU)
-                {
-                    rc = delegateSamplePercent(AMDT_FUNC_SUMMMARY_FUNC_PER_SAMPLE_COL);
-                }
-                else
-                {
-                    if (m_pDisplayFilter->isCLUPercentCaptionSet())
-                    {
-                        delegateSamplePercent(AMDT_FUNC_SUMMMARY_FUNC_SAMPLE_COL);
-                    }
-                    else
-                    {
-                        setItemDelegateForColumn(AMDT_FUNC_SUMMMARY_FUNC_SAMPLE_COL, &acNumberDelegateItem::Instance());
-                    }
-
-                    sampleCol = AMDT_FUNC_SUMMMARY_FUNC_SAMPLE_COL + 1;
-                }
+                continue;
             }
 
-            SetIcon(procInfo.at(0).m_path,
-                    rowCount() - 1,
-                    functionCol,
-                    sampleCol,
-                    !procInfo.at(0).m_is64Bit,
-                    FunctionDataIndexRole);
+            //set tooltip
+            QString modulefullPath(acGTStringToQString(procInfo.at(0).m_path));
+            QTableWidgetItem* pModuleNameItem = item(rowCount() - 1, AMDT_FUNC_SUMMMARY_FUNC_MODULE_COL);
+
+            if (pModuleNameItem != nullptr)
+            {
+                pModuleNameItem->setToolTip(modulefullPath);
+            }
+
         }
 
         setSortingEnabled(true);

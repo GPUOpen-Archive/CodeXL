@@ -920,3 +920,111 @@ void CPUProfileDataTable::SetIcon(gtString modulePath, AMDTUInt32 rowIndex, AMDT
         }
     }
 }
+
+bool CPUProfileDataTable::SetSampleCountAndPercent(const AMDTSampleValueVec& sampleVector, QStringList& list)
+{
+    bool retVal = true;
+
+    if (sampleVector.empty() || sampleVector.at(0).m_sampleCount == 0)
+    {
+        retVal = false;
+    }
+    else
+    {
+        int precision           = SAMPLE_VALUE_PRECISION;
+        double sampleVal        = sampleVector.at(0).m_sampleCount;
+        double samplePercentage = sampleVector.at(0).m_sampleCountPercentage;
+
+        if (m_isCLU)
+        {
+            if (m_pDisplayFilter->isCLUPercentCaptionSet())
+            {
+                precision = SAMPLE_PERCENT_PRECISION;
+            }
+
+            list << QString::number(sampleVal, 'f', precision);
+        }
+        else
+        {
+            QVariant sampleCount(sampleVal);
+            list << sampleCount.toString();
+
+            QVariant sampleCountPercent(samplePercentage);
+            list << QString::number(samplePercentage, 'f', precision);
+        }
+    }
+
+    return retVal;
+}
+
+void CPUProfileDataTable::SetSummaryTabDelegateItemCol(int colNum)
+{
+    if (m_isCLU)
+    {
+        if (m_pDisplayFilter->isCLUPercentCaptionSet())
+        {
+            delegateSamplePercent(colNum);
+        }
+        else
+        {
+            setItemDelegateForColumn(colNum, &acNumberDelegateItem::Instance());
+        }
+    }
+    else
+    {
+        delegateSamplePercent(colNum + 1);
+    }
+}
+
+bool CPUProfileDataTable::SetSummaryTabIcon(gtUInt16 iconColNum,
+                                            gtUInt16 percentColIndex,
+                                            gtUInt16 samplesColIndex,
+                                            gtUInt32 modId,
+                                            const osFilePath& modulePath)
+{
+    bool retVal = true;
+
+    AMDTProfileModuleInfoVec procInfo;
+    m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, modId, procInfo);
+
+    if (procInfo.empty())
+    {
+        retVal = false;
+    }
+    else
+    {
+        int row = rowCount() - 1;
+
+        QTableWidgetItem* pNameItem = item(row, iconColNum);
+
+        if (pNameItem != nullptr)
+        {
+            if (AMDT_PROFILE_ALL_MODULES != modId)
+            {
+                QPixmap* pIcon = CPUProfileDataTable::moduleIcon(modulePath, !procInfo.at(0).m_is64Bit);
+
+                if (pIcon != nullptr)
+                {
+                    pNameItem->setIcon(QIcon(*pIcon));
+                }
+            }
+            else
+            {
+                QPixmap emptyIcon;
+                acSetIconInPixmap(emptyIcon, AC_ICON_EMPTY);
+                pNameItem->setIcon(QIcon(emptyIcon));
+                pNameItem->setTextColor(QColor(Qt::gray));
+
+                QTableWidgetItem* rowItem = item(row, percentColIndex);
+                rowItem->setTextColor(QColor(Qt::gray));
+
+                QFont font;
+                rowItem = item(row, samplesColIndex);
+                rowItem->setTextColor(QColor(Qt::gray));
+                rowItem->setFont(font);
+            }
+        }
+    }
+
+    return retVal;
+}

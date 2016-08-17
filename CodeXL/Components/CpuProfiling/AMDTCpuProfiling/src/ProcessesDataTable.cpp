@@ -24,6 +24,8 @@
 #include <inc/ProcessesDataTable.h>
 #include <inc/SessionWindow.h>
 #include <inc/SessionOverviewWindow.h>
+#include <inc/StringConstants.h>
+
 
 ProcessesDataTable::ProcessesDataTable(QWidget* pParent, const gtVector<TableContextMenuActionType>& additionalContextMenuActions, SessionTreeNodeData* pSessionData)
     : CPUProfileDataTable(pParent, additionalContextMenuActions, pSessionData)
@@ -55,7 +57,6 @@ bool ProcessesDataTable::fillSummaryTables(int counterIdx)
 
             for (auto profData : processProfileData)
             {
-                // get the process info
                 AMDTProfileProcessInfoVec procInfo;
                 rc = m_pProfDataRdr->GetProcessInfo(profData.m_id, procInfo);
 
@@ -66,59 +67,26 @@ bool ProcessesDataTable::fillSummaryTables(int counterIdx)
                     continue;
                 }
 
-                if (profData.m_name != L"other")
+                if (profData.m_id != AMDT_PROFILE_ALL_MODULES)
                 {
                     list << procInfo.at(0).m_name.asASCIICharArray();
                     list << QString::number(procInfo.at(0).m_pid);
                 }
                 else
                 {
-                    list << "other";
+                    list << CP_strOther;
                     list << "";
                 }
 
-                int precision = SAMPLE_VALUE_PRECISION;
-                const AMDTSampleValueVec& sampleVector = profData.m_sampleValue;
-
-                if (sampleVector.empty() || sampleVector.at(0).m_sampleCount == 0)
+                if (false == SetSampleCountAndPercent(profData.m_sampleValue, list))
                 {
                     continue;
                 }
 
-                if (m_isCLU)
-                {
-                    if (m_pDisplayFilter->isCLUPercentCaptionSet())
-                    {
-                        precision = SAMPLE_PERCENT_PRECISION;
-                    }
-
-                    list << QString::number(sampleVector.at(0).m_sampleCount, 'f', precision);
-                }
-                else
-                {
-                    QVariant sampleCount(sampleVector.at(0).m_sampleCount);
-                    list << sampleCount.toString();
-
-                    list << QString::number(sampleVector.at(0).m_sampleCountPercentage, 'f', precision);
-                }
-
                 addRow(list, nullptr);
 
-                if (!m_isCLU)
-                {
-                    delegateSamplePercent(3);
-                }
-                else
-                {
-                    if (m_pDisplayFilter->isCLUPercentCaptionSet())
-                    {
-                        delegateSamplePercent(PROCESS_SAMPLE_COL);
-                    }
-                    else
-                    {
-                        setItemDelegateForColumn(PROCESS_SAMPLE_COL, &acNumberDelegateItem::Instance());
-                    }
-                }
+                SetSummaryTabDelegateItemCol(PROCESS_SAMPLE_COL);
+
             }
 
             setSortingEnabled(true);

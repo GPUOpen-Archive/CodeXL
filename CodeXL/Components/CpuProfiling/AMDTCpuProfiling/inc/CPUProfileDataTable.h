@@ -231,6 +231,14 @@ protected:
     // saves the other samples message row item
     QTableWidgetItem* m_pOtherSamplesRowItem = nullptr;
 
+    bool SetSampleCountAndPercent(const AMDTSampleValueVec& sampleVector, QStringList& list);
+    void SetSummaryTabDelegateItemCol(int colNum);
+    bool SetSummaryTabIcon(gtUInt16 iconColNum,
+                           gtUInt16 percentColIndex,
+                           gtUInt16 samplesColIndex,
+                           gtUInt32 modId,
+                           const osFilePath& modulePath);
+
     enum
     {
         DisplayProfileData,             // CPUProfileDataTable
