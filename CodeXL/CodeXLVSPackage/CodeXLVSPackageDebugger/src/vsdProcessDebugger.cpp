@@ -2519,7 +2519,16 @@ bool vsdProcessDebugger::suspendHostDebuggedProcess()
         }
         else // TRUE != rcBreak
         {
-            m_hostBreakReason = AP_FOREIGN_BREAK_HIT;
+            // If this external option failed, try using the debug engine itself:
+            HRESULT hr = m_piNativeDebugEngine->CauseBreak();
+            if (SUCCEEDED(hr) && (S_FALSE != hr))
+            {
+                retVal = true;
+            }
+            else // !SUCCEEDED(hr) || S_FALSE == hr
+            {
+                m_hostBreakReason = AP_FOREIGN_BREAK_HIT;
+            }
         }
     }
 

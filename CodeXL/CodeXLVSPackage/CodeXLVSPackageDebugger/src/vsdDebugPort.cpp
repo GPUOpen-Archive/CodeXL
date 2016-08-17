@@ -213,7 +213,7 @@ HRESULT vsdCDebugPort::QueryInterface(REFIID riid, LPVOID* ppvObj)
         retVal = E_NOINTERFACE;
         static const GUID sdm_CDebugPort_guid = {0xC121E238, 0xE7F7, 0x492B, {0x8E, 0xA1, 0xE3, 0xB3, 0x59, 0x08, 0x57, 0x6B}};
 
-        if (sdm_CDebugPort_guid == riid)
+        if ((sdm_CDebugPort_guid == riid) || (IID_IMarshal == riid))
         {
             retVal = m_piUnderlyingPort->QueryInterface(riid, ppvObj);
         }

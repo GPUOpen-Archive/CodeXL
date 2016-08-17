@@ -444,6 +444,7 @@ HRESULT vspCDebugEngine::LaunchSuspended(
 
                 if (rc64Bit && is64Bit)
                 {
+                    // US- 15/8/16 - comment out this line to re-enable 64-bit host debugging, as the hang on startup seems to be fixed now.
                     _processCreationData.setShouldDisableVSDebugEngine(true);
                 }
 
