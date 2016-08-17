@@ -262,7 +262,7 @@ void SessionFunctionView::CreateToolbar()
     m_pTopToolbar->setContentsMargins(0, 0, 0, 0);
 
     // Display system dll is initialized with the value of the current display system dll value:
-    m_functionsTablesFilter.m_shouldDisplaySystemDllInModulesDlg = CPUGlobalDisplayFilter::instance().m_displaySystemDLLs;
+    m_functionsTablesFilter.m_shouldDisplaySystemDllInModulesDlg = !m_pDisplayFilter->IsSystemModuleIgnored();
 
     m_pTopToolbar->AddLabel(CP_strFunctions, true, false, 0);
 
@@ -445,7 +445,7 @@ void SessionFunctionView::onOpenModuleSelector(const QString& link)
         pSessionData = qobject_cast<CPUSessionTreeItemData*>(m_pDisplayedSessionItemData->extendedItemData());
     }
 
-    ModuleFilterDialog mfd(m_pProfDataRdr, &m_functionsTablesFilter, pSessionData, !m_pDisplayFilter->IsSystemModuleIgnored(), afMainAppWindow::instance());
+    ModuleFilterDialog mfd(m_pProfDataRdr, m_pDisplayFilter, &m_functionsTablesFilter, pSessionData, afMainAppWindow::instance());
 
     if (QDialog::Accepted == mfd.exec())
     {
@@ -790,7 +790,7 @@ void SessionFunctionView::onOpenDisplayFilterDialog()
 {
     OnDisplaySettingsClicked();
 
-    m_functionsTablesFilter.m_shouldDisplaySystemDllInModulesDlg = CPUGlobalDisplayFilter::instance().m_displaySystemDLLs;
+    m_functionsTablesFilter.m_shouldDisplaySystemDllInModulesDlg = !m_pDisplayFilter->IsSystemModuleIgnored();
 }
 
 void SessionFunctionView::displayModule(const QString& moduleFullPath)

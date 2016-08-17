@@ -38,9 +38,9 @@ class ModuleFilterDialog : public acDialog
 public:
 
     ModuleFilterDialog(std::shared_ptr<cxlProfileDataReader> m_pProfDataRdr,
+					   std::shared_ptr<DisplayFilter> m_pDisplayFilter,
                        TableDisplaySettings* pDisplaySettings,
                        CPUSessionTreeItemData* pSessionData,
-                       bool isDisplaySysModEn,
                        QWidget* pParent = nullptr);
     virtual ~ModuleFilterDialog();
 
@@ -53,9 +53,9 @@ private:
     acListCtrl* m_pModuleTree = nullptr;
 
     std::shared_ptr<cxlProfileDataReader> m_pProfDataRdr = nullptr;
+	std::shared_ptr<DisplayFilter> m_pDisplayFilter = nullptr;
     TableDisplaySettings* m_pTableDisplaySettings = nullptr;
     CPUSessionTreeItemData* m_pSessionData = nullptr;
-    bool m_isDisplaySysModEn = false;
 
     void intializeLayout();
     void intializeData();

@@ -37,14 +37,14 @@
 #define CP_CPU_TABLE_ROW_HEIGHT 18
 
 ModuleFilterDialog::ModuleFilterDialog(std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
+                                       std::shared_ptr<DisplayFilter> pDisplayFilter,
                                        TableDisplaySettings* pDisplaySettings,
                                        CPUSessionTreeItemData* pSessionData,
-                                       bool isDisplaySysModEn,
                                        QWidget* pParent): acDialog(pParent),
     m_pProfDataRdr(pProfDataRdr),
+    m_pDisplayFilter(pDisplayFilter),
     m_pTableDisplaySettings(pDisplaySettings),
-    m_pSessionData(pSessionData),
-    m_isDisplaySysModEn(isDisplaySysModEn)
+    m_pSessionData(pSessionData)
 {
     setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
     intializeLayout();
@@ -151,7 +151,6 @@ void ModuleFilterDialog::intializeLayout()
 
 void ModuleFilterDialog::intializeData()
 {
-    // Sanity check:
     GT_IF_WITH_ASSERT(m_pTableDisplaySettings != nullptr)
     {
         // Set the "Select all modules" check state:
@@ -168,10 +167,9 @@ void ModuleFilterDialog::intializeData()
             m_pSelectAllModules->setCheckState(Qt::Unchecked);
         }
 
-
-        m_pDisplaySystemDLL->setChecked(m_pTableDisplaySettings->m_shouldDisplaySystemDllInModulesDlg);
-        m_pDisplaySystemDLL->setEnabled(m_isDisplaySysModEn);
-        //m_pDisplaySystemDLL->setEnabled(CPUGlobalDisplayFilter::instance().m_displaySystemDLLs);
+        bool sysModuleEn = m_pTableDisplaySettings->m_shouldDisplaySystemDllInModulesDlg;
+        m_pDisplaySystemDLL->setChecked(sysModuleEn);
+        m_pDisplaySystemDLL->setEnabled(sysModuleEn);
 
         GT_IF_WITH_ASSERT(m_pTableDisplaySettings->m_allModulesFullPathsList.size() == m_pTableDisplaySettings->m_isModule32BitList.size())
         {
@@ -377,7 +375,9 @@ void ModuleFilterDialog::onClickOk()
 {
     if (m_pDisplaySystemDLL->isEnabled())
     {
-        m_pTableDisplaySettings->m_shouldDisplaySystemDllInModulesDlg = m_pDisplaySystemDLL->isChecked();
+        bool isSystemDLLChecked = m_pDisplaySystemDLL->isChecked();
+        m_pTableDisplaySettings->m_shouldDisplaySystemDllInModulesDlg = isSystemDLLChecked;
+        m_pDisplayFilter->setIgnoreSysDLL(!isSystemDLLChecked);
     }
 
     m_pTableDisplaySettings->m_filterByModulePathsList.clear();

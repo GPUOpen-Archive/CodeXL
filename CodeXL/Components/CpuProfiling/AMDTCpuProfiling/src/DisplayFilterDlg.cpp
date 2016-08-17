@@ -147,8 +147,8 @@ DisplayFilterDlg::displayDialog(const QString& sessionPath, bool enableOnlySyste
                 }
 
 #endif
-
-                m_pCheckBoxDisplaySystemDLLs->setChecked(m_displaySystemDLLs);
+				m_displaySystemDLLs = !m_displayFilter->IsSystemModuleIgnored();
+				m_pCheckBoxDisplaySystemDLLs->setChecked(m_displaySystemDLLs);
                 m_pCheckBoxShowPercentageBars->setChecked(m_displayPercentageInColumn);
             }
 
@@ -396,9 +396,6 @@ void DisplayFilterDlg::onChangeView(const QString& newlySelectedView)
             // Remove old items:
             if (nullptr != m_pVBLayoutForColumn)
             {
-                //const int noOfColumnOld = m_pVBLayoutForColumn->count();
-
-                //for (int i = 0; i < noOfColumnOld; ++i)
                 for (auto it : m_pCheckBoxColumns)
                 {
                     m_pVBLayoutForColumn->removeWidget(it);
@@ -427,7 +424,6 @@ void DisplayFilterDlg::onChangeView(const QString& newlySelectedView)
 
             for (const auto& counter : counterDetails)
             {
-                //m_pCheckBoxColumns[idx].setText(counter.first.asASCIICharArray());
                 m_pCheckBoxColumns[idx]->setText(acGTStringToQString(std::get<1>(counter))); // get abbreviation
                 m_pVBLayoutForColumn->addWidget(m_pCheckBoxColumns[idx]);
                 m_pCheckBoxColumns[idx++]->setChecked(true);
@@ -809,8 +805,6 @@ void DisplayFilterDlg::updateHiddenColumnList()
                         {
                             selectedCounters.push_back(sel);
                         }
-
-                        //checkCounterName.push_back(gStr);
                     }
                     else
                     {
