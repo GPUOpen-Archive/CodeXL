@@ -170,9 +170,9 @@ protected:
     bool m_CLUNoteShown = false;
     bool m_ignoreVerticalScroll = false;
 
-    AMDTUInt32  m_moduleId;
-    AMDTUInt32  m_functionId;
-    AMDTUInt32  m_processId;
+    AMDTUInt32  m_moduleId      = AMDT_PROFILE_ALL_MODULES;
+    AMDTUInt32  m_functionId    = AMDT_PROFILE_ALL_FUNCTIONS;
+    AMDTUInt32  m_processId     = AMDT_PROFILE_ALL_PROCESSES;
     std::vector<AMDTUInt32> m_functionIdVec;
     gtString m_srcFilePath;
     std::vector<gtString> m_supportedCounterList;

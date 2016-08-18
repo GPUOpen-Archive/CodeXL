@@ -51,7 +51,8 @@ class SourceCodeTreeModel : public QAbstractItemModel
 
 public:
     SourceCodeTreeModel(const QString& sessionDir,
-                        std::shared_ptr<cxlProfileDataReader> pProfDataRdr, std::shared_ptr<DisplayFilter> displayFilter);
+                        std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
+                        std::shared_ptr<DisplayFilter> displayFilter);
 
     ~SourceCodeTreeModel();
 
@@ -118,29 +119,24 @@ public:
     void SetModuleDetails(AMDTUInt32 moduleId, AMDTUInt32 pId);
     void BuildTree(const std::vector<SourceViewTreeItem*>& srcLineViewTreeMap);
 
-    void PrintFunctionDetailData(AMDTProfileFunctionData  functionData,
+    void PrintFunctionDetailData(const AMDTProfileFunctionData&  functionData,
                                  gtString srcFilePath,
                                  AMDTSourceAndDisasmInfoVec srcInfoVec,
                                  const std::vector<SourceViewTreeItem*>& srcLineViewTreeMap);
-    void GetInstOffsets(gtUInt16 srcLine, AMDTSourceAndDisasmInfoVec& srcInfoVec, gtVector<InstOffsetSize>& instOffsetVec);
-    void GetDisasmString(gtVAddr offset, AMDTSourceAndDisasmInfoVec& srcInfoVec, gtString& disasm, gtString& codeByte);
-    void GetDisasmSampleValue(InstOffsetSize& instInfo, AMDTProfileInstructionDataVec& dataVec, AMDTSampleValueVec& sampleValue);
+    void GetInstOffsets(gtUInt16 srcLine, const AMDTSourceAndDisasmInfoVec& srcInfoVec, gtVector<InstOffsetSize>& instOffsetVec);
+    void GetDisasmString(gtVAddr offset, const AMDTSourceAndDisasmInfoVec& srcInfoVec, gtString& disasm, gtString& codeByte);
+    void GetDisasmSampleValue(const InstOffsetSize& instInfo,
+                              const AMDTProfileInstructionDataVec& dataVec,
+                              AMDTSampleValueVec& sampleValue);
+
     AMDTUInt64 GetFuncSrcFirstLnNum() const { return m_funcFirstSrcLine; }
     const std::vector<SourceViewTreeItem*> GetSrcLineViewMap() const { return m_srcLineViewTreeMap; }
 
 private:
 
     bool SetSourceLines(const QString& filepath, unsigned int startLine, unsigned int stopLine);
-
     bool IsSourceLineMapped(const SourceLineKey& sourceLineKey);
-
-
     bool SetupSourceInfo();
-
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    bool SetupSymbolInfoNgen(QString pjsFile);
-    bool GetClrOffsetFromSymbol(gtRVAddr& offset);
-#endif // AMDT_WINDOWS_OS
 
 #ifdef TBI
     bool SetupSourceInfoForOcl(gtVAddr address);
@@ -148,12 +144,12 @@ private:
 
     SourceViewTreeItem* getItem(const QModelIndex& index) const;
     void SetHotSpotsrcLnSamples(AMDTUInt32 counterId,
-                                AMDTProfileFunctionData  functionData,
-                                AMDTSourceAndDisasmInfoVec srcInfoVec);
+                                const AMDTProfileFunctionData&  functionData,
+                                const AMDTSourceAndDisasmInfoVec& srcInfoVec);
 
     void SetHotSpotDisamOnlySamples(AMDTUInt32 counterId,
-                                    AMDTProfileFunctionData  functionData,
-                                    AMDTSourceAndDisasmInfoVec srcInfoVec);
+                                    const AMDTProfileFunctionData&  functionData,
+                                    const AMDTSourceAndDisasmInfoVec& srcInfoVec);
 
 private:
 

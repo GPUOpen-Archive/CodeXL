@@ -36,6 +36,8 @@
 #include <inc/Auxil.h>
 
 const gtUInt32 CLR_HIDDEN_LINE = 0x00feefee;
+const gtUInt32 SAMPLE_PERCENT_PRECISION = 2;
+const gtUInt32 SAMPLE_PRECISION = 6;
 
 // The size of disassembly block to be fetched on first time.
 const unsigned int FIRST_DISASSEMBLY_FETCH_BLOCK_SIZE = 1024;
@@ -52,9 +54,6 @@ void DebugPrintMapToOutput(const OffsetLinenumMap& map)
 
     osOutputDebugString(mapStr);
 }
-
-#define SAMPLE_PERCENT_PRECISION  2
-#define SAMPLE_PRECISION          6
 
 SourceCodeTreeModel::SourceCodeTreeModel(const QString& sessionDir,
                                          std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
@@ -501,7 +500,9 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
     return true;
 }
 
-void SourceCodeTreeModel::GetInstOffsets(gtUInt16 srcLine, AMDTSourceAndDisasmInfoVec& srcInfoVec, gtVector<InstOffsetSize>& instOffsetVec)
+void SourceCodeTreeModel::GetInstOffsets(gtUInt16 srcLine,
+                                         const AMDTSourceAndDisasmInfoVec& srcInfoVec,
+                                         gtVector<InstOffsetSize>& instOffsetVec)
 {
     for (auto& srcInfo : srcInfoVec)
     {
@@ -518,7 +519,9 @@ void SourceCodeTreeModel::GetInstOffsets(gtUInt16 srcLine, AMDTSourceAndDisasmIn
     return;
 }
 
-void SourceCodeTreeModel::GetDisasmString(gtVAddr offset, AMDTSourceAndDisasmInfoVec& srcInfoVec, gtString& disasm, gtString& codeByte)
+void SourceCodeTreeModel::GetDisasmString(gtVAddr offset,
+                                          const AMDTSourceAndDisasmInfoVec& srcInfoVec,
+                                          gtString& disasm, gtString& codeByte)
 {
     auto instData = std::find_if(srcInfoVec.begin(), srcInfoVec.end(),
     [&offset](AMDTSourceAndDisasmInfo const & srcInfo) { return srcInfo.m_offset == offset; });
@@ -532,11 +535,13 @@ void SourceCodeTreeModel::GetDisasmString(gtVAddr offset, AMDTSourceAndDisasmInf
     return;
 }
 
-void SourceCodeTreeModel::GetDisasmSampleValue(InstOffsetSize& instInfo, AMDTProfileInstructionDataVec& dataVec, AMDTSampleValueVec& sampleValue)
+void SourceCodeTreeModel::GetDisasmSampleValue(const InstOffsetSize& instInfo,
+                                               const AMDTProfileInstructionDataVec& dataVec,
+                                               AMDTSampleValueVec& sampleValue)
 {
     auto instData = std::find_if(dataVec.begin(), dataVec.end(),
-        [&instInfo](AMDTProfileInstructionData const & data) 
-        { return ((data.m_offset >= instInfo .m_offset) && (data.m_offset < (instInfo.m_offset + instInfo.m_size))); });
+                                 [&instInfo](AMDTProfileInstructionData const & data)
+    { return ((data.m_offset >= instInfo .m_offset) && (data.m_offset < (instInfo.m_offset + instInfo.m_size))); });
 
     bool found = false;
 
@@ -557,19 +562,20 @@ void SourceCodeTreeModel::GetDisasmSampleValue(InstOffsetSize& instInfo, AMDTPro
         }
 
         instData = std::find_if(++instData, dataVec.end(),
-            [&instInfo](AMDTProfileInstructionData const & data)
-            { return ((data.m_offset >= instInfo.m_offset) && (data.m_offset < (instInfo.m_offset + instInfo.m_size))); });
+                                [&instInfo](AMDTProfileInstructionData const & data)
+        { return ((data.m_offset >= instInfo.m_offset) && (data.m_offset < (instInfo.m_offset + instInfo.m_size))); });
     }
 
     return;
 }
 
-void SourceCodeTreeModel::PrintFunctionDetailData(AMDTProfileFunctionData data,
+void SourceCodeTreeModel::PrintFunctionDetailData(const AMDTProfileFunctionData& data,
                                                   gtString srcFilePath,
                                                   AMDTSourceAndDisasmInfoVec srcInfoVec,
                                                   const std::vector<SourceViewTreeItem*>& srcLineViewTreeMap)
 {
-    (void)srcFilePath; //unused
+    GT_UNREFERENCED_PARAMETER(srcFilePath);
+
     SourceViewTreeItem* pLineItem = nullptr;
     m_srcLineDataVec.clear();
     bool samplePercentSet = m_pDisplayFilter->GetSamplePercent();
@@ -1061,8 +1067,8 @@ void SourceCodeTreeModel::SetModuleDetails(AMDTUInt32 moduleId, AMDTUInt32 proce
 }
 
 void SourceCodeTreeModel::SetHotSpotsrcLnSamples(AMDTUInt32 counterId,
-                                                 AMDTProfileFunctionData  functionData,
-                                                 AMDTSourceAndDisasmInfoVec srcInfoVec)
+                                                 const AMDTProfileFunctionData&  functionData,
+                                                 const AMDTSourceAndDisasmInfoVec& srcInfoVec)
 {
     SourceViewTreeItem* pLineItem = nullptr;
 
@@ -1131,8 +1137,8 @@ void SourceCodeTreeModel::SetHotSpotsrcLnSamples(AMDTUInt32 counterId,
 
 
 void SourceCodeTreeModel::SetHotSpotDisamOnlySamples(AMDTUInt32 counterId,
-                                                     AMDTProfileFunctionData  functionData,
-                                                     AMDTSourceAndDisasmInfoVec srcInfoVec)
+                                                     const AMDTProfileFunctionData&  functionData,
+                                                     const AMDTSourceAndDisasmInfoVec& srcInfoVec)
 {
     int childIdx = 0;
 
