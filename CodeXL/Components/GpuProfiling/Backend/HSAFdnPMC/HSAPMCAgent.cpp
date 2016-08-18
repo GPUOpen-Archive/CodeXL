@@ -54,12 +54,10 @@ extern "C" bool DLL_PUBLIC OnLoad(void* pTable, uint64_t runtimeVersion, uint64_
     {
         InitHSAAPIInterceptPMC1_0(reinterpret_cast<ApiTable1_0*>(pTable));
     }
-#ifdef FUTURE_ROCR_VERSION
     else
     {
         InitHSAAPIInterceptPMC(reinterpret_cast<HsaApiTable*>(pTable));
     }
-#endif
 
     Parameters params;
     FileUtils::GetParametersFromFile(params);

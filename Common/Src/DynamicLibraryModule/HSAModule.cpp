@@ -125,22 +125,12 @@ bool HSAModule::LoadModule(const std::string& moduleName)
 #undef X
                 }
             }
-#ifdef FUTURE_ROCR_VERSION 
             status = system_extension_supported(HSA_EXTENSION_AMD_LOADER, 1, 0, &extensionSupported);
-#else
-            status = system_extension_supported(HSA_EXTENSION_AMD_LOADED_CODE_OBJECT, 1, 0, &extensionSupported);
-#endif
             if ((HSA_STATUS_SUCCESS == status) && extensionSupported)
             {
-#ifdef FUTURE_ROCR_VERSION
                 hsa_ven_amd_loader_1_00_pfn_t loaderTable;
                 memset(&loaderTable, 0, sizeof(hsa_ven_amd_loader_1_00_pfn_t));
                 status = system_get_extension_table(HSA_EXTENSION_AMD_LOADER, 1, 0, &loaderTable);
-#else
-                hsa_ven_amd_loaded_code_object_1_00_pfn_t loaderTable;
-                memset(&loaderTable, 0, sizeof(hsa_ven_amd_loaded_code_object_1_00_pfn_t));
-                status = system_get_extension_table(HSA_EXTENSION_AMD_LOADED_CODE_OBJECT, 1, 0, &loaderTable);
-#endif
                 if (HSA_STATUS_SUCCESS == status)
                 {
 #define X(SYM) SYM = loaderTable.hsa_##SYM;

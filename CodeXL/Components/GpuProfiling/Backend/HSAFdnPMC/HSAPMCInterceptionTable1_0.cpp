@@ -14,15 +14,9 @@
 /// Intercepts HSA APIs for this HSA Profiler agent
 void InitHSAAPIInterceptPMC1_0(ApiTable1_0* pTable)
 {
-#ifdef FUTURE_ROCR_VERSION
     g_pRealCoreFunctions = (CoreApiTable*)malloc(sizeof(CoreApiTable));
     g_pRealFinalizerExtFunctions = (FinalizerExtTable*)malloc(sizeof(FinalizerExtTable));
     g_pRealImageExtFunctions = (ImageExtTable*)malloc(sizeof(ImageExtTable));
-#else
-    g_pRealCoreFunctions = (ApiTable*)malloc(sizeof(ApiTable));
-    g_pRealFinalizerExtFunctions = (ExtTable*)malloc(sizeof(ExtTable));
-    g_pRealImageExtFunctions = g_pRealFinalizerExtFunctions; // duplicate
-#endif
 
     g_pRealCoreFunctions->hsa_status_string_fn = pTable->hsa_status_string_fn;
     g_pRealCoreFunctions->hsa_init_fn = pTable->hsa_init_fn;

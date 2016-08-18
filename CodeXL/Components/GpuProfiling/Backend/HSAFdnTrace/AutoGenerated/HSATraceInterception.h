@@ -10,7 +10,6 @@
 
 #include <hsa_api_trace.h>
 
-#ifdef FUTURE_ROCR_VERSION
 extern CoreApiTable* g_pRealCoreFunctions;    ///< table of real core functions
 extern FinalizerExtTable* g_pRealFinalizerExtFunctions; ///< table of real finalizer extension functions
 extern ImageExtTable* g_pRealImageExtFunctions; ///< table of real image extension functions
@@ -18,11 +17,6 @@ extern AmdExtTable* g_pRealAmdExtFunctions; ///< table of real AMD extension fun
 
 /// Intercepts HSA APIs for this HSA Profiler agent
 void InitHSAAPIInterceptTrace(HsaApiTable* pTable);
-#else
-extern ApiTable* g_pRealCoreFunctions;    ///< table of real HSA functions
-extern ExtTable* g_pRealFinalizerExtFunctions;    ///< table of real HSA extension functions
-extern ExtTable* g_pRealImageExtFunctions;    ///< table of real HSA extension functions (duplicate)
-#endif
 
 /// Cleans up API interception for this HSA Profiler agent
 void DoneHSAAPIInterceptTrace();
@@ -142,13 +136,9 @@ hsa_status_t HSA_API_Trace_hsa_ext_sampler_destroy(hsa_agent_t agent, hsa_ext_sa
 hsa_status_t HSA_API_Trace_hsa_amd_coherency_get_type(hsa_agent_t agent, hsa_amd_coherency_type_t* type);
 hsa_status_t HSA_API_Trace_hsa_amd_coherency_set_type(hsa_agent_t agent, hsa_amd_coherency_type_t type);
 hsa_status_t HSA_API_Trace_hsa_amd_profiling_set_profiler_enabled(hsa_queue_t* queue, int enable);
-#ifdef FUTURE_ROCR_VERSION
 hsa_status_t HSA_API_Trace_hsa_amd_profiling_async_copy_enable(bool enable);
-#endif
 hsa_status_t HSA_API_Trace_hsa_amd_profiling_get_dispatch_time(hsa_agent_t agent, hsa_signal_t signal, hsa_amd_profiling_dispatch_time_t* time);
-#ifdef FUTURE_ROCR_VERSION
 hsa_status_t HSA_API_Trace_hsa_amd_profiling_get_async_copy_time(hsa_signal_t signal, hsa_amd_profiling_async_copy_time_t* time);
-#endif
 hsa_status_t HSA_API_Trace_hsa_amd_profiling_convert_tick_to_system_domain(hsa_agent_t agent, uint64_t agent_tick, uint64_t* system_tick);
 hsa_status_t HSA_API_Trace_hsa_amd_signal_async_handler(hsa_signal_t signal, hsa_signal_condition_t cond, hsa_signal_value_t value, hsa_amd_signal_handler handler, void* arg);
 hsa_status_t HSA_API_Trace_hsa_amd_async_function(void (*callback)(void* arg), void* arg);

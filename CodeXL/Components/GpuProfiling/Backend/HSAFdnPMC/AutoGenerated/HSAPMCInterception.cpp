@@ -15,16 +15,10 @@
 
 #include "HSAPMCInterception.h"
 
-#ifdef FUTURE_ROCR_VERSION
 CoreApiTable*      g_pRealCoreFunctions         = nullptr;
 FinalizerExtTable* g_pRealFinalizerExtFunctions = nullptr;
 ImageExtTable*     g_pRealImageExtFunctions     = nullptr;
 AmdExtTable*       g_pRealAmdExtFunctions       = nullptr;
-#else
-ApiTable* g_pRealCoreFunctions         = nullptr;
-ExtTable* g_pRealFinalizerExtFunctions = nullptr;
-ExtTable* g_pRealImageExtFunctions     = nullptr;
-#endif
 
 hsa_status_t HSA_PMC_hsa_agent_get_info(hsa_agent_t agent, hsa_agent_info_t attribute, void* value)
 {
@@ -65,7 +59,6 @@ hsa_status_t HSA_PMC_hsa_executable_get_symbol(hsa_executable_t executable, cons
     return retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 void InitHSAAPIInterceptPMC(HsaApiTable* pTable)
 {
     g_pRealCoreFunctions = (CoreApiTable*)malloc(sizeof(CoreApiTable));
@@ -85,16 +78,13 @@ void InitHSAAPIInterceptPMC(HsaApiTable* pTable)
     pTable->core_->hsa_queue_destroy_fn = HSA_PMC_hsa_queue_destroy;
     pTable->core_->hsa_executable_get_symbol_fn = HSA_PMC_hsa_executable_get_symbol;
 }
-#endif
 
 void DoneHSAAPIInterceptPMC()
 {
     free(g_pRealCoreFunctions);
     free(g_pRealFinalizerExtFunctions);
-#ifdef FUTURE_ROCR_VERSION
     free(g_pRealImageExtFunctions);
     free(g_pRealAmdExtFunctions);
-#endif
 }
 
 

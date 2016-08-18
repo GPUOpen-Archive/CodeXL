@@ -116,12 +116,10 @@ extern "C" bool DLL_PUBLIC OnLoad(void* pTable, uint64_t runtimeVersion, uint64_
         // ROCm versions 1.1.1 and earlier
         InitHSAAPIInterceptTrace1_0(reinterpret_cast<ApiTable1_0*>(pTable));
     }
-#ifdef FUTURE_ROCR_VERSION
     else
     {
         InitHSAAPIInterceptTrace(reinterpret_cast<HsaApiTable*>(pTable));
     }
-#endif
 
     // Add a fabricated entry for hsa_init when OnLoad is called.
     // OnLoad is called when the first hsa_init is called.

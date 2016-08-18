@@ -10,7 +10,6 @@
 
 #include <hsa_api_trace.h>
 
-#ifdef FUTURE_ROCR_VERSION
 extern CoreApiTable* g_pRealCoreFunctions;    ///< table of real core functions
 extern FinalizerExtTable* g_pRealFinalizerExtFunctions; ///< table of real finalizer extension functions
 extern ImageExtTable* g_pRealImageExtFunctions; ///< table of real image extension functions
@@ -18,12 +17,6 @@ extern AmdExtTable* g_pRealAmdExtFunctions; ///< table of real AMD extension fun
 
 /// Intercepts HSA APIs for this HSA Profiler agent
 void InitHSAAPIInterceptPMC(HsaApiTable* pTable);
-#else
-extern ApiTable* g_pRealCoreFunctions;    ///< table of real HSA functions
-extern ExtTable* g_pRealFinalizerExtFunctions;    ///< table of real HSA extension functions
-extern ExtTable* g_pRealImageExtFunctions;    ///< table of real HSA extension functions (duplicate)
-
-#endif
 
 /// Cleans up API interception for this HSA Profiler agent
 void DoneHSAAPIInterceptPMC();

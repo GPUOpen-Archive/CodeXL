@@ -8,8 +8,6 @@
 #ifndef _HSAAMDEXTENSIONAPITRACECLASSES_H_
 #define _HSAAMDEXTENSIONAPITRACECLASSES_H_
 
-#ifdef FUTURE_ROCR_VERSION
-
 #include "../HSAAPIBase.h"
 
 ///////////////////////////////////////////////////
@@ -1204,8 +1202,6 @@ private:
     void* m_ptr; ///< Parameter passed to hsa_amd_interop_unmap_buffer
     hsa_status_t m_retVal; ///< Parameter passed to hsa_amd_interop_unmap_buffer
 };
-
-#endif
 
 #endif // _HSAAMDEXTENSIONAPITRACECLASSES_H_
 

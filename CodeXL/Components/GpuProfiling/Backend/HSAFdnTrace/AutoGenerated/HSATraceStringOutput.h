@@ -831,7 +831,6 @@ std::string Get_hsa_amd_profiling_dispatch_time_t_String(hsa_amd_profiling_dispa
 /// \return the string representation of the hsa_amd_profiling_dispatch_time_t
 std::string Get_hsa_amd_profiling_dispatch_time_t_Ptr_String(const hsa_amd_profiling_dispatch_time_t* pInputPtr, hsa_amd_profiling_dispatch_time_t input);
 
-#ifdef FUTURE_ROCR_VERSION
 /// Gets the string representation of the hsa_amd_profiling_async_copy_time_t type
 /// \param input the input hsa_amd_profiling_async_copy_time_t
 /// \return the string representation of the hsa_amd_profiling_async_copy_time_t
@@ -842,7 +841,6 @@ std::string Get_hsa_amd_profiling_async_copy_time_t_String(hsa_amd_profiling_asy
 /// \param input the input hsa_amd_profiling_async_copy_time_t
 /// \return the string representation of the hsa_amd_profiling_async_copy_time_t
 std::string Get_hsa_amd_profiling_async_copy_time_t_Ptr_String(const hsa_amd_profiling_async_copy_time_t* pInputPtr, hsa_amd_profiling_async_copy_time_t input);
-#endif
 
 /// Gets the string representation of the hsa_amd_segment_t type
 /// \param input the input hsa_amd_segment_t

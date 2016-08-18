@@ -22,16 +22,10 @@
 
 #include "HSATraceInterception.h"
 
-#ifdef FUTURE_ROCR_VERSION
 CoreApiTable*      g_pRealCoreFunctions         = nullptr;
 FinalizerExtTable* g_pRealFinalizerExtFunctions = nullptr;
 ImageExtTable*     g_pRealImageExtFunctions     = nullptr;
 AmdExtTable*       g_pRealAmdExtFunctions       = nullptr;
-#else
-ApiTable* g_pRealCoreFunctions         = nullptr;
-ExtTable* g_pRealFinalizerExtFunctions = nullptr;
-ExtTable* g_pRealImageExtFunctions     = nullptr;
-#endif
 
 hsa_status_t HSA_API_Trace_hsa_status_string(hsa_status_t status, const char** status_string)
 {
@@ -2528,7 +2522,6 @@ hsa_status_t HSA_API_Trace_hsa_ext_sampler_destroy(hsa_agent_t agent, hsa_ext_sa
     return retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 hsa_status_t HSA_API_Trace_hsa_amd_coherency_get_type(hsa_agent_t agent, hsa_amd_coherency_type_t* type)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
@@ -2595,7 +2588,6 @@ hsa_status_t HSA_API_Trace_hsa_amd_profiling_set_profiler_enabled(hsa_queue_t* q
     return retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 hsa_status_t HSA_API_Trace_hsa_amd_profiling_async_copy_enable(bool enable)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
@@ -2616,7 +2608,6 @@ hsa_status_t HSA_API_Trace_hsa_amd_profiling_async_copy_enable(bool enable)
 
     return retVal;
 }
-#endif
 
 hsa_status_t HSA_API_Trace_hsa_amd_profiling_get_dispatch_time(hsa_agent_t agent, hsa_signal_t signal, hsa_amd_profiling_dispatch_time_t* time)
 {
@@ -2641,7 +2632,6 @@ hsa_status_t HSA_API_Trace_hsa_amd_profiling_get_dispatch_time(hsa_agent_t agent
     return retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 hsa_status_t HSA_API_Trace_hsa_amd_profiling_get_async_copy_time(hsa_signal_t signal, hsa_amd_profiling_async_copy_time_t* time)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
@@ -2663,7 +2653,6 @@ hsa_status_t HSA_API_Trace_hsa_amd_profiling_get_async_copy_time(hsa_signal_t si
 
     return retVal;
 }
-#endif
 
 hsa_status_t HSA_API_Trace_hsa_amd_profiling_convert_tick_to_system_domain(hsa_agent_t agent, uint64_t agent_tick, uint64_t* system_tick)
 {
@@ -3816,16 +3805,13 @@ void InitHSAAPIInterceptTrace(HsaApiTable* pTable)
     }
 
 }
-#endif
 
 void DoneHSAAPIInterceptTrace()
 {
     free(g_pRealCoreFunctions);
     free(g_pRealFinalizerExtFunctions);
-#ifdef FUTURE_ROCR_VERSION
     free(g_pRealImageExtFunctions);
     free(g_pRealAmdExtFunctions);
-#endif
 }
 
 

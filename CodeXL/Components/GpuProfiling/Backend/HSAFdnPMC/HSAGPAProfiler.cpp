@@ -401,15 +401,9 @@ bool HSAGPAProfiler::PopulateKernelStatsFromDispatchPacket(hsa_kernel_dispatch_p
         else
         {
             const void* pKernelHostAddress = nullptr;
-#ifdef FUTURE_ROCR_VERSION
             if (nullptr != pHsaModule->ven_amd_loader_query_host_address)
             {
                 hsa_status_t status = pHsaModule->ven_amd_loader_query_host_address(reinterpret_cast<const void*>(pAqlPacket->kernel_object), &pKernelHostAddress);
-#else
-            if (nullptr != pHsaModule->ven_amd_loaded_code_object_query_host_address)
-            {
-                hsa_status_t status = pHsaModule->ven_amd_loaded_code_object_query_host_address(reinterpret_cast<const void*>(pAqlPacket->kernel_object), &pKernelHostAddress);
-#endif
                 if (HSA_STATUS_SUCCESS == status)
                 {
                     pKernelCode = reinterpret_cast<const amd_kernel_code_t*>(pKernelHostAddress);

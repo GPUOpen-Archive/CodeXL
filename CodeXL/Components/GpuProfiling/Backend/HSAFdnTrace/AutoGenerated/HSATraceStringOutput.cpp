@@ -251,11 +251,7 @@ std::string HSATraceStringUtils::Get_hsa_extension_t_String(hsa_extension_t inpu
             CASE(HSA_EXTENSION_FINALIZER);
             CASE(HSA_EXTENSION_IMAGES);
             CASE(HSA_EXTENSION_AMD_PROFILER);
-#ifdef FUTURE_ROCR_VERSION
             CASE(HSA_EXTENSION_AMD_LOADER);
-#else
-            CASE(HSA_EXTENSION_AMD_LOADED_CODE_OBJECT);
-#endif
 
         default:
             ss << input;
@@ -2246,7 +2242,6 @@ std::string HSATraceStringUtils::Get_hsa_amd_profiling_dispatch_time_t_Ptr_Strin
     }
 }
 
-#ifdef FUTURE_ROCR_VERSION
 std::string HSATraceStringUtils::Get_hsa_amd_profiling_async_copy_time_t_String(hsa_amd_profiling_async_copy_time_t input)
 {
     std::ostringstream ss;
@@ -2268,7 +2263,6 @@ std::string HSATraceStringUtils::Get_hsa_amd_profiling_async_copy_time_t_Ptr_Str
         return SurroundWithDeRef(Get_hsa_amd_profiling_async_copy_time_t_String(input));
     }
 }
-#endif
 
 std::string HSATraceStringUtils::Get_hsa_amd_segment_t_String(hsa_amd_segment_t input)
 {
