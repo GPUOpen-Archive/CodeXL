@@ -55,7 +55,7 @@ public:
 
     /// Filter functions by a the process file path
     /// \param moduleFilePaths - the list of modules file paths
-    void FilterByModuleFilePaths(const QStringList& moduleFilePaths);
+    void FilterByModuleFilePaths(AMDTModuleId moduleId);
 
     /// Updates the current tables display according to the needed update type:
     /// \param updateType the type of update needs to be performed (see SettingsDifference for details):
@@ -127,6 +127,7 @@ private:
     void updateDataFromPidComboBox();
     ProcessIdType getCurrentPid();
     bool m_updateData;
+    AMDTModuleId m_moduleId = AMDT_PROFILE_ALL_MODULES;
 
     std::map<gtString, AMDTUInt64> m_moduleNameIdMap;
 

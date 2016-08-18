@@ -471,8 +471,6 @@ bool FunctionsDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId,
                 GT_ASSERT(rc);
                 allModuleData.insert(allModuleData.end(), moduleData.begin(), moduleData.end());
             }
-
-            retVal = true;
         }
 
         AddRowToTable(allModuleData);
@@ -480,6 +478,8 @@ bool FunctionsDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId,
         setColumnWidth(AMDT_FUNC_SUMMMARY_FUNC_NAME_COL, MAX_FUNCTION_NAME_LEN);
         hideColumn(AMDT_FUNC_SUMMMARY_FUNC_ID_COL);
         setColumnWidth(AMDT_FUNC_SUMMMARY_FUNC_NAME_COL + 1, MAX_MODULE_NAME_LEN);
+
+        retVal = true;
 
     }
 

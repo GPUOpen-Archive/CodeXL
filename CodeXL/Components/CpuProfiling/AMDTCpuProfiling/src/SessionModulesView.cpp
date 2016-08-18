@@ -591,8 +591,8 @@ void SessionModulesView::activateTableItem(QTableWidgetItem* pActivateItem, CPUP
     bool isProcessesTable = false;
     bool isModulesTable = false;
     ProcessIdType pid = 0;
-    bool isModuleUnKnown = true;
     QStringList modulesFilePaths;
+    AMDTModuleId mId = pActivateItem->text().toInt();
 
     // check if Process table
     ProcessesDataTable* pProcessesTable = qobject_cast<ProcessesDataTable*>(pDataTable);
@@ -613,28 +613,6 @@ void SessionModulesView::activateTableItem(QTableWidgetItem* pActivateItem, CPUP
         if (pModulesTable != nullptr)
         {
             isModulesTable = true;
-            // get selected module
-            //QTableWidgetItem* pSelectedItem = pModulesTable->selectedItems().first();
-
-            QString moduleFilePath;
-
-            // findModuleFilePath - gets the name of the module file for each items from the row =>
-            // no need for doing the same for all the items because all will get the same file name
-            //bool rc = pModulesTable->findModuleFilePath(pSelectedItem->row(), moduleFilePath);
-            bool rc = true;
-            // if rc is false - the case is like unknown module
-            GT_IF_WITH_ASSERT(rc)
-            {
-                isModuleUnKnown = moduleFilePath.toLower().startsWith("unknown module");
-            }
-
-            if (isModuleUnKnown)
-            {
-                acMessageBox::instance().information(AF_STR_InformationA, CP_strUnknownModule);
-                return;
-            }
-
-            modulesFilePaths << moduleFilePath;
 
         }
     }
@@ -685,10 +663,10 @@ void SessionModulesView::activateTableItem(QTableWidgetItem* pActivateItem, CPUP
                                     {
                                         pFunctionsView->filterByPID(pid);
                                     }
-                                    else if (isModulesTable && !isModuleUnKnown)
+                                    else if (isModulesTable)
                                     {
                                         // Filter the functions view with the list:
-                                        pFunctionsView->FilterByModuleFilePaths(modulesFilePaths);
+                                        pFunctionsView->FilterByModuleFilePaths(mId);
                                     }
                                 }
                             }

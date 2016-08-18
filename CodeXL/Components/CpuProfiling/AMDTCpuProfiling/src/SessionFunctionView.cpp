@@ -200,7 +200,7 @@ bool SessionFunctionView::displaySessionDataTables()
             retVal = m_pFunctionTable->displayTableData(m_pProfDataRdr,
                                                         m_pDisplayFilter,
                                                         pid,
-                                                        AMDT_PROFILE_ALL_MODULES);
+                                                        m_moduleId);
         }
         else
         {
@@ -223,7 +223,7 @@ bool SessionFunctionView::displaySessionDataTables()
             retVal = m_pFunctionTable->displayTableData(m_pProfDataRdr,
                                                         m_pDisplayFilter,
                                                         AMDT_PROFILE_ALL_PROCESSES,
-                                                        AMDT_PROFILE_ALL_MODULES,
+                                                        m_moduleId,
                                                         selecedModIdVec);
         }
 
@@ -404,7 +404,7 @@ void SessionFunctionView::filterByPID(int pid)
     }
 }
 
-void SessionFunctionView::FilterByModuleFilePaths(const QStringList& moduleFilePaths)
+void SessionFunctionView::FilterByModuleFilePaths(AMDTModuleId moduleId)
 {
     const QComboBox* pPIDComboBox = TopToolbarComboBox(m_pPIDComboBoxAction);
     GT_IF_WITH_ASSERT((m_pFunctionTable != nullptr) && (m_pPIDComboBoxAction != nullptr) && (pPIDComboBox != nullptr))
@@ -421,9 +421,7 @@ void SessionFunctionView::FilterByModuleFilePaths(const QStringList& moduleFileP
 
         m_pPIDComboBoxAction->UpdateCurrentIndex(index);
 
-        // Filter functions by the requested pid:
-        m_functionsTablesFilter.m_filterByModulePathsList.clear();
-        m_functionsTablesFilter.m_filterByModulePathsList = moduleFilePaths;
+        m_moduleId = moduleId;
 
         // Update the link string:
         updateModulesFilterLinkString();
