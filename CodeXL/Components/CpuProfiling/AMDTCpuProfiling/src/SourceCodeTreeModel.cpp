@@ -99,7 +99,6 @@ SourceCodeTreeModel::SourceCodeTreeModel(const QString& sessionDir,
     // Create the tree root item:
     m_pRootItem = new SourceViewTreeItem(SOURCE_VIEW_DEFAULT_DEPTH, nullptr);
 
-
     // Update the headers:
     UpdateHeaders();
 

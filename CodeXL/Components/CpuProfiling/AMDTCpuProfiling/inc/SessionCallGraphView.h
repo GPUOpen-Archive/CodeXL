@@ -31,9 +31,7 @@
 //#include <QDockWidget>
 #include <QFileInfo>
 
-#include <AMDTCpuPerfEventUtils/inc/ViewConfig.h>
-#include <AMDTCpuProfilingRawData/inc/CpuProfileReader.h>
-#include <AMDTCpuCallstackSampling/inc/FunctionGraph.h>
+
 #include "inc/DataTab.h"
 #include <inc/StringConstants.h>
 
@@ -189,7 +187,6 @@ private:
 class CallGraphFuncListItem : public QTreeWidgetItem
 {
 public:
-    //explicit CallGraphFuncListItem(const FunctionGraph::Node* pFuncNode = nullptr);
     CallGraphFuncListItem();
     explicit CallGraphFuncListItem(AMDTFunctionId funcId) { m_functionId = funcId;}
     CallGraphFuncListItem(acTreeCtrl* pParent, QTreeWidgetItem* pAfter);
@@ -200,7 +197,6 @@ public:
     qulonglong AddCountValue(int column, qulonglong value);
     void SetPercentageValue(int column, double numerator, double denominator);
 
-    const FunctionGraph::Node* m_pFuncNode;
     AMDTUInt32  m_functionId;
     gtUInt64    m_moduleId;
     gtString    m_functionName;
@@ -224,9 +220,6 @@ public:
 
     void setWindowTitle(const QString& title);
     CallGraphFuncListItem* getSelectedFunction();
-    bool isFuncHidden(const FunctionGraph::Node& funcNode);
-    CallGraphFuncListItem* HideSystemModules(CpuProfileCss& css);
-    CallGraphFuncListItem* UnhideAllItems();
 
     void SetFunctionNameHeader(int totalFuncCount, int shownFuncCount);
 
@@ -389,9 +382,6 @@ public:
     /// \param updateType the type of update needs to be performed (see SettingsDifference for details):
     virtual void UpdateTableDisplay(unsigned int updateType);
 
-    EventMaskType getFilterEvent() const;
-
-    //void displayInFunctionView(const QString& functionName);
     void displayInFunctionView(AMDTFunctionId funcId);
 
 protected:
@@ -422,7 +412,6 @@ private:
     //selected pid and counterId
     AMDTUInt32              m_selectedPID;
     AMDTUInt32              m_selectedCounter;
-    AMDTFunctionId          m_selectedFuncId;
     bool                    m_isSystemDLLDisplayed  = false;
 
     std::vector<AMDTUInt32> m_hotSpotCounterIdMap;
