@@ -55,6 +55,7 @@
 #define HS_STR_debugLogDebugEventThreadWaitingForTermination1 L"hsDebuggingManager::Cleanup stopping thread"
 #define HS_STR_debugLogDebugEventThreadWaitingForTermination2 L"hsDebuggingManager::Cleanup forcing thread termination"
 #define HS_STR_debugLogCouldNotGetPrivateMemory L"Error getting HSAIL kernel scratch memory: %#x"
+#define HS_STR_debugLogNewerROCmVersionNotSupported L"Newer ROCm runtime version not supported"
 
 // Source files
 #define HS_STR_hsailSourceFileExtension L"hsail"

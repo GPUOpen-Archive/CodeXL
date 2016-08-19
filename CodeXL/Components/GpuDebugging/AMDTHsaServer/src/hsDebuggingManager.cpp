@@ -8,12 +8,12 @@
 
 
 // HSA and HSA debugging:
-#include <hsa.h>
-#include <hsa_api_trace.h>
-#include <hsa_ext_amd.h>
-#include <hsa_ext_finalize.h>
-#include <amd_hsa_kernel_code.h>
-#include <amd_hsa_tools_interfaces.h>
+#include "ROCm11Headers/hsa.h"
+#include "ROCm11Headers/hsa_api_trace.h"
+#include "ROCm11Headers/hsa_ext_amd.h"
+#include "ROCm11Headers/hsa_ext_finalize.h"
+#include "ROCm11Headers/amd_hsa_kernel_code.h"
+#include "ROCm11Headers/amd_hsa_tools_interfaces.h"
 #include <AMDGPUDebug.h>
 #include <DbgInfoDwarfParser.h>
 
@@ -369,21 +369,29 @@ extern "C" bool OnLoad(ApiTable* pApiTable, uint64_t runtimeVersion, uint64_t fa
     GT_UNREFERENCED_PARAMETER(runtimeVersion);
     GT_UNREFERENCED_PARAMETER(failedToolCount);
     GT_UNREFERENCED_PARAMETER(pFailedToolNames);
-    GT_IF_WITH_ASSERT(nullptr != pApiTable)
+
+    if (0 != runtimeVersion)
     {
-        ::memcpy(&gs_HSAAPITable, pApiTable, sizeof(ApiTable));
-        pApiTable->hsa_queue_create_fn = &hsWrapper_hsa_queue_create;
-        pApiTable->hsa_shut_down_fn = &hsWrapper_hsa_shut_down;
-
-        ExtTable* pExtTable = pApiTable->std_exts_;
-        GT_IF_WITH_ASSERT(nullptr != pExtTable)
+        OS_OUTPUT_DEBUG_LOG(HS_STR_debugLogNewerROCmVersionNotSupported, OS_DEBUG_LOG_DEBUG);
+    }
+    else
+    {
+        GT_IF_WITH_ASSERT(nullptr != pApiTable)
         {
-            ::memcpy(&gs_HSAEXTTable, pExtTable, sizeof(ExtTable));
-            pExtTable->hsa_ext_program_finalize_fn = &hsWrapper_hsa_ext_program_finalize;
-        }
+            ::memcpy(&gs_HSAAPITable, pApiTable, sizeof(ApiTable));
+            pApiTable->hsa_queue_create_fn = &hsWrapper_hsa_queue_create;
+            pApiTable->hsa_shut_down_fn = &hsWrapper_hsa_shut_down;
 
-        HwDbgStatus rcInitDBE = HwDbgInit(pApiTable);
-        GT_ASSERT(HWDBG_STATUS_SUCCESS == rcInitDBE);
+            ExtTable* pExtTable = pApiTable->std_exts_;
+            GT_IF_WITH_ASSERT(nullptr != pExtTable)
+            {
+                ::memcpy(&gs_HSAEXTTable, pExtTable, sizeof(ExtTable));
+                pExtTable->hsa_ext_program_finalize_fn = &hsWrapper_hsa_ext_program_finalize;
+            }
+
+            HwDbgStatus rcInitDBE = HwDbgInit(pApiTable);
+            GT_ASSERT(HWDBG_STATUS_SUCCESS == rcInitDBE);
+        }
     }
 
     return true;
