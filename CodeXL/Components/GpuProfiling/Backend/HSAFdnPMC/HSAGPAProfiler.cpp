@@ -465,7 +465,7 @@ bool HSAGPAProfiler::Begin(const hsa_agent_t             device,
         GDT_GfxCardInfo cardInfo;
 
         // TODO: need to get revision id from HSA runtime (SWDEV-79571)
-        if (AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceId, 0, cardInfo))
+        if (AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceId, REVISION_ID_ANY, cardInfo))
         {
             strAgentName = std::string(cardInfo.m_szCALName);
         }

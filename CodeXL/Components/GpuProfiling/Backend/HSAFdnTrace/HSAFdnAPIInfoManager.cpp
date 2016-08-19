@@ -96,7 +96,7 @@ bool HSAAPIInfoManager::WriteKernelTimestampEntry(std::ostream& sout, hsa_profil
         GDT_GfxCardInfo cardInfo;
 
         // TODO: need to get revision id from HSA runtime (SWDEV-79571)
-        if (AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceId, 0, cardInfo))
+        if (AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceId, REVISION_ID_ANY, cardInfo))
         {
             strDeviceName = std::string(cardInfo.m_szCALName);
         }
