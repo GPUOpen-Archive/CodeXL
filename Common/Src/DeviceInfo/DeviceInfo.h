@@ -12,7 +12,7 @@
     #include <cstddef>      // Required by GCC size_t
 #endif
 
-#define DEVICE_INFO_NA 0xFFFFFFFF
+#define REVISION_ID_ANY 0xFFFFFFFF ///< ignore revision id when looking up device Id
 
 enum GDT_HW_ASIC_TYPE
 {
