@@ -1,0 +1,9 @@
+[submodule "Common/Src/AMDTBaseTools"]
+	path = Common/Src/AMDTBaseTools
+	url = https://github.com/GPUOpen-Tools/common-src-AMDTBaseTools.git
+[submodule "Common/Src/AMDTOSWrappers"]
+	path = Common/Src/AMDTOSWrappers
+	url = https://github.com/GPUOpen-Tools/common-src-AMDTOSWrappers.git
+[submodule "Common/Src/AMDTOSAPIWrappers"]
+	path = Common/Src/AMDTOSAPIWrappers
+	url = https://github.com/GPUOpen-Tools/common-src-AMDTOSAPIWrappers.git
