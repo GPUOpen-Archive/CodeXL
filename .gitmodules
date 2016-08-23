@@ -34,3 +34,6 @@
 [submodule "Common/Src/ShaderUtils"]
 	path = Common/Src/ShaderUtils
 	url = ../common-src-ShaderUtils.git
+[submodule "Common/Src/AMDTActivityLogger"]
+	path = Common/Src/AMDTActivityLogger
+	url = ../common-src-AMDTActivityLogger.git
