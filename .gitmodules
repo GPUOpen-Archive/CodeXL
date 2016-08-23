@@ -31,3 +31,6 @@
 [submodule "Common/Src/ACLModuleManager"]
 	path = Common/Src/ACLModuleManager
 	url = ../common-src-ACLModuleManager.git
+[submodule "Common/Src/ShaderUtils"]
+	path = Common/Src/ShaderUtils
+	url = ../common-src-ShaderUtils.git
