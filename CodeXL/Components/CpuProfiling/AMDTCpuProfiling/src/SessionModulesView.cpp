@@ -592,7 +592,7 @@ void SessionModulesView::activateTableItem(QTableWidgetItem* pActivateItem, CPUP
     bool isModulesTable = false;
     ProcessIdType pid = 0;
     QStringList modulesFilePaths;
-    AMDTModuleId mId = pActivateItem->text().toInt();
+    AMDTModuleId mId = AMDT_PROFILE_ALL_MODULES;
 
     // check if Process table
     ProcessesDataTable* pProcessesTable = qobject_cast<ProcessesDataTable*>(pDataTable);
@@ -613,7 +613,8 @@ void SessionModulesView::activateTableItem(QTableWidgetItem* pActivateItem, CPUP
         if (pModulesTable != nullptr)
         {
             isModulesTable = true;
-
+            QTableWidgetItem* moduleIdItem = pModulesTable->item(pActivateItem->row(), 0);
+            mId = moduleIdItem->text().toInt();
         }
     }
 
