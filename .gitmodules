@@ -88,3 +88,6 @@
 [submodule "Common/Lib/Ext/Windows-Kits"]
 	path = Common/Lib/Ext/Windows-Kits
 	url = ../common-lib-ext-WindowsKits.git
+[submodule "Common/Lib/Ext/Boost"]
+	path = Common/Lib/Ext/Boost
+	url = ../common-lib-ext-Boost-1.59.git
