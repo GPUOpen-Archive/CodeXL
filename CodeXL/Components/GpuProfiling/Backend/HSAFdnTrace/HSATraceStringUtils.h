@@ -282,12 +282,28 @@ std::string Get_hsa_amd_agent_memory_pool_get_info_AttributeString(void* value, 
 
 #ifdef FUTURE_ROCR_VERSION
 
+/// Gets the size of the underlying data for the specified cache attribute
+/// \param attribute the attribute whose size is needed
+/// \return the size of the underlying data for the specified cache attribute (0 for unsupported/unkown attributes)
 unsigned int Get_hsa_cache_get_info_AttributeSize(hsa_cache_info_t attribute);
 
+/// Gets the string representation of the specified cache data
+/// \param value the value whose string representation is needed
+/// \param attribute the attribute type
+/// \param the return value of the hsa_cache_get_info call
+/// \return the string representation of the specified cache data
 std::string Get_hsa_cache_get_info_AttributeString(void* value, hsa_cache_info_t attribute, hsa_status_t retVal);
 
+/// Gets the size of the underlying data for the specified wavefront attribute
+/// \param attribute the attribute whose size is needed
+/// \return the size of the underlying data for the specified wavefront attribute (0 for unsupported/unkown attributes)
 unsigned int Get_hsa_wavefront_get_info_AttributeSize(hsa_wavefront_info_t attribute);
 
+/// Gets the string representation of the specified wavefront data
+/// \param value the value whose string representation is needed
+/// \param attribute the attribute type
+/// \param the return value of the hsa_wavefront_get_info call
+/// \return the string representation of the specified wavefront data
 std::string Get_hsa_wavefront_get_info_AttributeString(void* value, hsa_wavefront_info_t attribute, hsa_status_t retVal);
 #endif
 
