@@ -1157,3 +1157,114 @@ std::string HSATraceStringUtils::Get_hsa_amd_agent_memory_pool_get_info_Attribut
         return SurroundWithDeRef(ss.str());
     }
 }
+
+#ifdef FUTURE_ROCR_VERSION
+
+unsigned int HSATraceStringUtils::Get_hsa_cache_get_info_AttributeSize(hsa_cache_info_t attribute)
+{
+    switch (attribute)
+    {
+        // uint32_t
+        case HSA_CACHE_INFO_NAME_LENGTH:
+        case HSA_CACHE_INFO_SIZE:
+            return sizeof(uint32_t);
+
+        // char*
+        case HSA_CACHE_INFO_NAME: //TODO: Fix this to make caller read the length from HSA_ISA_INFO_NAME_LENGTH
+            return sizeof(char*);
+
+        // uint8_t
+        case HSA_CACHE_INFO_LEVEL:
+            return sizeof(hsa_amd_memory_pool_link_info_t);
+
+    default:
+        return 0;
+    }
+}
+
+std::string HSATraceStringUtils::Get_hsa_cache_get_info_AttributeString(void* value, hsa_cache_info_t attribute, hsa_status_t retVal)
+{
+    if (NULL == value)
+    {
+        return "NULL";
+    }
+    else
+    {
+        std::ostringstream ss;
+
+        if (HSA_STATUS_SUCCESS == retVal)
+        {
+            switch (attribute)
+            {
+
+                // uint32_t
+                case HSA_CACHE_INFO_NAME_LENGTH:
+                case HSA_CACHE_INFO_SIZE:
+                    ss << (*(static_cast<uint32_t*>(value)));
+                    break;
+
+                // char*
+                case HSA_CACHE_INFO_NAME:
+                    ss << GetStringString(static_cast<char*>(value), false, false);
+                    break;
+
+                // uint8_t
+                case HSA_CACHE_INFO_LEVEL:
+                    ss << Get_uint8_t_String(*(static_cast<uint8_t*>(value)));
+                    break;
+
+                default:
+                    ss << StringUtils::ToString(*(static_cast<int*>(value)));
+                    break;
+            }
+        }
+
+        return SurroundWithDeRef(ss.str());
+    }
+}
+
+unsigned int HSATraceStringUtils::Get_hsa_wavefront_get_info_AttributeSize(hsa_wavefront_info_t attribute)
+{
+    switch (attribute)
+    {
+        // uint32_t
+        case HSA_WAVEFRONT_INFO_SIZE:
+            return sizeof(uint32_t);
+
+    default:
+        return 0;
+    }
+}
+
+std::string HSATraceStringUtils::Get_hsa_wavefront_get_info_AttributeString(void* value, hsa_wavefront_info_t attribute, hsa_status_t retVal)
+{
+    if (NULL == value)
+    {
+        return "NULL";
+    }
+    else
+    {
+        std::ostringstream ss;
+
+        if (HSA_STATUS_SUCCESS == retVal)
+        {
+            switch (attribute)
+            {
+
+                // uint32_t
+                case HSA_WAVEFRONT_INFO_SIZE:
+                    ss << (*(static_cast<uint32_t*>(value)));
+                    break;
+
+                default:
+                    ss << StringUtils::ToString(*(static_cast<int*>(value)));
+                    break;
+            }
+        }
+
+        return SurroundWithDeRef(ss.str());
+    }
+}
+#endif
+
+

@@ -279,6 +279,18 @@ unsigned int Get_hsa_amd_agent_memory_pool_get_info_AttributeSize(hsa_amd_agent_
 /// \param the return value of the hsa_amd_agent_memory_pool_get_info call
 /// \return the string representation of the specified agent memory pool data
 std::string Get_hsa_amd_agent_memory_pool_get_info_AttributeString(void* value, hsa_amd_agent_memory_pool_info_t attribute, hsa_status_t retVal);
+
+#ifdef FUTURE_ROCR_VERSION
+
+unsigned int Get_hsa_cache_get_info_AttributeSize(hsa_cache_info_t attribute);
+
+std::string Get_hsa_cache_get_info_AttributeString(void* value, hsa_cache_info_t attribute, hsa_status_t retVal);
+
+unsigned int Get_hsa_wavefront_get_info_AttributeSize(hsa_wavefront_info_t attribute);
+
+std::string Get_hsa_wavefront_get_info_AttributeString(void* value, hsa_wavefront_info_t attribute, hsa_status_t retVal);
+#endif
+
 }
 
 #endif //_HSA_TRACE_STRING_UTILS_H_
