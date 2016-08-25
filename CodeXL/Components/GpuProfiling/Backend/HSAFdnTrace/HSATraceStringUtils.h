@@ -150,7 +150,7 @@ std::string Get_uint8_t_String(uint8_t input);
 
 /// Gets the size of the underlying data for the specified agent attribute
 /// \param attribute the attribute whose size is needed
-/// \return the size of the underlying data for the specified agent attribute (0 for unsupported/unkown attributes)
+/// \return the size of the underlying data for the specified agent attribute (0 for unsupported/unknown attributes)
 unsigned int Get_hsa_agent_get_info_AttributeSize(hsa_agent_info_t attribute);
 
 /// Gets the string representation of the specified agent attribute data
@@ -162,7 +162,7 @@ std::string Get_hsa_agent_get_info_AttributeString(void* value, hsa_agent_info_t
 
 /// Gets the size of the underlying data for the specified system attribute
 /// \param attribute the attribute whose size is needed
-/// \return the size of the underlying data for the specified agent attribute (0 for unsupported/unkown attributes)
+/// \return the size of the underlying data for the specified agent attribute (0 for unsupported/unknown attributes)
 unsigned int Get_hsa_system_get_info_AttributeSize(hsa_system_info_t attribute);
 
 /// Gets the string representation of the specified system attribute data
@@ -174,7 +174,7 @@ std::string Get_hsa_system_get_info_AttributeString(void* value, hsa_system_info
 
 /// Gets the size of the underlying data for the specified region attribute
 /// \param attribute the attribute whose size is needed
-/// \return the size of the underlying data for the specified region attribute (0 for unsupported/unkown attributes)
+/// \return the size of the underlying data for the specified region attribute (0 for unsupported/unknown attributes)
 unsigned int Get_hsa_region_get_info_AttributeSize(hsa_region_info_t attribute);
 
 /// Gets the string representation of the specified region data
@@ -186,7 +186,7 @@ std::string Get_hsa_region_get_info_AttributeString(void* value, hsa_region_info
 
 /// Gets the size of the underlying data for the specified isa attribute
 /// \param attribute the attribute whose size is needed
-/// \return the size of the underlying data for the specified isa attribute (0 for unsupported/unkown attributes)
+/// \return the size of the underlying data for the specified isa attribute (0 for unsupported/unknown attributes)
 unsigned int Get_hsa_isa_get_info_AttributeSize(hsa_isa_info_t attribute);
 
 /// Gets the string representation of the specified isa data
@@ -198,7 +198,7 @@ std::string Get_hsa_isa_get_info_AttributeString(void* value, hsa_isa_info_t att
 
 /// Gets the size of the underlying data for the specified code object attribute
 /// \param attribute the attribute whose size is needed
-/// \return the size of the underlying data for the specified code object attribute (0 for unsupported/unkown attributes)
+/// \return the size of the underlying data for the specified code object attribute (0 for unsupported/unknown attributes)
 unsigned int Get_hsa_code_object_get_info_AttributeSize(hsa_code_object_info_t attribute);
 
 /// Gets the string representation of the specified code object data
@@ -210,7 +210,7 @@ std::string Get_hsa_code_object_get_info_AttributeString(void* value, hsa_code_o
 
 /// Gets the size of the underlying data for the specified code symbol attribute
 /// \param attribute the attribute whose size is needed
-/// \return the size of the underlying data for the specified code symbol attribute (0 for unsupported/unkown attributes)
+/// \return the size of the underlying data for the specified code symbol attribute (0 for unsupported/unknown attributes)
 unsigned int Get_hsa_code_symbol_get_info_AttributeSize(hsa_code_symbol_info_t attribute);
 
 /// Gets the string representation of the specified code symbol data
@@ -222,7 +222,7 @@ std::string Get_hsa_code_symbol_get_info_AttributeString(void* value, hsa_code_s
 
 /// Gets the size of the underlying data for the specified executable attribute
 /// \param attribute the attribute whose size is needed
-/// \return the size of the underlying data for the specified executable attribute (0 for unsupported/unkown attributes)
+/// \return the size of the underlying data for the specified executable attribute (0 for unsupported/unknown attributes)
 unsigned int Get_hsa_executable_get_info_AttributeSize(hsa_executable_info_t attribute);
 
 /// Gets the string representation of the specified executable data
@@ -234,7 +234,7 @@ std::string Get_hsa_executable_get_info_AttributeString(void* value, hsa_executa
 
 /// Gets the size of the underlying data for the specified executable symbol attribute
 /// \param attribute the attribute whose size is needed
-/// \return the size of the underlying data for the specified executable symbol attribute (0 for unsupported/unkown attributes)
+/// \return the size of the underlying data for the specified executable symbol attribute (0 for unsupported/unknown attributes)
 unsigned int Get_hsa_executable_symbol_get_info_AttributeSize(hsa_executable_symbol_info_t attribute);
 
 /// Gets the string representation of the specified executable symbol data
@@ -246,7 +246,7 @@ std::string Get_hsa_executable_symbol_get_info_AttributeString(void* value, hsa_
 
 /// Gets the size of the underlying data for the specified program attribute
 /// \param attribute the attribute whose size is needed
-/// \return the size of the underlying data for the specified program attribute (0 for unsupported/unkown attributes)
+/// \return the size of the underlying data for the specified program attribute (0 for unsupported/unknown attributes)
 unsigned int Get_hsa_ext_program_get_info_AttributeSize(hsa_ext_program_info_t attribute);
 
 /// Gets the string representation of the specified program data
@@ -258,7 +258,7 @@ std::string Get_hsa_ext_program_get_info_AttributeString(void* value, hsa_ext_pr
 
 /// Gets the size of the underlying data for the specified memory pool attribute
 /// \param attribute the attribute whose size is needed
-/// \return the size of the underlying data for the specified memory pool attribute (0 for unsupported/unkown attributes)
+/// \return the size of the underlying data for the specified memory pool attribute (0 for unsupported/unknown attributes)
 unsigned int Get_hsa_amd_memory_pool_get_info_AttributeSize(hsa_amd_memory_pool_info_t attribute);
 
 /// Gets the string representation of the specified memory pool data
@@ -270,7 +270,7 @@ std::string Get_hsa_amd_memory_pool_get_info_AttributeString(void* value, hsa_am
 
 /// Gets the size of the underlying data for the specified agent memory pool attribute
 /// \param attribute the attribute whose size is needed
-/// \return the size of the underlying data for the specified agent memory pool attribute (0 for unsupported/unkown attributes)
+/// \return the size of the underlying data for the specified agent memory pool attribute (0 for unsupported/unknown attributes)
 unsigned int Get_hsa_amd_agent_memory_pool_get_info_AttributeSize(hsa_amd_agent_memory_pool_info_t attribute);
 
 /// Gets the string representation of the specified agent memory pool data
@@ -284,7 +284,7 @@ std::string Get_hsa_amd_agent_memory_pool_get_info_AttributeString(void* value, 
 
 /// Gets the size of the underlying data for the specified cache attribute
 /// \param attribute the attribute whose size is needed
-/// \return the size of the underlying data for the specified cache attribute (0 for unsupported/unkown attributes)
+/// \return the size of the underlying data for the specified cache attribute (0 for unsupported/unknown attributes)
 unsigned int Get_hsa_cache_get_info_AttributeSize(hsa_cache_info_t attribute);
 
 /// Gets the string representation of the specified cache data
@@ -296,7 +296,7 @@ std::string Get_hsa_cache_get_info_AttributeString(void* value, hsa_cache_info_t
 
 /// Gets the size of the underlying data for the specified wavefront attribute
 /// \param attribute the attribute whose size is needed
-/// \return the size of the underlying data for the specified wavefront attribute (0 for unsupported/unkown attributes)
+/// \return the size of the underlying data for the specified wavefront attribute (0 for unsupported/unknown attributes)
 unsigned int Get_hsa_wavefront_get_info_AttributeSize(hsa_wavefront_info_t attribute);
 
 /// Gets the string representation of the specified wavefront data
