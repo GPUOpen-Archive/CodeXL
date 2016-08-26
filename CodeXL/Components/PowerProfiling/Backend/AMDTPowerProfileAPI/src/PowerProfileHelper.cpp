@@ -157,7 +157,7 @@ AMDTUInt32 GetSupportedTargetPlatformId()
 }
 
 // getCpuid: Rea CPU instruction id
-static AMDTResult getCpuid(AMDTUInt32 fn, AMDTInt32 cpuInfo[4])
+AMDTResult getCpuid(AMDTUInt32 fn, AMDTInt32 cpuInfo[4])
 {
 #if ( defined (_WIN32) || defined (_WIN64) )
 
@@ -198,12 +198,20 @@ static AMDTResult getCpuid(AMDTUInt32 fn, AMDTInt32 cpuInfo[4])
     return AMDT_STATUS_OK;
 }
 
+// PwrGetLogicalProcessCount: Get number of logical cores
+AMDTUInt32 PwrGetLogicalProcessCount()
+{
+    AMDTUInt32 numOfThreads = 0;
+    AMDTInt32 cpuInfo[4] = { -1 };
+
+    getCpuid(CPUID_FnFeatureId, cpuInfo);
+    numOfThreads = (cpuInfo[EBX_OFFSET] & CPUID_FeatureId_EBX_LogicalProcessorCount) >> 16;
+    PwrTrace("Logical processors %d", numOfThreads);
+    return numOfThreads;
+}
 // IsCefSupported: Check if Core Effectiver Frequency is supported by the CPU
 bool IsCefSupported()
 {
-#define CPUID_FnThermalAndPowerManagement 6
-#define CPUID_FnThermalAndPowerManagement_ECX_EffFreq  (1 << 0)
-#define ECX_OFFSET 2
     bool result = false;
     AMDTInt32 cpuInfo[4] = { -1 };
 
@@ -303,7 +311,6 @@ bool GetFirstSetBitIndex(AMDTUInt32* core_id, AMDTUInt64 mask)
 uint32 GetActiveCoreCount()
 {
     uint32 coreCnt = 0;
-#define CPUID_FnSizeIdentifiers 0x80000008
     int aCPUInfo[4] = { -1 };
     getCpuid(CPUID_FnSizeIdentifiers, aCPUInfo);
 

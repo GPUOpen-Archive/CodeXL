@@ -18,7 +18,7 @@
 #endif
 
 #define MAX_OUTPUT_FILE_PATH    255
-#define MAX_DEVICE_CNT          15
+#define MAX_DEVICE_CNT          50
 
 typedef enum
 {

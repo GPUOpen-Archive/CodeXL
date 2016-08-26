@@ -470,7 +470,16 @@ AMDTResult PrepareSystemTopologyInfo()
             newCore->m_type = AMDT_PWR_DEVICE_CPU_CORE;
             //TODO: GUI shouldn't check for constant string
             sprintf(newCore->m_pName, "Core%d", coreId);
-            sprintf(newCore->m_pDescription, "Core%d", coreId);
+
+            if (g_sysInfo.m_isSmtEnabled)
+            {
+                sprintf(newCore->m_pDescription, "Logical core%d", coreId);
+            }
+            else
+            {
+                sprintf(newCore->m_pDescription, "Core%d", coreId);
+            }
+
             PwrInsertDeviceCounters(newCore, coreId, 0);
             newCore->m_isAccessible = true;
             coreId++;
@@ -1245,31 +1254,7 @@ AMDTResult AMDTPwrEnableCounter(AMDTUInt32 counterID)
         }
     }
 
-    // If dGPU counter, check if it is still accessible
-    if ((AMDT_STATUS_OK == ret) && (counterID >= DGPU_COUNTER_BASE_ID))
-    {
-        AMDTUInt32 pkgId = 0;
-        PciPortAddress* pAddress = nullptr;
-        bool isAccessible = false;
 
-        // Find the package id
-        // dGpu pkgId will always start from index 2 irrespective of AMD or Intel platform
-        pkgId = 2 + (counterID % DGPU_COUNTER_BASE_ID) / DGPU_COUNTERS_MAX;
-
-        // Check if this dGPU package is accessible
-        GetPciDeviceInfo(pkgId, nullptr, &pAddress);
-        isAccessible = IsDgpuMMIOAccessible(pAddress->m_bus, pAddress->m_dev, pAddress->m_func);
-
-        if (false == isAccessible)
-        {
-            ret = AMDT_ERROR_COUNTER_NOT_ACCESSIBLE;
-            PwrTrace("B%d:D%d:F%dCounter: %d AMDT_ERROR_COUNTER_NOT_ACCESSIBLE",
-                     pAddress->m_bus,
-                     pAddress->m_dev,
-                     pAddress->m_func,
-                     counterID);
-        }
-    }
 
     if (AMDT_STATUS_OK == ret)
     {
@@ -2198,9 +2183,13 @@ AMDTResult AMDTPwrReadCumulativeCounter(AMDTUInt32 counterId,
                     g_cummulativeResult.push_back(*value);
                     *ppData = &g_cummulativeResult[0];
                     *pNumEntries = 1;
+                    ret = AMDT_STATUS_OK;
+                }
+                else
+                {
+                    ret = AMDT_ERROR_NODATA;
                 }
 
-                ret = AMDT_STATUS_OK;
             }
             else
             {

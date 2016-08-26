@@ -84,6 +84,7 @@ enum HardwareType
     GDT_STONEY,               ///< STONEY
     GDT_ELLESMERE,
     GDT_BAFFIN,
+    GDT_RESERVED,
     GDT_LAST,                   ///< last
     GDT_INVALID = 0xFFFFFFFF
 };
@@ -93,6 +94,7 @@ enum DeviceType
 {
     DEVICE_TYPE_APU,
     DEVICE_TYPE_DGPU,
+    DEVICE_TYPE_CPU_WITH_SMU,
     DEVICE_TYPE_CPU_NO_SMU,
     DEVICE_TYPE_NPU_NO_SMU,
     DEVICE_TYPE_DGPU_NO_SMU,
@@ -109,7 +111,7 @@ typedef struct PciDeviceInfo
     char            m_name[PWR_MAX_NAME_LEN];
     char            m_shortName[PWR_MAX_NAME_LEN];
     AMDTUInt32      m_smuIpVersion;
-}PciDeviceInfo;
+} PciDeviceInfo;
 
 // PlatformInfo: AMD platform information
 struct PlatformInfo
@@ -128,11 +130,14 @@ struct AMDTPwrTargetSystemInfo
 {
     bool           m_isAmd;
     bool           m_isAmdApu;
+    bool           m_isPlatformWithSmu;
     bool           m_isPlatformSupported;
+    bool           m_isSmtEnabled;
     AMDTUInt32     m_family;
     AMDTUInt32     m_model;
     AMDTUInt32     m_platformId;
     AMDTUInt32     m_coreCnt;
+    AMDTUInt32     m_threadCount;
     AMDTUInt32     m_computeUnitCnt;
     AMDTUInt32     m_coresPerCu;
     AMDTUInt32     m_svi2Cnt;

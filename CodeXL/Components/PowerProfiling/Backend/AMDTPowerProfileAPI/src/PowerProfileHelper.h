@@ -14,6 +14,33 @@
 
 #define _PWR_BACKEND_TRACE_
 #define TEMP_PATH_MAX_LEN       260
+
+#define CPUID_FnIdentifiers 0x8000001E
+#define CPUID_FnThermalAndPowerManagement 6
+#define CPUID_FnSizeIdentifiers 0x80000008
+#define CPUID_FnFeatureId 1
+
+
+#define CPUID_FeatureId_EBX_LogicalProcessorCount 0xFF << 16
+#define CPUID_FnThermalAndPowerManagement_ECX_EffFreq  (1 << 0)
+
+
+// The enumeration used to retrieve data from the __cpuid intrinsic
+enum
+{
+    /// The offset of EAX data
+    EAX_OFFSET,
+    /// The offset of EBX data
+    EBX_OFFSET,
+    /// The offset of ECX data
+    ECX_OFFSET,
+    /// The offset of EDX data
+    EDX_OFFSET,
+    /// The number of values in the CPUID array
+    NUM_CPUID_OFFSETS
+};
+
+
 //SMU Limit registers
 #define SMU_INDEX_ADDR        0x800000B8
 #define SMU_INDEX_DATA        0x800000BC
@@ -65,6 +92,8 @@ typedef struct MemoryPool
 } MemoryPool;
 
 extern AMDTPwrProfileAttributeList g_attributeList;
+
+AMDTResult getCpuid(AMDTUInt32 fn, AMDTInt32 cpuInfo[4]);
 
 // GetSupportedTargetPlatformId: Provide the target system platform id
 // if it is supported by power profiler. Otherwise return PLATFORM_INVALID
@@ -141,6 +170,11 @@ AMDTResult CreateMemoryPool(MemoryPool* pPool, AMDTUInt32 size);
 AMDTUInt8* GetMemoryPoolBuffer(MemoryPool* pPool, AMDTUInt32 size);
 // Delete the memory pool
 AMDTResult ReleaseMemoryPool(MemoryPool* pPool);
+
+// PwrGetLogicalProcessCount: Get number of logical cores
+AMDTUInt32 PwrGetLogicalProcessCount();
+
+
 
 #endif //_POWERPROFILEHELPER_H_
 
