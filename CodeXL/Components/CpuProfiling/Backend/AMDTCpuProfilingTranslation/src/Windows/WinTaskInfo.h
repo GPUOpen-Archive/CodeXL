@@ -337,6 +337,7 @@ private:
     osCriticalSection m_TIMutex;
     osCriticalSection m_TIMutexKE;
     osCriticalSection m_TIMutexModule;
+    osCriticalSection m_TIMutexModuleIdMap;
 
     gtInt32 m_nextModInstanceId = 1;
     gtInt32 m_nextModuleId = 1;

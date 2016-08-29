@@ -2568,8 +2568,14 @@ HRESULT WinTaskInfo::FindModuleId(const wchar_t* pModuleName, gtInt32& moduleId)
 
     if (m_moduleIdMap.end() == iter)
     {
-        auto ret = m_moduleIdMap.emplace(pModuleName, AtomicAdd(m_nextModuleId, 1));
-        iter = ret.first;
+        osCriticalSectionLocker lock(m_TIMutexModuleIdMap);
+        iter = m_moduleIdMap.find(pModuleName);
+
+        if (m_moduleIdMap.end() == iter)
+        {
+            auto ret = m_moduleIdMap.emplace(pModuleName, AtomicAdd(m_nextModuleId, 1));
+            iter = ret.first;
+        }
     }
 
     moduleId = iter->second;
@@ -2891,8 +2897,6 @@ HRESULT WinTaskInfo::GetModuleInfo(TiModuleInfo* pModInfo)
         // Module name is known
         modName = pModInfo->pModulename;
     }
-
-    osCriticalSectionLocker lock(m_TIMutexModule);
 
     gtInt32 moduleId;
     FindModuleId(modName.c_str(), moduleId);
