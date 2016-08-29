@@ -118,6 +118,6 @@
 [submodule "Common/Lib/Ext/utf8cpp"]
 	path = Common/Lib/Ext/utf8cpp
 	url = ../common-lib-ext-utf8cpp.git
-[submodule "common-lib-ext-GRLibDWARF"]
-	path = common-lib-ext-GRLibDWARF
+[submodule "Common/Lib/Ext/GRLibDWARF"]
+	path = Common/Lib/Ext/GRLibDWARF
 	url = ../common-lib-ext-GRLibDWARF.git
