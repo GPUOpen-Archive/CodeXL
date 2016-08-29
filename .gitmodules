@@ -127,3 +127,6 @@
 [submodule "Common/Lib/Ext/mhook"]
 	path = Common/Lib/Ext/mhook
 	url = ../common-lib-ext-mhook.git
+[submodule "Common/Lib/AMD/ags"]
+	path = Common/Lib/AMD/ags
+	url = ../common-lib-AMD-ags-4.0.0.git
