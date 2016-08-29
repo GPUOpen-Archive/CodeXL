@@ -124,3 +124,6 @@
 [submodule "Common/Lib/Ext/libpng"]
 	path = Common/Lib/Ext/libpng
 	url = ../common-lib-ext-libpng-1.6.19.git
+[submodule "Common/Lib/Ext/mhook"]
+	path = Common/Lib/Ext/mhook
+	url = ../common-lib-ext-mhook.git
