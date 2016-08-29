@@ -129,7 +129,7 @@ void FunctionsDataTable::onAboutToShowContextMenu()
         {
             if (pAction != nullptr)
             {
-                bool isActionEnabled = true;
+                bool isActionEnabled = false;
 
                 if (pAction->data().isValid())
                 {
@@ -145,80 +145,56 @@ void FunctionsDataTable::onAboutToShowContextMenu()
                         if (nullptr != pItem)
                         {
                             int rowIndex = pItem->row();
+                            gtString funcName = acQStringToGTString(getFunctionName(rowIndex));
                             QString funcIdStr = getFunctionId(rowIndex);
                             funcId = funcIdStr.toInt();
-                        }
 
-                        // if its empty or is the "empty row" string item
-                        if (nullptr == pItem || pItem->row() == -1)
-                        {
-                            isActionEnabled = false;
-                        }
-
-                        //if more then one row selected
-                        else if (columnCount() != 0 &&
-                                 (selectedItems().count() / columnCount()) > 1)
-                        {
-                            isActionEnabled = false;
-                        }
-
-                        else if (DISPLAY_FUNCTION_IN_CALLGRAPH_VIEW == actionType)
-                        {
-                            isActionEnabled = false;
-
-                            //get supported call graph process
-                            gtVector<AMDTProcessId> cssProcesses;
-                            bool rc = m_pProfDataRdr->GetCallGraphProcesses(cssProcesses);
-
-                            if ((INVALID_FUNCTION_ID != funcId) && (true == rc))
+                            // if its empty or is the "empty row" string item
+                            if ((pItem->row() == -1) ||
+                                (funcName.startsWith(L"Unknown Module")) ||
+                                ((columnCount() != 0 &&
+                                  (selectedItems().count() / columnCount()) > 1)))
                             {
-                                for (auto const& process : cssProcesses)
-                                {
-                                    AMDTProfileFunctionData  functionData;
-                                    bool retVal = m_pProfDataRdr->GetFunctionData(funcId,
-                                                                                  process,
-                                                                                  AMDT_PROFILE_ALL_THREADS,
-                                                                                  functionData);
+                                isActionEnabled = false;
+                            }
+                            else if (DISPLAY_FUNCTION_IN_CALLGRAPH_VIEW == actionType)
+                            {
+                                //get supported call graph process
+                                gtVector<AMDTProcessId> cssProcesses;
+                                bool rc = m_pProfDataRdr->GetCallGraphProcesses(cssProcesses);
 
-                                    if (retVal)
+                                if ((INVALID_FUNCTION_ID != funcId) && (true == rc))
+                                {
+                                    for (auto const& process : cssProcesses)
                                     {
-                                        if (!functionData.m_pidsList.empty())
+                                        AMDTProfileFunctionData  functionData;
+                                        bool retVal = m_pProfDataRdr->GetFunctionData(funcId,
+                                                                                      process,
+                                                                                      AMDT_PROFILE_ALL_THREADS,
+                                                                                      functionData);
+
+                                        if (retVal)
                                         {
-                                            if (process == functionData.m_pidsList.at(0))
+                                            if (!functionData.m_pidsList.empty())
                                             {
-                                                isActionEnabled = true;
-                                                break;
+                                                if (process == functionData.m_pidsList.at(0))
+                                                {
+                                                    isActionEnabled = true;
+                                                    break;
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
-                        }
-                        else if (DISPLAY_FUNCTION_IN_SOURCE_CODE_VIEW == actionType)
-                        {
-                            QTableWidgetItem* pItem = selectedItems().first();
-
-                            if (nullptr != pItem)
+                            else if (DISPLAY_FUNCTION_IN_SOURCE_CODE_VIEW == actionType)
                             {
-                                int rowIndex = pItem->row();
-                                gtString funcName = acQStringToGTString(getFunctionName(rowIndex));
-
-                                if (funcName.startsWith(L"Unknown Module"))
+                                if (INVALID_FUNCTION_ID != funcId)
                                 {
-                                    isActionEnabled = false;
+                                    isActionEnabled = true;
                                 }
                             }
-
-                            if (INVALID_FUNCTION_ID == funcId)
-                            {
-                                isActionEnabled = false;
-                            }
                         }
-                    }
-                    else
-                    {
-                        // if no items selected
-                        isActionEnabled = false;
                     }
 
                     // Enable / disable the action:
