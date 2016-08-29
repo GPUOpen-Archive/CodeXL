@@ -130,3 +130,6 @@
 [submodule "Common/Lib/AMD/ags"]
 	path = Common/Lib/AMD/ags
 	url = ../common-lib-amd-ags-4.0.0.git
+[submodule "Common/Lib/AMD/AMDTCpuPerfEventUtils"]
+	path = Common/Lib/AMD/AMDTCpuPerfEventUtils
+	url = ../common-lib-amd-AMDTCpuPerfEventUtils-1.0.git
