@@ -109,3 +109,6 @@
 [submodule "Common/Lib/Ext/Vulkan"]
 	path = Common/Lib/Ext/Vulkan
 	url = ../common-lib-ext-Vulkan-1.0.21.1.git
+[submodule "Common/Lib/AMD/ACL"]
+	path = Common/Lib/AMD/ACL
+	url = ../common-lib-AMD-ACL.git
