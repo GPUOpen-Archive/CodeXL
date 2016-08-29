@@ -80,7 +80,6 @@
     <ClCompile Include="src\CommandsHandler.cpp" />
     <ClCompile Include="src\CpuAffinityThread.cpp" />
     <ClCompile Include="src\CpuGlobalSettings.cpp" />
-    <ClCompile Include="src\CpuProfileCss.cpp" />
     <ClCompile Include="src\CPUProfileDataTable.cpp" />
     <ClCompile Include="src\CPUProfileDataTableItem.cpp" />
     <ClCompile Include="src\CpuProfileTreeHandler.cpp" />
@@ -179,7 +178,6 @@
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp</Outputs>
       <AdditionalInputs>$(QtDir)\bin\moc.exe</AdditionalInputs>
     </CustomBuild>
-    <ClInclude Include="inc\CpuProfileCss.h" />
     <ClInclude Include="inc\CPUProfileDataTableItem.h" />
     <ClInclude Include="inc\CpuProfileTreeHandler.h" />
     <ClInclude Include="inc\CPUProfileUtils.h" />

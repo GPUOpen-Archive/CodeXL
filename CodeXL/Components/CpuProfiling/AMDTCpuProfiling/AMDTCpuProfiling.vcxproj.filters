@@ -145,9 +145,6 @@
     <ClCompile Include="src\CpuGlobalSettings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\CpuProfileCss.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\CPUProfileDataTable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -471,9 +468,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\CpuAffinityThread.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\CpuProfileCss.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\CPUProfileUtils.h">

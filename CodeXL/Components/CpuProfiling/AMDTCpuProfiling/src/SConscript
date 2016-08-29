@@ -13,7 +13,6 @@ cpu_prof_files = Split(
         'CpuRetryDialog.cpp ' +
         'CpuAffinityThread.cpp ' +
         'CpuGlobalSettings.cpp ' +
-        'CpuProfileCss.cpp ' +
         'CPUProfileDataTable.cpp ' +
         'CPUProfileDataTableItem.cpp ' +
         'CpuProfileTreeHandler.cpp ' +
