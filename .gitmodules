@@ -97,3 +97,6 @@
 [submodule "Common/Lib/Ext/zlib"]
 	path = Common/Lib/Ext/zlib
 	url = ../common-lib-ext-zlib-1.2.8.git
+[submodule "Common/Lib/Ext/qcustomplot"]
+	path = Common/Lib/Ext/qcustomplot
+	url = ../common-lib-ext-qcustomplot-1.3.1.git
