@@ -133,3 +133,6 @@
 [submodule "Common/Lib/AMD/AMDTCpuPerfEventUtils"]
 	path = Common/Lib/AMD/AMDTCpuPerfEventUtils
 	url = ../common-lib-amd-AMDTCpuPerfEventUtils-1.0.git
+[submodule "Common/Src/Misc"]
+	path = Common/Src/Misc
+	url = ../common-src-Misc.git
