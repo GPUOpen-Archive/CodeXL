@@ -69,7 +69,7 @@
 	url = ../common-src-VersionInfo.git
 [submodule "Common/Src/Vulkan"]
 	path = Common/Src/Vulkan
-	url = ../common-src-Vulkan.git
+	url = ../common-src-Vulkan-1.0.21.1.git
 [submodule "Common/Src/SCons"]
 	path = Common/Src/SCons
 	url = ../common-src-SCons.git
