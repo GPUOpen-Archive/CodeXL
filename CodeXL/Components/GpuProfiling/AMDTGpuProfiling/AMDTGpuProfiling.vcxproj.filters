@@ -69,9 +69,6 @@
     <ClCompile Include="SessionWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\rcc_QtClientMain.cpp">
-      <Filter>GeneratedFiles</Filter>
-    </ClCompile>
     <ClCompile Include="SessionManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -141,7 +138,7 @@
     <ClCompile Include="CLTimelineItems.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-	<ClCompile Include="DXTimelineItems.cpp">
+    <ClCompile Include="DXTimelineItems.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SymbolInfo.cpp">
@@ -359,20 +356,20 @@
     </ClCompile>
     <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpSummaryTab.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile> 
+    </ClCompile>
     <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpTraceSummaryTab.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>  
-	<ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpCommandListSummaryTab.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile> 
-	<ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpSummaryTable.cpp">
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpCommandListSummaryTab.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-	<ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpTraceSummaryTable.cpp">
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpSummaryTable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-	<ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpCommandListSummaryTable.cpp">
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpTraceSummaryTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpCommandListSummaryTable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpPerformanceCountersDataView.cpp">
@@ -416,20 +413,20 @@
     </ClCompile>
     <ClCompile Include="gpSummaryTab.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>   
-	<ClCompile Include="gpTraceSummaryTab.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile> 
-	<ClCompile Include="gpCommandListSummaryTab.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile> 
-	<ClCompile Include="gpSummaryTable.cpp">
+    </ClCompile>
+    <ClCompile Include="gpTraceSummaryTab.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-	<ClCompile Include="gpTraceSummaryTable.cpp">
+    <ClCompile Include="gpCommandListSummaryTab.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-	<ClCompile Include="gpCommandListSummaryTable.cpp">
+    <ClCompile Include="gpSummaryTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpTraceSummaryTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpCommandListSummaryTable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="gpPerformanceCountersDataView.cpp">
@@ -531,6 +528,27 @@
     <ClCompile Include="gpDetailedDataRibbon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="gpObjectDataContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpObjectDataModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpObjectDataParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpObjectModels.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gpObjectView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpObjectView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tmp\moc_$(Platform)$(Configuration)\moc_gpObjectModels.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Util.h">
@@ -605,7 +623,7 @@
     <ClInclude Include="CLTimelineItems.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-	<ClInclude Include="DXTimelineItems.h">
+    <ClInclude Include="DXTimelineItems.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SymbolInfo.h">
@@ -689,11 +707,17 @@
     <CustomBuild Include="gpDetailedDataRibbon.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <ClInclude Include="gpObjectDataContainer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gpObjectDataModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gpObjectDataParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="QtClientMain.qrc">
-      <Filter>Resource Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="EditNameValue.ui">
       <Filter>UI Files</Filter>
     </CustomBuild>
@@ -771,11 +795,11 @@
     </CustomBuild>
     <CustomBuild Include="gpSummaryTab.h">
       <Filter>Header Files</Filter>
-    </CustomBuild> 
-	<CustomBuild Include="gpTraceSummaryTab.h">
+    </CustomBuild>
+    <CustomBuild Include="gpTraceSummaryTab.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-	<CustomBuild Include="gpCommandListSummaryTab.h">
+    <CustomBuild Include="gpCommandListSummaryTab.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="gpSummaryTable.h">
@@ -829,9 +853,15 @@
     <CustomBuild Include="gpSessionUpdaterThread.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="gpObjectView.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="gpObjectModels.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\..\..\..\CommonProjects\VersionInfo\VersionResource.rc">
+    <ResourceCompile Include="..\..\..\..\Common\Src\VersionInfo\VersionResource.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

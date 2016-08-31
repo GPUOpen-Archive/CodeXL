@@ -126,7 +126,6 @@
     <ClCompile Include="EditNameValueDialog.cpp" />
     <ClCompile Include="FindToolBarView.cpp" />
     <ClCompile Include="GeneralSettingWindow.cpp" />
-    <ClCompile Include="GeneratedFiles\rcc_QtClientMain.cpp" />
     <ClCompile Include="GlobalSettings.cpp" />
     <ClCompile Include="gpBaseSessionView.cpp" />
     <ClCompile Include="gpExecutionMode.cpp" />
@@ -593,14 +592,14 @@
       <Message>Moc%27ing %(Filename)%(Extension)...</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp;%(Outputs)</Outputs>
       <AdditionalInputs>$(QTDIR)\bin\moc.exe;%(FullPath);%(AdditionalInputs)</AdditionalInputs>
-    </CustomBuild> 
-	<CustomBuild Include="gpTraceSummaryTab.h">
+    </CustomBuild>
+    <CustomBuild Include="gpTraceSummaryTab.h">
       <Command>"$(QTDIR)\bin\moc.exe" -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB "-D$(GDT_BUILD)\." "-DGDT_BUILD_SUFFIX=""$(GDTBuildSuffix)""" "-DGDT_PROJECT_SUFFIX=""$(GDTProjectSuffix)""" -D_WINDOWS -DWIN32_LEAN_AND_MEAN -DSU_USE_NATIVE_STL -DWINVER=0x0502 -D_WIN32_WINNT=0x0502 -D_WIN32_WINDOWS=0x0502 -D_WINDLL  "-I.\GeneratedFiles" "-I$(QTDIR)\include" "-I.\GeneratedFiles\." "-I$(QTDIR)\include\qtmain" "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I." "%(FullPath)" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>Moc%27ing %(Filename)%(Extension)...</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp;%(Outputs)</Outputs>
       <AdditionalInputs>$(QTDIR)\bin\moc.exe;%(FullPath);%(AdditionalInputs)</AdditionalInputs>
-    </CustomBuild>	
-	<CustomBuild Include="gpCommandListSummaryTab.h">
+    </CustomBuild>
+    <CustomBuild Include="gpCommandListSummaryTab.h">
       <Command>"$(QTDIR)\bin\moc.exe" -DUNICODE -DWIN32 -DQT_LARGEFILE_SUPPORT -DQT_CORE_LIB -DQT_GUI_LIB "-D$(GDT_BUILD)\." "-DGDT_BUILD_SUFFIX=""$(GDTBuildSuffix)""" "-DGDT_PROJECT_SUFFIX=""$(GDTProjectSuffix)""" -D_WINDOWS -DWIN32_LEAN_AND_MEAN -DSU_USE_NATIVE_STL -DWINVER=0x0502 -D_WIN32_WINNT=0x0502 -D_WIN32_WINDOWS=0x0502 -D_WINDLL  "-I.\GeneratedFiles" "-I$(QTDIR)\include" "-I.\GeneratedFiles\." "-I$(QTDIR)\include\qtmain" "-I$(QTDIR)\include\QtCore" "-I$(QTDIR)\include\QtGui" "-I." "%(FullPath)" -o "tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp"</Command>
       <Message>Moc%27ing %(Filename)%(Extension)...</Message>
       <Outputs>tmp\moc_$(Platform)$(Configuration)\moc_%(Filename).cpp;%(Outputs)</Outputs>
@@ -666,13 +665,6 @@
       <Message>Uic%27ing %(Filename)%(Extension)...</Message>
       <Outputs>.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
       <AdditionalInputs>$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
-    </CustomBuild>
-    <CustomBuild Include="QtClientMain.qrc">
-      <FileType>Document</FileType>
-      <Command>"$(QTDIR)\bin\rcc.exe"   "%(FullPath)" -o ".\GeneratedFiles\rcc_%(Filename).cpp"</Command>
-      <Message>RCC%27ing %(Filename)%(Extension)...</Message>
-      <Outputs>.\GeneratedFiles\rcc_%(Filename).cpp;%(Outputs)</Outputs>
-      <AdditionalInputs>$(QTDIR)\bin\rcc.exe;%(AdditionalInputs)</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="SummaryViewBase.ui">
       <FileType>Document</FileType>
