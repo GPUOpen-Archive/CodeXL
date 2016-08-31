@@ -118,6 +118,7 @@ protected:
             }
         }
 
+        StringUtils::TrimInPlace(line);
         m_nLine++;
         return true;
     }
@@ -175,7 +176,7 @@ public:
     /// \return true if succeed
     bool LoadFile(const char* szFileName)
     {
-        fin.open(szFileName);
+        fin.open(szFileName, std::ifstream::binary);
 
         if (fin.is_open())
         {
