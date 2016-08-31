@@ -1,7 +1,7 @@
 # -*- Python -*-
 # $Id: SConscript 4614 2010-04-09 13:11:41Z rgorton $
 # SConscript for building the GpuProfiling component
-# Generates all of the moc/uic/rcc files, and compiles
+# Generates all of the moc/uic files, and compiles
 # the rest of the sources
 
 import os
@@ -165,18 +165,6 @@ moc_files = Split(
         'gpPerformanceCountersDataView.h '
         )
 
-# rcc files are a bit funny; ours references Resources/*.ico
-# When duplicated (the default) the rcc invocation is
-#   rcc obj/<dir>/foo.qrc -o obj/<dir>/foo.cpp
-# which causes rcc to blow up with complaints of not being able to find
-# the Resources files.
-# There is a -root <path> switch which looks like it should do what 
-# is expected, but said switch does not seem to work at all.
-# So the hack is to reference '#/<qrc files>' from the original directory.
-rcc_files = Split(
-        '#Components/GpuProfiling/AMDTGpuProfiling/QtClientMain.qrc '
-        )
-
 # This leaves annoying artifacts (objects) in ..../Common/Src
 # There is probably a good way to do that (TBD)
 commonsrc_files = Split(
@@ -322,19 +310,12 @@ MOC_Generated = moc_gen
 # cases; adding the dependency has trivial "downside"
 GPUProf_env.Depends(MOC_Generated, UIC_Generated)
 
-# Building rcc content
-#   foo.qrc --> rcc_foo.cpp
-rcc_gen = []
-for rcc_file in rcc_files:
-    rcc_gen += GPUProf_env.RccBld(rcc_file)
-RCC_Generated = rcc_gen
-
 # Now the "regular" build parts
-gpuprof_objs = GPUProf_env.SharedObject(gpuprof_files + backend_files + commonsrc_files + MOC_Generated + RCC_Generated)
+gpuprof_objs = GPUProf_env.SharedObject(gpuprof_files + backend_files + commonsrc_files + MOC_Generated)
 all_objs = gpuprof_objs
 
 GPUProfiling_Lib = [all_objs]
-GPUProf_env.Depends(GPUProfiling_Lib, UIC_Generated + MOC_Generated + RCC_Generated)
+GPUProf_env.Depends(GPUProfiling_Lib, UIC_Generated + MOC_Generated)
 soFiles = GPUProf_env.SharedLibrary(TheLibraryName, GPUProfiling_Lib)
 
 libInstall = GPUProf_env.Install(
