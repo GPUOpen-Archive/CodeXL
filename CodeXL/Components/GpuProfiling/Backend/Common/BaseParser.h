@@ -13,6 +13,7 @@
 #include <string>
 #include "IParserListener.h"
 #include "Logger.h"
+#include "StringUtils.h"
 
 using namespace GPULogger;
 
