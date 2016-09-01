@@ -48,10 +48,10 @@
 	url = ../common-src-AMDTApplicationComponents.git
 [submodule "Common/Src/AMDTAssertionHandlers"]
 	path = Common/Src/AMDTAssertionHandlers
-	url = ../common-src-AMDTAssertionHandlers/
+	url = ../common-src-AMDTAssertionHandlers.git
 [submodule "Common/Src/AMDTInterceptor"]
 	path = Common/Src/AMDTInterceptor
-	url = ../common-src-AMDTInterceptor
+	url = ../common-src-AMDTInterceptor.git
 [submodule "Common/Src/CElf"]
 	path = Common/Src/CElf
 	url = ../common-src-CElf.git
