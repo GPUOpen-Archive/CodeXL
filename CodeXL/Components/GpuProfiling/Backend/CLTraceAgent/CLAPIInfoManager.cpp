@@ -691,16 +691,16 @@ void CLAPIInfoManager::SetTimerFinishHandler(ProfilerTimerType timerType, TimerE
 
         switch (timerType)
         {
-        case PROFILEDELAYTIMER:
-            m_delayTimer->SetTimerFinishHandler(timerEndHandler);
-            break;
+            case PROFILEDELAYTIMER:
+                m_delayTimer->SetTimerFinishHandler(timerEndHandler);
+                break;
 
-        case PROFILEDURATIONTIMER:
-            m_durationTimer->SetTimerFinishHandler(timerEndHandler);
-            break;
+            case PROFILEDURATIONTIMER:
+                m_durationTimer->SetTimerFinishHandler(timerEndHandler);
+                break;
 
-        default:
-            break;
+            default:
+                break;
         }
     }
 }
@@ -709,30 +709,30 @@ void CLAPIInfoManager::CreateTimer(ProfilerTimerType timerType, unsigned int tim
 {
     switch (timerType)
     {
-    case PROFILEDELAYTIMER:
-        if (m_delayTimer == nullptr && timeIntervalInSeconds > 0)
-        {
-            m_delayTimer = new ProfilerTimer(timeIntervalInSeconds * 1000);
-            m_delayTimer->SetTimerType(PROFILEDELAYTIMER);
-            m_bDelayStartEnabled = true;
-            m_secondsToDelay = timeIntervalInSeconds;
-        }
+        case PROFILEDELAYTIMER:
+            if (m_delayTimer == nullptr && timeIntervalInSeconds > 0)
+            {
+                m_delayTimer = new ProfilerTimer(timeIntervalInSeconds * 1000);
+                m_delayTimer->SetTimerType(PROFILEDELAYTIMER);
+                m_bDelayStartEnabled = true;
+                m_secondsToDelay = timeIntervalInSeconds;
+            }
 
-        break;
+            break;
 
-    case PROFILEDURATIONTIMER:
-        if (m_durationTimer == nullptr && timeIntervalInSeconds > 0)
-        {
-            m_durationTimer = new ProfilerTimer(timeIntervalInSeconds * 1000);
-            m_durationTimer->SetTimerType(PROFILEDURATIONTIMER);
-            m_bProfilerDurationEnabled = true;
-            m_profilerShouldRunForSeconds = timeIntervalInSeconds;
-        }
+        case PROFILEDURATIONTIMER:
+            if (m_durationTimer == nullptr && timeIntervalInSeconds > 0)
+            {
+                m_durationTimer = new ProfilerTimer(timeIntervalInSeconds * 1000);
+                m_durationTimer->SetTimerType(PROFILEDURATIONTIMER);
+                m_bProfilerDurationEnabled = true;
+                m_profilerShouldRunForSeconds = timeIntervalInSeconds;
+            }
 
-        break;
+            break;
 
-    default:
-        break;
+        default:
+            break;
     }
 }
 
@@ -743,16 +743,16 @@ void CLAPIInfoManager::startTimer(ProfilerTimerType timerType)
     {
         switch (timerType)
         {
-        case PROFILEDELAYTIMER:
-            m_delayTimer->startTimer(true);
-            break;
+            case PROFILEDELAYTIMER:
+                m_delayTimer->startTimer(true);
+                break;
 
-        case PROFILEDURATIONTIMER:
-            m_durationTimer->startTimer(true);
-            break;
+            case PROFILEDURATIONTIMER:
+                m_durationTimer->startTimer(true);
+                break;
 
-        default:
-            break;
+            default:
+                break;
         }
     }
 }

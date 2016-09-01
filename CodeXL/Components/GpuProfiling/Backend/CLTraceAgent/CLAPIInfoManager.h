@@ -145,7 +145,7 @@ public:
 
     /// Indicates whether profiler should run after delay or not
     /// \param delayInSeconds to return the amount by which profile set to be delayed
-    /// \returns true and seconds if delay is enabled
+    /// \returns true if delay is enabled
     bool IsProfilerDelayEnabled(unsigned int& delayInSeconds);
 
     /// Indicates whether profiler should run only for set duration or not

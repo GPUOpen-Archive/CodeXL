@@ -271,9 +271,9 @@ public:
     bool IsProfilerDelayEnabled(unsigned int& delayInSeconds);
 
     /// Indicates whether profiler should run only for set duration or not
-    /// \param profilerDurationInSeconds to return the amount by which profile set to run
+    /// \param durationInSeconds to return the amount by which profile set to run
     /// \returns true if duration of the profiler is enabled
-    bool IsProfilerDurationEnabled(unsigned int& profilerDurationInSeconds);
+    bool IsProfilerDurationEnabled(unsigned int& durationInSeconds);
 
     /// Assigns the call back function
     /// \param timerType type of the timer

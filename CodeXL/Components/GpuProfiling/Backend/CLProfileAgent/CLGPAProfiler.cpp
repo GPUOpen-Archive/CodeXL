@@ -1115,9 +1115,9 @@ bool CLGPAProfiler::IsProfilerDelayEnabled(unsigned int& delayInSeconds)
 }
 
 
-bool CLGPAProfiler::IsProfilerDurationEnabled(unsigned int& profilerDurationInSeconds)
+bool CLGPAProfiler::IsProfilerDurationEnabled(unsigned int& durationInSeconds)
 {
-    profilerDurationInSeconds = m_profilerShouldRunForSeconds;
+    durationInSeconds = m_profilerShouldRunForSeconds;
     return m_bProfilerDurationEnabled;
 }
 
