@@ -33,6 +33,13 @@
 #include "CLUserEvent.h"
 #include "DeviceInfoUtils.h"
 #include "../Common/KernelProfileResultManager.h"
+#include "../Common/ProfilerTimer.h"
+
+
+/// Handle the response on the end of the timer
+/// \param timerType type of the ending timer for which response have to be executed
+void CLGPAProfilerTimerEndResponse(ProfilerTimerType timerType);
+
 
 /// \addtogroup CLProfileAgent
 // @{
@@ -252,11 +259,35 @@ public:
 
     /// Indicates whether or not profiling is currently enabled
     /// \return true if profiling is enabled, false otherwise
-    bool IsProfilingEnabled() const { return m_bIsProfilingEnabled; }
+    bool IsProfilingEnabled();
 
     /// Enable to disable profiling
     /// \param doEnable, flag indicating whether to enable (true) or disable (false) profiling
     void EnableProfiling(bool doEnable) { m_bIsProfilingEnabled = doEnable; }
+
+    /// Indicates whether profiler should run after delay or not
+    /// \param delayInSeconds to return the amount by which profile set to be delayed
+    /// \returns true if delay is enabled otherwise false
+    bool IsProfilerDelayEnabled(unsigned int& delayInSeconds);
+
+    /// Indicates whether profiler should run only for set duration or not
+    /// \param profilerDurationInSeconds to return the amount by which profile set to run
+    /// \returns true if duration of the profiler is enabled
+    bool IsProfilerDurationEnabled(unsigned int& profilerDurationInSeconds);
+
+    /// Assigns the call back function
+    /// \param timerType type of the timer
+    /// \param timerEndHandler call back function pointer
+    void SetTimerFinishHandler(ProfilerTimerType timerType, TimerEndHandler timerEndHandler);
+
+    /// Creates the Profiler Timer
+    /// \param timerType timer type of the starting timer
+    /// \param timeIntervalInSeconds profiler duration or profiler delay in seconds
+    void CreateTimer(ProfilerTimerType timerType, unsigned int timeIntervalInSeconds);
+
+    /// Starts the timer if it is set properly
+    /// \param timerType timer type of the starting timer
+    void StartTimer(ProfilerTimerType timerType);
 
 private:
     /// Set the output file path
@@ -279,24 +310,30 @@ private:
     /// \param[out] revisionId the revision id for the specified device
     bool GetAvailableDeviceIdFromDeviceNameAndAsicInfoList(const char* pszDeviceName, const AsicInfoList asicInfoList, int& deviceId, int& revisionId);
 
-    GPAUtils           m_GPAUtils;            ///< common GPA utility functions
-    bool               m_isGPAOpened;         ///< flag indicating if a GPA Context is currently opened
-    std::string        m_strDeviceName;       ///< the device name
-    unsigned int       m_uiCurKernelCount;    ///< number of kernels that have been profiled.
-    unsigned int       m_uiMaxKernelCount;    ///< max number of kernels to profile.
-    unsigned int       m_uiOutputLineCount;   ///< number of items written to the output file
-    bool               m_bIsProfilingEnabled; ///< flag indicating if profiling is currently enabled
-    bool               m_bGPU;                ///< true if profiling a GPU device (false is the default)
-    CLContextManager   m_contextManager;      ///< manages all the CL contexts for arena support
+    GPAUtils           m_GPAUtils;                          ///< common GPA utility functions
+    bool               m_isGPAOpened;                       ///< flag indicating if a GPA Context is currently opened
+    std::string        m_strDeviceName;                     ///< the device name
+    unsigned int       m_uiCurKernelCount;                  ///< number of kernels that have been profiled.
+    unsigned int       m_uiMaxKernelCount;                  ///< max number of kernels to profile.
+    unsigned int       m_uiOutputLineCount;                 ///< number of items written to the output file
+    bool               m_bIsProfilingEnabled;               ///< flag indicating if profiling is currently enabled
+    bool               m_bGPU;                              ///< true if profiling a GPU device (false is the default)
+    CLContextManager   m_contextManager;                    ///< manages all the CL contexts for arena support
 
-    KernelAssembly     m_KernelAssembly;      ///< manages retrieving the CL source, IL and ISA from the CL run-time
-    std::string        m_strOutputFile;       ///< the output file path
-    std::string        m_strOccupancyFile;    ///< the output kernel occupancy file
-    UserEventList      m_userEventList;       ///< user event list
-    CLPlatformSet      m_platformList;        ///< Platform list
+    KernelAssembly     m_KernelAssembly;                    ///< manages retrieving the CL source, IL and ISA from the CL run-time
+    std::string        m_strOutputFile;                     ///< the output file path
+    std::string        m_strOccupancyFile;                  ///< the output kernel occupancy file
+    UserEventList      m_userEventList;                     ///< user event list
+    CLPlatformSet      m_platformList;                      ///< Platform list
 
-    bool               m_bForceSinglePass;    ///< flag indicating whether or not the profiler should only allow a single pass
-    bool               m_bCollectGPUTime;     ///< flag indicating whether or not the profiler should collect gpu time when collecting perf counters
+    bool               m_bForceSinglePass;                  ///< flag indicating whether or not the profiler should only allow a single pass
+    bool               m_bCollectGPUTime;                   ///< flag indicating whether or not the profiler should collect gpu time when collecting perf counters
+    bool               m_bDelayStartEnabled;                ///< flag indicating whether or not the profiler should start with delay or not
+    bool               m_bProfilerDurationEnabled;          ///< Flag indiacating whether profiler should only run for certain duration
+    unsigned int       m_secondsToDelay;                    ///< Seconds to delay for profiler to start
+    unsigned int       m_profilerShouldRunForSeconds;       ///< Duration in seconds for which Profiler should run
+    ProfilerTimer*     m_delayTimer;                        ///< timer for handling delay timer for the profile agent
+    ProfilerTimer*     m_durationTimer;                     ///< timer for handling duration timer for the profile agent
 };
 
 // @}

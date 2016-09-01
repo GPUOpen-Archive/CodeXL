@@ -52,7 +52,9 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
         // Parse command line options using Boost library
         po::options_description genericOpt("General options");
         genericOpt.add_options()
-        ("startdisabled,d", "Start the application with profiling disabled. This is useful for applications that call amdtStopProfiling and amdtResumeProfiling from the AMDTActivityLogger library.")
+        ("startdisabled", "Start the application with profiling disabled. This is useful for applications that call amdtStopProfiling and amdtResumeProfiling from the AMDTActivityLogger library.")
+        ("startdelay,d", po::value<unsigned int>()->default_value(0), "Start the application with profiling disabled. Profiling will be enabled after the specified delay (in seconds).")
+        ("profileduration,D", po::value<unsigned int>()->default_value(0), "Profile duration in seconds.")
         ("envvar,e", po::value< std::vector<string> >()->multitoken(), "Environment variable that should be defined when running the profiled application. Argument should be in the format NAME=VALUE.")
         ("envvarfile,E", po::value<string>(), "Path to a file containing a list of environment variables that should be defined when running the profiled application. The file should contain one line for each variable in the format NAME=VALUE.")
         ("fullenv,f", "The environment variables specified with the envvar or envvarfile switch represent the full environment block.  If not specified, then the environment variables represent additions or changes to the system environment block.")
@@ -311,6 +313,32 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
         {
             configOut.uiTimeOutInterval = DEFAULT_TIMEOUT_INTERVAL;
         }
+
+
+        if (unicodeOptionsMap.count("startdelay") > 0)
+        {
+            wstring valueStr = unicodeOptionsMap["startdelay"];
+            string valueStrConverted;
+            StringUtils::WideStringToUtf8String(valueStr, valueStrConverted);
+            configOut.m_secondsToDelay = boost::lexical_cast<unsigned int>(valueStrConverted.c_str());
+        }
+        else
+        {
+            configOut.m_secondsToDelay = 0;
+        }
+
+        if (unicodeOptionsMap.count("profileduration") > 0)
+        {
+            wstring valueStr = unicodeOptionsMap["profileduration"];
+            string valueStrConverted;
+            StringUtils::WideStringToUtf8String(valueStr, valueStrConverted);
+            configOut.m_profilerShouldRunForSeconds = boost::lexical_cast<unsigned int>(valueStrConverted.c_str());
+        }
+        else
+        {
+            configOut.m_profilerShouldRunForSeconds = 0;
+        }
+
 
         configOut.bOutputIL = false;
         configOut.bOutputISA = false;

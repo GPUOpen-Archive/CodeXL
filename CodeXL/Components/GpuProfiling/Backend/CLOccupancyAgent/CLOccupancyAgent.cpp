@@ -171,6 +171,31 @@ clAgent_OnLoad(cl_agent* agent)
     GlobalSettings::GetInstance()->m_params = params;
     OccupancyInfoEntry::m_cListSeparator = params.m_cOutputSeparator;
 
+    if (params.m_bStartDisabled)
+    {
+        OccupancyInfoManager::Instance()->StopTracing();
+    }
+    else
+    {
+        OccupancyInfoManager::Instance()->EnableProfileDelayStart(params.m_bDelayStartEnabled, params.m_secondsToDelay);
+        OccupancyInfoManager::Instance()->EnableProfileDuration(params.m_bProfilerDurationEnabled, params.m_profilerShouldRunForSeconds);
+
+        if (params.m_bDelayStartEnabled)
+        {
+            OccupancyInfoManager::Instance()->CreateTimer(PROFILEDELAYTIMER, params.m_secondsToDelay);
+            OccupancyInfoManager::Instance()->SetTimerFinishHandler(PROFILEDELAYTIMER, CLOccupancyAgentTimerEndResponse);
+            OccupancyInfoManager::Instance()->StopTracing();
+            OccupancyInfoManager::Instance()->EnableProfiling(false);
+            OccupancyInfoManager::Instance()->startTimer(PROFILEDELAYTIMER);
+        }
+        else if (params.m_bProfilerDurationEnabled)
+        {
+            OccupancyInfoManager::Instance()->CreateTimer(PROFILEDURATIONTIMER, params.m_profilerShouldRunForSeconds);
+            OccupancyInfoManager::Instance()->SetTimerFinishHandler(PROFILEDURATIONTIMER, CLOccupancyAgentTimerEndResponse);
+            OccupancyInfoManager::Instance()->startTimer(PROFILEDURATIONTIMER);
+        }
+    }
+
     if (params.m_bTimeOutBasedOutput)
     {
         OccupancyInfoManager::Instance()->SetInterval(params.m_uiTimeOutInterval);

@@ -191,6 +191,10 @@ void FileUtils::PassParametersByFile(Parameters params)
     fout << "KernelOccupancy=" << (params.m_bKernelOccupancy ? "True" : "False") << endl;
     fout << "GMTrace=" << (params.m_bGMTrace ? "True" : "False") << endl;
     fout << "FullEnvBlock=" << (params.m_bFullEnvBlock ? "True" : "False") << endl;
+    fout << "StartDelayEnabled=" << (params.m_bDelayStartEnabled ? "True" : "False") << endl;
+    fout << "ProfilerDurationEnabled=" << (params.m_bProfilerDurationEnabled ? "True" : "False") << endl;
+    fout << "StartDelaySeconds=" << params.m_secondsToDelay << endl;
+    fout << "ProfileDuration=" << params.m_profilerShouldRunForSeconds << endl;
 
     for (EnvVarMap::const_iterator it = params.m_mapEnvVars.begin(); it != params.m_mapEnvVars.end(); ++it)
     {
@@ -491,6 +495,36 @@ bool FileUtils::GetParametersFromFile(Parameters& params)
                 else if (opStr.find("FullEnvBlock") != std::string::npos)
                 {
                     params.m_bFullEnvBlock = (valStr.find("True") != std::string::npos);
+                }
+                else if (opStr.find("StartDelayEnabled") != std::string::npos)
+                {
+                    params.m_bDelayStartEnabled = valStr.find("True") != std::string::npos;
+                }
+                else if (opStr.find("StartDelaySeconds") != std::string::npos)
+                {
+                    bool ret = StringUtils::Parse(valStr, params.m_secondsToDelay);
+
+                    if (!ret)
+                    {
+                        // failed to parse, assign no delay
+                        Log(logWARNING, "Failed to parse parameter file.\n");
+                        params.m_secondsToDelay = 0;
+                    }
+                }
+                else if (opStr.find("ProfilerDurationEnabled") != std::string::npos)
+                {
+                    params.m_bProfilerDurationEnabled = valStr.find("True") != std::string::npos;
+                }
+                else if (opStr.find("ProfileDuration") != std::string::npos)
+                {
+                    bool ret = StringUtils::Parse(valStr, params.m_profilerShouldRunForSeconds);
+
+                    if (!ret)
+                    {
+                        // failed to parse, assign to no profile duration
+                        Log(logWARNING, "Failed to parse parameter file.\n");
+                        params.m_profilerShouldRunForSeconds = 0;
+                    }
                 }
                 else if (opStr.find("EnvVar") != std::string::npos)
                 {

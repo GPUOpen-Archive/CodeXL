@@ -15,6 +15,8 @@
 #include "../Common/Logger.h"
 #include "../Common/Defs.h"
 #include "../Common/StringUtils.h"
+#include <AMDTOSWrappers/Include/osProcess.h>
+#include "FileUtils.h"
 
 #ifndef _WIN32
     #include <cstdlib> //getenv

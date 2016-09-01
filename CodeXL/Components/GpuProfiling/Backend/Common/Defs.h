@@ -13,6 +13,7 @@
 #include <map>
 #include <unordered_set>
 #include <assert.h>
+#include <time.h>
 #include "Version.h"
 #include "../Common/Logger.h"
 #include "AMDTBaseTools/Include/gtString.h"
@@ -27,7 +28,7 @@ using namespace GPULogger;
 // @{
 
 #ifdef WIN32
-   #if AMDT_ADDRESS_SPACE_TYPE == AMDT_64_BIT_ADDRESS_SPACE
+    #if AMDT_ADDRESS_SPACE_TYPE == AMDT_64_BIT_ADDRESS_SPACE
         #define BITNESS "-x64"
         #define NUMBITS "64"
     #else
@@ -67,7 +68,7 @@ using namespace GPULogger;
 #define HSA_PROFILE_AGENT_DLL LIB_PREFIX GPU_PROFILER_LIBRARY_NAME_PREFIX "HSAProfileAgent" BITNESS DEBUG_PREFIX GDT_BUILD_SUFFIX LIB_SUFFIX
 
 #ifdef WIN32
-   #if AMDT_ADDRESS_SPACE_TYPE == AMDT_64_BIT_ADDRESS_SPACE
+    #if AMDT_ADDRESS_SPACE_TYPE == AMDT_64_BIT_ADDRESS_SPACE
         #define HSA_RUNTIME_TOOLS_LIB "hsa-runtime-tools64.dll"
     #else
         #define HSA_RUNTIME_TOOLS_LIB "hsa-runtime-tools.dll"
@@ -320,53 +321,61 @@ struct Parameters
         m_bForceSinglePassPMC = false;
         m_bGPUTimePMC = false;
         m_bStartDisabled = false;
+        m_bDelayStartEnabled = false;
+        m_bProfilerDurationEnabled = false;
+        m_secondsToDelay = 0;
+        m_profilerShouldRunForSeconds = 0;
     }
 
-    unsigned int m_uiVersionMajor;      ///< Version major
-    unsigned int m_uiVersionMinor;      ///< Version minor
-    gtString m_strCmdArgs;              ///< command line arguments
-    gtString m_strWorkingDir;           ///< working directory
-    std::string m_strOutputFile;        ///< output file path string
-    std::string m_strSessionName;       ///< session name string
-    gtString m_strDLLPath;              ///< GPUPerfAPIDLL path
-    std::string m_strCounterFile;       ///< Counter file
-    std::string m_strKernelFile;        ///< Kernel list file
-    std::string m_strAPIFilterFile;     ///< API Filter file
-    std::string m_strTimerDLLFile;      ///< User timer DLL file (including path)
-    std::string m_strUserTimerFn;       ///< User timer function name
-    std::string m_strUserTimerInitFn;   ///< User timer initialization function (name)
-    std::string m_strUserTimerDestroyFn;///< User timer destroy function (name)
-    std::string m_strUserPMCLibPath;    ///< User PMC sampler module path
-    bool m_bVerbose;                    ///< verbose option
-    bool m_bOutputIL;                   ///< output OpenCL kernel IL file option
-    bool m_bOutputHSAIL;                ///< output Kernel HSAIL file option
-    bool m_bOutputISA;                  ///< output OpenCL kernel ISA file option
-    bool m_bOutputCL;                   ///< output OpenCL kernel CL file option
-    bool m_bOutputASM;                  ///< output DirectCompute shader ASM file option
-    bool m_bPerfCounter;                ///< enable CL/DirectCompute performance counter mode option
-    bool m_bTrace;                      ///< enable CL trace mode option
-    bool m_bTimeOutBasedOutput;         ///< timeOut-based output model
-    bool m_bHSATrace;                   ///< enable HSA trace mode option
-    bool m_bHSAPMC;                     ///< enable HSA performance counter mode option
-    unsigned int m_uiTimeOutInterval;   ///< Timeout interval
-    EnvVarMap m_mapEnvVars;             ///< an environment block for the profiled app
-    bool m_bFullEnvBlock;               ///< flag indicating whether or not the strEnvBlock represents a full environment block
-    char m_cOutputSeparator;            ///< output file separator character
-    bool m_bTestMode;                   ///< internal test mode flag
-    bool m_bUserTimer;                  ///< internal mode to use the user timer rather than the default Win32 timers
-    bool m_bQueryRetStat;               ///< Always query cl function status
-    bool m_bCollapseClGetEventInfo;     ///< Collapse consecutive, identical clGetEventInfo calls into a single call
-    bool m_bStackTrace;                 ///< Stack trace
-    bool m_bKernelOccupancy;            ///< Flag to signal whether to record kernel occupancy
-    bool m_bUserPMC;                    ///< flag indicating whether or not user PMC sampler callbacks are invoked during CPU timestamp read.
-    bool m_bCompatibilityMode;          ///< flag indicating whether or not compatibility mode is enabled
-    unsigned int m_uiMaxNumOfAPICalls;  ///< Maximum number of API calls
-    unsigned int m_uiMaxKernels;        ///< maximum number of kernels to profile.
-    bool m_bGMTrace;                    ///< Flag indicating whether or not global memory trace is enabled
-    bool m_bForceSinglePassPMC;         ///< Flag indicating that only a single pass should be allowed when collecting performance counters
-    bool m_bGPUTimePMC;                 ///< Flag indicating whether or not the profiler should collect gpu time when collecting perf counters
-    bool m_bStartDisabled;              ///< Flag indicating whether or not to start with profiling disabled
-    KernelFilterList m_kernelFilterList;///< List of kernels to filter for perf counter profiling and subkernel profiling
+    unsigned int m_uiVersionMajor;                ///< Version major
+    unsigned int m_uiVersionMinor;                ///< Version minor
+    gtString m_strCmdArgs;                        ///< command line arguments
+    gtString m_strWorkingDir;                     ///< working directory
+    std::string m_strOutputFile;                  ///< output file path string
+    std::string m_strSessionName;                 ///< session name string
+    gtString m_strDLLPath;                        ///< GPUPerfAPIDLL path
+    std::string m_strCounterFile;                 ///< Counter file
+    std::string m_strKernelFile;                  ///< Kernel list file
+    std::string m_strAPIFilterFile;               ///< API Filter file
+    std::string m_strTimerDLLFile;                ///< User timer DLL file (including path)
+    std::string m_strUserTimerFn;                 ///< User timer function name
+    std::string m_strUserTimerInitFn;             ///< User timer initialization function (name)
+    std::string m_strUserTimerDestroyFn;          ///< User timer destroy function (name)
+    std::string m_strUserPMCLibPath;              ///< User PMC sampler module path
+    bool m_bVerbose;                              ///< verbose option
+    bool m_bOutputIL;                             ///< output OpenCL kernel IL file option
+    bool m_bOutputHSAIL;                          ///< output Kernel HSAIL file option
+    bool m_bOutputISA;                            ///< output OpenCL kernel ISA file option
+    bool m_bOutputCL;                             ///< output OpenCL kernel CL file option
+    bool m_bOutputASM;                            ///< output DirectCompute shader ASM file option
+    bool m_bPerfCounter;                          ///< enable CL/DirectCompute performance counter mode option
+    bool m_bTrace;                                ///< enable CL trace mode option
+    bool m_bTimeOutBasedOutput;                   ///< timeOut-based output model
+    bool m_bHSATrace;                             ///< enable HSA trace mode option
+    bool m_bHSAPMC;                               ///< enable HSA performance counter mode option
+    unsigned int m_uiTimeOutInterval;             ///< Timeout interval
+    EnvVarMap m_mapEnvVars;                       ///< an environment block for the profiled app
+    bool m_bFullEnvBlock;                         ///< flag indicating whether or not the strEnvBlock represents a full environment block
+    char m_cOutputSeparator;                      ///< output file separator character
+    bool m_bTestMode;                             ///< internal test mode flag
+    bool m_bUserTimer;                            ///< internal mode to use the user timer rather than the default Win32 timers
+    bool m_bQueryRetStat;                         ///< Always query cl function status
+    bool m_bCollapseClGetEventInfo;               ///< Collapse consecutive, identical clGetEventInfo calls into a single call
+    bool m_bStackTrace;                           ///< Stack trace
+    bool m_bKernelOccupancy;                      ///< Flag to signal whether to record kernel occupancy
+    bool m_bUserPMC;                              ///< flag indicating whether or not user PMC sampler callbacks are invoked during CPU timestamp read.
+    bool m_bCompatibilityMode;                    ///< flag indicating whether or not compatibility mode is enabled
+    unsigned int m_uiMaxNumOfAPICalls;            ///< Maximum number of API calls
+    unsigned int m_uiMaxKernels;                  ///< maximum number of kernels to profile.
+    bool m_bGMTrace;                              ///< Flag indicating whether or not global memory trace is enabled
+    bool m_bForceSinglePassPMC;                   ///< Flag indicating that only a single pass should be allowed when collecting performance counters
+    bool m_bGPUTimePMC;                           ///< Flag indicating whether or not the profiler should collect gpu time when collecting perf counters
+    bool m_bStartDisabled;                        ///< Flag indicating whether or not to start with profiling disabled
+    KernelFilterList m_kernelFilterList;          ///< List of kernels to filter for perf counter profiling and subkernel profiling
+    bool m_bDelayStartEnabled;                    ///< Flag indicating whether to start profiler with a delay or not
+    bool m_bProfilerDurationEnabled;              ///< Flag indiacating whether profiler should only run for certain duration
+    unsigned int m_secondsToDelay;                ///< Seconds to delay for profiler to start
+    unsigned int m_profilerShouldRunForSeconds;   ///< Duration in seconds for which Profiler should run
 };
 
 typedef std::map<std::string, bool> AnalyzerMap;

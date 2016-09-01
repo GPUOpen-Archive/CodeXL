@@ -90,6 +90,7 @@
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="..\..\..\..\..\Common\Src\AMDTMutex\AMDTMutex.cpp" />
     <ClCompile Include="OSUtils.cpp" />
+    <ClCompile Include="ProfilerTimer.cpp" />
     <ClCompile Include="StackTracer.cpp" />
     <ClCompile Include="StringUtils.cpp" />
     <ClCompile Include="Timer.cpp" />
@@ -128,6 +129,7 @@
     <ClInclude Include="Logger.h" />
     <ClInclude Include="..\..\..\..\..\Common\Src\AMDTMutex\AMDTMutex.h" />
     <ClInclude Include="OSUtils.h" />
+    <ClInclude Include="ProfilerTimer.h" />
     <ClInclude Include="Runnable.h" />
     <ClInclude Include="SeqIDGenerator.h" />
     <ClInclude Include="StackTracer.h" />

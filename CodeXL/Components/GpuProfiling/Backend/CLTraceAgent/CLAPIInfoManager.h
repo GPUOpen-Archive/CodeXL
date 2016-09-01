@@ -23,6 +23,7 @@
 #include "CLEnqueueAPIDefs.h"
 #include "../CLCommon/CLFunctionDefs.h"
 #include "../Common/GlobalSettings.h"
+#include "../Common/ProfilerTimer.h"
 
 typedef std::map<osThreadId, CLAPI_clGetEventInfo*> PreviousGEIMap;
 typedef std::pair<osThreadId, CLAPI_clGetEventInfo*> PreviousGEIMapPair;
@@ -33,6 +34,10 @@ typedef std::pair<const cl_context, std::list<const CLAPI_clCreateContextBase*> 
 typedef std::map<const cl_kernel, std::string> CLKernelMap;
 typedef std::pair<const cl_kernel, std::string> CLKernelMapPair;
 typedef std::vector<cl_kernel> EnqueuedTaskList;
+
+/// Handle the response on the end of the timer
+/// \param timerType type of the ending timer for which response have to be executed
+void CLAPITraceAgentTimerEndResponse(ProfilerTimerType timerType);
 
 void TimerThread(void* param);
 
@@ -128,6 +133,40 @@ public:
     /// \return true if the specified kernel is in the list, false otherwise
     bool CheckEnqueuedTask(const cl_kernel kernel);
 
+    /// Enables or Disables the profiler delay
+    /// \param doEnable true for enable and false for disable
+    /// \param delayInSeconds seconds to delay the profiler
+    void EnableProfileDelayStart(bool doEnable, unsigned int delayInSeconds = 0);
+
+    /// Enables or Disables the profiler duration
+    /// \param doEnable true for enable and false for disable
+    /// \param durationInSeconds profiler duration in seconds
+    void EnableProfileDuration(bool doEnable, unsigned int durationInSeconds = 0);
+
+    /// Indicates whether profiler should run after delay or not
+    /// \param delayInSeconds to return the amount by which profile set to be delayed
+    /// \returns true and seconds if delay is enabled
+    bool IsProfilerDelayEnabled(unsigned int& delayInSeconds);
+
+    /// Indicates whether profiler should run only for set duration or not
+    /// \param durationInSeconds to return the amount by which profile set to run
+    /// \returns true if duration of the profiler is enabled
+    bool IsProfilerDurationEnabled(unsigned int& durationInSeconds);
+
+    /// Assigns the call back function
+    /// \param timerType type of the timer
+    /// \param timerEndHandler call back function pointer
+    void SetTimerFinishHandler(ProfilerTimerType timerType, TimerEndHandler timerEndHandler);
+
+    /// Creates the Profiler Timer
+    /// \param timerType timer type of the starting timer
+    /// \param timeIntervalInSeconds profiler duration or profiler delay in seconds
+    void CreateTimer(ProfilerTimerType timerType, unsigned int timeIntervalInSeconds);
+
+    /// Starts the timer
+    /// \param timerType Type of the the timer
+    void startTimer(ProfilerTimerType timerType);
+
 protected:
     /// Add the specified api to the list of APIs to filter
     /// \param strAPIName the name of the API to add to the filter
@@ -151,18 +190,24 @@ private:
     CLAPIInfoManager& operator = (const CLAPIInfoManager& obj);
 
 private:
-    unsigned int            m_uiLineNum;            ///< number of lines output to file
-    PreviousGEIMap          m_previousGEIMap;       ///< stl map that contains the previous CLAPI_clGetEventInfo instance for each thread
-    CLCommandQueueMap       m_clCommandQueueMap;    ///< stl map that maps from cl_command_queue to CLAPI_clCreateCommandQueue*
-    CLContextMap            m_clContextMap;         ///< stl map that maps from cl_context to CLAPI_clCreateContextBase*
-    CLKernelMap             m_clKernelMap;          ///< stl map that maps from cl_kernel to string
-    EnqueuedTaskList        m_enqueuedTasks;        ///< stl vector containing the clEnqueueTask apis
-    AMDTMutex               m_mtxPreviousGEI;       ///< mutex used to lock access to m_PreviousGEIMap
-    AMDTMutex               m_mtxEnqueuedTask;      ///< mutex used to lock access to m_enqueuedTasks
-    std::set<CL_FUNC_TYPE>  m_filterAPIs;           ///< OpenCL APIs that are disabled in the trace, if API is not in m_MustInterceptAPIs list, the API will not be intercept,
+    unsigned int            m_uiLineNum;                         ///< number of lines output to file
+    PreviousGEIMap          m_previousGEIMap;                    ///< stl map that contains the previous CLAPI_clGetEventInfo instance for each thread
+    CLCommandQueueMap       m_clCommandQueueMap;                 ///< stl map that maps from cl_command_queue to CLAPI_clCreateCommandQueue*
+    CLContextMap            m_clContextMap;                      ///< stl map that maps from cl_context to CLAPI_clCreateContextBase*
+    CLKernelMap             m_clKernelMap;                       ///< stl map that maps from cl_kernel to string
+    EnqueuedTaskList        m_enqueuedTasks;                     ///< stl vector containing the clEnqueueTask apis
+    AMDTMutex               m_mtxPreviousGEI;                    ///< mutex used to lock access to m_PreviousGEIMap
+    AMDTMutex               m_mtxEnqueuedTask;                   ///< mutex used to lock access to m_enqueuedTasks
+    std::set<CL_FUNC_TYPE>  m_filterAPIs;                        ///< OpenCL APIs that are disabled in the trace, if API is not in m_MustInterceptAPIs list, the API will not be intercept,
     ///< otherwise, API is intercepted but it won't show up in trace file.
-    std::set<CL_FUNC_TYPE>  m_mustInterceptAPIs;    ///< Some of the APIs like clCreateContext, clCreateCommandQueue and etc are not able to be disabled.
-    std::list<ITraceEntry*> m_mustInterceptAPIList; ///< List containing the must-intercept API objects, if they are not actually traced.  If not tracing the APIs, we need to store the must-intercept API objects somewhere
+    std::set<CL_FUNC_TYPE>  m_mustInterceptAPIs;                 ///< Some of the APIs like clCreateContext, clCreateCommandQueue and etc are not able to be disabled.
+    std::list<ITraceEntry*> m_mustInterceptAPIList;              ///< List containing the must-intercept API objects, if they are not actually traced.  If not tracing the APIs, we need to store the must-intercept API objects somewhere
+    bool                    m_bDelayStartEnabled;                ///< flag indicating whether or not the profiler should start with delay or not
+    bool                    m_bProfilerDurationEnabled;          ///< Flag indiacating whether profiler should only run for certain duration
+    unsigned int            m_secondsToDelay;                    ///< Seconds to delay for profiler to start
+    unsigned int            m_profilerShouldRunForSeconds;       ///< Duration in seconds for which Profiler should run
+    ProfilerTimer*          m_delayTimer;                        ///< timer for handling delay timer for the profile agent
+    ProfilerTimer*          m_durationTimer;                     ///< timer for handling duration timer for the profile agent
 };
 
 // @}

@@ -39,6 +39,7 @@ SO_OBJS = \
 	./$(OBJ_DIR)/CLCUInfoBase.o \
 	./$(OBJ_DIR)/CLOccupancyFile.o \
 	./$(OBJ_DIR)/CLOccupancyInfoManager.o \
+	./$(OBJ_DIR)/CLProfilerTimer.o \
 
 include $(DEPTH)/Build/CommonTargets.mk
 

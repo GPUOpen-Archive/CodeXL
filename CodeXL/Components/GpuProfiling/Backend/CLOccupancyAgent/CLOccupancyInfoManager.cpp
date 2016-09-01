@@ -187,12 +187,31 @@ std::string OccupancyInfoEntry::ToString()
 
 OccupancyInfoManager::OccupancyInfoManager() :
     TraceInfoManager(),
-    m_bIsProfilingEnabled(true)
+    m_bIsProfilingEnabled(true),
+    m_bDelayStartEnabled(false),
+    m_bProfilerDurationEnabled(false),
+    m_secondsToDelay(0u),
+    m_profilerShouldRunForSeconds(0u)
 {
+    m_delayTimer = nullptr;
+    m_durationTimer = nullptr;
 }
 
 OccupancyInfoManager::~OccupancyInfoManager()
 {
+    if (m_delayTimer)
+    {
+        m_delayTimer->stopTimer();
+        delete m_delayTimer;
+        m_delayTimer = nullptr;
+    }
+
+    if (m_durationTimer)
+    {
+        m_durationTimer->stopTimer();
+        delete m_durationTimer;
+        m_durationTimer = nullptr;
+    }
 }
 
 void OccupancyInfoManager::FlushTraceData(bool bForceFlush)
@@ -315,3 +334,129 @@ void OccupancyInfoManager::SaveToOccupancyFile()
         }
     }
 }
+
+
+void CLOccupancyAgentTimerEndResponse(ProfilerTimerType timerType)
+{
+    switch (timerType)
+    {
+        case PROFILEDELAYTIMER:
+            OccupancyInfoManager::Instance()->ResumeTracing();
+            OccupancyInfoManager::Instance()->EnableProfiling(true);
+            unsigned int profilerDuration;
+
+            if (OccupancyInfoManager::Instance()->IsProfilerDurationEnabled(profilerDuration))
+            {
+                OccupancyInfoManager::Instance()->CreateTimer(PROFILEDURATIONTIMER, profilerDuration);
+                OccupancyInfoManager::Instance()->SetTimerFinishHandler(PROFILEDURATIONTIMER, CLOccupancyAgentTimerEndResponse);
+                OccupancyInfoManager::Instance()->startTimer(PROFILEDURATIONTIMER);
+            }
+
+            break;
+
+        case PROFILEDURATIONTIMER:
+            OccupancyInfoManager::Instance()->StopTracing();
+            OccupancyInfoManager::Instance()->EnableProfiling(false);
+            break;
+
+        default:
+            break;
+    }
+}
+
+
+bool OccupancyInfoManager::IsProfilerDelayEnabled(unsigned int& delayInSeconds)
+{
+    delayInSeconds = m_secondsToDelay;
+    return m_bDelayStartEnabled;
+}
+
+bool OccupancyInfoManager::IsProfilerDurationEnabled(unsigned int& profilerDurationInSeconds)
+{
+    profilerDurationInSeconds = m_profilerShouldRunForSeconds;
+    return m_bProfilerDurationEnabled;
+}
+
+void OccupancyInfoManager::SetTimerFinishHandler(ProfilerTimerType timerType, TimerEndHandler timerEndHandler)
+{
+    switch (timerType)
+    {
+        case PROFILEDELAYTIMER:
+            m_delayTimer->SetTimerFinishHandler(timerEndHandler);
+            break;
+
+        case PROFILEDURATIONTIMER:
+            m_durationTimer->SetTimerFinishHandler(timerEndHandler);
+            break;
+
+        default:
+            break;
+    }
+}
+
+void OccupancyInfoManager::EnableProfileDelayStart(bool doEnable, unsigned int delayInSeconds)
+{
+    m_bDelayStartEnabled = doEnable;
+    m_secondsToDelay = doEnable ? delayInSeconds : 0;
+}
+
+void OccupancyInfoManager::EnableProfileDuration(bool doEnable, unsigned int durationInSeconds)
+{
+    m_bProfilerDurationEnabled = doEnable;
+    m_profilerShouldRunForSeconds = doEnable ? durationInSeconds : 0;
+}
+
+
+void OccupancyInfoManager::CreateTimer(ProfilerTimerType timerType, unsigned int timeIntervalInSeconds)
+{
+    switch (timerType)
+    {
+    case PROFILEDELAYTIMER:
+        if (m_delayTimer == nullptr && timeIntervalInSeconds > 0)
+        {
+            m_delayTimer = new ProfilerTimer(timeIntervalInSeconds * 1000);
+            m_delayTimer->SetTimerType(PROFILEDELAYTIMER);
+            m_bDelayStartEnabled = true;
+            m_secondsToDelay = timeIntervalInSeconds;
+        }
+
+        break;
+
+    case PROFILEDURATIONTIMER:
+        if (m_durationTimer == nullptr && timeIntervalInSeconds > 0)
+        {
+            m_durationTimer = new ProfilerTimer(timeIntervalInSeconds * 1000);
+            m_durationTimer->SetTimerType(PROFILEDURATIONTIMER);
+            m_bProfilerDurationEnabled = true;
+            m_profilerShouldRunForSeconds = timeIntervalInSeconds;
+        }
+
+        break;
+
+    default:
+        break;
+    }
+}
+
+
+
+void OccupancyInfoManager::startTimer(ProfilerTimerType timerType)
+{
+    if (m_delayTimer || m_durationTimer)
+    {
+        switch (timerType)
+        {
+        case PROFILEDELAYTIMER:
+            m_delayTimer->startTimer(true);
+            break;
+
+        case PROFILEDURATIONTIMER:
+            m_durationTimer->startTimer(true);
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+

@@ -82,6 +82,9 @@
     <ClCompile Include="ATPFileUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ProfilerTimer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\Common\Src\DeviceInfo\DeviceInfo.h">
@@ -193,6 +196,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TraceInfoManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProfilerTimer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
