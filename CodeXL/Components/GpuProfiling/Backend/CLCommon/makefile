@@ -23,8 +23,7 @@ LIB_OBJS =  \
 	./$(OBJ_DIR)/CLUtils.o \
 	./$(OBJ_DIR)/CLCUInfoBase.o \
 	./$(OBJ_DIR)/CLPlatformInfo.o \
-	./$(OBJ_DIR)/OpenCLModule.o \
-        ./$(OBJ_DIR)/CLProfilerTimer.o
+	./$(OBJ_DIR)/OpenCLModule.o \        
 
 include $(DEPTH)/Build/CommonTargets.mk
 
