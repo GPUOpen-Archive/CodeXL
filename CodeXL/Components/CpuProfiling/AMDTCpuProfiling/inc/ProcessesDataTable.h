@@ -15,7 +15,8 @@ enum ProcessTableCol
 {
     PROCESS_NAME_COL = 0,
     PROCESS_ID_COL,
-    PROCESS_SAMPLE_COL
+    PROCESS_SAMPLE_COL,
+    PROCESS_TBP_PER_COL = PROCESS_SAMPLE_COL + 1
 };
 /// -----------------------------------------------------------------------------------------------
 /// \class Name: ProcessesDataTable : public CPUProfileDataTable

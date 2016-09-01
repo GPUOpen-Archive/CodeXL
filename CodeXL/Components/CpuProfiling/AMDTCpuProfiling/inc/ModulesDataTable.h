@@ -21,7 +21,8 @@ enum ModuleTableCol
     AMDT_MOD_TABLE_MOD_ID = 0,
     AMDT_MOD_TABLE_MOD_NAME,
     AMDT_MOD_TABLE_SYMBOL_LOADED,
-    AMDT_MOD_TABLE_CLU_HS_COL = 1
+    AMDT_MOD_TABLE_CLU_HS_COL = 1,
+    AMDT_MOD_TBP_PER_COL = AMDT_MOD_TABLE_SYMBOL_LOADED + 2
 };
 
 void mergedProfileModuleData(gtVector<AMDTProfileData>& data);

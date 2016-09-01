@@ -23,12 +23,7 @@
 #include <AMDTApplicationFramework/Include/afAppStringConstants.h>
 #include <AMDTApplicationFramework/src/afUtils.h>
 
-// Backend:
-#include <AMDTCpuPerfEventUtils/inc/ViewConfig.h>
-#include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
-
 // Local:
-#include <inc/CPUProfileUtils.h>
 #include <inc/DisplayFilter.h>
 #include <inc/StdAfx.h>
 #include <inc/StringConstants.h>

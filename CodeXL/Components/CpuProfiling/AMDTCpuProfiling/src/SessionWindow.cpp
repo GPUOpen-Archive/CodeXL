@@ -384,7 +384,6 @@ void CpuSessionWindow::onNavigateToDifferentTab(const QString& dest)
         unsigned int pid = param.section(".", 0, 0).toUInt();
         onViewCallGraphView(pid);
     }
-
     else
     {
         QMessageBox::warning(this, "CodeXL Error", "Link Error: " + dest + ".");
@@ -452,36 +451,32 @@ bool CpuSessionWindow::displayOverviewWindow(const osFilePath& filePath)
 
 bool CpuSessionWindow::onViewModulesView(SYSTEM_DATA_TAB_CONTENT aggregateBy)
 {
-    (void)(aggregateBy); // unused
-    //bool ret = checkIfDataIsPresent();
+    GT_UNREFERENCED_PARAMETER(aggregateBy);
 
-    if (true)
+    if (m_pSessionModulesView == nullptr)
     {
-        if (m_pSessionModulesView == nullptr)
+        m_pSessionModulesView = new SessionModulesView(m_pTabWidget, this);
+
+
+        // Get the modules item data:
+        afApplicationTreeItemData* pModuleItemData = CpuProfileTreeHandler::instance().findChildItemData(m_pSessionTreeItemData, AF_TREE_ITEM_PROFILE_CPU_MODULES);
+        GT_IF_WITH_ASSERT(pModuleItemData != nullptr)
         {
-            m_pSessionModulesView = new SessionModulesView(m_pTabWidget, this);
-
-
-            // Get the modules item data:
-            afApplicationTreeItemData* pModuleItemData = CpuProfileTreeHandler::instance().findChildItemData(m_pSessionTreeItemData, AF_TREE_ITEM_PROFILE_CPU_MODULES);
-            GT_IF_WITH_ASSERT(pModuleItemData != nullptr)
-            {
-                m_pSessionModulesView->display(pModuleItemData);
-            }
-
-            // Look for the icon for this tab:
-            QPixmap* pPixmap = ProfileApplicationTreeHandler::instance()->TreeItemTypeToPixmap(AF_TREE_ITEM_PROFILE_CPU_MODULES);
-
-            // Add the modules tab to the navigator:
-            AddTabToNavigatorBar(m_pSessionModulesView, CP_STR_ModulesTabTitle, pPixmap);
+            m_pSessionModulesView->display(pModuleItemData);
         }
 
-        m_pTabWidget->setCurrentWidget(m_pSessionModulesView);
-        m_pSessionModulesView->setFocus();
+        // Look for the icon for this tab:
+        QPixmap* pPixmap = ProfileApplicationTreeHandler::instance()->TreeItemTypeToPixmap(AF_TREE_ITEM_PROFILE_CPU_MODULES);
 
-        // BUG421904: Set Module view m_CLUNoteShown to current clu flag
-        CPUProfileDataTable::m_CLUNoteShown = m_pSessionModulesView->m_CLUNoteShown;
+        // Add the modules tab to the navigator:
+        AddTabToNavigatorBar(m_pSessionModulesView, CP_STR_ModulesTabTitle, pPixmap);
     }
+
+    m_pTabWidget->setCurrentWidget(m_pSessionModulesView);
+    m_pSessionModulesView->setFocus();
+
+    // BUG421904: Set Module view m_CLUNoteShown to current clu flag
+    CPUProfileDataTable::m_CLUNoteShown = m_pSessionModulesView->m_CLUNoteShown;
 
     return true;
 }
@@ -494,8 +489,6 @@ void CpuSessionWindow::onViewSourceViewSlot(std::tuple<AMDTFunctionId, const gtS
     QWidget* pOldTab = FindTab(caption);
     SessionSourceCodeView* pSourceCodeView = (SessionSourceCodeView*)pOldTab;
 
-    //bool createdNewView = false;
-
     if (nullptr == pSourceCodeView)
     {
         // Create new source tab:
@@ -503,8 +496,6 @@ void CpuSessionWindow::onViewSourceViewSlot(std::tuple<AMDTFunctionId, const gtS
         m_sessionFile.getFileDirectory(sessionDir);
         QString sessionFileStr = acGTStringToQString(sessionDir.directoryPath().asString());
         pSourceCodeView = new SessionSourceCodeView(m_pTabWidget, this, sessionFileStr);
-
-        //createdNewView = true;
     }
 
     if (nullptr != pSourceCodeView)
@@ -526,13 +517,6 @@ void CpuSessionWindow::onViewSourceViewSlot(std::tuple<AMDTFunctionId, const gtS
         QPixmap* pPixmap = ProfileApplicationTreeHandler::instance()->TreeItemTypeToPixmap(AF_TREE_ITEM_PROFILE_CPU_SOURCE_CODE);
 
         AddTabToNavigatorBar(pSourceCodeView, caption, pPixmap);
-
-        // Baskar: FIXME why?
-        //if (createdNewView)
-        //{
-        //    // Do not redisplay address for alredy displayed source code view:
-        //    pSourceCodeView->DisplayAddress(0, pid, SHOW_ALL_TIDS);
-        //}
 
         // TODO: Baskar: Shouldn't we pass the correct address?
         pSourceCodeView->DisplayAddress(0, pid, SHOW_ALL_TIDS);
@@ -575,7 +559,7 @@ void CpuSessionWindow::onViewSourceView(gtVAddr Address, ProcessIdType pid, Thre
 
     if (createdNewView || Address > 0)
     {
-        // Do not redisplay address for alredy displayed source code view:
+        // Do not redisplay address for already displayed source code view:
         pSourceCodeView->DisplayAddress(Address, pid, tid);
     }
 
@@ -1331,4 +1315,27 @@ bool CpuSessionWindow::IsProfilingTypeCLU()
     }
 
     return retVal;
+}
+
+AMDTProfileType CpuSessionWindow::GetProfileType()
+{
+    AMDTProfileType profType = AMDT_PROFILE_TYPE_OTHERS;
+
+    AMDTProfileSessionInfo sessionInfo;
+
+    if (nullptr != m_pProfDataRd &&
+        nullptr != m_pDisplayFilter &&
+        m_pProfDataRd->GetProfileSessionInfo(sessionInfo))
+    {
+        if (sessionInfo.m_sessionType == L"Time-based Sampling")
+        {
+            profType = AMDT_PROFILE_TYPE_TBP;
+        }
+        else if (sessionInfo.m_sessionType == L"Cache Line Utilization")
+        {
+            profType = AMDT_PROFILE_TYPE_CLU;
+        }
+    }
+
+    return profType;
 }

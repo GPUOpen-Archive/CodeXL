@@ -27,7 +27,8 @@ enum FunctionSummaryCol
     AMDT_FUNC_SUMMMARY_FUNC_MODULE_COL,
     AMDT_FUNC_FUNC_NAME_COL = AMDT_FUNC_SUMMMARY_FUNC_NAME_COL,
     AMDT_FUNC_FUNC_MODULE_COL,
-    AMDT_FUNC_START_SAMPLE
+    AMDT_FUNC_START_SAMPLE,
+    AMDT_FUNC_TBP_PER_COL = AMDT_FUNC_START_SAMPLE + 1
 };
 
 /// -----------------------------------------------------------------------------------------------

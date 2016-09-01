@@ -297,7 +297,8 @@ bool FunctionsDataTable::fillSummaryTables(int counterIdx)
 
             addRow(list, nullptr);
 
-            SetSummaryTabDelegateItemCol(AMDT_FUNC_SUMMMARY_FUNC_SAMPLE_COL);
+			// for summary table
+            SetDelegateItemColumn(AMDT_FUNC_SUMMMARY_FUNC_SAMPLE_COL, true);
 
             if (!SetSummaryTabIcon(AMDT_FUNC_SUMMMARY_FUNC_NAME_COL,
                                    AMDT_FUNC_SUMMMARY_FUNC_PER_SAMPLE_COL,
@@ -336,9 +337,9 @@ bool FunctionsDataTable::fillSummaryTables(int counterIdx)
 
 bool FunctionsDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allModuleData)
 {
-    if (!allModuleData.empty())
-    {
-        setSortingEnabled(false);
+	if (!allModuleData.empty())
+	{
+		setSortingEnabled(false);
 
         for (auto profData : allModuleData)
         {
@@ -365,42 +366,8 @@ bool FunctionsDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allModul
 
             list << acGTStringToQString(procInfo.at(0).m_name);
 
-            m_pDisplayFilter->GetSelectedCounterList(selectedCounterList);
-            int i = 0;
-
-            for (auto counter : selectedCounterList)
-            {
-                // get counter type
-                AMDTProfileCounterType counterType = static_cast<AMDTProfileCounterType>(std::get<4>(counter));
-                bool setSampleValue = true;
-
-                if (counterType == AMDT_PROFILE_COUNTER_TYPE_RAW)
-                {
-                    if (m_pDisplayFilter->GetSamplePercent() == true)
-                    {
-                        list << QString::number(profData.m_sampleValue.at(i++).m_sampleCountPercentage, 'f', SAMPLE_PERCENT_PRECISION);
-                        delegateSamplePercent(AMDT_FUNC_FUNC_MODULE_COL + i);
-                        setSampleValue = false;
-                    }
-                }
-
-                if (true == setSampleValue)
-                {
-                    double sampleCnt = profData.m_sampleValue.at(i++).m_sampleCount;
-                    setItemDelegateForColumn(AMDT_FUNC_FUNC_MODULE_COL + i, &acNumberDelegateItem::Instance());
-
-                    if (0 == sampleCnt)
-                    {
-                        list << "";
-                    }
-                    else
-                    {
-                        list << QString::number(sampleCnt, 'f', SAMPLE_VALUE_PRECISION);
-                    }
-                }
-            }
-
-            addRow(list, nullptr);
+			SetTableSampleCntAndPercent(list, AMDT_FUNC_FUNC_MODULE_COL, profData);
+			addRow(list, nullptr);
 
             SetIcon(procInfo.at(0).m_path,
                     rowCount() - 1,
@@ -409,9 +376,8 @@ bool FunctionsDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allModul
                     !procInfo.at(0).m_is64Bit,
                     FunctionDataIndexRole);
 
-        }
+		}
     }
-
     return true;
 }
 
@@ -453,6 +419,8 @@ bool FunctionsDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId,
 
         setColumnWidth(AMDT_FUNC_SUMMMARY_FUNC_NAME_COL, MAX_FUNCTION_NAME_LEN);
         hideColumn(AMDT_FUNC_SUMMMARY_FUNC_ID_COL);
+
+		IfTbpSetPercentCol(AMDT_FUNC_TBP_PER_COL);
         setColumnWidth(AMDT_FUNC_SUMMMARY_FUNC_NAME_COL + 1, MAX_MODULE_NAME_LEN);
 
         retVal = true;

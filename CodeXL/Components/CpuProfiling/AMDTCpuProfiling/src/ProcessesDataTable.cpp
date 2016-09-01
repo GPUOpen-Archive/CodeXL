@@ -85,7 +85,8 @@ bool ProcessesDataTable::fillSummaryTables(int counterIdx)
 
                 addRow(list, nullptr);
 
-                SetSummaryTabDelegateItemCol(PROCESS_SAMPLE_COL);
+				// for summary table
+				SetDelegateItemColumn(PROCESS_SAMPLE_COL, true);
 
             }
 
@@ -147,42 +148,7 @@ bool ProcessesDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allProce
             list << procInfo.at(0).m_name.asASCIICharArray();
             list << QString::number(procInfo.at(0).m_pid);
 
-
-            m_pDisplayFilter->GetSelectedCounterList(selectedCounterList);
-            int i = 0;
-
-            for (auto counter : selectedCounterList)
-            {
-                // get counter type
-                AMDTProfileCounterType counterType = static_cast<AMDTProfileCounterType>(std::get<4>(counter));
-                bool setSampleValue = true;
-
-                if (counterType == AMDT_PROFILE_COUNTER_TYPE_RAW)
-                {
-                    if (m_pDisplayFilter->GetSamplePercent() == true)
-                    {
-                        list << QString::number(profData.m_sampleValue.at(i++).m_sampleCountPercentage, 'f', SAMPLE_PERCENT_PRECISION);
-                        delegateSamplePercent(PROCESS_ID_COL + i);
-                        setSampleValue = false;
-                    }
-                }
-
-                if (true == setSampleValue)
-                {
-                    double sampleCnt = profData.m_sampleValue.at(i++).m_sampleCount;
-                    setItemDelegateForColumn(PROCESS_ID_COL + i, &acNumberDelegateItem::Instance());
-
-                    if (0 == sampleCnt)
-                    {
-                        list << "";
-                    }
-                    else
-                    {
-                        list << QString::number(sampleCnt, 'f', SAMPLE_VALUE_PRECISION);
-                    }
-                }
-            }
-
+            SetTableSampleCntAndPercent(list, PROCESS_ID_COL, profData);
             addRow(list, nullptr);
         }
 
@@ -225,7 +191,9 @@ bool ProcessesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId,
         }
 
         AddRowToTable(allProcessData);
+        IfTbpSetPercentCol(PROCESS_TBP_PER_COL);
         setColumnWidth(PROCESS_NAME_COL, MAX_PROCESS_NAME_LEN);
+
         retVal = true;
     }
 
