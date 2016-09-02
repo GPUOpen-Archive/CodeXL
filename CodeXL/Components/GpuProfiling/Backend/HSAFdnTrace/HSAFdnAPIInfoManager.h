@@ -14,7 +14,12 @@
 
 #include "../Common/APIInfoManagerBase.h"
 #include "HSAAPIBase.h"
+#include "../common/ProfilerTimer.h"
 
+
+/// Handle the response on the end of the timer
+/// \param timerType type of the ending timer for which response have to be executed
+void HSATraceAgentTimerEndResponse(ProfilerTimerType timerType);
 
 class HSAAPIInfoManager :
     public APIInfoManagerBase, public TSingleton<HSAAPIInfoManager>
@@ -43,6 +48,40 @@ public:
     /// \param[out] queueIndex the index of the specified queue (if found)
     /// \return true if the queueu is known, false otherwise
     bool GetQueueIndex(const hsa_queue_t* pQueue, size_t& queueIndex) const;
+
+    /// Enables or Disables the profiler delay
+    /// \param doEnable true for enable and false for disable
+    /// \param delayInSeconds seconds to delay the profiler
+    void EnableProfileDelayStart(bool doEnable, unsigned int delayInSeconds = 0);
+
+    /// Enables or Disables the profiler duration
+    /// \param doEnable true for enable and false for disable
+    /// \param durationInSeconds profiler duration in seconds
+    void EnableProfileDuration(bool doEnable, unsigned int durationInSeconds = 0);
+
+    /// Indicates whether profiler should run after delay or not
+    /// \param delayInSeconds to return the amount by which profile set to be delayed
+    /// \returns true if delay is enabled
+    bool IsProfilerDelayEnabled(unsigned int& delayInSeconds);
+
+    /// Indicates whether profiler should run only for set duration or not
+    /// \param durationInSeconds to return the amount by which profile set to run
+    /// \returns true if duration of the profiler is enabled
+    bool IsProfilerDurationEnabled(unsigned int& durationInSeconds);
+
+    /// Assigns the call back function
+    /// \param timerType type of the timer
+    /// \param timerEndHandler call back function pointer
+    void SetTimerFinishHandler(ProfilerTimerType timerType, TimerEndHandler timerEndHandler);
+
+    /// Creates the Profiler Timer
+    /// \param timerType timer type of the starting timer
+    /// \param timeIntervalInSeconds profiler duration or profiler delay in seconds
+    void CreateTimer(ProfilerTimerType timerType, unsigned int timeIntervalInSeconds);
+
+    /// Starts the timer
+    /// \param timerType Type of the the timer
+    void startTimer(ProfilerTimerType timerType);
 
 protected:
     /// Flush non-API timestamp data to the output stream
@@ -78,6 +117,13 @@ private:
     std::set<HSA_API_Type> m_filterAPIs;         ///< HSA APIs that are not traced due to API filtering
     std::set<HSA_API_Type> m_mustInterceptAPIs;  ///< HSA APIs that must be intercepted (even when they are filtered out and not traced)
     QueueIndexMap          m_queueIndexMap;      ///< map of a queue to that queue's index (basically creation order)
+    bool                    m_bDelayStartEnabled;                ///< flag indicating whether or not the profiler should start with delay or not
+    bool                    m_bProfilerDurationEnabled;          ///< Flag indiacating whether profiler should only run for certain duration
+    unsigned int            m_secondsToDelay;                    ///< Seconds to delay for profiler to start
+    unsigned int            m_profilerShouldRunForSeconds;       ///< Duration in seconds for which Profiler should run
+    ProfilerTimer*          m_delayTimer;                        ///< timer for handling delay timer for the profile agent
+    ProfilerTimer*          m_durationTimer;                     ///< timer for handling duration timer for the profile agent
+
 };
 
 #endif // _HSA_FDN_API_INFO_MANAGER_H_

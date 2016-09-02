@@ -17,6 +17,11 @@
 #include "TSingleton.h"
 #include "AMDTMutex.h"
 #include "../Common/KernelStats.h"
+#include "../Common/ProfilerTimer.h"
+
+/// Handle the response on the end of the timer
+/// \param timerType type of the ending timer for which response have to be executed
+void HSAGPAProfilerTimerEndResponse(ProfilerTimerType timerType);
 
 //------------------------------------------------------------------------------------
 /// This class interfaces with GPA to retrieve PMC and save to file
@@ -73,6 +78,30 @@ public:
     /// Enable to disable profiling
     /// \param doEnable, flag indicating whether to enable (true) or disable (false) profiling
     void EnableProfiling(bool doEnable) { m_isProfilingEnabled = doEnable; }
+
+    /// Indicates whether profiler should run after delay or not
+    /// \param delayInSeconds to return the amount by which profile set to be delayed
+    /// \returns true if delay is enabled otherwise false
+    bool IsProfilerDelayEnabled(unsigned int& delayInSeconds);
+
+    /// Indicates whether profiler should run only for set duration or not
+    /// \param durationInSeconds to return the amount by which profile set to run
+    /// \returns true if duration of the profiler is enabled
+    bool IsProfilerDurationEnabled(unsigned int& durationInSeconds);
+
+    /// Assigns the call back function
+    /// \param timerType type of the timer
+    /// \param timerEndHandler call back function pointer
+    void SetTimerFinishHandler(ProfilerTimerType timerType, TimerEndHandler timerEndHandler);
+
+    /// Creates the Profiler Timer
+    /// \param timerType timer type of the starting timer
+    /// \param timeIntervalInSeconds profiler duration or profiler delay in seconds
+    void CreateTimer(ProfilerTimerType timerType, unsigned int timeIntervalInSeconds);
+
+    /// Starts the timer if it is set properly
+    /// \param timerType timer type of the starting timer
+    void StartTimer(ProfilerTimerType timerType);
 
 protected:
     /// Constructor
@@ -140,15 +169,21 @@ private:
     /// Typedef for holding a map of active session per queue
     typedef std::unordered_map<uint64_t, SessionInfo> QueueSessionMap;
 
-    std::string             m_strOutputFile;         ///< Output file
-    GPAUtils                m_gpaUtils;              ///< common GPA utility functions
-    AMDTMutex               m_mtx;                   ///< mutex
-    QueueSessionMap         m_activeSessionMap;      ///< map of active session per queue
-    unsigned int            m_uiCurKernelCount;      ///< number of kernels that have been profiled.
-    unsigned int            m_uiMaxKernelCount;      ///< max number of kernels to profile.
-    unsigned int            m_uiOutputLineCount;     ///< number of items written to the output file
-    bool                    m_isProfilingEnabled;    ///< flag indicating if profiling is currently enabled
-    bool                    m_isProfilerInitialized; ///< flag indicating if the profiler object has been initialized already
+    std::string             m_strOutputFile;                     ///< Output file
+    GPAUtils                m_gpaUtils;                          ///< common GPA utility functions
+    AMDTMutex               m_mtx;                               ///< mutex
+    QueueSessionMap         m_activeSessionMap;                  ///< map of active session per queue
+    unsigned int            m_uiCurKernelCount;                  ///< number of kernels that have been profiled.
+    unsigned int            m_uiMaxKernelCount;                  ///< max number of kernels to profile.
+    unsigned int            m_uiOutputLineCount;                 ///< number of items written to the output file
+    bool                    m_isProfilingEnabled;                ///< flag indicating if profiling is currently enabled
+    bool                    m_isProfilerInitialized;             ///< flag indicating if the profiler object has been initialized already
+    bool                    m_bDelayStartEnabled;                ///< flag indicating whether or not the profiler should start with delay or not
+    bool                    m_bProfilerDurationEnabled;          ///< Flag indiacating whether profiler should only run for certain duration
+    unsigned int            m_secondsToDelay;                    ///< Seconds to delay for profiler to start
+    unsigned int            m_profilerShouldRunForSeconds;       ///< Duration in seconds for which Profiler should run
+    ProfilerTimer*          m_delayTimer;                        ///< timer for handling delay timer for the profile agent
+    ProfilerTimer*          m_durationTimer;                     ///< timer for handling duration timer for the profile agent
 };
 
 #endif  //_HSA_GPA_PROFILE_H_
