@@ -7,6 +7,7 @@
 
 #include <string>
 #include <algorithm>
+#include <fstream>
 #include "HSAFdnAPIInfoManager.h"
 #include "HSAToolsRTModule.h"
 #include "HSARTModuleLoader.h"
@@ -34,7 +35,7 @@ HSAAPIInfoManager::~HSAAPIInfoManager(void)
 {
 }
 
-bool HSAAPIInfoManager::WriteKernelTimestampEntry(std::ostream& sout, hsa_profiler_kernel_time_t record)
+bool HSAAPIInfoManager::WriteKernelTimestampEntry(std::ostream& sout, const hsa_profiler_kernel_time_t& record)
 {
     FinalizerInfoManager* pFinalizerInfoMan = FinalizerInfoManager::Instance();
 
@@ -119,7 +120,7 @@ bool HSAAPIInfoManager::WriteKernelTimestampEntry(std::ostream& sout, hsa_profil
     return true;
 }
 
-void HSAAPIInfoManager::FlushNonAPITimestampData(std::ostream& sout)
+void HSAAPIInfoManager::FlushNonAPITimestampData(const osProcessId& pid)
 {
     if (HSARTModuleLoader<HSAToolsRTModule>::Instance()->IsLoaded())
     {
@@ -135,13 +136,18 @@ void HSAAPIInfoManager::FlushNonAPITimestampData(std::ostream& sout)
 
                 if (NULL != records)
                 {
+                    string tmpKernelTimestampFile = GetTempFileName(pid, 0, TMP_KERNEL_TIME_STAMP_EXT);
+                    ofstream foutKTS(tmpKernelTimestampFile.c_str(), fstream::out | fstream::app);
+
                     count = toolsRTModule->ext_tools_get_kernel_times(count, records);
 
                     for (size_t i = 0; i < count; i++)
                     {
-                        WriteKernelTimestampEntry(sout, records[i]);
-                        sout << std::endl;
+                        WriteKernelTimestampEntry(foutKTS, records[i]);
+                        foutKTS << std::endl;
                     }
+
+                    foutKTS.close();
                 }
                 else
                 {

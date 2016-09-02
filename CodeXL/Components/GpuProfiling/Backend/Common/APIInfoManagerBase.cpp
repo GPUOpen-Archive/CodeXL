@@ -88,7 +88,7 @@ APIInfoManagerBase::~APIInfoManagerBase(void)
 {
 }
 
-std::string APIInfoManagerBase::GetTempFileName(osProcessId pid, osThreadId tid, const std::string& strExtension)
+std::string APIInfoManagerBase::GetTempFileName(const osProcessId& pid, const osThreadId& tid, const std::string& strExtension)
 {
     stringstream ss;
     std::string path;
@@ -187,10 +187,7 @@ void APIInfoManagerBase::FlushTraceData(bool bForceFlush)
         }
     }
 
-    string tmpKernelTimestampFile = GetTempFileName(pid, 0, TMP_KERNEL_TIME_STAMP_EXT);
-    ofstream foutKTS(tmpKernelTimestampFile.c_str(), fstream::out | fstream::app);
-    FlushNonAPITimestampData(foutKTS);
-    foutKTS.close();
+    FlushNonAPITimestampData(pid);
 
     m_mtxFlush.Unlock();
 }
@@ -398,10 +395,10 @@ void APIInfoManagerBase::SetOutputFile(const std::string& strFileName)
     m_strOutputFile = ss.str();
 }
 
-void APIInfoManagerBase::FlushNonAPITimestampData(std::ostream& sout)
+void APIInfoManagerBase::FlushNonAPITimestampData(const osProcessId& pid)
 {
     // do nothing in base class
-    SP_UNREFERENCED_PARAMETER(sout);
+    SP_UNREFERENCED_PARAMETER(pid);
 }
 
 void APIInfoManagerBase::AddAPIToFilter(const std::string& strAPIName)

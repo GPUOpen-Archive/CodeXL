@@ -135,8 +135,8 @@ protected:
     void WriteStackTraceDataToStream(std::ostream& sout);
 
     /// Write non-API timing data to stream
-    /// \param sout output stream
-    virtual void FlushNonAPITimestampData(std::ostream& sout);
+    /// \param pid the process id of the profiled process
+    virtual void FlushNonAPITimestampData(const osProcessId& pid);
 
     /// Add the specified api to the list of APIs to filter
     /// \param strAPIName the name of the API to add to the filter
@@ -147,7 +147,7 @@ protected:
     /// \param tid the thread id
     /// \param strExtension the extension
     /// \return the full path of the temp file name
-    std::string GetTempFileName(osProcessId pid, osThreadId tid, const std::string& strExtension);
+    std::string GetTempFileName(const osProcessId& pid, const osThreadId& tid, const std::string& strExtension);
 
 protected:
     ULONGLONG     m_ullStart;            ///< first time stamp of the whole program

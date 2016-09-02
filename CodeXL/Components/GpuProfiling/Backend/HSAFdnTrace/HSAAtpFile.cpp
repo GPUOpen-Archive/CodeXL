@@ -323,7 +323,10 @@ bool HSAAtpFilePart::Parse(std::istream& in, std::string& outErrorMsg)
             }
             else
             {
-                if (!bKTSStart)
+                size_t sectionNameStart = line.find_first_not_of('=');
+                size_t sectionNameEnd = line.find_last_not_of('=');
+                string sectionName = line.substr(sectionNameStart, line.size() - sectionNameStart - sectionNameEnd);
+                if (!bKTSStart && (0 == sectionName.compare(s_HSA_KERNEL_TIMESTAMP_OUTPUT)))
                 {
                     bKTSStart = true;
                     strProgressMessage = "Parsing Kernel Timestamp Data...";

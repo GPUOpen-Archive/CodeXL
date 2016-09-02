@@ -46,8 +46,8 @@ public:
 
 protected:
     /// Flush non-API timestamp data to the output stream
-    /// \param foutTS the output stream to write data to
-    virtual void FlushNonAPITimestampData(std::ostream& sout);
+    /// \param pid the process id of the profiled process
+    virtual void FlushNonAPITimestampData(const osProcessId& pid);
 
     /// Add the specified api to the list of APIs to filter
     /// \param strAPIName the name of the API to add to the filter
@@ -60,7 +60,7 @@ private:
     /// Write kernel timestamp data to stream
     /// \param sout the output stream
     /// \param record the kernel timestamp record to write to the stream
-    bool WriteKernelTimestampEntry(std::ostream& sout, hsa_profiler_kernel_time_t record);
+    bool WriteKernelTimestampEntry(std::ostream& sout, const hsa_profiler_kernel_time_t& record);
 
     /// Check if specified API is in API filter list
     /// \param type HSA function type
