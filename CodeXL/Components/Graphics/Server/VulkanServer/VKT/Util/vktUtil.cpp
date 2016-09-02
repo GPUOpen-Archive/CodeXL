@@ -92,7 +92,7 @@ std::string VktUtil::GetLayerName()
 #ifdef CODEXL_GRAPHICS
     std::string layerNameA = "libCXLGraphicsServerVulkan";
 #else
-    std::string layerNameA = "libVulkanServer";
+    std::string layerNameA = "VulkanServer";
 #endif
 
 #else

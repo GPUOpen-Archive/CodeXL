@@ -232,12 +232,18 @@ protected:
     QTableWidgetItem* m_pOtherSamplesRowItem = nullptr;
 
     bool SetSampleCountAndPercent(const AMDTSampleValueVec& sampleVector, QStringList& list);
-    void SetSummaryTabDelegateItemCol(int colNum);
+    void SetDelegateItemColumn(int colNum, bool isSummaryTable);
     bool SetSummaryTabIcon(gtUInt16 iconColNum,
                            gtUInt16 percentColIndex,
                            gtUInt16 samplesColIndex,
                            gtUInt32 modId,
                            const osFilePath& modulePath);
+
+    void SetTableSampleCntAndPercent(QStringList& list,
+                                     gtUInt16 delegateColIdx,
+                                     AMDTProfileData profData);
+
+    void IfTbpSetPercentCol(int colIdx);
 
     enum
     {

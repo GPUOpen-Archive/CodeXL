@@ -52,6 +52,7 @@ class CPUSessionTreeItemData;
 class SessionCallGraphView;
 class cxlProfileDataReader;
 
+
 class CpuSessionWindow : public SharedSessionWindow
 {
     Q_OBJECT
@@ -99,6 +100,7 @@ public:
     std::shared_ptr<cxlProfileDataReader> profDbReader() { return m_pProfDataRd; }
     std::shared_ptr<DisplayFilter> GetDisplayFilter() { return m_pDisplayFilter; }
     bool IsProfilingTypeCLU();
+    AMDTProfileType GetProfileType();
 
 public slots:
 

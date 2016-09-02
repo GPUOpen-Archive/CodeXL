@@ -268,8 +268,6 @@
     <None Include="ui\iDisplayFilterDlg.ui">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="src\SConscript" />
-    <None Include="inc\SConscript" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

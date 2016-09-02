@@ -93,6 +93,13 @@ private:
     static CPUGlobalDisplayFilter* m_psMySingleInstance;
 };
 
+enum AMDTProfileType
+{
+    AMDT_PROFILE_TYPE_CLU,
+    AMDT_PROFILE_TYPE_TBP,
+    AMDT_PROFILE_TYPE_OTHERS,
+};
+
 typedef gtMap<QString, ViewElementType> ConfigurationMap;
 
 /// -----------------------------------------------------------------------------------------------
@@ -229,6 +236,10 @@ public:
     void SetViewName(const QString& viewName) { m_viewName = viewName; }
     QString GetViewName() const { return m_viewName; }
 
+    //ProfileType
+    AMDTProfileType GetProfileType() const { return m_profType; }
+    void SetProfileType(AMDTProfileType type) { m_profType = type; }
+
 private:
     void SetProfileDataOption();
 
@@ -245,6 +256,8 @@ private:
     bool                                    m_isCLUPercent = true;
     QString                                 m_viewName;
     gtUInt32                                m_coreCount;
+    bool                                    m_isTbp = false;
+    AMDTProfileType                         m_profType = AMDT_PROFILE_TYPE_OTHERS;
 };
 
 #endif //__DISPLAYFILTER_H

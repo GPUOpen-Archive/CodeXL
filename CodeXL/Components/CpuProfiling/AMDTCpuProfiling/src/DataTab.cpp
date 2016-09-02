@@ -71,6 +71,11 @@ DataTab::DataTab(QWidget* pParent, CpuSessionWindow* pParentSessionWindow, const
         m_isCLU = pParentSessionWindow->IsProfilingTypeCLU();
         m_pDisplayFilter = pParentSessionWindow->GetDisplayFilter();
 
+        if (nullptr != m_pDisplayFilter)
+        {
+            m_pDisplayFilter->SetProfileType(pParentSessionWindow->GetProfileType());
+        }
+
         AMDTProfileCounterDescVec counterDesc;
         m_pProfDataRdr->GetSampledCountersList(counterDesc);
         int idx = 0;

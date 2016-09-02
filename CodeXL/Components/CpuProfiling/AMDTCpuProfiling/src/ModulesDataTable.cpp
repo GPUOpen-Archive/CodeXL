@@ -178,7 +178,8 @@ bool ModulesDataTable::fillSummaryTables(int counterIdx)
 
             addRow(list, nullptr);
 
-            SetSummaryTabDelegateItemCol(AMDT_MOD_TABLE_CLU_HS_COL);
+			// for summary table
+            SetDelegateItemColumn(AMDT_MOD_TABLE_CLU_HS_COL, true);
 
             if (!SetSummaryTabIcon(AMDT_MOD_TABLE_SUMMARY_MOD_NAME,
                                    AMDT_MOD_TABLE_SUMMARY_SAMPLE_PER,
@@ -241,6 +242,8 @@ bool ModulesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, s
 
         hideColumn(AMDT_MOD_TABLE_MOD_ID);
         setColumnWidth(AMDT_MOD_TABLE_SUMMARY_MOD_NAME, MAX_MODULE_NAME_LEN);
+		IfTbpSetPercentCol(AMDT_MOD_TBP_PER_COL);
+
         retVal = true;
     }
 
@@ -287,42 +290,7 @@ bool ModulesDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allProcess
             gtString symbols = procInfo.at(0).m_foundDebugInfo ? L"Loaded" : L"Not Loaded";
 
             list << acGTStringToQString(symbols);
-
-            m_pDisplayFilter->GetSelectedCounterList(selectedCounterList);
-            int i = 0;
-
-            for (auto counter : selectedCounterList)
-            {
-                // get counter type
-                AMDTProfileCounterType counterType = static_cast<AMDTProfileCounterType>(std::get<4>(counter));
-                bool setSampleValue = true;
-
-                if (counterType == AMDT_PROFILE_COUNTER_TYPE_RAW)
-                {
-                    if (m_pDisplayFilter->GetSamplePercent() == true)
-                    {
-                        list << QString::number(profData.m_sampleValue.at(i++).m_sampleCountPercentage, 'f', SAMPLE_PERCENT_PRECISION);
-                        delegateSamplePercent(AMDT_MOD_TABLE_SYMBOL_LOADED + i);
-                        setSampleValue = false;
-                    }
-                }
-
-                if (true == setSampleValue)
-                {
-                    double sampleCnt = profData.m_sampleValue.at(i++).m_sampleCount;
-                    setItemDelegateForColumn(AMDT_MOD_TABLE_SYMBOL_LOADED + i, &acNumberDelegateItem::Instance());
-
-                    if (0 == sampleCnt)
-                    {
-                        list << "";
-                    }
-                    else
-                    {
-                        list << QString::number(sampleCnt, 'f', SAMPLE_VALUE_PRECISION);
-                    }
-                }
-            }
-
+			SetTableSampleCntAndPercent(list, AMDT_MOD_TABLE_SYMBOL_LOADED, profData);
             addRow(list, nullptr);
 
             AMDTProfileModuleInfoVec modInfo;

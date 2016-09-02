@@ -887,6 +887,11 @@ bool CPUProfileDataTable::initializeTableHeaders(std::shared_ptr<DisplayFilter> 
             {
                 // print counter abbreviation
                 columnsStringByObjectType << acGTStringToQString(std::get<1>(counter));
+
+                if (diplayFilter->GetProfileType() == AMDT_PROFILE_TYPE_TBP)
+                {
+                    columnsStringByObjectType << "Timer Percentage";
+                }
             }
         }
 
@@ -957,7 +962,7 @@ bool CPUProfileDataTable::SetSampleCountAndPercent(const AMDTSampleValueVec& sam
     return retVal;
 }
 
-void CPUProfileDataTable::SetSummaryTabDelegateItemCol(int colNum)
+void CPUProfileDataTable::SetDelegateItemColumn(int colNum, bool isSummaryTable)
 {
     if (m_isCLU)
     {
@@ -969,6 +974,10 @@ void CPUProfileDataTable::SetSummaryTabDelegateItemCol(int colNum)
         {
             setItemDelegateForColumn(colNum, &acNumberDelegateItem::Instance());
         }
+    }
+    else if ((m_pDisplayFilter->GetProfileType() == AMDT_PROFILE_TYPE_TBP) && (!isSummaryTable))
+    {
+        delegateSamplePercent(colNum);
     }
     else
     {
@@ -1027,4 +1036,76 @@ bool CPUProfileDataTable::SetSummaryTabIcon(gtUInt16 iconColNum,
     }
 
     return retVal;
+}
+
+void CPUProfileDataTable::SetTableSampleCntAndPercent(QStringList& list,
+                                                      gtUInt16 delegateColIdx,
+                                                      AMDTProfileData profData)
+{
+    CounterNameIdVec selectedCounterList;
+
+    if (nullptr != m_pDisplayFilter)
+    {
+        m_pDisplayFilter->GetSelectedCounterList(selectedCounterList);
+        int i = 0;
+
+        for (auto counter : selectedCounterList)
+        {
+            // get counter type
+            AMDTProfileCounterType counterType = static_cast<AMDTProfileCounterType>(std::get<4>(counter));
+            bool setSampleValue = true;
+
+            if (counterType == AMDT_PROFILE_COUNTER_TYPE_RAW)
+            {
+                if ((m_pDisplayFilter->GetSamplePercent() == true) && (m_pDisplayFilter->GetProfileType() != AMDT_PROFILE_TYPE_TBP))
+                {
+                    list << QString::number(profData.m_sampleValue.at(i++).m_sampleCountPercentage, 'f', SAMPLE_PERCENT_PRECISION);
+                    delegateSamplePercent(delegateColIdx + i);
+                    setSampleValue = false;
+                }
+            }
+
+            if (setSampleValue)
+            {
+                double sampleCnt = profData.m_sampleValue.at(i).m_sampleCount;
+                setItemDelegateForColumn(delegateColIdx + i, &acNumberDelegateItem::Instance());
+
+                if (0 == sampleCnt)
+                {
+                    list << "";
+                }
+                else
+                {
+                    list << QString::number(sampleCnt);
+
+                    if (m_pDisplayFilter->GetProfileType() == AMDT_PROFILE_TYPE_TBP)
+                    {
+                        list << QString::number(profData.m_sampleValue.at(i).m_sampleCountPercentage, 'f', SAMPLE_PERCENT_PRECISION);
+                    }
+                }
+
+                ++i;
+            }
+        }
+    }
+}
+
+void CPUProfileDataTable::IfTbpSetPercentCol(int colIdx)
+{
+    if (m_pDisplayFilter->GetProfileType() == AMDT_PROFILE_TYPE_TBP)
+    {
+        if (!m_pDisplayFilter->GetSamplePercent())
+        {
+            hideColumn(colIdx);
+        }
+        else
+        {
+            SetDelegateItemColumn(colIdx, false);
+        }
+    }
+    else
+    {
+        // reset the delegation column to non delegate
+        setItemDelegateForColumn(colIdx, &acNumberDelegateItem::Instance());
+    }
 }
