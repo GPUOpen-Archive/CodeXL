@@ -190,8 +190,8 @@ OccupancyInfoManager::OccupancyInfoManager() :
     m_bIsProfilingEnabled(true),
     m_bDelayStartEnabled(false),
     m_bProfilerDurationEnabled(false),
-    m_secondsToDelay(0u),
-    m_profilerShouldRunForSeconds(0u)
+    m_delayInMilliseconds(0ul),
+    m_durationInMilliseconds(0ul)
 {
     m_delayTimer = nullptr;
     m_durationTimer = nullptr;
@@ -343,7 +343,7 @@ void CLOccupancyAgentTimerEndResponse(ProfilerTimerType timerType)
         case PROFILEDELAYTIMER:
             OccupancyInfoManager::Instance()->ResumeTracing();
             OccupancyInfoManager::Instance()->EnableProfiling(true);
-            unsigned int profilerDuration;
+            unsigned long profilerDuration;
 
             if (OccupancyInfoManager::Instance()->IsProfilerDurationEnabled(profilerDuration))
             {
@@ -365,15 +365,15 @@ void CLOccupancyAgentTimerEndResponse(ProfilerTimerType timerType)
 }
 
 
-bool OccupancyInfoManager::IsProfilerDelayEnabled(unsigned int& delayInSeconds)
+bool OccupancyInfoManager::IsProfilerDelayEnabled(unsigned long& delayInMilliseconds)
 {
-    delayInSeconds = m_secondsToDelay;
+    delayInMilliseconds = m_delayInMilliseconds;
     return m_bDelayStartEnabled;
 }
 
-bool OccupancyInfoManager::IsProfilerDurationEnabled(unsigned int& profilerDurationInSeconds)
+bool OccupancyInfoManager::IsProfilerDurationEnabled(unsigned long& durationInMilliseconds)
 {
-    profilerDurationInSeconds = m_profilerShouldRunForSeconds;
+    durationInMilliseconds = m_durationInMilliseconds;
     return m_bProfilerDurationEnabled;
 }
 
@@ -394,41 +394,41 @@ void OccupancyInfoManager::SetTimerFinishHandler(ProfilerTimerType timerType, Ti
     }
 }
 
-void OccupancyInfoManager::EnableProfileDelayStart(bool doEnable, unsigned int delayInSeconds)
+void OccupancyInfoManager::EnableProfileDelayStart(bool doEnable, unsigned long delayInSeconds)
 {
     m_bDelayStartEnabled = doEnable;
-    m_secondsToDelay = doEnable ? delayInSeconds : 0;
+    m_delayInMilliseconds = doEnable ? delayInSeconds : 0;
 }
 
-void OccupancyInfoManager::EnableProfileDuration(bool doEnable, unsigned int durationInSeconds)
+void OccupancyInfoManager::EnableProfileDuration(bool doEnable, unsigned long durationInMilliseconds)
 {
     m_bProfilerDurationEnabled = doEnable;
-    m_profilerShouldRunForSeconds = doEnable ? durationInSeconds : 0;
+    m_durationInMilliseconds = doEnable ? durationInMilliseconds : 0;
 }
 
 
-void OccupancyInfoManager::CreateTimer(ProfilerTimerType timerType, unsigned int timeIntervalInSeconds)
+void OccupancyInfoManager::CreateTimer(ProfilerTimerType timerType, unsigned long timeIntervalInMilliseconds)
 {
     switch (timerType)
     {
         case PROFILEDELAYTIMER:
-            if (m_delayTimer == nullptr && timeIntervalInSeconds > 0)
+            if (m_delayTimer == nullptr && timeIntervalInMilliseconds > 0)
             {
-                m_delayTimer = new ProfilerTimer(timeIntervalInSeconds * 1000);
+                m_delayTimer = new ProfilerTimer(timeIntervalInMilliseconds);
                 m_delayTimer->SetTimerType(PROFILEDELAYTIMER);
                 m_bDelayStartEnabled = true;
-                m_secondsToDelay = timeIntervalInSeconds;
+                m_delayInMilliseconds = timeIntervalInMilliseconds;
             }
 
             break;
 
         case PROFILEDURATIONTIMER:
-            if (m_durationTimer == nullptr && timeIntervalInSeconds > 0)
+            if (m_durationTimer == nullptr && timeIntervalInMilliseconds > 0)
             {
-                m_durationTimer = new ProfilerTimer(timeIntervalInSeconds * 1000);
+                m_durationTimer = new ProfilerTimer(timeIntervalInMilliseconds);
                 m_durationTimer->SetTimerType(PROFILEDURATIONTIMER);
                 m_bProfilerDurationEnabled = true;
-                m_profilerShouldRunForSeconds = timeIntervalInSeconds;
+                m_durationInMilliseconds = timeIntervalInMilliseconds;
             }
 
             break;

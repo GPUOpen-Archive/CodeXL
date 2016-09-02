@@ -36,7 +36,13 @@ HSAGPAProfiler::HSAGPAProfiler(void) :
     m_uiMaxKernelCount(DEFAULT_MAX_KERNELS),
     m_uiOutputLineCount(0),
     m_isProfilingEnabled(true),
-    m_isProfilerInitialized(false)
+    m_isProfilerInitialized(false),
+    m_bDelayStartEnabled(false),
+    m_bProfilerDurationEnabled(false),
+    m_delayInMilliseconds(0ul),
+    m_durationInMilliseconds(0ul),
+    m_delayTimer(nullptr),
+    m_durationTimer(nullptr)
 {
 }
 
@@ -46,7 +52,7 @@ void HSAGPAProfilerTimerEndResponse(ProfilerTimerType timerType)
     {
         case PROFILEDELAYTIMER:
             HSAGPAProfiler::Instance()->EnableProfiling(true);
-            unsigned int profilerDuration;
+            unsigned long profilerDuration;
 
             if (HSAGPAProfiler::Instance()->IsProfilerDurationEnabled(profilerDuration))
             {
@@ -211,19 +217,19 @@ bool HSAGPAProfiler::Init(const Parameters& params, std::string& strErrorOut)
         {
             m_bDelayStartEnabled = params.m_bDelayStartEnabled;
             m_bProfilerDurationEnabled = params.m_bProfilerDurationEnabled;
-            m_secondsToDelay = params.m_secondsToDelay;
-            m_profilerShouldRunForSeconds = params.m_profilerShouldRunForSeconds;
-            m_isProfilingEnabled = m_secondsToDelay > 0 ? false : true;
+            m_delayInMilliseconds = params.m_delayInMilliseconds;
+            m_durationInMilliseconds = params.m_durationInMilliseconds;
+            m_isProfilingEnabled = m_delayInMilliseconds > 0 ? false : true;
 
             if (m_bDelayStartEnabled)
             {
-                CreateTimer(PROFILEDELAYTIMER, m_secondsToDelay);
+                CreateTimer(PROFILEDELAYTIMER, m_delayInMilliseconds);
                 m_delayTimer->SetTimerFinishHandler(HSAGPAProfilerTimerEndResponse);
                 m_delayTimer->startTimer(true);
             }
             else if (m_bProfilerDurationEnabled)
             {
-                CreateTimer(PROFILEDURATIONTIMER, m_profilerShouldRunForSeconds);
+                CreateTimer(PROFILEDURATIONTIMER, m_durationInMilliseconds);
                 m_durationTimer->SetTimerFinishHandler(HSAGPAProfilerTimerEndResponse);
                 m_durationTimer->startTimer(true);
             }
@@ -833,16 +839,16 @@ bool HSAGPAProfiler::AddOccupancyEntry(const KernelStats& kernelStats, const std
     return retVal;
 }
 
-bool HSAGPAProfiler::IsProfilerDelayEnabled(unsigned int& delayInSeconds)
+bool HSAGPAProfiler::IsProfilerDelayEnabled(unsigned long& delayInMilliseconds)
 {
-    delayInSeconds = m_secondsToDelay;
+    delayInMilliseconds = m_delayInMilliseconds;
     return m_bDelayStartEnabled;
 }
 
 
-bool HSAGPAProfiler::IsProfilerDurationEnabled(unsigned int& durationInSeconds)
+bool HSAGPAProfiler::IsProfilerDurationEnabled(unsigned long& durationInMilliseconds)
 {
-    durationInSeconds = m_profilerShouldRunForSeconds;
+    durationInMilliseconds = m_durationInMilliseconds;
     return m_bProfilerDurationEnabled;
 }
 
@@ -868,28 +874,28 @@ void HSAGPAProfiler::SetTimerFinishHandler(ProfilerTimerType timerType, TimerEnd
     }
 }
 
-void HSAGPAProfiler::CreateTimer(ProfilerTimerType timerType, unsigned int timeIntervalInSeconds)
+void HSAGPAProfiler::CreateTimer(ProfilerTimerType timerType, unsigned int timeIntervalInMilliseconds)
 {
     switch (timerType)
     {
         case PROFILEDELAYTIMER:
-            if (m_delayTimer == nullptr && timeIntervalInSeconds > 0)
+            if (m_delayTimer == nullptr && timeIntervalInMilliseconds > 0)
             {
-                m_delayTimer = new ProfilerTimer(timeIntervalInSeconds * 1000);
+                m_delayTimer = new ProfilerTimer(timeIntervalInMilliseconds);
                 m_delayTimer->SetTimerType(PROFILEDELAYTIMER);
                 m_bDelayStartEnabled = true;
-                m_secondsToDelay = timeIntervalInSeconds;
+                m_delayInMilliseconds = timeIntervalInMilliseconds;
             }
 
             break;
 
         case PROFILEDURATIONTIMER:
-            if (m_durationTimer == nullptr && timeIntervalInSeconds > 0)
+            if (m_durationTimer == nullptr && timeIntervalInMilliseconds > 0)
             {
-                m_durationTimer = new ProfilerTimer(timeIntervalInSeconds * 1000);
+                m_durationTimer = new ProfilerTimer(timeIntervalInMilliseconds);
                 m_durationTimer->SetTimerType(PROFILEDURATIONTIMER);
                 m_bProfilerDurationEnabled = true;
-                m_profilerShouldRunForSeconds = timeIntervalInSeconds;
+                m_durationInMilliseconds = timeIntervalInMilliseconds;
             }
 
             break;

@@ -323,8 +323,8 @@ struct Parameters
         m_bStartDisabled = false;
         m_bDelayStartEnabled = false;
         m_bProfilerDurationEnabled = false;
-        m_secondsToDelay = 0;
-        m_profilerShouldRunForSeconds = 0;
+        m_delayInMilliseconds = 0;
+        m_durationInMilliseconds = 0;
     }
 
     unsigned int m_uiVersionMajor;                ///< Version major
@@ -372,10 +372,10 @@ struct Parameters
     bool m_bGPUTimePMC;                           ///< Flag indicating whether or not the profiler should collect gpu time when collecting perf counters
     bool m_bStartDisabled;                        ///< Flag indicating whether or not to start with profiling disabled
     KernelFilterList m_kernelFilterList;          ///< List of kernels to filter for perf counter profiling and subkernel profiling
-    bool m_bDelayStartEnabled;                    ///< Flag indicating whether to start profiler with a delay or not
-    bool m_bProfilerDurationEnabled;              ///< Flag indiacating whether profiler should only run for certain duration
-    unsigned int m_secondsToDelay;                ///< Seconds to delay for profiler to start
-    unsigned int m_profilerShouldRunForSeconds;   ///< Duration in seconds for which Profiler should run
+    bool m_bDelayStartEnabled;                    ///< flag indicating whether to start profiler with a delay or not
+    bool m_bProfilerDurationEnabled;              ///< flag indiacating whether profiler should only run for certain duration
+    unsigned int m_delayInMilliseconds;           ///< delay for profiler in milliseconds
+    unsigned int m_durationInMilliseconds;        ///< duration for profiler in milliseconds for which profiler should run
 };
 
 typedef std::map<std::string, bool> AnalyzerMap;

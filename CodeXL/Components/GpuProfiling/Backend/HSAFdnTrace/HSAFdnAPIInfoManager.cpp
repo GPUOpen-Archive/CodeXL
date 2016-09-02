@@ -29,6 +29,8 @@ HSAAPIInfoManager::HSAAPIInfoManager(void) : m_tracedApiCount(0)
     m_mustInterceptAPIs.insert(HSA_API_Type_hsa_queue_create);               // needed so we can create a profiled queue for kernel timestamps
     m_mustInterceptAPIs.insert(HSA_API_Type_hsa_executable_get_symbol);      // needed to extract kernel name
     m_mustInterceptAPIs.insert(HSA_API_Type_hsa_executable_symbol_get_info); // needed to extract kernel name
+    m_delayTimer = nullptr;
+    m_durationTimer = nullptr;
 }
 
 HSAAPIInfoManager::~HSAAPIInfoManager(void)
@@ -232,7 +234,7 @@ void HSATraceAgentTimerEndResponse(ProfilerTimerType timerType)
     {
         case PROFILEDELAYTIMER:
             HSAAPIInfoManager::Instance()->ResumeTracing();
-            unsigned int profilerDuration;
+            unsigned long profilerDuration;
 
             if (HSAAPIInfoManager::Instance()->IsProfilerDurationEnabled(profilerDuration))
             {
@@ -252,27 +254,27 @@ void HSATraceAgentTimerEndResponse(ProfilerTimerType timerType)
     }
 }
 
-void HSAAPIInfoManager::EnableProfileDelayStart(bool doEnable, unsigned int delayInSeconds)
+void HSAAPIInfoManager::EnableProfileDelayStart(bool doEnable, unsigned long delayInMilliseconds)
 {
     m_bDelayStartEnabled = doEnable;
-    m_secondsToDelay = doEnable ? delayInSeconds : 0;
+    m_delayInMilliseconds = doEnable ? delayInMilliseconds : 0;
 }
 
-void HSAAPIInfoManager::EnableProfileDuration(bool doEnable, unsigned int durationInSeconds)
+void HSAAPIInfoManager::EnableProfileDuration(bool doEnable, unsigned long durationInMilliseconds)
 {
     m_bProfilerDurationEnabled = doEnable;
-    m_profilerShouldRunForSeconds = doEnable ? durationInSeconds : 0;
+    m_durationInMilliseconds = doEnable ? durationInMilliseconds : 0;
 }
 
-bool HSAAPIInfoManager::IsProfilerDelayEnabled(unsigned int& delayInSeconds)
+bool HSAAPIInfoManager::IsProfilerDelayEnabled(unsigned long& delayInMilliseconds)
 {
-    delayInSeconds = m_secondsToDelay;
+    delayInMilliseconds = m_delayInMilliseconds;
     return m_bDelayStartEnabled;
 }
 
-bool HSAAPIInfoManager::IsProfilerDurationEnabled(unsigned int& durationInSeconds)
+bool HSAAPIInfoManager::IsProfilerDurationEnabled(unsigned long& durationInSeconds)
 {
-    durationInSeconds = m_profilerShouldRunForSeconds;
+    durationInSeconds = m_durationInMilliseconds;
     return m_bProfilerDurationEnabled;
 }
 
@@ -297,28 +299,28 @@ void HSAAPIInfoManager::SetTimerFinishHandler(ProfilerTimerType timerType, Timer
     }
 }
 
-void HSAAPIInfoManager::CreateTimer(ProfilerTimerType timerType, unsigned int timeIntervalInSeconds)
+void HSAAPIInfoManager::CreateTimer(ProfilerTimerType timerType, unsigned long timeIntervalInMilliseconds)
 {
     switch (timerType)
     {
         case PROFILEDELAYTIMER:
-            if (m_delayTimer == nullptr && timeIntervalInSeconds > 0)
+            if (m_delayTimer == nullptr && timeIntervalInMilliseconds > 0)
             {
-                GT_ASSERT((m_delayTimer = new ProfilerTimer(timeIntervalInSeconds * 1000)) != nullptr)
+                m_delayTimer = new ProfilerTimer(timeIntervalInMilliseconds);
                 m_delayTimer->SetTimerType(PROFILEDELAYTIMER);
                 m_bDelayStartEnabled = true;
-                m_secondsToDelay = timeIntervalInSeconds;
+                m_delayInMilliseconds = timeIntervalInMilliseconds;
             }
 
             break;
 
         case PROFILEDURATIONTIMER:
-            if (m_durationTimer == nullptr && timeIntervalInSeconds > 0)
+            if (m_durationTimer == nullptr && timeIntervalInMilliseconds > 0)
             {
-                GT_ASSERT((m_durationTimer = new ProfilerTimer(timeIntervalInSeconds * 1000)) != nullptr)
+                m_durationTimer = new ProfilerTimer(timeIntervalInMilliseconds);
                 m_durationTimer->SetTimerType(PROFILEDURATIONTIMER);
                 m_bProfilerDurationEnabled = true;
-                m_profilerShouldRunForSeconds = timeIntervalInSeconds;
+                m_durationInMilliseconds = timeIntervalInMilliseconds;
             }
 
             break;

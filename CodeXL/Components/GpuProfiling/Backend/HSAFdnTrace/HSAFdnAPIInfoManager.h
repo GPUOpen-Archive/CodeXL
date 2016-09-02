@@ -14,7 +14,7 @@
 
 #include "../Common/APIInfoManagerBase.h"
 #include "HSAAPIBase.h"
-#include "../common/ProfilerTimer.h"
+#include "../Common/ProfilerTimer.h"
 
 
 /// Handle the response on the end of the timer
@@ -51,23 +51,23 @@ public:
 
     /// Enables or Disables the profiler delay
     /// \param doEnable true for enable and false for disable
-    /// \param delayInSeconds seconds to delay the profiler
-    void EnableProfileDelayStart(bool doEnable, unsigned int delayInSeconds = 0);
+    /// \param delayInMilliseconds milliseconds to delay the profiler
+    void EnableProfileDelayStart(bool doEnable, unsigned long delayInMilliseconds = 0);
 
     /// Enables or Disables the profiler duration
     /// \param doEnable true for enable and false for disable
-    /// \param durationInSeconds profiler duration in seconds
-    void EnableProfileDuration(bool doEnable, unsigned int durationInSeconds = 0);
+    /// \param durationInMilliseconds profiler duration in milliseconds
+    void EnableProfileDuration(bool doEnable, unsigned long durationInMilliseconds = 0);
 
     /// Indicates whether profiler should run after delay or not
-    /// \param delayInSeconds to return the amount by which profile set to be delayed
+    /// \param delayInMilliseconds to return the amount by which profile set to be delayed
     /// \returns true if delay is enabled
-    bool IsProfilerDelayEnabled(unsigned int& delayInSeconds);
+    bool IsProfilerDelayEnabled(unsigned long& delayInMilliseconds);
 
     /// Indicates whether profiler should run only for set duration or not
-    /// \param durationInSeconds to return the amount by which profile set to run
+    /// \param durationInMilliseconds to return the amount by which profile set to run
     /// \returns true if duration of the profiler is enabled
-    bool IsProfilerDurationEnabled(unsigned int& durationInSeconds);
+    bool IsProfilerDurationEnabled(unsigned long& durationInMilliseconds);
 
     /// Assigns the call back function
     /// \param timerType type of the timer
@@ -76,8 +76,8 @@ public:
 
     /// Creates the Profiler Timer
     /// \param timerType timer type of the starting timer
-    /// \param timeIntervalInSeconds profiler duration or profiler delay in seconds
-    void CreateTimer(ProfilerTimerType timerType, unsigned int timeIntervalInSeconds);
+    /// \param timeIntervalInMilliseconds profiler duration or profiler delay in milliseconds
+    void CreateTimer(ProfilerTimerType timerType, unsigned long timeIntervalInMilliseconds);
 
     /// Starts the timer
     /// \param timerType Type of the the timer
@@ -113,16 +113,16 @@ private:
     typedef std::unordered_map<const hsa_queue_t*, size_t> QueueIndexMap;     ///< typedef for the queue index map
     typedef std::pair<const hsa_queue_t*, size_t>          QueueIndexMapPair; ///< typedef for the queue index pair
 
-    unsigned int           m_tracedApiCount;     ///< number of APIs that have been traced, used to support max apis to trace option
-    std::set<HSA_API_Type> m_filterAPIs;         ///< HSA APIs that are not traced due to API filtering
-    std::set<HSA_API_Type> m_mustInterceptAPIs;  ///< HSA APIs that must be intercepted (even when they are filtered out and not traced)
-    QueueIndexMap          m_queueIndexMap;      ///< map of a queue to that queue's index (basically creation order)
-    bool                    m_bDelayStartEnabled;                ///< flag indicating whether or not the profiler should start with delay or not
-    bool                    m_bProfilerDurationEnabled;          ///< Flag indiacating whether profiler should only run for certain duration
-    unsigned int            m_secondsToDelay;                    ///< Seconds to delay for profiler to start
-    unsigned int            m_profilerShouldRunForSeconds;       ///< Duration in seconds for which Profiler should run
-    ProfilerTimer*          m_delayTimer;                        ///< timer for handling delay timer for the profile agent
-    ProfilerTimer*          m_durationTimer;                     ///< timer for handling duration timer for the profile agent
+    unsigned int           m_tracedApiCount;                ///< number of APIs that have been traced, used to support max apis to trace option
+    std::set<HSA_API_Type> m_filterAPIs;                    ///< HSA APIs that are not traced due to API filtering
+    std::set<HSA_API_Type> m_mustInterceptAPIs;             ///< HSA APIs that must be intercepted (even when they are filtered out and not traced)
+    QueueIndexMap          m_queueIndexMap;                 ///< map of a queue to that queue's index (basically creation order)
+    bool                   m_bDelayStartEnabled;            ///< flag indicating whether or not the profiler should start with delay or not
+    bool                   m_bProfilerDurationEnabled;      ///< flag indiacating whether profiler should only run for certain duration
+    unsigned long          m_delayInMilliseconds;           ///< millieconds to delay for profiler to start
+    unsigned long          m_durationInMilliseconds;        ///< duration in milliseconds for which Profiler should run
+    ProfilerTimer*         m_delayTimer;                    ///< timer for handling delay timer for the profile agent
+    ProfilerTimer*         m_durationTimer;                 ///< timer for handling duration timer for the profile agent
 
 };
 

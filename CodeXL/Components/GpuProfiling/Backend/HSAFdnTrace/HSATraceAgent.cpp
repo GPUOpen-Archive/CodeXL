@@ -92,18 +92,18 @@ extern "C" bool DLL_PUBLIC OnLoad(void* pTable, uint64_t runtimeVersion, uint64_
     }
     else
     {
-        HSAAPIInfoManager::Instance()->EnableProfileDelayStart(params.m_bDelayStartEnabled, params.m_secondsToDelay);
-        HSAAPIInfoManager::Instance()->EnableProfileDuration(params.m_bProfilerDurationEnabled, params.m_profilerShouldRunForSeconds);
+        HSAAPIInfoManager::Instance()->EnableProfileDelayStart(params.m_bDelayStartEnabled, params.m_delayInMilliseconds);
+        HSAAPIInfoManager::Instance()->EnableProfileDuration(params.m_bProfilerDurationEnabled, params.m_durationInMilliseconds);
         if (params.m_bDelayStartEnabled)
         {
-            HSAAPIInfoManager::Instance()->CreateTimer(PROFILEDELAYTIMER, params.m_secondsToDelay);
+            HSAAPIInfoManager::Instance()->CreateTimer(PROFILEDELAYTIMER, params.m_delayInMilliseconds);
             HSAAPIInfoManager::Instance()->SetTimerFinishHandler(PROFILEDELAYTIMER, HSATraceAgentTimerEndResponse);
             HSAAPIInfoManager::Instance()->StopTracing();
             HSAAPIInfoManager::Instance()->startTimer(PROFILEDELAYTIMER);
         }
         else if (params.m_bProfilerDurationEnabled)
         {
-            HSAAPIInfoManager::Instance()->CreateTimer(PROFILEDURATIONTIMER, params.m_profilerShouldRunForSeconds);
+            HSAAPIInfoManager::Instance()->CreateTimer(PROFILEDURATIONTIMER, params.m_durationInMilliseconds);
             HSAAPIInfoManager::Instance()->SetTimerFinishHandler(PROFILEDURATIONTIMER, HSATraceAgentTimerEndResponse);
             HSAAPIInfoManager::Instance()->startTimer(PROFILEDURATIONTIMER);
         }

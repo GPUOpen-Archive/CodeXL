@@ -578,10 +578,10 @@ void CheckOutputFile(const Config& configInner)
         params.m_bForceSinglePassPMC = config.bForceSinglePassPMC;
         params.m_bGPUTimePMC = config.bGPUTimePMC;
         params.m_bStartDisabled = config.bStartDisabled;
-        params.m_secondsToDelay = config.m_secondsToDelay > 0 ? config.m_secondsToDelay : 0;
-        params.m_bDelayStartEnabled = config.m_secondsToDelay > 0;
-        params.m_profilerShouldRunForSeconds = config.m_profilerShouldRunForSeconds > 0 ? config.m_profilerShouldRunForSeconds : 0;
-        params.m_bProfilerDurationEnabled = config.m_profilerShouldRunForSeconds > 0;
+        params.m_delayInMilliseconds = config.m_delayInMilliseconds > 0 ? config.m_delayInMilliseconds : 0;
+        params.m_bDelayStartEnabled = config.m_delayInMilliseconds > 0;
+        params.m_durationInMilliseconds = config.m_durationInMilliseconds > 0 ? config.m_durationInMilliseconds : 0;
+        params.m_bProfilerDurationEnabled = config.m_durationInMilliseconds > 0;
 
 #ifdef GDT_INTERNAL
 

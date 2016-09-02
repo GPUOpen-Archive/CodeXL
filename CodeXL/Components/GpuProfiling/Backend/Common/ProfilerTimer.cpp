@@ -22,8 +22,8 @@ void ProfilerTimer::SetTimerType(ProfilerTimerType timerType)
     m_timerType = timerType;
 }
 
-ProfilerTimer::ProfilerTimer(unsigned int timerInterval) :
-    osTimer(static_cast<long>(timerInterval)),
+ProfilerTimer::ProfilerTimer(long timerInterval) :
+    osTimer(timerInterval),
     m_timerHandler(nullptr),
     m_timerType(NONE)
 {

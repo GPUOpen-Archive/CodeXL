@@ -89,8 +89,8 @@ CLAPIInfoManager::CLAPIInfoManager(void) :
     m_strTraceModuleName = "ocl";
     m_bDelayStartEnabled = false;
     m_bProfilerDurationEnabled = false;
-    m_secondsToDelay = 0u;
-    m_profilerShouldRunForSeconds = 0u;
+    m_delayInMilliseconds = 0ul;
+    m_durationInMilliseconds = 0ul;
     m_durationTimer = nullptr;
     m_delayTimer = nullptr;
 }
@@ -640,7 +640,7 @@ void CLAPITraceAgentTimerEndResponse(ProfilerTimerType timerType)
     {
         case PROFILEDELAYTIMER:
             CLAPIInfoManager::Instance()->ResumeTracing();
-            unsigned int profilerDuration;
+            unsigned long profilerDuration;
 
             if (CLAPIInfoManager::Instance()->IsProfilerDurationEnabled(profilerDuration))
             {
@@ -660,27 +660,27 @@ void CLAPITraceAgentTimerEndResponse(ProfilerTimerType timerType)
     }
 }
 
-void CLAPIInfoManager::EnableProfileDelayStart(bool doEnable, unsigned int delayInSeconds)
+void CLAPIInfoManager::EnableProfileDelayStart(bool doEnable, unsigned long delayInMilliseconds)
 {
     m_bDelayStartEnabled = doEnable;
-    m_secondsToDelay = doEnable ? delayInSeconds : 0;
+    m_delayInMilliseconds = doEnable ? delayInMilliseconds : 0;
 }
 
-void CLAPIInfoManager::EnableProfileDuration(bool doEnable, unsigned int durationInSeconds)
+void CLAPIInfoManager::EnableProfileDuration(bool doEnable, unsigned long durationInMilliseconds)
 {
     m_bProfilerDurationEnabled = doEnable;
-    m_profilerShouldRunForSeconds = doEnable ? durationInSeconds : 0;
+    m_durationInMilliseconds = doEnable ? durationInMilliseconds : 0;
 }
 
-bool CLAPIInfoManager::IsProfilerDelayEnabled(unsigned int& delayInSeconds)
+bool CLAPIInfoManager::IsProfilerDelayEnabled(unsigned long& delayInMilliseconds)
 {
-    delayInSeconds = m_secondsToDelay;
+    delayInMilliseconds = m_delayInMilliseconds;
     return m_bDelayStartEnabled;
 }
 
-bool CLAPIInfoManager::IsProfilerDurationEnabled(unsigned int& durationInSeconds)
+bool CLAPIInfoManager::IsProfilerDurationEnabled(unsigned long& durationInMilliseconds)
 {
-    durationInSeconds = m_profilerShouldRunForSeconds;
+    durationInMilliseconds = m_durationInMilliseconds;
     return m_bProfilerDurationEnabled;
 }
 
@@ -705,28 +705,28 @@ void CLAPIInfoManager::SetTimerFinishHandler(ProfilerTimerType timerType, TimerE
     }
 }
 
-void CLAPIInfoManager::CreateTimer(ProfilerTimerType timerType, unsigned int timeIntervalInSeconds)
+void CLAPIInfoManager::CreateTimer(ProfilerTimerType timerType, unsigned long timeIntervalInMilliseconds)
 {
     switch (timerType)
     {
         case PROFILEDELAYTIMER:
-            if (m_delayTimer == nullptr && timeIntervalInSeconds > 0)
+            if (m_delayTimer == nullptr && timeIntervalInMilliseconds > 0)
             {
-                m_delayTimer = new ProfilerTimer(timeIntervalInSeconds * 1000);
+                m_delayTimer = new ProfilerTimer(timeIntervalInMilliseconds);
                 m_delayTimer->SetTimerType(PROFILEDELAYTIMER);
                 m_bDelayStartEnabled = true;
-                m_secondsToDelay = timeIntervalInSeconds;
+                m_delayInMilliseconds = timeIntervalInMilliseconds;
             }
 
             break;
 
         case PROFILEDURATIONTIMER:
-            if (m_durationTimer == nullptr && timeIntervalInSeconds > 0)
+            if (m_durationTimer == nullptr && timeIntervalInMilliseconds > 0)
             {
-                m_durationTimer = new ProfilerTimer(timeIntervalInSeconds * 1000);
+                m_durationTimer = new ProfilerTimer(timeIntervalInMilliseconds);
                 m_durationTimer->SetTimerType(PROFILEDURATIONTIMER);
                 m_bProfilerDurationEnabled = true;
-                m_profilerShouldRunForSeconds = timeIntervalInSeconds;
+                m_durationInMilliseconds = timeIntervalInMilliseconds;
             }
 
             break;

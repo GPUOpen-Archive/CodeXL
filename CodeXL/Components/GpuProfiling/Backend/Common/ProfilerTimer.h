@@ -28,8 +28,8 @@ class ProfilerTimer :
 {
 public:
     /// Constructor
-    /// \param timerInterval time Interval for the timer in seconds
-    ProfilerTimer(unsigned int timerInterval);
+    /// \param timerInterval time Interval for the timer in milliseconds
+    ProfilerTimer(long timerInterval);
 
     /// Sets the timer type for the timer
     /// \param timerType Type of the timer

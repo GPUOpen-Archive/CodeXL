@@ -80,14 +80,14 @@ public:
     void EnableProfiling(bool doEnable) { m_isProfilingEnabled = doEnable; }
 
     /// Indicates whether profiler should run after delay or not
-    /// \param delayInSeconds to return the amount by which profile set to be delayed
+    /// \param delayInMilliseconds to return the amount by which profile set to be delayed
     /// \returns true if delay is enabled otherwise false
-    bool IsProfilerDelayEnabled(unsigned int& delayInSeconds);
+    bool IsProfilerDelayEnabled(unsigned long& delayInMilliseconds);
 
     /// Indicates whether profiler should run only for set duration or not
-    /// \param durationInSeconds to return the amount by which profile set to run
+    /// \param durationInMilliseconds to return the amount by which profile set to run
     /// \returns true if duration of the profiler is enabled
-    bool IsProfilerDurationEnabled(unsigned int& durationInSeconds);
+    bool IsProfilerDurationEnabled(unsigned long& durationInMilliseconds);
 
     /// Assigns the call back function
     /// \param timerType type of the timer
@@ -96,10 +96,10 @@ public:
 
     /// Creates the Profiler Timer
     /// \param timerType timer type of the starting timer
-    /// \param timeIntervalInSeconds profiler duration or profiler delay in seconds
-    void CreateTimer(ProfilerTimerType timerType, unsigned int timeIntervalInSeconds);
+    /// \param timeIntervalInMilliseconds profiler duration or profiler delay in milliseconds
+    void CreateTimer(ProfilerTimerType timerType, unsigned int timeIntervalInMilliseconds);
 
-    /// Starts the timer if it is set properly
+    /// Starts the timer
     /// \param timerType timer type of the starting timer
     void StartTimer(ProfilerTimerType timerType);
 
@@ -179,9 +179,9 @@ private:
     bool                    m_isProfilingEnabled;                ///< flag indicating if profiling is currently enabled
     bool                    m_isProfilerInitialized;             ///< flag indicating if the profiler object has been initialized already
     bool                    m_bDelayStartEnabled;                ///< flag indicating whether or not the profiler should start with delay or not
-    bool                    m_bProfilerDurationEnabled;          ///< Flag indiacating whether profiler should only run for certain duration
-    unsigned int            m_secondsToDelay;                    ///< Seconds to delay for profiler to start
-    unsigned int            m_profilerShouldRunForSeconds;       ///< Duration in seconds for which Profiler should run
+    bool                    m_bProfilerDurationEnabled;          ///< flag indiacating whether profiler should only run for certain duration
+    unsigned long           m_delayInMilliseconds;               ///< milliseconds to delay for profiler to start
+    unsigned long           m_durationInMilliseconds;            ///< duration in milliseconds for which Profiler should run
     ProfilerTimer*          m_delayTimer;                        ///< timer for handling delay timer for the profile agent
     ProfilerTimer*          m_durationTimer;                     ///< timer for handling duration timer for the profile agent
 };

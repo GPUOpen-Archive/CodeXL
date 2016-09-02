@@ -189,18 +189,18 @@ clAgent_OnLoad(cl_agent* agent)
     }
     else
     {
-        CLAPIInfoManager::Instance()->EnableProfileDelayStart(params.m_bDelayStartEnabled, params.m_secondsToDelay);
-        CLAPIInfoManager::Instance()->EnableProfileDuration(params.m_bProfilerDurationEnabled, params.m_profilerShouldRunForSeconds);
+        CLAPIInfoManager::Instance()->EnableProfileDelayStart(params.m_bDelayStartEnabled, params.m_delayInMilliseconds);
+        CLAPIInfoManager::Instance()->EnableProfileDuration(params.m_bProfilerDurationEnabled, params.m_durationInMilliseconds);
         if (params.m_bDelayStartEnabled)
         {
-            CLAPIInfoManager::Instance()->CreateTimer(PROFILEDELAYTIMER, params.m_secondsToDelay);
+            CLAPIInfoManager::Instance()->CreateTimer(PROFILEDELAYTIMER, params.m_delayInMilliseconds);
             CLAPIInfoManager::Instance()->SetTimerFinishHandler(PROFILEDELAYTIMER, CLAPITraceAgentTimerEndResponse);
             CLAPIInfoManager::Instance()->StopTracing();
             CLAPIInfoManager::Instance()->startTimer(PROFILEDELAYTIMER);
         }
         else if (params.m_bProfilerDurationEnabled)
         {
-            CLAPIInfoManager::Instance()->CreateTimer(PROFILEDURATIONTIMER, params.m_profilerShouldRunForSeconds);
+            CLAPIInfoManager::Instance()->CreateTimer(PROFILEDURATIONTIMER, params.m_durationInMilliseconds);
             CLAPIInfoManager::Instance()->SetTimerFinishHandler(PROFILEDURATIONTIMER, CLAPITraceAgentTimerEndResponse);
             CLAPIInfoManager::Instance()->startTimer(PROFILEDURATIONTIMER);
         }

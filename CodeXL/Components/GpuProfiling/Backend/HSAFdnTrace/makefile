@@ -40,6 +40,7 @@ SO_OBJS =  \
 	./$(OBJ_DIR)/HSAImageExtensionAPITraceClasses.o \
 	./$(OBJ_DIR)/HSATraceStringOutput.o \
 	./$(OBJ_DIR)/HSATraceInterceptionTable1_0.o \
+	./$(OBJ_DIR)/ProfilerTimer.o \
 
 include $(DEPTH)/Build/CommonTargets.mk
 

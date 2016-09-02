@@ -177,12 +177,12 @@ clAgent_OnLoad(cl_agent* agent)
     }
     else
     {
-        OccupancyInfoManager::Instance()->EnableProfileDelayStart(params.m_bDelayStartEnabled, params.m_secondsToDelay);
-        OccupancyInfoManager::Instance()->EnableProfileDuration(params.m_bProfilerDurationEnabled, params.m_profilerShouldRunForSeconds);
+        OccupancyInfoManager::Instance()->EnableProfileDelayStart(params.m_bDelayStartEnabled, params.m_delayInMilliseconds);
+        OccupancyInfoManager::Instance()->EnableProfileDuration(params.m_bProfilerDurationEnabled, params.m_durationInMilliseconds);
 
         if (params.m_bDelayStartEnabled)
         {
-            OccupancyInfoManager::Instance()->CreateTimer(PROFILEDELAYTIMER, params.m_secondsToDelay);
+            OccupancyInfoManager::Instance()->CreateTimer(PROFILEDELAYTIMER, params.m_delayInMilliseconds);
             OccupancyInfoManager::Instance()->SetTimerFinishHandler(PROFILEDELAYTIMER, CLOccupancyAgentTimerEndResponse);
             OccupancyInfoManager::Instance()->StopTracing();
             OccupancyInfoManager::Instance()->EnableProfiling(false);
@@ -190,7 +190,7 @@ clAgent_OnLoad(cl_agent* agent)
         }
         else if (params.m_bProfilerDurationEnabled)
         {
-            OccupancyInfoManager::Instance()->CreateTimer(PROFILEDURATIONTIMER, params.m_profilerShouldRunForSeconds);
+            OccupancyInfoManager::Instance()->CreateTimer(PROFILEDURATIONTIMER, params.m_durationInMilliseconds);
             OccupancyInfoManager::Instance()->SetTimerFinishHandler(PROFILEDURATIONTIMER, CLOccupancyAgentTimerEndResponse);
             OccupancyInfoManager::Instance()->startTimer(PROFILEDURATIONTIMER);
         }
