@@ -38,7 +38,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="inc\SConscript" />
     <None Include="ReadMe.txt" />
     <CustomBuild Include="ui\iCssButterfly.ui">
       <FileType>Document</FileType>
@@ -61,7 +60,6 @@
       <Outputs>tmp\ui\ui_%(Filename).h</Outputs>
       <AdditionalInputs>$(QtDir)\bin\uic.exe</AdditionalInputs>
     </CustomBuild>
-    <None Include="src\SConscript" />
     <None Include="ui\iDisplayFilterDlg.ui" />
   </ItemGroup>
   <ItemGroup>
