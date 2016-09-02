@@ -18,7 +18,7 @@ HSAFunctionDefsUtils::HSAFunctionDefsUtils()
     HSA_RUNTIME_API_TABLE
     HSA_EXT_FINALIZE_API_TABLE
     HSA_EXT_IMAGE_API_TABLE
-    //HSA_EXT_AMD_API_TABLE // pending discussion with RT team whether these should be added to interception table
+    HSA_EXT_AMD_API_TABLE
 #undef X
 }
 
