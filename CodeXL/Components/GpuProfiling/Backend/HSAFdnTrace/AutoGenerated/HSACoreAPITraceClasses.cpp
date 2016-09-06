@@ -973,6 +973,7 @@ void HSA_APITrace_hsa_signal_load_relaxed::Create(
     m_retVal = retVal;
 }
 
+#ifndef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_load_acquire
 ///////////////////////////////////////////////////
@@ -1009,6 +1010,7 @@ void HSA_APITrace_hsa_signal_load_acquire::Create(
     m_signal = signal;
     m_retVal = retVal;
 }
+#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_store_relaxed
@@ -1086,7 +1088,7 @@ void HSA_APITrace_hsa_signal_store_screlease::Create(
     m_signal = signal;
     m_value = value;
 }
-#endif
+#else
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_store_release
@@ -1125,6 +1127,7 @@ void HSA_APITrace_hsa_signal_store_release::Create(
     m_signal = signal;
     m_value = value;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
@@ -1242,7 +1245,7 @@ void HSA_APITrace_hsa_signal_exchange_scacq_screl::Create(
     m_value = value;
     m_retVal = retVal;
 }
-#endif
+#else
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_exchange_acq_rel
@@ -1283,6 +1286,7 @@ void HSA_APITrace_hsa_signal_exchange_acq_rel::Create(
     m_value = value;
     m_retVal = retVal;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
@@ -1324,7 +1328,7 @@ void HSA_APITrace_hsa_signal_exchange_scacquire::Create(
     m_value = value;
     m_retVal = retVal;
 }
-#endif
+#else
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_exchange_acquire
@@ -1365,6 +1369,7 @@ void HSA_APITrace_hsa_signal_exchange_acquire::Create(
     m_value = value;
     m_retVal = retVal;
 }
+#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_exchange_relaxed
@@ -1446,7 +1451,7 @@ void HSA_APITrace_hsa_signal_exchange_screlease::Create(
     m_value = value;
     m_retVal = retVal;
 }
-#endif
+#else
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_exchange_release
@@ -1487,6 +1492,7 @@ void HSA_APITrace_hsa_signal_exchange_release::Create(
     m_value = value;
     m_retVal = retVal;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
@@ -1531,7 +1537,7 @@ void HSA_APITrace_hsa_signal_cas_scacq_screl::Create(
     m_value = value;
     m_retVal = retVal;
 }
-#endif
+#else
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_cas_acq_rel
@@ -1575,6 +1581,7 @@ void HSA_APITrace_hsa_signal_cas_acq_rel::Create(
     m_value = value;
     m_retVal = retVal;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
@@ -1619,7 +1626,7 @@ void HSA_APITrace_hsa_signal_cas_scacquire::Create(
     m_value = value;
     m_retVal = retVal;
 }
-#endif
+#else
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_cas_acquire
@@ -1663,6 +1670,7 @@ void HSA_APITrace_hsa_signal_cas_acquire::Create(
     m_value = value;
     m_retVal = retVal;
 }
+#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_cas_relaxed
@@ -1750,7 +1758,7 @@ void HSA_APITrace_hsa_signal_cas_screlease::Create(
     m_value = value;
     m_retVal = retVal;
 }
-#endif
+#else
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_cas_release
@@ -1794,6 +1802,7 @@ void HSA_APITrace_hsa_signal_cas_release::Create(
     m_value = value;
     m_retVal = retVal;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
@@ -1833,7 +1842,7 @@ void HSA_APITrace_hsa_signal_add_scacq_screl::Create(
     m_signal = signal;
     m_value = value;
 }
-#endif
+#else
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_add_acq_rel
@@ -1872,6 +1881,7 @@ void HSA_APITrace_hsa_signal_add_acq_rel::Create(
     m_signal = signal;
     m_value = value;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
@@ -1911,7 +1921,7 @@ void HSA_APITrace_hsa_signal_add_scacquire::Create(
     m_signal = signal;
     m_value = value;
 }
-#endif
+#else
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_add_acquire
@@ -1950,6 +1960,7 @@ void HSA_APITrace_hsa_signal_add_acquire::Create(
     m_signal = signal;
     m_value = value;
 }
+#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_add_relaxed
@@ -2027,7 +2038,7 @@ void HSA_APITrace_hsa_signal_add_screlease::Create(
     m_signal = signal;
     m_value = value;
 }
-#endif
+#else
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_add_release
@@ -2066,6 +2077,7 @@ void HSA_APITrace_hsa_signal_add_release::Create(
     m_signal = signal;
     m_value = value;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
@@ -2105,7 +2117,7 @@ void HSA_APITrace_hsa_signal_subtract_scacq_screl::Create(
     m_signal = signal;
     m_value = value;
 }
-#endif
+#else
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_subtract_acq_rel
@@ -2144,6 +2156,7 @@ void HSA_APITrace_hsa_signal_subtract_acq_rel::Create(
     m_signal = signal;
     m_value = value;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
@@ -2183,7 +2196,7 @@ void HSA_APITrace_hsa_signal_subtract_scacquire::Create(
     m_signal = signal;
     m_value = value;
 }
-#endif
+#else
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_subtract_acquire
@@ -2222,6 +2235,7 @@ void HSA_APITrace_hsa_signal_subtract_acquire::Create(
     m_signal = signal;
     m_value = value;
 }
+#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_subtract_relaxed
@@ -2299,7 +2313,7 @@ void HSA_APITrace_hsa_signal_subtract_screlease::Create(
     m_signal = signal;
     m_value = value;
 }
-#endif
+#else
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_subtract_release
@@ -2338,6 +2352,7 @@ void HSA_APITrace_hsa_signal_subtract_release::Create(
     m_signal = signal;
     m_value = value;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
@@ -2377,7 +2392,7 @@ void HSA_APITrace_hsa_signal_and_scacq_screl::Create(
     m_signal = signal;
     m_value = value;
 }
-#endif
+#else
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_and_acq_rel
@@ -2416,6 +2431,7 @@ void HSA_APITrace_hsa_signal_and_acq_rel::Create(
     m_signal = signal;
     m_value = value;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
@@ -2455,7 +2471,7 @@ void HSA_APITrace_hsa_signal_and_scacquire::Create(
     m_signal = signal;
     m_value = value;
 }
-#endif
+#else
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_and_acquire
@@ -2494,6 +2510,7 @@ void HSA_APITrace_hsa_signal_and_acquire::Create(
     m_signal = signal;
     m_value = value;
 }
+#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_and_relaxed
@@ -2571,7 +2588,7 @@ void HSA_APITrace_hsa_signal_and_screlease::Create(
     m_signal = signal;
     m_value = value;
 }
-#endif
+#else
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_and_release
@@ -2610,6 +2627,7 @@ void HSA_APITrace_hsa_signal_and_release::Create(
     m_signal = signal;
     m_value = value;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
@@ -2649,7 +2667,7 @@ void HSA_APITrace_hsa_signal_or_scacq_screl::Create(
     m_signal = signal;
     m_value = value;
 }
-#endif
+#else
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_or_acq_rel
@@ -2688,6 +2706,7 @@ void HSA_APITrace_hsa_signal_or_acq_rel::Create(
     m_signal = signal;
     m_value = value;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
@@ -2727,7 +2746,7 @@ void HSA_APITrace_hsa_signal_or_scacquire::Create(
     m_signal = signal;
     m_value = value;
 }
-#endif
+#else
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_or_acquire
@@ -2766,6 +2785,7 @@ void HSA_APITrace_hsa_signal_or_acquire::Create(
     m_signal = signal;
     m_value = value;
 }
+#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_or_relaxed
@@ -2843,7 +2863,7 @@ void HSA_APITrace_hsa_signal_or_screlease::Create(
     m_signal = signal;
     m_value = value;
 }
-#endif
+#else
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_or_release
@@ -2882,6 +2902,7 @@ void HSA_APITrace_hsa_signal_or_release::Create(
     m_signal = signal;
     m_value = value;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
@@ -2921,7 +2942,7 @@ void HSA_APITrace_hsa_signal_xor_scacq_screl::Create(
     m_signal = signal;
     m_value = value;
 }
-#endif
+#else
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_xor_acq_rel
@@ -2960,6 +2981,7 @@ void HSA_APITrace_hsa_signal_xor_acq_rel::Create(
     m_signal = signal;
     m_value = value;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
@@ -2999,7 +3021,7 @@ void HSA_APITrace_hsa_signal_xor_scacquire::Create(
     m_signal = signal;
     m_value = value;
 }
-#endif
+#else
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_xor_acquire
@@ -3038,6 +3060,7 @@ void HSA_APITrace_hsa_signal_xor_acquire::Create(
     m_signal = signal;
     m_value = value;
 }
+#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_xor_relaxed
@@ -3115,7 +3138,7 @@ void HSA_APITrace_hsa_signal_xor_screlease::Create(
     m_signal = signal;
     m_value = value;
 }
-#endif
+#else
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_xor_release
@@ -3154,6 +3177,7 @@ void HSA_APITrace_hsa_signal_xor_release::Create(
     m_signal = signal;
     m_value = value;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
@@ -3204,6 +3228,56 @@ void HSA_APITrace_hsa_signal_wait_scacquire::Create(
     m_wait_state_hint = wait_state_hint;
     m_retVal = retVal;
 }
+#else
+
+///////////////////////////////////////////////////
+/// Class HSA_APITrace_hsa_signal_wait_acquire
+///////////////////////////////////////////////////
+
+HSA_APITrace_hsa_signal_wait_acquire::HSA_APITrace_hsa_signal_wait_acquire()
+{
+}
+
+HSA_APITrace_hsa_signal_wait_acquire::~HSA_APITrace_hsa_signal_wait_acquire()
+{
+}
+
+std::string HSA_APITrace_hsa_signal_wait_acquire::GetRetString()
+{
+    return StringUtils::ToString(m_retVal);
+}
+
+std::string HSA_APITrace_hsa_signal_wait_acquire::ToString()
+{
+    std::ostringstream ss;
+    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal) << s_strParamSeparator;
+    ss << HSATraceStringUtils::Get_hsa_signal_condition_t_String(m_condition) << s_strParamSeparator;
+    ss << StringUtils::ToString(m_compare_value) << s_strParamSeparator;
+    ss << StringUtils::ToString(m_timeout_hint) << s_strParamSeparator;
+    ss << HSATraceStringUtils::Get_hsa_wait_state_t_String(m_wait_state_hint);
+    return ss.str();
+}
+
+void HSA_APITrace_hsa_signal_wait_acquire::Create(
+    ULONGLONG ullStartTime,
+    ULONGLONG ullEndTime,
+    hsa_signal_t signal,
+    hsa_signal_condition_t condition,
+    hsa_signal_value_t compare_value,
+    uint64_t timeout_hint,
+    hsa_wait_state_t wait_state_hint,
+    hsa_signal_value_t retVal)
+{
+    m_ullStart = ullStartTime;
+    m_ullEnd = ullEndTime;
+    m_type = HSA_API_Type_hsa_signal_wait_acquire;
+    m_signal = signal;
+    m_condition = condition;
+    m_compare_value = compare_value;
+    m_timeout_hint = timeout_hint;
+    m_wait_state_hint = wait_state_hint;
+    m_retVal = retVal;
+}
 #endif
 
 ///////////////////////////////////////////////////
@@ -3247,55 +3321,6 @@ void HSA_APITrace_hsa_signal_wait_relaxed::Create(
     m_ullStart = ullStartTime;
     m_ullEnd = ullEndTime;
     m_type = HSA_API_Type_hsa_signal_wait_relaxed;
-    m_signal = signal;
-    m_condition = condition;
-    m_compare_value = compare_value;
-    m_timeout_hint = timeout_hint;
-    m_wait_state_hint = wait_state_hint;
-    m_retVal = retVal;
-}
-
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_signal_wait_acquire
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_signal_wait_acquire::HSA_APITrace_hsa_signal_wait_acquire()
-{
-}
-
-HSA_APITrace_hsa_signal_wait_acquire::~HSA_APITrace_hsa_signal_wait_acquire()
-{
-}
-
-std::string HSA_APITrace_hsa_signal_wait_acquire::GetRetString()
-{
-    return StringUtils::ToString(m_retVal);
-}
-
-std::string HSA_APITrace_hsa_signal_wait_acquire::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal) << s_strParamSeparator;
-    ss << HSATraceStringUtils::Get_hsa_signal_condition_t_String(m_condition) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_compare_value) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_timeout_hint) << s_strParamSeparator;
-    ss << HSATraceStringUtils::Get_hsa_wait_state_t_String(m_wait_state_hint);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_signal_wait_acquire::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    hsa_signal_t signal,
-    hsa_signal_condition_t condition,
-    hsa_signal_value_t compare_value,
-    uint64_t timeout_hint,
-    hsa_wait_state_t wait_state_hint,
-    hsa_signal_value_t retVal)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_signal_wait_acquire;
     m_signal = signal;
     m_condition = condition;
     m_compare_value = compare_value;
@@ -3784,49 +3809,6 @@ void HSA_APITrace_hsa_queue_inactivate::Create(
     m_retVal = retVal;
 }
 
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_queue_load_read_index_acquire
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_queue_load_read_index_acquire::HSA_APITrace_hsa_queue_load_read_index_acquire()
-{
-}
-
-HSA_APITrace_hsa_queue_load_read_index_acquire::~HSA_APITrace_hsa_queue_load_read_index_acquire()
-{
-}
-
-std::string HSA_APITrace_hsa_queue_load_read_index_acquire::GetRetString()
-{
-    return StringUtils::ToString(m_retVal);
-}
-
-std::string HSA_APITrace_hsa_queue_load_read_index_acquire::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_queue_load_read_index_acquire::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    const hsa_queue_t* queue,
-    uint64_t retVal)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_queue_load_read_index_acquire;
-    m_queue = queue;
-
-    if (nullptr != m_queue)
-    {
-        m_queueVal = *m_queue;
-    }
-
-    m_retVal = retVal;
-}
-
 #ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_queue_load_read_index_scacquire
@@ -3861,6 +3843,50 @@ void HSA_APITrace_hsa_queue_load_read_index_scacquire::Create(
     m_ullStart = ullStartTime;
     m_ullEnd = ullEndTime;
     m_type = HSA_API_Type_hsa_queue_load_read_index_scacquire;
+    m_queue = queue;
+
+    if (nullptr != m_queue)
+    {
+        m_queueVal = *m_queue;
+    }
+
+    m_retVal = retVal;
+}
+#else
+
+///////////////////////////////////////////////////
+/// Class HSA_APITrace_hsa_queue_load_read_index_acquire
+///////////////////////////////////////////////////
+
+HSA_APITrace_hsa_queue_load_read_index_acquire::HSA_APITrace_hsa_queue_load_read_index_acquire()
+{
+}
+
+HSA_APITrace_hsa_queue_load_read_index_acquire::~HSA_APITrace_hsa_queue_load_read_index_acquire()
+{
+}
+
+std::string HSA_APITrace_hsa_queue_load_read_index_acquire::GetRetString()
+{
+    return StringUtils::ToString(m_retVal);
+}
+
+std::string HSA_APITrace_hsa_queue_load_read_index_acquire::ToString()
+{
+    std::ostringstream ss;
+    ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal);
+    return ss.str();
+}
+
+void HSA_APITrace_hsa_queue_load_read_index_acquire::Create(
+    ULONGLONG ullStartTime,
+    ULONGLONG ullEndTime,
+    const hsa_queue_t* queue,
+    uint64_t retVal)
+{
+    m_ullStart = ullStartTime;
+    m_ullEnd = ullEndTime;
+    m_type = HSA_API_Type_hsa_queue_load_read_index_acquire;
     m_queue = queue;
 
     if (nullptr != m_queue)
@@ -3915,49 +3941,6 @@ void HSA_APITrace_hsa_queue_load_read_index_relaxed::Create(
     m_retVal = retVal;
 }
 
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_queue_load_write_index_acquire
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_queue_load_write_index_acquire::HSA_APITrace_hsa_queue_load_write_index_acquire()
-{
-}
-
-HSA_APITrace_hsa_queue_load_write_index_acquire::~HSA_APITrace_hsa_queue_load_write_index_acquire()
-{
-}
-
-std::string HSA_APITrace_hsa_queue_load_write_index_acquire::GetRetString()
-{
-    return StringUtils::ToString(m_retVal);
-}
-
-std::string HSA_APITrace_hsa_queue_load_write_index_acquire::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_queue_load_write_index_acquire::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    const hsa_queue_t* queue,
-    uint64_t retVal)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_queue_load_write_index_acquire;
-    m_queue = queue;
-
-    if (nullptr != m_queue)
-    {
-        m_queueVal = *m_queue;
-    }
-
-    m_retVal = retVal;
-}
-
 #ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_queue_load_write_index_scacquire
@@ -3992,6 +3975,50 @@ void HSA_APITrace_hsa_queue_load_write_index_scacquire::Create(
     m_ullStart = ullStartTime;
     m_ullEnd = ullEndTime;
     m_type = HSA_API_Type_hsa_queue_load_write_index_scacquire;
+    m_queue = queue;
+
+    if (nullptr != m_queue)
+    {
+        m_queueVal = *m_queue;
+    }
+
+    m_retVal = retVal;
+}
+#else
+
+///////////////////////////////////////////////////
+/// Class HSA_APITrace_hsa_queue_load_write_index_acquire
+///////////////////////////////////////////////////
+
+HSA_APITrace_hsa_queue_load_write_index_acquire::HSA_APITrace_hsa_queue_load_write_index_acquire()
+{
+}
+
+HSA_APITrace_hsa_queue_load_write_index_acquire::~HSA_APITrace_hsa_queue_load_write_index_acquire()
+{
+}
+
+std::string HSA_APITrace_hsa_queue_load_write_index_acquire::GetRetString()
+{
+    return StringUtils::ToString(m_retVal);
+}
+
+std::string HSA_APITrace_hsa_queue_load_write_index_acquire::ToString()
+{
+    std::ostringstream ss;
+    ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal);
+    return ss.str();
+}
+
+void HSA_APITrace_hsa_queue_load_write_index_acquire::Create(
+    ULONGLONG ullStartTime,
+    ULONGLONG ullEndTime,
+    const hsa_queue_t* queue,
+    uint64_t retVal)
+{
+    m_ullStart = ullStartTime;
+    m_ullEnd = ullEndTime;
+    m_type = HSA_API_Type_hsa_queue_load_write_index_acquire;
     m_queue = queue;
 
     if (nullptr != m_queue)
@@ -4090,50 +4117,6 @@ void HSA_APITrace_hsa_queue_store_write_index_relaxed::Create(
     m_value = value;
 }
 
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_queue_store_write_index_release
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_queue_store_write_index_release::HSA_APITrace_hsa_queue_store_write_index_release()
-{
-}
-
-HSA_APITrace_hsa_queue_store_write_index_release::~HSA_APITrace_hsa_queue_store_write_index_release()
-{
-}
-
-std::string HSA_APITrace_hsa_queue_store_write_index_release::GetRetString()
-{
-    return "";
-}
-
-std::string HSA_APITrace_hsa_queue_store_write_index_release::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_queue_store_write_index_release::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    const hsa_queue_t* queue,
-    uint64_t value)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_queue_store_write_index_release;
-    m_queue = queue;
-
-    if (nullptr != m_queue)
-    {
-        m_queueVal = *m_queue;
-    }
-
-    m_value = value;
-}
-
 #ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_queue_store_write_index_screlease
@@ -4178,45 +4161,41 @@ void HSA_APITrace_hsa_queue_store_write_index_screlease::Create(
 
     m_value = value;
 }
-#endif
-
+#else
 ///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_queue_cas_write_index_acq_rel
+/// Class HSA_APITrace_hsa_queue_store_write_index_release
 ///////////////////////////////////////////////////
 
-HSA_APITrace_hsa_queue_cas_write_index_acq_rel::HSA_APITrace_hsa_queue_cas_write_index_acq_rel()
+HSA_APITrace_hsa_queue_store_write_index_release::HSA_APITrace_hsa_queue_store_write_index_release()
 {
 }
 
-HSA_APITrace_hsa_queue_cas_write_index_acq_rel::~HSA_APITrace_hsa_queue_cas_write_index_acq_rel()
+HSA_APITrace_hsa_queue_store_write_index_release::~HSA_APITrace_hsa_queue_store_write_index_release()
 {
 }
 
-std::string HSA_APITrace_hsa_queue_cas_write_index_acq_rel::GetRetString()
+std::string HSA_APITrace_hsa_queue_store_write_index_release::GetRetString()
 {
-    return StringUtils::ToString(m_retVal);
+    return "";
 }
 
-std::string HSA_APITrace_hsa_queue_cas_write_index_acq_rel::ToString()
+std::string HSA_APITrace_hsa_queue_store_write_index_release::ToString()
 {
     std::ostringstream ss;
     ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_expected) << s_strParamSeparator;
     ss << StringUtils::ToString(m_value);
     return ss.str();
 }
 
-void HSA_APITrace_hsa_queue_cas_write_index_acq_rel::Create(
+void HSA_APITrace_hsa_queue_store_write_index_release::Create(
     ULONGLONG ullStartTime,
     ULONGLONG ullEndTime,
     const hsa_queue_t* queue,
-    uint64_t expected,
-    uint64_t value,
-    uint64_t retVal)
+    uint64_t value)
 {
     m_ullStart = ullStartTime;
     m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_queue_cas_write_index_acq_rel;
+    m_type = HSA_API_Type_hsa_queue_store_write_index_release;
     m_queue = queue;
 
     if (nullptr != m_queue)
@@ -4224,10 +4203,9 @@ void HSA_APITrace_hsa_queue_cas_write_index_acq_rel::Create(
         m_queueVal = *m_queue;
     }
 
-    m_expected = expected;
     m_value = value;
-    m_retVal = retVal;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
@@ -4278,26 +4256,26 @@ void HSA_APITrace_hsa_queue_cas_write_index_scacq_screl::Create(
     m_value = value;
     m_retVal = retVal;
 }
-#endif
+#else
 
 ///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_queue_cas_write_index_acquire
+/// Class HSA_APITrace_hsa_queue_cas_write_index_acq_rel
 ///////////////////////////////////////////////////
 
-HSA_APITrace_hsa_queue_cas_write_index_acquire::HSA_APITrace_hsa_queue_cas_write_index_acquire()
+HSA_APITrace_hsa_queue_cas_write_index_acq_rel::HSA_APITrace_hsa_queue_cas_write_index_acq_rel()
 {
 }
 
-HSA_APITrace_hsa_queue_cas_write_index_acquire::~HSA_APITrace_hsa_queue_cas_write_index_acquire()
+HSA_APITrace_hsa_queue_cas_write_index_acq_rel::~HSA_APITrace_hsa_queue_cas_write_index_acq_rel()
 {
 }
 
-std::string HSA_APITrace_hsa_queue_cas_write_index_acquire::GetRetString()
+std::string HSA_APITrace_hsa_queue_cas_write_index_acq_rel::GetRetString()
 {
     return StringUtils::ToString(m_retVal);
 }
 
-std::string HSA_APITrace_hsa_queue_cas_write_index_acquire::ToString()
+std::string HSA_APITrace_hsa_queue_cas_write_index_acq_rel::ToString()
 {
     std::ostringstream ss;
     ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal) << s_strParamSeparator;
@@ -4306,7 +4284,7 @@ std::string HSA_APITrace_hsa_queue_cas_write_index_acquire::ToString()
     return ss.str();
 }
 
-void HSA_APITrace_hsa_queue_cas_write_index_acquire::Create(
+void HSA_APITrace_hsa_queue_cas_write_index_acq_rel::Create(
     ULONGLONG ullStartTime,
     ULONGLONG ullEndTime,
     const hsa_queue_t* queue,
@@ -4316,7 +4294,7 @@ void HSA_APITrace_hsa_queue_cas_write_index_acquire::Create(
 {
     m_ullStart = ullStartTime;
     m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_queue_cas_write_index_acquire;
+    m_type = HSA_API_Type_hsa_queue_cas_write_index_acq_rel;
     m_queue = queue;
 
     if (nullptr != m_queue)
@@ -4328,6 +4306,7 @@ void HSA_APITrace_hsa_queue_cas_write_index_acquire::Create(
     m_value = value;
     m_retVal = retVal;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
@@ -4367,6 +4346,56 @@ void HSA_APITrace_hsa_queue_cas_write_index_scacquire::Create(
     m_ullStart = ullStartTime;
     m_ullEnd = ullEndTime;
     m_type = HSA_API_Type_hsa_queue_cas_write_index_scacquire;
+    m_queue = queue;
+
+    if (nullptr != m_queue)
+    {
+        m_queueVal = *m_queue;
+    }
+
+    m_expected = expected;
+    m_value = value;
+    m_retVal = retVal;
+}
+#else
+
+///////////////////////////////////////////////////
+/// Class HSA_APITrace_hsa_queue_cas_write_index_acquire
+///////////////////////////////////////////////////
+
+HSA_APITrace_hsa_queue_cas_write_index_acquire::HSA_APITrace_hsa_queue_cas_write_index_acquire()
+{
+}
+
+HSA_APITrace_hsa_queue_cas_write_index_acquire::~HSA_APITrace_hsa_queue_cas_write_index_acquire()
+{
+}
+
+std::string HSA_APITrace_hsa_queue_cas_write_index_acquire::GetRetString()
+{
+    return StringUtils::ToString(m_retVal);
+}
+
+std::string HSA_APITrace_hsa_queue_cas_write_index_acquire::ToString()
+{
+    std::ostringstream ss;
+    ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal) << s_strParamSeparator;
+    ss << StringUtils::ToString(m_expected) << s_strParamSeparator;
+    ss << StringUtils::ToString(m_value);
+    return ss.str();
+}
+
+void HSA_APITrace_hsa_queue_cas_write_index_acquire::Create(
+    ULONGLONG ullStartTime,
+    ULONGLONG ullEndTime,
+    const hsa_queue_t* queue,
+    uint64_t expected,
+    uint64_t value,
+    uint64_t retVal)
+{
+    m_ullStart = ullStartTime;
+    m_ullEnd = ullEndTime;
+    m_type = HSA_API_Type_hsa_queue_cas_write_index_acquire;
     m_queue = queue;
 
     if (nullptr != m_queue)
@@ -4429,55 +4458,6 @@ void HSA_APITrace_hsa_queue_cas_write_index_relaxed::Create(
     m_retVal = retVal;
 }
 
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_queue_cas_write_index_release
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_queue_cas_write_index_release::HSA_APITrace_hsa_queue_cas_write_index_release()
-{
-}
-
-HSA_APITrace_hsa_queue_cas_write_index_release::~HSA_APITrace_hsa_queue_cas_write_index_release()
-{
-}
-
-std::string HSA_APITrace_hsa_queue_cas_write_index_release::GetRetString()
-{
-    return StringUtils::ToString(m_retVal);
-}
-
-std::string HSA_APITrace_hsa_queue_cas_write_index_release::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_expected) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_queue_cas_write_index_release::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    const hsa_queue_t* queue,
-    uint64_t expected,
-    uint64_t value,
-    uint64_t retVal)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_queue_cas_write_index_release;
-    m_queue = queue;
-
-    if (nullptr != m_queue)
-    {
-        m_queueVal = *m_queue;
-    }
-
-    m_expected = expected;
-    m_value = value;
-    m_retVal = retVal;
-}
-
 #ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_queue_cas_write_index_screlease
@@ -4527,43 +4507,45 @@ void HSA_APITrace_hsa_queue_cas_write_index_screlease::Create(
     m_value = value;
     m_retVal = retVal;
 }
-#endif
+#else
 
 ///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_queue_add_write_index_acq_rel
+/// Class HSA_APITrace_hsa_queue_cas_write_index_release
 ///////////////////////////////////////////////////
 
-HSA_APITrace_hsa_queue_add_write_index_acq_rel::HSA_APITrace_hsa_queue_add_write_index_acq_rel()
+HSA_APITrace_hsa_queue_cas_write_index_release::HSA_APITrace_hsa_queue_cas_write_index_release()
 {
 }
 
-HSA_APITrace_hsa_queue_add_write_index_acq_rel::~HSA_APITrace_hsa_queue_add_write_index_acq_rel()
+HSA_APITrace_hsa_queue_cas_write_index_release::~HSA_APITrace_hsa_queue_cas_write_index_release()
 {
 }
 
-std::string HSA_APITrace_hsa_queue_add_write_index_acq_rel::GetRetString()
+std::string HSA_APITrace_hsa_queue_cas_write_index_release::GetRetString()
 {
     return StringUtils::ToString(m_retVal);
 }
 
-std::string HSA_APITrace_hsa_queue_add_write_index_acq_rel::ToString()
+std::string HSA_APITrace_hsa_queue_cas_write_index_release::ToString()
 {
     std::ostringstream ss;
     ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal) << s_strParamSeparator;
+    ss << StringUtils::ToString(m_expected) << s_strParamSeparator;
     ss << StringUtils::ToString(m_value);
     return ss.str();
 }
 
-void HSA_APITrace_hsa_queue_add_write_index_acq_rel::Create(
+void HSA_APITrace_hsa_queue_cas_write_index_release::Create(
     ULONGLONG ullStartTime,
     ULONGLONG ullEndTime,
     const hsa_queue_t* queue,
+    uint64_t expected,
     uint64_t value,
     uint64_t retVal)
 {
     m_ullStart = ullStartTime;
     m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_queue_add_write_index_acq_rel;
+    m_type = HSA_API_Type_hsa_queue_cas_write_index_release;
     m_queue = queue;
 
     if (nullptr != m_queue)
@@ -4571,9 +4553,11 @@ void HSA_APITrace_hsa_queue_add_write_index_acq_rel::Create(
         m_queueVal = *m_queue;
     }
 
+    m_expected = expected;
     m_value = value;
     m_retVal = retVal;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
@@ -4621,26 +4605,26 @@ void HSA_APITrace_hsa_queue_add_write_index_scacq_screl::Create(
     m_value = value;
     m_retVal = retVal;
 }
-#endif
+#else
 
 ///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_queue_add_write_index_acquire
+/// Class HSA_APITrace_hsa_queue_add_write_index_acq_rel
 ///////////////////////////////////////////////////
 
-HSA_APITrace_hsa_queue_add_write_index_acquire::HSA_APITrace_hsa_queue_add_write_index_acquire()
+HSA_APITrace_hsa_queue_add_write_index_acq_rel::HSA_APITrace_hsa_queue_add_write_index_acq_rel()
 {
 }
 
-HSA_APITrace_hsa_queue_add_write_index_acquire::~HSA_APITrace_hsa_queue_add_write_index_acquire()
+HSA_APITrace_hsa_queue_add_write_index_acq_rel::~HSA_APITrace_hsa_queue_add_write_index_acq_rel()
 {
 }
 
-std::string HSA_APITrace_hsa_queue_add_write_index_acquire::GetRetString()
+std::string HSA_APITrace_hsa_queue_add_write_index_acq_rel::GetRetString()
 {
     return StringUtils::ToString(m_retVal);
 }
 
-std::string HSA_APITrace_hsa_queue_add_write_index_acquire::ToString()
+std::string HSA_APITrace_hsa_queue_add_write_index_acq_rel::ToString()
 {
     std::ostringstream ss;
     ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal) << s_strParamSeparator;
@@ -4648,7 +4632,7 @@ std::string HSA_APITrace_hsa_queue_add_write_index_acquire::ToString()
     return ss.str();
 }
 
-void HSA_APITrace_hsa_queue_add_write_index_acquire::Create(
+void HSA_APITrace_hsa_queue_add_write_index_acq_rel::Create(
     ULONGLONG ullStartTime,
     ULONGLONG ullEndTime,
     const hsa_queue_t* queue,
@@ -4657,7 +4641,7 @@ void HSA_APITrace_hsa_queue_add_write_index_acquire::Create(
 {
     m_ullStart = ullStartTime;
     m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_queue_add_write_index_acquire;
+    m_type = HSA_API_Type_hsa_queue_add_write_index_acq_rel;
     m_queue = queue;
 
     if (nullptr != m_queue)
@@ -4668,6 +4652,7 @@ void HSA_APITrace_hsa_queue_add_write_index_acquire::Create(
     m_value = value;
     m_retVal = retVal;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
@@ -4705,6 +4690,53 @@ void HSA_APITrace_hsa_queue_add_write_index_scacquire::Create(
     m_ullStart = ullStartTime;
     m_ullEnd = ullEndTime;
     m_type = HSA_API_Type_hsa_queue_add_write_index_scacquire;
+    m_queue = queue;
+
+    if (nullptr != m_queue)
+    {
+        m_queueVal = *m_queue;
+    }
+
+    m_value = value;
+    m_retVal = retVal;
+}
+#else
+
+///////////////////////////////////////////////////
+/// Class HSA_APITrace_hsa_queue_add_write_index_acquire
+///////////////////////////////////////////////////
+
+HSA_APITrace_hsa_queue_add_write_index_acquire::HSA_APITrace_hsa_queue_add_write_index_acquire()
+{
+}
+
+HSA_APITrace_hsa_queue_add_write_index_acquire::~HSA_APITrace_hsa_queue_add_write_index_acquire()
+{
+}
+
+std::string HSA_APITrace_hsa_queue_add_write_index_acquire::GetRetString()
+{
+    return StringUtils::ToString(m_retVal);
+}
+
+std::string HSA_APITrace_hsa_queue_add_write_index_acquire::ToString()
+{
+    std::ostringstream ss;
+    ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal) << s_strParamSeparator;
+    ss << StringUtils::ToString(m_value);
+    return ss.str();
+}
+
+void HSA_APITrace_hsa_queue_add_write_index_acquire::Create(
+    ULONGLONG ullStartTime,
+    ULONGLONG ullEndTime,
+    const hsa_queue_t* queue,
+    uint64_t value,
+    uint64_t retVal)
+{
+    m_ullStart = ullStartTime;
+    m_ullEnd = ullEndTime;
+    m_type = HSA_API_Type_hsa_queue_add_write_index_acquire;
     m_queue = queue;
 
     if (nullptr != m_queue)
@@ -4763,52 +4795,6 @@ void HSA_APITrace_hsa_queue_add_write_index_relaxed::Create(
     m_retVal = retVal;
 }
 
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_queue_add_write_index_release
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_queue_add_write_index_release::HSA_APITrace_hsa_queue_add_write_index_release()
-{
-}
-
-HSA_APITrace_hsa_queue_add_write_index_release::~HSA_APITrace_hsa_queue_add_write_index_release()
-{
-}
-
-std::string HSA_APITrace_hsa_queue_add_write_index_release::GetRetString()
-{
-    return StringUtils::ToString(m_retVal);
-}
-
-std::string HSA_APITrace_hsa_queue_add_write_index_release::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_queue_add_write_index_release::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    const hsa_queue_t* queue,
-    uint64_t value,
-    uint64_t retVal)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_queue_add_write_index_release;
-    m_queue = queue;
-
-    if (nullptr != m_queue)
-    {
-        m_queueVal = *m_queue;
-    }
-
-    m_value = value;
-    m_retVal = retVal;
-}
-
 #ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_queue_add_write_index_screlease
@@ -4845,6 +4831,53 @@ void HSA_APITrace_hsa_queue_add_write_index_screlease::Create(
     m_ullStart = ullStartTime;
     m_ullEnd = ullEndTime;
     m_type = HSA_API_Type_hsa_queue_add_write_index_screlease;
+    m_queue = queue;
+
+    if (nullptr != m_queue)
+    {
+        m_queueVal = *m_queue;
+    }
+
+    m_value = value;
+    m_retVal = retVal;
+}
+#else
+
+///////////////////////////////////////////////////
+/// Class HSA_APITrace_hsa_queue_add_write_index_release
+///////////////////////////////////////////////////
+
+HSA_APITrace_hsa_queue_add_write_index_release::HSA_APITrace_hsa_queue_add_write_index_release()
+{
+}
+
+HSA_APITrace_hsa_queue_add_write_index_release::~HSA_APITrace_hsa_queue_add_write_index_release()
+{
+}
+
+std::string HSA_APITrace_hsa_queue_add_write_index_release::GetRetString()
+{
+    return StringUtils::ToString(m_retVal);
+}
+
+std::string HSA_APITrace_hsa_queue_add_write_index_release::ToString()
+{
+    std::ostringstream ss;
+    ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal) << s_strParamSeparator;
+    ss << StringUtils::ToString(m_value);
+    return ss.str();
+}
+
+void HSA_APITrace_hsa_queue_add_write_index_release::Create(
+    ULONGLONG ullStartTime,
+    ULONGLONG ullEndTime,
+    const hsa_queue_t* queue,
+    uint64_t value,
+    uint64_t retVal)
+{
+    m_ullStart = ullStartTime;
+    m_ullEnd = ullEndTime;
+    m_type = HSA_API_Type_hsa_queue_add_write_index_release;
     m_queue = queue;
 
     if (nullptr != m_queue)
@@ -4901,50 +4934,6 @@ void HSA_APITrace_hsa_queue_store_read_index_relaxed::Create(
     m_value = value;
 }
 
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_queue_store_read_index_release
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_queue_store_read_index_release::HSA_APITrace_hsa_queue_store_read_index_release()
-{
-}
-
-HSA_APITrace_hsa_queue_store_read_index_release::~HSA_APITrace_hsa_queue_store_read_index_release()
-{
-}
-
-std::string HSA_APITrace_hsa_queue_store_read_index_release::GetRetString()
-{
-    return "";
-}
-
-std::string HSA_APITrace_hsa_queue_store_read_index_release::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_queue_store_read_index_release::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    const hsa_queue_t* queue,
-    uint64_t value)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_queue_store_read_index_release;
-    m_queue = queue;
-
-    if (nullptr != m_queue)
-    {
-        m_queueVal = *m_queue;
-    }
-
-    m_value = value;
-}
-
 #ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_queue_store_read_index_screlease
@@ -4980,6 +4969,51 @@ void HSA_APITrace_hsa_queue_store_read_index_screlease::Create(
     m_ullStart = ullStartTime;
     m_ullEnd = ullEndTime;
     m_type = HSA_API_Type_hsa_queue_store_read_index_screlease;
+    m_queue = queue;
+
+    if (nullptr != m_queue)
+    {
+        m_queueVal = *m_queue;
+    }
+
+    m_value = value;
+}
+#else
+
+///////////////////////////////////////////////////
+/// Class HSA_APITrace_hsa_queue_store_read_index_release
+///////////////////////////////////////////////////
+
+HSA_APITrace_hsa_queue_store_read_index_release::HSA_APITrace_hsa_queue_store_read_index_release()
+{
+}
+
+HSA_APITrace_hsa_queue_store_read_index_release::~HSA_APITrace_hsa_queue_store_read_index_release()
+{
+}
+
+std::string HSA_APITrace_hsa_queue_store_read_index_release::GetRetString()
+{
+    return "";
+}
+
+std::string HSA_APITrace_hsa_queue_store_read_index_release::ToString()
+{
+    std::ostringstream ss;
+    ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal) << s_strParamSeparator;
+    ss << StringUtils::ToString(m_value);
+    return ss.str();
+}
+
+void HSA_APITrace_hsa_queue_store_read_index_release::Create(
+    ULONGLONG ullStartTime,
+    ULONGLONG ullEndTime,
+    const hsa_queue_t* queue,
+    uint64_t value)
+{
+    m_ullStart = ullStartTime;
+    m_ullEnd = ullEndTime;
+    m_type = HSA_API_Type_hsa_queue_store_read_index_release;
     m_queue = queue;
 
     if (nullptr != m_queue)

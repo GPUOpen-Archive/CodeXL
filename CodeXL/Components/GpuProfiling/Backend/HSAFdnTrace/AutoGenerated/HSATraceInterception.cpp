@@ -469,15 +469,14 @@ hsa_signal_value_t HSA_API_Trace_hsa_signal_load_scacquire(hsa_signal_t signal)
 
     return retVal;
 }
-#endif
-
-hsa_signal_value_t HSA_API_Trace_hsa_signal_load_relaxed(hsa_signal_t signal)
+#else
+hsa_signal_value_t HSA_API_Trace_hsa_signal_load_acquire(hsa_signal_t signal)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
-    hsa_signal_value_t retVal = g_pRealCoreFunctions->hsa_signal_load_relaxed_fn(signal);
+    hsa_signal_value_t retVal = g_pRealCoreFunctions->hsa_signal_load_acquire_fn(signal);
     ULONGLONG ullEnd = OSUtils::Instance()->GetTimeNanos();
 
-    HSA_APITrace_hsa_signal_load_relaxed* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_signal_load_relaxed();
+    HSA_APITrace_hsa_signal_load_acquire* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_signal_load_acquire();
     SpAssertRet(nullptr != pAPIInfo) retVal;
 
     pAPIInfo->Create(
@@ -491,14 +490,15 @@ hsa_signal_value_t HSA_API_Trace_hsa_signal_load_relaxed(hsa_signal_t signal)
 
     return retVal;
 }
+#endif
 
-hsa_signal_value_t HSA_API_Trace_hsa_signal_load_acquire(hsa_signal_t signal)
+hsa_signal_value_t HSA_API_Trace_hsa_signal_load_relaxed(hsa_signal_t signal)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
-    hsa_signal_value_t retVal = g_pRealCoreFunctions->hsa_signal_load_acquire_fn(signal);
+    hsa_signal_value_t retVal = g_pRealCoreFunctions->hsa_signal_load_relaxed_fn(signal);
     ULONGLONG ullEnd = OSUtils::Instance()->GetTimeNanos();
 
-    HSA_APITrace_hsa_signal_load_acquire* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_signal_load_acquire();
+    HSA_APITrace_hsa_signal_load_relaxed* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_signal_load_relaxed();
     SpAssertRet(nullptr != pAPIInfo) retVal;
 
     pAPIInfo->Create(
@@ -551,8 +551,7 @@ void HSA_API_Trace_hsa_signal_store_screlease(hsa_signal_t signal, hsa_signal_va
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
-#endif
-
+#else
 void HSA_API_Trace_hsa_signal_store_release(hsa_signal_t signal, hsa_signal_value_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
@@ -571,6 +570,7 @@ void HSA_API_Trace_hsa_signal_store_release(hsa_signal_t signal, hsa_signal_valu
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 void HSA_API_Trace_hsa_signal_silent_store_relaxed(hsa_signal_t signal, hsa_signal_value_t value)
@@ -632,8 +632,7 @@ hsa_signal_value_t HSA_API_Trace_hsa_signal_exchange_scacq_screl(hsa_signal_t si
 
     return retVal;
 }
-#endif
-
+#else
 hsa_signal_value_t HSA_API_Trace_hsa_signal_exchange_acq_rel(hsa_signal_t signal, hsa_signal_value_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
@@ -655,6 +654,7 @@ hsa_signal_value_t HSA_API_Trace_hsa_signal_exchange_acq_rel(hsa_signal_t signal
 
     return retVal;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 hsa_signal_value_t HSA_API_Trace_hsa_signal_exchange_scacquire(hsa_signal_t signal, hsa_signal_value_t value)
@@ -678,8 +678,7 @@ hsa_signal_value_t HSA_API_Trace_hsa_signal_exchange_scacquire(hsa_signal_t sign
 
     return retVal;
 }
-#endif
-
+#else
 hsa_signal_value_t HSA_API_Trace_hsa_signal_exchange_acquire(hsa_signal_t signal, hsa_signal_value_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
@@ -701,6 +700,7 @@ hsa_signal_value_t HSA_API_Trace_hsa_signal_exchange_acquire(hsa_signal_t signal
 
     return retVal;
 }
+#endif
 
 hsa_signal_value_t HSA_API_Trace_hsa_signal_exchange_relaxed(hsa_signal_t signal, hsa_signal_value_t value)
 {
@@ -746,8 +746,7 @@ hsa_signal_value_t HSA_API_Trace_hsa_signal_exchange_screlease(hsa_signal_t sign
 
     return retVal;
 }
-#endif
-
+#else
 hsa_signal_value_t HSA_API_Trace_hsa_signal_exchange_release(hsa_signal_t signal, hsa_signal_value_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
@@ -769,6 +768,7 @@ hsa_signal_value_t HSA_API_Trace_hsa_signal_exchange_release(hsa_signal_t signal
 
     return retVal;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 hsa_signal_value_t HSA_API_Trace_hsa_signal_cas_scacq_screl(hsa_signal_t signal, hsa_signal_value_t expected, hsa_signal_value_t value)
@@ -793,8 +793,7 @@ hsa_signal_value_t HSA_API_Trace_hsa_signal_cas_scacq_screl(hsa_signal_t signal,
 
     return retVal;
 }
-#endif
-
+#else
 hsa_signal_value_t HSA_API_Trace_hsa_signal_cas_acq_rel(hsa_signal_t signal, hsa_signal_value_t expected, hsa_signal_value_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
@@ -817,6 +816,7 @@ hsa_signal_value_t HSA_API_Trace_hsa_signal_cas_acq_rel(hsa_signal_t signal, hsa
 
     return retVal;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 hsa_signal_value_t HSA_API_Trace_hsa_signal_cas_scacquire(hsa_signal_t signal, hsa_signal_value_t expected, hsa_signal_value_t value)
@@ -841,8 +841,7 @@ hsa_signal_value_t HSA_API_Trace_hsa_signal_cas_scacquire(hsa_signal_t signal, h
 
     return retVal;
 }
-#endif
-
+#else
 hsa_signal_value_t HSA_API_Trace_hsa_signal_cas_acquire(hsa_signal_t signal, hsa_signal_value_t expected, hsa_signal_value_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
@@ -865,6 +864,7 @@ hsa_signal_value_t HSA_API_Trace_hsa_signal_cas_acquire(hsa_signal_t signal, hsa
 
     return retVal;
 }
+#endif
 
 hsa_signal_value_t HSA_API_Trace_hsa_signal_cas_relaxed(hsa_signal_t signal, hsa_signal_value_t expected, hsa_signal_value_t value)
 {
@@ -912,8 +912,7 @@ hsa_signal_value_t HSA_API_Trace_hsa_signal_cas_screlease(hsa_signal_t signal, h
 
     return retVal;
 }
-#endif
-
+#else
 hsa_signal_value_t HSA_API_Trace_hsa_signal_cas_release(hsa_signal_t signal, hsa_signal_value_t expected, hsa_signal_value_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
@@ -936,6 +935,7 @@ hsa_signal_value_t HSA_API_Trace_hsa_signal_cas_release(hsa_signal_t signal, hsa
 
     return retVal;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 void HSA_API_Trace_hsa_signal_add_scacq_screl(hsa_signal_t signal, hsa_signal_value_t value)
@@ -956,8 +956,7 @@ void HSA_API_Trace_hsa_signal_add_scacq_screl(hsa_signal_t signal, hsa_signal_va
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
-#endif
-
+#else
 void HSA_API_Trace_hsa_signal_add_acq_rel(hsa_signal_t signal, hsa_signal_value_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
@@ -976,6 +975,7 @@ void HSA_API_Trace_hsa_signal_add_acq_rel(hsa_signal_t signal, hsa_signal_value_
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 void HSA_API_Trace_hsa_signal_add_scacquire(hsa_signal_t signal, hsa_signal_value_t value)
@@ -996,8 +996,7 @@ void HSA_API_Trace_hsa_signal_add_scacquire(hsa_signal_t signal, hsa_signal_valu
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
-#endif
-
+#else
 void HSA_API_Trace_hsa_signal_add_acquire(hsa_signal_t signal, hsa_signal_value_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
@@ -1016,6 +1015,7 @@ void HSA_API_Trace_hsa_signal_add_acquire(hsa_signal_t signal, hsa_signal_value_
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
+#endif
 
 void HSA_API_Trace_hsa_signal_add_relaxed(hsa_signal_t signal, hsa_signal_value_t value)
 {
@@ -1055,8 +1055,7 @@ void HSA_API_Trace_hsa_signal_add_screlease(hsa_signal_t signal, hsa_signal_valu
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
-#endif
-
+#else
 void HSA_API_Trace_hsa_signal_add_release(hsa_signal_t signal, hsa_signal_value_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
@@ -1075,6 +1074,7 @@ void HSA_API_Trace_hsa_signal_add_release(hsa_signal_t signal, hsa_signal_value_
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 void HSA_API_Trace_hsa_signal_subtract_scacq_screl(hsa_signal_t signal, hsa_signal_value_t value)
@@ -1095,8 +1095,7 @@ void HSA_API_Trace_hsa_signal_subtract_scacq_screl(hsa_signal_t signal, hsa_sign
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
-#endif
-
+#else
 void HSA_API_Trace_hsa_signal_subtract_acq_rel(hsa_signal_t signal, hsa_signal_value_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
@@ -1115,6 +1114,7 @@ void HSA_API_Trace_hsa_signal_subtract_acq_rel(hsa_signal_t signal, hsa_signal_v
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 void HSA_API_Trace_hsa_signal_subtract_scacquire(hsa_signal_t signal, hsa_signal_value_t value)
@@ -1135,8 +1135,7 @@ void HSA_API_Trace_hsa_signal_subtract_scacquire(hsa_signal_t signal, hsa_signal
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
-#endif
-
+#else
 void HSA_API_Trace_hsa_signal_subtract_acquire(hsa_signal_t signal, hsa_signal_value_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
@@ -1155,6 +1154,7 @@ void HSA_API_Trace_hsa_signal_subtract_acquire(hsa_signal_t signal, hsa_signal_v
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
+#endif
 
 void HSA_API_Trace_hsa_signal_subtract_relaxed(hsa_signal_t signal, hsa_signal_value_t value)
 {
@@ -1194,8 +1194,7 @@ void HSA_API_Trace_hsa_signal_subtract_screlease(hsa_signal_t signal, hsa_signal
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
-#endif
-
+#else
 void HSA_API_Trace_hsa_signal_subtract_release(hsa_signal_t signal, hsa_signal_value_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
@@ -1214,6 +1213,7 @@ void HSA_API_Trace_hsa_signal_subtract_release(hsa_signal_t signal, hsa_signal_v
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 void HSA_API_Trace_hsa_signal_and_scacq_screl(hsa_signal_t signal, hsa_signal_value_t value)
@@ -1234,8 +1234,7 @@ void HSA_API_Trace_hsa_signal_and_scacq_screl(hsa_signal_t signal, hsa_signal_va
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
-#endif
-
+#else
 void HSA_API_Trace_hsa_signal_and_acq_rel(hsa_signal_t signal, hsa_signal_value_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
@@ -1254,6 +1253,7 @@ void HSA_API_Trace_hsa_signal_and_acq_rel(hsa_signal_t signal, hsa_signal_value_
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 void HSA_API_Trace_hsa_signal_and_scacquire(hsa_signal_t signal, hsa_signal_value_t value)
@@ -1274,8 +1274,7 @@ void HSA_API_Trace_hsa_signal_and_scacquire(hsa_signal_t signal, hsa_signal_valu
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
-#endif
-
+#else
 void HSA_API_Trace_hsa_signal_and_acquire(hsa_signal_t signal, hsa_signal_value_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
@@ -1294,6 +1293,7 @@ void HSA_API_Trace_hsa_signal_and_acquire(hsa_signal_t signal, hsa_signal_value_
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
+#endif
 
 void HSA_API_Trace_hsa_signal_and_relaxed(hsa_signal_t signal, hsa_signal_value_t value)
 {
@@ -1333,8 +1333,7 @@ void HSA_API_Trace_hsa_signal_and_screlease(hsa_signal_t signal, hsa_signal_valu
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
-#endif
-
+#else
 void HSA_API_Trace_hsa_signal_and_release(hsa_signal_t signal, hsa_signal_value_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
@@ -1353,6 +1352,7 @@ void HSA_API_Trace_hsa_signal_and_release(hsa_signal_t signal, hsa_signal_value_
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 void HSA_API_Trace_hsa_signal_or_scacq_screl(hsa_signal_t signal, hsa_signal_value_t value)
@@ -1373,8 +1373,7 @@ void HSA_API_Trace_hsa_signal_or_scacq_screl(hsa_signal_t signal, hsa_signal_val
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
-#endif
-
+#else
 void HSA_API_Trace_hsa_signal_or_acq_rel(hsa_signal_t signal, hsa_signal_value_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
@@ -1393,6 +1392,7 @@ void HSA_API_Trace_hsa_signal_or_acq_rel(hsa_signal_t signal, hsa_signal_value_t
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 void HSA_API_Trace_hsa_signal_or_scacquire(hsa_signal_t signal, hsa_signal_value_t value)
@@ -1413,8 +1413,7 @@ void HSA_API_Trace_hsa_signal_or_scacquire(hsa_signal_t signal, hsa_signal_value
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
-#endif
-
+#else
 void HSA_API_Trace_hsa_signal_or_acquire(hsa_signal_t signal, hsa_signal_value_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
@@ -1433,6 +1432,7 @@ void HSA_API_Trace_hsa_signal_or_acquire(hsa_signal_t signal, hsa_signal_value_t
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
+#endif
 
 void HSA_API_Trace_hsa_signal_or_relaxed(hsa_signal_t signal, hsa_signal_value_t value)
 {
@@ -1472,8 +1472,7 @@ void HSA_API_Trace_hsa_signal_or_screlease(hsa_signal_t signal, hsa_signal_value
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
-#endif
-
+#else
 void HSA_API_Trace_hsa_signal_or_release(hsa_signal_t signal, hsa_signal_value_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
@@ -1492,6 +1491,7 @@ void HSA_API_Trace_hsa_signal_or_release(hsa_signal_t signal, hsa_signal_value_t
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 void HSA_API_Trace_hsa_signal_xor_scacq_screl(hsa_signal_t signal, hsa_signal_value_t value)
@@ -1512,8 +1512,7 @@ void HSA_API_Trace_hsa_signal_xor_scacq_screl(hsa_signal_t signal, hsa_signal_va
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
-#endif
-
+#else
 void HSA_API_Trace_hsa_signal_xor_acq_rel(hsa_signal_t signal, hsa_signal_value_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
@@ -1532,6 +1531,7 @@ void HSA_API_Trace_hsa_signal_xor_acq_rel(hsa_signal_t signal, hsa_signal_value_
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 void HSA_API_Trace_hsa_signal_xor_scacquire(hsa_signal_t signal, hsa_signal_value_t value)
@@ -1552,8 +1552,7 @@ void HSA_API_Trace_hsa_signal_xor_scacquire(hsa_signal_t signal, hsa_signal_valu
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
-#endif
-
+#else
 void HSA_API_Trace_hsa_signal_xor_acquire(hsa_signal_t signal, hsa_signal_value_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
@@ -1572,6 +1571,7 @@ void HSA_API_Trace_hsa_signal_xor_acquire(hsa_signal_t signal, hsa_signal_value_
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
+#endif
 
 void HSA_API_Trace_hsa_signal_xor_relaxed(hsa_signal_t signal, hsa_signal_value_t value)
 {
@@ -1611,8 +1611,7 @@ void HSA_API_Trace_hsa_signal_xor_screlease(hsa_signal_t signal, hsa_signal_valu
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
-#endif
-
+#else
 void HSA_API_Trace_hsa_signal_xor_release(hsa_signal_t signal, hsa_signal_value_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
@@ -1631,6 +1630,7 @@ void HSA_API_Trace_hsa_signal_xor_release(hsa_signal_t signal, hsa_signal_value_
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 hsa_signal_value_t HSA_API_Trace_hsa_signal_wait_scacquire(hsa_signal_t signal, hsa_signal_condition_t condition, hsa_signal_value_t compare_value, uint64_t timeout_hint, hsa_wait_state_t wait_state_hint)
@@ -1657,15 +1657,14 @@ hsa_signal_value_t HSA_API_Trace_hsa_signal_wait_scacquire(hsa_signal_t signal, 
 
     return retVal;
 }
-#endif
-
-hsa_signal_value_t HSA_API_Trace_hsa_signal_wait_relaxed(hsa_signal_t signal, hsa_signal_condition_t condition, hsa_signal_value_t compare_value, uint64_t timeout_hint, hsa_wait_state_t wait_state_hint)
+#else
+hsa_signal_value_t HSA_API_Trace_hsa_signal_wait_acquire(hsa_signal_t signal, hsa_signal_condition_t condition, hsa_signal_value_t compare_value, uint64_t timeout_hint, hsa_wait_state_t wait_state_hint)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
-    hsa_signal_value_t retVal = g_pRealCoreFunctions->hsa_signal_wait_relaxed_fn(signal, condition, compare_value, timeout_hint, wait_state_hint);
+    hsa_signal_value_t retVal = g_pRealCoreFunctions->hsa_signal_wait_acquire_fn(signal, condition, compare_value, timeout_hint, wait_state_hint);
     ULONGLONG ullEnd = OSUtils::Instance()->GetTimeNanos();
 
-    HSA_APITrace_hsa_signal_wait_relaxed* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_signal_wait_relaxed();
+    HSA_APITrace_hsa_signal_wait_acquire* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_signal_wait_acquire();
     SpAssertRet(nullptr != pAPIInfo) retVal;
 
     pAPIInfo->Create(
@@ -1683,14 +1682,15 @@ hsa_signal_value_t HSA_API_Trace_hsa_signal_wait_relaxed(hsa_signal_t signal, hs
 
     return retVal;
 }
+#endif
 
-hsa_signal_value_t HSA_API_Trace_hsa_signal_wait_acquire(hsa_signal_t signal, hsa_signal_condition_t condition, hsa_signal_value_t compare_value, uint64_t timeout_hint, hsa_wait_state_t wait_state_hint)
+hsa_signal_value_t HSA_API_Trace_hsa_signal_wait_relaxed(hsa_signal_t signal, hsa_signal_condition_t condition, hsa_signal_value_t compare_value, uint64_t timeout_hint, hsa_wait_state_t wait_state_hint)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
-    hsa_signal_value_t retVal = g_pRealCoreFunctions->hsa_signal_wait_acquire_fn(signal, condition, compare_value, timeout_hint, wait_state_hint);
+    hsa_signal_value_t retVal = g_pRealCoreFunctions->hsa_signal_wait_relaxed_fn(signal, condition, compare_value, timeout_hint, wait_state_hint);
     ULONGLONG ullEnd = OSUtils::Instance()->GetTimeNanos();
 
-    HSA_APITrace_hsa_signal_wait_acquire* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_signal_wait_acquire();
+    HSA_APITrace_hsa_signal_wait_relaxed* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_signal_wait_relaxed();
     SpAssertRet(nullptr != pAPIInfo) retVal;
 
     pAPIInfo->Create(
@@ -1929,13 +1929,14 @@ hsa_status_t HSA_API_Trace_hsa_queue_inactivate(hsa_queue_t* queue)
     return retVal;
 }
 
-uint64_t HSA_API_Trace_hsa_queue_load_read_index_acquire(const hsa_queue_t* queue)
+#ifdef FUTURE_ROCR_VERSION
+uint64_t HSA_API_Trace_hsa_queue_load_read_index_scacquire(const hsa_queue_t* queue)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
-    uint64_t retVal = g_pRealCoreFunctions->hsa_queue_load_read_index_acquire_fn(queue);
+    uint64_t retVal = g_pRealCoreFunctions->hsa_queue_load_read_index_scacquire_fn(queue);
     ULONGLONG ullEnd = OSUtils::Instance()->GetTimeNanos();
 
-    HSA_APITrace_hsa_queue_load_read_index_acquire* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_load_read_index_acquire();
+    HSA_APITrace_hsa_queue_load_read_index_scacquire* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_load_read_index_scacquire();
     SpAssertRet(nullptr != pAPIInfo) retVal;
 
     pAPIInfo->Create(
@@ -1949,15 +1950,14 @@ uint64_t HSA_API_Trace_hsa_queue_load_read_index_acquire(const hsa_queue_t* queu
 
     return retVal;
 }
-
-#ifdef FUTURE_ROCR_VERSION
-uint64_t HSA_API_Trace_hsa_queue_load_read_index_scacquire(const hsa_queue_t* queue)
+#else
+uint64_t HSA_API_Trace_hsa_queue_load_read_index_acquire(const hsa_queue_t* queue)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
-    uint64_t retVal = g_pRealCoreFunctions->hsa_queue_load_read_index_scacquire_fn(queue);
+    uint64_t retVal = g_pRealCoreFunctions->hsa_queue_load_read_index_acquire_fn(queue);
     ULONGLONG ullEnd = OSUtils::Instance()->GetTimeNanos();
 
-    HSA_APITrace_hsa_queue_load_read_index_scacquire* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_load_read_index_scacquire();
+    HSA_APITrace_hsa_queue_load_read_index_acquire* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_load_read_index_acquire();
     SpAssertRet(nullptr != pAPIInfo) retVal;
 
     pAPIInfo->Create(
@@ -1994,13 +1994,14 @@ uint64_t HSA_API_Trace_hsa_queue_load_read_index_relaxed(const hsa_queue_t* queu
     return retVal;
 }
 
-uint64_t HSA_API_Trace_hsa_queue_load_write_index_acquire(const hsa_queue_t* queue)
+#ifdef FUTURE_ROCR_VERSION
+uint64_t HSA_API_Trace_hsa_queue_load_write_index_scacquire(const hsa_queue_t* queue)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
-    uint64_t retVal = g_pRealCoreFunctions->hsa_queue_load_write_index_acquire_fn(queue);
+    uint64_t retVal = g_pRealCoreFunctions->hsa_queue_load_write_index_scacquire_fn(queue);
     ULONGLONG ullEnd = OSUtils::Instance()->GetTimeNanos();
 
-    HSA_APITrace_hsa_queue_load_write_index_acquire* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_load_write_index_acquire();
+    HSA_APITrace_hsa_queue_load_write_index_scacquire* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_load_write_index_scacquire();
     SpAssertRet(nullptr != pAPIInfo) retVal;
 
     pAPIInfo->Create(
@@ -2014,15 +2015,14 @@ uint64_t HSA_API_Trace_hsa_queue_load_write_index_acquire(const hsa_queue_t* que
 
     return retVal;
 }
-
-#ifdef FUTURE_ROCR_VERSION
-uint64_t HSA_API_Trace_hsa_queue_load_write_index_scacquire(const hsa_queue_t* queue)
+#else
+uint64_t HSA_API_Trace_hsa_queue_load_write_index_acquire(const hsa_queue_t* queue)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
-    uint64_t retVal = g_pRealCoreFunctions->hsa_queue_load_write_index_scacquire_fn(queue);
+    uint64_t retVal = g_pRealCoreFunctions->hsa_queue_load_write_index_acquire_fn(queue);
     ULONGLONG ullEnd = OSUtils::Instance()->GetTimeNanos();
 
-    HSA_APITrace_hsa_queue_load_write_index_scacquire* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_load_write_index_scacquire();
+    HSA_APITrace_hsa_queue_load_write_index_acquire* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_load_write_index_acquire();
     SpAssertRet(nullptr != pAPIInfo) retVal;
 
     pAPIInfo->Create(
@@ -2078,25 +2078,6 @@ void HSA_API_Trace_hsa_queue_store_write_index_relaxed(const hsa_queue_t* queue,
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
 
-void HSA_API_Trace_hsa_queue_store_write_index_release(const hsa_queue_t* queue, uint64_t value)
-{
-    ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
-    g_pRealCoreFunctions->hsa_queue_store_write_index_release_fn(queue, value);
-    ULONGLONG ullEnd = OSUtils::Instance()->GetTimeNanos();
-
-    HSA_APITrace_hsa_queue_store_write_index_release* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_store_write_index_release();
-    SpAssert(nullptr != pAPIInfo);
-
-    pAPIInfo->Create(
-        ullStart,
-        ullEnd,
-        queue,
-        value);
-
-    RECORD_STACK_TRACE_FOR_API(pAPIInfo);
-    HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
-}
-
 #ifdef FUTURE_ROCR_VERSION
 void HSA_API_Trace_hsa_queue_store_write_index_screlease(const hsa_queue_t* queue, uint64_t value)
 {
@@ -2116,30 +2097,26 @@ void HSA_API_Trace_hsa_queue_store_write_index_screlease(const hsa_queue_t* queu
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
-#endif
-
-uint64_t HSA_API_Trace_hsa_queue_cas_write_index_acq_rel(const hsa_queue_t* queue, uint64_t expected, uint64_t value)
+#else
+void HSA_API_Trace_hsa_queue_store_write_index_release(const hsa_queue_t* queue, uint64_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
-    uint64_t retVal = g_pRealCoreFunctions->hsa_queue_cas_write_index_acq_rel_fn(queue, expected, value);
+    g_pRealCoreFunctions->hsa_queue_store_write_index_release_fn(queue, value);
     ULONGLONG ullEnd = OSUtils::Instance()->GetTimeNanos();
 
-    HSA_APITrace_hsa_queue_cas_write_index_acq_rel* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_cas_write_index_acq_rel();
-    SpAssertRet(nullptr != pAPIInfo) retVal;
+    HSA_APITrace_hsa_queue_store_write_index_release* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_store_write_index_release();
+    SpAssert(nullptr != pAPIInfo);
 
     pAPIInfo->Create(
         ullStart,
         ullEnd,
         queue,
-        expected,
-        value,
-        retVal);
+        value);
 
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
-
-    return retVal;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 uint64_t HSA_API_Trace_hsa_queue_cas_write_index_scacq_screl(const hsa_queue_t* queue, uint64_t expected, uint64_t value)
@@ -2164,15 +2141,14 @@ uint64_t HSA_API_Trace_hsa_queue_cas_write_index_scacq_screl(const hsa_queue_t* 
 
     return retVal;
 }
-#endif
-
-uint64_t HSA_API_Trace_hsa_queue_cas_write_index_acquire(const hsa_queue_t* queue, uint64_t expected, uint64_t value)
+#else
+uint64_t HSA_API_Trace_hsa_queue_cas_write_index_acq_rel(const hsa_queue_t* queue, uint64_t expected, uint64_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
-    uint64_t retVal = g_pRealCoreFunctions->hsa_queue_cas_write_index_acquire_fn(queue, expected, value);
+    uint64_t retVal = g_pRealCoreFunctions->hsa_queue_cas_write_index_acq_rel_fn(queue, expected, value);
     ULONGLONG ullEnd = OSUtils::Instance()->GetTimeNanos();
 
-    HSA_APITrace_hsa_queue_cas_write_index_acquire* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_cas_write_index_acquire();
+    HSA_APITrace_hsa_queue_cas_write_index_acq_rel* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_cas_write_index_acq_rel();
     SpAssertRet(nullptr != pAPIInfo) retVal;
 
     pAPIInfo->Create(
@@ -2188,6 +2164,7 @@ uint64_t HSA_API_Trace_hsa_queue_cas_write_index_acquire(const hsa_queue_t* queu
 
     return retVal;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 uint64_t HSA_API_Trace_hsa_queue_cas_write_index_scacquire(const hsa_queue_t* queue, uint64_t expected, uint64_t value)
@@ -2197,6 +2174,29 @@ uint64_t HSA_API_Trace_hsa_queue_cas_write_index_scacquire(const hsa_queue_t* qu
     ULONGLONG ullEnd = OSUtils::Instance()->GetTimeNanos();
 
     HSA_APITrace_hsa_queue_cas_write_index_scacquire* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_cas_write_index_scacquire();
+    SpAssertRet(nullptr != pAPIInfo) retVal;
+
+    pAPIInfo->Create(
+        ullStart,
+        ullEnd,
+        queue,
+        expected,
+        value,
+        retVal);
+
+    RECORD_STACK_TRACE_FOR_API(pAPIInfo);
+    HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
+
+    return retVal;
+}
+#else
+uint64_t HSA_API_Trace_hsa_queue_cas_write_index_acquire(const hsa_queue_t* queue, uint64_t expected, uint64_t value)
+{
+    ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
+    uint64_t retVal = g_pRealCoreFunctions->hsa_queue_cas_write_index_acquire_fn(queue, expected, value);
+    ULONGLONG ullEnd = OSUtils::Instance()->GetTimeNanos();
+
+    HSA_APITrace_hsa_queue_cas_write_index_acquire* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_cas_write_index_acquire();
     SpAssertRet(nullptr != pAPIInfo) retVal;
 
     pAPIInfo->Create(
@@ -2237,29 +2237,6 @@ uint64_t HSA_API_Trace_hsa_queue_cas_write_index_relaxed(const hsa_queue_t* queu
     return retVal;
 }
 
-uint64_t HSA_API_Trace_hsa_queue_cas_write_index_release(const hsa_queue_t* queue, uint64_t expected, uint64_t value)
-{
-    ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
-    uint64_t retVal = g_pRealCoreFunctions->hsa_queue_cas_write_index_release_fn(queue, expected, value);
-    ULONGLONG ullEnd = OSUtils::Instance()->GetTimeNanos();
-
-    HSA_APITrace_hsa_queue_cas_write_index_release* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_cas_write_index_release();
-    SpAssertRet(nullptr != pAPIInfo) retVal;
-
-    pAPIInfo->Create(
-        ullStart,
-        ullEnd,
-        queue,
-        expected,
-        value,
-        retVal);
-
-    RECORD_STACK_TRACE_FOR_API(pAPIInfo);
-    HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
-
-    return retVal;
-}
-
 #ifdef FUTURE_ROCR_VERSION
 uint64_t HSA_API_Trace_hsa_queue_cas_write_index_screlease(const hsa_queue_t* queue, uint64_t expected, uint64_t value)
 {
@@ -2283,21 +2260,21 @@ uint64_t HSA_API_Trace_hsa_queue_cas_write_index_screlease(const hsa_queue_t* qu
 
     return retVal;
 }
-#endif
-
-uint64_t HSA_API_Trace_hsa_queue_add_write_index_acq_rel(const hsa_queue_t* queue, uint64_t value)
+#else
+uint64_t HSA_API_Trace_hsa_queue_cas_write_index_release(const hsa_queue_t* queue, uint64_t expected, uint64_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
-    uint64_t retVal = g_pRealCoreFunctions->hsa_queue_add_write_index_acq_rel_fn(queue, value);
+    uint64_t retVal = g_pRealCoreFunctions->hsa_queue_cas_write_index_release_fn(queue, expected, value);
     ULONGLONG ullEnd = OSUtils::Instance()->GetTimeNanos();
 
-    HSA_APITrace_hsa_queue_add_write_index_acq_rel* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_add_write_index_acq_rel();
+    HSA_APITrace_hsa_queue_cas_write_index_release* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_cas_write_index_release();
     SpAssertRet(nullptr != pAPIInfo) retVal;
 
     pAPIInfo->Create(
         ullStart,
         ullEnd,
         queue,
+        expected,
         value,
         retVal);
 
@@ -2306,6 +2283,7 @@ uint64_t HSA_API_Trace_hsa_queue_add_write_index_acq_rel(const hsa_queue_t* queu
 
     return retVal;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 uint64_t HSA_API_Trace_hsa_queue_add_write_index_scacq_screl(const hsa_queue_t* queue, uint64_t value)
@@ -2329,15 +2307,14 @@ uint64_t HSA_API_Trace_hsa_queue_add_write_index_scacq_screl(const hsa_queue_t* 
 
     return retVal;
 }
-#endif
-
-uint64_t HSA_API_Trace_hsa_queue_add_write_index_acquire(const hsa_queue_t* queue, uint64_t value)
+#else
+uint64_t HSA_API_Trace_hsa_queue_add_write_index_acq_rel(const hsa_queue_t* queue, uint64_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
-    uint64_t retVal = g_pRealCoreFunctions->hsa_queue_add_write_index_acquire_fn(queue, value);
+    uint64_t retVal = g_pRealCoreFunctions->hsa_queue_add_write_index_acq_rel_fn(queue, value);
     ULONGLONG ullEnd = OSUtils::Instance()->GetTimeNanos();
 
-    HSA_APITrace_hsa_queue_add_write_index_acquire* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_add_write_index_acquire();
+    HSA_APITrace_hsa_queue_add_write_index_acq_rel* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_add_write_index_acq_rel();
     SpAssertRet(nullptr != pAPIInfo) retVal;
 
     pAPIInfo->Create(
@@ -2352,6 +2329,7 @@ uint64_t HSA_API_Trace_hsa_queue_add_write_index_acquire(const hsa_queue_t* queu
 
     return retVal;
 }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
 uint64_t HSA_API_Trace_hsa_queue_add_write_index_scacquire(const hsa_queue_t* queue, uint64_t value)
@@ -2361,6 +2339,28 @@ uint64_t HSA_API_Trace_hsa_queue_add_write_index_scacquire(const hsa_queue_t* qu
     ULONGLONG ullEnd = OSUtils::Instance()->GetTimeNanos();
 
     HSA_APITrace_hsa_queue_add_write_index_scacquire* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_add_write_index_scacquire();
+    SpAssertRet(nullptr != pAPIInfo) retVal;
+
+    pAPIInfo->Create(
+        ullStart,
+        ullEnd,
+        queue,
+        value,
+        retVal);
+
+    RECORD_STACK_TRACE_FOR_API(pAPIInfo);
+    HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
+
+    return retVal;
+}
+#else
+uint64_t HSA_API_Trace_hsa_queue_add_write_index_acquire(const hsa_queue_t* queue, uint64_t value)
+{
+    ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
+    uint64_t retVal = g_pRealCoreFunctions->hsa_queue_add_write_index_acquire_fn(queue, value);
+    ULONGLONG ullEnd = OSUtils::Instance()->GetTimeNanos();
+
+    HSA_APITrace_hsa_queue_add_write_index_acquire* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_add_write_index_acquire();
     SpAssertRet(nullptr != pAPIInfo) retVal;
 
     pAPIInfo->Create(
@@ -2399,13 +2399,14 @@ uint64_t HSA_API_Trace_hsa_queue_add_write_index_relaxed(const hsa_queue_t* queu
     return retVal;
 }
 
-uint64_t HSA_API_Trace_hsa_queue_add_write_index_release(const hsa_queue_t* queue, uint64_t value)
+#ifdef FUTURE_ROCR_VERSION
+uint64_t HSA_API_Trace_hsa_queue_add_write_index_screlease(const hsa_queue_t* queue, uint64_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
-    uint64_t retVal = g_pRealCoreFunctions->hsa_queue_add_write_index_release_fn(queue, value);
+    uint64_t retVal = g_pRealCoreFunctions->hsa_queue_add_write_index_screlease_fn(queue, value);
     ULONGLONG ullEnd = OSUtils::Instance()->GetTimeNanos();
 
-    HSA_APITrace_hsa_queue_add_write_index_release* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_add_write_index_release();
+    HSA_APITrace_hsa_queue_add_write_index_screlease* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_add_write_index_screlease();
     SpAssertRet(nullptr != pAPIInfo) retVal;
 
     pAPIInfo->Create(
@@ -2420,15 +2421,14 @@ uint64_t HSA_API_Trace_hsa_queue_add_write_index_release(const hsa_queue_t* queu
 
     return retVal;
 }
-
-#ifdef FUTURE_ROCR_VERSION
-uint64_t HSA_API_Trace_hsa_queue_add_write_index_screlease(const hsa_queue_t* queue, uint64_t value)
+#else
+uint64_t HSA_API_Trace_hsa_queue_add_write_index_release(const hsa_queue_t* queue, uint64_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
-    uint64_t retVal = g_pRealCoreFunctions->hsa_queue_add_write_index_screlease_fn(queue, value);
+    uint64_t retVal = g_pRealCoreFunctions->hsa_queue_add_write_index_release_fn(queue, value);
     ULONGLONG ullEnd = OSUtils::Instance()->GetTimeNanos();
 
-    HSA_APITrace_hsa_queue_add_write_index_screlease* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_add_write_index_screlease();
+    HSA_APITrace_hsa_queue_add_write_index_release* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_add_write_index_release();
     SpAssertRet(nullptr != pAPIInfo) retVal;
 
     pAPIInfo->Create(
@@ -2464,13 +2464,14 @@ void HSA_API_Trace_hsa_queue_store_read_index_relaxed(const hsa_queue_t* queue, 
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
 
-void HSA_API_Trace_hsa_queue_store_read_index_release(const hsa_queue_t* queue, uint64_t value)
+#ifdef FUTURE_ROCR_VERSION
+void HSA_API_Trace_hsa_queue_store_read_index_screlease(const hsa_queue_t* queue, uint64_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
-    g_pRealCoreFunctions->hsa_queue_store_read_index_release_fn(queue, value);
+    g_pRealCoreFunctions->hsa_queue_store_read_index_screlease_fn(queue, value);
     ULONGLONG ullEnd = OSUtils::Instance()->GetTimeNanos();
 
-    HSA_APITrace_hsa_queue_store_read_index_release* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_store_read_index_release();
+    HSA_APITrace_hsa_queue_store_read_index_screlease* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_store_read_index_screlease();
     SpAssert(nullptr != pAPIInfo);
 
     pAPIInfo->Create(
@@ -2482,15 +2483,14 @@ void HSA_API_Trace_hsa_queue_store_read_index_release(const hsa_queue_t* queue, 
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 }
-
-#ifdef FUTURE_ROCR_VERSION
-void HSA_API_Trace_hsa_queue_store_read_index_screlease(const hsa_queue_t* queue, uint64_t value)
+#else
+void HSA_API_Trace_hsa_queue_store_read_index_release(const hsa_queue_t* queue, uint64_t value)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
-    g_pRealCoreFunctions->hsa_queue_store_read_index_screlease_fn(queue, value);
+    g_pRealCoreFunctions->hsa_queue_store_read_index_release_fn(queue, value);
     ULONGLONG ullEnd = OSUtils::Instance()->GetTimeNanos();
 
-    HSA_APITrace_hsa_queue_store_read_index_screlease* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_store_read_index_screlease();
+    HSA_APITrace_hsa_queue_store_read_index_release* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_queue_store_read_index_release();
     SpAssert(nullptr != pAPIInfo);
 
     pAPIInfo->Create(
@@ -4721,16 +4721,16 @@ void InitHSAAPIInterceptTrace(HsaApiTable* pTable)
     {
         pTable->core_->hsa_signal_load_scacquire_fn = HSA_API_Trace_hsa_signal_load_scacquire;
     }
+#else
+    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_load_acquire))
+    {
+        pTable->core_->hsa_signal_load_acquire_fn = HSA_API_Trace_hsa_signal_load_acquire;
+    }
 #endif
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_load_relaxed))
     {
         pTable->core_->hsa_signal_load_relaxed_fn = HSA_API_Trace_hsa_signal_load_relaxed;
-    }
-
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_load_acquire))
-    {
-        pTable->core_->hsa_signal_load_acquire_fn = HSA_API_Trace_hsa_signal_load_acquire;
     }
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_store_relaxed))
@@ -4743,12 +4743,13 @@ void InitHSAAPIInterceptTrace(HsaApiTable* pTable)
     {
         pTable->core_->hsa_signal_store_screlease_fn = HSA_API_Trace_hsa_signal_store_screlease;
     }
-#endif
-
+#else
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_store_release))
     {
         pTable->core_->hsa_signal_store_release_fn = HSA_API_Trace_hsa_signal_store_release;
     }
+#endif
+
 
 #ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_silent_store_relaxed))
@@ -4765,24 +4766,25 @@ void InitHSAAPIInterceptTrace(HsaApiTable* pTable)
     {
         pTable->core_->hsa_signal_exchange_scacq_screl_fn = HSA_API_Trace_hsa_signal_exchange_scacq_screl;
     }
-#endif
-
+#else
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_exchange_acq_rel))
     {
         pTable->core_->hsa_signal_exchange_acq_rel_fn = HSA_API_Trace_hsa_signal_exchange_acq_rel;
     }
+#endif
+
 
 #ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_exchange_scacquire))
     {
         pTable->core_->hsa_signal_exchange_scacquire_fn = HSA_API_Trace_hsa_signal_exchange_scacquire;
     }
-#endif
-
+#else
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_exchange_acquire))
     {
         pTable->core_->hsa_signal_exchange_acquire_fn = HSA_API_Trace_hsa_signal_exchange_acquire;
     }
+#endif
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_exchange_relaxed))
     {
@@ -4794,36 +4796,36 @@ void InitHSAAPIInterceptTrace(HsaApiTable* pTable)
     {
         pTable->core_->hsa_signal_exchange_screlease_fn = HSA_API_Trace_hsa_signal_exchange_screlease;
     }
-#endif
-
+#else
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_exchange_release))
     {
         pTable->core_->hsa_signal_exchange_release_fn = HSA_API_Trace_hsa_signal_exchange_release;
     }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_cas_scacq_screl))
     {
         pTable->core_->hsa_signal_cas_scacq_screl_fn = HSA_API_Trace_hsa_signal_cas_scacq_screl;
     }
-#endif
-
+#else
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_cas_acq_rel))
     {
         pTable->core_->hsa_signal_cas_acq_rel_fn = HSA_API_Trace_hsa_signal_cas_acq_rel;
     }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_cas_scacquire))
     {
         pTable->core_->hsa_signal_cas_scacquire_fn = HSA_API_Trace_hsa_signal_cas_scacquire;
     }
-#endif
-
+#else    
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_cas_acquire))
     {
         pTable->core_->hsa_signal_cas_acquire_fn = HSA_API_Trace_hsa_signal_cas_acquire;
     }
+#endif
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_cas_relaxed))
     {
@@ -4835,36 +4837,36 @@ void InitHSAAPIInterceptTrace(HsaApiTable* pTable)
     {
         pTable->core_->hsa_signal_cas_screlease_fn = HSA_API_Trace_hsa_signal_cas_screlease;
     }
-#endif
-
+#else    
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_cas_release))
     {
         pTable->core_->hsa_signal_cas_release_fn = HSA_API_Trace_hsa_signal_cas_release;
     }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_add_scacq_screl))
     {
         pTable->core_->hsa_signal_add_scacq_screl_fn = HSA_API_Trace_hsa_signal_add_scacq_screl;
     }
-#endif
-
+#else
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_add_acq_rel))
     {
         pTable->core_->hsa_signal_add_acq_rel_fn = HSA_API_Trace_hsa_signal_add_acq_rel;
     }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_add_scacquire))
     {
         pTable->core_->hsa_signal_add_scacquire_fn = HSA_API_Trace_hsa_signal_add_scacquire;
     }
-#endif
-
+#else
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_add_acquire))
     {
         pTable->core_->hsa_signal_add_acquire_fn = HSA_API_Trace_hsa_signal_add_acquire;
     }
+#endif
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_add_relaxed))
     {
@@ -4876,36 +4878,36 @@ void InitHSAAPIInterceptTrace(HsaApiTable* pTable)
     {
         pTable->core_->hsa_signal_add_screlease_fn = HSA_API_Trace_hsa_signal_add_screlease;
     }
-#endif
-
+#else
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_add_release))
     {
         pTable->core_->hsa_signal_add_release_fn = HSA_API_Trace_hsa_signal_add_release;
     }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_subtract_scacq_screl))
     {
         pTable->core_->hsa_signal_subtract_scacq_screl_fn = HSA_API_Trace_hsa_signal_subtract_scacq_screl;
     }
-#endif
-
+#else
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_subtract_acq_rel))
     {
         pTable->core_->hsa_signal_subtract_acq_rel_fn = HSA_API_Trace_hsa_signal_subtract_acq_rel;
     }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_subtract_scacquire))
     {
         pTable->core_->hsa_signal_subtract_scacquire_fn = HSA_API_Trace_hsa_signal_subtract_scacquire;
     }
-#endif
-
+#else
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_subtract_acquire))
     {
         pTable->core_->hsa_signal_subtract_acquire_fn = HSA_API_Trace_hsa_signal_subtract_acquire;
     }
+#endif
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_subtract_relaxed))
     {
@@ -4917,36 +4919,36 @@ void InitHSAAPIInterceptTrace(HsaApiTable* pTable)
     {
         pTable->core_->hsa_signal_subtract_screlease_fn = HSA_API_Trace_hsa_signal_subtract_screlease;
     }
-#endif
-
+#else
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_subtract_release))
     {
         pTable->core_->hsa_signal_subtract_release_fn = HSA_API_Trace_hsa_signal_subtract_release;
     }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_and_scacq_screl))
     {
         pTable->core_->hsa_signal_and_scacq_screl_fn = HSA_API_Trace_hsa_signal_and_scacq_screl;
     }
-#endif
-
+#else
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_and_acq_rel))
     {
         pTable->core_->hsa_signal_and_acq_rel_fn = HSA_API_Trace_hsa_signal_and_acq_rel;
     }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_and_scacquire))
     {
         pTable->core_->hsa_signal_and_scacquire_fn = HSA_API_Trace_hsa_signal_and_scacquire;
     }
-#endif
-
+#else
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_and_acquire))
     {
         pTable->core_->hsa_signal_and_acquire_fn = HSA_API_Trace_hsa_signal_and_acquire;
     }
+#endif
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_and_relaxed))
     {
@@ -4958,36 +4960,36 @@ void InitHSAAPIInterceptTrace(HsaApiTable* pTable)
     {
         pTable->core_->hsa_signal_and_screlease_fn = HSA_API_Trace_hsa_signal_and_screlease;
     }
-#endif
-
+#else
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_and_release))
     {
         pTable->core_->hsa_signal_and_release_fn = HSA_API_Trace_hsa_signal_and_release;
     }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_or_scacq_screl))
     {
         pTable->core_->hsa_signal_or_scacq_screl_fn = HSA_API_Trace_hsa_signal_or_scacq_screl;
     }
-#endif
-
+#else
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_or_acq_rel))
     {
         pTable->core_->hsa_signal_or_acq_rel_fn = HSA_API_Trace_hsa_signal_or_acq_rel;
     }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_or_scacquire))
     {
         pTable->core_->hsa_signal_or_scacquire_fn = HSA_API_Trace_hsa_signal_or_scacquire;
     }
-#endif
-
+#else
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_or_acquire))
     {
         pTable->core_->hsa_signal_or_acquire_fn = HSA_API_Trace_hsa_signal_or_acquire;
     }
+#endif
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_or_relaxed))
     {
@@ -4999,36 +5001,36 @@ void InitHSAAPIInterceptTrace(HsaApiTable* pTable)
     {
         pTable->core_->hsa_signal_or_screlease_fn = HSA_API_Trace_hsa_signal_or_screlease;
     }
-#endif
-
+#else
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_or_release))
     {
         pTable->core_->hsa_signal_or_release_fn = HSA_API_Trace_hsa_signal_or_release;
     }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_xor_scacq_screl))
     {
         pTable->core_->hsa_signal_xor_scacq_screl_fn = HSA_API_Trace_hsa_signal_xor_scacq_screl;
     }
-#endif
-
+#else
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_xor_acq_rel))
     {
         pTable->core_->hsa_signal_xor_acq_rel_fn = HSA_API_Trace_hsa_signal_xor_acq_rel;
     }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_xor_scacquire))
     {
         pTable->core_->hsa_signal_xor_scacquire_fn = HSA_API_Trace_hsa_signal_xor_scacquire;
     }
-#endif
-
+#else
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_xor_acquire))
     {
         pTable->core_->hsa_signal_xor_acquire_fn = HSA_API_Trace_hsa_signal_xor_acquire;
     }
+#endif
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_xor_relaxed))
     {
@@ -5040,28 +5042,28 @@ void InitHSAAPIInterceptTrace(HsaApiTable* pTable)
     {
         pTable->core_->hsa_signal_xor_screlease_fn = HSA_API_Trace_hsa_signal_xor_screlease;
     }
-#endif
-
+#else
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_xor_release))
     {
         pTable->core_->hsa_signal_xor_release_fn = HSA_API_Trace_hsa_signal_xor_release;
     }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_wait_scacquire))
     {
         pTable->core_->hsa_signal_wait_scacquire_fn = HSA_API_Trace_hsa_signal_wait_scacquire;
     }
+#else
+    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_wait_acquire))
+    {
+        pTable->core_->hsa_signal_wait_acquire_fn = HSA_API_Trace_hsa_signal_wait_acquire;
+    }
 #endif
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_wait_relaxed))
     {
         pTable->core_->hsa_signal_wait_relaxed_fn = HSA_API_Trace_hsa_signal_wait_relaxed;
-    }
-
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_wait_acquire))
-    {
-        pTable->core_->hsa_signal_wait_acquire_fn = HSA_API_Trace_hsa_signal_wait_acquire;
     }
 
 #ifdef FUTURE_ROCR_VERSION
@@ -5106,15 +5108,15 @@ void InitHSAAPIInterceptTrace(HsaApiTable* pTable)
         pTable->core_->hsa_queue_inactivate_fn = HSA_API_Trace_hsa_queue_inactivate;
     }
 
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_load_read_index_acquire))
-    {
-        pTable->core_->hsa_queue_load_read_index_acquire_fn = HSA_API_Trace_hsa_queue_load_read_index_acquire;
-    }
-
 #ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_load_read_index_scacquire))
     {
         pTable->core_->hsa_queue_load_read_index_scacquire_fn = HSA_API_Trace_hsa_queue_load_read_index_scacquire;
+    }
+#else
+    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_load_read_index_acquire))
+    {
+        pTable->core_->hsa_queue_load_read_index_acquire_fn = HSA_API_Trace_hsa_queue_load_read_index_acquire;
     }
 #endif
 
@@ -5123,15 +5125,15 @@ void InitHSAAPIInterceptTrace(HsaApiTable* pTable)
         pTable->core_->hsa_queue_load_read_index_relaxed_fn = HSA_API_Trace_hsa_queue_load_read_index_relaxed;
     }
 
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_load_write_index_acquire))
-    {
-        pTable->core_->hsa_queue_load_write_index_acquire_fn = HSA_API_Trace_hsa_queue_load_write_index_acquire;
-    }
-
 #ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_load_write_index_scacquire))
     {
         pTable->core_->hsa_queue_load_write_index_scacquire_fn = HSA_API_Trace_hsa_queue_load_write_index_scacquire;
+    }
+#else
+    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_load_write_index_acquire))
+    {
+        pTable->core_->hsa_queue_load_write_index_acquire_fn = HSA_API_Trace_hsa_queue_load_write_index_acquire;
     }
 #endif
 
@@ -5145,39 +5147,39 @@ void InitHSAAPIInterceptTrace(HsaApiTable* pTable)
         pTable->core_->hsa_queue_store_write_index_relaxed_fn = HSA_API_Trace_hsa_queue_store_write_index_relaxed;
     }
 
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_store_write_index_release))
-    {
-        pTable->core_->hsa_queue_store_write_index_release_fn = HSA_API_Trace_hsa_queue_store_write_index_release;
-    }
-
 #ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_store_write_index_screlease))
     {
         pTable->core_->hsa_queue_store_write_index_screlease_fn = HSA_API_Trace_hsa_queue_store_write_index_screlease;
     }
-#endif
-
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_cas_write_index_acq_rel))
+#else
+    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_store_write_index_release))
     {
-        pTable->core_->hsa_queue_cas_write_index_acq_rel_fn = HSA_API_Trace_hsa_queue_cas_write_index_acq_rel;
+        pTable->core_->hsa_queue_store_write_index_release_fn = HSA_API_Trace_hsa_queue_store_write_index_release;
     }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_cas_write_index_scacq_screl))
     {
         pTable->core_->hsa_queue_cas_write_index_scacq_screl_fn = HSA_API_Trace_hsa_queue_cas_write_index_scacq_screl;
     }
-#endif
-
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_cas_write_index_acquire))
+#else
+    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_cas_write_index_acq_rel))
     {
-        pTable->core_->hsa_queue_cas_write_index_acquire_fn = HSA_API_Trace_hsa_queue_cas_write_index_acquire;
+        pTable->core_->hsa_queue_cas_write_index_acq_rel_fn = HSA_API_Trace_hsa_queue_cas_write_index_acq_rel;
     }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_cas_write_index_scacquire))
     {
         pTable->core_->hsa_queue_cas_write_index_scacquire_fn = HSA_API_Trace_hsa_queue_cas_write_index_scacquire;
+    }
+#else
+    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_cas_write_index_acquire))
+    {
+        pTable->core_->hsa_queue_cas_write_index_acquire_fn = HSA_API_Trace_hsa_queue_cas_write_index_acquire;
     }
 #endif
 
@@ -5186,39 +5188,39 @@ void InitHSAAPIInterceptTrace(HsaApiTable* pTable)
         pTable->core_->hsa_queue_cas_write_index_relaxed_fn = HSA_API_Trace_hsa_queue_cas_write_index_relaxed;
     }
 
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_cas_write_index_release))
-    {
-        pTable->core_->hsa_queue_cas_write_index_release_fn = HSA_API_Trace_hsa_queue_cas_write_index_release;
-    }
-
 #ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_cas_write_index_screlease))
     {
         pTable->core_->hsa_queue_cas_write_index_screlease_fn = HSA_API_Trace_hsa_queue_cas_write_index_screlease;
     }
-#endif
-
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_add_write_index_acq_rel))
+#else
+    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_cas_write_index_release))
     {
-        pTable->core_->hsa_queue_add_write_index_acq_rel_fn = HSA_API_Trace_hsa_queue_add_write_index_acq_rel;
+        pTable->core_->hsa_queue_cas_write_index_release_fn = HSA_API_Trace_hsa_queue_cas_write_index_release;
     }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_add_write_index_scacq_screl))
     {
         pTable->core_->hsa_queue_add_write_index_scacq_screl_fn = HSA_API_Trace_hsa_queue_add_write_index_scacq_screl;
     }
-#endif
-
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_add_write_index_acquire))
+#else
+    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_add_write_index_acq_rel))
     {
-        pTable->core_->hsa_queue_add_write_index_acquire_fn = HSA_API_Trace_hsa_queue_add_write_index_acquire;
+        pTable->core_->hsa_queue_add_write_index_acq_rel_fn = HSA_API_Trace_hsa_queue_add_write_index_acq_rel;
     }
+#endif
 
 #ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_add_write_index_scacquire))
     {
         pTable->core_->hsa_queue_add_write_index_scacquire_fn = HSA_API_Trace_hsa_queue_add_write_index_scacquire;
+    }
+#else
+    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_add_write_index_acquire))
+    {
+        pTable->core_->hsa_queue_add_write_index_acquire_fn = HSA_API_Trace_hsa_queue_add_write_index_acquire;
     }
 #endif
 
@@ -5227,15 +5229,15 @@ void InitHSAAPIInterceptTrace(HsaApiTable* pTable)
         pTable->core_->hsa_queue_add_write_index_relaxed_fn = HSA_API_Trace_hsa_queue_add_write_index_relaxed;
     }
 
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_add_write_index_release))
-    {
-        pTable->core_->hsa_queue_add_write_index_release_fn = HSA_API_Trace_hsa_queue_add_write_index_release;
-    }
-
 #ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_add_write_index_screlease))
     {
         pTable->core_->hsa_queue_add_write_index_screlease_fn = HSA_API_Trace_hsa_queue_add_write_index_screlease;
+    }
+#else
+    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_add_write_index_release))
+    {
+        pTable->core_->hsa_queue_add_write_index_release_fn = HSA_API_Trace_hsa_queue_add_write_index_release;
     }
 #endif
 
@@ -5244,15 +5246,15 @@ void InitHSAAPIInterceptTrace(HsaApiTable* pTable)
         pTable->core_->hsa_queue_store_read_index_relaxed_fn = HSA_API_Trace_hsa_queue_store_read_index_relaxed;
     }
 
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_store_read_index_release))
-    {
-        pTable->core_->hsa_queue_store_read_index_release_fn = HSA_API_Trace_hsa_queue_store_read_index_release;
-    }
-
 #ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_store_read_index_screlease))
     {
         pTable->core_->hsa_queue_store_read_index_screlease_fn = HSA_API_Trace_hsa_queue_store_read_index_screlease;
+    }
+#else
+    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_store_read_index_release))
+    {
+        pTable->core_->hsa_queue_store_read_index_release_fn = HSA_API_Trace_hsa_queue_store_read_index_release;
     }
 #endif
 

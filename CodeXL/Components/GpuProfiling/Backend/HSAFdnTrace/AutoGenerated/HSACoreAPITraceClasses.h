@@ -852,6 +852,7 @@ private:
     hsa_status_t m_retVal; ///< Parameter passed to hsa_signal_destroy
 };
 
+#ifndef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_load_acquire
 ///////////////////////////////////////////////////
@@ -892,7 +893,7 @@ private:
     hsa_signal_value_t m_retVal; ///< Parameter passed to hsa_signal_load_acquire
 };
 
-#ifdef FUTURE_ROCR_VERSION
+#else
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_load_scacquire
 ///////////////////////////////////////////////////
@@ -1015,6 +1016,7 @@ private:
     hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_store_relaxed
 };
 
+#ifndef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_store_release
 ///////////////////////////////////////////////////
@@ -1141,6 +1143,7 @@ private:
     hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_exchange_acquire
     hsa_signal_value_t m_retVal; ///< Parameter passed to hsa_signal_exchange_acquire
 };
+#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_exchange_relaxed
@@ -1185,6 +1188,7 @@ private:
     hsa_signal_value_t m_retVal; ///< Parameter passed to hsa_signal_exchange_relaxed
 };
 
+#ifndef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_exchange_release
 ///////////////////////////////////////////////////
@@ -1319,6 +1323,7 @@ private:
     hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_cas_acquire
     hsa_signal_value_t m_retVal; ///< Parameter passed to hsa_signal_cas_acquire
 };
+#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_cas_relaxed
@@ -1366,6 +1371,7 @@ private:
     hsa_signal_value_t m_retVal; ///< Parameter passed to hsa_signal_cas_relaxed
 };
 
+#ifndef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_cas_release
 ///////////////////////////////////////////////////
@@ -1493,6 +1499,7 @@ private:
     hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_add_acquire
     hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_add_acquire
 };
+#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_add_relaxed
@@ -1535,6 +1542,7 @@ private:
     hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_add_relaxed
 };
 
+#ifndef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_add_release
 ///////////////////////////////////////////////////
@@ -1657,6 +1665,7 @@ private:
     hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_subtract_acquire
     hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_subtract_acquire
 };
+#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_subtract_relaxed
@@ -1699,6 +1708,7 @@ private:
     hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_subtract_relaxed
 };
 
+#ifndef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_subtract_release
 ///////////////////////////////////////////////////
@@ -1821,6 +1831,7 @@ private:
     hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_and_acquire
     hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_and_acquire
 };
+#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_and_relaxed
@@ -1863,6 +1874,7 @@ private:
     hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_and_relaxed
 };
 
+#ifndef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_and_release
 ///////////////////////////////////////////////////
@@ -1985,6 +1997,7 @@ private:
     hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_or_acquire
     hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_or_acquire
 };
+#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_or_relaxed
@@ -2027,6 +2040,7 @@ private:
     hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_or_relaxed
 };
 
+#ifndef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_or_release
 ///////////////////////////////////////////////////
@@ -2149,6 +2163,7 @@ private:
     hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_xor_acquire
     hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_xor_acquire
 };
+#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_xor_relaxed
@@ -2191,6 +2206,7 @@ private:
     hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_xor_relaxed
 };
 
+#ifndef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_xor_release
 ///////////////////////////////////////////////////
@@ -2283,6 +2299,7 @@ private:
     hsa_wait_state_t m_wait_state_hint; ///< Parameter passed to hsa_signal_wait_acquire
     hsa_signal_value_t m_retVal; ///< Parameter passed to hsa_signal_wait_acquire
 };
+#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_wait_relaxed
@@ -2607,7 +2624,6 @@ private:
     hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_exchange_scacquire
     hsa_signal_value_t m_retVal; ///< Parameter passed to hsa_signal_exchange_scacquire
 };
-#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_exchange_screlease
@@ -3457,7 +3473,6 @@ private:
     hsa_signal_value_t m_retVal; ///< Parameter passed to hsa_signal_wait_scacquire
 };
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_group_create
 ///////////////////////////////////////////////////
@@ -4098,6 +4113,7 @@ private:
     uint64_t m_value; ///< Parameter passed to hsa_queue_store_write_index_relaxed
 };
 
+#ifndef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_store_write_index_release
 ///////////////////////////////////////////////////
@@ -4140,6 +4156,8 @@ private:
     uint64_t m_value; ///< Parameter passed to hsa_queue_store_write_index_release
 };
 
+#else
+
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_store_write_index_screlease
 ///////////////////////////////////////////////////
@@ -4181,7 +4199,9 @@ private:
     hsa_queue_t m_queueVal; ///< Member to hold value passed to hsa_queue_store_write_index_screlease in queue parameter
     uint64_t m_value; ///< Parameter passed to hsa_queue_store_write_index_screlease
 };
+#endif
 
+#ifndef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_cas_write_index_acq_rel
 ///////////////////////////////////////////////////
@@ -4229,6 +4249,8 @@ private:
     uint64_t m_retVal; ///< Parameter passed to hsa_queue_cas_write_index_acq_rel
 };
 
+#else
+
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_cas_write_index_scacq_screl
 ///////////////////////////////////////////////////
@@ -4275,7 +4297,9 @@ private:
     uint64_t m_value; ///< Parameter passed to hsa_queue_cas_write_index_scacq_screl
     uint64_t m_retVal; ///< Parameter passed to hsa_queue_cas_write_index_scacq_screl
 };
+#endif
 
+#ifndef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_cas_write_index_acquire
 ///////////////////////////////////////////////////
@@ -4323,6 +4347,8 @@ private:
     uint64_t m_retVal; ///< Parameter passed to hsa_queue_cas_write_index_acquire
 };
 
+#else
+
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_cas_write_index_scacquire
 ///////////////////////////////////////////////////
@@ -4369,6 +4395,7 @@ private:
     uint64_t m_value; ///< Parameter passed to hsa_queue_cas_write_index_scacquire
     uint64_t m_retVal; ///< Parameter passed to hsa_queue_cas_write_index_scacquire
 };
+#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_cas_write_index_relaxed
@@ -4417,6 +4444,7 @@ private:
     uint64_t m_retVal; ///< Parameter passed to hsa_queue_cas_write_index_relaxed
 };
 
+#ifndef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_cas_write_index_release
 ///////////////////////////////////////////////////
@@ -4464,6 +4492,8 @@ private:
     uint64_t m_retVal; ///< Parameter passed to hsa_queue_cas_write_index_release
 };
 
+#else
+
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_cas_write_index_screlease
 ///////////////////////////////////////////////////
@@ -4510,7 +4540,9 @@ private:
     uint64_t m_value; ///< Parameter passed to hsa_queue_cas_write_index_screlease
     uint64_t m_retVal; ///< Parameter passed to hsa_queue_cas_write_index_screlease
 };
+#endif
 
+#ifndef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_add_write_index_acq_rel
 ///////////////////////////////////////////////////
@@ -4555,6 +4587,8 @@ private:
     uint64_t m_retVal; ///< Parameter passed to hsa_queue_add_write_index_acq_rel
 };
 
+#else
+
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_add_write_index_scacq_screl
 ///////////////////////////////////////////////////
@@ -4598,7 +4632,9 @@ private:
     uint64_t m_value; ///< Parameter passed to hsa_queue_add_write_index_scacq_screl
     uint64_t m_retVal; ///< Parameter passed to hsa_queue_add_write_index_scacq_screl
 };
+#endif
 
+#ifndef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_add_write_index_acquire
 ///////////////////////////////////////////////////
@@ -4643,6 +4679,8 @@ private:
     uint64_t m_retVal; ///< Parameter passed to hsa_queue_add_write_index_acquire
 };
 
+#else
+
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_add_write_index_scacquire
 ///////////////////////////////////////////////////
@@ -4686,6 +4724,7 @@ private:
     uint64_t m_value; ///< Parameter passed to hsa_queue_add_write_index_scacquire
     uint64_t m_retVal; ///< Parameter passed to hsa_queue_add_write_index_scacquire
 };
+#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_add_write_index_relaxed
@@ -4731,6 +4770,7 @@ private:
     uint64_t m_retVal; ///< Parameter passed to hsa_queue_add_write_index_relaxed
 };
 
+#ifndef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_add_write_index_release
 ///////////////////////////////////////////////////
@@ -4775,6 +4815,8 @@ private:
     uint64_t m_retVal; ///< Parameter passed to hsa_queue_add_write_index_release
 };
 
+#else
+
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_add_write_index_screlease
 ///////////////////////////////////////////////////
@@ -4818,6 +4860,7 @@ private:
     uint64_t m_value; ///< Parameter passed to hsa_queue_add_write_index_screlease
     uint64_t m_retVal; ///< Parameter passed to hsa_queue_add_write_index_screlease
 };
+#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_store_read_index_relaxed
@@ -4861,6 +4904,7 @@ private:
     uint64_t m_value; ///< Parameter passed to hsa_queue_store_read_index_relaxed
 };
 
+#ifndef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_store_read_index_release
 ///////////////////////////////////////////////////
@@ -4903,6 +4947,8 @@ private:
     uint64_t m_value; ///< Parameter passed to hsa_queue_store_read_index_release
 };
 
+#else
+
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_store_read_index_screlease
 ///////////////////////////////////////////////////
@@ -4944,6 +4990,7 @@ private:
     hsa_queue_t m_queueVal; ///< Member to hold value passed to hsa_queue_store_read_index_screlease in queue parameter
     uint64_t m_value; ///< Parameter passed to hsa_queue_store_read_index_screlease
 };
+#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_region_get_info
@@ -7177,7 +7224,4 @@ private:
     hsa_status_t m_retVal; ///< Parameter passed to hsa_code_object_iterate_symbols
 };
 
-
-
 #endif // _HSACOREAPITRACECLASSES_H_
-
