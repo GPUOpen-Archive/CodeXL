@@ -279,7 +279,15 @@ void DXGILayerManager::OnSwapchainCreated(void* inSwapchain, void* inDevice)
 /// \param pLM The layer manager to add.
 void DXGILayerManager::PushBack(LayerManager* pLM)
 {
-    m_LayersList.push_back(pLM);
+    std::list<LayerManager*>::iterator findIter = std::find(m_LayersList.begin(), m_LayersList.end(), pLM);
+    if (findIter == m_LayersList.end())
+    {
+        m_LayersList.push_back(pLM);
+    }
+    else
+    {
+        Log(logERROR, "Prevented duplicate Layer from being pushed within DXGILayerManager.\n");
+    }
 }
 
 /// Removes a layer manager from the list

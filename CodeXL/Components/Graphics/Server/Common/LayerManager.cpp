@@ -29,6 +29,9 @@ LayerManager::LayerManager()
 {
     m_DebugFlag = SG_GET_UINT(OptionLayerFlag);
 
+    // Initialize the CaptureCount based on the config file.
+    m_captureCount = SG_GET_INT(OptionNumTracedFrames);
+
     AddCommand(CONTENT_XML, "ShowStack",  "Show Stack",   "ShowStack", NO_DISPLAY, INCLUDE, m_showStack);
     AddCommand(CONTENT_HTML, "PopLayer",  "Pop Layer",   "PopLayer", NO_DISPLAY, INCLUDE, m_popLayer);
     AddCommand(CONTENT_HTML, "PushLayer",  "Push Layer",   "PushLayer", NO_DISPLAY, INCLUDE, m_pushLayer);
@@ -40,6 +43,10 @@ LayerManager::LayerManager()
     AddCommand(CONTENT_TEXT, "FlattenCommandLists", "FlattenCommandLists", "FlattenCommandLists", NO_DISPLAY, INCLUDE, m_FlattenCommandLists);
     AddCommand(CONTENT_TEXT, "NumGPUs",     "NumGPUs",     "NumGPUs",     NO_DISPLAY, INCLUDE, m_NumGPUs);
     AddCommand(CONTENT_TEXT, "FrameCaptured", "FrameCaptured", "FrameCaptured", NO_DISPLAY, INCLUDE, m_FrameCaptured);
+
+    // Command used to specify how many sequential frames should be traced when collecting any kind of trace.
+    AddCommand(CONTENT_TEXT, "NumSequentialPresents", "NumSequentialPresents", "NumSequentialPresents.txt", NO_DISPLAY, NO_INCLUDE, mNumSequentialPresents);
+    mNumSequentialPresents.SetEditableContentAutoReply(false); // This means that we have to manually respond to this command.
 
     m_captureFrame = SG_GET_INT(OptionCaptureFrame);
 
@@ -195,6 +202,19 @@ void LayerManager::BeginFrame()
         m_stepFrame.Send("OK");
     }
 
+    if (mNumSequentialPresents.IsActive())
+    {
+        m_captureCount = mNumSequentialPresents.GetValue();
+
+        if (m_captureCount == 0)
+        {
+            Log(logERROR, "LayerManager::BeginFrame - m_captureCount is 0, forcing it to 1.\n");
+            m_captureCount = 1;
+        }
+
+        mNumSequentialPresents.Send("OK");
+    }
+
     std::vector<ILayer*>::const_iterator it;
 
     for (it = m_EnabledLayers.begin(); it != m_EnabledLayers.end(); ++it)
@@ -230,64 +250,30 @@ void LayerManager::EndFrame()
 
 void LayerManager::UpdateFrameTimingInfo()
 {
-    double currentTime = mFrameTimer.GetAbsolute();
+    double currentTime = mFrameTimer.GetAbsoluteMicroseconds();
     static double previousTime = currentTime;
-    static long rollingCount = 0;
-
-    // Roll around when we reach end of array
-    if (rollingCount >= FRAMES_TO_MEASURE)
-    {
-        rollingCount = 0;
-    }
 
     mPreviousFrameDurationMilliseconds = mLastFrameDurationMilliseconds;
-
     mLastFrameDurationMilliseconds = currentTime - previousTime;
+    mPreviousAverageFramesPerSecond = mAverageFramesPerSecond;
 
-    // This catches the first usage where the time delta is zero
-    if (mLastFrameDurationMilliseconds == 0)
-    {
-        previousTime = currentTime;
-
-        // Update the shared memory with our current rendering time.
-        SG_SET_DOUBLE(LastPresentTime, currentTime);
-        return;
-    }
+    //Log(logERROR, "previousTime: %lf, currentTime: %lf,  mLastFrameDurationMilliseconds: %lf\n", currentTime, previousTime, mLastFrameDurationMilliseconds);
 
     // Update the shared memory with our current rendering time.
     SG_SET_DOUBLE(LastPresentTime, currentTime);
 
-    //Log(logERROR, "mLastFrameDurationMilliseconds: %lf\n", mLastFrameDurationMilliseconds);
-    //Log(logDEBUG, "1) UpdateFrameTimingInfo: F: %ld C: %lf P: %lf D: %lf Duration(current frame): %lf\n", GetFrameCount(), currentTime, previousTime, mFrameDuration, mFrameDuration);
-
-    mFrameDurationsMilliseconds[rollingCount] = mLastFrameDurationMilliseconds;
-    rollingCount++;
-
-    int sampleCount = 0;
-    double totalDuration = 0.0;
-
-    for (int i = 0; i < FRAMES_TO_MEASURE; i++)
-    {
-        //Log(logDEBUG, "2) UpdateFrameTimingInfo: Loop Count: %d, mFrameTimes[i] = %lf\n", i, mFrameTimes[i]);
-
-        if (mFrameDurationsMilliseconds[i] > 0.0)
+    // This catches the first usage where the time delta is zero
+    if (mLastFrameDurationMilliseconds == 0)
         {
-            sampleCount++;
-            totalDuration += mFrameDurationsMilliseconds[i];
-
-            //Log(logDEBUG, "3) UpdateFrameTimingInfo: Loop Count: %d, Sample Count: %d,  Duration: %lf, Total Duration: %lf\n", i, sampleCount, mFrameTimes[i], totalDuration);
-        }
+        previousTime = currentTime;
+        mPreviousAverageFramesPerSecond = mAverageFramesPerSecond = 1.0;
+        return;
     }
 
-    double averageDuration = totalDuration / (double)sampleCount;
-    mAverageFramesPerSecond = 1000.0f / averageDuration;
-
-    //Log(logDEBUG, "4) UpdateFrameTimingInfo: Total Duration: %lf, SampleCount: %d, Average Duration: %lf, Average FPS: %lf\n\n", totalDuration, sampleCount, averageDuration, mComputedFPS);
+    mAverageFramesPerSecond = 1000000.0 / mLastFrameDurationMilliseconds;
 
     previousTime = currentTime;
 }
-
-
 
 
 /// A handler invoked when Autocapture mode has been triggered.

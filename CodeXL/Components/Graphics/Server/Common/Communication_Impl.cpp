@@ -634,7 +634,7 @@ bool ShouldResponseBeSent(CommunicationID requestID, bool bUpdateTime)
             return false;
         }
 
-        DWORD dwCurrTime = g_streamTimer.GetAbsolute();
+        DWORD dwCurrTime = g_streamTimer.GetAbsoluteMilliseconds();
 
         if (dwCurrTime - pResponse->m_dwLastSent >= 1000 / pResponse->m_dwMaxStreamsPerSecond)
         {
@@ -1402,7 +1402,7 @@ bool SendFileResponse(CommunicationID& requestID, const char* cpFile, NetSocket*
 
     // collect file data and generate response
     FILE* in;
-#if defined WIN32 &&  (AMDT_ADDRESS_SPACE_TYPE == AMDT_32_BIT_ADDRESS_SPACE)
+#if defined WIN32 && !defined X64
     long fileSize, bytesRead;
 #else
     size_t fileSize, bytesRead;
@@ -1425,12 +1425,10 @@ bool SendFileResponse(CommunicationID& requestID, const char* cpFile, NetSocket*
     // allocate Buffer_ and read in file contents
     fileBuffer = new char[fileSize];
     bytesRead = fread(fileBuffer, sizeof(char), fileSize, in);
-
     if (bytesRead != fileSize)
     {
         Log(logERROR, "File read error in SendFileResponse()\n");
     }
-
     fclose(in);
 
     bool bRes = Send(*pResponse, mimetypes[ FindMimeType(cpFile)].mime, fileBuffer, (unsigned long)fileSize);

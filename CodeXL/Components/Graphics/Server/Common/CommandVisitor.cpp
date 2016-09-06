@@ -9,6 +9,8 @@
 #include "CommandVisitor.h"
 #include "CommandProcessor.h"
 
+using namespace std;
+
 //--------------------------------------------------------------------------
 /// Destructor - Make sure to clear the vectors.
 //--------------------------------------------------------------------------
@@ -114,10 +116,12 @@ void CommandVisitor::RecordCommandString(CommandResponse* pCommResp)
 {
     gtASCIIString strFinal;
 
-    for (const gtASCIIString& iter : vCommandTreeStack)
+    for (vector< gtASCIIString >::iterator iter = vCommandTreeStack.begin();
+         iter != vCommandTreeStack.end();
+         iter ++)
     {
         strFinal += "/";
-        strFinal += iter;
+        strFinal += *iter;
     }
 
     switch (pCommResp->GetEditableContent())
@@ -169,9 +173,11 @@ gtASCIIString CommandVisitor::GetCommandStrings()
 {
     gtASCIIString strFinal;
 
-    for (const gtASCIIString& iter : vFinalCommands)
+    for (vector< gtASCIIString >::iterator iter = vFinalCommands.begin();
+         iter != vFinalCommands.end();
+         iter ++)
     {
-        strFinal += iter;
+        strFinal += *iter;
         strFinal += "\n";
     }
 

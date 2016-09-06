@@ -65,8 +65,11 @@ public:
     /// reads the time (in ms, double precision) but does not stop the timer
     double LapDouble();
 
-    /// Gets the QPC time ( in ms )
-    unsigned long GetAbsolute();
+    /// Gets the QPC time ( in milliseconds )
+    unsigned long GetAbsoluteMilliseconds();
+
+    /// Gets the QPC time ( in microseconds )
+    unsigned long GetAbsoluteMicroseconds();
 
     /// Gets the raw QPC time
     GPS_TIMESTAMP GetRaw() const;

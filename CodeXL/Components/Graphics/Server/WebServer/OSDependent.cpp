@@ -1196,6 +1196,7 @@ static int ParseCommandLine(int argc, TARGV* argv[], int* optionPort, bool* remo
 #endif
         ("gpa-dllpath", po::value<string>(), "Directory containing the GPUPerfAPI DLLs.")
         ("layer-flag,l", po::value<unsigned int>(), "Bitfield to control disabling specific server layers for debugging.")
+        ("num-sequential-traced-frames,l", po::value<unsigned int>(), "The number of sequential frames to trace/capture in a row.")
         ("framerate-stats-collection", "Enable the collection of minimum, maximum, and average framerate over a duration specified in milliseconds.")
         ("framerate-stats-duration,l", po::value<unsigned int>(), "The total duration to collect frame statistics for after stats collection has been triggered.")
         ("framerate-stats-trigger,l", po::value<unsigned int>(), "The collection trigger is any valid Virtual-Key Code used to start the collection of frame statistics.")
@@ -1687,6 +1688,17 @@ static int ParseCommandLine(int argc, TARGV* argv[], int* optionPort, bool* remo
         else
         {
             SG_SET_UINT(OptionLayerFlag, 0);
+        }
+
+		// Set the number of sequential frames to capture/trace in a row.
+        if (vm.count("num-sequential-traced-frames"))
+        {
+            SG_SET_UINT(OptionNumTracedFrames, vm["num-sequential-traced-frames"].as<unsigned int>());
+        }
+        else
+        {
+            // Always default to capturing/tracing a single frame.
+            SG_SET_UINT(OptionNumTracedFrames, 1);
         }
 
         // Set if framerate statistics collection is enabled.

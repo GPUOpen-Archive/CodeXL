@@ -16,8 +16,6 @@
 #include "../../Common/timer.h"
 #include <unordered_map>
 
-#define ENABLE_MULTI_FRAME_TRACE 1
-
 //
 /// Forward declare these, since the definition exists in multiple places.
 //
@@ -296,7 +294,7 @@ protected:
     /// \param captureType Input capture type.
     /// \param APITraceFlag
     /// \param GPUTraceFlag
-    void FilterTraceTypes(CaptureType captureType, bool& APITraceFlag, bool& GPUTraceFlag);
+    void FilterTraceTypes(CaptureType captureType, bool &APITraceFlag, bool &GPUTraceFlag);
 
     //--------------------------------------------------------------------------
     /// The LinkedTrace CommandResponse can do two things:
@@ -310,11 +308,6 @@ protected:
 
     /// Command to request the GPUTrace data to be sent back to the client.
     CommandResponse m_cmdGPUTrace;
-
-#if ENABLE_MULTI_FRAME_TRACE
-    /// A count of the number of Present calls to count before responding to commands.
-    IntCommandResponse mNumSequentialPresents;
-#endif // ENABLE_MULTI_FRAME_TRACE
 
     //--------------------------------------------------------------------------
     /// A CommandResponse that accepts a path to a trace metadata file, and will

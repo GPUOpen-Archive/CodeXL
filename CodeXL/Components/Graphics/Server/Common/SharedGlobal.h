@@ -58,6 +58,7 @@ struct PsSharedGlobal
     int32 OptionFilterDrawCalls;        ///< Duplicate of "filter non Draw/Dispatch draw calls" client setting for autocapture
     int32 OptionTraceType;              ///< Mantle/DX12 Only: Specifies which trace type to collect during the set CaptureFrame.
     uint32 OptionLayerFlag;             ///< Allows a GPS developer to turn on or off certain layers in a Plugin
+    uint32 OptionNumTracedFrames;       ///< The number of sequential frames to trace/capture in a row.
     uint32 OptionStatsDuration;         ///< Sets the target millisecond duration for which to collect frame statistics.
     uint32 OptionStatsTrigger;          ///< Customize the trigger (any valid Virtual-Key Code) used to start collection of frame statistics.
     float OptionSpeed;                  ///< Overrides the default speed setting in the TimeControlLayer

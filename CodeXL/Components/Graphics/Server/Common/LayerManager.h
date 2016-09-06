@@ -59,7 +59,8 @@ protected:
 
     Timer mFrameTimer; ///< Timing object used to support CPU timings
     double mFrameDurationsMilliseconds[FRAMES_TO_MEASURE]; ///< Array of frame durations in milliseconds
-    double mAverageFramesPerSecond; ///< The average FPS for the number of frames being measured
+    double mAverageFramesPerSecond; ///< The FPS of the currently rendered frame
+    double mPreviousAverageFramesPerSecond; ///< The average FPS for the previously rendered frame
     double mLastFrameDurationMilliseconds; ///< The frame duration of the last frame rendered
     double mPreviousFrameDurationMilliseconds; ///< The frame duration of the last but one frame rendered
 
@@ -182,7 +183,7 @@ public:
     //--------------------------------------------------------------------------
     double GetAverageFPS() const
     {
-        return mAverageFramesPerSecond;
+        return mPreviousAverageFramesPerSecond;
     }
 
 protected:
@@ -198,6 +199,9 @@ protected:
 
     /// A Stats logger that can be used within every Server plugin.
     static FrameStatsLogger* mFrameStatsLogger;
+
+    /// The number of frames to capture
+    int m_captureCount;
 
 private:
     //-----------------------------------------------------------------------------
@@ -238,6 +242,11 @@ private:
     /// Has a server autocapture been done with flatten command lists enable? This flag has been set up in the capture layer, but
     /// is reset once processed so if that value is used, the value sent back to the client will always be false
     BoolCommandResponse m_FlattenCommandLists;
+
+    //-----------------------------------------------------------------------------
+    /// A count of the number of Present calls to count before responding to commands.
+    //-----------------------------------------------------------------------------
+    IntCommandResponse mNumSequentialPresents;
 };
 
 #endif //LAYERMANAGER_H

@@ -9,6 +9,7 @@
 #include "../timer.h"
 #include "../mymutex.h"
 #include "../HookTimer.h"
+#include <AMDTBaseTools/Include/gtAssert.h>
 
 // #define TRACE_TIMER   // enable this to turn on API Trace logging for timer functions.
 // Disabled by default due to volume of messages and performance implications
@@ -279,9 +280,9 @@ double Timer::LapDouble()
 ///
 /// GetAbsolute method for the Timer class.
 ///
-/// \return the current time
+/// \return the current time in milliseconds
 //---------------------------------------------------------------------
-unsigned long Timer::GetAbsolute()
+unsigned long Timer::GetAbsoluteMilliseconds()
 {
     GPS_TIMESTAMP time;
 
@@ -295,6 +296,30 @@ unsigned long Timer::GetAbsolute()
     }
 
     return (unsigned long)((1000 * time.QuadPart) / m_iFreq);
+}
+
+//---------------------------------------------------------------------
+///
+/// GetAbsolute method for the Timer class.
+///
+/// \return the current time in microseconds
+//---------------------------------------------------------------------
+unsigned long Timer::GetAbsoluteMicroseconds()
+{
+    GPS_TIMESTAMP time;
+
+    if (Real_QueryPerformanceCounter == NULL)
+    {
+        QueryPerformanceCounter(&time);
+    }
+    else
+    {
+        Real_QueryPerformanceCounter(&time);
+    }
+
+    GT_ASSERT(m_iFreq != 0);
+
+    return static_cast<unsigned long>((1000000 * time.QuadPart) / m_iFreq);
 }
 
 //---------------------------------------------------------------------

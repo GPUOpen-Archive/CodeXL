@@ -14,7 +14,7 @@
 /// Deep copy the incoming structure into the destination structure.
 /// \param inStruct The original structure to copy.
 /// \param outDestination The destination that the structure will be deep copied to.
-//-----------------------------------------------------------------------------//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void DX12CoreDeepCopy::DeepCopy(const D3D12_COMMAND_QUEUE_DESC* inStruct, D3D12_COMMAND_QUEUE_DESC* outDestination)
 {
     outDestination->Type = inStruct->Type;

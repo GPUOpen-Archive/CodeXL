@@ -97,7 +97,11 @@ inline gtASCIIString UINTToString(UINT uVal)
 /// \return String version of the input data
 inline gtASCIIString UINT64ToHexString(gtUInt64 uVal)
 {
+#ifdef CODEXL_GRAPHICS
     return FormatText(GT_64_BIT_POINTER_ASCII_FORMAT_LOWERCASE, uVal);
+#else
+    return FormatText("%p", uVal);
+#endif
 }
 
 /// Converts a bool to a UINT64

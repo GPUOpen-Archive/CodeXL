@@ -34,8 +34,7 @@ static const UINT kPrintScreenVirtualKeyCode = 0x2C;
 ModernAPILayerManager::ModernAPILayerManager() :
     mbInCapturePlayer(false),
     mbTraceTriggeredFromKeypress(false),
-    m_captureType(CaptureType_LinkedTrace),
-    m_captureCount(1)
+    m_captureType(CaptureType_LinkedTrace)
 {
     // Command that collects a CPU and GPU trace from the same frame.
     AddCommand(CONTENT_TEXT, "FrameCaptureWithSave", "FrameCaptureWithSave", "FrameCaptureWithSave", NO_DISPLAY, NO_INCLUDE, mCmdFrameCaptureWithSave);

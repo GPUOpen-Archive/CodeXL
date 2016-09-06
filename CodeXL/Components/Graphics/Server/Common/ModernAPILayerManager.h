@@ -187,7 +187,7 @@ private:
 private:
 
     CaptureType m_captureType;  ///< Capture type
-    int m_captureCount; ///< The number of frames to capture
+
 };
 
 #endif // MODERNAPILAYERMANAGER_H
