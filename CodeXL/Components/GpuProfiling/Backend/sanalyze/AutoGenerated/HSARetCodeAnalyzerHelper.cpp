@@ -10,7 +10,7 @@
 void GetNoReturnCodeAPIs(HSAAPITypeSet& noReturnCodeAPIs)
 {
     noReturnCodeAPIs.clear();
-#ifdef FUTURE_ROCR_RELEASE
+#ifdef FUTURE_ROCR_VERSION
     noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_load_scacquire);
     noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_store_screlease);
     noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_silent_store_screlease);
