@@ -11,6 +11,7 @@
 #include "timer.h"
 #include "mymutex.h"
 #include "HookTimer.h"
+#include <AMDTBaseTools/Include/gtAssert.h>
 
 // #define TRACE_TIMER   // enable this to turn on API Trace logging for timer functions.
 // Disabled by default due to volume of messages and performance implications
@@ -103,13 +104,12 @@ int     gettimeofday(struct timeval* __restrict tv, __timezone_ptr_t tz)
     int result = Real_gettimeofday(&real_tv, tz);
 
     // convert struct to microsecond time
-    GPS_TIMESTAMP Cnt;
-    Cnt.QuadPart = (uint64)real_tv.tv_sec * 1000000 + real_tv.tv_usec;
+    LONGLONG Cnt = (LONGLONG)real_tv.tv_sec * 1000000 + real_tv.tv_usec;
 
-    LONGLONG delta = Cnt.QuadPart - s_TimeGTDPrevious;
-    s_TimeGTDPrevious = Cnt.QuadPart;
+    LONGLONG delta = Cnt - s_TimeGTDPrevious;
+    s_TimeGTDPrevious = Cnt;
 
-    GPS_TIMESTAMP time;
+    LONGLONG time;
 
     if (TimeControl::Singleton().GetFreezeTime() == false)
     {
@@ -123,15 +123,15 @@ int     gettimeofday(struct timeval* __restrict tv, __timezone_ptr_t tz)
             s_TimeGTDCurrent += delta;
         }
 
-        time.QuadPart = s_TimeGTDCurrent - s_TimeGTDFrozen;
+        time = s_TimeGTDCurrent - s_TimeGTDFrozen;
     }
     else
     {
-        time.QuadPart = s_TimeGTDIni - s_TimeGTDFrozen;
+        time = s_TimeGTDIni - s_TimeGTDFrozen;
     }
 
-    tv->tv_sec = time.QuadPart / 1000000;
-    tv->tv_usec = time.QuadPart % 1000000;
+    tv->tv_sec = time / 1000000;
+    tv->tv_usec = time % 1000000;
 
     return result;
 }
@@ -161,13 +161,12 @@ int     ftime(struct timeb* tb)
     int result = Real_ftime(&real_tb);
 
     // convert struct to microsecond time
-    GPS_TIMESTAMP Cnt;
-    Cnt.QuadPart = (uint64)real_tb.time * 1000 + real_tb.millitm;
+    LONGLONG Cnt = (LONGLONG)real_tb.time * 1000 + real_tb.millitm;
 
-    LONGLONG delta = Cnt.QuadPart - s_TimeGFTPrevious;
-    s_TimeGFTPrevious = Cnt.QuadPart;
+    LONGLONG delta = Cnt - s_TimeGFTPrevious;
+    s_TimeGFTPrevious = Cnt;
 
-    GPS_TIMESTAMP time;
+    LONGLONG time;
 
     if (TimeControl::Singleton().GetFreezeTime() == false)
     {
@@ -181,15 +180,15 @@ int     ftime(struct timeb* tb)
             s_TimeGFTCurrent += delta;
         }
 
-        time.QuadPart = s_TimeGFTCurrent - s_TimeGFTFrozen;
+        time = s_TimeGFTCurrent - s_TimeGFTFrozen;
     }
     else
     {
-        time.QuadPart = s_TimeGFTIni - s_TimeGFTFrozen;
+        time = s_TimeGFTIni - s_TimeGFTFrozen;
     }
 
-    tb->time = time.QuadPart / 1000;
-    tb->millitm = time.QuadPart % 1000;
+    tb->time = time / 1000;
+    tb->millitm = time % 1000;
 
     return result;
 }
@@ -210,7 +209,7 @@ int     clock_gettime(clockid_t id, struct timespec* ts)
     }
 
 #ifdef TRACE_TIMER
-    LogTrace(traceMESSAGE, "clock_gettime( %d )", (ts->tv_sec * ONE_BILLION) + ts->tv_nsec);
+    LogTrace(traceMESSAGE, "clock_gettime( %lld )", (ts->tv_sec * ONE_BILLION) + ts->tv_nsec);
 #endif
     static mutex mtx;
     ScopeLock t(&mtx);
@@ -219,13 +218,12 @@ int     clock_gettime(clockid_t id, struct timespec* ts)
     int result = Real_clock_gettime(id, &real_ts);
 
     // convert struct to microsecond time
-    GPS_TIMESTAMP Cnt;
-    Cnt.QuadPart = (uint64)(real_ts.tv_sec * ONE_BILLION) + real_ts.tv_nsec;
+    LONGLONG Cnt = (LONGLONG)(real_ts.tv_sec * ONE_BILLION) + real_ts.tv_nsec;
 
-    LONGLONG delta = Cnt.QuadPart - s_TimeCGTPrevious;
-    s_TimeCGTPrevious = Cnt.QuadPart;
+    LONGLONG delta = Cnt - s_TimeCGTPrevious;
+    s_TimeCGTPrevious = Cnt;
 
-    GPS_TIMESTAMP time;
+    LONGLONG time;
 
     if (TimeControl::Singleton().GetFreezeTime() == false)
     {
@@ -239,15 +237,15 @@ int     clock_gettime(clockid_t id, struct timespec* ts)
             s_TimeCGTCurrent += delta;
         }
 
-        time.QuadPart = s_TimeCGTCurrent - s_TimeCGTFrozen;
+        time = s_TimeCGTCurrent - s_TimeCGTFrozen;
     }
     else
     {
-        time.QuadPart = s_TimeCGTIni - s_TimeCGTFrozen;
+        time = s_TimeCGTIni - s_TimeCGTFrozen;
     }
 
-    ts->tv_sec = time.QuadPart / ONE_BILLION;
-    ts->tv_nsec = time.QuadPart % ONE_BILLION;
+    ts->tv_sec = time / ONE_BILLION;
+    ts->tv_nsec = time % ONE_BILLION;
 
     return result;
 }
@@ -293,7 +291,7 @@ void Timer::ResetTimer()
 //---------------------------------------------------------------------
 unsigned long Timer::Lap()
 {
-    GPS_TIMESTAMP time;
+    LONGLONG time;
 
     struct timespec ts;
 
@@ -307,8 +305,8 @@ unsigned long Timer::Lap()
         Real_clock_gettime(CLOCK_REALTIME, &ts);
     }
 
-    time.QuadPart = (uint64)(ts.tv_sec * ONE_BILLION) + ts.tv_nsec;
-    return (unsigned long)((1000 * (time.QuadPart - m_iStartTime)) / m_iFreq);
+    time = (uint64)(ts.tv_sec * ONE_BILLION) + ts.tv_nsec;
+    return (unsigned long)((1000 * (time - m_iStartTime)) / m_iFreq);
 }
 
 //---------------------------------------------------------------------
@@ -319,7 +317,7 @@ unsigned long Timer::Lap()
 //---------------------------------------------------------------------
 double Timer::LapDouble()
 {
-    GPS_TIMESTAMP time;
+    LONGLONG time;
 
     struct timespec ts;
 
@@ -333,19 +331,19 @@ double Timer::LapDouble()
         Real_clock_gettime(CLOCK_REALTIME, &ts);
     }
 
-    time.QuadPart = (uint64)(ts.tv_sec * ONE_BILLION) + ts.tv_nsec;
-    return (double)((1000.0 * (double)(time.QuadPart - m_iStartTime)) / (double)m_iFreq);
+    time = (uint64)(ts.tv_sec * ONE_BILLION) + ts.tv_nsec;
+    return (double)((1000.0 * (double)(time - m_iStartTime)) / (double)m_iFreq);
 }
 
 //---------------------------------------------------------------------
 ///
 /// GetAbsolute method for the Timer class.
 ///
-/// \return the current time
+/// \return the current time in milliseconds
 //---------------------------------------------------------------------
-unsigned long Timer::GetAbsolute()
+unsigned long Timer::GetAbsoluteMilliseconds()
 {
-    GPS_TIMESTAMP time;
+    LONGLONG time;
 
     struct timespec ts;
 
@@ -359,8 +357,38 @@ unsigned long Timer::GetAbsolute()
         Real_clock_gettime(CLOCK_REALTIME, &ts);
     }
 
-    time.QuadPart = (uint64)(ts.tv_sec * ONE_BILLION) + ts.tv_nsec;
-    return (unsigned long)((1000 * time.QuadPart) / m_iFreq);
+    GT_ASSERT (m_iFreq != 0);
+
+    time = (uint64)(ts.tv_sec * ONE_BILLION) + ts.tv_nsec;
+    return static_cast<unsigned long>((1000 * time) / m_iFreq);
+}
+
+//---------------------------------------------------------------------
+///
+/// GetAbsolute method for the Timer class.
+///
+/// \return the current time in micro seconds
+//---------------------------------------------------------------------
+unsigned long Timer::GetAbsoluteMicroseconds()
+{
+    LONGLONG time;
+
+    struct timespec ts;
+
+    if (Real_clock_gettime == NULL)
+    {
+        clock_gettime_type fn = (clock_gettime_type)dlsym(RTLD_NEXT, "clock_gettime");
+        fn(CLOCK_REALTIME, &ts);
+    }
+    else
+    {
+        Real_clock_gettime(CLOCK_REALTIME, &ts);
+    }
+
+    GT_ASSERT (m_iFreq != 0);
+
+    time = (uint64)(ts.tv_sec * ONE_BILLION) + ts.tv_nsec;
+    return static_cast<unsigned long>((1000000 * time) / m_iFreq);
 }
 
 //---------------------------------------------------------------------
