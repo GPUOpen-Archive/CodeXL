@@ -257,8 +257,6 @@ void LayerManager::UpdateFrameTimingInfo()
     mLastFrameDurationMilliseconds = currentTime - previousTime;
     mPreviousAverageFramesPerSecond = mAverageFramesPerSecond;
 
-    //Log(logERROR, "previousTime: %lf, currentTime: %lf,  mLastFrameDurationMilliseconds: %lf\n", currentTime, previousTime, mLastFrameDurationMilliseconds);
-
     // Update the shared memory with our current rendering time.
     SG_SET_DOUBLE(LastPresentTime, currentTime);
 
