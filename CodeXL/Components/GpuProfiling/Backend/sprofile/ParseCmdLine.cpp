@@ -53,7 +53,7 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
         po::options_description genericOpt("General options");
         genericOpt.add_options()
         ("startdisabled", "Start the application with profiling disabled. This is useful for applications that call amdtStopProfiling and amdtResumeProfiling from the AMDTActivityLogger library.")
-        ("startdelay,d", po::value<unsigned int>()->default_value(0), "Start the application with profiling disabled. Profiling will be enabled after the specified delay of the first GPUs API call(in milliseconds).")
+        ("startdelay,d", po::value<unsigned int>()->default_value(0), "Profiling will be enabled after the specified delay (in milliseconds). This delay is relative to the first API call (either OpenCL or HSA) made by the application.")
         ("profileduration,D", po::value<unsigned int>()->default_value(0), "Profile duration in milliseconds.")
         ("envvar,e", po::value< std::vector<string> >()->multitoken(), "Environment variable that should be defined when running the profiled application. Argument should be in the format NAME=VALUE.")
         ("envvarfile,E", po::value<string>(), "Path to a file containing a list of environment variables that should be defined when running the profiled application. The file should contain one line for each variable in the format NAME=VALUE.")

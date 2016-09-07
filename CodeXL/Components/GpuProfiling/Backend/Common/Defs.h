@@ -13,7 +13,6 @@
 #include <map>
 #include <unordered_set>
 #include <assert.h>
-#include <time.h>
 #include "Version.h"
 #include "../Common/Logger.h"
 #include "AMDTBaseTools/Include/gtString.h"
