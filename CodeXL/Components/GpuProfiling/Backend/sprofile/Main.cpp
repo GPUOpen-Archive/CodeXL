@@ -578,6 +578,8 @@ void CheckOutputFile(const Config& configInner)
         params.m_bForceSinglePassPMC = config.bForceSinglePassPMC;
         params.m_bGPUTimePMC = config.bGPUTimePMC;
         params.m_bStartDisabled = config.bStartDisabled;
+        params.m_bForceSingleGPU = config.bForceSingleGPU;
+        params.m_uiForcedGpuIndex = config.uiForcedGpuIndex;
 
 #ifdef GDT_INTERNAL
 

@@ -191,6 +191,8 @@ void FileUtils::PassParametersByFile(Parameters params)
     fout << "KernelOccupancy=" << (params.m_bKernelOccupancy ? "True" : "False") << endl;
     fout << "GMTrace=" << (params.m_bGMTrace ? "True" : "False") << endl;
     fout << "FullEnvBlock=" << (params.m_bFullEnvBlock ? "True" : "False") << endl;
+    fout << "ForceSingleGPU=" << (params.m_bForceSingleGPU ? "True" : "False") << endl;
+    fout << "ForcedGpuIndex=" << params.m_uiForcedGpuIndex << endl;
 
     for (EnvVarMap::const_iterator it = params.m_mapEnvVars.begin(); it != params.m_mapEnvVars.end(); ++it)
     {
@@ -511,6 +513,21 @@ bool FileUtils::GetParametersFromFile(Parameters& params)
                         gtString realStr;
                         realStr.fromUtf8String(valStr);
                         params.m_mapEnvVars[realStr] = L"";
+                    }
+                }
+                else if (opStr.find("ForceSingleGPU") != std::string::npos)
+                {
+                    params.m_bForceSingleGPU = (valStr.find("True") != std::string::npos);
+                }
+                else if (opStr.find("ForcedGpuIndex") != std::string::npos)
+                {
+                    bool ret = StringUtils::Parse(valStr, params.m_uiForcedGpuIndex);
+
+                    if (!ret)
+                    {
+                        // failed to parse, don't force single GPU
+                        Log(logWARNING, "Failed to parse parameter file.\n");
+                        params.m_bForceSingleGPU = false;
                     }
                 }
             }

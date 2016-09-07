@@ -320,6 +320,8 @@ struct Parameters
         m_bForceSinglePassPMC = false;
         m_bGPUTimePMC = false;
         m_bStartDisabled = false;
+        m_bForceSingleGPU = false;
+        m_uiForcedGpuIndex = 0;
     }
 
     unsigned int m_uiVersionMajor;      ///< Version major
@@ -367,6 +369,8 @@ struct Parameters
     bool m_bGPUTimePMC;                 ///< Flag indicating whether or not the profiler should collect gpu time when collecting perf counters
     bool m_bStartDisabled;              ///< Flag indicating whether or not to start with profiling disabled
     KernelFilterList m_kernelFilterList;///< List of kernels to filter for perf counter profiling and subkernel profiling
+    bool m_bForceSingleGPU;             ///< Flag indicating whether or not to force a single GPU
+    unsigned int m_uiForcedGpuIndex;    ///< Forced GPU index
 };
 
 typedef std::map<std::string, bool> AnalyzerMap;

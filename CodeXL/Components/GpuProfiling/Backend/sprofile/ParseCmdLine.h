@@ -76,6 +76,8 @@ typedef struct
     bool         bForceSinglePassPMC;     ///< flag indicating that only a single pass should be allowed when collecting performance counters
     bool         bGPUTimePMC;             ///< flag indicating whether or not the profiler should collect gpu time when collecting perf counters
     bool         bStartDisabled;          ///< flag indicating whether or not to start with profiling disabled
+    bool         bForceSingleGPU;         ///< Flag indicating whether or not to force a single GPU
+    unsigned int uiForcedGpuIndex;        ///< Forced GPU index
 } Config;
 
 /// Parse the command line arguments

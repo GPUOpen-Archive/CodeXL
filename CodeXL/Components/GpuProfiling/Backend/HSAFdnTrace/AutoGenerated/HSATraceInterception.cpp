@@ -14,6 +14,7 @@
 #include "HSARTModuleLoader.h"
 #include "../HSAFdnAPIInfoManager.h"
 #include "../HSATraceInterceptionHelpers.h"
+#include "HSAAgentIterateReplacer.h"
 
 #include "HSACoreAPITraceClasses.h"
 #include "HSAImageExtensionAPITraceClasses.h"
@@ -261,7 +262,7 @@ hsa_status_t HSA_API_Trace_hsa_agent_get_info(hsa_agent_t agent, hsa_agent_info_
 hsa_status_t HSA_API_Trace_hsa_iterate_agents(hsa_status_t (*callback)(hsa_agent_t agent, void* data), void* data)
 {
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
-    hsa_status_t retVal = g_pRealCoreFunctions->hsa_iterate_agents_fn(callback, data);
+    hsa_status_t retVal = g_pRealCoreFunctions->hsa_iterate_agents_fn(HSAAgentIterateReplacer::Instance()->GetAgentIterator(callback, g_pRealCoreFunctions), data);
     ULONGLONG ullEnd = OSUtils::Instance()->GetTimeNanos();
 
     HSA_APITrace_hsa_iterate_agents* pAPIInfo = new(std::nothrow) HSA_APITrace_hsa_iterate_agents();
