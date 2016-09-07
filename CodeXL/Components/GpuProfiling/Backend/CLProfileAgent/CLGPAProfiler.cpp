@@ -19,11 +19,14 @@
 #include "../Common/Version.h"
 #include "../CLCommon/CLPlatformInfo.h"
 
+
 #include <AMDTOSWrappers/Include/osFilePath.h>
 #include <AMDTOSWrappers/Include/osProcess.h>
 
 using namespace std;
 using namespace CLUtils;
+
+extern CLGPAProfiler g_Profiler;
 
 CLGPAProfiler::CLGPAProfiler() :
     m_isGPAOpened(false),
@@ -31,9 +34,42 @@ CLGPAProfiler::CLGPAProfiler() :
     m_uiMaxKernelCount(DEFAULT_MAX_KERNELS),
     m_uiOutputLineCount(0),
     m_bIsProfilingEnabled(true),
-    m_bGPU(false)
+    m_bGPU(false),
+    m_bDelayStartEnabled(false),
+    m_bProfilerDurationEnabled(false),
+    m_delayInMilliseconds(0ul),
+    m_durationInMilliseconds(0ul)
 {
     m_strOutputFile.clear();
+    m_delayTimer = nullptr;
+    m_durationTimer = nullptr;
+}
+
+
+void CLGPAProfilerTimerEndResponse(ProfilerTimerType timerType)
+{
+    switch (timerType)
+    {
+        case PROFILEDELAYTIMER:
+            g_Profiler.EnableProfiling(true);
+            unsigned long profilerDuration;
+
+            if (g_Profiler.IsProfilerDurationEnabled(profilerDuration))
+            {
+                g_Profiler.CreateTimer(PROFILEDURATIONTIMER, profilerDuration);
+                g_Profiler.SetTimerFinishHandler(PROFILEDURATIONTIMER, CLGPAProfilerTimerEndResponse);
+                g_Profiler.StartTimer(PROFILEDURATIONTIMER);
+            }
+
+            break;
+
+        case PROFILEDURATIONTIMER:
+            g_Profiler.EnableProfiling(false);
+            break;
+
+        default:
+            break;
+    }
 }
 
 CLGPAProfiler::~CLGPAProfiler()
@@ -43,6 +79,18 @@ CLGPAProfiler::~CLGPAProfiler()
     for (UserEventList::iterator it = m_userEventList.begin(); it != m_userEventList.end(); it++)
     {
         delete(*it);
+    }
+
+    if (m_delayTimer != nullptr)
+    {
+        m_delayTimer->stopTimer();
+        delete m_delayTimer;
+    }
+
+    if (m_durationTimer != nullptr)
+    {
+        m_durationTimer->stopTimer();
+        delete m_durationTimer;
     }
 }
 
@@ -272,7 +320,32 @@ bool CLGPAProfiler::Init(const Parameters& params, string& strErrorOut)
     m_bCollectGPUTime = m_bForceSinglePass ? false : params.m_bGPUTimePMC;
     size_t nMaxPass = m_bForceSinglePass ? 1 : GPA_INFINITE_PASS;
 
-    m_bIsProfilingEnabled = !params.m_bStartDisabled;
+    if (!params.m_bStartDisabled)
+    {
+        m_bDelayStartEnabled = params.m_bDelayStartEnabled;
+        m_bProfilerDurationEnabled = params.m_bProfilerDurationEnabled;
+        m_delayInMilliseconds = params.m_delayInMilliseconds;
+        m_durationInMilliseconds = params.m_durationInMilliseconds;
+        m_bIsProfilingEnabled = m_delayInMilliseconds > 0 ? false : true;
+
+        if (m_bDelayStartEnabled)
+        {
+            CreateTimer(PROFILEDELAYTIMER, m_delayInMilliseconds);
+            m_delayTimer->SetTimerFinishHandler(CLGPAProfilerTimerEndResponse);
+            m_delayTimer->startTimer(true);
+        }
+        else if (m_bProfilerDurationEnabled)
+        {
+            CreateTimer(PROFILEDURATIONTIMER, m_durationInMilliseconds);
+            m_durationTimer->SetTimerFinishHandler(CLGPAProfilerTimerEndResponse);
+            m_durationTimer->startTimer(true);
+        }
+    }
+    else
+    {
+        m_bIsProfilingEnabled = !params.m_bStartDisabled;
+    }
+
 
     gtString strDllPath = params.m_strDLLPath;
 
@@ -1027,6 +1100,92 @@ void CLGPAProfiler::RemoveUserEvent(cl_event event)
         delete(*found);
         m_userEventList.erase(found);
     }
+}
+
+
+bool CLGPAProfiler::IsProfilerDelayEnabled(unsigned long& delayInMilliseconds)
+{
+    delayInMilliseconds = m_delayInMilliseconds;
+    return m_bDelayStartEnabled;
+}
+
+
+bool CLGPAProfiler::IsProfilerDurationEnabled(unsigned long& durationInMilliseconds)
+{
+    durationInMilliseconds = m_durationInMilliseconds;
+    return m_bProfilerDurationEnabled;
+}
+
+
+void CLGPAProfiler::SetTimerFinishHandler(ProfilerTimerType timerType, TimerEndHandler timerEndHandler)
+{
+    if (m_delayTimer || m_durationTimer)
+    {
+
+        switch (timerType)
+        {
+            case PROFILEDELAYTIMER:
+                m_delayTimer->SetTimerFinishHandler(timerEndHandler);
+                break;
+
+            case PROFILEDURATIONTIMER:
+                m_durationTimer->SetTimerFinishHandler(timerEndHandler);
+                break;
+
+            default:
+                break;
+        }
+    }
+}
+
+void CLGPAProfiler::CreateTimer(ProfilerTimerType timerType, unsigned long timeIntervalInMilliseconds)
+{
+    switch (timerType)
+    {
+        case PROFILEDELAYTIMER:
+            if (m_delayTimer == nullptr && timeIntervalInMilliseconds > 0)
+            {
+                m_delayTimer = new ProfilerTimer(timeIntervalInMilliseconds);
+                m_delayTimer->SetTimerType(PROFILEDELAYTIMER);
+                m_bDelayStartEnabled = true;
+                m_delayInMilliseconds = timeIntervalInMilliseconds;
+            }
+
+            break;
+
+        case PROFILEDURATIONTIMER:
+            if (m_durationTimer == nullptr && timeIntervalInMilliseconds > 0)
+            {
+                m_durationTimer = new ProfilerTimer(timeIntervalInMilliseconds);
+                m_durationTimer->SetTimerType(PROFILEDURATIONTIMER);
+                m_bProfilerDurationEnabled = true;
+                m_durationInMilliseconds = timeIntervalInMilliseconds;
+            }
+
+            break;
+
+        default:
+            break;
+    }
+}
+
+
+void CLGPAProfiler::StartTimer(ProfilerTimerType timerType)
+{
+    switch (timerType)
+    {
+        case PROFILEDELAYTIMER:
+            m_delayTimer->startTimer(true);
+            break;
+
+        case PROFILEDURATIONTIMER:
+            m_durationTimer->startTimer(true);
+            break;
+
+        default:
+            break;
+    }
+
 }
 
 void CLGPAProfiler::SetOutputFile(const std::string& strOutputFile)

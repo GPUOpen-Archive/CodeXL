@@ -36,12 +36,55 @@ HSAGPAProfiler::HSAGPAProfiler(void) :
     m_uiMaxKernelCount(DEFAULT_MAX_KERNELS),
     m_uiOutputLineCount(0),
     m_isProfilingEnabled(true),
-    m_isProfilerInitialized(false)
+    m_isProfilerInitialized(false),
+    m_bDelayStartEnabled(false),
+    m_bProfilerDurationEnabled(false),
+    m_delayInMilliseconds(0ul),
+    m_durationInMilliseconds(0ul),
+    m_delayTimer(nullptr),
+    m_durationTimer(nullptr)
 {
+}
+
+void HSAGPAProfilerTimerEndResponse(ProfilerTimerType timerType)
+{
+    switch (timerType)
+    {
+        case PROFILEDELAYTIMER:
+            HSAGPAProfiler::Instance()->EnableProfiling(true);
+            unsigned long profilerDuration;
+
+            if (HSAGPAProfiler::Instance()->IsProfilerDurationEnabled(profilerDuration))
+            {
+                HSAGPAProfiler::Instance()->CreateTimer(PROFILEDURATIONTIMER, profilerDuration);
+                HSAGPAProfiler::Instance()->SetTimerFinishHandler(PROFILEDURATIONTIMER, HSAGPAProfilerTimerEndResponse);
+                HSAGPAProfiler::Instance()->StartTimer(PROFILEDURATIONTIMER);
+            }
+
+            break;
+
+        case PROFILEDURATIONTIMER:
+            HSAGPAProfiler::Instance()->EnableProfiling(false);
+            break;
+
+        default:
+            break;
+    }
 }
 
 HSAGPAProfiler::~HSAGPAProfiler(void)
 {
+    if (m_delayTimer != nullptr)
+    {
+        m_delayTimer->stopTimer();
+        delete m_delayTimer;
+    }
+
+    if (m_durationTimer != nullptr)
+    {
+        m_durationTimer->stopTimer();
+        delete m_durationTimer;
+    }
 }
 
 bool HSAGPAProfiler::WaitForCompletedSession(uint64_t queueId, uint32_t timeoutSeconds)
@@ -170,7 +213,31 @@ bool HSAGPAProfiler::Init(const Parameters& params, std::string& strErrorOut)
         Log(logMESSAGE, "Initializing HSAGPAProfiler\n");
         const size_t nMaxPass = 1;
 
-        m_isProfilingEnabled = !params.m_bStartDisabled;
+        if (!params.m_bStartDisabled)
+        {
+            m_bDelayStartEnabled = params.m_bDelayStartEnabled;
+            m_bProfilerDurationEnabled = params.m_bProfilerDurationEnabled;
+            m_delayInMilliseconds = params.m_delayInMilliseconds;
+            m_durationInMilliseconds = params.m_durationInMilliseconds;
+            m_isProfilingEnabled = m_delayInMilliseconds > 0 ? false : true;
+
+            if (m_bDelayStartEnabled)
+            {
+                CreateTimer(PROFILEDELAYTIMER, m_delayInMilliseconds);
+                m_delayTimer->SetTimerFinishHandler(HSAGPAProfilerTimerEndResponse);
+                m_delayTimer->startTimer(true);
+            }
+            else if (m_bProfilerDurationEnabled)
+            {
+                CreateTimer(PROFILEDURATIONTIMER, m_durationInMilliseconds);
+                m_durationTimer->SetTimerFinishHandler(HSAGPAProfilerTimerEndResponse);
+                m_durationTimer->startTimer(true);
+            }
+        }
+        else
+        {
+            m_isProfilingEnabled = !params.m_bStartDisabled;
+        }
 
         m_uiMaxKernelCount = params.m_uiMaxKernels;
 
@@ -401,9 +468,11 @@ bool HSAGPAProfiler::PopulateKernelStatsFromDispatchPacket(hsa_kernel_dispatch_p
         else
         {
             const void* pKernelHostAddress = nullptr;
+
             if (nullptr != pHsaModule->ven_amd_loader_query_host_address)
             {
                 hsa_status_t status = pHsaModule->ven_amd_loader_query_host_address(reinterpret_cast<const void*>(pAqlPacket->kernel_object), &pKernelHostAddress);
+
                 if (HSA_STATUS_SUCCESS == status)
                 {
                     pKernelCode = reinterpret_cast<const amd_kernel_code_t*>(pKernelHostAddress);
@@ -768,4 +837,89 @@ bool HSAGPAProfiler::AddOccupancyEntry(const KernelStats& kernelStats, const std
     OccupancyInfoManager::Instance()->AddTraceInfoEntry(pEntry);
 
     return retVal;
+}
+
+bool HSAGPAProfiler::IsProfilerDelayEnabled(unsigned long& delayInMilliseconds)
+{
+    delayInMilliseconds = m_delayInMilliseconds;
+    return m_bDelayStartEnabled;
+}
+
+
+bool HSAGPAProfiler::IsProfilerDurationEnabled(unsigned long& durationInMilliseconds)
+{
+    durationInMilliseconds = m_durationInMilliseconds;
+    return m_bProfilerDurationEnabled;
+}
+
+
+void HSAGPAProfiler::SetTimerFinishHandler(ProfilerTimerType timerType, TimerEndHandler timerEndHandler)
+{
+    if (m_delayTimer || m_durationTimer)
+    {
+
+        switch (timerType)
+        {
+            case PROFILEDELAYTIMER:
+                m_delayTimer->SetTimerFinishHandler(timerEndHandler);
+                break;
+
+            case PROFILEDURATIONTIMER:
+                m_durationTimer->SetTimerFinishHandler(timerEndHandler);
+                break;
+
+            default:
+                break;
+        }
+    }
+}
+
+void HSAGPAProfiler::CreateTimer(ProfilerTimerType timerType, unsigned int timeIntervalInMilliseconds)
+{
+    switch (timerType)
+    {
+        case PROFILEDELAYTIMER:
+            if (m_delayTimer == nullptr && timeIntervalInMilliseconds > 0)
+            {
+                m_delayTimer = new ProfilerTimer(timeIntervalInMilliseconds);
+                m_delayTimer->SetTimerType(PROFILEDELAYTIMER);
+                m_bDelayStartEnabled = true;
+                m_delayInMilliseconds = timeIntervalInMilliseconds;
+            }
+
+            break;
+
+        case PROFILEDURATIONTIMER:
+            if (m_durationTimer == nullptr && timeIntervalInMilliseconds > 0)
+            {
+                m_durationTimer = new ProfilerTimer(timeIntervalInMilliseconds);
+                m_durationTimer->SetTimerType(PROFILEDURATIONTIMER);
+                m_bProfilerDurationEnabled = true;
+                m_durationInMilliseconds = timeIntervalInMilliseconds;
+            }
+
+            break;
+
+        default:
+            break;
+    }
+}
+
+
+void HSAGPAProfiler::StartTimer(ProfilerTimerType timerType)
+{
+    switch (timerType)
+    {
+        case PROFILEDELAYTIMER:
+            m_delayTimer->startTimer(true);
+            break;
+
+        case PROFILEDURATIONTIMER:
+            m_durationTimer->startTimer(true);
+            break;
+
+        default:
+            break;
+    }
+
 }

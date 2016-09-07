@@ -18,6 +18,7 @@
 #include "../Common/GlobalSettings.h"
 #include "DeviceInfoUtils.h"
 #include "../HSAFdnCommon/HSAFunctionDefsUtils.h"
+#include <AMDTBaseTools/Include/gtAssert.h>
 
 using namespace std;
 
@@ -29,10 +30,23 @@ HSAAPIInfoManager::HSAAPIInfoManager(void) : m_tracedApiCount(0)
     m_mustInterceptAPIs.insert(HSA_API_Type_hsa_queue_create);               // needed so we can create a profiled queue for kernel timestamps
     m_mustInterceptAPIs.insert(HSA_API_Type_hsa_executable_get_symbol);      // needed to extract kernel name
     m_mustInterceptAPIs.insert(HSA_API_Type_hsa_executable_symbol_get_info); // needed to extract kernel name
+    m_delayTimer = nullptr;
+    m_durationTimer = nullptr;
 }
 
 HSAAPIInfoManager::~HSAAPIInfoManager(void)
 {
+    if (m_delayTimer)
+    {
+        m_delayTimer->stopTimer();
+        delete m_delayTimer;
+    }
+
+    if (m_durationTimer)
+    {
+        m_durationTimer->stopTimer();
+        delete m_durationTimer;
+    }
 }
 
 bool HSAAPIInfoManager::WriteKernelTimestampEntry(std::ostream& sout, const hsa_profiler_kernel_time_t& record)
@@ -218,6 +232,129 @@ bool HSAAPIInfoManager::GetQueueIndex(const hsa_queue_t* pQueue, size_t& queueIn
     }
 
     return retVal;
+}
+
+void HSATraceAgentTimerEndResponse(ProfilerTimerType timerType)
+{
+    switch (timerType)
+    {
+        case PROFILEDELAYTIMER:
+            HSAAPIInfoManager::Instance()->ResumeTracing();
+            unsigned long profilerDuration;
+
+            if (HSAAPIInfoManager::Instance()->IsProfilerDurationEnabled(profilerDuration))
+            {
+                HSAAPIInfoManager::Instance()->CreateTimer(PROFILEDURATIONTIMER, profilerDuration);
+                HSAAPIInfoManager::Instance()->SetTimerFinishHandler(PROFILEDURATIONTIMER, HSATraceAgentTimerEndResponse);
+                HSAAPIInfoManager::Instance()->startTimer(PROFILEDURATIONTIMER);
+            }
+
+            break;
+
+        case PROFILEDURATIONTIMER:
+            HSAAPIInfoManager::Instance()->StopTracing();
+            break;
+
+        default:
+            break;
+    }
+}
+
+void HSAAPIInfoManager::EnableProfileDelayStart(bool doEnable, unsigned long delayInMilliseconds)
+{
+    m_bDelayStartEnabled = doEnable;
+    m_delayInMilliseconds = doEnable ? delayInMilliseconds : 0;
+}
+
+void HSAAPIInfoManager::EnableProfileDuration(bool doEnable, unsigned long durationInMilliseconds)
+{
+    m_bProfilerDurationEnabled = doEnable;
+    m_durationInMilliseconds = doEnable ? durationInMilliseconds : 0;
+}
+
+bool HSAAPIInfoManager::IsProfilerDelayEnabled(unsigned long& delayInMilliseconds)
+{
+    delayInMilliseconds = m_delayInMilliseconds;
+    return m_bDelayStartEnabled;
+}
+
+bool HSAAPIInfoManager::IsProfilerDurationEnabled(unsigned long& durationInSeconds)
+{
+    durationInSeconds = m_durationInMilliseconds;
+    return m_bProfilerDurationEnabled;
+}
+
+void HSAAPIInfoManager::SetTimerFinishHandler(ProfilerTimerType timerType, TimerEndHandler timerEndHandler)
+{
+    if (m_delayTimer || m_durationTimer)
+    {
+
+        switch (timerType)
+        {
+            case PROFILEDELAYTIMER:
+                m_delayTimer->SetTimerFinishHandler(timerEndHandler);
+                break;
+
+            case PROFILEDURATIONTIMER:
+                m_durationTimer->SetTimerFinishHandler(timerEndHandler);
+                break;
+
+            default:
+                break;
+        }
+    }
+}
+
+void HSAAPIInfoManager::CreateTimer(ProfilerTimerType timerType, unsigned long timeIntervalInMilliseconds)
+{
+    switch (timerType)
+    {
+        case PROFILEDELAYTIMER:
+            if (m_delayTimer == nullptr && timeIntervalInMilliseconds > 0)
+            {
+                m_delayTimer = new ProfilerTimer(timeIntervalInMilliseconds);
+                m_delayTimer->SetTimerType(PROFILEDELAYTIMER);
+                m_bDelayStartEnabled = true;
+                m_delayInMilliseconds = timeIntervalInMilliseconds;
+            }
+
+            break;
+
+        case PROFILEDURATIONTIMER:
+            if (m_durationTimer == nullptr && timeIntervalInMilliseconds > 0)
+            {
+                m_durationTimer = new ProfilerTimer(timeIntervalInMilliseconds);
+                m_durationTimer->SetTimerType(PROFILEDURATIONTIMER);
+                m_bProfilerDurationEnabled = true;
+                m_durationInMilliseconds = timeIntervalInMilliseconds;
+            }
+
+            break;
+
+        default:
+            break;
+    }
+}
+
+
+void HSAAPIInfoManager::startTimer(ProfilerTimerType timerType)
+{
+    if (m_delayTimer || m_durationTimer)
+    {
+        switch (timerType)
+        {
+            case PROFILEDELAYTIMER:
+                m_delayTimer->startTimer(true);
+                break;
+
+            case PROFILEDURATIONTIMER:
+                m_durationTimer->startTimer(true);
+                break;
+
+            default:
+                break;
+        }
+    }
 }
 
 void HSAAPIInfoManager::AddAPIInfoEntry(APIBase* api)

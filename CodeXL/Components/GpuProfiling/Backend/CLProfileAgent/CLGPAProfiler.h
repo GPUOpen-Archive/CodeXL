@@ -33,6 +33,13 @@
 #include "CLUserEvent.h"
 #include "DeviceInfoUtils.h"
 #include "../Common/KernelProfileResultManager.h"
+#include "../Common/ProfilerTimer.h"
+
+
+/// Handle the response on the end of the timer
+/// \param timerType type of the ending timer for which response have to be executed
+void CLGPAProfilerTimerEndResponse(ProfilerTimerType timerType);
+
 
 /// \addtogroup CLProfileAgent
 // @{
@@ -258,6 +265,30 @@ public:
     /// \param doEnable, flag indicating whether to enable (true) or disable (false) profiling
     void EnableProfiling(bool doEnable) { m_bIsProfilingEnabled = doEnable; }
 
+    /// Indicates whether profiler should run after delay or not
+    /// \param delayInMilliseconds to return the amount by which profile set to be delayed
+    /// \returns true if delay is enabled otherwise false
+    bool IsProfilerDelayEnabled(unsigned long& delayInMilliseconds);
+
+    /// Indicates whether profiler should run only for set duration or not
+    /// \param durationInMilliseconds to return the amount by which profile set to run
+    /// \returns true if duration of the profiler is enabled
+    bool IsProfilerDurationEnabled(unsigned long& durationInMilliseconds);
+
+    /// Assigns the call back function
+    /// \param timerType type of the timer
+    /// \param timerEndHandler call back function pointer
+    void SetTimerFinishHandler(ProfilerTimerType timerType, TimerEndHandler timerEndHandler);
+
+    /// Creates the Profiler Timer
+    /// \param timerType timer type of the starting timer
+    /// \param timeIntervalInMilliseconds profiler duration or profiler delay in milliseconds
+    void CreateTimer(ProfilerTimerType timerType, unsigned long timeIntervalInMilliseconds);
+
+    /// Starts the timer
+    /// \param timerType timer type of the starting timer
+    void StartTimer(ProfilerTimerType timerType);
+
 private:
     /// Set the output file path
     /// \param strOutputFile  the output file path
@@ -279,24 +310,30 @@ private:
     /// \param[out] revisionId the revision id for the specified device
     bool GetAvailableDeviceIdFromDeviceNameAndAsicInfoList(const char* pszDeviceName, const AsicInfoList asicInfoList, int& deviceId, int& revisionId);
 
-    GPAUtils           m_GPAUtils;            ///< common GPA utility functions
-    bool               m_isGPAOpened;         ///< flag indicating if a GPA Context is currently opened
-    std::string        m_strDeviceName;       ///< the device name
-    unsigned int       m_uiCurKernelCount;    ///< number of kernels that have been profiled.
-    unsigned int       m_uiMaxKernelCount;    ///< max number of kernels to profile.
-    unsigned int       m_uiOutputLineCount;   ///< number of items written to the output file
-    bool               m_bIsProfilingEnabled; ///< flag indicating if profiling is currently enabled
-    bool               m_bGPU;                ///< true if profiling a GPU device (false is the default)
-    CLContextManager   m_contextManager;      ///< manages all the CL contexts for arena support
+    GPAUtils           m_GPAUtils;                          ///< common GPA utility functions
+    bool               m_isGPAOpened;                       ///< flag indicating if a GPA Context is currently opened
+    std::string        m_strDeviceName;                     ///< the device name
+    unsigned int       m_uiCurKernelCount;                  ///< number of kernels that have been profiled.
+    unsigned int       m_uiMaxKernelCount;                  ///< max number of kernels to profile.
+    unsigned int       m_uiOutputLineCount;                 ///< number of items written to the output file
+    bool               m_bIsProfilingEnabled;               ///< flag indicating if profiling is currently enabled
+    bool               m_bGPU;                              ///< true if profiling a GPU device (false is the default)
+    CLContextManager   m_contextManager;                    ///< manages all the CL contexts for arena support
 
-    KernelAssembly     m_KernelAssembly;      ///< manages retrieving the CL source, IL and ISA from the CL run-time
-    std::string        m_strOutputFile;       ///< the output file path
-    std::string        m_strOccupancyFile;    ///< the output kernel occupancy file
-    UserEventList      m_userEventList;       ///< user event list
-    CLPlatformSet      m_platformList;        ///< Platform list
+    KernelAssembly     m_KernelAssembly;                    ///< manages retrieving the CL source, IL and ISA from the CL run-time
+    std::string        m_strOutputFile;                     ///< the output file path
+    std::string        m_strOccupancyFile;                  ///< the output kernel occupancy file
+    UserEventList      m_userEventList;                     ///< user event list
+    CLPlatformSet      m_platformList;                      ///< Platform list
 
-    bool               m_bForceSinglePass;    ///< flag indicating whether or not the profiler should only allow a single pass
-    bool               m_bCollectGPUTime;     ///< flag indicating whether or not the profiler should collect gpu time when collecting perf counters
+    bool               m_bForceSinglePass;                  ///< flag indicating whether or not the profiler should only allow a single pass
+    bool               m_bCollectGPUTime;                   ///< flag indicating whether or not the profiler should collect gpu time when collecting perf counters
+    bool               m_bDelayStartEnabled;                ///< flag indicating whether or not the profiler should start with delay or not
+    bool               m_bProfilerDurationEnabled;          ///< flag indiacating whether profiler should only run for certain duration
+    unsigned long      m_delayInMilliseconds;               ///< milliseconds to delay for profiler to start
+    unsigned long      m_durationInMilliseconds;            ///< duration in milliseconds for which Profiler should run
+    ProfilerTimer*     m_delayTimer;                        ///< timer for handling delay timer for the profile agent
+    ProfilerTimer*     m_durationTimer;                     ///< timer for handling duration timer for the profile agent
 };
 
 // @}
