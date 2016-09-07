@@ -324,6 +324,8 @@ struct Parameters
         m_bProfilerDurationEnabled = false;
         m_delayInMilliseconds = 0;
         m_durationInMilliseconds = 0;
+        m_bForceSingleGPU = false;
+        m_uiForcedGpuIndex = 0;
     }
 
     unsigned int m_uiVersionMajor;                ///< Version major
@@ -375,6 +377,8 @@ struct Parameters
     bool m_bProfilerDurationEnabled;              ///< flag indiacating whether profiler should only run for certain duration
     unsigned int m_delayInMilliseconds;           ///< delay for profiler in milliseconds
     unsigned int m_durationInMilliseconds;        ///< duration for profiler in milliseconds for which profiler should run
+    bool m_bForceSingleGPU;                       ///< Flag indicating whether or not to force a single GPU
+    unsigned int m_uiForcedGpuIndex;              ///< Forced GPU index
 };
 
 typedef std::map<std::string, bool> AnalyzerMap;

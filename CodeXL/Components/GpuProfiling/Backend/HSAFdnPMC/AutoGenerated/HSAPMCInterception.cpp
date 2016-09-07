@@ -13,6 +13,8 @@
 
 #include "../HSAPMCInterceptionHelpers.h"
 
+#include "HSAAgentIterateReplacer.h"
+
 #include "HSAPMCInterception.h"
 
 CoreApiTable*      g_pRealCoreFunctions         = nullptr;
@@ -59,6 +61,13 @@ hsa_status_t HSA_PMC_hsa_executable_get_symbol(hsa_executable_t executable, cons
     return retVal;
 }
 
+hsa_status_t HSA_PMC_hsa_iterate_agents(hsa_status_t (*callback)(hsa_agent_t agent, void* data), void* data)
+{
+    hsa_status_t retVal = g_pRealCoreFunctions->hsa_iterate_agents_fn(HSAAgentIterateReplacer::Instance()->GetAgentIterator(callback, g_pRealCoreFunctions), data);
+
+    return retVal;
+}
+
 void InitHSAAPIInterceptPMC(HsaApiTable* pTable)
 {
     g_pRealCoreFunctions = (CoreApiTable*)malloc(sizeof(CoreApiTable));
@@ -77,6 +86,7 @@ void InitHSAAPIInterceptPMC(HsaApiTable* pTable)
     pTable->core_->hsa_queue_create_fn = HSA_PMC_hsa_queue_create;
     pTable->core_->hsa_queue_destroy_fn = HSA_PMC_hsa_queue_destroy;
     pTable->core_->hsa_executable_get_symbol_fn = HSA_PMC_hsa_executable_get_symbol;
+    pTable->core_->hsa_iterate_agents_fn = HSA_PMC_hsa_iterate_agents;
 }
 
 void DoneHSAAPIInterceptPMC()

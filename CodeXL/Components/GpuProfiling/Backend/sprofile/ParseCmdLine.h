@@ -78,6 +78,8 @@ typedef struct
     bool         bStartDisabled;                     ///< flag indicating whether or not to start with profiling disabled
     unsigned int m_delayInMilliseconds;              ///< delay for profiler in milliseconds
     unsigned int m_durationInMilliseconds;           ///< duration for profiler in milliseconds for which profiler should run
+    bool         bForceSingleGPU;                    ///< Flag indicating whether or not to force a single GPU
+    unsigned int uiForcedGpuIndex;                   ///< Forced GPU index
 } Config;
 
 /// Parse the command line arguments
