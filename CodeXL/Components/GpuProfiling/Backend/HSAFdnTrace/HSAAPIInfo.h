@@ -68,22 +68,38 @@ public:
         unsigned int sizeArgPos = 0;
         bool doesAPIHaveSizeArg = false;
 
+        unsigned int multiplySizeArgPos = 0;
+        bool doesAPIHaveMultiplySizeArg = false;
+
         if (HSA_API_Type_UNKNOWN == m_apiID)
         {
             m_apiID = HSAFunctionDefsUtils::Instance()->ToHSAAPIType(m_strName);
         }
 
         if (m_apiID == HSA_API_Type_hsa_memory_allocate || m_apiID == HSA_API_Type_hsa_memory_register ||
-            m_apiID == HSA_API_Type_hsa_memory_deregister)
+            m_apiID == HSA_API_Type_hsa_memory_deregister || m_apiID == HSA_API_Type_hsa_amd_memory_pool_allocate ||
+            m_apiID == HSA_API_Type_hsa_amd_memory_lock )
         {
             doesAPIHaveSizeArg = true;
             sizeArgPos = 1;
         }
-        else if (m_apiID == HSA_API_Type_hsa_memory_copy)
+        else if (m_apiID == HSA_API_Type_hsa_memory_copy || m_apiID == HSA_API_Type_hsa_amd_memory_async_copy)
         {
             doesAPIHaveSizeArg = true;
             sizeArgPos = 2;
-            m_shouldShowBandwidth = true;
+            // m_shouldShowBandwidth = true;
+        }
+        else if (m_apiID == HSA_API_Type_hsa_amd_interop_map_buffer)
+        {
+            doesAPIHaveSizeArg = true;
+            sizeArgPos = 4;
+        }
+        else if (m_apiID == HSA_API_Type_hsa_amd_memory_fill)
+        {
+            doesAPIHaveSizeArg = true;
+            sizeArgPos = 2;
+            doesAPIHaveMultiplySizeArg = true;
+            multiplySizeArgPos = 1;
         }
 
         if (doesAPIHaveSizeArg)
@@ -95,6 +111,17 @@ public:
             {
                 std::istringstream ss(args[sizeArgPos]);
                 ss >> m_size;
+            }
+
+            if (doesAPIHaveMultiplySizeArg)
+            {
+                if (multiplySizeArgPos < args.size())
+                {
+                    size_t multiplyArg = 0;
+                    std::istringstream ss(args[multiplySizeArgPos]);
+                    ss >> multiplyArg;
+                    m_size *= multiplyArg;
+                }
             }
         }
     }

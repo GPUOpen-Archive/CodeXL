@@ -51,7 +51,8 @@ enum HSAAPIGroup
     HSAAPIGroup_Memory,
     HSAAPIGroup_QueryInfo,
     HSAAPIGroup_Queue,
-    HSAAPIGroup_Signal
+    HSAAPIGroup_Signal,
+    HSAAPIGroup_ExtensionsAMD
 };
 
 /// a type representing a set of HSAAPIGroup values
