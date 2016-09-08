@@ -47,18 +47,29 @@ public:
 
     unsigned int uiNumBuffer;           ///< Number of Buffers created on this context
     unsigned int uiNumImage;            ///< Number of Images created on this context
+    unsigned int uiNumQueue;            ///< Number of Queues created on this context
 
     /// Constructor
-    ContextSummaryItems()
-    {
-        uiNumCopy = uiNumMap = uiNumWrite = uiNumRead = 0;
-        uiByteCopy = uiByteMap = uiByteWrite = uiByteRead = 0;
-        ullDurationCopy = ullDurationMap = ullDurationWrite = ullDurationRead = 0;
-        uiContextID = (unsigned int) - 1;
-        uiNumMemOp = 0;
-        ullTotalMemDuration = 0;
-        uiNumBuffer = uiNumImage = 0;
-    }
+    ContextSummaryItems() :
+        uiNumCopy(0u),
+        uiNumMap(0u),
+        uiNumWrite(0u),
+        uiNumRead(0u),
+        uiByteCopy(0u),
+        uiByteMap(0u),
+        uiByteWrite(0u),
+        uiByteRead(0u),
+        ullDurationCopy(0ull),
+        ullDurationMap(0ull),
+        ullDurationWrite(0ull),
+        ullDurationRead(0ull),
+        uiContextID(static_cast<unsigned int>(-1)),
+        uiNumMemOp(0u),
+        ullTotalMemDuration(0u),
+        uiNumBuffer(0u),
+        uiNumImage(0u),
+        uiNumQueue(0u)
+    {}
 
     /// Copy constructor
     /// \param obj object
@@ -90,6 +101,7 @@ public:
 
         uiNumBuffer = obj.uiNumBuffer;
         uiNumImage = obj.uiNumImage;
+        uiNumQueue = obj.uiNumQueue;
     }
 
     /// Assignment operator
@@ -125,6 +137,7 @@ public:
 
             uiNumBuffer = obj.uiNumBuffer;
             uiNumImage = obj.uiNumImage;
+            uiNumQueue= obj.uiNumQueue;
         }
 
         return *this;
@@ -173,6 +186,7 @@ public:
 
         uiNumBuffer += obj.uiNumBuffer;
         uiNumImage += obj.uiNumImage;
+        uiNumQueue += obj.uiNumQueue;
 
         return *this;
     }
@@ -188,11 +202,14 @@ struct CLObjectCounter
 {
     unsigned int uiImageCount;    /// Image count
     unsigned int uiBufferCount;   /// Buffer count
+    unsigned int uiQueueCount;    /// Queue count
 
     /// Constructor
-    CLObjectCounter()
+    CLObjectCounter() :
+        uiBufferCount(0),
+        uiImageCount(0),
+        uiQueueCount(0)
     {
-        uiBufferCount = uiImageCount = 0;
     }
 };
 
