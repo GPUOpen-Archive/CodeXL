@@ -51,6 +51,9 @@ public:
 
     /// Constructor
     ContextSummaryItems() :
+        uiContextID(static_cast<unsigned int>(-1)),
+        uiNumMemOp(0u),
+        ullTotalMemDuration(0u),
         uiNumCopy(0u),
         uiNumMap(0u),
         uiNumWrite(0u),
@@ -63,9 +66,6 @@ public:
         ullDurationMap(0ull),
         ullDurationWrite(0ull),
         ullDurationRead(0ull),
-        uiContextID(static_cast<unsigned int>(-1)),
-        uiNumMemOp(0u),
-        ullTotalMemDuration(0u),
         uiNumBuffer(0u),
         uiNumImage(0u),
         uiNumQueue(0u)
@@ -206,8 +206,8 @@ struct CLObjectCounter
 
     /// Constructor
     CLObjectCounter() :
-        uiBufferCount(0),
         uiImageCount(0),
+        uiBufferCount(0),
         uiQueueCount(0)
     {
     }
