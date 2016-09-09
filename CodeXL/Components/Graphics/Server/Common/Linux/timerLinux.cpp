@@ -280,7 +280,9 @@ void Timer::ResetTimer()
         Real_clock_gettime(CLOCK_REALTIME, &ts);
     }
 
-    m_iStartTime = (uint64)(ts.tv_sec * ONE_BILLION) + ts.tv_nsec;
+    m_iStartTime = ts.tv_sec;
+    m_iStartTime *= ONE_BILLION;
+    m_iStartTime += ts.tv_nsec;
 }
 
 //---------------------------------------------------------------------
@@ -305,7 +307,10 @@ unsigned long Timer::Lap()
         Real_clock_gettime(CLOCK_REALTIME, &ts);
     }
 
-    time = (uint64)(ts.tv_sec * ONE_BILLION) + ts.tv_nsec;
+    time = ts.tv_sec;
+    time *= ONE_BILLION;
+    time += ts.tv_nsec;
+
     return (unsigned long)((1000 * (time - m_iStartTime)) / m_iFreq);
 }
 
@@ -331,7 +336,10 @@ double Timer::LapDouble()
         Real_clock_gettime(CLOCK_REALTIME, &ts);
     }
 
-    time = (uint64)(ts.tv_sec * ONE_BILLION) + ts.tv_nsec;
+    time = ts.tv_sec;
+    time *= ONE_BILLION;
+    time += ts.tv_nsec;
+
     return (double)((1000.0 * (double)(time - m_iStartTime)) / (double)m_iFreq);
 }
 
@@ -359,7 +367,10 @@ unsigned long Timer::GetAbsoluteMilliseconds()
 
     GT_ASSERT (m_iFreq != 0);
 
-    time = (uint64)(ts.tv_sec * ONE_BILLION) + ts.tv_nsec;
+    time = ts.tv_sec;
+    time *= ONE_BILLION;
+    time += ts.tv_nsec;
+
     return static_cast<unsigned long>((1000 * time) / m_iFreq);
 }
 
@@ -387,7 +398,10 @@ unsigned long Timer::GetAbsoluteMicroseconds()
 
     GT_ASSERT (m_iFreq != 0);
 
-    time = (uint64)(ts.tv_sec * ONE_BILLION) + ts.tv_nsec;
+    time = ts.tv_sec;
+    time *= ONE_BILLION;
+    time += ts.tv_nsec;
+
     return static_cast<unsigned long>((1000000 * time) / m_iFreq);
 }
 
@@ -412,6 +426,8 @@ GPS_TIMESTAMP Timer::GetRaw() const
         Real_clock_gettime(CLOCK_REALTIME, &ts);
     }
 
-    time.QuadPart = (uint64)(ts.tv_sec * ONE_BILLION) + ts.tv_nsec;
+    time.QuadPart = ts.tv_sec;
+    time.QuadPart *= ONE_BILLION;
+    time.QuadPart += ts.tv_nsec;
     return time;
 }
