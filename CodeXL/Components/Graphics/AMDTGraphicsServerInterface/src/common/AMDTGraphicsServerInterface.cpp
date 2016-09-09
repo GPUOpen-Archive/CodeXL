@@ -144,18 +144,6 @@ bool GraphicsServerCommunication::ConnectProcess(const gtASCIIString strPid, con
         // Connect
         gtASCIIString showStack = m_strApiHttpCommand;
         retVal = SendCommandPid(showStack.append("/ShowStack"), strWebResponse, "");
-
-        if (retVal)
-        {
-            gtASCIIString timeControl = m_strApiHttpCommand;
-            retVal = SendCommandPid(timeControl.append("/PushLayer=TimeControl") , strWebResponse, "");
-        }
-
-        if (retVal)
-        {
-            gtASCIIString tcSettings = m_strApiHttpCommand;
-            retVal = SendCommandPid(tcSettings.append("/TC/Settings.xml"), strWebResponse, "");
-        }
     }
 
     return retVal;
