@@ -223,6 +223,10 @@ void MultithreadedTraceAnalyzerLayer::EndFrame()
     // Will we be required to dump the trace response to a file on disk?
     bool bSaveResponseToFile = GetParentLayerManager()->mCmdFrameCaptureWithSave.IsActive() || mbLinkedTraceForCapture;
 
+#ifndef CODEXL_GRAPHICS
+	bSaveResponseToFile = false;
+#endif // CODEXL_GRAPHICS
+
     // If the linked trace was requested, return all of the results through a single response.
     bool bLinkedTraceRequested = bSaveResponseToFile || mCmdLinkedTrace.IsActive() || (autotraceFlags == kTraceType_Linked);
 
@@ -501,61 +505,39 @@ void MultithreadedTraceAnalyzerLayer::HandleLinkedTraceResponse(const gtASCIIStr
     }
     else
     {
-        gtASCIIString traceHeaderBlock;
-        bool bBuiltHeaderSuccessfully = GenerateLinkedTraceHeader(traceHeaderBlock);
+		// If the trace wasn't triggered by a keypress, we'll need to send a response back through either of the following commands.
+		CommandResponse& frameCaptureWithSaveResponse = (inbSaveResponseToFile == true) ? parentLayerManager->mCmdFrameCaptureWithSave : mCmdLinkedTrace;
 
-        if (bBuiltHeaderSuccessfully)
-        {
-            bool bKeypressTrigger = parentLayerManager->IsTraceTriggeredByKeypress();
-
-            // Collect a trace and generate the trace metadata string. Write the trace and metadata files to disk.
-            std::string metadataXMLString;
-            bool bWriteMetadataSuccessful = WriteTraceAndMetadataFiles(traceHeaderBlock, inFullResponseString, metadataXMLString);
-
-            // If the trace wasn't triggered by a keypress, we'll need to send a response back through either of the following commands.
-            CommandResponse& frameCaptureWithSaveResponse = (inbSaveResponseToFile == true) ? parentLayerManager->mCmdFrameCaptureWithSave : mCmdLinkedTrace;
-
-            if (bWriteMetadataSuccessful)
-            {
-                // We only need to send the response back through a request if the client triggered collection.
-                if (!bKeypressTrigger)
-                {
-                    // Check if we want to cache the response to disk, or return it as-is.
-                    if (inbSaveResponseToFile)
-                    {
-                        if (bWriteMetadataSuccessful)
-                        {
-                            // Send a response back to the client indicating which trace metadata file was written to disk.
-                            frameCaptureWithSaveResponse.Send(metadataXMLString.c_str());
-                        }
-                        else
-                        {
-                            Log(logERROR, "Failed to write trace metadata XML.\n");
-                            frameCaptureWithSaveResponse.Send("Failed");
-                        }
-                    }
-                    else
-                    {
-                        // Send a response containing the API and GPU trace text.
-                        frameCaptureWithSaveResponse.Send(inFullResponseString.asCharArray());
-                    }
-                }
-                else
-                {
-                    Log(logMESSAGE, "Successfully traced frame %d.\n", parentLayerManager->GetCurrentFrameIndex());
-                }
-            }
-            else
-            {
-                Log(logERROR, "Failed to write trace metadata XML.\n");
-
-                // If a failed trace collection was triggered by a command, we need to respond with an error message.
-                if (!bKeypressTrigger)
-                {
-                    frameCaptureWithSaveResponse.Send("Failed");
-                }
-            }
-        }
+		// Should we write the trace + metadata + thumbnail files to disk to be picked up later?
+		if (inbSaveResponseToFile)
+		{
+			// Generate a block of text for the top header of the trace response.
+			gtASCIIString traceHeaderBlock;
+			bool bBuiltHeaderSuccessfully = GenerateLinkedTraceHeader(traceHeaderBlock);
+			if (bBuiltHeaderSuccessfully)
+			{
+				// Write the trace and metadata files to disk.
+				std::string metadataXMLString;
+				bool bWriteMetadataSuccessful = WriteTraceAndMetadataFiles(traceHeaderBlock, inFullResponseString, metadataXMLString);
+				if (bWriteMetadataSuccessful)
+				{
+					frameCaptureWithSaveResponse.Send(metadataXMLString.c_str());
+				}
+				else
+				{
+					frameCaptureWithSaveResponse.Send("Failed");
+					Log(logERROR, "Failed to generate trace and trace metadata files for writing.\n");
+				}
+			}
+			else
+			{
+				Log(logERROR, "Failed to construct header for Trace response.\n");
+			}
+		}
+		else
+		{
+			frameCaptureWithSaveResponse.Send(inFullResponseString.asCharArray());
+		}
     }
 }
 
