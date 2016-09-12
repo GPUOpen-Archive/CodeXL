@@ -126,7 +126,7 @@ const char* APIEntry::GetParameterString() const
                 PARAMETER_TYPE paramType;
                 memcpy(&paramType, ptr, sizeof(PARAMETER_TYPE));
                 ptr += sizeof(PARAMETER_TYPE);
-		unsigned char length = *(ptr++);
+		        int length = *(ptr++);
 
                 if (length < BYTES_PER_PARAMETER)
                 {
