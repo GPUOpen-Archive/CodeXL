@@ -17,6 +17,7 @@
 #include <vector>
 #include <string>
 
+#include "ADLUtil/ADLUtil.h"
 #include <AMDTBaseTools/Include/gtString.h>
 
 typedef decltype(GPA_GetAvailableCounters)* GPA_GetAvailableCountersForDeviceProc;
@@ -37,6 +38,16 @@ typedef void (*CounterNameMappingProc)(CounterList& counters);
 class GPAUtils
 {
 public:
+
+    struct CounterPassInfo
+    {
+        int vendorId;
+        int deviceId;
+        int revId;
+        CounterList listofCounter;
+        unsigned int numberOfPass;
+    };
+
     /// Constructor
     GPAUtils();
 
@@ -108,9 +119,15 @@ public:
     /// \return true if successful
     bool SetEnabledCounters(const CounterList& countersToEnable);
 
-    /// If SetCounterFile is called, selected counters will be enabled, if not, all counters are enabled
+    /// If SetEnabledCounters is called, selected counters will be enabled, if not, all counters are enabled
     /// \return true if successful, false otherwise
     bool EnableCounters();
+
+    /// Gives the number of passes required by the given counter list Enables the counter too
+    /// \param counterList list of the counters
+    /// \param[out] number of passes
+    /// \return true if successful, false otherwise
+    bool GetNumberOfPass(const CounterList counterList, std::vector<GPAUtils::CounterPassInfo> &numberOfPass);
 
     /// Load GPA Dll, load counter files if specified
     /// \param api the API to initialize

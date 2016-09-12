@@ -95,6 +95,12 @@ public:
     /// \param globalIndex The index into the main list of counters
     /// \return The info about the counter
     virtual GPACounterTypeInfo GetCounterTypeInfo(gpa_uint32 globalIndex) = 0;
+
+    /// Gets a counter's index
+    /// \param pName The name of a counter
+    /// \param[out] pIndex The index of the counter
+    /// \return true if the counter is found, false otherwise
+    virtual bool GetCounterIndex(const char* pName, gpa_uint32* pIndex) = 0;
 };
 
 #endif //_GPA_I_COUNTER_ACCESSOR_H_

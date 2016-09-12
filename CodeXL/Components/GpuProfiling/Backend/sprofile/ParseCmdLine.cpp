@@ -19,6 +19,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <functional>
 #include "../Common/Version.h"
 #include "ParseCmdLine.h"
 #include "../Common/StringUtils.h"
@@ -35,6 +36,7 @@ void PrintCounters(const std::string& strOutputFile, const bool shouldIncludeCou
 void PrintCounters(CounterList& counterList, const string& strGenerationName, const std::string& outputFile, const bool shouldIncludeCounterDescriptions = false);
 std::string RemoveGroupFromCounterDescriptionIfPresent(std::string counterDescription);
 inline void ShowExamples();
+void PrintNumberOfPass(const std::string counterFile);
 
 pair<string, string> Parser(const string& strOptionToParse);
 
@@ -61,6 +63,7 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
         ("list,l", "Print a list of valid counter names.")
         ("listdetailed,L", "Print a list of valid counter names with descriptions")
         ("sessionname,N", po::value<string>(), "Name of the generated session.")
+        ("numberofpass", "Shows the number of pass for profiling with default counters or counters in the provided counter file")
 #ifdef _WIN32
         ("outputfile,o", po::value<string>(), "Path to OutputFile (the default is Session1.csv in an \"CodeXL\" directory under the current user's Documents directory; when performing an API trace, the default is apitrace.atp in the same location).")
 #else
@@ -767,6 +770,22 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
             return false;
         }
 
+        if (unicodeOptionsMap.count("numberofpass") > 0)
+        {
+#ifdef GDT_INTERNAL
+
+            if (!configOut.strCounterFile.empty())
+            {
+                std::cout << "Counter File is required" << std::endl << std::endl;
+                return false;
+            }
+
+#endif
+            PrintNumberOfPass(configOut.strCounterFile);
+            return false;
+
+        }
+
         // All command line arguments that appear after a non-option are treated as app command line
         //  and have already been collected
         wstring wstrInjectedApp;
@@ -1100,6 +1119,148 @@ void PrintCounters(const std::string& strOutputFile, const bool shouldIncludeCou
 
 #endif
 }
+
+
+void PrintNumberOfPass(const std::string counterFile)
+{
+    gtString strDirPath = FileUtils::GetExePathAsUnicode();
+    string strErrorOut;
+    GPAUtils gpaUtils;
+    CounterList counterList;
+
+    std::vector<GPAUtils::CounterPassInfo> counterPassInfiListForCL;
+
+    std::function<void(CounterList)> PrintCounterList = [](CounterList counterList)
+    {
+        unsigned int lineend = 5;
+
+        unsigned int counterListSize = static_cast<unsigned int>(counterList.size());
+        unsigned int counterListSizeMinusOne = counterListSize - 1;
+
+        for (unsigned int i = 0; i < counterListSize; ++i)
+        {
+            std::cout << counterList[i];
+            lineend--;
+            if (lineend == 0)
+            {
+                std::cout << ", " << std::endl;
+                lineend = 5;
+            }
+            else
+            {
+                counterListSizeMinusOne == i ? std::cout<<" " : std::cout << ", ";
+            }
+        }
+
+    };
+
+    std::function<void(GPAUtils::CounterPassInfo, std::string, std::function<void(CounterList)>)> PrintCounterPassInfo = 
+        [](GPAUtils::CounterPassInfo counterPassInfo, std::string api, std::function<void(CounterList)> counterListDisplayLambda)
+    {
+        std::cout << "Number of Pass required for "<<api.c_str()<<" application for below counters (default if not provided)" << std::endl<<std::endl;
+        counterListDisplayLambda(counterPassInfo.listofCounter);
+        std::cout << "\nPass Required: " << counterPassInfo.numberOfPass << std::endl<<std::endl;
+    };
+
+#if defined (_LINUX) || defined (LINUX)
+    std::vector<GPAUtils::CounterPassInfo> counterPassInfiListForHSA;
+#endif
+
+
+#ifdef _WIN32
+    std::vector<GPAUtils::CounterPassInfo> counterPassInfiListForDC;
+#endif
+
+    if (!counterFile.empty() && FileUtils::ReadFile(counterFile, counterList, true, true))
+    {
+        std::cout << "Counter File Read Successfully" << std::endl;
+    }
+
+    //OpenCL
+    {
+        bool gpaInit = gpaUtils.InitGPA(GPA_API_OPENCL,
+                                        strDirPath,
+                                        strErrorOut,
+                                        NULL,
+                                        &counterList);
+
+        if (gpaInit)
+        {
+            gpaUtils.GetNumberOfPass(counterList, counterPassInfiListForCL);
+        }
+        else
+        {
+            std::cout << "Unable to retreive the CL pass count";
+        }
+
+        gpaUtils.Unload();
+
+        for (int i = 0; i < counterPassInfiListForCL.size(); ++i)
+        {
+            PrintCounterPassInfo(counterPassInfiListForCL[i], "CL", PrintCounterList);
+        }
+    }
+
+#if defined (_LINUX) || defined (LINUX)
+    //HSA
+    {
+        bool gpaInit = gpaUtils.InitGPA(GPA_API_HSA,
+                                        strDirPath,
+                                        strErrorOut,
+                                        NULL,
+                                        &counterList);
+
+        if (gpaInit)
+        {
+            gpaUtils.GetNumberOfPass(counterList, counterPassInfiListForHSA);
+        }
+        else
+        {
+            std::cout << "Unable to retreive the HSA pass count";
+        }
+
+        gpaUtils.Unload();
+
+        for (int i = 0; i < counterPassInfiListForHSA.size(); ++i)
+        {
+            PrintCounterPassInfo(counterPassInfiListForHSA[i], "HSA", PrintCounterList);
+        }
+    }
+#endif
+
+
+#ifdef _WIN32
+    //DirectX - DC
+    {
+        bool gpaInit = gpaUtils.InitGPA(GPA_API_DIRECTX_11,
+                                        strDirPath,
+                                        strErrorOut,
+                                        NULL,
+                                        &counterList);
+
+
+        if (gpaInit)
+        {
+            gpaUtils.GetNumberOfPass(counterList, counterPassInfiListForDC);
+        }
+        else
+        {
+            std::cout << "Unable to retreive the CL pass count";
+        }
+
+        gpaUtils.Unload();
+
+        for (int i = 0; i < counterPassInfiListForDC.size(); ++i)
+        {
+            PrintCounterPassInfo(counterPassInfiListForDC[i], "Direct Compute", PrintCounterList);
+        }
+    }
+#endif
+}
+
+
+
+
 
 // helper function
 void PrintCounters(CounterList& counterList, const string& strGenerationName, const std::string& outputFile, const bool shouldIncludeCounterDescriptions)
