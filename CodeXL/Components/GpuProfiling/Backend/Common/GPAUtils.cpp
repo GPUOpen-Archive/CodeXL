@@ -187,7 +187,7 @@ bool GPAUtils::GetNumberOfPass(const CounterList counterList, std::vector<GPAUti
     };
 
     std::function<AsicInfoList(AsicInfoList, std::function<bool(ADLUtil_ASICInfo, ADLUtil_ASICInfo)>)> RemoveDuplicateDevice =
-        [](AsicInfoList asicInfoList, auto compareAsicInfoLambda) ->AsicInfoList
+        [](AsicInfoList asicInfoList, std::function<bool(ADLUtil_ASICInfo, ADLUtil_ASICInfo)> compareAsicInfoLambda) ->AsicInfoList
     {
         AsicInfoList tempAsicInfoList;
 
