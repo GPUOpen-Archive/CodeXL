@@ -1195,7 +1195,7 @@ void PrintNumberOfPass(const std::string counterFile)
 
         gpaUtils.Unload();
 
-        for (int i = 0; i < counterPassInfiListForCL.size(); ++i)
+        for (unsigned int i = 0; i < counterPassInfiListForCL.size(); ++i)
         {
             PrintCounterPassInfo(counterPassInfiListForCL[i], "CL", PrintCounterList);
         }
@@ -1221,7 +1221,7 @@ void PrintNumberOfPass(const std::string counterFile)
 
         gpaUtils.Unload();
 
-        for (int i = 0; i < counterPassInfiListForHSA.size(); ++i)
+        for (unsigned int i = 0; i < counterPassInfiListForHSA.size(); ++i)
         {
             PrintCounterPassInfo(counterPassInfiListForHSA[i], "HSA", PrintCounterList);
         }
@@ -1250,7 +1250,7 @@ void PrintNumberOfPass(const std::string counterFile)
 
         gpaUtils.Unload();
 
-        for (int i = 0; i < counterPassInfiListForDC.size(); ++i)
+        for (unsigned int i = 0; i < counterPassInfiListForDC.size(); ++i)
         {
             PrintCounterPassInfo(counterPassInfiListForDC[i], "Direct Compute", PrintCounterList);
         }
