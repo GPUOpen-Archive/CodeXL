@@ -21,7 +21,7 @@ INCLUDES = \
 	-I$(DEVICEINFO_DIR) \
 	-I$(TSINGLETON_DIR) \
 	-I$(AMDTMUTEX_DIR) \
-        -I$(ADL_DIR)/include 
+	-I$(ADL_DIR)/include
 
 LIBS = \
 	$(HSAFDNCOMMON_LIBS) \
@@ -41,7 +41,7 @@ SO_OBJS = \
 	./$(OBJ_DIR)/CLOccupancyFile.o \
 	./$(OBJ_DIR)/CLOccupancyInfoManager.o \
 	./$(OBJ_DIR)/ProfilerTimer.o \
-        ./$(OBJ_DIR)/ADLUtil.o \
+	./$(OBJ_DIR)/ADLUtil.o \
 
 include $(DEPTH)/Build/CommonTargets.mk
 

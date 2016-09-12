@@ -123,11 +123,11 @@ public:
     /// \return true if successful, false otherwise
     bool EnableCounters();
 
-    /// Gives the number of passes required by the given counter list Enables the counter too
+    /// Gives the number of passes required by the given counter list - enables the counter too
     /// \param counterList list of the counters
-    /// \param[out] number of passes
+    /// \param[out] counterPassInfoList list containing device info, counter list and number of pass
     /// \return true if successful, false otherwise
-    bool GetNumberOfPass(const CounterList counterList, std::vector<GPAUtils::CounterPassInfo> &numberOfPass);
+    bool GetNumberOfPass(const CounterList counterList, std::vector<GPAUtils::CounterPassInfo>& counterPassInfoList);
 
     /// Load GPA Dll, load counter files if specified
     /// \param api the API to initialize

@@ -1141,6 +1141,7 @@ void PrintNumberOfPass(const std::string counterFile)
         {
             std::cout << counterList[i];
             lineend--;
+
             if (lineend == 0)
             {
                 std::cout << ", " << std::endl;
@@ -1148,18 +1149,18 @@ void PrintNumberOfPass(const std::string counterFile)
             }
             else
             {
-                counterListSizeMinusOne == i ? std::cout<<" " : std::cout << ", ";
+                counterListSizeMinusOne == i ? std::cout << " " : std::cout << ", ";
             }
         }
 
     };
 
-    std::function<void(GPAUtils::CounterPassInfo, std::string, std::function<void(CounterList)>)> PrintCounterPassInfo = 
+    std::function<void(GPAUtils::CounterPassInfo, std::string, std::function<void(CounterList)>)> PrintCounterPassInfo =
         [](GPAUtils::CounterPassInfo counterPassInfo, std::string api, std::function<void(CounterList)> counterListDisplayLambda)
     {
-        std::cout << "Number of Pass required for "<<api.c_str()<<" application for below counters (default if not provided)" << std::endl<<std::endl;
+        std::cout << "Number of Pass required for " << api.c_str() << " application for below counters (default if not provided)" << std::endl << std::endl;
         counterListDisplayLambda(counterPassInfo.listofCounter);
-        std::cout << "\nPass Required: " << counterPassInfo.numberOfPass << std::endl<<std::endl;
+        std::cout << "\nPass Required: " << counterPassInfo.numberOfPass << std::endl << std::endl;
     };
 
 #if defined (_LINUX) || defined (LINUX)
