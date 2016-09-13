@@ -192,6 +192,7 @@ bool GPAUtils::GetNumberOfPass(const CounterList counterList, std::vector<GPAUti
     {
         AsicInfoList tempAsicInfoList;
         GDT_DeviceInfo deviceInfo;
+
         for (unsigned int i = 0; i < asicInfoList.size(); ++i)
         {
             if (tempAsicInfoList.size() > 0)
@@ -199,9 +200,9 @@ bool GPAUtils::GetNumberOfPass(const CounterList counterList, std::vector<GPAUti
                 for (unsigned int j = 0; j < tempAsicInfoList.size(); ++j)
                 {
                     if (!compareAsicInfoLambda(asicInfoList[i], tempAsicInfoList[j]) &&
-                            AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(asicInfoList[i].deviceID, 
-                                                                           REVISION_ID_ANY,
-                                                                           deviceInfo))
+                    AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(asicInfoList[i].deviceID,
+                    REVISION_ID_ANY,
+                    deviceInfo))
                     {
                         tempAsicInfoList.push_back(asicInfoList[i]);
                     }
@@ -209,9 +210,9 @@ bool GPAUtils::GetNumberOfPass(const CounterList counterList, std::vector<GPAUti
             }
             else
             {
-                if(AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(asicInfoList[i].deviceID, 
-                                                          REVISION_ID_ANY,
-                                                          deviceInfo))
+                if (AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(asicInfoList[i].deviceID,
+                                                                   REVISION_ID_ANY,
+                                                                   deviceInfo))
                 {
                     tempAsicInfoList.push_back(asicInfoList[i]);
                 }
@@ -236,7 +237,7 @@ bool GPAUtils::GetNumberOfPass(const CounterList counterList, std::vector<GPAUti
             GPA_ICounterScheduler* ppCounterScheduler;
             AMDTADLUtils::Instance()->GetAsicInfoList(asicInfoList);
             asicInfoList = RemoveDuplicateDevice(asicInfoList, CompareAsicInfo);
-            GPAUtils::CounterPassInfo counterPassInfo;            
+            GPAUtils::CounterPassInfo counterPassInfo;
 
             for (unsigned int i = 0; i < asicInfoList.size(); ++i)
             {
@@ -294,9 +295,9 @@ bool GPAUtils::GetNumberOfPass(const CounterList counterList, std::vector<GPAUti
     return success;
 }
 
-bool GPAUtils::GetNumberOfPassByDevice(const CounterList counterList, 
-        std::vector<GPAUtils::DeviceInfo> deviceList, 
-        std::vector<GPAUtils::CounterPassInfo>& counterPassInfoList)
+bool GPAUtils::GetNumberOfPassByDevice(const CounterList counterList,
+                                       std::vector<GPAUtils::DeviceInfo> deviceList,
+                                       std::vector<GPAUtils::CounterPassInfo>& counterPassInfoList)
 {
     bool success = true;
 
@@ -306,7 +307,7 @@ bool GPAUtils::GetNumberOfPassByDevice(const CounterList counterList,
     }
     else
     {
-        if(deviceList.empty())
+        if (deviceList.empty())
         {
             success &= GetNumberOfPass(counterList, counterPassInfoList);
         }
@@ -315,7 +316,7 @@ bool GPAUtils::GetNumberOfPassByDevice(const CounterList counterList,
             if (m_pGetAvailableCountersForDevice != nullptr && m_pGetAvailableCountersByGen != nullptr)
             {
                 GPA_ICounterAccessor* ppCounterAccessor;
-                GPA_ICounterScheduler* ppCounterScheduler;            
+                GPA_ICounterScheduler* ppCounterScheduler;
                 GPAUtils::CounterPassInfo counterPassInfo;
 
                 for (unsigned int i = 0; i < deviceList.size(); ++i)
@@ -323,7 +324,7 @@ bool GPAUtils::GetNumberOfPassByDevice(const CounterList counterList,
                     if (GPA_STATUS_OK == m_pGetAvailableCountersForDevice(m_API, deviceList[i].vendorId, deviceList[i].deviceId, deviceList[i].revId, &ppCounterAccessor, &ppCounterScheduler))
                     {
                         ppCounterScheduler->SetCounterAccessor(ppCounterAccessor, deviceList[i].vendorId, deviceList[i].deviceId, deviceList[i].revId);
-                        
+
                         if (!counterList.empty())
                         {
                             ppCounterScheduler->DisableAllCounters();
@@ -342,14 +343,14 @@ bool GPAUtils::GetNumberOfPassByDevice(const CounterList counterList,
                             counterPassInfo.deviceInfo.revId = deviceList[i].revId;
                             counterPassInfo.listofCounter = counterList;
                             counterPassInfo.numberOfPass = numPass;
-                            counterPassInfoList.push_back(counterPassInfo);                           
+                            counterPassInfoList.push_back(counterPassInfo);
                         }
                         else
                         {
                             unsigned int numPass;
                             CounterList tempCounterList;
 
-                            unsigned int availableCounters = ppCounterAccessor->GetNumCounters();                                
+                            unsigned int availableCounters = ppCounterAccessor->GetNumCounters();
 
                             for (unsigned int j = 0; j < availableCounters; ++j)
                             {
@@ -357,12 +358,12 @@ bool GPAUtils::GetNumberOfPassByDevice(const CounterList counterList,
                                 tempCounterList.push_back(ppCounterAccessor->GetCounterName(j));
                             }
 
-                            if(m_API == GPA_API_HSA)
+                            if (m_API == GPA_API_HSA)
                             {
                                 numPass = 1u;
                             }
-                            else 
-                            {                                
+                            else
+                            {
                                 ppCounterScheduler->GetNumRequiredPasses(&numPass);
                             }
 

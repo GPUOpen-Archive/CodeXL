@@ -64,7 +64,7 @@ public:
             deviceInfo = DeviceInfo();
             numberOfPass = 0;
         }
-    };    
+    };
 
     /// Constructor
     GPAUtils();
