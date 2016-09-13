@@ -214,4 +214,5 @@ void InitHSAAPIInterceptPMC1_0(ApiTable1_0* pTable)
     pTable->hsa_queue_create_fn = HSA_PMC_hsa_queue_create;
     pTable->hsa_queue_destroy_fn = HSA_PMC_hsa_queue_destroy;
     pTable->hsa_executable_get_symbol_fn = HSA_PMC_hsa_executable_get_symbol;
+    pTable->hsa_iterate_agents_fn = HSA_PMC_hsa_iterate_agents;    
 }

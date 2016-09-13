@@ -25,6 +25,8 @@ static const char* s_pStructEnd = "}";      ///< end of a structure
 static const char* s_pPtrDeRefStart = "[";  ///< start of a dereferenced pointer
 static const char* s_pPtrDeRefEnd = "]";    ///< end of a dereferenced pointer
 
+extern bool (*pGetApiDisplayName)(HSA_API_Type type, std::string& apiDisplayName);
+
 /// General template function to surround an input with two other strings
 /// \param input the input string
 /// \param pSurroundBegin the string to put at the beginning of the input
