@@ -39,14 +39,32 @@ class GPAUtils
 {
 public:
 
-    struct CounterPassInfo
+    struct DeviceInfo
     {
         int vendorId;
         int deviceId;
         int revId;
+
+        DeviceInfo()
+        {
+            vendorId = 0x1002; //AMD_VENDOR_ID
+            deviceId = 0;
+            revId = 0;
+        }
+    };
+
+    struct CounterPassInfo
+    {
+        DeviceInfo deviceInfo;
         CounterList listofCounter;
         unsigned int numberOfPass;
-    };
+
+        CounterPassInfo()
+        {
+            deviceInfo = DeviceInfo();
+            numberOfPass = 0;
+        }
+    };    
 
     /// Constructor
     GPAUtils();
@@ -128,6 +146,13 @@ public:
     /// \param[out] counterPassInfoList list containing device info, counter list and number of pass
     /// \return true if successful, false otherwise
     bool GetNumberOfPass(const CounterList counterList, std::vector<GPAUtils::CounterPassInfo>& counterPassInfoList);
+
+    /// Gives the number of passes required by the given counter list - enables the counter too
+    /// \param counterList list of the counters
+    /// \param deviceList list of the device
+    /// \param[out] counterPassInfoList list containing device info, counter list and number of pass
+    /// \return true if successful, false otherwise
+    bool GetNumberOfPassByDevice(const CounterList counterList, std::vector<GPAUtils::DeviceInfo> deviceList, std::vector<GPAUtils::CounterPassInfo>& counterPassInfoList);
 
     /// Load GPA Dll, load counter files if specified
     /// \param api the API to initialize

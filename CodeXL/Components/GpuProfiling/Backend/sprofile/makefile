@@ -25,7 +25,8 @@ INCLUDES = \
 	-I$(GPUPERFAPIUTILS_DIR) \
 	-I$(GPU_THREAD_TRACE_API_DIR) \
 	-I$(AMDTMUTEX_DIR) \
-	-I$(ADL_DIR)/include
+	-I$(ADL_DIR)/include \
+	-I$(HSAUTIL_DIR)
 
 STATIC_LIBS = \
 	$(BOOST_LIB_DIR)/libboost_chrono.a \
@@ -76,6 +77,8 @@ OBJS = \
 	./$(OBJ_DIR)/CLOccupancyFile.o \
 	./$(OBJ_DIR)/StackTraceAtpFile.o \
 	./$(OBJ_DIR)/ADLUtil.o \
+	./$(OBJ_DIR)/HSAModule.o \
+	./$(OBJ_DIR)/HSAUtils.o \
 
 include $(DEPTH)/Build/CommonTargets.mk
 

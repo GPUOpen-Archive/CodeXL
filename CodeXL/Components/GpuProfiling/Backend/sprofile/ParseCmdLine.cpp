@@ -28,6 +28,9 @@
 #include "../Common/Defs.h"
 #include "../Common/GPAUtils.h"
 #include "DeviceInfoUtils.h"
+#include "HSAUtils.h"
+#include "CLUtils.h"
+#include "CLFunctionDefs.h"
 
 namespace po = boost::program_options;
 using namespace std;
@@ -1126,9 +1129,7 @@ void PrintNumberOfPass(const std::string counterFile)
     gtString strDirPath = FileUtils::GetExePathAsUnicode();
     string strErrorOut;
     GPAUtils gpaUtils;
-    CounterList counterList;
-
-    std::vector<GPAUtils::CounterPassInfo> counterPassInfiListForCL;
+    CounterList counterList;    
 
     std::function<void(CounterList)> PrintCounterList = [](CounterList counterList)
     {
@@ -1163,6 +1164,9 @@ void PrintNumberOfPass(const std::string counterFile)
         std::cout << "\nPass Required: " << counterPassInfo.numberOfPass << std::endl << std::endl;
     };
 
+    
+    std::vector<GPAUtils::CounterPassInfo> counterPassInfiListForCL;
+
 #if defined (_LINUX) || defined (LINUX)
     std::vector<GPAUtils::CounterPassInfo> counterPassInfiListForHSA;
 #endif
@@ -1179,27 +1183,48 @@ void PrintNumberOfPass(const std::string counterFile)
 
     //OpenCL
     {
-        bool gpaInit = gpaUtils.InitGPA(GPA_API_OPENCL,
+        CLPlatformSet platformSet;
+        InitRealCLFunctions();
+        bool success = CLUtils::GetPlatformInfo(platformSet);
+        std::string amdVendor = "Advanced Micro Devices, Inc.";
+        
+        bool isAMDDevice = false;
+        
+        if(success && !platformSet.empty())
+        {
+            for(std::set<CLPlatformInfo::platform_info, 
+                CLPlatformInfo::CLPlatformInfoCompare>::iterator it = platformSet.begin();
+                it != platformSet.end() && !isAMDDevice; ++it)
+                {
+                    isAMDDevice |= it->strPlatformVendor.compare(amdVendor) == 0;
+                }
+
+            if(isAMDDevice)
+            {
+                bool gpaInit = gpaUtils.InitGPA(GPA_API_OPENCL,
                                         strDirPath,
                                         strErrorOut,
                                         NULL,
                                         &counterList);
 
-        if (gpaInit)
-        {
-            gpaUtils.GetNumberOfPass(counterList, counterPassInfiListForCL);
-        }
-        else
-        {
-            std::cout << "Unable to retreive the CL pass count";
-        }
+                if (gpaInit)
+                {
+                    if(gpaUtils.GetNumberOfPass(counterList, counterPassInfiListForCL))
+                    {
+                        for (unsigned int i = 0; i < counterPassInfiListForCL.size(); ++i)
+                        {
+                            PrintCounterPassInfo(counterPassInfiListForCL[i], "CL", PrintCounterList);
+                        }
+                    }
+                }
+                else
+                {
+                    std::cout << "Unable to retreive the CL pass count";
+                }
 
-        gpaUtils.Unload();
-
-        for (unsigned int i = 0; i < counterPassInfiListForCL.size(); ++i)
-        {
-            PrintCounterPassInfo(counterPassInfiListForCL[i], "CL", PrintCounterList);
-        }
+                gpaUtils.Unload();                
+            }
+        }        
     }
 
 #if defined (_LINUX) || defined (LINUX)
@@ -1213,19 +1238,76 @@ void PrintNumberOfPass(const std::string counterFile)
 
         if (gpaInit)
         {
-            gpaUtils.GetNumberOfPass(counterList, counterPassInfiListForHSA);
+            std::function<HSADeviceIdList(HSADeviceIdList)> removeDuplicateDevice = [](HSADeviceIdList hsaDeviceList)->HSADeviceIdList
+            {
+                HSADeviceIdList tempHSADeviceIdList;
+            
+                for (unsigned int i = 0; i < hsaDeviceList.size(); ++i)
+                {
+                   GDT_DeviceInfo deviceInfo;
+                   if (tempHSADeviceIdList.size() > 0)
+                   {
+                       for (unsigned int j = 0; j < tempHSADeviceIdList.size(); ++j)
+                       {
+                           if ((hsaDeviceList[i] != tempHSADeviceIdList[j]) &&
+                            AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(hsaDeviceList[i], 
+                                                                           REVISION_ID_ANY,
+                                                                           deviceInfo))
+                           {
+                              tempHSADeviceIdList.push_back(hsaDeviceList[i]);
+                           }
+                       }
+                   }
+                   else
+                   {                      
+                       if(AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(hsaDeviceList[i], 
+                                                          REVISION_ID_ANY,
+                       deviceInfo))
+                       {
+                            tempHSADeviceIdList.push_back(hsaDeviceList[i]);
+                       }
+                   }
+                }
+
+                return tempHSADeviceIdList;
+            };
+
+            HSADeviceIdList hsaDeviceList;
+            HSAUtils::Instance()->GetHSADeviceIds(hsaDeviceList);
+
+            if(!hsaDeviceList.empty())
+            {
+                hsaDeviceList = removeDuplicateDevice(hsaDeviceList);
+            }
+
+            GPAUtils::DeviceInfo deviceInfo;
+            std::vector<GPAUtils::DeviceInfo> deviceInfoList;
+
+            for(unsigned int i=0; i< hsaDeviceList.size(); ++i)
+            {
+                deviceInfo.deviceId = hsaDeviceList[i];                               
+                deviceInfoList.push_back(deviceInfo);
+            }            
+            
+            if(!deviceInfoList.empty())
+            {            
+                if(gpaUtils.GetNumberOfPassByDevice(counterList, deviceInfoList, counterPassInfiListForHSA))
+                {            
+                    for (unsigned int i = 0; i < counterPassInfiListForHSA.size(); ++i)
+                    {
+                        PrintCounterPassInfo(counterPassInfiListForHSA[i], "HSA", PrintCounterList);
+                    }
+                }
+            }
+            
+            gpaUtils.Unload();
         }
         else
         {
             std::cout << "Unable to retreive the HSA pass count";
         }
 
-        gpaUtils.Unload();
-
-        for (unsigned int i = 0; i < counterPassInfiListForHSA.size(); ++i)
-        {
-            PrintCounterPassInfo(counterPassInfiListForHSA[i], "HSA", PrintCounterList);
-        }
+        gpaUtils.Unload();        
     }
 #endif
 

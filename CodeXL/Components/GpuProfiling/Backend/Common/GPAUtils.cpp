@@ -175,6 +175,7 @@ bool GPAUtils::EnableCounters()
 
 bool GPAUtils::GetNumberOfPass(const CounterList counterList, std::vector<GPAUtils::CounterPassInfo>& counterPassInfoList)
 {
+    // To Do - Figure out how to get the device Ids for HSA from here.
     if (m_API == GPA_API_HSA)
     {
         return false;
@@ -190,14 +191,17 @@ bool GPAUtils::GetNumberOfPass(const CounterList counterList, std::vector<GPAUti
         [](AsicInfoList asicInfoList, std::function<bool(ADLUtil_ASICInfo, ADLUtil_ASICInfo)> compareAsicInfoLambda) ->AsicInfoList
     {
         AsicInfoList tempAsicInfoList;
-
+        GDT_DeviceInfo deviceInfo;
         for (unsigned int i = 0; i < asicInfoList.size(); ++i)
         {
             if (tempAsicInfoList.size() > 0)
             {
                 for (unsigned int j = 0; j < tempAsicInfoList.size(); ++j)
                 {
-                    if (!compareAsicInfoLambda(asicInfoList[i], tempAsicInfoList[j]))
+                    if (!compareAsicInfoLambda(asicInfoList[i], tempAsicInfoList[j]) &&
+                            AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(asicInfoList[i].deviceID, 
+                                                                           REVISION_ID_ANY,
+                                                                           deviceInfo))
                     {
                         tempAsicInfoList.push_back(asicInfoList[i]);
                     }
@@ -205,7 +209,12 @@ bool GPAUtils::GetNumberOfPass(const CounterList counterList, std::vector<GPAUti
             }
             else
             {
-                tempAsicInfoList.push_back(asicInfoList[i]);
+                if(AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(asicInfoList[i].deviceID, 
+                                                          REVISION_ID_ANY,
+                                                          deviceInfo))
+                {
+                    tempAsicInfoList.push_back(asicInfoList[i]);
+                }
             }
         }
 
@@ -227,7 +236,7 @@ bool GPAUtils::GetNumberOfPass(const CounterList counterList, std::vector<GPAUti
             GPA_ICounterScheduler* ppCounterScheduler;
             AMDTADLUtils::Instance()->GetAsicInfoList(asicInfoList);
             asicInfoList = RemoveDuplicateDevice(asicInfoList, CompareAsicInfo);
-            GPAUtils::CounterPassInfo counterPassInfo;
+            GPAUtils::CounterPassInfo counterPassInfo;            
 
             for (unsigned int i = 0; i < asicInfoList.size(); ++i)
             {
@@ -248,9 +257,9 @@ bool GPAUtils::GetNumberOfPass(const CounterList counterList, std::vector<GPAUti
                         }
 
                         ppCounterScheduler->GetNumRequiredPasses(&numPass);
-                        counterPassInfo.vendorId = asicInfoList[i].vendorID;
-                        counterPassInfo.deviceId = asicInfoList[i].deviceID;
-                        counterPassInfo.revId = asicInfoList[i].revID;
+                        counterPassInfo.deviceInfo.vendorId = asicInfoList[i].vendorID;
+                        counterPassInfo.deviceInfo.deviceId = asicInfoList[i].deviceID;
+                        counterPassInfo.deviceInfo.revId = asicInfoList[i].revID;
                         counterPassInfo.listofCounter = counterList;
                         counterPassInfo.numberOfPass = numPass;
                         counterPassInfoList.push_back(counterPassInfo);
@@ -270,17 +279,103 @@ bool GPAUtils::GetNumberOfPass(const CounterList counterList, std::vector<GPAUti
                         }
 
                         ppCounterScheduler->GetNumRequiredPasses(&numPass);
-                        counterPassInfo.vendorId = asicInfoList[i].vendorID;
-                        counterPassInfo.deviceId = asicInfoList[i].deviceID;
-                        counterPassInfo.revId = asicInfoList[i].revID;
+                        counterPassInfo.deviceInfo.vendorId = asicInfoList[i].vendorID;
+                        counterPassInfo.deviceInfo.deviceId = asicInfoList[i].deviceID;
+                        counterPassInfo.deviceInfo.revId = asicInfoList[i].revID;
                         counterPassInfo.listofCounter = tempCounterList;
                         counterPassInfo.numberOfPass = numPass;
                         counterPassInfoList.push_back(counterPassInfo);
                     }
                 }
             }
+        }
+    }
 
+    return success;
+}
 
+bool GPAUtils::GetNumberOfPassByDevice(const CounterList counterList, 
+        std::vector<GPAUtils::DeviceInfo> deviceList, 
+        std::vector<GPAUtils::CounterPassInfo>& counterPassInfoList)
+{
+    bool success = true;
+
+    if (!m_GPALoader.Loaded())
+    {
+        success &= false;
+    }
+    else
+    {
+        if(deviceList.empty())
+        {
+            success &= GetNumberOfPass(counterList, counterPassInfoList);
+        }
+        else
+        {
+            if (m_pGetAvailableCountersForDevice != nullptr && m_pGetAvailableCountersByGen != nullptr)
+            {
+                GPA_ICounterAccessor* ppCounterAccessor;
+                GPA_ICounterScheduler* ppCounterScheduler;            
+                GPAUtils::CounterPassInfo counterPassInfo;
+
+                for (unsigned int i = 0; i < deviceList.size(); ++i)
+                {
+                    if (GPA_STATUS_OK == m_pGetAvailableCountersForDevice(m_API, deviceList[i].vendorId, deviceList[i].deviceId, deviceList[i].revId, &ppCounterAccessor, &ppCounterScheduler))
+                    {
+                        ppCounterScheduler->SetCounterAccessor(ppCounterAccessor, deviceList[i].vendorId, deviceList[i].deviceId, deviceList[i].revId);
+                        
+                        if (!counterList.empty())
+                        {
+                            ppCounterScheduler->DisableAllCounters();
+                            unsigned int counterIndex;
+                            unsigned int numPass;
+
+                            for (unsigned int j = 0; j < counterList.size(); ++j)
+                            {
+                                ppCounterAccessor->GetCounterIndex(counterList[j].c_str(), &counterIndex);
+                                ppCounterScheduler->EnableCounter(counterIndex);
+                            }
+
+                            ppCounterScheduler->GetNumRequiredPasses(&numPass);
+                            counterPassInfo.deviceInfo.vendorId = deviceList[i].vendorId;
+                            counterPassInfo.deviceInfo.deviceId = deviceList[i].deviceId;
+                            counterPassInfo.deviceInfo.revId = deviceList[i].revId;
+                            counterPassInfo.listofCounter = counterList;
+                            counterPassInfo.numberOfPass = numPass;
+                            counterPassInfoList.push_back(counterPassInfo);                           
+                        }
+                        else
+                        {
+                            unsigned int numPass;
+                            CounterList tempCounterList;
+
+                            unsigned int availableCounters = ppCounterAccessor->GetNumCounters();                                
+
+                            for (unsigned int j = 0; j < availableCounters; ++j)
+                            {
+                                ppCounterScheduler->EnableCounter(j);
+                                tempCounterList.push_back(ppCounterAccessor->GetCounterName(j));
+                            }
+
+                            if(m_API == GPA_API_HSA)
+                            {
+                                numPass = 1u;
+                            }
+                            else 
+                            {                                
+                                ppCounterScheduler->GetNumRequiredPasses(&numPass);
+                            }
+
+                            counterPassInfo.deviceInfo.vendorId = deviceList[i].vendorId;
+                            counterPassInfo.deviceInfo.deviceId = deviceList[i].deviceId;
+                            counterPassInfo.deviceInfo.revId = deviceList[i].revId;
+                            counterPassInfo.listofCounter = tempCounterList;
+                            counterPassInfo.numberOfPass = numPass;
+                            counterPassInfoList.push_back(counterPassInfo);
+                        }
+                    }
+                }
+            }
         }
     }
 
