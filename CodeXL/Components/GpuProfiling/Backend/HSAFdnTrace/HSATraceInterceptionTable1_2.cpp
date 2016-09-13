@@ -16,6 +16,10 @@
 
 #ifdef FUTURE_ROCR_VERSION
 
+/// Gets the display name for an API
+/// \param type the API whose name is needed
+/// \param[out] apiDisplayName the display name of the specified API
+/// \return true if the display name is returned for the specified API
 bool TranslateHSASpec11ToHSASpec10(HSA_API_Type type, std::string& hsa10SpecApiName)
 {
     bool retVal = true;
