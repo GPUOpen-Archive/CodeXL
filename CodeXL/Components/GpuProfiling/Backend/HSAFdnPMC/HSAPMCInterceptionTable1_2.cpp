@@ -18,7 +18,7 @@ void InitHSAAPIInterceptPMC1_2(HsaApiTable1_2* pTable)
 {
     // minor_id gets set to the size of the struct
     g_pRealCoreFunctions = (CoreApiTable*)malloc(pTable->core_->version.minor_id);
-    memcpy(g_pRealCoreFunctions, pTable->core_, pTable->core_->version.minor_id); 
+    memcpy(g_pRealCoreFunctions, pTable->core_, pTable->core_->version.minor_id);
 
     g_pRealFinalizerExtFunctions = (FinalizerExtTable*)malloc(pTable->finalizer_ext_->version.minor_id);
     memcpy(g_pRealFinalizerExtFunctions, pTable->finalizer_ext_, pTable->finalizer_ext_->version.minor_id);
@@ -33,7 +33,7 @@ void InitHSAAPIInterceptPMC1_2(HsaApiTable1_2* pTable)
     pTable->core_->hsa_queue_create_fn = HSA_PMC_hsa_queue_create;
     pTable->core_->hsa_queue_destroy_fn = HSA_PMC_hsa_queue_destroy;
     pTable->core_->hsa_executable_get_symbol_fn = HSA_PMC_hsa_executable_get_symbol;
-    pTable->core_->hsa_iterate_agents_fn = HSA_PMC_hsa_iterate_agents;    
+    pTable->core_->hsa_iterate_agents_fn = HSA_PMC_hsa_iterate_agents;
 }
 
 #endif
