@@ -159,7 +159,7 @@ bool TranslateHSASpec11ToHSASpec10(HSA_API_Type type, std::string& hsa10SpecApiN
     else
     {
         hsa10SpecApiName = "";
-        retVal = false;   
+        retVal = false;
     }
 
     return retVal;
@@ -169,10 +169,10 @@ bool TranslateHSASpec11ToHSASpec10(HSA_API_Type type, std::string& hsa10SpecApiN
 void InitHSAAPIInterceptTrace1_2(HsaApiTable1_2* pTable)
 {
     HSATraceStringUtils::pGetApiDisplayName = TranslateHSASpec11ToHSASpec10;
-    
+
     // minor_id gets set to the size of the struct
     g_pRealCoreFunctions = (CoreApiTable*)malloc(pTable->core_->version.minor_id);
-    memcpy(g_pRealCoreFunctions, pTable->core_, pTable->core_->version.minor_id); 
+    memcpy(g_pRealCoreFunctions, pTable->core_, pTable->core_->version.minor_id);
 
     g_pRealFinalizerExtFunctions = (FinalizerExtTable*)malloc(pTable->finalizer_ext_->version.minor_id);
     memcpy(g_pRealFinalizerExtFunctions, pTable->finalizer_ext_, pTable->finalizer_ext_->version.minor_id);

@@ -20,7 +20,7 @@ struct ApiTableVersion1_2 {
     uint32_t reserved;
 };
 
-// Table to export HSA Finalizer Extension Apis 
+// Table to export HSA Finalizer Extension Apis
 struct FinalizerExtTable1_2 {
     ApiTableVersion1_2 version;
     decltype(hsa_ext_program_create)* hsa_ext_program_create_fn;
@@ -183,7 +183,7 @@ struct CoreApiTable1_2 {
 struct HsaApiTable1_2 {
     // Version of Hsa Api Table
     ApiTableVersion1_2 version;
-  
+
     // Table of function pointers to HSA Core Runtime
     CoreApiTable1_2* core_;
 
@@ -192,7 +192,7 @@ struct HsaApiTable1_2 {
 
     // Table of function pointers to HSA Finalizer Extension
     FinalizerExtTable1_2* finalizer_ext_;
-  
+
     // Table of function pointers to HSA Image Extension
     ImageExtTable1_2* image_ext_;
 };

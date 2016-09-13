@@ -10,7 +10,7 @@
 bool IsROCm12(const HsaApiTable* pHsaTable)
 {
     bool retVal = false;
-    
+
     if (ROCM_1_2_ROOT_MAJOR_VERSION == pHsaTable->version.major_id &&
         ROCM_1_2_ROOT_MINOR_VERSION == pHsaTable->version.minor_id &&
         ROCM_1_2_ROOT_STEP_VERSION == pHsaTable->version.step_id &&
@@ -29,6 +29,6 @@ bool IsROCm12(const HsaApiTable* pHsaTable)
     {
         retVal = true;
     }
-    
+
     return retVal;
 }
