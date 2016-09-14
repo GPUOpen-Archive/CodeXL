@@ -82,6 +82,7 @@
     <ClCompile Include="GlobalSettings.cpp" />
     <ClCompile Include="GPAUtils.cpp" />
     <ClCompile Include="..\..\..\..\..\Common\Src\GPUPerfAPIUtils\GPUPerfAPILoader.cpp" />
+    <ClCompile Include="GPUPerfAPICounterLoader.cpp" />
     <ClCompile Include="HTMLTable.cpp" />
     <ClCompile Include="jqPlotChart.cpp" />
     <ClCompile Include="KernelProfileResultManager.cpp" />
@@ -117,6 +118,7 @@
     <ClInclude Include="GlobalSettings.h" />
     <ClInclude Include="GPAUtils.h" />
     <ClInclude Include="..\..\..\..\..\Common\Src\GPUPerfAPIUtils\GPUPerfAPILoader.h" />
+    <ClInclude Include="GPUPerfAPICounterLoader.h" />
     <ClInclude Include="HTMLTable.h" />
     <ClInclude Include="IParserListener.h" />
     <ClInclude Include="IParserProgressMonitor.h" />

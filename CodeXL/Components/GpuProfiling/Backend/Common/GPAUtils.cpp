@@ -173,215 +173,6 @@ bool GPAUtils::EnableCounters()
     return true;
 }
 
-bool GPAUtils::GetNumberOfPass(const CounterList counterList, std::vector<GPAUtils::CounterPassInfo>& counterPassInfoList)
-{
-    // To Do - Figure out how to get the device Ids for HSA from here.
-    if (m_API == GPA_API_HSA)
-    {
-        return false;
-    }
-
-    std::function<bool(ADLUtil_ASICInfo, ADLUtil_ASICInfo)> CompareAsicInfo = [](ADLUtil_ASICInfo first, ADLUtil_ASICInfo second) -> bool
-    {
-        bool equal = ((first.deviceID == second.deviceID) && (first.vendorID == second.vendorID) && (first.revID == second.revID));
-        return equal;
-    };
-
-    std::function<AsicInfoList(AsicInfoList, std::function<bool(ADLUtil_ASICInfo, ADLUtil_ASICInfo)>)> RemoveDuplicateDevice =
-        [](AsicInfoList asicInfoList, std::function<bool(ADLUtil_ASICInfo, ADLUtil_ASICInfo)> compareAsicInfoLambda) ->AsicInfoList
-    {
-        AsicInfoList tempAsicInfoList;
-        GDT_DeviceInfo deviceInfo;
-
-        for (unsigned int i = 0; i < asicInfoList.size(); ++i)
-        {
-            if (tempAsicInfoList.size() > 0)
-            {
-                for (unsigned int j = 0; j < tempAsicInfoList.size(); ++j)
-                {
-                    if (!compareAsicInfoLambda(asicInfoList[i], tempAsicInfoList[j]) &&
-                    AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(asicInfoList[i].deviceID,
-                    REVISION_ID_ANY,
-                    deviceInfo))
-                    {
-                        tempAsicInfoList.push_back(asicInfoList[i]);
-                    }
-                }
-            }
-            else
-            {
-                if (AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(asicInfoList[i].deviceID,
-                                                                   REVISION_ID_ANY,
-                                                                   deviceInfo))
-                {
-                    tempAsicInfoList.push_back(asicInfoList[i]);
-                }
-            }
-        }
-
-        return tempAsicInfoList;
-    };
-
-    bool success = true;
-
-    if (!m_GPALoader.Loaded())
-    {
-        success &= false;
-    }
-    else
-    {
-        if (m_pGetAvailableCountersForDevice != nullptr && m_pGetAvailableCountersByGen != nullptr)
-        {
-            AsicInfoList asicInfoList;
-            GPA_ICounterAccessor* ppCounterAccessor;
-            GPA_ICounterScheduler* ppCounterScheduler;
-            AMDTADLUtils::Instance()->GetAsicInfoList(asicInfoList);
-            asicInfoList = RemoveDuplicateDevice(asicInfoList, CompareAsicInfo);
-            GPAUtils::CounterPassInfo counterPassInfo;
-
-            for (unsigned int i = 0; i < asicInfoList.size(); ++i)
-            {
-                if (GPA_STATUS_OK == m_pGetAvailableCountersForDevice(m_API, asicInfoList[i].vendorID, asicInfoList[i].deviceID, asicInfoList[i].revID, &ppCounterAccessor, &ppCounterScheduler))
-                {
-                    ppCounterScheduler->SetCounterAccessor(ppCounterAccessor, asicInfoList[i].vendorID, asicInfoList[i].deviceID, asicInfoList[i].revID);
-
-                    if (!counterList.empty())
-                    {
-                        ppCounterScheduler->DisableAllCounters();
-                        unsigned int counterIndex;
-                        unsigned int numPass;
-
-                        for (unsigned int j = 0; j < counterList.size(); ++j)
-                        {
-                            ppCounterAccessor->GetCounterIndex(counterList[j].c_str(), &counterIndex);
-                            ppCounterScheduler->EnableCounter(counterIndex);
-                        }
-
-                        ppCounterScheduler->GetNumRequiredPasses(&numPass);
-                        counterPassInfo.deviceInfo.vendorId = asicInfoList[i].vendorID;
-                        counterPassInfo.deviceInfo.deviceId = asicInfoList[i].deviceID;
-                        counterPassInfo.deviceInfo.revId = asicInfoList[i].revID;
-                        counterPassInfo.listofCounter = counterList;
-                        counterPassInfo.numberOfPass = numPass;
-                        counterPassInfoList.push_back(counterPassInfo);
-
-                    }
-                    else
-                    {
-                        unsigned int numPass;
-                        unsigned int availableCounters = ppCounterAccessor->GetNumCounters();
-                        CounterList tempCounterList;
-
-                        for (unsigned int j = 0; j < availableCounters; ++j)
-                        {
-                            ppCounterScheduler->EnableCounter(j);
-                            tempCounterList.push_back(ppCounterAccessor->GetCounterName(j));
-
-                        }
-
-                        ppCounterScheduler->GetNumRequiredPasses(&numPass);
-                        counterPassInfo.deviceInfo.vendorId = asicInfoList[i].vendorID;
-                        counterPassInfo.deviceInfo.deviceId = asicInfoList[i].deviceID;
-                        counterPassInfo.deviceInfo.revId = asicInfoList[i].revID;
-                        counterPassInfo.listofCounter = tempCounterList;
-                        counterPassInfo.numberOfPass = numPass;
-                        counterPassInfoList.push_back(counterPassInfo);
-                    }
-                }
-            }
-        }
-    }
-
-    return success;
-}
-
-bool GPAUtils::GetNumberOfPassByDevice(const CounterList counterList,
-                                       std::vector<GPAUtils::DeviceInfo> deviceList,
-                                       std::vector<GPAUtils::CounterPassInfo>& counterPassInfoList)
-{
-    bool success = true;
-
-    if (!m_GPALoader.Loaded())
-    {
-        success &= false;
-    }
-    else
-    {
-        if (deviceList.empty())
-        {
-            success &= GetNumberOfPass(counterList, counterPassInfoList);
-        }
-        else
-        {
-            if (m_pGetAvailableCountersForDevice != nullptr && m_pGetAvailableCountersByGen != nullptr)
-            {
-                GPA_ICounterAccessor* ppCounterAccessor;
-                GPA_ICounterScheduler* ppCounterScheduler;
-                GPAUtils::CounterPassInfo counterPassInfo;
-
-                for (unsigned int i = 0; i < deviceList.size(); ++i)
-                {
-                    if (GPA_STATUS_OK == m_pGetAvailableCountersForDevice(m_API, deviceList[i].vendorId, deviceList[i].deviceId, deviceList[i].revId, &ppCounterAccessor, &ppCounterScheduler))
-                    {
-                        ppCounterScheduler->SetCounterAccessor(ppCounterAccessor, deviceList[i].vendorId, deviceList[i].deviceId, deviceList[i].revId);
-
-                        if (!counterList.empty())
-                        {
-                            ppCounterScheduler->DisableAllCounters();
-                            unsigned int counterIndex;
-                            unsigned int numPass;
-
-                            for (unsigned int j = 0; j < counterList.size(); ++j)
-                            {
-                                ppCounterAccessor->GetCounterIndex(counterList[j].c_str(), &counterIndex);
-                                ppCounterScheduler->EnableCounter(counterIndex);
-                            }
-
-                            ppCounterScheduler->GetNumRequiredPasses(&numPass);
-                            counterPassInfo.deviceInfo.vendorId = deviceList[i].vendorId;
-                            counterPassInfo.deviceInfo.deviceId = deviceList[i].deviceId;
-                            counterPassInfo.deviceInfo.revId = deviceList[i].revId;
-                            counterPassInfo.listofCounter = counterList;
-                            counterPassInfo.numberOfPass = numPass;
-                            counterPassInfoList.push_back(counterPassInfo);
-                        }
-                        else
-                        {
-                            unsigned int numPass;
-                            CounterList tempCounterList;
-
-                            unsigned int availableCounters = ppCounterAccessor->GetNumCounters();
-
-                            for (unsigned int j = 0; j < availableCounters; ++j)
-                            {
-                                ppCounterScheduler->EnableCounter(j);
-                                tempCounterList.push_back(ppCounterAccessor->GetCounterName(j));
-                            }
-
-                            if (m_API == GPA_API_HSA)
-                            {
-                                numPass = 1u;
-                            }
-                            else
-                            {
-                                ppCounterScheduler->GetNumRequiredPasses(&numPass);
-                            }
-
-                            counterPassInfo.deviceInfo.vendorId = deviceList[i].vendorId;
-                            counterPassInfo.deviceInfo.deviceId = deviceList[i].deviceId;
-                            counterPassInfo.deviceInfo.revId = deviceList[i].revId;
-                            counterPassInfo.listofCounter = tempCounterList;
-                            counterPassInfo.numberOfPass = numPass;
-                            counterPassInfoList.push_back(counterPassInfo);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    return success;
-}
 
 bool GPAUtils::InitGPA(GPA_API_Type api,
                        const gtString& strDLLPath,
@@ -390,24 +181,8 @@ bool GPAUtils::InitGPA(GPA_API_Type api,
                        CounterList* pSelectedCounters,
                        size_t nMaxPass)
 {
-    // Set DLL Path
-    string strGPACounterDllName;
     m_API = api;
     m_nMaxPass = nMaxPass;
-
-#ifdef USE_DEBUG_GPA
-#define DEBUG_DLL_SUFFIX "-d"
-#else
-#define DEBUG_DLL_SUFFIX ""
-#endif
-
-    strGPACounterDllName = LIB_PREFIX "GPUPerfAPICounters" BITNESS DEBUG_DLL_SUFFIX GDT_BUILD_SUFFIX LIB_SUFFIX;
-
-    wstring strGPACounterDllNameUnicode;
-    StringUtils::Utf8StringToWideString(strGPACounterDllName, strGPACounterDllNameUnicode);
-
-    gtString strGPACounterDll = strDLLPath;
-    strGPACounterDll.append(strGPACounterDllNameUnicode.c_str());
 
     const char* pszErrorMessage = NULL;
 
@@ -429,17 +204,13 @@ bool GPAUtils::InitGPA(GPA_API_Type api,
         strError = pszErrorMessage;
     }
 
-    StringUtils::WideStringToUtf8String(strGPACounterDll.asCharArray(), utf8DllPath);
-    // Load counter access DLL
-    LIB_HANDLE hLib = OSUtils::Instance()->GenericLoadLibrary(utf8DllPath);
-
-    if (hLib != NULL)
+    if (!GPUPerfAPICounterLoader::Instance()->IsLoaded())
     {
-        m_pGetAvailableCountersByGen = reinterpret_cast<GPA_GetAvailableCountersByGenerationProc>(OSUtils::Instance()->GetSymbolAddr(hLib, "GPA_GetAvailableCountersByGeneration"));
-        SpAssertRet(m_pGetAvailableCountersByGen != NULL) false;
-        m_pGetAvailableCountersForDevice = reinterpret_cast<GPA_GetAvailableCountersForDeviceProc>(OSUtils::Instance()->GetSymbolAddr(hLib, "GPA_GetAvailableCounters"));
-        SpAssertRet(m_pGetAvailableCountersForDevice != NULL) false;
+        GPUPerfAPICounterLoader::Instance()->LoadPerfAPICounterDll(strDLLPath);
     }
+
+    m_pGetAvailableCountersForDevice = GPUPerfAPICounterLoader::Instance()->GetGPAAvailableCountersForDeviceProc();
+    m_pGetAvailableCountersByGen = GPUPerfAPICounterLoader::Instance()->GetGPAAvailableCountersByGenerationProc();
 
     if (pszCounterFile != NULL)
     {

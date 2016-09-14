@@ -8,20 +8,14 @@
 #ifndef _GPA_UTILS_H_
 #define _GPA_UTILS_H_
 
-#include "GPUPerfAPI.h"
-#include "GPACounterGenerator.h"
-#include "GPUPerfAPICounters.h"
+#include "GPUPerfAPICounterLoader.h"
 #include "DeviceInfo.h"
 #include "GPUPerfAPILoader.h"
 #include <map>
 #include <vector>
 #include <string>
 
-#include "ADLUtil/ADLUtil.h"
 #include <AMDTBaseTools/Include/gtString.h>
-
-typedef decltype(GPA_GetAvailableCounters)* GPA_GetAvailableCountersForDeviceProc;
-typedef decltype(GPA_GetAvailableCountersByGeneration)* GPA_GetAvailableCountersByGenerationProc;
 
 typedef std::vector<std::string> CounterList;
 typedef std::map<GPA_HW_GENERATION, CounterList> HWCounterMap;
@@ -38,33 +32,6 @@ typedef void (*CounterNameMappingProc)(CounterList& counters);
 class GPAUtils
 {
 public:
-
-    struct DeviceInfo
-    {
-        int vendorId;
-        int deviceId;
-        int revId;
-
-        DeviceInfo()
-        {
-            vendorId = 0x1002; //AMD_VENDOR_ID
-            deviceId = 0;
-            revId = 0;
-        }
-    };
-
-    struct CounterPassInfo
-    {
-        DeviceInfo deviceInfo;
-        CounterList listofCounter;
-        unsigned int numberOfPass;
-
-        CounterPassInfo()
-        {
-            deviceInfo = DeviceInfo();
-            numberOfPass = 0;
-        }
-    };
 
     /// Constructor
     GPAUtils();
@@ -140,19 +107,6 @@ public:
     /// If SetEnabledCounters is called, selected counters will be enabled, if not, all counters are enabled
     /// \return true if successful, false otherwise
     bool EnableCounters();
-
-    /// Gives the number of passes required by the given counter list - enables the counter too
-    /// \param counterList list of the counters
-    /// \param[out] counterPassInfoList list containing device info, counter list and number of pass
-    /// \return true if successful, false otherwise
-    bool GetNumberOfPass(const CounterList counterList, std::vector<GPAUtils::CounterPassInfo>& counterPassInfoList);
-
-    /// Gives the number of passes required by the given counter list - enables the counter too
-    /// \param counterList list of the counters
-    /// \param deviceList list of the device
-    /// \param[out] counterPassInfoList list containing device info, counter list and number of pass
-    /// \return true if successful, false otherwise
-    bool GetNumberOfPassByDevice(const CounterList counterList, std::vector<GPAUtils::DeviceInfo> deviceList, std::vector<GPAUtils::CounterPassInfo>& counterPassInfoList);
 
     /// Load GPA Dll, load counter files if specified
     /// \param api the API to initialize

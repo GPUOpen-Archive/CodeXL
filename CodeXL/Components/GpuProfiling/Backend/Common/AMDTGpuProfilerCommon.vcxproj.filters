@@ -85,6 +85,9 @@
     <ClCompile Include="ProfilerTimer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GPUPerfAPICounterLoader.cpp">
+      <Filter>GPUPerfAPIUtils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\Common\Src\DeviceInfo\DeviceInfo.h">
@@ -200,6 +203,9 @@
     </ClInclude>
     <ClInclude Include="ProfilerTimer.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GPUPerfAPICounterLoader.h">
+      <Filter>GPUPerfAPIUtils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
