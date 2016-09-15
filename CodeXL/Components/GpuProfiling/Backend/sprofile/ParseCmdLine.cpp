@@ -1631,6 +1631,7 @@ std::vector<CounterPassInfo> GetNumberOfPassFromGPUPerfAPI(GPA_API_Type apiType,
 }
 
 
+//To-Do: add it to new option masspassperfile
 void SaveCounterFileForEachPass()
 {
     auto countDigit = [](unsigned int number)-> unsigned int

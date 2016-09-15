@@ -35,9 +35,11 @@ public:
     void UnLoadPerfAPICounterDll();
 
     /// Accessor to the function pointer of the GPA Perf API Counters exposed function
+    /// \return if dll is loaded return function pointer to the GPA_GetAvailableCounters function otherwise null pointer
     GPA_GetAvailableCountersForDeviceProc GetGPAAvailableCountersForDeviceProc();
 
     /// Accessor to the function pointer of the GPA Perf API Counters exposed function
+    /// \return if dll is loaded return function pointer to the GPA_GetAvailableCountersByGeneration function otherwise null pointer
     GPA_GetAvailableCountersByGenerationProc GetGPAAvailableCountersByGenerationProc();
 
     ~GPUPerfAPICounterLoader();
