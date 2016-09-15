@@ -1196,7 +1196,7 @@ void PrintNumberOfPass(const std::string counterFile)
     //HSA
     {
         std::vector<CounterPassInfo> counterPassInfiListForHSA;
-        counterPassInfiListForCL = GetNumberOfPassForAPI(GPA_API_HSA, counterList);
+        counterPassInfiListForHSA = GetNumberOfPassForAPI(GPA_API_HSA, counterList);
 
         for (unsigned int i = 0; i < counterPassInfiListForHSA.size(); ++i)
         {
@@ -1495,22 +1495,24 @@ std::vector<CounterPassInfo> GetNumberOfPassForAPI(GPA_API_Type apiType, Counter
     if (apiType == GPA_API_HSA)
     {
         HSADeviceIdList hsaDeviceList;
-        HSAUtils::Instance()->GetHSADeviceIds(hsaDeviceList);
-
-        DeviceInfo deviceInfo;
-        std::vector<DeviceInfo> deviceInfoList;
-
-        for (unsigned int i = 0; i < hsaDeviceList.size(); ++i)
+        if(HSAUtils::Instance()->GetHSADeviceIds(hsaDeviceList))
         {
-            deviceInfo.deviceId = hsaDeviceList[i];
-            deviceInfoList.push_back(deviceInfo);
-        }
 
-        deviceInfoList = RemoveDuplicateDevice(deviceInfoList);
+            DeviceInfo deviceInfo;
+            std::vector<DeviceInfo> deviceInfoList;
 
-        if (!deviceInfoList.empty())
-        {
-            counterInfoList = GetNumberOfPassFromGPUPerfAPI(GPA_API_HSA, counterList, deviceInfoList);
+            for (unsigned int i = 0; i < hsaDeviceList.size(); ++i)
+            {
+                deviceInfo.deviceId = hsaDeviceList[i];
+                deviceInfoList.push_back(deviceInfo);
+            }
+
+            deviceInfoList = RemoveDuplicateDevice(deviceInfoList);
+
+            if (!deviceInfoList.empty())
+            {
+                counterInfoList = GetNumberOfPassFromGPUPerfAPI(GPA_API_HSA, counterList, deviceInfoList);
+            }
         }
     }
 

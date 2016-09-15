@@ -54,6 +54,7 @@ SO_OBJS =  \
 	./$(OBJ_DIR)/CElfSection.o \
 	./$(OBJ_DIR)/CElfStringTable.o \
 	./$(OBJ_DIR)/CElfSymbolTable.o \
+        ./$(OBJ_DIR)/GPUPerfAPICounterLoader.o \
 
 include $(DEPTH)/Build/CommonTargets.mk
 
