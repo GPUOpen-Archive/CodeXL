@@ -96,7 +96,9 @@ void DX12APIEntry::AppendAPITraceLine(gtASCIIString& out, double inStartTime, do
     // APIType APIFunctionId InterfacePtr D3D12Interface_FunctionName(Parameters) = ReturnValue StartMillisecond EndMillisecond SampleId
     void* handle = nullptr;
     const char* type = "\0";
-    const char* parameters = GetParameterString();
+
+    gtASCIIString parameterString;
+    const char* parameters = GetParameterString(parameterString);
 
     if (wrapperInfo)
     {
