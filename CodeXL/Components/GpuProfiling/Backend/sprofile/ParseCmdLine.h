@@ -78,6 +78,7 @@ typedef struct
     bool         bStartDisabled;                     ///< flag indicating whether or not to start with profiling disabled
     unsigned int m_delayInMilliseconds;              ///< delay for profiler in milliseconds
     unsigned int m_durationInMilliseconds;           ///< duration for profiler in milliseconds for which profiler should run
+    unsigned int m_maxPassPerFile;                   ///< maximum pass for generating counter files
 } Config;
 
 /// Parse the command line arguments
