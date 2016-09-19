@@ -39,13 +39,13 @@ HSAAPIInfoManager::~HSAAPIInfoManager(void)
     if (m_delayTimer)
     {
         m_delayTimer->stopTimer();
-        delete m_delayTimer;
+        SAFE_DELETE(m_delayTimer);
     }
 
     if (m_durationTimer)
     {
         m_durationTimer->stopTimer();
-        delete m_durationTimer;
+        SAFE_DELETE(m_durationTimer);
     }
 }
 
@@ -295,14 +295,22 @@ void HSAAPIInfoManager::AddAsyncCopyCompletionSignal(const hsa_signal_t& complet
 {
     hsa_signal_value_t signalValue = g_pRealCoreFunctions->hsa_signal_load_scacquire_fn(completionSignal);
 
-    AsyncHandlerParam* pHandlerParam = new AsyncHandlerParam();
-    pHandlerParam->m_signal = completionSignal;
+    AsyncHandlerParam* pHandlerParam = new(std::nothrow) AsyncHandlerParam();
 
-    hsa_status_t status = g_pRealAmdExtFunctions->hsa_amd_signal_async_handler_fn(completionSignal, HSA_SIGNAL_CONDITION_LT, signalValue, AsyncSignalHandler, pHandlerParam);
-
-    if (HSA_STATUS_SUCCESS != status)
+    if (nullptr == pHandlerParam)
     {
-        Log(logERROR, "Error returned from hsa_amd_signal_async_handler\n");
+        Log(logERROR, "AddAsyncCopyCompletionSignal: unable to allocate memory for async handler param\n");
+    }
+    else
+    {
+        pHandlerParam->m_signal = completionSignal;
+
+        hsa_status_t status = g_pRealAmdExtFunctions->hsa_amd_signal_async_handler_fn(completionSignal, HSA_SIGNAL_CONDITION_LT, signalValue, AsyncSignalHandler, pHandlerParam);
+
+        if (HSA_STATUS_SUCCESS != status)
+        {
+            Log(logERROR, "Error returned from hsa_amd_signal_async_handler\n");
+        }
     }
 }
 
@@ -391,10 +399,18 @@ void HSAAPIInfoManager::CreateTimer(ProfilerTimerType timerType, unsigned long t
         case PROFILEDELAYTIMER:
             if (m_delayTimer == nullptr && timeIntervalInMilliseconds > 0)
             {
-                m_delayTimer = new ProfilerTimer(timeIntervalInMilliseconds);
-                m_delayTimer->SetTimerType(PROFILEDELAYTIMER);
-                m_bDelayStartEnabled = true;
-                m_delayInMilliseconds = timeIntervalInMilliseconds;
+                m_delayTimer = new(std::nothrow) ProfilerTimer(timeIntervalInMilliseconds);
+
+                if (nullptr == m_delayTimer)
+                {
+                    Log(logERROR, "CreateTimer: unable to allocate memory for delay timer\n");
+                }
+                else
+                {
+                    m_delayTimer->SetTimerType(PROFILEDELAYTIMER);
+                    m_bDelayStartEnabled = true;
+                    m_delayInMilliseconds = timeIntervalInMilliseconds;
+                }
             }
 
             break;
@@ -402,10 +418,18 @@ void HSAAPIInfoManager::CreateTimer(ProfilerTimerType timerType, unsigned long t
         case PROFILEDURATIONTIMER:
             if (m_durationTimer == nullptr && timeIntervalInMilliseconds > 0)
             {
-                m_durationTimer = new ProfilerTimer(timeIntervalInMilliseconds);
-                m_durationTimer->SetTimerType(PROFILEDURATIONTIMER);
-                m_bProfilerDurationEnabled = true;
-                m_durationInMilliseconds = timeIntervalInMilliseconds;
+                m_durationTimer = new(std::nothrow) ProfilerTimer(timeIntervalInMilliseconds);
+
+                if (nullptr == m_durationTimer)
+                {
+                    Log(logERROR, "CreateTimer: unable to allocate memory for duration timer\n");
+                }
+                else
+                {
+                    m_durationTimer->SetTimerType(PROFILEDURATIONTIMER);
+                    m_bProfilerDurationEnabled = true;
+                    m_durationInMilliseconds = timeIntervalInMilliseconds;
+                }
             }
 
             break;
