@@ -12,6 +12,8 @@
 
 #include <unordered_map>
 
+#include <AMDTMutex.h>
+
 #include "../Common/APIInfoManagerBase.h"
 #include "HSAAPIBase.h"
 #include "../Common/ProfilerTimer.h"
@@ -48,6 +50,14 @@ public:
     /// \param[out] queueIndex the index of the specified queue (if found)
     /// \return true if the queueu is known, false otherwise
     bool GetQueueIndex(const hsa_queue_t* pQueue, size_t& queueIndex) const;
+
+    /// Adds the specified signal to the list of async copy signals that need to be tracked.
+    /// \param completionSignal the signal that should be tracked
+    void AddAsyncCopyCompletionSignal(const hsa_signal_t& completionSignal);
+
+    /// Adds the specified set of timestamps to be written to the output file
+    /// \param asyncCopyTime the timestamps to be written
+    void AddAsyncCopyTimestamp(const hsa_amd_profiling_async_copy_time_t& asyncCopyTime);
 
     /// Enables or Disables the profiler delay
     /// \param doEnable true for enable and false for disable
@@ -101,6 +111,8 @@ private:
     /// \param record the kernel timestamp record to write to the stream
     bool WriteKernelTimestampEntry(std::ostream& sout, const hsa_profiler_kernel_time_t& record);
 
+    bool WriteAsyncCopyTimestamp(std::ostream& sout, const hsa_amd_profiling_async_copy_time_t& timestamp);
+
     /// Check if specified API is in API filter list
     /// \param type HSA function type
     /// \return true if API is in filter list
@@ -110,20 +122,22 @@ private:
     /// \return true if max number of APIs are traced.
     bool IsCapReached() const;
 
-    typedef std::unordered_map<const hsa_queue_t*, size_t> QueueIndexMap;     ///< typedef for the queue index map
-    typedef std::pair<const hsa_queue_t*, size_t>          QueueIndexMapPair; ///< typedef for the queue index pair
+    typedef std::unordered_map<const hsa_queue_t*, size_t>   QueueIndexMap;     ///< typedef for the queue index map
+    typedef std::pair<const hsa_queue_t*, size_t>            QueueIndexMapPair; ///< typedef for the queue index pair
+    typedef std::vector<hsa_amd_profiling_async_copy_time_t> AsyncCopyTimestampList;
 
     unsigned int           m_tracedApiCount;                ///< number of APIs that have been traced, used to support max apis to trace option
     std::set<HSA_API_Type> m_filterAPIs;                    ///< HSA APIs that are not traced due to API filtering
     std::set<HSA_API_Type> m_mustInterceptAPIs;             ///< HSA APIs that must be intercepted (even when they are filtered out and not traced)
     QueueIndexMap          m_queueIndexMap;                 ///< map of a queue to that queue's index (basically creation order)
+    AsyncCopyTimestampList m_asyncCopyTimestamps;
+    AMDTMutex              m_asyncTimeStampsMtx;
     bool                   m_bDelayStartEnabled;            ///< flag indicating whether or not the profiler should start with delay or not
     bool                   m_bProfilerDurationEnabled;      ///< flag indiacating whether profiler should only run for certain duration
     unsigned long          m_delayInMilliseconds;           ///< millieconds to delay for profiler to start
     unsigned long          m_durationInMilliseconds;        ///< duration in milliseconds for which Profiler should run
     ProfilerTimer*         m_delayTimer;                    ///< timer for handling delay timer for the profile agent
     ProfilerTimer*         m_durationTimer;                 ///< timer for handling duration timer for the profile agent
-
 };
 
 #endif // _HSA_FDN_API_INFO_MANAGER_H_

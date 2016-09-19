@@ -78,13 +78,13 @@ HSAGPAProfiler::~HSAGPAProfiler(void)
     if (m_delayTimer != nullptr)
     {
         m_delayTimer->stopTimer();
-        delete m_delayTimer;
+        SAFE_DELETE(m_delayTimer);
     }
 
     if (m_durationTimer != nullptr)
     {
         m_durationTimer->stopTimer();
-        delete m_durationTimer;
+        SAFE_DELETE(m_durationTimer);
     }
 }
 
@@ -882,10 +882,18 @@ void HSAGPAProfiler::CreateTimer(ProfilerTimerType timerType, unsigned int timeI
         case PROFILEDELAYTIMER:
             if (m_delayTimer == nullptr && timeIntervalInMilliseconds > 0)
             {
-                m_delayTimer = new ProfilerTimer(timeIntervalInMilliseconds);
-                m_delayTimer->SetTimerType(PROFILEDELAYTIMER);
-                m_bDelayStartEnabled = true;
-                m_delayInMilliseconds = timeIntervalInMilliseconds;
+                m_delayTimer = new(std::nothrow) ProfilerTimer(timeIntervalInMilliseconds);
+
+                if (nullptr == m_delayTimer)
+                {
+                    Log(logERROR, "CreateTimer: unable to allocate memory for delay timer\n");
+                }
+                else
+                {
+                    m_delayTimer->SetTimerType(PROFILEDELAYTIMER);
+                    m_bDelayStartEnabled = true;
+                    m_delayInMilliseconds = timeIntervalInMilliseconds;
+                }
             }
 
             break;
@@ -893,10 +901,18 @@ void HSAGPAProfiler::CreateTimer(ProfilerTimerType timerType, unsigned int timeI
         case PROFILEDURATIONTIMER:
             if (m_durationTimer == nullptr && timeIntervalInMilliseconds > 0)
             {
-                m_durationTimer = new ProfilerTimer(timeIntervalInMilliseconds);
-                m_durationTimer->SetTimerType(PROFILEDURATIONTIMER);
-                m_bProfilerDurationEnabled = true;
-                m_durationInMilliseconds = timeIntervalInMilliseconds;
+                m_durationTimer = new(std::nothrow) ProfilerTimer(timeIntervalInMilliseconds);
+
+                if (nullptr == m_durationTimer)
+                {
+                    Log(logERROR, "CreateTimer: unable to allocate memory for duration timer\n");
+                }
+                else
+                {
+                    m_durationTimer->SetTimerType(PROFILEDURATIONTIMER);
+                    m_bProfilerDurationEnabled = true;
+                    m_durationInMilliseconds = timeIntervalInMilliseconds;
+                }
             }
 
             break;
