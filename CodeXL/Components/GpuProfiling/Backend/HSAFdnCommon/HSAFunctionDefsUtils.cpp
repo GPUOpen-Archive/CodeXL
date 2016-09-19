@@ -57,7 +57,7 @@ HSAFunctionDefsUtils::HSAFunctionDefsUtils()
     m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_cas_acquire"), HSA_API_Type_hsa_signal_cas_scacquire));
     m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_cas_release"), HSA_API_Type_hsa_signal_cas_screlease));
     m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_cas_acq_rel"), HSA_API_Type_hsa_signal_cas_scacq_screl));
-#endif 
+#endif
 }
 
 HSA_API_Type HSAFunctionDefsUtils::ToHSAAPIType(const std::string& strName)
