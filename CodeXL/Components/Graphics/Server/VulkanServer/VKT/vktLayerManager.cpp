@@ -23,34 +23,16 @@
 #include "../../Common/IServerPlugin.h"
 #include "../../Common/SharedGlobal.h"
 
-#ifdef CODEXL_GRAPHICS
-
-//-----------------------------------------------------------------------------
-/// Initial configuration of layers that we can use within the VulkanServer DLL for CodeXL.
-//-----------------------------------------------------------------------------
-static LAYERDESC s_LayerList[] =
-{
-    { "Logger",         "Trace Analyzer",   "LOG",  NO_DISPLAY,     VktTraceAnalyzerLayer::Instance(),         VktTraceAnalyzerLayer::Instance() },
-    { "ObjectDatabase", "Object Database",  "DB",   DISPLAY,        VktObjectDatabaseProcessor::Instance(),    VktObjectDatabaseProcessor::Instance() },
-    { "FrameDebugger",  "Frame Debugger",   "FD",   NO_DISPLAY,     VktFrameDebuggerLayer::Instance(),         VktFrameDebuggerLayer::Instance() },
-    { "FrameProfiler",  "Frame Profiler",   "FP",   NO_DISPLAY,     VktFrameProfilerLayer::Instance(),         VktFrameProfilerLayer::Instance() }
-};
-
-#else
-
-//-----------------------------------------------------------------------------
-/// Initial configuration of layers that we can use within the VulkanServer DLL for GPS.
-//-----------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
+/// Initial configuration of layers that we can use within the VulkanServer DLL for GPS and CodeXL
+//--------------------------------------------------------------------------------------------------
 static LAYERDESC s_LayerList[] =
 {
     { "Logger",         "Trace Analyzer",   "LOG",  NO_DISPLAY,     VktTraceAnalyzerLayer::Instance(),         VktTraceAnalyzerLayer::Instance() },
     { "ObjectDatabase", "Object Database",  "DB",   DISPLAY,        VktObjectDatabaseProcessor::Instance(),    VktObjectDatabaseProcessor::Instance() },
     { "FrameDebugger",  "Frame Debugger",   "FD",   NO_DISPLAY,     VktFrameDebuggerLayer::Instance(),         VktFrameDebuggerLayer::Instance() },
     { "FrameProfiler",  "Frame Profiler",   "FP",   NO_DISPLAY,     VktFrameProfilerLayer::Instance(),         VktFrameProfilerLayer::Instance() },
-    { "TimeControl",    "Time Control",     "TC",   NO_DISPLAY,     TimeControlLayer::Instance(),              TimeControlLayer::Instance() }
 };
-
-#endif
 
 //-----------------------------------------------------------------------------
 /// Get a pointer to this layer manager.

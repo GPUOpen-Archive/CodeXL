@@ -143,9 +143,12 @@ struct ParameterEntry
 };
 
 //-----------------------------------------------------------------------------
-/// Amount of memory needed for each parameter.
+/// Amount of memory needed for each parameter. Take into account that some
+/// parameters may be wide strings, so buffer length is double 
 //-----------------------------------------------------------------------------
+typedef uint16_t  bufferSize_t;
 static const int BYTES_PER_PARAMETER = 512;
+static const int BYTES_PER_PARAMETER_DATA = BYTES_PER_PARAMETER - sizeof(bufferSize_t);
 
 //--------------------------------------------------------------------------
 /// The APIEntry structure is used to track all calls that are traced at runtime.
