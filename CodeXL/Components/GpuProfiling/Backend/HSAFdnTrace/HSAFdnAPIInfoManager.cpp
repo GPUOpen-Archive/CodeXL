@@ -263,7 +263,7 @@ struct AsyncHandlerParam
     hsa_signal_t m_signal;
 };
 
-bool AsyncSignalHandler(hsa_signal_value_t value, void* arg)
+bool AsyncSignalHandler(hsa_signal_value_t /* value */, void* arg)
 {
     hsa_amd_profiling_async_copy_time_t asyncCopyTime;
     AsyncHandlerParam* pHandlerParam = reinterpret_cast<AsyncHandlerParam*>(arg);
