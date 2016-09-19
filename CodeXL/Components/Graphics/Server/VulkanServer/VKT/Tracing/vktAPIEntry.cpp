@@ -82,8 +82,10 @@ void VktAPIEntry::AppendAPITraceLine(gtASCIIString& out, double startTime, doubl
 
     out += GetAPIName();
 
+    gtASCIIString parameterString;
+
     out += "(";
-    out += GetParameterString();
+    out += GetParameterString(parameterString);
     out += ") = ";
 
     out += pResultCode;

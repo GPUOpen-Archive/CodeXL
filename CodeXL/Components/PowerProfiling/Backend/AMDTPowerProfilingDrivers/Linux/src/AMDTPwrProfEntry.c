@@ -257,7 +257,15 @@ long PwrProfDrvIoctlImpl(struct file* file, unsigned int ioctl_num, unsigned lon
 
             for (i = 0; i < prof_configs.ulConfigCnt; i++, prof_config++)
             {
-                retval = ConfigureTimer(prof_config, clientId);
+                if (CopyFromUser(&prof_config, (ProfileConfig*)(prof_configs.uliProfileConfigs) + i, sizeof(ProfileConfig)) == 0)
+                {
+                    retval = ConfigureTimer(&prof_config, clientId);
+                }
+                else
+                {
+                    printk(KERN_WARNING "Failed copying parameter to Add profile Config \n ");
+                    return -1;
+                }
             }
 
             return retval;

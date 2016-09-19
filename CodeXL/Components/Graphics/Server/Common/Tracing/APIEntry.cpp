@@ -101,12 +101,12 @@ void APIEntry::PrintReturnValue(const INT64 inReturnValue, const ReturnDisplayTy
 //-----------------------------------------------------------------------------
 /// Get the API parameters as a single string. Build the string from the
 /// individual parameters if necessary
+/// Important note: This function is called by multiple threads so needs to
+/// be thread safe (no global variable modifications etc)
 /// \return parameter string
 //-----------------------------------------------------------------------------
-const char* APIEntry::GetParameterString() const
+const char* APIEntry::GetParameterString(gtASCIIString& parameterString) const
 {
-    static gtASCIIString parameterString;
-
     if (mNumParameters == 0)
     {
         return mParameters.asCharArray();
