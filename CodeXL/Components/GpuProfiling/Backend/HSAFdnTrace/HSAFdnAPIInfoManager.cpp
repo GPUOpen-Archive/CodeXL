@@ -134,6 +134,13 @@ bool HSAAPIInfoManager::WriteKernelTimestampEntry(std::ostream& sout, const hsa_
     return true;
 }
 
+bool HSAAPIInfoManager::WriteAsyncCopyTimestamp(std::ostream& sout, const hsa_amd_profiling_async_copy_time_t& timestamp)
+{
+    sout << std::left << std::setw(21) << timestamp.start;
+    sout << std::left << std::setw(21) << timestamp.end;
+    return true;
+}
+
 void HSAAPIInfoManager::FlushNonAPITimestampData(const osProcessId& pid)
 {
     if (HSARTModuleLoader<HSAToolsRTModule>::Instance()->IsLoaded())
@@ -174,6 +181,23 @@ void HSAAPIInfoManager::FlushNonAPITimestampData(const osProcessId& pid)
         else
         {
             Log(logERROR, "FlushNonAPITimestampData: tools lib not loaded\n");
+        }
+
+        {
+            AMDTScopeLock lock(m_asyncTimeStampsMtx);
+
+            string tmpKernelTimestampFile = GetTempFileName(pid, 0, TMP_ASYNC_COPY_TIME_STAMP_EXT);
+            ofstream foutCopyTS(tmpKernelTimestampFile.c_str(), fstream::out | fstream::app);
+
+            for (auto timestamp : m_asyncCopyTimestamps)
+            {
+                WriteAsyncCopyTimestamp(foutCopyTS, timestamp);
+                foutCopyTS << std::endl;
+            }
+
+            foutCopyTS.close();
+
+            m_asyncCopyTimestamps.clear();
         }
     }
 }
@@ -232,6 +256,61 @@ bool HSAAPIInfoManager::GetQueueIndex(const hsa_queue_t* pQueue, size_t& queueIn
     }
 
     return retVal;
+}
+
+struct AsyncHandlerParam
+{
+    hsa_signal_t m_signal;
+};
+
+bool AsyncSignalHandler(hsa_signal_value_t value, void* arg)
+{
+    hsa_amd_profiling_async_copy_time_t asyncCopyTime;
+    AsyncHandlerParam* pHandlerParam = reinterpret_cast<AsyncHandlerParam*>(arg);
+
+    if (nullptr == pHandlerParam)
+    {
+        Log(logERROR, "AsyncSignalhandler called with a null user arg.\n");
+    }
+    else
+    {
+        hsa_status_t status = g_pRealAmdExtFunctions->hsa_amd_profiling_get_async_copy_time_fn(pHandlerParam->m_signal, &asyncCopyTime);
+
+        if (HSA_STATUS_SUCCESS != status)
+        {
+            Log(logERROR, "Error returned from hsa_amd_profiling_get_dispatch_time\n");
+        }
+        else
+        {
+            HSAAPIInfoManager::Instance()->AddAsyncCopyTimestamp(asyncCopyTime);
+        }
+
+        delete pHandlerParam;
+    }
+
+    return false; // no longer monitor this signal (it will be re-added if necessary)
+}
+
+void HSAAPIInfoManager::AddAsyncCopyCompletionSignal(const hsa_signal_t& completionSignal)
+{
+    hsa_signal_value_t signalValue = g_pRealCoreFunctions->hsa_signal_load_scacquire_fn(completionSignal);
+
+    AsyncHandlerParam* pHandlerParam = new AsyncHandlerParam();
+    pHandlerParam->m_signal = completionSignal;
+
+    hsa_status_t status = g_pRealAmdExtFunctions->hsa_amd_signal_async_handler_fn(completionSignal, HSA_SIGNAL_CONDITION_LT, signalValue, AsyncSignalHandler, pHandlerParam);
+
+    if (HSA_STATUS_SUCCESS != status)
+    {
+        Log(logERROR, "Error returned from hsa_amd_signal_async_handler\n");
+    }
+}
+
+void HSAAPIInfoManager::AddAsyncCopyTimestamp(const hsa_amd_profiling_async_copy_time_t& asyncCopyTime)
+{
+    AMDTScopeLock lock(m_asyncTimeStampsMtx);
+
+    m_asyncCopyTimestamps.push_back(asyncCopyTime);
 }
 
 void HSATraceAgentTimerEndResponse(ProfilerTimerType timerType)

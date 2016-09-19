@@ -4339,6 +4339,8 @@ hsa_status_t HSA_API_Trace_hsa_amd_memory_pool_free(void* ptr)
 
 hsa_status_t HSA_API_Trace_hsa_amd_memory_async_copy(void* dst, hsa_agent_t dst_agent, const void* src, hsa_agent_t src_agent, size_t size, uint32_t num_dep_signals, const hsa_signal_t* dep_signals, hsa_signal_t completion_signal)
 {
+    HSA_APITrace_hsa_amd_memory_async_copy_PreCallHelper(dst, dst_agent, src, src_agent, size, num_dep_signals, dep_signals, completion_signal);
+
     ULONGLONG ullStart = OSUtils::Instance()->GetTimeNanos();
     hsa_status_t retVal = g_pRealAmdExtFunctions->hsa_amd_memory_async_copy_fn(dst, dst_agent, src, src_agent, size, num_dep_signals, dep_signals, completion_signal);
     ULONGLONG ullEnd = OSUtils::Instance()->GetTimeNanos();

@@ -200,6 +200,7 @@ using namespace GPULogger;
 #define TMP_TIME_STAMP_EXT ".tstamp"
 #define TMP_GPU_TIME_STAMP_RAW_EXT ".ocltstampraw"
 #define TMP_KERNEL_TIME_STAMP_EXT ".kerneltstamp"
+#define TMP_ASYNC_COPY_TIME_STAMP_EXT ".copytstamp"
 #define TMP_TRACE_EXT ".apitrace"
 #define TMP_TRACE_STACK_EXT ".stfrag"
 #define TMP_OCCUPANCY_EXT ".occupancyfrag"
