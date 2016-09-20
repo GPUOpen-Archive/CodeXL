@@ -293,7 +293,11 @@ bool AsyncSignalHandler(hsa_signal_value_t /* value */, void* arg)
 
 void HSAAPIInfoManager::AddAsyncCopyCompletionSignal(const hsa_signal_t& completionSignal)
 {
+#ifdef FUTURE_ROCR_VERSION
     hsa_signal_value_t signalValue = g_pRealCoreFunctions->hsa_signal_load_scacquire_fn(completionSignal);
+#else
+    hsa_signal_value_t signalValue = g_pRealCoreFunctions->hsa_signal_load_acquire_fn(completionSignal);
+#endif
 
     AsyncHandlerParam* pHandlerParam = new(std::nothrow) AsyncHandlerParam();
 
