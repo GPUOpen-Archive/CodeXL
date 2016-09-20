@@ -375,7 +375,7 @@ struct Parameters
     bool m_bStartDisabled;                        ///< Flag indicating whether or not to start with profiling disabled
     KernelFilterList m_kernelFilterList;          ///< List of kernels to filter for perf counter profiling and subkernel profiling
     bool m_bDelayStartEnabled;                    ///< flag indicating whether to start profiler with a delay or not
-    bool m_bProfilerDurationEnabled;              ///< flag indiacating whether profiler should only run for certain duration
+    bool m_bProfilerDurationEnabled;              ///< flag indicating whether profiler should only run for certain duration
     unsigned int m_delayInMilliseconds;           ///< delay for profiler in milliseconds
     unsigned int m_durationInMilliseconds;        ///< duration for profiler in milliseconds for which profiler should run
     bool m_bForceSingleGPU;                       ///< Flag indicating whether or not to force a single GPU
