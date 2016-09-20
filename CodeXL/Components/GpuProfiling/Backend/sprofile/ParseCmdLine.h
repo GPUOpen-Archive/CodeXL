@@ -11,6 +11,7 @@
 #include <map>
 #include <string>
 #include "../Common/Defs.h"
+#include <vector>
 
 #include "AMDTBaseTools/Include/gtString.h"
 

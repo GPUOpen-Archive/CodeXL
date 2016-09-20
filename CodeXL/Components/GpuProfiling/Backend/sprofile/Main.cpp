@@ -328,6 +328,9 @@ bool DisplayOccupancy(const std::string& strOutputFile)
 
 bool ProfileApplication(const std::string& strCounterFile, const int& profilerBits)
 {
+
+    std::string counterfile = strCounterFile;
+
     if ((config.bTrace || config.bHSATrace) && config.bAnalyze && config.analyzeOps.strAtpFile.empty())
     {
         // use trace output as sanalyze module input
@@ -403,7 +406,7 @@ bool ProfileApplication(const std::string& strCounterFile, const int& profilerBi
     StringUtils::WideStringToUtf8String(retVal.asCharArray(), strHomePath);
 
     FileUtils::ReplaceTilde(strHomePath, config.strOutputFile);
-    FileUtils::ReplaceTilde(strHomePath, config.strCounterFile);
+    FileUtils::ReplaceTilde(strHomePath, counterfile);
 
     // replace tilde using gtString
     if (config.strInjectedApp[0] == '~')
@@ -453,7 +456,7 @@ bool ProfileApplication(const std::string& strCounterFile, const int& profilerBi
 
     params.m_strCmdArgs = config.strInjectedAppArgs;
     params.m_strWorkingDir = config.strWorkingDirectory;
-    params.m_strCounterFile = strCounterFile;
+    params.m_strCounterFile = counterfile;
     params.m_strKernelFile = config.strKernelFile;
     params.m_strAPIFilterFile = config.strAPIFilterFile;
     params.m_strDLLPath = strDirPath;

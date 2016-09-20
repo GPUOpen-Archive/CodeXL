@@ -26,7 +26,7 @@ INCLUDES = \
 	-I$(GPU_THREAD_TRACE_API_DIR) \
 	-I$(AMDTMUTEX_DIR) \
 	-I$(ADL_DIR)/include \
-	-I$(HSAUTIL_DIR)
+	-I$(HSAUTILS_DIR)
 
 STATIC_LIBS = \
 	$(BOOST_LIB_DIR)/libboost_chrono.a \
