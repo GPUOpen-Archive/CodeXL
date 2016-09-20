@@ -41,30 +41,30 @@ using namespace std;
 
 struct DeviceInfo
 {
-    int vendorId;
-    int deviceId;
-    int revId;
-    std::string deviceCALName;
-    GDT_HW_GENERATION generation;
+    int m_vendorId;                     /// vendor Id of the device
+    int m_deviceId;                     /// device Id
+    int m_revId;                        /// revision Id of the device
+    std::string m_deviceCALName;        /// CAL device name
+    GDT_HW_GENERATION m_generation;     /// generration of the device
 
     DeviceInfo()
     {
-        vendorId = 0x1002; //AMD_VENDOR_ID
-        deviceId = 0;
-        revId = 0;
+        m_vendorId = 0x1002; //AMD_VENDOR_ID
+        m_deviceId = 0;
+        m_revId = 0;
     }
 };
 
 struct CounterPassInfo
 {
-    DeviceInfo deviceInfo;
-    CounterList listofCounter;
-    unsigned int numberOfPass;
+    DeviceInfo m_deviceInfo;            /// device Info
+    CounterList m_counterList;          /// list of the counter for the device
+    unsigned int m_numberOfPass;        /// number of pass for the counters and selected deviceId
 
     CounterPassInfo()
     {
-        deviceInfo = DeviceInfo();
-        numberOfPass = 0;
+        m_deviceInfo = DeviceInfo();
+        m_numberOfPass = 0;
     }
 };
 
@@ -109,10 +109,10 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
         ("envvarfile,E", po::value<string>(), "Path to a file containing a list of environment variables that should be defined when running the profiled application. The file should contain one line for each variable in the format NAME=VALUE.")
         ("fullenv,f", "The environment variables specified with the envvar or envvarfile switch represent the full environment block.  If not specified, then the environment variables represent additions or changes to the system environment block.")
         ("list,l", "Print a list of valid counter names.")
-        ("maxpassperfile", po::value<unsigned int>()->default_value(1), "Generates counter files for given pass (used along with --list and --outputfile option)")
         ("listdetailed,L", "Print a list of valid counter names with descriptions")
         ("sessionname,N", po::value<string>(), "Name of the generated session.")
-        ("numberofpass", "Shows the number of pass for profiling with default counters or counters in the provided counter file")
+        ("maxpassperfile", po::value<unsigned int>()->default_value(1), "Limits the set of counters in the generated counter file to a set that can be collected in the the specified number of passes. If the full set of counters do not fit in the specified number of passes, then multiple counter files will be generated. Ignored if --list and --outputfile are not specified.")
+        ("numberofpass", "Print the number of passes required for the specified counter set (or the default set if no counter file is specified)")
 #ifdef _WIN32
         ("outputfile,o", po::value<string>(), "Path to OutputFile (the default is Session1.csv in an \"CodeXL\" directory under the current user's Documents directory; when performing an API trace, the default is apitrace.atp in the same location).")
 #else
@@ -160,7 +160,7 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
 
         po::options_description perfCounterOpt("Performance Counter mode options (for --perfcounter or --hsapmc)");
         perfCounterOpt.add_options()
-        ("counterfile,c", po::value<string>(), "Path to the counter file to enable selected counters (case-sensitive). If not provided, all counters will be used.")
+        ("counterfile,c", po::value< std::vector<string> >()->multitoken(), "Path to the counter file to enable selected counters (case-sensitive). If not provided, all counters will be used.")
         ("singlepass,g", "Only allow a single pass when collecting performance counters. Any counters that cannot fit into a single pass will be ignored. If specified, the GPUTime will not be collected, as a separate pass is required to query the GPUTime.")
         ("nogputime,G", "Skip collection of GPUTime when profiling a kernel (GPUTime requires a separate pass).")
         ("kerneloutput,k", po::value< std::vector<string> >()->multitoken(), "Output the specified kernel file. Valid argument values are: \n"
@@ -267,17 +267,14 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
             return false;
         }
 
-        // get the counter file
+        // get the counter files
         boost::filesystem::wpath counterFile;
 
         if (unicodeOptionsMap.count("counterfile") > 0)
         {
-            counterFile = boost::filesystem::wpath(unicodeOptionsMap["counterfile"]);
-            configOut.strCounterFile = counterFile.string();
-        }
-        else
-        {
-            configOut.strCounterFile.clear();
+            std::wstring valueStr;
+            valueStr = unicodeOptionsMap["counterfile"];
+            boost::split(configOut.counterFileList, valueStr, boost::is_any_of(","));
         }
 
         // get the kernel file
@@ -847,12 +844,27 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
 
             if (!configOut.strCounterFile.empty())
             {
-                std::cout << "Counter File is required" << std::endl << std::endl;
+                std::cout << "A counter file is required in the internal build.  Please specify a counter file using the --counterfile option" << std::endl << std::endl;
                 return false;
             }
 
 #endif
-            PrintNumberOfPass(configOut.strCounterFile);
+
+            if (!configOut.counterFileList.empty())
+            {
+                for (unsigned int i = 0; i < configOut.counterFileList.size(); ++i)
+                {
+                    PrintNumberOfPass(configOut.counterFileList[i]);
+                }
+            }
+            else
+            {
+                std::string emptyCounterFile;
+                PrintNumberOfPass(emptyCounterFile);
+            }
+
+
+
             return false;
 
         }
@@ -1196,16 +1208,17 @@ void PrintNumberOfPass(const std::string counterFile)
     std::function<void(CounterPassInfo, std::string)> PrintCounterPassInfo =
         [](CounterPassInfo counterPassInfo, std::string api)
     {
-        std::cout << "Number of Pass required for " << api.c_str() << " application for below counters (default if not provided)" << std::endl << std::endl;
-        PrintCounterList(counterPassInfo.listofCounter);
-        std::cout << "\nPass Required: " << counterPassInfo.numberOfPass << std::endl << std::endl;
+        std::cout << "The following set of counters  " << std::endl << std::endl;
+        PrintCounterList(counterPassInfo.m_counterList);
+        std::cout << "\nrequires " << counterPassInfo.m_numberOfPass << " pass(es) for a(n) " << api.c_str() << " application." << std::endl << std::endl;
     };
 
     CounterList counterList;
 
-    if (!counterFile.empty() && FileUtils::ReadFile(counterFile, counterList, true, true))
+    if (!counterFile.empty() && !FileUtils::ReadFile(counterFile, counterList, true, true))
     {
-        std::cout << "Counter File Read Successfully" << std::endl;
+        std::cout << "Unable to read counter file" << std::endl;
+        return;
     }
 
     std::vector<CounterPassInfo> counterPassInfiListForCL;
@@ -1215,7 +1228,7 @@ void PrintNumberOfPass(const std::string counterFile)
 
         for (unsigned int i = 0; i < counterPassInfiListForCL.size(); ++i)
         {
-            PrintCounterPassInfo(counterPassInfiListForCL[i], "CL");
+            PrintCounterPassInfo(counterPassInfiListForCL[i], "OpenCL");
         }
     }
 
@@ -1224,7 +1237,7 @@ void PrintNumberOfPass(const std::string counterFile)
     //HSA
     {
         std::vector<CounterPassInfo> counterPassInfiListForHSA;
-        counterPassInfiListForCL = GetNumberOfPassForAPI(GPA_API_HSA, counterList);
+        counterPassInfiListForHSA = GetNumberOfPassForAPI(GPA_API_HSA, counterList);
 
         for (unsigned int i = 0; i < counterPassInfiListForHSA.size(); ++i)
         {
@@ -1239,7 +1252,7 @@ void PrintNumberOfPass(const std::string counterFile)
 
     for (unsigned int i = 0; i < counterPassInfiListForDC.size(); ++i)
     {
-        PrintCounterPassInfo(counterPassInfiListForDC[i], "DC");
+        PrintCounterPassInfo(counterPassInfiListForDC[i], "Direct Compute");
     }
 
 #endif
@@ -1404,7 +1417,7 @@ inline void ShowExamples()
 
 bool CompareDeviceInfo(DeviceInfo first, DeviceInfo second)
 {
-    return ((first.deviceId == second.deviceId) && (first.vendorId == second.vendorId) && (first.revId == second.revId));
+    return ((first.m_deviceId == second.m_deviceId) && (first.m_vendorId == second.m_vendorId) && (first.m_revId == second.m_revId));
 };
 
 std::vector<DeviceInfo> RemoveDuplicateDevice(std::vector<DeviceInfo> deviceInfoList)
@@ -1419,7 +1432,7 @@ std::vector<DeviceInfo> RemoveDuplicateDevice(std::vector<DeviceInfo> deviceInfo
             for (unsigned int j = 0; j < tempDeviceInfoList.size(); ++j)
             {
                 if (!CompareDeviceInfo(deviceInfoList[i], tempDeviceInfoList[j]) &&
-                    AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceInfoList[i].deviceId,
+                    AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceInfoList[i].m_deviceId,
                                                                    REVISION_ID_ANY,
                                                                    deviceInfo))
                 {
@@ -1429,7 +1442,7 @@ std::vector<DeviceInfo> RemoveDuplicateDevice(std::vector<DeviceInfo> deviceInfo
         }
         else
         {
-            if (AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceInfoList[i].deviceId,
+            if (AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceInfoList[i].m_deviceId,
                                                                REVISION_ID_ANY,
                                                                deviceInfo))
             {
@@ -1443,7 +1456,7 @@ std::vector<DeviceInfo> RemoveDuplicateDevice(std::vector<DeviceInfo> deviceInfo
 
 void PrintCounterList(CounterList counterList)
 {
-    unsigned int lineend = 5;
+    unsigned int lineEnd = 5;
 
     unsigned int counterListSize = static_cast<unsigned int>(counterList.size());
     unsigned int counterListSizeMinusOne = counterListSize - 1;
@@ -1451,12 +1464,12 @@ void PrintCounterList(CounterList counterList)
     for (unsigned int i = 0; i < counterListSize; ++i)
     {
         std::cout << counterList[i];
-        lineend--;
+        lineEnd--;
 
-        if (lineend == 0)
+        if (lineEnd == 0)
         {
             std::cout << ", " << std::endl;
-            lineend = 5;
+            lineEnd = 5;
         }
         else
         {
@@ -1516,51 +1529,47 @@ std::vector<DeviceInfo> GetDeviceInfoList(GPA_API_Type apiType)
 
                 for (unsigned int i = 0; i < asicInfoList.size(); ++i)
                 {
-                    deviceInfo.deviceId = asicInfoList[i].deviceID;
-                    deviceInfo.vendorId = asicInfoList[i].vendorID;
-                    deviceInfo.revId = asicInfoList[i].revID;
-                    AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceInfo.deviceId, deviceInfo.revId, cardInfo);
-                    deviceInfo.deviceCALName = cardInfo.m_szCALName;
-                    deviceInfo.generation = cardInfo.m_generation;
+                    deviceInfo.m_deviceId = asicInfoList[i].deviceID;
+                    deviceInfo.m_vendorId = asicInfoList[i].vendorID;
+                    deviceInfo.m_revId = asicInfoList[i].revID;
+                    AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceInfo.m_deviceId, deviceInfo.m_revId, cardInfo);
+                    deviceInfo.m_deviceCALName = cardInfo.m_szCALName;
+                    deviceInfo.m_generation = cardInfo.m_generation;
                     deviceInfoList.push_back(deviceInfo);
                 }
 
                 deviceInfoList = RemoveDuplicateDevice(deviceInfoList);
-
-            }
-            else
-            {
-                std::cout << "Not and AMD Device";
             }
         }
     }
-
 
 #if defined (_LINUX) || defined (LINUX)
 
     if (apiType == GPA_API_HSA)
     {
         HSADeviceIdList hsaDeviceList;
-        HSAUtils::Instance()->GetHSADeviceIds(hsaDeviceList);
 
-        DeviceInfo deviceInfo;
-
-        GDT_GfxCardInfo cardInfo;
-
-        for (unsigned int i = 0; i < hsaDeviceList.size(); ++i)
+        if (HSAUtils::Instance()->GetHSADeviceIds(hsaDeviceList))
         {
-            deviceInfo.deviceId = hsaDeviceList[i];
-            AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceInfo.deviceId, deviceInfo.revId, cardInfo);
-            deviceInfo.deviceCALName = cardInfo.m_szCALName;
-            deviceInfo.generation = cardInfo.m_generation;
-            deviceInfoList.push_back(deviceInfo);
-        }
 
-        deviceInfoList = RemoveDuplicateDevice(deviceInfoList);
+            DeviceInfo deviceInfo;
+
+            GDT_GfxCardInfo cardInfo;
+
+            for (unsigned int i = 0; i < hsaDeviceList.size(); ++i)
+            {
+                deviceInfo.m_deviceId = hsaDeviceList[i];
+                AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceInfo.m_deviceId, deviceInfo.m_revId, cardInfo);
+                deviceInfo.m_deviceCALName = cardInfo.m_szCALName;
+                deviceInfo.m_generation = cardInfo.m_generation;
+                deviceInfoList.push_back(deviceInfo);
+            }
+
+            deviceInfoList = RemoveDuplicateDevice(deviceInfoList);
+        }
     }
 
 #endif
-
 
 #ifdef _WIN32
 
@@ -1575,12 +1584,12 @@ std::vector<DeviceInfo> GetDeviceInfoList(GPA_API_Type apiType)
 
         for (unsigned int i = 0; i < asicInfoList.size(); ++i)
         {
-            deviceInfo.deviceId = asicInfoList[i].deviceID;
-            deviceInfo.vendorId = asicInfoList[i].vendorID;
-            deviceInfo.revId = asicInfoList[i].revID;
-            AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceInfo.deviceId, deviceInfo.revId, cardInfo);
-            deviceInfo.deviceCALName = cardInfo.m_szCALName;
-            deviceInfo.generation = cardInfo.m_generation;
+            deviceInfo.m_deviceId = asicInfoList[i].deviceID;
+            deviceInfo.m_vendorId = asicInfoList[i].vendorID;
+            deviceInfo.m_revId = asicInfoList[i].revID;
+            AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceInfo.m_deviceId, deviceInfo.m_revId, cardInfo);
+            deviceInfo.m_deviceCALName = cardInfo.m_szCALName;
+            deviceInfo.m_generation = cardInfo.m_generation;
             deviceInfoList.push_back(deviceInfo);
         }
 
@@ -1588,87 +1597,87 @@ std::vector<DeviceInfo> GetDeviceInfoList(GPA_API_Type apiType)
     }
 
 #endif
-
     return deviceInfoList;
-
 }
-
-
 
 
 std::vector<CounterPassInfo> GetNumberOfPassFromGPUPerfAPI(GPA_API_Type apiType, CounterList counterList, std::vector<DeviceInfo> deviceInfoList)
 {
     gtString strDirPath = FileUtils::GetExePathAsUnicode();
-    GPA_ICounterAccessor* ppCounterAccessor;
-    GPA_ICounterScheduler* ppCounterScheduler;
+    GPA_ICounterAccessor* ppCounterAccessor = nullptr;
+    GPA_ICounterScheduler* ppCounterScheduler = nullptr;
     std::vector<CounterPassInfo> counterPassInfoList;
     CounterPassInfo counterPassInfo;
-
-    GPA_GetAvailableCountersForDeviceProc get_GPAGetAvailableCountersForDeviceProc;
+    GPA_GetAvailableCountersForDeviceProc get_GPAGetAvailableCountersForDeviceProc = nullptr;
+    GPAUtils gpaUtils;
 
     GPUPerfAPICounterLoader::Instance()->LoadPerfAPICounterDll(strDirPath);
     get_GPAGetAvailableCountersForDeviceProc = GPUPerfAPICounterLoader::Instance()->GetGPAAvailableCountersForDeviceProc();
 
-    GPAUtils gpaUtils;
-
     for (unsigned int i = 0; i < deviceInfoList.size(); ++i)
     {
         if (GPA_STATUS_OK == get_GPAGetAvailableCountersForDeviceProc(apiType,
-                                                                      deviceInfoList[i].vendorId,
-                                                                      deviceInfoList[i].deviceId,
-                                                                      deviceInfoList[i].revId,
+                                                                      deviceInfoList[i].m_vendorId,
+                                                                      deviceInfoList[i].m_deviceId,
+                                                                      deviceInfoList[i].m_revId,
                                                                       &ppCounterAccessor,
-                                                                      &ppCounterScheduler))
+                                                                      &ppCounterScheduler) &&
+            ppCounterScheduler != nullptr &&
+            ppCounterAccessor != nullptr &&
+            GPA_STATUS_OK == ppCounterScheduler->SetCounterAccessor(ppCounterAccessor,
+                                                                    deviceInfoList[i].m_vendorId,
+                                                                    deviceInfoList[i].m_deviceId,
+                                                                    deviceInfoList[i].m_revId))
         {
-            ppCounterScheduler->SetCounterAccessor(ppCounterAccessor,
-                                                   deviceInfoList[i].vendorId,
-                                                   deviceInfoList[i].deviceId,
-                                                   deviceInfoList[i].revId);
-
             if (!counterList.empty())
             {
                 if (apiType == GPA_API_DIRECTX_11)
                 {
-                    gpaUtils.FilterNonComputeCounters(static_cast<GPA_HW_GENERATION>(deviceInfoList[i].generation), counterList);
+                    gpaUtils.FilterNonComputeCounters(static_cast<GPA_HW_GENERATION>(deviceInfoList[i].m_generation), counterList);
                 }
 
                 ppCounterScheduler->DisableAllCounters();
-                unsigned int counterIndex;
-                unsigned int numPass;
+                unsigned int counterIndex = 0;
+                unsigned int numPass = 0;
+                bool success = false;
 
                 for (unsigned int j = 0; j < counterList.size(); ++j)
                 {
-                    ppCounterAccessor->GetCounterIndex(counterList[j].c_str(), &counterIndex);
-                    ppCounterScheduler->EnableCounter(counterIndex);
+                    success &= ppCounterAccessor->GetCounterIndex(counterList[j].c_str(), &counterIndex) ?
+                               (ppCounterScheduler->EnableCounter(counterIndex) == GPA_STATUS_OK) : false;
+
                 }
 
-                ppCounterScheduler->GetNumRequiredPasses(&numPass);
-                counterPassInfo.deviceInfo.vendorId = deviceInfoList[i].vendorId;
-                counterPassInfo.deviceInfo.deviceId = deviceInfoList[i].deviceId;
-                counterPassInfo.deviceInfo.revId = deviceInfoList[i].revId;
-                counterPassInfo.deviceInfo.deviceCALName = deviceInfoList[i].deviceCALName;
-                counterPassInfo.deviceInfo.generation = deviceInfoList[i].generation;
-                counterPassInfo.listofCounter = counterList;
-                counterPassInfo.numberOfPass = numPass;
-                counterPassInfoList.push_back(counterPassInfo);
+                success &= (GPA_STATUS_OK == ppCounterScheduler->GetNumRequiredPasses(&numPass));
+
+                if (success)
+                {
+                    counterPassInfo.m_deviceInfo.m_vendorId = deviceInfoList[i].m_vendorId;
+                    counterPassInfo.m_deviceInfo.m_deviceId = deviceInfoList[i].m_deviceId;
+                    counterPassInfo.m_deviceInfo.m_revId = deviceInfoList[i].m_revId;
+                    counterPassInfo.m_deviceInfo.m_deviceCALName = deviceInfoList[i].m_deviceCALName;
+                    counterPassInfo.m_deviceInfo.m_generation = deviceInfoList[i].m_generation;
+                    counterPassInfo.m_counterList = counterList;
+                    counterPassInfo.m_numberOfPass = numPass;
+                    counterPassInfoList.push_back(counterPassInfo);
+                }
 
             }
             else
             {
-                unsigned int numPass;
+                unsigned int numPass = 0;
                 unsigned int availableCounters = ppCounterAccessor->GetNumCounters();
                 CounterList tempCounterList;
+                bool success = true;
 
                 for (unsigned int j = 0; j < availableCounters; ++j)
                 {
-                    ppCounterScheduler->EnableCounter(j);
                     tempCounterList.push_back(ppCounterAccessor->GetCounterName(j));
-
                 }
 
                 if (apiType == GPA_API_DIRECTX_11)
                 {
-                    gpaUtils.FilterNonComputeCounters(static_cast<GPA_HW_GENERATION>(deviceInfoList[i].generation), tempCounterList);
+                    gpaUtils.FilterNonComputeCounters(static_cast<GPA_HW_GENERATION>(deviceInfoList[i].m_generation), tempCounterList);
                 }
 
                 if (apiType == GPA_API_HSA)
@@ -1677,17 +1686,27 @@ std::vector<CounterPassInfo> GetNumberOfPassFromGPUPerfAPI(GPA_API_Type apiType,
                 }
                 else
                 {
-                    ppCounterScheduler->GetNumRequiredPasses(&numPass);
+                    for (unsigned int j = 0; j < tempCounterList.size(); ++j)
+                    {
+                        uint32_t index = 0;
+                        success &= ppCounterAccessor->GetCounterIndex(tempCounterList[j].c_str(), &index) ?
+                                   (ppCounterScheduler->EnableCounter(index) == GPA_STATUS_OK) : false;
+                    }
+
+                    success &= (GPA_STATUS_OK == ppCounterScheduler->GetNumRequiredPasses(&numPass));
                 }
 
-                counterPassInfo.deviceInfo.vendorId = deviceInfoList[i].vendorId;
-                counterPassInfo.deviceInfo.deviceId = deviceInfoList[i].deviceId;
-                counterPassInfo.deviceInfo.revId = deviceInfoList[i].revId;
-                counterPassInfo.deviceInfo.deviceCALName = deviceInfoList[i].deviceCALName;
-                counterPassInfo.deviceInfo.generation = deviceInfoList[i].generation;
-                counterPassInfo.listofCounter = tempCounterList;
-                counterPassInfo.numberOfPass = numPass;
-                counterPassInfoList.push_back(counterPassInfo);
+                if (success)
+                {
+                    counterPassInfo.m_deviceInfo.m_vendorId = deviceInfoList[i].m_vendorId;
+                    counterPassInfo.m_deviceInfo.m_deviceId = deviceInfoList[i].m_deviceId;
+                    counterPassInfo.m_deviceInfo.m_revId = deviceInfoList[i].m_revId;
+                    counterPassInfo.m_deviceInfo.m_deviceCALName = deviceInfoList[i].m_deviceCALName;
+                    counterPassInfo.m_deviceInfo.m_generation = deviceInfoList[i].m_generation;
+                    counterPassInfo.m_counterList = tempCounterList;
+                    counterPassInfo.m_numberOfPass = numPass;
+                    counterPassInfoList.push_back(counterPassInfo);
+                }
             }
         }
     }
@@ -1698,42 +1717,6 @@ std::vector<CounterPassInfo> GetNumberOfPassFromGPUPerfAPI(GPA_API_Type apiType,
 
 void ListCounterToFileForMaxPass(std::string counterFile, unsigned int maxPass)
 {
-    auto countDigit = [](unsigned int number)-> unsigned int
-    {
-        unsigned int numDigit = 0;
-
-        if (number == 0)
-        {
-            return 1;
-        }
-
-        while (number > 0)
-        {
-            numDigit++;
-            number /= 10;
-        }
-
-        return numDigit;
-    };
-
-    auto convertToChar = [](int number, std::function<unsigned int(unsigned int)> countDigitLambda)->std::string
-    {
-        unsigned int numOfDigits = countDigitLambda(number);
-        char* charValue = new char[numOfDigits + 1];
-        char characters[] = "0123456789";
-
-        for (int i = numOfDigits - 1; i >= 0; i--)
-        {
-            charValue[i] = characters[number % 10];
-            number /= 10;
-        }
-
-        charValue[numOfDigits] = '\0';
-        std::string returnChar(charValue);
-        delete[] charValue;
-        return returnChar;
-    };
-
     CounterList counterList;
     GPA_API_Type apiType;
     std::vector<CounterList> counterListByEachPass;
@@ -1748,22 +1731,22 @@ void ListCounterToFileForMaxPass(std::string counterFile, unsigned int maxPass)
 
         for (unsigned int i = 0; i < counterPassInfoList.size(); ++i)
         {
-            std::string cardAndPassNumber;
-            cardAndPassNumber = counterPassInfoList[i].deviceInfo.deviceCALName;
-            cardAndPassNumber += "_pass";
+            std::string deviceNameWithPass = counterPassInfoList[i].m_deviceInfo.m_deviceCALName + "_pass";
             counterListByEachPass = GetCounterListsByMaxPassForEachDevice(apiType, counterPassInfoList[i], maxPass, leftCounterList);
 
             for (unsigned int j = 0; j < counterListByEachPass.size(); ++j)
             {
-                std::string cardWithPass = cardAndPassNumber + std::string(convertToChar(j + 1, countDigit));
-                cardWithPass = GetCounterListOutputFileName(counterFile, apiTypeString, cardWithPass);
+                std::stringstream stringStream;
+                std::string cardWithPass;
+                stringStream << deviceNameWithPass << (j + 1);
+                cardWithPass = GetCounterListOutputFileName(counterFile, apiTypeString, stringStream.str());
                 std::string fullPath = FileUtils::GetDefaultOutputPath() + cardWithPass;
                 FileUtils::WriteFile(fullPath, counterListByEachPass[j]);
             }
 
             if (!leftCounterList.empty())
             {
-                std::cout << "Below counters can't be profiled with given maxpass of " << maxPass << " for " << apiTypeString << std::endl;
+                std::cout << "The following individual counters require more than " << maxPass << " pass(es) for " << apiTypeString << std::endl;
                 PrintCounterList(leftCounterList);
             }
         }
@@ -1778,25 +1761,22 @@ void ListCounterToFileForMaxPass(std::string counterFile, unsigned int maxPass)
 
         for (unsigned int i = 0; i < counterPassInfoList.size(); ++i)
         {
-            std::string cardAndPassNumber;
-            cardAndPassNumber = counterPassInfoList[i].deviceInfo.deviceCALName;
-            cardAndPassNumber += "_withmaxpassof_";
-            cardAndPassNumber += convertToChar(maxPass, countDigit);
-            cardAndPassNumber += "_pass";
-            //GetCounterListOutputFileName(counterFile, apiType, )
+            std::string deviceNameWithPass = counterPassInfoList[i].m_deviceInfo.m_deviceCALName + "_pass";
             counterListByEachPass = GetCounterListsByMaxPassForEachDevice(apiType, counterPassInfoList[i], maxPass, leftCounterList);
 
             for (unsigned int j = 0; j < counterListByEachPass.size(); ++j)
             {
-                std::string cardWithPass = cardAndPassNumber + std::string(convertToChar(j + 1, countDigit));
-                cardWithPass = GetCounterListOutputFileName(counterFile, apiTypeString, cardWithPass);
+                std::stringstream stringStream;
+                std::string cardWithPass;
+                stringStream << deviceNameWithPass << (j + 1);
+                cardWithPass = GetCounterListOutputFileName(counterFile, apiTypeString, stringStream.str());
                 std::string fullPath = FileUtils::GetDefaultOutputPath() + cardWithPass;
                 FileUtils::WriteFile(fullPath, counterListByEachPass[j]);
             }
 
             if (!leftCounterList.empty())
             {
-                std::cout << "Below counters can't be profiled with given maxpass of " << maxPass << " for " << apiTypeString << std::endl;
+                std::cout << "The following individual counters require more than " << maxPass << " pass(es) for " << apiTypeString << std::endl;
                 PrintCounterList(leftCounterList);
             }
         }
@@ -1812,25 +1792,22 @@ void ListCounterToFileForMaxPass(std::string counterFile, unsigned int maxPass)
 
         for (unsigned int i = 0; i < counterPassInfoList.size(); ++i)
         {
-            std::string cardAndPassNumber;
-            cardAndPassNumber = counterPassInfoList[i].deviceInfo.deviceCALName;
-            cardAndPassNumber += "_withmaxpassof_";
-            cardAndPassNumber += convertToChar(maxPass, countDigit);
-            cardAndPassNumber += "_pass";
-            //GetCounterListOutputFileName(counterFile, apiType, )
+            std::string deviceNameWithPass = counterPassInfoList[i].m_deviceInfo.m_deviceCALName + "_pass";
             counterListByEachPass = GetCounterListsByMaxPassForEachDevice(apiType, counterPassInfoList[i], maxPass, leftCounterList);
 
             for (unsigned int j = 0; j < counterListByEachPass.size(); ++j)
             {
-                std::string cardWithPass = cardAndPassNumber + std::string(convertToChar(j + 1, countDigit));
-                cardWithPass = GetCounterListOutputFileName(counterFile, apiTypeString, cardWithPass);
+                std::stringstream stringStream;
+                std::string cardWithPass;
+                stringStream << deviceNameWithPass << (j + 1);
+                cardWithPass = GetCounterListOutputFileName(counterFile, apiTypeString, stringStream.str());
                 std::string fullPath = FileUtils::GetDefaultOutputPath() + cardWithPass;
                 FileUtils::WriteFile(fullPath, counterListByEachPass[j]);
             }
 
             if (!leftCounterList.empty())
             {
-                std::cout << "Below counters can't be profiled with given maxpass of " << maxPass << " for " << apiTypeString << std::endl << std::endl;;
+                std::cout << "The following individual counters require more than " << maxPass << " pass(es) for " << apiTypeString << std::endl;
                 PrintCounterList(leftCounterList);
                 std::cout << std::endl;
             }
@@ -1843,51 +1820,60 @@ void ListCounterToFileForMaxPass(std::string counterFile, unsigned int maxPass)
 std::vector<CounterList> GetCounterListsByMaxPassForEachDevice(GPA_API_Type apiType, CounterPassInfo counterPassInfo, unsigned int maxPass, CounterList& leftCounterList)
 {
     std::vector<CounterList> counterListEachPass;
-
     gtString strDirPath = FileUtils::GetExePathAsUnicode();
-    GPA_ICounterAccessor* ppCounterAccessor;
-    GPA_ICounterScheduler* ppCounterScheduler;
+    GPA_ICounterAccessor* ppCounterAccessor = nullptr;
+    GPA_ICounterScheduler* ppCounterScheduler = nullptr;
+    GPA_GetAvailableCountersForDeviceProc getGPAGetAvailableCountersForDeviceProc = nullptr;
 
-    GPA_GetAvailableCountersForDeviceProc getGPAGetAvailableCountersForDeviceProc;
+    bool success = false;
 
-    GPUPerfAPICounterLoader::Instance()->LoadPerfAPICounterDll(strDirPath);
+    success = GPUPerfAPICounterLoader::Instance()->LoadPerfAPICounterDll(strDirPath);
     getGPAGetAvailableCountersForDeviceProc = GPUPerfAPICounterLoader::Instance()->GetGPAAvailableCountersForDeviceProc();
+    success &= (getGPAGetAvailableCountersForDeviceProc != nullptr);
 
-    if (counterPassInfo.numberOfPass > maxPass)
+    if (success && counterPassInfo.m_numberOfPass > maxPass)
     {
-        CounterList handleCounters = counterPassInfo.listofCounter;
+        CounterList handleCounters = counterPassInfo.m_counterList;
 
         if (GPA_STATUS_OK == getGPAGetAvailableCountersForDeviceProc(apiType,
-                                                                     counterPassInfo.deviceInfo.vendorId,
-                                                                     counterPassInfo.deviceInfo.deviceId,
-                                                                     counterPassInfo.deviceInfo.revId,
+                                                                     counterPassInfo.m_deviceInfo.m_vendorId,
+                                                                     counterPassInfo.m_deviceInfo.m_deviceId,
+                                                                     counterPassInfo.m_deviceInfo.m_revId,
                                                                      &ppCounterAccessor,
-                                                                     &ppCounterScheduler))
+                                                                     &ppCounterScheduler) &&
+            ppCounterScheduler != nullptr &&
+            ppCounterAccessor != nullptr &&
+            (GPA_STATUS_OK == ppCounterScheduler->SetCounterAccessor(ppCounterAccessor,
+                                                                     counterPassInfo.m_deviceInfo.m_vendorId,
+                                                                     counterPassInfo.m_deviceInfo.m_deviceId,
+                                                                     counterPassInfo.m_deviceInfo.m_revId)))
         {
-            ppCounterScheduler->SetCounterAccessor(ppCounterAccessor,
-                                                   counterPassInfo.deviceInfo.vendorId,
-                                                   counterPassInfo.deviceInfo.deviceId,
-                                                   counterPassInfo.deviceInfo.revId);
-
-            for (unsigned int j = 0; j < counterPassInfo.numberOfPass; ++j)
+            for (unsigned int j = 0; j < counterPassInfo.m_numberOfPass; ++j)
             {
                 ppCounterScheduler->DisableAllCounters();
 
                 CounterList includeCountersInThisPass;
                 CounterList excludeCountersInThisPass;
 
+                bool succeed = false;
+
                 for (unsigned int k = 0; k < handleCounters.size(); ++k)
                 {
-                    unsigned int index;
-                    unsigned int numberOfPass;
-                    ppCounterAccessor->GetCounterIndex(handleCounters[k].c_str(), &index);
-                    ppCounterScheduler->EnableCounter(index);
-                    ppCounterScheduler->GetNumRequiredPasses(&numberOfPass);
+                    unsigned int index = 0;
+                    unsigned int numberOfPass = 0;
 
-                    if (numberOfPass > maxPass)
+                    succeed = ppCounterAccessor->GetCounterIndex(handleCounters[k].c_str(), &index);
+                    succeed &= (GPA_STATUS_OK == ppCounterScheduler->EnableCounter(index));
+                    succeed &= (GPA_STATUS_OK == ppCounterScheduler->GetNumRequiredPasses(&numberOfPass));
+
+                    if (succeed && numberOfPass > maxPass)
                     {
-                        ppCounterScheduler->DisableCounter(index);
-                        excludeCountersInThisPass.push_back(handleCounters[k]);
+                        succeed &= (GPA_STATUS_OK == ppCounterScheduler->DisableCounter(index));
+
+                        if (succeed)
+                        {
+                            excludeCountersInThisPass.push_back(handleCounters[k]);
+                        }
                     }
                     else
                     {
@@ -1895,24 +1881,26 @@ std::vector<CounterList> GetCounterListsByMaxPassForEachDevice(GPA_API_Type apiT
                     }
                 }
 
-                if (!includeCountersInThisPass.empty())
+                if (succeed)
                 {
-                    counterListEachPass.push_back(includeCountersInThisPass);
+                    if (!includeCountersInThisPass.empty())
+                    {
+                        counterListEachPass.push_back(includeCountersInThisPass);
+                    }
+
+                    handleCounters = excludeCountersInThisPass;
+
+                    if (j == counterPassInfo.m_numberOfPass - 1 && !handleCounters.empty())
+                    {
+                        leftCounterList = handleCounters;
+                    }
                 }
-
-                handleCounters = excludeCountersInThisPass;
-
-                if (j == counterPassInfo.numberOfPass - 1 && !handleCounters.empty())
-                {
-                    leftCounterList = handleCounters;
-                }
-
             }
         }
     }
     else
     {
-        counterListEachPass.push_back(counterPassInfo.listofCounter);
+        counterListEachPass.push_back(counterPassInfo.m_counterList);
     }
 
     return counterListEachPass;

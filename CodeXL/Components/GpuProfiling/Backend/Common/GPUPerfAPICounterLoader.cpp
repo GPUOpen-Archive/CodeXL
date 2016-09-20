@@ -6,7 +6,6 @@ bool GPUPerfAPICounterLoader::LoadPerfAPICounterDll(const gtString& strDLLPath)
 {
     if (!m_bGPAPerfAPICounterLoaded)
     {
-
         // Set DLL Path
         std::string strGPACounterDllName;
 
@@ -28,13 +27,13 @@ bool GPUPerfAPICounterLoader::LoadPerfAPICounterDll(const gtString& strDLLPath)
         std::string utf8DllPath;
         StringUtils::WideStringToUtf8String(strGPACounterDll.asCharArray(), utf8DllPath);
         // Load counter access DLL
-        m_DllModuleHandle = OSUtils::Instance()->GenericLoadLibrary(utf8DllPath);
+        m_dllModuleHandle = OSUtils::Instance()->GenericLoadLibrary(utf8DllPath);
 
-        if (m_DllModuleHandle != NULL)
+        if (m_dllModuleHandle != NULL)
         {
-            m_pGetAvailableCountersByGen = reinterpret_cast<GPA_GetAvailableCountersByGenerationProc>(OSUtils::Instance()->GetSymbolAddr(m_DllModuleHandle, "GPA_GetAvailableCountersByGeneration"));
+            m_pGetAvailableCountersByGen = reinterpret_cast<GPA_GetAvailableCountersByGenerationProc>(OSUtils::Instance()->GetSymbolAddr(m_dllModuleHandle, "GPA_GetAvailableCountersByGeneration"));
             SpAssertRet(m_pGetAvailableCountersByGen != NULL) false;
-            m_pGetAvailableCountersForDevice = reinterpret_cast<GPA_GetAvailableCountersForDeviceProc>(OSUtils::Instance()->GetSymbolAddr(m_DllModuleHandle, "GPA_GetAvailableCounters"));
+            m_pGetAvailableCountersForDevice = reinterpret_cast<GPA_GetAvailableCountersForDeviceProc>(OSUtils::Instance()->GetSymbolAddr(m_dllModuleHandle, "GPA_GetAvailableCounters"));
             SpAssertRet(m_pGetAvailableCountersForDevice != NULL) false;
 
             if (m_pGetAvailableCountersByGen != nullptr && m_pGetAvailableCountersForDevice != nullptr)
@@ -56,11 +55,11 @@ bool GPUPerfAPICounterLoader::LoadPerfAPICounterDll(const gtString& strDLLPath)
 }
 
 
-void GPUPerfAPICounterLoader::UnLoadPerfAPICounterDll()
+void GPUPerfAPICounterLoader::UnloadPerfAPICounterDll()
 {
-    if (m_DllModuleHandle)
+    if (m_dllModuleHandle)
     {
-        OSUtils::Instance()->GenericUnloadLibrary(m_DllModuleHandle);
+        OSUtils::Instance()->GenericUnloadLibrary(m_dllModuleHandle);
         m_bGPAPerfAPICounterLoaded = false;
         m_pGetAvailableCountersByGen = nullptr;
         m_pGetAvailableCountersForDevice = nullptr;
@@ -85,14 +84,15 @@ bool GPUPerfAPICounterLoader::IsLoaded()
     return m_bGPAPerfAPICounterLoaded;
 }
 
-GPUPerfAPICounterLoader::GPUPerfAPICounterLoader()
+GPUPerfAPICounterLoader::GPUPerfAPICounterLoader():
+    m_pGetAvailableCountersByGen(nullptr),
+    m_pGetAvailableCountersForDevice(nullptr),
+    m_bGPAPerfAPICounterLoaded(false),
+    m_dllModuleHandle(nullptr)
 {
-    m_bGPAPerfAPICounterLoaded = false;
-    m_pGetAvailableCountersByGen = nullptr;
-    m_pGetAvailableCountersForDevice = nullptr;
 }
 
 GPUPerfAPICounterLoader::~GPUPerfAPICounterLoader()
 {
-    UnLoadPerfAPICounterDll();
+    UnloadPerfAPICounterDll();
 }

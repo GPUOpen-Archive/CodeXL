@@ -101,6 +101,8 @@ const unsigned int MAX_NBR_AGENTS = 5;
 #define CL_AGENT_TRACE      GPU_PROFILER_LIBRARY_NAME_PREFIX "CLTraceAgent"
 #define CL_AGENT_PERF_CTR   GPU_PROFILER_LIBRARY_NAME_PREFIX "CLProfileAgent"
 #define CL_AGENT_SUB_KRNL   GPU_PROFILER_LIBRARY_NAME_PREFIX "CLSubKernelProfileAgent"
+#define LOG_FILE_NAME   "codexlgpuprofiler"
+#define LOG_FILE_EXTENSION ".log"
 
 #ifdef _WIN32
 
@@ -299,6 +301,457 @@ void CheckOutputFile(const Config& configInner)
     }
 }
 
+bool DisplayOccupancy(const std::string& strOutputFile)
+{
+    bool success = false;
+    if (!config.strOccupancyParamsFile.empty())
+    {
+        OccupancyUtils::OccupancyParams paramsInner;
+
+        std::string occupancyError;
+
+        //Generate HTML file
+        if (OccupancyUtils::GetOccupancyParamsFromFile(config.strOccupancyParamsFile, paramsInner, occupancyError) &&
+            GenerateOccupancyChart(paramsInner, strOutputFile, occupancyError))
+        {
+            success = true;
+        }
+        else
+        {
+            std::cout << "Error generating occupancy display file." << std::endl << occupancyError << std::endl;
+            success = false;
+        }
+    }
+
+    return success;
+}
+
+bool ProfileApplication(const std::string& strCounterFile, const int& profilerBits)
+{
+    if ((config.bTrace || config.bHSATrace) && config.bAnalyze && config.analyzeOps.strAtpFile.empty())
+    {
+        // use trace output as sanalyze module input
+        config.analyzeOps.strAtpFile = config.strOutputFile;
+    }
+
+    params.m_strOutputFile = config.strOutputFile;
+    params.m_strSessionName = config.strSessionName;
+
+    // Note: the following is a fix for CODEXL-50 -- use osDirectory to create the output directory
+    //       if it does not already exist.  Some of the code here can be removed when we move to
+    //       use osFilePath/gtString in more places in the backend (i.e. like in all members in the
+    //       "Config" sturcture declared in ParseCmdLine.h
+    gtString gtStringOutputFile;
+    gtStringOutputFile.fromUtf8String(params.m_strOutputFile.c_str());
+    osFilePath outputFilePath(gtStringOutputFile);
+    osDirectory outputDir;
+    outputFilePath.getFileDirectory(outputDir);
+
+    if (!outputDir.exists())
+    {
+        outputDir.create();
+    }
+
+    // Note: end fix for CODEXL-50
+
+    //----------------------------------------
+    // Merge mode
+    //----------------------------------------
+
+    if (config.bMergeMode)
+    {
+        cout << "--- Merge Mode ---" << endl;
+        cout << "Temp files prefix (Process ID): " << config.uiPID << endl;
+        processId = config.uiPID;
+
+        if (config.strWorkingDirectory.isEmpty())
+        {
+            osFilePath tempPath;
+            tempPath.setPath(osFilePath::OS_CURRENT_DIRECTORY);
+            strTmpFilePath = tempPath.asString();
+        }
+        else
+        {
+            strTmpFilePath = config.strWorkingDirectory;
+        }
+
+        config.bTrace = true;
+        params.m_bTimeOutBasedOutput = true;
+        MergeFragFiles(1);
+
+        return true;
+    }
+
+    //----------------------------------------
+    // Remove all tmp files
+    //----------------------------------------
+    FileUtils::RemoveFragFiles();
+
+    //----------------------------------------
+    // Get CodeXLGpuProfiler.exe's full path
+    //----------------------------------------
+    gtString strDirPath = FileUtils::GetExePathAsUnicode();
+
+#if defined (_LINUX) || defined (LINUX)
+
+    //----------------------------------------
+    // Set replace tilde
+    //----------------------------------------
+    gtString retVal;
+    osGetCurrentProcessEnvVariableValue(L"HOME", retVal);
+    string strHomePath;
+    StringUtils::WideStringToUtf8String(retVal.asCharArray(), strHomePath);
+
+    FileUtils::ReplaceTilde(strHomePath, config.strOutputFile);
+    FileUtils::ReplaceTilde(strHomePath, config.strCounterFile);
+
+    // replace tilde using gtString
+    if (config.strInjectedApp[0] == '~')
+    {
+        config.strInjectedApp.extruct(0, 1);
+        gtString tempStr = config.strInjectedApp;
+        config.strInjectedApp = retVal;
+        config.strInjectedApp.appendFormattedString(L"%ls", tempStr.asCharArray());
+    }
+
+    // For linux, we need to check file existence before we fork
+    osFile fileToCheck(config.strInjectedApp);
+
+    if (!fileToCheck.exists())
+    {
+        cout << "Process failed to run. Make sure you have specified the correct path." << endl;
+        return -1;
+    }
+
+#endif
+
+    bool bAnyAgentSet = false;
+
+    //----------------------------------------
+    // Set Agent
+    //----------------------------------------
+    if (config.bHSATrace || config.bHSAPMC)
+    {
+        bAnyAgentSet |= SetHSAServer(strDirPath);
+    }
+
+    bAnyAgentSet |= SetAgent(strDirPath);
+
+    if (!bAnyAgentSet)
+    {
+        if (!config.bAnalyzeOnly && !config.bMergeMode)
+        {
+            cout << "No profile mode specified. Nothing will be done." << endl;
+        }
+
+        return false;
+    }
+
+    //----------------------------------------
+    // Pass params
+    //----------------------------------------
+
+    params.m_strCmdArgs = config.strInjectedAppArgs;
+    params.m_strWorkingDir = config.strWorkingDirectory;
+    params.m_strCounterFile = strCounterFile;
+    params.m_strKernelFile = config.strKernelFile;
+    params.m_strAPIFilterFile = config.strAPIFilterFile;
+    params.m_strDLLPath = strDirPath;
+    params.m_cOutputSeparator = config.cOutputSeparator;
+    params.m_bVerbose = config.bVerbose;
+    params.m_bPerfCounter = config.bPerfCounter;
+    params.m_bOutputIL = config.bOutputIL;
+    params.m_bOutputISA = config.bOutputISA;
+    params.m_bOutputCL = config.bOutputCL;
+    params.m_bOutputASM = config.bOutputASM;
+    params.m_bOutputHSAIL = config.bOutputHSAIL;
+    params.m_bTrace = config.bTrace;
+    params.m_bTimeOutBasedOutput = config.bTimeOut;
+    params.m_uiTimeOutInterval = config.uiTimeOutInterval;
+    params.m_bTestMode = config.bTestMode;
+    params.m_bQueryRetStat = config.bQueryRetStat;
+    params.m_bCollapseClGetEventInfo = config.bCollapseClGetEventInfo;
+    params.m_bUserTimer = config.bUserTimer;
+    params.m_strTimerDLLFile = config.strTimerDLLFile;
+    params.m_strUserTimerFn = config.strUserTimerFn;
+    params.m_strUserTimerInitFn = config.strUserTimerInitFn;
+    params.m_strUserTimerDestroyFn = config.strUserTimerDestroyFn;
+    params.m_bStackTrace = config.bSym;
+    params.m_uiMaxNumOfAPICalls = config.uiMaxNumOfAPICalls;
+    params.m_uiMaxKernels = config.uiMaxKernels;
+    params.m_bKernelOccupancy = config.bOccupancy;
+    params.m_bUserPMC = config.bUserPMCSampler;
+    params.m_bCompatibilityMode = config.bCompatibilityMode;
+    params.m_strUserPMCLibPath = config.strUserPMCLibPath;
+    params.m_bHSATrace = config.bHSATrace;
+    params.m_bHSAPMC = config.bHSAPMC;
+    params.m_bGMTrace = config.bGMTrace;
+    params.m_mapEnvVars = config.mapEnvVars;
+    params.m_bFullEnvBlock = config.bFullEnvBlock;
+    params.m_bForceSinglePassPMC = config.bForceSinglePassPMC;
+    params.m_bGPUTimePMC = config.bGPUTimePMC;
+    params.m_bStartDisabled = config.bStartDisabled;
+    params.m_delayInMilliseconds = config.m_delayInMilliseconds > 0 ? config.m_delayInMilliseconds : 0;
+    params.m_bDelayStartEnabled = config.m_delayInMilliseconds > 0;
+    params.m_durationInMilliseconds = config.m_durationInMilliseconds > 0 ? config.m_durationInMilliseconds : 0;
+    params.m_bProfilerDurationEnabled = config.m_durationInMilliseconds > 0;
+
+#ifdef GDT_INTERNAL
+
+    if ((params.m_bPerfCounter || params.m_bHSAPMC) && params.m_strCounterFile.empty())
+    {
+        std::cout << "A counter file must be specified when collecting perf counters in the internal build\n";
+        std::cout << "Use --counterfile (or -c) to specify a counter file\n";
+        return false;
+    }
+
+#endif
+
+    //for debugging
+    //cout << strDirPath << endl;
+    //cout << config.strInjectedApp << endl;
+    //cout << params.m_strOutputFile << endl;
+
+    FileUtils::PassParametersByFile(params);
+
+    //----------------------------------------
+    // Get App working dir
+    //----------------------------------------
+
+    gtString strAppWorkingDirectory;
+
+    if (config.strWorkingDirectory.isEmpty())
+    {
+        osFilePath injectedApp(config.strInjectedApp);
+        // remove file name and ext:
+        injectedApp.setFileName(L"");
+        injectedApp.setFileExtension(L"");
+        strAppWorkingDirectory = injectedApp.asString();
+        // FileUtils::GetWorkingDirectory(config.strInjectedApp, strAppWorkingDirectory);
+    }
+    else
+    {
+        strAppWorkingDirectory = config.strWorkingDirectory;
+    }
+
+
+    //----------------------------------------
+    // Set signal
+    //----------------------------------------
+    if (config.bTrace || config.bHSATrace || config.bOccupancy || config.bThreadTrace)
+    {
+        // set tmp file path
+        strTmpFilePath = FileUtils::GetTempFragFilePathAsUnicode();
+
+        signal(SIGABRT, MergeFragFiles);
+        signal(SIGTERM, MergeFragFiles);
+        signal(SIGINT, MergeFragFiles);
+    }
+
+    //----------------------------------------
+    // Create process
+    //----------------------------------------
+
+    //check that the application to be profiled is valid
+    if (!CheckIsAppValid(config.strInjectedApp, profilerBits))
+    {
+        wcout << config.strInjectedApp.asCharArray() << " is not a valid application" << endl;
+        return false;
+    }
+
+#ifdef _DEBUG
+    bool reportPerfCounterEnablement = true;
+#else
+    bool reportPerfCounterEnablement = false;
+#endif
+
+    if (config.bHSAPMC)
+    {
+        SetHSASoftCPEnvVar(reportPerfCounterEnablement);
+    }
+
+#ifdef _WIN32
+
+    gtString strAppCommandLine;
+    strAppCommandLine.appendFormattedString(L"\"%ls\"", config.strInjectedApp.asCharArray());
+
+    // create a command line if the app argument list is not empty
+    // put arguments in quotes
+    if (!config.strInjectedAppArgs.isEmpty())
+    {
+        strAppCommandLine.appendFormattedString(L" %ls", config.strInjectedAppArgs.asCharArray());
+    }
+
+    // call SetDllDirectory so that the app being profiled can locate and load AMDTBaseTools/AMDTOSWrappers DLLs
+    SetDllDirectory(strDirPath.asCharArray());
+
+    int ret = CreateProcessWithDetour(strDirPath, strAppCommandLine, strAppWorkingDirectory, !config.bNoDetours);
+
+    if (ret != 0)
+    {
+        FileUtils::DeleteTmpFile();
+        return false;
+    }
+
+#else
+    SetPreLoadLibs();
+
+    std::string strAppCommandLine;
+
+    // create a command line if the app argument list is not empty
+    // put arguments in quotes
+    size_t nCmdlineLength = 0;
+
+    if (!config.strInjectedAppArgs.isEmpty())
+    {
+        StringUtils::WideStringToUtf8String(config.strInjectedAppArgs.asCharArray(), strAppCommandLine);
+        nCmdlineLength = strAppCommandLine.length();
+    }
+
+    char* pszCmdline = new(std::nothrow) char[nCmdlineLength + 1];
+
+    if (pszCmdline == NULL)
+    {
+        cout << "Error processing command line\n";
+        return false;
+    }
+
+    if (nCmdlineLength > 0)
+    {
+        strcpy(pszCmdline, strAppCommandLine.c_str());
+    }
+    else
+    {
+        pszCmdline[0] = '\0';
+    }
+
+    char szExe[SP_MAX_PATH] = { '\0' };
+    std::string convertedInjectApp;
+    StringUtils::WideStringToUtf8String(config.strInjectedApp.asCharArray(), convertedInjectApp);
+
+    strcpy(szExe, convertedInjectApp.c_str());
+
+    const char* pEnvBlock = NULL;
+
+    EnvSysBlockString strEnvBlock;
+
+    if (!config.mapEnvVars.empty())
+    {
+        strEnvBlock = GetEnvironmentBlock(config.mapEnvVars, !config.bFullEnvBlock);
+
+        if (!strEnvBlock.empty())
+        {
+            pEnvBlock = strEnvBlock.c_str();
+        }
+    }
+
+    std::string convertedWorkingDir;
+    StringUtils::WideStringToUtf8String(strAppWorkingDirectory.asCharArray(), convertedWorkingDir);
+
+    processId = OSUtils::Instance()->ExecProcess(szExe, pszCmdline, convertedWorkingDir.c_str(), pEnvBlock);
+
+    if (processId < 0)
+    {
+        // error
+        processId = 0;
+        std::cout << "error in fork()\n";
+        exit(1);
+    }
+    else if (processId > 0)
+    {
+        // parent code
+        int status;
+        waitpid(processId, &status, 0);
+
+        // if process returned an error, return that error code from CodeXLGpuProfiler
+        if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
+        {
+            retVal = WEXITSTATUS(status);
+        }
+
+        // if process was terminated by a signal, return that signal number from CodeXLGpuProfiler
+        if (WIFSIGNALED(status) && WTERMSIG(status) != 0)
+        {
+            retVal = WTERMSIG(status);
+        }
+    }
+
+    delete[] pszCmdline;
+#endif
+
+    if (config.bHSAPMC)
+    {
+        UnsetHSASoftCPEnvVar(reportPerfCounterEnablement);
+    }
+
+    //----------------------------------------
+    // Unset agent before calling CLUtils to generate atp file header
+    //----------------------------------------
+    OSUtils::Instance()->UnsetEnvVar(OCL_ENABLE_PROFILING_ENV_VAR);
+
+    if (config.bHSATrace)
+    {
+        OSUtils::Instance()->UnsetEnvVar(HSA_ENABLE_PROFILING_ENV_VAR);
+    }
+
+    //----------------------------------------
+    // Merge result if needed
+    //----------------------------------------
+
+    MergeFragFiles(1);
+    CheckOutputFile(config);
+
+    return true;
+}
+
+
+bool ProcessCommandLine(const std::string& strCounterFile)
+{
+    //If the occupancy switch is set, open the occupancy parameters file and parse
+    //Then, generate the HTML output.
+    if (config.bOccupancyDisplay)
+    {
+        if (!config.strOccupancyParamsFile.empty())
+        {
+            return DisplayOccupancy(config.strOutputFile);
+        }
+    }
+
+    bool success = false;
+
+    if (!config.bAnalyzeOnly)
+    {
+        //Get the number of bits of the profiler
+        int iProfilerNbrBits = FileUtils::FILE_BITS_UNKNOWN;
+
+        gtString strProfiler = FileUtils::GetExeFullPathAsUnicode();
+
+        iProfilerNbrBits = GetNbrAppBits(strProfiler);
+        success = ProfileApplication(strCounterFile, iProfilerNbrBits);
+    }
+
+
+    //----------------------------------------
+    // Summary
+    //----------------------------------------
+    if (config.bAnalyze)
+    {
+        if (!APITraceAnalyze(config))
+        {
+            cout << "\nFailed to generate summary pages\n";
+            success &= false;
+        }
+    }
+
+    //----------------------------------------
+    // Cleanup
+    //----------------------------------------
+
+    FileUtils::DeleteTmpFile();
+
+    return success;
+}
+
 #ifdef _WIN32
     int _tmain(int argc, wchar_t* argv[])
 #else
@@ -307,17 +760,12 @@ void CheckOutputFile(const Config& configInner)
 {
     int retVal = 0;
 
-    std::string strLogFile = FileUtils::GetDefaultOutputPath() + "codexlgpuprofiler.log";
-    LogFileInitialize(strLogFile.c_str());
+    std::string strLogFileWithPath = FileUtils::GetDefaultOutputPath() + LOG_FILE_NAME + LOG_FILE_EXTENSION;
+    LogFileInitialize(strLogFileWithPath.c_str());
+
     // First, register the out-of-memory event handler.
     std::set_new_handler(osDumpCallStackAndExit);
 
-    //Get the number of bits of the profiler
-    int iProfilerNbrBits = FileUtils::FILE_BITS_UNKNOWN;
-
-    gtString strProfiler = FileUtils::GetExeFullPathAsUnicode();
-
-    iProfilerNbrBits = GetNbrAppBits(strProfiler);
 
 #ifdef _WIN32
 
@@ -344,470 +792,156 @@ void CheckOutputFile(const Config& configInner)
 
 #endif
 
-    //If the occupancy switch is set, open the occupancy parameters file and parse
-    //Then, generate the HTML output.
-    if (config.bOccupancyDisplay)
+    bool success = false;
+
+    bool isCounterFileMoreThanOne = config.counterFileList.size() > 1 ? true : false;
+    std::string defaultOutputFileName = config.strOutputFile;
+    
+    if (!config.counterFileList.empty())
     {
-        if (!config.strOccupancyParamsFile.empty())
+        bool isReplaying = false;
+
+        for (unsigned int i = 0; i < config.counterFileList.size(); ++i)
         {
-            OccupancyUtils::OccupancyParams paramsInner;
-
-            std::string occupancyError;
-
-            //Generate HTML file
-            if (OccupancyUtils::GetOccupancyParamsFromFile(config.strOccupancyParamsFile, paramsInner, occupancyError) &&
-                GenerateOccupancyChart(paramsInner, config.strOutputFile, occupancyError))
+            std::string outputFileName;
+            std::string logFile;
+            std::string appendString;
+            
+            if (!outputFileName.empty())
             {
-                return 0;
+                outputFileName.clear();
+            }
+
+            if (isReplaying)
+            {
+                config.bTrace = false;
+                config.bHSATrace = false;
+                config.bMergeMode = false;
+                config.bSubKernelProfile = false;
+                config.bThreadTrace = false;
+                config.bOccupancy = false;
+                config.strOutputFile = defaultOutputFileName;
+            }
+
+            //Output File
+            //----------------------------------------
+            // Get output file path
+            //----------------------------------------
+            if (config.strOutputFile.empty())
+            {
+                if (isCounterFileMoreThanOne)
+                {
+                    std::stringstream stringStream;
+                    stringStream << "_pass" << (i + 1);
+                    appendString = stringStream.str() ;
+                }
+
+                if (config.bPerfCounter)
+                {
+                    outputFileName = FileUtils::GetDefaultProfileOutputFile(appendString);
+                }
+                else if (config.bTrace || config.bHSATrace || config.bMergeMode)
+                {
+                    outputFileName = FileUtils::GetDefaultTraceOutputFile();
+                }
+                else if (config.bSubKernelProfile)
+                {
+                    outputFileName = FileUtils::GetDefaultSubKernelProfileOutputFile();
+                }
+                else if (config.bThreadTrace)
+                {
+                    outputFileName = FileUtils::GetDefaultThreadTraceOutputDir();
+                }
             }
             else
             {
-                std::cout << "Error generating occupancy display file." << std::endl << occupancyError << std::endl;
-                return -1;
+                config.strOutputFile = FileUtils::ToAbsPath(config.strOutputFile);
+                outputFileName = config.strOutputFile;
+
+                if (isCounterFileMoreThanOne)
+                {
+                    std::stringstream stringStream;
+                    stringStream << "_pass" << (i + 1);
+                    outputFileName += stringStream.str();
+                }
+
+                std::string strRequiredExt("");
+
+                if (config.bPerfCounter || config.bHSAPMC)
+                {
+                    strRequiredExt.assign(PERF_COUNTER_EXT);
+                    outputFileName = GetExpectedOutputFile(outputFileName, strRequiredExt);
+                }
+                else if (config.bTrace || config.bHSATrace || config.bMergeMode)
+                {
+                    strRequiredExt.assign(TRACE_EXT);
+                    outputFileName = GetExpectedOutputFile(outputFileName, strRequiredExt);
+                }
+                else if (config.bOccupancy)
+                {
+                    strRequiredExt.assign(OCCUPANCY_EXT);
+                    outputFileName = GetExpectedOutputFile(outputFileName, strRequiredExt);
+                }
             }
+
+            config.strOutputFile = outputFileName;
+            success = ProcessCommandLine(config.counterFileList[i]);
+            isReplaying = true;
         }
     }
-
-    if (!config.bAnalyzeOnly)
+    else
     {
-        //----------------------------------------
-        // Get output file path
-        //----------------------------------------
+        std::string counterFile;
+        std::string outputFileName;
+
         if (config.strOutputFile.empty())
         {
-            if (config.bTrace || config.bHSATrace || config.bMergeMode)
+            if (config.bPerfCounter)
             {
-                config.strOutputFile = FileUtils::GetDefaultTraceOutputFile();
+                outputFileName = FileUtils::GetDefaultProfileOutputFile();
+            }
+            else if (config.bTrace || config.bHSATrace || config.bMergeMode)
+            {
+                outputFileName = FileUtils::GetDefaultTraceOutputFile();
             }
             else if (config.bSubKernelProfile)
             {
-                config.strOutputFile = FileUtils::GetDefaultSubKernelProfileOutputFile();
+                outputFileName = FileUtils::GetDefaultSubKernelProfileOutputFile();
             }
             else if (config.bThreadTrace)
             {
-                config.strOutputFile = FileUtils::GetDefaultThreadTraceOutputDir();
-            }
-            else
-            {
-                config.strOutputFile = FileUtils::GetDefaultProfileOutputFile();
+                outputFileName = FileUtils::GetDefaultThreadTraceOutputDir();
             }
         }
         else
         {
             config.strOutputFile = FileUtils::ToAbsPath(config.strOutputFile);
+            outputFileName = config.strOutputFile;
 
             std::string strRequiredExt("");
 
-            if (config.bTrace || config.bHSATrace || config.bMergeMode)
-            {
-                strRequiredExt.assign(TRACE_EXT);
-                config.strOutputFile = GetExpectedOutputFile(config.strOutputFile, strRequiredExt);
-            }
-            else if (config.bPerfCounter || config.bHSAPMC)
+            if (config.bPerfCounter || config.bHSAPMC)
             {
                 strRequiredExt.assign(PERF_COUNTER_EXT);
-                config.strOutputFile = GetExpectedOutputFile(config.strOutputFile, strRequiredExt);
+                outputFileName = GetExpectedOutputFile(outputFileName, strRequiredExt);
+            }
+            else if (config.bTrace || config.bHSATrace || config.bMergeMode)
+            {
+                strRequiredExt.assign(TRACE_EXT);
+                outputFileName = GetExpectedOutputFile(outputFileName, strRequiredExt);
             }
             else if (config.bOccupancy)
             {
                 strRequiredExt.assign(OCCUPANCY_EXT);
-                config.strOutputFile = GetExpectedOutputFile(config.strOutputFile, strRequiredExt);
+                outputFileName = GetExpectedOutputFile(outputFileName, strRequiredExt);
             }
         }
 
-        if ((config.bTrace || config.bHSATrace) && config.bAnalyze && config.analyzeOps.strAtpFile.empty())
-        {
-            // use trace output as sanalyze module input
-            config.analyzeOps.strAtpFile = config.strOutputFile;
-        }
-
-        params.m_strOutputFile = config.strOutputFile;
-        params.m_strSessionName = config.strSessionName;
-
-        // Note: the following is a fix for CODEXL-50 -- use osDirectory to create the output directory
-        //       if it does not already exist.  Some of the code here can be removed when we move to
-        //       use osFilePath/gtString in more places in the backend (i.e. like in all members in the
-        //       "Config" sturcture declared in ParseCmdLine.h
-        gtString gtStringOutputFile;
-        gtStringOutputFile.fromUtf8String(params.m_strOutputFile.c_str());
-        osFilePath outputFilePath(gtStringOutputFile);
-        osDirectory outputDir;
-        outputFilePath.getFileDirectory(outputDir);
-
-        if (!outputDir.exists())
-        {
-            outputDir.create();
-        }
-
-        // Note: end fix for CODEXL-50
-
-        //----------------------------------------
-        // Merge mode
-        //----------------------------------------
-
-        if (config.bMergeMode)
-        {
-            cout << "--- Merge Mode ---" << endl;
-            cout << "Temp files prefix (Process ID): " << config.uiPID << endl;
-            processId = config.uiPID;
-
-            if (config.strWorkingDirectory.isEmpty())
-            {
-                osFilePath tempPath;
-                tempPath.setPath(osFilePath::OS_CURRENT_DIRECTORY);
-                strTmpFilePath = tempPath.asString();
-            }
-            else
-            {
-                strTmpFilePath = config.strWorkingDirectory;
-            }
-
-            config.bTrace = true;
-            params.m_bTimeOutBasedOutput = true;
-            MergeFragFiles(1);
-
-            return 0;
-        }
-
-        //----------------------------------------
-        // Remove all tmp files
-        //----------------------------------------
-        FileUtils::RemoveFragFiles();
-
-        //----------------------------------------
-        // Get CodeXLGpuProfiler.exe's full path
-        //----------------------------------------
-        gtString strDirPath = FileUtils::GetExePathAsUnicode();
-
-#if defined (_LINUX) || defined (LINUX)
-
-        //----------------------------------------
-        // Set replace tilde
-        //----------------------------------------
-        gtString retVal;
-        osGetCurrentProcessEnvVariableValue(L"HOME", retVal);
-        string strHomePath;
-        StringUtils::WideStringToUtf8String(retVal.asCharArray(), strHomePath);
-
-        FileUtils::ReplaceTilde(strHomePath, config.strOutputFile);
-        FileUtils::ReplaceTilde(strHomePath, config.strCounterFile);
-
-        // replace tilde using gtString
-        if (config.strInjectedApp[0] == '~')
-        {
-            config.strInjectedApp.extruct(0, 1);
-            gtString tempStr = config.strInjectedApp;
-            config.strInjectedApp = retVal;
-            config.strInjectedApp.appendFormattedString(L"%ls", tempStr.asCharArray());
-        }
-
-        // For linux, we need to check file existence before we fork
-        osFile fileToCheck(config.strInjectedApp);
-
-        if (!fileToCheck.exists())
-        {
-            cout << "Process failed to run. Make sure you have specified the correct path." << endl;
-            return -1;
-        }
-
-#endif
-
-        bool bAnyAgentSet = false;
-
-        //----------------------------------------
-        // Set Agent
-        //----------------------------------------
-        if (config.bHSATrace || config.bHSAPMC)
-        {
-            bAnyAgentSet |= SetHSAServer(strDirPath);
-        }
-
-        bAnyAgentSet |= SetAgent(strDirPath);
-
-        if (!bAnyAgentSet)
-        {
-            if (!config.bAnalyzeOnly && !config.bMergeMode)
-            {
-                cout << "No profile mode specified. Nothing will be done." << endl;
-            }
-
-            return 1;
-        }
-
-        //----------------------------------------
-        // Pass params
-        //----------------------------------------
-
-        params.m_strCmdArgs = config.strInjectedAppArgs;
-        params.m_strWorkingDir = config.strWorkingDirectory;
-        params.m_strCounterFile = config.strCounterFile;
-        params.m_strKernelFile = config.strKernelFile;
-        params.m_strAPIFilterFile = config.strAPIFilterFile;
-        params.m_strDLLPath = strDirPath;
-        params.m_cOutputSeparator = config.cOutputSeparator;
-        params.m_bVerbose = config.bVerbose;
-        params.m_bPerfCounter = config.bPerfCounter;
-        params.m_bOutputIL = config.bOutputIL;
-        params.m_bOutputISA = config.bOutputISA;
-        params.m_bOutputCL = config.bOutputCL;
-        params.m_bOutputASM = config.bOutputASM;
-        params.m_bOutputHSAIL = config.bOutputHSAIL;
-        params.m_bTrace = config.bTrace;
-        params.m_bTimeOutBasedOutput = config.bTimeOut;
-        params.m_uiTimeOutInterval = config.uiTimeOutInterval;
-        params.m_bTestMode = config.bTestMode;
-        params.m_bQueryRetStat = config.bQueryRetStat;
-        params.m_bCollapseClGetEventInfo = config.bCollapseClGetEventInfo;
-        params.m_bUserTimer = config.bUserTimer;
-        params.m_strTimerDLLFile = config.strTimerDLLFile;
-        params.m_strUserTimerFn = config.strUserTimerFn;
-        params.m_strUserTimerInitFn = config.strUserTimerInitFn;
-        params.m_strUserTimerDestroyFn = config.strUserTimerDestroyFn;
-        params.m_bStackTrace = config.bSym;
-        params.m_uiMaxNumOfAPICalls = config.uiMaxNumOfAPICalls;
-        params.m_uiMaxKernels = config.uiMaxKernels;
-        params.m_bKernelOccupancy = config.bOccupancy;
-        params.m_bUserPMC = config.bUserPMCSampler;
-        params.m_bCompatibilityMode = config.bCompatibilityMode;
-        params.m_strUserPMCLibPath = config.strUserPMCLibPath;
-        params.m_bHSATrace = config.bHSATrace;
-        params.m_bHSAPMC = config.bHSAPMC;
-        params.m_bGMTrace = config.bGMTrace;
-        params.m_mapEnvVars = config.mapEnvVars;
-        params.m_bFullEnvBlock = config.bFullEnvBlock;
-        params.m_bForceSinglePassPMC = config.bForceSinglePassPMC;
-        params.m_bGPUTimePMC = config.bGPUTimePMC;
-        params.m_bStartDisabled = config.bStartDisabled;
-        params.m_delayInMilliseconds = config.m_delayInMilliseconds > 0 ? config.m_delayInMilliseconds : 0;
-        params.m_bDelayStartEnabled = config.m_delayInMilliseconds > 0;
-        params.m_durationInMilliseconds = config.m_durationInMilliseconds > 0 ? config.m_durationInMilliseconds : 0;
-        params.m_bProfilerDurationEnabled = config.m_durationInMilliseconds > 0;
-
-#ifdef GDT_INTERNAL
-
-        if ((params.m_bPerfCounter || params.m_bHSAPMC) && params.m_strCounterFile.empty())
-        {
-            std::cout << "A counter file must be specified when collecting perf counters in the internal build\n";
-            std::cout << "Use --counterfile (or -c) to specify a counter file\n";
-            return -1;
-        }
-
-#endif
-
-        //for debugging
-        //cout << strDirPath << endl;
-        //cout << config.strInjectedApp << endl;
-        //cout << params.m_strOutputFile << endl;
-
-        FileUtils::PassParametersByFile(params);
-
-        //----------------------------------------
-        // Get App working dir
-        //----------------------------------------
-
-        gtString strAppWorkingDirectory;
-
-        if (config.strWorkingDirectory.isEmpty())
-        {
-            osFilePath injectedApp(config.strInjectedApp);
-            // remove file name and ext:
-            injectedApp.setFileName(L"");
-            injectedApp.setFileExtension(L"");
-            strAppWorkingDirectory = injectedApp.asString();
-            // FileUtils::GetWorkingDirectory(config.strInjectedApp, strAppWorkingDirectory);
-        }
-        else
-        {
-            strAppWorkingDirectory = config.strWorkingDirectory;
-        }
-
-
-        //----------------------------------------
-        // Set signal
-        //----------------------------------------
-        if (config.bTrace || config.bHSATrace || config.bOccupancy || config.bThreadTrace)
-        {
-            // set tmp file path
-            strTmpFilePath = FileUtils::GetTempFragFilePathAsUnicode();
-
-            signal(SIGABRT, MergeFragFiles);
-            signal(SIGTERM, MergeFragFiles);
-            signal(SIGINT,  MergeFragFiles);
-        }
-
-        //----------------------------------------
-        // Create process
-        //----------------------------------------
-
-        //check that the application to be profiled is valid
-        if (!CheckIsAppValid(config.strInjectedApp, iProfilerNbrBits))
-        {
-            wcout << config.strInjectedApp.asCharArray() << " is not a valid application" << endl;
-            return -1;
-        }
-
-#ifdef _DEBUG
-        bool reportPerfCounterEnablement = true;
-#else
-        bool reportPerfCounterEnablement = false;
-#endif
-
-        if (config.bHSAPMC)
-        {
-            SetHSASoftCPEnvVar(reportPerfCounterEnablement);
-        }
-
-#ifdef _WIN32
-
-        gtString strAppCommandLine;
-        strAppCommandLine.appendFormattedString(L"\"%ls\"", config.strInjectedApp.asCharArray());
-
-        // create a command line if the app argument list is not empty
-        // put arguments in quotes
-        if (!config.strInjectedAppArgs.isEmpty())
-        {
-            strAppCommandLine.appendFormattedString(L" %ls", config.strInjectedAppArgs.asCharArray());
-        }
-
-        // call SetDllDirectory so that the app being profiled can locate and load AMDTBaseTools/AMDTOSWrappers DLLs
-        SetDllDirectory(strDirPath.asCharArray());
-
-        int ret = CreateProcessWithDetour(strDirPath, strAppCommandLine, strAppWorkingDirectory, !config.bNoDetours);
-
-        if (ret != 0)
-        {
-            FileUtils::DeleteTmpFile();
-            return -1;
-        }
-
-#else
-        SetPreLoadLibs();
-
-        std::string strAppCommandLine;
-
-        // create a command line if the app argument list is not empty
-        // put arguments in quotes
-        size_t nCmdlineLength = 0;
-
-        if (!config.strInjectedAppArgs.isEmpty())
-        {
-            StringUtils::WideStringToUtf8String(config.strInjectedAppArgs.asCharArray(), strAppCommandLine);
-            nCmdlineLength = strAppCommandLine.length();
-        }
-
-        char* pszCmdline = new(std::nothrow) char[nCmdlineLength + 1];
-
-        if (pszCmdline == NULL)
-        {
-            cout << "Error processing command line\n";
-            return -1;
-        }
-
-        if (nCmdlineLength > 0)
-        {
-            strcpy(pszCmdline, strAppCommandLine.c_str());
-        }
-        else
-        {
-            pszCmdline[0] = '\0';
-        }
-
-        char szExe[SP_MAX_PATH] = {'\0'};
-        std::string convertedInjectApp;
-        StringUtils::WideStringToUtf8String(config.strInjectedApp.asCharArray(), convertedInjectApp);
-
-        strcpy(szExe, convertedInjectApp.c_str());
-
-        const char* pEnvBlock = NULL;
-
-        EnvSysBlockString strEnvBlock;
-
-        if (!config.mapEnvVars.empty())
-        {
-            strEnvBlock = GetEnvironmentBlock(config.mapEnvVars, !config.bFullEnvBlock);
-
-            if (!strEnvBlock.empty())
-            {
-                pEnvBlock = strEnvBlock.c_str();
-            }
-        }
-
-        std::string convertedWorkingDir;
-        StringUtils::WideStringToUtf8String(strAppWorkingDirectory.asCharArray(), convertedWorkingDir);
-
-        processId = OSUtils::Instance()->ExecProcess(szExe, pszCmdline, convertedWorkingDir.c_str(), pEnvBlock);
-
-        if (processId < 0)
-        {
-            // error
-            processId = 0;
-            std::cout << "error in fork()\n";
-            exit(1);
-        }
-        else if (processId > 0)
-        {
-            // parent code
-            int status;
-            waitpid(processId, &status, 0);
-
-            // if process returned an error, return that error code from CodeXLGpuProfiler
-            if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
-            {
-                retVal = WEXITSTATUS(status);
-            }
-
-            // if process was terminated by a signal, return that signal number from CodeXLGpuProfiler
-            if (WIFSIGNALED(status) && WTERMSIG(status) != 0)
-            {
-                retVal = WTERMSIG(status);
-            }
-        }
-
-        delete[] pszCmdline;
-#endif
-
-        if (config.bHSAPMC)
-        {
-            UnsetHSASoftCPEnvVar(reportPerfCounterEnablement);
-        }
-
-        //----------------------------------------
-        // Unset agent before calling CLUtils to generate atp file header
-        //----------------------------------------
-        OSUtils::Instance()->UnsetEnvVar(OCL_ENABLE_PROFILING_ENV_VAR);
-
-        if (config.bHSATrace)
-        {
-            OSUtils::Instance()->UnsetEnvVar(HSA_ENABLE_PROFILING_ENV_VAR);
-        }
-
-        //----------------------------------------
-        // Merge result if needed
-        //----------------------------------------
-
-        MergeFragFiles(1);
-        CheckOutputFile(config);
+        config.strOutputFile = outputFileName;
+        success = ProcessCommandLine(counterFile);
     }
 
-
-    //----------------------------------------
-    // Summary
-    //----------------------------------------
-    if (config.bAnalyze)
-    {
-        if (!APITraceAnalyze(config))
-        {
-            cout << "Failed to generate summary pages";
-        }
-    }
-
-    //----------------------------------------
-    // Cleanup
-    //----------------------------------------
-
-    FileUtils::DeleteTmpFile();
-
-    return retVal;
+    return retVal = success ? 0 : -1;
 }
 
 static void MergeFragFiles(int sig)

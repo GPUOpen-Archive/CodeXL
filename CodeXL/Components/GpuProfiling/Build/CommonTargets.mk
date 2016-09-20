@@ -98,7 +98,7 @@ $(OBJ_DIR)/%.o: $(CELF_DIR)/Src/%.cpp
 $(OBJ_DIR)/%.o: $(COMMON_SRC)/HSATestCommon/%.cpp
 	$(BUILD_SRC)
 
-$(OBJ_DIR)/%.o: $(HSAUTIL_DIR)/%.cpp
+$(OBJ_DIR)/%.o: $(HSAUTILS_DIR)/%.cpp
 	$(BUILD_SRC)
 
 # clean targets

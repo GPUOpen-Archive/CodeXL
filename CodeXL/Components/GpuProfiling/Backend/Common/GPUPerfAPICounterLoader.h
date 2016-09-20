@@ -2,7 +2,7 @@
 // Copyright (c) 2016 Advanced Micro Devices, Inc. All rights reserved.
 /// \author AMD Developer Tools Team
 /// \file
-/// \brief GPUPerfAPI Utilities
+/// \brief GPUPerfAPI Counter dll Loader
 //==============================================================================
 
 #ifndef _GPU_PERFAPI_COUNTER_LOADER_H_
@@ -25,6 +25,7 @@ public:
 
     /// Loads the dll for the GPU Perf API counter
     /// \param strDLLPath GPA DLL Path
+    /// \return true if the dll is loaded successfully otherwise false
     bool LoadPerfAPICounterDll(const gtString& strDLLPath);
 
     /// Accessor to whether or not GPA Perf API Counter has been loaded
@@ -32,7 +33,7 @@ public:
     bool IsLoaded();
 
     /// unloads the currently loaded GPA Perf API counter dll
-    void UnLoadPerfAPICounterDll();
+    void UnloadPerfAPICounterDll();
 
     /// Accessor to the function pointer of the GPA Perf API Counters exposed function
     /// \return if dll is loaded return function pointer to the GPA_GetAvailableCounters function otherwise null pointer
@@ -51,7 +52,7 @@ private:
     GPA_GetAvailableCountersByGenerationProc m_pGetAvailableCountersByGen;     ///< Function to retrieve list of counters for a particular hw generation
     GPA_GetAvailableCountersForDeviceProc    m_pGetAvailableCountersForDevice; ///< Function to retrieve list of counters for a particular device
     bool                                     m_bGPAPerfAPICounterLoaded;       ///< Flag indicating whther the GPA perf api counter dll is loaded or not
-    LIB_HANDLE                               m_DllModuleHandle;                ///< Handle to the GPA Perf Counter dll
+    LIB_HANDLE                               m_dllModuleHandle;                ///< Handle to the GPA Perf Counter dll
 };
 
 #endif

@@ -969,34 +969,34 @@ std::string FileUtils::GetDefaultOutputPath()
     return std::string(szDefaultOutputPath);
 }
 
-std::string FileUtils::GetDefaultProfileOutputFile()
+std::string FileUtils::GetDefaultProfileOutputFile(const std::string& appendToDefaultFileName)
 {
-    return GetDefaultOutputPath() + "Session1.csv";
+    return GetDefaultOutputPath() + "Session1" + (appendToDefaultFileName.empty() ? "":appendToDefaultFileName) + ".csv";
 }
 
-std::string FileUtils::GetDefaultOccupancyOutputFile()
+std::string FileUtils::GetDefaultOccupancyOutputFile(const std::string& appendToDefaultFileName)
 {
-    return GetDefaultOutputPath() + "Session1.occupancy";
+    return GetDefaultOutputPath() + "Session1" + (appendToDefaultFileName.empty() ? "" : appendToDefaultFileName) + ".occupancy";
 }
 
-std::string FileUtils::GetDefaultPerfMarkerOutputFile()
+std::string FileUtils::GetDefaultPerfMarkerOutputFile(const std::string& appendToDefaultFileName)
 {
-    return GetDefaultOutputPath() + "apitrace" PERFMARKER_EXT;
+    return GetDefaultOutputPath() + "apitrace" +(appendToDefaultFileName.empty() ? "" : appendToDefaultFileName) + PERFMARKER_EXT;
 }
 
-std::string FileUtils::GetDefaultTraceOutputFile()
+std::string FileUtils::GetDefaultTraceOutputFile(const std::string& appendToDefaultFileName)
 {
-    return GetDefaultOutputPath() + "apitrace.atp";
+    return GetDefaultOutputPath() + "apitrace" + (appendToDefaultFileName.empty() ? "" : appendToDefaultFileName) + ".atp";
 }
 
-std::string FileUtils::GetDefaultSubKernelProfileOutputFile()
+std::string FileUtils::GetDefaultSubKernelProfileOutputFile(const std::string& appendToDefaultFileName)
 {
-    return GetDefaultOutputPath() + "subkernelprofile.csv";
+    return GetDefaultOutputPath() + "subkernelprofile" + (appendToDefaultFileName.empty() ? "" : appendToDefaultFileName) + ".csv";
 }
 
-std::string FileUtils::GetDefaultThreadTraceOutputDir()
+std::string FileUtils::GetDefaultThreadTraceOutputDir(const std::string& appendToDefaultFileName)
 {
-    return GetDefaultOutputPath() + "clthreadtrace";
+    return GetDefaultOutputPath() + "clthreadtrace" + (appendToDefaultFileName.empty() ? "" : appendToDefaultFileName);
 }
 
 bool FileUtils::MergeFiles(const std::wstring& strNewFileName, const std::wstring& strFileName1,
