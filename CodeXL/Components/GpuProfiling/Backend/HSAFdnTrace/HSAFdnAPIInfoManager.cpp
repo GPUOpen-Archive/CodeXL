@@ -186,18 +186,21 @@ void HSAAPIInfoManager::FlushNonAPITimestampData(const osProcessId& pid)
         {
             AMDTScopeLock lock(m_asyncTimeStampsMtx);
 
-            string tmpKernelTimestampFile = GetTempFileName(pid, 0, TMP_ASYNC_COPY_TIME_STAMP_EXT);
-            ofstream foutCopyTS(tmpKernelTimestampFile.c_str(), fstream::out | fstream::app);
-
-            for (auto timestamp : m_asyncCopyTimestamps)
+            if (m_asyncCopyTimestamps.size() > 0)
             {
-                WriteAsyncCopyTimestamp(foutCopyTS, timestamp);
-                foutCopyTS << std::endl;
+                string tmpKernelTimestampFile = GetTempFileName(pid, 0, TMP_ASYNC_COPY_TIME_STAMP_EXT);
+                ofstream foutCopyTS(tmpKernelTimestampFile.c_str(), fstream::out | fstream::app);
+
+                for (auto timestamp : m_asyncCopyTimestamps)
+                {
+                    WriteAsyncCopyTimestamp(foutCopyTS, timestamp);
+                    foutCopyTS << std::endl;
+                }
+
+                foutCopyTS.close();
+
+                m_asyncCopyTimestamps.clear();
             }
-
-            foutCopyTS.close();
-
-            m_asyncCopyTimestamps.clear();
         }
     }
 }
