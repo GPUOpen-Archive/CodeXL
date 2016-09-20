@@ -144,7 +144,7 @@ long PwrProfDrvIoctlImpl(struct file* file, unsigned int ioctl_num, unsigned lon
 
     PROFILER_PROPERTIES prof_props;
     PROF_CONFIGS prof_configs;
-    ProfileConfig* prof_config;
+    ProfileConfig prof_config;
 
     FILE_HEADER file_header;
     DATA_BUFFER data_buffer;
@@ -253,9 +253,8 @@ long PwrProfDrvIoctlImpl(struct file* file, unsigned int ioctl_num, unsigned lon
 
             /* Get the profiler config */
             clientId = prof_configs.ulClientId;
-            prof_config = (ProfileConfig*)(prof_configs.uliProfileConfigs);
 
-            for (i = 0; i < prof_configs.ulConfigCnt; i++, prof_config++)
+            for (i = 0; i < prof_configs.ulConfigCnt; i++)
             {
                 if (CopyFromUser(&prof_config, (ProfileConfig*)(prof_configs.uliProfileConfigs) + i, sizeof(ProfileConfig)) == 0)
                 {
