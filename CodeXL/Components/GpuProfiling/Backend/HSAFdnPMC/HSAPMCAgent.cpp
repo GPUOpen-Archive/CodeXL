@@ -15,6 +15,8 @@
 #include "GlobalSettings.h"
 
 #include "HSAPMCInterceptionTable1_0.h"
+#include "HSAPMCInterceptionTable1_2.h"
+#include "HSAAPITableVersions.h"
 #include "HSAAgentUtils.h"
 
 #include "HSAGPAProfiler.h"
@@ -50,13 +52,27 @@ extern "C" bool DLL_PUBLIC OnLoad(void* pTable, uint64_t runtimeVersion, uint64_
 
     std::cout << "CodeXL GPU Profiler " << GPUPROFILER_BACKEND_VERSION_STRING << " is enabled\n";
 
-    if (0 == runtimeVersion)
+    if (ROCM_1_1_X_AND_EARLIER_ROOT_RUNTIME_VERSION == runtimeVersion)
     {
+        // ROCm versions 1.1.1 and earlier
         InitHSAAPIInterceptPMC1_0(reinterpret_cast<ApiTable1_0*>(pTable));
     }
     else
     {
-        InitHSAAPIInterceptPMC(reinterpret_cast<HsaApiTable*>(pTable));
+        HsaApiTable* pHsaTable = reinterpret_cast<HsaApiTable*>(pTable);
+
+#ifdef FUTURE_ROCR_VERSION
+        if (IsROCm12(pHsaTable))
+        {
+            // ROCm 1.2 backwards compatibility
+            HsaApiTable1_2* pHsaTable1_2 = reinterpret_cast<HsaApiTable1_2*>(pTable);
+            InitHSAAPIInterceptPMC1_2(pHsaTable1_2);
+        }
+        else
+#endif
+        {
+            InitHSAAPIInterceptPMC(pHsaTable);
+        }
     }
 
     Parameters params;

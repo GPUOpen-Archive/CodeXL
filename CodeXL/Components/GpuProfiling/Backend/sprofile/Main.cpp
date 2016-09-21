@@ -582,6 +582,8 @@ void CheckOutputFile(const Config& configInner)
         params.m_bDelayStartEnabled = config.m_delayInMilliseconds > 0;
         params.m_durationInMilliseconds = config.m_durationInMilliseconds > 0 ? config.m_durationInMilliseconds : 0;
         params.m_bProfilerDurationEnabled = config.m_durationInMilliseconds > 0;
+        params.m_bForceSingleGPU = config.bForceSingleGPU;
+        params.m_uiForcedGpuIndex = config.uiForcedGpuIndex;
 
 #ifdef GDT_INTERNAL
 

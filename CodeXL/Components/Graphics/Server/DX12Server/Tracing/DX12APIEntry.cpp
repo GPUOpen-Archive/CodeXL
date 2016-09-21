@@ -96,7 +96,9 @@ void DX12APIEntry::AppendAPITraceLine(gtASCIIString& out, double inStartTime, do
     // APIType APIFunctionId InterfacePtr D3D12Interface_FunctionName(Parameters) = ReturnValue StartMillisecond EndMillisecond SampleId
     void* handle = nullptr;
     const char* type = "\0";
-    const char* parameters = GetParameterString();
+
+    gtASCIIString parameterString;
+    const char* parameters = GetParameterString(parameterString);
 
     if (wrapperInfo)
     {
@@ -180,7 +182,7 @@ void DX12APIEntry::AddParameter(unsigned int index, int type, const void* pParam
 
     if (mParameterBuffer)
     {
-        unsigned int bufferLength = BYTES_PER_PARAMETER - 5;
+        unsigned int bufferLength = BYTES_PER_PARAMETER_DATA;
         unsigned int length = 0;
         char* buffer = mParameterBuffer;
 
@@ -233,6 +235,7 @@ void DX12APIEntry::AddParameter(unsigned int index, int type, const void* pParam
                 {
                     // 1 byte less to account for terminator
                     length = bufferLength - 1;
+                    Log(logMESSAGE, "DX12APIEntry::AddParameter: string parameter too large. String will be truncated\n");
                 }
 
                 break;
@@ -246,6 +249,7 @@ void DX12APIEntry::AddParameter(unsigned int index, int type, const void* pParam
                 {
                     // round down length to even number
                     length = ((bufferLength - 2) & 0xfffffffe);
+                    Log(logMESSAGE, "DX12APIEntry::AddParameter: wide string parameter wide string too large. String will be truncated\n");
                 }
 
                 break;
@@ -290,7 +294,9 @@ void DX12APIEntry::AddParameter(unsigned int index, int type, const void* pParam
                 break;
         }
 
-        *buffer++ = (char)length;
+        bufferSize_t len = (bufferSize_t)length;
+        memcpy(buffer, &len, sizeof(bufferSize_t));
+        buffer += sizeof(bufferSize_t);
 
         if (type == PARAMETER_POINTER || type == PARAMETER_POINTER_SPECIAL)
         {
@@ -318,7 +324,7 @@ void DX12APIEntry::AddParameter(unsigned int index, int type, const void* pParam
 //-----------------------------------------------------------------------------
 void DX12APIEntry::GetParameterAsString(PARAMETER_TYPE paramType, UINT dataLength, const char* pRawData, char* ioParameterString) const
 {
-    int bufferLength = BYTES_PER_PARAMETER - 5;
+    int bufferLength = BYTES_PER_PARAMETER_DATA;
 
     switch (paramType)
     {

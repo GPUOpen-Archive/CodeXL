@@ -143,9 +143,16 @@ struct ParameterEntry
 };
 
 //-----------------------------------------------------------------------------
-/// Amount of memory needed for each parameter.
+/// Amount of memory needed for each parameter. Take into account that some
+/// parameters may be wide strings, so buffer length is double 
 //-----------------------------------------------------------------------------
 static const int BYTES_PER_PARAMETER = 512;
+
+/// Data type for buffer length parameter (incase it needs to be changed later)
+typedef uint16_t  bufferSize_t;
+
+/// Actual amount of data in the buffer reserved for the actual parameter string
+static const int BYTES_PER_PARAMETER_DATA = BYTES_PER_PARAMETER - sizeof(bufferSize_t) - sizeof(PARAMETER_TYPE);
 
 //--------------------------------------------------------------------------
 /// The APIEntry structure is used to track all calls that are traced at runtime.
@@ -215,7 +222,7 @@ public:
     /// individual parameters if necessary
     /// \return parameter string
     //-----------------------------------------------------------------------------
-    const char* GetParameterString() const;
+    const char* GetParameterString(gtASCIIString& parameterString) const;
 
     //-----------------------------------------------------------------------------
     /// Track whether we got to gather GPU time for this call.

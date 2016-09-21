@@ -15,7 +15,9 @@
 #include "GlobalSettings.h"
 #include "StackTracer.h"
 
+#include "HSAAPITableVersions.h"
 #include "HSATraceInterceptionTable1_0.h"
+#include "HSATraceInterceptionTable1_2.h"
 #include "HSAAgentUtils.h"
 
 #include "HSAFdnAPIInfoManager.h"
@@ -129,14 +131,27 @@ extern "C" bool DLL_PUBLIC OnLoad(void* pTable, uint64_t runtimeVersion, uint64_
         }
     }
 
-    if (0 == runtimeVersion)
+    if (ROCM_1_1_X_AND_EARLIER_ROOT_RUNTIME_VERSION == runtimeVersion)
     {
         // ROCm versions 1.1.1 and earlier
         InitHSAAPIInterceptTrace1_0(reinterpret_cast<ApiTable1_0*>(pTable));
     }
     else
     {
-        InitHSAAPIInterceptTrace(reinterpret_cast<HsaApiTable*>(pTable));
+        HsaApiTable* pHsaTable = reinterpret_cast<HsaApiTable*>(pTable);
+
+#ifdef FUTURE_ROCR_VERSION
+        if (IsROCm12(pHsaTable))
+        {
+            // ROCm 1.2 backwards compatibility
+            HsaApiTable1_2* pHsaTable1_2 = reinterpret_cast<HsaApiTable1_2*>(pTable);
+            InitHSAAPIInterceptTrace1_2(pHsaTable1_2);
+        }
+        else
+#endif
+        {
+            InitHSAAPIInterceptTrace(pHsaTable);
+        }
     }
 
     // Add a fabricated entry for hsa_init when OnLoad is called.

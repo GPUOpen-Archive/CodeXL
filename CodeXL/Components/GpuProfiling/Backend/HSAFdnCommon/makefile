@@ -21,6 +21,8 @@ LIB_OBJS =  \
 	./$(OBJ_DIR)/HSAModule.o \
 	./$(OBJ_DIR)/HSAToolsRTModule.o \
 	./$(OBJ_DIR)/HSAAgentUtils.o \
+	./$(OBJ_DIR)/HSAAgentIterateReplacer.o \
+	./$(OBJ_DIR)/HSAAPITableVersions.o \
 
 include $(DEPTH)/Build/CommonTargets.mk
 

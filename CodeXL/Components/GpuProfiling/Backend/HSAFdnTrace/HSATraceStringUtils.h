@@ -25,6 +25,12 @@ static const char* s_pStructEnd = "}";      ///< end of a structure
 static const char* s_pPtrDeRefStart = "[";  ///< start of a dereferenced pointer
 static const char* s_pPtrDeRefEnd = "]";    ///< end of a dereferenced pointer
 
+/// Pointer to a function to use to get the display name for an API
+/// \param type the API whose name is needed
+/// \param[out] apiDisplayName the display name of the specified API
+/// \return true if the display name is returned for the specified API
+extern bool (*pGetApiDisplayName)(HSA_API_Type type, std::string& apiDisplayName);
+
 /// General template function to surround an input with two other strings
 /// \param input the input string
 /// \param pSurroundBegin the string to put at the beginning of the input

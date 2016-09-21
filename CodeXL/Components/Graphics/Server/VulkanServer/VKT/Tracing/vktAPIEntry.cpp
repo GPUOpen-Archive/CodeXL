@@ -82,8 +82,10 @@ void VktAPIEntry::AppendAPITraceLine(gtASCIIString& out, double startTime, doubl
 
     out += GetAPIName();
 
+    gtASCIIString parameterString;
+
     out += "(";
-    out += GetParameterString();
+    out += GetParameterString(parameterString);
     out += ") = ";
 
     out += pResultCode;
@@ -134,7 +136,7 @@ void VktAPIEntry::AddParameter(unsigned int index, int type, const void* pParame
 
     if (mParameterBuffer)
     {
-        unsigned int bufferLength = BYTES_PER_PARAMETER - 5;
+        unsigned int bufferLength = BYTES_PER_PARAMETER_DATA;
         unsigned int length = 0;
         char* buffer = mParameterBuffer;
 
@@ -187,6 +189,7 @@ void VktAPIEntry::AddParameter(unsigned int index, int type, const void* pParame
             {
                 // 1 byte less to account for terminator
                 length = bufferLength - 1;
+                Log(logMESSAGE, "VktAPIEntry::AddParameter: Parameter string too large. String will be truncated\n");
             }
 
             break;
@@ -273,7 +276,9 @@ void VktAPIEntry::AddParameter(unsigned int index, int type, const void* pParame
             break;
         }
 
-        *buffer++ = (char)length;
+        bufferSize_t len = (bufferSize_t)length;
+        memcpy(buffer, &len, sizeof(bufferSize_t));
+        buffer += sizeof(bufferSize_t);
 
         if (type == PARAMETER_POINTER || type == PARAMETER_POINTER_SPECIAL)
         {
@@ -301,7 +306,7 @@ void VktAPIEntry::AddParameter(unsigned int index, int type, const void* pParame
 //-----------------------------------------------------------------------------
 void VktAPIEntry::GetParameterAsString(PARAMETER_TYPE paramType, UINT dataLength, const char* pRawData, char* ioParameterString) const
 {
-    int bufferLength = BYTES_PER_PARAMETER - 5;
+    int bufferLength = BYTES_PER_PARAMETER_DATA;
 
     switch (paramType)
     {

@@ -197,7 +197,8 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
 #if defined (_LINUX) || defined (LINUX)
         ("__preload__", po::value<string>(), "Name of an optional library or libraries to preload in the application being profiled")
 #endif
-        ("__nodetours__", "Don't launch application using detours (will prevent DirectCompute from being profiled).");
+        ("__nodetours__", "Don't launch application using detours (will prevent DirectCompute from being profiled).")
+        ("__hsaforcesinglegpu__", po::value<unsigned int>(), "Override HSA agent discovery to only expose a single GPU to the application. The argument is the device index.");
 
         // all options available from command line
         po::options_description cmdline_options;
@@ -742,6 +743,16 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
         configOut.bCompatibilityMode = unicodeOptionsMap.count("__compatibilitymode__") > 0;
 
         configOut.bNoDetours = unicodeOptionsMap.count("__nodetours__") > 0;
+
+        configOut.bForceSingleGPU = unicodeOptionsMap.count("__hsaforcesinglegpu__") > 0;
+
+        if (configOut.bForceSingleGPU)
+        {
+            wstring valueStr = unicodeOptionsMap["__hsaforcesinglegpu__"];
+            string valueStrConverted;
+            StringUtils::WideStringToUtf8String(valueStr, valueStrConverted);
+            configOut.uiForcedGpuIndex = boost::lexical_cast<unsigned int>(valueStrConverted.c_str());
+        }
 
         // check for "list" last so that other params are checked first (like output file)
         if (unicodeOptionsMap.count("list") > 0)

@@ -33,6 +33,7 @@ void CLContextSummarizer::FlushTmpCounters(string& strCntx, ContextSummaryItems*
     {
         pItems->uiNumBuffer += it->second.uiBufferCount;
         pItems->uiNumImage += it->second.uiImageCount;
+        pItems->uiNumQueue += it->second.uiQueueCount;
         // after we flush counters for image and buffer, remove it from tmp map so that when context handle get reused, we won't count
         // incorrect number of cl objects
         m_tmpCLObjCounter.erase(it);
@@ -218,6 +219,23 @@ void CLContextSummarizer::OnParse(CLAPIInfo* pAPIInfo, bool& stopParsing)
                     m_tmpCLObjCounter[strCntxHandle] = counter;
                 }
             }
+            else if (pAPIInfo->m_strName.find("CommandQueue") != string::npos)
+            {
+                size_t idx = pAPIInfo->m_ArgList.find_first_of(';');
+                string strCntxHandle = pAPIInfo->m_ArgList.substr(0, idx);
+
+                if (m_tmpCLObjCounter.find(strCntxHandle) != m_tmpCLObjCounter.end())
+                {
+                    CLObjectCounter& counter = m_tmpCLObjCounter[strCntxHandle];
+                    counter.uiQueueCount++;
+                }
+                else
+                {
+                    CLObjectCounter counter;
+                    counter.uiQueueCount = 1;
+                    m_tmpCLObjCounter[strCntxHandle] = counter;
+                }
+            }
         }
     }
 
@@ -227,12 +245,13 @@ void CLContextSummarizer::GenerateHTMLTable(std::ostream& sout)
 {
     HTMLTable table;
     table.AddColumn("Context ID")
+    .AddColumn("# of Queues", true, true)
     .AddColumn("# of Buffers", true, true)
     .AddColumn("# of Images", true, true);
 
 
     stringstream tmpss;
-    int tableIdx = 3;
+    int tableIdx = 4;
 
     // Add all devices to header
     for (vector<string>::iterator it = m_vecDevices.begin(); it != m_vecDevices.end(); it++)
@@ -268,14 +287,15 @@ void CLContextSummarizer::GenerateHTMLTable(std::ostream& sout)
 
     for (ContextSumMap::iterator it = m_ContextSumMap.begin(); it != m_ContextSumMap.end(); it++)
     {
-        itemIdx = 3;
+        itemIdx = 4;
         HTMLTableRow row(&table);
 
         ContextSummaryItems& items = it->second;
 
         row.AddItem(0, StringUtils::ToString(items.uiContextID))
-        .AddItem(1, StringUtils::ToString(items.uiNumBuffer))
-        .AddItem(2, StringUtils::ToString(items.uiNumImage));
+        .AddItem(1, StringUtils::ToString(items.uiNumQueue))
+        .AddItem(2, StringUtils::ToString(items.uiNumBuffer))
+        .AddItem(3, StringUtils::ToString(items.uiNumImage));
 
         // Add per device stats
         for (vector<string>::iterator vit = m_vecDevices.begin(); vit != m_vecDevices.end(); vit++)
@@ -323,10 +343,11 @@ void CLContextSummarizer::GenerateHTMLTable(std::ostream& sout)
     {
         HTMLTableRow totalRow(&table);
         totalRow.AddItem(0, string("Total"))
-        .AddItem(1, StringUtils::ToString(sum.uiNumBuffer))
-        .AddItem(2, StringUtils::ToString(sum.uiNumImage));
+        .AddItem(1, StringUtils::ToString(sum.uiNumQueue))
+        .AddItem(2, StringUtils::ToString(sum.uiNumBuffer))
+        .AddItem(3, StringUtils::ToString(sum.uiNumImage));
 
-        itemIdx = 3;
+        itemIdx = 4;
 
         for (vector<string>::iterator vit = m_vecDevices.begin(); vit != m_vecDevices.end(); vit++)
         {

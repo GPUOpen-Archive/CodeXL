@@ -25,6 +25,7 @@ static const std::string s_PART_NAME = HSA_PART_NAME;
 static const std::string s_HSA_TRACE_OUTPUT = "CodeXL " HSA_PART_NAME " API Trace Output";
 static const std::string s_HSA_TIMESTAMP_OUTPUT = "CodeXL " HSA_PART_NAME " Timestamp Output";
 static const std::string s_HSA_KERNEL_TIMESTAMP_OUTPUT = "CodeXL " HSA_PART_NAME " Kernel Timestamp Output";
+static const std::string s_HSA_ASYNC_COPY_TIMESTAMP_OUTPUT = "CodeXL " HSA_PART_NAME " Async Copy Timestamp Output";
 #undef HSA_PART_NAME
 
 HSAAtpFilePart::HSAAtpFilePart(const Config& config, bool shouldReleaseMemory)
@@ -34,6 +35,7 @@ HSAAtpFilePart::HSAAtpFilePart(const Config& config, bool shouldReleaseMemory)
     m_sections.push_back(s_HSA_TRACE_OUTPUT);
     m_sections.push_back(s_HSA_TIMESTAMP_OUTPUT);
     m_sections.push_back(s_HSA_KERNEL_TIMESTAMP_OUTPUT);
+    m_sections.push_back(s_HSA_ASYNC_COPY_TIMESTAMP_OUTPUT);
 }
 
 
@@ -51,7 +53,7 @@ void HSAAtpFilePart::WriteHeaderSection(SP_fileStream& sout)
 bool HSAAtpFilePart::WriteContentSection(SP_fileStream& sout, const std::string& strTmpFilePath, const std::string& strPID)
 {
     bool ret = false;
-    SpAssertRet(m_sections.size() == 3) ret;
+    SpAssertRet(m_sections.size() == 4) ret;
 
     if (m_config.bTimeOut || m_config.bMergeMode)
     {
@@ -67,6 +69,10 @@ bool HSAAtpFilePart::WriteContentSection(SP_fileStream& sout, const std::string&
         ss.str("");
         ss << "." << m_strPartName << TMP_KERNEL_TIME_STAMP_EXT;
         ret |= FileUtils::MergeTmpTraceFiles(sout, strTmpFilePath, strPID, ss.str().c_str(), GetSectionHeader(m_sections[2]).c_str(), FileUtils::MergeSummaryType_CumulativeNumEntries);
+
+        ss.str("");
+        ss << "." << m_strPartName << TMP_ASYNC_COPY_TIME_STAMP_EXT;
+        ret |= FileUtils::MergeTmpTraceFiles(sout, strTmpFilePath, strPID, ss.str().c_str(), GetSectionHeader(m_sections[3]).c_str(), FileUtils::MergeSummaryType_CumulativeNumEntries);
     }
     else
     {
@@ -103,7 +109,10 @@ HSAAPIInfo* HSAAtpFilePart::CreateAPIInfo(const std::string& strAPIName)
     HSA_API_Type apiType = HSAFunctionDefsUtils::Instance()->ToHSAAPIType(strAPIName);
 
     if (apiType == HSA_API_Type_hsa_memory_allocate || apiType == HSA_API_Type_hsa_memory_copy ||
-        apiType == HSA_API_Type_hsa_memory_register || apiType == HSA_API_Type_hsa_memory_deregister)
+        apiType == HSA_API_Type_hsa_memory_register || apiType == HSA_API_Type_hsa_memory_deregister ||
+        apiType == HSA_API_Type_hsa_amd_memory_pool_allocate || apiType == HSA_API_Type_hsa_amd_memory_async_copy ||
+        apiType == HSA_API_Type_hsa_amd_memory_lock || apiType == HSA_API_Type_hsa_amd_memory_fill ||
+        apiType == HSA_API_Type_hsa_amd_interop_map_buffer)
     {
         retObj = new(nothrow)HSAMemoryAPIInfo();
     }

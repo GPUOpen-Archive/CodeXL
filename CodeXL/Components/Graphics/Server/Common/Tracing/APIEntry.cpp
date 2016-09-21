@@ -101,12 +101,12 @@ void APIEntry::PrintReturnValue(const INT64 inReturnValue, const ReturnDisplayTy
 //-----------------------------------------------------------------------------
 /// Get the API parameters as a single string. Build the string from the
 /// individual parameters if necessary
+/// Important note: This function is called by multiple threads so needs to
+/// be thread safe (no global variable modifications etc)
 /// \return parameter string
 //-----------------------------------------------------------------------------
-const char* APIEntry::GetParameterString() const
+const char* APIEntry::GetParameterString(gtASCIIString& parameterString) const
 {
-    static gtASCIIString parameterString;
-
     if (mNumParameters == 0)
     {
         return mParameters.asCharArray();
@@ -122,11 +122,14 @@ const char* APIEntry::GetParameterString() const
         {
             for (UINT32 loop = 0; loop < mNumParameters; loop++)
             {
-                char* ptr = buffer;
-                PARAMETER_TYPE paramType;
-                memcpy(&paramType, ptr, sizeof(PARAMETER_TYPE));
-                ptr += sizeof(PARAMETER_TYPE);
-                int length = *ptr++;
+				char* ptr = buffer;
+				PARAMETER_TYPE paramType;
+				memcpy(&paramType, ptr, sizeof(PARAMETER_TYPE));
+				ptr += sizeof(PARAMETER_TYPE);
+
+                bufferSize_t length;
+                memcpy(&length, ptr, sizeof(bufferSize_t));
+                ptr += sizeof(bufferSize_t);
 
                 if (length < BYTES_PER_PARAMETER)
                 {
@@ -161,6 +164,10 @@ const char* APIEntry::GetParameterString() const
                             parameterString += ", ";
                         }
                     }
+                }
+                else
+                {
+                    Log(logERROR, "APIEntry::GetParameterString: Incorrect string length.\n");
                 }
 
                 // point to next parameter in the buffer

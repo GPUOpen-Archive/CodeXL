@@ -200,6 +200,7 @@ using namespace GPULogger;
 #define TMP_TIME_STAMP_EXT ".tstamp"
 #define TMP_GPU_TIME_STAMP_RAW_EXT ".ocltstampraw"
 #define TMP_KERNEL_TIME_STAMP_EXT ".kerneltstamp"
+#define TMP_ASYNC_COPY_TIME_STAMP_EXT ".copytstamp"
 #define TMP_TRACE_EXT ".apitrace"
 #define TMP_TRACE_STACK_EXT ".stfrag"
 #define TMP_OCCUPANCY_EXT ".occupancyfrag"
@@ -324,6 +325,8 @@ struct Parameters
         m_bProfilerDurationEnabled = false;
         m_delayInMilliseconds = 0;
         m_durationInMilliseconds = 0;
+        m_bForceSingleGPU = false;
+        m_uiForcedGpuIndex = 0;
     }
 
     unsigned int m_uiVersionMajor;                ///< Version major
@@ -372,9 +375,11 @@ struct Parameters
     bool m_bStartDisabled;                        ///< Flag indicating whether or not to start with profiling disabled
     KernelFilterList m_kernelFilterList;          ///< List of kernels to filter for perf counter profiling and subkernel profiling
     bool m_bDelayStartEnabled;                    ///< flag indicating whether to start profiler with a delay or not
-    bool m_bProfilerDurationEnabled;              ///< flag indiacating whether profiler should only run for certain duration
+    bool m_bProfilerDurationEnabled;              ///< flag indicating whether profiler should only run for certain duration
     unsigned int m_delayInMilliseconds;           ///< delay for profiler in milliseconds
     unsigned int m_durationInMilliseconds;        ///< duration for profiler in milliseconds for which profiler should run
+    bool m_bForceSingleGPU;                       ///< Flag indicating whether or not to force a single GPU
+    unsigned int m_uiForcedGpuIndex;              ///< Forced GPU index
 };
 
 typedef std::map<std::string, bool> AnalyzerMap;

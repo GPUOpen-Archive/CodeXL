@@ -375,8 +375,9 @@ void DX12TraceAnalyzerLayer::ProfilerResultToStr(
     profiledCommandsLinesStr += "ID3D12GraphicsCommandList_";
     profiledCommandsLinesStr += GetFunctionNameFromId(pResultEntry->mFunctionId);
 
+    gtASCIIString parameterString;
     profiledCommandsLinesStr += "(";
-    profiledCommandsLinesStr += pResultEntry->GetParameterString();
+    profiledCommandsLinesStr += pResultEntry->GetParameterString(parameterString);
     profiledCommandsLinesStr += ") = ";
 
     profiledCommandsLinesStr += returnValueString.asCharArray();

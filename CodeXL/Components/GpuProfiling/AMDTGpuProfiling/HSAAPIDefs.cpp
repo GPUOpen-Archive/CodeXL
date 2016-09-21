@@ -118,6 +118,9 @@ const QString HSAAPIDefs::GroupToString(HSAAPIGroup group)
         case HSAAPIGroup_Signal:
             return "Signal";
 
+        case HSAAPIGroup_ExtensionsAMD:
+            return "Extensions AMD";
+
         default:
             return "Other";
     }
@@ -129,6 +132,11 @@ void HSAAPIDefs::BuildAPIGroupsMap()
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_iterate_agents, HSAAPIGroup_Agent);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_agent_iterate_regions, HSAAPIGroup_Agent);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_agent_get_exception_policies, HSAAPIGroup_Agent);
+#ifdef FUTURE_ROCR_VERSION
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_agent_iterate_caches, HSAAPIGroup_Agent);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_agent_major_extension_supported, HSAAPIGroup_Agent);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_agent_iterate_isas, HSAAPIGroup_ISA);
+#endif
 
     // HSAAPIGroup_CodeObject:
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_code_object_serialize, HSAAPIGroup_CodeObject);
@@ -136,6 +144,12 @@ void HSAAPIDefs::BuildAPIGroupsMap()
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_code_object_destroy, HSAAPIGroup_CodeObject);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_code_object_get_symbol, HSAAPIGroup_CodeObject);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_code_object_iterate_symbols, HSAAPIGroup_CodeObject);
+#ifdef FUTURE_ROCR_VERSION
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_code_object_reader_create_from_file, HSAAPIGroup_CodeObject);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_code_object_reader_create_from_memory, HSAAPIGroup_CodeObject);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_code_object_reader_destroy, HSAAPIGroup_CodeObject);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_code_object_get_symbol_from_name, HSAAPIGroup_CodeObject);
+#endif
 
     // HSAAPIGroup_Executable:
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_executable_create, HSAAPIGroup_Executable);
@@ -148,12 +162,25 @@ void HSAAPIDefs::BuildAPIGroupsMap()
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_executable_validate, HSAAPIGroup_Executable);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_executable_get_symbol, HSAAPIGroup_Executable);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_executable_iterate_symbols, HSAAPIGroup_Executable);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_status_string, HSAAPIGroup_Executable);
+#ifdef FUTURE_ROCR_VERSION
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_executable_create_alt, HSAAPIGroup_Executable);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_executable_load_program_code_object, HSAAPIGroup_Executable);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_executable_load_agent_code_object, HSAAPIGroup_Executable);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_executable_validate_alt, HSAAPIGroup_Executable);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_executable_get_symbol_by_name, HSAAPIGroup_Executable);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_executable_iterate_agent_symbols, HSAAPIGroup_Executable);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_executable_iterate_program_symbols, HSAAPIGroup_Executable);
+#endif
 
     // HSAAPIGroup_ExtensionsGeneral:
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_system_extension_supported, HSAAPIGroup_ExtensionsGeneral);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_system_get_extension_table, HSAAPIGroup_ExtensionsGeneral);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_agent_extension_supported, HSAAPIGroup_ExtensionsGeneral);
+#ifdef FUTURE_ROCR_VERSION
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_system_major_extension_supported, HSAAPIGroup_ExtensionsGeneral);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_system_get_major_extension_table, HSAAPIGroup_ExtensionsGeneral);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_agent_major_extension_supported, HSAAPIGroup_ExtensionsGeneral);
+#endif
 
     // HSAAPIGroup_ExtensionsFinalizer:
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ext_program_create, HSAAPIGroup_ExtensionsFinalizer);
@@ -173,6 +200,35 @@ void HSAAPIDefs::BuildAPIGroupsMap()
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ext_image_clear, HSAAPIGroup_ExtensionsImage);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ext_image_destroy, HSAAPIGroup_ExtensionsImage);
 
+    // HSAAPIGroup_ExtensionsAMD:
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_coherency_get_type, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_coherency_set_type, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_profiling_set_profiler_enabled, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_profiling_async_copy_enable, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_profiling_get_dispatch_time, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_profiling_get_async_copy_time, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_profiling_convert_tick_to_system_domain, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_signal_async_handler, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_async_function, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_signal_wait_any, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_image_get_info_max_dim, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_queue_cu_set_mask, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_memory_pool_get_info, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_agent_iterate_memory_pools, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_memory_pool_allocate, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_memory_pool_free, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_memory_async_copy, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_agent_memory_pool_get_info, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_agents_allow_access, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_memory_pool_can_migrate, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_memory_migrate, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_memory_lock, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_memory_unlock, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_memory_fill, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_interop_map_buffer, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_interop_unmap_buffer, HSAAPIGroup_ExtensionsAMD);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_amd_image_create, HSAAPIGroup_ExtensionsAMD);
+
     // HSAAPIGroup_ExtensionsSampler:
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ext_sampler_create, HSAAPIGroup_ExtensionsSampler);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ext_sampler_destroy, HSAAPIGroup_ExtensionsSampler);
@@ -184,6 +240,11 @@ void HSAAPIDefs::BuildAPIGroupsMap()
     // HSAAPIGroup_ISA:
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_isa_from_name, HSAAPIGroup_ISA);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_isa_compatible, HSAAPIGroup_ISA);
+#ifdef FUTURE_ROCR_VERSION
+    m_HSAAPIGroupMap.insert(HSA_API_Type_isa_get_exception_policies, HSAAPIGroup_ISA);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_isa_get_round_method, HSAAPIGroup_ISA);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_isa_iterate_wavefronts, HSAAPIGroup_ISA);
+#endif
 
     // HSAAPIGroup_Memory:
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_memory_register, HSAAPIGroup_Memory);
@@ -202,183 +263,127 @@ void HSAAPIDefs::BuildAPIGroupsMap()
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_code_symbol_get_info, HSAAPIGroup_QueryInfo);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_executable_get_info, HSAAPIGroup_QueryInfo);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_executable_symbol_get_info, HSAAPIGroup_QueryInfo);
+#ifdef FUTURE_ROCR_VERSION
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_cache_get_info, HSAAPIGroup_QueryInfo);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_isa_get_info_alt, HSAAPIGroup_QueryInfo);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_wavefront_get_info, HSAAPIGroup_QueryInfo);
+#endif
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_status_string, HSAAPIGroup_QueryInfo);
+
 
     // HSAAPIGroup_Queue:
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_create, HSAAPIGroup_Queue);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_soft_queue_create, HSAAPIGroup_Queue);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_destroy, HSAAPIGroup_Queue);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_inactivate, HSAAPIGroup_Queue);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_load_read_index_acquire, HSAAPIGroup_Queue);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_load_read_index_relaxed, HSAAPIGroup_Queue);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_load_write_index_acquire, HSAAPIGroup_Queue);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_load_write_index_relaxed, HSAAPIGroup_Queue);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_store_write_index_relaxed, HSAAPIGroup_Queue);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_cas_write_index_relaxed, HSAAPIGroup_Queue);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_add_write_index_relaxed, HSAAPIGroup_Queue);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_store_read_index_relaxed, HSAAPIGroup_Queue);
+#ifdef FUTURE_ROCR_VERSION
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_load_read_index_scacquire, HSAAPIGroup_Queue);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_load_write_index_scacquire, HSAAPIGroup_Queue);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_store_write_index_screlease, HSAAPIGroup_Queue);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_cas_write_index_scacq_screl, HSAAPIGroup_Queue);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_cas_write_index_scacquire, HSAAPIGroup_Queue);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_cas_write_index_screlease, HSAAPIGroup_Queue);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_add_write_index_scacq_screl, HSAAPIGroup_Queue);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_add_write_index_scacquire, HSAAPIGroup_Queue);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_add_write_index_screlease, HSAAPIGroup_Queue);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_store_read_index_screlease, HSAAPIGroup_Queue);
+#else
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_load_read_index_acquire, HSAAPIGroup_Queue);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_load_write_index_acquire, HSAAPIGroup_Queue);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_store_write_index_release, HSAAPIGroup_Queue);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_cas_write_index_acq_rel, HSAAPIGroup_Queue);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_cas_write_index_acquire, HSAAPIGroup_Queue);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_cas_write_index_relaxed, HSAAPIGroup_Queue);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_cas_write_index_release, HSAAPIGroup_Queue);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_add_write_index_acq_rel, HSAAPIGroup_Queue);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_add_write_index_acquire, HSAAPIGroup_Queue);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_add_write_index_relaxed, HSAAPIGroup_Queue);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_add_write_index_release, HSAAPIGroup_Queue);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_store_read_index_relaxed, HSAAPIGroup_Queue);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_store_read_index_release, HSAAPIGroup_Queue);
+#endif
 
     // HSAAPIGroup_Signal:
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_create, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_destroy, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_load_relaxed, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_load_acquire, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_store_relaxed, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_store_release, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_wait_relaxed, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_wait_acquire, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_and_relaxed, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_or_relaxed, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_xor_relaxed, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_exchange_relaxed, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_add_relaxed, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_subtract_relaxed, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_cas_relaxed, HSAAPIGroup_Signal);
+#ifdef FUTURE_ROCR_VERSION
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_group_create, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_group_destroy, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_group_wait_any_scacquire, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_group_wait_any_relaxed, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_load_scacquire, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_store_screlease, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_wait_scacquire, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_and_scacquire, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_and_screlease, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_and_scacq_screl, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_or_scacquire, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_or_screlease, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_or_scacq_screl, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_xor_scacquire, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_xor_screlease, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_xor_scacq_screl, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_exchange_scacquire, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_exchange_screlease, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_exchange_scacq_screl, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_add_scacquire, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_add_screlease, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_add_scacq_screl, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_subtract_scacquire, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_subtract_screlease, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_subtract_scacq_screl, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_cas_scacquire, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_cas_screlease, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_cas_scacq_screl, HSAAPIGroup_Signal);
+#else
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_load_acquire, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_store_release, HSAAPIGroup_Signal);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_wait_acquire, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_and_acquire, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_and_release, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_and_acq_rel, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_or_relaxed, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_or_acquire, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_or_release, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_or_acq_rel, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_xor_relaxed, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_xor_acquire, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_xor_release, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_xor_acq_rel, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_exchange_relaxed, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_exchange_acquire, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_exchange_release, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_exchange_acq_rel, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_add_relaxed, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_add_acquire, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_add_release, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_add_acq_rel, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_subtract_relaxed, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_subtract_acquire, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_subtract_release, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_subtract_acq_rel, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_cas_relaxed, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_cas_acquire, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_cas_release, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_cas_acq_rel, HSAAPIGroup_Signal);
+#endif
 }
 
 void HSAAPIDefs::BuildAPIFunctionNamesMap()
 {
-    AddFunctionToMap(HSA_API_Type_hsa_iterate_agents, "hsa_iterate_agents");
-    AddFunctionToMap(HSA_API_Type_hsa_agent_iterate_regions, "hsa_agent_iterate_regions");
-    AddFunctionToMap(HSA_API_Type_hsa_agent_get_exception_policies, "hsa_agent_get_exception_policies");
-    AddFunctionToMap(HSA_API_Type_hsa_code_object_serialize, "hsa_code_object_serialize");
-    AddFunctionToMap(HSA_API_Type_hsa_code_object_deserialize, "hsa_code_object_deserialize");
-    AddFunctionToMap(HSA_API_Type_hsa_code_object_destroy, "hsa_code_object_destroy");
-    AddFunctionToMap(HSA_API_Type_hsa_code_object_get_symbol, "hsa_code_object_get_symbol");
-    AddFunctionToMap(HSA_API_Type_hsa_code_object_iterate_symbols, "hsa_code_object_iterate_symbols");
-    AddFunctionToMap(HSA_API_Type_hsa_executable_create, "hsa_executable_create");
-    AddFunctionToMap(HSA_API_Type_hsa_executable_destroy, "hsa_executable_destroy");
-    AddFunctionToMap(HSA_API_Type_hsa_executable_load_code_object, "hsa_executable_load_code_object");
-    AddFunctionToMap(HSA_API_Type_hsa_executable_freeze, "hsa_executable_freeze");
-    AddFunctionToMap(HSA_API_Type_hsa_executable_global_variable_define, "hsa_executable_global_variable_define");
-    AddFunctionToMap(HSA_API_Type_hsa_executable_agent_global_variable_define, "hsa_executable_agent_global_variable_define");
-    AddFunctionToMap(HSA_API_Type_hsa_executable_readonly_variable_define, "hsa_executable_readonly_variable_define");
-    AddFunctionToMap(HSA_API_Type_hsa_executable_validate, "hsa_executable_validate");
-    AddFunctionToMap(HSA_API_Type_hsa_executable_get_symbol, "hsa_executable_get_symbol");
-    AddFunctionToMap(HSA_API_Type_hsa_executable_iterate_symbols, "hsa_executable_iterate_symbols");
-    AddFunctionToMap(HSA_API_Type_hsa_status_string, "hsa_status_string");
-    AddFunctionToMap(HSA_API_Type_hsa_system_extension_supported, "hsa_system_extension_supported");
-    AddFunctionToMap(HSA_API_Type_hsa_system_get_extension_table, "hsa_system_get_extension_table");
-    AddFunctionToMap(HSA_API_Type_hsa_agent_extension_supported, "hsa_agent_extension_supported");
-    AddFunctionToMap(HSA_API_Type_hsa_ext_program_create, "hsa_ext_program_create");
-    AddFunctionToMap(HSA_API_Type_hsa_ext_program_destroy, "hsa_ext_program_destroy");
-    AddFunctionToMap(HSA_API_Type_hsa_ext_program_add_module, "hsa_ext_program_add_module");
-    AddFunctionToMap(HSA_API_Type_hsa_ext_program_iterate_modules, "hsa_ext_program_iterate_module");
-    AddFunctionToMap(HSA_API_Type_hsa_ext_program_get_info, "hsa_ext_program_get_info");
-    AddFunctionToMap(HSA_API_Type_hsa_ext_program_finalize, "hsa_ext_program_finalize ");
-    AddFunctionToMap(HSA_API_Type_hsa_ext_image_get_capability, "hsa_ext_image_get_capability");
-    AddFunctionToMap(HSA_API_Type_hsa_ext_image_data_get_info, "hsa_ext_image_data_get_info");
-    AddFunctionToMap(HSA_API_Type_hsa_ext_image_create, "hsa_ext_image_create");
-    AddFunctionToMap(HSA_API_Type_hsa_ext_image_import, "hsa_ext_image_import");
-    AddFunctionToMap(HSA_API_Type_hsa_ext_image_export, "hsa_ext_image_export");
-    AddFunctionToMap(HSA_API_Type_hsa_ext_image_copy, "hsa_ext_image_copy");
-    AddFunctionToMap(HSA_API_Type_hsa_ext_image_clear, "hsa_ext_image_clear");
-    AddFunctionToMap(HSA_API_Type_hsa_ext_image_destroy, "hsa_ext_image_destroy");
-    AddFunctionToMap(HSA_API_Type_hsa_ext_sampler_create, "hsa_ext_sampler_create");
-    AddFunctionToMap(HSA_API_Type_hsa_ext_sampler_destroy, "hsa_ext_sampler_destroy");
-    AddFunctionToMap(HSA_API_Type_hsa_init, "hsa_init");
-    AddFunctionToMap(HSA_API_Type_hsa_shut_down, "hsa_shut_down");
-    AddFunctionToMap(HSA_API_Type_hsa_isa_from_name, "hsa_isa_from_name");
-    AddFunctionToMap(HSA_API_Type_hsa_isa_compatible, "hsa_isa_compatible");
-    AddFunctionToMap(HSA_API_Type_hsa_memory_register, "hsa_memory_register");
-    AddFunctionToMap(HSA_API_Type_hsa_memory_deregister, "hsa_memory_deregister");
-    AddFunctionToMap(HSA_API_Type_hsa_memory_allocate, "hsa_memory_allocate");
-    AddFunctionToMap(HSA_API_Type_hsa_memory_free, "hsa_memory_free");
-    AddFunctionToMap(HSA_API_Type_hsa_memory_copy, "hsa_memory_copy");
-    AddFunctionToMap(HSA_API_Type_hsa_memory_assign_agent, "hsa_memory_assign_agent");
-    AddFunctionToMap(HSA_API_Type_hsa_system_get_info, "hsa_system_get_info");
-    AddFunctionToMap(HSA_API_Type_hsa_agent_get_info, "hsa_agent_get_info");
-    AddFunctionToMap(HSA_API_Type_hsa_region_get_info, "hsa_region_get_info");
-    AddFunctionToMap(HSA_API_Type_hsa_isa_get_info, "hsa_isa_get_info");
-    AddFunctionToMap(HSA_API_Type_hsa_code_object_get_info, "hsa_code_object_get_info");
-    AddFunctionToMap(HSA_API_Type_hsa_code_symbol_get_info, "hsa_code_symbol_get_info");
-    AddFunctionToMap(HSA_API_Type_hsa_executable_get_info, "hsa_executable_get_info");
-    AddFunctionToMap(HSA_API_Type_hsa_executable_symbol_get_info, "hsa_executable_symbol_get_info");
-    AddFunctionToMap(HSA_API_Type_hsa_queue_create, "hsa_queue_create");
-    AddFunctionToMap(HSA_API_Type_hsa_soft_queue_create, "hsa_soft_queue_create");
-    AddFunctionToMap(HSA_API_Type_hsa_queue_destroy, "hsa_queue_destroy");
-    AddFunctionToMap(HSA_API_Type_hsa_queue_inactivate, "hsa_queue_inactivate");
-    AddFunctionToMap(HSA_API_Type_hsa_queue_load_read_index_acquire, "hsa_queue_load_read_index_acquire");
-    AddFunctionToMap(HSA_API_Type_hsa_queue_load_read_index_relaxed, "hsa_queue_load_read_index_relaxed");
-    AddFunctionToMap(HSA_API_Type_hsa_queue_load_write_index_acquire, "hsa_queue_load_write_index_acquire");
-    AddFunctionToMap(HSA_API_Type_hsa_queue_load_write_index_relaxed, "hsa_queue_load_write_index_relaxed");
-    AddFunctionToMap(HSA_API_Type_hsa_queue_store_write_index_relaxed, "hsa_queue_store_write_index_relaxed");
-    AddFunctionToMap(HSA_API_Type_hsa_queue_store_write_index_release, "hsa_queue_store_write_index_release");
-    AddFunctionToMap(HSA_API_Type_hsa_queue_cas_write_index_acq_rel, "hsa_queue_cas_write_index_acq_rel");
-    AddFunctionToMap(HSA_API_Type_hsa_queue_cas_write_index_acquire, "hsa_queue_cas_write_index_acquire");
-    AddFunctionToMap(HSA_API_Type_hsa_queue_cas_write_index_relaxed, "hsa_queue_cas_write_index_relaxed");
-    AddFunctionToMap(HSA_API_Type_hsa_queue_cas_write_index_release, "hsa_queue_cas_write_index_release");
-    AddFunctionToMap(HSA_API_Type_hsa_queue_add_write_index_acq_rel, "hsa_queue_add_write_index_acq_rel");
-    AddFunctionToMap(HSA_API_Type_hsa_queue_add_write_index_acquire, "hsa_queue_add_write_index_acquire");
-    AddFunctionToMap(HSA_API_Type_hsa_queue_add_write_index_relaxed, "hsa_queue_add_write_index_relaxed");
-    AddFunctionToMap(HSA_API_Type_hsa_queue_add_write_index_release, "hsa_queue_add_write_index_release");
-    AddFunctionToMap(HSA_API_Type_hsa_queue_store_read_index_relaxed, "hsa_queue_store_read_index_relaxed");
-    AddFunctionToMap(HSA_API_Type_hsa_queue_store_read_index_release, "hsa_queue_store_read_index_release");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_create, "hsa_signal_create");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_destroy, "hsa_signal_destroy");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_load_relaxed, "hsa_signal_load_relaxed");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_load_acquire, "hsa_signal_load_acquire");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_store_relaxed, "hsa_signal_store_relaxed");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_store_release, "hsa_signal_store_release");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_wait_relaxed, "hsa_signal_wait_relaxed");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_wait_acquire, "hsa_signal_wait_acquire");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_and_relaxed, "hsa_signal_and_relaxed");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_and_acquire, "hsa_signal_and_acquire");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_and_release, "hsa_signal_and_release");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_and_acq_rel, "hsa_signal_and_acq_rel");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_or_relaxed, "hsa_signal_or_relaxed");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_or_acquire, "hsa_signal_or_acquire");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_or_release, "hsa_signal_or_release");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_or_acq_rel, "hsa_signal_or_acq_rel");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_xor_relaxed, "hsa_signal_xor_relaxed");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_xor_acquire, "hsa_signal_xor_acquire");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_xor_release, "hsa_signal_xor_release");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_xor_acq_rel, "hsa_signal_xor_acq_rel");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_exchange_relaxed, "hsa_signal_exchange_relaxed");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_exchange_acquire, "hsa_signal_exchange_acquire");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_exchange_release, "hsa_signal_exchange_release");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_exchange_acq_rel, "hsa_signal_exchange_acq_rel");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_add_relaxed, "hsa_signal_add_relaxed");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_add_acquire, "hsa_signal_add_acquire");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_add_release, "hsa_signal_add_release");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_add_acq_rel, "hsa_signal_add_acq_rel");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_subtract_relaxed, "hsa_signal_subtract_relaxed");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_subtract_acquire, "hsa_signal_subtract_acquire");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_subtract_release, "hsa_signal_subtract_release");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_subtract_acq_rel, "hsa_signal_subtract_acq_rel");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_cas_relaxed, "hsa_signal_cas_relaxed");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_cas_acquire, "hsa_signal_cas_acquire");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_cas_release, "hsa_signal_cas_release");
-    AddFunctionToMap(HSA_API_Type_hsa_signal_cas_acq_rel, "hsa_signal_cas_acq_rel");
-
+#define X(SYM) AddFunctionToMap(HSA_API_Type_hsa_##SYM, "hsa_" #SYM);
+    HSA_RUNTIME_API_TABLE
+    HSA_EXT_FINALIZE_API_TABLE
+    HSA_EXT_IMAGE_API_TABLE
+    HSA_EXT_AMD_API_TABLE
+#undef X
 }
 
 void HSAAPIDefs::AddFunctionToMap(HSA_API_Type hsaType, const QString& funcName)

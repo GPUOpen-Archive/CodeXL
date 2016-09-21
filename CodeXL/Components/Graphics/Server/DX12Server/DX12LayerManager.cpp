@@ -171,34 +171,16 @@ GPS_PLUGIN_API bool UpdateHooks()
     return true;
 }
 
-#ifdef CODEXL_GRAPHICS
-
-//-----------------------------------------------------------------------------
-/// Initial configuration of layers that we can use within the DX12Server DLL for CodeXL.
-//-----------------------------------------------------------------------------
-static LAYERDESC s_LayerList[] =
-{
-    { "Logger",         "Trace Analyzer",   "LOG",  NO_DISPLAY,     DX12TraceAnalyzerLayer::Instance(),         DX12TraceAnalyzerLayer::Instance() },
-    { "ObjectDatabase", "Object Database",  "DB",   DISPLAY,        DX12ObjectDatabaseProcessor::Instance(),    DX12ObjectDatabaseProcessor::Instance() },
-    { "FrameDebugger",  "Frame Debugger",   "FD",   NO_DISPLAY,     DX12FrameDebuggerLayer::Instance(),         DX12FrameDebuggerLayer::Instance() },
-    { "FrameProfiler",  "Frame Profiler",   "FP",   NO_DISPLAY,     DX12FrameProfilerLayer::Instance(),         DX12FrameProfilerLayer::Instance() }
-};
-
-#else
-
-//-----------------------------------------------------------------------------
-/// Initial configuration of layers that we can use within the DX12Server DLL for GPS.
-//-----------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------
+/// Initial configuration of layers that we can use within the DX12Server DLL for GPS and CodeXL.
+//------------------------------------------------------------------------------------------------
 static LAYERDESC s_LayerList[] =
 {
     { "Logger",         "Trace Analyzer",   "LOG",  NO_DISPLAY,     DX12TraceAnalyzerLayer::Instance(),         DX12TraceAnalyzerLayer::Instance() },
     { "ObjectDatabase", "Object Database",  "DB",   DISPLAY,        DX12ObjectDatabaseProcessor::Instance(),    DX12ObjectDatabaseProcessor::Instance() },
     { "FrameDebugger",  "Frame Debugger",   "FD",   NO_DISPLAY,     DX12FrameDebuggerLayer::Instance(),         DX12FrameDebuggerLayer::Instance() },
     { "FrameProfiler",  "Frame Profiler",   "FP",   NO_DISPLAY,     DX12FrameProfilerLayer::Instance(),         DX12FrameProfilerLayer::Instance() },
-    { "TimeControl",    "Time Control",     "TC",   NO_DISPLAY,     TimeControlLayer::Instance(),               TimeControlLayer::Instance() }
 };
-
-#endif
 
 //-----------------------------------------------------------------------------
 /// Retrieve the DX12LayerManager instance.
