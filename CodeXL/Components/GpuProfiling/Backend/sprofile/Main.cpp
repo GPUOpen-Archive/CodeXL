@@ -304,6 +304,7 @@ void CheckOutputFile(const Config& configInner)
 bool DisplayOccupancy(const std::string& strOutputFile)
 {
     bool success = false;
+
     if (!config.strOccupancyParamsFile.empty())
     {
         OccupancyUtils::OccupancyParams paramsInner;
@@ -799,7 +800,7 @@ bool ProcessCommandLine(const std::string& strCounterFile)
 
     bool isCounterFileMoreThanOne = config.counterFileList.size() > 1 ? true : false;
     std::string defaultOutputFileName = config.strOutputFile;
-    
+
     if (!config.counterFileList.empty())
     {
         bool isReplaying = false;
@@ -809,7 +810,7 @@ bool ProcessCommandLine(const std::string& strCounterFile)
             std::string outputFileName;
             std::string logFile;
             std::string appendString;
-            
+
             if (!outputFileName.empty())
             {
                 outputFileName.clear();

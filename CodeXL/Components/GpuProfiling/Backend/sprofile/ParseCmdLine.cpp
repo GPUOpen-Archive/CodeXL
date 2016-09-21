@@ -74,7 +74,7 @@ void PrintCounters(CounterList& counterList, const string& strGenerationName, co
 std::string GetCounterListOutputFileName(const std::string& strOutputFile, const std::string& strAPI, const std::string& strGeneration);
 std::string RemoveGroupFromCounterDescriptionIfPresent(std::string counterDescription);
 inline void ShowExamples();
-void PrintNumberOfPass(const std::string counterFile);
+void PrintNumberOfPass(const std::string counterFile, const bool& gpuTimePMCEnabled);
 std::vector<DeviceInfo> RemoveDuplicateDevice(std::vector<DeviceInfo> deviceInfoList);
 inline bool CompareDeviceInfo(DeviceInfo first, DeviceInfo second);
 void PrintCounterList(CounterList counterList);
@@ -854,19 +854,16 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
             {
                 for (unsigned int i = 0; i < configOut.counterFileList.size(); ++i)
                 {
-                    PrintNumberOfPass(configOut.counterFileList[i]);
+                    PrintNumberOfPass(configOut.counterFileList[i], configOut.bGPUTimePMC);
                 }
             }
             else
             {
                 std::string emptyCounterFile;
-                PrintNumberOfPass(emptyCounterFile);
+                PrintNumberOfPass(emptyCounterFile, configOut.bGPUTimePMC);
             }
 
-
-
             return false;
-
         }
 
         // All command line arguments that appear after a non-option are treated as app command line
@@ -1203,7 +1200,7 @@ void PrintCounters(const std::string& strOutputFile, const bool shouldIncludeCou
 #endif
 }
 
-void PrintNumberOfPass(const std::string counterFile)
+void PrintNumberOfPass(const std::string counterFile, const bool& gpuTimePMCEnabled)
 {
     std::function<void(CounterPassInfo, std::string)> PrintCounterPassInfo =
         [](CounterPassInfo counterPassInfo, std::string api)
@@ -1224,11 +1221,23 @@ void PrintNumberOfPass(const std::string counterFile)
     std::vector<CounterPassInfo> counterPassInfiListForCL;
     //OpenCL
     {
+        bool gpuTimeConsidered = true;
+
+        if (counterList.empty())
+        {
+            gpuTimeConsidered = false;
+        }
+
         counterPassInfiListForCL = GetNumberOfPassForAPI(GPA_API_OPENCL, counterList);
 
         for (unsigned int i = 0; i < counterPassInfiListForCL.size(); ++i)
         {
             PrintCounterPassInfo(counterPassInfiListForCL[i], "OpenCL");
+        }
+
+        if (!gpuTimeConsidered && !gpuTimePMCEnabled)
+        {
+            std::cout << "\nNote: GPUTime will take an additional pass.\n";
         }
     }
 
