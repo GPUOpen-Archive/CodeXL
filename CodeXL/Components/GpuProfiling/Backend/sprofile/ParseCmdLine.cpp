@@ -45,7 +45,7 @@ struct DeviceInfo
     int m_deviceId;                     ///< device Id
     int m_revId;                        ///< revision Id of the device
     std::string m_deviceCALName;        ///< CAL device name
-    GDT_HW_GENERATION m_generation;     ///< generration of the device
+    GDT_HW_GENERATION m_generation;     ///< generation of the device
 
     DeviceInfo()
     {
