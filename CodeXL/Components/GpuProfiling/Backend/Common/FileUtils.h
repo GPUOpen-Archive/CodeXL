@@ -129,28 +129,29 @@ gtString GetExeFullPathAsUnicode();
 std::string GetDefaultOutputPath();
 
 /// Get default profile output file name
+/// \param[in, opt] appendToDefaultFileName string to append to the default file name
 /// \return default output file name -- Session1.csv in the directory returned by GetDefaultOptionPath
 std::string GetDefaultProfileOutputFile(const std::string& appendToDefaultFileName = std::string());
 
 /// Get default trace output file name
 /// \return default trace output file name -- apitrace.atp in the directory returned by GetDefaultOptionPath
-std::string GetDefaultTraceOutputFile(const std::string& appendToDefaultFileName = std::string());
+std::string GetDefaultTraceOutputFile();
 
 /// Get default occupancy output file name
 /// \return default occupancy output file name -- Session1.occupancy in the directory returned by GetDefaultOptionPath
-std::string GetDefaultOccupancyOutputFile(const std::string& appendToDefaultFileName = std::string());
+std::string GetDefaultOccupancyOutputFile();
 
 /// Get default perfmarker output file name
 /// \return default perfmarker output file name -- apitrace.amdtperfmarker in the directory returned by GetDefaultOptionPath
-std::string GetDefaultPerfMarkerOutputFile(const std::string& appendToDefaultFileName = std::string());
+std::string GetDefaultPerfMarkerOutputFile();
 
 /// Get default sub-kernel profile output file name
 /// \return default sub-kernel profile output file name -- subkernelprofile.txt in the directory returned by GetDefaultOptionPath
-std::string GetDefaultSubKernelProfileOutputFile(const std::string& appendToDefaultFileName = std::string());
+std::string GetDefaultSubKernelProfileOutputFile();
 
 /// Get default thread trace output directory path
 /// \return Default thread trace output directory path -- clthreadtrace in the directory returned by GetDefaultOptionPath
-std::string GetDefaultThreadTraceOutputDir(const std::string& appendToDefaultFileName = std::string());
+std::string GetDefaultThreadTraceOutputDir();
 
 /// Merge the contents of the two specified files into a combined file, which can include an additional string written to the start of the file
 /// \param strNewFileName the name of the merged file

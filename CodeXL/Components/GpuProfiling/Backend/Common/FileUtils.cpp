@@ -974,29 +974,29 @@ std::string FileUtils::GetDefaultProfileOutputFile(const std::string& appendToDe
     return GetDefaultOutputPath() + "Session1" + (appendToDefaultFileName.empty() ? "":appendToDefaultFileName) + ".csv";
 }
 
-std::string FileUtils::GetDefaultOccupancyOutputFile(const std::string& appendToDefaultFileName)
+std::string FileUtils::GetDefaultOccupancyOutputFile()
 {
-    return GetDefaultOutputPath() + "Session1" + (appendToDefaultFileName.empty() ? "" : appendToDefaultFileName) + ".occupancy";
+    return GetDefaultOutputPath() + "Session1.occupancy";
 }
 
-std::string FileUtils::GetDefaultPerfMarkerOutputFile(const std::string& appendToDefaultFileName)
+std::string FileUtils::GetDefaultPerfMarkerOutputFile()
 {
-    return GetDefaultOutputPath() + "apitrace" +(appendToDefaultFileName.empty() ? "" : appendToDefaultFileName) + PERFMARKER_EXT;
+    return GetDefaultOutputPath() + "apitrace" PERFMARKER_EXT;
 }
 
-std::string FileUtils::GetDefaultTraceOutputFile(const std::string& appendToDefaultFileName)
+std::string FileUtils::GetDefaultTraceOutputFile()
 {
-    return GetDefaultOutputPath() + "apitrace" + (appendToDefaultFileName.empty() ? "" : appendToDefaultFileName) + ".atp";
+    return GetDefaultOutputPath() + "apitrace.atp";
 }
 
-std::string FileUtils::GetDefaultSubKernelProfileOutputFile(const std::string& appendToDefaultFileName)
+std::string FileUtils::GetDefaultSubKernelProfileOutputFile()
 {
-    return GetDefaultOutputPath() + "subkernelprofile" + (appendToDefaultFileName.empty() ? "" : appendToDefaultFileName) + ".csv";
+    return GetDefaultOutputPath() + "subkernelprofile.csv";
 }
 
-std::string FileUtils::GetDefaultThreadTraceOutputDir(const std::string& appendToDefaultFileName)
+std::string FileUtils::GetDefaultThreadTraceOutputDir()
 {
-    return GetDefaultOutputPath() + "clthreadtrace" + (appendToDefaultFileName.empty() ? "" : appendToDefaultFileName);
+    return GetDefaultOutputPath() + "clthreadtrace" ;
 }
 
 bool FileUtils::MergeFiles(const std::wstring& strNewFileName, const std::wstring& strFileName1,

@@ -54,7 +54,7 @@
     <Import Project="..\Backend-Common.props" />
     <Import Project="..\Backend-Common-OpenCL.props" />
     <Import Project="..\Backend-Deliverable.props" />
-	<Import Project="..\..\..\..\..\Common\Src\ADLUtil\Global-ADLUtil.props" />
+    <Import Project="..\..\..\..\..\Common\Src\ADLUtil\Global-ADLUtil.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>

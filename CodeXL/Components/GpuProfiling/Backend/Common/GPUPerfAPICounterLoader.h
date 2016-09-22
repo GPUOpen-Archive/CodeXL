@@ -15,6 +15,8 @@
 #include "StringUtils.h"
 #include "OSUtils.h"
 
+SP_TODO("Investigate the functionality using DynamicLibraryModule");
+
 typedef decltype(GPA_GetAvailableCounters)* GPA_GetAvailableCountersForDeviceProc;
 typedef decltype(GPA_GetAvailableCountersByGeneration)* GPA_GetAvailableCountersByGenerationProc;
 
