@@ -301,9 +301,9 @@ void CheckOutputFile(const Config& configInner)
     }
 }
 
-bool DisplayOccupancy(const std::string& strOutputFile)
+int DisplayOccupancy(const std::string& strOutputFile)
 {
-    bool success = false;
+    int retVal = 0;
 
     if (!config.strOccupancyParamsFile.empty())
     {
@@ -315,20 +315,21 @@ bool DisplayOccupancy(const std::string& strOutputFile)
         if (OccupancyUtils::GetOccupancyParamsFromFile(config.strOccupancyParamsFile, paramsInner, occupancyError) &&
             GenerateOccupancyChart(paramsInner, strOutputFile, occupancyError))
         {
-            success = true;
+            retVal = 0;
         }
         else
         {
             std::cout << "Error generating occupancy display file." << std::endl << occupancyError << std::endl;
-            success = false;
+            retVal = -1;
         }
     }
 
-    return success;
+    return retVal;
 }
 
-bool ProfileApplication(const std::string& strCounterFile, const int& profilerBits)
+int ProfileApplication(const std::string& strCounterFile, const int& profilerBits)
 {
+    int retVal = 0;
 
     std::string counterfile = strCounterFile;
 
@@ -383,7 +384,7 @@ bool ProfileApplication(const std::string& strCounterFile, const int& profilerBi
         params.m_bTimeOutBasedOutput = true;
         MergeFragFiles(1);
 
-        return true;
+        return 0;
     }
 
     //----------------------------------------
@@ -397,36 +398,36 @@ bool ProfileApplication(const std::string& strCounterFile, const int& profilerBi
     gtString strDirPath = FileUtils::GetExePathAsUnicode();
 
 #if defined (_LINUX) || defined (LINUX)
-
-    //----------------------------------------
-    // Set replace tilde
-    //----------------------------------------
-    gtString retVal;
-    osGetCurrentProcessEnvVariableValue(L"HOME", retVal);
-    string strHomePath;
-    StringUtils::WideStringToUtf8String(retVal.asCharArray(), strHomePath);
-
-    FileUtils::ReplaceTilde(strHomePath, config.strOutputFile);
-    FileUtils::ReplaceTilde(strHomePath, counterfile);
-
-    // replace tilde using gtString
-    if (config.strInjectedApp[0] == '~')
     {
-        config.strInjectedApp.extruct(0, 1);
-        gtString tempStr = config.strInjectedApp;
-        config.strInjectedApp = retVal;
-        config.strInjectedApp.appendFormattedString(L"%ls", tempStr.asCharArray());
+        //----------------------------------------
+        // Set replace tilde
+        //----------------------------------------
+        gtString retVal;
+        osGetCurrentProcessEnvVariableValue(L"HOME", retVal);
+        string strHomePath;
+        StringUtils::WideStringToUtf8String(retVal.asCharArray(), strHomePath);
+
+        FileUtils::ReplaceTilde(strHomePath, config.strOutputFile);
+        FileUtils::ReplaceTilde(strHomePath, counterfile);
+
+        // replace tilde using gtString
+        if (config.strInjectedApp[0] == '~')
+        {
+            config.strInjectedApp.extruct(0, 1);
+            gtString tempStr = config.strInjectedApp;
+            config.strInjectedApp = retVal;
+            config.strInjectedApp.appendFormattedString(L"%ls", tempStr.asCharArray());
+        }
+
+        // For linux, we need to check file existence before we fork
+        osFile fileToCheck(config.strInjectedApp);
+
+        if (!fileToCheck.exists())
+        {
+            cout << "Process failed to run. Make sure you have specified the correct path." << endl;
+            return -1;
+        }
     }
-
-    // For linux, we need to check file existence before we fork
-    osFile fileToCheck(config.strInjectedApp);
-
-    if (!fileToCheck.exists())
-    {
-        cout << "Process failed to run. Make sure you have specified the correct path." << endl;
-        return -1;
-    }
-
 #endif
 
     bool bAnyAgentSet = false;
@@ -448,7 +449,7 @@ bool ProfileApplication(const std::string& strCounterFile, const int& profilerBi
             cout << "No profile mode specified. Nothing will be done." << endl;
         }
 
-        return false;
+        return 1;
     }
 
     //----------------------------------------
@@ -506,7 +507,7 @@ bool ProfileApplication(const std::string& strCounterFile, const int& profilerBi
     {
         std::cout << "A counter file must be specified when collecting perf counters in the internal build\n";
         std::cout << "Use --counterfile (or -c) to specify a counter file\n";
-        return false;
+        return -1;
     }
 
 #endif
@@ -560,7 +561,7 @@ bool ProfileApplication(const std::string& strCounterFile, const int& profilerBi
     if (!CheckIsAppValid(config.strInjectedApp, profilerBits))
     {
         wcout << config.strInjectedApp.asCharArray() << " is not a valid application" << endl;
-        return false;
+        return -1;
     }
 
 #ifdef _DEBUG
@@ -594,7 +595,7 @@ bool ProfileApplication(const std::string& strCounterFile, const int& profilerBi
     if (ret != 0)
     {
         FileUtils::DeleteTmpFile();
-        return false;
+        return -1;
     }
 
 #else
@@ -617,7 +618,7 @@ bool ProfileApplication(const std::string& strCounterFile, const int& profilerBi
     if (pszCmdline == NULL)
     {
         cout << "Error processing command line\n";
-        return false;
+        return -1;
     }
 
     if (nCmdlineLength > 0)
@@ -705,12 +706,14 @@ bool ProfileApplication(const std::string& strCounterFile, const int& profilerBi
     MergeFragFiles(1);
     CheckOutputFile(config);
 
-    return true;
+    return retVal;
 }
 
 
-bool ProcessCommandLine(const std::string& strCounterFile)
+int ProcessCommandLine(const std::string& strCounterFile)
 {
+    int retVal = 0;
+
     //If the occupancy switch is set, open the occupancy parameters file and parse
     //Then, generate the HTML output.
     if (config.bOccupancyDisplay)
@@ -721,8 +724,6 @@ bool ProcessCommandLine(const std::string& strCounterFile)
         }
     }
 
-    bool success = false;
-
     if (!config.bAnalyzeOnly)
     {
         //Get the number of bits of the profiler
@@ -731,7 +732,7 @@ bool ProcessCommandLine(const std::string& strCounterFile)
         gtString strProfiler = FileUtils::GetExeFullPathAsUnicode();
 
         iProfilerNbrBits = GetNbrAppBits(strProfiler);
-        success = ProfileApplication(strCounterFile, iProfilerNbrBits);
+        retVal = ProfileApplication(strCounterFile, iProfilerNbrBits);
     }
 
 
@@ -743,7 +744,6 @@ bool ProcessCommandLine(const std::string& strCounterFile)
         if (!APITraceAnalyze(config))
         {
             cout << "\nFailed to generate summary pages\n";
-            success &= false;
         }
     }
 
@@ -753,7 +753,7 @@ bool ProcessCommandLine(const std::string& strCounterFile)
 
     FileUtils::DeleteTmpFile();
 
-    return success;
+    return retVal;
 }
 
 #ifdef _WIN32
@@ -795,8 +795,6 @@ bool ProcessCommandLine(const std::string& strCounterFile)
     }
 
 #endif
-
-    bool success = false;
 
     bool isCounterFileMoreThanOne = config.counterFileList.size() > 1 ? true : false;
     std::string defaultOutputFileName = config.strOutputFile;
@@ -889,7 +887,7 @@ bool ProcessCommandLine(const std::string& strCounterFile)
             }
 
             config.strOutputFile = outputFileName;
-            success = ProcessCommandLine(config.counterFileList[i]);
+            retVal = ProcessCommandLine(config.counterFileList[i]);
             isReplaying = true;
         }
     }
@@ -942,10 +940,10 @@ bool ProcessCommandLine(const std::string& strCounterFile)
         }
 
         config.strOutputFile = outputFileName;
-        success = ProcessCommandLine(counterFile);
+        retVal = ProcessCommandLine(counterFile);
     }
 
-    return retVal = success ? 0 : -1;
+    return retVal;
 }
 
 static void MergeFragFiles(int sig)

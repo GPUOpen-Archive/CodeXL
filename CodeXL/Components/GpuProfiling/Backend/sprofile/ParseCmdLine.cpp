@@ -1220,9 +1220,9 @@ void PrintNumberOfPass(const std::string counterFile, const bool& gpuTimePMCEnab
     std::vector<CounterPassInfo> counterPassInfiListForCL;
     counterPassInfiListForCL = GetNumberOfPassForAPI(GPA_API_OPENCL, counterList);
 
-    for (unsigned int i = 0; i < counterPassInfiListForCL.size(); ++i)
+    for (std::vector<CounterPassInfo>::iterator i = counterPassInfiListForCL.begin(); i != counterPassInfiListForCL.end(); ++i)
     {
-        PrintCounterPassInfo(counterPassInfiListForCL[i], "OpenCL");
+        PrintCounterPassInfo((*i), "OpenCL");
     }
 
     if (gpuTimePMCEnabled)
@@ -1238,9 +1238,9 @@ void PrintNumberOfPass(const std::string counterFile, const bool& gpuTimePMCEnab
     std::vector<CounterPassInfo> counterPassInfiListForHSA;
     counterPassInfiListForHSA = GetNumberOfPassForAPI(GPA_API_HSA, counterList);
 
-    for (unsigned int i = 0; i < counterPassInfiListForHSA.size(); ++i)
+    for (std::vector<CounterPassInfo>::iterator i = counterPassInfiListForHSA.begin(); i != counterPassInfiListForHSA.end(); ++i)
     {
-        PrintCounterPassInfo(counterPassInfiListForHSA[i], "HSA");
+        PrintCounterPassInfo((*i), "HSA");
     }
 
 #endif
@@ -1250,9 +1250,9 @@ void PrintNumberOfPass(const std::string counterFile, const bool& gpuTimePMCEnab
     std::vector<CounterPassInfo> counterPassInfiListForDC;
     counterPassInfiListForDC = GetNumberOfPassForAPI(GPA_API_DIRECTX_11, counterList);
 
-    for (unsigned int i = 0; i < counterPassInfiListForDC.size(); ++i)
+    for (std::vector<CounterPassInfo>::iterator i = counterPassInfiListForDC.begin(); i != counterPassInfiListForDC.end(); ++i)
     {
-        PrintCounterPassInfo(counterPassInfiListForDC[i], "Direct Compute");
+        PrintCounterPassInfo((*i), "Direct Compute");
     }
 
 #endif
@@ -1566,7 +1566,7 @@ std::vector<DeviceInfo> GetDeviceInfoList(GPA_API_Type apiType)
             DeviceInfo deviceInfo;
             GDT_GfxCardInfo cardInfo;
 
-            for (std::vector<uint32_t>::iterator i = hsaDeviceList.size(); i != hsaDeviceList.end(); ++i)
+            for (std::vector<uint32_t>::iterator i = hsaDeviceList.begin(); i != hsaDeviceList.end(); ++i)
             {
                 deviceInfo.m_deviceId = (*i);
 
