@@ -134,11 +134,19 @@ bool HSAAPIInfoManager::WriteKernelTimestampEntry(std::ostream& sout, const hsa_
     return true;
 }
 
-bool HSAAPIInfoManager::WriteAsyncCopyTimestamp(std::ostream& sout, const hsa_amd_profiling_async_copy_time_t& timestamp)
+bool HSAAPIInfoManager::WriteAsyncCopyTimestamp(std::ostream& sout, const AsyncCopyInfo* pAsyncCopyInfo)
 {
-    sout << std::left << std::setw(21) << timestamp.start;
-    sout << std::left << std::setw(21) << timestamp.end;
-    return true;
+    if (nullptr != pAsyncCopyInfo)
+    {
+        sout << std::left << std::setw(21) << pAsyncCopyInfo->m_threadId;
+        sout << std::left << std::setw(21) << pAsyncCopyInfo->m_signal.handle;
+        sout << std::left << std::setw(21) << pAsyncCopyInfo->m_start;
+        sout << std::left << std::setw(21) << pAsyncCopyInfo->m_end;
+
+        return true;
+    }
+
+    return false;
 }
 
 void HSAAPIInfoManager::FlushNonAPITimestampData(const osProcessId& pid)
@@ -186,20 +194,25 @@ void HSAAPIInfoManager::FlushNonAPITimestampData(const osProcessId& pid)
         {
             AMDTScopeLock lock(m_asyncTimeStampsMtx);
 
-            if (m_asyncCopyTimestamps.size() > 0)
+            if (m_asyncCopyInfoList.size() > 0)
             {
                 string tmpKernelTimestampFile = GetTempFileName(pid, 0, TMP_ASYNC_COPY_TIME_STAMP_EXT);
                 ofstream foutCopyTS(tmpKernelTimestampFile.c_str(), fstream::out | fstream::app);
 
-                for (auto timestamp : m_asyncCopyTimestamps)
+                for (auto asyncCopyInfo : m_asyncCopyInfoList)
                 {
-                    WriteAsyncCopyTimestamp(foutCopyTS, timestamp);
+                    WriteAsyncCopyTimestamp(foutCopyTS, asyncCopyInfo);
                     foutCopyTS << std::endl;
                 }
 
                 foutCopyTS.close();
 
-                m_asyncCopyTimestamps.clear();
+                for (auto it = m_asyncCopyInfoList.begin(); it != m_asyncCopyInfoList.end(); ++it)
+                {
+                    delete (*it);
+                }
+
+                m_asyncCopyInfoList.clear();
             }
         }
     }
@@ -261,23 +274,18 @@ bool HSAAPIInfoManager::GetQueueIndex(const hsa_queue_t* pQueue, size_t& queueIn
     return retVal;
 }
 
-struct AsyncHandlerParam
-{
-    hsa_signal_t m_signal;
-};
-
 bool AsyncSignalHandler(hsa_signal_value_t /* value */, void* arg)
 {
-    hsa_amd_profiling_async_copy_time_t asyncCopyTime;
-    AsyncHandlerParam* pHandlerParam = reinterpret_cast<AsyncHandlerParam*>(arg);
+    AsyncCopyInfo* pAsyncCopyInfo = reinterpret_cast<AsyncCopyInfo*>(arg);
 
-    if (nullptr == pHandlerParam)
+    if (nullptr == pAsyncCopyInfo)
     {
         Log(logERROR, "AsyncSignalhandler called with a null user arg.\n");
     }
     else
     {
-        hsa_status_t status = g_pRealAmdExtFunctions->hsa_amd_profiling_get_async_copy_time_fn(pHandlerParam->m_signal, &asyncCopyTime);
+        hsa_amd_profiling_async_copy_time_t asyncCopyTime;
+        hsa_status_t status = g_pRealAmdExtFunctions->hsa_amd_profiling_get_async_copy_time_fn(pAsyncCopyInfo->m_signal, &asyncCopyTime);
 
         if (HSA_STATUS_SUCCESS != status)
         {
@@ -285,10 +293,9 @@ bool AsyncSignalHandler(hsa_signal_value_t /* value */, void* arg)
         }
         else
         {
-            HSAAPIInfoManager::Instance()->AddAsyncCopyTimestamp(asyncCopyTime);
+            pAsyncCopyInfo->m_start = asyncCopyTime.start;
+            pAsyncCopyInfo->m_end = asyncCopyTime.end;
         }
-
-        delete pHandlerParam;
     }
 
     return false; // no longer monitor this signal (it will be re-added if necessary)
@@ -302,30 +309,23 @@ void HSAAPIInfoManager::AddAsyncCopyCompletionSignal(const hsa_signal_t& complet
     hsa_signal_value_t signalValue = g_pRealCoreFunctions->hsa_signal_load_acquire_fn(completionSignal);
 #endif
 
-    AsyncHandlerParam* pHandlerParam = new(std::nothrow) AsyncHandlerParam();
+    AsyncCopyInfo* pAsyncCopyInfo = new(std::nothrow) AsyncCopyInfo(osGetUniqueCurrentThreadId(), completionSignal);
 
-    if (nullptr == pHandlerParam)
+    if (nullptr == pAsyncCopyInfo)
     {
-        Log(logERROR, "AddAsyncCopyCompletionSignal: unable to allocate memory for async handler param\n");
+        Log(logERROR, "Unable to allocate memory for ASyncCopyInfo\n");
     }
     else
     {
-        pHandlerParam->m_signal = completionSignal;
+        m_asyncCopyInfoList.push_back(pAsyncCopyInfo);
 
-        hsa_status_t status = g_pRealAmdExtFunctions->hsa_amd_signal_async_handler_fn(completionSignal, HSA_SIGNAL_CONDITION_LT, signalValue, AsyncSignalHandler, pHandlerParam);
+        hsa_status_t status = g_pRealAmdExtFunctions->hsa_amd_signal_async_handler_fn(completionSignal, HSA_SIGNAL_CONDITION_LT, signalValue, AsyncSignalHandler, pAsyncCopyInfo);
 
         if (HSA_STATUS_SUCCESS != status)
         {
             Log(logERROR, "Error returned from hsa_amd_signal_async_handler\n");
         }
     }
-}
-
-void HSAAPIInfoManager::AddAsyncCopyTimestamp(const hsa_amd_profiling_async_copy_time_t& asyncCopyTime)
-{
-    AMDTScopeLock lock(m_asyncTimeStampsMtx);
-
-    m_asyncCopyTimestamps.push_back(asyncCopyTime);
 }
 
 void HSATraceAgentTimerEndResponse(ProfilerTimerType timerType)

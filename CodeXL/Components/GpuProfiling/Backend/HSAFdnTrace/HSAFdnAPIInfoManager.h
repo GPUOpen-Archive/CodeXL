@@ -12,12 +12,32 @@
 
 #include <unordered_map>
 
+#include <AMDTOSWrappers/Include/osThread.h>
+
 #include <AMDTMutex.h>
 
 #include "../Common/APIInfoManagerBase.h"
 #include "HSAAPIBase.h"
 #include "../Common/ProfilerTimer.h"
 
+/// Struct to hold AsyncCopy timestamps
+struct AsyncCopyInfo
+{
+    osThreadId   m_threadId; ///< thread id of host thread that called the API using hte signal being tracked
+    hsa_signal_t m_signal;   ///< the signal being tracked
+    uint64_t     m_start;    ///< the start timestamp
+    uint64_t     m_end;      ///< the end timestamp
+
+    AsyncCopyInfo(const osThreadId& threadId, const hsa_signal_t& signal) :
+       m_threadId(threadId),
+       m_signal(signal),
+       m_start(0),
+       m_end(0)
+    {
+    }
+};
+
+typedef std::vector<AsyncCopyInfo*> AsyncCopyInfoList; ///< typedef for the async copy info list
 
 /// Handle the response on the end of the timer
 /// \param timerType type of the ending timer for which response have to be executed
@@ -54,10 +74,6 @@ public:
     /// Adds the specified signal to the list of async copy signals that need to be tracked.
     /// \param completionSignal the signal that should be tracked
     void AddAsyncCopyCompletionSignal(const hsa_signal_t& completionSignal);
-
-    /// Adds the specified set of timestamps to be written to the output file
-    /// \param asyncCopyTime the timestamps to be written
-    void AddAsyncCopyTimestamp(const hsa_amd_profiling_async_copy_time_t& asyncCopyTime);
 
     /// Enables or Disables the profiler delay
     /// \param doEnable true for enable and false for disable
@@ -109,9 +125,14 @@ private:
     /// Write kernel timestamp data to stream
     /// \param sout the output stream
     /// \param record the kernel timestamp record to write to the stream
+    /// \return true on success
     bool WriteKernelTimestampEntry(std::ostream& sout, const hsa_profiler_kernel_time_t& record);
 
-    bool WriteAsyncCopyTimestamp(std::ostream& sout, const hsa_amd_profiling_async_copy_time_t& timestamp);
+    /// Write Async Copy timestamp data to stream
+    /// \param sout the output stream
+    /// \param pAsyncCopyInfo the async copy info to write to the stream
+    /// \return true on success
+    bool WriteAsyncCopyTimestamp(std::ostream& sout, const AsyncCopyInfo* pAsyncCopyInfo);
 
     /// Check if specified API is in API filter list
     /// \param type HSA function type
@@ -124,14 +145,13 @@ private:
 
     typedef std::unordered_map<const hsa_queue_t*, size_t>   QueueIndexMap;     ///< typedef for the queue index map
     typedef std::pair<const hsa_queue_t*, size_t>            QueueIndexMapPair; ///< typedef for the queue index pair
-    typedef std::vector<hsa_amd_profiling_async_copy_time_t> AsyncCopyTimestampList;
 
     unsigned int           m_tracedApiCount;                ///< number of APIs that have been traced, used to support max apis to trace option
     std::set<HSA_API_Type> m_filterAPIs;                    ///< HSA APIs that are not traced due to API filtering
     std::set<HSA_API_Type> m_mustInterceptAPIs;             ///< HSA APIs that must be intercepted (even when they are filtered out and not traced)
     QueueIndexMap          m_queueIndexMap;                 ///< map of a queue to that queue's index (basically creation order)
-    AsyncCopyTimestampList m_asyncCopyTimestamps;
-    AMDTMutex              m_asyncTimeStampsMtx;
+    AsyncCopyInfoList      m_asyncCopyInfoList;             ///< list of async copy information
+    AMDTMutex              m_asyncTimeStampsMtx;            ///< mutex to guard access to m_asyncCopyInfoList
     bool                   m_bDelayStartEnabled;            ///< flag indicating whether or not the profiler should start with delay or not
     bool                   m_bProfilerDurationEnabled;      ///< flag indiacating whether profiler should only run for certain duration
     unsigned long          m_delayInMilliseconds;           ///< millieconds to delay for profiler to start
