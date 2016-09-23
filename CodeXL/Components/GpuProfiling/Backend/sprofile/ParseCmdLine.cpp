@@ -27,9 +27,9 @@
 #include "../Common/LocaleSetting.h"
 #include "../Common/Defs.h"
 #include "../Common/GPAUtils.h"
+#include "../CLCommon/CLUtils.h"
+#include "../CLCommon/CLFunctionDefs.h"
 #include "DeviceInfoUtils.h"
-#include "CLUtils.h"
-#include "CLFunctionDefs.h"
 #include <ADLUtil/ADLUtil.h>
 
 #if defined (_LINUX) || defined (LINUX)
