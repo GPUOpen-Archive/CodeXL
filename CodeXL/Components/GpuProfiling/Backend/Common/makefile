@@ -46,7 +46,7 @@ LIB_OBJS =  \
 	./$(OBJ_DIR)/ACLModule.o \
 	./$(OBJ_DIR)/ADLUtil.o \
 	./$(OBJ_DIR)/ProfilerTimer.o \
-        ./$(OBJ_DIR)/GPUPerfAPICounterLoader.o
+	./$(OBJ_DIR)/GPUPerfAPICounterLoader.o
 
 
 include $(DEPTH)/Build/CommonTargets.mk

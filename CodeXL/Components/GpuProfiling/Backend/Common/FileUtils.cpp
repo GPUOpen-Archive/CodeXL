@@ -986,9 +986,9 @@ std::string FileUtils::GetDefaultOutputPath()
     return std::string(szDefaultOutputPath);
 }
 
-std::string FileUtils::GetDefaultProfileOutputFile()
+std::string FileUtils::GetDefaultProfileOutputFile(const std::string& appendToDefaultFileName)
 {
-    return GetDefaultOutputPath() + "Session1.csv";
+    return GetDefaultOutputPath() + "Session1" + (appendToDefaultFileName.empty() ? "":appendToDefaultFileName) + ".csv";
 }
 
 std::string FileUtils::GetDefaultOccupancyOutputFile()
@@ -1013,7 +1013,7 @@ std::string FileUtils::GetDefaultSubKernelProfileOutputFile()
 
 std::string FileUtils::GetDefaultThreadTraceOutputDir()
 {
-    return GetDefaultOutputPath() + "clthreadtrace";
+    return GetDefaultOutputPath() + "clthreadtrace" ;
 }
 
 bool FileUtils::MergeFiles(const std::wstring& strNewFileName, const std::wstring& strFileName1,

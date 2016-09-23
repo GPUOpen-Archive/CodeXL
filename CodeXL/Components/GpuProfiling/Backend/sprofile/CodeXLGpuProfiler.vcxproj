@@ -54,17 +54,6 @@
     <Import Project="..\Backend-Common.props" />
     <Import Project="..\Backend-Common-OpenCL.props" />
     <Import Project="..\Backend-Deliverable.props" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Import Project="..\..\..\..\..\Common\Src\ADLUtil\Global-ADLUtil.props" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="..\..\..\..\..\Common\Src\ADLUtil\Global-ADLUtil.props" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="..\..\..\..\..\Common\Src\ADLUtil\Global-ADLUtil.props" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="..\..\..\..\..\Common\Src\ADLUtil\Global-ADLUtil.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />

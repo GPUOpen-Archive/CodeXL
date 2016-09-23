@@ -129,8 +129,9 @@ gtString GetExeFullPathAsUnicode();
 std::string GetDefaultOutputPath();
 
 /// Get default profile output file name
+/// \param[in, opt] appendToDefaultFileName string to append to the default file name
 /// \return default output file name -- Session1.csv in the directory returned by GetDefaultOptionPath
-std::string GetDefaultProfileOutputFile();
+std::string GetDefaultProfileOutputFile(const std::string& appendToDefaultFileName = std::string());
 
 /// Get default trace output file name
 /// \return default trace output file name -- apitrace.atp in the directory returned by GetDefaultOptionPath
