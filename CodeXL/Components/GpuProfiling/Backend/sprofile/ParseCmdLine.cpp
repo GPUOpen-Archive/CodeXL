@@ -41,9 +41,9 @@ using namespace std;
 
 struct DeviceInfo
 {
-    int m_vendorId;                     ///< vendor Id of the device
-    int m_deviceId;                     ///< device Id
-    int m_revId;                        ///< revision Id of the device
+    unsigned int m_vendorId;            ///< vendor Id of the device
+    unsigned int m_deviceId;            ///< device Id
+    unsigned int m_revId;               ///< revision Id of the device
     std::string m_deviceCALName;        ///< CAL device name
     GDT_HW_GENERATION m_generation;     ///< generation of the device
 
@@ -1225,7 +1225,7 @@ void PrintNumberOfPass(const std::string counterFile, const bool& gpuTimePMCEnab
         PrintCounterPassInfo((*i), "OpenCL");
     }
 
-    if (gpuTimePMCEnabled)
+    if (gpuTimePMCEnabled && !counterPassInfiListForCL.empty())
     {
         std::cout << "Note: GPUTime will take an additional pass.\n\n\n";
     }
