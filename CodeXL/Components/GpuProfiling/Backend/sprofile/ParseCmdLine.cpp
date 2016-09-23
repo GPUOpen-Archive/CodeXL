@@ -1425,28 +1425,28 @@ std::vector<DeviceInfo> RemoveDuplicateDevice(std::vector<DeviceInfo> deviceInfo
     std::vector<DeviceInfo> tempDeviceInfoList;
     GDT_DeviceInfo deviceInfo;
 
-    for (std::vector<DeviceInfo>::iterator i = deviceInfoList.begin(); i != deviceInfoList.end(); ++i)
+    for (std::vector<DeviceInfo>::iterator iterOuter = deviceInfoList.begin(); iterOuter != deviceInfoList.end(); ++iterOuter)
     {
         if (!tempDeviceInfoList.empty())
         {
-            for (std::vector<DeviceInfo>::iterator j = tempDeviceInfoList.begin(); j != tempDeviceInfoList.end(); ++j)
+            for (std::vector<DeviceInfo>::iterator iterInner = tempDeviceInfoList.begin(); iterInner != tempDeviceInfoList.end(); ++iterInner)
             {
-                if (!CompareDeviceInfo((*i), (*j)) &&
-                    AMDTDeviceInfoUtils::Instance()->GetDeviceInfo((*i).m_deviceId,
+                if (!CompareDeviceInfo((*iterOuter), (*iterInner)) &&
+                    AMDTDeviceInfoUtils::Instance()->GetDeviceInfo((*iterOuter).m_deviceId,
                                                                    REVISION_ID_ANY,
                                                                    deviceInfo))
                 {
-                    tempDeviceInfoList.push_back(*i);
+                    tempDeviceInfoList.push_back(*iterOuter);
                 }
             }
         }
         else
         {
-            if (AMDTDeviceInfoUtils::Instance()->GetDeviceInfo((*i).m_deviceId,
+            if (AMDTDeviceInfoUtils::Instance()->GetDeviceInfo((*iterOuter).m_deviceId,
                                                                REVISION_ID_ANY,
                                                                deviceInfo))
             {
-                tempDeviceInfoList.push_back(*i);
+                tempDeviceInfoList.push_back(*iterOuter);
             }
         }
     }
@@ -1531,15 +1531,16 @@ std::vector<DeviceInfo> GetDeviceInfoList(GPA_API_Type apiType)
                 bool succeed = (AMDTADLUtils::Instance()->GetAsicInfoList(asicInfoList) == ADL_SUCCESS);
 
                 DeviceInfo deviceInfo;
-                GDT_GfxCardInfo cardInfo;
 
                 if (succeed)
                 {
-                    for (std::vector<ADLUtil_ASICInfo>::iterator i = asicInfoList.begin(); i != asicInfoList.end(); ++i)
+                    GDT_GfxCardInfo cardInfo;
+
+                    for (std::vector<ADLUtil_ASICInfo>::iterator it = asicInfoList.begin(); it != asicInfoList.end(); ++it)
                     {
-                        deviceInfo.m_deviceId = i->deviceID;
-                        deviceInfo.m_vendorId = i->vendorID;
-                        deviceInfo.m_revId = i->revID;
+                        deviceInfo.m_deviceId = it->deviceID;
+                        deviceInfo.m_vendorId = it->vendorID;
+                        deviceInfo.m_revId = it->revID;
 
                         if (AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceInfo.m_deviceId, deviceInfo.m_revId, cardInfo))
                         {
@@ -1566,9 +1567,9 @@ std::vector<DeviceInfo> GetDeviceInfoList(GPA_API_Type apiType)
             DeviceInfo deviceInfo;
             GDT_GfxCardInfo cardInfo;
 
-            for (std::vector<uint32_t>::iterator i = hsaDeviceList.begin(); i != hsaDeviceList.end(); ++i)
+            for (std::vector<uint32_t>::iterator it = hsaDeviceList.begin(); it != hsaDeviceList.end(); ++it)
             {
-                deviceInfo.m_deviceId = (*i);
+                deviceInfo.m_deviceId = (*it);
 
                 if (AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceInfo.m_deviceId, deviceInfo.m_revId, cardInfo))
                 {
@@ -1596,11 +1597,11 @@ std::vector<DeviceInfo> GetDeviceInfoList(GPA_API_Type apiType)
 
         if (success)
         {
-            for (std::vector<ADLUtil_ASICInfo>::iterator i = asicInfoList.begin(); i != asicInfoList.end(); ++i)
+            for (std::vector<ADLUtil_ASICInfo>::iterator it = asicInfoList.begin(); it != asicInfoList.end(); ++it)
             {
-                deviceInfo.m_deviceId = i->deviceID;
-                deviceInfo.m_vendorId = i->vendorID;
-                deviceInfo.m_revId = i->revID;
+                deviceInfo.m_deviceId = it->deviceID;
+                deviceInfo.m_vendorId = it->vendorID;
+                deviceInfo.m_revId = it->revID;
 
                 if (AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceInfo.m_deviceId, deviceInfo.m_revId, cardInfo))
                 {
@@ -1632,7 +1633,7 @@ std::vector<CounterPassInfo> GetNumberOfPassFromGPUPerfAPI(GPA_API_Type apiType,
     GPUPerfAPICounterLoader::Instance()->LoadPerfAPICounterDll(strDirPath);
     get_GPAGetAvailableCountersForDeviceProc = GPUPerfAPICounterLoader::Instance()->GetGPAAvailableCountersForDeviceProc();
 
-    if (get_GPAGetAvailableCountersForDeviceProc != nullptr)
+    if (nullptr != get_GPAGetAvailableCountersForDeviceProc)
     {
         for (std::vector<DeviceInfo>::iterator i = deviceInfoList.begin(); i != deviceInfoList.end(); ++i)
         {
