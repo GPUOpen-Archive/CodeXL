@@ -569,9 +569,9 @@ bool HSAAtpFilePart::ParseHeader(const std::string& strKey, const std::string& s
     return true;
 }
 
-bool HSAAtpFilePart::UpdateTmpTimestampFiles(const string& strTmpFilePath, const string& strFilePrefix)
+bool HSAAtpFilePart::UpdateTmpTimestampFiles(const std::string& strTmpFilePath, const std::string& strFilePrefix)
 {
-    vector<string> files;
+    std::vector<std::string> files;
 
     if (!FileUtils::GetFilesUnderDir(strTmpFilePath, files, strFilePrefix))
     {
@@ -579,10 +579,10 @@ bool HSAAtpFilePart::UpdateTmpTimestampFiles(const string& strTmpFilePath, const
     }
     else
     {
-        string strAsyncCopyTSFile;
-        stringstream ss;
+        std::string strAsyncCopyTSFile;
+        std::stringstream ss;
         ss << '.' << m_strPartName;
-        string strPartName = ss.str();
+        std::string strPartName = ss.str();
         ThreadCopyItemMap threadCopyTimestamps;
 
         // first locate the async copy timestamp file
@@ -601,7 +601,7 @@ bool HSAAtpFilePart::UpdateTmpTimestampFiles(const string& strTmpFilePath, const
 
             if (found != string::npos)
             {
-                string strExt = it->substr(found);
+                std::string strExt = it->substr(found);
 
                 if (strExt == TMP_ASYNC_COPY_TIME_STAMP_EXT)
                 {
@@ -622,9 +622,8 @@ bool HSAAtpFilePart::UpdateTmpTimestampFiles(const string& strTmpFilePath, const
                 Log(logMESSAGE, "Incorrect file name : %s.\n", it->c_str());
                 continue;
             }
-
         }
-        
+
         bool retVal = true;
 
         // now search the temp trace files to match up the timestamps to the correct API (using the signal handle string)
@@ -642,7 +641,7 @@ bool HSAAtpFilePart::UpdateTmpTimestampFiles(const string& strTmpFilePath, const
 
             if (found != string::npos)
             {
-                string strExt = it->substr(found);
+                std::string strExt = it->substr(found);
 
                 if (strExt == TMP_TRACE_EXT)
                 {
@@ -670,7 +669,7 @@ bool HSAAtpFilePart::UpdateTmpTimestampFiles(const string& strTmpFilePath, const
 
                 if (found != string::npos)
                 {
-                    string strExt = it->substr(found);
+                    std::string strExt = it->substr(found);
 
                     if (strExt == TMP_TIME_STAMP_EXT)
                     {
@@ -708,7 +707,7 @@ bool HSAAtpFilePart::LoadAsyncCopyTimestamps(const std::string& strFile, ThreadC
     {
         memset(buf, 0, MAX_LINE_SIZE * sizeof(char));
         fin.getline(buf, MAX_LINE_SIZE);
-        istringstream ss(buf);
+        std::istringstream ss(buf);
 
         // check empty line.
         if (ss.str().empty())
@@ -763,7 +762,7 @@ bool HSAAtpFilePart::UpdateApiIndexes(const std::string strFile, ThreadCopyItemM
     AsyncCopyItemList itemList = threadCopyInfoMap[tid];
 
     char buf[MAX_LINE_SIZE];
-    ifstream fin(strFile.c_str());
+    std::ifstream fin(strFile.c_str());
 
     if (!fin.is_open())
     {
@@ -872,14 +871,6 @@ bool HSAAtpFilePart::UpdateApiIndexes(const std::string strFile, ThreadCopyItemM
                     return false;
                 }
             }
-    osThreadId tid;
-    bool correctTidFile = IsCorrectTidFile(strFile, threadCopyInfoMap, tid);
-
-    if (!correctTidFile)
-    {
-        return false;
-    }
-
         }
         else
         {
