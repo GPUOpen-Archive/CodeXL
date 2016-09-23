@@ -851,7 +851,7 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
         {
 #ifdef GDT_INTERNAL
 
-            if (!configOut.strCounterFile.empty())
+            if (configOut.counterFileList.empty())
             {
                 std::cout << "A counter file is required in the internal build.  Please specify a counter file using the --counterfile option" << std::endl << std::endl;
                 return false;
