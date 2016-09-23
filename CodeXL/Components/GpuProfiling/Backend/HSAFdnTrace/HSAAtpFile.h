@@ -115,6 +115,7 @@ private:
     /// specified threadCopyInfoMap
     /// \param strFile the temp file name to check
     /// \param threadCopyInfoMap the map containing the loaded async copy timestamps
+    /// \param[out] the thread id that is found
     /// \return if the strFile is from a thread that can be found in the threadCopyInfoMap
     bool IsCorrectTidFile(const std::string strFile, ThreadCopyItemMap threadCopyInfoMap, osThreadId& threadId);
 

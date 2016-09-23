@@ -151,7 +151,7 @@ private:
     std::set<HSA_API_Type> m_mustInterceptAPIs;             ///< HSA APIs that must be intercepted (even when they are filtered out and not traced)
     QueueIndexMap          m_queueIndexMap;                 ///< map of a queue to that queue's index (basically creation order)
     AsyncCopyInfoList      m_asyncCopyInfoList;             ///< list of async copy information
-    AMDTMutex              m_asyncTimeStampsMtx;            ///< mutext to guard access to m_asyncCopyInfoList
+    AMDTMutex              m_asyncTimeStampsMtx;            ///< mutex to guard access to m_asyncCopyInfoList
     bool                   m_bDelayStartEnabled;            ///< flag indicating whether or not the profiler should start with delay or not
     bool                   m_bProfilerDurationEnabled;      ///< flag indiacating whether profiler should only run for certain duration
     unsigned long          m_delayInMilliseconds;           ///< millieconds to delay for profiler to start

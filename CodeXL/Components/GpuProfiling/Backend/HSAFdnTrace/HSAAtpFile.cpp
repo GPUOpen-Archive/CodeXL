@@ -693,7 +693,6 @@ bool HSAAtpFilePart::UpdateTmpTimestampFiles(const std::string& strTmpFilePath, 
 bool HSAAtpFilePart::LoadAsyncCopyTimestamps(const std::string& strFile, ThreadCopyItemMap& threadCopyItemMap)
 {
     char buf[MAX_LINE_SIZE];
-
     ifstream fin(strFile.c_str());
 
     if (!fin.is_open())
