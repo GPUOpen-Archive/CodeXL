@@ -77,6 +77,7 @@ public:
     int GetTbpSamplingInterval() const { return m_tbpSamplingInterval; }
     int GetProfileDuration() const { return m_profileDuration; }
     int GetStartDelay() const { return m_startDelay; }
+    gtString GetRawEventString() const { return m_rawEventsString; }
 
     gtUInt64 GetCoreAffinityMask() const { return m_coreAffinityMask; }
 

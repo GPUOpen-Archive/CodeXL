@@ -359,10 +359,11 @@ void CpuProfileCollect::ValidateProfile()
         return;
     }
 
-    // No profile config is specified - "-m" , "-C" , "-T"
+    // No profile config is specified - "-m" , "-C" , "-T", "-E"
     if (m_args.GetProfileConfig().isEmpty()
         && (0 == m_args.GetTbpSamplingInterval())
-        && m_args.GetCustomFile().isEmpty())
+        && m_args.GetCustomFile().isEmpty()
+        && m_args.GetRawEventString().isEmpty())
     {
         reportError(false, L"No Profile Config is specified. Use any of the following options -m or -C or -T !\n");
         return;
@@ -573,7 +574,7 @@ void CpuProfileCollect::ValidateProfile()
         // Custom Profile XML file specified by the customer
         profileFilePath = m_args.GetCustomFile();
 
-        if (! profileFilePath.exists())
+        if (!profileFilePath.isEmpty() && !profileFilePath.exists())
         {
             reportError(false, L"Given Custom profile XML file does not exist !\n");
             return;
@@ -592,7 +593,18 @@ void CpuProfileCollect::ValidateProfile()
     }
     else
     {
-        if (!IsTP())
+        if (!m_args.GetRawEventString().isEmpty())
+        {
+            DcEventConfig eventConfig;
+            ProcessRawEvent(eventConfig);
+            gtVector<DcEventConfig> eventVec;
+            eventVec.push_back(eventConfig);
+
+            m_profileDcConfig.SetEventInfo(eventVec);
+            m_profileDcConfig.SetConfigType(DCConfigEBP);
+            m_profileDcConfig.SetConfigName(QString::fromWCharArray(L"Custom"));
+        }
+        else if (!IsTP())
         {
             reportError(false, L"Invalid Profile Config specified!\n");
             return;
@@ -630,11 +642,83 @@ void CpuProfileCollect::ValidateProfile()
     return;
 }
 
+void CpuProfileCollect::ProcessRawEvent(DcEventConfig& eventConfig)
+{
+    gtString rawEventStr = m_args.GetRawEventString();
+
+    if (!rawEventStr.isEmpty())
+    {
+        gtStringTokenizer tokens(rawEventStr, L",");
+        gtString value;
+
+        int i = 0;
+        gtUInt32 aNumber = 0;
+        gtUInt64 interval = 0;
+        unsigned int eventSelect = 0;
+        unsigned int unitMask = 0;
+        bool usrEvents = true;
+        bool osEvents = true;
+        gtUInt64 performanceEvent = 0;
+
+        while (tokens.getNextToken(value))
+        {
+            switch (i)
+            {
+            case 0:
+                value.toUnsignedIntNumber(eventSelect);
+                break;
+
+            case 1:
+                value.toUnsignedIntNumber(unitMask);
+                break;
+
+            case 2:
+                if (value.toUnsignedIntNumber(aNumber))
+                {
+                    usrEvents = aNumber ? true : false;
+                }
+                break;
+
+            case 3:
+                if (value.toUnsignedIntNumber(aNumber))
+                {
+                    osEvents = aNumber ? true : false;
+                }
+                break;
+
+            case 4:
+                value.toUnsignedInt64Number(interval);
+                break;
+
+            default:
+                break;
+            }
+            
+            i++;
+        }
+
+        HRESULT res = S_OK;
+        res = fnMakeProfileEvent(eventSelect,
+                                 unitMask,
+                                 false, // edge detect
+                                 usrEvents,
+                                 osEvents,
+                                 false, // guestOnlyEvents,
+                                 false, // hostOnlyEvents,
+                                 false, // countingEvent,
+                                 &performanceEvent);
+
+
+        eventConfig.pmc.perf_ctl = performanceEvent;
+        eventConfig.eventCount = interval;
+    }
+}
+
 void CpuProfileCollect::VerifyAndSetEvents(EventConfiguration** ppDriverEvents)
 {
     int nbrOfEvents = m_profileDcConfig.GetNumberOfEvents();
 
-    if (! nbrOfEvents)
+    if (!nbrOfEvents)
     {
         return;
     }
@@ -672,7 +756,7 @@ void CpuProfileCollect::VerifyAndSetEvents(EventConfiguration** ppDriverEvents)
         if (nullptr == pEventFile)
         {
             reportError(false, L"Unable to find the event file: %ls",
-                        eventEngine.GetEventFilePath(cpuInfo.getFamily(), model).toStdWString().c_str());
+                eventEngine.GetEventFilePath(cpuInfo.getFamily(), model).toStdWString().c_str());
             m_error = E_NOFILE;
         }
     }
@@ -720,8 +804,8 @@ void CpuProfileCollect::VerifyAndSetEvents(EventConfiguration** ppDriverEvents)
         if (!retVal)
         {
             reportError(false, L"The configuration erronously contains an event (%#x) which is not\n"
-                        L"available on this system.  Please choose a different\n"
-                        L"configuration.", evSelect);
+                L"available on this system.  Please choose a different\n"
+                L"configuration.", evSelect);
             m_error = E_NOTAVAILABLE;
             break;
         }
@@ -736,8 +820,8 @@ void CpuProfileCollect::VerifyAndSetEvents(EventConfiguration** ppDriverEvents)
             if (eventData.source.contains("L2I", Qt::CaseInsensitive))
             {
                 reportError(false, L"The Profile configuration contains L2I event.\n"
-                            L"L2I PMC events based sampling is not supported.\n"
-                            L"Please choose a different configuration");
+                    L"L2I PMC events based sampling is not supported.\n"
+                    L"Please choose a different configuration");
                 m_error = E_NOTAVAILABLE;
                 break;
             }
@@ -750,9 +834,9 @@ void CpuProfileCollect::VerifyAndSetEvents(EventConfiguration** ppDriverEvents)
             if (eventData.source.startsWith("NB", Qt::CaseInsensitive))
             {
                 reportError(false, L"The Profile configuration contains a northbridge(NB) event:\n"
-                            L"[%#x] %ls\n which is not a valid sampling event. "
-                            L"Please fix the configuration",
-                            eventData.value, eventData.name.data());
+                    L"[%#x] %ls\n which is not a valid sampling event. "
+                    L"Please fix the configuration",
+                    eventData.value, eventData.name.data());
                 m_error = E_NOTAVAILABLE;
                 break;
             }
@@ -776,7 +860,7 @@ void CpuProfileCollect::VerifyAndSetEvents(EventConfiguration** ppDriverEvents)
 
     if (S_OK != m_error && nullptr != *ppDriverEvents)
     {
-        delete [] *ppDriverEvents;
+        delete[] * ppDriverEvents;
         *ppDriverEvents = nullptr;
     }
 
@@ -787,7 +871,7 @@ void CpuProfileCollect::VerifyAndSetEvents(EventConfiguration** ppDriverEvents)
 
     if (nullptr != pEvents)
     {
-        delete [] pEvents;
+        delete[] pEvents;
     }
 }
 
@@ -956,7 +1040,9 @@ void CpuProfileCollect::SetEbpConfig()
 
 void CpuProfileCollect::SetIbsConfig()
 {
-    if (isStateReady() && isOK())
+    bool isIbs = (DCConfigCLU == m_profileDcConfig.GetConfigType() || DCConfigIBS == m_profileDcConfig.GetConfigType());
+
+    if (isStateReady() && isOK() && isIbs)
     {
         IbsConfig ibsConfig;
         m_profileDcConfig.GetIBSInfo(&ibsConfig);

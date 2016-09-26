@@ -234,6 +234,7 @@ HRESULT fnMakeProfileEvent(
         return E_INVALIDARG;
     }
 
+#if 0
     if ((guestOnlyEvents) && (hostOnlyEvents))
     {
         if (INVALID_CLIENT != clientId)
@@ -263,9 +264,10 @@ HRESULT fnMakeProfileEvent(
 
         return E_INVALIDARG;
     }
+#endif // 0
 
 #ifdef CODEXL_LIBCPUPERFEVENT_AVBL
-
+#if 0
     //is the event and unit mask valid?
     if (NULL == gp_eventsFile)
     {
@@ -329,7 +331,7 @@ HRESULT fnMakeProfileEvent(
 
         return E_INVALIDARG;
     }
-
+#endif //0
 #endif // CODEXL_LIBCPUPERFEVENT_AVBL
 
     HRESULT hr = S_OK;
