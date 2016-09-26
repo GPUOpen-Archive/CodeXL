@@ -363,7 +363,7 @@ void CpuProfileCollect::ValidateProfile()
     if (m_args.GetProfileConfig().isEmpty()
         && (0 == m_args.GetTbpSamplingInterval())
         && m_args.GetCustomFile().isEmpty()
-        && m_args.GetRawEventString().isEmpty())
+        && m_args.GetRawEventString().empty())
     {
         reportError(false, L"No Profile Config is specified. Use any of the following options -m or -C or -T !\n");
         return;
@@ -593,16 +593,16 @@ void CpuProfileCollect::ValidateProfile()
     }
     else
     {
-        if (!m_args.GetRawEventString().isEmpty())
+        if (!m_args.GetRawEventString().empty())
         {
-            DcEventConfig eventConfig;
-            ProcessRawEvent(eventConfig);
-            gtVector<DcEventConfig> eventVec;
-            eventVec.push_back(eventConfig);
-
-            m_profileDcConfig.SetEventInfo(eventVec);
-            m_profileDcConfig.SetConfigType(DCConfigEBP);
-            m_profileDcConfig.SetConfigName(QString::fromWCharArray(L"Custom"));
+            gtVector<DcEventConfig> eventConfigVec;
+            
+            if (ProcessRawEvent(eventConfigVec))
+            {
+                m_profileDcConfig.SetEventInfo(eventConfigVec);
+                m_profileDcConfig.SetConfigType(DCConfigEBP);
+                m_profileDcConfig.SetConfigName(QString::fromWCharArray(L"Custom"));
+            }
         }
         else if (!IsTP())
         {
@@ -642,11 +642,12 @@ void CpuProfileCollect::ValidateProfile()
     return;
 }
 
-void CpuProfileCollect::ProcessRawEvent(DcEventConfig& eventConfig)
+bool CpuProfileCollect::ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec)
 {
-    gtString rawEventStr = m_args.GetRawEventString();
+    bool ret = false;
+    gtVector<gtString> rawEventStrVec = m_args.GetRawEventString();
 
-    if (!rawEventStr.isEmpty())
+    for(const auto& rawEventStr : rawEventStrVec)
     {
         gtStringTokenizer tokens(rawEventStr, L",");
         gtString value;
@@ -697,8 +698,7 @@ void CpuProfileCollect::ProcessRawEvent(DcEventConfig& eventConfig)
             i++;
         }
 
-        HRESULT res = S_OK;
-        res = fnMakeProfileEvent(eventSelect,
+        HRESULT res = fnMakeProfileEvent(eventSelect,
                                  unitMask,
                                  false, // edge detect
                                  usrEvents,
@@ -708,10 +708,21 @@ void CpuProfileCollect::ProcessRawEvent(DcEventConfig& eventConfig)
                                  false, // countingEvent,
                                  &performanceEvent);
 
-
-        eventConfig.pmc.perf_ctl = performanceEvent;
-        eventConfig.eventCount = interval;
+        if (SUCCEEDED(res))
+        {
+            DcEventConfig ec;
+            ec.pmc.perf_ctl = performanceEvent;
+            ec.eventCount = interval;
+            eventConfigVec.push_back(ec);
+            ret = true;
+        }
+        else
+        {
+            reportError(true, L"There was a problem configuring the raw profile event(0x%lx). (error code 0x%lx)\n\n", eventSelect, m_error);
+        }
     }
+
+    return ret;
 }
 
 void CpuProfileCollect::VerifyAndSetEvents(EventConfiguration** ppDriverEvents)

@@ -323,8 +323,7 @@ bool ParseArgs::InitializeArgs(int nbrArgs, wchar_t* args[])
             case 'E':
                 // Raw Event support
                 // multiple -E's are supported
-                m_rawEventsString.append(optArg);
-                m_rawEventsString.append(L",");
+                m_rawEventsStringVec.push_back(optArg);
                 break;
 
             case 'F':

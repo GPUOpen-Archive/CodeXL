@@ -148,7 +148,7 @@ private:
     void EnableProfiling();
     void ValidateProfile();
     void VerifyAndSetEvents(EventConfiguration** ppDriverEvents);
-    void ProcessRawEvent(DcEventConfig& eventConfig);
+    bool ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec);
     void ConfigureProfile();
 
     void SetTbpConfig();

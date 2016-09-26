@@ -77,7 +77,7 @@ public:
     int GetTbpSamplingInterval() const { return m_tbpSamplingInterval; }
     int GetProfileDuration() const { return m_profileDuration; }
     int GetStartDelay() const { return m_startDelay; }
-    gtString GetRawEventString() const { return m_rawEventsString; }
+    gtVector<gtString> GetRawEventString() const { return m_rawEventsStringVec; }
 
     gtUInt64 GetCoreAffinityMask() const { return m_coreAffinityMask; }
 
@@ -116,11 +116,10 @@ private:
     gtString  m_customFile;
 
     gtString  m_outputFile;
-    gtString  m_rawEventsString;
+    gtVector<gtString>  m_rawEventsStringVec;
 
     gtString  m_workingDir;
 
-    gtList<gtUInt64>    m_rawEventsList; // UNUSED. will be used with -e option
     gtVector<int>       m_pidsList;
 
     gtUInt64  m_coreAffinityMask = static_cast<gtUInt64>(-1);
