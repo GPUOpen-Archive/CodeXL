@@ -274,7 +274,7 @@ bool HSAAPIInfoManager::GetQueueIndex(const hsa_queue_t* pQueue, size_t& queueIn
     return retVal;
 }
 
-bool AsyncSignalHandler(hsa_signal_value_t /* value */, void* arg)
+bool AsyncSignalHandler(hsa_signal_value_t value, void* arg)
 {
     AsyncCopyInfo* pAsyncCopyInfo = reinterpret_cast<AsyncCopyInfo*>(arg);
 
@@ -284,17 +284,27 @@ bool AsyncSignalHandler(hsa_signal_value_t /* value */, void* arg)
     }
     else
     {
-        hsa_amd_profiling_async_copy_time_t asyncCopyTime;
-        hsa_status_t status = g_pRealAmdExtFunctions->hsa_amd_profiling_get_async_copy_time_fn(pAsyncCopyInfo->m_signal, &asyncCopyTime);
-
-        if (HSA_STATUS_SUCCESS != status)
+        if (0 > value)
         {
-            Log(logERROR, "Error returned from hsa_amd_profiling_get_dispatch_time\n");
+            // the signal passed hsa_amd_memory_async_copy will get a value less than zero to indicate that the copy operation failed
+            // we will flag this condition by using 0 start and end times
+            pAsyncCopyInfo->m_start = 0;
+            pAsyncCopyInfo->m_end = 0;
         }
         else
         {
-            pAsyncCopyInfo->m_start = asyncCopyTime.start;
-            pAsyncCopyInfo->m_end = asyncCopyTime.end;
+            hsa_amd_profiling_async_copy_time_t asyncCopyTime;
+            hsa_status_t status = g_pRealAmdExtFunctions->hsa_amd_profiling_get_async_copy_time_fn(pAsyncCopyInfo->m_signal, &asyncCopyTime);
+
+            if (HSA_STATUS_SUCCESS != status)
+            {
+                Log(logERROR, "Error returned from hsa_amd_profiling_get_dispatch_time\n");
+            }
+            else
+            {
+                pAsyncCopyInfo->m_start = asyncCopyTime.start;
+                pAsyncCopyInfo->m_end = asyncCopyTime.end;
+            }
         }
     }
 
