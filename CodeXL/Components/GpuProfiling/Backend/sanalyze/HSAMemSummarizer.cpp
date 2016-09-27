@@ -7,7 +7,7 @@
 
 #include <fstream>
 #include <sstream>
-#include "CLMemSummarizer.h"
+#include "HSAMemSummarizer.h"
 #include "AnalyzerHTMLUtils.h"
 #include "../Common/HTMLTable.h"
 #include "../Common/StringUtils.h"
@@ -17,73 +17,67 @@ using std::ofstream;
 using std::multiset;
 using std::string;
 
-CLMemSummarizer::CLMemSummarizer(void)
+HSAMemSummarizer::HSAMemSummarizer(void)
 {
     m_uiTopX = 10;
 }
 
-CLMemSummarizer::~CLMemSummarizer(void)
+HSAMemSummarizer::~HSAMemSummarizer(void)
 {
 }
 
-void CLMemSummarizer::OnParse(CLAPIInfo* pAPIInfo, bool& stopParsing)
+void HSAMemSummarizer::OnParse(HSAAPIInfo* pAPIInfo, bool& stopParsing)
 {
     stopParsing = false;
 
-    if (pAPIInfo->m_Type == CL_ENQUEUE_MEM)
+    if (pAPIInfo->m_apiID == HSA_API_Type_hsa_amd_memory_async_copy)
     {
-        CLMemAPIInfo* pMAPI = (CLMemAPIInfo*)pAPIInfo;
+        HSAMemoryTransferAPIInfo* pMemTransferAPI = dynamic_cast<HSAMemoryTransferAPIInfo*>(pAPIInfo);
 
-        if (!pMAPI->m_bInfoMissing)
+        if (pMemTransferAPI->m_transferEndTime < pMemTransferAPI->m_transferStartTime)
         {
-            //CL_FUNC_TYPE_clEnqueueMapBuffer = 63
-            //CL_FUNC_TYPE_clEnqueueMapImage = 64
-            //CL_FUNC_TYPE_clEnqueueUnmapMemObject = 65
-            if (pMAPI->m_ullComplete < pMAPI->m_ullRunning && (pMAPI->m_uiAPIID < CL_FUNC_TYPE_clEnqueueMapBuffer || pMAPI->m_uiAPIID > CL_FUNC_TYPE_clEnqueueUnmapMemObject))
-            {
-                // Complete and Running can be the same for Zero copy.
-                return;
-            }
-
-            m_MemAPISet.insert(pMAPI);
+            Log(logERROR, "HSAMemSummarizer: mem transfer end time is less than start time\n");
+            return;
         }
+
+        m_memAPISet.insert(pMemTransferAPI);
     }
 }
 
-void CLMemSummarizer::Debug()
-{}
+void HSAMemSummarizer::Debug()
+{
+}
 
 /// Generate HTML table from statistic data and write to std::ostream
 /// \param sout output stream
-void CLMemSummarizer::GenerateHTMLTable(std::ostream& sout)
+void HSAMemSummarizer::GenerateHTMLTable(std::ostream& sout)
 {
     HTMLTable table;
 
     unsigned int count = 0;
 
-    table.AddColumn("Command Type")
-    .AddColumn("Context ID")
-    .AddColumn("Command Queue ID")
+    table.AddColumn("Source Agent Handle")
+    .AddColumn("Destination Agent Handle")
     .AddColumn("Duration(ms)", true, true)
     .AddColumn("Transfer Size", true, true)
     .AddColumn("Transfer Rate(MB/s)")
     .AddColumn("Thread ID")
     .AddColumn("Call Index");
 
-    for (multiset<CLMemAPIInfo*, CLMemDurationCmp>::reverse_iterator it = m_MemAPISet.rbegin(); it != m_MemAPISet.rend(); it++)
+    for (multiset<HSAMemoryTransferAPIInfo*, HSAMemDurationCmp>::reverse_iterator it = m_memAPISet.rbegin(); it != m_memAPISet.rend(); it++)
     {
         if (count > m_uiTopX)
         {
             break;
         }
 
-        CLMemAPIInfo* info = *it;
+        HSAMemoryTransferAPIInfo* info = *it;
 
-        ULONGLONG ullDuration = info->m_ullComplete - info->m_ullRunning;
+        ULONGLONG ullDuration = info->m_transferEndTime - info->m_transferStartTime;
         string strRate;
-        string strSize = StringUtils::InsertLeadingSpace(StringUtils::GetDataSizeStr(info->m_uiTransferSize, 2), 15);
+        string strSize = StringUtils::InsertLeadingSpace(StringUtils::GetDataSizeStr(info->m_size, 2), 15);
 
-        if (ullDuration == 0 || ((info->m_strCMDType.find("IMAGE") != string::npos || info->m_strCMDType.find("MAP") != string::npos) && ullDuration < 1000))
+        if (ullDuration == 0)
         {
             // Runtime return incorrect timing for Image type object
             // Show NA for zero copy as well.
@@ -92,7 +86,7 @@ void CLMemSummarizer::GenerateHTMLTable(std::ostream& sout)
         else
         {
             unsigned int mb = 1 << 20;
-            double dSize = (double)info->m_uiTransferSize / mb;
+            double dSize = (double)info->m_size / mb;
             double dRate = dSize / ((double)ullDuration * 1e-9);
             strRate = StringUtils::ToStringPrecision(dRate, 3);  // + "MB/s"; //StringUtils::GetDataSizeStr( (unsigned int)ullRate, 3 ) + "/s";
         }
@@ -103,16 +97,15 @@ void CLMemSummarizer::GenerateHTMLTable(std::ostream& sout)
         keyValues = GenerateHTMLKeyValue(gs_THREAD_ID_TAG, info->m_tid);
         keyValues = AppendHTMLKeyValue(keyValues, GenerateHTMLKeyValue(gs_SEQUENCE_ID_TAG, info->m_uiSeqID));
         keyValues = AppendHTMLKeyValue(keyValues, GenerateHTMLKeyValue(gs_VIEW_TAG, gs_VIEW_TIMELINE_DEVICE_TAG));
-        std::string hRef = GenerateHref(keyValues, info->m_strCMDType.substr(11));
+        std::string hRef = GenerateHref(keyValues, info->m_uiSeqID);
 
-        row.AddItem(0, hRef)
-        .AddItem(1, StringUtils::ToString(info->m_uiContextID))
-        .AddItem(2, StringUtils::ToString(info->m_uiQueueID))
-        .AddItem(3, StringUtils::NanosecToMillisec(ullDuration))
-        .AddItem(4, strSize)
-        .AddItem(5, strRate)
-        .AddItem(6, StringUtils::ToString(info->m_tid))
-        .AddItem(7, info->m_bHasDisplayableSeqId ? StringUtils::ToString(info->m_uiDisplaySeqID) : "N/A");
+        row.AddItem(0, info->m_strSrcAgent)
+        .AddItem(1, info->m_strDstAgent)
+        .AddItem(2, StringUtils::NanosecToMillisec(ullDuration))
+        .AddItem(3, strSize)
+        .AddItem(4, strRate)
+        .AddItem(5, StringUtils::ToString(info->m_tid))
+        .AddItem(6, hRef);
         table.AddRow(row);
 
         count++;
@@ -121,11 +114,11 @@ void CLMemSummarizer::GenerateHTMLTable(std::ostream& sout)
     table.WriteToStream(sout);
 }
 
-bool CLMemSummarizer::GenerateHTMLPage(const char* szFileName)
+bool HSAMemSummarizer::GenerateHTMLPage(const char* szFileName)
 {
     bool retVal = false;
 
-    if (!m_MemAPISet.empty())
+    if (!m_memAPISet.empty())
     {
         ofstream fout(szFileName);
         fout <<

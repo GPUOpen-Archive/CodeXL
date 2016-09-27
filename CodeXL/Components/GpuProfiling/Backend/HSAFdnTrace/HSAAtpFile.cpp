@@ -104,11 +104,15 @@ HSAAPIInfo* HSAAtpFilePart::CreateAPIInfo(const std::string& strAPIName)
 
     HSA_API_Type apiType = HSAFunctionDefsUtils::Instance()->ToHSAAPIType(strAPIName);
 
-    if (apiType == HSA_API_Type_hsa_memory_allocate || apiType == HSA_API_Type_hsa_memory_copy ||
+
+    if (apiType == HSA_API_Type_hsa_amd_memory_async_copy)
+    {
+        retObj = new(nothrow) HSAMemoryTransferAPIInfo();
+    }
+    else if (apiType == HSA_API_Type_hsa_memory_allocate || apiType == HSA_API_Type_hsa_memory_copy ||
         apiType == HSA_API_Type_hsa_memory_register || apiType == HSA_API_Type_hsa_memory_deregister ||
-        apiType == HSA_API_Type_hsa_amd_memory_pool_allocate || apiType == HSA_API_Type_hsa_amd_memory_async_copy ||
-        apiType == HSA_API_Type_hsa_amd_memory_lock || apiType == HSA_API_Type_hsa_amd_memory_fill ||
-        apiType == HSA_API_Type_hsa_amd_interop_map_buffer)
+        apiType == HSA_API_Type_hsa_amd_memory_pool_allocate || apiType == HSA_API_Type_hsa_amd_memory_lock ||
+        apiType == HSA_API_Type_hsa_amd_memory_fill || apiType == HSA_API_Type_hsa_amd_interop_map_buffer)
     {
         retObj = new(nothrow)HSAMemoryAPIInfo();
     }
@@ -172,6 +176,8 @@ bool ParseWorkgroup(istream& str, string& raw, size_t& dim, size_t& x, size_t& y
 
 bool HSAAtpFilePart::ParseHostTimestamp(const char* buf, HSAAPIInfo* pAPIInfo, bool bTimeoutMode)
 {
+    SP_UNREFERENCED_PARAMETER(bTimeoutMode);
+
     stringstream ss(buf);
     int apiTypeID;
     string apiName;
@@ -208,7 +214,21 @@ bool HSAAtpFilePart::ParseHostTimestamp(const char* buf, HSAAPIInfo* pAPIInfo, b
     pAPIInfo->m_ullStart = ullStart;
     pAPIInfo->m_ullEnd = ullEnd;
 
-    SP_UNREFERENCED_PARAMETER(bTimeoutMode);
+    if (HSA_API_Type_hsa_amd_memory_async_copy == pAPIInfo->m_apiID)
+    {
+        ULONGLONG ullAsyncCopyStart;
+        ULONGLONG ullAsyncCopyEnd;
+
+        ss >> ullAsyncCopyStart;
+        CHECK_SS_ERROR(ss)
+        ss >> ullAsyncCopyEnd;
+        CHECK_SS_ERROR(ss)
+
+        HSAMemoryTransferAPIInfo* pAsyncCopyApi = dynamic_cast<HSAMemoryTransferAPIInfo*>(pAPIInfo);
+
+        pAsyncCopyApi->m_transferStartTime = ullAsyncCopyStart;
+        pAsyncCopyApi->m_transferEndTime = ullAsyncCopyEnd;
+    }
 
     return true;
 }

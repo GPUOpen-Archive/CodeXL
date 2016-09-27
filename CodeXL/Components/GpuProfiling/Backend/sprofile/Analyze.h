@@ -20,6 +20,7 @@
 #define HSAAPI_SUM "HSAAPISummary.html"
 #define HSAKERNEL_SUM "HSAKernelSummary.html"
 #define HSATOP10_KERNEL "HSATop10KernelSummary.html"
+#define HSATOP10_DATA "HSATop10DataTransferSummary.html"
 #define HSABEST_PRACTICES "HSABestPractices.html"
 
 bool APITraceAnalyze(const Config& config);

@@ -10,7 +10,6 @@
 #include "AtpFile.h"
 #include "../CLTraceAgent/CLAtpFile.h"
 #include "../HSAFdnTrace/HSAAtpFile.h"
-#include "../sanalyze/HSAKernelSummarizer.h"
 #include "../sanalyze/APISummarizer.h"
 #include "../sanalyze/CLKernelSummarizer.h"
 #include "../sanalyze/CLMemSummarizer.h"
@@ -23,6 +22,8 @@
 #include "../sanalyze/CLDataTransferAnalyzer.h"
 #include "../sanalyze/CLSyncAnalyzer.h"
 #include "../sanalyze/HSAAPIAnalyzer.h"
+#include "../sanalyze/HSAKernelSummarizer.h"
+#include "../sanalyze/HSAMemSummarizer.h"
 #include "../sanalyze/HSARetCodeAnalyzer.h"
 #include "../sanalyze/HSAObjRefTracker.h"
 #include "../Common/FileUtils.h"
@@ -41,6 +42,7 @@ bool APITraceAnalyze(const Config& config)
 
     HSAAPISummarizer hsaApiSum;
     HSAKernelSummarizer hsaKernelSum;
+    HSAMemSummarizer hsaMemSum;
 
     CLAPISummarizer clApiSum;
     CLKernelSummarizer clKernelSum;
@@ -86,6 +88,7 @@ bool APITraceAnalyze(const Config& config)
     if (config.analyzeOps.bTop10DataTransferSummary)
     {
         clFile.AddListener(&clMemSum);
+        hsaTrace.AddListener(&hsaMemSum);
     }
 
     if (config.analyzeOps.bContextSummary)
@@ -179,6 +182,7 @@ bool APITraceAnalyze(const Config& config)
     if (config.analyzeOps.bTop10DataTransferSummary)
     {
         summaryPagesGenerated |= clMemSum.GenerateHTMLPage((filePrefix + CLTOP10_DATA).c_str());
+        summaryPagesGenerated |= hsaMemSum.GenerateHTMLPage((filePrefix + HSATOP10_DATA).c_str());
         anySummaryPageShouldBeGenerated = true;
     }
 
