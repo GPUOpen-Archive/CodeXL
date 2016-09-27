@@ -129,7 +129,7 @@ public:
 };
 
 //------------------------------------------------------------------------------------
-/// HSAAPIInfo descendant for memory APIs
+/// HSAMemoryAPIInfo descendant for data transfer memory APIs
 //------------------------------------------------------------------------------------
 class HSAMemoryTransferAPIInfo : public HSAMemoryAPIInfo
 {
@@ -150,8 +150,16 @@ public:
         std::vector<std::string> args;
         StringUtils::Split(args, m_ArgList, ";");
 
-        m_strSrcAgent = args[3];
-        m_strDstAgent = args[1];
+        if (3 < args.size())
+        {
+            m_strSrcAgent = args[3];
+            m_strDstAgent = args[1];
+        }
+        else
+        {
+            m_strSrcAgent = "Unknown_Agent";
+            m_strDstAgent = "Unknown_Agent";
+        }
     }
 
 

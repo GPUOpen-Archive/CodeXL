@@ -111,9 +111,8 @@ HSAAPIInfo* HSAAtpFilePart::CreateAPIInfo(const std::string& strAPIName)
     }
     else if (apiType == HSA_API_Type_hsa_memory_allocate || apiType == HSA_API_Type_hsa_memory_copy ||
         apiType == HSA_API_Type_hsa_memory_register || apiType == HSA_API_Type_hsa_memory_deregister ||
-        apiType == HSA_API_Type_hsa_amd_memory_pool_allocate ||
-        apiType == HSA_API_Type_hsa_amd_memory_lock || apiType == HSA_API_Type_hsa_amd_memory_fill ||
-        apiType == HSA_API_Type_hsa_amd_interop_map_buffer)
+        apiType == HSA_API_Type_hsa_amd_memory_pool_allocate || apiType == HSA_API_Type_hsa_amd_memory_lock ||
+        apiType == HSA_API_Type_hsa_amd_memory_fill || apiType == HSA_API_Type_hsa_amd_interop_map_buffer)
     {
         retObj = new(nothrow)HSAMemoryAPIInfo();
     }
