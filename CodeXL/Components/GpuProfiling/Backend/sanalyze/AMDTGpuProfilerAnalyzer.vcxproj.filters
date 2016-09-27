@@ -58,6 +58,9 @@
     <ClCompile Include="AnalyzerHTMLUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="HSAMemSummarizer.cpp">
+      <Filter>Source Files\HSA</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CLAPIAnalyzer.h">
@@ -128,6 +131,9 @@
     </ClInclude>
     <ClInclude Include="AnalyzerHTMLUtils.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HSAMemSummarizer.h">
+      <Filter>Header Files\HSA</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

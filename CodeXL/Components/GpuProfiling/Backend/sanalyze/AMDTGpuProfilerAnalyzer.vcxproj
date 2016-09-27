@@ -74,6 +74,7 @@
     <ClCompile Include="CLSyncAnalyzer.cpp" />
     <ClCompile Include="HSAAPIAnalyzer.cpp" />
     <ClCompile Include="HSAKernelSummarizer.cpp" />
+    <ClCompile Include="HSAMemSummarizer.cpp" />
     <ClCompile Include="HSAObjRefTracker.cpp" />
     <ClCompile Include="HSARetCodeAnalyzer.cpp" />
     <ClCompile Include="KernelProfileResultParser.cpp" />
@@ -96,6 +97,7 @@
     <ClInclude Include="CLSyncAnalyzer.h" />
     <ClInclude Include="HSAAPIAnalyzer.h" />
     <ClInclude Include="HSAKernelSummarizer.h" />
+    <ClInclude Include="HSAMemSummarizer.h" />
     <ClInclude Include="HSAObjRefTracker.h" />
     <ClInclude Include="HSARetCodeAnalyzer.h" />
     <ClInclude Include="IHTMLExporter.h" />
