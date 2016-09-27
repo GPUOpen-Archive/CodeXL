@@ -185,7 +185,7 @@ std::string NanosecToMillisec(ULONGLONG ullTime);
 /// \param sizeInByte size in byte
 /// \param precision Precision
 /// \return data size in string
-std::string GetDataSizeStr(unsigned int sizeInByte, int precision);
+std::string GetDataSizeStr(size_t sizeInByte, int precision);
 
 /// To lower case
 /// \param str input string

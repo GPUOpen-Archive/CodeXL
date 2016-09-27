@@ -193,7 +193,7 @@ string StringUtils::NanosecToMillisec(ULONGLONG ullTime)
     }
 }
 
-string StringUtils::GetDataSizeStr(unsigned int sizeInByte, int precision)
+string StringUtils::GetDataSizeStr(size_t sizeInByte, int precision)
 {
     if (sizeInByte == 0)
     {
@@ -202,31 +202,31 @@ string StringUtils::GetDataSizeStr(unsigned int sizeInByte, int precision)
 
     double newSize = 0;
     stringstream ss;
-    unsigned int kb = 1 << 10;
-    unsigned int mb = 1 << 20;
-    unsigned int gb = 1 << 30;
+    size_t kb = 1 << 10;
+    size_t mb = 1 << 20;
+    size_t gb = 1 << 30;
 
     if (sizeInByte > gb)
     {
-        newSize = (double)sizeInByte / (double)gb;
+        newSize = static_cast<double>(sizeInByte) / static_cast<double>(gb);
         ss << ToStringPrecision(newSize, precision);
         ss << " GB";
     }
     else if (sizeInByte > mb)
     {
-        newSize = (double)sizeInByte / (double)mb;
+        newSize = static_cast<double>(sizeInByte) / static_cast<double>(mb);
         ss << ToStringPrecision(newSize, precision);
         ss << " MB";
     }
     else if (sizeInByte > kb)
     {
-        newSize = (double)sizeInByte / (double)kb;
+        newSize = static_cast<double>(sizeInByte) / static_cast<double>(kb);
         ss << ToStringPrecision(newSize, precision);
         ss << " KB";
     }
     else
     {
-        newSize = sizeInByte;
+        newSize = static_cast<double>(sizeInByte);
         ss << ToStringPrecision(newSize, precision);
         ss << " Byte";
     }
