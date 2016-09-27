@@ -118,6 +118,10 @@ public:
     /// \return list of column items
     const std::vector<std::string>& GetColumns() const { return m_columns; }
 
+    /// Get Headers
+    /// \return list of header items
+    std::vector<std::string> GetHeaders() const { return m_headers; }
+
     /// Set list separator
     /// \param ch List separator
     void SetListSeparator(char ch) { m_cSeparator = ch; }

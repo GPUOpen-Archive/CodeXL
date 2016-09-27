@@ -25,6 +25,7 @@
 #include <sstream>
 #include <string>
 #include <signal.h>
+#include <algorithm>
 #include "GPUPerfAPIRegistry.h"
 #include "ParseCmdLine.h"
 #include "Analyze.h"
@@ -41,6 +42,7 @@
 #include "../CLOccupancyAgent/CLOccupancyFile.h"
 #include "../Common/Version.h"
 #include "../Common/BinFileHeader.h"
+#include "../Common/CSVFileParser.h"
 
 #include <AMDTOSWrappers/Include/osDirectory.h>
 #include <AMDTOSWrappers/Include/osFilePath.h>
@@ -711,7 +713,6 @@ int ProfileApplication(const std::string& strCounterFile, const int& profilerBit
     return retVal;
 }
 
-
 int ProcessCommandLine(const std::string& strCounterFile)
 {
     int retVal = 0;
@@ -758,6 +759,291 @@ int ProcessCommandLine(const std::string& strCounterFile)
     return retVal;
 }
 
+bool MergeKernelProfileOutputFiles(std::vector<std::string> outPutfileList, std::string defaultOutputFileName)
+{
+    class KernelRowData :
+        public IParserListener<CSVRow>
+    {
+    public:
+
+        unsigned int GetRowCount()
+        {
+            return static_cast<unsigned int>(m_rows.size());
+        }
+
+        std::vector<std::string> GetColumns(unsigned int rowIndex)
+        {
+            std::vector<std::string> columnNameArray;
+
+            if (rowIndex <= m_rows.size())
+            {
+                columnNameArray = m_rows[rowIndex]->GetColumns();
+            }
+
+            return columnNameArray;
+        }
+
+        bool operator<(KernelRowData rowData)
+        {
+            return this->GetRowCount() < rowData.GetRowCount();
+        }
+
+        bool operator<(KernelRowData* rowData)
+        {
+            return this->GetRowCount() < rowData->GetRowCount();
+        }
+
+        std::string GetValue(const unsigned int& rowIndex, const std::string& columnName)
+        {
+            std::string retValue;
+
+            if (rowIndex < m_rows.size())
+            {
+                retValue.assign(m_rows[rowIndex]->operator[](columnName));
+            }
+
+            return retValue;
+        }
+
+        std::vector<std::string> GetRow(unsigned int rowIndex)
+        {
+            std::vector<std::string> rowData;
+
+            if (rowIndex <= m_rows.size())
+            {
+                std::vector<std::string> columns = m_rows.front()->GetColumns();
+
+                for (std::vector<std::string>::const_iterator iter = columns.begin(); iter != columns.end(); ++iter)
+                {
+                    rowData.push_back(m_rows[rowIndex]->GetRowData(*iter));
+                }
+            }
+
+            return rowData;
+        }
+
+        void OnParse(CSVRow* csvRow, bool& stopParsing)
+        {
+            if (!stopParsing)
+            {
+                m_rows.push_back(csvRow);
+            }
+        }
+    private:
+        std::vector<CSVRow*> m_rows;
+    };
+
+    auto removeLineFeed = [](std::string string)->std::string
+    {
+        char ch = string.c_str()[string.size() - 1];
+        if (ch == '\r' || ch == '\n')
+        {
+            string.pop_back();
+        }
+
+        return string;
+    };
+
+    if (outPutfileList.size() > 1)
+    {
+        std::map<unsigned int, KernelRowData*> dataPerFile;
+        std::vector<CSVFileParser*> csvFileParsers;
+
+        std::vector<std::string> commonColumns = { "Method",
+                                                   "ExecutionOrder",
+                                                   "ThreadID",
+                                                   "CallIndex",
+                                                   "GlobalWorkSize",
+                                                   "WorkGroupSize",
+                                                   "LocalMemSize",
+                                                   "VGPRs",
+                                                   "SGPRs",
+                                                   "ScratchRegs"
+                                                 };
+
+        std::string methodString = "Method";
+        std::string callIndexString = "CallIndex";
+        std::vector<std::string> headers;
+
+        unsigned int count = 0;
+
+        for (std::vector<std::string>::iterator it = outPutfileList.begin(); it != outPutfileList.end(); ++it)
+        {
+            CSVFileParser* csvParser = new(std::nothrow) CSVFileParser;
+            KernelRowData* rowData = new(std::nothrow) KernelRowData;
+
+            if (nullptr != csvParser && nullptr != rowData)
+            {
+                csvFileParsers.push_back(csvParser);
+                csvParser->AddListener(rowData);
+
+                if (csvParser->LoadFile(it->c_str()) && csvParser->Parse())
+                {
+                    dataPerFile[count] = rowData;
+                    count++;
+                }
+
+                headers = csvParser->GetHeaders();
+            }
+        }
+
+        CSVFileWriter mergedFileWriter(defaultOutputFileName + "." + PERF_COUNTER_EXT);
+        std::map<std::string, std::vector<int>> counterColumns;
+        std::map<std::string, std::vector<int>>::iterator counterColumnsIterator;
+        std::vector<std::string> csvFileColumns;
+        std::string passString = "_pass_";
+
+        for (std::map<unsigned int, KernelRowData*>::iterator iter = dataPerFile.begin(); iter != dataPerFile.end(); ++iter)
+        {
+            std::vector<std::string> columnNames = iter->second->GetColumns(1);
+
+            for (std::vector<std::string>::iterator it = columnNames.begin(); it != columnNames.end(); ++it)
+            {
+                counterColumnsIterator = counterColumns.find(*it);
+
+                if (counterColumnsIterator != counterColumns.end())
+                {
+                    bool succeed = !(std::count(commonColumns.begin(), commonColumns.end(), *it) >= 1);
+
+                    if (succeed)
+                    {
+                        counterColumnsIterator->second.push_back(iter->first);
+                    }
+                }
+                else
+                {
+                    bool succeed = !(std::count(commonColumns.begin(), commonColumns.end(), *it) >= 1);
+
+                    if (succeed)
+                    {
+                        std::vector<int> tempFileIndex;
+                        tempFileIndex.push_back(iter->first);
+                        counterColumns.insert(counterColumnsIterator, std::pair<std::string, std::vector<int>>(*it, tempFileIndex));
+                    }
+                }
+            }
+        }
+
+        for (std::vector<std::string>::const_iterator it = commonColumns.begin(); it != commonColumns.end(); ++it)
+        {
+            csvFileColumns.push_back(*it);
+        }
+
+        for (counterColumnsIterator = counterColumns.begin(); counterColumnsIterator != counterColumns.end(); ++counterColumnsIterator)
+        {
+            std::string columnNameWithoutLineFeed = removeLineFeed(counterColumnsIterator->first);
+            if (counterColumnsIterator->second.size() > 1)
+            {
+                for (unsigned int i = 1; i <= counterColumnsIterator->second.size(); i++)
+                {
+                    std::stringstream stringStream;
+                    stringStream << counterColumnsIterator->second.at(i-1);
+                    csvFileColumns.push_back(columnNameWithoutLineFeed + passString + stringStream.str());
+                }
+            }
+            else
+            {
+                csvFileColumns.push_back(columnNameWithoutLineFeed);
+            }
+        }
+
+        unsigned int totalMergedCSVRowCount = dataPerFile.begin()->second->GetRowCount();
+        std::map<unsigned int, KernelRowData*>::iterator baseCSV = dataPerFile.begin();
+
+        for (std::map<unsigned int, KernelRowData*>::iterator iter = dataPerFile.begin(); iter != dataPerFile.end(); ++iter)
+        {
+            unsigned int currentRowCount = iter->second->GetRowCount();
+
+            if (totalMergedCSVRowCount < currentRowCount)
+            {
+                totalMergedCSVRowCount = currentRowCount;
+                baseCSV = iter;
+            }
+        }
+
+        for (std::vector<std::string>::const_iterator headerIter = headers.begin(); headerIter != headers.end(); ++headerIter)
+        {
+            mergedFileWriter.AddHeader(removeLineFeed(*headerIter));
+        }
+
+        mergedFileWriter.AddColumns(csvFileColumns);
+        std::vector<std::string> rowData;
+        std::map<std::string, std::string> rowDataWithColumn;
+
+        for (unsigned int rowIndexIter = 0; rowIndexIter < totalMergedCSVRowCount; rowIndexIter++)
+        {
+            CSVRow* row = mergedFileWriter.AddRow();
+
+            for (std::map<unsigned int, KernelRowData*>::iterator iter = dataPerFile.begin(); iter != dataPerFile.end(); ++iter)
+            {
+                if (iter != baseCSV)
+                {
+                    if (iter->second->GetValue(rowIndexIter, methodString) == baseCSV->second->GetValue(rowIndexIter, methodString) &&
+                        iter->second->GetValue(rowIndexIter, callIndexString) == baseCSV->second->GetValue(rowIndexIter, callIndexString))
+                    {
+                        for (std::vector<std::string>::iterator commonColumnsIter = commonColumns.begin(); commonColumnsIter != commonColumns.end(); ++commonColumnsIter)
+                        {
+                            rowDataWithColumn[*commonColumnsIter] = baseCSV->second->GetValue(rowIndexIter, *commonColumnsIter);
+                        }
+
+                        for (counterColumnsIterator = counterColumns.begin(); counterColumnsIterator != counterColumns.end(); ++counterColumnsIterator)
+                        {
+                            if (counterColumnsIterator->second.size() > 1)
+                            {
+                                for (unsigned int commonColumnsCountIter = 0; commonColumnsCountIter < counterColumnsIterator->second.size(); commonColumnsCountIter++)
+                                {
+                                    stringstream commonCounterStringStream;
+                                    commonCounterStringStream << commonColumnsCountIter;
+                                    rowDataWithColumn[counterColumnsIterator->first + passString + commonCounterStringStream.str()] =
+                                        dataPerFile[commonColumnsCountIter]->GetValue(rowIndexIter, counterColumnsIterator->first);
+                                }
+                            }
+                            else
+                            {
+                                rowDataWithColumn.insert(std::pair<std::string, std::string>(counterColumnsIterator->first, dataPerFile[counterColumnsIterator->second.front()]->GetValue(rowIndexIter, counterColumnsIterator->first)));
+                            }
+
+                        }
+                    }
+                    else
+                    {
+                        std::vector<std::string> baseCSVColumns = baseCSV->second->GetColumns(rowIndexIter);
+                        for (std::vector<std::string>::iterator baseCSVColumnsIter = baseCSVColumns.begin(); baseCSVColumnsIter != baseCSVColumns.end(); ++baseCSVColumnsIter)
+                        {
+                            stringstream commonCounterStringStream;
+                            commonCounterStringStream << baseCSV->first;
+                            bool succeed = std::count(csvFileColumns.begin(), csvFileColumns.end(), (*baseCSVColumnsIter) + passString + commonCounterStringStream.str()) >= 1;
+                            if (succeed)
+                            {
+                                rowDataWithColumn[*baseCSVColumnsIter + passString + commonCounterStringStream.str()] =
+                                    baseCSV->second->GetValue(rowIndexIter, *baseCSVColumnsIter);
+                            }
+                            else
+                            {
+                                rowDataWithColumn[*baseCSVColumnsIter] = baseCSV->second->GetValue(rowIndexIter, *baseCSVColumnsIter);
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (std::vector<std::string>::iterator csvFileColumnsIter = csvFileColumns.begin(); csvFileColumnsIter != csvFileColumns.end(); ++csvFileColumnsIter)
+            {
+                rowData.push_back(rowDataWithColumn[*csvFileColumnsIter]);
+            }
+
+            row->FromRowData(rowData);
+            rowDataWithColumn.clear();
+            rowData.clear();
+        }
+
+
+        return mergedFileWriter.Flush();
+    }
+
+    return false;
+}
+
 #ifdef _WIN32
     int _tmain(int argc, wchar_t* argv[])
 #else
@@ -800,6 +1086,7 @@ int ProcessCommandLine(const std::string& strCounterFile)
 
     bool isCounterFileMoreThanOne = config.counterFileList.size() > 1 ? true : false;
     std::string defaultOutputFileName = config.strOutputFile;
+    std::vector<std::string> outputFileList;
 
     if (!config.counterFileList.empty())
     {
@@ -889,6 +1176,7 @@ int ProcessCommandLine(const std::string& strCounterFile)
             }
 
             config.strOutputFile = outputFileName;
+            outputFileList.push_back(outputFileName);
             retVal = ProcessCommandLine(config.counterFileList[i]);
             isReplaying = true;
         }
@@ -942,7 +1230,13 @@ int ProcessCommandLine(const std::string& strCounterFile)
         }
 
         config.strOutputFile = outputFileName;
+        outputFileList.push_back(outputFileName);
         retVal = ProcessCommandLine(counterFile);
+    }
+
+    if (outputFileList.size() > 1)
+    {
+        MergeKernelProfileOutputFiles(outputFileList, defaultOutputFileName);
     }
 
     return retVal;
