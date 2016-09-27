@@ -316,8 +316,9 @@ private:
     QMap<osThreadId, acTimelineBranch*>      m_hostBranchMap;           ///< map from thread id to the host timeline branch for that thread
     QMap<osThreadId, TraceTableModel*>       m_modelMap;                ///< a map from host thread label to model map
     QMap<uint, QList<SymbolInfo*> >          m_symbolTableMap;          ///< stack trace table map. From thread ID to symbol list
-    acTimelineBranch*                        m_pOpenCLBranch;            ///< the main OpenCL branch in the timeline
-    acTimelineBranch*                        m_pHSABranch;               ///< the main HSA branch in the timeline
+    acTimelineBranch*                        m_pOpenCLBranch;           ///< the main OpenCL branch in the timeline
+    acTimelineBranch*                        m_pHSABranch;              ///< the main HSA branch in the timeline
+    acTimelineBranch*                        m_pHSADataTransferBranch;  ///< the HSA data transfer branch in the timeline
     QMap<unsigned int, acTimelineBranch*>    m_oclCtxMap;               ///< map from OCL context id to the branch for that context
     QMap<unsigned int, OCLQueueBranchInfo*>  m_oclQueueMap;             ///< map from OCL queue id to the QueueBranchInfo for that queue
     QMap<QString, acTimelineBranch*>         m_hsaQueueMap;             ///< map from HSA queue handle string to the branch for that queue

@@ -74,8 +74,8 @@ void HSADispatchTimelineItem::tooltipItems(acTimelineItemToolTip& tooltip) const
     */
 }
 
-HSAMemoryTimelineItem::HSAMemoryTimelineItem(quint64 startTime, quint64 endTime, int apiIndex, size_t size, bool shouldShowBandwidth)
-    : HostAPITimelineItem(startTime, endTime, apiIndex), m_size(size), m_shouldShowBandwidth(shouldShowBandwidth)
+HSAMemoryTimelineItem::HSAMemoryTimelineItem(quint64 startTime, quint64 endTime, int apiIndex, size_t size)
+    : HostAPITimelineItem(startTime, endTime, apiIndex), m_size(size)
 {
 }
 
@@ -85,39 +85,80 @@ void HSAMemoryTimelineItem::tooltipItems(acTimelineItemToolTip& tooltip) const
     acAPITimelineItem::tooltipItems(tooltip);
 
     tooltip.add(tr("Size"), QString(tr("%1")).arg(m_size));
+}
 
-    if (m_shouldShowBandwidth)
+HSAMemoryTransferTimelineItem::HSAMemoryTransferTimelineItem(quint64 transferStartTime, quint64 transferEndTime, int apiIndex, size_t size, QString srcAgent, QString dstAgent)
+    : HSAMemoryTimelineItem(transferStartTime, transferEndTime, apiIndex, size), m_srcAgent(srcAgent), m_dstAgent(dstAgent)
+{
+}
+
+void HSAMemoryTransferTimelineItem::tooltipItems(acTimelineItemToolTip& tooltip) const
+{
+    tooltip.add(tr("Name"), m_strText);
+    tooltip.add(tr("Source Agent Handle"), m_srcAgent);
+    tooltip.add(tr("Destination Agent Handle"), m_dstAgent);
+
+    acTimeline* timeline = m_pParentBranch->parentTimeline();
+
+    double fnum = (m_nStartTime - timeline->startTime()) / 1e6; // convert to milliseconds
+    QString strNum = QString(tr("%1 millisecond")).arg(fnum, 0, 'f', 3);
+    tooltip.add(tr("Data Transfer Start Time"), strNum);
+
+    fnum = (m_nEndTime - timeline->startTime()) / 1e6; // convert to milliseconds
+    strNum = QString(tr("%1 millisecond")).arg(fnum, 0, 'f', 3);
+    tooltip.add(tr("Data Transfer End Time"), strNum);
+
+    QString name = m_strText.toLower();
+    quint64 duration = m_nEndTime - m_nStartTime;
+
+    tooltip.add(tr("Data Transfer Duration"), getDurationString(duration));
+
+    static const quint64 kb = 1 << 10;
+    static const quint64 mb = 1 << 20;
+    static const quint64 gb = 1 << 30;
+
+    double elapsedInSec = duration * 1e-9;
+    double transferRate = (double)m_size / elapsedInSec;
+
+    QString transferRateStr;
+
+    if (transferRate > gb)
     {
-        static const quint64 kb = 1 << 10;
-        static const quint64 mb = 1 << 20;
-        static const quint64 gb = 1 << 30;
-
-        quint64 elapsed = m_nEndTime - m_nStartTime;
-        double elapsedInSec = elapsed * 1e-9;
-        double transferRate = (double)m_size / elapsedInSec;
-
-        QString transferRateStr;
-
-        if (transferRate > gb)
-        {
-            transferRate /= double(gb);
-            transferRateStr = QString(tr("%1 GB/s")).arg(transferRate, 0, 'f', 3);
-        }
-        else if (transferRate > mb)
-        {
-            transferRate /= double(mb);
-            transferRateStr = QString(tr("%1 MB/s")).arg(transferRate, 0, 'f', 3);
-        }
-        else if (transferRate > kb)
-        {
-            transferRate /= double(kb);
-            transferRateStr = QString(tr("%1 KB/s")).arg(transferRate, 0, 'f', 3);
-        }
-        else
-        {
-            transferRateStr = QString(tr("%1 Byte/s")).arg(transferRate, 0, 'f', 3);
-        }
-
-        tooltip.add(tr("Bandwidth"), transferRateStr);
+        transferRate /= double(gb);
+        transferRateStr = QString(tr("%1 GB/s")).arg(transferRate, 0, 'f', 3);
     }
+    else if (transferRate > mb)
+    {
+        transferRate /= double(mb);
+        transferRateStr = QString(tr("%1 MB/s")).arg(transferRate, 0, 'f', 3);
+    }
+    else if (transferRate > kb)
+    {
+        transferRate /= double(kb);
+        transferRateStr = QString(tr("%1 KB/s")).arg(transferRate, 0, 'f', 3);
+    }
+    else
+    {
+        transferRateStr = QString(tr("%1 Byte/s")).arg(transferRate, 0, 'f', 3);
+    }
+
+    tooltip.add(tr("Transfer Rate"), transferRateStr);
+
+    acAPITimelineItem* localHostItem = hostItem();
+
+    tooltip.add(tr("Host API Name"), localHostItem->text());
+
+    fnum = (localHostItem->startTime() - timeline->startTime()) / 1e6; // convert to milliseconds
+    strNum = QString(tr("%1 millisecond")).arg(fnum, 0, 'f', 3);
+    tooltip.add(tr("Host API Start Time"), strNum);
+
+    fnum = (localHostItem->endTime() - timeline->startTime()) / 1e6; // convert to milliseconds
+    strNum = QString(tr("%1 millisecond")).arg(fnum, 0, 'f', 3);
+    tooltip.add(tr("Host API End Time"), strNum);
+
+    duration = localHostItem->endTime() - localHostItem->startTime();
+    tooltip.add(tr("Host API Duration"), getDurationString(duration));
+
+    strNum.setNum(localHostItem->apiIndex());
+    tooltip.add(tr("Host Call Index"), strNum);
 }

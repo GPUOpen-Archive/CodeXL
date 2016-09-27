@@ -73,6 +73,7 @@ TraceView::TraceView(QWidget* parent) : gpBaseSessionView(parent),
     m_pSummarizer(nullptr),
     m_pOpenCLBranch(nullptr),
     m_pHSABranch(nullptr),
+    m_pHSADataTransferBranch(nullptr),
     m_perfMarkersAdded(false)
 #ifdef SHOW_KERNEL_LAUNCH_AND_COMPLETION_LATENCY
     , m_lastDeviceItem(nullptr),
@@ -331,6 +332,7 @@ void TraceView::Clear()
     m_symbolTableMap.clear();
     m_pOpenCLBranch = nullptr;
     m_pHSABranch = nullptr;
+    m_pHSADataTransferBranch = nullptr;
     m_oclCtxMap.clear();
     m_oclQueueMap.clear();
     m_hsaQueueMap.clear();
@@ -1455,7 +1457,47 @@ void TraceView::HandleHSAAPIInfo(HSAAPIInfo* pApiInfo)
 
         if (nullptr != pHsaMemoryAPIInfo)
         {
-            item = new HSAMemoryTimelineItem(itemStartTime, itemEndTime, pApiInfo->m_uiDisplaySeqID, pHsaMemoryAPIInfo->m_size, pHsaMemoryAPIInfo->m_shouldShowBandwidth);
+            item = new HSAMemoryTimelineItem(itemStartTime, itemEndTime, pApiInfo->m_uiDisplaySeqID, pHsaMemoryAPIInfo->m_size);
+
+            HSAMemoryTransferAPIInfo* pHsaMemoryTransferAPIInfo = dynamic_cast<HSAMemoryTransferAPIInfo*>(pHsaMemoryAPIInfo);
+
+            if (nullptr != pHsaMemoryTransferAPIInfo)
+            {
+                QString srcAgent = QString::fromStdString(pHsaMemoryTransferAPIInfo->m_strSrcAgent);
+                QString dstAgent = QString::fromStdString(pHsaMemoryTransferAPIInfo->m_strDstAgent);
+
+                HSAMemoryTransferTimelineItem* transferItem = new HSAMemoryTransferTimelineItem(pHsaMemoryTransferAPIInfo->m_transferStartTime, pHsaMemoryTransferAPIInfo->m_transferEndTime, pApiInfo->m_uiDisplaySeqID, pHsaMemoryTransferAPIInfo->m_size, srcAgent, dstAgent);
+                transferItem->setHostItem(item);
+                transferItem->setBackgroundColor(APIColorMap::Instance()->GetAPIColor(apiName, QColor(90, 90, 90)));
+
+                quint64 transferSize = pHsaMemoryAPIInfo->m_size;
+                //((CLMemTimelineItem*)gpuItem)->setDataTransferSize(transferSize);
+
+                transferItem->setText(CLMemTimelineItem::getDataSizeString(transferSize, 1) + " copy");
+
+                // Create HSA branch if it does not yet exist
+                if (nullptr == m_pHSABranch)
+                {
+                    m_pHSABranch = new acTimelineBranch();
+                    m_pHSABranch->SetBGColor(QColor::fromRgb(230, 230, 230));
+                    m_pHSABranch->setText(GPU_STR_TraceViewHSA);
+                }
+
+                // TODO: investigate using a separate branch (timeline row) for each destination agent
+                //       as it is possible to have overlapping transfers in a MGPU system when transferring
+                //       to multiple agents simultaneously
+                if (nullptr == m_pHSADataTransferBranch)
+                {
+                    m_pHSADataTransferBranch = new acTimelineBranch();
+                    m_pHSADataTransferBranch->SetBGColor(QColor::fromRgb(230, 230, 230));
+                    m_pHSADataTransferBranch->setText(GPU_STR_TraceViewHSADataTransfers);
+                }
+
+                m_pHSADataTransferBranch->addTimelineItem(transferItem);
+            }
+            else
+            {
+            }
         }
         else
         {
@@ -1761,18 +1803,31 @@ void TraceView::DoneParsingATPFile()
         m_oclQueueMap.clear();
     }
 
-    if (!m_hsaQueueMap.isEmpty())
+    if (!m_hsaQueueMap.isEmpty() || nullptr != m_pHSADataTransferBranch)
     {
         timelineDataLoaded = true;
+        bool anySubBranchAdded = false;
 
         for (QMap<QString, acTimelineBranch*>::const_iterator i = m_hsaQueueMap.begin(); i != m_hsaQueueMap.end(); ++i)
         {
             m_pHSABranch->addSubBranch(*i);
+            anySubBranchAdded = true;
         }
 
-        m_pTimeline->addBranch(m_pHSABranch);
+        if (nullptr != m_pHSADataTransferBranch)
+        {
+            m_pHSABranch->addSubBranch(m_pHSADataTransferBranch);
+            anySubBranchAdded = true;
+        }
+
+        if (anySubBranchAdded)
+        {
+            m_pTimeline->addBranch(m_pHSABranch);
+        }
+
         m_hsaQueueMap.clear();
     }
+
 
     if (!m_modelMap.isEmpty())
     {

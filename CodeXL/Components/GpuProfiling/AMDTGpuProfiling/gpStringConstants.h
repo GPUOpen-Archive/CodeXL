@@ -247,6 +247,7 @@
 #define GPU_STR_TraceViewCpuDevice "CPU_Device"
 #define GPU_STR_TraceViewOpenCL "OpenCL"
 #define GPU_STR_TraceViewHSA "HSA"
+#define GPU_STR_TraceViewHSADataTransfers "Data Transfers"
 #define GPU_STR_DX12Api "DX12"
 #define GPU_STR_VulkanApi "Vulkan"
 #define GPU_STR_TraceViewGPU "GPU Queues"
