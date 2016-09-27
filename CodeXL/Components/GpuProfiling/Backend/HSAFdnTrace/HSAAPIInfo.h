@@ -55,7 +55,7 @@ class HSAMemoryAPIInfo : public HSAAPIInfo
 {
 public:
     /// Constructor
-    HSAMemoryAPIInfo() : HSAAPIInfo(), m_size(0), m_shouldShowBandwidth(false)
+    HSAMemoryAPIInfo() : HSAAPIInfo(), m_size(0)
     {
     }
 
@@ -83,13 +83,12 @@ public:
             doesAPIHaveSizeArg = true;
             sizeArgPos = 1;
         }
-        else if (m_apiID == HSA_API_Type_hsa_memory_copy || m_apiID == HSA_API_Type_hsa_amd_memory_async_copy)
+        else if (m_apiID == HSA_API_Type_hsa_memory_copy)
         {
             doesAPIHaveSizeArg = true;
             sizeArgPos = 2;
-            // m_shouldShowBandwidth = true;
         }
-        else if (m_apiID == HSA_API_Type_hsa_amd_interop_map_buffer)
+        else if (m_apiID == HSA_API_Type_hsa_amd_interop_map_buffer || m_apiID == HSA_API_Type_hsa_amd_memory_async_copy)
         {
             doesAPIHaveSizeArg = true;
             sizeArgPos = 4;
@@ -127,7 +126,39 @@ public:
     }
 
     size_t m_size;                ///< size of memory operation
-    bool   m_shouldShowBandwidth; ///< flag indicating whether or not we should show bandwidth for this api
+};
+
+//------------------------------------------------------------------------------------
+/// HSAAPIInfo descendant for memory APIs
+//------------------------------------------------------------------------------------
+class HSAMemoryTransferAPIInfo : public HSAMemoryAPIInfo
+{
+public:
+    /// Constructor
+    HSAMemoryTransferAPIInfo() : HSAMemoryAPIInfo(), m_transferStartTime(0ull), m_transferEndTime(0ull)
+    {
+    }
+
+    /// Virtual destructor
+    virtual ~HSAMemoryTransferAPIInfo() {}
+
+    /// Parse the argument list
+    virtual void ParseArgList()
+    {
+        HSAMemoryAPIInfo::ParseArgList();
+
+        std::vector<std::string> args;
+        StringUtils::Split(args, m_ArgList, ";");
+
+        m_strSrcAgent = args[3];
+        m_strDstAgent = args[1];
+    }
+
+
+    uint64_t    m_transferStartTime; ///< timestamp for when the async copy started
+    uint64_t    m_transferEndTime;   ///< timestamp for when the async copy ended
+    std::string m_strSrcAgent;       ///< Source agent of mem transfer
+    std::string m_strDstAgent;       ///< Destination agent of mem transfer
 };
 
 //------------------------------------------------------------------------------------

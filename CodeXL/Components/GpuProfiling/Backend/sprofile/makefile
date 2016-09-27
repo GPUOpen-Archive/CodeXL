@@ -72,6 +72,7 @@ OBJS = \
 	./$(OBJ_DIR)/HSAObjRefTracker.o \
 	./$(OBJ_DIR)/HSAKernelSummarizer.o \
 	./$(OBJ_DIR)/HSAFunctionDefsUtils.o \
+	./$(OBJ_DIR)/HSAMemSummarizer.o \
 	./$(OBJ_DIR)/AtpFile.o \
 	./$(OBJ_DIR)/PerfMarkerAtpFile.o \
 	./$(OBJ_DIR)/CLOccupancyFile.o \
