@@ -45,6 +45,13 @@
     #define THREAD_PROFILE_RAWFILE_EXT_STR      "cxltp"
 #endif
 
+struct CpuProfilePmcEventCount
+{
+    gtUInt32    m_coreId = 0;
+    gtUInt32    m_nbrEvents = 0;
+    gtUInt64    m_eventConfig[6];  // Max six counters
+    gtUInt64    m_eventCountValue[6];  // Max six counters
+};
 
 typedef enum CpuProfileStates
 {
@@ -128,6 +135,9 @@ public:
         return retVal;
     }
 
+    bool hasCountModeEvents() const { return (m_nbrCountEvents > 0) ? true : false; }
+    void GetCountEventValues(gtVector<CpuProfilePmcEventCount>& value) const { value = m_eventCountValuesVec; }
+
 private:
     ParseArgs&          m_args;
     bool                m_isProfilingEnabled;
@@ -144,10 +154,15 @@ private:
 
     osFilePath          m_outputFilePath;   // constructed outputfile path either user-provided or default path + timestamp
 
+    gtUInt64            m_nbrSampleEvents = 0;
+    gtUInt64            m_nbrCountEvents = 0;
+    gtVector<CpuProfilePmcEventCount>  m_eventCountValuesVec;
+    gtVector<gtUInt64>  m_countEventVec;
+
     void SetupEnvironment();
     void EnableProfiling();
     void ValidateProfile();
-    void VerifyAndSetEvents(EventConfiguration** ppDriverEvents);
+    void VerifyAndSetEvents(EventConfiguration** ppDriverSampleEvents, EventConfiguration** ppDriverCountEvents);
     bool ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec);
     void ConfigureProfile();
 

@@ -2048,7 +2048,7 @@ HRESULT CpuPerfGetEventCount(/*in*/ unsigned int core,
         // if (((*evIt).ulCounterIndex == eventCounterIndex)
         //  && (0 != ((*evIt).ullCpuMask.QuadPart & coreMask)))
         if (((*evIt).ulCounterIndex == eventCounterIndex)
-            && (isCoreSet((gtUInt64*)((*evIt).ullCpuMask.QuadPart), core)))
+            && (isCoreSet((gtUInt64*)((*evIt).ullCpuMask.QuadPart), core) || ((*evIt).ulCoreMaskCount ==0)))
         {
             break;
         }
@@ -2351,7 +2351,7 @@ HRESULT CpuPerfGetCountingEventCount(
     {
         // if ((0 != ((*evIt).ullCpuMask.QuadPart & coreMask))
         //  && (clientId == (*evIt).ulClientId))
-        if ((isCoreSet((gtUInt64*)((*evIt).ullCpuMask.QuadPart), core))
+        if ((((*evIt).ulCoreMaskCount == 0) || (isCoreSet((gtUInt64*)((*evIt).ullCpuMask.QuadPart), core)))
             && (clientId == (*evIt).ulClientId))
         {
             (*pCount)++;
@@ -2390,7 +2390,7 @@ HRESULT CpuPerfGetAllEventCounts(
     for (gtList<EVENT_PROPERTIES>::iterator evIt  = g_eventCfgs.begin(), evEnd = g_eventCfgs.end(); evIt != evEnd; ++evIt)
     {
         // if (0 == ((*evIt).ullCpuMask.QuadPart & coreMask))
-        if (! isCoreSet((gtUInt64*)((*evIt).ullCpuMask.QuadPart), core))
+        if ((! isCoreSet((gtUInt64*)((*evIt).ullCpuMask.QuadPart), core)) && ((*evIt).ulCoreMaskCount != 0))
         {
             continue;
         }
@@ -2424,6 +2424,7 @@ HRESULT CpuPerfGetAllEventCounts(
         }
 
         pCounts[countIndex] = countProperties.ullEventCount;
+        countIndex++;
     }
 
     return hr;

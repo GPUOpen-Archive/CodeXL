@@ -606,6 +606,23 @@ HRESULT HandleCollectCommand(ParseArgs& args)
             // Terminate the launched process if the user has requested or StartProfiling fails
             osTerminateProcess(processId);
         }
+
+        // Print the count mode event values
+        if (collect.hasCountModeEvents())
+        {
+            gtVector<CpuProfilePmcEventCount> countValues;
+            collect.GetCountEventValues(countValues);
+            
+            fprintf(stderr, "\nCore     Event       Count-Value\n");
+
+            for (const auto& aValue : countValues)
+            {
+                for (gtUInt32 i = 0; i < aValue.m_nbrEvents; i++)
+                {
+                    fprintf(stderr, "%u     0x%llx      %llu\n", aValue.m_coreId, aValue.m_eventConfig[i], aValue.m_eventCountValue[i]);
+                }
+            }
+        }
     }
 
     return hr;

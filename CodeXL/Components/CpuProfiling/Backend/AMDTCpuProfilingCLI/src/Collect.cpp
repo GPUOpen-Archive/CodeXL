@@ -179,6 +179,50 @@ HRESULT CpuProfileCollect::StopProfiling()
         {
             m_profEndTime = GetTimeStr();
 
+            if (m_nbrCountEvents > 0)
+            {
+                // TODO: Support for more than 64 cores
+                int nbrCores = 0;
+                gtUInt64 coreAffinityMask = m_args.GetCoreAffinityMask();
+
+                if ((coreAffinityMask + 1) == 0)
+                {
+                    coreAffinityMask = 0;
+                    osGetAmountOfLocalMachineCPUs(nbrCores);
+
+                    if (nbrCores < 64)
+                    {
+                        coreAffinityMask = (1ULL << nbrCores) - 1;
+                    }
+                }
+
+                int coreId = 0;
+                while (coreAffinityMask)
+                {
+                    if (coreAffinityMask & 0x1)
+                    {
+                        CpuProfilePmcEventCount eventCountData;
+                        eventCountData.m_coreId = coreId;
+                        eventCountData.m_nbrEvents = m_nbrCountEvents;
+
+                        m_error = fnGetAllEventCounts(coreId, this->m_nbrCountEvents, &eventCountData.m_eventCountValue[0]);
+
+                        int idx = 0;
+
+                        for (const auto& aEvent : m_countEventVec)
+                        {
+                            eventCountData.m_eventConfig[idx] = aEvent;
+                            idx++;
+                        }
+
+                        m_eventCountValuesVec.push_back(eventCountData);
+                    }
+
+                    coreAffinityMask >>= 1;
+                    coreId++;
+                }
+            }
+
             //stop profile
             m_error = fnStopProfiling();
 
@@ -659,6 +703,7 @@ bool CpuProfileCollect::ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec)
         unsigned int unitMask = 0;
         bool usrEvents = true;
         bool osEvents = true;
+        bool countingEvent = false;
         gtUInt64 performanceEvent = 0;
 
         while (tokens.getNextToken(value))
@@ -689,6 +734,12 @@ bool CpuProfileCollect::ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec)
 
             case 4:
                 value.toUnsignedInt64Number(interval);
+
+                if (!interval)
+                {
+                    countingEvent = true;
+                }
+
                 break;
 
             default:
@@ -705,7 +756,7 @@ bool CpuProfileCollect::ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec)
                                  osEvents,
                                  false, // guestOnlyEvents,
                                  false, // hostOnlyEvents,
-                                 false, // countingEvent,
+                                 countingEvent, // countingEvent,
                                  &performanceEvent);
 
         if (SUCCEEDED(res))
@@ -725,7 +776,7 @@ bool CpuProfileCollect::ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec)
     return ret;
 }
 
-void CpuProfileCollect::VerifyAndSetEvents(EventConfiguration** ppDriverEvents)
+void CpuProfileCollect::VerifyAndSetEvents(EventConfiguration** ppDriverSampleEvents, EventConfiguration** ppDriverCountEvents)
 {
     int nbrOfEvents = m_profileDcConfig.GetNumberOfEvents();
 
@@ -776,11 +827,13 @@ void CpuProfileCollect::VerifyAndSetEvents(EventConfiguration** ppDriverEvents)
     DcEventConfig* pEvents = new DcEventConfig[nbrOfEvents];
     m_profileDcConfig.GetEventInfo(pEvents, nbrOfEvents);
 
-    *ppDriverEvents = nullptr;
+    *ppDriverSampleEvents = nullptr;
+    *ppDriverCountEvents = nullptr;
 
     if (isOK())
     {
-        *ppDriverEvents = new EventConfiguration[nbrOfEvents];
+        *ppDriverSampleEvents = new EventConfiguration[nbrOfEvents];
+        *ppDriverCountEvents = new EventConfiguration[nbrOfEvents];
     }
 
     unsigned int evCounter = 0;
@@ -855,9 +908,21 @@ void CpuProfileCollect::VerifyAndSetEvents(EventConfiguration** ppDriverEvents)
 #endif // AMDT_LINUX_OS
 
         // Save the event configuration that will be written to the hardware
-        (*ppDriverEvents)[i].performanceEvent = pCurrentConfig->pmc.perf_ctl;
-        (*ppDriverEvents)[i].value = pCurrentConfig->eventCount;
-        (*ppDriverEvents)[i].eventCounter = evCounter;
+        if (pCurrentConfig->pmc.bitSampleEvents)
+        {
+            (*ppDriverSampleEvents)[m_nbrSampleEvents].performanceEvent = pCurrentConfig->pmc.perf_ctl;
+            (*ppDriverSampleEvents)[m_nbrSampleEvents].value = pCurrentConfig->eventCount;
+            (*ppDriverSampleEvents)[m_nbrSampleEvents].eventCounter = evCounter;
+            m_nbrSampleEvents++;
+        }
+        else
+        {
+            (*ppDriverCountEvents)[m_nbrCountEvents].performanceEvent = pCurrentConfig->pmc.perf_ctl;
+            (*ppDriverCountEvents)[m_nbrCountEvents].value = pCurrentConfig->eventCount;
+            (*ppDriverCountEvents)[m_nbrCountEvents].eventCounter = evCounter;
+            m_nbrCountEvents++;
+            m_countEventVec.push_back(pCurrentConfig->pmc.perf_ctl);
+        }
 
         if (++evCounter == maxCounter)
         {
@@ -869,10 +934,19 @@ void CpuProfileCollect::VerifyAndSetEvents(EventConfiguration** ppDriverEvents)
 
     eventsMap.clear();
 
-    if (S_OK != m_error && nullptr != *ppDriverEvents)
+    if (S_OK != m_error)
     {
-        delete[] * ppDriverEvents;
-        *ppDriverEvents = nullptr;
+        if (nullptr != *ppDriverSampleEvents)
+        {
+            delete[] * ppDriverSampleEvents;
+            *ppDriverSampleEvents = nullptr;
+        }
+
+        if (nullptr != *ppDriverCountEvents)
+        {
+            delete[] * ppDriverCountEvents;
+            *ppDriverCountEvents = nullptr;
+        }
     }
 
     if (nullptr != pEventFile)
@@ -1019,32 +1093,55 @@ void CpuProfileCollect::SetEbpConfig()
 
 #endif
 
-        EventConfiguration* pDriverEvents = nullptr;
+        EventConfiguration* pDriverSampleEvents = nullptr;
+        EventConfiguration* pDriverCountEvents = nullptr;
 
         if (isOK())
         {
-            VerifyAndSetEvents(&pDriverEvents);
+            VerifyAndSetEvents(&pDriverSampleEvents, &pDriverCountEvents);
         }
 
         if (isOK())
         {
-            // Profile only on selected cores specified in the CPU Affinity Mask
-            // TODO: support for more than 64 cores ?
-            gtUInt64 cpuCoreMask = m_args.GetCoreAffinityMask();
-            m_error = fnSetEventConfiguration(pDriverEvents,
-                                              m_profileDcConfig.GetNumberOfEvents(),
-                                              cpuCoreMask);
-
-            if (!SUCCEEDED(m_error))
+            if (m_nbrSampleEvents > 0)
             {
-                reportError(true, L"There was a problem configuring the event profile. (error code 0x%lx)\n\n", m_error);
+                // Profile only on selected cores specified in the CPU Affinity Mask
+                // TODO: support for more than 64 cores ?
+                gtUInt64 cpuCoreMask = m_args.GetCoreAffinityMask();
+                m_error = fnSetEventConfiguration(pDriverSampleEvents,
+                                                  m_nbrSampleEvents,
+                                                  cpuCoreMask);
+
+                if (!SUCCEEDED(m_error))
+                {
+                    reportError(true, L"There was a problem configuring the event profile. (error code 0x%lx)\n\n", m_error);
+                }
+            }
+
+            if (m_nbrCountEvents > 0)
+            {
+                gtUInt64 cpuCoreMask = m_args.GetCoreAffinityMask();
+
+                m_error = fnSetCountingConfiguration(pDriverCountEvents,
+                                                     m_nbrCountEvents,
+                                                     cpuCoreMask);
+
+                if (!SUCCEEDED(m_error))
+                {
+                    reportError(true, L"There was a problem configuring the event count. (error code 0x%lx)\n\n", m_error);
+                }
             }
         }
 
         // Free the event array allocated in VerifyAndSetEvents()
-        if (nullptr != pDriverEvents)
+        if (nullptr != pDriverSampleEvents)
         {
-            delete [] pDriverEvents;
+            delete [] pDriverSampleEvents;
+        }
+
+        if (nullptr != pDriverCountEvents)
+        {
+            delete[] pDriverCountEvents;
         }
     }
 }
