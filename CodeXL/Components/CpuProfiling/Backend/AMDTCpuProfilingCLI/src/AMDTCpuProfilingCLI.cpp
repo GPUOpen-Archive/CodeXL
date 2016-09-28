@@ -57,9 +57,17 @@
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
     #define TEMP_PATH    "c:\\Temp\\"
     #define DEFAULT_TEMP_PATH    "%Temp%\\"
+
+    #define U_FORMAT "%llu"
+    #define D_FORMAT "%lld"
+    #define H_FORMAT "%llx"
 #else
     #define TEMP_PATH    "/tmp/"
     #define DEFAULT_TEMP_PATH   TEMP_PATH
+
+    #define U_FORMAT "%lu"
+    #define D_FORMAT "%ld"
+    #define H_FORMAT "%lx"
 #endif
 
 // Helper functions
@@ -619,7 +627,7 @@ HRESULT HandleCollectCommand(ParseArgs& args)
             {
                 for (gtUInt32 i = 0; i < aValue.m_nbrEvents; i++)
                 {
-                    fprintf(stderr, "%u     0x%llx      %llu\n", aValue.m_coreId, aValue.m_eventConfig[i], aValue.m_eventCountValue[i]);
+                    fprintf(stderr, "%u     0x" H_FORMAT "      " U_FORMAT"\n", aValue.m_coreId, aValue.m_eventConfig[i], aValue.m_eventCountValue[i]);
                 }
             }
         }
