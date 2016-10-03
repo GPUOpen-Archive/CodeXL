@@ -1109,6 +1109,63 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
         return headersWithActualHeaderNameAndFileIndex;
     };
 
+
+    auto SortMappedThreadByExecutionOrder = [](std::map<unsigned int, KernelRowData*> allFilesRowData, std::vector<std::set<std::pair<std::string, unsigned int>>> mappedThreads)->std::vector<std::set<std::pair<std::string, unsigned int>>>
+    {
+        std::vector<std::set<std::pair<std::string, unsigned int>>> sortedMappedThreadByExecutionOrder;
+        std::vector<std::set<std::pair<std::string, unsigned int>>>::iterator mappedThreadIterator;
+        std::vector<std::pair<std::string, unsigned int>> executionOrders;
+
+        std::string executionOrderString = "ExecutionOrder";
+        unsigned int firstRow = 0;
+        std::map<std::string, unsigned int> executionOrderAndIndex;
+
+        unsigned int index = 0;
+
+        for (mappedThreadIterator = mappedThreads.begin(); mappedThreadIterator != mappedThreads.end(); ++mappedThreadIterator)
+        {
+            std::string executionOrder = allFilesRowData[mappedThreadIterator->begin()->second]->GetValueByThreadId(mappedThreadIterator->begin()->first, firstRow, executionOrderString);
+            executionOrders.push_back(std::pair<std::string, unsigned int>(executionOrder, index));
+            index++;
+        }
+
+        unsigned int outerIndex = 0;
+
+        for (std::vector<std::pair<std::string, unsigned int>>::iterator outerIter = executionOrders.begin(); outerIter != executionOrders.end(); ++outerIter)
+        {
+            std::string exectionOrder = outerIter->first;
+            unsigned int indexToSwap = outerIndex;
+            unsigned int innerIndex = outerIndex + 1;
+
+            for (std::vector<std::pair<std::string, unsigned int>>::iterator innerIter = outerIter + 1; innerIter != executionOrders.end(); ++innerIter)
+            {
+                if (exectionOrder.compare(innerIter->first) > 0)
+                {
+                    exectionOrder = innerIter->first;
+                    indexToSwap = innerIndex;
+                }
+
+                innerIndex++;
+            }
+
+            if (indexToSwap != outerIndex)
+            {
+                std::pair<std::string, unsigned int> tempPair = executionOrders[indexToSwap];
+                executionOrders[indexToSwap] = executionOrders.at(outerIndex);
+                executionOrders[outerIndex] = tempPair;
+            }
+
+            outerIndex++;
+        }
+
+        for (std::vector<std::pair<std::string, unsigned int>>::iterator outerIter = executionOrders.begin(); outerIter != executionOrders.end(); ++outerIter)
+        {
+            sortedMappedThreadByExecutionOrder.push_back(mappedThreads[outerIter->second]);
+        }
+
+        return sortedMappedThreadByExecutionOrder;
+    };
+
     auto GetMappedThreads = [&](std::map<unsigned int, KernelRowData*> allFilesRowData)->std::vector<std::set<std::pair<std::string, unsigned int>>>
     {
         std::vector<std::set<std::pair<std::string, unsigned int>>> mappedThreads;
@@ -1175,6 +1232,8 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
             for (std::map<unsigned int, KernelRowData*>::iterator rowPerFileIterator = allFilesRowData.begin();
                  rowPerFileIterator != allFilesRowData.end(); ++rowPerFileIterator)
             {
+                std::string executionOrder;
+
                 // Do except for base files
                 if (baseRowData != rowPerFileIterator->second)
                 {
@@ -1210,7 +1269,7 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
             }
         }
 
-        return mappedThreads;
+        return SortMappedThreadByExecutionOrder(allFilesRowData, mappedThreads);
     };
 
     if (outPutfileList.size() > 1 && counterFileList.size() > 1)
@@ -1309,46 +1368,77 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
 
         for (mappedThreadsIterator = mappedThreads.begin(); mappedThreadsIterator != mappedThreads.end(); ++mappedThreadsIterator)
         {
-            unsigned int rowsToAdd = dataPerFile[mappedThreadsIterator->begin()->second]->GetRowCountByThreadId(mappedThreadsIterator->begin()->first);
-            unsigned int commonColumnsFileIndex = 0;
-            unsigned int fileIndexCounter = 0;
-
-            for (std::set<std::pair<std::string, unsigned int>>::iterator mappedThreadSetIter = mappedThreadsIterator->begin();
-                 mappedThreadSetIter != mappedThreadsIterator->end(); ++mappedThreadSetIter)
+            if (mappedThreadsIterator->size() > 1)
             {
-                unsigned int currentMappedThreadIteratorRowCount = dataPerFile[mappedThreadSetIter->second]->GetRowCountByThreadId(mappedThreadSetIter->first);
 
-                if (rowsToAdd < currentMappedThreadIteratorRowCount)
+                unsigned int rowsToAdd = dataPerFile[mappedThreadsIterator->begin()->second]->GetRowCountByThreadId(mappedThreadsIterator->begin()->first);
+                unsigned int commonColumnsFileIndex = 0;
+                unsigned int fileIndexCounter = 0;
+
+                for (std::set<std::pair<std::string, unsigned int>>::iterator mappedThreadSetIter = mappedThreadsIterator->begin();
+                     mappedThreadSetIter != mappedThreadsIterator->end(); ++mappedThreadSetIter)
                 {
-                    rowsToAdd = currentMappedThreadIteratorRowCount;
-                    commonColumnsFileIndex = fileIndexCounter;
+                    unsigned int currentMappedThreadIteratorRowCount = dataPerFile[mappedThreadSetIter->second]->GetRowCountByThreadId(mappedThreadSetIter->first);
+
+                    if (rowsToAdd < currentMappedThreadIteratorRowCount)
+                    {
+                        rowsToAdd = currentMappedThreadIteratorRowCount;
+                        commonColumnsFileIndex = fileIndexCounter;
+                    }
+
+                    fileIndexCounter++;
                 }
 
-                fileIndexCounter++;
-            }
+                for (unsigned int rowsToAddIter = 0; rowsToAddIter < rowsToAdd; ++rowsToAddIter)
+                {
+                    CSVRow* rowToAddToFile = mergedFileWriter.AddRow();
 
-            for (unsigned int rowsToAddIter = 0; rowsToAddIter < rowsToAdd; ++rowsToAddIter)
+                    std::set<std::pair<std::string, unsigned int>>::iterator tempMappedThreadSetIterator;
+
+                    for (headersWithFileIndexIterator = headersWithFileIndex.begin(); headersWithFileIndexIterator != headersWithFileIndex.end(); ++headersWithFileIndexIterator)
+                    {
+                        if (IsCommonColumn(headersWithFileIndexIterator->first))
+                        {
+                            tempMappedThreadSetIterator = mappedThreadsIterator->begin();
+                            std::string checkVal = dataPerFile[commonColumnsFileIndex]->GetValueByThreadId(tempMappedThreadSetIterator->first, rowsToAddIter, headersWithFileIndexIterator->first);
+                            std::cout << checkVal;
+                            rowToAddToFile->SetRowData(headersWithFileIndexIterator->first, dataPerFile[commonColumnsFileIndex]->GetValueByThreadId(tempMappedThreadSetIterator->first, rowsToAddIter, headersWithFileIndexIterator->first));
+                        }
+                        else
+                        {
+                            for (tempMappedThreadSetIterator = mappedThreadsIterator->begin(); tempMappedThreadSetIterator != mappedThreadsIterator->end(); ++tempMappedThreadSetIterator)
+                            {
+                                if (headersWithFileIndexIterator->second.second == tempMappedThreadSetIterator->second)
+                                {
+                                    unsigned int fileIndexValue = tempMappedThreadSetIterator->second;
+                                    rowToAddToFile->SetRowData(headersWithFileIndexIterator->first, dataPerFile[fileIndexValue]->GetValueByThreadId(tempMappedThreadSetIterator->first, rowsToAddIter, headersWithFileIndexIterator->second.first));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else
             {
                 CSVRow* rowToAddToFile = mergedFileWriter.AddRow();
-
                 std::set<std::pair<std::string, unsigned int>>::iterator tempMappedThreadSetIterator;
+                unsigned int rowIndex = 0;
 
                 for (headersWithFileIndexIterator = headersWithFileIndex.begin(); headersWithFileIndexIterator != headersWithFileIndex.end(); ++headersWithFileIndexIterator)
                 {
                     if (IsCommonColumn(headersWithFileIndexIterator->first))
                     {
                         tempMappedThreadSetIterator = mappedThreadsIterator->begin();
-                        rowToAddToFile->SetRowData(headersWithFileIndexIterator->first, dataPerFile[commonColumnsFileIndex]->GetValueByThreadId(tempMappedThreadSetIterator->first, rowsToAddIter, headersWithFileIndexIterator->first));
+                        std::string checkVal = dataPerFile[tempMappedThreadSetIterator->second]->GetValueByThreadId(tempMappedThreadSetIterator->first, rowIndex, headersWithFileIndexIterator->first);
+                        std::cout << checkVal;
+                        rowToAddToFile->SetRowData(headersWithFileIndexIterator->first, dataPerFile[tempMappedThreadSetIterator->second]->GetValueByThreadId(tempMappedThreadSetIterator->first, 0, headersWithFileIndexIterator->first));
                     }
                     else
                     {
-                        for (tempMappedThreadSetIterator = mappedThreadsIterator->begin(); tempMappedThreadSetIterator != mappedThreadsIterator->end(); ++tempMappedThreadSetIterator)
+                        if (headersWithFileIndexIterator->second.second == tempMappedThreadSetIterator->second)
                         {
-                            if (headersWithFileIndexIterator->second.second == tempMappedThreadSetIterator->second)
-                            {
-                                unsigned int fileIndexValue = tempMappedThreadSetIterator->second;
-                                rowToAddToFile->SetRowData(headersWithFileIndexIterator->first, dataPerFile[fileIndexValue]->GetValueByThreadId(tempMappedThreadSetIterator->first, rowsToAddIter, headersWithFileIndexIterator->second.first));
-                            }
+                            unsigned int fileIndexValue = tempMappedThreadSetIterator->second;
+                            rowToAddToFile->SetRowData(headersWithFileIndexIterator->first, dataPerFile[fileIndexValue]->GetValueByThreadId(tempMappedThreadSetIterator->first, rowIndex, headersWithFileIndexIterator->second.first));
                         }
                     }
                 }
