@@ -1108,8 +1108,7 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
 
         return headersWithActualHeaderNameAndFileIndex;
     };
-
-
+    
     auto SortMappedThreadByExecutionOrder = [](std::map<unsigned int, KernelRowData*> allFilesRowData, std::vector<std::set<std::pair<std::string, unsigned int>>> mappedThreads)->std::vector<std::set<std::pair<std::string, unsigned int>>>
     {
         std::vector<std::set<std::pair<std::string, unsigned int>>> sortedMappedThreadByExecutionOrder;
@@ -1328,7 +1327,8 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
             }
         }
 
-        CSVFileWriter mergedFileWriter(defaultOutputFileName + "." + PERF_COUNTER_EXT);
+        std::string collatedOutputFileName = defaultOutputFileName + "." + PERF_COUNTER_EXT;
+        CSVFileWriter mergedFileWriter(collatedOutputFileName);
         std::map<std::string, std::vector<int>> counterColumns;
         std::map<std::string, std::vector<int>>::iterator counterColumnsIterator;
         std::vector<std::string> csvFileColumns;
@@ -1352,19 +1352,15 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
 
         mergedFileWriter.AddColumns(csvFileColumns);
 
-        unsigned int totalMergedCSVRowCount = dataPerFile.begin()->second->GetRowCount();
-        std::map<unsigned int, KernelRowData*>::iterator baseCSV = dataPerFile.begin();
+        bool inconsistentDispatchInInputFiles = false;
+        unsigned int baseCSVRowCount = dataPerFile.begin()->second->GetRowCount();
 
-        for (std::map<unsigned int, KernelRowData*>::iterator iter = dataPerFile.begin(); iter != dataPerFile.end(); ++iter)
+        for (std::map<unsigned int, KernelRowData*>::iterator dataPerFileIter = dataPerFile.begin(); dataPerFileIter != dataPerFile.end(); ++dataPerFileIter)
         {
-            unsigned int currentRowCount = iter->second->GetRowCount();
-
-            if (totalMergedCSVRowCount < currentRowCount)
-            {
-                totalMergedCSVRowCount = currentRowCount;
-                baseCSV = iter;
-            }
+            inconsistentDispatchInInputFiles |= (baseCSVRowCount == dataPerFileIter->second->GetRowCount());
         }
+
+        unsigned int addedRow = 0;
 
         for (mappedThreadsIterator = mappedThreads.begin(); mappedThreadsIterator != mappedThreads.end(); ++mappedThreadsIterator)
         {
@@ -1372,7 +1368,7 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
             {
 
                 unsigned int rowsToAdd = dataPerFile[mappedThreadsIterator->begin()->second]->GetRowCountByThreadId(mappedThreadsIterator->begin()->first);
-                unsigned int commonColumnsFileIndex = 0;
+                unsigned int commonColumnsFileIndex = mappedThreadsIterator->begin()->second;
                 unsigned int fileIndexCounter = 0;
 
                 for (std::set<std::pair<std::string, unsigned int>>::iterator mappedThreadSetIter = mappedThreadsIterator->begin();
@@ -1383,7 +1379,7 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
                     if (rowsToAdd < currentMappedThreadIteratorRowCount)
                     {
                         rowsToAdd = currentMappedThreadIteratorRowCount;
-                        commonColumnsFileIndex = fileIndexCounter;
+                        commonColumnsFileIndex = mappedThreadSetIter->second;
                     }
 
                     fileIndexCounter++;
@@ -1392,6 +1388,7 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
                 for (unsigned int rowsToAddIter = 0; rowsToAddIter < rowsToAdd; ++rowsToAddIter)
                 {
                     CSVRow* rowToAddToFile = mergedFileWriter.AddRow();
+                    addedRow++;
 
                     std::set<std::pair<std::string, unsigned int>>::iterator tempMappedThreadSetIterator;
 
@@ -1400,8 +1397,6 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
                         if (IsCommonColumn(headersWithFileIndexIterator->first))
                         {
                             tempMappedThreadSetIterator = mappedThreadsIterator->begin();
-                            std::string checkVal = dataPerFile[commonColumnsFileIndex]->GetValueByThreadId(tempMappedThreadSetIterator->first, rowsToAddIter, headersWithFileIndexIterator->first);
-                            std::cout << checkVal;
                             rowToAddToFile->SetRowData(headersWithFileIndexIterator->first, dataPerFile[commonColumnsFileIndex]->GetValueByThreadId(tempMappedThreadSetIterator->first, rowsToAddIter, headersWithFileIndexIterator->first));
                         }
                         else
@@ -1421,6 +1416,7 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
             else
             {
                 CSVRow* rowToAddToFile = mergedFileWriter.AddRow();
+                addedRow++;
                 std::set<std::pair<std::string, unsigned int>>::iterator tempMappedThreadSetIterator;
                 unsigned int rowIndex = 0;
 
@@ -1445,6 +1441,12 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
             }
         }
 
+        if ((dataPerFile.begin()->second->GetRowCount() != addedRow) || inconsistentDispatchInInputFiles)
+        {
+            std::cout << "\n\nUnable to merge all of the data for undeterministic dispatches\n\n";
+        }
+
+        std::cout << "\n\nCollated file output path : " << collatedOutputFileName << std::endl << std::endl;
         return mergedFileWriter.Flush();
     }
 
