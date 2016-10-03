@@ -26,6 +26,7 @@
 #include <string>
 #include <signal.h>
 #include <algorithm>
+#include <set>
 #include "GPUPerfAPIRegistry.h"
 #include "ParseCmdLine.h"
 #include "Analyze.h"
@@ -759,7 +760,7 @@ int ProcessCommandLine(const std::string& strCounterFile)
     return retVal;
 }
 
-bool MergeKernelProfileOutputFiles(std::vector<std::string> outPutfileList, std::string defaultOutputFileName)
+bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std::vector<std::string> outPutfileList, std::string defaultOutputFileName, bool includeTime)
 {
     class KernelRowData :
         public IParserListener<CSVRow>
@@ -769,6 +770,43 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> outPutfileList, std:
         unsigned int GetRowCount()
         {
             return static_cast<unsigned int>(m_rows.size());
+        }
+
+        unsigned int GetRowCountByThreadId(unsigned int threadId)
+        {
+            stringstream ss;
+            ss << threadId;
+            return static_cast<unsigned int>(m_rowsbyThreadId[ss.str()].size());
+        }
+
+        unsigned int GetRowCountByThreadId(std::string threadId)
+        {
+            return static_cast<unsigned int>(m_rowsbyThreadId[threadId].size());
+        }
+
+        std::string GetThreadId(unsigned int rowIndex)
+        {
+            std::string threadIdString = "ThreadID";
+            return GetValue(rowIndex, threadIdString);
+        }
+
+        std::vector<std::string> GetUniqueThreads()
+        {
+            std::vector<std::string> threads;
+
+            for (std::map<std::string, std::vector<CSVRow*>>::iterator kernelRowDataByThreadIterator = m_rowsbyThreadId.begin();
+                 kernelRowDataByThreadIterator != m_rowsbyThreadId.end();
+                 ++kernelRowDataByThreadIterator)
+            {
+                threads.push_back(kernelRowDataByThreadIterator->first);
+            }
+
+            return threads;
+        }
+
+        unsigned int GetThreadCount()
+        {
+            return static_cast<unsigned int>(m_rowsbyThreadId.size());
         }
 
         std::vector<std::string> GetColumns(unsigned int rowIndex)
@@ -783,16 +821,6 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> outPutfileList, std:
             return columnNameArray;
         }
 
-        bool operator<(KernelRowData rowData)
-        {
-            return this->GetRowCount() < rowData.GetRowCount();
-        }
-
-        bool operator<(KernelRowData* rowData)
-        {
-            return this->GetRowCount() < rowData->GetRowCount();
-        }
-
         std::string GetValue(const unsigned int& rowIndex, const std::string& columnName)
         {
             std::string retValue;
@@ -800,6 +828,19 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> outPutfileList, std:
             if (rowIndex < m_rows.size())
             {
                 retValue.assign(m_rows[rowIndex]->operator[](columnName));
+            }
+
+            return retValue;
+        }
+
+        std::string GetValueByThreadId(const std::string threadId, const unsigned int& rowIndex, const std::string& columnName)
+        {
+            std::string retValue;
+            CSVRow* tempRow = GetRowByThreadId(threadId, rowIndex);
+
+            if (nullptr != tempRow)
+            {
+                retValue = tempRow->operator[](columnName);
             }
 
             return retValue;
@@ -822,20 +863,51 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> outPutfileList, std:
             return rowData;
         }
 
+        CSVRow* GetRowByThreadId(std::string threadId, unsigned int rowIndex)
+        {
+            CSVRow* row = nullptr;
+
+            bool isThreadExist = m_rowsbyThreadId.find(threadId) != m_rowsbyThreadId.end();
+
+            if (isThreadExist && rowIndex < m_rowsbyThreadId[threadId].size())
+            {
+                row = m_rowsbyThreadId[threadId].at(rowIndex);
+            }
+
+            return row;
+        }
+
         void OnParse(CSVRow* csvRow, bool& stopParsing)
         {
-            if (!stopParsing)
+            std::string threadIdString = "ThreadID";
+
+            if (!stopParsing && nullptr != csvRow)
             {
                 m_rows.push_back(csvRow);
+                std::string threadIdValueString = csvRow->GetRowData(threadIdString);
+                bool succeed = m_rowsbyThreadId.find(threadIdValueString) != m_rowsbyThreadId.end();
+
+                if (succeed)
+                {
+                    m_rowsbyThreadId[threadIdValueString].push_back(csvRow);
+                }
+                else
+                {
+                    std::vector<CSVRow*> tempCSVRowVector;
+                    tempCSVRowVector.push_back(csvRow);
+                    m_rowsbyThreadId.insert(std::pair<std::string, std::vector<CSVRow*>>(threadIdValueString, tempCSVRowVector));
+                }
             }
         }
     private:
+        std::map<std::string, std::vector<CSVRow*>> m_rowsbyThreadId;
         std::vector<CSVRow*> m_rows;
-    };
+    };//KernelRowData
 
     auto removeLineFeed = [](std::string string)->std::string
     {
         char ch = string.c_str()[string.size() - 1];
+
         if (ch == '\r' || ch == '\n')
         {
             string.pop_back();
@@ -844,7 +916,304 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> outPutfileList, std:
         return string;
     };
 
-    if (outPutfileList.size() > 1)
+    auto IsThreadMappingRow = [&](CSVRow * firstRow, CSVRow * secondRow)->bool
+    {
+        bool equal = true;
+        std::string threadIdString = "ThreadID";
+        std::string threadIdFirstRow = firstRow->operator[](threadIdString);
+        std::string threadIdSecondRow = secondRow->operator[](threadIdString);
+
+        if (nullptr != firstRow && nullptr != secondRow && firstRow != secondRow)
+        {
+            std::string methodString = "Method";
+            std::string executionOrderString = "ExecutionOrder";
+            std::string callIndexString = "CallIndex";
+            std::string globalWorkSizeString = "GlobalWorkSize";
+            std::string workGroupSizeString = "WorkGroupSize";
+            std::string localMemSizeString = "LocalMemSize";
+            std::string vgprsString = "VGPRs";
+            std::string sgprsString = "SGPRs";
+            std::string scratchRegsString = "ScratchRegs";
+
+            equal &= removeLineFeed(firstRow->operator[](methodString)).compare(removeLineFeed(secondRow->operator[](methodString))) == 0;
+            equal &= removeLineFeed(firstRow->operator[](executionOrderString)).compare(removeLineFeed(secondRow->operator[](executionOrderString))) == 0;
+            equal &= removeLineFeed(firstRow->operator[](callIndexString)).compare(removeLineFeed(secondRow->operator[](callIndexString))) == 0;
+            equal &= removeLineFeed(firstRow->operator[](globalWorkSizeString)).compare(removeLineFeed(secondRow->operator[](globalWorkSizeString))) == 0;
+            equal &= removeLineFeed(firstRow->operator[](workGroupSizeString)).compare(removeLineFeed(secondRow->operator[](workGroupSizeString))) == 0;
+            equal &= removeLineFeed(firstRow->operator[](localMemSizeString)).compare(removeLineFeed(secondRow->operator[](localMemSizeString))) == 0;
+            equal &= removeLineFeed(firstRow->operator[](vgprsString)).compare(removeLineFeed(secondRow->operator[](vgprsString))) == 0;
+            equal &= removeLineFeed(firstRow->operator[](sgprsString)).compare(removeLineFeed(secondRow->operator[](sgprsString))) == 0;
+            equal &= removeLineFeed(firstRow->operator[](scratchRegsString)).compare(removeLineFeed(secondRow->operator[](scratchRegsString))) == 0;
+        }
+        else
+        {
+            equal = false;
+        }
+
+        return equal;
+    };
+
+    auto IsCommonColumn = [](std::string columnName)->bool
+    {
+        std::string methodString = "Method";
+        std::string executionOrderString = "ExecutionOrder";
+        std::string callIndexString = "CallIndex";
+        std::string globalWorkSizeString = "GlobalWorkSize";
+        std::string workGroupSizeString = "WorkGroupSize";
+        std::string localMemSizeString = "LocalMemSize";
+        std::string vgprsString = "VGPRs";
+        std::string sgprsString = "SGPRs";
+        std::string scratchRegsString = "ScratchRegs";
+
+        bool isCommon = false;
+
+        isCommon |= columnName.compare(methodString) == 0;
+        isCommon |= columnName.compare(executionOrderString) == 0;
+        isCommon |= columnName.compare(callIndexString) == 0;
+        isCommon |= columnName.compare(globalWorkSizeString) == 0;
+        isCommon |= columnName.compare(workGroupSizeString) == 0;
+        isCommon |= columnName.compare(localMemSizeString) == 0;
+        isCommon |= columnName.compare(vgprsString) == 0;
+        isCommon |= columnName.compare(sgprsString) == 0;
+        isCommon |= columnName.compare(scratchRegsString) == 0;
+
+        return isCommon;
+    };
+
+    auto createHeader = [](std::vector<std::string> counterFileList, bool includeTime)->std::vector<std::pair<std::string, std::pair<std::string, unsigned int>>>
+    {
+        std::vector<std::pair<std::string, std::pair<std::string, unsigned int>>> headersWithActualHeaderNameAndFileIndex;
+        std::vector<std::pair<unsigned int, std::vector<std::string>>> counterNamesByFileIndex;
+
+        bool succeedReadingCounterFile = true;
+        unsigned int baseFileIndex = 0;
+
+        if (counterFileList.size() > 1)
+        {
+            unsigned int fileIndex = 0;
+
+            for (std::vector<std::string>::iterator counterFileListIterator = counterFileList.begin(); counterFileListIterator != counterFileList.end(); ++counterFileListIterator)
+            {
+                std::vector<std::string> counternames;
+                succeedReadingCounterFile &= FileUtils::ReadFile(*counterFileListIterator, counternames, true, true);
+
+                if (succeedReadingCounterFile)
+                {
+                    counterNamesByFileIndex.push_back(std::pair<unsigned int, std::vector<std::string>>(fileIndex, counternames));
+                }
+
+                fileIndex++;
+            }
+
+            //Common Columns
+            std::string methodString = "Method";
+            std::string executionOrderString = "ExecutionOrder";
+            std::string threadIdString = "ThreadID";
+            std::string callIndexString = "CallIndex";
+            std::string globalWorkSizeString = "GlobalWorkSize";
+            std::string workGroupSizeString = "WorkGroupSize";
+            std::string timeString = "Time";
+            std::string localMemSizeString = "LocalMemSize";
+            std::string vgprsString = "VGPRs";
+            std::string sgprsString = "SGPRs";
+            std::string scratchRegsString = "ScratchRegs";
+            std::string passString = "_pass_";
+
+            headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(methodString, std::pair<std::string, unsigned int>(methodString, baseFileIndex)));
+            headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(executionOrderString, std::pair<std::string, unsigned int>(executionOrderString, baseFileIndex)));
+
+            for (unsigned int i = 0; i < counterFileList.size(); i++)
+            {
+                stringstream ss;
+                ss << i;
+                std::string threadIdWithPass = threadIdString + passString + ss.str();
+                headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(threadIdWithPass, std::pair<std::string, unsigned int>(threadIdString, i)));
+            }
+
+            headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(callIndexString, std::pair<std::string, unsigned int>(callIndexString, baseFileIndex)));
+            headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(globalWorkSizeString, std::pair<std::string, unsigned int>(globalWorkSizeString, baseFileIndex)));
+            headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(workGroupSizeString, std::pair<std::string, unsigned int>(workGroupSizeString, baseFileIndex)));
+
+            // noGputime flag is not set - need to include time in the file headers
+            if (includeTime)
+            {
+                for (unsigned int i = 0; i < counterFileList.size(); i++)
+                {
+                    stringstream ss;
+                    ss << i;
+                    std::string timeWithPass = timeString + passString + ss.str();
+                    headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(timeWithPass, std::pair<std::string, unsigned int>(timeString, i)));
+                }
+            }
+
+            headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(localMemSizeString, std::pair<std::string, unsigned int>(localMemSizeString, baseFileIndex)));
+            headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(vgprsString, std::pair<std::string, unsigned int>(vgprsString, baseFileIndex)));
+            headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(sgprsString, std::pair<std::string, unsigned int>(sgprsString, baseFileIndex)));
+            headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(scratchRegsString, std::pair<std::string, unsigned int>(scratchRegsString, baseFileIndex)));
+
+            std::vector<std::pair<std::string, std::vector<unsigned int>>> counterColumns;
+            std::vector<std::pair<std::string, std::vector<unsigned int>>>::iterator counterColumnsIterator;
+
+            for (std::vector<std::pair<unsigned int, std::vector<std::string>>>::iterator counterNamesByFileIndexIterator = counterNamesByFileIndex.begin();
+                 counterNamesByFileIndexIterator != counterNamesByFileIndex.end(); ++counterNamesByFileIndexIterator)
+            {
+                for (std::vector<std::string>::iterator counterNamesIterator = counterNamesByFileIndexIterator->second.begin();
+                     counterNamesIterator != counterNamesByFileIndexIterator->second.end(); ++counterNamesIterator)
+                {
+                    //counterColumnsIterator = counterColumns.find(*counterNamesIterator);
+
+                    bool isCounterExistInColumn = false;
+
+                    for (std::vector<std::pair<std::string, std::vector<unsigned int>>>::iterator counterColumnsTempIterator = counterColumns.begin(); counterColumnsTempIterator != counterColumns.end(); ++counterColumnsTempIterator)
+                    {
+                        if (!isCounterExistInColumn)
+                        {
+                            isCounterExistInColumn |= counterColumnsTempIterator->first.compare(*counterNamesIterator) == 0;
+                            counterColumnsIterator = counterColumnsTempIterator;
+                        }
+                    }
+
+                    if (isCounterExistInColumn/*counterColumnsIterator != counterColumns.end()*/)
+                    {
+                        counterColumnsIterator->second.push_back(counterNamesByFileIndexIterator->first);
+                    }
+                    else
+                    {
+                        std::vector<unsigned int> tempFileIndex;
+                        tempFileIndex.push_back(counterNamesByFileIndexIterator->first);
+                        counterColumns.push_back(std::pair<std::string, std::vector<unsigned int>>(*counterNamesIterator, tempFileIndex));
+                    }
+                }
+            }
+
+
+            for (counterColumnsIterator = counterColumns.begin(); counterColumnsIterator != counterColumns.end(); ++counterColumnsIterator)
+            {
+                if (counterColumnsIterator->second.size() > 1)
+                {
+                    for (unsigned int i = 1; i <= counterColumnsIterator->second.size(); i++)
+                    {
+                        std::stringstream stringStream;
+                        stringStream << counterColumnsIterator->second.at(i - 1);
+                        std::string columnNameWithPassString = counterColumnsIterator->first + passString + stringStream.str();
+                        headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(columnNameWithPassString, std::pair<std::string, unsigned int>(counterColumnsIterator->first, i - 1)));
+                    }
+                }
+                else
+                {
+                    headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(counterColumnsIterator->first, std::pair<std::string, unsigned int>(counterColumnsIterator->first, counterColumnsIterator->second.front())));
+                }
+            }
+        }
+
+        return headersWithActualHeaderNameAndFileIndex;
+    };
+
+    auto GetMappedThreads = [&](std::map<unsigned int, KernelRowData*> allFilesRowData)->std::vector<std::set<std::pair<std::string, unsigned int>>>
+    {
+        std::vector<std::set<std::pair<std::string, unsigned int>>> mappedThreads;
+        std::vector<std::set<std::pair<std::string, unsigned int>>>::iterator mappedThreadsIterator;
+
+        if (allFilesRowData.size() > 1)
+        {
+            KernelRowData* baseRowData = allFilesRowData.begin()->second;
+            std::vector<std::string> baseRowDataThreads = baseRowData->GetUniqueThreads();
+
+            //Iterate for all threads in base files
+            for (std::vector<std::string>::iterator baseRowDataThreadsIter = baseRowDataThreads.begin();
+            baseRowDataThreadsIter != baseRowDataThreads.end(); ++baseRowDataThreadsIter)
+            {
+                std::pair <std::string, unsigned int> baseFileCurrentThreadPair(*baseRowDataThreadsIter, 0);
+                std::set<std::pair<std::string, unsigned int>> mappedThreadSet;
+                mappedThreadSet.insert(baseFileCurrentThreadPair);
+
+                unsigned int fileIndex = 0;
+
+                //Itreate for all files
+                for (std::map<unsigned int, KernelRowData*>::iterator rowPerFileIterator = allFilesRowData.begin();
+                rowPerFileIterator != allFilesRowData.end(); ++rowPerFileIterator)
+                {
+                    // Do except for base files
+                    if (baseRowData != rowPerFileIterator->second)
+                    {
+                        fileIndex++;
+
+                        std::vector<std::string> currentFileUniqueThreads = rowPerFileIterator->second->GetUniqueThreads();
+                        unsigned int baseFileRowDataCountByThread = baseRowData->GetRowCountByThreadId(*baseRowDataThreadsIter);
+
+                        for (std::vector<std::string>::iterator currentFileThreadIter = currentFileUniqueThreads.begin();
+                        currentFileThreadIter != currentFileUniqueThreads.end(); currentFileThreadIter++)
+                        {
+                            unsigned int currentFileRowDataCountForCurrentThread = rowPerFileIterator->second->GetRowCountByThreadId(*currentFileThreadIter);
+                            unsigned int rowsToCheck = baseFileRowDataCountByThread < currentFileRowDataCountForCurrentThread ? baseFileRowDataCountByThread : currentFileRowDataCountForCurrentThread;
+                            bool isMapped = true;
+
+                            for (unsigned int rowIterForCurrentThread = 0; rowIterForCurrentThread < rowsToCheck; rowIterForCurrentThread++)
+                            {
+                                isMapped &= IsThreadMappingRow(baseRowData->GetRowByThreadId(*baseRowDataThreadsIter, rowIterForCurrentThread),
+                                rowPerFileIterator->second->GetRowByThreadId(*currentFileThreadIter, rowIterForCurrentThread));
+                            }
+
+                            if (isMapped)
+                            {
+                                std::pair<std::string, unsigned int> currentThreadPair(*currentFileThreadIter, fileIndex);
+                                mappedThreadSet.insert(currentThreadPair);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                mappedThreads.push_back(mappedThreadSet);
+            }
+
+            //Reinitialize
+            unsigned int fileIndex = 0;
+            baseRowData = allFilesRowData.begin()->second;
+
+            //Itreate for all files
+            for (std::map<unsigned int, KernelRowData*>::iterator rowPerFileIterator = allFilesRowData.begin();
+                 rowPerFileIterator != allFilesRowData.end(); ++rowPerFileIterator)
+            {
+                // Do except for base files
+                if (baseRowData != rowPerFileIterator->second)
+                {
+                    fileIndex++;
+                    std::vector<std::string> currentFileUniqueThreads = rowPerFileIterator->second->GetUniqueThreads();
+
+                    /*std::vector<std::set<std::pair<std::string, unsigned int>>>*/
+
+                    for (std::vector<std::string>::iterator currentFileThreadIter = currentFileUniqueThreads.begin();
+                         currentFileThreadIter != currentFileUniqueThreads.end(); currentFileThreadIter++)
+                    {
+                        bool isThreadfound = false;
+
+                        for (mappedThreadsIterator = mappedThreads.begin(); mappedThreadsIterator != mappedThreads.end(); ++mappedThreadsIterator)
+                        {
+                            for (std::set<std::pair<std::string, unsigned int>>::iterator currentSetIter = mappedThreadsIterator->begin();
+                                 currentSetIter != mappedThreadsIterator->end(); ++currentSetIter)
+                            {
+                                isThreadfound |= (currentSetIter->first.compare(*currentFileThreadIter) == 0) &&
+                                                 (currentSetIter->second == fileIndex);
+                            }
+                        }
+
+                        if (!isThreadfound)
+                        {
+                            std::set<std::pair<std::string, unsigned int>> unMappedThreadSet;
+                            std::pair<std::string, unsigned int> unMappedThreadPair(*currentFileThreadIter, fileIndex);
+                            unMappedThreadSet.insert(unMappedThreadPair);
+                            mappedThreads.push_back(unMappedThreadSet);
+                        }
+                    }
+                }
+            }
+        }
+
+        return mappedThreads;
+    };
+
+    if (outPutfileList.size() > 1 && counterFileList.size() > 1)
     {
         std::map<unsigned int, KernelRowData*> dataPerFile;
         std::vector<CSVFileParser*> csvFileParsers;
@@ -861,12 +1230,24 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> outPutfileList, std:
                                                    "ScratchRegs"
                                                  };
 
+        //Common Columns
         std::string methodString = "Method";
+        std::string executionOrderString = "ExecutionOrder";
+        std::string threadIdString = "ThreadID";
         std::string callIndexString = "CallIndex";
+        std::string globalWorkSizeString = "GlobalWorkSize";
+        std::string workGroupSizeString = "WorkGroupSize";
+        std::string localMemSizeString = "LocalMemSize";
+        std::string vgprsString = "VGPRs";
+        std::string sgprsString = "SGPRs";
+        std::string scratchRegsString = "ScratchRegs";
+
+        //headers/comments in the csv file
         std::vector<std::string> headers;
 
         unsigned int count = 0;
 
+        //Load all the CSV files in Kernel Row Data
         for (std::vector<std::string>::iterator it = outPutfileList.begin(); it != outPutfileList.end(); ++it)
         {
             CSVFileParser* csvParser = new(std::nothrow) CSVFileParser;
@@ -879,10 +1260,11 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> outPutfileList, std:
 
                 if (csvParser->LoadFile(it->c_str()) && csvParser->Parse())
                 {
-                    dataPerFile[count] = rowData;
+                    dataPerFile.insert(std::pair<unsigned int, KernelRowData*>(count, rowData));
                     count++;
                 }
 
+                //header will be same in all files - retreiving from 1st file
                 headers = csvParser->GetHeaders();
             }
         }
@@ -893,59 +1275,23 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> outPutfileList, std:
         std::vector<std::string> csvFileColumns;
         std::string passString = "_pass_";
 
-        for (std::map<unsigned int, KernelRowData*>::iterator iter = dataPerFile.begin(); iter != dataPerFile.end(); ++iter)
+        std::vector<std::pair<std::string, std::pair<std::string, unsigned int>>> headersWithFileIndex = createHeader(counterFileList, includeTime);
+        std::vector<std::pair<std::string, std::pair<std::string, unsigned int>>>::iterator headersWithFileIndexIterator;
+
+        for (headersWithFileIndexIterator = headersWithFileIndex.begin(); headersWithFileIndexIterator != headersWithFileIndex.end(); ++headersWithFileIndexIterator)
         {
-            std::vector<std::string> columnNames = iter->second->GetColumns(1);
-
-            for (std::vector<std::string>::iterator it = columnNames.begin(); it != columnNames.end(); ++it)
-            {
-                counterColumnsIterator = counterColumns.find(*it);
-
-                if (counterColumnsIterator != counterColumns.end())
-                {
-                    bool succeed = !(std::count(commonColumns.begin(), commonColumns.end(), *it) >= 1);
-
-                    if (succeed)
-                    {
-                        counterColumnsIterator->second.push_back(iter->first);
-                    }
-                }
-                else
-                {
-                    bool succeed = !(std::count(commonColumns.begin(), commonColumns.end(), *it) >= 1);
-
-                    if (succeed)
-                    {
-                        std::vector<int> tempFileIndex;
-                        tempFileIndex.push_back(iter->first);
-                        counterColumns.insert(counterColumnsIterator, std::pair<std::string, std::vector<int>>(*it, tempFileIndex));
-                    }
-                }
-            }
+            csvFileColumns.push_back(removeLineFeed(headersWithFileIndexIterator->first));
         }
 
-        for (std::vector<std::string>::const_iterator it = commonColumns.begin(); it != commonColumns.end(); ++it)
+        std::vector<std::set<std::pair<std::string, unsigned int>>> mappedThreads = GetMappedThreads(dataPerFile);
+        std::vector<std::set<std::pair<std::string, unsigned int>>>::iterator mappedThreadsIterator;
+
+        for (std::vector<std::string>::const_iterator headerIter = headers.begin(); headerIter != headers.end(); ++headerIter)
         {
-            csvFileColumns.push_back(*it);
+            mergedFileWriter.AddHeader(removeLineFeed(*headerIter));
         }
 
-        for (counterColumnsIterator = counterColumns.begin(); counterColumnsIterator != counterColumns.end(); ++counterColumnsIterator)
-        {
-            std::string columnNameWithoutLineFeed = removeLineFeed(counterColumnsIterator->first);
-            if (counterColumnsIterator->second.size() > 1)
-            {
-                for (unsigned int i = 1; i <= counterColumnsIterator->second.size(); i++)
-                {
-                    std::stringstream stringStream;
-                    stringStream << counterColumnsIterator->second.at(i-1);
-                    csvFileColumns.push_back(columnNameWithoutLineFeed + passString + stringStream.str());
-                }
-            }
-            else
-            {
-                csvFileColumns.push_back(columnNameWithoutLineFeed);
-            }
-        }
+        mergedFileWriter.AddColumns(csvFileColumns);
 
         unsigned int totalMergedCSVRowCount = dataPerFile.begin()->second->GetRowCount();
         std::map<unsigned int, KernelRowData*>::iterator baseCSV = dataPerFile.begin();
@@ -961,82 +1307,53 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> outPutfileList, std:
             }
         }
 
-        for (std::vector<std::string>::const_iterator headerIter = headers.begin(); headerIter != headers.end(); ++headerIter)
+        for (mappedThreadsIterator = mappedThreads.begin(); mappedThreadsIterator != mappedThreads.end(); ++mappedThreadsIterator)
         {
-            mergedFileWriter.AddHeader(removeLineFeed(*headerIter));
-        }
+            unsigned int rowsToAdd = dataPerFile[mappedThreadsIterator->begin()->second]->GetRowCountByThreadId(mappedThreadsIterator->begin()->first);
+            unsigned int commonColumnsFileIndex = 0;
+            unsigned int fileIndexCounter = 0;
 
-        mergedFileWriter.AddColumns(csvFileColumns);
-        std::vector<std::string> rowData;
-        std::map<std::string, std::string> rowDataWithColumn;
-
-        for (unsigned int rowIndexIter = 0; rowIndexIter < totalMergedCSVRowCount; rowIndexIter++)
-        {
-            CSVRow* row = mergedFileWriter.AddRow();
-
-            for (std::map<unsigned int, KernelRowData*>::iterator iter = dataPerFile.begin(); iter != dataPerFile.end(); ++iter)
+            for (std::set<std::pair<std::string, unsigned int>>::iterator mappedThreadSetIter = mappedThreadsIterator->begin();
+                 mappedThreadSetIter != mappedThreadsIterator->end(); ++mappedThreadSetIter)
             {
-                if (iter != baseCSV)
+                unsigned int currentMappedThreadIteratorRowCount = dataPerFile[mappedThreadSetIter->second]->GetRowCountByThreadId(mappedThreadSetIter->first);
+
+                if (rowsToAdd < currentMappedThreadIteratorRowCount)
                 {
-                    if (iter->second->GetValue(rowIndexIter, methodString) == baseCSV->second->GetValue(rowIndexIter, methodString) &&
-                        iter->second->GetValue(rowIndexIter, callIndexString) == baseCSV->second->GetValue(rowIndexIter, callIndexString))
+                    rowsToAdd = currentMappedThreadIteratorRowCount;
+                    commonColumnsFileIndex = fileIndexCounter;
+                }
+
+                fileIndexCounter++;
+            }
+
+            for (unsigned int rowsToAddIter = 0; rowsToAddIter < rowsToAdd; ++rowsToAddIter)
+            {
+                CSVRow* rowToAddToFile = mergedFileWriter.AddRow();
+
+                std::set<std::pair<std::string, unsigned int>>::iterator tempMappedThreadSetIterator;
+
+                for (headersWithFileIndexIterator = headersWithFileIndex.begin(); headersWithFileIndexIterator != headersWithFileIndex.end(); ++headersWithFileIndexIterator)
+                {
+                    if (IsCommonColumn(headersWithFileIndexIterator->first))
                     {
-                        for (std::vector<std::string>::iterator commonColumnsIter = commonColumns.begin(); commonColumnsIter != commonColumns.end(); ++commonColumnsIter)
-                        {
-                            rowDataWithColumn[*commonColumnsIter] = baseCSV->second->GetValue(rowIndexIter, *commonColumnsIter);
-                        }
-
-                        for (counterColumnsIterator = counterColumns.begin(); counterColumnsIterator != counterColumns.end(); ++counterColumnsIterator)
-                        {
-                            if (counterColumnsIterator->second.size() > 1)
-                            {
-                                for (unsigned int commonColumnsCountIter = 0; commonColumnsCountIter < counterColumnsIterator->second.size(); commonColumnsCountIter++)
-                                {
-                                    stringstream commonCounterStringStream;
-                                    commonCounterStringStream << commonColumnsCountIter;
-                                    rowDataWithColumn[counterColumnsIterator->first + passString + commonCounterStringStream.str()] =
-                                        dataPerFile[commonColumnsCountIter]->GetValue(rowIndexIter, counterColumnsIterator->first);
-                                }
-                            }
-                            else
-                            {
-                                rowDataWithColumn.insert(std::pair<std::string, std::string>(counterColumnsIterator->first, dataPerFile[counterColumnsIterator->second.front()]->GetValue(rowIndexIter, counterColumnsIterator->first)));
-                            }
-
-                        }
+                        tempMappedThreadSetIterator = mappedThreadsIterator->begin();
+                        rowToAddToFile->SetRowData(headersWithFileIndexIterator->first, dataPerFile[commonColumnsFileIndex]->GetValueByThreadId(tempMappedThreadSetIterator->first, rowsToAddIter, headersWithFileIndexIterator->first));
                     }
                     else
                     {
-                        std::vector<std::string> baseCSVColumns = baseCSV->second->GetColumns(rowIndexIter);
-                        for (std::vector<std::string>::iterator baseCSVColumnsIter = baseCSVColumns.begin(); baseCSVColumnsIter != baseCSVColumns.end(); ++baseCSVColumnsIter)
+                        for (tempMappedThreadSetIterator = mappedThreadsIterator->begin(); tempMappedThreadSetIterator != mappedThreadsIterator->end(); ++tempMappedThreadSetIterator)
                         {
-                            stringstream commonCounterStringStream;
-                            commonCounterStringStream << baseCSV->first;
-                            bool succeed = std::count(csvFileColumns.begin(), csvFileColumns.end(), (*baseCSVColumnsIter) + passString + commonCounterStringStream.str()) >= 1;
-                            if (succeed)
+                            if (headersWithFileIndexIterator->second.second == tempMappedThreadSetIterator->second)
                             {
-                                rowDataWithColumn[*baseCSVColumnsIter + passString + commonCounterStringStream.str()] =
-                                    baseCSV->second->GetValue(rowIndexIter, *baseCSVColumnsIter);
-                            }
-                            else
-                            {
-                                rowDataWithColumn[*baseCSVColumnsIter] = baseCSV->second->GetValue(rowIndexIter, *baseCSVColumnsIter);
+                                unsigned int fileIndexValue = tempMappedThreadSetIterator->second;
+                                rowToAddToFile->SetRowData(headersWithFileIndexIterator->first, dataPerFile[fileIndexValue]->GetValueByThreadId(tempMappedThreadSetIterator->first, rowsToAddIter, headersWithFileIndexIterator->second.first));
                             }
                         }
                     }
                 }
             }
-
-            for (std::vector<std::string>::iterator csvFileColumnsIter = csvFileColumns.begin(); csvFileColumnsIter != csvFileColumns.end(); ++csvFileColumnsIter)
-            {
-                rowData.push_back(rowDataWithColumn[*csvFileColumnsIter]);
-            }
-
-            row->FromRowData(rowData);
-            rowDataWithColumn.clear();
-            rowData.clear();
         }
-
 
         return mergedFileWriter.Flush();
     }
@@ -1234,9 +1551,9 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> outPutfileList, std:
         retVal = ProcessCommandLine(counterFile);
     }
 
-    if (outputFileList.size() > 1)
+    if (outputFileList.size() > 1 && config.counterFileList.size() > 1)
     {
-        MergeKernelProfileOutputFiles(outputFileList, defaultOutputFileName);
+        MergeKernelProfileOutputFiles(config.counterFileList, outputFileList, defaultOutputFileName, config.bGPUTimePMC);
     }
 
     return retVal;
