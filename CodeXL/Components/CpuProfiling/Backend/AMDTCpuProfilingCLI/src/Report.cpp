@@ -205,13 +205,20 @@ HRESULT CpuProfileReport::Report()
 
         if (retVal)
         {
-            ReportExecution(sessionInfo);
-            ReportProfileDetails(sessionInfo);
-            ReportMonitoredEventDetails();
+            if (m_args.IsReportSampleCount())
+            {
+                ReportSampleCount(m_args.IsReportByCore());
+            }
+            else
+            {
+                ReportExecution(sessionInfo);
+                ReportProfileDetails(sessionInfo);
+                ReportMonitoredEventDetails();
 
-            ReportOverviewData(sessionInfo);
-            ReportProcessData();
-            //ReportImixData();
+                ReportOverviewData(sessionInfo);
+                ReportProcessData();
+                //ReportImixData();
+            }
         }
     }
 
@@ -727,8 +734,11 @@ void CpuProfileReport::ValidateOptions()
     }
     else
     {
-        reportError(false, L"Output file path is missing. Please use option(-o) to specify the output file path.\n");
-        return;
+        if (!m_args.IsReportSampleCount())
+        {
+            reportError(false, L"Output file path is missing. Please use option(-o) to specify the output file path.\n");
+            return;
+        }
     }
 
     // Check the output file format
@@ -829,7 +839,7 @@ void CpuProfileReport::ValidateOptions()
 
     // Validate the core affinity mask
     // TODO: Currently this supports only upto 64 cores
-    if (GT_UINT64_MAX == m_args.GetCoreAffinityMask())
+    if (GT_UINT64_MAX != m_args.GetCoreAffinityMask())
     {
         int nbrCores = 0;
         gtUInt64 maxAffinity = 0;
@@ -1030,6 +1040,43 @@ bool CpuProfileReport::InitializeReportFile()
     m_pReporter->Open();
 
     return true;
+}
+
+void CpuProfileReport::ReportSampleCount(bool sepByCore)
+{
+    AMDTProfileCounterDescVec counterDesc;
+    AMDTProfileSamplingConfigVec samplingConfigVec;
+
+    m_profileDbReader.GetSampledCountersList(counterDesc);
+
+    for (const auto& counter : counterDesc)
+    {
+        AMDTProfileSamplingConfig sampleConfig;
+        m_profileDbReader.GetSamplingConfiguration(counter.m_id, sampleConfig);
+        samplingConfigVec.push_back(sampleConfig);
+    }
+
+    AMDTSampleValueVec sampleValueVec;
+    m_profileDbReader.GetSampleCount(sepByCore, sampleValueVec);
+    
+    fprintf(stderr, "\ncoreId     counterId     samplingInterval     nbrSamples\n");
+
+    for (const auto& value : sampleValueVec)
+    {
+        AMDTCounterId cid = value.m_counterId;
+
+        auto counterInfo = std::find_if(samplingConfigVec.begin(), samplingConfigVec.end(),
+            [&cid](AMDTProfileSamplingConfig const& aConfig) { return aConfig.m_id == cid; });
+
+        //fprintf(stderr, "%u     0x%x      %llu      %llu\n", value.m_coreId, counterInfo->m_hwEventId, counterInfo->m_samplingInterval, static_cast<AMDTUInt64>(value.m_sampleCount));
+        gtString printStr;
+        printStr.appendFormattedString(L"%4d %12x %16llu %16llu",
+            value.m_coreId, counterInfo->m_hwEventId, counterInfo->m_samplingInterval, static_cast<AMDTUInt64>(value.m_sampleCount));
+
+        fprintf(stderr, "%s\n", printStr.asASCIICharArray());
+    }
+
+    return;
 }
 
 void CpuProfileReport::ReportExecution(AMDTProfileSessionInfo& sessionInfo)

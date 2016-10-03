@@ -261,6 +261,7 @@ private:
     bool SetCLUViewConfig(ViewConfig& viewCfg);
     bool SetAllDataViewConfig(ViewConfig& viewCfg);
 
+    void ReportSampleCount(bool sepByCore);
     void ReportExecution(AMDTProfileSessionInfo& sessionInfo);
     void ReportProfileDetails(AMDTProfileSessionInfo& sessionInfo);
     void ReportMonitoredEventDetails();

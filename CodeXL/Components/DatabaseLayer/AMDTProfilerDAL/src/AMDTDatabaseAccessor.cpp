@@ -3800,7 +3800,7 @@ public:
 
     // This helper function is used while constructing the query to generate process/thread/module summary data
     // This is seperate By Core
-    bool GetEventSeparateByCorePartialQuery(AMDTUInt32 counterId, AMDTUInt64 coreMask, std::stringstream& partialQuery, std::string& firstCountColName)
+    bool GetEventSeparateByCorePartialQuery(AMDTUInt32 counterId, AMDTUInt64 coreMask, std::stringstream& partialQuery, std::string& firstCountColName, AMDTSampleValueVec& sampleInfoVec)
     {
         gtVector<AMDTUInt64> coreSamplingConfigIds;
 
@@ -3830,6 +3830,12 @@ public:
             query << countColName;
 
             addComma = true;
+
+            // Add it to sampleInfoVec
+            AMDTSampleValue sampleInfo;
+            sampleInfo.m_coreId = static_cast<AMDTUInt32>(id >> 32);
+            sampleInfo.m_counterId = counterId;
+            sampleInfoVec.push_back(sampleInfo);
         }
 
         if (addComma)
@@ -3911,7 +3917,7 @@ public:
 
             if (separateByCore)
             {
-                ret = ret && GetEventSeparateByCorePartialQuery(counterId, coreMask, query, firstCountColName);
+                ret = ret && GetEventSeparateByCorePartialQuery(counterId, coreMask, query, firstCountColName, sampleInfoVec);
             }
             else
             {

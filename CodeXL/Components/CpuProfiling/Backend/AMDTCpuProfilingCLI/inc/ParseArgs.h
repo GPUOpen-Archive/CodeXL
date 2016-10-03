@@ -105,6 +105,7 @@ public:
     bool IsReportByCore() const { return m_reportByCore; }
     bool IsShowPercentage() const { return m_showPercentage; }
     bool IsEnableCache() const { return m_enableCache; }
+    bool IsReportSampleCount() const { return m_printSampleCount; }
 
 private:
     gtString  m_commandLineArgs;
@@ -124,6 +125,7 @@ private:
 
     gtUInt64  m_coreAffinityMask = static_cast<gtUInt64>(-1);
 
+    bool      m_printSampleCount = false;
     int       m_debugLogLevel = 0;
     int       m_tbpSamplingInterval = 0;  // TBP sampling interval in milli-seconds
     int       m_profileDuration = 0;      // Profile Duration in Seconds

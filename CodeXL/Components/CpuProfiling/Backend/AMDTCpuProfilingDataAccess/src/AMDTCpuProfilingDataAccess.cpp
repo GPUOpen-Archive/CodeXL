@@ -1622,6 +1622,30 @@ public:
         return ret;
     }
 
+    bool GetSampleCount(bool sepByCore, AMDTSampleValueVec& totalValueVec)
+    {
+        bool ret = false;
+
+        if (nullptr != m_pDbAdapter)
+        {
+            AMDTCounterIdVec countersList;
+
+            ret = GetAllSampledCountersIdList(countersList);
+
+            ret = ret && m_pDbAdapter->GetCounterTotals(AMDT_PROFILE_DATA_PROCESS,
+                                                        AMDT_PROFILE_ALL_PROCESSES,
+                                                        AMDT_PROFILE_ALL_THREADS,
+                                                        AMDT_PROFILE_ALL_MODULES,
+                                                        0,
+                                                        countersList,
+                                                        AMDT_PROFILE_ALL_CORES,
+                                                        sepByCore,
+                                                        totalValueVec);
+        }
+
+        return ret;
+    }
+
     bool GetProcessSummary(AMDTUInt32 counterId, AMDTProfileDataVec& processSummaryData)
     {
         bool ret = false;
@@ -4679,6 +4703,18 @@ bool cxlProfileDataReader::GetFunctionInfo(
     if (nullptr != m_pImpl)
     {
         ret = m_pImpl->GetFunctionInfo(functionId, functionInfo, pModLoadAddress, pProcessList, pThreadList);
+    }
+
+    return ret;
+}
+
+bool cxlProfileDataReader::GetSampleCount(bool sepByCore, AMDTSampleValueVec& totalValueVec)
+{
+    bool ret = false;
+
+    if (nullptr != m_pImpl)
+    {
+        ret = m_pImpl->GetSampleCount(sepByCore, totalValueVec);
     }
 
     return ret;

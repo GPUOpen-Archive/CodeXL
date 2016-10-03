@@ -332,7 +332,6 @@ bool ParseArgs::InitializeArgs(int nbrArgs, wchar_t* args[])
                 break;
 
             case 'G':
-
                 // Call Stack Sampling with default unwind interval and unwind depth values
                 if (m_cssWithDefaultValues && printCSSWarning)
                 {
@@ -359,11 +358,19 @@ bool ParseArgs::InitializeArgs(int nbrArgs, wchar_t* args[])
                 {
                     tmp.toIntNumber(m_debugLogLevel);
 
-                    // check if -L is non negative
-                    if (m_debugLogLevel < OS_DEBUG_LOG_ERROR || m_debugLogLevel > OS_DEBUG_LOG_EXTENSIVE)
+                    if (m_debugLogLevel == 9)
                     {
-                        fprintf(stderr, "Invalid debug log level(%d) specified with option(-L), setting this to default value(0).\n", m_debugLogLevel);
-                        m_debugLogLevel = 0; // set to default
+                        m_printSampleCount = true;
+                        m_debugLogLevel = 0;
+                    }
+                    else
+                    {
+                        // check if -L is non negative
+                        if (m_debugLogLevel < OS_DEBUG_LOG_ERROR || m_debugLogLevel > OS_DEBUG_LOG_EXTENSIVE)
+                        {
+                            fprintf(stderr, "Invalid debug log level(%d) specified with option(-L), setting this to default value(0).\n", m_debugLogLevel);
+                            m_debugLogLevel = 0; // set to default
+                        }
                     }
                 }
                 else
