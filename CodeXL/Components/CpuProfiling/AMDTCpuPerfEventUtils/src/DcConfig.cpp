@@ -768,7 +768,7 @@ bool DcConfig::startElement(
         ec.pmc.ucEventSelect = evtSelect & 0xFF;
         ec.pmc.ucEventSelectHigh = (evtSelect >> 8) & 0xF;
         ec.pmc.bitEnabled = 1;
-        ec.pmc.bitSampleEvents = 1;
+        //ec.pmc.bitSampleEvents = 1;
 
         ec.pmc.ucUnitMask = atts.value("mask").toInt(0, 16) ;
 
@@ -816,6 +816,7 @@ bool DcConfig::startElement(
         }
 
         ec.eventCount = atts.value("count").toInt(0, 10) ;
+        ec.pmc.bitSampleEvents = (ec.eventCount > 0) ? 1 : 0;
         m_eventConfigList.push_back(ec) ;
         m_numberOfEvents++;
     }

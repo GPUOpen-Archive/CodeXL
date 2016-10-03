@@ -196,7 +196,8 @@ HRESULT CpuProfileCollect::StopProfiling()
                     }
                 }
 
-                int coreId = 0;
+                gtUInt32 coreId = 0;
+                CpuProfilePmcEventCount eventCountTotals;
                 while (coreAffinityMask)
                 {
                     if (coreAffinityMask & 0x1)
@@ -215,11 +216,35 @@ HRESULT CpuProfileCollect::StopProfiling()
                             idx++;
                         }
 
-                        m_eventCountValuesVec.push_back(eventCountData);
+                        if (m_args.IsReportByCore())
+                        {
+                            m_eventCountValuesVec.push_back(eventCountData);
+                        }
+                        else
+                        {
+                            if (!eventCountTotals.m_nbrEvents)
+                            {
+                                eventCountTotals = eventCountData;
+                            }
+                            else
+                            {
+                                eventCountTotals.m_coreId = static_cast<gtUInt32>(-1);
+
+                                for (gtUInt32 id = 0; id < eventCountData.m_nbrEvents; id++)
+                                {
+                                    eventCountTotals.m_eventCountValue[id] += eventCountData.m_eventCountValue[id];
+                                }
+                            }
+                        }
                     }
 
                     coreAffinityMask >>= 1;
                     coreId++;
+                }
+
+                if (!m_args.IsReportByCore())
+                {
+                    m_eventCountValuesVec.push_back(eventCountTotals);
                 }
             }
 

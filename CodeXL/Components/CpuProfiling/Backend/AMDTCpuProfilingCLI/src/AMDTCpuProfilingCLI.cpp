@@ -627,7 +627,7 @@ HRESULT HandleCollectCommand(ParseArgs& args)
             {
                 for (gtUInt32 i = 0; i < aValue.m_nbrEvents; i++)
                 {
-                    fprintf(stderr, "%u     0x" H_FORMAT "      " U_FORMAT"\n", aValue.m_coreId, aValue.m_eventConfig[i], aValue.m_eventCountValue[i]);
+                    fprintf(stderr, "%d     0x" H_FORMAT "      " U_FORMAT"\n", aValue.m_coreId, aValue.m_eventConfig[i], aValue.m_eventCountValue[i]);
                 }
             }
         }
