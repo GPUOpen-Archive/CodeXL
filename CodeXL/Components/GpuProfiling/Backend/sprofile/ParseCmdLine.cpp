@@ -1699,6 +1699,34 @@ std::vector<CounterPassInfo> GetNumberOfPassFromGPUPerfAPI(GPA_API_Type apiType,
                 if (!calculateNumberofPass)
                 {
                     numPass = 1u;
+                    ppCounterScheduler->DisableAllCounters();
+                    std::vector<std::string> counterListForHSA;
+
+                    for (std::vector<std::string>::const_iterator availableCountersIter = computeCounterList.begin(); availableCountersIter != computeCounterList.end(); ++availableCountersIter)
+                    {
+                        bool succeed = true;
+                        unsigned int counterIndex;
+                        unsigned int tempNumberOfPass;
+
+                        succeed &= ppCounterAccessor->GetCounterIndex(availableCountersIter->c_str(), &counterIndex);
+                        succeed &= ppCounterScheduler->EnableCounter(counterIndex) == GPA_STATUS_OK;
+                        succeed &= ppCounterScheduler->GetNumRequiredPasses(&tempNumberOfPass) == GPA_STATUS_OK;
+
+                        if (succeed)
+                        {
+                            if (tempNumberOfPass == numPass)
+                            {
+                                counterListForHSA.push_back(availableCountersIter->c_str());
+                            }
+                            else
+                            {
+                                ppCounterScheduler->DisableCounter(counterIndex);
+                            }
+                        }
+                    }
+
+                    computeCounterList.clear();
+                    computeCounterList = counterListForHSA;
                 }
                 else
                 {

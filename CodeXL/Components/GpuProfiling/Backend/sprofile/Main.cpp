@@ -1108,7 +1108,7 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
 
         return headersWithActualHeaderNameAndFileIndex;
     };
-    
+
     auto SortMappedThreadByExecutionOrder = [](std::map<unsigned int, KernelRowData*> allFilesRowData, std::vector<std::set<std::pair<std::string, unsigned int>>> mappedThreads)->std::vector<std::set<std::pair<std::string, unsigned int>>>
     {
         std::vector<std::set<std::pair<std::string, unsigned int>>> sortedMappedThreadByExecutionOrder;
