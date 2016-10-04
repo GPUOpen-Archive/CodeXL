@@ -120,7 +120,7 @@ public:
 
     /// Get Headers
     /// \return list of header items
-    std::vector<std::string> GetHeaders() const { return m_headers; }
+    const std::vector<std::string>& GetHeaders() const { return m_headers; }
 
     /// Set list separator
     /// \param ch List separator
