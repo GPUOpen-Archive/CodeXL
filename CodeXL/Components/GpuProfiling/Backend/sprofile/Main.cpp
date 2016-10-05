@@ -760,7 +760,7 @@ int ProcessCommandLine(const std::string& strCounterFile)
     return retVal;
 }
 
-bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std::vector<std::string> outPutfileList, std::string defaultOutputFileName, bool includeTime)
+bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std::vector<std::string> outputFileList, std::string defaultOutputFileName, bool includeTime)
 {
     class KernelRowData :
         public IParserListener<CSVRow>
@@ -1060,8 +1060,6 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
                 for (std::vector<std::string>::iterator counterNamesIterator = counterNamesByFileIndexIterator->second.begin();
                      counterNamesIterator != counterNamesByFileIndexIterator->second.end(); ++counterNamesIterator)
                 {
-                    //counterColumnsIterator = counterColumns.find(*counterNamesIterator);
-
                     bool isCounterExistInColumn = false;
 
                     for (std::vector<std::pair<std::string, std::vector<unsigned int>>>::iterator counterColumnsTempIterator = counterColumns.begin(); counterColumnsTempIterator != counterColumns.end(); ++counterColumnsTempIterator)
@@ -1073,7 +1071,7 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
                         }
                     }
 
-                    if (isCounterExistInColumn/*counterColumnsIterator != counterColumns.end()*/)
+                    if (isCounterExistInColumn)
                     {
                         counterColumnsIterator->second.push_back(counterNamesByFileIndexIterator->first);
                     }
@@ -1271,7 +1269,7 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
         return SortMappedThreadByExecutionOrder(allFilesRowData, mappedThreads);
     };
 
-    if (outPutfileList.size() > 1 && counterFileList.size() > 1)
+    if (outputFileList.size() > 1 && counterFileList.size() > 1)
     {
         std::map<unsigned int, KernelRowData*> dataPerFile;
         std::vector<CSVFileParser*> csvFileParsers;
@@ -1306,7 +1304,7 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
         unsigned int count = 0;
 
         //Load all the CSV files in Kernel Row Data
-        for (std::vector<std::string>::iterator it = outPutfileList.begin(); it != outPutfileList.end(); ++it)
+        for (std::vector<std::string>::iterator it = outputFileList.begin(); it != outputFileList.end(); ++it)
         {
             CSVFileParser* csvParser = new(std::nothrow) CSVFileParser;
             KernelRowData* rowData = new(std::nothrow) KernelRowData;
