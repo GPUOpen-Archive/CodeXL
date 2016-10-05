@@ -37,7 +37,7 @@
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>CXLApplicationComponents$(GDTProjectSuffix).lib;CXLApiClasses$(GDTProjectSuffix).lib;CXLSharedProfiling$(GDTProjectSuffix).lib;CXLPowerProfilingMidTier$(GDTProjectSuffix).lib;CXLDbAdapter$(GDTProjectSuffix).lib;CXLProfilerDAL$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>CXLApplicationComponents$(GDTProjectSuffix).lib;CXLApiClasses$(GDTProjectSuffix).lib;CXLSharedProfiling$(GDTProjectSuffix).lib;CXLPowerProfilingMidTier$(GDTProjectSuffix).lib;CXLDbAdapter$(GDTProjectSuffix).lib;CXLProfilerDAL$(GDTProjectSuffix).lib;CXLPowerProfileAPI$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

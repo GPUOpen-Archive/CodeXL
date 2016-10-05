@@ -315,7 +315,7 @@ void ppMultiLnePowerStackedPlot::PrepareTimeLineSelectedCountersInitData(QVector
         int apuCounterId = m_pSessionController->GetAPUCounterID();
 
         // if cant APU counter in data - do nothing
-        GT_IF_WITH_ASSERT(apuCounterId != -1)
+        //GT_IF_WITH_ASSERT(apuCounterId != -1)
         {
             QString name;
             QColor color;

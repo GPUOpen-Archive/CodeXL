@@ -527,7 +527,7 @@ PPResult ppAppController::UpdateCountersInfoMap()
             ppControllerCounterData counterData;
             counterData.m_name = pCurrentCounterDesc->m_name;
             counterData.m_description = pCurrentCounterDesc->m_description;
-            counterData.m_color = theColorsMap.GetColorForCounterName(counterData.m_name);
+            counterData.m_color = theColorsMap.GetColorForCounterName(pCurrentCounterDesc->m_counterID);
             counterData.m_category = pCurrentCounterDesc->m_category;
             counterData.m_units = pCurrentCounterDesc->m_units;
 

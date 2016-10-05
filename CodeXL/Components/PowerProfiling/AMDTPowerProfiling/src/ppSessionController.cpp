@@ -362,13 +362,7 @@ QColor ppSessionController::GetColorForCounter(int counterId)
     }
     else
     {
-        // Get the correct color from the colors map.
-        const AMDTPwrCounterDesc* pCounterDesc = GetCounterDescriptor(counterId);
-
-        if (pCounterDesc != nullptr)
-        {
-            retVal = ppColorsMap::Instance().GetColorForCounterName(pCounterDesc->m_name);
-        }
+        retVal = ppColorsMap::Instance().GetColorForCounterName(counterId);
     }
 
     return retVal;

@@ -39,7 +39,7 @@ public:
     /// gets counter color
     /// \param counterName the counter name
     /// \returns the color for this counter
-    QColor GetColorForCounterName(const QString& counterName);
+    QColor GetColorForCounterName(const unsigned int& counterId);
 
 private:
 
@@ -47,7 +47,7 @@ private:
     ppColorsMap();
 
     /// counters to colors map
-    QMap<QString, QColor> m_colorsMap;
+    QMap<unsigned int, QColor> m_colorsMap;
 
     /// number of dGpus (for dynamic color calculations)
     unsigned int m_dgpusCount;

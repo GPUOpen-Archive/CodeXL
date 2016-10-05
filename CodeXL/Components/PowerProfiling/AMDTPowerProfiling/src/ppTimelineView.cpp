@@ -450,6 +450,7 @@ void ppTimeLineView::InitGraphs()
     graphTypes << ppDataUtils::TIMELINE_CURRENT;
     graphTypes << ppDataUtils::TIMELINE_CPU_CORE_PSTATE;
     graphTypes << ppDataUtils::TIMELINE_CPU_CORE_CSTATE;
+    graphTypes << ppDataUtils::TIMELINE_NODE_ENERGY;
 
     // delete all graphs and start over
     RemoveAllRibbons();
@@ -1483,7 +1484,15 @@ void ppTimeLineView::InitGraphByCategory(ppDataUtils::GraphViewCategoryType grap
         {
             category = AMDT_PWR_CATEGORY_DVFS;
             graphName = PP_StrTimelineCStateGraphName;
-            unitsStr = PP_STR_UnitsPostfixPercentage;
+            unitsStr = AF_STR_EmptyA;
+            break;
+        }
+
+        case ppDataUtils::TIMELINE_NODE_ENERGY:
+        {
+            category = AMDT_PWR_CATEGORY_ENERGY;
+            graphName = PP_StrTimelineEnergyGraphName;
+            unitsStr = AF_STR_EmptyA;
             break;
         }
 
@@ -1587,7 +1596,7 @@ void ppTimeLineView::AddNavigationCounterSelectionWidgets(QWidget* pContainingWi
         // Get the list of counter IDs for this session:
         gtVector<int> sessionCounterIds;
 
-        for (int i = (int)ppDataUtils::TIMELINE_POWER; i <= (int)ppDataUtils::TIMELINE_CPU_CORE_CSTATE; i++)
+        for (int i = (int)ppDataUtils::TIMELINE_POWER; i <= (int)ppDataUtils::TIMELINE_CATEGORY_TYPES_COUNT; i++)
         {
             // Add the counter IDs for this type:
             ppDataUtils::GetRelevantCounterIdsByGraphType(sessionCounterIds, (ppDataUtils::GraphViewCategoryType)i, m_pSessionController);

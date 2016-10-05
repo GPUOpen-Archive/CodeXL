@@ -480,6 +480,11 @@ void ppDataUtils::GetRelevantCounterIdsByGraphType(gtVector<int>& allrelevantCou
                 category = AMDT_PWR_CATEGORY_DVFS;
                 isCategoryFound = true;
                 break;
+
+            case TIMELINE_NODE_ENERGY:
+                category = AMDT_PWR_CATEGORY_ENERGY;
+                isCategoryFound = true;
+                break;
         }
 
         // if category exist
@@ -529,7 +534,8 @@ void ppDataUtils::GetRelevantCounterIdsByGraphType(gtVector<int>& allrelevantCou
                 graphType == TIMELINE_CURRENT ||
                 graphType == TIMELINE_VOLTAGE ||
                 graphType == TIMELINE_CPU_CORE_PSTATE ||
-                graphType == TIMELINE_CPU_CORE_CSTATE)
+                graphType == TIMELINE_CPU_CORE_CSTATE ||
+                graphType == TIMELINE_NODE_ENERGY)
             {
                 // cumulative graphs should be inserted into plot in reverted order (so the first graph will be the upper)
                 RevertCountersVecOrder(allrelevantCounters);

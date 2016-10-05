@@ -15,51 +15,21 @@
 // Local:
 #include <AMDTPowerProfiling/src/ppAidFunctions.h>
 #include <AMDTPowerProfiling/Include/ppStringConstants.h>
+#include <AMDTPowerProfileApi.h>
 
 // ---------------------------------------------------------------------------
 QString ppAidFunction::CounterCategoryToStr(AMDTPwrCategory categoryID)
 {
+    AMDTResult ret = AMDT_ERROR_FAIL;
     QString categoryName;
+    AMDTPwrCategoryInfo category;
 
-    switch (categoryID)
+    ret = AMDTPwrGetCategoryInfo(categoryID, &category);
+
+    if(AMDT_STATUS_OK == ret)
     {
-        case AMDT_PWR_CATEGORY_POWER:
-            categoryName = PP_STR_PowerCategoryName;
-            break;
-
-        case AMDT_PWR_CATEGORY_CURRENT:
-            categoryName = PP_STR_CurrentCategoryName;
-            break;
-
-        case AMDT_PWR_CATEGORY_VOLTAGE:
-            categoryName = PP_STR_VoltageCategoryName;
-            break;
-
-        case AMDT_PWR_CATEGORY_DVFS:
-            categoryName = PP_STR_DVFSCategoryName;
-            break;
-
-        case AMDT_PWR_CATEGORY_PROCESS:
-            categoryName = PP_STR_ProcessCategoryName;
-            break;
-
-        case AMDT_PWR_CATEGORY_TEMPERATURE:
-            categoryName = PP_STR_TemperatureCategoryName;
-            break;
-
-        case AMDT_PWR_CATEGORY_FREQUENCY:
-            categoryName = PP_STR_FrequencyCategoryName;
-            break;
-
-        case AMDT_PWR_CATEGORY_COUNT:
-            categoryName = PP_STR_CountCategoryName;
-            break;
-
-        default:
-            categoryName = PP_STR_UnsupportedCategoryName;
-            break;
+        categoryName = (char*)category.m_name;
     }
-
     return categoryName;
 }
 
@@ -100,6 +70,10 @@ acIconId ppAidFunction::GetCategoryIconId(AMDTPwrCategory categoryID)
 
         case AMDT_PWR_CATEGORY_COUNT:
             categoryIdIcon = AC_ICON_PROFILE_PWR_COUNTER_COUNT;
+            break;
+
+        case AMDT_PWR_CATEGORY_ENERGY:
+            categoryIdIcon = AC_ICON_PROFILE_PWR_COUNTER_POWER;
             break;
 
         default:

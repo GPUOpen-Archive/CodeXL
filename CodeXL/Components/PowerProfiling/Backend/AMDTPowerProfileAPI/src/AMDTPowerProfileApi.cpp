@@ -17,6 +17,7 @@
 #include <AMDTHistogram.h>
 #include <PowerProfileHelper.h>
 #include <PowerProfileDriverInterface.h>
+#include <ppCountersStringConstants.h>
 
 #include <algorithm>
 #include <atomic>
@@ -2622,5 +2623,105 @@ AMDTResult AMDTPwrGetModuleProfileData(AMDTPwrModuleData** ppData, AMDTUInt32* p
 #endif
 }
 
+// This API will provide the category details for a given category id.
+AMDTResult AMDTPwrGetCategoryInfo(AMDTPwrCategory category, AMDTPwrCategoryInfo* pCategory)
+{
+    AMDTPwrProfileState state = AMDT_PWR_PROFILE_STATE_UNINITIALIZED;
+    AMDTResult ret = AMDT_STATUS_OK;
+    ret = AMDTPwrGetProfilingState(&state);
+
+    if (AMDT_STATUS_OK == ret)
+    {
+        if (AMDT_PWR_PROFILE_STATE_UNINITIALIZED == state)
+        {
+            ret = AMDT_ERROR_DRIVER_UNINITIALIZED;
+        }
+    }
+
+    if ((AMDT_STATUS_OK == ret) && (nullptr == pCategory))
+    {
+        ret = AMDT_ERROR_INVALIDARG;
+    }
+
+
+    if (AMDT_STATUS_OK == ret)
+    {
+
+        pCategory->m_category = category;
+        memset(pCategory->m_name, '\0', AMDT_PWR_EXE_NAME_LENGTH);
+
+        switch (category)
+        {
+            case AMDT_PWR_CATEGORY_POWER:
+            {
+                memcpy(pCategory->m_name, PP_STR_PowerCategoryName, strlen(PP_STR_PowerCategoryName));
+                break;
+            }
+
+            case AMDT_PWR_CATEGORY_FREQUENCY:
+            {
+                memcpy(pCategory->m_name, PP_STR_FrequencyCategoryName, strlen(PP_STR_FrequencyCategoryName));
+                break;
+            }
+
+            case AMDT_PWR_CATEGORY_TEMPERATURE:
+            {
+                memcpy(pCategory->m_name, PP_STR_TemperatureCategoryName, strlen(PP_STR_TemperatureCategoryName));
+                break;
+            }
+
+            case AMDT_PWR_CATEGORY_VOLTAGE:
+            {
+                memcpy(pCategory->m_name, PP_STR_VoltageCategoryName, strlen(PP_STR_VoltageCategoryName));
+                break;
+            }
+
+            case AMDT_PWR_CATEGORY_CURRENT:
+            {
+                memcpy(pCategory->m_name, PP_STR_CurrentCategoryName, strlen(PP_STR_CurrentCategoryName));
+                break;
+            }
+
+            case AMDT_PWR_CATEGORY_DVFS:
+            {
+                memcpy(pCategory->m_name, PP_STR_DVFSCategoryName, strlen(PP_STR_DVFSCategoryName));
+                break;
+            }
+
+            case AMDT_PWR_CATEGORY_PROCESS:
+            {
+                memcpy(pCategory->m_name, PP_STR_ProcessCategoryName, strlen(PP_STR_ProcessCategoryName));
+                break;
+            }
+
+            case AMDT_PWR_CATEGORY_TIME:
+            {
+                memcpy(pCategory->m_name, PP_STR_TimeCategoryName, strlen(PP_STR_TimeCategoryName));
+                break;
+            }
+
+            case AMDT_PWR_CATEGORY_COUNT:
+            {
+                memcpy(pCategory->m_name, PP_STR_CountCategoryName, strlen(PP_STR_CountCategoryName));
+                break;
+            }
+
+            case AMDT_PWR_CATEGORY_ENERGY:
+            {
+                memcpy(pCategory->m_name, PP_STR_EnergyCategoryName, strlen(PP_STR_EnergyCategoryName));
+                break;
+            }
+
+            case AMDT_PWR_CATEGORY_CNT:
+            default:
+            {
+                memcpy(pCategory->m_name, PP_STR_UnsupportedCategoryName, strlen(PP_STR_UnsupportedCategoryName));
+                break;
+            }
+        }
+    }
+
+    return ret;
+}
 #endif
 

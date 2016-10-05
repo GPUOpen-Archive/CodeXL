@@ -26,7 +26,9 @@
 #define PP_STR_ProcessCategoryName      "Process"
 #define PP_STR_TemperatureCategoryName  "Temperature"
 #define PP_STR_FrequencyCategoryName    "Frequency"
+#define PP_STR_TimeCategoryName         "Time"
 #define PP_STR_CountCategoryName        "Count"
+#define PP_STR_EnergyCategoryName       "Energy"
 #define PP_STR_UnsupportedCategoryName  "Unsupported Category"
 
 // Counter names:

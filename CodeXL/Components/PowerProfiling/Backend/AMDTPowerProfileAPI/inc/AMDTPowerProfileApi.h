@@ -491,4 +491,17 @@ This API can be called at any point of time from start of the profile to the sto
 */
 AMDTResult AMDTPwrGetModuleProfileData(AMDTPwrModuleData** ppData, AMDTUInt32* pModuleCount, AMDTFloat32* pPower);
 
+
+/** This API will provide the category details for a given category id..
+
+    \ingroup profiling
+    @param[in] category: Counter category
+    @param[out] pCategory: Provides details of the category
+    \return The status retrieving category information for the given category
+    \retval AMDT_STATUS_OK: On Success
+    \retval AMDT_ERROR_INVALIDARG: NULL pointer was passed as argument
+    \retval AMDT_ERROR_DRIVER_UNINITIALIZED: AMDTPwrProfileInitialize() function was neither called nor successful
+*/
+AMDTResult AMDTPwrGetCategoryInfo(AMDTPwrCategory category, AMDTPwrCategoryInfo* pCategory);
+
 #endif //_AMDTPOWERPROFILEAPI_H_

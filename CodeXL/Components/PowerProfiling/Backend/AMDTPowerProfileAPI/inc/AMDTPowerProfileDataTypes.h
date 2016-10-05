@@ -95,7 +95,7 @@ typedef enum
     AMDT_PWR_CATEGORY_PROCESS,            /**< PID, TID */
     AMDT_PWR_CATEGORY_TIME,               /**< Time */
     AMDT_PWR_CATEGORY_COUNT,              /**< Generic count value */
-//    AMDT_PWR_CATEGORY_ENERGY,             /**< Energy consumed */
+    AMDT_PWR_CATEGORY_ENERGY,             /**< Energy consumed */
     AMDT_PWR_CATEGORY_CNT,                /**< Total category count */
 } AMDTPwrCategory;
 
@@ -316,7 +316,7 @@ typedef struct  ContextPowerData
 typedef struct AMDTPwrModuleData
 {
     AMDTUInt32    m_processId;                               /**< Process id */
-	char          m_processName[AMDT_PWR_EXE_NAME_LENGTH];   /**< Executable name */
+    char          m_processName[AMDT_PWR_EXE_NAME_LENGTH];   /**< Executable name */
     char          m_processPath[AMDT_PWR_EXE_PATH_LENGTH];   /**< Path */
     AMDTFloat32   m_power;                                   /**< Power consumed */
     AMDTFloat32   m_ipcLoad;                                 /**< Agreegated IPC value */
@@ -341,5 +341,15 @@ typedef struct AMDTPwrInstrumentedPowerData
     AMDTUInt64          m_endTs;                                      /**< Marker end elapsed time */
     AMDTPwrProcessInfo  m_pidInfo;                                    /**< Process information */
 } AMDTPwrInstrumentedPowerData;
+
+/** Represents the counter category information.
+\ingroup profiling
+*/
+
+typedef struct AMDTPwrCategoryInfo
+{
+    AMDTUInt8           m_name[AMDT_PWR_EXE_NAME_LENGTH];             /**< Name of the category */
+    AMDTPwrCategory     m_category;                                   /**< Power/Freq/Temperature */
+} AMDTPwrCategoryInfo;
 
 #endif //_AMDTPOWERPROFILEDATATYPES_H_

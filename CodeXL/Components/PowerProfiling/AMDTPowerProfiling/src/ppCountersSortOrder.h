@@ -33,8 +33,8 @@ private:
     void GetCountersByName(AMDTPwrCategory category, gtMap < QString, int >& countersByName);
 
     bool m_isInitialised;
-    gtVector<int> m_prefixByCategory[AMDT_PWR_CATEGORY_COUNT];
-    gtVector<int> m_postfixByCategory[AMDT_PWR_CATEGORY_COUNT];
+    gtVector<int> m_prefixByCategory[AMDT_PWR_CATEGORY_CNT];
+    gtVector<int> m_postfixByCategory[AMDT_PWR_CATEGORY_CNT];
 
 };
 
