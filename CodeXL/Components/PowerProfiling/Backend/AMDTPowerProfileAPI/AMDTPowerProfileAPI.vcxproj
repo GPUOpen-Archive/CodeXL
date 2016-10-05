@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -99,7 +99,7 @@
     <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTOSWrappers\AMDTOSWrappersVS14.vcxproj">
       <Project>{5d9222ac-39fb-4123-9497-78cea5be58ad}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\CpuProfiling\Backend\AMDTCpuProfilingTranslation\AMDTCpuProfilingTranslation.vcxproj">
+    <ProjectReference Condition="'$(Platform)'=='Win32'" Include="..\..\..\CpuProfiling\Backend\AMDTCpuProfilingTranslation\AMDTCpuProfilingTranslation.vcxproj">
       <Project>{bfb56e73-d54d-4d80-9ca2-a52359ad6566}</Project>
     </ProjectReference>
   </ItemGroup>
