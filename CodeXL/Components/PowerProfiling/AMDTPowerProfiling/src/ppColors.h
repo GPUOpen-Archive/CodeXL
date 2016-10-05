@@ -10,6 +10,10 @@
 
 #ifndef __PPCOLORS
 #define __PPCOLORS
+#ifdef _WIN32
+#pragma warning(push)
+#pragma warning(disable : 4718)
+#endif
 
 #include <QtCore>
 
@@ -94,5 +98,8 @@ private:
     static ppHierarchyMap* m_hierarchyMapSingleInstance;
 };
 
+#ifdef _WIN32
+    #pragma warning( pop )
+#endif
 
 #endif //__PPCOLORS
