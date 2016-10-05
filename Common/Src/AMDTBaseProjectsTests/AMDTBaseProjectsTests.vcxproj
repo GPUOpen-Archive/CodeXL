@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -115,7 +115,6 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>CXLOSWrappers$(GDTProjectSuffix).lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLApiClasses$(GDTProjectSuffix).lib;CXLApplicationComponents$(GDTProjectSuffix).lib;CXLAssertionHandlers$(GDTProjectSuffix).lib;CXLApplicationFramework$(GDTProjectSuffix).lib;CXLApplication$(GDTProjectSuffix).lib;CXLAnalyzer$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(AMDTOutputDir)$(Configuration)\arch;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -136,7 +135,6 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>CXLOSWrappers$(GDTProjectSuffix).lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLApiClasses$(GDTProjectSuffix).lib;CXLApplicationComponents$(GDTProjectSuffix).lib;CXLAssertionHandlers$(GDTProjectSuffix).lib;CXLApplicationFramework$(GDTProjectSuffix).lib;CXLApplication$(GDTProjectSuffix).lib;CXLAnalyzer$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(AMDTOutputDir)$(Configuration)\arch;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -160,7 +158,6 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>CXLOSWrappers$(GDTProjectSuffix).lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLApiClasses$(GDTProjectSuffix).lib;CXLApplicationComponents$(GDTProjectSuffix).lib;CXLAssertionHandlers$(GDTProjectSuffix).lib;CXLApplicationFramework$(GDTProjectSuffix).lib;CXLApplication$(GDTProjectSuffix).lib;CXLAnalyzer$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(AMDTOutputDir)$(Configuration)\arch;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>

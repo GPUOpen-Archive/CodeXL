@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="UserMacros">
     <COMMONDIR>$(SolutionDir)..\..\Common</COMMONDIR>
@@ -11,11 +11,6 @@
     <Import Project="$(SolutionDir)\..\Components\CodeXLComponent.props" />
     <Import Project="$(AMDTCommonExt)\Qt\Global-QT-nographics.props" />
   </ImportGroup>
-  <ItemDefinitionGroup>
-    <Link>
-      <AdditionalDependencies>CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
   <ItemGroup>
     <BuildMacro Include="COMMONDIR">
       <Value>$(COMMONDIR)</Value>

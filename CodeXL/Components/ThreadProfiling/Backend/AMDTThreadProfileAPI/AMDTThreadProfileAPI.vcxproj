@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -68,7 +68,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;CXLExecutableFormat$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -84,7 +84,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>CXLExecutableFormat$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -106,6 +105,17 @@
     <ClCompile Include="src\Windows\tpEtlTranslate.cpp" />
     <ClCompile Include="src\Windows\tpGlobals.cpp" />
     <ClCompile Include="src\Windows\tpTranslateCB.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTBaseTools\AMDTBaseToolsVS14.vcxproj">
+      <Project>{11221a7f-3883-418f-b286-b0ea1e28ef10}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTExecutableFormat\AMDTExecutableFormat.vcxproj">
+      <Project>{9ad5347a-8c9a-4952-8a63-8eb2c4dff629}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTOSWrappers\AMDTOSWrappersVS14.vcxproj">
+      <Project>{5d9222ac-39fb-4123-9497-78cea5be58ad}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

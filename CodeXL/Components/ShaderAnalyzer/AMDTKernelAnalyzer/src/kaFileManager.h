@@ -7,7 +7,7 @@
 #include <map>
 
 // Infra:
-#include <AMDTAPIClasses/inc/apSerializable.h>
+#include <AMDTAPIClasses/Include/apSerializable.h>
 #include <AMDTBaseTools/Include/gtMap.h>
 #include <AMDTBaseTools/Include/gtList.h>
 

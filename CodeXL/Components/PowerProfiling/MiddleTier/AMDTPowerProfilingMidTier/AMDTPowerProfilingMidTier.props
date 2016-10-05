@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
@@ -14,7 +14,6 @@
       <AdditionalIncludeDirectories>$(CommonProjectsDir)\AMDTCommonHeaders;$(PowerProfilingBackendDir)\AMDTPowerProfileAPI\inc;$(PowerProfilingBackendDir);$(ProjectDir)\..\;$(SolutionDir)\..\Components\DatabaseLayer;$(SolutionDir)\..\Remote;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;CXLProfilerDAL$(GDTProjectSuffix).lib;CXLPowerProfileAPI$(GDTProjectSuffix).lib;CXLRemoteClient$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(AMDTOutputDir)$(Configuration)\arch;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImportLibrary>$(AMDTOutputDir)$(Configuration)\arch\$(TargetName).lib</ImportLibrary>
     </Link>

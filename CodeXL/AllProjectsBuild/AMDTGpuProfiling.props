@@ -18,11 +18,6 @@
       <AdditionalIncludeDirectories>..;$(SolutionDir)\..\Components\AMDTSharedProfiling\inc\;$(SolutionDir)\..;$(SolutionDir)\..\Components;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup>
-    <Link>
-      <AdditionalDependencies>CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;CXLApiClasses$(GDTProjectSuffix).lib;CXLApplicationComponents$(GDTProjectSuffix).lib;CXLApplicationFramework$(GDTProjectSuffix).lib;CXLSharedProfiling$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
   <ItemGroup>
     <BuildMacro Include="COMMONDIR">
       <Value>$(COMMONDIR)</Value>

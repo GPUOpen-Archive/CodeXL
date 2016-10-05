@@ -10,11 +10,6 @@
   <ImportGroup Label="AMDTBaseProjects">
     <Import Project="$(SolutionDir)\..\Components\CodeXLComponent.props" />
   </ImportGroup>
-  <ItemDefinitionGroup>
-    <Link>
-      <AdditionalDependencies>AMDTBaseTools$(GDTProjectSuffix).lib;AMDTOSWrappers$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-  </ItemDefinitionGroup>
   <ItemGroup>
     <BuildMacro Include="COMMONDIR">
       <Value>$(COMMONDIR)</Value>

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -56,7 +56,6 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>CXLApiClasses$(GDTProjectSuffix).lib;CXLOSAPIWrappers$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;CXLBaseTools$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(AMDTOutputDir)$(Configuration)\arch;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -92,6 +91,20 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\siOpenCLInformationCollector.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\Src\AMDTAPIClasses\AMDTApiClasses.vcxproj">
+      <Project>{f62443fc-1d1f-43d1-bf19-a208c38fc0c1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Src\AMDTBaseTools\AMDTBaseToolsVS14.vcxproj">
+      <Project>{11221a7f-3883-418f-b286-b0ea1e28ef10}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Src\AMDTOSAPIWrappers\AMDTOSAPIWrappersVS14.vcxproj">
+      <Project>{f401aa0f-e7e4-44aa-bd84-a2b1d5719b32}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Src\AMDTOSWrappers\AMDTOSWrappersVS14.vcxproj">
+      <Project>{5d9222ac-39fb-4123-9497-78cea5be58ad}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

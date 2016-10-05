@@ -50,7 +50,4 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="AMDTPowerProfileCLI.licenseheader" />
-  </ItemGroup>
 </Project>

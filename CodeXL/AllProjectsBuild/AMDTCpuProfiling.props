@@ -18,9 +18,6 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir)\..\Components\AMDTSharedProfiling\inc\;%(AdditionalIncludeDirectories);..\..\Backend\AMDTThreadProfileAPI\inc;$(SolutionDir)\..\Components\CpuProfiling;$(SolutionDir)\..\Components\DatabaseLayer;$(SolutionDir)\..;$(SolutionDir)\..\Components;</AdditionalIncludeDirectories>
     </ClCompile>
-    <Link>
-      <AdditionalDependencies>CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;CXLApiClasses$(GDTProjectSuffix).lib;CXLApplicationComponents$(GDTProjectSuffix).lib;CXLApplicationFramework$(GDTProjectSuffix).lib;CXLSharedProfiling$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
-	</Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <BuildMacro Include="CommonProjectsDir">

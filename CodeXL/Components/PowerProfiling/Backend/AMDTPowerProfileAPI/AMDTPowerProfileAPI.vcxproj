@@ -43,21 +43,15 @@
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CXLDriverControl$(GDTProjectSuffix).lib;advapi32.lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;CXLCpuProfilingTranslation$(GDTProjectSuffix).lib</AdditionalDependencies>
-      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CXLDriverControl$(GDTProjectSuffix).lib;advapi32.lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;CXLCpuProfilingTranslation$(GDTProjectSuffix).lib</AdditionalDependencies>
-      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CXLDriverControl$(GDTProjectSuffix).lib;advapi32.lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib</AdditionalDependencies>
-      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CXLDriverControl$(GDTProjectSuffix).lib;advapi32.lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib</AdditionalDependencies>
-      <ModuleDefinitionFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AMDTPowerProfileAPI.def</ModuleDefinitionFile>
-      <ModuleDefinitionFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AMDTPowerProfileAPI.def</ModuleDefinitionFile>
-      <ModuleDefinitionFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AMDTPowerProfileAPI.def</ModuleDefinitionFile>
-      <ModuleDefinitionFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AMDTPowerProfileAPI.def</ModuleDefinitionFile>
+      <AdditionalDependencies>advapi32.lib</AdditionalDependencies>
+      <ModuleDefinitionFile>AMDTPowerProfileAPI.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ResourceCompile Include="$(CommonProjectsDir)\VersionInfo\VersionResource.rc" />
   </ItemGroup>
   <ItemGroup>
-   <ClCompile Condition="'$(GDT_BUILD)'=='GDT_INTERNAL'" Include="Non-OpenSource\AMDTPowerProfileSmu9Api-Internal.cpp" />
+    <ClCompile Condition="'$(GDT_BUILD)'=='GDT_INTERNAL'" Include="Non-OpenSource\AMDTPowerProfileSmu9Api-Internal.cpp" />
     <ClCompile Condition="'$(GDT_BUILD)'=='GDT_NDA'" Include="Non-OpenSource\AMDTPowerProfileSmu9Api-Internal.cpp" />
     <ClCompile Condition="'$(GDT_BUILD)'=='GDT_INTERNAL'" Include="Non-OpenSource\AMDTPowerProfileApi-Internal.cpp" />
     <ClCompile Condition="'$(GDT_BUILD)'=='GDT_NDA'" Include="Non-OpenSource\AMDTPowerProfileApi-Internal.cpp" />
@@ -94,6 +88,20 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="AMDTPowerProfileAPI.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTBaseTools\AMDTBaseToolsVS14.vcxproj">
+      <Project>{11221a7f-3883-418f-b286-b0ea1e28ef10}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTDriverControl\AMDTDriverControl.vcxproj">
+      <Project>{99eb0d28-d17b-4c25-b348-0351bd1771df}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTOSWrappers\AMDTOSWrappersVS14.vcxproj">
+      <Project>{5d9222ac-39fb-4123-9497-78cea5be58ad}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\CpuProfiling\Backend\AMDTCpuProfilingTranslation\AMDTCpuProfilingTranslation.vcxproj">
+      <Project>{bfb56e73-d54d-4d80-9ca2-a52359ad6566}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

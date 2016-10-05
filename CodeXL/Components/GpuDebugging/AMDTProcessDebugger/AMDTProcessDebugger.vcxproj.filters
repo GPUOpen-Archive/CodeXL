@@ -22,9 +22,6 @@
     <ClCompile Include="src\pdGDBProcessWaiterThread.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\pdIPhoneDeviceProcessDebugger.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="src\pdLauncherProcessWatcherThread.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -148,12 +145,6 @@
       <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="src\pdLauncherProcessWatcherThread.h">
-      <Filter>inc</Filter>
-    </ClInclude>
-    <ClInclude Include="src\pdIPhoneDeviceProcessDebugger.h">
-      <Filter>inc</Filter>
-    </ClInclude>
-    <ClInclude Include="src\pdIPhoneDebuggingFunctions.h">
       <Filter>inc</Filter>
     </ClInclude>
     <ClInclude Include="src\pdGDBProcessWaiterThread.h">

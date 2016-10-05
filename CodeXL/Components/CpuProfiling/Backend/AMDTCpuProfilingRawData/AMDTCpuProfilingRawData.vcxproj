@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -24,18 +24,15 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="CommonPropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-	<Import Project="$(SolutionDir)\CodeXLCommonProjects.props" />
-	<Import Project="$(SolutionDir)\..\Components\CodeXLComponent.props" />
-	<Import Project="$(AMDTCommonExt)\Qt\Global-QT-nographics.props" />	
+    <Import Project="$(SolutionDir)\CodeXLCommonProjects.props" />
+    <Import Project="$(SolutionDir)\..\Components\CodeXLComponent.props" />
+    <Import Project="$(AMDTCommonExt)\Qt\Global-QT-nographics.props" />
   </ImportGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(CommonProjectsDir);$(CommonProjectsDir)\AMDTCommonHeaders;$(ProjectDir);$(ProjectDir)\inc;$(ProjectDir)\..;$(SolutionDir)\..\Components\CpuProfiling;$(SolutionDir)\..\Components\DatabaseLayer;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>AMDT_CPU_PROFILING_RAWDATA_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <Link>
-      <AdditionalDependencies>CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;CXLDbAdapter$(GDTProjectSuffix).lib;CXLCpuPerfEventUtils$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\DllMain.cpp" />
@@ -108,6 +105,20 @@
     <ClInclude Include="src\RunInfo\RunInfoWriter.h" />
     <ClInclude Include="src\Translation\ImdReader.h" />
     <ClInclude Include="src\Translation\ImdWriter.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTBaseTools\AMDTBaseToolsVS14.vcxproj">
+      <Project>{11221a7f-3883-418f-b286-b0ea1e28ef10}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTOSWrappers\AMDTOSWrappersVS14.vcxproj">
+      <Project>{5d9222ac-39fb-4123-9497-78cea5be58ad}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\DatabaseLayer\AMDTDbAdapter\AMDTDbAdapter.vcxproj">
+      <Project>{03d9da41-e510-4205-bcda-f988d507ef50}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\AMDTCpuPerfEventUtils\AMDTCpuPerfEventUtils.vcxproj">
+      <Project>{fb5de7c5-1997-4bc0-b854-5a3d82e8d28e}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

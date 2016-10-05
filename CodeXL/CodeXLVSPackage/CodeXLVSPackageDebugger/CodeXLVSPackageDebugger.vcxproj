@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -35,7 +35,7 @@
       <BufferSecurityCheck>true</BufferSecurityCheck>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;CXLApiClasses$(GDTProjectSuffix).lib;CXLProcessDebugger$(GDTProjectSuffix).lib;vsguids.lib;ad2de.lib;dbgmetric.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>vsguids.lib;ad2de.lib;dbgmetric.lib;Version.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -57,6 +57,20 @@
     <ClCompile Include="src\vsdPackageConnector.cpp" />
     <ClCompile Include="src\vsdProcessDebugger.cpp" />
     <ClCompile Include="src\vsdUnknown.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\Src\AMDTAPIClasses\AMDTApiClasses.vcxproj">
+      <Project>{f62443fc-1d1f-43d1-bf19-a208c38fc0c1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Src\AMDTBaseTools\AMDTBaseToolsVS14.vcxproj">
+      <Project>{11221a7f-3883-418f-b286-b0ea1e28ef10}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Common\Src\AMDTOSWrappers\AMDTOSWrappersVS14.vcxproj">
+      <Project>{5d9222ac-39fb-4123-9497-78cea5be58ad}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Components\GpuDebugging\AMDTProcessDebugger\AMDTProcessDebugger.vcxproj">
+      <Project>{89777cbd-d9ec-4974-9acb-5886b7d9c60e}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v14.0\VSSDK\Microsoft.VsSDK.Cpp.targets" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

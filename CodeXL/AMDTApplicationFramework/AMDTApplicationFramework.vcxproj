@@ -55,7 +55,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
       <ImportLibrary>$(AMDTOutputDir)$(Configuration)\arch\$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;CXLOSAPIWrappers$(GDTProjectSuffix).lib;CXLApiClasses$(GDTProjectSuffix).lib;CXLApplicationComponents$(GDTProjectSuffix).lib;CXLRemoteClient$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(AMDTOutputDir)$(Configuration)\arch;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT$(GDTDebugSuffixNoDash);%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <TargetMachine>MachineX86</TargetMachine>
@@ -442,6 +441,26 @@
     <None Include="Include\res\icons\up_button.xpm" />
     <None Include="Include\res\welcome\Welcome.html" />
     <None Include="Include\res\welcome\WelcomeAnalyzeNA.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Common\Src\AMDTAPIClasses\AMDTApiClasses.vcxproj">
+      <Project>{f62443fc-1d1f-43d1-bf19-a208c38fc0c1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Common\Src\AMDTApplicationComponents\AMDTApplicationComponents.vcxproj">
+      <Project>{37e228d9-e9b8-434d-ac24-533a88a7498a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Common\Src\AMDTBaseTools\AMDTBaseToolsVS14.vcxproj">
+      <Project>{11221a7f-3883-418f-b286-b0ea1e28ef10}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Common\Src\AMDTOSAPIWrappers\AMDTOSAPIWrappersVS14.vcxproj">
+      <Project>{f401aa0f-e7e4-44aa-bd84-a2b1d5719b32}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Common\Src\AMDTOSWrappers\AMDTOSWrappersVS14.vcxproj">
+      <Project>{5d9222ac-39fb-4123-9497-78cea5be58ad}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Remote\AMDTRemoteClient\AMDTRemoteClient.vcxproj">
+      <Project>{3807b7b9-8694-4279-92fd-e2a6b964c491}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -79,6 +79,20 @@
   <ItemGroup>
     <ResourceCompile Include="..\..\..\..\Common\Src\VersionInfo\VersionResource.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Common\Src\AMDTAPIClasses\AMDTApiClasses.vcxproj">
+      <Project>{f62443fc-1d1f-43d1-bf19-a208c38fc0c1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Common\Src\AMDTBaseTools\AMDTBaseToolsVS14.vcxproj">
+      <Project>{11221a7f-3883-418f-b286-b0ea1e28ef10}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Common\Src\AMDTOSAPIWrappers\AMDTOSAPIWrappersVS14.vcxproj">
+      <Project>{f401aa0f-e7e4-44aa-bd84-a2b1d5719b32}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Common\Src\AMDTOSWrappers\AMDTOSWrappersVS14.vcxproj">
+      <Project>{5d9222ac-39fb-4123-9497-78cea5be58ad}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

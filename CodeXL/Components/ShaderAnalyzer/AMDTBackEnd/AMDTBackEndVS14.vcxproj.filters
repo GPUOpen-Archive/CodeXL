@@ -14,7 +14,6 @@
     <ClCompile Include="$(CommonDir)\Src\DynamicLibraryModule\DXXModule.cpp" />
     <ClCompile Include="$(CommonDir)\Src\DynamicLibraryModule\DynamicLibraryModule.cpp" />
     <ClCompile Include="$(CommonDir)\Src\DynamicLibraryModule\OpenCLModule.cpp" />
-    <ClCompile Include="$(CommonDir)\Src\GDT_Memory.cpp" />
     <ClCompile Include="$(CommonDir)\Src\ShaderUtils\DX10\D3D10ShaderObject.cpp" />
     <ClCompile Include="$(CommonDir)\Src\ShaderUtils\DX10\D3D10ShaderUtils.cpp" />
     <ClCompile Include="$(CommonDir)\Src\ShaderUtils\DX10\DXBCChecksum.cpp" />
@@ -94,6 +93,7 @@
     <ClCompile Include="src\beUtils.cpp" />
     <ClCompile Include="src\beStaticIsaAnalyzer.cpp" />
     <ClCompile Include="$(CommonDir)\Src\ACLModuleManager\ACLModuleManager.cpp" />
+    <ClCompile Include="$(CommonDir)\Src\Misc\GDT_Memory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(CommonDir)\Src\ADLUtil\ADLUtil.h" />
@@ -106,7 +106,6 @@
     <ClInclude Include="$(CommonDir)\Src\DynamicLibraryModule\DXXModule.h" />
     <ClInclude Include="$(CommonDir)\Src\DynamicLibraryModule\DynamicLibraryModule.h" />
     <ClInclude Include="$(CommonDir)\Src\DynamicLibraryModule\OpenCLModule.h" />
-    <ClInclude Include="$(CommonDir)\Src\GDT_Memory.h" />
     <ClInclude Include="$(CommonDir)\Src\ShaderUtils\DX10\D3D10ShaderObject.h" />
     <ClInclude Include="$(CommonDir)\Src\ShaderUtils\DX10\D3D10ShaderUtils.h" />
     <ClInclude Include="$(CommonDir)\Src\ShaderUtils\DX10\DXBCChecksum.h" />
@@ -240,6 +239,7 @@
     <ClInclude Include="Include\beProgramBuilderOpenGL.h" />
     <ClInclude Include="Include\beUtils.h" />
     <ClInclude Include="Include\beStaticIsaAnalyzer.h" />
+    <ClInclude Include="$(CommonDir)\Src\Misc\GDT_Memory.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Emulator">

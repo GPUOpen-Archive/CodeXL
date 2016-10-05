@@ -8,7 +8,7 @@
 #include <QtWidgets>
 
 /// infra
-#include <AMDTAPIClasses/inc/apSerializable.h>
+#include <AMDTAPIClasses/Include/apSerializable.h>
 #include <AMDTOSWrappers/Include/osFilePath.h>
 #include <AMDTOSWrappers/Include/osDirectory.h>
 #include <AMDTBaseTools/Include/gtPtrVector.h>

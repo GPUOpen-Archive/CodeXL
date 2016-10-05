@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug_Static|Win32">
@@ -101,10 +101,6 @@
       <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Release_Static|x64'">wsock32.lib;Ws2_32.lib;$(COMMONDIR)\Lib\AMD\DX10ASM\Lib\VS2015/x64\Release\DX10ASMLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug_Static|Win32'">wsock32.lib;Ws2_32.lib;$(COMMONDIR)\Lib\AMD\DX10ASM\Lib\VS2015\Win32\Debug\DX10ASMLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug_Static|x64'">wsock32.lib;Ws2_32.lib;$(COMMONDIR)\Lib\AMD\DX10ASM\Lib\VS2015\x64\Debug\DX10ASMLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CXLAnalysisBackend$(GDTProjectSuffix).lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CXLAnalysisBackend$(GDTProjectSuffix).lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CXLAnalysisBackend$(GDTProjectSuffix).lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CXLAnalysisBackend$(GDTProjectSuffix).lib;CXLBaseTools$(GDTProjectSuffix).lib;CXLOSWrappers$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreAllDefaultLibraries Condition="'$(Configuration)|$(Platform)'=='Debug_Static|Win32'">
       </IgnoreAllDefaultLibraries>
       <IgnoreAllDefaultLibraries Condition="'$(Configuration)|$(Platform)'=='Debug_Static|x64'">
@@ -169,9 +165,6 @@
     </ProjectReference>
     <ProjectReference Include="$(CommonDir)\Src\AMDTBaseTools\AMDTBaseToolsVS14.vcxproj">
       <Project>{11221a7f-3883-418f-b286-b0ea1e28ef10}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(CommonDir)\Src\AMDTOSAPIWrappers\AMDTOSAPIWrappersVS14.vcxproj">
-      <Project>{f401aa0f-e7e4-44aa-bd84-a2b1d5719b32}</Project>
     </ProjectReference>
     <ProjectReference Include="$(CommonDir)\Src\AMDTOSWrappers\AMDTOSWrappersVS14.vcxproj">
       <Project>{5d9222ac-39fb-4123-9497-78cea5be58ad}</Project>

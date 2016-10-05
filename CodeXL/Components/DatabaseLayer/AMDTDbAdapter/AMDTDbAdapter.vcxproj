@@ -27,6 +27,17 @@
     <ClCompile Include="src\AMDTDbAdapter.cpp" />
     <ClCompile Include="src\AMDTProfileDbAdapter.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Common\Src\AMDTBaseTools\AMDTBaseToolsVS14.vcxproj">
+      <Project>{11221a7f-3883-418f-b286-b0ea1e28ef10}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Common\Src\AMDTOSWrappers\AMDTOSWrappersVS14.vcxproj">
+      <Project>{5d9222ac-39fb-4123-9497-78cea5be58ad}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\AMDTProfilerDAL\AMDTProfilerDAL.vcxproj">
+      <Project>{cb4c5f57-0177-4adc-866e-fc0e8527fbb7}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{03D9DA41-E510-4205-BCDA-F988D507EF50}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

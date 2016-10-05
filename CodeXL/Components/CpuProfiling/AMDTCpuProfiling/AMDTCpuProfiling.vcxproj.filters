@@ -441,12 +441,6 @@
     <None Include="ui\iDisplayFilterDlg.ui">
       <Filter>CpuProfiling\ui</Filter>
     </None>
-    <None Include="src\SConscript">
-      <Filter>CpuProfiling\src</Filter>
-    </None>
-    <None Include="inc\SConscript">
-      <Filter>CpuProfiling\inc</Filter>
-    </None>
     <ClInclude Include="tmp\ui\ui_iCpuGlobalSettings.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
@@ -1002,9 +996,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <None Include="inc\SConscript" />
     <None Include="ReadMe.txt" />
-    <None Include="src\SConscript" />
     <CustomBuild Include="inc\SessionSourceCodeView.h">
       <Filter>CpuProfiling\inc</Filter>
     </CustomBuild>
