@@ -778,7 +778,7 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
                                                    "ScratchRegs"
                                                  };
 
-        //Common Columns
+        // Common Columns
         std::string methodString = "Method";
         std::string executionOrderString = "ExecutionOrder";
         std::string threadIdString = "ThreadID";
@@ -790,12 +790,12 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
         std::string sgprsString = "SGPRs";
         std::string scratchRegsString = "ScratchRegs";
 
-        //headers/comments in the csv file
+        // headers (or comments) in the csv file
         std::vector<std::string> headers;
 
         unsigned int count = 0;
 
-        //Load all the CSV files in Kernel Row Data
+        // Load all the CSV files in Kernel Row Data
         for (std::vector<std::string>::iterator it = outputFileList.begin(); it != outputFileList.end(); ++it)
         {
             CSVFileParser* csvParser = new(std::nothrow) CSVFileParser;
@@ -812,7 +812,7 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
                     count++;
                 }
 
-                //header will be same in all files - retreiving from 1st file
+                // header will be same in all files - retreiving from 1st file
                 headers = csvParser->GetHeaders();
             }
         }
