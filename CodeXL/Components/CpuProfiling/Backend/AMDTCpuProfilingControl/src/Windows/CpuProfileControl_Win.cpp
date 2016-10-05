@@ -56,10 +56,16 @@ typedef enum
 enum EventCfgMode
 {
     EVENTCFG_NOTSET = 0,
-    EVENTCFG_PROFILE,
-    EVENTCFG_CNTLIST,
-    EVENTCFG_CNTSINGLE
+    EVENTCFG_SAMPLE_MODE = 0x1,
+    EVENTCFG_COUNT_MODE = 0x2,
 };
+
+#define IS_PMC_SAMPLE_MODE(clientId_)    ((EVENTCFG_SAMPLE_MODE & g_EventCfgMode[clientId_]) == EVENTCFG_SAMPLE_MODE)
+#define IS_PMC_COUNT_MODE(clientId_)    ((EVENTCFG_COUNT_MODE & g_EventCfgMode[clientId_]) == EVENTCFG_COUNT_MODE)
+
+#define IS_SAMPLING_MODE(clientId_)     (   (0 != (g_profileType[clientId_] & PROFILE_STATE_IBS_SET))    \
+                                         || (0 != (g_profileType[clientId_] & PROFILE_STATE_TBP_SET)) \
+                                         || (IS_PMC_SAMPLE_MODE(clientId_)))
 
 //Will unlock state mutex when it goes out of scope
 class MutexLocker
@@ -123,7 +129,7 @@ TIMER_PROPERTIES g_timerCfg[MAX_CLIENT_COUNT];
 IBS_PROPERTIES g_ibsCfg[MAX_CLIENT_COUNT];
 PID_PROPERTIES g_pidCfg[MAX_CLIENT_COUNT];
 
-EventCfgMode g_EventCfgMode[MAX_CLIENT_COUNT];
+gtUInt32 g_EventCfgMode[MAX_CLIENT_COUNT];
 gtList<EVENT_PROPERTIES> g_eventCfgs;
 
 // Baskar: TBD: Should this is be in Windows Specific Implementation ?
@@ -433,9 +439,7 @@ HRESULT mutexFreePause(gtUInt32 clientId)
     }
 
     HRESULT hr = S_OK;
-    bool sampling = (0 != (g_profileType[clientId] & PROFILE_STATE_IBS_SET))
-                    || (0 != (g_profileType[clientId] & PROFILE_STATE_TBP_SET))
-                    || (EVENTCFG_PROFILE == g_EventCfgMode[clientId]);
+    bool sampling = IS_SAMPLING_MODE(clientId);
 
     //sampling can use the shared data pause
     if ((NULL != g_aSharedPause) && ((sampling) || (myClientId != clientId)))
@@ -445,8 +449,7 @@ HRESULT mutexFreePause(gtUInt32 clientId)
 
     //counting has to use the full ioctl pause
     if ((NULL == g_aSharedPause) ||
-        (((EVENTCFG_PROFILE != g_EventCfgMode[clientId])
-          && (EVENTCFG_NOTSET != g_EventCfgMode[clientId])) && (myClientId == clientId)))
+        ((myClientId == clientId) && (IS_PMC_COUNT_MODE(clientId))))
     {
         PROFILER_PROPERTIES profProp;
         DWORD dwReturned;
@@ -783,6 +786,24 @@ isCoreSet(gtUInt64* pCoreMaskArray, unsigned int core)
     return coreMasked;
 }
 
+bool
+isProfileAllCores(EVENT_PROPERTIES& eventProp)
+{
+    return (eventProp.ulCoreMaskCount == 0) ? true : false;
+}
+
+bool
+isProfileCore(EVENT_PROPERTIES& eventProp, unsigned int coreId)
+{
+    bool ret = isProfileAllCores(eventProp);
+
+    if (!ret)
+    {
+        ret = isCoreSet((gtUInt64*)(eventProp.ullCpuMask.QuadPart), coreId);
+    }
+
+    return ret;
+}
 
 bool GetAppPath(QString& appPath)
 {
@@ -809,6 +830,15 @@ bool GetAppPath(QString& appPath)
     appPath = QString::fromWCharArray(filePath.fileDirectoryAsString().asCharArray());
 
     return retVal;
+}
+
+
+bool isSampleEvent(EVENT_PROPERTIES& eventProp)
+{
+    PERF_CTL pmc;
+    pmc.perf_ctl = eventProp.ullEventCfg;
+
+    return pmc.bitSampleEvents ? true : false;
 }
 
 
@@ -1319,9 +1349,7 @@ HRESULT CpuPerfGetProfilerState(
         g_profilingState[clientId] = ProfilingAborted;
     }
 
-    bool sampling = (0 != (g_profileType[clientId] & PROFILE_STATE_IBS_SET))
-                    || (0 != (g_profileType[clientId] & PROFILE_STATE_TBP_SET))
-                    || (EVENTCFG_PROFILE == g_EventCfgMode[clientId]);
+    bool sampling = IS_SAMPLING_MODE(clientId);
 
     switch (g_profilingState[clientId])
     {
@@ -1378,9 +1406,7 @@ HRESULT CpuPerfStartProfiling(
         return E_ACCESSDENIED;
     }
 
-    bool sampling = (0 != (g_profileType[clientId] & PROFILE_STATE_IBS_SET))
-                    || (0 != (g_profileType[clientId] & PROFILE_STATE_TBP_SET))
-                    || (EVENTCFG_PROFILE == g_EventCfgMode[clientId]);
+    bool sampling = IS_SAMPLING_MODE(clientId);
 
     if (sampling)
     {
@@ -1712,9 +1738,7 @@ HRESULT CpuPerfResumeProfiling(CaProfileCtrlKey profileKey)
             return E_ACCESSDENIED;
         }
 
-        bool sampling = (0 != (g_profileType[clientId] & PROFILE_STATE_IBS_SET))
-                        || (0 != (g_profileType[clientId] & PROFILE_STATE_TBP_SET))
-                        || (EVENTCFG_PROFILE == g_EventCfgMode[clientId]);
+        bool sampling = IS_SAMPLING_MODE(clientId);
 
         //sampling can use the shared data resume
         if ((NULL != g_aSharedPause) && (sampling))
@@ -1723,9 +1747,7 @@ HRESULT CpuPerfResumeProfiling(CaProfileCtrlKey profileKey)
         }
 
         //counting has to use the full ioctl resume
-        if ((NULL == g_aSharedPause)
-            || (((EVENTCFG_PROFILE != g_EventCfgMode[clientId])
-                 && (EVENTCFG_NOTSET != g_EventCfgMode[clientId]))))
+        if ((NULL == g_aSharedPause) || IS_PMC_COUNT_MODE(clientId))
         {
             PROFILER_PROPERTIES profProp;
             DWORD dwReturned;
@@ -1820,9 +1842,9 @@ HRESULT CpuPerfStopSamplingProfile(gtUInt32 clientId)
     {
         g_profilingState[clientId] = ProfilingStopped;
 
-        if ((0 != (g_profileType[clientId] & PROFILE_STATE_IBS_SET))
-            || (0 != (g_profileType[clientId] & PROFILE_STATE_TBP_SET))
-            || (EVENTCFG_PROFILE == g_EventCfgMode[clientId]))
+        bool sampling = IS_SAMPLING_MODE(clientId);
+
+        if (sampling)
         {
             hr = fnStopCapture(true, g_dynamicTiFileName[clientId]);
 
@@ -1955,19 +1977,9 @@ HRESULT CpuPerfSetCountingEvent(
         return E_INVALIDARG;
     }
 
-    if ((EVENTCFG_CNTSINGLE != g_EventCfgMode[clientId])
-        && (EVENTCFG_NOTSET != g_EventCfgMode[clientId]))
-    {
-        g_errorString[clientId] = L"The profiler was already configured";
-        return E_ACCESSDENIED;
-    }
-
     //check previous configurations for the core/counter combo
-    // gtUInt64 coreMask = 1ULL << core;
     for (gtList<EVENT_PROPERTIES>::iterator evIt  = g_eventCfgs.begin(), evEnd = g_eventCfgs.end(); evIt != evEnd; ++evIt)
     {
-        // if (((*evIt).ulCounterIndex == eventCounterIndex)
-        //  && (0 != ((*evIt).ullCpuMask.QuadPart & coreMask)))
         if (((*evIt).ulCounterIndex == eventCounterIndex)
             && (isCoreSet((gtUInt64*)((*evIt).ullCpuMask.QuadPart), core)))
         {
@@ -1975,22 +1987,14 @@ HRESULT CpuPerfSetCountingEvent(
         }
     }
 
-    if (EVENTCFG_NOTSET == g_EventCfgMode[clientId])
-    {
-        g_eventCfgs.clear();
-
-        g_EventCfgMode[clientId] = EVENTCFG_CNTSINGLE;
-    }
+    g_EventCfgMode[clientId] |= EVENTCFG_COUNT_MODE;
 
     EVENT_PROPERTIES eventCfg;
     eventCfg.ullEventCfg = performanceEvent.performanceEvent;
     eventCfg.ullEventCount = performanceEvent.value;
     eventCfg.ulCounterIndex = eventCounterIndex;
 
-    // eventCfg.ullCpuMask.QuadPart = 1ULL << core;
-    // gtUInt64 cpuCoreMask = 1ULL << core;
     eventCfg.ulCoreMaskCount = core; // Largest core masked;
-    // eventCfg.ullCpuMask.QuadPart = (gtUInt64)CopyCoreMask(&cpuCoreMask, core);
     // Create the coremask array
     eventCfg.ullCpuMask.QuadPart = (gtUInt64)CreateCoreMask(core);
 
@@ -2027,7 +2031,7 @@ HRESULT CpuPerfGetEventCount(/*in*/ unsigned int core,
         return E_INVALIDARG;
     }
 
-    if (EVENTCFG_CNTSINGLE != g_EventCfgMode[clientId])
+    if (!IS_PMC_COUNT_MODE(clientId))
     {
         g_errorString[clientId] = L"The profiler was not configured for counting";
         return E_FAIL;
@@ -2040,15 +2044,12 @@ HRESULT CpuPerfGetEventCount(/*in*/ unsigned int core,
         return E_PENDING;
     }
 
-    // gtUInt64 coreMask = 1ULL << core;
     gtList<EVENT_PROPERTIES>::iterator evIt  = g_eventCfgs.begin(), evEnd = g_eventCfgs.end();
 
     for (; evIt != evEnd; ++evIt)
     {
-        // if (((*evIt).ulCounterIndex == eventCounterIndex)
-        //  && (0 != ((*evIt).ullCpuMask.QuadPart & coreMask)))
         if (((*evIt).ulCounterIndex == eventCounterIndex)
-            && (isCoreSet((gtUInt64*)((*evIt).ullCpuMask.QuadPart), core) || ((*evIt).ulCoreMaskCount ==0)))
+            && (isProfileCore((*evIt), core)))
         {
             break;
         }
@@ -2171,15 +2172,7 @@ HRESULT CpuPerfSetCountingConfiguration(
         }
     }
 
-    if ((EVENTCFG_CNTLIST != g_EventCfgMode[clientId])
-        && (EVENTCFG_NOTSET != g_EventCfgMode[clientId]))
-    {
-        g_errorString[clientId] = L"The profiler was already configured";
-        return E_ACCESSDENIED;
-    }
-
-    g_eventCfgs.clear();
-    g_EventCfgMode[clientId] = EVENTCFG_CNTLIST;
+    g_EventCfgMode[clientId] |= EVENTCFG_COUNT_MODE;
 
     for (unsigned int i = 0; i < count; i++)
     {
@@ -2289,15 +2282,7 @@ HRESULT CpuPerfSetCountingConfiguration(
         }
     }
 
-    if ((EVENTCFG_CNTLIST != g_EventCfgMode[clientId])
-        && (EVENTCFG_NOTSET != g_EventCfgMode[clientId]))
-    {
-        g_errorString[clientId] = L"The profiler was already configured";
-        return E_ACCESSDENIED;
-    }
-
-    g_eventCfgs.clear();
-    g_EventCfgMode[clientId] = EVENTCFG_CNTLIST;
+    g_EventCfgMode[clientId] |= EVENTCFG_COUNT_MODE;
 
     for (unsigned int i = 0; i < count; i++)
     {
@@ -2339,26 +2324,23 @@ HRESULT CpuPerfGetCountingEventCount(
 {
     gtUInt32 clientId = helpGetClientId();
     *pCount = 0;
+    HRESULT ret = E_FAIL;
 
-    if (EVENTCFG_CNTLIST != g_EventCfgMode[clientId])
+    if (IS_PMC_COUNT_MODE(clientId))
     {
-        return S_OK;
-    }
-
-    // gtUInt64 coreMask = 1ULL << core;
-    //count each counting event with the core in the core mask
-    for (gtList<EVENT_PROPERTIES>::iterator evIt  = g_eventCfgs.begin(), evEnd = g_eventCfgs.end(); evIt != evEnd; ++evIt)
-    {
-        // if ((0 != ((*evIt).ullCpuMask.QuadPart & coreMask))
-        //  && (clientId == (*evIt).ulClientId))
-        if ((((*evIt).ulCoreMaskCount == 0) || (isCoreSet((gtUInt64*)((*evIt).ullCpuMask.QuadPart), core)))
-            && (clientId == (*evIt).ulClientId))
+        //count each counting event with the core in the core mask
+        for (gtList<EVENT_PROPERTIES>::iterator evIt = g_eventCfgs.begin(), evEnd = g_eventCfgs.end(); evIt != evEnd; ++evIt)
         {
-            (*pCount)++;
+            if ((clientId == (*evIt).ulClientId) && (!isSampleEvent((*evIt))) && isProfileCore((*evIt), core))
+            {
+                (*pCount)++;
+            }
         }
+
+        ret = S_OK;
     }
 
-    return S_OK;
+    return ret;
 }
 
 
@@ -2375,22 +2357,20 @@ HRESULT CpuPerfGetAllEventCounts(
         return E_ACCESSDENIED;
     }
 
-    if (EVENTCFG_CNTLIST != g_EventCfgMode[clientId])
+    if (! IS_PMC_COUNT_MODE(clientId))
     {
         return E_FAIL;
     }
 
     memset(pCounts, 0, size * sizeof(gtUInt64));
 
-    // gtUInt64 coreMask = 1ULL << core;
     int countIndex = 0;
     HRESULT hr = S_OK;
 
     //count each counting event with the core in the core mask
     for (gtList<EVENT_PROPERTIES>::iterator evIt  = g_eventCfgs.begin(), evEnd = g_eventCfgs.end(); evIt != evEnd; ++evIt)
     {
-        // if (0 == ((*evIt).ullCpuMask.QuadPart & coreMask))
-        if ((! isCoreSet((gtUInt64*)((*evIt).ullCpuMask.QuadPart), core)) && ((*evIt).ulCoreMaskCount != 0))
+        if (isSampleEvent((*evIt)) || (! isProfileCore((*evIt), core)))
         {
             continue;
         }
@@ -2787,17 +2767,7 @@ HRESULT CpuPerfSetEventConfiguration(
         }
     }
 
-    if ((EVENTCFG_PROFILE != g_EventCfgMode[clientId])
-        && (EVENTCFG_NOTSET != g_EventCfgMode[clientId]))
-    {
-        g_errorString[clientId] = L"The profiler was already configured";
-        return E_ACCESSDENIED;
-    }
-
-    if (EVENTCFG_PROFILE != g_EventCfgMode[clientId])
-    {
-        g_EventCfgMode[clientId] = EVENTCFG_PROFILE;
-    }
+     g_EventCfgMode[clientId] |= EVENTCFG_SAMPLE_MODE;
 
     for (unsigned int j = 0; j < count; j++)
     {
@@ -2940,17 +2910,7 @@ HRESULT CpuPerfSetEventConfiguration(
         }
     }
 
-    if ((EVENTCFG_PROFILE != g_EventCfgMode[clientId])
-        && (EVENTCFG_NOTSET != g_EventCfgMode[clientId]))
-    {
-        g_errorString[clientId] = L"The profiler was already configured";
-        return E_ACCESSDENIED;
-    }
-
-    if (EVENTCFG_PROFILE != g_EventCfgMode[clientId])
-    {
-        g_EventCfgMode[clientId] = EVENTCFG_PROFILE;
-    }
+     g_EventCfgMode[clientId] |= EVENTCFG_SAMPLE_MODE;
 
     for (unsigned int j = 0; j < count; j++)
     {

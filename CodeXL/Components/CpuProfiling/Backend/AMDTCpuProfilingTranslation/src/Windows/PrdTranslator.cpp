@@ -738,9 +738,13 @@ bool PrdTranslator::InitPrdReader(PrdReader* pReader, const wchar_t* pFileName, 
 
         for (unsigned int i = 0; i < cfgCnt; i++)
         {
-            EventMaskType encodedEvent = EncodeEvent(pEvtCfg[i].ctl);
-            m_norms[encodedEvent] = pEvtCfg[i].ctr * groupNum / pEvtCfg[i].numApperance;
-            m_eventMap.insert(EventMap::value_type(encodedEvent, (gtUInt32) m_norms[encodedEvent]));
+            // Handle only the sample events
+            if (static_cast<gtInt64>(pEvtCfg[i].ctr) > 0)
+            {
+                EventMaskType encodedEvent = EncodeEvent(pEvtCfg[i].ctl);
+                m_norms[encodedEvent] = pEvtCfg[i].ctr * groupNum / pEvtCfg[i].numApperance;
+                m_eventMap.insert(EventMap::value_type(encodedEvent, (gtUInt32)m_norms[encodedEvent]));
+            }
         }
 
         if (nullptr != pEvtCfg)

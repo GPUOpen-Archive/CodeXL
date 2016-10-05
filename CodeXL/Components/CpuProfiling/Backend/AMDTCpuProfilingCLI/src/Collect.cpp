@@ -865,97 +865,117 @@ void CpuProfileCollect::VerifyAndSetEvents(EventConfiguration** ppDriverSampleEv
     unsigned int maxCounter = 0;
     fnGetEventCounters(&maxCounter);
 
-    DcEventConfig* pCurrentConfig = pEvents;
     gtMap<gtUInt64, gtUInt64> eventsMap;
 
-    for (int i = 0; (i < nbrOfEvents) && (S_OK == m_error); i++)
+    // First process sampling events
+    int processEvents = 2;
+    do
     {
-        //validate the event
-        unsigned int evSelect = GetEvent12BitSelect(pCurrentConfig->pmc);
+        DcEventConfig* pCurrentConfig = pEvents;
 
-        // Duplicate events in custom xml file leads to issues during collection/translation.
-        // If there are any duplicate events, report an error
-        if (eventsMap.find(pCurrentConfig->pmc.perf_ctl) == eventsMap.end())
+        for (int i = 0; (i < nbrOfEvents) && (S_OK == m_error); i++)
         {
-            eventsMap.insert(gtMap<gtUInt64, gtUInt64>::value_type(pCurrentConfig->pmc.perf_ctl, pCurrentConfig->eventCount));
-        }
-        else
-        {
-            reportError(false, L"Duplicate event (%#x) in the profile configuration.\n", evSelect);
-            m_error = E_FAIL;
-            break;
-        }
+            if (processEvents == 2 && !pCurrentConfig->pmc.bitSampleEvents)
+            {
+                pCurrentConfig++;
+                continue;
+            }
 
-        bool retVal = pEventFile->ValidateEvent(evSelect, pCurrentConfig->pmc.ucUnitMask);
+            if (processEvents == 1 && pCurrentConfig->pmc.bitSampleEvents)
+            {
+                pCurrentConfig++;
+                continue;
+            }
 
-        // Don't allow events which are not valid on this cpu
-        // TBD: should we check for - (eventData.m_minValidModel > model)
-        if (!retVal)
-        {
-            reportError(false, L"The configuration erronously contains an event (%#x) which is not\n"
-                L"available on this system.  Please choose a different\n"
-                L"configuration.", evSelect);
-            m_error = E_NOTAVAILABLE;
-            break;
-        }
+            //validate the event
+            unsigned int evSelect = GetEvent12BitSelect(pCurrentConfig->pmc);
+
+            // Duplicate events in custom xml file leads to issues during collection/translation.
+            // If there are any duplicate events, report an error
+            if (eventsMap.find(pCurrentConfig->pmc.perf_ctl) == eventsMap.end())
+            {
+                eventsMap.insert(gtMap<gtUInt64, gtUInt64>::value_type(pCurrentConfig->pmc.perf_ctl, pCurrentConfig->eventCount));
+            }
+            else
+            {
+                reportError(false, L"Duplicate event (%#x) in the profile configuration.\n", evSelect);
+                m_error = E_FAIL;
+                break;
+            }
+
+            bool retVal = pEventFile->ValidateEvent(evSelect, pCurrentConfig->pmc.ucUnitMask);
+
+            // Don't allow events which are not valid on this cpu
+            // TBD: should we check for - (eventData.m_minValidModel > model)
+            if (!retVal)
+            {
+                reportError(false, L"The configuration erronously contains an event (%#x) which is not\n"
+                    L"available on this system.  Please choose a different\n"
+                    L"configuration.", evSelect);
+                m_error = E_NOTAVAILABLE;
+                break;
+            }
 
 #if AMDT_BUILD_TARGET == AMDT_LINUX_OS
-        // On Linux, PERF does not support L2I events based sampling
-        CpuEvent eventData;
-        pEventFile->FindEventByValue(evSelect, eventData);
+            // On Linux, PERF does not support L2I events based sampling
+            CpuEvent eventData;
+            pEventFile->FindEventByValue(evSelect, eventData);
 
-        if (FAMILY_KB == cpuInfo.getFamily())
-        {
-            if (eventData.source.contains("L2I", Qt::CaseInsensitive))
+            if (FAMILY_KB == cpuInfo.getFamily())
             {
-                reportError(false, L"The Profile configuration contains L2I event.\n"
-                    L"L2I PMC events based sampling is not supported.\n"
-                    L"Please choose a different configuration");
-                m_error = E_NOTAVAILABLE;
-                break;
+                if (eventData.source.contains("L2I", Qt::CaseInsensitive))
+                {
+                    reportError(false, L"The Profile configuration contains L2I event.\n"
+                        L"L2I PMC events based sampling is not supported.\n"
+                        L"Please choose a different configuration");
+                    m_error = E_NOTAVAILABLE;
+                    break;
+                }
             }
-        }
 
-        // TBD: what do we do for Windows ?
-        // On Linux, PERF does not support NB events based sampling.
-        // if (FAMILY_OR == cpuInfo.getFamily())
-        {
-            if (eventData.source.startsWith("NB", Qt::CaseInsensitive))
+            // TBD: what do we do for Windows ?
+            // On Linux, PERF does not support NB events based sampling.
+            // if (FAMILY_OR == cpuInfo.getFamily())
             {
-                reportError(false, L"The Profile configuration contains a northbridge(NB) event:\n"
-                    L"[%#x] %ls\n which is not a valid sampling event. "
-                    L"Please fix the configuration",
-                    eventData.value, eventData.name.data());
-                m_error = E_NOTAVAILABLE;
-                break;
+                if (eventData.source.startsWith("NB", Qt::CaseInsensitive))
+                {
+                    reportError(false, L"The Profile configuration contains a northbridge(NB) event:\n"
+                        L"[%#x] %ls\n which is not a valid sampling event. "
+                        L"Please fix the configuration",
+                        eventData.value, eventData.name.data());
+                    m_error = E_NOTAVAILABLE;
+                    break;
+                }
             }
-        }
 #endif // AMDT_LINUX_OS
 
-        // Save the event configuration that will be written to the hardware
-        if (pCurrentConfig->pmc.bitSampleEvents)
-        {
-            (*ppDriverSampleEvents)[m_nbrSampleEvents].performanceEvent = pCurrentConfig->pmc.perf_ctl;
-            (*ppDriverSampleEvents)[m_nbrSampleEvents].value = pCurrentConfig->eventCount;
-            (*ppDriverSampleEvents)[m_nbrSampleEvents].eventCounter = evCounter;
-            m_nbrSampleEvents++;
-        }
-        else
-        {
-            (*ppDriverCountEvents)[m_nbrCountEvents].performanceEvent = pCurrentConfig->pmc.perf_ctl;
-            (*ppDriverCountEvents)[m_nbrCountEvents].value = pCurrentConfig->eventCount;
-            (*ppDriverCountEvents)[m_nbrCountEvents].eventCounter = evCounter;
-            m_nbrCountEvents++;
-            m_countEventVec.push_back(pCurrentConfig->pmc.perf_ctl);
+            // Save the event configuration that will be written to the hardware
+            if (pCurrentConfig->pmc.bitSampleEvents)
+            {
+                (*ppDriverSampleEvents)[m_nbrSampleEvents].performanceEvent = pCurrentConfig->pmc.perf_ctl;
+                (*ppDriverSampleEvents)[m_nbrSampleEvents].value = pCurrentConfig->eventCount;
+                (*ppDriverSampleEvents)[m_nbrSampleEvents].eventCounter = evCounter;
+                m_nbrSampleEvents++;
+            }
+            else
+            {
+                (*ppDriverCountEvents)[m_nbrCountEvents].performanceEvent = pCurrentConfig->pmc.perf_ctl;
+                (*ppDriverCountEvents)[m_nbrCountEvents].value = pCurrentConfig->eventCount;
+                (*ppDriverCountEvents)[m_nbrCountEvents].eventCounter = evCounter;
+                m_nbrCountEvents++;
+                m_countEventVec.push_back(pCurrentConfig->pmc.perf_ctl);
+            }
+
+            if (++evCounter == maxCounter)
+            {
+                evCounter = 0;
+            }
+
+            pCurrentConfig++;
         }
 
-        if (++evCounter == maxCounter)
-        {
-            evCounter = 0;
-        }
-
-        pCurrentConfig++;
-    }
+        processEvents--;
+    } while (processEvents > 0);
 
     eventsMap.clear();
 
