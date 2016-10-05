@@ -1059,7 +1059,7 @@ void CpuProfileReport::ReportSampleCount(bool sepByCore)
     AMDTSampleValueVec sampleValueVec;
     m_profileDbReader.GetSampleCount(sepByCore, sampleValueVec);
     
-    fprintf(stderr, "\ncoreId     counterId     samplingInterval     nbrSamples\n");
+    fprintf(stderr, "\nCPCLI>>> coreId     counterId     samplingInterval     nbrSamples\n");
 
     for (const auto& value : sampleValueVec)
     {
@@ -1073,7 +1073,7 @@ void CpuProfileReport::ReportSampleCount(bool sepByCore)
         printStr.appendFormattedString(L"%4d %12x %16llu %16llu",
             value.m_coreId, counterInfo->m_hwEventId, counterInfo->m_samplingInterval, static_cast<AMDTUInt64>(value.m_sampleCount));
 
-        fprintf(stderr, "%s\n", printStr.asASCIICharArray());
+        fprintf(stderr, "CPCLI>>> %s\n", printStr.asASCIICharArray());
     }
 
     return;
