@@ -108,6 +108,7 @@
     <ClCompile Include="ParseCmdLine.cpp" />
     <ClCompile Include="PerfMarkerAtpFile.cpp" />
     <ClCompile Include="..\Common\StackTraceAtpFile.cpp" />
+    <ClCompile Include="CSVFileMerger.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\HSAFdnTrace\HSAAtpFile.h" />
@@ -120,6 +121,7 @@
     <ClInclude Include="ParseCmdLine.h" />
     <ClInclude Include="PerfMarkerAtpFile.h" />
     <ClInclude Include="..\Common\StackTraceAtpFile.h" />
+    <ClInclude Include="CSVFileMerger.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTBaseTools\AMDTBaseToolsVS14.vcxproj">

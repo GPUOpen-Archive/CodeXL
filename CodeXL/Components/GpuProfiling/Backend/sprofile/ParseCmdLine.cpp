@@ -1665,6 +1665,7 @@ std::vector<CounterPassInfo> GetNumberOfPassFromGPUPerfAPI(GPA_API_Type apiType,
                 unsigned int numPass = 0;
                 bool considerNumberOfPassToBeOne = false;
                 CounterList computeCounterList;
+                std::vector<std::string> counterListForHSA;
 
                 if (!counterList.empty())
                 {
@@ -1700,46 +1701,7 @@ std::vector<CounterPassInfo> GetNumberOfPassFromGPUPerfAPI(GPA_API_Type apiType,
                 {
                     numPass = 1u;
                     ppCounterScheduler->DisableAllCounters();
-                    /*std::vector<std::string> counterListForHSA;
-
-                    for (std::vector<std::string>::const_iterator availableCountersIter = computeCounterList.begin(); availableCountersIter != computeCounterList.end(); ++availableCountersIter)
-                    {
-                        bool succeed = true;
-                        unsigned int counterIndex;
-                        unsigned int tempNumberOfPass;
-
-                        succeed &= ppCounterAccessor->GetCounterIndex(availableCountersIter->c_str(), &counterIndex);
-                        succeed &= ppCounterScheduler->EnableCounter(counterIndex) == GPA_STATUS_OK;
-                        succeed &= ppCounterScheduler->GetNumRequiredPasses(&tempNumberOfPass) == GPA_STATUS_OK;
-
-                        if (succeed)
-                        {
-                            if (tempNumberOfPass == numPass)
-                            {
-                                counterListForHSA.push_back(availableCountersIter->c_str());
-                            }
-                            else
-                            {
-                                ppCounterScheduler->DisableCounter(counterIndex);
-                            }
-                        }
-                    }
-
-                    computeCounterList.clear();
-                    computeCounterList = counterListForHSA;*/
                 }
-                /*else
-                {
-                    for (unsigned int j = 0; j < computeCounterList.size(); ++j)
-                    {
-                        uint32_t index = 0;
-                        success &= ppCounterAccessor->GetCounterIndex(computeCounterList[j].c_str(), &index);
-                        success &= ppCounterScheduler->EnableCounter(index) == GPA_STATUS_OK;
-                    }
-
-                    success &= (GPA_STATUS_OK == ppCounterScheduler->GetNumRequiredPasses(&numPass));
-                }*/
-
 
                 for (std::vector<std::string>::const_iterator availableCountersIter = computeCounterList.begin(); availableCountersIter != computeCounterList.end(); ++availableCountersIter)
                 {
@@ -1752,10 +1714,16 @@ std::vector<CounterPassInfo> GetNumberOfPassFromGPUPerfAPI(GPA_API_Type apiType,
                         unsigned int tempNumberPass;
                         success &= (GPA_STATUS_OK == ppCounterScheduler->GetNumRequiredPasses(&tempNumberPass));
 
-                        if (success && tempNumberPass != numPass)
+                        if (success)
                         {
-                            ppCounterScheduler->DisableCounter(index);
-                            computeCounterList.erase(availableCountersIter);
+                            if (tempNumberPass == numPass)
+                            {
+                                counterListForHSA.push_back(availableCountersIter->c_str());
+                            }
+                            else
+                            {
+                                ppCounterScheduler->DisableCounter(index);
+                            }
                         }
                     }
                 }
@@ -1763,6 +1731,11 @@ std::vector<CounterPassInfo> GetNumberOfPassFromGPUPerfAPI(GPA_API_Type apiType,
                 if (!considerNumberOfPassToBeOne)
                 {
                     success &= (GPA_STATUS_OK == ppCounterScheduler->GetNumRequiredPasses(&numPass));
+                }
+                else
+                {
+                    computeCounterList.clear();
+                    computeCounterList = counterListForHSA;
                 }
 
                 if (success)
@@ -1820,14 +1793,14 @@ void ListCounterToFileForMaxPass(std::string counterFile, unsigned int maxPass)
         }
     };
 
-    //OpenCL
+    // OpenCL
     apiType = GPA_API_OPENCL;
     apiTypeString = "OpenCL";
 
     CounterToFileForMaxPassLambda();
 
 #if defined (_LINUX) || defined (LINUX)
-    //HSA
+    // HSA
     apiType = GPA_API_HSA;
     apiTypeString = "HSA";
 
@@ -1836,7 +1809,7 @@ void ListCounterToFileForMaxPass(std::string counterFile, unsigned int maxPass)
 #endif
 
 #if defined _WIN32
-    //Direct Compute
+    // Direct Compute
     apiType = GPA_API_DIRECTX_11;
     apiTypeString = "DC";
 

@@ -80,7 +80,8 @@ OBJS = \
 	./$(OBJ_DIR)/ADLUtil.o \
 	./$(OBJ_DIR)/HSAModule.o \
 	./$(OBJ_DIR)/HSAUtils.o \
-        ./$(OBJ_DIR)/GPUPerfAPICounterLoader.o \
+	./$(OBJ_DIR)/GPUPerfAPICounterLoader.o \
+	./$(OBJ_DIR)/CSVFileMerger.o \
 
 include $(DEPTH)/Build/CommonTargets.mk
 
