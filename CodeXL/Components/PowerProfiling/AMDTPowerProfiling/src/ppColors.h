@@ -47,7 +47,7 @@ private:
     ppColorsMap();
 
     /// counters to colors map
-    QMap<unsigned int, QColor> m_colorsMap;
+    QMap<int, QColor> m_colorsMap;
 
     /// number of dGpus (for dynamic color calculations)
     unsigned int m_dgpusCount;
