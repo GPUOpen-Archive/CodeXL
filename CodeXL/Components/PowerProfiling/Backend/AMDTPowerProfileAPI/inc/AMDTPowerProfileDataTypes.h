@@ -96,6 +96,7 @@ typedef enum
     AMDT_PWR_CATEGORY_TIME,               /**< Time */
     AMDT_PWR_CATEGORY_COUNT,              /**< Generic count value */
     AMDT_PWR_CATEGORY_ENERGY,             /**< Energy consumed */
+    AMDT_PWR_CATEGORY_CORRELATED_POWER,   /**< Energy consumed */
     AMDT_PWR_CATEGORY_CNT,                /**< Total category count */
 } AMDTPwrCategory;
 
@@ -212,6 +213,7 @@ typedef struct AMDTPwrCounterDesc
     AMDTFloat64          m_minValue;        /**< Minimum possible counter value */
     AMDTFloat64          m_maxValue;        /**< Maximum possible counter value */
     AMDTPwrUnit          m_units;           /**< Seconds/MHz/Joules/Watts/Volt/Ampere */
+    AMDTUInt32           m_parentCounterId; /**< Counter id of the parent counter if applicable*/
 } AMDTPwrCounterDesc;
 
 /** Structure represents a counter ID and its value

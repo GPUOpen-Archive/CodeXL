@@ -2712,6 +2712,12 @@ AMDTResult AMDTPwrGetCategoryInfo(AMDTPwrCategory category, AMDTPwrCategoryInfo*
                 break;
             }
 
+            case AMDT_PWR_CATEGORY_CORRELATED_POWER:
+            {
+                memcpy(pCategory->m_name, PP_STR_CorrelatedPowerCategoryName, strlen(PP_STR_CorrelatedPowerCategoryName));
+                break;
+            }
+
             case AMDT_PWR_CATEGORY_CNT:
             default:
             {

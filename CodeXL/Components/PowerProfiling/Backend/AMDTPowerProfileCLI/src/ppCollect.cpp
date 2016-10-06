@@ -18,7 +18,7 @@
     #include <fstream>
 #endif
 
-#define MAX_PROFILE_COUNTER (100)
+#define MAX_PROFILE_COUNTER (256)
 //
 //  Public member functions
 //
@@ -587,7 +587,6 @@ AMDTResult ppCollect::ValidateCounters()
         for (gtList<AMDTUInt32>::iterator iter = deviceIdList.begin(); iter != deviceIdList.end(); iter++)
         {
             AMDTUInt32 deviceId = (*iter);
-            //            bool foundDevice = false;
             AMDTUInt32 count = 0;
             AMDTPwrCounterDesc* pDesc = nullptr;
 
@@ -601,31 +600,7 @@ AMDTResult ppCollect::ValidateCounters()
                 }
             }
 
-#if 0
 
-            for (AMDTUInt32 i = 0; i < m_nbrSupportedCounters; i++)
-            {
-                if (((m_pSupportedCountersDesc + i)->m_deviceId == deviceId)
-                    || (AMDT_PWR_ALL_DEVICES == deviceId)
-                    || (0 == deviceId))
-                {
-                    // Add only the simple counter
-                    if (AMDTUInt32(AMDT_PWR_VALUE_SINGLE == (m_pSupportedCountersDesc + i)->m_aggregation))
-                    {
-                        AddValidCounterId((m_pSupportedCountersDesc + i)->m_counterID);
-                    }
-
-                    foundDevice = true;
-                }
-            }
-
-            if (false == foundDevice)
-            {
-                ReportError(false, "Invalid device(%u).\n", deviceId);
-                m_error = AMDT_ERROR_FAIL;
-            }
-
-#endif
         }
 
         gtList<AMDTUInt32> counterIdList = m_args.GetCounterIDList();

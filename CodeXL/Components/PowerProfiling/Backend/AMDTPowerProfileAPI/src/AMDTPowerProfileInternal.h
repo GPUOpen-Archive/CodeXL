@@ -193,7 +193,7 @@ enum AMDTPwrAttributeInstanceType
 struct AMDTPwrCounterBasicInfo
 {
     AMDTUInt32 m_attrId;
-    AMDTUInt16 m_len;                             // Length in bytes
+    AMDTUInt16 m_parentCounterId;                 // Length in bytes
     char    m_name[PWR_MAX_NAME_LEN];             // Name of the attribute
     char    m_description[PWR_MAX_DESC_LEN];      // Description of the attribute
     AMDTPwrAttributeUnitType m_unitType;          // The attribute's unit type

@@ -13,7 +13,7 @@
 //
 {
     /*attr_id*/COUNTERID_SMU8_APU_PWR_CU,
-    /*len*/8,
+    /*parentCoutnerId*/COUNTERID_SMU8_APU_PWR_APU,
     /*name*/"Power",
     /*description*/"Average CPU Compute Unit Power for the sampling period, reported in Watts. This is an estimated consumption value which is calculated based on APU activity levels.",
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_WATT,
@@ -24,7 +24,7 @@
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_TEMP_CU,
-    /*len*/8,
+    /*parentCoutnerId*/0,
     /*name*/"Temp",
     /*description*/"Average CPU Compute Unit Temperature for the sampling period, reported in Celsius. This is an estimated temperature value which is calculated based on APU activity levels. The reported value is normalized and scaled, relative to the specific processor's maximum operating temperature. This value can be used to indicate rise and decline of temperature.",
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_CENTIGRADE,
@@ -35,7 +35,7 @@
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_C0STATE_RES,
-    /*len*/8,
+    /*parentCoutnerId*/0,
     /*name*/"C0 Residency",
     /*description*/"Percentage of the sample interval time during which the CPU Compute Unit was in C0 state.",
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_PERCENT,
@@ -47,7 +47,7 @@
 
 {
     /*attr_id*/COUNTERID_SMU8_APU_C1STATE_RES,
-    /*len*/8,
+    /*parentCoutnerId*/0,
     /*name*/"C1 Residency",
     /*description*/"Percentage of the sample interval time during which the CPU Compute Unit was in C1 state.",
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_PERCENT,
@@ -59,7 +59,7 @@
 
 {
     /*attr_id*/COUNTERID_SMU8_APU_CC6_RES,
-    /*len*/8,
+    /*parentCoutnerId*/0,
     /*name*/"CC6 Residency",
     /*description*/"Percentage of the sample interval time during which the CPU Compute Unit was in CC6 state.",
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_PERCENT,
@@ -70,7 +70,7 @@
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_PWR_VDDGFX,
-    /*len*/8,
+    /*parentCoutnerId*/COUNTERID_SMU8_APU_PWR_APU,
     /*name*/ PP_STR_Counter_Power_GFX,
     /*description*/"Average power consumed by the Integrated-GPU graphics core during the sampling period, reported in Watts. This is an estimated consumption value which is calculated based on APU activity levels.",
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_WATT,
@@ -81,7 +81,7 @@
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_PWR_APU,
-    /*len*/8,
+    /*parentCoutnerId*/0,
     /*name*/ PP_STR_Counter_Power_TotalAPU,
     /*description*/"Average APU Power for the sampling period, reported in Watts. This is an estimated consumption value which is calculated based on APU activity levels.",
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_WATT,
@@ -92,7 +92,7 @@
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_TEMP_VDDGFX,
-    /*len*/8,
+    /*parentCoutnerId*/0,
     /*name*/ PP_STR_Counter_Temp_GFX,
     /*description*/"Average temperature of the Integrated-GPU graphics core during the sampling period, reported in Celsius. This is an estimated temperature value which is calculated based on APU activity levels. The reported value is normalized and scaled relative to the specific processor's maximum operating temperature. This value can be used to indicate rise and decline of temperature.",
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_CENTIGRADE,
@@ -103,7 +103,7 @@
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_FREQ_IGPU,
-    /*len*/8,
+    /*parentCoutnerId*/0,
     /*name*/ PP_STR_Counter_AvgFreq_GFX,
     /*description*/"Average sclk Frequency (clock source) for the Integrated-GPU graphics core sampling period, reported in MHz.",
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_MEGA_HERTZ,
@@ -114,7 +114,7 @@
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_PWR_VDDIO,
-    /*len*/8,
+    /*parentCoutnerId*/COUNTERID_SMU8_APU_PWR_APU,
     /*name*/ PP_STR_Counter_Power_IOCtrl,
     /*description*/"Average power consumed by the DDR Memory Controller, PCIe Controller and other misc IOs powered by the VDDIO power rail during the sampling period, reported in Watts.",
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_WATT,
@@ -125,7 +125,7 @@
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_PWR_VDDNB,
-    /*len*/8,
+    /*parentCoutnerId*/0,
     /*name*/ PP_STR_Counter_Power_NB,
     /*description*/"Average North Bridge Power for the sampling period, reported in Watts. This includes the power consumed by North Bridge sub-components: Graphics Memory Controller (GMC), Graphics IO (GIO), Display Controller Engine (DCE), Universal Video Decoder (UVD), Video Compression Engine (VCE), Audio Co-Processor (ACP), Unified North Bridge (UNB) and System Management Unit (SMU). Note that power consumed by UVD, VCE, ACP, UNB and SMU is also monitored as individual counters.",
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_WATT,
@@ -136,7 +136,7 @@
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_PWR_VDDP,
-    /*len*/8,
+    /*parentCoutnerId*/COUNTERID_SMU8_APU_PWR_APU,
     /*name*/ PP_STR_Counter_Power_GFXCtrl,
     /*description*/"Average power consumed by the integrated display controller and other components powered by the VDDP power rail during the sampling period, reported in Watts.",
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_WATT,
@@ -148,7 +148,7 @@
 // Carrizo specifi counters
 {
     /*attr_id*/COUNTERID_SMU8_APU_PWR_UVD,
-    /*len*/8,
+    /*parentCoutnerId*/COUNTERID_SMU8_APU_PWR_APU,
     /*name*/ PP_STR_Counter_Power_UVD,
     /*description*/"Average power consumed by the high performance Universal Video Decoder (UVD), reported in Watts. The power consumed by this component is also included in the NB Power counter.",
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_WATT,
@@ -159,7 +159,7 @@
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_PWR_VCE,
-    /*len*/8,
+    /*parentCoutnerId*/COUNTERID_SMU8_APU_PWR_APU,
     /*name*/ PP_STR_Counter_Power_VCE,
     /*description*/"Average power consumed by the Video Compression Engine (VCE), reported in Watts. The power consumed by this component is also included in the NB Power counter.",
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_WATT,
@@ -170,7 +170,7 @@
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_PWR_ACP,
-    /*len*/8,
+    /*parentCoutnerId*/COUNTERID_SMU8_APU_PWR_APU,
     /*name*/ PP_STR_Counter_Power_ACP,
     /*description*/"Average power consumed by the Audio Co-Processor (ACP), reported in Watts. The power consumed by this component is also included in the NB Power counter.",
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_WATT,
@@ -181,7 +181,7 @@
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_PWR_UNB,
-    /*len*/8,
+    /*parentCoutnerId*/0,
     /*name*/ PP_STR_Counter_Power_UNB,
     /*description*/"Average power consumed by the Unified North Bridge (UNB), reported in Watts. The power consumed by this component is also included in the NB Power counter.",
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_WATT,
@@ -192,7 +192,7 @@
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_PWR_SMU,
-    /*len*/8,
+    /*parentCoutnerId*/COUNTERID_SMU8_APU_PWR_APU,
     /*name*/ PP_STR_Counter_Power_SMU,
     /*description*/"Average power consumed by the System Management Unit (SMU) micro controller, reported in Watts. The power consumed by this component is also included in the NB Power counter.",
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_WATT,
@@ -203,7 +203,7 @@
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_PWR_ROC,
-    /*len*/8,
+    /*parentCoutnerId*/COUNTERID_SMU8_APU_PWR_APU,
     /*name*/ PP_STR_Counter_Power_RoC,
     /*description*/"Average power for the rest of the chip. This includes power consumed by parts of the APU not specifically captured by the other power counters. Reported in Watts.",
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_WATT,
@@ -214,7 +214,7 @@
 },
 {
     /*attr_id*/COUNTERID_SMU8_APU_FREQ_ACLK,
-    /*len*/8,
+    /*parentCoutnerId*/0,
     /*name*/ PP_STR_Counter_AvgFreq_ACP,
     /*description*/"Average aclk Frequency (clock source) for the Audio Co-processor core sampling period, reported in MHz.",
     /*unittype*/(AMDTPwrAttributeUnitType)PWR_UNIT_TYPE_MEGA_HERTZ,

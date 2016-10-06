@@ -29,6 +29,8 @@
 #define PP_STR_TimeCategoryName         "Time"
 #define PP_STR_CountCategoryName        "Count"
 #define PP_STR_EnergyCategoryName       "Energy"
+#define PP_STR_CorrelatedPowerCategoryName       "Correlated Power"
+
 #define PP_STR_UnsupportedCategoryName  "Unsupported Category"
 
 // Counter names:

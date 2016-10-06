@@ -1572,6 +1572,7 @@ void PwrInsertDeviceCounters(AMDTPwrDevice* dev, AMDTUInt32 instId, AMDTUInt32 l
                     counter.m_desc.m_deviceId = dev->m_deviceID;
                     counter.m_desc.m_category = (AMDTPwrCategory)pInfo->m_category;
                     counter.m_desc.m_units = (AMDTPwrUnit)pInfo->m_unitType;
+                    counter.m_desc.m_parentCounterId = pInfo->m_parentCounterId;
                     counter.m_desc.m_aggregation = (AMDTPwrAggregation)pInfo->m_aggr;
                     counter.m_desc.m_name = (char*)GetMemoryPoolBuffer(&g_controlMemoryPool,
                                                                        sizeof(char) * PWR_MAX_NAME_LEN);

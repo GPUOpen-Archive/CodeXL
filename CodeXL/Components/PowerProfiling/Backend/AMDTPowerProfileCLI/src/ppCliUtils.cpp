@@ -30,6 +30,8 @@ const char* STR_AMDT_PWR_CATEGORY_DVFS = "DVFS";
 const char* STR_AMDT_PWR_CATEGORY_PROCESS = "Process";
 const char* STR_AMDT_PWR_CATEGORY_TIME = "Time";
 const char* STR_AMDT_PWR_CATEGORY_COUNT = "Generic Count Value";
+const char* STR_AMDT_PWR_CATEGORY_ENERGY = "Energy";
+const char* STR_AMDT_PWR_CATEGORY_CORRELATED_POWER = "Correlated Power";
 const char* STR_AMDT_PWR_CATEGORY_UNKNOWN = "Unknown";
 
 // Aggregation Type String
@@ -92,6 +94,14 @@ bool ppCliUtils::GetCategoryString(AMDTPwrCategory category, gtString& categoryS
 
         case AMDT_PWR_CATEGORY_COUNT:
             pStr = STR_AMDT_PWR_CATEGORY_COUNT;
+            break;
+
+        case AMDT_PWR_CATEGORY_ENERGY:
+            pStr = STR_AMDT_PWR_CATEGORY_ENERGY;
+            break;
+
+        case AMDT_PWR_CATEGORY_CORRELATED_POWER:
+            pStr = STR_AMDT_PWR_CATEGORY_CORRELATED_POWER;
             break;
 
         default:
