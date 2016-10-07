@@ -131,23 +131,8 @@ bool StringUtils::ParseMajorMinorVersion(const string& strVersion, unsigned int&
 
 string StringUtils::Trim(const string& str)
 {
-    string ret;
-    ret.clear();
-    size_t endpos = str.find_last_not_of(" \t");
-
-    if (string::npos != endpos)
-    {
-        ret = str.substr(0, endpos + 1);
-    }
-
-    size_t startpos = ret.find_first_not_of(" \t");
-
-    if (string::npos != startpos)
-    {
-        ret = ret.substr(startpos);
-    }
-
-    return ret;
+    string tempString = str;
+    return TrimInPlace(tempString);
 }
 
 string StringUtils::Replace(const string& input, const string& original, const string& replace)
