@@ -26,7 +26,6 @@
 #define _RAW_DATA_FILE_HEADER_H_
 #include <AMDTPwrProfAttributes.h>
 #include <AMDTDriverTypedefs.h>
-#include <AMDTSmu9Interface.h>
 #include <AMDTSmu8Interface.h>
 #include <AMDTSmu7Interface.h>
 #include <AMDTAccessPmcData.h>
@@ -306,7 +305,6 @@ typedef struct SmuAccess
 {
     union
     {
-        Smu9Interface m_smu9;
         Smu8Interface m_smu8;
         Smu7Interface m_smu7;
     };
