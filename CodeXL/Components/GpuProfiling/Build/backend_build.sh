@@ -439,7 +439,7 @@ if !($bZipOnly) ; then
       cp "$ACTIVITYLOGGERDIR/CXLActivityLogger.h" "$BIN/$ACTIVITYLOGGER/include/$ACTIVITYLOGGER.h"
       cp "$ACTIVITYLOGGERDIR/Doc/AMDTActivityLogger.pdf" "$BIN/$ACTIVITYLOGGER/doc/AMDTActivityLogger.pdf"
       #jqPlot files
-      cp "$JQPLOT_PATH/*" "$BIN/jqPlot"
+      cp "$JQPLOT_PATH/"* "$BIN/jqPlot"
    fi
 fi
 
@@ -459,7 +459,7 @@ if [ -d "$CODEXLOUTPUTREL" ]; then
       cp -R "$BIN/$ACTIVITYLOGGER" "$CODEXLOUTPUTREL/bin"
       cp -R "$BIN/jqPlot" "$CODEXLOUTPUTREL/bin"
 
-      cp -f "$BIN/*" "$CODEXLOUTPUTREL/bin"
+      cp -f "$BIN/"* "$CODEXLOUTPUTREL/bin"
    fi
 fi
 
@@ -472,7 +472,7 @@ if [ -d $CODEXLOUTPUTDBG ]; then
       cp -R "$BIN/$ACTIVITYLOGGER" "$CODEXLOUTPUTDBG/bin"
       cp -R "$BIN/jqPlot" "$CODEXLOUTPUTDBG/bin"
 
-      cp -f "$BIN/*" "$CODEXLOUTPUTDBG/bin"
+      cp -f "$BIN/"* "$CODEXLOUTPUTDBG/bin"
    fi
 fi
 
@@ -487,7 +487,7 @@ if $bZip || $bZipOnly ; then
    echo "Creating public build tarball..." | tee -a "$LOGFILE"
    mkdir -p "$BUILD_PATH/$PRODUCTNAME-$VERSION/bin"
 
-   cp "$BIN/*" "$BUILD_PATH/$PRODUCTNAME-$VERSION/bin"
+   cp "$BIN/"* "$BUILD_PATH/$PRODUCTNAME-$VERSION/bin"
    cp -R "$BIN/$ACTIVITYLOGGER" "$BUILD_PATH/$PRODUCTNAME-$VERSION"
    cp -R "$BIN/jqPlot" "$BUILD_PATH/$PRODUCTNAME-$VERSION"
    chmod -R 755 "$BUILD_PATH/$PRODUCTNAME-$VERSION"
