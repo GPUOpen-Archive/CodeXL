@@ -136,6 +136,6 @@
 [submodule "Common/Src/Misc"]
 	path = Common/Src/Misc
 	url = ../common-src-Misc.git
-[submodule "Common/Src/HASUtils"]
+[submodule "Common/Src/HSAUtils"]
 	path = Common/Src/HSAUtils
 	url = ../common-src-HSAUtils.git
