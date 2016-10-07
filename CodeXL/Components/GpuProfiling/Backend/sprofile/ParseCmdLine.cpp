@@ -1569,87 +1569,97 @@ std::vector<DeviceInfo> GetDeviceInfoList(GPA_API_Type apiType)
                     OpenCLModule clModule;
                     clModule.LoadModule();
 
-                    cl_platform_id* platformId = nullptr;
+                    cl_platform_id* platformIds = nullptr;
                     cl_uint number_platforms;
-                    success &= CL_SUCCESS == clModule.GetPlatformIDs(NULL, platformId, &number_platforms);
+                    success &= CL_SUCCESS == clModule.GetPlatformIDs(NULL, platformIds, &number_platforms);
 
                     if (success && (number_platforms >= 1))
                     {
-                        platformId = new(std::nothrow) cl_platform_id[number_platforms];
+                        platformIds = new(std::nothrow) cl_platform_id[number_platforms];
 
-                        success &= CL_SUCCESS == clModule.GetPlatformIDs(number_platforms, platformId, NULL);
+                        success &= CL_SUCCESS == clModule.GetPlatformIDs(number_platforms, platformIds, NULL);
 
                         for (unsigned int platformIter = 0; success && (platformIter < number_platforms); platformIter++)
                         {
-                            cl_uint numberOfDevices = 0;
-                            cl_uint numberOfEntries = 0;
-                            success &= CL_SUCCESS == clModule.GetDeviceIDs(platformId[platformIter], CL_DEVICE_TYPE_GPU, numberOfEntries, NULL, &numberOfDevices);
+                            size_t platformVendorNameParameterSize;
+                            success &= CL_SUCCESS == clModule.GetPlatformInfo(platformIds[platformIter], CL_PLATFORM_VENDOR,
+                                                                              platformVendorNameParameterSize, nullptr, &platformVendorNameParameterSize);
 
-                            if (success && (numberOfDevices >= 1))
+                            if (platformVendorNameParameterSize > 0)
                             {
-                                cl_device_id* deviceIds = new(std::nothrow) cl_device_id[numberOfDevices];
-                                success &= CL_SUCCESS == clModule.GetDeviceIDs(platformId[platformIter], CL_DEVICE_TYPE_GPU, numberOfDevices, deviceIds, NULL);
+                                char* platformVendorName = new(std::nothrow) char[platformVendorNameParameterSize];
 
-                                for (unsigned int deviceIdIter = 0; success && (deviceIdIter < numberOfDevices); deviceIdIter++)
+                                if (nullptr != platformVendorName)
                                 {
-                                    size_t paramValueSize;
-                                    success &= CL_SUCCESS == clModule.GetDeviceInfo(deviceIds[deviceIdIter], CL_DEVICE_VENDOR, paramValueSize, nullptr, &paramValueSize);
+                                    success &= CL_SUCCESS == clModule.GetPlatformInfo(platformIds[platformIter], CL_PLATFORM_VENDOR,
+                                                                                      platformVendorNameParameterSize, reinterpret_cast<void*>(platformVendorName), nullptr);
 
-                                    if (success && (paramValueSize > 0))
+                                    std::string platformVendorNameString(platformVendorName);
+
+                                    if (success && (platformVendorNameString.compare(amdVendor)==0))
                                     {
-                                        void* paramVendorName = malloc(paramValueSize);
-                                        success &= CL_SUCCESS == clModule.GetDeviceInfo(deviceIds[deviceIdIter], CL_DEVICE_VENDOR, paramValueSize, paramVendorName, nullptr);
-                                        std::string vendorName(reinterpret_cast<char*>(paramVendorName));
+                                        cl_uint numberOfDevices = 0;
+                                        cl_uint numberOfEntries = 0;
+                                        success &= CL_SUCCESS == clModule.GetDeviceIDs(platformIds[platformIter], CL_DEVICE_TYPE_GPU, numberOfEntries, NULL, &numberOfDevices);
 
-                                        if (success && (0 == vendorName.compare(amdVendor)))
+                                        if (success && (numberOfDevices >= 1))
                                         {
-                                            success &= CL_SUCCESS == clModule.GetDeviceInfo(deviceIds[deviceIdIter], CL_DEVICE_NAME, paramValueSize, nullptr, &paramValueSize);
+                                            cl_device_id* deviceIds = new(std::nothrow) cl_device_id[numberOfDevices];
+                                            success &= CL_SUCCESS == clModule.GetDeviceIDs(platformIds[platformIter], CL_DEVICE_TYPE_GPU, numberOfDevices, deviceIds, NULL);
 
-                                            if (success && (paramValueSize > 0))
+                                            for (unsigned int deviceIdIter = 0; success && (deviceIdIter < numberOfDevices); deviceIdIter++)
                                             {
-                                                void* paramDeviceName = malloc(paramValueSize);
-                                                success &= CL_SUCCESS == clModule.GetDeviceInfo(deviceIds[deviceIdIter], CL_DEVICE_NAME, paramValueSize, paramDeviceName, nullptr);
+                                                size_t paramValueSize;
+                                                success &= CL_SUCCESS == clModule.GetDeviceInfo(deviceIds[deviceIdIter], CL_DEVICE_NAME,
+                                                                                                paramValueSize, nullptr, &paramValueSize);
 
-                                                if (success)
+                                                if (success && (paramValueSize > 0))
                                                 {
-                                                    std::string deviceName(reinterpret_cast<char*>(paramDeviceName));
-                                                    std::vector<GDT_GfxCardInfo> cardList;
-                                                    AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceName.c_str(), cardList);
+                                                    char* paramDeviceName = new(std::nothrow) char[paramValueSize];
+                                                    success &= CL_SUCCESS == clModule.GetDeviceInfo(deviceIds[deviceIdIter], CL_DEVICE_NAME,
+                                                                                                    paramValueSize, reinterpret_cast<void*>(paramDeviceName), nullptr);
 
-                                                    if (cardList.size() > 0)
+                                                    if (success)
                                                     {
-                                                        deviceInfo.m_deviceId = static_cast<unsigned int>(cardList.begin()->m_deviceID);
-                                                        deviceInfo.m_revId = static_cast<unsigned int>(cardList.begin()->m_revID);
-                                                        deviceInfo.m_deviceCALName = cardList.begin()->m_szCALName;
-                                                        deviceInfo.m_generation = cardList.begin()->m_generation;
-                                                        deviceInfoList.push_back(deviceInfo);
+                                                        std::string deviceName(reinterpret_cast<char*>(paramDeviceName));
+                                                        std::vector<GDT_GfxCardInfo> cardList;
+                                                        AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceName.c_str(), cardList);
+
+                                                        if (cardList.size() > 0)
+                                                        {
+                                                            deviceInfo.m_deviceId = static_cast<unsigned int>(cardList.begin()->m_deviceID);
+                                                            deviceInfo.m_revId = static_cast<unsigned int>(cardList.begin()->m_revID);
+                                                            deviceInfo.m_deviceCALName = cardList.begin()->m_szCALName;
+                                                            deviceInfo.m_generation = cardList.begin()->m_generation;
+                                                            deviceInfoList.push_back(deviceInfo);
+                                                        }
+                                                    }
+
+                                                    if (nullptr != paramDeviceName)
+                                                    {
+                                                        delete[] paramDeviceName;
                                                     }
                                                 }
-
-                                                if (paramDeviceName)
-                                                {
-                                                    free(paramDeviceName);
-                                                }
                                             }
-                                        }
 
-                                        if (paramVendorName)
-                                        {
-                                            free(paramVendorName);
+                                            if (nullptr != deviceIds)
+                                            {
+                                                delete[] deviceIds;
+                                            }
                                         }
                                     }
                                 }
 
-                                if (nullptr != deviceIds)
+                                if (nullptr != platformVendorName)
                                 {
-                                    delete[] deviceIds;
+                                    delete[] platformVendorName;
                                 }
                             }
                         }
 
-                        if (nullptr != platformId)
+                        if (nullptr != platformIds)
                         {
-                            delete[] platformId;
+                            delete[] platformIds;
                         }
                     }
 

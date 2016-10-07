@@ -2,12 +2,29 @@
 // Copyright (c) 2016 Advanced Micro Devices, Inc. All rights reserved.
 /// \author AMD Developer Tools Team
 /// \file
-/// \brief Helpers for profile data CSV File Pasrsing and merging
+/// \brief Helpers for profile data CSV File Parsing and merging
 //==============================================================================
 
 #include "CSVFileMerger.h"
 #include "../Common/FileUtils.h"
 #include <sstream>
+
+typedef std::vector<std::string> CounterNameList;
+typedef std::pair<unsigned int, CounterNameList> CounterListFileIndexPair;
+typedef std::vector<unsigned int> FileIndexList;
+typedef std::pair<std::string, FileIndexList> CounterInFilesPair;
+typedef std::vector<std::string> ThreadList;
+
+const std::string KernelRowDataHelper::m_methodString = "Method";
+const std::string KernelRowDataHelper::m_executionOrderString = "ExecutionOrder";
+const std::string KernelRowDataHelper::m_threadIdString = "ThreadID";
+const std::string KernelRowDataHelper::m_callIndexString = "CallIndex";
+const std::string KernelRowDataHelper::m_globalWorkSizeString = "GlobalWorkSize";
+const std::string KernelRowDataHelper::m_workGroupSizeString = "WorkGroupSize";
+const std::string KernelRowDataHelper::m_localMemSizeString = "LocalMemSize";
+const std::string KernelRowDataHelper::m_vgprsString = "VGPRs";
+const std::string KernelRowDataHelper::m_sgprsString = "SGPRs";
+const std::string KernelRowDataHelper::m_scratchRegsString = "ScratchRegs";
 
 unsigned int KernelRowData::GetRowCount()
 {
@@ -16,15 +33,15 @@ unsigned int KernelRowData::GetRowCount()
 
 unsigned int KernelRowData::GetRowCountByThreadId(const std::string& threadId)
 {
-    return static_cast<unsigned int>(m_rowsbyThreadId[threadId].size());
+    return static_cast<unsigned int>(m_rowsByThreadId[threadId].size());
 }
 
 std::vector<std::string> KernelRowData::GetUniqueThreads()
 {
     std::vector<std::string> threads;
 
-    for (std::map<std::string, std::vector<CSVRow*>>::iterator kernelRowDataByThreadIterator = m_rowsbyThreadId.begin();
-         kernelRowDataByThreadIterator != m_rowsbyThreadId.end();
+    for (std::map<std::string, CSVRowList>::iterator kernelRowDataByThreadIterator = m_rowsByThreadId.begin();
+         kernelRowDataByThreadIterator != m_rowsByThreadId.end();
          ++kernelRowDataByThreadIterator)
     {
         threads.push_back(kernelRowDataByThreadIterator->first);
@@ -46,16 +63,15 @@ std::string KernelRowData::GetValueByThreadId(const std::string& threadId, const
     return retValue;
 }
 
-
 CSVRow* KernelRowData::GetRowByThreadId(const std::string& threadId, const unsigned int& rowIndex)
 {
     CSVRow* row = nullptr;
 
-    bool isThreadExist = m_rowsbyThreadId.find(threadId) != m_rowsbyThreadId.end();
+    bool isThreadExist = m_rowsByThreadId.find(threadId) != m_rowsByThreadId.end();
 
-    if (isThreadExist && rowIndex < m_rowsbyThreadId[threadId].size())
+    if (isThreadExist && rowIndex < m_rowsByThreadId[threadId].size())
     {
-        row = m_rowsbyThreadId[threadId].at(rowIndex);
+        row = m_rowsByThreadId[threadId].at(rowIndex);
     }
 
     return row;
@@ -65,23 +81,25 @@ void KernelRowData::OnParse(CSVRow* csvRow, bool& stopParsing)
 {
     std::string threadIdString = "ThreadID";
 
-    if (!stopParsing && nullptr != csvRow)
+    if (nullptr != csvRow)
     {
         m_rows.push_back(csvRow);
         std::string threadIdValueString = csvRow->GetRowData(threadIdString);
-        bool succeed = m_rowsbyThreadId.find(threadIdValueString) != m_rowsbyThreadId.end();
+        bool succeed = m_rowsByThreadId.find(threadIdValueString) != m_rowsByThreadId.end();
 
         if (succeed)
         {
-            m_rowsbyThreadId[threadIdValueString].push_back(csvRow);
+            m_rowsByThreadId[threadIdValueString].push_back(csvRow);
         }
         else
         {
             std::vector<CSVRow*> tempCSVRowVector;
             tempCSVRowVector.push_back(csvRow);
-            m_rowsbyThreadId.insert(std::pair<std::string, std::vector<CSVRow*>>(threadIdValueString, tempCSVRowVector));
+            m_rowsByThreadId.insert(std::pair<std::string, std::vector<CSVRow*>>(threadIdValueString, tempCSVRowVector));
         }
     }
+
+    stopParsing = false;
 }
 
 std::string KernelRowDataHelper::RemoveLineFeed(const std::string& string)
@@ -101,31 +119,18 @@ std::string KernelRowDataHelper::RemoveLineFeed(const std::string& string)
 bool KernelRowDataHelper::IsThreadMappingRow(CSVRow* firstRow, CSVRow* secondRow)
 {
     bool equal = true;
-    std::string threadIdString = "ThreadID";
-    std::string threadIdFirstRow = firstRow->operator[](threadIdString);
-    std::string threadIdSecondRow = secondRow->operator[](threadIdString);
 
     if (nullptr != firstRow && nullptr != secondRow && firstRow != secondRow)
     {
-        std::string methodString = "Method";
-        std::string executionOrderString = "ExecutionOrder";
-        std::string callIndexString = "CallIndex";
-        std::string globalWorkSizeString = "GlobalWorkSize";
-        std::string workGroupSizeString = "WorkGroupSize";
-        std::string localMemSizeString = "LocalMemSize";
-        std::string vgprsString = "VGPRs";
-        std::string sgprsString = "SGPRs";
-        std::string scratchRegsString = "ScratchRegs";
-
-        equal &= RemoveLineFeed(firstRow->operator[](methodString)).compare(RemoveLineFeed(secondRow->operator[](methodString))) == 0;
-        equal &= RemoveLineFeed(firstRow->operator[](executionOrderString)).compare(RemoveLineFeed(secondRow->operator[](executionOrderString))) == 0;
-        equal &= RemoveLineFeed(firstRow->operator[](callIndexString)).compare(RemoveLineFeed(secondRow->operator[](callIndexString))) == 0;
-        equal &= RemoveLineFeed(firstRow->operator[](globalWorkSizeString)).compare(RemoveLineFeed(secondRow->operator[](globalWorkSizeString))) == 0;
-        equal &= RemoveLineFeed(firstRow->operator[](workGroupSizeString)).compare(RemoveLineFeed(secondRow->operator[](workGroupSizeString))) == 0;
-        equal &= RemoveLineFeed(firstRow->operator[](localMemSizeString)).compare(RemoveLineFeed(secondRow->operator[](localMemSizeString))) == 0;
-        equal &= RemoveLineFeed(firstRow->operator[](vgprsString)).compare(RemoveLineFeed(secondRow->operator[](vgprsString))) == 0;
-        equal &= RemoveLineFeed(firstRow->operator[](sgprsString)).compare(RemoveLineFeed(secondRow->operator[](sgprsString))) == 0;
-        equal &= RemoveLineFeed(firstRow->operator[](scratchRegsString)).compare(RemoveLineFeed(secondRow->operator[](scratchRegsString))) == 0;
+        equal &= RemoveLineFeed(firstRow->operator[](m_methodString)).compare(RemoveLineFeed(secondRow->operator[](m_methodString))) == 0;
+        equal &= RemoveLineFeed(firstRow->operator[](m_executionOrderString)).compare(RemoveLineFeed(secondRow->operator[](m_executionOrderString))) == 0;
+        equal &= RemoveLineFeed(firstRow->operator[](m_callIndexString)).compare(RemoveLineFeed(secondRow->operator[](m_callIndexString))) == 0;
+        equal &= RemoveLineFeed(firstRow->operator[](m_globalWorkSizeString)).compare(RemoveLineFeed(secondRow->operator[](m_globalWorkSizeString))) == 0;
+        equal &= RemoveLineFeed(firstRow->operator[](m_workGroupSizeString)).compare(RemoveLineFeed(secondRow->operator[](m_workGroupSizeString))) == 0;
+        equal &= RemoveLineFeed(firstRow->operator[](m_localMemSizeString)).compare(RemoveLineFeed(secondRow->operator[](m_localMemSizeString))) == 0;
+        equal &= RemoveLineFeed(firstRow->operator[](m_vgprsString)).compare(RemoveLineFeed(secondRow->operator[](m_vgprsString))) == 0;
+        equal &= RemoveLineFeed(firstRow->operator[](m_sgprsString)).compare(RemoveLineFeed(secondRow->operator[](m_sgprsString))) == 0;
+        equal &= RemoveLineFeed(firstRow->operator[](m_scratchRegsString)).compare(RemoveLineFeed(secondRow->operator[](m_scratchRegsString))) == 0;
     }
     else
     {
@@ -135,38 +140,27 @@ bool KernelRowDataHelper::IsThreadMappingRow(CSVRow* firstRow, CSVRow* secondRow
     return equal;
 }
 
-
 bool KernelRowDataHelper::IsCommonColumn(const std::string& columnName)
 {
-    std::string methodString = "Method";
-    std::string executionOrderString = "ExecutionOrder";
-    std::string callIndexString = "CallIndex";
-    std::string globalWorkSizeString = "GlobalWorkSize";
-    std::string workGroupSizeString = "WorkGroupSize";
-    std::string localMemSizeString = "LocalMemSize";
-    std::string vgprsString = "VGPRs";
-    std::string sgprsString = "SGPRs";
-    std::string scratchRegsString = "ScratchRegs";
-
     bool isCommon = false;
 
-    isCommon |= columnName.compare(methodString) == 0;
-    isCommon |= columnName.compare(executionOrderString) == 0;
-    isCommon |= columnName.compare(callIndexString) == 0;
-    isCommon |= columnName.compare(globalWorkSizeString) == 0;
-    isCommon |= columnName.compare(workGroupSizeString) == 0;
-    isCommon |= columnName.compare(localMemSizeString) == 0;
-    isCommon |= columnName.compare(vgprsString) == 0;
-    isCommon |= columnName.compare(sgprsString) == 0;
-    isCommon |= columnName.compare(scratchRegsString) == 0;
+    isCommon |= columnName.compare(m_methodString) == 0;
+    isCommon |= columnName.compare(m_executionOrderString) == 0;
+    isCommon |= columnName.compare(m_callIndexString) == 0;
+    isCommon |= columnName.compare(m_globalWorkSizeString) == 0;
+    isCommon |= columnName.compare(m_workGroupSizeString) == 0;
+    isCommon |= columnName.compare(m_localMemSizeString) == 0;
+    isCommon |= columnName.compare(m_vgprsString) == 0;
+    isCommon |= columnName.compare(m_sgprsString) == 0;
+    isCommon |= columnName.compare(m_scratchRegsString) == 0;
 
     return isCommon;
 }
 
-std::vector<std::pair<std::string, std::pair<std::string, unsigned int>>> KernelRowDataHelper::CreateHeader(const std::vector<std::string>& counterFileList, bool includeTime)
+HeaderList KernelRowDataHelper::CreateHeader(const std::vector<std::string>& counterFileList, bool includeTime)
 {
-    std::vector<std::pair<std::string, std::pair<std::string, unsigned int>>> headersWithActualHeaderNameAndFileIndex;
-    std::vector<std::pair<unsigned int, std::vector<std::string>>> counterNamesByFileIndex;
+    HeaderList headersWithActualHeaderNameAndFileIndex;
+    std::vector<CounterListFileIndexPair> counterNamesByFileIndex;
 
     bool succeedReadingCounterFile = true;
     unsigned int baseFileIndex = 0;
@@ -177,45 +171,34 @@ std::vector<std::pair<std::string, std::pair<std::string, unsigned int>>> Kernel
 
         for (std::vector<std::string>::const_iterator counterFileListIterator = counterFileList.begin(); counterFileListIterator != counterFileList.end(); ++counterFileListIterator)
         {
-            std::vector<std::string> counternames;
-            succeedReadingCounterFile &= FileUtils::ReadFile(*counterFileListIterator, counternames, true, true);
+            CounterNameList counternameList;
+            succeedReadingCounterFile &= FileUtils::ReadFile(*counterFileListIterator, counternameList, true, true);
 
             if (succeedReadingCounterFile)
             {
-                counterNamesByFileIndex.push_back(std::pair<unsigned int, std::vector<std::string>>(fileIndex, counternames));
+                counterNamesByFileIndex.push_back(CounterListFileIndexPair(fileIndex, counternameList));
             }
 
             fileIndex++;
         }
 
-        // Common Columns
-        std::string methodString = "Method";
-        std::string executionOrderString = "ExecutionOrder";
-        std::string threadIdString = "ThreadID";
-        std::string callIndexString = "CallIndex";
-        std::string globalWorkSizeString = "GlobalWorkSize";
-        std::string workGroupSizeString = "WorkGroupSize";
         std::string timeString = "Time";
-        std::string localMemSizeString = "LocalMemSize";
-        std::string vgprsString = "VGPRs";
-        std::string sgprsString = "SGPRs";
-        std::string scratchRegsString = "ScratchRegs";
         std::string passString = "_pass_";
 
-        headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(methodString, std::pair<std::string, unsigned int>(methodString, baseFileIndex)));
-        headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(executionOrderString, std::pair<std::string, unsigned int>(executionOrderString, baseFileIndex)));
+        headersWithActualHeaderNameAndFileIndex.push_back(HeaderPair(m_methodString, MethodFileIndexPair(m_methodString, baseFileIndex)));
+        headersWithActualHeaderNameAndFileIndex.push_back(HeaderPair(m_executionOrderString, MethodFileIndexPair(m_executionOrderString, baseFileIndex)));
 
         for (unsigned int i = 0; i < counterFileList.size(); i++)
         {
             std::stringstream ss;
             ss << i;
-            std::string threadIdWithPass = threadIdString + passString + ss.str();
-            headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(threadIdWithPass, std::pair<std::string, unsigned int>(threadIdString, i)));
+            std::string threadIdWithPass = m_threadIdString + passString + ss.str();
+            headersWithActualHeaderNameAndFileIndex.push_back(HeaderPair(threadIdWithPass, MethodFileIndexPair(m_threadIdString, i)));
         }
 
-        headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(callIndexString, std::pair<std::string, unsigned int>(callIndexString, baseFileIndex)));
-        headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(globalWorkSizeString, std::pair<std::string, unsigned int>(globalWorkSizeString, baseFileIndex)));
-        headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(workGroupSizeString, std::pair<std::string, unsigned int>(workGroupSizeString, baseFileIndex)));
+        headersWithActualHeaderNameAndFileIndex.push_back(HeaderPair(m_callIndexString, MethodFileIndexPair(m_callIndexString, baseFileIndex)));
+        headersWithActualHeaderNameAndFileIndex.push_back(HeaderPair(m_globalWorkSizeString, MethodFileIndexPair(m_globalWorkSizeString, baseFileIndex)));
+        headersWithActualHeaderNameAndFileIndex.push_back(HeaderPair(m_workGroupSizeString, MethodFileIndexPair(m_workGroupSizeString, baseFileIndex)));
 
         // noGputime flag is not set - need to include time in the file headers
         if (includeTime)
@@ -225,27 +208,27 @@ std::vector<std::pair<std::string, std::pair<std::string, unsigned int>>> Kernel
                 std::stringstream ss;
                 ss << i;
                 std::string timeWithPass = timeString + passString + ss.str();
-                headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(timeWithPass, std::pair<std::string, unsigned int>(timeString, i)));
+                headersWithActualHeaderNameAndFileIndex.push_back(HeaderPair(timeWithPass, MethodFileIndexPair(timeString, i)));
             }
         }
 
-        headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(localMemSizeString, std::pair<std::string, unsigned int>(localMemSizeString, baseFileIndex)));
-        headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(vgprsString, std::pair<std::string, unsigned int>(vgprsString, baseFileIndex)));
-        headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(sgprsString, std::pair<std::string, unsigned int>(sgprsString, baseFileIndex)));
-        headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(scratchRegsString, std::pair<std::string, unsigned int>(scratchRegsString, baseFileIndex)));
+        headersWithActualHeaderNameAndFileIndex.push_back(HeaderPair(m_localMemSizeString, MethodFileIndexPair(m_localMemSizeString, baseFileIndex)));
+        headersWithActualHeaderNameAndFileIndex.push_back(HeaderPair(m_vgprsString, MethodFileIndexPair(m_vgprsString, baseFileIndex)));
+        headersWithActualHeaderNameAndFileIndex.push_back(HeaderPair(m_sgprsString, MethodFileIndexPair(m_sgprsString, baseFileIndex)));
+        headersWithActualHeaderNameAndFileIndex.push_back(HeaderPair(m_scratchRegsString, MethodFileIndexPair(m_scratchRegsString, baseFileIndex)));
 
-        std::vector<std::pair<std::string, std::vector<unsigned int>>> counterColumns;
-        std::vector<std::pair<std::string, std::vector<unsigned int>>>::iterator counterColumnsIterator;
+        std::vector<CounterInFilesPair> counterColumns;
+        std::vector<CounterInFilesPair>::iterator counterColumnsIterator;
 
-        for (std::vector<std::pair<unsigned int, std::vector<std::string>>>::iterator counterNamesByFileIndexIterator = counterNamesByFileIndex.begin();
+        for (std::vector<CounterListFileIndexPair>::iterator counterNamesByFileIndexIterator = counterNamesByFileIndex.begin();
              counterNamesByFileIndexIterator != counterNamesByFileIndex.end(); ++counterNamesByFileIndexIterator)
         {
-            for (std::vector<std::string>::iterator counterNamesIterator = counterNamesByFileIndexIterator->second.begin();
+            for (CounterNameList::iterator counterNamesIterator = counterNamesByFileIndexIterator->second.begin();
                  counterNamesIterator != counterNamesByFileIndexIterator->second.end(); ++counterNamesIterator)
             {
                 bool isCounterExistInColumn = false;
 
-                for (std::vector<std::pair<std::string, std::vector<unsigned int>>>::iterator counterColumnsTempIterator = counterColumns.begin(); counterColumnsTempIterator != counterColumns.end(); ++counterColumnsTempIterator)
+                for (std::vector<CounterInFilesPair>::iterator counterColumnsTempIterator = counterColumns.begin(); counterColumnsTempIterator != counterColumns.end(); ++counterColumnsTempIterator)
                 {
                     if (!isCounterExistInColumn)
                     {
@@ -262,7 +245,7 @@ std::vector<std::pair<std::string, std::pair<std::string, unsigned int>>> Kernel
                 {
                     std::vector<unsigned int> tempFileIndex;
                     tempFileIndex.push_back(counterNamesByFileIndexIterator->first);
-                    counterColumns.push_back(std::pair<std::string, std::vector<unsigned int>>(*counterNamesIterator, tempFileIndex));
+                    counterColumns.push_back(CounterInFilesPair(*counterNamesIterator, tempFileIndex));
                 }
             }
         }
@@ -277,12 +260,12 @@ std::vector<std::pair<std::string, std::pair<std::string, unsigned int>>> Kernel
                     std::stringstream stringStream;
                     stringStream << counterColumnsIterator->second.at(i - 1);
                     std::string columnNameWithPassString = counterColumnsIterator->first + passString + stringStream.str();
-                    headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(columnNameWithPassString, std::pair<std::string, unsigned int>(counterColumnsIterator->first, i - 1)));
+                    headersWithActualHeaderNameAndFileIndex.push_back(HeaderPair(columnNameWithPassString, MethodFileIndexPair(counterColumnsIterator->first, i - 1)));
                 }
             }
             else
             {
-                headersWithActualHeaderNameAndFileIndex.push_back(std::pair<std::string, std::pair<std::string, unsigned int>>(counterColumnsIterator->first, std::pair<std::string, unsigned int>(counterColumnsIterator->first, counterColumnsIterator->second.front())));
+                headersWithActualHeaderNameAndFileIndex.push_back(HeaderPair(counterColumnsIterator->first, MethodFileIndexPair(counterColumnsIterator->first, counterColumnsIterator->second.front())));
             }
         }
     }
@@ -290,14 +273,12 @@ std::vector<std::pair<std::string, std::pair<std::string, unsigned int>>> Kernel
     return headersWithActualHeaderNameAndFileIndex;
 }
 
-
-std::vector<std::set<std::pair<std::string, unsigned int>>> KernelRowDataHelper::SortMappedThreadByExecutionOrder(std::map<unsigned int, KernelRowData*> allFilesRowData, std::vector<std::set<std::pair<std::string, unsigned int>>> mappedThreads)
+MappedThreadSetList KernelRowDataHelper::SortMappedThreadByExecutionOrder(std::map<unsigned int, KernelRowData*> allFilesRowData, MappedThreadSetList mappedThreads)
 {
-    std::vector<std::set<std::pair<std::string, unsigned int>>> sortedMappedThreadByExecutionOrder;
-    std::vector<std::set<std::pair<std::string, unsigned int>>>::iterator mappedThreadIterator;
+    MappedThreadSetList sortedMappedThreadByExecutionOrder;
+    MappedThreadSetList::iterator mappedThreadIterator;
     std::vector<std::pair<std::string, unsigned int>> executionOrders;
 
-    std::string executionOrderString = "ExecutionOrder";
     unsigned int firstRow = 0;
     std::map<std::string, unsigned int> executionOrderAndIndex;
 
@@ -305,7 +286,7 @@ std::vector<std::set<std::pair<std::string, unsigned int>>> KernelRowDataHelper:
 
     for (mappedThreadIterator = mappedThreads.begin(); mappedThreadIterator != mappedThreads.end(); ++mappedThreadIterator)
     {
-        std::string executionOrder = allFilesRowData[mappedThreadIterator->begin()->second]->GetValueByThreadId(mappedThreadIterator->begin()->first, firstRow, executionOrderString);
+        std::string executionOrder = allFilesRowData[mappedThreadIterator->begin()->second]->GetValueByThreadId(mappedThreadIterator->begin()->first, firstRow, m_executionOrderString);
         executionOrders.push_back(std::pair<std::string, unsigned int>(executionOrder, index));
         index++;
     }
@@ -348,22 +329,22 @@ std::vector<std::set<std::pair<std::string, unsigned int>>> KernelRowDataHelper:
 }
 
 
-std::vector<std::set<std::pair<std::string, unsigned int>>> KernelRowDataHelper::GetMappedThreads(std::map<unsigned int, KernelRowData*> allFilesRowData)
+MappedThreadSetList KernelRowDataHelper::GetMappedThreads(std::map<unsigned int, KernelRowData*> allFilesRowData)
 {
-    std::vector<std::set<std::pair<std::string, unsigned int>>> mappedThreads;
-    std::vector<std::set<std::pair<std::string, unsigned int>>>::iterator mappedThreadsIterator;
+    MappedThreadSetList mappedThreads;
+    MappedThreadSetList::iterator mappedThreadsIterator;
 
     if (allFilesRowData.size() > 1)
     {
         KernelRowData* baseRowData = allFilesRowData.begin()->second;
-        std::vector<std::string> baseRowDataThreads = baseRowData->GetUniqueThreads();
+        ThreadList baseRowDataThreads = baseRowData->GetUniqueThreads();
 
         // Iterate for all threads in base files
-        for (std::vector<std::string>::iterator baseRowDataThreadsIter = baseRowDataThreads.begin();
+        for (ThreadList::iterator baseRowDataThreadsIter = baseRowDataThreads.begin();
              baseRowDataThreadsIter != baseRowDataThreads.end(); ++baseRowDataThreadsIter)
         {
-            std::pair <std::string, unsigned int> baseFileCurrentThreadPair(*baseRowDataThreadsIter, 0);
-            std::set<std::pair<std::string, unsigned int>> mappedThreadSet;
+            ThreadFileIndexPair baseFileCurrentThreadPair(*baseRowDataThreadsIter, 0);
+            MappedThreadSet mappedThreadSet;
             mappedThreadSet.insert(baseFileCurrentThreadPair);
 
             unsigned int fileIndex = 0;
@@ -377,10 +358,10 @@ std::vector<std::set<std::pair<std::string, unsigned int>>> KernelRowDataHelper:
                 {
                     fileIndex++;
 
-                    std::vector<std::string> currentFileUniqueThreads = rowPerFileIterator->second->GetUniqueThreads();
+                    ThreadList currentFileUniqueThreads = rowPerFileIterator->second->GetUniqueThreads();
                     unsigned int baseFileRowDataCountByThread = baseRowData->GetRowCountByThreadId(*baseRowDataThreadsIter);
 
-                    for (std::vector<std::string>::iterator currentFileThreadIter = currentFileUniqueThreads.begin();
+                    for (ThreadList::iterator currentFileThreadIter = currentFileUniqueThreads.begin();
                          currentFileThreadIter != currentFileUniqueThreads.end(); currentFileThreadIter++)
                     {
                         unsigned int currentFileRowDataCountForCurrentThread = rowPerFileIterator->second->GetRowCountByThreadId(*currentFileThreadIter);
@@ -395,7 +376,7 @@ std::vector<std::set<std::pair<std::string, unsigned int>>> KernelRowDataHelper:
 
                         if (isMapped)
                         {
-                            std::pair<std::string, unsigned int> currentThreadPair(*currentFileThreadIter, fileIndex);
+                            ThreadFileIndexPair currentThreadPair(*currentFileThreadIter, fileIndex);
                             mappedThreadSet.insert(currentThreadPair);
                             break;
                         }
@@ -420,16 +401,16 @@ std::vector<std::set<std::pair<std::string, unsigned int>>> KernelRowDataHelper:
             if (baseRowData != rowPerFileIterator->second)
             {
                 fileIndex++;
-                std::vector<std::string> currentFileUniqueThreads = rowPerFileIterator->second->GetUniqueThreads();
+                ThreadList currentFileUniqueThreads = rowPerFileIterator->second->GetUniqueThreads();
 
-                for (std::vector<std::string>::iterator currentFileThreadIter = currentFileUniqueThreads.begin();
+                for (ThreadList::iterator currentFileThreadIter = currentFileUniqueThreads.begin();
                      currentFileThreadIter != currentFileUniqueThreads.end(); currentFileThreadIter++)
                 {
                     bool isThreadfound = false;
 
                     for (mappedThreadsIterator = mappedThreads.begin(); mappedThreadsIterator != mappedThreads.end(); ++mappedThreadsIterator)
                     {
-                        for (std::set<std::pair<std::string, unsigned int>>::iterator currentSetIter = mappedThreadsIterator->begin();
+                        for (MappedThreadSet::iterator currentSetIter = mappedThreadsIterator->begin();
                              currentSetIter != mappedThreadsIterator->end(); ++currentSetIter)
                         {
                             isThreadfound |= (currentSetIter->first.compare(*currentFileThreadIter) == 0) &&
@@ -439,8 +420,8 @@ std::vector<std::set<std::pair<std::string, unsigned int>>> KernelRowDataHelper:
 
                     if (!isThreadfound)
                     {
-                        std::set<std::pair<std::string, unsigned int>> unMappedThreadSet;
-                        std::pair<std::string, unsigned int> unMappedThreadPair(*currentFileThreadIter, fileIndex);
+                        MappedThreadSet unMappedThreadSet;
+                        ThreadFileIndexPair unMappedThreadPair(*currentFileThreadIter, fileIndex);
                         unMappedThreadSet.insert(unMappedThreadPair);
                         mappedThreads.push_back(unMappedThreadSet);
                     }

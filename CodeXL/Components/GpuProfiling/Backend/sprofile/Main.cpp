@@ -766,30 +766,6 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
         std::map<unsigned int, KernelRowData*> dataPerFile;
         std::vector<CSVFileParser*> csvFileParsers;
 
-        std::vector<std::string> commonColumns = { "Method",
-                                                   "ExecutionOrder",
-                                                   "ThreadID",
-                                                   "CallIndex",
-                                                   "GlobalWorkSize",
-                                                   "WorkGroupSize",
-                                                   "LocalMemSize",
-                                                   "VGPRs",
-                                                   "SGPRs",
-                                                   "ScratchRegs"
-                                                 };
-
-        // Common Columns
-        std::string methodString = "Method";
-        std::string executionOrderString = "ExecutionOrder";
-        std::string threadIdString = "ThreadID";
-        std::string callIndexString = "CallIndex";
-        std::string globalWorkSizeString = "GlobalWorkSize";
-        std::string workGroupSizeString = "WorkGroupSize";
-        std::string localMemSizeString = "LocalMemSize";
-        std::string vgprsString = "VGPRs";
-        std::string sgprsString = "SGPRs";
-        std::string scratchRegsString = "ScratchRegs";
-
         // headers (or comments) in the csv file
         std::vector<std::string> headers;
 
@@ -824,16 +800,13 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
         std::vector<std::string> csvFileColumns;
         std::string passString = "_pass_";
 
-        std::vector<std::pair<std::string, std::pair<std::string, unsigned int>>> headersWithFileIndex = KernelRowDataHelper::CreateHeader(counterFileList, includeTime);
-        std::vector<std::pair<std::string, std::pair<std::string, unsigned int>>>::iterator headersWithFileIndexIterator;
+        HeaderList headersWithFileIndex = KernelRowDataHelper::CreateHeader(counterFileList, includeTime);
+        HeaderList::iterator headersWithFileIndexIterator;
 
         for (headersWithFileIndexIterator = headersWithFileIndex.begin(); headersWithFileIndexIterator != headersWithFileIndex.end(); ++headersWithFileIndexIterator)
         {
             csvFileColumns.push_back(KernelRowDataHelper::RemoveLineFeed(headersWithFileIndexIterator->first));
         }
-
-        std::vector<std::set<std::pair<std::string, unsigned int>>> mappedThreads = KernelRowDataHelper::GetMappedThreads(dataPerFile);
-        std::vector<std::set<std::pair<std::string, unsigned int>>>::iterator mappedThreadsIterator;
 
         for (std::vector<std::string>::const_iterator headerIter = headers.begin(); headerIter != headers.end(); ++headerIter)
         {
@@ -851,17 +824,18 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
         }
 
         unsigned int addedRow = 0;
+        MappedThreadSetList mappedThreads = KernelRowDataHelper::GetMappedThreads(dataPerFile);
+        MappedThreadSetList::iterator mappedThreadsIterator;
 
         for (mappedThreadsIterator = mappedThreads.begin(); mappedThreadsIterator != mappedThreads.end(); ++mappedThreadsIterator)
         {
             if (mappedThreadsIterator->size() > 1)
             {
-
                 unsigned int rowsToAdd = dataPerFile[mappedThreadsIterator->begin()->second]->GetRowCountByThreadId(mappedThreadsIterator->begin()->first);
                 unsigned int commonColumnsFileIndex = mappedThreadsIterator->begin()->second;
                 unsigned int fileIndexCounter = 0;
 
-                for (std::set<std::pair<std::string, unsigned int>>::iterator mappedThreadSetIter = mappedThreadsIterator->begin();
+                for (MappedThreadSet::iterator mappedThreadSetIter = mappedThreadsIterator->begin();
                      mappedThreadSetIter != mappedThreadsIterator->end(); ++mappedThreadSetIter)
                 {
                     unsigned int currentMappedThreadIteratorRowCount = dataPerFile[mappedThreadSetIter->second]->GetRowCountByThreadId(mappedThreadSetIter->first);
@@ -880,7 +854,7 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
                     CSVRow* rowToAddToFile = mergedFileWriter.AddRow();
                     addedRow++;
 
-                    std::set<std::pair<std::string, unsigned int>>::iterator tempMappedThreadSetIterator;
+                    MappedThreadSet::iterator tempMappedThreadSetIterator;
 
                     for (headersWithFileIndexIterator = headersWithFileIndex.begin(); headersWithFileIndexIterator != headersWithFileIndex.end(); ++headersWithFileIndexIterator)
                     {
@@ -907,7 +881,7 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
             {
                 CSVRow* rowToAddToFile = mergedFileWriter.AddRow();
                 addedRow++;
-                std::set<std::pair<std::string, unsigned int>>::iterator tempMappedThreadSetIterator;
+                MappedThreadSet::iterator tempMappedThreadSetIterator;
                 unsigned int rowIndex = 0;
 
                 for (headersWithFileIndexIterator = headersWithFileIndex.begin(); headersWithFileIndexIterator != headersWithFileIndex.end(); ++headersWithFileIndexIterator)
