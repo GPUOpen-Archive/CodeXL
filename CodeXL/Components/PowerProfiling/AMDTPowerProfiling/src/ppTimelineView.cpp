@@ -480,7 +480,7 @@ void ppTimeLineView::InitGraphs()
 
     if (ids.size() > 0)
     {
-        InitStackedGraph(ppDataUtils::TIMELINE_NODE_ENERGY, AMDT_PWR_CATEGORY_CORRELATED_POWER, PP_StrTimelineCorrelatedPowerGraphName, PP_STR_UnitsPostfixWatt);
+        InitStackedGraph(ppDataUtils::TIMELINE_NODE_CORRELATED_POWER, AMDT_PWR_CATEGORY_CORRELATED_POWER, PP_StrTimelineCorrelatedPowerGraphName, PP_STR_UnitsPostfixWatt);
     }
 
     ids.clear();
