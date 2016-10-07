@@ -76,6 +76,10 @@ acIconId ppAidFunction::GetCategoryIconId(AMDTPwrCategory categoryID)
             categoryIdIcon = AC_ICON_PROFILE_PWR_COUNTER_POWER;
             break;
 
+        case AMDT_PWR_CATEGORY_CORRELATED_POWER:
+            categoryIdIcon = AC_ICON_PROFILE_PWR_COUNTER_POWER;
+            break;
+
         default:
             categoryIdIcon = AC_ICON_EMPTY;
             break;

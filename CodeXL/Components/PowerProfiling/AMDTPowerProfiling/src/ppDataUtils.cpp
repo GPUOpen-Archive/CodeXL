@@ -485,6 +485,11 @@ void ppDataUtils::GetRelevantCounterIdsByGraphType(gtVector<int>& allrelevantCou
                 category = AMDT_PWR_CATEGORY_ENERGY;
                 isCategoryFound = true;
                 break;
+
+            case TIMELINE_NODE_CORRELATED_POWER:
+                category = AMDT_PWR_CATEGORY_CORRELATED_POWER;
+                isCategoryFound = true;
+                break;
         }
 
         // if category exist

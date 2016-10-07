@@ -450,7 +450,6 @@ void ppTimeLineView::InitGraphs()
     graphTypes << ppDataUtils::TIMELINE_CURRENT;
     graphTypes << ppDataUtils::TIMELINE_CPU_CORE_PSTATE;
     graphTypes << ppDataUtils::TIMELINE_CPU_CORE_CSTATE;
-    graphTypes << ppDataUtils::TIMELINE_NODE_ENERGY;
 
     // delete all graphs and start over
     RemoveAllRibbons();
@@ -461,7 +460,27 @@ void ppTimeLineView::InitGraphs()
 
     if (ids.size() > 0)
     {
-        InitPowerGraph();
+        InitStackedGraph(ppDataUtils::TIMELINE_POWER, AMDT_PWR_CATEGORY_POWER, PP_StrTimelineNodePowerGraphName, PP_STR_UnitsPostfixWatt);
+    }
+
+    ids.clear();
+
+    // Add the energy graphs:
+    ppDataUtils::GetRelevantCounterIdsByGraphType(ids, ppDataUtils::TIMELINE_NODE_ENERGY, m_pSessionController);
+
+    if (ids.size() > 0)
+    {
+        InitStackedGraph(ppDataUtils::TIMELINE_NODE_ENERGY, AMDT_PWR_CATEGORY_ENERGY, PP_StrTimelineEnergyGraphName, PP_STR_UnitsPostfixMilliJoules);
+    }
+
+    ids.clear();
+
+    // Add the power correlation graphs:
+    ppDataUtils::GetRelevantCounterIdsByGraphType(ids, ppDataUtils::TIMELINE_NODE_CORRELATED_POWER, m_pSessionController);
+
+    if (ids.size() > 0)
+    {
+        InitStackedGraph(ppDataUtils::TIMELINE_NODE_ENERGY, AMDT_PWR_CATEGORY_CORRELATED_POWER, PP_StrTimelineCorrelatedPowerGraphName, PP_STR_UnitsPostfixWatt);
     }
 
     ids.clear();
@@ -538,19 +557,16 @@ void ppTimeLineView::ReplotAllGraphs()
     }
 }
 
-// -------------------------- Power Graph----------------------------------------
-
-void ppTimeLineView::InitPowerGraph()
+// -------------------------- Intialize stacked Graph----------------------------------------
+void ppTimeLineView::InitStackedGraph(ppDataUtils::GraphViewCategoryType categoryType, AMDTPwrCategory type, QString graphName,   QString postFixUnit)
 {
     // Create the power plot:
     m_pPowerPlot = new ppMultiLinePowerNonStackedPlot(m_pSessionController);
 
-    QString graphName = PP_StrTimelineAPUPowerGraphName;
-
     // Initialize the power plot properties:
     QString xAxisTitle;
-    QString yAxisTitle = QString(AF_STR_QStringAppend).arg(graphName).arg(PP_STR_UnitsPostfixWatt);
-    m_pPowerPlot->InitPlot(xAxisTitle, yAxisTitle, AMDT_PWR_CATEGORY_POWER, ppDataUtils::TIMELINE_POWER, acMultiLinePlot::GRAPHVALUESTYPE_DOUBLE, PP_STR_UnitsPostfixWatt);
+    QString yAxisTitle = QString(AF_STR_QStringAppend).arg(graphName).arg(postFixUnit);
+    m_pPowerPlot->InitPlot(xAxisTitle, yAxisTitle, type, ppDataUtils::TIMELINE_POWER, acMultiLinePlot::GRAPHVALUESTYPE_DOUBLE, postFixUnit);
 
     m_allRibbonsVec << m_pPowerPlot;
 
@@ -565,8 +581,8 @@ void ppTimeLineView::InitPowerGraph()
     m_pPowerStackedPlot = new ppMultiLnePowerStackedPlot(m_pSessionController);
 
     // Initialize the power stacked plot properties:
-    yAxisTitle = QString(AF_STR_QStringAppend).arg(graphName).arg(PP_STR_UnitsPostfixWatt);
-    m_pPowerStackedPlot->InitPlot(xAxisTitle, yAxisTitle, AMDT_PWR_CATEGORY_POWER, ppDataUtils::TIMELINE_POWER, acMultiLinePlot::GRAPHVALUESTYPE_DOUBLE, PP_STR_UnitsPostfixWatt);
+    yAxisTitle = QString(AF_STR_QStringAppend).arg(graphName).arg(postFixUnit);
+    m_pPowerStackedPlot->InitPlot(xAxisTitle, yAxisTitle, type, categoryType, acMultiLinePlot::GRAPHVALUESTYPE_DOUBLE, postFixUnit);
 
     m_pPowerStackedPlot->InitPlotWithSelectedCounters();
     m_pPowerStackedPlot->SetShown(true, false);
@@ -1484,14 +1500,6 @@ void ppTimeLineView::InitGraphByCategory(ppDataUtils::GraphViewCategoryType grap
         {
             category = AMDT_PWR_CATEGORY_DVFS;
             graphName = PP_StrTimelineCStateGraphName;
-            unitsStr = AF_STR_EmptyA;
-            break;
-        }
-
-        case ppDataUtils::TIMELINE_NODE_ENERGY:
-        {
-            category = AMDT_PWR_CATEGORY_ENERGY;
-            graphName = PP_StrTimelineEnergyGraphName;
             unitsStr = AF_STR_EmptyA;
             break;
         }

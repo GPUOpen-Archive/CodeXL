@@ -47,6 +47,7 @@
 #define PP_STR_UnitsPostfixPercentage "%"
 #define PP_STR_UnitsPostfixCelsius "[C]"
 #define PP_STR_UnitsPostfixmA "[mA]"
+#define PP_STR_UnitsPostfixMilliJoules "[mJ]"
 
 // file info
 #define PP_STR_dbFileExt L"cxldb"
@@ -106,12 +107,13 @@
 #define PP_StrTimelineRibbonButtonIndexPropertyName "RibbonIndex"
 #define PP_StrTimelineTimeLabelPrefix "Time:&nbsp;"
 #define PP_StrTimelineCurrentGraphName "Current"
-#define PP_StrTimelineAPUPowerGraphName "Node Power"
+#define PP_StrTimelineNodePowerGraphName "Node Power"
 #define PP_StrTimelineScaledTemperatureGraphName "Scaled Temp."
 #define PP_StrTimelineVoltageGraphName "Voltage"
 #define PP_StrTimelineCPUCoreStateGraphName "CPU Core State (DVFS)"
 #define PP_StrTimelineCStateGraphName "C - State Residency"
 #define PP_StrTimelineEnergyGraphName "Energy"
+#define PP_StrTimelineCorrelatedPowerGraphName "Correlated Power"
 #define PP_StrTimelineProgressBarWrapperLabel L"Profile duration: "
 #define PP_StrTimelineNavigationCounterSelectionLabel "Use <b>%1</b> for session navigation.<br><a href='change_counter'>Click to change</a>"
 #define PP_StrTimelineRibbonButtonDownTooltip "Move \"%1\" graph down"

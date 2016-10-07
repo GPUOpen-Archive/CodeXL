@@ -223,8 +223,7 @@ private:
     void AddNewDataToAllExistingGraphs(ppQtEventData pSampledDataPerCounter, bool bShouldUpdateLastSample);
 
     /// Init graphs:
-    void InitPowerGraph();
-
+    void InitStackedGraph(ppDataUtils::GraphViewCategoryType categoryType, AMDTPwrCategory type, QString graphName,   QString postFixUnit);
     /// Generic function that initializes and add a plot to the grid according to requested graph category type:
     void InitGraphByCategory(ppDataUtils::GraphViewCategoryType graphCategory);
 
