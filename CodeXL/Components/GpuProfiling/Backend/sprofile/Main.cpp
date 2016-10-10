@@ -833,6 +833,7 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
             {
                 unsigned int rowsToAdd = dataPerFile[mappedThreadsIterator->begin()->second]->GetRowCountByThreadId(mappedThreadsIterator->begin()->first);
                 unsigned int commonColumnsFileIndex = mappedThreadsIterator->begin()->second;
+                std::string commonThreadId = mappedThreadsIterator->begin()->first;
                 unsigned int fileIndexCounter = 0;
 
                 for (MappedThreadSet::iterator mappedThreadSetIter = mappedThreadsIterator->begin();
@@ -844,6 +845,7 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
                     {
                         rowsToAdd = currentMappedThreadIteratorRowCount;
                         commonColumnsFileIndex = mappedThreadSetIter->second;
+                        commonThreadId = mappedThreadSetIter->first;
                     }
 
                     fileIndexCounter++;
@@ -860,8 +862,7 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
                     {
                         if (KernelRowDataHelper::IsCommonColumn(headersWithFileIndexIterator->first))
                         {
-                            tempMappedThreadSetIterator = mappedThreadsIterator->begin();
-                            rowToAddToFile->SetRowData(headersWithFileIndexIterator->first, dataPerFile[commonColumnsFileIndex]->GetValueByThreadId(tempMappedThreadSetIterator->first, rowsToAddIter, headersWithFileIndexIterator->first));
+                            rowToAddToFile->SetRowData(headersWithFileIndexIterator->first, dataPerFile[commonColumnsFileIndex]->GetValueByThreadId(commonThreadId, rowsToAddIter, headersWithFileIndexIterator->first));
                         }
                         else
                         {
@@ -1109,7 +1110,14 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
 
     if (outputFileList.size() > 1 && config.counterFileList.size() > 1)
     {
-        MergeKernelProfileOutputFiles(config.counterFileList, outputFileList, defaultOutputFileName, config.bGPUTimePMC);
+        if (!MergeKernelProfileOutputFiles(config.counterFileList, outputFileList, defaultOutputFileName, config.bGPUTimePMC))
+        {
+            retVal = -1;
+        }
+        else
+        {
+            retVal = 0;
+        }
     }
 
     return retVal;
