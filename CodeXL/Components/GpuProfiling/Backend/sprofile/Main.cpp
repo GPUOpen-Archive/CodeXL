@@ -891,7 +891,6 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
                     {
                         tempMappedThreadSetIterator = mappedThreadsIterator->begin();
                         std::string checkVal = dataPerFile[tempMappedThreadSetIterator->second]->GetValueByThreadId(tempMappedThreadSetIterator->first, rowIndex, headersWithFileIndexIterator->first);
-                        std::cout << checkVal;
                         rowToAddToFile->SetRowData(headersWithFileIndexIterator->first, dataPerFile[tempMappedThreadSetIterator->second]->GetValueByThreadId(tempMappedThreadSetIterator->first, 0, headersWithFileIndexIterator->first));
                     }
                     else
