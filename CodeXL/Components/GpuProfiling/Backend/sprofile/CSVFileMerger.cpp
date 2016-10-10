@@ -102,35 +102,21 @@ void KernelRowData::OnParse(CSVRow* csvRow, bool& stopParsing)
     stopParsing = false;
 }
 
-std::string KernelRowDataHelper::RemoveLineFeed(const std::string& string)
-{
-    std::string tempString = string;
-
-    char ch = tempString.c_str()[tempString.size() - 1];
-
-    if (ch == '\r' || ch == '\n')
-    {
-        tempString.pop_back();
-    }
-
-    return tempString;
-}
-
 bool KernelRowDataHelper::IsThreadMappingRow(CSVRow* firstRow, CSVRow* secondRow)
 {
     bool equal = true;
 
     if (nullptr != firstRow && nullptr != secondRow && firstRow != secondRow)
     {
-        equal &= RemoveLineFeed(firstRow->operator[](m_methodString)).compare(RemoveLineFeed(secondRow->operator[](m_methodString))) == 0;
-        equal &= RemoveLineFeed(firstRow->operator[](m_executionOrderString)).compare(RemoveLineFeed(secondRow->operator[](m_executionOrderString))) == 0;
-        equal &= RemoveLineFeed(firstRow->operator[](m_callIndexString)).compare(RemoveLineFeed(secondRow->operator[](m_callIndexString))) == 0;
-        equal &= RemoveLineFeed(firstRow->operator[](m_globalWorkSizeString)).compare(RemoveLineFeed(secondRow->operator[](m_globalWorkSizeString))) == 0;
-        equal &= RemoveLineFeed(firstRow->operator[](m_workGroupSizeString)).compare(RemoveLineFeed(secondRow->operator[](m_workGroupSizeString))) == 0;
-        equal &= RemoveLineFeed(firstRow->operator[](m_localMemSizeString)).compare(RemoveLineFeed(secondRow->operator[](m_localMemSizeString))) == 0;
-        equal &= RemoveLineFeed(firstRow->operator[](m_vgprsString)).compare(RemoveLineFeed(secondRow->operator[](m_vgprsString))) == 0;
-        equal &= RemoveLineFeed(firstRow->operator[](m_sgprsString)).compare(RemoveLineFeed(secondRow->operator[](m_sgprsString))) == 0;
-        equal &= RemoveLineFeed(firstRow->operator[](m_scratchRegsString)).compare(RemoveLineFeed(secondRow->operator[](m_scratchRegsString))) == 0;
+        equal &= StringUtils::Trim(firstRow->operator[](m_methodString)).compare(StringUtils::Trim(secondRow->operator[](m_methodString))) == 0;
+        equal &= StringUtils::Trim(firstRow->operator[](m_executionOrderString)).compare(StringUtils::Trim(secondRow->operator[](m_executionOrderString))) == 0;
+        equal &= StringUtils::Trim(firstRow->operator[](m_callIndexString)).compare(StringUtils::Trim(secondRow->operator[](m_callIndexString))) == 0;
+        equal &= StringUtils::Trim(firstRow->operator[](m_globalWorkSizeString)).compare(StringUtils::Trim(secondRow->operator[](m_globalWorkSizeString))) == 0;
+        equal &= StringUtils::Trim(firstRow->operator[](m_workGroupSizeString)).compare(StringUtils::Trim(secondRow->operator[](m_workGroupSizeString))) == 0;
+        equal &= StringUtils::Trim(firstRow->operator[](m_localMemSizeString)).compare(StringUtils::Trim(secondRow->operator[](m_localMemSizeString))) == 0;
+        equal &= StringUtils::Trim(firstRow->operator[](m_vgprsString)).compare(StringUtils::Trim(secondRow->operator[](m_vgprsString))) == 0;
+        equal &= StringUtils::Trim(firstRow->operator[](m_sgprsString)).compare(StringUtils::Trim(secondRow->operator[](m_sgprsString))) == 0;
+        equal &= StringUtils::Trim(firstRow->operator[](m_scratchRegsString)).compare(StringUtils::Trim(secondRow->operator[](m_scratchRegsString))) == 0;
     }
     else
     {

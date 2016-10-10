@@ -66,11 +66,6 @@ class KernelRowDataHelper
 
 public:
 
-    /// Removes the line feed from the string if present
-    /// \param[in] string string for removing the line feed
-    /// \return string without line feed
-    static std::string RemoveLineFeed(const std::string& string);
-
     /// Checks the two CSVRows are same or not
     /// \param[in] firstRow CSVRow object pointer
     /// \param[in] secondRow CSVRow object pointer

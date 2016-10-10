@@ -805,12 +805,12 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
 
         for (headersWithFileIndexIterator = headersWithFileIndex.begin(); headersWithFileIndexIterator != headersWithFileIndex.end(); ++headersWithFileIndexIterator)
         {
-            csvFileColumns.push_back(KernelRowDataHelper::RemoveLineFeed(headersWithFileIndexIterator->first));
+            csvFileColumns.push_back(StringUtils::Trim(headersWithFileIndexIterator->first));
         }
 
         for (std::vector<std::string>::const_iterator headerIter = headers.begin(); headerIter != headers.end(); ++headerIter)
         {
-            mergedFileWriter.AddHeader(KernelRowDataHelper::RemoveLineFeed(*headerIter));
+            mergedFileWriter.AddHeader(StringUtils::Trim(*headerIter));
         }
 
         mergedFileWriter.AddColumns(csvFileColumns);
