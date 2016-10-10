@@ -31,6 +31,7 @@
 #include "../CLCommon/CLFunctionDefs.h"
 #include "DeviceInfoUtils.h"
 #include <ADLUtil/ADLUtil.h>
+#include "OpenCLModule.h"
 
 #if defined (_LINUX) || defined (LINUX)
     #include "HSAUtils.h"
@@ -1440,9 +1441,9 @@ std::vector<DeviceInfo> RemoveDuplicateDevice(std::vector<DeviceInfo> deviceInfo
     {
         if (!tempDeviceInfoList.empty())
         {
-            for (std::vector<DeviceInfo>::iterator iterInner = tempDeviceInfoList.begin(); iterInner != tempDeviceInfoList.end(); ++iterInner)
+            for (unsigned int iterInner = 0; iterInner < tempDeviceInfoList.size(); ++iterInner)
             {
-                if (!CompareDeviceInfo((*iterOuter), (*iterInner)) &&
+                if (!CompareDeviceInfo((*iterOuter), tempDeviceInfoList[iterInner]) &&
                     AMDTDeviceInfoUtils::Instance()->GetDeviceInfo((*iterOuter).m_deviceId,
                                                                    REVISION_ID_ANY,
                                                                    deviceInfo))
@@ -1563,6 +1564,107 @@ std::vector<DeviceInfo> GetDeviceInfoList(GPA_API_Type apiType)
 
                     deviceInfoList = RemoveDuplicateDevice(deviceInfoList);
                 }
+                else
+                {
+                    OpenCLModule clModule;
+                    clModule.LoadModule();
+
+                    cl_platform_id* platformIds = nullptr;
+                    cl_uint number_platforms;
+                    success &= CL_SUCCESS == clModule.GetPlatformIDs(NULL, platformIds, &number_platforms);
+
+                    if (success && (number_platforms >= 1))
+                    {
+                        platformIds = new(std::nothrow) cl_platform_id[number_platforms];
+
+                        success &= CL_SUCCESS == clModule.GetPlatformIDs(number_platforms, platformIds, NULL);
+
+                        for (unsigned int platformIter = 0; success && (platformIter < number_platforms); platformIter++)
+                        {
+                            size_t platformVendorNameParameterSize;
+                            success &= CL_SUCCESS == clModule.GetPlatformInfo(platformIds[platformIter], CL_PLATFORM_VENDOR,
+                                                                              platformVendorNameParameterSize, nullptr, &platformVendorNameParameterSize);
+
+                            if (platformVendorNameParameterSize > 0)
+                            {
+                                char* platformVendorName = new(std::nothrow) char[platformVendorNameParameterSize];
+
+                                if (nullptr != platformVendorName)
+                                {
+                                    success &= CL_SUCCESS == clModule.GetPlatformInfo(platformIds[platformIter], CL_PLATFORM_VENDOR,
+                                                                                      platformVendorNameParameterSize, reinterpret_cast<void*>(platformVendorName), nullptr);
+
+                                    std::string platformVendorNameString(platformVendorName);
+
+                                    if (success && (platformVendorNameString.compare(amdVendor)==0))
+                                    {
+                                        cl_uint numberOfDevices = 0;
+                                        cl_uint numberOfEntries = 0;
+                                        success &= CL_SUCCESS == clModule.GetDeviceIDs(platformIds[platformIter], CL_DEVICE_TYPE_GPU, numberOfEntries, NULL, &numberOfDevices);
+
+                                        if (success && (numberOfDevices >= 1))
+                                        {
+                                            cl_device_id* deviceIds = new(std::nothrow) cl_device_id[numberOfDevices];
+                                            success &= CL_SUCCESS == clModule.GetDeviceIDs(platformIds[platformIter], CL_DEVICE_TYPE_GPU, numberOfDevices, deviceIds, NULL);
+
+                                            for (unsigned int deviceIdIter = 0; success && (deviceIdIter < numberOfDevices); deviceIdIter++)
+                                            {
+                                                size_t paramValueSize;
+                                                success &= CL_SUCCESS == clModule.GetDeviceInfo(deviceIds[deviceIdIter], CL_DEVICE_NAME,
+                                                                                                paramValueSize, nullptr, &paramValueSize);
+
+                                                if (success && (paramValueSize > 0))
+                                                {
+                                                    char* paramDeviceName = new(std::nothrow) char[paramValueSize];
+                                                    success &= CL_SUCCESS == clModule.GetDeviceInfo(deviceIds[deviceIdIter], CL_DEVICE_NAME,
+                                                                                                    paramValueSize, reinterpret_cast<void*>(paramDeviceName), nullptr);
+
+                                                    if (success)
+                                                    {
+                                                        std::string deviceName(reinterpret_cast<char*>(paramDeviceName));
+                                                        std::vector<GDT_GfxCardInfo> cardList;
+                                                        AMDTDeviceInfoUtils::Instance()->GetDeviceInfo(deviceName.c_str(), cardList);
+
+                                                        if (cardList.size() > 0)
+                                                        {
+                                                            deviceInfo.m_deviceId = static_cast<unsigned int>(cardList.begin()->m_deviceID);
+                                                            deviceInfo.m_revId = static_cast<unsigned int>(cardList.begin()->m_revID);
+                                                            deviceInfo.m_deviceCALName = cardList.begin()->m_szCALName;
+                                                            deviceInfo.m_generation = cardList.begin()->m_generation;
+                                                            deviceInfoList.push_back(deviceInfo);
+                                                        }
+                                                    }
+
+                                                    if (nullptr != paramDeviceName)
+                                                    {
+                                                        delete[] paramDeviceName;
+                                                    }
+                                                }
+                                            }
+
+                                            if (nullptr != deviceIds)
+                                            {
+                                                delete[] deviceIds;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (nullptr != platformVendorName)
+                                {
+                                    delete[] platformVendorName;
+                                }
+                            }
+                        }
+
+                        if (nullptr != platformIds)
+                        {
+                            delete[] platformIds;
+                        }
+                    }
+
+                    clModule.UnloadModule();
+                }
             }
         }
     }
@@ -1663,8 +1765,9 @@ std::vector<CounterPassInfo> GetNumberOfPassFromGPUPerfAPI(GPA_API_Type apiType,
             {
                 bool success = true;
                 unsigned int numPass = 0;
-                bool calculateNumberofPass = true;
+                bool considerNumberOfPassToBeOne = false;
                 CounterList computeCounterList;
+                std::vector<std::string> counterListForHSA;
 
                 if (!counterList.empty())
                 {
@@ -1692,24 +1795,49 @@ std::vector<CounterPassInfo> GetNumberOfPassFromGPUPerfAPI(GPA_API_Type apiType,
 
                     if (apiType == GPA_API_HSA)
                     {
-                        calculateNumberofPass = false;
+                        considerNumberOfPassToBeOne = true;
                     }
                 }
 
-                if (!calculateNumberofPass)
+                if (considerNumberOfPassToBeOne)
                 {
                     numPass = 1u;
+                    ppCounterScheduler->DisableAllCounters();
+                }
+
+                for (std::vector<std::string>::const_iterator availableCountersIter = computeCounterList.begin(); availableCountersIter != computeCounterList.end(); ++availableCountersIter)
+                {
+                    uint32_t index = 0;
+                    success &= ppCounterAccessor->GetCounterIndex(availableCountersIter->c_str(), &index);
+                    success &= ppCounterScheduler->EnableCounter(index) == GPA_STATUS_OK;
+
+                    if (considerNumberOfPassToBeOne)
+                    {
+                        unsigned int tempNumberPass;
+                        success &= (GPA_STATUS_OK == ppCounterScheduler->GetNumRequiredPasses(&tempNumberPass));
+
+                        if (success)
+                        {
+                            if (tempNumberPass == numPass)
+                            {
+                                counterListForHSA.push_back(availableCountersIter->c_str());
+                            }
+                            else
+                            {
+                                ppCounterScheduler->DisableCounter(index);
+                            }
+                        }
+                    }
+                }
+
+                if (!considerNumberOfPassToBeOne)
+                {
+                    success &= (GPA_STATUS_OK == ppCounterScheduler->GetNumRequiredPasses(&numPass));
                 }
                 else
                 {
-                    for (unsigned int j = 0; j < computeCounterList.size(); ++j)
-                    {
-                        uint32_t index = 0;
-                        success &= ppCounterAccessor->GetCounterIndex(computeCounterList[j].c_str(), &index);
-                        success &= ppCounterScheduler->EnableCounter(index) == GPA_STATUS_OK;
-                    }
-
-                    success &= (GPA_STATUS_OK == ppCounterScheduler->GetNumRequiredPasses(&numPass));
+                    computeCounterList.clear();
+                    computeCounterList = counterListForHSA;
                 }
 
                 if (success)
@@ -1767,14 +1895,14 @@ void ListCounterToFileForMaxPass(std::string counterFile, unsigned int maxPass)
         }
     };
 
-    //OpenCL
+    // OpenCL
     apiType = GPA_API_OPENCL;
     apiTypeString = "OpenCL";
 
     CounterToFileForMaxPassLambda();
 
 #if defined (_LINUX) || defined (LINUX)
-    //HSA
+    // HSA
     apiType = GPA_API_HSA;
     apiTypeString = "HSA";
 
@@ -1783,7 +1911,7 @@ void ListCounterToFileForMaxPass(std::string counterFile, unsigned int maxPass)
 #endif
 
 #if defined _WIN32
-    //Direct Compute
+    // Direct Compute
     apiType = GPA_API_DIRECTX_11;
     apiTypeString = "DC";
 

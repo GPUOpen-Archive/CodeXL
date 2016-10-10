@@ -31,6 +31,7 @@
 #include "OccupancyChart.h"
 #include "OccupancyUtils.h"
 #include "PerfMarkerAtpFile.h"
+#include "CSVFileMerger.h"
 #include "../Common/OSUtils.h"
 #include "../Common/StringUtils.h"
 #include "../Common/FileUtils.h"
@@ -41,6 +42,7 @@
 #include "../CLOccupancyAgent/CLOccupancyFile.h"
 #include "../Common/Version.h"
 #include "../Common/BinFileHeader.h"
+
 
 #include <AMDTOSWrappers/Include/osDirectory.h>
 #include <AMDTOSWrappers/Include/osFilePath.h>
@@ -711,7 +713,6 @@ int ProfileApplication(const std::string& strCounterFile, const int& profilerBit
     return retVal;
 }
 
-
 int ProcessCommandLine(const std::string& strCounterFile)
 {
     int retVal = 0;
@@ -758,6 +759,164 @@ int ProcessCommandLine(const std::string& strCounterFile)
     return retVal;
 }
 
+bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std::vector<std::string> outputFileList, std::string defaultOutputFileName, bool includeTime)
+{
+    if (outputFileList.size() > 1 && counterFileList.size() > 1)
+    {
+        std::map<unsigned int, KernelRowData*> dataPerFile;
+        std::vector<CSVFileParser*> csvFileParsers;
+
+        // headers (or comments) in the csv file
+        std::vector<std::string> headers;
+
+        unsigned int count = 0;
+
+        // Load all the CSV files in Kernel Row Data
+        for (std::vector<std::string>::iterator it = outputFileList.begin(); it != outputFileList.end(); ++it)
+        {
+            CSVFileParser* csvParser = new(std::nothrow) CSVFileParser;
+            KernelRowData* rowData = new(std::nothrow) KernelRowData;
+
+            if (nullptr != csvParser && nullptr != rowData)
+            {
+                csvFileParsers.push_back(csvParser);
+                csvParser->AddListener(rowData);
+
+                if (csvParser->LoadFile(it->c_str()) && csvParser->Parse())
+                {
+                    dataPerFile.insert(std::pair<unsigned int, KernelRowData*>(count, rowData));
+                    count++;
+                }
+
+                // header will be same in all files - retreiving from 1st file
+                headers = csvParser->GetHeaders();
+            }
+        }
+
+        std::string collatedOutputFileName = defaultOutputFileName + "." + PERF_COUNTER_EXT;
+        CSVFileWriter mergedFileWriter(collatedOutputFileName);
+        std::map<std::string, std::vector<int>> counterColumns;
+        std::map<std::string, std::vector<int>>::iterator counterColumnsIterator;
+        std::vector<std::string> csvFileColumns;
+        std::string passString = "_pass_";
+
+        HeaderList headersWithFileIndex = KernelRowDataHelper::CreateHeader(counterFileList, includeTime);
+        HeaderList::iterator headersWithFileIndexIterator;
+
+        for (headersWithFileIndexIterator = headersWithFileIndex.begin(); headersWithFileIndexIterator != headersWithFileIndex.end(); ++headersWithFileIndexIterator)
+        {
+            csvFileColumns.push_back(StringUtils::Trim(headersWithFileIndexIterator->first));
+        }
+
+        for (std::vector<std::string>::const_iterator headerIter = headers.begin(); headerIter != headers.end(); ++headerIter)
+        {
+            mergedFileWriter.AddHeader(StringUtils::Trim(*headerIter));
+        }
+
+        mergedFileWriter.AddColumns(csvFileColumns);
+
+        bool inconsistentDispatchInInputFiles = false;
+        unsigned int baseCSVRowCount = dataPerFile.begin()->second->GetRowCount();
+
+        for (std::map<unsigned int, KernelRowData*>::iterator dataPerFileIter = dataPerFile.begin(); dataPerFileIter != dataPerFile.end(); ++dataPerFileIter)
+        {
+            inconsistentDispatchInInputFiles |= (baseCSVRowCount == dataPerFileIter->second->GetRowCount());
+        }
+
+        unsigned int addedRow = 0;
+        MappedThreadSetList mappedThreads = KernelRowDataHelper::GetMappedThreads(dataPerFile);
+        MappedThreadSetList::iterator mappedThreadsIterator;
+
+        for (mappedThreadsIterator = mappedThreads.begin(); mappedThreadsIterator != mappedThreads.end(); ++mappedThreadsIterator)
+        {
+            if (mappedThreadsIterator->size() > 1)
+            {
+                unsigned int rowsToAdd = dataPerFile[mappedThreadsIterator->begin()->second]->GetRowCountByThreadId(mappedThreadsIterator->begin()->first);
+                unsigned int commonColumnsFileIndex = mappedThreadsIterator->begin()->second;
+                std::string commonThreadId = mappedThreadsIterator->begin()->first;
+                unsigned int fileIndexCounter = 0;
+
+                for (MappedThreadSet::iterator mappedThreadSetIter = mappedThreadsIterator->begin();
+                     mappedThreadSetIter != mappedThreadsIterator->end(); ++mappedThreadSetIter)
+                {
+                    unsigned int currentMappedThreadIteratorRowCount = dataPerFile[mappedThreadSetIter->second]->GetRowCountByThreadId(mappedThreadSetIter->first);
+
+                    if (rowsToAdd < currentMappedThreadIteratorRowCount)
+                    {
+                        rowsToAdd = currentMappedThreadIteratorRowCount;
+                        commonColumnsFileIndex = mappedThreadSetIter->second;
+                        commonThreadId = mappedThreadSetIter->first;
+                    }
+
+                    fileIndexCounter++;
+                }
+
+                for (unsigned int rowsToAddIter = 0; rowsToAddIter < rowsToAdd; ++rowsToAddIter)
+                {
+                    CSVRow* rowToAddToFile = mergedFileWriter.AddRow();
+                    addedRow++;
+
+                    MappedThreadSet::iterator tempMappedThreadSetIterator;
+
+                    for (headersWithFileIndexIterator = headersWithFileIndex.begin(); headersWithFileIndexIterator != headersWithFileIndex.end(); ++headersWithFileIndexIterator)
+                    {
+                        if (KernelRowDataHelper::IsCommonColumn(headersWithFileIndexIterator->first))
+                        {
+                            rowToAddToFile->SetRowData(headersWithFileIndexIterator->first, dataPerFile[commonColumnsFileIndex]->GetValueByThreadId(commonThreadId, rowsToAddIter, headersWithFileIndexIterator->first));
+                        }
+                        else
+                        {
+                            for (tempMappedThreadSetIterator = mappedThreadsIterator->begin(); tempMappedThreadSetIterator != mappedThreadsIterator->end(); ++tempMappedThreadSetIterator)
+                            {
+                                if (headersWithFileIndexIterator->second.second == tempMappedThreadSetIterator->second)
+                                {
+                                    unsigned int fileIndexValue = tempMappedThreadSetIterator->second;
+                                    rowToAddToFile->SetRowData(headersWithFileIndexIterator->first, dataPerFile[fileIndexValue]->GetValueByThreadId(tempMappedThreadSetIterator->first, rowsToAddIter, headersWithFileIndexIterator->second.first));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                CSVRow* rowToAddToFile = mergedFileWriter.AddRow();
+                addedRow++;
+                MappedThreadSet::iterator tempMappedThreadSetIterator;
+                unsigned int rowIndex = 0;
+
+                for (headersWithFileIndexIterator = headersWithFileIndex.begin(); headersWithFileIndexIterator != headersWithFileIndex.end(); ++headersWithFileIndexIterator)
+                {
+                    if (KernelRowDataHelper::IsCommonColumn(headersWithFileIndexIterator->first))
+                    {
+                        tempMappedThreadSetIterator = mappedThreadsIterator->begin();
+                        std::string checkVal = dataPerFile[tempMappedThreadSetIterator->second]->GetValueByThreadId(tempMappedThreadSetIterator->first, rowIndex, headersWithFileIndexIterator->first);
+                        rowToAddToFile->SetRowData(headersWithFileIndexIterator->first, dataPerFile[tempMappedThreadSetIterator->second]->GetValueByThreadId(tempMappedThreadSetIterator->first, 0, headersWithFileIndexIterator->first));
+                    }
+                    else
+                    {
+                        if (headersWithFileIndexIterator->second.second == tempMappedThreadSetIterator->second)
+                        {
+                            unsigned int fileIndexValue = tempMappedThreadSetIterator->second;
+                            rowToAddToFile->SetRowData(headersWithFileIndexIterator->first, dataPerFile[fileIndexValue]->GetValueByThreadId(tempMappedThreadSetIterator->first, rowIndex, headersWithFileIndexIterator->second.first));
+                        }
+                    }
+                }
+            }
+        }
+
+        if ((dataPerFile.begin()->second->GetRowCount() != addedRow) || inconsistentDispatchInInputFiles)
+        {
+            std::cout << "\n\nUnable to merge all of the data for undeterministic dispatches\n\n";
+        }
+
+        std::cout << "\n\nCollated file output path : " << collatedOutputFileName << std::endl << std::endl;
+        return mergedFileWriter.Flush();
+    }
+
+    return false;
+}
+
 #ifdef _WIN32
     int _tmain(int argc, wchar_t* argv[])
 #else
@@ -800,6 +959,7 @@ int ProcessCommandLine(const std::string& strCounterFile)
 
     bool isCounterFileMoreThanOne = config.counterFileList.size() > 1 ? true : false;
     std::string defaultOutputFileName = config.strOutputFile;
+    std::vector<std::string> outputFileList;
 
     if (!config.counterFileList.empty())
     {
@@ -889,6 +1049,7 @@ int ProcessCommandLine(const std::string& strCounterFile)
             }
 
             config.strOutputFile = outputFileName;
+            outputFileList.push_back(outputFileName);
             retVal = ProcessCommandLine(config.counterFileList[i]);
             isReplaying = true;
         }
@@ -942,7 +1103,20 @@ int ProcessCommandLine(const std::string& strCounterFile)
         }
 
         config.strOutputFile = outputFileName;
+        outputFileList.push_back(outputFileName);
         retVal = ProcessCommandLine(counterFile);
+    }
+
+    if (outputFileList.size() > 1 && config.counterFileList.size() > 1)
+    {
+        if (!MergeKernelProfileOutputFiles(config.counterFileList, outputFileList, defaultOutputFileName, config.bGPUTimePMC))
+        {
+            retVal = -1;
+        }
+        else
+        {
+            retVal = 0;
+        }
     }
 
     return retVal;
