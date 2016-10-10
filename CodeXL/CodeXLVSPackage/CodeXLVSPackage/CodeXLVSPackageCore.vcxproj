@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -280,6 +280,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\Components\AMDTSharedProfiling\AMDTSharedProfiling.vcxproj">
       <Project>{033bb047-f8a8-4946-9fa4-0d2e25abd473}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Components\CpuProfiling\AMDTCpuProfiling\AMDTCpuProfiling.vcxproj">
+      <Project>{94bedc68-7b30-45a1-86f5-4d4a6714e0fd}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\Components\GpuDebugging\AMDTApiFunctions\AMDTApiFunctions.vcxproj">
       <Project>{43356050-3bb7-4fe9-8e01-fa614c9b4210}</Project>

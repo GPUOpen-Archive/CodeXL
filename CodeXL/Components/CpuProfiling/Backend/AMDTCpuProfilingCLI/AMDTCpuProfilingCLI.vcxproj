@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -37,7 +37,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>CXLCpuProfilingControl$(GDTProjectSuffix).lib;CXLCpuProfilingTranslation$(GDTProjectSuffix).lib;CXLCpuProfilingDataAccess$(GDTProjectSuffix).lib;CXLCpuProfilingRawData$(GDTProjectSuffix).lib;CXLCpuPerfEventUtils$(GDTProjectSuffix).lib;CXLExecutableFormat$(GDTProjectSuffix).lib;CXLCpuCallstackSampling$(GDTProjectSuffix).lib;CXLProfilingAgentsData$(GDTProjectSuffix).lib;CXLThreadProfileAPI$(GDTProjectSuffix).lib;CXLDisassembler$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -67,8 +66,38 @@
     <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTBaseTools\AMDTBaseToolsVS14.vcxproj">
       <Project>{11221a7f-3883-418f-b286-b0ea1e28ef10}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTDisassembler\AMDTDisassembler.vcxproj">
+      <Project>{d32b3a36-97e0-4042-a058-25c82f08693f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTExecutableFormat\AMDTExecutableFormat.vcxproj">
+      <Project>{9ad5347a-8c9a-4952-8a63-8eb2c4dff629}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\Common\Src\AMDTOSWrappers\AMDTOSWrappersVS14.vcxproj">
       <Project>{5d9222ac-39fb-4123-9497-78cea5be58ad}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\ThreadProfiling\Backend\AMDTThreadProfileAPI\AMDTThreadProfileAPI.vcxproj">
+      <Project>{5b3d32d8-9b36-479b-9bf1-20e76f361436}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\AMDTCpuCallstackSampling\AMDTCpuCallstackSampling.vcxproj">
+      <Project>{b0566507-33ca-4109-8bb6-4290ecc53fa0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\AMDTCpuPerfEventUtils\AMDTCpuPerfEventUtils.vcxproj">
+      <Project>{fb5de7c5-1997-4bc0-b854-5a3d82e8d28e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ProfilingAgents\AMDTProfilingAgentsData\AMDTProfilingAgentsData.vcxproj">
+      <Project>{f6da190f-ef40-43cc-9b8a-ba8e89e514f2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\AMDTCpuProfilingControl\AMDTCpuProfilingControl.vcxproj">
+      <Project>{c87d190f-524c-4681-b0ed-fed6b118b231}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\AMDTCpuProfilingDataAccess\AMDTCpuProfilingDataAccess.vcxproj">
+      <Project>{4067e556-31ab-4679-b1c9-6bfea232a246}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\AMDTCpuProfilingRawData\AMDTCpuProfilingRawData.vcxproj">
+      <Project>{83c7662a-4d27-403a-8072-fde0afa83cfb}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\AMDTCpuProfilingTranslation\AMDTCpuProfilingTranslation.vcxproj">
+      <Project>{bfb56e73-d54d-4d80-9ca2-a52359ad6566}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

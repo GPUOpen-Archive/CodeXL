@@ -77,20 +77,6 @@
     </ResourceCompile>
     <Link>
       <ImageHasSafeExceptionHandlers Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ImageHasSafeExceptionHandlers>
-      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/NODEFAULTLIB:AMDTPowerProfileAPI$(GDTProjectSuffix).lib
-/NODEFAULTLIB:tinyxml$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixNoDash).lib
-/NODEFAULTLIB:kernel32.lib
-/NODEFAULTLIB:user32.lib
-/NODEFAULTLIB:gdi32.lib
-/NODEFAULTLIB:winspool.lib
-/NODEFAULTLIB:comdlg32.lib
-/NODEFAULTLIB:advapi32.lib
-/NODEFAULTLIB:shell32.lib
-/NODEFAULTLIB:ole32.lib
-/NODEFAULTLIB:oleaut32.lib
-/NODEFAULTLIB:uuid.lib
-/NODEFAULTLIB:odbc32.lib
-/NODEFAULTLIB:odbccp32.lib %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
@@ -157,6 +143,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\Common\Src\AMDTOSWrappers\AMDTOSWrappersVS14.vcxproj">
       <Project>{5d9222ac-39fb-4123-9497-78cea5be58ad}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Components\PowerProfiling\Backend\AMDTPowerProfileAPI\AMDTPowerProfileAPI.vcxproj">
+      <Project>{5b9ef4de-1d94-43fa-9b28-5452055b8749}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

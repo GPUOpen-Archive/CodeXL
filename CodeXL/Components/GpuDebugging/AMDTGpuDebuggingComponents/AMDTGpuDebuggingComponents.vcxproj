@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -39,9 +39,6 @@
     <ClCompile>
       <PreprocessorDefinitions>QT_NO_OPENGL;AMDTGPUDEBUGGINGCOMPONENTS_EXPORTS;XPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <Link>
-      <AdditionalDependencies>CXLApplicationComponents$(GDTProjectSuffix).lib;CXLApplicationFramework$(GDTProjectSuffix).lib;CXLProcessDebugger$(GDTProjectSuffix).lib;CXLApiFunctions$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\gdAidFunctions.cpp" />
@@ -609,6 +606,9 @@
     <ProjectReference Include="..\..\..\..\Common\Src\AMDTAPIClasses\AMDTApiClasses.vcxproj">
       <Project>{f62443fc-1d1f-43d1-bf19-a208c38fc0c1}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Common\Src\AMDTApplicationComponents\AMDTApplicationComponents.vcxproj">
+      <Project>{37e228d9-e9b8-434d-ac24-533a88a7498a}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Common\Src\AMDTBaseTools\AMDTBaseToolsVS14.vcxproj">
       <Project>{11221a7f-3883-418f-b286-b0ea1e28ef10}</Project>
     </ProjectReference>
@@ -617,6 +617,15 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\Common\Src\AMDTOSWrappers\AMDTOSWrappersVS14.vcxproj">
       <Project>{5d9222ac-39fb-4123-9497-78cea5be58ad}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\AMDTApplicationFramework\AMDTApplicationFramework.vcxproj">
+      <Project>{1c20a760-cee0-4676-9976-dd0188ffd2c8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\AMDTApiFunctions\AMDTApiFunctions.vcxproj">
+      <Project>{43356050-3bb7-4fe9-8e01-fa614c9b4210}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\AMDTProcessDebugger\AMDTProcessDebugger.vcxproj">
+      <Project>{89777cbd-d9ec-4974-9acb-5886b7d9c60e}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

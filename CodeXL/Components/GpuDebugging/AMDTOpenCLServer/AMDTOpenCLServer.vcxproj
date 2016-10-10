@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -56,7 +56,6 @@
       <PreprocessorDefinitions>_AMDT_OPENCLSERVER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>CXLServerUtilities$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="'$(ENABLE_HSA)'=='TRUE'">AMDTHsaDebugging$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\WindowsResources\AMDTOpenCLServer.def</ModuleDefinitionFile>
       <ImportLibrary>$(AMDTOutputDir)$(Configuration)\arch\spies$(GDTPlatformSuffixNumBitsOnly)$(GDTBuildSuffix)\$(TargetName).lib</ImportLibrary>

@@ -55,7 +55,6 @@
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\inc;$(ProjectDir)\..\..\..\;$(CommonProjectsDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>CXLDriverControl$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -67,6 +66,11 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\CodeXLDriversLoadService.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Common\Src\AMDTDriverControl\AMDTDriverControl.vcxproj">
+      <Project>{99eb0d28-d17b-4c25-b348-0351bd1771df}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>

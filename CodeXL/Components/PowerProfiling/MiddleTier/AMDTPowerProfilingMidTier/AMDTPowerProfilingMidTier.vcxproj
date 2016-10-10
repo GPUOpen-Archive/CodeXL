@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -31,12 +31,6 @@
     <ClCompile>
       <PreprocessorDefinitions>AMDTPOWERPROFILINGMIDTIER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
-    <Link>
-      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CXLDbAdapter$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-    <Link>
-      <AdditionalDependencies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CXLDbAdapter$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\AMDTPowerProfilingMidTier.h" />
@@ -71,10 +65,13 @@
     <ProjectReference Include="..\..\..\..\Remote\AMDTRemoteClient\AMDTRemoteClient.vcxproj">
       <Project>{3807b7b9-8694-4279-92fd-e2a6b964c491}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\DatabaseLayer\AMDTDbAdapter\AMDTDbAdapter.vcxproj">
+      <Project>{03d9da41-e510-4205-bcda-f988d507ef50}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\DatabaseLayer\AMDTProfilerDAL\AMDTProfilerDAL.vcxproj">
       <Project>{cb4c5f57-0177-4adc-866e-fc0e8527fbb7}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\Backend\AMDTPowerProfileAPI\AMDTPowerProfileAPI.vcxproj">
+    <ProjectReference Condition="'$(Platform)'=='Win32'" Include="..\..\Backend\AMDTPowerProfileAPI\AMDTPowerProfileAPI.vcxproj">
       <Project>{5b9ef4de-1d94-43fa-9b28-5452055b8749}</Project>
     </ProjectReference>
   </ItemGroup>
