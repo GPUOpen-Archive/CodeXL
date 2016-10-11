@@ -5,6 +5,6 @@
     <AdjustedProjectName Condition="$(ProjectHaveAMDPrefix)">CXL$(ProjectName.Remove(0,4))</AdjustedProjectName>
     <AdjustedProjectName Condition="'$(ProjectHaveAMDPrefix)' == 'False'">$(ProjectName)</AdjustedProjectName>
     <GDTProjectName>$(AdjustedProjectName)$(GDTProjectSuffix)</GDTProjectName>
-    <TargetName>$(GDTProjectName))</TargetName>
+    <TargetName>$(GDTProjectName)</TargetName>
   </PropertyGroup>
 </Project>
