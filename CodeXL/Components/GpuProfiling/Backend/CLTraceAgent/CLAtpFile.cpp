@@ -641,13 +641,13 @@ bool CLAtpFilePart::MergeTimestamp(const string& strFile, EventMap& vTimestamps,
                     pEnAPI->m_ullRunning = it->second.front().m_ullRunningTimestamp;
                     pEnAPI->m_ullSubmit = it->second.front().m_ullSubmitTimestamp;
                     pEnAPI->m_ullQueue = it->second.front().m_ullQueuedTimestamp;
-                }
 
-                it->second.pop_front();
+                    it->second.pop_front();
 
-                if (it->second.empty())
-                {
-                    vTimestamps.erase(it);
+                    if (it->second.empty())
+                    {
+                        vTimestamps.erase(it);
+                    }
                 }
 
                 apis.push_back(pApiInfo);
