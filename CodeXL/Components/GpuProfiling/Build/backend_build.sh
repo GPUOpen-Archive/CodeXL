@@ -114,7 +114,7 @@ do
       BOOST_LIB_DIR_OVERRIDE="BOOST_LIB_DIR=$1"
    elif [ "$1" = "additionaldefines" ]; then
       shift
-      ADDITIONAL_COMPILER_DEFINES_OVERRIDE="ADDITIONAL_COMPILER_DEFINES_FROM_BUILD_SCRIPT=\"$1 $SKIP_HSA_BUILD_DEFINE\""
+      ADDITIONAL_COMPILER_DEFINES_OVERRIDE="ADDITIONAL_COMPILER_DEFINES_FROM_BUILD_SCRIPT=$1 $SKIP_HSA_BUILD_DEFINE"
    fi
    shift
 done
@@ -348,7 +348,7 @@ if !($bZipOnly) ; then
          #make 64 bit
          echo "Build ${BASENAME}, 64-bit..." | tee -a "$LOGFILE"
 
-         if ! make -C "$SUBDIR" -j$CPU_COUNT $HSA_DIR_OVERRIDE $BOOST_LIB_DIR_OVERRIDE $ADDITIONAL_COMPILER_DEFINES_OVERRIDE $MAKE_TARGET >> "$LOGFILE" 2>&1; then
+         if ! make -C "$SUBDIR" -j$CPU_COUNT $HSA_DIR_OVERRIDE $BOOST_LIB_DIR_OVERRIDE "$ADDITIONAL_COMPILER_DEFINES_OVERRIDE" $MAKE_TARGET >> "$LOGFILE" 2>&1; then
             echo "Failed to build ${BASENAME}, 64 bit"
             exit 1
          fi
@@ -365,7 +365,7 @@ if !($bZipOnly) ; then
             #make 32 bit
             echo "Build ${BASENAME}, 32-bit..." | tee -a "$LOGFILE"
 
-            if ! make -C "$SUBDIR" -j$CPU_COUNT $HSA_DIR_OVERRIDE $BOOST_LIB_DIR_OVERRIDE $ADDITIONAL_COMPILER_DEFINES_OVERRIDE $MAKE_TARGET$MAKE_TARGET_SUFFIX_X86 >> "$LOGFILE" 2>&1; then
+            if ! make -C "$SUBDIR" -j$CPU_COUNT $HSA_DIR_OVERRIDE $BOOST_LIB_DIR_OVERRIDE "$ADDITIONAL_COMPILER_DEFINES_OVERRIDE" $MAKE_TARGET$MAKE_TARGET_SUFFIX_X86 >> "$LOGFILE" 2>&1; then
                echo "Failed to build ${BASENAME}, 32 bit"
                exit 1
             fi
