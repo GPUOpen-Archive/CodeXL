@@ -39,11 +39,16 @@ STATIC_LIBS = \
 
 LIBPATH = $(COMMON_LIB_PATHS)
 
+ifneq ("$(wildcard $(HSAUTILS_DIR)/lib$(GPU_PROFILER_LIB_PREFIX)HSAUtils$(TARGET_SUFFIX).a)","")
+	LOCAL_HSAUTILS_LIBS := HSAUTILS_LIBS
+endif
+
 LIBS = \
 	$(CLCOMMON_LIBS) \
 	$(COMMON_LIBS) \
 	$(FRAMEWORK_LIBS) \
-	$(STANDARD_LIBS)
+	$(STANDARD_LIBS) \
+	$(LOCAL_HSAUTILS_LIBS)
 
 OBJS = \
 	./$(OBJ_DIR)/Main.o \
@@ -78,8 +83,6 @@ OBJS = \
 	./$(OBJ_DIR)/CLOccupancyFile.o \
 	./$(OBJ_DIR)/StackTraceAtpFile.o \
 	./$(OBJ_DIR)/ADLUtil.o \
-	./$(OBJ_DIR)/HSAModule.o \
-	./$(OBJ_DIR)/HSAUtils.o \
 	./$(OBJ_DIR)/GPUPerfAPICounterLoader.o \
 	./$(OBJ_DIR)/CSVFileMerger.o \
 

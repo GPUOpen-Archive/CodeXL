@@ -34,7 +34,9 @@
 #include "OpenCLModule.h"
 
 #if defined (_LINUX) || defined (LINUX)
-    #include "HSAUtils.h"
+    #ifndef SKIP_HSA_BUILD
+        #include "HSAUtils.h"
+    #endif
 #endif
 
 namespace po = boost::program_options;
@@ -1671,6 +1673,8 @@ std::vector<DeviceInfo> GetDeviceInfoList(GPA_API_Type apiType)
 
 #if defined (_LINUX) || defined (LINUX)
 
+#ifndef SKIP_HSA_BUILD
+
     if (apiType == GPA_API_HSA)
     {
         HSADeviceIdList hsaDeviceList;
@@ -1695,6 +1699,8 @@ std::vector<DeviceInfo> GetDeviceInfoList(GPA_API_Type apiType)
             deviceInfoList = RemoveDuplicateDevice(deviceInfoList);
         }
     }
+
+#endif
 
 #endif
 
