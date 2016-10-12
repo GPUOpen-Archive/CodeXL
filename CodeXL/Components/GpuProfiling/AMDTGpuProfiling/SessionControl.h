@@ -120,6 +120,11 @@ private:
     /// is session exist or already been deleted
     static bool IsControlExistInMap(QWidget* session);
 
+    /// Removes the _pass_* from the input string if exists
+    /// \param inputString input string
+    /// \return QString after removeing _pass_* if it exists else return inputString
+    QString RemovePassStringFromCounter(QString inputString);
+
     bool                      m_savedShowKernelDispatchCBState; ///< Save kernel dispatch CheckBox state.
     int                       m_iThreadColumnIndex;             ///< Represents Thread Column Index
     int                       m_iMethodColumnIndex;             ///< Represents Method Column Index

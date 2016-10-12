@@ -108,8 +108,9 @@ int SessionControl::PopulateColumnHeaders(const QStringList& headerItems, bool i
     for (int i = 0; i < retVal; i++)
     {
         QString headerName = headerItems.value(i).trimmed();
+        QString headerNameWithoutPassString = RemovePassStringFromCounter(headerName);
 
-        if (m_iThreadColumnIndex == -1 && headerName == "ThreadID")
+        if (headerNameWithoutPassString == "ThreadID")
         {
             m_iThreadColumnIndex = i;
         }
@@ -132,23 +133,23 @@ int SessionControl::PopulateColumnHeaders(const QStringList& headerItems, bool i
 
         if (!counterFound && CounterManager::Instance()->IsHardwareFamilySupported(VOLCANIC_ISLANDS_FAMILY))
         {
-            counterFound = CounterManager::Instance()->IsCounterTypePercentage(VOLCANIC_ISLANDS_FAMILY, headerName, isPercentage);
+            counterFound = CounterManager::Instance()->IsCounterTypePercentage(VOLCANIC_ISLANDS_FAMILY, headerNameWithoutPassString, isPercentage);
         }
 
         if (!counterFound && CounterManager::Instance()->IsHardwareFamilySupported(SEA_ISLANDS_FAMILY))
         {
-            counterFound = CounterManager::Instance()->IsCounterTypePercentage(SEA_ISLANDS_FAMILY, headerName, isPercentage);
+            counterFound = CounterManager::Instance()->IsCounterTypePercentage(SEA_ISLANDS_FAMILY, headerNameWithoutPassString, isPercentage);
         }
 
         if (!counterFound && CounterManager::Instance()->IsHardwareFamilySupported(SOUTHERN_ISLANDS_FAMILY))
         {
-            counterFound = CounterManager::Instance()->IsCounterTypePercentage(SOUTHERN_ISLANDS_FAMILY, headerName, isPercentage);
+            counterFound = CounterManager::Instance()->IsCounterTypePercentage(SOUTHERN_ISLANDS_FAMILY, headerNameWithoutPassString, isPercentage);
         }
 
         // check non-hardware counters (SC stats, etc.)
         if (!counterFound)
         {
-            counterFound = CounterManager::Instance()->IsCounterTypePercentage(NA_HARDWARE_FAMILY, headerName, isPercentage);
+            counterFound = CounterManager::Instance()->IsCounterTypePercentage(NA_HARDWARE_FAMILY, headerNameWithoutPassString, isPercentage);
         }
 
         if (counterFound && isPercentage)
@@ -466,6 +467,7 @@ void SessionControl::AssignTooltips(QTableView* tableView)
     for (int col = 0; col < ColumnCount; col++)
     {
         QString header = tableView->model()->headerData(col, Qt::Horizontal).toString().trimmed();
+        header = RemovePassStringFromCounter(header);
 
         if (header.indexOf(" (%)") != -1)
         {
@@ -610,5 +612,19 @@ bool PerfCounterItem::operator< (const QStandardItem& other) const
 bool SessionControl::IsControlExistInMap(QWidget* wid)
 {
     return m_sessionControlsMap.contains(wid);
+}
+
+QString SessionControl::RemovePassStringFromCounter(QString inputString)
+{
+    QString passString = "_pass_";
+    int passStringIndex = inputString.indexOf(passString);
+
+    if (passStringIndex != -1)
+    {
+        QString inputStringWithoutPassString = inputString.left(passStringIndex);
+        return inputStringWithoutPassString;
+    }
+
+    return inputString;
 }
 
