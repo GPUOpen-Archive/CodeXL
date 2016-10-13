@@ -1179,6 +1179,7 @@ PackageTheBuild()
 		cp -df Output_x86_64/release/bin/libCXLRemoteClient.so                  ${PKG_NAME}
 		cp -df Output_x86_64/release/bin/libCXLServerUtilities.so               ${PKG_NAME}
 		cp -df Output_x86_64/release/bin/libCXLSharedProfiling.so               ${PKG_NAME}
+		cp -df Output_x86_64/release/bin/libCXLThreadProfileAPI.so              ${PKG_NAME}
 		cp -df Output_x86_64/release/bin/libCXLPowerProfileAPI.so               ${PKG_NAME}
 		cp -df Output_x86_64/release/bin/libboost_filesystem.so.1.59.0           ${PKG_NAME}
 		cp -df Output_x86_64/release/bin/libboost_program_options.so.1.59.0      ${PKG_NAME}
