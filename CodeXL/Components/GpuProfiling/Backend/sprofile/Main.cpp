@@ -354,7 +354,7 @@ int ProfileApplication(const std::string& strCounterFile, const int& profilerBit
     osDirectory outputDir;
     outputFilePath.getFileDirectory(outputDir);
 
-    if (!outputDir.exists())
+    if (!outputDir.exists() && !outputDir.asFilePath().isEmpty())
     {
         outputDir.create();
     }
