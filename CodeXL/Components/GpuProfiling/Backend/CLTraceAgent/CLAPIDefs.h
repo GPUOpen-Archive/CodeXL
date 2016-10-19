@@ -4012,7 +4012,7 @@ public:
         if (m_arg_size == sizeof(int*) && retVal == CL_SUCCESS)
         {
             // If arg size = sizeof( pointer ), we want to dereference it since it helps user to debug.
-            // e.g. check whether correct cl_mem object is binded.
+            // e.g. check whether correct cl_mem object is bound.
             DeepCopyBuffer(&m_arg_valueVal, arg_value, m_arg_size);
         }
         else

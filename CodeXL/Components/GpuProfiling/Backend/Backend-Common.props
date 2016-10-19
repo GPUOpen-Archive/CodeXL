@@ -3,6 +3,7 @@
   <PropertyGroup Label="UserMacros">
     <WorkspaceRootDir Condition="'$(SolutionName)'=='CodeXLGPUProfiler-Backend'">$(SolutionDir)..\..\..\..\..</WorkspaceRootDir>
     <WorkspaceRootDir Condition="'$(SolutionName)'=='CodeXL-AllProjects'">$(SolutionDir)..\..</WorkspaceRootDir>
+    <CustomPreProcessorDefs Condition="'$(SolutionName)'=='CodeXL-AllProjects'">CODEXL_BUILD</CustomPreProcessorDefs>
     <CommonDir>$(WorkspaceRootDir)\Common</CommonDir>
     <CodeXLDir>$(WorkspaceRootDir)\CodeXL</CodeXLDir>
     <CommonProjectsDir>$(WorkspaceRootDir)\Common\Src</CommonProjectsDir>
@@ -27,7 +28,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <PreprocessorDefinitions>NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;$(CustomPreProcessorDefs);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(CodeXLGpuProfilingDir)\Backend\Common;$(CommonProjectsDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary Condition="$([System.Convert]::ToBoolean($(IsDebug)))">MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeLibrary Condition="$([System.Convert]::ToBoolean($(IsRelease)))">MultiThreadedDLL</RuntimeLibrary>
