@@ -82,8 +82,8 @@ std::vector<DeviceInfo> RemoveDuplicateDevice(std::vector<DeviceInfo> deviceInfo
 inline bool CompareDeviceInfo(DeviceInfo first, DeviceInfo second);
 void PrintCounterList(CounterList counterList);
 std::vector<DeviceInfo> GetDeviceInfoList(GPA_API_Type);
-std::vector<CounterPassInfo> GetNumberOfPassForAPI(GPA_API_Type apiType, CounterList counterList);
-std::vector<CounterPassInfo> GetNumberOfPassFromGPUPerfAPI(GPA_API_Type apiType, CounterList counterList, std::vector<DeviceInfo> deviceInfoList);
+std::vector<CounterPassInfo> GetNumberOfPassForAPI(GPA_API_Type apiType, CounterList counterList, bool forceSinglePassForHSA = true);
+std::vector<CounterPassInfo> GetNumberOfPassFromGPUPerfAPI(GPA_API_Type apiType, CounterList counterList, std::vector<DeviceInfo> deviceInfoList, bool forceSinglePassForHSA = true);
 std::vector<CounterList> GetCounterListsByMaxPassForEachDevice(GPA_API_Type apiType, CounterPassInfo counterPassInfo, unsigned int maxPass, CounterList& leftCounterList);
 void ListCounterToFileForMaxPass(std::string counterFile, unsigned int maxPass);
 
@@ -1501,7 +1501,7 @@ void PrintCounterList(CounterList counterList)
     }
 }
 
-std::vector<CounterPassInfo> GetNumberOfPassForAPI(GPA_API_Type apiType, CounterList counterList)
+std::vector<CounterPassInfo> GetNumberOfPassForAPI(GPA_API_Type apiType, CounterList counterList, bool forceSinglePassForHSA)
 {
     std::vector<DeviceInfo> deviceInfoList;
     std::vector<CounterPassInfo> counterInfoList;
@@ -1510,7 +1510,7 @@ std::vector<CounterPassInfo> GetNumberOfPassForAPI(GPA_API_Type apiType, Counter
 
     if (!deviceInfoList.empty())
     {
-        counterInfoList = GetNumberOfPassFromGPUPerfAPI(apiType, counterList, deviceInfoList);
+        counterInfoList = GetNumberOfPassFromGPUPerfAPI(apiType, counterList, deviceInfoList, forceSinglePassForHSA);
     }
 
     return counterInfoList;
@@ -1739,7 +1739,7 @@ std::vector<DeviceInfo> GetDeviceInfoList(GPA_API_Type apiType)
 }
 
 
-std::vector<CounterPassInfo> GetNumberOfPassFromGPUPerfAPI(GPA_API_Type apiType, CounterList counterList, std::vector<DeviceInfo> deviceInfoList)
+std::vector<CounterPassInfo> GetNumberOfPassFromGPUPerfAPI(GPA_API_Type apiType, CounterList counterList, std::vector<DeviceInfo> deviceInfoList, bool forceSinglePassForHSA)
 {
     gtString strDirPath = FileUtils::GetExePathAsUnicode();
     GPA_ICounterAccessor* ppCounterAccessor = nullptr;
@@ -1799,7 +1799,7 @@ std::vector<CounterPassInfo> GetNumberOfPassFromGPUPerfAPI(GPA_API_Type apiType,
                         gpaUtils.FilterNonComputeCounters(static_cast<GPA_HW_GENERATION>(i->m_generation), computeCounterList);
                     }
 
-                    if (apiType == GPA_API_HSA)
+                    if (apiType == GPA_API_HSA && forceSinglePassForHSA)
                     {
                         considerNumberOfPassToBeOne = true;
                     }
@@ -1876,7 +1876,7 @@ void ListCounterToFileForMaxPass(std::string counterFile, unsigned int maxPass)
 
     auto CounterToFileForMaxPassLambda = [&]()
     {
-        counterPassInfoList = GetNumberOfPassForAPI(apiType, counterList);
+        counterPassInfoList = GetNumberOfPassForAPI(apiType, counterList, false);
 
         for (unsigned int i = 0; i < counterPassInfoList.size(); ++i)
         {
