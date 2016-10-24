@@ -231,7 +231,7 @@ void HSAAPIInfoManager::FlushNonAPITimestampData(const osProcessId& pid)
         {
             if ((*it)->m_isReady)
             {
-                (*it)->WritePacketEntry(foutAqlTrace, false);
+                (*it)->WritePacketEntry(foutAqlTrace);
                 foutAqlTrace << std::endl;
                 delete (*it);
             }

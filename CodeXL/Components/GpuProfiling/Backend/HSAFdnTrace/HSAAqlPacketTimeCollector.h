@@ -15,6 +15,7 @@
 #ifndef _HSA_AQL_PACKET_TIME_COLLECTOR_H_
 #define _HSA_AQL_PACKET_TIME_COLLECTOR_H_
 
+
 #include <stack>
 #include <queue>
 #include <unordered_map>
@@ -22,7 +23,10 @@
 #include "hsa.h"
 
 #include <AMDTOSWrappers/Include/osThread.h>
+
+#if defined (_LINUX) || defined (LINUX)
 #include <AMDTOSWrappers/Include/osCondition.h>
+#endif
 
 #include <AMDTMutex.h>
 #include <TSingleton.h>
@@ -70,7 +74,9 @@ class HSATimeCollectorGlobals: public TSingleton<HSATimeCollectorGlobals>
 public:
     hsa_signal_t              m_forceSignalCollection;  ///< signal used to indicate that the collector thread should collect timestamps for all remaining signals
     bool                      m_doQuit;                 ///< flag to indicate that the signal collector should finish
+#if defined (_LINUX) || defined (LINUX)
     osCondition               m_dispatchesInFlight;     ///< condition used to wake up the signal collector thread
+#endif
 
 private:
     /// Constructor

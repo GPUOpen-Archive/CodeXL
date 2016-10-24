@@ -215,6 +215,7 @@ extern "C" void DLL_PUBLIC OnUnload()
     auto& forceSignalCollection = HSATimeCollectorGlobals::Instance()->m_forceSignalCollection;
     g_pRealCoreFunctions->hsa_signal_store_screlease_fn(forceSignalCollection, 1);
 
+#if defined (_LINUX) || defined (LINUX)
     // notify the signal collector thread to collect all remaining signals
     if (!HSATimeCollectorGlobals::Instance()->m_dispatchesInFlight.unlockCondition())
     {
@@ -222,8 +223,9 @@ extern "C" void DLL_PUBLIC OnUnload()
     }
 
     HSATimeCollectorGlobals::Instance()->m_dispatchesInFlight.signalSingleThread();
+#endif
 
-    g_pSignalCollector->waitForThreadEnd(osTimeInterval(10 * 1e9)); // wait ten seconds for thread to end
+    g_pSignalCollector->waitForThreadEnd(osTimeInterval(static_cast<gtUInt64>(10 * 1e9))); // wait ten seconds for thread to end
     g_pSignalCollector->terminate();
     g_pSignalCollector = nullptr;
 

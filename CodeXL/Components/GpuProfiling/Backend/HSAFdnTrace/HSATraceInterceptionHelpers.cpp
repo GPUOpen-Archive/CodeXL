@@ -21,7 +21,7 @@
 #include "HSATraceInterceptionHelpers.h"
 #include "HSAAqlPacketTimeCollector.h"
 
-hsa_status_t AqlPacketTraceCallback(const hsa_aql_trace_t* pAqlPacketTrace, void* pUserArg)
+hsa_status_t AqlPacketTraceCallback(const hsa_aql_trace_t* pAqlPacketTrace, void* /*pUserArg*/)
 {
     SpAssertRet(nullptr != pAqlPacketTrace) HSA_STATUS_ERROR_INVALID_ARGUMENT;
 
@@ -49,6 +49,7 @@ hsa_status_t AqlPacketTraceCallback(const hsa_aql_trace_t* pAqlPacketTrace, void
                 // add the replacer to the list of signals that are available to listen for
                 HSASignalQueue::Instance()->AddSignalToBack(signalReplacer);
 
+#if defined (_LINUX) || defined (LINUX)
                 // notify the signal collector that there are now dispatches available to listen for
                 if (!HSATimeCollectorGlobals::Instance()->m_dispatchesInFlight.unlockCondition())
                 {
@@ -59,6 +60,7 @@ hsa_status_t AqlPacketTraceCallback(const hsa_aql_trace_t* pAqlPacketTrace, void
                 {
                     Log(logERROR, "unable to signal condition\n");
                 }
+#endif
             }
 
             break;

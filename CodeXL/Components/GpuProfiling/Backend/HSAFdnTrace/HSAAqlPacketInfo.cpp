@@ -31,7 +31,7 @@ HSAAqlPacketBase:: ~HSAAqlPacketBase()
 {
 }
 
-bool HSAAqlPacketBase::WritePacketEntry(std::ostream& sout, bool bTimeout)
+bool HSAAqlPacketBase::WritePacketEntry(std::ostream& sout)
 {
     uint32_t deviceId;
     hsa_status_t status = g_pRealCoreFunctions->hsa_agent_get_info_fn(m_agent, static_cast<hsa_agent_info_t>(HSA_AMD_AGENT_INFO_CHIP_ID), &deviceId);
@@ -80,7 +80,7 @@ HSAAqlKernelDispatchPacket::HSAAqlKernelDispatchPacket(hsa_kernel_dispatch_packe
 {
 }
 
-bool HSAAqlKernelDispatchPacket::WritePacketEntry(std::ostream& sout, bool bTimeout)
+bool HSAAqlKernelDispatchPacket::WritePacketEntry(std::ostream& sout)
 {
     // NOTE: the reason for the odd ordering of items below (for instance, the location of the
     // call to base class) is to match the order of items when not using aql-packet-tracing.
@@ -119,7 +119,7 @@ bool HSAAqlKernelDispatchPacket::WritePacketEntry(std::ostream& sout, bool bTime
     sout << std::left << std::setw(21) << m_end;
 
     // call base class
-    bool retVal = HSAAqlPacketBase::WritePacketEntry(sout, bTimeout);
+    bool retVal = HSAAqlPacketBase::WritePacketEntry(sout);
 
     // kernel dispatch packet
     sout << HSATraceStringUtils::Get_hsa_kernel_dispatch_packet_t_String(m_packet);
@@ -141,9 +141,9 @@ HSAAqlAgentDispatchPacket::HSAAqlAgentDispatchPacket(hsa_agent_dispatch_packet_t
     m_isReady = true; // this packet type is always ready
 }
 
-bool HSAAqlAgentDispatchPacket::WritePacketEntry(std::ostream& sout, bool bTimeout)
+bool HSAAqlAgentDispatchPacket::WritePacketEntry(std::ostream& sout)
 {
-    bool retVal = HSAAqlPacketBase::WritePacketEntry(sout, bTimeout);
+    bool retVal = HSAAqlPacketBase::WritePacketEntry(sout);
     sout << HSATraceStringUtils::Get_hsa_agent_dispatch_packet_t_String(m_packet);
 
     return retVal;
@@ -156,9 +156,9 @@ HSAAqlBarrierAndPacket::HSAAqlBarrierAndPacket(hsa_barrier_and_packet_t barrierA
     m_isReady = true; // this packet type is always ready
 }
 
-bool HSAAqlBarrierAndPacket::WritePacketEntry(std::ostream& sout, bool bTimeout)
+bool HSAAqlBarrierAndPacket::WritePacketEntry(std::ostream& sout)
 {
-    bool retVal = HSAAqlPacketBase::WritePacketEntry(sout, bTimeout);
+    bool retVal = HSAAqlPacketBase::WritePacketEntry(sout);
     sout << HSATraceStringUtils::Get_hsa_barrier_and_packet_t_String(m_packet);
 
     return retVal;
@@ -171,9 +171,9 @@ HSAAqlBarrierOrPacket::HSAAqlBarrierOrPacket(hsa_barrier_or_packet_t barrierOrPa
     m_isReady = true; // this packet type is always ready
 }
 
-bool HSAAqlBarrierOrPacket::WritePacketEntry(std::ostream& sout, bool bTimeout)
+bool HSAAqlBarrierOrPacket::WritePacketEntry(std::ostream& sout)
 {
-    bool retVal = HSAAqlPacketBase::WritePacketEntry(sout, bTimeout);
+    bool retVal = HSAAqlPacketBase::WritePacketEntry(sout);
     sout << HSATraceStringUtils::Get_hsa_barrier_or_packet_t_String(m_packet);
 
     return retVal;

@@ -23,9 +23,8 @@ public:
 
     /// Write timestamp entry
     /// \param sout output stream
-    /// \param bTimeout a flag indicating output mode
     /// \return True if timestamps are ready
-    virtual bool WritePacketEntry(std::ostream& sout, bool bTimeout);
+    virtual bool WritePacketEntry(std::ostream& sout);
 
     hsa_packet_type_t m_type;     ///< aql packet type
     uint64_t          m_packetId; ///< packet id of the packet
@@ -53,9 +52,8 @@ public:
 
     /// Write timestamp entry
     /// \param sout output stream
-    /// \param bTimeout a flag indicating output mode
     /// \return True if timestamps are ready
-    virtual bool WritePacketEntry(std::ostream& sout, bool bTimeout);
+    virtual bool WritePacketEntry(std::ostream& sout);
 
     /// Sets the start/end timestamps
     /// \param start the start timestamp
@@ -77,9 +75,8 @@ public:
 
     /// Write timestamp entry
     /// \param sout output stream
-    /// \param bTimeout a flag indicating output mode
     /// \return True if timestamps are ready
-    virtual bool WritePacketEntry(std::ostream& sout, bool bTimeout);
+    virtual bool WritePacketEntry(std::ostream& sout);
 
 private:
     hsa_agent_dispatch_packet_t m_packet; ///< the agent dispatch packet
@@ -94,9 +91,8 @@ public:
 
     /// Write timestamp entry
     /// \param sout output stream
-    /// \param bTimeout a flag indicating output mode
     /// \return True if timestamps are ready
-    virtual bool WritePacketEntry(std::ostream& sout, bool bTimeout);
+    virtual bool WritePacketEntry(std::ostream& sout);
 
 private:
     hsa_barrier_and_packet_t m_packet; ///< the barrier and packet
@@ -111,9 +107,8 @@ public:
 
     /// Write timestamp entry
     /// \param sout output stream
-    /// \param bTimeout a flag indicating output mode
     /// \return True if timestamps are ready
-    virtual bool WritePacketEntry(std::ostream& sout, bool bTimeout);
+    virtual bool WritePacketEntry(std::ostream& sout);
 
 private:
     hsa_barrier_or_packet_t m_packet; ///< the barrier or packet
