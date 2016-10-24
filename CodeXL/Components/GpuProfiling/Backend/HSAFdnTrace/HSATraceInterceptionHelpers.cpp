@@ -5,8 +5,6 @@
 /// \brief  This file contains functions called by various intercepted APIs
 //==============================================================================
 
-//#include <hsa_ext_profiler.h>
-
 #include "Defs.h"
 #include "Logger.h"
 #include "GlobalSettings.h"

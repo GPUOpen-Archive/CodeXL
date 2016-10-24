@@ -55,9 +55,9 @@ struct HSAPacketSignalReplacer
         m_profilerSignal(profilerSignal),
         m_agent(agent),
         m_pQueue(pQueue)
-    {        
+    {
     }
-    
+
     /// Default Constructor
     HSAPacketSignalReplacer() {}
 };
@@ -82,7 +82,7 @@ private:
 class HSASignalPool : public TSingleton<HSASignalPool>
 {
     friend class TSingleton<HSASignalPool>;
-    
+
 public:
     /// Destructor
     ~HSASignalPool();

@@ -312,12 +312,12 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
         configOut.bHSATrace = unicodeOptionsMap.count("hsatrace") > 0;
         configOut.bHSAPMC = unicodeOptionsMap.count("hsapmc") > 0;
         configOut.bAqlPacketTracing = unicodeOptionsMap.count("hsaaqlpackettrace") > 0;
-        
+
         if (configOut.bAqlPacketTracing)
         {
             configOut.bHSATrace = true;
         }
-        
+
         configOut.bOccupancy = unicodeOptionsMap.count("occupancy") > 0;
         configOut.bSubKernelProfile = unicodeOptionsMap.count("subkernel") > 0;
         configOut.bGMTrace = unicodeOptionsMap.count("gmtrace") > 0;

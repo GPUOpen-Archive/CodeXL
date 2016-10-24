@@ -1278,12 +1278,6 @@ std::string HSATraceStringUtils::Get_hsa_wavefront_get_info_AttributeString(void
     }
 }
 
-/*
-std::string HSATraceStringUtils::Get_hsa_aql_trace_t_String(hsa_aql_trace_t input)
-{
-}
-*/
-
 #endif
 
 
