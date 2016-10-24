@@ -109,7 +109,7 @@ void GPAUtils::FilterNonComputeCounters(GPA_HW_GENERATION gen, CounterList& coun
             else if (strCounterName.find("CS") == 0)
             {
                 // all counters starting with "CS" except CSBusy and CSTime are considered compute counters
-                if (0 != strCounterName.compare("CSBusy") && 0 != strCounterName.compare("CSTime"))
+                if (0 != strCounterName.compare("CSBusy") && 0 != strCounterName.compare("CSTime") && 0 != strCounterName.compare("CSInvocations"))
                 {
                     ++it;
 
