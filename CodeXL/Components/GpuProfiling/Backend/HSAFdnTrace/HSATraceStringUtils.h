@@ -311,6 +311,11 @@ unsigned int Get_hsa_wavefront_get_info_AttributeSize(hsa_wavefront_info_t attri
 /// \param the return value of the hsa_wavefront_get_info call
 /// \return the string representation of the specified wavefront data
 std::string Get_hsa_wavefront_get_info_AttributeString(void* value, hsa_wavefront_info_t attribute, hsa_status_t retVal);
+
+/// Gets the string representation of the hsa_aql_trace_t type
+/// \param input the input hsa_aql_trace_t
+/// \return the string representation of the hsa_aql_trace_t
+//std::string Get_hsa_aql_trace_t_String(hsa_aql_trace_t input);
 #endif
 
 }

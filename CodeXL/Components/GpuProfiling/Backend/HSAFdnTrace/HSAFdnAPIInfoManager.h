@@ -18,6 +18,7 @@
 
 #include "../Common/APIInfoManagerBase.h"
 #include "HSAAPIBase.h"
+#include "HSAAqlPacketInfo.h"
 #include "../Common/ProfilerTimer.h"
 
 /// Struct to hold AsyncCopy timestamps
@@ -38,6 +39,7 @@ struct AsyncCopyInfo
 };
 
 typedef std::vector<AsyncCopyInfo*> AsyncCopyInfoList; ///< typedef for the async copy info list
+typedef std::vector<HSAAqlPacketBase*> PacketList; ///< typedef for the packet list
 
 /// Handle the response on the end of the timer
 /// \param timerType type of the ending timer for which response have to be executed
@@ -49,12 +51,16 @@ class HSAAPIInfoManager :
     friend class TSingleton<HSAAPIInfoManager>;
 
 public:
-    /// Add APIInfo to the list
-    /// \param api APIInfo entry
-    void AddAPIInfoEntry(APIBase* api);
-
     /// Destructor
     virtual ~HSAAPIInfoManager();
+
+    /// Add APIInfo to the list
+    /// \param api APIInfo entry
+    void AddAPIInfoEntry(APIBase* pApi);
+
+    /// Add AqlPacket to the list
+    /// \param aqlPacket AqlPacketBase entry
+    void AddAqlPacketEntry(HSAAqlPacketBase* PAqlPacket);
 
     /// Check if the specified API should be intercepted
     /// \param type HSA function type
@@ -151,7 +157,9 @@ private:
     std::set<HSA_API_Type> m_mustInterceptAPIs;             ///< HSA APIs that must be intercepted (even when they are filtered out and not traced)
     QueueIndexMap          m_queueIndexMap;                 ///< map of a queue to that queue's index (basically creation order)
     AsyncCopyInfoList      m_asyncCopyInfoList;             ///< list of async copy information
+    PacketList             m_packetList;                    ///< list of packets
     AMDTMutex              m_asyncTimeStampsMtx;            ///< mutex to guard access to m_asyncCopyInfoList
+    AMDTMutex              m_packetTraceMtx;                ///< mutex to guard access to m_packetList
     bool                   m_bDelayStartEnabled;            ///< flag indicating whether or not the profiler should start with delay or not
     bool                   m_bProfilerDurationEnabled;      ///< flag indiacating whether profiler should only run for certain duration
     unsigned long          m_delayInMilliseconds;           ///< millieconds to delay for profiler to start

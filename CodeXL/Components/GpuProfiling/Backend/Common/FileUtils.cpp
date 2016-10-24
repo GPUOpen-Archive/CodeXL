@@ -197,6 +197,7 @@ void FileUtils::PassParametersByFile(Parameters params)
     fout << "ProfileDuration=" << params.m_durationInMilliseconds << endl;
     fout << "ForceSingleGPU=" << (params.m_bForceSingleGPU ? "True" : "False") << endl;
     fout << "ForcedGpuIndex=" << params.m_uiForcedGpuIndex << endl;
+    fout << "AqlPacketTracing=" << (params.m_bAqlPacketTracing ? "True" : "False") << endl;
 
     for (EnvVarMap::const_iterator it = params.m_mapEnvVars.begin(); it != params.m_mapEnvVars.end(); ++it)
     {
@@ -563,6 +564,10 @@ bool FileUtils::GetParametersFromFile(Parameters& params)
                         Log(logWARNING, "Failed to parse parameter file.\n");
                         params.m_bForceSingleGPU = false;
                     }
+                }
+                else if (opStr.find("AqlPacketTracing") != std::string::npos)
+                {
+                    params.m_bAqlPacketTracing = (valStr.find("True") != std::string::npos);
                 }
             }
         }

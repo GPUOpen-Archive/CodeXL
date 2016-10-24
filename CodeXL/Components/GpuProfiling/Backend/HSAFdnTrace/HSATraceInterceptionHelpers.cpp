@@ -5,6 +5,8 @@
 /// \brief  This file contains functions called by various intercepted APIs
 //==============================================================================
 
+//#include <hsa_ext_profiler.h>
+
 #include "Defs.h"
 #include "Logger.h"
 #include "GlobalSettings.h"
@@ -19,6 +21,77 @@
 #include "HSAFdnAPIInfoManager.h"
 #include "FinalizerInfoManager.h"
 #include "HSATraceInterceptionHelpers.h"
+#include "HSAAqlPacketTimeCollector.h"
+
+hsa_status_t AqlPacketTraceCallback(const hsa_aql_trace_t* pAqlPacketTrace, void* pUserArg)
+{
+    SpAssertRet(nullptr != pAqlPacketTrace) HSA_STATUS_ERROR_INVALID_ARGUMENT;
+
+    HSAAqlPacketBase* pAqlPacket = nullptr;
+
+    switch (pAqlPacketTrace->type)
+    {
+        case HSA_PACKET_TYPE_KERNEL_DISPATCH:
+        {
+            HSAAqlKernelDispatchPacket* pAqlKernelDispatchPacket = new(std::nothrow) HSAAqlKernelDispatchPacket(*static_cast<hsa_kernel_dispatch_packet_t*>(pAqlPacketTrace->packet));
+            pAqlPacket = pAqlKernelDispatchPacket;
+
+            hsa_kernel_dispatch_packet_t* pKernelDispatchPacket = static_cast<hsa_kernel_dispatch_packet_t*>(pAqlPacketTrace->packet);
+
+            hsa_signal_t replacement_signal;
+            if (HSASignalPool::Instance()->AcquireSignal(1, replacement_signal))
+            {
+                // create a replacement signal
+                HSAPacketSignalReplacer signalReplacer(pAqlKernelDispatchPacket, pKernelDispatchPacket->completion_signal,
+                                                       replacement_signal, pAqlPacketTrace->agent,
+                                                       pAqlPacketTrace->queue);
+
+                pKernelDispatchPacket->completion_signal = replacement_signal;
+
+                // add the replacer to the list of signals that are available to listen for
+                HSASignalQueue::Instance()->AddSignalToBack(signalReplacer);
+
+                // notify the signal collector that there are now dispatches available to listen for
+                if (!HSATimeCollectorGlobals::Instance()->m_dispatchesInFlight.unlockCondition())
+                {
+                    Log(logERROR, "unable to unlock condition\n");
+                }
+
+                if (!HSATimeCollectorGlobals::Instance()->m_dispatchesInFlight.signalSingleThread())
+                {
+                    Log(logERROR, "unable to signal condition\n");
+                }
+            }
+
+            break;
+        }
+
+        case HSA_PACKET_TYPE_AGENT_DISPATCH:
+            pAqlPacket = new(std::nothrow) HSAAqlAgentDispatchPacket(*static_cast<hsa_agent_dispatch_packet_t*>(pAqlPacketTrace->packet));
+            break;
+
+        case HSA_PACKET_TYPE_BARRIER_AND:
+            pAqlPacket = new(std::nothrow) HSAAqlBarrierAndPacket(*static_cast<hsa_barrier_and_packet_t*>(pAqlPacketTrace->packet));
+            break;
+
+        case HSA_PACKET_TYPE_BARRIER_OR:
+            pAqlPacket = new(std::nothrow) HSAAqlBarrierOrPacket(*static_cast<hsa_barrier_or_packet_t*>(pAqlPacketTrace->packet));
+            break;
+
+        default:
+            break;
+    }
+
+    if (nullptr != pAqlPacket)
+    {
+        pAqlPacket->m_packetId = pAqlPacketTrace->packet_id;
+        pAqlPacket->m_agent = pAqlPacketTrace->agent;
+        pAqlPacket->m_pQueue = pAqlPacketTrace->queue;
+        HSAAPIInfoManager::Instance()->AddAqlPacketEntry(pAqlPacket);
+    }
+
+    return HSA_STATUS_SUCCESS;
+}
 
 void HSA_APITrace_hsa_queue_create_PostCallHelper(hsa_status_t retVal, hsa_agent_t agent, uint32_t size, hsa_queue_type_t type, void(*callback)(hsa_status_t status, hsa_queue_t* source,
                                                   void* data), void* data, uint32_t private_segment_size, uint32_t group_segment_size, hsa_queue_t** queue)
@@ -35,6 +108,22 @@ void HSA_APITrace_hsa_queue_create_PostCallHelper(hsa_status_t retVal, hsa_agent
     {
         g_pRealAmdExtFunctions->hsa_amd_profiling_async_copy_enable_fn(true);
         HSAAPIInfoManager::Instance()->AddQueue(*queue);
+
+        if (GlobalSettings::GetInstance()->m_params.m_bAqlPacketTracing)
+        {
+            HSAToolsRTModule* pToolsRTModule = HSARTModuleLoader<HSAToolsRTModule>::Instance()->GetHSARTModule();
+
+            if (pToolsRTModule->IsModuleLoaded())
+            {
+                hsa_status_t localStatus = pToolsRTModule->ext_tools_register_aql_trace_callback(*queue, nullptr, AqlPacketTraceCallback);
+
+                if (HSA_STATUS_SUCCESS != localStatus)
+                {
+                    Log(logERROR, "Error registering an Aql Trace Callback\n");
+                    GlobalSettings::GetInstance()->m_params.m_bAqlPacketTracing = false;
+                }
+            }
+        }
     }
 }
 

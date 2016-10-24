@@ -9,6 +9,7 @@
 #define _HSATRACESTRINGOUTPUT_H_
 
 #include <string>
+#include <sstream>
 
 #include <hsa.h>
 #include <hsa_ext_finalize.h>

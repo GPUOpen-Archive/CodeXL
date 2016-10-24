@@ -498,12 +498,13 @@ int ProfileApplication(const std::string& strCounterFile, const int& profilerBit
     params.m_bForceSinglePassPMC = config.bForceSinglePassPMC;
     params.m_bGPUTimePMC = config.bGPUTimePMC;
     params.m_bStartDisabled = config.bStartDisabled;
-    params.m_delayInMilliseconds = config.m_delayInMilliseconds > 0 ? config.m_delayInMilliseconds : 0;
-    params.m_bDelayStartEnabled = config.m_delayInMilliseconds > 0;
-    params.m_durationInMilliseconds = config.m_durationInMilliseconds > 0 ? config.m_durationInMilliseconds : 0;
-    params.m_bProfilerDurationEnabled = config.m_durationInMilliseconds > 0;
+    params.m_delayInMilliseconds = config.uiDelayInMilliseconds > 0 ? config.uiDelayInMilliseconds : 0;
+    params.m_bDelayStartEnabled = config.uiDelayInMilliseconds > 0;
+    params.m_durationInMilliseconds = config.uiDurationInMilliseconds > 0 ? config.uiDurationInMilliseconds : 0;
+    params.m_bProfilerDurationEnabled = config.uiDurationInMilliseconds > 0;
     params.m_bForceSingleGPU = config.bForceSingleGPU;
     params.m_uiForcedGpuIndex = config.uiForcedGpuIndex;
+    params.m_bAqlPacketTracing = config.bAqlPacketTracing;
 
 #ifdef GDT_INTERNAL
 
@@ -1250,6 +1251,13 @@ static bool SetHSAServer(const gtString& strDirPathUnicode)
     }
 
     OSUtils::Instance()->SetEnvVar(HSA_ENABLE_PROFILING_ENV_VAR, strServerPath.c_str());
+
+    if (config.bHSATrace && config.bAqlPacketTracing)
+    {
+        // for now, AQL packet tracing is enabled via an env var
+        OSUtils::Instance()->SetEnvVar("HSA_SERVICE_GET_KERNEL_TIMES", "0");
+    }
+
     return true;
 }
 

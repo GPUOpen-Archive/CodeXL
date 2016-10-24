@@ -130,6 +130,7 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
 #if defined (_LINUX) || defined (LINUX)
         ("hsatrace,A", "Trace HSA application and generate CPU and GPU time stamps and detailed API call traces.")
         ("hsapmc,C", "Get the performance counters for each HSA kernel dispatched by the application.")
+        ("hsaaqlpackettrace", "Enable HSA AQL Packet tracing.  This enhances the --hsatrace output by adding information about all AQL packets processed by the application.")
 #endif
         ("occupancy,O", "Generate kernel occupancy information for each OpenCL kernel dispatched by the application.")
         ("occupancydisplay,P", po::value<string>(), "Path to configuration file to use to generate an occupancy display file.  The occupancy display file to generate should be specified with --outputfile.")
@@ -310,6 +311,13 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
         configOut.bPerfCounter = unicodeOptionsMap.count("perfcounter") > 0;
         configOut.bHSATrace = unicodeOptionsMap.count("hsatrace") > 0;
         configOut.bHSAPMC = unicodeOptionsMap.count("hsapmc") > 0;
+        configOut.bAqlPacketTracing = unicodeOptionsMap.count("hsaaqlpackettrace") > 0;
+        
+        if (configOut.bAqlPacketTracing)
+        {
+            configOut.bHSATrace = true;
+        }
+        
         configOut.bOccupancy = unicodeOptionsMap.count("occupancy") > 0;
         configOut.bSubKernelProfile = unicodeOptionsMap.count("subkernel") > 0;
         configOut.bGMTrace = unicodeOptionsMap.count("gmtrace") > 0;
@@ -371,11 +379,11 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
             wstring valueStr = unicodeOptionsMap["startdelay"];
             string valueStrConverted;
             StringUtils::WideStringToUtf8String(valueStr, valueStrConverted);
-            configOut.m_delayInMilliseconds = boost::lexical_cast<unsigned int>(valueStrConverted.c_str());
+            configOut.uiDelayInMilliseconds = boost::lexical_cast<unsigned int>(valueStrConverted.c_str());
         }
         else
         {
-            configOut.m_delayInMilliseconds = 0;
+            configOut.uiDelayInMilliseconds = 0;
         }
 
         if (unicodeOptionsMap.count("profileduration") > 0)
@@ -383,11 +391,11 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
             wstring valueStr = unicodeOptionsMap["profileduration"];
             string valueStrConverted;
             StringUtils::WideStringToUtf8String(valueStr, valueStrConverted);
-            configOut.m_durationInMilliseconds = boost::lexical_cast<unsigned int>(valueStrConverted.c_str());
+            configOut.uiDurationInMilliseconds = boost::lexical_cast<unsigned int>(valueStrConverted.c_str());
         }
         else
         {
-            configOut.m_durationInMilliseconds = 0;
+            configOut.uiDurationInMilliseconds = 0;
         }
 
 
@@ -763,20 +771,20 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
             wstring valueStr = unicodeOptionsMap["maxpassperfile"];
             string valueStrConverted;
             StringUtils::WideStringToUtf8String(valueStr, valueStrConverted);
-            configOut.m_maxPassPerFile = boost::lexical_cast<unsigned int>(valueStrConverted.c_str());
+            configOut.uiMaxPassPerFile = boost::lexical_cast<unsigned int>(valueStrConverted.c_str());
         }
         else
         {
-            configOut.m_maxPassPerFile = 0;
+            configOut.uiMaxPassPerFile = 0;
 
         }
 
         // check for "list" last so that other params are checked first (like output file)
         if (unicodeOptionsMap.count("list") > 0)
         {
-            if (!configOut.strOutputFile.empty() && configOut.m_maxPassPerFile >= 1)
+            if (!configOut.strOutputFile.empty() && configOut.uiMaxPassPerFile >= 1)
             {
-                ListCounterToFileForMaxPass(configOut.strOutputFile, configOut.m_maxPassPerFile);
+                ListCounterToFileForMaxPass(configOut.strOutputFile, configOut.uiMaxPassPerFile);
             }
             else
             {

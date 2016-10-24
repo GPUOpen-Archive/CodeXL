@@ -10,7 +10,7 @@
 
 #include "../Common/APIInfoManagerBase.h"
 #include "../Common/APITraceUtils.h"
-#include "HSATraceStringUtils.h"
+#include "../HSAFdnCommon/HSAFunctionDefs.h"
 
 //------------------------------------------------------------------------------------
 /// HSAAPI base class

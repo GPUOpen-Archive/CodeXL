@@ -7,6 +7,7 @@
 
 #include "HSAFunctionDefs.h"
 #include "HSAAPIBase.h"
+#include "HSATraceStringUtils.h"
 
 HSAAPIBase::HSAAPIBase() :
     APIBase(),

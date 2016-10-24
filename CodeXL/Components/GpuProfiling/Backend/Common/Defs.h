@@ -336,6 +336,7 @@ struct Parameters
         m_durationInMilliseconds = 0;
         m_bForceSingleGPU = false;
         m_uiForcedGpuIndex = 0;
+        m_bAqlPacketTracing = false;
     }
 
     unsigned int m_uiVersionMajor;                ///< Version major
@@ -389,6 +390,7 @@ struct Parameters
     unsigned int m_durationInMilliseconds;        ///< duration for profiler in milliseconds for which profiler should run
     bool m_bForceSingleGPU;                       ///< Flag indicating whether or not to force a single GPU
     unsigned int m_uiForcedGpuIndex;              ///< Forced GPU index
+    bool m_bAqlPacketTracing;                     ///< Flag indicating that an AQL Packet Trace should be performed.
 };
 
 typedef std::map<std::string, bool> AnalyzerMap;
