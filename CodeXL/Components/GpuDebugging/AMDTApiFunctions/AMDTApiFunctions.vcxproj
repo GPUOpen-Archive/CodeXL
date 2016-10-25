@@ -71,7 +71,7 @@
     <ClInclude Include="Include\gaGRApiFunctions.h" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuildStep Include="Sconstruct">
+    <CustomBuildStep Include="Sconscript">
       <FileType>Document</FileType>
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </CustomBuildStep>

@@ -99,11 +99,11 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuildStep Include="Sconstruct" />
+    <CustomBuildStep Include="Sconscript" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\..\Common\Src\VersionInfo\VersionResource.rc">
-      <Filter>src</Filter>
+      <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
 </Project>
