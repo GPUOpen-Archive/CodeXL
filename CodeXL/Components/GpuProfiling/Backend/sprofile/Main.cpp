@@ -1001,7 +1001,7 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
                     appendString = stringStream.str() ;
                 }
 
-                if (config.bPerfCounter)
+                if (config.bPerfCounter || config.bHSAPMC)
                 {
                     outputFileName = FileUtils::GetDefaultProfileOutputFile(appendString);
                 }
@@ -1062,7 +1062,7 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
 
         if (config.strOutputFile.empty())
         {
-            if (config.bPerfCounter)
+            if (config.bPerfCounter || config.bHSAPMC)
             {
                 outputFileName = FileUtils::GetDefaultProfileOutputFile();
             }
