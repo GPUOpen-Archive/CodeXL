@@ -213,7 +213,12 @@ extern "C" void DLL_PUBLIC OnUnload()
     HSATimeCollectorGlobals::Instance()->m_doQuit = true;
 
     auto& forceSignalCollection = HSATimeCollectorGlobals::Instance()->m_forceSignalCollection;
+
+#ifdef FUTURE_ROCR_VERSION
     g_pRealCoreFunctions->hsa_signal_store_screlease_fn(forceSignalCollection, 1);
+#else
+    g_pRealCoreFunctions->hsa_signal_store_release_fn(forceSignalCollection, 1);
+#endif
 
 #if defined (_LINUX) || defined (LINUX)
     // notify the signal collector thread to collect all remaining signals
