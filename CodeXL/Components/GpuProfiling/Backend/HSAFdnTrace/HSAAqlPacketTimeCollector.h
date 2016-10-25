@@ -111,7 +111,7 @@ public:
     void Clear();
 
 private:
-    static const int s_MAX_POOL_SIZE = 100; ///< only keep 100 unused signals in the pool
+    static const size_t s_MAX_POOL_SIZE = 100; ///< only keep 100 unused signals in the pool
 
     /// Constructor
     HSASignalPool();
