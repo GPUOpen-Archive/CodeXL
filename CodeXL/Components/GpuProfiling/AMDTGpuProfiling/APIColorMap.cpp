@@ -31,8 +31,10 @@
 #include <AMDTGpuProfiling/APIColorMap.h>
 
 ///< color used for perf marker timeline items
-static const QColor s_LIGHT_BLUE_PERF_MARKER_COLOR = QColor(173, 216, 230);
+static const QColor s_PERF_MARKER_COLOR = QColor(255, 123, 0); // orange
 
+///< color used for command buffer timeline items
+static const QColor s_COMMAND_BUFFER_COLOR = QColor(173, 216, 0); // light blue
 
 APIColorMap::APIColorMap()
 {
@@ -318,12 +320,12 @@ QColor APIColorMap::GetAPIColor(ProfileSessionDataItem::ProfileItemType itemType
 
 QColor APIColorMap::GetPerfMarkersColor() const
 {
-    return s_LIGHT_BLUE_PERF_MARKER_COLOR;
+    return s_PERF_MARKER_COLOR;
 }
 
 QColor APIColorMap::GetCommandListColor(int index) const
 {
-    QColor retVal = s_LIGHT_BLUE_PERF_MARKER_COLOR;
+    QColor retVal = s_COMMAND_BUFFER_COLOR;
     int indexInVec = index % (m_commandListsColors.size() - 1);
     GT_IF_WITH_ASSERT(indexInVec < m_commandListsColors.size() && index >= 0)
     {

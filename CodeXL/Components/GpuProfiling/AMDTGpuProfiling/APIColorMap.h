@@ -40,7 +40,7 @@ public:
     /// \param apiName the name of the api method
     /// \param defaultColor color the color to use if this is an unknown api
     /// \return the color for the specified apiName
-    QColor GetAPIColor(const QString& apiName, const QColor& defaultColor) ;
+    QColor GetAPIColor(const QString& apiName, const QColor& defaultColor);
 
     /// Gets the API color for the specified api type
     /// \param itemType struct describing the API function (main + sub types)
@@ -51,10 +51,10 @@ public:
 
     /// Gets the color for a performance marker item
     /// \return the color for performance markers
-    QColor GetPerfMarkersColor() const ;
+    QColor GetPerfMarkersColor() const;
 
     /// Gets the color for the command list with the specified index
-    /// \return the color for the command list 
+    /// \return the color for the command list
     QColor GetCommandListColor(int index) const;
 
 private:

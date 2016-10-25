@@ -564,7 +564,7 @@ QVariant TraceTableModel::data(const QModelIndex& index, int role) const
 
                     if (pMarker != nullptr)
                     {
-                        retVal = acQAMD_CYAN_OVERLAP_COLOUR;
+                        retVal = APIColorMap::Instance()->GetPerfMarkersColor();
                     }
                     else
                     {
