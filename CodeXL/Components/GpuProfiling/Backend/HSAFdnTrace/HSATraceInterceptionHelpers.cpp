@@ -21,9 +21,11 @@
 #include "HSATraceInterceptionHelpers.h"
 #include "HSAAqlPacketTimeCollector.h"
 
-hsa_status_t AqlPacketTraceCallback(const hsa_aql_trace_t* pAqlPacketTrace, void* /*pUserArg*/)
+hsa_status_t AqlPacketTraceCallback(const hsa_aql_trace_t* pAqlPacketTrace, void* pUserArg)
 {
     SpAssertRet(nullptr != pAqlPacketTrace) HSA_STATUS_ERROR_INVALID_ARGUMENT;
+
+    SP_UNREFERENCED_PARAMETER(pUserArg);
 
     HSAAqlPacketBase* pAqlPacket = nullptr;
 

@@ -96,14 +96,14 @@ public:
     /// Get a signal that can be used for a kernel dispatch. Creates one if
     /// needed or uses an existing one from the pool
     /// \param initialValue the initial value for the signal
-    /// \param the newly-created or recycled signal
+    /// \param signal the newly-created or recycled signal
     /// \return true if a signal is returned
     bool AcquireSignal(hsa_signal_value_t initialValue, hsa_signal_t& signal);
 
     /// Marks a signal as longer being used.  Makes it available in the pool
     /// for future dispatches
-    /// \param the signal that is no longer needed.  It willbe added to the
-    ///        pool for future dispatches
+    /// \param signal the signal that is no longer needed.  It will be added
+    ///        to the pool for future dispatches
     /// \return true if a signal is released
     bool ReleaseSignal(hsa_signal_t signal);
 
