@@ -286,7 +286,7 @@ bool HSAGPAProfiler::Init(const Parameters& params, std::string& strErrorOut)
                 {
                     CounterList counterNames;
                     // TODO: need to get revision id from HSA runtime (SWDEV-79571)
-                    m_gpaUtils.GetAvailableCountersForDevice(deviceId, 0, nMaxPass, counterNames);
+                    m_gpaUtils.GetAvailableCountersForDevice(deviceId, REVISION_ID_ANY, nMaxPass, counterNames);
                     tempCounters.insert(tempCounters.end(), counterNames.begin(), counterNames.end());
                 }
 
