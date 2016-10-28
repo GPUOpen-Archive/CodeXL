@@ -1496,7 +1496,7 @@ std::string FileUtils::GetFileExtension(const std::string& strFileName)
 
     found = fileNameWithoutPath.find_last_of(".");
 
-    if (found > 0 && found != fileNameWithoutPath.length() - 1)
+    if (found != string::npos && found != fileNameWithoutPath.length() - 1)
     {
         return fileNameWithoutPath.substr(found + 1);
     }
