@@ -2461,6 +2461,9 @@ std::string HSATraceStringUtils::Get_hsa_amd_agent_info_t_String(hsa_amd_agent_i
             CASE(HSA_AMD_AGENT_INFO_BDFID);
             CASE(HSA_AMD_AGENT_INFO_MEMORY_WIDTH);
             CASE(HSA_AMD_AGENT_INFO_MEMORY_MAX_FREQUENCY);
+#ifdef FUTURE_ROCR_VERSION
+            CASE(HSA_AMD_AGENT_INFO_PRODUCT_NAME);
+#endif
 
         default:
             ss << input;
