@@ -199,7 +199,7 @@ unsigned int HSATraceStringUtils::Get_hsa_agent_get_info_AttributeSize(hsa_agent
             return sizeof(uint16_t);
 
         default:
-            return 0;
+            return Get_hsa_amd_agent_get_info_AttributeSize(static_cast<hsa_amd_agent_info_t>(attribute));
     }
 }
 
@@ -328,7 +328,7 @@ std::string HSATraceStringUtils::Get_hsa_agent_get_info_AttributeString(void* va
                 case HSA_AGENT_INFO_EXTENSIONS:
 
                 default:
-                    ss << StringUtils::ToString(*(static_cast<int*>(value)));
+                    ss << Get_hsa_amd_agent_get_info_AttributeString(value, static_cast<hsa_amd_agent_info_t>(attribute), retVal);
                     break;
             }
         }
@@ -336,6 +336,82 @@ std::string HSATraceStringUtils::Get_hsa_agent_get_info_AttributeString(void* va
         return SurroundWithDeRef(ss.str());
     }
 }
+
+unsigned int HSATraceStringUtils::Get_hsa_amd_agent_get_info_AttributeSize(hsa_amd_agent_info_t attribute)
+{
+    switch (attribute)
+    {
+#ifdef FUTURE_ROCR_VERSION
+        // char[64]
+        case HSA_AMD_AGENT_INFO_PRODUCT_NAME:
+            return sizeof(char[64]);
+#endif
+
+            // uint32_t
+        case HSA_AMD_AGENT_INFO_CHIP_ID:
+        case HSA_AMD_AGENT_INFO_CACHELINE_SIZE:
+        case HSA_AMD_AGENT_INFO_COMPUTE_UNIT_COUNT:
+        case HSA_AMD_AGENT_INFO_MAX_CLOCK_FREQUENCY:
+        case HSA_AMD_AGENT_INFO_DRIVER_NODE_ID:
+        case HSA_AMD_AGENT_INFO_MAX_ADDRESS_WATCH_POINTS:
+        case HSA_AMD_AGENT_INFO_MEMORY_WIDTH:
+        case HSA_AMD_AGENT_INFO_MEMORY_MAX_FREQUENCY:
+            return sizeof(uint32_t);
+
+        // uint16_t
+        case HSA_AMD_AGENT_INFO_BDFID:
+            return sizeof(uint16_t);
+
+        default:
+            return 0;
+    }
+}
+std::string HSATraceStringUtils::Get_hsa_amd_agent_get_info_AttributeString(void* value, hsa_amd_agent_info_t attribute, hsa_status_t retVal)
+{
+    if (NULL == value)
+    {
+        return "NULL";
+    }
+    else
+    {
+        std::ostringstream ss;
+
+        if (HSA_STATUS_SUCCESS == retVal)
+        {
+            switch (attribute)
+            {
+                // char*
+                case HSA_AMD_AGENT_INFO_PRODUCT_NAME:
+                    ss << GetStringString(static_cast<char*>(value), false, false);
+                    break;
+
+                // uint32_t
+                case HSA_AMD_AGENT_INFO_CHIP_ID:
+                case HSA_AMD_AGENT_INFO_CACHELINE_SIZE:
+                case HSA_AMD_AGENT_INFO_COMPUTE_UNIT_COUNT:
+                case HSA_AMD_AGENT_INFO_MAX_CLOCK_FREQUENCY:
+                case HSA_AMD_AGENT_INFO_DRIVER_NODE_ID:
+                case HSA_AMD_AGENT_INFO_MAX_ADDRESS_WATCH_POINTS:
+                case HSA_AMD_AGENT_INFO_MEMORY_WIDTH:
+                case HSA_AMD_AGENT_INFO_MEMORY_MAX_FREQUENCY:
+                    ss << (*(static_cast<uint32_t*>(value)));
+                    break;
+
+                // uint16_t
+                case HSA_AMD_AGENT_INFO_BDFID:
+                    ss << (*(static_cast<uint16_t*>(value)));
+                    break;
+
+            default:
+                ss << StringUtils::ToString(*(static_cast<int*>(value)));
+                break;
+            }
+        }
+
+        return ss.str();
+    }
+}
+
 
 unsigned int HSATraceStringUtils::Get_hsa_system_get_info_AttributeSize(hsa_system_info_t attribute)
 {

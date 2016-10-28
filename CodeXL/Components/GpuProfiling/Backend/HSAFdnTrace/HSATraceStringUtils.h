@@ -166,6 +166,18 @@ unsigned int Get_hsa_agent_get_info_AttributeSize(hsa_agent_info_t attribute);
 /// \return the string representation of the specified agent attribute data
 std::string Get_hsa_agent_get_info_AttributeString(void* value, hsa_agent_info_t attribute, hsa_status_t retVal);
 
+/// Gets the size of the underlying data for the specified agent attribute
+/// \param attribute the attribute whose size is needed
+/// \return the size of the underlying data for the specified agent attribute (0 for unsupported/unknown attributes)
+unsigned int Get_hsa_amd_agent_get_info_AttributeSize(hsa_amd_agent_info_t attribute);
+
+/// Gets the string representation of the specified agent attribute data
+/// \param value the value whose string representation is needed
+/// \param attribute the attribute type
+/// \param the return value of the hsa_agent_get_info call
+/// \return the string representation of the specified agent attribute data
+std::string Get_hsa_amd_agent_get_info_AttributeString(void* value, hsa_amd_agent_info_t attribute, hsa_status_t retVal);
+
 /// Gets the size of the underlying data for the specified system attribute
 /// \param attribute the attribute whose size is needed
 /// \return the size of the underlying data for the specified agent attribute (0 for unsupported/unknown attributes)
