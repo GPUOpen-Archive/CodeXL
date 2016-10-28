@@ -162,7 +162,7 @@ unsigned int Get_hsa_agent_get_info_AttributeSize(hsa_agent_info_t attribute);
 /// Gets the string representation of the specified agent attribute data
 /// \param value the value whose string representation is needed
 /// \param attribute the attribute type
-/// \param the return value of the hsa_agent_get_info call
+/// \param retVal the return value of the hsa_agent_get_info call
 /// \return the string representation of the specified agent attribute data
 std::string Get_hsa_agent_get_info_AttributeString(void* value, hsa_agent_info_t attribute, hsa_status_t retVal);
 
@@ -174,7 +174,7 @@ unsigned int Get_hsa_amd_agent_get_info_AttributeSize(hsa_amd_agent_info_t attri
 /// Gets the string representation of the specified agent attribute data
 /// \param value the value whose string representation is needed
 /// \param attribute the attribute type
-/// \param the return value of the hsa_agent_get_info call
+/// \param retVal the return value of the hsa_agent_get_info call
 /// \return the string representation of the specified agent attribute data
 std::string Get_hsa_amd_agent_get_info_AttributeString(void* value, hsa_amd_agent_info_t attribute, hsa_status_t retVal);
 
@@ -187,7 +187,7 @@ unsigned int Get_hsa_system_get_info_AttributeSize(hsa_system_info_t attribute);
 /// \param value the value whose string representation is needed
 /// \param attribute the attribute type
 /// \param the return value of the hsa_system_get_info call
-/// \return the string representation of the specified agent attribute data
+/// \return retVal the string representation of the specified agent attribute data
 std::string Get_hsa_system_get_info_AttributeString(void* value, hsa_system_info_t attribute, hsa_status_t retVal);
 
 /// Gets the size of the underlying data for the specified region attribute
@@ -198,7 +198,7 @@ unsigned int Get_hsa_region_get_info_AttributeSize(hsa_region_info_t attribute);
 /// Gets the string representation of the specified region data
 /// \param value the value whose string representation is needed
 /// \param attribute the attribute type
-/// \param the return value of the hsa_region_get_info call
+/// \param retVal the return value of the hsa_region_get_info call
 /// \return the string representation of the specified agent attribute data
 std::string Get_hsa_region_get_info_AttributeString(void* value, hsa_region_info_t attribute, hsa_status_t retVal);
 
@@ -210,7 +210,7 @@ unsigned int Get_hsa_isa_get_info_AttributeSize(hsa_isa_info_t attribute);
 /// Gets the string representation of the specified isa data
 /// \param value the value whose string representation is needed
 /// \param attribute the attribute type
-/// \param the return value of the hsa_isa_get_info call
+/// \param retVal the return value of the hsa_isa_get_info call
 /// \return the string representation of the specified agent attribute data
 std::string Get_hsa_isa_get_info_AttributeString(void* value, hsa_isa_info_t attribute, hsa_status_t retVal);
 
@@ -222,7 +222,7 @@ unsigned int Get_hsa_code_object_get_info_AttributeSize(hsa_code_object_info_t a
 /// Gets the string representation of the specified code object data
 /// \param value the value whose string representation is needed
 /// \param attribute the attribute type
-/// \param the return value of the hsa_code_object_get_info call
+/// \param retVal the return value of the hsa_code_object_get_info call
 /// \return the string representation of the specified code object attribute data
 std::string Get_hsa_code_object_get_info_AttributeString(void* value, hsa_code_object_info_t attribute, hsa_status_t retVal);
 
@@ -234,7 +234,7 @@ unsigned int Get_hsa_code_symbol_get_info_AttributeSize(hsa_code_symbol_info_t a
 /// Gets the string representation of the specified code symbol data
 /// \param value the value whose string representation is needed
 /// \param attribute the attribute type
-/// \param the return value of the hsa_code_symbol_get_info call
+/// \param retVal the return value of the hsa_code_symbol_get_info call
 /// \return the string representation of the specified code symbol attribute data
 std::string Get_hsa_code_symbol_get_info_AttributeString(void* value, hsa_code_symbol_info_t attribute, hsa_status_t retVal);
 
@@ -246,7 +246,7 @@ unsigned int Get_hsa_executable_get_info_AttributeSize(hsa_executable_info_t att
 /// Gets the string representation of the specified executable data
 /// \param value the value whose string representation is needed
 /// \param attribute the attribute type
-/// \param the return value of the hsa_executable_get_info call
+/// \param retVal the return value of the hsa_executable_get_info call
 /// \return the string representation of the specified agent executable data
 std::string Get_hsa_executable_get_info_AttributeString(void* value, hsa_executable_info_t attribute, hsa_status_t retVal);
 
@@ -258,7 +258,7 @@ unsigned int Get_hsa_executable_symbol_get_info_AttributeSize(hsa_executable_sym
 /// Gets the string representation of the specified executable symbol data
 /// \param value the value whose string representation is needed
 /// \param attribute the attribute type
-/// \param the return value of the hsa_executable_symbol_get_info call
+/// \param retVal the return value of the hsa_executable_symbol_get_info call
 /// \return the string representation of the specified agent executable symbol data
 std::string Get_hsa_executable_symbol_get_info_AttributeString(void* value, hsa_executable_symbol_info_t attribute, hsa_status_t retVal);
 
@@ -270,7 +270,7 @@ unsigned int Get_hsa_ext_program_get_info_AttributeSize(hsa_ext_program_info_t a
 /// Gets the string representation of the specified program data
 /// \param value the value whose string representation is needed
 /// \param attribute the attribute type
-/// \param the return value of the hsa_ext_program_get_info call
+/// \param retVal the return value of the hsa_ext_program_get_info call
 /// \return the string representation of the specified program data
 std::string Get_hsa_ext_program_get_info_AttributeString(void* value, hsa_ext_program_info_t attribute, hsa_status_t retVal);
 
@@ -282,7 +282,7 @@ unsigned int Get_hsa_amd_memory_pool_get_info_AttributeSize(hsa_amd_memory_pool_
 /// Gets the string representation of the specified memory pool data
 /// \param value the value whose string representation is needed
 /// \param attribute the attribute type
-/// \param the return value of the hsa_amd_memory_pool_get_info call
+/// \param retVal the return value of the hsa_amd_memory_pool_get_info call
 /// \return the string representation of the specified memory pool data
 std::string Get_hsa_amd_memory_pool_get_info_AttributeString(void* value, hsa_amd_memory_pool_info_t attribute, hsa_status_t retVal);
 
@@ -294,7 +294,7 @@ unsigned int Get_hsa_amd_agent_memory_pool_get_info_AttributeSize(hsa_amd_agent_
 /// Gets the string representation of the specified agent memory pool data
 /// \param value the value whose string representation is needed
 /// \param attribute the attribute type
-/// \param the return value of the hsa_amd_agent_memory_pool_get_info call
+/// \param retVal the return value of the hsa_amd_agent_memory_pool_get_info call
 /// \return the string representation of the specified agent memory pool data
 std::string Get_hsa_amd_agent_memory_pool_get_info_AttributeString(void* value, hsa_amd_agent_memory_pool_info_t attribute, hsa_status_t retVal);
 
@@ -308,7 +308,7 @@ unsigned int Get_hsa_cache_get_info_AttributeSize(hsa_cache_info_t attribute);
 /// Gets the string representation of the specified cache data
 /// \param value the value whose string representation is needed
 /// \param attribute the attribute type
-/// \param the return value of the hsa_cache_get_info call
+/// \param retVal the return value of the hsa_cache_get_info call
 /// \return the string representation of the specified cache data
 std::string Get_hsa_cache_get_info_AttributeString(void* value, hsa_cache_info_t attribute, hsa_status_t retVal);
 
@@ -320,7 +320,7 @@ unsigned int Get_hsa_wavefront_get_info_AttributeSize(hsa_wavefront_info_t attri
 /// Gets the string representation of the specified wavefront data
 /// \param value the value whose string representation is needed
 /// \param attribute the attribute type
-/// \param the return value of the hsa_wavefront_get_info call
+/// \param retVal the return value of the hsa_wavefront_get_info call
 /// \return the string representation of the specified wavefront data
 std::string Get_hsa_wavefront_get_info_AttributeString(void* value, hsa_wavefront_info_t attribute, hsa_status_t retVal);
 #endif
