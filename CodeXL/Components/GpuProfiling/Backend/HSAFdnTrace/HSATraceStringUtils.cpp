@@ -380,10 +380,12 @@ std::string HSATraceStringUtils::Get_hsa_amd_agent_get_info_AttributeString(void
         {
             switch (attribute)
             {
+#ifdef FUTURE_ROCR_VERSION
                 // char*
                 case HSA_AMD_AGENT_INFO_PRODUCT_NAME:
                     ss << GetStringString(static_cast<char*>(value), false, false);
                     break;
+#endif
 
                 // uint32_t
                 case HSA_AMD_AGENT_INFO_CHIP_ID:
