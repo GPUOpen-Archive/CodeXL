@@ -186,8 +186,8 @@ unsigned int Get_hsa_system_get_info_AttributeSize(hsa_system_info_t attribute);
 /// Gets the string representation of the specified system attribute data
 /// \param value the value whose string representation is needed
 /// \param attribute the attribute type
-/// \param the return value of the hsa_system_get_info call
-/// \return retVal the string representation of the specified agent attribute data
+/// \param retVal the return value of the hsa_system_get_info call
+/// \return the string representation of the specified agent attribute data
 std::string Get_hsa_system_get_info_AttributeString(void* value, hsa_system_info_t attribute, hsa_status_t retVal);
 
 /// Gets the size of the underlying data for the specified region attribute
