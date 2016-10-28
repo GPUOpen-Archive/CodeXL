@@ -1110,7 +1110,7 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
 
     if ((config.bHSAPMC || config.bPerfCounter) && outputFileList.size() > 1 && config.counterFileList.size() > 1)
     {
-        if (!MergeKernelProfileOutputFiles(config.counterFileList, outputFileList, defaultOutputFileName, config.bGPUTimePMC))
+        if (!MergeKernelProfileOutputFiles(config.counterFileList, outputFileList, defaultOutputFileName, config.bHSAPMC ? false : config.bGPUTimePMC))
         {
             retVal = -1;
         }
