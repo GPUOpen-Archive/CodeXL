@@ -784,19 +784,28 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
         {
             if (!configOut.strOutputFile.empty() && configOut.uiMaxPassPerFile >= 1)
             {
-                bool appendCounterFileName = configOut.counterFileList.size() > 1 ? true : false;
+                CounterList counterList;
+                std::string outputFileName = configOut.strOutputFile;
 
-                for (CounterFileList::iterator it = configOut.counterFileList.begin(); it!=configOut.counterFileList.end(); ++it)
+                if(!configOut.counterFileList.empty())
                 {
-                    CounterList counterList;
-                    std::string outputFileName = configOut.strOutputFile;
-                    FileUtils::ReadFile(*it, counterList, true);
+                    bool appendCounterFileName = configOut.counterFileList.size() > 1 ? true : false;
 
-                    if(appendCounterFileName)
+                    for (CounterFileList::iterator it = configOut.counterFileList.begin(); it!=configOut.counterFileList.end(); ++it)
                     {
-                        outputFileName = outputFileName + FileUtils::GetFileNameFromAbsolutePath(*it); 
-                    }
+                        FileUtils::ReadFile(*it, counterList, true);
 
+                        if(appendCounterFileName)
+                        {
+                            outputFileName = outputFileName + FileUtils::GetFileNameFromAbsolutePath(*it);
+                        }
+
+                        ListCounterToFileForMaxPass(counterList, outputFileName, configOut.uiMaxPassPerFile);
+                        counterList.clear();
+                    }
+                }
+                else
+                {
                     ListCounterToFileForMaxPass(counterList, outputFileName, configOut.uiMaxPassPerFile);
                 }
             }

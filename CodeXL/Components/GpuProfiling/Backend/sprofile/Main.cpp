@@ -984,7 +984,29 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
     std::string defaultOutputFileName;
     std::vector<std::string> outputFileList;
 
-    if (!config.counterFileList.empty())
+    bool needReplay = config.counterFileList.size() > 1;
+
+    if(config.bPerfCounter && config.bTrace)
+    {
+        config.bPerfCounter = false;
+
+        if(needReplay)
+        {
+            std::cout<<"\nMultiple Counters cannot be used with trace option and Performance counter mode. Enabling only trace.\n\n";
+        }
+    }
+
+    if(config.bHSAPMC && (config.bHSATrace || config.bAqlPacketTracing))
+    {
+        config.bHSAPMC = false;
+
+        if(needReplay)
+        {
+            std::cout<<"\nMultiple Counters cannot be used with trace option and Performance counter mode. Enabling only trace.\n\n";
+        }
+    }
+
+    if ((config.bHSAPMC || config.bPerfCounter) && needReplay)
     {
         bool isReplaying = false;
 
@@ -1087,11 +1109,7 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
 
         if (config.strOutputFile.empty())
         {
-            if (config.bPerfCounter || config.bHSAPMC)
-            {
-                outputFileName = FileUtils::GetDefaultProfileOutputFile();
-            }
-            else if (config.bTrace || config.bHSATrace || config.bMergeMode)
+            if (config.bTrace || config.bHSATrace || config.bMergeMode)
             {
                 outputFileName = FileUtils::GetDefaultTraceOutputFile();
             }
@@ -1103,6 +1121,10 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
             {
                 outputFileName = FileUtils::GetDefaultThreadTraceOutputDir();
             }
+            else if(config.bPerfCounter || config.bHSAPMC)
+            {
+                config.strOutputFile = FileUtils::GetDefaultProfileOutputFile();
+            }
         }
         else
         {
@@ -1111,14 +1133,14 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
 
             std::string strRequiredExt("");
 
-            if (config.bPerfCounter || config.bHSAPMC)
-            {
-                strRequiredExt.assign(PERF_COUNTER_EXT);
-                outputFileName = GetExpectedOutputFile(outputFileName, strRequiredExt);
-            }
-            else if (config.bTrace || config.bHSATrace || config.bMergeMode)
+            if (config.bTrace || config.bHSATrace || config.bMergeMode)
             {
                 strRequiredExt.assign(TRACE_EXT);
+                outputFileName = GetExpectedOutputFile(outputFileName, strRequiredExt);
+            }
+            else if (config.bPerfCounter || config.bHSAPMC)
+            {
+                strRequiredExt.assign(PERF_COUNTER_EXT);
                 outputFileName = GetExpectedOutputFile(outputFileName, strRequiredExt);
             }
             else if (config.bOccupancy)
