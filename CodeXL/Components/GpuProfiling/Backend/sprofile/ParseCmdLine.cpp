@@ -85,7 +85,7 @@ std::vector<DeviceInfo> GetDeviceInfoList(GPA_API_Type);
 std::vector<CounterPassInfo> GetNumberOfPassForAPI(GPA_API_Type apiType, CounterList counterList, bool forceSinglePassForHSA = true);
 std::vector<CounterPassInfo> GetNumberOfPassFromGPUPerfAPI(GPA_API_Type apiType, CounterList counterList, std::vector<DeviceInfo> deviceInfoList, bool forceSinglePassForHSA = true);
 std::vector<CounterList> GetCounterListsByMaxPassForEachDevice(GPA_API_Type apiType, CounterPassInfo counterPassInfo, unsigned int maxPass, CounterList& leftCounterList);
-void ListCounterToFileForMaxPass(std::string counterFile, unsigned int maxPass);
+void ListCounterToFileForMaxPass(CounterList counterList, std::string counterOutputFile, unsigned int maxPass);
 
 pair<string, string> Parser(const string& strOptionToParse);
 
@@ -784,7 +784,21 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
         {
             if (!configOut.strOutputFile.empty() && configOut.uiMaxPassPerFile >= 1)
             {
-                ListCounterToFileForMaxPass(configOut.strOutputFile, configOut.uiMaxPassPerFile);
+                bool appendCounterFileName = configOut.counterFileList.size() > 1 ? true : false;
+
+                for (CounterFileList::iterator it = configOut.counterFileList.begin(); it!=configOut.counterFileList.end(); ++it)
+                {
+                    CounterList counterList;
+                    std::string outputFileName = configOut.strOutputFile;
+                    FileUtils::ReadFile(*it, counterList, true);
+
+                    if(appendCounterFileName)
+                    {
+                        outputFileName = outputFileName + FileUtils::GetFileNameFromAbsolutePath(*it); 
+                    }
+
+                    ListCounterToFileForMaxPass(counterList, outputFileName, configOut.uiMaxPassPerFile);
+                }
             }
             else
             {
@@ -1873,9 +1887,8 @@ std::vector<CounterPassInfo> GetNumberOfPassFromGPUPerfAPI(GPA_API_Type apiType,
 }
 
 
-void ListCounterToFileForMaxPass(std::string counterFile, unsigned int maxPass)
+void ListCounterToFileForMaxPass(CounterList counterList, std::string counterOutputFile, unsigned int maxPass)
 {
-    CounterList counterList;
     GPA_API_Type apiType;
     std::vector<CounterList> counterListByEachPass;
     CounterList leftCounterList;
@@ -1896,7 +1909,7 @@ void ListCounterToFileForMaxPass(std::string counterFile, unsigned int maxPass)
                 std::stringstream stringStream;
                 std::string cardWithPass;
                 stringStream << deviceNameWithPass << (j + 1);
-                cardWithPass = GetCounterListOutputFileName(counterFile, apiTypeString, stringStream.str());
+                cardWithPass = GetCounterListOutputFileName(counterOutputFile, apiTypeString, stringStream.str());
                 std::string fullPath = cardWithPass;
                 FileUtils::WriteFile(fullPath, counterListByEachPass[j]);
             }
