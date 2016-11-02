@@ -135,7 +135,7 @@ void HSAAPIDefs::BuildAPIGroupsMap()
 #ifdef FUTURE_ROCR_VERSION
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_agent_iterate_caches, HSAAPIGroup_Agent);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_agent_major_extension_supported, HSAAPIGroup_Agent);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_agent_iterate_isas, HSAAPIGroup_ISA);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_agent_iterate_isas, HSAAPIGroup_ISA);
 #endif
 
     // HSAAPIGroup_CodeObject:
@@ -241,9 +241,9 @@ void HSAAPIDefs::BuildAPIGroupsMap()
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_isa_from_name, HSAAPIGroup_ISA);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_isa_compatible, HSAAPIGroup_ISA);
 #ifdef FUTURE_ROCR_VERSION
-    m_HSAAPIGroupMap.insert(HSA_API_Type_isa_get_exception_policies, HSAAPIGroup_ISA);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_isa_get_round_method, HSAAPIGroup_ISA);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_isa_iterate_wavefronts, HSAAPIGroup_ISA);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_isa_get_exception_policies, HSAAPIGroup_ISA);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_isa_get_round_method, HSAAPIGroup_ISA);
+    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_isa_iterate_wavefronts, HSAAPIGroup_ISA);
 #endif
 
     // HSAAPIGroup_Memory:

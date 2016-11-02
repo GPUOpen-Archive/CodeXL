@@ -213,6 +213,19 @@ private:
         }
     };
 
+    /// sruct holding the info of the HSA data transfer branch
+    struct HSADataTransferBranchInfo
+    {
+        QString m_Source;                          ///< source of the data transfer
+        QString m_Destination;                     ///< destination of the data transfer
+        acTimelineBranch* m_pTransferBranch;       ///< pointer to the timeline branch
+
+        HSADataTransferBranchInfo(): m_pTransferBranch(nullptr)
+        {
+
+        }
+    };
+
     /// Gets the host timeline branch for the give thread and API
     /// \param threadId the thread id whose host timeline branch is needed
     /// \param strAPIName the API whose host timeline branch is needed
@@ -292,6 +305,25 @@ private:
     /// \return true if the parser should stop, false otherwise
     bool CheckStopParsing(quint64 curEndTime);
 
+    /// Adds the data transfer branch based on uniqueness of the src and dest
+    /// \param[in] src source string of the HSA data transfer
+    /// \param[in] dest destination string of the HSA data transfer
+    /// \return pointer to the new data transfer acTimelineBranch
+    acTimelineBranch* AddHSADataTransferBranch(QString src, QString dest);
+
+    /// Returns pointer to the existing timeline branch of the HSA data transfer
+    /// \param[in] src source string of the HSA data transfer
+    /// \param[in] dest destination string of the HSA data transfer
+    /// \return pointer to the data transfer acTimelineBranch if it exist otherwise nullptr
+    acTimelineBranch* GetHSADataTransferBranch(QString src, QString dest);
+
+    /// Cheack whether the data transfer exist or not
+    /// \param[in] src source string of the HSA data transfer
+    /// \param[in] dest destination string of the HSA data transfer
+    /// \return true is the branch exist for given src and dest otherwise false
+    bool IsExistHSADataTransferBranch(QString src, QString dest);
+
+
     TraceSession*                            m_pCurrentSession;        ///< the current session
     QSplitter*                               m_pMainSplitter;           ///< the splitter for the main view
     acTimeline*                              m_pTimeline;               ///< Timeline control
@@ -319,6 +351,7 @@ private:
     acTimelineBranch*                        m_pOpenCLBranch;           ///< the main OpenCL branch in the timeline
     acTimelineBranch*                        m_pHSABranch;              ///< the main HSA branch in the timeline
     acTimelineBranch*                        m_pHSADataTransferBranch;  ///< the HSA data transfer branch in the timeline
+    std::vector<HSADataTransferBranchInfo>   m_HSADataTransferBranches; ///< the HSA src and destination branches in the timeline
     QMap<unsigned int, acTimelineBranch*>    m_oclCtxMap;               ///< map from OCL context id to the branch for that context
     QMap<unsigned int, OCLQueueBranchInfo*>  m_oclQueueMap;             ///< map from OCL queue id to the QueueBranchInfo for that queue
     QMap<QString, acTimelineBranch*>         m_hsaQueueMap;             ///< map from HSA queue handle string to the branch for that queue

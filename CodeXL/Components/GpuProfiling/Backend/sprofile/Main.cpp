@@ -764,12 +764,12 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
 {
     bool isOutputFileExist = true;
 
-    for(std::vector<std::string>::iterator it = outputFileList.begin(); it!= outputFileList.end(); ++it)
+    for (std::vector<std::string>::iterator it = outputFileList.begin(); it != outputFileList.end(); ++it)
     {
         isOutputFileExist &= FileUtils::FileExist(*it);
     }
 
-    if(!isOutputFileExist)
+    if (!isOutputFileExist)
     {
         std::cout << "Profiling files are not generated. No Merging required.\n\n";
     }
@@ -808,9 +808,10 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
             }
 
             std::string collatedOutputFileName;
-            if(FileUtils::GetFileExtension(defaultOutputFileName).empty())
+
+            if (FileUtils::GetFileExtension(defaultOutputFileName).empty())
             {
-                collatedOutputFileName= defaultOutputFileName + "." + PERF_COUNTER_EXT;
+                collatedOutputFileName = defaultOutputFileName + "." + PERF_COUNTER_EXT;
             }
             else
             {
@@ -852,7 +853,7 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
                     unsigned int fileIndexCounter = 0;
 
                     for (MappedThreadSet::iterator mappedThreadSetIter = mappedThreadsIterator->begin();
-                        mappedThreadSetIter != mappedThreadsIterator->end(); ++mappedThreadSetIter)
+                         mappedThreadSetIter != mappedThreadsIterator->end(); ++mappedThreadSetIter)
                     {
                         unsigned int currentMappedThreadIteratorRowCount = dataPerFile[mappedThreadSetIter->second]->GetRowCountByThreadId(mappedThreadSetIter->first);
 
@@ -921,6 +922,7 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
             }
 
             bool inconsistentDispatchInInputFiles = false;
+
             for (std::map<unsigned int, KernelRowData*>::iterator dataPerFileIter = dataPerFile.begin(); dataPerFileIter != dataPerFile.end(); ++dataPerFileIter)
             {
                 inconsistentDispatchInInputFiles |= (addedRow > dataPerFileIter->second->GetRowCount());
@@ -985,24 +987,25 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
     std::vector<std::string> outputFileList;
 
     bool needReplay = config.counterFileList.size() > 1;
-    const std::string messageOnMultipleSwitches = "\nMultiple Counters cannot be used with trace option and Performance counter mode. Enabling only trace.\n\n"; 
-    if(config.bPerfCounter && config.bTrace)
+    const std::string messageOnMultipleSwitches = "\nMultiple Counters cannot be used with trace option and Performance counter mode. Enabling only trace.\n\n";
+
+    if (config.bPerfCounter && config.bTrace)
     {
         config.bPerfCounter = false;
 
-        if(needReplay)
+        if (needReplay)
         {
-            std::cout<<messageOnMultipleSwitches;
+            std::cout << messageOnMultipleSwitches;
         }
     }
 
-    if(config.bHSAPMC && (config.bHSATrace || config.bAqlPacketTracing))
+    if (config.bHSAPMC && (config.bHSATrace || config.bAqlPacketTracing))
     {
         config.bHSAPMC = false;
 
-        if(needReplay)
+        if (needReplay)
         {
-            std::cout<<messageOnMultipleSwitches;
+            std::cout << messageOnMultipleSwitches;
         }
     }
 
@@ -1121,7 +1124,7 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
             {
                 outputFileName = FileUtils::GetDefaultThreadTraceOutputDir();
             }
-            else if(config.bPerfCounter || config.bHSAPMC)
+            else if (config.bPerfCounter || config.bHSAPMC)
             {
                 config.strOutputFile = FileUtils::GetDefaultProfileOutputFile();
             }

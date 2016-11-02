@@ -333,6 +333,14 @@ void TraceView::Clear()
     m_pOpenCLBranch = nullptr;
     m_pHSABranch = nullptr;
     m_pHSADataTransferBranch = nullptr;
+
+    for(std::vector<HSADataTransferBranchInfo>::iterator it = m_HSADataTransferBranches.begin();
+        it!=m_HSADataTransferBranches.end(); ++it)
+    {
+        it->m_pTransferBranch = nullptr;
+    }
+
+    m_HSADataTransferBranches.clear();
     m_oclCtxMap.clear();
     m_oclQueueMap.clear();
     m_hsaQueueMap.clear();
@@ -872,6 +880,65 @@ bool TraceView::CheckStopParsing(quint64 curEndTime)
     return stopParsing;
 }
 
+
+acTimelineBranch* TraceView::AddHSADataTransferBranch(QString src, QString dest)
+{
+    acTimelineBranch* returnBranch = nullptr;
+
+    if (!IsExistHSADataTransferBranch(src, dest))
+    {
+        returnBranch = new(std::nothrow) acTimelineBranch();
+
+        if (nullptr != returnBranch)
+        {
+            HSADataTransferBranchInfo dataTransferBranchInfo;
+            dataTransferBranchInfo.m_Source = src;
+            dataTransferBranchInfo.m_Destination = dest;
+            dataTransferBranchInfo.m_pTransferBranch = returnBranch;
+            m_HSADataTransferBranches.push_back(dataTransferBranchInfo);
+        }
+    }
+
+    return returnBranch;
+}
+
+
+bool TraceView::IsExistHSADataTransferBranch(QString src, QString dest)
+{
+    bool isExist = false;
+
+    for (std::vector<HSADataTransferBranchInfo>::iterator it = m_HSADataTransferBranches.begin();
+         it != m_HSADataTransferBranches.end(); ++it)
+    {
+        if (src == it->m_Source && dest == it->m_Destination)
+        {
+            isExist = true;
+            break;
+        }
+    }
+
+    return isExist;
+}
+
+
+acTimelineBranch* TraceView::GetHSADataTransferBranch(QString src, QString dest)
+{
+    acTimelineBranch* returnBranch = nullptr;
+
+    for (std::vector<HSADataTransferBranchInfo>::iterator it = m_HSADataTransferBranches.begin();
+         it != m_HSADataTransferBranches.end(); ++it)
+    {
+        if (src == it->m_Source && dest == it->m_Destination)
+        {
+            returnBranch = it->m_pTransferBranch;
+            break;
+        }
+    }
+
+    return returnBranch;
+}
+
+
 void TraceView::OnParse(CLAPIInfo* pAPIInfo, bool& stopParsing)
 {
     // Save the API type for later use:
@@ -1337,7 +1404,7 @@ void TraceView::HandleCLAPIInfo(CLAPIInfo* pApiInfo)
                             GT_IF_WITH_ASSERT((pDataEnqueueOperationsInfo != nullptr) && (pBranchInfo != nullptr) && (pBranchInfo->m_pQueueBranch != nullptr))
                             {
                                 quint64 dataSize = pDataEnqueueOperationsInfo->m_uiDataSize;
-                                ((CLDataEnqueueOperationsTimelineItem*)gpuItem)->setDataSize(dataSize);
+                                static_cast<CLDataEnqueueOperationsTimelineItem*>(gpuItem)->setDataSize(dataSize);
 
                                 commandName.prepend(CLMemTimelineItem::getDataSizeString(dataSize, 1) + " ");
                             }
@@ -1483,9 +1550,7 @@ void TraceView::HandleHSAAPIInfo(HSAAPIInfo* pApiInfo)
                     m_pHSABranch->setText(GPU_STR_TraceViewHSA);
                 }
 
-                // TODO: investigate using a separate branch (timeline row) for each destination agent
-                //       as it is possible to have overlapping transfers in a MGPU system when transferring
-                //       to multiple agents simultaneously
+                // TODO: investigate getting the name of the source and destination of the data transfer branch
                 if (nullptr == m_pHSADataTransferBranch)
                 {
                     m_pHSADataTransferBranch = new acTimelineBranch();
@@ -1493,10 +1558,25 @@ void TraceView::HandleHSAAPIInfo(HSAAPIInfo* pApiInfo)
                     m_pHSADataTransferBranch->setText(GPU_STR_TraceViewHSADataTransfers);
                 }
 
-                m_pHSADataTransferBranch->addTimelineItem(transferItem);
-            }
-            else
-            {
+                acTimelineBranch*  hsaDataTransferBranch = nullptr;
+
+                if (!IsExistHSADataTransferBranch(srcAgent, dstAgent))
+                {
+                    hsaDataTransferBranch = AddHSADataTransferBranch(srcAgent, dstAgent);
+
+                    if (nullptr != hsaDataTransferBranch)
+                    {
+                        hsaDataTransferBranch->SetBGColor(QColor::fromRgb(230, 230, 230));
+                        QString branchText = srcAgent + "->" + dstAgent;
+                        hsaDataTransferBranch->setText(branchText);
+                    }
+                }
+                else
+                {
+                    hsaDataTransferBranch = GetHSADataTransferBranch(srcAgent, dstAgent);
+                }
+
+                hsaDataTransferBranch->addTimelineItem(transferItem);
             }
         }
         else
@@ -1818,6 +1898,12 @@ void TraceView::DoneParsingATPFile()
         {
             m_pHSABranch->addSubBranch(m_pHSADataTransferBranch);
             anySubBranchAdded = true;
+
+            for (std::vector<HSADataTransferBranchInfo>::iterator it = m_HSADataTransferBranches.begin();
+                 it != m_HSADataTransferBranches.end(); ++it)
+            {
+                m_pHSADataTransferBranch->addSubBranch(it->m_pTransferBranch);
+            }
         }
 
         if (anySubBranchAdded)

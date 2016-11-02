@@ -787,23 +787,23 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
                 CounterList counterList;
                 std::string outputFileName = configOut.strOutputFile;
 
-                if(!configOut.counterFileList.empty())
+                if (!configOut.counterFileList.empty())
                 {
                     bool appendCounterFileName = configOut.counterFileList.size() > 1 ? true : false;
 
-                    for (CounterFileList::iterator it = configOut.counterFileList.begin(); it!=configOut.counterFileList.end(); ++it)
+                    for (CounterFileList::iterator it = configOut.counterFileList.begin(); it != configOut.counterFileList.end(); ++it)
                     {
                         FileUtils::ReadFile(*it, counterList, true);
 
-                        if(appendCounterFileName)
+                        if (appendCounterFileName)
                         {
                             gtString counterFileFullPathString;
-                            counterFileFullPathString.fromUtf8String(it->c_str()); 
+                            counterFileFullPathString.fromUtf8String(it->c_str());
                             osFilePath counterFilePath = osFilePath(counterFileFullPathString);
                             gtString baseCounterFileName;
                             counterFilePath.getFileName(baseCounterFileName);
                             std::string baseFileString(baseCounterFileName.asASCIICharArray());
-                            outputFileName = outputFileName + "_" +baseFileString;
+                            outputFileName = outputFileName + "_" + baseFileString;
                         }
 
                         ListCounterToFileForMaxPass(counterList, outputFileName, configOut.uiMaxPassPerFile);
@@ -1635,7 +1635,7 @@ std::vector<DeviceInfo> GetDeviceInfoList(GPA_API_Type apiType)
 
                                     std::string platformVendorNameString(platformVendorName);
 
-                                    if (success && (platformVendorNameString.compare(amdVendor)==0))
+                                    if (success && (platformVendorNameString.compare(amdVendor) == 0))
                                     {
                                         cl_uint numberOfDevices = 0;
                                         cl_uint numberOfEntries = 0;
