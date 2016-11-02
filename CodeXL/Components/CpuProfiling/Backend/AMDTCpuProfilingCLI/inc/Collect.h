@@ -74,6 +74,8 @@ public:
     {
         StopProfiling();
         fnReleaseProfiling();
+
+        m_pmcEventMsrMap.clear();
     };
 
     CpuProfileCollect& operator=(const CpuProfileCollect&) = delete;
@@ -158,6 +160,8 @@ private:
     gtUInt64            m_nbrCountEvents = 0;
     gtVector<CpuProfilePmcEventCount>  m_eventCountValuesVec;
     gtVector<gtUInt64>  m_countEventVec;
+    gtMap<gtUInt64, gtUInt32>   m_pmcEventMsrMap;
+    bool                        m_hasPmcEventMsrMap = false;
 
     void SetupEnvironment();
     void EnableProfiling();

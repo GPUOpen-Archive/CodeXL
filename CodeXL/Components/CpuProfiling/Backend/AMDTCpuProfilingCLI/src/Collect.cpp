@@ -728,8 +728,9 @@ bool CpuProfileCollect::ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec)
         unsigned int unitMask = 0;
         bool usrEvents = true;
         bool osEvents = true;
-        bool countingEvent = false;
+        bool countingEvent = true;
         gtUInt64 performanceEvent = 0;
+        gtUInt32 pmcMsrId = 0;
 
         while (tokens.getNextToken(value))
         {
@@ -760,11 +761,16 @@ bool CpuProfileCollect::ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec)
             case 4:
                 value.toUnsignedInt64Number(interval);
 
-                if (!interval)
+                if (interval > 0)
                 {
-                    countingEvent = true;
+                    countingEvent = false;
                 }
 
+                break;
+
+            case 5:
+                m_hasPmcEventMsrMap = true;
+                value.toUnsignedIntNumber(pmcMsrId);
                 break;
 
             default:
@@ -774,27 +780,33 @@ bool CpuProfileCollect::ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec)
             i++;
         }
 
-        HRESULT res = fnMakeProfileEvent(eventSelect,
-                                 unitMask,
-                                 false, // edge detect
-                                 usrEvents,
-                                 osEvents,
-                                 false, // guestOnlyEvents,
-                                 false, // hostOnlyEvents,
-                                 countingEvent, // countingEvent,
-                                 &performanceEvent);
+        if (eventSelect != 0xf000 && eventSelect != 0xf100)
+        {
+            HRESULT res = fnMakeProfileEvent(eventSelect,
+                unitMask,
+                false, // edge detect
+                usrEvents,
+                osEvents,
+                false, // guestOnlyEvents,
+                false, // hostOnlyEvents,
+                countingEvent, // countingEvent,
+                &performanceEvent);
 
-        if (SUCCEEDED(res))
-        {
-            DcEventConfig ec;
-            ec.pmc.perf_ctl = performanceEvent;
-            ec.eventCount = interval;
-            eventConfigVec.push_back(ec);
-            ret = true;
-        }
-        else
-        {
-            reportError(true, L"There was a problem configuring the raw profile event(0x%lx). (error code 0x%lx)\n\n", eventSelect, m_error);
+            if (SUCCEEDED(res))
+            {
+                DcEventConfig ec;
+                ec.pmc.perf_ctl = performanceEvent;
+                ec.eventCount = interval;
+                eventConfigVec.push_back(ec);
+
+                m_pmcEventMsrMap.insert({ performanceEvent, pmcMsrId });
+
+                ret = true;
+            }
+            else
+            {
+                reportError(true, L"There was a problem configuring the raw profile event(0x%lx). (error code 0x%lx)\n\n", eventSelect, m_error);
+            }
         }
     }
 
@@ -861,6 +873,7 @@ void CpuProfileCollect::VerifyAndSetEvents(EventConfiguration** ppDriverSampleEv
         *ppDriverCountEvents = new EventConfiguration[nbrOfEvents];
     }
 
+    unsigned int pmcMsrId = 0;
     unsigned int evCounter = 0;
     unsigned int maxCounter = 0;
     fnGetEventCounters(&maxCounter);
@@ -950,18 +963,21 @@ void CpuProfileCollect::VerifyAndSetEvents(EventConfiguration** ppDriverSampleEv
 #endif // AMDT_LINUX_OS
 
             // Save the event configuration that will be written to the hardware
+            auto it = m_pmcEventMsrMap.find(pCurrentConfig->pmc.perf_ctl);
+            pmcMsrId = (it != m_pmcEventMsrMap.end()) ? (*it).second : evCounter;
+
             if (pCurrentConfig->pmc.bitSampleEvents)
             {
                 (*ppDriverSampleEvents)[m_nbrSampleEvents].performanceEvent = pCurrentConfig->pmc.perf_ctl;
                 (*ppDriverSampleEvents)[m_nbrSampleEvents].value = pCurrentConfig->eventCount;
-                (*ppDriverSampleEvents)[m_nbrSampleEvents].eventCounter = evCounter;
+                (*ppDriverSampleEvents)[m_nbrSampleEvents].eventCounter = pmcMsrId;
                 m_nbrSampleEvents++;
             }
             else
             {
                 (*ppDriverCountEvents)[m_nbrCountEvents].performanceEvent = pCurrentConfig->pmc.perf_ctl;
                 (*ppDriverCountEvents)[m_nbrCountEvents].value = pCurrentConfig->eventCount;
-                (*ppDriverCountEvents)[m_nbrCountEvents].eventCounter = evCounter;
+                (*ppDriverCountEvents)[m_nbrCountEvents].eventCounter = pmcMsrId;
                 m_nbrCountEvents++;
                 m_countEventVec.push_back(pCurrentConfig->pmc.perf_ctl);
             }
@@ -1302,20 +1318,20 @@ void CpuProfileCollect::SetIbsConfig()
                     opCycleCount = cluConfig.cluCycleCount;
                     opInterval = cluConfig.cluMaxCount;
                 }
+            }
 
-                // Profile only on selected cores specified in the CPU Affinity Mask
-                // TODO: support for more than 64 cores ?
-                gtUInt64 cpuCoreMask = m_args.GetCoreAffinityMask();
-                m_error = fnSetIbsConfiguration(cpuCoreMask,
-                                                ibsConfig.fetchSampling ? ibsConfig.fetchMaxCount : 0,
-                                                opSample ? opInterval : 0,
-                                                true,
-                                                (!opCycleCount));
+            // Profile only on selected cores specified in the CPU Affinity Mask
+            // TODO: support for more than 64 cores ?
+            gtUInt64 cpuCoreMask = m_args.GetCoreAffinityMask();
+            m_error = fnSetIbsConfiguration(cpuCoreMask,
+                                            ibsConfig.fetchSampling ? ibsConfig.fetchMaxCount : 0,
+                                            opSample ? opInterval : 0,
+                                            true,
+                                            (!opCycleCount));
 
-                if (!isOK())
-                {
-                    reportError(true, L"There was a problem configuring the IBS profile. (error code 0x%lx)\n\n", m_error);
-                }
+            if (!isOK())
+            {
+                reportError(true, L"There was a problem configuring the IBS profile. (error code 0x%lx)\n\n", m_error);
             }
         }
     }
