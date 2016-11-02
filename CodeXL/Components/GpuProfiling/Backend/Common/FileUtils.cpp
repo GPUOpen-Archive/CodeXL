@@ -1478,20 +1478,6 @@ std::string FileUtils::GetBaseFileName(const std::string& strFileName)
     }
 }
 
-
-std::string FileUtils::GetFileNameFromAbsolutePath(const std::string& strFileName)
-{
-    size_t found = strFileName.find_last_of("/\\");
-    std::string fileNameWithoutPath;
-
-    if(found != string::npos)
-    {
-        fileNameWithoutPath = strFileName.substr(found + 1);
-    }
-
-    return fileNameWithoutPath;
-}
-
 std::string FileUtils::GetFileExtension(const std::string& strFileName)
 {
     size_t found = strFileName.find_last_of("/\\");

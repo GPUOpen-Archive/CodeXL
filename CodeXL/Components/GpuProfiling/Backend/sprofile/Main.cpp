@@ -985,14 +985,14 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
     std::vector<std::string> outputFileList;
 
     bool needReplay = config.counterFileList.size() > 1;
-
+    const std::string messageOnMultipleSwitches = "\nMultiple Counters cannot be used with trace option and Performance counter mode. Enabling only trace.\n\n"; 
     if(config.bPerfCounter && config.bTrace)
     {
         config.bPerfCounter = false;
 
         if(needReplay)
         {
-            std::cout<<"\nMultiple Counters cannot be used with trace option and Performance counter mode. Enabling only trace.\n\n";
+            std::cout<<messageOnMultipleSwitches;
         }
     }
 
@@ -1002,7 +1002,7 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
 
         if(needReplay)
         {
-            std::cout<<"\nMultiple Counters cannot be used with trace option and Performance counter mode. Enabling only trace.\n\n";
+            std::cout<<messageOnMultipleSwitches;
         }
     }
 

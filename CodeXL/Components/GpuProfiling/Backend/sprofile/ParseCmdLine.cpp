@@ -797,7 +797,13 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
 
                         if(appendCounterFileName)
                         {
-                            outputFileName = outputFileName + FileUtils::GetFileNameFromAbsolutePath(*it);
+                            gtString counterFileFullPathString;
+                            counterFileFullPathString.fromUtf8String(it->c_str()); 
+                            osFilePath counterFilePath = osFilePath(counterFileFullPathString);
+                            gtString baseCounterFileName;
+                            counterFilePath.getFileName(baseCounterFileName);
+                            std::string baseFileString(baseCounterFileName.asASCIICharArray());
+                            outputFileName = outputFileName + "_" +baseFileString;
                         }
 
                         ListCounterToFileForMaxPass(counterList, outputFileName, configOut.uiMaxPassPerFile);

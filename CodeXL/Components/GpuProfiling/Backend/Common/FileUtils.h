@@ -108,11 +108,6 @@ gtString GetExePathAsUnicode();
 /// \return base file name
 std::string GetBaseFileName(const std::string& strFileName);
 
-/// Get the file name from the absolute path
-/// \param strFileName Input file Name
-/// \return file name without absolute path (will contain extension if present)
-std::string GetFileNameFromAbsolutePath(const std::string& strFileName);
-
 /// Get file extension
 /// \param strFileName Input file name
 /// \return extension
