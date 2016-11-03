@@ -23,7 +23,8 @@ public:
     enum PerfMarkerType
     {
         PerfMarkerType_Begin = 0,  ///< Begin Perf Marker
-        PerfMarkerType_End = 1     ///< End Perf Marker
+        PerfMarkerType_End = 1,    ///< End Perf Marker
+        PerfMarkerType_EndEx = 2   ///< End Ex Perf Marker
     };
 
     /// Constructor
@@ -53,6 +54,25 @@ public:
     /// \param strName Marker name
     /// \param strGroup Group name
     PerfMarkerBeginEntry(PerfMarkerType markerType, ULONGLONG timestamp, osThreadId tid, const std::string& strName, const std::string& strGroup) :
+        PerfMarkerEntry(markerType, timestamp, tid), m_strName(strName), m_strGroup(strGroup) {}
+
+    std::string m_strName;           ///< Marker name
+    std::string m_strGroup;          ///< Group name
+};
+
+//------------------------------------------------------------------------------------
+/// PerfMarker End Ex Entry
+//------------------------------------------------------------------------------------
+class PerfMarkerEndExEntry : public PerfMarkerEntry
+{
+public:
+    /// Constructor
+    /// \param markerType the type of perf marker entry
+    /// \param timestamp the timestamp for the perf marker entry
+    /// \param tid the thread id for the perf marker entry
+    /// \param strName Marker name
+    /// \param strGroup Group name
+    PerfMarkerEndExEntry(PerfMarkerType markerType, ULONGLONG timestamp, osThreadId tid, const std::string& strName, const std::string& strGroup) :
         PerfMarkerEntry(markerType, timestamp, tid), m_strName(strName), m_strGroup(strGroup) {}
 
     std::string m_strName;           ///< Marker name

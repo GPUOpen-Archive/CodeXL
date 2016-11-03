@@ -1772,7 +1772,7 @@ void TraceView::HandlePerfMarkerEntry(PerfMarkerEntry* pPerfMarkerEntry)
             GT_ASSERT(pTableItem != nullptr);
         }
     }
-    else // PerfMarkerEntry::PerfMarkerType_End
+    else if (pPerfMarkerEntry->m_markerType == PerfMarkerEntry::PerfMarkerType_End)
     {
         if (m_timestampStack.isEmpty())
         {
@@ -1795,6 +1795,51 @@ void TraceView::HandlePerfMarkerEntry(PerfMarkerEntry* pPerfMarkerEntry)
         GT_IF_WITH_ASSERT(m_branchStack.count() > 0)
         {
             acTimelineBranch* currentBranch = m_branchStack.pop();
+            currentBranch->addTimelineItem(pNewItem);
+        }
+
+        // Add an item to the table:
+        TraceTableItem* pTableItem = pTableModel->CloseLastOpenedPerfMarker(pNewItem);
+        GT_IF_WITH_ASSERT(pTableItem != nullptr)
+        {
+            pNewItem->setTraceTableItem(pTableItem);
+        }
+    }
+    else if (pPerfMarkerEntry->m_markerType == PerfMarkerEntry::PerfMarkerType_EndEx)
+    {
+        if (m_timestampStack.isEmpty())
+        {
+            Util::LogError("Invalid input perfmarker file");
+            return;
+        }
+
+        PerfMarkerEndExEntry* pEndExMarkerEntry = dynamic_cast<PerfMarkerEndExEntry*>(pPerfMarkerEntry);
+
+        startTime = m_timestampStack.pop();
+        endTime = pEndExMarkerEntry->m_timestamp;
+
+        // Create the new time line item:
+        PerfMarkerTimelineItem* pNewItem = new PerfMarkerTimelineItem(startTime, endTime);
+
+        // Set the font and color for the perf marker item:
+        pNewItem->setBackgroundColor(APIColorMap::Instance()->GetPerfMarkersColor());
+        pNewItem->setForegroundColor(Qt::black);
+        pNewItem->setText(QString::fromStdString(pEndExMarkerEntry->m_strName));
+
+        // Remove the title that was specified from the BeginPerfMarker call
+        m_titleStack.pop();
+
+        // Add the timeline item to the branch:
+        GT_IF_WITH_ASSERT(m_branchStack.count() > 0)
+        {
+            acTimelineBranch* currentBranch = m_branchStack.pop();
+
+            if (m_branchStack.count() > 0)
+            {
+                hostBranch = m_branchStack.top();
+            }
+
+            currentBranch = GetPerfMarkerSubBranchHelper(QString::fromStdString(pEndExMarkerEntry->m_strGroup), hostBranch);
             currentBranch->addTimelineItem(pNewItem);
         }
 

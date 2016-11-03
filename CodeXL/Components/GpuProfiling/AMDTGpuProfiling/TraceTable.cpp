@@ -322,6 +322,12 @@ void TraceTableItem::UpdateIndices(int childStartIndex, int childEndIndex)
 }
 
 
+void TraceTableItem::UpdateMarkerName(const QString& strMarkerName)
+{
+    m_data[TraceTableModel::TRACE_INTERFACE_COLUMN] = strMarkerName;
+}
+
+
 TraceTableModel::TraceTableModel(QObject* parent) : QAbstractItemModel(parent), m_isInitialized(false), m_shouldExpandBeEnabled(false)
 {
     m_pRootItem = new TraceTableItem("", "", nullptr, nullptr, nullptr, nullptr);
@@ -480,6 +486,8 @@ TraceTableItem* TraceTableModel::CloseLastOpenedPerfMarker(acTimelineItem* pTime
         // Set the timeline pTableItem:
         pOpenedItem->SetTimelineItem(pTimelineItem);
 
+        pOpenedItem->UpdateMarkerName(pTimelineItem->text());
+
         // Calculate the CPU time:
         quint64 cpuTime = pTimelineItem->endTime() - pTimelineItem->startTime();
         float cpuTimeSec = (float)cpuTime / 1000000;
@@ -496,7 +504,6 @@ TraceTableItem* TraceTableModel::CloseLastOpenedPerfMarker(acTimelineItem* pTime
 
     return pOpenedItem;
 }
-
 
 int TraceTableModel::rowCount(const QModelIndex& parent) const
 {

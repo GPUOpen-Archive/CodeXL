@@ -133,6 +133,10 @@ public:
     /// \return the item end index
     int GetEndIndex() const { return m_endIndex; }
 
+    /// Updates the marker name for an existing perf marker
+    /// \param strMarkerName the new marker name for the item
+    void UpdateMarkerName(const QString& strMarkerName);
+
 private:
     /// Disable copy constructor
     TraceTableItem(const TraceTableItem&);

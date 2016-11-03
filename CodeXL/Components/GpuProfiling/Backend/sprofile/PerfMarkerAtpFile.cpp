@@ -174,6 +174,15 @@ bool PerfMarkerAtpFilePart::Parse(std::istream& in, std::string& outErrorMsg)
                 pEntry = new PerfMarkerEntry(PerfMarkerEntry::PerfMarkerType_End, ts, tid);
                 numEndEntries++;
             }
+            else if (strMarkerType == "clEndPerfMarkerEx")
+            {
+                READ_STREAM(ss, ts, "Failed to parse marker timestamp.");
+                READ_STREAM(ss, strMarkerName, "Failed to parse marker name.");
+                READ_STREAM(ss, strGroupName, "Failed to parse marker group.");
+
+                pEntry = new PerfMarkerEndExEntry(PerfMarkerEntry::PerfMarkerType_EndEx, ts, tid, strMarkerName, strGroupName);
+                numEndEntries++;
+            }
 
             // notify listeners
             for (std::vector<IParserListener<PerfMarkerEntry>*>::iterator it = m_listenerList.begin(); it != m_listenerList.end() && !m_shouldStopParsing; ++it)
