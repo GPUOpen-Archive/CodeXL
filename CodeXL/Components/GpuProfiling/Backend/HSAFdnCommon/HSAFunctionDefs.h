@@ -258,8 +258,6 @@ enum HSA_API_Type
     HSA_API_Type_hsa_amd_interop_map_buffer,
     HSA_API_Type_hsa_amd_interop_unmap_buffer,
     HSA_API_Type_hsa_amd_image_create,
-    HSA_API_Type_hsa_ven_amd_loader_query_host_address,
-    HSA_API_Type_hsa_ven_amd_loader_query_segment_descriptors,
 
     // new for ROCm 1.3
     HSA_API_Type_hsa_extension_get_name,
