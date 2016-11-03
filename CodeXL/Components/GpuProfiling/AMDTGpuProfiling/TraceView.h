@@ -213,7 +213,7 @@ private:
         }
     };
 
-    /// sruct holding the info of the HSA data transfer branch
+    /// struct holding the info of the HSA data transfer branch
     struct HSADataTransferBranchInfo
     {
         QString m_Source;                          ///< source of the data transfer
@@ -317,12 +317,6 @@ private:
     /// \return pointer to the data transfer acTimelineBranch if it exist otherwise nullptr
     acTimelineBranch* GetHSADataTransferBranch(QString src, QString dest);
 
-    /// Cheack whether the data transfer exist or not
-    /// \param[in] src source string of the HSA data transfer
-    /// \param[in] dest destination string of the HSA data transfer
-    /// \return true is the branch exist for given src and dest otherwise false
-    bool IsExistHSADataTransferBranch(QString src, QString dest);
-
 
     TraceSession*                            m_pCurrentSession;        ///< the current session
     QSplitter*                               m_pMainSplitter;           ///< the splitter for the main view
@@ -351,7 +345,7 @@ private:
     acTimelineBranch*                        m_pOpenCLBranch;           ///< the main OpenCL branch in the timeline
     acTimelineBranch*                        m_pHSABranch;              ///< the main HSA branch in the timeline
     acTimelineBranch*                        m_pHSADataTransferBranch;  ///< the HSA data transfer branch in the timeline
-    std::vector<HSADataTransferBranchInfo>   m_HSADataTransferBranches; ///< the HSA src and destination branches in the timeline
+    std::vector<HSADataTransferBranchInfo>   m_hsaDataTransferBranches; ///< the HSA src and destination branches in the timeline
     QMap<unsigned int, acTimelineBranch*>    m_oclCtxMap;               ///< map from OCL context id to the branch for that context
     QMap<unsigned int, OCLQueueBranchInfo*>  m_oclQueueMap;             ///< map from OCL queue id to the QueueBranchInfo for that queue
     QMap<QString, acTimelineBranch*>         m_hsaQueueMap;             ///< map from HSA queue handle string to the branch for that queue

@@ -334,13 +334,13 @@ void TraceView::Clear()
     m_pHSABranch = nullptr;
     m_pHSADataTransferBranch = nullptr;
 
-    for(std::vector<HSADataTransferBranchInfo>::iterator it = m_HSADataTransferBranches.begin();
-        it!=m_HSADataTransferBranches.end(); ++it)
+    for (std::vector<HSADataTransferBranchInfo>::iterator it = m_hsaDataTransferBranches.begin();
+         it != m_hsaDataTransferBranches.end(); ++it)
     {
         it->m_pTransferBranch = nullptr;
     }
 
-    m_HSADataTransferBranches.clear();
+    m_hsaDataTransferBranches.clear();
     m_oclCtxMap.clear();
     m_oclQueueMap.clear();
     m_hsaQueueMap.clear();
@@ -883,9 +883,9 @@ bool TraceView::CheckStopParsing(quint64 curEndTime)
 
 acTimelineBranch* TraceView::AddHSADataTransferBranch(QString src, QString dest)
 {
-    acTimelineBranch* returnBranch = nullptr;
+    acTimelineBranch* returnBranch = GetHSADataTransferBranch(src, dest);
 
-    if (!IsExistHSADataTransferBranch(src, dest))
+    if (returnBranch == nullptr)
     {
         returnBranch = new(std::nothrow) acTimelineBranch();
 
@@ -895,7 +895,10 @@ acTimelineBranch* TraceView::AddHSADataTransferBranch(QString src, QString dest)
             dataTransferBranchInfo.m_Source = src;
             dataTransferBranchInfo.m_Destination = dest;
             dataTransferBranchInfo.m_pTransferBranch = returnBranch;
-            m_HSADataTransferBranches.push_back(dataTransferBranchInfo);
+            dataTransferBranchInfo.m_pTransferBranch->SetBGColor(QColor::fromRgb(230, 230, 230));
+            QString branchText = src + "->" + dest;
+            dataTransferBranchInfo.m_pTransferBranch->setText(branchText);
+            m_hsaDataTransferBranches.push_back(dataTransferBranchInfo);
         }
     }
 
@@ -903,30 +906,12 @@ acTimelineBranch* TraceView::AddHSADataTransferBranch(QString src, QString dest)
 }
 
 
-bool TraceView::IsExistHSADataTransferBranch(QString src, QString dest)
-{
-    bool isExist = false;
-
-    for (std::vector<HSADataTransferBranchInfo>::iterator it = m_HSADataTransferBranches.begin();
-         it != m_HSADataTransferBranches.end(); ++it)
-    {
-        if (src == it->m_Source && dest == it->m_Destination)
-        {
-            isExist = true;
-            break;
-        }
-    }
-
-    return isExist;
-}
-
-
 acTimelineBranch* TraceView::GetHSADataTransferBranch(QString src, QString dest)
 {
     acTimelineBranch* returnBranch = nullptr;
 
-    for (std::vector<HSADataTransferBranchInfo>::iterator it = m_HSADataTransferBranches.begin();
-         it != m_HSADataTransferBranches.end(); ++it)
+    for (std::vector<HSADataTransferBranchInfo>::iterator it = m_hsaDataTransferBranches.begin();
+         it != m_hsaDataTransferBranches.end(); ++it)
     {
         if (src == it->m_Source && dest == it->m_Destination)
         {
@@ -1558,25 +1543,14 @@ void TraceView::HandleHSAAPIInfo(HSAAPIInfo* pApiInfo)
                     m_pHSADataTransferBranch->setText(GPU_STR_TraceViewHSADataTransfers);
                 }
 
-                acTimelineBranch*  hsaDataTransferBranch = nullptr;
+                acTimelineBranch*  pHsaDataTransferBranch = GetHSADataTransferBranch(srcAgent, dstAgent);
 
-                if (!IsExistHSADataTransferBranch(srcAgent, dstAgent))
+                if (nullptr == pHsaDataTransferBranch)
                 {
-                    hsaDataTransferBranch = AddHSADataTransferBranch(srcAgent, dstAgent);
-
-                    if (nullptr != hsaDataTransferBranch)
-                    {
-                        hsaDataTransferBranch->SetBGColor(QColor::fromRgb(230, 230, 230));
-                        QString branchText = srcAgent + "->" + dstAgent;
-                        hsaDataTransferBranch->setText(branchText);
-                    }
-                }
-                else
-                {
-                    hsaDataTransferBranch = GetHSADataTransferBranch(srcAgent, dstAgent);
+                    pHsaDataTransferBranch = AddHSADataTransferBranch(srcAgent, dstAgent);
                 }
 
-                hsaDataTransferBranch->addTimelineItem(transferItem);
+                pHsaDataTransferBranch->addTimelineItem(transferItem);
             }
         }
         else
@@ -1899,8 +1873,8 @@ void TraceView::DoneParsingATPFile()
             m_pHSABranch->addSubBranch(m_pHSADataTransferBranch);
             anySubBranchAdded = true;
 
-            for (std::vector<HSADataTransferBranchInfo>::iterator it = m_HSADataTransferBranches.begin();
-                 it != m_HSADataTransferBranches.end(); ++it)
+            for (std::vector<HSADataTransferBranchInfo>::iterator it = m_hsaDataTransferBranches.begin();
+                 it != m_hsaDataTransferBranches.end(); ++it)
             {
                 m_pHSADataTransferBranch->addSubBranch(it->m_pTransferBranch);
             }
