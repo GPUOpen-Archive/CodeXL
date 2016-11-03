@@ -253,8 +253,6 @@ HSAFunctionDefsUtils::HSAFunctionDefsUtils()
     m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_amd_interop_map_buffer"), HSA_API_Type_hsa_amd_interop_map_buffer));
     m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_amd_interop_unmap_buffer"), HSA_API_Type_hsa_amd_interop_unmap_buffer));
     m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_amd_image_create"), HSA_API_Type_hsa_amd_image_create));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_ven_amd_loader_query_host_address"), HSA_API_Type_hsa_ven_amd_loader_query_host_address));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_ven_amd_loader_query_segment_descriptors"), HSA_API_Type_hsa_ven_amd_loader_query_segment_descriptors));
 
 
 #ifdef FUTURE_ROCR_VERSION
