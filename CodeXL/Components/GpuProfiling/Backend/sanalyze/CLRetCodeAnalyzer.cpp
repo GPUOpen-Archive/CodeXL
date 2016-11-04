@@ -50,6 +50,7 @@ CLRetCodeAnalyzer::CLRetCodeAnalyzer(CLAPIAnalyzerManager* pManager) : CLAPIAnal
     m_retCodeArgMap[CL_FUNC_TYPE_clCreateCommandQueueWithProperties] = 3;
     m_retCodeArgMap[CL_FUNC_TYPE_clCreateSamplerWithProperties] = 2;
     m_retCodeArgMap[CL_FUNC_TYPE_clCreatePipe] = 5;
+    m_retCodeArgMap[CL_FUNC_TYPE_clCreateUserEvent] = 1;
 }
 
 CLRetCodeAnalyzer::~CLRetCodeAnalyzer(void)
