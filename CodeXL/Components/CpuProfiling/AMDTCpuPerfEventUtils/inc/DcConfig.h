@@ -43,18 +43,18 @@ enum DcConfigType
 
 struct IbsConfig
 {
-    gtUInt64 fetchMaxCount;     // Maximum value of periodic fetch counter
-    gtUInt64 opMaxCount;        // Maximum value of periodic op counter
-    bool fetchSampling;       // Enable IBS fetch sampling
-    bool opSampling;          // Enable IBS op sampling
-    bool opCycleCount;      //Whether the op sampling is by cycle or dispatch
+    gtUInt64 fetchMaxCount = 0;          // Maximum value of periodic fetch counter
+    gtUInt64 opMaxCount    = 0;          // Maximum value of periodic op counter
+    bool fetchSampling     = false;      // Enable IBS fetch sampling
+    bool opSampling        = false;      // Enable IBS op sampling
+    bool opCycleCount      = false;      //Whether the op sampling is by cycle or dispatch
 };
 
 struct CluConfig
 {
-    gtUInt64 cluMaxCount;        // Maximum value of periodic op counter while CLU profiling
-    bool cluSampling;            // Enable CLU sampling
-    bool cluCycleCount;          // Whether the op sampling is by cycle or dispatch while CLU profiling
+    gtUInt64 cluMaxCount = 0;        // Maximum value of periodic op counter while CLU profiling
+    bool cluSampling     = false;    // Enable CLU sampling
+    bool cluCycleCount   = false;    // Whether the op sampling is by cycle or dispatch while CLU profiling
 };
 
 ////////////////////////////////////////////////////////////////////////////////////

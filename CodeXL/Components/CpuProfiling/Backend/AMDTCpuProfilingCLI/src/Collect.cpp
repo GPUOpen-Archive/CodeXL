@@ -665,11 +665,23 @@ void CpuProfileCollect::ValidateProfile()
         if (!m_args.GetRawEventString().empty())
         {
             gtVector<DcEventConfig> eventConfigVec;
-            
-            if (ProcessRawEvent(eventConfigVec))
+            IbsConfig ibsConfig;
+
+            if (ProcessRawEvent(eventConfigVec, ibsConfig))
             {
-                m_profileDcConfig.SetEventInfo(eventConfigVec);
-                m_profileDcConfig.SetConfigType(DCConfigEBP);
+                if (ibsConfig.fetchSampling || ibsConfig.opSampling)
+                {
+                    m_profileDcConfig.SetIBSInfo(&ibsConfig);
+                    m_profileDcConfig.SetConfigType(DCConfigIBS);
+                }
+
+                if (!eventConfigVec.empty())
+                {
+                    DcConfigType type = (ibsConfig.fetchSampling || ibsConfig.opSampling) ? DCConfigMultiple : DCConfigEBP;
+                    m_profileDcConfig.SetEventInfo(eventConfigVec);
+                    m_profileDcConfig.SetConfigType(type);
+                }
+
                 m_profileDcConfig.SetConfigName(QString::fromWCharArray(L"Custom"));
             }
         }
@@ -711,7 +723,7 @@ void CpuProfileCollect::ValidateProfile()
     return;
 }
 
-bool CpuProfileCollect::ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec)
+bool CpuProfileCollect::ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec, IbsConfig& ibsConfig)
 {
     bool ret = false;
     gtVector<gtString> rawEventStrVec = m_args.GetRawEventString();
@@ -731,6 +743,8 @@ bool CpuProfileCollect::ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec)
         bool countingEvent = true;
         gtUInt64 performanceEvent = 0;
         gtUInt32 pmcMsrId = 0;
+        IbsConfig aIbsConfig;
+        bool ibsEvent = false;
 
         while (tokens.getNextToken(value))
         {
@@ -738,10 +752,28 @@ bool CpuProfileCollect::ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec)
             {
             case 0:
                 value.toUnsignedIntNumber(eventSelect);
+                
+                if (eventSelect == 0xf000)
+                {
+                    aIbsConfig.fetchSampling = true;
+                }
+                else if (eventSelect == 0xf100)
+                {
+                    aIbsConfig.opSampling = true;
+                }
+
+                ibsEvent = aIbsConfig.fetchSampling || aIbsConfig.opSampling;
+
                 break;
 
             case 1:
                 value.toUnsignedIntNumber(unitMask);
+
+                if (aIbsConfig.opSampling)
+                {
+                    aIbsConfig.opCycleCount = (unitMask == 1) ? true : false;
+                }
+
                 break;
 
             case 2:
@@ -780,7 +812,23 @@ bool CpuProfileCollect::ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec)
             i++;
         }
 
-        if (eventSelect != 0xf000 && eventSelect != 0xf100)
+        if (ibsEvent)
+        {
+            if (aIbsConfig.fetchSampling)
+            {
+                ibsConfig.fetchSampling = true;
+                ibsConfig.fetchMaxCount = interval;
+            }
+            else if (aIbsConfig.opSampling)
+            {
+                ibsConfig.opSampling = true;
+                ibsConfig.opCycleCount = aIbsConfig.opCycleCount;
+                ibsConfig.opMaxCount = interval;
+            }
+
+            ret = true;
+        }
+        else
         {
             HRESULT res = fnMakeProfileEvent(eventSelect,
                 unitMask,
@@ -1209,7 +1257,8 @@ void CpuProfileCollect::SetEbpConfig()
 
 void CpuProfileCollect::SetIbsConfig()
 {
-    bool isIbs = (DCConfigCLU == m_profileDcConfig.GetConfigType() || DCConfigIBS == m_profileDcConfig.GetConfigType());
+    DcConfigType configType = m_profileDcConfig.GetConfigType();
+    bool isIbs = (DCConfigCLU == configType || DCConfigIBS == configType || DCConfigMultiple == configType);
 
     if (isStateReady() && isOK() && isIbs)
     {

@@ -1058,8 +1058,8 @@ void CpuProfileReport::ReportSampleCount(bool sepByCore)
 
     AMDTSampleValueVec sampleValueVec;
     m_profileDbReader.GetSampleCount(sepByCore, sampleValueVec);
-    
-    fprintf(stderr, "\nCPCLI>>> coreId     counterId     samplingInterval     nbrSamples\n");
+
+    fprintf(stderr, "\nCPCLI>>> coreId  counterId   counterName      samplingInterval   nbrSamples\n");
 
     for (const auto& value : sampleValueVec)
     {
@@ -1068,10 +1068,14 @@ void CpuProfileReport::ReportSampleCount(bool sepByCore)
         auto counterInfo = std::find_if(samplingConfigVec.begin(), samplingConfigVec.end(),
             [&cid](AMDTProfileSamplingConfig const& aConfig) { return aConfig.m_id == cid; });
 
-        //fprintf(stderr, "%u     0x%x      %llu      %llu\n", value.m_coreId, counterInfo->m_hwEventId, counterInfo->m_samplingInterval, static_cast<AMDTUInt64>(value.m_sampleCount));
+        AMDTUInt32 eventId = counterInfo->m_hwEventId;
+        auto aCounterDesc = std::find_if(counterDesc.begin(), counterDesc.end(),
+            [&eventId](AMDTProfileCounterDesc const& aCounter) { return aCounter.m_hwEventId == eventId; });
+
         gtString printStr;
-        printStr.appendFormattedString(L"%4d %12x %16llu %16llu",
-            value.m_coreId, counterInfo->m_hwEventId, counterInfo->m_samplingInterval, static_cast<AMDTUInt64>(value.m_sampleCount));
+        aCounterDesc->m_abbrev.replace(L" ", L"-");
+        printStr.appendFormattedString(L"%4d %10x    %-20s %8llu  %12llu",
+            value.m_coreId, counterInfo->m_hwEventId, aCounterDesc->m_abbrev.asCharArray(), counterInfo->m_samplingInterval, static_cast<AMDTUInt64>(value.m_sampleCount));
 
         fprintf(stderr, "CPCLI>>> %s\n", printStr.asASCIICharArray());
     }
