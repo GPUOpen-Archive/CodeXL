@@ -1513,7 +1513,7 @@ void TraceView::HandleHSAAPIInfo(HSAAPIInfo* pApiInfo)
 
             HSAMemoryTransferAPIInfo* pHsaMemoryTransferAPIInfo = dynamic_cast<HSAMemoryTransferAPIInfo*>(pHsaMemoryAPIInfo);
 
-            if (nullptr != pHsaMemoryTransferAPIInfo)
+            if ((nullptr != pHsaMemoryTransferAPIInfo) && (0 != pHsaMemoryTransferAPIInfo->m_transferStartTime) && (0 != pHsaMemoryTransferAPIInfo->m_transferEndTime))
             {
                 QString srcAgent = QString::fromStdString(pHsaMemoryTransferAPIInfo->m_strSrcAgent);
                 QString dstAgent = QString::fromStdString(pHsaMemoryTransferAPIInfo->m_strDstAgent);

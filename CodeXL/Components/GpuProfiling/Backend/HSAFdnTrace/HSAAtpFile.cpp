@@ -214,7 +214,7 @@ bool HSAAtpFilePart::ParseHostTimestamp(const char* buf, HSAAPIInfo* pAPIInfo, b
     pAPIInfo->m_ullStart = ullStart;
     pAPIInfo->m_ullEnd = ullEnd;
 
-    if (HSA_API_Type_hsa_amd_memory_async_copy == pAPIInfo->m_apiID)
+    if (HSA_API_Type_hsa_amd_memory_async_copy == pAPIInfo->m_apiID && !ss.eof())
     {
         ULONGLONG ullAsyncCopyStart;
         ULONGLONG ullAsyncCopyEnd;
