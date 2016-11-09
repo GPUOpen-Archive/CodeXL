@@ -22,6 +22,7 @@
 #include "HSATraceInterceptionTable1_2.h"
 #include "HSAAgentUtils.h"
 
+#include "HSASignalPool.h"
 #include "HSAAqlPacketTimeCollector.h"
 
 #include "HSAFdnAPIInfoManager.h"
@@ -181,8 +182,11 @@ extern "C" bool DLL_PUBLIC OnLoad(void* pTable, uint64_t runtimeVersion, uint64_
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 
-    g_pSignalCollector = new HSASignalCollectorThread();
-    g_pSignalCollector->execute();
+    if (params.m_bAqlPacketTracing)
+    {
+        g_pSignalCollector = new HSASignalCollectorThread();
+        g_pSignalCollector->execute();
+    }
 
     return true;
 }
@@ -210,34 +214,37 @@ extern "C" void DLL_PUBLIC OnUnload()
     RECORD_STACK_TRACE_FOR_API(pAPIInfo);
     HSAAPIInfoManager::Instance()->AddAPIInfoEntry(pAPIInfo);
 
-    HSATimeCollectorGlobals::Instance()->m_doQuit = true;
+    if (nullptr != g_pSignalCollector)
+    {
+        HSATimeCollectorGlobals::Instance()->m_doQuit = true;
 
-    auto& forceSignalCollection = HSATimeCollectorGlobals::Instance()->m_forceSignalCollection;
+        auto& forceSignalCollection = HSATimeCollectorGlobals::Instance()->m_forceSignalCollection;
 
 #ifdef FUTURE_ROCR_VERSION
-    g_pRealCoreFunctions->hsa_signal_store_screlease_fn(forceSignalCollection, 1);
+        g_pRealCoreFunctions->hsa_signal_store_screlease_fn(forceSignalCollection, 1);
 #else
-    g_pRealCoreFunctions->hsa_signal_store_release_fn(forceSignalCollection, 1);
+        g_pRealCoreFunctions->hsa_signal_store_release_fn(forceSignalCollection, 1);
 #endif
 
 #if defined (_LINUX) || defined (LINUX)
-    // notify the signal collector thread to collect all remaining signals
-    if (!HSATimeCollectorGlobals::Instance()->m_dispatchesInFlight.unlockCondition())
-    {
-        Log(logERROR, "unable to unlock condition\n");
-    }
+        // notify the signal collector thread to collect all remaining signals
+        if (!HSATimeCollectorGlobals::Instance()->m_dispatchesInFlight.unlockCondition())
+        {
+             Log(logERROR, "unable to unlock condition\n");
+        }
 
-    HSATimeCollectorGlobals::Instance()->m_dispatchesInFlight.signalSingleThread();
+        HSATimeCollectorGlobals::Instance()->m_dispatchesInFlight.signalSingleThread();
 #endif
 
-    g_pSignalCollector->waitForThreadEnd(osTimeInterval(static_cast<gtUInt64>(10 * 1e9))); // wait ten seconds for thread to end
-    g_pSignalCollector->terminate();
-    g_pSignalCollector = nullptr;
+        g_pSignalCollector->waitForThreadEnd(osTimeInterval(static_cast<gtUInt64>(10 * 1e9))); // wait ten seconds for thread to end
+        g_pSignalCollector->terminate();
+        g_pSignalCollector = nullptr;
+
+        retVal = g_pRealCoreFunctions->hsa_signal_destroy_fn(forceSignalCollection);
+    }
 
     HSASignalQueue::Instance()->Clear();
     HSASignalPool::Instance()->Clear();
-
-    retVal = g_pRealCoreFunctions->hsa_signal_destroy_fn(forceSignalCollection);
 
     if (HSA_STATUS_SUCCESS != retVal)
     {

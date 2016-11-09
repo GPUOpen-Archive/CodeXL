@@ -21,6 +21,6 @@ void HSA_APITrace_hsa_executable_get_symbol_PostCallHelper(hsa_status_t retVal, 
 
 /// interception helper function for hsa_amd_memory_async_copy
 /// see HSA runtime spec for parameter descriptions
-void HSA_APITrace_hsa_amd_memory_async_copy_PreCallHelper(void* dst, hsa_agent_t dst_agent, const void* src, hsa_agent_t src_agent, size_t size, uint32_t num_dep_signals, const hsa_signal_t* dep_signals, hsa_signal_t completion_signal);
+void HSA_APITrace_hsa_amd_memory_async_copy_PreCallHelper(void* dst, hsa_agent_t dst_agent, const void* src, hsa_agent_t src_agent, size_t size, uint32_t num_dep_signals, const hsa_signal_t* dep_signals, hsa_signal_t& completion_signal);
 
 #endif // _HSA_TRACE_INTERCEPTION_HELPERS_H

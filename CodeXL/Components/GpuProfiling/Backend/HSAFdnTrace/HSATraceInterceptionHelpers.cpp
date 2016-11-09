@@ -19,6 +19,7 @@
 #include "HSAFdnAPIInfoManager.h"
 #include "FinalizerInfoManager.h"
 #include "HSATraceInterceptionHelpers.h"
+#include "HSASignalPool.h"
 #include "HSAAqlPacketTimeCollector.h"
 
 hsa_status_t AqlPacketTraceCallback(const hsa_aql_trace_t* pAqlPacketTrace, void* pUserArg)
@@ -38,15 +39,15 @@ hsa_status_t AqlPacketTraceCallback(const hsa_aql_trace_t* pAqlPacketTrace, void
 
             hsa_kernel_dispatch_packet_t* pKernelDispatchPacket = static_cast<hsa_kernel_dispatch_packet_t*>(pAqlPacketTrace->packet);
 
-            hsa_signal_t replacement_signal;
-            if (HSASignalPool::Instance()->AcquireSignal(1, replacement_signal))
+            hsa_signal_t replacementSignal;
+            if (HSASignalPool::Instance()->AcquireSignal(1, replacementSignal))
             {
                 // create a replacement signal
                 HSAPacketSignalReplacer signalReplacer(pAqlKernelDispatchPacket, pKernelDispatchPacket->completion_signal,
-                                                       replacement_signal, pAqlPacketTrace->agent,
+                                                       replacementSignal, pAqlPacketTrace->agent,
                                                        pAqlPacketTrace->queue);
 
-                pKernelDispatchPacket->completion_signal = replacement_signal;
+                pKernelDispatchPacket->completion_signal = replacementSignal;
 
                 // add the replacer to the list of signals that are available to listen for
                 HSASignalQueue::Instance()->AddSignalToBack(signalReplacer);
@@ -156,7 +157,7 @@ void HSA_APITrace_hsa_executable_get_symbol_PostCallHelper(hsa_status_t retVal, 
     }
 }
 
-void HSA_APITrace_hsa_amd_memory_async_copy_PreCallHelper(void* dst, hsa_agent_t dst_agent, const void* src, hsa_agent_t src_agent, size_t size, uint32_t num_dep_signals, const hsa_signal_t* dep_signals, hsa_signal_t completion_signal)
+void HSA_APITrace_hsa_amd_memory_async_copy_PreCallHelper(void* dst, hsa_agent_t dst_agent, const void* src, hsa_agent_t src_agent, size_t size, uint32_t num_dep_signals, const hsa_signal_t* dep_signals, hsa_signal_t& completion_signal)
 {
     SP_UNREFERENCED_PARAMETER(dst);
     SP_UNREFERENCED_PARAMETER(dst_agent);
@@ -168,6 +169,17 @@ void HSA_APITrace_hsa_amd_memory_async_copy_PreCallHelper(void* dst, hsa_agent_t
 
     if (0 != completion_signal.handle)
     {
-        HSAAPIInfoManager::Instance()->AddAsyncCopyCompletionSignal(completion_signal);
+        hsa_signal_value_t origValue = g_pRealCoreFunctions->hsa_signal_load_relaxed_fn(completion_signal);
+        hsa_signal_t replacementSignal;
+
+        if (HSAAPIInfoManager::Instance()->IsCapReached() || !HSASignalPool::Instance()->AcquireSignal(origValue, replacementSignal))
+        {
+            replacementSignal = completion_signal;
+        }
+        else
+        {
+            HSAAPIInfoManager::Instance()->AddReplacementAsyncCopySignal(completion_signal, replacementSignal);
+            HSAAPIInfoManager::Instance()->AddAsyncCopyCompletionSignal(completion_signal);
+        }
     }
 }
