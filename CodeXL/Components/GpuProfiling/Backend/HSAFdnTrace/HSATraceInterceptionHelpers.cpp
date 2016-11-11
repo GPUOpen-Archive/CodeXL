@@ -169,7 +169,12 @@ void HSA_APITrace_hsa_amd_memory_async_copy_PreCallHelper(void* dst, hsa_agent_t
 
     if (0 != completion_signal.handle)
     {
-        hsa_signal_value_t origValue = g_pRealCoreFunctions->hsa_signal_load_relaxed_fn(completion_signal);
+#ifdef FUTURE_ROCR_VERSION
+        hsa_signal_value_t origValue = g_pRealCoreFunctions->hsa_signal_load_scacquire_fn(completion_signal);
+#else
+        hsa_signal_value_t origValue = g_pRealCoreFunctions->hsa_signal_load_acquire_fn(completion_signal);
+#endif
+
         hsa_signal_t replacementSignal;
 
         if (HSAAPIInfoManager::Instance()->IsCapReached() || !HSASignalPool::Instance()->AcquireSignal(origValue, replacementSignal))
@@ -179,7 +184,8 @@ void HSA_APITrace_hsa_amd_memory_async_copy_PreCallHelper(void* dst, hsa_agent_t
         else
         {
             HSAAPIInfoManager::Instance()->AddReplacementAsyncCopySignal(completion_signal, replacementSignal);
-            HSAAPIInfoManager::Instance()->AddAsyncCopyCompletionSignal(completion_signal);
+            HSAAPIInfoManager::Instance()->AddAsyncCopyCompletionSignal(replacementSignal);
+            completion_signal = replacementSignal;
         }
     }
 }
