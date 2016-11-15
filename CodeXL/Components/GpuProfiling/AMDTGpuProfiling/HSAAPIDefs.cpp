@@ -132,11 +132,9 @@ void HSAAPIDefs::BuildAPIGroupsMap()
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_iterate_agents, HSAAPIGroup_Agent);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_agent_iterate_regions, HSAAPIGroup_Agent);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_agent_get_exception_policies, HSAAPIGroup_Agent);
-#ifdef FUTURE_ROCR_VERSION
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_agent_iterate_caches, HSAAPIGroup_Agent);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_agent_major_extension_supported, HSAAPIGroup_Agent);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_agent_iterate_isas, HSAAPIGroup_ISA);
-#endif
 
     // HSAAPIGroup_CodeObject:
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_code_object_serialize, HSAAPIGroup_CodeObject);
@@ -144,12 +142,10 @@ void HSAAPIDefs::BuildAPIGroupsMap()
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_code_object_destroy, HSAAPIGroup_CodeObject);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_code_object_get_symbol, HSAAPIGroup_CodeObject);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_code_object_iterate_symbols, HSAAPIGroup_CodeObject);
-#ifdef FUTURE_ROCR_VERSION
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_code_object_reader_create_from_file, HSAAPIGroup_CodeObject);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_code_object_reader_create_from_memory, HSAAPIGroup_CodeObject);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_code_object_reader_destroy, HSAAPIGroup_CodeObject);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_code_object_get_symbol_from_name, HSAAPIGroup_CodeObject);
-#endif
 
     // HSAAPIGroup_Executable:
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_executable_create, HSAAPIGroup_Executable);
@@ -162,7 +158,6 @@ void HSAAPIDefs::BuildAPIGroupsMap()
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_executable_validate, HSAAPIGroup_Executable);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_executable_get_symbol, HSAAPIGroup_Executable);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_executable_iterate_symbols, HSAAPIGroup_Executable);
-#ifdef FUTURE_ROCR_VERSION
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_executable_create_alt, HSAAPIGroup_Executable);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_executable_load_program_code_object, HSAAPIGroup_Executable);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_executable_load_agent_code_object, HSAAPIGroup_Executable);
@@ -170,17 +165,14 @@ void HSAAPIDefs::BuildAPIGroupsMap()
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_executable_get_symbol_by_name, HSAAPIGroup_Executable);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_executable_iterate_agent_symbols, HSAAPIGroup_Executable);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_executable_iterate_program_symbols, HSAAPIGroup_Executable);
-#endif
 
     // HSAAPIGroup_ExtensionsGeneral:
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_system_extension_supported, HSAAPIGroup_ExtensionsGeneral);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_system_get_extension_table, HSAAPIGroup_ExtensionsGeneral);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_agent_extension_supported, HSAAPIGroup_ExtensionsGeneral);
-#ifdef FUTURE_ROCR_VERSION
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_system_major_extension_supported, HSAAPIGroup_ExtensionsGeneral);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_system_get_major_extension_table, HSAAPIGroup_ExtensionsGeneral);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_agent_major_extension_supported, HSAAPIGroup_ExtensionsGeneral);
-#endif
 
     // HSAAPIGroup_ExtensionsFinalizer:
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_ext_program_create, HSAAPIGroup_ExtensionsFinalizer);
@@ -240,11 +232,9 @@ void HSAAPIDefs::BuildAPIGroupsMap()
     // HSAAPIGroup_ISA:
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_isa_from_name, HSAAPIGroup_ISA);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_isa_compatible, HSAAPIGroup_ISA);
-#ifdef FUTURE_ROCR_VERSION
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_isa_get_exception_policies, HSAAPIGroup_ISA);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_isa_get_round_method, HSAAPIGroup_ISA);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_isa_iterate_wavefronts, HSAAPIGroup_ISA);
-#endif
 
     // HSAAPIGroup_Memory:
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_memory_register, HSAAPIGroup_Memory);
@@ -263,11 +253,9 @@ void HSAAPIDefs::BuildAPIGroupsMap()
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_code_symbol_get_info, HSAAPIGroup_QueryInfo);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_executable_get_info, HSAAPIGroup_QueryInfo);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_executable_symbol_get_info, HSAAPIGroup_QueryInfo);
-#ifdef FUTURE_ROCR_VERSION
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_cache_get_info, HSAAPIGroup_QueryInfo);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_isa_get_info_alt, HSAAPIGroup_QueryInfo);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_wavefront_get_info, HSAAPIGroup_QueryInfo);
-#endif
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_status_string, HSAAPIGroup_QueryInfo);
 
 
@@ -282,7 +270,6 @@ void HSAAPIDefs::BuildAPIGroupsMap()
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_cas_write_index_relaxed, HSAAPIGroup_Queue);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_add_write_index_relaxed, HSAAPIGroup_Queue);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_store_read_index_relaxed, HSAAPIGroup_Queue);
-#ifdef FUTURE_ROCR_VERSION
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_load_read_index_scacquire, HSAAPIGroup_Queue);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_load_write_index_scacquire, HSAAPIGroup_Queue);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_store_write_index_screlease, HSAAPIGroup_Queue);
@@ -293,18 +280,6 @@ void HSAAPIDefs::BuildAPIGroupsMap()
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_add_write_index_scacquire, HSAAPIGroup_Queue);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_add_write_index_screlease, HSAAPIGroup_Queue);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_store_read_index_screlease, HSAAPIGroup_Queue);
-#else
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_load_read_index_acquire, HSAAPIGroup_Queue);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_load_write_index_acquire, HSAAPIGroup_Queue);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_store_write_index_release, HSAAPIGroup_Queue);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_cas_write_index_acq_rel, HSAAPIGroup_Queue);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_cas_write_index_acquire, HSAAPIGroup_Queue);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_cas_write_index_release, HSAAPIGroup_Queue);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_add_write_index_acq_rel, HSAAPIGroup_Queue);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_add_write_index_acquire, HSAAPIGroup_Queue);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_add_write_index_release, HSAAPIGroup_Queue);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_queue_store_read_index_release, HSAAPIGroup_Queue);
-#endif
 
     // HSAAPIGroup_Signal:
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_create, HSAAPIGroup_Signal);
@@ -319,7 +294,6 @@ void HSAAPIDefs::BuildAPIGroupsMap()
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_add_relaxed, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_subtract_relaxed, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_cas_relaxed, HSAAPIGroup_Signal);
-#ifdef FUTURE_ROCR_VERSION
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_group_create, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_group_destroy, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_group_wait_any_scacquire, HSAAPIGroup_Signal);
@@ -348,32 +322,6 @@ void HSAAPIDefs::BuildAPIGroupsMap()
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_cas_scacquire, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_cas_screlease, HSAAPIGroup_Signal);
     m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_cas_scacq_screl, HSAAPIGroup_Signal);
-#else
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_load_acquire, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_store_release, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_wait_acquire, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_and_acquire, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_and_release, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_and_acq_rel, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_or_acquire, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_or_release, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_or_acq_rel, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_xor_acquire, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_xor_release, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_xor_acq_rel, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_exchange_acquire, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_exchange_release, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_exchange_acq_rel, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_add_acquire, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_add_release, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_add_acq_rel, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_subtract_acquire, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_subtract_release, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_subtract_acq_rel, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_cas_acquire, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_cas_release, HSAAPIGroup_Signal);
-    m_HSAAPIGroupMap.insert(HSA_API_Type_hsa_signal_cas_acq_rel, HSAAPIGroup_Signal);
-#endif
 }
 
 void HSAAPIDefs::BuildAPIFunctionNamesMap()
