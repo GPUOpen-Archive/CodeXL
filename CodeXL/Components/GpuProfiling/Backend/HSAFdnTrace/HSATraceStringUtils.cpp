@@ -342,11 +342,9 @@ unsigned int HSATraceStringUtils::Get_hsa_amd_agent_get_info_AttributeSize(hsa_a
 {
     switch (attribute)
     {
-#ifdef FUTURE_ROCR_VERSION
         // char[64]
         case HSA_AMD_AGENT_INFO_PRODUCT_NAME:
             return sizeof(char[64]);
-#endif
 
             // uint32_t
         case HSA_AMD_AGENT_INFO_CHIP_ID:
@@ -381,12 +379,10 @@ std::string HSATraceStringUtils::Get_hsa_amd_agent_get_info_AttributeString(void
         {
             switch (attribute)
             {
-#ifdef FUTURE_ROCR_VERSION
                 // char*
                 case HSA_AMD_AGENT_INFO_PRODUCT_NAME:
                     ss << GetStringString(static_cast<char*>(value), false, false);
                     break;
-#endif
 
                 // uint32_t
                 case HSA_AMD_AGENT_INFO_CHIP_ID:
@@ -1249,8 +1245,6 @@ std::string HSATraceStringUtils::Get_hsa_amd_agent_memory_pool_get_info_Attribut
     }
 }
 
-#ifdef FUTURE_ROCR_VERSION
-
 unsigned int HSATraceStringUtils::Get_hsa_cache_get_info_AttributeSize(hsa_cache_info_t attribute)
 {
     switch (attribute)
@@ -1356,7 +1350,4 @@ std::string HSATraceStringUtils::Get_hsa_wavefront_get_info_AttributeString(void
         return SurroundWithDeRef(ss.str());
     }
 }
-
-#endif
-
 

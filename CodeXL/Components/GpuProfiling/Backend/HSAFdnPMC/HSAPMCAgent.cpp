@@ -61,7 +61,6 @@ extern "C" bool DLL_PUBLIC OnLoad(void* pTable, uint64_t runtimeVersion, uint64_
     {
         HsaApiTable* pHsaTable = reinterpret_cast<HsaApiTable*>(pTable);
 
-#ifdef FUTURE_ROCR_VERSION
         if (IsROCm12(pHsaTable))
         {
             // ROCm 1.2 backwards compatibility
@@ -69,7 +68,6 @@ extern "C" bool DLL_PUBLIC OnLoad(void* pTable, uint64_t runtimeVersion, uint64_
             InitHSAAPIInterceptPMC1_2(pHsaTable1_2);
         }
         else
-#endif
         {
             InitHSAAPIInterceptPMC(pHsaTable);
         }

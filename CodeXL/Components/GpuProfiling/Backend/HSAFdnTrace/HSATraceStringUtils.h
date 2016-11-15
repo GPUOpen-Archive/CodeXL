@@ -298,8 +298,6 @@ unsigned int Get_hsa_amd_agent_memory_pool_get_info_AttributeSize(hsa_amd_agent_
 /// \return the string representation of the specified agent memory pool data
 std::string Get_hsa_amd_agent_memory_pool_get_info_AttributeString(void* value, hsa_amd_agent_memory_pool_info_t attribute, hsa_status_t retVal);
 
-#ifdef FUTURE_ROCR_VERSION
-
 /// Gets the size of the underlying data for the specified cache attribute
 /// \param attribute the attribute whose size is needed
 /// \return the size of the underlying data for the specified cache attribute (0 for unsupported/unknown attributes)
@@ -323,7 +321,6 @@ unsigned int Get_hsa_wavefront_get_info_AttributeSize(hsa_wavefront_info_t attri
 /// \param retVal the return value of the hsa_wavefront_get_info call
 /// \return the string representation of the specified wavefront data
 std::string Get_hsa_wavefront_get_info_AttributeString(void* value, hsa_wavefront_info_t attribute, hsa_status_t retVal);
-#endif
 
 }
 

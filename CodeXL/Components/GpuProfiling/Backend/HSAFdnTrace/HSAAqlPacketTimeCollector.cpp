@@ -131,11 +131,7 @@ int HSASignalCollectorThread::entryPoint()
 
                 if (doFlush)
                 {
-#ifdef FUTURE_ROCR_VERSION
                     g_pRealCoreFunctions->hsa_signal_store_screlease_fn(signalList[0], 0); // this is HSATimeCollectorGlobals::Instance()->m_forceSignalCollection
-#else
-                    g_pRealCoreFunctions->hsa_signal_store_release_fn(signalList[0], 0); // this is HSATimeCollectorGlobals::Instance()->m_forceSignalCollection
-#endif
                     m_deferList[0] = m_deferList[m_index];
                 }
 

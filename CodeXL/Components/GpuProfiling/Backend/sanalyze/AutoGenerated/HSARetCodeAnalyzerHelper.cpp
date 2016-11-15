@@ -10,7 +10,6 @@
 void GetNoReturnCodeAPIs(HSAAPITypeSet& noReturnCodeAPIs)
 {
     noReturnCodeAPIs.clear();
-#ifdef FUTURE_ROCR_VERSION
     noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_load_scacquire);
     noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_store_screlease);
     noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_silent_store_screlease);
@@ -46,43 +45,6 @@ void GetNoReturnCodeAPIs(HSAAPITypeSet& noReturnCodeAPIs)
     noReturnCodeAPIs.insert(HSA_API_Type_hsa_queue_add_write_index_screlease);
     noReturnCodeAPIs.insert(HSA_API_Type_hsa_queue_cas_write_index_scacquire);
     noReturnCodeAPIs.insert(HSA_API_Type_hsa_queue_store_read_index_screlease);
-#else
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_load_acquire);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_store_release);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_exchange_acq_rel);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_exchange_acquire);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_exchange_release);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_cas_acq_rel);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_cas_acquire);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_cas_release);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_add_acq_rel);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_add_acquire);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_add_release);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_subtract_acq_rel);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_subtract_acquire);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_subtract_release);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_and_acq_rel);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_and_acquire);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_and_release);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_or_acq_rel);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_or_acquire);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_or_release);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_xor_acq_rel);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_xor_acquire);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_xor_release);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_wait_acquire);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_queue_load_read_index_acquire);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_queue_load_write_index_acquire);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_queue_store_write_index_release);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_queue_cas_write_index_acq_rel);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_queue_cas_write_index_acquire);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_queue_cas_write_index_release);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_queue_add_write_index_acq_rel);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_queue_add_write_index_acquire);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_queue_add_write_index_release);
-    noReturnCodeAPIs.insert(HSA_API_Type_hsa_queue_store_read_index_release);
-#endif
-
     noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_load_relaxed);
     noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_store_relaxed);
     noReturnCodeAPIs.insert(HSA_API_Type_hsa_signal_exchange_relaxed);

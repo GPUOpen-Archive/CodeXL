@@ -173,7 +173,6 @@ std::string Get_hsa_exception_policy_t_String(hsa_exception_policy_t input);
 /// \return the string representation of the hsa_exception_policy_t
 std::string Get_hsa_exception_policy_t_Ptr_String(const hsa_exception_policy_t* pInputPtr, hsa_exception_policy_t input);
 
-#ifdef FUTURE_ROCR_VERSION
 /// Gets the string representation of the hsa_cache_t type
 /// \param input the input hsa_cache_t
 /// \return the string representation of the hsa_cache_t
@@ -195,7 +194,6 @@ std::string Get_hsa_cache_info_t_String(hsa_cache_info_t input);
 /// \param input the input hsa_cache_info_t
 /// \return the string representation of the hsa_cache_info_t
 std::string Get_hsa_cache_info_t_Ptr_String(const hsa_cache_info_t* pInputPtr, hsa_cache_info_t input);
-#endif
 
 /// Gets the string representation of the hsa_signal_t type
 /// \param input the input hsa_signal_t
@@ -230,7 +228,6 @@ std::string Get_hsa_wait_state_t_String(hsa_wait_state_t input);
 /// \return the string representation of the hsa_wait_state_t
 std::string Get_hsa_wait_state_t_Ptr_String(const hsa_wait_state_t* pInputPtr, hsa_wait_state_t input);
 
-#ifdef FUTURE_ROCR_VERSION
 /// Gets the string representation of the hsa_signal_group_t type
 /// \param input the input hsa_signal_group_t
 /// \return the string representation of the hsa_signal_group_t
@@ -241,7 +238,6 @@ std::string Get_hsa_signal_group_t_String(hsa_signal_group_t input);
 /// \param input the input hsa_signal_group_t
 /// \return the string representation of the hsa_signal_group_t
 std::string Get_hsa_signal_group_t_Ptr_String(const hsa_signal_group_t* pInputPtr, hsa_signal_group_t input);
-#endif
 
 /// Gets the string representation of the hsa_region_t type
 /// \param input the input hsa_region_t
@@ -452,7 +448,6 @@ std::string Get_hsa_isa_info_t_String(hsa_isa_info_t input);
 /// \return the string representation of the hsa_isa_info_t
 std::string Get_hsa_isa_info_t_Ptr_String(const hsa_isa_info_t* pInputPtr, hsa_isa_info_t input);
 
-#ifdef FUTURE_ROCR_VERSION
 /// Gets the string representation of the hsa_fp_type_t type
 /// \param input the input hsa_fp_type_t
 /// \return the string representation of the hsa_fp_type_t
@@ -518,7 +513,7 @@ std::string Get_hsa_code_object_reader_t_String(hsa_code_object_reader_t input);
 /// \param input the input hsa_code_object_reader_t
 /// \return the string representation of the hsa_code_object_reader_t
 std::string Get_hsa_code_object_reader_t_Ptr_String(const hsa_code_object_reader_t* pInputPtr, hsa_code_object_reader_t input);
-#endif
+
 /// Gets the string representation of the hsa_executable_t type
 /// \param input the input hsa_executable_t
 /// \return the string representation of the hsa_executable_t
@@ -541,7 +536,6 @@ std::string Get_hsa_executable_state_t_String(hsa_executable_state_t input);
 /// \return the string representation of the hsa_executable_state_t
 std::string Get_hsa_executable_state_t_Ptr_String(const hsa_executable_state_t* pInputPtr, hsa_executable_state_t input);
 
-#ifdef FUTURE_ROCR_VERSION
 /// Gets the string representation of the hsa_loaded_code_object_t type
 /// \param input the input hsa_loaded_code_object_t
 /// \return the string representation of the hsa_loaded_code_object_t
@@ -552,7 +546,6 @@ std::string Get_hsa_loaded_code_object_t_String(hsa_loaded_code_object_t input);
 /// \param input the input hsa_loaded_code_object_t
 /// \return the string representation of the hsa_loaded_code_object_t
 std::string Get_hsa_loaded_code_object_t_Ptr_String(const hsa_loaded_code_object_t* pInputPtr, hsa_loaded_code_object_t input);
-#endif
 
 /// Gets the string representation of the hsa_executable_info_t type
 /// \param input the input hsa_executable_info_t

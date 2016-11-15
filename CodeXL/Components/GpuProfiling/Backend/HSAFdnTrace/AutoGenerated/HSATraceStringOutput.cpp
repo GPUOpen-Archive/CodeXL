@@ -46,7 +46,6 @@ std::string HSATraceStringUtils::Get_hsa_status_t_String(hsa_status_t input)
             CASE(HSA_STATUS_ERROR_VARIABLE_ALREADY_DEFINED);
             CASE(HSA_STATUS_ERROR_VARIABLE_UNDEFINED);
             CASE(HSA_STATUS_ERROR_EXCEPTION);
-#ifdef FUTURE_ROCR_VERSION
             CASE(HSA_STATUS_ERROR_INVALID_CODE_SYMBOL);
             CASE(HSA_STATUS_ERROR_INVALID_EXECUTABLE_SYMBOL);
             CASE(HSA_STATUS_ERROR_INVALID_FILE);
@@ -55,7 +54,7 @@ std::string HSATraceStringUtils::Get_hsa_status_t_String(hsa_status_t input)
             CASE(HSA_STATUS_ERROR_INVALID_WAVEFRONT);
             CASE(HSA_STATUS_ERROR_INVALID_SIGNAL_GROUP);
             CASE(HSA_STATUS_ERROR_INVALID_RUNTIME_STATE);
-#endif
+
         default:
             ss << input;
             break;
@@ -259,13 +258,9 @@ std::string HSATraceStringUtils::Get_hsa_extension_t_String(hsa_extension_t inpu
     {
             CASE(HSA_EXTENSION_FINALIZER);
             CASE(HSA_EXTENSION_IMAGES);
-#ifdef FUTURE_ROCR_VERSION
             CASE(HSA_EXTENSION_PERFORMANCE_COUNTERS);
             CASE(HSA_EXTENSION_PROFILING_EVENTS);
             CASE(HSA_AMD_FIRST_EXTENSION);
-#else
-            CASE(HSA_EXTENSION_AMD_PROFILER);
-#endif
             CASE(HSA_EXTENSION_AMD_LOADER);
 
         default:
@@ -499,8 +494,6 @@ std::string HSATraceStringUtils::Get_hsa_exception_policy_t_Ptr_String(const hsa
     }
 }
 
-#ifdef FUTURE_ROCR_VERSION
-
 std::string HSATraceStringUtils::Get_hsa_cache_t_String(hsa_cache_t input)
 {
     std::ostringstream ss;
@@ -552,7 +545,6 @@ std::string HSATraceStringUtils::Get_hsa_cache_info_t_Ptr_String(const hsa_cache
         return SurroundWithDeRef(Get_hsa_cache_info_t_String(input));
     }
 }
-#endif
 
 std::string HSATraceStringUtils::Get_hsa_signal_t_String(hsa_signal_t input)
 {
@@ -635,7 +627,6 @@ std::string HSATraceStringUtils::Get_hsa_wait_state_t_Ptr_String(const hsa_wait_
     }
 }
 
-#ifdef FUTURE_ROCR_VERSION
 std::string HSATraceStringUtils::Get_hsa_signal_group_t_String(hsa_signal_group_t input)
 {
     std::ostringstream ss;
@@ -656,7 +647,6 @@ std::string HSATraceStringUtils::Get_hsa_signal_group_t_Ptr_String(const hsa_sig
         return SurroundWithDeRef(Get_hsa_signal_group_t_String(input));
     }
 }
-#endif
 
 std::string HSATraceStringUtils::Get_hsa_region_t_String(hsa_region_t input)
 {
@@ -761,11 +751,7 @@ std::string HSATraceStringUtils::Get_hsa_queue_t_String(hsa_queue_t input)
 {
     std::ostringstream ss;
 
-#ifdef FUTURE_ROCR_VERSION
     ss << StringUtils::ToString(input.type) << s_pFieldSeparator;
-#else
-    ss << HSATraceStringUtils::Get_hsa_queue_type_t_String(input.type) << s_pFieldSeparator;
-#endif
     ss << StringUtils::ToString(input.features) << s_pFieldSeparator;
     ss << StringUtils::ToString(input.base_address) << s_pFieldSeparator;
     ss << HSATraceStringUtils::Get_hsa_signal_t_String(input.doorbell_signal) << s_pFieldSeparator;
@@ -859,13 +845,8 @@ std::string HSATraceStringUtils::Get_hsa_packet_header_t_String(hsa_packet_heade
     {
             CASE(HSA_PACKET_HEADER_TYPE);
             CASE(HSA_PACKET_HEADER_BARRIER);
-#ifdef FUTURE_ROCR_VERSION
             CASE(HSA_PACKET_HEADER_SCACQUIRE_FENCE_SCOPE);
             CASE(HSA_PACKET_HEADER_SCRELEASE_FENCE_SCOPE);
-#else
-            CASE(HSA_PACKET_HEADER_ACQUIRE_FENCE_SCOPE);
-            CASE(HSA_PACKET_HEADER_RELEASE_FENCE_SCOPE);
-#endif
 
         default:
             ss << input;
@@ -895,11 +876,7 @@ std::string HSATraceStringUtils::Get_hsa_packet_header_width_t_String(hsa_packet
     {
             CASE(HSA_PACKET_HEADER_WIDTH_TYPE);
             CASE(HSA_PACKET_HEADER_WIDTH_BARRIER);
-#ifdef FUTURE_ROCR_VERSION
             CASE(HSA_PACKET_HEADER_WIDTH_SCACQUIRE_FENCE_SCOPE);
-#else
-            CASE(HSA_PACKET_HEADER_WIDTH_ACQUIRE_FENCE_SCOPE);
-#endif
 
         default:
             ss << input;
@@ -1101,9 +1078,7 @@ std::string HSATraceStringUtils::Get_hsa_region_segment_t_String(hsa_region_segm
             CASE(HSA_REGION_SEGMENT_READONLY);
             CASE(HSA_REGION_SEGMENT_PRIVATE);
             CASE(HSA_REGION_SEGMENT_GROUP);
-#ifdef FUTURE_ROCR_VERSION
             CASE(HSA_REGION_SEGMENT_KERNARG);
-#endif
 
         default:
             ss << input;
@@ -1189,9 +1164,7 @@ std::string HSATraceStringUtils::Get_hsa_region_info_t_String(hsa_region_info_t 
             CASE(HSA_REGION_INFO_GLOBAL_FLAGS);
             CASE(HSA_REGION_INFO_SIZE);
             CASE(HSA_REGION_INFO_ALLOC_MAX_SIZE);
-#ifdef FUTURE_ROCR_VERSION
             CASE(HSA_REGION_INFO_ALLOC_MAX_PRIVATE_WORKGROUP_SIZE);
-#endif
             CASE(HSA_REGION_INFO_RUNTIME_ALLOC_ALLOWED);
             CASE(HSA_REGION_INFO_RUNTIME_ALLOC_GRANULE);
             CASE(HSA_REGION_INFO_RUNTIME_ALLOC_ALIGNMENT);
@@ -1365,7 +1338,6 @@ std::string HSATraceStringUtils::Get_hsa_isa_info_t_String(hsa_isa_info_t input)
             CASE(HSA_ISA_INFO_CALL_CONVENTION_COUNT);
             CASE(HSA_ISA_INFO_CALL_CONVENTION_INFO_WAVEFRONT_SIZE);
             CASE(HSA_ISA_INFO_CALL_CONVENTION_INFO_WAVEFRONTS_PER_COMPUTE_UNIT);
-#ifdef FUTURE_ROCR_VERSION
             CASE(HSA_ISA_INFO_MACHINE_MODELS);
             CASE(HSA_ISA_INFO_PROFILES);
             CASE(HSA_ISA_INFO_DEFAULT_FLOAT_ROUNDING_MODES);
@@ -1376,7 +1348,6 @@ std::string HSATraceStringUtils::Get_hsa_isa_info_t_String(hsa_isa_info_t input)
             CASE(HSA_ISA_INFO_GRID_MAX_DIM);
             CASE(HSA_ISA_INFO_GRID_MAX_SIZE);
             CASE(HSA_ISA_INFO_FBARRIER_MAX_SIZE);
-#endif
 
         default:
             ss << input;
@@ -1545,9 +1516,7 @@ std::string HSATraceStringUtils::Get_hsa_code_symbol_info_t_String(hsa_code_symb
             CASE(HSA_CODE_SYMBOL_INFO_KERNEL_GROUP_SEGMENT_SIZE);
             CASE(HSA_CODE_SYMBOL_INFO_KERNEL_PRIVATE_SEGMENT_SIZE);
             CASE(HSA_CODE_SYMBOL_INFO_KERNEL_DYNAMIC_CALLSTACK);
-#ifdef FUTURE_ROCR_VERSION
             CASE(HSA_CODE_SYMBOL_INFO_KERNEL_CALL_CONVENTION);
-#endif
             CASE(HSA_CODE_SYMBOL_INFO_INDIRECT_FUNCTION_CALL_CONVENTION);
 
         default:
@@ -1570,7 +1539,6 @@ std::string HSATraceStringUtils::Get_hsa_code_symbol_info_t_Ptr_String(const hsa
     }
 }
 
-#ifdef FUTURE_ROCR_VERSION
 std::string HSATraceStringUtils::Get_hsa_fp_type_t_String(hsa_fp_type_t input)
 {
     std::ostringstream ss;
@@ -1728,7 +1696,6 @@ std::string HSATraceStringUtils::Get_hsa_code_object_reader_t_Ptr_String(const h
         return SurroundWithDeRef(Get_hsa_code_object_reader_t_String(input));
     }
 }
-#endif
 
 std::string HSATraceStringUtils::Get_hsa_executable_t_String(hsa_executable_t input)
 {
@@ -1788,9 +1755,7 @@ std::string HSATraceStringUtils::Get_hsa_executable_info_t_String(hsa_executable
     {
             CASE(HSA_EXECUTABLE_INFO_PROFILE);
             CASE(HSA_EXECUTABLE_INFO_STATE);
-#ifdef FUTURE_ROCR_VERSION
             CASE(HSA_EXECUTABLE_INFO_DEFAULT_FLOAT_ROUNDING_MODE);
-#endif
 
         default:
             ss << input;
@@ -1859,9 +1824,7 @@ std::string HSATraceStringUtils::Get_hsa_executable_symbol_info_t_String(hsa_exe
             CASE(HSA_EXECUTABLE_SYMBOL_INFO_KERNEL_GROUP_SEGMENT_SIZE);
             CASE(HSA_EXECUTABLE_SYMBOL_INFO_KERNEL_PRIVATE_SEGMENT_SIZE);
             CASE(HSA_EXECUTABLE_SYMBOL_INFO_KERNEL_DYNAMIC_CALLSTACK);
-#ifdef FUTURE_ROCR_VERSION
             CASE(HSA_EXECUTABLE_SYMBOL_INFO_KERNEL_CALL_CONVENTION);
-#endif
             CASE(HSA_EXECUTABLE_SYMBOL_INFO_INDIRECT_FUNCTION_OBJECT);
             CASE(HSA_EXECUTABLE_SYMBOL_INFO_INDIRECT_FUNCTION_CALL_CONVENTION);
 
@@ -1885,7 +1848,6 @@ std::string HSATraceStringUtils::Get_hsa_executable_symbol_info_t_Ptr_String(con
     }
 }
 
-#ifdef FUTURE_ROCR_VERSION
 std::string HSATraceStringUtils::Get_hsa_loaded_code_object_t_String(hsa_loaded_code_object_t input)
 {
     std::ostringstream ss;
@@ -1906,7 +1868,6 @@ std::string HSATraceStringUtils::Get_hsa_loaded_code_object_t_Ptr_String(const h
         return SurroundWithDeRef(Get_hsa_loaded_code_object_t_String(input));
     }
 }
-#endif
 
 std::string HSATraceStringUtils::Get_BrigModule_t_String(BrigModule_t input)
 {
@@ -2421,15 +2382,9 @@ std::string HSATraceStringUtils::Get_hsa_ext_sampler_descriptor_t_String(hsa_ext
 {
     std::ostringstream ss;
 
-#ifdef FUTURE_ROCR_VERSION
     ss << StringUtils::ToString(input.coordinate_mode) << s_pFieldSeparator;
     ss << StringUtils::ToString(input.filter_mode) << s_pFieldSeparator;
     ss << StringUtils::ToString(input.address_mode);
-#else
-    ss << HSATraceStringUtils::Get_hsa_ext_sampler_coordinate_mode_t_String(input.coordinate_mode) << s_pFieldSeparator;
-    ss << HSATraceStringUtils::Get_hsa_ext_sampler_filter_mode_t_String(input.filter_mode) << s_pFieldSeparator;
-    ss << HSATraceStringUtils::Get_hsa_ext_sampler_addressing_mode_t_String(input.address_mode);
-#endif
 
     return SurroundWithStruct(ss.str());
 }
@@ -2461,9 +2416,7 @@ std::string HSATraceStringUtils::Get_hsa_amd_agent_info_t_String(hsa_amd_agent_i
             CASE(HSA_AMD_AGENT_INFO_BDFID);
             CASE(HSA_AMD_AGENT_INFO_MEMORY_WIDTH);
             CASE(HSA_AMD_AGENT_INFO_MEMORY_MAX_FREQUENCY);
-#ifdef FUTURE_ROCR_VERSION
             CASE(HSA_AMD_AGENT_INFO_PRODUCT_NAME);
-#endif
 
         default:
             ss << input;

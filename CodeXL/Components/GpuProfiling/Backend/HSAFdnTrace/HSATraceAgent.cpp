@@ -147,7 +147,6 @@ extern "C" bool DLL_PUBLIC OnLoad(void* pTable, uint64_t runtimeVersion, uint64_
     {
         HsaApiTable* pHsaTable = reinterpret_cast<HsaApiTable*>(pTable);
 
-#ifdef FUTURE_ROCR_VERSION
         if (IsROCm12(pHsaTable))
         {
             // ROCm 1.2 backwards compatibility
@@ -155,7 +154,6 @@ extern "C" bool DLL_PUBLIC OnLoad(void* pTable, uint64_t runtimeVersion, uint64_
             InitHSAAPIInterceptTrace1_2(pHsaTable1_2);
         }
         else
-#endif
         {
             InitHSAAPIInterceptTrace(pHsaTable);
         }
@@ -220,11 +218,7 @@ extern "C" void DLL_PUBLIC OnUnload()
 
         auto& forceSignalCollection = HSATimeCollectorGlobals::Instance()->m_forceSignalCollection;
 
-#ifdef FUTURE_ROCR_VERSION
         g_pRealCoreFunctions->hsa_signal_store_screlease_fn(forceSignalCollection, 1);
-#else
-        g_pRealCoreFunctions->hsa_signal_store_release_fn(forceSignalCollection, 1);
-#endif
 
 #if defined (_LINUX) || defined (LINUX)
         // notify the signal collector thread to collect all remaining signals

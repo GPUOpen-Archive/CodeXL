@@ -182,7 +182,6 @@ void HSA_APITrace_hsa_system_get_info::Create(
     m_retVal = retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_extension_get_name
 ///////////////////////////////////////////////////
@@ -239,7 +238,6 @@ void HSA_APITrace_hsa_extension_get_name::Create(
 
     m_retVal = retVal;
 }
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_system_extension_supported
@@ -293,7 +291,6 @@ void HSA_APITrace_hsa_system_extension_supported::Create(
     m_retVal = retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_system_major_extension_supported
 ///////////////////////////////////////////////////
@@ -351,7 +348,6 @@ void HSA_APITrace_hsa_system_major_extension_supported::Create(
 
     m_retVal = retVal;
 }
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_system_get_extension_table
@@ -399,7 +395,6 @@ void HSA_APITrace_hsa_system_get_extension_table::Create(
     m_retVal = retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_system_get_major_extension_table
 ///////////////////////////////////////////////////
@@ -445,7 +440,6 @@ void HSA_APITrace_hsa_system_get_major_extension_table::Create(
     m_table = table;
     m_retVal = retVal;
 }
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_agent_get_info
@@ -588,7 +582,6 @@ void HSA_APITrace_hsa_agent_get_exception_policies::Create(
     m_retVal = retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_cache_get_info
 ///////////////////////////////////////////////////
@@ -683,7 +676,6 @@ void HSA_APITrace_hsa_agent_iterate_caches::Create(
     m_data = data;
     m_retVal = retVal;
 }
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_agent_extension_supported
@@ -740,7 +732,6 @@ void HSA_APITrace_hsa_agent_extension_supported::Create(
     m_retVal = retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_agent_major_extension_supported
 ///////////////////////////////////////////////////
@@ -801,7 +792,6 @@ void HSA_APITrace_hsa_agent_major_extension_supported::Create(
 
     m_retVal = retVal;
 }
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_create
@@ -898,7 +888,6 @@ void HSA_APITrace_hsa_signal_destroy::Create(
     m_retVal = retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_load_scacquire
 ///////////////////////////////////////////////////
@@ -935,7 +924,6 @@ void HSA_APITrace_hsa_signal_load_scacquire::Create(
     m_signal = signal;
     m_retVal = retVal;
 }
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_load_relaxed
@@ -973,45 +961,6 @@ void HSA_APITrace_hsa_signal_load_relaxed::Create(
     m_signal = signal;
     m_retVal = retVal;
 }
-
-#ifndef FUTURE_ROCR_VERSION
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_signal_load_acquire
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_signal_load_acquire::HSA_APITrace_hsa_signal_load_acquire()
-{
-}
-
-HSA_APITrace_hsa_signal_load_acquire::~HSA_APITrace_hsa_signal_load_acquire()
-{
-}
-
-std::string HSA_APITrace_hsa_signal_load_acquire::GetRetString()
-{
-    return StringUtils::ToString(m_retVal);
-}
-
-std::string HSA_APITrace_hsa_signal_load_acquire::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_signal_load_acquire::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    hsa_signal_t signal,
-    hsa_signal_value_t retVal)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_signal_load_acquire;
-    m_signal = signal;
-    m_retVal = retVal;
-}
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_store_relaxed
@@ -1051,7 +1000,6 @@ void HSA_APITrace_hsa_signal_store_relaxed::Create(
     m_value = value;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_store_screlease
 ///////////////////////////////////////////////////
@@ -1089,48 +1037,7 @@ void HSA_APITrace_hsa_signal_store_screlease::Create(
     m_signal = signal;
     m_value = value;
 }
-#else
 
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_signal_store_release
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_signal_store_release::HSA_APITrace_hsa_signal_store_release()
-{
-}
-
-HSA_APITrace_hsa_signal_store_release::~HSA_APITrace_hsa_signal_store_release()
-{
-}
-
-std::string HSA_APITrace_hsa_signal_store_release::GetRetString()
-{
-    return "";
-}
-
-std::string HSA_APITrace_hsa_signal_store_release::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_signal_store_release::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    hsa_signal_t signal,
-    hsa_signal_value_t value)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_signal_store_release;
-    m_signal = signal;
-    m_value = value;
-}
-#endif
-
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_silent_store_relaxed
 ///////////////////////////////////////////////////
@@ -1246,50 +1153,7 @@ void HSA_APITrace_hsa_signal_exchange_scacq_screl::Create(
     m_value = value;
     m_retVal = retVal;
 }
-#else
 
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_signal_exchange_acq_rel
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_signal_exchange_acq_rel::HSA_APITrace_hsa_signal_exchange_acq_rel()
-{
-}
-
-HSA_APITrace_hsa_signal_exchange_acq_rel::~HSA_APITrace_hsa_signal_exchange_acq_rel()
-{
-}
-
-std::string HSA_APITrace_hsa_signal_exchange_acq_rel::GetRetString()
-{
-    return StringUtils::ToString(m_retVal);
-}
-
-std::string HSA_APITrace_hsa_signal_exchange_acq_rel::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_signal_exchange_acq_rel::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    hsa_signal_t signal,
-    hsa_signal_value_t value,
-    hsa_signal_value_t retVal)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_signal_exchange_acq_rel;
-    m_signal = signal;
-    m_value = value;
-    m_retVal = retVal;
-}
-#endif
-
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_exchange_scacquire
 ///////////////////////////////////////////////////
@@ -1329,48 +1193,6 @@ void HSA_APITrace_hsa_signal_exchange_scacquire::Create(
     m_value = value;
     m_retVal = retVal;
 }
-#else
-
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_signal_exchange_acquire
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_signal_exchange_acquire::HSA_APITrace_hsa_signal_exchange_acquire()
-{
-}
-
-HSA_APITrace_hsa_signal_exchange_acquire::~HSA_APITrace_hsa_signal_exchange_acquire()
-{
-}
-
-std::string HSA_APITrace_hsa_signal_exchange_acquire::GetRetString()
-{
-    return StringUtils::ToString(m_retVal);
-}
-
-std::string HSA_APITrace_hsa_signal_exchange_acquire::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_signal_exchange_acquire::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    hsa_signal_t signal,
-    hsa_signal_value_t value,
-    hsa_signal_value_t retVal)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_signal_exchange_acquire;
-    m_signal = signal;
-    m_value = value;
-    m_retVal = retVal;
-}
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_exchange_relaxed
@@ -1412,7 +1234,6 @@ void HSA_APITrace_hsa_signal_exchange_relaxed::Create(
     m_retVal = retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_exchange_screlease
 ///////////////////////////////////////////////////
@@ -1452,50 +1273,7 @@ void HSA_APITrace_hsa_signal_exchange_screlease::Create(
     m_value = value;
     m_retVal = retVal;
 }
-#else
 
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_signal_exchange_release
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_signal_exchange_release::HSA_APITrace_hsa_signal_exchange_release()
-{
-}
-
-HSA_APITrace_hsa_signal_exchange_release::~HSA_APITrace_hsa_signal_exchange_release()
-{
-}
-
-std::string HSA_APITrace_hsa_signal_exchange_release::GetRetString()
-{
-    return StringUtils::ToString(m_retVal);
-}
-
-std::string HSA_APITrace_hsa_signal_exchange_release::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_signal_exchange_release::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    hsa_signal_t signal,
-    hsa_signal_value_t value,
-    hsa_signal_value_t retVal)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_signal_exchange_release;
-    m_signal = signal;
-    m_value = value;
-    m_retVal = retVal;
-}
-#endif
-
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_cas_scacq_screl
 ///////////////////////////////////////////////////
@@ -1538,53 +1316,7 @@ void HSA_APITrace_hsa_signal_cas_scacq_screl::Create(
     m_value = value;
     m_retVal = retVal;
 }
-#else
 
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_signal_cas_acq_rel
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_signal_cas_acq_rel::HSA_APITrace_hsa_signal_cas_acq_rel()
-{
-}
-
-HSA_APITrace_hsa_signal_cas_acq_rel::~HSA_APITrace_hsa_signal_cas_acq_rel()
-{
-}
-
-std::string HSA_APITrace_hsa_signal_cas_acq_rel::GetRetString()
-{
-    return StringUtils::ToString(m_retVal);
-}
-
-std::string HSA_APITrace_hsa_signal_cas_acq_rel::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_expected) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_signal_cas_acq_rel::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    hsa_signal_t signal,
-    hsa_signal_value_t expected,
-    hsa_signal_value_t value,
-    hsa_signal_value_t retVal)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_signal_cas_acq_rel;
-    m_signal = signal;
-    m_expected = expected;
-    m_value = value;
-    m_retVal = retVal;
-}
-#endif
-
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_cas_scacquire
 ///////////////////////////////////////////////////
@@ -1627,51 +1359,6 @@ void HSA_APITrace_hsa_signal_cas_scacquire::Create(
     m_value = value;
     m_retVal = retVal;
 }
-#else
-
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_signal_cas_acquire
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_signal_cas_acquire::HSA_APITrace_hsa_signal_cas_acquire()
-{
-}
-
-HSA_APITrace_hsa_signal_cas_acquire::~HSA_APITrace_hsa_signal_cas_acquire()
-{
-}
-
-std::string HSA_APITrace_hsa_signal_cas_acquire::GetRetString()
-{
-    return StringUtils::ToString(m_retVal);
-}
-
-std::string HSA_APITrace_hsa_signal_cas_acquire::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_expected) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_signal_cas_acquire::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    hsa_signal_t signal,
-    hsa_signal_value_t expected,
-    hsa_signal_value_t value,
-    hsa_signal_value_t retVal)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_signal_cas_acquire;
-    m_signal = signal;
-    m_expected = expected;
-    m_value = value;
-    m_retVal = retVal;
-}
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_cas_relaxed
@@ -1716,7 +1403,6 @@ void HSA_APITrace_hsa_signal_cas_relaxed::Create(
     m_retVal = retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_cas_screlease
 ///////////////////////////////////////////////////
@@ -1759,53 +1445,7 @@ void HSA_APITrace_hsa_signal_cas_screlease::Create(
     m_value = value;
     m_retVal = retVal;
 }
-#else
 
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_signal_cas_release
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_signal_cas_release::HSA_APITrace_hsa_signal_cas_release()
-{
-}
-
-HSA_APITrace_hsa_signal_cas_release::~HSA_APITrace_hsa_signal_cas_release()
-{
-}
-
-std::string HSA_APITrace_hsa_signal_cas_release::GetRetString()
-{
-    return StringUtils::ToString(m_retVal);
-}
-
-std::string HSA_APITrace_hsa_signal_cas_release::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_expected) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_signal_cas_release::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    hsa_signal_t signal,
-    hsa_signal_value_t expected,
-    hsa_signal_value_t value,
-    hsa_signal_value_t retVal)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_signal_cas_release;
-    m_signal = signal;
-    m_expected = expected;
-    m_value = value;
-    m_retVal = retVal;
-}
-#endif
-
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_add_scacq_screl
 ///////////////////////////////////////////////////
@@ -1843,48 +1483,7 @@ void HSA_APITrace_hsa_signal_add_scacq_screl::Create(
     m_signal = signal;
     m_value = value;
 }
-#else
 
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_signal_add_acq_rel
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_signal_add_acq_rel::HSA_APITrace_hsa_signal_add_acq_rel()
-{
-}
-
-HSA_APITrace_hsa_signal_add_acq_rel::~HSA_APITrace_hsa_signal_add_acq_rel()
-{
-}
-
-std::string HSA_APITrace_hsa_signal_add_acq_rel::GetRetString()
-{
-    return "";
-}
-
-std::string HSA_APITrace_hsa_signal_add_acq_rel::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_signal_add_acq_rel::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    hsa_signal_t signal,
-    hsa_signal_value_t value)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_signal_add_acq_rel;
-    m_signal = signal;
-    m_value = value;
-}
-#endif
-
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_add_scacquire
 ///////////////////////////////////////////////////
@@ -1922,46 +1521,6 @@ void HSA_APITrace_hsa_signal_add_scacquire::Create(
     m_signal = signal;
     m_value = value;
 }
-#else
-
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_signal_add_acquire
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_signal_add_acquire::HSA_APITrace_hsa_signal_add_acquire()
-{
-}
-
-HSA_APITrace_hsa_signal_add_acquire::~HSA_APITrace_hsa_signal_add_acquire()
-{
-}
-
-std::string HSA_APITrace_hsa_signal_add_acquire::GetRetString()
-{
-    return "";
-}
-
-std::string HSA_APITrace_hsa_signal_add_acquire::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_signal_add_acquire::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    hsa_signal_t signal,
-    hsa_signal_value_t value)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_signal_add_acquire;
-    m_signal = signal;
-    m_value = value;
-}
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_add_relaxed
@@ -2001,7 +1560,6 @@ void HSA_APITrace_hsa_signal_add_relaxed::Create(
     m_value = value;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_add_screlease
 ///////////////////////////////////////////////////
@@ -2039,48 +1597,6 @@ void HSA_APITrace_hsa_signal_add_screlease::Create(
     m_signal = signal;
     m_value = value;
 }
-#else
-
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_signal_add_release
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_signal_add_release::HSA_APITrace_hsa_signal_add_release()
-{
-}
-
-HSA_APITrace_hsa_signal_add_release::~HSA_APITrace_hsa_signal_add_release()
-{
-}
-
-std::string HSA_APITrace_hsa_signal_add_release::GetRetString()
-{
-    return "";
-}
-
-std::string HSA_APITrace_hsa_signal_add_release::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_signal_add_release::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    hsa_signal_t signal,
-    hsa_signal_value_t value)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_signal_add_release;
-    m_signal = signal;
-    m_value = value;
-}
-#endif
-
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_subtract_scacq_screl
 ///////////////////////////////////////////////////
@@ -2118,48 +1634,7 @@ void HSA_APITrace_hsa_signal_subtract_scacq_screl::Create(
     m_signal = signal;
     m_value = value;
 }
-#else
 
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_signal_subtract_acq_rel
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_signal_subtract_acq_rel::HSA_APITrace_hsa_signal_subtract_acq_rel()
-{
-}
-
-HSA_APITrace_hsa_signal_subtract_acq_rel::~HSA_APITrace_hsa_signal_subtract_acq_rel()
-{
-}
-
-std::string HSA_APITrace_hsa_signal_subtract_acq_rel::GetRetString()
-{
-    return "";
-}
-
-std::string HSA_APITrace_hsa_signal_subtract_acq_rel::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_signal_subtract_acq_rel::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    hsa_signal_t signal,
-    hsa_signal_value_t value)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_signal_subtract_acq_rel;
-    m_signal = signal;
-    m_value = value;
-}
-#endif
-
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_subtract_scacquire
 ///////////////////////////////////////////////////
@@ -2197,46 +1672,6 @@ void HSA_APITrace_hsa_signal_subtract_scacquire::Create(
     m_signal = signal;
     m_value = value;
 }
-#else
-
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_signal_subtract_acquire
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_signal_subtract_acquire::HSA_APITrace_hsa_signal_subtract_acquire()
-{
-}
-
-HSA_APITrace_hsa_signal_subtract_acquire::~HSA_APITrace_hsa_signal_subtract_acquire()
-{
-}
-
-std::string HSA_APITrace_hsa_signal_subtract_acquire::GetRetString()
-{
-    return "";
-}
-
-std::string HSA_APITrace_hsa_signal_subtract_acquire::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_signal_subtract_acquire::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    hsa_signal_t signal,
-    hsa_signal_value_t value)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_signal_subtract_acquire;
-    m_signal = signal;
-    m_value = value;
-}
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_subtract_relaxed
@@ -2276,7 +1711,6 @@ void HSA_APITrace_hsa_signal_subtract_relaxed::Create(
     m_value = value;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_subtract_screlease
 ///////////////////////////////////////////////////
@@ -2314,48 +1748,7 @@ void HSA_APITrace_hsa_signal_subtract_screlease::Create(
     m_signal = signal;
     m_value = value;
 }
-#else
 
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_signal_subtract_release
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_signal_subtract_release::HSA_APITrace_hsa_signal_subtract_release()
-{
-}
-
-HSA_APITrace_hsa_signal_subtract_release::~HSA_APITrace_hsa_signal_subtract_release()
-{
-}
-
-std::string HSA_APITrace_hsa_signal_subtract_release::GetRetString()
-{
-    return "";
-}
-
-std::string HSA_APITrace_hsa_signal_subtract_release::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_signal_subtract_release::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    hsa_signal_t signal,
-    hsa_signal_value_t value)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_signal_subtract_release;
-    m_signal = signal;
-    m_value = value;
-}
-#endif
-
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_and_scacq_screl
 ///////////////////////////////////////////////////
@@ -2393,48 +1786,7 @@ void HSA_APITrace_hsa_signal_and_scacq_screl::Create(
     m_signal = signal;
     m_value = value;
 }
-#else
 
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_signal_and_acq_rel
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_signal_and_acq_rel::HSA_APITrace_hsa_signal_and_acq_rel()
-{
-}
-
-HSA_APITrace_hsa_signal_and_acq_rel::~HSA_APITrace_hsa_signal_and_acq_rel()
-{
-}
-
-std::string HSA_APITrace_hsa_signal_and_acq_rel::GetRetString()
-{
-    return "";
-}
-
-std::string HSA_APITrace_hsa_signal_and_acq_rel::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_signal_and_acq_rel::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    hsa_signal_t signal,
-    hsa_signal_value_t value)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_signal_and_acq_rel;
-    m_signal = signal;
-    m_value = value;
-}
-#endif
-
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_and_scacquire
 ///////////////////////////////////////////////////
@@ -2472,46 +1824,6 @@ void HSA_APITrace_hsa_signal_and_scacquire::Create(
     m_signal = signal;
     m_value = value;
 }
-#else
-
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_signal_and_acquire
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_signal_and_acquire::HSA_APITrace_hsa_signal_and_acquire()
-{
-}
-
-HSA_APITrace_hsa_signal_and_acquire::~HSA_APITrace_hsa_signal_and_acquire()
-{
-}
-
-std::string HSA_APITrace_hsa_signal_and_acquire::GetRetString()
-{
-    return "";
-}
-
-std::string HSA_APITrace_hsa_signal_and_acquire::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_signal_and_acquire::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    hsa_signal_t signal,
-    hsa_signal_value_t value)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_signal_and_acquire;
-    m_signal = signal;
-    m_value = value;
-}
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_and_relaxed
@@ -2551,7 +1863,6 @@ void HSA_APITrace_hsa_signal_and_relaxed::Create(
     m_value = value;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_and_screlease
 ///////////////////////////////////////////////////
@@ -2589,48 +1900,7 @@ void HSA_APITrace_hsa_signal_and_screlease::Create(
     m_signal = signal;
     m_value = value;
 }
-#else
 
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_signal_and_release
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_signal_and_release::HSA_APITrace_hsa_signal_and_release()
-{
-}
-
-HSA_APITrace_hsa_signal_and_release::~HSA_APITrace_hsa_signal_and_release()
-{
-}
-
-std::string HSA_APITrace_hsa_signal_and_release::GetRetString()
-{
-    return "";
-}
-
-std::string HSA_APITrace_hsa_signal_and_release::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_signal_and_release::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    hsa_signal_t signal,
-    hsa_signal_value_t value)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_signal_and_release;
-    m_signal = signal;
-    m_value = value;
-}
-#endif
-
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_or_scacq_screl
 ///////////////////////////////////////////////////
@@ -2668,48 +1938,7 @@ void HSA_APITrace_hsa_signal_or_scacq_screl::Create(
     m_signal = signal;
     m_value = value;
 }
-#else
 
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_signal_or_acq_rel
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_signal_or_acq_rel::HSA_APITrace_hsa_signal_or_acq_rel()
-{
-}
-
-HSA_APITrace_hsa_signal_or_acq_rel::~HSA_APITrace_hsa_signal_or_acq_rel()
-{
-}
-
-std::string HSA_APITrace_hsa_signal_or_acq_rel::GetRetString()
-{
-    return "";
-}
-
-std::string HSA_APITrace_hsa_signal_or_acq_rel::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_signal_or_acq_rel::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    hsa_signal_t signal,
-    hsa_signal_value_t value)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_signal_or_acq_rel;
-    m_signal = signal;
-    m_value = value;
-}
-#endif
-
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_or_scacquire
 ///////////////////////////////////////////////////
@@ -2747,46 +1976,6 @@ void HSA_APITrace_hsa_signal_or_scacquire::Create(
     m_signal = signal;
     m_value = value;
 }
-#else
-
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_signal_or_acquire
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_signal_or_acquire::HSA_APITrace_hsa_signal_or_acquire()
-{
-}
-
-HSA_APITrace_hsa_signal_or_acquire::~HSA_APITrace_hsa_signal_or_acquire()
-{
-}
-
-std::string HSA_APITrace_hsa_signal_or_acquire::GetRetString()
-{
-    return "";
-}
-
-std::string HSA_APITrace_hsa_signal_or_acquire::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_signal_or_acquire::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    hsa_signal_t signal,
-    hsa_signal_value_t value)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_signal_or_acquire;
-    m_signal = signal;
-    m_value = value;
-}
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_or_relaxed
@@ -2826,7 +2015,6 @@ void HSA_APITrace_hsa_signal_or_relaxed::Create(
     m_value = value;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_or_screlease
 ///////////////////////////////////////////////////
@@ -2864,48 +2052,7 @@ void HSA_APITrace_hsa_signal_or_screlease::Create(
     m_signal = signal;
     m_value = value;
 }
-#else
 
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_signal_or_release
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_signal_or_release::HSA_APITrace_hsa_signal_or_release()
-{
-}
-
-HSA_APITrace_hsa_signal_or_release::~HSA_APITrace_hsa_signal_or_release()
-{
-}
-
-std::string HSA_APITrace_hsa_signal_or_release::GetRetString()
-{
-    return "";
-}
-
-std::string HSA_APITrace_hsa_signal_or_release::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_signal_or_release::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    hsa_signal_t signal,
-    hsa_signal_value_t value)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_signal_or_release;
-    m_signal = signal;
-    m_value = value;
-}
-#endif
-
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_xor_scacq_screl
 ///////////////////////////////////////////////////
@@ -2943,48 +2090,7 @@ void HSA_APITrace_hsa_signal_xor_scacq_screl::Create(
     m_signal = signal;
     m_value = value;
 }
-#else
 
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_signal_xor_acq_rel
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_signal_xor_acq_rel::HSA_APITrace_hsa_signal_xor_acq_rel()
-{
-}
-
-HSA_APITrace_hsa_signal_xor_acq_rel::~HSA_APITrace_hsa_signal_xor_acq_rel()
-{
-}
-
-std::string HSA_APITrace_hsa_signal_xor_acq_rel::GetRetString()
-{
-    return "";
-}
-
-std::string HSA_APITrace_hsa_signal_xor_acq_rel::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_signal_xor_acq_rel::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    hsa_signal_t signal,
-    hsa_signal_value_t value)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_signal_xor_acq_rel;
-    m_signal = signal;
-    m_value = value;
-}
-#endif
-
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_xor_scacquire
 ///////////////////////////////////////////////////
@@ -3022,46 +2128,6 @@ void HSA_APITrace_hsa_signal_xor_scacquire::Create(
     m_signal = signal;
     m_value = value;
 }
-#else
-
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_signal_xor_acquire
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_signal_xor_acquire::HSA_APITrace_hsa_signal_xor_acquire()
-{
-}
-
-HSA_APITrace_hsa_signal_xor_acquire::~HSA_APITrace_hsa_signal_xor_acquire()
-{
-}
-
-std::string HSA_APITrace_hsa_signal_xor_acquire::GetRetString()
-{
-    return "";
-}
-
-std::string HSA_APITrace_hsa_signal_xor_acquire::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_signal_xor_acquire::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    hsa_signal_t signal,
-    hsa_signal_value_t value)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_signal_xor_acquire;
-    m_signal = signal;
-    m_value = value;
-}
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_xor_relaxed
@@ -3101,7 +2167,6 @@ void HSA_APITrace_hsa_signal_xor_relaxed::Create(
     m_value = value;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_xor_screlease
 ///////////////////////////////////////////////////
@@ -3139,48 +2204,7 @@ void HSA_APITrace_hsa_signal_xor_screlease::Create(
     m_signal = signal;
     m_value = value;
 }
-#else
 
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_signal_xor_release
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_signal_xor_release::HSA_APITrace_hsa_signal_xor_release()
-{
-}
-
-HSA_APITrace_hsa_signal_xor_release::~HSA_APITrace_hsa_signal_xor_release()
-{
-}
-
-std::string HSA_APITrace_hsa_signal_xor_release::GetRetString()
-{
-    return "";
-}
-
-std::string HSA_APITrace_hsa_signal_xor_release::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_signal_xor_release::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    hsa_signal_t signal,
-    hsa_signal_value_t value)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_signal_xor_release;
-    m_signal = signal;
-    m_value = value;
-}
-#endif
-
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_wait_scacquire
 ///////////////////////////////////////////////////
@@ -3229,57 +2253,6 @@ void HSA_APITrace_hsa_signal_wait_scacquire::Create(
     m_wait_state_hint = wait_state_hint;
     m_retVal = retVal;
 }
-#else
-
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_signal_wait_acquire
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_signal_wait_acquire::HSA_APITrace_hsa_signal_wait_acquire()
-{
-}
-
-HSA_APITrace_hsa_signal_wait_acquire::~HSA_APITrace_hsa_signal_wait_acquire()
-{
-}
-
-std::string HSA_APITrace_hsa_signal_wait_acquire::GetRetString()
-{
-    return StringUtils::ToString(m_retVal);
-}
-
-std::string HSA_APITrace_hsa_signal_wait_acquire::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_signal_t_String(m_signal) << s_strParamSeparator;
-    ss << HSATraceStringUtils::Get_hsa_signal_condition_t_String(m_condition) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_compare_value) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_timeout_hint) << s_strParamSeparator;
-    ss << HSATraceStringUtils::Get_hsa_wait_state_t_String(m_wait_state_hint);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_signal_wait_acquire::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    hsa_signal_t signal,
-    hsa_signal_condition_t condition,
-    hsa_signal_value_t compare_value,
-    uint64_t timeout_hint,
-    hsa_wait_state_t wait_state_hint,
-    hsa_signal_value_t retVal)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_signal_wait_acquire;
-    m_signal = signal;
-    m_condition = condition;
-    m_compare_value = compare_value;
-    m_timeout_hint = timeout_hint;
-    m_wait_state_hint = wait_state_hint;
-    m_retVal = retVal;
-}
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_wait_relaxed
@@ -3330,7 +2303,6 @@ void HSA_APITrace_hsa_signal_wait_relaxed::Create(
     m_retVal = retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_signal_group_create
 ///////////////////////////////////////////////////
@@ -3586,7 +2558,6 @@ void HSA_APITrace_hsa_signal_group_wait_any_relaxed::Create(
 
     m_retVal = retVal;
 }
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_queue_create
@@ -3810,7 +2781,6 @@ void HSA_APITrace_hsa_queue_inactivate::Create(
     m_retVal = retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_queue_load_read_index_scacquire
 ///////////////////////////////////////////////////
@@ -3853,51 +2823,6 @@ void HSA_APITrace_hsa_queue_load_read_index_scacquire::Create(
 
     m_retVal = retVal;
 }
-#else
-
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_queue_load_read_index_acquire
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_queue_load_read_index_acquire::HSA_APITrace_hsa_queue_load_read_index_acquire()
-{
-}
-
-HSA_APITrace_hsa_queue_load_read_index_acquire::~HSA_APITrace_hsa_queue_load_read_index_acquire()
-{
-}
-
-std::string HSA_APITrace_hsa_queue_load_read_index_acquire::GetRetString()
-{
-    return StringUtils::ToString(m_retVal);
-}
-
-std::string HSA_APITrace_hsa_queue_load_read_index_acquire::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_queue_load_read_index_acquire::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    const hsa_queue_t* queue,
-    uint64_t retVal)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_queue_load_read_index_acquire;
-    m_queue = queue;
-
-    if (nullptr != m_queue)
-    {
-        m_queueVal = *m_queue;
-    }
-
-    m_retVal = retVal;
-}
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_queue_load_read_index_relaxed
@@ -3942,7 +2867,6 @@ void HSA_APITrace_hsa_queue_load_read_index_relaxed::Create(
     m_retVal = retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_queue_load_write_index_scacquire
 ///////////////////////////////////////////////////
@@ -3985,51 +2909,6 @@ void HSA_APITrace_hsa_queue_load_write_index_scacquire::Create(
 
     m_retVal = retVal;
 }
-#else
-
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_queue_load_write_index_acquire
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_queue_load_write_index_acquire::HSA_APITrace_hsa_queue_load_write_index_acquire()
-{
-}
-
-HSA_APITrace_hsa_queue_load_write_index_acquire::~HSA_APITrace_hsa_queue_load_write_index_acquire()
-{
-}
-
-std::string HSA_APITrace_hsa_queue_load_write_index_acquire::GetRetString()
-{
-    return StringUtils::ToString(m_retVal);
-}
-
-std::string HSA_APITrace_hsa_queue_load_write_index_acquire::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_queue_load_write_index_acquire::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    const hsa_queue_t* queue,
-    uint64_t retVal)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_queue_load_write_index_acquire;
-    m_queue = queue;
-
-    if (nullptr != m_queue)
-    {
-        m_queueVal = *m_queue;
-    }
-
-    m_retVal = retVal;
-}
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_queue_load_write_index_relaxed
@@ -4118,7 +2997,6 @@ void HSA_APITrace_hsa_queue_store_write_index_relaxed::Create(
     m_value = value;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_queue_store_write_index_screlease
 ///////////////////////////////////////////////////
@@ -4162,53 +3040,7 @@ void HSA_APITrace_hsa_queue_store_write_index_screlease::Create(
 
     m_value = value;
 }
-#else
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_queue_store_write_index_release
-///////////////////////////////////////////////////
 
-HSA_APITrace_hsa_queue_store_write_index_release::HSA_APITrace_hsa_queue_store_write_index_release()
-{
-}
-
-HSA_APITrace_hsa_queue_store_write_index_release::~HSA_APITrace_hsa_queue_store_write_index_release()
-{
-}
-
-std::string HSA_APITrace_hsa_queue_store_write_index_release::GetRetString()
-{
-    return "";
-}
-
-std::string HSA_APITrace_hsa_queue_store_write_index_release::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_queue_store_write_index_release::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    const hsa_queue_t* queue,
-    uint64_t value)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_queue_store_write_index_release;
-    m_queue = queue;
-
-    if (nullptr != m_queue)
-    {
-        m_queueVal = *m_queue;
-    }
-
-    m_value = value;
-}
-#endif
-
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_queue_cas_write_index_scacq_screl
 ///////////////////////////////////////////////////
@@ -4257,59 +3089,7 @@ void HSA_APITrace_hsa_queue_cas_write_index_scacq_screl::Create(
     m_value = value;
     m_retVal = retVal;
 }
-#else
 
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_queue_cas_write_index_acq_rel
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_queue_cas_write_index_acq_rel::HSA_APITrace_hsa_queue_cas_write_index_acq_rel()
-{
-}
-
-HSA_APITrace_hsa_queue_cas_write_index_acq_rel::~HSA_APITrace_hsa_queue_cas_write_index_acq_rel()
-{
-}
-
-std::string HSA_APITrace_hsa_queue_cas_write_index_acq_rel::GetRetString()
-{
-    return StringUtils::ToString(m_retVal);
-}
-
-std::string HSA_APITrace_hsa_queue_cas_write_index_acq_rel::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_expected) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_queue_cas_write_index_acq_rel::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    const hsa_queue_t* queue,
-    uint64_t expected,
-    uint64_t value,
-    uint64_t retVal)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_queue_cas_write_index_acq_rel;
-    m_queue = queue;
-
-    if (nullptr != m_queue)
-    {
-        m_queueVal = *m_queue;
-    }
-
-    m_expected = expected;
-    m_value = value;
-    m_retVal = retVal;
-}
-#endif
-
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_queue_cas_write_index_scacquire
 ///////////////////////////////////////////////////
@@ -4358,57 +3138,6 @@ void HSA_APITrace_hsa_queue_cas_write_index_scacquire::Create(
     m_value = value;
     m_retVal = retVal;
 }
-#else
-
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_queue_cas_write_index_acquire
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_queue_cas_write_index_acquire::HSA_APITrace_hsa_queue_cas_write_index_acquire()
-{
-}
-
-HSA_APITrace_hsa_queue_cas_write_index_acquire::~HSA_APITrace_hsa_queue_cas_write_index_acquire()
-{
-}
-
-std::string HSA_APITrace_hsa_queue_cas_write_index_acquire::GetRetString()
-{
-    return StringUtils::ToString(m_retVal);
-}
-
-std::string HSA_APITrace_hsa_queue_cas_write_index_acquire::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_expected) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_queue_cas_write_index_acquire::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    const hsa_queue_t* queue,
-    uint64_t expected,
-    uint64_t value,
-    uint64_t retVal)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_queue_cas_write_index_acquire;
-    m_queue = queue;
-
-    if (nullptr != m_queue)
-    {
-        m_queueVal = *m_queue;
-    }
-
-    m_expected = expected;
-    m_value = value;
-    m_retVal = retVal;
-}
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_queue_cas_write_index_relaxed
@@ -4459,7 +3188,6 @@ void HSA_APITrace_hsa_queue_cas_write_index_relaxed::Create(
     m_retVal = retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_queue_cas_write_index_screlease
 ///////////////////////////////////////////////////
@@ -4508,59 +3236,7 @@ void HSA_APITrace_hsa_queue_cas_write_index_screlease::Create(
     m_value = value;
     m_retVal = retVal;
 }
-#else
 
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_queue_cas_write_index_release
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_queue_cas_write_index_release::HSA_APITrace_hsa_queue_cas_write_index_release()
-{
-}
-
-HSA_APITrace_hsa_queue_cas_write_index_release::~HSA_APITrace_hsa_queue_cas_write_index_release()
-{
-}
-
-std::string HSA_APITrace_hsa_queue_cas_write_index_release::GetRetString()
-{
-    return StringUtils::ToString(m_retVal);
-}
-
-std::string HSA_APITrace_hsa_queue_cas_write_index_release::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_expected) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_queue_cas_write_index_release::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    const hsa_queue_t* queue,
-    uint64_t expected,
-    uint64_t value,
-    uint64_t retVal)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_queue_cas_write_index_release;
-    m_queue = queue;
-
-    if (nullptr != m_queue)
-    {
-        m_queueVal = *m_queue;
-    }
-
-    m_expected = expected;
-    m_value = value;
-    m_retVal = retVal;
-}
-#endif
-
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_queue_add_write_index_scacq_screl
 ///////////////////////////////////////////////////
@@ -4606,56 +3282,7 @@ void HSA_APITrace_hsa_queue_add_write_index_scacq_screl::Create(
     m_value = value;
     m_retVal = retVal;
 }
-#else
 
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_queue_add_write_index_acq_rel
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_queue_add_write_index_acq_rel::HSA_APITrace_hsa_queue_add_write_index_acq_rel()
-{
-}
-
-HSA_APITrace_hsa_queue_add_write_index_acq_rel::~HSA_APITrace_hsa_queue_add_write_index_acq_rel()
-{
-}
-
-std::string HSA_APITrace_hsa_queue_add_write_index_acq_rel::GetRetString()
-{
-    return StringUtils::ToString(m_retVal);
-}
-
-std::string HSA_APITrace_hsa_queue_add_write_index_acq_rel::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_queue_add_write_index_acq_rel::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    const hsa_queue_t* queue,
-    uint64_t value,
-    uint64_t retVal)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_queue_add_write_index_acq_rel;
-    m_queue = queue;
-
-    if (nullptr != m_queue)
-    {
-        m_queueVal = *m_queue;
-    }
-
-    m_value = value;
-    m_retVal = retVal;
-}
-#endif
-
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_queue_add_write_index_scacquire
 ///////////////////////////////////////////////////
@@ -4701,54 +3328,6 @@ void HSA_APITrace_hsa_queue_add_write_index_scacquire::Create(
     m_value = value;
     m_retVal = retVal;
 }
-#else
-
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_queue_add_write_index_acquire
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_queue_add_write_index_acquire::HSA_APITrace_hsa_queue_add_write_index_acquire()
-{
-}
-
-HSA_APITrace_hsa_queue_add_write_index_acquire::~HSA_APITrace_hsa_queue_add_write_index_acquire()
-{
-}
-
-std::string HSA_APITrace_hsa_queue_add_write_index_acquire::GetRetString()
-{
-    return StringUtils::ToString(m_retVal);
-}
-
-std::string HSA_APITrace_hsa_queue_add_write_index_acquire::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_queue_add_write_index_acquire::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    const hsa_queue_t* queue,
-    uint64_t value,
-    uint64_t retVal)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_queue_add_write_index_acquire;
-    m_queue = queue;
-
-    if (nullptr != m_queue)
-    {
-        m_queueVal = *m_queue;
-    }
-
-    m_value = value;
-    m_retVal = retVal;
-}
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_queue_add_write_index_relaxed
@@ -4796,7 +3375,6 @@ void HSA_APITrace_hsa_queue_add_write_index_relaxed::Create(
     m_retVal = retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_queue_add_write_index_screlease
 ///////////////////////////////////////////////////
@@ -4842,54 +3420,6 @@ void HSA_APITrace_hsa_queue_add_write_index_screlease::Create(
     m_value = value;
     m_retVal = retVal;
 }
-#else
-
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_queue_add_write_index_release
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_queue_add_write_index_release::HSA_APITrace_hsa_queue_add_write_index_release()
-{
-}
-
-HSA_APITrace_hsa_queue_add_write_index_release::~HSA_APITrace_hsa_queue_add_write_index_release()
-{
-}
-
-std::string HSA_APITrace_hsa_queue_add_write_index_release::GetRetString()
-{
-    return StringUtils::ToString(m_retVal);
-}
-
-std::string HSA_APITrace_hsa_queue_add_write_index_release::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_queue_add_write_index_release::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    const hsa_queue_t* queue,
-    uint64_t value,
-    uint64_t retVal)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_queue_add_write_index_release;
-    m_queue = queue;
-
-    if (nullptr != m_queue)
-    {
-        m_queueVal = *m_queue;
-    }
-
-    m_value = value;
-    m_retVal = retVal;
-}
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_queue_store_read_index_relaxed
@@ -4935,7 +3465,6 @@ void HSA_APITrace_hsa_queue_store_read_index_relaxed::Create(
     m_value = value;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_queue_store_read_index_screlease
 ///////////////////////////////////////////////////
@@ -4979,52 +3508,6 @@ void HSA_APITrace_hsa_queue_store_read_index_screlease::Create(
 
     m_value = value;
 }
-#else
-
-///////////////////////////////////////////////////
-/// Class HSA_APITrace_hsa_queue_store_read_index_release
-///////////////////////////////////////////////////
-
-HSA_APITrace_hsa_queue_store_read_index_release::HSA_APITrace_hsa_queue_store_read_index_release()
-{
-}
-
-HSA_APITrace_hsa_queue_store_read_index_release::~HSA_APITrace_hsa_queue_store_read_index_release()
-{
-}
-
-std::string HSA_APITrace_hsa_queue_store_read_index_release::GetRetString()
-{
-    return "";
-}
-
-std::string HSA_APITrace_hsa_queue_store_read_index_release::ToString()
-{
-    std::ostringstream ss;
-    ss << HSATraceStringUtils::Get_hsa_queue_t_Ptr_String(m_queue, m_queueVal) << s_strParamSeparator;
-    ss << StringUtils::ToString(m_value);
-    return ss.str();
-}
-
-void HSA_APITrace_hsa_queue_store_read_index_release::Create(
-    ULONGLONG ullStartTime,
-    ULONGLONG ullEndTime,
-    const hsa_queue_t* queue,
-    uint64_t value)
-{
-    m_ullStart = ullStartTime;
-    m_ullEnd = ullEndTime;
-    m_type = HSA_API_Type_hsa_queue_store_read_index_release;
-    m_queue = queue;
-
-    if (nullptr != m_queue)
-    {
-        m_queueVal = *m_queue;
-    }
-
-    m_value = value;
-}
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_region_get_info
@@ -5423,7 +3906,6 @@ void HSA_APITrace_hsa_isa_from_name::Create(
     m_retVal = retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_agent_iterate_isas
 ///////////////////////////////////////////////////
@@ -5466,7 +3948,6 @@ void HSA_APITrace_hsa_agent_iterate_isas::Create(
     m_data = data;
     m_retVal = retVal;
 }
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_isa_get_info
@@ -5523,7 +4004,6 @@ void HSA_APITrace_hsa_isa_get_info::Create(
     m_retVal = retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_isa_get_info_alt
 ///////////////////////////////////////////////////
@@ -5762,7 +4242,6 @@ void HSA_APITrace_hsa_isa_iterate_wavefronts::Create(
     m_data = data;
     m_retVal = retVal;
 }
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_isa_compatible
@@ -5813,7 +4292,6 @@ void HSA_APITrace_hsa_isa_compatible::Create(
     m_retVal = retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_code_object_reader_create_from_file
 ///////////////////////////////////////////////////
@@ -5945,7 +4423,6 @@ void HSA_APITrace_hsa_code_object_reader_destroy::Create(
     m_code_object_reader = code_object_reader;
     m_retVal = retVal;
 }
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_executable_create
@@ -6009,7 +4486,6 @@ void HSA_APITrace_hsa_executable_create::Create(
     m_retVal = retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_executable_create_alt
 ///////////////////////////////////////////////////
@@ -6071,7 +4547,6 @@ void HSA_APITrace_hsa_executable_create_alt::Create(
 
     m_retVal = retVal;
 }
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_executable_destroy
@@ -6110,7 +4585,6 @@ void HSA_APITrace_hsa_executable_destroy::Create(
     m_retVal = retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_executable_load_program_code_object
 ///////////////////////////////////////////////////
@@ -6237,7 +4711,6 @@ void HSA_APITrace_hsa_executable_load_agent_code_object::Create(
 
     m_retVal = retVal;
 }
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_executable_freeze
@@ -6552,7 +5025,6 @@ void HSA_APITrace_hsa_executable_validate::Create(
     m_retVal = retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_executable_validate_alt
 ///////////////////////////////////////////////////
@@ -6611,7 +5083,6 @@ void HSA_APITrace_hsa_executable_validate_alt::Create(
 
     m_retVal = retVal;
 }
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_executable_get_symbol
@@ -6691,7 +5162,6 @@ void HSA_APITrace_hsa_executable_get_symbol::Create(
     m_retVal = retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_executable_get_symbol_by_name
 ///////////////////////////////////////////////////
@@ -6759,7 +5229,6 @@ void HSA_APITrace_hsa_executable_get_symbol_by_name::Create(
 
     m_retVal = retVal;
 }
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_executable_symbol_get_info
@@ -6856,7 +5325,6 @@ void HSA_APITrace_hsa_executable_iterate_symbols::Create(
     m_retVal = retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_executable_iterate_agent_symbols
 ///////////////////////////////////////////////////
@@ -6945,7 +5413,6 @@ void HSA_APITrace_hsa_executable_iterate_program_symbols::Create(
     m_data = data;
     m_retVal = retVal;
 }
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_code_object_serialize
@@ -7281,7 +5748,6 @@ void HSA_APITrace_hsa_code_object_get_symbol::Create(
     m_retVal = retVal;
 }
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_code_object_get_symbol_from_name
 ///////////////////////////////////////////////////
@@ -7353,7 +5819,6 @@ void HSA_APITrace_hsa_code_object_get_symbol_from_name::Create(
 
     m_retVal = retVal;
 }
-#endif
 
 ///////////////////////////////////////////////////
 /// Class HSA_APITrace_hsa_code_symbol_get_info

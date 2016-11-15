@@ -33,153 +33,60 @@ void InitHSAAPIInterceptTrace1_0(ApiTable1_0* pTable)
     g_pRealCoreFunctions->hsa_agent_extension_supported_fn = pTable->hsa_agent_extension_supported_fn;
     g_pRealCoreFunctions->hsa_signal_create_fn = pTable->hsa_signal_create_fn;
     g_pRealCoreFunctions->hsa_signal_destroy_fn = pTable->hsa_signal_destroy_fn;
-#ifdef FUTURE_ROCR_VERSION
     g_pRealCoreFunctions->hsa_signal_load_scacquire_fn = pTable->hsa_signal_load_acquire_fn;
-#else
-    g_pRealCoreFunctions->hsa_signal_load_acquire_fn = pTable->hsa_signal_load_acquire_fn;
-#endif
     g_pRealCoreFunctions->hsa_signal_load_relaxed_fn = pTable->hsa_signal_load_relaxed_fn;
     g_pRealCoreFunctions->hsa_signal_store_relaxed_fn = pTable->hsa_signal_store_relaxed_fn;
-#ifdef FUTURE_ROCR_VERSION
     g_pRealCoreFunctions->hsa_signal_store_screlease_fn = pTable->hsa_signal_store_release_fn;
     g_pRealCoreFunctions->hsa_signal_exchange_scacq_screl_fn = pTable->hsa_signal_exchange_acq_rel_fn;
     g_pRealCoreFunctions->hsa_signal_exchange_scacquire_fn = pTable->hsa_signal_exchange_acquire_fn;
-#else
-    g_pRealCoreFunctions->hsa_signal_store_release_fn = pTable->hsa_signal_store_release_fn;
-    g_pRealCoreFunctions->hsa_signal_exchange_acq_rel_fn = pTable->hsa_signal_exchange_acq_rel_fn;
-    g_pRealCoreFunctions->hsa_signal_exchange_acquire_fn = pTable->hsa_signal_exchange_acquire_fn;
-#endif
-
     g_pRealCoreFunctions->hsa_signal_exchange_relaxed_fn = pTable->hsa_signal_exchange_relaxed_fn;
-#ifdef FUTURE_ROCR_VERSION
     g_pRealCoreFunctions->hsa_signal_exchange_screlease_fn = pTable->hsa_signal_exchange_release_fn;
     g_pRealCoreFunctions->hsa_signal_cas_scacq_screl_fn = pTable->hsa_signal_cas_acq_rel_fn;
     g_pRealCoreFunctions->hsa_signal_cas_scacquire_fn = pTable->hsa_signal_cas_acquire_fn;
-#else
-    g_pRealCoreFunctions->hsa_signal_exchange_release_fn = pTable->hsa_signal_exchange_release_fn;
-    g_pRealCoreFunctions->hsa_signal_cas_acq_rel_fn = pTable->hsa_signal_cas_acq_rel_fn;
-    g_pRealCoreFunctions->hsa_signal_cas_acquire_fn = pTable->hsa_signal_cas_acquire_fn;
-#endif
-
     g_pRealCoreFunctions->hsa_signal_cas_relaxed_fn = pTable->hsa_signal_cas_relaxed_fn;
-#ifdef FUTURE_ROCR_VERSION
     g_pRealCoreFunctions->hsa_signal_cas_screlease_fn = pTable->hsa_signal_cas_release_fn;
     g_pRealCoreFunctions->hsa_signal_add_scacq_screl_fn = pTable->hsa_signal_add_acq_rel_fn;
     g_pRealCoreFunctions->hsa_signal_add_scacquire_fn = pTable->hsa_signal_add_acquire_fn;
-#else
-    g_pRealCoreFunctions->hsa_signal_cas_release_fn = pTable->hsa_signal_cas_release_fn;
-    g_pRealCoreFunctions->hsa_signal_add_acq_rel_fn = pTable->hsa_signal_add_acq_rel_fn;
-    g_pRealCoreFunctions->hsa_signal_add_acquire_fn = pTable->hsa_signal_add_acquire_fn;
-#endif
-
     g_pRealCoreFunctions->hsa_signal_add_relaxed_fn = pTable->hsa_signal_add_relaxed_fn;
-#ifdef FUTURE_ROCR_VERSION
     g_pRealCoreFunctions->hsa_signal_add_screlease_fn = pTable->hsa_signal_add_release_fn;
     g_pRealCoreFunctions->hsa_signal_subtract_scacq_screl_fn = pTable->hsa_signal_subtract_acq_rel_fn;
     g_pRealCoreFunctions->hsa_signal_subtract_scacquire_fn = pTable->hsa_signal_subtract_acquire_fn;
-#else
-    g_pRealCoreFunctions->hsa_signal_add_release_fn = pTable->hsa_signal_add_release_fn;
-    g_pRealCoreFunctions->hsa_signal_subtract_acq_rel_fn = pTable->hsa_signal_subtract_acq_rel_fn;
-    g_pRealCoreFunctions->hsa_signal_subtract_acquire_fn = pTable->hsa_signal_subtract_acquire_fn;
-#endif
-
     g_pRealCoreFunctions->hsa_signal_subtract_relaxed_fn = pTable->hsa_signal_subtract_relaxed_fn;
-#ifdef FUTURE_ROCR_VERSION
     g_pRealCoreFunctions->hsa_signal_subtract_screlease_fn = pTable->hsa_signal_subtract_release_fn;
     g_pRealCoreFunctions->hsa_signal_and_scacq_screl_fn = pTable->hsa_signal_and_acq_rel_fn;
     g_pRealCoreFunctions->hsa_signal_and_scacquire_fn = pTable->hsa_signal_and_acquire_fn;
-#else
-    g_pRealCoreFunctions->hsa_signal_subtract_release_fn = pTable->hsa_signal_subtract_release_fn;
-    g_pRealCoreFunctions->hsa_signal_and_acq_rel_fn = pTable->hsa_signal_and_acq_rel_fn;
-    g_pRealCoreFunctions->hsa_signal_and_acquire_fn = pTable->hsa_signal_and_acquire_fn;
-#endif
-
     g_pRealCoreFunctions->hsa_signal_and_relaxed_fn = pTable->hsa_signal_and_relaxed_fn;
-#ifdef FUTURE_ROCR_VERSION
     g_pRealCoreFunctions->hsa_signal_and_screlease_fn = pTable->hsa_signal_and_release_fn;
     g_pRealCoreFunctions->hsa_signal_or_scacq_screl_fn = pTable->hsa_signal_or_acq_rel_fn;
     g_pRealCoreFunctions->hsa_signal_or_scacquire_fn = pTable->hsa_signal_or_acquire_fn;
-#else
-    g_pRealCoreFunctions->hsa_signal_and_release_fn = pTable->hsa_signal_and_release_fn;
-    g_pRealCoreFunctions->hsa_signal_or_acq_rel_fn = pTable->hsa_signal_or_acq_rel_fn;
-    g_pRealCoreFunctions->hsa_signal_or_acquire_fn = pTable->hsa_signal_or_acquire_fn;
-#endif
-
     g_pRealCoreFunctions->hsa_signal_or_relaxed_fn = pTable->hsa_signal_or_relaxed_fn;
-#ifdef FUTURE_ROCR_VERSION
     g_pRealCoreFunctions->hsa_signal_or_screlease_fn = pTable->hsa_signal_or_release_fn;
     g_pRealCoreFunctions->hsa_signal_xor_scacq_screl_fn = pTable->hsa_signal_xor_acq_rel_fn;
     g_pRealCoreFunctions->hsa_signal_xor_scacquire_fn = pTable->hsa_signal_xor_acquire_fn;
-#else
-    g_pRealCoreFunctions->hsa_signal_or_release_fn = pTable->hsa_signal_or_release_fn;
-    g_pRealCoreFunctions->hsa_signal_xor_acq_rel_fn = pTable->hsa_signal_xor_acq_rel_fn;
-    g_pRealCoreFunctions->hsa_signal_xor_acquire_fn = pTable->hsa_signal_xor_acquire_fn;
-#endif
-
     g_pRealCoreFunctions->hsa_signal_xor_relaxed_fn = pTable->hsa_signal_xor_relaxed_fn;
-#ifdef FUTURE_ROCR_VERSION
     g_pRealCoreFunctions->hsa_signal_xor_screlease_fn = pTable->hsa_signal_xor_release_fn;
     g_pRealCoreFunctions->hsa_signal_wait_scacquire_fn = pTable->hsa_signal_wait_acquire_fn;
-#else
-    g_pRealCoreFunctions->hsa_signal_xor_release_fn = pTable->hsa_signal_xor_release_fn;
-    g_pRealCoreFunctions->hsa_signal_wait_acquire_fn = pTable->hsa_signal_wait_acquire_fn;
-#endif
-
     g_pRealCoreFunctions->hsa_signal_wait_relaxed_fn = pTable->hsa_signal_wait_relaxed_fn;
     g_pRealCoreFunctions->hsa_queue_create_fn = pTable->hsa_queue_create_fn;
     g_pRealCoreFunctions->hsa_soft_queue_create_fn = pTable->hsa_soft_queue_create_fn;
     g_pRealCoreFunctions->hsa_queue_destroy_fn = pTable->hsa_queue_destroy_fn;
     g_pRealCoreFunctions->hsa_queue_inactivate_fn = pTable->hsa_queue_inactivate_fn;
-#ifdef FUTURE_ROCR_VERSION
     g_pRealCoreFunctions->hsa_queue_load_read_index_scacquire_fn = pTable->hsa_queue_load_read_index_acquire_fn;
-#else
-    g_pRealCoreFunctions->hsa_queue_load_read_index_acquire_fn = pTable->hsa_queue_load_read_index_acquire_fn;
-#endif
-
     g_pRealCoreFunctions->hsa_queue_load_read_index_relaxed_fn = pTable->hsa_queue_load_read_index_relaxed_fn;
-#ifdef FUTURE_ROCR_VERSION
     g_pRealCoreFunctions->hsa_queue_load_write_index_scacquire_fn = pTable->hsa_queue_load_write_index_acquire_fn;
-#else
-    g_pRealCoreFunctions->hsa_queue_load_write_index_acquire_fn = pTable->hsa_queue_load_write_index_acquire_fn;
-#endif
-
     g_pRealCoreFunctions->hsa_queue_load_write_index_relaxed_fn = pTable->hsa_queue_load_write_index_relaxed_fn;
     g_pRealCoreFunctions->hsa_queue_store_write_index_relaxed_fn = pTable->hsa_queue_store_write_index_relaxed_fn;
-#ifdef FUTURE_ROCR_VERSION
     g_pRealCoreFunctions->hsa_queue_store_write_index_screlease_fn = pTable->hsa_queue_store_write_index_release_fn;
     g_pRealCoreFunctions->hsa_queue_cas_write_index_scacq_screl_fn = pTable->hsa_queue_cas_write_index_acq_rel_fn;
     g_pRealCoreFunctions->hsa_queue_cas_write_index_scacquire_fn = pTable->hsa_queue_cas_write_index_acquire_fn;
-#else
-    g_pRealCoreFunctions->hsa_queue_store_write_index_release_fn = pTable->hsa_queue_store_write_index_release_fn;
-    g_pRealCoreFunctions->hsa_queue_cas_write_index_acq_rel_fn = pTable->hsa_queue_cas_write_index_acq_rel_fn;
-    g_pRealCoreFunctions->hsa_queue_cas_write_index_acquire_fn = pTable->hsa_queue_cas_write_index_acquire_fn;
-#endif
-
     g_pRealCoreFunctions->hsa_queue_cas_write_index_relaxed_fn = pTable->hsa_queue_cas_write_index_relaxed_fn;
-#ifdef FUTURE_ROCR_VERSION
     g_pRealCoreFunctions->hsa_queue_cas_write_index_screlease_fn = pTable->hsa_queue_cas_write_index_release_fn;
     g_pRealCoreFunctions->hsa_queue_add_write_index_scacq_screl_fn = pTable->hsa_queue_add_write_index_acq_rel_fn;
     g_pRealCoreFunctions->hsa_queue_add_write_index_scacquire_fn = pTable->hsa_queue_add_write_index_acquire_fn;
-#else
-    g_pRealCoreFunctions->hsa_queue_cas_write_index_release_fn = pTable->hsa_queue_cas_write_index_release_fn;
-    g_pRealCoreFunctions->hsa_queue_add_write_index_acq_rel_fn = pTable->hsa_queue_add_write_index_acq_rel_fn;
-    g_pRealCoreFunctions->hsa_queue_add_write_index_acquire_fn = pTable->hsa_queue_add_write_index_acquire_fn;
-#endif
-
     g_pRealCoreFunctions->hsa_queue_add_write_index_relaxed_fn = pTable->hsa_queue_add_write_index_relaxed_fn;
-#ifdef FUTURE_ROCR_VERSION
     g_pRealCoreFunctions->hsa_queue_add_write_index_screlease_fn = pTable->hsa_queue_add_write_index_release_fn;
-#else
-    g_pRealCoreFunctions->hsa_queue_add_write_index_release_fn = pTable->hsa_queue_add_write_index_release_fn;
-#endif
-
     g_pRealCoreFunctions->hsa_queue_store_read_index_relaxed_fn = pTable->hsa_queue_store_read_index_relaxed_fn;
-#ifdef FUTURE_ROCR_VERSION
     g_pRealCoreFunctions->hsa_queue_store_read_index_screlease_fn = pTable->hsa_queue_store_read_index_release_fn;
-#else
-    g_pRealCoreFunctions->hsa_queue_store_read_index_release_fn = pTable->hsa_queue_store_read_index_release_fn;
-#endif
-
     g_pRealCoreFunctions->hsa_region_get_info_fn = pTable->hsa_region_get_info_fn;
     g_pRealCoreFunctions->hsa_agent_iterate_regions_fn = pTable->hsa_agent_iterate_regions_fn;
     g_pRealCoreFunctions->hsa_memory_allocate_fn = pTable->hsa_memory_allocate_fn;
@@ -287,17 +194,10 @@ void InitHSAAPIInterceptTrace1_0(ApiTable1_0* pTable)
         pTable->hsa_signal_destroy_fn = HSA_API_Trace_hsa_signal_destroy;
     }
 
-#ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_load_scacquire))
     {
         pTable->hsa_signal_load_acquire_fn = HSA_API_Trace_hsa_signal_load_scacquire;
     }
-#else
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_load_acquire))
-    {
-        pTable->hsa_signal_load_acquire_fn = HSA_API_Trace_hsa_signal_load_acquire;
-    }
-#endif
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_load_relaxed))
     {
@@ -309,7 +209,6 @@ void InitHSAAPIInterceptTrace1_0(ApiTable1_0* pTable)
         pTable->hsa_signal_store_relaxed_fn = HSA_API_Trace_hsa_signal_store_relaxed;
     }
 
-#ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_store_screlease))
     {
         pTable->hsa_signal_store_release_fn = HSA_API_Trace_hsa_signal_store_screlease;
@@ -324,29 +223,12 @@ void InitHSAAPIInterceptTrace1_0(ApiTable1_0* pTable)
     {
         pTable->hsa_signal_exchange_acquire_fn = HSA_API_Trace_hsa_signal_exchange_scacquire;
     }
-#else
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_store_release))
-    {
-        pTable->hsa_signal_store_release_fn = HSA_API_Trace_hsa_signal_store_release;
-    }
-
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_exchange_acq_rel))
-    {
-        pTable->hsa_signal_exchange_acq_rel_fn = HSA_API_Trace_hsa_signal_exchange_acq_rel;
-    }
-
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_exchange_acquire))
-    {
-        pTable->hsa_signal_exchange_acquire_fn = HSA_API_Trace_hsa_signal_exchange_acquire;
-    }
-#endif
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_exchange_relaxed))
     {
         pTable->hsa_signal_exchange_relaxed_fn = HSA_API_Trace_hsa_signal_exchange_relaxed;
     }
 
-#ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_exchange_screlease))
     {
         pTable->hsa_signal_exchange_release_fn = HSA_API_Trace_hsa_signal_exchange_screlease;
@@ -361,28 +243,12 @@ void InitHSAAPIInterceptTrace1_0(ApiTable1_0* pTable)
     {
         pTable->hsa_signal_cas_acquire_fn = HSA_API_Trace_hsa_signal_cas_scacquire;
     }
-#else
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_exchange_release))
-    {
-        pTable->hsa_signal_exchange_release_fn = HSA_API_Trace_hsa_signal_exchange_release;
-    }
-
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_cas_acq_rel))
-    {
-        pTable->hsa_signal_cas_acq_rel_fn = HSA_API_Trace_hsa_signal_cas_acq_rel;
-    }
-
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_cas_acquire))
-    {
-        pTable->hsa_signal_cas_acquire_fn = HSA_API_Trace_hsa_signal_cas_acquire;
-    }
-#endif
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_cas_relaxed))
     {
         pTable->hsa_signal_cas_relaxed_fn = HSA_API_Trace_hsa_signal_cas_relaxed;
     }
-#ifdef FUTURE_ROCR_VERSION
+
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_cas_screlease))
     {
         pTable->hsa_signal_cas_release_fn = HSA_API_Trace_hsa_signal_cas_screlease;
@@ -397,29 +263,12 @@ void InitHSAAPIInterceptTrace1_0(ApiTable1_0* pTable)
     {
         pTable->hsa_signal_add_acquire_fn = HSA_API_Trace_hsa_signal_add_scacquire;
     }
-#else
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_cas_release))
-    {
-        pTable->hsa_signal_cas_release_fn = HSA_API_Trace_hsa_signal_cas_release;
-    }
-
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_add_acq_rel))
-    {
-        pTable->hsa_signal_add_acq_rel_fn = HSA_API_Trace_hsa_signal_add_acq_rel;
-    }
-
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_add_acquire))
-    {
-        pTable->hsa_signal_add_acquire_fn = HSA_API_Trace_hsa_signal_add_acquire;
-    }
-#endif
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_add_relaxed))
     {
         pTable->hsa_signal_add_relaxed_fn = HSA_API_Trace_hsa_signal_add_relaxed;
     }
 
-#ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_add_screlease))
     {
         pTable->hsa_signal_add_release_fn = HSA_API_Trace_hsa_signal_add_screlease;
@@ -434,29 +283,12 @@ void InitHSAAPIInterceptTrace1_0(ApiTable1_0* pTable)
     {
         pTable->hsa_signal_subtract_acquire_fn = HSA_API_Trace_hsa_signal_subtract_scacquire;
     }
-#else
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_add_release))
-    {
-        pTable->hsa_signal_add_release_fn = HSA_API_Trace_hsa_signal_add_release;
-    }
-
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_subtract_acq_rel))
-    {
-        pTable->hsa_signal_subtract_acq_rel_fn = HSA_API_Trace_hsa_signal_subtract_acq_rel;
-    }
-
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_subtract_acquire))
-    {
-        pTable->hsa_signal_subtract_acquire_fn = HSA_API_Trace_hsa_signal_subtract_acquire;
-    }
-#endif
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_subtract_relaxed))
     {
         pTable->hsa_signal_subtract_relaxed_fn = HSA_API_Trace_hsa_signal_subtract_relaxed;
     }
 
-#ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_subtract_screlease))
     {
         pTable->hsa_signal_subtract_release_fn = HSA_API_Trace_hsa_signal_subtract_screlease;
@@ -471,29 +303,12 @@ void InitHSAAPIInterceptTrace1_0(ApiTable1_0* pTable)
     {
         pTable->hsa_signal_and_acquire_fn = HSA_API_Trace_hsa_signal_and_scacquire;
     }
-#else
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_subtract_release))
-    {
-        pTable->hsa_signal_subtract_release_fn = HSA_API_Trace_hsa_signal_subtract_release;
-    }
-
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_and_acq_rel))
-    {
-        pTable->hsa_signal_and_acq_rel_fn = HSA_API_Trace_hsa_signal_and_acq_rel;
-    }
-
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_and_acquire))
-    {
-        pTable->hsa_signal_and_acquire_fn = HSA_API_Trace_hsa_signal_and_acquire;
-    }
-#endif
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_and_relaxed))
     {
         pTable->hsa_signal_and_relaxed_fn = HSA_API_Trace_hsa_signal_and_relaxed;
     }
 
-#ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_and_screlease))
     {
         pTable->hsa_signal_and_release_fn = HSA_API_Trace_hsa_signal_and_screlease;
@@ -508,29 +323,12 @@ void InitHSAAPIInterceptTrace1_0(ApiTable1_0* pTable)
     {
         pTable->hsa_signal_or_acquire_fn = HSA_API_Trace_hsa_signal_or_scacquire;
     }
-#else
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_and_release))
-    {
-        pTable->hsa_signal_and_release_fn = HSA_API_Trace_hsa_signal_and_release;
-    }
-
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_or_acq_rel))
-    {
-        pTable->hsa_signal_or_acq_rel_fn = HSA_API_Trace_hsa_signal_or_acq_rel;
-    }
-
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_or_acquire))
-    {
-        pTable->hsa_signal_or_acquire_fn = HSA_API_Trace_hsa_signal_or_acquire;
-    }
-#endif
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_or_relaxed))
     {
         pTable->hsa_signal_or_relaxed_fn = HSA_API_Trace_hsa_signal_or_relaxed;
     }
 
-#ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_or_screlease))
     {
         pTable->hsa_signal_or_release_fn = HSA_API_Trace_hsa_signal_or_screlease;
@@ -545,29 +343,12 @@ void InitHSAAPIInterceptTrace1_0(ApiTable1_0* pTable)
     {
         pTable->hsa_signal_xor_acquire_fn = HSA_API_Trace_hsa_signal_xor_scacquire;
     }
-#else
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_or_release))
-    {
-        pTable->hsa_signal_or_release_fn = HSA_API_Trace_hsa_signal_or_release;
-    }
-
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_xor_acq_rel))
-    {
-        pTable->hsa_signal_xor_acq_rel_fn = HSA_API_Trace_hsa_signal_xor_acq_rel;
-    }
-
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_xor_acquire))
-    {
-        pTable->hsa_signal_xor_acquire_fn = HSA_API_Trace_hsa_signal_xor_acquire;
-    }
-#endif
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_xor_relaxed))
     {
         pTable->hsa_signal_xor_relaxed_fn = HSA_API_Trace_hsa_signal_xor_relaxed;
     }
 
-#ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_xor_screlease))
     {
         pTable->hsa_signal_xor_release_fn = HSA_API_Trace_hsa_signal_xor_screlease;
@@ -577,17 +358,6 @@ void InitHSAAPIInterceptTrace1_0(ApiTable1_0* pTable)
     {
         pTable->hsa_signal_wait_acquire_fn = HSA_API_Trace_hsa_signal_wait_scacquire;
     }
-#else
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_xor_release))
-    {
-        pTable->hsa_signal_xor_release_fn = HSA_API_Trace_hsa_signal_xor_release;
-    }
-
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_wait_acquire))
-    {
-        pTable->hsa_signal_wait_acquire_fn = HSA_API_Trace_hsa_signal_wait_acquire;
-    }
-#endif
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_signal_wait_relaxed))
     {
@@ -614,34 +384,20 @@ void InitHSAAPIInterceptTrace1_0(ApiTable1_0* pTable)
         pTable->hsa_queue_inactivate_fn = HSA_API_Trace_hsa_queue_inactivate;
     }
 
-#ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_load_read_index_scacquire))
     {
         pTable->hsa_queue_load_read_index_acquire_fn = HSA_API_Trace_hsa_queue_load_read_index_scacquire;
     }
-#else
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_load_read_index_acquire))
-    {
-        pTable->hsa_queue_load_read_index_acquire_fn = HSA_API_Trace_hsa_queue_load_read_index_acquire;
-    }
-#endif
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_load_read_index_relaxed))
     {
         pTable->hsa_queue_load_read_index_relaxed_fn = HSA_API_Trace_hsa_queue_load_read_index_relaxed;
     }
 
-#ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_load_write_index_scacquire))
     {
         pTable->hsa_queue_load_write_index_acquire_fn = HSA_API_Trace_hsa_queue_load_write_index_scacquire;
     }
-#else
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_load_write_index_acquire))
-    {
-        pTable->hsa_queue_load_write_index_acquire_fn = HSA_API_Trace_hsa_queue_load_write_index_acquire;
-    }
-#endif
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_load_write_index_relaxed))
     {
@@ -653,7 +409,6 @@ void InitHSAAPIInterceptTrace1_0(ApiTable1_0* pTable)
         pTable->hsa_queue_store_write_index_relaxed_fn = HSA_API_Trace_hsa_queue_store_write_index_relaxed;
     }
 
-#ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_store_write_index_screlease))
     {
         pTable->hsa_queue_store_write_index_release_fn = HSA_API_Trace_hsa_queue_store_write_index_screlease;
@@ -668,29 +423,12 @@ void InitHSAAPIInterceptTrace1_0(ApiTable1_0* pTable)
     {
         pTable->hsa_queue_cas_write_index_acquire_fn = HSA_API_Trace_hsa_queue_cas_write_index_scacquire;
     }
-#else
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_store_write_index_release))
-    {
-        pTable->hsa_queue_store_write_index_release_fn = HSA_API_Trace_hsa_queue_store_write_index_release;
-    }
-
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_cas_write_index_acq_rel))
-    {
-        pTable->hsa_queue_cas_write_index_acq_rel_fn = HSA_API_Trace_hsa_queue_cas_write_index_acq_rel;
-    }
-
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_cas_write_index_acquire))
-    {
-        pTable->hsa_queue_cas_write_index_acquire_fn = HSA_API_Trace_hsa_queue_cas_write_index_acquire;
-    }
-#endif
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_cas_write_index_relaxed))
     {
         pTable->hsa_queue_cas_write_index_relaxed_fn = HSA_API_Trace_hsa_queue_cas_write_index_relaxed;
     }
 
-#ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_cas_write_index_screlease))
     {
         pTable->hsa_queue_cas_write_index_release_fn = HSA_API_Trace_hsa_queue_cas_write_index_screlease;
@@ -705,56 +443,26 @@ void InitHSAAPIInterceptTrace1_0(ApiTable1_0* pTable)
     {
         pTable->hsa_queue_add_write_index_acquire_fn = HSA_API_Trace_hsa_queue_add_write_index_scacquire;
     }
-#else
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_cas_write_index_release))
-    {
-        pTable->hsa_queue_cas_write_index_release_fn = HSA_API_Trace_hsa_queue_cas_write_index_release;
-    }
-
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_add_write_index_acq_rel))
-    {
-        pTable->hsa_queue_add_write_index_acq_rel_fn = HSA_API_Trace_hsa_queue_add_write_index_acq_rel;
-    }
-
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_add_write_index_acquire))
-    {
-        pTable->hsa_queue_add_write_index_acquire_fn = HSA_API_Trace_hsa_queue_add_write_index_acquire;
-    }
-#endif
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_add_write_index_relaxed))
     {
         pTable->hsa_queue_add_write_index_relaxed_fn = HSA_API_Trace_hsa_queue_add_write_index_relaxed;
     }
 
-#ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_add_write_index_screlease))
     {
         pTable->hsa_queue_add_write_index_release_fn = HSA_API_Trace_hsa_queue_add_write_index_screlease;
     }
-#else
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_add_write_index_release))
-    {
-        pTable->hsa_queue_add_write_index_release_fn = HSA_API_Trace_hsa_queue_add_write_index_release;
-    }
-#endif
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_store_read_index_relaxed))
     {
         pTable->hsa_queue_store_read_index_relaxed_fn = HSA_API_Trace_hsa_queue_store_read_index_relaxed;
     }
 
-#ifdef FUTURE_ROCR_VERSION
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_store_read_index_screlease))
     {
         pTable->hsa_queue_store_read_index_release_fn = HSA_API_Trace_hsa_queue_store_read_index_screlease;
     }
-#else
-    if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_queue_store_read_index_release))
-    {
-        pTable->hsa_queue_store_read_index_release_fn = HSA_API_Trace_hsa_queue_store_read_index_release;
-    }
-#endif
 
     if (HSAAPIInfoManager::Instance()->ShouldIntercept(HSA_API_Type_hsa_region_get_info))
     {

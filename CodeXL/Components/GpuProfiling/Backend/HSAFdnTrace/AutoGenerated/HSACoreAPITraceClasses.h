@@ -173,7 +173,6 @@ private:
     hsa_status_t m_retVal; ///< Parameter passed to hsa_system_get_info
 };
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_extension_get_name
 ///////////////////////////////////////////////////
@@ -217,7 +216,6 @@ private:
     std::string m_nameVal; ///< Member to hold value passed to hsa_extension_get_name in name parameter
     hsa_status_t m_retVal; ///< Parameter passed to hsa_extension_get_name
 };
-#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_system_extension_supported
@@ -269,7 +267,6 @@ private:
     hsa_status_t m_retVal; ///< Parameter passed to hsa_system_extension_supported
 };
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_system_major_extension_supported
 ///////////////////////////////////////////////////
@@ -320,7 +317,6 @@ private:
     bool m_resultVal; ///< Member to hold value passed to hsa_system_major_extension_supported in result parameter
     hsa_status_t m_retVal; ///< Parameter passed to hsa_system_major_extension_supported
 };
-#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_system_get_extension_table
@@ -371,7 +367,6 @@ private:
     hsa_status_t m_retVal; ///< Parameter passed to hsa_system_get_extension_table
 };
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_system_get_major_extension_table
 ///////////////////////////////////////////////////
@@ -420,7 +415,6 @@ private:
     void* m_table; ///< Parameter passed to hsa_system_get_major_extension_table
     hsa_status_t m_retVal; ///< Parameter passed to hsa_system_get_major_extension_table
 };
-#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_agent_get_info
@@ -558,7 +552,6 @@ private:
     hsa_status_t m_retVal; ///< Parameter passed to hsa_agent_get_exception_policies
 };
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_cache_get_info
 ///////////////////////////////////////////////////
@@ -650,7 +643,6 @@ private:
     void* m_data; ///< Parameter passed to hsa_agent_iterate_caches
     hsa_status_t m_retVal; ///< Parameter passed to hsa_agent_iterate_caches
 };
-#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_agent_extension_supported
@@ -705,7 +697,6 @@ private:
     hsa_status_t m_retVal; ///< Parameter passed to hsa_agent_extension_supported
 };
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_agent_major_extension_supported
 ///////////////////////////////////////////////////
@@ -759,7 +750,6 @@ private:
     bool m_resultVal; ///< Member to hold value passed to hsa_agent_major_extension_supported in result parameter
     hsa_status_t m_retVal; ///< Parameter passed to hsa_agent_major_extension_supported
 };
-#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_create
@@ -852,48 +842,6 @@ private:
     hsa_status_t m_retVal; ///< Parameter passed to hsa_signal_destroy
 };
 
-#ifndef FUTURE_ROCR_VERSION
-///////////////////////////////////////////////////
-/// Class used to trace hsa_signal_load_acquire
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_signal_load_acquire : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_signal_load_acquire();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_signal_load_acquire();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param signal Parameter passed to hsa_signal_load_acquire
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                hsa_signal_t signal,
-                hsa_signal_value_t retVal);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_signal_load_acquire(const HSA_APITrace_hsa_signal_load_acquire& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_signal_load_acquire& operator = (const HSA_APITrace_hsa_signal_load_acquire& rhs);
-
-    hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_load_acquire
-    hsa_signal_value_t m_retVal; ///< Parameter passed to hsa_signal_load_acquire
-};
-
-#else
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_load_scacquire
 ///////////////////////////////////////////////////
@@ -933,7 +881,6 @@ private:
     hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_load_scacquire
     hsa_signal_value_t m_retVal; ///< Parameter passed to hsa_signal_load_scacquire
 };
-#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_load_relaxed
@@ -1016,135 +963,6 @@ private:
     hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_store_relaxed
 };
 
-#ifndef FUTURE_ROCR_VERSION
-///////////////////////////////////////////////////
-/// Class used to trace hsa_signal_store_release
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_signal_store_release : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_signal_store_release();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_signal_store_release();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param signal Parameter passed to hsa_signal_store_release
-    /// \param value Parameter passed to hsa_signal_store_release
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                hsa_signal_t signal,
-                hsa_signal_value_t value);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_signal_store_release(const HSA_APITrace_hsa_signal_store_release& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_signal_store_release& operator = (const HSA_APITrace_hsa_signal_store_release& rhs);
-
-    hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_store_release
-    hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_store_release
-};
-
-///////////////////////////////////////////////////
-/// Class used to trace hsa_signal_exchange_acq_rel
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_signal_exchange_acq_rel : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_signal_exchange_acq_rel();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_signal_exchange_acq_rel();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param signal Parameter passed to hsa_signal_exchange_acq_rel
-    /// \param value Parameter passed to hsa_signal_exchange_acq_rel
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                hsa_signal_t signal,
-                hsa_signal_value_t value,
-                hsa_signal_value_t retVal);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_signal_exchange_acq_rel(const HSA_APITrace_hsa_signal_exchange_acq_rel& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_signal_exchange_acq_rel& operator = (const HSA_APITrace_hsa_signal_exchange_acq_rel& rhs);
-
-    hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_exchange_acq_rel
-    hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_exchange_acq_rel
-    hsa_signal_value_t m_retVal; ///< Parameter passed to hsa_signal_exchange_acq_rel
-};
-
-///////////////////////////////////////////////////
-/// Class used to trace hsa_signal_exchange_acquire
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_signal_exchange_acquire : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_signal_exchange_acquire();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_signal_exchange_acquire();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param signal Parameter passed to hsa_signal_exchange_acquire
-    /// \param value Parameter passed to hsa_signal_exchange_acquire
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                hsa_signal_t signal,
-                hsa_signal_value_t value,
-                hsa_signal_value_t retVal);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_signal_exchange_acquire(const HSA_APITrace_hsa_signal_exchange_acquire& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_signal_exchange_acquire& operator = (const HSA_APITrace_hsa_signal_exchange_acquire& rhs);
-
-    hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_exchange_acquire
-    hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_exchange_acquire
-    hsa_signal_value_t m_retVal; ///< Parameter passed to hsa_signal_exchange_acquire
-};
-#endif
-
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_exchange_relaxed
 ///////////////////////////////////////////////////
@@ -1187,143 +1005,6 @@ private:
     hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_exchange_relaxed
     hsa_signal_value_t m_retVal; ///< Parameter passed to hsa_signal_exchange_relaxed
 };
-
-#ifndef FUTURE_ROCR_VERSION
-///////////////////////////////////////////////////
-/// Class used to trace hsa_signal_exchange_release
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_signal_exchange_release : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_signal_exchange_release();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_signal_exchange_release();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param signal Parameter passed to hsa_signal_exchange_release
-    /// \param value Parameter passed to hsa_signal_exchange_release
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                hsa_signal_t signal,
-                hsa_signal_value_t value,
-                hsa_signal_value_t retVal);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_signal_exchange_release(const HSA_APITrace_hsa_signal_exchange_release& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_signal_exchange_release& operator = (const HSA_APITrace_hsa_signal_exchange_release& rhs);
-
-    hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_exchange_release
-    hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_exchange_release
-    hsa_signal_value_t m_retVal; ///< Parameter passed to hsa_signal_exchange_release
-};
-
-///////////////////////////////////////////////////
-/// Class used to trace hsa_signal_cas_acq_rel
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_signal_cas_acq_rel : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_signal_cas_acq_rel();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_signal_cas_acq_rel();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param signal Parameter passed to hsa_signal_cas_acq_rel
-    /// \param expected Parameter passed to hsa_signal_cas_acq_rel
-    /// \param value Parameter passed to hsa_signal_cas_acq_rel
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                hsa_signal_t signal,
-                hsa_signal_value_t expected,
-                hsa_signal_value_t value,
-                hsa_signal_value_t retVal);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_signal_cas_acq_rel(const HSA_APITrace_hsa_signal_cas_acq_rel& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_signal_cas_acq_rel& operator = (const HSA_APITrace_hsa_signal_cas_acq_rel& rhs);
-
-    hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_cas_acq_rel
-    hsa_signal_value_t m_expected; ///< Parameter passed to hsa_signal_cas_acq_rel
-    hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_cas_acq_rel
-    hsa_signal_value_t m_retVal; ///< Parameter passed to hsa_signal_cas_acq_rel
-};
-
-///////////////////////////////////////////////////
-/// Class used to trace hsa_signal_cas_acquire
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_signal_cas_acquire : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_signal_cas_acquire();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_signal_cas_acquire();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param signal Parameter passed to hsa_signal_cas_acquire
-    /// \param expected Parameter passed to hsa_signal_cas_acquire
-    /// \param value Parameter passed to hsa_signal_cas_acquire
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                hsa_signal_t signal,
-                hsa_signal_value_t expected,
-                hsa_signal_value_t value,
-                hsa_signal_value_t retVal);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_signal_cas_acquire(const HSA_APITrace_hsa_signal_cas_acquire& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_signal_cas_acquire& operator = (const HSA_APITrace_hsa_signal_cas_acquire& rhs);
-
-    hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_cas_acquire
-    hsa_signal_value_t m_expected; ///< Parameter passed to hsa_signal_cas_acquire
-    hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_cas_acquire
-    hsa_signal_value_t m_retVal; ///< Parameter passed to hsa_signal_cas_acquire
-};
-#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_cas_relaxed
@@ -1371,136 +1052,6 @@ private:
     hsa_signal_value_t m_retVal; ///< Parameter passed to hsa_signal_cas_relaxed
 };
 
-#ifndef FUTURE_ROCR_VERSION
-///////////////////////////////////////////////////
-/// Class used to trace hsa_signal_cas_release
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_signal_cas_release : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_signal_cas_release();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_signal_cas_release();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param signal Parameter passed to hsa_signal_cas_release
-    /// \param expected Parameter passed to hsa_signal_cas_release
-    /// \param value Parameter passed to hsa_signal_cas_release
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                hsa_signal_t signal,
-                hsa_signal_value_t expected,
-                hsa_signal_value_t value,
-                hsa_signal_value_t retVal);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_signal_cas_release(const HSA_APITrace_hsa_signal_cas_release& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_signal_cas_release& operator = (const HSA_APITrace_hsa_signal_cas_release& rhs);
-
-    hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_cas_release
-    hsa_signal_value_t m_expected; ///< Parameter passed to hsa_signal_cas_release
-    hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_cas_release
-    hsa_signal_value_t m_retVal; ///< Parameter passed to hsa_signal_cas_release
-};
-
-///////////////////////////////////////////////////
-/// Class used to trace hsa_signal_add_acq_rel
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_signal_add_acq_rel : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_signal_add_acq_rel();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_signal_add_acq_rel();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param signal Parameter passed to hsa_signal_add_acq_rel
-    /// \param value Parameter passed to hsa_signal_add_acq_rel
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                hsa_signal_t signal,
-                hsa_signal_value_t value);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_signal_add_acq_rel(const HSA_APITrace_hsa_signal_add_acq_rel& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_signal_add_acq_rel& operator = (const HSA_APITrace_hsa_signal_add_acq_rel& rhs);
-
-    hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_add_acq_rel
-    hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_add_acq_rel
-};
-
-///////////////////////////////////////////////////
-/// Class used to trace hsa_signal_add_acquire
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_signal_add_acquire : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_signal_add_acquire();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_signal_add_acquire();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param signal Parameter passed to hsa_signal_add_acquire
-    /// \param value Parameter passed to hsa_signal_add_acquire
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                hsa_signal_t signal,
-                hsa_signal_value_t value);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_signal_add_acquire(const HSA_APITrace_hsa_signal_add_acquire& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_signal_add_acquire& operator = (const HSA_APITrace_hsa_signal_add_acquire& rhs);
-
-    hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_add_acquire
-    hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_add_acquire
-};
-#endif
-
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_add_relaxed
 ///////////////////////////////////////////////////
@@ -1541,131 +1092,6 @@ private:
     hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_add_relaxed
     hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_add_relaxed
 };
-
-#ifndef FUTURE_ROCR_VERSION
-///////////////////////////////////////////////////
-/// Class used to trace hsa_signal_add_release
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_signal_add_release : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_signal_add_release();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_signal_add_release();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param signal Parameter passed to hsa_signal_add_release
-    /// \param value Parameter passed to hsa_signal_add_release
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                hsa_signal_t signal,
-                hsa_signal_value_t value);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_signal_add_release(const HSA_APITrace_hsa_signal_add_release& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_signal_add_release& operator = (const HSA_APITrace_hsa_signal_add_release& rhs);
-
-    hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_add_release
-    hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_add_release
-};
-
-///////////////////////////////////////////////////
-/// Class used to trace hsa_signal_subtract_acq_rel
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_signal_subtract_acq_rel : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_signal_subtract_acq_rel();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_signal_subtract_acq_rel();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param signal Parameter passed to hsa_signal_subtract_acq_rel
-    /// \param value Parameter passed to hsa_signal_subtract_acq_rel
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                hsa_signal_t signal,
-                hsa_signal_value_t value);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_signal_subtract_acq_rel(const HSA_APITrace_hsa_signal_subtract_acq_rel& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_signal_subtract_acq_rel& operator = (const HSA_APITrace_hsa_signal_subtract_acq_rel& rhs);
-
-    hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_subtract_acq_rel
-    hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_subtract_acq_rel
-};
-
-///////////////////////////////////////////////////
-/// Class used to trace hsa_signal_subtract_acquire
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_signal_subtract_acquire : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_signal_subtract_acquire();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_signal_subtract_acquire();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param signal Parameter passed to hsa_signal_subtract_acquire
-    /// \param value Parameter passed to hsa_signal_subtract_acquire
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                hsa_signal_t signal,
-                hsa_signal_value_t value);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_signal_subtract_acquire(const HSA_APITrace_hsa_signal_subtract_acquire& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_signal_subtract_acquire& operator = (const HSA_APITrace_hsa_signal_subtract_acquire& rhs);
-
-    hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_subtract_acquire
-    hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_subtract_acquire
-};
-#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_subtract_relaxed
@@ -1708,131 +1134,6 @@ private:
     hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_subtract_relaxed
 };
 
-#ifndef FUTURE_ROCR_VERSION
-///////////////////////////////////////////////////
-/// Class used to trace hsa_signal_subtract_release
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_signal_subtract_release : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_signal_subtract_release();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_signal_subtract_release();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param signal Parameter passed to hsa_signal_subtract_release
-    /// \param value Parameter passed to hsa_signal_subtract_release
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                hsa_signal_t signal,
-                hsa_signal_value_t value);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_signal_subtract_release(const HSA_APITrace_hsa_signal_subtract_release& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_signal_subtract_release& operator = (const HSA_APITrace_hsa_signal_subtract_release& rhs);
-
-    hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_subtract_release
-    hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_subtract_release
-};
-
-///////////////////////////////////////////////////
-/// Class used to trace hsa_signal_and_acq_rel
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_signal_and_acq_rel : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_signal_and_acq_rel();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_signal_and_acq_rel();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param signal Parameter passed to hsa_signal_and_acq_rel
-    /// \param value Parameter passed to hsa_signal_and_acq_rel
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                hsa_signal_t signal,
-                hsa_signal_value_t value);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_signal_and_acq_rel(const HSA_APITrace_hsa_signal_and_acq_rel& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_signal_and_acq_rel& operator = (const HSA_APITrace_hsa_signal_and_acq_rel& rhs);
-
-    hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_and_acq_rel
-    hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_and_acq_rel
-};
-
-///////////////////////////////////////////////////
-/// Class used to trace hsa_signal_and_acquire
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_signal_and_acquire : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_signal_and_acquire();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_signal_and_acquire();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param signal Parameter passed to hsa_signal_and_acquire
-    /// \param value Parameter passed to hsa_signal_and_acquire
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                hsa_signal_t signal,
-                hsa_signal_value_t value);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_signal_and_acquire(const HSA_APITrace_hsa_signal_and_acquire& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_signal_and_acquire& operator = (const HSA_APITrace_hsa_signal_and_acquire& rhs);
-
-    hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_and_acquire
-    hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_and_acquire
-};
-#endif
-
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_and_relaxed
 ///////////////////////////////////////////////////
@@ -1873,131 +1174,6 @@ private:
     hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_and_relaxed
     hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_and_relaxed
 };
-
-#ifndef FUTURE_ROCR_VERSION
-///////////////////////////////////////////////////
-/// Class used to trace hsa_signal_and_release
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_signal_and_release : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_signal_and_release();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_signal_and_release();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param signal Parameter passed to hsa_signal_and_release
-    /// \param value Parameter passed to hsa_signal_and_release
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                hsa_signal_t signal,
-                hsa_signal_value_t value);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_signal_and_release(const HSA_APITrace_hsa_signal_and_release& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_signal_and_release& operator = (const HSA_APITrace_hsa_signal_and_release& rhs);
-
-    hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_and_release
-    hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_and_release
-};
-
-///////////////////////////////////////////////////
-/// Class used to trace hsa_signal_or_acq_rel
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_signal_or_acq_rel : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_signal_or_acq_rel();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_signal_or_acq_rel();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param signal Parameter passed to hsa_signal_or_acq_rel
-    /// \param value Parameter passed to hsa_signal_or_acq_rel
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                hsa_signal_t signal,
-                hsa_signal_value_t value);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_signal_or_acq_rel(const HSA_APITrace_hsa_signal_or_acq_rel& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_signal_or_acq_rel& operator = (const HSA_APITrace_hsa_signal_or_acq_rel& rhs);
-
-    hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_or_acq_rel
-    hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_or_acq_rel
-};
-
-///////////////////////////////////////////////////
-/// Class used to trace hsa_signal_or_acquire
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_signal_or_acquire : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_signal_or_acquire();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_signal_or_acquire();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param signal Parameter passed to hsa_signal_or_acquire
-    /// \param value Parameter passed to hsa_signal_or_acquire
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                hsa_signal_t signal,
-                hsa_signal_value_t value);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_signal_or_acquire(const HSA_APITrace_hsa_signal_or_acquire& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_signal_or_acquire& operator = (const HSA_APITrace_hsa_signal_or_acquire& rhs);
-
-    hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_or_acquire
-    hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_or_acquire
-};
-#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_or_relaxed
@@ -2040,131 +1216,6 @@ private:
     hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_or_relaxed
 };
 
-#ifndef FUTURE_ROCR_VERSION
-///////////////////////////////////////////////////
-/// Class used to trace hsa_signal_or_release
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_signal_or_release : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_signal_or_release();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_signal_or_release();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param signal Parameter passed to hsa_signal_or_release
-    /// \param value Parameter passed to hsa_signal_or_release
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                hsa_signal_t signal,
-                hsa_signal_value_t value);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_signal_or_release(const HSA_APITrace_hsa_signal_or_release& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_signal_or_release& operator = (const HSA_APITrace_hsa_signal_or_release& rhs);
-
-    hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_or_release
-    hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_or_release
-};
-
-///////////////////////////////////////////////////
-/// Class used to trace hsa_signal_xor_acq_rel
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_signal_xor_acq_rel : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_signal_xor_acq_rel();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_signal_xor_acq_rel();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param signal Parameter passed to hsa_signal_xor_acq_rel
-    /// \param value Parameter passed to hsa_signal_xor_acq_rel
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                hsa_signal_t signal,
-                hsa_signal_value_t value);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_signal_xor_acq_rel(const HSA_APITrace_hsa_signal_xor_acq_rel& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_signal_xor_acq_rel& operator = (const HSA_APITrace_hsa_signal_xor_acq_rel& rhs);
-
-    hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_xor_acq_rel
-    hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_xor_acq_rel
-};
-
-///////////////////////////////////////////////////
-/// Class used to trace hsa_signal_xor_acquire
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_signal_xor_acquire : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_signal_xor_acquire();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_signal_xor_acquire();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param signal Parameter passed to hsa_signal_xor_acquire
-    /// \param value Parameter passed to hsa_signal_xor_acquire
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                hsa_signal_t signal,
-                hsa_signal_value_t value);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_signal_xor_acquire(const HSA_APITrace_hsa_signal_xor_acquire& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_signal_xor_acquire& operator = (const HSA_APITrace_hsa_signal_xor_acquire& rhs);
-
-    hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_xor_acquire
-    hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_xor_acquire
-};
-#endif
-
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_xor_relaxed
 ///////////////////////////////////////////////////
@@ -2205,101 +1256,6 @@ private:
     hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_xor_relaxed
     hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_xor_relaxed
 };
-
-#ifndef FUTURE_ROCR_VERSION
-///////////////////////////////////////////////////
-/// Class used to trace hsa_signal_xor_release
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_signal_xor_release : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_signal_xor_release();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_signal_xor_release();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param signal Parameter passed to hsa_signal_xor_release
-    /// \param value Parameter passed to hsa_signal_xor_release
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                hsa_signal_t signal,
-                hsa_signal_value_t value);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_signal_xor_release(const HSA_APITrace_hsa_signal_xor_release& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_signal_xor_release& operator = (const HSA_APITrace_hsa_signal_xor_release& rhs);
-
-    hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_xor_release
-    hsa_signal_value_t m_value; ///< Parameter passed to hsa_signal_xor_release
-};
-
-///////////////////////////////////////////////////
-/// Class used to trace hsa_signal_wait_acquire
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_signal_wait_acquire : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_signal_wait_acquire();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_signal_wait_acquire();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param signal Parameter passed to hsa_signal_wait_acquire
-    /// \param condition Parameter passed to hsa_signal_wait_acquire
-    /// \param compare_value Parameter passed to hsa_signal_wait_acquire
-    /// \param timeout_hint Parameter passed to hsa_signal_wait_acquire
-    /// \param wait_state_hint Parameter passed to hsa_signal_wait_acquire
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                hsa_signal_t signal,
-                hsa_signal_condition_t condition,
-                hsa_signal_value_t compare_value,
-                uint64_t timeout_hint,
-                hsa_wait_state_t wait_state_hint,
-                hsa_signal_value_t retVal);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_signal_wait_acquire(const HSA_APITrace_hsa_signal_wait_acquire& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_signal_wait_acquire& operator = (const HSA_APITrace_hsa_signal_wait_acquire& rhs);
-
-    hsa_signal_t m_signal; ///< Parameter passed to hsa_signal_wait_acquire
-    hsa_signal_condition_t m_condition; ///< Parameter passed to hsa_signal_wait_acquire
-    hsa_signal_value_t m_compare_value; ///< Parameter passed to hsa_signal_wait_acquire
-    uint64_t m_timeout_hint; ///< Parameter passed to hsa_signal_wait_acquire
-    hsa_wait_state_t m_wait_state_hint; ///< Parameter passed to hsa_signal_wait_acquire
-    hsa_signal_value_t m_retVal; ///< Parameter passed to hsa_signal_wait_acquire
-};
-#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_wait_relaxed
@@ -2415,7 +1371,6 @@ private:
     hsa_status_t m_retVal; ///< Parameter passed to hsa_queue_create
 };
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_signal_store_screlease
 ///////////////////////////////////////////////////
@@ -3685,7 +2640,6 @@ private:
     hsa_signal_value_t m_valueVal; ///< Member to hold value passed to hsa_signal_group_wait_any_relaxed in value parameter
     hsa_status_t m_retVal; ///< Parameter passed to hsa_signal_group_wait_any_relaxed
 };
-#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_soft_queue_create
@@ -4113,51 +3067,6 @@ private:
     uint64_t m_value; ///< Parameter passed to hsa_queue_store_write_index_relaxed
 };
 
-#ifndef FUTURE_ROCR_VERSION
-///////////////////////////////////////////////////
-/// Class used to trace hsa_queue_store_write_index_release
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_queue_store_write_index_release : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_queue_store_write_index_release();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_queue_store_write_index_release();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param queue Parameter passed to hsa_queue_store_write_index_release
-    /// \param value Parameter passed to hsa_queue_store_write_index_release
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                const hsa_queue_t* queue,
-                uint64_t value);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_queue_store_write_index_release(const HSA_APITrace_hsa_queue_store_write_index_release& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_queue_store_write_index_release& operator = (const HSA_APITrace_hsa_queue_store_write_index_release& rhs);
-
-    const hsa_queue_t* m_queue; ///< Parameter passed to hsa_queue_store_write_index_release
-    hsa_queue_t m_queueVal; ///< Member to hold value passed to hsa_queue_store_write_index_release in queue parameter
-    uint64_t m_value; ///< Parameter passed to hsa_queue_store_write_index_release
-};
-
-#else
-
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_store_write_index_screlease
 ///////////////////////////////////////////////////
@@ -4199,57 +3108,6 @@ private:
     hsa_queue_t m_queueVal; ///< Member to hold value passed to hsa_queue_store_write_index_screlease in queue parameter
     uint64_t m_value; ///< Parameter passed to hsa_queue_store_write_index_screlease
 };
-#endif
-
-#ifndef FUTURE_ROCR_VERSION
-///////////////////////////////////////////////////
-/// Class used to trace hsa_queue_cas_write_index_acq_rel
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_queue_cas_write_index_acq_rel : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_queue_cas_write_index_acq_rel();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_queue_cas_write_index_acq_rel();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param queue Parameter passed to hsa_queue_cas_write_index_acq_rel
-    /// \param expected Parameter passed to hsa_queue_cas_write_index_acq_rel
-    /// \param value Parameter passed to hsa_queue_cas_write_index_acq_rel
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                const hsa_queue_t* queue,
-                uint64_t expected,
-                uint64_t value,
-                uint64_t retVal);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_queue_cas_write_index_acq_rel(const HSA_APITrace_hsa_queue_cas_write_index_acq_rel& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_queue_cas_write_index_acq_rel& operator = (const HSA_APITrace_hsa_queue_cas_write_index_acq_rel& rhs);
-
-    const hsa_queue_t* m_queue; ///< Parameter passed to hsa_queue_cas_write_index_acq_rel
-    hsa_queue_t m_queueVal; ///< Member to hold value passed to hsa_queue_cas_write_index_acq_rel in queue parameter
-    uint64_t m_expected; ///< Parameter passed to hsa_queue_cas_write_index_acq_rel
-    uint64_t m_value; ///< Parameter passed to hsa_queue_cas_write_index_acq_rel
-    uint64_t m_retVal; ///< Parameter passed to hsa_queue_cas_write_index_acq_rel
-};
-
-#else
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_cas_write_index_scacq_screl
@@ -4297,57 +3155,6 @@ private:
     uint64_t m_value; ///< Parameter passed to hsa_queue_cas_write_index_scacq_screl
     uint64_t m_retVal; ///< Parameter passed to hsa_queue_cas_write_index_scacq_screl
 };
-#endif
-
-#ifndef FUTURE_ROCR_VERSION
-///////////////////////////////////////////////////
-/// Class used to trace hsa_queue_cas_write_index_acquire
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_queue_cas_write_index_acquire : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_queue_cas_write_index_acquire();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_queue_cas_write_index_acquire();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param queue Parameter passed to hsa_queue_cas_write_index_acquire
-    /// \param expected Parameter passed to hsa_queue_cas_write_index_acquire
-    /// \param value Parameter passed to hsa_queue_cas_write_index_acquire
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                const hsa_queue_t* queue,
-                uint64_t expected,
-                uint64_t value,
-                uint64_t retVal);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_queue_cas_write_index_acquire(const HSA_APITrace_hsa_queue_cas_write_index_acquire& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_queue_cas_write_index_acquire& operator = (const HSA_APITrace_hsa_queue_cas_write_index_acquire& rhs);
-
-    const hsa_queue_t* m_queue; ///< Parameter passed to hsa_queue_cas_write_index_acquire
-    hsa_queue_t m_queueVal; ///< Member to hold value passed to hsa_queue_cas_write_index_acquire in queue parameter
-    uint64_t m_expected; ///< Parameter passed to hsa_queue_cas_write_index_acquire
-    uint64_t m_value; ///< Parameter passed to hsa_queue_cas_write_index_acquire
-    uint64_t m_retVal; ///< Parameter passed to hsa_queue_cas_write_index_acquire
-};
-
-#else
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_cas_write_index_scacquire
@@ -4395,7 +3202,6 @@ private:
     uint64_t m_value; ///< Parameter passed to hsa_queue_cas_write_index_scacquire
     uint64_t m_retVal; ///< Parameter passed to hsa_queue_cas_write_index_scacquire
 };
-#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_cas_write_index_relaxed
@@ -4444,56 +3250,6 @@ private:
     uint64_t m_retVal; ///< Parameter passed to hsa_queue_cas_write_index_relaxed
 };
 
-#ifndef FUTURE_ROCR_VERSION
-///////////////////////////////////////////////////
-/// Class used to trace hsa_queue_cas_write_index_release
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_queue_cas_write_index_release : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_queue_cas_write_index_release();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_queue_cas_write_index_release();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param queue Parameter passed to hsa_queue_cas_write_index_release
-    /// \param expected Parameter passed to hsa_queue_cas_write_index_release
-    /// \param value Parameter passed to hsa_queue_cas_write_index_release
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                const hsa_queue_t* queue,
-                uint64_t expected,
-                uint64_t value,
-                uint64_t retVal);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_queue_cas_write_index_release(const HSA_APITrace_hsa_queue_cas_write_index_release& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_queue_cas_write_index_release& operator = (const HSA_APITrace_hsa_queue_cas_write_index_release& rhs);
-
-    const hsa_queue_t* m_queue; ///< Parameter passed to hsa_queue_cas_write_index_release
-    hsa_queue_t m_queueVal; ///< Member to hold value passed to hsa_queue_cas_write_index_release in queue parameter
-    uint64_t m_expected; ///< Parameter passed to hsa_queue_cas_write_index_release
-    uint64_t m_value; ///< Parameter passed to hsa_queue_cas_write_index_release
-    uint64_t m_retVal; ///< Parameter passed to hsa_queue_cas_write_index_release
-};
-
-#else
-
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_cas_write_index_screlease
 ///////////////////////////////////////////////////
@@ -4540,54 +3296,6 @@ private:
     uint64_t m_value; ///< Parameter passed to hsa_queue_cas_write_index_screlease
     uint64_t m_retVal; ///< Parameter passed to hsa_queue_cas_write_index_screlease
 };
-#endif
-
-#ifndef FUTURE_ROCR_VERSION
-///////////////////////////////////////////////////
-/// Class used to trace hsa_queue_add_write_index_acq_rel
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_queue_add_write_index_acq_rel : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_queue_add_write_index_acq_rel();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_queue_add_write_index_acq_rel();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param queue Parameter passed to hsa_queue_add_write_index_acq_rel
-    /// \param value Parameter passed to hsa_queue_add_write_index_acq_rel
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                const hsa_queue_t* queue,
-                uint64_t value,
-                uint64_t retVal);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_queue_add_write_index_acq_rel(const HSA_APITrace_hsa_queue_add_write_index_acq_rel& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_queue_add_write_index_acq_rel& operator = (const HSA_APITrace_hsa_queue_add_write_index_acq_rel& rhs);
-
-    const hsa_queue_t* m_queue; ///< Parameter passed to hsa_queue_add_write_index_acq_rel
-    hsa_queue_t m_queueVal; ///< Member to hold value passed to hsa_queue_add_write_index_acq_rel in queue parameter
-    uint64_t m_value; ///< Parameter passed to hsa_queue_add_write_index_acq_rel
-    uint64_t m_retVal; ///< Parameter passed to hsa_queue_add_write_index_acq_rel
-};
-
-#else
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_add_write_index_scacq_screl
@@ -4632,54 +3340,6 @@ private:
     uint64_t m_value; ///< Parameter passed to hsa_queue_add_write_index_scacq_screl
     uint64_t m_retVal; ///< Parameter passed to hsa_queue_add_write_index_scacq_screl
 };
-#endif
-
-#ifndef FUTURE_ROCR_VERSION
-///////////////////////////////////////////////////
-/// Class used to trace hsa_queue_add_write_index_acquire
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_queue_add_write_index_acquire : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_queue_add_write_index_acquire();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_queue_add_write_index_acquire();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param queue Parameter passed to hsa_queue_add_write_index_acquire
-    /// \param value Parameter passed to hsa_queue_add_write_index_acquire
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                const hsa_queue_t* queue,
-                uint64_t value,
-                uint64_t retVal);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_queue_add_write_index_acquire(const HSA_APITrace_hsa_queue_add_write_index_acquire& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_queue_add_write_index_acquire& operator = (const HSA_APITrace_hsa_queue_add_write_index_acquire& rhs);
-
-    const hsa_queue_t* m_queue; ///< Parameter passed to hsa_queue_add_write_index_acquire
-    hsa_queue_t m_queueVal; ///< Member to hold value passed to hsa_queue_add_write_index_acquire in queue parameter
-    uint64_t m_value; ///< Parameter passed to hsa_queue_add_write_index_acquire
-    uint64_t m_retVal; ///< Parameter passed to hsa_queue_add_write_index_acquire
-};
-
-#else
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_add_write_index_scacquire
@@ -4724,7 +3384,6 @@ private:
     uint64_t m_value; ///< Parameter passed to hsa_queue_add_write_index_scacquire
     uint64_t m_retVal; ///< Parameter passed to hsa_queue_add_write_index_scacquire
 };
-#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_add_write_index_relaxed
@@ -4770,53 +3429,6 @@ private:
     uint64_t m_retVal; ///< Parameter passed to hsa_queue_add_write_index_relaxed
 };
 
-#ifndef FUTURE_ROCR_VERSION
-///////////////////////////////////////////////////
-/// Class used to trace hsa_queue_add_write_index_release
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_queue_add_write_index_release : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_queue_add_write_index_release();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_queue_add_write_index_release();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param queue Parameter passed to hsa_queue_add_write_index_release
-    /// \param value Parameter passed to hsa_queue_add_write_index_release
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                const hsa_queue_t* queue,
-                uint64_t value,
-                uint64_t retVal);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_queue_add_write_index_release(const HSA_APITrace_hsa_queue_add_write_index_release& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_queue_add_write_index_release& operator = (const HSA_APITrace_hsa_queue_add_write_index_release& rhs);
-
-    const hsa_queue_t* m_queue; ///< Parameter passed to hsa_queue_add_write_index_release
-    hsa_queue_t m_queueVal; ///< Member to hold value passed to hsa_queue_add_write_index_release in queue parameter
-    uint64_t m_value; ///< Parameter passed to hsa_queue_add_write_index_release
-    uint64_t m_retVal; ///< Parameter passed to hsa_queue_add_write_index_release
-};
-
-#else
-
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_add_write_index_screlease
 ///////////////////////////////////////////////////
@@ -4860,7 +3472,6 @@ private:
     uint64_t m_value; ///< Parameter passed to hsa_queue_add_write_index_screlease
     uint64_t m_retVal; ///< Parameter passed to hsa_queue_add_write_index_screlease
 };
-#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_store_read_index_relaxed
@@ -4904,51 +3515,6 @@ private:
     uint64_t m_value; ///< Parameter passed to hsa_queue_store_read_index_relaxed
 };
 
-#ifndef FUTURE_ROCR_VERSION
-///////////////////////////////////////////////////
-/// Class used to trace hsa_queue_store_read_index_release
-///////////////////////////////////////////////////
-class HSA_APITrace_hsa_queue_store_read_index_release : public HSAAPIBase
-{
-public:
-    /// Constructor
-    HSA_APITrace_hsa_queue_store_read_index_release();
-
-    /// Destructor
-    ~HSA_APITrace_hsa_queue_store_read_index_release();
-
-    /// get return value string
-    /// \return string representation of the return value;
-    std::string GetRetString();
-
-    /// Returns the API's arguments formatted as strings
-    /// \return string representation of the API's arguments
-    std::string ToString();
-
-    /// Assigns the API's various parameter values
-    /// \param queue Parameter passed to hsa_queue_store_read_index_release
-    /// \param value Parameter passed to hsa_queue_store_read_index_release
-    void Create(ULONGLONG ullStartTime,
-                ULONGLONG ullEndTime,
-                const hsa_queue_t* queue,
-                uint64_t value);
-
-private:
-    /// Disabled copy constructor
-    /// \rhs item being copied
-    HSA_APITrace_hsa_queue_store_read_index_release(const HSA_APITrace_hsa_queue_store_read_index_release& rhs);
-
-    /// Disabled assignment operator
-    /// \rhs item being assigned
-    HSA_APITrace_hsa_queue_store_read_index_release& operator = (const HSA_APITrace_hsa_queue_store_read_index_release& rhs);
-
-    const hsa_queue_t* m_queue; ///< Parameter passed to hsa_queue_store_read_index_release
-    hsa_queue_t m_queueVal; ///< Member to hold value passed to hsa_queue_store_read_index_release in queue parameter
-    uint64_t m_value; ///< Parameter passed to hsa_queue_store_read_index_release
-};
-
-#else
-
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_queue_store_read_index_screlease
 ///////////////////////////////////////////////////
@@ -4990,7 +3556,6 @@ private:
     hsa_queue_t m_queueVal; ///< Member to hold value passed to hsa_queue_store_read_index_screlease in queue parameter
     uint64_t m_value; ///< Parameter passed to hsa_queue_store_read_index_screlease
 };
-#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_region_get_info
@@ -5488,7 +4053,6 @@ private:
     hsa_status_t m_retVal; ///< Parameter passed to hsa_isa_get_info
 };
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_isa_get_info_alt
 ///////////////////////////////////////////////////
@@ -5723,7 +4287,6 @@ private:
     void* m_data; ///< Parameter passed to hsa_isa_iterate_wavefronts
     hsa_status_t m_retVal; ///< Parameter passed to hsa_isa_iterate_wavefronts
 };
-#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_isa_compatible
@@ -5772,7 +4335,6 @@ private:
     hsa_status_t m_retVal; ///< Parameter passed to hsa_isa_compatible
 };
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_code_object_reader_create_from_file
 ///////////////////////////////////////////////////
@@ -5903,7 +4465,6 @@ private:
     hsa_code_object_reader_t m_code_object_reader; ///< Parameter passed to hsa_code_object_reader_destroy
     hsa_status_t m_retVal; ///< Parameter passed to hsa_code_object_reader_destroy
 };
-#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_executable_create
@@ -6047,7 +4608,6 @@ private:
     hsa_status_t m_retVal; ///< Parameter passed to hsa_executable_destroy
 };
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_executable_load_program_code_object
 ///////////////////////////////////////////////////
@@ -6152,7 +4712,6 @@ private:
     hsa_loaded_code_object_t m_loaded_code_objectVal; ///< Member to hold value passed to hsa_executable_load_agent_code_object in loaded_code_object parameter
     hsa_status_t m_retVal; ///< Parameter passed to hsa_executable_load_agent_code_object
 };
-#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_executable_freeze
@@ -6435,7 +4994,6 @@ private:
     hsa_status_t m_retVal; ///< Parameter passed to hsa_executable_validate
 };
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_executable_validate_alt
 ///////////////////////////////////////////////////
@@ -6483,7 +5041,6 @@ private:
     uint32_t m_resultVal; ///< Member to hold value passed to hsa_executable_validate_alt in result parameter
     hsa_status_t m_retVal; ///< Parameter passed to hsa_executable_validate_alt
 };
-#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_executable_get_symbol
@@ -6543,7 +5100,6 @@ private:
     hsa_status_t m_retVal; ///< Parameter passed to hsa_executable_get_symbol
 };
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_executable_get_symbol_by_name
 ///////////////////////////////////////////////////
@@ -6595,7 +5151,6 @@ private:
     hsa_executable_symbol_t m_symbolVal; ///< Member to hold value passed to hsa_executable_get_symbol_by_name in symbol parameter
     hsa_status_t m_retVal; ///< Parameter passed to hsa_executable_get_symbol_by_name
 };
-#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_executable_symbol_get_info
@@ -6689,7 +5244,6 @@ private:
     hsa_status_t m_retVal; ///< Parameter passed to hsa_executable_iterate_symbols
 };
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_executable_iterate_agent_symbols
 ///////////////////////////////////////////////////
@@ -6784,7 +5338,6 @@ private:
     void* m_data; ///< Parameter passed to hsa_executable_iterate_program_symbols
     hsa_status_t m_retVal; ///< Parameter passed to hsa_executable_iterate_program_symbols
 };
-#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_code_object_serialize
@@ -7078,7 +5631,6 @@ private:
     hsa_status_t m_retVal; ///< Parameter passed to hsa_code_object_get_symbol
 };
 
-#ifdef FUTURE_ROCR_VERSION
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_code_object_get_symbol_from_name
 ///////////////////////////////////////////////////
@@ -7130,7 +5682,6 @@ private:
     hsa_code_symbol_t m_symbolVal; ///< Member to hold value passed to hsa_code_object_get_symbol_from_name in symbol parameter
     hsa_status_t m_retVal; ///< Parameter passed to hsa_code_object_get_symbol_from_name
 };
-#endif
 
 ///////////////////////////////////////////////////
 /// Class used to trace hsa_code_symbol_get_info

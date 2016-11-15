@@ -14,8 +14,6 @@
 #include "HSAFdnAPIInfoManager.h"
 #include "HSATraceStringUtils.h"
 
-#ifdef FUTURE_ROCR_VERSION
-
 /// Gets the display name for an API
 /// \param type the API whose name is needed
 /// \param[out] apiDisplayName the display name of the specified API
@@ -872,5 +870,3 @@ void InitHSAAPIInterceptTrace1_2(HsaApiTable1_2* pTable)
         pTable->amd_ext_->hsa_amd_image_create_fn = HSA_API_Trace_hsa_amd_image_create;
     }
 }
-
-#endif

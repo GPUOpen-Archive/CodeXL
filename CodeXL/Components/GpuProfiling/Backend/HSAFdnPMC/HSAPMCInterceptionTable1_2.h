@@ -8,11 +8,9 @@
 #ifndef _HSA_PMC_INTERCEPTION_TABLE_1_2_H_
 #define _HSA_PMC_INTERCEPTION_TABLE_1_2_H_
 
-#ifdef FUTURE_ROCR_VERSION
 #include "HSAAPITable1_2.h"
 
 /// Intercepts HSA APIs for this HSA Profiler agent
 void InitHSAAPIInterceptPMC1_2(HsaApiTable1_2* pTable);
-#endif
 
 #endif // _HSA_PMC_INTERCEPTION_TABLE_1_2_H_

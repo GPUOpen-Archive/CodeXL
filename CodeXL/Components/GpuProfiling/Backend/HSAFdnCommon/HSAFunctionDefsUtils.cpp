@@ -78,7 +78,6 @@ HSAFunctionDefsUtils::HSAFunctionDefsUtils()
     m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_group_destroy"), HSA_API_Type_hsa_signal_group_destroy));
     m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_group_wait_any_scacquire"), HSA_API_Type_hsa_signal_group_wait_any_scacquire));
     m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_group_wait_any_relaxed"), HSA_API_Type_hsa_signal_group_wait_any_relaxed));
-#ifdef FUTURE_ROCR_VERSION
     m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_load_scacquire"), HSA_API_Type_hsa_signal_load_scacquire));
     m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_store_screlease"), HSA_API_Type_hsa_signal_store_screlease));
     m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_silent_store_relaxed"), HSA_API_Type_hsa_signal_silent_store_relaxed));
@@ -115,76 +114,6 @@ HSAFunctionDefsUtils::HSAFunctionDefsUtils()
     m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_queue_add_write_index_scacquire"), HSA_API_Type_hsa_queue_add_write_index_scacquire));
     m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_queue_add_write_index_screlease"), HSA_API_Type_hsa_queue_add_write_index_screlease));
     m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_queue_store_read_index_screlease"), HSA_API_Type_hsa_queue_store_read_index_screlease));
-#else
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_load_acquire"), HSA_API_Type_hsa_signal_load_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_store_release"), HSA_API_Type_hsa_signal_store_release));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_exchange_acquire"), HSA_API_Type_hsa_signal_exchange_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_exchange_release"), HSA_API_Type_hsa_signal_exchange_release));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_cas_acq_rel"), HSA_API_Type_hsa_signal_cas_acq_rel));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_cas_acquire"), HSA_API_Type_hsa_signal_cas_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_cas_release"), HSA_API_Type_hsa_signal_cas_release));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_add_acq_rel"), HSA_API_Type_hsa_signal_add_acq_rel));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_add_acquire"), HSA_API_Type_hsa_signal_add_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_add_release"), HSA_API_Type_hsa_signal_add_release));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_subtract_acq_rel"), HSA_API_Type_hsa_signal_subtract_acq_rel));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_subtract_acquire"), HSA_API_Type_hsa_signal_subtract_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_subtract_release"), HSA_API_Type_hsa_signal_subtract_release));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_and_acq_rel"), HSA_API_Type_hsa_signal_and_acq_rel));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_and_acquire"), HSA_API_Type_hsa_signal_and_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_and_release"), HSA_API_Type_hsa_signal_and_release));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_or_acq_rel"), HSA_API_Type_hsa_signal_or_acq_rel));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_or_acquire"), HSA_API_Type_hsa_signal_or_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_or_release"), HSA_API_Type_hsa_signal_or_release));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_xor_acq_rel"), HSA_API_Type_hsa_signal_xor_acq_rel));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_xor_acquire"), HSA_API_Type_hsa_signal_xor_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_xor_release"), HSA_API_Type_hsa_signal_xor_release));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_wait_acquire"), HSA_API_Type_hsa_signal_wait_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_queue_load_read_index_acquire"), HSA_API_Type_hsa_queue_load_read_index_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_queue_load_write_index_acquire"), HSA_API_Type_hsa_queue_load_write_index_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_queue_store_write_index_release"), HSA_API_Type_hsa_queue_store_write_index_release));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_queue_cas_write_index_acq_rel"), HSA_API_Type_hsa_queue_cas_write_index_acq_rel));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_queue_cas_write_index_acquire"), HSA_API_Type_hsa_queue_cas_write_index_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_queue_cas_write_index_release"), HSA_API_Type_hsa_queue_cas_write_index_release));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_queue_add_write_index_acq_rel"), HSA_API_Type_hsa_queue_add_write_index_acq_rel));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_queue_add_write_index_acquire"), HSA_API_Type_hsa_queue_add_write_index_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_queue_add_write_index_release"), HSA_API_Type_hsa_queue_add_write_index_release));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_queue_store_read_index_release"), HSA_API_Type_hsa_queue_store_read_index_release));
-
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_load_scacquire"), HSA_API_Type_hsa_signal_load_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_store_screlease"), HSA_API_Type_hsa_signal_store_release));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_exchange_scacq_screl"), HSA_API_Type_hsa_signal_exchange_acq_rel));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_exchange_scacquire"), HSA_API_Type_hsa_signal_exchange_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_exchange_screlease"), HSA_API_Type_hsa_signal_exchange_release));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_cas_scacq_screl"), HSA_API_Type_hsa_signal_cas_acq_rel));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_cas_scacquire"), HSA_API_Type_hsa_signal_cas_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_cas_screlease"), HSA_API_Type_hsa_signal_cas_release));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_add_scacq_screl"), HSA_API_Type_hsa_signal_add_acq_rel));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_add_scacquire"), HSA_API_Type_hsa_signal_add_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_add_screlease"), HSA_API_Type_hsa_signal_add_release));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_subtract_scacq_screl"), HSA_API_Type_hsa_signal_subtract_acq_rel));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_subtract_scacquire"), HSA_API_Type_hsa_signal_subtract_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_subtract_screlease"), HSA_API_Type_hsa_signal_subtract_release));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_and_scacq_screl"), HSA_API_Type_hsa_signal_and_acq_rel));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_and_scacquire"), HSA_API_Type_hsa_signal_and_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_and_screlease"), HSA_API_Type_hsa_signal_and_release));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_or_scacq_screl"), HSA_API_Type_hsa_signal_or_acq_rel));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_or_scacquire"), HSA_API_Type_hsa_signal_or_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_or_screlease"), HSA_API_Type_hsa_signal_or_release));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_xor_scacq_screl"), HSA_API_Type_hsa_signal_xor_acq_rel));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_xor_scacquire"), HSA_API_Type_hsa_signal_xor_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_xor_screlease"), HSA_API_Type_hsa_signal_xor_release));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_wait_scacquire"), HSA_API_Type_hsa_signal_wait_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_queue_load_read_index_scacquire"), HSA_API_Type_hsa_queue_load_read_index_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_queue_load_write_index_scacquire"), HSA_API_Type_hsa_queue_load_write_index_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_queue_store_write_index_screlease"), HSA_API_Type_hsa_queue_store_write_index_release));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_queue_cas_write_index_scacq_screl"), HSA_API_Type_hsa_queue_cas_write_index_acq_rel));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_queue_cas_write_index_scacquire"), HSA_API_Type_hsa_queue_cas_write_index_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_queue_cas_write_index_screlease"), HSA_API_Type_hsa_queue_cas_write_index_release));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_queue_add_write_index_scacq_screl"), HSA_API_Type_hsa_queue_add_write_index_acq_rel));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_queue_add_write_index_scacquire"), HSA_API_Type_hsa_queue_add_write_index_acquire));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_queue_add_write_index_screlease"), HSA_API_Type_hsa_queue_add_write_index_release));
-    m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_queue_store_read_index_screlease"), HSA_API_Type_hsa_queue_store_read_index_release));
-#endif
     m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_agent_iterate_isas"), HSA_API_Type_hsa_agent_iterate_isas));
     m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_isa_get_info_alt"), HSA_API_Type_hsa_isa_get_info_alt));
     m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_isa_get_exception_policies"), HSA_API_Type_hsa_isa_get_exception_policies));
@@ -254,8 +183,6 @@ HSAFunctionDefsUtils::HSAFunctionDefsUtils()
     m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_amd_interop_unmap_buffer"), HSA_API_Type_hsa_amd_interop_unmap_buffer));
     m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_amd_image_create"), HSA_API_Type_hsa_amd_image_create));
 
-
-#ifdef FUTURE_ROCR_VERSION
     // add mapping for ROCm 1.2 functions to the ROCm 1.3 enum values
     m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_queue_load_read_index_acquire"), HSA_API_Type_hsa_queue_load_read_index_scacquire));
     m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_queue_load_write_index_acquire"), HSA_API_Type_hsa_queue_load_write_index_scacquire));
@@ -291,7 +218,6 @@ HSAFunctionDefsUtils::HSAFunctionDefsUtils()
     m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_cas_acquire"), HSA_API_Type_hsa_signal_cas_scacquire));
     m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_cas_release"), HSA_API_Type_hsa_signal_cas_screlease));
     m_hsaAPIMap.insert(std::pair<std::string, HSA_API_Type>(std::string("hsa_signal_cas_acq_rel"), HSA_API_Type_hsa_signal_cas_scacq_screl));
-#endif
 }
 
 HSA_API_Type HSAFunctionDefsUtils::ToHSAAPIType(const std::string& strName)

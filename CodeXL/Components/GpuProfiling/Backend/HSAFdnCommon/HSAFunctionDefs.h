@@ -25,166 +25,60 @@ enum HSA_API_Type
     HSA_API_Type_hsa_agent_extension_supported,
     HSA_API_Type_hsa_signal_create,
     HSA_API_Type_hsa_signal_destroy,
-#ifdef FUTURE_ROCR_VERSION
     HSA_API_Type_hsa_signal_load_scacquire,
-#else
-    HSA_API_Type_hsa_signal_load_acquire,
-#endif
     HSA_API_Type_hsa_signal_load_relaxed,
     HSA_API_Type_hsa_signal_store_relaxed,
-#ifdef FUTURE_ROCR_VERSION
     HSA_API_Type_hsa_signal_store_screlease,
     HSA_API_Type_hsa_signal_exchange_scacq_screl,
     HSA_API_Type_hsa_signal_exchange_scacquire,
-#else
-    HSA_API_Type_hsa_signal_store_release,
-    HSA_API_Type_hsa_signal_exchange_acq_rel,
-    HSA_API_Type_hsa_signal_exchange_acquire,
-#endif
     HSA_API_Type_hsa_signal_exchange_relaxed,
-#ifdef FUTURE_ROCR_VERSION
     HSA_API_Type_hsa_signal_exchange_screlease,
-#else
-    HSA_API_Type_hsa_signal_exchange_release,
-#endif
-#ifdef FUTURE_ROCR_VERSION
     HSA_API_Type_hsa_signal_cas_scacq_screl,
     HSA_API_Type_hsa_signal_cas_scacquire,
-#else
-    HSA_API_Type_hsa_signal_cas_acq_rel,
-    HSA_API_Type_hsa_signal_cas_acquire,
-#endif
     HSA_API_Type_hsa_signal_cas_relaxed,
-#ifdef FUTURE_ROCR_VERSION
     HSA_API_Type_hsa_signal_cas_screlease,
-#else
-    HSA_API_Type_hsa_signal_cas_release,
-#endif
-#ifdef FUTURE_ROCR_VERSION
     HSA_API_Type_hsa_signal_add_scacq_screl,
     HSA_API_Type_hsa_signal_add_scacquire,
-#else
-    HSA_API_Type_hsa_signal_add_acq_rel,
-    HSA_API_Type_hsa_signal_add_acquire,
-#endif
     HSA_API_Type_hsa_signal_add_relaxed,
-#ifdef FUTURE_ROCR_VERSION
     HSA_API_Type_hsa_signal_add_screlease,
-#else
-    HSA_API_Type_hsa_signal_add_release,
-#endif
-#ifdef FUTURE_ROCR_VERSION
     HSA_API_Type_hsa_signal_subtract_scacq_screl,
     HSA_API_Type_hsa_signal_subtract_scacquire,
-#else
-    HSA_API_Type_hsa_signal_subtract_acq_rel,
-    HSA_API_Type_hsa_signal_subtract_acquire,
-#endif
     HSA_API_Type_hsa_signal_subtract_relaxed,
-#ifdef FUTURE_ROCR_VERSION
     HSA_API_Type_hsa_signal_subtract_screlease,
-#else
-    HSA_API_Type_hsa_signal_subtract_release,
-#endif
-#ifdef FUTURE_ROCR_VERSION
     HSA_API_Type_hsa_signal_and_scacq_screl,
     HSA_API_Type_hsa_signal_and_scacquire,
-#else
-    HSA_API_Type_hsa_signal_and_acq_rel,
-    HSA_API_Type_hsa_signal_and_acquire,
-#endif
     HSA_API_Type_hsa_signal_and_relaxed,
-#ifdef FUTURE_ROCR_VERSION
     HSA_API_Type_hsa_signal_and_screlease,
-#else
-    HSA_API_Type_hsa_signal_and_release,
-#endif
-#ifdef FUTURE_ROCR_VERSION
     HSA_API_Type_hsa_signal_or_scacq_screl,
     HSA_API_Type_hsa_signal_or_scacquire,
-#else
-    HSA_API_Type_hsa_signal_or_acq_rel,
-    HSA_API_Type_hsa_signal_or_acquire,
-#endif
     HSA_API_Type_hsa_signal_or_relaxed,
-#ifdef FUTURE_ROCR_VERSION
     HSA_API_Type_hsa_signal_or_screlease,
-#else
-    HSA_API_Type_hsa_signal_or_release,
-#endif
-#ifdef FUTURE_ROCR_VERSION
     HSA_API_Type_hsa_signal_xor_scacq_screl,
     HSA_API_Type_hsa_signal_xor_scacquire,
-#else
-    HSA_API_Type_hsa_signal_xor_acq_rel,
-    HSA_API_Type_hsa_signal_xor_acquire,
-#endif
     HSA_API_Type_hsa_signal_xor_relaxed,
-#ifdef FUTURE_ROCR_VERSION
     HSA_API_Type_hsa_signal_xor_screlease,
-#else
-    HSA_API_Type_hsa_signal_xor_release,
-#endif
-#ifdef FUTURE_ROCR_VERSION
     HSA_API_Type_hsa_signal_wait_scacquire,
-#else
-    HSA_API_Type_hsa_signal_wait_acquire,
-#endif
     HSA_API_Type_hsa_signal_wait_relaxed,
     HSA_API_Type_hsa_queue_create,
     HSA_API_Type_hsa_soft_queue_create,
     HSA_API_Type_hsa_queue_destroy,
     HSA_API_Type_hsa_queue_inactivate,
-#ifdef FUTURE_ROCR_VERSION
     HSA_API_Type_hsa_queue_load_read_index_scacquire,
-#else
-    HSA_API_Type_hsa_queue_load_read_index_acquire,
-#endif
     HSA_API_Type_hsa_queue_load_read_index_relaxed,
-#ifdef FUTURE_ROCR_VERSION
     HSA_API_Type_hsa_queue_load_write_index_scacquire,
-#else
-    HSA_API_Type_hsa_queue_load_write_index_acquire,
-#endif
     HSA_API_Type_hsa_queue_load_write_index_relaxed,
     HSA_API_Type_hsa_queue_store_write_index_relaxed,
-#ifdef FUTURE_ROCR_VERSION
     HSA_API_Type_hsa_queue_store_write_index_screlease,
-#else
-    HSA_API_Type_hsa_queue_store_write_index_release,
-#endif
-#ifdef FUTURE_ROCR_VERSION
     HSA_API_Type_hsa_queue_cas_write_index_scacq_screl,
     HSA_API_Type_hsa_queue_cas_write_index_scacquire,
-#else
-    HSA_API_Type_hsa_queue_cas_write_index_acq_rel,
-    HSA_API_Type_hsa_queue_cas_write_index_acquire,
-#endif
     HSA_API_Type_hsa_queue_cas_write_index_relaxed,
-#ifdef FUTURE_ROCR_VERSION
     HSA_API_Type_hsa_queue_cas_write_index_screlease,
-#else
-    HSA_API_Type_hsa_queue_cas_write_index_release,
-#endif
-#ifdef FUTURE_ROCR_VERSION
     HSA_API_Type_hsa_queue_add_write_index_scacq_screl,
     HSA_API_Type_hsa_queue_add_write_index_scacquire,
-#else
-    HSA_API_Type_hsa_queue_add_write_index_acq_rel,
-    HSA_API_Type_hsa_queue_add_write_index_acquire,
-#endif
     HSA_API_Type_hsa_queue_add_write_index_relaxed,
-#ifdef FUTURE_ROCR_VERSION
     HSA_API_Type_hsa_queue_add_write_index_screlease,
-#else
-    HSA_API_Type_hsa_queue_add_write_index_release,
-#endif
     HSA_API_Type_hsa_queue_store_read_index_relaxed,
-#ifdef FUTURE_ROCR_VERSION
     HSA_API_Type_hsa_queue_store_read_index_screlease,
-#else
-    HSA_API_Type_hsa_queue_store_read_index_release,
-#endif
     HSA_API_Type_hsa_region_get_info,
     HSA_API_Type_hsa_agent_iterate_regions,
     HSA_API_Type_hsa_memory_allocate,

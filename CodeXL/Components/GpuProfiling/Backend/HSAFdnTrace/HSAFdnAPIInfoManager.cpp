@@ -367,11 +367,7 @@ void HSAAPIInfoManager::UnlockSignalMap()
 
 void HSAAPIInfoManager::AddAsyncCopyCompletionSignal(const hsa_signal_t& completionSignal)
 {
-#ifdef FUTURE_ROCR_VERSION
     hsa_signal_value_t signalValue = g_pRealCoreFunctions->hsa_signal_load_scacquire_fn(completionSignal);
-#else
-    hsa_signal_value_t signalValue = g_pRealCoreFunctions->hsa_signal_load_acquire_fn(completionSignal);
-#endif
 
     AsyncCopyInfo* pAsyncCopyInfo = new(std::nothrow) AsyncCopyInfo(osGetUniqueCurrentThreadId(), completionSignal);
 
