@@ -12,6 +12,9 @@
 #include <ctype.h>
 #include <stdlib.h>
 
+// Enables standalone disassembler.
+//#define DISASSEMBLER_STANDALONE
+
 #if _MSC_VER
     #define snprintf _snprintf
 #endif
@@ -49,6 +52,7 @@ Inst_Info* GetJcxIndex(CDisassembler* pThis);
 Inst_Info* Get_2_38_Index(CDisassembler* pThis);
 Inst_Info* Get_2_38_XX_Index(CDisassembler* pThis);
 Inst_Info* Get_2_38_f01_Index(CDisassembler* pThis);
+Inst_Info* Get_2_38_f6_Index(CDisassembler* pThis);
 Inst_Info* Get_2_3a_Index(CDisassembler* pThis);
 Inst_Info* Get_2_3a_XX_Index(CDisassembler* pThis);
 Inst_Info* Get_RexOperandsize_Index(CDisassembler* pThis);
@@ -1320,6 +1324,31 @@ Inst_Info* Get_2_38_f01_Index(CDisassembler* pThis)
     }
 }
 
+Inst_Info* Get_2_38_f6_Index(CDisassembler* pThis)
+{
+    // This fuinction can be combined with Get_2_38_XX_Index()
+    pThis->HandleExtraPrefixOpcode();
+
+    AMD_UINT8 firstOpcode = pThis->GetOpcode(0);
+
+    if (firstOpcode == PREFIX_REP)
+    {
+        return (&((Inst_Info*)pThis->m_opcode_table_ptr->mnem)[3]);
+    }
+    else if (firstOpcode == PREFIX_REPNE)
+    {
+        return (&((Inst_Info*)pThis->m_opcode_table_ptr->mnem)[2]);
+    }
+    else if (firstOpcode == PREFIX_DATA)
+    {
+        return (&((Inst_Info*)pThis->m_opcode_table_ptr->mnem)[1]);
+    }
+    else // if( firstOpcode == 0x0f )
+    {
+        return (&((Inst_Info*)pThis->m_opcode_table_ptr->mnem)[0]);
+    }
+}
+
 Inst_Info* Get_2_3a_Index(CDisassembler* pThis)
 {
     AMD_UINT8 index = pThis->GetOpcode(2);
@@ -1483,6 +1512,10 @@ int Inst_Info::SizeofNestedTable()
     else if (GetInfoPtr == Get_2_38_f01_Index)
     {
         return 3;
+    }
+    else if (GetInfoPtr == Get_2_38_f6_Index)
+    {
+        return 4;
     }
     else if (GetInfoPtr == Get_2_3a_Index)
     {
@@ -1823,6 +1856,9 @@ PVOIDMEMBERFUNC CDisassembler::S_DisassembleOperandFnPtrs[] =
     /* OPRND_UxM8 */    &CDisassembler::SimdModrmStr,
     /* OPRND_UxM4 */    &CDisassembler::SimdModrmStr,
     /* OPRND_UxM2 */    &CDisassembler::SimdModrmStr,
+
+    /* OPRND_Wd_q */    &CDisassembler::SimdModrmStr,
+    /* OPRND_Eq */      &CDisassembler::ModrmStr,
 };
 
 StringRef CDisassembler::S_modrm16_str[]    = { "bx+si", "bx+di", "bp+si", "bp+di", "si", "di", "bp", "bx" };
@@ -2754,6 +2790,9 @@ PVOIDMEMBERFUNC CDisassembler::S_DecodeOperandFnPtrs[] =
     /* OPRND_UxM8 */    &CDisassembler::GetSimdOwordRegOrEigthMemoryModrm,
     /* OPRND_UxM4 */    &CDisassembler::GetSimdOwordRegOrQuarterMemoryModrm,
     /* OPRND_UxM2 */    &CDisassembler::GetSimdOwordRegOrHalfMemoryModrm,
+
+    /* OPRND_Wd_q */    &CDisassembler::GetSimdDQwordModrm,
+    /* OPRND_Eq */      &CDisassembler::GetQwordModrm,
 };
 
 void CDisassembler::DecodeModrm()
@@ -3174,6 +3213,12 @@ void CDisassembler::GetWordModrm()
 void CDisassembler::GetDwordModrm()
 {
     m_pOperand->size = OPERANDSIZE_32;
+    OperandModrm();
+}
+
+void CDisassembler::GetQwordModrm()
+{
+    m_pOperand->size = OPERANDSIZE_64;
     OperandModrm();
 }
 
@@ -3883,6 +3928,12 @@ void CDisassembler::GetSimdQwordModrm()
     GetSimdModrm();
 }
 
+void CDisassembler::GetSimdDQwordModrm()
+{
+    m_pOperand->size = OPERANDSIZE_128;
+    GetSimdModrm();
+}
+
 void CDisassembler::GetSimdQwordOrOwordModrm()
 {
     m_pOperand->size = (HasVex() && GetVexL()) ? OPERANDSIZE_128 : OPERANDSIZE_64;
@@ -4202,6 +4253,8 @@ bool CDisassembler::TablesHooked()
         _CHECK_HOOKS(S_group_2_01_01_tbl);
         _CHECK_HOOKS(S_group_2_01_01_00_tbl);
         _CHECK_HOOKS(S_group_2_01_01_01_tbl);
+        _CHECK_HOOKS(S_group_2_01_01_02_tbl);
+        _CHECK_HOOKS(S_group_2_01_01_03_tbl);
         _CHECK_HOOKS(S_group_2_01_02_tbl);
         _CHECK_HOOKS(S_group_2_01_02_000_tbl);
         _CHECK_HOOKS(S_group_2_01_02_001_tbl);
@@ -4279,6 +4332,12 @@ bool CDisassembler::TablesHooked()
         _CHECK_HOOKS(S_group_2_38_40_tbl);
         _CHECK_HOOKS(S_group_2_38_41_tbl);
         _CHECK_HOOKS(S_group_2_38_82_tbl);
+        _CHECK_HOOKS(S_group_2_38_c8_tbl);
+        _CHECK_HOOKS(S_group_2_38_c9_tbl);
+        _CHECK_HOOKS(S_group_2_38_ca_tbl);
+        _CHECK_HOOKS(S_group_2_38_cb_tbl);
+        _CHECK_HOOKS(S_group_2_38_cc_tbl);
+        _CHECK_HOOKS(S_group_2_38_cd_tbl);
         _CHECK_HOOKS(S_group_2_38_db_tbl);
         _CHECK_HOOKS(S_group_2_38_dc_tbl);
         _CHECK_HOOKS(S_group_2_38_dd_tbl);
@@ -4286,6 +4345,9 @@ bool CDisassembler::TablesHooked()
         _CHECK_HOOKS(S_group_2_38_df_tbl);
         _CHECK_HOOKS(S_group_2_38_f0_tbl);
         _CHECK_HOOKS(S_group_2_38_f1_tbl);
+        _CHECK_HOOKS(S_group_2_38_f6_tbl);
+        _CHECK_HOOKS(S_group_2_38_f6_66_tbl);
+        _CHECK_HOOKS(S_group_2_38_f6_f3_tbl);
         _CHECK_HOOKS(S_group_2_3a_tbl);
         _CHECK_HOOKS(S_group_2_3a_08_tbl);
         _CHECK_HOOKS(S_group_2_3a_09_tbl);
@@ -4312,6 +4374,7 @@ bool CDisassembler::TablesHooked()
         _CHECK_HOOKS(S_group_2_3a_61_tbl);
         _CHECK_HOOKS(S_group_2_3a_62_tbl);
         _CHECK_HOOKS(S_group_2_3a_63_tbl);
+        _CHECK_HOOKS(S_group_2_3a_cc_tbl);
         _CHECK_HOOKS(S_group_2_3a_df_tbl);
         _CHECK_HOOKS(S_group_2_50_tbl);
         _CHECK_HOOKS(S_group_2_51_tbl);
@@ -4372,6 +4435,7 @@ bool CDisassembler::TablesHooked()
         _CHECK_HOOKS(S_group_2_7f_tbl);
         _CHECK_HOOKS(S_group_2_ae_tbl);
         _CHECK_HOOKS(S_group_2_ae_np_tbl);
+        _CHECK_HOOKS(S_group_2_ae_66_tbl);
         _CHECK_HOOKS(S_group_2_ae_f3_tbl);
         _CHECK_HOOKS(S_group_2_ae_f3_m3r0_tbl);
         _CHECK_HOOKS(S_group_2_ae_f3_m3r1_tbl);
@@ -4388,7 +4452,11 @@ bool CDisassembler::TablesHooked()
         _CHECK_HOOKS(S_group_2_c6_tbl);
         _CHECK_HOOKS(S_group_2_c7_tbl);
         _CHECK_HOOKS(S_group_2_c7_01_tbl);
+        _CHECK_HOOKS(S_group_2_c7_03_tbl);
+        _CHECK_HOOKS(S_group_2_c7_04_tbl);
+        _CHECK_HOOKS(S_group_2_c7_05_tbl);
         _CHECK_HOOKS(S_group_2_c7_06_tbl);
+        _CHECK_HOOKS(S_group_2_c7_07_tbl);
         _CHECK_HOOKS(S_group_2_d0_tbl);
         _CHECK_HOOKS(S_group_2_d1_tbl);
         _CHECK_HOOKS(S_group_2_d2_tbl);
@@ -4969,18 +5037,20 @@ void CInstructionData::ShowOpcodes()
 }
 
 #ifdef DISASSEMBLER_STANDALONE
+#include <cstdio>
+
 void main(void)
 {
     CDisassembler disassembler;
 
     unsigned count = 0;
-    char line[256];
+    char line[256] = { 0 };
 
-    while (gets(line))
+    while (std::fgets(line, 255, stdin))
     {
         count++;
 
-        AMD_UINT8 instBuf[16];
+        AMD_UINT8 instBuf[17] = { 0 };  // 15 for instruction bytes and 2 for dbit, longmode
         int len = 0;
         char* ptr = line;
 
@@ -4988,21 +5058,31 @@ void main(void)
         AMD_UINT64 rip = strtoul(ptr, &ptr, 16);
 #endif
 
-        while (*ptr != '\0')
+        while (*ptr != '\0' && len < 17)
         {
-            instBuf[len++] = strtoul(ptr, &ptr, 16);
+            char *last_ptr = ptr;
+
+            instBuf[len++] = static_cast<char>(strtoul(ptr, &ptr, 16));
+
+            // If strtoul failed to parse, then skip rest of the bytes.
+            if (last_ptr == ptr)
+            {
+                len--;
+                break;
+            }
         }
 
-        disassembler.SetDbit(instBuf[len - 2]);
-        disassembler.SetLongMode(instBuf[len - 1]);
+        disassembler.SetDbit(instBuf[len - 2] != 0);
+        disassembler.SetLongMode(instBuf[len - 1] != 0);
 
 #ifdef CONVEY_RIP
-
         if (disassembler.Disassemble(instBuf, rip) != NULL)
 #else
         if (disassembler.Disassemble(instBuf) != NULL)
 #endif
+        {
             printf("%s\n", disassembler.GetMnemonic());
+        }
         else
         {
             printf("%08d: Unable to disassemble\n", count);

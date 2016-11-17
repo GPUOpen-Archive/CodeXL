@@ -6769,12 +6769,12 @@ Inst_Info CDisassembler::S_group_2_01_01_tbl[] =
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
     { /*rm = 010 */
-        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        S_group_2_01_01_02_tbl, GetSSEIndex, INST_NONE, NULL, SET_NONE,
         { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
     { /*rm = 011 */
-        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        S_group_2_01_01_03_tbl, GetSSEIndex, INST_NONE, NULL, SET_NONE,
         { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
@@ -6828,6 +6828,54 @@ Inst_Info CDisassembler::S_group_2_01_01_01_tbl[] =
 {
     { /*no prefix*/
         "mwait", NULL, INST_NONE, NULL, SET_MWAIT,
+        { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /*66 prefix*/
+        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /*f2 prefix*/
+        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /*f3 prefix*/
+        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+};
+
+Inst_Info CDisassembler::S_group_2_01_01_02_tbl[] =
+{
+    { /*no prefix*/
+        "clac", NULL, INST_NONE, NULL, SET_SMAP,
+        { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /*66 prefix*/
+        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /*f2 prefix*/
+        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /*f3 prefix*/
+        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+};
+
+Inst_Info CDisassembler::S_group_2_01_01_03_tbl[] =
+{
+    { /*no prefix*/
+        "stac", NULL, INST_NONE, NULL, SET_SMAP,
         { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
@@ -7030,7 +7078,7 @@ Inst_Info CDisassembler::S_group_2_01_07_tbl[] =
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
     { /*rm = 100 */
-        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        "clzero", NULL, INST_NONE, NULL, SET_CLZERO,
         { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
@@ -8751,32 +8799,32 @@ Inst_Info CDisassembler::S_group_2_38_tbl[] =
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
     { /* 0xc8 */
-        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        S_group_2_38_c8_tbl, Get_2_38_XX_Index, INST_NONE, NULL, SET_NONE,
         { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
     { /* 0xc9 */
-        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        S_group_2_38_c9_tbl, Get_2_38_XX_Index, INST_NONE, NULL, SET_NONE,
         { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
     { /* 0xca */
-        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        S_group_2_38_ca_tbl, Get_2_38_XX_Index, INST_NONE, NULL, SET_NONE,
         { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
     { /* 0xcb */
-        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        S_group_2_38_cb_tbl, Get_2_38_XX_Index, INST_NONE, NULL, SET_NONE,
         { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
     { /* 0xcc */
-        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        S_group_2_38_cc_tbl, Get_2_38_XX_Index, INST_NONE, NULL, SET_NONE,
         { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
     { /* 0xcd */
-        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        S_group_2_38_cd_tbl, Get_2_38_XX_Index, INST_NONE, NULL, SET_NONE,
         { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
@@ -8981,7 +9029,7 @@ Inst_Info CDisassembler::S_group_2_38_tbl[] =
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
     { /* 0xf6 */
-        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        S_group_2_38_f6_tbl, Get_2_38_f6_Index, INST_NONE, NULL, SET_NONE,
         { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
@@ -9690,6 +9738,90 @@ Inst_Info CDisassembler::S_group_2_38_82_tbl[] =
     },
 };
 
+Inst_Info CDisassembler::S_group_2_38_c8_tbl[] =
+{
+    { /*no prefix*/
+        "sha1nexte", NULL, INST_NONE, NULL, SET_SHA,
+        { OPRND_Vd_q,   OPRND_Wd_q, OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /*66 prefix*/
+        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+};
+
+Inst_Info CDisassembler::S_group_2_38_c9_tbl[] =
+{
+    { /*no prefix*/
+        "sha1msg1", NULL, INST_NONE, NULL, SET_SHA,
+        { OPRND_Vd_q,   OPRND_Wd_q,  OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,    OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /*66 prefix*/
+        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+};
+
+Inst_Info CDisassembler::S_group_2_38_ca_tbl[] =
+{
+    { /*no prefix*/
+        "sha1msg2", NULL, INST_NONE, NULL, SET_SHA,
+        { OPRND_Vd_q,   OPRND_Wd_q,  OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,    OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /*66 prefix*/
+        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,  OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,  OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+};
+
+Inst_Info CDisassembler::S_group_2_38_cb_tbl[] =
+{
+    { /*no prefix*/
+        "sha256rnds2", NULL, INST_NONE, NULL, SET_SHA,
+        { OPRND_Vd_q,   OPRND_Wd_q,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /*66 prefix*/
+        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,  OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+};
+
+Inst_Info CDisassembler::S_group_2_38_cc_tbl[] =
+{
+    { /*no prefix*/
+        "sha256msg1", NULL, INST_NONE, NULL, SET_SHA,
+        { OPRND_Vd_q,   OPRND_Wd_q,  OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,    OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /*66 prefix*/
+        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,  OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+};
+
+Inst_Info CDisassembler::S_group_2_38_cd_tbl[] =
+{
+    { /*no prefix*/
+        "sha256msg2", NULL, INST_NONE, NULL, SET_SHA,
+        { OPRND_Vd_q,   OPRND_Wd_q,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /*66 prefix*/
+        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,  OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+};
+
 Inst_Info CDisassembler::S_group_2_38_db_tbl[] =
 {
     { /*no prefix*/
@@ -9794,6 +9926,58 @@ Inst_Info CDisassembler::S_group_2_38_f1_tbl[] =
     { /*f3 prefix*/
         NULL, NULL, INST_NONE, NULL, SET_NONE,
         { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+};
+
+Inst_Info CDisassembler::S_group_2_38_f6_tbl[] =
+{
+    { /*no prefix*/
+        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /*66 prefix*/
+        S_group_2_38_f6_66_tbl, Get_RexOperandsize_Index, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /*f2 prefix*/
+        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /*f3 prefix*/
+        S_group_2_38_f6_f3_tbl, Get_RexOperandsize_Index, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+};
+
+Inst_Info CDisassembler::S_group_2_38_f6_66_tbl[] =
+{
+    { /* !REX.W */
+        "adcx", NULL, INST_NONE, NULL, SET_ADX,
+        { OPRND_Gd,     OPRND_Ed,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /* REX.W */
+        "adcx", NULL, INST_NONE, NULL, SET_ADX,
+        { OPRND_Gq,     OPRND_Eq,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+};
+
+Inst_Info CDisassembler::S_group_2_38_f6_f3_tbl[] =
+{
+    { /* !REX.W */
+        "adox", NULL, INST_NONE, NULL, SET_ADX,
+        { OPRND_Gd,     OPRND_Ed,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /* REX.W */
+        "adox", NULL, INST_NONE, NULL, SET_ADX,
+        { OPRND_Gq,     OPRND_Eq,   OPRND_na,   OPRND_na,   OPRND_na },
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
 };
@@ -10821,7 +11005,7 @@ Inst_Info CDisassembler::S_group_2_3a_tbl[] =
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
     { /* 0xcc */
-        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        S_group_2_3a_cc_tbl, Get_2_3a_XX_Index, INST_NONE, NULL, SET_NONE,
         { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
@@ -11429,6 +11613,20 @@ Inst_Info CDisassembler::S_group_2_3a_63_tbl[] =
     { /*66 prefix*/
         "pcmpistri", NULL, INST_NONE, NULL, SET_SSE4_2,
         { OPRND_Vx,     OPRND_Wx,   OPRND_Ib,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+};
+
+Inst_Info CDisassembler::S_group_2_3a_cc_tbl[] =
+{
+    { /*no prefix*/
+        "sha1rnds4", NULL, INST_NONE, NULL, SET_SHA,
+        { OPRND_Vd_q,   OPRND_Wd_q,  OPRND_Ib,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,    OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /*66 prefix*/
+        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
 };
@@ -12904,7 +13102,7 @@ Inst_Info CDisassembler::S_group_2_ae_tbl[] =
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
     { /*66 prefix*/
-        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        S_group_2_ae_66_tbl, GetGroupIndex, INST_NONE, NULL, SET_NONE,
         { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
@@ -13002,6 +13200,50 @@ Inst_Info CDisassembler::S_group_2_ae_np_tbl[] =
     { /* reg = 007 */
         "sfence", NULL, INST_NONE, NULL, SET_SSE,
         { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+};
+
+Inst_Info CDisassembler::S_group_2_ae_66_tbl[] =
+{
+    { /* 0x00 */
+        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /* 0x01 */
+        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /* 0x02 */
+        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /* 0x03 */
+        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /* 0x04 */
+        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /* 0x05 */
+        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /* 0x06 */
+        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /* 0x07 */
+        "clflushopt", NULL, INST_NONE, NULL, SET_CLFSHOPT,
+        { OPRND_Mb,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
 };
@@ -13372,17 +13614,17 @@ Inst_Info CDisassembler::S_group_2_c7_tbl[] =
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
     { /* 0x03 */
-        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        S_group_2_c7_03_tbl, Get_RexOperandsize_Index, INST_NONE, NULL, SET_NONE,
         { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
     { /* 0x04 */
-        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        S_group_2_c7_04_tbl, Get_RexOperandsize_Index, INST_NONE, NULL, SET_NONE,
         { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
     { /* 0x05 */
-        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        S_group_2_c7_05_tbl, Get_RexOperandsize_Index, INST_NONE, NULL, SET_NONE,
         { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
@@ -13392,7 +13634,7 @@ Inst_Info CDisassembler::S_group_2_c7_tbl[] =
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
     { /* 0x07 */
-        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        S_group_2_c7_07_tbl, Get_2_38_f01_Index, INST_NONE, NULL, SET_NONE,
         { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
@@ -13402,7 +13644,7 @@ Inst_Info CDisassembler::S_group_2_c7_01_tbl[] =
 {
     { /* !REX.W */
         "cmpxchg8b", NULL, INST_NONE, NULL, SET_X86,
-        { OPRND_Mq,         OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPRND_Mq,             OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
         { (OPF_LOCK | OPF_SS),  OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },
     { /* REX.W */
@@ -13412,10 +13654,71 @@ Inst_Info CDisassembler::S_group_2_c7_01_tbl[] =
     },
 };
 
+Inst_Info CDisassembler::S_group_2_c7_03_tbl[] =
+{
+    { /* !REX.W */
+        "xrstors", NULL, INST_NONE, NULL, SET_X86,
+        { OPRND_M,   OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,  OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /* REX.W */
+        "xrstors64", NULL, INST_NONE, NULL, SET_X86,
+        { OPRND_M,   OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,  OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+};
+
+Inst_Info CDisassembler::S_group_2_c7_04_tbl[] =
+{
+    { /* !REX.W */
+        "xsavec", NULL, INST_NONE, NULL, SET_XSAVEC,
+        { OPRND_M,   OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,  OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /* REX.W */
+        "xsavec64", NULL, INST_NONE, NULL, SET_XSAVEC,
+        { OPRND_M,   OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,  OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+};
+
+Inst_Info CDisassembler::S_group_2_c7_05_tbl[] =
+{
+    { /* !REX.W */
+        "xsaves", NULL, INST_NONE, NULL, SET_X86,
+        { OPRND_M,   OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,  OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /* REX.W */
+        "xsaves64", NULL, INST_NONE, NULL, SET_X86,
+        { OPRND_M,   OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,  OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+};
+
 Inst_Info CDisassembler::S_group_2_c7_06_tbl[] =
 {
     { /*no prefix*/
         "rdrand", NULL, INST_NONE, NULL, SET_RDRAND,
+        { OPRND_Rv,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /*f2 prefix*/
+        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+    { /*f3 prefix*/
+        NULL, NULL, INST_NONE, NULL, SET_NONE,
+        { OPRND_na,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
+        { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
+    },
+};
+
+Inst_Info CDisassembler::S_group_2_c7_07_tbl[] =
+{
+    { /*no prefix*/
+        "rdseed", NULL, INST_NONE, NULL, SET_RDSEED,
         { OPRND_Rv,     OPRND_na,   OPRND_na,   OPRND_na,   OPRND_na },
         { OPF_NONE,     OPF_NONE,   OPF_NONE,   OPF_NONE,   OPF_NONE }
     },

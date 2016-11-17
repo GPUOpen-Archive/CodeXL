@@ -16,6 +16,9 @@
 
 #include "AttDisassembler.h"
 
+// Uncomment this to enable standalone disassembler
+//#define ATTDISASSEMBLER_STANDALONE
+
 using namespace n_Disassembler;
 
 bool CAttDisassembler::m_bTablesUpdated = false;        // only need to link tables once
@@ -1250,12 +1253,9 @@ void CAttDisassembler::ClearLongMode()
 CAttDisassembler disassembler;
 bool showMemorySize = false;
 
-// gets ptr to the option value: handles options of the form "-x=value" or "-x value"
-#define GET_OPTION_PTR(argv,argc,i,j) ((argv[i][j] == '=') ? &argv[i][j+1] : ((++i < argc) ? argv[i] : NULL))
-
 void Usage()
 {
-    puts("Usage: attstandalone [-h] [-d] [-i] [-m] [-o] [filename]");
+    puts("Usage: attstandalone [-h] [-m]");
     puts("\t-h\t\tPrint usage statement");
     puts("\t-m\t\tShow memory size qualifiers");
 }
@@ -1271,14 +1271,11 @@ bool ParseCommandLine(int argc, char* argv[])
         {
             switch (argv[i][1])
             {
-                case 'h':
-                    Usage();
-                    return false;
-
                 case 'm':
                     showMemorySize = true;
                     break;
 
+                case 'h':
                 default:
                     Usage();
                     return false;
@@ -1299,13 +1296,13 @@ int main(int argc, char* argv[])
         }
 
         unsigned count = 0;
-        char line[256];
+        char line[256] = { 0 };
 
-        while (gets(line))
+        while (fgets(line, 255, stdin))
         {
             count++;
 
-            UINT8 instBuf[16];
+            UINT8 instBuf[17] = { 0 };  // 15 for instruction, 2 for dbit, longmode
             int len = 0;
             char* ptr = line;
 
@@ -1313,21 +1310,30 @@ int main(int argc, char* argv[])
             UINT64 rip = strtoul(ptr, &ptr, 16);
 #endif
 
-            while (*ptr != '\0')
+            while (*ptr != '\0' && len < 17)
             {
+                char *last_ptr = ptr;
+
                 instBuf[len++] = strtoul(ptr, &ptr, 16);
+
+                if (last_ptr == ptr)
+                {
+                    len--;
+                    break;
+                }
             }
 
-            disassembler.SetDbit(instBuf[len - 2]);
-            disassembler.SetLongMode(instBuf[len - 1]);
+            disassembler.SetDbit(instBuf[len - 2] != 0);
+            disassembler.SetLongMode(instBuf[len - 1] != 0);
 
 #ifdef CONVEY_RIP
-
             if (disassembler.Disassemble(instBuf, rip) != NULL)
 #else
             if (disassembler.Disassemble(instBuf) != NULL)
 #endif
+            {
                 printf("%s\n", disassembler.GetMnemonic());
+            }
             else
             {
                 printf("%08d: Unable to disassemble\n", count);

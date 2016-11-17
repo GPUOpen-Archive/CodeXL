@@ -21,8 +21,7 @@
 typedef enum
 {
     NA = 0,
-    a,          // two 1-word operands in memory or
-    // two double-word operands in memory
+    a,          // two 1-word operands in memory or two double-word operands in memory
     b,          // byte (regardless of operand size attribute)
     ib,         // Immediate byte (regardless of operand size attribute)
     c,          // byte or word (depending on operand size attribute),
@@ -45,8 +44,8 @@ typedef enum
     WW = 0x40,      // Operand causes a "write" to memory
     RW = 0x70,      // Operand results into a Read/Modify/Write to memory
     ER = 0xF0,      // This is an invalid flag.  It only happens in the case
-    // of CMPXCHG & CMPXCHG8B instructions, and is used to flag
-    // the UI to handle the case differently..
+                    // of CMPXCHG & CMPXCHG8B instructions, and is used to flag
+                    // the UI to handle the case differently..
 } eMemAccessType ;
 
 
@@ -71,7 +70,8 @@ typedef enum
     K7          = 0x00000010,   // K7
     K7_2        = 0x00000020,   // K7 Mustang
     K8          = 0x00000040,   // Sledge Hammer (supports REX instruction)
-    ANY     = ((K6) | (K6_2) | (K6_3) | (K6_ST50) | (K7) | (K7_2) | (K8)),
+    FAMILY17    = 0x00000080,   // Zen (supports new instructions)
+    ANY     = ((K6) | (K6_2) | (K6_3) | (K6_ST50) | (K7) | (K7_2) | (K8) | (FAMILY17)),
     ALL     = K6
 } eProcType ;
 
@@ -264,7 +264,7 @@ typedef struct
 {
     BOOL                IsImplicit ;
     //  BOOL                bMemAccess ;
-    eMemAccessType      MemAccessType ; // Access type "nA = 0" means operand doesn't acess memory
+    eMemAccessType      MemAccessType ; // Access type "nA = 0" means operand doesn't access memory
     //  eRegType            RegisterType ;
     eAddrMode           AddrMode ;
     BOOL                bBaseRegPresent ;
@@ -282,7 +282,7 @@ typedef struct
     BYTE                NumOperands ;
     BYTE                InstrPrefix ;           // This could be either any flavor of REP, or the LOCK prefix.
     eInstrPrefixType    InstrPfxType ;
-    BYTE                SegmentPrefix ;     // if 0, no segment override prefix is present
+    BYTE                SegmentPrefix ;         // if 0, no segment override prefix is present
     BOOL                bAddrSizePrefix ;       // if 0, no address size prefix is present
     BOOL                bOpSizePrefix ;         // if 0, no operand size prefix is present
     BOOL                bModRMPresent ;

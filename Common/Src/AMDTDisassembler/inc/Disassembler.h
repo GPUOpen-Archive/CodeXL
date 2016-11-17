@@ -378,6 +378,13 @@ enum e_SetType
     SET_RDRAND     = 33,
     SET_MWAITX     = 34,
     SET_MWAIT      = 35,
+    SET_RDSEED     = 36,
+    SET_XSAVEC     = 37,
+    SET_SMAP       = 38,
+    SET_CLZERO     = 39,
+    SET_CLFSHOPT   = 40,
+    SET_SHA        = 41,
+    SET_ADX        = 42,
 };
 
 enum e_OperandType
@@ -524,7 +531,10 @@ enum e_OperandSpecifier
     OPRND_Rv        = 103,
     OPRND_UxM8      = 104,
     OPRND_UxM4      = 105,
-    OPRND_UxM2      = 106
+    OPRND_UxM2      = 106,
+
+    OPRND_Wd_q      = 107,
+    OPRND_Eq        = 108,
 };
 
 enum e_DisassemblerErrorCodes { NO_EXCEPTION, FORMAT_EXCEPTION, LENGTH_EXCEPTION, TABLE_EXCEPTION };
@@ -1115,6 +1125,7 @@ protected:
     inline void GetByteModrm();
     inline void GetWordModrm();
     inline void GetDwordModrm();
+    inline void GetQwordModrm();
     inline void GetWDQModrm();
     inline void GetWDQModrmMem();
     inline void GetWDQModrmReg();
@@ -1185,6 +1196,7 @@ protected:
     inline void GetSimdReg();
     inline void GetSimdDwordModrm();
     inline void GetSimdQwordModrm();
+    inline void GetSimdDQwordModrm();
     inline void GetSimdQwordOrOwordModrm();
     inline void GetSimdQwordModrmRegister();
     inline void GetSimdOwordModrm();
@@ -1333,6 +1345,8 @@ protected:
     static Inst_Info S_group_2_01_01_tbl[9];
     static Inst_Info S_group_2_01_01_00_tbl[4];
     static Inst_Info S_group_2_01_01_01_tbl[4];
+    static Inst_Info S_group_2_01_01_02_tbl[4];
+    static Inst_Info S_group_2_01_01_03_tbl[4];
     static Inst_Info S_group_2_01_02_tbl[9];
     static Inst_Info S_group_2_01_02_000_tbl[4];
     static Inst_Info S_group_2_01_02_001_tbl[4];
@@ -1411,6 +1425,12 @@ protected:
     static Inst_Info S_group_2_38_40_tbl[2];
     static Inst_Info S_group_2_38_41_tbl[2];
     static Inst_Info S_group_2_38_82_tbl[2];
+    static Inst_Info S_group_2_38_c8_tbl[2];
+    static Inst_Info S_group_2_38_c9_tbl[2];
+    static Inst_Info S_group_2_38_ca_tbl[2];
+    static Inst_Info S_group_2_38_cb_tbl[2];
+    static Inst_Info S_group_2_38_cc_tbl[2];
+    static Inst_Info S_group_2_38_cd_tbl[2];
     static Inst_Info S_group_2_38_db_tbl[2];
     static Inst_Info S_group_2_38_dc_tbl[2];
     static Inst_Info S_group_2_38_dd_tbl[2];
@@ -1418,6 +1438,9 @@ protected:
     static Inst_Info S_group_2_38_df_tbl[2];
     static Inst_Info S_group_2_38_f0_tbl[3];
     static Inst_Info S_group_2_38_f1_tbl[3];
+    static Inst_Info S_group_2_38_f6_tbl[4];
+    static Inst_Info S_group_2_38_f6_66_tbl[2];
+    static Inst_Info S_group_2_38_f6_f3_tbl[2];
     static Inst_Info S_group_2_3a_tbl[256];
     static Inst_Info S_group_2_3a_08_tbl[2];
     static Inst_Info S_group_2_3a_09_tbl[2];
@@ -1444,6 +1467,7 @@ protected:
     static Inst_Info S_group_2_3a_61_tbl[2];
     static Inst_Info S_group_2_3a_62_tbl[2];
     static Inst_Info S_group_2_3a_63_tbl[2];
+    static Inst_Info S_group_2_3a_cc_tbl[2];
     static Inst_Info S_group_2_3a_df_tbl[2];
     static Inst_Info S_group_2_50_tbl[4];
     static Inst_Info S_group_2_51_tbl[4];
@@ -1505,6 +1529,7 @@ protected:
     static Inst_Info S_group_2_7f_tbl[4];
     static Inst_Info S_group_2_ae_tbl[4];
     static Inst_Info S_group_2_ae_np_tbl[16];
+    static Inst_Info S_group_2_ae_66_tbl[8];
     static Inst_Info S_group_2_ae_f3_tbl[16];
     static Inst_Info S_group_2_ae_f3_m3r0_tbl[2];
     static Inst_Info S_group_2_ae_f3_m3r1_tbl[2];
@@ -1521,7 +1546,11 @@ protected:
     static Inst_Info S_group_2_c6_tbl[4];
     static Inst_Info S_group_2_c7_tbl[8];
     static Inst_Info S_group_2_c7_01_tbl[2];
+    static Inst_Info S_group_2_c7_03_tbl[2];
+    static Inst_Info S_group_2_c7_04_tbl[2];
+    static Inst_Info S_group_2_c7_05_tbl[2];
     static Inst_Info S_group_2_c7_06_tbl[3];
+    static Inst_Info S_group_2_c7_07_tbl[3];
     static Inst_Info S_group_2_d0_tbl[4];
     static Inst_Info S_group_2_d1_tbl[4];
     static Inst_Info S_group_2_d2_tbl[4];
@@ -1930,6 +1959,7 @@ public:
     friend Inst_Info* Get_2_38_Index(CDisassembler* pThis);
     friend Inst_Info* Get_2_38_XX_Index(CDisassembler* pThis);
     friend Inst_Info* Get_2_38_f01_Index(CDisassembler* pThis);
+    friend Inst_Info* Get_2_38_f6_Index(CDisassembler* pThis);
     friend Inst_Info* Get_2_3a_Index(CDisassembler* pThis);
     friend Inst_Info* Get_2_3a_XX_Index(CDisassembler* pThis);
     friend Inst_Info* Get_2_b8_Index(CDisassembler* pThis);
