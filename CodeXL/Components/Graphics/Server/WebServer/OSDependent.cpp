@@ -1089,7 +1089,7 @@ public:
     void RemoveHandlers()
     {
         std::map<int, SignalData>::iterator it;
-        for (it = m_signalMap.begin(); it != m_signalMap.end(); ++it);
+        for (it = m_signalMap.begin(); it != m_signalMap.end(); ++it)
         {
             sigaction(it->first, &(it->second.old_action), nullptr);
         }
