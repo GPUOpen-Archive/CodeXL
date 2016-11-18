@@ -8,7 +8,7 @@ PLATFORM_CFLAG =
 PLATFORM_LFLAG =
 TARGET_SUFFIX =
 ADDL_CFLAGS =
-CFLAGS = $(OPTIMIZE) -std=c++11 -fPIC -Wall -Wno-unknown-pragmas -Wno-strict-aliasing -Wno-non-virtual-dtor -Wno-conversion-null -Werror -msse $(PLATFORM_CFLAG) $(ADDL_CFLAGS)
+CFLAGS = $(OPTIMIZE) -std=c++11 -fPIC -Wall -Wno-unknown-pragmas -Wno-strict-aliasing -Wno-non-virtual-dtor -Wno-conversion-null -Wno-ignored-attributes -Werror -msse $(PLATFORM_CFLAG) $(ADDL_CFLAGS)
 HSAFDN_CFLAGS =
 PLATFORM_DIR = x64
 HSA_PLATFORM_DIR = x86_64
