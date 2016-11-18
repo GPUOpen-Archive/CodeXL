@@ -34,6 +34,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <math.h>
 void __attribute__((constructor)) initPowerProfileDriverInterface(void);
 void __attribute__((destructor))  finiPowerProfileDriverInterface(void);
 
@@ -761,7 +762,7 @@ AMDTUInt32 PwrGetCoreMask()
 
     if (PROFILE_TYPE_PROCESS_PROFILING == g_profileType)
     {
-        mask = ~0 ^ (~0 << g_sysInfo.m_coreCnt);
+        mask = ~((AMDTUInt32)0) ^ (~((AMDTUInt32)0) << g_sysInfo.m_coreCnt);
     }
     else
     {
