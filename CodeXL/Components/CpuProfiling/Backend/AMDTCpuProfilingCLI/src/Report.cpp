@@ -1046,6 +1046,8 @@ void CpuProfileReport::ReportSampleCount(bool sepByCore)
 {
     AMDTProfileCounterDescVec counterDesc;
     AMDTProfileSamplingConfigVec samplingConfigVec;
+    AMDTProfileSessionInfo sessionInfo;
+    m_profileDbReader.GetProfileSessionInfo(sessionInfo);
 
     m_profileDbReader.GetSampledCountersList(counterDesc);
 
@@ -1059,7 +1061,7 @@ void CpuProfileReport::ReportSampleCount(bool sepByCore)
     AMDTSampleValueVec sampleValueVec;
     m_profileDbReader.GetSampleCount(sepByCore, sampleValueVec);
 
-    fprintf(stderr, "\nCPCLI>>> coreId  counterId   counterName      samplingInterval   nbrSamples\n");
+    fprintf(stderr, "\nCPCLI>>> coreMask  counterId   counterName      samplingInterval   nbrSamples\n");
 
     for (const auto& value : sampleValueVec)
     {
@@ -1074,8 +1076,8 @@ void CpuProfileReport::ReportSampleCount(bool sepByCore)
 
         gtString printStr;
         aCounterDesc->m_abbrev.replace(L" ", L"-");
-        printStr.appendFormattedString(L"%4d %10x    %-20s %8llu  %12llu",
-            value.m_coreId, counterInfo->m_hwEventId, aCounterDesc->m_abbrev.asCharArray(), counterInfo->m_samplingInterval, static_cast<AMDTUInt64>(value.m_sampleCount));
+        printStr.appendFormattedString(L"    0x%llx %10x    %-20s %8llu  %12llu",
+            sessionInfo.m_coreAffinity, counterInfo->m_hwEventId, aCounterDesc->m_abbrev.asCharArray(), counterInfo->m_samplingInterval, static_cast<AMDTUInt64>(value.m_sampleCount));
 
         fprintf(stderr, "CPCLI>>> %s\n", printStr.asASCIICharArray());
     }
