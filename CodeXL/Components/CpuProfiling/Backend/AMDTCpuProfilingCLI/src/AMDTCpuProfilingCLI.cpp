@@ -627,7 +627,12 @@ HRESULT HandleCollectCommand(ParseArgs& args)
             {
                 for (gtUInt32 i = 0; i < aValue.m_nbrEvents; i++)
                 {
-                    fprintf(stderr, "CPCLI>>> %d     0x" H_FORMAT "      " U_FORMAT"\n", aValue.m_coreId, aValue.m_eventConfig[i], aValue.m_eventCountValue[i]);
+                    PERF_CTL ctl;
+                    ctl.perf_ctl = aValue.m_eventConfig[i];
+                    gtUInt64 hwEventId = GetEvent12BitSelect(ctl);
+
+                    fprintf(stderr, "CPCLI>>> %d     0x" H_FORMAT "      " U_FORMAT"\n",
+                        aValue.m_coreId, hwEventId, aValue.m_eventCountValue[i]);
                 }
             }
         }
