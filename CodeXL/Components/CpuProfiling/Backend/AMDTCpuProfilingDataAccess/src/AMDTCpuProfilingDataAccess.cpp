@@ -92,7 +92,7 @@ struct ViewConfigInfo
 #define CXL_GET_DB_MODULE_ID(funcId_)   (((funcId_) & CXL_DB_MODULEID_MASK) >> CXL_DB_MODULEID_SHIFT_BITS)
 
 #define CXL_UNKNOWN_FUNC_START_ID           0xF000
-#define IS_UNKNOWN_FUNC(id_) (((id_) & 0x0000FFFF) == 0) 
+#define IS_UNKNOWN_FUNC(id_) (((id_) & 0x0000FFFF) == 0)
 #define GET_MODOFFSET_FOR_UNKNOWN_FUNC(mod_, offset_, val_) val_ = mod_; val_ = (val_ << 32) | offset_;
 #define GET_MODULEID_FROM_FUNCTIONID(id_) (((id_) & 0xFFFF0000) >> 16)
 
@@ -916,7 +916,7 @@ public:
 
     bool UpdateSampledCountersForCLU()
     {
-        // Treat CXL_CLU_EVENT_CLU_PERCENTAGE as computed counter as this involves 
+        // Treat CXL_CLU_EVENT_CLU_PERCENTAGE as computed counter as this involves
         // computing the percenatge based on evictions
         for (auto& eventDesc : m_sampledCounterDescVec)
         {
@@ -1182,7 +1182,7 @@ public:
     {
         bool retVal = false;
 
-        if (NULL != pExecutable)
+        if (nullptr != pExecutable)
         {
             const wchar_t* pSearchPath = m_symbolFilePath.asCharArray();
             const wchar_t* pServerList = m_symbolServerPath.asCharArray();
@@ -1314,7 +1314,7 @@ public:
                 otherEntry.m_id = AMDT_PROFILE_ALL_PROCESSES; // FIXME
                 otherEntry.m_name = L"other";
                 otherEntry.m_moduleId = AMDT_PROFILE_ALL_MODULES;   // FIXME
-				otherEntry.m_type = type; /*summaryDataVec[0].m_type*/
+                otherEntry.m_type = type; /*summaryDataVec[0].m_type*/
 
                 AMDTSampleValue otherSampleValue;
                 otherSampleValue.m_counterId = counterId;
@@ -1399,7 +1399,7 @@ public:
 
                 if (procTotalIt == m_processSampleTotalMap.end())
                 {
-                    AMDTCounterIdVec allCounterIdList;                   
+                    AMDTCounterIdVec allCounterIdList;
 
                     ret = GetAllSampledCountersIdList(allCounterIdList);
 
@@ -1580,7 +1580,7 @@ public:
             {
                 for (gtUInt32 idx = 0; idx < srcLineData.m_sampleValues.size(); idx++)
                 {
-                    srcLineData.m_sampleValues[idx].m_sampleCountPercentage = 
+                    srcLineData.m_sampleValues[idx].m_sampleCountPercentage =
                         CXL_COMPUTE_PERCENTAGE(srcLineData.m_sampleValues[idx].m_sampleCount, totalValueVec[idx].m_sampleCount);
                 }
             }
@@ -3174,8 +3174,9 @@ public:
 
                 // this is the IL that address belongs to
                 SourceLineInfo srcLine;
+                SymbolEngine* pSymbolEngine = exe.GetSymbolEngine();
 
-                if (exe.GetSymbolEngine()->FindSourceLine(ilOffset, srcLine))
+                if (pSymbolEngine != nullptr && pSymbolEngine->FindSourceLine(ilOffset, srcLine))
                 {
                     if (CLR_HIDDEN_LINE == srcLine.m_line)
                     {
@@ -3261,7 +3262,8 @@ public:
                     if (jncReader.Open(jncFilePath.asCharArray()))
                     {
                         ret = GetClrOffsetFromSymbol(jncReader, *pExecutable, clrSymOffset);
-                        ret = ret && pExecutable->GetSymbolEngine()->FindSourceLine(clrSymOffset, srcLine);
+                        SymbolEngine* pSymbolEngine = pExecutable->GetSymbolEngine();
+                        ret = ret && (pSymbolEngine != nullptr) && pSymbolEngine->FindSourceLine(clrSymOffset, srcLine);
                     }
                 }
             }
@@ -3695,7 +3697,7 @@ public:
 
                 // Get list of Leaf nodes for the given process
                 // For each Leaf node
-                //      get the callstack frames 
+                //      get the callstack frames
                 //      construct the arc details and update node and edge details
 
                 UpdateUnknownCallstackLeafs(pid);
@@ -3832,7 +3834,7 @@ public:
             {
                 // Get list of Leaf nodes for the given process
                 // For each Leaf node
-                //      get the callstack frames 
+                //      get the callstack frames
                 //      construct the arc details and update node and edge details
 
                 UpdateUnknownCallstackLeafs(pid);
@@ -3933,7 +3935,7 @@ public:
         cgFunc.m_functionInfo = node.m_funcInfo;
         cgFunc.m_moduleBaseAddr = node.m_moduleBaseAddr;
         cgFunc.m_pathCount = node.m_pathCount;
-        
+
         cgFunc.m_totalDeepSamples = node.m_totalDeepSamples.m_sampleCount;
         cgFunc.m_totalSelfSamples = node.m_totalSelfSamples.m_sampleCount;
 
@@ -4105,9 +4107,9 @@ public:
         AMDTProfileFunctionInfo unknownFuncInfo;
 
         bool isUnkownFunc = IsUnknownFunctionId(funcId, dbFuncId, unknownFuncInfo);
-        
+
         AMDTUInt32 funcOffset = (isUnkownFunc) ? unknownFuncInfo.m_startOffset : 0;
-        
+
         ret = GetCallGraphPathsForNonLeafFunction(processId, dbFuncId, funcOffset, paths);
 
         ret = GetCallGraphPathsForLeafFunction(processId, dbFuncId, funcOffset, paths);
@@ -4362,7 +4364,7 @@ public:
             ret = HandleUnknownFunction(funcInfo);
         }
 
-        // If it is system module and the user hasn't provide any path for debug-info/symbol-server, 
+        // If it is system module and the user hasn't provide any path for debug-info/symbol-server,
         // then don't continue further
         //if (!ret)
         //{
@@ -4387,11 +4389,15 @@ public:
             {
                 ret = false;
                 SymbolEngine* pSymbolEngine = pExecutable->GetSymbolEngine();
-
                 gtRVAddr funcRvaEnd = GT_INVALID_RVADDR;
-                const FunctionSymbolInfo* pFuncSymbol = pSymbolEngine->LookupFunction(funcInfo.m_startOffset, &funcRvaEnd);
+                const FunctionSymbolInfo* pFuncSymbol = nullptr;
 
-                if (NULL != pFuncSymbol)
+                if (pSymbolEngine != nullptr)
+                {
+                    pFuncSymbol = pSymbolEngine->LookupFunction(funcInfo.m_startOffset, &funcRvaEnd);
+                }
+
+                if (nullptr != pFuncSymbol)
                 {
                     gtUInt32 funcSize = pFuncSymbol->m_size;
 
