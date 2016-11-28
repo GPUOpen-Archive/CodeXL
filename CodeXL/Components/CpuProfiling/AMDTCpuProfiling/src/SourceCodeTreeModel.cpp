@@ -10,7 +10,6 @@
 #include <qtIgnoreCompilerWarnings.h>
 
 // Infra:
-#include <AMDTBaseTools/Include/gtAlgorithms.h>
 #include <AMDTApplicationComponents/Include/acColours.h>
 #include <AMDTApplicationComponents/Include/acFunctions.h>
 #include <AMDTApplicationComponents/Include/acSourceCodeDefinitions.h>
@@ -21,11 +20,6 @@
 #include <AMDTApplicationFramework/Include/afGlobalVariablesManager.h>
 #include <AMDTApplicationFramework/Include/afProgressBarWrapper.h>
 #include <AMDTApplicationFramework/src/afUtils.h>
-
-// Cpu Profile BE:
-#include <AMDTDisassembler/inc/LibDisassembler.h>
-
-#include <AMDTCpuPerfEventUtils/inc/IbsEvents.h>
 
 // Local:
 #include <inc/CPUProfileUtils.h>
@@ -42,6 +36,10 @@ const gtUInt32 SAMPLE_PRECISION = 6;
 // The size of disassembly block to be fetched on first time.
 const unsigned int FIRST_DISASSEMBLY_FETCH_BLOCK_SIZE = 1024;
 
+// Custom colors
+#define TEXT_COLOUR_1  QColor(0,0x32,0xC8)
+#define TEXT_COLOUR_2  QColor(0,0x78,0x20)
+
 void DebugPrintMapToOutput(const OffsetLinenumMap& map)
 {
     gtString mapStr = L"map:\n";
@@ -57,28 +55,8 @@ void DebugPrintMapToOutput(const OffsetLinenumMap& map)
 
 SourceCodeTreeModel::SourceCodeTreeModel(const QString& sessionDir,
                                          std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
-                                         std::shared_ptr<DisplayFilter> displayFilter) : QAbstractItemModel(nullptr),
-    m_pSessionSourceCodeTreeView(nullptr),
-    m_isDisplayingOnlyDasm(false),
-    m_pExecutable(nullptr),
-    m_isLongMode(true),
-    m_pCode(nullptr),
-    m_codeSize(0),
-    m_startLine(1),
-    m_stopLine(0),
-    m_sessionDir(""),
-    m_moduleName(""),
-    m_pid(AMDT_PROFILE_ALL_PROCESSES),
-    m_newPid(AMDT_PROFILE_ALL_PROCESSES),
-    m_tid(AMDT_PROFILE_ALL_THREADS),
-    m_newTid(AMDT_PROFILE_ALL_THREADS),
-    m_pModule(nullptr),
-    m_pDisplayedFunction(nullptr),
-    m_isModuleCached(false),
-    m_moduleTotalSamplesCount(0),
-    m_sessionTotalSamplesCount(0),
-    m_srcFile(""),
-    m_pRootItem(nullptr),
+                                         std::shared_ptr<DisplayFilter> displayFilter) :
+    QAbstractItemModel(nullptr),
     m_pProfDataRdr(pProfDataRdr),
     m_pDisplayFilter(displayFilter)
 {
@@ -90,11 +68,6 @@ SourceCodeTreeModel::SourceCodeTreeModel(const QString& sessionDir,
     m_newAddress = 0;
     m_currentSymbolIterator = m_symbolsInfoList.end();
     m_lastSymIt = m_symbolsInfoList.end();
-    m_isLongMode = true;
-    m_pCode = nullptr;
-    m_codeSize = 0;
-
-    m_isModuleCached = false;
 
     // Create the tree root item:
     m_pRootItem = new SourceViewTreeItem(SOURCE_VIEW_DEFAULT_DEPTH, nullptr);
@@ -109,11 +82,6 @@ SourceCodeTreeModel::SourceCodeTreeModel(const QString& sessionDir,
 
 SourceCodeTreeModel::~SourceCodeTreeModel()
 {
-    if (m_pExecutable != nullptr)
-    {
-        delete m_pExecutable;
-        m_pExecutable = nullptr;
-    }
 }
 
 void SourceCodeTreeModel::Clear()
@@ -142,7 +110,6 @@ int SourceCodeTreeModel::columnCount(const QModelIndex& parent) const
     // Sanity check:
     GT_IF_WITH_ASSERT(m_pProfDataRdr != nullptr)
     {
-        // only raw counters supported
         AMDTProfileCounterDescVec counterDesc;
         m_pProfDataRdr->GetSampledCountersList(counterDesc);
 
@@ -151,7 +118,6 @@ int SourceCodeTreeModel::columnCount(const QModelIndex& parent) const
 
     return retVal;
 }
-
 
 QVariant SourceCodeTreeModel::data(const QModelIndex& index, int role) const
 {
@@ -163,6 +129,7 @@ QVariant SourceCodeTreeModel::data(const QModelIndex& index, int role) const
     if (role == Qt::ForegroundRole)
     {
         SourceViewTreeItem* pItem = getItem(index);
+
         GT_IF_WITH_ASSERT(pItem != nullptr)
         {
             return pItem->forground(index.column());
@@ -182,6 +149,7 @@ QVariant SourceCodeTreeModel::data(const QModelIndex& index, int role) const
         if (role == Qt::DisplayRole)
         {
             SourceViewTreeItem* pItem = getItem(index);
+
             GT_IF_WITH_ASSERT(pItem != nullptr)
             {
                 retVal = pItem->data(index.column()).toString();
@@ -190,6 +158,7 @@ QVariant SourceCodeTreeModel::data(const QModelIndex& index, int role) const
         else if (role == Qt::ToolTipRole)
         {
             SourceViewTreeItem* pItem = getItem(index);
+
             GT_IF_WITH_ASSERT(pItem != nullptr)
             {
                 retVal = pItem->tooltip(index.column()).toString();
@@ -256,7 +225,6 @@ QVariant SourceCodeTreeModel::headerData(int section, Qt::Orientation orientatio
     }
 
     return QVariant();
-
 }
 
 QModelIndex SourceCodeTreeModel::index(int row, int column, const QModelIndex& parent) const
@@ -272,7 +240,7 @@ QModelIndex SourceCodeTreeModel::index(int row, int column, const QModelIndex& p
     {
         SourceViewTreeItem* pChildItem = pParentItem->child(row);
 
-        if (pChildItem)
+        if (pChildItem != nullptr)
         {
             return createIndex(row, column, pChildItem);
         }
@@ -283,7 +251,6 @@ QModelIndex SourceCodeTreeModel::index(int row, int column, const QModelIndex& p
     }
 
     return QModelIndex();
-
 }
 
 bool SourceCodeTreeModel::insertColumns(int position, int columns, const QModelIndex& parent)
@@ -300,8 +267,8 @@ bool SourceCodeTreeModel::insertColumns(int position, int columns, const QModelI
 bool SourceCodeTreeModel::insertRows(int position, int rows, const QModelIndex& parent)
 {
     bool retVal = false;
-
     SourceViewTreeItem* pParentItem = getItem(parent);
+
     GT_IF_WITH_ASSERT(pParentItem != nullptr)
     {
         beginInsertRows(parent, position, position + rows - 1);
@@ -319,12 +286,13 @@ QModelIndex SourceCodeTreeModel::parent(const QModelIndex& index) const
         return QModelIndex();
     }
 
-    SourceViewTreeItem* pChildItem = getItem(index);
-    GT_IF_WITH_ASSERT(pChildItem != nullptr)
-    {
-        SourceViewTreeItem* pParentItem = pChildItem->parent();
+    SourceViewTreeItem* pItem = getItem(index);
 
-        if (pParentItem == m_pRootItem)
+    GT_IF_WITH_ASSERT(pItem != nullptr)
+    {
+        SourceViewTreeItem* pParentItem = pItem->parent();
+
+        if (pParentItem == nullptr) // || pParentItem == m_pRootItem)
         {
             return QModelIndex();
         }
@@ -361,6 +329,7 @@ bool SourceCodeTreeModel::removeRows(int position, int rows, const QModelIndex& 
 {
     SourceViewTreeItem* pParentItem = getItem(parent);
     bool retVal = false;
+
     GT_IF_WITH_ASSERT(pParentItem != nullptr)
     {
         retVal = true;
@@ -416,8 +385,8 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
     gtVector<AMDTProfileCounterDesc> counterDesc;
     gtString srcFilePath;
     AMDTSourceAndDisasmInfoVec srcInfoVec;
-
     AMDTProfileFunctionData  functionData;
+
     int retVal = m_pProfDataRdr->GetFunctionDetailedProfileData(m_funcId,
                                                                 m_pid,
                                                                 m_tid,
@@ -432,7 +401,7 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
 
     for (const auto& srcData : functionData.m_srcLineDataList)
     {
-        bool samplePercentSet = m_pDisplayFilter->GetSamplePercent();
+        bool isSamplePercentSet = m_pDisplayFilter->GetSamplePercent();
         gtVector<InstOffsetSize> instOffsetVec;
 
         GetInstOffsets(srcData.m_sourceLineNumber, srcInfoVec, instOffsetVec);
@@ -441,9 +410,7 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
 
         for (auto& instOffset : instOffsetVec)
         {
-            SourceViewTreeItem* pAsmItem = new SourceViewTreeItem(SOURCE_VIEW_ASM_DEPTH,
-                                                                  m_pRootItem);
-
+            SourceViewTreeItem* pAsmItem = new SourceViewTreeItem(SOURCE_VIEW_ASM_DEPTH, m_pRootItem);
             gtString disasm;
             gtString codeByte;
 
@@ -452,23 +419,23 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
             GetDisasmSampleValue(instOffset, functionData.m_instDataList, sampleValue);
 
             idx = SOURCE_VIEW_SAMPLES_PERCENT_COLUMN + 1;
-            bool flag = true;
+            bool isFirst = true;
 
             for (auto& aSampleValue : sampleValue)
             {
-                if (true == flag)
+                if (isFirst)
                 {
                     QVariant var;
+
                     SetDisplayFormat(aSampleValue.m_sampleCount, false, var, SAMPLE_PRECISION);
                     pAsmItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, var);
-
                     pAsmItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, aSampleValue.m_sampleCountPercentage);
                     pAsmItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
 
-                    flag = false;
+                    isFirst = false;
                 }
 
-                if (false == samplePercentSet)
+                if (!isSamplePercentSet)
                 {
                     QVariant var;
                     SetDisplayFormat(aSampleValue.m_sampleCount, false, var, SAMPLE_PRECISION);
@@ -488,11 +455,10 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
             pAsmItem->setForeground(SOURCE_VIEW_ADDRESS_COLUMN, acQGREY_TEXT_COLOUR);
 
             pAsmItem->setData(SOURCE_VIEW_SOURCE_COLUMN, acGTStringToQString(disasm));
-            pAsmItem->setForeground(SOURCE_VIEW_SOURCE_COLUMN, acQGREY_TEXT_COLOUR);
+            pAsmItem->setForeground(SOURCE_VIEW_SOURCE_COLUMN, TEXT_COLOUR_1);
 
             pAsmItem->setData(SOURCE_VIEW_CODE_BYTES_COLUMN, acGTStringToQString(codeByte));
-            pAsmItem->setForeground(SOURCE_VIEW_CODE_BYTES_COLUMN, acQGREY_TEXT_COLOUR);
-
+            pAsmItem->setForeground(SOURCE_VIEW_CODE_BYTES_COLUMN, TEXT_COLOUR_2);
         }
     }
 
@@ -503,6 +469,7 @@ void SourceCodeTreeModel::GetInstOffsets(gtUInt16 srcLine,
                                          const AMDTSourceAndDisasmInfoVec& srcInfoVec,
                                          gtVector<InstOffsetSize>& instOffsetVec)
 {
+    // FIXME: This is a linear search till end of vector always. Can this be improved?
     for (auto& srcInfo : srcInfoVec)
     {
         if (srcInfo.m_sourceLine == srcLine)
@@ -514,14 +481,13 @@ void SourceCodeTreeModel::GetInstOffsets(gtUInt16 srcLine,
             instOffsetVec.emplace_back(instOffset);
         }
     }
-
-    return;
 }
 
 void SourceCodeTreeModel::GetDisasmString(gtVAddr offset,
                                           const AMDTSourceAndDisasmInfoVec& srcInfoVec,
                                           gtString& disasm, gtString& codeByte)
 {
+    // FIXME: This is a linear search. Can this be improved?
     auto instData = std::find_if(srcInfoVec.begin(), srcInfoVec.end(),
     [&offset](AMDTSourceAndDisasmInfo const & srcInfo) { return srcInfo.m_offset == offset; });
 
@@ -530,8 +496,11 @@ void SourceCodeTreeModel::GetDisasmString(gtVAddr offset,
         disasm = instData->m_disasmStr;
         codeByte = instData->m_codeByteStr;
     }
-
-    return;
+    else
+    {
+        disasm.makeEmpty();
+        codeByte.makeEmpty();
+    }
 }
 
 void SourceCodeTreeModel::GetDisasmSampleValue(const InstOffsetSize& instInfo,
@@ -564,8 +533,6 @@ void SourceCodeTreeModel::GetDisasmSampleValue(const InstOffsetSize& instInfo,
                                 [&instInfo](AMDTProfileInstructionData const & data)
         { return ((data.m_offset >= instInfo.m_offset) && (data.m_offset < (instInfo.m_offset + instInfo.m_size))); });
     }
-
-    return;
 }
 
 void SourceCodeTreeModel::PrintFunctionDetailData(const AMDTProfileFunctionData& data,
@@ -583,12 +550,11 @@ void SourceCodeTreeModel::PrintFunctionDetailData(const AMDTProfileFunctionData&
     m_srcLineDataVec = data.m_srcLineDataList;
 
     // set the address for first line of a function
-    bool flag = true;
+    bool isFirstLine = true;
 
     for (const auto& srcData : data.m_srcLineDataList)
     {
-        // error check: validating file contains the requested
-        // line number.
+        // error check: validating file contains the requested line number.
         if (srcLineViewTreeMap.size() < srcData.m_sourceLineNumber - 1)
         {
             return;
@@ -598,10 +564,10 @@ void SourceCodeTreeModel::PrintFunctionDetailData(const AMDTProfileFunctionData&
             pLineItem = srcLineViewTreeMap.at(srcData.m_sourceLineNumber - 1);
         }
 
-        if (true == flag)
+        if (true == isFirstLine)
         {
             m_funcFirstSrcLine = srcData.m_sourceLineNumber;
-            flag = false;
+            isFirstLine = false;
         }
 
         m_sampleSrcLnViewTreeList.push_back(std::make_pair(srcData, pLineItem));
@@ -623,10 +589,9 @@ void SourceCodeTreeModel::PrintFunctionDetailData(const AMDTProfileFunctionData&
         QVariant var;
         SetDisplayFormat(sampleValue, false, var, SAMPLE_PRECISION);
         pLineItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, var);
-
         pLineItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, sampleValuePer);
-
         pLineItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
+
         int idx = SOURCE_VIEW_SAMPLES_PERCENT_COLUMN + 1;
 
         for (const auto& sample : srcData.m_sampleValues)
@@ -647,7 +612,6 @@ void SourceCodeTreeModel::PrintFunctionDetailData(const AMDTProfileFunctionData&
             idx++;
         }
 
-
         for (auto& instOffset : instOffsetVec)
         {
             SourceViewTreeItem* pAsmItem = new SourceViewTreeItem(SOURCE_VIEW_ASM_DEPTH,
@@ -655,8 +619,8 @@ void SourceCodeTreeModel::PrintFunctionDetailData(const AMDTProfileFunctionData&
 
             gtString disasm;
             gtString codeByte;
-
             GetDisasmString(instOffset.m_offset, srcInfoVec, disasm, codeByte);
+
             AMDTSampleValueVec sampleValue;
             GetDisasmSampleValue(instOffset, data.m_instDataList, sampleValue);
 
@@ -669,10 +633,9 @@ void SourceCodeTreeModel::PrintFunctionDetailData(const AMDTProfileFunctionData&
                 QVariant var;
                 SetDisplayFormat(sampleCount, false, var, SAMPLE_PRECISION);
                 pAsmItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, var);
-
                 pAsmItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, sampleCountPer);
-
                 pAsmItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
+
                 idx = SOURCE_VIEW_SAMPLES_PERCENT_COLUMN + 1;
 
                 for (auto& aSampleValue : sampleValue)
@@ -704,17 +667,17 @@ void SourceCodeTreeModel::PrintFunctionDetailData(const AMDTProfileFunctionData&
             pAsmItem->setForeground(SOURCE_VIEW_ADDRESS_COLUMN, acQGREY_TEXT_COLOUR);
 
             pAsmItem->setData(SOURCE_VIEW_SOURCE_COLUMN, acGTStringToQString(disasm));
-            pAsmItem->setForeground(SOURCE_VIEW_SOURCE_COLUMN, acQGREY_TEXT_COLOUR);
+            pAsmItem->setForeground(SOURCE_VIEW_SOURCE_COLUMN, TEXT_COLOUR_1);
 
             pAsmItem->setData(SOURCE_VIEW_CODE_BYTES_COLUMN, acGTStringToQString(codeByte));
-            pAsmItem->setForeground(SOURCE_VIEW_CODE_BYTES_COLUMN, acQGREY_TEXT_COLOUR);
+            pAsmItem->setForeground(SOURCE_VIEW_CODE_BYTES_COLUMN, TEXT_COLOUR_2);
         }
-
     }
 }
 
 void SourceCodeTreeModel::BuildTree(const std::vector<SourceViewTreeItem*>& srcLineViewTreeMap)
 {
+    // FIXME: we are not using counterDesc. Can we avoid this?
     gtVector<AMDTProfileCounterDesc> counterDesc;
     bool ret = m_pProfDataRdr->GetSampledCountersList(counterDesc);
 
@@ -746,7 +709,6 @@ bool SourceCodeTreeModel::BuildSourceAndDASMTree()
     BuildSourceLinesTree(m_srcLineViewTreeMap);
     BuildTree(m_srcLineViewTreeMap);
     return true;
-
 }
 
 bool SourceCodeTreeModel::UpdateHeaders()
@@ -780,15 +742,14 @@ bool SourceCodeTreeModel::UpdateHeaders()
 
         for (const auto& counter : counterDesc)
         {
-            m_headerCaptions << acGTStringToQString(std::get<1>(counter));
-
-            QString currentCaption = acGTStringToQString(std::get<1>(counter));
             QString currentFullName = acGTStringToQString(std::get<0>(counter));
+            QString currentCaption = acGTStringToQString(std::get<1>(counter));
             QString currentDescription = acGTStringToQString(std::get<2>(counter));
 
             QString tooltip;
             acBuildFormattedTooltip(currentFullName, currentDescription, tooltip);
 
+            m_headerCaptions << acGTStringToQString(std::get<1>(counter));
             m_headerTooltips << tooltip;
         }
 
@@ -822,7 +783,6 @@ void SourceCodeTreeModel::UpdateModel()
     endResetModel();
 }
 
-
 int SourceCodeTreeModel::indexOfTopLevelItem(SourceViewTreeItem* pItem)
 {
     int retVal = -1;
@@ -832,6 +792,7 @@ int SourceCodeTreeModel::indexOfTopLevelItem(SourceViewTreeItem* pItem)
     {
         retVal = m_pRootItem->indexOfChild(pItem);
     }
+
     return retVal;
 }
 
@@ -844,6 +805,7 @@ SourceViewTreeItem* SourceCodeTreeModel::topLevelItem(int index)
     {
         pRetVal = m_pRootItem->child(index);
     }
+
     return pRetVal;
 }
 
@@ -860,25 +822,6 @@ bool SourceCodeTreeModel::SetupSourceInfo()
     }
 
     return ret;
-}
-
-bool SourceCodeTreeModel::IsSourceLineMapped(const SourceLineKey& sourceLineKey)
-{
-    bool retVal = false;
-
-    SourceLineToDataMap::iterator mappedSourceLinesIter = m_sourceLinesData.begin();
-    SourceLineToDataMap::iterator mappedSourceLinesIterEnd = m_sourceLinesData.begin();
-
-    for (; mappedSourceLinesIter != mappedSourceLinesIterEnd; mappedSourceLinesIter++)
-    {
-        if (mappedSourceLinesIter->first == sourceLineKey)
-        {
-            retVal = true;
-            break;
-        }
-    }
-
-    return retVal;
 }
 
 void SourceCodeTreeModel::BuildSourceLinesTree(std::vector<SourceViewTreeItem*>& srcLineViewTreeMap)
@@ -907,7 +850,6 @@ void SourceCodeTreeModel::BuildSourceLinesTree(std::vector<SourceViewTreeItem*>&
         srcLineViewTreeMap.push_back(pLineItem);
     }
 }
-
 
 bool SourceCodeTreeModel::SetSourceLines(const QString& filePath, unsigned int startLine, unsigned int stopLine)
 {
@@ -947,7 +889,7 @@ QModelIndex SourceCodeTreeModel::indexOfItem(SourceViewTreeItem* pItem)
     return createIndex(m_funcFirstSrcLine - 1, 0, pItem);
 }
 
-void SourceCodeTreeModel::SetDisplayFormat(double  val, bool appendPercent, QVariant& data, const int precision)
+void SourceCodeTreeModel::SetDisplayFormat(double val, bool appendPercent, QVariant& data, const int precision)
 {
     if (val > 0)
     {
@@ -961,7 +903,7 @@ void SourceCodeTreeModel::SetDisplayFormat(double  val, bool appendPercent, QVar
     }
     else if (val == 0)
     {
-        QString emptyStr = "";
+        QString emptyStr;
         data = QVariant(emptyStr);
     }
 }
@@ -973,7 +915,6 @@ SourceViewTreeItem* SourceCodeTreeModel::AddDoubleClickItem(SourceViewTreeItem* 
     GT_IF_WITH_ASSERT(pAsmItem != nullptr)
     {
         pRetVal = new SourceViewTreeItem(SOURCE_VIEW_ASM_DEPTH, pAsmItem);
-
 
         int currentDasmLineNumber = pAsmItem->childCount() - 1;
 
@@ -988,6 +929,7 @@ SourceViewTreeItem* SourceCodeTreeModel::AddDoubleClickItem(SourceViewTreeItem* 
         pRetVal->setTooltip(SOURCE_VIEW_SOURCE_COLUMN, tooltipData);
         pRetVal->setForeground(SOURCE_VIEW_SOURCE_COLUMN, acRED_NUMBER_COLOUR);
     }
+
     return pRetVal;
 }
 
@@ -1000,29 +942,26 @@ bool SourceCodeTreeModel::GetItemTopLevelIndex(const QModelIndex& index, int& in
     // Get the item for this index:
     SourceViewTreeItem* pItem = getItem(index);
 
-    if (pItem != nullptr)
+    if ((pItem != nullptr) && (m_pRootItem != nullptr))
     {
-        if ((pItem != nullptr) && (m_pRootItem != nullptr))
+        // Check if this is a top level item:
+        int topLevelIndex = m_pRootItem->indexOfChild(pItem);
+
+        if (topLevelIndex >= 0)
         {
-            // Check if this is a top level item:
-            int topLevelIndex = m_pRootItem->indexOfChild(pItem);
+            indexOfTopLevelItem = topLevelIndex;
+            retVal = true;
+        }
+        else
+        {
+            // Should be a child of a top level item:
+            topLevelIndex = m_pRootItem->indexOfChild(pItem->parent());
 
             if (topLevelIndex >= 0)
             {
                 indexOfTopLevelItem = topLevelIndex;
+                indexOfTopLevelItemChild = pItem->parent()->indexOfChild(pItem);
                 retVal = true;
-            }
-            else
-            {
-                // Should be a child of a top level item:
-                topLevelIndex = m_pRootItem->indexOfChild(pItem->parent());
-
-                if (topLevelIndex >= 0)
-                {
-                    indexOfTopLevelItem = topLevelIndex;
-                    indexOfTopLevelItemChild = pItem->parent()->indexOfChild(pItem);
-                    retVal = true;
-                }
             }
         }
     }
@@ -1048,18 +987,16 @@ void SourceCodeTreeModel::SetModuleDetails(AMDTUInt32 moduleId, AMDTUInt32 proce
     {
         AMDTProfileModuleInfoVec modInfo;
 
-        // Baskar: FIXME what to do if the moduleId is ALL_MODULES?
+        // FIXME: what to do if the moduleId is ALL_MODULES?
         bool ret = m_pProfDataRdr->GetModuleInfo(processId, moduleId, modInfo);
 
-        if (true == ret)
+        if (ret)
         {
-            for (const auto& module : modInfo)
+            if (modInfo.size() > 0)
             {
-                // Fill in the details from the CpuProfileModule class:
-                m_modType = module.m_type;
-                //TODO: setting to 0 for now
-                m_moduleTotalSamplesCount = 0;
-                m_moduleName = acGTStringToQString(module.m_path);
+                // Fill in the details from the CpuProfileModule class
+                m_modType = modInfo[0].m_type;
+                m_moduleName = acGTStringToQString(modInfo[0].m_path);
             }
         }
     }
@@ -1089,13 +1026,12 @@ void SourceCodeTreeModel::SetHotSpotsrcLnSamples(AMDTUInt32 counterId,
                 QVariant var;
                 SetDisplayFormat(counter.m_sampleCount, false, var, SAMPLE_PRECISION);
                 pLineItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, var);
-
                 pLineItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, sampleValuePer);
                 pLineItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
 
                 int idx = 0;
 
-                for (auto& instOffset : instOffsetVec)
+                for (const auto& instOffset : instOffsetVec)
                 {
                     SourceViewTreeItem* pAsmItem = pLineItem->child(idx++);
 
@@ -1103,14 +1039,14 @@ void SourceCodeTreeModel::SetHotSpotsrcLnSamples(AMDTUInt32 counterId,
                     {
                         gtString disasm;
                         gtString codeByte;
-
                         GetDisasmString(instOffset.m_offset, srcInfoVec, disasm, codeByte);
+
                         AMDTSampleValueVec sampleValue;
                         GetDisasmSampleValue(instOffset, functionData.m_instDataList, sampleValue);
 
                         if (!sampleValue.empty())
                         {
-                            for (const auto sample : sampleValue)
+                            for (const auto& sample : sampleValue)
                             {
                                 if (sample.m_counterId == counterId)
                                 {
@@ -1120,7 +1056,6 @@ void SourceCodeTreeModel::SetHotSpotsrcLnSamples(AMDTUInt32 counterId,
                                     QVariant var;
                                     SetDisplayFormat(sampleCount, false, var, SAMPLE_PRECISION);
                                     pAsmItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, var);
-
                                     pAsmItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, sampleCountPer);
                                     pAsmItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
                                 }
@@ -1128,7 +1063,6 @@ void SourceCodeTreeModel::SetHotSpotsrcLnSamples(AMDTUInt32 counterId,
                         }
                     }
                 }
-
             }
         }
     }
@@ -1146,16 +1080,16 @@ void SourceCodeTreeModel::SetHotSpotDisamOnlySamples(AMDTUInt32 counterId,
         gtVector<InstOffsetSize> instOffsetVec;
         GetInstOffsets(srcData.m_sourceLineNumber, srcInfoVec, instOffsetVec);
 
-        for (auto& instOffset : instOffsetVec)
+        for (const auto& instOffset : instOffsetVec)
         {
             gtString disasm;
             gtString codeByte;
-
             GetDisasmString(instOffset.m_offset, srcInfoVec, disasm, codeByte);
+
             AMDTSampleValueVec sampleValue;
             GetDisasmSampleValue(instOffset, functionData.m_instDataList, sampleValue);
 
-            for (auto& aSampleValue : sampleValue)
+            for (const auto& aSampleValue : sampleValue)
             {
                 if (counterId == aSampleValue.m_counterId)
                 {
@@ -1164,7 +1098,6 @@ void SourceCodeTreeModel::SetHotSpotDisamOnlySamples(AMDTUInt32 counterId,
                     QVariant var;
                     SetDisplayFormat(aSampleValue.m_sampleCount, false, var, SAMPLE_PRECISION);
                     pAsmItem->setData(SOURCE_VIEW_SAMPLES_COLUMN, var);
-
                     pAsmItem->setData(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, aSampleValue.m_sampleCountPercentage);
                     pAsmItem->setForeground(SOURCE_VIEW_SAMPLES_PERCENT_COLUMN, acRED_NUMBER_COLOUR);
                 }
@@ -1174,7 +1107,6 @@ void SourceCodeTreeModel::SetHotSpotDisamOnlySamples(AMDTUInt32 counterId,
         }
     }
 }
-
 
 void SourceCodeTreeModel::SetHotSpotSamples(AMDTUInt32 counterId)
 {
@@ -1193,10 +1125,7 @@ void SourceCodeTreeModel::SetHotSpotSamples(AMDTUInt32 counterId)
             AMDTSourceAndDisasmInfoVec srcInfoVec;
             gtString srcFilePath;
 
-            if (retVal != static_cast<int>(CXL_DATAACCESS_ERROR_DASM_INFO_NOTAVAILABLE))
-            {
-                retVal = m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_funcId, srcFilePath, srcInfoVec);
-            }
+            m_pProfDataRdr->GetFunctionSourceAndDisasmInfo(m_funcId, srcFilePath, srcInfoVec);
 
             if (m_sampleSrcLnViewTreeList.empty())
             {
@@ -1206,7 +1135,6 @@ void SourceCodeTreeModel::SetHotSpotSamples(AMDTUInt32 counterId)
             {
                 SetHotSpotsrcLnSamples(counterId, functionData, srcInfoVec);
             }
-
         }
     }
 }

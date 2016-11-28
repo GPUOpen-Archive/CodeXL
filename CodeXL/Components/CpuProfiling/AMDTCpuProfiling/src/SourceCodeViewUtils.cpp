@@ -8,10 +8,9 @@
 
 /// Local:
 #include <inc/SourceCodeViewUtils.h>
-#include <inc/StdAfx.h>
 
-SourceLineKey::SourceLineKey(int lineNumber) :
-    m_fileName(""), m_lineNumber(lineNumber), m_functionName(""), m_functionStartAddress(0)
+
+SourceLineKey::SourceLineKey(int lineNumber) : m_lineNumber(lineNumber)
 {
 }
 
@@ -84,12 +83,6 @@ bool SourceLineKey::operator==(const SourceLineKey& other) const
 
 SourceLineAsmInfo::SourceLineAsmInfo(int lineNumber, int asmLineNumber) : m_sourceLineNumber(lineNumber), m_asmLineNumber(asmLineNumber)
 {
-
-}
-
-SourceLineAsmInfo::SourceLineAsmInfo() : m_sourceLineNumber(-1), m_asmLineNumber(-1)
-{
-
 }
 
 bool SourceLineAsmInfo::operator<(const SourceLineAsmInfo& other) const
@@ -132,14 +125,8 @@ bool SourceLineAsmInfo::operator==(const SourceLineAsmInfo& other) const
     return true;
 }
 
-UiFunctionSymbolInfo::UiFunctionSymbolInfo() : m_va(GT_INVALID_VADDR), m_size(0), m_name(CA_NO_SYMBOL)
-{
-}
-
 UiFunctionSymbolInfo::UiFunctionSymbolInfo(const FunctionSymbolInfo& exeSym, gtVAddr baseVAddr) : m_size(exeSym.m_size),
-    m_name(nullptr != exeSym.m_pName ?
-           QString::fromWCharArray(exeSym.m_pName) :
-           CA_NO_SYMBOL)
+    m_name(nullptr != exeSym.m_pName ? QString::fromWCharArray(exeSym.m_pName) : CA_NO_SYMBOL)
 {
     m_va = baseVAddr + static_cast<gtVAddr>(exeSym.m_rva);
 }
@@ -151,7 +138,13 @@ bool UiFunctionSymbolInfo::operator<(const UiFunctionSymbolInfo& other) const
 
 bool UiFunctionSymbolInfo::operator==(const UiFunctionSymbolInfo& other) const
 {
-    return m_va  == other.m_va && m_size == other.m_size && m_name == other.m_name;
+    return m_va == other.m_va && m_size == other.m_size && m_name == other.m_name;
+}
+
+SourceCodeTreeView::SourceCodeTreeView(SessionSourceCodeView* pSourceCodeView, QAbstractItemModel* pModel, int frozenColumn) :
+    acFrozenColumnTreeView(nullptr, pModel, frozenColumn), m_pSourceCodeView(pSourceCodeView)
+{
+    setModel(pModel);
 }
 
 void SourceCodeTreeView::FixColumnSizes()
@@ -173,13 +166,6 @@ void SourceCodeTreeView::FixColumnSizes()
 
     // Calculate the width for the source code column:
     setColumnWidth(SOURCE_VIEW_SOURCE_COLUMN, sourceColWidth);
-}
-
-SourceCodeTreeView::SourceCodeTreeView(SessionSourceCodeView* pSourceCodeView, QAbstractItemModel* pModel, int frozenColumn) :
-    acFrozenColumnTreeView(nullptr, pModel, frozenColumn), m_pSourceCodeView(pSourceCodeView)
-{
-    // Set my model:
-    setModel(pModel);
 }
 
 void SourceCodeTreeView::Repaint()

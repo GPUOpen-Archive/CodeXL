@@ -9,20 +9,12 @@
 #ifndef __SESSIONSOURCECODEVIEW_H
 #define __SESSIONSOURCECODEVIEW_H
 
-#include <list>
-#include <assert.h>
-#include <math.h>
-
 // Qt:
 #include <QtWidgets>
 #include <QtCore>
 #include <QItemDelegate>
 #include <QLabel>
 #include <QTextEdit>
-
-// Infra:
-#include <AMDTBaseTools/Include/gtAssert.h>
-#include <AMDTExecutableFormat/inc/ExecutableFile.h>
 
 #include <inc/DataTab.h>
 #include <inc/SourceViewTreeItem.h>
@@ -33,6 +25,7 @@
 
 class acTreeItemDeletate;
 class SourceCodeTreeModel;
+
 /// -----------------------------------------------------------------------------------------------
 /// \class Name: SessionSourceCodeView : public DataTab
 /// \brief Description: Is used to display source code for cpu profile sessions
@@ -42,12 +35,12 @@ class SessionSourceCodeView : public DataTab
     Q_OBJECT
 
 public:
-
     SessionSourceCodeView(QWidget* pParent, CpuSessionWindow* pSessionWindow, const QString& sessionDir);
     virtual ~SessionSourceCodeView();
 
     //bool DisplayModule(const CpuProfileModule* pModDetail);
     bool DisplayViewModule(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> funcModInfo);
+
     /// Add a source code item to the CodeXL explorer. This function is called when the source view is opened for
     /// a requested module
     void AddSourceCodeItemToExplorer();
@@ -61,7 +54,6 @@ public:
 
     virtual void applyUserDisplayInformation();
 
-
     void RefreshView();
 
 public slots:
@@ -73,7 +65,6 @@ public slots:
     virtual void onFindNext();
 
 protected slots:
-
     void OnFunctionsComboChange(int fnIndex);
     void OnPIDComboChange(int index);
     void OnTIDComboChange(int index);
@@ -92,16 +83,11 @@ protected slots:
     void OnItemSelectChanged(const QModelIndex& current, const QModelIndex& previous);
 
 protected:
-
     // Overrides.
     virtual void keyPressEvent(QKeyEvent* pKeyEvent);
-
     bool CreateViewLayout();
-
     bool InitSourceCodeTreeView();
-
     void SetItemsDelegate();
-
     void ExtendTreeContextMenu();
     void CreateTopLayout();
     bool FillHotspotIndicatorCombo();
@@ -112,34 +98,24 @@ private:
     void CreateFunctionsComboBox();
     void CreatePidTidComboBoxes();
     void CreateDisplayFilterLinkLabel();
-
     void CreateHotSpotIndicatorComboBox();
-
     bool IsAddressInCurrentFunction(gtVAddr addr);
-
-    //bool ReadPE();
-
     bool UpdateDisplay();
-
     void UpdateColumnWidths();
-
     void UpdatePercentDelegate();
-
     bool CreateModelData();
-
     void UpdateWithNewSymbol();
 
     // Code cache stuff
     bool CacheSourceLinesFromFile();
 
     QString FindSourceFile(QString fileName);
-
     void HideFilteredColumns();
 
     /// Select the requested tree item in the tree. Select and ensure visible the matching item in the table
     void SetTreeSelection(SourceViewTreeItem* pItemToSelect);
-protected:
 
+protected:
     // GUI Elements:
     QWidget* m_pWidget = nullptr;
     QVBoxLayout* m_pMainVBoxLayout = nullptr;
@@ -176,8 +152,6 @@ protected:
     std::vector<AMDTUInt32> m_functionIdVec;
     gtString m_srcFilePath;
     std::vector<gtString> m_supportedCounterList;
-
 };
-
 
 #endif //__SESSIONSOURCECODEVIEW_H

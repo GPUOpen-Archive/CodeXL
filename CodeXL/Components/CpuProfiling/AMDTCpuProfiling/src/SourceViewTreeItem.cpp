@@ -17,23 +17,15 @@
 #include <QtWidgets>
 
 // Infra:
-#include <AMDTBaseTools/Include/gtAlgorithms.h>
-#include <AMDTOSWrappers/Include/osDebuggingFunctions.h>
+#include <AMDTBaseTools/Include/gtAssert.h>
 
 // Local:
 #include <inc/SourceViewTreeItem.h>
-#include <inc/DisplayFilter.h>
 
 SourceViewTreeItem::SourceViewTreeItem(SOURCE_TREE_ITEM_DEPTH dep, SourceViewTreeItem* pParentItem) :
-    m_depth(dep),
     m_pParentItem(pParentItem)
 {
-#ifdef CLU_TAB
-    m_pCLUData = nullptr;
-#endif
-    clear();
-    m_depth = dep;
-    m_total = 0;
+    (void)dep; //unused
 
     if (pParentItem != nullptr)
     {
@@ -41,30 +33,19 @@ SourceViewTreeItem::SourceViewTreeItem(SOURCE_TREE_ITEM_DEPTH dep, SourceViewTre
     }
 }
 
-SourceViewTreeItem::SourceViewTreeItem(const QVector<QVariant>& data, SourceViewTreeItem* pParent)
+SourceViewTreeItem::SourceViewTreeItem(const QVector<QVariant>& data, SourceViewTreeItem* pParentItem) :
+    m_itemData(data),
+    m_pParentItem(pParentItem)
 {
-    m_itemData = data;
-    m_pParentItem = pParent;
 }
 
 SourceViewTreeItem::~SourceViewTreeItem()
 {
-#ifdef CLU_TAB
-
-    if (nullptr != m_pCLUData)
-    {
-        delete m_pCLUData;
-    }
-
-    m_pCLUData = nullptr;
-#endif
+    clear();
 }
-
 
 void SourceViewTreeItem::clear()
 {
-    m_depth = SOURCE_VIEW_DEFAULT_DEPTH;
-    m_asmLength = 0;
 #ifdef CLU_TAB
 
     if (nullptr != m_pCLUData)
@@ -86,25 +67,6 @@ SourceViewTreeItem* SourceViewTreeItem::child(int index)
     }
 
     return pRetVal;
-}
-
-int SourceViewTreeItem::childIndex() const
-{
-    int retVal = -1;
-
-    if (m_pParentItem != nullptr)
-    {
-        for (int i = 0 ; i < (int)m_childItems.size(); i++)
-        {
-            if (m_childItems[i] == this)
-            {
-                retVal = i;
-                break;
-            }
-        }
-    }
-
-    return retVal;
 }
 
 int SourceViewTreeItem::columnCount() const
@@ -133,7 +95,6 @@ bool SourceViewTreeItem::appendChild(SourceViewTreeItem* pChild)
     return retVal;
 }
 
-
 bool SourceViewTreeItem::insertChild(int position, SourceViewTreeItem* pChild)
 {
     bool retVal = false;
@@ -144,7 +105,6 @@ bool SourceViewTreeItem::insertChild(int position, SourceViewTreeItem* pChild)
     }
     return retVal;
 }
-
 
 bool SourceViewTreeItem::insertChildren(int position, int count, int columns)
 {
@@ -160,7 +120,6 @@ bool SourceViewTreeItem::insertChildren(int position, int count, int columns)
         {
             QVector<QVariant> data(columns);
             SourceViewTreeItem* pItem = new SourceViewTreeItem(data, this);
-
 
             // Insert the new child:
             m_childItems.insert(position, pItem);
@@ -188,6 +147,7 @@ bool SourceViewTreeItem::insertColumns(int position, int columns)
         for (int i = 0 ; i < (int)m_childItems.size(); i++)
         {
             SourceViewTreeItem* pChild = m_childItems[i];
+
             GT_IF_WITH_ASSERT(pChild != nullptr)
             {
                 pChild->insertColumns(position, columns);
@@ -206,6 +166,7 @@ SourceViewTreeItem* SourceViewTreeItem::parent()
 bool SourceViewTreeItem::removeChildren(int position, int count)
 {
     bool retVal = false;
+
     GT_IF_WITH_ASSERT((position >= 0) && ((position + count - 1) < (int)m_childItems.size()))
     {
         for (int row = position + count - 1; row >= position; row--)
@@ -218,7 +179,6 @@ bool SourceViewTreeItem::removeChildren(int position, int count)
     }
 
     return retVal;
-
 }
 
 bool SourceViewTreeItem::removeColumns(int position, int columns)
@@ -261,7 +221,6 @@ bool SourceViewTreeItem::setData(int column, const QVariant& value)
     }
 
     return retVal;
-
 }
 
 bool SourceViewTreeItem::setTooltip(int column, const QVariant& value)
@@ -280,7 +239,6 @@ bool SourceViewTreeItem::setTooltip(int column, const QVariant& value)
     }
 
     return retVal;
-
 }
 
 bool SourceViewTreeItem::setForeground(int column, const QColor& color)
@@ -306,7 +264,6 @@ bool SourceViewTreeItem::setForeground(int column, const QColor& color)
 int SourceViewTreeItem::indexOfChild(SourceViewTreeItem* pItem)
 {
     int retVal = m_childItems.indexOf(pItem);
-
     return retVal;
 }
 
@@ -323,6 +280,7 @@ QColor SourceViewTreeItem::forground(int column) const
 }
 
 #if AMDT_BUILD_CONFIGURATION == AMDT_DEBUG_BUILD
+#include <AMDTOSWrappers/Include/osDebuggingFunctions.h>
 
 void SourceViewTreeItem::DebugPrintChildrenList()
 {
@@ -343,7 +301,6 @@ void SourceViewTreeItem::DebugPrintChildrenList()
             {
                 outputStr.appendFormattedString(L"Child %d: %ls\n", i, pChild->data(SOURCE_VIEW_ADDRESS_COLUMN).toString().toStdWString().c_str());
             }
-
         }
     }
 
@@ -367,8 +324,6 @@ void SourceViewTreeItem::DebugPrintChildrenList()
     }
 
     osOutputDebugString(outputStr);
-
 }
 
 #endif
-

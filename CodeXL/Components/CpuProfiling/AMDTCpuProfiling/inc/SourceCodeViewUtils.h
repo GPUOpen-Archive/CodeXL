@@ -19,87 +19,68 @@
 #include <AMDTApplicationComponents/Include/acFrozenColumnTreeView.h>
 #include <AMDTExecutableFormat/inc/SymbolEngine.h>
 
-// CPU Profile BE:
-#include <ProfilingAgents/Utils/ExecutableReader.h>
-
 // Local:
 #include <inc/SourceViewTreeItem.h>
-
-class SourceChartSample
-{
-public:
-    gtVAddr m_firstAddress;
-    gtVector<float> m_samples;
-    QString m_functionName;
-};
-
-
-typedef QMap < gtVAddr, SourceChartSample> SourceChartSampMap;
+#include <inc/StdAfx.h>
 
 class SourceLineKey
 {
 public:
     QString m_fileName;
-    int m_lineNumber;
+    int m_lineNumber = 0;
     QString m_functionName;
-    gtVAddr m_functionStartAddress;
+    gtVAddr m_functionStartAddress = 0;
 
     SourceLineKey(int lineNumber);
-    bool operator< (const SourceLineKey& other) const;
+    bool operator<(const SourceLineKey& other) const;
     bool operator==(const SourceLineKey& other) const;
 };
 
 class SourceLineAsmInfo
 {
 public:
+    int m_sourceLineNumber = -1;
+    int m_asmLineNumber = -1;
 
-    int m_sourceLineNumber;
-    int m_asmLineNumber;
-    SourceLineAsmInfo();
+    SourceLineAsmInfo() = default;
     SourceLineAsmInfo(int lineNumber, int asmLineNumber);
-    bool operator< (const SourceLineAsmInfo& other) const;
-    bool operator== (const SourceLineAsmInfo& other) const;
-
+    bool operator<(const SourceLineAsmInfo& other) const;
+    bool operator==(const SourceLineAsmInfo& other) const;
 };
+
 class SessionSourceCodeView;
-class acTablePercentItemDelegate;
-class TreeItemDelegate;
+
 class SourceCodeTreeView : public acFrozenColumnTreeView
 {
 public:
     SourceCodeTreeView(SessionSourceCodeView* pSourceCodeView, QAbstractItemModel* pModel, int frozenColumn);
-
     void FixColumnSizes();
-
     void Repaint();
 
 protected:
-
-    SessionSourceCodeView* m_pSourceCodeView;
-
+    SessionSourceCodeView* m_pSourceCodeView = nullptr;
 };
 
 class UiFunctionSymbolInfo
 {
 public:
-    gtVAddr  m_va;
-    gtUInt32 m_size;
-    QString m_name;
+    gtVAddr  m_va = GT_INVALID_VADDR;
+    gtUInt32 m_size = 0;
+    QString  m_name = CA_NO_SYMBOL;
 
-    UiFunctionSymbolInfo();
+    UiFunctionSymbolInfo() = default;
     UiFunctionSymbolInfo(const FunctionSymbolInfo& exeSym, gtVAddr baseVAddr);
     bool operator<(const UiFunctionSymbolInfo& other) const;
     bool operator==(const UiFunctionSymbolInfo& other) const;
 };
 
-typedef QMap <gtVAddr, gtVector<float> > AddressToDataMap;
-typedef gtMap <SourceLineKey, gtVector<float> > SourceLineToDataMap;
+typedef QMap<gtVAddr, gtVector<float>> AddressToDataMap;
+typedef gtMap<SourceLineKey, gtVector<float>> SourceLineToDataMap;
 typedef gtList<UiFunctionSymbolInfo> FuncSymbolsList;
-typedef gtMap<SourceLineAsmInfo, int> SourceLineToTableRowMap;
 typedef gtMap<SourceLineAsmInfo, QString> SourceLineToCodeBytesMap;
 typedef gtMap<SourceLineAsmInfo, SourceViewTreeItem*> SourceViewTreeItemMap;
 typedef QMap<SourceViewTreeItem*, SourceLineAsmInfo> SourceLineToItemMap;
-typedef gtMap<SourceLineAsmInfo, gtVector<float> > SourceLineAsmInfoToDataMap;
+typedef gtMap<SourceLineAsmInfo, gtVector<float>> SourceLineAsmInfoToDataMap;
 
 
 #endif //__SOURCECODEVIEWUTILS_H

@@ -16,34 +16,18 @@
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
 #include <AMDTExecutableFormat/inc/ExecutableFile.h>
 
-// AMDTCpuProfilingRawData:
-#include <AMDTCpuProfilingRawData/inc/CpuProfileModule.h>
-
-
-#include <AMDTProfilingAgentsData/inc/JavaJncReader.h>
-
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    #include <AMDTProfilingAgentsData/inc/Windows/ClrJncReader.h>
-    #include <AMDTProfilingAgentsData/inc/Windows/PjsReader.h>
-#endif // AMDT_WINDOWS_OS
-
-#ifdef TBI
-    #include <ProfilingAgentsData/inc/OclJncReader.h>
-#endif
+// Backend
+#include <AMDTCpuProfilingRawData/inc/CpuProfileFunction.h>
 
 // Local:
 #include <inc/SourceCodeViewUtils.h>
 #include <inc/StdAfx.h>
-
-#include <unordered_map>
 
 struct InstOffsetSize
 {
     gtVAddr     m_offset = 0;
     gtUInt32    m_size = 0;
 };
-
-class CpuProfileReader;
 
 class SourceCodeTreeModel : public QAbstractItemModel
 {
@@ -60,14 +44,15 @@ public:
     int columnCount(const QModelIndex& parent = QModelIndex()) const;
 
     QVariant data(const QModelIndex& index, int role) const;
+    bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    bool setHeaderData(int section, Qt::Orientation orientation, const QVariant& value, int role = Qt::EditRole);
+    /// Update the displayed headers:
+    bool UpdateHeaders();
 
     QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const;
     QModelIndex parent(const QModelIndex& index) const;
-
     Qt::ItemFlags flags(const QModelIndex& index) const;
-    bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
-    bool setHeaderData(int section, Qt::Orientation orientation, const QVariant& value, int role = Qt::EditRole);
 
     bool insertColumns(int position, int columns, const QModelIndex& parent = QModelIndex());
     bool removeColumns(int position, int columns, const QModelIndex& parent = QModelIndex());
@@ -76,8 +61,6 @@ public:
 
     /// Return the index of the top level item parent (or itself), and the index of the item within it's top level item parent:
     bool GetItemTopLevelIndex(const QModelIndex& index, int& indexOfTopLevelItem, int& indexOfTopLevelItemChild);
-
-    void Clear();
 
     /// Return the amount of tree top level items:
     int topLevelItemCount();
@@ -108,12 +91,7 @@ public:
 
     void SetHotSpotSamples(AMDTUInt32 counterIdx);
 
-    void SetDisplayFormat(double  val, bool appendPercent, QVariant& data, const int precision);
-
-
-
-    /// Update the displayed headers:
-    bool UpdateHeaders();
+    void SetDisplayFormat(double val, bool appendPercent, QVariant& data, const int precision);
 
     /// Store module details:
     void SetModuleDetails(AMDTUInt32 moduleId, AMDTUInt32 pId);
@@ -132,15 +110,11 @@ public:
     AMDTUInt64 GetFuncSrcFirstLnNum() const { return m_funcFirstSrcLine; }
     const std::vector<SourceViewTreeItem*> GetSrcLineViewMap() const { return m_srcLineViewTreeMap; }
 
+    void Clear();
+
 private:
-
     bool SetSourceLines(const QString& filepath, unsigned int startLine, unsigned int stopLine);
-    bool IsSourceLineMapped(const SourceLineKey& sourceLineKey);
     bool SetupSourceInfo();
-
-#ifdef TBI
-    bool SetupSourceInfoForOcl(gtVAddr address);
-#endif
 
     SourceViewTreeItem* getItem(const QModelIndex& index) const;
     void SetHotSpotsrcLnSamples(AMDTUInt32 counterId,
@@ -152,8 +126,7 @@ private:
                                     const AMDTSourceAndDisasmInfoVec& srcInfoVec);
 
 private:
-
-    SourceCodeTreeView* m_pSessionSourceCodeTreeView;
+    SourceCodeTreeView* m_pSessionSourceCodeTreeView = nullptr;
 
     /// Source line -> tree item map:
     SourceViewTreeItemMap m_sourceTreeItemsMap;
@@ -164,80 +137,45 @@ private:
     /// Source line -> data map:
     SourceLineAsmInfoToDataMap m_sourceLinesToDataMap;
 
-    SourceLineToDataMap m_sourceLinesData;
-
     /// Contain a map from dasm lines to the code bytes:
     SourceLineToCodeBytesMap m_sourceLineToCodeBytesMap;
 
-    /// Contain the accumulated data values for the current displayed function:
-    gtVector<float> m_currentFunctionTotalDataVector;
-
-    /// Contain the accumulated data values for the current displayed module:
-    gtVector<float> m_currentModuleTotalDataVector;
-
-    bool m_isDisplayingOnlyDasm;
-
-    AddressToDataMap m_addressData;
-
-    ExecutableFile* m_pExecutable;
-
-    bool m_isLongMode;
-    const gtUByte* m_pCode;
-    unsigned int m_codeSize;
+    bool m_isDisplayingOnlyDasm = false;
 
     // This map contains the current offset to
     // source line information for current function
     OffsetLinenumMap m_funOffsetLinenumMap;
 
     QVector<QString> m_srcLinesCache;
-    unsigned int m_startLine;
-    unsigned int m_stopLine;
-
+    unsigned int m_startLine = 1;
+    unsigned int m_stopLine = 0;
 
     // Session and module details:
     QString m_sessionDir;
     QString m_moduleName;
 
-    ProcessIdType m_pid;
-    ProcessIdType m_newPid;
-    ThreadIdType m_tid;
-    ThreadIdType m_newTid;
-    AMDTFunctionId m_funcId;
+    ProcessIdType m_pid = AMDT_PROFILE_ALL_PROCESSES;
+    ProcessIdType m_newPid = AMDT_PROFILE_ALL_PROCESSES;
+    ThreadIdType m_tid = AMDT_PROFILE_ALL_THREADS;
+    ThreadIdType m_newTid = AMDT_PROFILE_ALL_THREADS;
+    AMDTFunctionId m_funcId = 0;
 
-    CpuProfileModule::MOD_MODE_TYPE m_moduleType;
-    AggregatedSample m_moduleAggregatedSample;
-    const CpuProfileModule* m_pModule;
-    const CpuProfileFunction* m_pDisplayedFunction;
+    const CpuProfileFunction* m_pDisplayedFunction = nullptr;
 
-    AMDTModuleType m_modType;
+    AMDTModuleType m_modType = AMDT_MODULE_TYPE_NONE;
 
-    bool m_isModuleCached;
-    long m_moduleTotalSamplesCount;
-    long m_sessionTotalSamplesCount;
-
-    // Java JNC reader
-    JavaJncReader m_javaJncReader;
-
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    ClrJncReader m_clrJncReader;
-#endif // AMDT_WINDOWS_OS
-
-#ifdef TBI
-    OclJncReader m_oclJncReader;
-#endif
-
+    bool m_isModuleCached = false;
 
     QString m_srcFile;
 
-    gtVAddr m_loadAddr;
-    gtVAddr m_newAddress;
+    gtVAddr m_newAddress = 0;
 
     FuncSymbolsList m_symbolsInfoList;
     FuncSymbolsList::iterator m_currentSymbolIterator;
     FuncSymbolsList::iterator m_lastSymIt;
 
-    /// Contain the tree root item:
-    SourceViewTreeItem* m_pRootItem;
+    // Contain the tree root item:
+    SourceViewTreeItem* m_pRootItem = nullptr;
 
     QStringList m_headerCaptions;
     QStringList m_headerTooltips;
@@ -253,8 +191,6 @@ private:
     // srcLineNumber for sampled  --> SourceViewTreeItem
     std::vector<std::pair<AMDTProfileSourceLineData, SourceViewTreeItem*>> m_sampleSrcLnViewTreeList;
     std::vector<SourceViewTreeItem*> m_srcLineViewTreeMap;
-
 };
 
 #endif //__SOURCECODETREEMODEL_H
-

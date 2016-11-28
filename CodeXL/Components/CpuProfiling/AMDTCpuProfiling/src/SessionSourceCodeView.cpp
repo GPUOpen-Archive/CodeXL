@@ -18,16 +18,11 @@
 #include <QtWidgets>
 #include <QPushButton>
 
-// Infra:
-#include <AMDTOSWrappers/Include/osDebuggingFunctions.h>
-#include <AMDTBaseTools/Include/gtHashMap.h>
-#include <AMDTBaseTools/Include/gtAlgorithms.h>
+// AMDTApplicationComponents
 #include <AMDTApplicationComponents/Include/acColours.h>
 #include <AMDTApplicationComponents/Include/acItemDelegate.h>
 #include <AMDTApplicationComponents/Include/acToolBar.h>
 #include <AMDTApplicationComponents/Include/acFunctions.h>
-#include <AMDTOSWrappers/Include/osFilePath.h>
-#include <AMDTOSWrappers/Include/osDirectory.h>
 
 // AMDTApplicationFramework:
 #include <AMDTApplicationFramework/Include/afApplicationCommands.h>
@@ -39,8 +34,6 @@
 
 // AMDTSharedProfiling:
 #include <AMDTSharedProfiling/inc/ProfileApplicationTreeHandler.h>
-
-#include <AMDTCpuPerfEventUtils/inc/IbsEvents.h>
 
 // Local:
 #include <inc/CPUProfileUtils.h>
@@ -57,6 +50,7 @@
     #pragma warning( push )
     #pragma warning( disable : 4091)
     #pragma warning( disable : 4458)
+    #include <cor.h>
     #include <corhdr.h>
     #include <corprof.h>
     #pragma warning( pop )
@@ -74,7 +68,6 @@ SessionSourceCodeView::SessionSourceCodeView(QWidget* pParent,
     m_pTreeViewModel = new SourceCodeTreeModel(m_sessionDir, m_pProfDataRdr, m_pDisplayFilter);
 }
 
-
 SessionSourceCodeView::~SessionSourceCodeView()
 {
     if (m_pTreeViewModel != nullptr)
@@ -87,12 +80,11 @@ SessionSourceCodeView::~SessionSourceCodeView()
 bool SessionSourceCodeView::DisplayViewModule(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> funcModInfo)
 {
     bool ret = true;
+    m_functionId = std::get<0>(funcModInfo);
+    m_moduleId   = std::get<2>(funcModInfo);
+    m_processId  = std::get<3>(funcModInfo);
 
-    m_moduleId      = std::get<2>(funcModInfo);
-    m_functionId    = std::get<0>(funcModInfo);;
-    m_processId     = std::get<3>(funcModInfo);
-
-    //store module details
+    // Store module details
     m_pTreeViewModel->SetModuleDetails(m_moduleId, m_processId);
 
     // Create the central widget:
@@ -155,10 +147,12 @@ void SessionSourceCodeView::UpdateTableDisplay(unsigned int updateType)
 
         // Update the model headers:
         bool rc = m_pTreeViewModel->UpdateHeaders();
+
         GT_IF_WITH_ASSERT(rc)
         {
             // Populate data for the displayed function:
             const QComboBox* pHotspotCombo = TopToolbarComboBox(m_pHotSpotIndicatorComboBoxAction);
+
             GT_IF_WITH_ASSERT(pHotspotCombo != nullptr)
             {
                 // Set the current index if it is not set:
@@ -168,8 +162,6 @@ void SessionSourceCodeView::UpdateTableDisplay(unsigned int updateType)
                 {
                     m_pHotSpotIndicatorComboBoxAction->UpdateCurrentIndex(0);
                 }
-
-                //m_pTreeViewModel->PopulateCurrentFunction(pHotspotCombo->currentText());
             }
 
             if (!m_pTreeViewModel->m_isDisplayingOnlyDasm)
@@ -195,31 +187,26 @@ void SessionSourceCodeView::UpdateTableDisplay(unsigned int updateType)
 
             // Refresh the view:
             RefreshView();
-
         }
+
         qApp->restoreOverrideCursor();
     }
 }
 
 void SessionSourceCodeView::HideFilteredColumns()
 {
-
 }
-
 
 bool SessionSourceCodeView::CreateViewLayout()
 {
     // Create the tree control:
     m_pSourceCodeTree = new SourceCodeTreeView(this, m_pTreeViewModel, SOURCE_VIEW_CODE_BYTES_COLUMN);
 
-
     m_pTreeViewModel->m_pSessionSourceCodeTreeView = m_pSourceCodeTree;
 
     // Align both lists line widths:
     m_pSourceCodeTree->setUniformRowHeights(true);
-
     m_pSourceCodeTree->setRootIsDecorated(true);
-
     m_pSourceCodeTree->setAllColumnsShowFocus(true);
 
     bool rc = connect(m_pSourceCodeTree, SIGNAL(ItemDoubleClicked(const QModelIndex&)), SLOT(OnTreeItemDoubleClick(const QModelIndex&)));
@@ -250,6 +237,7 @@ bool SessionSourceCodeView::CreateViewLayout()
 
     // Create the bottom information frame:
     QFrame* pHintFrame = createHintLabelFrame();
+
     GT_IF_WITH_ASSERT(pHintFrame != nullptr)
     {
         m_pMainVBoxLayout->addWidget(pHintFrame);
@@ -267,13 +255,13 @@ bool SessionSourceCodeView::CreateViewLayout()
     return true;
 }
 
-
 void SessionSourceCodeView::ExtendTreeContextMenu()
 {
     // Sanity check:
     GT_IF_WITH_ASSERT(m_pSourceCodeTree != nullptr)
     {
         QMenu* pContextMenu = m_pSourceCodeTree->ContextMenu();
+
         GT_IF_WITH_ASSERT(pContextMenu != nullptr)
         {
             pContextMenu->addSeparator();
@@ -281,12 +269,15 @@ void SessionSourceCodeView::ExtendTreeContextMenu()
             m_pCollapseAllAction = pContextMenu->addAction(CP_sourceCodeCollapseAll, this, SLOT(OnCollapseAll()));
             pContextMenu->addSeparator();
             m_pShowCodeBytesAction = pContextMenu->addAction(CP_sourceCodeShowCodeBytes, this, SLOT(OnShowCodeBytes()));
+
             GT_IF_WITH_ASSERT(m_pShowCodeBytesAction != nullptr)
             {
                 m_pShowCodeBytesAction->setCheckable(true);
                 m_pShowCodeBytesAction->setChecked(true);
             }
+
             m_pShowAddressAction = pContextMenu->addAction(CP_sourceCodeShowAddress, this, SLOT(OnShowAddress()));
+
             GT_IF_WITH_ASSERT(m_pShowAddressAction != nullptr)
             {
                 m_pShowAddressAction->setCheckable(true);
@@ -338,6 +329,7 @@ void SessionSourceCodeView::CreateDisplayFilterLinkLabel()
 
         int width = 25;
         const QLabel* pTestLabel = TopToolbarLabel(pTestAction);
+
         GT_IF_WITH_ASSERT(pTestLabel != nullptr)
         {
             static QString longestDisplayFilter = "Hide System Modules";
@@ -351,7 +343,6 @@ void SessionSourceCodeView::CreateDisplayFilterLinkLabel()
         actionData.m_minWidth = width;
 
         m_pDisplaySettingsAction = m_pTopToolbar->AddWidget(actionData);
-
     }
 }
 
@@ -360,6 +351,7 @@ bool SessionSourceCodeView::FillHotspotIndicatorCombo()
     bool retVal = false;
 
     const QComboBox* pHotspotCombo = TopToolbarComboBox(m_pHotSpotIndicatorComboBoxAction);
+
     GT_IF_WITH_ASSERT((pHotspotCombo != nullptr) &&
                       (m_pDisplayedSessionItemData != nullptr) &&
                       (m_pDisplayFilter != nullptr) &&
@@ -368,11 +360,13 @@ bool SessionSourceCodeView::FillHotspotIndicatorCombo()
         // Find the profile type:
         SessionTreeNodeData* pSessionData = qobject_cast<SessionTreeNodeData*>(m_pDisplayedSessionItemData->extendedItemData());
         m_supportedCounterList.clear();
+
         GT_IF_WITH_ASSERT(pSessionData != nullptr)
         {
             QStringList hotSpotColumns;
 
             QString filterName = m_pDisplayFilter->GetCurrentCofigName();
+
             GT_IF_WITH_ASSERT(!filterName.isEmpty())
             {
                 CounterNameIdVec countersName;
@@ -393,8 +387,8 @@ bool SessionSourceCodeView::FillHotspotIndicatorCombo()
             m_pHotSpotIndicatorComboBoxAction->UpdateStringList(hotSpotColumns);
             m_pHotSpotIndicatorComboBoxAction->UpdateEnabled(hotSpotColumns.size() > 1);
         }
-
     }
+
     return retVal;
 }
 
@@ -436,7 +430,7 @@ void SessionSourceCodeView::CreateFunctionsComboBox()
         }
 
 #if 0
-        // Baskar: Though this approach will have folowing side effects, its OK for 2.2 release
+        // Though this approach will have following side effects, its OK for 2.2 release
         //      - function combo box will have functions that do not have IP samples
         //              a) functions having only deep samples due to CSS
         //              b) functions from some other instance of the same application (instance-1 may have ip samples
@@ -484,7 +478,6 @@ void SessionSourceCodeView::CreateFunctionsComboBox()
                                                                 SIGNAL(currentIndexChanged(int)),
                                                                 this,
                                                                 SLOT(OnFunctionsComboChange(int)));
-
     }
 }
 
@@ -579,7 +572,7 @@ void SessionSourceCodeView::OnTreeVerticalScrollPositionChange(int value, bool i
             {
                 int max = pScrollBar->maximum();
 
-                if ((!isFromKeyboard  && value == max) || (isFromKeyboard && value == (max - 1)))
+                if ((!isFromKeyboard && value == max) || (isFromKeyboard && value == (max - 1)))
                 {
                     // Extract the index of the last item.
                     int lastItemIndex = m_pTreeViewModel->topLevelItemCount() - 1;
@@ -587,7 +580,6 @@ void SessionSourceCodeView::OnTreeVerticalScrollPositionChange(int value, bool i
 
                     // First, set the display settings so that we will get back at where we were.
                     m_userDisplayInformation.m_selectedTopLevelItemIndex = lastItemIndex;
-
                 }
             }
         }
@@ -602,6 +594,7 @@ void SessionSourceCodeView::OnItemExpanded(const QModelIndex& index)
         int topLevelItemIndex = -1;
         int topLevelChildItemIndex = -1;
         bool rc = m_pTreeViewModel->GetItemTopLevelIndex(index, topLevelItemIndex, topLevelChildItemIndex);
+
         GT_IF_WITH_ASSERT(rc)
         {
             if (!m_userDisplayInformation.m_expandedTreeItems.contains(topLevelItemIndex))
@@ -618,6 +611,7 @@ void SessionSourceCodeView::OnItemCollapsed(const QModelIndex& index)
     int topLevelItemIndex = -1;
     int topLevelChildItemIndex = -1;
     bool rc = m_pTreeViewModel->GetItemTopLevelIndex(index, topLevelItemIndex, topLevelChildItemIndex);
+
     GT_IF_WITH_ASSERT(rc)
     {
         if (m_userDisplayInformation.m_expandedTreeItems.contains(topLevelItemIndex))
@@ -673,9 +667,9 @@ void SessionSourceCodeView::DisplayAddress(gtVAddr addr, ProcessIdType pid, Thre
             // Now find the index for this functionId
             AMDTUInt32 index = 0;
 
-            for (auto& aFundId : m_functionIdVec)
+            for (const auto funcId : m_functionIdVec)
             {
-                if (aFundId == m_functionId)
+                if (funcId == m_functionId)
                 {
                     break;
                 }
@@ -683,13 +677,12 @@ void SessionSourceCodeView::DisplayAddress(gtVAddr addr, ProcessIdType pid, Thre
                 index++;
             }
 
-            // Baskar: This is used as hack to generate index change notification
+            // This is used as hack to generate index change notification
             m_pFunctionsComboBoxAction->UpdateCurrentIndex(-1);
             m_pFunctionsComboBoxAction->UpdateCurrentIndex(index);
         }
     }
 }
-
 
 void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
 {
@@ -760,9 +753,9 @@ void SessionSourceCodeView::OnFunctionsComboChange(int functionIndex)
             // Notice: Since a widget cannot be hide on a toolbar, we should hide the action of the widget:
             m_pPIDComboBoxAction->UpdateVisible(isMultiPID);
             m_pPIDLabelAction->UpdateVisible(isMultiPID);
+
             m_pTIDComboBoxAction->UpdateVisible(isMultiPID || isMultiTID);
             m_pTIDLabelAction->UpdateVisible(isMultiPID || isMultiTID);
-
             m_pTIDComboBoxAction->UpdateEnabled(isMultiTID);
 
             // Update the display:
@@ -823,7 +816,6 @@ bool SessionSourceCodeView::UpdateDisplay()
     return retVal;
 }
 
-
 void SessionSourceCodeView::OnPIDComboChange(int index)
 {
     if (index >= 0)
@@ -831,6 +823,7 @@ void SessionSourceCodeView::OnPIDComboChange(int index)
         m_pTreeViewModel->m_pid = AMDT_PROFILE_ALL_PROCESSES;
         const QComboBox* pPIDComboBox = (QComboBox*)TopToolbarComboBox(m_pPIDComboBoxAction);
         const QComboBox* pTIDComboBox = (QComboBox*)TopToolbarComboBox(m_pTIDComboBoxAction);
+
         GT_IF_WITH_ASSERT((pPIDComboBox != nullptr) && (m_pPIDComboBoxAction != nullptr)
                           && (pTIDComboBox != nullptr) && (m_pTIDComboBoxAction != nullptr))
         {
@@ -854,7 +847,9 @@ void SessionSourceCodeView::OnPIDComboChange(int index)
                 {
                     bool isSamePid = (sit->first.m_pid == m_pTreeViewModel->m_pid) || m_pTreeViewModel->m_pid == SHOW_ALL_PIDS;
 
-                    if (SHOW_ALL_TIDS == sit->first.m_tid || !isSamePid || !IsAddressInCurrentFunction(sit->first.m_addr + m_pTreeViewModel->m_pDisplayedFunction->getBaseAddr()))
+                    if (SHOW_ALL_TIDS == sit->first.m_tid ||
+                        !isSamePid ||
+                        !IsAddressInCurrentFunction(sit->first.m_addr + m_pTreeViewModel->m_pDisplayedFunction->getBaseAddr()))
                     {
                         continue;
                     }
@@ -866,7 +861,6 @@ void SessionSourceCodeView::OnPIDComboChange(int index)
                         tidList << QString::number(sit->first.m_tid);
                     }
                 }
-
             }
 
             bool isMultiTID =  false;
@@ -901,12 +895,12 @@ void SessionSourceCodeView::OnPIDComboChange(int index)
     }
 }
 
-
 void SessionSourceCodeView::OnTIDComboChange(int index)
 {
     if (index >= 0)
     {
         const QComboBox* pTIDComboBox = TopToolbarComboBox(m_pTIDComboBoxAction);
+
         GT_IF_WITH_ASSERT((m_pTreeViewModel != nullptr) && (pTIDComboBox != nullptr))
         {
             if (SHOW_ALL_TIDS == index)
@@ -923,7 +917,6 @@ void SessionSourceCodeView::OnTIDComboChange(int index)
     }
 }
 
-
 void SessionSourceCodeView::HighlightMatchingSourceLine(gtVAddr functionFirstAddressLine)
 {
     gtVAddr currentLineAddress = 0;
@@ -932,7 +925,9 @@ void SessionSourceCodeView::HighlightMatchingSourceLine(gtVAddr functionFirstAdd
     // Reset selection information:
     m_userDisplayInformation.clear();
 
-    for (int lineNumber = 0; lineNumber < m_pTreeViewModel->topLevelItemCount() && (m_userDisplayInformation.m_selectedTopLevelItemIndex  == -1); lineNumber++)
+    for (int lineNumber = 0;
+        lineNumber < m_pTreeViewModel->topLevelItemCount() && (m_userDisplayInformation.m_selectedTopLevelItemIndex == -1);
+        lineNumber++)
     {
         // Get the current and next source line items:
         SourceViewTreeItem* pSrcItem = (SourceViewTreeItem*)m_pTreeViewModel->topLevelItem(lineNumber);
@@ -957,7 +952,9 @@ void SessionSourceCodeView::HighlightMatchingSourceLine(gtVAddr functionFirstAdd
             // and not to the address of the instruction itself, compare the scope:
             if (!isNextAddressInScope && m_pTreeViewModel->m_isDisplayingOnlyDasm)
             {
-                isNextAddressInScope = (currentLineAddress != 0 && currentLineAddress < functionFirstAddressLine && nextLineAddress > functionFirstAddressLine);
+                isNextAddressInScope = currentLineAddress != 0 &&
+                    currentLineAddress < functionFirstAddressLine &&
+                    nextLineAddress > functionFirstAddressLine;
             }
 
             if (isNextAddressInScope)
@@ -972,9 +969,9 @@ void SessionSourceCodeView::HighlightMatchingSourceLine(gtVAddr functionFirstAdd
             for (int jLine = 0; jLine < pSrcItem->childCount(); jLine++)
             {
                 // Search in the children level:
-                SourceViewTreeItem* pAsmItem = (SourceViewTreeItem*)pSrcItem->child(jLine);
+                SourceViewTreeItem* pAsmItem = pSrcItem->child(jLine);
 
-                if (!pAsmItem)
+                if (pAsmItem == nullptr)
                 {
                     continue;
                 }
@@ -984,14 +981,15 @@ void SessionSourceCodeView::HighlightMatchingSourceLine(gtVAddr functionFirstAdd
                 nextLineAddress = 0;
                 SourceViewTreeItem* pNextAsmItem = (SourceViewTreeItem*)pSrcItem->child(jLine + 1);
 
-                if (pNextAsmItem)
+                if (pNextAsmItem != nullptr)
                 {
                     nextLineAddress = pNextAsmItem->data(SOURCE_VIEW_ADDRESS_COLUMN).toString().toULongLong(nullptr, 16);
                 }
 
                 // In cases where an IBS event is attributed to an address that falls within the code bytes of an instruction
                 // and not to the address of the instruction itself, compare the scope:
-                if ((currentLineAddress == functionFirstAddressLine) || (currentLineAddress != 0 && currentLineAddress < functionFirstAddressLine && nextLineAddress > functionFirstAddressLine))
+                if ((currentLineAddress == functionFirstAddressLine) ||
+                    (currentLineAddress != 0 && currentLineAddress < functionFirstAddressLine && nextLineAddress > functionFirstAddressLine))
                 {
                     // Select the assembly item:
                     m_userDisplayInformation.m_selectedTopLevelItemIndex = (pNextSrcItem != nullptr) ? (lineNumber + 1) : lineNumber;
@@ -1034,7 +1032,6 @@ void SessionSourceCodeView::OnExpandAll()
             }
         }
     }
-
 }
 
 void SessionSourceCodeView::OnCollapseAll()
@@ -1115,13 +1112,11 @@ bool SessionSourceCodeView::GetActualSourceFile(const QString& targetFile, QStri
     }
     else if (m_pTreeViewModel->m_isModuleCached && (0 == targetFile.compare(tryFile)))
     {
-
         CacheFile(m_sessionDir, targetFile);
     }
 
     // Display the complete source file path for java source files
-    if ((m_pTreeViewModel->m_modType == AMDT_MODULE_TYPE_JAVA)
-        && (! tryFile.isEmpty()))
+    if ((m_pTreeViewModel->m_modType == AMDT_MODULE_TYPE_JAVA) && (! tryFile.isEmpty()))
     {
         m_pModuleLocationInfoLabel->setText(tryFile);
     }
@@ -1129,18 +1124,15 @@ bool SessionSourceCodeView::GetActualSourceFile(const QString& targetFile, QStri
     return ret;
 }
 
-
 QString SessionSourceCodeView::FindSourceFile(QString fileName)
 {
     QString tryFile = fileName;
-
     gtString sourceDirectories = afProjectManager::instance().currentProjectSettings().SourceFilesDirectories();
     QString srcDirs = acGTStringToQString(sourceDirectories);
 
     // add the working directory
     //QString wrkDir = QString::fromWCharArray(m_pProfileInfo->m_wrkDirectory.asCharArray());
-    QString wrkDir = "";
-
+    QString wrkDir;
     QStringList dirList;
 
     if (!srcDirs.isEmpty())
@@ -1158,7 +1150,7 @@ QString SessionSourceCodeView::FindSourceFile(QString fileName)
 
     while (!QFile::exists(tryFile))
     {
-        //try default source directory
+        // Try default source directory
         if (curDir != dirList.end())
         {
             tryFile = *curDir + PATH_SLASH + fileName.section(PATH_SLASH, -1);
@@ -1205,120 +1197,6 @@ QString SessionSourceCodeView::FindSourceFile(QString fileName)
     return tryFile;
 }
 
-
-#ifdef TBI
-bool SessionSourceCodeView::SetupSourceInfoForOcl(gtVAddr address)
-{
-    if (m_pTreeViewModel->m_currentSymbolIterator == m_pTreeViewModel->m_symbolsInfoList.end())
-    {
-        return false;
-    }
-
-    // If the JNC file does not change, we can just return
-    QString jncFilePath(m_sessionDir + "/" +
-                        QString::fromStdWString(m_pDisplayedFunction->getJncFileName()));
-
-    // Get the module name (i.e. the path of OCL file)
-    wchar_t modName[OS_MAX_PATH];
-
-    if (m_oclJncReader.GetModuleName(modName, OS_MAX_PATH)
-        && jncFilePath.compare(QString::fromWCharArray(modName)) == 0)
-    {
-        return true;
-    }
-
-    // In case the JNC file changes, we open the new JNC file
-    m_pTreeViewModel->m_pCode = nullptr;
-    m_oclJncReader.Close();
-
-    // Try open the OCL JNC file
-    gtVAddr jitLoadAddr = m_pTreeViewModel->m_currentSymbolIterator->symbolRVA;
-
-    if (!m_oclJncReader.Open
-        ((TCHAR*)jncFilePath.toStdWString().c_str(), jitLoadAddr, m_pSymbolEngine))
-    {
-        return false;
-    }
-
-    gtVAddr symRVA = jitLoadAddr - m_oclJncReader.GetJITLoadAddress() -
-                     m_oclJncReader.GetCodeOffset();
-
-    SESYMBOL sym;
-    unsigned int symSize = 0;
-
-    if (m_pSymbolEngine->GetSymbolFromAddress
-        (jitLoadAddr - m_oclJncReader.GetJITLoadAddress(), &sym))
-    {
-        symSize = sym.symbolSize;
-    }
-
-    // Get code pointer
-    unsigned int codeOffset = 0;
-    unsigned int codeSize = 0;
-    m_pTreeViewModel->m_pCode = m_oclJncReader.GetCodeBytesOfTextSection(&codeOffset, &codeSize);
-    UINT64 base = 0;
-    m_pSymbolEngine->GetBaseLoad(&base);
-
-    if (codeSize > symRVA)
-    {
-        codeSize -= symRVA;
-    }
-
-    m_pTreeViewModel->m_pCode += symRVA;
-
-    if (m_pTreeViewModel->m_pCode == nullptr)
-    {
-        m_oclJncReader.Close();
-        return false;
-    }
-
-    // Get code size
-    if (symSize != 0)
-    {
-        m_pTreeViewModel->m_codeSize = symSize;
-    }
-    else if (codeSize != 0)
-    {
-        m_pTreeViewModel->m_codeSize = codeSize;
-    }
-    else
-    {
-        return false;
-    }
-
-    // Get long mode
-    m_pTreeViewModel->m_isLongMode = (m_oclJncReader.OperandSize() == OS_64BIT);
-
-    // Update Source file
-    SELINE seline;
-
-    if (!m_pSymbolEngine->GetSourceLineFromAddress(symRVA + m_oclJncReader.GetCodeOffset(), &seline))
-    {
-        return false;
-    }
-
-    m_pTreeViewModel->m_srcFile.clear();
-    m_pTreeViewModel->m_srcFile = QString::fromWCharArray(seline.filePathName);
-
-    // Get Offset from symbol to line number map
-    LinenumMap* pMap = m_oclJncReader.GetpLineMap();
-    LinenumMap::iterator it = pMap->begin();
-    LinenumMap::iterator itEnd = pMap->end();
-    m_pTreeViewModel->m_funOffsetLinenumMap.clear();
-
-    for (; it != itEnd; it++)
-    {
-        if (it->first >= symRVA && (it->first <= symRVA + m_pTreeViewModel->m_codeSize))
-        {
-            m_pTreeViewModel->m_funOffsetLinenumMap.insert(it->first - symRVA, it->second);
-        }
-    }
-
-    return true;
-}
-#endif
-
-
 void SessionSourceCodeView::OnHotSpotComboChanged(const QString& text)
 {
     // Set the selected hot spot (to be selected later when switching pid / tid):
@@ -1332,8 +1210,10 @@ void SessionSourceCodeView::OnHotSpotComboChanged(const QString& text)
         if (counterIdx != m_supportedCounterList.end())
         {
             //int val = counterIdx - m_supportedCounterList.begin();
+
             // Re-Set the tree samples column:
             //m_pTreeViewModel->SetTreeSamples(text);
+
             AMDTUInt32 counterId = m_pDisplayFilter->GetCounterId(text);
 
             if (0 != counterId)
@@ -1344,7 +1224,6 @@ void SessionSourceCodeView::OnHotSpotComboChanged(const QString& text)
 
         // Refresh the view:
         RefreshView();
-
     }
 }
 
@@ -1364,7 +1243,6 @@ void SessionSourceCodeView::SetItemsDelegate()
     {
         // Create the tree item delegate:
         m_pTreeItemDelegate = new acTreeItemDeletate;
-
 
         // Set the frozen tree as owner to the delegate item:
         m_pTreeItemDelegate->SetOwnerFrozenTree(m_pSourceCodeTree);
@@ -1395,9 +1273,11 @@ void SessionSourceCodeView::AddSourceCodeItemToExplorer()
                 pSourceCodeData->m_exeFullPath = m_pTreeViewModel->m_moduleName;
 
                 afApplicationTreeItemData* pSourceCodeCreatedData = CpuProfileTreeHandler::instance().AddSourceCodeToSessionNode(pSourceCodeData);
+
                 GT_IF_WITH_ASSERT(pSourceCodeCreatedData != nullptr)
                 {
                     afApplicationCommands* pApplicationCommands = afApplicationCommands::instance();
+
                     GT_IF_WITH_ASSERT((pApplicationCommands != nullptr) && (pApplicationCommands->applicationTree() != nullptr))
                     {
                         // The file path for the source code node should be the session file. We want it to open first before opening the
@@ -1446,6 +1326,7 @@ void SessionSourceCodeView::SetTreeSelection(SourceViewTreeItem* pItemToSelect)
 
         // Get the index for the requested item:
         QModelIndex index = m_pTreeViewModel->indexOfItem(pItemToSelect);
+
         GT_IF_WITH_ASSERT(index.isValid())
         {
             // Expand / collapse the item:
@@ -1488,7 +1369,6 @@ void SessionSourceCodeView::SetTreeSelection(SourceViewTreeItem* pItemToSelect)
 bool SessionSourceCodeView::CreateModelData()
 {
     bool retVal = false;
-
     QString tryFile;
 
     // Sanity check:
@@ -1503,6 +1383,7 @@ bool SessionSourceCodeView::CreateModelData()
             if (GetActualSourceFile(m_pTreeViewModel->m_srcFile, tryFile))
             {
                 bool rc = m_pTreeViewModel->SetSourceLines(tryFile, 1, GT_INT32_MAX);
+
                 GT_IF_WITH_ASSERT(rc)
                 {
                     // Build the source and disassembly tree structure:
@@ -1541,6 +1422,7 @@ bool SessionSourceCodeView::CreateModelData()
             m_pTreeViewModel->m_isDisplayingOnlyDasm = false;
         }
     }
+
     return retVal;
 }
 
@@ -1595,6 +1477,7 @@ void SessionSourceCodeView::RefreshView()
 void SessionSourceCodeView::applyUserDisplayInformation()
 {
     const QComboBox* pHotSpotIndicatorComboBox = TopToolbarComboBox(m_pHotSpotIndicatorComboBoxAction);
+
     GT_IF_WITH_ASSERT((m_pSourceCodeTree != nullptr) && (pHotSpotIndicatorComboBox != nullptr))
     {
         AMDTUInt64 firstSrcLine = m_pTreeViewModel->GetFuncSrcFirstLnNum();
