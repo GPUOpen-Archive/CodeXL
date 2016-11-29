@@ -41,18 +41,19 @@ SourceViewTreeItem::SourceViewTreeItem(const QVector<QVariant>& data, SourceView
 
 SourceViewTreeItem::~SourceViewTreeItem()
 {
-    clear();
-}
-
-void SourceViewTreeItem::clear()
-{
-#ifdef CLU_TAB
-
-    if (nullptr != m_pCLUData)
+    for (auto pChild : m_childItems)
     {
-        delete m_pCLUData;
+        delete pChild;
     }
 
+    m_childItems.clear();
+    m_itemData.clear();
+    m_itemTooltip.clear();
+    m_itemForegrounds.clear();
+    m_pParentItem = nullptr;
+
+#ifdef CLU_TAB
+    delete m_pCLUData;
     m_pCLUData = nullptr;
 #endif
 }
@@ -61,7 +62,7 @@ SourceViewTreeItem* SourceViewTreeItem::child(int index)
 {
     SourceViewTreeItem* pRetVal = nullptr;
 
-    if ((index >= 0) && (index < (int)m_childItems.size()))
+    if ((index >= 0) && (index < m_childItems.size()))
     {
         pRetVal = m_childItems[index];
     }
@@ -111,7 +112,7 @@ bool SourceViewTreeItem::insertChildren(int position, int count, int columns)
     bool retVal = false;
 
     // Sanity check:
-    GT_IF_WITH_ASSERT((position >= 0) && (position < (int)m_childItems.size()))
+    GT_IF_WITH_ASSERT((position >= 0) && (position < m_childItems.size()))
     {
         retVal = true;
 
@@ -133,7 +134,7 @@ bool SourceViewTreeItem::insertColumns(int position, int columns)
 {
     bool retVal = false;
 
-    if (position < 0 || position > (int)m_itemData.size())
+    if (position < 0 || position > m_itemData.size())
     {
         retVal = false;
     }
@@ -144,7 +145,7 @@ bool SourceViewTreeItem::insertColumns(int position, int columns)
             m_itemData.insert(position, QVariant());
         }
 
-        for (int i = 0 ; i < (int)m_childItems.size(); i++)
+        for (int i = 0 ; i < m_childItems.size(); i++)
         {
             SourceViewTreeItem* pChild = m_childItems[i];
 
@@ -167,7 +168,7 @@ bool SourceViewTreeItem::removeChildren(int position, int count)
 {
     bool retVal = false;
 
-    GT_IF_WITH_ASSERT((position >= 0) && ((position + count - 1) < (int)m_childItems.size()))
+    GT_IF_WITH_ASSERT((position >= 0) && ((position + count - 1) < m_childItems.size()))
     {
         for (int row = position + count - 1; row >= position; row--)
         {
@@ -196,7 +197,7 @@ bool SourceViewTreeItem::removeColumns(int position, int columns)
             m_itemData.remove(position);
         }
 
-        foreach (SourceViewTreeItem* pChild, m_childItems)
+        for (auto pChild : m_childItems)
         {
             pChild->removeColumns(position, columns);
         }
@@ -214,7 +215,7 @@ bool SourceViewTreeItem::setData(int column, const QVariant& value)
         m_itemData.resize(column + 1);
     }
 
-    GT_IF_WITH_ASSERT((column >= 0) && (column < (int)m_itemData.size()))
+    GT_IF_WITH_ASSERT((column >= 0) && (column < m_itemData.size()))
     {
         m_itemData[column] = value;
         retVal = true;
@@ -232,7 +233,7 @@ bool SourceViewTreeItem::setTooltip(int column, const QVariant& value)
         m_itemTooltip.resize(column + 1);
     }
 
-    GT_IF_WITH_ASSERT((column >= 0) && (column < (int)m_itemTooltip.size()))
+    GT_IF_WITH_ASSERT((column >= 0) && (column < m_itemTooltip.size()))
     {
         m_itemTooltip[column] = value;
         retVal = true;
@@ -253,7 +254,7 @@ bool SourceViewTreeItem::setForeground(int column, const QColor& color)
         }
     }
 
-    GT_IF_WITH_ASSERT((column >= 0) && (column < (int)m_itemForegrounds.size()))
+    GT_IF_WITH_ASSERT((column >= 0) && (column < m_itemForegrounds.size()))
     {
         m_itemForegrounds[column] = color;
     }
@@ -271,7 +272,7 @@ QColor SourceViewTreeItem::forground(int column) const
 {
     QColor retVal = Qt::black;
 
-    if ((column >= 0) && (column < (int)m_itemForegrounds.size()))
+    if ((column >= 0) && (column < m_itemForegrounds.size()))
     {
         retVal = m_itemForegrounds[column];
     }

@@ -518,7 +518,7 @@ void CpuSessionWindow::onViewSourceViewSlot(std::tuple<AMDTFunctionId, const gtS
 
         AddTabToNavigatorBar(pSourceCodeView, caption, pPixmap);
 
-        // TODO: Baskar: Shouldn't we pass the correct address?
+        // TODO: Shouldn't we pass the correct address?
         pSourceCodeView->DisplayAddress(0, pid, SHOW_ALL_TIDS);
 
         m_pTabWidget->setCurrentWidget(pSourceCodeView);
@@ -998,6 +998,7 @@ void CpuSessionWindow::UpdateDisplaySettings(bool isActive, unsigned int changeT
 bool CpuSessionWindow::displaySessionSource()
 {
     bool retVal = false;
+
     // Overview window should be already opened:
     GT_IF_WITH_ASSERT(m_pOverviewWindow != nullptr)
     {
@@ -1006,15 +1007,16 @@ bool CpuSessionWindow::displaySessionSource()
         m_pOverviewWindow->UpdateTableDisplaySettings();
 
         const CPUSessionTreeItemData* pItemData = displayedCPUSessionItemData();
+
         GT_IF_WITH_ASSERT(pItemData != nullptr)
         {
             osFilePath moduleFilePath = acQStringToGTString(pItemData->m_exeFullPath);
 
             // Get the module hander for this file path:
             const CpuProfileModule* pModule = m_pOverviewWindow->findModuleHandler(moduleFilePath);
+
             GT_IF_WITH_ASSERT(pModule != nullptr)
             {
-                //TODO : aalok
                 onViewSourceView(0, 0, 0, pModule);
                 retVal = true;
             }
@@ -1075,180 +1077,13 @@ void CpuSessionWindow::onAboutToActivate()
     m_firstActivation = false;
 }
 
-CpuProfileModule* CpuSessionWindow::getModuleDetail(const QString& modulePath, QWidget* pParent, ExecutableFile** ppExe)
-{
-    CpuProfileModule* pModule = nullptr;
-    GT_UNREFERENCED_PARAMETER(modulePath);
-    GT_UNREFERENCED_PARAMETER(pParent);
-    GT_UNREFERENCED_PARAMETER(ppExe);
-    return pModule;
-}
-
-bool CpuSessionWindow::syncWithSymbolEngine(CpuProfileModule& module, const QString& exePath, ExecutableFile** ppExe)
-{
-    bool ret = true;
-
-    if (nullptr != ppExe)
-    {
-        *ppExe = nullptr;
-    }
-
-    if (CpuProfileModule::UNMANAGEDPE == module.getModType())
-    {
-        gtVAddr modLoadVAddr = module.getBaseAddr();
-
-        ExecutableFile* pExecutable = nullptr;
-        SymbolEngine* pSymbolEngine = nullptr;
-
-        CpuProfileFunction* const pUnchartedFunc = module.getUnchartedFunction();
-
-        AddrFunctionMultMap& funcMap = module.getFunctionMap();
-        AddrFunctionMultMap::iterator f = funcMap.begin(), fEnd = funcMap.end();
-
-        while (f != fEnd)
-        {
-            CpuProfileFunction& function = f->second;
-
-            // If the function's name is empty then we need to try and discover the matching name.
-            // If the function's size is zero then it has only partial symbol information, and we need to try and get the full info.
-            // If the function is actually the "uncharted function" then we obviously need to process it.
-            if (!function.getFuncName().isEmpty() && function.getSize() != 0 && pUnchartedFunc != &function)
-            {
-                ++f;
-                continue;
-            }
-
-            if (nullptr == pSymbolEngine)
-            {
-                // Get an executable handler for this process:
-                pExecutable = ExecutableFile::Open(exePath.toStdWString().c_str(), module.getBaseAddr());
-
-                if (nullptr != pExecutable)
-                {
-                    // Initialize executable symbol engine:
-                    if (AuxInitializeSymbolEngine(pExecutable))
-                    {
-                        pSymbolEngine = pExecutable->GetSymbolEngine();
-                    }
-                }
-
-                if (nullptr == pSymbolEngine)
-                {
-                    ret = false;
-                    break;
-                }
-
-                ret = pSymbolEngine->IsComplete();
-            }
-
-            AptAggregatedSampleMap::iterator s = function.getBeginSample(), sEnd = function.getEndSample();
-
-            while (s != sEnd)
-            {
-                gtVAddr sampleVAddr = s->first.m_addr + function.getBaseAddr();
-                gtRVAddr sampleRva = static_cast<gtRVAddr>(sampleVAddr - modLoadVAddr);
-                gtRVAddr funcRvaEnd = GT_INVALID_RVADDR;
-
-                const FunctionSymbolInfo* pFuncSymbol = pSymbolEngine->LookupFunction(sampleRva, &funcRvaEnd, true);
-
-                if (nullptr == pFuncSymbol)
-                {
-                    ++s;
-                    continue;
-                }
-
-                gtVAddr funcVAddr = static_cast<gtVAddr>(pFuncSymbol->m_rva) + modLoadVAddr;
-
-                AddrFunctionMultMap::iterator fParent = funcMap.find(funcVAddr);
-
-                if (fParent == funcMap.end())
-                {
-                    gtString srcFileName;
-                    SourceLineInfo sourceLine;
-
-                    if (pSymbolEngine->FindSourceLine(pFuncSymbol->m_rva, sourceLine))
-                    {
-                        int srcFileNameLen = static_cast<int>(wcslen(sourceLine.m_filePath));
-
-                        if (!osFilePath::ConvertCygwinPath(sourceLine.m_filePath, srcFileNameLen, srcFileName))
-                        {
-                            srcFileName.assign(sourceLine.m_filePath, srcFileNameLen);
-                        }
-                    }
-                    else
-                    {
-                        sourceLine.m_line = 0U;
-                    }
-
-                    gtUInt32 funcSize = pFuncSymbol->m_size;
-
-                    if (0 == funcSize)
-                    {
-                        if (GT_INVALID_RVADDR != funcRvaEnd)
-                        {
-                            funcSize = funcRvaEnd - pFuncSymbol->m_rva;
-                        }
-                        else
-                        {
-                            funcSize = gtUInt32(-1);
-                        }
-                    }
-
-                    CpuProfileFunction funcNew((nullptr != pFuncSymbol->m_pName) ? pFuncSymbol->m_pName : L"",
-                                               funcVAddr,
-                                               funcSize,
-                                               gtString(),
-                                               srcFileName,
-                                               sourceLine.m_line);
-                    fParent = funcMap.insert(AddrFunctionMultMap::value_type(funcVAddr, funcNew));
-                }
-                else if (fParent == f)
-                {
-                    ++s;
-                    continue;
-                }
-
-                AptKey key(sampleVAddr - funcVAddr, s->first.m_pid, s->first.m_tid);
-
-                fParent->second.addSample(key, s->second);
-
-                function.removeSample(s++);
-                sEnd = function.getEndSample();
-            }
-
-            if (0ULL == function.getTotal())
-            {
-                funcMap.erase(f++);
-                fEnd = funcMap.end();
-            }
-            else
-            {
-                ++f;
-            }
-        }
-
-        if (nullptr != pExecutable)
-        {
-            if (nullptr != ppExe)
-            {
-                *ppExe = pExecutable;
-            }
-            else
-            {
-                delete pExecutable;
-            }
-        }
-    }
-
-    return ret;
-}
-
 bool CpuSessionWindow::OpenDataReader()
 {
     bool result = false;
+
     GT_IF_WITH_ASSERT((nullptr != m_pTabWidget) && (nullptr != m_pSessionTreeItemData))
     {
-        // TODO:  to get the file path
+        // Get the file path
         m_sessionFile = m_pSessionTreeItemData->m_filePath;
 
         // get Session directory Path
@@ -1283,18 +1118,14 @@ bool CpuSessionWindow::OpenDataReader()
 
             result = reader->OpenProfileData(dbFilePath.asString());
 
-            if (true == result)
+            if (result)
             {
                 m_pProfDataRd = reader;
-                // TODO: debug code need to be removed
-                AMDTProfileSessionInfo sessionInfo;
-
-                result = m_pProfDataRd->GetProfileSessionInfo(sessionInfo);
             }
         }
     }
-    return result;
 
+    return result;
 }
 
 bool CpuSessionWindow::IsProfilingTypeCLU()

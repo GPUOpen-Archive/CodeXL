@@ -38,10 +38,6 @@
 #include <AMDTSharedProfiling/inc/SharedProfileSettingPage.h>
 #include <AMDTSharedProfiling/inc/StringConstants.h>
 
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    #include <AMDTExecutableFormat/inc/PeFile.h>
-#endif
-
 // Local:
 #include <inc/StdAfx.h>
 #include <inc/CpuProjectSettings.h>

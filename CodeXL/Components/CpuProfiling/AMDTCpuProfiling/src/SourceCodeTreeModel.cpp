@@ -82,6 +82,23 @@ SourceCodeTreeModel::SourceCodeTreeModel(const QString& sessionDir,
 
 SourceCodeTreeModel::~SourceCodeTreeModel()
 {
+    m_srcLineViewTreeMap.clear();
+    m_sampleSrcLnViewTreeList.clear();
+
+    delete m_pRootItem;
+    m_pRootItem = nullptr;
+
+    m_srcLineDataVec.clear();
+    m_headerTooltips.clear();
+    m_headerCaptions.clear();
+    m_symbolsInfoList.clear();
+    m_srcLinesCache.clear();
+    m_sourceLineToCodeBytesMap.clear();
+    m_sourceLinesToDataMap.clear();
+    m_sourceLineToTreeItemsMap.clear();
+    m_sourceTreeItemsMap.clear();
+
+    m_pSessionSourceCodeTreeView = nullptr;
 }
 
 void SourceCodeTreeModel::Clear()
@@ -292,6 +309,7 @@ QModelIndex SourceCodeTreeModel::parent(const QModelIndex& index) const
     {
         SourceViewTreeItem* pParentItem = pItem->parent();
 
+        // TODO: fix the condition
         if (pParentItem == nullptr) // || pParentItem == m_pRootItem)
         {
             return QModelIndex();
@@ -408,20 +426,21 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
 
         int idx = SOURCE_VIEW_SAMPLES_PERCENT_COLUMN + 1;
 
-        for (auto& instOffset : instOffsetVec)
+        for (const auto& instOffset : instOffsetVec)
         {
             SourceViewTreeItem* pAsmItem = new SourceViewTreeItem(SOURCE_VIEW_ASM_DEPTH, m_pRootItem);
+
             gtString disasm;
             gtString codeByte;
-
             GetDisasmString(instOffset.m_offset, srcInfoVec, disasm, codeByte);
+
             AMDTSampleValueVec sampleValue;
             GetDisasmSampleValue(instOffset, functionData.m_instDataList, sampleValue);
 
             idx = SOURCE_VIEW_SAMPLES_PERCENT_COLUMN + 1;
             bool isFirst = true;
 
-            for (auto& aSampleValue : sampleValue)
+            for (const auto& aSampleValue : sampleValue)
             {
                 if (isFirst)
                 {
@@ -470,7 +489,7 @@ void SourceCodeTreeModel::GetInstOffsets(gtUInt16 srcLine,
                                          gtVector<InstOffsetSize>& instOffsetVec)
 {
     // FIXME: This is a linear search till end of vector always. Can this be improved?
-    for (auto& srcInfo : srcInfoVec)
+    for (const auto& srcInfo : srcInfoVec)
     {
         if (srcInfo.m_sourceLine == srcLine)
         {
@@ -507,9 +526,12 @@ void SourceCodeTreeModel::GetDisasmSampleValue(const InstOffsetSize& instInfo,
                                                const AMDTProfileInstructionDataVec& dataVec,
                                                AMDTSampleValueVec& sampleValue)
 {
-    auto instData = std::find_if(dataVec.begin(), dataVec.end(),
-                                 [&instInfo](AMDTProfileInstructionData const & data)
-    { return ((data.m_offset >= instInfo .m_offset) && (data.m_offset < (instInfo.m_offset + instInfo.m_size))); });
+    auto instData = std::find_if(
+        dataVec.begin(),
+        dataVec.end(),
+        [&instInfo](AMDTProfileInstructionData const & data) {
+            return ((data.m_offset >= instInfo .m_offset) && (data.m_offset < (instInfo.m_offset + instInfo.m_size)));
+        });
 
     bool found = false;
 
@@ -529,9 +551,12 @@ void SourceCodeTreeModel::GetDisasmSampleValue(const InstOffsetSize& instInfo,
             }
         }
 
-        instData = std::find_if(++instData, dataVec.end(),
-                                [&instInfo](AMDTProfileInstructionData const & data)
-        { return ((data.m_offset >= instInfo.m_offset) && (data.m_offset < (instInfo.m_offset + instInfo.m_size))); });
+        instData = std::find_if(
+            ++instData,
+            dataVec.end(),
+            [&instInfo](AMDTProfileInstructionData const & data) {
+                return ((data.m_offset >= instInfo.m_offset) && (data.m_offset < (instInfo.m_offset + instInfo.m_size)));
+            });
     }
 }
 
@@ -612,7 +637,7 @@ void SourceCodeTreeModel::PrintFunctionDetailData(const AMDTProfileFunctionData&
             idx++;
         }
 
-        for (auto& instOffset : instOffsetVec)
+        for (const auto& instOffset : instOffsetVec)
         {
             SourceViewTreeItem* pAsmItem = new SourceViewTreeItem(SOURCE_VIEW_ASM_DEPTH,
                                                                   pLineItem);
@@ -638,7 +663,7 @@ void SourceCodeTreeModel::PrintFunctionDetailData(const AMDTProfileFunctionData&
 
                 idx = SOURCE_VIEW_SAMPLES_PERCENT_COLUMN + 1;
 
-                for (auto& aSampleValue : sampleValue)
+                for (const auto& aSampleValue : sampleValue)
                 {
                     if (false == samplePercentSet)
                     {
@@ -983,18 +1008,15 @@ bool SourceCodeTreeModel::isItemTopLevel(SourceViewTreeItem* pItem)
 
 void SourceCodeTreeModel::SetModuleDetails(AMDTUInt32 moduleId, AMDTUInt32 processId)
 {
-    GT_IF_WITH_ASSERT((nullptr != m_pProfDataRdr) && (nullptr != m_pDisplayFilter))
+    GT_IF_WITH_ASSERT(moduleId != AMDT_PROFILE_ALL_MODULES && processId != AMDT_PROFILE_ALL_PROCESSES)
     {
-        AMDTProfileModuleInfoVec modInfo;
-
-        // FIXME: what to do if the moduleId is ALL_MODULES?
-        bool ret = m_pProfDataRdr->GetModuleInfo(processId, moduleId, modInfo);
-
-        if (ret)
+        GT_IF_WITH_ASSERT((nullptr != m_pProfDataRdr) && (nullptr != m_pDisplayFilter))
         {
-            if (modInfo.size() > 0)
+            AMDTProfileModuleInfoVec modInfo;
+            bool ret = m_pProfDataRdr->GetModuleInfo(processId, moduleId, modInfo);
+
+            if (ret && (modInfo.size() > 0))
             {
-                // Fill in the details from the CpuProfileModule class
                 m_modType = modInfo[0].m_type;
                 m_moduleName = acGTStringToQString(modInfo[0].m_path);
             }

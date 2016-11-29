@@ -31,7 +31,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <PreprocessorDefinitions>QT_LARGEFILE_SUPPORT;QT_DLL;QT_GUI_LIB;QT_CORE_LIB;QT_THREAD_SUPPORT;AMDT_CPU_PROFILING_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\..\Backend;$(ProjectDir)\..\Backend\ProfileAgents;$(ProjectDir)\..\ProfilingAgents;$(CommonDir)\Lib\Ext\Java\jdk1.7.0_17\include;$(CommonDir)\Lib\Ext\Java\jdk1.7.0_17\include\win32;$(ProjectDir)\..\..\ThreadProfiling\Backend\AMDTThreadProfileAPI\inc;$(CommonProjectsDir)\AMDTCommonHeaders;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)..\Backend;$(ProjectDir)..\ProfilingAgents;$(ProjectDir)..\..\ThreadProfiling\Backend\AMDTThreadProfileAPI\inc;$(CommonProjectsDir)AMDTCommonHeaders;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

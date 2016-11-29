@@ -18,19 +18,14 @@
 #include <QtCore>
 #include <QtWidgets>
 
-
 // Infra:
 #include <AMDTBaseTools/Include/gtAssert.h>
 #include <AMDTApplicationComponents/Include/acTreeCtrl.h>
 
-#include <AMDTExecutableFormat/inc/ExecutableFile.h>
 #include <AMDTApplicationFramework/Include/views/afApplicationTreeItemData.h>
 #include <SessionTreeNodeData.h>
 
-
-//#include <QDockWidget>
 #include <QFileInfo>
-
 
 #include "inc/DataTab.h"
 #include <inc/StringConstants.h>

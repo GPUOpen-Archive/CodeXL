@@ -76,22 +76,6 @@ void AuxGetSymbolSearchPath(gtString& searchPath, gtString& serverList, gtString
     }
 }
 
-
-bool AuxInitializeSymbolEngine(ExecutableFile* pExecutable)
-{
-    gtString searchPath;
-    gtString serverList;
-    gtString cachePath;
-
-    AuxGetSymbolSearchPath(searchPath, serverList, cachePath);
-
-    const wchar_t* pSearchPath = (!searchPath.isEmpty()) ? searchPath.asCharArray() : nullptr;
-    const wchar_t* pServerList = (!serverList.isEmpty()) ? serverList.asCharArray() : nullptr;
-    const wchar_t* pCachePath = (nullptr != pServerList && !cachePath.isEmpty()) ? cachePath.asCharArray() : nullptr;
-    return pExecutable->InitializeSymbolEngine(pSearchPath, pServerList, pCachePath);
-}
-
-
 // the purpose of this API is for 64-bit module under \windows\system32
 bool AuxFileExists(QString fileNamePath)
 {

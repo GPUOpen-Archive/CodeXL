@@ -26,7 +26,6 @@
 
 // Infra:
 #include <AMDTOSWrappers/Include/osFilePath.h>
-#include <AMDTExecutableFormat/inc/ExecutableFile.h>
 
 // AMDTApplicationFramework:
 #include <AMDTApplicationFramework/Include/views/afApplicationTreeItemData.h>
@@ -43,7 +42,6 @@
 // Pre-declarations
 class SystemDataTab;
 class SessionOverviewWindow;
-class CssTab;
 class afApplicationTreeItemData;
 class SessionModulesView;
 class SessionFunctionView;
@@ -56,6 +54,7 @@ class cxlProfileDataReader;
 class CpuSessionWindow : public SharedSessionWindow
 {
     Q_OBJECT
+
 public:
     CpuSessionWindow(const afApplicationTreeItemData* pSessionTreeItemData, QWidget* pParent = nullptr);
     ~CpuSessionWindow();
@@ -95,7 +94,6 @@ public:
     /// \param changeType what change type should be performed (see SettingsDifference for definitions)
     void UpdateDisplaySettings(bool isActive, unsigned int changeType);
 
-    CpuProfileModule* getModuleDetail(const QString& modulePath, QWidget* pParent = nullptr, ExecutableFile** ppExe = nullptr);
 
     std::shared_ptr<cxlProfileDataReader> profDbReader() { return m_pProfDataRd; }
     std::shared_ptr<DisplayFilter> GetDisplayFilter() { return m_pDisplayFilter; }
@@ -103,7 +101,6 @@ public:
     AMDTProfileType GetProfileType();
 
 public slots:
-
     /// New GUI:
     bool displayOverviewWindow(const osFilePath& filePath);
     void onTabClose(int index);
@@ -141,14 +138,10 @@ public slots:
     void onAboutToActivate();
 
 protected:
-
     /// return true if data is present else provide error message and return false
     bool checkIfDataIsPresent();
-    bool syncWithSymbolEngine(CpuProfileModule& module, const QString& exePath, ExecutableFile** ppExe = nullptr);
 
 private:
-
-    //TODO: Hack to get database file needs to be taken care of
     bool OpenDataReader();
 
     /// Session tree item data:

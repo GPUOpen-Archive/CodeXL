@@ -14,15 +14,13 @@
 #ifndef _CPUPROF_AUXIL_H_
 #define _CPUPROF_AUXIL_H_
 
-#include "inc/StdAfx.h"
-#include <AMDTExecutableFormat/inc/ExecutableFile.h>
 #include <AMDTCpuProfilingRawData/inc/CpuProfileReader.h>
+#include "inc/StdAfx.h"
 
 class osFilePath;
 
 // Prototypes
 void AuxGetSymbolSearchPath(gtString& searchPath, gtString& serverList, gtString& cachePath);
-bool AuxInitializeSymbolEngine(ExecutableFile* pExecutable);
 
 // The purpose of this API is for 64-bit module under \windows\system32
 bool AuxFileExists(QString fileNamePath);

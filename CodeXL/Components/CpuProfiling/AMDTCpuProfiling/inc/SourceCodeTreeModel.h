@@ -14,7 +14,6 @@
 
 // Infra:
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
-#include <AMDTExecutableFormat/inc/ExecutableFile.h>
 
 // Backend
 #include <AMDTCpuProfilingRawData/inc/CpuProfileFunction.h>
@@ -22,6 +21,7 @@
 // Local:
 #include <inc/SourceCodeViewUtils.h>
 #include <inc/StdAfx.h>
+
 
 struct InstOffsetSize
 {
@@ -142,10 +142,6 @@ private:
 
     bool m_isDisplayingOnlyDasm = false;
 
-    // This map contains the current offset to
-    // source line information for current function
-    OffsetLinenumMap m_funOffsetLinenumMap;
-
     QVector<QString> m_srcLinesCache;
     unsigned int m_startLine = 1;
     unsigned int m_stopLine = 0;
@@ -160,6 +156,7 @@ private:
     ThreadIdType m_newTid = AMDT_PROFILE_ALL_THREADS;
     AMDTFunctionId m_funcId = 0;
 
+    // FIMXE: this mem-var never set, only accessed.
     const CpuProfileFunction* m_pDisplayedFunction = nullptr;
 
     AMDTModuleType m_modType = AMDT_MODULE_TYPE_NONE;

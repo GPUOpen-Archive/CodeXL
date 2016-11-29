@@ -70,11 +70,8 @@ SessionSourceCodeView::SessionSourceCodeView(QWidget* pParent,
 
 SessionSourceCodeView::~SessionSourceCodeView()
 {
-    if (m_pTreeViewModel != nullptr)
-    {
-        delete m_pTreeViewModel;
-        m_pTreeViewModel = nullptr;
-    }
+    delete m_pTreeViewModel;
+    m_pTreeViewModel = nullptr;
 }
 
 bool SessionSourceCodeView::DisplayViewModule(std::tuple<AMDTFunctionId, const gtString&, AMDTUInt32, AMDTUInt32> funcModInfo)
@@ -429,6 +426,8 @@ void SessionSourceCodeView::CreateFunctionsComboBox()
             }
         }
 
+        // TODO: Which is appropriate here m_pProfDataRdr->GetFunctionInfo() or m_pProfDataRdr->GetFunctionInfoByModuleId()?
+        //       Can the commented code be removed ?
 #if 0
         // Though this approach will have following side effects, its OK for 2.2 release
         //      - function combo box will have functions that do not have IP samples
@@ -774,8 +773,6 @@ void SessionSourceCodeView::UpdateWithNewSymbol()
 
     if (m_pTreeViewModel->m_srcFile.isEmpty())
     {
-        m_pTreeViewModel->m_funOffsetLinenumMap.clear();
-
         fileLocationStr = QString("Module: ") + m_pTreeViewModel->m_moduleName;
         // TODO: For JAVAMODULE and MANAGEDPE, we update the jnc file in the module label.
     }

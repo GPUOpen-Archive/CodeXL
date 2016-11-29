@@ -10,7 +10,6 @@
 #define __SOURCEVIEWTREEITEM_H
 
 // Qt:
-#include <QtWidgets>
 #include <QVariant>
 #include <QVector>
 
@@ -65,8 +64,6 @@ public:
     QColor forground(int column) const;
     bool setForeground(int column, const QColor& color);
 
-    void clear();
-
 #if AMDT_BUILD_CONFIGURATION == AMDT_DEBUG_BUILD
     void DebugPrintChildrenList();
 #endif
@@ -83,6 +80,4 @@ protected:
     SourceViewTreeItem* m_pParentItem = nullptr;
 };
 
-
 #endif //__SOURCEVIEWTREEITEM_H
-
