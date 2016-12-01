@@ -13,7 +13,6 @@
 
 // Qt:
 #include <qtIgnoreCompilerWarnings.h>
-#include <QtCore>
 #include <QtWidgets>
 
 // Infra:
@@ -37,16 +36,17 @@ SourceViewTreeItem::SourceViewTreeItem(const QVector<QVariant>& data, SourceView
     m_itemData(data),
     m_pParentItem(pParentItem)
 {
+    if (pParentItem != nullptr)
+    {
+        pParentItem->appendChild(this);
+    }
 }
 
 SourceViewTreeItem::~SourceViewTreeItem()
 {
-    for (auto pChild : m_childItems)
-    {
-        delete pChild;
-    }
-
+    qDeleteAll(m_childItems);
     m_childItems.clear();
+
     m_itemData.clear();
     m_itemTooltip.clear();
     m_itemForegrounds.clear();
@@ -58,16 +58,16 @@ SourceViewTreeItem::~SourceViewTreeItem()
 #endif
 }
 
-SourceViewTreeItem* SourceViewTreeItem::child(int index)
+SourceViewTreeItem* SourceViewTreeItem::child(int index) const
 {
-    SourceViewTreeItem* pRetVal = nullptr;
+    SourceViewTreeItem* pChild = nullptr;
 
     if ((index >= 0) && (index < m_childItems.size()))
     {
-        pRetVal = m_childItems[index];
+        pChild = m_childItems[index];
     }
 
-    return pRetVal;
+    return pChild;
 }
 
 int SourceViewTreeItem::columnCount() const
@@ -87,11 +87,13 @@ QVariant SourceViewTreeItem::tooltip(int column) const
 
 bool SourceViewTreeItem::appendChild(SourceViewTreeItem* pChild)
 {
-    bool retVal = true;
+    bool retVal = false;
 
-    // Insert the child in the last place:
-    int numberOfChildren = m_childItems.size();
-    m_childItems.insert(numberOfChildren, pChild);
+    if (pChild != nullptr)
+    {
+        m_childItems.append(pChild);
+        retVal = true;
+    }
 
     return retVal;
 }
@@ -99,24 +101,23 @@ bool SourceViewTreeItem::appendChild(SourceViewTreeItem* pChild)
 bool SourceViewTreeItem::insertChild(int position, SourceViewTreeItem* pChild)
 {
     bool retVal = false;
-    GT_IF_WITH_ASSERT((position >= 0) && (position < m_childItems.size()))
+
+    GT_IF_WITH_ASSERT((position >= 0) && (position < m_childItems.size()) && pChild != nullptr)
     {
         m_childItems.insert(position, pChild);
         retVal = true;
     }
+
     return retVal;
 }
 
 bool SourceViewTreeItem::insertChildren(int position, int count, int columns)
 {
+    // Insert given number of children with given number of columns at the given position.
     bool retVal = false;
 
-    // Sanity check:
     GT_IF_WITH_ASSERT((position >= 0) && (position < m_childItems.size()))
     {
-        retVal = true;
-
-        // Insert items to the list:
         for (int row = 0; row < count; ++row)
         {
             QVector<QVariant> data(columns);
@@ -125,6 +126,8 @@ bool SourceViewTreeItem::insertChildren(int position, int count, int columns)
             // Insert the new child:
             m_childItems.insert(position, pItem);
         }
+
+        retVal = true;
     }
 
     return retVal;
@@ -132,45 +135,53 @@ bool SourceViewTreeItem::insertChildren(int position, int count, int columns)
 
 bool SourceViewTreeItem::insertColumns(int position, int columns)
 {
+    // Insert given number of columns to the parent and all the children recursively.
     bool retVal = false;
 
-    if (position < 0 || position > m_itemData.size())
-    {
-        retVal = false;
-    }
-    else
+    if (position >= 0 && position < m_itemData.size())
     {
         for (int column = 0; column < columns; ++column)
         {
             m_itemData.insert(position, QVariant());
         }
 
-        for (int i = 0 ; i < m_childItems.size(); i++)
+        for (auto pChild : m_childItems)
         {
-            SourceViewTreeItem* pChild = m_childItems[i];
-
             GT_IF_WITH_ASSERT(pChild != nullptr)
             {
                 pChild->insertColumns(position, columns);
             }
         }
+
+        retVal = true;
     }
 
     return retVal;
 }
 
-SourceViewTreeItem* SourceViewTreeItem::parent()
+SourceViewTreeItem* SourceViewTreeItem::parent() const
 {
     return m_pParentItem;
+}
+
+int SourceViewTreeItem::row() const
+{
+    if (m_pParentItem != nullptr)
+    {
+        return m_pParentItem->m_childItems.indexOf(const_cast<SourceViewTreeItem*>(this));
+    }
+
+    return 0;
 }
 
 bool SourceViewTreeItem::removeChildren(int position, int count)
 {
     bool retVal = false;
+    int endPosition = position + count - 1;
 
-    GT_IF_WITH_ASSERT((position >= 0) && ((position + count - 1) < m_childItems.size()))
+    GT_IF_WITH_ASSERT((position >= 0) && (endPosition < m_childItems.size()))
     {
-        for (int row = position + count - 1; row >= position; row--)
+        for (int row = endPosition; row >= position; row--)
         {
             // Remove the item from the list, and delete it:
             delete m_childItems.takeAt(row);
@@ -185,12 +196,9 @@ bool SourceViewTreeItem::removeChildren(int position, int count)
 bool SourceViewTreeItem::removeColumns(int position, int columns)
 {
     bool retVal = false;
+    int endPosition = position + columns - 1;
 
-    if (position < 0 || (position + columns) > m_itemData.size())
-    {
-        retVal = false;
-    }
-    else
+    if (position >= 0 && endPosition < m_itemData.size())
     {
         for (int column = 0; column < columns; ++column)
         {
@@ -257,27 +265,27 @@ bool SourceViewTreeItem::setForeground(int column, const QColor& color)
     GT_IF_WITH_ASSERT((column >= 0) && (column < m_itemForegrounds.size()))
     {
         m_itemForegrounds[column] = color;
+        retVal = true;
     }
 
     return retVal;
 }
 
-int SourceViewTreeItem::indexOfChild(SourceViewTreeItem* pItem)
+int SourceViewTreeItem::indexOfChild(SourceViewTreeItem* pItem) const
 {
-    int retVal = m_childItems.indexOf(pItem);
-    return retVal;
+    return m_childItems.indexOf(pItem);
 }
 
 QColor SourceViewTreeItem::forground(int column) const
 {
-    QColor retVal = Qt::black;
+    QColor color = Qt::black;
 
     if ((column >= 0) && (column < m_itemForegrounds.size()))
     {
-        retVal = m_itemForegrounds[column];
+        color = m_itemForegrounds[column];
     }
 
-    return retVal;
+    return color;
 }
 
 #if AMDT_BUILD_CONFIGURATION == AMDT_DEBUG_BUILD

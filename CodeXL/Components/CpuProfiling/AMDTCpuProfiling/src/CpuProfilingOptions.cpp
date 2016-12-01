@@ -12,25 +12,21 @@
 // Change list:    $Change: 569613 $
 //=============================================================
 
-// Qt:
-#include <QtCore>
-#include <QtWidgets>
-
-// Infar:
-#include <AMDTAPIClasses/Include/apBasicParameters.h>
+// Infra:
 #include <AMDTBaseTools/Include/gtAssert.h>
 #include <AMDTApplicationComponents/Include/acFunctions.h>
 
 // AMDTApplicationFramework:
 #include <AMDTApplicationFramework/Include/afAidFunctions.h>
 
-//local
+// Local:
 #include <inc/CpuProfilingOptions.h>
 #include <inc/StringConstants.h>
 
-const int DEFAULT_MAX_SYM_COLUMN_WIDTH = 250;
 #define DIASSEMBLY_INSTRUCTIONS_CHUNK_SIZE_VAR_NAME    "disassemblyInstrcutionsChunckSize"
 #define DIASSEMBLY_INSTRUCTIONS_CHUNK_SIZE_VAR_NAME_L L"disassemblyInstrcutionsChunckSize"
+
+const int DEFAULT_MAX_SYM_COLUMN_WIDTH = 250;
 
 // Static members:
 CpuProfilingOptions* CpuProfilingOptions::m_pMySingleInstance = nullptr;
@@ -161,7 +157,6 @@ bool CpuProfilingOptions::setProjectSettingsXML(const gtString& projectAsXMLStri
 
     return reader.parse(source);
 }
-
 
 bool CpuProfilingOptions::startDocument()
 {

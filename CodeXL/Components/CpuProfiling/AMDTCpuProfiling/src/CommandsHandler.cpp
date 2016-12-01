@@ -772,7 +772,6 @@ HRESULT CommandsHandler::tryStartProfiling(int retries) const
 
 unsigned int* CommandsHandler::constructAttachPidArray(unsigned int& launchedPid, unsigned int& count) const
 {
-    // Baskar: 19, March 2013:
     // Currently CodeXL does not support to profile an already existing process. Of course the
     // user can profile in System-wide mode to profile the already running processes. But in
     // System-wide mode, CodeXL will collect the CSS samples only for the launched application.
@@ -2051,18 +2050,7 @@ bool CommandsHandler::IsSpecialExetableCaseSet()
 
 bool CommandsHandler::IsProfileEnabled()
 {
-    bool retVal = true;
-
-#ifdef _WIN32
-
-    if (!IsPlatformSupportsCPUProfiling())
-    {
-        retVal = false;
-    }
-
-#endif
-
-    return retVal;
+    return true;
 }
 
 void CommandsHandler::updateUI(afExecutionCommandId commandId, QAction* pAction)
@@ -2109,30 +2097,3 @@ void CommandsHandler::HandleInvalidProjectSettings(bool& isProfileSettingsOK, os
         isProfileSettingsOK = true;
     }
 }
-
-#ifdef _WIN32
-bool CommandsHandler::IsPlatformSupportsCPUProfiling()
-{
-    osCpuid cpuInfo;
-    OSVERSIONINFO osvi;
-
-    ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
-    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-
-    GetVersionEx(&osvi);
-
-    if ((!cpuInfo.isCpuAmd()) && // Non-AMD CPU
-        ((osvi.dwMajorVersion >= 6) && (osvi.dwMinorVersion >= 2))) //Win8 or Windows Server 2012
-    {
-        // Baskar:
-        // BUG393358: Enable TBP and Custom profile on Intel + Win8 Platforms.
-        // Now that the driver has been fixed, we can enable cpu-profiling support on Intel systems.
-        return true;
-    }
-    else
-    {
-        return true;
-    }
-}
-
-#endif

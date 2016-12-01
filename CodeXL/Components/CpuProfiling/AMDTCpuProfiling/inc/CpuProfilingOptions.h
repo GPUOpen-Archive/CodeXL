@@ -16,29 +16,28 @@
 #define _CPUPROFILINGOPTIONS_H
 
 // Qt:
-#include <QtCore>
-#include <QtWidgets>
 #include <QXmlDefaultHandler>
 
-//infrastructure
+// Infrastructure:
 #include <AMDTBaseTools/Include/gtString.h>
 
 
 struct PROFILE_OPTIONS
 {
-    bool addDebug;
-    gtUInt32 useSymSrvMask;   //Assumes a maximum of 32 symbol servers added
+    bool addDebug = false;
+    gtUInt32 useSymSrvMask = 0;   //Assumes a maximum of 32 symbol servers added
     QString symbolDownloadDir;
-    bool enableSymServer;
+    bool enableSymServer = false;
     QString symSrvList;
     QString debugSearchPaths;
-    int maxSymColWidth;
-    unsigned int disassemblyInstrcutionsChunkSize;
+    int maxSymColWidth = 0;
+    unsigned int disassemblyInstrcutionsChunkSize = 0;
 };
 
 class CpuProfilingOptions: public QObject, public QXmlDefaultHandler
 {
     Q_OBJECT
+
 public:
     static CpuProfilingOptions& instance();
     virtual ~CpuProfilingOptions();
@@ -51,15 +50,18 @@ public:
     bool setProjectSettingsXML(const gtString& projectAsXMLString);
 
     // Override QXmlDefaultHandler
-    bool startDocument() ;
-    bool endDocument() ;
+    bool startDocument();
+    bool endDocument();
+
     bool startElement(
         const QString& namespaceURI, const QString& localName,
-        const QString& qName, const QXmlAttributes& atts) ;
+        const QString& qName, const QXmlAttributes& atts);
+
     bool endElement(
         const QString& namespaceURI, const QString& localName,
-        const QString& qName) ;
-    bool characters(const QString& ch) ;
+        const QString& qName);
+
+    bool characters(const QString& ch);
 
 signals:
     void settingsUpdated();
@@ -75,7 +77,7 @@ protected:
 
     PROFILE_OPTIONS m_options;
 
-    bool m_CpuProfileExtension;
+    bool m_CpuProfileExtension = false;
     QString m_xmlContent;
 };
 

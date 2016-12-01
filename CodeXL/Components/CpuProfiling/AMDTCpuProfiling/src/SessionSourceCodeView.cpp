@@ -16,7 +16,6 @@
 #include <qtIgnoreCompilerWarnings.h>
 #include <QtCore>
 #include <QtWidgets>
-#include <QPushButton>
 
 // AMDTApplicationComponents
 #include <AMDTApplicationComponents/Include/acColours.h>
@@ -27,23 +26,17 @@
 // AMDTApplicationFramework:
 #include <AMDTApplicationFramework/Include/afApplicationCommands.h>
 #include <AMDTApplicationFramework/Include/afProgressBarWrapper.h>
-#include <AMDTApplicationFramework/Include/views/afApplicationTree.h>
 #include <AMDTApplicationFramework/Include/afGlobalVariablesManager.h>
 #include <AMDTApplicationFramework/Include/afProjectManager.h>
-#include <AMDTApplicationFramework/src/afUtils.h>
 
 // AMDTSharedProfiling:
 #include <AMDTSharedProfiling/inc/ProfileApplicationTreeHandler.h>
 
 // Local:
-#include <inc/CPUProfileUtils.h>
 #include <inc/CpuProjectHandler.h>
-#include <inc/CpuProfilingOptions.h>
 #include <inc/SessionSourceCodeView.h>
 #include <inc/SourceCodeTreeModel.h>
 #include <inc/StringConstants.h>
-#include <inc/SessionWindow.h>
-#include <inc/Auxil.h>
 #include <inc/CpuProfileTreeHandler.h>
 
 #if defined (_WIN32)
@@ -134,10 +127,6 @@ void SessionSourceCodeView::UpdateTableDisplay(unsigned int updateType)
 
         // Clear the tree and table items:
         m_pTreeViewModel->removeRows(0, m_pTreeViewModel->rowCount());
-        m_pTreeViewModel->m_sourceTreeItemsMap.clear();
-        m_pTreeViewModel->m_sourceLineToTreeItemsMap.clear();
-        m_pTreeViewModel->m_sourceLinesToDataMap.clear();
-        m_pTreeViewModel->m_sourceLineToCodeBytesMap.clear();
 
         // Update the display with the current displayed source:
         UpdateDisplay();
@@ -1477,7 +1466,7 @@ void SessionSourceCodeView::applyUserDisplayInformation()
 
     GT_IF_WITH_ASSERT((m_pSourceCodeTree != nullptr) && (pHotSpotIndicatorComboBox != nullptr))
     {
-        AMDTUInt64 firstSrcLine = m_pTreeViewModel->GetFuncSrcFirstLnNum();
+        AMDTUInt32 firstSrcLine = m_pTreeViewModel->GetFuncSrcFirstLnNum();
         const std::vector<SourceViewTreeItem*>& srcLineVec = m_pTreeViewModel->GetSrcLineViewMap();
 
         if (!srcLineVec.empty())

@@ -41,10 +41,11 @@ public:
     SourceViewTreeItem(const QVector<QVariant>& data, SourceViewTreeItem* pParent = nullptr);
     virtual ~SourceViewTreeItem();
 
-    SourceViewTreeItem* parent();
+    SourceViewTreeItem* parent() const;
+    int row() const;
 
-    SourceViewTreeItem* child(int index);
-    int indexOfChild(SourceViewTreeItem* pItem);
+    SourceViewTreeItem* child(int index) const;
+    int indexOfChild(SourceViewTreeItem* pItem) const;
     int childCount() const { return m_childItems.size(); };
     bool insertChildren(int position, int count, int columns);
     bool removeChildren(int position, int count);

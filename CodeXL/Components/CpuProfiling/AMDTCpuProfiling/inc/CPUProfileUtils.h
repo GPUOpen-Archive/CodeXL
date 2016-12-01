@@ -15,10 +15,6 @@
 #include <AMDTCpuPerfEventUtils/inc/ViewConfig.h>
 #include <AMDTCpuPerfEventUtils/inc/IbsEvents.h>
 
-// Local:
-#include <inc/StdAfx.h>
-#include <inc/DisplayFilter.h>
-
 
 // The list of events for which higher sample value is better
 const unsigned int EventsBetterHigher[] =
@@ -37,42 +33,35 @@ const unsigned int EventsBetterHigher[] =
 /// -----------------------------------------------------------------------------------------------
 class CPUProfileUtils
 {
-
 public:
-
-
     /// \brief Name:        addDataArrays
     /// \brief Description: Utility: add 2 data arrays
     /// \param[in]          pDestArray - the destination array
     /// \param[in]          pSourceArray - the source array
     static void AddDataArrays(gtVector<float>& destVector, const gtVector<float>& sourceVector) ;
 
-
     /// Return the column full name according to the column type and title:
     /// \param[in]          colType the requested column type
     /// \param[in]          colType the requested column title
     /// \param[in]          hwEvent the matching event details
-    /// \param[in]          the postfix of the column (can contain numa node or core details)
+    /// \param[in]          the postfix of the column (can contain NUMA node or core details)
     static QString GetColumnFullName(ColumnType colType, const QString& title, const CpuEvent& hwEvent, const QString& postfix);
 
     /// Returns true if higher sample value is better for the hot spot, false otherwise
-    /// \param[in]          pEventsFile the refrence to the object of class EventsFile
+    /// \param[in]          pEventsFile the reference to the object of class EventsFile
     /// \param[in]          hotSpotCaption the hot spot indicator caption
     static bool IsHotSpotBetterHigher(EventsFile* pEventsFile, const QString& hotSpotCaption);
 
     /// Returns true if the hot spot is a CLU metric, false otherwise
-    /// \param[in]          pEventsFile the refrence to the object of class EventsFile
+    /// \param[in]          pEventsFile the reference to the object of class EventsFile
     /// \param[in]          hotSpotCaption the hot spot indicator caption
     static bool IsHotSpotCluMetric(EventsFile* pEventsFile, const QString& hotSpotCaption);
 
     // List of strings (name/abbreviation/caption) related to the events for which higher sample value is better
     static QStringList m_hotSpotsBetterHigher;
 
-    // List of hot spot captions of all clu metrics
+    // List of hot spot captions of all CLU metrics
     static QStringList m_hotSpotsCluMetric;
 };
 
-
-
 #endif //__CPUPROFILEUTILS_H
-
