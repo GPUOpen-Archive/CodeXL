@@ -113,7 +113,7 @@ private:
     std::shared_ptr<DisplayFilter> m_displayFilter = nullptr;
 
     std::shared_ptr<cxlProfileDataReader>   m_pProfDataReader;
-    std::shared_ptr<cofigNameCounterMap>    m_CongigrationMap;
+    std::shared_ptr<configNameCounterMap>    m_CongigrationMap;
     QString                                 m_cofigName;
     gtVector<AMDTUInt32>                    m_selectedCounters;
     std::map<int, int>                      m_colIdxCounterIdMap;

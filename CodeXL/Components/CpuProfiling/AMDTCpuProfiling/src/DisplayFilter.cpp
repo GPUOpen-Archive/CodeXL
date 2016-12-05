@@ -12,20 +12,11 @@
 
 // Infra:
 #include <AMDTBaseTools/Include/gtAssert.h>
-#include <AMDTOSWrappers/Include/osDirectory.h>
 #include <AMDTOSWrappers/Include/osDebuggingFunctions.h>
-#include <AMDTOSWrappers/Include/osFilePath.h>
-#include <AMDTOSWrappers/Include/osCpuid.h>
-#include <AMDTApplicationComponents/Include/acMessageBox.h>
 #include <AMDTApplicationComponents/Include/acFunctions.h>
-
-// AMDTApplicationFramework:
-#include <AMDTApplicationFramework/Include/afAppStringConstants.h>
-#include <AMDTApplicationFramework/src/afUtils.h>
 
 // Local:
 #include <inc/DisplayFilter.h>
-#include <inc/StdAfx.h>
 #include <inc/StringConstants.h>
 
 // Global:
@@ -35,26 +26,13 @@ static bool g_isSamplePercent = false;
 // Static member initialization:
 CPUGlobalDisplayFilter* CPUGlobalDisplayFilter::m_psMySingleInstance = nullptr;
 
-TableDisplaySettings::TableDisplaySettings()
-{
-    m_amountOfItemsInDisplay = -1;
-    m_hotSpotIndicatorColumnCaption = "";
-    m_filterByPIDsList.clear();
-    m_filterByModulePathsList.clear();
-    m_allModulesFullPathsList.clear();
-    m_shouldDisplaySystemDllInModulesDlg = true;
-    m_isModule32BitList.clear();
-    m_isSystemDllList.clear();
-    m_lastSortOrder = Qt::DescendingOrder;
-    m_lastSortColumnCaption = "";
-}
 
 TableDisplaySettings::TableDisplaySettings(const TableDisplaySettings& other)
 {
     // Copy the displayed columns:
-    for (int i = 0; i < (int)other.m_displayedColumns.size(); i++)
+    for (const auto& col : other.m_displayedColumns)
     {
-        m_displayedColumns.push_back(other.m_displayedColumns[i]);
+        m_displayedColumns.push_back(col);
     }
 
     m_amountOfItemsInDisplay = other.m_amountOfItemsInDisplay;
@@ -165,12 +143,6 @@ void CPUGlobalDisplayFilter::reset()
     }
 }
 
-CPUGlobalDisplayFilter::CPUGlobalDisplayFilter()
-{
-    m_displaySystemDLLs = false;
-    m_displayPercentageInColumn = false;
-}
-
 DisplayFilter::DisplayFilter()
 {
     m_CLUOVHdrName = acGTStringToQString(L"Cache Line Utilization Percentage");
@@ -186,7 +158,7 @@ bool DisplayFilter::CreateConfigCounterMap()
     {
         ret = m_pProfDataReader->GetReportConfigurations(m_reportConfigs);
 
-        if (true == ret)
+        if (ret)
         {
             m_configCounterMap.clear();
 
@@ -207,7 +179,7 @@ bool DisplayFilter::CreateConfigCounterMap()
                     m_counterIdNameMap.insert(std::make_pair(counter.m_id, counter.m_name));
                 }
 
-                m_configCounterMap.insert(cofigNameCounterPair(config.m_name, counters));
+                m_configCounterMap.insert(configNameCounterPair(config.m_name, counters));
                 m_configNameList.push_back(config.m_name);
             }
         }
@@ -296,11 +268,11 @@ bool DisplayFilter::InitToDefault()
         for (auto const& counter : m_reportConfigs[0].m_counterDescs)
         {
             m_options.m_counters.push_back(counter.m_id);
-            m_selectedCountersIdList.push_back(std::make_tuple(counter.m_name,
-                                                               counter.m_abbrev,
-                                                               counter.m_description,
-                                                               counter.m_id,
-                                                               counter.m_type));
+            m_selectedCountersIdList.emplace_back(counter.m_name,
+                                                  counter.m_abbrev,
+                                                  counter.m_description,
+                                                  counter.m_id,
+                                                  counter.m_type);
         }
 
         retVal = m_pProfDataReader->SetReportOption(m_options);

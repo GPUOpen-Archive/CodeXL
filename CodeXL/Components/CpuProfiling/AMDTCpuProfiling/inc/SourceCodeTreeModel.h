@@ -43,10 +43,9 @@ public:
 
     QVariant data(const QModelIndex& index, int role) const override;
     bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
+
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     bool setHeaderData(int section, Qt::Orientation orientation, const QVariant& value, int role = Qt::EditRole) override;
-    /// Update the displayed headers:
-    bool UpdateHeaders();
 
     QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
     QModelIndex parent(const QModelIndex& index) const override;
@@ -56,6 +55,9 @@ public:
     bool removeColumns(int position, int columns, const QModelIndex& parent = QModelIndex()) override;
     bool insertRows(int position, int rows, const QModelIndex& parent = QModelIndex()) override;
     bool removeRows(int position, int rows, const QModelIndex& parent = QModelIndex()) override;
+
+    /// Update the displayed headers:
+    bool UpdateHeaders(AMDTUInt32 hotspotCounterId = 0);
 
     /// Return the index of the top level item parent (or itself), and the index of the item within it's top level item parent:
     bool GetItemTopLevelIndex(const QModelIndex& index, int& indexOfTopLevelItem, int& indexOfTopLevelItemChild) const;
@@ -75,9 +77,6 @@ public:
 
     QModelIndex indexOfItem(SourceViewTreeItem* pItem) const;
 
-    /// Fill the current file source lines:
-    void BuildSourceLinesTree(std::vector<SourceViewTreeItem*>& srcLineViewTreeMap);
-
     /// Fill the current file disassembly lines:
     bool BuildDisassemblyTree();
 
@@ -89,26 +88,11 @@ public:
 
     void SetHotSpotSamples(AMDTUInt32 counterIdx);
 
-    void SetDisplayFormat(double val, bool appendPercent, QVariant& data, const int precision);
-
     /// Store module details:
     void SetModuleDetails(AMDTUInt32 moduleId, AMDTUInt32 pId);
-    void BuildTree(const std::vector<SourceViewTreeItem*>& srcLineViewTreeMap);
 
-    void PrintFunctionDetailData(const AMDTProfileFunctionData&  functionData,
-                                 gtString srcFilePath,
-                                 AMDTSourceAndDisasmInfoVec srcInfoVec,
-                                 const std::vector<SourceViewTreeItem*>& srcLineViewTreeMap);
-    void GetInstOffsets(gtUInt16 srcLine, const AMDTSourceAndDisasmInfoVec& srcInfoVec, gtVector<InstOffsetSize>& instOffsetVec) const;
-    void GetDisasmString(gtVAddr offset, const AMDTSourceAndDisasmInfoVec& srcInfoVec, gtString& disasm, gtString& codeByte) const;
-    void GetDisasmSampleValue(const InstOffsetSize& instInfo,
-                              const AMDTProfileInstructionDataVec& dataVec,
-                              AMDTSampleValueVec& sampleValue) const;
-
-    AMDTUInt32 GetFuncSrcFirstLnNum() const { return m_funcFirstSrcLine; }
+    AMDTUInt32 GetFuncSrcFirstLnNum() const { return (m_funcFirstSrcLine > 0) ? (m_funcFirstSrcLine - 1) : 0; }
     const std::vector<SourceViewTreeItem*> GetSrcLineViewMap() const { return m_srcLineViewTreeMap; }
-
-    void Clear();
 
 private:
     bool SetSourceLines(const QString& filepath, unsigned int startLine, unsigned int stopLine);
@@ -122,6 +106,30 @@ private:
     void SetHotSpotDisamOnlySamples(AMDTUInt32 counterId,
                                     const AMDTProfileFunctionData&  functionData,
                                     const AMDTSourceAndDisasmInfoVec& srcInfoVec);
+
+    void SetTooltipFormat(double val, double funcPercent, double appPercent, QVariant& tooltip);
+    void SetDisplayFormat(double val, bool appendPercent, QVariant& data, const int precision);
+
+    /// Fill the current file source lines:
+    void BuildSourceLinesTree(std::vector<SourceViewTreeItem*>& srcLineViewTreeMap);
+    void BuildTree(const std::vector<SourceViewTreeItem*>& srcLineViewTreeMap);
+    void PopulateFunctionSampleData(const AMDTProfileFunctionData&  functionData,
+                                    gtString srcFilePath,
+                                    AMDTSourceAndDisasmInfoVec srcInfoVec,
+                                    const std::vector<SourceViewTreeItem*>& srcLineViewTreeMap);
+
+    void GetInstOffsets(gtUInt16 srcLine,
+                        const AMDTSourceAndDisasmInfoVec& srcInfoVec,
+                        gtVector<InstOffsetSize>& instOffsetVec) const;
+
+    void GetDisasmString(gtVAddr offset,
+                         const AMDTSourceAndDisasmInfoVec& srcInfoVec,
+                         gtString& disasm,
+                         gtString& codeByte) const;
+
+    void GetDisasmSampleValue(const InstOffsetSize& instInfo,
+                              const AMDTProfileInstructionDataVec& dataVec,
+                              AMDTSampleValueVec& sampleValue) const;
 
 private:
     SourceCodeTreeView* m_pSessionSourceCodeTreeView = nullptr;
@@ -149,7 +157,10 @@ private:
 
     bool m_isModuleCached = false;
 
+    // Latest source file to be displayed
     QString m_srcFile;
+    // Previous source file (if any) displayed
+    QString m_lastSrcFile;
 
     gtVAddr m_newAddress = 0;
 

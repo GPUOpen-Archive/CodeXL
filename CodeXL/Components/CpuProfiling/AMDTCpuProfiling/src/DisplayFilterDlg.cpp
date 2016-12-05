@@ -147,8 +147,8 @@ DisplayFilterDlg::displayDialog(const QString& sessionPath, bool enableOnlySyste
                 }
 
 #endif
-				m_displaySystemDLLs = !m_displayFilter->IsSystemModuleIgnored();
-				m_pCheckBoxDisplaySystemDLLs->setChecked(m_displaySystemDLLs);
+                m_displaySystemDLLs = !m_displayFilter->IsSystemModuleIgnored();
+                m_pCheckBoxDisplaySystemDLLs->setChecked(m_displaySystemDLLs);
                 m_pCheckBoxShowPercentageBars->setChecked(m_displayPercentageInColumn);
             }
 
@@ -768,7 +768,7 @@ void DisplayFilterDlg::updateHiddenColumnList()
         m_notChecked.clear();
 
         // get Config name
-        QString configName = m_displayFilter->GetCurrentCofigName();
+        QString configName = m_displayFilter->GetCurrentConfigName();
         CounterNameIdVec counterDetails;
 
         //get supported counter list
@@ -779,7 +779,7 @@ void DisplayFilterDlg::updateHiddenColumnList()
 
         if (nullptr != m_displayFilter)
         {
-            QString configName = m_displayFilter->GetCurrentCofigName();
+            QString configName = m_displayFilter->GetCurrentConfigName();
             CounterNameIdVec counterDetails;
 
             //get supported counter list

@@ -351,7 +351,7 @@ bool SessionSourceCodeView::FillHotspotIndicatorCombo()
         {
             QStringList hotSpotColumns;
 
-            QString filterName = m_pDisplayFilter->GetCurrentCofigName();
+            QString filterName = m_pDisplayFilter->GetCurrentConfigName();
 
             GT_IF_WITH_ASSERT(!filterName.isEmpty())
             {
@@ -1188,18 +1188,12 @@ void SessionSourceCodeView::OnHotSpotComboChanged(const QString& text)
     // Set the selected hot spot (to be selected later when switching pid / tid):
     m_userDisplayInformation.m_selectedHotSpot = text;
 
-    // Sanity check:
     GT_IF_WITH_ASSERT(m_pTreeViewModel != nullptr)
     {
         auto counterIdx = std::find(m_supportedCounterList.begin(), m_supportedCounterList.end(), acQStringToGTString(text));
 
         if (counterIdx != m_supportedCounterList.end())
         {
-            //int val = counterIdx - m_supportedCounterList.begin();
-
-            // Re-Set the tree samples column:
-            //m_pTreeViewModel->SetTreeSamples(text);
-
             AMDTUInt32 counterId = m_pDisplayFilter->GetCounterId(text);
 
             if (0 != counterId)
@@ -1208,7 +1202,6 @@ void SessionSourceCodeView::OnHotSpotComboChanged(const QString& text)
             }
         }
 
-        // Refresh the view:
         RefreshView();
     }
 }
@@ -1368,6 +1361,12 @@ bool SessionSourceCodeView::CreateModelData()
             // Get the source file and store it in the cache
             if (GetActualSourceFile(m_pTreeViewModel->m_srcFile, tryFile))
             {
+                // if tryFile is different, then update the label
+                if (!tryFile.isEmpty() && m_pTreeViewModel->m_srcFile != tryFile)
+                {
+                    m_pModuleLocationInfoLabel->setText(tryFile);
+                }
+
                 bool rc = m_pTreeViewModel->SetSourceLines(tryFile, 1, GT_INT32_MAX);
 
                 GT_IF_WITH_ASSERT(rc)

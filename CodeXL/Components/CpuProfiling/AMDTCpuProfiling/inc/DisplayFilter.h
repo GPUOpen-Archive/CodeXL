@@ -12,29 +12,33 @@
 // Qt:
 #include <QVector>
 #include <QStringList>
-#include <QMultiMap>
+
+// STANDARD INCLUDES
+#include <memory>
+#include <map>
+#include <vector>
+#include <utility>
+#include <tuple>
 
 // Infra:
 #include <AMDTBaseTools/Include/gtMap.h>
 #include <AMDTBaseTools/Include/gtVector.h>
+#include <AMDTBaseTools/Include/AMDTDefinitions.h>
 
+// PROJECT INCLUDES
 #include <AMDTCpuProfilingRawData/inc/CpuProfileInfo.h>
+#include <AMDTCpuProfilingDataAccess/inc/AMDTCpuProfilingDataAccess.h>
 
 // Local:
 #include <inc/StdAfx.h>
-class CpuProfileInfo;
 
-typedef QVector<unsigned int> CoreFilter;
+
 enum SeparateByType
 {
     SEPARATE_BY_NONE = 0,
     SEPARATE_BY_CORE = 1,
     SEPARATE_BY_NUMA = 2
 };
-
-/// Forward declaration:
-class EventsFile;
-typedef gtMap <int, int> TotalIndicesMap;
 
 /// Enumeration describing the change done to the session display settings:
 enum CPUTableUpdateType
@@ -45,30 +49,22 @@ enum CPUTableUpdateType
     UPDATE_TABLE_REBUILD = 0x0004
 };
 
-// STANDARD INCLUDES
-#include <memory>
-#include <map>
-#include <vector>
-#include <utility>
-#include <tuple>
-
-//PROJECT INCLUDES
-#include <AMDTBaseTools/Include/AMDTDefinitions.h>
-#include <AMDTCpuProfilingDataAccess/inc/AMDTCpuProfilingDataAccess.h>
-
 // FORWARD DECLARATION
 class cxlProfileDataReader;
 
 // TYPEDEFS
-using CounterNameIdVec = std::vector<std::tuple<gtString,               // counter name
+typedef QVector<unsigned int> CoreFilter;
+using CounterNameIdVec = std::vector<std::tuple<
+      gtString,                                                         // counter name
       gtString,                                                         // counter abbreviation
       gtString,                                                         // counter desc
       AMDTUInt32,                                                       // counter-id
       AMDTUInt32>>;                                                     // counter-type
-using cofigNameCounterMap = std::map<gtString, CounterNameIdVec>;
-using cofigNameCounterPair = std::pair<gtString, CounterNameIdVec>;
+using configNameCounterMap = std::map<gtString, CounterNameIdVec>;
+using configNameCounterPair = std::pair<gtString, CounterNameIdVec>;
 using CounterNameIdMap = std::map<gtString, AMDTUInt64>;
 using CounterIdNameMap = std::map<AMDTUInt64, gtString>;
+
 const gtString CLU_PERCENTAGE_CAPTION = L"Cache Line Utilization Percentage";
 
 /// -----------------------------------------------------------------------------------------------
@@ -83,11 +79,11 @@ public:
     static void reset();
     ~CPUGlobalDisplayFilter();
 
-    bool m_displaySystemDLLs;
-    bool m_displayPercentageInColumn;
+    bool m_displaySystemDLLs = false;
+    bool m_displayPercentageInColumn = false;
 
 private:
-    CPUGlobalDisplayFilter();
+    CPUGlobalDisplayFilter() = default;
     CPUGlobalDisplayFilter(const CPUGlobalDisplayFilter& other) = delete;
 
     static CPUGlobalDisplayFilter* m_psMySingleInstance;
@@ -100,8 +96,6 @@ enum AMDTProfileType
     AMDT_PROFILE_TYPE_OTHERS,
 };
 
-typedef gtMap<QString, ViewElementType> ConfigurationMap;
-
 /// -----------------------------------------------------------------------------------------------
 /// \class Name: TableDisplaySettings
 /// \brief Description:  This class is supposed to represent a display filter for a CPU profile table
@@ -109,7 +103,7 @@ typedef gtMap<QString, ViewElementType> ConfigurationMap;
 class TableDisplaySettings
 {
 public:
-    TableDisplaySettings();
+    TableDisplaySettings() = default;
     TableDisplaySettings(const TableDisplaySettings& other);
 
     enum ProfileDataColumnType
@@ -133,7 +127,7 @@ public:
     bool colTypeAsString(ProfileDataColumnType column, QString& colStr, QString& tooltip);
 
     // The maximum amount of items shown in table (-1 if we should display all):
-    int m_amountOfItemsInDisplay;
+    int m_amountOfItemsInDisplay = -1;
 
     // The Information columns to display:
     gtVector<ProfileDataColumnType> m_displayedColumns;
@@ -157,13 +151,13 @@ public:
     QList<bool> m_isSystemDllList;
 
     /// Contain true iff the system modules should be displayed in modules dialog:
-    bool m_shouldDisplaySystemDllInModulesDlg;
+    bool m_shouldDisplaySystemDllInModulesDlg = true;
 
     /// Contain the list of hot spot indicator full names:
     gtMap<QString, int> m_hotSpotIndicatorToDataIndexMap;
 
     /// Contain the last column that the table was sorted by:
-    Qt::SortOrder m_lastSortOrder;
+    Qt::SortOrder m_lastSortOrder = Qt::DescendingOrder;
 
     QString m_lastSortColumnCaption;
 };
@@ -181,7 +175,7 @@ public:
     bool CreateConfigCounterMap();
     bool GetConfigCounters(const QString& configName, CounterNameIdVec& counterDetails);
     void GetConfigName(std::vector<gtString>& configNameList) const { configNameList = m_configNameList; }
-    const QString& GetCurrentCofigName() const { return m_configurationName; }
+    const QString& GetCurrentConfigName() const { return m_configurationName; }
 
     // Options
     bool SetProfileDataOptions(AMDTProfileDataOptions opts);
@@ -191,7 +185,7 @@ public:
     bool SetReportConfig();
     const gtVector<AMDTProfileReportConfig>& GetReportConfig() const;
 
-    // Numa settings
+    // NUMA settings
     void SetSeperatedbyNuma(bool isSet) { m_options.m_isSeperateByNuma = isSet; }
     bool IsSeperatedByNumaEnabled() const { return m_options.m_isSeperateByNuma; }
 
@@ -246,7 +240,7 @@ private:
     std::shared_ptr<cxlProfileDataReader>   m_pProfDataReader;
     gtVector<AMDTProfileReportConfig>       m_reportConfigs;
     AMDTProfileDataOptions                  m_options;
-    cofigNameCounterMap                     m_configCounterMap;
+    configNameCounterMap                    m_configCounterMap;
     QString                                 m_configurationName;
     std::vector<gtString>                   m_configNameList;
     CounterNameIdMap                        m_counterNameIdMap;
@@ -255,7 +249,7 @@ private:
     QString                                 m_CLUOVHdrName;
     bool                                    m_isCLUPercent = true;
     QString                                 m_viewName;
-    gtUInt32                                m_coreCount;
+    gtUInt32                                m_coreCount = 0;
     bool                                    m_isTbp = false;
     AMDTProfileType                         m_profType = AMDT_PROFILE_TYPE_OTHERS;
 };
