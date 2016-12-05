@@ -388,6 +388,11 @@ bool SourceCodeTreeModel::setHeaderData(int section, Qt::Orientation orientation
 
 bool SourceCodeTreeModel::BuildDisassemblyTree()
 {
+    m_srcLineViewTreeMap.clear();
+    m_sampleSrcLnViewTreeList.clear();
+    m_srcLineDataVec.clear();
+    m_funcFirstSrcLine = 0;
+
     gtString srcFilePath;
     AMDTSourceAndDisasmInfoVec srcInfoVec;
     AMDTProfileFunctionData  functionData;
@@ -923,9 +928,16 @@ void SourceCodeTreeModel::BuildSourceLinesTree(std::vector<SourceViewTreeItem*>&
 
 bool SourceCodeTreeModel::SetSourceLines(const QString& filePath, unsigned int startLine, unsigned int stopLine)
 {
-    // Don't read the source file again if it is already cached.
-    if (m_lastSrcFile != filePath)
+    if (filePath.isEmpty())
     {
+        // Clear cached source line info
+        m_lastSrcFile.clear();
+        m_srcLinesCache.clear();
+        m_startLine = m_stopLine = 0;
+    }
+    else if (m_lastSrcFile != filePath)
+    {
+        // Don't read the source file again if it is already cached.
         unsigned int count = 0;
         QFile file(filePath);
         m_lastSrcFile = filePath;

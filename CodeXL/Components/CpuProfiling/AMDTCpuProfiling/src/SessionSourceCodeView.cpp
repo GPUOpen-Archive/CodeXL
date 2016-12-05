@@ -1403,8 +1403,9 @@ bool SessionSourceCodeView::CreateModelData()
         if (m_pTreeViewModel->m_isDisplayingOnlyDasm)
         {
             // Render DASM
-            retVal = m_pTreeViewModel->BuildDisassemblyTree();
+            m_pTreeViewModel->SetSourceLines(QString(), 0, 0);
             m_pTreeViewModel->m_isDisplayingOnlyDasm = false;
+            retVal = m_pTreeViewModel->BuildDisassemblyTree();
         }
     }
 
