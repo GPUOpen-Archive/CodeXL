@@ -19,15 +19,10 @@
 #include <AMDTOSWrappers/Include/osProcess.h>
 #include <AMDTOSWrappers/Include/osFilePath.h>
 #include <AMDTOSWrappers/Include/osFile.h>
-
-// Backend:
-#include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
-#include <AMDTCpuPerfEventUtils/inc/ViewConfig.h>
 #include <AMDTOSWrappers/Include/osTime.h>
 
-#if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    #include <AMDTExecutableFormat/inc/PeFile.h>
-#endif // AMDT_WINDOWS_OS
+// Backend:
+#include <AMDTCommonHeaders/AMDTCommonProfileDataTypes.h>
 
 // Project:
 #include <Utils.h>
@@ -42,16 +37,12 @@ public:
     };
 
     HRESULT      m_error;
-
-    bool         m_isCLU;
     SortOrder    m_sortOrder;    // Order in which the data will be reported
     int          m_sortEventIndex;
-
     osFilePath   m_reportFilePath;  // output report
     osFile       m_reportFile;
 
     Reporter(osFilePath& filePath) : m_error(S_OK),
-        m_isCLU(false),
         m_sortOrder(DESCENDING_ORDER),
         m_sortEventIndex(-1),
         m_reportFilePath(filePath)
@@ -64,7 +55,6 @@ public:
     bool Close();
     bool IsOpened();
 
-    void SetCLU(bool isCLU);
     void SetSortOrder(SortOrder sortOrder);
     void SetSortEventIndex(int sortEvent);
 
@@ -103,17 +93,19 @@ public:
         bool                 showPerc,
         bool                 sepByCore) = 0;
 
-    virtual bool WriteCallGraphFunctionSummary(gtVector<gtString>    sectionHdrs,
-                                               CGSampleFunctionMap&  funcMap,
-                                               EventMaskType         eventId,
-                                               bool                  showPerc) = 0;
+    virtual bool WriteCallGraphFunctionSummary(gtVector<gtString>        sectionHdrs,
+                                               AMDTCallGraphFunctionVec& cgFuncsVec,
+                                               bool                      showPerc) = 0;
 
-    virtual bool WriteCallGraph(gtVector<gtString>    sectionHdrs,
-                                CGSampleFunctionMap&  funcMap,
-                                EventMaskType         eventId,
-                                bool                  showPerc) = 0;
+    virtual bool WriteCallGraph(const AMDTCallGraphFunction&  self,
+                                AMDTCallGraphFunctionVec&     caller,
+                                AMDTCallGraphFunctionVec&     callee,
+                                bool                          showPerc) = 0;
+
+    virtual bool WriteCallGraphHdr(gtVector<gtString>  sectionHdrs) = 0;
 
     // IMIX Specific reporters
+#ifdef AMDT_CPCLI_ENABLE_IMIX
     virtual bool WriteImixSummaryInfo(gtVector<gtString>   sectionHdrs,
                                       ImixSummaryMap&      imixSummaryMap,
                                       gtUInt64             totalSamples) = 0;
@@ -121,6 +113,7 @@ public:
     virtual bool WriteImixInfo(gtVector<gtString>   sectionHdrs,
                                ModuleImixInfoList&  modImixInfoList,
                                gtUInt64             totalSamples) = 0;
+#endif // AMDT_CPCLI_ENABLE_IMIX
 };
 
 class CSVReporter : public Reporter
@@ -173,16 +166,18 @@ public:
         bool                showPerc,
         bool                sepByCore);
 
-    bool WriteCallGraphFunctionSummary(gtVector<gtString>    sectionHdrs,
-                                       CGSampleFunctionMap&  funcMap,
-                                       EventMaskType         eventId,
-                                       bool                  showPerc);
+    bool WriteCallGraphFunctionSummary(gtVector<gtString>        sectionHdrs,
+                                       AMDTCallGraphFunctionVec& cgFuncsVec,
+                                       bool                      showPerc);
 
-    bool WriteCallGraph(gtVector<gtString>    sectionHdrs,
-                        CGSampleFunctionMap&  funcMap,
-                        EventMaskType         eventId,
-                        bool                  showPerc);
+    bool WriteCallGraph(const AMDTCallGraphFunction&     self,
+                        AMDTCallGraphFunctionVec&  caller,
+                        AMDTCallGraphFunctionVec&  callee,
+                        bool                       showPerc);
 
+    bool WriteCallGraphHdr(gtVector<gtString>  sectionHdrs);
+
+#ifdef AMDT_CPCLI_ENABLE_IMIX
     bool WriteImixSummaryInfo(gtVector<gtString>   sectionHdrs,
                               ImixSummaryMap&      imixSummaryMap,
                               gtUInt64             totalSamples);
@@ -190,18 +185,10 @@ public:
     bool WriteImixInfo(gtVector<gtString>   sectionHdrs,
                        ModuleImixInfoList&  modImixInfoList,
                        gtUInt64             totalSamples);
+#endif // AMDT_CPCLI_ENABLE_IMIX
 
 private:
     void WriteSectionHeaders(gtVector<gtString>& sectionHdrs);
-
-    void WriteParentsData(const CGFunctionInfo& funcNode, bool showPerc);
-    void WriteChildrenData(const CGFunctionInfo& funcNode, bool showPerc);
-    void WriteSelf(const CGFunctionInfo& funcNode, bool showPerc);
-
-    double GetCLUData(gtVector<gtUInt64>&  dataVector,
-                      gtUInt32             nbrCols,
-                      ColumnSpec*          pColumnSpec,
-                      EventEncodeVec&      evtEncodeVec);
 };
 
 #endif // #ifndef _CPUPROFILE_REPORTER_H_

@@ -4042,6 +4042,12 @@ public:
             }
         }
 
+        if (ret)
+        {
+            std::sort(cgFuncsVec.begin(), cgFuncsVec.end(),
+                [](AMDTCallGraphFunction const& a, AMDTCallGraphFunction const& b) { return a.m_totalDeepSamples > b.m_totalDeepSamples; });
+        }
+
         return ret;
     }
 
@@ -4095,6 +4101,16 @@ public:
 
                 ret = true;
             }
+        }
+
+        // Sort the parents and children based on DeepSamples
+        if (ret)
+        {
+            std::sort(parents.begin(), parents.end(),
+                [](AMDTCallGraphFunction const& a, AMDTCallGraphFunction const& b) { return a.m_totalDeepSamples > b.m_totalDeepSamples; });
+
+            std::sort(children.begin(), children.end(),
+                [](AMDTCallGraphFunction const& a, AMDTCallGraphFunction const& b) { return a.m_totalDeepSamples > b.m_totalDeepSamples; });
         }
 
         return ret;

@@ -10,11 +10,6 @@
 // STL
 #include <map>
 
-// Backend:
-#include <AMDTCpuPerfEventUtils/inc/ViewConfig.h>
-#include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
-#include <AMDTCpuProfilingTranslation/inc/CpuProfileDataTranslation.h>
-
 // Infra:
 #include <AMDTOSWrappers/Include/osTime.h>
 #include <AMDTOSWrappers/Include/osDirectory.h>
@@ -37,7 +32,7 @@ inline static void AddPercentageValue(gtString& dataStr, float leftData, float r
 
     if (leftData && rightData)
     {
-        floatVal = (leftData / rightData) * 100.0;
+        floatVal = (leftData / rightData) * static_cast<float>(100.0);
     }
 
     dataStr.appendFormattedString(L" (%3.02f%%)", floatVal);
@@ -70,12 +65,6 @@ bool Reporter::Close()
 bool Reporter::IsOpened()
 {
     return m_reportFile.isOpened();
-}
-
-void Reporter::SetCLU(bool isCLU)
-{
-    m_isCLU = isCLU;
-    return;
 }
 
 void Reporter::SetSortOrder(SortOrder sortOrder)
@@ -406,79 +395,138 @@ bool CSVReporter::WritePidFunctionSummary(gtVector<gtString>&   sectionHdrs,
     return true;
 }
 
-bool CSVReporter::WriteCallGraphFunctionSummary(gtVector<gtString>    sectionHdrs,
-                                                CGSampleFunctionMap&  cgFuncMap,
-                                                EventMaskType         eventId,
-                                                bool                  reportPerc)
+bool CSVReporter::WriteCallGraphFunctionSummary(
+    gtVector<gtString>        sectionHdrs,
+    AMDTCallGraphFunctionVec& cgFuncsVec,
+    bool                      showPerc)
 {
-    GT_UNREFERENCED_PARAMETER(eventId);
-
-    if (cgFuncMap.size() == 0)
-    {
-        return false;
-    }
+    bool retVal = false;
 
     WriteSectionHeaders(sectionHdrs);
 
-
-    CGSampleFunctionMap::reverse_iterator rit = cgFuncMap.rbegin();
-    gtUInt64 totalDeepSamples = (*rit).second->m_deepCount;
-
-    for (; rit != cgFuncMap.rend(); rit++)
+    for (const auto& cgFunc : cgFuncsVec)
     {
-        CGFunctionInfo* pFuncNode = (*rit).second;
-
-#if 0
-
-        if (NULL == pFuncNode->m_pModule || NULL == pFuncNode->m_pFunction ||
-            pFuncNode->m_pModule->isUnchartedFunction(*pFuncNode->m_pFunction))
-        {
-            fprintf(stderr, "No debug info available\n");
-        }
-
-#endif //0
-
-        if (pFuncNode->m_deepCount != 0)
+        if (cgFunc.m_totalDeepSamples > 0)
         {
             gtString tmpStr(L"\n");
             tmpStr += L"\"";
-            tmpStr += pFuncNode->m_funcName;
+            tmpStr += cgFunc.m_functionInfo.m_name;
             tmpStr += L"\"";
-            tmpStr.appendFormattedString(L",%ld", pFuncNode->m_selfCount);
+            tmpStr.appendFormattedString(L",%ld", cgFunc.m_totalSelfSamples);
+            tmpStr.appendFormattedString(L",%ld", cgFunc.m_totalDeepSamples);
 
-            if (reportPerc)
+            if (showPerc)
             {
-                AddPercentageValue(tmpStr, static_cast<float>(pFuncNode->m_selfCount), static_cast<float>(totalDeepSamples));
+                // tmpStr.appendFormattedString(L" (%3.02f%%)", cgFunc.m_deepSamplesPerc);
+                tmpStr.appendFormattedString(L",%3.02f%%", cgFunc.m_deepSamplesPerc);
             }
 
-            tmpStr.appendFormattedString(L",%ld", pFuncNode->m_deepCount);
-
-            if (reportPerc)
-            {
-                AddPercentageValue(tmpStr, static_cast<float>(pFuncNode->m_deepCount), static_cast<float>(totalDeepSamples));
-            }
-
-            tmpStr.appendFormattedString(L",%u", pFuncNode->m_pathCount);
-
-            gtString sourceInfo;
-
-            if (NULL != pFuncNode->m_pFunction)
-            {
-                pFuncNode->m_pFunction->getSourceInfo(sourceInfo);
-            }
+            tmpStr.appendFormattedString(L",%u", cgFunc.m_pathCount);
 
             tmpStr += L",";
-            tmpStr += sourceInfo;
-
-            gtString modFileName;
-
-            if (NULL != pFuncNode->m_pModule && !pFuncNode->m_pModule->getPath().isEmpty())
-            {
-                pFuncNode->m_pModule->extractFileName(modFileName);
-            }
+            tmpStr += cgFunc.m_srcFile;
 
             tmpStr += L",";
-            tmpStr += modFileName;
+            tmpStr += cgFunc.m_functionInfo.m_modulePath;
+
+            m_reportFile.writeString(tmpStr);
+
+            retVal = true;
+        }
+    }
+
+    m_reportFile.writeString(L"\n");
+
+    return retVal;
+}
+
+bool CSVReporter::WriteCallGraphHdr(gtVector<gtString>  sectionHdrs)
+{
+    WriteSectionHeaders(sectionHdrs);
+    m_reportFile.writeString(L"\n");
+
+    return true;
+}
+
+bool CSVReporter::WriteCallGraph(const AMDTCallGraphFunction&     self,
+                                 AMDTCallGraphFunctionVec&  caller,
+                                 AMDTCallGraphFunctionVec&  callee,
+                                 bool                       showPerc)
+{
+    (void)(showPerc);
+    bool retVal = true;
+
+    // Write the Parents/Callers
+    for (const auto& cgFunc : caller)
+    {
+        if (cgFunc.m_totalDeepSamples > 0)
+        {
+            gtString tmpStr(L"\n");
+            tmpStr += L",,";
+            tmpStr.appendFormattedString(L"                %ld", cgFunc.m_totalDeepSamples);
+            tmpStr.appendFormattedString(L" (%3.02f%%)", cgFunc.m_deepSamplesPerc);
+            tmpStr += L",";
+            tmpStr += L"\"                ";
+            tmpStr += cgFunc.m_functionInfo.m_name;
+            tmpStr += L"\"";
+
+            tmpStr += L",";
+            tmpStr += cgFunc.m_functionInfo.m_modulePath;
+
+            m_reportFile.writeString(tmpStr);
+        }
+    }
+
+    // Print Self
+    if (self.m_totalDeepSamples > 0)
+    {
+        gtString tmpStr(L"\n");
+
+        float selfSamplePerc = 0.0;
+
+        if (self.m_totalSelfSamples && self.m_totalDeepSamples)
+        {
+            selfSamplePerc = (static_cast<float>(self.m_totalSelfSamples) / static_cast<float>(self.m_totalDeepSamples)) * static_cast<float>(100.0);
+        }
+
+        tmpStr += L",";
+        tmpStr.appendFormattedString(L"%ld", self.m_totalDeepSamples);
+        tmpStr.appendFormattedString(L" (%3.02f%%)", self.m_deepSamplesPerc);
+        tmpStr += L",";
+        tmpStr.appendFormattedString(L"%ld", self.m_totalSelfSamples);
+        tmpStr.appendFormattedString(L" (%3.02f%%)", selfSamplePerc);
+
+        tmpStr += L",";
+        tmpStr += L"\"";
+        tmpStr += self.m_functionInfo.m_name;
+        tmpStr += L"\"";
+
+        tmpStr += L",";
+        tmpStr += self.m_functionInfo.m_modulePath;
+
+        tmpStr += L",";
+        tmpStr += self.m_srcFile;
+
+        m_reportFile.writeString(tmpStr);
+    }
+
+    // Write the Children/Callees
+    for (const auto& cgFunc : callee)
+    {
+        if (cgFunc.m_functionInfo.m_name.compare(L"[self]") && cgFunc.m_totalDeepSamples > 0)
+        {
+            gtString tmpStr(L"\n");
+            tmpStr += L",,";
+            tmpStr.appendFormattedString(L"                %ld", cgFunc.m_totalDeepSamples);
+            tmpStr.appendFormattedString(L" (%3.02f%%)", cgFunc.m_deepSamplesPerc);
+
+            tmpStr += L",";
+            tmpStr += L"\"                ";
+            tmpStr += cgFunc.m_functionInfo.m_name;
+            tmpStr += L"\"";
+
+            tmpStr += L",";
+            tmpStr += cgFunc.m_functionInfo.m_modulePath;
 
             m_reportFile.writeString(tmpStr);
         }
@@ -486,58 +534,10 @@ bool CSVReporter::WriteCallGraphFunctionSummary(gtVector<gtString>    sectionHdr
 
     m_reportFile.writeString(L"\n");
 
-    return true;
+    return retVal;
 }
 
-bool CSVReporter::WriteCallGraph(gtVector<gtString>    sectionHdrs,
-                                 CGSampleFunctionMap&  cgFuncMap,
-                                 EventMaskType         eventId,
-                                 bool                  reportPerc)
-{
-    GT_UNREFERENCED_PARAMETER(eventId);
-
-    if (cgFuncMap.size() == 0)
-    {
-        return false;
-    }
-
-    WriteSectionHeaders(sectionHdrs);
-
-    gtUInt32 index = 1;
-
-    for (CGSampleFunctionMap::reverse_iterator rit = cgFuncMap.rbegin(); rit != cgFuncMap.rend(); rit++, index++)
-    {
-        CGFunctionInfo* pFuncNode = (*rit).second;
-
-#if 0
-
-        if (NULL == pFuncNode->m_pModule || NULL == pFuncNode->m_pFunction ||
-            pFuncNode->m_pModule->isUnchartedFunction(*pFuncNode->m_pFunction))
-        {
-            fprintf(stderr, "No debug info available\n");
-        }
-
-#endif //0
-
-        if (pFuncNode->m_deepCount != 0)
-        {
-            // Write the parents
-            WriteParentsData(*pFuncNode, reportPerc);
-
-            WriteSelf(*pFuncNode, reportPerc);
-
-            // Write the children
-            WriteChildrenData(*pFuncNode, reportPerc);
-
-            m_reportFile.writeString(L"\n");
-        }
-    }
-
-    m_reportFile.writeString(L"\n");
-
-    return true;
-}
-
+#ifdef AMDT_CPCLI_ENABLE_IMIX
 bool CSVReporter::WriteImixSummaryInfo(gtVector<gtString>   sectionHdrs,
                                        ImixSummaryMap&      imixSummaryMap,
                                        gtUInt64             totalSamples)
@@ -567,7 +567,7 @@ bool CSVReporter::WriteImixSummaryInfo(gtVector<gtString>   sectionHdrs,
 
         if (leftData && rightData)
         {
-            floatVal = (leftData / rightData) * 100.0;
+            floatVal = (leftData / rightData) * static_cast<float>(100.0);
         }
 
         tmpString.appendFormattedString(L",%3.02f", floatVal);
@@ -641,111 +641,7 @@ bool CSVReporter::WriteImixInfo(gtVector<gtString>   sectionHdrs,
 
     return true;
 }
-
-void CSVReporter::WriteSelf(const CGFunctionInfo& funcNode, bool reportPerc)
-{
-    gtString selfData(L"\n");
-
-    selfData.appendFormattedString(L"[%d]", funcNode.m_index);
-    selfData += L",";
-
-    selfData += L"\"";
-    selfData += funcNode.m_funcName;
-    selfData.appendFormattedString(L" [%ld]", funcNode.m_index);  // function index
-    selfData += L"\"";
-    selfData += L","; // parent/children function-name column
-
-    selfData.appendFormattedString(L",%ld", funcNode.m_selfCount);
-
-    if (reportPerc)
-    {
-        AddPercentageValue(selfData, static_cast<float>(funcNode.m_selfCount), static_cast<float>(funcNode.m_deepCount));
-    }
-
-    selfData.appendFormattedString(L",%ld", funcNode.m_deepCount);
-
-    gtString sourceInfo;
-
-    if (NULL != funcNode.m_pFunction)
-    {
-        funcNode.m_pFunction->getSourceInfo(sourceInfo);
-    }
-
-    selfData += L",";
-    selfData += sourceInfo;
-
-    gtString modFileName;
-
-    if (NULL != funcNode.m_pModule && !funcNode.m_pModule->getPath().isEmpty())
-    {
-        funcNode.m_pModule->extractFileName(modFileName);
-    }
-
-    selfData += L",";
-    selfData += modFileName;
-
-    m_reportFile.writeString(selfData);
-}
-
-void CSVReporter::WriteParentsData(const CGFunctionInfo& funcNode, bool reportPerc)
-{
-    for (const auto& parentNode : funcNode.m_parents)
-    {
-        if (parentNode.m_deepCount)
-        {
-            gtString parentData(L"\n");
-            parentData += L","; // Index
-            parentData += L","; // Self
-
-            parentData += L"\"";
-            parentData += parentNode.m_pFuncInfo->m_funcName;
-            parentData.appendFormattedString(L" [%ld]", parentNode.m_pFuncInfo->m_index);  // function index
-            parentData += L"\"";
-
-            parentData += L",";    // self samples
-            parentData += L",";
-
-            parentData.appendFormattedString(L"%ld", parentNode.m_deepCount);
-
-            if (reportPerc)
-            {
-                AddPercentageValue(parentData, static_cast<float>(parentNode.m_deepCount), static_cast<float>(funcNode.m_deepCount));
-            }
-
-            m_reportFile.writeString(parentData);
-        }
-    }
-}
-
-void CSVReporter::WriteChildrenData(const CGFunctionInfo& funcNode, bool reportPerc)
-{
-    for (const auto& childNode : funcNode.m_children)
-    {
-        if (childNode.m_deepCount)
-        {
-            gtString childData(L"\n");
-            childData += L","; // index
-            childData += L","; // self
-
-            childData += L"\"";
-            childData += childNode.m_pFuncInfo->m_funcName;
-            childData.appendFormattedString(L" [%ld]", childNode.m_pFuncInfo->m_index);  // function index
-            childData += L"\"";
-
-            childData += L","; // self samples
-            childData += L","; // self samples
-
-            childData.appendFormattedString(L"%ld", childNode.m_deepCount);
-
-            if (reportPerc)
-            {
-                AddPercentageValue(childData, static_cast<float>(childNode.m_deepCount), static_cast<float>(funcNode.m_deepCount));
-            }
-
-            m_reportFile.writeString(childData);
-        }
-    }
-}
+#endif // AMDT_CPCLI_ENABLE_IMIX
 
 void CSVReporter::WriteSectionHeaders(gtVector<gtString>& sectionHdrs)
 {
@@ -761,52 +657,4 @@ void CSVReporter::WriteSectionHeaders(gtVector<gtString>& sectionHdrs)
             m_reportFile.writeString(hdrStr);
         }
     }
-}
-
-double CSVReporter::GetCLUData(gtVector<gtUInt64>&  dataVector,
-                               gtUInt32             nbrCols,
-                               ColumnSpec*          pColumnSpec,
-                               EventEncodeVec&      evtEncodeVec)
-{
-    ColumnSpec* pColSpec = pColumnSpec;
-
-    double cluVal = 0.0;
-    bool foundVal = false;
-
-    for (gtUInt32 i = 0; (i < nbrCols) && (!foundVal); i++)
-    {
-        EventMaskType eventLeft = EncodeEvent(pColSpec->dataSelectLeft.eventSelect, pColSpec->dataSelectLeft.eventUnitMask,
-                                              pColSpec->dataSelectLeft.bitOs, pColSpec->dataSelectLeft.bitUsr);
-        EventMaskType eventRight = EncodeEvent(pColSpec->dataSelectRight.eventSelect, pColSpec->dataSelectRight.eventUnitMask,
-                                               pColSpec->dataSelectRight.bitOs, pColSpec->dataSelectRight.bitUsr);
-
-        gtUInt64 eventLeftCount;
-        gtUInt64 eventRightCount;
-        gtUInt32 eventLeftIndex;
-        gtUInt32 eventRightIndex;
-
-        GetEventDetailForEventMask(evtEncodeVec, eventLeft, eventLeftIndex, eventLeftCount);
-        GetEventDetailForEventMask(evtEncodeVec, eventRight, eventRightIndex, eventRightCount);
-
-        switch (pColSpec->type)
-        {
-            case ColumnPercentage:
-                if ((static_cast<float>(dataVector[eventRightIndex]) > static_cast<float>(0.0))
-                    && (static_cast<float>(dataVector[eventLeftIndex]) > static_cast<float>(0.0)))
-                {
-                    cluVal = ((static_cast<float>(dataVector[eventLeftIndex]) / static_cast<float>(64.0)) /
-                              (static_cast<float>(dataVector[eventRightIndex]))) * static_cast<float>(100.0);
-                }
-
-                foundVal = true;
-                break;
-
-            default:
-                break;
-        } // switch column type
-
-        pColSpec++;
-    } // for loop to iterate over all the columns
-
-    return cluVal;
 }

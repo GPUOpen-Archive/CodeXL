@@ -3474,6 +3474,35 @@ public:
         return ret;
     }
 
+    // returns true if the process has Callstack samples
+    bool IsProcessHasCallstackSamples(AMDTProcessId pid)
+    {
+        bool ret = false;
+
+        sqlite3_stmt* pQueryStmt = nullptr;
+        std::stringstream query;
+
+        query << "SELECT EXISTS (SELECT 1 FROM Process WHERE hasCSS = 1 AND id = ?);";
+
+        const std::string& queryStr = query.str();
+        int rc = sqlite3_prepare_v2(m_pReadDbConn, queryStr.c_str(), -1, &pQueryStmt, nullptr);
+
+        if (SQLITE_OK == rc)
+        {
+            sqlite3_bind_int(pQueryStmt, 1, pid);
+
+            // Execute the query.
+            sqlite3_step(pQueryStmt);
+            AMDTUInt32 rowExists = sqlite3_column_int(pQueryStmt, 0);
+
+            // Finalize the statement.
+            sqlite3_finalize(pQueryStmt);
+            ret = (rowExists == 1) ? true : false;
+        }
+
+        return ret;
+    }
+
     bool GetModuleInstanceIds(AMDTProcessId pid, AMDTModuleId mid, gtVector<AMDTUInt32>& moduleInstanceIds)
     {
         bool ret = false;

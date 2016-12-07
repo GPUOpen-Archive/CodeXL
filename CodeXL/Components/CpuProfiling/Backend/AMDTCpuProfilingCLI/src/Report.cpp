@@ -8,8 +8,6 @@
 //==================================================================================
 
 // Backend:
-#include <AMDTCpuPerfEventUtils/inc/ViewConfig.h>
-#include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
 #include <AMDTCpuProfilingTranslation/inc/CpuProfileDataTranslation.h>
 
 // Infra:
@@ -31,7 +29,6 @@
 
 #define TP_ALL_PIDS                0xFFFFFFFFUL
 
-
 // External function.
 extern bool reportError(bool appendDriverError, const wchar_t* pFormatString, ...);
 
@@ -47,13 +44,6 @@ HRESULT CpuProfileReport::Initialize()
 
     // Validate Profile Type and other options
     ValidateOptions();
-
-    // Initialize the Events XML file access
-    if (isOK() && (!InitializeEventsXMLFile(m_eventsFile)))
-    {
-        reportError(false, L"Failed to initialize Events XML file.\n");
-        m_error = E_FAIL;
-    }
 
     return m_error;
 }
@@ -217,16 +207,16 @@ HRESULT CpuProfileReport::Report()
 
                 ReportOverviewData(sessionInfo);
                 ReportProcessData();
-                //ReportImixData();
+
+#ifdef AMDT_CPCLI_ENABLE_IMIX
+                ReportImixData();
+#endif
             }
         }
     }
 
     return hr = (retVal) ? S_OK : E_FAIL;
 } // Report
-
-
-
 
 static gtString printTS(AMDTUInt64 timeStamp)
 {
@@ -534,7 +524,6 @@ static AMDTResult printThreadSummary(AMDTThreadProfileDataHandle& tpReaderHandle
 
     return hr;
 }
-
 
 HRESULT CpuProfileReport::ReportTP()
 {
@@ -902,45 +891,20 @@ void CpuProfileReport::ValidateOptions()
 
     // For predefined profile configs, construct the profile XML file path
     osFilePath profileFilePath;
+    gtString reportConfig = m_args.GetViewConfigName();
 
-    if (! m_args.GetViewConfigName().isEmpty())
+    if (!reportConfig.isEmpty())
     {
-        // Construct the profile path
-        if (osGetCurrentApplicationDllsPath(profileFilePath) || osGetCurrentApplicationPath(profileFilePath))
-        {
-            profileFilePath.clearFileName();
-            profileFilePath.clearFileExtension();
-
-            profileFilePath.appendSubDirectory(L"Data");
-            profileFilePath.appendSubDirectory(L"Views");
-
-            // TODO: For TBP, no need to add family sub directory
-            {
-                gtString familySubDir;
-                cpuInfo.getFamily() >= FAMILY_OR
-                ? familySubDir.appendFormattedString(L"0x%x_0x%x", cpuInfo.getFamily(), (cpuInfo.getModel() >> 4))
-                : familySubDir.appendFormattedString(L"0x%x", cpuInfo.getFamily());
-
-                profileFilePath.appendSubDirectory(familySubDir);
-            }
-
-            profileFilePath.setFileName(m_args.GetViewConfigName().toLowerCase());
-            profileFilePath.setFileExtension(L"xml");
-        }
-
-        m_viewConfigXMLPath = profileFilePath;
-
-        if (! m_viewConfigXMLPath.exists())
-        {
-            reportError(false, L"View XML path (" STR_FORMAT L") does not exists.\n", m_viewConfigXMLPath.asString().asCharArray());
-            return;
-        }
+        // TODO: call GetReportConfigurations() and check whether the user provided View config name 
+        // m_args.GetViewConfigName() is in the list returned by the API?
+        // returned 
+        reportError(false, L"-V Option is not yet supported.\n");
+        return;
     }
 
     m_error = S_OK;
     return;
 }
-
 
 // Actually this one returns the absolute path with only the base file name.
 // with this base name
@@ -1357,7 +1321,6 @@ void CpuProfileReport::ReportOverviewData(AMDTProfileSessionInfo& sessionInfo)
         bool ignoreSysModules = m_args.IsIgnoreSystemModules();
         gtUInt64 coreMask = sessionInfo.m_coreAffinity;
 
-
         gtVector<AMDTProfileReportConfig> reportConfigs;
         m_profileDbReader.GetReportConfigurations(reportConfigs);
 
@@ -1369,7 +1332,18 @@ void CpuProfileReport::ReportOverviewData(AMDTProfileSessionInfo& sessionInfo)
         options.m_isSeperateByCore = sepByCore;
         options.m_othersEntryInSummary = false;
 
-        for (const auto& counter : reportConfigs[0].m_counterDescs)
+        AMDTProfileReportConfig* pReportConfig = &reportConfigs[0]; // all-data report view
+        gtString reportConfigName = m_args.GetViewConfigName();
+
+        if (!reportConfigName.isEmpty())
+        {
+            auto aReportConfig = std::find_if(reportConfigs.begin(), reportConfigs.end(),
+                [&reportConfigName](AMDTProfileReportConfig const& aConfig) { return aConfig.m_name.compareNoCase(reportConfigName) == 0; });
+
+            pReportConfig = &(*aReportConfig);
+        }
+
+        for (const auto& counter : pReportConfig->m_counterDescs)
         {
             options.m_counters.push_back(counter.m_id);
         }
@@ -1475,7 +1449,7 @@ void CpuProfileReport::ReportProcessData()
     // TBD - just print the top 5 processes
     for (const auto& proc : processProfileData)
     {
-        ProcessIdType pid = proc.m_id;
+        AMDTProcessId pid = static_cast<AMDTProcessId>(proc.m_id);
 
         if (IsReportAggregateByProcess())
         {
@@ -1501,7 +1475,7 @@ void CpuProfileReport::ReportProcessData()
 
             //// Get the module data for this pid
             AMDTProfileDataVec moduleProfileData;
-            m_profileDbReader.GetModuleProfileData(proc.m_id, AMDT_PROFILE_ALL_MODULES, moduleProfileData);
+            m_profileDbReader.GetModuleProfileData(static_cast<AMDTProcessId>(proc.m_id), AMDT_PROFILE_ALL_MODULES, moduleProfileData);
 
             // MODULE section Hdrs
             sectionHdrs.clear();
@@ -1528,7 +1502,7 @@ void CpuProfileReport::ReportProcessData()
 
             //  FUNCTIONS  SUMMARY
             AMDTProfileDataVec functionProfileData;
-            m_profileDbReader.GetFunctionProfileData(proc.m_id, AMDT_PROFILE_ALL_MODULES, functionProfileData);
+            m_profileDbReader.GetFunctionProfileData(static_cast<AMDTProcessId>(proc.m_id), AMDT_PROFILE_ALL_MODULES, functionProfileData);
 
             sectionHdrs.clear();
             sectionHdrs.push_back(FUNCTION_SUMMARY_SECTION_HDR);
@@ -1556,15 +1530,158 @@ void CpuProfileReport::ReportProcessData()
         }
 
         // Report CallGraph
-        //TODO: Fetch from DB if CSS available for each process.
-        if (IsReportCallGraph() /*&& proc.m_hasCSS*/)
+        if (IsReportCallGraph() && m_profileDbReader.IsProcessHasCssSamples(pid))
         {
-            //ReportCSSData(proc.m_id);
+            ReportCSSData(static_cast<AMDTProcessId>(proc.m_id));
         }
     } // iterate over the process list
 }
 
-#if 0
+bool CpuProfileReport::ReportCSSData(AMDTProcessId pid)
+{
+    bool retVal = false;
+    bool showPerc = true;
+    AMDTProfileCounterDescVec counterDesc;
+    int sortEventIndex = m_args.GetSortEventIndex();
+
+    m_profileDbReader.GetSampledCountersList(counterDesc);
+
+    AMDTProfileCounterDesc& sortEvent = ((sortEventIndex != -1) && static_cast<size_t>(sortEventIndex) < counterDesc.size()) 
+                                            ? counterDesc[sortEventIndex] : counterDesc[0];
+
+    // Get the callgraph function list
+    AMDTCallGraphFunctionVec cgFuncsVec;
+    retVal = m_profileDbReader.GetCallGraphFunctions(pid, sortEvent.m_id, cgFuncsVec);
+
+    // Headers
+    gtVector<gtString> sectionHdrs;
+
+    gtString cgHdr(CALLGRAPH_HDR);
+    cgHdr.appendFormattedString(L" (PID - %ld)", pid);
+    cgHdr.appendFormattedString(L" (Sort Event - ");
+    cgHdr.appendFormattedString(STR_FORMAT, sortEvent.m_name.asCharArray());
+    cgHdr.appendFormattedString(L")");
+    sectionHdrs.push_back(cgHdr);
+
+    sectionHdrs.push_back(CALLGRAPH_FUNCTION_SUMMARY_HDR);
+
+    gtString tmpStr(CALLGRAPH_FUNCTION);
+    tmpStr += L",";
+    tmpStr += CALLGRAPH_SELF_SAMPLES;
+    tmpStr += L",";
+    tmpStr += CALLGRAPH_DEEP_SAMPLES;
+
+    if (showPerc)
+    {
+        tmpStr += L",";
+        tmpStr += CALLGRAPH_PERC_DEEP_SAMPLES;
+    }
+
+    tmpStr += L",";
+    tmpStr += CALLGRAPH_PATH_COUNT;
+    tmpStr += L",";
+    tmpStr += CALLGRAPH_SOURCE_FILE;
+    tmpStr += L",";
+    tmpStr += CALLGRAPH_MODULE;
+    sectionHdrs.push_back(tmpStr);
+
+    // write the callgraph function table
+    // TODO: Index for the functions?
+
+    m_pReporter->WriteCallGraphFunctionSummary(sectionHdrs, cgFuncsVec, showPerc);
+
+    // Write the callgraph
+    sectionHdrs.clear();
+    sectionHdrs.push_back(CALLGRAPH_SECTION_HDR);
+
+    tmpStr.makeEmpty();
+    tmpStr += L",,";
+    tmpStr += L"                SAMPLES UNDER PARENTS";
+    tmpStr += L",";
+    tmpStr += L"                ";
+    tmpStr += CALLGRAPH_PARENTS;
+
+    sectionHdrs.push_back(tmpStr);
+
+    tmpStr.makeEmpty();
+    tmpStr += CALLGRAPH_INDEX;
+    tmpStr += L",";
+    tmpStr += CALLGRAPH_DEEP_SAMPLES;
+    tmpStr += L",";
+    tmpStr += L"SAMPLES IN FUNCTION";
+    tmpStr += L",";
+    tmpStr += CALLGRAPH_FUNCTION;
+    tmpStr += L",";
+    tmpStr += CALLGRAPH_MODULE;
+    tmpStr += L",";
+    tmpStr += CALLGRAPH_SOURCE_FILE;
+    sectionHdrs.push_back(tmpStr);
+
+    tmpStr.makeEmpty();
+    tmpStr += L",,";
+    tmpStr += L"                SAMPLES IN CHILDREN";
+    tmpStr += L",";
+    tmpStr += L"                ";
+    tmpStr += CALLGRAPH_CHILDREN;
+
+    sectionHdrs.push_back(tmpStr);
+
+    m_pReporter->WriteCallGraphHdr(sectionHdrs);
+
+    // Get the callgraph function list
+    for (const auto& cgFunc : cgFuncsVec)
+    {
+        AMDTCallGraphFunctionVec caller;
+        AMDTCallGraphFunctionVec callee;
+
+        retVal = m_profileDbReader.GetCallGraphFunctionInfo(pid, cgFunc.m_functionInfo.m_functionId, caller, callee);
+
+        m_pReporter->WriteCallGraph(cgFunc, caller, callee, true);
+    }
+
+    return retVal;
+}
+
+bool CpuProfileReport::InitCoresList()
+{
+    // Fill-in the m_coresList from the coreAffinity mask
+    // If separate-by-core and core-affinity-mask not used, then report for all the cores
+    if (m_args.IsReportByCore())
+    {
+        AMDTProfileSessionInfo sessionInfo;
+        m_profileDbReader.GetProfileSessionInfo(sessionInfo);
+
+        gtUInt64 coreMask = m_args.GetCoreAffinityMask();
+
+        if (static_cast<gtUInt64>(-1) == coreMask)
+        {
+            gtUInt32 nbrCores = sessionInfo.m_coreCount;
+
+            for (gtUInt32 core = 0; core < nbrCores; core++)
+            {
+                coreMask <<= 1;
+                coreMask |= 1;
+            }
+        }
+
+        gtUInt32 coreId = 0;
+
+        while (coreMask)
+        {
+            if (coreMask & 0x1)
+            {
+                m_coresList.push_back(coreId);
+
+                coreMask >>= 1;
+                coreId++;
+            }
+        }
+    }
+
+    return true;
+}
+
+#if AMDT_CPCLI_ENABLE_IMIX
 // Report is aggregated by Module
 // TODO: Add support for event filtering (option -e)
 void CpuProfileReport::ReportImixData()
@@ -1619,630 +1736,4 @@ void CpuProfileReport::ReportImixData()
         m_pReporter->WriteImixInfo(sectionHdrs, modImixInfoList, totalSamples);
     }
 }
-
-bool CpuProfileReport::ReportCSSData(ProcessIdType pid)
-{
-    bool retVal = false;
-
-    // Construct the callgraph function list
-    int sortEventIndex = m_args.GetSortEventIndex();
-
-    EventMaskType eventType = (sortEventIndex != -1) ? m_profileReader.getProfileInfo()->m_eventVec[sortEventIndex].eventMask
-                              : EventMaskType(-1);
-
-    // Hack to disable the OS/USER flags for TIMER event
-    gtUInt16 eventSel;
-    gtUByte unitMask;
-    bool os;
-    bool user;
-    DecodeEvent(eventType, &eventSel, &unitMask, &os, &user);
-
-    // Timer event, IBS Fetch/Op event do not have the OS/USER settings
-    if (IsTimerEvent(eventSel) || IsIbsFetchEvent(eventSel) || IsIbsOpEvent(eventSel))
-    {
-        os = user = false;
-        eventType = EncodeEvent(eventSel,
-                                unitMask,
-                                os,
-                                user);
-    }
-
-    retVal = GetCSSData(pid, eventType, m_callGraphFuncMap);
-
-    // Headers
-    gtVector<gtString> sectionHdrs;
-
-    gtString cgHdr(CALLGRAPH_HDR);
-    cgHdr.appendFormattedString(L" (PID - %ld)", pid);
-    cgHdr.appendFormattedString(L" (Sort Event - ");
-    cgHdr.appendFormattedString(STR_FORMAT, m_sortEventName.asCharArray());
-    cgHdr.appendFormattedString(L")");
-    sectionHdrs.push_back(cgHdr);
-
-    sectionHdrs.push_back(CALLGRAPH_FUNCTION_SUMMARY_HDR);
-
-    gtString tmpStr(CALLGRAPH_FUCNTION);
-    tmpStr += L",";
-    tmpStr += CALLGRAPH_SELF_SAMPLES;
-    tmpStr += L",";
-    tmpStr += CALLGRAPH_DEEP_SAMPLES;
-    tmpStr += L",";
-    tmpStr += CALLGRAPH_PATH_COUNT;
-    tmpStr += L",";
-    tmpStr += CALLGRAPH_SOURCE_FILE;
-    tmpStr += L",";
-    tmpStr += CALLGRAPH_MODULE;
-    sectionHdrs.push_back(tmpStr);
-
-    // Create the map based on the number of deep samples
-    CGSampleFunctionMap cgSampleFuncMap;
-
-    for (CGFunctionInfoMap::iterator it = m_callGraphFuncMap.begin(); it != m_callGraphFuncMap.end(); it++)
-    {
-        CGFunctionInfo* pFuncNode = (*it).second;
-        cgSampleFuncMap.insert(CGSampleFunctionMap::value_type(pFuncNode->m_deepCount, pFuncNode));
-    }
-
-    // Set the index
-    gtUInt64 funcIndex = 0;
-
-    for (CGSampleFunctionMap::reverse_iterator rit = cgSampleFuncMap.rbegin(); rit != cgSampleFuncMap.rend(); rit++)
-    {
-        CGFunctionInfo* pFuncNode = (*rit).second;
-        pFuncNode->m_index = ++funcIndex;
-    }
-
-    // write the callgraph function table
-    bool showPerc = true;
-    m_pReporter->WriteCallGraphFunctionSummary(sectionHdrs, cgSampleFuncMap, eventType, showPerc);
-
-    //
-    // Write the callgraph
-    //
-    sectionHdrs.clear();
-    sectionHdrs.push_back(CALLGRAPH_SECTION_HDR);
-
-    tmpStr.makeEmpty();
-    tmpStr += L",";
-    tmpStr += L",";
-    tmpStr += CALLGRAPH_PARENTS;
-    sectionHdrs.push_back(tmpStr);
-
-    tmpStr.makeEmpty();
-    tmpStr += CALLGRAPH_INDEX;
-    tmpStr += L",";
-    tmpStr += CALLGRAPH_FUCNTION;
-    tmpStr += L",";
-    tmpStr += L",";
-    tmpStr += CALLGRAPH_SELF_SAMPLES;
-    tmpStr += L",";
-    tmpStr += CALLGRAPH_DEEP_SAMPLES;
-    tmpStr += L",";
-    tmpStr += CALLGRAPH_SOURCE_FILE;
-    tmpStr += L",";
-    tmpStr += CALLGRAPH_MODULE;
-    sectionHdrs.push_back(tmpStr);
-
-    tmpStr.makeEmpty();
-    tmpStr += L",";
-    tmpStr += L",";
-    tmpStr += CALLGRAPH_CHILDREN;
-    sectionHdrs.push_back(tmpStr);
-
-    m_pReporter->WriteCallGraph(sectionHdrs, cgSampleFuncMap, eventType, showPerc);
-
-    ClearCSSData();
-
-    return retVal;
-}
-
-void CpuProfileReport::ClearCSSData()
-{
-    CGFunctionInfoMap::iterator iter = m_callGraphFuncMap.begin();
-
-    for (; iter != m_callGraphFuncMap.end(); iter++)
-    {
-        CGFunctionInfo* pFunc = (*iter).second;
-
-        if (nullptr != pFunc)
-        {
-            delete pFunc;
-        }
-    }
-
-    m_callGraphFuncMap.clear();
-}
-
-CGFunctionInfo* GetCSSFuncNode(CGFunctionInfoMap& cgFunctionMap, gtString& funcName, CpuProfileFunction* pFunc, CpuProfileModule* pMod)
-{
-    CGFunctionInfoMap::iterator pit = cgFunctionMap.find(funcName);
-    CGFunctionInfo* pInfo = nullptr;
-
-    if (pit != cgFunctionMap.end())
-    {
-        pInfo = (*pit).second;
-    }
-    else
-    {
-        pInfo = new CGFunctionInfo(funcName, pMod, pFunc);
-        cgFunctionMap.insert(CGFunctionInfoMap::value_type(funcName, pInfo));
-    }
-
-    return pInfo;
-}
-
-bool CpuProfileReport::GetCSSData(ProcessIdType pid, EventMaskType eventSel, CGFunctionInfoMap& cgFunctionMap)
-{
-    bool retVal = false;
-    bool ignoreSystemModuleSamples = m_args.IsIgnoreSystemModules();
-
-    if (nullptr != m_pCss)
-    {
-        delete m_pCss;
-        m_pCss = nullptr;
-    }
-
-    // TODO
-    // gtString debugSearch = m_args.m_debugSymbolPaths;
-    // gtString symDir = m_args.m_symbolServerDirs;
-    // gtString symList;
-
-    m_pCss = new CGCallback(&m_profileReader);
-
-    gtString reportFilePath = GetDBFilePath().fileDirectoryAsString();
-    reportFilePath.appendFormattedString(STR_FORMAT, PATH_SEPARATOR);
-
-    retVal = m_pCss->Initialize(reportFilePath, pid);
-
-    // Construct the Callgraph function map
-    if (retVal)
-    {
-        m_pCss->SetEventId(eventSel);
-
-        FunctionGraph& funcGraph = m_pCss->GetFunctionGraph();
-        const EventMaskType eventId = m_pCss->GetEventId();
-
-        for (FunctionGraph::const_node_iterator itFunc = funcGraph.GetBeginNode(), itFuncEnd = funcGraph.GetEndNode();
-             itFunc != itFuncEnd; ++itFunc)
-        {
-            const FunctionGraph::Node& funcNode = *itFunc;
-            CGFunctionMetaData* pNodeMetadata = static_cast<CGFunctionMetaData*>(funcNode.m_val);
-
-            bool isLeafNode = false;
-
-            for (PathIndexSet::const_iterator it = funcNode.m_pathIndices.begin(), itEnd = funcNode.m_pathIndices.end();
-                 it != itEnd; ++it)
-            {
-                const FunctionGraph::Path& path = *funcGraph.GetPath(*it);
-                const LeafFunctionList& leaves = path.GetData();
-
-                // Check if this function found in the path..
-                bool isFoundInPath = false;
-
-                for (FunctionGraph::Path::const_iterator itNode = path.begin(), itNodeEnd = path.end(); itNode != itNodeEnd; ++itNode)
-                {
-                    if (&*itNode == &funcNode)
-                    {
-                        isFoundInPath = true;
-                        break;
-                    }
-                }
-
-                const FunctionGraph::Node* pPrevLeafNode = nullptr;
-
-                for (LeafFunctionList::const_iterator itLeaf = leaves.begin(), itLeafEnd = leaves.end(); itLeaf != itLeafEnd; ++itLeaf)
-                {
-                    gtUInt64 selfCount = 0ULL;
-                    gtUInt64 deepCount = 0ULL;
-                    gtUInt64 pathCount = 0ULL;
-
-                    const LeafFunction& leaf = *itLeaf;
-                    const FunctionGraph::Node* pCurLeafNode = leaf.m_pNode;
-                    CGFunctionMetaData* pCurLeafNodeMetadata = static_cast<CGFunctionMetaData*>(pCurLeafNode->m_val);
-
-                    // Ignore if the leaf node is from system module
-                    if (ignoreSystemModuleSamples
-                        && (nullptr != pCurLeafNodeMetadata->m_pModule)
-                        && (pCurLeafNodeMetadata->m_pModule->isSystemModule()))
-                    {
-                        continue;
-                    }
-
-                    if (eventId == EventMaskType(-1) || eventId == leaf.m_eventId)
-                    {
-                        isLeafNode = (&funcNode == leaf.m_pNode) ? true : false;
-
-                        if (isLeafNode && !isFoundInPath)
-                        {
-                            // Found leaf node
-                            selfCount += leaf.m_count;
-                            deepCount += leaf.m_count;
-                            pathCount++;
-                        }
-
-                        if (!isLeafNode && isFoundInPath)
-                        {
-                            deepCount += leaf.m_count;
-                            pathCount++;
-                        }
-
-                        // compute the path count
-                        if (pPrevLeafNode != leaf.m_pNode)
-                        {
-                            pPrevLeafNode = leaf.m_pNode;
-                        }
-                    }
-
-                    // Is leaf node, find parent, otherwise find parent and children
-                    const FunctionGraph::Node* pParent = nullptr;
-                    const FunctionGraph::Node* pChildren = nullptr;
-                    const FunctionGraph::Node* pPrevNode = nullptr;
-
-                    for (FunctionGraph::Path::const_iterator itNode = path.begin(), itNodeEnd = path.end(); itNode != itNodeEnd; ++itNode)
-                    {
-                        if (!isFoundInPath)
-                        {
-                            // leaf...
-                            pParent = &*itNode;
-                            break;
-                        }
-                        else
-                        {
-                            if (&*itNode == &funcNode)
-                            {
-                                pChildren = (nullptr != pPrevNode) ? pPrevNode : pCurLeafNode;
-                                pParent = ((++itNode) == itNodeEnd) ? nullptr : &*(itNode);
-                                break;
-                            }
-                        }
-
-                        pPrevNode = &*itNode;
-                    }
-
-                    // Add/update leaf node in CGFunctionInfoMap
-                    CGFunctionInfo* pSelfNode = nullptr;
-                    CGFunctionInfoMap::iterator nit = cgFunctionMap.find(pNodeMetadata->m_funcName);
-
-                    if (nit == cgFunctionMap.end())
-                    {
-                        pSelfNode = new CGFunctionInfo(pNodeMetadata->m_funcName, pNodeMetadata->m_pModule, pNodeMetadata->m_pFunction);
-
-                        if (isLeafNode)
-                        {
-                            pSelfNode->m_selfCount += selfCount;
-                        }
-
-                        pSelfNode->m_deepCount += deepCount;
-                        pSelfNode->m_pathCount += pathCount;
-                        cgFunctionMap.insert(CGFunctionInfoMap::value_type(pSelfNode->m_funcName, pSelfNode));
-                    }
-                    else
-                    {
-                        pSelfNode = (*nit).second;
-
-                        if (isLeafNode)
-                        {
-                            pSelfNode->m_selfCount += selfCount;
-                        }
-
-                        pSelfNode->m_deepCount += deepCount;
-                        pSelfNode->m_pathCount += pathCount;
-                    }
-
-                    if (nullptr != pSelfNode)
-                    {
-                        // Add/update the parent details in the function-node
-                        if (nullptr != pParent)
-                        {
-                            bool foundParent = false;
-                            CGFunctionMetaData* parentData = static_cast<CGFunctionMetaData*>(pParent->m_val);
-
-                            for (auto& parent : pSelfNode->m_parents)
-                            {
-                                if (!parentData->m_funcName.compare(parent.m_pFuncInfo->m_funcName))
-                                {
-                                    parent.m_deepCount += deepCount;
-                                    foundParent = true;
-                                }
-                            }
-
-                            if (!foundParent)
-                            {
-                                CGFunctionInfo* pInfo = nullptr;
-                                pInfo = GetCSSFuncNode(cgFunctionMap, parentData->m_funcName, parentData->m_pFunction, parentData->m_pModule);
-
-                                if (nullptr != pInfo)
-                                {
-                                    CGParentChildInfo parentInfo(pInfo);
-                                    parentInfo.m_deepCount = deepCount;
-                                    pSelfNode->m_parents.push_back(parentInfo);
-                                }
-                            }
-                        }
-
-                        // Add/update the child details in the self function-node
-                        if (nullptr != pChildren)
-                        {
-                            bool foundChild = false;
-                            CGFunctionMetaData* childrenData = static_cast<CGFunctionMetaData*>(pChildren->m_val);
-
-                            for (auto& child : pSelfNode->m_children)
-                            {
-                                if (!childrenData->m_funcName.compare(child.m_pFuncInfo->m_funcName))
-                                {
-                                    child.m_deepCount += deepCount;
-                                    foundChild = true;
-                                }
-                            }
-
-                            if (!foundChild)
-                            {
-                                CGFunctionInfo* pInfo = nullptr;
-                                pInfo = GetCSSFuncNode(cgFunctionMap, childrenData->m_funcName, childrenData->m_pFunction, childrenData->m_pModule);
-
-                                if (nullptr != pInfo)
-                                {
-                                    CGParentChildInfo childInfo(pInfo);
-                                    childInfo.m_deepCount = deepCount;
-                                    pSelfNode->m_children.push_back(childInfo);
-                                }
-                            }
-                        } // add child details
-                    }
-                } // Iterate over the path
-            } // iterate over the leaf nodes
-        } // iterate over the FunctionGraph
-    }
-
-    return retVal;
-}
-
-bool CpuProfileReport::InitProfileEventsNameVec()
-{
-    bool retVal = true;
-
-    if (m_profileEventsNameVec.size() != 0)
-    {
-        return true;
-    }
-
-    EventEncodeVec eventVec;
-    eventVec = m_profileReader.getProfileInfo()->m_eventVec;
-
-    int sortEventIndex = m_args.GetSortEventIndex();
-
-    if ((sortEventIndex >= 0) && static_cast<unsigned int>(sortEventIndex) >= eventVec.size())
-    {
-        reportError(false, L"Invalid event index(%d) specified with option(-e).\n", sortEventIndex);
-        return false;
-    }
-
-    // Get the Events to Index Map
-    GetEventToIndexMap(m_profileReader, m_evtIndexMap);
-
-    // Event info
-    EventEncodeVec::const_iterator eit = eventVec.begin(), eitEnd = eventVec.end();
-    gtUInt32 nbrEvents = eventVec.size();
-    gtUInt32 nbrCols = (!m_args.IsReportByCore()) ? nbrEvents
-                       : nbrEvents * m_coresList.size();
-    m_monitoredEventsNameVec.resize(nbrEvents);
-    m_profileEventsNameVec.resize(nbrCols);
-    m_eventsVec.resize(nbrEvents);
-
-    m_pEventConfig = new EventConfig[nbrEvents];
-
-    int colIdx = 0;
-
-    for (int i = 0; eit != eitEnd; ++eit, ++i)
-    {
-        // Find the event name and add it to the vector..
-        EventEncodeType evtType = *eit;
-        gtUInt16 eventSel;
-        gtUByte unitMask;
-        bool user;
-        bool os;
-
-        DecodeEvent(evtType.eventMask, &eventSel, &unitMask, &os, &user);
-
-        // Initialize event config array
-        m_pEventConfig[i].eventSelect = eventSel;
-        m_pEventConfig[i].eventUnitMask = unitMask;
-        m_pEventConfig[i].bitUsr = user;
-        m_pEventConfig[i].bitOs = os;
-
-        CpuEvent* pCpuEvent;
-        gtString eventName;
-
-        if (m_eventsFile.FindEventByValue(eventSel, &pCpuEvent))
-        {
-            eventName = convertToGTString(pCpuEvent->name);
-        }
-        else if (IsTimerEvent(eventSel))
-        {
-            eventName = L"Timer";
-        }
-        else
-        {
-            eventName = L"Unknown";
-        }
-
-        // sampling events
-        m_monitoredEventsNameVec[i] = eventName;
-        m_eventsVec[i] = eventSel;
-
-        // Coloumn headers
-        if (m_args.IsReportByCore())
-        {
-            for (gtList<gtUInt32>::iterator it = m_coresList.begin(); it != m_coresList.end(); it++)
-            {
-                eventName.appendFormattedString(L" (Core-%d)", (*it));
-                m_profileEventsNameVec[i] = eventName;
-                colIdx++;
-            }
-        }
-        else
-        {
-            m_profileEventsNameVec[i] = eventName;
-        }
-    }
-
-    // set the sort event name
-    m_sortEventName = (-1 == sortEventIndex) ? L"All Events" : m_monitoredEventsNameVec[sortEventIndex].asCharArray();
-
-    return retVal;
-}
-
-bool CpuProfileReport::InitCoresList(gtUInt64 coreMask)
-{
-    // Fill-in the m_coresList from the coreAffinity mask
-    // If separate-by-core and core-affinity-mask not used, then report for all the cores
-    if (m_args.IsReportByCore())
-    {
-        gtUInt64 coreMask = m_args.GetCoreAffinityMask();
-
-        if (static_cast<gtUInt64>(-1) == coreMask)
-        {
-            gtUInt32 nbrCores = m_profileReader.getProfileInfo()->m_numCpus;
-
-            for (gtUInt32 core = 0; core < nbrCores; core++)
-            {
-                coreMask <<= 1;
-                coreMask |= 1;
-            }
-        }
-
-        gtUInt32 coreId = 0;
-
-        while (coreMask)
-        {
-            if (coreMask & 0x1)
-            {
-                m_coresList.push_back(coreId);
-
-                coreMask >>= 1;
-                coreId++;
-            }
-        }
-    }
-
-    return true;
-}
-
-bool CpuProfileReport::SetCLUViewConfig(ViewConfig& viewCfg)
-{
-    viewCfg.SetConfigName(QString("CLU"));
-
-    QStringList eventList;
-
-    gtUInt32 nbrEvents = m_monitoredEventsNameVec.size();
-
-    for (gtUInt32 i = 0; i < nbrEvents; i++)
-    {
-        eventList += QString(m_monitoredEventsNameVec[i].asASCIICharArray());
-    }
-
-    // Index of the L1 evictions event
-    EventMaskType L1EvictEvent = EncodeEvent(CLU_EVENT_L1_EVICTIONS, 0, true, true);
-    EventMaskType accessesEvent = EncodeEvent(CLU_EVENT_ACCESSES, 0, true, true);
-    EventMaskType bytesAccessedEvent = EncodeEvent(CLU_EVENT_BYTES_ACCESSED, 0, true, true);
-    int evictionsIndex = GetIndexForEvent(m_evtIndexMap, L1EvictEvent);
-    int accessesIndex = GetIndexForEvent(m_evtIndexMap, accessesEvent);
-    int bytesAccessedIndex = GetIndexForEvent(m_evtIndexMap, bytesAccessedEvent);
-
-    if (nbrEvents > 0)
-    {
-        ColumnSpec* pColumnSpec = new ColumnSpec[nbrEvents];
-
-        for (gtUInt32 i = 0; i < nbrEvents; i++)
-        {
-            pColumnSpec[i].type = ColumnValue;
-            pColumnSpec[i].sorting = NoSort;
-            pColumnSpec[i].visible = true;
-            pColumnSpec[i].dataSelectLeft = m_pEventConfig[i];
-            pColumnSpec[i].dataSelectRight.eventSelect = 0;
-            pColumnSpec[i].dataSelectRight.eventUnitMask = 0;
-            pColumnSpec[i].dataSelectRight.bitOs = 0;
-            pColumnSpec[i].dataSelectRight.bitUsr = 0;
-            pColumnSpec[i].title = m_monitoredEventsNameVec[i].asASCIICharArray();
-
-            if (CLU_EVENT_CLU_PERCENTAGE == m_eventsVec[i])
-            {
-                pColumnSpec[i].dataSelectRight = m_pEventConfig[evictionsIndex];
-                pColumnSpec[i].type = ColumnPercentage;
-            }
-            else if (CLU_EVENT_BYTES_PER_L1_EVICTION == m_eventsVec[i])
-            {
-                pColumnSpec[i].dataSelectLeft = m_pEventConfig[bytesAccessedIndex];
-                pColumnSpec[i].dataSelectRight = m_pEventConfig[evictionsIndex];
-                pColumnSpec[i].type = ColumnRatio;
-            }
-            else if (CLU_EVENT_ACCESSES_PER_L1_EVICTION == m_eventsVec[i])
-            {
-                pColumnSpec[i].dataSelectLeft = m_pEventConfig[accessesIndex];
-                pColumnSpec[i].dataSelectRight = m_pEventConfig[evictionsIndex];
-                pColumnSpec[i].type = ColumnRatio;
-            }
-        }
-
-        viewCfg.SetColumnSpecs(pColumnSpec, nbrEvents, false);
-        viewCfg.SetDescription("This special view has all of the data from the profile available.");
-
-        if (nullptr != pColumnSpec)
-        {
-            delete[] pColumnSpec;
-        }
-    }
-
-    return true;
-}
-
-bool CpuProfileReport::SetAllDataViewConfig(ViewConfig& viewCfg)
-{
-    viewCfg.SetConfigName(QString("All Data"));
-    QStringList eventList;
-
-    gtUInt32 nbrEvents = m_monitoredEventsNameVec.size();
-
-    for (gtUInt32 i = 0; i < nbrEvents; i++)
-    {
-        eventList += QString(m_monitoredEventsNameVec[i].asASCIICharArray());
-    }
-
-    // Make column specifications
-    viewCfg.MakeColumnSpecs(nbrEvents, m_pEventConfig, eventList);
-    viewCfg.SetDescription("This special view has all of the data from the profile available.");
-
-    return true;
-}
-
-void CpuProfileReport::InitializeViewData()
-{
-    int sortEventIndex = m_args.GetSortEventIndex() == -1 ? 0 : m_args.GetSortEventIndex();
-
-    if (m_viewConfigXMLPath.isEmpty())
-    {
-        if (m_profileReader.getProfileInfo()->m_isProfilingCLU)
-        {
-            SetCLUViewConfig(m_viewConfig);
-            SetCLUViewConfig(m_overviewConfig);
-
-            m_pReporter->SetCLU(true);
-            m_pReporter->SetSortOrder(Reporter::ASCENDING_ORDER);
-            sortEventIndex = 0;
-        }
-        else
-        {
-            // All data
-            SetAllDataViewConfig(m_viewConfig);
-            SetAllDataViewConfig(m_overviewConfig);
-        }
-    }
-    else
-    {
-        m_viewConfig.ReadConfigFile(convertToQString(m_viewConfigXMLPath.asString()));
-        SetAllDataViewConfig(m_overviewConfig);
-    }
-
-    m_pReporter->SetSortEventIndex(sortEventIndex);
-}
-#endif
+#endif // AMDT_CPCLI_ENABLE_IMIX

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -41,7 +41,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\AMDTCpuProfilingCLI.cpp" />
-    <ClCompile Include="src\CGCallback.cpp" />
     <ClCompile Include="src\Collect.cpp" />
     <ClCompile Include="src\ParseArgs.cpp" />
     <ClCompile Include="src\Report.cpp" />
@@ -50,7 +49,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\AMDTCpuProfilingCLI.h" />
-    <ClInclude Include="inc\CGCallback.h" />
     <ClInclude Include="inc\Collect.h" />
     <ClInclude Include="inc\ParseArgs.h" />
     <ClInclude Include="inc\Report.h" />

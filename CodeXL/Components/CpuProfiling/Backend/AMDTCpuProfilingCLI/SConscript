@@ -52,7 +52,6 @@ sources = \
     "src/Utils.cpp",
     "src/Report.cpp",
     "src/Reporter.cpp",
-    "src/CGCallback.cpp",
 ]
 
 # Dependent libraries
