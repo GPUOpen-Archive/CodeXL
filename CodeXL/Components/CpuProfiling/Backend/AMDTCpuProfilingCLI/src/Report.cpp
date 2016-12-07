@@ -22,6 +22,7 @@
 // Project:
 #include <Report.h>
 #include <CommonUtils.h>
+#include <algorithm>
 
 #if AMDT_BUILD_TARGET == AMDT_LINUX_OS
     #include <time.h>
