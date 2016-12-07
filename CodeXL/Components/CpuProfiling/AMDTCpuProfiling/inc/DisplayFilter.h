@@ -79,7 +79,7 @@ public:
     static void reset();
     ~CPUGlobalDisplayFilter();
 
-    bool m_displaySystemDLLs = false;
+    bool m_displaySystemModules = false;
     bool m_displayPercentageInColumn = false;
 
 private:
@@ -144,14 +144,14 @@ public:
     /// A list of all modules for the current session:
     QStringList m_allModulesFullPathsList;
 
-    /// List of booleans. Element i contain true iff the m_allModulesFullPathsList[i] is 32 bit dll:
+    /// List of booleans. Element i contain true iff the m_allModulesFullPathsList[i] is 32 bit module:
     QList<bool> m_isModule32BitList;
 
-    /// List of booleans. Element i contain true iff the m_allModulesFullPathsList[i] is 32 bit dll:
-    QList<bool> m_isSystemDllList;
+    /// List of booleans. Element i contain true iff the m_allModulesFullPathsList[i] is 32 bit module:
+    QList<bool> m_isSystemModuleList;
 
     /// Contain true iff the system modules should be displayed in modules dialog:
-    bool m_shouldDisplaySystemDllInModulesDlg = true;
+    bool m_shouldDisplaySystemModuleInModulesDlg = true;
 
     /// Contain the list of hot spot indicator full names:
     gtMap<QString, int> m_hotSpotIndicatorToDataIndexMap;
@@ -214,12 +214,12 @@ public:
     AMDTUInt32 GetCoreCount() const;
 
     // System Module
-    void setIgnoreSysDLL(bool isChecked);
+    void setIgnoreSystemModule(bool isChecked);
     bool IsSystemModuleIgnored() const;
 
     // Sample Percent
-    void SetSamplePercent(bool isSet);
-    bool GetSamplePercent() const;
+    void SetDisplaySamplePercent(bool isSet);
+    bool isDisplaySamplePercent() const;
 
     // CLU
     void SetCLUOVHdrName(const QString& name);
@@ -230,9 +230,9 @@ public:
     void SetViewName(const QString& viewName) { m_viewName = viewName; }
     QString GetViewName() const { return m_viewName; }
 
-    //ProfileType
-    AMDTProfileType GetProfileType() const { return m_profType; }
+    // ProfileType
     void SetProfileType(AMDTProfileType type) { m_profType = type; }
+    AMDTProfileType GetProfileType() const { return m_profType; }
 
 private:
     void SetProfileDataOption();

@@ -85,8 +85,8 @@ bool ProcessesDataTable::fillSummaryTables(int counterIdx)
 
                 addRow(list, nullptr);
 
-				// for summary table
-				SetDelegateItemColumn(PROCESS_SAMPLE_COL, true);
+                // for summary table
+                SetDelegateItemColumn(PROCESS_SAMPLE_COL, true);
 
             }
 
@@ -148,7 +148,7 @@ bool ProcessesDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allProce
             list << procInfo.at(0).m_name.asASCIICharArray();
             list << QString::number(procInfo.at(0).m_pid);
 
-            SetTableSampleCntAndPercent(list, PROCESS_ID_COL, profData);
+            SetTableSampleCountAndPercent(list, PROCESS_ID_COL, profData);
             addRow(list, nullptr);
         }
 

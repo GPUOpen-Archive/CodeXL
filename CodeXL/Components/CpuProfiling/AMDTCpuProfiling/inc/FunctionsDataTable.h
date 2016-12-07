@@ -25,10 +25,16 @@ enum FunctionSummaryCol
     AMDT_FUNC_SUMMMARY_FUNC_SAMPLE_COL,
     AMDT_FUNC_SUMMMARY_FUNC_PER_SAMPLE_COL,
     AMDT_FUNC_SUMMMARY_FUNC_MODULE_COL,
-    AMDT_FUNC_FUNC_NAME_COL = AMDT_FUNC_SUMMMARY_FUNC_NAME_COL,
-    AMDT_FUNC_FUNC_MODULE_COL,
-    AMDT_FUNC_START_SAMPLE,
-    AMDT_FUNC_TBP_PER_COL = AMDT_FUNC_START_SAMPLE + 1
+};
+
+enum FunctionTabCol
+{
+    AMDT_FUNC_TAB_FUNC_ID_COL = 0,
+    AMDT_FUNC_TAB_FUNC_NAME_COL,
+    AMDT_FUNC_TAB_MOD_NAME_COL,
+    AMDT_FUNC_TAB_SAMPLE_START_COL,
+    AMDT_FUNC_TAB_TBP_SAMPLE_COL = AMDT_FUNC_TAB_SAMPLE_START_COL,
+    AMDT_FUNC_TAB_TBP_PER_SAMPLE_COL,
 };
 
 /// -----------------------------------------------------------------------------------------------
@@ -47,9 +53,6 @@ public:
                        SessionTreeNodeData* pSessionData,
                        CpuSessionWindow* pSessionWindow);
     virtual ~FunctionsDataTable();
-
-    // TODO: Unused ??
-    int getFunctionNameColumnIndex() const { return m_functionNameColIndex; }
 
     QString getFunctionName(int rowIndex) const;
     QString getModuleName(int rowIndex) const;
@@ -70,17 +73,17 @@ protected:
 
     virtual bool fillSummaryTables(int counterIdx);
     virtual bool fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> modIdVec = {});
-    virtual bool HandleHotSpotIndicatorSet();
-
-    bool setModuleIcon(int row, const AMDTProfileModuleInfo& moduleInfo);
+    virtual bool HandleHotSpotIndicatorSet() { return true; };
     bool AddRowToTable(const gtVector<AMDTProfileData>& allModuleData);
 
     /// Contain the indices for the function and module name columns:
-    int m_functionNameColIndex;
-    int m_moduleNameColIndex;
-    bool m_popupToBrowseMissingFiles;
+    int m_functionIdColumn = -1;
+    int m_functionNameColumn = -1;
+    int m_moduleNameColumn = -1;
 
-    CpuSessionWindow* m_pParentSessionWindow;
+    bool m_popupToBrowseMissingFiles = true;
+
+    CpuSessionWindow* m_pParentSessionWindow = nullptr;
 };
 
 

@@ -147,7 +147,6 @@ bool CPUProfileDataTable::displayTableSummaryData(std::shared_ptr<cxlProfileData
         fillSummaryTables(counterIdx);
 
         retVal = true;
-
     }
 
     return retVal;
@@ -1038,54 +1037,78 @@ bool CPUProfileDataTable::SetSummaryTabIcon(gtUInt16 iconColNum,
     return retVal;
 }
 
-void CPUProfileDataTable::SetTableSampleCntAndPercent(QStringList& list,
-                                                      gtUInt16 delegateColIdx,
-                                                      AMDTProfileData profData)
+void CPUProfileDataTable::SetTableSampleCountAndPercent(QStringList& list,
+                                                        gtUInt16 delegateColIdx,
+                                                        const AMDTProfileData& profData)
 {
-    CounterNameIdVec selectedCounterList;
-
     if (nullptr != m_pDisplayFilter)
     {
+        CounterNameIdVec selectedCounterList;
         m_pDisplayFilter->GetSelectedCounterList(selectedCounterList);
+
         int i = 0;
 
-        for (auto counter : selectedCounterList)
+        for (const auto& counter : selectedCounterList)
         {
             // get counter type
             AMDTProfileCounterType counterType = static_cast<AMDTProfileCounterType>(std::get<4>(counter));
-            bool setSampleValue = true;
+            auto sampleCount = profData.m_sampleValue.at(i).m_sampleCount;
+            bool setPercentInColumn = m_pDisplayFilter->isDisplaySamplePercent();
 
+            // TBP, EBP, IBS
             if (counterType == AMDT_PROFILE_COUNTER_TYPE_RAW)
             {
-                if ((m_pDisplayFilter->GetSamplePercent() == true) && (m_pDisplayFilter->GetProfileType() != AMDT_PROFILE_TYPE_TBP))
+                auto samplePercent = profData.m_sampleValue.at(i).m_sampleCountPercentage;
+
+                // EBP, IBS
+                if (m_pDisplayFilter->GetProfileType() != AMDT_PROFILE_TYPE_TBP)
                 {
-                    list << QString::number(profData.m_sampleValue.at(i++).m_sampleCountPercentage, 'f', SAMPLE_PERCENT_PRECISION);
-                    delegateSamplePercent(delegateColIdx + i);
-                    setSampleValue = false;
+                    if (setPercentInColumn == true && samplePercent > 0)
+                    {
+                        list << QString::number(samplePercent, 'f', SAMPLE_PERCENT_PRECISION);
+                        delegateSamplePercent(delegateColIdx + i);
+                    }
+                    else if (setPercentInColumn != true && sampleCount > 0)
+                    {
+                        list << QString::number(sampleCount);
+                        setItemDelegateForColumn(delegateColIdx + i, &acNumberDelegateItem::Instance());
+                    }
+                    else
+                    {
+                        list << "";
+                    }
+                }
+                else // TBP
+                {
+                    if (sampleCount > 0)
+                    {
+                        list << QString::number(sampleCount);
+                        setItemDelegateForColumn(delegateColIdx + i, &acNumberDelegateItem::Instance());
+
+                        list << QString::number(samplePercent, 'f', SAMPLE_PERCENT_PRECISION);
+                        delegateSamplePercent(delegateColIdx + i + 1);
+                    }
+                    else
+                    {
+                        list << "" << "";
+                    }
                 }
             }
-
-            if (setSampleValue)
+            else // CLU
             {
-                double sampleCnt = profData.m_sampleValue.at(i).m_sampleCount;
                 setItemDelegateForColumn(delegateColIdx + i, &acNumberDelegateItem::Instance());
 
-                if (0 == sampleCnt)
+                if (sampleCount > 0)
                 {
-                    list << "";
+                    list << QString::number(sampleCount);
                 }
                 else
                 {
-                    list << QString::number(sampleCnt);
-
-                    if (m_pDisplayFilter->GetProfileType() == AMDT_PROFILE_TYPE_TBP)
-                    {
-                        list << QString::number(profData.m_sampleValue.at(i).m_sampleCountPercentage, 'f', SAMPLE_PERCENT_PRECISION);
-                    }
+                    list << "";
                 }
-
-                ++i;
             }
+
+            ++i;
         }
     }
 }
@@ -1094,7 +1117,7 @@ void CPUProfileDataTable::IfTbpSetPercentCol(int colIdx)
 {
     if (m_pDisplayFilter->GetProfileType() == AMDT_PROFILE_TYPE_TBP)
     {
-        if (!m_pDisplayFilter->GetSamplePercent())
+        if (!m_pDisplayFilter->isDisplaySamplePercent())
         {
             hideColumn(colIdx);
         }

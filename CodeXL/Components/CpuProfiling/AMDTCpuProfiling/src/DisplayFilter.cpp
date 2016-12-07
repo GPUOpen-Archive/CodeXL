@@ -20,8 +20,8 @@
 #include <inc/StringConstants.h>
 
 // Global:
-static bool g_isDisplaySystemModule = false;
-static bool g_isSamplePercent = false;
+static bool g_displaySystemModule = false;
+static bool g_displaySamplePercent = false;
 
 // Static member initialization:
 CPUGlobalDisplayFilter* CPUGlobalDisplayFilter::m_psMySingleInstance = nullptr;
@@ -41,8 +41,8 @@ TableDisplaySettings::TableDisplaySettings(const TableDisplaySettings& other)
     m_filterByModulePathsList = other.m_filterByModulePathsList;
     m_allModulesFullPathsList = other.m_allModulesFullPathsList;
     m_isModule32BitList = other.m_isModule32BitList;
-    m_isSystemDllList = other.m_isSystemDllList;
-    m_shouldDisplaySystemDllInModulesDlg = other.m_shouldDisplaySystemDllInModulesDlg;
+    m_isSystemModuleList = other.m_isSystemModuleList;
+    m_shouldDisplaySystemModuleInModulesDlg = other.m_shouldDisplaySystemModuleInModulesDlg;
 }
 
 bool TableDisplaySettings::colTypeAsString(ProfileDataColumnType column, QString& colStr, QString& tooltip)
@@ -262,7 +262,7 @@ bool DisplayFilter::InitToDefault()
         m_options.m_summaryCount = 5;
         m_options.m_isSeperateByCore = false;
         m_options.m_isSeperateByNuma = false;
-        m_options.m_ignoreSystemModules = !g_isDisplaySystemModule;
+        m_options.m_ignoreSystemModules = !g_displaySystemModule;
 
         //setting all counters for config "All Data"
         for (auto const& counter : m_reportConfigs[0].m_counterDescs)
@@ -336,20 +336,20 @@ bool DisplayFilter::IsSystemModuleIgnored() const
     return m_options.m_ignoreSystemModules;
 }
 
-void DisplayFilter::SetSamplePercent(bool isSet)
-{
-    g_isSamplePercent = isSet;
-}
-
-void DisplayFilter::setIgnoreSysDLL(bool isChecked)
+void DisplayFilter::setIgnoreSystemModule(bool isChecked)
 {
     m_options.m_ignoreSystemModules = isChecked;
-    g_isDisplaySystemModule = !isChecked;
+    g_displaySystemModule = !isChecked;
 }
 
-bool DisplayFilter::GetSamplePercent() const
+void DisplayFilter::SetDisplaySamplePercent(bool isSet)
 {
-    return g_isSamplePercent;
+    g_displaySamplePercent = isSet;
+}
+
+bool DisplayFilter::isDisplaySamplePercent() const
+{
+    return g_displaySamplePercent;
 }
 
 AMDTUInt32 DisplayFilter::GetCoreCount() const

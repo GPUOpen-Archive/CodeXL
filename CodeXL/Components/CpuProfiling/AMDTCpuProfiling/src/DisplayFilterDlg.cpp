@@ -87,11 +87,11 @@ DisplayFilterDlg::~DisplayFilterDlg()
 }
 
 QDialog::DialogCode
-DisplayFilterDlg::displayDialog(const QString& sessionPath, bool enableOnlySystemDll)
+DisplayFilterDlg::displayDialog(const QString& sessionPath, bool enableOnlySystemModule)
 {
     QDialog::DialogCode retVal = QDialog::Rejected;
 
-    m_enableOnlySystemDll = enableOnlySystemDll;
+    m_enableOnlySystemModule = enableOnlySystemModule;
 
     SessionViewCreator* pSessionViewCreator = AmdtCpuProfiling::sessionViewCreator();
     GT_IF_WITH_ASSERT(pSessionViewCreator != nullptr)
@@ -147,8 +147,8 @@ DisplayFilterDlg::displayDialog(const QString& sessionPath, bool enableOnlySyste
                 }
 
 #endif
-                m_displaySystemDLLs = !m_displayFilter->IsSystemModuleIgnored();
-                m_pCheckBoxDisplaySystemDLLs->setChecked(m_displaySystemDLLs);
+                m_displaySystemModules = !m_displayFilter->IsSystemModuleIgnored();
+                m_pCheckBoxDisplaySystemModules->setChecked(m_displaySystemModules);
                 m_pCheckBoxShowPercentageBars->setChecked(m_displayPercentageInColumn);
             }
 
@@ -166,8 +166,8 @@ DisplayFilterDlg::displayDialog(const QString& sessionPath, bool enableOnlySyste
         }
     }
 
-    m_pCheckBoxDisplaySystemDLLs->setEnabled(true);
-    disableAllControlsExceptSystemDll(m_enableOnlySystemDll);
+    m_pCheckBoxDisplaySystemModules->setEnabled(true);
+    disableAllControlsExceptSystemModule(m_enableOnlySystemModule);
 
     //for CLU:: Need to be optimised
     if (nullptr != m_pProfDataReader)
@@ -221,7 +221,7 @@ bool DisplayFilterDlg::initializeLayout()
 
     m_pComboBoxViewes = new QComboBox;
 
-    m_pCheckBoxDisplaySystemDLLs = new QCheckBox("Display system modules", this);
+    m_pCheckBoxDisplaySystemModules = new QCheckBox("Display system modules", this);
 
     m_pCheckBoxShowPercentageBars = new QCheckBox("Show percentages", this);
 
@@ -579,10 +579,10 @@ void DisplayFilterDlg::onClickOk()
 
 #endif
         m_displayPercentageInColumn = m_pCheckBoxShowPercentageBars->isChecked();
-        m_displayFilter->SetSamplePercent(m_displayPercentageInColumn);
+        m_displayFilter->SetDisplaySamplePercent(m_displayPercentageInColumn);
 
-        m_displaySystemDLLs = m_pCheckBoxDisplaySystemDLLs->isChecked();
-        m_displayFilter->setIgnoreSysDLL(!m_displaySystemDLLs);
+        m_displaySystemModules = m_pCheckBoxDisplaySystemModules->isChecked();
+        m_displayFilter->setIgnoreSystemModule(!m_displaySystemModules);
 
     }
 
@@ -612,7 +612,7 @@ void DisplayFilterDlg::onClickCheckBoxSeparateColumnsBy(int state)
 #endif
 }
 
-void DisplayFilterDlg::disableAllControlsExceptSystemDll(bool disable)
+void DisplayFilterDlg::disableAllControlsExceptSystemModule(bool disable)
 {
     GT_IF_WITH_ASSERT((m_pCheckBoxAllCore != nullptr) &&
                       (m_pComboBoxViewes != nullptr) &&
@@ -691,12 +691,12 @@ void DisplayFilterDlg::addFinalLayout()
 
     m_pMainLayout->addWidget(m_plabelGeneral);
 
-    m_pCheckBoxDisplaySystemDLLsLayout = new QHBoxLayout;
+    m_pCheckBoxDisplaySystemModulesLayout = new QHBoxLayout;
 
-    m_pCheckBoxDisplaySystemDLLsLayout->addSpacing(acScalePixelSizeToDisplayDPI(CP_DISPLAY_SETTINGS_HMARGIN));
-    m_pCheckBoxDisplaySystemDLLsLayout->addWidget(m_pCheckBoxDisplaySystemDLLs);
-    m_pCheckBoxDisplaySystemDLLsLayout->addSpacing(acScalePixelSizeToDisplayDPI(CP_DISPLAY_SETTINGS_HMARGIN));
-    m_pMainLayout->addLayout(m_pCheckBoxDisplaySystemDLLsLayout);
+    m_pCheckBoxDisplaySystemModulesLayout->addSpacing(acScalePixelSizeToDisplayDPI(CP_DISPLAY_SETTINGS_HMARGIN));
+    m_pCheckBoxDisplaySystemModulesLayout->addWidget(m_pCheckBoxDisplaySystemModules);
+    m_pCheckBoxDisplaySystemModulesLayout->addSpacing(acScalePixelSizeToDisplayDPI(CP_DISPLAY_SETTINGS_HMARGIN));
+    m_pMainLayout->addLayout(m_pCheckBoxDisplaySystemModulesLayout);
 
     m_pCheckBoxShowPercentageBarsLayout = new QHBoxLayout;
 

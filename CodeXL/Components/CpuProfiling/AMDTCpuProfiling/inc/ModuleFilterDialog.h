@@ -38,7 +38,7 @@ class ModuleFilterDialog : public acDialog
 public:
 
     ModuleFilterDialog(std::shared_ptr<cxlProfileDataReader> m_pProfDataRdr,
-					   std::shared_ptr<DisplayFilter> m_pDisplayFilter,
+                       std::shared_ptr<DisplayFilter> m_pDisplayFilter,
                        TableDisplaySettings* pDisplaySettings,
                        CPUSessionTreeItemData* pSessionData,
                        QWidget* pParent = nullptr);
@@ -48,12 +48,12 @@ private:
     QPushButton* m_pPbOk = nullptr;
     QPushButton* m_pPbCancel = nullptr;
     QCheckBox* m_pSelectAllModules = nullptr;
-    QCheckBox* m_pDisplaySystemDLL = nullptr;
+    QCheckBox* m_pDisplaySystemModule = nullptr;
     QLabel* m_pProcessDescriptor = nullptr;
     acListCtrl* m_pModuleTree = nullptr;
 
     std::shared_ptr<cxlProfileDataReader> m_pProfDataRdr = nullptr;
-	std::shared_ptr<DisplayFilter> m_pDisplayFilter = nullptr;
+    std::shared_ptr<DisplayFilter> m_pDisplayFilter = nullptr;
     TableDisplaySettings* m_pTableDisplaySettings = nullptr;
     CPUSessionTreeItemData* m_pSessionData = nullptr;
 
@@ -62,7 +62,7 @@ private:
     bool isThisPidListed(gtUInt64 pid);
 
 private slots:
-    void onCheckSystemDLL(int state);
+    void onCheckSystemModule(int state);
     void onCheckSelectALL(int state);
     void onClickModuleItem(QTableWidgetItem* item);
     void onClickOk();

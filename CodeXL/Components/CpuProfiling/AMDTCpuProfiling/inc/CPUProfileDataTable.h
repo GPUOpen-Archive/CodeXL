@@ -239,9 +239,9 @@ protected:
                            gtUInt32 modId,
                            const osFilePath& modulePath);
 
-    void SetTableSampleCntAndPercent(QStringList& list,
-                                     gtUInt16 delegateColIdx,
-                                     AMDTProfileData profData);
+    void SetTableSampleCountAndPercent(QStringList& list,
+                                       gtUInt16 delegateColIdx,
+                                       const AMDTProfileData& profData);
 
     void IfTbpSetPercentCol(int colIdx);
 

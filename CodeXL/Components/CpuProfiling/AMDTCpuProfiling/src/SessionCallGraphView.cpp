@@ -991,7 +991,7 @@ bool SessionCallGraphView::ShowParentChild(AMDTFunctionId functionId)
     return ret;
 }
 
-void CallGraphFuncList::GetFunctionCount(std::pair<int, int>& sysDllCount,
+void CallGraphFuncList::GetFunctionCount(std::pair<int, int>& sysModuleCount,
                                          const std::shared_ptr<DisplayFilter> pDisplayFilter,
                                          std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
                                          AMDTUInt32 counterId,
@@ -1015,21 +1015,19 @@ void CallGraphFuncList::GetFunctionCount(std::pair<int, int>& sysDllCount,
         else
         {
             callGraphFuncs.clear();
-            pDisplayFilter->setIgnoreSysDLL(!origState);
+            pDisplayFilter->setIgnoreSystemModule(!origState);
             pDisplayFilter->SetReportConfig();
 
             pProfDataRdr->GetCallGraphFunctions(processId, counterId, callGraphFuncs);
             total = callGraphFuncs.size();
 
-            //restore orignal state
-            pDisplayFilter->setIgnoreSysDLL(origState);
+            //restore original state
+            pDisplayFilter->setIgnoreSystemModule(origState);
             pDisplayFilter->SetReportConfig();
         }
 
-        sysDllCount = std::make_pair(total, shown);
+        sysModuleCount = std::make_pair(total, shown);
     }
-
-
 }
 
 bool CallGraphFuncList::FillDisplayFuncList(std::shared_ptr<cxlProfileDataReader> pProfDataRdr,

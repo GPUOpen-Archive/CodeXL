@@ -53,7 +53,7 @@ ModuleFilterDialog::ModuleFilterDialog(std::shared_ptr<cxlProfileDataReader> pPr
     QObject::connect(m_pPbOk, SIGNAL(clicked()), this, SLOT(onClickOk()));
     QObject::connect(m_pPbCancel, SIGNAL(clicked()), this, SLOT(onClickCancel()));
     QObject::connect(m_pSelectAllModules, SIGNAL(stateChanged(int)), this, SLOT(onCheckSelectALL(int)));
-    QObject::connect(m_pDisplaySystemDLL, SIGNAL(stateChanged(int)), this, SLOT(onCheckSystemDLL(int)));
+    QObject::connect(m_pDisplaySystemModule, SIGNAL(stateChanged(int)), this, SLOT(onCheckSystemDLL(int)));
     resize(QSize(600, 350));
 
     setWindowTitle(str_DialogCaption);
@@ -69,7 +69,7 @@ void ModuleFilterDialog::intializeLayout()
     m_pPbOk                 = new QPushButton("OK", this);
     m_pPbCancel             = new QPushButton("Cancel", this);
     m_pSelectAllModules     = new QCheckBox(str_SelectAllModules, this);
-    m_pDisplaySystemDLL     = new QCheckBox(str_DisplaySystemDLLs, this);
+    m_pDisplaySystemModule = new QCheckBox(str_DisplaySystemDLLs, this);
     m_pProcessDescriptor    = new QLabel(str_Modules, this);
 
     QString exeName;
@@ -141,7 +141,7 @@ void ModuleFilterDialog::intializeLayout()
 
     pFullLayout->addWidget(m_pProcessDescriptor);
     pFullLayout->addWidget(m_pModuleTree);
-    pFullLayout->addWidget(m_pDisplaySystemDLL);
+    pFullLayout->addWidget(m_pDisplaySystemModule);
     pFullLayout->addWidget(m_pSelectAllModules);
 
     pFullLayout->addItem(pButtonBox);
@@ -167,9 +167,9 @@ void ModuleFilterDialog::intializeData()
             m_pSelectAllModules->setCheckState(Qt::Unchecked);
         }
 
-        bool sysModuleEn = m_pTableDisplaySettings->m_shouldDisplaySystemDllInModulesDlg;
-        m_pDisplaySystemDLL->setChecked(sysModuleEn);
-        m_pDisplaySystemDLL->setEnabled(sysModuleEn);
+        bool sysModuleEn = m_pTableDisplaySettings->m_shouldDisplaySystemModuleInModulesDlg;
+        m_pDisplaySystemModule->setChecked(sysModuleEn);
+        m_pDisplaySystemModule->setEnabled(sysModuleEn);
 
         GT_IF_WITH_ASSERT(m_pTableDisplaySettings->m_allModulesFullPathsList.size() == m_pTableDisplaySettings->m_isModule32BitList.size())
         {
@@ -197,7 +197,7 @@ void ModuleFilterDialog::intializeData()
 
 
                 // Check if this module is a system module:
-                m_pTableDisplaySettings->m_isSystemDllList[i] = AuxIsSystemModule(modulePath);
+                m_pTableDisplaySettings->m_isSystemModuleList[i] = AuxIsSystemModule(modulePath);
 
                 pItemName->setFlags(pItemName->flags() ^ Qt::ItemIsEditable);
                 pItemName->data(Qt::CheckStateRole);
@@ -231,14 +231,14 @@ void ModuleFilterDialog::intializeData()
             m_pModuleTree->setRowHeight(CP_CPU_TABLE_ROW_HEIGHT);
             m_pModuleTree->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft);
             m_pModuleTree->setSortingEnabled(true);
-            onCheckSystemDLL(m_pTableDisplaySettings->m_shouldDisplaySystemDllInModulesDlg);
+            onCheckSystemModule(m_pTableDisplaySettings->m_shouldDisplaySystemModuleInModulesDlg);
             QObject::connect(m_pModuleTree, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(onClickModuleItem(QTableWidgetItem*)));
         }
     }
 }
 
 
-void ModuleFilterDialog::onCheckSystemDLL(int state)
+void ModuleFilterDialog::onCheckSystemModule(int state)
 {
     int rowCount = m_pModuleTree->rowCount();
 
@@ -373,11 +373,11 @@ void ModuleFilterDialog::onClickModuleItem(QTableWidgetItem* item)
 
 void ModuleFilterDialog::onClickOk()
 {
-    if (m_pDisplaySystemDLL->isEnabled())
+    if (m_pDisplaySystemModule->isEnabled())
     {
-        bool isSystemDLLChecked = m_pDisplaySystemDLL->isChecked();
-        m_pTableDisplaySettings->m_shouldDisplaySystemDllInModulesDlg = isSystemDLLChecked;
-        m_pDisplayFilter->setIgnoreSysDLL(!isSystemDLLChecked);
+        bool isSystemModuleChecked = m_pDisplaySystemModule->isChecked();
+        m_pTableDisplaySettings->m_shouldDisplaySystemModuleInModulesDlg = isSystemModuleChecked;
+        m_pDisplayFilter->setIgnoreSystemModule(!isSystemModuleChecked);
     }
 
     m_pTableDisplaySettings->m_filterByModulePathsList.clear();

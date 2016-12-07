@@ -261,8 +261,8 @@ void SessionFunctionView::CreateToolbar()
     m_pTopToolbar->setStyleSheet("QToolBar { border-style: none; }");
     m_pTopToolbar->setContentsMargins(0, 0, 0, 0);
 
-    // Display system dll is initialized with the value of the current display system dll value:
-    m_functionsTablesFilter.m_shouldDisplaySystemDllInModulesDlg = !m_pDisplayFilter->IsSystemModuleIgnored();
+    // Display system module is initialized with the value of the current display system module value:
+    m_functionsTablesFilter.m_shouldDisplaySystemModuleInModulesDlg = !m_pDisplayFilter->IsSystemModuleIgnored();
 
     m_pTopToolbar->AddLabel(CP_strFunctions, true, false, 0);
 
@@ -470,19 +470,19 @@ QString SessionFunctionView::updateModulesFilterLinkString()
     {
         amountOfModulesShown = m_functionsTablesFilter.m_allModulesFullPathsList.size();
 
-        if (!CPUGlobalDisplayFilter::instance().m_displaySystemDLLs)
+        if (!CPUGlobalDisplayFilter::instance().m_displaySystemModules)
         {
-            int systemDllCount = 0;
+            int systemModuleCount = 0;
 
-            foreach (bool isSys, m_functionsTablesFilter.m_isSystemDllList)
+            foreach (bool isSys, m_functionsTablesFilter.m_isSystemModuleList)
             {
                 if (isSys)
                 {
-                    systemDllCount ++;
+                    systemModuleCount ++;
                 }
             }
 
-            amountOfModulesShown -= systemDllCount;
+            amountOfModulesShown -= systemModuleCount;
         }
     }
 
@@ -593,7 +593,7 @@ void SessionFunctionView::updateDataFromPidComboBox()
         m_functionsTablesFilter.m_filterByModulePathsList.clear();
         m_functionsTablesFilter.m_allModulesFullPathsList.clear();
         m_functionsTablesFilter.m_isModule32BitList.clear();
-        m_functionsTablesFilter.m_isSystemDllList.clear();
+        m_functionsTablesFilter.m_isSystemModuleList.clear();
 
         AMDTUInt32 pid = 0;
 
@@ -636,7 +636,7 @@ void SessionFunctionView::updateDataFromPidComboBox()
             {
                 m_functionsTablesFilter.m_allModulesFullPathsList.append(acGTStringToQString(module.m_path));
                 m_functionsTablesFilter.m_isModule32BitList.append(module.m_is64Bit ? false : true);
-                m_functionsTablesFilter.m_isSystemDllList.append(module.m_isSystemModule);
+                m_functionsTablesFilter.m_isSystemModuleList.append(module.m_isSystemModule);
                 m_moduleNameIdMap.insert(std::make_pair(module.m_path, module.m_moduleId));
             }
         }
@@ -647,12 +647,12 @@ void SessionFunctionView::UpdateTableDisplay(unsigned int updateType)
 {
     GT_UNREFERENCED_PARAMETER(updateType);
 
-    bool displaySystemDLLs = !m_pDisplayFilter->IsSystemModuleIgnored();
+    bool displaySystemModules = !m_pDisplayFilter->IsSystemModuleIgnored();
 
     // This function is called after the session display filter is changed:
-    if (m_functionsTablesFilter.m_shouldDisplaySystemDllInModulesDlg != displaySystemDLLs)
+    if (m_functionsTablesFilter.m_shouldDisplaySystemModuleInModulesDlg != displaySystemModules)
     {
-        m_functionsTablesFilter.m_shouldDisplaySystemDllInModulesDlg = displaySystemDLLs;
+        m_functionsTablesFilter.m_shouldDisplaySystemModuleInModulesDlg = displaySystemModules;
 
         if (m_functionsTablesFilter.m_filterByModulePathsList.size() > 0)
         {
@@ -662,12 +662,12 @@ void SessionFunctionView::UpdateTableDisplay(unsigned int updateType)
                 // Get the module for the current index:
                 QString moduleFilePath = m_functionsTablesFilter.m_allModulesFullPathsList.at(i);
 
-                if (m_functionsTablesFilter.m_isSystemDllList[i])
+                if (m_functionsTablesFilter.m_isSystemModuleList[i])
                 {
                     // Check if the modules should be added / remove from the filter list:
-                    bool shouldAdd = m_functionsTablesFilter.m_shouldDisplaySystemDllInModulesDlg &&
+                    bool shouldAdd = m_functionsTablesFilter.m_shouldDisplaySystemModuleInModulesDlg &&
                                      !m_functionsTablesFilter.m_filterByModulePathsList.contains(moduleFilePath);
-                    bool shouldRemove = m_functionsTablesFilter.m_shouldDisplaySystemDllInModulesDlg &&
+                    bool shouldRemove = m_functionsTablesFilter.m_shouldDisplaySystemModuleInModulesDlg &&
                                         m_functionsTablesFilter.m_filterByModulePathsList.contains(moduleFilePath);
 
                     if (shouldAdd)
@@ -788,7 +788,7 @@ void SessionFunctionView::onOpenDisplayFilterDialog()
 {
     OnDisplaySettingsClicked();
 
-    m_functionsTablesFilter.m_shouldDisplaySystemDllInModulesDlg = !m_pDisplayFilter->IsSystemModuleIgnored();
+    m_functionsTablesFilter.m_shouldDisplaySystemModuleInModulesDlg = !m_pDisplayFilter->IsSystemModuleIgnored();
 }
 
 void SessionFunctionView::displayModule(const QString& moduleFullPath)

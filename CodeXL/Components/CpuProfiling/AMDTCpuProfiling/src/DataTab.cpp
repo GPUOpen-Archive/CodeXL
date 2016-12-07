@@ -396,7 +396,7 @@ QString DataTab::displayFilterString()
 
         retVal.append(displaySys);
 
-        bool displayPercentageInColumn = m_pDisplayFilter->GetSamplePercent();
+        bool displayPercentageInColumn = m_pDisplayFilter->isDisplaySamplePercent();
 
         if (displayPercentageInColumn)
         {

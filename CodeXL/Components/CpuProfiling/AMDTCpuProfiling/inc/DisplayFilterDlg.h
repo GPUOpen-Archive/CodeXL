@@ -30,7 +30,7 @@
 #include <AMDTCpuProfilingDataAccess/inc/AMDTCpuProfilingDataAccess.h>
 
 class CpuSessionWindow;
-class CpuProfileInfo;
+
 
 class DisplayFilterDlg : public QDialog
 {
@@ -41,10 +41,10 @@ public:
     static DisplayFilterDlg& instance();
 
     /// Display the dialog for the requested session path:
-    QDialog::DialogCode displayDialog(const QString& sessionPath, bool enableOnlySystemDll);
+    QDialog::DialogCode displayDialog(const QString& sessionPath, bool enableOnlySystemModule);
 
-    bool DisplaySystemDlls() const { return m_displaySystemDLLs; }
-    bool ShowPercentage() const { return m_displayPercentageInColumn; }
+    bool isDisplaySystemModules() const { return m_displaySystemModules; }
+    bool isShowPercentage() const { return m_displayPercentageInColumn; }
 
     virtual ~DisplayFilterDlg();
 
@@ -55,7 +55,7 @@ private:
     bool populateCoreList(int noOfCores);
     bool populateColumnList();
     bool initializeLayout();
-    void disableAllControlsExceptSystemDll(bool disable);
+    void disableAllControlsExceptSystemModule(bool disable);
     void addFinalLayout();
     void updateHiddenColumnList();
     bool createConfigCounterMap();
@@ -72,7 +72,7 @@ private:
     static DisplayFilterDlg* m_psMySingleInstance;
     osFilePath          m_sessionFile;
 
-    bool m_displaySystemDLLs = false;
+    bool m_displaySystemModules = false;
     bool m_displayPercentageInColumn = false;
     afApplicationTreeItemData* m_pSessionTreeItemData = nullptr;
     CpuSessionWindow* m_pCurrentSessionWindow = nullptr;
@@ -89,7 +89,7 @@ private:
     QLabel* m_plabelGeneral = nullptr;
     QLabel* m_plabelCPUCores = nullptr;
     QComboBox* m_pComboBoxViewes = nullptr;
-    QCheckBox* m_pCheckBoxDisplaySystemDLLs = nullptr;
+    QCheckBox* m_pCheckBoxDisplaySystemModules = nullptr;
     QCheckBox* m_pCheckBoxShowPercentageBars = nullptr;
     QCheckBox* m_pCheckBoxSeparateColumnsBy = nullptr;
     QRadioButton* m_pRadioButtonSeparateByCore = nullptr;
@@ -101,7 +101,7 @@ private:
     QVBoxLayout* m_pMainLayout = nullptr;
     QHBoxLayout* m_pComboBoxViewesLayout = nullptr;
     QHBoxLayout* m_pScrollAreaColumnsLayout = nullptr;
-    QHBoxLayout* m_pCheckBoxDisplaySystemDLLsLayout = nullptr;
+    QHBoxLayout* m_pCheckBoxDisplaySystemModulesLayout = nullptr;
     QHBoxLayout* m_pCheckBoxShowPercentageBarsLayout = nullptr;
     QHBoxLayout* m_pScrollAreaCPUCoreLayout = nullptr;
     QFrame* m_pLine = nullptr;
@@ -109,7 +109,7 @@ private:
     QHBoxLayout* m_pCoreLayout = nullptr;
     QHBoxLayout* m_pNUMALayout = nullptr;
     QHBoxLayout* m_pButtonBox = nullptr;
-    bool m_enableOnlySystemDll = false;
+    bool m_enableOnlySystemModule = false;
     std::shared_ptr<DisplayFilter> m_displayFilter = nullptr;
 
     std::shared_ptr<cxlProfileDataReader>   m_pProfDataReader;
