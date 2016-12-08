@@ -6,34 +6,18 @@
 ///
 //==================================================================================
 
-// Qt
-#include <qtIgnoreCompilerWarnings.h>
-
 // STL
 #include <unordered_map>
 
-// Infra:
-#include <AMDTOSWrappers/Include/osFilePath.h>
-#include <AMDTBaseTools/Include/gtAlgorithms.h>
-#include <AMDTApplicationComponents/Include/acMessageBox.h>
-#include <AMDTApplicationComponents/Include/acItemDelegate.h>
-#include <AMDTOSWrappers/Include/osDebugLog.h>
+// Infra
+#include <AMDTApplicationComponents/Include/acFunctions.h>
 
-// AMDTApplicationFramework:
-#include <AMDTApplicationFramework/src/afUtils.h>
-#include <AMDTApplicationFramework/Include/afGlobalVariablesManager.h>
-#include <AMDTApplicationFramework/Include/afProgressBarWrapper.h>
-
-/// Local:
-#include <inc/Auxil.h>
-#include <inc/CPUProfileUtils.h>
-#include <inc/DebugUtils.h>
+// Local
 #include <inc/FunctionsDataTable.h>
-#include <inc/StringConstants.h>
-#include <inc/SessionWindow.h>
-#include <SessionTreeNodeData.h>
+
 
 #define FunctionDataIndexRole  ((int)(Qt::UserRole) + 0)
+
 
 const AMDTFunctionId INVALID_FUNCTION_ID = 0;
 
@@ -202,9 +186,9 @@ bool FunctionsDataTable::fillSummaryTables(int counterIdx)
     bool retVal = false;
 
     // Set the columns for function summary table
-    m_functionIdColumn = AMDT_FUNC_SUMMMARY_FUNC_ID_COL;
-    m_functionNameColumn = AMDT_FUNC_SUMMMARY_FUNC_NAME_COL;
-    m_moduleNameColumn = AMDT_FUNC_SUMMMARY_FUNC_MODULE_COL;
+    m_functionIdColumn = CXL_FUNC_SUMMMARY_FUNC_ID_COL;
+    m_functionNameColumn = CXL_FUNC_SUMMMARY_FUNC_NAME_COL;
+    m_moduleNameColumn = CXL_FUNC_SUMMMARY_MODULE_COL;
 
     if (nullptr != m_pProfDataRdr)
     {
@@ -255,11 +239,11 @@ bool FunctionsDataTable::fillSummaryTables(int counterIdx)
             addRow(list, nullptr);
 
             // for summary table
-            SetDelegateItemColumn(AMDT_FUNC_SUMMMARY_FUNC_SAMPLE_COL, true);
+            SetDelegateItemColumn(CXL_FUNC_SUMMMARY_SAMPLE_COL, true);
 
-            if (!SetSummaryTabIcon(AMDT_FUNC_SUMMMARY_FUNC_NAME_COL,
-                                   AMDT_FUNC_SUMMMARY_FUNC_PER_SAMPLE_COL,
-                                   AMDT_FUNC_SUMMMARY_FUNC_SAMPLE_COL,
+            if (!SetSummaryTabIcon(CXL_FUNC_SUMMMARY_FUNC_NAME_COL,
+                                   CXL_FUNC_SUMMMARY_SAMPLE_PER_COL,
+                                   CXL_FUNC_SUMMMARY_SAMPLE_COL,
                                    profData.m_moduleId,
                                    procInfo.at(0).m_path))
             {
@@ -268,7 +252,7 @@ bool FunctionsDataTable::fillSummaryTables(int counterIdx)
 
             // Set tooltip for module column
             QString modulefullPath(acGTStringToQString(procInfo.at(0).m_path));
-            QTableWidgetItem* pModuleNameItem = item(rowCount() - 1, AMDT_FUNC_SUMMMARY_FUNC_MODULE_COL);
+            QTableWidgetItem* pModuleNameItem = item(rowCount() - 1, CXL_FUNC_SUMMMARY_MODULE_COL);
 
             if (pModuleNameItem != nullptr)
             {
@@ -276,12 +260,12 @@ bool FunctionsDataTable::fillSummaryTables(int counterIdx)
             }
         }
 
-        hideColumn(AMDT_FUNC_SUMMMARY_FUNC_ID_COL);
+        hideColumn(CXL_FUNC_SUMMMARY_FUNC_ID_COL);
 
-        setColumnWidth(AMDT_FUNC_SUMMMARY_FUNC_NAME_COL, MAX_FUNCTION_NAME_LEN);
-        resizeColumnToContents(AMDT_FUNC_SUMMMARY_FUNC_SAMPLE_COL);
-        resizeColumnToContents(AMDT_FUNC_SUMMMARY_FUNC_PER_SAMPLE_COL);
-        resizeColumnToContents(AMDT_FUNC_SUMMMARY_FUNC_MODULE_COL);
+        setColumnWidth(CXL_FUNC_SUMMMARY_FUNC_NAME_COL, MAX_FUNCTION_NAME_LEN);
+        resizeColumnToContents(CXL_FUNC_SUMMMARY_SAMPLE_COL);
+        resizeColumnToContents(CXL_FUNC_SUMMMARY_SAMPLE_PER_COL);
+        resizeColumnToContents(CXL_FUNC_SUMMMARY_MODULE_COL);
 
         setSortingEnabled(true);
 
@@ -314,7 +298,7 @@ bool FunctionsDataTable::AddRowToTable(const gtVector<AMDTProfileData>& function
         {
             list << acGTStringToQString(moduleInfoList.at(0).m_name);
 
-            SetTableSampleCountAndPercent(list, AMDT_FUNC_TAB_SAMPLE_START_COL, profData);
+            SetTableSampleCountAndPercent(list, CXL_FUNC_TAB_SAMPLE_START_COL, profData);
             addRow(list, nullptr);
 
             SetIcon(moduleInfoList.at(0).m_path,
@@ -336,9 +320,9 @@ bool FunctionsDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId,
     bool retVal = false;
 
     // Set the columns for function Tab
-    m_functionIdColumn = AMDT_FUNC_TAB_FUNC_ID_COL;
-    m_functionNameColumn = AMDT_FUNC_TAB_FUNC_NAME_COL;
-    m_moduleNameColumn = AMDT_FUNC_TAB_MOD_NAME_COL;
+    m_functionIdColumn = CXL_FUNC_TAB_FUNC_ID_COL;
+    m_functionNameColumn = CXL_FUNC_TAB_FUNC_NAME_COL;
+    m_moduleNameColumn = CXL_FUNC_TAB_MOD_NAME_COL;
 
     GT_IF_WITH_ASSERT((m_pProfDataRdr != nullptr) &&
                       (m_pDisplayFilter != nullptr) &&
@@ -363,10 +347,10 @@ bool FunctionsDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId,
             }
         }
 
-        if (!m_isCLU)
+        // Compute total samples per counter for non-CLU profile.
+        // (Not getting expected percentage from reporter layer. Need to fix this in DB layer later.)
+        if (m_pDisplayFilter->GetProfileType() != AMDT_PROFILE_TYPE_CLU)
         {
-            // Compute total samples per counter for non-CLU profile.
-            // (Not getting expected percentage from reporter layer. Need to fix this in DB layer later.)
             std::unordered_map<AMDTCounterId, double> sampleMap;
 
             // Compute the total samples per counter for given process.
@@ -402,12 +386,12 @@ bool FunctionsDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId,
             sampleMap.clear();
         }
 
-        IfTbpSetPercentCol(AMDT_FUNC_TAB_TBP_PER_SAMPLE_COL);
+        IfTbpSetPercentCol(CXL_FUNC_TAB_TBP_SAMPLE_PER_COL);
         AddRowToTable(functionProfileData);
-        hideColumn(AMDT_FUNC_TAB_FUNC_ID_COL);
+        hideColumn(CXL_FUNC_TAB_FUNC_ID_COL);
 
-        setColumnWidth(AMDT_FUNC_TAB_FUNC_NAME_COL, MAX_FUNCTION_NAME_LEN);
-        setColumnWidth(AMDT_FUNC_TAB_MOD_NAME_COL, MAX_MODULE_NAME_LEN);
+        setColumnWidth(CXL_FUNC_TAB_FUNC_NAME_COL, MAX_FUNCTION_NAME_LEN);
+        setColumnWidth(CXL_FUNC_TAB_MOD_NAME_COL, MAX_MODULE_NAME_LEN);
 
         retVal = true;
     }

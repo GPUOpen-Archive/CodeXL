@@ -6,83 +6,31 @@
 ///
 //==================================================================================
 
-// Qt
-#include <qtIgnoreCompilerWarnings.h>
-
 // Infra:
-#include <AMDTBaseTools/Include/gtAlgorithms.h>
 #include <AMDTBaseTools/Include/gtAssert.h>
 #include <AMDTOSWrappers/Include/osFilePath.h>
 #include <AMDTOSWrappers/Include/osDebugLog.h>
 #include <AMDTApplicationComponents/Include/acFunctions.h>
-#include <AMDTApplicationComponents/Include/acIcons.h>
 #include <AMDTApplicationComponents/Include/acItemDelegate.h>
 #include <AMDTApplicationComponents/Include/acMessageBox.h>
-#include <AMDTApplicationComponents/Include/acTableWidgetItem.h>
 
 // AMDTApplicationFramework:
 #include <AMDTApplicationFramework/Include/afGlobalVariablesManager.h>
 
-#include <AMDTCpuPerfEventUtils/inc/IbsEvents.h>
-#include <AMDTCpuPerfEventUtils/inc/EventsFile.h>
-
 /// Local:
 #include <inc/CPUProfileDataTable.h>
-#include <inc/CPUProfileUtils.h>
-#include <inc/DebugUtils.h>
-#include <inc/StdAfx.h>
 #include <inc/Auxil.h>
 #include <inc/StringConstants.h>
 #include <inc/CPUProfileDataTableItem.h>
-#include <AMDTSharedProfiling/inc/StringConstants.h>
 
 #define MAX_COLUMN_WIDTH 350
+
 
 // Static members:
 gtPtrVector<QPixmap*> CPUProfileDataTable::m_sTableIcons;
 bool CPUProfileDataTable::m_sIconsInitialized = false;
 bool CPUProfileDataTable::m_CLUNoteShown = true;
 
-
-void mergedProfileDataVectors(gtVector<AMDTProfileData>& data)
-{
-    if (data.empty())
-    {
-        return;
-    }
-
-    // create map from longest vector
-    std::map<AMDTUInt64, AMDTProfileData> mIdProfileDataMap;
-
-    for (const auto& elem : data)
-    {
-        auto itr = mIdProfileDataMap.find(elem.m_id);
-
-        if (itr == mIdProfileDataMap.end())
-        {
-            mIdProfileDataMap.insert(std::make_pair(elem.m_id, elem));
-        }
-        else
-        {
-            AMDTProfileData& profData = itr->second;
-            int idx = 0;
-
-            for (auto& counter : profData.m_sampleValue)
-            {
-                counter.m_sampleCount += elem.m_sampleValue.at(idx).m_sampleCount;
-                counter.m_sampleCountPercentage += elem.m_sampleValue.at(idx).m_sampleCountPercentage;
-                idx++;
-            }
-        }
-    }
-
-    data.clear();
-
-    for (const auto& elem : mIdProfileDataMap)
-    {
-        data.push_back(elem.second);
-    }
-}
 
 CPUProfileDataTable::CPUProfileDataTable(QWidget* pParent,
                                          const gtVector<CPUProfileDataTable::TableContextMenuActionType>& additionalContextMenuActions,
@@ -111,7 +59,6 @@ CPUProfileDataTable::CPUProfileDataTable(QWidget* pParent,
 
 CPUProfileDataTable::~CPUProfileDataTable()
 {
-
 }
 
 bool CPUProfileDataTable::displayTableSummaryData(std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
@@ -204,7 +151,6 @@ bool CPUProfileDataTable::organizeTableByHotSpotIndicator()
     }
 
     return retVal;
-
 }
 
 void CPUProfileDataTable::sortTable()
@@ -253,7 +199,6 @@ void CPUProfileDataTable::sortTable()
                 // Sort by first data column:
                 sortByColIndex = m_pTableDisplaySettings->m_displayedColumns.size();
             }
-
         }
 
         if ((sortByColIndex >= 0) && (sortByColIndex < columnCount()))
@@ -488,7 +433,7 @@ void CPUProfileDataTable::onAboutToShowContextMenu()
 
                     if (actionType != DISPLAY_CLU_NOTES)
                     {
-                        // All the actions but the CLU notes action are actions that are dependant on the selected items:
+                        // All the actions but the CLU notes action are actions that are dependent on the selected items:
                         isActionEnabled = !selectedIndexes().isEmpty();
                         pAction->setEnabled(isActionEnabled);
                     }
@@ -670,7 +615,6 @@ void CPUProfileDataTable::GetCluDataInRow(int row, int sampleIndex, gtVector<flo
     GT_UNREFERENCED_PARAMETER(cluData);
 }
 
-
 void CPUProfileDataTable::sortIndicatorChanged(int sortColumn, Qt::SortOrder order)
 {
     // Save the sort caption & order:
@@ -705,10 +649,11 @@ bool CPUProfileDataTable::IsTableEmpty() const
 
     return !isOneRowShown;
 }
+
 bool CPUProfileDataTable::HandleEmptyTable()
 {
-    // if at least one shown row: hide "empty tbale" row
-    // if no: unhide "empty tbale" row
+    // if at least one shown row: hide "empty table" row
+    // if no: unhide "empty table" row
     bool isTableEmpty = false;
     GT_IF_WITH_ASSERT(m_pEmptyRowTableItem != nullptr)
     {
@@ -898,7 +843,6 @@ bool CPUProfileDataTable::initializeTableHeaders(std::shared_ptr<DisplayFilter> 
     }
     return retVal;
 }
-
 
 void CPUProfileDataTable::SetIcon(gtString modulePath, AMDTUInt32 rowIndex, AMDTUInt32 iconColIndex, AMDTUInt32 toolTipColidx, bool is32Bit, int idxRole)
 {

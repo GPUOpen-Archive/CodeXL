@@ -11,13 +11,24 @@
 
 #include <inc/CPUProfileDataTable.h>
 
-enum ProcessTableCol
+
+enum ProcessSummaryCol
 {
-    PROCESS_NAME_COL = 0,
-    PROCESS_ID_COL,
-    PROCESS_SAMPLE_COL,
-    PROCESS_TBP_PER_COL = PROCESS_SAMPLE_COL + 1
+    CXL_PROC_SUMMMARY_PROC_NAME_COL = 0,
+    CXL_PROC_SUMMMARY_PROC_ID_COL,
+    CXL_PROC_SUMMMARY_SAMPLE_COL,
+    CXL_PROC_SUMMMARY_SAMPLE_PER_COL,
 };
+
+enum ProcessTabCol
+{
+    CXL_PROC_TAB_PROC_NAME_COL = 0,
+    CXL_PROC_TAB_PROC_ID_COL,
+    CXL_PROC_TAB_SAMPLE_START_COL,
+    CXL_PROC_TAB_TBP_SAMPLE_COL = CXL_PROC_TAB_SAMPLE_START_COL,
+    CXL_PROC_TAB_TBP_SAMPLE_PER_COL,
+};
+
 /// -----------------------------------------------------------------------------------------------
 /// \class Name: ProcessesDataTable : public CPUProfileDataTable
 /// \brief Description:  This class will be used to display processes in data table.
@@ -45,11 +56,16 @@ public:
 
 protected:
 
-    virtual bool fillSummaryTables(int counterIdx);
-    virtual bool fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> modIdVec = {});
+    bool fillSummaryTables(int counterIdx) override;
+    bool fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> modIdVec = {}) override;
 
 private:
+
     bool AddRowToTable(const gtVector<AMDTProfileData>& allProcessData);
+    void mergeProfileProcessData(gtVector<AMDTProfileData>& data) const;
+
+    int m_processIdColumn = -1;
+    int m_processNameColumn = -1;
 };
 
 

@@ -10,20 +10,14 @@
 #define __CPUPROFILEDATATABLE_H
 
 // Infra:
-#include <AMDTBaseTools/Include/gtMap.h>
 #include <AMDTBaseTools/Include/gtPtrVector.h>
 #include <AMDTOSWrappers/Include/osFilePath.h>
 #include <AMDTApplicationComponents/Include/acListCtrl.h>
-#include <AMDTApplicationComponents/Include/acTableWidgetItem.h>
-#include <AMDTApplicationComponents/Include/acUserRoles.h>
 
 // Local:
-#include <inc/StdAfx.h>
 #include <inc/DisplayFilter.h>
 
-class CpuProfileModule;
-class CpuProfileFunction;
-class CPUProfileDataTable;
+
 class SessionTreeNodeData;
 class acTablePercentItemDelegate;
 
@@ -49,7 +43,6 @@ class acTablePercentItemDelegate;
 #define SAMPLE_VALUE_PRECISION 8
 #define SAMPLE_PERCENT_PRECISION 2
 
-void mergedProfileDataVectors(gtVector<AMDTProfileData>& data);
 
 /// -----------------------------------------------------------------------------------------------
 /// \class Name: CPUProfileDataTable : public acListCtrl
@@ -133,6 +126,7 @@ public:
     int GetOtherSamplesItemRowNum() const;
 
 signals:
+
     void contextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType actionType, QTableWidgetItem* pTableItem);
 
 public slots:
@@ -220,7 +214,7 @@ protected:
     static bool m_sIconsInitialized;
 
     /// Contain the tree item data for the currently displayed session:
-    SessionTreeNodeData* m_pDisplaySessionData;
+    SessionTreeNodeData* m_pDisplaySessionData = nullptr;
 
     /// Contain the object that is responsible for the delegate of the CLU percent items:
     acTablePercentItemDelegate* m_pCLUDelegate = nullptr;
@@ -259,7 +253,6 @@ protected:
 
     gtUInt32 m_elapsedTime[CPU_TABLE_MAX_VALUES];
     gtUInt32 m_startTime[CPU_TABLE_MAX_VALUES];
-
 };
 
 #endif //__CPUPROFILEDATATABLE_H

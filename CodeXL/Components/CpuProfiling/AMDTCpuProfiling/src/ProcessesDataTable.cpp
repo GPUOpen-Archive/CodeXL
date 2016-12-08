@@ -6,41 +6,26 @@
 ///
 //==================================================================================
 
-// Qt
-#include <qtIgnoreCompilerWarnings.h>
-
-// Infra:
-#include <AMDTOSWrappers/Include/osFilePath.h>
-#include <AMDTApplicationComponents/Include/acItemDelegate.h>
-#include <AMDTApplicationComponents/Include/acFunctions.h>
-
-// AMDTApplicationFramework:
-#include <AMDTApplicationFramework/src/afUtils.h>
-#include <AMDTApplicationFramework/Include/afGlobalVariablesManager.h>
-
 /// Local:
-#include <inc/DataTab.h>
-#include <inc/CPUProfileUtils.h>
 #include <inc/ProcessesDataTable.h>
-#include <inc/SessionWindow.h>
-#include <inc/SessionOverviewWindow.h>
 #include <inc/StringConstants.h>
 
 
 ProcessesDataTable::ProcessesDataTable(QWidget* pParent, const gtVector<TableContextMenuActionType>& additionalContextMenuActions, SessionTreeNodeData* pSessionData)
     : CPUProfileDataTable(pParent, additionalContextMenuActions, pSessionData)
 {
-
 }
 
 ProcessesDataTable::~ProcessesDataTable()
 {
-
 }
 
 bool ProcessesDataTable::fillSummaryTables(int counterIdx)
 {
     bool retVal = false;
+
+    m_processIdColumn = CXL_PROC_SUMMMARY_PROC_ID_COL;
+    m_processNameColumn = CXL_PROC_SUMMMARY_PROC_NAME_COL;
 
     if (nullptr != m_pProfDataRdr)
     {
@@ -48,14 +33,13 @@ bool ProcessesDataTable::fillSummaryTables(int counterIdx)
         bool rc = m_pProfDataRdr->GetSampledCountersList(counterDesc);
 
         AMDTProfileDataVec processProfileData;
-        rc = m_pProfDataRdr->GetProcessSummary(counterDesc.at(counterIdx).m_id,
-                                               processProfileData);
+        rc = m_pProfDataRdr->GetProcessSummary(counterDesc.at(counterIdx).m_id, processProfileData);
 
         if (rc)
         {
             setSortingEnabled(false);
 
-            for (auto profData : processProfileData)
+            for (const auto& profData : processProfileData)
             {
                 AMDTProfileProcessInfoVec procInfo;
                 rc = m_pProfDataRdr->GetProcessInfo(profData.m_id, procInfo);
@@ -78,7 +62,7 @@ bool ProcessesDataTable::fillSummaryTables(int counterIdx)
                     list << "";
                 }
 
-                if (false == SetSampleCountAndPercent(profData.m_sampleValue, list))
+                if (!SetSampleCountAndPercent(profData.m_sampleValue, list))
                 {
                     continue;
                 }
@@ -86,12 +70,12 @@ bool ProcessesDataTable::fillSummaryTables(int counterIdx)
                 addRow(list, nullptr);
 
                 // for summary table
-                SetDelegateItemColumn(PROCESS_SAMPLE_COL, true);
+                SetDelegateItemColumn(CXL_PROC_SUMMMARY_SAMPLE_COL, true);
 
             }
 
             setSortingEnabled(true);
-            setColumnWidth(PROCESS_NAME_COL, MAX_PROCESS_NAME_LEN);
+            setColumnWidth(CXL_PROC_SUMMMARY_PROC_NAME_COL, MAX_PROCESS_NAME_LEN);
             retVal = true;
         }
     }
@@ -101,21 +85,14 @@ bool ProcessesDataTable::fillSummaryTables(int counterIdx)
 
 bool ProcessesDataTable::findProcessDetails(int rowIndex, ProcessIdType& pid, QString& processFileName)
 {
-    bool retVal = true;
-    QTableWidgetItem* pidWidget = item(rowIndex, 1);
-    int pidInt = pidWidget->text().toInt();
-    pid = pidInt;
-    (void)processFileName;
+    QTableWidgetItem* pidWidget = item(rowIndex, m_processIdColumn);
+    pid = pidWidget->text().toUInt();
 
-    QTableWidgetItem* qPid = item(rowIndex, 1);
-    QTableWidgetItem* qProcName = item(rowIndex, 0);
+    QTableWidgetItem* procNameWidget = item(rowIndex, m_processNameColumn);
+    processFileName = procNameWidget->text();
 
-    pid = qPid->text().toInt();
-    processFileName = qProcName->text();
-
-    return retVal;
+    return true;
 }
-
 
 CPUProfileDataTable::TableType ProcessesDataTable::GetTableType() const
 {
@@ -124,17 +101,15 @@ CPUProfileDataTable::TableType ProcessesDataTable::GetTableType() const
 
 bool ProcessesDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allProcessData)
 {
-    setSortingEnabled(false);
-
     bool retVal = false;
+
+    setSortingEnabled(false);
 
     if (!allProcessData.empty())
     {
-        for (auto profData : allProcessData)
+        for (const auto& profData : allProcessData)
         {
             QStringList list;
-
-            CounterNameIdVec selectedCounterList;
 
             AMDTProfileProcessInfoVec procInfo;
             m_pProfDataRdr->GetProcessInfo(profData.m_id, procInfo);
@@ -144,11 +119,10 @@ bool ProcessesDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allProce
                 continue;
             }
 
-
             list << procInfo.at(0).m_name.asASCIICharArray();
             list << QString::number(procInfo.at(0).m_pid);
 
-            SetTableSampleCountAndPercent(list, PROCESS_ID_COL, profData);
+            SetTableSampleCountAndPercent(list, CXL_PROC_TAB_SAMPLE_START_COL, profData);
             addRow(list, nullptr);
         }
 
@@ -161,8 +135,10 @@ bool ProcessesDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allProce
 
 bool ProcessesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> modIdVec)
 {
-    (void)modIdVec;
     bool retVal = false;
+
+    m_processIdColumn = CXL_PROC_TAB_PROC_ID_COL;
+    m_processNameColumn = CXL_PROC_TAB_PROC_NAME_COL;
 
     GT_IF_WITH_ASSERT((m_pProfDataRdr != nullptr) &&
                       (m_pDisplayFilter != nullptr) &&
@@ -187,15 +163,58 @@ bool ProcessesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId,
                 allProcessData.insert(allProcessData.end(), moduleData.begin(), moduleData.end());
             }
 
-            mergedProfileDataVectors(allProcessData);
+            if (modIdVec.size() > 1)
+            {
+                mergeProfileProcessData(allProcessData);
+            }
         }
 
+        IfTbpSetPercentCol(CXL_PROC_TAB_TBP_SAMPLE_PER_COL);
         AddRowToTable(allProcessData);
-        IfTbpSetPercentCol(PROCESS_TBP_PER_COL);
-        setColumnWidth(PROCESS_NAME_COL, MAX_PROCESS_NAME_LEN);
+
+        setColumnWidth(CXL_PROC_TAB_PROC_NAME_COL, MAX_PROCESS_NAME_LEN);
 
         retVal = true;
     }
 
     return retVal;
+}
+
+void ProcessesDataTable::mergeProfileProcessData(gtVector<AMDTProfileData>& processData) const
+{
+    if (processData.empty())
+    {
+        return;
+    }
+
+    std::map<AMDTUInt64, AMDTProfileData> mIdProfileDataMap;
+
+    for (const auto& elem : processData)
+    {
+        auto itr = mIdProfileDataMap.find(elem.m_id);
+
+        if (itr == mIdProfileDataMap.end())
+        {
+            mIdProfileDataMap.insert(std::make_pair(elem.m_id, elem));
+        }
+        else
+        {
+            AMDTProfileData& profData = itr->second;
+            int idx = 0;
+
+            for (auto& counter : profData.m_sampleValue)
+            {
+                counter.m_sampleCount += elem.m_sampleValue.at(idx).m_sampleCount;
+                counter.m_sampleCountPercentage += elem.m_sampleValue.at(idx).m_sampleCountPercentage;
+                idx++;
+            }
+        }
+    }
+
+    processData.clear();
+
+    for (const auto& elem : mIdProfileDataMap)
+    {
+        processData.push_back(elem.second);
+    }
 }

@@ -953,7 +953,7 @@ void SessionOverviewWindow::onTableItemActivated(QTableWidgetItem* pActivateItem
         {
             if (pTable == m_pFunctionsTable)
             {
-                QTableWidgetItem* funcName = m_pFunctionsTable->item(rowNum, AMDT_FUNC_SUMMMARY_FUNC_NAME_COL);
+                QTableWidgetItem* funcName = m_pFunctionsTable->item(rowNum, CXL_FUNC_SUMMMARY_FUNC_NAME_COL);
                 gtString str = acQStringToGTString(funcName->text());
                 bool isOther = str.compare(L"other") == 0;
                 bool isUnknown = str.startsWith(L"Unknown Module");

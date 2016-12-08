@@ -6,24 +6,14 @@
 ///
 //==================================================================================
 
-// Qt
-#include <qtIgnoreCompilerWarnings.h>
+// STL
+#include <unordered_map>
 
 // Infra:
 #include <AMDTOSWrappers/Include/osFilePath.h>
-#include <AMDTApplicationComponents/Include/acItemDelegate.h>
-#include <AMDTApplicationComponents/Include/acFunctions.h>
-
-// AMDTApplicationFramework:
-#include <AMDTApplicationFramework/src/afUtils.h>
-#include <AMDTApplicationFramework/Include/afGlobalVariablesManager.h>
 
 /// Local:
-#include <inc/CPUProfileUtils.h>
 #include <inc/ModulesDataTable.h>
-#include <inc/Auxil.h>
-#include <inc/StringConstants.h>
-#include <inc/SessionWindow.h>
 
 
 ModulesDataTable::ModulesDataTable(QWidget* pParent,
@@ -38,11 +28,11 @@ ModulesDataTable::ModulesDataTable(QWidget* pParent,
 ModulesDataTable::~ModulesDataTable()
 {
 }
+
 bool ModulesDataTable::findModuleFilePath(int moduleRowIndex, QString& moduleFileName)
 {
     bool retVal = false;
 
-    // Sanity check:
     GT_IF_WITH_ASSERT(m_pTableDisplaySettings != nullptr)
     {
         for (int i = 0; i < (int)m_pTableDisplaySettings->m_displayedColumns.size(); i++)
@@ -50,12 +40,13 @@ bool ModulesDataTable::findModuleFilePath(int moduleRowIndex, QString& moduleFil
             if (m_pTableDisplaySettings->m_displayedColumns[i] == TableDisplaySettings::MODULE_NAME_COL)
             {
                 QTableWidgetItem* pItem = item(moduleRowIndex, i);
+
                 GT_IF_WITH_ASSERT(pItem != nullptr)
                 {
                     // Get the module file path (the full path is stored in the tooltip):
                     moduleFileName = pItem->toolTip();
 
-                    // For system dll's - remove the "System" postfix from the tooltip:
+                    // For system modules - remove the "System" postfix from the tooltip:
                     if (moduleFileName.endsWith(" (System)"))
                     {
                         moduleFileName = moduleFileName.replace(" (System)", "");
@@ -145,21 +136,19 @@ bool ModulesDataTable::fillSummaryTables(int counterIdx)
 {
     bool retVal = false;
 
-    GT_IF_WITH_ASSERT((m_pProfDataRdr != nullptr) &&
-                      (m_pTableDisplaySettings != nullptr))
+    GT_IF_WITH_ASSERT((m_pProfDataRdr != nullptr) && (m_pTableDisplaySettings != nullptr))
     {
         AMDTProfileCounterDescVec counterDesc;
         bool rc = m_pProfDataRdr->GetSampledCountersList(counterDesc);
         GT_ASSERT(rc);
 
         AMDTProfileDataVec moduleProfileData;
-        rc = m_pProfDataRdr->GetModuleSummary(counterDesc.at(counterIdx).m_id,
-                                              moduleProfileData);
+        rc = m_pProfDataRdr->GetModuleSummary(counterDesc.at(counterIdx).m_id, moduleProfileData);
         GT_ASSERT(rc);
 
         setSortingEnabled(false);
 
-        for (auto moduleData : moduleProfileData)
+        for (const auto& moduleData : moduleProfileData)
         {
             QStringList list;
 
@@ -169,8 +158,6 @@ bool ModulesDataTable::fillSummaryTables(int counterIdx)
 
             list << filename.asASCIICharArray();
 
-            QString modulefullPath(moduleData.m_name.asASCIICharArray());
-
             if (!SetSampleCountAndPercent(moduleData.m_sampleValue, list))
             {
                 continue;
@@ -179,29 +166,28 @@ bool ModulesDataTable::fillSummaryTables(int counterIdx)
             addRow(list, nullptr);
 
             // for summary table
-            SetDelegateItemColumn(AMDT_MOD_TABLE_CLU_HS_COL, true);
+            SetDelegateItemColumn(CXL_MOD_SUMMARY_SAMPLE_COL, true);
 
-            if (!SetSummaryTabIcon(AMDT_MOD_TABLE_SUMMARY_MOD_NAME,
-                                   AMDT_MOD_TABLE_SUMMARY_SAMPLE_PER,
-                                   AMDT_MOD_TABLE_SUMMARY_SAMPLE,
+            if (!SetSummaryTabIcon(CXL_MOD_SUMMARY_MOD_NAME_COL,
+                                   CXL_MOD_SUMMARY_SAMPLE_PER_COL,
+                                   CXL_MOD_SUMMARY_SAMPLE_COL,
                                    moduleData.m_moduleId,
                                    modulePath))
             {
                 continue;
             }
 
-            //tooltip
-            QTableWidgetItem* pModuleNameItem = item(rowCount() - 1, AMDT_MOD_TABLE_SUMMARY_MOD_NAME);
+            // tooltip
+            QTableWidgetItem* pModuleNameItem = item(rowCount() - 1, CXL_MOD_SUMMARY_MOD_NAME_COL);
 
             if (pModuleNameItem != nullptr)
             {
                 pModuleNameItem->setToolTip(moduleData.m_name.asASCIICharArray());
             }
-
         }
 
         setSortingEnabled(true);
-        setColumnWidth(AMDT_MOD_TABLE_SUMMARY_MOD_NAME, MAX_MODULE_NAME_LEN);
+        setColumnWidth(CXL_MOD_SUMMARY_MOD_NAME_COL, MAX_MODULE_NAME_LEN);
         retVal = true;
     }
 
@@ -217,32 +203,74 @@ bool ModulesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, s
                       (m_pDisplayFilter != nullptr) &&
                       (m_pTableDisplaySettings != nullptr))
     {
-        gtVector<AMDTProfileData> allProcessData;
+        gtVector<AMDTProfileData> allModulesData;
 
         if (processIdVec.empty())
         {
-            bool rc = m_pProfDataRdr->GetModuleProfileData(procId, modId, allProcessData);
+            bool rc = m_pProfDataRdr->GetModuleProfileData(procId, modId, allModulesData);
             GT_ASSERT(rc);
         }
         else
         {
-            gtVector<AMDTProfileData> processData;
+            gtVector<AMDTProfileData> moduleData;
 
             for (const auto& processId : processIdVec)
             {
-                processData.clear();
-                m_pProfDataRdr->GetModuleProfileData(processId, modId, processData);
-                allProcessData.insert(allProcessData.end(), processData.begin(), processData.end());
+                moduleData.clear();
+                m_pProfDataRdr->GetModuleProfileData(processId, modId, moduleData);
+                allModulesData.insert(allModulesData.end(), moduleData.begin(), moduleData.end());
             }
 
-            mergedProfileModuleData(allProcessData);
+            if (processIdVec.size() > 1)
+            {
+                mergeProfileModuleData(allModulesData);
+            }
         }
 
-        AddRowToTable(allProcessData);
+        // Compute total samples per counter for non-CLU profile.
+        // (Not getting expected percentage from reporter layer. Need to fix this in DB layer later.)
+        if (m_pDisplayFilter->GetProfileType() != AMDT_PROFILE_TYPE_CLU)
+        {
+            std::unordered_map<AMDTCounterId, double> sampleMap;
 
-        hideColumn(AMDT_MOD_TABLE_MOD_ID);
-        setColumnWidth(AMDT_MOD_TABLE_SUMMARY_MOD_NAME, MAX_MODULE_NAME_LEN);
-        IfTbpSetPercentCol(AMDT_MOD_TBP_PER_COL);
+            // Compute the total samples per counter for given process.
+            for (const auto& profileData : allModulesData)
+            {
+                for (const auto& sampleData : profileData.m_sampleValue)
+                {
+                    if (sampleMap.find(sampleData.m_counterId) == sampleMap.end())
+                    {
+                        sampleMap[sampleData.m_counterId] = sampleData.m_sampleCount;
+                    }
+                    else
+                    {
+                        sampleMap[sampleData.m_counterId] += sampleData.m_sampleCount;
+                    }
+                }
+            }
+
+            // Compute percentage of samples per counter per function for given process.
+            for (auto& profileData : allModulesData)
+            {
+                for (auto& sampleData : profileData.m_sampleValue)
+                {
+                    sampleData.m_sampleCountPercentage = 0;
+
+                    if (sampleMap[sampleData.m_counterId] > 0)
+                    {
+                        sampleData.m_sampleCountPercentage = (sampleData.m_sampleCount / sampleMap[sampleData.m_counterId]) * 100;
+                    }
+                }
+            }
+
+            sampleMap.clear();
+        }
+
+        IfTbpSetPercentCol(CXL_MOD_TAB_TBP_SAMPLE_PER_COL);
+        AddRowToTable(allModulesData);
+
+        hideColumn(CXL_MOD_TAB_MOD_ID_COL);
+        setColumnWidth(CXL_MOD_TAB_MOD_NAME_COL, MAX_MODULE_NAME_LEN);
 
         retVal = true;
     }
@@ -252,94 +280,78 @@ bool ModulesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, s
 
 bool ModulesDataTable::findModueId(int rowIndex, AMDTModuleId& modId)
 {
-    QTableWidgetItem* pidWidget = item(rowIndex, 0);
-    int moduleId = pidWidget->text().toInt();
-    modId = moduleId;
-
+    QTableWidgetItem* pidWidget = item(rowIndex, CXL_MOD_TAB_MOD_ID_COL);
+    modId = pidWidget->text().toUInt();
     return true;
 }
 
-bool ModulesDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allProcessData)
+bool ModulesDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allModulesData)
 {
     bool retVal = false;
 
-    if (!allProcessData.empty())
+    if (!allModulesData.empty())
     {
         setSortingEnabled(false);
 
-        for (auto profData : allProcessData)
+        for (const auto& profData : allModulesData)
         {
             QStringList list;
 
-            CounterNameIdVec selectedCounterList;
-
             // insert module id
-            QVariant mId(profData.m_moduleId);
-            list << mId.toString();
+            list << QString::number(profData.m_moduleId);
 
-            AMDTProfileModuleInfoVec procInfo;
-            m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, profData.m_moduleId, procInfo);
+            AMDTProfileModuleInfoVec moduleInfoList;
+            m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, profData.m_moduleId, moduleInfoList);
 
-            if (procInfo.empty())
+            if (moduleInfoList.empty())
             {
                 continue;
             }
 
-            list << acGTStringToQString(procInfo.at(0).m_name);
+            // insert module name
+            list << moduleInfoList.at(0).m_name.asASCIICharArray();
 
-            gtString symbols = procInfo.at(0).m_foundDebugInfo ? L"Loaded" : L"Not Loaded";
+            // insert debug info load status
+            QString symbols = moduleInfoList.at(0).m_foundDebugInfo ? "Loaded" : "Not Loaded";
+            list << symbols;
 
-            list << acGTStringToQString(symbols);
-            SetTableSampleCountAndPercent(list, AMDT_MOD_TABLE_SYMBOL_LOADED, profData);
+            SetTableSampleCountAndPercent(list, CXL_MOD_TAB_SAMPLE_START_COL, profData);
             addRow(list, nullptr);
 
-            AMDTProfileModuleInfoVec modInfo;
-            m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, profData.m_moduleId, modInfo);
+            int idxRole = static_cast<int>(Qt::UserRole + 0);
 
-            int row = rowCount() - 1;
-
-            QPixmap* pIcon = CPUProfileDataTable::moduleIcon(modInfo.at(0).m_path, !procInfo.at(0).m_is64Bit);
-            QTableWidgetItem* pNameItem = item(row, AMDT_MOD_TABLE_MOD_NAME);
-
-            if (pNameItem != nullptr)
-            {
-                if (pIcon != nullptr)
-                {
-                    pNameItem->setIcon(QIcon(*pIcon));
-                }
-            }
-
-            QTableWidgetItem* pModuleNameItem = item(row, AMDT_MOD_TABLE_MOD_NAME);
-
-            if (pModuleNameItem != nullptr)
-            {
-                pModuleNameItem->setToolTip(acGTStringToQString(modInfo.at(0).m_path));
-            }
+            SetIcon(moduleInfoList.at(0).m_path,
+                    rowCount() - 1,
+                    CXL_MOD_TAB_MOD_NAME_COL,
+                    CXL_MOD_TAB_MOD_NAME_COL,
+                    !moduleInfoList.at(0).m_is64Bit,
+                    idxRole);
 
             retVal = true;
         }
+
+        setSortingEnabled(true);
     }
 
     return retVal;
 }
 
-void mergedProfileModuleData(gtVector<AMDTProfileData>& data)
+void ModulesDataTable::mergeProfileModuleData(gtVector<AMDTProfileData>& moduleData) const
 {
-    if (data.empty())
+    if (moduleData.empty())
     {
         return;
     }
 
-    // create map from longest vector
-    std::map<AMDTUInt64, AMDTProfileData> mIdProfileDataMap;
+    std::unordered_map<AMDTUInt64, AMDTProfileData> mIdProfileDataMap;
 
-    for (const auto& elem : data)
+    for (const auto& elem : moduleData)
     {
         auto itr = mIdProfileDataMap.find(elem.m_moduleId);
 
         if (itr == mIdProfileDataMap.end())
         {
-            mIdProfileDataMap.insert(std::make_pair(elem.m_moduleId, elem));
+            mIdProfileDataMap.emplace(elem.m_moduleId, elem);
         }
         else
         {
@@ -355,10 +367,10 @@ void mergedProfileModuleData(gtVector<AMDTProfileData>& data)
         }
     }
 
-    data.clear();
+    moduleData.clear();
 
     for (const auto& elem : mIdProfileDataMap)
     {
-        data.push_back(elem.second);
+        moduleData.push_back(elem.second);
     }
 }

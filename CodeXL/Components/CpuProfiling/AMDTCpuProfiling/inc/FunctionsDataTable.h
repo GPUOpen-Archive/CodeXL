@@ -9,10 +9,6 @@
 #ifndef __FunctionsDataTable_H
 #define __FunctionsDataTable_H
 
-// Qt:
-#include <QtCore>
-#include <QtWidgets>
-
 // Local:
 #include <inc/CPUProfileDataTable.h>
 
@@ -20,21 +16,21 @@ class CpuSessionWindow;
 
 enum FunctionSummaryCol
 {
-    AMDT_FUNC_SUMMMARY_FUNC_ID_COL = 0,
-    AMDT_FUNC_SUMMMARY_FUNC_NAME_COL,
-    AMDT_FUNC_SUMMMARY_FUNC_SAMPLE_COL,
-    AMDT_FUNC_SUMMMARY_FUNC_PER_SAMPLE_COL,
-    AMDT_FUNC_SUMMMARY_FUNC_MODULE_COL,
+    CXL_FUNC_SUMMMARY_FUNC_ID_COL = 0,
+    CXL_FUNC_SUMMMARY_FUNC_NAME_COL,
+    CXL_FUNC_SUMMMARY_SAMPLE_COL,
+    CXL_FUNC_SUMMMARY_SAMPLE_PER_COL,
+    CXL_FUNC_SUMMMARY_MODULE_COL,
 };
 
 enum FunctionTabCol
 {
-    AMDT_FUNC_TAB_FUNC_ID_COL = 0,
-    AMDT_FUNC_TAB_FUNC_NAME_COL,
-    AMDT_FUNC_TAB_MOD_NAME_COL,
-    AMDT_FUNC_TAB_SAMPLE_START_COL,
-    AMDT_FUNC_TAB_TBP_SAMPLE_COL = AMDT_FUNC_TAB_SAMPLE_START_COL,
-    AMDT_FUNC_TAB_TBP_PER_SAMPLE_COL,
+    CXL_FUNC_TAB_FUNC_ID_COL = 0,
+    CXL_FUNC_TAB_FUNC_NAME_COL,
+    CXL_FUNC_TAB_MOD_NAME_COL,
+    CXL_FUNC_TAB_SAMPLE_START_COL,
+    CXL_FUNC_TAB_TBP_SAMPLE_COL = CXL_FUNC_TAB_SAMPLE_START_COL,
+    CXL_FUNC_TAB_TBP_SAMPLE_PER_COL,
 };
 
 /// -----------------------------------------------------------------------------------------------
@@ -66,14 +62,13 @@ public:
 
 public slots:
 
-    /// Overriding CPUProfileDataTable:
-    virtual void onAboutToShowContextMenu();
+    void onAboutToShowContextMenu() override;
 
 protected:
 
-    virtual bool fillSummaryTables(int counterIdx);
-    virtual bool fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> modIdVec = {});
-    virtual bool HandleHotSpotIndicatorSet() { return true; };
+    bool fillSummaryTables(int counterIdx) override;
+    bool fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> modIdVec = {}) override;
+    bool HandleHotSpotIndicatorSet() override { return true; };
     bool AddRowToTable(const gtVector<AMDTProfileData>& allModuleData);
 
     /// Contain the indices for the function and module name columns:

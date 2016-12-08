@@ -11,21 +11,27 @@
 
 #include <inc/CPUProfileDataTable.h>
 
+
 class CpuSessionWindow;
 
-enum ModuleTableCol
+enum ModuleSummaryCol
 {
-    AMDT_MOD_TABLE_SUMMARY_MOD_NAME = 0,
-    AMDT_MOD_TABLE_SUMMARY_SAMPLE,
-    AMDT_MOD_TABLE_SUMMARY_SAMPLE_PER,
-    AMDT_MOD_TABLE_MOD_ID = 0,
-    AMDT_MOD_TABLE_MOD_NAME,
-    AMDT_MOD_TABLE_SYMBOL_LOADED,
-    AMDT_MOD_TABLE_CLU_HS_COL = 1,
-    AMDT_MOD_TBP_PER_COL = AMDT_MOD_TABLE_SYMBOL_LOADED + 2
+    //CXL_MOD_SUMMARY_MOD_ID_COL = 0,
+    CXL_MOD_SUMMARY_MOD_NAME_COL = 0,
+    CXL_MOD_SUMMARY_SAMPLE_COL,
+    CXL_MOD_SUMMARY_SAMPLE_PER_COL,
 };
 
-void mergedProfileModuleData(gtVector<AMDTProfileData>& data);
+enum ModuleTabCol
+{
+    CXL_MOD_TAB_MOD_ID_COL = 0,
+    CXL_MOD_TAB_MOD_NAME_COL,
+    CXL_MOD_TAB_SYM_LOADED_COL,
+    CXL_MOD_TAB_SAMPLE_START_COL,
+    CXL_MOD_TAB_TBP_SAMPLE_COL = CXL_MOD_TAB_SAMPLE_START_COL,
+    CXL_MOD_TAB_TBP_SAMPLE_PER_COL,
+};
+
 
 /// -----------------------------------------------------------------------------------------------
 /// \class Name: ModulesDataTable : public CPUProfileDataTable
@@ -44,11 +50,13 @@ public:
                      CpuSessionWindow* pSessionWindow);
 
     virtual ~ModulesDataTable();
+
     /// Find the module file name for the module in the specified row:
     /// \param moduleRowIndex - the requested module row index
     /// \param[out] moduleFilePath - the requested module file path
     /// \return true on success false on failure
     bool findModuleFilePath(int moduleRowIndex, QString& moduleFilePath);
+
     // returns modules table type
     TableType GetTableType() const;
 
@@ -56,18 +64,19 @@ public:
 
 public slots:
 
-    /// Overrides CPUProfileDataTable:
-    virtual void onAboutToShowContextMenu();
+    void onAboutToShowContextMenu() override;
 
 protected:
 
-    virtual bool fillSummaryTables(int counterIdx);
-    virtual bool fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> modIdVec = {});
+    bool fillSummaryTables(int counterIdx) override;
+    bool fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> modIdVec = {}) override;
 
 private:
-    bool AddRowToTable(const gtVector<AMDTProfileData>& allProcessData);
 
-    CpuSessionWindow* m_pParentSessionWindow;
+    bool AddRowToTable(const gtVector<AMDTProfileData>& allProcessData);
+    void mergeProfileModuleData(gtVector<AMDTProfileData>& data) const;
+
+    CpuSessionWindow* m_pParentSessionWindow = nullptr;
 };
 
 
