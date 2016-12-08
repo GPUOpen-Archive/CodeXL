@@ -714,7 +714,12 @@ void SessionOverviewWindow::onHotSpotComboChanged(const QString& text)
             m_pFunctionsTable->tableDisplaySettings()->m_lastSortOrder = defaultSortOrder;
             m_pModulesTable->tableDisplaySettings()->m_lastSortOrder = defaultSortOrder;
             m_pProcessesTable->tableDisplaySettings()->m_lastSortOrder = defaultSortOrder;
+
             m_pDisplayFilter->SetCLUOVHdrName(text);
+
+            m_pFunctionsTable->tableDisplaySettings()->m_hotSpotIndicatorColumnCaption = text;
+            m_pModulesTable->tableDisplaySettings()->m_hotSpotIndicatorColumnCaption = text;
+            m_pProcessesTable->tableDisplaySettings()->m_hotSpotIndicatorColumnCaption = text;
 
             auto itr = m_CounterIdxMap.find(text.toStdWString().c_str());
 
@@ -756,7 +761,7 @@ void SessionOverviewWindow::initDisplayFilters()
 
         // Set the display filter for the modules table:
         m_modulesTablesFilter.m_amountOfItemsInDisplay = 5;
-        m_modulesTablesFilter.m_hotSpotIndicatorColumnCaption = "";
+        m_modulesTablesFilter.m_hotSpotIndicatorColumnCaption.clear();
         m_modulesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::MODULE_NAME_COL);
         m_modulesTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_COUNT_COL);
 
@@ -767,12 +772,12 @@ void SessionOverviewWindow::initDisplayFilters()
 
         // Set the display filter for the functions table:
         m_functionsTablesFilter.m_amountOfItemsInDisplay = 5;
-        m_functionsTablesFilter.m_hotSpotIndicatorColumnCaption = "";
+        m_functionsTablesFilter.m_hotSpotIndicatorColumnCaption.clear();
         m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::FUNCTION_ID);
         m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::FUNCTION_NAME_COL);
         m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_COUNT_COL);
 
-        if (false == m_isCLU)
+        if (!m_isCLU)
         {
             m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::SAMPLES_PERCENT_COL);
         }
@@ -780,7 +785,7 @@ void SessionOverviewWindow::initDisplayFilters()
         m_functionsTablesFilter.m_displayedColumns.push_back(TableDisplaySettings::MODULE_NAME_COL);
 
 
-        if (true == m_isCLU)
+        if (m_isCLU)
         {
             updateHint(CP_overviewInformationHintForCLU);
         }

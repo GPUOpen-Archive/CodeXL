@@ -52,8 +52,6 @@ CPUProfileDataTable::CPUProfileDataTable(QWidget* pParent,
                       SIGNAL(sortIndicatorChanged(int, Qt::SortOrder)),
                       this,
                       SLOT(sortIndicatorChanged(int, Qt::SortOrder)));
-
-
     GT_ASSERT(rc);
 }
 
@@ -103,54 +101,6 @@ QTableWidgetItem* CPUProfileDataTable::allocateNewWidgetItem(const QString& text
 {
     // Allocate my own widget item:
     return new CPUProfileDataTableItem(text);
-}
-
-bool CPUProfileDataTable::organizeTableByHotSpotIndicator()
-{
-    bool retVal = false;
-
-    if ((m_pDisplayFilter != nullptr) &&
-        (m_pTableDisplaySettings != nullptr))
-    {
-        QStringList columnTooltipsByObjectType;
-
-        for (int i = 0; i < (int)m_pTableDisplaySettings->m_displayedColumns.size(); i++)
-        {
-            QString colStr, colTooltip;
-            bool rc = m_pTableDisplaySettings->colTypeAsString(m_pTableDisplaySettings->m_displayedColumns[i], colStr, colTooltip);
-            GT_ASSERT(rc);
-            columnTooltipsByObjectType << colTooltip;
-        }
-
-        CounterNameIdVec selectedList;
-        m_pDisplayFilter->GetSelectedCounterList(selectedList);
-
-        for (const auto& counter : selectedList)
-        {
-            QString currentCaption      = acGTStringToQString(std::get<1>(counter));  // abbreviation
-            QString currentFullName     = acGTStringToQString(std::get<0>(counter));  // name
-            QString currentDescription  = acGTStringToQString(std::get<2>(counter));  // description
-
-            // Format the tooltip:
-            QString tooltip;
-            acWrapAndBuildFormattedTooltip(currentFullName, currentDescription, tooltip);
-
-            columnTooltipsByObjectType << tooltip;
-        }
-
-        for (int i = 0, colsAmount = columnCount(); i < colsAmount; i++)
-        {
-            QTableWidgetItem* pHeaderItem = horizontalHeaderItem(i);
-            GT_IF_WITH_ASSERT((pHeaderItem != nullptr) && (i < columnTooltipsByObjectType.size()))
-            {
-                pHeaderItem->setToolTip(columnTooltipsByObjectType[i]);
-            }
-        }
-
-        retVal = true;
-    }
-
-    return retVal;
 }
 
 void CPUProfileDataTable::sortTable()
@@ -803,6 +753,14 @@ bool CPUProfileDataTable::initializeTableHeaders(std::shared_ptr<DisplayFilter> 
 
         int tableDispSettingsColsNum = (int)m_pTableDisplaySettings->m_displayedColumns.size();
 
+        CounterNameIdVec selectedCounterList;
+        diplayFilter->GetSelectedCounterList(selectedCounterList);
+
+        if (m_pTableDisplaySettings->m_hotSpotIndicatorColumnCaption.isEmpty() && selectedCounterList.size() > 0)
+        {
+            m_pTableDisplaySettings->m_hotSpotIndicatorColumnCaption = acGTStringToQString(std::get<0>(selectedCounterList[0]));
+        }
+
         for (int i = 0; i < tableDispSettingsColsNum; ++i)
         {
             QString colStr, colTooltip;
@@ -821,25 +779,54 @@ bool CPUProfileDataTable::initializeTableHeaders(std::shared_ptr<DisplayFilter> 
             columnTooltipsByObjectType << colTooltip;
         }
 
-        if (false == isSummary)
+        if (!isSummary)
         {
             CounterNameIdVec selectedCounterList;
-
             diplayFilter->GetSelectedCounterList(selectedCounterList);
 
             for (const auto& counter : selectedCounterList)
             {
-                // print counter abbreviation
+                // Append event abbreviation as column name
                 columnsStringByObjectType << acGTStringToQString(std::get<1>(counter));
 
+                // Fetch event name and description
+                QString counterName = acGTStringToQString(std::get<0>(counter));
+                QString counterDesc = acGTStringToQString(std::get<2>(counter));
+
+                // Prepare tooltip string
+                QString tooltip;
+                acWrapAndBuildFormattedTooltip(counterName, counterDesc, tooltip);
+
+                // Append column tooltip
+                columnTooltipsByObjectType << tooltip;
+
+                // If TBP, append percent column and tooltip
                 if (diplayFilter->GetProfileType() == AMDT_PROFILE_TYPE_TBP)
                 {
-                    columnsStringByObjectType << "Timer Percentage";
+                    QString columnName("Timer Percentage");
+                    QString columnDesc("Percent of samples collected for Timer.");
+
+                    QString tooltip;
+                    acWrapAndBuildFormattedTooltip(columnName, columnDesc, tooltip);
+
+                    columnsStringByObjectType << columnName;
+                    columnTooltipsByObjectType << tooltip;
                 }
             }
         }
 
         initHeaders(columnsStringByObjectType, false);
+
+        int column = 0;
+        for (const auto& tooltipStr : columnTooltipsByObjectType)
+        {
+            auto headerItem = horizontalHeaderItem(column++);
+
+            if (headerItem != nullptr)
+            {
+                headerItem->setToolTip(tooltipStr);
+            }
+        }
     }
     return retVal;
 }
