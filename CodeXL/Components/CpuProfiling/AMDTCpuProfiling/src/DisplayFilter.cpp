@@ -218,6 +218,8 @@ bool DisplayFilter::SetProfileDataOptions(AMDTProfileDataOptions opts)
     m_options.m_summaryCount = opts.m_summaryCount;
     m_options.m_counters = opts.m_counters;
 
+    g_displaySystemModule = !m_options.m_ignoreSystemModules;
+
     return true;
 }
 
@@ -333,10 +335,10 @@ void DisplayFilter::SetProfileDataOption()
 
 bool DisplayFilter::IsSystemModuleIgnored() const
 {
-    return m_options.m_ignoreSystemModules;
+    return !g_displaySystemModule;
 }
 
-void DisplayFilter::setIgnoreSystemModule(bool isChecked)
+void DisplayFilter::SetIgnoreSystemModule(bool isChecked)
 {
     m_options.m_ignoreSystemModules = isChecked;
     g_displaySystemModule = !isChecked;
@@ -347,7 +349,7 @@ void DisplayFilter::SetDisplaySamplePercent(bool isSet)
     g_displaySamplePercent = isSet;
 }
 
-bool DisplayFilter::isDisplaySamplePercent() const
+bool DisplayFilter::IsDisplaySamplePercent() const
 {
     return g_displaySamplePercent;
 }

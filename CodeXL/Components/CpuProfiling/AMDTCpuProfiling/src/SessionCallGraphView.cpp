@@ -1015,14 +1015,14 @@ void CallGraphFuncList::GetFunctionCount(std::pair<int, int>& sysModuleCount,
         else
         {
             callGraphFuncs.clear();
-            pDisplayFilter->setIgnoreSystemModule(!origState);
+            pDisplayFilter->SetIgnoreSystemModule(!origState);
             pDisplayFilter->SetReportConfig();
 
             pProfDataRdr->GetCallGraphFunctions(processId, counterId, callGraphFuncs);
             total = callGraphFuncs.size();
 
             //restore original state
-            pDisplayFilter->setIgnoreSystemModule(origState);
+            pDisplayFilter->SetIgnoreSystemModule(origState);
             pDisplayFilter->SetReportConfig();
         }
 

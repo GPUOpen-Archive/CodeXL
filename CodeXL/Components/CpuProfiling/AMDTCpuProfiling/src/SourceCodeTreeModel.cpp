@@ -415,7 +415,7 @@ bool SourceCodeTreeModel::BuildDisassemblyTree()
 
     for (const auto& srcData : functionData.m_srcLineDataList)
     {
-        bool isSamplePercentSet = m_pDisplayFilter->isDisplaySamplePercent();
+        bool isSamplePercentSet = m_pDisplayFilter->IsDisplaySamplePercent();
 
         gtVector<InstOffsetSize> instOffsetVec;
         GetInstOffsets(srcData.m_sourceLineNumber, srcInfoVec, instOffsetVec);
@@ -576,7 +576,7 @@ void SourceCodeTreeModel::PopulateFunctionSampleData(const AMDTProfileFunctionDa
     GT_UNREFERENCED_PARAMETER(srcFilePath);
 
     SourceViewTreeItem* pLineItem = nullptr;
-    bool samplePercentSet = m_pDisplayFilter->isDisplaySamplePercent();
+    bool samplePercentSet = m_pDisplayFilter->IsDisplaySamplePercent();
     AMDTUInt64 moduleBaseAddr = data.m_modBaseAddress;
 
     // Fetch aggregated samples for each counter id

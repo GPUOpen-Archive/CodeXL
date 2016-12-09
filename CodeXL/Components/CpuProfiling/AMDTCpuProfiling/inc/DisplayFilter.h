@@ -214,17 +214,17 @@ public:
     AMDTUInt32 GetCoreCount() const;
 
     // System Module
-    void setIgnoreSystemModule(bool isChecked);
+    void SetIgnoreSystemModule(bool isChecked);
     bool IsSystemModuleIgnored() const;
 
     // Sample Percent
     void SetDisplaySamplePercent(bool isSet);
-    bool isDisplaySamplePercent() const;
+    bool IsDisplaySamplePercent() const;
 
     // CLU
     void SetCLUOVHdrName(const QString& name);
     const QString& GetCLUOVHdrName() const { return m_CLUOVHdrName; }
-    bool isCLUPercentCaptionSet() const { return m_isCLUPercent; }
+    bool IsCLUPercentCaptionSet() const { return m_isCLUPercent; }
 
     // View
     void SetViewName(const QString& viewName) { m_viewName = viewName; }

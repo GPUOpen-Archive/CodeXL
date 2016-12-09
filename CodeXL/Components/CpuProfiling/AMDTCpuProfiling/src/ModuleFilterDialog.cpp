@@ -377,7 +377,7 @@ void ModuleFilterDialog::onClickOk()
     {
         bool isSystemModuleChecked = m_pDisplaySystemModule->isChecked();
         m_pTableDisplaySettings->m_shouldDisplaySystemModuleInModulesDlg = isSystemModuleChecked;
-        m_pDisplayFilter->setIgnoreSystemModule(!isSystemModuleChecked);
+        m_pDisplayFilter->SetIgnoreSystemModule(!isSystemModuleChecked);
     }
 
     m_pTableDisplaySettings->m_filterByModulePathsList.clear();

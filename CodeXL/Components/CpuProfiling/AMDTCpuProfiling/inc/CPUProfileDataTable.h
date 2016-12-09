@@ -103,9 +103,6 @@ public:
     // Static function that returns an icon according to file path:
     static QPixmap* moduleIcon(const osFilePath& filePath, bool is32Bit);
 
-    // Organize the table a the hot spot indicator values:
-    bool organizeTableByHotSpotIndicator();
-
     // Set the table display filter
     void setTableDisplaySettings(TableDisplaySettings* pTableSettings) { m_pTableDisplaySettings = pTableSettings; }
 

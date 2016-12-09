@@ -872,7 +872,7 @@ bool CPUProfileDataTable::SetSampleCountAndPercent(const AMDTSampleValueVec& sam
 
         if (m_isCLU)
         {
-            if (m_pDisplayFilter->isCLUPercentCaptionSet())
+            if (m_pDisplayFilter->IsCLUPercentCaptionSet())
             {
                 precision = SAMPLE_PERCENT_PRECISION;
             }
@@ -896,7 +896,7 @@ void CPUProfileDataTable::SetDelegateItemColumn(int colNum, bool isSummaryTable)
 {
     if (m_isCLU)
     {
-        if (m_pDisplayFilter->isCLUPercentCaptionSet())
+        if (m_pDisplayFilter->IsCLUPercentCaptionSet())
         {
             delegateSamplePercent(colNum);
         }
@@ -984,7 +984,7 @@ void CPUProfileDataTable::SetTableSampleCountAndPercent(QStringList& list,
             // get counter type
             AMDTProfileCounterType counterType = static_cast<AMDTProfileCounterType>(std::get<4>(counter));
             auto sampleCount = profData.m_sampleValue.at(i).m_sampleCount;
-            bool setPercentInColumn = m_pDisplayFilter->isDisplaySamplePercent();
+            bool setPercentInColumn = m_pDisplayFilter->IsDisplaySamplePercent();
 
             // TBP, EBP, IBS
             if (counterType == AMDT_PROFILE_COUNTER_TYPE_RAW)
@@ -1048,7 +1048,7 @@ void CPUProfileDataTable::IfTbpSetPercentCol(int colIdx)
 {
     if (m_pDisplayFilter->GetProfileType() == AMDT_PROFILE_TYPE_TBP)
     {
-        if (!m_pDisplayFilter->isDisplaySamplePercent())
+        if (!m_pDisplayFilter->IsDisplaySamplePercent())
         {
             hideColumn(colIdx);
         }

@@ -582,7 +582,7 @@ void DisplayFilterDlg::onClickOk()
         m_displayFilter->SetDisplaySamplePercent(m_displayPercentageInColumn);
 
         m_displaySystemModules = m_pCheckBoxDisplaySystemModules->isChecked();
-        m_displayFilter->setIgnoreSystemModule(!m_displaySystemModules);
+        m_displayFilter->SetIgnoreSystemModule(!m_displaySystemModules);
 
     }
 
