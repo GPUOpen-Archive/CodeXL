@@ -5686,7 +5686,7 @@ public:
         return ret;
     }
 
-    // Retrives the list of processes and threads for which the given function-id has samples
+    // Retrieves the list of processes and threads for which the given function-id has samples
     bool GetProcessAndThreadListForFunction(
         AMDTFunctionId              funcId,
         AMDTUInt32                  funcStartOffset,
@@ -5727,9 +5727,22 @@ public:
                 // Execute the query.
                 while ((rc = sqlite3_step(pQueryStmt)) == SQLITE_ROW)
                 {
-                    processList.push_back(sqlite3_column_int(pQueryStmt, 0));
-                    threadList.push_back(sqlite3_column_int(pQueryStmt, 1));
+                    pidUniqueSet.insert(sqlite3_column_int(pQueryStmt, 0));
+                    tidUniqueSet.insert(sqlite3_column_int(pQueryStmt, 1));
                 }
+
+                for (const auto& pid : pidUniqueSet)
+                {
+                    processList.push_back(pid);
+                }
+
+                for (const auto& tid : tidUniqueSet)
+                {
+                    threadList.push_back(tid);
+                }
+
+                pidUniqueSet.clear();
+                tidUniqueSet.clear();
             }
 
             // Finalize the statement.
