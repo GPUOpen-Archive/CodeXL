@@ -947,41 +947,30 @@ void SessionOverviewWindow::activateTableItem(QTableWidgetItem* pActivateItem, C
 
 void SessionOverviewWindow::onTableItemActivated(QTableWidgetItem* pActivateItem)
 {
-    // Sanity check:
     if (pActivateItem != nullptr)
     {
         CPUProfileDataTable* pTable = qobject_cast<CPUProfileDataTable*>(sender());
         int rowNum = pActivateItem->row();
 
-        // open related window only if not empty row or "other" row
+        // open related window only if not empty row
         if (rowNum != pTable->GetEmptyTableItemRowNum())
         {
             if (pTable == m_pFunctionsTable)
             {
-                QTableWidgetItem* funcName = m_pFunctionsTable->item(rowNum, CXL_FUNC_SUMMMARY_FUNC_NAME_COL);
-                gtString str = acQStringToGTString(funcName->text());
-                bool isOther = str.compare(L"other") == 0;
-                bool isUnknown = str.startsWith(L"Unknown Module");
-
-                // if double click on "other" row  open functions table
-                if (isOther)
+                if (pTable->GetOtherSamplesItemRowNum() == rowNum)
                 {
-                    openFunctionViewForModule(nullptr);
+                    openFunctionsView();
                 }
                 else
                 {
-                    if (!isUnknown)
-                    {
-                        openSourceCodeView(pActivateItem);
-                    }
+                    openSourceCodeView(pActivateItem);
                 }
             }
             else if (pTable == m_pModulesTable)
             {
-                // if double click on "other" row  open modules table
-                if (rowNum == pTable->GetOtherSamplesItemRowNum())
+                if (pTable->GetOtherSamplesItemRowNum() == rowNum)
                 {
-                    openModulesViewForProcess(nullptr);
+                    openModulesView();
                 }
                 else
                 {
@@ -995,7 +984,6 @@ void SessionOverviewWindow::onTableItemActivated(QTableWidgetItem* pActivateItem
         }
     }
 }
-
 
 void SessionOverviewWindow::onTableContextMenuActionTriggered(CPUProfileDataTable::TableContextMenuActionType actionType,
                                                               QTableWidgetItem* pTableItem)

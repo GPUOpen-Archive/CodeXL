@@ -59,6 +59,66 @@ CPUProfileDataTable::~CPUProfileDataTable()
 {
 }
 
+bool CPUProfileDataTable::AddEmptyAndOtherRow()
+{
+    // Get the item for the empty table message:
+    int newRowIndex = rowCount();
+
+    // set row with empty row message
+    QStringList list;
+    list << CP_emptyTableMessage;
+
+    for (int i = 1; i < columnCount(); ++i)
+    {
+        list << "";
+    }
+
+    addRow(list, nullptr);
+
+    // save item of this row
+    m_pEmptyRowTableItem = item(newRowIndex, 0);
+
+    // hide the empty row, show this row if table is empty
+    GT_IF_WITH_ASSERT(m_pEmptyRowTableItem != nullptr)
+    {
+        setRowHidden(newRowIndex, true);
+    }
+
+    // add "other" row
+    QStringList samplesList;
+
+    for (int i = 0; i < columnCount(); ++i)
+    {
+        samplesList << "";
+    }
+
+    newRowIndex = rowCount();
+    addRow(samplesList, nullptr);
+
+    // set all row items with "other" row data role
+    m_pOtherSamplesRowItem = item(newRowIndex, 0);
+
+    GT_IF_WITH_ASSERT(m_pOtherSamplesRowItem != nullptr)
+    {
+        m_pOtherSamplesRowItem->setData(AC_USER_ROLE_OTHER_ROW, CPUProfileDataTableItem::ASCENDING_ORDER);
+
+        for (int i = 1; i < columnCount(); ++i)
+        {
+            auto rowItem = item(newRowIndex, i);
+
+            if (rowItem != nullptr)
+            {
+                rowItem->setData(AC_USER_ROLE_OTHER_ROW, CPUProfileDataTableItem::ASCENDING_ORDER);
+            }
+        }
+
+        // hide the other row, show this row if there other samples
+        setRowHidden(newRowIndex, true);
+    }
+
+    return true;
+}
+
 bool CPUProfileDataTable::displayTableSummaryData(std::shared_ptr<cxlProfileDataReader> pProfDataRdr,
                                                   std::shared_ptr<DisplayFilter> pDisplayFilter,
                                                   int counterIdx,
@@ -89,7 +149,11 @@ bool CPUProfileDataTable::displayTableSummaryData(std::shared_ptr<cxlProfileData
             initializeTableHeaders(pDisplayFilter, true);
         }
 
-        fillSummaryTables(counterIdx);
+        AddEmptyAndOtherRow();
+        fillSummaryTable(counterIdx);
+        HandleEmptyTable();
+
+        sortTable();
 
         retVal = true;
     }
@@ -158,6 +222,67 @@ void CPUProfileDataTable::sortTable()
             sortItems(sortByColIndex, m_pTableDisplaySettings->m_lastSortOrder);
         }
     }
+}
+
+bool CPUProfileDataTable::SetPIDColumnValue(int row, int column, AMDTUInt32 pid)
+{
+    QTableWidgetItem *pPIDItem = item(row, column);
+
+    if (pPIDItem != nullptr)
+    {
+        QVariant dataVariant;
+        dataVariant.setValue(pid);
+
+        pPIDItem->setData(Qt::DisplayRole, dataVariant);
+        pPIDItem->setTextAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+
+        QString tooltip = dataVariant.toString();
+        pPIDItem->setToolTip(tooltip);
+    }
+
+    return true;
+}
+
+bool CPUProfileDataTable::SetSampleColumnValue(int row, int column, double sampleValue)
+{
+    QTableWidgetItem *pSampleItem = item(row, column);
+
+    if (pSampleItem != nullptr && sampleValue > 0)
+    {
+        QVariant dataVariant;
+        dataVariant.setValue(sampleValue);
+
+        pSampleItem->setData(Qt::DisplayRole, dataVariant);
+        pSampleItem->setTextAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+
+        QString tooltip = dataVariant.toString();
+        pSampleItem->setToolTip(tooltip);
+    }
+
+    return true;
+}
+
+bool CPUProfileDataTable::SetSamplePercentColumnValue(int row, int column, double samplePercentValue)
+{
+    QTableWidgetItem *pSamplePercentItem = item(row, column);
+
+    if (pSamplePercentItem != nullptr && samplePercentValue > 0)
+    {
+        QString currentValue = QString::number(samplePercentValue, 'f', SAMPLE_PERCENT_PRECISION);
+
+        QVariant dataVariant;
+        dataVariant.setValue(currentValue.toFloat());
+
+        pSamplePercentItem->setData(Qt::EditRole, dataVariant);
+        pSamplePercentItem->setTextAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+
+        QString tooltip = QString::number(samplePercentValue, 'f', SAMPLE_VALUE_PRECISION);
+        tooltip.append("%");
+
+        pSamplePercentItem->setToolTip(tooltip);
+    }
+
+    return true;
 }
 
 void CPUProfileDataTable::setTableRowCellValue(int rowIndex, int colIndex, int dataIndex, const gtVector<float>& dataVector)
@@ -581,15 +706,16 @@ void CPUProfileDataTable::sortIndicatorChanged(int sortColumn, Qt::SortOrder ord
 
 bool CPUProfileDataTable::IsTableEmpty() const
 {
-    // Check if there is at least one shown row:
+    // Check if there is at least one row shown
     bool isOneRowShown = false;
-    int rows = rowCount();
 
     GT_IF_WITH_ASSERT(m_pEmptyRowTableItem != nullptr)
     {
+        int rows = rowCount();
+
         for (int i = 0 ; i < rows ; i++)
         {
-            if (!isRowHidden(i) && (i != m_pEmptyRowTableItem->row()) && (i != m_pOtherSamplesRowItem->row()))
+            if (!isRowHidden(i) && (i != m_pEmptyRowTableItem->row()))
             {
                 isOneRowShown = true;
                 break;
@@ -602,9 +728,10 @@ bool CPUProfileDataTable::IsTableEmpty() const
 
 bool CPUProfileDataTable::HandleEmptyTable()
 {
-    // if at least one shown row: hide "empty table" row
+    // if at least one row shown: hide "empty table" row
     // if no: unhide "empty table" row
     bool isTableEmpty = false;
+
     GT_IF_WITH_ASSERT(m_pEmptyRowTableItem != nullptr)
     {
         isTableEmpty = IsTableEmpty();
@@ -620,12 +747,15 @@ void CPUProfileDataTable::UpdateLastRowItemsSortOrder()
     blockSignals(true);
     setSortingEnabled(false);
 
-    GT_IF_WITH_ASSERT(m_pTableDisplaySettings)
+    GT_IF_WITH_ASSERT(nullptr != m_pTableDisplaySettings)
     {
         //get table sort order
-        CPUProfileDataTableItem::SortOrder order = CPUProfileDataTableItem::GetTableSortOrder(m_pTableDisplaySettings->m_lastSortOrder);
-        GT_IF_WITH_ASSERT(nullptr != m_pOtherSamplesRowItem)
+
+        if (nullptr != m_pOtherSamplesRowItem)
         {
+            CPUProfileDataTableItem::SortOrder order =
+                CPUProfileDataTableItem::GetTableSortOrder(m_pTableDisplaySettings->m_lastSortOrder);
+
             //update all "other" row items
             int rowNum = m_pOtherSamplesRowItem->row();
             QTableWidgetItem* rowItem;
@@ -633,6 +763,7 @@ void CPUProfileDataTable::UpdateLastRowItemsSortOrder()
             for (int i = 0; i < columnCount(); ++i)
             {
                 rowItem = item(rowNum, i);
+
                 GT_IF_WITH_ASSERT(rowItem)
                 {
                     rowItem->setData(AC_USER_ROLE_OTHER_ROW, order);
@@ -644,17 +775,6 @@ void CPUProfileDataTable::UpdateLastRowItemsSortOrder()
     // enable sorting and signals
     blockSignals(false);
     setSortingEnabled(true);
-}
-
-bool CPUProfileDataTable::IsBaseTimeProfiling() const
-{
-    return true;
-}
-
-bool CPUProfileDataTable::IsCacheLineProfiling() const
-{
-    bool retVal = false;
-    return retVal;
 }
 
 int CPUProfileDataTable::GetEmptyTableItemRowNum() const
@@ -670,7 +790,7 @@ int CPUProfileDataTable::GetEmptyTableItemRowNum() const
 int CPUProfileDataTable::GetOtherSamplesItemRowNum() const
 {
     int retVal = -1;
-    GT_IF_WITH_ASSERT(m_pEmptyRowTableItem != nullptr)
+    GT_IF_WITH_ASSERT(m_pOtherSamplesRowItem != nullptr)
     {
         retVal = m_pOtherSamplesRowItem->row();
     }
@@ -831,7 +951,12 @@ bool CPUProfileDataTable::initializeTableHeaders(std::shared_ptr<DisplayFilter> 
     return retVal;
 }
 
-void CPUProfileDataTable::SetIcon(gtString modulePath, AMDTUInt32 rowIndex, AMDTUInt32 iconColIndex, AMDTUInt32 toolTipColidx, bool is32Bit, int idxRole)
+void CPUProfileDataTable::SetIcon(gtString modulePath,
+                                  AMDTUInt32 rowIndex,
+                                  AMDTUInt32 iconColIndex,
+                                  AMDTUInt32 toolTipColidx,
+                                  bool is32Bit,
+                                  int idxRole)
 {
     QString modulefullPath(acGTStringToQString(modulePath));
     QTableWidgetItem* pModuleNameItem = item(rowIndex, toolTipColidx);
@@ -856,122 +981,9 @@ void CPUProfileDataTable::SetIcon(gtString modulePath, AMDTUInt32 rowIndex, AMDT
     }
 }
 
-bool CPUProfileDataTable::SetSampleCountAndPercent(const AMDTSampleValueVec& sampleVector, QStringList& list)
+void CPUProfileDataTable::SetTableSampleCountAndPercent(int row, int delegateColumn, const AMDTProfileData& profData)
 {
-    bool retVal = true;
-
-    if (sampleVector.empty() || sampleVector.at(0).m_sampleCount == 0)
-    {
-        retVal = false;
-    }
-    else
-    {
-        int precision           = SAMPLE_VALUE_PRECISION;
-        double sampleVal        = sampleVector.at(0).m_sampleCount;
-        double samplePercentage = sampleVector.at(0).m_sampleCountPercentage;
-
-        if (m_isCLU)
-        {
-            if (m_pDisplayFilter->IsCLUPercentCaptionSet())
-            {
-                precision = SAMPLE_PERCENT_PRECISION;
-            }
-
-            list << QString::number(sampleVal, 'f', precision);
-        }
-        else
-        {
-            QVariant sampleCount(sampleVal);
-            list << sampleCount.toString();
-
-            QVariant sampleCountPercent(samplePercentage);
-            list << QString::number(samplePercentage, 'f', precision);
-        }
-    }
-
-    return retVal;
-}
-
-void CPUProfileDataTable::SetDelegateItemColumn(int colNum, bool isSummaryTable)
-{
-    if (m_isCLU)
-    {
-        if (m_pDisplayFilter->IsCLUPercentCaptionSet())
-        {
-            delegateSamplePercent(colNum);
-        }
-        else
-        {
-            setItemDelegateForColumn(colNum, &acNumberDelegateItem::Instance());
-        }
-    }
-    else if ((m_pDisplayFilter->GetProfileType() == AMDT_PROFILE_TYPE_TBP) && (!isSummaryTable))
-    {
-        delegateSamplePercent(colNum);
-    }
-    else
-    {
-        delegateSamplePercent(colNum + 1);
-    }
-}
-
-bool CPUProfileDataTable::SetSummaryTabIcon(gtUInt16 iconColNum,
-                                            gtUInt16 percentColIndex,
-                                            gtUInt16 samplesColIndex,
-                                            gtUInt32 modId,
-                                            const osFilePath& modulePath)
-{
-    bool retVal = true;
-
-    AMDTProfileModuleInfoVec procInfo;
-    m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, modId, procInfo);
-
-    if (procInfo.empty())
-    {
-        retVal = false;
-    }
-    else
-    {
-        int row = rowCount() - 1;
-
-        QTableWidgetItem* pNameItem = item(row, iconColNum);
-
-        if (pNameItem != nullptr)
-        {
-            if (AMDT_PROFILE_ALL_MODULES != modId)
-            {
-                QPixmap* pIcon = CPUProfileDataTable::moduleIcon(modulePath, !procInfo.at(0).m_is64Bit);
-
-                if (pIcon != nullptr)
-                {
-                    pNameItem->setIcon(QIcon(*pIcon));
-                }
-            }
-            else
-            {
-                QPixmap emptyIcon;
-                acSetIconInPixmap(emptyIcon, AC_ICON_EMPTY);
-                pNameItem->setIcon(QIcon(emptyIcon));
-                pNameItem->setTextColor(QColor(Qt::gray));
-
-                QTableWidgetItem* rowItem = item(row, percentColIndex);
-                rowItem->setTextColor(QColor(Qt::gray));
-
-                QFont font;
-                rowItem = item(row, samplesColIndex);
-                rowItem->setTextColor(QColor(Qt::gray));
-                rowItem->setFont(font);
-            }
-        }
-    }
-
-    return retVal;
-}
-
-void CPUProfileDataTable::SetTableSampleCountAndPercent(QStringList& list,
-                                                        gtUInt16 delegateColIdx,
-                                                        const AMDTProfileData& profData)
-{
+    // TODO: Move column delegation functions outside as they are row-invariant
     if (nullptr != m_pDisplayFilter)
     {
         CounterNameIdVec selectedCounterList;
@@ -994,49 +1006,30 @@ void CPUProfileDataTable::SetTableSampleCountAndPercent(QStringList& list,
                 // EBP, IBS
                 if (m_pDisplayFilter->GetProfileType() != AMDT_PROFILE_TYPE_TBP)
                 {
-                    if (setPercentInColumn == true && samplePercent > 0)
+                    if (setPercentInColumn == true)
                     {
-                        list << QString::number(samplePercent, 'f', SAMPLE_PERCENT_PRECISION);
-                        delegateSamplePercent(delegateColIdx + i);
-                    }
-                    else if (setPercentInColumn != true && sampleCount > 0)
-                    {
-                        list << QString::number(sampleCount);
-                        setItemDelegateForColumn(delegateColIdx + i, &acNumberDelegateItem::Instance());
+                        SetSamplePercentColumnValue(row, delegateColumn + i, samplePercent);
+                        delegateSamplePercent(delegateColumn + i);
                     }
                     else
                     {
-                        list << "";
+                        SetSampleColumnValue(row, delegateColumn + i, sampleCount);
+                        setItemDelegateForColumn(delegateColumn + i, &acNumberDelegateItem::Instance());
                     }
                 }
                 else // TBP
                 {
-                    if (sampleCount > 0)
-                    {
-                        list << QString::number(sampleCount);
-                        setItemDelegateForColumn(delegateColIdx + i, &acNumberDelegateItem::Instance());
+                    SetSampleColumnValue(row, delegateColumn + i, sampleCount);
+                    setItemDelegateForColumn(delegateColumn + i, &acNumberDelegateItem::Instance());
 
-                        list << QString::number(samplePercent, 'f', SAMPLE_PERCENT_PRECISION);
-                        delegateSamplePercent(delegateColIdx + i + 1);
-                    }
-                    else
-                    {
-                        list << "" << "";
-                    }
+                    SetSamplePercentColumnValue(row, delegateColumn + i + 1, samplePercent);
+                    delegateSamplePercent(delegateColumn + i + 1);
                 }
             }
             else // CLU
             {
-                setItemDelegateForColumn(delegateColIdx + i, &acNumberDelegateItem::Instance());
-
-                if (sampleCount > 0)
-                {
-                    list << QString::number(sampleCount);
-                }
-                else
-                {
-                    list << "";
-                }
+                SetSampleColumnValue(row, delegateColumn + i, sampleCount);
+                setItemDelegateForColumn(delegateColumn + i, &acNumberDelegateItem::Instance());
             }
 
             ++i;
@@ -1044,22 +1037,13 @@ void CPUProfileDataTable::SetTableSampleCountAndPercent(QStringList& list,
     }
 }
 
-void CPUProfileDataTable::IfTbpSetPercentCol(int colIdx)
+void CPUProfileDataTable::HandleTBPPercentCol(int column)
 {
     if (m_pDisplayFilter->GetProfileType() == AMDT_PROFILE_TYPE_TBP)
     {
         if (!m_pDisplayFilter->IsDisplaySamplePercent())
         {
-            hideColumn(colIdx);
+            hideColumn(column);
         }
-        else
-        {
-            SetDelegateItemColumn(colIdx, false);
-        }
-    }
-    else
-    {
-        // reset the delegation column to non delegate
-        setItemDelegateForColumn(colIdx, &acNumberDelegateItem::Instance());
     }
 }

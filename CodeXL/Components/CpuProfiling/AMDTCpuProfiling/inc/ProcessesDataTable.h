@@ -14,10 +14,10 @@
 
 enum ProcessSummaryCol
 {
-    CXL_PROC_SUMMMARY_PROC_NAME_COL = 0,
-    CXL_PROC_SUMMMARY_PROC_ID_COL,
-    CXL_PROC_SUMMMARY_SAMPLE_COL,
-    CXL_PROC_SUMMMARY_SAMPLE_PER_COL,
+    CXL_PROC_SUMMARY_PROC_NAME_COL = 0,
+    CXL_PROC_SUMMARY_PROC_ID_COL,
+    CXL_PROC_SUMMARY_SAMPLE_COL,
+    CXL_PROC_SUMMARY_SAMPLE_PER_COL,
 };
 
 enum ProcessTabCol
@@ -56,7 +56,7 @@ public:
 
 protected:
 
-    bool fillSummaryTables(int counterIdx) override;
+    bool fillSummaryTable(int counterIdx) override;
     bool fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> modIdVec = {}) override;
 
 private:

@@ -13,9 +13,11 @@
 #include <AMDTBaseTools/Include/gtPtrVector.h>
 #include <AMDTOSWrappers/Include/osFilePath.h>
 #include <AMDTApplicationComponents/Include/acListCtrl.h>
+#include <AMDTApplicationComponents/Include/acIcons.h>
 
 // Local:
 #include <inc/DisplayFilter.h>
+#include <inc/StringConstants.h>
 
 
 class SessionTreeNodeData;
@@ -136,8 +138,10 @@ protected:
     // Overrides acListCtrl:
     virtual QTableWidgetItem* allocateNewWidgetItem(const QString& text);
 
+    bool AddEmptyAndOtherRow();
+
     // Fill summary DataTables
-    virtual bool fillSummaryTables(int counterIdx) = 0;
+    virtual bool fillSummaryTable(int counterIdx) = 0;
 
     // handles event of changing the hot-spot indicator combobox
     virtual bool HandleHotSpotIndicatorSet();
@@ -168,7 +172,6 @@ protected:
     /// Get a string from action type
     QString actionTypeToString(TableContextMenuActionType actionType);
 
-
     /// Find the CLU percent column:
     /// \param cluSampleColumnIndexList the indexes on which the CLU percentage columns is in
     /// \param hotSpotCaption the current hot spot caption
@@ -178,19 +181,13 @@ protected:
     // updates the 6th row (of top 5 table - hotspot) items data, to the current table sort order
     void UpdateLastRowItemsSortOrder();
 
-    /// checks the profiling mode and return true if Base Time profiling
-    bool IsBaseTimeProfiling() const;
-
-
-    /// checks the profiling mode and return true if Cache Line profiling
-    bool IsCacheLineProfiling() const;
     bool delegateSamplePercent(int colNum);
+
     void SetIcon(gtString modulePath,
                  AMDTUInt32 rowIndex,
                  AMDTUInt32 iconColIndex,
                  AMDTUInt32 toolTipColidx,
                  bool is32Bit, int idxRole);
-
 
     std::shared_ptr<DisplayFilter>  m_pDisplayFilter = nullptr;
     std::shared_ptr<cxlProfileDataReader> m_pProfDataRdr = nullptr;
@@ -219,22 +216,15 @@ protected:
     // saves the empty table message row item
     QTableWidgetItem* m_pEmptyRowTableItem = nullptr;
 
-    // saves the other samples message row item
+    // saves the other samples message row item (Overview Tab)
     QTableWidgetItem* m_pOtherSamplesRowItem = nullptr;
 
-    bool SetSampleCountAndPercent(const AMDTSampleValueVec& sampleVector, QStringList& list);
-    void SetDelegateItemColumn(int colNum, bool isSummaryTable);
-    bool SetSummaryTabIcon(gtUInt16 iconColNum,
-                           gtUInt16 percentColIndex,
-                           gtUInt16 samplesColIndex,
-                           gtUInt32 modId,
-                           const osFilePath& modulePath);
+    bool SetPIDColumnValue(int row, int column, AMDTUInt32 pid);
+    bool SetSampleColumnValue(int row, int column, double sampleValue);
+    bool SetSamplePercentColumnValue(int row, int column, double samplePercentValue);
+    void SetTableSampleCountAndPercent(int row, int delegateColumn, const AMDTProfileData& profData);
 
-    void SetTableSampleCountAndPercent(QStringList& list,
-                                       gtUInt16 delegateColIdx,
-                                       const AMDTProfileData& profData);
-
-    void IfTbpSetPercentCol(int colIdx);
+    void HandleTBPPercentCol(int column);
 
     enum
     {

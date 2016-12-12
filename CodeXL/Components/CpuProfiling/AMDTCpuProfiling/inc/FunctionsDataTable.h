@@ -16,11 +16,11 @@ class CpuSessionWindow;
 
 enum FunctionSummaryCol
 {
-    CXL_FUNC_SUMMMARY_FUNC_ID_COL = 0,
-    CXL_FUNC_SUMMMARY_FUNC_NAME_COL,
-    CXL_FUNC_SUMMMARY_SAMPLE_COL,
-    CXL_FUNC_SUMMMARY_SAMPLE_PER_COL,
-    CXL_FUNC_SUMMMARY_MODULE_COL,
+    CXL_FUNC_SUMMARY_FUNC_ID_COL = 0,
+    CXL_FUNC_SUMMARY_FUNC_NAME_COL,
+    CXL_FUNC_SUMMARY_SAMPLE_COL,
+    CXL_FUNC_SUMMARY_SAMPLE_PER_COL,
+    CXL_FUNC_SUMMARY_MODULE_COL,
 };
 
 enum FunctionTabCol
@@ -66,7 +66,7 @@ public slots:
 
 protected:
 
-    bool fillSummaryTables(int counterIdx) override;
+    bool fillSummaryTable(int counterIdx) override;
     bool fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> modIdVec = {}) override;
     bool HandleHotSpotIndicatorSet() override { return true; };
     bool AddRowToTable(const gtVector<AMDTProfileData>& allModuleData);

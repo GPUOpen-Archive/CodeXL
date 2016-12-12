@@ -11,6 +11,7 @@
 
 // Infra:
 #include <AMDTOSWrappers/Include/osFilePath.h>
+#include <AMDTApplicationComponents/Include/acItemDelegate.h>
 
 /// Local:
 #include <inc/ModulesDataTable.h>
@@ -132,7 +133,7 @@ CPUProfileDataTable::TableType ModulesDataTable::GetTableType() const
     return CPUProfileDataTable::PROCESSES_DATA_TABLE;
 }
 
-bool ModulesDataTable::fillSummaryTables(int counterIdx)
+bool ModulesDataTable::fillSummaryTable(int counterIdx)
 {
     bool retVal = false;
 
@@ -150,41 +151,89 @@ bool ModulesDataTable::fillSummaryTables(int counterIdx)
 
         for (const auto& moduleData : moduleProfileData)
         {
-            QStringList list;
+            bool isOther = (moduleData.m_name.compare(L"other") == 0);
 
-            osFilePath modulePath(moduleData.m_name);
-            gtString filename;
-            modulePath.getFileNameAndExtension(filename);
-
-            list << filename.asASCIICharArray();
-
-            if (!SetSampleCountAndPercent(moduleData.m_sampleValue, list))
+            if (!isOther)
             {
-                continue;
+                AMDTProfileModuleInfoVec moduleInfo;
+                m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, moduleData.m_id, moduleInfo);
+
+                if (moduleInfo.empty())
+                {
+                    continue;
+                }
+
+                QStringList list;
+
+                osFilePath modulePath(moduleData.m_name);
+                gtString moduleName;
+                modulePath.getFileNameAndExtension(moduleName);
+
+                list << moduleName.asASCIICharArray();
+
+                // Insert blank sample and sample percent
+                list << "" << "";
+
+                addRow(list, nullptr);
+
+                QTableWidgetItem* pNameItem = item(rowCount() - 1, CXL_MOD_SUMMARY_MOD_NAME_COL);
+                QPixmap* pIcon = CPUProfileDataTable::moduleIcon(moduleInfo[0].m_path, !moduleInfo[0].m_is64Bit);
+
+                if (pNameItem != nullptr && pIcon != nullptr)
+                {
+                    pNameItem->setIcon(QIcon(*pIcon));
+                }
+
+                // tooltip
+                QTableWidgetItem* pModuleNameItem = item(rowCount() - 1, CXL_MOD_SUMMARY_MOD_NAME_COL);
+
+                if (pModuleNameItem != nullptr)
+                {
+                    pModuleNameItem->setToolTip(moduleData.m_name.asASCIICharArray());
+                }
+
+                SetSampleColumnValue(rowCount() - 1,
+                    CXL_MOD_SUMMARY_SAMPLE_COL,
+                    moduleData.m_sampleValue.at(0).m_sampleCount);
+
+                SetSamplePercentColumnValue(rowCount() - 1,
+                    CXL_MOD_SUMMARY_SAMPLE_PER_COL,
+                    moduleData.m_sampleValue.at(0).m_sampleCountPercentage);
             }
-
-            addRow(list, nullptr);
-
-            // for summary table
-            SetDelegateItemColumn(CXL_MOD_SUMMARY_SAMPLE_COL, true);
-
-            if (!SetSummaryTabIcon(CXL_MOD_SUMMARY_MOD_NAME_COL,
-                                   CXL_MOD_SUMMARY_SAMPLE_PER_COL,
-                                   CXL_MOD_SUMMARY_SAMPLE_COL,
-                                   moduleData.m_moduleId,
-                                   modulePath))
+            else
             {
-                continue;
-            }
+                int rowNum = m_pOtherSamplesRowItem->row();
+                QTableWidgetItem* rowItem;
+                QString tmpStr;
 
-            // tooltip
-            QTableWidgetItem* pModuleNameItem = item(rowCount() - 1, CXL_MOD_SUMMARY_MOD_NAME_COL);
+                // Set "other" row name column item
+                tmpStr = CP_strOther;
+                rowItem = item(rowNum, CXL_MOD_SUMMARY_MOD_NAME_COL);
+                rowItem->setText(tmpStr);
+                rowItem->setTextColor(QColor(Qt::gray));
 
-            if (pModuleNameItem != nullptr)
-            {
-                pModuleNameItem->setToolTip(moduleData.m_name.asASCIICharArray());
+                // Set empty icon for "other" row
+                QPixmap emptyIcon;
+                acSetIconInPixmap(emptyIcon, AC_ICON_EMPTY);
+                rowItem->setIcon(QIcon(emptyIcon));
+
+                // Set "other" row samples column item
+                rowItem = item(rowNum, CXL_MOD_SUMMARY_SAMPLE_COL);
+                rowItem->setText(tmpStr.setNum(moduleData.m_sampleValue.at(0).m_sampleCount));
+                rowItem->setTextColor(QColor(Qt::gray));
+
+                // Set "other" row percent column item
+                rowItem = item(rowNum, CXL_MOD_SUMMARY_SAMPLE_PER_COL);
+                rowItem->setText(tmpStr.setNum(moduleData.m_sampleValue.at(0).m_sampleCountPercentage));
+                rowItem->setTextColor(QColor(Qt::gray));
+
+                // Show "other" row
+                setRowHidden(rowNum, false);
             }
         }
+
+        setItemDelegateForColumn(CXL_MOD_SUMMARY_SAMPLE_COL, &acNumberDelegateItem::Instance());
+        delegateSamplePercent(CXL_MOD_SUMMARY_SAMPLE_PER_COL);
 
         setSortingEnabled(true);
         setColumnWidth(CXL_MOD_SUMMARY_MOD_NAME_COL, MAX_MODULE_NAME_LEN);
@@ -266,10 +315,11 @@ bool ModulesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId, s
             sampleMap.clear();
         }
 
-        IfTbpSetPercentCol(CXL_MOD_TAB_TBP_SAMPLE_PER_COL);
         AddRowToTable(allModulesData);
 
+        HandleTBPPercentCol(CXL_MOD_TAB_TBP_SAMPLE_PER_COL);
         hideColumn(CXL_MOD_TAB_MOD_ID_COL);
+
         setColumnWidth(CXL_MOD_TAB_MOD_NAME_COL, MAX_MODULE_NAME_LEN);
 
         retVal = true;
@@ -315,8 +365,22 @@ bool ModulesDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allModules
             QString symbols = moduleInfoList.at(0).m_foundDebugInfo ? "Loaded" : "Not Loaded";
             list << symbols;
 
-            SetTableSampleCountAndPercent(list, CXL_MOD_TAB_SAMPLE_START_COL, profData);
+            CounterNameIdVec selectedCounterList;
+            m_pDisplayFilter->GetSelectedCounterList(selectedCounterList);
+
+            for (size_t i = 0; i < selectedCounterList.size(); ++i)
+            {
+                list << "";
+            }
+
+            if (m_pDisplayFilter->GetProfileType() == AMDT_PROFILE_TYPE_TBP)
+            {
+                list << "";
+            }
+
             addRow(list, nullptr);
+
+            SetTableSampleCountAndPercent(rowCount() - 1, CXL_MOD_TAB_SAMPLE_START_COL, profData);
 
             int idxRole = static_cast<int>(Qt::UserRole + 0);
 

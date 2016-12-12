@@ -68,7 +68,7 @@ public slots:
 
 protected:
 
-    bool fillSummaryTables(int counterIdx) override;
+    bool fillSummaryTable(int counterIdx) override;
     bool fillTableData(AMDTProcessId procId, AMDTModuleId modId, std::vector<AMDTUInt64> modIdVec = {}) override;
 
 private:

@@ -6,6 +6,9 @@
 ///
 //==================================================================================
 
+// Infra:
+#include <AMDTApplicationComponents/Include/acItemDelegate.h>
+
 /// Local:
 #include <inc/ProcessesDataTable.h>
 #include <inc/StringConstants.h>
@@ -20,12 +23,12 @@ ProcessesDataTable::~ProcessesDataTable()
 {
 }
 
-bool ProcessesDataTable::fillSummaryTables(int counterIdx)
+bool ProcessesDataTable::fillSummaryTable(int counterIdx)
 {
     bool retVal = false;
 
-    m_processIdColumn = CXL_PROC_SUMMMARY_PROC_ID_COL;
-    m_processNameColumn = CXL_PROC_SUMMMARY_PROC_NAME_COL;
+    m_processIdColumn = CXL_PROC_SUMMARY_PROC_ID_COL;
+    m_processNameColumn = CXL_PROC_SUMMARY_PROC_NAME_COL;
 
     if (nullptr != m_pProfDataRdr)
     {
@@ -41,41 +44,71 @@ bool ProcessesDataTable::fillSummaryTables(int counterIdx)
 
             for (const auto& profData : processProfileData)
             {
-                AMDTProfileProcessInfoVec procInfo;
-                rc = m_pProfDataRdr->GetProcessInfo(profData.m_id, procInfo);
+                bool isOther = (profData.m_name.compare(L"other") == 0);
 
-                QStringList list;
-
-                if (procInfo.empty())
+                if (!isOther)
                 {
-                    continue;
-                }
+                    AMDTProfileProcessInfoVec procInfo;
+                    rc = m_pProfDataRdr->GetProcessInfo(profData.m_id, procInfo);
 
-                if (profData.m_id != AMDT_PROFILE_ALL_MODULES)
-                {
+                    if (procInfo.empty())
+                    {
+                        continue;
+                    }
+
+                    QStringList list;
+
                     list << procInfo.at(0).m_name.asASCIICharArray();
-                    list << QString::number(procInfo.at(0).m_pid);
+
+                    // Insert blank pid, sample and sample percent
+                    list << "" << "" << "";
+
+                    addRow(list, nullptr);
+
+                    SetPIDColumnValue(rowCount() - 1,
+                        CXL_PROC_SUMMARY_PROC_ID_COL,
+                        procInfo.at(0).m_pid);
+
+                    SetSampleColumnValue(rowCount() - 1,
+                        CXL_PROC_SUMMARY_SAMPLE_COL,
+                        profData.m_sampleValue.at(0).m_sampleCount);
+
+                    SetSamplePercentColumnValue(rowCount() - 1,
+                        CXL_PROC_SUMMARY_SAMPLE_PER_COL,
+                        profData.m_sampleValue.at(0).m_sampleCountPercentage);
                 }
                 else
                 {
-                    list << CP_strOther;
-                    list << "";
+                    int rowNum = m_pOtherSamplesRowItem->row();
+                    QTableWidgetItem* rowItem;
+                    QString tmpStr;
+
+                    // Set "other" row name column item
+                    tmpStr = CP_strOther;
+                    rowItem = item(rowNum, CXL_PROC_SUMMARY_PROC_NAME_COL);
+                    rowItem->setText(tmpStr);
+                    rowItem->setTextColor(QColor(Qt::gray));
+
+                    // Set "other" row samples column item
+                    rowItem = item(rowNum, CXL_PROC_SUMMARY_SAMPLE_COL);
+                    rowItem->setText(tmpStr.setNum(profData.m_sampleValue.at(0).m_sampleCount));
+                    rowItem->setTextColor(QColor(Qt::gray));
+
+                    // Set "other" row percent column item
+                    rowItem = item(rowNum, CXL_PROC_SUMMARY_SAMPLE_PER_COL);
+                    rowItem->setText(tmpStr.setNum(profData.m_sampleValue.at(0).m_sampleCountPercentage));
+                    rowItem->setTextColor(QColor(Qt::gray));
+
+                    // Show "other" row
+                    setRowHidden(rowNum, false);
                 }
-
-                if (!SetSampleCountAndPercent(profData.m_sampleValue, list))
-                {
-                    continue;
-                }
-
-                addRow(list, nullptr);
-
-                // for summary table
-                SetDelegateItemColumn(CXL_PROC_SUMMMARY_SAMPLE_COL, true);
-
             }
 
+            setItemDelegateForColumn(CXL_PROC_SUMMARY_SAMPLE_COL, &acNumberDelegateItem::Instance());
+            delegateSamplePercent(CXL_PROC_SUMMARY_SAMPLE_PER_COL);
+
             setSortingEnabled(true);
-            setColumnWidth(CXL_PROC_SUMMMARY_PROC_NAME_COL, MAX_PROCESS_NAME_LEN);
+            setColumnWidth(CXL_PROC_SUMMARY_PROC_NAME_COL, MAX_PROCESS_NAME_LEN);
             retVal = true;
         }
     }
@@ -120,10 +153,28 @@ bool ProcessesDataTable::AddRowToTable(const gtVector<AMDTProfileData>& allProce
             }
 
             list << procInfo.at(0).m_name.asASCIICharArray();
-            list << QString::number(procInfo.at(0).m_pid);
+            // insert blank pid item
+            list << "";
 
-            SetTableSampleCountAndPercent(list, CXL_PROC_TAB_SAMPLE_START_COL, profData);
+            CounterNameIdVec selectedCounterList;
+            m_pDisplayFilter->GetSelectedCounterList(selectedCounterList);
+
+            for (size_t i = 0; i < selectedCounterList.size(); ++i)
+            {
+                // inert blank sample item
+                list << "";
+            }
+
+            if (m_pDisplayFilter->GetProfileType() == AMDT_PROFILE_TYPE_TBP)
+            {
+                // insert blank sample percent item
+                list << "";
+            }
+
             addRow(list, nullptr);
+
+            SetPIDColumnValue(rowCount() - 1, CXL_PROC_TAB_PROC_ID_COL, procInfo.at(0).m_pid);
+            SetTableSampleCountAndPercent(rowCount() - 1, CXL_PROC_TAB_SAMPLE_START_COL, profData);
         }
 
         retVal = true;
@@ -169,8 +220,9 @@ bool ProcessesDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId,
             }
         }
 
-        IfTbpSetPercentCol(CXL_PROC_TAB_TBP_SAMPLE_PER_COL);
         AddRowToTable(allProcessData);
+
+        HandleTBPPercentCol(CXL_PROC_TAB_TBP_SAMPLE_PER_COL);
 
         setColumnWidth(CXL_PROC_TAB_PROC_NAME_COL, MAX_PROCESS_NAME_LEN);
 

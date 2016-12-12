@@ -11,6 +11,7 @@
 
 // Infra
 #include <AMDTApplicationComponents/Include/acFunctions.h>
+#include <AMDTApplicationComponents/Include/acItemDelegate.h>
 
 // Local
 #include <inc/FunctionsDataTable.h>
@@ -181,14 +182,14 @@ CPUProfileDataTable::TableType FunctionsDataTable::GetTableType() const
     return CPUProfileDataTable::FUNCTION_DATA_TABLE;
 }
 
-bool FunctionsDataTable::fillSummaryTables(int counterIdx)
+bool FunctionsDataTable::fillSummaryTable(int counterIdx)
 {
     bool retVal = false;
 
     // Set the columns for function summary table
-    m_functionIdColumn = CXL_FUNC_SUMMMARY_FUNC_ID_COL;
-    m_functionNameColumn = CXL_FUNC_SUMMMARY_FUNC_NAME_COL;
-    m_moduleNameColumn = CXL_FUNC_SUMMMARY_MODULE_COL;
+    m_functionIdColumn = CXL_FUNC_SUMMARY_FUNC_ID_COL;
+    m_functionNameColumn = CXL_FUNC_SUMMARY_FUNC_NAME_COL;
+    m_moduleNameColumn = CXL_FUNC_SUMMARY_MODULE_COL;
 
     if (nullptr != m_pProfDataRdr)
     {
@@ -203,69 +204,102 @@ bool FunctionsDataTable::fillSummaryTables(int counterIdx)
 
         for (auto profData : funcProfileData)
         {
-            // Create QstringList to hold the values
-            QStringList list;
+            bool isOther = (profData.m_name.compare(L"other") == 0);
 
-            // Insert the function id
-            list << QString::number(profData.m_id);
-
-            // Insert the function name
-            list << profData.m_name.asASCIICharArray();
-
-            //Insert sample and sample percent
-            if (!SetSampleCountAndPercent(profData.m_sampleValue, list))
+            if (!isOther)
             {
-                continue;
-            }
+                // Create QstringList to hold the values
+                QStringList list;
 
-            // Insert module name
-            AMDTProfileModuleInfoVec procInfo;
-            rc = m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, profData.m_moduleId, procInfo);
+                // Insert the function id
+                list << QString::number(profData.m_id);
 
-            if (procInfo.empty())
-            {
-                continue;
-            }
+                // Insert the function name
+                list << profData.m_name.asASCIICharArray();
 
-            if (profData.m_moduleId == AMDT_PROFILE_ALL_MODULES)
-            {
-                list << "";
+                // Insert blank sample and sample percent
+                list << "" << "";
+
+                // Insert module name
+                AMDTProfileModuleInfoVec procInfo;
+                m_pProfDataRdr->GetModuleInfo(AMDT_PROFILE_ALL_PROCESSES, profData.m_moduleId, procInfo);
+
+                if (procInfo.empty())
+                {
+                    continue;
+                }
+
+                list << procInfo.at(0).m_name.asASCIICharArray();
+
+                addRow(list, nullptr);
+
+                // Set module type icon
+                QTableWidgetItem* pNameItem = item(rowCount() - 1, CXL_FUNC_SUMMARY_FUNC_NAME_COL);
+                QPixmap* pIcon = moduleIcon(procInfo.at(0).m_path, !procInfo.at(0).m_is64Bit);
+
+                if (pNameItem != nullptr && pIcon != nullptr)
+                {
+                    pNameItem->setIcon(QIcon(*pIcon));
+                }
+
+                // Set tooltip for module column
+                QString modulefullPath(acGTStringToQString(procInfo.at(0).m_path));
+                QTableWidgetItem* pModuleNameItem = item(rowCount() - 1, CXL_FUNC_SUMMARY_MODULE_COL);
+
+                if (pModuleNameItem != nullptr)
+                {
+                    pModuleNameItem->setToolTip(modulefullPath);
+                }
+
+                SetSampleColumnValue(rowCount() - 1,
+                    CXL_FUNC_SUMMARY_SAMPLE_COL,
+                    profData.m_sampleValue.at(0).m_sampleCount);
+
+                SetSamplePercentColumnValue(rowCount() - 1,
+                    CXL_FUNC_SUMMARY_SAMPLE_PER_COL,
+                    profData.m_sampleValue.at(0).m_sampleCountPercentage);
             }
             else
             {
-                list << procInfo.at(0).m_name.asASCIICharArray();
-            }
+                int rowNum = m_pOtherSamplesRowItem->row();
+                QTableWidgetItem* rowItem;
+                QString tmpStr;
 
-            addRow(list, nullptr);
+                // Set "other" row name column item
+                tmpStr = CP_strOther;
+                rowItem = item(rowNum, CXL_FUNC_SUMMARY_FUNC_NAME_COL);
+                rowItem->setText(tmpStr);
+                rowItem->setTextColor(QColor(Qt::gray));
 
-            // for summary table
-            SetDelegateItemColumn(CXL_FUNC_SUMMMARY_SAMPLE_COL, true);
+                // Set empty icon for "other" row
+                QPixmap emptyIcon;
+                acSetIconInPixmap(emptyIcon, AC_ICON_EMPTY);
+                rowItem->setIcon(QIcon(emptyIcon));
 
-            if (!SetSummaryTabIcon(CXL_FUNC_SUMMMARY_FUNC_NAME_COL,
-                                   CXL_FUNC_SUMMMARY_SAMPLE_PER_COL,
-                                   CXL_FUNC_SUMMMARY_SAMPLE_COL,
-                                   profData.m_moduleId,
-                                   procInfo.at(0).m_path))
-            {
-                continue;
-            }
+                // Set "other" row samples column item
+                rowItem = item(rowNum, CXL_FUNC_SUMMARY_SAMPLE_COL);
+                rowItem->setText(tmpStr.setNum(profData.m_sampleValue.at(0).m_sampleCount));
+                rowItem->setTextColor(QColor(Qt::gray));
 
-            // Set tooltip for module column
-            QString modulefullPath(acGTStringToQString(procInfo.at(0).m_path));
-            QTableWidgetItem* pModuleNameItem = item(rowCount() - 1, CXL_FUNC_SUMMMARY_MODULE_COL);
+                // Set "other" row percent column item
+                rowItem = item(rowNum, CXL_FUNC_SUMMARY_SAMPLE_PER_COL);
+                rowItem->setText(tmpStr.setNum(profData.m_sampleValue.at(0).m_sampleCountPercentage));
+                rowItem->setTextColor(QColor(Qt::gray));
 
-            if (pModuleNameItem != nullptr)
-            {
-                pModuleNameItem->setToolTip(modulefullPath);
+                // Show "other" row
+                setRowHidden(rowNum, false);
             }
         }
 
-        hideColumn(CXL_FUNC_SUMMMARY_FUNC_ID_COL);
+        setItemDelegateForColumn(CXL_FUNC_SUMMARY_SAMPLE_COL, &acNumberDelegateItem::Instance());
+        delegateSamplePercent(CXL_FUNC_SUMMARY_SAMPLE_PER_COL);
 
-        setColumnWidth(CXL_FUNC_SUMMMARY_FUNC_NAME_COL, MAX_FUNCTION_NAME_LEN);
-        resizeColumnToContents(CXL_FUNC_SUMMMARY_SAMPLE_COL);
-        resizeColumnToContents(CXL_FUNC_SUMMMARY_SAMPLE_PER_COL);
-        resizeColumnToContents(CXL_FUNC_SUMMMARY_MODULE_COL);
+        hideColumn(CXL_FUNC_SUMMARY_FUNC_ID_COL);
+
+        setColumnWidth(CXL_FUNC_SUMMARY_FUNC_NAME_COL, MAX_FUNCTION_NAME_LEN);
+        resizeColumnToContents(CXL_FUNC_SUMMARY_SAMPLE_COL);
+        resizeColumnToContents(CXL_FUNC_SUMMARY_SAMPLE_PER_COL);
+        resizeColumnToContents(CXL_FUNC_SUMMARY_MODULE_COL);
 
         setSortingEnabled(true);
 
@@ -298,8 +332,22 @@ bool FunctionsDataTable::AddRowToTable(const gtVector<AMDTProfileData>& function
         {
             list << acGTStringToQString(moduleInfoList.at(0).m_name);
 
-            SetTableSampleCountAndPercent(list, CXL_FUNC_TAB_SAMPLE_START_COL, profData);
+            CounterNameIdVec selectedCounterList;
+            m_pDisplayFilter->GetSelectedCounterList(selectedCounterList);
+
+            for (size_t i = 0; i < selectedCounterList.size(); ++i)
+            {
+                list << "";
+            }
+
+            if (m_pDisplayFilter->GetProfileType() == AMDT_PROFILE_TYPE_TBP)
+            {
+                list << "";
+            }
+
             addRow(list, nullptr);
+
+            SetTableSampleCountAndPercent(rowCount() - 1, CXL_FUNC_TAB_SAMPLE_START_COL, profData);
 
             SetIcon(moduleInfoList.at(0).m_path,
                     rowCount() - 1,
@@ -386,8 +434,9 @@ bool FunctionsDataTable::fillTableData(AMDTProcessId procId, AMDTModuleId modId,
             sampleMap.clear();
         }
 
-        IfTbpSetPercentCol(CXL_FUNC_TAB_TBP_SAMPLE_PER_COL);
         AddRowToTable(functionProfileData);
+
+        HandleTBPPercentCol(CXL_FUNC_TAB_TBP_SAMPLE_PER_COL);
         hideColumn(CXL_FUNC_TAB_FUNC_ID_COL);
 
         setColumnWidth(CXL_FUNC_TAB_FUNC_NAME_COL, MAX_FUNCTION_NAME_LEN);
