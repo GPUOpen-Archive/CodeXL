@@ -15,7 +15,7 @@ bool GPUPerfAPICounterLoader::LoadPerfAPICounterDll(const gtString& strDLLPath)
 #define DEBUG_DLL_SUFFIX ""
 #endif
 
-        strGPACounterDllName = LIB_PREFIX "GPUPerfAPICounters" BITNESS DEBUG_DLL_SUFFIX GDT_BUILD_SUFFIX LIB_SUFFIX;
+        strGPACounterDllName = LIB_PREFIX "GPUPerfAPICounters" BITNESS DEBUG_DLL_SUFFIX AMDT_BUILD_SUFFIX LIB_SUFFIX;
 
         std::wstring strGPACounterDllNameUnicode;
         StringUtils::Utf8StringToWideString(strGPACounterDllName, strGPACounterDllNameUnicode);

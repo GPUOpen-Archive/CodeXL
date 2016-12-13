@@ -28,7 +28,7 @@
     <Import Project="$(SolutionDir)\AMDTCpuProfilingCLI.props" />
   </ImportGroup>
   <PropertyGroup>
-    <TargetName>CodeXLCpuProfiler$(GDTProjectSuffix)</TargetName>
+    <TargetName>CodeXLCpuProfiler$(AMDTProjectSuffix)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>

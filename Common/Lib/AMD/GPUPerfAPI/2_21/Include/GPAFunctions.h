@@ -12,9 +12,9 @@
 
 GPA_FUNCTION_PREFIX(GPA_RegisterLoggingCallback)
 
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
     GPA_FUNCTION_PREFIX(GPA_RegisterLoggingDebugCallback)
-#endif // GDT_INTERNAL
+#endif // AMDT_INTERNAL
 
 GPA_FUNCTION_PREFIX(GPA_Initialize)
 GPA_FUNCTION_PREFIX(GPA_Destroy)
@@ -71,7 +71,7 @@ GPA_FUNCTION_PREFIX(GPA_GetSampleFloat32)
 GPA_FUNCTION_PREFIX(GPA_GetDeviceID)
 GPA_FUNCTION_PREFIX(GPA_GetDeviceDesc)
 
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
     GPA_FUNCTION_PREFIX(GPA_InternalSetDrawCallCounts)
 #endif
 

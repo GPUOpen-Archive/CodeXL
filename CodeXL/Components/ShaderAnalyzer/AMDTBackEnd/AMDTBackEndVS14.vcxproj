@@ -87,12 +87,12 @@
   </ImportGroup>
   <PropertyGroup>
     <OutDir Condition="'$(AMDTModuleType)'=='Dynamic'">$(AMDTOutputDir)$(Configuration)\bin\</OutDir>
-    <IntDir Condition="'$(AMDTModuleType)'=='Dynamic'">$(AMDTOutputDir)$(Configuration)\obj\$(ProjectName)\$(Platform)$(GDTBuildSuffix)\</IntDir>
+    <IntDir Condition="'$(AMDTModuleType)'=='Dynamic'">$(AMDTOutputDir)$(Configuration)\obj\$(ProjectName)\$(Platform)$(AMDTBuildSuffix)\</IntDir>
     <OutDir Condition="'$(AMDTModuleType)'=='Static'">$(IntDir)</OutDir>
-    <IntDir Condition="'$(AMDTModuleType)'=='Static'">$(SolutionDir)obj\$(Configuration)-$(PlatformName)$(GDTBuildSuffix)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(AMDTModuleType)'=='Static'">$(SolutionDir)obj\$(Configuration)-$(PlatformName)$(AMDTBuildSuffix)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Platform)'=='x64'">
-    <TargetName>$(GDTProjectName)</TargetName>
+    <TargetName>$(AMDTProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
@@ -127,7 +127,7 @@
     </ClCompile>
     <Lib>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(DX10ASMDir)\Lib\$(Platform)\$(AMDTConfiguration);$(ELFDir)\lib\$(GDTPlatform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DX10ASMDir)\Lib\$(Platform)\$(AMDTConfiguration);$(ELFDir)\lib\$(AMDTPlatform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>MSVCRTD</IgnoreSpecificDefaultLibraries>
       <TargetMachine Condition="'$(Platform)'=='x64'">MachineX64</TargetMachine>
     </Lib>
@@ -264,7 +264,7 @@
     <ClCompile Include="$(CommonDir)\Src\CElf\Src\CElfStringTable.cpp" />
     <ClCompile Include="$(CommonDir)\Src\CElf\Src\CElfSymbolTable.cpp" />
     <ClCompile Include="$(CommonDir)\Src\DeviceInfo\DeviceInfoInternal.cpp">
-      <ExcludedFromBuild Condition="'$(GDT_BUILD)'!='GDT_INTERNAL'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(AMDT_BUILD)'!='AMDT_INTERNAL'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="$(CommonDir)\Src\DeviceInfo\DeviceInfoUtils.cpp" />
     <ClCompile Include="$(CommonDir)\Src\DynamicLibraryModule\ACLModule.cpp" />

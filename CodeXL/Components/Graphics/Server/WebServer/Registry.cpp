@@ -125,7 +125,7 @@ void EnableAppInit()
         DWORD result = GetShortPathName(curDir, shortDir, PS_MAX_PATH);
         Log(logMESSAGE, "PerfStudio short folder is %s\n", shortDir);
 
-        sprintf_s(dlls, "%s\\" MICRODLLNAME GDT_DEBUG_SUFFIX GDT_BUILD_SUFFIX ".dll %s\\" MICRODLLNAME "-x64" GDT_DEBUG_SUFFIX GDT_BUILD_SUFFIX ".dll", shortDir, shortDir);
+        sprintf_s(dlls, "%s\\" MICRODLLNAME AMDT_DEBUG_SUFFIX AMDT_BUILD_SUFFIX ".dll %s\\" MICRODLLNAME "-x64" AMDT_DEBUG_SUFFIX AMDT_BUILD_SUFFIX ".dll", shortDir, shortDir);
 
         Log(logMESSAGE, "PerfStudio appinit reg key is %s\n", dlls);
 

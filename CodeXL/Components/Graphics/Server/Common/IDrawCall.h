@@ -52,7 +52,7 @@ public:
     //------------------------------------------------------------------
     virtual gtASCIIString GetHash() = 0;
 
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
     //------------------------------------------------------------------
     /// Calculate a CRC based from the current draw call's pixel shader
     ///
@@ -60,7 +60,7 @@ public:
     /// is available for the current draw call
     //------------------------------------------------------------------
     virtual UINT64 GetShaderCRC(PIPELINE_STAGE shaderType) = 0;
-#endif //GDT_INTERNAL
+#endif //AMDT_INTERNAL
 
     //------------------------------------------------------------------
     /// returns hash categories

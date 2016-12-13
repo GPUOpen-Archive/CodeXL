@@ -11,7 +11,7 @@
       <AdditionalIncludeDirectories>$(HwDbgFacilitiesDir)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(HwDbgFacilitiesDir)\Lib\$(GDTPlatform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(HwDbgFacilitiesDir)\Lib\$(AMDTPlatform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

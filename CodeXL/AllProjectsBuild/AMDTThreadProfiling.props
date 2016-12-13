@@ -15,7 +15,7 @@
       <AdditionalIncludeDirectories>.;..;$(QTDir)\include\QtGui;$(CommonProjectsDir)\AMDTCommonHeaders;..\Backend\AMDTThreadProfileAPI\inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>AMDTThreadProfileAPI$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>AMDTThreadProfileAPI$(AMDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

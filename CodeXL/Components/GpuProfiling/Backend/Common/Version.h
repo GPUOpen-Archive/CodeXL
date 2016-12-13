@@ -22,9 +22,9 @@
 /// \ingroup Backend
 // @{
 
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
     #define GPUPROFILER_BACKEND_EXE_NAME "CodeXLGpuProfiler-Internal"
-#elif defined( GDT_NDA )
+#elif defined( AMDT_NDA )
     #define GPUPROFILER_BACKEND_EXE_NAME "CodeXLGpuProfiler-NDA"
 #else // public version
     #define GPUPROFILER_BACKEND_EXE_NAME "CodeXLGpuProfiler"

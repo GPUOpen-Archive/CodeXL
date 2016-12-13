@@ -114,12 +114,12 @@ std::string VktUtil::GetLayerName()
     {
         if (appBinaryType == OS_I386_ARCHITECTURE)
         {
-            layerNameA.append(GDT_DEBUG_SUFFIX);
+            layerNameA.append(AMDT_DEBUG_SUFFIX);
         }
         else if (appBinaryType == OS_X86_64_ARCHITECTURE)
         {
             layerNameA.append("-x64");
-            layerNameA.append(GDT_DEBUG_SUFFIX);
+            layerNameA.append(AMDT_DEBUG_SUFFIX);
         }
     }
 

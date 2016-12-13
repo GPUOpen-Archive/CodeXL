@@ -269,7 +269,7 @@ bool HSAGPAProfiler::Init(const Parameters& params, std::string& strErrorOut)
         // Enable all counters if no counter file is specified or counter file is empty.
         if (enabledCounters.empty())
         {
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
             // Internal mode must have a counter file specified.
             cout << "Please specify a counter file using -c. No counter is enabled." << endl;
             return false;
@@ -303,7 +303,7 @@ bool HSAGPAProfiler::Init(const Parameters& params, std::string& strErrorOut)
                 m_gpaUtils.SetEnabledCounters(enabledCounters);
             }
 
-#endif //GDT_INTERNAL
+#endif //AMDT_INTERNAL
         }
 
         for (CounterList::iterator it = enabledCounters.begin(); it != enabledCounters.end(); ++it)

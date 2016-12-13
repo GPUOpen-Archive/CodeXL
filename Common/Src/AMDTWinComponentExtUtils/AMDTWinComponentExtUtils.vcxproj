@@ -48,8 +48,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(AMDTOutputDir)$(Configuration)\bin\</OutDir>
-    <IntDir>$(AMDTOutputDir)$(Configuration)\obj\$(ProjectName)\$(Platform)$(GDTBuildSuffix)\</IntDir>
-    <TargetName>$(GDTProjectName)</TargetName>
+    <IntDir>$(AMDTOutputDir)$(Configuration)\obj\$(ProjectName)\$(Platform)$(AMDTBuildSuffix)\</IntDir>
+    <TargetName>$(AMDTProjectName)</TargetName>
     <IncludePath>$(IncludePath)</IncludePath>
     <ReferencePath>$(VCINSTALLDIR)vcpackages;$(VCInstallDir)atlmfc\lib;$(VCInstallDir)lib;$(WindowsSdkDir)UnionMetadata;$(LibraryPath);$(VC_ReferencesPath_x86)</ReferencePath>
     <GenerateManifest>true</GenerateManifest>
@@ -60,7 +60,7 @@
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <ReferencePath>$(VCINSTALLDIR)vcpackages;$(VCInstallDir)atlmfc\lib;$(VCInstallDir)lib;$(WindowsSdkDir)UnionMetadata;$(LibraryPath);$(VC_ReferencesPath_x86)</ReferencePath>
     <OutDir>$(AMDTOutputDir)$(Configuration)\bin\</OutDir>
-    <IntDir>$(AMDTOutputDir)$(Configuration)\obj\$(ProjectName)\$(Platform)$(GDTBuildSuffix)\</IntDir>
+    <IntDir>$(AMDTOutputDir)$(Configuration)\obj\$(ProjectName)\$(Platform)$(AMDTBuildSuffix)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

@@ -60,7 +60,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>winmm.lib;d3d11.lib;wsock32.lib;Ws2_32.lib;shlwapi.lib;comctl32.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)$(GDTProjectName).dll</OutputFile>
+      <OutputFile>$(OutDir)$(AMDTProjectName).dll</OutputFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -72,7 +72,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>dxguid.lib;winmm.lib;d3d11.lib;wsock32.lib;Ws2_32.lib;shlwapi.lib;comctl32.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)$(GDTProjectName).dll</OutputFile>
+      <OutputFile>$(OutDir)$(AMDTProjectName).dll</OutputFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -84,7 +84,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>dxguid.lib;winmm.lib;d3d11.lib;wsock32.lib;Ws2_32.lib;shlwapi.lib;comctl32.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)$(GDTProjectName).dll</OutputFile>
+      <OutputFile>$(OutDir)$(AMDTProjectName).dll</OutputFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -96,7 +96,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>dxguid.lib;winmm.lib;d3d11.lib;wsock32.lib;Ws2_32.lib;shlwapi.lib;comctl32.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)$(GDTProjectName).dll</OutputFile>
+      <OutputFile>$(OutDir)$(AMDTProjectName).dll</OutputFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>

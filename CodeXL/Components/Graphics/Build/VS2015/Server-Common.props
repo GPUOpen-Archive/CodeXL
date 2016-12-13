@@ -8,7 +8,7 @@
     <ConfigurationFolderName Condition="'$(Configuration)'=='Release_Static'">Release</ConfigurationFolderName>
     <!--MyBinDir-->
     <MyBinDir Condition="'$(SolutionName)'=='CodeXL-AllProjects'">$(SolutionDir)..\Output\$(ConfigurationFolderName)\bin\</MyBinDir>
-    <MyBinDir Condition="'$(SolutionName)'!='CodeXL-AllProjects'">$(SolutionDir)bin\$(ConfigurationFolderName)$(GDT_BUILD_SUFFIX)\</MyBinDir>
+    <MyBinDir Condition="'$(SolutionName)'!='CodeXL-AllProjects'">$(SolutionDir)bin\$(ConfigurationFolderName)$(AMDT_BUILD_SUFFIX)\</MyBinDir>
     <!--BaseDir-->
     <BaseDir Condition="'$(SolutionName)'=='CodeXL-AllProjects'">$(SolutionDir)..\..\</BaseDir>
     <BaseDir Condition="'$(SolutionName)'!='CodeXL-AllProjects'">$(SolutionDir)..\..\..\</BaseDir>
@@ -43,8 +43,8 @@
     <BuildMacro Include="UtilDir">
       <Value>$(UtilDir)</Value>
     </BuildMacro>
-    <BuildMacro Include="GDTCRT">
-      <Value>$(GDTCRT)</Value>
+    <BuildMacro Include="AMDTCRT">
+      <Value>$(AMDTCRT)</Value>
     </BuildMacro>
   </ItemGroup>
 </Project>

@@ -37,7 +37,7 @@
 #include <AMDTPowerProfileApi.h>
 
 // SVI2 is available only in internal and NDA version
-#if defined(GDT_INTERNAL) || defined(GDT_NDA)
+#if defined(AMDT_INTERNAL) || defined(AMDT_NDA)
     #define SVI2_COUNTERS_SUPPORTED
 #endif
 

@@ -16,9 +16,9 @@
 #include "timer.h"
 #include <vector>
 
-#if defined GDT_INTERNAL && defined _WIN32
+#if defined AMDT_INTERNAL && defined _WIN32
     #include "../InternalCommonSource/ThreadTracer.h"
-#endif // GDT_INTERNAL
+#endif // AMDT_INTERNAL
 
 /// Structure to hold draw call pairs
 typedef struct
@@ -136,7 +136,7 @@ private:
     //-----------------------------------------------------------------------------
     gtASCIIString GetStatsXML();
 
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
     //-----------------------------------------------------------------------------
     /// Get the shader CRC values as XML.
     /// \param rDrawCall the drawcall to capture XML description of, profile, and/or execute
@@ -221,17 +221,17 @@ private:
     /// \param message the message to log
     static void GPALoggingCallback(GPA_Logging_Type messageType, const char* message);
 
-#if defined GDT_INTERNAL && defined _WIN32
+#if defined AMDT_INTERNAL && defined _WIN32
     /// Callback function for GPA debug Logging.
     /// Routes GPA log messages to the PerfStudio log.
     /// \param messageType the type of logging message
     /// \param message the message to log
     static void GPALoggingDebugCallback(GPA_Log_Debug_Type messageType, const char* message);
-#endif // GDT_INTERNAL
+#endif // AMDT_INTERNAL
 
 private:
 
-#if defined GDT_INTERNAL && defined _WIN32
+#if defined AMDT_INTERNAL && defined _WIN32
     /// Handles all thread trace commands.
     ThreadTracer m_threadTracer;
 #endif

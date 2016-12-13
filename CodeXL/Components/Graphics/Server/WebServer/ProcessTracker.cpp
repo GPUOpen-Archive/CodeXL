@@ -111,10 +111,10 @@ gtASCIIString ProcessTracker::GetProcessesXML()
             static const char* pluginExtensions[] =
             {
 #ifdef WIN32
-                GDT_DEBUG_SUFFIX GDT_BUILD_SUFFIX "." DLL_EXTENSION,
-                "-x64" GDT_DEBUG_SUFFIX GDT_BUILD_SUFFIX "." DLL_EXTENSION
+                AMDT_DEBUG_SUFFIX AMDT_BUILD_SUFFIX "." DLL_EXTENSION,
+                "-x64" AMDT_DEBUG_SUFFIX AMDT_BUILD_SUFFIX "." DLL_EXTENSION
 #else
-                GDT_PROJECT_SUFFIX "." DLL_EXTENSION
+                AMDT_PROJECT_SUFFIX "." DLL_EXTENSION
 #endif
             };
 
@@ -399,17 +399,17 @@ void ProcessTracker::UpdateListOfInjectedProcesses()
     }
     else
     {
-        get_process_list(MICRODLLNAME GDT_DEBUG_SUFFIX GDT_BUILD_SUFFIX ".dll", localProcessInfoArray);
-        get_process_list(MICRODLLNAME "-x64" GDT_DEBUG_SUFFIX GDT_BUILD_SUFFIX ".dll", localProcessInfoArray);
+        get_process_list(MICRODLLNAME AMDT_DEBUG_SUFFIX AMDT_BUILD_SUFFIX ".dll", localProcessInfoArray);
+        get_process_list(MICRODLLNAME "-x64" AMDT_DEBUG_SUFFIX AMDT_BUILD_SUFFIX ".dll", localProcessInfoArray);
     }
 
 #else
     #ifdef CODEXL_GRAPHICS
-        get_process_list("libCXLGraphicsServerVulkan" GDT_PROJECT_SUFFIX ".so", localProcessInfoArray);
+        get_process_list("libCXLGraphicsServerVulkan" AMDT_PROJECT_SUFFIX ".so", localProcessInfoArray);
     #else
-        get_process_list("GLServer" GDT_PROJECT_SUFFIX ".so", localProcessInfoArray);
-        get_process_list("GLESServer" GDT_PROJECT_SUFFIX ".so", localProcessInfoArray);
-        get_process_list("VulkanServer" GDT_PROJECT_SUFFIX ".so", localProcessInfoArray);
+        get_process_list("GLServer" AMDT_PROJECT_SUFFIX ".so", localProcessInfoArray);
+        get_process_list("GLESServer" AMDT_PROJECT_SUFFIX ".so", localProcessInfoArray);
+        get_process_list("VulkanServer" AMDT_PROJECT_SUFFIX ".so", localProcessInfoArray);
     #endif
 #endif
 
@@ -704,7 +704,7 @@ PROCESS_INFORMATION ProcessTracker::LaunchAppInNewProcess(gtASCIIString strApp, 
         // can only launch 64 bit applications
         if (binaryType != OS_X86_64_ARCHITECTURE)
         {
-            sprintf_s(microDLLPath, PS_MAX_PATH, "%s" MICRODLLNAME "%s%s.dll", SG_GET_PATH(ServerPath), GDT_DEBUG_SUFFIX, GDT_BUILD_SUFFIX);
+            sprintf_s(microDLLPath, PS_MAX_PATH, "%s" MICRODLLNAME "%s%s.dll", SG_GET_PATH(ServerPath), AMDT_DEBUG_SUFFIX, AMDT_BUILD_SUFFIX);
             succeeded = AMDT::CreateProcessAndInjectDll(strApp.asCharArray(), (LPSTR)strCmdLine.asCharArray(),
                                                         NULL, NULL, TRUE, dwFlags, NULL,
                                                         strDir.asCharArray(),
@@ -716,7 +716,7 @@ PROCESS_INFORMATION ProcessTracker::LaunchAppInNewProcess(gtASCIIString strApp, 
 
         if (binaryType != OS_I386_ARCHITECTURE)
         {
-            sprintf_s(microDLLPath, PS_MAX_PATH, "%s" MICRODLLNAME "-x64%s%s.dll", SG_GET_PATH(ServerPath), GDT_DEBUG_SUFFIX, GDT_BUILD_SUFFIX);
+            sprintf_s(microDLLPath, PS_MAX_PATH, "%s" MICRODLLNAME "-x64%s%s.dll", SG_GET_PATH(ServerPath), AMDT_DEBUG_SUFFIX, AMDT_BUILD_SUFFIX);
             succeeded = AMDT::CreateProcessAndInjectDll(strApp.asCharArray(), (LPSTR)strCmdLine.asCharArray(),
                                                         NULL, NULL, TRUE, dwFlags, NULL,
                                                         strDir.asCharArray(),
@@ -1128,9 +1128,9 @@ bool ProcessTracker::PassRequestToPlugin(const char* strDestination,
 void ProcessTracker::SetupVulkanEnvVariables()
 {
 #ifdef CODEXL_GRAPHICS
-    gtASCIIString layerNameA = "libCXLGraphicsServerVulkan" GDT_PROJECT_SUFFIX;
+    gtASCIIString layerNameA = "libCXLGraphicsServerVulkan" AMDT_PROJECT_SUFFIX;
 #else
-    gtASCIIString layerNameA = "VulkanServer" GDT_PROJECT_SUFFIX;
+    gtASCIIString layerNameA = "VulkanServer" AMDT_PROJECT_SUFFIX;
 #endif
 
     gtString layerName;
@@ -1203,7 +1203,7 @@ bool ProcessTracker::PrelaunchEnvironmentInitialization()
     const char* strServerPath;
     strServerPath = SG_GET_PATH(ServerPath);
     char ext[PS_MAX_PATH];
-    sprintf_s(ext, PS_MAX_PATH, "%s.so", GDT_PROJECT_SUFFIX);
+    sprintf_s(ext, PS_MAX_PATH, "%s.so", AMDT_PROJECT_SUFFIX);
     if (strcasecmp("Vulkan", m_injectedAppPluginName.c_str()) != 0)
     {
         char strLdPreload[PS_MAX_PATH];

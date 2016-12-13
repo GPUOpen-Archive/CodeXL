@@ -60,28 +60,28 @@
     <Import Project="$(CommonDir)\Lib\Ext\Windows-Kits\Global-WindowsSDK.props" />
   </ImportGroup>
   <PropertyGroup>
-    <TargetName>CodeXLAnalyzer$(GDTProjectSuffix)</TargetName>
+    <TargetName>CodeXLAnalyzer$(AMDTProjectSuffix)</TargetName>
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Static|Win32'">
-    <OutDir>$(SolutionDir)bin\Debug$(GDTBuildSuffix)\</OutDir>
-    <TargetName>GPUPerfStudioAnalyzer$(GDTProjectSuffix)</TargetName>
-    <IntDir>$(SolutionDir)obj\$(Configuration)-$(Platform)$(GDTBuildSuffix)\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)bin\Debug$(AMDTBuildSuffix)\</OutDir>
+    <TargetName>GPUPerfStudioAnalyzer$(AMDTProjectSuffix)</TargetName>
+    <IntDir>$(SolutionDir)obj\$(Configuration)-$(Platform)$(AMDTBuildSuffix)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Static|x64'">
-    <TargetName>GPUPerfStudioAnalyzer$(GDTProjectSuffix)</TargetName>
-    <IntDir>$(SolutionDir)obj\$(Configuration)-$(Platform)$(GDTBuildSuffix)\$(ProjectName)\</IntDir>
-    <OutDir>$(SolutionDir)bin\Debug$(GDTBuildSuffix)\</OutDir>
+    <TargetName>GPUPerfStudioAnalyzer$(AMDTProjectSuffix)</TargetName>
+    <IntDir>$(SolutionDir)obj\$(Configuration)-$(Platform)$(AMDTBuildSuffix)\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)bin\Debug$(AMDTBuildSuffix)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Static|Win32'">
-    <OutDir>$(SolutionDir)bin\Release$(GDTBuildSuffix)\</OutDir>
-    <TargetName>GPUPerfStudioAnalyzer$(GDTProjectSuffix)</TargetName>
-    <IntDir>$(SolutionDir)obj\$(Configuration)-$(Platform)$(GDTBuildSuffix)\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)bin\Release$(AMDTBuildSuffix)\</OutDir>
+    <TargetName>GPUPerfStudioAnalyzer$(AMDTProjectSuffix)</TargetName>
+    <IntDir>$(SolutionDir)obj\$(Configuration)-$(Platform)$(AMDTBuildSuffix)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Static|x64'">
-    <TargetName>GPUPerfStudioAnalyzer$(GDTProjectSuffix)</TargetName>
-    <IntDir>$(SolutionDir)obj\$(Configuration)-$(Platform)$(GDTBuildSuffix)\$(ProjectName)\</IntDir>
-    <OutDir>$(SolutionDir)bin\Release$(GDTBuildSuffix)\</OutDir>
+    <TargetName>GPUPerfStudioAnalyzer$(AMDTProjectSuffix)</TargetName>
+    <IntDir>$(SolutionDir)obj\$(Configuration)-$(Platform)$(AMDTBuildSuffix)\$(ProjectName)\</IntDir>
+    <OutDir>$(SolutionDir)bin\Release$(AMDTBuildSuffix)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
@@ -122,7 +122,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="$(CommonDir)\Src\DeviceInfo\DeviceInfoInternal.cpp">
-      <ExcludedFromBuild Condition="'$(GDT_BUILD)'!='GDT_INTERNAL'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(AMDT_BUILD)'!='AMDT_INTERNAL'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="$(CommonDir)\Src\DeviceInfo\DeviceInfoUtils.cpp" />
     <ClCompile Include="src\kcCLICommanderCL.cpp" />

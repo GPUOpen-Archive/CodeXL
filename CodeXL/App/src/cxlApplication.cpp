@@ -64,12 +64,12 @@ int main(int argc, char* argv[])
     codexlStartupData.m_dllNamesForLoad.push_back(L"libCXLAnalyzer");
     codexlStartupData.m_dllNamesForLoad.push_back(L"libCXLPowerProfiling");
 #else
-    codexlStartupData.m_dllNamesForLoad.push_back(L"CXLGpuDebugging"     GDT_PROJECT_SUFFIX_W);
-    codexlStartupData.m_dllNamesForLoad.push_back(L"CXLSharedProfiling"  GDT_PROJECT_SUFFIX_W);
-    codexlStartupData.m_dllNamesForLoad.push_back(L"CXLCpuProfiling"     GDT_PROJECT_SUFFIX_W);
-    codexlStartupData.m_dllNamesForLoad.push_back(L"CXLGpuProfiling"     GDT_PROJECT_SUFFIX_W);
-    codexlStartupData.m_dllNamesForLoad.push_back(L"CXLAnalyzer"         GDT_PROJECT_SUFFIX_W);
-    codexlStartupData.m_dllNamesForLoad.push_back(L"CXLPowerProfiling"   GDT_PROJECT_SUFFIX_W);
+    codexlStartupData.m_dllNamesForLoad.push_back(L"CXLGpuDebugging"     AMDT_PROJECT_SUFFIX_W);
+    codexlStartupData.m_dllNamesForLoad.push_back(L"CXLSharedProfiling"  AMDT_PROJECT_SUFFIX_W);
+    codexlStartupData.m_dllNamesForLoad.push_back(L"CXLCpuProfiling"     AMDT_PROJECT_SUFFIX_W);
+    codexlStartupData.m_dllNamesForLoad.push_back(L"CXLGpuProfiling"     AMDT_PROJECT_SUFFIX_W);
+    codexlStartupData.m_dllNamesForLoad.push_back(L"CXLAnalyzer"         AMDT_PROJECT_SUFFIX_W);
+    codexlStartupData.m_dllNamesForLoad.push_back(L"CXLPowerProfiling"   AMDT_PROJECT_SUFFIX_W);
 #endif
 
 

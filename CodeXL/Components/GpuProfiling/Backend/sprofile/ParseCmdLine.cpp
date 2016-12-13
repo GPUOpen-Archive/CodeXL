@@ -135,11 +135,11 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
         ("occupancy,O", "Generate kernel occupancy information for each OpenCL kernel dispatched by the application.")
         ("occupancydisplay,P", po::value<string>(), "Path to configuration file to use to generate an occupancy display file.  The occupancy display file to generate should be specified with --outputfile.")
         ("tracesummary,T", "Generate summary pages from an input .atp file.")
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
         ("subkernel,S", "Sub-kernel profiling.")
         ("gmtrace", "Global memory access trace.")
 #endif
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
         ("threadtrace,H", "Generate thread trace.")
 #endif
         ;
@@ -174,7 +174,7 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
          "  asm:   output DirectCompute shader ASM files\n"
 #endif
          "  all:   output all files")
-#ifndef GDT_INTERNAL
+#ifndef AMDT_INTERNAL
         ("kernellistfile,K", po::value<string>(), "Path to the kernel list file which contains a case-sensitive list of kernels to profile. If not provided, all kernels will be profiled.")
 #endif
         ("outputseparator,s", po::value<char>(), "Character used to separate fields in the OutputFile.")
@@ -189,7 +189,7 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
         ("atpfile,a", po::value<string>(), "Path to the .atp file from which to generate summary pages. Optional when performing an API trace. Required if --tracesummary is specified when not performing an API trace.")
         ("apirulesfile,R", po::value<string>(), "Path to OpenCL API analyzer configuration file. If not specified, all rules are enabled.");
 
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
         po::options_description subkernelOrPerfCounterProfilingOpt("Performance Counter mode or Sub-kernel Profiling mode options (for --subkernel or --gmtrace)");
         subkernelOrPerfCounterProfilingOpt.add_options()
         ("kernellistfile,K", po::value<string>(), "Path to the kernel list file which contains a case-sensitive list of kernels to profile. If not provided, all kernels will be profiled.");
@@ -212,7 +212,7 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
         po::options_description cmdline_options;
         cmdline_options.add(genericOpt).add(profileModeOpt).add(apiTraceOpt).add(perfCounterOpt).add(traceSummaryOpt).add(hiddenOpt);
 
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
         cmdline_options.add(subkernelOrPerfCounterProfilingOpt);
 #endif
 
@@ -839,7 +839,7 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
             bool bModeSpecificHelp = configOut.bTrace || configOut.bHSATrace ||
                                      configOut.bPerfCounter || configOut.bHSAPMC ||
                                      configOut.bAnalyze
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
                                      || configOut.bSubKernelProfile || configOut.bGMTrace
 #endif
                                      ;
@@ -863,7 +863,7 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
             if (configOut.bPerfCounter || configOut.bHSAPMC)
             {
                 cout << perfCounterOpt << endl << endl;
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
                 cout << subkernelOrPerfCounterProfilingOpt << endl << endl;
 #endif
             }
@@ -873,7 +873,7 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
                 cout << traceSummaryOpt << endl << endl;
             }
 
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
 
             if (configOut.bSubKernelProfile || configOut.bGMTrace)
             {
@@ -889,7 +889,7 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
 
         if (unicodeOptionsMap.count("numberofpass") > 0)
         {
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
 
             if (configOut.counterFileList.empty())
             {
@@ -946,7 +946,7 @@ bool ParseCmdLine(int argc, wchar_t* argv[], Config& configOut)
                      << profileModeOpt << endl << endl
                      << apiTraceOpt << endl << endl
                      << perfCounterOpt << endl << endl
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
                      << subkernelOrPerfCounterProfilingOpt << endl << endl
 #endif
                      << traceSummaryOpt << endl << endl;

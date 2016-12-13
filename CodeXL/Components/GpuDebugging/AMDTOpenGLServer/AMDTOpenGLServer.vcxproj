@@ -42,7 +42,7 @@
   </ImportGroup>
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir>$(OutDir)spies$(GDTPlatformSuffixNumBitsOnly)$(GDTBuildSuffix)\</OutDir>
+    <OutDir>$(OutDir)spies$(AMDTPlatformSuffixNumBitsOnly)$(AMDTBuildSuffix)\</OutDir>
     <TargetName>opengl32</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup>
@@ -52,8 +52,8 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>ddraw.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary>$(AMDTOutputDir)$(Configuration)\arch\spies$(GDTPlatformSuffixNumBitsOnly)$(GDTBuildSuffix)\$(TargetName).lib</ImportLibrary>
-      <AdditionalLibraryDirectories>$(AMDTCommonExt)MicrosoftDirectX_SDK\March2009\lib\$(GDTPlatform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ImportLibrary>$(AMDTOutputDir)$(Configuration)\arch\spies$(AMDTPlatformSuffixNumBitsOnly)$(AMDTBuildSuffix)\$(TargetName).lib</ImportLibrary>
+      <AdditionalLibraryDirectories>$(AMDTCommonExt)MicrosoftDirectX_SDK\March2009\lib\$(AMDTPlatform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ModuleDefinitionFile>.\WindowsResources\AMDTOpenGLServer.def</ModuleDefinitionFile>
     </Link>
   </ItemDefinitionGroup>

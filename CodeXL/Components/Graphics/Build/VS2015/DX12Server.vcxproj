@@ -64,8 +64,8 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>d3d12.lib;d3dcompiler.lib;wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)$(GDTProjectName).dll</OutputFile>
-      <DelayLoadDLLs>PerformanceExperimentFile$(GDTPlatformSuffix)$(GDTBuildSuffix).dll;GPUThreadTrace$(GDTPlatformSuffix)$(GDTBuildSuffix).dll</DelayLoadDLLs>
+      <OutputFile>$(OutDir)$(AMDTProjectName).dll</OutputFile>
+      <DelayLoadDLLs>PerformanceExperimentFile$(AMDTPlatformSuffix)$(AMDTBuildSuffix).dll;GPUThreadTrace$(AMDTPlatformSuffix)$(AMDTBuildSuffix).dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -75,8 +75,8 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>d3d12.lib;d3dcompiler.lib;wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)$(GDTProjectName).dll</OutputFile>
-      <DelayLoadDLLs>PerformanceExperimentFile$(GDTPlatformSuffix)$(GDTBuildSuffix).dll;GPUThreadTrace$(GDTPlatformSuffix)$(GDTBuildSuffix).dll</DelayLoadDLLs>
+      <OutputFile>$(OutDir)$(AMDTProjectName).dll</OutputFile>
+      <DelayLoadDLLs>PerformanceExperimentFile$(AMDTPlatformSuffix)$(AMDTBuildSuffix).dll;GPUThreadTrace$(AMDTPlatformSuffix)$(AMDTBuildSuffix).dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -86,8 +86,8 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>d3d12.lib;d3dcompiler.lib;wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)$(GDTProjectName).dll</OutputFile>
-      <DelayLoadDLLs>PerformanceExperimentFile$(GDTPlatformSuffix)$(GDTBuildSuffix).dll;GPUThreadTrace$(GDTPlatformSuffix)$(GDTBuildSuffix).dll</DelayLoadDLLs>
+      <OutputFile>$(OutDir)$(AMDTProjectName).dll</OutputFile>
+      <DelayLoadDLLs>PerformanceExperimentFile$(AMDTPlatformSuffix)$(AMDTBuildSuffix).dll;GPUThreadTrace$(AMDTPlatformSuffix)$(AMDTBuildSuffix).dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -97,8 +97,8 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>d3d12.lib;d3dcompiler.lib;wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)$(GDTProjectName).dll</OutputFile>
-      <DelayLoadDLLs>PerformanceExperimentFile$(GDTPlatformSuffix)$(GDTBuildSuffix).dll;GPUThreadTrace$(GDTPlatformSuffix)$(GDTBuildSuffix).dll</DelayLoadDLLs>
+      <OutputFile>$(OutDir)$(AMDTProjectName).dll</OutputFile>
+      <DelayLoadDLLs>PerformanceExperimentFile$(AMDTPlatformSuffix)$(AMDTBuildSuffix).dll;GPUThreadTrace$(AMDTPlatformSuffix)$(AMDTBuildSuffix).dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

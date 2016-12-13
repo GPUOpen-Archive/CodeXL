@@ -51,7 +51,7 @@ FrameProfiler::FrameProfiler()
       m_profileRetries(0)
 {
 
-#if defined GDT_INTERNAL && defined _WIN32
+#if defined AMDT_INTERNAL && defined _WIN32
     AddProcessor("ThreadTrace", "Thread Trace", "TT", "", DISPLAY, m_threadTracer);
 #endif
 
@@ -113,7 +113,7 @@ void FrameProfiler::OnDrawCall(IDrawCall& rDrawCall)
         return;
     }
 
-#if defined GDT_INTERNAL && defined _WIN32
+#if defined AMDT_INTERNAL && defined _WIN32
     m_threadTracer.MidTrace(m_ulDrawCallCounter);
 #endif
 
@@ -165,9 +165,9 @@ void FrameProfiler::OnDrawCall_Profile(IDrawCall& rDrawCall)
     if (m_currentPass == 1)
     {
         gtASCIIString xmlString = rDrawCall.GetXML();
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
         GetShaderCRC(rDrawCall, xmlString);
-#endif //GDT_INTERNAL
+#endif //AMDT_INTERNAL
         xmlString += XML("hash", rDrawCall.GetHash().asCharArray());
         m_profilerDrawCalls += GetDrawCallXML(m_ulDrawCallCounter, xmlString.asCharArray()).asCharArray();
     }
@@ -204,9 +204,9 @@ void FrameProfiler::OnDrawCall_ProfileRange(IDrawCall& rDrawCall)
             {
                 DrawCallPair pair1 = *(m_ProfileRangeDrawCallPairs.begin());
                 gtASCIIString xmlString = rDrawCall.GetXML();
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
                 GetShaderCRC(rDrawCall, xmlString);
-#endif //GDT_INTERNAL
+#endif //AMDT_INTERNAL
                 xmlString += XML("hash", rDrawCall.GetHash().asCharArray());
                 m_profilerDrawCalls += GetDrawCallXML(pair1.startCall, xmlString.asCharArray()).asCharArray();
             }
@@ -277,9 +277,9 @@ void FrameProfiler::OnDrawCallEnd(IDrawCall& rDrawCall)
         if (m_currentPass == 1)
         {
             gtASCIIString xmlString = rDrawCall.GetXML();
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
             GetShaderCRC(rDrawCall, xmlString);
-#endif //GDT_INTERNAL
+#endif //AMDT_INTERNAL
             xmlString += XML("hash", rDrawCall.GetHash().asCharArray());
             m_profilerDrawCalls += GetDrawCallXML(m_ulDrawCallCounter, xmlString.asCharArray()).asCharArray();
         }
@@ -296,9 +296,9 @@ void FrameProfiler::OnDrawCallEnd(IDrawCall& rDrawCall)
             if (m_currentPass == 1)
             {
                 gtASCIIString xmlString = rDrawCall.GetXML();
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
                 GetShaderCRC(rDrawCall, xmlString);
-#endif //GDT_INTERNAL
+#endif //AMDT_INTERNAL
                 xmlString += XML("hash", rDrawCall.GetHash().asCharArray());
                 m_profilerDrawCalls += GetDrawCallXML(m_ulDrawCallCounter, xmlString.asCharArray()).asCharArray();
             }
@@ -320,9 +320,9 @@ void FrameProfiler::OnDrawCallEnd(IDrawCall& rDrawCall)
             {
                 DrawCallPair pair1 = *(m_ProfileRangeDrawCallPairs.begin());
                 gtASCIIString xmlString = rDrawCall.GetXML();
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
                 GetShaderCRC(rDrawCall, xmlString);
-#endif //GDT_INTERNAL
+#endif //AMDT_INTERNAL
                 xmlString += XML("hash", rDrawCall.GetHash().asCharArray());
                 m_profilerDrawCalls += GetDrawCallXML(pair1.startCall, xmlString.asCharArray()).asCharArray();
             }
@@ -359,14 +359,14 @@ bool FrameProfiler::LoadProfilerDLL(GPA_API_Type api)
         Log(logERROR, "Failed to register profiler logging callback.");
     }
 
-#if defined GDT_INTERNAL && defined _WIN32
+#if defined AMDT_INTERNAL && defined _WIN32
 
     if (m_GPALoader.GPA_RegisterLoggingDebugCallback(GPA_LOG_DEBUG_MESSAGE, (GPA_LoggingDebugCallbackPtrType)&FrameProfiler::GPALoggingDebugCallback) != GPA_STATUS_OK)
     {
         Log(logERROR, "Failed to register profiler debug logging callback.");
     }
 
-#endif // GDT_INTERNAL
+#endif // AMDT_INTERNAL
 
     return true;
 }
@@ -898,7 +898,7 @@ void FrameProfiler::UpdateProfiler(uint32 totalDrawCallCount, bool timePasses)
             if (m_currentPass == 1)
             {
 
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
                 // first pass, need to start sampling
                 m_GPALoader.GPA_InternalSetDrawCallCounts(m_ulDrawCallsInPrevFrame);
 #endif
@@ -1119,7 +1119,7 @@ void FrameProfiler::CounterMeasureFail(const char* error)
 //-----------------------------------------------------------------------------
 void FrameProfiler::BeginFrame()
 {
-#if defined GDT_INTERNAL && defined _WIN32
+#if defined AMDT_INTERNAL && defined _WIN32
     m_threadTracer.Initialize(GetProfilerDevicePtr(), GetProfilerConfigLabel().asCharArray());
     m_threadTracer.BeginTrace();
 #endif
@@ -1370,7 +1370,7 @@ void FrameProfiler::BeginFrame()
         // deal with start/end timing, set up counters
         uint32 currentSessionID = 0;
 
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
         m_GPALoader.GPA_InternalSetDrawCallCounts(m_ulDrawCallsInPrevFrame);
 #endif
 
@@ -1402,7 +1402,7 @@ void FrameProfiler::BeginFrame()
 //-----------------------------------------------------------------------------
 void FrameProfiler::EndFrame()
 {
-#if defined GDT_INTERNAL && defined _WIN32
+#if defined AMDT_INTERNAL && defined _WIN32
     m_threadTracer.EndTrace();
     m_threadTracer.SendResults();
 #endif
@@ -2309,7 +2309,7 @@ void FrameProfiler::GPALoggingCallback(GPA_Logging_Type messageType, const char*
 }
 
 //-----------------------------------------------------------------------------
-#if defined GDT_INTERNAL && defined _WIN32
+#if defined AMDT_INTERNAL && defined _WIN32
 void FrameProfiler::GPALoggingDebugCallback(GPA_Log_Debug_Type messageType, const char* message)
 {
     if (messageType == GPA_LOG_DEBUG_ERROR)
@@ -2330,9 +2330,9 @@ void FrameProfiler::GPALoggingDebugCallback(GPA_Log_Debug_Type messageType, cons
         Log(logMESSAGE, "GPA: %s\n", message);
     }
 }
-#endif // GDT_INTERNAL
+#endif // AMDT_INTERNAL
 
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
 void FrameProfiler::GetShaderCRC(IDrawCall& rDrawCall, gtASCIIString& ioXMLString)
 {
     // get the CRC's for the various shaders
@@ -2355,4 +2355,4 @@ void FrameProfiler::GetShaderCRC(IDrawCall& rDrawCall, gtASCIIString& ioXMLStrin
     ioXMLString += XML("pscrc", hexCode.asCharArray());
 }
 
-#endif // GDT_INTERNAL
+#endif // AMDT_INTERNAL

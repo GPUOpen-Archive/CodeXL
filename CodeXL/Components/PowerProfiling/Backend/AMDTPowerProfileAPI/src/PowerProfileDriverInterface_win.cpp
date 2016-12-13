@@ -39,9 +39,9 @@ AMDTUInt8* g_pSharedBuffer = nullptr;
 #define POWER_DRIVER_IN_OUT InvokeInOut
 
 #if defined(WIN64)
-    #define CODEXL_PPLIB_NAME  L"CXLPowerProfileAPI-x64"        GDT_DEBUG_SUFFIX_W  GDT_BUILD_SUFFIX_W
+    #define CODEXL_PPLIB_NAME  L"CXLPowerProfileAPI-x64"        AMDT_DEBUG_SUFFIX_W  AMDT_BUILD_SUFFIX_W
 #else
-    #define CODEXL_PPLIB_NAME  L"CXLPowerProfileAPI"    GDT_DEBUG_SUFFIX_W  GDT_BUILD_SUFFIX_W
+    #define CODEXL_PPLIB_NAME  L"CXLPowerProfileAPI"    AMDT_DEBUG_SUFFIX_W  AMDT_BUILD_SUFFIX_W
 #endif
 
 static HANDLE g_powerDrvHld = INVALID_HANDLE_VALUE;

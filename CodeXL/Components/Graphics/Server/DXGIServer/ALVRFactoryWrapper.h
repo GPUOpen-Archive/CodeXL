@@ -64,7 +64,7 @@ public:
         // Start talking to the DX11 Server
         HMODULE hDX11Module = NULL;
         // Get the DX11Server dll
-        GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN, "DX11Server" GDT_PROJECT_SUFFIX ".dll", &hDX11Module);
+        GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN, "DX11Server" AMDT_PROJECT_SUFFIX ".dll", &hDX11Module);
 
         // Wrap the device
         WrapALVRDeviceExD3D11_type pWrapALVRDeviceExD3D1 = (WrapALVRDeviceExD3D11_type)GetProcAddress(hDX11Module, "WrapALVRDeviceExD3D11");
@@ -94,7 +94,7 @@ public:
         // Start talking to the DX11 Server
         HMODULE hDX11Module = NULL;
         // Get the DX11Server dll
-        GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN, "DX11Server" GDT_PROJECT_SUFFIX ".dll", &hDX11Module);
+        GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN, "DX11Server" AMDT_PROJECT_SUFFIX ".dll", &hDX11Module);
 
         // Wrap the compute context
         WrapALVRComputeContext_type pWrapComputeContext = (WrapALVRComputeContext_type)GetProcAddress(hDX11Module, "WrapALVRComputeContext");

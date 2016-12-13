@@ -82,7 +82,7 @@
 // Remote process debugger:
 #define PD_STR_remoteProcessDebuggerSharedMemoryObject L"AMDTPDSharedMemObj"
 #define PD_STR_remoteProcessDebuggerEventsSharedMemoryObject L"AMDTPDEventsSharedMemObj"
-#define PD_STR_remoteDebuggingServer64ExecutableFileName L"CXLRemoteDebuggingServer-x64" GDT_DEBUG_SUFFIX_W GDT_BUILD_SUFFIX_W
+#define PD_STR_remoteDebuggingServer64ExecutableFileName L"CXLRemoteDebuggingServer-x64" AMDT_DEBUG_SUFFIX_W AMDT_BUILD_SUFFIX_W
 
 // ProcessDebuggerESLauncher (iPhone launcher):
 #if AMDT_BUILD_CONFIGURATION == AMDT_DEBUG_BUILD

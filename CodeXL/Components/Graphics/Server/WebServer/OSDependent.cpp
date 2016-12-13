@@ -490,14 +490,14 @@ static bool CollectWrapperInfo()
                     gtASCIIString strPath(s_LibPath);
 
 #ifdef _WIN32
-                    // strip GDT_PROJECT_SUFFIX from the filename to determine
+                    // strip AMDT_PROJECT_SUFFIX from the filename to determine
                     // the root of the plugin name
                     gtASCIIString pluginName(findData.cFileName);
                     int pos;
 
-                    if (strlen(GDT_PROJECT_SUFFIX) > 0)
+                    if (strlen(AMDT_PROJECT_SUFFIX) > 0)
                     {
-                        pos = pluginName.find(GDT_PROJECT_SUFFIX);
+                        pos = pluginName.find(AMDT_PROJECT_SUFFIX);
                     }
                     else
                     {
@@ -517,9 +517,9 @@ static bool CollectWrapperInfo()
                     gtASCIIString pluginName(pFile->d_name);
                     int pos;
 
-                    if (strlen(GDT_PROJECT_SUFFIX) > 0)
+                    if (strlen(AMDT_PROJECT_SUFFIX) > 0)
                     {
-                        pos = pluginName.find(GDT_PROJECT_SUFFIX);
+                        pos = pluginName.find(AMDT_PROJECT_SUFFIX);
                     }
                     else
                     {
@@ -606,7 +606,7 @@ static bool CollectWrapperInfo()
 
             if (SG_GET_BOOL(OptionDllReplacement) == false)
             {
-                strPluginName += GDT_PROJECT_SUFFIX "." DLL_EXTENSION;
+                strPluginName += AMDT_PROJECT_SUFFIX "." DLL_EXTENSION;
             }
 
             LogConsole(logMESSAGE, "   %s\t%s\t%s\n", strPluginName.asCharArray(), w->second.strPluginVersion.asCharArray(), w->second.strPluginShortDesc.asCharArray());
@@ -625,7 +625,7 @@ static bool CollectWrapperInfo()
 
             if (SG_GET_BOOL(OptionDllReplacement) == false)
             {
-                strPluginName += GDT_PROJECT_SUFFIX "." DLL_EXTENSION;
+                strPluginName += AMDT_PROJECT_SUFFIX "." DLL_EXTENSION;
             }
 
             LogConsole(logMESSAGE, "%s\t%s\t%s\n", strPluginName.asCharArray(), s_pluginArray[p].strPluginVersion.asCharArray(), s_pluginArray[p].strPluginShortDesc.asCharArray());
@@ -689,7 +689,7 @@ void DoWrappersCommand(CommunicationID requestID, NetSocket* pClientSocket)
     for (WrapperMap::const_iterator iter = s_wrapperMap.begin(); iter != s_wrapperMap.end(); ++iter)
     {
         gtASCIIString strPluginName = iter->second.strPluginName;
-        strPluginName += GDT_PROJECT_SUFFIX "." DLL_EXTENSION;
+        strPluginName += AMDT_PROJECT_SUFFIX "." DLL_EXTENSION;
         gtASCIIString tmpString = XML("name", XMLEscape(strPluginName).asCharArray());
         tmpString += XML("API", XMLEscape(iter->second.strPluginShortDesc).asCharArray());
         tmpString += XML("Description", XMLEscape(iter->second.strPluginLongDesc).asCharArray());
@@ -791,7 +791,7 @@ static bool OSDependentGlobalsInitialization()
 
 #ifdef _WIN32
     pathString = s_LibPath;
-    pathString += MICRODLLNAME GDT_PROJECT_SUFFIX ".dll";
+    pathString += MICRODLLNAME AMDT_PROJECT_SUFFIX ".dll";
     SG_SET_PATH(MicroDLLPath, pathString.asCharArray());
 #endif
 
@@ -2044,14 +2044,14 @@ void DetectConflictingProcesses()
 
     LogHeader();
 
-#if defined (_LINUX) || defined (GDT_INTERNAL)
+#if defined (_LINUX) || defined (AMDT_INTERNAL)
     int serverFlags = 0;
 #endif
 
 #ifdef _DEBUG
     LogConsole(logMESSAGE, "This is a debug build\n");
 #endif
-#if defined GDT_INTERNAL
+#if defined AMDT_INTERNAL
     LogConsole(logMESSAGE, "This is an internal build\n");
     serverFlags |= FLAG_BUILD_INTERNAL;
 #endif

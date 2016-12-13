@@ -79,7 +79,7 @@ void GPAUtils::FilterNonComputeCounters(GPA_HW_GENERATION gen, CounterList& coun
     {
         string strCounterName = *it;
 
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
 
         // check for internal counters (all counters with an underscore)
         if (strCounterName.find("_") != string::npos)
@@ -146,7 +146,7 @@ bool GPAUtils::EnableCounters()
 
     if (m_selectedCounters.size() == 0)
     {
-#ifndef GDT_INTERNAL
+#ifndef AMDT_INTERNAL
         // enable all counters
         return m_GPALoader.GPA_EnableAllCounters() == GPA_STATUS_OK;
 #else

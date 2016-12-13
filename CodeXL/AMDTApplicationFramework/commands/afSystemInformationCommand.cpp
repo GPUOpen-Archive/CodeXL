@@ -1352,7 +1352,7 @@ bool afSystemInformationCommand::CollectOpenCLDevicesInformation(gtList< gtList 
         }
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-        fileName.append(GDT_DEBUG_SUFFIX_W GDT_BUILD_SUFFIX_W);
+        fileName.append(AMDT_DEBUG_SUFFIX_W AMDT_BUILD_SUFFIX_W);
         filePath.setFileExtension(AF_STR_exeFileExtension);
 #endif
 

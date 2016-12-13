@@ -506,7 +506,7 @@ int ProfileApplication(const std::string& strCounterFile, const int& profilerBit
     params.m_uiForcedGpuIndex = config.uiForcedGpuIndex;
     params.m_bAqlPacketTracing = config.bAqlPacketTracing;
 
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
 
     if ((params.m_bPerfCounter || params.m_bHSAPMC) && params.m_strCounterFile.empty())
     {

@@ -28,7 +28,7 @@
     #include <CpuProfilingTranslationDLLBuild.h>
 #endif
 
-#if (defined (GDT_INTERNAL) || defined(GDT_NDA))
+#if (defined (AMDT_INTERNAL) || defined(AMDT_NDA))
     #include <AMDTPowerProfileSmu9Api-Internal.h>
 #endif
 

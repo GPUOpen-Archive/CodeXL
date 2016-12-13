@@ -62,10 +62,10 @@
     <Link>
       <AdditionalOptions>/MACHINE:I386</AdditionalOptions>
       <AdditionalLibraryDirectories>$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vsguids.lib;ad2de.lib;dbgmetric.lib;Version.lib;msvcrt$(GDTDebugSuffixNoDash).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>vsguids.lib;ad2de.lib;dbgmetric.lib;Version.lib;msvcrt$(AMDTDebugSuffixNoDash).lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\res\CodeXLVSPackage.def</ModuleDefinitionFile>
       <EntryPointSymbol>_DllMainCRTStartup@12</EntryPointSymbol>
-      <IgnoreSpecificDefaultLibraries>LIBCMT$(GDTDebugSuffixNoDash).lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMT$(AMDTDebugSuffixNoDash).lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">

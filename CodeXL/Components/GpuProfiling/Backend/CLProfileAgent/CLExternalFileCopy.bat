@@ -1,7 +1,7 @@
 : %1 = path to the GPUPerfAPI directory ($(CommonDir)\GPUPerfAPI\2_3)
-: %2 = GDTBuildSuffix
-: %3 = GDTPlatform
-: %4 = GDTPlatformSuffix
+: %2 = AMDTBuildSuffix
+: %3 = AMDTPlatform
+: %4 = AMDTPlatformSuffix
 : %5 = Destination directory for build
 : %6 = Optional Destination directory for build
 : %7 = Optional Destination directory for build

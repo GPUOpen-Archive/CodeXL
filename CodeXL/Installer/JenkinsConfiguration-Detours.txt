@@ -242,8 +242,8 @@ Release
     SYSTEM "[CXLPATH]\Installer\VersionPatch.bat [CXLPATH]\Installer\VersionPatch.ps1 [ROOTPATH] [MAJOR].[MINOR].[BUILD].[UPDATE] Public"
 
 ReleaseInternal
-    SetEnv "GDT_BUILD"        "GDT_INTERNAL"
-    SetEnv "GDT_BUILD_SUFFIX" "-internal"
+    SetEnv "AMDT_BUILD"        "AMDT_INTERNAL"
+    SetEnv "AMDT_BUILD_SUFFIX" "-internal"
 
     BuildSln "[ALLPROJECTS]\CodeXL-AllProjects.sln" "" "BuildandTest" "Release|x64"
     BuildSln "[ALLPROJECTS]\CodeXL-AllProjects.sln" "" "BuildandTest" "Release|Win32"
@@ -259,8 +259,8 @@ ReleaseInternal
     // either get built by the main CodeXL solution, or they should be built before the GPU Profiler backend
 
 ReleaseNda
-    SetEnv "GDT_BUILD"        "GDT_NDA"
-    SetEnv "GDT_BUILD_SUFFIX" "-nda"
+    SetEnv "AMDT_BUILD"        "AMDT_NDA"
+    SetEnv "AMDT_BUILD_SUFFIX" "-nda"
 
     BuildSln "[ALLPROJECTS]\CodeXL-AllProjects.sln" "" "BuildandTest" "Release|x64"
     BuildSln "[ALLPROJECTS]\CodeXL-AllProjects.sln" "" "BuildandTest" "Release|Win32"

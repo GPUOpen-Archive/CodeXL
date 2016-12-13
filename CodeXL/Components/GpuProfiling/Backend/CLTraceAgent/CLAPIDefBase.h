@@ -78,7 +78,7 @@ public:
 
     CL_FUNC_TYPE m_type;                   ///< api type enum
     CLAPIType m_apiType;                   ///< api type
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
     std::vector<ULONGLONG> m_PrePMCs;      ///< Pre API call PMC values
     std::vector<ULONGLONG> m_PostPMCs;     ///< Post API call PMC values
 #endif

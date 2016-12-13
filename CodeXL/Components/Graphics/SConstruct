@@ -159,16 +159,16 @@ GPS_env.Prepend(CCFLAGS =
     '-DGL_GLEXT_PROTOTYPES',
 
 # These flags will need to be build-dependent from visual studio
-    "-D'GDT_PLATFORM_SUFFIX=\"" + GPS_env.platformSuffix + "\"'",
-    "-D'GDT_DEBUG_SUFFIX=\"" + GPS_env.debugSuffix + "\"'",
-    "-D'GDT_BUILD_SUFFIX=\"" + GPS_env.buildSuffix + "\"'",
-    "-D'GDT_PROJECT_SUFFIX=\"" + GPS_env.projectSuffix + "\"'",
+    "-D'AMDT_PLATFORM_SUFFIX=\"" + GPS_env.platformSuffix + "\"'",
+    "-D'AMDT_DEBUG_SUFFIX=\"" + GPS_env.debugSuffix + "\"'",
+    "-D'AMDT_BUILD_SUFFIX=\"" + GPS_env.buildSuffix + "\"'",
+    "-D'AMDT_PROJECT_SUFFIX=\"" + GPS_env.projectSuffix + "\"'",
 ])
 
 if buildInternal == True:
-    GPS_env.Prepend(CCFLAGS = "-DGDT_INTERNAL")
+    GPS_env.Prepend(CCFLAGS = "-DAMDT_INTERNAL")
 else:
-    GPS_env.Prepend(CCFLAGS = "-DGDT_PUBLIC")
+    GPS_env.Prepend(CCFLAGS = "-DAMDT_PUBLIC")
 
 if buildCodeXL == True:
     GPS_env.Prepend(CCFLAGS = "-DCODEXL_GRAPHICS")

@@ -11,7 +11,7 @@
       <AdditionalIncludeDirectories>$(GPUPerfAPIDir)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(GPUPerfAPIDir)\Bin$(GDT_BUILD_SUFFIX)\$(GDTPlatform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(GPUPerfAPIDir)\Bin$(AMDT_BUILD_SUFFIX)\$(AMDTPlatform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

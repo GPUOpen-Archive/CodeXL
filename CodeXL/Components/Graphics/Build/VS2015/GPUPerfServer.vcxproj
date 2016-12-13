@@ -40,7 +40,7 @@
     <Import Project="$(CommonDir)\Lib\Ext\Windows-Kits\Global-WindowsSDK.props" />
     <Import Project="$(CommonDir)\Lib\Ext\Boost\Global-Boost-2015.props" />
     <Import Project="$(CommonDir)\Lib\AMD\GPUPerfAPI\Global-GPUPerfAPI.props" />
-    <Import Condition="'$(GDT_BUILD)'=='GDT_INTERNAL'" Project="$(CommonDir)\Lib\AMD\GPUThreadTrace\Global-GPUThreadTrace.props" />
+    <Import Condition="'$(AMDT_BUILD)'=='AMDT_INTERNAL'" Project="$(CommonDir)\Lib\AMD\GPUThreadTrace\Global-GPUThreadTrace.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(SolutionName)'=='CodeXL-AllProjects'">
     <Import Project="$(CommonDir)\Src\AMDTInterceptor\Global-Interceptor-mhook-2015.props" />
@@ -66,7 +66,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
+      <OutputFile>$(OutDir)$(AMDTProjectName).exe</OutputFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ResourceCompile>
@@ -80,7 +80,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
+      <OutputFile>$(OutDir)$(AMDTProjectName).exe</OutputFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ResourceCompile>
@@ -94,7 +94,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
+      <OutputFile>$(OutDir)$(AMDTProjectName).exe</OutputFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ResourceCompile>
@@ -108,7 +108,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
+      <OutputFile>$(OutDir)$(AMDTProjectName).exe</OutputFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ResourceCompile>

@@ -27,7 +27,7 @@
     <Import Project="$(SolutionDir)\AMDTPowerProfilingNoGUI.props" />
   </ImportGroup>
   <PropertyGroup>
-    <TargetName>CodeXLPowerProfiler$(GDTProjectSuffix)</TargetName>
+    <TargetName>CodeXLPowerProfiler$(AMDTProjectSuffix)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>

@@ -29,14 +29,14 @@ xcopy /r /y %VSIX_COPY_COMMON_FOLDER%Lib\Ext\QT\5.5\plugins\platforms\qwindows.d
 )
 
 :BINARIES_PATH_DEFINED
-FOR %%C IN (Debug Release) DO FOR %%E IN (dll pdb exe) DO xcopy /r /d /y %2\%%C\bin\*%GDT_BUILD_SUFFIX%.%%E %VSIX_COPY_TARGET_DIR%
+FOR %%C IN (Debug Release) DO FOR %%E IN (dll pdb exe) DO xcopy /r /d /y %2\%%C\bin\*%AMDT_BUILD_SUFFIX%.%%E %VSIX_COPY_TARGET_DIR%
 
 IF "%1"=="Release" GOTO COPY_RELEASE_SPIES_WITH_PATH
 :COPY_DEBUG_SPIES_WITH_PATH
-FOR %%F IN (spies%GDT_BUILD_SUFFIX% spies64%GDT_BUILD_SUFFIX%) DO FOR %%E IN (dll pdb) DO xcopy /r /d /y %2\Debug\bin\%%F\*.%%E %VSIX_COPY_TARGET_DIR%%%F\
+FOR %%F IN (spies%AMDT_BUILD_SUFFIX% spies64%AMDT_BUILD_SUFFIX%) DO FOR %%E IN (dll pdb) DO xcopy /r /d /y %2\Debug\bin\%%F\*.%%E %VSIX_COPY_TARGET_DIR%%%F\
 GOTO AFTER_SPIES
 :COPY_RELEASE_SPIES_WITH_PATH
-FOR %%F IN (spies%GDT_BUILD_SUFFIX% spies64%GDT_BUILD_SUFFIX%) DO FOR %%E IN (dll pdb) DO xcopy /r /d /y %2\Release\bin\%%F\*.%%E %VSIX_COPY_TARGET_DIR%%%F\
+FOR %%F IN (spies%AMDT_BUILD_SUFFIX% spies64%AMDT_BUILD_SUFFIX%) DO FOR %%E IN (dll pdb) DO xcopy /r /d /y %2\Release\bin\%%F\*.%%E %VSIX_COPY_TARGET_DIR%%%F\
 GOTO AFTER_SPIES
 :AFTER_SPIES_WITH_PATH
 GOTO COPY_COMMON
@@ -47,15 +47,15 @@ FOR %%L IN (AMDTBaseTools AMDTOSWrappers AMDTAPIClasses AMDTApplicationComponent
 FOR %%L IN (AMDTApplicationFramework) DO FOR %%E IN (dll pdb) DO xcopy /r /d /y %VSIX_COPY_COMMON_FOLDER%Lib\AMD\%%L\2.0\lib\x86\*.%%E %VSIX_COPY_TARGET_DIR%
 FOR %%L IN (AMDTSharedProfiling) DO FOR %%E IN (dll pdb) DO xcopy /r /d /y %VSIX_COPY_COMMON_FOLDER%Lib\AMD\%%L\0.5\lib\x86\*.%%E %VSIX_COPY_TARGET_DIR%
 FOR %%L IN (AMDTBaseTools AMDTOSWrappers AMDTAPIClasses) DO FOR %%E IN (dll pdb) DO xcopy /r /d /y %VSIX_COPY_COMMON_FOLDER%Lib\AMD\%%L\1.0\lib\x64\*.%%E %VSIX_COPY_TARGET_DIR%
-FOR %%C IN (Debug Release) DO FOR %%E IN (dll pdb exe) DO xcopy /r /d /y %VSIX_COPY_CODEXL_FOLDER%Components\Output\%%C\bin\*%GDT_BUILD_SUFFIX%.%%E %VSIX_COPY_TARGET_DIR%
+FOR %%C IN (Debug Release) DO FOR %%E IN (dll pdb exe) DO xcopy /r /d /y %VSIX_COPY_CODEXL_FOLDER%Components\Output\%%C\bin\*%AMDT_BUILD_SUFFIX%.%%E %VSIX_COPY_TARGET_DIR%
 
 
 IF "%1"=="Release" GOTO COPY_RELEASE_SPIES
 :COPY_DEBUG_SPIES
-FOR %%F IN (spies%GDT_BUILD_SUFFIX% spies64%GDT_BUILD_SUFFIX%) DO FOR %%E IN (dll pdb) DO xcopy /r /d /y %VSIX_COPY_CODEXL_FOLDER%Components\Output\Debug\bin\%%F\*.%%E %VSIX_COPY_TARGET_DIR%%%F
+FOR %%F IN (spies%AMDT_BUILD_SUFFIX% spies64%AMDT_BUILD_SUFFIX%) DO FOR %%E IN (dll pdb) DO xcopy /r /d /y %VSIX_COPY_CODEXL_FOLDER%Components\Output\Debug\bin\%%F\*.%%E %VSIX_COPY_TARGET_DIR%%%F
 GOTO AFTER_SPIES
 :COPY_RELEASE_SPIES
-FOR %%F IN (spies%GDT_BUILD_SUFFIX% spies64%GDT_BUILD_SUFFIX%) DO FOR %%E IN (dll pdb) DO xcopy /r /d /y %VSIX_COPY_CODEXL_FOLDER%Components\Output\Release\bin\%%F\*.%%E %VSIX_COPY_TARGET_DIR%%%F
+FOR %%F IN (spies%AMDT_BUILD_SUFFIX% spies64%AMDT_BUILD_SUFFIX%) DO FOR %%E IN (dll pdb) DO xcopy /r /d /y %VSIX_COPY_CODEXL_FOLDER%Components\Output\Release\bin\%%F\*.%%E %VSIX_COPY_TARGET_DIR%%%F
 GOTO AFTER_SPIES
 :AFTER_SPIES
 GOTO COPY_COMMON

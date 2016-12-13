@@ -37,8 +37,8 @@
 
 // JVMTI Agent library name for Java Profiling
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    #define JVMTIAGENT32_NAME  L"CXLJvmtiAgent"        GDT_DEBUG_SUFFIX_W  GDT_BUILD_SUFFIX_W
-    #define JVMTIAGENT64_NAME  L"CXLJvmtiAgent-x64"    GDT_DEBUG_SUFFIX_W  GDT_BUILD_SUFFIX_W
+    #define JVMTIAGENT32_NAME  L"CXLJvmtiAgent"        AMDT_DEBUG_SUFFIX_W  AMDT_BUILD_SUFFIX_W
+    #define JVMTIAGENT64_NAME  L"CXLJvmtiAgent-x64"    AMDT_DEBUG_SUFFIX_W  AMDT_BUILD_SUFFIX_W
 #else
     #ifdef NDEBUG
         #define JVMTIAGENT32_NAME  L"libCXLJvmtiAgent"

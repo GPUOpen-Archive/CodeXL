@@ -1136,7 +1136,7 @@ bool ProfileManager::GetProfilerServer(osFilePath& strServer, QString& strErrorM
         profilerFileName.append(L"-x64");
     }
 
-    profilerFileName.append(GDT_DEBUG_SUFFIX_W GDT_BUILD_SUFFIX_W);
+    profilerFileName.append(AMDT_DEBUG_SUFFIX_W AMDT_BUILD_SUFFIX_W);
 
     strServer.setFileExtension(L"exe");
 #else

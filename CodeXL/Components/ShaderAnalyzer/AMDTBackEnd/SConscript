@@ -14,7 +14,7 @@ initGLEW(env)
 UseBoost(env)
 
 #need to overwrite compiler flags without the -Werror since some libraries are causing problems
-compiler_base_flags = " -std=c++11 -Wall -Wextra -g -fmessage-length=0 -Wno-unknown-pragmas -pthread -DGDT_PUBLIC -DGDT_BUILD_SUFFIX="
+compiler_base_flags = " -std=c++11 -Wall -Wextra -g -fmessage-length=0 -Wno-unknown-pragmas -pthread -DAMDT_PUBLIC -DAMDT_BUILD_SUFFIX="
     
 if (env['CXL_build'] == 'debug'):
     compiler_base_flags += ' -D_DEBUG -D_LINUX'

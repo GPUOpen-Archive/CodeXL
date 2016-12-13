@@ -58,7 +58,7 @@
       <PreprocessorDefinitions>MICRODLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <OutputFile>$(OutDir)$(GDTProjectName).dll</OutputFile>
+      <OutputFile>$(OutDir)$(AMDTProjectName).dll</OutputFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -75,7 +75,7 @@
       <PreprocessorDefinitions>MICRODLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <OutputFile>$(OutDir)$(GDTProjectName).dll</OutputFile>
+      <OutputFile>$(OutDir)$(AMDTProjectName).dll</OutputFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -89,7 +89,7 @@
       <PreprocessorDefinitions>MICRODLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <OutputFile>$(OutDir)$(GDTProjectName).dll</OutputFile>
+      <OutputFile>$(OutDir)$(AMDTProjectName).dll</OutputFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
@@ -103,7 +103,7 @@
       <PreprocessorDefinitions>MICRODLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <OutputFile>$(OutDir)$(GDTProjectName).dll</OutputFile>
+      <OutputFile>$(OutDir)$(AMDTProjectName).dll</OutputFile>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>

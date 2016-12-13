@@ -99,7 +99,7 @@
     <ClCompile Include="windows\RefTracker.cpp" />
     <ClCompile Include="..\..\..\..\..\Common\Src\DynamicLibraryModule\DynamicLibraryModule.cpp" />
     <ClCompile Include="..\..\..\..\..\Common\Src\DeviceInfo\DeviceInfoInternal.cpp">
-      <ExcludedFromBuild Condition="'$(GDT_BUILD)'!='GDT_INTERNAL'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(AMDT_BUILD)'!='AMDT_INTERNAL'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\Common\Src\DeviceInfo\DeviceInfoUtils.cpp" />
   </ItemGroup>

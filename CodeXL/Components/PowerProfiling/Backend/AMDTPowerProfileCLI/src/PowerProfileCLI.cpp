@@ -159,7 +159,7 @@ static int PrintHelp()
 
     //fprintf(stderr, "\n    -c <core mask>             Specify core mask for 'core' mode in option '-e'\n");
     //fprintf(stderr, "                               Default mask is all the available cores.\n");
-#if defined(GDT_INTERNAL) || defined(GDT_NDA)
+#if defined(AMDT_INTERNAL) || defined(AMDT_NDA)
     fprintf(stderr, "\n    -T <sampling period>       Sampling interval in milli seconds. The minimum value is 1ms.\n");
 #else
     fprintf(stderr, "\n    -T <sampling period>       Sampling interval in milli seconds. The minimum value is 10ms.\n");

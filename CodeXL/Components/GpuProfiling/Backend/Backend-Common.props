@@ -24,7 +24,7 @@
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
     <_PropertySheetDisplayName>Server-Common</_PropertySheetDisplayName>
     <OutDir>$(CodeXLOutputDir)\$(Configuration)\bin\</OutDir>
-    <IntDir>$(CodeXLOutputDir)\$(Configuration)\obj\$(ProjectName)\$(PlatformName)$(GDTBuildSuffix)\</IntDir>
+    <IntDir>$(CodeXLOutputDir)\$(Configuration)\obj\$(ProjectName)\$(PlatformName)$(AMDTBuildSuffix)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
@@ -35,7 +35,7 @@
     </ClCompile>
     <Link>
       <ImportLibrary>$(IntDir)$(ProjectName)</ImportLibrary>
-      <AdditionalOptions Condition="'$(GDT_BUILD)'=='GDT_INTERNAL'">/EXPORT:InitInternalDeviceInfo %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(AMDT_BUILD)'=='AMDT_INTERNAL'">/EXPORT:InitInternalDeviceInfo %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

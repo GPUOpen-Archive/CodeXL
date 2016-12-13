@@ -582,7 +582,7 @@ bool CLAPIInfoManager::ShouldIntercept(const char* szAPIName)
 
 ULONGLONG CLAPIInfoManager::GetTimeNanosStart(CLAPIBase* pEntry)
 {
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
 
     if (GlobalSettings::GetInstance()->m_params.m_bUserPMC && pEntry != NULL)
     {
@@ -599,7 +599,7 @@ ULONGLONG CLAPIInfoManager::GetTimeNanosStart(CLAPIBase* pEntry)
 ULONGLONG CLAPIInfoManager::GetTimeNanosEnd(CLAPIBase* pEntry)
 {
     ULONGLONG ret = OSUtils::Instance()->GetTimeNanos();
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
 
     if (GlobalSettings::GetInstance()->m_params.m_bUserPMC && pEntry != NULL)
     {

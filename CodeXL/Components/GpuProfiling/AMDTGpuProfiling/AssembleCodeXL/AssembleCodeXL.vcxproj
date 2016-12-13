@@ -65,70 +65,70 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>copy $(AMDTAPIClassesDir)\Lib\$(GDTPlatform)\AMDTApiClasses$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(AMDTAPIClassesDir)\Lib\$(GDTPlatform)\AMDTApiClasses$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
+      <Command>copy $(AMDTAPIClassesDir)\Lib\$(AMDTPlatform)\AMDTApiClasses$(AMDTPlatformSuffixNumBitsOnly)$(AMDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTAPIClassesDir)\Lib\$(AMDTPlatform)\AMDTApiClasses$(AMDTPlatformSuffixNumBitsOnly)$(AMDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(AMDTAPPFRAMEWORKDIR)\Lib\$(GDTPlatform)\AMDTApplicationFramework$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(AMDTAPPFRAMEWORKDIR)\Lib\$(GDTPlatform)\AMDTApplicationFramework$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTAPPFRAMEWORKDIR)\Lib\$(AMDTPlatform)\AMDTApplicationFramework$(AMDTPlatformSuffixNumBitsOnly)$(AMDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTAPPFRAMEWORKDIR)\Lib\$(AMDTPlatform)\AMDTApplicationFramework$(AMDTPlatformSuffixNumBitsOnly)$(AMDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(AMDTApplicationComponentsDir)\Lib\$(GDTPlatform)\AMDTApplicationComponents$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(AMDTApplicationComponentsDir)\Lib\$(GDTPlatform)\AMDTApplicationComponents$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTApplicationComponentsDir)\Lib\$(AMDTPlatform)\AMDTApplicationComponents$(AMDTPlatformSuffixNumBitsOnly)$(AMDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTApplicationComponentsDir)\Lib\$(AMDTPlatform)\AMDTApplicationComponents$(AMDTPlatformSuffixNumBitsOnly)$(AMDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(AMDTBaseToolsDir)\Lib\$(GDTPlatform)\AMDTBaseTools$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(AMDTBaseToolsDir)\Lib\$(GDTPlatform)\AMDTBaseTools$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTBaseToolsDir)\Lib\$(AMDTPlatform)\AMDTBaseTools$(AMDTPlatformSuffixNumBitsOnly)$(AMDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTBaseToolsDir)\Lib\$(AMDTPlatform)\AMDTBaseTools$(AMDTPlatformSuffixNumBitsOnly)$(AMDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(AMDTOsWrappersDir)\Lib\$(GDTPlatform)\AMDTOSWrappers$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(AMDTOsWrappersDir)\Lib\$(GDTPlatform)\AMDTOSWrappers$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTOsWrappersDir)\Lib\$(AMDTPlatform)\AMDTOSWrappers$(AMDTPlatformSuffixNumBitsOnly)$(AMDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTOsWrappersDir)\Lib\$(AMDTPlatform)\AMDTOSWrappers$(AMDTPlatformSuffixNumBitsOnly)$(AMDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(AMDTSHAREDPROFDIR)\Lib\$(GDTPlatform)\AMDTSharedProfiling$(GDTPlatformSuffix)$(GDTDebugSuffix).dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(AMDTSHAREDPROFDIR)\Lib\$(GDTPlatform)\AMDTSharedProfiling$(GDTPlatformSuffix)$(GDTDebugSuffix).pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTSHAREDPROFDIR)\Lib\$(AMDTPlatform)\AMDTSharedProfiling$(AMDTPlatformSuffix)$(AMDTDebugSuffix).dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTSHAREDPROFDIR)\Lib\$(AMDTPlatform)\AMDTSharedProfiling$(AMDTPlatformSuffix)$(AMDTDebugSuffix).pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(AMDTApplicationDir)\Lib\$(GDTPlatform)\CodeXL$(GDTDebugSuffixUnderscore).exe $(AMDTOutputDir)$(Configuration)\bin
-copy $(AMDTApplicationDir)\Lib\$(GDTPlatform)\CodeXL$(GDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTApplicationDir)\Lib\$(AMDTPlatform)\CodeXL$(AMDTDebugSuffixUnderscore).exe $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTApplicationDir)\Lib\$(AMDTPlatform)\CodeXL$(AMDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
 
 copy $(FreeImageDir)\Lib\FreeImage.dll $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(QSCINTILLADIR)\Lib\$(Platform)\$(Configuration)\qscintillaAmdDt474$(GDTDebugSuffixNoDash)2.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(QSCINTILLADIR)\Lib\$(Platform)\$(Configuration)\qscintillaAmdDt474$(GDTDebugSuffixNoDash)2.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(QSCINTILLADIR)\Lib\$(Platform)\$(Configuration)\qscintillaAmdDt474$(AMDTDebugSuffixNoDash)2.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QSCINTILLADIR)\Lib\$(Platform)\$(Configuration)\qscintillaAmdDt474$(AMDTDebugSuffixNoDash)2.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(QTDIR)\Lib\$(Platform)\QtCoreAmdDt474$(GDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(QTDIR)\Lib\$(Platform)\QtCoreAmdDt474$(GDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtCoreAmdDt474$(AMDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtCoreAmdDt474$(AMDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(QTDIR)\Lib\$(Platform)\QtGuiAmdDt474$(GDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(QTDIR)\Lib\$(Platform)\QtGuiAmdDt474$(GDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtGuiAmdDt474$(AMDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtGuiAmdDt474$(AMDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(QTDIR)\Lib\$(Platform)\QtOpenGLAmdDt474$(GDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(QTDIR)\Lib\$(Platform)\QtOpenGLAmdDt474$(GDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtOpenGLAmdDt474$(AMDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtOpenGLAmdDt474$(AMDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(QTDIR)\Lib\$(Platform)\QtNetworkAmdDt474$(GDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(QTDIR)\Lib\$(Platform)\QtNetworkAmdDt474$(GDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtNetworkAmdDt474$(AMDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtNetworkAmdDt474$(AMDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(QTDIR)\Lib\$(Platform)\QtXmlAmdDt474$(GDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(QTDIR)\Lib\$(Platform)\QtXmlAmdDt474$(GDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtXmlAmdDt474$(AMDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtXmlAmdDt474$(AMDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(QTDIR)\Lib\$(Platform)\QtWebKitAmdDt474$(GDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(QTDIR)\Lib\$(Platform)\QtWebKitAmdDt474$(GDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtWebKitAmdDt474$(AMDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtWebKitAmdDt474$(AMDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxbase292u$(GDTDebugSuffixNoDash)_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxbase292u$(GDTDebugSuffixNoDash)_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxbase292u$(AMDTDebugSuffixNoDash)_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxbase292u$(AMDTDebugSuffixNoDash)_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_adv_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_adv_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(AMDTDebugSuffixNoDash)_adv_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(AMDTDebugSuffixNoDash)_adv_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_aui_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_aui_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(AMDTDebugSuffixNoDash)_aui_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(AMDTDebugSuffixNoDash)_aui_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_core_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_core_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(AMDTDebugSuffixNoDash)_core_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(AMDTDebugSuffixNoDash)_core_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_gl_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_gl_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(AMDTDebugSuffixNoDash)_gl_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(AMDTDebugSuffixNoDash)_gl_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_html_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_html_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(AMDTDebugSuffixNoDash)_html_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(AMDTDebugSuffixNoDash)_html_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_stc_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_stc_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(AMDTDebugSuffixNoDash)_stc_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(AMDTDebugSuffixNoDash)_stc_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
 
 if NOT EXIST $(AMDTOutputDir)$(Configuration)\bin\x86. mkdir $(AMDTOutputDir)$(Configuration)\bin\x86
 xcopy /Y ..\..\..\..\..\APPProfiler\bin\Release-Win32\sprofile\*.* $(AMDTOutputDir)$(Configuration)\bin\x86
@@ -167,70 +167,70 @@ xcopy /Y ..\..\..\..\..\APPProfiler\Backend\Common\jqPlot\*.* $(SolutionDir)\..\
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PreBuildEvent>
-      <Command>copy $(AMDTAPIClassesDir)\Lib\$(GDTPlatform)\AMDTApiClasses$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(AMDTAPIClassesDir)\Lib\$(GDTPlatform)\AMDTApiClasses$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
+      <Command>copy $(AMDTAPIClassesDir)\Lib\$(AMDTPlatform)\AMDTApiClasses$(AMDTPlatformSuffixNumBitsOnly)$(AMDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTAPIClassesDir)\Lib\$(AMDTPlatform)\AMDTApiClasses$(AMDTPlatformSuffixNumBitsOnly)$(AMDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(AMDTAPPFRAMEWORKDIR)\Lib\$(GDTPlatform)\AMDTApplicationFramework$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(AMDTAPPFRAMEWORKDIR)\Lib\$(GDTPlatform)\AMDTApplicationFramework$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTAPPFRAMEWORKDIR)\Lib\$(AMDTPlatform)\AMDTApplicationFramework$(AMDTPlatformSuffixNumBitsOnly)$(AMDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTAPPFRAMEWORKDIR)\Lib\$(AMDTPlatform)\AMDTApplicationFramework$(AMDTPlatformSuffixNumBitsOnly)$(AMDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(AMDTApplicationComponentsDir)\Lib\$(GDTPlatform)\AMDTApplicationComponents$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(AMDTApplicationComponentsDir)\Lib\$(GDTPlatform)\AMDTApplicationComponents$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTApplicationComponentsDir)\Lib\$(AMDTPlatform)\AMDTApplicationComponents$(AMDTPlatformSuffixNumBitsOnly)$(AMDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTApplicationComponentsDir)\Lib\$(AMDTPlatform)\AMDTApplicationComponents$(AMDTPlatformSuffixNumBitsOnly)$(AMDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(AMDTBaseToolsDir)\Lib\$(GDTPlatform)\AMDTBaseTools$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(AMDTBaseToolsDir)\Lib\$(GDTPlatform)\AMDTBaseTools$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTBaseToolsDir)\Lib\$(AMDTPlatform)\AMDTBaseTools$(AMDTPlatformSuffixNumBitsOnly)$(AMDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTBaseToolsDir)\Lib\$(AMDTPlatform)\AMDTBaseTools$(AMDTPlatformSuffixNumBitsOnly)$(AMDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(AMDTOsWrappersDir)\Lib\$(GDTPlatform)\AMDTOSWrappers$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(AMDTOsWrappersDir)\Lib\$(GDTPlatform)\AMDTOSWrappers$(GDTPlatformSuffixNumBitsOnly)$(GDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTOsWrappersDir)\Lib\$(AMDTPlatform)\AMDTOSWrappers$(AMDTPlatformSuffixNumBitsOnly)$(AMDTDebugSuffixUnderscore).dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTOsWrappersDir)\Lib\$(AMDTPlatform)\AMDTOSWrappers$(AMDTPlatformSuffixNumBitsOnly)$(AMDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(AMDTSHAREDPROFDIR)\Lib\$(GDTPlatform)\AMDTSharedProfiling$(GDTPlatformSuffix)$(GDTDebugSuffix).dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(AMDTSHAREDPROFDIR)\Lib\$(GDTPlatform)\AMDTSharedProfiling$(GDTPlatformSuffix)$(GDTDebugSuffix).pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTSHAREDPROFDIR)\Lib\$(AMDTPlatform)\AMDTSharedProfiling$(AMDTPlatformSuffix)$(AMDTDebugSuffix).dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTSHAREDPROFDIR)\Lib\$(AMDTPlatform)\AMDTSharedProfiling$(AMDTPlatformSuffix)$(AMDTDebugSuffix).pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(AMDTApplicationDir)\Lib\$(GDTPlatform)\CodeXL$(GDTDebugSuffixUnderscore).exe $(AMDTOutputDir)$(Configuration)\bin
-copy $(AMDTApplicationDir)\Lib\$(GDTPlatform)\CodeXL$(GDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTApplicationDir)\Lib\$(AMDTPlatform)\CodeXL$(AMDTDebugSuffixUnderscore).exe $(AMDTOutputDir)$(Configuration)\bin
+copy $(AMDTApplicationDir)\Lib\$(AMDTPlatform)\CodeXL$(AMDTDebugSuffixUnderscore).pdb $(AMDTOutputDir)$(Configuration)\bin
 
 copy $(FreeImageDir)\Lib\FreeImage.dll $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(QSCINTILLADIR)\Lib\$(Platform)\$(Configuration)\qscintillaAmdDt474$(GDTDebugSuffixNoDash)2.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(QSCINTILLADIR)\Lib\$(Platform)\$(Configuration)\qscintillaAmdDt474$(GDTDebugSuffixNoDash)2.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(QSCINTILLADIR)\Lib\$(Platform)\$(Configuration)\qscintillaAmdDt474$(AMDTDebugSuffixNoDash)2.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QSCINTILLADIR)\Lib\$(Platform)\$(Configuration)\qscintillaAmdDt474$(AMDTDebugSuffixNoDash)2.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(QTDIR)\Lib\$(Platform)\QtCoreAmdDt474$(GDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(QTDIR)\Lib\$(Platform)\QtCoreAmdDt474$(GDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtCoreAmdDt474$(AMDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtCoreAmdDt474$(AMDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(QTDIR)\Lib\$(Platform)\QtGuiAmdDt474$(GDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(QTDIR)\Lib\$(Platform)\QtGuiAmdDt474$(GDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtGuiAmdDt474$(AMDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtGuiAmdDt474$(AMDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(QTDIR)\Lib\$(Platform)\QtOpenGLAmdDt474$(GDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(QTDIR)\Lib\$(Platform)\QtOpenGLAmdDt474$(GDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtOpenGLAmdDt474$(AMDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtOpenGLAmdDt474$(AMDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(QTDIR)\Lib\$(Platform)\QtNetworkAmdDt474$(GDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(QTDIR)\Lib\$(Platform)\QtNetworkAmdDt474$(GDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtNetworkAmdDt474$(AMDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtNetworkAmdDt474$(AMDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(QTDIR)\Lib\$(Platform)\QtXmlAmdDt474$(GDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(QTDIR)\Lib\$(Platform)\QtXmlAmdDt474$(GDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtXmlAmdDt474$(AMDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtXmlAmdDt474$(AMDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(QTDIR)\Lib\$(Platform)\QtWebKitAmdDt474$(GDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(QTDIR)\Lib\$(Platform)\QtWebKitAmdDt474$(GDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtWebKitAmdDt474$(AMDTDebugSuffixNoDash)4.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(QTDIR)\Lib\$(Platform)\QtWebKitAmdDt474$(AMDTDebugSuffixNoDash)4.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxbase292u$(GDTDebugSuffixNoDash)_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxbase292u$(GDTDebugSuffixNoDash)_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxbase292u$(AMDTDebugSuffixNoDash)_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxbase292u$(AMDTDebugSuffixNoDash)_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_adv_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_adv_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(AMDTDebugSuffixNoDash)_adv_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(AMDTDebugSuffixNoDash)_adv_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_aui_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_aui_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(AMDTDebugSuffixNoDash)_aui_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(AMDTDebugSuffixNoDash)_aui_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_core_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_core_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(AMDTDebugSuffixNoDash)_core_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(AMDTDebugSuffixNoDash)_core_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_gl_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_gl_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(AMDTDebugSuffixNoDash)_gl_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(AMDTDebugSuffixNoDash)_gl_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_html_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_html_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(AMDTDebugSuffixNoDash)_html_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(AMDTDebugSuffixNoDash)_html_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
 
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_stc_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
-copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(GDTDebugSuffixNoDash)_stc_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(AMDTDebugSuffixNoDash)_stc_vc_custom.dll $(AMDTOutputDir)$(Configuration)\bin
+copy $(WXDIR)\Lib\$(Platform)\vc_dll\wxmsw292u$(AMDTDebugSuffixNoDash)_stc_vc_custom.pdb $(AMDTOutputDir)$(Configuration)\bin
 
 if NOT EXIST $(AMDTOutputDir)$(Configuration)\bin\x86. mkdir $(AMDTOutputDir)$(Configuration)\bin\x86
 xcopy /Y ..\..\..\..\..\APPProfiler\bin\Release-Win32\sprofile\*.* $(AMDTOutputDir)$(Configuration)\bin\x86

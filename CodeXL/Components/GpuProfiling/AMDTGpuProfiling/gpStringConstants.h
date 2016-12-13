@@ -413,17 +413,17 @@
 #define GPU_STR_atrHeader L"//API:DX12\n=====CodeXL dx12 API Trace Output=====\n"
 
 //when running CXL client on linux below isn't defined, thus we add it(for remote windows agent)
-#ifndef GDT_DEBUG_SUFFIX_W
+#ifndef AMDT_DEBUG_SUFFIX_W
     #ifdef _DEBUG
-        #define GDT_DEBUG_SUFFIX_W L"-d"
+        #define AMDT_DEBUG_SUFFIX_W L"-d"
     #else
-        #define GDT_DEBUG_SUFFIX_W 
+        #define AMDT_DEBUG_SUFFIX_W 
     #endif
 #endif
 
-#define GPU_STR_perfStudioServer64_WIN L"CXLGraphicsServer-x64" GDT_DEBUG_SUFFIX_W
-#define GPU_STR_CodeXLAgent_WIN L"CodeXLRemoteAgent" GDT_DEBUG_SUFFIX_W   L"." AF_STR_exeFileExtension
-#define GPU_STR_GraphicsCapturePlayer64_WIN L"CXLGraphicsServerPlayer-x64" GDT_DEBUG_SUFFIX_W
+#define GPU_STR_perfStudioServer64_WIN L"CXLGraphicsServer-x64" AMDT_DEBUG_SUFFIX_W
+#define GPU_STR_CodeXLAgent_WIN L"CodeXLRemoteAgent" AMDT_DEBUG_SUFFIX_W   L"." AF_STR_exeFileExtension
+#define GPU_STR_GraphicsCapturePlayer64_WIN L"CXLGraphicsServerPlayer-x64" AMDT_DEBUG_SUFFIX_W
 
 #define GPU_STR_perfStudioServer64_LNX L"CXLGraphicsServer"
 #define GPU_STR_CodeXLAgent_LNX L"CodeXLRemoteAgent-bin"

@@ -35,7 +35,7 @@ void ConnectWithDXGI(LayerManager* pLayerManager)
 #ifdef DLL_REPLACEMENT
         GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN, "dxgi.dll", &hDXGIModule);
 #else
-        GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN, "DXGIServer" GDT_PROJECT_SUFFIX ".dll", &hDXGIModule);
+        GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN, "DXGIServer" AMDT_PROJECT_SUFFIX ".dll", &hDXGIModule);
 #endif
 
         if (hDXGIModule != NULL)
@@ -73,7 +73,7 @@ void DisconnectFromDXGI(LayerManager* pLayerManager)
         HMODULE hDXGIModule = NULL;
 
         // Get the DXGI dll
-        GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN, "DXGIServer" GDT_PROJECT_SUFFIX ".dll", &hDXGIModule);
+        GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN, "DXGIServer" AMDT_PROJECT_SUFFIX ".dll", &hDXGIModule);
 
         // Get the process address of the UnsetLayerManager function
         USLM = (UnsetLayerManager_type)GetProcAddress(hDXGIModule, "UnsetLayerManager");

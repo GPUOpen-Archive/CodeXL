@@ -146,7 +146,7 @@ public:
         HMODULE hDX11Module = NULL;
 
         // Get the DX11Server dll
-        GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN, "DX11Server" GDT_PROJECT_SUFFIX ".dll", &hDX11Module);
+        GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN, "DX11Server" AMDT_PROJECT_SUFFIX ".dll", &hDX11Module);
 
         // If there are more than 1 GPUs we need to go on to unwrap the GPS wrapped device.
         ID3D11DeviceContext* pDevConOrig = NULL;

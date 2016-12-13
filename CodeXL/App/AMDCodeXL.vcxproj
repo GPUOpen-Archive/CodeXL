@@ -31,9 +31,9 @@
     <Import Project="$(AMDTCommonExt)\Qt\Global-QT.props" />
   </ImportGroup>
   <PropertyGroup>
-    <TargetName>CodeXL$(GDTProjectSuffix)</TargetName>
+    <TargetName>CodeXL$(AMDTProjectSuffix)</TargetName>
     <OutDir>$(AMDTOutputDir)$(Configuration)\bin\</OutDir>
-    <IntDir>$(AMDTOutputDir)$(Configuration)\obj\$(ProjectName)\$(Platform)$(GDTBuildSuffix)\</IntDir>
+    <IntDir>$(AMDTOutputDir)$(Configuration)\obj\$(ProjectName)\$(Platform)$(AMDTBuildSuffix)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <GenerateManifest>true</GenerateManifest>

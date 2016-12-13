@@ -7,7 +7,7 @@ appName = "CodeXLCpuProfiler-bin"
 
 env = CXL_env.Clone()
 UseBoost(env)
-compiler_base_flags = "-D_LINUX -DLINUX -Wall -Werror -Wextra -g -fmessage-length=0 -Wno-unknown-pragmas -pthread -std=c++11 -DGDT_BUILD_SUFFIX="
+compiler_base_flags = "-D_LINUX -DLINUX -Wall -Werror -Wextra -g -fmessage-length=0 -Wno-unknown-pragmas -pthread -std=c++11 -DAMDT_BUILD_SUFFIX="
 
 if (env['CXL_build'] == 'debug'):
     compiler_base_flags += ' -D_DEBUG -D_LINUX '
@@ -15,13 +15,13 @@ else:
     compiler_base_flags += ' -O3 -DNDEBUG -D_LINUX '
 
 if (env['CXL_build_conf'] == 'PUBLIC'):
-        compiler_base_flags += ' -DGDT_PUBLIC '
+        compiler_base_flags += ' -DAMDT_PUBLIC '
 elif (env['CXL_build_conf'] == 'NDA'):
-        compiler_base_flags += ' -DGDT_NDA '
+        compiler_base_flags += ' -DAMDT_NDA '
 elif (env['CXL_build_conf'] == 'INTERNAL'):
-        compiler_base_flags += ' -DGDT_INTERNAL '
+        compiler_base_flags += ' -DAMDT_INTERNAL '
 else:
-        compiler_base_flags += ' -DGDT_PUBLIC '
+        compiler_base_flags += ' -DAMDT_PUBLIC '
 
 env.Replace(CPPFLAGS = compiler_base_flags)
 

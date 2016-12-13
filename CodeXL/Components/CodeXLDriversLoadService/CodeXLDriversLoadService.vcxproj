@@ -38,16 +38,16 @@
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <TargetName>$(ProjectName)$(GDTPlatformSuffix)</TargetName>
+    <TargetName>$(ProjectName)$(AMDTPlatformSuffix)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <TargetName>$(ProjectName)$(GDTPlatformSuffix)</TargetName>
+    <TargetName>$(ProjectName)$(AMDTPlatformSuffix)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetName>$(ProjectName)$(GDTPlatformSuffix)</TargetName>
+    <TargetName>$(ProjectName)$(AMDTPlatformSuffix)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetName>$(ProjectName)$(GDTPlatformSuffix)</TargetName>
+    <TargetName>$(ProjectName)$(AMDTPlatformSuffix)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>

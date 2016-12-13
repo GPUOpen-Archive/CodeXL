@@ -60,8 +60,8 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <CustomBuildStep>
-      <Command>"$(CodeXLGpuProfilingDir)\Backend\DCServer\DCExternalFileCopy.bat" "$(GPUPerfAPIDir)" "$(GDTBuildSuffix)" "$(GDTPlatform)" "$(GDTPlatformSuffix)" "$(OutDir)" "$(CodeXLGpuProfilerDeliverDir)\"</Command>
-      <Outputs>$(OutDir)\GPUPerfAPIDX11$(GDTPlatformSuffix)$(GDT_BUILD_SUFFIX).dll;$(OutDir)\GPUPerfAPICounters$(GDTPlatformSuffix)$(GDT_BUILD_SUFFIX).dll;$(Outputs)</Outputs>
+      <Command>"$(CodeXLGpuProfilingDir)\Backend\DCServer\DCExternalFileCopy.bat" "$(GPUPerfAPIDir)" "$(AMDTBuildSuffix)" "$(AMDTPlatform)" "$(AMDTPlatformSuffix)" "$(OutDir)" "$(CodeXLGpuProfilerDeliverDir)\"</Command>
+      <Outputs>$(OutDir)\GPUPerfAPIDX11$(AMDTPlatformSuffix)$(AMDT_BUILD_SUFFIX).dll;$(OutDir)\GPUPerfAPICounters$(AMDTPlatformSuffix)$(AMDT_BUILD_SUFFIX).dll;$(Outputs)</Outputs>
     </CustomBuildStep>
     <Link>
       <AdditionalDependencies>d3d11.lib;%(AdditionalDependencies)</AdditionalDependencies>

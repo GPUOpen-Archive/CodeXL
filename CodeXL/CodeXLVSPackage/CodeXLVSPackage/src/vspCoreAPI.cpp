@@ -25,7 +25,7 @@ const IVscCoreAPI& gr_coreAPIPointers = g_coreAPIPointers;
 bool g_coreAPIPointersInitialized = false;
 const bool& gr_coreAPIPointersInitialized = g_coreAPIPointersInitialized;
 
-#define VSP_CORE_MODULE_NAME "\\CodeXLVSPackageCore" GDT_PROJECT_SUFFIX ".dll"
+#define VSP_CORE_MODULE_NAME "\\CodeXLVSPackageCore" AMDT_PROJECT_SUFFIX ".dll"
 #define VSP_APP_SETTINGS_FILE_NAME "\\CodeXL_App_Settings.txt"
 typedef bool (*VSCGETCOREAPI_PFN)(IVscCoreAPI* o_pCoreAPI);
 

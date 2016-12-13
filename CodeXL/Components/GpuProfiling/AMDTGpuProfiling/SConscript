@@ -109,7 +109,7 @@ GPUProf_env.Append(CPPPATH = [backend_common_dir, backend_clcommon_dir, backend_
 # compiler flags required in order to build HSA headers
 GPUProf_env.Append(CPPFLAGS = '-fpermissive -Wno-error ')
 
-GPUProf_env.Append(CPPFLAGS = '-std=c++11 -DGDT_BUILD_SUFFIX=\'\'')
+GPUProf_env.Append(CPPFLAGS = '-std=c++11 -DAMDT_BUILD_SUFFIX=\'\'')
 
 # Assume that the environment does not need to be cloned, etc.
 uic_files = Split(

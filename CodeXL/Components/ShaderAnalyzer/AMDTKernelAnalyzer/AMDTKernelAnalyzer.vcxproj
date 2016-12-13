@@ -61,7 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(CommonDir)\Src\DeviceInfo\DeviceInfoInternal.cpp">
-      <ExcludedFromBuild Condition="'$(GDT_BUILD)'!='GDT_INTERNAL'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(AMDT_BUILD)'!='AMDT_INTERNAL'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="$(CommonDir)\Src\DeviceInfo\DeviceInfoUtils.cpp" />
     <ClCompile Include="src\dllmain.cpp" />

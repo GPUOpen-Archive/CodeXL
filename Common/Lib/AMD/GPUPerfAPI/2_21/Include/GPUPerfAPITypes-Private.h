@@ -36,14 +36,14 @@ enum GPA_Log_Debug_Type
     GPA_LOG_ERROR_MESSAGE_AND_TRACE = 7,
     GPA_LOG_ALL = 0xFF,
 
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
     // these are private types that are only defined in internal builds
     GPA_LOG_DEBUG_ERROR        = 0x0100,
     GPA_LOG_DEBUG_MESSAGE      = 0x0200,
     GPA_LOG_DEBUG_TRACE        = 0x0400,
     GPA_LOG_DEBUG_COUNTERDEFS  = 0x0800,
     GPA_LOG_DEBUG_ALL          = 0xFF00
-#endif // GDT_INTERNAL
+#endif // AMDT_INTERNAL
 };
 
 /// this enum needs to be kept up to date with GDT_HW_GENERATION in DeviceInfo.h

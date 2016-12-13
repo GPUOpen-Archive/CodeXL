@@ -44,7 +44,7 @@
   </ImportGroup>
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir>$(OutDir)spies$(GDTPlatformSuffixNumBitsOnly)$(GDTBuildSuffix)\</OutDir>
+    <OutDir>$(OutDir)spies$(AMDTPlatformSuffixNumBitsOnly)$(AMDTBuildSuffix)\</OutDir>
     <TargetName>OpenCL</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -56,9 +56,9 @@
       <PreprocessorDefinitions>_AMDT_OPENCLSERVER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies Condition="'$(ENABLE_HSA)'=='TRUE'">AMDTHsaDebugging$(GDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(ENABLE_HSA)'=='TRUE'">AMDTHsaDebugging$(AMDTProjectSuffix).lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>.\WindowsResources\AMDTOpenCLServer.def</ModuleDefinitionFile>
-      <ImportLibrary>$(AMDTOutputDir)$(Configuration)\arch\spies$(GDTPlatformSuffixNumBitsOnly)$(GDTBuildSuffix)\$(TargetName).lib</ImportLibrary>
+      <ImportLibrary>$(AMDTOutputDir)$(Configuration)\arch\spies$(AMDTPlatformSuffixNumBitsOnly)$(AMDTBuildSuffix)\$(TargetName).lib</ImportLibrary>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/opt:nolbr %(AdditionalOptions)</AdditionalOptions>
       <ImageHasSafeExceptionHandlers Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ImageHasSafeExceptionHandlers>
     </Link>

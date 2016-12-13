@@ -56,10 +56,10 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(MyBinDir)Plugins\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(MyBinDir)Plugins\</OutDir>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(MyBinDir)Plugins\</OutDir>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectName)$(GDTProjectSuffix)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)$(GDTProjectSuffix)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectName)$(GDTProjectSuffix)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectName)$(GDTProjectSuffix)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectName)$(AMDTProjectSuffix)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)$(AMDTProjectSuffix)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectName)$(AMDTProjectSuffix)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectName)$(AMDTProjectSuffix)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -68,11 +68,11 @@
     <Link>
       <AdditionalDependencies>wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <DelayLoadDLLs>PerformanceExperimentFile$(GDTPlatformSuffix)$(GDTBuildSuffix).dll;GPUThreadTrace$(GDTPlatformSuffix)$(GDTBuildSuffix).dll</DelayLoadDLLs>
+      <DelayLoadDLLs>PerformanceExperimentFile$(AMDTPlatformSuffix)$(AMDTBuildSuffix).dll;GPUThreadTrace$(AMDTPlatformSuffix)$(AMDTBuildSuffix).dll</DelayLoadDLLs>
       <ModuleDefinitionFile>VulkanServer.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(ProjectDir)..\..\Server\VulkanServer\JSON\$(ProjectName)$(GDTPlatformSuffix).json $(MyBinDir)Plugins\</Command>
+      <Command>copy $(ProjectDir)..\..\Server\VulkanServer\JSON\$(ProjectName)$(AMDTPlatformSuffix).json $(MyBinDir)Plugins\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -85,11 +85,11 @@
     <Link>
       <AdditionalDependencies>wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <DelayLoadDLLs>PerformanceExperimentFile$(GDTPlatformSuffix)$(GDTBuildSuffix).dll;GPUThreadTrace$(GDTPlatformSuffix)$(GDTBuildSuffix).dll</DelayLoadDLLs>
+      <DelayLoadDLLs>PerformanceExperimentFile$(AMDTPlatformSuffix)$(AMDTBuildSuffix).dll;GPUThreadTrace$(AMDTPlatformSuffix)$(AMDTBuildSuffix).dll</DelayLoadDLLs>
       <ModuleDefinitionFile>VulkanServer.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(ProjectDir)..\..\Server\VulkanServer\JSON\$(ProjectName)$(GDTPlatformSuffix).json $(MyBinDir)Plugins\</Command>
+      <Command>copy $(ProjectDir)..\..\Server\VulkanServer\JSON\$(ProjectName)$(AMDTPlatformSuffix).json $(MyBinDir)Plugins\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -99,11 +99,11 @@
     <Link>
       <AdditionalDependencies>wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <DelayLoadDLLs>PerformanceExperimentFile$(GDTPlatformSuffix)$(GDTBuildSuffix).dll;GPUThreadTrace$(GDTPlatformSuffix)$(GDTBuildSuffix).dll</DelayLoadDLLs>
+      <DelayLoadDLLs>PerformanceExperimentFile$(AMDTPlatformSuffix)$(AMDTBuildSuffix).dll;GPUThreadTrace$(AMDTPlatformSuffix)$(AMDTBuildSuffix).dll</DelayLoadDLLs>
       <ModuleDefinitionFile>VulkanServer.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(ProjectDir)..\..\Server\VulkanServer\JSON\$(ProjectName)$(GDTPlatformSuffix).json $(MyBinDir)Plugins\</Command>
+      <Command>copy $(ProjectDir)..\..\Server\VulkanServer\JSON\$(ProjectName)$(AMDTPlatformSuffix).json $(MyBinDir)Plugins\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -118,11 +118,11 @@
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
-      <DelayLoadDLLs>PerformanceExperimentFile$(GDTPlatformSuffix)$(GDTBuildSuffix).dll;GPUThreadTrace$(GDTPlatformSuffix)$(GDTBuildSuffix).dll</DelayLoadDLLs>
+      <DelayLoadDLLs>PerformanceExperimentFile$(AMDTPlatformSuffix)$(AMDTBuildSuffix).dll;GPUThreadTrace$(AMDTPlatformSuffix)$(AMDTBuildSuffix).dll</DelayLoadDLLs>
       <ModuleDefinitionFile>VulkanServer.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(ProjectDir)..\..\Server\VulkanServer\JSON\$(ProjectName)$(GDTPlatformSuffix).json $(MyBinDir)Plugins\</Command>
+      <Command>copy $(ProjectDir)..\..\Server\VulkanServer\JSON\$(ProjectName)$(AMDTPlatformSuffix).json $(MyBinDir)Plugins\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -130,7 +130,7 @@
     <Link>
       <SubSystem>
       </SubSystem>
-      <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
+      <OutputFile>$(OutDir)$(AMDTProjectName).exe</OutputFile>
       <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>vulkan-1.dll</DelayLoadDLLs>
       <AdditionalLibraryDirectories>$(VulkanReqsDir)SDK\Bin32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -140,7 +140,7 @@
     <Link>
       <SubSystem>
       </SubSystem>
-      <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
+      <OutputFile>$(OutDir)$(AMDTProjectName).exe</OutputFile>
       <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>vulkan-1.dll</DelayLoadDLLs>
       <AdditionalLibraryDirectories>$(VulkanReqsDir)SDK\Bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -151,7 +151,7 @@
       <SubSystem>
       </SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
+      <OutputFile>$(OutDir)$(AMDTProjectName).exe</OutputFile>
       <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>vulkan-1.dll</DelayLoadDLLs>
       <AdditionalLibraryDirectories>$(VulkanReqsDir)SDK\Bin32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -162,7 +162,7 @@
       <SubSystem>
       </SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
+      <OutputFile>$(OutDir)$(AMDTProjectName).exe</OutputFile>
       <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>vulkan-1.dll</DelayLoadDLLs>
       <AdditionalLibraryDirectories>$(VulkanReqsDir)SDK\Bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -172,7 +172,7 @@
     <Link>
       <SubSystem>
       </SubSystem>
-      <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
+      <OutputFile>$(OutDir)$(AMDTProjectName).exe</OutputFile>
       <AdditionalDependencies>d3d12.lib;dxgi.lib;wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>D3D12.DLL;%(DelayLoadDLLs)</DelayLoadDLLs>
     </Link>
@@ -181,7 +181,7 @@
     <Link>
       <SubSystem>
       </SubSystem>
-      <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
+      <OutputFile>$(OutDir)$(AMDTProjectName).exe</OutputFile>
       <AdditionalDependencies>d3d12.lib;dxgi.lib;wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>D3D12.DLL;%(DelayLoadDLLs)</DelayLoadDLLs>
     </Link>
@@ -191,7 +191,7 @@
       <SubSystem>
       </SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
+      <OutputFile>$(OutDir)$(AMDTProjectName).exe</OutputFile>
       <AdditionalDependencies>d3d12.lib;dxgi.lib;wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>D3D12.DLL;%(DelayLoadDLLs)</DelayLoadDLLs>
     </Link>
@@ -201,7 +201,7 @@
       <SubSystem>
       </SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OutputFile>$(OutDir)$(GDTProjectName).exe</OutputFile>
+      <OutputFile>$(OutDir)$(AMDTProjectName).exe</OutputFile>
       <AdditionalDependencies>d3d12.lib;dxgi.lib;wsock32.lib;winmm.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <DelayLoadDLLs>D3D12.DLL;%(DelayLoadDLLs)</DelayLoadDLLs>
     </Link>

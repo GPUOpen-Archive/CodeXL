@@ -137,12 +137,12 @@ static void SetupVulkanEnvVariables()
     {
         if (appBinaryType == OS_I386_ARCHITECTURE)
         {
-            layerNameA.append(GDT_DEBUG_SUFFIX);
+            layerNameA.append(AMDT_DEBUG_SUFFIX);
         }
         else if (appBinaryType == OS_X86_64_ARCHITECTURE)
         {
             layerNameA.append("-x64");
-            layerNameA.append(GDT_DEBUG_SUFFIX);
+            layerNameA.append(AMDT_DEBUG_SUFFIX);
         }
     }
 
@@ -187,7 +187,7 @@ static void SetMicroDLLPathA(LPCSTR lpApplicationName, LPCSTR lpCommandLine)
     osModuleArchitecture appBinaryType = OS_I386_ARCHITECTURE;
     const osModuleArchitecture currentBinaryType = OS_I386_ARCHITECTURE;
 #endif
-    sprintf_s(g_MicroDLLPath, PS_MAX_PATH, "%s" MICRODLLNAME "%s.dll", SG_GET_PATH(ServerPath), GDT_PROJECT_SUFFIX);
+    sprintf_s(g_MicroDLLPath, PS_MAX_PATH, "%s" MICRODLLNAME "%s.dll", SG_GET_PATH(ServerPath), AMDT_PROJECT_SUFFIX);
 
     // Get binary type of the application that's loaded in and make sure the correct version
     // of MicroDLL is injected (either 32 or 64 bit)
@@ -204,17 +204,17 @@ static void SetMicroDLLPathA(LPCSTR lpApplicationName, LPCSTR lpCommandLine)
             // tables (I think)
             if (appBinaryType == OS_X86_64_ARCHITECTURE)
             {
-                sprintf_s(g_MicroDLLPath, PS_MAX_PATH, "%s" MICRODLLNAME "-x64%s%s.dll", SG_GET_PATH(ServerPath), GDT_DEBUG_SUFFIX, GDT_BUILD_SUFFIX);
+                sprintf_s(g_MicroDLLPath, PS_MAX_PATH, "%s" MICRODLLNAME "-x64%s%s.dll", SG_GET_PATH(ServerPath), AMDT_DEBUG_SUFFIX, AMDT_BUILD_SUFFIX);
             }
             else if (appBinaryType == OS_I386_ARCHITECTURE)
             {
-                sprintf_s(g_MicroDLLPath, PS_MAX_PATH, "%s" MICRODLLNAME "%s%s.dll", SG_GET_PATH(ServerPath), GDT_DEBUG_SUFFIX, GDT_BUILD_SUFFIX);
+                sprintf_s(g_MicroDLLPath, PS_MAX_PATH, "%s" MICRODLLNAME "%s%s.dll", SG_GET_PATH(ServerPath), AMDT_DEBUG_SUFFIX, AMDT_BUILD_SUFFIX);
             }
         }
     }
     else
     {
-        //        LogConsole(logERROR, "SetMicroDLLPath(%s) can't determine bitness of file '%s'\n", GDT_PROJECT_SUFFIX, appName);
+        //        LogConsole(logERROR, "SetMicroDLLPath(%s) can't determine bitness of file '%s'\n", AMDT_PROJECT_SUFFIX, appName);
     }
 }
 

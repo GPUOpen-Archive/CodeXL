@@ -15,7 +15,7 @@
 // For internal use only
 
 // *INDENT-OFF*
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
 /// \brief Register a debug callback function to receive debug log messages.
 ///
 /// Only one debug callback function can be registered, so the implementation should be able
@@ -32,7 +32,7 @@ GPALIB_DECL GPA_Status GPA_RegisterLoggingDebugCallback(GPA_Log_Debug_Type loggi
 /// \return The GPA result status of the operation. GPA_STATUS_OK is returned if the operation is successful.
 GPALIB_DECL GPA_Status GPA_InternalSetDrawCallCounts(const int iCounts);
 
-#endif // GDT_INTERNAL
+#endif // AMDT_INTERNAL
 // *INDENT-ON*
 
 /// \brief Internal function. Unsupported and may be removed from the API at any time.

@@ -204,11 +204,11 @@ void CheckWrapperOnLoadLibrary(void)
                 // wrapper not loaded - so load it
 
                 gtASCIIString strPluginName = g_wrapperArray[ i ].strPluginName;
-                strPluginName += GDT_PROJECT_SUFFIX ".dll";
+                strPluginName += AMDT_PROJECT_SUFFIX ".dll";
                 //                Log(logMESSAGE, "Loading %s = 0x%p\n", strPluginName.asCharArray(), g_wrapperArray[ i ].hWrapperLoaded);
 
                 gtASCIIString strPluginPath = g_wrapperArray[ i ].strPluginPath;
-                strPluginPath += GDT_PROJECT_SUFFIX ".dll";
+                strPluginPath += AMDT_PROJECT_SUFFIX ".dll";
                 g_wrapperArray[ i ].hWrapperLoaded = LoadLibrary(strPluginPath.asCharArray());
 
                 if (g_wrapperArray[ i ].hWrapperLoaded == NULL)
@@ -249,7 +249,7 @@ void CheckWrapperOnFreeLibrary()
             {
                 // no longer needed - unload the plugin
                 gtASCIIString strPluginName = g_wrapperArray[i].strPluginName;
-                strPluginName += GDT_PROJECT_SUFFIX ".dll";
+                strPluginName += AMDT_PROJECT_SUFFIX ".dll";
                 Log(logMESSAGE, "CheckWrapperOnFreeLibrary: Unloading %s\n", strPluginName.asCharArray());
                 FreeLibrary(g_wrapperArray[ i ].hWrapperLoaded);
                 g_wrapperArray[ i ].hWrapperLoaded = NULL;

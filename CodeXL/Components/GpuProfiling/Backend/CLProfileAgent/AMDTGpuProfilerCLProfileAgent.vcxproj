@@ -65,8 +65,8 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <CustomBuildStep>
-      <Command>"$(CodeXLGpuProfilingDir)\Backend\CLProfileAgent\CLExternalFileCopy.bat" "$(GPUPerfAPIDir)" "$(GDTBuildSuffix)" "$(GDTPlatform)" "$(GDTPlatformSuffix)" "$(OutDir)" "$(CodeXLGpuProfilerDeliverDir)\"</Command>
-      <Outputs>$(OutDir)GPUPerfAPICL$(GDTPlatformSuffix)$(GDT_BUILD_SUFFIX).dll;$(OutDir)\GPUPerfAPICounters$(GDTPlatformSuffix)$(GDT_BUILD_SUFFIX).dll;$(Outputs)</Outputs>
+      <Command>"$(CodeXLGpuProfilingDir)\Backend\CLProfileAgent\CLExternalFileCopy.bat" "$(GPUPerfAPIDir)" "$(AMDTBuildSuffix)" "$(AMDTPlatform)" "$(AMDTPlatformSuffix)" "$(OutDir)" "$(CodeXLGpuProfilerDeliverDir)\"</Command>
+      <Outputs>$(OutDir)GPUPerfAPICL$(AMDTPlatformSuffix)$(AMDT_BUILD_SUFFIX).dll;$(OutDir)\GPUPerfAPICounters$(AMDTPlatformSuffix)$(AMDT_BUILD_SUFFIX).dll;$(Outputs)</Outputs>
     </CustomBuildStep>
     <Link>
       <AdditionalOptions>/EXPORT:clAgent_OnLoad %(AdditionalOptions)</AdditionalOptions>

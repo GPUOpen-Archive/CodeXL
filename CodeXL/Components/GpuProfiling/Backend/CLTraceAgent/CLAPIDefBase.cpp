@@ -181,7 +181,7 @@ bool CLAPIBase::WriteTimestampEntry(std::ostream& sout, bool bTimeout)
     // start time
     sout << left << setw(21) << m_ullStart;
 
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
 
     if (m_PrePMCs.size() > 0)
     {
@@ -198,7 +198,7 @@ bool CLAPIBase::WriteTimestampEntry(std::ostream& sout, bool bTimeout)
 #endif
     // end time
     sout << left << setw(21) << m_ullEnd;
-#ifdef GDT_INTERNAL
+#ifdef AMDT_INTERNAL
 
     if (m_PostPMCs.size() > 0)
     {

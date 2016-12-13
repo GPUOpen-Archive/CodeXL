@@ -67,11 +67,11 @@ void AttemptAttachToAPIServer()
         GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN, "D3D11.dll", &d3d11ServerModule);
         GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN, "D3D12.dll", &d3d12ServerModule);
 #else
-        GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN, "DX11Server" GDT_PROJECT_SUFFIX ".dll", &d3d11ServerModule);
+        GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN, "DX11Server" AMDT_PROJECT_SUFFIX ".dll", &d3d11ServerModule);
 #ifdef CODEXL_GRAPHICS
-        GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN, "CXLGraphicsServerDX12" GDT_PROJECT_SUFFIX ".dll", &d3d12ServerModule);
+        GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN, "CXLGraphicsServerDX12" AMDT_PROJECT_SUFFIX ".dll", &d3d12ServerModule);
 #else // CODEXL_GRAPHICS
-        GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN, "DX12Server" GDT_PROJECT_SUFFIX ".dll", &d3d12ServerModule);
+        GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN, "DX12Server" AMDT_PROJECT_SUFFIX ".dll", &d3d12ServerModule);
 #endif // CODEXL_GRAPHICS
 #endif
 

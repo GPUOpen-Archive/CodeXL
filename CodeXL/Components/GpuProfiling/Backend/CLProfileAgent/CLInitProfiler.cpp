@@ -42,9 +42,9 @@ bool InitProfiler()
 
     // if it is not loaded, let's load the dll
 #ifdef USE_DEBUG_GPA
-    string strDll(LIB_PREFIX "GPUPerfAPICL" BITNESS "-d" GDT_BUILD_SUFFIX LIB_SUFFIX);
+    string strDll(LIB_PREFIX "GPUPerfAPICL" BITNESS "-d" AMDT_BUILD_SUFFIX LIB_SUFFIX);
 #else
-    string strDll(LIB_PREFIX "GPUPerfAPICL" BITNESS GDT_BUILD_SUFFIX LIB_SUFFIX);
+    string strDll(LIB_PREFIX "GPUPerfAPICL" BITNESS AMDT_BUILD_SUFFIX LIB_SUFFIX);
 #endif
 
     // Pass params between processes through file

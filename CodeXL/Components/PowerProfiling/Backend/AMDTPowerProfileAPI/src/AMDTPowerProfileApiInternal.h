@@ -11,7 +11,7 @@
 
 // minimum sampling interval is 100 msec for public
 // and 1 msec for internal/nda builds
-#if defined(GDT_INTERNAL) || defined(GDT_NDA)
+#if defined(AMDT_INTERNAL) || defined(AMDT_NDA)
     #define MINIMAL_SAMPLING_PERIOD 1
 #else
     #define MINIMAL_SAMPLING_PERIOD 10
