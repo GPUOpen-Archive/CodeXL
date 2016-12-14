@@ -1153,6 +1153,11 @@ bool MergeKernelProfileOutputFiles(std::vector<std::string> counterFileList, std
             }
         }
 
+        if (config.counterFileList.size() == 1)
+        {
+            counterFile = config.counterFileList[0];
+        }
+
         config.strOutputFile = outputFileName;
         outputFileList.push_back(outputFileName);
         retVal = ProcessCommandLine(counterFile);
