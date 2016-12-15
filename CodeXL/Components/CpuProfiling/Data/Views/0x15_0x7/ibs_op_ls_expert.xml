@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<!DOCTYPE view_configuration SYSTEM "..\viewconfig.dtd">
+
+<!--
+        IBS load/store op "expert" information: Bank conflicts, forwarding, MAB hits
+        View configuration
+        Date:    14 January 2016
+        Version: 1.05
+		    Processor: AMD family 15h Models 70h - 7Fh
+        Copyright (c) 2016 Advanced Micro Devices, Inc. All rights reserved.
+
+        Related data collection configurations: ibs.xml
+ -->
+
+<view_configuration>
+
+  <view name="IBS MEM forwarding and bank conflicts"
+        separate_cpus="F"
+        separate_processes="F"
+        separate_threads="F"
+        >
+
+    <data>
+      <event id="OpLoadStore"     select="F200" mask="00" />
+      <event id="OpLoad"          select="F201" mask="00" />
+      <event id="OpStore"         select="F202" mask="00" />
+      <event id="OpBankConfLoad"  select="F209" mask="00" />
+      <event id="OpBankConfStore" select="F20A" mask="00" />
+      <event id="OpForwarded"     select="F20B" mask="00" />
+      <event id="OpCancelled"     select="F20C" mask="00" />
+      <event id="OpMABHit"        select="F210" mask="00" />
+    </data>
+
+    <output>
+      <column title="IBS load/store" sort="descending" visible="F">
+        <value id="OpLoadStore" />
+      </column>
+      <column title="IBS load" sort="none">
+        <value id="OpLoad" />
+      </column>
+      <column title="IBS store" sort="none">
+        <value id="OpStore" />
+      </column>
+      <column title="IBS bank conf load" sort="none">
+        <value id="OpBankConfLoad" />
+      </column>
+      <column title="IBS bank conf store" sort="none">
+        <value id="OpBankConfStore" />
+      </column>
+      <column title="IBS forwarded" sort="none">
+        <value id="OpForwarded" />
+      </column>
+      <column title="IBS STLF cancelled" sort="none">
+        <value id="OpCancelled" />
+      </column>
+      <column title="IBS MAB hits" sort="none">
+        <value id="OpMABHit" />
+      </column>
+    </output>
+
+    <tool_tip>
+      Show bank conflicts and forwarding
+    </tool_tip>
+
+    <description>
+      Use this view to show memory access bank conflicts,
+      data forwarding and Missed Address Buffer (MAB) hits.
+    </description>
+
+  </view>
+
+</view_configuration>

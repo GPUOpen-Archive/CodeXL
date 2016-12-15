@@ -1,0 +1,1332 @@
+<cpu_events>
+
+<!--
+       AMD Family 10h performance monitor events (public)
+
+       Source: BIOS and Kernel Developer's Guide for AMD family 10h
+       Processors, Rev 3.20, 2 February 2009
+
+       Copyright (c) 2007-2010 Advanced Micro Devices, Inc.
+-->
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; FP Unit
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+<source unit="FP">
+
+
+<event name="Dispatched FPU ops" abbreviation="FPU ops" value="0" >
+	<mask name="Add pipe ops excluding load ops and SSE move ops" value="0"></mask>
+	<mask name="Multiply pipe ops excluding load ops and SSE move ops" value="1"></mask>
+	<mask name="Store pipe ops excluding load ops and SSE move ops" value="2"></mask>
+	<mask name="Add pipe load ops and SSE move ops" value="3"></mask>
+	<mask name="Multiply pipe load ops and SSE move ops" value="4"></mask>
+	<mask name="Store pipe load ops and SSE move ops" value="5"></mask>
+	<op_name name="op" value="DISPATCHED_FPU_OPS" />
+	<description>The number of operations (uops) dispatched to the FPU execution pipelines. This event reflects how busy the FPU pipelines are. This includes all operations done by x87, MMXTM and SSE instructions, including moves. Each increment represents a one-cycle dispatch event; packed 128-bit SSE operations count as two ops in 64-bit FPU implementations; scalar operations count as one. This event is a speculative event. (See EventSelect 0CBh). Note: Since this event includes non-numeric operations it is not suitable for measuring MFLOPs.</description>
+</event>
+
+<event name="Cycles in which the FPU is Empty" abbreviation="Cycles FPU emtpy" value="1" >
+	<op_name name="op" value="CYCLES_FPU_EMPTY" />
+	<description>The number of cycles in which the FPU is empty. Invert this (MSRC001_00[03:00][Invert]=1) to count cycles in which at least one FPU operation is present in the FPU.</description>
+</event>
+
+<event name="Dispatched fast flag FPU operations" abbreviation="Fast flag FPU ops" value="2" >
+	<op_name name="op" value="DISPATCHED_FPU_OPS_FAST_FLAG" />
+	<description>The number of FPU operations that use the fast flag interface (e.g. FCOMI, COMISS, COMISD, UCOMISS, UCOMISD, MOVD, CVTSD2SI). This event is a speculative event.</description>
+</event>
+
+<event name="Retired SSE Ops" abbreviation="Retired SSE Ops" value="3" >
+	<mask name="Single precision add/subtract ops" value="0"></mask>
+	<mask name="Single precision multiply ops" value="1"></mask>
+	<mask name="Single precision divide/square root ops" value="2"></mask>
+	<mask name="Double precision add/subtract ops" value="3"></mask>
+	<mask name="Double precision multiply ops" value="4"></mask>
+	<mask name="Double precision divide/square root ops" value="5"></mask>
+	<mask name="Op type: 0=uops. 1=FLOPS" value="6"></mask>
+	<op_name name="op" value="RETIRED_SSE_OPS" />
+	<description>The number of SSE operations retired. This counter can count either FLOPS (UnitMask bit 6 = 1) or uops (UnitMask bit 6 = 0).</description>
+</event>
+
+<event name="Retired move ops" abbreviation="Ret move ops" value="4" >
+	<mask name="Merging low quadword move uops" value="0"></mask>
+	<mask name="Merging high quadword move uops" value="1"></mask>
+	<mask name="All other merging move uops" value="2"></mask>
+	<mask name="All other move uops" value="3"></mask>
+	<op_name name="op" value="RETIRED_MOVE_OPS" />
+	<description>The number of move uops retired. Merging low quadword move ops copy the lower 64 bits of a source register to the upper 64 bits of a destination register. The lower 64 bits of the destination register remain unchanged. Merging high quadword move ops copy the upper 64 bits of a source register to the lower 64 bits of a destination register. The upper 64 bits of the destination register remain unchanged.</description>
+</event>
+
+<event name="Retired serializing ops" abbreviation="Ret serializing ops" value="5" >
+	<mask name="SSE bottom-executing uops retired" value="0"></mask>
+	<mask name="SSE bottom-serializing uops retired" value="1"></mask>
+	<mask name="x87 bottom-executing uops retired" value="2"></mask>
+	<mask name="x87 bottom-serializing uops retired" value="3"></mask>
+	<op_name name="op" value="RETIRED_SERIALIZING_OPS" />
+	<description>The number of serializing uops retired. A bottom-executing uop is not issued until it is the oldest non-retired uop in the FPU. Bottom-executing ops are most commonly seen with FSTSW and STMXCSR instructions. A bottom-serializing uop does not issue until it is the oldest non-issued uop in the FP scheduler. Bottom-serializing uops block all subsequent uops from being issued until the uop is issued. Bottom-serializing ops are most commonly seen with FLCDW and LDMXCSR instructions.</description>
+</event>
+
+<event name="Number of cycles that a serializing uop is in the FP scheduler" abbreviation="Serialized uop cycles" value="6" >
+	<mask name="Number of cycles a bottom-execute uop is in the FP scheduler" value="0"></mask>
+	<mask name="Number of cycles a bottom-serializing uop is in the FP scheduler" value="1"></mask>
+	<op_name name="op" value="SERIAL_UOPS_IN_FP_SCHED" />
+	<description>See EventSelect 005h for a description of bottom-executing and bottom-serializing uop.</description>
+</event>
+
+</source>
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Load Store Unit = 1
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+<source unit="LS">
+
+<event name="Segment register loads"  abbreviation="Seg reg loads" value="20" >
+	<mask name="ES" value="0"></mask>
+	<mask name="CS" value="1"></mask>
+	<mask name="SS" value="2"></mask>
+	<mask name="DS" value="3"></mask>
+	<mask name="FS" value="4"></mask>
+	<mask name="GS" value="5"></mask>
+	<mask name="HS" value="6"></mask>
+	<op_name name="op" value="SEGMENT_REGISTER_LOADS" />
+	<description>The number of segment register loads performed.</description>
+</event>
+
+<event name="Pipeline restart due to self-modifying code"  abbreviation="Restart self-mod code" value="21" >
+	<op_name name="op" value="PIPELINE_RESTART_DUE_TO_SELF_MODIFYING_CODE" />
+	<description>The number of pipeline restarts caused by self-modifying code (a store that hits any instruction that has been fetched for execution beyond the instruction doing the store).</description>
+</event>
+
+<event name="Pipeline restart due to probe hit"  abbreviation="Restart probe hit" value="22" >
+	<op_name name="op" value="PIPELINE_RESTART_DUE_TO_PROBE_HIT" />
+	<description>The number of pipeline restarts caused by an invalidating probe hitting on a speculative out-of-order load.</description>
+</event>
+
+<event name="LS buffer 2 full"  abbreviation="LS buffer2 full" value="23" >
+	<op_name name="op" value="LS_BUFFER_2_FULL_CYCLES" />
+	<description>The number of cycles that the LS2 buffer is full. This buffer holds stores waiting to retire as well as requests that missed the data cache and are waiting on a refill. This condition stalls further data cache accesses, although such stalls may be overlapped by independent instruction execution.</description>
+</event>
+
+<event name="Locked operations"  abbreviation="Locked ops" value="24" >
+	<op_name name="op" value="LOCKED_OPS" />
+	<mask name="Number of locked instructions executed" value="0"></mask>
+	<mask name="Cycles spent in speculative phase" value="1"></mask>
+	<mask name="Cycles spent in non-speculative phase (including cache miss penalty)" value="2"></mask>
+	<mask name="Cycles waiting for a cache hit (cache miss penalty)" value="3"></mask>
+	<description>This event covers locked operations performed and their execution time. The execution time represented by the cycle counts is typically overlapped to a large extent with other instructions. The non-speculative cycles event is suitable for event-based profiling of lock operations that tend to miss in the cache.</description>
+</event>
+
+<event name="Retired CLFLUSH instructions" abbreviation="Ret CLFLUSH inst" value="26" >
+	<op_name name="op" value="RETIRED_CFLUSH" />
+	<description>The number of CLFLUSH instructions retired.</description>
+</event>
+
+<event name="Retired CPUID instructions" abbreviation="Ret CPUID inst" value="27" >
+	<op_name name="op" value="RETIRED_CPUID" />
+	<description>The number of CPUID instructions retired.</description>
+</event>
+
+<event name="Cancelled store to load forward operations" abbreviation="Cancelled fwd ops" value="2A" >
+	<op_name name="op" value="CANCELLED_STORE_TO_LOAD" />
+	<mask name="Address mismatches (starting byte not the same)" value="0"></mask>
+	<mask name="Store is smaller than load"     value="1"></mask>
+	<mask name="Misaligned"                     value="2"></mask>
+	<description>Counts the number store to load forward operations that are cancelled.</description>
+</event>
+
+<event name="SMIs received" abbreviation="SMIs received" value="2B" >
+	<op_name name="op" value="SMIS_RECEIVED" />
+	<description>Counts the number of SMIs received by the processor.</description>
+</event>
+
+</source>
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Data Cache Unit = 3
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+<source unit="DC">
+
+<event name="Data cache accesses"  abbreviation="DC accesses" value="40" >
+        <op_name name="op" value="DATA_CACHE_ACCESSES" />
+	<description>The number of accesses to the data cache for load and store references. This may include certain microcode scratchpad accesses, although these are generally rare. Each increment represents an eight-byte access, although the instruction may only be accessing a portion of that. This event is a speculative event.</description>
+</event>
+
+<event name="Data cache misses" abbreviation="DC misses"  value="41" >
+	<op_name name="op" value="DATA_CACHE_MISSES" />
+	<description>The number of data cache references which missed in the data cache. This event is a speculative event. Except in the case of streaming stores, only the first miss for a given line is included - access attempts by other instructions while the refill is still pending are not included in this event. So in the absence of streaming stores, each event reflects one 64-byte cache line refill, and counts of this event are the same as, or very close to, the combined count for EventSelect 042h. Streaming stores however cause this event for every such store, since the target memory is not refilled into the cache. Hence this event should not be used as an indication of data cache refill activity - EventSelect 042h should be used for such measurements. See EventSelect 065h for an indication of streaming store activity. A large difference between this event (with all UnitMask bits set) and EventSelect 042h would be due mainly to streaming store activity and hardware prefetch requests. For revision C and later revisions, this event no longer counts data cache misses associated with streaming stores.</description>
+</event>
+
+<event name="Data cache refills from L2 or Northbridge" abbreviation="DC refills L2/NB" value="42" >
+	<mask name="Refill from Northbridge" value="0" />
+	<mask name="Shared-state line from L2" value="1" />
+	<mask name="Exclusive-state line from L2" value="2" />
+	<mask name="Owned-state line from L2" value="3" />
+	<mask name="Modified-state line from L2" value="4" />
+	<op_name name="op" value="DATA_CACHE_REFILLS_FROM_L2_OR_NORTHBRIDGE" />
+	<description>The number of data cache refills satisfied from the L2 cache (and/or the Northbridge), per the UnitMask. Unit-Mask bits 4:1 allow a breakdown of refills from the L2 by coherency state. UnitMask bit 0 reflects refills which missed in the L2, and provides the same measure as the combined sub-events of EventSelect 043h. Each increment reflects a 64-byte transfer. This event is a speculative event.</description>
+</event>
+
+<event name="Data cache refills from Northbridge" abbreviation="DC refills NB" value="43" >
+	<mask name="Invalid" value="0" />
+	<mask name="Shared" value="1" />
+	<mask name="Exclusive" value="2" />
+	<mask name="Owned" value="3" />
+	<mask name="Modified" value="4" />
+	<op_name name="op" value="DATA_CACHE_REFILLS_FROM_NORTHBRIDGE" />
+	<description>The number of L1 cache refills satisfied from the Northbridge (DRAM, L3 or another processor's cache), as opposed to the L2. The UnitMask selects lines in one or more specific coherency states. Each increment reflects a 64-byte transfer. This event is a speculative event.</description>
+</event>
+
+<event name="Data cache lines evicted" abbreviation="DC evicted" value="44" >
+	<mask name="Invalid" value="0" />
+	<mask name="Shared" value="1" />
+	<mask name="Exclusive" value="2" />
+	<mask name="Owned" value="3" />
+	<mask name="Modified" value="4" />
+	<mask name="Cache line evicted was brought into cache by PrefetchNTA instruction" value="5" />
+	<mask name="Cache line evicted was not brought into cache by PrefetchNTA instruction" value="6" />
+	<op_name name="op" value="DATA_CACHE_LINES_EVICTED" />
+	<description>The number of L1 data cache lines written to the L2 cache or system memory, having been displaced by L1 refills. The UnitMask may be used to count only victims in specific coherency states. Each increment represents a 64-byte transfer. This event is a speculative event. In most cases, L1 victims are moved to the L2 cache, displacing an older cache line there. Lines brought into
+the data cache by PrefetchNTA instructions, however, are evicted directly to system memory (if dirty) or invalidated (if clean). The Invalid case (UnitMask value 01h) reflects the replacement of lines that would have been invalidated by probes for write operations from another processor or DMA activity. UnitMask 20h and 40h count all evictions regardless of cache line state. When either UnitMask 20h or 40h is enabled all other Unit-Masks should be disabled.</description>
+</event>
+
+<event name="L1 DTLB miss and L2 DTLB hit"  abbreviation="DTLB L1M L2H" value="45" >
+	<op_name name="op" value="L1_DTLB_MISS_AND_L2_DTLB_HIT" />
+	<mask name="L2 4K TLB hit" value="0" />
+	<mask name="L2 2M TLB hit" value="1" />
+	<mask name="L2 1G TLB hit (RevC)" value="2" />
+	<description>The number of data cache accesses that miss in the L1 DTLB and hit in the L2 DTLB. This event is a speculative event.</description>
+</event>
+
+<event name="L1 DTLB and L2 DTLB miss" abbreviation="DTLB L1M L2M" value="46" >
+	<op_name name="op" value="L1_DTLB_AND_L2_DTLB_MISS" />
+	<mask name="4K TLB reload" value="0" />
+	<mask name="2M TLB reload" value="1" />
+	<mask name="1G TLB reload" value="2" />
+	<description>The number of data cache accesses that miss in both the L1 and L2 DTLBs. This event is a speculative event.</description>
+</event>
+
+<event name="Misaligned accesses" abbreviation="Misalign access" value="47" >
+	<op_name name="op" value="MISALIGNED_ACCESSES" />
+	<description>The number of data cache accesses that are misaligned. These are accesses which cross a sixteen-byte boundary. They incur an extra cache access (reflected in EventSelect 040h), and an extra cycle of latency on reads. This event is a speculative event.</description>
+</event>
+
+<event name="Microarchitectural late cancel of an acess" abbreviation="Late cancel" value="48" >
+	<op_name name="op" value="MICRO_ARCH_LATE_CANCEL_ACCESS" />
+	<description>Microarchitectural late cancel of an acess.</description>
+</event>
+
+<event name="Microarchitectural early cancel of an access" abbreviation="Early cancel" value="49" >
+	<op_name name="op" value="MICRO_ARCH_EARLY_CANCEL_ACCESS" />
+	<description>Microarchitectural early cancel of an access.</description>
+</event>
+
+<event name="Single-bit ECC errors recorded by scrubber" abbreviation="1-bit ECC errors"  value="4A" >
+	<mask name="Scrubber error" value="0" />
+	<mask name="Piggyback scrubber errors" value="1" />
+	<mask name="Load pipe error" value="2" />
+	<mask name="Store write pipe error" value="3" />
+	<op_name name="op" value="1_BIT_ECC_ERRORS" />
+	<description>The number of single-bit errors corrected by either of the error detection/correction mechanisms in the data cache.</description>
+</event>
+
+<event name="Prefetch instructions dispatched" abbreviation="Prefetch inst" value="4B" >
+	<mask name="Load (Prefetch, PrefetchT0/T1/T2)" value="0" />
+	<mask name="Store (PrefetchW)" value="1" />
+	<mask name="NTA (PrefetchNTA)" value="2" />
+	<op_name name="op" value="PREFETCH_INSTRUCTIONS_DISPATCHED" />
+	<description>The number of prefetch instructions dispatched by the decoder. Such instructions may or may not cause a cache line transfer. All Dcache and L2 accesses, hits and misses by prefetch instructions, except for prefetch instructions that collide with an outstanding hardware prefetch, are included in these events. This event is a speculative event.</description>
+</event>
+
+<event name="DCACHE misses by locked instructions" abbreviation="DC misses locked inst" value="4C" >
+	<mask name="Data cache misses by locked instructions " value="1" />
+	<op_name name="op" value="LOCKED_INSTRUCTIONS_DCACHE_MISSES" />
+	<description>The number of data cache misses incurred by locked instructions. (The total number of locked instructions may be obtained from EventSelect 024h.) Such misses may be satisfied from the L2 or system memory, but there is no provision for distinguishing between the two. When used for event-based profiling, this event tends to occur very close to the offending instructions. This event is also included in the basic Dcache miss event (EventSelect 041h).</description>
+</event>
+
+<event name="L1 DTLB hit" abbreviation="L1 DTLB hit" value="4D" >
+	<mask name="L1 4K TLB hit" value="0" />
+	<mask name="L1 2M TLB hit" value="1" />
+	<mask name="L1 1G TLB hit" value="2" />
+	<op_name name="op" value="L1_DTLB_HIT" />
+	<description>The number of data cache accesses that hit in the L1 DTLB. This event is a speculative event.</description>
+</event>
+
+<event name="Ineffective software prefetches" abbreviation="Ineffective SW prefetch" value="52" >
+	<mask name="Software prefetch hit in the L1" value="0" />
+	<mask name="Software prefetch hit in the L2" value="3" />
+	<op_name name="op" value="INEFFECTIVE_SW_PREFETCHES" />
+	<description>The number of software prefetches that did not fetch data outside of the processor core.</description>
+</event>
+
+<event name="Global TLB flushes" abbreviation="Global TLB flushes" value="54" >
+	<op_name name="op" value="GLOBAL_TLB_FLUSHES" />
+	<description>This event counts TLB flushes that flush TLB entries that have the global bit set.</description>
+</event>
+
+</source>
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;   L2 Cache and System Interface
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+<source unit="L2">
+
+<event name="Memory requests by type" abbreviation="Memory req" value="65" >
+	<op_name name="op" value="MEMORY_REQUESTS" />
+	<mask name="Requests to non-cacheable (UC) memory" value="0"></mask>
+	<mask name="Requests to write-combining (WC) memory" value="1"></mask>
+	<mask name="Streaming store (SS) requests" value="7"></mask>
+	<description>These events reflect accesses to uncacheable (UC) or write-combining (WC) memory regions (as defined by MTRR or PAT settings) and Streaming Store activity to WB memory. Both the WC and Streaming Store events reflect Write Combining buffer flushes, not individual store instructions. WC buffer flushes which typically consist of one 64-byte write to the system for each flush (assuming software typically fills a buffer before it gets flushed). A partially-filled buffer requires two or more smaller writes to the system. The WC event reflects flushes of WC buffers that are filled by stores to WC memory or streaming stores to WB memory. The Streaming Store event reflects only flushes due to streaming stores (which are typically only to WB memory). The difference between counts of these two events reflects the true amount of write events to WC memory.</description>
+</event>
+
+<event name="Data prefetcher"  abbreviation="Data prefetcher" value="67" >
+	<op_name name="op" value="DATA_PREFETCHES" />
+	<mask name="Cancelled prefetches" value="0" />
+	<mask name="Prefetch attempts" value="1" />
+	<description>These events reflect requests made by the data prefetcher. UnitMask bit 1 counts total prefetch requests, while bit 0 counts requests where the target block is found in the L2 or data cache. The difference between the two represents actual data read (in units of 64-byte cache lines) from the system by the prefetcher. This is also included in the count of EventSelect 07Fh, UnitMask bit 0 (combined with other L2 fill events). This event is always 0 because the processor prefetches into the data cache, not the L2 cache.</description>
+</event>
+
+<event name="Northbridge read responses by coherency state" abbreviation="NB read resp coh state" value="6C" >
+	<mask name="Exclusive" value="0" />
+	<mask name="Modified" value="1" />
+	<mask name="Shared" value="2" />
+	<mask name="Data error" value="4" />
+	<op_name name="op" value="NORTHBRIDGE_READ_RESPONSES" />
+	<description>specific cache coherency states. Each increment represents one 64-byte cache line transferred from the Northbridge (DRAM, L3, or another cache, including another core on the same node) to the data cache, instruction cache or L2 cache (for data prefetcher and TLB table walks). Modified-state responses may be for Dcache store miss refills, PrefetchW software prefetches, hardware prefetches for a store-miss stream, or Change-to-Dirty requests that get a dirty (Owned) probe hit in another cache. Exclusive responses may be for any Icache refill, Dcache load miss refill, other software prefetches, hardware prefetches for a load-miss stream, or TLB table walks that miss in the L2 cache; Shared responses may be for any of those that hit a clean line in another cache.</description>
+</event>
+
+<event name="Octwords written to system" abbreviation="Octwords written to sys" value="6D" >
+	<op_name name="op" value="OCTWORD_WRITE_TRANSFERS" />
+	<mask name="Octword write transfer" value="0" />
+	<description>The number of octword (16-byte) data transfers from the processor to the system. These may be part of a 64-byte cache line writeback or a 64-byte dirty probe hit response, each of which would cause four increments; or a partial or complete Write Combining buffer flush (Sized Write), which could cause from one to four increments.</description>
+</event>
+
+
+<event name="Requests to L2 cache" abbreviation="L2 requests" value="7D" >
+	<mask name="IC fill" value="0" />
+	<mask name="DC fill" value="1" />
+	<mask name="TLB fill (page table walks)" value="2" />
+	<mask name="Tag snoop request" value="3" />
+	<mask name="Cancelled request" value="4" />
+	<mask name="Hardware prefetch from DC" value="5" />
+	<op_name name="op" value="REQUESTS_TO_L2" />
+	<description>The number of requests to the L2 cache for Icache or Dcache fills, or page table lookups for the TLB. These events reflect only read requests to the L2. These include some amount of retries associated with address or resource conflicts. Such retries tend to occur more as the L2 gets busier, and in certain extreme cases (such as large block moves that overflow the L2) these extra requests can dominate the event count. These extra requests are not a direct indication of performance impact - they simply reflect opportunistic accesses that don't complete. But because of this, they are not a good indication of actual cache line movement. The Icache and Dcache miss and refill events (81h, 82h, 83h, 41h, 42h, 43h) provide a more accurate indication of this, and are the preferred way to measure such traffic.</description>
+</event>
+
+<event name="L2 cache misses" abbreviation="L2 misses" value="7E">
+	<mask name="IC fill" value="0" />
+	<mask name="DC fill (includes possible replays)" value="1" />
+	<mask name="TLB page table walk" value="2" />
+	<mask name="Hardware prefetch from DC" value="3" />
+	<op_name name="op" value="L2_CACHE_MISS" />
+	<description>The number of requests that miss in the L2 cache. This may include some amount of speculative activity, as well as some amount of retried requests as described in EventSelect 07Dh. The IC-fill-miss and DC-fill-miss events tend to mirror the Icache and Dcache refill-from-system events (83h and EventSelect 043h, respectively), and tend to include more speculative activity than those events.</description>
+</event>
+
+<event name="L2 fill/writeback" abbreviation="L2 fill/writeback" value="7F" >
+	<mask name="L2 fills" value="0" />
+	<mask name="L2 writebacks to system" value="1" />
+	<op_name name="op" value="L2_CACHE_FILL_WRITEBACK" />
+	<description>The number of lines written into the L2 cache due to victim writebacks from the Icache or Dcache, TLB page table walks and the hardware data prefetcher (UnitMask bit 0); or writebacks of dirty lines from the L2 to the system (UnitMask bit 1). Each increment represents a 64-byte cache line transfer. Note: Victim writebacks from the Dcache may be measured separately using EventSelect 044h. However this is not quite the same as the Dcache component of this event, the main difference being PrefetchNTA lines. When these are evicted from the Dcache due to replacement, they are written out to system memory (if dirty) or simply invalidated (if clean), rather than being moved to the L2 cache.</description>
+</event>
+
+<event name="Page size mismatches (RevC)"
+		abbreviation="Page size mismatches" value="165" minimumModel="4">
+	<mask name="Guest page size is larger than the host page size" value="0" />
+	<mask name="MTRR mismatch" value="1" />
+	<mask name="Host page size is larger than the guest page size" value="2" />
+	<op_name name="op" value="PAGE_SIZE_MISMATCHES" />
+	<description>Revision B: Reserved. Revision C and later revisions: Counts the number of large pages that are installed into the TLB as a smaller page size when nested paging is enabled.</description>
+</event>
+
+</source>
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; IC source unit
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+<source unit="IC">
+
+<event name="Instruction Cache fetches" abbreviation="IC fetches" value="80" >
+	<op_name name="op" value="INSTRUCTION_CACHE_FETCHES" />
+	<description>The number of instruction cache accesses by the instruction fetcher. Each access is an aligned 16 byte read, from which a varying number of instructions may be decoded.</description>
+</event>
+
+<event name="Instruction Cache misses" abbreviation="IC misses" value="81" >
+	<op_name name="op" value="INSTRUCTION_CACHE_MISSES" />
+	<description>The number of instruction fetches and prefetch requests that miss in the instruction cache. This is typically equal to or very close to the sum of events 82h and 83h. Each miss results in a 64-byte cache line refill.</description>
+</event>
+
+<event name="Instruction Cache refills from L2" abbreviation="IC refills from L2" value="82" >
+	<op_name name="op" value="INSTRUCTION_CACHE_REFILLS_FROM_L2" />
+	<description>The number of instruction cache refills satisfied from the L2 cache. Each increment represents one 64-byte cache line transfer.</description>
+</event>
+
+<event name="Instruction Cache refills from system" abbreviation="IC refills from sys" value="83" >
+	<op_name name="op" value="INSTRUCTION_CACHE_REFILLS_FROM_SYSTEM" />
+	<description>The number of instruction cache refills from system memory (or another cache). Each increment represents one 64-byte cache line transfer.</description>
+</event>
+
+<event name="L1 ITLB miss and L2 ITLB hit" abbreviation="ITLB L1M L2H" value="84" >
+	<op_name name="op" value="L1_ITLB_MISS_AND_L2_ITLB_HIT" />
+	<description>The number of instruction fetches that miss in the L1 ITLB but hit in the L2 ITLB.</description>
+</event>
+
+<event name="L1 ITLB miss and L2 ITLB miss" abbreviation="ITLB L1M L2M" value="85" >
+   	<mask name="Instruction fetches to a 4K page" value="0" />
+   	<mask name="Instruction fetches to a 2M page" value="1" />
+	<op_name name="op" value="L1_ITLB_MISS_AND_L2_ITLB_MISS" />
+	<description>The number of instruction fetches that miss in both the L1 and L2 ITLBs.</description>
+</event>
+
+<event name="Pipeline restart due to instruction stream probe" abbreviation="Restart i-stream probe" value="86" >
+	<op_name name="op" value="PIPELINE_RESTART_DUE_TO_INSTRUCTION_STREAM_PROBE" />
+	<description>The number of pipeline restarts caused by invalidating probes that hit on the instruction stream currently being executed. This would happen if the active instruction stream was being modified by another processor in an MP system - typically a highly unlikely event.</description>
+</event>
+
+<event name="Instruction fetch stall" abbreviation="Inst fetch stall" value="87" >
+	<op_name name="op" value="INSTRUCTION_FETCH_STALL"/>
+	<description>The number of cycles the instruction fetcher is stalled. This may be for a variety of reasons such as branch predictor updates, unconditional branch bubbles, far jumps and cache misses, among others. May be overlapped by instruction dispatch stalls or instruction execution, such that these stalls don't necessarily impact performance.</description>
+</event>
+
+<event name="Return stack hits" abbreviation="RET stack hits" value="88" >
+	<op_name name="op" value="RETURN_STACK_HITS"/>
+	<description>The number of near return instructions (RET or RET Iw) that get their return address from the return address stack (i.e. where the stack has not gone empty). This may include cases where the address is incorrect (return mispredicts). This may also include speculatively executed false-path returns. Return mispredicts are typically caused by the return address stack underflowing, however they may also be caused by an imbalance in calls vs. returns, such as doing a call but then popping the return address off the stack. Note: This event cannot be reliably compared with events C9h and CAh (such as to calculate percentage of return mispredicts due to an empty return address stack), since it may include speculatively executed false-path returns that are not included in those retire-time events.</description>
+</event>
+
+<event name="Return stack overflows" abbreviation="RET stack overflows" value="89" >
+	<op_name name="op" value="RETURN_STACK_OVERFLOWS"/>
+	<description>The number of (near) call instructions that cause the return address stack to overflow. When this happens, the oldest entry is discarded. This count may include speculatively executed calls.</description>
+</event>
+
+<event name="Instruction cache victims" abbreviation="IC victims" value="8B" >
+	<op_name name="op" value="INSTRUCTION_CACHE_VICTIMS"/>
+	<description>The number of cachelines evicticed from the instruction cache to the L2.</description>
+</event>
+
+<event name="Instruction cache lines invalidated" abbreviation="IC lines invalidated" value="8C" >
+   	<mask name="Invalidating probe that did not hit any in-flight instructions" value="0" />
+   	<mask name="Invalidating probe that hit one or more in-flight instructions" value="1" />
+   	<mask name="SMC that did not hit any in-flight instructions" value="2" />
+   	<mask name="SMC that hit one or more in-flight instructions" value="3" />
+	<op_name name="op" value="INSTRUCTION_CHCHE_INVALIDATED"/>
+	<description>The number of instruction cache lines invalidated.</description>
+</event>
+
+<event name="ITLB reloads" abbreviation="ITLB reloads" value="99" >
+	<op_name name="op" value="ITLB_RELOADS"/>
+	<description>The number of ITLB reload requests.</description>
+</event>
+
+<event name="ITLB reloads aborted" abbreviation="ITLB reloads aborted" value="9A" >
+	<op_name name="op" value="ITLB_RELOADS_ABORTED"/>
+	<description>The number of ITLB reloads aborted.</description>
+</event>
+
+</source>
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; FR source unit
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+<source unit="FR">
+
+<event name="CPU clocks not halted (cycles)" abbreviation="CPU clocks" value="76" >
+        <op_name name="op" value="CPU_CLK_UNHALTED" />
+	<description>The number of clocks that the CPU is not in a halted state (due to STPCLK or a HLT instruction). Note: this event allows system idle time to be automatically factored out from IPC (or CPI) measurements, providing the OS halts the CPU when going idle. If the OS goes into an idle loop rather than halting, such calculations are influenced by the IPC of the idle loop.</description>
+</event>
+
+<event name="Retired instructions" abbreviation="Ret inst" value="C0" >
+	<op_name name="op" value="RETIRED_INSTRUCTIONS"/>
+	<description>The number of instructions retired (execution completed and architectural state updated). This count includes exceptions and interrupts - each exception or interrupt is counted as one instruction.</description>
+</event>
+
+<event name="Retired uops" abbreviation="Ret uops" value="C1" >
+	<op_name name="op" value="RETIRED_UOPS"/>
+	<description>The number of micro-ops retired. This includes all processor activity (instructions, exceptions, interrupts, microcode assists, etc.).</description>
+</event>
+
+<event name="Retired branch instructions" abbreviation="Ret branch" value="C2" >
+	<op_name name="op" value="RETIRED_BRANCH_INSTRUCTIONS"/>
+	<description>The number of branch instructions retired. This includes all types of architectural control flow changes, including exceptions and interrupts.</description>
+</event>
+
+<event name="Retired mispredicted branch instructions" abbreviation="Ret misp branch" value="C3" >
+	<op_name name="op" value="RETIRED_MISPREDICTED_BRANCH_INSTRUCTIONS"/>
+	<description>The number of branch instructions retired, of any type, that are not correctly predicted. This includes those for which prediction is not attempted (far control transfers, exceptions and interrupts).</description>
+</event>
+
+<event name="Retired taken branch instructions" abbreviation="Ret taken branch" value="C4" >
+	<op_name name="op" value="RETIRED_TAKEN_BRANCH_INSTRUCTIONS"/>
+	<description>The number of taken branches retired. This includes all types of architectural control flow changes, including exceptions and interrupts.</description>
+</event>
+
+<event name="Retired taken branch instructions mispredicted" abbreviation="Ret taken branch misp" value="C5" >
+	<op_name name="op" value="RETIRED_TAKEN_BRANCH_INSTRUCTIONS_MISPREDICTED" />
+	<description>The number of retired taken branch instructions that are mispredicted.</description>
+</event>
+
+<event name="Retired far control transfers" abbreviation="Ret far xfers" value="C6" >
+	<op_name name="op" value="RETIRED_FAR_CONTROL_TRANSFERS" />
+	<description>The number of far control transfers retired including far call/jump/return, IRET, SYSCALL and SYSRET, plus exceptions and interrupts. Far control transfers are not subject to branch prediction.</description>
+</event>
+
+<event name="Retired branch resyncs" abbreviation="Ret branch resyncs" value="C7" >
+	<op_name name="op" value="RETIRED_BRANCH_RESYNCS" />
+	<description>The number of resync branches. These reflect pipeline restarts due to certain microcode assists and events such as writes to the active instruction stream, among other things. Each occurrence reflects a restart penalty similar to a branch mispredict. This is relatively rare.</description>
+</event>
+
+<event name="Retired near returns" abbreviation="Ret near RET" value="C8" >
+	<op_name name="op" value="RETIRED_NEAR_RETURNS" />
+	<description>The number of near return instructions (RET or RET Iw) retired.</description>
+</event>
+
+<event name="Retired near returns mispredicted" abbreviation="Ret near RET misp" value="C9" >
+	<op_name name="op" value="RETIRED_NEAR_RETURNS_MISPREDICTED" />
+	<description>The number of near returns retired that are not correctly predicted by the return address predictor. Each such mispredict incurs the same penalty as a mispredicted conditional branch instruction.</description>
+</event>
+
+<event name="Retired indirect branches mispredicted" abbreviation="Ret ind branch misp" value="CA" >
+	<op_name name="op" value="RETIRED_INDIRECT_BRANCHES_MISPREDICTED" />
+	<description>The number of indirect branch instructions retired where the target address was not correctly predicted.</description>
+</event>
+
+<event name="Retired MMX/FP instructions" abbreviation="Ret MMX/FP inst" value="CB" >
+	<mask name="x87 instructions" value="0" />
+	<mask name="MMX and 3DNow! instructions" value="1" />
+	<mask name="SSE instructions (SSE, SSE2, SSE3, and SSE4A)" value="2" />
+	<op_name name="op" value="RETIRED_MMX_FP_INSTRUCTIONS" />
+	<description>The number of MMXTM, SSE or X87 instructions retired. The UnitMask allows the selection of the individual classes of instructions as given in the table. Each increment represents one complete instruction. Note: Since this event includes non-numeric instructions it is not suitable for measuring MFLOPS.</description>
+</event>
+
+<event name="Retired fastpath double op instructions" abbreviation="Ret fastpath double op" value="CC" >
+	<mask name="With low op in position 0" value="0" />
+	<mask name="With low op in position 1" value="1" />
+	<mask name="With low op in position 2" value="2" />
+	<op_name name="op" value="RETIRED_FASTPATH_DOUBLE_OP_INSTRUCTIONS" />
+	<description>Retired fastpath double op instructions.</description>
+</event>
+
+<event name="Interrupts-masked cycles" abbreviation="Int-masked cycles" value="CD" >
+	<op_name name="op" value="INTERRUPTS_MASKED_CYCLES" />
+	<description>The number of processor cycles where interrupts are masked (EFLAGS.IF = 0). Using edge-counting with this event gives the number of times IF is cleared; dividing the cycle-count value by this value gives the average length of time that interrupts are disabled on each instance. Compare the edge count with EventSelect 0CFh to determine how often interrupts are disabled for interrupt handling vs. other reasons (e.g. critical sections).</description>
+</event>
+
+<event name="Interrupts-masked cycles with interrupt pending" abbreviation="Int-masked pending" value="CE" >
+	<op_name name="op" value="INTERRUPTS_MASKED_CYCLES_WITH_INTERRUPT_PENDING" />
+	<description>The number of processor cycles where interrupts are masked (EFLAGS.IF = 0) and an interrupt is pending. Using edge-counting with this event and comparing the resulting count with the edge count for EventSelect 0CDh gives the proportion of interrupts for which handling is delayed due to prior interrupts being serviced, critical sections, etc. The cycle count value gives the total amount of time for such delays. The cycle count divided by the edge count gives the average length of each such delay.</description>
+</event>
+
+<event name="Interrupts taken" abbreviation="Int taken" value="CF" >
+	<op_name name="op" value="INTERRUPTS_TAKEN" />
+	<description>The number of hardware interrupts taken. This does not include software interrupts (INT n instruction).</description>
+</event>
+
+<event name="Decoder empty" abbreviation="Decoder empty" value="D0" >
+	<op_name name="op" value="DECODER_EMPTY" />
+	<description>The number of processor cycles where the decoder has nothing to dispatch (typically waiting on an instruction fetch that missed the Icache, or for the target fetch after a branch mispredict).</description>
+</event>
+
+<event name="Dispatch stalls" abbreviation="Dispatch stalls" value="D1" >
+	<op_name name="op" value="DISPATCH_STALLS" />
+	<description>The number of processor cycles where the decoder is stalled for any reason (has one or more instructions ready but can't dispatch them due to resource limitations in execution). This is the combined effect of events D2h - DAh, some of which may overlap; this event reflects the net stall cycles. The more common stall conditions (events D5h, D6h, D7h, D8h, and to a lesser extent D2) may overlap considerably. The occurrence of these stalls is highly dependent on the nature of the code being executed (instruction mix, memory reference patterns, etc.).</description>
+</event>
+
+<event name="Dispatch stall for branch abort to retire" abbreviation="Stall branch abort" value="D2" >
+	<op_name name="op" value="DISPATCH_STALL_FOR_BRANCH_ABORT" />
+	<description>The number of processor cycles the decoder is stalled waiting for the pipe to drain after a mispredicted branch. This stall occurs if the corrected target instruction reaches the dispatch stage before the pipe has emptied. See EventSelect 0D1h.</description>
+</event>
+
+<event name="Dispatch stall for serialization" abbreviation="Stall serialization" value="D3" >
+	<op_name name="op" value="DISPATCH_STALL_FOR_SERIALIZATION" />
+	<description>The number of processor cycles the decoder is stalled due to a serializing operation, which waits for the execution pipeline to drain. Relatively rare; mainly associated with system instructions. See EventSelect 0D1h.</description>
+</event>
+
+<event name="Dispatch stall for segment load" abbreviation="Stall seg load" value="D4" >
+	<op_name name="op" value="DISPATCH_STALL_FOR_SEGMENT_LOAD" />
+	<description>The number of processor cycles the decoder is stalled due to a segment load instruction being encountered while execution of a previous segment load operation is still pending. Relatively rare except in 16-bit code. See EventSelect 0D1h.</description>
+</event>
+
+<event name="Dispatch stall for reorder buffer full" abbreviation="Stall reorder full" value="D5" >
+	<op_name name="op" value="DISPATCH_STALL_FOR_REORDER_BUFFER_FULL" />
+	<description>The number of processor cycles the decoder is stalled because the reorder buffer is full. May occur simultaneously with certain other stall conditions; see EventSelect 0D1h.</description>
+</event>
+
+<event name="Dispatch stall for reservation station full" abbreviation="Stall res station full" value="D6" >
+	<op_name name="op" value="DISPATCH_STALL_FOR_RESERVATION_STATION_FULL" />
+	<description>The number of processor cycles the decoder is stalled because a required integer unit reservation stations is full. May occur simultaneously with certain other stall conditions; see EventSelect 0D1h.</description>
+</event>
+
+<event name="Dispatch stall for FPU full" abbreviation="Stall FPU full" value="D7" >
+	<op_name name="op" value="DISPATCH_STALL_FOR_FPU_FULL" />
+	<description>The number of processor cycles the decoder is stalled because the scheduler for the Floating Point Unit is full. This condition can be caused by a lack of parallelism in FP-intensive code, or by cache misses on FP operand loads (which could also show up as EventSelect 0D8h instead, depending on the nature of the instruction sequences). May occur simultaneously with certain other stall conditions; see EventSelect 0D1h.</description>
+</event>
+
+<event name="Dispatch stall for LS full" abbreviation="Stall LS full" value="D8" >
+	<op_name name="op" value="DISPATCH_STALL_FOR_LS_FULL" />
+	<description>The number of processor cycles the decoder is stalled because the Load/Store Unit is full. This generally occurs due to heavy cache miss activity. May occur simultaneously with certain other stall conditions; see EventSelect 0D1h.</description>
+</event>
+
+<event name="Dispatch stall waiting for all quiet" abbreviation="Stall waiting quiet" value="D9" >
+	<op_name name="op" value="DISPATCH_STALL_WAITING_FOR_ALL_QUIET" />
+	<description>The number of processor cycles the decoder is stalled waiting for all outstanding requests to the system to be resolved. Relatively rare; associated with certain system instructions and types of interrupts. May partially overlap certain other stall conditions; see EventSelect 0D1h.</description>
+</event>
+
+<event name="Dispatch stall for far control transfer or resync to retire" abbreviation="Stall far/resync" value="DA" >
+	<op_name name="op" value="DISPATCH_STALL_FOR_FAR_TRANSFER_OR_RESYNC" />
+	<description>The number of processor cycles the decoder is stalled waiting for the execution pipeline to drain before dispatching the target instructions of a far control transfer or a Resync (an instruction stream restart associated with certain microcode assists). Relatively rare; does not overlap with other stall conditions. See EventSelect 0D1h.</description>
+</event>
+
+<event name="FPU exceptions" abbreviation="FPU except" value="DB">
+	<mask name="x87 reclass microfaults" value="0" />
+	<mask name="SSE retype microfaults" value="1" />
+	<mask name="SSE reclass microfaults" value="2" />
+	<mask name="SSE and x87 microtraps" value="3" />
+	<op_name name="op" value="FPU_EXCEPTIONS" />
+	<description>The number of floating point unit exceptions for microcode assists. The UnitMask may be used to isolate specific types of exceptions.</description>
+</event>
+
+<event name="DR0 breakpoint matches" abbreviation="DR0 matches" value="DC" >
+	<op_name name="op" value="DR0_BREAKPOINTS" />
+	<description>The number of matches on the address in breakpoint register DR0, per the breakpoint type specified in DR7. The breakpoint does not have to be enabled. Each instruction breakpoint match incurs an overhead of about 120 cycles; load/store breakpoint matches do not incur any overhead.</description>
+</event>
+
+<event name="DR1 breakpoint matches" abbreviation="DR1 matches" value="DD" >
+	<op_name name="op" value="DR1_BREAKPOINTS" />
+	<description>The number of matches on the address in breakpoint register DR1. See notes for EventSelect 0DCh.</description>
+</event>
+
+<event name="DR2 breakpoint matches" abbreviation="DR2 matches" value="DE" >
+	<op_name name="op" value="DR2_BREAKPOINTS" />
+	<description>The number of matches on the address in breakpoint register DR2. See notes for EventSelect 0DCh.</description>
+</event>
+
+<event name="DR3 breakpoint matches" abbreviation="DR3 matches" value="DF" >
+	<op_name name="op" value="DR3_BREAKPOINTS" />
+	<description>The number of matches on the address in breakpoint register DR3. See notes for EventSelect 0DCh.</description>
+</event>
+
+<event name="Retired x87 floating point ops (RevC)" 
+        abbreviation="Ret x87 FP ops" value="1C0" minimumModel="4">
+	<mask name="Add/subtract ops" value="0" />
+	<mask name="Multiply ops" value="1" />
+	<mask name="Divide ops" value="2" />
+	<op_name name="op" value="RETIRED_X87_FP_OPS" />
+	<description>The number of x87 floating point ops that have retired.</description>
+</event>
+
+<event name="IBS ops tagged (RevC)" 
+        abbreviation="IBS ops tagged" value="1CF" minimumModel="4" >
+	<op_name name="op" value="IBS_OPS_TAGGED" />
+	<description>The number of ops tagged by IBS.</description>
+</event>
+
+<event name="LFENCE instructions retired (RevC)" 
+        abbreviation="LFENCE inst ret" value="1D3" minimumModel="4">
+	<op_name name="op" value="LFENSE_INST_RETIRED" />
+	<description>The number of LFENCE instructions retired.</description>
+</event>
+
+<event name="SFENCE instructions retired (RevC)" 
+        abbreviation="SFENCE inst ret" value="1D4" minimumModel="4">
+	<op_name name="op" value="SFENSE_INST_RETIRED" />
+	<description>The number of SFENCE instructions retired. This counter only counts properly if MSRC001_0015[SlowSfence]=0.</description>
+</event>
+
+<event name="MFENCE instructions retired (RevC)" 
+        abbreviation="MFENCE inst ret" value="1D5" minimumModel="4">
+	<op_name name="op" value="MFENSE_INST_RETIRED" />
+	<description>The number of MFENCE instructions retired.</description>
+</event>
+
+</source>
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Memory controller / Northbridge
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+<source unit="NB">
+
+<event value="E0" name="DRAM accesses" abbreviation="DRAM accesses" >
+	<mask value="0" name="DCT0 Page hit" />
+	<mask value="1" name="DCT0 Page miss" />
+	<mask value="2" name="DCT0 Page conflict" />
+	<mask value="3" name="DCT1 Page hit" />
+	<mask value="4" name="DCT1 Page miss" />
+	<mask value="5" name="DCT1 Page conflict" />
+	<op_name name="op" value="DRAM_ACCESSES" />
+	<description>The number of memory accesses performed by the local DRAM controller. The UnitMask may be used to isolate the different DRAM page access cases. Page miss cases incur an extra latency to open a page; page conflict cases incur both a page-close as well as page-open penalties. These penalties may be overlapped by DRAM accesses for other requests and don't necessarily represent lost DRAM bandwidth. The associated penalties are as follows: Page miss: Trcd (DRAM RAS-to-CAS delay), Page conflict: Trp + Trcd (DRAM row-precharge time plus RAS-to-CAS delay). Each DRAM access represents one 64-byte block of data transferred if the DRAM is configured for 64-byte granularity, or one 32-byte block if the DRAM is configured for 32-byte granularity. (The latter is only applicable to single-channel DRAM systems, which may be configured either way.)</description>
+</event>
+
+<event value="E1" name="Memory controller page table overflows" abbreviation="Page table overflows" >
+   	<mask value="0" name="DCT0 page table overflow" />
+	<mask value="1" name="DCT1 page table overflow" />
+	<op_name name="op" value="MEMORY_CONTROLLER_PAGE_TABLE_OVERFLOWS" />
+	<description>The number of page table overflows in the local DRAM controller. This table maintains information about which DRAM pages are open. An overflow occurs when a request for a new page arrives when the maximum number of pages are already open. Each occurrence reflects an access latency penalty equivalent to a page conflict.</description>
+</event>
+
+<event value="E2" name="Memory controller DRAM command slots missed" abbreviation="DRAM cmd slot miss" >
+   	<mask value="0" name="DCT0 command slots missed" />
+	<mask value="1" name="DCT1 command slots missed" />
+	<op_name name="op" value="MEMORY_CONTROLLER_SLOT_MISSED" />
+	<description>Memory controller DRAM command slots missed.</description>
+</event>
+
+<event value="E3" name="Memory controller turnarounds" abbreviation="Turnarounds" >
+	<mask value="0" name="DCT0 DIMM (chip select) turnaround" />
+	<mask value="1" name="DCT0 Read to write turnaround" />
+	<mask value="2" name="DCT0 Write to read turnaround" />
+	<mask value="3" name="DCT1 DIMM (chip select) turnaround" />
+	<mask value="4" name="DCT1 Read to write turnaround" />
+	<mask value="5" name="DCT1 Write to read turnaround" />
+	<op_name name="op" value="MEMORY_CONTROLLER_TURNAROUNDS" />
+	<description>The number of turnarounds on the local DRAM data bus. The UnitMask may be used to isolate the different cases. These represent lost DRAM bandwidth, which may be calculated as follows (in bytes per occurrence): DIMM turnaround: DRAM_width_in_bytes * 2 edges_per_memclk * 2; R/W turnaround: DRAM_width_in_bytes * 2 edges_per_memclk * 1; R/W turnaround: DRAM_width_in_bytes * 2 edges_per_memclk * (Tcl-1); where DRAM_width_in_bytes is 8 or 16 (for single- or dual-channel systems), and Tcl is the CAS latency of the DRAM in memory system clock cycles (where the memory clock for DDR-400, or PC3200 DIMMS, for example, would be 200 MHz).</description>
+</event>
+
+<event value="E4" name="Memory controller bypass counter saturation" abbreviation="Bypass ctr sat" >
+	<mask value="0" name="Memory controller high priority bypass" />
+	<mask value="1" name="Memory controller medium priority bypass" />
+	<mask value="2" name="DCT0 DCQ bypass" />
+	<mask value="3" name="DCT1 DCQ bypass" />
+	<op_name name="op" value="MEMORY_CONTROLLER_BYPASS_COUNTER_SATURATION" />
+	<description>Memory controller bypass counter saturation.</description>
+</event>
+
+<event name="Thermal status" value="E8" abbreviation="Thermal status" >
+	<mask value="2" name="Number of times the HTC trip point is crossed" />
+	<mask value="3" name="Number of clocks when STC trip point active" />
+	<mask value="4" name="Number of times the STC trip point is crossed" />
+	<mask value="5" name="Number of clocks HTC P-state is inactive" />
+	<mask value="6" name="Number of clocks HTC P-state is active" />
+	<op_name name="op" value="THERMAL_STATUS" />
+	<description>Thermal status.</description>
+</event>
+
+<event value="E9" name="CPU/IO requests to memory/IO" abbreviation="CPU/IO req mem/IO" >
+	<mask value="0" name="I/O to I/O" />
+	<mask value="1" name="I/O to memory" />
+	<mask value="2" name="CPU to I/O" />
+	<mask value="3" name="CPU to Memory" />
+	<mask value="4" name="To remote node" />
+	<mask value="5" name="To local node" />
+	<mask value="6" name="From remote node" />
+	<mask value="7" name="From local node" />
+	<op_name name="op" value="CPU_IO_REQUESTS_TO_MEMORY_IO" />
+	<description>These events reflect request flow between units and nodes, as selected by the UnitMask. The UnitMask is divided into two fields: request type (CPU or IO access to IO or Memory) and source/target location (local vs. remote). One or more requests types must be enabled via bits 3:0, and at least one source and one target location must be selected via bits 7:4. Each event reflects a request of the selected type(s) going from the selected source(s) to the selected target(s). Note: It is not possible to tell from these events how much data is going in which direction, as there is no distinction between reads and writes. Also, particularly for IO, the requests may be for varying amounts of data, anywhere from one to sixty-four bytes.For a direct measure of the amount and direction of data flowing between nodes, use events F6h, F7h and F8h.</description>
+</event>
+
+<event value="EA" name="Cache block commands" abbreviation="Cache block cmd" >
+	<mask value="0" name="Victim block (writeback)" />
+	<mask value="2" name="Read block (Dcache load miss refill)" />
+	<mask value="3" name="Read block shared (Icache refill)" />
+	<mask value="4" name="Read block modified (Dcache store miss refill)" />
+	<mask value="5" name="Change to Dirty (first store to clean block in cache)" />
+	<op_name name="op" value="CACHE_BLOCK_COMMANDS" />
+	<description>The number of requests made to the system for cache line transfers or coherency state changes, by request type. Each increment represents one cache line transfer, except for Change-to-Dirty. If a Change-to-Dirty request hits on a line in another processor's cache that's in the Owned state, it causes a cache line transfer, otherwise there is no data transfer associated with Change-to-Dirty requests.</description>
+</event>
+
+<event value="EB" name="Sized commands" abbreviation="Sized cmd" >
+	<mask value="0" name="NonPosted SzWr byte (1-32 bytes)" />
+	<mask value="1" name="NonPosted SzWr DWORD (1-16 dwords)" />
+	<mask value="2" name="Posted SzWr byte (1-32 bytes)" />
+	<mask value="3" name="Posted SzWr DWORD (1-16 dwords)" />
+	<mask value="4" name="SzRd byte" />
+	<mask value="5" name="SzRd DWORD" />
+	<op_name name="op" value="SIZED_COMMANDS" />
+	<description>The number of Sized Read/Write commands handled by the System Request Interface (local processor and hostbridge interface to the system). These commands may originate from the processor or hostbridge. Typical uses of the various Sized Read/Write commands are given in the UnitMask table. See EventSelect 0ECh, which provides a separate measure of Hostbridge accesses.</description>
+</event>
+
+<event value="EC" name="Probe responses and upstream requests" abbreviation="Probe resp/up req" >
+	<mask value="0" name="Probe miss" />
+	<mask value="1" name="Probe hit clean" />
+	<mask value="2" name="Probe hit dirty without memory cancel" />
+	<mask value="3" name="Probe hit dirty with memory cancel" />
+	<mask value="4" name="Upstream display refresh/ISOC reads" />
+	<mask value="5" name="Upstream non-display refresh reads" />
+	<mask value="6" name="Upstream ISOC writes" />
+	<mask value="7" name="Upstream non-ISOC writes" />
+	<op_name name="op" value="PROBE_RESPONSES_AND_UPSTREAM_REQUESTS" />
+	<description>This covers two unrelated sets of events: cache probe results, and requests received by the hostbridge from devices on non-coherent links. Probe results: These events reflect the results of probes sent from a memory controller to local caches. They provide an indication of the degree data and code is shared between processors (or moved between processors due to process migration). The dirty-hit events indicate the transfer of a 64-byte cache line to the requestor (for a read or cache refill) or the target memory (for a write). The system bandwidth used by these, in terms of bytes per unit of time, may be calculated as 64 times the event count, divided by the elapsed time. Sized writes to memory that cover a full cache line do not incur this cache line transfer -- they simply invalidate the line and are reported as clean hits. Cache line transfers occur for Change2Dirty requests that hit cache lines in the Owned state. (Such cache lines are counted as Modified-state refills for EventSelect 06Ch, System Read Responses.) Upstream requests: The upstream read and write events reflect requests originating from a device on a local IO link. The two read events allow display refresh traffic in a UMA system to be measured separately from other DMA activity. Display refresh traffic is typically dominated by 64-byte transfers. Non-display-related DMA accesses may be anywhere from 1 to 64 bytes in size, but may be dominated by a particular size such as 32 or 64 bytes, depending on the nature of the devices.</description>
+</event>
+
+<event value="EE" name="GART events" abbreviation="GART events" >
+	<mask value="0" name="GART aperture hit on access from CPU" />
+	<mask value="1" name="GART aperture hit on access from I/O" />
+	<mask value="2" name="GART miss" />
+	<mask value="3" name="GART/DEV Request hit table walk in progress" />
+	<mask value="4" name="DEV hit" />
+	<mask value="5" name="DEV miss" />
+	<mask value="6" name="DEV error" />
+	<mask value="7" name="GART/DEV multiple table walk in progress" />
+	<op_name name="op" value="GART_EVENTS" />
+	<description>These events reflect GART activity, and in particular allow one to calculate the GART TLB miss ratio as GART_miss_count divided by GART_aperture_hit_count. GART aperture accesses are typically from IO devices as opposed to the processor, and generally from a 3D graphics accelerator, but can be from other devices when the GART is used as an IOMMU.</description>
+</event>
+
+<event value="1F0" name="Memory controller requests" abbreviation="MCT Requests" >
+	<mask value="0" name="Write requests sent to the DCT" />
+	<mask value="1" name="Read requests (including prefetch) sent to the DCT" />
+	<mask value="2" name="Prefetch Requests sent to the DCT" />
+	<mask value="3" name="32 Bytes Sized Writes" />
+	<mask value="4" name="64 Bytes Sized Writes" />
+	<mask value="5" name="32 Bytes Sized Reads" />
+	<mask value="6" name="64 Byte Sized Reads" />
+	<mask value="7" name="Read requests sent to the DCT while write requests pending in DCT" />
+	<op_name name="op" value="MEMORY_CONTROLLER_REQUESTS" />
+	<description>Read/Write requests: The read/write request events reflect the total number of commands sent to the DRAM controller. Sized Read/Write activity: The Sized Read/Write events reflect 32- or 64-byte transfers (as opposed to other sizes which could be anywhere between 1 and 64 bytes), from either the processor or the Hostbridge (on any node in an MP system). Such accesses from the processor would be due only to write combining buffer flushes, where 32-byte accesses would reflect flushes of partially-filled buffers. EventSelect 065h provides a count of sized write requests associated with WC buffer flushes; comparing that with counts for these events (providing there is very little Hostbridge activity at the same time) gives an indication of how efficiently the write combining buffers are being used. EventSelect 065h may also be useful in factoring out WC flushes when comparing these events with the Upstream Requests component of EventSelect 06Ch.</description>
+</event>
+
+<event value="1E0" name="CPU to DRAM requests to target node" abbreviation="CPU to DRAM req to node" >
+	<mask value="0" name="From Local node to Node 0" />
+	<mask value="1" name="From Local node to Node 1" />
+	<mask value="2" name="From Local node to Node 2" />
+	<mask value="3" name="From Local node to Node 3" />
+	<mask value="4" name="From Local node to Node 4" />
+	<mask value="5" name="From Local node to Node 5" />
+	<mask value="6" name="From Local node to Node 6" />
+	<mask value="7" name="From Local node to Node 7" />
+	<op_name name="op" value="CPU_DRAM_REQUEST_TO_NODE" />
+	<description>This event counts all DRAM reads and writes generated by cores on the local node to the targeted node in the coherent fabric. This counter can be used to observe processor data affinity in NUMA aware operating systems.</description>
+</event>
+
+<event value="1E1" name="IO to DRAM requests to target node" abbreviation="IO to DRAM req to node" >
+	<mask value="0" name="From Local node to Node 0" />
+	<mask value="1" name="From Local node to Node 1" />
+	<mask value="2" name="From Local node to Node 2" />
+	<mask value="3" name="From Local node to Node 3" />
+	<mask value="4" name="From Local node to Node 4" />
+	<mask value="5" name="From Local node to Node 5" />
+	<mask value="6" name="From Local node to Node 6" />
+	<mask value="7" name="From Local node to Node 7" />
+	<op_name name="op" value="IO_DRAM_REQUEST_TO_NODE" />
+	<description>This event counts all DRAM reads and writes generated by IO devices attached to the IO links of the local node the targeted node in the coherent fabric. This counter can be used to observe IO device data affinity in NUMA aware operating systems.</description>
+</event>
+
+<event value="1E2" name="CPU read command latency to target node 0-3" abbreviation="CPU read cmd lat to node 0-3" >
+	<mask value="0" name="Read block" />
+	<mask value="1" name="Read block shared" />
+	<mask value="2" name="Read block modified" />
+	<mask value="3" name="Change to Dirty" />
+	<mask value="4" name="From Local node to Node 0" />
+	<mask value="5" name="From Local node to Node 1" />
+	<mask value="6" name="From Local node to Node 2" />
+	<mask value="7" name="From Local node to Node 3" />
+	<op_name name="op" value="CPU_READ_COMMAND_LATENCY_NODE_0_3" />
+	<description>This event counts the number of NB clocks from when the targeted command is received in the NB to when the targeted command completes. This event only tracks one outstanding command at a time. To determine latency between the local node and a remote node set UnitMask[7:4] to select the node and UnitMask[3:0] to select the read command type. The count returned by the counter should be divided by the count returned by EventSelect 1E3h do determine the average latency for the command type.</description>
+</event>
+
+<event value="1E3" name="CPU read command requests to target node 0-3" abbreviation="CPU read cmd req to node 0-3" >
+	<mask value="0" name="Read block" />
+	<mask value="1" name="Read block shared" />
+	<mask value="2" name="Read block modified" />
+	<mask value="3" name="Change to Dirty" />
+	<mask value="4" name="From Local node to Node 0" />
+	<mask value="5" name="From Local node to Node 1" />
+	<mask value="6" name="From Local node to Node 2" />
+	<mask value="7" name="From Local node to Node 3" />
+	<op_name name="op" value="CPU_READ_COMMAND_REQUEST_NODE_0_3" />
+	<description>This event counts the number of requests that a latency measurement is made for using EventSelect 1E2h. To determine the number of commands that a latency measurement are made for between the local node and a remote node set UnitMask[7:4] to select the node and UnitMask[3:0] to select the read command type.</description>
+</event>
+
+<event value="1E4" name="CPU read command latency to target node 4-7" abbreviation="CPU read cmd lat to node 4-7" >
+	<mask value="0" name="Read block" />
+	<mask value="1" name="Read block shared" />
+	<mask value="2" name="Read block modified" />
+	<mask value="3" name="Change to Dirty" />
+	<mask value="4" name="From Local node to Node 4" />
+	<mask value="5" name="From Local node to Node 5" />
+	<mask value="6" name="From Local node to Node 6" />
+	<mask value="7" name="From Local node to Node 7" />
+	<op_name name="op" value="CPU_READ_COMMAND_LATENCY_NODE_4_7" />
+	<description>This event counts the number of NB clocks from when the targeted command is received in the NB to when the targeted command completes. This event only tracks one outstanding command at a time. To determine latency between the local node and a remote node set UnitMask[7:4] to select the node and UnitMask[3:0] to select the read command type. The count returned by the counter should be divided by the count returned by EventSelect 1E5h do determine the average latency for the command type.</description>
+</event>
+
+<event value="1E5" name="CPU read command requests to target node 4-7" abbreviation="CPU read cmd req to node 4-7" >
+	<mask value="0" name="Read block" />
+	<mask value="1" name="Read block shared" />
+	<mask value="2" name="Read block modified" />
+	<mask value="3" name="Change to Dirty" />
+	<mask value="4" name="From Local node to Node 4" />
+	<mask value="5" name="From Local node to Node 5" />
+	<mask value="6" name="From Local node to Node 6" />
+	<mask value="7" name="From Local node to Node 7" />
+	<op_name name="op" value="CPU_READ_COMMAND_REQUEST_NODE_4_7" />
+	<description>This event counts the number of requests that a latency measurement is made for using EventSelect 1E4h. To determine the number of commands that a latency measurement are made for between the local node and a remote node set UnitMask[7:4] to select the node and UnitMask[3:0] to select the read command type.</description>
+</event>
+
+<event value="1E6" name="CPU command latency to target node 0-3/4-7" abbreviation="CPU cmd lat to node 0-3/4-7" >
+	<mask value="0" name="Read Sized" />
+	<mask value="1" name="Write Sized" />
+	<mask value="2" name="Victim Block" />
+	<mask value="3" name="Node Group Select: 0=Nodes 0-3, 1=Nodes 4-7" />
+	<mask value="4" name="From Local node to Node 0/4" />
+	<mask value="5" name="From Local node to Node 1/5" />
+	<mask value="6" name="From Local node to Node 2/6" />
+	<mask value="7" name="From Local node to Node 3/7" />
+	<op_name name="op" value="CPU_COMMAND_LATENCY_TARGET" />
+	<description>This event counts the number of NB clocks from when the targeted command is received in the NB to when the targeted command completes. This event only tracks one outstanding command at a time. To determine latency between the local node and a remote node set UnitMask[7:4] to select the node, UnitMask[3] to select the node group and UnitMask[3:0] to select the command type. The count returned by the counter should be divided by the count returned by EventSelect 1E7h do determine the average latency for the command type.</description>
+</event>
+
+<event value="1E7" name="CPU requests to target node 0-3/4-7" abbreviation="CPU req to node 0-3/4-7" >
+	<mask value="0" name="Read Sized" />
+	<mask value="1" name="Write Sized" />
+	<mask value="2" name="Victim Block" />
+	<mask value="3" name="Node Group Select: 0=Nodes 0-3, 1= Nodes 4-7" />
+	<mask value="4" name="From Local node to Node 0/4" />
+	<mask value="5" name="From Local node to Node 1/5" />
+	<mask value="6" name="From Local node to Node 2/6" />
+	<mask value="7" name="From Local node to Node 3/7" />
+	<op_name name="op" value="CPU_REQUEST_TARGET" />
+	<description>This event counts the number of requests that a latency measurement is made for using EventSelect 1E6h. To determine the number of commands that a latency measurement are made for between the local node and a remote node set UnitMask[7:4] to select the node, UnitMask[3] to select the node group and UnitMask[3:0] to select the command type.</description>
+</event>
+
+<event value="F6" name="HyperTransport link 0 transmit bandwidth" abbreviation="HT0 bandwidth" >
+	<mask value="0" name="Command DWORD sent" />
+	<mask value="1" name="Data DWORD sent" />
+	<mask value="2" name="Buffer release DWORD sent" />
+	<mask value="3" name="Nop DW sent (idle)" />
+	<mask value="4" name="Address extension DWORD sent" />
+	<mask value="5" name="Per packet CRC sent" />
+	<mask value="7" name="SubLink Mask" />
+	<op_name name="op" value="HYPERTRANSPORT_LINK0_TRANSMIT_BANDWIDTH" />
+	<description>The number of DWORDs transmitted (or unused, in the case of NOPs) on the outgoing side of the HyperTransport links. The sum of UnitMask[5:0] directly reflects the maximum transmission rate of the link. Link utilization may be calculated by dividing the combined Command, Address extension, Data, Buffer Release and Per packet CRC count (UnitMask 02Fh) by that value plus the Nop count (UnitMask 10h). Bandwidth in terms of bytes per unit time for any one component or combination of components is calculated by multiplying the count by four and dividing by elapsed time. The Data event provides a direct indication of the flow of data around the system. Translating this link-based view into a source/target node based view requires knowledge of the system layout (i.e. which links connect to which nodes). UnitMask[7] specifies the sublink to count if the link is unganged.</description>
+</event>
+
+<event value="F7" name="HyperTransport link 1 transmit bandwidth" abbreviation="HT1 bandwidth" >
+	<mask value="0" name="Command DWORD sent" />
+	<mask value="1" name="Data DWORD sent" />
+	<mask value="2" name="Buffer release DWORD sent" />
+	<mask value="3" name="Nop DW sent (idle)" />
+	<mask value="4" name="Address extension DWORD sent" />
+	<mask value="5" name="Per packet CRC sent" />
+	<mask value="7" name="SubLink Mask" />
+	<op_name name="op" value="HYPERTRANSPORT_LINK1_TRANSMIT_BANDWIDTH" />
+	<description>The number of DWORDs transmitted (or unused, in the case of NOPs) on the outgoing side of the HyperTransport links. The sum of UnitMask[5:0] directly reflects the maximum transmission rate of the link. Link utilization may be calculated by dividing the combined Command, Address extension, Data, Buffer Release and Per packet CRC count (UnitMask 02Fh) by that value plus the Nop count (UnitMask 10h). Bandwidth in terms of bytes per unit time for any one component or combination of components is calculated by multiplying the count by four and dividing by elapsed time. The Data event provides a direct indication of the flow of data around the system. Translating this link-based view into a source/target node based view requires knowledge of the system layout (i.e. which links connect to which nodes). UnitMask[7] specifies the sublink to count if the link is unganged.</description>
+</event>
+
+<event value="F8" name="HyperTransport link 2 transmit bandwidth" abbreviation="HT2 bandwidth" >
+	<mask value="0" name="Command DWORD sent" />
+	<mask value="1" name="Data DWORD sent" />
+	<mask value="2" name="Buffer release DWORD sent" />
+	<mask value="3" name="Nop DW sent (idle)" />
+	<mask value="4" name="Address extension DWORD sent" />
+	<mask value="5" name="Per packet CRC sent" />
+	<mask value="7" name="SubLink Mask" />
+	<op_name name="op" value="HYPERTRANSPORT_LINK2_TRANSMIT_BANDWIDTH" />
+	<description>The number of DWORDs transmitted (or unused, in the case of NOPs) on the outgoing side of the HyperTransport links. The sum of UnitMask[5:0] directly reflects the maximum transmission rate of the link. Link utilization may be calculated by dividing the combined Command, Address extension, Data, Buffer Release and Per packet CRC count (UnitMask 02Fh) by that value plus the Nop count (UnitMask 10h). Bandwidth in terms of bytes per unit time for any one component or combination of components is calculated by multiplying the count by four and dividing by elapsed time. The Data event provides a direct indication of the flow of data around the system. Translating this link-based view into a source/target node based view requires knowledge of the system layout (i.e. which links connect to which nodes). UnitMask[7] specifies the sublink to count if the link is unganged.</description>
+</event>
+
+<event value="1F9" name="HyperTransport link 3 transmit bandwidth" abbreviation="HT3 bandwidth" >
+	<mask value="0" name="Command DWORD sent" />
+	<mask value="1" name="Data DWORD sent" />
+	<mask value="2" name="Buffer release DWORD sent" />
+	<mask value="3" name="Nop DW sent (idle)" />
+	<mask value="4" name="Address extension DWORD sent" />
+	<mask value="5" name="Per packet CRC sent" />
+	<mask value="7" name="SubLink Mask" />
+	<op_name name="op" value="HYPERTRANSPORT_LINK3_TRANSMIT_BANDWIDTH" />
+	<description>The number of DWORDs transmitted (or unused, in the case of NOPs) on the outgoing side of the HyperTransport links. The sum of UnitMask[5:0] directly reflects the maximum transmission rate of the link. Link utilization may be calculated by dividing the combined Command, Address extension, Data, Buffer Release and Per packet CRC count (UnitMask 02Fh) by that value plus the Nop count (UnitMask 10h). Bandwidth in terms of bytes per unit time for any one component or combination of components is calculated by multiplying the count by four and dividing by elapsed time. The Data event provides a direct indication of the flow of data around the system. Translating this link-based view into a source/target node based view requires knowledge of the system layout (i.e. which links connect to which nodes). UnitMask[7] specifies the sublink to count if the link is unganged.</description>
+</event>
+
+</source>
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; L3 Cache Events
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+<source unit="L3">
+
+<event value="4E0" name="Read request to L3 Cache" abbreviation="Read req L3" >
+	<mask value="0" name="Read Block Exclusive (Data cache read)" />
+	<mask value="1" name="Read Block Shared (Instruction cache read)" />
+	<mask value="2" name="Read Block Modify" />
+	<mask value="4" name="Core 0 Select or RevD: Core 1" />
+	<mask value="5" name="Core 1 Select or RevD: Core 2" />
+	<mask value="6" name="Core 2 Select or RevD: Core 4" />
+	<mask value="7" name="Core 3 Select" />
+	<op_name name="op" value="READ_REQUEST_L3_CACHE" />
+	<description>This event tracks the read requests from each core to the L3 cache including read requests that are cancelled. The core tracked is selected using UnitMask[7:4]. One or more cores must be selected. To determine the total number of read requests from one core, select only a single core using UnitMask[7:4] and set UnitMask[2:0] to 111b.</description>
+</event>
+
+<event value="4E1" name="L3 cache misses" abbreviation="L3 misses" >
+	<mask value="0" name="Read Block Exclusive (Data cache read)" />
+	<mask value="1" name="Read Block Shared (Instruction cache read)" />
+	<mask value="2" name="Read Block Modify" />
+	<mask value="4" name="Core 0 Select or RevD: Core 1" />
+	<mask value="5" name="Core 1 Select or RevD: Core 2" />
+	<mask value="6" name="Core 2 Select or RevD: Core 4" />
+	<mask value="7" name="Core 3 Select" />
+	<op_name name="op" value="L3_CACHE_MISSES" />
+	<description>This event counts the number of L3 cache misses for accesses from each core. The core tracked is selected using UnitMask[7:4]. One or more cores must be selected. To determine the total number of cache misses from one core, select only a single core using UnitMask[7:4] and set UnitMask[2:0] to 111b. The approximate number of L3 hits can be determined by subtracting this event from EventSelect 4E0h.</description>
+</event>
+
+<event value="4E2" name="L3 fills caused by L2 evictions" abbreviation="L3 fills" >
+	<mask value="0" name="Shared" />
+	<mask value="1" name="Exclusive" />
+	<mask value="2" name="Owned" />
+	<mask value="3" name="Modified" />
+	<mask value="4" name="Core 0 Select or RevD: Core 1" />
+	<mask value="5" name="Core 1 Select or RevD: Core 2" />
+	<mask value="6" name="Core 2 Select or RevD: Core 4" />
+	<mask value="7" name="Core 3 Select" />
+	<op_name name="op" value="L3_FILLS_CAUSED_BY_L2_EVICTIONS" />
+	<description>This event counts the number of L3 fills caused by L2 evictions. The core tracked is selected using UnitMask[7:4]. One or more cores must be selected.</description>
+</event>
+
+<event value="4E3" name="L3 evictions" abbreviation="L3 evictions" >
+	<mask value="0" name="Shared" />
+	<mask value="1" name="Exclusive" />
+	<mask value="2" name="Owned" />
+	<mask value="3" name="Modified" />
+	<op_name name="op" value="L3_EVICTIONS" />
+	<description>This event counts the state of the L3 lines when they are evicted from the L3 cache.</description>
+</event>
+
+</source>
+
+
+<!--
+       IBS derived event definitions
+       Revision: 0.4
+       Date: 11 June 2007
+
+       Source: BIOS and Kernel Developer's Guide for AMD family 10h
+       Processors, Rev 1.08, 10 June 2007
+
+       Copyright (c) 2006-2009 Advanced Micro Devices, Inc.
+ -->
+
+<!--
+       **************************************************
+                              IC Unit
+       **************************************************
+ -->
+
+<source unit="IC">
+
+<event name="IBS fetch samples" abbreviation="IBS fetch" value="F000" >
+	<description>The number of all IBS fetch samples. This derived event counts the number of all IBS fetch samples that were collected including IBS-killed fetch samples.</description>
+</event>
+
+<event name="IBS fetch killed" abbreviation="IBS fetch killed" value="F001" >
+	<description>The number of IBS sampled fetches that were killed fetches. A fetch operation is killed if the fetch did not reach ITLB or IC access. The number of killed fetch samples is not generally useful for analysis and are filtered out in other derived IBS fetch events (except Event Select 0xF000 which counts all IBS fetch samples including IBS killed fetch samples.)</description>
+</event>
+
+<event name="IBS fetch attempted" abbreviation="IBS fetch attempt" value="F002" >
+	<description>The number of IBS sampled fetches that were not killed fetch attempts. This derived event measures the number of useful fetch attempts and does not include the number of IBS killed fetch samples. This event should be used to compute ratios such as the ratio of IBS fetch IC misses to attempted fetches. The number of attempted fetches should equal the sum of the number of completed fetches and the number of aborted fetches.</description>
+</event>
+
+<event name="IBS fetch completed" abbreviation="IBS fetch comp" value="F003" >
+	<description>The number of IBS sampled fetches that completed. A fetch is completed if the attempted fetch delivers instruction data to the instruction decoder. Although the instruction data was delivered, it may still not be used (e.g., the instruction data may have been on the "wrong path" of an incorrectly predicted branch.)</description>
+</event>
+
+<event name="IBS fetch aborted" abbreviation="IBS fetch abort" value="F004" >
+	<description>The number of IBS sampled fetches that aborted. An attempted fetch is aborted if it did not complete and deliver instruction data to the decoder. An attempted fetch may abort at any point in the process of fetching instruction data. An abort may be due to a branch redirection as the result of a mispredicted branch. The number of IBS aborted fetch samples is a lower bound on the amount of unsuccessful, speculative fetch activity. It is a lower bound since the instruction data delivered by completed fetches may not be used.</description>
+</event>
+
+<event name="IBS L1 ITLB hit" abbreviation="IBS L1 ITLB hit" value="F005" >
+	<description>The number of IBS attempted fetch samples where the fetch operation initially hit in the L1 ITLB (Instruction Translation Lookaside Buffer).</description>
+</event>
+
+<event name="IBS L1 ITLB miss, L2 ITLB hit" abbreviation="IBS ITLB L1M L2H" value="F006" >
+	<description>The number of IBS attempted fetch samples where the fetch operation initially missed in the L1 ITLB and hit in the L2 ITLB.</description>
+</event>
+
+<event name="IBS L1 ITLB miss, L2 ITLB miss" abbreviation="IBS ITLB L1M L2M" value="F007" >
+	<description>The number of IBS attempted fetch samples where the fetch operation initially missed in both the L1 ITLB and the L2 ITLB.</description>
+</event>
+
+<event name="IBS instruction cache miss" abbreviation="IBS IC miss" value="F008" >
+	<description>The number of IBS attempted fetch samples where the fetch operation initially missed in the IC (instruction cache).</description>
+</event>
+
+<event name="IBS instruction cache hit" abbreviation="IBS IC hit" value="F009" >
+	<description>The number of IBS attempted fetch samples where the fetch operation initially hit in the IC.</description>
+</event>
+
+<event name="IBS 4K page translation" abbreviation="IBS 4K page" value="F00A" >
+	<description>The number of IBS attempted fetch samples where the fetch operation produced a valid physical address (i.e., address translation completed successfully) and used a 4-KByte page entry in the L1 ITLB.</description>
+</event>
+
+<event name="IBS 2M page translation" abbreviation="IBS 2M page" value="F00B" >
+	<description>The number of IBS attempted fetch samples where the fetch operation produced a valid physical address (i.e., address translation completed successfully) and used a 2-MByte page entry in the L1 ITLB.</description>
+</event>
+
+<!-- F00C and F00D reserved for other page translations -->
+
+<event name="IBS fetch latency" abbreviation="IBS fetch lat" value="F00E" >
+	<description>The total latency of all IBS attempted fetch samples. Divide the total IBS fetch latency by the number of IBS attempted fetch samples to obtain the average latency of the attempted fetches that were sampled.</description>
+</event>
+
+</source>
+
+<!--
+       **************************************************
+                              FR Unit
+       **************************************************
+ -->
+
+<source unit="FR">
+
+<!--
+       The IBS op samples, tag-to-retire and completion-to-retire derived
+       events are common to all IBS op samples
+ -->
+
+<event name="IBS all op samples" abbreviation="IBS all ops" value="F100" >
+	<description>The number of all IBS op samples that were collected. These op samples may be branch ops, resync ops, ops that perform load/store operations, or undifferentiated ops (e.g., those ops that perform arithmetic operations, logical operations, etc.). IBS collects data for retired ops. No data is collected for ops that are aborted due to pipeline flushes, etc. Thus, all sampled ops are architecturally significant and contribute to the successful forward progress of executing programs.</description>
+</event>
+
+<event name="IBS tag-to-retire cycles" abbreviation="IBS tag-to-ret" value="F101" >
+	<description>The total number of tag-to-retire cycles across all IBS op samples. The tag-to-retire time of an op is the number of cycles from when the op was tagged (selected for sampling) to when the op retired.</description>
+</event>
+
+<event name="IBS completion-to-retire cycles" abbreviation="IBS comp-to-ret" value="F102" >
+	<description>The total number of completion-to-retire cycles across all IBS op samples. The completion-to-retire time of an op is the number of cycles from when the op completed to when the op retired.</description>
+</event>
+
+<!--
+       The following derived events are specific to branch/return samples
+ -->
+
+<event name="IBS branch op" abbreviation="IBS BR" value="F103" >
+	<description>The number of IBS retired branch op samples. A branch operation is a change in program control flow and includes unconditional and conditional branches, subroutine calls and subroutine returns. Branch ops are used to implement AMD64 branch semantics.</description>
+</event>
+
+<event name="IBS mispredicted branch op" abbreviation="IBS misp BR" value="F104" >
+	<description>The number of IBS samples for retired branch operations that were mispredicted. This event should be used to compute the ratio of mispredicted branch operations to all branch operations.</description>
+</event>
+
+<event name="IBS taken branch op" abbreviation="IBS taken BR" value="F105" >
+	<description>The number of IBS samples for retired branch operations that were taken branches.</description>
+</event>
+
+<event name="IBS mispredicted taken branch op" abbreviation="IBS misp taken BR" value="F106" >
+	<description>The number of IBS samples for retired branch operations that were mispredicted taken branches.</description>
+</event>
+
+<event name="IBS return op" abbreviation="IBS RET" value="F107" >
+	<description>The number of IBS retired branch op samples where the operation was a subroutine return. These samples are a subset of all IBS retired branch op samples.</description>
+</event>
+
+<event name="IBS mispredicted return op" abbreviation="IBS misp RET" value="F108" >
+	<description>The number of IBS retired branch op samples where the operation was a mispredicted subroutine return. This event should be used to compute the ratio of mispredicted returns to all subroutine returns.</description>
+</event>
+
+<event name="IBS resync op" abbreviation="IBS resync" value="F109" >
+	<description>The number of IBS resync op samples. A resync op is only found in certain microcoded AMD64 instructions and causes a complete pipeline flush.</description>
+</event>
+
+</source>
+
+<!--
+       **************************************************
+                              DC Unit
+       **************************************************
+ -->
+
+<source unit="DC">
+
+<!--
+       The following derived events are specific to load/store samples
+ -->
+
+<event name="IBS all load/store ops" abbreviation="IBS load/store" value="F200" >
+	<description>The number of IBS op samples for ops that perform either a load and/or store operation. An AMD64 instruction may be translated into one ("single fastpath"), two ("double fastpath"), or several ("vector path") ops. Each op may perform a load operation, a store operation or both a load and store operation (each to the same address). Some op samples attributed to an AMD64 instruction may perform a load/store operation while other op samples attributed to the same instruction may not. Further, some branch instructions perform load/store operations. Thus, a mix of op sample types may be attributed to a single AMD64 instruction depending upon the ops that are issued from the AMD64 instruction and the op types.</description>
+</event>
+
+<event name="IBS load ops" abbreviation="IBS load" value="F201" >
+	<description>The number of IBS op samples for ops that perform a load operation.</description>
+</event>
+
+<event name="IBS store ops" abbreviation="IBS store" value="F202" >
+	<description>The number of IBS op samples for ops that perform a store operation.</description>
+</event>
+
+<event name="IBS L1 DTLB hit" abbreviation="IBS L1 DTLB hit" value="F203" >
+	<description>The number of IBS op samples where either a load or store operation initially hit in the L1 DTLB (data translation lookaside buffer).</description>
+</event>
+
+<event name="IBS L1 DTLB miss, L2 DTLB hit" abbreviation="IBS DTLB L1M L2H" value="F204" >
+	<description>The number of IBS op samples where either a load or store operation initially missed in the L1 DTLB and hit in the L2 DTLB.</description>
+</event>
+
+<event name="IBS L1 DTLB miss, L2 DTLM miss" abbreviation="IBS DTLB L1M L2M" value="F205" >
+	<description>The number of IBS op samples where either a load or store operation initially missed in both the L1 DTLB and the L2 DTLB.</description>
+</event>
+
+<event name="IBS DC miss" abbreviation="IBS DC miss" value="F206" >
+	<description>The number of IBS op samples where either a load or store operation initially missed in the data cache (DC).</description>
+</event>
+
+<event name="IBS DC hit" abbreviation="IBS DC hit" value="F207" >
+	<description>The number of IBS op samples where either a load or store operation initially hit in the data cache (DC).</description>
+</event>
+
+<event name="IBS misaligned access" abbreviation="IBS misalign acc" value="F208" >
+	<description>The number of IBS op samples where either a load or store operation caused a misaligned access (i.e., the load or store operation crossed a 128-bit boundary).</description>
+</event>
+
+<event name="IBS bank conflict on load op" abbreviation="IBS bank conf load" value="F209" >
+	<description>The number of IBS op samples where either a load or store operation caused a bank conflict with a load operation.</description>
+</event>
+
+<event name="IBS bank conflict on store op" abbreviation="IBS bank conf store" value="F20A" >
+	<description>The number of IBS op samples where either a load or store operation caused a bank conflict with a store operation.</description>
+</event>
+
+<event name="IBS store-to-load forwarded" abbreviation="IBS forwarded" value="F20B" >
+	<description>The number of IBS op samples where data for a load operation was forwarded from a store operation.</description>
+</event>
+
+<event name="IBS store-to-load cancelled" abbreviation="IBS STLF cancelled" value="F20C" >
+	<description>The number of IBS op samples where data forwarding to a load operation from a store was cancelled.</description>
+</event>
+
+<event name="IBS UC memory access" abbreviation="IBS UC mem acc" value="F20D" >
+	<description>The number of IBS op samples where a load or store operation accessed uncacheable (UC) memory.</description>
+</event>
+
+<event name="IBS WC memory access" abbreviation="IBS WC mem acc" value="F20E" >
+	<description>The number of IBS op samples where a load or store operation accessed write combining (WC) memory.</description>
+</event>
+
+<event name="IBS locked operation" abbreviation="IBS locked op" value="F20F" >
+	<description>The number of IBS op samples where a load or store operation was a locked operation.</description>
+</event>
+
+<event name="IBS MAB hit" abbreviation="IBS MAB hit" value="F210" >
+	<description>The number of IBS op samples where a load or store operation hit an already allocated entry in the Miss Address Buffer (MAB).</description>
+</event>
+
+<event name="IBS L1 DTLB 4K page" abbreviation="IBS L1 DTLB 4K" value="F211" >
+	<description>The number of IBS op samples where a load or store operation produced a valid linear (virtual) address and a 4-KByte page entry in the L1 DTLB was used for address translation.</description>
+</event>
+
+<event name="IBS L1 DTLB 2M page" abbreviation="IBS L1 DTLB 2M" value="F212" >
+	<description>The number of IBS op samples where a load or store operation produced a valid linear (virtual) address and a 2-MByte page entry in the L1 DTLB was used for address translation.</description>
+</event>
+
+<event name="IBS L1 DTLB 1G page" abbreviation="IBS L1 DTLB 1G" value="F213" >
+	<description>The number of IBS op samples where a load or store operation produced a valid linear (virtual) address and a 1-GByte page entry in the L1 DTLB was used for address translation.</description>
+</event>
+
+<!-- F214 is reserved for yet another page size -->
+
+<event name="IBS L2 DTLB 4K page" abbreviation="IBS L2 DTLB 4K" value="F215" >
+	<description>The number of IBS op samples where a load or store operation produced a valid linear (virtual) address, hit the L2 DTLB, and used a 4 KByte page entry for address translation.</description>
+</event>
+
+<event name="IBS L2 DTLB 2M page" abbreviation="IBS L2 DTLB 2M" value="F216" >
+	<description>The number of IBS op samples where a load or store operation produced a valid linear (virtual) address, hit the L2 DTLB, and used a 2-MByte page entry for address translation.</description>
+</event>
+
+<event name="IBS L2 DTLB 1G page (RevC)" abbreviation="IBS L2 DTLB 1G" value="F217" minimumModel="4" >
+	<description>The number of IBS op samples where a load or store operation produced a valid linear (virtual) address, hit the L2 DTLB, and used a 1-GByte page entry for address translation.</description>
+</event>
+
+<!-- F218 is reserved for another page size -->
+
+<event name="IBS DC miss load latency" abbreviation="IBS DC miss lat" value="F219" >
+	<description>The total DC miss load latency (in processor cycles) across all IBS op samples that performed a load operation and missed in the data cache. The miss latency is the number of clock cycles from when the data cache miss was detected to when data was delivered to the core. Divide the total DC miss load latency by the number of data cache misses to obtain the average DC miss load latency.</description>
+</event>
+
+<event name="Cache Line Utilization Percentage" abbreviation="Cache Line Utilization" value="FF00" >
+</event>
+
+<event name="Line Boundary Crossings" abbreviation="Line Boundary Crossings" value="FF01" >
+</event>
+
+<event name="Bytes/L1 Eviction" abbreviation="Bytes/L1 Eviction" value="FF02" >
+</event>
+
+<event name="Accesses/L1 Eviction" abbreviation="Accesses/L1 Eviction" value="FF03" >
+</event>
+
+<event name="L1 Evictions" abbreviation="L1 Evictions" value="FF04" >
+</event>
+
+<event name="Accesses" abbreviation="Accesses" value="FF05" >
+</event>
+
+<event name="Bytes Accessed" abbreviation="Bytes Accessed" value="FF06" >
+</event>
+
+</source>
+
+<!--
+       **************************************************
+                              NB Unit
+       **************************************************
+ -->
+
+<source unit="NB">
+
+<!--
+       The following derived events are specific to load operations
+ -->
+
+<event name="IBS NB local" abbreviation="IBS NB local" value="F240" >
+	<description>The number of IBS op samples where a load operation was serviced from the local processor. Northbridge IBS data is only valid for load operations that miss in both the L1 data cache and the L2 data cache. If a load operation crosses a cache line boundary, then the IBS data reflects the access to the lower cache line.</description>
+</event>
+
+<event name="IBS NB remote" abbreviation="IBS NB remote" value="F241" >
+	<description>The number of IBS op samples where a load operation was serviced from a remote processor.</description>
+</event>
+
+<event name="IBS NB local L3 cache" abbreviation="IBS NB local L3" value="F242" >
+	<description>The number of IBS op samples where a load operation was serviced by the local L3 cache.</description>
+</event>
+
+<event name="IBS NB local core L1 or L2 cache" abbreviation="IBS NB local cache" value="F243" >
+	<description>The number of IBS op samples where a load operation was serviced by a cache (L1 data cache or L2 cache) belonging to a local core which is a sibling of the core making the memory request.</description>
+</event>
+
+<event name="IBS NB remote L1, L2 or L3 cache" abbreviation="IBS NB remote cache" value="F244" >
+	<description>The number of IBS op samples where a load operation was serviced by a remote L1 data cache, L2 cache or L3 cache after traversing one or more coherent HyperTransport links.</description>
+</event>
+
+<event name="IBS NB local DRAM" abbreviation="IBS NB local DRAM" value="F245" >
+	<description>The number of IBS op samples where a load operation was serviced by local system memory (local DRAM via the memory controller).</description>
+</event>
+
+<event name="IBS NB remote DRAM" abbreviation="IBS NB remote DRAM" value="F246" >
+	<description>The number of IBS op samples where a load operation was serviced by remote system memory (after traversing one or more coherent HyperTransport links and through a remote memory controller).</description>
+</event>
+
+<event name="IBS NB local APIC/MMIO/Config/PCI" abbreviation="IBS NB local other" value="F247" >
+	<description>The number of IBS op samples where a load operation was serviced from local MMIO, configuration or PCI space, or from the local APIC.</description>
+</event>
+
+<event name="IBS NB MMIO/Config/PCI" abbreviation="IBS NB remote other" value="F248" >
+	<description>The number of IBS op samples where a load operation was serviced from remote MMIO, configuration or PCI space.</description>
+</event>
+
+<event name="IBS NB cache Modified state" abbreviation="IBS NB cache Modified" value="F249" >
+	<description>The number of IBS op samples where a load operation was serviced from local or remote cache, and the cache hit state was the Modified (M) state.</description>
+</event>
+
+<event name="IBS NB cache Owned state" abbreviation="IBS NB cache Owned" value="F24A" >
+	<description>The number of IBS op samples where a load operation was serviced from local or remote cache, and the cache hit state was the Owned (O) state.</description>
+</event>
+
+<event name="IBS NB local cache latency" abbreviation="IBS NB local lat" value="F24B" >
+	<description>The total data cache miss latency (in processor cycles) for load operations that were serviced by the local processor.</description>
+</event>
+
+<event name="IBS NB remote cache latency" abbreviation="IBS NB remote lat" value="F24C" >
+	<description>The total data cache miss latency (in processor cycles) for load operations that were serviced by a remote processor.</description>
+</event>
+
+</source>
+
+</cpu_events>

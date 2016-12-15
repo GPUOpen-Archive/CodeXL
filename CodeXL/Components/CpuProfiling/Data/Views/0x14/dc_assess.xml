@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!DOCTYPE view_configuration SYSTEM "..\viewconfig.dtd">
+
+<!--
+        Show basic data access (L1 data cache) measurements
+        View configuration
+        Date:    15 August 2006
+        Version: 1.1
+        Copyright (c) 2006 Advanced Micro Devices, Inc. All rights reserved.
+
+        The dc_assess view should be available when data cache accesses,
+        data cache misses, and retired instructions are available.
+
+        Related data collection configurations: assess.xml, data_access.xml
+ -->
+
+<view_configuration>
+
+  <view name="Data access assessment"
+        separate_cpus="F"
+        separate_processes="F"
+        separate_threads="F"
+        >
+
+    <data>
+      <event id="Ret_instructions" select="c0" mask="00" />
+      <event id="DC_accesses"      select="40" mask="00" />
+      <event id="DC_misses"        select="41" mask="00" />
+    </data>
+
+    <output>
+      <column title="Ret inst" sort="descending">
+        <value id="Ret_instructions" />
+      </column>
+      <column title="DC accesses" sort="none">
+        <value id="DC_accesses" />
+      </column>
+      <column title="DC misses" sort="none">
+        <value id="DC_misses" />
+      </column>
+      <column title="DC access rate" sort="none">
+        <ratio left="DC_accesses" right="Ret_instructions" />
+      </column>
+      <column title="DC miss rate" sort="none">
+        <ratio left="DC_misses" right="Ret_instructions" />
+      </column>
+      <column title="DC miss ratio" sort="none">
+        <ratio left="DC_misses" right="DC_accesses" />
+      </column>
+    </output>
+
+    <tool_tip>
+      Show essential data cache measurements
+    </tool_tip>
+
+    <description>
+      Use this view to identify regions of code that miss in the L1 data cache.
+    </description>
+
+  </view>
+
+</view_configuration>
