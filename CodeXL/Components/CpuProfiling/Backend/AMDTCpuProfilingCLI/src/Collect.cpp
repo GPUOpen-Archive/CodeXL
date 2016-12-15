@@ -984,7 +984,7 @@ void CpuProfileCollect::VerifyAndSetEvents(EventConfiguration** ppDriverSampleEv
 
             if (FAMILY_KB == cpuInfo.getFamily())
             {
-                if (eventData.source.contains("L2I", Qt::CaseInsensitive))
+                if (eventData.m_source == "L2I")
                 {
                     reportError(false, L"The Profile configuration contains L2I event.\n"
                         L"L2I PMC events based sampling is not supported.\n"
@@ -998,12 +998,12 @@ void CpuProfileCollect::VerifyAndSetEvents(EventConfiguration** ppDriverSampleEv
             // On Linux, PERF does not support NB events based sampling.
             // if (FAMILY_OR == cpuInfo.getFamily())
             {
-                if (eventData.source.startsWith("NB", Qt::CaseInsensitive))
+                if (eventData.m_source == "NB")
                 {
                     reportError(false, L"The Profile configuration contains a northbridge(NB) event:\n"
                         L"[%#x] %ls\n which is not a valid sampling event. "
                         L"Please fix the configuration",
-                        eventData.value, eventData.name.data());
+                        eventData.m_value, eventData.m_name.data());
                     m_error = E_NOTAVAILABLE;
                     break;
                 }

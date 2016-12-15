@@ -1905,7 +1905,7 @@ HRESULT CommandsHandler::verifyAndSetEvents(EventConfiguration** ppDriverEvents)
 
         if (FAMILY_KB == cpuInfo.getFamily())
         {
-            if (eventData.source.contains("L2I", Qt::CaseInsensitive))
+            if (eventData.m_source == "L2I")
             {
                 ReportErrorMessage(false, L"", L"The configuration contains L2I event.\n"
                                    L"L2I PMC events are not yet supported by Linux PERF subsystem for CPU family 16h.\n"

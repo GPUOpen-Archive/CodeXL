@@ -42,7 +42,7 @@ void EventsFile::PrintEvents()
 {
     for (const auto& ev : m_eventList)
     {
-        printf("%02X '%s'\n\tAbbrev: '%s'\n\tSource: %s Counters: %lX\n\t Description: %s\n",
+        printf("%02X '%s'\n\tAbbrev: '%s'\n\tSource: %s Counters: %X\n\t Description: %s\n",
             ev.m_value, ev.m_name.data(), ev.m_abbrev.data(),
             ev.m_source.data(), ev.m_counters, ev.m_description.data());
 
