@@ -28,6 +28,7 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(SolutionDir)\CodeXLCommonProjects.props" />
     <Import Project="$(AMDTCommonExt)\Qt\Global-QT-nographics.props" />
+    <Import Project="$(AMDTCommonEXT)\tinyxml\Global-TinyXML-2015.props" />
   </ImportGroup>
   <PropertyGroup>
     <OutDir>$(AMDTOutputDir)$(Configuration)\bin\</OutDir>

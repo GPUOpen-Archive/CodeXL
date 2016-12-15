@@ -43,7 +43,7 @@ QString CPUProfileUtils::GetColumnFullName(ColumnType colType, const QString& ti
     // For value give the event full name:
     if (colType == ColumnValue)
     {
-        retVal = hwEvent.name + postFix;
+        retVal = QString(hwEvent.m_name.data()) + postFix;
 
         if (title == "DTLB requests")
         {
@@ -288,9 +288,9 @@ bool CPUProfileUtils::IsHotSpotBetterHigher(EventsFile* pEventsFile, const QStri
             {
                 CpuEvent cpuEv;
                 pEventsFile->FindEventByValue(EventsBetterHigher[i], cpuEv);
-                m_hotSpotsBetterHigher << cpuEv.name;
-                m_hotSpotsBetterHigher << cpuEv.abbrev;
-                m_hotSpotsBetterHigher << (cpuEv.name + SUFFIX_HOTSPOT_BETTER_HIGH);
+                m_hotSpotsBetterHigher << QString(cpuEv.m_name.data());
+                m_hotSpotsBetterHigher << QString(cpuEv.m_abbrev.data());
+                m_hotSpotsBetterHigher << (QString(cpuEv.m_name.data()) + SUFFIX_HOTSPOT_BETTER_HIGH);
             }
         }
 
@@ -317,7 +317,7 @@ bool CPUProfileUtils::IsHotSpotCluMetric(EventsFile* pEventsFile, const QString&
         {
             CpuEvent cpuEv;
             pEventsFile->FindEventByValue((IBS_CLU_BASE + i), cpuEv);
-            m_hotSpotsCluMetric << cpuEv.name;
+            m_hotSpotsCluMetric << cpuEv.m_name.data();
         }
     }
 

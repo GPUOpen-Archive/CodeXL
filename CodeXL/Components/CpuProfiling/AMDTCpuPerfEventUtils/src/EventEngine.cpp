@@ -6,24 +6,11 @@
 /// \brief Implementation of the EventEngine class.
 ///
 //==================================================================================
-// $Id: //devtools/main/CodeXL/Components/CpuProfiling/AMDTCpuPerfEventUtils/src/EventEngine.cpp#2 $
-// Last checkin:   $DateTime: 2016/04/14 02:12:44 $
-// Last edited by: $Author:  AMD Developer Tools Team
-// Change list:    $Change: 569058 $
-//=====================================================================
 
 #include <QtCore>
 #include <EventEngine.h>
 #include <AMDTOSWrappers/Include/osCpuid.h>
 
-
-EventEngine::EventEngine()
-{
-}
-
-EventEngine::~EventEngine()
-{
-}
 
 bool EventEngine::Initialize(QString eventsDirectory)
 {
@@ -73,8 +60,11 @@ EventsFile* EventEngine::GetEventFile(gtUInt32 cpuFamily, gtUInt32 cpuModel)
     }
 
     EventsFile* pEventFile = new EventsFile();
-
+#ifdef USE_TINYXML_PARSER
+    if (pEventFile->Open(fullPathString.toStdString()))
+#else
     if (pEventFile->Open(fullPathString))
+#endif
     {
         return pEventFile;
     }

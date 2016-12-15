@@ -936,7 +936,6 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 
             if (NULL != gp_eventsFile)
             {
-                gp_eventsFile->Close();
                 delete gp_eventsFile;
             }
 
@@ -1317,17 +1316,17 @@ HRESULT CpuPerfGetEventCounterAvailability(
         return E_INVALIDARG;
     }
 
-    if ((eventData.source == "NB") && (0 != g_Availability.nbAvailable))
+    if ((eventData.m_source == "NB") && (0 != g_Availability.nbAvailable))
     {
-        *pAvailabilityMask = eventData.counters & g_Availability.nbAvailable;
+        *pAvailabilityMask = eventData.m_counters & g_Availability.nbAvailable;
     }
-    else if ((eventData.source == "L2I") && (0 != g_Availability.l2iAvailable))
+    else if ((eventData.m_source == "L2I") && (0 != g_Availability.l2iAvailable))
     {
-        *pAvailabilityMask = eventData.counters & g_Availability.l2iAvailable;
+        *pAvailabilityMask = eventData.m_counters & g_Availability.l2iAvailable;
     }
     else
     {
-        *pAvailabilityMask = eventData.counters & g_Availability.pmcAvailable;
+        *pAvailabilityMask = eventData.m_counters & g_Availability.pmcAvailable;
     }
 
     return S_OK;

@@ -1406,7 +1406,6 @@ CpuProfileDataAccess::CpuProfileDataAccess()
 
 CpuProfileDataAccess::~CpuProfileDataAccess()
 {
-    m_eventsFile.Close();
 #if SUPPORT_CSS
     ModAnalysisMap::iterator iter = NULL;
 
@@ -1563,7 +1562,7 @@ HRESULT CpuProfileDataAccess::OpenPrdFile(const wchar_t* pPrdFile)
 
                     CpuEvent oneEvent;
                     m_eventsFile.FindEventByValue(eventSelect, oneEvent);
-                    m_labels.push_back(oneEvent.name);
+                    m_labels.push_back(QString(oneEvent.m_name.data()));
 
                     m_sampIntvls.push_back(pEvtCfg->ctr);
                 }
@@ -1673,7 +1672,7 @@ HRESULT CpuProfileDataAccess::ImportDataSet(const wchar_t* pProfileFile)
         {
             CpuEvent oneEvent;
             m_eventsFile.FindEventByValue(eventSelect, oneEvent);
-            m_labels.push_back(oneEvent.name);
+            m_labels.push_back(QString(oneEvent.m_name.data()));
         }
 
         m_sampIntvls.push_back((*evIt).eventCount);
@@ -3050,7 +3049,7 @@ void CpuProfileDataAccess::AddOneIbsEvent(unsigned int eventSelect)
 
     CpuEvent oneEvent;
     m_eventsFile.FindEventByValue(eventSelect, oneEvent);
-    m_labels.push_back(oneEvent.name);
+    m_labels.push_back(QString(oneEvent.m_name.data()));
 
     m_sampIntvls.push_back(1);
 }
@@ -3955,7 +3954,7 @@ HRESULT CpuProfileDataAccess::OpenEventsFile(int cpuFamily, int cpuModel)
     eventFile = pEvEngine->GetEventFilePath(cpuFamily, cpuModel);
 
     // Initialize event file
-    if (!m_eventsFile.Open(eventFile))
+    if (!m_eventsFile.Open(eventFile.toStdString()))
     {
         delete pEvEngine;
         return E_UNEXPECTED;

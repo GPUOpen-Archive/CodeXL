@@ -181,9 +181,8 @@ private:
     void PackCoreSamplingConfigInfo(const NameModuleMap& modMap, CPACoreSamplingConfigList& coreConfigList);
     void PackSampleInfo(const NameModuleMap& modMap, CPASampeInfoList& sampleList);
     void PackFunctionInfo(const NameModuleMap& modMap, CPAFunctionInfoList& funcInfoList);
-#endif
-    // TODO: These helper functions should be in utils
     gtString ConvertQtToGTString(const QString& inputStr);
+#endif
     void DecodeSamplingEvent(EventMaskType encoded, gtUInt16& event, gtUByte& unitMask, bool& bitOs, bool& bitUsr);
     bool InitializeEventsXMLFile(gtUInt32 cpuFamily, gtUInt32 cpuModel, EventsFile& eventsFile);
     void ClearWriterQueue();

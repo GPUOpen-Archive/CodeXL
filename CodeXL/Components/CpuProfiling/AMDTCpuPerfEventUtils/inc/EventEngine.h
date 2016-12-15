@@ -35,8 +35,8 @@
 class CP_EVENT_API EventEngine
 {
 public:
-    EventEngine();
-    virtual ~EventEngine();
+    EventEngine() = default;
+    virtual ~EventEngine() = default;
 
     bool Initialize(QString eventsDirectory);
     QString GetEventFilePath(gtUInt32 cpuFamily, gtUInt32 cpuModel);

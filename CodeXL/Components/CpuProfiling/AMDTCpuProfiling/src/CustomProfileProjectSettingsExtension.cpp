@@ -864,7 +864,7 @@ void CustomProfileProjectSettingsExtension::OnEventEdited(QTreeWidgetItem* pItem
                     for (umit = m_pEventFile->FirstUnitMask(oneEvent);
                          umit != m_pEventFile->EndOfUnitMasks(oneEvent); ++umit)
                     {
-                        verify |= unitMask & (1 << umit->value);
+                        verify |= unitMask & (1 << umit->m_value);
                     }
 
                     unitMask = verify;
@@ -1117,14 +1117,14 @@ QString CustomProfileProjectSettingsExtension::eventUnitMaskTip(gtUInt16 event, 
             for (umit = m_pEventFile->FirstUnitMask(oneEvent);
                  umit != m_pEventFile->EndOfUnitMasks(oneEvent); ++umit)
             {
-                if ((unitMask & (1 << umit->value)) > 0)
+                if ((unitMask & (1 << umit->m_value)) > 0)
                 {
                     if (!strRet.isEmpty())
                     {
                         strRet.append("\n");
                     }
 
-                    strRet.append(umit->name);
+                    strRet.append(umit->m_name.data());
                 }
             }
         }
@@ -1176,7 +1176,7 @@ bool CustomProfileProjectSettingsExtension::addConfigurationToTree(const gtStrin
                 if (m_pEventFile->FindEventByValue(GetIbsOpEvent(), oneEvent))
                 {
                     pItem->setFlags(pItem->flags() | Qt::ItemIsEditable);
-                    pItem->setText(EVENT_NAME_COLUMN, buildEventName(GetIbsOpEvent(), oneEvent.name));
+                    pItem->setText(EVENT_NAME_COLUMN, buildEventName(GetIbsOpEvent(), oneEvent.m_name.data()));
                     pItem->setData(EVENT_INTERVAL_COLUMN, Qt::EditRole, QVariant((uint)opts.m_opInterval));
                     pItem->setText(EVENT_UNITMASK_COLUMN, "0x" + QString::number(opts.m_opCycleCount ? 0 : 1, 16));
                     pItem->setToolTip(EVENT_UNITMASK_COLUMN, opToolTip(opts.m_opCycleCount));
@@ -1201,7 +1201,7 @@ bool CustomProfileProjectSettingsExtension::addConfigurationToTree(const gtStrin
                 if (m_pEventFile->FindEventByValue(GetIbsFetchEvent(), oneEvent))
                 {
                     pItem->setFlags(pItem->flags() | Qt::ItemIsEditable);
-                    pItem->setText(EVENT_NAME_COLUMN, buildEventName(GetIbsFetchEvent(), oneEvent.name));
+                    pItem->setText(EVENT_NAME_COLUMN, buildEventName(GetIbsFetchEvent(), QString(oneEvent.m_name.data())));
                     pItem->setData(EVENT_INTERVAL_COLUMN, Qt::EditRole, QVariant((uint)opts.m_fetchInterval));
                 }
                 else
@@ -1253,7 +1253,7 @@ bool CustomProfileProjectSettingsExtension::addConfigurationToTree(const gtStrin
                     if (m_pEventFile->FindEventByValue(eventSelect, oneEvent))
                     {
                         pItem->setFlags(pItem->flags() | Qt::ItemIsEditable);
-                        pItem->setText(EVENT_NAME_COLUMN, buildEventName(eventSelect, oneEvent.name));
+                        pItem->setText(EVENT_NAME_COLUMN, buildEventName(eventSelect, QString(oneEvent.m_name.data())));
                         pItem->setData(EVENT_INTERVAL_COLUMN, Qt::EditRole, QVariant((qulonglong)opts.m_eventsVector[i].eventCount));
                         pItem->setText(EVENT_UNITMASK_COLUMN, "0x" + QString::number(opts.m_eventsVector[i].pmc.ucUnitMask, 16));
                         pItem->setToolTip(EVENT_UNITMASK_COLUMN, eventUnitMaskTip(eventSelect, opts.m_eventsVector[i].pmc.ucUnitMask));
@@ -1384,7 +1384,7 @@ void CustomProfileProjectSettingsExtension::OnAvailableItemChanged(QTreeWidgetIt
 
             if (m_pEventFile->FindEventByValue(eventSelect, oneEvent))
             {
-                description = oneEvent.description;
+                description = QString(oneEvent.m_description.data());
             }
         }
         else if (GetIbsOpEvent() == eventSelect)
@@ -1476,9 +1476,9 @@ void CustomProfileProjectSettingsExtension::OnMonitoredItemChanged(QTreeWidgetIt
                     {
                         m_pSettingsLabel->show();
                         m_pSettings->show();
-                        m_pUnitMasks[umit->value]->setVisible(true);
-                        m_pUnitMasks[umit->value]->setText(umit->name);
-                        m_pUnitMasks[umit->value]->setChecked((unitMask & (1 << umit->value)) > 0);
+                        m_pUnitMasks[umit->m_value]->setVisible(true);
+                        m_pUnitMasks[umit->m_value]->setText(umit->m_name.data());
+                        m_pUnitMasks[umit->m_value]->setChecked((unitMask & (1 << umit->m_value)) > 0);
                     }
                 }
             }
@@ -1564,7 +1564,7 @@ bool CustomProfileProjectSettingsExtension::addAllEventsToAvailable(bool isIbsAv
             if (m_pEventFile->FindEventByValue(GetIbsOpEvent(), oneEvent))
             {
                 pItem->setFlags(pItem->flags() | Qt::ItemIsEditable);
-                pItem->setText(EVENT_NAME_COLUMN, buildEventName(GetIbsOpEvent(), oneEvent.name));
+                pItem->setText(EVENT_NAME_COLUMN, buildEventName(GetIbsOpEvent(), oneEvent.m_name.data()));
                 pItem->setData(EVENT_INTERVAL_COLUMN, Qt::EditRole, QVariant(DEFAULT_IBS_INTERVAL));
                 // IBS Op Dispatch count
                 pItem->setText(EVENT_UNITMASK_COLUMN, "0x1");
@@ -1587,7 +1587,7 @@ bool CustomProfileProjectSettingsExtension::addAllEventsToAvailable(bool isIbsAv
             if (m_pEventFile->FindEventByValue(GetIbsFetchEvent(), oneEvent))
             {
                 pItem->setFlags(pItem->flags() | Qt::ItemIsEditable);
-                pItem->setText(EVENT_NAME_COLUMN, buildEventName(GetIbsFetchEvent(), oneEvent.name));
+                pItem->setText(EVENT_NAME_COLUMN, buildEventName(GetIbsFetchEvent(), oneEvent.m_name.data()));
                 pItem->setData(EVENT_INTERVAL_COLUMN, Qt::EditRole, QVariant(DEFAULT_IBS_INTERVAL));
             }
             else
@@ -1638,36 +1638,34 @@ bool CustomProfileProjectSettingsExtension::addAllEventsToAvailable(bool isIbsAv
         for (; it != endIt; ++it)
         {
             //All PMC events are less than the Timer event,
-            if (!IsPmcEvent(it->value) && !IsL2IEvent(it->value))
+            if (!IsPmcEvent(it->m_value) && !IsL2IEvent(it->m_value))
             {
                 break;
             }
 
-            QTreeWidgetItem* pItem = new QTreeWidgetItem(pParent, ((int) QTreeWidgetItem::UserType + it->value));
+            QTreeWidgetItem* pItem = new QTreeWidgetItem(pParent, ((int) QTreeWidgetItem::UserType + it->m_value));
 
-
-            srcIt = sources.find(it->source);
+            srcIt = sources.find(it->m_source.data());
 
             if (sources.end() == srcIt)
             {
                 QTreeWidgetItem* pHardwareSource = new QTreeWidgetItem(pHardwareParent);
 
-                pHardwareSource->setText(EVENT_NAME_COLUMN, extendSourceName(it->source));
-                srcIt = sources.insert(it->source, pHardwareSource);
+                pHardwareSource->setText(EVENT_NAME_COLUMN, extendSourceName(QString(it->m_source.data())));
+                srcIt = sources.insert(QString(it->m_source.data()), pHardwareSource);
             }
 
-            QTreeWidgetItem* pSourceItem = new QTreeWidgetItem(srcIt.value(), ((int) QTreeWidgetItem::UserType + it->value));
-
+            QTreeWidgetItem* pSourceItem = new QTreeWidgetItem(srcIt.value(), ((int) QTreeWidgetItem::UserType + it->m_value));
 
             pItem->setFlags(pItem->flags() | Qt::ItemIsEditable);
             pSourceItem->setFlags(pSourceItem->flags() | Qt::ItemIsEditable);
-            pItem->setText(EVENT_NAME_COLUMN, buildEventName(it->value, it->name));
-            pSourceItem->setText(EVENT_NAME_COLUMN, buildEventName(it->value, it->name));
+            pItem->setText(EVENT_NAME_COLUMN, buildEventName(it->m_value, QString(it->m_name.data())));
+            pSourceItem->setText(EVENT_NAME_COLUMN, buildEventName(it->m_value, QString(it->m_name.data())));
 
             //Default Count
             gtUInt64 count(50000);
 
-            switch (it->value)
+            switch (it->m_value)
             {
                 case 0x76:
                     count = 1000000;
@@ -1692,19 +1690,19 @@ bool CustomProfileProjectSettingsExtension::addAllEventsToAvailable(bool isIbsAv
             for (umit = m_pEventFile->FirstUnitMask(*it);
                  umit != m_pEventFile->EndOfUnitMasks(*it); ++umit)
             {
-                if (umit->value >= (size_t) MAX_UNITMASK)
+                if (umit->m_value >= (size_t) MAX_UNITMASK)
                 {
                     continue;
                 }
 
-                mask |= 1 << umit->value;
+                mask |= 1 << umit->m_value;
 
                 if (!maskTip.isEmpty())
                 {
                     maskTip.append("\n");
                 }
 
-                maskTip.append(umit->name);
+                maskTip.append(umit->m_name.data());
             }
 
             pItem->setText(EVENT_UNITMASK_COLUMN, "0x" + QString::number(mask, 16));

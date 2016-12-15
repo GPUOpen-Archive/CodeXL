@@ -1837,7 +1837,7 @@ HRESULT CommandsHandler::verifyAndSetEvents(EventConfiguration** ppDriverEvents)
 {
     HRESULT hr = S_OK;
     osCpuid cpuInfo;
-    int model = cpuInfo.getModel();
+    gtUInt32 model = cpuInfo.getModel();
     osFilePath eventFilePath(osFilePath::OS_CODEXL_DATA_PATH);
     eventFilePath.appendSubDirectory(L"Events");
 
@@ -1895,7 +1895,7 @@ HRESULT CommandsHandler::verifyAndSetEvents(EventConfiguration** ppDriverEvents)
         if (eventData.m_minValidModel > model)
         {
             gtString errorMessage;
-            errorMessage.appendFormattedString(CP_STR_FailedToFindEvent, eventData.value);
+            errorMessage.appendFormattedString(CP_STR_FailedToFindEvent, eventData.m_value);
             ReportErrorMessage(false, errorMessage, errorMessage.asCharArray());
             hr = E_NOTAVAILABLE;
             break;
@@ -1919,10 +1919,13 @@ HRESULT CommandsHandler::verifyAndSetEvents(EventConfiguration** ppDriverEvents)
 
         if (FAMILY_OR == cpuInfo.getFamily())
         {
-            if (eventData.source.startsWith("NB", Qt::CaseInsensitive))
+            gtString eventSource;
+            eventSource.fromUtf8String(eventData.m_source);
+
+            if (eventSource.startsWith(L"NB"))
             {
                 gtString errorMessage;
-                errorMessage.appendFormattedString(CP_STR_FailedToFindNBEvent, eventData.value, eventData.name.data());
+                errorMessage.appendFormattedString(CP_STR_FailedToFindNBEvent, eventData.m_value, eventData.m_name.data());
                 ReportErrorMessage(false, errorMessage, errorMessage.asCharArray());
                 hr = E_NOTAVAILABLE;
                 break;
@@ -1934,7 +1937,7 @@ HRESULT CommandsHandler::verifyAndSetEvents(EventConfiguration** ppDriverEvents)
             unsigned int minCounter = static_cast<unsigned int>(-1);
             unsigned int curCounter = 0U;
             int minVal = 255;
-            unsigned int countMask = eventData.counters;
+            unsigned int countMask = eventData.m_counters;
 
             //check the count of events on each available counter
             while (countMask > 0)

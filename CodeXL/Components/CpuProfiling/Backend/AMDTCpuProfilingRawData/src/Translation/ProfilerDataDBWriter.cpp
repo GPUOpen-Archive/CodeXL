@@ -273,26 +273,13 @@ bool ProfilerDataDBWriter::InitializeEventsXMLFile(gtUInt32 cpuFamily, gtUInt32 
         eventFile = eventEngine.GetEventFilePath(cpuFamily, cpuModel);
 
         // Initialize event file
-        if (!eventsFile.Open(eventFile))
+        if (!eventsFile.Open(eventFile.toStdString()))
         {
             rv = false;
         }
     }
 
     return rv;
-}
-
-gtString ProfilerDataDBWriter::ConvertQtToGTString(const QString& inputStr)
-{
-    gtString str;
-    str.resize(inputStr.length());
-
-    if (inputStr.length())
-    {
-        str.resize(inputStr.toWCharArray(&str[0]));
-    }
-
-    return str;
 }
 
 void ProfilerDataDBWriter::PackCounterInfo(gtVector<EventMaskType>& events, AMDTProfileCounterDescVec& counterInfo)
@@ -311,7 +298,7 @@ void ProfilerDataDBWriter::PackCounterInfo(gtVector<EventMaskType>& events, AMDT
 
         AMDTProfileCounterDesc counterDesc;
         counterDesc.m_hwEventId = eventSel;
-        CpuEvent* pCpuEvent;
+        CpuEvent cpuEvent;
 
         if (IsTimerEvent(eventSel))
         {
@@ -319,11 +306,11 @@ void ProfilerDataDBWriter::PackCounterInfo(gtVector<EventMaskType>& events, AMDT
             counterDesc.m_abbrev = L"Timer";
             counterDesc.m_description = L"Timer";
         }
-        else if (eventsFileAvbl && eventsFile.FindEventByValue(eventSel, &pCpuEvent))
+        else if (eventsFileAvbl && eventsFile.FindEventByValue(eventSel, cpuEvent))
         {
-            counterDesc.m_name = ConvertQtToGTString(pCpuEvent->name);
-            counterDesc.m_abbrev = ConvertQtToGTString(pCpuEvent->abbrev);
-            counterDesc.m_description = ConvertQtToGTString(pCpuEvent->description);
+            counterDesc.m_name.fromASCIIString(cpuEvent.m_name.data());
+            counterDesc.m_abbrev.fromASCIIString(cpuEvent.m_abbrev.data());
+            counterDesc.m_description.fromASCIIString(cpuEvent.m_description.data());
         }
         else
         {
@@ -335,8 +322,6 @@ void ProfilerDataDBWriter::PackCounterInfo(gtVector<EventMaskType>& events, AMDT
         // This can have duplicate events? But will be handled while inserting into db
         counterInfo.emplace_back(counterDesc);
     }
-
-    eventsFile.Close();
 }
 
 void ProfilerDataDBWriter::Write(TranslatedDataType type, void* data)
@@ -494,6 +479,19 @@ void ProfilerDataDBWriter::Write(TranslatedDataType type, void* data)
     }
 }
 #if 0
+gtString ProfilerDataDBWriter::ConvertQtToGTString(const QString& inputStr)
+{
+    gtString str;
+    str.resize(inputStr.length());
+
+    if (inputStr.length())
+    {
+        str.resize(inputStr.toWCharArray(&str[0]));
+    }
+
+    return str;
+}
+
 void ProfilerDataDBWriter::PackSessionInfo(const CpuProfileInfo& profileInfo, gtUInt64 cpuAffinity, AMDTProfileSessionInfo& sessionInfo)
 {
     sessionInfo.m_targetAppPath = profileInfo.m_targetPath;
