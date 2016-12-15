@@ -1,4 +1,4 @@
-VerPatch,Name,Folder,GDT_Dynamic_Suffix
+VerPatch,Name,Folder,AMDT_Dynamic_Suffix
 No_Ver,AMDOpenCLDebug.dll,CodeXL\Output\Release\bin\,No
 No_Ver,AMDOpenCLDebug-x64.dll,CodeXL\Output\Release\bin\,No
 ALL,amdspv.exe,CodeXL\Output\Release\bin\x86,No
