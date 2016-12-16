@@ -34,10 +34,9 @@
 #include <sddl.h>
 
 #include <AMDTDriverControl/inc/DriverControl.h>
-#include <../CpuProfiling/Backend/Driver/Windows/CpuProf/inc/UserAccess/CpuProfDriver.h>
+#include <../CpuProfiling/Backend/Driver/Windows/CpuProf/inc/UserAccess/CpuProfSharedObj.h>
 #include <../PowerProfiling/Backend/AMDTPowerProfilingDrivers/Windows/inc/AMDTSharedObjPath.h>
 #include <../PowerProfiling/Backend/AMDTPowerProfilingDrivers/inc/AMDTSharedBufferConfig.h>
-
 
 const int nBufferSize = 500;
 wchar_t pServiceName[nBufferSize + 1];
