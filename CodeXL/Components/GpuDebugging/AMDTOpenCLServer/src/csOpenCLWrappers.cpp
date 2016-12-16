@@ -44,6 +44,59 @@
 #include <src/csOpenCLWrappersAidMacros.h>
 #include <src/csStringConstants.h>
 
+// return true if running on software stack with Lightning compiler (kernel debugging is not supported), false otherwise
+static bool IsRunningOnLC(cl_device_id deviceId)
+{
+    bool isOnLC = false;
+
+    // check whether the driver version string includes "LC" string.  If it does, it is running on software stack with Lightning compiler
+    // On Linux ROCm, the device version string will contain "(HSA,LC)"
+    // On Windows PAL, the device version string will contain "(PAL,LC)"
+
+    size_t stringLen = 0;
+    cl_int retVal = cs_stat_realFunctionPointers.clGetDeviceInfo(deviceId, CL_DEVICE_VERSION, 0, NULL, &stringLen);
+    GT_IF_WITH_ASSERT((retVal == CL_SUCCESS) && (stringLen > 0))
+    {
+        char* pDeviceVersion = new char[stringLen + 1];
+        retVal = cs_stat_realFunctionPointers.clGetDeviceInfo(cl_device_id(deviceId), CL_DEVICE_VERSION, stringLen + 1, pDeviceVersion, NULL);
+        GT_IF_WITH_ASSERT(retVal == CL_SUCCESS)
+        {
+            GT_IF_WITH_ASSERT(pDeviceVersion != NULL)
+            {
+                // Get the device vendor string from the device id:
+                gtString deviceVersion;
+                deviceVersion.fromASCIIString(pDeviceVersion);
+                delete[] pDeviceVersion;
+
+                if (deviceVersion.find(L"LC") != -1)
+                {
+                    // found the "LC" substring
+                    isOnLC = true;
+                }
+            }
+        }
+    }
+
+    return isOnLC;
+}
+
+// return true if running on software stack with Lightning compiler (kernel debugging is not supported), false otherwise
+static bool IsRunningOnLC(cl_command_queue commandQueue)
+{
+    bool isOnLC = false;
+
+    // get the device id from the command queue
+    cl_device_id deviceId;
+    cl_int retVal = cs_stat_realFunctionPointers.clGetCommandQueueInfo(commandQueue, CL_QUEUE_DEVICE, sizeof(cl_device_id), &deviceId, NULL);
+
+    GT_IF_WITH_ASSERT(retVal == CL_SUCCESS)
+    {
+        isOnLC = IsRunningOnLC(deviceId);
+    }
+
+    return isOnLC;
+}
+
 // --------------------------------------------------------
 //             OpenCL Wrapper functions
 // --------------------------------------------------------
@@ -3741,6 +3794,10 @@ cl_int CL_API_CALL clEnqueueNDRangeKernel(cl_command_queue command_queue, cl_ker
                     // Check if any of the kernel arguments are not supported (e.g. SVM buffers):
                     bool kernelHasUnsupportedArgs = false;
                     bool programIsNotSupported = false;
+
+                    // check if running on software stack with Lightning compiler which is not supported
+                    bool isOnLC = false;
+
                     gtString errorString;
                     cl_int originalCLError = CL_SUCCESS;
 
@@ -3754,6 +3811,9 @@ cl_int CL_API_CALL clEnqueueNDRangeKernel(cl_command_queue command_queue, cl_ker
                         const csCLKernel* pKernel = programsAndKernelsMon.kernelMonitor(hKernel);
                         GT_IF_WITH_ASSERT(NULL != pKernel)
                         {
+                            // check if running on software stack with Lightning compiler
+                            isOnLC = IsRunningOnLC(command_queue);
+
                             // See if any of the kernel arguments is an SVM buffer, or if the kernel is set to use SVM pointers:
                             kernelHasUnsupportedArgs = pKernel->kernelHasSVMArguments() || pKernel->kernelUsesSVMPointers();
 
@@ -3777,7 +3837,7 @@ cl_int CL_API_CALL clEnqueueNDRangeKernel(cl_command_queue command_queue, cl_ker
                         }
                     }
 
-                    if (!(kernelHasUnsupportedArgs || programIsNotSupported))
+                    if (!(isOnLC || kernelHasUnsupportedArgs || programIsNotSupported))
                     {
                         // Let the OpenCL monitor know we are about to debug a kernel:
                         cs_stat_openCLMonitorInstance.beforeKernelDebuggingEnqueued();
@@ -3818,6 +3878,11 @@ cl_int CL_API_CALL clEnqueueNDRangeKernel(cl_command_queue command_queue, cl_ker
                             // Delete the unused session structure:
                             delete pKernelDebuggingSession;
                         }
+                    }
+                    else if (isOnLC)
+                    {
+                        // Don't enqueue the kernel for debug:
+                        originalCLError = CL_UNSUPPORTED_PLATFORM_AMD;
                     }
                     else if (programIsNotSupported)
                     {
@@ -4050,6 +4115,10 @@ cl_int CL_API_CALL clEnqueueTask(cl_command_queue command_queue, cl_kernel kerne
                     // Check if any of the kernel arguments are not supported (e.g. SVM buffers):
                     bool kernelHasUnsupportedArgs = false;
                     bool programIsNotSupported = false;
+
+                    // check if running on software stack with Lightning compiler which is not supported
+                    bool isOnLC = false;
+
                     gtString errorString;
                     cl_int originalCLError = CL_SUCCESS;
 
@@ -4059,6 +4128,9 @@ cl_int CL_API_CALL clEnqueueTask(cl_command_queue command_queue, cl_kernel kerne
 
                     if (NULL != pContext)
                     {
+                        // check if running on software stack with Lightning compiler
+                        isOnLC = IsRunningOnLC(command_queue);
+
                         const csProgramsAndKernelsMonitor& programsAndKernelsMon = pContext->programsAndKernelsMonitor();
                         const csCLKernel* pKernel = programsAndKernelsMon.kernelMonitor(hKernel);
                         GT_IF_WITH_ASSERT(NULL != pKernel)
@@ -4086,7 +4158,7 @@ cl_int CL_API_CALL clEnqueueTask(cl_command_queue command_queue, cl_kernel kerne
                         }
                     }
 
-                    if (!(kernelHasUnsupportedArgs || programIsNotSupported))
+                    if (!(isOnLC || kernelHasUnsupportedArgs || programIsNotSupported))
                     {
                         // Let the OpenCL monitor know we are about to debug a kernel:
                         cs_stat_openCLMonitorInstance.beforeKernelDebuggingEnqueued();
@@ -4127,6 +4199,11 @@ cl_int CL_API_CALL clEnqueueTask(cl_command_queue command_queue, cl_kernel kerne
                             // Delete the unused session structure:
                             delete pKernelDebuggingSession;
                         }
+                    }
+                    else if (isOnLC)
+                    {
+                        // Don't enqueue the kernel for debug:
+                        originalCLError = CL_UNSUPPORTED_PLATFORM_AMD;
                     }
                     else if (programIsNotSupported)
                     {
