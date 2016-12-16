@@ -34,7 +34,7 @@
 #include <sddl.h>
 
 #include <AMDTDriverControl/inc/DriverControl.h>
-#include <CodeXLDrivers/CpuProf/inc/UserAccess/CpuProfSharedObj.h>
+#include <CpuProf/inc/UserAccess/CpuProfSharedObj.h>
 #include <../PowerProfiling/Backend/AMDTPowerProfilingDrivers/Windows/inc/AMDTSharedObjPath.h>
 #include <../PowerProfiling/Backend/AMDTPowerProfilingDrivers/inc/AMDTSharedBufferConfig.h>
 

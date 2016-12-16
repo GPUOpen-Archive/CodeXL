@@ -24,7 +24,7 @@
 
 #include <psapi.h>
 #include <WinIoCtl.h>
-#include <Driver/Windows/CpuProf/inc/UserAccess/CpuProfDriver.h>
+#include <CpuProf/inc/UserAccess/CpuProfDriver.h>
 
 #define TASK_INFO_FILE_SIGNATURE  FCC('cati')
 

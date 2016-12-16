@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -33,7 +33,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <PreprocessorDefinitions>AMDT_CPU_PROFILING_TRANSLATION_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(CommonProjectsDir)\AMDTCommonHeaders;$(ProjectDir);$(ProjectDir)\inc;$(ProjectDir)\..;$(ProjectDir)\..\ProfileAgents;$(ProjectDir)\..\..\ProfilingAgents;$(SolutionDir)\..\Components\CpuProfiling;$(SolutionDir)\..\Components\DatabaseLayer;$(CommonDir)\Lib\Ext\Java\jdk1.7.0_17\include;$(CommonDir)\Lib\Ext\Java\jdk1.7.0_17\include\win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(CommonProjectsDir)\AMDTCommonHeaders;$(ProjectDir);$(ProjectDir)\inc;$(ProjectDir)\..;$(ProjectDir)\..\ProfileAgents;$(ProjectDir)\..\..\ProfilingAgents;$(SolutionDir)\..\Components\CpuProfiling;$(SolutionDir)\..\Components\DatabaseLayer;$(SolutionDir)\..\Components\CodeXLDrivers;$(CommonDir)\Lib\Ext\Java\jdk1.7.0_17\include;$(CommonDir)\Lib\Ext\Java\jdk1.7.0_17\include\win32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>

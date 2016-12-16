@@ -13,7 +13,7 @@
 #include <AMDTCpuPerfEventUtils/inc/EventsFile.h>
 #include <AMDTCpuProfilingTranslation/inc/CpuProfileDataTranslation.h>
 #include <WinIoCtl.h>
-#include <Driver/Windows/CpuProf/inc/UserAccess/CpuProfDriver.h>
+#include <CpuProf/inc/UserAccess/CpuProfDriver.h>
 #include <CpuProfileControl.h>
 
 

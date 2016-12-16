@@ -21,10 +21,10 @@
 
 #include <WinIoCtl.h>
 
-#include <Driver/Windows/CpuProf/inc/UserAccess/CpuProfDriver.h>
+#include <CpuProf/inc/UserAccess/CpuProfDriver.h>
 #pragma warning(push)
 #pragma warning(disable:4091) //'typedef ': ignored on left of '' when no variable is declared
-#include <Driver/Windows/CpuProf/inc/UserAccess/PrdRecords.h>
+#include <CpuProf/inc/UserAccess/PrdRecords.h>
 #pragma warning(pop)
 
 
