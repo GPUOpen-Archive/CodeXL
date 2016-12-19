@@ -69,7 +69,7 @@ void CpuTranslationMonitor::run()
     const wchar_t* pServerList = (!serverList.isEmpty()) ? serverList.asCharArray() : nullptr;
     const wchar_t* pCachePath = (nullptr != pServerList && !cachePath.isEmpty()) ? cachePath.asCharArray() : nullptr;
 
-    *m_pRet = fnWriteSetToFile(m_pHandle, nullptr, m_sessionFile.asCharArray(), ProgressBarCallback, pSearchPath, pServerList, pCachePath);
+    *m_pRet = fnCpuProfileDataTranslate(m_pHandle, m_sessionFile.asCharArray(), ProgressBarCallback, pSearchPath, pServerList, pCachePath);
 
     if (S_OK != *m_pRet)
     {

@@ -191,21 +191,6 @@ struct ProfileDataSetInterval
     CPA_TIME end;
 };
 
-/** This will provide a count of the current data sets
-
-    \ingroup datasets
-    @param[in] pReaderHandle The open reader handle
-    @param[out] pCount The count of data sets
-    \return The success of getting the data set information
-    \retval S_OK Success
-    \retval E_INVALIDARG pReaderHandle was not an open handle, or a NULL
-    pointer was provided
-    \retval E_UNEXPECTED an unexpected error occurred
-*/
-CP_TRANS_API HRESULT fnGetDataSetCount(
-    /*in*/ ReaderHandle* pReaderHandle,
-    /*out*/unsigned int* pCount);
-
 /** This will write the named data set to a file, including all necessary
     call-stack and JIT data files in the same directory.  No filters will be
     applied to the written data.
@@ -223,9 +208,8 @@ CP_TRANS_API HRESULT fnGetDataSetCount(
     \retval E_ACCESSDENIED the access to the path was denied
     \retval E_UNEXPECTED an unexpected error occurred
 */
-CP_TRANS_API HRESULT fnWriteSetToFile(
+CP_TRANS_API HRESULT fnCpuProfileDataTranslate(
     /*in*/ ReaderHandle* pReaderHandle,
-    /*in*/ const wchar_t* pDataSetName,
     /*in*/ const wchar_t* pFileName,
     /*in*/ PfnProgressBarCallback pfnProgressBarCallback,
     /*in*/ const wchar_t* pSearchPath = NULL,

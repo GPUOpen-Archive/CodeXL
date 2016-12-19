@@ -20,7 +20,6 @@
 //#include "config.h"
 #include <CpuProfileDataTranslation.h>
 #include <CpuProfileDataMigrator.h>
-#include "CpuProfileDataAccess.h"
 
 #include <AMDTOSWrappers/Include/osProcess.h>
 
@@ -94,28 +93,22 @@ static HRESULT helpValidatePath(const wchar_t* pPath)
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
 static HRESULT helpHandlePrdFile(const wchar_t* pFilePath, ReaderHandle** pReaderHandle)
 {
-    //create new object
-    CpuProfileDataAccess* pDataAccess = new CpuProfileDataAccess();
+    HRESULT hr = S_OK;
 
-    if (NULL == pDataAccess)
+    // Create the PrdTranslator
+    gtString envVal;
+    bool collectStats = osGetCurrentProcessEnvVariableValue(L"CODEXL_CPU_TRANS_STATS", envVal);
+    gtString path = pFilePath;
+
+    PrdTranslator* pDataTranslator = new PrdTranslator(QString::fromStdWString(pFilePath), collectStats);
+
+    if (nullptr == pDataTranslator)
     {
         return E_OUTOFMEMORY;
     }
 
-    *pReaderHandle = static_cast<ReaderHandle*>(pDataAccess);
-
-    //add prd file to object
-    HRESULT hr = pDataAccess->OpenPrdFile(pFilePath);
-
-    if (S_OK != hr)
-    {
-        delete pDataAccess;
-        *pReaderHandle = NULL;
-    }
-    else
-    {
-        g_validReaders.push_back(*pReaderHandle);
-    }
+    *pReaderHandle = static_cast<ReaderHandle*>(pDataTranslator);
+    g_validReaders.push_back(*pReaderHandle);
 
     return hr;
 }
@@ -206,14 +199,8 @@ HRESULT fnCloseProfile(
     }
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    CpuProfileDataAccess* pDataAccess =  static_cast<CpuProfileDataAccess*>(*pReaderHandle);
-
-    if (pDataAccess->IsAggregationInProgress())
-    {
-        return E_ACCESSDENIED;
-    }
-
-    delete pDataAccess;
+    PrdTranslator* pTrans =  static_cast<PrdTranslator*>(*pReaderHandle);
+    delete pTrans;
 #else
     CaPerfTranslator* pTrans = static_cast<CaPerfTranslator*>(*pReaderHandle);
     delete pTrans;
@@ -227,37 +214,14 @@ HRESULT fnCloseProfile(
     return S_OK;
 }
 
-HRESULT fnGetDataSetCount(
+HRESULT fnCpuProfileDataTranslate(
     /*in*/ ReaderHandle* pReaderHandle,
-    /*out*/unsigned int* pCount)
-{
-    if ((NULL == pReaderHandle) || (NULL == pCount))
-    {
-        return E_INVALIDARG;
-    }
-
-    if (!helpCheckValidReader(pReaderHandle))
-    {
-        return E_INVALIDARG;
-    }
-
-    CpuProfileDataAccess* pDataAccess =  static_cast<CpuProfileDataAccess*>(pReaderHandle);
-    gtList<wchar_t*> dataList;
-    HRESULT hr = pDataAccess->GetDataSets(&dataList);
-    *pCount = (unsigned int)dataList.size();
-    return hr;
-}
-
-HRESULT fnWriteSetToFile(
-    /*in*/ ReaderHandle* pReaderHandle,
-    /*in*/ const wchar_t* pDataSetName,
     /*in*/ const wchar_t* pFileName,
     /*in*/ PfnProgressBarCallback pfnProgressBarCallback,
     /*in*/ const wchar_t* pSearchPath,
     /*in*/ const wchar_t* pServerList,
     /*in*/ const wchar_t* pCachePath)
 {
-    (void)(pDataSetName); // unused
     HRESULT hr = S_OK;
 
     if ((NULL == pReaderHandle) || (NULL == pFileName))
@@ -271,71 +235,29 @@ HRESULT fnWriteSetToFile(
     }
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    unsigned int numDataSet = 0;
-    hr = fnGetDataSetCount(pReaderHandle, &numDataSet);
-
-    if (S_OK != hr)
-    {
-        return hr;
-    }
-
-    CpuProfileDataAccess* pDataAccess =  static_cast<CpuProfileDataAccess*>(pReaderHandle);
-
     //Get absolute path
     QFileInfo outFile(QString::fromStdWString(pFileName));
     QString outPath = outFile.absoluteFilePath();
     outPath.replace('/', '\\');
 
-    if ((NULL == pDataSetName) || (0 == numDataSet))
+    PrdTranslator* pDataTranslator = static_cast<PrdTranslator*>(pReaderHandle);
+
+    if (nullptr != pDataTranslator)
     {
-        //**********************
-        // Use CADataTranslator
-        //**********************
-
-        // Get the PRD file name from DataAccess
-        QString prdFile(QString::fromWCharArray(pDataAccess->GetPrdFilePath()));
-
-        gtString envVal;
-        bool collectStats = osGetCurrentProcessEnvVariableValue(L"CODEXL_CPU_TRANS_STATS", envVal);
-
-        // Create the PrdTranslator
-        PrdTranslator* pDataTranslator = new PrdTranslator(prdFile, collectStats);
-
         pDataTranslator->SetDebugSymbolsSearchPath(pSearchPath, pServerList, pCachePath);
-
-        if (NULL == pDataTranslator)
-        {
-            return E_OUTOFMEMORY;
-        }
 
         MissedInfoType missedInfo;
         QString errorString;
-        hr = pDataTranslator->TranslateData(
-                 outPath ,
-                 &missedInfo, //MissedInfoType *pMissedInfo
-                 QStringList(), //QStringList processFilters
-                 QStringList(), //QStringList targetPidList
-                 errorString, //QWidget *pApp = NULL
-                 false, //bool bThread = false
-                 false, //bool bCLUtil = false
-                 false,
-                 pfnProgressBarCallback); //bool bLdStCollect = false
 
-        delete pDataTranslator;
-    }
-    else
-    {
-        if (!pDataAccess->IsDataSetExists(pDataSetName))
-        {
-            return E_INVALIDARG;
-        }
-
-        if (!pDataAccess->IsDataSetReady(pDataSetName))
-        {
-            return E_PENDING;
-        }
-
-        hr = pDataAccess->WriteSetToFile(pDataSetName, outPath.toStdWString().c_str());
+        hr = pDataTranslator->TranslateData(outPath,
+                                            &missedInfo, //MissedInfoType *pMissedInfo
+                                            QStringList(), //QStringList processFilters
+                                            QStringList(), //QStringList targetPidList
+                                            errorString, //QWidget *pApp = NULL
+                                            false, //bool bThread = false
+                                            false, //bool bCLUtil = false
+                                            false,
+                                            pfnProgressBarCallback); //bool bLdStCollect = false
     }
 
 #else // WINDOWS_ONLY

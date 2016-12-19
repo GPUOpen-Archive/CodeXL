@@ -97,17 +97,16 @@ HRESULT CpuProfileReport::Translate()
             }
         }
 
-        hr = fnWriteSetToFile(pHandle,
-                              nullptr,
+        hr = fnCpuProfileDataTranslate(pHandle,
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-                              outputFilePath.asString().asCharArray(),
+                                       outputFilePath.asString().asCharArray(),
 #else
-                              outputFilePath.fileDirectoryAsString().asCharArray(),
+                                       outputFilePath.fileDirectoryAsString().asCharArray(),
 #endif
-                              nullptr,
-                              pSearchPath,
-                              pServerList,
-                              pCachePath);
+                                       nullptr,
+                                       pSearchPath,
+                                       pServerList,
+                                       pCachePath);
 
         if (S_OK != hr)
         {
