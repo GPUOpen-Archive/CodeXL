@@ -55,12 +55,8 @@ class gdDebugApplicationTreeData;
 
 // Common definitions:
 
-// HSA debugging only currently supported on Linux:
-#if AMDT_BUILD_TARGET == AMDT_LINUX_OS
-    #define GD_ALLOW_HSA_DEBUGGING 1
-#else
-    #define GD_DISALLOW_HSA_DEBUGGING 1
-#endif
+// HSA Debugging is not supported
+#define GD_DISALLOW_HSA_DEBUGGING 1
 
 // ----------------------------------------------------------------------------------
 // Class Name:          gdApplicationCommands

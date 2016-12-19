@@ -224,12 +224,6 @@ GpuDebuggingPlugins += GpuD_OpenGL_Obj
 # a link from libGL.so to libGL.so.1 is then created. Same logic applies here as in the CL spy
 CXL_env.AddPostAction (GpuD_OpenGL_Obj, "( cd " + CXL_env['CXL_spies_dir'] + " && mv libGLTemp.so libGL.so.1 && ln -s -f libGL.so.1 libGL.so )")
 
-allow_hsa = CXL_env['CXL_hsa']
-if (allow_hsa == 'true'):
-    GpuD_HSASrv_Obj = SConscript('Components/GpuDebugging/AMDTHsaServer/SConscript', variant_dir=obj_variant_dir+'/AMDTHsaServer', duplicate=1)
-    CXL_env.Depends(GpuD_HSASrv_Obj, GDbg_Server_Core)
-    GpuDebuggingPlugins += GpuD_HSASrv_Obj
-
 GpuD_Components_Obj = SConscript('Components/GpuDebugging/AMDTGpuDebuggingComponents/SConscript', variant_dir=obj_variant_dir+'/AMDTGpuDebuggingComponents', duplicate=1) 
 CXL_env.Depends(GpuD_Components_Obj,
                 GpuD_ApiFunctions_Obj
