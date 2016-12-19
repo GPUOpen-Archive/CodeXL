@@ -326,6 +326,7 @@ const QString CPU_PROF_MESSAGE(QObject::tr("CPU Profiling Error"));
 #define CP_STR_cpuProfileProjectSettingsUsrColumnTooltip "Count events occuring in User Mode"
 #define CP_STR_cpuProfileProjectSettingsOSColumn "Kernel\nMode"
 #define CP_STR_cpuProfileProjectSettingsOSColumnTooltip "Count events occuring in  Kernel Mode"
+#define CP_STR_cpuProfileProjectSettingsCustomTypeWarning "*** Note: Multiple events profiling may not work properly on this processor. ***\n\n"
 #define CP_STR_cpuProfileProjectSettingsCustomTypeChangeQuestion "Profile custom settings were changed.\nDo you want to change the current profile type to 'Custom Profile'?"
 #define CP_STR_cpuProfileProjectSettingsCurrentProfileType "Collect call stack details for current session type - %1"
 #define CP_STR_cpuProfileProjectSettingsAddButtonTooltip "Click to add the selected event to the list of monitored events"

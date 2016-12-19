@@ -27,6 +27,8 @@
 // Infra:
 #include <AMDTApplicationFramework/Include/afAidFunctions.h>
 
+// Backend:
+#include <AMDTCpuProfilingControl/inc/CpuProfileControl.h>
 #include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
 
 // Local:
@@ -102,6 +104,14 @@ void ProfileConfigs::readAvailableProfiles()
 
     //If AMD, check in current family_model directory for Event configurations
     if (!cpuInfo.isCpuAmd())
+    {
+        return;
+    }
+
+    bool isPredefinedProfilesSupported = false;
+    fnGetPredefinedProfilesAvailable(isPredefinedProfilesSupported);
+
+    if (!isPredefinedProfilesSupported)
     {
         return;
     }

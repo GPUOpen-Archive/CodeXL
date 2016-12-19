@@ -1716,3 +1716,10 @@ HRESULT fnWriteRunInfo(const wchar_t* pRIFilePath, const RunInfo* pRunInfo)
 
     return hr;
 }
+
+
+HRESULT fnGetPredefinedProfilesAvailable(/*out*/ bool& isPredefinedProfilesAvailable)
+{
+    isPredefinedProfilesAvailable = true;
+    return S_OK;
+}

@@ -1505,7 +1505,17 @@ void CustomProfileProjectSettingsExtension::OnSettingsTreeSelectionAboutToChange
 
     if (m_wereSettingsChanged && !isCustomCpuProfile)
     {
-        int userSelection = acMessageBox::instance().question(AF_STR_QuestionA, CP_STR_cpuProfileProjectSettingsCustomTypeChangeQuestion, QMessageBox::Yes | QMessageBox::No);
+        QString noteStr;
+        bool isPredefinedProfilesSupported = false;
+
+        fnGetPredefinedProfilesAvailable(isPredefinedProfilesSupported);
+
+        if (!isPredefinedProfilesSupported)
+        {
+            noteStr = CP_STR_cpuProfileProjectSettingsCustomTypeWarning;
+        }
+
+        int userSelection = acMessageBox::instance().question(AF_STR_QuestionA, noteStr += CP_STR_cpuProfileProjectSettingsCustomTypeChangeQuestion, QMessageBox::Yes | QMessageBox::No);
 
         if (userSelection == QMessageBox::Yes)
         {

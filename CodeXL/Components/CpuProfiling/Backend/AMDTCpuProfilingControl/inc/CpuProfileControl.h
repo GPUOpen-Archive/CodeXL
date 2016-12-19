@@ -1055,6 +1055,14 @@ CP_CTRL_API HRESULT fnWriteRunInfo(
     /* in */ const wchar_t* pRIFilePath,
     /* in */ const RunInfo* pRunInfo);
 
+/** This function will get whether predefined profiles are supported or not.
+
+\ingroup profiling
+@param[out] isPredefinedProfilesAvailable true if predefined profiles supported
+\retval S_OK Success
+\retval S_FALSE if failed
+*/
+CP_CTRL_API HRESULT fnGetPredefinedProfilesAvailable(/*out*/ bool& isPredefinedProfilesAvailable);
 
 /*@}*/
 #endif  // _CPUPROFILECONTROL_H_

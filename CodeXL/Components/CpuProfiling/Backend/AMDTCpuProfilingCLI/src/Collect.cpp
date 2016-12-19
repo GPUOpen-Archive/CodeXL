@@ -313,7 +313,7 @@ gtString CpuProfileCollect::GetProfileTypeStr()
 }
 
 
-//      Private Memeber Functions
+//      Private Member Functions
 
 void CpuProfileCollect::SetupEnvironment()
 {
@@ -424,8 +424,20 @@ void CpuProfileCollect::ValidateProfile()
         && m_args.GetLaunchApp().isEmpty()
         && (0 == m_args.GetProfileDuration()))
     {
-        reportError(false, L"Specifiy either Profile Duration(-d) or Launch Application in System-Wide Profile mode\n");
+        reportError(false, L"Specify either Profile Duration(-d) or Launch Application in System-Wide Profile mode\n");
         return;
+    }
+
+    bool isPredefinedProfilesSupported = false;
+    fnGetPredefinedProfilesAvailable(isPredefinedProfilesSupported);
+
+    if (!isPredefinedProfilesSupported)
+    {
+        if (!IsTBP() && !m_args.GetProfileConfig().isEmpty())
+        {
+            reportError(false, L"Predefined profiles are unavailable on this processor. Use \'-C\' option for custom profile instead.\n");
+            return;
+        }
     }
 
     // No profile config is specified - "-m" , "-C" , "-T", "-E"
@@ -752,7 +764,7 @@ bool CpuProfileCollect::ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec,
             {
             case 0:
                 value.toUnsignedIntNumber(eventSelect);
-                
+
                 if (eventSelect == 0xf000)
                 {
                     aIbsConfig.fetchSampling = true;
@@ -808,7 +820,7 @@ bool CpuProfileCollect::ProcessRawEvent(gtVector<DcEventConfig>& eventConfigVec,
             default:
                 break;
             }
-            
+
             i++;
         }
 
