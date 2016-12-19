@@ -35,7 +35,6 @@
 #include <AMDTApplicationFramework/Include/afGlobalVariablesManager.h>
 #include <AMDTApplicationFramework/Include/afQMdiSubWindow.h>
 
-#include <AMDTCpuPerfEventUtils/inc/ViewConfig.h>
 #include <AMDTCpuPerfEventUtils/inc/IbsEvents.h>
 
 // AMDTSharedProfiling:

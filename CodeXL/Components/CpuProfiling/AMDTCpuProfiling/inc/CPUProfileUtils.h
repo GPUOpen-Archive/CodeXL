@@ -9,6 +9,7 @@
 #ifndef __CPUPROFILEUTILS_H
 #define __CPUPROFILEUTILS_H
 
+#include <QStringList>
 
 // AMDTCpuPerfEventUtils:
 #include <AMDTCpuPerfEventUtils/inc/EventsFile.h>

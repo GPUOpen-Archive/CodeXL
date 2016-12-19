@@ -56,19 +56,16 @@ EventsFile* EventEngine::GetEventFile(gtUInt32 cpuFamily, gtUInt32 cpuModel)
 
     if (fullPathString.isEmpty())
     {
-        return NULL;
+        return nullptr;
     }
 
     EventsFile* pEventFile = new EventsFile();
-#ifdef USE_TINYXML_PARSER
-    if (pEventFile->Open(fullPathString.toStdString()))
-#else
-    if (pEventFile->Open(fullPathString))
-#endif
+
+    if (pEventFile != nullptr && pEventFile->Open(fullPathString.toStdString()))
     {
         return pEventFile;
     }
 
     delete pEventFile;
-    return NULL;
+    return nullptr;
 }

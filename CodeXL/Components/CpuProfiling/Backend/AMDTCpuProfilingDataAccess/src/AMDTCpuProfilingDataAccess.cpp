@@ -7,9 +7,6 @@
 //
 //=============================================================
 
-#include <qtIgnoreCompilerWarnings.h>
-#include <QtCore>
-
 #include <string.h>
 
 #include <AMDTBaseTools/Include/AMDTDefinitions.h>
@@ -547,44 +544,44 @@ public:
         if (ret)
         {
             ViewConfigInfo viewCfgInfo;
-            viewCfgInfo.m_viewCfg.SetConfigName(QString(CXL_REPORT_VIEW_ALL_DATA));
+            viewCfgInfo.m_viewCfg.SetConfigName(CXL_REPORT_VIEW_ALL_DATA);
 
             gtUInt32 nbrEvents = m_sampledCounterDescVec.size();
-            EventConfig* pEventConfig = new EventConfig[nbrEvents];
 
-            if (nullptr != pEventConfig)
+            std::vector<EventConfig> eventConfigList;
+            eventConfigList.reserve(nbrEvents);
+
+            std::vector<std::string> eventTitleList;
+            eventTitleList.reserve(nbrEvents);
+
+            for (const auto& event : m_sampledCounterDescVec)
             {
-                QStringList eventList;
-                int i = 0;
+                AMDTProfileSamplingConfig sampleConfig;
+                ret = GetSamplingConfiguration(event.m_id, sampleConfig);
 
-                for (auto& event : m_sampledCounterDescVec)
+                if (ret)
                 {
-                    AMDTProfileSamplingConfig sampleConfig;
-                    ret = GetSamplingConfiguration(event.m_id, sampleConfig);
+                    std::string title;
+                    event.m_name.asUtf8(title);
+                    eventTitleList.push_back(title);
 
-                    if (ret)
-                    {
-                        eventList += QString(event.m_name.asASCIICharArray());
+                    // Initialize event config array
+                    EventConfig eventConfig;
+                    eventConfig.eventSelect = event.m_hwEventId;
+                    eventConfig.eventUnitMask = sampleConfig.m_unitMask;
+                    eventConfig.bitUsr = sampleConfig.m_userMode;
+                    eventConfig.bitOs = sampleConfig.m_osMode;
+                    eventConfigList.push_back(eventConfig);
 
-                        // Initialize event config array
-                        pEventConfig[i].eventSelect = event.m_hwEventId;
-                        pEventConfig[i].eventUnitMask = sampleConfig.m_unitMask;
-                        pEventConfig[i].bitUsr = sampleConfig.m_userMode;
-                        pEventConfig[i].bitOs = sampleConfig.m_osMode;
-
-                        viewCfgInfo.m_counterIdVec.push_back(event.m_id);
-                        i++;
-                    }
+                    viewCfgInfo.m_counterIdVec.push_back(event.m_id);
                 }
-
-                // Make column specifications
-                viewCfgInfo.m_viewCfg.MakeColumnSpecs(i, pEventConfig, eventList);
-                viewCfgInfo.m_viewCfg.SetDescription("This special view has all of the data from the profile available.");
-
-                m_viewConfigInfoVec.push_back(viewCfgInfo);
-
-                delete[] pEventConfig;
             }
+
+            // Make column specifications
+            viewCfgInfo.m_viewCfg.MakeColumnSpecs(eventConfigList, eventTitleList);
+            viewCfgInfo.m_viewCfg.SetDescription("This special view has all of the data from the profile available.");
+
+            m_viewConfigInfoVec.push_back(viewCfgInfo);
         }
 
         return ret;
@@ -615,26 +612,27 @@ public:
         return ret;
     }
 
-    bool GetCounterIdsFromColumnSpec(ColumnSpec*& columnArray, AMDTUInt32 nbrCols, AMDTCounterIdVec& counterVec)
+    bool GetCounterIdsFromColumnSpec(ColumnSpecList& columnArray, AMDTCounterIdVec& counterVec)
     {
         bool ret = true;
 
         AMDTProfileCounterDesc counterDesc;
 
-        for (gtUInt32 i = 0; i < nbrCols; i++)
+        for (const auto& colSpec : columnArray)
         {
-            if (columnArray[i].dataSelectLeft.eventSelect && columnArray[i].dataSelectRight.eventSelect)
+            if (colSpec.dataSelectLeft.eventSelect && colSpec.dataSelectRight.eventSelect)
             {
                 // This is COMPUTED counter
                 // check whether we have seen this already
-                gtString computedCounterName = ConvertQtToGTString(columnArray[i].title);
+                gtString computedCounterName;
+                computedCounterName.fromUtf8String(colSpec.title);
 
                 AMDTCounterId computedCounterId = 0;
                 auto it = m_computedCounterNameIdMap.find(computedCounterName);
 
                 if (it == m_computedCounterNameIdMap.end())
                 {
-                    // Construct dummy event decriptor
+                    // Construct dummy event descriptor
                     computedCounterId = m_computedCounterStartId++;
 
                     counterDesc.m_id = computedCounterId;
@@ -643,15 +641,15 @@ public:
                     counterDesc.m_deviceId = 0;
                     counterDesc.m_category = 0;
 
-                    counterDesc.m_unit = (columnArray[i].type = ColumnRatio)
+                    counterDesc.m_unit = (colSpec.type == ColumnRatio)
                                             ? AMDT_PROFILE_COUNTER_UNIT_RATIO : AMDT_PROFILE_COUNTER_UNIT_PERCENT;
 
-                    counterDesc.m_name = ConvertQtToGTString(columnArray[i].title);
-                    counterDesc.m_abbrev = ConvertQtToGTString(columnArray[i].title);
-                    counterDesc.m_description = counterDesc.m_name; // FIXME
+                    counterDesc.m_name.fromUtf8String(colSpec.title);
+                    counterDesc.m_abbrev = counterDesc.m_name;
+                    counterDesc.m_description = counterDesc.m_name;
 
                     m_computedCounterDescVec.push_back(counterDesc);
-                    m_computedCounterIdSpecMap.insert({ computedCounterId, columnArray[i] });
+                    m_computedCounterIdSpecMap.insert({ computedCounterId, colSpec });
                 }
                 else
                 {
@@ -660,15 +658,15 @@ public:
 
                 counterVec.push_back(computedCounterId);
             }
-            else if (columnArray[i].dataSelectLeft.eventSelect)
+            else if (colSpec.dataSelectLeft.eventSelect)
             {
                 // This is RAW counter
                 AMDTCounterId counterId;
 
-                ret = GetRawCounterId(columnArray[i].dataSelectLeft.eventSelect,
-                                      columnArray[i].dataSelectLeft.eventUnitMask,
-                                      columnArray[i].dataSelectLeft.bitOs,
-                                      columnArray[i].dataSelectLeft.bitUsr,
+                ret = GetRawCounterId(colSpec.dataSelectLeft.eventSelect,
+                                      colSpec.dataSelectLeft.eventUnitMask,
+                                      colSpec.dataSelectLeft.bitOs,
+                                      colSpec.dataSelectLeft.bitUsr,
                                       counterId);
 
                 if (ret)
@@ -686,30 +684,32 @@ public:
         bool ret = true;
 
         gtUInt32 nbrCols = viewConfig.GetNumberOfColumns();
-        ColumnSpec* columnArray = new ColumnSpec[nbrCols];
+
+        ColumnSpecList columnArray;
+        columnArray.reserve(nbrCols);
         viewConfig.GetColumnSpecs(columnArray);
 
         // Now that we have got the columnspec from view config, check
         // whether all the events are in event vector
-        for (gtUInt32 i = 0; ret && i < nbrCols; i++)
+        for (auto& colSpec : columnArray)
         {
             AMDTCounterId counterId;
 
-            if (columnArray[i].dataSelectLeft.eventSelect)
+            if (colSpec.dataSelectLeft.eventSelect)
             {
-                ret = GetRawCounterId(columnArray[i].dataSelectLeft.eventSelect,
-                                      columnArray[i].dataSelectLeft.eventUnitMask,
-                                      columnArray[i].dataSelectLeft.bitOs,
-                                      columnArray[i].dataSelectLeft.bitUsr,
+                ret = GetRawCounterId(colSpec.dataSelectLeft.eventSelect,
+                                      colSpec.dataSelectLeft.eventUnitMask,
+                                      colSpec.dataSelectLeft.bitOs,
+                                      colSpec.dataSelectLeft.bitUsr,
                                       counterId);
             }
 
-            if (ret && columnArray[i].dataSelectRight.eventSelect)
+            if (ret && colSpec.dataSelectRight.eventSelect)
             {
-                ret = GetRawCounterId(columnArray[i].dataSelectRight.eventSelect,
-                                      columnArray[i].dataSelectRight.eventUnitMask,
-                                      columnArray[i].dataSelectRight.bitOs,
-                                      columnArray[i].dataSelectRight.bitUsr,
+                ret = GetRawCounterId(colSpec.dataSelectRight.eventSelect,
+                                      colSpec.dataSelectRight.eventUnitMask,
+                                      colSpec.dataSelectRight.bitOs,
+                                      colSpec.dataSelectRight.bitUsr,
                                       counterId);
             }
         }
@@ -717,12 +717,7 @@ public:
         // This ViewConfig can be supported for this profile run
         if (ret)
         {
-            ret = GetCounterIdsFromColumnSpec(columnArray, nbrCols, counterVec);
-        }
-
-        if (columnArray)
-        {
-            delete[] columnArray;
+            ret = GetCounterIdsFromColumnSpec(columnArray, counterVec);
         }
 
         return ret;
@@ -747,9 +742,11 @@ public:
         if (ret)
         {
             ViewConfigInfo viewCfgInfo;
-            ViewConfig& viewCfg = viewCfgInfo.m_viewCfg;
 
-            viewCfg.ReadConfigFile(ConvertToQString(viewConfigPath));
+            std::string configFilePath;
+            viewConfigPath.asUtf8(configFilePath);
+
+            viewCfgInfo.m_viewCfg.ReadConfigFile(configFilePath);
             AddViewConfig(viewCfgInfo);
         }
 
@@ -819,13 +816,12 @@ public:
 
         columnSpec.type = ColumnRatio;
         columnSpec.sorting = NoSort;
-        columnSpec.visible = true;
 
         if (CXL_CLU_EVENT_CLU_PERCENTAGE == eventId)
         {
             GetEventConfigByEventId(CXL_CLU_EVENT_CLU_PERCENTAGE, columnSpec.dataSelectLeft);
             GetEventConfigByEventId(CXL_CLU_EVENT_L1_EVICTIONS, columnSpec.dataSelectRight);
-            columnSpec.title = QString(CXL_CLU_EVENT_CLU_PERCENTAGE_NAME_STR);
+            columnSpec.title = CXL_CLU_EVENT_CLU_PERCENTAGE_NAME_STR;
             columnSpec.type = ColumnPercentage;
             ret = true;
         }
@@ -833,14 +829,14 @@ public:
         {
             GetEventConfigByEventId(CXL_CLU_EVENT_BYTES_ACCESSED, columnSpec.dataSelectLeft);
             GetEventConfigByEventId(CXL_CLU_EVENT_L1_EVICTIONS, columnSpec.dataSelectRight);
-            columnSpec.title = QString(CXL_CLU_EVENT_BYTES_PER_L1_EVICTION_NAME_STR);
+            columnSpec.title = CXL_CLU_EVENT_BYTES_PER_L1_EVICTION_NAME_STR;
             ret = true;
         }
         else if (CXL_CLU_EVENT_ACCESSES_PER_L1_EVICTION == eventId)
         {
             GetEventConfigByEventId(CXL_CLU_EVENT_ACCESSES, columnSpec.dataSelectLeft);
             GetEventConfigByEventId(CXL_CLU_EVENT_L1_EVICTIONS, columnSpec.dataSelectRight);
-            columnSpec.title = QString(CXL_CLU_EVENT_ACCESSES_PER_L1_EVICTION_NAME_STR);
+            columnSpec.title = CXL_CLU_EVENT_ACCESSES_PER_L1_EVICTION_NAME_STR;
             ret = true;
         }
 
@@ -854,60 +850,58 @@ public:
         if (ret)
         {
             ViewConfigInfo viewCfgInfo;
-            viewCfgInfo.m_viewCfg.SetConfigName(QString(CXL_REPORT_VIEW_ALL_DATA));
+            viewCfgInfo.m_viewCfg.SetConfigName(CXL_REPORT_VIEW_ALL_DATA);
 
             gtUInt32 nbrEvents = m_sampledCounterDescVec.size();
+            ColumnSpecList columnSpecList;
+            columnSpecList.reserve(nbrEvents + 3);
 
-            ColumnSpec* pColumnSpec = new ColumnSpec[nbrEvents];
+            ColumnSpec cs;
 
-            if (nullptr != pColumnSpec)
+            // First Add the derived counters?
+            PrepareComputedCounterForCLU(CXL_CLU_EVENT_CLU_PERCENTAGE, cs);
+            columnSpecList.push_back(cs);
+
+            PrepareComputedCounterForCLU(CXL_CLU_EVENT_BYTES_PER_L1_EVICTION, cs);
+            columnSpecList.push_back(cs);
+
+            PrepareComputedCounterForCLU(CXL_CLU_EVENT_ACCESSES_PER_L1_EVICTION, cs);
+            columnSpecList.push_back(cs);
+
+            for (auto& event : m_sampledCounterDescVec)
             {
-                int i = 0;
-
-                // First Add the derived counters?
-                PrepareComputedCounterForCLU(CXL_CLU_EVENT_CLU_PERCENTAGE, pColumnSpec[i]);
-                PrepareComputedCounterForCLU(CXL_CLU_EVENT_BYTES_PER_L1_EVICTION, pColumnSpec[++i]);
-                PrepareComputedCounterForCLU(CXL_CLU_EVENT_ACCESSES_PER_L1_EVICTION, pColumnSpec[++i]);
-                i++;
-
-                for (auto& event : m_sampledCounterDescVec)
+                if ((CXL_CLU_EVENT_CLU_PERCENTAGE == event.m_id)
+                    || (CXL_CLU_EVENT_BYTES_PER_L1_EVICTION == event.m_id)
+                    || (CXL_CLU_EVENT_ACCESSES_PER_L1_EVICTION == event.m_id))
                 {
-                    if ((CXL_CLU_EVENT_CLU_PERCENTAGE == event.m_id)
-                        || (CXL_CLU_EVENT_BYTES_PER_L1_EVICTION == event.m_id)
-                        || (CXL_CLU_EVENT_ACCESSES_PER_L1_EVICTION == event.m_id))
-                    {
-                        continue;
-                    }
-
-                    AMDTProfileSamplingConfig sampleConfig;
-                    ret = GetSamplingConfiguration(event.m_id, sampleConfig);
-
-                    if (ret)
-                    {
-                        pColumnSpec[i].type = ColumnValue;
-                        pColumnSpec[i].sorting = NoSort;
-                        pColumnSpec[i].visible = true;
-                        pColumnSpec[i].dataSelectRight.eventSelect = 0;
-                        pColumnSpec[i].dataSelectRight.eventUnitMask = 0;
-                        pColumnSpec[i].dataSelectRight.bitOs = 0;
-                        pColumnSpec[i].dataSelectRight.bitUsr = 0;
-
-                        ConstructEventConfig(sampleConfig, pColumnSpec[i].dataSelectLeft);
-                        pColumnSpec[i].title = QString(event.m_name.asASCIICharArray());
-
-                        i++;
-                    }
+                    continue;
                 }
+
+                AMDTProfileSamplingConfig sampleConfig;
+                ret = GetSamplingConfiguration(event.m_id, sampleConfig);
 
                 if (ret)
                 {
-                    viewCfgInfo.m_viewCfg.SetColumnSpecs(pColumnSpec, nbrEvents, false);
-                    viewCfgInfo.m_viewCfg.SetDescription("This special view has all of the data from the profile available.");
+                    cs.type = ColumnValue;
+                    cs.sorting = NoSort;
+                    cs.title = std::string(event.m_name.asASCIICharArray());
+                    cs.dataSelectRight.eventSelect = 0;
+                    cs.dataSelectRight.eventUnitMask = 0;
+                    cs.dataSelectRight.bitOs = 0;
+                    cs.dataSelectRight.bitUsr = 0;
 
-                    AddViewConfig(viewCfgInfo);
+                    ConstructEventConfig(sampleConfig, cs.dataSelectLeft);
+
+                    columnSpecList.push_back(cs);
                 }
+            }
 
-                delete[] pColumnSpec;
+            if (ret)
+            {
+                viewCfgInfo.m_viewCfg.SetColumnSpecs(columnSpecList, false);
+                viewCfgInfo.m_viewCfg.SetDescription("This special view has all of the data from the profile available.");
+
+                AddViewConfig(viewCfgInfo);
             }
         }
 
@@ -917,7 +911,7 @@ public:
     bool UpdateSampledCountersForCLU()
     {
         // Treat CXL_CLU_EVENT_CLU_PERCENTAGE as computed counter as this involves
-        // computing the percenatge based on evictions
+        // computing the percentage based on evictions
         for (auto& eventDesc : m_sampledCounterDescVec)
         {
             AMDTProfileCounterDesc cluCounterDesc;
@@ -980,14 +974,15 @@ public:
             // construct the report configs
             for (auto& viewConfigInfo : m_viewConfigInfoVec)
             {
-                QString name;
+                std::string name;
                 viewConfigInfo.m_viewCfg.GetConfigName(name);
 
-                gtString cfgName = ConvertQtToGTString(name);
+                gtString cfgName;
+                cfgName.fromUtf8String(name);
 
                 if (cfgName.compareNoCase(configName) == 0)
                 {
-                    reportConfig.m_name = ConvertQtToGTString(name);
+                    reportConfig.m_name.fromUtf8String(name);
 
                     for (auto& counterId : viewConfigInfo.m_counterIdVec)
                     {
@@ -1019,9 +1014,9 @@ public:
             {
                 AMDTProfileReportConfig reportConfig;
 
-                QString name;
+                std::string name;
                 viewConfigInfo.m_viewCfg.GetConfigName(name);
-                reportConfig.m_name = ConvertQtToGTString(name);
+                reportConfig.m_name.fromUtf8String(name);
 
                 for (auto& counterId : viewConfigInfo.m_counterIdVec)
                 {
