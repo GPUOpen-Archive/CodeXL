@@ -61,7 +61,6 @@ CpuSessionWindow::CpuSessionWindow(const afApplicationTreeItemData* pSessionTree
     m_isSessionBeingRenamed = false;
     m_pSessionTreeItemData = pSessionTreeItemData;
     m_pTabWidget = nullptr;
-    m_pProfileInfo = nullptr;
     m_pOverviewWindow = nullptr;
     m_pSessionModulesView = nullptr;
     m_pSessionFunctionView = nullptr;
@@ -104,7 +103,6 @@ CpuSessionWindow::~CpuSessionWindow()
 
     delete m_pTabWidget;
     m_pProfDataRd->CloseProfileData();
-    m_pProfileInfo = nullptr;
 }
 
 bool CpuSessionWindow::initialize()
@@ -569,8 +567,7 @@ void CpuSessionWindow::onViewSourceView(gtVAddr Address, ProcessIdType pid, Thre
 
 void CpuSessionWindow::onViewCallGraphView(unsigned long pid)
 {
-    if (true)
-        //if (checkIfDataIsPresent())
+    if (checkIfDataIsPresent())
     {
         //This tab is not allocated until it's needed
         if (nullptr == m_pCallGraphTab)
@@ -612,8 +609,7 @@ void CpuSessionWindow::onViewFunctionTab(unsigned long pid)
 {
     (void)(pid); // unused
 
-    //if (checkIfDataIsPresent())
-    if (true)
+    if (checkIfDataIsPresent())
     {
         if (nullptr == m_pSessionFunctionView)
         {
@@ -1030,7 +1026,7 @@ bool CpuSessionWindow::checkIfDataIsPresent()
 {
     bool ret = true;
 
-    if (m_pProfileInfo->m_numSamples == 0)
+    if (! m_pProfDataRd->SessionHasSamples())
     {
         ret = false;
         QMessageBox::information(this, "No Samples available", "The selected session does not have any data, please try again.");

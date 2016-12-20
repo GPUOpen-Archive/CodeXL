@@ -207,9 +207,6 @@ protected slots:
 
 protected:
 
-    /// Data:
-    CpuProfileInfo*   m_pProfileInfo;
-
     /// Tree item data:
     afApplicationTreeItemData* m_pDisplayedSessionItemData;
 
@@ -272,10 +269,11 @@ protected:
 
     /// True iff we're in the update function (avoid multiple updates)
     bool m_isUpdatingData;
-    std::shared_ptr<cxlProfileDataReader> m_pProfDataRdr = nullptr;
-    std::map<gtString, AMDTUInt32>      m_CounterIdxMap;
-    bool m_isCLU = false;
 
+    // Profile Data Accessor
+    std::shared_ptr<cxlProfileDataReader> m_pProfDataRdr = nullptr;
+    std::map<gtString, AMDTUInt32> m_CounterIdxMap;
+    bool m_isCLU = false;
 };
 
 #endif

@@ -107,6 +107,7 @@ public:
                          gtVector<AMDTThreadId>*    pThreadList);
 
     //  Summary APIs
+    bool SessionHasSamples(void);
     bool GetSampleCount(bool sepByCore, AMDTSampleValueVec& sampleCount);
     bool GetProcessSummary(AMDTUInt32 counterId, AMDTProfileDataVec& processSummaryData);
     bool GetThreadSummary(AMDTUInt32 counterId, AMDTProfileDataVec& threadSummaryData);

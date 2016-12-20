@@ -148,7 +148,6 @@ private:
     const afApplicationTreeItemData* m_pSessionTreeItemData;
 
     /// Project/Profile related data structures
-    CpuProfileInfo*      m_pProfileInfo;
     osFilePath          m_sessionFile;
 
     /// Data tabs

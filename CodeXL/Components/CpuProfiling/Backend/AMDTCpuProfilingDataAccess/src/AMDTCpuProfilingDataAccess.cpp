@@ -4727,6 +4727,22 @@ bool cxlProfileDataReader::GetFunctionInfo(
     return ret;
 }
 
+bool cxlProfileDataReader::SessionHasSamples(void)
+{
+    bool ret = false;
+
+    if (nullptr != m_pImpl)
+    {
+        AMDTSampleValueVec totalValueVec;
+
+        ret = m_pImpl->GetSampleCount(false, totalValueVec);
+
+        ret = ret && (totalValueVec.size() > 0);
+    }
+
+    return ret;
+}
+
 bool cxlProfileDataReader::GetSampleCount(bool sepByCore, AMDTSampleValueVec& totalValueVec)
 {
     bool ret = false;

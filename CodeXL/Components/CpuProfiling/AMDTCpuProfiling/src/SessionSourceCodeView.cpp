@@ -1117,8 +1117,14 @@ QString SessionSourceCodeView::FindSourceFile(QString fileName)
     QString srcDirs = acGTStringToQString(sourceDirectories);
 
     // add the working directory
-    //QString wrkDir = QString::fromWCharArray(m_pProfileInfo->m_wrkDirectory.asCharArray());
     QString wrkDir;
+    AMDTProfileSessionInfo sessionInfo;
+
+    if (m_pProfDataRdr->GetProfileSessionInfo(sessionInfo))
+    {
+        wrkDir = acGTStringToQString(sessionInfo.m_targetAppWorkingDir);
+    }
+
     QStringList dirList;
 
     if (!srcDirs.isEmpty())
