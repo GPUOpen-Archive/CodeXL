@@ -42,7 +42,6 @@
   <ItemGroup>
     <ClCompile Include="src\Cache.cpp" />
     <ClCompile Include="src\CluInfo.cpp" />
-    <ClCompile Include="src\CpuProfileDataAccess.cpp" />
     <ClCompile Include="src\CpuProfileDataMigrator.cpp" />
     <ClCompile Include="src\CpuProfileDataTranslation.cpp" />
     <ClCompile Include="src\DllMain.cpp" />
@@ -75,7 +74,6 @@
     <ClInclude Include="inc\Windows\TaskInfoInterface.h" />
     <ClInclude Include="src\Cache.h" />
     <ClInclude Include="src\CluInfo.h" />
-    <ClInclude Include="src\CpuProfileDataAccess.h" />
     <ClInclude Include="src\ExecutableAnalyzer.h" />
     <ClInclude Include="src\JitTaskInfo.h" />
     <ClInclude Include="src\Linux\CaPerfTranslator.h">

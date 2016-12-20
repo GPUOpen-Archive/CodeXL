@@ -235,16 +235,16 @@ HRESULT fnCpuProfileDataTranslate(
     }
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
-    //Get absolute path
-    QFileInfo outFile(QString::fromStdWString(pFileName));
-    QString outPath = outFile.absoluteFilePath();
-    outPath.replace('/', '\\');
-
     PrdTranslator* pDataTranslator = static_cast<PrdTranslator*>(pReaderHandle);
 
     if (nullptr != pDataTranslator)
     {
         pDataTranslator->SetDebugSymbolsSearchPath(pSearchPath, pServerList, pCachePath);
+
+        //Get absolute path
+        QFileInfo outFile(QString::fromStdWString(pFileName));
+        QString outPath = outFile.absoluteFilePath();
+        outPath.replace('/', '\\');
 
         MissedInfoType missedInfo;
         QString errorString;

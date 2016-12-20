@@ -37,7 +37,6 @@ env.Append (LIBS = [
 sources = \
 [
     "src/CpuProfileDataTranslation.cpp",
-    "src/CpuProfileDataAccess.cpp",
     "src/ExecutableAnalyzer.cpp",
     "src/JitTaskInfo.cpp",
     "src/Linux/CaPerfTranslator.cpp",

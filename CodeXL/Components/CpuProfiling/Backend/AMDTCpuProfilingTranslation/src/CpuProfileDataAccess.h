@@ -30,6 +30,7 @@
 #include <CpuProfileDataTranslation.h>
 #include <AMDTCpuPerfEventUtils/inc/EventsFile.h>
 #include <AMDTCpuProfilingRawData/inc/CpuProfileReader.h>
+#include "CPA_TIME.h"
 
 #if AMDT_BUILD_TARGET == AMDT_WINDOWS_OS
 
@@ -54,6 +55,239 @@
 #endif
 
 const gtUInt64 HASHSIZE = 4096ULL;
+
+/** \struct ProfileDataSetInterval
+\brief A data set interval is defined by two time marks, [start, end).
+\ingroup datasets
+
+A data set is defined by one or more data set intervals.  Any intervals
+that end before the start of the profile data or start after the end of the
+profile data will be ignored.
+
+You can generate the time marks either through the \ref
+fnGetCurrentTimeMark or with the Windows time functions like
+CoDosDateTimeToFileTime().
+*/
+struct ProfileDataSetInterval
+{
+    /** interval start */
+    CPA_TIME start;
+    /** interval end */
+    CPA_TIME end;
+};
+
+/** \struct SampleDatumKey
+\brief This structure is a key for the sample count data in \ref SampleData
+
+\ingroup data
+*/
+struct SampleDatumKey
+{
+    /** Which core is the value for */
+    int core;
+    /** Which performance event is the value for */
+    gtUInt64 event;
+};
+
+/** This function has to imply that !(a < b) is (a >= b), for the sorting to
+work
+*/
+inline bool operator< (const SampleDatumKey& temp1, const SampleDatumKey& temp2)
+{
+    if (temp1.core < temp2.core)
+    {
+        return true;
+    }
+    else if (temp1.core > temp2.core)
+    {
+        return false;
+    }
+    else if (temp1.event < temp2.event)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+};
+
+/** \struct SampleData
+\brief This structure holds the data
+\ingroup data
+*/
+struct SampleData
+{
+    /** How many data are available in the arrays */
+    unsigned int count;
+    /** The array of keys of the data */
+    SampleDatumKey* keyArray;
+    /** The array of data */
+    gtUInt64* dataArray;
+    /** Constructor */
+    SampleData() { keyArray = NULL; dataArray = NULL; count = 0; }
+};
+
+/** \struct InstructionDataType
+\brief This structure holds all the data for instruction-level samples.
+\ingroup data
+*/
+struct InstructionDataType
+{
+    /** The address of the sampled instruction.
+    \note that IBS fetch samples addresses may fall between actual instructions
+    */
+    gtUInt64 address;
+    /** The process id of the samples, may vary based on rules */
+    unsigned int processId;
+    /** The thread id of the samples, may vary based on rules */
+    unsigned int threadId;
+    /** The load address of the jit function only provided for JIT samples */
+    gtUInt64 jitAddress;
+    /** The JIT generated function name, only provided for JIT samples */
+    wchar_t* pJitFunctionName;
+    /** The JIT generated data file name, only provided for JIT samples */
+    wchar_t* pJitDataFile;
+    /** The sample data that occurred in the module */
+    SampleData data;
+    InstructionDataType()
+    {
+        pJitFunctionName = NULL;
+        pJitDataFile = NULL;
+    }
+};
+
+/** The less than function for the \ref InstructionDataType
+*/
+inline bool operator< (const InstructionDataType& temp1,
+    const InstructionDataType& temp2)
+{
+    if (temp1.address < temp2.address)
+    {
+        return true;
+    }
+    else if (temp1.processId > temp2.processId)
+    {
+        return false;
+    }
+    else if (temp1.threadId < temp2.threadId)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+};
+
+/** The equality function for the \ref InstructionDataType
+*/
+inline bool operator== (const InstructionDataType& temp1,
+    const InstructionDataType& temp2)
+{
+    if (temp1.address != temp2.address)
+    {
+        return false;
+    }
+    else if (temp1.processId != temp2.processId)
+    {
+        return false;
+    }
+    else if (temp1.threadId != temp2.threadId)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+};
+
+/** \struct JITDataType
+\brief This structure retrieves JIT information for the given address.
+\ingroup data
+*/
+typedef struct
+{
+    /** The native code bytes for the instruction at the address */
+    const gtUByte* pNativeCodeBytes;
+    /** The Java virtual machine reported source file name */
+    wchar_t* sourceFileName;
+    /** The Java virtual machine reported line number */
+    int lineNumber;
+} JITDataType;
+
+/** \struct RawDataType
+\brief This structure holds all the data for one profile sample.
+
+If the module of a sample is unknown, the full sample address will be
+given.  If the module is known, the offset into the module will be given.
+
+\note An IBS sample will have multiple data for one sample.
+
+\ingroup data
+*/
+typedef struct
+{
+    /** Sample time mark */
+    CPA_TIME timeMark;
+    /** The path of the module */
+    wchar_t* path;
+    /** The load address of the module */
+    gtUInt64 loadAddress;
+    /** The size of the module */
+    gtUInt64 moduleSize;
+    /** Sample address */
+    gtUInt64 address;
+    /** What type of module is it */
+    ModuleType type;
+    /** The process id of the sample */
+    unsigned int processId;
+    /** The thread id of the sample */
+    unsigned int threadId;
+    /** The JIT generated function name, only provided for JIT samples */
+    wchar_t* pJitFunctionName;
+    /** The JIT generated data file name, only provided for JIT samples */
+    wchar_t* pJitDataFile;
+    /** Valid if the IBS ops sample data contained a branch target address */
+    gtUInt64 ibsOpBranchAddress;
+    /** Valid if the IBS ops sample data contained a data cache linear address */
+    gtUInt64 ibsOpDcLinearAddress;
+    /** Valid if the IBS ops sample data contained a data cache physical address */
+    gtUInt64 ibsOpDcPhysicalAddress;
+    /** The sample data that occurred in the module */
+    SampleData data;
+} RawDataType;
+
+
+/** This enum represents the type of module.
+\ingroup data
+*/typedef enum
+{
+    InvalidModType, /**< An invalid module */
+    UnmanagedModType, /**< A regular, unmanaged application or library */
+    JavaModType, /**< JIT-generated module information */
+    ManagedModType, /**< A managed application or library */
+    KernelModType, /**< Kernel module> */
+    UnknownModType /**< An unknown module */
+} ModuleType;
+
+/** \struct ModuleDataType
+\brief This structure holds all the data for module-level samples.
+\ingroup data
+*/
+struct ModuleDataType
+{
+    /** The path of the module */
+    wchar_t* path;
+    /** The process id of the samples, may vary based on rules */
+    unsigned int processId;
+    /** Whether the module is 64-bit */
+    bool is64Bit;
+    /** The sample data that occurred in the module */
+    SampleData data;
+    ModuleDataType() { path = NULL; }
+};
 
 
 typedef gtMap<SampleDatumKey, gtUInt64> SampleDataMap;

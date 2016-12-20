@@ -54,9 +54,6 @@
     <ClCompile Include="src\Linux\CaPerfTranslatorIbs.cpp">
       <Filter>Source Files\Linux</Filter>
     </ClCompile>
-    <ClCompile Include="src\CpuProfileDataAccess.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Windows\WinTaskInfo.cpp">
       <Filter>Source Files\Windows</Filter>
     </ClCompile>
@@ -120,9 +117,6 @@
     </ClInclude>
     <ClInclude Include="src\Linux\CaPerfTranslatorIbs.h">
       <Filter>Source Files\Linux</Filter>
-    </ClInclude>
-    <ClInclude Include="src\CpuProfileDataAccess.h">
-      <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Windows\WinTaskInfo.h">
       <Filter>Source Files\Windows</Filter>
