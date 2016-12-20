@@ -11,7 +11,6 @@
 #ifndef _JAVAJNCREADER_LIN_H_
 #define _JAVAJNCREADER_LIN_H_
 
-#include <QMap>
 #include "../../inc/ProfilingAgentsDataDLLBuild.h"
 #include "../../inc/JncJvmtiTypes.h"
 #include <AMDTExecutableFormat/inc/ExecutableFile.h>
@@ -22,7 +21,7 @@
 #include <list>
 
 // Note: the key of map is the offset, the data is line number
-typedef QMap<unsigned int, unsigned int> OffsetLinenumMap;
+typedef gtMap<unsigned int, unsigned int> OffsetLinenumMap;
 
 #ifndef _ADDRESSRANGE_DEFINED
 #define _ADDRESSRANGE_DEFINED

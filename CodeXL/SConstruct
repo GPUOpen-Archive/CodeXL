@@ -306,7 +306,8 @@ CpuProfilingPlugins += libCpuPerfEventUtils_Obj
 libProfilingAgentsData_Obj = SConscript('Components/CpuProfiling/ProfilingAgents/AMDTProfilingAgentsData/SConscript', variant_dir=obj_variant_dir+'/AMDTProfilingAgentsData', duplicate=1)
 CXL_env.Depends( libProfilingAgentsData_Obj, 
 	OSWrappers_Obj + 
-	BaseTools_Obj)
+	BaseTools_Obj +
+	libExecutableFormat_Obj)
 CpuProfilingPlugins += libProfilingAgentsData_Obj
 
 if (CXL_env['CXL_use_java'] != ''):

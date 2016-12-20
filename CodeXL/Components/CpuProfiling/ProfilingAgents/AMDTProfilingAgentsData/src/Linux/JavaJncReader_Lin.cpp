@@ -652,7 +652,7 @@ JavaJncReader::GetOffsetLines()
     int line = -1;
     std::string file;
 
-    if (! m_lineMap.isEmpty())
+    if (! m_lineMap.empty())
     {
         return m_lineMap;
     }
@@ -705,7 +705,7 @@ JavaJncReader::GetOffsetLines(std::wstring funcName)
     int line = -1;
     std::string file;
 
-    if (! m_lineMap.isEmpty())
+    if (! m_lineMap.empty())
     {
         return m_lineMap;
     }

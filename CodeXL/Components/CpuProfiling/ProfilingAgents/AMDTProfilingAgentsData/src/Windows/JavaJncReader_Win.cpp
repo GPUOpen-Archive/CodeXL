@@ -21,7 +21,7 @@ JavaJncReader::JavaJncReader()
 {
     Clear();
 
-    m_SrcName = "UnknownJITSource";
+    m_SrcName = L"UnknownJITSource";
 }
 
 JavaJncReader::~JavaJncReader()
@@ -83,7 +83,7 @@ bool JavaJncReader::Open(const wchar_t* pImageName)
         if (strLength < MAX_PATH)
         {
             wcscpy_s(temp, MAX_PATH, reinterpret_cast<wchar_t*>(pCode));
-            m_SrcName = QString::fromWCharArray(temp);
+            m_SrcName = temp;
         }
 
         pCode += strLength;
@@ -97,7 +97,7 @@ bool JavaJncReader::Open(const wchar_t* pImageName)
         if (strLength < 1024)
         {
             wcscpy_s(temp, 1024, reinterpret_cast<wchar_t*>(pCode));
-            m_FuncName = QString::fromWCharArray(temp);
+            m_FuncName = temp;
         }
 
         pCode += strLength;
@@ -239,11 +239,11 @@ bool JavaJncReader::OpenWithoutInline(const wchar_t* jncFile)
 
     if ((sectionNum > JNC_ILMAP))
     {
-        QString msg = "JNC file was not properly formed.\nDisassembly will not be available.";
+        //gtString msg(L"JNC file was not properly formed.\nDisassembly will not be available.");
         return false;
     }
 
-    m_jncFilePath = QString::fromWCharArray(jncFile);
+    m_jncFilePath = jncFile;
 
     // Get the code section
     m_pCode = m_pExecutable->GetSectionBytes(JNC_CODE);
@@ -372,11 +372,11 @@ bool JavaJncReader::OpenWithInline(const wchar_t* jncFile)
 
     if ((sectionNum > JNC_ILMAP))
     {
-        QString msg = "JNC file was not properly formed.\nDisassembly will not be available.";
+        //gtString msg(L"JNC file was not properly formed.\nDisassembly will not be available.");
         return false;
     }
 
-    m_jncFilePath = QString::fromWCharArray(jncFile);
+    m_jncFilePath = jncFile;
 
     // Get the code section
     m_pCode = m_pExecutable->GetSectionBytes(JNC_CODE);
@@ -572,9 +572,9 @@ JavaJncReader::Clear()
     m_lineMap.clear();
     m_LoadAddr = 0;
 
-    m_SrcName.clear();
-    m_FuncName.clear();
-    m_jncFilePath.clear();
+    m_SrcName.makeEmpty();
+    m_FuncName.makeEmpty();
+    m_jncFilePath.makeEmpty();
 
     m_pData = nullptr;
     m_pCode = nullptr;
@@ -588,11 +588,11 @@ JavaJncReader::Clear()
     m_addressRangeTable.clear();
 }
 
-QString JavaJncReader::GetSourceName()
+gtString JavaJncReader::GetSourceName()
 {
     return  m_SrcName;
 }
-QString JavaJncReader::GetFunctionName()
+gtString JavaJncReader::GetFunctionName()
 {
     return m_FuncName;
 }
@@ -1126,7 +1126,7 @@ JavaJncReader::GetOffsetLines(std::wstring funcName)
     int line = -1;
     std::string file;
 
-    if (! m_lineMap.isEmpty())
+    if (! m_lineMap.empty())
     {
         return m_lineMap;
     }

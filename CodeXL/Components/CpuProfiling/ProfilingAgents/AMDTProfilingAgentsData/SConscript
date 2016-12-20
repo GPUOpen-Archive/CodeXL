@@ -16,8 +16,12 @@ env.Append( CPPPATH = [
 	env['CXL_commonproj_dir'] + '/../../CodeXL/Components/CpuProfiling',
 ])
 
-UseQt4(env)
 initLibElf (env)
+
+env.Append (LIBS = [
+	"CXLBaseTools",
+	"CXLOSWrappers",
+])
 
 sources = \
 [

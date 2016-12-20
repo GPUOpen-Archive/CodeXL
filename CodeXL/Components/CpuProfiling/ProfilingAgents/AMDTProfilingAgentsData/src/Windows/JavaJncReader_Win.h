@@ -13,10 +13,6 @@
 #include <AMDTBaseTools/Include/gtAlgorithms.h>
 #include <AMDTExecutableFormat/inc/PeFile.h>
 #include "JncJvmtiTypes.h"
-#include <QString>
-#include <QMap>
-
-#include <QList>
 
 #include <string>
 #include <vector>
@@ -41,7 +37,7 @@ typedef struct _AddressRange
 
 
 // Note: the key of map is the offset, the data is line number
-typedef QMap<unsigned int, unsigned int> OffsetLinenumMap;
+typedef gtMap<unsigned int, unsigned int> OffsetLinenumMap;
 
 typedef struct
 {
@@ -95,13 +91,13 @@ public:
     void Clear();
 
     unsigned int GetSectionNum();
-    QString GetSourceName();
-    QString GetFunctionName();
+    gtString GetSourceName();
+    gtString GetFunctionName();
     gtUInt64 GetLoadAddr();
 
     OffsetLinenumMap GetOffsetLines();
     bool Is64Bit() const { return m_pExecutable->Is64Bit(); }
-    QString GetJncFilePath() { return m_jncFilePath; }
+    gtString GetJncFilePath() { return m_jncFilePath; }
 
     const gtUByte* GetCodeBytesOfTextSection(unsigned int* pSectionSize);
 
@@ -182,10 +178,10 @@ private:
     PeFile*             m_pExecutable;
     OffsetLinenumMap    m_lineMap;
     gtUInt64            m_LoadAddr;
-    QString             m_SrcName;
-    QString             m_FuncName;
+    gtString            m_SrcName;
+    gtString            m_FuncName;
 
-    QString             m_jncFilePath;
+    gtString            m_jncFilePath;
     const gtUByte*      m_pData;
     const gtUByte*      m_pCode;
 

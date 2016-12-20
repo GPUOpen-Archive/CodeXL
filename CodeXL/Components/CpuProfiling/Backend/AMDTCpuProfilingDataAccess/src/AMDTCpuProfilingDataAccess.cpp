@@ -3002,12 +3002,12 @@ public:
 
                         if (! funcOffsetLinenumMap.empty())
                         {
-                            currLineNumber = funcOffsetLinenumMap.begin().value();
+                            currLineNumber = funcOffsetLinenumMap.begin()->second;
 
-                            for (auto offsetLineIt = funcOffsetLinenumMap.begin(); offsetLineIt != funcOffsetLinenumMap.end(); ++offsetLineIt)
+                            for (auto& offsetLineIt : funcOffsetLinenumMap)
                             {
-                                AMDTUInt32 nextOffset = offsetLineIt.key();
-                                AMDTUInt32 nextLineNumber = offsetLineIt.value();
+                                AMDTUInt32 nextOffset = offsetLineIt.first;
+                                AMDTUInt32 nextLineNumber = offsetLineIt.second;
                                 bytesToRead = nextOffset - currOffset;
                                 bytesUsed = 0;
 
@@ -3297,12 +3297,12 @@ public:
                     GetSourceLineInfoForCLR(jncReader, *pExecutable, clrSymOffset, funcOffsetLinenumMap);
 
                     AMDTUInt32 currOffset = 0;
-                    AMDTUInt32 currLineNumber = funcOffsetLinenumMap.begin().value();
+                    AMDTUInt32 currLineNumber = funcOffsetLinenumMap.begin()->second;
 
-                    for (auto offsetLineIt = funcOffsetLinenumMap.begin(); offsetLineIt != funcOffsetLinenumMap.end(); ++offsetLineIt)
+                    for (auto& offsetLineIt : funcOffsetLinenumMap)
                     {
-                        AMDTUInt32 nextOffset = offsetLineIt.key();
-                        AMDTUInt32 nextLineNumber = offsetLineIt.value();
+                        AMDTUInt32 nextOffset = offsetLineIt.first;
+                        AMDTUInt32 nextLineNumber = offsetLineIt.second;
                         AMDTUInt32 bytesToRead = nextOffset - currOffset;
                         AMDTUInt32 bytesUsed = 0;
 
