@@ -486,18 +486,24 @@ bool DcConfig::parseDomTree(TiXmlElement* pRoot)
                 }
             }
 
-            TiXmlHandle configElemHandle(pConfigElem);
-
-            const char* str = configElemHandle.FirstChild("tool_tip").ToElement()->GetText();
-            if (str)
+            TiXmlElement* pTooltipElem = pConfigElem->FirstChildElement("tool_tip");
+            if (pTooltipElem)
             {
-                m_toolTip = str;
+                const char* str = pTooltipElem->GetText();
+                if (str)
+                {
+                    m_toolTip = str;
+                }
             }
 
-            str = configElemHandle.FirstChild("description").ToElement()->GetText();
-            if (str)
+            TiXmlElement* pDescElem = pConfigElem->FirstChildElement("description");
+            if (pDescElem)
             {
-                m_description = str;
+                const char* str = pDescElem->GetText();
+                if (str)
+                {
+                    m_description = str;
+                }
             }
 
             pConfigElem = pConfigElem->NextSiblingElement();
