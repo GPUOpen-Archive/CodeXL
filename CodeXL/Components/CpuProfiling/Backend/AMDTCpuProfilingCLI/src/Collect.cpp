@@ -344,8 +344,9 @@ void CpuProfileCollect::EnableProfiling()
     {
         // Enable Profiling
         m_error = fnEnableProfiling();
+        m_isProfilingEnabled = SUCCEEDED(m_error);
 
-        if ((m_isProfilingEnabled = SUCCEEDED(m_error)))
+        if (m_isProfilingEnabled)
         {
             m_profileState = CPUPROF_STATE_READY;
 
