@@ -24,6 +24,8 @@
 #include <memory>
 #include <linux/perf_event.h>
 
+#include <QtCore>
+
 #include <AMDTBaseTools/Include/gtFlatMap.h>
 #include <AMDTBaseTools/Include/gtList.h>
 #include <AMDTExecutableFormat/inc/ProcessWorkingSet.h>

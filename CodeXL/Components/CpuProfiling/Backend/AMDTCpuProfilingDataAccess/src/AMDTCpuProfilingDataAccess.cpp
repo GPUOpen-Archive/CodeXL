@@ -7,7 +7,8 @@
 //
 //=============================================================
 
-#include <string.h>
+#include <cstring>
+#include <algorithm>
 
 #include <qtIgnoreCompilerWarnings.h>
 

@@ -11,6 +11,8 @@
     #include <tchar.h>
 #endif
 
+#include <cstdarg>
+
 // Backend:
 #include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
 #include <AMDTCpuProfilingControl/inc/CpuProfileControl.h>
