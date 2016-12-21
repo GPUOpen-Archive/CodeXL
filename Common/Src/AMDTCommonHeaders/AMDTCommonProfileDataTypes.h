@@ -342,8 +342,8 @@ struct AMDTCallGraphFunction
     gtVAddr                 m_moduleBaseAddr = 0;
     bool                    m_isSystemModule = false;
 
-    gtUInt64                m_totalSelfSamples = 0;
-    gtUInt64                m_totalDeepSamples = 0;
+    double                  m_totalSelfSamples = 0.0;
+    double                  m_totalDeepSamples = 0.0;
     double                  m_deepSamplesPerc = 0.0;
 
     gtUInt32                m_pathCount = 0;

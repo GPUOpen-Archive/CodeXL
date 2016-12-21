@@ -130,27 +130,6 @@ using ModOffsetFuncInfoMap = gtMap<gtUInt64, AMDTProfileFunctionInfo>;
 using ProcessSampleTotalMap = gtMap<AMDTProcessId, AMDTSampleValueVec>;
 using ModuleSampleTotalMap = gtMap<AMDTModuleId, AMDTSampleValueVec>;
 
-//
-// Helper Routines
-// TODO: These helper routines need to be in common utils
-//
-static inline gtString ConvertQtToGTString(const QString& inputStr)
-{
-    gtString str;
-    str.resize(inputStr.length());
-
-    if (inputStr.length())
-    {
-        str.resize(inputStr.toWCharArray(&str[0]));
-    }
-
-    return str;
-}
-
-static inline QString ConvertToQString(const gtString& inputStr)
-{
-    return QString::fromWCharArray(inputStr.asCharArray(), inputStr.length());
-}
 
 //
 // Impl used by cxlProfileDataReader to query the profile db
@@ -194,7 +173,7 @@ public:
 
     AMDTProfileDataOptions              m_options;
 
-    // Unknwon functions
+    // Unknown functions
     FuncIdInfoMap                       m_unknownFuncIdInfoMap;
     ModOffsetFuncInfoMap                m_modOffsetFuncInfoMap;
     AMDTFunctionId                      m_currentUnknownFuncId = CXL_UNKNOWN_FUNC_START_ID;
@@ -569,7 +548,7 @@ public:
 
                     // Initialize event config array
                     EventConfig eventConfig;
-                    eventConfig.eventSelect = event.m_hwEventId;
+                    eventConfig.eventSelect = static_cast<gtUInt16>(event.m_hwEventId);
                     eventConfig.eventUnitMask = sampleConfig.m_unitMask;
                     eventConfig.bitUsr = sampleConfig.m_userMode;
                     eventConfig.bitOs = sampleConfig.m_osMode;
@@ -729,7 +708,7 @@ public:
     {
         bool ret = false;
 
-        if ((ret = IsSamplingEventsAvailable(viewCfgInfo.m_viewCfg, viewCfgInfo.m_counterIdVec)))
+        if ((ret = IsSamplingEventsAvailable(viewCfgInfo.m_viewCfg, viewCfgInfo.m_counterIdVec)) == true)
         {
             m_viewConfigInfoVec.push_back(viewCfgInfo);
         }
@@ -971,7 +950,7 @@ public:
     {
         bool ret = false;
 
-        if ((ret = InitializeReportConfigurations()))
+        if ((ret = InitializeReportConfigurations()) == true)
         {
             // construct the report configs
             for (auto& viewConfigInfo : m_viewConfigInfoVec)
@@ -1009,7 +988,7 @@ public:
     {
         bool ret = false;
 
-        if ((ret = InitializeReportConfigurations()))
+        if ((ret = InitializeReportConfigurations()) == true)
         {
             // construct the report configs
             for (auto& viewConfigInfo : m_viewConfigInfoVec)
@@ -1648,7 +1627,7 @@ public:
         bool ret = false;
         AMDTProfileCounterDesc desc;
 
-        if ((ret = GetCounterDescById(counterId, desc)))
+        if ((ret = GetCounterDescById(counterId, desc)) == true)
         {
             if (AMDT_PROFILE_COUNTER_TYPE_RAW == desc.m_type)
             {
@@ -1681,7 +1660,7 @@ public:
         bool ret = false;
         AMDTProfileCounterDesc desc;
 
-        if ((ret = GetCounterDescById(counterId, desc)))
+        if ((ret = GetCounterDescById(counterId, desc)) == true)
         {
             if (AMDT_PROFILE_COUNTER_TYPE_RAW == desc.m_type)
             {
@@ -1710,7 +1689,7 @@ public:
         bool ret = false;
         AMDTProfileCounterDesc desc;
 
-        if ((ret = GetCounterDescById(counterId, desc)))
+        if ((ret = GetCounterDescById(counterId, desc)) == true)
         {
             if (AMDT_PROFILE_COUNTER_TYPE_RAW == desc.m_type)
             {
@@ -1777,7 +1756,7 @@ public:
         if (IS_UNKNOWN_FUNC(func.m_functionId))
         {
             // Get the offset and moduleid
-            gtUInt32 funcOffset = func.m_startOffset;
+            gtUInt32 funcOffset = static_cast<gtUInt32>(func.m_startOffset);
             AMDTModuleId moduleId = func.m_moduleId;
             gtUInt64 unknownFuncModOffset;
             GET_MODOFFSET_FOR_UNKNOWN_FUNC(moduleId, funcOffset, unknownFuncModOffset);
@@ -1835,7 +1814,7 @@ public:
 
         if (IS_UNKNOWN_FUNC(func.m_functionId))
         {
-            gtUInt32 funcOffset = func.m_startOffset;
+            gtUInt32 funcOffset = static_cast<gtUInt32>(func.m_startOffset);
             AMDTModuleId moduleId = func.m_moduleId;
             gtUInt64 unknownFuncModOffset;
             GET_MODOFFSET_FOR_UNKNOWN_FUNC(moduleId, funcOffset, unknownFuncModOffset);
@@ -2030,7 +2009,7 @@ public:
 
                 if (AMDT_PROFILE_COUNTER_TYPE_RAW == desc.m_type)
                 {
-                    if ((ret = GetRawCounterValueFromSampleValueVec(profileDataVec, counterId, sampleValue, samplePerc)))
+                    if ((ret = GetRawCounterValueFromSampleValueVec(profileDataVec, counterId, sampleValue, samplePerc)) == true)
                     {
                         sampleData.m_counterId = counterId;
                         sampleData.m_sampleCount = sampleValue;
@@ -2047,7 +2026,7 @@ public:
                     {
                         ColumnSpec& columnSpec = it->second;
 
-                        if ((ret = GetDataForColumnSpec(columnSpec, profileDataVec, sampleValue)))
+                        if ((ret = GetDataForColumnSpec(columnSpec, profileDataVec, sampleValue)) == true)
                         {
                             sampleData.m_counterId = counterId;
                             sampleData.m_sampleCount = sampleValue;
@@ -2166,7 +2145,7 @@ public:
         if (it != m_unknownFuncIdInfoMap.end())
         {
             origFuncId = funcId & 0xffff0000;
-            offset = it->second.m_startOffset;
+            offset = static_cast<gtUInt32>(it->second.m_startOffset);
             name = it->second.m_name;
             ret = true;
         }
@@ -2221,7 +2200,7 @@ public:
 
             if (isUnkownFunc)
             {
-                funcOffset = unknownFuncInfo.m_startOffset;
+                funcOffset = static_cast<gtUInt32>(unknownFuncInfo.m_startOffset);
             }
 
             ret = ret && m_pDbAdapter->GetFunctionProfileData(dbFuncId,
@@ -2244,7 +2223,7 @@ public:
 
                 // if function size is zero, compute the size from instruction data.
                 gtUInt32 functionSize = functionData.m_functionInfo.m_size;
-                gtUInt32 startOffset = functionData.m_functionInfo.m_startOffset;
+                gtUInt32 startOffset = static_cast<gtUInt32>(functionData.m_functionInfo.m_startOffset);
                 gtUInt32 nbrInsts = functionData.m_instDataList.size();
 
                 if (functionSize == 0 && nbrInsts)
@@ -2286,7 +2265,7 @@ public:
                 functionInfo.m_moduleId = CXL_GET_DB_MODULE_ID(functionId);
 
                 HandleUnknownFunction(functionInfo);
-                funcStartOffset = functionInfo.m_startOffset;
+                funcStartOffset = static_cast<gtUInt32>(functionInfo.m_startOffset);
             }
 
             ret = m_pDbAdapter->GetFunctionInfo(functionId, funcStartOffset, functionInfo);
@@ -2388,7 +2367,7 @@ public:
         return retVal;
     }
 
-    bool GetSrcFilePathForVaddr(ExecutableFile& exeFile, gtVAddr rvAddr, gtString& srcFilePath, gtUInt32& srcLine)
+    bool GetSrcFilePathForVaddr(ExecutableFile& exeFile, gtRVAddr rvAddr, gtString& srcFilePath, gtUInt32& srcLine)
     {
         bool ret = false;
         SymbolEngine* pSymbolEngine = exeFile.GetSymbolEngine();
@@ -2532,7 +2511,7 @@ public:
                 if (AMDT_MODULE_TYPE_NATIVE == modInfo.m_type)
                 {
                     moduleId = funcInfo.m_moduleId;
-                    offset = funcInfo.m_startOffset;
+                    offset = static_cast<gtUInt32>(funcInfo.m_startOffset);
 
                     ret = GetSrcFilePathForModuleOffset(moduleId, offset, srcFilePath, srcLine);
                 }
@@ -2625,7 +2604,7 @@ public:
                 if (AMDT_MODULE_TYPE_NATIVE == modInfo.m_type)
                 {
                     retVal = GetNativeDisassembly(funcInfo.m_moduleId,
-                                                  funcInfo.m_startOffset,
+                                                  static_cast<gtUInt32>(funcInfo.m_startOffset),
                                                   funcInfo.m_size,
                                                   pFuncData,
                                                   disasmInfoVec);
@@ -2866,7 +2845,7 @@ public:
 
                         if (ret)
                         {
-                            disasmInfo.m_sourceLine = srcData.m_line;
+                            disasmInfo.m_sourceLine = static_cast<gtUInt16>(srcData.m_line);
                             retVal = CXL_DATAACCESS_SUCCESS;
                         }
                     }
@@ -3016,7 +2995,7 @@ public:
                                     AMDTSourceAndDisasmInfo instInfo;
 
                                     instInfo.m_offset = currOffset;
-                                    instInfo.m_sourceLine = currLineNumber;
+                                    instInfo.m_sourceLine = static_cast<gtUInt16>(currLineNumber);
 
                                     const gtUByte* pCurrentCode = pCode + instInfo.m_offset;
 
@@ -3061,7 +3040,7 @@ public:
                                     AMDTSourceAndDisasmInfo instInfo;
 
                                     instInfo.m_offset = currOffset;
-                                    instInfo.m_sourceLine = currLineNumber;
+                                    instInfo.m_sourceLine = static_cast<gtUInt16>(currLineNumber);
 
                                     const gtUByte* pCurrentCode = pCode + instInfo.m_offset;
 
@@ -3311,7 +3290,7 @@ public:
                             AMDTSourceAndDisasmInfo instInfo;
 
                             instInfo.m_offset = currOffset;
-                            instInfo.m_sourceLine = currLineNumber;
+                            instInfo.m_sourceLine = static_cast<gtUInt16>(currLineNumber);
 
                             const gtUByte* pCurrentCode = pCode + instInfo.m_offset;
 
@@ -3391,7 +3370,7 @@ public:
                     disasmInfo.m_codeByteStr << L" ";
                 }
 
-                disasmInfo.m_size = bytesUsed;
+                disasmInfo.m_size = static_cast<gtUInt16>(bytesUsed);
                 ret = true;
             }
             else
@@ -3473,7 +3452,11 @@ public:
         return true;
     }
 
-    bool GetFunctionNode(functionIdcgNodeMap& nodeMap, CallstackFrame& frame, gtUInt32 deepSamples, gtUInt32 pathCount, cgNode*& funcNode)
+    bool GetFunctionNode(functionIdcgNodeMap& nodeMap,
+                         CallstackFrame& frame,
+                         double deepSamples,
+                         gtUInt32 pathCount,
+                         cgNode*& funcNode)
     {
         bool ret = false;
         AMDTFunctionId funcId = frame.m_funcInfo.m_functionId;
@@ -3723,7 +3706,7 @@ public:
                     if (IS_UNKNOWN_FUNC(leaf.m_funcInfo.m_functionId))
                     {
                         funcId = leaf.m_funcInfo.m_functionId;
-                        funcOffset = leaf.m_funcInfo.m_startOffset;
+                        funcOffset = static_cast<gtUInt32>(leaf.m_funcInfo.m_startOffset);
                     }
 
                     ret = m_pDbAdapter->GetCallstackLeafData(pid,
@@ -3927,7 +3910,7 @@ public:
     }
 #endif //0
 
-    bool CopyCGNode(AMDTCallGraphFunction& cgFunc, cgNode& node, gtUInt32 totalDeepSamples)
+    bool CopyCGNode(AMDTCallGraphFunction& cgFunc, cgNode& node, double totalDeepSamples)
     {
         cgFunc.m_functionInfo = node.m_funcInfo;
         cgFunc.m_moduleBaseAddr = node.m_moduleBaseAddr;
@@ -3938,15 +3921,18 @@ public:
 
         if (cgFunc.m_totalDeepSamples > 0 && totalDeepSamples > 0)
         {
-            cgFunc.m_deepSamplesPerc = CXL_COMPUTE_PERCENTAGE(cgFunc.m_totalDeepSamples, (double)(totalDeepSamples));
+            cgFunc.m_deepSamplesPerc = CXL_COMPUTE_PERCENTAGE(cgFunc.m_totalDeepSamples, totalDeepSamples);
         }
 
-        GetSrcFilePathForModuleOffset(node.m_funcInfo.m_moduleId, node.m_funcInfo.m_startOffset, cgFunc.m_srcFile, cgFunc.m_srcFileLine);
+        GetSrcFilePathForModuleOffset(node.m_funcInfo.m_moduleId,
+                                      static_cast<gtUInt32>(node.m_funcInfo.m_startOffset),
+                                      cgFunc.m_srcFile,
+                                      cgFunc.m_srcFileLine);
 
         return true;
     }
 
-    bool CopyCGEdge(AMDTCallGraphFunction& cgFunc, cgEdge& edge, gtUInt32 totalDeepSamples)
+    bool CopyCGEdge(AMDTCallGraphFunction& cgFunc, cgEdge& edge, double totalDeepSamples)
     {
         cgFunc.m_functionInfo = edge.m_funcInfo;
         cgFunc.m_moduleBaseAddr = edge.m_moduleBaseAddr;
@@ -3957,13 +3943,13 @@ public:
 
         if (cgFunc.m_totalDeepSamples > 0 && totalDeepSamples > 0)
         {
-            cgFunc.m_deepSamplesPerc = CXL_COMPUTE_PERCENTAGE(cgFunc.m_totalDeepSamples, (double)(totalDeepSamples));
+            cgFunc.m_deepSamplesPerc = CXL_COMPUTE_PERCENTAGE(cgFunc.m_totalDeepSamples, totalDeepSamples);
         }
 
         return true;
     }
 
-    bool CopyCGSelf(AMDTCallGraphFunction& cgFunc, cgNode& node, gtUInt32 totalDeepSamples)
+    bool CopyCGSelf(AMDTCallGraphFunction& cgFunc, cgNode& node, double totalDeepSamples)
     {
         cgFunc.m_functionInfo = node.m_funcInfo;
         // override the name to [self]
@@ -3978,7 +3964,7 @@ public:
         //  For "[self]" entry the m_deepSamplesPerc denotes the percentage of self samples w.r.t to deep sample of the function
         if (cgFunc.m_totalSelfSamples > 0 && totalDeepSamples > 0)
         {
-            cgFunc.m_deepSamplesPerc = CXL_COMPUTE_PERCENTAGE(cgFunc.m_totalSelfSamples, (double)(totalDeepSamples));
+            cgFunc.m_deepSamplesPerc = CXL_COMPUTE_PERCENTAGE(cgFunc.m_totalSelfSamples, totalDeepSamples);
         }
 
         GetSrcFilePathForFuncId(node.m_funcInfo.m_functionId, cgFunc.m_srcFile, cgFunc.m_srcFileLine);
@@ -4015,7 +4001,7 @@ public:
             if (ret && (nullptr != pCgFunctionMap))
             {
                 auto rootFuncIter = pCgFunctionMap->find(CXL_ROOT_FUNCTION_ID);
-                gtUInt32 totalDeepSamples = 0;
+                double totalDeepSamples = 0.0;
 
                 if (pCgFunctionMap->end() != rootFuncIter)
                 {
@@ -4062,7 +4048,7 @@ public:
 
             if (pCgFunctionMap->end() != cgFuncIter)
             {
-                gtUInt32 totalDeepSamples = cgFuncIter->second.m_totalDeepSamples.m_sampleCount;
+                double totalDeepSamples = cgFuncIter->second.m_totalDeepSamples.m_sampleCount;
 
                 for (auto& parent : cgFuncIter->second.m_callerVec)
                 {
@@ -4121,7 +4107,7 @@ public:
 
         bool isUnkownFunc = IsUnknownFunctionId(funcId, dbFuncId, unknownFuncInfo);
 
-        AMDTUInt32 funcOffset = (isUnkownFunc) ? unknownFuncInfo.m_startOffset : 0;
+        AMDTUInt32 funcOffset = (isUnkownFunc) ? static_cast<gtUInt32>(unknownFuncInfo.m_startOffset) : 0;
 
         ret = GetCallGraphPathsForNonLeafFunction(processId, dbFuncId, funcOffset, paths);
 
@@ -4319,7 +4305,7 @@ public:
 
                     if (b64bitSystemDir)
                     {
-                        b64bitSystemDir = Wow64DisableWow64FsRedirection(&oldValue);
+                        b64bitSystemDir = (Wow64DisableWow64FsRedirection(&oldValue) == TRUE);
                     }
                 }
 #endif // AMDT_WINDOWS_OS
@@ -4407,7 +4393,7 @@ public:
 
                 if (pSymbolEngine != nullptr)
                 {
-                    pFuncSymbol = pSymbolEngine->LookupFunction(funcInfo.m_startOffset, &funcRvaEnd);
+                    pFuncSymbol = pSymbolEngine->LookupFunction(static_cast<gtRVAddr>(funcInfo.m_startOffset), &funcRvaEnd);
                 }
 
                 if (nullptr != pFuncSymbol)
@@ -4422,7 +4408,8 @@ public:
                     if (funcSize == 0)
                     {
                         // FIXME
-                        funcSize = (funcInfo.m_startOffset > pFuncSymbol->m_rva) ? (funcInfo.m_startOffset + 16) - pFuncSymbol->m_rva : 0;
+                        gtUInt32 offset = static_cast<gtUInt32>(funcInfo.m_startOffset);
+                        funcSize = (offset > pFuncSymbol->m_rva) ? (offset + 16) - pFuncSymbol->m_rva : 0;
                     }
 
                     // Only if we have found the function
@@ -4845,7 +4832,7 @@ bool cxlProfileDataReader::GetFunctionData(AMDTFunctionId            funcId,
                                            AMDTThreadId              threadId,
                                            AMDTProfileFunctionData&  functionData)
 {
-    int ret = false;
+    bool ret = false;
 
     if (nullptr != m_pImpl)
     {
