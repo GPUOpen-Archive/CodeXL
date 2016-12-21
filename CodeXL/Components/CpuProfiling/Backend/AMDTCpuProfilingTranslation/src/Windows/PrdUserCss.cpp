@@ -7,8 +7,6 @@
 ///
 //==================================================================================
 
-#include <QString>
-
 #include <new>
 #include <AMDTOSWrappers/Include/osAtomic.h>
 #include <AMDTOSWrappers/Include/osDebugLog.h>

@@ -211,7 +211,7 @@ unsigned char CluInfo::GetOperationSize(gtVAddr RIP,
         fmit->second.codeOffset = pe.GetCodeBase();
 #else
         // Reduce the amount of memory - more alloc/free, but less memory used
-        codeOffset = RIP - pModInfo->ModuleStartAddr - fmit->second.startRva;
+        codeOffset = static_cast<DWORD>(RIP - pModInfo->ModuleStartAddr - fmit->second.startRva);
         csiz = std::min((DWORD)4096, (fmit->second.endRva - (fmit->second.startRva + codeOffset)));
         fmit->second.startRva = static_cast<gtRVAddr>(RIP - pModInfo->ModuleStartAddr);
         fmit->second.endRva = static_cast<gtRVAddr>(fmit->second.startRva + csiz - 1);
@@ -229,7 +229,7 @@ unsigned char CluInfo::GetOperationSize(gtVAddr RIP,
     // Find the size of the operation - use the disassembler
     codeVaddr = pModInfo->ModuleStartAddr;
     code = fmit->second.getCodeBytes();
-    codeOffset = RIP - pModInfo->ModuleStartAddr - fmit->second.startRva;
+    codeOffset = static_cast<DWORD>(RIP - pModInfo->ModuleStartAddr - fmit->second.startRva);
 
     if (codeOffset > fmit->second.codeSize)
     {
@@ -378,7 +378,7 @@ unsigned char CluInfo::GetOperationSize(gtVAddr RIP,
         return SIZE_ERROR;  // Default to 4 bytes
     }
 
-    return dType.MemAccessSize[memopIndex];
+    return static_cast<unsigned char>(dType.MemAccessSize[memopIndex]);
 }
 
 void CluInfo::RecordCacheLdSt(IBSOpRecordData* ibsOpRec,
@@ -485,7 +485,7 @@ void CluInfo::CacheEvent(IBSOpRecordData* ibsOpRec,
     // Check for access spanning 2 cache lines
     if (m_pCache->SpansLines(offset, size))
     {
-        unsigned char off = m_pCache->GetBytesPerLine() - offset; // remaining bytes in 1st cache line
+        unsigned char off = m_pCache->GetBytesPerLine() - static_cast<UINT8>(offset); // remaining bytes in 1st cache line
         CacheEvent(ibsOpRec, off, isLoad, bSizeUnknown, modIndex, false);
         // Adjust the address
         ibsOpRec->m_IbsDcPhysAd += off;
@@ -557,14 +557,21 @@ void CluInfo::CacheLineEviction(CacheDataStuff& cData, unsigned int index, unsig
         // Update data for the instruction
         cluMap_it->second.byteMask |= pidrip_it->second.access_bitmap;
         cluMap_it->second.tot_evictions++;  // Increment # evictions
-        cluMap_it->second.min_bytes = std::min(bitmap, (UINT64)cluMap_it->second.min_bytes);
-        cluMap_it->second.max_bytes = std::max(bitmap, (UINT64)cluMap_it->second.max_bytes);
+
+        UINT64 result = 0;
+
+        result = std::min(bitmap, (UINT64)cluMap_it->second.min_bytes);
+        cluMap_it->second.min_bytes = static_cast<UINT8>(result);
+
+        result = std::max(bitmap, (UINT64)cluMap_it->second.max_bytes);
+        cluMap_it->second.max_bytes = static_cast<UINT8>(result);
+
         cluMap_it->second.bSizeUnknown = pidrip_it->second.bSizeUnknown;
         cluMap_it->second.tot_rw += pidrip_it->second.rw_bytes;
         cluMap_it->second.num_rw += pidrip_it->second.rw_count;
         cluMap_it->second.modIndex = pidrip_it->second.modIndex;
         cluMap_it->second.SpanCount += pidrip_it->second.SpanCount;
-        cluMap_it->second.sumMax += bitmap;
+        cluMap_it->second.sumMax += static_cast<UINT32>(bitmap);
 
 #ifdef MAINTAIN_DATA
         AddrMap::iterator amit = pidrip_it->second.dataAddresses.begin();
@@ -587,8 +594,12 @@ void CluInfo::CacheLineEviction(CacheDataStuff& cData, unsigned int index, unsig
 #endif
 
         // Update data for the line
-        cData.max_bytes = std::max(bitmap, (UINT64)cData.max_bytes);
-        cData.min_bytes = std::min(bitmap, (UINT64)cData.min_bytes);
+        result = std::max(bitmap, (UINT64)cData.max_bytes);
+        cData.max_bytes = static_cast<UINT8>(result);
+
+        result = std::min(bitmap, (UINT64)cData.min_bytes);
+        cData.min_bytes = static_cast<UINT8>(result);
+
         cData.tot_rw += pidrip_it->second.rw_count;
         cData.tot_rw_bytes += pidrip_it->second.rw_bytes;
     }
@@ -607,9 +618,9 @@ void CluInfo::IncrCacheByteCount(CacheDataStuff& cacheData,
 {
     GT_UNREFERENCED_PARAMETER(isLoad);
 
-    UINT32 PID = ibsOpRec->m_PID;
+    UINT32 PID = static_cast<UINT32>(ibsOpRec->m_PID);
     gtVAddr RIP = ibsOpRec->m_RIP;
-    UINT32 TID = ibsOpRec->m_ThreadHandle;
+    UINT32 TID = static_cast<UINT32>(ibsOpRec->m_ThreadHandle);
     UINT8 core = ibsOpRec->m_ProcessorID;
     UINT64 bitmap = (1 << size) - 1;    // Number of bits in low-order bits
     bitmap <<= 64 - offset - size;

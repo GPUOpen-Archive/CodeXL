@@ -10,10 +10,6 @@
 #ifndef _PRDREADER_H_
 #define _PRDREADER_H_
 
-#pragma warning(push)
-#pragma warning(disable: 4251 4201)
-
-#include <qstring.h>
 
 #include <AMDTBaseTools/Include/gtList.h>
 #include <AMDTBaseTools/Include/gtMap.h>
@@ -22,16 +18,18 @@
 #include <WinIoCtl.h>
 
 #include <CpuProf/inc/UserAccess/CpuProfDriver.h>
+
 #pragma warning(push)
 #pragma warning(disable:4091) //'typedef ': ignored on left of '' when no variable is declared
 #include <CpuProf/inc/UserAccess/PrdRecords.h>
 #pragma warning(pop)
 
-
 #include <AMDTCpuPerfEventUtils/inc/EventEncoding.h>
 #include <AMDTCpuProfilingRawData/inc/CpuProfilingRawDataDLLBuild.h>
-#include "PrdOldRecords.h"
 
+#pragma warning(push)
+#pragma warning(disable: 4201) // nameless struct/union
+#include "PrdOldRecords.h"
 #pragma warning(pop)
 
 #define ERBT_713_NON_CANONICAL_MASK 0x0000FFFFFFFFFFFF

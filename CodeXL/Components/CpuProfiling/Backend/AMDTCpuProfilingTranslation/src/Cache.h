@@ -48,12 +48,12 @@ public:
 
     UINT32 GetIndex(gtVAddr addr)
     {
-        return (addr >> m_indexShift) & m_indexMask;
+        return static_cast<UINT32>((addr >> m_indexShift) & m_indexMask);
     }
 
     UINT32 GetOffset(gtVAddr addr)
     {
-        return (addr >> m_offsetShift) & m_offsetMask;
+        return static_cast<UINT32>((addr >> m_offsetShift) & m_offsetMask);
     }
 
     UINT8 GetBytesPerLine()
@@ -77,7 +77,7 @@ public:
         bitmap = (bitmap & 0x33333333) + ((bitmap >>  2) & 0x33333333);
         bitmap = (bitmap & 0x0f0f0f0f) + ((bitmap >>  4) & 0x0f0f0f0f);
         bitmap = (bitmap & 0x00ff00ff) + ((bitmap >>  8) & 0x00ff00ff);
-        return (bitmap & 0x0000ffff) + ((bitmap >> 16) & 0x0000ffff);
+        return static_cast<UINT8>((bitmap & 0x0000ffff) + ((bitmap >> 16) & 0x0000ffff));
     }
 
     inline UINT8 CountBits(UINT8 bitmap)
@@ -101,7 +101,7 @@ public:
 
         if (x >= (1 <<  1)) {           l |=  1; }
 
-        return l;
+        return static_cast<UINT8>(l);
     }
 
 private:

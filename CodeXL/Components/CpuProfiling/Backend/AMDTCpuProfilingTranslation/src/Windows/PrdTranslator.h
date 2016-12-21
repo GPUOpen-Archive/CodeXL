@@ -10,14 +10,11 @@
 #ifndef _PRDTRANSLATOR_H_
 #define _PRDTRANSLATOR_H_
 
-// Suppress Qt header warnings
-#pragma warning(push)
-#pragma warning(disable : 4127 4718)
-#include <qtIgnoreCompilerWarnings.h>
-#include <QString>
-#pragma warning(pop)
 
 #include <memory>
+
+#include <QStringList>
+
 #include "MemoryMap.h"
 #include "CluInfo.h"
 #include <AMDTCpuPerfEventUtils/inc/EventEncoding.h>

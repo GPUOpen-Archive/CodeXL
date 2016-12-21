@@ -11,10 +11,8 @@
 #ifndef _CLUINFO_H_
 #define _CLUINFO_H_
 
-#include <stdlib.h>
-#include <assert.h>
 #include <windows.h>
-#include <QDir>
+#include <cstdlib>
 #include <map>
 #include <list>
 

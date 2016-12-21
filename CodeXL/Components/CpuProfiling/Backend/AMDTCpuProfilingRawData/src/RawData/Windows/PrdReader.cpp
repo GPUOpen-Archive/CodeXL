@@ -9,14 +9,12 @@
 
 #pragma warning( disable : 4127 )
 
-
-#include <QDir>
-#include <QString>
-
 #include <Windows/PrdReader.h>
 #include <AMDTOSWrappers/Include/osDebugLog.h>
 #include <AMDTOSWrappers/Include/osCpuid.h>
 #include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
+
+
 enum physicalCtrs
 {
     NBR_OF_PHY_CTR              = 4,
@@ -701,14 +699,18 @@ HRESULT PrdReader::ConvertSampleData(const RawPRDRecord& rawRecord, RecordDataSt
                 pRecData->m_ThreadHandle = pEvtRec->m_ThreadHandle;
                 pRecData->m_DeltaTick = pEvtRec->m_TickStamp;
 
+                gtUInt32 weight = 0;
+
                 if (isL2IEvent)
                 {
-                    pRecData->m_weight = GetWeight(pEvtRec->m_Core, L2I_PMC_WEIGHT_BASE + pEvtRec->m_EventCounter);
+                    weight = GetWeight(pEvtRec->m_Core, L2I_PMC_WEIGHT_BASE + pEvtRec->m_EventCounter);
                 }
                 else
                 {
-                    pRecData->m_weight = GetWeight(pEvtRec->m_Core, PMC_WEIGHT_BASE + pEvtRec->m_EventCounter);
+                    weight = GetWeight(pEvtRec->m_Core, PMC_WEIGHT_BASE + pEvtRec->m_EventCounter);
                 }
+
+                pRecData->m_weight = static_cast<gtUInt16>(weight);
             }
             else    // ca 2.9 and earlier
             {
@@ -745,7 +747,8 @@ HRESULT PrdReader::ConvertSampleData(const RawPRDRecord& rawRecord, RecordDataSt
                 pRecData->m_RIP = pRec->m_InstructionPointer;
                 pRecData->m_ThreadHandle = pRec->m_ThreadHandle;
                 pRecData->m_DeltaTick = pRec->m_TickStamp;
-                pRecData->m_weight = GetWeight(pRec->m_Core, APIC_WEIGHT_BASE);
+                auto weight = GetWeight(pRec->m_Core, APIC_WEIGHT_BASE);
+                pRecData->m_weight = static_cast<gtUInt16>(weight);
             }
             else
             {
@@ -2254,14 +2257,18 @@ HRESULT PrdReaderThread::ConvertSampleData(const RawPRDRecord& rawRecord, Record
                 pRecData->m_ThreadHandle = pEvtRec->m_ThreadHandle;
                 pRecData->m_DeltaTick = pEvtRec->m_TickStamp;
 
+                gtUInt32 weight = 0;
+
                 if (isL2IEvent)
                 {
-                    pRecData->m_weight = GetWeight(pEvtRec->m_Core, L2I_PMC_WEIGHT_BASE + pEvtRec->m_EventCounter);
+                    weight = GetWeight(pEvtRec->m_Core, L2I_PMC_WEIGHT_BASE + pEvtRec->m_EventCounter);
                 }
                 else
                 {
-                    pRecData->m_weight = GetWeight(pEvtRec->m_Core, PMC_WEIGHT_BASE + pEvtRec->m_EventCounter);
+                    weight = GetWeight(pEvtRec->m_Core, PMC_WEIGHT_BASE + pEvtRec->m_EventCounter);
                 }
+
+                pRecData->m_weight = static_cast<gtUInt16>(weight);
             }
             else    // ca 2.9 and earlier
             {
@@ -2295,14 +2302,15 @@ HRESULT PrdReaderThread::ConvertSampleData(const RawPRDRecord& rawRecord, Record
                 pRecData->m_PID = pRec->m_ProcessHandle;
                 pRecData->m_ProcessorID = pRec->m_Core;
 
-                // Baskar: Linear address may be present in canonical or non-canonical form.
+                // Linear address may be present in canonical or non-canonical form.
                 // In canonical form, bits 48 to 63 must be the copies of bit 47 - which can either be 1 or 0.
                 // For the canonical form address with 0xffff... kernel module discovery will fail.
                 pRecData->m_RIP = pRec->m_InstructionPointer & ERBT_713_NON_CANONICAL_MASK;
 
                 pRecData->m_ThreadHandle = pRec->m_ThreadHandle;
                 pRecData->m_DeltaTick = pRec->m_TickStamp;
-                pRecData->m_weight = GetWeight(pRec->m_Core, APIC_WEIGHT_BASE);
+                auto weight = GetWeight(pRec->m_Core, APIC_WEIGHT_BASE);
+                pRecData->m_weight = static_cast<gtUInt16>(weight);
             }
             else
             {

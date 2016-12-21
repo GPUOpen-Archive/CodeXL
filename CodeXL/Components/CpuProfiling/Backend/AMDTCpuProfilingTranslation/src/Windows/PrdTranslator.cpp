@@ -12,17 +12,11 @@
 // Change list:    $Change: 569611 $
 //=====================================================================
 
-#include <QDateTime>
-#include <QDir>
-
 #include <AMDTBaseTools/Include/gtString.h>
-#include <AMDTBaseTools/Include/gtList.h>
 #include <AMDTBaseTools/Include/gtHashSet.h>
 #include <AMDTBaseTools/Include/gtAssert.h>
 #include <AMDTOSWrappers/Include/osAtomic.h>
 #include <AMDTOSWrappers/Include/osCpuid.h>
-#include <AMDTOSWrappers/Include/osDirectory.h>
-#include <AMDTOSWrappers/Include/osFile.h>
 #include <AMDTOSWrappers/Include/osProcess.h>
 #include <AMDTOSWrappers/Include/osDebugLog.h>
 #include <AMDTOSWrappers/Include/osGeneralFunctions.h>
@@ -33,7 +27,6 @@
 #include <AMDTCpuPerfEventUtils/inc/EventEngine.h>
 #include <AMDTExecutableFormat/inc/PeFile.h>
 #include <AMDTCpuCallstackSampling/inc/CallStackBuilder.h>
-//#include <AMDTCpuCallstackSampling/inc/CssWriter.h>
 
 #include "ThreadPool.h"
 #include "PrdTranslator.h"
@@ -4108,59 +4101,11 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
 {
     HRESULT  res = S_OK;
 
-#if ENABLE_OLD_PROFILE_WRITER
-    // Write the CSS files to the same directory as the profile file
-    for (gtMap<ProcessIdType, ProcessInfo*>::iterator it = m_processInfos.begin(), itEnd = m_processInfos.end(); it != itEnd; ++it)
-    {
-        ProcessInfo* pProcessInfo = it->second;
-
-        if (nullptr != pProcessInfo && 0U != pProcessInfo->m_callGraph.GetOrder())
-        {
-            ProcessIdType pid = it->first;
-
-            QString cssFile = proFile.section("\\", 0, -2) + '\\' + QString::number(pid) + ".css";
-
-            TiProcessWorkingSetQuery workingSet(pid);
-
-            CssWriter cssWriter;
-            cssWriter.Open(cssFile.toStdWString().c_str());
-            cssWriter.Write(pProcessInfo->m_callGraph, workingSet, pid);
-        }
-    }
-#else
     GT_UNREFERENCED_PARAMETER(processMap);
     GT_UNREFERENCED_PARAMETER(pMissedInfo);
     GT_UNREFERENCED_PARAMETER(tPrdReader);
-#endif
 
     UpdateProgressBar(60ULL, 100ULL);
-
-#if ENABLE_OLD_PROFILE_WRITER
-    int cpuFamily = tPrdReader.GetCpuFamily();
-    int cpuModel = tPrdReader.GetCpuModel();
-
-    if (0 == cpuFamily)
-    {
-        osCpuid cpuid;
-        cpuFamily = cpuid.getFamily();
-        cpuModel = cpuid.getModel();
-    }
-
-    unsigned int cpuCount = tPrdReader.GetCoreCount();
-
-    // Build up the core topology map.
-    CoreTopologyMap topMap;
-
-    for (unsigned int j = 0; j < cpuCount; j++)
-    {
-        CoreTopology topTemp;
-
-        if (tPrdReader.GetTopology(j, &(topTemp.processor), &(topTemp.numaNode)))
-        {
-            topMap.insert(CoreTopologyMap::value_type(j, topTemp));
-        }
-    }
-#endif
 
     //  Write out all the jit jnc that were sampled during the profile
     //  to the <session name>.dir directory, assumes that the output file is
@@ -4197,103 +4142,14 @@ HRESULT PrdTranslator::WriteProfile(const QString& proFile,
 
     UpdateProgressBar(70ULL, 100ULL);
 
-#if ENABLE_OLD_PROFILE_WRITER
-    if (!WriteProfileFile(proFile.toStdWString().c_str(),
-                          &processMap,
-                          &moduleMap,
-                          &topMap,
-                          cpuCount,
-                          pMissedInfo->missedCount,
-                          cpuFamily,
-                          cpuModel))
-    {
-        res = E_UNEXPECTED;
-        return res;
-    }
-#endif
-
     return res;
 }
-#if ENABLE_OLD_PROFILE_WRITER
-bool PrdTranslator::WriteProfileFile(const gtString& path,
-                                     const PidProcessMap* procMap,
-                                     const NameModuleMap* modMap,
-                                     const CoreTopologyMap* pTopMap,
-                                     gtUInt32 num_cpus,
-                                     gtUInt64 missedCount,
-                                     int cpuFamily,
-                                     int cpuModel)
-{
-    CpuProfileWriter writer;
-    CpuProfileInfo info;
 
-    // Populate info
-    info.m_numCpus      = num_cpus;
-    info.m_numSamples   = 0;
-    info.m_numMisses    = missedCount;
-    info.m_numModules   = modMap->size();
-    info.m_tbpVersion   = TBPVER_BEFORE_RI;
-    info.m_cpuFamily    = cpuFamily;
-    info.m_cpuModel     = cpuModel;
-    QString tmp = QDateTime::currentDateTime().toString();
-    info.setTimeStamp(tmp.toStdWString().c_str());
 
-    EventMap::const_iterator iter = m_eventMap.begin(), iterEnd = m_eventMap.end();
-
-    for (; iter != iterEnd; ++iter)
-    {
-        info.addEvent(iter->first, iter->second);
-    }
-
-    PidProcessMap::const_iterator pit = procMap->begin(), pend = procMap->end();
-
-    for (; pit != pend; ++pit)
-    {
-        info.m_numSamples += pit->second.getTotal();
-    }
-
-    if (nullptr != m_runInfo)
-    {
-        // We have the RI data, set current TBP version
-        info.m_tbpVersion = TBPVER_DEFAULT;
-
-        // populate RI info
-        info.m_targetPath = m_runInfo->m_targetPath;
-        info.m_wrkDirectory = m_runInfo->m_wrkDirectory;
-        info.m_cmdArguments = m_runInfo->m_cmdArguments;
-        info.m_envVariables = m_runInfo->m_envVariables;
-        info.m_profType = m_runInfo->m_profType;
-        info.m_profDirectory = m_runInfo->m_profDirectory;
-        info.m_profStartTime = m_runInfo->m_profStartTime;
-        info.m_profEndTime = m_runInfo->m_profEndTime;
-        info.m_isCSSEnabled = m_runInfo->m_isCSSEnabled;
-        info.m_cssUnwindDepth = m_runInfo->m_cssUnwindDepth;
-        info.m_cssScope = m_runInfo->m_cssScope;
-        info.m_isCssSupportFpo = m_runInfo->m_isCssSupportFpo;
-        info.m_isProfilingCLU = m_runInfo->m_isProfilingClu;
-        info.m_osName = m_runInfo->m_osName;
-        info.m_profScope = m_runInfo->m_profScope;
-    }
-
-    UpdateProgressBar(80ULL, 100ULL);
-
-    if (!writer.Write(path, &info, procMap, modMap, pTopMap))
-    {
-        OS_OUTPUT_FORMAT_DEBUG_LOG(OS_DEBUG_LOG_ERROR, L"Failed to write profile file '%ls'", path.asCharArray());
-        return false;
-    }
-
-    return true;
-}
-#endif
 unsigned int PrdTranslator::GetCpuCount() const
 {
     SYSTEM_INFO sysinfo;
-#ifdef CODEANALYST64
-    GetNativeSystemInfo(&sysinfo);
-#else
     GetSystemInfo(&sysinfo);
-#endif
     return sysinfo.dwNumberOfProcessors;
 }
 
